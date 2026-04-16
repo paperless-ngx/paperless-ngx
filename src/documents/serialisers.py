@@ -39,6 +39,7 @@ from drf_spectacular.utils import extend_schema_field
 from drf_spectacular.utils import extend_schema_serializer
 from drf_writable_nested.serializers import NestedUpdateMixin
 from guardian.core import ObjectPermissionChecker
+from guardian.shortcuts import get_objects_for_user
 from guardian.shortcuts import get_users_with_perms
 from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
@@ -2575,13 +2576,20 @@ class TaskSerializerV9(serializers.ModelSerializer):
         dup_of = obj.result_data.get("duplicate_of")
         if dup_of is None:
             return []
-        return list(
-            Document.global_objects.filter(pk=dup_of).values(
-                "id",
-                "title",
-                "deleted_at",
-            ),
-        )
+        request = self.context.get("request")
+        if request is None:
+            return []
+        user = request.user
+        qs = Document.global_objects.filter(pk=dup_of)
+        if not user.is_staff:
+            with_perms = get_objects_for_user(
+                user,
+                "documents.view_document",
+                qs,
+                accept_global_perms=False,
+            )
+            qs = with_perms | qs.filter(owner=user) | qs.filter(owner__isnull=True)
+        return list(qs.values("id", "title", "deleted_at"))
 
 
 class TaskSummarySerializer(serializers.Serializer):

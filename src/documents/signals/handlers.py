@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import hashlib
 import logging
 import re as _re
@@ -1066,11 +1067,15 @@ def _extract_input_data(
         if input_doc.mailrule_id:
             data["mailrule_id"] = input_doc.mailrule_id
         if overrides:
-            override_dict = {
-                k: v
-                for k, v in vars(overrides).items()
-                if v is not None and not k.startswith("_")
-            }
+            override_dict = {}
+            for k, v in vars(overrides).items():
+                if v is None or k.startswith("_"):
+                    continue
+                if isinstance(v, datetime.date):
+                    v = v.isoformat()
+                elif isinstance(v, Path):
+                    v = str(v)
+                override_dict[k] = v
             if override_dict:
                 data["overrides"] = override_dict
         return data

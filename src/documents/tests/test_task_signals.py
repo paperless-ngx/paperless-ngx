@@ -1,5 +1,7 @@
+import datetime
 import sys
 import uuid
+from pathlib import Path
 from unittest import mock
 
 import pytest
@@ -93,6 +95,33 @@ class TestBeforeTaskPublishHandler:
         task_id = send_publish("paperless_mail.tasks.process_mail_accounts", (), {})
         task = PaperlessTask.objects.get(task_id=task_id)
         assert task.input_data == {}
+
+    def test_overrides_date_serialized_as_iso_string(self, consume_input_doc):
+        """A datetime.date in overrides is stored as an ISO string so input_data is JSON-safe."""
+        overrides = DocumentMetadataOverrides(created=datetime.date(2024, 1, 15))
+
+        task_id = send_publish(
+            "documents.tasks.consume_file",
+            (consume_input_doc, overrides),
+            {},
+        )
+
+        task = PaperlessTask.objects.get(task_id=task_id)
+        assert task.input_data["overrides"]["created"] == "2024-01-15"
+
+    def test_overrides_path_serialized_as_string(self, consume_input_doc):
+        """A Path value in overrides is stored as a plain string so input_data is JSON-safe."""
+        overrides = DocumentMetadataOverrides()
+        overrides.filename = Path("/uploads/invoice.pdf")  # type: ignore[assignment]
+
+        task_id = send_publish(
+            "documents.tasks.consume_file",
+            (consume_input_doc, overrides),
+            {},
+        )
+
+        task = PaperlessTask.objects.get(task_id=task_id)
+        assert task.input_data["overrides"]["filename"] == "/uploads/invoice.pdf"
 
     @pytest.mark.parametrize(
         ("header_value", "expected_trigger_source"),

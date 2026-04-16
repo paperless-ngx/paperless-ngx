@@ -334,7 +334,7 @@ class TestAIIndex(DirectoriesMixin, TestCase):
         # lazy-loaded so mock the actual function
         with mock.patch("paperless_ai.indexing.update_llm_index") as update_llm_index:
             update_llm_index.side_effect = Exception("LLM index update failed.")
-            with self.assertRaises(Exception, msg="LLM index update failed."):
+            with self.assertRaisesRegex(Exception, "LLM index update failed."):
                 tasks.llmindex_index()
             update_llm_index.assert_called_once()
 

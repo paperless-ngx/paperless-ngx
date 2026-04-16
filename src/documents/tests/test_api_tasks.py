@@ -14,6 +14,7 @@ import pytest
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.utils import timezone
+from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -746,3 +747,97 @@ class TestRun:
             kwargs={"raise_on_error": False},
             headers={"trigger_source": PaperlessTask.TriggerSource.MANUAL},
         )
+
+
+@pytest.mark.django_db()
+class TestDuplicateDocumentsPermissions:
+    """duplicate_documents in the v9 response must respect document-level permissions."""
+
+    @pytest.fixture()
+    def user_v9_client(self, regular_user: User) -> APIClient:
+        regular_user.user_permissions.add(
+            Permission.objects.get(codename="view_paperlesstask"),
+        )
+        client = APIClient()
+        client.force_authenticate(user=regular_user)
+        client.credentials(HTTP_ACCEPT=ACCEPT_V9)
+        return client
+
+    def test_owner_sees_duplicate_document(
+        self,
+        user_v9_client: APIClient,
+        regular_user: User,
+    ) -> None:
+        """A non-staff user sees a duplicate_of document they own."""
+        doc = DocumentFactory(owner=regular_user, title="My Doc")
+        PaperlessTaskFactory(
+            owner=regular_user,
+            status=PaperlessTask.Status.SUCCESS,
+            result_data={"duplicate_of": doc.pk},
+        )
+
+        response = user_v9_client.get(ENDPOINT)
+
+        assert response.status_code == status.HTTP_200_OK
+        dupes = response.data[0]["duplicate_documents"]
+        assert len(dupes) == 1
+        assert dupes[0]["id"] == doc.pk
+
+    def test_unowned_duplicate_document_is_visible(
+        self,
+        user_v9_client: APIClient,
+        regular_user: User,
+    ) -> None:
+        """An unowned duplicate_of document is visible to any authenticated user."""
+        doc = DocumentFactory(owner=None, title="Shared Doc")
+        PaperlessTaskFactory(
+            owner=regular_user,
+            status=PaperlessTask.Status.SUCCESS,
+            result_data={"duplicate_of": doc.pk},
+        )
+
+        response = user_v9_client.get(ENDPOINT)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data[0]["duplicate_documents"]) == 1
+
+    def test_other_users_duplicate_document_is_hidden(
+        self,
+        user_v9_client: APIClient,
+        regular_user: User,
+        admin_user: User,
+    ) -> None:
+        """A non-staff user cannot see a duplicate_of document owned by another user."""
+        doc = DocumentFactory(owner=admin_user, title="Admin Doc")
+        PaperlessTaskFactory(
+            owner=regular_user,
+            status=PaperlessTask.Status.SUCCESS,
+            result_data={"duplicate_of": doc.pk},
+        )
+
+        response = user_v9_client.get(ENDPOINT)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data[0]["duplicate_documents"] == []
+
+    def test_explicit_permission_grants_visibility(
+        self,
+        user_v9_client: APIClient,
+        regular_user: User,
+        admin_user: User,
+    ) -> None:
+        """A user with explicit guardian view_document permission sees the duplicate_of document."""
+        doc = DocumentFactory(owner=admin_user, title="Granted Doc")
+        assign_perm("view_document", regular_user, doc)
+        PaperlessTaskFactory(
+            owner=regular_user,
+            status=PaperlessTask.Status.SUCCESS,
+            result_data={"duplicate_of": doc.pk},
+        )
+
+        response = user_v9_client.get(ENDPOINT)
+
+        assert response.status_code == status.HTTP_200_OK
+        dupes = response.data[0]["duplicate_documents"]
+        assert len(dupes) == 1
+        assert dupes[0]["id"] == doc.pk
