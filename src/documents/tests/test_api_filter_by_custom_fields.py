@@ -440,6 +440,32 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
             ),
         )
 
+    def test_exact_monetary(self) -> None:
+        # Users should be able to search for "EUR50.00"
+        self._assert_query_match_predicate(
+            ["monetary_field", "exact", "EUR50.00"],
+            lambda document: (
+                "monetary_field" in document
+                and document["monetary_field"] is not None
+                and (
+                    document["monetary_field"] == "EUR50.00" # With currency symbol
+                    or document["monetary_field"] == "50.00" # No currency symbol
+                )
+            ),
+        )
+        # Also works for values stored without a currency prefix ("50.00")
+        self._assert_query_match_predicate(
+            ["monetary_field", "exact", "101.00"],
+            lambda document: (
+                "monetary_field" in document
+                and document["monetary_field"] is not None
+                and (
+                    document["monetary_field"] == "EUR101.00" # With currency symbol
+                    or document["monetary_field"] == "101.00" # No currency symbol
+                )
+            ),
+        )
+
     def test_gt_monetary(self) -> None:
         self._assert_query_match_predicate(
             ["monetary_field", "gt", "99"],

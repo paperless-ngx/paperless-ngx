@@ -6,6 +6,8 @@ import json
 import logging
 import operator
 from contextlib import contextmanager
+from decimal import Decimal
+from decimal import InvalidOperation
 from typing import TYPE_CHECKING
 from typing import Any
 
@@ -519,6 +521,18 @@ class CustomFieldQueryParser:
             and op in self.EXPR_BY_CATEGORY["arithmetic"]
         ):
             value_field_name = "value_monetary_amount"
+        if (
+            custom_field.data_type == CustomField.FieldDataType.MONETARY
+            and op == "exact"
+            and value
+        ):
+            try:
+                value = Decimal(str(value))
+                value_field_name = "value_monetary_amount"
+            except InvalidOperation:
+                # fall back to value_monetary for raw string match (e.g. "EUR10.00")
+                pass
+
         has_field = Q(custom_fields__field=custom_field)
 
         # We need to use an annotation here because different atoms
