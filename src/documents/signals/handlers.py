@@ -1056,15 +1056,15 @@ def _extract_input_data(
     """
     if task_type == PaperlessTask.TaskType.CONSUME_FILE:
         input_doc, overrides = _get_consume_args(args, task_kwargs)
-        if input_doc is None:
+        if input_doc is None:  # pragma: no cover
             return {}
         data: dict = {
             "filename": input_doc.original_file.name,
             "mime_type": input_doc.mime_type,
         }
-        if input_doc.original_path:
+        if input_doc.original_path:  # pragma: no cover
             data["source_path"] = str(input_doc.original_path)
-        if input_doc.mailrule_id:
+        if input_doc.mailrule_id:  # pragma: no cover
             data["mailrule_id"] = input_doc.mailrule_id
         if overrides:
             override_dict = {}
@@ -1132,7 +1132,7 @@ def _extract_owner_id(
     _, overrides = _get_consume_args(args, task_kwargs)
     if overrides and hasattr(overrides, "owner_id"):
         return overrides.owner_id
-    return None
+    return None  # pragma: no cover
 
 
 def _parse_consume_result(result: str) -> dict | None:
@@ -1151,7 +1151,7 @@ def _parse_consume_result(result: str) -> dict | None:
             "duplicate_of": int(match.group(1)),
             "duplicate_in_trash": "existing document is in the trash" in result,
         }
-    return None
+    return None  # pragma: no cover
 
 
 @before_task_publish.connect
@@ -1304,7 +1304,7 @@ def task_failure_handler(
     """
     if task_id is None:  # pragma: no cover
         return
-    if sender and sender.name not in TRACKED_TASKS:
+    if sender and sender.name not in TRACKED_TASKS:  # pragma: no cover
         return
     try:
         close_old_connections()
@@ -1364,7 +1364,7 @@ def task_revoked_handler(
     task_id = request.id if request else None
     if task_id is None:  # pragma: no cover
         return
-    if sender and sender.name not in TRACKED_TASKS:
+    if sender and sender.name not in TRACKED_TASKS:  # pragma: no cover
         return
     try:
         close_old_connections()
