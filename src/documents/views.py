@@ -3794,11 +3794,20 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
         "llmindex_update": PaperlessTask.TaskType.LLM_INDEX,
     }
 
-    # v9 backwards compat: maps old "type" query param values to new TriggerSource
-    _V9_TYPE_TO_TRIGGER_SOURCE = {
-        "auto_task": PaperlessTask.TriggerSource.SYSTEM,
-        "scheduled_task": PaperlessTask.TriggerSource.SCHEDULED,
-        "manual_task": PaperlessTask.TriggerSource.MANUAL,
+    # v9 backwards compat: maps old "type" query param values to new TriggerSource.
+    # Must match the reverse of TaskSerializerV9._TRIGGER_SOURCE_TO_V9_TYPE.
+    _V9_TYPE_TO_TRIGGER_SOURCES = {
+        "auto_task": [
+            PaperlessTask.TriggerSource.SYSTEM,
+            PaperlessTask.TriggerSource.EMAIL_CONSUME,
+            PaperlessTask.TriggerSource.FOLDER_CONSUME,
+        ],
+        "scheduled_task": [PaperlessTask.TriggerSource.SCHEDULED],
+        "manual_task": [
+            PaperlessTask.TriggerSource.MANUAL,
+            PaperlessTask.TriggerSource.WEB_UI,
+            PaperlessTask.TriggerSource.API_UPLOAD,
+        ],
     }
 
     _RUNNABLE_TASKS = {
@@ -3834,9 +3843,9 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
                 queryset = queryset.filter(task_type=mapped)
             task_type_old = self.request.query_params.get("type")
             if task_type_old is not None:
-                new_source = self._V9_TYPE_TO_TRIGGER_SOURCE.get(task_type_old)
-                if new_source:
-                    queryset = queryset.filter(trigger_source=new_source)
+                sources = self._V9_TYPE_TO_TRIGGER_SOURCES.get(task_type_old)
+                if sources:
+                    queryset = queryset.filter(trigger_source__in=sources)
         # v10+: direct task_id param for backwards compat
         task_id = self.request.query_params.get("task_id")
         if task_id is not None:

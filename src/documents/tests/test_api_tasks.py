@@ -422,8 +422,8 @@ class TestGetTasksV9:
         assert len(response.data) == 1
         assert response.data[0]["task_name"] == "consume_file"
 
-    def test_filter_by_type_maps_to_trigger_source(self, v9_client: APIClient) -> None:
-        """?type=scheduled_task filter maps to trigger_source=scheduled for v9 compatibility."""
+    def test_filter_by_type_scheduled_task(self, v9_client: APIClient) -> None:
+        """?type=scheduled_task matches trigger_source=scheduled only."""
         PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.SCHEDULED)
         PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.WEB_UI)
 
@@ -432,6 +432,42 @@ class TestGetTasksV9:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
         assert response.data[0]["type"] == "scheduled_task"
+
+    def test_filter_by_type_auto_task_includes_all_auto_sources(
+        self,
+        v9_client: APIClient,
+    ) -> None:
+        """?type=auto_task matches system, email_consume, and folder_consume tasks."""
+        PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.SYSTEM)
+        PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.EMAIL_CONSUME)
+        PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.FOLDER_CONSUME)
+        PaperlessTaskFactory(
+            trigger_source=PaperlessTask.TriggerSource.MANUAL,
+        )  # excluded
+
+        response = v9_client.get(ENDPOINT, {"type": "auto_task"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) == 3
+        assert all(t["type"] == "auto_task" for t in response.data)
+
+    def test_filter_by_type_manual_task_includes_all_manual_sources(
+        self,
+        v9_client: APIClient,
+    ) -> None:
+        """?type=manual_task matches manual, web_ui, and api_upload tasks."""
+        PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.MANUAL)
+        PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.WEB_UI)
+        PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.API_UPLOAD)
+        PaperlessTaskFactory(
+            trigger_source=PaperlessTask.TriggerSource.SCHEDULED,
+        )  # excluded
+
+        response = v9_client.get(ENDPOINT, {"type": "manual_task"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) == 3
+        assert all(t["type"] == "manual_task" for t in response.data)
 
 
 @pytest.mark.django_db()
