@@ -207,14 +207,93 @@ class TestGetTasksV10:
 
 @pytest.mark.django_db()
 class TestGetTasksV9:
-    def test_task_name_equals_task_type_value(self, v9_client: APIClient) -> None:
-        """task_name mirrors the task_type value for v9 backwards compatibility."""
-        PaperlessTaskFactory(task_type=PaperlessTask.TaskType.CONSUME_FILE)
+    @pytest.mark.parametrize(
+        ("task_type", "expected_task_name"),
+        [
+            pytest.param(
+                PaperlessTask.TaskType.CONSUME_FILE,
+                "consume_file",
+                id="consume_file-passthrough",
+            ),
+            pytest.param(
+                PaperlessTask.TaskType.SANITY_CHECK,
+                "check_sanity",
+                id="sanity_check-remapped",
+            ),
+            pytest.param(
+                PaperlessTask.TaskType.LLM_INDEX,
+                "llmindex_update",
+                id="llm_index-remapped",
+            ),
+        ],
+    )
+    def test_task_name_mapping(
+        self,
+        v9_client: APIClient,
+        task_type: PaperlessTask.TaskType,
+        expected_task_name: str,
+    ) -> None:
+        """v9 task_name is either a direct pass-through or a legacy remap of task_type."""
+        PaperlessTaskFactory(task_type=task_type)
 
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["task_name"] == "consume_file"
+        assert response.data[0]["task_name"] == expected_task_name
+
+    @pytest.mark.parametrize(
+        ("trigger_source", "expected_type"),
+        [
+            pytest.param(
+                PaperlessTask.TriggerSource.SCHEDULED,
+                "scheduled_task",
+                id="scheduled",
+            ),
+            pytest.param(
+                PaperlessTask.TriggerSource.SYSTEM,
+                "auto_task",
+                id="system",
+            ),
+            pytest.param(
+                PaperlessTask.TriggerSource.EMAIL_CONSUME,
+                "auto_task",
+                id="email_consume",
+            ),
+            pytest.param(
+                PaperlessTask.TriggerSource.FOLDER_CONSUME,
+                "auto_task",
+                id="folder_consume",
+            ),
+            pytest.param(
+                PaperlessTask.TriggerSource.WEB_UI,
+                "manual_task",
+                id="web_ui",
+            ),
+            pytest.param(
+                PaperlessTask.TriggerSource.MANUAL,
+                "manual_task",
+                id="manual",
+            ),
+            pytest.param(
+                PaperlessTask.TriggerSource.API_UPLOAD,
+                "manual_task",
+                id="api_upload",
+            ),
+        ],
+    )
+    def test_trigger_source_maps_to_v9_type(
+        self,
+        v9_client: APIClient,
+        trigger_source: PaperlessTask.TriggerSource,
+        expected_type: str,
+    ) -> None:
+        """Every TriggerSource value maps to the correct v9 type string."""
+        PaperlessTaskFactory(trigger_source=trigger_source)
+
+        response = v9_client.get(ENDPOINT)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data[0]["type"] == expected_type
 
     def test_task_file_name_from_input_data(self, v9_client: APIClient) -> None:
         """task_file_name is read from input_data['filename']."""
@@ -236,42 +315,6 @@ class TestGetTasksV9:
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data[0]["task_file_name"] is None
-
-    def test_type_scheduled_maps_to_scheduled_task(self, v9_client: APIClient) -> None:
-        """trigger_source=scheduled maps to type='scheduled_task' in v9."""
-        PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.SCHEDULED)
-
-        response = v9_client.get(ENDPOINT)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["type"] == "scheduled_task"
-
-    def test_type_system_maps_to_auto_task(self, v9_client: APIClient) -> None:
-        """trigger_source=system maps to type='auto_task' in v9."""
-        PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.SYSTEM)
-
-        response = v9_client.get(ENDPOINT)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["type"] == "auto_task"
-
-    def test_type_web_ui_maps_to_manual_task(self, v9_client: APIClient) -> None:
-        """trigger_source=web_ui maps to type='manual_task' in v9."""
-        PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.WEB_UI)
-
-        response = v9_client.get(ENDPOINT)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["type"] == "manual_task"
-
-    def test_type_manual_maps_to_manual_task(self, v9_client: APIClient) -> None:
-        """trigger_source=manual maps to type='manual_task' in v9."""
-        PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.MANUAL)
-
-        response = v9_client.get(ENDPOINT)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["type"] == "manual_task"
 
     def test_related_document_from_result_data_document_id(
         self,
@@ -340,42 +383,6 @@ class TestGetTasksV9:
         assert response.status_code == status.HTTP_200_OK
         statuses = {t["status"] for t in response.data}
         assert statuses == {"SUCCESS", "PENDING", "FAILURE"}
-
-    def test_task_name_remap_sanity_check(self, v9_client: APIClient) -> None:
-        """v9 remaps task_type=sanity_check to task_name=check_sanity."""
-        PaperlessTaskFactory(task_type=PaperlessTask.TaskType.SANITY_CHECK)
-
-        response = v9_client.get(ENDPOINT)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["task_name"] == "check_sanity"
-
-    def test_task_name_remap_llm_index(self, v9_client: APIClient) -> None:
-        """v9 remaps task_type=llm_index to task_name=llmindex_update."""
-        PaperlessTaskFactory(task_type=PaperlessTask.TaskType.LLM_INDEX)
-
-        response = v9_client.get(ENDPOINT)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["task_name"] == "llmindex_update"
-
-    def test_type_email_consume_maps_to_auto_task(self, v9_client: APIClient) -> None:
-        """trigger_source=email_consume maps to type='auto_task' in v9."""
-        PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.EMAIL_CONSUME)
-
-        response = v9_client.get(ENDPOINT)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["type"] == "auto_task"
-
-    def test_type_folder_consume_maps_to_auto_task(self, v9_client: APIClient) -> None:
-        """trigger_source=folder_consume maps to type='auto_task' in v9."""
-        PaperlessTaskFactory(trigger_source=PaperlessTask.TriggerSource.FOLDER_CONSUME)
-
-        response = v9_client.get(ENDPOINT)
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["type"] == "auto_task"
 
     def test_filter_by_task_name_maps_old_value(self, v9_client: APIClient) -> None:
         """?task_name=check_sanity maps to task_type=sanity_check in v9."""
@@ -559,24 +566,27 @@ class TestAcknowledgeAll:
         assert response.status_code == status.HTTP_200_OK
         assert response.data == {"result": 1}
 
-    def test_skips_pending_and_started(self, admin_client: APIClient) -> None:
-        """acknowledge_all/ does not touch PENDING or STARTED tasks."""
-        PaperlessTaskFactory(status=PaperlessTask.Status.PENDING)
-        PaperlessTaskFactory(status=PaperlessTask.Status.STARTED)
+    @pytest.mark.parametrize(
+        ("task_status", "expected_count"),
+        [
+            pytest.param(PaperlessTask.Status.PENDING, 0, id="pending-excluded"),
+            pytest.param(PaperlessTask.Status.STARTED, 0, id="started-excluded"),
+            pytest.param(PaperlessTask.Status.REVOKED, 1, id="revoked-included"),
+        ],
+    )
+    def test_acknowledge_all_by_status(
+        self,
+        admin_client: APIClient,
+        task_status: PaperlessTask.Status,
+        expected_count: int,
+    ) -> None:
+        """acknowledge_all/ ignores PENDING/STARTED and includes REVOKED."""
+        PaperlessTaskFactory(status=task_status, acknowledged=False)
 
         response = admin_client.post(ENDPOINT + "acknowledge_all/")
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data == {"result": 0}
-
-    def test_includes_revoked(self, admin_client: APIClient) -> None:
-        """acknowledge_all/ marks REVOKED tasks as acknowledged."""
-        PaperlessTaskFactory(status=PaperlessTask.Status.REVOKED, acknowledged=False)
-
-        response = admin_client.post(ENDPOINT + "acknowledge_all/")
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data == {"result": 1}
+        assert response.data == {"result": expected_count}
 
 
 @pytest.mark.django_db()
@@ -679,24 +689,31 @@ class TestRun:
         assert response.data == {"task_id": fake_task_id}
         mock_apply_async.assert_called_once_with(
             kwargs={},
-            headers={"trigger_source": "manual"},
+            headers={"trigger_source": PaperlessTask.TriggerSource.MANUAL},
         )
 
-    def test_returns_400_for_consume_file(self, admin_client: APIClient) -> None:
-        """consume_file cannot be manually triggered via the run endpoint."""
+    @pytest.mark.parametrize(
+        "task_type",
+        [
+            pytest.param(
+                PaperlessTask.TaskType.CONSUME_FILE,
+                id="consume_file-not-runnable",
+            ),
+            pytest.param(
+                "not_a_real_type",
+                id="invalid-task-type",
+            ),
+        ],
+    )
+    def test_returns_400_for_non_runnable_task_type(
+        self,
+        admin_client: APIClient,
+        task_type: str,
+    ) -> None:
+        """run/ returns 400 for task types that cannot be manually triggered."""
         response = admin_client.post(
             ENDPOINT + "run/",
-            {"task_type": PaperlessTask.TaskType.CONSUME_FILE},
-            format="json",
-        )
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-
-    def test_returns_400_for_invalid_task_type(self, admin_client: APIClient) -> None:
-        """run/ returns 400 for an unrecognized task_type value."""
-        response = admin_client.post(
-            ENDPOINT + "run/",
-            {"task_type": "not_a_real_type"},
+            {"task_type": task_type},
             format="json",
         )
 
@@ -727,5 +744,5 @@ class TestRun:
         assert response.data == {"task_id": fake_task_id}
         mock_apply_async.assert_called_once_with(
             kwargs={"raise_on_error": False},
-            headers={"trigger_source": "manual"},
+            headers={"trigger_source": PaperlessTask.TriggerSource.MANUAL},
         )

@@ -1,13 +1,19 @@
+import sys
 import uuid
 from unittest import mock
 
 import pytest
 import pytest_mock
+from django.utils import timezone
 
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.models import PaperlessTask
+from documents.signals.handlers import before_task_publish_handler
+from documents.signals.handlers import task_failure_handler
+from documents.signals.handlers import task_postrun_handler
+from documents.signals.handlers import task_prerun_handler
 from documents.signals.handlers import task_revoked_handler
 from documents.tests.factories import PaperlessTaskFactory
 
@@ -39,7 +45,6 @@ def send_publish(
     kwargs: dict,
     headers: dict | None = None,
 ) -> str:
-    from documents.signals.handlers import before_task_publish_handler
 
     task_id = str(uuid.uuid4())
     hdrs = {"task": task_name, "id": task_id, **(headers or {})}
@@ -89,97 +94,108 @@ class TestBeforeTaskPublishHandler:
         task = PaperlessTask.objects.get(task_id=task_id)
         assert task.input_data == {}
 
-    def test_scheduled_header_sets_trigger_source(self):
+    @pytest.mark.parametrize(
+        ("header_value", "expected_trigger_source"),
+        [
+            pytest.param(
+                PaperlessTask.TriggerSource.SCHEDULED,
+                PaperlessTask.TriggerSource.SCHEDULED,
+                id="scheduled",
+            ),
+            pytest.param(
+                PaperlessTask.TriggerSource.SYSTEM,
+                PaperlessTask.TriggerSource.SYSTEM,
+                id="system",
+            ),
+            pytest.param(
+                "bogus_value",
+                PaperlessTask.TriggerSource.MANUAL,
+                id="invalid-falls-back-to-manual",
+            ),
+        ],
+    )
+    def test_trigger_source_header_resolution(
+        self,
+        header_value: str,
+        expected_trigger_source: PaperlessTask.TriggerSource,
+    ) -> None:
+        """trigger_source header maps to the expected TriggerSource; invalid values fall back to MANUAL."""
         task_id = send_publish(
             "documents.tasks.train_classifier",
             (),
             {},
-            headers={"trigger_source": PaperlessTask.TriggerSource.SCHEDULED},
+            headers={"trigger_source": header_value},
         )
         task = PaperlessTask.objects.get(task_id=task_id)
-        assert task.trigger_source == PaperlessTask.TriggerSource.SCHEDULED
-
-    def test_system_header_sets_trigger_source(self):
-        task_id = send_publish(
-            "documents.tasks.llmindex_index",
-            (),
-            {"rebuild": True},
-            headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
-        )
-        task = PaperlessTask.objects.get(task_id=task_id)
-        assert task.trigger_source == PaperlessTask.TriggerSource.SYSTEM
-
-    def test_invalid_header_falls_back_to_manual(self):
-        task_id = send_publish(
-            "documents.tasks.train_classifier",
-            (),
-            {},
-            headers={"trigger_source": "bogus_value"},
-        )
-        task = PaperlessTask.objects.get(task_id=task_id)
-        assert task.trigger_source == PaperlessTask.TriggerSource.MANUAL
+        assert task.trigger_source == expected_trigger_source
 
     def test_ignores_untracked_task(self):
         send_publish("documents.tasks.some_untracked_task", (), {})
         assert PaperlessTask.objects.count() == 0
 
     def test_ignores_none_headers(self):
-        from documents.signals.handlers import before_task_publish_handler
 
         before_task_publish_handler(sender=None, headers=None, body=None)
         assert PaperlessTask.objects.count() == 0
 
-    def test_consume_folder_source_maps_correctly(
+    @pytest.mark.parametrize(
+        ("document_source", "expected_trigger_source"),
+        [
+            pytest.param(
+                DocumentSource.ConsumeFolder,
+                PaperlessTask.TriggerSource.FOLDER_CONSUME,
+                id="folder_consume",
+            ),
+            pytest.param(
+                DocumentSource.MailFetch,
+                PaperlessTask.TriggerSource.EMAIL_CONSUME,
+                id="email_consume",
+            ),
+        ],
+    )
+    def test_consume_document_source_maps_to_trigger_source(
         self,
         consume_input_doc,
         consume_overrides,
-    ):
-        consume_input_doc.source = DocumentSource.ConsumeFolder
+        document_source: DocumentSource,
+        expected_trigger_source: PaperlessTask.TriggerSource,
+    ) -> None:
+        """DocumentSource on the input doc maps to the correct TriggerSource."""
+        consume_input_doc.source = document_source
         task_id = send_publish(
             "documents.tasks.consume_file",
             (consume_input_doc, consume_overrides),
             {},
         )
         task = PaperlessTask.objects.get(task_id=task_id)
-        assert task.trigger_source == PaperlessTask.TriggerSource.FOLDER_CONSUME
-
-    def test_email_source_maps_correctly(self, consume_input_doc, consume_overrides):
-        consume_input_doc.source = DocumentSource.MailFetch
-        task_id = send_publish(
-            "documents.tasks.consume_file",
-            (consume_input_doc, consume_overrides),
-            {},
-        )
-        task = PaperlessTask.objects.get(task_id=task_id)
-        assert task.trigger_source == PaperlessTask.TriggerSource.EMAIL_CONSUME
+        assert task.trigger_source == expected_trigger_source
 
 
 @pytest.mark.django_db
 class TestTaskPrerunHandler:
     def test_marks_task_started(self):
         task = PaperlessTaskFactory(status=PaperlessTask.Status.PENDING)
-        from documents.signals.handlers import task_prerun_handler
 
         task_prerun_handler(task_id=task.task_id)
         task.refresh_from_db()
         assert task.status == PaperlessTask.Status.STARTED
         assert task.date_started is not None
 
-    def test_ignores_unknown_task_id(self):
-        from documents.signals.handlers import task_prerun_handler
+    @pytest.mark.parametrize(
+        "task_id",
+        [
+            pytest.param("nonexistent-id", id="unknown"),
+            pytest.param(None, id="none"),
+        ],
+    )
+    def test_ignores_invalid_task_id(self, task_id: str | None) -> None:
 
-        task_prerun_handler(task_id="nonexistent-id")  # must not raise
-
-    def test_ignores_none_task_id(self):
-        from documents.signals.handlers import task_prerun_handler
-
-        task_prerun_handler(task_id=None)  # must not raise
+        task_prerun_handler(task_id=task_id)  # must not raise
 
 
 @pytest.mark.django_db
 class TestTaskPostrunHandler:
     def _started_task(self) -> PaperlessTask:
-        from django.utils import timezone
 
         return PaperlessTaskFactory(
             task_type=PaperlessTask.TaskType.TRAIN_CLASSIFIER,
@@ -189,7 +205,6 @@ class TestTaskPostrunHandler:
 
     def test_records_success_with_dict_result(self):
         task = self._started_task()
-        from documents.signals.handlers import task_postrun_handler
 
         task_postrun_handler(
             task_id=task.task_id,
@@ -206,7 +221,6 @@ class TestTaskPostrunHandler:
     def test_skips_failure_state(self):
         """postrun skips FAILURE; task_failure_handler owns that path."""
         task = self._started_task()
-        from documents.signals.handlers import task_postrun_handler
 
         task_postrun_handler(task_id=task.task_id, retval="some error", state="FAILURE")
         task.refresh_from_db()
@@ -214,7 +228,6 @@ class TestTaskPostrunHandler:
 
     def test_parses_legacy_new_document_string(self):
         task = self._started_task()
-        from documents.signals.handlers import task_postrun_handler
 
         task_postrun_handler(
             task_id=task.task_id,
@@ -228,7 +241,6 @@ class TestTaskPostrunHandler:
     def test_parses_duplicate_string(self):
         """Duplicate detection returns a string with SUCCESS state (StopConsumeTaskError is caught and returned, not raised)."""
         task = self._started_task()
-        from documents.signals.handlers import task_postrun_handler
 
         task_postrun_handler(
             task_id=task.task_id,
@@ -240,7 +252,6 @@ class TestTaskPostrunHandler:
         assert task.result_data["duplicate_in_trash"] is False
 
     def test_ignores_unknown_task_id(self):
-        from documents.signals.handlers import task_postrun_handler
 
         task_postrun_handler(
             task_id="nonexistent",
@@ -250,7 +261,6 @@ class TestTaskPostrunHandler:
 
     def test_records_revoked_state(self):
         task = self._started_task()
-        from documents.signals.handlers import task_postrun_handler
 
         task_postrun_handler(task_id=task.task_id, retval=None, state="REVOKED")
         task.refresh_from_db()
@@ -260,14 +270,12 @@ class TestTaskPostrunHandler:
 @pytest.mark.django_db
 class TestTaskFailureHandler:
     def test_records_failure_with_exception(self):
-        from django.utils import timezone
 
         task = PaperlessTaskFactory(
             task_type=PaperlessTask.TaskType.CONSUME_FILE,
             status=PaperlessTask.Status.STARTED,
             date_started=timezone.now(),
         )
-        from documents.signals.handlers import task_failure_handler
 
         task_failure_handler(
             task_id=task.task_id,
@@ -281,9 +289,6 @@ class TestTaskFailureHandler:
         assert task.date_done is not None
 
     def test_records_traceback_when_provided(self):
-        import sys
-
-        from django.utils import timezone
 
         task = PaperlessTaskFactory(
             task_type=PaperlessTask.TaskType.CONSUME_FILE,
@@ -307,7 +312,6 @@ class TestTaskFailureHandler:
         assert len(task.result_data["traceback"]) <= 5000
 
     def test_computes_duration_and_wait_time(self):
-        from django.utils import timezone
 
         now = timezone.now()
         task = PaperlessTaskFactory(
@@ -316,7 +320,6 @@ class TestTaskFailureHandler:
             date_created=now - timezone.timedelta(seconds=10),
             date_started=now - timezone.timedelta(seconds=5),
         )
-        from documents.signals.handlers import task_failure_handler
 
         task_failure_handler(
             task_id=task.task_id,
@@ -328,7 +331,6 @@ class TestTaskFailureHandler:
         assert task.wait_time_seconds == pytest.approx(5.0, abs=1.0)
 
     def test_ignores_none_task_id(self):
-        from documents.signals.handlers import task_failure_handler
 
         task_failure_handler(task_id=None, exception=ValueError("x"), traceback=None)
 
