@@ -193,13 +193,14 @@ class TestTaskPostrunHandler:
         assert task.duration_seconds is not None
         assert task.wait_time_seconds is not None
 
-    def test_records_failure_state(self):
+    def test_skips_failure_state(self):
+        """postrun skips FAILURE; task_failure_handler owns that path."""
         task = self._started_task()
         from documents.signals.handlers import task_postrun_handler
 
         task_postrun_handler(task_id=task.task_id, retval="some error", state="FAILURE")
         task.refresh_from_db()
-        assert task.status == PaperlessTask.Status.FAILURE
+        assert task.status == PaperlessTask.Status.STARTED
 
     def test_parses_legacy_new_document_string(self):
         task = self._started_task()
@@ -294,6 +295,27 @@ class TestTaskFailureHandler:
         task.refresh_from_db()
         assert "traceback" in task.result_data
         assert len(task.result_data["traceback"]) <= 5000
+
+    def test_computes_duration_and_wait_time(self):
+        from django.utils import timezone
+
+        now = timezone.now()
+        task = PaperlessTaskFactory(
+            task_type=PaperlessTask.TaskType.CONSUME_FILE,
+            status=PaperlessTask.Status.STARTED,
+            date_created=now - timezone.timedelta(seconds=10),
+            date_started=now - timezone.timedelta(seconds=5),
+        )
+        from documents.signals.handlers import task_failure_handler
+
+        task_failure_handler(
+            task_id=task.task_id,
+            exception=ValueError("boom"),
+            traceback=None,
+        )
+        task.refresh_from_db()
+        assert task.duration_seconds == pytest.approx(5.0, abs=1.0)
+        assert task.wait_time_seconds == pytest.approx(5.0, abs=1.0)
 
     def test_ignores_none_task_id(self):
         from documents.signals.handlers import task_failure_handler

@@ -1226,12 +1226,11 @@ def task_postrun_handler(
     **kwargs,
 ) -> None:
     """
-    Records task completion and result data.
+    Records task completion and result data for non-failure outcomes.
 
-    task_failure also fires when a task raises an exception, and it writes
-    richer structured error data.  To avoid a race where this handler
-    overwrites that data, result_data and result_message are left untouched
-    when the final state is FAILURE. task_failure_handler owns those fields.
+    Skips FAILURE states entirely, since task_failure_handler fires first
+    and fully owns the failure path (status, date_done, duration,
+    result_data, result_message).
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-postrun
     """
@@ -1243,6 +1242,8 @@ def task_postrun_handler(
         close_old_connections()
 
         new_status = _CELERY_STATE_TO_STATUS.get(state, PaperlessTask.Status.FAILURE)
+        if new_status == PaperlessTask.Status.FAILURE:
+            return
 
         now = timezone.now()
         try:
@@ -1265,16 +1266,13 @@ def task_postrun_handler(
             ).total_seconds()
             changed_fields.append("wait_time_seconds")
 
-        # Only write result data for non-failure outcomes; task_failure_handler
-        # owns result_data/result_message for FAILURE states.
-        if new_status != PaperlessTask.Status.FAILURE:
-            if isinstance(retval, dict):
-                task_instance.result_data = retval
-                changed_fields.append("result_data")
-            elif isinstance(retval, str):
-                task_instance.result_message = retval
-                task_instance.result_data = _parse_consume_result(retval)
-                changed_fields.extend(["result_message", "result_data"])
+        if isinstance(retval, dict):
+            task_instance.result_data = retval
+            changed_fields.append("result_data")
+        elif isinstance(retval, str):
+            task_instance.result_message = retval
+            task_instance.result_data = _parse_consume_result(retval)
+            changed_fields.extend(["result_message", "result_data"])
 
         task_instance.save(update_fields=changed_fields)
     except Exception:  # pragma: no cover
@@ -1293,6 +1291,9 @@ def task_failure_handler(
     """
     Records failure details when a task raises an exception.
 
+    Fully owns the FAILURE path. task_postrun_handler skips FAILURE
+    states so there is no overlap.
+
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-failure
     """
     if task_id is None:  # pragma: no cover
@@ -1310,12 +1311,26 @@ def task_failure_handler(
             tb_str = "".join(_tb.format_tb(traceback))
             result_data["traceback"] = tb_str[:5000]
 
-        PaperlessTask.objects.filter(task_id=task_id).update(
-            status=PaperlessTask.Status.FAILURE,
-            result_data=result_data,
-            result_message=str(exception) if exception else None,
-            date_done=timezone.now(),
-        )
+        now = timezone.now()
+        update_fields: dict = {
+            "status": PaperlessTask.Status.FAILURE,
+            "result_data": result_data,
+            "result_message": str(exception) if exception else None,
+            "date_done": now,
+        }
+
+        task_qs = PaperlessTask.objects.filter(task_id=task_id)
+        task_instance = task_qs.values("date_started", "date_created").first()
+        if task_instance:
+            date_started = task_instance["date_started"]
+            if date_started:
+                update_fields["duration_seconds"] = (now - date_started).total_seconds()
+            date_created = task_instance["date_created"]
+            if date_started and date_created:
+                update_fields["wait_time_seconds"] = (
+                    date_started - date_created
+                ).total_seconds()
+            task_qs.update(**update_fields)
     except Exception:  # pragma: no cover
         logger.exception("Updating PaperlessTask on failure failed")
 
