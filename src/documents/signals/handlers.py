@@ -1097,12 +1097,13 @@ def _determine_trigger_source(
     2. For consume_file tasks, the DocumentSource on the input document.
     3. MANUAL as the catch-all for all other cases.
     """
-    # Explicit header takes priority -- covers beat ("scheduled") and system auto-runs ("system")
+    # Explicit header takes priority -- callers pass a TriggerSource DB value directly.
     header_source = headers.get("trigger_source")
-    if header_source == "scheduled":
-        return PaperlessTask.TriggerSource.SCHEDULED
-    if header_source == "system":
-        return PaperlessTask.TriggerSource.SYSTEM
+    if header_source is not None:
+        try:
+            return PaperlessTask.TriggerSource(header_source)
+        except ValueError:
+            pass
 
     if task_type == PaperlessTask.TaskType.CONSUME_FILE:
         input_doc, _ = _get_consume_args(args, task_kwargs)

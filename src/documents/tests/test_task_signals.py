@@ -94,7 +94,7 @@ class TestBeforeTaskPublishHandler:
             "documents.tasks.train_classifier",
             (),
             {},
-            headers={"trigger_source": "scheduled"},
+            headers={"trigger_source": PaperlessTask.TriggerSource.SCHEDULED},
         )
         task = PaperlessTask.objects.get(task_id=task_id)
         assert task.trigger_source == PaperlessTask.TriggerSource.SCHEDULED
@@ -104,10 +104,20 @@ class TestBeforeTaskPublishHandler:
             "documents.tasks.llmindex_index",
             (),
             {"rebuild": True},
-            headers={"trigger_source": "system"},
+            headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
         )
         task = PaperlessTask.objects.get(task_id=task_id)
         assert task.trigger_source == PaperlessTask.TriggerSource.SYSTEM
+
+    def test_invalid_header_falls_back_to_manual(self):
+        task_id = send_publish(
+            "documents.tasks.train_classifier",
+            (),
+            {},
+            headers={"trigger_source": "bogus_value"},
+        )
+        task = PaperlessTask.objects.get(task_id=task_id)
+        assert task.trigger_source == PaperlessTask.TriggerSource.MANUAL
 
     def test_ignores_untracked_task(self):
         send_publish("documents.tasks.some_untracked_task", (), {})
