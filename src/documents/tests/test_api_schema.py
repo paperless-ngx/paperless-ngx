@@ -102,3 +102,23 @@ class TestTasksSummarySchema:
         assert "total_count" in props, (
             "summary items must have 'total_count' (TaskSummarySerializer)"
         )
+
+
+class TestTasksActiveSchema:
+    """tasks_active_retrieve: response must be an array of TaskSerializerV10."""
+
+    def test_active_response_is_array(self, api_schema):
+        op = api_schema["paths"]["/api/tasks/active/"]["get"]
+        resp_200 = op["responses"]["200"]["content"]["application/json"]["schema"]
+        assert resp_200["type"] == "array", (
+            "tasks_active_retrieve response must be type:array"
+        )
+
+    def test_active_items_ref_named_schema(self, api_schema):
+        op = api_schema["paths"]["/api/tasks/active/"]["get"]
+        resp_200 = op["responses"]["200"]["content"]["application/json"]["schema"]
+        items = resp_200.get("items", {})
+        ref = items.get("$ref", "")
+        component_name = ref.split("/")[-1] if ref else ""
+        assert component_name, "items should be a $ref to a named schema"
+        assert component_name in api_schema["components"]["schemas"]

@@ -3795,6 +3795,10 @@ class RemoteVersionView(GenericAPIView[Any]):
             ),
         ],
     ),
+    active=extend_schema(
+        description="Currently pending and running tasks (capped at 50).",
+        responses={200: TaskSerializerV10(many=True)},
+    ),
 )
 class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
