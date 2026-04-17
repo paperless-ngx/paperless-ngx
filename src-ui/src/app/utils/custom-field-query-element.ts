@@ -70,29 +70,29 @@ export class CustomFieldQueryAtom extends CustomFieldQueryElement {
     const newTypes: string[] =
       CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR[operator]?.split('|')
     if (!newTypes) {
-      this.value = null
+      this._value = null
     } else {
       if (!newTypes.includes(typeof this.value)) {
         switch (newTypes[0]) {
           case 'string':
-            this.value = ''
+            this._value = ''
             break
           case 'boolean':
-            this.value = 'true'
+            this._value = 'true'
             break
           case 'array':
-            this.value = []
+            this._value = []
             break
           case 'number':
             const num = parseFloat(this.value as string)
-            this.value = isNaN(num) ? null : num.toString()
+            this._value = isNaN(num) ? null : num.toString()
             break
         }
       } else if (
         ['true', 'false'].includes(this.value as string) &&
         newTypes.includes('string')
       ) {
-        this.value = ''
+        this._value = ''
       }
     }
     super.operator = operator
