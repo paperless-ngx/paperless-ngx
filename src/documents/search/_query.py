@@ -606,26 +606,21 @@ def parse_simple_query(
     return tantivy.Query.boolean_query(field_queries)
 
 
-def parse_simple_highlight_query(
+def parse_simple_text_highlight_query(
     index: tantivy.Index,
     raw_query: str,
-    fields: list[str],
 ) -> tantivy.Query:
-    """Build a snippet-friendly query for simple text/title searches.
+    """Build a snippet-friendly query for simple text searches.
 
     Simple search matching uses regex queries but for compatibility with Tantivy
-    SnippetGenerator we build a plain term query over the actual text fields instead.
+    SnippetGenerator we build a plain term query over the content field instead.
     """
 
     tokens = _simple_query_tokens(raw_query)
     if not tokens:
         return tantivy.Query.empty_query()
 
-    return index.parse_query(
-        " ".join(tokens),
-        fields,
-        field_boosts={field: _FIELD_BOOSTS.get(field, 1.0) for field in fields},
-    )
+    return index.parse_query(" ".join(tokens), ["content"])
 
 
 def parse_simple_text_query(
