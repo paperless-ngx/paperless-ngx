@@ -3841,18 +3841,15 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
         return TaskSerializerV10
 
     def get_queryset(self):
-        # Staff see all tasks.
-        # v9 non-staff: own tasks + unowned tasks (preserves old behavior).
-        # v10 non-staff: own tasks only.
         is_v9 = self.request.version and int(self.request.version) < 10
         if self.request.user.is_staff:
             queryset = PaperlessTask.objects.all()
-        elif is_v9:
+        else:
+            # Own tasks + unowned (system/scheduled) tasks. Tasks owned by other
+            # users are never visible to non-staff regardless of API version.
             queryset = PaperlessTask.objects.filter(
                 Q(owner=self.request.user) | Q(owner__isnull=True),
             )
-        else:
-            queryset = PaperlessTask.objects.filter(owner=self.request.user)
         # v9 backwards compat: map old query params to new field names
         if is_v9:
             task_name = self.request.query_params.get("task_name")

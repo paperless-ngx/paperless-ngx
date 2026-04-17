@@ -165,12 +165,12 @@ class TestGetTasksV10:
         ids = [t["task_id"] for t in response.data]
         assert ids == [t3.task_id, t2.task_id, t1.task_id]
 
-    def test_list_scoped_to_own_tasks_for_regular_user(
+    def test_list_scoped_to_own_and_unowned_tasks_for_regular_user(
         self,
         admin_user: User,
         regular_user: User,
     ) -> None:
-        """Regular users see only tasks they own; tasks owned by others or unowned are hidden."""
+        """Regular users see their own tasks and unowned (system) tasks; other users' tasks are hidden."""
         regular_user.user_permissions.add(
             Permission.objects.get(codename="view_paperlesstask"),
         )
@@ -180,14 +180,15 @@ class TestGetTasksV10:
         client.credentials(HTTP_ACCEPT=ACCEPT_V10)
 
         PaperlessTaskFactory(owner=admin_user)  # other user — not visible
-        PaperlessTaskFactory()  # unowned (system task) — not visible
+        unowned_task = PaperlessTaskFactory()  # unowned (system task) — visible
         own_task = PaperlessTaskFactory(owner=regular_user)
 
         response = client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 1
-        assert response.data[0]["task_id"] == own_task.task_id
+        assert len(response.data) == 2
+        visible_ids = {t["task_id"] for t in response.data}
+        assert visible_ids == {own_task.task_id, unowned_task.task_id}
 
     def test_list_admin_sees_all_tasks(
         self,
@@ -401,7 +402,7 @@ class TestGetTasksV9:
         admin_user: User,
         regular_user: User,
     ) -> None:
-        """v9 non-staff users see their own tasks plus unowned tasks."""
+        """Non-staff users see their own tasks plus unowned tasks via v9 API."""
         regular_user.user_permissions.add(
             Permission.objects.get(codename="view_paperlesstask"),
         )
