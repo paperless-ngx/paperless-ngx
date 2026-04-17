@@ -205,3 +205,24 @@ class TestProcessedMailBulkDeleteSchema:
         assert component_name != "ProcessedMail", (
             "bulk_delete 200 response must not be the full ProcessedMail serializer"
         )
+
+
+class TestShareLinkBundleRebuildSchema:
+    """share_link_bundles_rebuild_create: 200 returns bundle data; 400 is documented."""
+
+    def test_rebuild_has_400_response(self, api_schema):
+        op = api_schema["paths"]["/api/share_link_bundles/{id}/rebuild/"]["post"]
+        assert "400" in op["responses"], (
+            "rebuild must document the 400 response for 'Bundle is already being processed.'"
+        )
+
+    def test_rebuild_400_has_detail_field(self, api_schema):
+        op = api_schema["paths"]["/api/share_link_bundles/{id}/rebuild/"]["post"]
+        resp_400 = op["responses"]["400"]["content"]["application/json"]["schema"]
+        ref = resp_400.get("$ref", "")
+        component_name = ref.split("/")[-1] if ref else ""
+        if component_name:
+            props = api_schema["components"]["schemas"][component_name]["properties"]
+        else:
+            props = resp_400.get("properties", {})
+        assert "detail" in props, "rebuild 400 response must have a 'detail' field"
