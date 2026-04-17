@@ -160,6 +160,31 @@ class MailAccountViewSet(PassUserMixin, ModelViewSet[MailAccount]):
         return Response({"result": "OK"})
 
 
+@extend_schema_view(
+    bulk_delete=extend_schema(
+        operation_id="processed_mail_bulk_delete",
+        description="Delete multiple processed mail records by ID.",
+        request=inline_serializer(
+            name="BulkDeleteMailRequest",
+            fields={
+                "mail_ids": serializers.ListField(child=serializers.IntegerField()),
+            },
+        ),
+        responses={
+            (200, "application/json"): inline_serializer(
+                name="BulkDeleteMailResponse",
+                fields={
+                    "result": serializers.CharField(),
+                    "deleted_mail_ids": serializers.ListField(
+                        child=serializers.IntegerField(),
+                    ),
+                },
+            ),
+            400: None,
+            403: None,
+        },
+    ),
+)
 class ProcessedMailViewSet(PassUserMixin, ReadOnlyModelViewSet[ProcessedMail]):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = ProcessedMailSerializer

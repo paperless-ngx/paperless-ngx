@@ -178,3 +178,30 @@ class TestStoragePathTestSchema:
         assert component_name == "StoragePathTestRequest", (
             f"Request body should reference StoragePathTestRequest, got {component_name!r}"
         )
+
+
+class TestProcessedMailBulkDeleteSchema:
+    """processed_mail_bulk_delete_create: response must be {result, deleted_mail_ids}."""
+
+    def _get_props(self, api_schema):
+        op = api_schema["paths"]["/api/processed_mail/bulk_delete/"]["post"]
+        resp_200 = op["responses"]["200"]["content"]["application/json"]["schema"]
+        ref = resp_200.get("$ref", "")
+        component_name = ref.split("/")[-1] if ref else ""
+        if component_name:
+            return api_schema["components"]["schemas"][component_name]["properties"]
+        return resp_200.get("properties", {})
+
+    @pytest.mark.parametrize("field", ["result", "deleted_mail_ids"])
+    def test_bulk_delete_response_has_field(self, api_schema, field):
+        props = self._get_props(api_schema)
+        assert field in props, f"bulk_delete 200 response must have a '{field}' field"
+
+    def test_bulk_delete_response_is_not_processed_mail_serializer(self, api_schema):
+        op = api_schema["paths"]["/api/processed_mail/bulk_delete/"]["post"]
+        resp_200 = op["responses"]["200"]["content"]["application/json"]["schema"]
+        ref = resp_200.get("$ref", "")
+        component_name = ref.split("/")[-1] if ref else ""
+        assert component_name != "ProcessedMail", (
+            "bulk_delete 200 response must not be the full ProcessedMail serializer"
+        )
