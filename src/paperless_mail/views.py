@@ -1,6 +1,7 @@
 import datetime
 import logging
 from datetime import timedelta
+from http import HTTPStatus
 from typing import Any
 
 from django.http import HttpResponseBadRequest
@@ -171,7 +172,7 @@ class MailAccountViewSet(PassUserMixin, ModelViewSet[MailAccount]):
             },
         ),
         responses={
-            (200, "application/json"): inline_serializer(
+            (HTTPStatus.OK, "application/json"): inline_serializer(
                 name="BulkDeleteMailResponse",
                 fields={
                     "result": serializers.CharField(),
@@ -180,8 +181,8 @@ class MailAccountViewSet(PassUserMixin, ModelViewSet[MailAccount]):
                     ),
                 },
             ),
-            400: None,
-            403: None,
+            HTTPStatus.BAD_REQUEST: None,
+            HTTPStatus.FORBIDDEN: None,
         },
     ),
 )

@@ -77,14 +77,14 @@ class TestApiSchema(APITestCase):
 class TestTasksSummarySchema:
     """tasks_summary_retrieve: response must be an array of TaskSummarySerializer."""
 
-    def test_summary_response_is_array(self, api_schema):
+    def test_summary_response_is_array(self, api_schema: SchemaGenerator):
         op = api_schema["paths"]["/api/tasks/summary/"]["get"]
         resp_200 = op["responses"]["200"]["content"]["application/json"]["schema"]
         assert resp_200["type"] == "array", (
             "tasks_summary_retrieve response must be type:array"
         )
 
-    def test_summary_items_have_total_count(self, api_schema):
+    def test_summary_items_have_total_count(self, api_schema: SchemaGenerator):
         op = api_schema["paths"]["/api/tasks/summary/"]["get"]
         resp_200 = op["responses"]["200"]["content"]["application/json"]["schema"]
         items = resp_200.get("items", {})
@@ -102,14 +102,14 @@ class TestTasksSummarySchema:
 class TestTasksActiveSchema:
     """tasks_active_retrieve: response must be an array of TaskSerializerV10."""
 
-    def test_active_response_is_array(self, api_schema):
+    def test_active_response_is_array(self, api_schema: SchemaGenerator):
         op = api_schema["paths"]["/api/tasks/active/"]["get"]
         resp_200 = op["responses"]["200"]["content"]["application/json"]["schema"]
         assert resp_200["type"] == "array", (
             "tasks_active_retrieve response must be type:array"
         )
 
-    def test_active_items_ref_named_schema(self, api_schema):
+    def test_active_items_ref_named_schema(self, api_schema: SchemaGenerator):
         op = api_schema["paths"]["/api/tasks/active/"]["get"]
         resp_200 = op["responses"]["200"]["content"]["application/json"]["schema"]
         items = resp_200.get("items", {})
@@ -123,13 +123,13 @@ class TestMetadataSchema:
     """Metadata component: array fields and optional archive fields."""
 
     @pytest.mark.parametrize("field", ["original_metadata", "archive_metadata"])
-    def test_metadata_field_is_array(self, api_schema, field):
+    def test_metadata_field_is_array(self, api_schema: SchemaGenerator, field: str):
         props = api_schema["components"]["schemas"]["Metadata"]["properties"]
         assert props[field]["type"] == "array", (
             f"{field} should be type:array, not type:object"
         )
 
-    def test_original_metadata_items_have_key_field(self, api_schema):
+    def test_original_metadata_items_have_key_field(self, api_schema: SchemaGenerator):
         props = api_schema["components"]["schemas"]["Metadata"]["properties"]
         items = props["original_metadata"]["items"]
         ref = items.get("$ref", "")
@@ -151,7 +151,7 @@ class TestMetadataSchema:
             "archive_metadata",
         ],
     )
-    def test_archive_field_not_required(self, api_schema, field):
+    def test_archive_field_not_required(self, api_schema: SchemaGenerator, field: str):
         required = api_schema["components"]["schemas"]["Metadata"].get("required", [])
         assert field not in required
 
@@ -159,14 +159,14 @@ class TestMetadataSchema:
 class TestStoragePathTestSchema:
     """storage_paths_test_create: response must be a string, not a StoragePath object."""
 
-    def test_test_action_response_is_string(self, api_schema):
+    def test_test_action_response_is_string(self, api_schema: SchemaGenerator):
         op = api_schema["paths"]["/api/storage_paths/test/"]["post"]
         resp_200 = op["responses"]["200"]["content"]["application/json"]["schema"]
         assert resp_200.get("type") == "string", (
             "storage_paths_test_create 200 response must be type:string"
         )
 
-    def test_test_action_request_uses_storage_path_test_serializer(self, api_schema):
+    def test_test_action_request_uses_storage_path_test_serializer(self, api_schema: SchemaGenerator):
         op = api_schema["paths"]["/api/storage_paths/test/"]["post"]
         content = (
             op.get("requestBody", {}).get("content", {}).get("application/json", {})
@@ -183,7 +183,7 @@ class TestStoragePathTestSchema:
 class TestProcessedMailBulkDeleteSchema:
     """processed_mail_bulk_delete_create: response must be {result, deleted_mail_ids}."""
 
-    def _get_props(self, api_schema):
+    def _get_props(self, api_schema: SchemaGenerator):
         op = api_schema["paths"]["/api/processed_mail/bulk_delete/"]["post"]
         resp_200 = op["responses"]["200"]["content"]["application/json"]["schema"]
         ref = resp_200.get("$ref", "")
@@ -193,7 +193,7 @@ class TestProcessedMailBulkDeleteSchema:
         return resp_200.get("properties", {})
 
     @pytest.mark.parametrize("field", ["result", "deleted_mail_ids"])
-    def test_bulk_delete_response_has_field(self, api_schema, field):
+    def test_bulk_delete_response_has_field(self, api_schema: SchemaGenerator, field: str):
         props = self._get_props(api_schema)
         assert field in props, f"bulk_delete 200 response must have a '{field}' field"
 
@@ -210,13 +210,13 @@ class TestProcessedMailBulkDeleteSchema:
 class TestShareLinkBundleRebuildSchema:
     """share_link_bundles_rebuild_create: 200 returns bundle data; 400 is documented."""
 
-    def test_rebuild_has_400_response(self, api_schema):
+    def test_rebuild_has_400_response(self, api_schema: SchemaGenerator):
         op = api_schema["paths"]["/api/share_link_bundles/{id}/rebuild/"]["post"]
         assert "400" in op["responses"], (
             "rebuild must document the 400 response for 'Bundle is already being processed.'"
         )
 
-    def test_rebuild_400_has_detail_field(self, api_schema):
+    def test_rebuild_400_has_detail_field(self, api_schema: SchemaGenerator):
         op = api_schema["paths"]["/api/share_link_bundles/{id}/rebuild/"]["post"]
         resp_400 = op["responses"]["400"]["content"]["application/json"]["schema"]
         ref = resp_400.get("$ref", "")

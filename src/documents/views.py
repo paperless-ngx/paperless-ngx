@@ -9,6 +9,7 @@ from collections import defaultdict
 from collections import deque
 from datetime import datetime
 from datetime import timedelta
+from http import HTTPStatus
 from pathlib import Path
 from time import mktime
 from typing import TYPE_CHECKING
@@ -729,9 +730,9 @@ class EmailDocumentDetailSchema(EmailSerializer):
                     "lang": serializers.CharField(),
                 },
             ),
-            400: None,
-            403: None,
-            404: None,
+            HTTPStatus.BAD_REQUEST: None,
+            HTTPStatus.FORBIDDEN: None,
+            HTTPStatus.NOT_FOUND: None,
         },
     ),
     notes=extend_schema(
@@ -3566,7 +3567,7 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
         description="Test a storage path template against a document.",
         request=StoragePathTestSerializer,
         responses={
-            (200, "application/json"): OpenApiTypes.STR,
+            (HTTPStatus.OK, "application/json"): OpenApiTypes.STR,
         },
     ),
 )
@@ -4031,8 +4032,8 @@ class ShareLinkViewSet(
         operation_id="share_link_bundles_rebuild",
         description="Reset and re-queue a share link bundle for processing.",
         responses={
-            200: ShareLinkBundleSerializer,
-            (400, "application/json"): inline_serializer(
+            HTTPStatus.OK: ShareLinkBundleSerializer,
+            (HTTPStatus.BAD_REQUEST, "application/json"): inline_serializer(
                 name="RebuildBundleError",
                 fields={"detail": serializers.CharField()},
             ),
