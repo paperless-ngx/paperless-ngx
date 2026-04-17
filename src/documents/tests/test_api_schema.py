@@ -154,3 +154,27 @@ class TestMetadataSchema:
     def test_archive_field_not_required(self, api_schema, field):
         required = api_schema["components"]["schemas"]["Metadata"].get("required", [])
         assert field not in required
+
+
+class TestStoragePathTestSchema:
+    """storage_paths_test_create: response must be a string, not a StoragePath object."""
+
+    def test_test_action_response_is_string(self, api_schema):
+        op = api_schema["paths"]["/api/storage_paths/test/"]["post"]
+        resp_200 = op["responses"]["200"]["content"]["application/json"]["schema"]
+        assert resp_200.get("type") == "string", (
+            "storage_paths_test_create 200 response must be type:string"
+        )
+
+    def test_test_action_request_uses_storage_path_test_serializer(self, api_schema):
+        op = api_schema["paths"]["/api/storage_paths/test/"]["post"]
+        content = (
+            op.get("requestBody", {}).get("content", {}).get("application/json", {})
+        )
+        schema_ref = content.get("schema", {}).get("$ref", "")
+        component_name = schema_ref.split("/")[-1]
+        # COMPONENT_SPLIT_REQUEST=True causes drf-spectacular to append "Request"
+        # to request body component names, so StoragePathTestSerializer -> StoragePathTestRequest
+        assert component_name == "StoragePathTestRequest", (
+            f"Request body should reference StoragePathTestRequest, got {component_name!r}"
+        )

@@ -3559,7 +3559,17 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
             return response
 
 
-@extend_schema_view(**generate_object_with_permissions_schema(StoragePathSerializer))
+@extend_schema_view(
+    **generate_object_with_permissions_schema(StoragePathSerializer),
+    test=extend_schema(
+        operation_id="storage_paths_test",
+        description="Test a storage path template against a document.",
+        request=StoragePathTestSerializer,
+        responses={
+            (200, "application/json"): OpenApiTypes.STR,
+        },
+    ),
+)
 class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[StoragePath]):
     model = StoragePath
 
