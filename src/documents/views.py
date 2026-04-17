@@ -94,7 +94,6 @@ from rest_framework.mixins import DestroyModelMixin
 from rest_framework.mixins import ListModelMixin
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.mixins import UpdateModelMixin
-from rest_framework.permissions import IsAdminUser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -3770,7 +3769,7 @@ class RemoteVersionView(GenericAPIView[Any]):
     ),
     run=extend_schema(
         operation_id="run_task",
-        description="Manually dispatch a background task. Staff only.",
+        description="Manually dispatch a background task. Superuser only.",
         request=RunTaskSerializer,
         responses={
             (200, "application/json"): inline_serializer(
@@ -3965,9 +3964,11 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(methods=["post"], detail=False, permission_classes=[IsAdminUser])
+    @action(methods=["post"], detail=False)
     def run(self, request):
-        """Manually dispatch a background task. Staff only."""
+        """Manually dispatch a background task. Superuser only."""
+        if not request.user.is_superuser:
+            return HttpResponseForbidden("Insufficient permissions")
         serializer = RunTaskSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         task_type = serializer.validated_data.get("task_type")
