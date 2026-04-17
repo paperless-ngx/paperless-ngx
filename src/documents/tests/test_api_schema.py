@@ -6,6 +6,11 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 
+@pytest.fixture(scope="session")
+def api_schema():
+    generator = SchemaGenerator()
+    return generator.get_schema(request=None, public=True)
+
 class TestApiSchema(APITestCase):
     ENDPOINT = "/api/schema/"
 
@@ -69,16 +74,6 @@ class TestApiSchema(APITestCase):
         ]:
             self.assertIn(action_method, advertised_methods)
 
-
-# ---- session-scoped fixture: generate schema once for all TestXxx classes ----
-
-
-@pytest.fixture(scope="session")
-def api_schema():
-    generator = SchemaGenerator()
-    return generator.get_schema(request=None, public=True)
-
-
 class TestTasksSummarySchema:
     """tasks_summary_retrieve: response must be an array of TaskSummarySerializer."""
 
@@ -122,3 +117,40 @@ class TestTasksActiveSchema:
         component_name = ref.split("/")[-1] if ref else ""
         assert component_name, "items should be a $ref to a named schema"
         assert component_name in api_schema["components"]["schemas"]
+
+
+class TestMetadataSchema:
+    """Metadata component: array fields and optional archive fields."""
+
+    @pytest.mark.parametrize("field", ["original_metadata", "archive_metadata"])
+    def test_metadata_field_is_array(self, api_schema, field):
+        props = api_schema["components"]["schemas"]["Metadata"]["properties"]
+        assert props[field]["type"] == "array", (
+            f"{field} should be type:array, not type:object"
+        )
+
+    def test_original_metadata_items_have_key_field(self, api_schema):
+        props = api_schema["components"]["schemas"]["Metadata"]["properties"]
+        items = props["original_metadata"]["items"]
+        ref = items.get("$ref", "")
+        component_name = ref.split("/")[-1] if ref else ""
+        if component_name:
+            item_props = api_schema["components"]["schemas"][component_name][
+                "properties"
+            ]
+        else:
+            item_props = items.get("properties", {})
+        assert "key" in item_props
+
+    @pytest.mark.parametrize(
+        "field",
+        [
+            "archive_checksum",
+            "archive_media_filename",
+            "archive_size",
+            "archive_metadata",
+        ],
+    )
+    def test_archive_field_not_required(self, api_schema, field):
+        required = api_schema["components"]["schemas"]["Metadata"].get("required", [])
+        assert field not in required
