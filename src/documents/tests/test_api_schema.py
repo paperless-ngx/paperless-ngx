@@ -129,9 +129,10 @@ class TestMetadataSchema:
             f"{field} should be type:array, not type:object"
         )
 
-    def test_original_metadata_items_have_key_field(self, api_schema: SchemaGenerator):
+    @pytest.mark.parametrize("field", ["original_metadata", "archive_metadata"])
+    def test_metadata_items_have_key_field(self, api_schema: SchemaGenerator, field: str):
         props = api_schema["components"]["schemas"]["Metadata"]["properties"]
-        items = props["original_metadata"]["items"]
+        items = props[field]["items"]
         ref = items.get("$ref", "")
         component_name = ref.split("/")[-1] if ref else ""
         if component_name:
@@ -151,9 +152,14 @@ class TestMetadataSchema:
             "archive_metadata",
         ],
     )
-    def test_archive_field_not_required(self, api_schema: SchemaGenerator, field: str):
-        required = api_schema["components"]["schemas"]["Metadata"].get("required", [])
+    def test_archive_field_not_required(self, api_schema, field):
+        schema = api_schema["components"]["schemas"]["Metadata"]
+        required = schema.get("required", [])
         assert field not in required
+        props = schema["properties"]
+        assert props[field].get("nullable") is True, (
+            f"{field} should be nullable (allow_null=True)"
+        )
 
 
 class TestStoragePathTestSchema:
