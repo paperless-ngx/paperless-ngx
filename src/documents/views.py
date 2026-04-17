@@ -3784,6 +3784,7 @@ class RemoteVersionView(GenericAPIView[Any]):
         },
     ),
     summary=extend_schema(
+        responses={200: TaskSummarySerializer(many=True)},
         parameters=[
             OpenApiParameter(
                 name="days",
