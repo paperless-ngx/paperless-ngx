@@ -3,7 +3,7 @@
 Covers:
 - v10 serializer (new field names)
 - v9 serializer (backwards-compatible field names)
-- Filtering, ordering, acknowledge, acknowledge_all, summary, active, run
+- Filtering, ordering, acknowledge, summary, active, run
 """
 
 import uuid
@@ -542,52 +542,6 @@ class TestAcknowledge:
         )
 
         assert response.status_code == status.HTTP_200_OK
-
-
-@pytest.mark.django_db()
-class TestAcknowledgeAll:
-    def test_marks_only_completed_tasks(self, admin_client: APIClient) -> None:
-        """acknowledge_all/ marks only SUCCESS and FAILURE tasks as acknowledged."""
-        PaperlessTaskFactory(status=PaperlessTask.Status.SUCCESS, acknowledged=False)
-        PaperlessTaskFactory(status=PaperlessTask.Status.FAILURE, acknowledged=False)
-        PaperlessTaskFactory(status=PaperlessTask.Status.PENDING, acknowledged=False)
-
-        response = admin_client.post(ENDPOINT + "acknowledge_all/")
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data == {"result": 2}
-
-    def test_skips_already_acknowledged(self, admin_client: APIClient) -> None:
-        """acknowledge_all/ does not re-acknowledge tasks that are already acknowledged."""
-        PaperlessTaskFactory(status=PaperlessTask.Status.SUCCESS, acknowledged=True)
-        PaperlessTaskFactory(status=PaperlessTask.Status.SUCCESS, acknowledged=False)
-
-        response = admin_client.post(ENDPOINT + "acknowledge_all/")
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data == {"result": 1}
-
-    @pytest.mark.parametrize(
-        ("task_status", "expected_count"),
-        [
-            pytest.param(PaperlessTask.Status.PENDING, 0, id="pending-excluded"),
-            pytest.param(PaperlessTask.Status.STARTED, 0, id="started-excluded"),
-            pytest.param(PaperlessTask.Status.REVOKED, 1, id="revoked-included"),
-        ],
-    )
-    def test_acknowledge_all_by_status(
-        self,
-        admin_client: APIClient,
-        task_status: PaperlessTask.Status,
-        expected_count: int,
-    ) -> None:
-        """acknowledge_all/ ignores PENDING/STARTED and includes REVOKED."""
-        PaperlessTaskFactory(status=task_status, acknowledged=False)
-
-        response = admin_client.post(ENDPOINT + "acknowledge_all/")
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data == {"result": expected_count}
 
 
 @pytest.mark.django_db()

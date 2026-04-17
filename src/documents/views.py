@@ -3755,18 +3755,6 @@ class RemoteVersionView(GenericAPIView[Any]):
             ),
         },
     ),
-    acknowledge_all=extend_schema(
-        operation_id="acknowledge_all_tasks",
-        description="Acknowledge all completed tasks visible to the requesting user",
-        responses={
-            (200, "application/json"): inline_serializer(
-                name="AcknowledgeAllTasks",
-                fields={
-                    "result": serializers.IntegerField(),
-                },
-            ),
-        },
-    ),
     run=extend_schema(
         operation_id="run_task",
         description="Manually dispatch a background task. Superuser only.",
@@ -3893,23 +3881,6 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
         task_ids = serializer.validated_data.get("tasks")
         tasks = self.get_queryset().filter(id__in=task_ids)
         count = tasks.update(acknowledged=True)
-        return Response({"result": count})
-
-    @action(
-        methods=["post"],
-        detail=False,
-        permission_classes=[IsAuthenticated, AcknowledgeTasksPermissions],
-    )
-    def acknowledge_all(self, request):
-        """Acknowledge all completed tasks visible to the requesting user."""
-        count = (
-            self.get_queryset()
-            .filter(
-                acknowledged=False,
-                status__in=PaperlessTask.COMPLETE_STATUSES,
-            )
-            .update(acknowledged=True)
-        )
         return Response({"result": count})
 
     @action(methods=["get"], detail=False)

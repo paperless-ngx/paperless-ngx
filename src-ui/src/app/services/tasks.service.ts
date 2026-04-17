@@ -85,16 +85,6 @@ export class TasksService {
       )
   }
 
-  public dismissAllTasks(): Observable<any> {
-    return this.http.post(`${this.baseUrl}tasks/acknowledge_all/`, {}).pipe(
-      first(),
-      takeUntil(this.unsubscribeNotifer),
-      tap(() => {
-        this.reload()
-      })
-    )
-  }
-
   public cancelPending(): void {
     this.unsubscribeNotifer.next(true)
   }
