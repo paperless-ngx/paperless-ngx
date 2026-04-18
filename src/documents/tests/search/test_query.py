@@ -265,6 +265,40 @@ class TestDateTimeFields:
         assert lo == "2025-12-01T00:00:00Z"
         assert hi == "2026-01-01T00:00:00Z"
 
+    @pytest.mark.parametrize(
+        ("query", "expected_lo", "expected_hi"),
+        [
+            pytest.param(
+                'added:"previous quarter"',
+                "2026-04-01T00:00:00Z",
+                "2026-07-01T00:00:00Z",
+                id="quoted_previous_quarter",
+            ),
+            pytest.param(
+                "added:previous month",
+                "2026-06-01T00:00:00Z",
+                "2026-07-01T00:00:00Z",
+                id="bare_previous_month",
+            ),
+            pytest.param(
+                "added:this month",
+                "2026-07-01T00:00:00Z",
+                "2026-08-01T00:00:00Z",
+                id="bare_this_month",
+            ),
+        ],
+    )
+    @time_machine.travel(datetime(2026, 7, 15, 12, 0, tzinfo=UTC), tick=False)
+    def test_legacy_natural_language_aliases(
+        self,
+        query: str,
+        expected_lo: str,
+        expected_hi: str,
+    ) -> None:
+        lo, hi = _range(rewrite_natural_date_keywords(query, UTC), "added")
+        assert lo == expected_lo
+        assert hi == expected_hi
+
     def test_unknown_keyword_raises(self) -> None:
         with pytest.raises(ValueError, match="Unknown keyword"):
             _datetime_range("bogus_keyword", UTC)

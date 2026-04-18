@@ -25,21 +25,43 @@ _REGEX_TIMEOUT: Final[float] = 1.0
 
 _DATE_ONLY_FIELDS = frozenset({"created"})
 
-_DATE_KEYWORDS = frozenset(
-    {
-        "today",
-        "yesterday",
-        "this_week",
-        "last_week",
-        "this_month",
-        "last_month",
-        "this_year",
-        "last_year",
-    },
+# Natural date keywords with whoosh-style aliases mapped to
+# canonical forms.
+_DATE_KEYWORD_ALIASES: Final[dict[str, str]] = {
+    "today": "today",
+    "yesterday": "yesterday",
+    "this_week": "this_week",
+    "this week": "this_week",
+    "last_week": "last_week",
+    "last week": "last_week",
+    "previous week": "last_week",
+    "this_month": "this_month",
+    "this month": "this_month",
+    "last_month": "last_month",
+    "last month": "last_month",
+    "previous month": "last_month",
+    "last_quarter": "last_quarter",
+    "last quarter": "last_quarter",
+    "previous_quarter": "last_quarter",
+    "previous quarter": "last_quarter",
+    "this_year": "this_year",
+    "this year": "this_year",
+    "last_year": "last_year",
+    "last year": "last_year",
+    "previous year": "last_year",
+}
+_DATE_KEYWORDS = frozenset(_DATE_KEYWORD_ALIASES.values())
+_DATE_KEYWORD_PATTERN = "|".join(
+    sorted((regex.escape(k) for k in _DATE_KEYWORD_ALIASES), key=len, reverse=True),
 )
 
 _FIELD_DATE_RE = regex.compile(
-    r"(\w+):(" + "|".join(_DATE_KEYWORDS) + r")\b",
+    rf"""(?P<field>\w+)\s*:\s*(?:
+    (?P<quote>["'])(?P<quoted>{_DATE_KEYWORD_PATTERN})(?P=quote)
+    |
+    (?P<bare>{_DATE_KEYWORD_PATTERN})(?![\w-])
+)""",
+    regex.IGNORECASE | regex.VERBOSE,
 )
 _COMPACT_DATE_RE = regex.compile(r"\b(\d{14})\b")
 _RELATIVE_RANGE_RE = regex.compile(
@@ -74,6 +96,9 @@ def _date_only_range(keyword: str, tz: tzinfo) -> str:
 
     today = datetime.now(tz).date()
 
+    def _quarter_start(d: date) -> date:
+        return date(d.year, ((d.month - 1) // 3) * 3 + 1, 1)
+
     if keyword == "today":
         lo = datetime(today.year, today.month, today.day, tzinfo=UTC)
         return _iso_range(lo, lo + timedelta(days=1))
@@ -106,6 +131,22 @@ def _date_only_range(keyword: str, tz: tzinfo) -> str:
             lo = datetime(today.year, today.month - 1, 1, tzinfo=UTC)
         hi = datetime(today.year, today.month, 1, tzinfo=UTC)
         return _iso_range(lo, hi)
+    if keyword == "last_quarter":
+        this_quarter = _quarter_start(today)
+        last_quarter = this_quarter - relativedelta(months=3)
+        lo = datetime(
+            last_quarter.year,
+            last_quarter.month,
+            last_quarter.day,
+            tzinfo=UTC,
+        )
+        hi = datetime(
+            this_quarter.year,
+            this_quarter.month,
+            this_quarter.day,
+            tzinfo=UTC,
+        )
+        return _iso_range(lo, hi)
     if keyword == "this_year":
         lo = datetime(today.year, 1, 1, tzinfo=UTC)
         return _iso_range(lo, datetime(today.year + 1, 1, 1, tzinfo=UTC))
@@ -126,6 +167,9 @@ def _datetime_range(keyword: str, tz: tzinfo) -> str:
 
     def _midnight(d: date) -> datetime:
         return datetime(d.year, d.month, d.day, tzinfo=tz).astimezone(UTC)
+
+    def _quarter_start(d: date) -> date:
+        return date(d.year, ((d.month - 1) // 3) * 3 + 1, 1)
 
     if keyword == "today":
         return _iso_range(_midnight(today), _midnight(today + timedelta(days=1)))
@@ -153,6 +197,10 @@ def _datetime_range(keyword: str, tz: tzinfo) -> str:
         else:
             last_first = date(today.year, today.month - 1, 1)
         return _iso_range(_midnight(last_first), _midnight(this_first))
+    if keyword == "last_quarter":
+        this_quarter = _quarter_start(today)
+        last_quarter = this_quarter - relativedelta(months=3)
+        return _iso_range(_midnight(last_quarter), _midnight(this_quarter))
     if keyword == "this_year":
         return _iso_range(
             _midnight(date(today.year, 1, 1)),
@@ -326,7 +374,9 @@ def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
     query = _rewrite_relative_range(query)
 
     def _replace(m: regex.Match[str]) -> str:
-        field, keyword = m.group(1), m.group(2)
+        field = m.group("field")
+        raw_keyword = m.group("quoted") or m.group("bare")
+        keyword = _DATE_KEYWORD_ALIASES[raw_keyword.lower()]
         if field in _DATE_ONLY_FIELDS:
             return f"{field}:{_date_only_range(keyword, tz)}"
         return f"{field}:{_datetime_range(keyword, tz)}"
