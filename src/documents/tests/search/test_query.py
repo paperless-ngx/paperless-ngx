@@ -157,6 +157,15 @@ class TestCreatedDateField:
         assert lo == "2025-12-01T00:00:00Z"
         assert hi == "2026-01-01T00:00:00Z"
 
+    @time_machine.travel(datetime(2026, 7, 15, 12, 0, tzinfo=UTC), tick=False)
+    def test_legacy_previous_quarter_alias(self) -> None:
+        lo, hi = _range(
+            rewrite_natural_date_keywords('created:"previous quarter"', UTC),
+            "created",
+        )
+        assert lo == "2026-04-01T00:00:00Z"
+        assert hi == "2026-07-01T00:00:00Z"
+
     def test_unknown_keyword_raises(self) -> None:
         with pytest.raises(ValueError, match="Unknown keyword"):
             _date_only_range("bogus_keyword", UTC)
