@@ -158,11 +158,11 @@ const RELATIVE_DATE_QUERYSTRINGS = [
   },
   {
     relativeDate: RelativeDate.THIS_YEAR,
-    dateQuery: 'this year',
+    dateQuery: 'this_year',
   },
   {
     relativeDate: RelativeDate.THIS_MONTH,
-    dateQuery: 'this month',
+    dateQuery: 'this_month',
   },
   {
     relativeDate: RelativeDate.TODAY,
@@ -174,19 +174,19 @@ const RELATIVE_DATE_QUERYSTRINGS = [
   },
   {
     relativeDate: RelativeDate.PREVIOUS_WEEK,
-    dateQuery: 'previous week',
+    dateQuery: 'last_week',
   },
   {
     relativeDate: RelativeDate.PREVIOUS_MONTH,
-    dateQuery: 'previous month',
+    dateQuery: 'last_month',
   },
   {
     relativeDate: RelativeDate.PREVIOUS_QUARTER,
-    dateQuery: 'previous quarter',
+    dateQuery: 'last_quarter',
   },
   {
     relativeDate: RelativeDate.PREVIOUS_YEAR,
-    dateQuery: 'previous year',
+    dateQuery: 'last_year',
   },
 ]
 

@@ -1837,6 +1837,93 @@ describe('FilterEditorComponent', () => {
     ])
   }))
 
+  it('should emit quoted keyword for non-range relative date created (e.g. this year)', fakeAsync(() => {
+    const dateCreatedDropdown = fixture.debugElement.queryAll(
+      By.directive(DatesDropdownComponent)
+    )[0]
+    component.dateCreatedRelativeDate = RelativeDate.THIS_YEAR
+    dateCreatedDropdown.triggerEventHandler('datesSet')
+    fixture.detectChanges()
+    tick(400)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'created:"this_year"',
+      },
+    ])
+  }))
+
+  it('should emit quoted keyword for non-range relative date added (e.g. last month)', fakeAsync(() => {
+    const datesDropdown = fixture.debugElement.query(
+      By.directive(DatesDropdownComponent)
+    )
+    component.dateAddedRelativeDate = RelativeDate.PREVIOUS_MONTH
+    datesDropdown.triggerEventHandler('datesSet')
+    fixture.detectChanges()
+    tick(400)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'added:"last_month"',
+      },
+    ])
+  }))
+
+  it('should ingest quoted keyword relative date for created', fakeAsync(() => {
+    expect(component.dateCreatedRelativeDate).toBeNull()
+    component.filterRules = [
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'created:"this_year"',
+      },
+    ]
+    expect(component.dateCreatedRelativeDate).toEqual(RelativeDate.THIS_YEAR)
+    expect(component.textFilter).toBeNull()
+  }))
+
+  it('should ingest quoted keyword relative date for added', fakeAsync(() => {
+    expect(component.dateAddedRelativeDate).toBeNull()
+    component.filterRules = [
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'added:"last_month"',
+      },
+    ]
+    expect(component.dateAddedRelativeDate).toEqual(RelativeDate.PREVIOUS_MONTH)
+    expect(component.textFilter).toBeNull()
+  }))
+
+  it('should ingest both created and added relative dates from a single fulltext rule', fakeAsync(() => {
+    expect(component.dateCreatedRelativeDate).toBeNull()
+    expect(component.dateAddedRelativeDate).toBeNull()
+    component.filterRules = [
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'created:"this_year",added:"last_month"',
+      },
+    ]
+    expect(component.dateCreatedRelativeDate).toEqual(RelativeDate.THIS_YEAR)
+    expect(component.dateAddedRelativeDate).toEqual(RelativeDate.PREVIOUS_MONTH)
+    expect(component.textFilter).toBeNull()
+  }))
+
+  it('should emit both created and added relative dates in a single fulltext rule', fakeAsync(() => {
+    const dateCreatedDropdown = fixture.debugElement.queryAll(
+      By.directive(DatesDropdownComponent)
+    )[0]
+    component.dateCreatedRelativeDate = RelativeDate.THIS_YEAR
+    component.dateAddedRelativeDate = RelativeDate.PREVIOUS_MONTH
+    dateCreatedDropdown.triggerEventHandler('datesSet')
+    fixture.detectChanges()
+    tick(400)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'created:"this_year",added:"last_month"',
+      },
+    ])
+  }))
+
   it('should convert user input to correct filter on permissions select my docs', fakeAsync(() => {
     const permissionsDropdown = fixture.debugElement.query(
       By.directive(PermissionsFilterDropdownComponent)

@@ -116,6 +116,13 @@ class TestCreatedDateField:
             ),
             pytest.param(
                 "created",
+                "last_quarter",
+                "2025-10-01T00:00:00Z",
+                "2026-01-01T00:00:00Z",
+                id="last_quarter_q4_2025",
+            ),
+            pytest.param(
+                "created",
                 "last_year",
                 "2025-01-01T00:00:00Z",
                 "2026-01-01T00:00:00Z",
@@ -156,6 +163,26 @@ class TestCreatedDateField:
         )
         assert lo == "2025-12-01T00:00:00Z"
         assert hi == "2026-01-01T00:00:00Z"
+
+    @time_machine.travel(datetime(2026, 1, 15, 12, 0, tzinfo=UTC), tick=False)
+    def test_last_quarter_wraps_to_previous_year(self) -> None:
+        # January is Q1; last quarter is Q4 of the previous year
+        lo, hi = _range(
+            rewrite_natural_date_keywords("created:last_quarter", UTC),
+            "created",
+        )
+        assert lo == "2025-10-01T00:00:00Z"
+        assert hi == "2026-01-01T00:00:00Z"
+
+    @time_machine.travel(datetime(2026, 3, 28, 15, 0, tzinfo=UTC), tick=False)
+    def test_quoted_keyword_accepted(self) -> None:
+        # Frontend sends created:"this_year"
+        lo, hi = _range(
+            rewrite_natural_date_keywords('created:"this_year"', UTC),
+            "created",
+        )
+        assert lo == "2026-01-01T00:00:00Z"
+        assert hi == "2027-01-01T00:00:00Z"
 
     def test_unknown_keyword_raises(self) -> None:
         with pytest.raises(ValueError, match="Unknown keyword"):
@@ -232,6 +259,12 @@ class TestDateTimeFields:
                 id="this_year",
             ),
             pytest.param(
+                "last_quarter",
+                "2025-10-01T00:00:00Z",
+                "2026-01-01T00:00:00Z",
+                id="last_quarter_q4_2025",
+            ),
+            pytest.param(
                 "last_year",
                 "2025-01-01T00:00:00Z",
                 "2026-01-01T00:00:00Z",
@@ -263,6 +296,13 @@ class TestDateTimeFields:
         # January: last month wraps back to December of previous year
         lo, hi = _range(rewrite_natural_date_keywords("added:last_month", UTC), "added")
         assert lo == "2025-12-01T00:00:00Z"
+        assert hi == "2026-01-01T00:00:00Z"
+
+    @time_machine.travel(datetime(2026, 1, 15, 12, 0, tzinfo=UTC), tick=False)
+    def test_last_quarter_wraps_to_previous_year(self) -> None:
+        # January is Q1; last quarter is Q4 of the previous year
+        lo, hi = _range(rewrite_natural_date_keywords("added:last_quarter", UTC), "added")
+        assert lo == "2025-10-01T00:00:00Z"
         assert hi == "2026-01-01T00:00:00Z"
 
     def test_unknown_keyword_raises(self) -> None:

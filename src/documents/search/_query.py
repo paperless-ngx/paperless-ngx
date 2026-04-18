@@ -33,13 +33,14 @@ _DATE_KEYWORDS = frozenset(
         "last_week",
         "this_month",
         "last_month",
+        "last_quarter",
         "this_year",
         "last_year",
     },
 )
 
 _FIELD_DATE_RE = regex.compile(
-    r"(\w+):(" + "|".join(_DATE_KEYWORDS) + r")\b",
+    r'(\w+):"?(' + "|".join(_DATE_KEYWORDS) + r')\b"?',
 )
 _COMPACT_DATE_RE = regex.compile(r"\b(\d{14})\b")
 _RELATIVE_RANGE_RE = regex.compile(
@@ -106,6 +107,17 @@ def _date_only_range(keyword: str, tz: tzinfo) -> str:
             lo = datetime(today.year, today.month - 1, 1, tzinfo=UTC)
         hi = datetime(today.year, today.month, 1, tzinfo=UTC)
         return _iso_range(lo, hi)
+    if keyword == "last_quarter":
+        current_q_start_month = ((today.month - 1) // 3) * 3 + 1
+        last_q_start_month = current_q_start_month - 3
+        if last_q_start_month <= 0:
+            last_q_start_month += 12
+            last_q_year = today.year - 1
+        else:
+            last_q_year = today.year
+        lo = datetime(last_q_year, last_q_start_month, 1, tzinfo=UTC)
+        hi = datetime(today.year, current_q_start_month, 1, tzinfo=UTC)
+        return _iso_range(lo, hi)
     if keyword == "this_year":
         lo = datetime(today.year, 1, 1, tzinfo=UTC)
         return _iso_range(lo, datetime(today.year + 1, 1, 1, tzinfo=UTC))
@@ -153,6 +165,18 @@ def _datetime_range(keyword: str, tz: tzinfo) -> str:
         else:
             last_first = date(today.year, today.month - 1, 1)
         return _iso_range(_midnight(last_first), _midnight(this_first))
+    if keyword == "last_quarter":
+        current_q_start_month = ((today.month - 1) // 3) * 3 + 1
+        last_q_start_month = current_q_start_month - 3
+        if last_q_start_month <= 0:
+            last_q_start_month += 12
+            last_q_year = today.year - 1
+        else:
+            last_q_year = today.year
+        return _iso_range(
+            _midnight(date(last_q_year, last_q_start_month, 1)),
+            _midnight(date(today.year, current_q_start_month, 1)),
+        )
     if keyword == "this_year":
         return _iso_range(
             _midnight(date(today.year, 1, 1)),
@@ -367,6 +391,8 @@ def normalize_query(query: str) -> str:
             query,
             timeout=_REGEX_TIMEOUT,
         )
+        # Example of query to parse: created:[XXX],added:[XXX]
+        query = regex.sub(r"\s*,\s*", " ", query, timeout=_REGEX_TIMEOUT)
         return regex.sub(r" {2,}", " ", query, timeout=_REGEX_TIMEOUT).strip()
     except TimeoutError:  # pragma: no cover
         raise ValueError("Query too complex to process (normalization timed out)")
