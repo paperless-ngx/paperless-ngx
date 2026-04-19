@@ -151,7 +151,7 @@ class TestCreatedDateField:
         assert hi == "2026-01-01T00:00:00Z"
 
     @time_machine.travel(datetime(2026, 7, 15, 12, 0, tzinfo=UTC), tick=False)
-    def test_legacy_previous_quarter_alias(self) -> None:
+    def test_previous_quarter(self) -> None:
         lo, hi = _range(
             rewrite_natural_date_keywords('created:"previous quarter"', UTC),
             "created",
