@@ -762,22 +762,16 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         d1 = DocumentFactory.create(
             title="quarterly statement april",
             content="bank statement",
-            checksum="Q1",
-            pk=1,
             added=datetime.datetime(2026, 4, 10, 12, 0, tzinfo=datetime.UTC),
         )
         d2 = DocumentFactory.create(
             title="quarterly statement june",
             content="bank statement",
-            checksum="Q2",
-            pk=2,
             added=datetime.datetime(2026, 6, 20, 12, 0, tzinfo=datetime.UTC),
         )
         d3 = DocumentFactory.create(
             title="quarterly statement july",
             content="bank statement",
-            checksum="Q3",
-            pk=3,
             added=datetime.datetime(2026, 7, 10, 12, 0, tzinfo=datetime.UTC),
         )
 
