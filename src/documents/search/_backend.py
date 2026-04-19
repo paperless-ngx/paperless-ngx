@@ -222,24 +222,9 @@ class WriteBatch:
         self._writer.add_document(doc)
 
     def remove(self, doc_id: int) -> None:
-        """
-        Remove a document from the batch by its primary key.
-
-        Uses range_query instead of term_query to work around a tantivy-py bug
-        where Python integers are inferred as i64, producing Terms that never
-        match u64 fields.
-
-        TODO: Replace with term_query("id", doc_id) once
-        https://github.com/quickwit-oss/tantivy-py/pull/642 lands.
-        """
+        """Remove a document from the batch by its primary key."""
         self._writer.delete_documents_by_query(
-            tantivy.Query.range_query(
-                self._backend._schema,
-                "id",
-                tantivy.FieldType.Unsigned,
-                doc_id,
-                doc_id,
-            ),
+            tantivy.Query.term_query(self._backend._schema, "id", doc_id),
         )
 
 
@@ -526,15 +511,6 @@ class TantivyBackend:
         Use this when you already know which documents to display (from
         search_ids + ORM filtering) and just need highlight data.
 
-        Note: Each doc_id requires an individual index lookup because tantivy-py
-        does not yet expose a batch fast-field read API. This is acceptable for
-        page-sized batches (typically 25 docs) but should not be called with
-        thousands of IDs.
-
-        TODO: When https://github.com/quickwit-oss/tantivy-py/pull/641 lands,
-        the per-doc range_query lookups here can be replaced with a single
-        collect_u64_fast_field("id", doc_addresses) call.
-
         Args:
             query: The search query (used for snippet generation)
             doc_ids: Ordered list of document IDs to generate hits for
@@ -571,32 +547,42 @@ class TantivyBackend:
             notes_text_query = user_query
 
         searcher = self._index.searcher()
+
+        # Fetch all requested docs in a single search: user_query MUST match
+        # and exactly the requested IDs MUST match (OR of term_queries).
+        id_filter = tantivy.Query.boolean_query(
+            [
+                (
+                    tantivy.Occur.Should,
+                    tantivy.Query.term_query(self._schema, "id", did),
+                )
+                for did in doc_ids
+            ],
+        )
+        batch_query = tantivy.Query.boolean_query(
+            [
+                (tantivy.Occur.Must, user_query),
+                (tantivy.Occur.Must, id_filter),
+            ],
+        )
+        batch_results = searcher.search(batch_query, limit=len(doc_ids))
+
+        result_addrs = [addr for _score, addr in batch_results.hits]
+        result_ids = searcher.fast_field_values("id", result_addrs)
+        addr_by_id: dict[int, tuple[float, tantivy.DocAddress]] = {
+            doc_id: (score, addr)
+            for (score, addr), doc_id in zip(batch_results.hits, result_ids)
+        }
+
         snippet_generator = None
         notes_snippet_generator = None
         hits: list[SearchHit] = []
 
         for rank, doc_id in enumerate(doc_ids, start=rank_start):
-            # Look up document by ID, scoring against the user query so that
-            # the returned SearchHit carries a real BM25 relevance score.
-            id_query = tantivy.Query.range_query(
-                self._schema,
-                "id",
-                tantivy.FieldType.Unsigned,
-                doc_id,
-                doc_id,
-            )
-            scored_query = tantivy.Query.boolean_query(
-                [
-                    (tantivy.Occur.Must, user_query),
-                    (tantivy.Occur.Must, id_query),
-                ],
-            )
-            results = searcher.search(scored_query, limit=1)
-
-            if not results.hits:
+            if doc_id not in addr_by_id:
                 continue
 
-            score, doc_address = results.hits[0]
+            score, doc_address = addr_by_id[doc_id]
             actual_doc = searcher.doc(doc_address)
             doc_dict = actual_doc.to_dict()
 
@@ -701,10 +687,7 @@ class TantivyBackend:
             if threshold is not None:
                 all_hits = [hit for hit in all_hits if hit[1] >= threshold]
 
-        # TODO: Replace with searcher.collect_u64_fast_field("id", addrs) once
-        # https://github.com/quickwit-oss/tantivy-py/pull/641 lands — eliminates
-        # one stored-doc fetch per result (~80% reduction in search_ids latency).
-        return [searcher.doc(doc_addr).to_dict()["id"][0] for doc_addr, *_ in all_hits]
+        return searcher.fast_field_values("id", [doc_addr for doc_addr, *_ in all_hits])
 
     def autocomplete(
         self,
@@ -821,13 +804,7 @@ class TantivyBackend:
         self._ensure_open()
         searcher = self._index.searcher()
 
-        id_query = tantivy.Query.range_query(
-            self._schema,
-            "id",
-            tantivy.FieldType.Unsigned,
-            doc_id,
-            doc_id,
-        )
+        id_query = tantivy.Query.term_query(self._schema, "id", doc_id)
         results = searcher.search(id_query, limit=1)
 
         if not results.hits:
@@ -851,14 +828,9 @@ class TantivyBackend:
         # Fetch one extra to account for excluding the original document
         results = searcher.search(final_query, limit=effective_limit + 1)
 
-        # TODO: Replace with collect_u64_fast_field("id", addrs) once
-        # https://github.com/quickwit-oss/tantivy-py/pull/641 lands.
-        ids = []
-        for _score, doc_address in results.hits:
-            result_doc_id = searcher.doc(doc_address).to_dict()["id"][0]
-            if result_doc_id != doc_id:
-                ids.append(result_doc_id)
-
+        addrs = [addr for _score, addr in results.hits]
+        all_ids = searcher.fast_field_values("id", addrs)
+        ids = [rid for rid in all_ids if rid != doc_id]
         return ids[:limit] if limit is not None else ids
 
     def batch_update(self, lock_timeout: float = 30.0) -> WriteBatch:
