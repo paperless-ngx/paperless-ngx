@@ -27,6 +27,7 @@ from documents.models import Tag
 from documents.models import Workflow
 from documents.search import get_backend
 from documents.search import reset_backend
+from documents.tests.factories import DocumentFactory
 from documents.tests.utils import DirectoriesMixin
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -749,7 +750,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         datetime.datetime(2026, 7, 15, 12, 0, tzinfo=datetime.UTC),
         tick=False,
     )
-    def test_search_added_previous_quarter_legacy_phrase(self) -> None:
+    def test_search_added_previous_quarter(self) -> None:
         """
         GIVEN:
             - Documents inside and outside the previous quarter
@@ -758,21 +759,21 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         THEN:
             - Previous-quarter documents are returned
         """
-        d1 = Document.objects.create(
+        d1 = DocumentFactory.create(
             title="quarterly statement april",
             content="bank statement",
             checksum="Q1",
             pk=1,
             added=datetime.datetime(2026, 4, 10, 12, 0, tzinfo=datetime.UTC),
         )
-        d2 = Document.objects.create(
+        d2 = DocumentFactory.create(
             title="quarterly statement june",
             content="bank statement",
             checksum="Q2",
             pk=2,
             added=datetime.datetime(2026, 6, 20, 12, 0, tzinfo=datetime.UTC),
         )
-        d3 = Document.objects.create(
+        d3 = DocumentFactory.create(
             title="quarterly statement july",
             content="bank statement",
             checksum="Q3",
