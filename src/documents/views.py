@@ -3493,7 +3493,7 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
         follow_filename_format = serializer.validated_data.get("follow_formatting")
 
         for document in documents:
-            if not has_perms_owner_aware(request.user, "change_document", document):
+            if not has_perms_owner_aware(request.user, "view_document", document):
                 return HttpResponseForbidden("Insufficient permissions")
 
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
@@ -3516,11 +3516,13 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
                 strategy.add_document(document)
 
         # TODO(stumpylog): Investigate using FileResponse here
+        today_str = timezone.now().strftime("%Y-%m-%d")
+        zip_filename = f"documents_{today_str}.zip"
         with Path(temp.name).open("rb") as f:
             response = HttpResponse(f, content_type="application/zip")
             response["Content-Disposition"] = '{}; filename="{}"'.format(
                 "attachment",
-                "documents.zip",
+                zip_filename,
             )
 
             return response
