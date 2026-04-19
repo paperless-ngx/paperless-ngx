@@ -25,34 +25,21 @@ _REGEX_TIMEOUT: Final[float] = 1.0
 
 _DATE_ONLY_FIELDS = frozenset({"created"})
 
-# Natural date keywords with whoosh-style aliases mapped to
-# canonical forms.
-_DATE_KEYWORD_ALIASES: Final[dict[str, str]] = {
-    "today": "today",
-    "yesterday": "yesterday",
-    "this_week": "this_week",
-    "this week": "this_week",
-    "last_week": "last_week",
-    "last week": "last_week",
-    "previous week": "last_week",
-    "this_month": "this_month",
-    "this month": "this_month",
-    "last_month": "last_month",
-    "last month": "last_month",
-    "previous month": "last_month",
-    "last_quarter": "last_quarter",
-    "last quarter": "last_quarter",
-    "previous_quarter": "last_quarter",
-    "previous quarter": "last_quarter",
-    "this_year": "this_year",
-    "this year": "this_year",
-    "last_year": "last_year",
-    "last year": "last_year",
-    "previous year": "last_year",
-}
-_DATE_KEYWORDS = frozenset(_DATE_KEYWORD_ALIASES.values())
+_DATE_KEYWORDS = frozenset(
+    {
+        "today",
+        "yesterday",
+        "previous week",
+        "this month",
+        "previous month",
+        "this year",
+        "previous year",
+        "previous quarter",
+    },
+)
+
 _DATE_KEYWORD_PATTERN = "|".join(
-    sorted((regex.escape(k) for k in _DATE_KEYWORD_ALIASES), key=len, reverse=True),
+    sorted((regex.escape(k) for k in _DATE_KEYWORDS), key=len, reverse=True),
 )
 
 _FIELD_DATE_RE = regex.compile(
@@ -107,31 +94,33 @@ def _date_only_range(keyword: str, tz: tzinfo) -> str:
         lo = datetime(y.year, y.month, y.day, tzinfo=UTC)
         hi = datetime(today.year, today.month, today.day, tzinfo=UTC)
         return _iso_range(lo, hi)
-    if keyword == "this_week":
-        mon = today - timedelta(days=today.weekday())
-        lo = datetime(mon.year, mon.month, mon.day, tzinfo=UTC)
-        return _iso_range(lo, lo + timedelta(weeks=1))
-    if keyword == "last_week":
+    if keyword == "previous week":
         this_mon = today - timedelta(days=today.weekday())
         last_mon = this_mon - timedelta(weeks=1)
         lo = datetime(last_mon.year, last_mon.month, last_mon.day, tzinfo=UTC)
         hi = datetime(this_mon.year, this_mon.month, this_mon.day, tzinfo=UTC)
         return _iso_range(lo, hi)
-    if keyword == "this_month":
+    if keyword == "this month":
         lo = datetime(today.year, today.month, 1, tzinfo=UTC)
         if today.month == 12:
             hi = datetime(today.year + 1, 1, 1, tzinfo=UTC)
         else:
             hi = datetime(today.year, today.month + 1, 1, tzinfo=UTC)
         return _iso_range(lo, hi)
-    if keyword == "last_month":
+    if keyword == "previous month":
         if today.month == 1:
             lo = datetime(today.year - 1, 12, 1, tzinfo=UTC)
         else:
             lo = datetime(today.year, today.month - 1, 1, tzinfo=UTC)
         hi = datetime(today.year, today.month, 1, tzinfo=UTC)
         return _iso_range(lo, hi)
-    if keyword == "last_quarter":
+    if keyword == "this year":
+        lo = datetime(today.year, 1, 1, tzinfo=UTC)
+        return _iso_range(lo, datetime(today.year + 1, 1, 1, tzinfo=UTC))
+    if keyword == "previous year":
+        lo = datetime(today.year - 1, 1, 1, tzinfo=UTC)
+        return _iso_range(lo, datetime(today.year, 1, 1, tzinfo=UTC))
+    if keyword == "previous quarter":
         this_quarter = _quarter_start(today)
         last_quarter = this_quarter - relativedelta(months=3)
         lo = datetime(
@@ -147,12 +136,6 @@ def _date_only_range(keyword: str, tz: tzinfo) -> str:
             tzinfo=UTC,
         )
         return _iso_range(lo, hi)
-    if keyword == "this_year":
-        lo = datetime(today.year, 1, 1, tzinfo=UTC)
-        return _iso_range(lo, datetime(today.year + 1, 1, 1, tzinfo=UTC))
-    if keyword == "last_year":
-        lo = datetime(today.year - 1, 1, 1, tzinfo=UTC)
-        return _iso_range(lo, datetime(today.year, 1, 1, tzinfo=UTC))
     raise ValueError(f"Unknown keyword: {keyword}")
 
 
@@ -176,41 +159,38 @@ def _datetime_range(keyword: str, tz: tzinfo) -> str:
     if keyword == "yesterday":
         y = today - timedelta(days=1)
         return _iso_range(_midnight(y), _midnight(today))
-    if keyword == "this_week":
-        mon = today - timedelta(days=today.weekday())
-        return _iso_range(_midnight(mon), _midnight(mon + timedelta(weeks=1)))
-    if keyword == "last_week":
+    if keyword == "previous week":
         this_mon = today - timedelta(days=today.weekday())
         last_mon = this_mon - timedelta(weeks=1)
         return _iso_range(_midnight(last_mon), _midnight(this_mon))
-    if keyword == "this_month":
+    if keyword == "this month":
         first = today.replace(day=1)
         if today.month == 12:
             next_first = date(today.year + 1, 1, 1)
         else:
             next_first = date(today.year, today.month + 1, 1)
         return _iso_range(_midnight(first), _midnight(next_first))
-    if keyword == "last_month":
+    if keyword == "previous month":
         this_first = today.replace(day=1)
         if today.month == 1:
             last_first = date(today.year - 1, 12, 1)
         else:
             last_first = date(today.year, today.month - 1, 1)
         return _iso_range(_midnight(last_first), _midnight(this_first))
-    if keyword == "last_quarter":
-        this_quarter = _quarter_start(today)
-        last_quarter = this_quarter - relativedelta(months=3)
-        return _iso_range(_midnight(last_quarter), _midnight(this_quarter))
-    if keyword == "this_year":
+    if keyword == "this year":
         return _iso_range(
             _midnight(date(today.year, 1, 1)),
             _midnight(date(today.year + 1, 1, 1)),
         )
-    if keyword == "last_year":
+    if keyword == "previous year":
         return _iso_range(
             _midnight(date(today.year - 1, 1, 1)),
             _midnight(date(today.year, 1, 1)),
         )
+    if keyword == "previous quarter":
+        this_quarter = _quarter_start(today)
+        last_quarter = this_quarter - relativedelta(months=3)
+        return _iso_range(_midnight(last_quarter), _midnight(this_quarter))
     raise ValueError(f"Unknown keyword: {keyword}")
 
 
@@ -375,8 +355,7 @@ def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
 
     def _replace(m: regex.Match[str]) -> str:
         field = m.group("field")
-        raw_keyword = m.group("quoted") or m.group("bare")
-        keyword = _DATE_KEYWORD_ALIASES[raw_keyword.lower()]
+        keyword = m.group("quoted") or m.group("bare")
         if field in _DATE_ONLY_FIELDS:
             return f"{field}:{_date_only_range(keyword, tz)}"
         return f"{field}:{_datetime_range(keyword, tz)}"
