@@ -855,13 +855,14 @@ Matching natural date keywords:
 ```
 added:today
 modified:yesterday
-created:this_week
-added:last_month
-modified:this_year
+created:"previous week"
+added:"previous month"
+modified:"this year"
 ```
 
-Supported date keywords: `today`, `yesterday`, `this_week`, `last_week`,
-`this_month`, `last_month`, `this_year`, `last_year`.
+Supported date keywords: `today`, `yesterday`, `previous week`,
+`this month`, `previous month`, `this year`, `previous year`,
+`previous quarter`.
 
 #### Searching custom fields
 
