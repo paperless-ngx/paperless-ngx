@@ -336,7 +336,7 @@ def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
     - Compact 14-digit dates (YYYYMMDDHHmmss)
     - Whoosh relative ranges ([-7 days to now], [now-1h TO now+2h])
     - 8-digit dates with field awareness (created:20240115)
-    - Natural keywords (field:today, field:last_week, etc.)
+    - Natural keywords (field:today, field:"previous quarter", etc.)
 
     Args:
         query: Raw user query string
@@ -355,7 +355,7 @@ def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
 
     def _replace(m: regex.Match[str]) -> str:
         field = m.group("field")
-        keyword = m.group("quoted") or m.group("bare")
+        keyword = (m.group("quoted") or m.group("bare")).lower()
         if field in _DATE_ONLY_FIELDS:
             return f"{field}:{_date_only_range(keyword, tz)}"
         return f"{field}:{_datetime_range(keyword, tz)}"

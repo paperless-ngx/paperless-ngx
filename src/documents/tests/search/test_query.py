@@ -110,7 +110,6 @@ class TestCreatedDateField:
             pytest.param(
                 "created",
                 "previous year",
-                "2026-03-23T00:00:00Z",
                 "2025-01-01T00:00:00Z",
                 "2026-01-01T00:00:00Z",
                 id="previous_year",
@@ -135,7 +134,7 @@ class TestCreatedDateField:
     def test_this_month_december_wraps_to_next_year(self) -> None:
         # December: next month must roll over to January 1 of next year
         lo, hi = _range(
-            rewrite_natural_date_keywords("created:this_month", UTC),
+            rewrite_natural_date_keywords("created:this month", UTC),
             "created",
         )
         assert lo == "2026-12-01T00:00:00Z"
@@ -145,7 +144,7 @@ class TestCreatedDateField:
     def test_last_month_january_wraps_to_previous_year(self) -> None:
         # January: last month must roll back to December 1 of previous year
         lo, hi = _range(
-            rewrite_natural_date_keywords("created:last_month", UTC),
+            rewrite_natural_date_keywords("created:previous month", UTC),
             "created",
         )
         assert lo == "2025-12-01T00:00:00Z"
