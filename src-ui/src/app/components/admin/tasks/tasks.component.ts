@@ -217,11 +217,14 @@ export class TasksComponent
 
   get isFiltered(): boolean {
     return (
-      this.selectedSection !== ALL_TASK_SECTIONS ||
       this.selectedTaskType !== ALL_FILTER_VALUE ||
       this.selectedTriggerSource !== ALL_FILTER_VALUE ||
       this._filterText.length > 0
     )
+  }
+
+  get hasScopedSectionView(): boolean {
+    return this.selectedSection !== ALL_TASK_SECTIONS
   }
 
   ngOnInit() {
@@ -441,7 +444,6 @@ export class TasksComponent
   }
 
   public resetFilters() {
-    this.selectedSection = ALL_TASK_SECTIONS
     this.selectedTaskType = ALL_FILTER_VALUE
     this.selectedTriggerSource = ALL_FILTER_VALUE
     this.resetFilter()

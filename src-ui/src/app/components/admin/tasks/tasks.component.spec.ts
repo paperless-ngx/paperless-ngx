@@ -211,13 +211,15 @@ describe('TasksComponent', () => {
     expect(component.selectedTaskType).toBe(ALL_FILTER_VALUE)
     expect(component.selectedTriggerSource).toBe(ALL_FILTER_VALUE)
 
-    const buttons = fixture.debugElement.queryAll(By.css('.btn.btn-sm'))
-    const text = buttons.map((button) => button.nativeElement.textContent)
+    fixture.detectChanges()
 
-    expect(text.join(' ')).toContain('All')
-    expect(text.join(' ')).toContain('Needs attention2')
-    expect(text.join(' ')).toContain('In progress2')
-    expect(text.join(' ')).toContain('Recent completed2')
+    const viewScope = fixture.debugElement.query(By.css('.task-view-scope'))
+    const text = viewScope.nativeElement.textContent
+
+    expect(text).toContain('All')
+    expect(text).toContain('Needs attention2')
+    expect(text).toContain('In progress2')
+    expect(text).toContain('Recent completed2')
   })
 
   it('should filter visible sections by selected status', () => {
@@ -260,11 +262,38 @@ describe('TasksComponent', () => {
 
     component.resetFilters()
 
-    expect(component.selectedSection).toBe(ALL_TASK_SECTIONS)
+    expect(component.selectedSection).toBe(TaskSection.InProgress)
     expect(component.selectedTaskType).toBe(ALL_FILTER_VALUE)
     expect(component.selectedTriggerSource).toBe(ALL_FILTER_VALUE)
     expect(component.filterText).toBe('')
     expect(component.isFiltered).toBe(false)
+  })
+
+  it('should keep header controls focused on actions and auto refresh', () => {
+    fixture.detectChanges()
+
+    const header = fixture.debugElement.query(By.css('pngx-page-header'))
+    const headerText = header.nativeElement.textContent
+
+    expect(headerText).toContain('Dismiss visible')
+    expect(headerText).toContain('Auto refresh')
+    expect(headerText).not.toContain('All types')
+    expect(headerText).not.toContain('All sources')
+    expect(headerText).not.toContain('Reset filters')
+  })
+
+  it('should render the view scope row above the filter bar', () => {
+    fixture.detectChanges()
+
+    const controls = fixture.debugElement.query(By.css('.task-controls'))
+    const controlChildren = controls.children
+
+    expect(controlChildren[0].nativeElement.className).toContain(
+      'task-view-scope'
+    )
+    expect(controlChildren[1].nativeElement.className).toContain(
+      'task-filter-bar'
+    )
   })
 
   it('should expose stable task type options and disable empty ones', () => {
@@ -387,6 +416,22 @@ describe('TasksComponent', () => {
     expect(dismissSpy).toHaveBeenCalledWith(new Set([467, 466]))
   })
 
+  it('should dismiss the currently visible scoped and filtered tasks', () => {
+    component.setSection(TaskSection.InProgress)
+    component.setTaskType(PaperlessTaskType.SanityCheck)
+    component.setTriggerSource(PaperlessTaskTriggerSource.System)
+
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+    const dismissSpy = jest.spyOn(tasksService, 'dismissTasks')
+
+    component.dismissTasks()
+
+    expect(modal).not.toBeUndefined()
+    modal.componentInstance.confirmClicked.emit()
+    expect(dismissSpy).toHaveBeenCalledWith(new Set([461]))
+  })
+
   it('should support toggling a full section', () => {
     const toggleCheck = fixture.debugElement.query(
       By.css('#all-tasks-needs_attention')
@@ -416,7 +461,7 @@ describe('TasksComponent', () => {
 
   it('should filter tasks by file name', () => {
     const input = fixture.debugElement.query(
-      By.css('pngx-page-header input[type=text]')
+      By.css('.task-filter-bar input[type=text]')
     )
     input.nativeElement.value = '191092'
     input.nativeElement.dispatchEvent(new Event('input'))
@@ -458,7 +503,7 @@ describe('TasksComponent', () => {
     component.setSection(TaskSection.NeedsAttention)
     component.filterTargetID = 1
     const input = fixture.debugElement.query(
-      By.css('pngx-page-header input[type=text]')
+      By.css('.task-filter-bar input[type=text]')
     )
     input.nativeElement.value = 'duplicate'
     input.nativeElement.dispatchEvent(new Event('input'))
@@ -472,7 +517,7 @@ describe('TasksComponent', () => {
 
   it('should support keyboard events for filtering', () => {
     const input = fixture.debugElement.query(
-      By.css('pngx-page-header input[type=text]')
+      By.css('.task-filter-bar input[type=text]')
     )
     input.nativeElement.value = '191092'
     input.nativeElement.dispatchEvent(
@@ -483,5 +528,17 @@ describe('TasksComponent', () => {
       new KeyboardEvent('keyup', { key: 'Escape' })
     )
     expect(component.filterText).toEqual('')
+  })
+
+  it('should keep clearing selection independent from resetting filters', () => {
+    component.setTaskType(PaperlessTaskType.ConsumeFile)
+    component.toggleSelected(tasks[0])
+    expect(component.selectedTasks.size).toBe(1)
+
+    component.clearSelection()
+
+    expect(component.selectedTasks.size).toBe(0)
+    expect(component.selectedTaskType).toBe(PaperlessTaskType.ConsumeFile)
+    expect(component.isFiltered).toBe(true)
   })
 })

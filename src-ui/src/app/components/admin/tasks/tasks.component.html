@@ -5,56 +5,12 @@
   i18n-info
   >
   <div class="btn-toolbar col col-md-auto align-items-center gap-2">
-    @if (isFiltered) {
-      <button class="btn btn-link py-0" (click)="resetFilters()">
-        <i-bs width="1em" height="1em" name="x"></i-bs><small i18n>Reset filters</small>
-      </button>
-    }
     <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedTasks.size === 0">
       <i-bs name="x" class="me-1"></i-bs><ng-container i18n>Clear selection</ng-container>
     </button>
     <button class="btn btn-sm btn-outline-primary me-2" (click)="dismissTasks()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="visibleTasks.length === 0">
       <i-bs name="check2-all" class="me-1"></i-bs>{{dismissButtonText}}
     </button>
-    <div class="form-inline d-flex align-items-center">
-      <div class="input-group input-group-sm flex-fill w-auto flex-nowrap">
-        <span class="input-group-text text-muted" i18n>Filter by</span>
-        <div ngbDropdown>
-          <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{filterTargetName}}</button>
-          <div class="dropdown-menu shadow" ngbDropdownMenu>
-            @for (t of filterTargets; track t.id) {
-              <button ngbDropdownItem [class.active]="filterTargetID === t.id" (click)="filterTargetID = t.id">{{t.name}}</button>
-            }
-          </div>
-        </div>
-        @if (filterText?.length) {
-          <button class="btn btn-link btn-sm px-2 position-absolute top-0 end-0 z-10" (click)="resetFilter()">
-            <i-bs width="1em" height="1em" name="x"></i-bs>
-          </button>
-        }
-        <input #filterInput class="form-control form-control-sm" type="text"
-          (keyup)="filterInputKeyup($event)"
-          [(ngModel)]="filterText">
-      </div>
-    </div>
-    <div ngbDropdown>
-      <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{selectedTaskTypeLabel}}</button>
-      <div class="dropdown-menu shadow" ngbDropdownMenu>
-        <button ngbDropdownItem [class.active]="selectedTaskType === allFilterValue" (click)="setTaskType(allFilterValue)" i18n>All types</button>
-        @for (option of taskTypeOptions; track option.value) {
-          <button ngbDropdownItem [class.active]="selectedTaskType === option.value" [disabled]="isTaskTypeOptionDisabled(option.value)" (click)="setTaskType(option.value)">{{option.label}}</button>
-        }
-      </div>
-    </div>
-    <div ngbDropdown>
-      <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{selectedTriggerSourceLabel}}</button>
-      <div class="dropdown-menu shadow" ngbDropdownMenu>
-        <button ngbDropdownItem [class.active]="selectedTriggerSource === allFilterValue" (click)="setTriggerSource(allFilterValue)" i18n>All sources</button>
-        @for (option of triggerSourceOptions; track option.value) {
-          <button ngbDropdownItem [class.active]="selectedTriggerSource === option.value" [disabled]="isTriggerSourceOptionDisabled(option.value)" (click)="setTriggerSource(option.value)">{{option.label}}</button>
-        }
-      </div>
-    </div>
     <div class="form-check form-switch mb-0 ms-2">
       <input class="form-check-input" type="checkbox" role="switch" [(ngModel)]="autoRefreshEnabled">
       <label class="form-check-label" for="autoRefreshSwitch" i18n>Auto refresh</label>
@@ -67,24 +23,80 @@
   <div class="visually-hidden" i18n>Loading...</div>
 }
 
-<div class="d-flex flex-wrap gap-2 mb-3">
-  <button
-    class="btn btn-sm"
-    [class.btn-primary]="selectedSection === allTaskSections"
-    [class.btn-outline-primary]="selectedSection !== allTaskSections"
-    (click)="setSection(allTaskSections)">
-    <ng-container i18n>All</ng-container>
-  </button>
-  @for (section of sections; track section) {
-    <button
-      class="btn btn-sm"
-      [class.btn-primary]="selectedSection === section"
-      [class.btn-outline-primary]="selectedSection !== section"
-      (click)="setSection(section)">
-      {{ sectionLabel(section) }}
-      @if (sectionCount(section) > 0) {
-        <span class="badge ms-2" [class.bg-danger]="section === TaskSection.NeedsAttention" [class.bg-secondary]="section !== TaskSection.NeedsAttention">{{sectionCount(section)}}</span>
+<div class="task-controls mb-3 btn-toolbar" [class.task-controls-scoped]="hasScopedSectionView">
+  <div class="task-view-scope btn-group btn-group-sm me-3" role="group">
+    <input type="radio"  class="btn-check"
+    [checked]="selectedSection === allTaskSections"
+    id="section-all"
+    />
+    <label
+      class="btn btn-outline-primary"
+      for="section-all"
+      (click)="setSection(allTaskSections)">
+      <ng-container i18n>All</ng-container>
+    </label>
+    @for (section of sections; track section) {
+      <input
+        type="radio" class="btn-check"
+        [checked]="selectedSection === section"
+        id="section-{{section}}"
+        />
+      <label
+        class="btn btn-outline-primary"
+        [for]="'section-' + section"
+        (click)="setSection(section)">
+        {{ sectionLabel(section) }}
+        @if (sectionCount(section) > 0) {
+          <span class="badge ms-2" [class.bg-danger]="section === TaskSection.NeedsAttention" [class.bg-secondary]="section !== TaskSection.NeedsAttention">{{sectionCount(section)}}</span>
+        }
+      </label>
+    }
+  </div>
+
+  <div ngbDropdown>
+    <button class="btn btn-sm btn-outline-primary me-3" ngbDropdownToggle>{{selectedTaskTypeLabel}}</button>
+    <div class="dropdown-menu shadow" ngbDropdownMenu>
+      <button ngbDropdownItem [class.active]="selectedTaskType === allFilterValue" (click)="setTaskType(allFilterValue)" i18n>All types</button>
+      @for (option of taskTypeOptions; track option.value) {
+        <button ngbDropdownItem [class.active]="selectedTaskType === option.value" [disabled]="isTaskTypeOptionDisabled(option.value)" (click)="setTaskType(option.value)">{{option.label}}</button>
       }
+    </div>
+  </div>
+  <div ngbDropdown>
+    <button class="btn btn-sm btn-outline-primary me-3" ngbDropdownToggle>{{selectedTriggerSourceLabel}}</button>
+    <div class="dropdown-menu shadow" ngbDropdownMenu>
+      <button ngbDropdownItem [class.active]="selectedTriggerSource === allFilterValue" (click)="setTriggerSource(allFilterValue)" i18n>All sources</button>
+      @for (option of triggerSourceOptions; track option.value) {
+        <button ngbDropdownItem [class.active]="selectedTriggerSource === option.value" [disabled]="isTriggerSourceOptionDisabled(option.value)" (click)="setTriggerSource(option.value)">{{option.label}}</button>
+      }
+    </div>
+  </div>
+
+  <div class="form-inline d-flex align-items-center flex-grow-1 task-search">
+    <div class="input-group input-group-sm flex-fill w-auto flex-nowrap">
+      <span class="input-group-text text-muted" i18n>Filter by</span>
+      <div ngbDropdown>
+        <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{filterTargetName}}</button>
+        <div class="dropdown-menu shadow" ngbDropdownMenu>
+          @for (t of filterTargets; track t.id) {
+            <button ngbDropdownItem [class.active]="filterTargetID === t.id" (click)="filterTargetID = t.id">{{t.name}}</button>
+          }
+        </div>
+      </div>
+      @if (filterText?.length) {
+        <button class="btn btn-link btn-sm px-2 position-absolute top-0 end-0 z-10" (click)="resetFilter()">
+          <i-bs width="1em" height="1em" name="x"></i-bs>
+        </button>
+      }
+      <input #filterInput class="form-control form-control-sm" type="text"
+        (keyup)="filterInputKeyup($event)"
+        [(ngModel)]="filterText">
+    </div>
+  </div>
+
+  @if (isFiltered) {
+    <button class="btn btn-link py-0 ms-md-auto" (click)="resetFilters()">
+      <i-bs width="1em" height="1em" name="x"></i-bs><small i18n>Reset filters</small>
     </button>
   }
 </div>
