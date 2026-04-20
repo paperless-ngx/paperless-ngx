@@ -86,6 +86,7 @@ class LLMBackend(models.TextChoices):
 
     OPENAI = ("openai", _("OpenAI"))
     OLLAMA = ("ollama", _("Ollama"))
+    MINIMAX = ("minimax", _("MiniMax"))
 
 
 class ApplicationConfiguration(AbstractSingletonModel):

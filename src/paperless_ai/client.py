@@ -50,6 +50,20 @@ class AIClient:
                 api_base=endpoint,
                 api_key=self.settings.llm_api_key,
             )
+        elif self.settings.llm_backend == "minimax":
+            from llama_index.llms.openai import OpenAI
+
+            endpoint = self.settings.llm_endpoint or "https://api.minimax.io/v1"
+            validate_outbound_http_url(
+                endpoint,
+                allow_internal=self.settings.llm_allow_internal_endpoints,
+            )
+            return OpenAI(
+                model=self.settings.llm_model or "MiniMax-M2.7",
+                api_base=endpoint,
+                api_key=self.settings.llm_api_key,
+                temperature=1.0,
+            )
         else:
             raise ValueError(f"Unsupported LLM backend: {self.settings.llm_backend}")
 

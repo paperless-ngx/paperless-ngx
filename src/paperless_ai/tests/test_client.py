@@ -78,6 +78,57 @@ def test_get_llm_unsupported_backend(mock_ai_config):
         AIClient()
 
 
+def test_get_llm_minimax(mock_ai_config, mock_openai_llm):
+    mock_ai_config.llm_backend = "minimax"
+    mock_ai_config.llm_model = "MiniMax-M2.7"
+    mock_ai_config.llm_api_key = "test_minimax_api_key"
+    mock_ai_config.llm_endpoint = None
+
+    client = AIClient()
+
+    mock_openai_llm.assert_called_once_with(
+        model="MiniMax-M2.7",
+        api_base="https://api.minimax.io/v1",
+        api_key="test_minimax_api_key",
+        temperature=1.0,
+    )
+    assert client.llm == mock_openai_llm.return_value
+
+
+def test_get_llm_minimax_custom_endpoint(mock_ai_config, mock_openai_llm):
+    mock_ai_config.llm_backend = "minimax"
+    mock_ai_config.llm_model = "MiniMax-M2.7-highspeed"
+    mock_ai_config.llm_api_key = "test_minimax_api_key"
+    mock_ai_config.llm_endpoint = "https://api.minimax.io/v1"
+
+    client = AIClient()
+
+    mock_openai_llm.assert_called_once_with(
+        model="MiniMax-M2.7-highspeed",
+        api_base="https://api.minimax.io/v1",
+        api_key="test_minimax_api_key",
+        temperature=1.0,
+    )
+    assert client.llm == mock_openai_llm.return_value
+
+
+def test_get_llm_minimax_default_model(mock_ai_config, mock_openai_llm):
+    mock_ai_config.llm_backend = "minimax"
+    mock_ai_config.llm_model = None
+    mock_ai_config.llm_api_key = "test_minimax_api_key"
+    mock_ai_config.llm_endpoint = None
+
+    client = AIClient()
+
+    mock_openai_llm.assert_called_once_with(
+        model="MiniMax-M2.7",
+        api_base="https://api.minimax.io/v1",
+        api_key="test_minimax_api_key",
+        temperature=1.0,
+    )
+    assert client.llm == mock_openai_llm.return_value
+
+
 def test_run_llm_query(mock_ai_config, mock_ollama_llm):
     mock_ai_config.llm_backend = "ollama"
     mock_ai_config.llm_model = "test_model"
@@ -121,3 +172,4 @@ def test_run_chat(mock_ai_config, mock_ollama_llm):
 
     mock_llm_instance.chat.assert_called_once_with(messages)
     assert result == "test_chat_result"
+
