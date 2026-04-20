@@ -171,15 +171,6 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "result_message",
-                    models.TextField(
-                        blank=True,
-                        help_text="Human-readable result message",
-                        null=True,
-                        verbose_name="Result Message",
-                    ),
-                ),
-                (
                     "acknowledged",
                     models.BooleanField(
                         db_index=True,

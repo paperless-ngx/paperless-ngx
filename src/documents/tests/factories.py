@@ -78,5 +78,4 @@ class PaperlessTaskFactory(DjangoModelFactory):
     status = PaperlessTask.Status.PENDING
     input_data = factory.LazyFunction(dict)
     result_data = None
-    result_message = None
     acknowledged = False
