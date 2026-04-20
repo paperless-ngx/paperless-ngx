@@ -215,6 +215,15 @@ export class TasksComponent
     )
   }
 
+  get isFiltered(): boolean {
+    return (
+      this.selectedSection !== ALL_TASK_SECTIONS ||
+      this.selectedTaskType !== ALL_FILTER_VALUE ||
+      this.selectedTriggerSource !== ALL_FILTER_VALUE ||
+      this._filterText.length > 0
+    )
+  }
+
   ngOnInit() {
     this.tasksService.reload()
     timer(5000, 5000)
@@ -429,6 +438,14 @@ export class TasksComponent
 
   public resetFilter() {
     this._filterText = ''
+  }
+
+  public resetFilters() {
+    this.selectedSection = ALL_TASK_SECTIONS
+    this.selectedTaskType = ALL_FILTER_VALUE
+    this.selectedTriggerSource = ALL_FILTER_VALUE
+    this.resetFilter()
+    this.clearSelection()
   }
 
   filterInputKeyup(event: KeyboardEvent) {

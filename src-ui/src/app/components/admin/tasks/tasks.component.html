@@ -5,6 +5,11 @@
   i18n-info
   >
   <div class="btn-toolbar col col-md-auto align-items-center gap-2">
+    @if (isFiltered) {
+      <button class="btn btn-link py-0" (click)="resetFilters()">
+        <i-bs width="1em" height="1em" name="x"></i-bs><small i18n>Reset filters</small>
+      </button>
+    }
     <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedTasks.size === 0">
       <i-bs name="x" class="me-1"></i-bs><ng-container i18n>Clear selection</ng-container>
     </button>

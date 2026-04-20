@@ -249,6 +249,24 @@ describe('TasksComponent', () => {
     ).toBe(PaperlessTaskTriggerSource.EmailConsume)
   })
 
+  it('should reset all active filters together', () => {
+    component.setSection(TaskSection.InProgress)
+    component.setTaskType(PaperlessTaskType.SanityCheck)
+    component.setTriggerSource(PaperlessTaskTriggerSource.System)
+    component.filterText = 'system'
+    jest.advanceTimersByTime(150)
+
+    expect(component.isFiltered).toBe(true)
+
+    component.resetFilters()
+
+    expect(component.selectedSection).toBe(ALL_TASK_SECTIONS)
+    expect(component.selectedTaskType).toBe(ALL_FILTER_VALUE)
+    expect(component.selectedTriggerSource).toBe(ALL_FILTER_VALUE)
+    expect(component.filterText).toBe('')
+    expect(component.isFiltered).toBe(false)
+  })
+
   it('should expose stable task type options and disable empty ones', () => {
     expect(component.taskTypeOptions.map((option) => option.value)).toContain(
       PaperlessTaskType.TrainClassifier
