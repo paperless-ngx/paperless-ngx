@@ -1,4 +1,4 @@
-import { NgTemplateOutlet, SlicePipe } from '@angular/common'
+import { NgTemplateOutlet } from '@angular/common'
 import { Component, inject, OnDestroy, OnInit } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
@@ -6,8 +6,6 @@ import {
   NgbCollapseModule,
   NgbDropdownModule,
   NgbModal,
-  NgbNavModule,
-  NgbPaginationModule,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -20,7 +18,7 @@ import {
   takeUntil,
   timer,
 } from 'rxjs'
-import { PaperlessTask } from 'src/app/data/paperless-task'
+import { PaperlessTask, PaperlessTaskStatus } from 'src/app/data/paperless-task'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { TasksService } from 'src/app/services/tasks.service'
@@ -29,11 +27,10 @@ import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dial
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
-export enum TaskTab {
-  Queued = 'queued',
-  Started = 'started',
+export enum TaskSection {
+  NeedsAttention = 'needs_attention',
+  InProgress = 'in_progress',
   Completed = 'completed',
-  Failed = 'failed',
 }
 
 enum TaskFilterTargetID {
@@ -46,6 +43,14 @@ const FILTER_TARGETS = [
   { id: TaskFilterTargetID.Result, name: $localize`Result` },
 ]
 
+export const ALL_TASK_SECTIONS = 'all'
+
+const SECTION_LABELS: Record<TaskSection, string> = {
+  [TaskSection.NeedsAttention]: $localize`Needs attention`,
+  [TaskSection.InProgress]: $localize`In progress`,
+  [TaskSection.Completed]: $localize`Recently completed`,
+}
+
 @Component({
   selector: 'pngx-tasks',
   templateUrl: './tasks.component.html',
@@ -54,14 +59,11 @@ const FILTER_TARGETS = [
     PageHeaderComponent,
     IfPermissionsDirective,
     CustomDatePipe,
-    SlicePipe,
     FormsModule,
     ReactiveFormsModule,
     NgTemplateOutlet,
     NgbCollapseModule,
     NgbDropdownModule,
-    NgbNavModule,
-    NgbPaginationModule,
     NgbPopoverModule,
     NgxBootstrapIconsModule,
   ],
@@ -75,15 +77,18 @@ export class TasksComponent
   private readonly router = inject(Router)
   private readonly toastService = inject(ToastService)
 
-  public activeTab: TaskTab
+  readonly TaskSection = TaskSection
+  readonly sections = [
+    TaskSection.NeedsAttention,
+    TaskSection.InProgress,
+    TaskSection.Completed,
+  ]
+  readonly allTaskSections = ALL_TASK_SECTIONS
   public selectedTasks: Set<number> = new Set()
-  public togggleAll: boolean = false
   public expandedTask: number
-
-  public pageSize: number = 25
-  public page: number = 1
-
   public autoRefreshEnabled: boolean = true
+  public selectedSection: TaskSection | typeof ALL_TASK_SECTIONS =
+    ALL_TASK_SECTIONS
 
   private _filterText: string = ''
   get filterText() {
@@ -95,20 +100,35 @@ export class TasksComponent
 
   public filterTargetID: TaskFilterTargetID = TaskFilterTargetID.Name
   public get filterTargetName(): string {
-    return this.filterTargets.find((t) => t.id == this.filterTargetID).name
+    return FILTER_TARGETS.find((t) => t.id == this.filterTargetID).name
   }
   private filterDebounce: Subject<string> = new Subject<string>()
 
   public get filterTargets(): Array<{ id: number; name: string }> {
-    return [TaskTab.Failed, TaskTab.Completed].includes(this.activeTab)
-      ? FILTER_TARGETS
-      : FILTER_TARGETS.slice(0, 1)
+    return FILTER_TARGETS
   }
 
   get dismissButtonText(): string {
     return this.selectedTasks.size > 0
       ? $localize`Dismiss selected`
-      : $localize`Dismiss all`
+      : $localize`Dismiss visible`
+  }
+
+  get visibleSections(): TaskSection[] {
+    const sections =
+      this.selectedSection === ALL_TASK_SECTIONS
+        ? this.sections
+        : [this.selectedSection]
+
+    return sections.filter(
+      (section) => this.tasksForSection(section).length > 0
+    )
+  }
+
+  get visibleTasks(): PaperlessTask[] {
+    return this.visibleSections.flatMap((section) =>
+      this.tasksForSection(section)
+    )
   }
 
   ngOnInit() {
@@ -143,14 +163,16 @@ export class TasksComponent
 
   dismissTasks(task: PaperlessTask = undefined) {
     let tasks = task ? new Set([task.id]) : new Set(this.selectedTasks.values())
-    if (!task && tasks.size == 0)
-      tasks = new Set(this.tasksService.allFileTasks.map((t) => t.id))
+    if (!task && tasks.size == 0) {
+      tasks = new Set(this.visibleTasks.map((t) => t.id))
+    }
+
     if (tasks.size > 1) {
       let modal = this.modalService.open(ConfirmDialogComponent, {
         backdrop: 'static',
       })
-      modal.componentInstance.title = $localize`Confirm Dismiss All`
-      modal.componentInstance.messageBold = $localize`Dismiss all ${tasks.size} tasks?`
+      modal.componentInstance.title = $localize`Confirm Dismiss`
+      modal.componentInstance.messageBold = $localize`Dismiss ${tasks.size} tasks?`
       modal.componentInstance.btnClass = 'btn-warning'
       modal.componentInstance.btnCaption = $localize`Dismiss`
       modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
@@ -164,7 +186,7 @@ export class TasksComponent
         })
         this.clearSelection()
       })
-    } else {
+    } else if (tasks.size === 1) {
       this.tasksService.dismissTasks(tasks).subscribe({
         error: (e) =>
           this.toastService.showError($localize`Error dismissing task`, e),
@@ -188,6 +210,21 @@ export class TasksComponent
       : this.selectedTasks.add(task.id)
   }
 
+  toggleSection(section: TaskSection, event: PointerEvent) {
+    const sectionTasks = this.tasksForSection(section)
+    if ((event.target as HTMLInputElement).checked) {
+      sectionTasks.forEach((task) => this.selectedTasks.add(task.id))
+    } else {
+      sectionTasks.forEach((task) => this.selectedTasks.delete(task.id))
+    }
+  }
+
+  areAllSelected(tasks: PaperlessTask[]): boolean {
+    return (
+      tasks.length > 0 && tasks.every((task) => this.selectedTasks.has(task.id))
+    )
+  }
+
   taskDisplayName(task: PaperlessTask): string {
     return task.input_data?.filename?.toString() || task.task_type_display
   }
@@ -196,71 +233,49 @@ export class TasksComponent
     return this.taskDisplayName(task) !== task.task_type_display
   }
 
-  get currentTasks(): PaperlessTask[] {
-    let tasks: PaperlessTask[] = []
-    switch (this.activeTab) {
-      case TaskTab.Queued:
-        tasks = this.tasksService.queuedFileTasks
-        break
-      case TaskTab.Started:
-        tasks = this.tasksService.startedFileTasks
-        break
-      case TaskTab.Completed:
-        tasks = this.tasksService.completedFileTasks
-        break
-      case TaskTab.Failed:
-        tasks = this.tasksService.failedFileTasks
-        break
-    }
+  tasksForSection(section: TaskSection): PaperlessTask[] {
+    let tasks = this.tasksService.allFileTasks.filter((task) =>
+      this.taskBelongsToSection(task, section)
+    )
+
     if (this._filterText.length) {
-      tasks = tasks.filter((t) => {
+      tasks = tasks.filter((task) => {
         if (this.filterTargetID == TaskFilterTargetID.Name) {
-          return this.taskDisplayName(t)
+          return this.taskDisplayName(task)
             ?.toLowerCase()
             .includes(this._filterText.toLowerCase())
         } else if (this.filterTargetID == TaskFilterTargetID.Result) {
-          return t.result_message
+          return task.result_message
             ?.toLowerCase()
             .includes(this._filterText.toLowerCase())
         }
       })
     }
+
     return tasks
   }
 
-  toggleAll(event: PointerEvent) {
-    if ((event.target as HTMLInputElement).checked) {
-      this.selectedTasks = new Set(this.currentTasks.map((t) => t.id))
-    } else {
-      this.clearSelection()
-    }
+  sectionLabel(section: TaskSection): string {
+    return SECTION_LABELS[section]
+  }
+
+  sectionCount(section: TaskSection): number {
+    return this.tasksService.allFileTasks.filter((task) =>
+      this.taskBelongsToSection(task, section)
+    ).length
+  }
+
+  sectionShowsResults(section: TaskSection): boolean {
+    return section !== TaskSection.InProgress
+  }
+
+  setSection(section: TaskSection | typeof ALL_TASK_SECTIONS) {
+    this.selectedSection = section
+    this.clearSelection()
   }
 
   clearSelection() {
-    this.togggleAll = false
     this.selectedTasks.clear()
-  }
-
-  duringTabChange() {
-    this.page = 1
-  }
-
-  beforeTabChange() {
-    this.resetFilter()
-    this.filterTargetID = TaskFilterTargetID.Name
-  }
-
-  get activeTabLocalized(): string {
-    switch (this.activeTab) {
-      case TaskTab.Queued:
-        return $localize`queued`
-      case TaskTab.Started:
-        return $localize`started`
-      case TaskTab.Completed:
-        return $localize`completed`
-      case TaskTab.Failed:
-        return $localize`failed`
-    }
   }
 
   public resetFilter() {
@@ -272,6 +287,26 @@ export class TasksComponent
       this._filterText = (event.target as HTMLInputElement).value
     } else if (event.key === 'Escape') {
       this.resetFilter()
+    }
+  }
+
+  private taskBelongsToSection(
+    task: PaperlessTask,
+    section: TaskSection
+  ): boolean {
+    switch (section) {
+      case TaskSection.NeedsAttention:
+        return [
+          PaperlessTaskStatus.Failure,
+          PaperlessTaskStatus.Revoked,
+        ].includes(task.status)
+      case TaskSection.InProgress:
+        return [
+          PaperlessTaskStatus.Pending,
+          PaperlessTaskStatus.Started,
+        ].includes(task.status)
+      case TaskSection.Completed:
+        return task.status === PaperlessTaskStatus.Success
     }
   }
 }

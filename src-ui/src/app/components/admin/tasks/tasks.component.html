@@ -8,24 +8,20 @@
     <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedTasks.size === 0">
       <i-bs name="x" class="me-1"></i-bs><ng-container i18n>Clear selection</ng-container>
     </button>
-    <button class="btn btn-sm btn-outline-primary me-2" (click)="dismissTasks()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="tasksService.total === 0">
+    <button class="btn btn-sm btn-outline-primary me-2" (click)="dismissTasks()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="visibleTasks.length === 0">
       <i-bs name="check2-all" class="me-1"></i-bs>{{dismissButtonText}}
     </button>
     <div class="form-inline d-flex align-items-center">
       <div class="input-group input-group-sm flex-fill w-auto flex-nowrap">
         <span class="input-group-text text-muted" i18n>Filter by</span>
-        @if (filterTargets.length > 1) {
-          <div ngbDropdown>
-            <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{filterTargetName}}</button>
-            <div class="dropdown-menu shadow" ngbDropdownMenu>
-              @for (t of filterTargets; track t.id) {
-                <button ngbDropdownItem [class.active]="filterTargetID === t.id" (click)="filterTargetID = t.id">{{t.name}}</button>
-              }
-            </div>
+        <div ngbDropdown>
+          <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{filterTargetName}}</button>
+          <div class="dropdown-menu shadow" ngbDropdownMenu>
+            @for (t of filterTargets; track t.id) {
+              <button ngbDropdownItem [class.active]="filterTargetID === t.id" (click)="filterTargetID = t.id">{{t.name}}</button>
+            }
           </div>
-        } @else {
-          <span class="input-group-text">{{filterTargetName}}</span>
-        }
+        </div>
         @if (filterText?.length) {
           <button class="btn btn-link btn-sm px-2 position-absolute top-0 end-0 z-10" (click)="resetFilter()">
             <i-bs width="1em" height="1em" name="x"></i-bs>
@@ -48,19 +44,50 @@
   <div class="visually-hidden" i18n>Loading...</div>
 }
 
-<ng-template let-tasks="tasks" #tasksTemplate>
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <button
+    class="btn btn-sm"
+    [class.btn-primary]="selectedSection === allTaskSections"
+    [class.btn-outline-primary]="selectedSection !== allTaskSections"
+    (click)="setSection(allTaskSections)">
+    <ng-container i18n>All</ng-container>
+  </button>
+  @for (section of sections; track section) {
+    <button
+      class="btn btn-sm"
+      [class.btn-primary]="selectedSection === section"
+      [class.btn-outline-primary]="selectedSection !== section"
+      (click)="setSection(section)">
+      {{ sectionLabel(section) }}
+      @if (sectionCount(section) > 0) {
+        <span class="badge ms-2" [class.bg-danger]="section === TaskSection.NeedsAttention" [class.bg-secondary]="section !== TaskSection.NeedsAttention">{{sectionCount(section)}}</span>
+      }
+    </button>
+  }
+</div>
+
+<ng-template let-tasks="tasks" let-section="section" #tasksTemplate>
+  <div class="section-header d-flex align-items-center justify-content-between mb-2">
+    <div>
+      <h5 class="mb-0">{{ sectionLabel(section) }}</h5>
+      <div class="small text-muted">
+        <ng-container i18n>{tasks.length, plural, =1 {1 task} other {{{tasks.length}} tasks}}</ng-container>
+      </div>
+    </div>
+  </div>
+
   <table class="table table-striped align-middle border shadow-sm">
     <thead>
       <tr>
         <th scope="col">
           <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="all-tasks" [disabled]="currentTasks.length === 0" [(ngModel)]="togggleAll" (click)="toggleAll($event); $event.stopPropagation();">
-            <label class="form-check-label" for="all-tasks"></label>
+            <input type="checkbox" class="form-check-input" [id]="'all-tasks-' + section" [disabled]="tasks.length === 0" [checked]="areAllSelected(tasks)" (click)="toggleSection(section, $event); $event.stopPropagation();">
+            <label class="form-check-label" [for]="'all-tasks-' + section"></label>
           </div>
         </th>
         <th scope="col" i18n>Name</th>
         <th scope="col" class="d-none d-lg-table-cell" i18n>Created</th>
-        @if (activeTab !== 'started' && activeTab !== 'queued') {
+        @if (sectionShowsResults(section)) {
           <th scope="col" class="d-none d-lg-table-cell" i18n>Results</th>
         }
         <th scope="col" class="d-table-cell d-lg-none" i18n>Info</th>
@@ -68,11 +95,11 @@
       </tr>
     </thead>
     <tbody>
-      @for (task of tasks | slice: (page-1) * pageSize : page * pageSize; track task.id) {
-        <tr (click)="toggleSelected(task, $event); $event.stopPropagation();">
+      @for (task of tasks; track task.id) {
+        <tr (click)="toggleSelected(task); $event.stopPropagation();">
           <td>
             <div class="form-check">
-              <input type="checkbox" class="form-check-input" id="task{{task.id}}" [checked]="selectedTasks.has(task.id)" (click)="toggleSelected(task, $event); $event.stopPropagation();">
+              <input type="checkbox" class="form-check-input" id="task{{task.id}}" [checked]="selectedTasks.has(task.id)" (click)="toggleSelected(task); $event.stopPropagation();">
               <label class="form-check-label" for="task{{task.id}}"></label>
             </div>
           </td>
@@ -87,7 +114,7 @@
             </div>
           </td>
           <td class="d-none d-lg-table-cell">{{ task.date_created | customDate:'short' }}</td>
-          @if (activeTab !== 'started' && activeTab !== 'queued') {
+          @if (sectionShowsResults(section)) {
             <td class="d-none d-lg-table-cell">
               @if (task.result_message?.length > 50) {
                 <div class="result" (click)="expandTask(task); $event.stopPropagation();"
@@ -129,61 +156,21 @@
           </td>
         </tr>
         <tr>
-          <td class="p-0" [class.border-0]="expandedTask !== task.id" colspan="5">
+          <td class="p-0" [class.border-0]="expandedTask !== task.id" [attr.colspan]="sectionShowsResults(section) ? 5 : 4">
             <pre #collapse="ngbCollapse" [ngbCollapse]="expandedTask !== task.id" class="small mb-0"><div class="small p-1 p-lg-3 ms-lg-3">{{ task.result_message }}</div></pre>
           </td>
         </tr>
       }
     </tbody>
   </table>
-
-  <div class="pb-3 d-sm-flex justify-content-between align-items-center">
-    @if (tasks.length > 0) {
-      <div class="pb-2 pb-sm-0">
-        <ng-container i18n>{tasks.length, plural, =1 {One {{this.activeTabLocalized}} task} other {{{tasks.length || 0}} total {{this.activeTabLocalized}} tasks}}</ng-container>
-        @if (selectedTasks.size > 0) {
-          <ng-container i18n>&nbsp;({{selectedTasks.size}} selected)</ng-container>
-        }
-      </div>
-    }
-    @if (tasks.length > pageSize) {
-      <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="tasks.length" maxSize="8" size="sm"></ngb-pagination>
-    }
-  </div>
 </ng-template>
 
-<ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs" (hidden)="duringTabChange()" (navChange)="beforeTabChange()">
-  <li ngbNavItem="failed">
-    <a ngbNavLink i18n>Failed@if (tasksService.failedFileTasks.length > 0) {
-      <span class="badge bg-danger ms-2">{{tasksService.failedFileTasks.length}}</span>
-    }</a>
-    <ng-template ngbNavContent>
-      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:currentTasks}"></ng-container>
-    </ng-template>
-  </li>
-  <li ngbNavItem="completed">
-    <a ngbNavLink i18n>Complete@if (tasksService.completedFileTasks.length > 0) {
-      <span class="badge bg-secondary ms-2">{{tasksService.completedFileTasks.length}}</span>
-    }</a>
-    <ng-template ngbNavContent>
-      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:currentTasks}"></ng-container>
-    </ng-template>
-  </li>
-  <li ngbNavItem="started">
-    <a ngbNavLink i18n>Started@if (tasksService.startedFileTasks.length > 0) {
-      <span class="badge bg-secondary ms-2">{{tasksService.startedFileTasks.length}}</span>
-    }</a>
-    <ng-template ngbNavContent>
-      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:currentTasks}"></ng-container>
-    </ng-template>
-  </li>
-  <li ngbNavItem="queued">
-    <a ngbNavLink i18n>Queued@if (tasksService.queuedFileTasks.length > 0) {
-      <span class="badge bg-secondary ms-2">{{tasksService.queuedFileTasks.length}}</span>
-    }</a>
-    <ng-template ngbNavContent>
-      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks:currentTasks}"></ng-container>
-    </ng-template>
-  </li>
-</ul>
-<div [ngbNavOutlet]="nav"></div>
+@if (visibleSections.length > 0) {
+  @for (section of visibleSections; track section) {
+    <div class="mb-4">
+      <ng-container [ngTemplateOutlet]="tasksTemplate" [ngTemplateOutletContext]="{tasks: tasksForSection(section), section: section}"></ng-container>
+    </div>
+  }
+} @else {
+  <div class="alert alert-secondary fst-italic" i18n>No tasks match the current filters.</div>
+}

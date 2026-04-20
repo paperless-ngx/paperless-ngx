@@ -9,12 +9,7 @@ import { FormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import { Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
-import {
-  NgbModal,
-  NgbModalRef,
-  NgbModule,
-  NgbNavItem,
-} from '@ng-bootstrap/ng-bootstrap'
+import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
@@ -33,7 +28,11 @@ import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import { TasksComponent, TaskTab } from './tasks.component'
+import {
+  ALL_TASK_SECTIONS,
+  TasksComponent,
+  TaskSection,
+} from './tasks.component'
 
 const tasks: PaperlessTask[] = [
   {
@@ -205,53 +204,25 @@ describe('TasksComponent', () => {
       .flush(tasks)
   })
 
-  it('should display file tasks in 4 tabs by status', () => {
-    const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavItem))
+  it('should display task sections with counts', () => {
+    expect(component.selectedSection).toBe(ALL_TASK_SECTIONS)
 
-    let currentTasksLength = tasks.filter(
-      (t) => t.status === PaperlessTaskStatus.Failure
-    ).length
-    component.activeTab = TaskTab.Failed
-    fixture.detectChanges()
-    expect(tabButtons[0].nativeElement.textContent).toEqual(
-      `Failed${currentTasksLength}`
-    )
-    expect(
-      fixture.debugElement.queryAll(By.css('table input[type="checkbox"]'))
-    ).toHaveLength(currentTasksLength + 1)
+    const buttons = fixture.debugElement.queryAll(By.css('.btn.btn-sm'))
+    const text = buttons.map((button) => button.nativeElement.textContent)
 
-    currentTasksLength = tasks.filter(
-      (t) => t.status === PaperlessTaskStatus.Success
-    ).length
-    component.activeTab = TaskTab.Completed
-    fixture.detectChanges()
-    expect(tabButtons[1].nativeElement.textContent).toEqual(
-      `Complete${currentTasksLength}`
-    )
-
-    currentTasksLength = tasks.filter(
-      (t) => t.status === PaperlessTaskStatus.Started
-    ).length
-    component.activeTab = TaskTab.Started
-    fixture.detectChanges()
-    expect(tabButtons[2].nativeElement.textContent).toEqual(
-      `Started${currentTasksLength}`
-    )
-
-    currentTasksLength = tasks.filter(
-      (t) => t.status === PaperlessTaskStatus.Pending
-    ).length
-    component.activeTab = TaskTab.Queued
-    fixture.detectChanges()
-    expect(tabButtons[3].nativeElement.textContent).toEqual(
-      `Queued${currentTasksLength}`
-    )
+    expect(text.join(' ')).toContain('All')
+    expect(text.join(' ')).toContain('Needs attention2')
+    expect(text.join(' ')).toContain('In progress2')
+    expect(text.join(' ')).toContain('Recent completed2')
   })
 
-  it('should to go page 1 between tab switch', () => {
-    component.page = 10
-    component.duringTabChange()
-    expect(component.page).toEqual(1)
+  it('should filter visible sections by selected status', () => {
+    component.setSection(TaskSection.InProgress)
+    fixture.detectChanges()
+
+    expect(component.visibleSections).toEqual([TaskSection.InProgress])
+    expect(fixture.nativeElement.textContent).toContain('In progress')
+    expect(fixture.nativeElement.textContent).not.toContain('Recent completed')
   })
 
   it('should support expanding / collapsing one task at a time', () => {
@@ -273,7 +244,7 @@ describe('TasksComponent', () => {
     component.toggleSelected(tasks[0])
     component.toggleSelected(tasks[1])
     component.toggleSelected(tasks[3])
-    component.toggleSelected(tasks[3]) // uncheck, for coverage
+    component.toggleSelected(tasks[3])
     const selected = new Set([tasks[0].id, tasks[1].id])
     expect(component.selectedTasks).toEqual(selected)
     let modal: NgbModalRef
@@ -322,32 +293,24 @@ describe('TasksComponent', () => {
     expect(component.selectedTasks.size).toBe(0)
   })
 
-  it('should support dismiss all tasks', () => {
+  it('should support dismiss visible tasks', () => {
+    component.setSection(TaskSection.NeedsAttention)
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
     const dismissSpy = jest.spyOn(tasksService, 'dismissTasks')
     component.dismissTasks()
     expect(modal).not.toBeUndefined()
     modal.componentInstance.confirmClicked.emit()
-    expect(dismissSpy).toHaveBeenCalledWith(new Set(tasks.map((t) => t.id)))
+    expect(dismissSpy).toHaveBeenCalledWith(new Set([467, 466]))
   })
 
-  it('should support toggle all tasks', () => {
+  it('should support toggling a full section', () => {
     const toggleCheck = fixture.debugElement.query(
-      By.css('table input[type=checkbox]')
+      By.css('#all-tasks-needs_attention')
     )
     toggleCheck.nativeElement.dispatchEvent(new MouseEvent('click'))
     fixture.detectChanges()
-    expect(component.selectedTasks).toEqual(
-      new Set(
-        tasks
-          .filter((t) => t.status === PaperlessTaskStatus.Failure)
-          .map((t) => t.id)
-      )
-    )
-    toggleCheck.nativeElement.dispatchEvent(new MouseEvent('click'))
-    fixture.detectChanges()
-    expect(component.selectedTasks).toEqual(new Set())
+    expect(component.selectedTasks).toEqual(new Set([467, 466]))
   })
 
   it('should support dismiss and open a document', () => {
@@ -374,16 +337,16 @@ describe('TasksComponent', () => {
     )
     input.nativeElement.value = '191092'
     input.nativeElement.dispatchEvent(new Event('input'))
-    jest.advanceTimersByTime(150) // debounce time
+    jest.advanceTimersByTime(150)
     fixture.detectChanges()
     expect(component.filterText).toEqual('191092')
-    expect(
-      fixture.debugElement.queryAll(By.css('table tbody tr')).length
-    ).toEqual(2) // 1 task x 2 lines
+    expect(component.tasksForSection(TaskSection.NeedsAttention)).toHaveLength(
+      1
+    )
   })
 
   it('should fall back to task type when filename is unavailable', () => {
-    component.activeTab = TaskTab.Started
+    component.setSection(TaskSection.InProgress)
     fixture.detectChanges()
 
     const nameColumn = fixture.debugElement.queryAll(
@@ -398,20 +361,19 @@ describe('TasksComponent', () => {
   })
 
   it('should filter tasks by result', () => {
-    component.activeTab = TaskTab.Failed
-    fixture.detectChanges()
+    component.setSection(TaskSection.NeedsAttention)
     component.filterTargetID = 1
     const input = fixture.debugElement.query(
       By.css('pngx-page-header input[type=text]')
     )
     input.nativeElement.value = 'duplicate'
     input.nativeElement.dispatchEvent(new Event('input'))
-    jest.advanceTimersByTime(150) // debounce time
+    jest.advanceTimersByTime(150)
     fixture.detectChanges()
     expect(component.filterText).toEqual('duplicate')
-    expect(
-      fixture.debugElement.queryAll(By.css('table tbody tr')).length
-    ).toEqual(4) // 2 tasks x 2 lines
+    expect(component.tasksForSection(TaskSection.NeedsAttention)).toHaveLength(
+      2
+    )
   })
 
   it('should support keyboard events for filtering', () => {
@@ -422,19 +384,10 @@ describe('TasksComponent', () => {
     input.nativeElement.dispatchEvent(
       new KeyboardEvent('keyup', { key: 'Enter' })
     )
-    expect(component.filterText).toEqual('191092') // no debounce needed
+    expect(component.filterText).toEqual('191092')
     input.nativeElement.dispatchEvent(
       new KeyboardEvent('keyup', { key: 'Escape' })
     )
     expect(component.filterText).toEqual('')
-  })
-
-  it('should reset filter and target on tab switch', () => {
-    component.filterText = '191092'
-    component.filterTargetID = 1
-    component.activeTab = TaskTab.Completed
-    component.beforeTabChange()
-    expect(component.filterText).toEqual('')
-    expect(component.filterTargetID).toEqual(0)
   })
 })
