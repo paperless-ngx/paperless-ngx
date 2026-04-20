@@ -9,6 +9,8 @@ from rest_framework.test import APITestCase
 
 from documents.models import CustomField
 from documents.models import Document
+from documents.models import SavedView
+from documents.models import SavedViewFilterRule
 from documents.serialisers import DocumentSerializer
 from documents.tests.utils import DirectoriesMixin
 
@@ -479,23 +481,82 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
             ),
         )
 
-    def test_exact_monetary_with_currency_prefix_is_invalid(self) -> None:
-        # Providing a currency-prefixed string like "USD100" for an exact/arithmetic
-        # monetary filter should be rejected, since these ops compare against the
-        # extracted numeric amount and cannot accept non-numeric values.
-        self._assert_validation_error(
-            json.dumps(["monetary_field", "exact", "USD100"]),
-            ["custom_field_query", "2"],
-            "valid number",
+    def test_exact_monetary_with_currency_prefix(self) -> None:
+        # Providing a currency-prefixed string like "USD100.00" for an exact monetary
+        # filter should work for backwards compatibility with saved views. The currency
+        # code is stripped and the numeric amount is used for comparison.
+        self._assert_query_match_predicate(
+            ["monetary_field", "exact", "USD100.00"],
+            lambda document: (
+                "monetary_field" in document
+                and document["monetary_field"] == "USD100.00"
+            ),
         )
-        self._assert_validation_error(
-            json.dumps(["monetary_field", "gt", "USD100"]),
-            ["custom_field_query", "2"],
-            "valid number",
+        self._assert_query_match_predicate(
+            ["monetary_field", "in", ["USD100.00", "EUR50.00"]],
+            lambda document: (
+                "monetary_field" in document
+                and document["monetary_field"] in {"USD100.00", "EUR50.00"}
+            ),
         )
+        self._assert_query_match_predicate(
+            ["monetary_field", "gt", "USD99.00"],
+            lambda document: (
+                "monetary_field" in document
+                and document["monetary_field"] is not None
+                and (
+                    document["monetary_field"] == "USD100.00"
+                    or document["monetary_field"] == "101.00"
+                )
+            ),
+        )
+
+    def test_saved_view_with_currency_prefixed_monetary_filter(self) -> None:
+        """
+        A saved view created before the exact-monetary fix stored currency-prefixed
+        values like '["monetary_field", "exact", "USD100.00"]' as the filter rule value
+        (rule_type=42). Those saved views must continue to return correct results.
+        """
+        saved_view = SavedView.objects.create(name="test view", owner=self.user)
+        SavedViewFilterRule.objects.create(
+            saved_view=saved_view,
+            rule_type=42,  # FILTER_CUSTOM_FIELDS_QUERY
+            value=json.dumps(["monetary_field", "exact", "USD100.00"]),
+        )
+        # The frontend translates rule_type=42 to the custom_field_query URL param;
+        # simulate that here using the stored filter rule value directly.
+        rule = saved_view.filter_rules.get(rule_type=42)
+        query_string = quote(rule.value, safe="")
+        response = self.client.get(
+            "/api/documents/?"
+            + "&".join(
+                (
+                    f"custom_field_query={query_string}",
+                    "ordering=archive_serial_number",
+                    "page=1",
+                    f"page_size={len(self.documents)}",
+                    "truncate_content=true",
+                ),
+            ),
+        )
+        self.assertEqual(response.status_code, 200, msg=str(response.json()))
+        result_ids = {doc["id"] for doc in response.json()["results"]}
+        # Should match the single document with monetary_field = "USD100.00"
+        expected_ids = {
+            doc.id
+            for doc in self.documents
+            if doc.custom_fields.filter(
+                field__name="monetary_field",
+                value_monetary="USD100.00",
+            ).exists()
+        }
+        self.assertEqual(result_ids, expected_ids)
+
+    def test_monetary_amount_with_invalid_value(self) -> None:
+        # A value that has a currency prefix but no valid number after it should fail.
         self._assert_validation_error(
-            json.dumps(["monetary_field", "in", ["USD100", "EUR50"]]),
-            ["custom_field_query", "2", "0"],
+            json.dumps(["monetary_field", "exact", "USDnotanumber"]),
+            ["custom_field_query", "2"],
             "valid number",
         )
 
