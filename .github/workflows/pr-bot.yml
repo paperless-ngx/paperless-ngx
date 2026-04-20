@@ -3,7 +3,7 @@ on:
   pull_request_target:
     types: [opened]
 jobs:
-  anti-slop:
+  Anti-slop:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -14,6 +14,7 @@ jobs:
         with:
           max-failures: 4
           failure-add-pr-labels: 'ai'
+          require-pr-template: true
   pr-bot:
     name: Automated PR Bot
     runs-on: ubuntu-latest
