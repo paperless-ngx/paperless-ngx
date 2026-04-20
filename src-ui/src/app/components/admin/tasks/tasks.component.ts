@@ -65,7 +65,7 @@ const TASK_TYPE_OPTIONS = [
   },
   { value: PaperlessTaskType.SanityCheck, label: $localize`Sanity Check` },
   { value: PaperlessTaskType.MailFetch, label: $localize`Mail Fetch` },
-  { value: PaperlessTaskType.LlmIndex, label: $localize`AI Index` },
+  { value: PaperlessTaskType.LlmIndex, label: $localize`LLM Index` },
   { value: PaperlessTaskType.EmptyTrash, label: $localize`Empty Trash` },
   {
     value: PaperlessTaskType.CheckWorkflows,
