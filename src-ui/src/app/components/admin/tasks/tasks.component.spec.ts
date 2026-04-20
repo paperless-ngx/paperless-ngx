@@ -29,6 +29,7 @@ import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import {
+  ALL_FILTER_VALUE,
   ALL_TASK_SECTIONS,
   TasksComponent,
   TaskSection,
@@ -206,6 +207,8 @@ describe('TasksComponent', () => {
 
   it('should display task sections with counts', () => {
     expect(component.selectedSection).toBe(ALL_TASK_SECTIONS)
+    expect(component.selectedTaskType).toBe(ALL_FILTER_VALUE)
+    expect(component.selectedTriggerSource).toBe(ALL_FILTER_VALUE)
 
     const buttons = fixture.debugElement.queryAll(By.css('.btn.btn-sm'))
     const text = buttons.map((button) => button.nativeElement.textContent)
@@ -223,6 +226,54 @@ describe('TasksComponent', () => {
     expect(component.visibleSections).toEqual([TaskSection.InProgress])
     expect(fixture.nativeElement.textContent).toContain('In progress')
     expect(fixture.nativeElement.textContent).not.toContain('Recent completed')
+  })
+
+  it('should filter tasks by task type', () => {
+    component.setSection(TaskSection.InProgress)
+    component.setTaskType(PaperlessTaskType.SanityCheck)
+
+    expect(component.tasksForSection(TaskSection.InProgress)).toHaveLength(1)
+    expect(component.tasksForSection(TaskSection.InProgress)[0].task_type).toBe(
+      PaperlessTaskType.SanityCheck
+    )
+  })
+
+  it('should filter tasks by trigger source', () => {
+    component.setSection(TaskSection.InProgress)
+    component.setTriggerSource(PaperlessTaskTriggerSource.EmailConsume)
+
+    expect(component.tasksForSection(TaskSection.InProgress)).toHaveLength(1)
+    expect(
+      component.tasksForSection(TaskSection.InProgress)[0].trigger_source
+    ).toBe(PaperlessTaskTriggerSource.EmailConsume)
+  })
+
+  it('should expose stable task type options and disable empty ones', () => {
+    expect(component.taskTypeOptions.map((option) => option.value)).toContain(
+      PaperlessTaskType.TrainClassifier
+    )
+    expect(
+      component.isTaskTypeOptionDisabled(PaperlessTaskType.TrainClassifier)
+    ).toBe(true)
+    expect(
+      component.isTaskTypeOptionDisabled(PaperlessTaskType.ConsumeFile)
+    ).toBe(false)
+  })
+
+  it('should expose stable trigger source options and disable empty ones', () => {
+    expect(
+      component.triggerSourceOptions.map((option) => option.value)
+    ).toContain(PaperlessTaskTriggerSource.ApiUpload)
+    expect(
+      component.isTriggerSourceOptionDisabled(
+        PaperlessTaskTriggerSource.ApiUpload
+      )
+    ).toBe(true)
+    expect(
+      component.isTriggerSourceOptionDisabled(
+        PaperlessTaskTriggerSource.EmailConsume
+      )
+    ).toBe(false)
   })
 
   it('should support expanding / collapsing one task at a time', () => {
@@ -342,6 +393,17 @@ describe('TasksComponent', () => {
     expect(component.filterText).toEqual('191092')
     expect(component.tasksForSection(TaskSection.NeedsAttention)).toHaveLength(
       1
+    )
+  })
+
+  it('should match task type and source in name filtering', () => {
+    component.setSection(TaskSection.InProgress)
+    component.filterText = 'system'
+    jest.advanceTimersByTime(150)
+
+    expect(component.tasksForSection(TaskSection.InProgress)).toHaveLength(1)
+    expect(component.tasksForSection(TaskSection.InProgress)[0].task_type).toBe(
+      PaperlessTaskType.SanityCheck
     )
   })
 

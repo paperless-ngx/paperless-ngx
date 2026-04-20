@@ -32,6 +32,24 @@
           [(ngModel)]="filterText">
       </div>
     </div>
+    <div ngbDropdown>
+      <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{selectedTaskTypeLabel}}</button>
+      <div class="dropdown-menu shadow" ngbDropdownMenu>
+        <button ngbDropdownItem [class.active]="selectedTaskType === allFilterValue" (click)="setTaskType(allFilterValue)" i18n>All types</button>
+        @for (option of taskTypeOptions; track option.value) {
+          <button ngbDropdownItem [class.active]="selectedTaskType === option.value" [disabled]="isTaskTypeOptionDisabled(option.value)" (click)="setTaskType(option.value)">{{option.label}}</button>
+        }
+      </div>
+    </div>
+    <div ngbDropdown>
+      <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{selectedTriggerSourceLabel}}</button>
+      <div class="dropdown-menu shadow" ngbDropdownMenu>
+        <button ngbDropdownItem [class.active]="selectedTriggerSource === allFilterValue" (click)="setTriggerSource(allFilterValue)" i18n>All sources</button>
+        @for (option of triggerSourceOptions; track option.value) {
+          <button ngbDropdownItem [class.active]="selectedTriggerSource === option.value" [disabled]="isTriggerSourceOptionDisabled(option.value)" (click)="setTriggerSource(option.value)">{{option.label}}</button>
+        }
+      </div>
+    </div>
     <div class="form-check form-switch mb-0 ms-2">
       <input class="form-check-input" type="checkbox" role="switch" [(ngModel)]="autoRefreshEnabled">
       <label class="form-check-label" for="autoRefreshSwitch" i18n>Auto refresh</label>
