@@ -11,6 +11,7 @@ def api_schema():
     generator = SchemaGenerator()
     return generator.get_schema(request=None, public=True)
 
+
 class TestApiSchema(APITestCase):
     ENDPOINT = "/api/schema/"
 
@@ -74,6 +75,7 @@ class TestApiSchema(APITestCase):
         ]:
             self.assertIn(action_method, advertised_methods)
 
+
 class TestTasksSummarySchema:
     """tasks_summary_retrieve: response must be an array of TaskSummarySerializer."""
 
@@ -130,7 +132,11 @@ class TestMetadataSchema:
         )
 
     @pytest.mark.parametrize("field", ["original_metadata", "archive_metadata"])
-    def test_metadata_items_have_key_field(self, api_schema: SchemaGenerator, field: str):
+    def test_metadata_items_have_key_field(
+        self,
+        api_schema: SchemaGenerator,
+        field: str,
+    ):
         props = api_schema["components"]["schemas"]["Metadata"]["properties"]
         items = props[field]["items"]
         ref = items.get("$ref", "")
@@ -172,7 +178,10 @@ class TestStoragePathTestSchema:
             "storage_paths_test_create 200 response must be type:string"
         )
 
-    def test_test_action_request_uses_storage_path_test_serializer(self, api_schema: SchemaGenerator):
+    def test_test_action_request_uses_storage_path_test_serializer(
+        self,
+        api_schema: SchemaGenerator,
+    ):
         op = api_schema["paths"]["/api/storage_paths/test/"]["post"]
         content = (
             op.get("requestBody", {}).get("content", {}).get("application/json", {})
@@ -199,7 +208,11 @@ class TestProcessedMailBulkDeleteSchema:
         return resp_200.get("properties", {})
 
     @pytest.mark.parametrize("field", ["result", "deleted_mail_ids"])
-    def test_bulk_delete_response_has_field(self, api_schema: SchemaGenerator, field: str):
+    def test_bulk_delete_response_has_field(
+        self,
+        api_schema: SchemaGenerator,
+        field: str,
+    ):
         props = self._get_props(api_schema)
         assert field in props, f"bulk_delete 200 response must have a '{field}' field"
 
