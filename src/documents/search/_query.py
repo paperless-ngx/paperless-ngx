@@ -25,21 +25,39 @@ _REGEX_TIMEOUT: Final[float] = 1.0
 
 _DATE_ONLY_FIELDS = frozenset({"created"})
 
+_TODAY: Final[str] = "today"
+_YESTERDAY: Final[str] = "yesterday"
+_PREVIOUS_WEEK: Final[str] = "previous week"
+_THIS_MONTH: Final[str] = "this month"
+_PREVIOUS_MONTH: Final[str] = "previous month"
+_THIS_YEAR: Final[str] = "this year"
+_PREVIOUS_YEAR: Final[str] = "previous year"
+_PREVIOUS_QUARTER: Final[str] = "previous quarter"
+
 _DATE_KEYWORDS = frozenset(
     {
-        "today",
-        "yesterday",
-        "this_week",
-        "last_week",
-        "this_month",
-        "last_month",
-        "this_year",
-        "last_year",
+        _TODAY,
+        _YESTERDAY,
+        _PREVIOUS_WEEK,
+        _THIS_MONTH,
+        _PREVIOUS_MONTH,
+        _THIS_YEAR,
+        _PREVIOUS_YEAR,
+        _PREVIOUS_QUARTER,
     },
 )
 
+_DATE_KEYWORD_PATTERN = "|".join(
+    sorted((regex.escape(k) for k in _DATE_KEYWORDS), key=len, reverse=True),
+)
+
 _FIELD_DATE_RE = regex.compile(
-    r"(\w+):(" + "|".join(_DATE_KEYWORDS) + r")\b",
+    rf"""(?P<field>\w+)\s*:\s*(?:
+    (?P<quote>["'])(?P<quoted>{_DATE_KEYWORD_PATTERN})(?P=quote)
+    |
+    (?P<bare>{_DATE_KEYWORD_PATTERN})(?![\w-])
+)""",
+    regex.IGNORECASE | regex.VERBOSE,
 )
 _COMPACT_DATE_RE = regex.compile(r"\b(\d{14})\b")
 _RELATIVE_RANGE_RE = regex.compile(
@@ -74,44 +92,59 @@ def _date_only_range(keyword: str, tz: tzinfo) -> str:
 
     today = datetime.now(tz).date()
 
-    if keyword == "today":
+    def _quarter_start(d: date) -> date:
+        return date(d.year, ((d.month - 1) // 3) * 3 + 1, 1)
+
+    if keyword == _TODAY:
         lo = datetime(today.year, today.month, today.day, tzinfo=UTC)
         return _iso_range(lo, lo + timedelta(days=1))
-    if keyword == "yesterday":
+    if keyword == _YESTERDAY:
         y = today - timedelta(days=1)
         lo = datetime(y.year, y.month, y.day, tzinfo=UTC)
         hi = datetime(today.year, today.month, today.day, tzinfo=UTC)
         return _iso_range(lo, hi)
-    if keyword == "this_week":
-        mon = today - timedelta(days=today.weekday())
-        lo = datetime(mon.year, mon.month, mon.day, tzinfo=UTC)
-        return _iso_range(lo, lo + timedelta(weeks=1))
-    if keyword == "last_week":
+    if keyword == _PREVIOUS_WEEK:
         this_mon = today - timedelta(days=today.weekday())
         last_mon = this_mon - timedelta(weeks=1)
         lo = datetime(last_mon.year, last_mon.month, last_mon.day, tzinfo=UTC)
         hi = datetime(this_mon.year, this_mon.month, this_mon.day, tzinfo=UTC)
         return _iso_range(lo, hi)
-    if keyword == "this_month":
+    if keyword == _THIS_MONTH:
         lo = datetime(today.year, today.month, 1, tzinfo=UTC)
         if today.month == 12:
             hi = datetime(today.year + 1, 1, 1, tzinfo=UTC)
         else:
             hi = datetime(today.year, today.month + 1, 1, tzinfo=UTC)
         return _iso_range(lo, hi)
-    if keyword == "last_month":
+    if keyword == _PREVIOUS_MONTH:
         if today.month == 1:
             lo = datetime(today.year - 1, 12, 1, tzinfo=UTC)
         else:
             lo = datetime(today.year, today.month - 1, 1, tzinfo=UTC)
         hi = datetime(today.year, today.month, 1, tzinfo=UTC)
         return _iso_range(lo, hi)
-    if keyword == "this_year":
+    if keyword == _THIS_YEAR:
         lo = datetime(today.year, 1, 1, tzinfo=UTC)
         return _iso_range(lo, datetime(today.year + 1, 1, 1, tzinfo=UTC))
-    if keyword == "last_year":
+    if keyword == _PREVIOUS_YEAR:
         lo = datetime(today.year - 1, 1, 1, tzinfo=UTC)
         return _iso_range(lo, datetime(today.year, 1, 1, tzinfo=UTC))
+    if keyword == _PREVIOUS_QUARTER:
+        this_quarter = _quarter_start(today)
+        last_quarter = this_quarter - relativedelta(months=3)
+        lo = datetime(
+            last_quarter.year,
+            last_quarter.month,
+            last_quarter.day,
+            tzinfo=UTC,
+        )
+        hi = datetime(
+            this_quarter.year,
+            this_quarter.month,
+            this_quarter.day,
+            tzinfo=UTC,
+        )
+        return _iso_range(lo, hi)
     raise ValueError(f"Unknown keyword: {keyword}")
 
 
@@ -127,42 +160,46 @@ def _datetime_range(keyword: str, tz: tzinfo) -> str:
     def _midnight(d: date) -> datetime:
         return datetime(d.year, d.month, d.day, tzinfo=tz).astimezone(UTC)
 
-    if keyword == "today":
+    def _quarter_start(d: date) -> date:
+        return date(d.year, ((d.month - 1) // 3) * 3 + 1, 1)
+
+    if keyword == _TODAY:
         return _iso_range(_midnight(today), _midnight(today + timedelta(days=1)))
-    if keyword == "yesterday":
+    if keyword == _YESTERDAY:
         y = today - timedelta(days=1)
         return _iso_range(_midnight(y), _midnight(today))
-    if keyword == "this_week":
-        mon = today - timedelta(days=today.weekday())
-        return _iso_range(_midnight(mon), _midnight(mon + timedelta(weeks=1)))
-    if keyword == "last_week":
+    if keyword == _PREVIOUS_WEEK:
         this_mon = today - timedelta(days=today.weekday())
         last_mon = this_mon - timedelta(weeks=1)
         return _iso_range(_midnight(last_mon), _midnight(this_mon))
-    if keyword == "this_month":
+    if keyword == _THIS_MONTH:
         first = today.replace(day=1)
         if today.month == 12:
             next_first = date(today.year + 1, 1, 1)
         else:
             next_first = date(today.year, today.month + 1, 1)
         return _iso_range(_midnight(first), _midnight(next_first))
-    if keyword == "last_month":
+    if keyword == _PREVIOUS_MONTH:
         this_first = today.replace(day=1)
         if today.month == 1:
             last_first = date(today.year - 1, 12, 1)
         else:
             last_first = date(today.year, today.month - 1, 1)
         return _iso_range(_midnight(last_first), _midnight(this_first))
-    if keyword == "this_year":
+    if keyword == _THIS_YEAR:
         return _iso_range(
             _midnight(date(today.year, 1, 1)),
             _midnight(date(today.year + 1, 1, 1)),
         )
-    if keyword == "last_year":
+    if keyword == _PREVIOUS_YEAR:
         return _iso_range(
             _midnight(date(today.year - 1, 1, 1)),
             _midnight(date(today.year, 1, 1)),
         )
+    if keyword == _PREVIOUS_QUARTER:
+        this_quarter = _quarter_start(today)
+        last_quarter = this_quarter - relativedelta(months=3)
+        return _iso_range(_midnight(last_quarter), _midnight(this_quarter))
     raise ValueError(f"Unknown keyword: {keyword}")
 
 
@@ -308,7 +345,7 @@ def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
     - Compact 14-digit dates (YYYYMMDDHHmmss)
     - Whoosh relative ranges ([-7 days to now], [now-1h TO now+2h])
     - 8-digit dates with field awareness (created:20240115)
-    - Natural keywords (field:today, field:last_week, etc.)
+    - Natural keywords (field:today, field:"previous quarter", etc.)
 
     Args:
         query: Raw user query string
@@ -326,7 +363,8 @@ def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
     query = _rewrite_relative_range(query)
 
     def _replace(m: regex.Match[str]) -> str:
-        field, keyword = m.group(1), m.group(2)
+        field = m.group("field")
+        keyword = (m.group("quoted") or m.group("bare")).lower()
         if field in _DATE_ONLY_FIELDS:
             return f"{field}:{_date_only_range(keyword, tz)}"
         return f"{field}:{_datetime_range(keyword, tz)}"

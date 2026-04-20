@@ -81,45 +81,38 @@ class TestCreatedDateField:
             ),
             pytest.param(
                 "created",
-                "this_week",
-                "2026-03-23T00:00:00Z",
-                "2026-03-30T00:00:00Z",
-                id="this_week_mon_sun",
-            ),
-            pytest.param(
-                "created",
-                "last_week",
+                "previous week",
                 "2026-03-16T00:00:00Z",
                 "2026-03-23T00:00:00Z",
-                id="last_week",
+                id="previous_week",
             ),
             pytest.param(
                 "created",
-                "this_month",
+                "this month",
                 "2026-03-01T00:00:00Z",
                 "2026-04-01T00:00:00Z",
                 id="this_month",
             ),
             pytest.param(
                 "created",
-                "last_month",
+                "previous month",
                 "2026-02-01T00:00:00Z",
                 "2026-03-01T00:00:00Z",
-                id="last_month",
+                id="previous_month",
             ),
             pytest.param(
                 "created",
-                "this_year",
+                "this year",
                 "2026-01-01T00:00:00Z",
                 "2027-01-01T00:00:00Z",
                 id="this_year",
             ),
             pytest.param(
                 "created",
-                "last_year",
+                "previous year",
                 "2025-01-01T00:00:00Z",
                 "2026-01-01T00:00:00Z",
-                id="last_year",
+                id="previous_year",
             ),
         ],
     )
@@ -141,7 +134,7 @@ class TestCreatedDateField:
     def test_this_month_december_wraps_to_next_year(self) -> None:
         # December: next month must roll over to January 1 of next year
         lo, hi = _range(
-            rewrite_natural_date_keywords("created:this_month", UTC),
+            rewrite_natural_date_keywords("created:this month", UTC),
             "created",
         )
         assert lo == "2026-12-01T00:00:00Z"
@@ -151,11 +144,20 @@ class TestCreatedDateField:
     def test_last_month_january_wraps_to_previous_year(self) -> None:
         # January: last month must roll back to December 1 of previous year
         lo, hi = _range(
-            rewrite_natural_date_keywords("created:last_month", UTC),
+            rewrite_natural_date_keywords("created:previous month", UTC),
             "created",
         )
         assert lo == "2025-12-01T00:00:00Z"
         assert hi == "2026-01-01T00:00:00Z"
+
+    @time_machine.travel(datetime(2026, 7, 15, 12, 0, tzinfo=UTC), tick=False)
+    def test_previous_quarter(self) -> None:
+        lo, hi = _range(
+            rewrite_natural_date_keywords('created:"previous quarter"', UTC),
+            "created",
+        )
+        assert lo == "2026-04-01T00:00:00Z"
+        assert hi == "2026-07-01T00:00:00Z"
 
     def test_unknown_keyword_raises(self) -> None:
         with pytest.raises(ValueError, match="Unknown keyword"):
@@ -202,40 +204,34 @@ class TestDateTimeFields:
                 id="yesterday",
             ),
             pytest.param(
-                "this_week",
-                "2026-03-23T00:00:00Z",
-                "2026-03-30T00:00:00Z",
-                id="this_week",
-            ),
-            pytest.param(
-                "last_week",
+                "previous week",
                 "2026-03-16T00:00:00Z",
                 "2026-03-23T00:00:00Z",
-                id="last_week",
+                id="previous_week",
             ),
             pytest.param(
-                "this_month",
+                "this month",
                 "2026-03-01T00:00:00Z",
                 "2026-04-01T00:00:00Z",
                 id="this_month",
             ),
             pytest.param(
-                "last_month",
+                "previous month",
                 "2026-02-01T00:00:00Z",
                 "2026-03-01T00:00:00Z",
-                id="last_month",
+                id="previous_month",
             ),
             pytest.param(
-                "this_year",
+                "this year",
                 "2026-01-01T00:00:00Z",
                 "2027-01-01T00:00:00Z",
                 id="this_year",
             ),
             pytest.param(
-                "last_year",
+                "previous year",
                 "2025-01-01T00:00:00Z",
                 "2026-01-01T00:00:00Z",
-                id="last_year",
+                id="previous_year",
             ),
         ],
     )
@@ -254,16 +250,53 @@ class TestDateTimeFields:
     @time_machine.travel(datetime(2026, 12, 15, 12, 0, tzinfo=UTC), tick=False)
     def test_this_month_december_wraps_to_next_year(self) -> None:
         # December: next month wraps to January of next year
-        lo, hi = _range(rewrite_natural_date_keywords("added:this_month", UTC), "added")
+        lo, hi = _range(rewrite_natural_date_keywords("added:this month", UTC), "added")
         assert lo == "2026-12-01T00:00:00Z"
         assert hi == "2027-01-01T00:00:00Z"
 
     @time_machine.travel(datetime(2026, 1, 15, 12, 0, tzinfo=UTC), tick=False)
     def test_last_month_january_wraps_to_previous_year(self) -> None:
         # January: last month wraps back to December of previous year
-        lo, hi = _range(rewrite_natural_date_keywords("added:last_month", UTC), "added")
+        lo, hi = _range(
+            rewrite_natural_date_keywords("added:previous month", UTC),
+            "added",
+        )
         assert lo == "2025-12-01T00:00:00Z"
         assert hi == "2026-01-01T00:00:00Z"
+
+    @pytest.mark.parametrize(
+        ("query", "expected_lo", "expected_hi"),
+        [
+            pytest.param(
+                'added:"previous quarter"',
+                "2026-04-01T00:00:00Z",
+                "2026-07-01T00:00:00Z",
+                id="quoted_previous_quarter",
+            ),
+            pytest.param(
+                "added:previous month",
+                "2026-06-01T00:00:00Z",
+                "2026-07-01T00:00:00Z",
+                id="bare_previous_month",
+            ),
+            pytest.param(
+                "added:this month",
+                "2026-07-01T00:00:00Z",
+                "2026-08-01T00:00:00Z",
+                id="bare_this_month",
+            ),
+        ],
+    )
+    @time_machine.travel(datetime(2026, 7, 15, 12, 0, tzinfo=UTC), tick=False)
+    def test_legacy_natural_language_aliases(
+        self,
+        query: str,
+        expected_lo: str,
+        expected_hi: str,
+    ) -> None:
+        lo, hi = _range(rewrite_natural_date_keywords(query, UTC), "added")
+        assert lo == expected_lo
+        assert hi == expected_hi
 
     def test_unknown_keyword_raises(self) -> None:
         with pytest.raises(ValueError, match="Unknown keyword"):

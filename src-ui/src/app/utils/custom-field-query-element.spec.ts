@@ -142,6 +142,21 @@ describe('CustomFieldQueryAtom', () => {
     atom.value = [1, 3]
     expect(changeSpy).toHaveBeenCalledTimes(1)
   })
+
+  it('should emit one changed event when operator change coerces value', () => {
+    const atom = new CustomFieldQueryAtom([
+      1,
+      CustomFieldQueryOperator.In,
+      [1, 2],
+    ])
+    const changeSpy = jest.fn()
+    atom.changed.subscribe(changeSpy)
+
+    atom.operator = CustomFieldQueryOperator.Exact
+
+    expect(changeSpy).toHaveBeenCalledTimes(1)
+    expect(atom.serialize()).toEqual([1, CustomFieldQueryOperator.Exact, ''])
+  })
 })
 
 describe('CustomFieldQueryExpression', () => {
