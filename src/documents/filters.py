@@ -627,6 +627,12 @@ class CustomFieldQueryParser:
         elif custom_field.data_type == CustomField.FieldDataType.URL:
             # For URL fields we don't need to be strict about validation (e.g., for istartswith).
             field = serializers.CharField()
+        elif custom_field.data_type == CustomField.FieldDataType.MONETARY and (
+            op in self.EXPR_BY_CATEGORY["arithmetic"] or op in {"exact", "in"}
+        ):
+            # These ops compare against value_monetary_amount (a DecimalField), so the
+            # filter value must be numeric, not a currency-prefixed string like "USD100".
+            field = serializers.DecimalField(max_digits=65, decimal_places=2)
         else:
             # The general case: inferred from the corresponding field in CustomFieldInstance.
             value_field_name = CustomFieldInstance.get_value_field_name(

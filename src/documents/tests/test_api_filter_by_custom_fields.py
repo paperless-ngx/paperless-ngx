@@ -479,6 +479,26 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
             ),
         )
 
+    def test_exact_monetary_with_currency_prefix_is_invalid(self) -> None:
+        # Providing a currency-prefixed string like "USD100" for an exact/arithmetic
+        # monetary filter should be rejected, since these ops compare against the
+        # extracted numeric amount and cannot accept non-numeric values.
+        self._assert_validation_error(
+            json.dumps(["monetary_field", "exact", "USD100"]),
+            ["custom_field_query", "2"],
+            "valid number",
+        )
+        self._assert_validation_error(
+            json.dumps(["monetary_field", "gt", "USD100"]),
+            ["custom_field_query", "2"],
+            "valid number",
+        )
+        self._assert_validation_error(
+            json.dumps(["monetary_field", "in", ["USD100", "EUR50"]]),
+            ["custom_field_query", "2", "0"],
+            "valid number",
+        )
+
     # ==========================================================#
     # Subset check (document link field only)                   #
     # ==========================================================#
