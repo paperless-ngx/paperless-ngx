@@ -36,6 +36,7 @@ import { RemoteVersionService } from 'src/app/services/rest/remote-version.servi
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SearchService } from 'src/app/services/rest/search.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
@@ -97,6 +98,7 @@ describe('AppFrameComponent', () => {
   let savedViewSpy
   let modalService: NgbModal
   let maybeRefreshSpy
+  let tasksService: TasksService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -174,6 +176,7 @@ describe('AppFrameComponent', () => {
     openDocumentsService = TestBed.inject(OpenDocumentsService)
     modalService = TestBed.inject(NgbModal)
     router = TestBed.inject(Router)
+    tasksService = TestBed.inject(TasksService)
 
     jest
       .spyOn(settingsService, 'displayName', 'get')
@@ -442,6 +445,16 @@ describe('AppFrameComponent', () => {
 
   it('should call maybeRefreshDocumentCounts after saved views reload', () => {
     expect(maybeRefreshSpy).toHaveBeenCalled()
+  })
+
+  it('should show tasks badge for needs-attention tasks', () => {
+    jest
+      .spyOn(tasksService, 'needsAttentionTasks', 'get')
+      .mockReturnValue([{} as any, {} as any])
+
+    fixture.detectChanges()
+
+    expect(fixture.nativeElement.textContent).toContain('Tasks2')
   })
 
   it('should indicate attributes management availability when any permission is granted', () => {

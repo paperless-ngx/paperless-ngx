@@ -56,6 +56,14 @@ export class TasksService {
     )
   }
 
+  public get needsAttentionTasks(): PaperlessTask[] {
+    return this.fileTasks.filter((t) =>
+      [PaperlessTaskStatus.Failure, PaperlessTaskStatus.Revoked].includes(
+        t.status
+      )
+    )
+  }
+
   public reload() {
     if (this.loading) return
     this.loading = true
