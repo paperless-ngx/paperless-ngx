@@ -3,13 +3,13 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
-from celery import states
 from django.test import override_settings
 from django.utils import timezone
 from llama_index.core.base.embeddings.base import BaseEmbedding
 
 from documents.models import Document
 from documents.models import PaperlessTask
+from documents.tests.factories import PaperlessTaskFactory
 from paperless_ai import indexing
 
 
@@ -292,13 +292,15 @@ def test_queue_llm_index_update_if_needed_enqueues_when_idle_or_skips_recent() -
         )
 
     assert result is True
-    mock_task.delay.assert_called_once_with(rebuild=True, scheduled=False, auto=True)
+    mock_task.apply_async.assert_called_once_with(
+        kwargs={"rebuild": True},
+        headers={"trigger_source": "system"},
+    )
 
-    PaperlessTask.objects.create(
-        task_id="task-1",
-        task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
-        status=states.STARTED,
-        date_created=timezone.now(),
+    PaperlessTaskFactory(
+        task_type=PaperlessTask.TaskType.LLM_INDEX,
+        trigger_source=PaperlessTask.TriggerSource.SYSTEM,
+        status=PaperlessTask.Status.STARTED,
     )
 
     # Existing running task
@@ -309,7 +311,7 @@ def test_queue_llm_index_update_if_needed_enqueues_when_idle_or_skips_recent() -
         )
 
     assert result is False
-    mock_task.delay.assert_not_called()
+    mock_task.apply_async.assert_not_called()
 
 
 @override_settings(

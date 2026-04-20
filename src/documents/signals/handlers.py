@@ -1,18 +1,21 @@
 from __future__ import annotations
 
+import datetime
 import hashlib
 import logging
+import re as _re
 import shutil
+import traceback as _tb
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
 
 from celery import shared_task
-from celery import states
 from celery.signals import before_task_publish
 from celery.signals import task_failure
 from celery.signals import task_postrun
 from celery.signals import task_prerun
+from celery.signals import task_revoked
 from celery.signals import worker_process_init
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -31,6 +34,7 @@ from documents import matching
 from documents.caching import clear_document_caches
 from documents.caching import invalidate_llm_suggestions_cache
 from documents.data_models import ConsumableDocument
+from documents.data_models import DocumentSource
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
@@ -996,68 +1000,225 @@ def run_workflows(
         return overrides, "\n".join(messages)
 
 
-@before_task_publish.connect
-def before_task_publish_handler(sender=None, headers=None, body=None, **kwargs) -> None:
+# ---------------------------------------------------------------------------
+# Task tracking -- Celery signal handlers
+# ---------------------------------------------------------------------------
+
+TRACKED_TASKS: dict[str, PaperlessTask.TaskType] = {
+    "documents.tasks.consume_file": PaperlessTask.TaskType.CONSUME_FILE,
+    "documents.tasks.train_classifier": PaperlessTask.TaskType.TRAIN_CLASSIFIER,
+    "documents.tasks.sanity_check": PaperlessTask.TaskType.SANITY_CHECK,
+    "documents.tasks.llmindex_index": PaperlessTask.TaskType.LLM_INDEX,
+    "documents.tasks.empty_trash": PaperlessTask.TaskType.EMPTY_TRASH,
+    "documents.tasks.check_scheduled_workflows": PaperlessTask.TaskType.CHECK_WORKFLOWS,
+    "paperless_mail.tasks.process_mail_accounts": PaperlessTask.TaskType.MAIL_FETCH,
+    "documents.tasks.bulk_update_documents": PaperlessTask.TaskType.BULK_UPDATE,
+    "documents.tasks.update_document_content_maybe_archive_file": PaperlessTask.TaskType.REPROCESS_DOCUMENT,
+    "documents.tasks.build_share_link_bundle": PaperlessTask.TaskType.BUILD_SHARE_LINK,
+    "documents.bulk_edit.delete": PaperlessTask.TaskType.BULK_DELETE,
+}
+
+_CELERY_STATE_TO_STATUS: dict[str, PaperlessTask.Status] = {
+    "SUCCESS": PaperlessTask.Status.SUCCESS,
+    "FAILURE": PaperlessTask.Status.FAILURE,
+    "REVOKED": PaperlessTask.Status.REVOKED,
+}
+
+_DOCUMENT_SOURCE_TO_TRIGGER: dict[DocumentSource, PaperlessTask.TriggerSource] = {
+    DocumentSource.ConsumeFolder: PaperlessTask.TriggerSource.FOLDER_CONSUME,
+    DocumentSource.ApiUpload: PaperlessTask.TriggerSource.API_UPLOAD,
+    DocumentSource.MailFetch: PaperlessTask.TriggerSource.EMAIL_CONSUME,
+    DocumentSource.WebUI: PaperlessTask.TriggerSource.WEB_UI,
+}
+
+
+def _get_consume_args(
+    args: tuple,
+    task_kwargs: dict,
+) -> tuple[Any | None, Any | None]:
+    """Extract (input_doc, overrides) from consume_file task arguments."""
+    input_doc = args[0] if args else task_kwargs.get("input_doc")
+    overrides = args[1] if len(args) >= 2 else task_kwargs.get("overrides")
+    return input_doc, overrides
+
+
+def _extract_input_data(
+    task_type: PaperlessTask.TaskType,
+    args: tuple,
+    task_kwargs: dict,
+) -> dict:
+    """Build the input_data dict stored on the PaperlessTask record.
+
+    For consume_file tasks this includes the filename, MIME type, and any
+    non-null overrides from the DocumentMetadataOverrides object.  For
+    mail_fetch tasks it captures the account_ids list.  All other task
+    types store no input data and return {}.
     """
-    Creates the PaperlessTask object in a pending state.  This is sent before
-    the task reaches the broker, but before it begins executing on a worker.
+    if task_type == PaperlessTask.TaskType.CONSUME_FILE:
+        input_doc, overrides = _get_consume_args(args, task_kwargs)
+        if input_doc is None:  # pragma: no cover
+            return {}
+        data: dict = {
+            "filename": input_doc.original_file.name,
+            "mime_type": input_doc.mime_type,
+        }
+        if input_doc.original_path:  # pragma: no cover
+            data["source_path"] = str(input_doc.original_path)
+        if input_doc.mailrule_id:  # pragma: no cover
+            data["mailrule_id"] = input_doc.mailrule_id
+        if overrides:
+            override_dict = {}
+            for k, v in vars(overrides).items():
+                if v is None or k.startswith("_"):
+                    continue
+                if isinstance(v, datetime.date):
+                    v = v.isoformat()
+                elif isinstance(v, Path):
+                    v = str(v)
+                override_dict[k] = v
+            if override_dict:
+                data["overrides"] = override_dict
+        return data
+
+    if task_type == PaperlessTask.TaskType.MAIL_FETCH:
+        account_ids = args[0] if args else task_kwargs.get("account_ids")
+        if account_ids is not None:
+            return {"account_ids": account_ids}
+        return {}
+
+    return {}
+
+
+def _determine_trigger_source(
+    task_type: PaperlessTask.TaskType,
+    args: tuple,
+    task_kwargs: dict,
+    headers: dict,
+) -> PaperlessTask.TriggerSource:
+    """Resolve the TriggerSource for a task being published to the broker.
+
+    Priority order:
+    1. Explicit trigger_source header (set by beat schedule or apply_async callers).
+    2. For consume_file tasks, the DocumentSource on the input document.
+    3. MANUAL as the catch-all for all other cases.
+    """
+    # Explicit header takes priority -- callers pass a TriggerSource DB value directly.
+    header_source = headers.get("trigger_source")
+    if header_source is not None:
+        try:
+            return PaperlessTask.TriggerSource(header_source)
+        except ValueError:
+            pass
+
+    if task_type == PaperlessTask.TaskType.CONSUME_FILE:
+        input_doc, _ = _get_consume_args(args, task_kwargs)
+        if input_doc is not None:
+            return _DOCUMENT_SOURCE_TO_TRIGGER.get(
+                input_doc.source,
+                PaperlessTask.TriggerSource.API_UPLOAD,
+            )
+
+    return PaperlessTask.TriggerSource.MANUAL
+
+
+def _extract_owner_id(
+    task_type: PaperlessTask.TaskType,
+    args: tuple,
+    task_kwargs: dict,
+) -> int | None:
+    """Return the owner_id from consume_file overrides, or None for all other task types."""
+    if task_type != PaperlessTask.TaskType.CONSUME_FILE:
+        return None
+    _, overrides = _get_consume_args(args, task_kwargs)
+    if overrides and hasattr(overrides, "owner_id"):
+        return overrides.owner_id
+    return None  # pragma: no cover
+
+
+def _parse_consume_result(result: str) -> dict | None:
+    """Parse a consume_file string result into a structured dict.
+
+    consume_file returns human-readable strings rather than dicts (e.g.
+    "Success. New document id 42 created" or "It is a duplicate of foo (#7)").
+    This function extracts the document ID or duplicate reference so the
+    result can be stored as structured data on the PaperlessTask record.
+    Returns None when the string does not match any known pattern.
+    """
+    if match := _re.search(r"New document id (\d+) created", result):
+        return {"document_id": int(match.group(1))}
+    if match := _re.search(r"It is a duplicate of .* \(#(\d+)\)", result):
+        return {
+            "duplicate_of": int(match.group(1)),
+            "duplicate_in_trash": "existing document is in the trash" in result,
+        }
+    return None  # pragma: no cover
+
+
+@before_task_publish.connect
+def before_task_publish_handler(
+    sender=None,
+    headers=None,
+    body=None,
+    **kwargs,
+) -> None:
+    """
+    Creates the PaperlessTask record when the task is published to broker.
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#before-task-publish
-
     https://docs.celeryq.dev/en/stable/internals/protocol.html#version-2
-
     """
-    if "task" not in headers or headers["task"] != "documents.tasks.consume_file":
-        # Assumption: this is only ever a v2 message
+    if headers is None or body is None:
+        return
+
+    task_name = headers.get("task", "")
+    task_type = TRACKED_TASKS.get(task_name)
+    if task_type is None:
         return
 
     try:
         close_old_connections()
+        args, task_kwargs, _ = body
+        task_id = headers["id"]
 
-        task_args = body[0]
-        input_doc, overrides = task_args
-
-        task_file_name = input_doc.original_file.name
-        user_id = overrides.owner_id if overrides else None
+        input_data = _extract_input_data(task_type, args, task_kwargs)
+        trigger_source = _determine_trigger_source(
+            task_type,
+            args,
+            task_kwargs,
+            headers,
+        )
+        owner_id = _extract_owner_id(task_type, args, task_kwargs)
 
         PaperlessTask.objects.create(
-            type=PaperlessTask.TaskType.AUTO,
-            task_id=headers["id"],
-            status=states.PENDING,
-            task_file_name=task_file_name,
-            task_name=PaperlessTask.TaskName.CONSUME_FILE,
-            result=None,
-            date_created=timezone.now(),
-            date_started=None,
-            date_done=None,
-            owner_id=user_id,
+            task_id=task_id,
+            task_type=task_type,
+            trigger_source=trigger_source,
+            status=PaperlessTask.Status.PENDING,
+            input_data=input_data,
+            owner_id=owner_id,
         )
     except Exception:  # pragma: no cover
-        # Don't let an exception in the signal handlers prevent
-        # a document from being consumed.
         logger.exception("Creating PaperlessTask failed")
 
 
 @task_prerun.connect
 def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs) -> None:
     """
-
-    Updates the PaperlessTask to be started.  Sent before the task begins execution
-    on a worker.
+    Marks the task STARTED when execution begins on a worker.
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-prerun
     """
+    if task_id is None:  # pragma: no cover
+        return
+    if task and task.name not in TRACKED_TASKS:
+        return
     try:
         close_old_connections()
-        task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
-
-        if task_instance is not None:
-            task_instance.status = states.STARTED
-            task_instance.date_started = timezone.now()
-            task_instance.save()
+        PaperlessTask.objects.filter(task_id=task_id).update(
+            status=PaperlessTask.Status.STARTED,
+            date_started=timezone.now(),
+        )
     except Exception:  # pragma: no cover
-        # Don't let an exception in the signal handlers prevent
-        # a document from being consumed.
         logger.exception("Setting PaperlessTask started failed")
 
 
@@ -1071,22 +1232,56 @@ def task_postrun_handler(
     **kwargs,
 ) -> None:
     """
-    Updates the result of the PaperlessTask.
+    Records task completion and result data for non-failure outcomes.
+
+    Skips FAILURE states entirely, since task_failure_handler fires first
+    and fully owns the failure path (status, date_done, duration,
+    result_data, result_message).
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-postrun
     """
+    if task_id is None:  # pragma: no cover
+        return
+    if task and task.name not in TRACKED_TASKS:
+        return
     try:
         close_old_connections()
-        task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
 
-        if task_instance is not None:
-            task_instance.status = state or states.FAILURE
-            task_instance.result = retval
-            task_instance.date_done = timezone.now()
-            task_instance.save()
+        new_status = _CELERY_STATE_TO_STATUS.get(state, PaperlessTask.Status.FAILURE)
+        if new_status == PaperlessTask.Status.FAILURE:
+            return
+
+        now = timezone.now()
+        try:
+            task_instance = PaperlessTask.objects.get(task_id=task_id)
+        except PaperlessTask.DoesNotExist:
+            return
+
+        task_instance.status = new_status
+        task_instance.date_done = now
+        changed_fields = ["status", "date_done"]
+
+        if task_instance.date_started:
+            task_instance.duration_seconds = (
+                now - task_instance.date_started
+            ).total_seconds()
+            changed_fields.append("duration_seconds")
+        if task_instance.date_started and task_instance.date_created:
+            task_instance.wait_time_seconds = (
+                task_instance.date_started - task_instance.date_created
+            ).total_seconds()
+            changed_fields.append("wait_time_seconds")
+
+        if isinstance(retval, dict):
+            task_instance.result_data = retval
+            changed_fields.append("result_data")
+        elif isinstance(retval, str):
+            task_instance.result_message = retval
+            task_instance.result_data = _parse_consume_result(retval)
+            changed_fields.extend(["result_message", "result_data"])
+
+        task_instance.save(update_fields=changed_fields)
     except Exception:  # pragma: no cover
-        # Don't let an exception in the signal handlers prevent
-        # a document from being consumed.
         logger.exception("Updating PaperlessTask failed")
 
 
@@ -1100,21 +1295,85 @@ def task_failure_handler(
     **kwargs,
 ) -> None:
     """
-    Updates the result of a failed PaperlessTask.
+    Records failure details when a task raises an exception.
+
+    Fully owns the FAILURE path. task_postrun_handler skips FAILURE
+    states so there is no overlap.
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-failure
     """
+    if task_id is None:  # pragma: no cover
+        return
+    if sender and sender.name not in TRACKED_TASKS:  # pragma: no cover
+        return
     try:
         close_old_connections()
-        task_instance = PaperlessTask.objects.filter(task_id=task_id).first()
 
-        if task_instance is not None and task_instance.result is None:
-            task_instance.status = states.FAILURE
-            task_instance.result = traceback
-            task_instance.date_done = timezone.now()
-            task_instance.save()
+        result_data: dict = {
+            "error_type": type(exception).__name__ if exception else "Unknown",
+            "error_message": str(exception) if exception else "Unknown error",
+        }
+        if traceback:
+            tb_str = "".join(_tb.format_tb(traceback))
+            result_data["traceback"] = tb_str[:5000]
+
+        now = timezone.now()
+        update_fields: dict = {
+            "status": PaperlessTask.Status.FAILURE,
+            "result_data": result_data,
+            "result_message": str(exception) if exception else None,
+            "date_done": now,
+        }
+
+        task_qs = PaperlessTask.objects.filter(task_id=task_id)
+        task_instance = task_qs.values("date_started", "date_created").first()
+        if task_instance:
+            date_started = task_instance["date_started"]
+            if date_started:
+                update_fields["duration_seconds"] = (now - date_started).total_seconds()
+            date_created = task_instance["date_created"]
+            if date_started and date_created:
+                update_fields["wait_time_seconds"] = (
+                    date_started - date_created
+                ).total_seconds()
+            task_qs.update(**update_fields)
     except Exception:  # pragma: no cover
-        logger.exception("Updating PaperlessTask failed")
+        logger.exception("Updating PaperlessTask on failure failed")
+
+
+@task_revoked.connect
+def task_revoked_handler(
+    sender=None,
+    request=None,
+    *,
+    terminated: bool = False,
+    signum=None,
+    expired: bool = False,
+    **kwargs,
+) -> None:
+    """
+    Marks the task REVOKED when it is cancelled before or during execution.
+
+    This fires for tasks revoked while still queued (before task_prerun) as
+    well as for tasks terminated mid-run.  task_postrun does NOT fire for
+    pre-start revocations, so this handler is the only way to move those
+    records out of PENDING.
+
+    https://docs.celeryq.dev/en/stable/userguide/signals.html#task-revoked
+    """
+    task_id = request.id if request else None
+    if task_id is None:  # pragma: no cover
+        return
+    if sender and sender.name not in TRACKED_TASKS:  # pragma: no cover
+        return
+    try:
+        close_old_connections()
+        PaperlessTask.objects.filter(task_id=task_id).update(
+            status=PaperlessTask.Status.REVOKED,
+            date_done=timezone.now(),
+        )
+    except Exception:  # pragma: no cover
+        logger.exception("Updating PaperlessTask on revocation failed")
 
 
 @worker_process_init.connect

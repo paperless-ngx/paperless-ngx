@@ -22,7 +22,6 @@ class Command(PaperlessCommand):
             self.buffered_logging("paperless.classifier"),
         ):
             train_classifier(
-                scheduled=False,
                 status_callback=lambda msg: self.console.print(f"  {msg}"),
             )
 

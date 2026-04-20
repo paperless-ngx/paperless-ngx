@@ -133,7 +133,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "django_filters",
-    "django_celery_results",
     "guardian",
     "allauth",
     "allauth.account",
@@ -669,8 +668,6 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT: Final[int] = get_int_from_env("PAPERLESS_WORKER_TIMEOUT", 1800)
 
-CELERY_RESULT_EXTENDED = True
-CELERY_RESULT_BACKEND = "django-db"
 CELERY_CACHE_BACKEND = "default"
 
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-serializer

@@ -1,7 +1,7 @@
 """Tests for the sanity checker module.
 
 Tests exercise ``check_sanity`` as a whole, verifying document validation,
-orphan detection, task recording, and the iter_wrapper contract.
+orphan detection, and the iter_wrapper contract.
 """
 
 from __future__ import annotations
@@ -12,13 +12,12 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from documents.models import Document
-from documents.models import PaperlessTask
 from documents.sanity_checker import check_sanity
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+    from documents.models import Document
     from documents.tests.conftest import PaperlessDirs
 
 
@@ -227,35 +226,6 @@ class TestCheckSanityIterWrapper:
     def test_default_works_without_wrapper(self, sample_doc: Document) -> None:
         messages = check_sanity()
         assert not messages.has_error
-
-
-@pytest.mark.django_db
-class TestCheckSanityTaskRecording:
-    @pytest.mark.parametrize(
-        ("expected_type", "scheduled"),
-        [
-            pytest.param(PaperlessTask.TaskType.SCHEDULED_TASK, True, id="scheduled"),
-            pytest.param(PaperlessTask.TaskType.MANUAL_TASK, False, id="manual"),
-        ],
-    )
-    @pytest.mark.usefixtures("_media_settings")
-    def test_task_type(self, expected_type: str, *, scheduled: bool) -> None:
-        check_sanity(scheduled=scheduled)
-        task = PaperlessTask.objects.latest("date_created")
-        assert task.task_name == PaperlessTask.TaskName.CHECK_SANITY
-        assert task.type == expected_type
-
-    def test_success_status(self, sample_doc: Document) -> None:
-        check_sanity()
-        task = PaperlessTask.objects.latest("date_created")
-        assert task.status == "SUCCESS"
-
-    def test_failure_status(self, sample_doc: Document) -> None:
-        Path(sample_doc.source_path).unlink()
-        check_sanity()
-        task = PaperlessTask.objects.latest("date_created")
-        assert task.status == "FAILURE"
-        assert "Check logs for details" in task.result
 
 
 @pytest.mark.django_db

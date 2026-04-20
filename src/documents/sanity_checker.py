@@ -10,7 +10,6 @@ is an identity function that adds no overhead.
 """
 
 import logging
-import uuid
 from collections import defaultdict
 from collections.abc import Iterator
 from pathlib import Path
@@ -18,12 +17,9 @@ from typing import TYPE_CHECKING
 from typing import Final
 from typing import TypedDict
 
-from celery import states
 from django.conf import settings
-from django.utils import timezone
 
 from documents.models import Document
-from documents.models import PaperlessTask
 from documents.utils import IterWrapper
 from documents.utils import compute_checksum
 from documents.utils import identity
@@ -287,33 +283,17 @@ def _check_document(
 
 def check_sanity(
     *,
-    scheduled: bool = True,
     iter_wrapper: IterWrapper[Document] = identity,
 ) -> SanityCheckMessages:
     """Run a full sanity check on the document archive.
 
     Args:
-        scheduled: Whether this is a scheduled (automatic) or manual check.
-            Controls the task type recorded in the database.
         iter_wrapper: A callable that wraps the document iterable, e.g.,
             for progress bar display. Defaults to identity (no wrapping).
 
     Returns:
         A SanityCheckMessages instance containing all detected issues.
     """
-    paperless_task = PaperlessTask.objects.create(
-        task_id=uuid.uuid4(),
-        type=(
-            PaperlessTask.TaskType.SCHEDULED_TASK
-            if scheduled
-            else PaperlessTask.TaskType.MANUAL_TASK
-        ),
-        task_name=PaperlessTask.TaskName.CHECK_SANITY,
-        status=states.STARTED,
-        date_created=timezone.now(),
-        date_started=timezone.now(),
-    )
-
     messages = SanityCheckMessages()
     present_files = _build_present_files()
 
@@ -331,23 +311,5 @@ def check_sanity(
 
     for extra_file in present_files:
         messages.warning(None, f"Orphaned file in media dir: {extra_file}")
-
-    paperless_task.status = states.SUCCESS if not messages.has_error else states.FAILURE
-    if messages.total_issue_count == 0:
-        paperless_task.result = "No issues found."
-    else:
-        parts: list[str] = []
-        if messages.document_error_count:
-            parts.append(f"{messages.document_error_count} document(s) with errors")
-        if messages.document_warning_count:
-            parts.append(f"{messages.document_warning_count} document(s) with warnings")
-        if messages.global_warning_count:
-            parts.append(f"{messages.global_warning_count} global warning(s)")
-        paperless_task.result = ", ".join(parts) + " found."
-        if messages.has_error:
-            paperless_task.result += " Check logs for details."
-
-    paperless_task.date_done = timezone.now()
-    paperless_task.save(update_fields=["status", "result", "date_done"])
 
     return messages

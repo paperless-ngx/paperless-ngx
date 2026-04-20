@@ -936,19 +936,6 @@ wheels = [
 ]
 
 [[package]]
-name = "django-celery-results"
-version = "2.6.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "celery", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
-    { name = "django", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/a6/b5/9966c28e31014c228305e09d48b19b35522a8f941fe5af5f81f40dc8fa80/django_celery_results-2.6.0.tar.gz", hash = "sha256:9abcd836ae6b61063779244d8887a88fe80bbfaba143df36d3cb07034671277c", size = 83985, upload-time = "2025-04-10T08:23:52.677Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/2c/da/70f0f3c5364735344c4bc89e53413bcaae95b4fc1de4e98a7a3b9fb70c88/django_celery_results-2.6.0-py3-none-any.whl", hash = "sha256:b9ccdca2695b98c7cbbb8dea742311ba9a92773d71d7b4944a676e69a7df1c73", size = 38351, upload-time = "2025-04-10T08:23:49.965Z" },
-]
-
-[[package]]
 name = "django-compression-middleware"
 version = "0.5.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2869,7 +2856,6 @@ dependencies = [
     { name = "django-allauth", extra = ["mfa", "socialaccount"], marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django-auditlog", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django-cachalot", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
-    { name = "django-celery-results", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django-compression-middleware", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django-cors-headers", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "django-extensions", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -3018,7 +3004,6 @@ requires-dist = [
     { name = "django-allauth", extras = ["mfa", "socialaccount"], specifier = "~=65.15.0" },
     { name = "django-auditlog", specifier = "~=3.4.1" },
     { name = "django-cachalot", specifier = "~=2.9.0" },
-    { name = "django-celery-results", specifier = "~=2.6.0" },
     { name = "django-compression-middleware", specifier = "~=0.5.0" },
     { name = "django-cors-headers", specifier = "~=4.9.0" },
     { name = "django-extensions", specifier = "~=4.1" },

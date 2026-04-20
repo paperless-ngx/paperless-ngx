@@ -3,6 +3,7 @@ from datetime import timedelta
 from unittest import mock
 
 import pytest
+import time_machine
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
@@ -26,6 +27,7 @@ from documents.models import Tag
 from documents.models import Workflow
 from documents.search import get_backend
 from documents.search import reset_backend
+from documents.tests.factories import DocumentFactory
 from documents.tests.utils import DirectoriesMixin
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -740,6 +742,49 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
 
         # Tantivy rejects unparsable field queries with a 400
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @override_settings(
+        TIME_ZONE="UTC",
+    )
+    @time_machine.travel(
+        datetime.datetime(2026, 7, 15, 12, 0, tzinfo=datetime.UTC),
+        tick=False,
+    )
+    def test_search_added_previous_quarter(self) -> None:
+        """
+        GIVEN:
+            - Documents inside and outside the previous quarter
+        WHEN:
+            - Query with the legacy natural-language phrase used by the UI
+        THEN:
+            - Previous-quarter documents are returned
+        """
+        d1 = DocumentFactory.create(
+            title="quarterly statement april",
+            content="bank statement",
+            added=datetime.datetime(2026, 4, 10, 12, 0, tzinfo=datetime.UTC),
+        )
+        d2 = DocumentFactory.create(
+            title="quarterly statement june",
+            content="bank statement",
+            added=datetime.datetime(2026, 6, 20, 12, 0, tzinfo=datetime.UTC),
+        )
+        d3 = DocumentFactory.create(
+            title="quarterly statement july",
+            content="bank statement",
+            added=datetime.datetime(2026, 7, 10, 12, 0, tzinfo=datetime.UTC),
+        )
+
+        backend = get_backend()
+        backend.add_or_update(d1)
+        backend.add_or_update(d2)
+        backend.add_or_update(d3)
+
+        response = self.client.get('/api/documents/?query=added:"previous quarter"')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        results = response.data["results"]
+        self.assertEqual({r["id"] for r in results}, {1, 2})
 
     @mock.patch("documents.search._backend.TantivyBackend.autocomplete")
     def test_search_autocomplete_limits(self, m) -> None:

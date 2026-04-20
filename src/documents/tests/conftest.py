@@ -13,6 +13,8 @@ from rest_framework.test import APIClient
 
 from documents.tests.factories import DocumentFactory
 
+UserModelT = get_user_model()
+
 if TYPE_CHECKING:
     from documents.models import Document
 
@@ -126,15 +128,34 @@ def rest_api_client():
     yield APIClient()
 
 
-@pytest.fixture
-def authenticated_rest_api_client(rest_api_client: APIClient):
-    """
-    The basic DRF ApiClient which has been authenticated
-    """
-    UserModel = get_user_model()
-    user = UserModel.objects.create_user(username="testuser", password="password")
-    rest_api_client.force_authenticate(user=user)
-    yield rest_api_client
+@pytest.fixture()
+def regular_user(django_user_model: type[UserModelT]) -> UserModelT:
+    """Unprivileged authenticated user for permission boundary tests."""
+    return django_user_model.objects.create_user(username="regular", password="regular")
+
+
+@pytest.fixture()
+def admin_client(rest_api_client: APIClient, admin_user: UserModelT) -> APIClient:
+    """Admin client pre-authenticated and sending the v10 Accept header."""
+    rest_api_client.force_authenticate(user=admin_user)
+    rest_api_client.credentials(HTTP_ACCEPT="application/json; version=10")
+    return rest_api_client
+
+
+@pytest.fixture()
+def v9_client(rest_api_client: APIClient, admin_user: UserModelT) -> APIClient:
+    """Admin client pre-authenticated and sending the v9 Accept header."""
+    rest_api_client.force_authenticate(user=admin_user)
+    rest_api_client.credentials(HTTP_ACCEPT="application/json; version=9")
+    return rest_api_client
+
+
+@pytest.fixture()
+def user_client(rest_api_client: APIClient, regular_user: UserModelT) -> APIClient:
+    """Regular-user client pre-authenticated and sending the v10 Accept header."""
+    rest_api_client.force_authenticate(user=regular_user)
+    rest_api_client.credentials(HTTP_ACCEPT="application/json; version=10")
+    return rest_api_client
 
 
 @pytest.fixture(scope="session", autouse=True)

@@ -175,7 +175,7 @@ export class TasksComponent
 
   dismissAndGo(task: PaperlessTask) {
     this.dismissTask(task)
-    this.router.navigate(['documents', task.related_document])
+    this.router.navigate(['documents', task.related_document_ids?.[0]])
   }
 
   expandTask(task: PaperlessTask) {
@@ -207,11 +207,13 @@ export class TasksComponent
     if (this._filterText.length) {
       tasks = tasks.filter((t) => {
         if (this.filterTargetID == TaskFilterTargetID.Name) {
-          return t.task_file_name
-            .toLowerCase()
+          return (t.input_data?.filename as string)
+            ?.toLowerCase()
             .includes(this._filterText.toLowerCase())
         } else if (this.filterTargetID == TaskFilterTargetID.Result) {
-          return t.result.toLowerCase().includes(this._filterText.toLowerCase())
+          return t.result_message
+            ?.toLowerCase()
+            .includes(this._filterText.toLowerCase())
         }
       })
     }

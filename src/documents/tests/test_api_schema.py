@@ -1,5 +1,7 @@
+import pytest
 from django.core.management import call_command
 from django.core.management.base import CommandError
+from drf_spectacular.generators import SchemaGenerator
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -66,3 +68,57 @@ class TestApiSchema(APITestCase):
             "delete_pages",
         ]:
             self.assertIn(action_method, advertised_methods)
+
+
+# ---- session-scoped fixture: generate schema once for all TestXxx classes ----
+
+
+@pytest.fixture(scope="session")
+def api_schema():
+    generator = SchemaGenerator()
+    return generator.get_schema(request=None, public=True)
+
+
+class TestTasksSummarySchema:
+    """tasks_summary_retrieve: response must be an array of TaskSummarySerializer."""
+
+    def test_summary_response_is_array(self, api_schema):
+        op = api_schema["paths"]["/api/tasks/summary/"]["get"]
+        resp_200 = op["responses"]["200"]["content"]["application/json"]["schema"]
+        assert resp_200["type"] == "array", (
+            "tasks_summary_retrieve response must be type:array"
+        )
+
+    def test_summary_items_have_total_count(self, api_schema):
+        op = api_schema["paths"]["/api/tasks/summary/"]["get"]
+        resp_200 = op["responses"]["200"]["content"]["application/json"]["schema"]
+        items = resp_200.get("items", {})
+        ref = items.get("$ref", "")
+        component_name = ref.split("/")[-1] if ref else ""
+        if component_name:
+            props = api_schema["components"]["schemas"][component_name]["properties"]
+        else:
+            props = items.get("properties", {})
+        assert "total_count" in props, (
+            "summary items must have 'total_count' (TaskSummarySerializer)"
+        )
+
+
+class TestTasksActiveSchema:
+    """tasks_active_retrieve: response must be an array of TaskSerializerV10."""
+
+    def test_active_response_is_array(self, api_schema):
+        op = api_schema["paths"]["/api/tasks/active/"]["get"]
+        resp_200 = op["responses"]["200"]["content"]["application/json"]["schema"]
+        assert resp_200["type"] == "array", (
+            "tasks_active_retrieve response must be type:array"
+        )
+
+    def test_active_items_ref_named_schema(self, api_schema):
+        op = api_schema["paths"]["/api/tasks/active/"]["get"]
+        resp_200 = op["responses"]["200"]["content"]["application/json"]["schema"]
+        items = resp_200.get("items", {})
+        ref = items.get("$ref", "")
+        component_name = ref.split("/")[-1] if ref else ""
+        assert component_name, "items should be a $ref to a named schema"
+        assert component_name in api_schema["components"]["schemas"]
