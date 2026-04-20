@@ -167,7 +167,6 @@ class TaskAdmin(admin.ModelAdmin):
         "wait_time_seconds",
         "input_data",
         "result_data",
-        "result_message",
     )
 
 

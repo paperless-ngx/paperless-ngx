@@ -20,6 +20,7 @@ from rest_framework.reverse import reverse
 
 from documents.classifier import load_classifier
 from documents.data_models import ConsumableDocument
+from documents.data_models import ConsumeFileSuccessResult
 from documents.data_models import DocumentMetadataOverrides
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_filename
@@ -395,7 +396,7 @@ class ConsumerPlugin(
                 exception=e,
             )
 
-    def run(self) -> str:
+    def run(self) -> "ConsumeFileSuccessResult":
         """
         Return the document object if it was successfully created.
         """
@@ -771,7 +772,7 @@ class ConsumerPlugin(
         # Return the most up to date fields
         document.refresh_from_db()
 
-        return f"Success. New document id {document.pk} created"
+        return ConsumeFileSuccessResult(document_id=document.pk)
 
     def _parse_title_placeholders(self, title: str) -> str:
         local_added = timezone.localtime(timezone.now())

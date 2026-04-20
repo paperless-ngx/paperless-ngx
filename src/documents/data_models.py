@@ -2,6 +2,7 @@ import dataclasses
 import datetime
 from enum import IntEnum
 from pathlib import Path
+from typing import TypedDict
 
 import magic
 from guardian.shortcuts import get_groups_with_perms
@@ -184,3 +185,19 @@ class ConsumableDocument:
         # Get the file type once at init
         # Note this function isn't called when the object is unpickled
         self.mime_type = magic.from_file(self.original_file, mime=True)
+
+
+class ConsumeFileSuccessResult(TypedDict):
+    """Returned by consume_file when the document is created successfully."""
+
+    document_id: int
+
+
+class ConsumeFileStoppedResult(TypedDict):
+    """Returned by consume_file when a plugin raises StopConsumeTaskError.
+
+    Examples: barcode split dispatched child tasks, double-sided scan waiting
+    for the second half, workflow deleted the document during consumption.
+    """
+
+    reason: str

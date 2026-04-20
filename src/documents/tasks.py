@@ -31,6 +31,8 @@ from documents.consumer import ConsumerPreflightPlugin
 from documents.consumer import WorkflowTriggerPlugin
 from documents.consumer import should_produce_archive
 from documents.data_models import ConsumableDocument
+from documents.data_models import ConsumeFileStoppedResult
+from documents.data_models import ConsumeFileSuccessResult
 from documents.data_models import DocumentMetadataOverrides
 from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
@@ -121,7 +123,7 @@ def consume_file(
     self: Task,
     input_doc: ConsumableDocument,
     overrides: DocumentMetadataOverrides | None = None,
-):
+) -> ConsumeFileSuccessResult | ConsumeFileStoppedResult | None:
     token = consume_task_id.set((self.request.id or "")[:8])
     try:
         # Default no overrides
@@ -183,7 +185,7 @@ def consume_file(
 
                 except StopConsumeTaskError as e:
                     logger.info(f"{plugin_name} requested task exit: {e.message}")
-                    return e.message
+                    return ConsumeFileStoppedResult(reason=e.message)
 
                 except Exception as e:
                     logger.exception(f"{plugin_name} failed: {e}")
