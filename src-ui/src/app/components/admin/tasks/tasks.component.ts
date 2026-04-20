@@ -1,4 +1,4 @@
-import { JsonPipe, NgTemplateOutlet, SlicePipe } from '@angular/common'
+import { JsonPipe, NgTemplateOutlet } from '@angular/common'
 import { Component, inject, OnDestroy, OnInit } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
@@ -107,7 +107,6 @@ const TRIGGER_SOURCE_OPTIONS = [
     PageHeaderComponent,
     IfPermissionsDirective,
     CustomDatePipe,
-    SlicePipe,
     JsonPipe,
     FormsModule,
     ReactiveFormsModule,
