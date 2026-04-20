@@ -9,6 +9,7 @@ from collections import defaultdict
 from collections import deque
 from datetime import datetime
 from datetime import timedelta
+from http import HTTPStatus
 from pathlib import Path
 from time import mktime
 from typing import TYPE_CHECKING
@@ -689,18 +690,49 @@ class EmailDocumentDetailSchema(EmailSerializer):
                     "original_mime_type": serializers.CharField(),
                     "media_filename": serializers.CharField(),
                     "has_archive_version": serializers.BooleanField(),
-                    "original_metadata": serializers.DictField(),
-                    "archive_checksum": serializers.CharField(),
-                    "archive_media_filename": serializers.CharField(),
+                    "original_metadata": serializers.ListField(
+                        child=inline_serializer(
+                            name="OriginalMetadataEntry",
+                            fields={
+                                "namespace": serializers.CharField(),
+                                "prefix": serializers.CharField(),
+                                "key": serializers.CharField(),
+                                "value": serializers.CharField(),
+                            },
+                        ),
+                    ),
+                    "archive_checksum": serializers.CharField(
+                        allow_null=True,
+                        required=False,
+                    ),
+                    "archive_media_filename": serializers.CharField(
+                        allow_null=True,
+                        required=False,
+                    ),
                     "original_filename": serializers.CharField(),
-                    "archive_size": serializers.IntegerField(),
-                    "archive_metadata": serializers.DictField(),
+                    "archive_size": serializers.IntegerField(
+                        allow_null=True,
+                        required=False,
+                    ),
+                    "archive_metadata": serializers.ListField(
+                        child=inline_serializer(
+                            name="ArchiveMetadataEntry",
+                            fields={
+                                "namespace": serializers.CharField(),
+                                "prefix": serializers.CharField(),
+                                "key": serializers.CharField(),
+                                "value": serializers.CharField(),
+                            },
+                        ),
+                        allow_null=True,
+                        required=False,
+                    ),
                     "lang": serializers.CharField(),
                 },
             ),
-            400: None,
-            403: None,
-            404: None,
+            HTTPStatus.BAD_REQUEST: None,
+            HTTPStatus.FORBIDDEN: None,
+            HTTPStatus.NOT_FOUND: None,
         },
     ),
     notes=extend_schema(
@@ -3528,7 +3560,17 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
             return response
 
 
-@extend_schema_view(**generate_object_with_permissions_schema(StoragePathSerializer))
+@extend_schema_view(
+    **generate_object_with_permissions_schema(StoragePathSerializer),
+    test=extend_schema(
+        operation_id="storage_paths_test",
+        description="Test a storage path template against a document.",
+        request=StoragePathTestSerializer,
+        responses={
+            (HTTPStatus.OK, "application/json"): OpenApiTypes.STR,
+        },
+    ),
+)
 class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[StoragePath]):
     model = StoragePath
 
@@ -3985,6 +4027,19 @@ class ShareLinkViewSet(
     ordering_fields = ("created", "expiration", "document")
 
 
+@extend_schema_view(
+    rebuild=extend_schema(
+        operation_id="share_link_bundles_rebuild",
+        description="Reset and re-queue a share link bundle for processing.",
+        responses={
+            HTTPStatus.OK: ShareLinkBundleSerializer,
+            (HTTPStatus.BAD_REQUEST, "application/json"): inline_serializer(
+                name="RebuildBundleError",
+                fields={"detail": serializers.CharField()},
+            ),
+        },
+    ),
+)
 class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
     model = ShareLinkBundle
 

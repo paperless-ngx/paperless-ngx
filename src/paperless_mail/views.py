@@ -1,6 +1,7 @@
 import datetime
 import logging
 from datetime import timedelta
+from http import HTTPStatus
 from typing import Any
 
 from django.http import HttpResponseBadRequest
@@ -160,6 +161,31 @@ class MailAccountViewSet(PassUserMixin, ModelViewSet[MailAccount]):
         return Response({"result": "OK"})
 
 
+@extend_schema_view(
+    bulk_delete=extend_schema(
+        operation_id="processed_mail_bulk_delete",
+        description="Delete multiple processed mail records by ID.",
+        request=inline_serializer(
+            name="BulkDeleteMailRequest",
+            fields={
+                "mail_ids": serializers.ListField(child=serializers.IntegerField()),
+            },
+        ),
+        responses={
+            (HTTPStatus.OK, "application/json"): inline_serializer(
+                name="BulkDeleteMailResponse",
+                fields={
+                    "result": serializers.CharField(),
+                    "deleted_mail_ids": serializers.ListField(
+                        child=serializers.IntegerField(),
+                    ),
+                },
+            ),
+            HTTPStatus.BAD_REQUEST: None,
+            HTTPStatus.FORBIDDEN: None,
+        },
+    ),
+)
 class ProcessedMailViewSet(PassUserMixin, ReadOnlyModelViewSet[ProcessedMail]):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = ProcessedMailSerializer
