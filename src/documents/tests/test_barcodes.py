@@ -632,7 +632,7 @@ class TestBarcodeNewConsume(
                     ),
                     overrides,
                 ),
-                "Barcode splitting complete!",
+                {"reason": "Barcode splitting complete!"},
             )
             # 2 new document consume tasks created
             self.assertEqual(self.consume_file_mock.call_count, 2)
@@ -1049,7 +1049,7 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
                 None,
             )
 
-            self.assertEqual(result, "Barcode splitting complete!")
+            self.assertEqual(result, {"reason": "Barcode splitting complete!"})
 
             documents = Document.objects.all().order_by("id")
             self.assertEqual(documents.count(), 3)

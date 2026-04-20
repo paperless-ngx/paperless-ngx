@@ -790,13 +790,6 @@ class PaperlessTask(ModelWithOwner):
         help_text=_("Structured result data from task execution"),
     )
 
-    result_message = models.TextField(
-        null=True,
-        blank=True,
-        verbose_name=_("Result Message"),
-        help_text=_("Human-readable result message"),
-    )
-
     # Acknowledgment
     acknowledged = models.BooleanField(
         default=False,

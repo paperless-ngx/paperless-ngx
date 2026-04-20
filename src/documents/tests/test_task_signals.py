@@ -238,30 +238,38 @@ class TestTaskPostrunHandler:
         task.refresh_from_db()
         assert task.status == PaperlessTask.Status.STARTED
 
-    def test_parses_legacy_new_document_string(self):
-        task = self._started_task()
+    def test_records_success_with_consume_result(self):
+        """ConsumeFileSuccessResult dict is stored directly as result_data."""
+        from documents.data_models import ConsumeFileSuccessResult
 
+        task = self._started_task()
         task_postrun_handler(
             task_id=task.task_id,
-            retval="New document id 42 created",
+            retval=ConsumeFileSuccessResult(document_id=42),
             state="SUCCESS",
         )
         task.refresh_from_db()
-        assert task.result_data["document_id"] == 42
-        assert task.result_message == "New document id 42 created"
+        assert task.result_data == {"document_id": 42}
 
-    def test_parses_duplicate_string(self):
-        """Duplicate detection returns a string with SUCCESS state (StopConsumeTaskError is caught and returned, not raised)."""
+    def test_records_stopped_with_reason(self):
+        """ConsumeFileStoppedResult dict is stored directly as result_data."""
+        from documents.data_models import ConsumeFileStoppedResult
+
         task = self._started_task()
-
         task_postrun_handler(
             task_id=task.task_id,
-            retval="It is a duplicate of some document (#99).",
+            retval=ConsumeFileStoppedResult(reason="Barcode splitting complete!"),
             state="SUCCESS",
         )
         task.refresh_from_db()
-        assert task.result_data["duplicate_of"] == 99
-        assert task.result_data["duplicate_in_trash"] is False
+        assert task.result_data == {"reason": "Barcode splitting complete!"}
+
+    def test_none_retval_stores_no_result_data(self):
+        """None return value (non-consume tasks) leaves result_data untouched."""
+        task = self._started_task()
+        task_postrun_handler(task_id=task.task_id, retval=None, state="SUCCESS")
+        task.refresh_from_db()
+        assert task.result_data is None
 
     def test_ignores_unknown_task_id(self):
 

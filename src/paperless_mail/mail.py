@@ -239,7 +239,7 @@ def mailbox_login(mailbox: MailBox, account: MailAccount) -> None:
 
 @shared_task
 def apply_mail_action(
-    result: list[str],
+    result: list,
     rule_id: int,
     message_uid: str,
     message_subject: str,

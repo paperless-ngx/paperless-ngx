@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime
 import hashlib
 import logging
-import re as _re
 import shutil
 import traceback as _tb
 from pathlib import Path
@@ -1101,25 +1100,6 @@ def _extract_owner_id(
     return None  # pragma: no cover
 
 
-def _parse_consume_result(result: str) -> dict | None:
-    """Parse a consume_file string result into a structured dict.
-
-    consume_file returns human-readable strings rather than dicts (e.g.
-    "Success. New document id 42 created" or "It is a duplicate of foo (#7)").
-    This function extracts the document ID or duplicate reference so the
-    result can be stored as structured data on the PaperlessTask record.
-    Returns None when the string does not match any known pattern.
-    """
-    if match := _re.search(r"New document id (\d+) created", result):
-        return {"document_id": int(match.group(1))}
-    if match := _re.search(r"It is a duplicate of .* \(#(\d+)\)", result):
-        return {
-            "duplicate_of": int(match.group(1)),
-            "duplicate_in_trash": "existing document is in the trash" in result,
-        }
-    return None  # pragma: no cover
-
-
 @before_task_publish.connect
 def before_task_publish_handler(
     sender=None,
@@ -1196,8 +1176,7 @@ def task_postrun_handler(
     Records task completion and result data for non-failure outcomes.
 
     Skips FAILURE states entirely, since task_failure_handler fires first
-    and fully owns the failure path (status, date_done, duration,
-    result_data, result_message).
+    and fully owns the failure path (status, date_done, duration, result_data).
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-postrun
     """
@@ -1236,10 +1215,9 @@ def task_postrun_handler(
         if isinstance(retval, dict):
             task_instance.result_data = retval
             changed_fields.append("result_data")
-        elif isinstance(retval, str):
-            task_instance.result_message = retval
-            task_instance.result_data = _parse_consume_result(retval)
-            changed_fields.extend(["result_message", "result_data"])
+            if "duplicate_of" in retval:
+                task_instance.status = PaperlessTask.Status.FAILURE
+                changed_fields.append("status")
 
         task_instance.save(update_fields=changed_fields)
     except Exception:  # pragma: no cover
@@ -1282,7 +1260,6 @@ def task_failure_handler(
         update_fields: dict = {
             "status": PaperlessTask.Status.FAILURE,
             "result_data": result_data,
-            "result_message": str(exception) if exception else None,
             "date_done": now,
         }
 

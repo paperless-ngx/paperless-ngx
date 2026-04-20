@@ -4685,7 +4685,11 @@ class SystemStatusView(PassUserMixin):
             classifier_error = "No classifier training tasks found"
         elif last_trained_task.status != PaperlessTask.Status.SUCCESS:
             classifier_status = "ERROR"
-            classifier_error = last_trained_task.result_message
+            classifier_error = (
+                last_trained_task.result_data.get("error_message")
+                if last_trained_task.result_data
+                else None
+            )
         classifier_last_trained = (
             last_trained_task.date_done if last_trained_task else None
         )
@@ -4705,7 +4709,11 @@ class SystemStatusView(PassUserMixin):
             sanity_check_error = "No sanity check tasks found"
         elif last_sanity_check.status != PaperlessTask.Status.SUCCESS:
             sanity_check_status = "ERROR"
-            sanity_check_error = last_sanity_check.result_message
+            sanity_check_error = (
+                last_sanity_check.result_data.get("error_message")
+                if last_sanity_check.result_data
+                else None
+            )
         sanity_check_last_run = (
             last_sanity_check.date_done if last_sanity_check else None
         )
@@ -4730,7 +4738,11 @@ class SystemStatusView(PassUserMixin):
                 llmindex_error = "No LLM index update tasks found"
             elif last_llmindex_update.status == PaperlessTask.Status.FAILURE:
                 llmindex_status = "ERROR"
-                llmindex_error = last_llmindex_update.result_message
+                llmindex_error = (
+                    last_llmindex_update.result_data.get("error_message")
+                    if last_llmindex_update.result_data
+                    else None
+                )
             llmindex_last_modified = (
                 last_llmindex_update.date_done if last_llmindex_update else None
             )
