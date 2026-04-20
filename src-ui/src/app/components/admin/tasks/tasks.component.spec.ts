@@ -134,6 +134,22 @@ const tasks: PaperlessTask[] = [
     acknowledged: false,
     related_document_ids: [],
   },
+  {
+    id: 461,
+    task_id: 'bb79efb3-1e78-4f31-b4be-0966620b0ce1',
+    input_data: {},
+    date_created: new Date('2023-06-07T03:54:35.694916Z'),
+    date_done: null,
+    task_type: PaperlessTaskType.SanityCheck,
+    task_type_display: 'Sanity Check',
+    trigger_source: PaperlessTaskTriggerSource.System,
+    trigger_source_display: 'System',
+    status: PaperlessTaskStatus.Started,
+    status_display: 'Started',
+    result_message: null,
+    acknowledged: false,
+    related_document_ids: [],
+  },
 ]
 
 describe('TasksComponent', () => {
@@ -185,9 +201,7 @@ describe('TasksComponent', () => {
     jest.useFakeTimers()
     fixture.detectChanges()
     httpTestingController
-      .expectOne(
-        `${environment.apiBaseUrl}tasks/?task_type=consume_file&acknowledged=false`
-      )
+      .expectOne(`${environment.apiBaseUrl}tasks/?acknowledged=false`)
       .flush(tasks)
   })
 
@@ -366,6 +380,21 @@ describe('TasksComponent', () => {
     expect(
       fixture.debugElement.queryAll(By.css('table tbody tr')).length
     ).toEqual(2) // 1 task x 2 lines
+  })
+
+  it('should fall back to task type when filename is unavailable', () => {
+    component.activeTab = TaskTab.Started
+    fixture.detectChanges()
+
+    const nameColumn = fixture.debugElement.queryAll(
+      By.css('tbody td.name-col')
+    )
+    const sanityTaskRow = nameColumn.find((cell) =>
+      cell.nativeElement.textContent.includes('Sanity Check')
+    )
+
+    expect(sanityTaskRow.nativeElement.textContent).toContain('Sanity Check')
+    expect(sanityTaskRow.nativeElement.textContent).toContain('System')
   })
 
   it('should filter tasks by result', () => {

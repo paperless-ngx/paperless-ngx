@@ -188,6 +188,14 @@ export class TasksComponent
       : this.selectedTasks.add(task.id)
   }
 
+  taskDisplayName(task: PaperlessTask): string {
+    return task.input_data?.filename?.toString() || task.task_type_display
+  }
+
+  taskShowsSeparateTypeLabel(task: PaperlessTask): boolean {
+    return this.taskDisplayName(task) !== task.task_type_display
+  }
+
   get currentTasks(): PaperlessTask[] {
     let tasks: PaperlessTask[] = []
     switch (this.activeTab) {
@@ -207,7 +215,7 @@ export class TasksComponent
     if (this._filterText.length) {
       tasks = tasks.filter((t) => {
         if (this.filterTargetID == TaskFilterTargetID.Name) {
-          return (t.input_data?.filename as string)
+          return this.taskDisplayName(t)
             ?.toLowerCase()
             .includes(this._filterText.toLowerCase())
         } else if (this.filterTargetID == TaskFilterTargetID.Result) {

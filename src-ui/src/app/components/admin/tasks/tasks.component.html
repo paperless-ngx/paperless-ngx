@@ -76,7 +76,16 @@
               <label class="form-check-label" for="task{{task.id}}"></label>
             </div>
           </td>
-          <td class="overflow-auto name-col">{{ task.input_data?.filename }}</td>
+          <td class="overflow-auto name-col">
+            <div>{{ taskDisplayName(task) }}</div>
+            <div class="small text-muted">
+              @if (taskShowsSeparateTypeLabel(task)) {
+                <span>{{ task.task_type_display }}</span>
+                <span class="mx-1">&bull;</span>
+              }
+              <span>{{ task.trigger_source_display }}</span>
+            </div>
+          </td>
           <td class="d-none d-lg-table-cell">{{ task.date_created | customDate:'short' }}</td>
           @if (activeTab !== 'started' && activeTab !== 'queued') {
             <td class="d-none d-lg-table-cell">
