@@ -242,6 +242,12 @@ For example:
 }
 ```
 
+## Task History Cleared on Upgrade
+
+The task tracking system has been redesigned in this release. All existing task history records are dropped from the database during the upgrade. Previously completed, failed, or acknowledged tasks will no longer appear in the task list after upgrading.
+
+No user action is required.
+
 ## Consume Script Positional Arguments Removed
 
 Pre- and post-consumption scripts no longer receive positional arguments. All information is
