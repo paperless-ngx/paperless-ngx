@@ -62,7 +62,7 @@ export class TasksService {
 
     this.http
       .get<PaperlessTask[]>(
-        `${this.baseUrl}${this.endpoint}/?task_type=${PaperlessTaskType.ConsumeFile}&acknowledged=false`
+        `${this.baseUrl}${this.endpoint}/?acknowledged=false`
       )
       .pipe(takeUntil(this.unsubscribeNotifer), first())
       .subscribe((r) => {
