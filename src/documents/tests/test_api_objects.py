@@ -291,7 +291,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(StoragePath.objects.count(), 2)
 
-    @mock.patch("documents.bulk_edit.bulk_update_documents.delay")
+    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
     def test_api_update_storage_path(self, bulk_update_mock) -> None:
         """
         GIVEN:
@@ -316,11 +316,12 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
 
         bulk_update_mock.assert_called_once()
 
-        args, _ = bulk_update_mock.call_args
+        self.assertCountEqual(
+            [document.pk],
+            bulk_update_mock.call_args.kwargs["kwargs"]["document_ids"],
+        )
 
-        self.assertCountEqual([document.pk], args[0])
-
-    @mock.patch("documents.bulk_edit.bulk_update_documents.delay")
+    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
     def test_api_delete_storage_path(self, bulk_update_mock) -> None:
         """
         GIVEN:
@@ -347,7 +348,11 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         # only called once
-        bulk_update_mock.assert_called_once_with([document.pk])
+        bulk_update_mock.assert_called_once()
+        self.assertCountEqual(
+            [document.pk],
+            bulk_update_mock.call_args.kwargs["kwargs"]["document_ids"],
+        )
 
     def test_test_storage_path(self) -> None:
         """

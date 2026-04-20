@@ -278,7 +278,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         doc.refresh_from_db()
         self.assertEqual(doc.custom_fields.first().value, None)
 
-    @mock.patch("documents.signals.handlers.process_cf_select_update.delay")
+    @mock.patch("documents.signals.handlers.process_cf_select_update.apply_async")
     def test_custom_field_update_offloaded_once(self, mock_delay) -> None:
         """
         GIVEN:
@@ -322,7 +322,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         }
         cf_select.save()
 
-        mock_delay.assert_called_once_with(cf_select)
+        mock_delay.assert_called_once_with(kwargs={"custom_field": cf_select})
 
     def test_create_custom_field_monetary_validation(self) -> None:
         """

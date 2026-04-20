@@ -3636,7 +3636,7 @@ class TestWorkflows(
         PAPERLESS_FORCE_SCRIPT_NAME="/paperless",
         BASE_URL="/paperless/",
     )
-    @mock.patch("documents.workflows.webhooks.send_webhook.delay")
+    @mock.patch("documents.workflows.webhooks.send_webhook.apply_async")
     def test_workflow_webhook_action_body(self, mock_post) -> None:
         """
         GIVEN:
@@ -3685,20 +3685,22 @@ class TestWorkflows(
         run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
         mock_post.assert_called_once_with(
-            url="http://paperless-ngx.com",
-            data=(
-                f"Test message: http://localhost:8000/paperless/documents/{doc.id}/"
-                f" with id {doc.id}"
-            ),
-            headers={},
-            files=None,
-            as_json=False,
+            kwargs={
+                "url": "http://paperless-ngx.com",
+                "data": (
+                    f"Test message: http://localhost:8000/paperless/documents/{doc.id}/"
+                    f" with id {doc.id}"
+                ),
+                "headers": {},
+                "files": None,
+                "as_json": False,
+            },
         )
 
     @override_settings(
         PAPERLESS_URL="http://localhost:8000",
     )
-    @mock.patch("documents.workflows.webhooks.send_webhook.delay")
+    @mock.patch("documents.workflows.webhooks.send_webhook.apply_async")
     def test_workflow_webhook_action_w_files(self, mock_post) -> None:
         """
         GIVEN:
@@ -3750,11 +3752,13 @@ class TestWorkflows(
         run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
         mock_post.assert_called_once_with(
-            url="http://paperless-ngx.com",
-            data=f"Test message: http://localhost:8000/documents/{doc.id}/",
-            headers={},
-            files={"file": ("simple.pdf", mock.ANY, "application/pdf")},
-            as_json=False,
+            kwargs={
+                "url": "http://paperless-ngx.com",
+                "data": f"Test message: http://localhost:8000/documents/{doc.id}/",
+                "headers": {},
+                "files": {"file": ("simple.pdf", mock.ANY, "application/pdf")},
+                "as_json": False,
+            },
         )
 
     @mock.patch("documents.signals.handlers.execute_webhook_action")
@@ -4036,7 +4040,7 @@ class TestWorkflows(
                 )
                 self.assertIn(expected_str, cm.output[0])
 
-    @mock.patch("documents.workflows.webhooks.send_webhook.delay")
+    @mock.patch("documents.workflows.webhooks.send_webhook.apply_async")
     def test_workflow_webhook_action_consumption(self, mock_post) -> None:
         """
         GIVEN:
@@ -4376,7 +4380,7 @@ class TestWorkflows(
     @override_settings(
         PAPERLESS_URL="http://localhost:8000",
     )
-    @mock.patch("documents.workflows.webhooks.send_webhook.delay")
+    @mock.patch("documents.workflows.webhooks.send_webhook.apply_async")
     def test_workflow_trash_with_webhook_action(self, mock_webhook_delay):
         """
         GIVEN:
@@ -4384,7 +4388,7 @@ class TestWorkflows(
         WHEN:
             - Document matches and workflow runs
         THEN:
-            - Webhook .delay() is called with complete data including file bytes
+            - Webhook .apply_async() is called with complete data including file bytes
             - Document is moved to trash (soft deleted)
             - Webhook task has all necessary data and doesn't rely on document existence
         """
@@ -4434,7 +4438,7 @@ class TestWorkflows(
         run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
         mock_webhook_delay.assert_called_once()
-        call_kwargs = mock_webhook_delay.call_args[1]
+        call_kwargs = mock_webhook_delay.call_args[1]["kwargs"]
         self.assertEqual(call_kwargs["url"], "https://paperless-ngx.com/webhook")
         self.assertEqual(
             call_kwargs["data"],

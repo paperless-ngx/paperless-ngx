@@ -537,7 +537,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         async_task.id = "task-123"
 
         with mock.patch("documents.views.consume_file") as consume_mock:
-            consume_mock.delay.return_value = async_task
+            consume_mock.apply_async.return_value = async_task
             resp = self.client.post(
                 f"/api/documents/{root.id}/update_version/",
                 {"document": upload, "version_label": "  New Version  "},
@@ -546,8 +546,9 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data, "task-123")
-        consume_mock.delay.assert_called_once()
-        input_doc, overrides = consume_mock.delay.call_args[0]
+        consume_mock.apply_async.assert_called_once()
+        task_kwargs = consume_mock.apply_async.call_args.kwargs["kwargs"]
+        input_doc, overrides = task_kwargs["input_doc"], task_kwargs["overrides"]
         self.assertEqual(input_doc.root_document_id, root.id)
         self.assertEqual(input_doc.source, DocumentSource.ApiUpload)
         self.assertEqual(overrides.version_label, "New Version")
@@ -571,7 +572,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         async_task.id = "task-123"
 
         with mock.patch("documents.views.consume_file") as consume_mock:
-            consume_mock.delay.return_value = async_task
+            consume_mock.apply_async.return_value = async_task
             resp = self.client.post(
                 f"/api/documents/{version.id}/update_version/",
                 {"document": upload, "version_label": "  New Version  "},
@@ -580,8 +581,9 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data, "task-123")
-        consume_mock.delay.assert_called_once()
-        input_doc, overrides = consume_mock.delay.call_args[0]
+        consume_mock.apply_async.assert_called_once()
+        task_kwargs = consume_mock.apply_async.call_args.kwargs["kwargs"]
+        input_doc, overrides = task_kwargs["input_doc"], task_kwargs["overrides"]
         self.assertEqual(input_doc.root_document_id, root.id)
         self.assertEqual(overrides.version_label, "New Version")
         self.assertEqual(overrides.actor_id, self.user.id)
@@ -595,7 +597,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         upload = self._make_pdf_upload()
 
         with mock.patch("documents.views.consume_file") as consume_mock:
-            consume_mock.delay.side_effect = Exception("boom")
+            consume_mock.apply_async.side_effect = Exception("boom")
             resp = self.client.post(
                 f"/api/documents/{root.id}/update_version/",
                 {"document": upload},

@@ -24,6 +24,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
+from documents.models import PaperlessTask
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import has_perms_owner_aware
 from documents.views import PassUserMixin
@@ -156,7 +157,10 @@ class MailAccountViewSet(PassUserMixin, ModelViewSet[MailAccount]):
     @action(methods=["post"], detail=True)
     def process(self, request, pk=None):
         account = self.get_object()
-        process_mail_accounts.delay([account.pk])
+        process_mail_accounts.apply_async(
+            kwargs={"account_ids": [account.pk]},
+            headers={"trigger_source": PaperlessTask.TriggerSource.MANUAL},
+        )
 
         return Response({"result": "OK"})
 

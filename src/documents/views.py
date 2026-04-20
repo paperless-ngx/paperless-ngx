@@ -1802,9 +1802,9 @@ class DocumentViewSet(
             if request.user is not None:
                 overrides.actor_id = request.user.id
 
-            async_task = consume_file.delay(
-                input_doc,
-                overrides,
+            async_task = consume_file.apply_async(
+                kwargs={"input_doc": input_doc, "overrides": overrides},
+                headers={"trigger_source": PaperlessTask.TriggerSource.WEB_UI},
             )
             logger.debug(
                 f"Updated document {root_doc.id} with new version",
@@ -2481,6 +2481,7 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         "edit_pdf",
         "remove_password",
     }
+    METHOD_NAMES_REQUIRING_TRIGGER_SOURCE = METHOD_NAMES_REQUIRING_USER
 
     def _has_document_permissions(
         self,
@@ -2571,12 +2572,19 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         parameters = {
             k: v
             for k, v in validated_data.items()
-            if k not in {"documents", "all", "filters"}
+            if k not in {"documents", "all", "filters", "from_webui"}
         }
         user = self.request.user
+        from_webui = validated_data.get("from_webui", False)
 
         if method.__name__ in self.METHOD_NAMES_REQUIRING_USER:
             parameters["user"] = user
+        if method.__name__ in self.METHOD_NAMES_REQUIRING_TRIGGER_SOURCE:
+            parameters["trigger_source"] = (
+                PaperlessTask.TriggerSource.WEB_UI
+                if from_webui
+                else PaperlessTask.TriggerSource.API_UPLOAD
+            )
 
         if not self._has_document_permissions(
             user=user,
@@ -2660,12 +2668,19 @@ class BulkEditView(DocumentOperationPermissionMixin):
         user = self.request.user
         method = serializer.validated_data.get("method")
         parameters = serializer.validated_data.get("parameters")
+        from_webui = serializer.validated_data.get("from_webui", False)
         documents = self._resolve_document_ids(
             user=user,
             validated_data=serializer.validated_data,
         )
         if method.__name__ in self.METHOD_NAMES_REQUIRING_USER:
             parameters["user"] = user
+        if method.__name__ in self.METHOD_NAMES_REQUIRING_TRIGGER_SOURCE:
+            parameters["trigger_source"] = (
+                PaperlessTask.TriggerSource.WEB_UI
+                if from_webui
+                else PaperlessTask.TriggerSource.API_UPLOAD
+            )
         if not self._has_document_permissions(
             user=user,
             documents=documents,
@@ -2959,9 +2974,15 @@ class PostDocumentView(GenericAPIView[Any]):
             custom_fields=custom_fields,
         )
 
-        async_task = consume_file.delay(
-            input_doc,
-            input_doc_overrides,
+        async_task = consume_file.apply_async(
+            kwargs={"input_doc": input_doc, "overrides": input_doc_overrides},
+            headers={
+                "trigger_source": (
+                    PaperlessTask.TriggerSource.WEB_UI
+                    if from_webui
+                    else PaperlessTask.TriggerSource.API_UPLOAD
+                ),
+            },
         )
 
         return Response(async_task.id)
@@ -3607,7 +3628,10 @@ class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Storag
         response = super().destroy(request, *args, **kwargs)
 
         if doc_ids:
-            bulk_edit.bulk_update_documents.delay(doc_ids)
+            bulk_edit.bulk_update_documents.apply_async(
+                kwargs={"document_ids": doc_ids},
+                headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
+            )
 
         return response
 
@@ -4117,7 +4141,10 @@ class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
                 "file_path",
             ],
         )
-        build_share_link_bundle.delay(bundle.pk)
+        build_share_link_bundle.apply_async(
+            kwargs={"bundle_id": bundle.pk},
+            headers={"trigger_source": PaperlessTask.TriggerSource.MANUAL},
+        )
         bundle.document_total = len(ordered_documents)
         response_serializer = self.get_serializer(bundle)
         headers = self.get_success_headers(response_serializer.data)
@@ -4150,7 +4177,10 @@ class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
                 "file_path",
             ],
         )
-        build_share_link_bundle.delay(bundle.pk)
+        build_share_link_bundle.apply_async(
+            kwargs={"bundle_id": bundle.pk},
+            headers={"trigger_source": PaperlessTask.TriggerSource.MANUAL},
+        )
         bundle.document_total = (
             getattr(bundle, "document_total", None) or bundle.documents.count()
         )

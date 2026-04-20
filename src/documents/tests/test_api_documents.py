@@ -47,11 +47,11 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.signals.handlers import run_workflows
+from documents.tests.utils import ConsumeTaskMixin
 from documents.tests.utils import DirectoriesMixin
-from documents.tests.utils import DocumentConsumeDelayMixin
 
 
-class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
+class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
@@ -1400,9 +1400,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.consume_file_mock.assert_called_once()
-
-        input_doc, overrides = self.get_last_consume_delay_call_args()
+        input_doc, overrides = self.assert_queue_consumption_task_call_args()
 
         self.assertEqual(input_doc.original_file.name, "simple.pdf")
         self.assertTrue(
@@ -1432,9 +1430,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.consume_file_mock.assert_called_once()
-
-        input_doc, overrides = self.get_last_consume_delay_call_args()
+        input_doc, overrides = self.assert_queue_consumption_task_call_args()
 
         self.assertEqual(input_doc.original_file.name, "outside.pdf")
         self.assertEqual(overrides.filename, "outside.pdf")
@@ -1474,9 +1470,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.consume_file_mock.assert_called_once()
-
-        input_doc, overrides = self.get_last_consume_delay_call_args()
+        input_doc, overrides = self.assert_queue_consumption_task_call_args()
 
         self.assertEqual(input_doc.original_file.name, "outside.pdf")
         self.assertEqual(overrides.filename, "outside.pdf")
@@ -1558,9 +1552,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.consume_file_mock.assert_called_once()
-
-        input_doc, overrides = self.get_last_consume_delay_call_args()
+        input_doc, overrides = self.assert_queue_consumption_task_call_args()
 
         self.assertEqual(input_doc.original_file.name, "simple.pdf")
         self.assertTrue(
@@ -1612,9 +1604,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.consume_file_mock.assert_called_once()
-
-        _, overrides = self.get_last_consume_delay_call_args()
+        _, overrides = self.assert_queue_consumption_task_call_args()
 
         self.assertEqual(overrides.title, "my custom title")
         self.assertIsNone(overrides.correspondent_id)
@@ -1634,9 +1624,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.consume_file_mock.assert_called_once()
-
-        _, overrides = self.get_last_consume_delay_call_args()
+        _, overrides = self.assert_queue_consumption_task_call_args()
 
         self.assertEqual(overrides.correspondent_id, c.id)
         self.assertIsNone(overrides.title)
@@ -1670,9 +1658,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.consume_file_mock.assert_called_once()
-
-        _, overrides = self.get_last_consume_delay_call_args()
+        _, overrides = self.assert_queue_consumption_task_call_args()
 
         self.assertEqual(overrides.document_type_id, dt.id)
         self.assertIsNone(overrides.correspondent_id)
@@ -1706,9 +1692,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.consume_file_mock.assert_called_once()
-
-        _, overrides = self.get_last_consume_delay_call_args()
+        _, overrides = self.assert_queue_consumption_task_call_args()
 
         self.assertEqual(overrides.storage_path_id, sp.id)
         self.assertIsNone(overrides.correspondent_id)
@@ -1743,9 +1727,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.consume_file_mock.assert_called_once()
-
-        _, overrides = self.get_last_consume_delay_call_args()
+        _, overrides = self.assert_queue_consumption_task_call_args()
 
         self.assertCountEqual(overrides.tag_ids, [t1.id, t2.id])
         self.assertIsNone(overrides.document_type_id)
@@ -1790,9 +1772,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.consume_file_mock.assert_called_once()
-
-        _, overrides = self.get_last_consume_delay_call_args()
+        _, overrides = self.assert_queue_consumption_task_call_args()
 
         self.assertEqual(overrides.created, created.date())
 
@@ -1809,9 +1789,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.consume_file_mock.assert_called_once()
-
-        input_doc, overrides = self.get_last_consume_delay_call_args()
+        input_doc, overrides = self.assert_queue_consumption_task_call_args()
 
         self.assertEqual(input_doc.original_file.name, "simple.pdf")
         self.assertEqual(overrides.filename, "simple.pdf")
@@ -1841,9 +1819,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.consume_file_mock.assert_called_once()
-
-        input_doc, overrides = self.get_last_consume_delay_call_args()
+        input_doc, overrides = self.assert_queue_consumption_task_call_args()
 
         self.assertEqual(input_doc.original_file.name, "simple.pdf")
         self.assertEqual(overrides.filename, "simple.pdf")
@@ -1898,9 +1874,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.consume_file_mock.assert_called_once()
-
-        input_doc, overrides = self.get_last_consume_delay_call_args()
+        input_doc, overrides = self.assert_queue_consumption_task_call_args()
 
         new_overrides, _ = run_workflows(
             trigger_type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
@@ -1946,9 +1920,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.consume_file_mock.assert_called_once()
-
-        input_doc, overrides = self.get_last_consume_delay_call_args()
+        input_doc, overrides = self.assert_queue_consumption_task_call_args()
 
         self.assertEqual(input_doc.original_file.name, "simple.pdf")
         self.assertEqual(overrides.filename, "simple.pdf")
@@ -2047,9 +2019,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.consume_file_mock.assert_called_once()
-
-        input_doc, _ = self.get_last_consume_delay_call_args()
+        input_doc, _ = self.assert_queue_consumption_task_call_args()
 
         self.assertEqual(input_doc.source, WorkflowTrigger.DocumentSourceChoices.WEB_UI)
 

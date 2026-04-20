@@ -31,7 +31,7 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         self.client.force_authenticate(self.user)
         self.document = DocumentFactory.create()
 
-    @mock.patch("documents.views.build_share_link_bundle.delay")
+    @mock.patch("documents.views.build_share_link_bundle.apply_async")
     def test_create_bundle_triggers_build_job(self, delay_mock) -> None:
         payload = {
             "document_ids": [self.document.pk],
@@ -45,7 +45,8 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         bundle = ShareLinkBundle.objects.get(pk=response.data["id"])
         self.assertEqual(bundle.documents.count(), 1)
         self.assertEqual(bundle.status, ShareLinkBundle.Status.PENDING)
-        delay_mock.assert_called_once_with(bundle.pk)
+        delay_mock.assert_called_once()
+        self.assertEqual(delay_mock.call_args.kwargs["kwargs"]["bundle_id"], bundle.pk)
 
     def test_create_bundle_rejects_missing_documents(self) -> None:
         payload = {
@@ -73,7 +74,7 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         self.assertIn("document_ids", response.data)
         perms_mock.assert_called()
 
-    @mock.patch("documents.views.build_share_link_bundle.delay")
+    @mock.patch("documents.views.build_share_link_bundle.apply_async")
     def test_rebuild_bundle_resets_state(self, delay_mock) -> None:
         bundle = ShareLinkBundle.objects.create(
             slug="rebuild-slug",
@@ -94,7 +95,8 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         self.assertIsNone(bundle.last_error)
         self.assertIsNone(bundle.size_bytes)
         self.assertEqual(bundle.file_path, "")
-        delay_mock.assert_called_once_with(bundle.pk)
+        delay_mock.assert_called_once()
+        self.assertEqual(delay_mock.call_args.kwargs["kwargs"]["bundle_id"], bundle.pk)
 
     def test_rebuild_bundle_rejects_processing_status(self) -> None:
         bundle = ShareLinkBundle.objects.create(

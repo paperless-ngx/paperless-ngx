@@ -59,8 +59,9 @@ class TestBeforeTaskPublishHandler:
     def test_creates_task_for_consume_file(self, consume_input_doc, consume_overrides):
         task_id = send_publish(
             "documents.tasks.consume_file",
-            (consume_input_doc, consume_overrides),
-            {},
+            (),
+            {"input_doc": consume_input_doc, "overrides": consume_overrides},
+            headers={"trigger_source": PaperlessTask.TriggerSource.WEB_UI},
         )
         task = PaperlessTask.objects.get(task_id=task_id)
         assert task.task_type == PaperlessTask.TaskType.CONSUME_FILE
@@ -102,8 +103,8 @@ class TestBeforeTaskPublishHandler:
 
         task_id = send_publish(
             "documents.tasks.consume_file",
-            (consume_input_doc, overrides),
-            {},
+            (),
+            {"input_doc": consume_input_doc, "overrides": overrides},
         )
 
         task = PaperlessTask.objects.get(task_id=task_id)
@@ -116,8 +117,8 @@ class TestBeforeTaskPublishHandler:
 
         task_id = send_publish(
             "documents.tasks.consume_file",
-            (consume_input_doc, overrides),
-            {},
+            (),
+            {"input_doc": consume_input_doc, "overrides": overrides},
         )
 
         task = PaperlessTask.objects.get(task_id=task_id)
@@ -167,37 +168,19 @@ class TestBeforeTaskPublishHandler:
         before_task_publish_handler(sender=None, headers=None, body=None)
         assert PaperlessTask.objects.count() == 0
 
-    @pytest.mark.parametrize(
-        ("document_source", "expected_trigger_source"),
-        [
-            pytest.param(
-                DocumentSource.ConsumeFolder,
-                PaperlessTask.TriggerSource.FOLDER_CONSUME,
-                id="folder_consume",
-            ),
-            pytest.param(
-                DocumentSource.MailFetch,
-                PaperlessTask.TriggerSource.EMAIL_CONSUME,
-                id="email_consume",
-            ),
-        ],
-    )
-    def test_consume_document_source_maps_to_trigger_source(
+    def test_consume_file_without_trigger_source_header_defaults_to_manual(
         self,
         consume_input_doc,
         consume_overrides,
-        document_source: DocumentSource,
-        expected_trigger_source: PaperlessTask.TriggerSource,
     ) -> None:
-        """DocumentSource on the input doc maps to the correct TriggerSource."""
-        consume_input_doc.source = document_source
+        """Without a trigger_source header the handler defaults to MANUAL."""
         task_id = send_publish(
             "documents.tasks.consume_file",
-            (consume_input_doc, consume_overrides),
-            {},
+            (),
+            {"input_doc": consume_input_doc, "overrides": consume_overrides},
         )
         task = PaperlessTask.objects.get(task_id=task_id)
-        assert task.trigger_source == expected_trigger_source
+        assert task.trigger_source == PaperlessTask.TriggerSource.MANUAL
 
 
 @pytest.mark.django_db

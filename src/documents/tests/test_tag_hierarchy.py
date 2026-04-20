@@ -23,7 +23,7 @@ class TestTagHierarchy(DirectoriesMixin, APITestCase):
         self.parent = Tag.objects.create(name="Parent")
         self.child = Tag.objects.create(name="Child", tn_parent=self.parent)
 
-        patcher = mock.patch("documents.bulk_edit.bulk_update_documents.delay")
+        patcher = mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
         self.async_task = patcher.start()
         self.addCleanup(patcher.stop)
 
