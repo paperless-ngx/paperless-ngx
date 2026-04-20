@@ -135,20 +135,20 @@
             <td class="d-none d-lg-table-cell">{{ task.date_created | customDate:'short' }}</td>
             @if (sectionShowsResults(section)) {
               <td class="d-none d-lg-table-cell">
-                @if (task.result_message?.length > 50) {
+                @if (taskHasLongResultMessage(task)) {
                   <div class="result" (click)="expandTask(task); $event.stopPropagation();"
                     [ngbPopover]="resultPopover" popoverClass="shadow small mobile" triggers="mouseenter:mouseleave" container="body">
-                    <span class="small d-none d-md-inline-block font-monospace text-muted">{{ task.result_message | slice:0:50 }}&hellip;</span>
+                    <span class="small d-none d-md-inline-block font-monospace text-muted">{{ taskResultPreview(task) }}</span>
                   </div>
                 }
-                @if (task.result_message?.length <= 50) {
-                  <span class="small d-none d-md-inline-block font-monospace text-muted">{{ task.result_message }}</span>
+                @if (taskHasResultMessage(task) && !taskHasLongResultMessage(task)) {
+                  <span class="small d-none d-md-inline-block font-monospace text-muted">{{ taskResultMessage(task) }}</span>
                 }
                 <ng-template #resultPopover>
-                  <pre class="small mb-0">{{ task.result_message | slice:0:300 }}@if (task.result_message.length > 300) {
+                  <pre class="small mb-0">{{ taskResultPopoverMessage(task) }}@if (taskResultMessageOverflowsPopover(task)) {
                     &hellip;
                   }</pre>
-                  @if (task.result_message?.length > 300) {
+                  @if (taskResultMessageOverflowsPopover(task)) {
                     <br/><em>(<ng-container i18n>click for full output</ng-container>)</em>
                   }
                 </ng-template>
@@ -178,10 +178,10 @@
           <td class="p-0" [class.border-0]="expandedTask !== task.id" [attr.colspan]="sectionShowsResults(section) ? 5 : 4">
             <div #collapse="ngbCollapse" [ngbCollapse]="expandedTask !== task.id" class="task-detail-panel bg-darker small mb-0">
               <div class="p-2 p-lg-3 ms-lg-3">
-                @if (task.result_message) {
+                @if (taskHasResultMessage(task)) {
                   <div class="detail-section mb-3">
                     <div class="detail-label fs-7 fw-bold text-uppercase text-muted mb-1" i18n>Result message</div>
-                    <pre class="detail-block border border-dark bg-body p-3 rounded-2 mb-0">{{ task.result_message }}</pre>
+                    <pre class="detail-block border border-dark bg-body p-3 rounded-2 mb-0">{{ taskResultMessage(task) }}</pre>
                   </div>
                 }
 

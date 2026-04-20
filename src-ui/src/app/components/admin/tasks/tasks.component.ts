@@ -318,6 +318,59 @@ export class TasksComponent
     return this.taskDisplayName(task) !== task.task_type_display
   }
 
+  taskResultMessage(task: PaperlessTask): string | null {
+    if (!task.result_data) {
+      return null
+    }
+
+    const documentId = task.result_data?.['document_id']
+    if (typeof documentId === 'number') {
+      return `Success. New document id ${documentId} created`
+    }
+
+    const reason = task.result_data?.['reason']
+    if (typeof reason === 'string') {
+      return reason
+    }
+
+    const duplicateOf = task.result_data?.['duplicate_of']
+    if (typeof duplicateOf === 'number') {
+      return `Not consuming: It is a duplicate of document #${duplicateOf}`
+    }
+
+    const errorMessage = task.result_data?.['error_message']
+    if (typeof errorMessage === 'string') {
+      return errorMessage
+    }
+
+    return null
+  }
+
+  taskResultPreview(task: PaperlessTask): string | null {
+    const message = this.taskResultMessage(task)
+    if (!message) {
+      return null
+    }
+
+    return message.length > 50 ? `${message.slice(0, 50)}...` : message
+  }
+
+  taskHasLongResultMessage(task: PaperlessTask): boolean {
+    return (this.taskResultMessage(task)?.length ?? 0) > 50
+  }
+
+  taskHasResultMessage(task: PaperlessTask): boolean {
+    return !!this.taskResultMessage(task)
+  }
+
+  taskResultPopoverMessage(task: PaperlessTask): string {
+    return this.taskResultMessage(task)?.slice(0, 300) ?? ''
+  }
+
+  taskResultMessageOverflowsPopover(task: PaperlessTask): boolean {
+    return (this.taskResultMessage(task)?.length ?? 0) > 300
+  }
+
   tasksForSection(section: TaskSection): PaperlessTask[] {
     let tasks = this.tasksService.allFileTasks.filter((task) =>
       this.taskBelongsToSection(task, section)
@@ -451,7 +504,7 @@ export class TasksComponent
         .some((value) => value.toLowerCase().includes(query))
     }
 
-    return task.result_message?.toLowerCase().includes(query)
+    return this.taskResultMessage(task)?.toLowerCase().includes(query) ?? false
   }
 
   private tasksForOptionCounts({

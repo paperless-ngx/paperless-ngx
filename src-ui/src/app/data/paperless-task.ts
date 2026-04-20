@@ -47,7 +47,6 @@ export interface PaperlessTask extends ObjectWithId {
   wait_time_seconds?: number
   input_data: Record<string, any>
   result_data?: Record<string, any>
-  result_message?: string
   related_document_ids: number[]
   acknowledged: boolean
   owner?: number
