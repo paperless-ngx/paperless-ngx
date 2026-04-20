@@ -38,6 +38,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.viewsets import ModelViewSet
 
+from documents.models import PaperlessTask
 from documents.permissions import PaperlessObjectPermissions
 from documents.tasks import llmindex_index
 from paperless.filters import GroupFilterSet
@@ -427,10 +428,9 @@ class ApplicationConfigurationViewSet(ModelViewSet[ApplicationConfiguration]):
             and not vector_store_file_exists()
         ):
             # AI index was just enabled and vector store file does not exist
-            llmindex_index.delay(
-                rebuild=True,
-                scheduled=False,
-                auto=True,
+            llmindex_index.apply_async(
+                kwargs={"rebuild": True},
+                headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
             )
 
 

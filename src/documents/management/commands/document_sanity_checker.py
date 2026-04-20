@@ -111,7 +111,6 @@ class Command(PaperlessCommand):
 
     def handle(self, *args: Any, **options: Any) -> None:
         messages = check_sanity(
-            scheduled=False,
             iter_wrapper=lambda docs: self.track(
                 docs,
                 description="Checking documents...",

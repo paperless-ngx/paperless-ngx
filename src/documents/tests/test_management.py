@@ -211,7 +211,7 @@ class TestCreateClassifier:
 
         call_command("document_create_classifier", skip_checks=True)
 
-        m.assert_called_once_with(scheduled=False, status_callback=mocker.ANY)
+        m.assert_called_once_with(status_callback=mocker.ANY)
         assert callable(m.call_args.kwargs["status_callback"])
 
     def test_create_classifier_callback_output(self, mocker: MockerFixture) -> None:

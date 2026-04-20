@@ -4,7 +4,6 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
-from celery import states
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import override_settings
@@ -13,6 +12,7 @@ from rest_framework.test import APITestCase
 
 from documents.models import PaperlessTask
 from documents.permissions import has_system_status_permission
+from documents.tests.factories import PaperlessTaskFactory
 from paperless import version
 
 
@@ -258,10 +258,10 @@ class TestSystemStatus(APITestCase):
         THEN:
             - The response contains an OK classifier status
         """
-        PaperlessTask.objects.create(
-            type=PaperlessTask.TaskType.SCHEDULED_TASK,
-            status=states.SUCCESS,
-            task_name=PaperlessTask.TaskName.TRAIN_CLASSIFIER,
+        PaperlessTaskFactory(
+            task_type=PaperlessTask.TaskType.TRAIN_CLASSIFIER,
+            trigger_source=PaperlessTask.TriggerSource.SCHEDULED,
+            status=PaperlessTask.Status.SUCCESS,
         )
         self.client.force_login(self.user)
         response = self.client.get(self.ENDPOINT)
@@ -295,11 +295,11 @@ class TestSystemStatus(APITestCase):
         THEN:
             - The response contains an ERROR classifier status
         """
-        PaperlessTask.objects.create(
-            type=PaperlessTask.TaskType.SCHEDULED_TASK,
-            status=states.FAILURE,
-            task_name=PaperlessTask.TaskName.TRAIN_CLASSIFIER,
-            result="Classifier training failed",
+        PaperlessTaskFactory(
+            task_type=PaperlessTask.TaskType.TRAIN_CLASSIFIER,
+            trigger_source=PaperlessTask.TriggerSource.SCHEDULED,
+            status=PaperlessTask.Status.FAILURE,
+            result_message="Classifier training failed",
         )
         self.client.force_login(self.user)
         response = self.client.get(self.ENDPOINT)
@@ -319,10 +319,10 @@ class TestSystemStatus(APITestCase):
         THEN:
             - The response contains an OK sanity check status
         """
-        PaperlessTask.objects.create(
-            type=PaperlessTask.TaskType.SCHEDULED_TASK,
-            status=states.SUCCESS,
-            task_name=PaperlessTask.TaskName.CHECK_SANITY,
+        PaperlessTaskFactory(
+            task_type=PaperlessTask.TaskType.SANITY_CHECK,
+            trigger_source=PaperlessTask.TriggerSource.SCHEDULED,
+            status=PaperlessTask.Status.SUCCESS,
         )
         self.client.force_login(self.user)
         response = self.client.get(self.ENDPOINT)
@@ -356,11 +356,11 @@ class TestSystemStatus(APITestCase):
         THEN:
             - The response contains an ERROR sanity check status
         """
-        PaperlessTask.objects.create(
-            type=PaperlessTask.TaskType.SCHEDULED_TASK,
-            status=states.FAILURE,
-            task_name=PaperlessTask.TaskName.CHECK_SANITY,
-            result="5 issues found.",
+        PaperlessTaskFactory(
+            task_type=PaperlessTask.TaskType.SANITY_CHECK,
+            trigger_source=PaperlessTask.TriggerSource.SCHEDULED,
+            status=PaperlessTask.Status.FAILURE,
+            result_message="5 issues found.",
         )
         self.client.force_login(self.user)
         response = self.client.get(self.ENDPOINT)
@@ -405,10 +405,10 @@ class TestSystemStatus(APITestCase):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(response.data["tasks"]["llmindex_status"], "WARNING")
 
-            PaperlessTask.objects.create(
-                type=PaperlessTask.TaskType.SCHEDULED_TASK,
-                status=states.SUCCESS,
-                task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
+            PaperlessTaskFactory(
+                task_type=PaperlessTask.TaskType.LLM_INDEX,
+                trigger_source=PaperlessTask.TriggerSource.SCHEDULED,
+                status=PaperlessTask.Status.SUCCESS,
             )
             response = self.client.get(self.ENDPOINT)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -425,11 +425,11 @@ class TestSystemStatus(APITestCase):
             - The response contains the correct AI status
         """
         with override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="openai"):
-            PaperlessTask.objects.create(
-                type=PaperlessTask.TaskType.SCHEDULED_TASK,
-                status=states.FAILURE,
-                task_name=PaperlessTask.TaskName.LLMINDEX_UPDATE,
-                result="AI index update failed",
+            PaperlessTaskFactory(
+                task_type=PaperlessTask.TaskType.LLM_INDEX,
+                trigger_source=PaperlessTask.TriggerSource.SCHEDULED,
+                status=PaperlessTask.Status.FAILURE,
+                result_message="AI index update failed",
             )
             self.client.force_login(self.user)
             response = self.client.get(self.ENDPOINT)

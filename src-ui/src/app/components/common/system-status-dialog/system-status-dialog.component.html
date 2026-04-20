@@ -168,16 +168,6 @@
                     <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
                   }
                 </button>
-                @if (currentUserIsSuperUser) {
-                  @if (isRunning(PaperlessTaskName.IndexOptimize)) {
-                    <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
-                  } @else {
-                    <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskName.IndexOptimize)">
-                      <i-bs name="play-fill" class="me-1"></i-bs>
-                      <ng-container i18n>Run Task</ng-container>
-                    </button>
-                  }
-                }
               </dd>
               <ng-template #indexStatus>
                 @if (status.tasks.index_status === 'OK') {
@@ -203,10 +193,10 @@
                   }
                 </button>
                 @if (currentUserIsSuperUser) {
-                  @if (isRunning(PaperlessTaskName.TrainClassifier)) {
+                  @if (isRunning(PaperlessTaskType.TrainClassifier)) {
                     <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
                   } @else {
-                    <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskName.TrainClassifier)">
+                    <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskType.TrainClassifier)">
                       <i-bs name="play-fill" class="me-1"></i-bs>
                       <ng-container i18n>Run Task</ng-container>
                     </button>
@@ -237,10 +227,10 @@
                   }
                 </button>
                 @if (currentUserIsSuperUser) {
-                  @if (isRunning(PaperlessTaskName.SanityCheck)) {
+                  @if (isRunning(PaperlessTaskType.SanityCheck)) {
                     <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
                   } @else {
-                    <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskName.SanityCheck)">
+                    <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskType.SanityCheck)">
                       <i-bs name="play-fill" class="me-1"></i-bs>
                       <ng-container i18n>Run Task</ng-container>
                     </button>
@@ -285,10 +275,10 @@
                     }
                   </button>
                   @if (currentUserIsSuperUser) {
-                    @if (isRunning(PaperlessTaskName.LLMIndexUpdate)) {
+                    @if (isRunning(PaperlessTaskType.LlmIndex)) {
                       <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
                     } @else {
-                      <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskName.LLMIndexUpdate)">
+                      <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskType.LlmIndex)">
                         <i-bs name="play-fill" class="me-1"></i-bs>
                         <ng-container i18n>Run Task</ng-container>
                       </button>

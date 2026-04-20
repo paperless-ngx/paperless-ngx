@@ -76,33 +76,27 @@
               <label class="form-check-label" for="task{{task.id}}"></label>
             </div>
           </td>
-          <td class="overflow-auto name-col">{{ task.task_file_name }}</td>
+          <td class="overflow-auto name-col">{{ task.input_data?.filename }}</td>
           <td class="d-none d-lg-table-cell">{{ task.date_created | customDate:'short' }}</td>
           @if (activeTab !== 'started' && activeTab !== 'queued') {
             <td class="d-none d-lg-table-cell">
-              @if (task.result?.length > 50) {
+              @if (task.result_message?.length > 50) {
                 <div class="result" (click)="expandTask(task); $event.stopPropagation();"
                   [ngbPopover]="resultPopover" popoverClass="shadow small mobile" triggers="mouseenter:mouseleave" container="body">
-                  <span class="small d-none d-md-inline-block font-monospace text-muted">{{ task.result | slice:0:50 }}&hellip;</span>
+                  <span class="small d-none d-md-inline-block font-monospace text-muted">{{ task.result_message | slice:0:50 }}&hellip;</span>
                 </div>
               }
-              @if (task.result?.length <= 50) {
-                <span class="small d-none d-md-inline-block font-monospace text-muted">{{ task.result }}</span>
+              @if (task.result_message?.length <= 50) {
+                <span class="small d-none d-md-inline-block font-monospace text-muted">{{ task.result_message }}</span>
               }
               <ng-template #resultPopover>
-                <pre class="small mb-0">{{ task.result | slice:0:300 }}@if (task.result.length > 300) {
+                <pre class="small mb-0">{{ task.result_message | slice:0:300 }}@if (task.result_message.length > 300) {
                   &hellip;
                 }</pre>
-                @if (task.result?.length > 300) {
+                @if (task.result_message?.length > 300) {
                   <br/><em>(<ng-container i18n>click for full output</ng-container>)</em>
                 }
               </ng-template>
-              @if (task.duplicate_documents?.length > 0) {
-                <div class="small text-warning-emphasis d-flex align-items-center gap-1">
-                  <i-bs class="lh-1" width="1em" height="1em" name="exclamation-triangle"></i-bs>
-                  <span i18n>Duplicate(s) detected</span>
-                </div>
-              }
             </td>
           }
           <td class="d-lg-none">
@@ -116,7 +110,7 @@
                 <i-bs name="check" class="me-1"></i-bs><ng-container i18n>Dismiss</ng-container>
               </button>
               <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
-                @if (task.related_document) {
+                @if (task.related_document_ids?.[0]) {
                   <button class="btn btn-sm btn-outline-primary" (click)="dismissAndGo(task); $event.stopPropagation();">
                     <i-bs name="file-text" class="me-1"></i-bs><ng-container i18n>Open Document</ng-container>
                   </button>
@@ -127,7 +121,7 @@
         </tr>
         <tr>
           <td class="p-0" [class.border-0]="expandedTask !== task.id" colspan="5">
-            <pre #collapse="ngbCollapse" [ngbCollapse]="expandedTask !== task.id" class="small mb-0"><div class="small p-1 p-lg-3 ms-lg-3">{{ task.result }}</div></pre>
+            <pre #collapse="ngbCollapse" [ngbCollapse]="expandedTask !== task.id" class="small mb-0"><div class="small p-1 p-lg-3 ms-lg-3">{{ task.result_message }}</div></pre>
           </td>
         </tr>
       }
