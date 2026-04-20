@@ -137,7 +137,7 @@ const tasks: PaperlessTask[] = [
   {
     id: 461,
     task_id: 'bb79efb3-1e78-4f31-b4be-0966620b0ce1',
-    input_data: {},
+    input_data: { dry_run: false, scope: 'global' },
     date_created: new Date('2023-06-07T03:54:35.694916Z'),
     date_done: null,
     task_type: PaperlessTaskType.SanityCheck,
@@ -147,6 +147,7 @@ const tasks: PaperlessTask[] = [
     status: PaperlessTaskStatus.Started,
     status_display: 'Started',
     result_message: null,
+    result_data: { issues_found: 0 },
     acknowledged: false,
     related_document_ids: [],
   },
@@ -283,6 +284,19 @@ describe('TasksComponent', () => {
     expect(component.expandedTask).toEqual(tasks[1].id)
     component.expandTask(tasks[1])
     expect(component.expandedTask).toBeUndefined()
+  })
+
+  it('should show structured task details when expanded', () => {
+    component.setSection(TaskSection.InProgress)
+    component.expandTask(tasks[6])
+    fixture.detectChanges()
+
+    const detailText = fixture.nativeElement.textContent
+
+    expect(detailText).toContain('Input data')
+    expect(detailText).toContain('Result data')
+    expect(detailText).toContain('"scope": "global"')
+    expect(detailText).toContain('"issues_found": 0')
   })
 
   it('should support dismiss single task', () => {

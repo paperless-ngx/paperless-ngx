@@ -174,12 +174,36 @@
               </div>
             </td>
           </tr>
-          <tr>
-            <td class="p-0" [class.border-0]="expandedTask !== task.id" [attr.colspan]="sectionShowsResults(section) ? 5 : 4">
-              <pre #collapse="ngbCollapse" [ngbCollapse]="expandedTask !== task.id" class="small mb-0"><div class="small p-1 p-lg-3 ms-lg-3">{{ task.result_message }}</div></pre>
-            </td>
-          </tr>
-        }
+        <tr>
+          <td class="p-0" [class.border-0]="expandedTask !== task.id" [attr.colspan]="sectionShowsResults(section) ? 5 : 4">
+            <div #collapse="ngbCollapse" [ngbCollapse]="expandedTask !== task.id" class="task-detail-panel bg-darker small mb-0">
+              <div class="p-2 p-lg-3 ms-lg-3">
+                @if (task.result_message) {
+                  <div class="detail-section mb-3">
+                    <div class="detail-label fs-7 fw-bold text-uppercase text-muted mb-1" i18n>Result message</div>
+                    <pre class="detail-block border border-dark bg-body p-3 rounded-2 mb-0">{{ task.result_message }}</pre>
+                  </div>
+                }
+
+                <div class="row g-3">
+                  <div class="col-12 col-xl-6">
+                    <div class="detail-section h-100">
+                      <div class="detail-label fs-7 fw-bold text-uppercase text-muted mb-1" i18n>Input data</div>
+                      <pre class="detail-block border border-dark bg-body p-3 rounded-2 mb-0">{{ task.input_data | json }}</pre>
+                    </div>
+                  </div>
+                  <div class="col-12 col-xl-6">
+                    <div class="detail-section h-100">
+                      <div class="detail-label fs-7 fw-bold text-uppercase text-muted mb-1" i18n>Result data</div>
+                      <pre class="detail-block border border-dark bg-body p-3 rounded-2 mb-0">{{ (task.result_data ?? {}) | json }}</pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      }
       </tbody>
     </table>
   </div>
