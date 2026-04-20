@@ -1215,6 +1215,9 @@ def task_postrun_handler(
         if isinstance(retval, dict):
             task_instance.result_data = retval
             changed_fields.append("result_data")
+            if "duplicate_of" in retval:
+                task_instance.status = PaperlessTask.Status.FAILURE
+                changed_fields.append("status")
 
         task_instance.save(update_fields=changed_fields)
     except Exception:  # pragma: no cover

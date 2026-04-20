@@ -91,6 +91,15 @@ class ConsumerError(Exception):
     pass
 
 
+class ConsumeFileDuplicateError(ConsumerError):
+    """Raised when a file is rejected because it duplicates an existing document."""
+
+    def __init__(self, message: str, duplicate_id: int, *, in_trash: bool) -> None:
+        super().__init__(message)
+        self.duplicate_id = duplicate_id
+        self.in_trash = in_trash
+
+
 class ConsumerStatusShortMessage(StrEnum):
     DOCUMENT_ALREADY_EXISTS = "document_already_exists"
     DOCUMENT_ALREADY_EXISTS_IN_TRASH = "document_already_exists_in_trash"
@@ -1011,9 +1020,13 @@ class ConsumerPreflightPlugin(
                     )
                     failure_msg += " Note: existing document is in the trash."
 
-                self._fail(
-                    status_msg,
-                    failure_msg,
+                self._send_progress(100, 100, ProgressStatusOptions.FAILED, status_msg)
+                self.log.error(failure_msg)
+                in_trash = duplicates_in_trash.exists()
+                raise ConsumeFileDuplicateError(
+                    f"{self.filename}: {failure_msg}",
+                    duplicate.pk,
+                    in_trash=in_trash,
                 )
 
     def pre_check_directories(self) -> None:

@@ -2544,6 +2544,8 @@ class TaskSerializerV9(serializers.ModelSerializer):
             return f"Success. New document id {doc_id} created"
         if reason := obj.result_data.get("reason"):
             return reason
+        if dup_id := obj.result_data.get("duplicate_of"):
+            return f"Not consuming: It is a duplicate of document #{dup_id}"
         if error := obj.result_data.get("error_message"):
             return error
         return None

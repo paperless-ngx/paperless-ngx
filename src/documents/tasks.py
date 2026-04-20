@@ -26,11 +26,13 @@ from documents.caching import clear_document_caches
 from documents.classifier import DocumentClassifier
 from documents.classifier import load_classifier
 from documents.consumer import AsnCheckPlugin
+from documents.consumer import ConsumeFileDuplicateError
 from documents.consumer import ConsumerPlugin
 from documents.consumer import ConsumerPreflightPlugin
 from documents.consumer import WorkflowTriggerPlugin
 from documents.consumer import should_produce_archive
 from documents.data_models import ConsumableDocument
+from documents.data_models import ConsumeFileDuplicateResult
 from documents.data_models import ConsumeFileStoppedResult
 from documents.data_models import ConsumeFileSuccessResult
 from documents.data_models import DocumentMetadataOverrides
@@ -123,7 +125,12 @@ def consume_file(
     self: Task,
     input_doc: ConsumableDocument,
     overrides: DocumentMetadataOverrides | None = None,
-) -> ConsumeFileSuccessResult | ConsumeFileStoppedResult | None:
+) -> (
+    ConsumeFileSuccessResult
+    | ConsumeFileStoppedResult
+    | ConsumeFileDuplicateResult
+    | None
+):
     token = consume_task_id.set((self.request.id or "")[:8])
     try:
         # Default no overrides
@@ -155,6 +162,7 @@ def consume_file(
             TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir,
         ):
             tmp_dir = Path(tmp_dir)
+            msg = None
             for plugin_class in plugins:
                 plugin_name = plugin_class.NAME
 
@@ -186,6 +194,13 @@ def consume_file(
                 except StopConsumeTaskError as e:
                     logger.info(f"{plugin_name} requested task exit: {e.message}")
                     return ConsumeFileStoppedResult(reason=e.message)
+
+                except ConsumeFileDuplicateError as e:
+                    logger.info(f"{plugin_name} rejected duplicate: {e}")
+                    return ConsumeFileDuplicateResult(
+                        duplicate_of=e.duplicate_id,
+                        duplicate_in_trash=e.in_trash,
+                    )
 
                 except Exception as e:
                     logger.exception(f"{plugin_name} failed: {e}")

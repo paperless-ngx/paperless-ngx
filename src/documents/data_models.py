@@ -187,6 +187,13 @@ class ConsumableDocument:
         self.mime_type = magic.from_file(self.original_file, mime=True)
 
 
+class ConsumeFileDuplicateResult(TypedDict):
+    """Returned by consume_file when the file is rejected as a duplicate."""
+
+    duplicate_of: int
+    duplicate_in_trash: bool
+
+
 class ConsumeFileSuccessResult(TypedDict):
     """Returned by consume_file when the document is created successfully."""
 
