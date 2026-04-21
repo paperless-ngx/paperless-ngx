@@ -124,7 +124,7 @@
                 [checked]="areAllSelected(tasks)"
                 (click)="toggleSection(section, $event); $event.stopPropagation();"
                 (keydown)="toggleSection(section, $event); $event.stopPropagation();" />
-              <label class="form-check-label" [for]="'all-tasks-' + section"></label>
+              <label class="form-check-label" for="all-tasks-{{section}}"></label>
             </div>
           </th>
           <th scope="col" i18n>Name</th>
@@ -138,7 +138,7 @@
       </thead>
       <tbody>
         @for (task of tasks; track task.id) {
-          <tr (click)="toggleSelected(task); $event.stopPropagation();">
+          <tr (click)="toggleSelected(task); $event.stopPropagation();" (keydown)="toggleSelected(task); $event.stopPropagation();">
             <td>
               <div class="form-check">
                 <input
