@@ -94,7 +94,7 @@ const tasks: PaperlessTask[] = [
     trigger_source_display: 'Email Consume',
     status: PaperlessTaskStatus.Success,
     status_display: 'Success',
-    result_data: { document_id: 422 },
+    result_data: { document_id: 422, duplicate_of: 99 },
     acknowledged: false,
     related_document_ids: [422],
   },
@@ -342,6 +342,18 @@ describe('TasksComponent', () => {
     expect(detailText).toContain('Result data')
     expect(detailText).toContain('"scope": "global"')
     expect(detailText).toContain('"issues_found": 0')
+  })
+
+  it('should show duplicate warnings and duplicate details when present', () => {
+    component.setSection(TaskSection.Completed)
+    component.expandTask(tasks[3])
+    fixture.detectChanges()
+
+    const content = fixture.nativeElement.textContent
+
+    expect(content).toContain('Duplicate of document #99')
+    expect(content).toContain('Duplicate')
+    expect(content).toContain('Open')
   })
 
   it('should support dismiss single task', () => {

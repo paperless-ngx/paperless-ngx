@@ -173,6 +173,12 @@
                 @if (taskHasResultMessage(task) && !taskHasLongResultMessage(task)) {
                   <span class="small d-none d-md-inline-block font-monospace text-muted">{{ taskResultMessage(task) }}</span>
                 }
+                @if (duplicateDocumentId(task)) {
+                  <div class="small text-warning-emphasis d-flex align-items-center gap-1 mt-1">
+                    <i-bs class="lh-1" width="1em" height="1em" name="exclamation-triangle"></i-bs>
+                    <span>{{ duplicateTaskLabel(task) }}</span>
+                  </div>
+                }
                 <ng-template #resultPopover>
                   <pre class="small mb-0">{{ taskResultPopoverMessage(task) }}@if (taskResultMessageOverflowsPopover(task)) {
                     &hellip;
@@ -211,6 +217,23 @@
                   <div class="detail-section mb-3">
                     <div class="detail-label fs-7 fw-bold text-uppercase text-muted mb-1" i18n>Result message</div>
                     <pre class="detail-block border border-dark bg-body p-3 rounded-2 mb-0">{{ taskResultMessage(task) }}</pre>
+                  </div>
+                }
+
+                @if (duplicateDocumentId(task); as duplicateDocumentId) {
+                  <div class="detail-section mb-3">
+                    <div class="detail-label fs-7 fw-bold text-uppercase text-muted mb-1" i18n>Duplicate</div>
+                    <div class="detail-block border border-dark bg-body p-3 rounded-2 mb-0">
+                      <div class="d-flex align-items-center justify-content-between gap-3">
+                        <div class="text-break">{{ duplicateTaskLabel(task) }}</div>
+                        <button
+                          class="btn btn-sm btn-outline-primary"
+                          type="button"
+                          (click)="openDuplicateDocument(duplicateDocumentId)">
+                          <ng-container i18n>Open</ng-container>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 }
 

@@ -371,7 +371,7 @@ export class TasksComponent
 
     const duplicateOf = task.result_data?.['duplicate_of']
     if (typeof duplicateOf === 'number') {
-      return `Not consuming: It is a duplicate of document #${duplicateOf}`
+      return `Duplicate of document #${duplicateOf}`
     }
 
     const errorMessage = task.result_data?.['error_message']
@@ -397,6 +397,19 @@ export class TasksComponent
 
   taskHasResultMessage(task: PaperlessTask): boolean {
     return !!this.taskResultMessage(task)
+  }
+
+  duplicateDocumentId(task: PaperlessTask): number | null {
+    const duplicateOf = task.result_data?.['duplicate_of']
+    return typeof duplicateOf === 'number' ? duplicateOf : null
+  }
+
+  duplicateTaskLabel(task: PaperlessTask): string {
+    return $localize`Duplicate of document #${this.duplicateDocumentId(task)}`
+  }
+
+  openDuplicateDocument(documentId: number) {
+    this.router.navigate(['documents', documentId, 'details'])
   }
 
   taskResultPopoverMessage(task: PaperlessTask): string {
