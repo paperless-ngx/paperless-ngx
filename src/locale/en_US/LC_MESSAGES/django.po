@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-20 20:20+0000\n"
+"POT-Creation-Date: 2026-04-21 17:25+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1352,8 +1352,8 @@ msgid "workflow runs"
 msgstr ""
 
 #: documents/serialisers.py:463 documents/serialisers.py:815
-#: documents/serialisers.py:2681 documents/views.py:2255
-#: documents/views.py:2324 paperless_mail/serialisers.py:143
+#: documents/serialisers.py:2681 documents/views.py:2258
+#: documents/views.py:2327 paperless_mail/serialisers.py:143
 msgid "Insufficient permissions."
 msgstr ""
 
@@ -1393,7 +1393,7 @@ msgstr ""
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2767 documents/views.py:4104
+#: documents/serialisers.py:2767 documents/views.py:4107
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1661,28 +1661,28 @@ msgstr ""
 msgid "Unable to parse URI {value}"
 msgstr ""
 
-#: documents/views.py:2135
+#: documents/views.py:2138
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:2248 documents/views.py:2321
+#: documents/views.py:2251 documents/views.py:2324
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:4116
+#: documents/views.py:4119
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr ""
 
-#: documents/views.py:4162
+#: documents/views.py:4165
 msgid "Bundle is already being processed."
 msgstr ""
 
-#: documents/views.py:4222
+#: documents/views.py:4225
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr ""
 
-#: documents/views.py:4232
+#: documents/views.py:4235
 msgid "The share link bundle is unavailable."
 msgstr ""
 
