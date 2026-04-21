@@ -6,6 +6,8 @@ import json
 import logging
 import operator
 from contextlib import contextmanager
+from decimal import Decimal
+from decimal import InvalidOperation
 from typing import TYPE_CHECKING
 from typing import Any
 
@@ -291,6 +293,34 @@ class MimeTypeFilter(Filter):
             return qs
 
 
+class MonetaryAmountField(serializers.Field):
+    """
+    Accepts either a plain decimal string ("100", "100.00") or a currency-prefixed
+    string ("USD100.00") and returns the numeric amount as a Decimal.
+
+    Mirrors the logic of the value_monetary_amount generated field: if the value
+    starts with a non-digit, the first 3 characters are treated as a currency code
+    (ISO 4217) and stripped before parsing. This preserves backwards compatibility
+    with saved views that stored a currency-prefixed string as the filter value.
+    """
+
+    default_error_messages = {"invalid": "A valid number is required."}
+
+    def to_internal_value(self, data):
+        if not isinstance(data, str | int | float):
+            self.fail("invalid")
+        value = str(data).strip()
+        if value and not value[0].isdigit() and value[0] != "-":
+            value = value[3:]  # strip 3-char ISO 4217 currency code
+        try:
+            return Decimal(value)
+        except InvalidOperation:
+            self.fail("invalid")
+
+    def to_representation(self, value):
+        return str(value)
+
+
 class SelectField(serializers.CharField):
     def __init__(self, custom_field: CustomField) -> None:
         self._options = custom_field.extra_data["select_options"]
@@ -516,9 +546,8 @@ class CustomFieldQueryParser:
         value_field_name = CustomFieldInstance.get_value_field_name(
             custom_field.data_type,
         )
-        if (
-            custom_field.data_type == CustomField.FieldDataType.MONETARY
-            and op in self.EXPR_BY_CATEGORY["arithmetic"]
+        if custom_field.data_type == CustomField.FieldDataType.MONETARY and (
+            op in self.EXPR_BY_CATEGORY["arithmetic"] or op in {"exact", "in"}
         ):
             value_field_name = "value_monetary_amount"
         has_field = Q(custom_fields__field=custom_field)
@@ -628,6 +657,13 @@ class CustomFieldQueryParser:
         elif custom_field.data_type == CustomField.FieldDataType.URL:
             # For URL fields we don't need to be strict about validation (e.g., for istartswith).
             field = serializers.CharField()
+        elif custom_field.data_type == CustomField.FieldDataType.MONETARY and (
+            op in self.EXPR_BY_CATEGORY["arithmetic"] or op in {"exact", "in"}
+        ):
+            # These ops compare against value_monetary_amount (a DecimalField).
+            # MonetaryAmountField accepts both "100" and "USD100.00" for backwards
+            # compatibility with saved views that stored currency-prefixed values.
+            field = MonetaryAmountField()
         else:
             # The general case: inferred from the corresponding field in CustomFieldInstance.
             value_field_name = CustomFieldInstance.get_value_field_name(
