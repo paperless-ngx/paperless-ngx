@@ -563,6 +563,26 @@ class TestFieldHandling:
 class TestHighlightHits:
     """Test highlight_hits returns proper HTML strings, not raw Snippet objects."""
 
+    def test_highlights_simple_text_mode_returns_html_string(
+        self,
+        backend: TantivyBackend,
+    ):
+        """Simple text search should still produce content highlights for exact-token hits."""
+        doc = Document.objects.create(
+            title="Highlight Test",
+            content="The quick brown fox jumps over the lazy dog",
+            checksum="HH0",
+            pk=89,
+        )
+        backend.add_or_update(doc)
+
+        hits = backend.highlight_hits("quick", [doc.pk], search_mode=SearchMode.TEXT)
+
+        assert len(hits) == 1
+        highlights = hits[0]["highlights"]
+        assert "content" in highlights
+        assert "<b>" in highlights["content"]
+
     def test_highlights_content_returns_html_string(self, backend: TantivyBackend):
         """highlight_hits must return HTML strings (from Snippet.to_html()), not Snippet objects."""
         doc = Document.objects.create(

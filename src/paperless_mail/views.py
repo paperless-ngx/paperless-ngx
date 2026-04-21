@@ -1,6 +1,7 @@
 import datetime
 import logging
 from datetime import timedelta
+from http import HTTPStatus
 from typing import Any
 
 from django.http import HttpResponseBadRequest
@@ -23,6 +24,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
+from documents.models import PaperlessTask
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import has_perms_owner_aware
 from documents.views import PassUserMixin
@@ -155,11 +157,39 @@ class MailAccountViewSet(PassUserMixin, ModelViewSet[MailAccount]):
     @action(methods=["post"], detail=True)
     def process(self, request, pk=None):
         account = self.get_object()
-        process_mail_accounts.delay([account.pk])
+        process_mail_accounts.apply_async(
+            kwargs={"account_ids": [account.pk]},
+            headers={"trigger_source": PaperlessTask.TriggerSource.MANUAL},
+        )
 
         return Response({"result": "OK"})
 
 
+@extend_schema_view(
+    bulk_delete=extend_schema(
+        operation_id="processed_mail_bulk_delete",
+        description="Delete multiple processed mail records by ID.",
+        request=inline_serializer(
+            name="BulkDeleteMailRequest",
+            fields={
+                "mail_ids": serializers.ListField(child=serializers.IntegerField()),
+            },
+        ),
+        responses={
+            (HTTPStatus.OK, "application/json"): inline_serializer(
+                name="BulkDeleteMailResponse",
+                fields={
+                    "result": serializers.CharField(),
+                    "deleted_mail_ids": serializers.ListField(
+                        child=serializers.IntegerField(),
+                    ),
+                },
+            ),
+            HTTPStatus.BAD_REQUEST: None,
+            HTTPStatus.FORBIDDEN: None,
+        },
+    ),
+)
 class ProcessedMailViewSet(PassUserMixin, ReadOnlyModelViewSet[ProcessedMail]):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     serializer_class = ProcessedMailSerializer

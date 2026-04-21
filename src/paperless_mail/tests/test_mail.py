@@ -28,6 +28,7 @@ from rest_framework.test import APITestCase
 
 from documents.models import Correspondent
 from documents.models import MatchingModel
+from documents.tests.factories import CorrespondentFactory
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from paperless_mail import tasks
@@ -38,6 +39,8 @@ from paperless_mail.mail import apply_mail_action
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
+from paperless_mail.tests.factories import MailAccountFactory
+from paperless_mail.tests.factories import MailRuleFactory
 
 
 @dataclasses.dataclass
@@ -359,7 +362,8 @@ class MailMocker(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
                 consume_tasks,
                 expected_signatures,
             ):
-                input_doc, overrides = consume_task.args
+                input_doc = consume_task.kwargs["input_doc"]
+                overrides = consume_task.kwargs["overrides"]
 
                 # assert the file exists
                 self.assertIsFile(input_doc.original_file)
@@ -432,8 +436,8 @@ class TestMail(
             "fake@localhost.com",
         )
 
-        me_localhost = Correspondent.objects.create(name=message2.from_)
-        someone_else = Correspondent.objects.create(name="someone else")
+        me_localhost = CorrespondentFactory(name=message2.from_)
+        someone_else = CorrespondentFactory(name="someone else")
 
         handler = MailAccountHandler()
 
@@ -1574,21 +1578,8 @@ class TestMail(
 
 class TestPostConsumeAction(TestCase):
     def setUp(self) -> None:
-        self.account = MailAccount.objects.create(
-            name="test",
-            imap_server="imap.test.com",
-            imap_port=993,
-            imap_security=MailAccount.ImapSecurity.SSL,
-            username="testuser",
-            password="password",
-        )
-        self.rule = MailRule.objects.create(
-            name="testrule",
-            account=self.account,
-            action=MailRule.MailAction.MARK_READ,
-            action_parameter="",
-            folder="INBOX",
-        )
+        self.account = MailAccountFactory()
+        self.rule = MailRuleFactory(account=self.account)
         self.message_uid = "12345"
         self.message_subject = "Test Subject"
         self.message_date = timezone.make_aware(timezone.datetime(2023, 1, 1, 12, 0, 0))
@@ -2022,7 +2013,7 @@ class TestMailAccountProcess(APITestCase):
         )
         self.url = f"/api/mail_accounts/{self.account.pk}/process/"
 
-    @mock.patch("paperless_mail.tasks.process_mail_accounts.delay")
+    @mock.patch("paperless_mail.tasks.process_mail_accounts.apply_async")
     def test_mail_account_process_view(self, m) -> None:
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -2036,15 +2027,7 @@ class TestMailRuleAPI(APITestCase):
             password="testpassword",
         )
         self.client.force_authenticate(user=self.user)
-        self.account = MailAccount.objects.create(
-            imap_server="imap.example.com",
-            imap_port=993,
-            imap_security=MailAccount.ImapSecurity.SSL,
-            username="admin",
-            password="secret",
-            account_type=MailAccount.MailAccountType.IMAP,
-            owner=self.user,
-        )
+        self.account = MailAccountFactory(owner=self.user)
         self.url = "/api/mail_rules/"
 
     def test_create_mail_rule(self) -> None:

@@ -13,6 +13,7 @@ from rest_framework import status
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.models import MailAccount
 from paperless_mail.oauth import PaperlessMailOAuth2Manager
+from paperless_mail.tests.factories import MailAccountFactory
 
 
 @override_settings(
@@ -289,11 +290,9 @@ class TestMailOAuth(
         mock_mailbox = mock.MagicMock()
         mock_get_mailbox.return_value.__enter__.return_value = mock_mailbox
 
-        mail_account = MailAccount.objects.create(
+        mail_account = MailAccountFactory(
             name="Test Gmail Mail Account",
             username="test_username",
-            imap_security=MailAccount.ImapSecurity.SSL,
-            imap_port=993,
             account_type=MailAccount.MailAccountType.GMAIL_OAUTH,
             is_token=True,
             refresh_token="test_refresh_token",
@@ -315,11 +314,9 @@ class TestMailOAuth(
             "refresh_token": "test_refresh",
             "expires_in": 3600,
         }
-        outlook_mail_account = MailAccount.objects.create(
+        outlook_mail_account = MailAccountFactory(
             name="Test Outlook Mail Account",
             username="test_username",
-            imap_security=MailAccount.ImapSecurity.SSL,
-            imap_port=993,
             account_type=MailAccount.MailAccountType.OUTLOOK_OAUTH,
             is_token=True,
             refresh_token="test_refresh_token",
@@ -352,11 +349,9 @@ class TestMailOAuth(
         mock_mailbox = mock.MagicMock()
         mock_get_mailbox.return_value.__enter__.return_value = mock_mailbox
 
-        mail_account = MailAccount.objects.create(
+        mail_account = MailAccountFactory(
             name="Test Gmail Mail Account",
             username="test_username",
-            imap_security=MailAccount.ImapSecurity.SSL,
-            imap_port=993,
             account_type=MailAccount.MailAccountType.GMAIL_OAUTH,
             is_token=True,
             refresh_token="test_refresh_token",

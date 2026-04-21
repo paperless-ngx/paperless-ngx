@@ -59,8 +59,9 @@ class TestBeforeTaskPublishHandler:
     def test_creates_task_for_consume_file(self, consume_input_doc, consume_overrides):
         task_id = send_publish(
             "documents.tasks.consume_file",
-            (consume_input_doc, consume_overrides),
-            {},
+            (),
+            {"input_doc": consume_input_doc, "overrides": consume_overrides},
+            headers={"trigger_source": PaperlessTask.TriggerSource.WEB_UI},
         )
         task = PaperlessTask.objects.get(task_id=task_id)
         assert task.task_type == PaperlessTask.TaskType.CONSUME_FILE
@@ -102,8 +103,8 @@ class TestBeforeTaskPublishHandler:
 
         task_id = send_publish(
             "documents.tasks.consume_file",
-            (consume_input_doc, overrides),
-            {},
+            (),
+            {"input_doc": consume_input_doc, "overrides": overrides},
         )
 
         task = PaperlessTask.objects.get(task_id=task_id)
@@ -116,8 +117,8 @@ class TestBeforeTaskPublishHandler:
 
         task_id = send_publish(
             "documents.tasks.consume_file",
-            (consume_input_doc, overrides),
-            {},
+            (),
+            {"input_doc": consume_input_doc, "overrides": overrides},
         )
 
         task = PaperlessTask.objects.get(task_id=task_id)
@@ -167,37 +168,19 @@ class TestBeforeTaskPublishHandler:
         before_task_publish_handler(sender=None, headers=None, body=None)
         assert PaperlessTask.objects.count() == 0
 
-    @pytest.mark.parametrize(
-        ("document_source", "expected_trigger_source"),
-        [
-            pytest.param(
-                DocumentSource.ConsumeFolder,
-                PaperlessTask.TriggerSource.FOLDER_CONSUME,
-                id="folder_consume",
-            ),
-            pytest.param(
-                DocumentSource.MailFetch,
-                PaperlessTask.TriggerSource.EMAIL_CONSUME,
-                id="email_consume",
-            ),
-        ],
-    )
-    def test_consume_document_source_maps_to_trigger_source(
+    def test_consume_file_without_trigger_source_header_defaults_to_manual(
         self,
         consume_input_doc,
         consume_overrides,
-        document_source: DocumentSource,
-        expected_trigger_source: PaperlessTask.TriggerSource,
     ) -> None:
-        """DocumentSource on the input doc maps to the correct TriggerSource."""
-        consume_input_doc.source = document_source
+        """Without a trigger_source header the handler defaults to MANUAL."""
         task_id = send_publish(
             "documents.tasks.consume_file",
-            (consume_input_doc, consume_overrides),
-            {},
+            (),
+            {"input_doc": consume_input_doc, "overrides": consume_overrides},
         )
         task = PaperlessTask.objects.get(task_id=task_id)
-        assert task.trigger_source == expected_trigger_source
+        assert task.trigger_source == PaperlessTask.TriggerSource.MANUAL
 
 
 @pytest.mark.django_db
@@ -255,30 +238,38 @@ class TestTaskPostrunHandler:
         task.refresh_from_db()
         assert task.status == PaperlessTask.Status.STARTED
 
-    def test_parses_legacy_new_document_string(self):
-        task = self._started_task()
+    def test_records_success_with_consume_result(self):
+        """ConsumeFileSuccessResult dict is stored directly as result_data."""
+        from documents.data_models import ConsumeFileSuccessResult
 
+        task = self._started_task()
         task_postrun_handler(
             task_id=task.task_id,
-            retval="New document id 42 created",
+            retval=ConsumeFileSuccessResult(document_id=42),
             state="SUCCESS",
         )
         task.refresh_from_db()
-        assert task.result_data["document_id"] == 42
-        assert task.result_message == "New document id 42 created"
+        assert task.result_data == {"document_id": 42}
 
-    def test_parses_duplicate_string(self):
-        """Duplicate detection returns a string with SUCCESS state (StopConsumeTaskError is caught and returned, not raised)."""
+    def test_records_stopped_with_reason(self):
+        """ConsumeFileStoppedResult dict is stored directly as result_data."""
+        from documents.data_models import ConsumeFileStoppedResult
+
         task = self._started_task()
-
         task_postrun_handler(
             task_id=task.task_id,
-            retval="It is a duplicate of some document (#99).",
+            retval=ConsumeFileStoppedResult(reason="Barcode splitting complete!"),
             state="SUCCESS",
         )
         task.refresh_from_db()
-        assert task.result_data["duplicate_of"] == 99
-        assert task.result_data["duplicate_in_trash"] is False
+        assert task.result_data == {"reason": "Barcode splitting complete!"}
+
+    def test_none_retval_stores_no_result_data(self):
+        """None return value (non-consume tasks) leaves result_data untouched."""
+        task = self._started_task()
+        task_postrun_handler(task_id=task.task_id, retval=None, state="SUCCESS")
+        task.refresh_from_db()
+        assert task.result_data is None
 
     def test_ignores_unknown_task_id(self):
 

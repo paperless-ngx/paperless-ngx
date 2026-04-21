@@ -37,6 +37,7 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.loggers import LoggingMixin
 from documents.models import Correspondent
+from documents.models import PaperlessTask
 from documents.parsers import is_mime_type_supported
 from documents.tasks import consume_file
 from paperless.network import is_public_ip
@@ -238,7 +239,7 @@ def mailbox_login(mailbox: MailBox, account: MailAccount) -> None:
 
 @shared_task
 def apply_mail_action(
-    result: list[str],
+    result: list,
     rule_id: int,
     message_uid: str,
     message_subject: str,
@@ -893,8 +894,12 @@ class MailAccountHandler(LoggingMixin):
                 )
 
                 consume_task = consume_file.s(
-                    input_doc,
-                    doc_overrides,
+                    input_doc=input_doc,
+                    overrides=doc_overrides,
+                ).set(
+                    headers={
+                        "trigger_source": PaperlessTask.TriggerSource.EMAIL_CONSUME,
+                    },
                 )
 
                 consume_tasks.append(consume_task)
@@ -991,9 +996,9 @@ class MailAccountHandler(LoggingMixin):
         )
 
         consume_task = consume_file.s(
-            input_doc,
-            doc_overrides,
-        )
+            input_doc=input_doc,
+            overrides=doc_overrides,
+        ).set(headers={"trigger_source": PaperlessTask.TriggerSource.EMAIL_CONSUME})
 
         queue_consumption_tasks(
             consume_tasks=[consume_task],

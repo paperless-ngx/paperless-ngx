@@ -20,6 +20,7 @@ from rest_framework.reverse import reverse
 
 from documents.classifier import load_classifier
 from documents.data_models import ConsumableDocument
+from documents.data_models import ConsumeFileSuccessResult
 from documents.data_models import DocumentMetadataOverrides
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_filename
@@ -88,6 +89,15 @@ class WorkflowTriggerPlugin(
 
 class ConsumerError(Exception):
     pass
+
+
+class ConsumeFileDuplicateError(ConsumerError):
+    """Raised when a file is rejected because it duplicates an existing document."""
+
+    def __init__(self, message: str, duplicate_id: int, *, in_trash: bool) -> None:
+        super().__init__(message)
+        self.duplicate_id = duplicate_id
+        self.in_trash = in_trash
 
 
 class ConsumerStatusShortMessage(StrEnum):
@@ -395,7 +405,7 @@ class ConsumerPlugin(
                 exception=e,
             )
 
-    def run(self) -> str:
+    def run(self) -> "ConsumeFileSuccessResult":
         """
         Return the document object if it was successfully created.
         """
@@ -771,7 +781,7 @@ class ConsumerPlugin(
         # Return the most up to date fields
         document.refresh_from_db()
 
-        return f"Success. New document id {document.pk} created"
+        return ConsumeFileSuccessResult(document_id=document.pk)
 
     def _parse_title_placeholders(self, title: str) -> str:
         local_added = timezone.localtime(timezone.now())
@@ -1010,9 +1020,13 @@ class ConsumerPreflightPlugin(
                     )
                     failure_msg += " Note: existing document is in the trash."
 
-                self._fail(
-                    status_msg,
-                    failure_msg,
+                self._send_progress(100, 100, ProgressStatusOptions.FAILED, status_msg)
+                self.log.error(failure_msg)
+                in_trash = duplicates_in_trash.exists()
+                raise ConsumeFileDuplicateError(
+                    f"{self.filename}: {failure_msg}",
+                    duplicate.pk,
+                    in_trash=in_trash,
                 )
 
     def pre_check_directories(self) -> None:

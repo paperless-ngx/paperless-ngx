@@ -1604,6 +1604,7 @@ class RotateDocumentsSerializer(DocumentSelectionSerializer, SourceModeValidatio
         required=False,
         default=bulk_edit.SourceModeChoices.LATEST_VERSION,
     )
+    from_webui = serializers.BooleanField(required=False, default=False)
 
 
 class MergeDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
@@ -1617,6 +1618,7 @@ class MergeDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin
         required=False,
         default=bulk_edit.SourceModeChoices.LATEST_VERSION,
     )
+    from_webui = serializers.BooleanField(required=False, default=False)
 
 
 class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
@@ -1628,6 +1630,7 @@ class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMix
         required=False,
         default=bulk_edit.SourceModeChoices.LATEST_VERSION,
     )
+    from_webui = serializers.BooleanField(required=False, default=False)
 
     def validate(self, attrs):
         documents = attrs["documents"]
@@ -1679,6 +1682,7 @@ class RemovePasswordDocumentsSerializer(
         required=False,
         default=bulk_edit.SourceModeChoices.LATEST_VERSION,
     )
+    from_webui = serializers.BooleanField(required=False, default=False)
 
 
 class DeleteDocumentsSerializer(DocumentSelectionSerializer):
@@ -1726,6 +1730,7 @@ class BulkEditSerializer(
     )
 
     parameters = serializers.DictField(allow_empty=True, default={}, write_only=True)
+    from_webui = serializers.BooleanField(required=False, default=False)
 
     def _validate_tag_id_list(self, tags, name="tags") -> None:
         if not isinstance(tags, list):
@@ -2398,7 +2403,10 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         """
         doc_ids = [doc.id for doc in instance.documents.all()]
         if doc_ids:
-            bulk_edit.bulk_update_documents.delay(doc_ids)
+            bulk_edit.bulk_update_documents.apply_async(
+                kwargs={"document_ids": doc_ids},
+                headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
+            )
 
         return super().update(instance, validated_data)
 
@@ -2469,7 +2477,6 @@ class TaskSerializerV10(OwnedObjectSerializer):
             "wait_time_seconds",
             "input_data",
             "result_data",
-            "result_message",
             "related_document_ids",
             "acknowledged",
             "owner",
@@ -2496,12 +2503,8 @@ class TaskSerializerV9(serializers.ModelSerializer):
     # v9 field: status -> uppercase Celery state strings
     status = serializers.SerializerMethodField()
 
-    # v9 field: result -> result_message (with legacy format fallback)
-    result = serializers.CharField(
-        source="result_message",
-        read_only=True,
-        allow_null=True,
-    )
+    # v9 field: result -> derived from result_data
+    result = serializers.SerializerMethodField()
 
     # v9 field: related_document -> first document ID from result_data
     related_document = serializers.SerializerMethodField()
@@ -2532,6 +2535,20 @@ class TaskSerializerV9(serializers.ModelSerializer):
         PaperlessTask.TaskType.SANITY_CHECK: "check_sanity",
         PaperlessTask.TaskType.LLM_INDEX: "llmindex_update",
     }
+
+    def get_result(self, obj: PaperlessTask) -> str | None:
+        """Reconstruct a human-readable result string from result_data for v9 clients."""
+        if not obj.result_data:
+            return None
+        if doc_id := obj.result_data.get("document_id"):
+            return f"Success. New document id {doc_id} created"
+        if reason := obj.result_data.get("reason"):
+            return reason
+        if dup_id := obj.result_data.get("duplicate_of"):
+            return f"Not consuming: It is a duplicate of document #{dup_id}"
+        if error := obj.result_data.get("error_message"):
+            return error
+        return None
 
     def get_task_name(self, obj: PaperlessTask) -> str:
         return self._TASK_TYPE_TO_V9_NAME.get(obj.task_type, obj.task_type)

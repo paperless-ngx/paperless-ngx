@@ -27,6 +27,7 @@ from watchfiles import watch
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
+from documents.models import PaperlessTask
 from documents.models import Tag
 from documents.parsers import get_supported_file_extensions
 from documents.tasks import consume_file
@@ -338,12 +339,15 @@ def _consume_file(
     # Queue for consumption
     try:
         logger.info(f"Adding {filepath} to the task queue")
-        consume_file.delay(
-            ConsumableDocument(
-                source=DocumentSource.ConsumeFolder,
-                original_file=filepath,
-            ),
-            DocumentMetadataOverrides(tag_ids=tag_ids),
+        consume_file.apply_async(
+            kwargs={
+                "input_doc": ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=filepath,
+                ),
+                "overrides": DocumentMetadataOverrides(tag_ids=tag_ids),
+            },
+            headers={"trigger_source": PaperlessTask.TriggerSource.FOLDER_CONSUME},
         )
     except Exception:
         logger.exception(f"Error while queuing document {filepath}")

@@ -490,6 +490,14 @@ _FIELD_BOOSTS = {"title": 2.0}
 _SIMPLE_FIELD_BOOSTS = {"simple_title": 2.0}
 
 
+def _simple_query_tokens(raw_query: str) -> list[str]:
+    tokens = [
+        ascii_fold(token.lower())
+        for token in _SIMPLE_QUERY_TOKEN_RE.findall(raw_query, timeout=_REGEX_TIMEOUT)
+    ]
+    return [token for token in tokens if token]
+
+
 def _build_simple_field_query(
     index: tantivy.Index,
     field: str,
@@ -585,11 +593,7 @@ def parse_simple_query(
 
     Query string is escaped and normalized to be treated as "simple" text query.
     """
-    tokens = [
-        ascii_fold(token.lower())
-        for token in _SIMPLE_QUERY_TOKEN_RE.findall(raw_query, timeout=_REGEX_TIMEOUT)
-    ]
-    tokens = [token for token in tokens if token]
+    tokens = _simple_query_tokens(raw_query)
     if not tokens:
         return tantivy.Query.empty_query()
 
@@ -600,6 +604,23 @@ def parse_simple_query(
     if len(field_queries) == 1:
         return field_queries[0][1]
     return tantivy.Query.boolean_query(field_queries)
+
+
+def parse_simple_text_highlight_query(
+    index: tantivy.Index,
+    raw_query: str,
+) -> tantivy.Query:
+    """Build a snippet-friendly query for simple text searches.
+
+    Simple search matching uses regex queries but for compatibility with Tantivy
+    SnippetGenerator we build a plain term query over the content field instead.
+    """
+
+    tokens = _simple_query_tokens(raw_query)
+    if not tokens:
+        return tantivy.Query.empty_query()
+
+    return index.parse_query(" ".join(tokens), ["content"])
 
 
 def parse_simple_text_query(

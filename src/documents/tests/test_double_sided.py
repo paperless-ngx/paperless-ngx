@@ -83,7 +83,7 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             dt.datetime.now(),
             delta=dt.timedelta(seconds=5),
         )
-        self.assertIn("Received odd numbered pages", msg)
+        self.assertIn("Received odd numbered pages", msg["reason"])
 
     def test_collation(self) -> None:
         """
@@ -129,7 +129,7 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         )
         msg = self.consume_file("double-sided-odd.pdf")
         self.assertIsFile(self.staging_file)
-        self.assertIn("Received odd numbered pages", msg)
+        self.assertIn("Received odd numbered pages", msg["reason"])
 
     def test_less_odd_pages_then_even_fails(self) -> None:
         """
@@ -212,7 +212,7 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         msg = self.consume_file("simple.pdf", Path("..") / "simple.pdf")
         self.assertIsNotFile(self.staging_file)
-        self.assertRegex(msg, r"Success. New document id \d+ created")
+        self.assertIsInstance(msg.get("document_id"), int)
 
     def test_subdirectory_upload(self) -> None:
         """
@@ -252,4 +252,4 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         msg = self.consume_file("simple.pdf")
         self.assertIsNotFile(self.staging_file)
-        self.assertRegex(msg, r"Success. New document id \d+ created")
+        self.assertIsInstance(msg.get("document_id"), int)

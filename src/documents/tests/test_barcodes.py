@@ -17,8 +17,8 @@ from documents.data_models import DocumentSource
 from documents.models import Document
 from documents.models import Tag
 from documents.plugins.base import StopConsumeTaskError
+from documents.tests.utils import ConsumeTaskMixin
 from documents.tests.utils import DirectoriesMixin
-from documents.tests.utils import DocumentConsumeDelayMixin
 from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
@@ -601,7 +601,7 @@ class TestBarcodeNewConsume(
     DirectoriesMixin,
     FileSystemAssertsMixin,
     SampleDirMixin,
-    DocumentConsumeDelayMixin,
+    ConsumeTaskMixin,
     TestCase,
 ):
     @override_settings(CONSUMER_ENABLE_BARCODES=True)
@@ -632,7 +632,7 @@ class TestBarcodeNewConsume(
                     ),
                     overrides,
                 ),
-                "Barcode splitting complete!",
+                {"reason": "Barcode splitting complete!"},
             )
             # 2 new document consume tasks created
             self.assertEqual(self.consume_file_mock.call_count, 2)
@@ -646,7 +646,7 @@ class TestBarcodeNewConsume(
             for (
                 new_input_doc,
                 new_doc_overrides,
-            ) in self.get_all_consume_delay_call_args():
+            ) in self.get_all_consume_task_call_args():
                 self.assertIsFile(new_input_doc.original_file)
                 self.assertEqual(new_input_doc.original_path, temp_copy)
                 self.assertEqual(new_input_doc.source, DocumentSource.ConsumeFolder)
@@ -1049,7 +1049,7 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
                 None,
             )
 
-            self.assertEqual(result, "Barcode splitting complete!")
+            self.assertEqual(result, {"reason": "Barcode splitting complete!"})
 
             documents = Document.objects.all().order_by("id")
             self.assertEqual(documents.count(), 3)

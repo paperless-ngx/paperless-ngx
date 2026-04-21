@@ -299,7 +299,7 @@ class TestSystemStatus(APITestCase):
             task_type=PaperlessTask.TaskType.TRAIN_CLASSIFIER,
             trigger_source=PaperlessTask.TriggerSource.SCHEDULED,
             status=PaperlessTask.Status.FAILURE,
-            result_message="Classifier training failed",
+            result_data={"error_message": "Classifier training failed"},
         )
         self.client.force_login(self.user)
         response = self.client.get(self.ENDPOINT)
@@ -360,7 +360,7 @@ class TestSystemStatus(APITestCase):
             task_type=PaperlessTask.TaskType.SANITY_CHECK,
             trigger_source=PaperlessTask.TriggerSource.SCHEDULED,
             status=PaperlessTask.Status.FAILURE,
-            result_message="5 issues found.",
+            result_data={"error_message": "5 issues found."},
         )
         self.client.force_login(self.user)
         response = self.client.get(self.ENDPOINT)
@@ -429,7 +429,7 @@ class TestSystemStatus(APITestCase):
                 task_type=PaperlessTask.TaskType.LLM_INDEX,
                 trigger_source=PaperlessTask.TriggerSource.SCHEDULED,
                 status=PaperlessTask.Status.FAILURE,
-                result_message="AI index update failed",
+                result_data={"error_message": "AI index update failed"},
             )
             self.client.force_login(self.user)
             response = self.client.get(self.ENDPOINT)

@@ -9,6 +9,7 @@ from collections import defaultdict
 from collections import deque
 from datetime import datetime
 from datetime import timedelta
+from http import HTTPStatus
 from pathlib import Path
 from time import mktime
 from typing import TYPE_CHECKING
@@ -689,18 +690,49 @@ class EmailDocumentDetailSchema(EmailSerializer):
                     "original_mime_type": serializers.CharField(),
                     "media_filename": serializers.CharField(),
                     "has_archive_version": serializers.BooleanField(),
-                    "original_metadata": serializers.DictField(),
-                    "archive_checksum": serializers.CharField(),
-                    "archive_media_filename": serializers.CharField(),
+                    "original_metadata": serializers.ListField(
+                        child=inline_serializer(
+                            name="OriginalMetadataEntry",
+                            fields={
+                                "namespace": serializers.CharField(),
+                                "prefix": serializers.CharField(),
+                                "key": serializers.CharField(),
+                                "value": serializers.CharField(),
+                            },
+                        ),
+                    ),
+                    "archive_checksum": serializers.CharField(
+                        allow_null=True,
+                        required=False,
+                    ),
+                    "archive_media_filename": serializers.CharField(
+                        allow_null=True,
+                        required=False,
+                    ),
                     "original_filename": serializers.CharField(),
-                    "archive_size": serializers.IntegerField(),
-                    "archive_metadata": serializers.DictField(),
+                    "archive_size": serializers.IntegerField(
+                        allow_null=True,
+                        required=False,
+                    ),
+                    "archive_metadata": serializers.ListField(
+                        child=inline_serializer(
+                            name="ArchiveMetadataEntry",
+                            fields={
+                                "namespace": serializers.CharField(),
+                                "prefix": serializers.CharField(),
+                                "key": serializers.CharField(),
+                                "value": serializers.CharField(),
+                            },
+                        ),
+                        allow_null=True,
+                        required=False,
+                    ),
                     "lang": serializers.CharField(),
                 },
             ),
-            400: None,
-            403: None,
-            404: None,
+            HTTPStatus.BAD_REQUEST: None,
+            HTTPStatus.FORBIDDEN: None,
+            HTTPStatus.NOT_FOUND: None,
         },
     ),
     notes=extend_schema(
@@ -936,7 +968,10 @@ class DocumentViewSet(
                     ),
                 ),
                 "tags",
-                "custom_fields",
+                Prefetch(
+                    "custom_fields",
+                    queryset=CustomFieldInstance.objects.select_related("field"),
+                ),
                 "notes",
             )
         )
@@ -1770,9 +1805,9 @@ class DocumentViewSet(
             if request.user is not None:
                 overrides.actor_id = request.user.id
 
-            async_task = consume_file.delay(
-                input_doc,
-                overrides,
+            async_task = consume_file.apply_async(
+                kwargs={"input_doc": input_doc, "overrides": overrides},
+                headers={"trigger_source": PaperlessTask.TriggerSource.WEB_UI},
             )
             logger.debug(
                 f"Updated document {root_doc.id} with new version",
@@ -2449,6 +2484,7 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         "edit_pdf",
         "remove_password",
     }
+    METHOD_NAMES_REQUIRING_TRIGGER_SOURCE = METHOD_NAMES_REQUIRING_USER
 
     def _has_document_permissions(
         self,
@@ -2539,12 +2575,19 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         parameters = {
             k: v
             for k, v in validated_data.items()
-            if k not in {"documents", "all", "filters"}
+            if k not in {"documents", "all", "filters", "from_webui"}
         }
         user = self.request.user
+        from_webui = validated_data.get("from_webui", False)
 
         if method.__name__ in self.METHOD_NAMES_REQUIRING_USER:
             parameters["user"] = user
+        if method.__name__ in self.METHOD_NAMES_REQUIRING_TRIGGER_SOURCE:
+            parameters["trigger_source"] = (
+                PaperlessTask.TriggerSource.WEB_UI
+                if from_webui
+                else PaperlessTask.TriggerSource.API_UPLOAD
+            )
 
         if not self._has_document_permissions(
             user=user,
@@ -2628,12 +2671,19 @@ class BulkEditView(DocumentOperationPermissionMixin):
         user = self.request.user
         method = serializer.validated_data.get("method")
         parameters = serializer.validated_data.get("parameters")
+        from_webui = serializer.validated_data.get("from_webui", False)
         documents = self._resolve_document_ids(
             user=user,
             validated_data=serializer.validated_data,
         )
         if method.__name__ in self.METHOD_NAMES_REQUIRING_USER:
             parameters["user"] = user
+        if method.__name__ in self.METHOD_NAMES_REQUIRING_TRIGGER_SOURCE:
+            parameters["trigger_source"] = (
+                PaperlessTask.TriggerSource.WEB_UI
+                if from_webui
+                else PaperlessTask.TriggerSource.API_UPLOAD
+            )
         if not self._has_document_permissions(
             user=user,
             documents=documents,
@@ -2927,9 +2977,15 @@ class PostDocumentView(GenericAPIView[Any]):
             custom_fields=custom_fields,
         )
 
-        async_task = consume_file.delay(
-            input_doc,
-            input_doc_overrides,
+        async_task = consume_file.apply_async(
+            kwargs={"input_doc": input_doc, "overrides": input_doc_overrides},
+            headers={
+                "trigger_source": (
+                    PaperlessTask.TriggerSource.WEB_UI
+                    if from_webui
+                    else PaperlessTask.TriggerSource.API_UPLOAD
+                ),
+            },
         )
 
         return Response(async_task.id)
@@ -3528,7 +3584,17 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
             return response
 
 
-@extend_schema_view(**generate_object_with_permissions_schema(StoragePathSerializer))
+@extend_schema_view(
+    **generate_object_with_permissions_schema(StoragePathSerializer),
+    test=extend_schema(
+        operation_id="storage_paths_test",
+        description="Test a storage path template against a document.",
+        request=StoragePathTestSerializer,
+        responses={
+            (HTTPStatus.OK, "application/json"): OpenApiTypes.STR,
+        },
+    ),
+)
 class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[StoragePath]):
     model = StoragePath
 
@@ -3565,7 +3631,10 @@ class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Storag
         response = super().destroy(request, *args, **kwargs)
 
         if doc_ids:
-            bulk_edit.bulk_update_documents.delay(doc_ids)
+            bulk_edit.bulk_update_documents.apply_async(
+                kwargs={"document_ids": doc_ids},
+                headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
+            )
 
         return response
 
@@ -3985,6 +4054,19 @@ class ShareLinkViewSet(
     ordering_fields = ("created", "expiration", "document")
 
 
+@extend_schema_view(
+    rebuild=extend_schema(
+        operation_id="share_link_bundles_rebuild",
+        description="Reset and re-queue a share link bundle for processing.",
+        responses={
+            HTTPStatus.OK: ShareLinkBundleSerializer,
+            (HTTPStatus.BAD_REQUEST, "application/json"): inline_serializer(
+                name="RebuildBundleError",
+                fields={"detail": serializers.CharField()},
+            ),
+        },
+    ),
+)
 class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
     model = ShareLinkBundle
 
@@ -4062,7 +4144,10 @@ class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
                 "file_path",
             ],
         )
-        build_share_link_bundle.delay(bundle.pk)
+        build_share_link_bundle.apply_async(
+            kwargs={"bundle_id": bundle.pk},
+            headers={"trigger_source": PaperlessTask.TriggerSource.MANUAL},
+        )
         bundle.document_total = len(ordered_documents)
         response_serializer = self.get_serializer(bundle)
         headers = self.get_success_headers(response_serializer.data)
@@ -4095,7 +4180,10 @@ class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
                 "file_path",
             ],
         )
-        build_share_link_bundle.delay(bundle.pk)
+        build_share_link_bundle.apply_async(
+            kwargs={"bundle_id": bundle.pk},
+            headers={"trigger_source": PaperlessTask.TriggerSource.MANUAL},
+        )
         bundle.document_total = (
             getattr(bundle, "document_total", None) or bundle.documents.count()
         )
@@ -4600,7 +4688,11 @@ class SystemStatusView(PassUserMixin):
             classifier_error = "No classifier training tasks found"
         elif last_trained_task.status != PaperlessTask.Status.SUCCESS:
             classifier_status = "ERROR"
-            classifier_error = last_trained_task.result_message
+            classifier_error = (
+                last_trained_task.result_data.get("error_message")
+                if last_trained_task.result_data
+                else None
+            )
         classifier_last_trained = (
             last_trained_task.date_done if last_trained_task else None
         )
@@ -4620,7 +4712,11 @@ class SystemStatusView(PassUserMixin):
             sanity_check_error = "No sanity check tasks found"
         elif last_sanity_check.status != PaperlessTask.Status.SUCCESS:
             sanity_check_status = "ERROR"
-            sanity_check_error = last_sanity_check.result_message
+            sanity_check_error = (
+                last_sanity_check.result_data.get("error_message")
+                if last_sanity_check.result_data
+                else None
+            )
         sanity_check_last_run = (
             last_sanity_check.date_done if last_sanity_check else None
         )
@@ -4645,7 +4741,11 @@ class SystemStatusView(PassUserMixin):
                 llmindex_error = "No LLM index update tasks found"
             elif last_llmindex_update.status == PaperlessTask.Status.FAILURE:
                 llmindex_status = "ERROR"
-                llmindex_error = last_llmindex_update.result_message
+                llmindex_error = (
+                    last_llmindex_update.result_data.get("error_message")
+                    if last_llmindex_update.result_data
+                    else None
+                )
             llmindex_last_modified = (
                 last_llmindex_update.date_done if last_llmindex_update else None
             )

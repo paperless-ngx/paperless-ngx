@@ -13,9 +13,9 @@ from django.test import override_settings
 from imap_tools import MailMessage
 
 from paperless_mail.mail import MailAccountHandler
-from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.preprocessor import MailMessageDecryptor
+from paperless_mail.tests.factories import MailAccountFactory
 from paperless_mail.tests.test_mail import TestMail
 from paperless_mail.tests.test_mail import _AttachmentDef
 
@@ -251,7 +251,7 @@ class TestMailMessageGpgDecryptor(TestMail):
 
         encrypted_message = self.messageEncryptor.encrypt(message)
 
-        account = MailAccount.objects.create()
+        account = MailAccountFactory()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             consumption_scope=MailRule.ConsumptionScope.EVERYTHING,

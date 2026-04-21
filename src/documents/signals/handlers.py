@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime
 import hashlib
 import logging
-import re as _re
 import shutil
 import traceback as _tb
 from pathlib import Path
@@ -34,7 +33,6 @@ from documents import matching
 from documents.caching import clear_document_caches
 from documents.caching import invalidate_llm_suggestions_cache
 from documents.data_models import ConsumableDocument
-from documents.data_models import DocumentSource
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
@@ -709,7 +707,7 @@ def check_paths_and_prune_custom_fields(
         and instance.fields.count() > 0
         and instance.extra_data
     ):  # Only select fields, for now
-        process_cf_select_update.delay(instance)
+        process_cf_select_update.apply_async(kwargs={"custom_field": instance})
 
 
 @receiver(models.signals.post_delete, sender=CustomField)
@@ -1024,27 +1022,9 @@ _CELERY_STATE_TO_STATUS: dict[str, PaperlessTask.Status] = {
     "REVOKED": PaperlessTask.Status.REVOKED,
 }
 
-_DOCUMENT_SOURCE_TO_TRIGGER: dict[DocumentSource, PaperlessTask.TriggerSource] = {
-    DocumentSource.ConsumeFolder: PaperlessTask.TriggerSource.FOLDER_CONSUME,
-    DocumentSource.ApiUpload: PaperlessTask.TriggerSource.API_UPLOAD,
-    DocumentSource.MailFetch: PaperlessTask.TriggerSource.EMAIL_CONSUME,
-    DocumentSource.WebUI: PaperlessTask.TriggerSource.WEB_UI,
-}
-
-
-def _get_consume_args(
-    args: tuple,
-    task_kwargs: dict,
-) -> tuple[Any | None, Any | None]:
-    """Extract (input_doc, overrides) from consume_file task arguments."""
-    input_doc = args[0] if args else task_kwargs.get("input_doc")
-    overrides = args[1] if len(args) >= 2 else task_kwargs.get("overrides")
-    return input_doc, overrides
-
 
 def _extract_input_data(
     task_type: PaperlessTask.TaskType,
-    args: tuple,
     task_kwargs: dict,
 ) -> dict:
     """Build the input_data dict stored on the PaperlessTask record.
@@ -1055,8 +1035,9 @@ def _extract_input_data(
     types store no input data and return {}.
     """
     if task_type == PaperlessTask.TaskType.CONSUME_FILE:
-        input_doc, overrides = _get_consume_args(args, task_kwargs)
-        if input_doc is None:  # pragma: no cover
+        input_doc = task_kwargs.get("input_doc")
+        overrides = task_kwargs.get("overrides")
+        if input_doc is None:
             return {}
         data: dict = {
             "filename": input_doc.original_file.name,
@@ -1081,7 +1062,7 @@ def _extract_input_data(
         return data
 
     if task_type == PaperlessTask.TaskType.MAIL_FETCH:
-        account_ids = args[0] if args else task_kwargs.get("account_ids")
+        account_ids = task_kwargs.get("account_ids")
         if account_ids is not None:
             return {"account_ids": account_ids}
         return {}
@@ -1090,67 +1071,32 @@ def _extract_input_data(
 
 
 def _determine_trigger_source(
-    task_type: PaperlessTask.TaskType,
-    args: tuple,
-    task_kwargs: dict,
     headers: dict,
 ) -> PaperlessTask.TriggerSource:
     """Resolve the TriggerSource for a task being published to the broker.
 
-    Priority order:
-    1. Explicit trigger_source header (set by beat schedule or apply_async callers).
-    2. For consume_file tasks, the DocumentSource on the input document.
-    3. MANUAL as the catch-all for all other cases.
+    Reads the trigger_source header set by the caller; falls back to MANUAL
+    when the header is absent or contains an unrecognised value.
     """
-    # Explicit header takes priority -- callers pass a TriggerSource DB value directly.
     header_source = headers.get("trigger_source")
     if header_source is not None:
         try:
             return PaperlessTask.TriggerSource(header_source)
         except ValueError:
             pass
-
-    if task_type == PaperlessTask.TaskType.CONSUME_FILE:
-        input_doc, _ = _get_consume_args(args, task_kwargs)
-        if input_doc is not None:
-            return _DOCUMENT_SOURCE_TO_TRIGGER.get(
-                input_doc.source,
-                PaperlessTask.TriggerSource.API_UPLOAD,
-            )
-
     return PaperlessTask.TriggerSource.MANUAL
 
 
 def _extract_owner_id(
     task_type: PaperlessTask.TaskType,
-    args: tuple,
     task_kwargs: dict,
 ) -> int | None:
     """Return the owner_id from consume_file overrides, or None for all other task types."""
     if task_type != PaperlessTask.TaskType.CONSUME_FILE:
         return None
-    _, overrides = _get_consume_args(args, task_kwargs)
+    overrides = task_kwargs.get("overrides")
     if overrides and hasattr(overrides, "owner_id"):
         return overrides.owner_id
-    return None  # pragma: no cover
-
-
-def _parse_consume_result(result: str) -> dict | None:
-    """Parse a consume_file string result into a structured dict.
-
-    consume_file returns human-readable strings rather than dicts (e.g.
-    "Success. New document id 42 created" or "It is a duplicate of foo (#7)").
-    This function extracts the document ID or duplicate reference so the
-    result can be stored as structured data on the PaperlessTask record.
-    Returns None when the string does not match any known pattern.
-    """
-    if match := _re.search(r"New document id (\d+) created", result):
-        return {"document_id": int(match.group(1))}
-    if match := _re.search(r"It is a duplicate of .* \(#(\d+)\)", result):
-        return {
-            "duplicate_of": int(match.group(1)),
-            "duplicate_in_trash": "existing document is in the trash" in result,
-        }
     return None  # pragma: no cover
 
 
@@ -1177,17 +1123,12 @@ def before_task_publish_handler(
 
     try:
         close_old_connections()
-        args, task_kwargs, _ = body
+        _, task_kwargs, _ = body
         task_id = headers["id"]
 
-        input_data = _extract_input_data(task_type, args, task_kwargs)
-        trigger_source = _determine_trigger_source(
-            task_type,
-            args,
-            task_kwargs,
-            headers,
-        )
-        owner_id = _extract_owner_id(task_type, args, task_kwargs)
+        input_data = _extract_input_data(task_type, task_kwargs)
+        trigger_source = _determine_trigger_source(headers)
+        owner_id = _extract_owner_id(task_type, task_kwargs)
 
         PaperlessTask.objects.create(
             task_id=task_id,
@@ -1235,8 +1176,7 @@ def task_postrun_handler(
     Records task completion and result data for non-failure outcomes.
 
     Skips FAILURE states entirely, since task_failure_handler fires first
-    and fully owns the failure path (status, date_done, duration,
-    result_data, result_message).
+    and fully owns the failure path (status, date_done, duration, result_data).
 
     https://docs.celeryq.dev/en/stable/userguide/signals.html#task-postrun
     """
@@ -1275,10 +1215,9 @@ def task_postrun_handler(
         if isinstance(retval, dict):
             task_instance.result_data = retval
             changed_fields.append("result_data")
-        elif isinstance(retval, str):
-            task_instance.result_message = retval
-            task_instance.result_data = _parse_consume_result(retval)
-            changed_fields.extend(["result_message", "result_data"])
+            if "duplicate_of" in retval:
+                task_instance.status = PaperlessTask.Status.FAILURE
+                changed_fields.append("status")
 
         task_instance.save(update_fields=changed_fields)
     except Exception:  # pragma: no cover
@@ -1321,7 +1260,6 @@ def task_failure_handler(
         update_fields: dict = {
             "status": PaperlessTask.Status.FAILURE,
             "result_data": result_data,
-            "result_message": str(exception) if exception else None,
             "date_done": now,
         }
 
@@ -1399,7 +1337,7 @@ def add_or_update_document_in_llm_index(sender, document, **kwargs):
     if ai_config.llm_index_enabled:
         from documents.tasks import update_document_in_llm_index
 
-        update_document_in_llm_index.delay(document)
+        update_document_in_llm_index.apply_async(kwargs={"document": document})
 
 
 @receiver(models.signals.post_delete, sender=Document)
@@ -1415,4 +1353,4 @@ def delete_document_from_llm_index(
     if ai_config.llm_index_enabled:
         from documents.tasks import remove_document_from_llm_index
 
-        remove_document_from_llm_index.delay(instance)
+        remove_document_from_llm_index.apply_async(kwargs={"document": instance})
