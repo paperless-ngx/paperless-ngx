@@ -25,26 +25,25 @@
 
 <div class="task-controls mb-3 btn-toolbar">
   <div class="task-view-scope btn-group btn-group-sm me-3" role="group">
-    <input type="radio"  class="btn-check"
-    [checked]="selectedSection === TaskSection.All"
-    id="section-all"
-    />
-    <label
-      class="btn btn-outline-primary"
-      for="section-all"
-      (click)="setSection(TaskSection.All)">
+    <input
+      type="radio"
+      class="btn-check"
+      [checked]="selectedSection === TaskSection.All"
+      id="section-all"
+      (click)="setSection(TaskSection.All)"
+      (keydown)="setSection(TaskSection.All)" />
+    <label class="btn btn-outline-primary" for="section-all">
       <ng-container i18n>All</ng-container>
     </label>
     @for (section of sections; track section) {
       <input
-        type="radio" class="btn-check"
+        type="radio"
+        class="btn-check"
         [checked]="selectedSection === section"
         id="section-{{section}}"
-        />
-      <label
-        class="btn btn-outline-primary"
-        [for]="'section-' + section"
-        (click)="setSection(section)">
+        (click)="setSection(section)"
+        (keydown)="setSection(section)" />
+      <label class="btn btn-outline-primary" for="section-{{section}}">
         {{ sectionLabel(section) }}
         @if (sectionCount(section) > 0) {
           <span class="badge ms-2" [class.bg-danger]="section === TaskSection.NeedsAttention" [class.bg-secondary]="section !== TaskSection.NeedsAttention">{{sectionCount(section)}}</span>
@@ -117,7 +116,14 @@
         <tr>
           <th scope="col">
             <div class="form-check">
-              <input type="checkbox" class="form-check-input" [id]="'all-tasks-' + section" [disabled]="tasks.length === 0" [checked]="areAllSelected(tasks)" (click)="toggleSection(section, $event); $event.stopPropagation();">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                [id]="'all-tasks-' + section"
+                [disabled]="tasks.length === 0"
+                [checked]="areAllSelected(tasks)"
+                (click)="toggleSection(section, $event); $event.stopPropagation();"
+                (keydown)="toggleSection(section, $event); $event.stopPropagation();" />
               <label class="form-check-label" [for]="'all-tasks-' + section"></label>
             </div>
           </th>
@@ -135,7 +141,13 @@
           <tr (click)="toggleSelected(task); $event.stopPropagation();">
             <td>
               <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="task{{task.id}}" [checked]="selectedTasks.has(task.id)" (click)="toggleSelected(task); $event.stopPropagation();">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  id="task{{task.id}}"
+                  [checked]="selectedTasks.has(task.id)"
+                  (click)="toggleSelected(task); $event.stopPropagation();"
+                  (keydown)="toggleSelected(task); $event.stopPropagation();" />
                 <label class="form-check-label" for="task{{task.id}}"></label>
               </div>
             </td>
