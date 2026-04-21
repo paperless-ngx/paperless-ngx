@@ -968,7 +968,10 @@ class DocumentViewSet(
                     ),
                 ),
                 "tags",
-                "custom_fields",
+                Prefetch(
+                    "custom_fields",
+                    queryset=CustomFieldInstance.objects.select_related("field"),
+                ),
                 "notes",
             )
         )
