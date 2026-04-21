@@ -223,10 +223,6 @@ export class TasksComponent
     )
   }
 
-  get hasScopedSectionView(): boolean {
-    return this.selectedSection !== ALL_TASK_SECTIONS
-  }
-
   ngOnInit() {
     this.tasksService.reload()
     timer(5000, 5000)
