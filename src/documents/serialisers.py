@@ -3352,13 +3352,13 @@ class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
         ManyToMany fields dont support e.g. on_delete so we need to discard unattached
         triggers and actions manually
         """
-        for trigger in WorkflowTrigger.objects.all():
-            if trigger.workflows.all().count() == 0:
-                trigger.delete()
+        WorkflowTrigger.objects.annotate(
+            workflow_count=Count("workflows"),
+        ).filter(workflow_count=0).delete()
 
-        for action in WorkflowAction.objects.all():
-            if action.workflows.all().count() == 0:
-                action.delete()
+        WorkflowAction.objects.annotate(
+            workflow_count=Count("workflows"),
+        ).filter(workflow_count=0).delete()
 
         WorkflowActionEmail.objects.filter(action=None).delete()
         WorkflowActionWebhook.objects.filter(action=None).delete()
@@ -3386,16 +3386,6 @@ class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
         self.prune_triggers_and_actions()
 
         return instance
-
-    def to_representation(self, instance: Workflow) -> dict[str, Any]:
-        data = super().to_representation(instance)
-        actions = instance.actions.order_by("order", "pk")
-        data["actions"] = WorkflowActionSerializer(
-            actions,
-            many=True,
-            context=self.context,
-        ).data
-        return data
 
 
 class TrashSerializer(SerializerWithPerms):
