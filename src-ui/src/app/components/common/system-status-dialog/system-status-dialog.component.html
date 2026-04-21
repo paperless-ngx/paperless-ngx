@@ -159,11 +159,7 @@
                 <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="indexStatus" triggers="click mouseenter:mouseleave">
                   {{status.tasks.index_status}}
                   @if (status.tasks.index_status === 'OK') {
-                    @if (isStale(status.tasks.index_last_modified)) {
-                      <i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></i-bs>
-                    } @else {
-                      <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
-                    }
+                    <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
                   } @else {
                     <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
                   }
