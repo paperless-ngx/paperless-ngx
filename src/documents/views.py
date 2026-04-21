@@ -4482,8 +4482,44 @@ class WorkflowViewSet(ModelViewSet[Workflow]):
         Workflow.objects.all()
         .order_by("order")
         .prefetch_related(
-            "triggers",
-            "actions",
+            Prefetch(
+                "triggers",
+                queryset=WorkflowTrigger.objects.prefetch_related(
+                    "filter_has_tags",
+                    "filter_has_all_tags",
+                    "filter_has_not_tags",
+                    "filter_has_any_correspondents",
+                    "filter_has_not_correspondents",
+                    "filter_has_any_document_types",
+                    "filter_has_not_document_types",
+                    "filter_has_any_storage_paths",
+                    "filter_has_not_storage_paths",
+                ),
+            ),
+            Prefetch(
+                "actions",
+                queryset=WorkflowAction.objects.order_by(
+                    "order",
+                    "pk",
+                ).prefetch_related(
+                    "assign_tags",
+                    "assign_view_users",
+                    "assign_view_groups",
+                    "assign_change_users",
+                    "assign_change_groups",
+                    "assign_custom_fields",
+                    "remove_tags",
+                    "remove_correspondents",
+                    "remove_document_types",
+                    "remove_storage_paths",
+                    "remove_custom_fields",
+                    "remove_owners",
+                    "remove_view_users",
+                    "remove_view_groups",
+                    "remove_change_users",
+                    "remove_change_groups",
+                ),
+            ),
         )
     )
 
