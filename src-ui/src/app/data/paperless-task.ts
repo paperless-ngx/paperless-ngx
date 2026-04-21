@@ -14,21 +14,6 @@ export enum PaperlessTaskType {
   BulkDelete = 'bulk_delete',
 }
 
-export enum PaperlessTaskTypeFilter {
-  All = 'all',
-  ConsumeFile = PaperlessTaskType.ConsumeFile,
-  TrainClassifier = PaperlessTaskType.TrainClassifier,
-  SanityCheck = PaperlessTaskType.SanityCheck,
-  MailFetch = PaperlessTaskType.MailFetch,
-  LlmIndex = PaperlessTaskType.LlmIndex,
-  EmptyTrash = PaperlessTaskType.EmptyTrash,
-  CheckWorkflows = PaperlessTaskType.CheckWorkflows,
-  BulkUpdate = PaperlessTaskType.BulkUpdate,
-  ReprocessDocument = PaperlessTaskType.ReprocessDocument,
-  BuildShareLink = PaperlessTaskType.BuildShareLink,
-  BulkDelete = PaperlessTaskType.BulkDelete,
-}
-
 export enum PaperlessTaskTriggerSource {
   Scheduled = 'scheduled',
   WebUI = 'web_ui',
@@ -37,17 +22,6 @@ export enum PaperlessTaskTriggerSource {
   EmailConsume = 'email_consume',
   System = 'system',
   Manual = 'manual',
-}
-
-export enum PaperlessTaskTriggerSourceFilter {
-  All = 'all',
-  Scheduled = PaperlessTaskTriggerSource.Scheduled,
-  WebUI = PaperlessTaskTriggerSource.WebUI,
-  ApiUpload = PaperlessTaskTriggerSource.ApiUpload,
-  FolderConsume = PaperlessTaskTriggerSource.FolderConsume,
-  EmailConsume = PaperlessTaskTriggerSource.EmailConsume,
-  System = PaperlessTaskTriggerSource.System,
-  Manual = PaperlessTaskTriggerSource.Manual,
 }
 
 export enum PaperlessTaskStatus {

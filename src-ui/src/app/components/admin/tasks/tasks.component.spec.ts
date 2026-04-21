@@ -17,9 +17,7 @@ import {
   PaperlessTask,
   PaperlessTaskStatus,
   PaperlessTaskTriggerSource,
-  PaperlessTaskTriggerSourceFilter,
   PaperlessTaskType,
-  PaperlessTaskTypeFilter,
 } from 'src/app/data/paperless-task'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
@@ -205,10 +203,8 @@ describe('TasksComponent', () => {
 
   it('should display task sections with counts', () => {
     expect(component.selectedSection).toBe(TaskSection.All)
-    expect(component.selectedTaskType).toBe(PaperlessTaskTypeFilter.All)
-    expect(component.selectedTriggerSource).toBe(
-      PaperlessTaskTriggerSourceFilter.All
-    )
+    expect(component.selectedTaskType).toBeNull()
+    expect(component.selectedTriggerSource).toBeNull()
 
     fixture.detectChanges()
 
@@ -264,10 +260,8 @@ describe('TasksComponent', () => {
     component.resetFilters()
 
     expect(component.selectedSection).toBe(TaskSection.InProgress)
-    expect(component.selectedTaskType).toBe(PaperlessTaskTypeFilter.All)
-    expect(component.selectedTriggerSource).toBe(
-      PaperlessTaskTriggerSourceFilter.All
-    )
+    expect(component.selectedTaskType).toBeNull()
+    expect(component.selectedTriggerSource).toBeNull()
     expect(component.filterText).toBe('')
     expect(component.isFiltered).toBe(false)
   })

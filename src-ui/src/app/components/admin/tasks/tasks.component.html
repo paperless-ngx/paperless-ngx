@@ -56,7 +56,7 @@
   <div ngbDropdown>
     <button class="btn btn-sm btn-outline-primary me-3" ngbDropdownToggle>{{selectedTaskTypeLabel}}</button>
     <div class="dropdown-menu shadow" ngbDropdownMenu>
-      <button ngbDropdownItem [class.active]="selectedTaskType === PaperlessTaskTypeFilter.All" (click)="setTaskType(PaperlessTaskTypeFilter.All)" i18n>All types</button>
+      <button ngbDropdownItem [class.active]="selectedTaskType === null" (click)="setTaskType(null)" i18n>All types</button>
       @for (option of taskTypeOptions; track option.value) {
         <button ngbDropdownItem [class.active]="selectedTaskType === option.value" [disabled]="isTaskTypeOptionDisabled(option.value)" (click)="setTaskType(option.value)">{{option.label}}</button>
       }
@@ -65,7 +65,7 @@
   <div ngbDropdown>
     <button class="btn btn-sm btn-outline-primary me-3" ngbDropdownToggle>{{selectedTriggerSourceLabel}}</button>
     <div class="dropdown-menu shadow" ngbDropdownMenu>
-      <button ngbDropdownItem [class.active]="selectedTriggerSource === PaperlessTaskTriggerSourceFilter.All" (click)="setTriggerSource(PaperlessTaskTriggerSourceFilter.All)" i18n>All sources</button>
+      <button ngbDropdownItem [class.active]="selectedTriggerSource === null" (click)="setTriggerSource(null)" i18n>All sources</button>
       @for (option of triggerSourceOptions; track option.value) {
         <button ngbDropdownItem [class.active]="selectedTriggerSource === option.value" [disabled]="isTriggerSourceOptionDisabled(option.value)" (click)="setTriggerSource(option.value)">{{option.label}}</button>
       }
