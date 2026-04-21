@@ -94,10 +94,16 @@ main {
   }
 
   .sidebar.slim:not(.animating) {
+    transition: none;
+
     li.nav-item span,
     .sidebar-heading span {
       display: none;
     }
+  }
+
+  .sidebar.slim:not(.animating) ~ main.col-slim {
+    transition: none;
   }
 
   .sidebar.animating {
