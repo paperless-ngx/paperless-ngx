@@ -26,13 +26,13 @@
 <div class="task-controls mb-3 btn-toolbar">
   <div class="task-view-scope btn-group btn-group-sm me-3" role="group">
     <input type="radio"  class="btn-check"
-    [checked]="selectedSection === allTaskSections"
+    [checked]="selectedSection === TaskSection.All"
     id="section-all"
     />
     <label
       class="btn btn-outline-primary"
       for="section-all"
-      (click)="setSection(allTaskSections)">
+      (click)="setSection(TaskSection.All)">
       <ng-container i18n>All</ng-container>
     </label>
     @for (section of sections; track section) {
@@ -56,7 +56,7 @@
   <div ngbDropdown>
     <button class="btn btn-sm btn-outline-primary me-3" ngbDropdownToggle>{{selectedTaskTypeLabel}}</button>
     <div class="dropdown-menu shadow" ngbDropdownMenu>
-      <button ngbDropdownItem [class.active]="selectedTaskType === allFilterValue" (click)="setTaskType(allFilterValue)" i18n>All types</button>
+      <button ngbDropdownItem [class.active]="selectedTaskType === PaperlessTaskTypeFilter.All" (click)="setTaskType(PaperlessTaskTypeFilter.All)" i18n>All types</button>
       @for (option of taskTypeOptions; track option.value) {
         <button ngbDropdownItem [class.active]="selectedTaskType === option.value" [disabled]="isTaskTypeOptionDisabled(option.value)" (click)="setTaskType(option.value)">{{option.label}}</button>
       }
@@ -65,7 +65,7 @@
   <div ngbDropdown>
     <button class="btn btn-sm btn-outline-primary me-3" ngbDropdownToggle>{{selectedTriggerSourceLabel}}</button>
     <div class="dropdown-menu shadow" ngbDropdownMenu>
-      <button ngbDropdownItem [class.active]="selectedTriggerSource === allFilterValue" (click)="setTriggerSource(allFilterValue)" i18n>All sources</button>
+      <button ngbDropdownItem [class.active]="selectedTriggerSource === PaperlessTaskTriggerSourceFilter.All" (click)="setTriggerSource(PaperlessTaskTriggerSourceFilter.All)" i18n>All sources</button>
       @for (option of triggerSourceOptions; track option.value) {
         <button ngbDropdownItem [class.active]="selectedTriggerSource === option.value" [disabled]="isTriggerSourceOptionDisabled(option.value)" (click)="setTriggerSource(option.value)">{{option.label}}</button>
       }

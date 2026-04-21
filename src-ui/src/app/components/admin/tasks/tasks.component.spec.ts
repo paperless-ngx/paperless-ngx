@@ -17,7 +17,9 @@ import {
   PaperlessTask,
   PaperlessTaskStatus,
   PaperlessTaskTriggerSource,
+  PaperlessTaskTriggerSourceFilter,
   PaperlessTaskType,
+  PaperlessTaskTypeFilter,
 } from 'src/app/data/paperless-task'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
@@ -28,12 +30,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
-import {
-  ALL_FILTER_VALUE,
-  ALL_TASK_SECTIONS,
-  TasksComponent,
-  TaskSection,
-} from './tasks.component'
+import { TasksComponent, TaskSection } from './tasks.component'
 
 const tasks: PaperlessTask[] = [
   {
@@ -207,9 +204,11 @@ describe('TasksComponent', () => {
   })
 
   it('should display task sections with counts', () => {
-    expect(component.selectedSection).toBe(ALL_TASK_SECTIONS)
-    expect(component.selectedTaskType).toBe(ALL_FILTER_VALUE)
-    expect(component.selectedTriggerSource).toBe(ALL_FILTER_VALUE)
+    expect(component.selectedSection).toBe(TaskSection.All)
+    expect(component.selectedTaskType).toBe(PaperlessTaskTypeFilter.All)
+    expect(component.selectedTriggerSource).toBe(
+      PaperlessTaskTriggerSourceFilter.All
+    )
 
     fixture.detectChanges()
 
@@ -265,8 +264,10 @@ describe('TasksComponent', () => {
     component.resetFilters()
 
     expect(component.selectedSection).toBe(TaskSection.InProgress)
-    expect(component.selectedTaskType).toBe(ALL_FILTER_VALUE)
-    expect(component.selectedTriggerSource).toBe(ALL_FILTER_VALUE)
+    expect(component.selectedTaskType).toBe(PaperlessTaskTypeFilter.All)
+    expect(component.selectedTriggerSource).toBe(
+      PaperlessTaskTriggerSourceFilter.All
+    )
     expect(component.filterText).toBe('')
     expect(component.isFiltered).toBe(false)
   })

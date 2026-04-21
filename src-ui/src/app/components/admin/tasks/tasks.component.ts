@@ -21,8 +21,8 @@ import {
 import {
   PaperlessTask,
   PaperlessTaskStatus,
-  PaperlessTaskTriggerSource,
-  PaperlessTaskType,
+  PaperlessTaskTriggerSourceFilter,
+  PaperlessTaskTypeFilter,
 } from 'src/app/data/paperless-task'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -33,6 +33,7 @@ import { PageHeaderComponent } from '../../common/page-header/page-header.compon
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 export enum TaskSection {
+  All = 'all',
   NeedsAttention = 'needs_attention',
   InProgress = 'in_progress',
   Completed = 'completed',
@@ -48,55 +49,80 @@ const FILTER_TARGETS = [
   { id: TaskFilterTargetID.Result, name: $localize`Result` },
 ]
 
-export const ALL_FILTER_VALUE = 'all'
-export const ALL_TASK_SECTIONS = ALL_FILTER_VALUE
-
 const SECTION_LABELS = {
+  [TaskSection.All]: $localize`All`,
   [TaskSection.NeedsAttention]: $localize`Needs attention`,
   [TaskSection.InProgress]: $localize`In progress`,
   [TaskSection.Completed]: $localize`Recently completed`,
 }
 
-const TASK_TYPE_OPTIONS = [
-  { value: PaperlessTaskType.ConsumeFile, label: $localize`Consume File` },
+const TASK_TYPE_OPTIONS: Array<{
+  value: PaperlessTaskTypeFilter
+  label: string
+}> = [
   {
-    value: PaperlessTaskType.TrainClassifier,
+    value: PaperlessTaskTypeFilter.ConsumeFile,
+    label: $localize`Consume File`,
+  },
+  {
+    value: PaperlessTaskTypeFilter.TrainClassifier,
     label: $localize`Train Classifier`,
   },
-  { value: PaperlessTaskType.SanityCheck, label: $localize`Sanity Check` },
-  { value: PaperlessTaskType.MailFetch, label: $localize`Mail Fetch` },
-  { value: PaperlessTaskType.LlmIndex, label: $localize`LLM Index` },
-  { value: PaperlessTaskType.EmptyTrash, label: $localize`Empty Trash` },
   {
-    value: PaperlessTaskType.CheckWorkflows,
+    value: PaperlessTaskTypeFilter.SanityCheck,
+    label: $localize`Sanity Check`,
+  },
+  { value: PaperlessTaskTypeFilter.MailFetch, label: $localize`Mail Fetch` },
+  { value: PaperlessTaskTypeFilter.LlmIndex, label: $localize`LLM Index` },
+  {
+    value: PaperlessTaskTypeFilter.EmptyTrash,
+    label: $localize`Empty Trash`,
+  },
+  {
+    value: PaperlessTaskTypeFilter.CheckWorkflows,
     label: $localize`Check Workflows`,
   },
-  { value: PaperlessTaskType.BulkUpdate, label: $localize`Bulk Update` },
   {
-    value: PaperlessTaskType.ReprocessDocument,
+    value: PaperlessTaskTypeFilter.BulkUpdate,
+    label: $localize`Bulk Update`,
+  },
+  {
+    value: PaperlessTaskTypeFilter.ReprocessDocument,
     label: $localize`Reprocess Document`,
   },
   {
-    value: PaperlessTaskType.BuildShareLink,
+    value: PaperlessTaskTypeFilter.BuildShareLink,
     label: $localize`Build Share Link`,
   },
-  { value: PaperlessTaskType.BulkDelete, label: $localize`Bulk Delete` },
+  {
+    value: PaperlessTaskTypeFilter.BulkDelete,
+    label: $localize`Bulk Delete`,
+  },
 ]
 
-const TRIGGER_SOURCE_OPTIONS = [
-  { value: PaperlessTaskTriggerSource.Scheduled, label: $localize`Scheduled` },
-  { value: PaperlessTaskTriggerSource.WebUI, label: $localize`Web UI` },
-  { value: PaperlessTaskTriggerSource.ApiUpload, label: $localize`API Upload` },
+const TRIGGER_SOURCE_OPTIONS: Array<{
+  value: PaperlessTaskTriggerSourceFilter
+  label: string
+}> = [
   {
-    value: PaperlessTaskTriggerSource.FolderConsume,
+    value: PaperlessTaskTriggerSourceFilter.Scheduled,
+    label: $localize`Scheduled`,
+  },
+  { value: PaperlessTaskTriggerSourceFilter.WebUI, label: $localize`Web UI` },
+  {
+    value: PaperlessTaskTriggerSourceFilter.ApiUpload,
+    label: $localize`API Upload`,
+  },
+  {
+    value: PaperlessTaskTriggerSourceFilter.FolderConsume,
     label: $localize`Folder Consume`,
   },
   {
-    value: PaperlessTaskTriggerSource.EmailConsume,
+    value: PaperlessTaskTriggerSourceFilter.EmailConsume,
     label: $localize`Email Consume`,
   },
-  { value: PaperlessTaskTriggerSource.System, label: $localize`System` },
-  { value: PaperlessTaskTriggerSource.Manual, label: $localize`Manual` },
+  { value: PaperlessTaskTriggerSourceFilter.System, label: $localize`System` },
+  { value: PaperlessTaskTriggerSourceFilter.Manual, label: $localize`Manual` },
 ]
 
 @Component({
@@ -127,20 +153,20 @@ export class TasksComponent
   private readonly toastService = inject(ToastService)
 
   readonly TaskSection = TaskSection
+  readonly PaperlessTaskTypeFilter = PaperlessTaskTypeFilter
+  readonly PaperlessTaskTriggerSourceFilter = PaperlessTaskTriggerSourceFilter
   readonly sections = [
     TaskSection.NeedsAttention,
     TaskSection.InProgress,
     TaskSection.Completed,
   ]
-  readonly allTaskSections = ALL_TASK_SECTIONS
-  readonly allFilterValue = ALL_FILTER_VALUE
   public selectedTasks: Set<number> = new Set()
   public expandedTask: number
   public autoRefreshEnabled: boolean = true
-  public selectedSection: TaskSection | typeof ALL_TASK_SECTIONS =
-    ALL_TASK_SECTIONS
-  public selectedTaskType: string = ALL_FILTER_VALUE
-  public selectedTriggerSource: string = ALL_FILTER_VALUE
+  public selectedSection: TaskSection = TaskSection.All
+  public selectedTaskType: PaperlessTaskTypeFilter = PaperlessTaskTypeFilter.All
+  public selectedTriggerSource: PaperlessTaskTriggerSourceFilter =
+    PaperlessTaskTriggerSourceFilter.All
 
   private _filterText: string = ''
   get filterText() {
@@ -160,16 +186,22 @@ export class TasksComponent
     return FILTER_TARGETS
   }
 
-  public get taskTypeOptions(): Array<{ value: string; label: string }> {
+  public get taskTypeOptions(): Array<{
+    value: PaperlessTaskTypeFilter
+    label: string
+  }> {
     return TASK_TYPE_OPTIONS
   }
 
-  public get triggerSourceOptions(): Array<{ value: string; label: string }> {
+  public get triggerSourceOptions(): Array<{
+    value: PaperlessTaskTriggerSourceFilter
+    label: string
+  }> {
     return TRIGGER_SOURCE_OPTIONS
   }
 
   public get selectedTaskTypeLabel(): string {
-    if (this.selectedTaskType === ALL_FILTER_VALUE) {
+    if (this.selectedTaskType === PaperlessTaskTypeFilter.All) {
       return $localize`All types`
     }
 
@@ -181,7 +213,7 @@ export class TasksComponent
   }
 
   public get selectedTriggerSourceLabel(): string {
-    if (this.selectedTriggerSource === ALL_FILTER_VALUE) {
+    if (this.selectedTriggerSource === PaperlessTaskTriggerSourceFilter.All) {
       return $localize`All sources`
     }
 
@@ -200,7 +232,7 @@ export class TasksComponent
 
   get visibleSections(): TaskSection[] {
     const sections =
-      this.selectedSection === ALL_TASK_SECTIONS
+      this.selectedSection === TaskSection.All
         ? this.sections
         : [this.selectedSection]
 
@@ -217,8 +249,8 @@ export class TasksComponent
 
   get isFiltered(): boolean {
     return (
-      this.selectedTaskType !== ALL_FILTER_VALUE ||
-      this.selectedTriggerSource !== ALL_FILTER_VALUE ||
+      this.selectedTaskType !== PaperlessTaskTypeFilter.All ||
+      this.selectedTriggerSource !== PaperlessTaskTriggerSourceFilter.All ||
       this._filterText.length > 0
     )
   }
@@ -400,34 +432,38 @@ export class TasksComponent
     return section !== TaskSection.InProgress
   }
 
-  setSection(section: TaskSection | typeof ALL_TASK_SECTIONS) {
+  setSection(section: TaskSection) {
     this.selectedSection = section
     this.clearSelection()
   }
 
-  setTaskType(taskType: string) {
+  setTaskType(taskType: PaperlessTaskTypeFilter) {
     this.selectedTaskType = taskType
     this.clearSelection()
   }
 
-  setTriggerSource(triggerSource: string) {
+  setTriggerSource(triggerSource: PaperlessTaskTriggerSourceFilter) {
     this.selectedTriggerSource = triggerSource
     this.clearSelection()
   }
 
-  taskTypeOptionCount(taskType: string): number {
+  taskTypeOptionCount(taskType: PaperlessTaskTypeFilter): number {
     return this.tasksForOptionCounts({ taskType }).length
   }
 
-  triggerSourceOptionCount(triggerSource: string): number {
+  triggerSourceOptionCount(
+    triggerSource: PaperlessTaskTriggerSourceFilter
+  ): number {
     return this.tasksForOptionCounts({ triggerSource }).length
   }
 
-  isTaskTypeOptionDisabled(taskType: string): boolean {
+  isTaskTypeOptionDisabled(taskType: PaperlessTaskTypeFilter): boolean {
     return this.taskTypeOptionCount(taskType) === 0
   }
 
-  isTriggerSourceOptionDisabled(triggerSource: string): boolean {
+  isTriggerSourceOptionDisabled(
+    triggerSource: PaperlessTaskTriggerSourceFilter
+  ): boolean {
     return this.triggerSourceOptionCount(triggerSource) === 0
   }
 
@@ -440,8 +476,8 @@ export class TasksComponent
   }
 
   public resetFilters() {
-    this.selectedTaskType = ALL_FILTER_VALUE
-    this.selectedTriggerSource = ALL_FILTER_VALUE
+    this.selectedTaskType = PaperlessTaskTypeFilter.All
+    this.selectedTriggerSource = PaperlessTaskTriggerSourceFilter.All
     this.resetFilter()
     this.clearSelection()
   }
@@ -487,16 +523,19 @@ export class TasksComponent
       taskType,
       triggerSource,
     }: {
-      taskType: string
-      triggerSource: string
+      taskType: PaperlessTaskTypeFilter
+      triggerSource: PaperlessTaskTriggerSourceFilter
     }
   ): boolean {
-    if (taskType !== ALL_FILTER_VALUE && task.task_type !== taskType) {
+    if (
+      taskType !== PaperlessTaskTypeFilter.All &&
+      task.task_type !== taskType
+    ) {
       return false
     }
 
     if (
-      triggerSource !== ALL_FILTER_VALUE &&
+      triggerSource !== PaperlessTaskTriggerSourceFilter.All &&
       task.trigger_source !== triggerSource
     ) {
       return false
@@ -525,11 +564,11 @@ export class TasksComponent
     taskType = this.selectedTaskType,
     triggerSource = this.selectedTriggerSource,
   }: {
-    taskType?: string
-    triggerSource?: string
+    taskType?: PaperlessTaskTypeFilter
+    triggerSource?: PaperlessTaskTriggerSourceFilter
   }): PaperlessTask[] {
     const sections =
-      this.selectedSection === ALL_TASK_SECTIONS
+      this.selectedSection === TaskSection.All
         ? this.sections
         : [this.selectedSection]
 
