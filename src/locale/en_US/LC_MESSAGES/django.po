@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-21 17:25+0000\n"
+"POT-Creation-Date: 2026-04-21 18:02+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr ""
 
-#: documents/filters.py:433
+#: documents/filters.py:463
 msgid "Value must be valid JSON."
 msgstr ""
 
-#: documents/filters.py:452
+#: documents/filters.py:482
 msgid "Invalid custom field query expression"
 msgstr ""
 
-#: documents/filters.py:462
+#: documents/filters.py:492
 msgid "Invalid expression list. Must be nonempty."
 msgstr ""
 
-#: documents/filters.py:483
+#: documents/filters.py:513
 msgid "Invalid logical operator {op!r}"
 msgstr ""
 
-#: documents/filters.py:497
+#: documents/filters.py:527
 msgid "Maximum number of query conditions exceeded."
 msgstr ""
 
-#: documents/filters.py:562
+#: documents/filters.py:591
 msgid "{name!r} is not a valid custom field."
 msgstr ""
 
-#: documents/filters.py:599
+#: documents/filters.py:628
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr ""
 
-#: documents/filters.py:707 documents/models.py:136
+#: documents/filters.py:743 documents/models.py:136
 msgid "Maximum nesting depth exceeded."
 msgstr ""
 
-#: documents/filters.py:954
+#: documents/filters.py:990
 msgid "Custom field not found"
 msgstr ""
 
