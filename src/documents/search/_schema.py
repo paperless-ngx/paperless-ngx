@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 import shutil
 from typing import TYPE_CHECKING
@@ -100,9 +101,9 @@ def needs_rebuild(index_dir: Path) -> bool:
     """
     Check if the search index needs rebuilding.
 
-    Compares the current schema version and search language configuration
-    against sentinel files to determine if the index is compatible with
-    the current paperless-ngx version and settings.
+    Reads .index_settings.json to compare the stored schema version and
+    search language against the current configuration. Returns True if the
+    file is missing, unparsable, or either value mismatches.
 
     Args:
         index_dir: Path to the search index directory
@@ -110,24 +111,19 @@ def needs_rebuild(index_dir: Path) -> bool:
     Returns:
         True if the index needs rebuilding, False if it's up to date
     """
-    version_file = index_dir / ".schema_version"
-    if not version_file.exists():
+    settings_file = index_dir / ".index_settings.json"
+    if not settings_file.exists():
         return True
     try:
-        if int(version_file.read_text().strip()) != SCHEMA_VERSION:
+        data = json.loads(settings_file.read_text())
+        if data.get("schema_version") != SCHEMA_VERSION:
             logger.info("Search index schema version mismatch - rebuilding.")
+            return True
+        if "language" not in data or data["language"] != settings.SEARCH_LANGUAGE:
+            logger.info("Search index language changed - rebuilding.")
             return True
     except ValueError:
         return True
-
-    language_file = index_dir / ".schema_language"
-    if not language_file.exists():
-        logger.info("Search index language sentinel missing - rebuilding.")
-        return True
-    if language_file.read_text().strip() != (settings.SEARCH_LANGUAGE or ""):
-        logger.info("Search index language changed - rebuilding.")
-        return True
-
     return False
 
 
@@ -149,9 +145,16 @@ def wipe_index(index_dir: Path) -> None:
 
 
 def _write_sentinels(index_dir: Path) -> None:
-    """Write schema version and language sentinel files so the next index open can skip rebuilding."""
-    (index_dir / ".schema_version").write_text(str(SCHEMA_VERSION))
-    (index_dir / ".schema_language").write_text(settings.SEARCH_LANGUAGE or "")
+    """Write .index_settings.json so the next index open can skip rebuilding."""
+    settings_file = index_dir / ".index_settings.json"
+    settings_file.write_text(
+        json.dumps(
+            {
+                "schema_version": SCHEMA_VERSION,
+                "language": settings.SEARCH_LANGUAGE,
+            },
+        ),
+    )
 
 
 def open_or_rebuild_index(index_dir: Path | None = None) -> tantivy.Index:
