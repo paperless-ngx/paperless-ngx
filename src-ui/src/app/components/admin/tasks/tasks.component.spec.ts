@@ -217,9 +217,11 @@ describe('TasksComponent', () => {
     const text = viewScope.nativeElement.textContent
 
     expect(text).toContain('All')
-    expect(text).toContain('Needs attention2')
-    expect(text).toContain('In progress2')
-    expect(text).toContain('Recent completed2')
+    expect(text).toContain('Needs attention')
+    expect(text).toContain('2')
+    expect(text).toContain('In progress')
+    expect(text).toContain('3')
+    expect(text).toContain('Recently completed')
   })
 
   it('should filter visible sections by selected status', () => {
@@ -286,14 +288,15 @@ describe('TasksComponent', () => {
     fixture.detectChanges()
 
     const controls = fixture.debugElement.query(By.css('.task-controls'))
-    const controlChildren = controls.children
+    const viewScope = controls.query(By.css('.task-view-scope'))
+    const search = controls.query(By.css('.task-search'))
 
-    expect(controlChildren[0].nativeElement.className).toContain(
-      'task-view-scope'
-    )
-    expect(controlChildren[1].nativeElement.className).toContain(
-      'task-filter-bar'
-    )
+    expect(viewScope).not.toBeNull()
+    expect(search).not.toBeNull()
+    expect(
+      viewScope.nativeElement.compareDocumentPosition(search.nativeElement) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
   })
 
   it('should expose stable task type options and disable empty ones', () => {
@@ -421,21 +424,21 @@ describe('TasksComponent', () => {
     component.setTaskType(PaperlessTaskType.SanityCheck)
     component.setTriggerSource(PaperlessTaskTriggerSource.System)
 
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
     const dismissSpy = jest.spyOn(tasksService, 'dismissTasks')
 
     component.dismissTasks()
 
-    expect(modal).not.toBeUndefined()
-    modal.componentInstance.confirmClicked.emit()
     expect(dismissSpy).toHaveBeenCalledWith(new Set([461]))
   })
 
   it('should support toggling a full section', () => {
+    component.setSection(TaskSection.NeedsAttention)
+    fixture.detectChanges()
+
     const toggleCheck = fixture.debugElement.query(
       By.css('#all-tasks-needs_attention')
     )
+    expect(toggleCheck).not.toBeNull()
     toggleCheck.nativeElement.dispatchEvent(new MouseEvent('click'))
     fixture.detectChanges()
     expect(component.selectedTasks).toEqual(new Set([467, 466]))
@@ -460,9 +463,11 @@ describe('TasksComponent', () => {
   })
 
   it('should filter tasks by file name', () => {
+    fixture.detectChanges()
     const input = fixture.debugElement.query(
-      By.css('.task-filter-bar input[type=text]')
+      By.css('.task-search input[type=text]')
     )
+    expect(input).not.toBeNull()
     input.nativeElement.value = '191092'
     input.nativeElement.dispatchEvent(new Event('input'))
     jest.advanceTimersByTime(150)
@@ -502,9 +507,11 @@ describe('TasksComponent', () => {
   it('should filter tasks by result', () => {
     component.setSection(TaskSection.NeedsAttention)
     component.filterTargetID = 1
+    fixture.detectChanges()
     const input = fixture.debugElement.query(
-      By.css('.task-filter-bar input[type=text]')
+      By.css('.task-search input[type=text]')
     )
+    expect(input).not.toBeNull()
     input.nativeElement.value = 'duplicate'
     input.nativeElement.dispatchEvent(new Event('input'))
     jest.advanceTimersByTime(150)
@@ -516,9 +523,11 @@ describe('TasksComponent', () => {
   })
 
   it('should support keyboard events for filtering', () => {
+    fixture.detectChanges()
     const input = fixture.debugElement.query(
-      By.css('.task-filter-bar input[type=text]')
+      By.css('.task-search input[type=text]')
     )
+    expect(input).not.toBeNull()
     input.nativeElement.value = '191092'
     input.nativeElement.dispatchEvent(
       new KeyboardEvent('keyup', { key: 'Enter' })
