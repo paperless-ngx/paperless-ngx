@@ -99,6 +99,40 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             self.action.assign_correspondent.pk,
         )
 
+    def test_api_get_workflow_actions_ordered(self) -> None:
+        """
+        GIVEN:
+            - A workflow with two actions added in reverse order (order=1 before order=0)
+        WHEN:
+            - API is called to get workflows
+        THEN:
+            - Actions are returned sorted by order ascending
+        """
+        # Created before action_first so its pk is lower — ensures pk order
+        # disagrees with the order field, catching regressions if order_by is removed.
+        action_second = WorkflowAction.objects.create(
+            assign_title="Second action",
+            order=1,
+        )
+        action_first = WorkflowAction.objects.create(
+            assign_title="First action",
+            order=0,
+        )
+        self.workflow.actions.add(action_second)
+        self.workflow.actions.add(action_first)
+
+        response = self.client.get(self.ENDPOINT, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        resp_actions = response.data["results"][0]["actions"]
+        action_ids = [a["id"] for a in resp_actions]
+        self.assertIn(action_first.id, action_ids)
+        self.assertIn(action_second.id, action_ids)
+        self.assertLess(
+            action_ids.index(action_first.id),
+            action_ids.index(action_second.id),
+        )
+
     def test_api_create_workflow(self) -> None:
         """
         GIVEN:
