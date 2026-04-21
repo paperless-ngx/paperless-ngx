@@ -306,6 +306,12 @@ describe('TasksComponent', () => {
     ).toBe(false)
   })
 
+  it('should fall back to the raw selected task type label when no option matches', () => {
+    component.selectedTaskType = 'unknown_task_type' as PaperlessTaskType
+
+    expect(component.selectedTaskTypeLabel).toBe('unknown_task_type')
+  })
+
   it('should expose stable trigger source options and disable empty ones', () => {
     expect(
       component.triggerSourceOptions.map((option) => option.value)
@@ -320,6 +326,13 @@ describe('TasksComponent', () => {
         PaperlessTaskTriggerSource.EmailConsume
       )
     ).toBe(false)
+  })
+
+  it('should fall back to the raw selected trigger source label when no option matches', () => {
+    component.selectedTriggerSource =
+      'unknown_trigger_source' as PaperlessTaskTriggerSource
+
+    expect(component.selectedTriggerSourceLabel).toBe('unknown_trigger_source')
   })
 
   it('should support expanding / collapsing one task at a time', () => {
@@ -451,6 +464,17 @@ describe('TasksComponent', () => {
     expect(component.selectedTasks).toEqual(new Set([467, 466]))
   })
 
+  it('should remove a full section from selection when toggled off', () => {
+    component.setSection(TaskSection.NeedsAttention)
+    component.selectedTasks = new Set([467, 466])
+
+    component.toggleSection(TaskSection.NeedsAttention, {
+      target: { checked: false },
+    } as PointerEvent)
+
+    expect(component.selectedTasks).toEqual(new Set())
+  })
+
   it('should support dismiss and open a document', () => {
     const routerSpy = jest.spyOn(router, 'navigate')
     component.dismissAndGo(tasks[3])
@@ -527,6 +551,42 @@ describe('TasksComponent', () => {
     expect(component.tasksForSection(TaskSection.NeedsAttention)).toHaveLength(
       2
     )
+  })
+
+  it('should prefer explicit reason in the result message', () => {
+    expect(
+      component.taskResultMessage({
+        ...tasks[0],
+        result_data: { reason: 'Manual review required', duplicate_of: 311 },
+      })
+    ).toBe('Manual review required')
+  })
+
+  it('should return null preview and popover text when there is no result message', () => {
+    expect(component.taskResultPreview(tasks[2])).toBeNull()
+    expect(component.taskResultPopoverMessage(tasks[2])).toBe('')
+    expect(component.taskResultMessageOverflowsPopover(tasks[2])).toBe(false)
+  })
+
+  it('should navigate to a duplicate document details page', () => {
+    const routerSpy = jest.spyOn(router, 'navigate')
+
+    component.openDuplicateDocument(99)
+
+    expect(routerSpy).toHaveBeenCalledWith(['documents', 99, 'details'])
+  })
+
+  it('should report when a result message overflows the popover limit', () => {
+    const longMessage = 'x'.repeat(350)
+    const task = {
+      ...tasks[0],
+      result_data: { error_message: longMessage },
+    }
+
+    expect(component.taskResultPopoverMessage(task)).toBe(
+      longMessage.slice(0, 300)
+    )
+    expect(component.taskResultMessageOverflowsPopover(task)).toBe(true)
   })
 
   it('should support keyboard events for filtering', () => {

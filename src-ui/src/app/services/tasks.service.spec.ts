@@ -136,6 +136,57 @@ describe('TasksService', () => {
     expect(tasksService.startedFileTasks).toHaveLength(1)
   })
 
+  it('includes revoked tasks in needs attention', () => {
+    const mockTasks = [
+      {
+        task_type: PaperlessTaskType.SanityCheck,
+        trigger_source: PaperlessTaskTriggerSource.System,
+        status: PaperlessTaskStatus.Failure,
+        acknowledged: false,
+        task_id: '1235',
+        input_data: {},
+        date_created: new Date(),
+        related_document_ids: [],
+      },
+      {
+        task_type: PaperlessTaskType.MailFetch,
+        trigger_source: PaperlessTaskTriggerSource.Scheduled,
+        status: PaperlessTaskStatus.Revoked,
+        acknowledged: false,
+        task_id: '1236',
+        input_data: {},
+        date_created: new Date(),
+        related_document_ids: [],
+      },
+      {
+        task_type: PaperlessTaskType.EmptyTrash,
+        trigger_source: PaperlessTaskTriggerSource.Manual,
+        status: PaperlessTaskStatus.Success,
+        acknowledged: false,
+        task_id: '1238',
+        input_data: {},
+        date_created: new Date(),
+        related_document_ids: [],
+      },
+    ]
+
+    tasksService.reload()
+
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}tasks/?acknowledged=false`
+    )
+
+    req.flush(mockTasks)
+
+    expect(tasksService.needsAttentionTasks).toHaveLength(2)
+    expect(tasksService.needsAttentionTasks.map((task) => task.status)).toEqual(
+      expect.arrayContaining([
+        PaperlessTaskStatus.Failure,
+        PaperlessTaskStatus.Revoked,
+      ])
+    )
+  })
+
   it('supports running tasks', () => {
     tasksService.run(PaperlessTaskType.SanityCheck).subscribe((res) => {
       expect(res).toEqual({
