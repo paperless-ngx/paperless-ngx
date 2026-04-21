@@ -124,7 +124,7 @@
                 [checked]="areAllSelected(tasks)"
                 (click)="toggleSection(section, $event); $event.stopPropagation();"
                 (keydown)="toggleSection(section, $event); $event.stopPropagation();" />
-              <label class="form-check-label" for="all-tasks-{{section}}"></label>
+              <label class="form-check-label" for="all-tasks-{{section}}"><span class="visually-hidden">Check all</span></label>
             </div>
           </th>
           <th scope="col" i18n>Name</th>
