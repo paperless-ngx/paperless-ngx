@@ -629,6 +629,40 @@ class TestSummaryPermissions:
         total = sum(item["total_count"] for item in response.data)
         assert total == 1
 
+    def test_regular_user_summary_scoped_to_own_and_unowned_tasks(
+        self,
+        user_client: APIClient,
+        regular_user: User,
+        admin_user: User,
+    ) -> None:
+        """A regular user with view_paperlesstask but not view_system_status sees only
+        their own tasks and unowned tasks in the summary, not other users' tasks."""
+        regular_user.user_permissions.add(
+            Permission.objects.get(codename="view_paperlesstask"),
+        )
+
+        PaperlessTaskFactory(
+            owner=regular_user,
+            task_type=PaperlessTask.TaskType.CONSUME_FILE,
+            status=PaperlessTask.Status.SUCCESS,
+        )
+        PaperlessTaskFactory(
+            owner=None,
+            task_type=PaperlessTask.TaskType.CONSUME_FILE,
+            status=PaperlessTask.Status.SUCCESS,
+        )
+        PaperlessTaskFactory(  # other user's task — must not appear
+            owner=admin_user,
+            task_type=PaperlessTask.TaskType.CONSUME_FILE,
+            status=PaperlessTask.Status.SUCCESS,
+        )
+
+        response = user_client.get(ENDPOINT + "summary/")
+
+        assert response.status_code == status.HTTP_200_OK
+        total = sum(item["total_count"] for item in response.data)
+        assert total == 2
+
     def test_unauthenticated_cannot_access_summary(
         self,
         rest_api_client: APIClient,
