@@ -261,7 +261,7 @@ export class PermissionsSelectComponent
     // Global statistics and system status only support view
     if (
       type === PermissionType.GlobalStatistics ||
-      type === PermissionType.SystemStatus
+      type === PermissionType.SystemMonitoring
     ) {
       return action === PermissionAction.View
     }

@@ -100,6 +100,14 @@ class TestTasksSummarySchema:
             "summary items must have 'total_count' (TaskSummarySerializer)"
         )
 
+    def test_summary_days_parameter_constraints(self, api_schema: SchemaGenerator):
+        op = api_schema["paths"]["/api/tasks/summary/"]["get"]
+        params = {p["name"]: p for p in op.get("parameters", [])}
+        assert "days" in params, "days query parameter must be declared"
+        schema = params["days"]["schema"]
+        assert schema.get("minimum") == 1, "days must have minimum: 1"
+        assert schema.get("maximum") == 365, "days must have maximum: 365"
+
 
 class TestTasksActiveSchema:
     """tasks_active_retrieve: response must be an array of TaskSerializerV10."""

@@ -3844,10 +3844,10 @@ class RemoteVersionView(GenericAPIView[Any]):
         parameters=[
             OpenApiParameter(
                 name="days",
-                type=int,
+                type={"type": "integer", "minimum": 1, "maximum": 365, "default": 30},
                 location=OpenApiParameter.QUERY,
                 required=False,
-                description="Number of days to include in aggregation (default 30)",
+                description="Number of days to include in aggregation (default 30, min 1, max 365)",
             ),
         ],
     ),
@@ -3949,18 +3949,28 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
         count = tasks.update(acknowledged=True)
         return Response({"result": count})
 
+    def get_permissions(self):
+        if self.action == "summary" and has_system_status_permission(
+            getattr(self.request, "user", None),
+        ):
+            return [IsAuthenticated()]
+        return super().get_permissions()
+
     @action(methods=["get"], detail=False)
     def summary(self, request):
         """Aggregated task statistics per task_type over the last N days (default 30)."""
         try:
-            days = max(1, int(request.query_params.get("days", 30)))
+            days = min(365, max(1, int(request.query_params.get("days", 30))))
         except (TypeError, ValueError):
             return Response(
                 {"days": "Must be a positive integer."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         cutoff = timezone.now() - timedelta(days=days)
-        queryset = self.get_queryset().filter(date_created__gte=cutoff)
+        if has_system_status_permission(request.user):
+            queryset = PaperlessTask.objects.filter(date_created__gte=cutoff)
+        else:
+            queryset = self.get_queryset().filter(date_created__gte=cutoff)
 
         data = queryset.values("task_type").annotate(
             total_count=Count("id"),

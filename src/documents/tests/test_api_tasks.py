@@ -578,6 +578,100 @@ class TestSummary:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "days" in response.data
 
+    def test_days_capped_at_365(self, admin_client: APIClient) -> None:
+        """?days= above 365 is silently clamped to 365 so tasks older than a year are excluded."""
+        old_task = PaperlessTaskFactory(task_type=PaperlessTask.TaskType.CONSUME_FILE)
+        PaperlessTask.objects.filter(pk=old_task.pk).update(
+            date_created=timezone.now() - timedelta(days=400),
+        )
+
+        response = admin_client.get(ENDPOINT + "summary/", {"days": 10000})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) == 0
+
+
+@pytest.mark.django_db()
+class TestSummaryPermissions:
+    def test_monitoring_user_can_access_summary(
+        self,
+        user_client: APIClient,
+        regular_user,
+    ) -> None:
+        """A user with view_system_monitoring but no document permissions can access summary/."""
+        regular_user.user_permissions.add(
+            Permission.objects.get(codename="view_system_monitoring"),
+        )
+
+        response = user_client.get(ENDPOINT + "summary/")
+
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_monitoring_user_sees_all_tasks(
+        self,
+        user_client: APIClient,
+        regular_user,
+        admin_user,
+    ) -> None:
+        """Monitoring user sees aggregate data for all tasks, not just unowned ones."""
+        regular_user.user_permissions.add(
+            Permission.objects.get(codename="view_system_monitoring"),
+        )
+        PaperlessTaskFactory(
+            owner=admin_user,
+            task_type=PaperlessTask.TaskType.CONSUME_FILE,
+            status=PaperlessTask.Status.SUCCESS,
+        )
+
+        response = user_client.get(ENDPOINT + "summary/")
+
+        assert response.status_code == status.HTTP_200_OK
+        total = sum(item["total_count"] for item in response.data)
+        assert total == 1
+
+    def test_regular_user_summary_scoped_to_own_and_unowned_tasks(
+        self,
+        user_client: APIClient,
+        regular_user: User,
+        admin_user: User,
+    ) -> None:
+        """A regular user with view_paperlesstask but not view_system_monitoring sees only
+        their own tasks and unowned tasks in the summary, not other users' tasks."""
+        regular_user.user_permissions.add(
+            Permission.objects.get(codename="view_paperlesstask"),
+        )
+
+        PaperlessTaskFactory(
+            owner=regular_user,
+            task_type=PaperlessTask.TaskType.CONSUME_FILE,
+            status=PaperlessTask.Status.SUCCESS,
+        )
+        PaperlessTaskFactory(
+            owner=None,
+            task_type=PaperlessTask.TaskType.CONSUME_FILE,
+            status=PaperlessTask.Status.SUCCESS,
+        )
+        PaperlessTaskFactory(  # other user's task — must not appear
+            owner=admin_user,
+            task_type=PaperlessTask.TaskType.CONSUME_FILE,
+            status=PaperlessTask.Status.SUCCESS,
+        )
+
+        response = user_client.get(ENDPOINT + "summary/")
+
+        assert response.status_code == status.HTTP_200_OK
+        total = sum(item["total_count"] for item in response.data)
+        assert total == 2
+
+    def test_unauthenticated_cannot_access_summary(
+        self,
+        rest_api_client: APIClient,
+    ) -> None:
+        """Unauthenticated requests to summary/ return 401."""
+        response = rest_api_client.get(ENDPOINT + "summary/")
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
 
 @pytest.mark.django_db()
 class TestActive:

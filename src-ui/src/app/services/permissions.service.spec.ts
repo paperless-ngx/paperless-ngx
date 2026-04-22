@@ -8,7 +8,7 @@ import {
 
 const VIEW_ONLY_PERMISSION_TYPES = new Set<PermissionType>([
   PermissionType.GlobalStatistics,
-  PermissionType.SystemStatus,
+  PermissionType.SystemMonitoring,
 ])
 
 describe('PermissionsService', () => {
@@ -270,7 +270,7 @@ describe('PermissionsService', () => {
         'delete_applicationconfiguration',
         'view_applicationconfiguration',
         'view_global_statistics',
-        'view_system_status',
+        'view_system_monitoring',
       ],
       {
         username: 'testuser',
