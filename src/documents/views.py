@@ -3844,10 +3844,10 @@ class RemoteVersionView(GenericAPIView[Any]):
         parameters=[
             OpenApiParameter(
                 name="days",
-                type=int,
+                type={"type": "integer", "minimum": 1, "maximum": 365, "default": 30},
                 location=OpenApiParameter.QUERY,
                 required=False,
-                description="Number of days to include in aggregation (default 30)",
+                description="Number of days to include in aggregation (default 30, min 1, max 365)",
             ),
         ],
     ),
