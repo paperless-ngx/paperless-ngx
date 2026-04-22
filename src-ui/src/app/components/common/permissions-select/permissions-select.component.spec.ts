@@ -133,7 +133,7 @@ describe('PermissionsSelectComponent', () => {
     expect(viewInput.nativeElement.disabled).toBeFalsy()
   })
 
-  it('should treat system status as view-only', () => {
+  it('should treat monitoring as view-only', () => {
     component.ngOnInit()
     fixture.detectChanges()
 
@@ -151,10 +151,10 @@ describe('PermissionsSelectComponent', () => {
     ).toBeFalsy()
 
     const changeInput = fixture.debugElement.query(
-      By.css('input#SystemStatus_Change')
+      By.css('input#Monitoring_Change')
     )
     const viewInput = fixture.debugElement.query(
-      By.css('input#SystemStatus_View')
+      By.css('input#Monitoring_View')
     )
 
     expect(changeInput.nativeElement.disabled).toBeTruthy()
