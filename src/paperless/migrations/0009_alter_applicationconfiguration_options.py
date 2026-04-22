@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             options={
                 "permissions": [
                     ("view_global_statistics", "Can view global object counts"),
-                    ("view_system_status", "Can view system status information"),
+                    ("view_system_monitoring", "Can view system status information"),
                 ],
                 "verbose_name": "paperless application settings",
             },

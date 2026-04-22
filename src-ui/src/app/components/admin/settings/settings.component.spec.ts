@@ -337,7 +337,7 @@ describe('SettingsComponent', () => {
       .mockImplementation(
         (action, type) =>
           action === PermissionAction.View &&
-          type === PermissionType.SystemStatus
+          type === PermissionType.SystemMonitoring
       )
     completeSetup()
     expect(component['systemStatus']).toEqual(status) // private
@@ -359,7 +359,7 @@ describe('SettingsComponent', () => {
       .mockImplementation(
         (action, type) =>
           action === PermissionAction.View &&
-          type === PermissionType.SystemStatus
+          type === PermissionType.SystemMonitoring
       )
     completeSetup()
     component.showSystemStatus()
