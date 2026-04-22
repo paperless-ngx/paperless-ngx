@@ -336,8 +336,7 @@ describe('SettingsComponent', () => {
       .spyOn(permissionsService, 'currentUserCan')
       .mockImplementation(
         (action, type) =>
-          action === PermissionAction.View &&
-          type === PermissionType.SystemStatus
+          action === PermissionAction.View && type === PermissionType.Monitoring
       )
     completeSetup()
     expect(component['systemStatus']).toEqual(status) // private
@@ -358,8 +357,7 @@ describe('SettingsComponent', () => {
       .spyOn(permissionsService, 'currentUserCan')
       .mockImplementation(
         (action, type) =>
-          action === PermissionAction.View &&
-          type === PermissionType.SystemStatus
+          action === PermissionAction.View && type === PermissionType.Monitoring
       )
     completeSetup()
     component.showSystemStatus()

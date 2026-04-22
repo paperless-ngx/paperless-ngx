@@ -652,7 +652,7 @@ export class SettingsComponent
       this.permissionsService.isAdmin() ||
       this.permissionsService.currentUserCan(
         PermissionAction.View,
-        PermissionType.SystemStatus
+        PermissionType.Monitoring
       )
     )
   }

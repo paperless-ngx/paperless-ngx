@@ -8,7 +8,7 @@ import {
 
 const VIEW_ONLY_PERMISSION_TYPES = new Set<PermissionType>([
   PermissionType.GlobalStatistics,
-  PermissionType.SystemStatus,
+  PermissionType.Monitoring,
 ])
 
 describe('PermissionsService', () => {

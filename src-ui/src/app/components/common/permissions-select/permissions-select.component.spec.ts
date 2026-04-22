@@ -139,13 +139,13 @@ describe('PermissionsSelectComponent', () => {
 
     expect(
       component.isActionSupported(
-        PermissionType.SystemStatus,
+        PermissionType.Monitoring,
         PermissionAction.View
       )
     ).toBeTruthy()
     expect(
       component.isActionSupported(
-        PermissionType.SystemStatus,
+        PermissionType.Monitoring,
         PermissionAction.Change
       )
     ).toBeFalsy()

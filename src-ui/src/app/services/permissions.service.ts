@@ -30,7 +30,7 @@ export enum PermissionType {
   Workflow = '%s_workflow',
   ProcessedMail = '%s_processedmail',
   GlobalStatistics = '%s_global_statistics',
-  SystemStatus = '%s_system_status',
+  Monitoring = '%s_monitoring',
 }
 
 @Injectable({
