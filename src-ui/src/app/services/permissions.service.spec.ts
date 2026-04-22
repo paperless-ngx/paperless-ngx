@@ -270,7 +270,7 @@ describe('PermissionsService', () => {
         'delete_applicationconfiguration',
         'view_applicationconfiguration',
         'view_global_statistics',
-        'view_system_status',
+        'view_monitoring',
       ],
       {
         username: 'testuser',
