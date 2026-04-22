@@ -102,7 +102,7 @@ class TestSystemStatus(APITestCase):
 
         user = User.objects.create_user(username="status_user")
         user.user_permissions.add(
-            Permission.objects.get(codename="view_system_status"),
+            Permission.objects.get(codename="view_system_monitoring"),
         )
 
         self.client.force_login(user)

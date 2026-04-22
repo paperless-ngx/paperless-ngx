@@ -598,9 +598,9 @@ class TestSummaryPermissions:
         user_client: APIClient,
         regular_user,
     ) -> None:
-        """A user with view_system_status but no document permissions can access summary/."""
+        """A user with view_system_monitoring but no document permissions can access summary/."""
         regular_user.user_permissions.add(
-            Permission.objects.get(codename="view_system_status"),
+            Permission.objects.get(codename="view_system_monitoring"),
         )
 
         response = user_client.get(ENDPOINT + "summary/")
@@ -615,7 +615,7 @@ class TestSummaryPermissions:
     ) -> None:
         """Monitoring user sees aggregate data for all tasks, not just unowned ones."""
         regular_user.user_permissions.add(
-            Permission.objects.get(codename="view_system_status"),
+            Permission.objects.get(codename="view_system_monitoring"),
         )
         PaperlessTaskFactory(
             owner=admin_user,
@@ -635,7 +635,7 @@ class TestSummaryPermissions:
         regular_user: User,
         admin_user: User,
     ) -> None:
-        """A regular user with view_paperlesstask but not view_system_status sees only
+        """A regular user with view_paperlesstask but not view_system_monitoring sees only
         their own tasks and unowned tasks in the summary, not other users' tasks."""
         regular_user.user_permissions.add(
             Permission.objects.get(codename="view_paperlesstask"),
