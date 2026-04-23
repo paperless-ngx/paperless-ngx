@@ -56,13 +56,21 @@ export class TasksService {
     )
   }
 
+  public get needsAttentionTasks(): PaperlessTask[] {
+    return this.fileTasks.filter((t) =>
+      [PaperlessTaskStatus.Failure, PaperlessTaskStatus.Revoked].includes(
+        t.status
+      )
+    )
+  }
+
   public reload() {
     if (this.loading) return
     this.loading = true
 
     this.http
       .get<PaperlessTask[]>(
-        `${this.baseUrl}${this.endpoint}/?task_type=${PaperlessTaskType.ConsumeFile}&acknowledged=false`
+        `${this.baseUrl}${this.endpoint}/?acknowledged=false`
       )
       .pipe(takeUntil(this.unsubscribeNotifer), first())
       .subscribe((r) => {

@@ -219,7 +219,7 @@ export class AppComponent implements OnInit, OnDestroy {
       },
       {
         anchorId: 'tour.file-tasks',
-        content: $localize`File Tasks shows you documents that have been consumed, are waiting to be, or may have failed during the process.`,
+        content: $localize`Tasks helps you track background work, what needs attention, and what recently completed.`,
         route: '/tasks',
         backdropConfig: {
           offset: 0,

@@ -37,3 +37,7 @@ pre {
 .z-10 {
     z-index: 10;
 }
+
+tbody tr:nth-last-child(2) td {
+    border-bottom: none !important;
+}

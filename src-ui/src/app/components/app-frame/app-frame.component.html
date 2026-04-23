@@ -294,13 +294,13 @@
               *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.PaperlessTask }"
               tourAnchor="tour.file-tasks">
               <a class="nav-link" routerLink="tasks" routerLinkActive="active" (click)="closeMenu()"
-                ngbPopover="File Tasks" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
+                ngbPopover="Tasks" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
                 container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-2" name="list-task"></i-bs><span><ng-container i18n>File Tasks</ng-container>@if (tasksService.failedFileTasks.length > 0) {
-                  <span><span class="badge bg-danger ms-2 d-inline">{{tasksService.failedFileTasks.length}}</span></span>
+                <i-bs class="me-2" name="list-task"></i-bs><span><ng-container i18n>Tasks</ng-container>@if (tasksService.needsAttentionTasks.length > 0) {
+                  <span><span class="badge bg-danger ms-2 d-inline">{{tasksService.needsAttentionTasks.length}}</span></span>
                 }</span>
-                @if (tasksService.failedFileTasks.length > 0 && slimSidebarEnabled) {
-                  <span class="badge bg-danger position-absolute top-0 end-0 d-none d-md-block">{{tasksService.failedFileTasks.length}}</span>
+                @if (tasksService.needsAttentionTasks.length > 0 && slimSidebarEnabled) {
+                  <span class="badge bg-danger position-absolute top-0 end-0 d-none d-md-block">{{tasksService.needsAttentionTasks.length}}</span>
                 }
               </a>
             </li>
