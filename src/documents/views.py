@@ -3867,7 +3867,7 @@ class _TasksViewSetSchema(AutoSchema):
     ),
 )
 class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
-    schema = _TasksViewSetSchema
+    schema = _TasksViewSetSchema()
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     pagination_class = StandardPagination
     filter_backends = (
