@@ -4812,17 +4812,26 @@ class SystemStatusView(PassUserMixin):
             )
 
         summary_cutoff = timezone.now() - timedelta(days=self.TASK_SUMMARY_DAYS)
-        task_summary_items = list(
-            get_task_summary_data(
-                PaperlessTask.objects.filter(date_created__gte=summary_cutoff),
-            ).order_by("-total_count", "task_type"),
+        task_summary_agg = PaperlessTask.objects.filter(
+            date_created__gte=summary_cutoff,
+        ).aggregate(
+            total_count=Count("id"),
+            pending_count=Count(
+                "id",
+                filter=Q(status=PaperlessTask.Status.PENDING),
+            ),
+            success_count=Count(
+                "id",
+                filter=Q(status=PaperlessTask.Status.SUCCESS),
+            ),
+            failure_count=Count(
+                "id",
+                filter=Q(status=PaperlessTask.Status.FAILURE),
+            ),
         )
         task_summary = {
             "days": self.TASK_SUMMARY_DAYS,
-            "total_count": sum(item["total_count"] for item in task_summary_items),
-            "pending_count": sum(item["pending_count"] for item in task_summary_items),
-            "success_count": sum(item["success_count"] for item in task_summary_items),
-            "failure_count": sum(item["failure_count"] for item in task_summary_items),
+            **task_summary_agg,
         }
 
         return Response(
