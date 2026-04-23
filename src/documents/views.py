@@ -4533,7 +4533,7 @@ class CustomFieldViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Custom
     queryset = CustomField.objects.all().order_by("name")
 
 
-def get_task_summary_data(queryset):
+def get_task_summary_data(queryset: QuerySet[PaperlessTask]) -> QuerySet:
     return queryset.values("task_type").annotate(
         total_count=Count("id"),
         pending_count=Count("id", filter=Q(status=PaperlessTask.Status.PENDING)),
