@@ -3972,29 +3972,7 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
         else:
             queryset = self.get_queryset().filter(date_created__gte=cutoff)
 
-        data = queryset.values("task_type").annotate(
-            total_count=Count("id"),
-            pending_count=Count("id", filter=Q(status=PaperlessTask.Status.PENDING)),
-            success_count=Count("id", filter=Q(status=PaperlessTask.Status.SUCCESS)),
-            failure_count=Count("id", filter=Q(status=PaperlessTask.Status.FAILURE)),
-            avg_duration_seconds=Avg(
-                "duration_seconds",
-                filter=Q(duration_seconds__isnull=False),
-            ),
-            avg_wait_time_seconds=Avg(
-                "wait_time_seconds",
-                filter=Q(wait_time_seconds__isnull=False),
-            ),
-            last_run=Max("date_created"),
-            last_success=Max(
-                "date_done",
-                filter=Q(status=PaperlessTask.Status.SUCCESS),
-            ),
-            last_failure=Max(
-                "date_done",
-                filter=Q(status=PaperlessTask.Status.FAILURE),
-            ),
-        )
+        data = get_task_summary_data(queryset)
         serializer = TaskSummarySerializer(data, many=True)
         return Response(serializer.data)
 
@@ -4553,6 +4531,32 @@ class CustomFieldViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Custom
     document_count_source_field = "field_id"
 
     queryset = CustomField.objects.all().order_by("name")
+
+
+def get_task_summary_data(queryset):
+    return queryset.values("task_type").annotate(
+        total_count=Count("id"),
+        pending_count=Count("id", filter=Q(status=PaperlessTask.Status.PENDING)),
+        success_count=Count("id", filter=Q(status=PaperlessTask.Status.SUCCESS)),
+        failure_count=Count("id", filter=Q(status=PaperlessTask.Status.FAILURE)),
+        avg_duration_seconds=Avg(
+            "duration_seconds",
+            filter=Q(duration_seconds__isnull=False),
+        ),
+        avg_wait_time_seconds=Avg(
+            "wait_time_seconds",
+            filter=Q(wait_time_seconds__isnull=False),
+        ),
+        last_run=Max("date_created"),
+        last_success=Max(
+            "date_done",
+            filter=Q(status=PaperlessTask.Status.SUCCESS),
+        ),
+        last_failure=Max(
+            "date_done",
+            filter=Q(status=PaperlessTask.Status.FAILURE),
+        ),
+    )
 
 
 @extend_schema_view(
