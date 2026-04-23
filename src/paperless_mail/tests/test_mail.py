@@ -192,14 +192,11 @@ class BogusMailBox(AbstractContextManager):
             raise Exception
 
 
-def fake_magic_from_buffer(buffer, *, mime=False):
-    if mime:
-        if "PDF" in str(buffer):
-            return "application/pdf"
-        else:
-            return "unknown/type"
+def fake_magic_from_buffer(buffer):
+    if "PDF" in str(buffer):
+        return "application/pdf"
     else:
-        return "Some verbose file description"
+        return "unknown/type"
 
 
 class MessageBuilder:
@@ -408,7 +405,7 @@ def assert_eventually_equals(
     raise AssertionError(f"Expected {expected_value}, but got {actual}")
 
 
-@mock.patch("paperless_mail.mail.magic.from_buffer", fake_magic_from_buffer)
+@mock.patch("paperless_mail.mail.mime_detection.from_buffer", fake_magic_from_buffer)
 class TestMail(
     DirectoriesMixin,
     FileSystemAssertsMixin,

@@ -10,7 +10,6 @@ from fnmatch import fnmatch
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import magic
 import pathvalidate
 from celery import chord
 from celery import shared_task
@@ -40,6 +39,7 @@ from documents.models import Correspondent
 from documents.models import PaperlessTask
 from documents.parsers import is_mime_type_supported
 from documents.tasks import consume_file
+from paperless import mime_detection
 from paperless.network import is_public_ip
 from paperless.network import resolve_hostname_ips
 from paperless_mail.models import MailAccount
@@ -848,7 +848,7 @@ class MailAccountHandler(LoggingMixin):
 
             # don't trust the content type of the attachment. Could be
             # generic application/octet-stream.
-            mime_type = magic.from_buffer(att.payload, mime=True)
+            mime_type = mime_detection.from_buffer(att.payload)
 
             if is_mime_type_supported(mime_type):
                 self.log.info(
@@ -954,14 +954,11 @@ class MailAccountHandler(LoggingMixin):
         )
         with Path(temp_filename).open("wb") as f:
             # Move "From"-header to beginning of file
-            # TODO: This ugly workaround is needed because the parser is
-            #   chosen only by the mime_type detected via magic
-            #   (see documents/consumer.py "mime_type = magic.from_file")
-            #   Unfortunately magic sometimes fails to detect the mime
-            #   type of .eml files correctly as message/rfc822 and instead
-            #   detects text/plain.
-            #   This also effects direct file consumption of .eml files
-            #   which are not treated with this workaround.
+            # TODO: This workaround may no longer be needed with Magika,
+            #   which has better text-format detection than libmagic.
+            #   Previously libmagic would misidentify .eml files as text/plain
+            #   instead of message/rfc822. Verify and remove if Magika handles
+            #   it correctly.
             from_element = None
             for i, header in enumerate(message.obj._headers):
                 if header[0] == "From":

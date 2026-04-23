@@ -4,9 +4,10 @@ from enum import IntEnum
 from pathlib import Path
 from typing import TypedDict
 
-import magic
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
+
+from paperless import mime_detection
 
 
 @dataclasses.dataclass
@@ -184,7 +185,7 @@ class ConsumableDocument:
 
         # Get the file type once at init
         # Note this function isn't called when the object is unpickled
-        self.mime_type = magic.from_file(self.original_file, mime=True)
+        self.mime_type = mime_detection.from_file(self.original_file)
 
 
 class ConsumeFileDuplicateResult(TypedDict):

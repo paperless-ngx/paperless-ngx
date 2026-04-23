@@ -1,7 +1,6 @@
 import logging
 from io import BytesIO
 
-import magic
 from allauth.mfa.adapter import get_adapter as get_mfa_adapter
 from allauth.mfa.models import Authenticator
 from allauth.mfa.totp.internal.auth import TOTP
@@ -18,6 +17,7 @@ from PIL import Image
 from rest_framework import serializers
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 
+from paperless import mime_detection
 from paperless.models import ApplicationConfiguration
 from paperless.network import validate_outbound_http_url
 from paperless.validators import reject_dangerous_svg
@@ -263,7 +263,7 @@ class ApplicationConfigurationSerializer(
         jpg/png/gif/svg.
         """
         if file:
-            mime_type = magic.from_buffer(file.read(2048), mime=True)
+            mime_type = mime_detection.from_buffer(file.read(2048))
 
             if mime_type == "image/svg+xml":
                 reject_dangerous_svg(file)

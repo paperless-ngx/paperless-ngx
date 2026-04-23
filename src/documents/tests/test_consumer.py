@@ -140,28 +140,25 @@ class FaultyGenericExceptionParser(_BaseNewStyleParser):
         raise Exception("Generic exception.")
 
 
-def fake_magic_from_file(file, *, mime=False):  # NOSONAR
-    if mime:
-        filepath = Path(file)
-        if filepath.name.startswith("invalid_pdf"):
-            return "application/octet-stream"
-        if filepath.name.startswith("valid_pdf"):
-            return "application/pdf"
-        if filepath.suffix == ".pdf":
-            return "application/pdf"
-        elif filepath.suffix == ".png":
-            return "image/png"
-        elif filepath.suffix == ".webp":
-            return "image/webp"
-        elif filepath.suffix == ".eml":
-            return "message/rfc822"
-        else:
-            return "unknown"
+def fake_magic_from_file(file):  # NOSONAR
+    filepath = Path(file)
+    if filepath.name.startswith("invalid_pdf"):
+        return "application/octet-stream"
+    if filepath.name.startswith("valid_pdf"):
+        return "application/pdf"
+    if filepath.suffix == ".pdf":
+        return "application/pdf"
+    elif filepath.suffix == ".png":
+        return "image/png"
+    elif filepath.suffix == ".webp":
+        return "image/webp"
+    elif filepath.suffix == ".eml":
+        return "message/rfc822"
     else:
-        return "A verbose string that describes the contents of the file"
+        return "unknown"
 
 
-@mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
+@mock.patch("documents.consumer.mime_detection.from_file", fake_magic_from_file)
 class TestConsumer(
     DirectoriesMixin,
     FileSystemAssertsMixin,
@@ -1146,7 +1143,7 @@ class TestConsumer(
             )
 
 
-@mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
+@mock.patch("documents.consumer.mime_detection.from_file", fake_magic_from_file)
 class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
     def setUp(self) -> None:
         super().setUp()

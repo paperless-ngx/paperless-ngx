@@ -1097,7 +1097,10 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             self.assertIsNotNone(task_kwargs["overrides"])
             self.assertEqual(result, "OK")
 
-    @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
+    @mock.patch(
+        "documents.data_models.mime_detection.from_file",
+        return_value="application/pdf",
+    )
     @mock.patch("documents.tasks.consume_file.apply_async")
     @mock.patch("pikepdf.open")
     def test_rotate_explicit_selection_uses_root_source_when_root_selected(
@@ -1127,7 +1130,10 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.tasks.consume_file.apply_async")
     @mock.patch("pikepdf.Pdf.save")
-    @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
+    @mock.patch(
+        "documents.data_models.mime_detection.from_file",
+        return_value="application/pdf",
+    )
     def test_delete_pages(self, mock_magic, mock_pdf_save, mock_consume_delay):
         """
         GIVEN:
@@ -1151,7 +1157,10 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertIsNotNone(task_kwargs["overrides"])
         self.assertEqual(result, "OK")
 
-    @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
+    @mock.patch(
+        "documents.data_models.mime_detection.from_file",
+        return_value="application/pdf",
+    )
     @mock.patch("documents.tasks.consume_file.apply_async")
     @mock.patch("pikepdf.open")
     def test_delete_pages_explicit_selection_uses_root_source_when_root_selected(
@@ -1328,7 +1337,10 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         )
         self.assertIsNotNone(task_kwargs["overrides"])
 
-    @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
+    @mock.patch(
+        "documents.data_models.mime_detection.from_file",
+        return_value="application/pdf",
+    )
     @mock.patch("documents.tasks.consume_file.apply_async")
     @mock.patch("pikepdf.new")
     @mock.patch("pikepdf.open")
@@ -1482,7 +1494,10 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertEqual(task_kwargs["input_doc"].root_document_id, doc.id)
         self.assertIsNotNone(task_kwargs["overrides"])
 
-    @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
+    @mock.patch(
+        "documents.data_models.mime_detection.from_file",
+        return_value="application/pdf",
+    )
     @mock.patch("documents.tasks.consume_file.apply_async")
     @mock.patch("pikepdf.open")
     def test_remove_password_explicit_selection_uses_root_source_when_root_selected(

@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Final
 
-import magic
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction
@@ -52,6 +51,7 @@ from documents.utils import compute_checksum
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
+from paperless import mime_detection
 from paperless.config import OcrConfig
 from paperless.models import ArchiveFileGenerationChoices
 from paperless.parsers import ParserContext
@@ -424,7 +424,7 @@ class ConsumerPlugin(
 
             # Determine the parser class.
 
-            mime_type = magic.from_file(self.working_copy, mime=True)
+            mime_type = mime_detection.from_file(self.working_copy)
 
             self.log.debug(f"Detected mime type: {mime_type}")
 
@@ -446,7 +446,7 @@ class ConsumerPlugin(
                         ],
                         logger=self.log,
                     )
-                    mime_type = magic.from_file(self.working_copy, mime=True)
+                    mime_type = mime_detection.from_file(self.working_copy)
                     self.log.debug(f"Detected mime type after qpdf: {mime_type}")
                     # Save the original file for later
                     self.unmodified_original = (

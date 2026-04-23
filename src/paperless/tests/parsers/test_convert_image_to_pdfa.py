@@ -15,11 +15,11 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import img2pdf
-import magic
 import pikepdf
 import pytest
 
 from documents.parsers import ParseError
+from paperless import mime_detection
 
 if TYPE_CHECKING:
     from pytest_mock import MockerFixture
@@ -43,7 +43,7 @@ class TestConvertImageToPdfa:
         result = tesseract_parser._convert_image_to_pdfa(simple_png_file)
 
         assert result.exists()
-        assert magic.from_file(str(result), mime=True) == "application/pdf"
+        assert mime_detection.from_file(result) == "application/pdf"
 
     def test_output_path_is_archive_pdf_in_tempdir(
         self,
@@ -92,7 +92,7 @@ class TestConvertImageToPdfa:
         result = tesseract_parser._convert_image_to_pdfa(simple_png_file)
 
         assert result.exists()
-        assert magic.from_file(str(result), mime=True) == "application/pdf"
+        assert mime_detection.from_file(result) == "application/pdf"
 
     def test_image_dpi_setting_applies_fixed_dpi_layout(
         self,
@@ -116,7 +116,7 @@ class TestConvertImageToPdfa:
         result = tesseract_parser._convert_image_to_pdfa(simple_no_dpi_png_file)
 
         spy.assert_called_once_with((150, 150))
-        assert magic.from_file(str(result), mime=True) == "application/pdf"
+        assert mime_detection.from_file(result) == "application/pdf"
 
     def test_no_image_dpi_setting_skips_fixed_dpi_layout(
         self,

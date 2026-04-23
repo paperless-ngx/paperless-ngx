@@ -11,7 +11,6 @@ from typing import Any
 from typing import Literal
 from typing import TypedDict
 
-import magic
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -48,6 +47,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.fields import SerializerMethodField
 from rest_framework.filters import OrderingFilter
+
+from paperless import mime_detection
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.context import set_actor
@@ -2159,7 +2160,7 @@ class PostDocumentSerializer(serializers.Serializer):
 
     def validate_document(self, document):
         document_data = document.file.read()
-        mime_type = magic.from_buffer(document_data, mime=True)
+        mime_type = mime_detection.from_buffer(document_data)
 
         if not is_mime_type_supported(mime_type):
             if (

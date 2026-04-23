@@ -20,7 +20,6 @@ from urllib.parse import quote
 from urllib.parse import urlparse
 
 import httpx
-import magic
 import pathvalidate
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -226,6 +225,7 @@ from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_request_version_param
 from documents.versioning import get_root_document
 from documents.versioning import resolve_requested_version_for_root
+from paperless import mime_detection
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import AIConfig
@@ -4896,7 +4896,7 @@ def serve_logo(request: HttpRequest, filename: str | None = None) -> FileRespons
         raise Http404("No logo configured")
 
     path = app_logo.path
-    content_type = magic.from_file(path, mime=True) or "application/octet-stream"
+    content_type = mime_detection.from_file(path) or "application/octet-stream"
 
     return FileResponse(
         app_logo.open("rb"),
