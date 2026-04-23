@@ -16,8 +16,8 @@ from documents.models import StoragePath
 from documents.models import Tag
 
 
-class CorrespondentFactory(DjangoModelFactory):
-    class Meta:
+class CorrespondentFactory(DjangoModelFactory[Correspondent]):
+    class Meta(DjangoModelFactory.Meta):
         model = Correspondent
 
     name = factory.Sequence(lambda n: f"{factory.Faker('company')} {n}")
@@ -25,8 +25,8 @@ class CorrespondentFactory(DjangoModelFactory):
     matching_algorithm = MatchingModel.MATCH_NONE
 
 
-class DocumentTypeFactory(DjangoModelFactory):
-    class Meta:
+class DocumentTypeFactory(DjangoModelFactory[DocumentType]):
+    class Meta(DjangoModelFactory.Meta):
         model = DocumentType
 
     name = factory.Sequence(lambda n: f"{factory.Faker('bs')} {n}")
@@ -34,8 +34,8 @@ class DocumentTypeFactory(DjangoModelFactory):
     matching_algorithm = MatchingModel.MATCH_NONE
 
 
-class TagFactory(DjangoModelFactory):
-    class Meta:
+class TagFactory(DjangoModelFactory[Tag]):
+    class Meta(DjangoModelFactory.Meta):
         model = Tag
 
     name = factory.Sequence(lambda n: f"{factory.Faker('word')} {n}")
@@ -44,8 +44,8 @@ class TagFactory(DjangoModelFactory):
     is_inbox_tag = False
 
 
-class StoragePathFactory(DjangoModelFactory):
-    class Meta:
+class StoragePathFactory(DjangoModelFactory[StoragePath]):
+    class Meta(DjangoModelFactory.Meta):
         model = StoragePath
 
     name = factory.Sequence(
@@ -56,8 +56,8 @@ class StoragePathFactory(DjangoModelFactory):
     matching_algorithm = MatchingModel.MATCH_NONE
 
 
-class DocumentFactory(DjangoModelFactory):
-    class Meta:
+class DocumentFactory(DjangoModelFactory[Document]):
+    class Meta(DjangoModelFactory.Meta):
         model = Document
 
     title = factory.Faker("sentence", nb_words=4)
@@ -68,8 +68,8 @@ class DocumentFactory(DjangoModelFactory):
     storage_path = None
 
 
-class PaperlessTaskFactory(DjangoModelFactory):
-    class Meta:
+class PaperlessTaskFactory(DjangoModelFactory[PaperlessTask]):
+    class Meta(DjangoModelFactory.Meta):
         model = PaperlessTask
 
     task_id = factory.Faker("uuid4")

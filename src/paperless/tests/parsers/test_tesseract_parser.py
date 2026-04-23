@@ -388,8 +388,10 @@ class TestParsePdf:
         )
         assert tesseract_parser.archive_path is not None
         assert tesseract_parser.archive_path.is_file()
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -531,7 +533,9 @@ class TestParseImages:
         tesseract_parser.parse(tesseract_samples_dir / "simple-no-dpi.png", "image/png")
         assert tesseract_parser.archive_path is not None
         assert tesseract_parser.archive_path.is_file()
-        assert "this is a test document." in tesseract_parser.get_text().lower()
+        _text = tesseract_parser.get_text()
+        assert _text is not None
+        assert "this is a test document." in _text.lower()
 
     def test_no_dpi_no_fallback_raises(
         self,
@@ -564,8 +568,10 @@ class TestParseMultiPage:
         )
         assert tesseract_parser.archive_path is not None
         assert tesseract_parser.archive_path.is_file()
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -590,8 +596,10 @@ class TestParseMultiPage:
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -606,8 +614,10 @@ class TestParseMultiPage:
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -633,7 +643,9 @@ class TestParseMultiPage:
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
-        text = tesseract_parser.get_text().lower()
+        text = tesseract_parser.get_text()
+        assert text is not None
+        text = text.lower()
         assert_ordered_substrings(text, ["page 1", "page 2"])
         assert "page 3" not in text
 
@@ -659,7 +671,9 @@ class TestParseMultiPage:
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
-        text = tesseract_parser.get_text().lower()
+        text = tesseract_parser.get_text()
+        assert text is not None
+        text = text.lower()
         assert "page 1" in text
         assert "page 2" not in text
         assert "page 3" not in text
@@ -682,8 +696,10 @@ class TestParseMultiPage:
             "image/tiff",
         )
         assert tesseract_parser.archive_path is not None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -705,8 +721,10 @@ class TestParseMultiPage:
         shutil.copy(tesseract_samples_dir / "multi-page-images-alpha.tiff", dest)
         tesseract_parser.parse(dest, "image/tiff")
         assert tesseract_parser.archive_path is not None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -728,8 +746,10 @@ class TestParseMultiPage:
         shutil.copy(tesseract_samples_dir / "multi-page-images-alpha-rgb.tiff", dest)
         tesseract_parser.parse(dest, "image/tiff")
         assert tesseract_parser.archive_path is not None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -762,8 +782,10 @@ class TestSkipArchive:
             produce_archive=False,
         )
         assert tesseract_parser.archive_path is None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -787,8 +809,10 @@ class TestSkipArchive:
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -845,7 +869,9 @@ class TestSkipArchive:
             "application/pdf",
             produce_archive=produce_archive,
         )
-        text = tesseract_parser.get_text().lower()
+        text = tesseract_parser.get_text()
+        assert text is not None
+        text = text.lower()
         assert_ordered_substrings(text, ["page 1", "page 2", "page 3"])
         if expect_archive:
             assert tesseract_parser.archive_path is not None
@@ -933,8 +959,10 @@ class TestParseMixed:
         )
         assert tesseract_parser.archive_path is not None
         assert tesseract_parser.archive_path.is_file()
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3", "page 4", "page 5", "page 6"],
         )
         sidecar = (tesseract_parser.tempdir / "sidecar.txt").read_text()
@@ -961,8 +989,10 @@ class TestParseMixed:
         )
         assert tesseract_parser.archive_path is not None
         assert tesseract_parser.archive_path.is_file()
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             [
                 "this is some normal text, present on page 1 of the document.",
                 "this is some text, but in an image, also on page 1.",
@@ -997,8 +1027,10 @@ class TestParseMixed:
             produce_archive=False,
         )
         assert tesseract_parser.archive_path is None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 4", "page 5", "page 6"],
         )
 
@@ -1058,9 +1090,11 @@ class TestParseRtl:
             tesseract_samples_dir / "rtl-test.pdf",
             "application/pdf",
         )
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         normalised = "".join(
             ch
-            for ch in unicodedata.normalize("NFKC", tesseract_parser.get_text())
+            for ch in unicodedata.normalize("NFKC", _text)
             if unicodedata.category(ch) != "Cf" and not ch.isspace()
         )
         assert "ةرازو" in normalised
@@ -1197,7 +1231,9 @@ class TestParserFileTypes:
         tesseract_parser.parse(tesseract_samples_dir / filename, mime_type)
         assert tesseract_parser.archive_path is not None
         assert tesseract_parser.archive_path.is_file()
-        assert "this is a test document" in tesseract_parser.get_text().lower()
+        _text = tesseract_parser.get_text()
+        assert _text is not None
+        assert "this is a test document" in _text.lower()
 
     def test_heic(
         self,
@@ -1206,7 +1242,9 @@ class TestParserFileTypes:
     ) -> None:
         tesseract_parser.parse(tesseract_samples_dir / "simple.heic", "image/heic")
         assert tesseract_parser.archive_path is not None
-        assert "pizza" in tesseract_parser.get_text().lower()
+        _text = tesseract_parser.get_text()
+        assert _text is not None
+        assert "pizza" in _text.lower()
 
     def test_gif_with_explicit_dpi(
         self,
@@ -1216,7 +1254,9 @@ class TestParserFileTypes:
         tesseract_parser.settings.image_dpi = 200
         tesseract_parser.parse(tesseract_samples_dir / "simple.gif", "image/gif")
         assert tesseract_parser.archive_path is not None
-        assert "this is a test document" in tesseract_parser.get_text().lower()
+        _text = tesseract_parser.get_text()
+        assert _text is not None
+        assert "this is a test document" in _text.lower()
 
     def test_webp_with_explicit_dpi(
         self,
@@ -1226,9 +1266,11 @@ class TestParserFileTypes:
         tesseract_parser.settings.image_dpi = 72
         tesseract_parser.parse(tesseract_samples_dir / "document.webp", "image/webp")
         assert tesseract_parser.archive_path is not None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert re.search(
             r"this is a ?webp document, created 11/14/2022\.",
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
         )
 
 

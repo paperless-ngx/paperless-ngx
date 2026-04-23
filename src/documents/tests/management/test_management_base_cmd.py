@@ -148,7 +148,7 @@ def mock_queryset():
 class TestProcessResult:
     """Tests for the ProcessResult dataclass."""
 
-    def test_success_result(self):
+    def test_success_result(self) -> None:
         result = ProcessResult(item=1, result=2, error=None)
 
         assert result.item == 1
@@ -156,7 +156,7 @@ class TestProcessResult:
         assert result.error is None
         assert result.success is True
 
-    def test_error_result(self):
+    def test_error_result(self) -> None:
         error = ValueError("test error")
         result = ProcessResult(item=1, result=None, error=error)
 
@@ -170,7 +170,7 @@ class TestProcessResult:
 class TestPaperlessCommandArguments:
     """Tests for argument parsing behavior."""
 
-    def test_progress_bar_argument_added_by_default(self):
+    def test_progress_bar_argument_added_by_default(self) -> None:
         command = SimpleCommand()
         parser = command.create_parser("manage.py", "simple")
 
@@ -180,14 +180,14 @@ class TestPaperlessCommandArguments:
         options = parser.parse_args([])
         assert options.no_progress_bar is False
 
-    def test_progress_bar_argument_not_added_when_disabled(self):
+    def test_progress_bar_argument_not_added_when_disabled(self) -> None:
         command = NoProgressBarCommand()
         parser = command.create_parser("manage.py", "noprogress")
 
         options = parser.parse_args([])
         assert not hasattr(options, "no_progress_bar")
 
-    def test_processes_argument_added_when_multiprocessing_enabled(self):
+    def test_processes_argument_added_when_multiprocessing_enabled(self) -> None:
         command = MultiprocessCommand()
         parser = command.create_parser("manage.py", "multiprocess")
 
@@ -197,7 +197,7 @@ class TestPaperlessCommandArguments:
         options = parser.parse_args([])
         assert options.processes >= 1
 
-    def test_processes_argument_not_added_when_multiprocessing_disabled(self):
+    def test_processes_argument_not_added_when_multiprocessing_disabled(self) -> None:
         command = SimpleCommand()
         parser = command.create_parser("manage.py", "simple")
 
@@ -232,7 +232,7 @@ class TestPaperlessCommandExecute:
         *,
         no_progress_bar_flag: bool,
         expected: bool,
-    ):
+    ) -> None:
         command = SimpleCommand()
         command.stdout = io.StringIO()
         command.stderr = io.StringIO()
@@ -242,7 +242,10 @@ class TestPaperlessCommandExecute:
 
         assert command.no_progress_bar is expected
 
-    def test_no_progress_bar_always_true_when_not_supported(self, base_options: dict):
+    def test_no_progress_bar_always_true_when_not_supported(
+        self,
+        base_options: dict,
+    ) -> None:
         command = NoProgressBarCommand()
         command.stdout = io.StringIO()
         command.stderr = io.StringIO()
@@ -263,7 +266,7 @@ class TestPaperlessCommandExecute:
         base_options: dict,
         processes: int,
         expected: int,
-    ):
+    ) -> None:
         command = MultiprocessCommand()
         command.stdout = io.StringIO()
         command.stderr = io.StringIO()
@@ -284,7 +287,7 @@ class TestPaperlessCommandExecute:
         self,
         base_options: dict,
         invalid_count: int,
-    ):
+    ) -> None:
         command = MultiprocessCommand()
         command.stdout = io.StringIO()
         command.stderr = io.StringIO()
@@ -294,7 +297,10 @@ class TestPaperlessCommandExecute:
         with pytest.raises(CommandError, match="--processes must be at least 1"):
             command.execute(**options)
 
-    def test_process_count_defaults_to_one_when_not_supported(self, base_options: dict):
+    def test_process_count_defaults_to_one_when_not_supported(
+        self,
+        base_options: dict,
+    ) -> None:
         command = SimpleCommand()
         command.stdout = io.StringIO()
         command.stderr = io.StringIO()
@@ -313,7 +319,7 @@ class TestGetIterableLength:
         self,
         simple_command: SimpleCommand,
         mock_queryset,
-    ):
+    ) -> None:
         """Should call .count() on Django querysets rather than len()."""
         queryset = mock_queryset([1, 2, 3, 4, 5])
 
@@ -322,13 +328,16 @@ class TestGetIterableLength:
         assert result == 5
         assert queryset.count_called is True
 
-    def test_uses_len_for_sized(self, simple_command: SimpleCommand):
+    def test_uses_len_for_sized(self, simple_command: SimpleCommand) -> None:
         """Should use len() for sequences and other Sized types."""
         result = simple_command._get_iterable_length([1, 2, 3, 4])
 
         assert result == 4
 
-    def test_returns_none_for_unsized_iterables(self, simple_command: SimpleCommand):
+    def test_returns_none_for_unsized_iterables(
+        self,
+        simple_command: SimpleCommand,
+    ) -> None:
         """Should return None for generators and other iterables without len()."""
         result = simple_command._get_iterable_length(x for x in [1, 2, 3])
 
@@ -339,7 +348,7 @@ class TestGetIterableLength:
 class TestTrack:
     """Tests for the track() method."""
 
-    def test_with_progress_bar_disabled(self, simple_command: SimpleCommand):
+    def test_with_progress_bar_disabled(self, simple_command: SimpleCommand) -> None:
         simple_command.no_progress_bar = True
         items = ["a", "b", "c"]
 
@@ -347,7 +356,7 @@ class TestTrack:
 
         assert result == items
 
-    def test_with_progress_bar_enabled(self, simple_command: SimpleCommand):
+    def test_with_progress_bar_enabled(self, simple_command: SimpleCommand) -> None:
         simple_command.no_progress_bar = False
         items = [1, 2, 3]
 
@@ -355,7 +364,7 @@ class TestTrack:
 
         assert result == items
 
-    def test_with_explicit_total(self, simple_command: SimpleCommand):
+    def test_with_explicit_total(self, simple_command: SimpleCommand) -> None:
         simple_command.no_progress_bar = False
 
         def gen():
@@ -365,7 +374,7 @@ class TestTrack:
 
         assert result == [1, 2, 3]
 
-    def test_with_generator_no_total(self, simple_command: SimpleCommand):
+    def test_with_generator_no_total(self, simple_command: SimpleCommand) -> None:
         def gen():
             yield from [1, 2, 3]
 
@@ -373,7 +382,7 @@ class TestTrack:
 
         assert result == [1, 2, 3]
 
-    def test_empty_iterable(self, simple_command: SimpleCommand):
+    def test_empty_iterable(self, simple_command: SimpleCommand) -> None:
         result = list(simple_command.track([]))
 
         assert result == []
@@ -383,7 +392,7 @@ class TestTrack:
         simple_command: SimpleCommand,
         mock_queryset,
         mocker: MockerFixture,
-    ):
+    ) -> None:
         """Verify track() uses .count() for querysets."""
         simple_command.no_progress_bar = False
         queryset = mock_queryset([1, 2, 3])
@@ -404,7 +413,7 @@ class TestProcessParallel:
     def test_sequential_processing_single_process(
         self,
         multiprocess_command: MultiprocessCommand,
-    ):
+    ) -> None:
         multiprocess_command.process_count = 1
         items = [1, 2, 3, 4, 5]
 
@@ -419,7 +428,7 @@ class TestProcessParallel:
     def test_sequential_processing_handles_errors(
         self,
         multiprocess_command: MultiprocessCommand,
-    ):
+    ) -> None:
         multiprocess_command.process_count = 1
         items = [1, 2, 0, 4]  # 0 causes ZeroDivisionError
 
@@ -439,7 +448,7 @@ class TestProcessParallel:
         self,
         multiprocess_command: MultiprocessCommand,
         mocker: MockerFixture,
-    ):
+    ) -> None:
         multiprocess_command.process_count = 2
         items = [1, 2, 3]
 
@@ -456,7 +465,7 @@ class TestProcessParallel:
         self,
         multiprocess_command: MultiprocessCommand,
         mocker: MockerFixture,
-    ):
+    ) -> None:
         multiprocess_command.process_count = 2
         items = [1, 2, 0, 4]
 
@@ -468,7 +477,7 @@ class TestProcessParallel:
         assert len(failures) == 1
         assert failures[0].item == 0
 
-    def test_empty_items(self, multiprocess_command: MultiprocessCommand):
+    def test_empty_items(self, multiprocess_command: MultiprocessCommand) -> None:
         results = list(multiprocess_command.process_parallel(_double_value, []))
 
         assert results == []
@@ -476,7 +485,7 @@ class TestProcessParallel:
     def test_result_contains_original_item(
         self,
         multiprocess_command: MultiprocessCommand,
-    ):
+    ) -> None:
         items = [10, 20, 30]
 
         results = list(multiprocess_command.process_parallel(_double_value, items))
@@ -489,7 +498,7 @@ class TestProcessParallel:
         self,
         multiprocess_command: MultiprocessCommand,
         mocker: MockerFixture,
-    ):
+    ) -> None:
         """Verify single process uses sequential path (important for testing)."""
         multiprocess_command.process_count = 1
 
@@ -505,7 +514,7 @@ class TestProcessParallel:
         self,
         multiprocess_command: MultiprocessCommand,
         mocker: MockerFixture,
-    ):
+    ) -> None:
         """Verify multiple processes uses parallel path."""
         multiprocess_command.process_count = 2
 

@@ -28,7 +28,7 @@ class ObfuscatedPasswordField(serializers.CharField):
 class MailAccountSerializer(OwnedObjectSerializer):
     password = ObfuscatedPasswordField()
 
-    class Meta:
+    class Meta(serializers.ModelSerializer.Meta):
         model = MailAccount
         fields = [
             "id",
@@ -86,7 +86,7 @@ class MailRuleSerializer(OwnedObjectSerializer):
     assign_document_type = DocumentTypeField(allow_null=True, required=False)
     order = serializers.IntegerField(required=False)
 
-    class Meta:
+    class Meta(serializers.ModelSerializer.Meta):
         model = MailRule
         fields = [
             "id",
@@ -162,7 +162,7 @@ class MailRuleSerializer(OwnedObjectSerializer):
 
 
 class ProcessedMailSerializer(OwnedObjectSerializer):
-    class Meta:
+    class Meta(serializers.ModelSerializer.Meta):
         model = ProcessedMail
         fields = [
             "id",

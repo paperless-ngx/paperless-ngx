@@ -91,6 +91,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
             - app_title and app_logo are included
         """
         config = ApplicationConfiguration.objects.first()
+        assert config is not None
         config.app_title = "Fancy New Title"
         config.app_logo = "/logo/example.jpg"
         config.save()
@@ -125,6 +126,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         config = ApplicationConfiguration.objects.first()
+        assert config is not None
         self.assertEqual(config.color_conversion_strategy, ColorConvertChoices.RGB)
 
     def test_api_update_config_empty_fields(self) -> None:
@@ -150,6 +152,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         config = ApplicationConfiguration.objects.first()
+        assert config is not None
         self.assertEqual(config.user_args, None)
         self.assertEqual(config.language, None)
         self.assertEqual(config.barcode_tag_mapping, None)
@@ -187,6 +190,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         self.assertIn("image/jpeg", response["Content-Type"])
 
         config = ApplicationConfiguration.objects.first()
+        assert config is not None
         old_logo = config.app_logo
         self.assertTrue(Path(old_logo.path).exists())
         self.client.patch(
@@ -233,6 +237,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         config = ApplicationConfiguration.objects.first()
+        assert config is not None
         with Image.open(config.app_logo.path) as stored_logo:
             stored_exif = stored_logo.getexif()
 
@@ -268,6 +273,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         config = ApplicationConfiguration.objects.first()
+        assert config is not None
         with Image.open(config.app_logo.path) as stored_logo:
             stored_text = stored_logo.text
 
@@ -786,6 +792,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
             - llm_api_key is set to None
         """
         config = ApplicationConfiguration.objects.first()
+        assert config is not None
         config.llm_api_key = "1234567890"
         config.save()
 
@@ -826,6 +833,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
             - LLM index is triggered to update
         """
         config = ApplicationConfiguration.objects.first()
+        assert config is not None
         config.ai_enabled = False
         config.llm_embedding_backend = None
         config.save()

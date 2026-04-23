@@ -1168,7 +1168,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertIn("all", response.data)
         self.assertCountEqual(response.data["all"], [d.id for d in docs])
 
-    def test_default_ordering_uses_id_as_tiebreaker(self):
+    def test_default_ordering_uses_id_as_tiebreaker(self) -> None:
         """
         GIVEN:
             - Documents sharing the same created date
@@ -2156,7 +2156,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         match_tags,
         match_document_types,
         match_storage_paths,
-    ):
+    ) -> None:
         doc = Document.objects.create(
             title="test",
             mime_type="application/pdf",
@@ -2193,7 +2193,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         match_document_types,
         match_storage_paths,
         mocked_load,
-    ):
+    ) -> None:
         """
         GIVEN:
            - Request for suggestions for a document
@@ -2276,7 +2276,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
     def test_get_suggestions_dates_disabled(
         self,
         mock_get_date_parser: mock.MagicMock,
-    ):
+    ) -> None:
         """
         GIVEN:
             - NUMBER_OF_SUGGESTED_DATES = 0 (disables feature)
@@ -3409,7 +3409,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-    def test_create_share_link_requires_view_permission_for_document(self):
+    def test_create_share_link_requires_view_permission_for_document(self) -> None:
         """
         GIVEN:
             - A user with add_sharelink but without view permission on a document
@@ -3457,7 +3457,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(create_resp.status_code, status.HTTP_201_CREATED)
         self.assertEqual(create_resp.data["document"], doc.pk)
 
-    def test_next_asn(self):
+    def test_next_asn(self) -> None:
         """
         GIVEN:
             - Existing documents with ASNs, highest owned by user2

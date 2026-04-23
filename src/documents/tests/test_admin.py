@@ -100,7 +100,7 @@ class TestTagAdmin(DirectoriesMixin, TestCase):
         self.tag_admin = TagAdmin(model=Tag, admin_site=AdminSite())
 
     @patch("documents.tasks.bulk_update_documents")
-    def test_parent_tags_get_added(self, mock_bulk_update):
+    def test_parent_tags_get_added(self, mock_bulk_update) -> None:
         document = Document.objects.create(title="test")
         parent = Tag.objects.create(name="parent")
         child = Tag.objects.create(name="child")

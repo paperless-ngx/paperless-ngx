@@ -276,7 +276,9 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         )
 
         doc.refresh_from_db()
-        self.assertEqual(doc.custom_fields.first().value, None)
+        _cf_1 = doc.custom_fields.first()
+        assert _cf_1 is not None
+        self.assertEqual(_cf_1.value, None)
 
     @mock.patch("documents.signals.handlers.process_cf_select_update.apply_async")
     def test_custom_field_update_offloaded_once(self, mock_delay) -> None:
@@ -567,7 +569,9 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(CustomFieldInstance.objects.count(), 1)
-        self.assertEqual(doc.custom_fields.first().value, "test value")
+        _cf_2 = doc.custom_fields.first()
+        assert _cf_2 is not None
+        self.assertEqual(_cf_2.value, "test value")
 
         # Update
         resp = self.client.patch(
@@ -584,7 +588,9 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(CustomFieldInstance.objects.count(), 1)
-        self.assertEqual(doc.custom_fields.first().value, "a new test value")
+        _cf_3 = doc.custom_fields.first()
+        assert _cf_3 is not None
+        self.assertEqual(_cf_3.value, "a new test value")
 
     def test_delete_custom_field_instance(self) -> None:
         """
@@ -650,7 +656,9 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(CustomFieldInstance.objects.count(), 1)
         self.assertEqual(Document.objects.count(), 1)
         self.assertEqual(len(doc.custom_fields.all()), 1)
-        self.assertEqual(doc.custom_fields.first().value, date_value)
+        _cf_4 = doc.custom_fields.first()
+        assert _cf_4 is not None
+        self.assertEqual(_cf_4.value, date_value)
 
     def test_custom_field_validation(self) -> None:
         """
@@ -1062,9 +1070,15 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(CustomFieldInstance.objects.count(), 4)
-        self.assertEqual(doc2.custom_fields.first().value, [1])
-        self.assertEqual(doc3.custom_fields.first().value, [1])
-        self.assertEqual(doc4.custom_fields.first().value, [1])
+        _cf_5 = doc2.custom_fields.first()
+        assert _cf_5 is not None
+        self.assertEqual(_cf_5.value, [1])
+        _cf_6 = doc3.custom_fields.first()
+        assert _cf_6 is not None
+        self.assertEqual(_cf_6.value, [1])
+        _cf_7 = doc4.custom_fields.first()
+        assert _cf_7 is not None
+        self.assertEqual(_cf_7.value, [1])
 
         # Add links appends if necessary
         resp = self.client.patch(
@@ -1081,7 +1095,9 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         )
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(doc4.custom_fields.first().value, [1, 3])
+        _cf_8 = doc4.custom_fields.first()
+        assert _cf_8 is not None
+        self.assertEqual(_cf_8.value, [1, 3])
 
         # Remove one of the links, removed on other doc
         resp = self.client.patch(
@@ -1098,9 +1114,15 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         )
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(doc2.custom_fields.first().value, [1])
-        self.assertEqual(doc3.custom_fields.first().value, [1, 4])
-        self.assertEqual(doc4.custom_fields.first().value, [3])
+        _cf_9 = doc2.custom_fields.first()
+        assert _cf_9 is not None
+        self.assertEqual(_cf_9.value, [1])
+        _cf_10 = doc3.custom_fields.first()
+        assert _cf_10 is not None
+        self.assertEqual(_cf_10.value, [1, 4])
+        _cf_11 = doc4.custom_fields.first()
+        assert _cf_11 is not None
+        self.assertEqual(_cf_11.value, [3])
 
         # Removes the field entirely
         resp = self.client.patch(
@@ -1112,9 +1134,15 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         )
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(doc2.custom_fields.first().value, [])
-        self.assertEqual(doc3.custom_fields.first().value, [4])
-        self.assertEqual(doc4.custom_fields.first().value, [3])
+        _cf_12 = doc2.custom_fields.first()
+        assert _cf_12 is not None
+        self.assertEqual(_cf_12.value, [])
+        _cf_13 = doc3.custom_fields.first()
+        assert _cf_13 is not None
+        self.assertEqual(_cf_13.value, [4])
+        _cf_14 = doc4.custom_fields.first()
+        assert _cf_14 is not None
+        self.assertEqual(_cf_14.value, [3])
 
         # If field exists on target doc but value is None
         doc5 = Document.objects.create(
@@ -1139,7 +1167,9 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         )
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(doc5.custom_fields.first().value, [1])
+        _cf_15 = doc5.custom_fields.first()
+        assert _cf_15 is not None
+        self.assertEqual(_cf_15.value, [1])
 
     def test_documentlink_patch_requires_change_permission_on_target_documents(
         self,
@@ -1321,7 +1351,9 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(results[0]["document_count"], 0)
 
-    def test_patch_document_invalid_date_custom_field_returns_validation_error(self):
+    def test_patch_document_invalid_date_custom_field_returns_validation_error(
+        self,
+    ) -> None:
         """
         GIVEN:
             - A date custom field

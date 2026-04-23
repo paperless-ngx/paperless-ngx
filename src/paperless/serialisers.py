@@ -89,7 +89,7 @@ class UserSerializer(PasswordValidationMixin, serializers.ModelSerializer[User])
         mfa_adapter = get_mfa_adapter()
         return mfa_adapter.is_mfa_enabled(user)
 
-    class Meta:
+    class Meta(serializers.ModelSerializer.Meta):
         model = User
         fields = (
             "id",
@@ -149,7 +149,7 @@ class GroupSerializer(serializers.ModelSerializer[Group]):
         slug_field="codename",
     )
 
-    class Meta:
+    class Meta(serializers.ModelSerializer.Meta):
         model = Group
         fields = (
             "id",
@@ -161,7 +161,7 @@ class GroupSerializer(serializers.ModelSerializer[Group]):
 class SocialAccountSerializer(serializers.ModelSerializer[SocialAccount]):
     name = serializers.SerializerMethodField()
 
-    class Meta:
+    class Meta(serializers.ModelSerializer.Meta):
         model = SocialAccount
         fields = (
             "id",
@@ -195,7 +195,7 @@ class ProfileSerializer(PasswordValidationMixin, serializers.ModelSerializer[Use
     def get_has_usable_password(self, user: User) -> bool:
         return user.has_usable_password()
 
-    class Meta:
+    class Meta(serializers.ModelSerializer.Meta):
         model = User
         fields = (
             "email",
@@ -291,6 +291,6 @@ class ApplicationConfigurationSerializer(
 
         return value
 
-    class Meta:
+    class Meta(serializers.ModelSerializer.Meta):
         model = ApplicationConfiguration
         fields = "__all__"

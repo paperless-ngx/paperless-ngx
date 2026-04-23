@@ -246,6 +246,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self.assertIsNotNone(document)
 
@@ -297,6 +298,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self.assertIsNotNone(document)
 
@@ -316,6 +318,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self.assertIsNotNone(document)
 
@@ -331,6 +334,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self.assertIsNotNone(document)
 
@@ -347,6 +351,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self.assertIsNotNone(document)
 
@@ -363,6 +368,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self.assertEqual(document.document_type.id, dt.id)
         self._assert_first_last_send_progress()
@@ -377,6 +383,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self.assertEqual(document.storage_path.id, sp.id)
         self._assert_first_last_send_progress()
@@ -393,6 +400,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self.assertIn(t1, document.tags.all())
         self.assertNotIn(t2, document.tags.all())
@@ -419,6 +427,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         fields_used = [
             field_instance.field for field_instance in document.custom_fields.all()
@@ -441,6 +450,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self.assertEqual(document.archive_serial_number, 123)
         self._assert_first_last_send_progress()
@@ -460,6 +470,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         now = timezone.now()
         self.assertEqual(document.title, f"{c.name}{dt.name} {now.strftime('%m-%y')}")
@@ -475,6 +486,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self.assertEqual(document.owner, testuser)
         self._assert_first_last_send_progress()
@@ -493,6 +505,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         user_checker = ObjectPermissionChecker(testuser)
         self.assertTrue(user_checker.has_perm("view_document", document))
@@ -565,6 +578,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
             document.delete()
 
         with self.assertRaisesMessage(ConsumerError, "document is in the trash"):
@@ -645,6 +659,7 @@ class TestConsumer(
             consumer.run()
 
         document = Document.objects.first()
+        assert document is not None
 
         self.assertEqual(document.title, "new docs")
         self.assertEqual(document.filename, "none/new docs.pdf")
@@ -666,6 +681,7 @@ class TestConsumer(
             consumer.run()
 
         document = Document.objects.first()
+        assert document is not None
         self.assertIsNotNone(document)
         assert document is not None
 
@@ -704,6 +720,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self.assertEqual(document.title, "new docs")
         self.assertIsNotNone(document.title)
@@ -723,6 +740,7 @@ class TestConsumer(
             consumer.run()
 
         document = Document.objects.first()
+        assert document is not None
         assert document is not None
 
         self.assertEqual(document.version_label, "v1")
@@ -940,6 +958,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self.assertEqual(document.correspondent, correspondent)
         self.assertEqual(document.document_type, dtype)
@@ -957,6 +976,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self._assert_first_last_send_progress()
 
@@ -987,6 +1007,7 @@ class TestConsumer(
 
         # Move the existing document to trash
         document = Document.objects.first()
+        assert document is not None
         document.delete()
 
         dst = self.get_test_file()
@@ -1015,6 +1036,7 @@ class TestConsumer(
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self._assert_first_last_send_progress()
 
@@ -1173,6 +1195,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self.assertEqual(
             document.created,
@@ -1203,6 +1226,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self.assertEqual(
             document.created,
@@ -1233,6 +1257,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self.assertEqual(
             document.created,
@@ -1265,6 +1290,7 @@ class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
             consumer.run()
 
             document = Document.objects.first()
+            assert document is not None
 
         self.assertEqual(
             document.created,

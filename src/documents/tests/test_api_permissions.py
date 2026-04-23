@@ -933,7 +933,7 @@ class TestApiUser(DirectoriesMixin, APITestCase):
         returned_user1 = User.objects.get(pk=user1.pk)
         self.assertEqual(returned_user1.is_superuser, False)
 
-    def test_only_superusers_can_create_or_alter_staff_status(self):
+    def test_only_superusers_can_create_or_alter_staff_status(self) -> None:
         """
         GIVEN:
             - Existing user account

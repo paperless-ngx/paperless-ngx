@@ -319,8 +319,10 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             [self.doc3.id],
         )
         # assert reflect document link
+        _cf_1 = self.doc3.custom_fields.first()
+        assert _cf_1 is not None
         self.assertEqual(
-            self.doc3.custom_fields.first().value,
+            _cf_1.value,
             [self.doc2.id, self.doc1.id],
         )
 
@@ -334,14 +336,12 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             add_custom_fields={},
             remove_custom_fields=[cf3.id],
         )
-        self.assertNotIn(
-            self.doc3.id,
-            self.doc1.custom_fields.filter(field=cf3).first().value,
-        )
-        self.assertNotIn(
-            self.doc3.id,
-            self.doc2.custom_fields.filter(field=cf3).first().value,
-        )
+        _cf_2 = self.doc1.custom_fields.filter(field=cf3).first()
+        assert _cf_2 is not None
+        self.assertNotIn(self.doc3.id, _cf_2.value)
+        _cf_3 = self.doc2.custom_fields.filter(field=cf3).first()
+        assert _cf_3 is not None
+        self.assertNotIn(self.doc3.id, _cf_3.value)
 
     def test_modify_custom_fields_doclink_self_link(self) -> None:
         """
@@ -363,14 +363,12 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             remove_custom_fields=[],
         )
 
-        self.assertEqual(
-            self.doc1.custom_fields.first().value,
-            [self.doc2.id],
-        )
-        self.assertEqual(
-            self.doc2.custom_fields.first().value,
-            [self.doc1.id],
-        )
+        _cf_4 = self.doc1.custom_fields.first()
+        assert _cf_4 is not None
+        self.assertEqual(_cf_4.value, [self.doc2.id])
+        _cf_5 = self.doc2.custom_fields.first()
+        assert _cf_5 is not None
+        self.assertEqual(_cf_5.value, [self.doc1.id])
 
     def test_delete(self) -> None:
         self.assertEqual(Document.objects.count(), 5)
@@ -693,7 +691,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self,
         mock_consume_file,
         mock_delete_documents,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Existing documents
@@ -932,7 +930,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_chord,
         mock_consume_file,
         mock_delete_documents,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Existing documents
@@ -1027,7 +1025,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_consume_file.assert_not_called()
 
     @mock.patch("documents.tasks.consume_file.apply_async")
-    def test_rotate(self, mock_consume_delay):
+    def test_rotate(self, mock_consume_delay) -> None:
         """
         GIVEN:
             - Existing documents
@@ -1054,7 +1052,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self,
         mock_pdf_save,
         mock_consume_delay,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Existing documents
@@ -1078,7 +1076,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
     def test_rotate_non_pdf(
         self,
         mock_consume_delay,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Existing documents
@@ -1105,7 +1103,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_open,
         mock_consume_delay,
         mock_magic,
-    ):
+    ) -> None:
         Document.objects.create(
             checksum="B-v1",
             title="B version 1",
@@ -1128,7 +1126,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
     @mock.patch("documents.tasks.consume_file.apply_async")
     @mock.patch("pikepdf.Pdf.save")
     @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
-    def test_delete_pages(self, mock_magic, mock_pdf_save, mock_consume_delay):
+    def test_delete_pages(self, mock_magic, mock_pdf_save, mock_consume_delay) -> None:
         """
         GIVEN:
             - Existing documents
@@ -1159,7 +1157,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_open,
         mock_consume_delay,
         mock_magic,
-    ):
+    ) -> None:
         Document.objects.create(
             checksum="B-v1",
             title="B version 1",
@@ -1181,7 +1179,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.tasks.consume_file.apply_async")
     @mock.patch("pikepdf.Pdf.save")
-    def test_delete_pages_with_error(self, mock_pdf_save, mock_consume_delay):
+    def test_delete_pages_with_error(self, mock_pdf_save, mock_consume_delay) -> None:
         """
         GIVEN:
             - Existing documents
@@ -1300,7 +1298,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertEqual(self.doc2.archive_serial_number, 333)
 
     @mock.patch("documents.tasks.consume_file.apply_async")
-    def test_edit_pdf_with_update_document(self, mock_consume_delay):
+    def test_edit_pdf_with_update_document(self, mock_consume_delay) -> None:
         """
         GIVEN:
             - A single existing PDF document
@@ -1338,7 +1336,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_new,
         mock_consume_delay,
         mock_magic,
-    ):
+    ) -> None:
         Document.objects.create(
             checksum="B-v1",
             title="B version 1",
@@ -1416,7 +1414,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self,
         mock_consume_file,
         mock_group,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Existing document
@@ -1446,7 +1444,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_mkdtemp,
         mock_consume_delay,
         mock_update_document,
-    ):
+    ) -> None:
         doc = self.doc1
         temp_dir = self.dirs.scratch_dir / "remove-password-update"
         temp_dir.mkdir(parents=True, exist_ok=True)

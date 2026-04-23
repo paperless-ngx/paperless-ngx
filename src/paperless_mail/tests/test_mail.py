@@ -1592,7 +1592,7 @@ class TestPostConsumeAction(TestCase):
         mock_get_rule_action,
         mock_mailbox_login,
         mock_get_mailbox,
-    ):
+    ) -> None:
         mock_mailbox = mock.MagicMock()
         mock_get_mailbox.return_value.__enter__.return_value = mock_mailbox
         mock_action = mock.MagicMock()
@@ -1625,7 +1625,7 @@ class TestPostConsumeAction(TestCase):
         mock_get_rule_action,
         mock_mailbox_login,
         mock_get_mailbox,
-    ):
+    ) -> None:
         mock_mailbox = mock.MagicMock()
         mock_get_mailbox.return_value.__enter__.return_value = mock_mailbox
         mock_action = mock.MagicMock()
@@ -1762,7 +1762,7 @@ class TestTasks(TestCase):
         self.assertIn("No new", result)
 
     @mock.patch("paperless_mail.tasks.MailAccountHandler.handle_mail_account")
-    def test_rule_with_stop_processing(self, m):
+    def test_rule_with_stop_processing(self, m) -> None:
         """
         GIVEN:
             - Mail account with a rule with stop_processing=True
@@ -1863,7 +1863,7 @@ class TestMailAccountTestView(APITestCase):
     def test_mail_account_test_view_refresh_token(
         self,
         mock_refresh_account_oauth_token,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Mail account with expired token
@@ -2050,6 +2050,7 @@ class TestMailRuleAPI(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(MailRule.objects.count(), 1)
         rule = MailRule.objects.first()
+        assert rule is not None
         self.assertEqual(rule.name, "Test Rule")
 
     def test_mail_rule_action_parameter_required_for_tag_or_move(self) -> None:

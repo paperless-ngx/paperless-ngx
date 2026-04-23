@@ -943,7 +943,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         response = self.client.get("/api/documents/?query=things")
         self.assertIsNone(response.data["corrected_query"])
 
-    def test_search_spelling_suggestion_suppressed_for_private_terms(self):
+    def test_search_spelling_suggestion_suppressed_for_private_terms(self) -> None:
         owner = User.objects.create_user("owner")
         attacker = User.objects.create_user("attacker")
         attacker.user_permissions.add(
