@@ -19,6 +19,7 @@ import {
   PaperlessTaskTriggerSource,
   PaperlessTaskType,
 } from 'src/app/data/paperless-task'
+import { Results } from 'src/app/data/results'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -148,6 +149,11 @@ const tasks: PaperlessTask[] = [
   },
 ]
 
+const paginatedTasks: Results<PaperlessTask> = {
+  count: tasks.length,
+  results: tasks,
+}
+
 describe('TasksComponent', () => {
   let component: TasksComponent
   let fixture: ComponentFixture<TasksComponent>
@@ -196,9 +202,25 @@ describe('TasksComponent', () => {
     component = fixture.componentInstance
     jest.useFakeTimers()
     fixture.detectChanges()
+
     httpTestingController
-      .expectOne(`${environment.apiBaseUrl}tasks/?acknowledged=false`)
-      .flush(tasks)
+      .expectOne(
+        (req) =>
+          req.url === `${environment.apiBaseUrl}tasks/` &&
+          req.params.get('acknowledged') === 'false' &&
+          req.params.get('page_size') === '1000'
+      )
+      .flush(paginatedTasks)
+
+    httpTestingController
+      .expectOne(
+        (req) =>
+          req.url === `${environment.apiBaseUrl}tasks/` &&
+          req.params.get('acknowledged') === 'false' &&
+          req.params.get('page_size') === '25' &&
+          req.params.get('page') === '1'
+      )
+      .flush(paginatedTasks)
   })
 
   it('should display task sections with counts', () => {
@@ -292,6 +314,40 @@ describe('TasksComponent', () => {
       viewScope.nativeElement.compareDocumentPosition(search.nativeElement) &
         Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy()
+  })
+
+  it('should render pagination controls next to the task filter', () => {
+    fixture.detectChanges()
+
+    const controls = fixture.debugElement.query(By.css('.task-controls'))
+    const search = controls.query(By.css('.task-search'))
+    const pagination = controls.query(By.css('ngb-pagination'))
+
+    expect(search).not.toBeNull()
+    expect(pagination).not.toBeNull()
+  })
+
+  it('should load a different task page when pagination changes', () => {
+    component.setPage(2)
+
+    const pageTwoTasks = {
+      count: 30,
+      results: [tasks[0]],
+    }
+
+    httpTestingController
+      .expectOne(
+        (req) =>
+          req.url === `${environment.apiBaseUrl}tasks/` &&
+          req.params.get('acknowledged') === 'false' &&
+          req.params.get('page_size') === '25' &&
+          req.params.get('page') === '2'
+      )
+      .flush(pageTwoTasks)
+
+    expect(component.page).toBe(2)
+    expect(component.totalTasks).toBe(30)
+    expect(component.pagedTasks).toEqual([tasks[0]])
   })
 
   it('should expose stable task type options and disable empty ones', () => {
@@ -470,7 +526,7 @@ describe('TasksComponent', () => {
 
     component.toggleSection(TaskSection.NeedsAttention, {
       target: { checked: false },
-    } as PointerEvent)
+    } as unknown as PointerEvent)
 
     expect(component.selectedTasks).toEqual(new Set())
   })

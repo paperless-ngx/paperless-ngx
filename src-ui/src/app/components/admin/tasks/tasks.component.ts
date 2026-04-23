@@ -6,6 +6,7 @@ import {
   NgbCollapseModule,
   NgbDropdownModule,
   NgbModal,
+  NgbPaginationModule,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -139,6 +140,7 @@ const TRIGGER_SOURCE_OPTIONS: Array<{
     NgTemplateOutlet,
     NgbCollapseModule,
     NgbDropdownModule,
+    NgbPaginationModule,
     NgbPopoverModule,
     NgxBootstrapIconsModule,
   ],
@@ -161,6 +163,10 @@ export class TasksComponent
   public selectedTasks: Set<number> = new Set()
   public expandedTask: number
   public autoRefreshEnabled: boolean = true
+  public readonly pageSize = 25
+  public page: number = 1
+  public totalTasks: number = 0
+  public pagedTasks: PaperlessTask[] = []
   public selectedSection: TaskSection = TaskSection.All
   public selectedTaskType: PaperlessTaskType | null = null
   public selectedTriggerSource: PaperlessTaskTriggerSource | null = null
@@ -254,6 +260,7 @@ export class TasksComponent
 
   ngOnInit() {
     this.tasksService.reload()
+    this.reloadPage()
     timer(5000, 5000)
       .pipe(
         filter(() => this.autoRefreshEnabled),
@@ -261,6 +268,7 @@ export class TasksComponent
       )
       .subscribe(() => {
         this.tasksService.reload()
+        this.reloadPage(false)
       })
 
     this.filterDebounce
@@ -270,7 +278,10 @@ export class TasksComponent
         distinctUntilChanged(),
         filter((query) => !query.length || query.length > 2)
       )
-      .subscribe((query) => (this._filterText = query))
+      .subscribe((query) => {
+        this._filterText = query
+        this.clearSelection()
+      })
   }
 
   ngOnDestroy() {
@@ -300,6 +311,9 @@ export class TasksComponent
         modal.componentInstance.buttonsEnabled = false
         modal.close()
         this.tasksService.dismissTasks(tasks).subscribe({
+          next: () => {
+            this.reloadPage(false)
+          },
           error: (e) => {
             this.toastService.showError($localize`Error dismissing tasks`, e)
             modal.componentInstance.buttonsEnabled = true
@@ -309,6 +323,9 @@ export class TasksComponent
       })
     } else if (tasks.size === 1) {
       this.tasksService.dismissTasks(tasks).subscribe({
+        next: () => {
+          this.reloadPage(false)
+        },
         error: (e) =>
           this.toastService.showError($localize`Error dismissing task`, e),
       })
@@ -421,7 +438,7 @@ export class TasksComponent
   }
 
   tasksForSection(section: TaskSection): PaperlessTask[] {
-    let tasks = this.tasksService.allFileTasks.filter((task) =>
+    let tasks = this.pagedTasks.filter((task) =>
       this.taskBelongsToSection(task, section)
     )
 
@@ -433,7 +450,7 @@ export class TasksComponent
   }
 
   sectionCount(section: TaskSection): number {
-    return this.tasksService.allFileTasks.filter((task) =>
+    return this.pagedTasks.filter((task) =>
       this.taskBelongsToSection(task, section)
     ).length
   }
@@ -479,6 +496,16 @@ export class TasksComponent
 
   clearSelection() {
     this.selectedTasks.clear()
+  }
+
+  setPage(page: number) {
+    if (this.page === page) {
+      return
+    }
+
+    this.page = page
+    this.clearSelection()
+    this.reloadPage()
   }
 
   public resetFilter() {
@@ -576,10 +603,39 @@ export class TasksComponent
         ? this.sections
         : [this.selectedSection]
 
-    return this.tasksService.allFileTasks.filter(
+    return this.pagedTasks.filter(
       (task) =>
         sections.some((section) => this.taskBelongsToSection(task, section)) &&
         this.taskMatchesFilters(task, { taskType, triggerSource })
     )
+  }
+
+  private reloadPage(resetToFirstPage: boolean = false) {
+    if (resetToFirstPage) {
+      this.page = 1
+    }
+
+    this.loading = true
+    this.tasksService
+      .list(this.page, this.pageSize, { acknowledged: false })
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (result) => {
+          this.pagedTasks = result.results
+          this.totalTasks = result.count
+          this.loading = false
+          if (
+            this.page > 1 &&
+            this.pagedTasks.length === 0 &&
+            this.totalTasks > 0
+          ) {
+            this.page -= 1
+            this.reloadPage()
+          }
+        },
+        error: () => {
+          this.loading = false
+        },
+      })
   }
 }

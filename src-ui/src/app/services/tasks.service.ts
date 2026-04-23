@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core'
 import { Observable, Subject } from 'rxjs'
-import { first, takeUntil, tap } from 'rxjs/operators'
+import { first, map, takeUntil, tap } from 'rxjs/operators'
 import {
   PaperlessTask,
   PaperlessTaskStatus,
   PaperlessTaskType,
 } from 'src/app/data/paperless-task'
+import { Results } from 'src/app/data/results'
 import { environment } from 'src/environments/environment'
 
 @Injectable({
@@ -17,6 +18,7 @@ export class TasksService {
 
   private baseUrl: string = environment.apiBaseUrl
   private endpoint: string = 'tasks'
+  private readonly defaultReloadPageSize = 1000
 
   public loading: boolean = false
 
@@ -69,14 +71,35 @@ export class TasksService {
     this.loading = true
 
     this.http
-      .get<PaperlessTask[]>(
-        `${this.baseUrl}${this.endpoint}/?acknowledged=false`
-      )
+      .get<Results<PaperlessTask>>(`${this.baseUrl}${this.endpoint}/`, {
+        params: {
+          acknowledged: 'false',
+          page_size: this.defaultReloadPageSize,
+        },
+      })
+      .pipe(map((r) => r.results))
       .pipe(takeUntil(this.unsubscribeNotifer), first())
       .subscribe((r) => {
         this.fileTasks = r
         this.loading = false
       })
+  }
+
+  public list(
+    page: number,
+    pageSize: number,
+    extraParams?: Record<string, string | number | boolean>
+  ): Observable<Results<PaperlessTask>> {
+    return this.http.get<Results<PaperlessTask>>(
+      `${this.baseUrl}${this.endpoint}/`,
+      {
+        params: {
+          page,
+          page_size: pageSize,
+          ...extraParams,
+        },
+      }
+    )
   }
 
   public dismissTasks(task_ids: Set<number>): Observable<any> {
