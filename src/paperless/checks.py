@@ -1,6 +1,4 @@
-import grp
 import os
-import pwd
 import shutil
 import stat
 import subprocess
@@ -38,8 +36,8 @@ def path_check(var: str, directory: Path) -> list[Error]:
             except PermissionError:
                 dir_stat: os.stat_result = Path(directory).stat()
                 dir_mode: str = stat.filemode(dir_stat.st_mode)
-                dir_owner: str = pwd.getpwuid(dir_stat.st_uid).pw_name
-                dir_group: str = grp.getgrgid(dir_stat.st_gid).gr_name
+                dir_owner: str = ""
+                dir_group: str = ""
                 messages.append(
                     Error(
                         writeable_message.format(var),

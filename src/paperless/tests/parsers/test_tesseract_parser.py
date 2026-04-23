@@ -18,6 +18,7 @@ from ocrmypdf import SubprocessOutputError
 
 from documents.parsers import ParseError
 from documents.parsers import run_convert
+from paperless.models import ModeChoices
 from paperless.parsers import ParserProtocol
 from paperless.parsers.tesseract import RasterisedDocumentParser
 from paperless.parsers.tesseract import post_process_text
@@ -413,7 +414,7 @@ class TestParsePdf:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.mode = "redo"
+        tesseract_parser.settings.mode = ModeChoices.REDO
         tesseract_parser.parse(
             tesseract_samples_dir / "with-form.pdf",
             "application/pdf",
@@ -430,7 +431,7 @@ class TestParsePdf:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.mode = "force"
+        tesseract_parser.settings.mode = ModeChoices.FORCE
         tesseract_parser.parse(
             tesseract_samples_dir / "with-form.pdf",
             "application/pdf",
@@ -445,7 +446,7 @@ class TestParsePdf:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(tesseract_samples_dir / "signed.pdf", "application/pdf")
         assert tesseract_parser.archive_path is None
         assert_ordered_substrings(
@@ -461,7 +462,7 @@ class TestParsePdf:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             tesseract_samples_dir / "encrypted.pdf",
             "application/pdf",
@@ -599,7 +600,7 @@ class TestParseMultiPage:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-images.pdf",
             "application/pdf",
@@ -626,7 +627,7 @@ class TestParseMultiPage:
             - Pages 1 and 2 extracted; page 3 absent
         """
         tesseract_parser.settings.pages = 2
-        tesseract_parser.settings.mode = "redo"
+        tesseract_parser.settings.mode = ModeChoices.REDO
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-images.pdf",
             "application/pdf",
@@ -652,7 +653,7 @@ class TestParseMultiPage:
             - Only page 1 extracted
         """
         tesseract_parser.settings.pages = 1
-        tesseract_parser.settings.mode = "force"
+        tesseract_parser.settings.mode = ModeChoices.FORCE
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-images.pdf",
             "application/pdf",
@@ -754,7 +755,7 @@ class TestSkipArchive:
             - Text extracted from original; no archive created (text exists +
               produce_archive=False skips OCRmyPDF entirely)
         """
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-digital.pdf",
             "application/pdf",
@@ -780,7 +781,7 @@ class TestSkipArchive:
         THEN:
             - Text extracted; archive created (OCR needed, no existing text)
         """
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-images.pdf",
             "application/pdf",
@@ -838,7 +839,7 @@ class TestSkipArchive:
             - archive_path is set if and only if produce_archive=True
             - Text is always extracted
         """
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             tesseract_samples_dir / filename,
             "application/pdf",
@@ -868,7 +869,7 @@ class TestSkipArchive:
             - Text is extracted from the original via pdftotext
             - No archive is produced
         """
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         mock_ocr = mocker.patch("ocrmypdf.ocr")
         tesseract_parser.parse(
             tesseract_samples_dir / "simple-digital.pdf",
@@ -895,7 +896,7 @@ class TestSkipArchive:
             - Archive is produced
             - Text is preserved from the original
         """
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             tesseract_samples_dir / "simple-digital.pdf",
             "application/pdf",
@@ -925,7 +926,7 @@ class TestParseMixed:
         THEN:
             - All pages extracted; archive created; sidecar notes skipped pages
         """
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-mixed.pdf",
             "application/pdf",
@@ -953,7 +954,7 @@ class TestParseMixed:
         THEN:
             - Both text layer and image text extracted; archive created
         """
-        tesseract_parser.settings.mode = "redo"
+        tesseract_parser.settings.mode = ModeChoices.REDO
         tesseract_parser.parse(
             tesseract_samples_dir / "single-page-mixed.pdf",
             "application/pdf",
@@ -989,7 +990,7 @@ class TestParseMixed:
         THEN:
             - No archive created (produce_archive=False); text from text layer present
         """
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-mixed.pdf",
             "application/pdf",
@@ -1013,7 +1014,7 @@ class TestParseRotate:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.settings.rotate = True
         tesseract_parser.parse(tesseract_samples_dir / "rotated.pdf", "application/pdf")
         assert_ordered_substrings(
@@ -1052,7 +1053,7 @@ class TestParseRtl:
         force-ocr with English Tesseract (producing garbage).  Using mode="off" forces
         skip_text=True so the Arabic text layer is preserved through PDF/A conversion.
         """
-        tesseract_parser.settings.mode = "off"
+        tesseract_parser.settings.mode = ModeChoices.OFF
         tesseract_parser.parse(
             tesseract_samples_dir / "rtl-test.pdf",
             "application/pdf",

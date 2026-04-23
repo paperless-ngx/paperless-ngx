@@ -261,7 +261,7 @@ def get_objects_for_user_owner_aware(
     Model: Any,
     *,
     include_deleted: bool = False,
-) -> QuerySet:
+) -> QuerySet[Any]:
     """
     Returns objects the user owns, are unowned, or has explicit perms.
     When include_deleted is True, soft-deleted items are also included.

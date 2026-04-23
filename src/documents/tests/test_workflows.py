@@ -2064,11 +2064,11 @@ class TestWorkflows(
             format="json",
         )
 
-        view_users_perms: QuerySet = get_users_with_perms(
+        view_users_perms: QuerySet[Any] = get_users_with_perms(
             doc,
             only_with_perms_in=["view_document"],
         )
-        change_users_perms: QuerySet = get_users_with_perms(
+        change_users_perms: QuerySet[Any] = get_users_with_perms(
             doc,
             only_with_perms_in=["change_document"],
         )
@@ -2079,7 +2079,7 @@ class TestWorkflows(
         self.assertIn(self.user3, view_users_perms)
         self.assertIn(self.user3, change_users_perms)
 
-        group_perms: QuerySet = get_groups_with_perms(doc)
+        group_perms: QuerySet[Any] = get_groups_with_perms(doc)
         # group1 should still have permissions
         self.assertIn(self.group1, group_perms)
         # group2 should have been added
@@ -2845,7 +2845,7 @@ class TestWorkflows(
         self.assertEqual(doc.custom_fields.all().count(), 0)
         self.assertFalse(self.user3.has_perm("documents.view_document", doc))
         self.assertFalse(self.user3.has_perm("documents.change_document", doc))
-        group_perms: QuerySet = get_groups_with_perms(doc)
+        group_perms: QuerySet[Any] = get_groups_with_perms(doc)
         self.assertNotIn(self.group1, group_perms)
 
     def test_document_updated_workflow_assignment_persists_when_removing_trigger_tag(
@@ -2979,7 +2979,7 @@ class TestWorkflows(
         self.assertEqual(doc.custom_fields.all().count(), 0)
         self.assertFalse(self.user3.has_perm("documents.view_document", doc))
         self.assertFalse(self.user3.has_perm("documents.change_document", doc))
-        group_perms: QuerySet = get_groups_with_perms(doc)
+        group_perms: QuerySet[Any] = get_groups_with_perms(doc)
         self.assertNotIn(self.group1, group_perms)
 
     def test_removal_action_document_consumed(self) -> None:
