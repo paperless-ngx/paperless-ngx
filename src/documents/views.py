@@ -4601,6 +4601,16 @@ def get_task_summary_data(queryset):
                             "redis_status": serializers.CharField(),
                             "redis_error": serializers.CharField(),
                             "celery_status": serializers.CharField(),
+                            "summary": inline_serializer(
+                                name="TasksSummaryOverview",
+                                fields={
+                                    "days": serializers.IntegerField(),
+                                    "total_count": serializers.IntegerField(),
+                                    "pending_count": serializers.IntegerField(),
+                                    "success_count": serializers.IntegerField(),
+                                    "failure_count": serializers.IntegerField(),
+                                },
+                            ),
                         },
                     ),
                     "index": inline_serializer(
