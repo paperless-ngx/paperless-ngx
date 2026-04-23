@@ -124,10 +124,10 @@
   </div>
 
   <div class="card border table-responsive mb-3">
-    <table class="table table-striped align-middle shadow-sm mb-0">
+    <table class="table table-striped align-middle shadow-sm mb-0 tasks-table">
       <thead>
         <tr>
-          <th scope="col">
+          <th scope="col" class="select-col">
             <div class="form-check">
               <input
                 type="checkbox"
@@ -140,19 +140,19 @@
               <label class="form-check-label" for="all-tasks-{{section}}"><span class="visually-hidden">Check all</span></label>
             </div>
           </th>
-          <th scope="col" i18n>Name</th>
-          <th scope="col" class="d-none d-lg-table-cell" i18n>Created</th>
+          <th scope="col" class="name-col-header" i18n>Name</th>
+          <th scope="col" class="d-none d-lg-table-cell created-col" i18n>Created</th>
           @if (sectionShowsResults(section)) {
-            <th scope="col" class="d-none d-lg-table-cell" i18n>Results</th>
+            <th scope="col" class="d-none d-lg-table-cell results-col" i18n>Results</th>
           }
           <th scope="col" class="d-table-cell d-lg-none" i18n>Info</th>
-          <th scope="col" i18n>Actions</th>
+          <th scope="col" class="actions-col" i18n>Actions</th>
         </tr>
       </thead>
       <tbody>
         @for (task of tasks; track task.id) {
           <tr (click)="toggleSelected(task); $event.stopPropagation();" (keydown)="toggleSelected(task); $event.stopPropagation();">
-            <td>
+            <td class="select-col">
               <div class="form-check">
                 <input
                   type="checkbox"
@@ -174,9 +174,9 @@
                 <span>{{ task.trigger_source_display }}</span>
               </div>
             </td>
-            <td class="d-none d-lg-table-cell">{{ task.date_created | customDate:'short' }}</td>
+            <td class="d-none d-lg-table-cell created-col">{{ task.date_created | customDate:'short' }}</td>
             @if (sectionShowsResults(section)) {
-              <td class="d-none d-lg-table-cell">
+              <td class="d-none d-lg-table-cell results-col">
                 @if (taskHasLongResultMessage(task)) {
                   <div class="result" (click)="expandTask(task); $event.stopPropagation();"
                     [ngbPopover]="resultPopover" popoverClass="shadow small mobile" triggers="mouseenter:mouseleave" container="body">
@@ -207,7 +207,7 @@
                 <i-bs width="1.2em" height="1.2em" name="info-circle"></i-bs>
               </button>
             </td>
-            <td scope="row">
+            <td scope="row" class="actions-col">
               <div class="btn-group" role="group">
                 <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }">
                   <i-bs name="check" class="me-1"></i-bs><ng-container i18n>Dismiss</ng-container>
@@ -223,7 +223,7 @@
             </td>
           </tr>
         <tr>
-          <td class="p-0" [class.border-0]="expandedTask !== task.id" [attr.colspan]="sectionShowsResults(section) ? 5 : 4">
+          <td class="px-2 py-0" [class.border-0]="expandedTask !== task.id" [attr.colspan]="sectionShowsResults(section) ? 5 : 4">
             <div #collapse="ngbCollapse" [ngbCollapse]="expandedTask !== task.id" class="task-detail-panel bg-darker small mb-0">
               <div class="p-2 p-lg-3 ms-lg-3">
                 @if (taskHasResultMessage(task)) {
