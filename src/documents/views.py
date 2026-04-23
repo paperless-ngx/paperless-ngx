@@ -4634,6 +4634,7 @@ def get_task_summary_data(queryset):
 )
 class SystemStatusView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
+    TASK_SUMMARY_DAYS = 30
 
     def get(self, request, format=None):
         if not has_system_status_permission(request.user):
@@ -4800,6 +4801,20 @@ class SystemStatusView(PassUserMixin):
                 last_llmindex_update.date_done if last_llmindex_update else None
             )
 
+        summary_cutoff = timezone.now() - timedelta(days=self.TASK_SUMMARY_DAYS)
+        task_summary_items = list(
+            get_task_summary_data(
+                PaperlessTask.objects.filter(date_created__gte=summary_cutoff),
+            ).order_by("-total_count", "task_type"),
+        )
+        task_summary = {
+            "days": self.TASK_SUMMARY_DAYS,
+            "total_count": sum(item["total_count"] for item in task_summary_items),
+            "pending_count": sum(item["pending_count"] for item in task_summary_items),
+            "success_count": sum(item["success_count"] for item in task_summary_items),
+            "failure_count": sum(item["failure_count"] for item in task_summary_items),
+        }
+
         return Response(
             {
                 "pngx_version": current_version,
@@ -4840,6 +4855,7 @@ class SystemStatusView(PassUserMixin):
                     "llmindex_status": llmindex_status,
                     "llmindex_last_modified": llmindex_last_modified,
                     "llmindex_error": llmindex_error,
+                    "summary": task_summary,
                 },
             },
         )
