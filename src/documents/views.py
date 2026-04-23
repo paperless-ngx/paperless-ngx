@@ -3858,6 +3858,7 @@ class RemoteVersionView(GenericAPIView[Any]):
 )
 class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    pagination_class = StandardPagination
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,

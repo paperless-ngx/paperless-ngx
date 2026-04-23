@@ -31,6 +31,20 @@ ACCEPT_V9 = "application/json; version=9"
 
 @pytest.mark.django_db()
 class TestGetTasksV10:
+    def test_list_response_has_paginated_structure(
+        self,
+        admin_client: APIClient,
+    ) -> None:
+        """GET /api/tasks/ returns a paginated envelope with count and results."""
+        PaperlessTaskFactory.create_batch(3)
+
+        response = admin_client.get(ENDPOINT)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "count" in response.data
+        assert "results" in response.data
+        assert response.data["count"] == 3
+
     def test_list_returns_tasks(self, admin_client: APIClient) -> None:
         """GET /api/tasks/ returns all tasks visible to the admin."""
         PaperlessTaskFactory.create_batch(2)
@@ -38,7 +52,7 @@ class TestGetTasksV10:
         response = admin_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 2
+        assert response.data["count"] == 2
 
     def test_related_document_ids_populated_from_result_data(
         self,
@@ -53,7 +67,7 @@ class TestGetTasksV10:
         response = admin_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["related_document_ids"] == [7]
+        assert response.data["results"][0]["related_document_ids"] == [7]
 
     def test_related_document_ids_includes_duplicate_of(
         self,
@@ -68,7 +82,7 @@ class TestGetTasksV10:
         response = admin_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["related_document_ids"] == [12]
+        assert response.data["results"][0]["related_document_ids"] == [12]
 
     def test_filter_by_task_type(self, admin_client: APIClient) -> None:
         """?task_type= filters results to tasks of that type only."""
@@ -81,8 +95,11 @@ class TestGetTasksV10:
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 1
-        assert response.data[0]["task_type"] == PaperlessTask.TaskType.TRAIN_CLASSIFIER
+        assert response.data["count"] == 1
+        assert (
+            response.data["results"][0]["task_type"]
+            == PaperlessTask.TaskType.TRAIN_CLASSIFIER
+        )
 
     def test_filter_by_status(self, admin_client: APIClient) -> None:
         """?status= filters results to tasks with that status only."""
@@ -95,8 +112,8 @@ class TestGetTasksV10:
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 1
-        assert response.data[0]["status"] == PaperlessTask.Status.SUCCESS
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["status"] == PaperlessTask.Status.SUCCESS
 
     def test_filter_by_task_id(self, admin_client: APIClient) -> None:
         """?task_id= returns only the task with that UUID."""
@@ -106,8 +123,8 @@ class TestGetTasksV10:
         response = admin_client.get(ENDPOINT, {"task_id": task.task_id})
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 1
-        assert response.data[0]["task_id"] == task.task_id
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["task_id"] == task.task_id
 
     def test_filter_by_acknowledged(self, admin_client: APIClient) -> None:
         """?acknowledged=false returns only tasks that have not been acknowledged."""
@@ -117,8 +134,8 @@ class TestGetTasksV10:
         response = admin_client.get(ENDPOINT, {"acknowledged": "false"})
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 1
-        assert response.data[0]["acknowledged"] is False
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["acknowledged"] is False
 
     def test_filter_is_complete_true(self, admin_client: APIClient) -> None:
         """?is_complete=true returns only SUCCESS and FAILURE tasks."""
@@ -129,8 +146,8 @@ class TestGetTasksV10:
         response = admin_client.get(ENDPOINT, {"is_complete": "true"})
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 2
-        returned_statuses = {t["status"] for t in response.data}
+        assert response.data["count"] == 2
+        returned_statuses = {t["status"] for t in response.data["results"]}
         assert returned_statuses == {
             PaperlessTask.Status.SUCCESS,
             PaperlessTask.Status.FAILURE,
@@ -145,8 +162,8 @@ class TestGetTasksV10:
         response = admin_client.get(ENDPOINT, {"is_complete": "false"})
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 2
-        returned_statuses = {t["status"] for t in response.data}
+        assert response.data["count"] == 2
+        returned_statuses = {t["status"] for t in response.data["results"]}
         assert returned_statuses == {
             PaperlessTask.Status.PENDING,
             PaperlessTask.Status.STARTED,
@@ -162,7 +179,7 @@ class TestGetTasksV10:
         response = admin_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        ids = [t["task_id"] for t in response.data]
+        ids = [t["task_id"] for t in response.data["results"]]
         assert ids == [t3.task_id, t2.task_id, t1.task_id]
 
     def test_list_scoped_to_own_and_unowned_tasks_for_regular_user(
@@ -186,8 +203,8 @@ class TestGetTasksV10:
         response = client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 2
-        visible_ids = {t["task_id"] for t in response.data}
+        assert response.data["count"] == 2
+        visible_ids = {t["task_id"] for t in response.data["results"]}
         assert visible_ids == {own_task.task_id, unowned_task.task_id}
 
     def test_list_admin_sees_all_tasks(
@@ -204,7 +221,7 @@ class TestGetTasksV10:
         response = admin_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 3
+        assert response.data["count"] == 3
 
 
 @pytest.mark.django_db()
@@ -241,7 +258,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["task_name"] == expected_task_name
+        assert response.data["results"][0]["task_name"] == expected_task_name
 
     @pytest.mark.parametrize(
         ("trigger_source", "expected_type"),
@@ -295,7 +312,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["type"] == expected_type
+        assert response.data["results"][0]["type"] == expected_type
 
     def test_task_file_name_from_input_data(self, v9_client: APIClient) -> None:
         """task_file_name is read from input_data['filename']."""
@@ -304,7 +321,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["task_file_name"] == "report.pdf"
+        assert response.data["results"][0]["task_file_name"] == "report.pdf"
 
     def test_task_file_name_none_when_no_filename_key(
         self,
@@ -316,7 +333,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["task_file_name"] is None
+        assert response.data["results"][0]["task_file_name"] is None
 
     def test_related_document_from_result_data_document_id(
         self,
@@ -331,7 +348,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["related_document"] == 99
+        assert response.data["results"][0]["related_document"] == 99
 
     def test_related_document_none_when_no_result_data(
         self,
@@ -343,7 +360,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["related_document"] is None
+        assert response.data["results"][0]["related_document"] is None
 
     def test_duplicate_documents_from_result_data(self, v9_client: APIClient) -> None:
         """duplicate_documents includes duplicate_of from result_data in v9."""
@@ -356,7 +373,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        dupes = response.data[0]["duplicate_documents"]
+        dupes = response.data["results"][0]["duplicate_documents"]
         assert len(dupes) == 1
         assert dupes[0]["id"] == doc.pk
         assert dupes[0]["title"] == doc.title
@@ -372,7 +389,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["duplicate_documents"] == []
+        assert response.data["results"][0]["duplicate_documents"] == []
 
     def test_status_remapped_to_uppercase(self, v9_client: APIClient) -> None:
         """v9 status values are uppercase Celery state strings."""
@@ -383,7 +400,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        statuses = {t["status"] for t in response.data}
+        statuses = {t["status"] for t in response.data["results"]}
         assert statuses == {"SUCCESS", "PENDING", "FAILURE"}
 
     def test_filter_by_task_name_maps_old_value(self, v9_client: APIClient) -> None:
@@ -394,8 +411,8 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT, {"task_name": "check_sanity"})
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 1
-        assert response.data[0]["task_name"] == "check_sanity"
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["task_name"] == "check_sanity"
 
     def test_v9_non_staff_sees_own_and_unowned_tasks(
         self,
@@ -418,7 +435,7 @@ class TestGetTasksV9:
         response = client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 2
+        assert response.data["count"] == 2
 
     def test_filter_by_task_name_maps_to_task_type(self, v9_client: APIClient) -> None:
         """?task_name=consume_file filter maps to the task_type field for v9 compatibility."""
@@ -428,8 +445,8 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT, {"task_name": "consume_file"})
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 1
-        assert response.data[0]["task_name"] == "consume_file"
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["task_name"] == "consume_file"
 
     def test_filter_by_type_scheduled_task(self, v9_client: APIClient) -> None:
         """?type=scheduled_task matches trigger_source=scheduled only."""
@@ -439,8 +456,8 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT, {"type": "scheduled_task"})
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 1
-        assert response.data[0]["type"] == "scheduled_task"
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["type"] == "scheduled_task"
 
     def test_filter_by_type_auto_task_includes_all_auto_sources(
         self,
@@ -457,8 +474,8 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT, {"type": "auto_task"})
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 3
-        assert all(t["type"] == "auto_task" for t in response.data)
+        assert response.data["count"] == 3
+        assert all(t["type"] == "auto_task" for t in response.data["results"])
 
     def test_filter_by_type_manual_task_includes_all_manual_sources(
         self,
@@ -475,8 +492,8 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT, {"type": "manual_task"})
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 3
-        assert all(t["type"] == "manual_task" for t in response.data)
+        assert response.data["count"] == 3
+        assert all(t["type"] == "manual_task" for t in response.data["results"])
 
 
 @pytest.mark.django_db()
@@ -510,7 +527,7 @@ class TestAcknowledge:
         response = admin_client.get(ENDPOINT, {"acknowledged": "false"})
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 0
+        assert response.data["count"] == 0
 
     def test_requires_change_permission(self, user_client: APIClient) -> None:
         """Regular users without change_paperlesstask permission receive 403."""
@@ -828,7 +845,7 @@ class TestDuplicateDocumentsPermissions:
         response = user_v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        dupes = response.data[0]["duplicate_documents"]
+        dupes = response.data["results"][0]["duplicate_documents"]
         assert len(dupes) == 1
         assert dupes[0]["id"] == doc.pk
 
@@ -848,7 +865,7 @@ class TestDuplicateDocumentsPermissions:
         response = user_v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data[0]["duplicate_documents"]) == 1
+        assert len(response.data["results"][0]["duplicate_documents"]) == 1
 
     def test_other_users_duplicate_document_is_hidden(
         self,
@@ -867,7 +884,7 @@ class TestDuplicateDocumentsPermissions:
         response = user_v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]["duplicate_documents"] == []
+        assert response.data["results"][0]["duplicate_documents"] == []
 
     def test_explicit_permission_grants_visibility(
         self,
@@ -887,6 +904,6 @@ class TestDuplicateDocumentsPermissions:
         response = user_v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        dupes = response.data[0]["duplicate_documents"]
+        dupes = response.data["results"][0]["duplicate_documents"]
         assert len(dupes) == 1
         assert dupes[0]["id"] == doc.pk
