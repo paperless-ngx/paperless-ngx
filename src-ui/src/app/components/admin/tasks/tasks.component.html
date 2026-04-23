@@ -23,7 +23,7 @@
   <div class="visually-hidden" i18n>Loading...</div>
 }
 
-<div class="task-controls mb-3 btn-toolbar">
+<div class="task-controls mb-3 btn-toolbar align-items-center" role="toolbar">
   <div class="task-view-scope btn-group btn-group-sm me-3" role="group">
     <input
       type="radio"
@@ -52,6 +52,8 @@
     }
   </div>
 
+  <div class="ms-3 me-2 text-muted"><ng-container i18n>Filter by</ng-container>:</div>
+
   <div ngbDropdown>
     <button class="btn btn-sm btn-outline-primary me-3" ngbDropdownToggle>{{selectedTaskTypeLabel}}</button>
     <div class="dropdown-menu shadow" ngbDropdownMenu>
@@ -73,7 +75,6 @@
 
   <div class="form-inline d-flex align-items-center flex-grow-1 task-search">
     <div class="input-group input-group-sm flex-fill w-auto flex-nowrap">
-      <span class="input-group-text text-muted" i18n>Filter by</span>
       <div ngbDropdown>
         <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{filterTargetName}}</button>
         <div class="dropdown-menu shadow" ngbDropdownMenu>
