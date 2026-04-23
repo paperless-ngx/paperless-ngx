@@ -17,7 +17,7 @@ from documents.models import Tag
 
 
 class CorrespondentFactory(DjangoModelFactory[Correspondent]):
-    class Meta(DjangoModelFactory.Meta):
+    class Meta:
         model = Correspondent
 
     name = factory.Sequence(lambda n: f"{factory.Faker('company')} {n}")
@@ -26,7 +26,7 @@ class CorrespondentFactory(DjangoModelFactory[Correspondent]):
 
 
 class DocumentTypeFactory(DjangoModelFactory[DocumentType]):
-    class Meta(DjangoModelFactory.Meta):
+    class Meta:
         model = DocumentType
 
     name = factory.Sequence(lambda n: f"{factory.Faker('bs')} {n}")
@@ -35,7 +35,7 @@ class DocumentTypeFactory(DjangoModelFactory[DocumentType]):
 
 
 class TagFactory(DjangoModelFactory[Tag]):
-    class Meta(DjangoModelFactory.Meta):
+    class Meta:
         model = Tag
 
     name = factory.Sequence(lambda n: f"{factory.Faker('word')} {n}")
@@ -45,7 +45,7 @@ class TagFactory(DjangoModelFactory[Tag]):
 
 
 class StoragePathFactory(DjangoModelFactory[StoragePath]):
-    class Meta(DjangoModelFactory.Meta):
+    class Meta:
         model = StoragePath
 
     name = factory.Sequence(
@@ -57,7 +57,7 @@ class StoragePathFactory(DjangoModelFactory[StoragePath]):
 
 
 class DocumentFactory(DjangoModelFactory[Document]):
-    class Meta(DjangoModelFactory.Meta):
+    class Meta:
         model = Document
 
     title = factory.Faker("sentence", nb_words=4)
@@ -69,7 +69,7 @@ class DocumentFactory(DjangoModelFactory[Document]):
 
 
 class PaperlessTaskFactory(DjangoModelFactory[PaperlessTask]):
-    class Meta(DjangoModelFactory.Meta):
+    class Meta:
         model = PaperlessTask
 
     task_id = factory.Faker("uuid4")

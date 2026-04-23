@@ -10,7 +10,7 @@ from paperless_mail.models import ProcessedMail
 
 
 class MailAccountFactory(DjangoModelFactory[MailAccount]):
-    class Meta(DjangoModelFactory.Meta):
+    class Meta:
         model = MailAccount
 
     name = factory.Sequence(lambda n: f"Mail Account {n}")
@@ -25,7 +25,7 @@ class MailAccountFactory(DjangoModelFactory[MailAccount]):
 
 
 class MailRuleFactory(DjangoModelFactory[MailRule]):
-    class Meta(DjangoModelFactory.Meta):
+    class Meta:
         model = MailRule
 
     name = factory.Sequence(lambda n: f"Mail Rule {n}")
@@ -45,7 +45,7 @@ class MailRuleFactory(DjangoModelFactory[MailRule]):
 
 
 class ProcessedMailFactory(DjangoModelFactory[ProcessedMail]):
-    class Meta(DjangoModelFactory.Meta):
+    class Meta:
         model = ProcessedMail
 
     rule = factory.SubFactory(MailRuleFactory)

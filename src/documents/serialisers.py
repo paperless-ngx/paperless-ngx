@@ -480,7 +480,7 @@ class OwnedObjectListSerializer(serializers.ListSerializer[Any]):
 class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     last_correspondence = serializers.DateField(read_only=True, required=False)
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = Correspondent
         fields = (
             "id",
@@ -499,7 +499,7 @@ class CorrespondentSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
 
 class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = DocumentType
         fields = (
             "id",
@@ -624,7 +624,7 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     # children as nested Tag objects
     children = serializers.SerializerMethodField()
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = Tag
         fields = (
             "id",
@@ -710,7 +710,7 @@ class CustomFieldSerializer(serializers.ModelSerializer[CustomField]):
 
     document_count = serializers.IntegerField(read_only=True)
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = CustomField
         fields = [
             "id",
@@ -916,7 +916,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer[CustomFieldInsta
 
         return data
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = CustomFieldInstance
         fields = [
             "value",
@@ -926,7 +926,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer[CustomFieldInsta
 
 class BasicUserSerializer(serializers.ModelSerializer[User]):
     # Different than paperless.serializers.UserSerializer
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = User
         fields = ["id", "username", "first_name", "last_name"]
 
@@ -934,7 +934,7 @@ class BasicUserSerializer(serializers.ModelSerializer[User]):
 class NotesSerializer(serializers.ModelSerializer[Note]):
     user = BasicUserSerializer(read_only=True)
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = Note
         fields = ["id", "note", "created", "user"]
         ordering = ["-created"]
@@ -1223,7 +1223,7 @@ class DocumentSerializer(
 
         super().__init__(*args, **kwargs)
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = Document
         fields = (
             "id",
@@ -1316,7 +1316,7 @@ class SearchResultSerializer(DocumentSerializer):
 
 
 class SavedViewFilterRuleSerializer(serializers.ModelSerializer[SavedViewFilterRule]):
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = SavedViewFilterRule
         fields = ["rule_type", "value"]
 
@@ -1324,7 +1324,7 @@ class SavedViewFilterRuleSerializer(serializers.ModelSerializer[SavedViewFilterR
 class SavedViewSerializer(OwnedObjectSerializer):
     filter_rules = SavedViewFilterRuleSerializer(many=True)
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = SavedView
         fields = [
             "id",
@@ -2366,7 +2366,7 @@ class EmailSerializer(DocumentListSerializer):
 
 
 class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = StoragePath
         fields = (
             "id",
@@ -2414,7 +2414,7 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 class UiSettingsViewSerializer(serializers.ModelSerializer[UiSettings]):
     settings = serializers.DictField(required=False, allow_null=True)
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = UiSettings
         depth = 1
         fields = [
@@ -2459,7 +2459,7 @@ class TaskSerializerV10(OwnedObjectSerializer):
         read_only=True,
     )
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = PaperlessTask
         fields = (
             "id",
@@ -2512,7 +2512,7 @@ class TaskSerializerV9(serializers.ModelSerializer[PaperlessTask]):
     # v9 field: duplicate_documents -> list of duplicate IDs from result_data
     duplicate_documents = serializers.SerializerMethodField()
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = PaperlessTask
         fields = (
             "id",
@@ -2655,7 +2655,7 @@ class AcknowledgeTasksViewSerializer(serializers.Serializer[dict[str, Any]]):
 
 
 class ShareLinkSerializer(OwnedObjectSerializer):
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = ShareLink
         fields = (
             "id",
@@ -2700,7 +2700,7 @@ class ShareLinkBundleSerializer(OwnedObjectSerializer):
     )
     document_count = SerializerMethodField()
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = ShareLinkBundle
         fields = (
             "id",
@@ -2913,7 +2913,7 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer[WorkflowTrigger]):
         label="Trigger Type",
     )
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = WorkflowTrigger
         fields = [
             "id",
@@ -3009,7 +3009,7 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer[WorkflowTrigger]):
 class WorkflowActionEmailSerializer(serializers.ModelSerializer[WorkflowActionEmail]):
     id = serializers.IntegerField(allow_null=True, required=False)
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = WorkflowActionEmail
         fields = [
             "id",
@@ -3029,7 +3029,7 @@ class WorkflowActionWebhookSerializer(
         url_validator(url)
         return url
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = WorkflowActionWebhook
         fields = [
             "id",
@@ -3052,7 +3052,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer[WorkflowAction]):
     email = WorkflowActionEmailSerializer(allow_null=True, required=False)
     webhook = WorkflowActionWebhookSerializer(allow_null=True, required=False)
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = WorkflowAction
         fields = [
             "id",
@@ -3171,7 +3171,7 @@ class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
     triggers = WorkflowTriggerSerializer(many=True)
     actions = WorkflowActionSerializer(many=True)
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:
         model = Workflow
         fields = [
             "id",
