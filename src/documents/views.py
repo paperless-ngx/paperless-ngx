@@ -3921,6 +3921,12 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
             return TaskSerializerV9
         return TaskSerializerV10
 
+    def paginate_queryset(self, queryset):
+        # v9: tasks endpoint was not paginated; preserve plain-list response
+        if self.request.version and int(self.request.version) < 10:
+            return None
+        return super().paginate_queryset(queryset)
+
     def get_queryset(self):
         is_v9 = self.request.version and int(self.request.version) < 10
         if self.request.user.is_staff:
