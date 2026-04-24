@@ -281,8 +281,7 @@ class IndexView(TemplateView):
             first = lang[: lang.index("-")]
             second = lang[lang.index("-") + 1 :]
             return f"{first}-{second.upper()}"
-        else:
-            return lang
+        return lang
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -305,9 +304,7 @@ class IndexView(TemplateView):
 
 
 class PassUserMixin(GenericAPIView[Any]):
-    """
-    Pass a user object to serializer
-    """
+    """Pass a user object to serializer"""
 
     def get_serializer(self, *args, **kwargs):
         serializer_class = self.get_serializer_class()
@@ -330,9 +327,7 @@ class PassUserMixin(GenericAPIView[Any]):
 
 
 class BulkPermissionMixin:
-    """
-    Prefetch Django-Guardian permissions for a list before serialization, to avoid N+1 queries.
-    """
+    """Prefetch Django-Guardian permissions for a list before serialization, to avoid N+1 queries."""
 
     def _get_object_perms(
         self,
@@ -340,9 +335,7 @@ class BulkPermissionMixin:
         perm_codenames: list[str],
         actor: Literal["users", "groups"],
     ) -> dict[int, dict[str, list[int]]]:
-        """
-        Collect object-level permissions for either users or groups.
-        """
+        """Collect object-level permissions for either users or groups."""
         model = self.queryset.model
         obj_perm_model = (
             get_user_obj_perms_model(model)
@@ -371,8 +364,7 @@ class BulkPermissionMixin:
         return perms
 
     def get_serializer_context(self):
-        """
-        Get all permissions of the current list of objects at once and pass them to the serializer.
+        """Get all permissions of the current list of objects at once and pass them to the serializer.
         This avoid fetching permissions object by object in database.
         """
         context = super().get_serializer_context()
@@ -427,9 +419,7 @@ class BulkPermissionMixin:
 
 
 class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
-    """
-    Mixin to add document count to queryset, permissions-aware if needed
-    """
+    """Mixin to add document count to queryset, permissions-aware if needed"""
 
     # Default is simple relation path, override for through-table/count specialization.
     document_count_through: type[Model] | None = None
@@ -538,9 +528,7 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Tag]):
         return context
 
     def list(self, request, *args, **kwargs):
-        """
-        Build a children map once to avoid per-parent queries in the serializer.
-        """
+        """Build a children map once to avoid per-parent queries in the serializer."""
         queryset = self.filter_queryset(self.get_queryset())
         ordering = OrderingFilter().get_ordering(request, queryset, self) or (
             Lower("name"),
@@ -1231,8 +1219,7 @@ class DocumentViewSet(
     def get_filesize(self, filename):
         if Path(filename).is_file():
             return Path(filename).stat().st_size
-        else:
-            return None
+        return None
 
     @action(methods=["get"], detail=True, filter_backends=[])
     @method_decorator(cache_control(no_cache=True))
@@ -2107,8 +2094,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
     def get_serializer_class(self):
         if self._is_search_request():
             return SearchResultSerializer
-        else:
-            return DocumentSerializer
+        return DocumentSerializer
 
     def _get_active_search_params(self, request: Request | None = None) -> list[str]:
         request = request or self.request
@@ -3226,7 +3212,7 @@ class GlobalSearchView(PassUserMixin):
         query = request.query_params.get("query", None)
         if query is None:
             return HttpResponseBadRequest("Query required")
-        elif len(query) < 3:
+        if len(query) < 3:
             return HttpResponseBadRequest("Query must be at least 3 characters")
 
         db_only = request.query_params.get("db_only", False)
@@ -3521,7 +3507,7 @@ class StatisticsView(GenericAPIView[Any]):
                 "inbox_tag": (
                     inbox_tag_pks[0] if inbox_tag_pks else None
                 ),  # backwards compatibility
-                "inbox_tags": (inbox_tag_pks if inbox_tag_pks else None),
+                "inbox_tags": (inbox_tag_pks or None),
                 "document_file_type_counts": document_file_type_counts,
                 "character_count": character_count,
                 "tag_count": len(tags),
@@ -3555,13 +3541,6 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
             if not has_perms_owner_aware(request.user, "change_document", document):
                 return HttpResponseForbidden("Insufficient permissions")
 
-        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
-        temp = tempfile.NamedTemporaryFile(  # noqa: SIM115
-            dir=settings.SCRATCH_DIR,
-            suffix="-compressed-archive",
-            delete=False,
-        )
-
         if content == "both":
             strategy_class = OriginalAndArchiveStrategy
         elif content == "originals":
@@ -3569,20 +3548,35 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
         else:
             strategy_class = ArchiveOnlyStrategy
 
-        with zipfile.ZipFile(temp.name, "w", compression) as zipf:
-            strategy = strategy_class(zipf, follow_formatting=follow_filename_format)
-            for document in documents:
-                strategy.add_document(document)
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
+        fd, temp_name = tempfile.mkstemp(
+            dir=settings.SCRATCH_DIR,
+            suffix="-compressed-archive",
+        )
+        os.close(fd)
+        temp_path = Path(temp_name)
 
-        # TODO(stumpylog): Investigate using FileResponse here
-        with Path(temp.name).open("rb") as f:
-            response = HttpResponse(f, content_type="application/zip")
-            response["Content-Disposition"] = '{}; filename="{}"'.format(
-                "attachment",
-                "documents.zip",
-            )
+        try:
+            with zipfile.ZipFile(temp_path, "w", compression) as zipf:
+                strategy = strategy_class(
+                    zipf,
+                    follow_formatting=follow_filename_format,
+                )
+                for document in documents:
+                    strategy.add_document(document)
 
-            return response
+            f = temp_path.open("rb")
+            temp_path.unlink()
+        except Exception:
+            temp_path.unlink(missing_ok=True)
+            raise
+
+        return FileResponse(
+            f,
+            as_attachment=True,
+            filename="documents.zip",
+            content_type="application/zip",
+        )
 
 
 @extend_schema_view(
@@ -3621,8 +3615,7 @@ class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Storag
         return super().get_permissions()
 
     def destroy(self, request, *args, **kwargs):
-        """
-        When a storage path is deleted, see if documents
+        """When a storage path is deleted, see if documents
         using it require a rename/move
         """
         instance = self.get_object()
@@ -3641,9 +3634,7 @@ class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Storag
 
     @action(methods=["post"], detail=False)
     def test(self, request):
-        """
-        Test storage path against a document
-        """
+        """Test storage path against a document"""
         serializer = StoragePathTestSerializer(
             data=request.data,
             context={"request": request},
@@ -4938,8 +4929,7 @@ class TrashView(ListModelMixin, PassUserMixin):
 
 
 def serve_logo(request: HttpRequest, filename: str | None = None) -> FileResponse:
-    """
-    Serves the configured logo file with Content-Disposition: attachment.
+    """Serves the configured logo file with Content-Disposition: attachment.
     Prevents inline execution of SVGs. See GHSA-6p53-hqqw-8j62
     """
     config = ApplicationConfiguration.objects.first()
