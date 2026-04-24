@@ -47,6 +47,13 @@ export interface SystemStatus {
     llmindex_status: SystemStatusItemStatus
     llmindex_last_modified: string // ISO date string
     llmindex_error: string
+    summary: {
+      days: number
+      total_count: number
+      pending_count: number
+      success_count: number
+      failure_count: number
+    }
   }
   websocket_connected?: SystemStatusItemStatus // added client-side
 }

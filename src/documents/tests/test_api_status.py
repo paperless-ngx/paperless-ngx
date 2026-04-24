@@ -1,12 +1,14 @@
 import os
 import shutil
 import tempfile
+from datetime import timedelta
 from pathlib import Path
 from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import override_settings
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -76,6 +78,11 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["tasks"]["redis_url"], "redis://localhost:6379")
         self.assertEqual(response.data["tasks"]["redis_status"], "ERROR")
         self.assertIsNotNone(response.data["tasks"]["redis_error"])
+        self.assertEqual(response.data["tasks"]["summary"]["days"], 30)
+        self.assertEqual(response.data["tasks"]["summary"]["total_count"], 0)
+        self.assertEqual(response.data["tasks"]["summary"]["success_count"], 0)
+        self.assertEqual(response.data["tasks"]["summary"]["failure_count"], 0)
+        self.assertEqual(response.data["tasks"]["summary"]["pending_count"], 0)
 
     def test_system_status_insufficient_permissions(self) -> None:
         """
@@ -436,3 +443,32 @@ class TestSystemStatus(APITestCase):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(response.data["tasks"]["llmindex_status"], "ERROR")
             self.assertIsNotNone(response.data["tasks"]["llmindex_error"])
+
+    def test_system_status_includes_recent_task_summary(self) -> None:
+        PaperlessTaskFactory(
+            task_type=PaperlessTask.TaskType.CONSUME_FILE,
+            status=PaperlessTask.Status.SUCCESS,
+        )
+        PaperlessTaskFactory(
+            task_type=PaperlessTask.TaskType.CONSUME_FILE,
+            status=PaperlessTask.Status.FAILURE,
+        )
+        PaperlessTaskFactory(
+            task_type=PaperlessTask.TaskType.SANITY_CHECK,
+            status=PaperlessTask.Status.PENDING,
+        )
+        PaperlessTaskFactory(
+            task_type=PaperlessTask.TaskType.MAIL_FETCH,
+            status=PaperlessTask.Status.SUCCESS,
+            date_created=timezone.now() - timedelta(days=45),
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["tasks"]["summary"]["days"], 30)
+        self.assertEqual(response.data["tasks"]["summary"]["total_count"], 3)
+        self.assertEqual(response.data["tasks"]["summary"]["success_count"], 1)
+        self.assertEqual(response.data["tasks"]["summary"]["failure_count"], 1)
+        self.assertEqual(response.data["tasks"]["summary"]["pending_count"], 1)

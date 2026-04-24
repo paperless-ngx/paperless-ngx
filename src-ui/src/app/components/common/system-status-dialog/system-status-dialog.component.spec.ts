@@ -71,6 +71,13 @@ const status: SystemStatus = {
     llmindex_status: SystemStatusItemStatus.OK,
     llmindex_last_modified: new Date().toISOString(),
     llmindex_error: null,
+    summary: {
+      days: 30,
+      total_count: 12,
+      pending_count: 1,
+      success_count: 10,
+      failure_count: 1,
+    },
   },
 }
 
