@@ -258,7 +258,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["results"][0]["task_name"] == expected_task_name
+        assert response.data[0]["task_name"] == expected_task_name
 
     @pytest.mark.parametrize(
         ("trigger_source", "expected_type"),
@@ -312,7 +312,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["results"][0]["type"] == expected_type
+        assert response.data[0]["type"] == expected_type
 
     def test_task_file_name_from_input_data(self, v9_client: APIClient) -> None:
         """task_file_name is read from input_data['filename']."""
@@ -321,7 +321,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["results"][0]["task_file_name"] == "report.pdf"
+        assert response.data[0]["task_file_name"] == "report.pdf"
 
     def test_task_file_name_none_when_no_filename_key(
         self,
@@ -333,7 +333,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["results"][0]["task_file_name"] is None
+        assert response.data[0]["task_file_name"] is None
 
     def test_related_document_from_result_data_document_id(
         self,
@@ -348,7 +348,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["results"][0]["related_document"] == 99
+        assert response.data[0]["related_document"] == 99
 
     def test_related_document_none_when_no_result_data(
         self,
@@ -360,7 +360,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["results"][0]["related_document"] is None
+        assert response.data[0]["related_document"] is None
 
     def test_duplicate_documents_from_result_data(self, v9_client: APIClient) -> None:
         """duplicate_documents includes duplicate_of from result_data in v9."""
@@ -373,7 +373,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        dupes = response.data["results"][0]["duplicate_documents"]
+        dupes = response.data[0]["duplicate_documents"]
         assert len(dupes) == 1
         assert dupes[0]["id"] == doc.pk
         assert dupes[0]["title"] == doc.title
@@ -389,7 +389,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["results"][0]["duplicate_documents"] == []
+        assert response.data[0]["duplicate_documents"] == []
 
     def test_status_remapped_to_uppercase(self, v9_client: APIClient) -> None:
         """v9 status values are uppercase Celery state strings."""
@@ -400,7 +400,7 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        statuses = {t["status"] for t in response.data["results"]}
+        statuses = {t["status"] for t in response.data}
         assert statuses == {"SUCCESS", "PENDING", "FAILURE"}
 
     def test_filter_by_task_name_maps_old_value(self, v9_client: APIClient) -> None:
@@ -411,8 +411,18 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT, {"task_name": "check_sanity"})
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["count"] == 1
-        assert response.data["results"][0]["task_name"] == "check_sanity"
+        assert len(response.data) == 1
+        assert response.data[0]["task_name"] == "check_sanity"
+
+    def test_v9_list_returns_plain_list(self, v9_client: APIClient) -> None:
+        """v9 task list returns a plain JSON array, not a paginated envelope."""
+        PaperlessTaskFactory.create_batch(3)
+
+        response = v9_client.get(ENDPOINT)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert isinstance(response.data, list)
+        assert len(response.data) == 3
 
     def test_v9_non_staff_sees_own_and_unowned_tasks(
         self,
@@ -435,7 +445,7 @@ class TestGetTasksV9:
         response = client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["count"] == 2
+        assert len(response.data) == 2
 
     def test_filter_by_task_name_maps_to_task_type(self, v9_client: APIClient) -> None:
         """?task_name=consume_file filter maps to the task_type field for v9 compatibility."""
@@ -445,8 +455,8 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT, {"task_name": "consume_file"})
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["count"] == 1
-        assert response.data["results"][0]["task_name"] == "consume_file"
+        assert len(response.data) == 1
+        assert response.data[0]["task_name"] == "consume_file"
 
     def test_filter_by_type_scheduled_task(self, v9_client: APIClient) -> None:
         """?type=scheduled_task matches trigger_source=scheduled only."""
@@ -456,8 +466,8 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT, {"type": "scheduled_task"})
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["count"] == 1
-        assert response.data["results"][0]["type"] == "scheduled_task"
+        assert len(response.data) == 1
+        assert response.data[0]["type"] == "scheduled_task"
 
     def test_filter_by_type_auto_task_includes_all_auto_sources(
         self,
@@ -474,8 +484,8 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT, {"type": "auto_task"})
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["count"] == 3
-        assert all(t["type"] == "auto_task" for t in response.data["results"])
+        assert len(response.data) == 3
+        assert all(t["type"] == "auto_task" for t in response.data)
 
     def test_filter_by_type_manual_task_includes_all_manual_sources(
         self,
@@ -492,8 +502,8 @@ class TestGetTasksV9:
         response = v9_client.get(ENDPOINT, {"type": "manual_task"})
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["count"] == 3
-        assert all(t["type"] == "manual_task" for t in response.data["results"])
+        assert len(response.data) == 3
+        assert all(t["type"] == "manual_task" for t in response.data)
 
 
 @pytest.mark.django_db()
@@ -845,7 +855,7 @@ class TestDuplicateDocumentsPermissions:
         response = user_v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        dupes = response.data["results"][0]["duplicate_documents"]
+        dupes = response.data[0]["duplicate_documents"]
         assert len(dupes) == 1
         assert dupes[0]["id"] == doc.pk
 
@@ -865,7 +875,7 @@ class TestDuplicateDocumentsPermissions:
         response = user_v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data["results"][0]["duplicate_documents"]) == 1
+        assert len(response.data[0]["duplicate_documents"]) == 1
 
     def test_other_users_duplicate_document_is_hidden(
         self,
@@ -884,7 +894,7 @@ class TestDuplicateDocumentsPermissions:
         response = user_v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["results"][0]["duplicate_documents"] == []
+        assert response.data[0]["duplicate_documents"] == []
 
     def test_explicit_permission_grants_visibility(
         self,
@@ -904,6 +914,6 @@ class TestDuplicateDocumentsPermissions:
         response = user_v9_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
-        dupes = response.data["results"][0]["duplicate_documents"]
+        dupes = response.data[0]["duplicate_documents"]
         assert len(dupes) == 1
         assert dupes[0]["id"] == doc.pk
