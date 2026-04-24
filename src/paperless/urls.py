@@ -89,7 +89,21 @@ urlpatterns = [
                 re_path(
                     "^auth/",
                     include(
-                        ("rest_framework.urls", "rest_framework"),
+                        (
+                            [
+                                path(
+                                    "login/",
+                                    allauth_account_views.login,
+                                    name="login",
+                                ),
+                                path(
+                                    "logout/",
+                                    allauth_account_views.logout,
+                                    name="logout",
+                                ),
+                            ],
+                            "rest_framework",
+                        ),
                         namespace="rest_framework",
                     ),
                 ),
