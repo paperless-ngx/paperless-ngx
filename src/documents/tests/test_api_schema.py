@@ -253,3 +253,47 @@ class TestShareLinkBundleRebuildSchema:
         else:
             props = resp_400.get("properties", {})
         assert "detail" in props, "rebuild 400 response must have a 'detail' field"
+
+
+class TestBulkDownloadSchema:
+    """bulk_download_create: POST accepts BulkDownloadSerializer, returns application/zip, documents 403."""
+
+    def test_bulk_download_path_exists(self, api_schema: SchemaGenerator) -> None:
+        assert "/api/documents/bulk_download/" in api_schema["paths"]
+
+    def test_bulk_download_operation_id(self, api_schema: SchemaGenerator) -> None:
+        op = api_schema["paths"]["/api/documents/bulk_download/"]["post"]
+        assert op["operationId"] == "bulk_download"
+
+    def test_bulk_download_request_body_is_json(
+        self,
+        api_schema: SchemaGenerator,
+    ) -> None:
+        op = api_schema["paths"]["/api/documents/bulk_download/"]["post"]
+        assert "requestBody" in op
+        assert "application/json" in op["requestBody"]["content"]
+
+    def test_bulk_download_request_references_serializer(
+        self,
+        api_schema: SchemaGenerator,
+    ) -> None:
+        op = api_schema["paths"]["/api/documents/bulk_download/"]["post"]
+        schema_ref = (
+            op["requestBody"]["content"]["application/json"]
+            .get("schema", {})
+            .get("$ref", "")
+        )
+        component_name = schema_ref.split("/")[-1]
+        assert component_name == "BulkDownloadRequest"
+
+    def test_bulk_download_response_200_is_zip(
+        self,
+        api_schema: SchemaGenerator,
+    ) -> None:
+        op = api_schema["paths"]["/api/documents/bulk_download/"]["post"]
+        assert "200" in op["responses"]
+        assert "application/zip" in op["responses"]["200"]["content"]
+
+    def test_bulk_download_response_403(self, api_schema: SchemaGenerator) -> None:
+        op = api_schema["paths"]["/api/documents/bulk_download/"]["post"]
+        assert "403" in op["responses"]

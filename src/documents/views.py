@@ -304,7 +304,9 @@ class IndexView(TemplateView):
 
 
 class PassUserMixin(GenericAPIView[Any]):
-    """Pass a user object to serializer"""
+    """
+    Pass a user object to serializer
+    """
 
     def get_serializer(self, *args, **kwargs):
         serializer_class = self.get_serializer_class()
@@ -327,7 +329,9 @@ class PassUserMixin(GenericAPIView[Any]):
 
 
 class BulkPermissionMixin:
-    """Prefetch Django-Guardian permissions for a list before serialization, to avoid N+1 queries."""
+    """
+    Prefetch Django-Guardian permissions for a list before serialization, to avoid N+1 queries.
+    """
 
     def _get_object_perms(
         self,
@@ -335,7 +339,9 @@ class BulkPermissionMixin:
         perm_codenames: list[str],
         actor: Literal["users", "groups"],
     ) -> dict[int, dict[str, list[int]]]:
-        """Collect object-level permissions for either users or groups."""
+        """
+        Collect object-level permissions for either users or groups.
+        """
         model = self.queryset.model
         obj_perm_model = (
             get_user_obj_perms_model(model)
@@ -364,7 +370,8 @@ class BulkPermissionMixin:
         return perms
 
     def get_serializer_context(self):
-        """Get all permissions of the current list of objects at once and pass them to the serializer.
+        """
+        Get all permissions of the current list of objects at once and pass them to the serializer.
         This avoid fetching permissions object by object in database.
         """
         context = super().get_serializer_context()
@@ -528,7 +535,9 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Tag]):
         return context
 
     def list(self, request, *args, **kwargs):
-        """Build a children map once to avoid per-parent queries in the serializer."""
+        """
+        Build a children map once to avoid per-parent queries in the serializer.
+        """
         queryset = self.filter_queryset(self.get_queryset())
         ordering = OrderingFilter().get_ordering(request, queryset, self) or (
             Lower("name"),
@@ -3519,6 +3528,16 @@ class StatisticsView(GenericAPIView[Any]):
         )
 
 
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="bulk_download",
+        description="Download multiple documents as a ZIP archive.",
+        responses={
+            (HTTPStatus.OK, "application/zip"): OpenApiTypes.BINARY,
+            HTTPStatus.FORBIDDEN: None,
+        },
+    ),
+)
 class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkDownloadSerializer
@@ -3615,7 +3634,8 @@ class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Storag
         return super().get_permissions()
 
     def destroy(self, request, *args, **kwargs):
-        """When a storage path is deleted, see if documents
+        """
+        When a storage path is deleted, see if documents
         using it require a rename/move
         """
         instance = self.get_object()
@@ -3634,7 +3654,9 @@ class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Storag
 
     @action(methods=["post"], detail=False)
     def test(self, request):
-        """Test storage path against a document"""
+        """
+        Test storage path against a document
+        """
         serializer = StoragePathTestSerializer(
             data=request.data,
             context={"request": request},
@@ -4929,7 +4951,8 @@ class TrashView(ListModelMixin, PassUserMixin):
 
 
 def serve_logo(request: HttpRequest, filename: str | None = None) -> FileResponse:
-    """Serves the configured logo file with Content-Disposition: attachment.
+    """
+    Serves the configured logo file with Content-Disposition: attachment.
     Prevents inline execution of SVGs. See GHSA-6p53-hqqw-8j62
     """
     config = ApplicationConfiguration.objects.first()
