@@ -463,10 +463,11 @@ SECURE_PROXY_SSL_HEADER = (
     else None
 )
 
-SECRET_KEY = os.getenv("PAPERLESS_SECRET_KEY", "")
-if not SECRET_KEY:  # pragma: no cover
+SECRET_KEY = os.getenv("PAPERLESS_SECRET_KEY")
+_INSECURE_SECRET_KEYS = {None, "", "change-me"}
+if not DEBUG and SECRET_KEY in _INSECURE_SECRET_KEYS:  # pragma: no cover
     raise ImproperlyConfigured(
-        "PAPERLESS_SECRET_KEY is not set. "
+        "PAPERLESS_SECRET_KEY is not set or is the default 'change-me' value. "
         "A unique, secret key is required for secure operation. "
         'Generate one with: python3 -c "import secrets; print(secrets.token_urlsafe(64))"',
     )

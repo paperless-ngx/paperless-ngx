@@ -142,6 +142,31 @@
                   }
                 </ng-template>
               </dd>
+              <dt i18n>Recent Task Activity <span class="small text-muted fw-light">({{status.tasks.summary.days}} days)</span></dt>
+              <dd class="mb-0">
+                @if (status.tasks.summary.total_count > 0) {
+                  <ul class="list-group border-light mt-2">
+                    <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                      <span class="small"><ng-container i18n>Total</ng-container>:</span>
+                      <span class="badge bg-light rounded-pill">{{status.tasks.summary.total_count}}</span>
+                    </li>
+                    <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                      <span class="small"><ng-container i18n>Successful</ng-container>:</span>
+                      <span class="badge bg-primary rounded-pill">{{status.tasks.summary.success_count}}</span>
+                    </li>
+                    <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                      <span class="small"><ng-container i18n>Failed</ng-container>:</span>
+                      <span class="badge bg-danger rounded-pill">{{status.tasks.summary.failure_count}}</span>
+                    </li>
+                    <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                      <span class="small"><ng-container i18n>Pending</ng-container>:</span>
+                      <span class="badge bg-warning rounded-pill">{{status.tasks.summary.pending_count}}</span>
+                    </li>
+                  </ul>
+                } @else {
+                  <span class="small text-muted" i18n>No recent tasks</span>
+                }
+              </dd>
             </dl>
           </div>
         </div>

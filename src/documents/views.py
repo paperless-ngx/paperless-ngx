@@ -4609,6 +4609,16 @@ class CustomFieldViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Custom
                             "redis_status": serializers.CharField(),
                             "redis_error": serializers.CharField(),
                             "celery_status": serializers.CharField(),
+                            "summary": inline_serializer(
+                                name="TasksSummaryOverview",
+                                fields={
+                                    "days": serializers.IntegerField(),
+                                    "total_count": serializers.IntegerField(),
+                                    "pending_count": serializers.IntegerField(),
+                                    "success_count": serializers.IntegerField(),
+                                    "failure_count": serializers.IntegerField(),
+                                },
+                            ),
                         },
                     ),
                     "index": inline_serializer(
@@ -4642,6 +4652,7 @@ class CustomFieldViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Custom
 )
 class SystemStatusView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
+    TASK_SUMMARY_DAYS = 30
 
     def get(self, request, format=None):
         if not has_system_status_permission(request.user):
@@ -4808,6 +4819,29 @@ class SystemStatusView(PassUserMixin):
                 last_llmindex_update.date_done if last_llmindex_update else None
             )
 
+        summary_cutoff = timezone.now() - timedelta(days=self.TASK_SUMMARY_DAYS)
+        task_summary_agg = PaperlessTask.objects.filter(
+            date_created__gte=summary_cutoff,
+        ).aggregate(
+            total_count=Count("id"),
+            pending_count=Count(
+                "id",
+                filter=Q(status=PaperlessTask.Status.PENDING),
+            ),
+            success_count=Count(
+                "id",
+                filter=Q(status=PaperlessTask.Status.SUCCESS),
+            ),
+            failure_count=Count(
+                "id",
+                filter=Q(status=PaperlessTask.Status.FAILURE),
+            ),
+        )
+        task_summary = {
+            "days": self.TASK_SUMMARY_DAYS,
+            **task_summary_agg,
+        }
+
         return Response(
             {
                 "pngx_version": current_version,
@@ -4848,6 +4882,7 @@ class SystemStatusView(PassUserMixin):
                     "llmindex_status": llmindex_status,
                     "llmindex_last_modified": llmindex_last_modified,
                     "llmindex_error": llmindex_error,
+                    "summary": task_summary,
                 },
             },
         )
