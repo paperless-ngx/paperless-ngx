@@ -18,6 +18,7 @@ from documents.filters import EffectiveContentFilter
 from documents.filters import TitleContentFilter
 from documents.models import Document
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import read_streaming_response
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -449,19 +450,19 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
             f"/api/documents/{root.id}/download/?version={version.id}",
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp.content, b"version")
+        self.assertEqual(read_streaming_response(resp), b"version")
 
         resp = self.client.get(
             f"/api/documents/{root.id}/preview/?version={version.id}",
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp.content, b"version")
+        self.assertEqual(read_streaming_response(resp), b"version")
 
         resp = self.client.get(
             f"/api/documents/{root.id}/thumb/?version={version.id}",
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp.content, b"thumb")
+        self.assertEqual(read_streaming_response(resp), b"thumb")
 
     def test_metadata_version_param_uses_version(self) -> None:
         root = Document.objects.create(

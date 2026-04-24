@@ -17,6 +17,7 @@ import pytest
 from django.apps import apps
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
+from django.http import StreamingHttpResponse
 from django.test import TransactionTestCase
 from django.test import override_settings
 
@@ -148,6 +149,13 @@ def util_call_with_backoff(
         pytest.skip("Repeated HTTP 50x for service")  # pragma: no cover
 
     return succeeded, result
+
+
+def read_streaming_response(response: StreamingHttpResponse) -> bytes:
+    """Consume a StreamingHttpResponse/FileResponse and close it."""
+    content = b"".join(response.streaming_content)
+    response.close()
+    return content
 
 
 class DirectoriesMixin:

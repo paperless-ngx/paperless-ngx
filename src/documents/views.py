@@ -1436,7 +1436,7 @@ class DocumentViewSet(
             file_doc = self._get_effective_file_doc(request_doc, root_doc, request)
             handle = file_doc.thumbnail_file
 
-            return HttpResponse(handle, content_type="image/webp")
+            return FileResponse(handle, content_type="image/webp")
         except FileNotFoundError:
             raise Http404
 
@@ -4281,7 +4281,7 @@ def serve_file(
     use_archive: bool,
     disposition: str,
     follow_formatting: bool = False,
-) -> HttpResponse:
+) -> FileResponse:
     if use_archive:
         if TYPE_CHECKING:
             assert doc.archive_filename
@@ -4304,7 +4304,7 @@ def serve_file(
         if mime_type in {"application/csv", "text/csv"} and disposition == "inline":
             mime_type = "text/plain"
 
-    response = HttpResponse(file_handle, content_type=mime_type)
+    response = FileResponse(file_handle, content_type=mime_type)
     # Firefox is not able to handle unicode characters in filename field
     # RFC 5987 addresses this issue
     # see https://datatracker.ietf.org/doc/html/rfc5987#section-4.2
