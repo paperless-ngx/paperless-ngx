@@ -69,6 +69,7 @@ from django.views.decorators.http import condition
 from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.openapi import AutoSchema
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 from drf_spectacular.utils import extend_schema
@@ -3799,6 +3800,15 @@ class RemoteVersionView(GenericAPIView[Any]):
         )
 
 
+class _TasksViewSetSchema(AutoSchema):
+    _UNPAGINATED_ACTIONS = frozenset({"summary", "active"})
+
+    def _get_paginator(self):
+        if getattr(self.view, "action", None) in self._UNPAGINATED_ACTIONS:
+            return None
+        return super()._get_paginator()
+
+
 @extend_schema_view(
     list=extend_schema(
         parameters=[
@@ -3857,7 +3867,9 @@ class RemoteVersionView(GenericAPIView[Any]):
     ),
 )
 class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
+    schema = _TasksViewSetSchema()
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    pagination_class = StandardPagination
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,

@@ -1,4 +1,8 @@
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import {
+  HttpRequest,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http'
 import {
   HttpTestingController,
   provideHttpClientTesting,
@@ -37,16 +41,21 @@ describe('TasksService', () => {
   it('calls tasks api endpoint on reload', () => {
     tasksService.reload()
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}tasks/?acknowledged=false`
+      (req: HttpRequest<unknown>) =>
+        req.url === `${environment.apiBaseUrl}tasks/` &&
+        req.params.get('acknowledged') === 'false' &&
+        req.params.get('page_size') === '1000'
     )
     expect(req.request.method).toEqual('GET')
+    req.flush({ count: 0, results: [] })
   })
 
   it('does not call tasks api endpoint on reload if already loading', () => {
     tasksService.loading = true
     tasksService.reload()
     httpTestingController.expectNone(
-      `${environment.apiBaseUrl}tasks/?acknowledged=false`
+      (req: HttpRequest<unknown>) =>
+        req.url === `${environment.apiBaseUrl}tasks/`
     )
   })
 
@@ -62,8 +71,13 @@ describe('TasksService', () => {
     req.flush([])
     // reload is then called
     httpTestingController
-      .expectOne(`${environment.apiBaseUrl}tasks/?acknowledged=false`)
-      .flush([])
+      .expectOne(
+        (req: HttpRequest<unknown>) =>
+          req.url === `${environment.apiBaseUrl}tasks/` &&
+          req.params.get('acknowledged') === 'false' &&
+          req.params.get('page_size') === '1000'
+      )
+      .flush({ count: 0, results: [] })
   })
 
   it('groups mixed task types by status when reloading', () => {
@@ -124,10 +138,13 @@ describe('TasksService', () => {
     tasksService.reload()
 
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}tasks/?acknowledged=false`
+      (req: HttpRequest<unknown>) =>
+        req.url === `${environment.apiBaseUrl}tasks/` &&
+        req.params.get('acknowledged') === 'false' &&
+        req.params.get('page_size') === '1000'
     )
 
-    req.flush(mockTasks)
+    req.flush({ count: mockTasks.length, results: mockTasks })
 
     expect(tasksService.allFileTasks).toHaveLength(5)
     expect(tasksService.completedFileTasks).toHaveLength(2)
@@ -173,10 +190,13 @@ describe('TasksService', () => {
     tasksService.reload()
 
     const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}tasks/?acknowledged=false`
+      (req: HttpRequest<unknown>) =>
+        req.url === `${environment.apiBaseUrl}tasks/` &&
+        req.params.get('acknowledged') === 'false' &&
+        req.params.get('page_size') === '1000'
     )
 
-    req.flush(mockTasks)
+    req.flush({ count: mockTasks.length, results: mockTasks })
 
     expect(tasksService.needsAttentionTasks).toHaveLength(2)
     expect(tasksService.needsAttentionTasks.map((task) => task.status)).toEqual(

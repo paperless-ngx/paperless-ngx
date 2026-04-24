@@ -98,6 +98,18 @@
       <i-bs width="1em" height="1em" name="x"></i-bs><small i18n>Reset filters</small>
     </button>
   }
+
+  <ngb-pagination
+    class="ms-md-3 mb-0"
+    [pageSize]="pageSize"
+    [collectionSize]="totalTasks"
+    [page]="page"
+    [maxSize]="5"
+    [rotate]="true"
+    size="sm"
+    aria-label="Tasks pagination"
+    (pageChange)="setPage($event)">
+  </ngb-pagination>
 </div>
 
 <ng-template let-tasks="tasks" let-section="section" #tasksTemplate>
