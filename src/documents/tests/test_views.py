@@ -27,6 +27,7 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.signals.handlers import update_llm_suggestions_cache
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import read_streaming_response
 from paperless.models import ApplicationConfiguration
 
 
@@ -157,7 +158,7 @@ class TestViews(DirectoriesMixin, TestCase):
         # Valid
         response = self.client.get(f"/share/{sl1.slug}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.content, content)
+        self.assertEqual(read_streaming_response(response), content)
 
         # Invalid
         response = self.client.get("/share/123notaslug", follow=True)

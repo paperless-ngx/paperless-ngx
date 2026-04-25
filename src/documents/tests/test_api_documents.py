@@ -49,6 +49,7 @@ from documents.models import WorkflowTrigger
 from documents.signals.handlers import run_workflows
 from documents.tests.utils import ConsumeTaskMixin
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import read_streaming_response
 
 
 class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
@@ -323,19 +324,16 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             f.write(content_thumbnail)
 
         response = self.client.get(f"/api/documents/{doc.pk}/download/")
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.content, content)
+        self.assertEqual(read_streaming_response(response), content)
 
         response = self.client.get(f"/api/documents/{doc.pk}/preview/")
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.content, content)
+        self.assertEqual(read_streaming_response(response), content)
 
         response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.content, content_thumbnail)
+        self.assertEqual(read_streaming_response(response), content_thumbnail)
 
     def test_document_actions_with_perms(self) -> None:
         """
@@ -386,12 +384,15 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
 
         response = self.client.get(f"/api/documents/{doc.pk}/download/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response.close()
 
         response = self.client.get(f"/api/documents/{doc.pk}/preview/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response.close()
 
         response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response.close()
 
     @override_settings(FILENAME_FORMAT="")
     def test_download_with_archive(self) -> None:
@@ -412,28 +413,24 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             f.write(content_archive)
 
         response = self.client.get(f"/api/documents/{doc.pk}/download/")
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.content, content_archive)
+        self.assertEqual(read_streaming_response(response), content_archive)
 
         response = self.client.get(
             f"/api/documents/{doc.pk}/download/?original=true",
         )
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.content, content)
+        self.assertEqual(read_streaming_response(response), content)
 
         response = self.client.get(f"/api/documents/{doc.pk}/preview/")
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.content, content_archive)
+        self.assertEqual(read_streaming_response(response), content_archive)
 
         response = self.client.get(
             f"/api/documents/{doc.pk}/preview/?original=true",
         )
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.content, content)
+        self.assertEqual(read_streaming_response(response), content)
 
     @override_settings(FILENAME_FORMAT="")
     def test_download_follow_formatting(self) -> None:
@@ -456,18 +453,21 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         # Without follow_formatting, should use public filename
         response = self.client.get(f"/api/documents/{doc.pk}/download/")
         self.assertIn("none.pdf", response["Content-Disposition"])
+        response.close()
 
         # With follow_formatting, should use actual filename on disk
         response = self.client.get(
             f"/api/documents/{doc.pk}/download/?follow_formatting=true",
         )
         self.assertIn("archived.pdf", response["Content-Disposition"])
+        response.close()
 
         # With follow_formatting and original, should use source filename
         response = self.client.get(
             f"/api/documents/{doc.pk}/download/?original=true&follow_formatting=true",
         )
         self.assertIn("my_document.pdf", response["Content-Disposition"])
+        response.close()
 
     def test_document_actions_not_existing_file(self) -> None:
         doc = Document.objects.create(

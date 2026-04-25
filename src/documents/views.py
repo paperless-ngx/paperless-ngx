@@ -281,8 +281,7 @@ class IndexView(TemplateView):
             first = lang[: lang.index("-")]
             second = lang[lang.index("-") + 1 :]
             return f"{first}-{second.upper()}"
-        else:
-            return lang
+        return lang
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -427,9 +426,7 @@ class BulkPermissionMixin:
 
 
 class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
-    """
-    Mixin to add document count to queryset, permissions-aware if needed
-    """
+    """Mixin to add document count to queryset, permissions-aware if needed"""
 
     # Default is simple relation path, override for through-table/count specialization.
     document_count_through: type[Model] | None = None
@@ -1231,8 +1228,7 @@ class DocumentViewSet(
     def get_filesize(self, filename):
         if Path(filename).is_file():
             return Path(filename).stat().st_size
-        else:
-            return None
+        return None
 
     @action(methods=["get"], detail=True, filter_backends=[])
     @method_decorator(cache_control(no_cache=True))
@@ -1449,7 +1445,7 @@ class DocumentViewSet(
             file_doc = self._get_effective_file_doc(request_doc, root_doc, request)
             handle = file_doc.thumbnail_file
 
-            return HttpResponse(handle, content_type="image/webp")
+            return FileResponse(handle, content_type="image/webp")
         except FileNotFoundError:
             raise Http404
 
@@ -2107,8 +2103,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
     def get_serializer_class(self):
         if self._is_search_request():
             return SearchResultSerializer
-        else:
-            return DocumentSerializer
+        return DocumentSerializer
 
     def _get_active_search_params(self, request: Request | None = None) -> list[str]:
         request = request or self.request
@@ -3226,7 +3221,7 @@ class GlobalSearchView(PassUserMixin):
         query = request.query_params.get("query", None)
         if query is None:
             return HttpResponseBadRequest("Query required")
-        elif len(query) < 3:
+        if len(query) < 3:
             return HttpResponseBadRequest("Query must be at least 3 characters")
 
         db_only = request.query_params.get("db_only", False)
@@ -3521,7 +3516,7 @@ class StatisticsView(GenericAPIView[Any]):
                 "inbox_tag": (
                     inbox_tag_pks[0] if inbox_tag_pks else None
                 ),  # backwards compatibility
-                "inbox_tags": (inbox_tag_pks if inbox_tag_pks else None),
+                "inbox_tags": (inbox_tag_pks or None),
                 "document_file_type_counts": document_file_type_counts,
                 "character_count": character_count,
                 "tag_count": len(tags),
@@ -3533,6 +3528,16 @@ class StatisticsView(GenericAPIView[Any]):
         )
 
 
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="bulk_download",
+        description="Download multiple documents as a ZIP archive.",
+        responses={
+            (HTTPStatus.OK, "application/zip"): OpenApiTypes.BINARY,
+            HTTPStatus.FORBIDDEN: None,
+        },
+    ),
+)
 class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
     permission_classes = (IsAuthenticated,)
     serializer_class = BulkDownloadSerializer
@@ -3555,13 +3560,6 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
             if not has_perms_owner_aware(request.user, "change_document", document):
                 return HttpResponseForbidden("Insufficient permissions")
 
-        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
-        temp = tempfile.NamedTemporaryFile(  # noqa: SIM115
-            dir=settings.SCRATCH_DIR,
-            suffix="-compressed-archive",
-            delete=False,
-        )
-
         if content == "both":
             strategy_class = OriginalAndArchiveStrategy
         elif content == "originals":
@@ -3569,20 +3567,35 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
         else:
             strategy_class = ArchiveOnlyStrategy
 
-        with zipfile.ZipFile(temp.name, "w", compression) as zipf:
-            strategy = strategy_class(zipf, follow_formatting=follow_filename_format)
-            for document in documents:
-                strategy.add_document(document)
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
+        fd, temp_name = tempfile.mkstemp(
+            dir=settings.SCRATCH_DIR,
+            suffix="-compressed-archive",
+        )
+        os.close(fd)
+        temp_path = Path(temp_name)
 
-        # TODO(stumpylog): Investigate using FileResponse here
-        with Path(temp.name).open("rb") as f:
-            response = HttpResponse(f, content_type="application/zip")
-            response["Content-Disposition"] = '{}; filename="{}"'.format(
-                "attachment",
-                "documents.zip",
-            )
+        try:
+            with zipfile.ZipFile(temp_path, "w", compression) as zipf:
+                strategy = strategy_class(
+                    zipf,
+                    follow_formatting=follow_filename_format,
+                )
+                for document in documents:
+                    strategy.add_document(document)
 
-            return response
+            f = temp_path.open("rb")
+            temp_path.unlink()
+        except Exception:
+            temp_path.unlink(missing_ok=True)
+            raise
+
+        return FileResponse(
+            f,
+            as_attachment=True,
+            filename="documents.zip",
+            content_type="application/zip",
+        )
 
 
 @extend_schema_view(
@@ -4290,7 +4303,7 @@ def serve_file(
     use_archive: bool,
     disposition: str,
     follow_formatting: bool = False,
-) -> HttpResponse:
+) -> FileResponse:
     if use_archive:
         if TYPE_CHECKING:
             assert doc.archive_filename
@@ -4313,7 +4326,7 @@ def serve_file(
         if mime_type in {"application/csv", "text/csv"} and disposition == "inline":
             mime_type = "text/plain"
 
-    response = HttpResponse(file_handle, content_type=mime_type)
+    response = FileResponse(file_handle, content_type=mime_type)
     # Firefox is not able to handle unicode characters in filename field
     # RFC 5987 addresses this issue
     # see https://datatracker.ietf.org/doc/html/rfc5987#section-4.2
