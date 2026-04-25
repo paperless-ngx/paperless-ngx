@@ -1320,7 +1320,17 @@ class DocumentViewSet(
                 refresh_suggestions_cache(doc.pk)
                 return Response(cached_llm_suggestions.suggestions)
 
-            llm_suggestions = get_ai_document_classification(doc, request.user)
+            try:
+                llm_suggestions = get_ai_document_classification(doc, request.user)
+            except ValueError as exc:
+                logger.exception(
+                    "Invalid AI configuration while generating suggestions for "
+                    "document %s: %s",
+                    doc.pk,
+                    exc,
+                    exc_info=True,
+                )
+                raise ValidationError({"ai": [_("Invalid AI configuration.")]}) from exc
 
             matched_tags = match_tags_by_name(
                 llm_suggestions.get("tags", []),
