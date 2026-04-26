@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 import re
 import threading
-from collections import Counter
 from datetime import UTC
 from datetime import datetime
 from enum import StrEnum
@@ -36,8 +35,10 @@ from documents.utils import identity
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from django.contrib.auth.base_user import AbstractBaseUser
+    from django.contrib.auth.base_user import AbstractUser
     from django.db.models import QuerySet
+    from tantivy import Index
+    from tantivy import Schema
 
     from documents.models import Document
 
@@ -324,7 +325,7 @@ class TantivyBackend:
     def _apply_permission_filter(
         self,
         query: tantivy.Query,
-        user: AbstractBaseUser | None,
+        user: AbstractUser | None,
     ) -> tantivy.Query:
         """Wrap a query with a permission filter if the user is not a superuser."""
         if user is not None:
@@ -633,7 +634,7 @@ class TantivyBackend:
     def search_ids(
         self,
         query: str,
-        user: AbstractBaseUser | None,
+        user: AbstractUser | None,
         *,
         sort_field: str | None = None,
         sort_reverse: bool = False,
@@ -693,7 +694,7 @@ class TantivyBackend:
         self,
         term: str,
         limit: int,
-        user: AbstractBaseUser | None = None,
+        user: AbstractUser | None = None,
     ) -> list[str]:
         """
         Get autocomplete suggestions for search queries.
@@ -719,71 +720,32 @@ class TantivyBackend:
         if not normalized_term:
             return []
 
+        if TYPE_CHECKING:
+            assert self._index is not None
+            assert isinstance(self._index, Index)
+            assert isinstance(self._schema, Schema)
+
         searcher = self._index.searcher()
 
-        # Build a prefix query on autocomplete_word so we only scan docs
-        # containing words that start with the prefix, not the entire index.
-        # tantivy regex is implicitly anchored; .+ avoids the empty-match
-        # error that .* triggers.  We OR with term_query to also match the
-        # exact prefix as a complete word.
-        escaped = re.escape(normalized_term)
-        prefix_query = tantivy.Query.boolean_query(
-            [
-                (
-                    tantivy.Occur.Should,
-                    tantivy.Query.term_query(
-                        self._schema,
-                        "autocomplete_word",
-                        normalized_term,
-                    ),
-                ),
-                (
-                    tantivy.Occur.Should,
-                    tantivy.Query.regex_query(
-                        self._schema,
-                        "autocomplete_word",
-                        f"{escaped}.+",
-                    ),
-                ),
-            ],
-        )
-
+        permission_query = None
         # Intersect with permission filter so autocomplete words from
         # invisible documents don't leak to other users.
         if user is not None and not user.is_superuser:
-            final_query = tantivy.Query.boolean_query(
-                [
-                    (tantivy.Occur.Must, prefix_query),
-                    (tantivy.Occur.Must, build_permission_filter(self._schema, user)),
-                ],
-            )
-        else:
-            final_query = prefix_query
+            permission_query = build_permission_filter(self._schema, user)
 
-        results = searcher.search(final_query, limit=searcher.num_docs)
-
-        # Count how many visible documents each matching word appears in.
-        word_counts: Counter[str] = Counter()
-        for _score, doc_address in results.hits:
-            stored_doc = searcher.doc(doc_address)
-            doc_dict = stored_doc.to_dict()
-            if "autocomplete_word" in doc_dict:
-                for word in doc_dict["autocomplete_word"]:
-                    if word.startswith(normalized_term):
-                        word_counts[word] += 1
-
-        # Sort by document frequency descending; break ties alphabetically.
-        matches = sorted(
-            word_counts,
-            key=lambda w: (-word_counts[w], w),
+        matches = searcher.terms_with_prefix(
+            "autocomplete_word",
+            normalized_term,
+            permission_query,
+            limit,
         )
 
-        return matches[:limit]
+        return [x[0] for x in matches]
 
     def more_like_this_ids(
         self,
         doc_id: int,
-        user: AbstractBaseUser | None,
+        user: AbstractUser | None,
         *,
         limit: int | None = None,
     ) -> list[int]:

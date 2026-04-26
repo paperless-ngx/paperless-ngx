@@ -4686,7 +4686,7 @@ wheels = [
 [[package]]
 name = "tantivy"
 version = "0.26.0"
-source = { git = "https://github.com/quickwit-oss/tantivy-py.git#fa1a1985b96001929fc1cafcdd9dc94e56658b2a" }
+source = { git = "https://github.com/quickwit-oss/tantivy-py.git#bf3a0c0d6e18591728121b3b5fa735ab61862110" }
 
 [[package]]
 name = "tenacity"
