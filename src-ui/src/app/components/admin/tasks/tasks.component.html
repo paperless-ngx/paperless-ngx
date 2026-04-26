@@ -214,9 +214,9 @@
                 </button>
                 <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
                   @if (task.related_document_ids?.[0]) {
-                    <button class="btn btn-sm btn-outline-primary" (click)="dismissAndGo(task); $event.stopPropagation();">
+                    <a class="btn btn-sm btn-outline-primary" [routerLink]="['/documents', task.related_document_ids[0]]" (click)="dismissTask(task)">
                       <i-bs name="file-text" class="me-1"></i-bs><ng-container i18n>Open Document</ng-container>
-                    </button>
+                    </a>
                   }
                 </ng-container>
               </div>
