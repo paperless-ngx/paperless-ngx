@@ -4,6 +4,8 @@ import json
 import logging
 import shutil
 from typing import TYPE_CHECKING
+from typing import Final
+from typing import cast
 
 import tantivy
 from django.conf import settings
@@ -13,7 +15,8 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("paperless.search")
 
-SCHEMA_VERSION = 1
+# v1 - Initial tantivy schema format
+SCHEMA_VERSION: Final[int] = 1
 
 
 def build_schema() -> tantivy.Schema:
@@ -172,7 +175,7 @@ def open_or_rebuild_index(index_dir: Path | None = None) -> tantivy.Index:
         Opened Tantivy index (caller must register custom tokenizers)
     """
     if index_dir is None:
-        index_dir = settings.INDEX_DIR
+        index_dir = cast("Path", settings.INDEX_DIR)
     if not index_dir.exists():
         return tantivy.Index(build_schema())
     if needs_rebuild(index_dir):
