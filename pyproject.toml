@@ -143,7 +143,8 @@ typing = [
   "types-python-dateutil",
   "types-pytz",
   "types-redis",
-  "types-setuptools",
+  "types-regex",
+  "types-setuptools"
 ]
 
 [tool.uv]

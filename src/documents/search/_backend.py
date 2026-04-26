@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 from typing import Self
 from typing import TypedDict
 from typing import TypeVar
+from typing import cast
 
 import filelock
 import regex
@@ -35,10 +36,8 @@ from documents.utils import identity
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from django.contrib.auth.base_user import AbstractUser
+    from django.contrib.auth.models import AbstractUser
     from django.db.models import QuerySet
-    from tantivy import Index
-    from tantivy import Schema
 
     from documents.models import Document
 
@@ -170,8 +169,15 @@ class WriteBatch:
     def __init__(self, backend: TantivyBackend, lock_timeout: float):
         self._backend = backend
         self._lock_timeout = lock_timeout
-        self._writer = None
+        self._raw_writer: tantivy.IndexWriter | None = None
         self._lock = None
+
+    @property
+    def _writer(self) -> tantivy.IndexWriter:
+        assert self._raw_writer is not None, (
+            "WriteBatch not entered; use as context manager"
+        )
+        return self._raw_writer
 
     def __enter__(self) -> Self:
         if self._backend._path is not None:
@@ -184,7 +190,7 @@ class WriteBatch:
                     f"Could not acquire index lock within {self._lock_timeout}s",
                 ) from e
 
-        self._writer = self._backend._index.writer()
+        self._raw_writer = self._backend._index.writer()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -194,9 +200,9 @@ class WriteBatch:
                 self._backend._index.reload()
             # Explicitly delete writer to release tantivy's internal lock.
             # On exception the uncommitted writer is simply discarded.
-            if self._writer is not None:
-                del self._writer
-                self._writer = None
+            if self._raw_writer is not None:
+                del self._raw_writer
+                self._raw_writer = None
         finally:
             if self._lock is not None:
                 self._lock.release()
@@ -274,8 +280,18 @@ class TantivyBackend:
         # path=None → in-memory index (for tests)
         # path=some_dir → on-disk index (for production)
         self._path = path
-        self._index = None
-        self._schema = None
+        self._raw_index: tantivy.Index | None = None
+        self._raw_schema: tantivy.Schema | None = None
+
+    @property
+    def _index(self) -> tantivy.Index:
+        assert self._raw_index is not None, "Index not open; call open() first"
+        return self._raw_index
+
+    @property
+    def _schema(self) -> tantivy.Schema:
+        assert self._raw_schema is not None, "Schema not open; call open() first"
+        return self._raw_schema
 
     def open(self) -> None:
         """
@@ -285,14 +301,14 @@ class TantivyBackend:
         version or language changes. Registers custom tokenizers after opening.
         Safe to call multiple times - subsequent calls are no-ops.
         """
-        if self._index is not None:
+        if self._raw_index is not None:
             return  # pragma: no cover
         if self._path is not None:
-            self._index = open_or_rebuild_index(self._path)
+            self._raw_index = open_or_rebuild_index(self._path)
         else:
-            self._index = tantivy.Index(build_schema())
-        register_tokenizers(self._index, settings.SEARCH_LANGUAGE)
-        self._schema = self._index.schema
+            self._raw_index = tantivy.Index(build_schema())
+        register_tokenizers(self._raw_index, settings.SEARCH_LANGUAGE)
+        self._raw_schema = self._raw_index.schema
 
     def close(self) -> None:
         """
@@ -300,12 +316,12 @@ class TantivyBackend:
 
         Safe to call multiple times - subsequent calls are no-ops.
         """
-        self._index = None
-        self._schema = None
+        self._raw_index = None
+        self._raw_schema = None
 
     def _ensure_open(self) -> None:
         """Ensure the index is open before operations."""
-        if self._index is None:
+        if self._raw_index is None:
             self.open()  # pragma: no cover
 
     def _parse_query(
@@ -569,7 +585,7 @@ class TantivyBackend:
         batch_results = searcher.search(batch_query, limit=len(doc_ids))
 
         result_addrs = [addr for _score, addr in batch_results.hits]
-        result_ids = searcher.fast_field_values("id", result_addrs)
+        result_ids = cast("list[int]", searcher.fast_field_values("id", result_addrs))
         addr_by_id: dict[int, tuple[float, tantivy.DocAddress]] = {
             doc_id: (score, addr)
             for (score, addr), doc_id in zip(batch_results.hits, result_ids)
@@ -688,7 +704,10 @@ class TantivyBackend:
             if threshold is not None:
                 all_hits = [hit for hit in all_hits if hit[1] >= threshold]
 
-        return searcher.fast_field_values("id", [doc_addr for doc_addr, *_ in all_hits])
+        return cast(
+            "list[int]",
+            searcher.fast_field_values("id", [doc_addr for doc_addr, *_ in all_hits]),
+        )
 
     def autocomplete(
         self,
@@ -719,11 +738,6 @@ class TantivyBackend:
         normalized_term = ascii_fold(term.lower())
         if not normalized_term:
             return []
-
-        if TYPE_CHECKING:
-            assert self._index is not None
-            assert isinstance(self._index, Index)
-            assert isinstance(self._schema, Schema)
 
         searcher = self._index.searcher()
 
@@ -791,7 +805,7 @@ class TantivyBackend:
         results = searcher.search(final_query, limit=effective_limit + 1)
 
         addrs = [addr for _score, addr in results.hits]
-        all_ids = searcher.fast_field_values("id", addrs)
+        all_ids = cast("list[int]", searcher.fast_field_values("id", addrs))
         ids = [rid for rid in all_ids if rid != doc_id]
         return ids[:limit] if limit is not None else ids
 
@@ -840,9 +854,9 @@ class TantivyBackend:
         register_tokenizers(new_index, settings.SEARCH_LANGUAGE)
 
         # Point instance at the new index so _build_tantivy_doc uses it
-        old_index, old_schema = self._index, self._schema
-        self._index = new_index
-        self._schema = new_index.schema
+        old_index, old_schema = self._raw_index, self._raw_schema
+        self._raw_index = new_index
+        self._raw_schema = new_index.schema
 
         try:
             writer = new_index.writer()
@@ -856,8 +870,8 @@ class TantivyBackend:
             new_index.reload()
         except BaseException:  # pragma: no cover
             # Restore old index on failure so the backend remains usable
-            self._index = old_index
-            self._schema = old_schema
+            self._raw_index = old_index
+            self._raw_schema = old_schema
             raise
 
 

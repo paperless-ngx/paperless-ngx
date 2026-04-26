@@ -3012,6 +3012,7 @@ typing = [
     { name = "types-python-dateutil", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-pytz", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-redis", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "types-regex", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "types-setuptools", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
 
@@ -3150,6 +3151,7 @@ typing = [
     { name = "types-python-dateutil" },
     { name = "types-pytz" },
     { name = "types-redis" },
+    { name = "types-regex" },
     { name = "types-setuptools" },
 ]
 
@@ -5208,6 +5210,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/3a/95/c054d3ac940e8bac4ca216470c80c26688a0e79e09f520a942bb27da3386/types-redis-4.6.0.20241004.tar.gz", hash = "sha256:5f17d2b3f9091ab75384153bfa276619ffa1cf6a38da60e10d5e6749cc5b902e", size = 49679, upload-time = "2024-10-04T02:43:59.224Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/55/82/7d25dce10aad92d2226b269bce2f85cfd843b4477cd50245d7d40ecf8f89/types_redis-4.6.0.20241004-py3-none-any.whl", hash = "sha256:ef5da68cb827e5f606c8f9c0b49eeee4c2669d6d97122f301d3a55dc6a63f6ed", size = 58737, upload-time = "2024-10-04T02:43:57.968Z" },
+]
+
+[[package]]
+name = "types-regex"
+version = "2026.4.4.20260408"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/92/42/d7c691fc5a8a8ecfba3f23c1c4c087a089af0767610d88c29201193d8f60/types_regex-2026.4.4.20260408.tar.gz", hash = "sha256:86b2975ff11b06e7f538839821510daea2566d9cb18bb8acde47834315409cf9", size = 13182, upload-time = "2026-04-08T04:31:11.887Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e1/92/e109654a804d11d9b60d67c7b29d64b2beac6b2e3209ea075e268e5a1021/types_regex-2026.4.4.20260408-py3-none-any.whl", hash = "sha256:d436bcc409abf9b06747b7e038014afc6d40ef7b72329655c353a1955534068f", size = 11116, upload-time = "2026-04-08T04:31:11.01Z" },
 ]
 
 [[package]]
