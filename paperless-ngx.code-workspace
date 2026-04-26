@@ -30,11 +30,25 @@
 			"**/.idea": true,
 			"**/.venv": true,
 			"**/.coverage": true,
-			"**/coverage.json": true
+			"**/coverage.json": true,
+			"htmlcov/": true,
+			"coverage.xml": true,
+			"junit.xml": true
 		},
-		"python.defaultInterpreterPath": ".venv/bin/python3",
+		"python.languageServer": "Pylance",
+		"python.defaultInterpreterPath": "${workspaceFolder:paperless-ngx}/.venv/bin/python3",
+		"python.analysis.extraPaths": ["${workspaceFolder:paperless-ngx}/src"],
 		"python.analysis.inlayHints.pytestParameters": true,
 		"python.testing.pytestEnabled": true,
+		"python.testing.unittestEnabled": false,
+		"[python]": {
+			"editor.defaultFormatter": "charliermarsh.ruff",
+			"editor.formatOnSave": true,
+			"editor.codeActionsOnSave": {
+				"source.fixAll.ruff": "explicit",
+				"source.organizeImports.ruff": "explicit"
+			}
+		}
 	},
 	"extensions": {
 		"recommendations": ["ms-python.python", "charliermarsh.ruff", "editorconfig.editorconfig"],
