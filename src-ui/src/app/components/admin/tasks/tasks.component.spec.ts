@@ -532,12 +532,22 @@ describe('TasksComponent', () => {
   })
 
   it('should support dismiss and open a document', () => {
-    const routerSpy = jest.spyOn(router, 'navigate')
-    component.dismissAndGo(tasks[3])
-    expect(routerSpy).toHaveBeenCalledWith([
-      'documents',
-      tasks[3].related_document_ids?.[0],
-    ])
+    const dismissSpy = jest.spyOn(component, 'dismissTask')
+
+    fixture.detectChanges()
+
+    const openDocumentLink = fixture.debugElement
+      .queryAll(By.css('a'))
+      .find((link) => link.nativeElement.textContent.includes('Open Document'))
+
+    expect(openDocumentLink).not.toBeNull()
+
+    openDocumentLink.triggerEventHandler(
+      'click',
+      new MouseEvent('click', { ctrlKey: true })
+    )
+
+    expect(dismissSpy).toHaveBeenCalledWith(tasks[3])
   })
 
   it('should auto refresh, allow toggle', () => {
