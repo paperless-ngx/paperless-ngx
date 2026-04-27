@@ -2919,6 +2919,62 @@ class TestWorkflows(
         group_perms: QuerySet = get_groups_with_perms(doc)
         self.assertNotIn(self.group1, group_perms)
 
+    def test_assignment_title_persists_when_removal_also_removes_tag(self) -> None:
+        """
+        GIVEN:
+            - Workflow with DOCUMENT_UPDATED trigger
+            - Action 1 (ASSIGNMENT): assigns a new title
+            - Action 2 (REMOVAL): removes a tag from the document
+            - Document has a filename so update_filename_and_move_files runs fully
+        WHEN:
+            - Workflow is executed for the document
+        THEN:
+            - Both the title change and tag removal are persisted
+            - Regression test for GH #12660: the tag-removal M2M signal triggered
+              update_filename_and_move_files which called a full refresh_from_db(),
+              wiping the in-memory title set by the assignment action before it
+              could be saved.
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        assign_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            assign_title="Renamed by workflow",
+            order=0,
+        )
+        remove_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.REMOVAL,
+            order=1,
+        )
+        remove_action.remove_tags.add(self.t1)
+
+        w = Workflow.objects.create(name="Assign-then-remove workflow", order=0)
+        w.triggers.add(trigger)
+        w.actions.add(assign_action)
+        w.actions.add(remove_action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="original title",
+            mime_type="application/pdf",
+            checksum="abc12312660",
+            original_filename="test.pdf",
+        )
+        doc.tags.add(self.t1)
+        # Give the document a filename so update_filename_and_move_files proceeds
+        # past its early-return guard and actually calls refresh_from_db().
+        # Use the ID-based default name so generate_filename returns the same
+        # value and no actual file move is attempted.
+        Document.objects.filter(pk=doc.pk).update(filename=f"{doc.pk:07}.pdf")
+        doc.refresh_from_db()
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.title, "Renamed by workflow")
+        self.assertNotIn(self.t1, doc.tags.all())
+
     def test_removal_action_document_consumed(self) -> None:
         """
         GIVEN:

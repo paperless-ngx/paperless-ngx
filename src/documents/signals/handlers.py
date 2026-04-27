@@ -478,8 +478,12 @@ def update_filename_and_move_files(
             # If this was waiting for the lock, the filename or archive_filename
             # of this document may have been updated.  This happens if multiple updates
             # get queued from the UI for the same document
-            # So freshen up the data before doing anything
-            instance.refresh_from_db()
+            # So freshen up the data before doing anything.
+            # Only refresh file path fields; a full refresh would overwrite any
+            # unsaved in-memory field changes (e.g. title set by a workflow
+            # assignment action that hasn't been saved yet when this runs via
+            # the m2m_changed signal from a tag-removal action in the same workflow).
+            instance.refresh_from_db(fields=["filename", "archive_filename"])
 
             old_filename = instance.filename
             old_source_path = instance.source_path
