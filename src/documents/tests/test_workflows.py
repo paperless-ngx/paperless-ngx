@@ -2848,6 +2848,69 @@ class TestWorkflows(
         group_perms: QuerySet = get_groups_with_perms(doc)
         self.assertNotIn(self.group1, group_perms)
 
+    def test_document_updated_workflow_assignment_persists_when_removing_trigger_tag(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A document updated workflow filtered on a tag
+            - The workflow assigns a new title and removes that same tag
+        WHEN:
+            - The document is updated while carrying the trigger tag
+        THEN:
+            - The new title persists and the trigger tag is removed
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        trigger.filter_has_tags.add(self.t1)
+        assignment = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            assign_title="workflow renamed",
+            order=0,
+        )
+        removal = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.REMOVAL,
+            order=1,
+        )
+        removal.remove_tags.add(self.t1)
+        removal.save()
+
+        workflow = Workflow.objects.create(
+            name="Workflow rename and remove trigger tag",
+            order=0,
+        )
+        workflow.triggers.add(trigger)
+        workflow.actions.add(assignment, removal)
+        workflow.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            mime_type="application/pdf",
+            checksum="rename-remove-trigger-tag",
+            original_filename="sample.pdf",
+        )
+        generated = generate_unique_filename(doc)
+        destination = (settings.ORIGINALS_DIR / generated).resolve()
+        create_source_path_directory(destination)
+        shutil.copy(self.SAMPLE_DIR / "simple.pdf", destination)
+        Document.objects.filter(pk=doc.pk).update(filename=generated.as_posix())
+        doc.refresh_from_db()
+        doc.tags.set([self.t1, self.t2])
+
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+        self.client.patch(
+            f"/api/documents/{doc.id}/",
+            {"title": "user update to trigger workflow"},
+            format="json",
+        )
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.title, "workflow renamed")
+        self.assertFalse(doc.tags.filter(pk=self.t1.pk).exists())
+        self.assertTrue(doc.tags.filter(pk=self.t2.pk).exists())
+
     def test_removal_action_document_updated_removeall(self) -> None:
         """
         GIVEN:
