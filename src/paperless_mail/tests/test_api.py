@@ -493,7 +493,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_rule1.name, "Updated Name 1")
         self.assertEqual(returned_rule1.action, MailRule.MailAction.DELETE)
 
-    def test_create_mail_rule_forbidden_for_unpermitted_account(self) -> None:
+    def test_create_mail_rule_scopes_accounts(self) -> None:
         other_user = User.objects.create_user(username="mail-owner")
         foreign_account = MailAccountFactory(name="ForeignEmail", owner=other_user)
 
@@ -512,8 +512,26 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
                 "attachment_type": MailRule.AttachmentProcessing.ATTACHMENTS_ONLY,
             },
         )
+        missing_response = self.client.post(
+            self.ENDPOINT,
+            data={
+                "name": "Rule1",
+                "account": foreign_account.pk + 1000,
+                "folder": "INBOX",
+                "filter_from": "from@example.com",
+                "maximum_age": 30,
+                "action": MailRule.MailAction.MARK_READ,
+                "assign_title_from": MailRule.TitleSource.FROM_SUBJECT,
+                "assign_correspondent_from": MailRule.CorrespondentSource.FROM_NOTHING,
+                "order": 0,
+                "attachment_type": MailRule.AttachmentProcessing.ATTACHMENTS_ONLY,
+            },
+        )
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(missing_response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["account"][0].code, "does_not_exist")
+        self.assertEqual(missing_response.data["account"][0].code, "does_not_exist")
         self.assertEqual(MailRule.objects.count(), 0)
 
     def test_create_mail_rule_allowed_for_granted_account_change_permission(
@@ -553,7 +571,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             data={"account": foreign_account.pk},
         )
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         rule1.refresh_from_db()
         self.assertEqual(rule1.account, own_account)
 

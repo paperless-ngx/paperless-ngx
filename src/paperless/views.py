@@ -192,6 +192,16 @@ class UserViewSet(ModelViewSet[User]):
             )
         return super().update(request, *args, **kwargs)
 
+    def destroy(self, request, *args, **kwargs):
+        user_to_delete: User = self.get_object()
+
+        if not request.user.is_superuser and user_to_delete.is_superuser:
+            return HttpResponseForbidden(
+                "Superusers can only be deleted by other superusers",
+            )
+
+        return super().destroy(request, *args, **kwargs)
+
     @extend_schema(
         request=None,
         responses={
