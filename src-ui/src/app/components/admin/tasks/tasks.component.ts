@@ -1,7 +1,7 @@
 import { JsonPipe, NgTemplateOutlet } from '@angular/common'
 import { Component, inject, OnDestroy, OnInit } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { Router } from '@angular/router'
+import { Router, RouterLink } from '@angular/router'
 import {
   NgbCollapseModule,
   NgbDropdownModule,
@@ -138,6 +138,7 @@ const TRIGGER_SOURCE_OPTIONS: Array<{
     FormsModule,
     ReactiveFormsModule,
     NgTemplateOutlet,
+    RouterLink,
     NgbCollapseModule,
     NgbDropdownModule,
     NgbPaginationModule,
@@ -331,11 +332,6 @@ export class TasksComponent
       })
       this.clearSelection()
     }
-  }
-
-  dismissAndGo(task: PaperlessTask) {
-    this.dismissTask(task)
-    this.router.navigate(['documents', task.related_document_ids?.[0]])
   }
 
   expandTask(task: PaperlessTask) {

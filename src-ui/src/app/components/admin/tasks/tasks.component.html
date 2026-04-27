@@ -23,7 +23,7 @@
   <div class="visually-hidden" i18n>Loading...</div>
 }
 
-<div class="task-controls mb-3 btn-toolbar">
+<div class="task-controls mb-3 btn-toolbar align-items-center" role="toolbar">
   <div class="task-view-scope btn-group btn-group-sm me-3" role="group">
     <input
       type="radio"
@@ -52,6 +52,8 @@
     }
   </div>
 
+  <div class="ms-3 me-2 text-muted"><ng-container i18n>Filter by</ng-container>:</div>
+
   <div ngbDropdown>
     <button class="btn btn-sm btn-outline-primary me-3" ngbDropdownToggle>{{selectedTaskTypeLabel}}</button>
     <div class="dropdown-menu shadow" ngbDropdownMenu>
@@ -73,7 +75,6 @@
 
   <div class="form-inline d-flex align-items-center flex-grow-1 task-search">
     <div class="input-group input-group-sm flex-fill w-auto flex-nowrap">
-      <span class="input-group-text text-muted" i18n>Filter by</span>
       <div ngbDropdown>
         <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{filterTargetName}}</button>
         <div class="dropdown-menu shadow" ngbDropdownMenu>
@@ -123,10 +124,10 @@
   </div>
 
   <div class="card border table-responsive mb-3">
-    <table class="table table-striped align-middle shadow-sm mb-0">
+    <table class="table table-striped align-middle shadow-sm mb-0 tasks-table">
       <thead>
         <tr>
-          <th scope="col">
+          <th scope="col" class="select-col">
             <div class="form-check">
               <input
                 type="checkbox"
@@ -139,19 +140,19 @@
               <label class="form-check-label" for="all-tasks-{{section}}"><span class="visually-hidden">Check all</span></label>
             </div>
           </th>
-          <th scope="col" i18n>Name</th>
-          <th scope="col" class="d-none d-lg-table-cell" i18n>Created</th>
+          <th scope="col" class="name-col-header" i18n>Name</th>
+          <th scope="col" class="d-none d-lg-table-cell created-col" i18n>Created</th>
           @if (sectionShowsResults(section)) {
-            <th scope="col" class="d-none d-lg-table-cell" i18n>Results</th>
+            <th scope="col" class="d-none d-lg-table-cell results-col" i18n>Results</th>
           }
           <th scope="col" class="d-table-cell d-lg-none" i18n>Info</th>
-          <th scope="col" i18n>Actions</th>
+          <th scope="col" class="actions-col" i18n>Actions</th>
         </tr>
       </thead>
       <tbody>
         @for (task of tasks; track task.id) {
           <tr (click)="toggleSelected(task); $event.stopPropagation();" (keydown)="toggleSelected(task); $event.stopPropagation();">
-            <td>
+            <td class="select-col">
               <div class="form-check">
                 <input
                   type="checkbox"
@@ -173,9 +174,9 @@
                 <span>{{ task.trigger_source_display }}</span>
               </div>
             </td>
-            <td class="d-none d-lg-table-cell">{{ task.date_created | customDate:'short' }}</td>
+            <td class="d-none d-lg-table-cell created-col">{{ task.date_created | customDate:'short' }}</td>
             @if (sectionShowsResults(section)) {
-              <td class="d-none d-lg-table-cell">
+              <td class="d-none d-lg-table-cell results-col">
                 @if (taskHasLongResultMessage(task)) {
                   <div class="result" (click)="expandTask(task); $event.stopPropagation();"
                     [ngbPopover]="resultPopover" popoverClass="shadow small mobile" triggers="mouseenter:mouseleave" container="body">
@@ -206,23 +207,23 @@
                 <i-bs width="1.2em" height="1.2em" name="info-circle"></i-bs>
               </button>
             </td>
-            <td scope="row">
+            <td scope="row" class="actions-col">
               <div class="btn-group" role="group">
                 <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }">
                   <i-bs name="check" class="me-1"></i-bs><ng-container i18n>Dismiss</ng-container>
                 </button>
                 <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
                   @if (task.related_document_ids?.[0]) {
-                    <button class="btn btn-sm btn-outline-primary" (click)="dismissAndGo(task); $event.stopPropagation();">
+                    <a class="btn btn-sm btn-outline-primary" [routerLink]="['/documents', task.related_document_ids[0]]" (click)="dismissTask(task)">
                       <i-bs name="file-text" class="me-1"></i-bs><ng-container i18n>Open Document</ng-container>
-                    </button>
+                    </a>
                   }
                 </ng-container>
               </div>
             </td>
           </tr>
         <tr>
-          <td class="p-0" [class.border-0]="expandedTask !== task.id" [attr.colspan]="sectionShowsResults(section) ? 5 : 4">
+          <td class="px-2 py-0" [class.border-0]="expandedTask !== task.id" [attr.colspan]="sectionShowsResults(section) ? 5 : 4">
             <div #collapse="ngbCollapse" [ngbCollapse]="expandedTask !== task.id" class="task-detail-panel bg-darker small mb-0">
               <div class="p-2 p-lg-3 ms-lg-3">
                 @if (taskHasResultMessage(task)) {

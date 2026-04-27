@@ -16,6 +16,39 @@ pre {
     cursor: pointer;
 }
 
+.tasks-table {
+    width: 100%;
+}
+
+@media (min-width: 992px) {
+    .tasks-table {
+        table-layout: fixed;
+    }
+
+    .tasks-table .select-col {
+        width: 3rem;
+    }
+
+    .tasks-table .created-col {
+        width: 13rem;
+        white-space: nowrap;
+    }
+
+    .tasks-table .results-col {
+        width: 24%;
+    }
+
+    .tasks-table .actions-col {
+        width: 18rem;
+        white-space: nowrap;
+    }
+
+    .tasks-table .name-col,
+    .tasks-table .results-col {
+        overflow: hidden;
+    }
+}
+
 .btn .spinner-border-sm {
     width: 0.8rem;
     height: 0.8rem;
@@ -30,8 +63,6 @@ pre {
 .input-group .dropdown .btn {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
 }
 
 .z-10 {
