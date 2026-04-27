@@ -160,3 +160,28 @@ class TestPaperlessAdmin(DirectoriesMixin, TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         superuser.refresh_from_db()
         self.assertEqual(superuser.first_name, "Updated")
+
+    def test_superuser_can_only_be_deleted_by_superuser(self):
+        superuser = User.objects.create_superuser(username="superuser", password="test")
+        user = User.objects.create(
+            username="test",
+            is_superuser=False,
+            is_staff=True,
+        )
+        delete_user_perm = Permission.objects.get(codename="delete_user")
+        user.user_permissions.add(delete_user_perm)
+
+        self.client.force_login(user)
+        response = self.client.delete(f"/api/users/{superuser.pk}/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(
+            response.content.decode(),
+            "Superusers can only be deleted by other superusers",
+        )
+        self.assertTrue(User.objects.filter(pk=superuser.pk).exists())
+
+        self.client.logout()
+        self.client.force_login(superuser)
+        response = self.client.delete(f"/api/users/{superuser.pk}/")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(User.objects.filter(pk=superuser.pk).exists())
