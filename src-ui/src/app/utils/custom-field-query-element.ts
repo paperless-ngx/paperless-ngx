@@ -103,7 +103,13 @@ export class CustomFieldQueryAtom extends CustomFieldQueryElement {
     return super.operator
   }
 
-  constructor(queryArray: [number, string, string] = [null, null, null]) {
+  constructor(
+    queryArray: [number, string, string | string[] | number[]] = [
+      null,
+      null,
+      null,
+    ]
+  ) {
     super(CustomFieldQueryElementType.Atom)
     ;[this._field, this._operator, this._value] = queryArray
   }
