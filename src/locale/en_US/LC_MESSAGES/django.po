@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-26 05:43+0000\n"
+"POT-Creation-Date: 2026-04-27 03:18+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1353,7 +1353,7 @@ msgstr ""
 
 #: documents/serialisers.py:463 documents/serialisers.py:815
 #: documents/serialisers.py:2681 documents/views.py:2264
-#: documents/views.py:2333 paperless_mail/serialisers.py:143
+#: documents/views.py:2333 paperless_mail/serialisers.py:155
 msgid "Insufficient permissions."
 msgstr ""
 
@@ -2070,7 +2070,7 @@ msgstr ""
 msgid "Chinese Traditional"
 msgstr ""
 
-#: paperless/urls.py:415
+#: paperless/urls.py:429
 msgid "Paperless-ngx administration"
 msgstr ""
 
