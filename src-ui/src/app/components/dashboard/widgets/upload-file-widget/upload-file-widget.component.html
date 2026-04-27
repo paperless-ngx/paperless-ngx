@@ -54,10 +54,10 @@
       @if (isFinished(status)) {
         <div>
           @if (status.documentId) {
-            <button class="btn btn-sm btn-outline-primary btn-open" routerLink="/documents/{{status.documentId}}" (click)="dismiss(status)">
+            <a class="btn btn-sm btn-outline-primary btn-open" [routerLink]="['/documents', status.documentId]" (click)="dismiss(status)">
               <small i18n>Open document</small>
               <i-bs name="arrow-right-short"></i-bs>
-            </button>
+            </a>
           }
         </div>
       }
