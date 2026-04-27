@@ -1,5 +1,29 @@
 # Changelog
 
+## paperless-ngx 2.20.15
+
+### Security
+
+-   Resolve [GHSA-96jx-fj7m-qh6x](https://github.com/paperless-ngx/paperless-ngx/security/advisories/GHSA-8c6x-pfjq-9gr7)
+
+### Bug Fixes
+
+-   Fix: use only allauth login/logout endpoints [@shamoon](https://github.com/shamoon) ([#12639](https://github.com/paperless-ngx/paperless-ngx/pull/12639))
+-   Fix: correctly scope mail account enumeration [@shamoon](https://github.com/shamoon) ([#12636](https://github.com/paperless-ngx/paperless-ngx/pull/12636))
+-   Fix: prevent intermediate change event when CustomFieldQueryAtom operator changes type [@ggouzi](https://github.com/ggouzi) ([#12597](https://github.com/paperless-ngx/paperless-ngx/pull/12597))
+-   Fix: reject invalid requests to API notes endpoint [@ggouzi](https://github.com/ggouzi) ([#12582](https://github.com/paperless-ngx/paperless-ngx/pull/12582))
+
+### All App Changes
+
+<details>
+<summary>4 changes</summary>
+
+-   Fix: use only allauth login/logout endpoints [@shamoon](https://github.com/shamoon) ([#12639](https://github.com/paperless-ngx/paperless-ngx/pull/12639))
+-   Fix: correctly scope mail account enumeration [@shamoon](https://github.com/shamoon) ([#12636](https://github.com/paperless-ngx/paperless-ngx/pull/12636))
+-   Fix: prevent intermediate change event when CustomFieldQueryAtom operator changes type [@ggouzi](https://github.com/ggouzi) ([#12597](https://github.com/paperless-ngx/paperless-ngx/pull/12597))
+-   Fix: reject invalid requests to API notes endpoint [@ggouzi](https://github.com/ggouzi) ([#12582](https://github.com/paperless-ngx/paperless-ngx/pull/12582))
+</details>
+
 ## paperless-ngx 2.20.14
 
 ### Bug Fixes
