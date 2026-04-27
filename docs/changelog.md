@@ -1,5 +1,21 @@
 # Changelog
 
+## paperless-ngx 2.20.15
+
+### Bug Fixes
+
+-   Fix: use only allauth login/logout endpoints [@shamoon](https://github.com/shamoon) ([#12639](https://github.com/paperless-ngx/paperless-ngx/pull/12639))
+-   Fix: correctly scope mail account enumeration [@shamoon](https://github.com/shamoon) ([#12636](https://github.com/paperless-ngx/paperless-ngx/pull/12636))
+
+### All App Changes
+
+<details>
+<summary>2 changes</summary>
+
+-   Fix: use only allauth login/logout endpoints [@shamoon](https://github.com/shamoon) ([#12639](https://github.com/paperless-ngx/paperless-ngx/pull/12639))
+-   Fix: correctly scope mail account enumeration [@shamoon](https://github.com/shamoon) ([#12636](https://github.com/paperless-ngx/paperless-ngx/pull/12636))
+</details>
+
 ## paperless-ngx 2.20.14
 
 ### Bug Fixes
