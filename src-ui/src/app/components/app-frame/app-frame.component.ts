@@ -47,6 +47,7 @@ import { environment } from 'src/environments/environment'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
+import { FolderTreeComponent } from '../folder-tree/folder-tree.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
 import { ToastsDropdownComponent } from './toasts-dropdown/toasts-dropdown.component'
 
@@ -55,6 +56,7 @@ import { ToastsDropdownComponent } from './toasts-dropdown/toasts-dropdown.compo
   templateUrl: './app-frame.component.html',
   styleUrls: ['./app-frame.component.scss'],
   imports: [
+    FolderTreeComponent,
     GlobalSearchComponent,
     DocumentTitlePipe,
     IfPermissionsDirective,

@@ -46,6 +46,8 @@ export interface WorkflowAction extends ObjectWithId {
 
   assign_storage_path?: number // StoragePath.id
 
+  assign_folder?: number // Folder.id
+
   assign_owner?: number // User.id
 
   assign_view_users?: number[] // [User.id]
@@ -93,6 +95,8 @@ export interface WorkflowAction extends ObjectWithId {
   remove_custom_fields?: number[] // [CustomField.id]
 
   remove_all_custom_fields?: boolean
+
+  remove_folder?: boolean
 
   email?: WorkflowActionEmail
 

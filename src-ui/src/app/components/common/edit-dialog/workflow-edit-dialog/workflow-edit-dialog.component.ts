@@ -19,6 +19,7 @@ import { Subscription, first, takeUntil } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentType } from 'src/app/data/document-type'
+import { Folder } from 'src/app/data/folder'
 import { MailRule } from 'src/app/data/mail-rule'
 import {
   MATCHING_ALGORITHMS,
@@ -41,12 +42,14 @@ import {
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { FolderService } from 'src/app/services/rest/folder.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { CustomFieldQueryExpression } from 'src/app/utils/custom-field-query-element'
+import { FolderSelectComponent } from '../../input/folder-select/folder-select.component'
 import { ConfirmButtonComponent } from '../../confirm-button/confirm-button.component'
 import {
   CustomFieldQueriesModel,
@@ -387,6 +390,7 @@ const FILTER_HANDLERS: Record<TriggerFilterType, FilterHandler> = {
     CustomFieldsQueryDropdownComponent,
     PermissionsGroupComponent,
     PermissionsUserComponent,
+    FolderSelectComponent,
     ConfirmButtonComponent,
     FormsModule,
     ReactiveFormsModule,
@@ -408,6 +412,7 @@ export class WorkflowEditDialogComponent
   private correspondentService: CorrespondentService
   private documentTypeService: DocumentTypeService
   private storagePathService: StoragePathService
+  private folderService: FolderService
   private mailRuleService: MailRuleService
   private customFieldsService: CustomFieldsService
 
@@ -415,6 +420,7 @@ export class WorkflowEditDialogComponent
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
   storagePaths: StoragePath[]
+  folders: Folder[]
   mailRules: MailRule[]
   customFields: CustomField[]
   dateCustomFields: CustomField[]
@@ -434,6 +440,7 @@ export class WorkflowEditDialogComponent
     this.correspondentService = inject(CorrespondentService)
     this.documentTypeService = inject(DocumentTypeService)
     this.storagePathService = inject(StoragePathService)
+    this.folderService = inject(FolderService)
     this.mailRuleService = inject(MailRuleService)
     this.userService = inject(UserService)
     this.settingsService = inject(SettingsService)
@@ -453,6 +460,11 @@ export class WorkflowEditDialogComponent
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.storagePaths = result.results))
+
+    this.folderService
+      .listAll(null, null, { parent: 'all' })
+      .pipe(first())
+      .subscribe((result) => (this.folders = result.results))
 
     this.mailRuleService
       .listAll()
@@ -1083,6 +1095,7 @@ export class WorkflowEditDialogComponent
         assign_document_type: new FormControl(action.assign_document_type),
         assign_correspondent: new FormControl(action.assign_correspondent),
         assign_storage_path: new FormControl(action.assign_storage_path),
+        assign_folder: new FormControl(action.assign_folder),
         assign_view_users: new FormControl(action.assign_view_users),
         assign_view_groups: new FormControl(action.assign_view_groups),
         assign_change_users: new FormControl(action.assign_change_users),
@@ -1116,6 +1129,7 @@ export class WorkflowEditDialogComponent
         remove_all_custom_fields: new FormControl(
           action.remove_all_custom_fields
         ),
+        remove_folder: new FormControl(action.remove_folder),
         email: new FormGroup({
           id: new FormControl(action.email?.id),
           subject: new FormControl(action.email?.subject),
@@ -1218,6 +1232,7 @@ export class WorkflowEditDialogComponent
       assign_document_type: null,
       assign_correspondent: null,
       assign_storage_path: null,
+      assign_folder: null,
       assign_owner: null,
       assign_view_users: [],
       assign_view_groups: [],
@@ -1242,6 +1257,7 @@ export class WorkflowEditDialogComponent
       remove_all_permissions: false,
       remove_custom_fields: [],
       remove_all_custom_fields: false,
+      remove_folder: false,
       email: {
         id: null,
         subject: null,

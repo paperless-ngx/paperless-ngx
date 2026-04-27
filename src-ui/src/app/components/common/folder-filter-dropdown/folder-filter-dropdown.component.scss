@@ -1,0 +1,48 @@
+.folder-filter-menu {
+  min-width: 220px;
+  max-width: 300px;
+}
+
+.folder-tree-scroll {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.folder-row {
+  cursor: pointer;
+  user-select: none;
+  border-radius: 4px;
+  transition: background-color 0.1s;
+
+  &:hover {
+    background-color: var(--bs-tertiary-bg);
+  }
+
+  &.active {
+    background-color: var(--bs-primary-bg-subtle);
+    color: var(--bs-primary);
+
+    .text-muted {
+      color: var(--bs-primary) !important;
+    }
+  }
+}
+
+.expand-btn {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  color: var(--bs-secondary);
+  line-height: 1;
+
+  &:hover {
+    color: var(--bs-body-color);
+  }
+}
+
+.expand-spacer {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+}

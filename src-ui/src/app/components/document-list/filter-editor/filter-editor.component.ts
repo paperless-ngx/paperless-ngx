@@ -53,8 +53,10 @@ import {
   FILTER_DOCUMENT_TYPE,
   FILTER_DOES_NOT_HAVE_CORRESPONDENT,
   FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
+  FILTER_DOES_NOT_HAVE_FOLDER,
   FILTER_DOES_NOT_HAVE_STORAGE_PATH,
   FILTER_DOES_NOT_HAVE_TAG,
+  FILTER_FOLDER,
   FILTER_FULLTEXT_MORELIKE,
   FILTER_FULLTEXT_QUERY,
   FILTER_HAS_ANY_TAG,
@@ -62,6 +64,7 @@ import {
   FILTER_HAS_CUSTOM_FIELDS_ALL,
   FILTER_HAS_CUSTOM_FIELDS_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
+  FILTER_HAS_FOLDER_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
   FILTER_HAS_TAGS_ANY,
@@ -90,6 +93,7 @@ import {
   SelectionDataItem,
 } from 'src/app/services/rest/document.service'
 import { SearchService } from 'src/app/services/rest/search.service'
+import { FolderService } from 'src/app/services/rest/folder.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import {
@@ -118,6 +122,7 @@ import {
   PermissionsFilterDropdownComponent,
   PermissionsSelectionModel,
 } from '../../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
+import { FolderFilterDropdownComponent } from '../../common/folder-filter-dropdown/folder-filter-dropdown.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
@@ -243,6 +248,7 @@ const DEFAULT_TEXT_FILTER_MODIFIER_OPTIONS = [
   styleUrls: ['./filter-editor.component.scss'],
   imports: [
     FilterableDropdownComponent,
+    FolderFilterDropdownComponent,
     CustomFieldsQueryDropdownComponent,
     DatesDropdownComponent,
     PermissionsFilterDropdownComponent,
@@ -263,6 +269,7 @@ export class FilterEditorComponent
   private correspondentService = inject(CorrespondentService)
   private documentService = inject(DocumentService)
   private storagePathService = inject(StoragePathService)
+  private folderService = inject(FolderService)
   permissionsService = inject(PermissionsService)
   private customFieldService = inject(CustomFieldsService)
   private searchService = inject(SearchService)
@@ -307,6 +314,18 @@ export class FilterEditorComponent
             return $localize`Without storage path`
           }
 
+        case FILTER_FOLDER:
+        case FILTER_HAS_FOLDER_ANY:
+          if (rule.value) {
+            return $localize`Folder: ${
+              this.folderSelectionModel.items.find(
+                (f) => f.id == +rule.value
+              )?.name
+            }`
+          } else {
+            return $localize`Without folder`
+          }
+
         case FILTER_HAS_TAGS_ALL:
           return $localize`Tag: ${
             this.tagSelectionModel.items.find((t) => t.id == +rule.value)?.name
@@ -349,6 +368,7 @@ export class FilterEditorComponent
   correspondentDocumentCounts: SelectionDataItem[]
   documentTypeDocumentCounts: SelectionDataItem[]
   storagePathDocumentCounts: SelectionDataItem[]
+  folderDocumentCounts: SelectionDataItem[]
   customFieldDocumentCounts: SelectionDataItem[]
 
   _textFilter = ''
@@ -387,6 +407,7 @@ export class FilterEditorComponent
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathSelectionModel = new FilterableDropdownSelectionModel()
+  folderSelectionModel = new FilterableDropdownSelectionModel()
   customFieldQueriesModel = new CustomFieldQueriesModel()
 
   dateCreatedTo: string
@@ -423,6 +444,7 @@ export class FilterEditorComponent
 
     this.documentTypeSelectionModel.clear(false)
     this.storagePathSelectionModel.clear(false)
+    this.folderSelectionModel.clear(false)
     this.tagSelectionModel.clear(false)
     this.correspondentSelectionModel.clear(false)
     this.customFieldQueriesModel.clear(false)
@@ -652,6 +674,36 @@ export class FilterEditorComponent
         case FILTER_DOES_NOT_HAVE_STORAGE_PATH:
           this.storagePathSelectionModel.intersection = Intersection.Exclude
           this.storagePathSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Excluded,
+            false
+          )
+          break
+        case FILTER_FOLDER:
+          this.folderSelectionModel.intersection =
+            rule.value == NEGATIVE_NULL_FILTER_VALUE.toString()
+              ? Intersection.Exclude
+              : Intersection.Include
+          this.folderSelectionModel.set(
+            rule.value ? +rule.value : null,
+            this.folderSelectionModel.intersection == Intersection.Include
+              ? ToggleableItemState.Selected
+              : ToggleableItemState.Excluded,
+            false
+          )
+          break
+        case FILTER_HAS_FOLDER_ANY:
+          this.folderSelectionModel.logicalOperator = LogicalOperator.Or
+          this.folderSelectionModel.intersection = Intersection.Include
+          this.folderSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Selected,
+            false
+          )
+          break
+        case FILTER_DOES_NOT_HAVE_FOLDER:
+          this.folderSelectionModel.intersection = Intersection.Exclude
+          this.folderSelectionModel.set(
             rule.value ? +rule.value : null,
             ToggleableItemState.Excluded,
             false
@@ -961,6 +1013,37 @@ export class FilterEditorComponent
           })
         })
     }
+    if (
+      this.folderSelectionModel.isNoneSelected() &&
+      this.folderSelectionModel.intersection == Intersection.Include
+    ) {
+      filterRules.push({ rule_type: FILTER_FOLDER, value: null })
+    } else {
+      if (
+        this.folderSelectionModel.isNoneSelected() &&
+        this.folderSelectionModel.intersection == Intersection.Exclude
+      ) {
+        filterRules.push({
+          rule_type: FILTER_FOLDER,
+          value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+        })
+      }
+      this.folderSelectionModel.getSelectedItems().forEach((folder) => {
+        filterRules.push({
+          rule_type: FILTER_HAS_FOLDER_ANY,
+          value: folder.id?.toString(),
+        })
+      })
+      this.folderSelectionModel
+        .getExcludedItems()
+        .filter((folder) => folder.id > 0)
+        .forEach((folder) => {
+          filterRules.push({
+            rule_type: FILTER_DOES_NOT_HAVE_FOLDER,
+            value: folder.id?.toString(),
+          })
+        })
+    }
     let queries = this.customFieldQueriesModel.queries.map((query) =>
       query.serialize()
     )
@@ -1110,6 +1193,7 @@ export class FilterEditorComponent
       selectionData?.selected_correspondents ?? null
     this.storagePathDocumentCounts =
       selectionData?.selected_storage_paths ?? null
+    this.folderDocumentCounts = selectionData?.selected_folders ?? null
     this.customFieldDocumentCounts =
       selectionData?.selected_custom_fields ?? null
   }
@@ -1203,6 +1287,18 @@ export class FilterEditorComponent
     if (
       this.permissionsService.currentUserCan(
         PermissionAction.View,
+        PermissionType.Folder
+      )
+    ) {
+      this.loadingCountTotal++
+      this.folderService.listAll(null, null, { parent: 'all' }).subscribe((result) => {
+        this.folderSelectionModel.items = result.results
+        this.maybeCompleteLoading()
+      })
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
         PermissionType.CustomField
       )
     ) {
@@ -1277,6 +1373,30 @@ export class FilterEditorComponent
 
   onStoragePathDropdownOpen() {
     this.storagePathSelectionModel.apply()
+  }
+
+  toggleFolder(folderId: number) {
+    this.folderSelectionModel.toggle(folderId)
+  }
+
+  onFolderDropdownOpen() {
+    this.folderSelectionModel.apply()
+  }
+
+  /** Returns the single selected folder ID for the hierarchical filter dropdown, or null */
+  get activeFolderId(): number | null {
+    const selected = this.folderSelectionModel.getSelectedItems()
+    return selected.length > 0 ? (selected[0].id ?? null) : null
+  }
+
+  /** Called when user picks a folder from the tree filter dropdown */
+  onFolderFilterSelected(folderId: number | null): void {
+    this.folderSelectionModel.clear(false)
+    if (folderId != null) {
+      this.folderSelectionModel.intersection = Intersection.Include
+      this.folderSelectionModel.set(folderId, ToggleableItemState.Selected, false)
+    }
+    this.updateRules()
   }
 
   updateTextFilter(text, updateRules = true) {

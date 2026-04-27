@@ -133,6 +133,8 @@
               (createNew)="createDocumentType($event)" [hideAddButton]="createDisabled(DataType.DocumentType)" [suggestions]="suggestions?.document_types" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }"></pngx-input-select>
               <pngx-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.StoragePath)"
               (createNew)="createStoragePath($event)" [hideAddButton]="createDisabled(DataType.StoragePath)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></pngx-input-select>
+              <pngx-input-folder-select [folders]="folders" i18n-title title="Folder" formControlName="folder" [allowNull]="true" [horizontal]="true"
+              (createNew)="createFolder($event)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Folder }"></pngx-input-folder-select>
               <pngx-input-tags formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.Tag)" [hideAddButton]="createDisabled(DataType.Tag)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>
               @for (fieldInstance of document?.custom_fields; track fieldInstance.field; let i = $index) {
                 <div [formGroup]="customFieldFormFields.controls[i]">

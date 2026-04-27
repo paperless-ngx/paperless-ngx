@@ -33,6 +33,7 @@ import {
   SelectionDataItem,
 } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { FolderService } from 'src/app/services/rest/folder.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -84,6 +85,7 @@ export class BulkEditorComponent
   private settings = inject(SettingsService)
   private toastService = inject(ToastService)
   private storagePathService = inject(StoragePathService)
+  private folderService = inject(FolderService)
   private customFieldService = inject(CustomFieldsService)
   private permissionService = inject(PermissionsService)
   private savedViewService = inject(SavedViewService)
@@ -92,11 +94,13 @@ export class BulkEditorComponent
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathsSelectionModel = new FilterableDropdownSelectionModel()
+  foldersSelectionModel = new FilterableDropdownSelectionModel()
   customFieldsSelectionModel = new FilterableDropdownSelectionModel(true)
   tagDocumentCounts: SelectionDataItem[]
   correspondentDocumentCounts: SelectionDataItem[]
   documentTypeDocumentCounts: SelectionDataItem[]
   storagePathDocumentCounts: SelectionDataItem[]
+  folderDocumentCounts: SelectionDataItem[]
   customFieldDocumentCounts: SelectionDataItem[]
   awaitingDownload: boolean
 
@@ -208,6 +212,19 @@ export class BulkEditorComponent
         .pipe(first())
         .subscribe(
           (result) => (this.storagePathsSelectionModel.items = result.results)
+        )
+    }
+    if (
+      this.permissionService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Folder
+      )
+    ) {
+      this.folderService
+        .listAll(null, null, { parent: 'all' })
+        .pipe(first())
+        .subscribe(
+          (result) => (this.foldersSelectionModel.items = result.results)
         )
     }
     if (
@@ -355,6 +372,16 @@ export class BulkEditorComponent
           s.selected_storage_paths,
           this.storagePathsSelectionModel
         )
+      })
+  }
+
+  openFoldersDropdown() {
+    this.documentService
+      .getSelectionData(Array.from(this.list.selected))
+      .pipe(first())
+      .subscribe((s) => {
+        this.folderDocumentCounts = s.selected_folders
+        this.applySelectionData(s.selected_folders, this.foldersSelectionModel)
       })
   }
 
@@ -565,6 +592,42 @@ export class BulkEditorComponent
     } else {
       this.executeBulkOperation(null, 'set_storage_path', {
         storage_path: storagePath ? storagePath.id : null,
+      })
+    }
+  }
+
+  setFolders(changedFolders: ChangedItems) {
+    if (
+      changedFolders.itemsToAdd.length == 0 &&
+      changedFolders.itemsToRemove.length == 0
+    )
+      return
+
+    let folder =
+      changedFolders.itemsToAdd.length > 0 ? changedFolders.itemsToAdd[0] : null
+
+    if (this.showConfirmationDialogs) {
+      let modal = this.modalService.open(ConfirmDialogComponent, {
+        backdrop: 'static',
+      })
+      modal.componentInstance.title = $localize`Confirm folder assignment`
+      if (folder) {
+        modal.componentInstance.message = $localize`This operation will move ${this.list.selected.size} selected document(s) to the folder "${folder.name}".`
+      } else {
+        modal.componentInstance.message = $localize`This operation will remove the folder from ${this.list.selected.size} selected document(s).`
+      }
+      modal.componentInstance.btnClass = 'btn-warning'
+      modal.componentInstance.btnCaption = $localize`Confirm`
+      modal.componentInstance.confirmClicked
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe(() => {
+          this.executeBulkOperation(modal, 'set_folder', {
+            folder: folder ? folder.id : null,
+          })
+        })
+    } else {
+      this.executeBulkOperation(null, 'set_folder', {
+        folder: folder ? folder.id : null,
       })
     }
   }

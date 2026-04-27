@@ -34,6 +34,7 @@ export interface SelectionData {
   selected_tags: SelectionDataItem[]
   selected_document_types: SelectionDataItem[]
   selected_custom_fields: SelectionDataItem[]
+  selected_folders: SelectionDataItem[]
 }
 
 @Injectable({

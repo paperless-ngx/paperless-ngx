@@ -66,6 +66,10 @@ export const FILTER_CUSTOM_FIELDS_QUERY = 42
 
 export const FILTER_MIME_TYPE = 47
 
+export const FILTER_FOLDER = 48
+export const FILTER_HAS_FOLDER_ANY = 49
+export const FILTER_DOES_NOT_HAVE_FOLDER = 50
+
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
     id: FILTER_TITLE,
@@ -363,6 +367,25 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     filtervar: 'mime_type',
     datatype: 'string',
     multi: false,
+  },
+  {
+    id: FILTER_FOLDER,
+    filtervar: 'folder__id',
+    isnull_filtervar: 'folder__isnull',
+    datatype: DataType.Folder,
+    multi: false,
+  },
+  {
+    id: FILTER_HAS_FOLDER_ANY,
+    filtervar: 'folder__id__in',
+    datatype: DataType.Folder,
+    multi: true,
+  },
+  {
+    id: FILTER_DOES_NOT_HAVE_FOLDER,
+    filtervar: 'folder__id__none',
+    datatype: DataType.Folder,
+    multi: true,
   },
 ]
 

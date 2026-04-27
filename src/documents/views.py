@@ -32,6 +32,7 @@ from django.db.models import Count
 from django.db.models import IntegerField
 from django.db.models import Max
 from django.db.models import Model
+from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import When
 from django.db.models.functions import Length
@@ -137,6 +138,7 @@ from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import ShareLink
+from documents.models import Folder
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
@@ -172,6 +174,7 @@ from documents.serialisers import RunTaskViewSerializer
 from documents.serialisers import SavedViewSerializer
 from documents.serialisers import SearchResultSerializer
 from documents.serialisers import ShareLinkSerializer
+from documents.serialisers import FolderSerializer
 from documents.serialisers import StoragePathSerializer
 from documents.serialisers import StoragePathTestSerializer
 from documents.serialisers import TagSerializer
@@ -784,13 +787,26 @@ class DocumentViewSet(
     )
 
     def get_queryset(self):
-        return (
+        qs = (
             Document.objects.distinct()
             .order_by("-created", "-id")
             .annotate(num_notes=Count("notes"))
-            .select_related("correspondent", "storage_path", "document_type", "owner")
+            .select_related(
+                "correspondent", "storage_path", "document_type", "owner", "folder"
+            )
             .prefetch_related("tags", "custom_fields", "notes")
         )
+        # Folder permission gate: documents inside a folder are only visible
+        # if the requesting user can also see that folder.
+        # Folder access beats all other permissions (tags, doc type, etc.).
+        user = self.request.user
+        accessible_folders = get_objects_for_user_owner_aware(
+            user, "documents.view_folder", Folder
+        )
+        qs = qs.filter(
+            Q(folder__isnull=True) | Q(folder__in=accessible_folders)
+        )
+        return qs
 
     def get_serializer(self, *args, **kwargs):
         fields_param = self.request.query_params.get("fields", None)
@@ -1576,6 +1592,7 @@ class BulkEditView(PassUserMixin):
         "set_correspondent": "correspondent",
         "set_document_type": "document_type",
         "set_storage_path": "storage_path",
+        "set_folder": "folder",
         "add_tag": "tags",
         "remove_tag": "tags",
         "modify_tags": "tags",
@@ -1685,6 +1702,7 @@ class BulkEditView(PassUserMixin):
                         "correspondent",
                         "document_type",
                         "storage_path",
+                        "folder",
                         "tags",
                         "custom_fields",
                         "deleted_at",
@@ -1905,6 +1923,12 @@ class SelectionDataView(GenericAPIView):
             ),
         )
 
+        folders = Folder.objects.annotate(
+            document_count=Count(
+                Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
+            ),
+        )
+
         custom_fields = CustomField.objects.annotate(
             document_count=Count(
                 Case(
@@ -1932,6 +1956,10 @@ class SelectionDataView(GenericAPIView):
                 "selected_storage_paths": [
                     {"id": t.id, "document_count": t.document_count}
                     for t in storage_paths
+                ],
+                "selected_folders": [
+                    {"id": t.id, "document_count": t.document_count}
+                    for t in folders
                 ],
                 "selected_custom_fields": [
                     {"id": t.id, "document_count": t.document_count}
@@ -2460,6 +2488,36 @@ class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
 
         result = format_filename(document, path)
         return Response(result)
+
+
+class FolderViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet):
+    model = Folder
+
+    queryset = Folder.objects.select_related("owner", "parent").order_by(Lower("name"))
+
+    serializer_class = FolderSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    ordering_fields = ("name", "created", "document_count")
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        parent_param = self.request.query_params.get("parent", None)
+        if parent_param is None:
+            # Default: root folders only
+            qs = qs.filter(parent__isnull=True)
+        elif parent_param == "all":
+            # Return full flat list for client-side tree building
+            pass
+        else:
+            # Children of a specific folder
+            qs = qs.filter(parent_id=parent_param)
+        return qs
 
 
 class UiSettingsView(GenericAPIView):

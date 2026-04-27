@@ -1,0 +1,26 @@
+.context-menu {
+  position: fixed;
+  z-index: 9999;
+  min-width: 160px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+
+  .btn-link {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    &.text-danger:hover {
+      background-color: rgba(220, 53, 69, 0.1);
+    }
+  }
+}
+
+.folder-link {
+  white-space: nowrap;
+  overflow: hidden;
+}

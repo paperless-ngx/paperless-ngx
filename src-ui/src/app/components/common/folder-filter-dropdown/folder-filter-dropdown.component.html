@@ -1,0 +1,85 @@
+<div ngbDropdown #folderDrop="ngbDropdown" [autoClose]="true" class="d-inline-flex">
+  <button
+    type="button"
+    class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 position-relative"
+    [class.active]="isActive"
+    [disabled]="disabled"
+    ngbDropdownToggle
+  >
+    <i-bs name="folder2" width="0.9em" height="0.9em"></i-bs>
+    <span class="d-none d-sm-inline">{{ selectedName }}</span>
+    @if (isActive) {
+      <span
+        class="badge rounded-pill bg-primary ms-1"
+        style="font-size:0.65em;padding:2px 5px;"
+      >1</span>
+    }
+  </button>
+
+  <div ngbDropdownMenu class="folder-filter-menu shadow p-0">
+    <!-- Clear filter -->
+    @if (isActive) {
+      <button
+        class="dropdown-item d-flex align-items-center gap-2 px-3 py-2 border-bottom"
+        (click)="clearFilter(folderDrop, $event)"
+      >
+        <i-bs name="x-circle" width="0.9em" height="0.9em"></i-bs>
+        <span i18n>Clear filter</span>
+      </button>
+    }
+
+    <div class="folder-tree-scroll">
+      @if (rootFolders.length === 0) {
+        <p class="text-muted small px-3 py-2 mb-0" i18n>No folders available.</p>
+      }
+      <ng-container *ngTemplateOutlet="folderNode; context: { $implicit: rootFolders, depth: 0 }"></ng-container>
+    </div>
+  </div>
+</div>
+
+<ng-template #folderNode let-folders let-depth="depth">
+  @for (folder of folders; track folder.id) {
+    <div class="folder-item">
+      <div
+        class="folder-row d-flex align-items-center gap-1 px-2 py-1"
+        [class.active]="selectedId === folder.id"
+        [style.padding-left.px]="8 + depth * 18"
+        (click)="selectFolder(folder.id, folderDrop)"
+        role="button"
+      >
+        <!-- expand toggle -->
+        @if (hasChildren(folder)) {
+          <button
+            type="button"
+            class="btn btn-link btn-sm p-0 expand-btn"
+            (click)="toggleExpand(folder.id, $event)"
+            tabindex="-1"
+          >
+            <i-bs
+              [name]="isExpanded(folder.id) ? 'chevron-down' : 'chevron-right'"
+              width="0.7em"
+              height="0.7em"
+            ></i-bs>
+          </button>
+        } @else {
+          <span class="expand-spacer"></span>
+        }
+        <!-- icon -->
+        <i-bs
+          [name]="selectedId === folder.id ? 'folder2-open' : 'folder2'"
+          width="0.9em"
+          height="0.9em"
+          class="text-muted"
+        ></i-bs>
+        <span class="flex-grow-1 text-truncate small">{{ folder.name }}</span>
+        @if (folder.document_count) {
+          <span class="badge bg-secondary flex-shrink-0" style="font-size:0.7em">{{ folder.document_count }}</span>
+        }
+      </div>
+      <!-- children (recursive) -->
+      @if (isExpanded(folder.id) && hasChildren(folder)) {
+        <ng-container *ngTemplateOutlet="folderNode; context: { $implicit: childrenOf(folder.id), depth: depth + 1 }"></ng-container>
+      }
+    </div>
+  }
+</ng-template>

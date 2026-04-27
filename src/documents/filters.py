@@ -33,6 +33,7 @@ from rest_framework.filters import OrderingFilter
 from rest_framework_guardian.filters import ObjectPermissionsFilter
 
 from documents.models import Correspondent
+from documents.models import Folder
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -719,6 +720,8 @@ class DocumentFilterSet(FilterSet):
 
     storage_path__id__none = ObjectFilter(field_name="storage_path", exclude=True)
 
+    folder__id__none = ObjectFilter(field_name="folder", exclude=True)
+
     is_in_inbox = InboxFilter()
 
     title_content = TitleContentFilter()
@@ -784,6 +787,8 @@ class DocumentFilterSet(FilterSet):
             "owner": ["isnull"],
             "owner__id": ID_KWARGS,
             "custom_fields": ["icontains"],
+            "folder": ["isnull"],
+            "folder__id": ID_KWARGS,
         }
 
 

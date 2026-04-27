@@ -119,6 +119,8 @@ export interface Document extends ObjectWithPermissions {
 
   storage_path?: number
 
+  folder?: number
+
   title?: string
 
   content?: string

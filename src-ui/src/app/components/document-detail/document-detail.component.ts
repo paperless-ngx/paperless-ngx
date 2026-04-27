@@ -33,6 +33,7 @@ import {
   takeUntil,
 } from 'rxjs/operators'
 import { Correspondent } from 'src/app/data/correspondent'
+import { Folder } from 'src/app/data/folder'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { DataType } from 'src/app/data/datatype'
@@ -47,6 +48,7 @@ import {
   FILTER_CREATED_AFTER,
   FILTER_CREATED_BEFORE,
   FILTER_DOCUMENT_TYPE,
+  FILTER_FOLDER,
   FILTER_FULLTEXT_MORELIKE,
   FILTER_HAS_TAGS_ALL,
   FILTER_STORAGE_PATH,
@@ -75,6 +77,7 @@ import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { FolderService } from 'src/app/services/rest/folder.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -95,6 +98,7 @@ import { DocumentLinkComponent } from '../common/input/document-link/document-li
 import { MonetaryComponent } from '../common/input/monetary/monetary.component'
 import { NumberComponent } from '../common/input/number/number.component'
 import { PermissionsFormComponent } from '../common/input/permissions/permissions-form/permissions-form.component'
+import { FolderSelectComponent } from '../common/input/folder-select/folder-select.component'
 import { SelectComponent } from '../common/input/select/select.component'
 import { TagsComponent } from '../common/input/tags/tags.component'
 import { TextComponent } from '../common/input/text/text.component'
@@ -156,6 +160,7 @@ export enum ZoomSetting {
     DocumentLinkComponent,
     MetadataCollapseComponent,
     PermissionsFormComponent,
+    FolderSelectComponent,
     SelectComponent,
     TagsComponent,
     TextComponent,
@@ -193,6 +198,7 @@ export class DocumentDetailComponent
   private toastService = inject(ToastService)
   private settings = inject(SettingsService)
   private storagePathService = inject(StoragePathService)
+  private folderService = inject(FolderService)
   private permissionsService = inject(PermissionsService)
   private userService = inject(UserService)
   private customFieldsService = inject(CustomFieldsService)
@@ -230,6 +236,7 @@ export class DocumentDetailComponent
   correspondents: Correspondent[]
   documentTypes: DocumentType[]
   storagePaths: StoragePath[]
+  folders: Folder[] = []
 
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
@@ -238,6 +245,7 @@ export class DocumentDetailComponent
     correspondent: new FormControl(),
     document_type: new FormControl(),
     storage_path: new FormControl(),
+    folder: new FormControl(null),
     archive_serial_number: new FormControl(),
     tags: new FormControl([]),
     permissions_form: new FormControl(null),
@@ -378,6 +386,7 @@ export class DocumentDetailComponent
       correspondent: originalDocument.correspondent,
       document_type: originalDocument.document_type,
       storage_path: originalDocument.storage_path,
+      folder: originalDocument.folder,
       archive_serial_number: originalDocument.archive_serial_number,
       tags: [...originalDocument.tags],
       permissions_form: {
@@ -526,6 +535,17 @@ export class DocumentDetailComponent
         .listAll()
         .pipe(first(), takeUntil(this.unsubscribeNotifier))
         .subscribe((result) => (this.storagePaths = result.results))
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Folder
+      )
+    ) {
+      this.folderService
+        .listAll(null, null, { parent: 'all' })
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe((result) => (this.folders = result.results))
     }
     if (
       this.permissionsService.currentUserCan(
@@ -777,6 +797,25 @@ export class DocumentDetailComponent
       })
   }
 
+  createFolder(newName: string) {
+    const payload: Partial<Folder> = { name: newName?.trim() }
+    this.folderService
+      .create(payload as Folder)
+      .pipe(
+        switchMap((newFolder) => {
+          return this.folderService
+            .listAll(null, null, { parent: 'all' })
+            .pipe(map((folders) => ({ newFolder, folders })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newFolder, folders }) => {
+        this.folders = folders.results
+        this.documentForm.get('folder').setValue(newFolder.id)
+        this.documentForm.get('folder').markAsDirty()
+      })
+  }
+
   createDisabled(dataType: DataType) {
     switch (dataType) {
       case DataType.Correspondent:
@@ -798,6 +837,11 @@ export class DocumentDetailComponent
         return !this.permissionsService.currentUserCan(
           PermissionAction.Add,
           PermissionType.Tag
+        )
+      case DataType.Folder:
+        return !this.permissionsService.currentUserCan(
+          PermissionAction.Add,
+          PermissionType.Folder
         )
     }
   }
@@ -1318,6 +1362,11 @@ export class DocumentDetailComponent
           return {
             rule_type: FILTER_HAS_TAGS_ALL,
             value: (i as Tag).id.toString(),
+          }
+        case DataType.Folder:
+          return {
+            rule_type: FILTER_FOLDER,
+            value: (i as Folder).id.toString(),
           }
       }
     })

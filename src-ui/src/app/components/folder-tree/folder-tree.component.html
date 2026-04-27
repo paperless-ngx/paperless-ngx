@@ -1,0 +1,102 @@
+<div class="nav-group mt-3 mb-1">
+  <h6 class="sidebar-heading px-3 text-muted"
+      (contextmenu)="onRightClick($event, null)">
+    <span i18n>Folders</span>
+  </h6>
+  <ul class="nav flex-column mb-2">
+    @if (creatingRoot) {
+      <li class="nav-item px-3 pb-1">
+        <input #newRootInput class="form-control form-control-sm"
+          [(ngModel)]="newFolderName"
+          placeholder="Folder name" i18n-placeholder
+          (keyup.enter)="createFolder(newFolderName, null)"
+          (keyup.escape)="cancelCreate()" />
+      </li>
+    }
+    <ng-container
+      *ngTemplateOutlet="folderNode; context: { $implicit: rootFolders, depth: 0 }">
+    </ng-container>
+  </ul>
+</div>
+
+<!-- Right-click context menu -->
+@if (contextMenu) {
+  <div class="context-menu shadow-sm py-1"
+       [style.left.px]="contextMenu.x"
+       [style.top.px]="contextMenu.y">
+    <button class="btn btn-link btn-sm text-start w-100 px-3"
+            (click)="startCreatingChild(contextMenu.folder); closeContextMenu()">
+      <i-bs name="folder-plus" class="me-2"></i-bs>
+      <ng-container i18n>New folder</ng-container>
+    </button>
+    @if (contextMenu.folder) {
+      <button class="btn btn-link btn-sm text-start w-100 px-3"
+              (click)="startEdit(contextMenu.folder); closeContextMenu()">
+        <i-bs name="pencil" class="me-2"></i-bs>
+        <ng-container i18n>Rename</ng-container>
+      </button>
+      <button class="btn btn-link btn-sm text-start w-100 px-3"
+              (click)="editPermissions(contextMenu.folder); closeContextMenu()">
+        <i-bs name="shield-lock" class="me-2"></i-bs>
+        <ng-container i18n>Permissions</ng-container>
+      </button>
+      <div class="dropdown-divider my-1"></div>
+      <button class="btn btn-link btn-sm text-start w-100 px-3 text-danger"
+              (click)="deleteFolder(contextMenu.folder); closeContextMenu()">
+        <i-bs name="trash" class="me-2"></i-bs>
+        <ng-container i18n>Delete</ng-container>
+      </button>
+    }
+  </div>
+}
+
+<!-- Recursive folder node template -->
+<ng-template #folderNode let-folders let-depth="depth">
+  @for (folder of folders; track folder.id) {
+    <li class="nav-item app-link">
+      <a class="nav-link d-flex align-items-center folder-link"
+         [class.active]="activeFolderId === folder.id"
+         (click)="selectFolder(folder)"
+         (contextmenu)="onRightClick($event, folder)"
+         [style.padding-left.px]="12 + depth * 14">
+        <i-bs class="me-1 flex-shrink-0"
+              [name]="activeFolderId === folder.id ? 'folder2-open' : 'folder2'">
+        </i-bs>
+        @if (editingFolderId === folder.id) {
+          <input class="form-control form-control-sm ms-1"
+            [(ngModel)]="editingName"
+            (keyup.enter)="renameFolder(folder, editingName)"
+            (keyup.escape)="cancelEdit()"
+            (click)="$event.stopPropagation()" />
+        } @else {
+          <span class="flex-grow-1 text-truncate">{{ folder.name }}</span>
+          @if (folder.document_count) {
+            <span class="badge bg-secondary ms-1 flex-shrink-0">
+              {{ folder.document_count }}
+            </span>
+          }
+        }
+      </a>
+
+      <!-- Inline child folder creation input -->
+      @if (creatingChildOf === folder.id) {
+        <div class="px-2 pb-1" [style.padding-left.px]="12 + (depth + 1) * 14">
+          <input class="form-control form-control-sm"
+            [(ngModel)]="newFolderName"
+            placeholder="Folder name" i18n-placeholder
+            (keyup.enter)="createFolder(newFolderName, folder.id)"
+            (keyup.escape)="cancelCreate()" />
+        </div>
+      }
+
+      <!-- Recurse into children -->
+      @if (childrenOf(folder.id).length > 0) {
+        <ul class="nav flex-column">
+          <ng-container
+            *ngTemplateOutlet="folderNode; context: { $implicit: childrenOf(folder.id), depth: depth + 1 }">
+          </ng-container>
+        </ul>
+      }
+    </li>
+  }
+</ng-template>

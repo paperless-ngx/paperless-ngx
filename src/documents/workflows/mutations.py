@@ -35,6 +35,9 @@ def apply_assignment_to_document(
     if action.assign_storage_path:
         document.storage_path = action.assign_storage_path
 
+    if action.assign_folder:
+        document.folder = action.assign_folder
+
     if action.assign_owner:
         document.owner = action.assign_owner
 
@@ -135,6 +138,9 @@ def apply_assignment_to_overrides(
     if action.assign_storage_path:
         overrides.storage_path_id = action.assign_storage_path.pk
 
+    if action.assign_folder:
+        overrides.folder_id = action.assign_folder.pk
+
     if action.assign_owner:
         overrides.owner_id = action.assign_owner.pk
 
@@ -227,6 +233,9 @@ def apply_removal_to_document(
     ):
         document.storage_path = None
 
+    if action.remove_folder:
+        document.folder = None
+
     if action.remove_all_owners or (
         document.owner and action.remove_owners.filter(pk=document.owner.pk).exists()
     ):
@@ -305,6 +314,9 @@ def apply_removal_to_overrides(
         and action.remove_storage_paths.filter(pk=overrides.storage_path_id).exists()
     ):
         overrides.storage_path_id = None
+
+    if action.remove_folder:
+        overrides.folder_id = None
 
     if action.remove_all_owners or (
         overrides.owner_id

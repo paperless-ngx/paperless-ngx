@@ -80,6 +80,17 @@
           shortcutKey="i"></pngx-filterable-dropdown>
         }
 
+        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Folder) && folderSelectionModel.items.length > 0) {
+          <pngx-folder-filter-dropdown
+            class="flex-fill fade"
+            [class.show]="show"
+            [folders]="folderSelectionModel.items"
+            [selectedId]="activeFolderId"
+            [disabled]="disabled"
+            (folderSelected)="onFolderFilterSelected($event)">
+          </pngx-folder-filter-dropdown>
+        }
+
         @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.CustomField) && customFields.length > 0) {
           <pngx-custom-fields-query-dropdown class="flex-fill fade" [class.show]="show" title="Custom fields" icon="ui-radios" i18n-title
           [(selectionModel)]="customFieldQueriesModel"

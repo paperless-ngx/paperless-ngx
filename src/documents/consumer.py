@@ -722,6 +722,13 @@ class ConsumerPlugin(
                 pk=self.metadata.storage_path_id,
             )
 
+        if self.metadata.folder_id:
+            from documents.models import Folder as FolderModel
+
+            document.folder = FolderModel.objects.get(
+                pk=self.metadata.folder_id,
+            )
+
         if self.metadata.asn is not None:
             document.archive_serial_number = self.metadata.asn
 

@@ -265,6 +265,7 @@
             <pngx-input-select i18n-title title="Assign document type" [items]="documentTypes" [allowNull]="true" formControlName="assign_document_type"></pngx-input-select>
             <pngx-input-select i18n-title title="Assign correspondent" [items]="correspondents" [allowNull]="true" formControlName="assign_correspondent"></pngx-input-select>
             <pngx-input-select i18n-title title="Assign storage path" [items]="storagePaths" [allowNull]="true" formControlName="assign_storage_path"></pngx-input-select>
+            <pngx-input-folder-select i18n-title title="Assign folder" [folders]="folders ?? []" [allowNull]="true" formControlName="assign_folder"></pngx-input-folder-select>
             <pngx-input-select i18n-title title="Assign custom fields" multiple="true" [items]="customFields" [allowNull]="true" formControlName="assign_custom_fields"></pngx-input-select>
             <pngx-input-custom-fields-values formControlName="assign_custom_fields_values" [selectedFields]="formGroup.get('assign_custom_fields').value" (removeSelectedField)="removeSelectedCustomField($event, formGroup)"></pngx-input-custom-fields-values>
           </div>
@@ -340,6 +341,9 @@
             <div class="mt-n3">
               <pngx-input-select i18n-title title="" multiple="true" [items]="storagePaths" formControlName="remove_storage_paths"></pngx-input-select>
             </div>
+
+            <h6 class="form-label" i18n>Remove folder</h6>
+            <pngx-input-switch i18n-title title="Remove folder" [horizontal]="true" formControlName="remove_folder" i18n-hint hint="Clear the folder assignment from matched documents."></pngx-input-switch>
 
             <h6 class="form-label" i18n>Remove custom fields</h6>
             <pngx-input-switch i18n-title title="Remove all" [horizontal]="true" formControlName="remove_all_custom_fields"></pngx-input-switch>

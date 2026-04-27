@@ -11,4 +11,5 @@ export enum DataType {
   MailRule = 'mail_rule',
   CustomField = 'custom_field',
   Workflow = 'workflow',
+  Folder = 'folder',
 }

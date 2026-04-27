@@ -24,6 +24,7 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import Folder
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import set_permissions_for_object
@@ -75,6 +76,25 @@ def set_storage_path(doc_ids: list[int], storage_path: StoragePath) -> Literal["
     bulk_update_documents.delay(
         document_ids=affected_docs,
     )
+
+    return "OK"
+
+
+def set_folder(doc_ids: list[int], folder: Folder) -> Literal["OK"]:
+    if folder:
+        folder = Folder.objects.only("pk").get(id=folder)
+
+    qs = (
+        Document.objects.filter(
+            Q(id__in=doc_ids) & ~Q(folder=folder),
+        )
+        .select_related("folder")
+        .only("pk", "folder__id")
+    )
+    affected_docs = list(qs.values_list("pk", flat=True))
+    qs.update(folder=folder)
+
+    bulk_update_documents.delay(document_ids=affected_docs)
 
     return "OK"
 

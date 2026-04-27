@@ -57,6 +57,18 @@
         shortcutKey="i">
       </pngx-filterable-dropdown>
     }
+    @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.Folder)) {
+      <pngx-filterable-dropdown title="Folder" icon="folder2" i18n-title
+        filterPlaceholder="Filter folders" i18n-filterPlaceholder
+        [disabled]="!userCanEditAll || disabled"
+        [editing]="true"
+        [applyOnClose]="applyOnClose"
+        (opened)="openFoldersDropdown()"
+        [(selectionModel)]="foldersSelectionModel"
+        [documentCounts]="folderDocumentCounts"
+        (apply)="setFolders($event)">
+      </pngx-filterable-dropdown>
+    }
     @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.CustomField)) {
       <pngx-filterable-dropdown title="Custom fields" icon="ui-radios" i18n-title
         filterPlaceholder="Filter custom fields" i18n-filterPlaceholder

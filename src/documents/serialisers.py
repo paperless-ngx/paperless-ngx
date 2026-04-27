@@ -32,6 +32,7 @@ from django.utils.timezone import get_current_timezone
 from django.utils.timezone import is_naive
 from django.utils.timezone import make_aware
 from django.utils.translation import gettext as _
+from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
 from drf_spectacular.utils import extend_schema_serializer
 from drf_writable_nested.serializers import NestedUpdateMixin
@@ -63,6 +64,7 @@ from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
 from documents.models import ShareLink
+from documents.models import Folder
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
@@ -714,6 +716,13 @@ class StoragePathField(serializers.PrimaryKeyRelatedField):
         return StoragePath.objects.all()
 
 
+class FolderField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        from documents.models import Folder as FolderModel
+
+        return FolderModel.objects.all()
+
+
 class CustomFieldSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         # Ignore args passed by permissions mixin
@@ -1262,6 +1271,7 @@ class DocumentSerializer(
             "correspondent",
             "document_type",
             "storage_path",
+            "folder",
             "title",
             "content",
             "tags",
@@ -1462,6 +1472,7 @@ class BulkEditSerializer(
             "set_correspondent",
             "set_document_type",
             "set_storage_path",
+            "set_folder",
             "add_tag",
             "remove_tag",
             "modify_tags",
@@ -1538,6 +1549,8 @@ class BulkEditSerializer(
             return bulk_edit.set_document_type
         elif method == "set_storage_path":
             return bulk_edit.set_storage_path
+        elif method == "set_folder":
+            return bulk_edit.set_folder
         elif method == "add_tag":
             return bulk_edit.add_tag
         elif method == "remove_tag":
@@ -1614,6 +1627,18 @@ class BulkEditSerializer(
                 )
         else:
             raise serializers.ValidationError("storage path not specified")
+
+    def _validate_folder(self, parameters):
+        if "folder" in parameters:
+            folder_id = parameters["folder"]
+            if folder_id is None:
+                return
+            try:
+                Folder.objects.get(id=folder_id)
+            except Folder.DoesNotExist:
+                raise serializers.ValidationError("Folder does not exist")
+        else:
+            raise serializers.ValidationError("folder not specified")
 
     def _validate_parameters_modify_tags(self, parameters):
         if "add_tags" in parameters:
@@ -1772,6 +1797,8 @@ class BulkEditSerializer(
             self._validate_parameters_modify_tags(parameters)
         elif method == bulk_edit.set_storage_path:
             self._validate_storage_path(parameters)
+        elif method == bulk_edit.set_folder:
+            self._validate_folder(parameters)
         elif method == bulk_edit.modify_custom_fields:
             self._validate_parameters_modify_custom_fields(parameters)
         elif method == bulk_edit.set_permissions:
@@ -2091,6 +2118,36 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             bulk_edit.bulk_update_documents.delay(doc_ids)
 
         return super().update(instance, validated_data)
+
+
+class FolderSerializer(OwnedObjectSerializer):
+    document_count = serializers.IntegerField(read_only=True)
+    children = serializers.SerializerMethodField()
+    full_path = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Folder
+        fields = (
+            "id",
+            "name",
+            "parent",
+            "children",
+            "document_count",
+            "full_path",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "set_permissions",
+        )
+
+    def get_children(self, obj):
+        return list(
+            Folder.objects.filter(parent=obj).values_list("id", flat=True),
+        )
+
+    @extend_schema_field(OpenApiTypes.STR)
+    def get_full_path(self, obj):
+        return obj.full_path()
 
 
 class UiSettingsViewSerializer(serializers.ModelSerializer):
@@ -2467,6 +2524,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
     assign_tags = TagsField(many=True, allow_null=True, required=False)
     assign_document_type = DocumentTypeField(allow_null=True, required=False)
     assign_storage_path = StoragePathField(allow_null=True, required=False)
+    assign_folder = FolderField(allow_null=True, required=False)
     email = WorkflowActionEmailSerializer(allow_null=True, required=False)
     webhook = WorkflowActionWebhookSerializer(allow_null=True, required=False)
 
@@ -2480,6 +2538,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
             "assign_correspondent",
             "assign_document_type",
             "assign_storage_path",
+            "assign_folder",
             "assign_owner",
             "assign_view_users",
             "assign_view_groups",
@@ -2495,6 +2554,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer):
             "remove_document_types",
             "remove_all_storage_paths",
             "remove_storage_paths",
+            "remove_folder",
             "remove_custom_fields",
             "remove_all_custom_fields",
             "remove_all_owners",

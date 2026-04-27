@@ -25,6 +25,7 @@ def get_workflows_for_trigger(
             "assign_correspondent",
             "assign_document_type",
             "assign_storage_path",
+            "assign_folder",
             "assign_owner",
             "email",
             "webhook",

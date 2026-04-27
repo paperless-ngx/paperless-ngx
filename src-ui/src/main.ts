@@ -85,7 +85,10 @@ import {
   files,
   filter,
   folder,
+  folder2,
+  folder2Open,
   folderFill,
+  folderPlus,
   funnel,
   gear,
   google,
@@ -137,6 +140,7 @@ import {
   x,
   xCircle,
   xLg,
+  shieldLock,
 } from 'ngx-bootstrap-icons'
 import { ColorSliderModule } from 'ngx-color/slider'
 import { CookieService } from 'ngx-cookie-service'
@@ -300,7 +304,10 @@ const icons = {
   fileText,
   filter,
   folder,
+  folder2,
+  folder2Open,
   folderFill,
+  folderPlus,
   funnel,
   gear,
   google,
@@ -352,6 +359,7 @@ const icons = {
   x,
   xCircle,
   xLg,
+  shieldLock,
 }
 
 if (environment.production) {

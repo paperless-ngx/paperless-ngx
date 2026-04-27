@@ -153,6 +153,45 @@ class StoragePath(MatchingModel):
         verbose_name_plural = _("storage paths")
 
 
+class Folder(ModelWithOwner):
+    name = models.CharField(_("name"), max_length=128)
+
+    parent = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        default=None,
+        on_delete=models.CASCADE,
+        related_name="children",
+        verbose_name=_("parent"),
+    )
+
+    created = models.DateTimeField(_("created"), auto_now_add=True)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = _("folder")
+        verbose_name_plural = _("folders")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "parent", "owner"],
+                name="documents_folder_unique_name_parent_owner",
+            ),
+        ]
+
+    def __str__(self):
+        return self.name
+
+    def full_path(self):
+        """Return slash-separated path from root to this folder."""
+        parts = [self.name]
+        node = self
+        while node.parent_id is not None:
+            node = node.parent
+            parts.insert(0, node.name)
+        return "/" + "/".join(parts)
+
+
 class Document(SoftDeleteModel, ModelWithOwner):
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
     STORAGE_TYPE_GPG = "gpg"
@@ -178,6 +217,16 @@ class Document(SoftDeleteModel, ModelWithOwner):
         related_name="documents",
         on_delete=models.SET_NULL,
         verbose_name=_("storage path"),
+    )
+
+    folder = models.ForeignKey(
+        Folder,
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=models.SET_NULL,
+        related_name="documents",
+        verbose_name=_("folder"),
     )
 
     title = models.CharField(_("title"), max_length=128, blank=True, db_index=True)
@@ -1338,6 +1387,20 @@ class WorkflowAction(models.Model):
         on_delete=models.SET_NULL,
         related_name="+",
         verbose_name=_("assign this storage path"),
+    )
+
+    assign_folder = models.ForeignKey(
+        "Folder",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        verbose_name=_("assign this folder"),
+    )
+
+    remove_folder = models.BooleanField(
+        default=False,
+        verbose_name=_("remove folder"),
     )
 
     assign_owner = models.ForeignKey(
