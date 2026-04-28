@@ -25,8 +25,8 @@ def mock_ollama_llm():
 
 @pytest.fixture
 def mock_openai_llm():
-    with patch("llama_index.llms.openai.OpenAI") as MockOpenAI:
-        yield MockOpenAI
+    with patch("llama_index.llms.openai_like.OpenAILike") as MockOpenAILike:
+        yield MockOpenAILike
 
 
 def test_get_llm_ollama(mock_ai_config, mock_ollama_llm):
@@ -56,6 +56,8 @@ def test_get_llm_openai(mock_ai_config, mock_openai_llm):
         model="test_model",
         api_base="http://test-url",
         api_key="test_api_key",
+        is_chat_model=True,
+        is_function_calling_model=True,
     )
     assert client.llm == mock_openai_llm.return_value
 
