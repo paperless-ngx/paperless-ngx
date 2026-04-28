@@ -8,10 +8,21 @@
       <div class="chat-messages font-monospace small">
         @for (message of messages; track message) {
           <div class="message d-flex flex-row small" [class.justify-content-end]="message.role === 'user'">
-            <span class="p-2 m-2" [class.bg-dark]="message.role === 'user'">
-              {{ message.content }}
-              @if (message.isStreaming) { <span class="blinking-cursor">|</span> }
-            </span>
+            <div class="p-2 m-2" [class.bg-dark]="message.role === 'user'">
+              <span>
+                {{ message.content }}
+                @if (message.isStreaming) { <span class="blinking-cursor">|</span> }
+              </span>
+              @if (message.role === 'assistant' && message.references?.length) {
+                <div class="chat-references list-group mt-3">
+                  @for (reference of message.references; track reference.id) {
+                    <a class="list-group-item list-group-item-action text-primary" [routerLink]="['/documents', reference.id]">
+                      <i-bs width="0.9em" height="0.9em" name="file-text" class="me-1"></i-bs><span>{{ reference.title }}</span>
+                    </a>
+                  }
+                </div>
+              }
+            </div>
           </div>
         }
         <div #scrollAnchor></div>

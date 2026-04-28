@@ -7,6 +7,10 @@
   overflow-y: auto;
 }
 
+.chat-references {
+  font-family: var(--bs-font-sans-serif);
+}
+
 .dropdown-toggle::after {
   display: none;
 }
