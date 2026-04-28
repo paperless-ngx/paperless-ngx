@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-27 03:18+0000\n"
+"POT-Creation-Date: 2026-04-28 17:07+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1771,7 +1771,7 @@ msgid "CMYK"
 msgstr ""
 
 #: paperless/models.py:78 paperless/models.py:87
-msgid "OpenAI"
+msgid "OpenAI-compatible"
 msgstr ""
 
 #: paperless/models.py:79
