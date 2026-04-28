@@ -404,7 +404,7 @@ class TestSystemStatus(APITestCase):
         THEN:
             - The response contains the correct AI status
         """
-        with override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="openai"):
+        with override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="openai-like"):
             self.client.force_login(self.user)
 
             # No tasks found
@@ -431,7 +431,7 @@ class TestSystemStatus(APITestCase):
         THEN:
             - The response contains the correct AI status
         """
-        with override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="openai"):
+        with override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="openai-like"):
             PaperlessTaskFactory(
                 task_type=PaperlessTask.TaskType.LLM_INDEX,
                 trigger_source=PaperlessTask.TriggerSource.SCHEDULED,

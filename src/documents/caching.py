@@ -218,7 +218,8 @@ def set_llm_suggestions_cache(
     timeout: int = CACHE_50_MINUTES,
 ) -> None:
     """
-    Cache LLM-generated suggestions using a backend-specific identifier (e.g. 'openai:gpt-4').
+    Cache LLM-generated suggestions using a backend-specific identifier
+    (e.g. 'openai-like:gpt-4').
     """
     doc_key = get_suggestion_cache_key(document_id)
     cache.set(

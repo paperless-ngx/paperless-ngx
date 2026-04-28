@@ -54,7 +54,7 @@ def mock_document():
 
 
 def test_get_embedding_model_openai(mock_ai_config):
-    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OPENAI
+    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OPENAI_LIKE
     mock_ai_config.return_value.llm_embedding_model = "text-embedding-3-small"
     mock_ai_config.return_value.llm_api_key = "test_api_key"
     mock_ai_config.return_value.llm_endpoint = "http://test-url"
@@ -74,7 +74,7 @@ def test_get_embedding_model_openai(mock_ai_config):
 def test_get_embedding_model_openai_blocks_internal_endpoint_when_disallowed(
     mock_ai_config,
 ):
-    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OPENAI
+    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OPENAI_LIKE
     mock_ai_config.return_value.llm_embedding_model = "text-embedding-3-small"
     mock_ai_config.return_value.llm_api_key = "test_api_key"
     mock_ai_config.return_value.llm_endpoint = "http://127.0.0.1:11434"
@@ -111,7 +111,7 @@ def test_get_embedding_model_invalid_backend(mock_ai_config):
 
 
 def test_get_embedding_dim_infers_and_saves(temp_llm_index_dir, mock_ai_config):
-    mock_ai_config.return_value.llm_embedding_backend = "openai"
+    mock_ai_config.return_value.llm_embedding_backend = "openai-like"
     mock_ai_config.return_value.llm_embedding_model = None
 
     class DummyEmbedding:
@@ -131,7 +131,7 @@ def test_get_embedding_dim_infers_and_saves(temp_llm_index_dir, mock_ai_config):
 
 
 def test_get_embedding_dim_reads_existing_meta(temp_llm_index_dir, mock_ai_config):
-    mock_ai_config.return_value.llm_embedding_backend = "openai"
+    mock_ai_config.return_value.llm_embedding_backend = "openai-like"
     mock_ai_config.return_value.llm_embedding_model = None
 
     (temp_llm_index_dir / "meta.json").write_text(
@@ -144,7 +144,7 @@ def test_get_embedding_dim_reads_existing_meta(temp_llm_index_dir, mock_ai_confi
 
 
 def test_get_embedding_dim_raises_on_model_change(temp_llm_index_dir, mock_ai_config):
-    mock_ai_config.return_value.llm_embedding_backend = "openai"
+    mock_ai_config.return_value.llm_embedding_backend = "openai-like"
     mock_ai_config.return_value.llm_embedding_model = None
 
     (temp_llm_index_dir / "meta.json").write_text(

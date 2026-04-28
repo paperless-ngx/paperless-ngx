@@ -98,7 +98,7 @@ def test_update_llm_index_removes_meta(
     config = AIConfig()
     expected_model = config.llm_embedding_model or (
         "text-embedding-3-small"
-        if config.llm_embedding_backend == "openai"
+        if config.llm_embedding_backend == "openai-like"
         else "sentence-transformers/all-MiniLM-L6-v2"
     )
     assert meta == {"embedding_model": expected_model, "dim": 384}

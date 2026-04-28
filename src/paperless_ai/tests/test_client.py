@@ -45,7 +45,7 @@ def test_get_llm_ollama(mock_ai_config, mock_ollama_llm):
 
 
 def test_get_llm_openai(mock_ai_config, mock_openai_llm):
-    mock_ai_config.llm_backend = "openai"
+    mock_ai_config.llm_backend = "openai-like"
     mock_ai_config.llm_model = "test_model"
     mock_ai_config.llm_api_key = "test_api_key"
     mock_ai_config.llm_endpoint = "http://test-url"
@@ -63,7 +63,7 @@ def test_get_llm_openai(mock_ai_config, mock_openai_llm):
 
 
 def test_get_llm_openai_blocks_internal_endpoint_when_disallowed(mock_ai_config):
-    mock_ai_config.llm_backend = "openai"
+    mock_ai_config.llm_backend = "openai-like"
     mock_ai_config.llm_model = "test_model"
     mock_ai_config.llm_api_key = "test_api_key"
     mock_ai_config.llm_endpoint = "http://127.0.0.1:1234"
