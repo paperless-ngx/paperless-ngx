@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from llama_index.core.llms import ChatMessage
     from llama_index.llms.ollama import Ollama
-    from llama_index.llms.openai import OpenAI
+    from llama_index.llms.openai_like import OpenAILike
 
 from paperless.config import AIConfig
 from paperless.network import validate_outbound_http_url
@@ -22,7 +22,7 @@ class AIClient:
         self.settings = AIConfig()
         self.llm = self.get_llm()
 
-    def get_llm(self) -> "Ollama | OpenAI":
+    def get_llm(self) -> "Ollama | OpenAILike":
         if self.settings.llm_backend == "ollama":
             from llama_index.llms.ollama import Ollama
 
@@ -37,7 +37,7 @@ class AIClient:
                 request_timeout=120,
             )
         elif self.settings.llm_backend == "openai":
-            from llama_index.llms.openai import OpenAI
+            from llama_index.llms.openai_like import OpenAILike
 
             endpoint = self.settings.llm_endpoint or None
             if endpoint:
@@ -45,10 +45,12 @@ class AIClient:
                     endpoint,
                     allow_internal=self.settings.llm_allow_internal_endpoints,
                 )
-            return OpenAI(
+            return OpenAILike(
                 model=self.settings.llm_model or "gpt-3.5-turbo",
                 api_base=endpoint,
                 api_key=self.settings.llm_api_key,
+                is_chat_model=True,
+                is_function_calling_model=True,
             )
         else:
             raise ValueError(f"Unsupported LLM backend: {self.settings.llm_backend}")

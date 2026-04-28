@@ -20,7 +20,7 @@ def get_embedding_model() -> "BaseEmbedding":
 
     match config.llm_embedding_backend:
         case LLMEmbeddingBackend.OPENAI:
-            from llama_index.embeddings.openai import OpenAIEmbedding
+            from llama_index.embeddings.openai_like import OpenAILikeEmbedding
 
             endpoint = config.llm_endpoint or None
             if endpoint:
@@ -28,7 +28,7 @@ def get_embedding_model() -> "BaseEmbedding":
                     endpoint,
                     allow_internal=config.llm_allow_internal_endpoints,
                 )
-            return OpenAIEmbedding(
+            return OpenAILikeEmbedding(
                 model=config.llm_embedding_model or "text-embedding-3-small",
                 api_key=config.llm_api_key,
                 api_base=endpoint,

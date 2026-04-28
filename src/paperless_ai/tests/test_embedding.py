@@ -59,7 +59,9 @@ def test_get_embedding_model_openai(mock_ai_config):
     mock_ai_config.return_value.llm_api_key = "test_api_key"
     mock_ai_config.return_value.llm_endpoint = "http://test-url"
 
-    with patch("llama_index.embeddings.openai.OpenAIEmbedding") as MockOpenAIEmbedding:
+    with patch(
+        "llama_index.embeddings.openai_like.OpenAILikeEmbedding",
+    ) as MockOpenAIEmbedding:
         model = get_embedding_model()
         MockOpenAIEmbedding.assert_called_once_with(
             model="text-embedding-3-small",
