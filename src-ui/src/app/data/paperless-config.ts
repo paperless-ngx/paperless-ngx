@@ -55,12 +55,12 @@ export const ConfigCategory = {
 }
 
 export const LLMEmbeddingBackendConfig = {
-  OPENAI: 'openai',
+  OPENAI_LIKE: 'openai-like',
   HUGGINGFACE: 'huggingface',
 }
 
 export const LLMBackendConfig = {
-  OPENAI: 'openai',
+  OPENAI_LIKE: 'openai-like',
   OLLAMA: 'ollama',
 }
 

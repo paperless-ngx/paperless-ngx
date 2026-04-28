@@ -848,7 +848,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 json.dumps(
                     {
                         "ai_enabled": True,
-                        "llm_embedding_backend": "openai",
+                        "llm_embedding_backend": "openai-like",
                     },
                 ),
                 content_type="application/json",

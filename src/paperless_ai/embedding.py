@@ -19,8 +19,8 @@ def get_embedding_model() -> "BaseEmbedding":
     config = AIConfig()
 
     match config.llm_embedding_backend:
-        case LLMEmbeddingBackend.OPENAI:
-            from llama_index.embeddings.openai import OpenAIEmbedding
+        case LLMEmbeddingBackend.OPENAI_LIKE:
+            from llama_index.embeddings.openai_like import OpenAILikeEmbedding
 
             endpoint = config.llm_endpoint or None
             if endpoint:
@@ -28,8 +28,8 @@ def get_embedding_model() -> "BaseEmbedding":
                     endpoint,
                     allow_internal=config.llm_allow_internal_endpoints,
                 )
-            return OpenAIEmbedding(
-                model=config.llm_embedding_model or "text-embedding-3-small",
+            return OpenAILikeEmbedding(
+                model_name=config.llm_embedding_model or "text-embedding-3-small",
                 api_key=config.llm_api_key,
                 api_base=endpoint,
             )
@@ -54,7 +54,7 @@ def get_embedding_dim() -> int:
     config = AIConfig()
     model = config.llm_embedding_model or (
         "text-embedding-3-small"
-        if config.llm_embedding_backend == "openai"
+        if config.llm_embedding_backend == LLMEmbeddingBackend.OPENAI_LIKE
         else "sentence-transformers/all-MiniLM-L6-v2"
     )
 

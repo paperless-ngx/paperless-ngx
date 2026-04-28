@@ -25,8 +25,8 @@ def mock_ollama_llm():
 
 @pytest.fixture
 def mock_openai_llm():
-    with patch("llama_index.llms.openai.OpenAI") as MockOpenAI:
-        yield MockOpenAI
+    with patch("llama_index.llms.openai_like.OpenAILike") as MockOpenAILike:
+        yield MockOpenAILike
 
 
 def test_get_llm_ollama(mock_ai_config, mock_ollama_llm):
@@ -45,7 +45,7 @@ def test_get_llm_ollama(mock_ai_config, mock_ollama_llm):
 
 
 def test_get_llm_openai(mock_ai_config, mock_openai_llm):
-    mock_ai_config.llm_backend = "openai"
+    mock_ai_config.llm_backend = "openai-like"
     mock_ai_config.llm_model = "test_model"
     mock_ai_config.llm_api_key = "test_api_key"
     mock_ai_config.llm_endpoint = "http://test-url"
@@ -56,12 +56,14 @@ def test_get_llm_openai(mock_ai_config, mock_openai_llm):
         model="test_model",
         api_base="http://test-url",
         api_key="test_api_key",
+        is_chat_model=True,
+        is_function_calling_model=True,
     )
     assert client.llm == mock_openai_llm.return_value
 
 
 def test_get_llm_openai_blocks_internal_endpoint_when_disallowed(mock_ai_config):
-    mock_ai_config.llm_backend = "openai"
+    mock_ai_config.llm_backend = "openai-like"
     mock_ai_config.llm_model = "test_model"
     mock_ai_config.llm_api_key = "test_api_key"
     mock_ai_config.llm_endpoint = "http://127.0.0.1:1234"

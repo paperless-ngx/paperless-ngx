@@ -2014,49 +2014,57 @@ suggestions. This setting is required to be set to true in order to use the AI f
 
 #### [`PAPERLESS_AI_LLM_EMBEDDING_BACKEND=<str>`](#PAPERLESS_AI_LLM_EMBEDDING_BACKEND) {#PAPERLESS_AI_LLM_EMBEDDING_BACKEND}
 
-: The embedding backend to use for RAG. This can be either "openai" or "huggingface".
+: The embedding backend to use for RAG. This can be either "openai-like" or "huggingface". The
+"openai-like" backend uses an OpenAI-compatible embeddings API.
 
     Defaults to None.
 
 #### [`PAPERLESS_AI_LLM_EMBEDDING_MODEL=<str>`](#PAPERLESS_AI_LLM_EMBEDDING_MODEL) {#PAPERLESS_AI_LLM_EMBEDDING_MODEL}
 
-: The model to use for the embedding backend for RAG. This can be set to any of the embedding models supported by the current embedding backend. If not supplied, defaults to "text-embedding-3-small" for OpenAI and "sentence-transformers/all-MiniLM-L6-v2" for Huggingface.
+: The model to use for the embedding backend for RAG. This can be set to any of the embedding
+models supported by the current embedding backend. If not supplied, defaults to
+"text-embedding-3-small" for the OpenAI-compatible backend and
+"sentence-transformers/all-MiniLM-L6-v2" for Huggingface.
 
     Defaults to None.
 
 #### [`PAPERLESS_AI_LLM_BACKEND=<str>`](#PAPERLESS_AI_LLM_BACKEND) {#PAPERLESS_AI_LLM_BACKEND}
 
-: The AI backend to use. This can be either "openai" or "ollama". If set to "ollama", the AI
-features will be run locally on your machine. If set to "openai", the AI features will be run
-using the OpenAI API. This setting is required to be set to use the AI features.
+: The AI backend to use. This can be either "openai-like" or "ollama". If set to "ollama", the AI
+features will be run locally on your machine. If set to "openai-like", the AI features will use
+an OpenAI-compatible API endpoint, including OpenAI itself and compatible providers. This
+setting is required to be set to use the AI features.
 
     Defaults to None.
 
     !!! note
 
-        The OpenAI API is a paid service. You will need to set up an OpenAI account and
-        will be charged for usage incurred by Paperless-ngx features and your document data
-        will (of course) be sent to the OpenAI API. Paperless-ngx does not endorse the use of the
-        OpenAI API in any way.
+        Remote AI providers may be paid services. If you use a hosted OpenAI-compatible API, you
+        are responsible for any usage charges incurred by Paperless-ngx features, and your
+        document data will be sent to the provider you configure.
 
-        Refer to the OpenAI terms of service, and use at your own risk.
+        Paperless-ngx does not endorse any specific provider. Refer to your provider's terms of
+        service and privacy policy, and use at your own risk.
 
 #### [`PAPERLESS_AI_LLM_MODEL=<str>`](#PAPERLESS_AI_LLM_MODEL) {#PAPERLESS_AI_LLM_MODEL}
 
-: The model to use for the AI backend, i.e. "gpt-3.5-turbo", "gpt-4" or any of the models supported by the
-current backend. If not supplied, defaults to "gpt-3.5-turbo" for OpenAI and "llama3.1" for Ollama.
+: The model to use for the AI backend, i.e. "gpt-3.5-turbo", "gpt-4" or any of the models supported
+by the current backend. If not supplied, defaults to "gpt-3.5-turbo" for the OpenAI-compatible
+backend and "llama3.1" for Ollama.
 
     Defaults to None.
 
 #### [`PAPERLESS_AI_LLM_API_KEY=<str>`](#PAPERLESS_AI_LLM_API_KEY) {#PAPERLESS_AI_LLM_API_KEY}
 
-: The API key to use for the AI backend. This is required for the OpenAI backend (optional for others).
+: The API key to use for the AI backend. This is typically required for the OpenAI-compatible
+backend (optional for others).
 
     Defaults to None.
 
 #### [`PAPERLESS_AI_LLM_ENDPOINT=<str>`](#PAPERLESS_AI_LLM_ENDPOINT) {#PAPERLESS_AI_LLM_ENDPOINT}
 
-: The endpoint / url to use for the AI backend. This is required for the Ollama backend (optional for others).
+: The endpoint / url to use for the AI backend. This is required for the Ollama backend and may be
+used with the OpenAI-compatible backend to target a custom provider or local gateway.
 
     Defaults to None.
 
