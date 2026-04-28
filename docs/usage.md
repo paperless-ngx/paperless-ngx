@@ -302,13 +302,19 @@ Paperless-ngx includes several features that use AI to enhance the document mana
 
 !!! warning
 
-    Remember that Paperless-ngx will send document content to the AI provider you have configured, so consider the privacy implications of using these features, especially if using a remote model (e.g. OpenAI), instead of the default local model.
+    Remember that Paperless-ngx will send document content to the AI provider you have configured,
+    so consider the privacy implications of using these features, especially if using a remote
+    model or API provider instead of the default local model.
 
 The AI features work by creating an embedding of the text content and metadata of documents, which is then used for various tasks such as similarity search and question answering. This uses the FAISS vector store.
 
 ### AI-Enhanced Suggestions
 
-If enabled, Paperless-ngx can use an AI LLM model to suggest document titles, dates, tags, correspondents and document types for documents. This feature will always be "opt-in" and does not disable the existing classifier-based suggestion system. Currently, both remote (via the OpenAI API) and local (via Ollama) models are supported, see [configuration](configuration.md#ai) for details.
+If enabled, Paperless-ngx can use an AI LLM model to suggest document titles, dates, tags,
+correspondents and document types for documents. This feature will always be "opt-in" and does not
+disable the existing classifier-based suggestion system. Currently, both remote
+(via OpenAI-compatible APIs) and local (via Ollama) models are supported, see
+[configuration](configuration.md#ai) for details.
 
 ### Document Chat
 
