@@ -9,7 +9,11 @@ import {
 } from '@angular/common/http/testing'
 import { TestBed } from '@angular/core/testing'
 import { environment } from 'src/environments/environment'
-import { ChatService } from './chat.service'
+import {
+  CHAT_METADATA_DELIMITER,
+  ChatService,
+  parseChatResponse,
+} from './chat.service'
 
 describe('ChatService', () => {
   let service: ChatService
@@ -54,5 +58,23 @@ describe('ChatService', () => {
       type: HttpEventType.DownloadProgress,
       partialText: mockResponse,
     } as any)
+  })
+
+  it('should parse chat references from the metadata trailer', () => {
+    const parsed = parseChatResponse(
+      `Answer text${CHAT_METADATA_DELIMITER}{"references":[{"id":1,"title":"Document 1"}]}`
+    )
+
+    expect(parsed.content).toBe('Answer text')
+    expect(parsed.references).toEqual([{ id: 1, title: 'Document 1' }])
+  })
+
+  it('should hide incomplete metadata trailer from the visible content', () => {
+    const parsed = parseChatResponse(
+      `Answer text${CHAT_METADATA_DELIMITER}{"references"`
+    )
+
+    expect(parsed.content).toBe('Answer text')
+    expect(parsed.references).toBeUndefined()
   })
 })

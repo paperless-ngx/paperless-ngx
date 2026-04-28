@@ -3,9 +3,13 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ElementRef } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NavigationEnd, Router } from '@angular/router'
+import { RouterTestingModule } from '@angular/router/testing'
 import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject } from 'rxjs'
-import { ChatService } from 'src/app/services/chat.service'
+import {
+  CHAT_METADATA_DELIMITER,
+  ChatService,
+} from 'src/app/services/chat.service'
 import { ChatComponent } from './chat.component'
 
 describe('ChatComponent', () => {
@@ -18,7 +22,11 @@ describe('ChatComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      imports: [NgxBootstrapIconsModule.pick(allIcons), ChatComponent],
+      imports: [
+        NgxBootstrapIconsModule.pick(allIcons),
+        RouterTestingModule,
+        ChatComponent,
+      ],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
@@ -82,6 +90,57 @@ describe('ChatComponent', () => {
     mockStream$.complete()
     expect(component.loading).toBe(false)
     expect(component.messages[1].isStreaming).toBe(false)
+  })
+
+  it('should parse references from the metadata trailer without showing it', () => {
+    component.input = 'Hello'
+    component.sendMessage()
+
+    mockStream$.next(
+      `Hi there${CHAT_METADATA_DELIMITER}{"references":[{"id":42,"title":"Bread Recipe"}]}`
+    )
+    jest.advanceTimersByTime(1000)
+
+    expect(component.messages[1].content).toBe('Hi there')
+    expect(component.messages[1].references).toEqual([
+      { id: 42, title: 'Bread Recipe' },
+    ])
+  })
+
+  it('should render document reference links under assistant messages', () => {
+    component.input = 'Hello'
+    component.sendMessage()
+
+    mockStream$.next(
+      `Hi there${CHAT_METADATA_DELIMITER}{"references":[{"id":42,"title":"Bread Recipe"}]}`
+    )
+    jest.advanceTimersByTime(1000)
+    fixture.detectChanges()
+
+    const link = fixture.nativeElement.querySelector('.chat-references a')
+    expect(link.textContent).toContain('Bread Recipe')
+    expect(link.getAttribute('href')).toContain('/documents/42')
+  })
+
+  it('should remove delimiter fragments that were already streamed', () => {
+    component.input = 'Hello'
+    component.sendMessage()
+
+    mockStream$.next(`Hi there${CHAT_METADATA_DELIMITER.slice(0, 8)}`)
+    jest.advanceTimersByTime(1000)
+    expect(component.messages[1].content).toBe(
+      `Hi there${CHAT_METADATA_DELIMITER.slice(0, 8)}`
+    )
+
+    mockStream$.next(
+      `Hi there${CHAT_METADATA_DELIMITER}{"references":[{"id":42,"title":"Bread Recipe"}]}`
+    )
+    jest.advanceTimersByTime(1000)
+
+    expect(component.messages[1].content).toBe('Hi there')
+    expect(component.messages[1].references).toEqual([
+      { id: 42, title: 'Bread Recipe' },
+    ])
   })
 
   it('should handle errors during streaming', () => {

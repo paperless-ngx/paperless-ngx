@@ -1,16 +1,21 @@
 import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { NavigationEnd, Router } from '@angular/router'
+import { NavigationEnd, Router, RouterModule } from '@angular/router'
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { filter, map } from 'rxjs'
-import { ChatMessage, ChatService } from 'src/app/services/chat.service'
+import {
+  ChatMessage,
+  ChatService,
+  parseChatResponse,
+} from 'src/app/services/chat.service'
 
 @Component({
   selector: 'pngx-chat',
   imports: [
     FormsModule,
     ReactiveFormsModule,
+    RouterModule,
     NgxBootstrapIconsModule,
     NgbDropdownModule,
   ],
@@ -70,13 +75,24 @@ export class ChatComponent implements OnInit {
     this.messages.push(assistantMessage)
     this.loading = true
 
-    let lastPartialLength = 0
+    let lastVisibleContent = ''
 
     this.chatService.streamChat(this.documentId, this.input).subscribe({
       next: (chunk) => {
-        const delta = chunk.substring(lastPartialLength)
-        lastPartialLength = chunk.length
-        this.enqueueTypewriter(delta, assistantMessage)
+        const nextResponse = parseChatResponse(chunk)
+
+        if (nextResponse.content.length < lastVisibleContent.length) {
+          this.resetTypewriter(assistantMessage, nextResponse.content)
+          lastVisibleContent = nextResponse.content
+        } else {
+          const visibleDelta = nextResponse.content.substring(
+            lastVisibleContent.length
+          )
+          lastVisibleContent = nextResponse.content
+          this.enqueueTypewriter(visibleDelta, assistantMessage)
+        }
+
+        assistantMessage.references = nextResponse.references
       },
       error: () => {
         assistantMessage.content += '\n\n⚠️ Error receiving response.'
@@ -91,6 +107,13 @@ export class ChatComponent implements OnInit {
     })
 
     this.input = ''
+  }
+
+  private resetTypewriter(message: ChatMessage, content: string): void {
+    this.typewriterBuffer = []
+    this.typewriterActive = false
+    message.content = content
+    this.scrollToBottom()
   }
 
   enqueueTypewriter(chunk: string, message: ChatMessage): void {
