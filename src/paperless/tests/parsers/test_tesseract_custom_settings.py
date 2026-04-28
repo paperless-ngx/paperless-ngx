@@ -44,6 +44,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         """
         with override_settings(OCR_PAGES=10):
             instance = ApplicationConfiguration.objects.all().first()
+            assert instance is not None
             instance.pages = 5
             instance.save()
 
@@ -62,6 +63,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         """
         with override_settings(OCR_LANGUAGE="eng+deu"):
             instance = ApplicationConfiguration.objects.all().first()
+            assert instance is not None
             instance.language = "fra+ita"
             instance.save()
 
@@ -80,6 +82,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         """
         with override_settings(OCR_OUTPUT_TYPE="pdfa-3"):
             instance = ApplicationConfiguration.objects.all().first()
+            assert instance is not None
             instance.output_type = OutputTypeChoices.PDF_A
             instance.save()
 
@@ -100,6 +103,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         # AUTO mode with skip_text=True explicitly passed: skip_text is set
         with override_settings(OCR_MODE="redo"):
             instance = ApplicationConfiguration.objects.all().first()
+            assert instance is not None
             instance.mode = ModeChoices.AUTO
             instance.save()
 
@@ -118,6 +122,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         # AUTO mode alone (no skip_text): no extra OCR flag is set
         with override_settings(OCR_MODE="redo"):
             instance = ApplicationConfiguration.objects.all().first()
+            assert instance is not None
             instance.mode = ModeChoices.AUTO
             instance.save()
 
@@ -138,6 +143,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         """
         with override_settings(OCR_CLEAN="clean-final"):
             instance = ApplicationConfiguration.objects.all().first()
+            assert instance is not None
             instance.unpaper_clean = CleanChoices.CLEAN
             instance.save()
 
@@ -147,6 +153,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
 
         with override_settings(OCR_CLEAN="clean-final"):
             instance = ApplicationConfiguration.objects.all().first()
+            assert instance is not None
             instance.unpaper_clean = CleanChoices.FINAL
             instance.save()
 
@@ -166,6 +173,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         """
         with override_settings(OCR_DESKEW=False):
             instance = ApplicationConfiguration.objects.all().first()
+            assert instance is not None
             instance.deskew = True
             instance.save()
 
@@ -184,6 +192,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         """
         with override_settings(OCR_ROTATE_PAGES=False, OCR_ROTATE_PAGES_THRESHOLD=30.0):
             instance = ApplicationConfiguration.objects.all().first()
+            assert instance is not None
             assert instance is not None
             instance.rotate_pages = True
             instance.rotate_pages_threshold = 15.0
@@ -205,6 +214,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         """
         with override_settings(OCR_MAX_IMAGE_PIXELS=2_000_000.0):
             instance = ApplicationConfiguration.objects.all().first()
+            assert instance is not None
             instance.max_image_pixels = 1_000_000.0
             instance.save()
 
@@ -223,6 +233,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
         """
         with override_settings(OCR_COLOR_CONVERSION_STRATEGY="LeaveColorUnchanged"):
             instance = ApplicationConfiguration.objects.all().first()
+            assert instance is not None
             instance.color_conversion_strategy = ColorConvertChoices.INDEPENDENT
             instance.save()
 
@@ -246,6 +257,7 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
             OCR_USER_ARGS=json.dumps({"continue_on_soft_render_error": True}),
         ):
             instance = ApplicationConfiguration.objects.all().first()
+            assert instance is not None
             instance.user_args = {"unpaper_args": "--pre-rotate 90"}
             instance.save()
 

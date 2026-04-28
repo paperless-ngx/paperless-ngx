@@ -16,7 +16,7 @@ from documents.models import StoragePath
 from documents.models import Tag
 
 
-class CorrespondentFactory(DjangoModelFactory):
+class CorrespondentFactory(DjangoModelFactory[Correspondent]):
     class Meta:
         model = Correspondent
 
@@ -25,7 +25,7 @@ class CorrespondentFactory(DjangoModelFactory):
     matching_algorithm = MatchingModel.MATCH_NONE
 
 
-class DocumentTypeFactory(DjangoModelFactory):
+class DocumentTypeFactory(DjangoModelFactory[DocumentType]):
     class Meta:
         model = DocumentType
 
@@ -34,7 +34,7 @@ class DocumentTypeFactory(DjangoModelFactory):
     matching_algorithm = MatchingModel.MATCH_NONE
 
 
-class TagFactory(DjangoModelFactory):
+class TagFactory(DjangoModelFactory[Tag]):
     class Meta:
         model = Tag
 
@@ -44,7 +44,7 @@ class TagFactory(DjangoModelFactory):
     is_inbox_tag = False
 
 
-class StoragePathFactory(DjangoModelFactory):
+class StoragePathFactory(DjangoModelFactory[StoragePath]):
     class Meta:
         model = StoragePath
 
@@ -56,7 +56,7 @@ class StoragePathFactory(DjangoModelFactory):
     matching_algorithm = MatchingModel.MATCH_NONE
 
 
-class DocumentFactory(DjangoModelFactory):
+class DocumentFactory(DjangoModelFactory[Document]):
     class Meta:
         model = Document
 
@@ -68,7 +68,7 @@ class DocumentFactory(DjangoModelFactory):
     storage_path = None
 
 
-class PaperlessTaskFactory(DjangoModelFactory):
+class PaperlessTaskFactory(DjangoModelFactory[PaperlessTask]):
     class Meta:
         model = PaperlessTask
 

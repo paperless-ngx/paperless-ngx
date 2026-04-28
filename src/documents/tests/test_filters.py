@@ -83,7 +83,7 @@ class TestDateLocalization:
         format_style: str,
         locale_str: str,
         expected_output: str,
-    ):
+    ) -> None:
         """
         Tests `localize_date` with `date` objects across different locales and formats.
         """
@@ -144,7 +144,7 @@ class TestDateLocalization:
         format_style: str,
         locale_str: str,
         expected_output: str,
-    ):
+    ) -> None:
         # To handle the non-breaking space in French and other locales
         result = localize_date(value, format_style, locale_str)
         assert result.replace("\u202f", " ") == expected_output.replace("\u202f", " ")
@@ -161,7 +161,7 @@ class TestDateLocalization:
     def test_localize_date_raises_type_error_for_invalid_input(
         self,
         invalid_value: None | list[object] | dict[Any, Any] | Literal[1698330605],
-    ):
+    ) -> None:
         with pytest.raises(TypeError) as excinfo:
             localize_date(invalid_value, "medium", "en_US")
 
@@ -228,7 +228,7 @@ class TestDateLocalization:
         format_style: str,
         locale_str: str,
         expected_output: str,
-    ):
+    ) -> None:
         """
         Tests `localize_date` with `date` string across different locales and formats.
         """
@@ -289,7 +289,7 @@ class TestDateLocalization:
         format_style: str,
         locale_str: str,
         expected_output: str,
-    ):
+    ) -> None:
         """
         Tests `localize_date` with `date` string across different locales and formats.
         """

@@ -9,7 +9,7 @@ from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
 
 
-class MailAccountFactory(DjangoModelFactory):
+class MailAccountFactory(DjangoModelFactory[MailAccount]):
     class Meta:
         model = MailAccount
 
@@ -24,7 +24,7 @@ class MailAccountFactory(DjangoModelFactory):
     is_token = False
 
 
-class MailRuleFactory(DjangoModelFactory):
+class MailRuleFactory(DjangoModelFactory[MailRule]):
     class Meta:
         model = MailRule
 
@@ -44,7 +44,7 @@ class MailRuleFactory(DjangoModelFactory):
     stop_processing = False
 
 
-class ProcessedMailFactory(DjangoModelFactory):
+class ProcessedMailFactory(DjangoModelFactory[ProcessedMail]):
     class Meta:
         model = ProcessedMail
 

@@ -56,7 +56,11 @@ def send_publish(
 
 @pytest.mark.django_db
 class TestBeforeTaskPublishHandler:
-    def test_creates_task_for_consume_file(self, consume_input_doc, consume_overrides):
+    def test_creates_task_for_consume_file(
+        self,
+        consume_input_doc,
+        consume_overrides,
+    ) -> None:
         task_id = send_publish(
             "documents.tasks.consume_file",
             (),
@@ -70,18 +74,18 @@ class TestBeforeTaskPublishHandler:
         assert task.input_data["filename"] == "invoice.pdf"
         assert task.owner_id == consume_overrides.owner_id
 
-    def test_creates_task_for_train_classifier(self):
+    def test_creates_task_for_train_classifier(self) -> None:
         task_id = send_publish("documents.tasks.train_classifier", (), {})
         task = PaperlessTask.objects.get(task_id=task_id)
         assert task.task_type == PaperlessTask.TaskType.TRAIN_CLASSIFIER
         assert task.trigger_source == PaperlessTask.TriggerSource.MANUAL
 
-    def test_creates_task_for_sanity_check(self):
+    def test_creates_task_for_sanity_check(self) -> None:
         task_id = send_publish("documents.tasks.sanity_check", (), {})
         task = PaperlessTask.objects.get(task_id=task_id)
         assert task.task_type == PaperlessTask.TaskType.SANITY_CHECK
 
-    def test_creates_task_for_process_mail_accounts(self):
+    def test_creates_task_for_process_mail_accounts(self) -> None:
         task_id = send_publish(
             "paperless_mail.tasks.process_mail_accounts",
             (),
@@ -91,13 +95,13 @@ class TestBeforeTaskPublishHandler:
         assert task.task_type == PaperlessTask.TaskType.MAIL_FETCH
         assert task.input_data["account_ids"] == [1, 2]
 
-    def test_mail_fetch_no_account_ids_stores_empty_input(self):
+    def test_mail_fetch_no_account_ids_stores_empty_input(self) -> None:
         """Beat-scheduled mail checks pass no account_ids; input_data should be {} not {"account_ids": None}."""
         task_id = send_publish("paperless_mail.tasks.process_mail_accounts", (), {})
         task = PaperlessTask.objects.get(task_id=task_id)
         assert task.input_data == {}
 
-    def test_overrides_date_serialized_as_iso_string(self, consume_input_doc):
+    def test_overrides_date_serialized_as_iso_string(self, consume_input_doc) -> None:
         """A datetime.date in overrides is stored as an ISO string so input_data is JSON-safe."""
         overrides = DocumentMetadataOverrides(created=datetime.date(2024, 1, 15))
 
@@ -110,7 +114,7 @@ class TestBeforeTaskPublishHandler:
         task = PaperlessTask.objects.get(task_id=task_id)
         assert task.input_data["overrides"]["created"] == "2024-01-15"
 
-    def test_overrides_path_serialized_as_string(self, consume_input_doc):
+    def test_overrides_path_serialized_as_string(self, consume_input_doc) -> None:
         """A Path value in overrides is stored as a plain string so input_data is JSON-safe."""
         overrides = DocumentMetadataOverrides()
         overrides.filename = Path("/uploads/invoice.pdf")  # type: ignore[assignment]
@@ -159,11 +163,11 @@ class TestBeforeTaskPublishHandler:
         task = PaperlessTask.objects.get(task_id=task_id)
         assert task.trigger_source == expected_trigger_source
 
-    def test_ignores_untracked_task(self):
+    def test_ignores_untracked_task(self) -> None:
         send_publish("documents.tasks.some_untracked_task", (), {})
         assert PaperlessTask.objects.count() == 0
 
-    def test_ignores_none_headers(self):
+    def test_ignores_none_headers(self) -> None:
 
         before_task_publish_handler(sender=None, headers=None, body=None)
         assert PaperlessTask.objects.count() == 0
@@ -185,7 +189,7 @@ class TestBeforeTaskPublishHandler:
 
 @pytest.mark.django_db
 class TestTaskPrerunHandler:
-    def test_marks_task_started(self):
+    def test_marks_task_started(self) -> None:
         task = PaperlessTaskFactory(status=PaperlessTask.Status.PENDING)
 
         task_prerun_handler(task_id=task.task_id)
@@ -215,7 +219,7 @@ class TestTaskPostrunHandler:
             date_started=timezone.now(),
         )
 
-    def test_records_success_with_dict_result(self):
+    def test_records_success_with_dict_result(self) -> None:
         task = self._started_task()
 
         task_postrun_handler(
@@ -230,7 +234,7 @@ class TestTaskPostrunHandler:
         assert task.duration_seconds is not None
         assert task.wait_time_seconds is not None
 
-    def test_skips_failure_state(self):
+    def test_skips_failure_state(self) -> None:
         """postrun skips FAILURE; task_failure_handler owns that path."""
         task = self._started_task()
 
@@ -238,7 +242,7 @@ class TestTaskPostrunHandler:
         task.refresh_from_db()
         assert task.status == PaperlessTask.Status.STARTED
 
-    def test_records_success_with_consume_result(self):
+    def test_records_success_with_consume_result(self) -> None:
         """ConsumeFileSuccessResult dict is stored directly as result_data."""
         from documents.data_models import ConsumeFileSuccessResult
 
@@ -251,7 +255,7 @@ class TestTaskPostrunHandler:
         task.refresh_from_db()
         assert task.result_data == {"document_id": 42}
 
-    def test_records_stopped_with_reason(self):
+    def test_records_stopped_with_reason(self) -> None:
         """ConsumeFileStoppedResult dict is stored directly as result_data."""
         from documents.data_models import ConsumeFileStoppedResult
 
@@ -264,14 +268,14 @@ class TestTaskPostrunHandler:
         task.refresh_from_db()
         assert task.result_data == {"reason": "Barcode splitting complete!"}
 
-    def test_none_retval_stores_no_result_data(self):
+    def test_none_retval_stores_no_result_data(self) -> None:
         """None return value (non-consume tasks) leaves result_data untouched."""
         task = self._started_task()
         task_postrun_handler(task_id=task.task_id, retval=None, state="SUCCESS")
         task.refresh_from_db()
         assert task.result_data is None
 
-    def test_ignores_unknown_task_id(self):
+    def test_ignores_unknown_task_id(self) -> None:
 
         task_postrun_handler(
             task_id="nonexistent",
@@ -279,7 +283,7 @@ class TestTaskPostrunHandler:
             state="SUCCESS",
         )  # must not raise
 
-    def test_records_revoked_state(self):
+    def test_records_revoked_state(self) -> None:
         task = self._started_task()
 
         task_postrun_handler(task_id=task.task_id, retval=None, state="REVOKED")
@@ -289,7 +293,7 @@ class TestTaskPostrunHandler:
 
 @pytest.mark.django_db
 class TestTaskFailureHandler:
-    def test_records_failure_with_exception(self):
+    def test_records_failure_with_exception(self) -> None:
 
         task = PaperlessTaskFactory(
             task_type=PaperlessTask.TaskType.CONSUME_FILE,
@@ -308,7 +312,7 @@ class TestTaskFailureHandler:
         assert task.result_data["error_message"] == "PDF parse failed"
         assert task.date_done is not None
 
-    def test_records_traceback_when_provided(self):
+    def test_records_traceback_when_provided(self) -> None:
 
         task = PaperlessTaskFactory(
             task_type=PaperlessTask.TaskType.CONSUME_FILE,
@@ -331,7 +335,7 @@ class TestTaskFailureHandler:
         assert "traceback" in task.result_data
         assert len(task.result_data["traceback"]) <= 5000
 
-    def test_computes_duration_and_wait_time(self):
+    def test_computes_duration_and_wait_time(self) -> None:
 
         now = timezone.now()
         task = PaperlessTaskFactory(
@@ -350,14 +354,14 @@ class TestTaskFailureHandler:
         assert task.duration_seconds == pytest.approx(5.0, abs=1.0)
         assert task.wait_time_seconds == pytest.approx(5.0, abs=1.0)
 
-    def test_ignores_none_task_id(self):
+    def test_ignores_none_task_id(self) -> None:
 
         task_failure_handler(task_id=None, exception=ValueError("x"), traceback=None)
 
 
 @pytest.mark.django_db
 class TestTaskRevokedHandler:
-    def test_marks_task_revoked(self, mocker: pytest_mock.MockerFixture):
+    def test_marks_task_revoked(self, mocker: pytest_mock.MockerFixture) -> None:
         """task_revoked_handler moves a queued task to REVOKED and stamps date_done."""
         task = PaperlessTaskFactory(status=PaperlessTask.Status.PENDING)
         request = mocker.MagicMock()
@@ -368,12 +372,12 @@ class TestTaskRevokedHandler:
         assert task.status == PaperlessTask.Status.REVOKED
         assert task.date_done is not None
 
-    def test_ignores_none_request(self):
+    def test_ignores_none_request(self) -> None:
         """task_revoked_handler must not raise when request is None."""
 
         task_revoked_handler(request=None)  # must not raise
 
-    def test_ignores_unknown_task_id(self, mocker: pytest_mock.MockerFixture):
+    def test_ignores_unknown_task_id(self, mocker: pytest_mock.MockerFixture) -> None:
         """task_revoked_handler must not raise for a task_id not in the database."""
         request = mocker.MagicMock()
         request.id = "nonexistent-id"

@@ -2009,7 +2009,7 @@ class DocumentViewSet(
         )
 
 
-class ChatStreamingSerializer(serializers.Serializer):
+class ChatStreamingSerializer(serializers.Serializer[dict[str, Any]]):
     q = serializers.CharField(required=True)
     document_id = serializers.IntegerField(required=False, allow_null=True)
 

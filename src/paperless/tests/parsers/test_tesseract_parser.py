@@ -18,6 +18,7 @@ from ocrmypdf import SubprocessOutputError
 
 from documents.parsers import ParseError
 from documents.parsers import run_convert
+from paperless.models import ModeChoices
 from paperless.parsers import ParserProtocol
 from paperless.parsers.tesseract import RasterisedDocumentParser
 from paperless.parsers.tesseract import post_process_text
@@ -387,8 +388,10 @@ class TestParsePdf:
         )
         assert tesseract_parser.archive_path is not None
         assert tesseract_parser.archive_path.is_file()
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -413,7 +416,7 @@ class TestParsePdf:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.mode = "redo"
+        tesseract_parser.settings.mode = ModeChoices.REDO
         tesseract_parser.parse(
             tesseract_samples_dir / "with-form.pdf",
             "application/pdf",
@@ -430,7 +433,7 @@ class TestParsePdf:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.mode = "force"
+        tesseract_parser.settings.mode = ModeChoices.FORCE
         tesseract_parser.parse(
             tesseract_samples_dir / "with-form.pdf",
             "application/pdf",
@@ -445,7 +448,7 @@ class TestParsePdf:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(tesseract_samples_dir / "signed.pdf", "application/pdf")
         assert tesseract_parser.archive_path is None
         assert_ordered_substrings(
@@ -461,7 +464,7 @@ class TestParsePdf:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             tesseract_samples_dir / "encrypted.pdf",
             "application/pdf",
@@ -530,7 +533,9 @@ class TestParseImages:
         tesseract_parser.parse(tesseract_samples_dir / "simple-no-dpi.png", "image/png")
         assert tesseract_parser.archive_path is not None
         assert tesseract_parser.archive_path.is_file()
-        assert "this is a test document." in tesseract_parser.get_text().lower()
+        _text = tesseract_parser.get_text()
+        assert _text is not None
+        assert "this is a test document." in _text.lower()
 
     def test_no_dpi_no_fallback_raises(
         self,
@@ -563,8 +568,10 @@ class TestParseMultiPage:
         )
         assert tesseract_parser.archive_path is not None
         assert tesseract_parser.archive_path.is_file()
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -589,8 +596,10 @@ class TestParseMultiPage:
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -599,14 +608,16 @@ class TestParseMultiPage:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-images.pdf",
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -626,13 +637,15 @@ class TestParseMultiPage:
             - Pages 1 and 2 extracted; page 3 absent
         """
         tesseract_parser.settings.pages = 2
-        tesseract_parser.settings.mode = "redo"
+        tesseract_parser.settings.mode = ModeChoices.REDO
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-images.pdf",
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
-        text = tesseract_parser.get_text().lower()
+        text = tesseract_parser.get_text()
+        assert text is not None
+        text = text.lower()
         assert_ordered_substrings(text, ["page 1", "page 2"])
         assert "page 3" not in text
 
@@ -652,13 +665,15 @@ class TestParseMultiPage:
             - Only page 1 extracted
         """
         tesseract_parser.settings.pages = 1
-        tesseract_parser.settings.mode = "force"
+        tesseract_parser.settings.mode = ModeChoices.FORCE
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-images.pdf",
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
-        text = tesseract_parser.get_text().lower()
+        text = tesseract_parser.get_text()
+        assert text is not None
+        text = text.lower()
         assert "page 1" in text
         assert "page 2" not in text
         assert "page 3" not in text
@@ -681,8 +696,10 @@ class TestParseMultiPage:
             "image/tiff",
         )
         assert tesseract_parser.archive_path is not None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -704,8 +721,10 @@ class TestParseMultiPage:
         shutil.copy(tesseract_samples_dir / "multi-page-images-alpha.tiff", dest)
         tesseract_parser.parse(dest, "image/tiff")
         assert tesseract_parser.archive_path is not None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -727,8 +746,10 @@ class TestParseMultiPage:
         shutil.copy(tesseract_samples_dir / "multi-page-images-alpha-rgb.tiff", dest)
         tesseract_parser.parse(dest, "image/tiff")
         assert tesseract_parser.archive_path is not None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -754,15 +775,17 @@ class TestSkipArchive:
             - Text extracted from original; no archive created (text exists +
               produce_archive=False skips OCRmyPDF entirely)
         """
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-digital.pdf",
             "application/pdf",
             produce_archive=False,
         )
         assert tesseract_parser.archive_path is None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -780,14 +803,16 @@ class TestSkipArchive:
         THEN:
             - Text extracted; archive created (OCR needed, no existing text)
         """
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-images.pdf",
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3"],
         )
 
@@ -838,13 +863,15 @@ class TestSkipArchive:
             - archive_path is set if and only if produce_archive=True
             - Text is always extracted
         """
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             tesseract_samples_dir / filename,
             "application/pdf",
             produce_archive=produce_archive,
         )
-        text = tesseract_parser.get_text().lower()
+        text = tesseract_parser.get_text()
+        assert text is not None
+        text = text.lower()
         assert_ordered_substrings(text, ["page 1", "page 2", "page 3"])
         if expect_archive:
             assert tesseract_parser.archive_path is not None
@@ -868,7 +895,7 @@ class TestSkipArchive:
             - Text is extracted from the original via pdftotext
             - No archive is produced
         """
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         mock_ocr = mocker.patch("ocrmypdf.ocr")
         tesseract_parser.parse(
             tesseract_samples_dir / "simple-digital.pdf",
@@ -895,7 +922,7 @@ class TestSkipArchive:
             - Archive is produced
             - Text is preserved from the original
         """
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             tesseract_samples_dir / "simple-digital.pdf",
             "application/pdf",
@@ -925,15 +952,17 @@ class TestParseMixed:
         THEN:
             - All pages extracted; archive created; sidecar notes skipped pages
         """
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-mixed.pdf",
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
         assert tesseract_parser.archive_path.is_file()
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 1", "page 2", "page 3", "page 4", "page 5", "page 6"],
         )
         sidecar = (tesseract_parser.tempdir / "sidecar.txt").read_text()
@@ -953,15 +982,17 @@ class TestParseMixed:
         THEN:
             - Both text layer and image text extracted; archive created
         """
-        tesseract_parser.settings.mode = "redo"
+        tesseract_parser.settings.mode = ModeChoices.REDO
         tesseract_parser.parse(
             tesseract_samples_dir / "single-page-mixed.pdf",
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
         assert tesseract_parser.archive_path.is_file()
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             [
                 "this is some normal text, present on page 1 of the document.",
                 "this is some text, but in an image, also on page 1.",
@@ -989,15 +1020,17 @@ class TestParseMixed:
         THEN:
             - No archive created (produce_archive=False); text from text layer present
         """
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             tesseract_samples_dir / "multi-page-mixed.pdf",
             "application/pdf",
             produce_archive=False,
         )
         assert tesseract_parser.archive_path is None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert_ordered_substrings(
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
             ["page 4", "page 5", "page 6"],
         )
 
@@ -1013,7 +1046,7 @@ class TestParseRotate:
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.settings.rotate = True
         tesseract_parser.parse(tesseract_samples_dir / "rotated.pdf", "application/pdf")
         assert_ordered_substrings(
@@ -1052,14 +1085,16 @@ class TestParseRtl:
         force-ocr with English Tesseract (producing garbage).  Using mode="off" forces
         skip_text=True so the Arabic text layer is preserved through PDF/A conversion.
         """
-        tesseract_parser.settings.mode = "off"
+        tesseract_parser.settings.mode = ModeChoices.OFF
         tesseract_parser.parse(
             tesseract_samples_dir / "rtl-test.pdf",
             "application/pdf",
         )
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         normalised = "".join(
             ch
-            for ch in unicodedata.normalize("NFKC", tesseract_parser.get_text())
+            for ch in unicodedata.normalize("NFKC", _text)
             if unicodedata.category(ch) != "Cf" and not ch.isspace()
         )
         assert "ةرازو" in normalised
@@ -1196,7 +1231,9 @@ class TestParserFileTypes:
         tesseract_parser.parse(tesseract_samples_dir / filename, mime_type)
         assert tesseract_parser.archive_path is not None
         assert tesseract_parser.archive_path.is_file()
-        assert "this is a test document" in tesseract_parser.get_text().lower()
+        _text = tesseract_parser.get_text()
+        assert _text is not None
+        assert "this is a test document" in _text.lower()
 
     def test_heic(
         self,
@@ -1205,7 +1242,9 @@ class TestParserFileTypes:
     ) -> None:
         tesseract_parser.parse(tesseract_samples_dir / "simple.heic", "image/heic")
         assert tesseract_parser.archive_path is not None
-        assert "pizza" in tesseract_parser.get_text().lower()
+        _text = tesseract_parser.get_text()
+        assert _text is not None
+        assert "pizza" in _text.lower()
 
     def test_gif_with_explicit_dpi(
         self,
@@ -1215,7 +1254,9 @@ class TestParserFileTypes:
         tesseract_parser.settings.image_dpi = 200
         tesseract_parser.parse(tesseract_samples_dir / "simple.gif", "image/gif")
         assert tesseract_parser.archive_path is not None
-        assert "this is a test document" in tesseract_parser.get_text().lower()
+        _text = tesseract_parser.get_text()
+        assert _text is not None
+        assert "this is a test document" in _text.lower()
 
     def test_webp_with_explicit_dpi(
         self,
@@ -1225,9 +1266,11 @@ class TestParserFileTypes:
         tesseract_parser.settings.image_dpi = 72
         tesseract_parser.parse(tesseract_samples_dir / "document.webp", "image/webp")
         assert tesseract_parser.archive_path is not None
+        _text = tesseract_parser.get_text()
+        assert _text is not None
         assert re.search(
             r"this is a ?webp document, created 11/14/2022\.",
-            tesseract_parser.get_text().lower(),
+            _text.lower(),
         )
 
 

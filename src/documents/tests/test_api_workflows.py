@@ -273,6 +273,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(Workflow.objects.count(), 2)
         workflow = Workflow.objects.get(name="Workflow 2")
         trigger = workflow.triggers.first()
+        assert trigger is not None
         self.assertSetEqual(
             set(trigger.filter_has_tags.values_list("id", flat=True)),
             {self.t1.id},
@@ -493,44 +494,24 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         workflow = Workflow.objects.get(id=response.data["id"])
         self.assertEqual(workflow.name, "Workflow Updated")
-        self.assertEqual(workflow.triggers.first().filter_has_tags.first(), self.t1)
+        trigger = workflow.triggers.first()
+        assert trigger is not None
+        action = workflow.actions.first()
+        assert action is not None
+        self.assertEqual(trigger.filter_has_tags.first(), self.t1)
+        self.assertEqual(trigger.filter_has_all_tags.first(), self.t2)
+        self.assertEqual(trigger.filter_has_not_tags.first(), self.t3)
+        self.assertEqual(trigger.filter_has_any_correspondents.first(), self.c)
+        self.assertEqual(trigger.filter_has_not_correspondents.first(), self.c2)
+        self.assertEqual(trigger.filter_has_any_document_types.first(), self.dt)
+        self.assertEqual(trigger.filter_has_not_document_types.first(), self.dt2)
+        self.assertEqual(trigger.filter_has_any_storage_paths.first(), self.sp)
+        self.assertEqual(trigger.filter_has_not_storage_paths.first(), self.sp2)
         self.assertEqual(
-            workflow.triggers.first().filter_has_all_tags.first(),
-            self.t2,
-        )
-        self.assertEqual(
-            workflow.triggers.first().filter_has_not_tags.first(),
-            self.t3,
-        )
-        self.assertEqual(
-            workflow.triggers.first().filter_has_any_correspondents.first(),
-            self.c,
-        )
-        self.assertEqual(
-            workflow.triggers.first().filter_has_not_correspondents.first(),
-            self.c2,
-        )
-        self.assertEqual(
-            workflow.triggers.first().filter_has_any_document_types.first(),
-            self.dt,
-        )
-        self.assertEqual(
-            workflow.triggers.first().filter_has_not_document_types.first(),
-            self.dt2,
-        )
-        self.assertEqual(
-            workflow.triggers.first().filter_has_any_storage_paths.first(),
-            self.sp,
-        )
-        self.assertEqual(
-            workflow.triggers.first().filter_has_not_storage_paths.first(),
-            self.sp2,
-        )
-        self.assertEqual(
-            workflow.triggers.first().filter_custom_field_query,
+            trigger.filter_custom_field_query,
             json.dumps(["AND", [[self.cf1.id, "exact", "value"]]]),
         )
-        self.assertEqual(workflow.actions.first().assign_title, "Action New Title")
+        self.assertEqual(action.assign_title, "Action New Title")
 
     def test_api_update_workflow_no_trigger_actions(self) -> None:
         """
@@ -612,9 +593,13 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         workflow = Workflow.objects.get(id=response.data["id"])
         self.assertEqual(WorkflowTrigger.objects.all().count(), 1)
-        self.assertNotEqual(workflow.triggers.first().id, self.trigger.id)
+        new_trigger = workflow.triggers.first()
+        assert new_trigger is not None
+        self.assertNotEqual(new_trigger.id, self.trigger.id)
         self.assertEqual(WorkflowAction.objects.all().count(), 1)
-        self.assertNotEqual(workflow.actions.first().id, self.action.id)
+        new_action = workflow.actions.first()
+        assert new_action is not None
+        self.assertNotEqual(new_action.id, self.action.id)
 
     def test_email_action_validation(self) -> None:
         """
@@ -873,7 +858,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.action.refresh_from_db()
         self.assertEqual(self.action.assign_title, "Patched Title")
 
-    def test_password_action_passwords_field(self):
+    def test_password_action_passwords_field(self) -> None:
         """
         GIVEN:
             - Nothing
@@ -896,7 +881,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["passwords"], passwords)
 
-    def test_password_action_invalid_passwords_field(self):
+    def test_password_action_invalid_passwords_field(self) -> None:
         """
         GIVEN:
             - Nothing

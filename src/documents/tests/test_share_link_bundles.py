@@ -280,6 +280,7 @@ class ShareLinkBundleBuildTaskTests(DirectoriesMixin, APITestCase):
             self.document.archive_filename = f"{self.document.pk:07}.pdf"
             self.document.save()
             path = self.document.archive_path
+            assert path is not None
         else:
             path = self.document.source_path
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -304,6 +305,7 @@ class ShareLinkBundleBuildTaskTests(DirectoriesMixin, APITestCase):
         self.assertGreater(bundle.size_bytes or 0, 0)
         final_path = bundle.absolute_file_path
         self.assertIsNotNone(final_path)
+        assert final_path is not None
         self.assertTrue(final_path.exists())
         with zipfile.ZipFile(final_path) as zipf:
             names = zipf.namelist()
@@ -327,6 +329,7 @@ class ShareLinkBundleBuildTaskTests(DirectoriesMixin, APITestCase):
         bundle.refresh_from_db()
         final_path = bundle.absolute_file_path
         self.assertIsNotNone(final_path)
+        assert final_path is not None
         self.assertTrue(final_path.exists())
         self.assertNotEqual(final_path.read_bytes(), b"old")
 
@@ -354,6 +357,7 @@ class ShareLinkBundleBuildTaskTests(DirectoriesMixin, APITestCase):
         bundle.refresh_from_db()
         self.assertEqual(bundle.status, ShareLinkBundle.Status.FAILED)
         self.assertIsInstance(bundle.last_error, dict)
+        assert isinstance(bundle.last_error, dict)
         self.assertEqual(bundle.last_error.get("message"), "zip failure")
         self.assertEqual(bundle.last_error.get("exception_type"), "RuntimeError")
         scratch_zips = list(Path(settings.SCRATCH_DIR).glob("*.zip"))
