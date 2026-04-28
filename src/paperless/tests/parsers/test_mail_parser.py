@@ -766,7 +766,11 @@ class TestParser:
             content=b"Pretend merged PDF content",
         )
 
-        def test_layout_option(layout_option, expected_calls, expected_pdf_names):
+        def test_layout_option(
+            layout_option,
+            expected_calls,
+            expected_pdf_names,
+        ) -> None:
             mock_mailrule_get.return_value = mock.Mock(pdf_layout=layout_option)
             mail_parser.configure(ParserContext(mailrule_id=1))
             mail_parser.parse(

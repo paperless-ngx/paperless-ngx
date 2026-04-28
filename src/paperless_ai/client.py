@@ -1,6 +1,8 @@
 import logging
 from typing import TYPE_CHECKING
 
+from paperless.models import LLMBackend
+
 if TYPE_CHECKING:
     from llama_index.core.llms import ChatMessage
     from llama_index.llms.ollama import Ollama
@@ -23,7 +25,7 @@ class AIClient:
         self.llm = self.get_llm()
 
     def get_llm(self) -> "Ollama | OpenAILike":
-        if self.settings.llm_backend == "ollama":
+        if self.settings.llm_backend == LLMBackend.OLLAMA:
             from llama_index.llms.ollama import Ollama
 
             endpoint = self.settings.llm_endpoint or "http://localhost:11434"
@@ -36,7 +38,7 @@ class AIClient:
                 base_url=endpoint,
                 request_timeout=120,
             )
-        elif self.settings.llm_backend == "openai-like":
+        elif self.settings.llm_backend == LLMBackend.OPENAI_LIKE:
             from llama_index.llms.openai_like import OpenAILike
 
             endpoint = self.settings.llm_endpoint or None

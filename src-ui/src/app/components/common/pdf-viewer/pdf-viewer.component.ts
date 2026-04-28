@@ -272,7 +272,7 @@ export class PngxPdfViewerComponent
     if (!this.hasRenderedPage) {
       return
     }
-    const query = this.searchQuery.trim()
+    const query = this.searchQuery?.trim()
     if (query === this.lastFindQuery) {
       return
     }

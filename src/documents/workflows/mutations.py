@@ -202,7 +202,7 @@ def apply_removal_to_document(
     """
 
     if action.remove_all_tags:
-        document.tags.clear()
+        Document.objects.get(pk=document.pk).tags.clear()
     else:
         tag_ids_to_remove: set[int] = set()
         for tag in action.remove_tags.all():
@@ -210,7 +210,7 @@ def apply_removal_to_document(
             tag_ids_to_remove.update(int(pk) for pk in tag.get_descendants_pks())
 
         if tag_ids_to_remove:
-            document.tags.remove(*tag_ids_to_remove)
+            Document.objects.get(pk=document.pk).tags.remove(*tag_ids_to_remove)
 
     if action.remove_all_correspondents or (
         document.correspondent

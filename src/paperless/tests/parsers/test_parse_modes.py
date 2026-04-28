@@ -16,6 +16,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+from paperless.models import ModeChoices
+
 if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
@@ -72,7 +74,7 @@ class TestAutoModeWithText:
         )
         mock_ocr = mocker.patch("ocrmypdf.ocr")
 
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             simple_digital_pdf_file,
             "application/pdf",
@@ -106,7 +108,7 @@ class TestAutoModeWithText:
         )
         mock_ocr = mocker.patch("ocrmypdf.ocr")
 
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             simple_digital_pdf_file,
             "application/pdf",
@@ -158,7 +160,7 @@ class TestAutoModeNoText:
         mocker.patch.object(tesseract_parser, "extract_text", side_effect=_extract_side)
         mock_ocr = mocker.patch("ocrmypdf.ocr")
 
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             multi_page_images_pdf_file,
             "application/pdf",
@@ -200,7 +202,7 @@ class TestAutoModeNoText:
         mocker.patch.object(tesseract_parser, "extract_text", side_effect=_extract_side)
         mock_ocr = mocker.patch("ocrmypdf.ocr")
 
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             multi_page_images_pdf_file,
             "application/pdf",
@@ -243,7 +245,7 @@ class TestOffModePdf:
         )
         mock_ocr = mocker.patch("ocrmypdf.ocr")
 
-        tesseract_parser.settings.mode = "off"
+        tesseract_parser.settings.mode = ModeChoices.OFF
         tesseract_parser.parse(
             simple_digital_pdf_file,
             "application/pdf",
@@ -283,7 +285,7 @@ class TestOffModePdf:
         )
         mocker.patch("ocrmypdf.pdfa.generate_pdfa_ps")
 
-        tesseract_parser.settings.mode = "off"
+        tesseract_parser.settings.mode = ModeChoices.OFF
         tesseract_parser.parse(
             simple_digital_pdf_file,
             "application/pdf",
@@ -323,7 +325,7 @@ class TestOffModeImage:
         """
         mock_ocr = mocker.patch("ocrmypdf.ocr")
 
-        tesseract_parser.settings.mode = "off"
+        tesseract_parser.settings.mode = ModeChoices.OFF
         tesseract_parser.parse(simple_png_file, "image/png", produce_archive=False)
 
         mock_ocr.assert_not_called()
@@ -355,7 +357,7 @@ class TestOffModeImage:
         )
         mock_ocr = mocker.patch("ocrmypdf.ocr")
 
-        tesseract_parser.settings.mode = "off"
+        tesseract_parser.settings.mode = ModeChoices.OFF
         tesseract_parser.parse(simple_png_file, "image/png", produce_archive=True)
 
         mock_convert.assert_called_once_with(simple_png_file)
@@ -429,7 +431,7 @@ class TestProduceArchiveFalse:
         )
         mock_ocr = mocker.patch("ocrmypdf.ocr")
 
-        tesseract_parser.settings.mode = "auto"
+        tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
             simple_digital_pdf_file,
             "application/pdf",

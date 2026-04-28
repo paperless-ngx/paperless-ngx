@@ -79,60 +79,60 @@ class TestMigrateFulltextQueryFieldPrefixes(TestMigrations):
             value="note:something",
         )
 
-    def test_note_prefix_rewritten(self):
+    def test_note_prefix_rewritten(self) -> None:
         self.rule_note.refresh_from_db()
         self.assertEqual(self.rule_note.value, "notes.note:invoice")
 
-    def test_custom_field_prefix_rewritten(self):
+    def test_custom_field_prefix_rewritten(self) -> None:
         self.rule_cf.refresh_from_db()
         self.assertEqual(self.rule_cf.value, "custom_fields.value:amount")
 
-    def test_combined_query_rewritten(self):
+    def test_combined_query_rewritten(self) -> None:
         self.rule_combined.refresh_from_db()
         self.assertEqual(
             self.rule_combined.value,
             "notes.note:invoice AND custom_fields.value:total",
         )
 
-    def test_parenthesized_groups(self):
+    def test_parenthesized_groups(self) -> None:
         self.rule_parens.refresh_from_db()
         self.assertEqual(
             self.rule_parens.value,
             "(notes.note:invoice OR notes.note:receipt)",
         )
 
-    def test_plus_prefix(self):
+    def test_plus_prefix(self) -> None:
         self.rule_plus.refresh_from_db()
         self.assertEqual(self.rule_plus.value, "+notes.note:foo")
 
-    def test_minus_prefix(self):
+    def test_minus_prefix(self) -> None:
         self.rule_minus.refresh_from_db()
         self.assertEqual(self.rule_minus.value, "-notes.note:bar")
 
-    def test_boosted(self):
+    def test_boosted(self) -> None:
         self.rule_boost.refresh_from_db()
         self.assertEqual(self.rule_boost.value, "notes.note:test^2")
 
-    def test_no_match_unchanged(self):
+    def test_no_match_unchanged(self) -> None:
         self.rule_no_match.refresh_from_db()
         self.assertEqual(self.rule_no_match.value, "title:hello content:world")
 
-    def test_word_boundary_no_false_positive(self):
+    def test_word_boundary_no_false_positive(self) -> None:
         self.rule_denote.refresh_from_db()
         self.assertEqual(self.rule_denote.value, "denote:foo")
 
-    def test_already_migrated_idempotent(self):
+    def test_already_migrated_idempotent(self) -> None:
         self.rule_already_migrated.refresh_from_db()
         self.assertEqual(self.rule_already_migrated.value, "notes.note:foo")
 
-    def test_already_migrated_cf_idempotent(self):
+    def test_already_migrated_cf_idempotent(self) -> None:
         self.rule_already_migrated_cf.refresh_from_db()
         self.assertEqual(self.rule_already_migrated_cf.value, "custom_fields.value:bar")
 
-    def test_null_value_no_crash(self):
+    def test_null_value_no_crash(self) -> None:
         self.rule_null.refresh_from_db()
         self.assertIsNone(self.rule_null.value)
 
-    def test_non_fulltext_rule_untouched(self):
+    def test_non_fulltext_rule_untouched(self) -> None:
         self.rule_other_type.refresh_from_db()
         self.assertEqual(self.rule_other_type.value, "note:something")

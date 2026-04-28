@@ -1514,7 +1514,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             Path("somepath/asn-201-400/asn-3xx/Does Matter.pdf"),
         )
 
-    def test_template_related_context_keeps_legacy_string_coercion(self):
+    def test_template_related_context_keeps_legacy_string_coercion(self) -> None:
         """
         GIVEN:
             - A storage path template that uses related objects directly as strings
@@ -1908,7 +1908,7 @@ class TestCustomFieldFilenameUpdates(
         self.assertLessEqual(m.call_count, 1)
 
     @override_settings(FILENAME_FORMAT=None)
-    def test_overlong_storage_path_keeps_existing_filename(self):
+    def test_overlong_storage_path_keeps_existing_filename(self) -> None:
         initial_filename = generate_filename(self.doc)
         Document.objects.filter(pk=self.doc.pk).update(filename=str(initial_filename))
         self.doc.refresh_from_db()

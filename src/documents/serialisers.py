@@ -214,7 +214,7 @@ class SetPermissionsMixin:
         set_permissions_for_object(permissions, object)
 
 
-class SerializerWithPerms(serializers.Serializer):
+class SerializerWithPerms(serializers.Serializer[dict[str, Any]]):
     def __init__(self, *args, **kwargs) -> None:
         self.user = kwargs.pop("user", None)
         self.full_perms = kwargs.pop("full_perms", False)
@@ -961,18 +961,10 @@ def _get_viewable_duplicates(
     return duplicates.filter(id__in=allowed)
 
 
-class DuplicateDocumentSummarySerializer(serializers.Serializer):
+class DuplicateDocumentSummarySerializer(serializers.Serializer[dict[str, Any]]):
     id = serializers.IntegerField()
     title = serializers.CharField()
     deleted_at = serializers.DateTimeField(allow_null=True)
-
-
-class DocumentVersionInfoSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    added = serializers.DateTimeField()
-    version_label = serializers.CharField(required=False, allow_null=True)
-    checksum = serializers.CharField(required=False, allow_null=True)
-    is_root = serializers.BooleanField()
 
 
 class _DocumentVersionInfo(TypedDict):
@@ -981,6 +973,14 @@ class _DocumentVersionInfo(TypedDict):
     version_label: str | None
     checksum: str | None
     is_root: bool
+
+
+class DocumentVersionInfoSerializer(serializers.Serializer[_DocumentVersionInfo]):
+    id = serializers.IntegerField()
+    added = serializers.DateTimeField()
+    version_label = serializers.CharField(required=False, allow_null=True)
+    checksum = serializers.CharField(required=False, allow_null=True)
+    is_root = serializers.BooleanField()
 
 
 @extend_schema_serializer(
@@ -1532,7 +1532,7 @@ class SavedViewSerializer(OwnedObjectSerializer):
         return saved_view
 
 
-class DocumentListSerializer(serializers.Serializer):
+class DocumentListSerializer(serializers.Serializer[dict[str, list[int]]]):
     documents = serializers.ListField(
         required=True,
         label="Documents",
@@ -2085,7 +2085,7 @@ class BulkEditSerializer(
         return attrs
 
 
-class PostDocumentSerializer(serializers.Serializer):
+class PostDocumentSerializer(serializers.Serializer[dict[str, Any]]):
     created = serializers.DateTimeField(
         label="Created",
         allow_null=True,
@@ -2262,7 +2262,7 @@ class PostDocumentSerializer(serializers.Serializer):
             return created.date()
 
 
-class DocumentVersionSerializer(serializers.Serializer):
+class DocumentVersionSerializer(serializers.Serializer[dict[str, Any]]):
     document = serializers.FileField(
         label="Document",
         write_only=True,
@@ -2278,7 +2278,7 @@ class DocumentVersionSerializer(serializers.Serializer):
     validate_document = PostDocumentSerializer().validate_document
 
 
-class DocumentVersionLabelSerializer(serializers.Serializer):
+class DocumentVersionLabelSerializer(serializers.Serializer[dict[str, str | None]]):
     version_label = serializers.CharField(
         label="Version label",
         required=True,
@@ -2484,7 +2484,7 @@ class TaskSerializerV10(OwnedObjectSerializer):
         read_only_fields = fields
 
 
-class TaskSerializerV9(serializers.ModelSerializer):
+class TaskSerializerV9(serializers.ModelSerializer[PaperlessTask]):
     """Task serializer for API v9 backwards compatibility.
 
     Maps old field names to the new model fields so existing clients continue
@@ -2609,7 +2609,7 @@ class TaskSerializerV9(serializers.ModelSerializer):
         return list(qs.values("id", "title", "deleted_at"))
 
 
-class TaskSummarySerializer(serializers.Serializer):
+class TaskSummarySerializer(serializers.Serializer[dict[str, Any]]):
     task_type = serializers.CharField()
     total_count = serializers.IntegerField()
     pending_count = serializers.IntegerField()
@@ -2622,7 +2622,7 @@ class TaskSummarySerializer(serializers.Serializer):
     last_failure = serializers.DateTimeField(allow_null=True)
 
 
-class RunTaskSerializer(serializers.Serializer):
+class RunTaskSerializer(serializers.Serializer[dict[str, str]]):
     task_type = serializers.ChoiceField(
         choices=PaperlessTask.TaskType.choices,
         label="Task Type",

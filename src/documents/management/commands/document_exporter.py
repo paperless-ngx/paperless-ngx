@@ -6,6 +6,7 @@ import tempfile
 from itertools import islice
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Any
 
 from allauth.mfa.models import Authenticator
 from allauth.socialaccount.models import SocialAccount
@@ -68,7 +69,7 @@ from paperless_mail.models import MailRule
 
 
 def serialize_queryset_batched(
-    queryset: "QuerySet",
+    queryset: "QuerySet[Any]",
     *,
     batch_size: int = 500,
 ) -> "Generator[list[dict], None, None]":
@@ -364,7 +365,7 @@ class Command(CryptMixin, PaperlessCommand):
 
         # 2. Create manifest, containing all correspondents, types, tags, storage paths
         # note, documents and ui_settings
-        manifest_key_to_object_query: dict[str, QuerySet] = {
+        manifest_key_to_object_query: dict[str, QuerySet[Any]] = {
             "correspondents": Correspondent.objects.all(),
             "tags": Tag.objects.all(),
             "document_types": DocumentType.objects.all(),

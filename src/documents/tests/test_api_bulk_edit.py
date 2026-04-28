@@ -918,7 +918,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             ],
         )
 
-    def test_api_selection_data_requires_view_permission(self):
+    def test_api_selection_data_requires_view_permission(self) -> None:
         self.doc2.owner = self.user
         self.doc2.save()
 

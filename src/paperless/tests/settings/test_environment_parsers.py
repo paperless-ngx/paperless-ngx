@@ -26,7 +26,7 @@ class TestStringToBool:
             pytest.param("  True  ", id="whitespace_true"),
         ],
     )
-    def test_true_conversion(self, true_value: str):
+    def test_true_conversion(self, true_value: str) -> None:
         """Test that various 'true' strings correctly evaluate to True."""
         assert str_to_bool(true_value) is True
 
@@ -41,18 +41,18 @@ class TestStringToBool:
             pytest.param("  False  ", id="whitespace_false"),
         ],
     )
-    def test_false_conversion(self, false_value: str):
+    def test_false_conversion(self, false_value: str) -> None:
         """Test that various 'false' strings correctly evaluate to False."""
         assert str_to_bool(false_value) is False
 
-    def test_invalid_conversion(self):
+    def test_invalid_conversion(self) -> None:
         """Test that an invalid string raises a ValueError."""
         with pytest.raises(ValueError, match="Cannot convert 'maybe' to a boolean\\."):
             str_to_bool("maybe")
 
 
 class TestParseDictFromString:
-    def test_empty_and_none_input(self):
+    def test_empty_and_none_input(self) -> None:
         """Test behavior with None or empty string input."""
         assert parse_dict_from_str(None) == {}
         assert parse_dict_from_str("") == {}
@@ -62,13 +62,13 @@ class TestParseDictFromString:
         # Ensure it returns a copy, not the original object
         assert res is not defaults
 
-    def test_basic_parsing(self):
+    def test_basic_parsing(self) -> None:
         """Test simple key-value parsing without defaults or types."""
         env_str = "key1=val1, key2=val2"
         expected = {"key1": "val1", "key2": "val2"}
         assert parse_dict_from_str(env_str) == expected
 
-    def test_with_defaults(self):
+    def test_with_defaults(self) -> None:
         """Test that environment values override defaults correctly."""
         defaults = {"host": "localhost", "port": 8000, "user": "default"}
         env_str = "port=9090, host=db.example.com"
@@ -76,7 +76,7 @@ class TestParseDictFromString:
         result = parse_dict_from_str(env_str, defaults=defaults)
         assert result == expected
 
-    def test_type_casting(self):
+    def test_type_casting(self) -> None:
         """Test successful casting of values to specified types."""
         env_str = "port=9090, debug=true, timeout=12.5, user=admin"
         type_map = {"port": int, "debug": bool, "timeout": float}
@@ -84,7 +84,7 @@ class TestParseDictFromString:
         result = parse_dict_from_str(env_str, type_map=type_map)
         assert result == expected
 
-    def test_type_casting_with_defaults(self):
+    def test_type_casting_with_defaults(self) -> None:
         """Test casting when values come from both defaults and env string."""
         defaults = {"port": 8000, "debug": False, "retries": 3}
         env_str = "port=9090, debug=true"
@@ -97,7 +97,7 @@ class TestParseDictFromString:
         assert result == expected
         assert isinstance(result["retries"], int)
 
-    def test_path_casting(self, tmp_path: Path):
+    def test_path_casting(self, tmp_path: Path) -> None:
         """Test successful casting of a string to a resolved pathlib.Path object."""
         # Create a dummy file to resolve against
         test_file = tmp_path / "test_file.txt"
@@ -111,14 +111,14 @@ class TestParseDictFromString:
         assert isinstance(result["config_path"], Path)
         assert result["config_path"] == test_file.resolve()
 
-    def test_custom_separator(self):
+    def test_custom_separator(self) -> None:
         """Test parsing with a custom separator like a semicolon."""
         env_str = "host=db; port=5432; user=test"
         expected = {"host": "db", "port": "5432", "user": "test"}
         result = parse_dict_from_str(env_str, separator=";")
         assert result == expected
 
-    def test_edge_cases_in_string(self):
+    def test_edge_cases_in_string(self) -> None:
         """Test malformed strings to ensure robustness."""
         # Malformed pair 'debug' is skipped, extra comma is ignored
         env_str = "key=val,, debug, foo=bar"
@@ -130,7 +130,7 @@ class TestParseDictFromString:
         expected = {"url": "postgres://user:pass@host:5432/db"}
         assert parse_dict_from_str(env_str) == expected
 
-    def test_casting_error_handling(self):
+    def test_casting_error_handling(self) -> None:
         """Test that a ValueError is raised for invalid casting."""
         env_str = "port=not-a-number"
         type_map = {"port": int}
@@ -142,14 +142,14 @@ class TestParseDictFromString:
         assert "value 'not-a-number'" in str(excinfo.value)
         assert "to type 'int'" in str(excinfo.value)
 
-    def test_bool_casting_error(self):
+    def test_bool_casting_error(self) -> None:
         """Test that an invalid boolean string raises a ValueError."""
         env_str = "debug=maybe"
         type_map = {"debug": bool}
         with pytest.raises(ValueError, match="Error casting key 'debug'"):
             parse_dict_from_str(env_str, type_map=type_map)
 
-    def test_nested_key_parsing_basic(self):
+    def test_nested_key_parsing_basic(self) -> None:
         """Basic nested key parsing using dot-notation."""
         env_str = "database.host=db.example.com, database.port=5432, logging.level=INFO"
         result = parse_dict_from_str(env_str)
@@ -158,7 +158,7 @@ class TestParseDictFromString:
             "logging": {"level": "INFO"},
         }
 
-    def test_nested_overrides_defaults_and_deepcopy(self):
+    def test_nested_overrides_defaults_and_deepcopy(self) -> None:
         """Nested env keys override defaults and defaults are deep-copied."""
         defaults = {"database": {"host": "127.0.0.1", "port": 3306, "user": "default"}}
         env_str = "database.host=db.example.com, debug=true"
@@ -176,7 +176,7 @@ class TestParseDictFromString:
         assert result is not defaults
         assert result["database"] is not defaults["database"]
 
-    def test_nested_type_casting(self):
+    def test_nested_type_casting(self) -> None:
         """Type casting for nested keys (dot-notation) should work."""
         env_str = "database.host=db.example.com, database.port=5433, debug=false"
         type_map = {"database.port": int, "debug": bool}
@@ -188,7 +188,7 @@ class TestParseDictFromString:
         assert result["debug"] is False
         assert isinstance(result["debug"], bool)
 
-    def test_nested_casting_error_message(self):
+    def test_nested_casting_error_message(self) -> None:
         """Error messages should include the full dotted key name on failure."""
         env_str = "database.port=not-a-number"
         type_map = {"database.port": int}
@@ -200,7 +200,7 @@ class TestParseDictFromString:
         assert "value 'not-a-number'" in msg
         assert "to type 'int'" in msg
 
-    def test_type_map_does_not_recast_non_string_defaults(self):
+    def test_type_map_does_not_recast_non_string_defaults(self) -> None:
         """If a default already provides a non-string value, the caster should skip it."""
         defaults = {"database": {"port": 3306}}
         type_map = {"database.port": int}
@@ -210,22 +210,22 @@ class TestParseDictFromString:
 
 
 class TestGetBoolFromEnv:
-    def test_existing_env_var(self, mocker):
+    def test_existing_env_var(self, mocker) -> None:
         """Test that an existing environment variable is read and converted."""
         mocker.patch.dict(os.environ, {"TEST_VAR": "true"})
         assert get_bool_from_env("TEST_VAR") is True
 
-    def test_missing_env_var_uses_default_no(self, mocker):
+    def test_missing_env_var_uses_default_no(self, mocker) -> None:
         """Test that a missing environment variable uses default 'NO' and returns False."""
         mocker.patch.dict(os.environ, {}, clear=True)
         assert get_bool_from_env("MISSING_VAR") is False
 
-    def test_missing_env_var_with_explicit_default(self, mocker):
+    def test_missing_env_var_with_explicit_default(self, mocker) -> None:
         """Test that a missing environment variable uses the provided default."""
         mocker.patch.dict(os.environ, {}, clear=True)
         assert get_bool_from_env("MISSING_VAR", default="yes") is True
 
-    def test_invalid_value_raises_error(self, mocker):
+    def test_invalid_value_raises_error(self, mocker) -> None:
         """Test that an invalid value raises ValueError (delegates to str_to_bool)."""
         mocker.patch.dict(os.environ, {"INVALID_VAR": "maybe"})
         with pytest.raises(ValueError):
@@ -243,7 +243,7 @@ class TestGetIntFromEnv:
             pytest.param("-999", -999, id="large_negative"),
         ],
     )
-    def test_existing_env_var_valid_ints(self, mocker, env_value, expected):
+    def test_existing_env_var_valid_ints(self, mocker, env_value, expected) -> None:
         """Test that existing environment variables with valid integers return correct values."""
         mocker.patch.dict(os.environ, {"INT_VAR": env_value})
         assert get_int_from_env("INT_VAR") == expected
@@ -257,12 +257,12 @@ class TestGetIntFromEnv:
             pytest.param(None, None, id="none_default"),
         ],
     )
-    def test_missing_env_var_with_defaults(self, mocker, default, expected):
+    def test_missing_env_var_with_defaults(self, mocker, default, expected) -> None:
         """Test that missing environment variables return provided defaults."""
         mocker.patch.dict(os.environ, {}, clear=True)
         assert get_int_from_env("MISSING_VAR", default=default) == expected
 
-    def test_missing_env_var_no_default(self, mocker):
+    def test_missing_env_var_no_default(self, mocker) -> None:
         """Test that missing environment variable with no default returns None."""
         mocker.patch.dict(os.environ, {}, clear=True)
         assert get_int_from_env("MISSING_VAR") is None
@@ -279,7 +279,7 @@ class TestGetIntFromEnv:
             pytest.param("1.0", id="decimal"),
         ],
     )
-    def test_invalid_int_values_raise_error(self, mocker, invalid_value):
+    def test_invalid_int_values_raise_error(self, mocker, invalid_value) -> None:
         """Test that invalid integer values raise ValueError."""
         mocker.patch.dict(os.environ, {"INVALID_INT": invalid_value})
         with pytest.raises(ValueError):
@@ -300,7 +300,7 @@ class TestGetFloatFromEnv:
             pytest.param("-1.23e4", -12300.0, id="sci_large"),
         ],
     )
-    def test_existing_env_var_valid_floats(self, mocker, env_value, expected):
+    def test_existing_env_var_valid_floats(self, mocker, env_value, expected) -> None:
         """Test that existing environment variables with valid floats return correct values."""
         mocker.patch.dict(os.environ, {"FLOAT_VAR": env_value})
         assert get_float_from_env("FLOAT_VAR") == expected
@@ -314,12 +314,12 @@ class TestGetFloatFromEnv:
             pytest.param(None, None, id="none_default"),
         ],
     )
-    def test_missing_env_var_with_defaults(self, mocker, default, expected):
+    def test_missing_env_var_with_defaults(self, mocker, default, expected) -> None:
         """Test that missing environment variables return provided defaults."""
         mocker.patch.dict(os.environ, {}, clear=True)
         assert get_float_from_env("MISSING_VAR", default=default) == expected
 
-    def test_missing_env_var_no_default(self, mocker):
+    def test_missing_env_var_no_default(self, mocker) -> None:
         """Test that missing environment variable with no default returns None."""
         mocker.patch.dict(os.environ, {}, clear=True)
         assert get_float_from_env("MISSING_VAR") is None
@@ -336,7 +336,7 @@ class TestGetFloatFromEnv:
             pytest.param("1.2.3", id="triple_decimal"),
         ],
     )
-    def test_invalid_float_values_raise_error(self, mocker, invalid_value):
+    def test_invalid_float_values_raise_error(self, mocker, invalid_value) -> None:
         """Test that invalid float values raise ValueError."""
         mocker.patch.dict(os.environ, {"INVALID_FLOAT": invalid_value})
         with pytest.raises(ValueError):
@@ -355,19 +355,19 @@ class TestGetPathFromEnv:
             pytest.param("/", id="root"),
         ],
     )
-    def test_existing_env_var_paths(self, mocker, env_value):
+    def test_existing_env_var_paths(self, mocker, env_value) -> None:
         """Test that existing environment variables with paths return resolved Path objects."""
         mocker.patch.dict(os.environ, {"PATH_VAR": env_value})
         result = get_path_from_env("PATH_VAR")
         assert isinstance(result, Path)
         assert result == Path(env_value).resolve()
 
-    def test_missing_env_var_no_default(self, mocker):
+    def test_missing_env_var_no_default(self, mocker) -> None:
         """Test that missing environment variable with no default returns None."""
         mocker.patch.dict(os.environ, {}, clear=True)
         assert get_path_from_env("MISSING_VAR") is None
 
-    def test_missing_env_var_with_none_default(self, mocker):
+    def test_missing_env_var_with_none_default(self, mocker) -> None:
         """Test that missing environment variable with None default returns None."""
         mocker.patch.dict(os.environ, {}, clear=True)
         assert get_path_from_env("MISSING_VAR", default=None) is None
@@ -380,7 +380,7 @@ class TestGetPathFromEnv:
             pytest.param(".", id="current_default"),
         ],
     )
-    def test_missing_env_var_with_path_defaults(self, mocker, default_path_str):
+    def test_missing_env_var_with_path_defaults(self, mocker, default_path_str) -> None:
         """Test that missing environment variables return resolved default Path objects."""
         mocker.patch.dict(os.environ, {}, clear=True)
         default_path = Path(default_path_str)
@@ -388,7 +388,7 @@ class TestGetPathFromEnv:
         assert isinstance(result, Path)
         assert result == default_path.resolve()
 
-    def test_relative_paths_are_resolved(self, mocker):
+    def test_relative_paths_are_resolved(self, mocker) -> None:
         """Test that relative paths are properly resolved to absolute paths."""
         mocker.patch.dict(os.environ, {"REL_PATH": "relative/path"})
         result = get_path_from_env("REL_PATH")
@@ -407,7 +407,7 @@ class TestGetListFromEnv:
             pytest.param("a,,b,c", ["a", "b", "c"], id="empty_elements_removed"),
         ],
     )
-    def test_existing_env_var_basic_parsing(self, mocker, env_value, expected):
+    def test_existing_env_var_basic_parsing(self, mocker, env_value, expected) -> None:
         """Test that existing environment variables are parsed correctly."""
         mocker.patch.dict(os.environ, {"LIST_VAR": env_value})
         result = get_list_from_env("LIST_VAR")
@@ -421,7 +421,7 @@ class TestGetListFromEnv:
             pytest.param(";", "a;b;c", ["a", "b", "c"], id="semicolon_separator"),
         ],
     )
-    def test_custom_separators(self, mocker, separator, env_value, expected):
+    def test_custom_separators(self, mocker, separator, env_value, expected) -> None:
         """Test that custom separators work correctly."""
         mocker.patch.dict(os.environ, {"LIST_VAR": env_value})
         result = get_list_from_env("LIST_VAR", separator=separator)
@@ -439,19 +439,19 @@ class TestGetListFromEnv:
             pytest.param(None, [], id="none_default_returns_empty_list"),
         ],
     )
-    def test_missing_env_var_with_defaults(self, mocker, default, expected):
+    def test_missing_env_var_with_defaults(self, mocker, default, expected) -> None:
         """Test that missing environment variables return provided defaults."""
         mocker.patch.dict(os.environ, {}, clear=True)
         result = get_list_from_env("MISSING_VAR", default=default)
         assert result == expected
 
-    def test_missing_env_var_no_default(self, mocker):
+    def test_missing_env_var_no_default(self, mocker) -> None:
         """Test that missing environment variable with no default returns empty list."""
         mocker.patch.dict(os.environ, {}, clear=True)
         result = get_list_from_env("MISSING_VAR")
         assert result == []
 
-    def test_required_env_var_missing_raises_error(self, mocker):
+    def test_required_env_var_missing_raises_error(self, mocker) -> None:
         """Test that missing required environment variable raises ValueError."""
         mocker.patch.dict(os.environ, {}, clear=True)
         with pytest.raises(
@@ -460,19 +460,19 @@ class TestGetListFromEnv:
         ):
             get_list_from_env("REQUIRED_VAR", required=True)
 
-    def test_required_env_var_with_default_does_not_raise(self, mocker):
+    def test_required_env_var_with_default_does_not_raise(self, mocker) -> None:
         """Test that required environment variable with default does not raise error."""
         mocker.patch.dict(os.environ, {}, clear=True)
         result = get_list_from_env("REQUIRED_VAR", default=["default"], required=True)
         assert result == ["default"]
 
-    def test_strip_whitespace_false(self, mocker):
+    def test_strip_whitespace_false(self, mocker) -> None:
         """Test that whitespace is preserved when strip_whitespace=False."""
         mocker.patch.dict(os.environ, {"LIST_VAR": " a , b , c "})
         result = get_list_from_env("LIST_VAR", strip_whitespace=False)
         assert result == [" a ", " b ", " c "]
 
-    def test_remove_empty_false(self, mocker):
+    def test_remove_empty_false(self, mocker) -> None:
         """Test that empty elements are preserved when remove_empty=False."""
         mocker.patch.dict(os.environ, {"LIST_VAR": "a,,b,,c"})
         result = get_list_from_env("LIST_VAR", remove_empty=False)

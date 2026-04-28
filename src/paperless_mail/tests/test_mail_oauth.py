@@ -96,7 +96,7 @@ class TestMailOAuth(
         self,
         mock_get_outlook_access_token,
         mock_get_gmail_access_token,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Mocked settings for Gmail and Outlook OAuth client IDs and secrets
@@ -277,7 +277,7 @@ class TestMailOAuth(
         self,
         mock_refresh_token,
         mock_get_mailbox,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Mail account with refresh token and expiration
@@ -334,7 +334,7 @@ class TestMailOAuth(
         self,
         mock_refresh_token,
         mock_get_mailbox,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Mail account with refresh token and expiration

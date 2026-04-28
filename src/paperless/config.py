@@ -38,7 +38,9 @@ class OutputTypeConfig(BaseConfig):
     def __post_init__(self) -> None:
         app_config = self._get_config_instance()
 
-        self.output_type = app_config.output_type or settings.OCR_OUTPUT_TYPE
+        self.output_type = app_config.output_type or OutputTypeChoices(
+            settings.OCR_OUTPUT_TYPE,
+        )
 
 
 @dataclasses.dataclass
@@ -70,12 +72,13 @@ class OcrConfig(OutputTypeConfig):
 
         self.pages = app_config.pages or settings.OCR_PAGES
         self.language = app_config.language or settings.OCR_LANGUAGE
-        self.mode = app_config.mode or settings.OCR_MODE
+        self.mode = app_config.mode or ModeChoices(settings.OCR_MODE)
         self.archive_file_generation = (
-            app_config.archive_file_generation or settings.ARCHIVE_FILE_GENERATION
+            app_config.archive_file_generation
+            or ArchiveFileGenerationChoices(settings.ARCHIVE_FILE_GENERATION)
         )
         self.image_dpi = app_config.image_dpi or settings.OCR_IMAGE_DPI
-        self.clean = app_config.unpaper_clean or settings.OCR_CLEAN
+        self.clean = app_config.unpaper_clean or CleanChoices(settings.OCR_CLEAN)
         self.deskew = (
             app_config.deskew if app_config.deskew is not None else settings.OCR_DESKEW
         )
@@ -92,7 +95,7 @@ class OcrConfig(OutputTypeConfig):
         )
         self.color_conversion_strategy = (
             app_config.color_conversion_strategy
-            or settings.OCR_COLOR_CONVERSION_STRATEGY
+            or ColorConvertChoices(settings.OCR_COLOR_CONVERSION_STRATEGY)
         )
 
         user_args = None

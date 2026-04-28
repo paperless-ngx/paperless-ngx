@@ -86,7 +86,7 @@ class TestBarcode(
             self.assertDictEqual(separator_page_numbers, {1: False})
 
     @override_settings(CONSUMER_ENABLE_ASN_BARCODE=True)
-    def test_asn_barcode_duplicate_in_trash_fails(self):
+    def test_asn_barcode_duplicate_in_trash_fails(self) -> None:
         """
         GIVEN:
             - A document with ASN barcode 123 is in the trash
@@ -585,6 +585,7 @@ class TestBarcode(
             - The barcode config is used
         """
         app_config = ApplicationConfiguration.objects.first()
+        assert app_config is not None
         app_config.barcodes_enabled = True
         app_config.barcode_string = "CUSTOM BARCODE"
         app_config.save()
@@ -771,6 +772,7 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
             )
 
             document = Document.objects.first()
+            assert document is not None
 
             self.assertEqual(document.archive_serial_number, 123)
 
@@ -1059,11 +1061,15 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
 
             doc2 = documents[1]
             self.assertEqual(doc2.tags.count(), 1)
-            self.assertEqual(doc2.tags.first().name, "invoice")
+            _tag_1 = doc2.tags.first()
+            assert _tag_1 is not None
+            self.assertEqual(_tag_1.name, "invoice")
 
             doc3 = documents[2]
             self.assertEqual(doc3.tags.count(), 1)
-            self.assertEqual(doc3.tags.first().name, "receipt")
+            _tag_2 = doc3.tags.first()
+            assert _tag_2 is not None
+            self.assertEqual(_tag_2.name, "receipt")
 
     @override_settings(
         CONSUMER_ENABLE_TAG_BARCODE=True,
