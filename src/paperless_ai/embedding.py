@@ -54,7 +54,7 @@ def get_embedding_dim() -> int:
     config = AIConfig()
     model = config.llm_embedding_model or (
         "text-embedding-3-small"
-        if config.llm_embedding_backend == "openai-like"
+        if config.llm_embedding_backend == LLMEmbeddingBackend.OPENAI_LIKE
         else "sentence-transformers/all-MiniLM-L6-v2"
     )
 
