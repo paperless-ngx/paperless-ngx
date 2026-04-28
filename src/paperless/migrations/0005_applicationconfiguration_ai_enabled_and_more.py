@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
             name="llm_backend",
             field=models.CharField(
                 blank=True,
-                choices=[("openai", "OpenAI"), ("ollama", "Ollama")],
+                choices=[("openai", "OpenAI-compatible"), ("ollama", "Ollama")],
                 max_length=128,
                 null=True,
                 verbose_name="Sets the LLM backend",
@@ -45,7 +45,10 @@ class Migration(migrations.Migration):
             name="llm_embedding_backend",
             field=models.CharField(
                 blank=True,
-                choices=[("openai", "OpenAI"), ("huggingface", "Huggingface")],
+                choices=[
+                    ("openai", "OpenAI-compatible"),
+                    ("huggingface", "Huggingface"),
+                ],
                 max_length=128,
                 null=True,
                 verbose_name="Sets the LLM embedding backend",
