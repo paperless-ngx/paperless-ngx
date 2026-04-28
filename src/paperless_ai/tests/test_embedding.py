@@ -64,7 +64,7 @@ def test_get_embedding_model_openai(mock_ai_config):
     ) as MockOpenAIEmbedding:
         model = get_embedding_model()
         MockOpenAIEmbedding.assert_called_once_with(
-            model="text-embedding-3-small",
+            model_name="text-embedding-3-small",
             api_key="test_api_key",
             api_base="http://test-url",
         )

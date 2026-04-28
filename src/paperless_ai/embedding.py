@@ -29,7 +29,7 @@ def get_embedding_model() -> "BaseEmbedding":
                     allow_internal=config.llm_allow_internal_endpoints,
                 )
             return OpenAILikeEmbedding(
-                model=config.llm_embedding_model or "text-embedding-3-small",
+                model_name=config.llm_embedding_model or "text-embedding-3-small",
                 api_key=config.llm_api_key,
                 api_base=endpoint,
             )
