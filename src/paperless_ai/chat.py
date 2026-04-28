@@ -1,3 +1,4 @@
+import json
 import logging
 import sys
 
@@ -9,6 +10,8 @@ logger = logging.getLogger("paperless_ai.chat")
 
 MAX_SINGLE_DOC_CONTEXT_CHARS = 15000
 SINGLE_DOC_SNIPPET_CHARS = 800
+CHAT_METADATA_DELIMITER = "\n\n__PAPERLESS_CHAT_METADATA__"
+MAX_CHAT_REFERENCES = 3
 
 CHAT_PROMPT_TMPL = """Context information is below.
     ---------------------
@@ -17,6 +20,52 @@ CHAT_PROMPT_TMPL = """Context information is below.
     Given the context information and not prior knowledge, answer the query.
     Query: {query_str}
     Answer:"""
+
+
+def _build_document_reference(
+    document: Document,
+    title: str | None = None,
+) -> dict[str, int | str]:
+    return {
+        "id": document.pk,
+        "title": title or document.title or document.filename,
+    }
+
+
+def _get_document_references(
+    documents: list[Document],
+    top_nodes: list,
+) -> list[dict[str, int | str]]:
+    allowed_documents = {doc.pk: doc for doc in documents}
+    references: list[dict[str, int | str]] = []
+    seen_document_ids: set[int] = set()
+
+    for node in top_nodes:
+        try:
+            document_id = int(node.metadata["document_id"])
+        except (KeyError, TypeError, ValueError):
+            continue
+
+        if document_id in seen_document_ids or document_id not in allowed_documents:
+            continue
+
+        seen_document_ids.add(document_id)
+        document = allowed_documents[document_id]
+        references.append(
+            _build_document_reference(document, node.metadata.get("title")),
+        )
+
+        if len(references) >= MAX_CHAT_REFERENCES:
+            break
+
+    return references
+
+
+def _format_chat_metadata_trailer(references: list[dict[str, int | str]]) -> str:
+    return (
+        f"{CHAT_METADATA_DELIMITER}"
+        f"{json.dumps({'references': references}, separators=(',', ':'))}"
+    )
 
 
 def stream_chat_with_documents(query_str: str, documents: list[Document]):
@@ -49,6 +98,7 @@ def stream_chat_with_documents(query_str: str, documents: list[Document]):
     if len(documents) == 1:
         # Just one doc — provide full content
         doc = documents[0]
+        references = [_build_document_reference(doc)]
         # TODO: include document metadata in the context
         content = doc.content or ""
         context_body = content
@@ -78,6 +128,7 @@ def stream_chat_with_documents(query_str: str, documents: list[Document]):
             yield "Sorry, I couldn't find any content to answer your question."
             return
 
+        references = _get_document_references(documents, top_nodes)
         context = "\n\n".join(
             f"TITLE: {node.metadata.get('title')}\n{node.text[:SINGLE_DOC_SNIPPET_CHARS]}"
             for node in top_nodes
@@ -102,3 +153,6 @@ def stream_chat_with_documents(query_str: str, documents: list[Document]):
     for chunk in response_stream.response_gen:
         yield chunk
         sys.stdout.flush()
+
+    if references:
+        yield _format_chat_metadata_trailer(references)
