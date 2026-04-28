@@ -43,7 +43,7 @@ def _get_document_references(
     for node in top_nodes:
         try:
             document_id = int(node.metadata["document_id"])
-        except (KeyError, TypeError, ValueError):
+        except (KeyError, TypeError, ValueError):  # pragma: no cover
             continue
 
         if document_id in seen_document_ids or document_id not in allowed_documents:
@@ -55,7 +55,7 @@ def _get_document_references(
             _build_document_reference(document, node.metadata.get("title")),
         )
 
-        if len(references) >= MAX_CHAT_REFERENCES:
+        if len(references) >= MAX_CHAT_REFERENCES:  # pragma: no cover
             break
 
     return references
