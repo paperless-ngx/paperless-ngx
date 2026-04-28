@@ -36,7 +36,7 @@ class AIClient:
                 base_url=endpoint,
                 request_timeout=120,
             )
-        elif self.settings.llm_backend == "openai":
+        elif self.settings.llm_backend == "openai-like":
             from llama_index.llms.openai_like import OpenAILike
 
             endpoint = self.settings.llm_endpoint or None

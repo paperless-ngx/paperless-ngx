@@ -359,7 +359,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
     @patch("documents.views.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
-        LLM_BACKEND="openai",
+        LLM_BACKEND="openai-like",
     )
     def test_suggestions_with_invalid_ai_configuration(
         self,
@@ -379,7 +379,9 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
                 "ai": ["Invalid AI configuration."],
             },
         )
-        self.assertIsNone(get_llm_suggestion_cache(self.document.pk, backend="openai"))
+        self.assertIsNone(
+            get_llm_suggestion_cache(self.document.pk, backend="openai-like"),
+        )
 
     def test_invalidate_suggestions_cache(self) -> None:
         self.client.force_login(user=self.user)

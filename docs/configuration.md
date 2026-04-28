@@ -2014,8 +2014,8 @@ suggestions. This setting is required to be set to true in order to use the AI f
 
 #### [`PAPERLESS_AI_LLM_EMBEDDING_BACKEND=<str>`](#PAPERLESS_AI_LLM_EMBEDDING_BACKEND) {#PAPERLESS_AI_LLM_EMBEDDING_BACKEND}
 
-: The embedding backend to use for RAG. This can be either "openai" or "huggingface". The
-"openai" backend uses an OpenAI-compatible embeddings API.
+: The embedding backend to use for RAG. This can be either "openai-like" or "huggingface". The
+"openai-like" backend uses an OpenAI-compatible embeddings API.
 
     Defaults to None.
 
@@ -2030,10 +2030,10 @@ models supported by the current embedding backend. If not supplied, defaults to
 
 #### [`PAPERLESS_AI_LLM_BACKEND=<str>`](#PAPERLESS_AI_LLM_BACKEND) {#PAPERLESS_AI_LLM_BACKEND}
 
-: The AI backend to use. This can be either "openai" or "ollama". If set to "ollama", the AI
-features will be run locally on your machine. If set to "openai", the AI features will use an
-OpenAI-compatible API endpoint, including OpenAI itself and compatible providers. This setting
-is required to be set to use the AI features.
+: The AI backend to use. This can be either "openai-like" or "ollama". If set to "ollama", the AI
+features will be run locally on your machine. If set to "openai-like", the AI features will use
+an OpenAI-compatible API endpoint, including OpenAI itself and compatible providers. This
+setting is required to be set to use the AI features.
 
     Defaults to None.
 
