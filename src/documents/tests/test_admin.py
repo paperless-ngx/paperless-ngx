@@ -34,11 +34,6 @@ def user_admin() -> PaperlessUserAdmin:
 
 
 @pytest.fixture
-def superuser(db) -> User:
-    return UserFactory.create(username="superuser", superuser=True)
-
-
-@pytest.fixture
 def staff_user(db) -> User:
     return UserFactory.create(username="staff", staff=True)
 
@@ -156,7 +151,7 @@ class TestPaperlessAdmin:
     def test_superuser_can_change_superuser_status(
         self,
         user_admin: PaperlessUserAdmin,
-        superuser: User,
+        admin_user: User,
     ) -> None:
         user = UserFactory.create()
 
@@ -164,7 +159,7 @@ class TestPaperlessAdmin:
             {"username": user.username, "is_superuser": True},
             instance=user,
         )
-        form.request = types.SimpleNamespace(user=superuser)
+        form.request = types.SimpleNamespace(user=admin_user)
 
         assert form.is_valid()
         assert form.errors == {}
@@ -189,7 +184,7 @@ class TestPaperlessAdmin:
     def test_non_superuser_cannot_mutate_superuser(
         self,
         client: Client,
-        superuser: User,
+        admin_user: User,
         staff_user: User,
         method: str,
         perm_codename: str,
@@ -201,38 +196,38 @@ class TestPaperlessAdmin:
         client.force_login(staff_user)
 
         response = getattr(client, method)(
-            f"/api/users/{superuser.pk}/",
+            f"/api/users/{admin_user.pk}/",
             {"first_name": "Updated"},
             content_type="application/json",
         )
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
         assert response.content.decode() == expected_message
-        assert User.objects.filter(pk=superuser.pk).exists()
+        assert User.objects.filter(pk=admin_user.pk).exists()
 
     def test_superuser_can_modify_superuser(
         self,
         client: Client,
-        superuser: User,
+        admin_user: User,
     ) -> None:
-        client.force_login(superuser)
+        client.force_login(admin_user)
         response = client.patch(
-            f"/api/users/{superuser.pk}/",
+            f"/api/users/{admin_user.pk}/",
             {"first_name": "Updated"},
             content_type="application/json",
         )
 
         assert response.status_code == status.HTTP_200_OK
-        superuser.refresh_from_db()
-        assert superuser.first_name == "Updated"
+        admin_user.refresh_from_db()
+        assert admin_user.first_name == "Updated"
 
     def test_superuser_can_delete_superuser(
         self,
         client: Client,
-        superuser: User,
+        admin_user: User,
     ) -> None:
         target = UserFactory.create(superuser=True)
-        client.force_login(superuser)
+        client.force_login(admin_user)
 
         response = client.delete(f"/api/users/{target.pk}/")
 
