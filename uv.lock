@@ -3082,7 +3082,7 @@ requires-dist = [
     { name = "scikit-learn", specifier = "~=1.8.0" },
     { name = "sentence-transformers", specifier = ">=4.1" },
     { name = "setproctitle", specifier = "~=1.3.4" },
-    { name = "tantivy", git = "https://github.com/quickwit-oss/tantivy-py.git" },
+    { name = "tantivy", specifier = "~=0.26.0" },
     { name = "tika-client", specifier = "~=0.11.0" },
     { name = "torch", specifier = "~=2.11.0", index = "https://download.pytorch.org/whl/cpu" },
     { name = "watchfiles", specifier = ">=1.1.1" },
@@ -4688,7 +4688,30 @@ wheels = [
 [[package]]
 name = "tantivy"
 version = "0.26.0"
-source = { git = "https://github.com/quickwit-oss/tantivy-py.git#bf3a0c0d6e18591728121b3b5fa735ab61862110" }
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/57/74/ec8c3f7bb3599af86c19f1a774c37e36a6e7524d3563f3aeb99220981f6f/tantivy-0.26.0.tar.gz", hash = "sha256:7c9507fcc62bac4ef1d40b1ed37ff7fa07e44b5043b30288f63bcf4fdc62644a", size = 93615, upload-time = "2026-04-29T11:51:31.115Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3d/94/832f4ee26ed2b3aae69923e827183cb28af8239c893430fbe6240351df9c/tantivy-0.26.0-cp311-cp311-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:5748304687042b2c643e30b646047f254e8a21441515929ea0e54c6de0ed493b", size = 8335068, upload-time = "2026-04-29T11:50:38.042Z" },
+    { url = "https://files.pythonhosted.org/packages/d2/dc/88eb02ad37acb5b022ded4fdad984562b2246ec28fe16d55580e678a1251/tantivy-0.26.0-cp311-cp311-macosx_10_12_x86_64.whl", hash = "sha256:d8617af05dfc030acca0d93c14594b247e18550d803359946cb8cf76620a767e", size = 4298822, upload-time = "2026-04-29T11:50:40.27Z" },
+    { url = "https://files.pythonhosted.org/packages/60/85/5a553d130be2704302c807fccebad575241f2a7bce2b765240ad9d4c697f/tantivy-0.26.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:3dbb17edf7ee25c77f60e7b757488bb8a127c28fc6cac3d8484e2d1ae862d77f", size = 4612952, upload-time = "2026-04-29T11:50:42.644Z" },
+    { url = "https://files.pythonhosted.org/packages/9a/c9/36c3e17d0a8efb2fab1ce0c748ddd1aa3234ead83aaa011fd5c6c780e043/tantivy-0.26.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:62cfb03e3ca4cb0f41213acf0a3fd04ffe7f359ca6e3e91cab37c06799e68d3c", size = 4567017, upload-time = "2026-04-29T11:50:44.943Z" },
+    { url = "https://files.pythonhosted.org/packages/88/34/fbdcbcb6862cdea4f2ed7d62b99c4785b89560c1ae72558a6cec724cf64c/tantivy-0.26.0-cp312-cp312-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:a4676c1989d8d7e61ebc4d6d4b46224fa9351eedb6e077a815a5f7233c4e20b6", size = 8301385, upload-time = "2026-04-29T11:50:48.769Z" },
+    { url = "https://files.pythonhosted.org/packages/d0/40/09e6a400d2505024a412d4c2a67f58ece4703799a53ba432215b90de3835/tantivy-0.26.0-cp312-cp312-macosx_10_12_x86_64.whl", hash = "sha256:df1e2f21f69ffe9ea12ca7f3f3900eadea4670cf6f8c15aa4fec0bb3a1185577", size = 4284335, upload-time = "2026-04-29T11:50:51.201Z" },
+    { url = "https://files.pythonhosted.org/packages/2f/9d/1e7db895aa5cfac5609bd03cc7bf44a6f8b9f2892baf9225f9189121316d/tantivy-0.26.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d2d22d53c9fd718b6d74eea3b0e8a26ec8bd7ca8a594ba15c7a38ac5e9e3d33b", size = 4610238, upload-time = "2026-04-29T11:50:53.01Z" },
+    { url = "https://files.pythonhosted.org/packages/f8/05/205758c98a5e450ec22c08904dbf3fe10dce4d39c3e1c6a05c9daaa436be/tantivy-0.26.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ff0765cfbc9e10e96b71c78074e29f25fee388e5bc8a0a7c8aa166bf80304769", size = 4570688, upload-time = "2026-04-29T11:50:55.057Z" },
+    { url = "https://files.pythonhosted.org/packages/fb/56/aef45e8ec7fddbca4885516bc1d8cc61950f666ba8b44ef9e50b8db51f91/tantivy-0.26.0-cp313-cp313-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:7509b06fab07d4209bf37759e3c0c407f6c53fa3184d694ec82416fc8d189e7d", size = 8301236, upload-time = "2026-04-29T11:50:59.299Z" },
+    { url = "https://files.pythonhosted.org/packages/ef/3b/8ce1a1662e6e6c303a65055a42206853adfeaa14596e62b6f218b5af5526/tantivy-0.26.0-cp313-cp313-macosx_10_12_x86_64.whl", hash = "sha256:0c77962afc03f8a7081991fee088d09891acaa3401cdf882b1cc40d9d839a683", size = 4284342, upload-time = "2026-04-29T11:51:01.626Z" },
+    { url = "https://files.pythonhosted.org/packages/32/15/4f4e74669bdc26e7508d527f27be1a12d249e1d9ab6bba05f47ba1cdedfa/tantivy-0.26.0-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:9f017f6991752da8092c46c670e0eae349a1266d2315720ff5b252ed1ea4acd4", size = 4610161, upload-time = "2026-04-29T11:51:03.966Z" },
+    { url = "https://files.pythonhosted.org/packages/50/3e/4648f7fc34834f3f4c99465111f50add73f0517f21ceae7c81771942c99b/tantivy-0.26.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:bb7df28cc98497c767b86ebc5f167e3f2552739f748a1c28c10e14e7db726cd1", size = 4571125, upload-time = "2026-04-29T11:51:06.162Z" },
+    { url = "https://files.pythonhosted.org/packages/59/3d/a85ffd178a6b00813cd144e4af2db100023a5a7cd9cae3a5f998e74d5cbd/tantivy-0.26.0-cp313-cp313t-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:7b9a350e59513e330fbcb0930ef2f574d86a8aa46047a1ad1c5b4c91838e3aec", size = 8296228, upload-time = "2026-04-29T11:51:10.844Z" },
+    { url = "https://files.pythonhosted.org/packages/d6/81/c78c3ae37c52e1244da340139e11cca0d44ee742e227bba19ecefbbf54b5/tantivy-0.26.0-cp313-cp313t-macosx_10_12_x86_64.whl", hash = "sha256:e1bdf6dcbd25fdc3244e6b09f5114253a81ec533ad5346eff135ee98668f04c7", size = 4279507, upload-time = "2026-04-29T11:51:13.065Z" },
+    { url = "https://files.pythonhosted.org/packages/39/df/a409dad06800793d7dd2cc831aeb46b808b4ce00df7d506e6760acee2cc2/tantivy-0.26.0-cp313-cp313t-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a9450186861d6f350ec5969ff2e349377d2ed5617f084a8ad0f303ed7a91a2e3", size = 4605550, upload-time = "2026-04-29T11:51:15.289Z" },
+    { url = "https://files.pythonhosted.org/packages/bf/24/68245511021df5b19879d262ef2b1adf214ec67cc69761e1a83fd28571b1/tantivy-0.26.0-cp313-cp313t-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e69569ec68c0e8d1c3aa3cf52423ced6b9b9b5bb0156e8b32088390919d41964", size = 4566249, upload-time = "2026-04-29T11:51:17.398Z" },
+    { url = "https://files.pythonhosted.org/packages/98/53/0c9ec136930dad07c8f24cd31210181e7ba2228aeea9fd75d751b9d716e5/tantivy-0.26.0-cp314-cp314-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:7983206d75c7334fdcb1c49372adf6afe8aeb89ad2abfc7a5fd9701254735134", size = 8319819, upload-time = "2026-04-29T11:51:21.451Z" },
+    { url = "https://files.pythonhosted.org/packages/10/5b/35b7f2af5101883dde8f0523a69944bd5b2471ce399339e97e2e3775a227/tantivy-0.26.0-cp314-cp314-macosx_10_12_x86_64.whl", hash = "sha256:4a970d35402612208b077de5feb9da978380c173e7835335c50d15d0f13cbaba", size = 4289015, upload-time = "2026-04-29T11:51:23.435Z" },
+    { url = "https://files.pythonhosted.org/packages/ef/4b/fbc1293fc8108eaa2f11718d77070e09cefe4aac4055fd2036548a776946/tantivy-0.26.0-cp314-cp314-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:22f6acf0c4d9dff2aecb161071db921c9a0bd3e2485dbc8304fd4561fe50c6a7", size = 4622332, upload-time = "2026-04-29T11:51:25.483Z" },
+    { url = "https://files.pythonhosted.org/packages/86/68/d1ae76c42b523b076434a357b675c37fd9684ac0fc6e0e63f703a1f1014a/tantivy-0.26.0-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a92825f3215fc4b5ef55da8a577eb9ad30c7ee5c7371daea82329e67aa4c7d12", size = 4573494, upload-time = "2026-04-29T11:51:27.512Z" },
+]
 
 [[package]]
 name = "tenacity"
