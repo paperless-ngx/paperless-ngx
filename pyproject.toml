@@ -73,7 +73,7 @@ dependencies = [
   "scikit-learn~=1.8.0",
   "sentence-transformers>=4.1",
   "setproctitle~=1.3.4",
-  "tantivy>=0.25.1",
+  "tantivy~=0.26.0",
   "tika-client~=0.11.0",
   "torch~=2.11.0",
   "watchfiles>=1.1.1",
@@ -143,7 +143,8 @@ typing = [
   "types-python-dateutil",
   "types-pytz",
   "types-redis",
-  "types-setuptools",
+  "types-regex",
+  "types-setuptools"
 ]
 
 [tool.uv]

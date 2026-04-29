@@ -24,13 +24,7 @@ class TestDocumentAdmin(DirectoriesMixin, TestCase):
         backend = get_backend()
         searcher = backend._index.searcher()
         results = searcher.search(
-            tantivy.Query.range_query(
-                backend._schema,
-                "id",
-                tantivy.FieldType.Unsigned,
-                doc.pk,
-                doc.pk,
-            ),
+            tantivy.Query.term_query(backend._schema, "id", doc.pk),
             limit=1,
         )
         if results.hits:
