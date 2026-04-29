@@ -1,238 +1,324 @@
-import shutil
-import tempfile
 from collections.abc import Iterable
-from pathlib import Path
-from random import randint
 
-from django.contrib.auth.models import User
-from django.test import TestCase
-from django.test import override_settings
+import pytest
+from factory.django import DjangoModelFactory
 
 from documents import matching
-from documents.models import Correspondent
 from documents.models import Document
-from documents.models import DocumentType
-from documents.models import Tag
+from documents.models import MatchingModel
 from documents.signals import document_consumption_finished
+from documents.tests.factories import CorrespondentFactory
+from documents.tests.factories import DocumentFactory
+from documents.tests.factories import DocumentTypeFactory
+from documents.tests.factories import TagFactory
 
 
-class _TestMatchingBase(TestCase):
-    def _test_matching(
-        self,
-        match_text: str,
-        match_algorithm: str,
-        should_match: Iterable[str],
-        no_match: Iterable[str],
-        *,
-        case_sensitive: bool = False,
-    ) -> None:
-        for klass in (Tag, Correspondent, DocumentType):
-            instance = klass.objects.create(
-                name=str(randint(10000, 99999)),
-                match=match_text,
-                matching_algorithm=getattr(klass, match_algorithm),
-                is_insensitive=not case_sensitive,
-            )
-            for string in should_match:
-                doc = Document(content=string)
-                self.assertTrue(
-                    matching.matches(instance, doc),
-                    f'"{match_text}" should match "{string}" but it does not',
-                )
-            for string in no_match:
-                doc = Document(content=string)
-                self.assertFalse(
-                    matching.matches(instance, doc),
-                    f'"{match_text}" should not match "{string}" but it does',
-                )
+@pytest.fixture(
+    params=[TagFactory, CorrespondentFactory, DocumentTypeFactory],
+    ids=["tag", "correspondent", "document_type"],
+)
+def matchable_factory(request: pytest.FixtureRequest) -> type[DjangoModelFactory]:
+    """
+    Parametrized fixture yielding each factory whose model participates in
+    content matching: ``TagFactory``, ``CorrespondentFactory``, and
+    ``DocumentTypeFactory``.
+
+    Tests that consume this fixture run once per factory, so a single test
+    body verifies the matching behavior across all three ``MatchingModel``
+    subclasses. The parametrize IDs (``tag`` / ``correspondent`` /
+    ``document_type``) appear in test names so a failure points directly at
+    the offending model.
+    """
+    return request.param
 
 
-class TestMatching(_TestMatchingBase):
-    def test_matches_uses_latest_version_content_for_root_documents(self) -> None:
-        root = Document.objects.create(
+@pytest.fixture()
+def doc_with_keyword() -> Document:
+    return DocumentFactory.create(
+        content="I contain the keyword.",
+        mime_type="application/pdf",
+    )
+
+
+def _assert_matches(
+    factory_cls: type[DjangoModelFactory],
+    match_text: str,
+    match_algorithm: int,
+    should_match: Iterable[str],
+    no_match: Iterable[str],
+    *,
+    case_sensitive: bool = False,
+) -> None:
+    """
+    Build one matchable instance from ``factory_cls`` configured with the
+    given ``match_text``, ``match_algorithm``, and case sensitivity, then
+    assert that ``matching.matches`` returns ``True`` for every string in
+    ``should_match`` and ``False`` for every string in ``no_match``.
+
+    Both the matchable and each candidate ``Document`` are constructed
+    unsaved: ``matching.matches`` only reads ``match`` / ``matching_algorithm``
+    / ``is_insensitive`` off the matchable, and an unsaved ``Document``
+    short-circuits ``get_effective_content`` via the ``pk is None`` branch.
+    Skipping the DB keeps the parametrized matrix cheap. ``case_sensitive``
+    is inverted into ``is_insensitive`` to match the model field. Assertion
+    failures include the pattern and the offending string so a parametrized
+    failure is self-describing.
+    """
+    instance = factory_cls.build(
+        match=match_text,
+        matching_algorithm=match_algorithm,
+        is_insensitive=not case_sensitive,
+    )
+    for content in should_match:
+        doc = Document(content=content)
+        assert matching.matches(instance, doc), (
+            f'"{match_text}" should match "{content}" but it does not'
+        )
+    for content in no_match:
+        doc = Document(content=content)
+        assert not matching.matches(instance, doc), (
+            f'"{match_text}" should not match "{content}" but it does'
+        )
+
+
+class TestMatching:
+    @pytest.mark.django_db
+    def test_root_uses_latest_version_content(self) -> None:
+        root = DocumentFactory.create(
             title="root",
             checksum="root",
             mime_type="application/pdf",
             content="root content without token",
         )
-        Document.objects.create(
+        DocumentFactory.create(
             title="v1",
             checksum="v1",
             mime_type="application/pdf",
             root_document=root,
             content="latest version contains keyword",
         )
-        tag = Tag.objects.create(
-            name="tag",
+        tag = TagFactory.create(
             match="keyword",
-            matching_algorithm=Tag.MATCH_ANY,
+            matching_algorithm=MatchingModel.MATCH_ANY,
         )
 
-        self.assertTrue(matching.matches(tag, root))
+        assert matching.matches(tag, root)
 
-    def test_matches_does_not_fall_back_to_root_content_when_version_exists(
-        self,
-    ) -> None:
-        root = Document.objects.create(
+    @pytest.mark.django_db
+    def test_root_does_not_fall_back_when_version_exists(self) -> None:
+        root = DocumentFactory.create(
             title="root",
             checksum="root",
             mime_type="application/pdf",
             content="root contains keyword",
         )
-        Document.objects.create(
+        DocumentFactory.create(
             title="v1",
             checksum="v1",
             mime_type="application/pdf",
             root_document=root,
             content="latest version without token",
         )
-        tag = Tag.objects.create(
-            name="tag",
+        tag = TagFactory.create(
             match="keyword",
-            matching_algorithm=Tag.MATCH_ANY,
+            matching_algorithm=MatchingModel.MATCH_ANY,
         )
 
-        self.assertFalse(matching.matches(tag, root))
+        assert not matching.matches(tag, root)
 
-    def test_match_none(self) -> None:
-        self._test_matching(
+    def test_match_none(
+        self,
+        matchable_factory: type[DjangoModelFactory],
+    ) -> None:
+        _assert_matches(
+            matchable_factory,
             "",
-            "MATCH_NONE",
+            MatchingModel.MATCH_NONE,
             (),
-            (
-                "no",
-                "match",
-            ),
+            ("no", "match"),
         )
 
-    def test_match_all(self) -> None:
-        self._test_matching(
-            "alpha charlie gamma",
-            "MATCH_ALL",
-            ("I have alpha, charlie, and gamma in me",),
-            (
-                "I have alpha in me",
-                "I have charlie in me",
-                "I have gamma in me",
-                "I have alpha and charlie in me",
-                "I have alphas, charlie, and gamma in me",
-                "I have alphas in me",
-                "I have bravo in me",
+    @pytest.mark.parametrize(
+        ("match_text", "should_match", "no_match"),
+        [
+            pytest.param(
+                "alpha charlie gamma",
+                ("I have alpha, charlie, and gamma in me",),
+                (
+                    "I have alpha in me",
+                    "I have charlie in me",
+                    "I have gamma in me",
+                    "I have alpha and charlie in me",
+                    "I have alphas, charlie, and gamma in me",
+                    "I have alphas in me",
+                    "I have bravo in me",
+                ),
+                id="words",
             ),
+            pytest.param(
+                "12 34 56",
+                ("I have 12 34, and 56 in me",),
+                (
+                    "I have 12 in me",
+                    "I have 34 in me",
+                    "I have 56 in me",
+                    "I have 12 and 34 in me",
+                    "I have 120, 34, and 56 in me",
+                    "I have 123456 in me",
+                    "I have 01234567 in me",
+                ),
+                id="numbers",
+            ),
+            pytest.param(
+                'brown fox "lazy dogs"',
+                (
+                    "the quick brown fox jumped over the lazy dogs",
+                    "the quick brown fox jumped over the lazy  dogs",
+                ),
+                (
+                    "the quick fox jumped over the lazy dogs",
+                    "the quick brown wolf jumped over the lazy dogs",
+                    "the quick brown fox jumped over the fat dogs",
+                    "the quick brown fox jumped over the lazy... dogs",
+                ),
+                id="quoted-phrase",
+            ),
+        ],
+    )
+    def test_match_all(
+        self,
+        matchable_factory: type[DjangoModelFactory],
+        match_text: str,
+        should_match: tuple[str, ...],
+        no_match: tuple[str, ...],
+    ) -> None:
+        _assert_matches(
+            matchable_factory,
+            match_text,
+            MatchingModel.MATCH_ALL,
+            should_match,
+            no_match,
         )
 
-        self._test_matching(
-            "12 34 56",
-            "MATCH_ALL",
-            ("I have 12 34, and 56 in me",),
-            (
-                "I have 12 in me",
-                "I have 34 in me",
-                "I have 56 in me",
-                "I have 12 and 34 in me",
-                "I have 120, 34, and 56 in me",
-                "I have 123456 in me",
-                "I have 01234567 in me",
+    @pytest.mark.parametrize(
+        ("match_text", "should_match", "no_match"),
+        [
+            pytest.param(
+                "alpha charlie gamma",
+                (
+                    "I have alpha in me",
+                    "I have charlie in me",
+                    "I have gamma in me",
+                    "I have alpha, charlie, and gamma in me",
+                    "I have alpha and charlie in me",
+                ),
+                (
+                    "I have alphas in me",
+                    "I have bravo in me",
+                ),
+                id="words",
             ),
+            pytest.param(
+                "12 34 56",
+                (
+                    "I have 12 in me",
+                    "I have 34 in me",
+                    "I have 56 in me",
+                    "I have 12 and 34 in me",
+                    "I have 12, 34, and 56 in me",
+                    "I have 120, 34, and 56 in me",
+                ),
+                (
+                    "I have 123456 in me",
+                    "I have 01234567 in me",
+                ),
+                id="numbers",
+            ),
+            pytest.param(
+                '"brown fox" " lazy  dogs "',
+                (
+                    "the quick brown fox",
+                    "jumped over the lazy  dogs.",
+                ),
+                ("the lazy fox jumped over the brown dogs",),
+                id="quoted-phrases",
+            ),
+        ],
+    )
+    def test_match_any(
+        self,
+        matchable_factory: type[DjangoModelFactory],
+        match_text: str,
+        should_match: tuple[str, ...],
+        no_match: tuple[str, ...],
+    ) -> None:
+        _assert_matches(
+            matchable_factory,
+            match_text,
+            MatchingModel.MATCH_ANY,
+            should_match,
+            no_match,
         )
 
-        self._test_matching(
-            'brown fox "lazy dogs"',
-            "MATCH_ALL",
-            (
-                "the quick brown fox jumped over the lazy dogs",
-                "the quick brown fox jumped over the lazy  dogs",
+    @pytest.mark.parametrize(
+        ("match_text", "should_match", "no_match"),
+        [
+            pytest.param(
+                "alpha charlie gamma",
+                ("I have 'alpha charlie gamma' in me",),
+                (
+                    "I have alpha in me",
+                    "I have charlie in me",
+                    "I have gamma in me",
+                    "I have alpha and charlie in me",
+                    "I have alpha, charlie, and gamma in me",
+                    "I have alphas, charlie, and gamma in me",
+                    "I have alphas in me",
+                    "I have bravo in me",
+                ),
+                id="words",
             ),
-            (
-                "the quick fox jumped over the lazy dogs",
-                "the quick brown wolf jumped over the lazy dogs",
-                "the quick brown fox jumped over the fat dogs",
-                "the quick brown fox jumped over the lazy... dogs",
+            pytest.param(
+                "12 34 56",
+                ("I have 12 34 56 in me",),
+                (
+                    "I have 12 in me",
+                    "I have 34 in me",
+                    "I have 56 in me",
+                    "I have 12 and 34 in me",
+                    "I have 12 34, and 56 in me",
+                    "I have 120, 34, and 560 in me",
+                    "I have 120, 340, and 560 in me",
+                    "I have 123456 in me",
+                    "I have 01234567 in me",
+                ),
+                id="numbers",
             ),
+        ],
+    )
+    def test_match_literal(
+        self,
+        matchable_factory: type[DjangoModelFactory],
+        match_text: str,
+        should_match: tuple[str, ...],
+        no_match: tuple[str, ...],
+    ) -> None:
+        _assert_matches(
+            matchable_factory,
+            match_text,
+            MatchingModel.MATCH_LITERAL,
+            should_match,
+            no_match,
         )
 
-    def test_match_any(self) -> None:
-        self._test_matching(
-            "alpha charlie gamma",
-            "MATCH_ANY",
-            (
-                "I have alpha in me",
-                "I have charlie in me",
-                "I have gamma in me",
-                "I have alpha, charlie, and gamma in me",
-                "I have alpha and charlie in me",
-            ),
-            (
-                "I have alphas in me",
-                "I have bravo in me",
-            ),
-        )
-
-        self._test_matching(
-            "12 34 56",
-            "MATCH_ANY",
-            (
-                "I have 12 in me",
-                "I have 34 in me",
-                "I have 56 in me",
-                "I have 12 and 34 in me",
-                "I have 12, 34, and 56 in me",
-                "I have 120, 34, and 56 in me",
-            ),
-            (
-                "I have 123456 in me",
-                "I have 01234567 in me",
-            ),
-        )
-
-        self._test_matching(
-            '"brown fox" " lazy  dogs "',
-            "MATCH_ANY",
-            (
-                "the quick brown fox",
-                "jumped over the lazy  dogs.",
-            ),
-            ("the lazy fox jumped over the brown dogs",),
-        )
-
-    def test_match_literal(self) -> None:
-        self._test_matching(
-            "alpha charlie gamma",
-            "MATCH_LITERAL",
-            ("I have 'alpha charlie gamma' in me",),
-            (
-                "I have alpha in me",
-                "I have charlie in me",
-                "I have gamma in me",
-                "I have alpha and charlie in me",
-                "I have alpha, charlie, and gamma in me",
-                "I have alphas, charlie, and gamma in me",
-                "I have alphas in me",
-                "I have bravo in me",
-            ),
-        )
-
-        self._test_matching(
-            "12 34 56",
-            "MATCH_LITERAL",
-            ("I have 12 34 56 in me",),
-            (
-                "I have 12 in me",
-                "I have 34 in me",
-                "I have 56 in me",
-                "I have 12 and 34 in me",
-                "I have 12 34, and 56 in me",
-                "I have 120, 34, and 560 in me",
-                "I have 120, 340, and 560 in me",
-                "I have 123456 in me",
-                "I have 01234567 in me",
-            ),
-        )
-
-    def test_match_regex(self) -> None:
-        self._test_matching(
+    def test_match_regex(
+        self,
+        matchable_factory: type[DjangoModelFactory],
+    ) -> None:
+        _assert_matches(
+            matchable_factory,
             r"alpha\w+gamma",
-            "MATCH_REGEX",
+            MatchingModel.MATCH_REGEX,
             (
                 "I have alpha_and_gamma in me",
                 "I have alphas_and_gamma in me",
@@ -249,29 +335,41 @@ class TestMatching(_TestMatchingBase):
             ),
         )
 
-    def test_tach_invalid_regex(self) -> None:
-        self._test_matching("[", "MATCH_REGEX", [], ["Don't match this"])
+    def test_invalid_regex(
+        self,
+        matchable_factory: type[DjangoModelFactory],
+    ) -> None:
+        _assert_matches(
+            matchable_factory,
+            "[",
+            MatchingModel.MATCH_REGEX,
+            (),
+            ("Don't match this",),
+        )
 
-    def test_match_regex_timeout_returns_false(self) -> None:
-        tag = Tag.objects.create(
-            name="slow",
+    def test_match_regex_timeout_returns_false(
+        self,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        tag = TagFactory.build(
             match=r"(a+)+$",
-            matching_algorithm=Tag.MATCH_REGEX,
+            matching_algorithm=MatchingModel.MATCH_REGEX,
         )
         document = Document(content=("a" * 5000) + "X")
 
-        with self.assertLogs("paperless.regex", level="WARNING") as cm:
-            self.assertFalse(matching.matches(tag, document))
+        with caplog.at_level("WARNING", logger="paperless.regex"):
+            assert not matching.matches(tag, document)
 
-        self.assertTrue(
-            any("timed out" in message for message in cm.output),
-            f"Expected timeout log, got {cm.output}",
-        )
+        assert "timed out" in caplog.text
 
-    def test_match_fuzzy(self) -> None:
-        self._test_matching(
+    def test_match_fuzzy(
+        self,
+        matchable_factory: type[DjangoModelFactory],
+    ) -> None:
+        _assert_matches(
+            matchable_factory,
             "Springfield, Miss.",
-            "MATCH_FUZZY",
+            MatchingModel.MATCH_FUZZY,
             (
                 "1220 Main Street, Springf eld, Miss.",
                 "1220 Main Street, Spring field, Miss.",
@@ -282,240 +380,283 @@ class TestMatching(_TestMatchingBase):
         )
 
 
-class TestCaseSensitiveMatching(_TestMatchingBase):
-    def test_match_all(self) -> None:
-        self._test_matching(
-            "alpha charlie gamma",
-            "MATCH_ALL",
-            (
-                "I have alpha, charlie, and gamma in me",
-                "I have gamma, charlie, and alpha in me",
+class TestCaseSensitiveMatching:
+    @pytest.mark.parametrize(
+        ("match_text", "should_match", "no_match"),
+        [
+            pytest.param(
+                "alpha charlie gamma",
+                (
+                    "I have alpha, charlie, and gamma in me",
+                    "I have gamma, charlie, and alpha in me",
+                ),
+                (
+                    "I have Alpha, charlie, and gamma in me",
+                    "I have gamma, Charlie, and alpha in me",
+                    "I have alpha, charlie, and Gamma in me",
+                    "I have gamma, charlie, and ALPHA in me",
+                ),
+                id="lowercase-pattern",
             ),
-            (
-                "I have Alpha, charlie, and gamma in me",
-                "I have gamma, Charlie, and alpha in me",
-                "I have alpha, charlie, and Gamma in me",
-                "I have gamma, charlie, and ALPHA in me",
+            pytest.param(
+                "Alpha charlie Gamma",
+                (
+                    "I have Alpha, charlie, and Gamma in me",
+                    "I have Gamma, charlie, and Alpha in me",
+                ),
+                (
+                    "I have Alpha, charlie, and gamma in me",
+                    "I have gamma, charlie, and alpha in me",
+                    "I have alpha, charlie, and Gamma in me",
+                    "I have Gamma, Charlie, and ALPHA in me",
+                ),
+                id="mixed-case-pattern",
             ),
+            pytest.param(
+                'brown fox "lazy dogs"',
+                (
+                    "the quick brown fox jumped over the lazy dogs",
+                    "the quick brown fox jumped over the lazy  dogs",
+                ),
+                (
+                    "the quick Brown fox jumped over the lazy dogs",
+                    "the quick brown Fox jumped over the lazy  dogs",
+                    "the quick brown fox jumped over the Lazy dogs",
+                    "the quick brown fox jumped over the lazy  Dogs",
+                ),
+                id="quoted-phrase",
+            ),
+        ],
+    )
+    def test_match_all(
+        self,
+        matchable_factory: type[DjangoModelFactory],
+        match_text: str,
+        should_match: tuple[str, ...],
+        no_match: tuple[str, ...],
+    ) -> None:
+        _assert_matches(
+            matchable_factory,
+            match_text,
+            MatchingModel.MATCH_ALL,
+            should_match,
+            no_match,
             case_sensitive=True,
         )
 
-        self._test_matching(
-            "Alpha charlie Gamma",
-            "MATCH_ALL",
-            (
-                "I have Alpha, charlie, and Gamma in me",
-                "I have Gamma, charlie, and Alpha in me",
+    @pytest.mark.parametrize(
+        ("match_text", "should_match", "no_match"),
+        [
+            pytest.param(
+                "alpha charlie gamma",
+                (
+                    "I have alpha in me",
+                    "I have charlie in me",
+                    "I have gamma in me",
+                    "I have alpha, charlie, and gamma in me",
+                    "I have alpha and charlie in me",
+                ),
+                (
+                    "I have Alpha in me",
+                    "I have chaRLie in me",
+                    "I have gamMA in me",
+                    "I have aLPha, cHArlie, and gAMma in me",
+                    "I have AlphA and CharlIe in me",
+                ),
+                id="lowercase-pattern",
             ),
-            (
-                "I have Alpha, charlie, and gamma in me",
-                "I have gamma, charlie, and alpha in me",
-                "I have alpha, charlie, and Gamma in me",
-                "I have Gamma, Charlie, and ALPHA in me",
+            pytest.param(
+                "Alpha Charlie Gamma",
+                (
+                    "I have Alpha in me",
+                    "I have Charlie in me",
+                    "I have Gamma in me",
+                    "I have Alpha, Charlie, and Gamma in me",
+                    "I have Alpha and Charlie in me",
+                ),
+                (
+                    "I have alpha in me",
+                    "I have ChaRLie in me",
+                    "I have GamMA in me",
+                    "I have ALPha, CHArlie, and GAMma in me",
+                    "I have AlphA and CharlIe in me",
+                ),
+                id="capitalized-pattern",
             ),
+            pytest.param(
+                '"brown fox" " lazy  dogs "',
+                (
+                    "the quick brown fox",
+                    "jumped over the lazy  dogs.",
+                ),
+                (
+                    "the quick Brown fox",
+                    "jumped over the lazy  Dogs.",
+                ),
+                id="quoted-phrases",
+            ),
+        ],
+    )
+    def test_match_any(
+        self,
+        matchable_factory: type[DjangoModelFactory],
+        match_text: str,
+        should_match: tuple[str, ...],
+        no_match: tuple[str, ...],
+    ) -> None:
+        _assert_matches(
+            matchable_factory,
+            match_text,
+            MatchingModel.MATCH_ANY,
+            should_match,
+            no_match,
             case_sensitive=True,
         )
 
-        self._test_matching(
-            'brown fox "lazy dogs"',
-            "MATCH_ALL",
-            (
-                "the quick brown fox jumped over the lazy dogs",
-                "the quick brown fox jumped over the lazy  dogs",
+    @pytest.mark.parametrize(
+        ("match_text", "should_match", "no_match"),
+        [
+            pytest.param(
+                "alpha charlie gamma",
+                ("I have 'alpha charlie gamma' in me",),
+                (
+                    "I have 'Alpha charlie gamma' in me",
+                    "I have 'alpha Charlie gamma' in me",
+                    "I have 'alpha charlie Gamma' in me",
+                    "I have 'Alpha Charlie Gamma' in me",
+                ),
+                id="lowercase-pattern",
             ),
-            (
-                "the quick Brown fox jumped over the lazy dogs",
-                "the quick brown Fox jumped over the lazy  dogs",
-                "the quick brown fox jumped over the Lazy dogs",
-                "the quick brown fox jumped over the lazy  Dogs",
+            pytest.param(
+                "Alpha Charlie Gamma",
+                ("I have 'Alpha Charlie Gamma' in me",),
+                (
+                    "I have 'Alpha charlie gamma' in me",
+                    "I have 'alpha Charlie gamma' in me",
+                    "I have 'alpha charlie Gamma' in me",
+                    "I have 'alpha charlie gamma' in me",
+                ),
+                id="capitalized-pattern",
             ),
+        ],
+    )
+    def test_match_literal(
+        self,
+        matchable_factory: type[DjangoModelFactory],
+        match_text: str,
+        should_match: tuple[str, ...],
+        no_match: tuple[str, ...],
+    ) -> None:
+        _assert_matches(
+            matchable_factory,
+            match_text,
+            MatchingModel.MATCH_LITERAL,
+            should_match,
+            no_match,
             case_sensitive=True,
         )
 
-    def test_match_any(self) -> None:
-        self._test_matching(
-            "alpha charlie gamma",
-            "MATCH_ANY",
-            (
-                "I have alpha in me",
-                "I have charlie in me",
-                "I have gamma in me",
-                "I have alpha, charlie, and gamma in me",
-                "I have alpha and charlie in me",
+    @pytest.mark.parametrize(
+        ("match_text", "should_match", "no_match"),
+        [
+            pytest.param(
+                r"alpha\w+gamma",
+                (
+                    "I have alpha_and_gamma in me",
+                    "I have alphas_and_gamma in me",
+                ),
+                (
+                    "I have Alpha_and_Gamma in me",
+                    "I have alpHAs_and_gaMMa in me",
+                ),
+                id="lowercase-pattern",
             ),
-            (
-                "I have Alpha in me",
-                "I have chaRLie in me",
-                "I have gamMA in me",
-                "I have aLPha, cHArlie, and gAMma in me",
-                "I have AlphA and CharlIe in me",
+            pytest.param(
+                r"Alpha\w+gamma",
+                (
+                    "I have Alpha_and_gamma in me",
+                    "I have Alphas_and_gamma in me",
+                ),
+                (
+                    "I have Alpha_and_Gamma in me",
+                    "I have alphas_and_gamma in me",
+                ),
+                id="capitalized-pattern",
             ),
-            case_sensitive=True,
-        )
-
-        self._test_matching(
-            "Alpha Charlie Gamma",
-            "MATCH_ANY",
-            (
-                "I have Alpha in me",
-                "I have Charlie in me",
-                "I have Gamma in me",
-                "I have Alpha, Charlie, and Gamma in me",
-                "I have Alpha and Charlie in me",
-            ),
-            (
-                "I have alpha in me",
-                "I have ChaRLie in me",
-                "I have GamMA in me",
-                "I have ALPha, CHArlie, and GAMma in me",
-                "I have AlphA and CharlIe in me",
-            ),
-            case_sensitive=True,
-        )
-
-        self._test_matching(
-            '"brown fox" " lazy  dogs "',
-            "MATCH_ANY",
-            (
-                "the quick brown fox",
-                "jumped over the lazy  dogs.",
-            ),
-            (
-                "the quick Brown fox",
-                "jumped over the lazy  Dogs.",
-            ),
-            case_sensitive=True,
-        )
-
-    def test_match_literal(self) -> None:
-        self._test_matching(
-            "alpha charlie gamma",
-            "MATCH_LITERAL",
-            ("I have 'alpha charlie gamma' in me",),
-            (
-                "I have 'Alpha charlie gamma' in me",
-                "I have 'alpha Charlie gamma' in me",
-                "I have 'alpha charlie Gamma' in me",
-                "I have 'Alpha Charlie Gamma' in me",
-            ),
-            case_sensitive=True,
-        )
-
-        self._test_matching(
-            "Alpha Charlie Gamma",
-            "MATCH_LITERAL",
-            ("I have 'Alpha Charlie Gamma' in me",),
-            (
-                "I have 'Alpha charlie gamma' in me",
-                "I have 'alpha Charlie gamma' in me",
-                "I have 'alpha charlie Gamma' in me",
-                "I have 'alpha charlie gamma' in me",
-            ),
-            case_sensitive=True,
-        )
-
-    def test_match_regex(self) -> None:
-        self._test_matching(
-            r"alpha\w+gamma",
-            "MATCH_REGEX",
-            (
-                "I have alpha_and_gamma in me",
-                "I have alphas_and_gamma in me",
-            ),
-            (
-                "I have Alpha_and_Gamma in me",
-                "I have alpHAs_and_gaMMa in me",
-            ),
-            case_sensitive=True,
-        )
-
-        self._test_matching(
-            r"Alpha\w+gamma",
-            "MATCH_REGEX",
-            (
-                "I have Alpha_and_gamma in me",
-                "I have Alphas_and_gamma in me",
-            ),
-            (
-                "I have Alpha_and_Gamma in me",
-                "I have alphas_and_gamma in me",
-            ),
+        ],
+    )
+    def test_match_regex(
+        self,
+        matchable_factory: type[DjangoModelFactory],
+        match_text: str,
+        should_match: tuple[str, ...],
+        no_match: tuple[str, ...],
+    ) -> None:
+        _assert_matches(
+            matchable_factory,
+            match_text,
+            MatchingModel.MATCH_REGEX,
+            should_match,
+            no_match,
             case_sensitive=True,
         )
 
 
-@override_settings(POST_CONSUME_SCRIPT=None)
-class TestDocumentConsumptionFinishedSignal(TestCase):
+@pytest.mark.django_db
+@pytest.mark.usefixtures("_search_index")
+class TestDocumentConsumptionFinishedSignal:
     """
-    We make use of document_consumption_finished, so we should test that it's
-    doing what we expect wrt to tag & correspondent matching.
+    document_consumption_finished should drive tag & correspondent matching.
     """
 
-    def setUp(self) -> None:
-        from documents.search import reset_backend
-
-        TestCase.setUp(self)
-        reset_backend()
-        User.objects.create_user(username="test_consumer", password="12345")
-        self.doc_contains = Document.objects.create(
-            content="I contain the keyword.",
-            mime_type="application/pdf",
-        )
-
-        self.index_dir = Path(tempfile.mkdtemp())
-        # TODO: we should not need the index here.
-        override_settings(INDEX_DIR=self.index_dir).enable()
-
-    def tearDown(self) -> None:
-        from documents.search import reset_backend
-
-        reset_backend()
-        shutil.rmtree(self.index_dir, ignore_errors=True)
-
-    def test_tag_applied_any(self) -> None:
-        t1 = Tag.objects.create(
-            name="test",
+    def test_tag_applied_any(self, doc_with_keyword: Document) -> None:
+        tag = TagFactory.create(
             match="keyword",
-            matching_algorithm=Tag.MATCH_ANY,
+            matching_algorithm=MatchingModel.MATCH_ANY,
         )
+
         document_consumption_finished.send(
             sender=self.__class__,
-            document=self.doc_contains,
+            document=doc_with_keyword,
         )
-        self.assertTrue(list(self.doc_contains.tags.all()) == [t1])
 
-    def test_tag_not_applied(self) -> None:
-        Tag.objects.create(
-            name="test",
+        assert list(doc_with_keyword.tags.all()) == [tag]
+
+    def test_tag_not_applied(self, doc_with_keyword: Document) -> None:
+        TagFactory.create(
             match="no-match",
-            matching_algorithm=Tag.MATCH_ANY,
+            matching_algorithm=MatchingModel.MATCH_ANY,
         )
+
         document_consumption_finished.send(
             sender=self.__class__,
-            document=self.doc_contains,
+            document=doc_with_keyword,
         )
-        self.assertTrue(list(self.doc_contains.tags.all()) == [])
 
-    def test_correspondent_applied(self) -> None:
-        correspondent = Correspondent.objects.create(
-            name="test",
+        assert list(doc_with_keyword.tags.all()) == []
+
+    def test_correspondent_applied(self, doc_with_keyword: Document) -> None:
+        correspondent = CorrespondentFactory.create(
             match="keyword",
-            matching_algorithm=Correspondent.MATCH_ANY,
+            matching_algorithm=MatchingModel.MATCH_ANY,
         )
-        document_consumption_finished.send(
-            sender=self.__class__,
-            document=self.doc_contains,
-        )
-        self.assertTrue(self.doc_contains.correspondent == correspondent)
 
-    def test_correspondent_not_applied(self) -> None:
-        Tag.objects.create(
-            name="test",
-            match="no-match",
-            matching_algorithm=Correspondent.MATCH_ANY,
-        )
         document_consumption_finished.send(
             sender=self.__class__,
-            document=self.doc_contains,
+            document=doc_with_keyword,
         )
-        self.assertEqual(self.doc_contains.correspondent, None)
+
+        assert doc_with_keyword.correspondent == correspondent
+
+    def test_correspondent_not_applied(self, doc_with_keyword: Document) -> None:
+        TagFactory.create(
+            match="no-match",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+        )
+
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=doc_with_keyword,
+        )
+
+        assert doc_with_keyword.correspondent is None
