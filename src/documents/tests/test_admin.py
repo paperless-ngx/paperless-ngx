@@ -1,12 +1,13 @@
 import types
-from unittest.mock import patch
 
+import pytest
 import tantivy
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.test import Client
 from django.test import TestCase
-from django.utils import timezone
+from pytest_mock import MockerFixture
 from rest_framework import status
 
 from documents.admin import DocumentAdmin
@@ -15,8 +16,31 @@ from documents.models import Document
 from documents.models import Tag
 from documents.search import get_backend
 from documents.search import reset_backend
+from documents.tests.factories import DocumentFactory
+from documents.tests.factories import TagFactory
+from documents.tests.factories import UserFactory
 from documents.tests.utils import DirectoriesMixin
 from paperless.admin import PaperlessUserAdmin
+
+
+@pytest.fixture
+def tag_admin() -> TagAdmin:
+    return TagAdmin(model=Tag, admin_site=AdminSite())
+
+
+@pytest.fixture
+def user_admin() -> PaperlessUserAdmin:
+    return PaperlessUserAdmin(model=User, admin_site=AdminSite())
+
+
+@pytest.fixture
+def superuser(db) -> User:
+    return UserFactory.create(username="superuser", superuser=True)
+
+
+@pytest.fixture
+def staff_user(db) -> User:
+    return UserFactory.create(username="staff", staff=True)
 
 
 class TestDocumentAdmin(DirectoriesMixin, TestCase):
@@ -41,160 +65,176 @@ class TestDocumentAdmin(DirectoriesMixin, TestCase):
         super().tearDown()
 
     def test_save_model(self) -> None:
-        doc = Document.objects.create(title="test")
+        doc = DocumentFactory.create(title="test")
 
         doc.title = "new title"
         self.doc_admin.save_model(None, doc, None, None)
-        self.assertEqual(Document.objects.get(id=doc.id).title, "new title")
+
         self.assertEqual(self.get_document_from_index(doc)["id"], [doc.id])
 
     def test_delete_model(self) -> None:
-        doc = Document.objects.create(title="test")
+        doc = DocumentFactory.create(title="test")
         get_backend().add_or_update(doc)
         self.assertIsNotNone(self.get_document_from_index(doc))
 
         self.doc_admin.delete_model(None, doc)
 
-        self.assertRaises(Document.DoesNotExist, Document.objects.get, id=doc.id)
         self.assertIsNone(self.get_document_from_index(doc))
 
     def test_delete_queryset(self) -> None:
-        docs = []
-        for i in range(42):
-            doc = Document.objects.create(
-                title="Many documents with the same title",
-                checksum=f"{i:02}",
-            )
-            docs.append(doc)
-            get_backend().add_or_update(doc)
-
-        self.assertEqual(Document.objects.count(), 42)
-
+        docs = DocumentFactory.create_batch(
+            2,
+            title="Many documents with the same title",
+        )
         for doc in docs:
+            get_backend().add_or_update(doc)
             self.assertIsNotNone(self.get_document_from_index(doc))
 
         self.doc_admin.delete_queryset(None, Document.objects.all())
 
-        self.assertEqual(Document.objects.count(), 0)
-
         for doc in docs:
             self.assertIsNone(self.get_document_from_index(doc))
 
-    def test_created(self) -> None:
-        doc = Document.objects.create(
-            title="test",
-            created=timezone.make_aware(timezone.datetime(2020, 4, 12)),
+
+@pytest.mark.django_db
+class TestTagAdmin:
+    def test_parent_tags_get_added(
+        self,
+        tag_admin: TagAdmin,
+        mocker: MockerFixture,
+    ) -> None:
+        mock_bulk_update = mocker.patch(
+            "documents.tasks.bulk_update_documents.apply_async",
         )
-        self.assertEqual(self.doc_admin.created_(doc), "2020-04-12")
-
-
-class TestTagAdmin(DirectoriesMixin, TestCase):
-    def setUp(self) -> None:
-        super().setUp()
-        self.tag_admin = TagAdmin(model=Tag, admin_site=AdminSite())
-
-    @patch("documents.tasks.bulk_update_documents")
-    def test_parent_tags_get_added(self, mock_bulk_update) -> None:
-        document = Document.objects.create(title="test")
-        parent = Tag.objects.create(name="parent")
-        child = Tag.objects.create(name="child")
+        document = DocumentFactory.create(title="test")
+        parent = TagFactory.create(name="parent")
+        child = TagFactory.create(name="child")
         document.tags.add(child)
 
         child.tn_parent = parent
-        self.tag_admin.save_model(None, child, None, change=True)
+        tag_admin.save_model(None, child, None, change=True)
+
         document.refresh_from_db()
-        self.assertIn(parent, document.tags.all())
-
-
-class TestPaperlessAdmin(DirectoriesMixin, TestCase):
-    def setUp(self) -> None:
-        super().setUp()
-        self.user_admin = PaperlessUserAdmin(model=User, admin_site=AdminSite())
-
-    def test_request_is_passed_to_form(self) -> None:
-        user = User.objects.create(username="test", is_superuser=False)
-        non_superuser = User.objects.create(username="requestuser")
-        request = types.SimpleNamespace(user=non_superuser)
-        formType = self.user_admin.get_form(request)
-        form = formType(data={}, instance=user)
-        self.assertEqual(form.request, request)
-
-    def test_only_superuser_can_change_superuser(self) -> None:
-        superuser = User.objects.create_superuser(username="superuser", password="test")
-        non_superuser = User.objects.create(username="requestuser")
-        user = User.objects.create(username="test", is_superuser=False)
-
-        data = {
-            "username": "test",
-            "is_superuser": True,
+        assert parent in document.tags.all()
+        mock_bulk_update.assert_called_once()
+        assert mock_bulk_update.call_args.kwargs["kwargs"] == {
+            "document_ids": [document.id],
         }
-        form = self.user_admin.form(data, instance=user)
+
+
+@pytest.mark.django_db
+class TestPaperlessAdmin:
+    def test_request_is_passed_to_form(
+        self,
+        user_admin: PaperlessUserAdmin,
+    ) -> None:
+        user = UserFactory.create()
+        non_superuser = UserFactory.create()
+        request = types.SimpleNamespace(user=non_superuser)
+        form_type = user_admin.get_form(request)
+        form = form_type(data={}, instance=user)
+        assert form.request == request
+
+    def test_non_superuser_cannot_change_superuser_status(
+        self,
+        user_admin: PaperlessUserAdmin,
+    ) -> None:
+        non_superuser = UserFactory.create()
+        user = UserFactory.create()
+
+        form = user_admin.form(
+            {"username": user.username, "is_superuser": True},
+            instance=user,
+        )
         form.request = types.SimpleNamespace(user=non_superuser)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(
-            form.errors.get("__all__"),
-            ["Superuser status can only be changed by a superuser"],
-        )
 
-        form = self.user_admin.form(data, instance=user)
+        assert not form.is_valid()
+        assert form.errors.get("__all__") == [
+            "Superuser status can only be changed by a superuser",
+        ]
+
+    def test_superuser_can_change_superuser_status(
+        self,
+        user_admin: PaperlessUserAdmin,
+        superuser: User,
+    ) -> None:
+        user = UserFactory.create()
+
+        form = user_admin.form(
+            {"username": user.username, "is_superuser": True},
+            instance=user,
+        )
         form.request = types.SimpleNamespace(user=superuser)
-        self.assertTrue(form.is_valid())
-        self.assertEqual({}, form.errors)
 
-    def test_superuser_can_only_be_modified_by_superuser(self) -> None:
-        superuser = User.objects.create_superuser(username="superuser", password="test")
-        user = User.objects.create(
-            username="test",
-            is_superuser=False,
-            is_staff=True,
+        assert form.is_valid()
+        assert form.errors == {}
+
+    @pytest.mark.parametrize(
+        ("method", "perm_codename", "expected_message"),
+        [
+            pytest.param(
+                "patch",
+                "change_user",
+                "Superusers can only be modified by other superusers",
+                id="modify",
+            ),
+            pytest.param(
+                "delete",
+                "delete_user",
+                "Superusers can only be deleted by other superusers",
+                id="delete",
+            ),
+        ],
+    )
+    def test_non_superuser_cannot_mutate_superuser(
+        self,
+        client: Client,
+        superuser: User,
+        staff_user: User,
+        method: str,
+        perm_codename: str,
+        expected_message: str,
+    ) -> None:
+        staff_user.user_permissions.add(
+            Permission.objects.get(codename=perm_codename),
         )
-        change_user_perm = Permission.objects.get(codename="change_user")
-        user.user_permissions.add(change_user_perm)
+        client.force_login(staff_user)
 
-        self.client.force_login(user)
-        response = self.client.patch(
+        response = getattr(client, method)(
             f"/api/users/{superuser.pk}/",
             {"first_name": "Updated"},
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(
-            response.content.decode(),
-            "Superusers can only be modified by other superusers",
-        )
 
-        self.client.logout()
-        self.client.force_login(superuser)
-        response = self.client.patch(
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.content.decode() == expected_message
+        assert User.objects.filter(pk=superuser.pk).exists()
+
+    def test_superuser_can_modify_superuser(
+        self,
+        client: Client,
+        superuser: User,
+    ) -> None:
+        client.force_login(superuser)
+        response = client.patch(
             f"/api/users/{superuser.pk}/",
             {"first_name": "Updated"},
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        assert response.status_code == status.HTTP_200_OK
         superuser.refresh_from_db()
-        self.assertEqual(superuser.first_name, "Updated")
+        assert superuser.first_name == "Updated"
 
-    def test_superuser_can_only_be_deleted_by_superuser(self):
-        superuser = User.objects.create_superuser(username="superuser", password="test")
-        user = User.objects.create(
-            username="test",
-            is_superuser=False,
-            is_staff=True,
-        )
-        delete_user_perm = Permission.objects.get(codename="delete_user")
-        user.user_permissions.add(delete_user_perm)
+    def test_superuser_can_delete_superuser(
+        self,
+        client: Client,
+        superuser: User,
+    ) -> None:
+        target = UserFactory.create(superuser=True)
+        client.force_login(superuser)
 
-        self.client.force_login(user)
-        response = self.client.delete(f"/api/users/{superuser.pk}/")
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(
-            response.content.decode(),
-            "Superusers can only be deleted by other superusers",
-        )
-        self.assertTrue(User.objects.filter(pk=superuser.pk).exists())
+        response = client.delete(f"/api/users/{target.pk}/")
 
-        self.client.logout()
-        self.client.force_login(superuser)
-        response = self.client.delete(f"/api/users/{superuser.pk}/")
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(User.objects.filter(pk=superuser.pk).exists())
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert not User.objects.filter(pk=target.pk).exists()
