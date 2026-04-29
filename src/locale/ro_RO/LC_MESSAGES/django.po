@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 17:41+0000\n"
-"PO-Revision-Date: 2025-12-12 17:44\n"
+"POT-Creation-Date: 2026-04-28 17:07+0000\n"
+"PO-Revision-Date: 2026-04-28 17:09\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -21,1250 +21,1396 @@ msgstr ""
 msgid "Documents"
 msgstr "Documente"
 
-#: documents/filters.py:395
+#: documents/filters.py:463
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "Valoarea trebuie să fie validă JSON."
 
-#: documents/filters.py:414
+#: documents/filters.py:482
 msgid "Invalid custom field query expression"
-msgstr ""
+msgstr "Expresie de interogare pentru câmp personalizat nevalidă"
 
-#: documents/filters.py:424
+#: documents/filters.py:492
 msgid "Invalid expression list. Must be nonempty."
-msgstr ""
+msgstr "Listă de expresii nevalidă. Trebuie să nu fie goală."
 
-#: documents/filters.py:445
+#: documents/filters.py:513
 msgid "Invalid logical operator {op!r}"
-msgstr ""
+msgstr "Operator logic nevalid {op!r}"
 
-#: documents/filters.py:459
+#: documents/filters.py:527
 msgid "Maximum number of query conditions exceeded."
-msgstr ""
+msgstr "Numărul maxim de condiții de interogare a fost depășit."
 
-#: documents/filters.py:524
+#: documents/filters.py:591
 msgid "{name!r} is not a valid custom field."
-msgstr ""
+msgstr "{name!r} nu este un câmp personalizat valid."
 
-#: documents/filters.py:561
+#: documents/filters.py:628
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr ""
+msgstr "{data_type} nu acceptă interogare expr {expr!r}."
 
-#: documents/filters.py:669 documents/models.py:135
+#: documents/filters.py:743 documents/models.py:136
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "Adâncimea maximă depășită."
 
-#: documents/filters.py:854
+#: documents/filters.py:990
 msgid "Custom field not found"
-msgstr ""
+msgstr "Câmpul personalizat nu a fost găsit"
 
-#: documents/models.py:38 documents/models.py:768
+#: documents/models.py:39 documents/models.py:916 documents/models.py:964
 msgid "owner"
 msgstr "proprietar"
 
-#: documents/models.py:55 documents/models.py:983
+#: documents/models.py:56 documents/models.py:1246
 msgid "None"
 msgstr "Nimic"
 
-#: documents/models.py:56 documents/models.py:984
+#: documents/models.py:57 documents/models.py:1247
 msgid "Any word"
 msgstr "Orice cuvânt"
 
-#: documents/models.py:57 documents/models.py:985
+#: documents/models.py:58 documents/models.py:1248
 msgid "All words"
 msgstr "Toate cuvintele"
 
-#: documents/models.py:58 documents/models.py:986
+#: documents/models.py:59 documents/models.py:1249
 msgid "Exact match"
 msgstr "Potrivire exactă"
 
-#: documents/models.py:59 documents/models.py:987
+#: documents/models.py:60 documents/models.py:1250
 msgid "Regular expression"
 msgstr "Expresie regulată"
 
-#: documents/models.py:60 documents/models.py:988
+#: documents/models.py:61 documents/models.py:1251
 msgid "Fuzzy word"
 msgstr "Cuvânt neclar"
 
-#: documents/models.py:61
+#: documents/models.py:62
 msgid "Automatic"
-msgstr ""
+msgstr "Automat"
 
-#: documents/models.py:64 documents/models.py:456 documents/models.py:1526
+#: documents/models.py:65 documents/models.py:538 documents/models.py:1829
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
 msgstr "nume"
 
-#: documents/models.py:66 documents/models.py:1052
+#: documents/models.py:67 documents/models.py:1315
 msgid "match"
 msgstr "potrivire"
 
-#: documents/models.py:69 documents/models.py:1055
+#: documents/models.py:70 documents/models.py:1318
 msgid "matching algorithm"
 msgstr "algoritm de potrivire"
 
-#: documents/models.py:74 documents/models.py:1060
+#: documents/models.py:75 documents/models.py:1323
 msgid "is insensitive"
 msgstr "nu ține cont de majuscule"
 
-#: documents/models.py:97 documents/models.py:170
+#: documents/models.py:98 documents/models.py:166
 msgid "correspondent"
 msgstr "corespondent"
 
-#: documents/models.py:98
+#: documents/models.py:99
 msgid "correspondents"
 msgstr "corespondenți"
 
-#: documents/models.py:102
+#: documents/models.py:103
 msgid "color"
 msgstr "culoare"
 
-#: documents/models.py:107
+#: documents/models.py:108
 msgid "is inbox tag"
 msgstr "este etichetă inbox"
 
-#: documents/models.py:110
+#: documents/models.py:111
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
 msgstr "Marchează aceasta eticheta ca etichetă inbox: Toate documentele nou consumate primesc aceasta eticheta."
 
-#: documents/models.py:116
+#: documents/models.py:117
 msgid "tag"
 msgstr "etichetă"
 
-#: documents/models.py:117 documents/models.py:208
+#: documents/models.py:118 documents/models.py:213
 msgid "tags"
 msgstr "etichete"
 
-#: documents/models.py:123
+#: documents/models.py:124
 msgid "Cannot set itself as parent."
 msgstr "Nu se poate seta ca părinte."
 
-#: documents/models.py:125
+#: documents/models.py:126
 msgid "Cannot set parent to a descendant."
-msgstr ""
+msgstr "Nu se poate seta părintele la un descendent."
 
-#: documents/models.py:142 documents/models.py:190
+#: documents/models.py:143 documents/models.py:186
 msgid "document type"
 msgstr "tip de document"
 
-#: documents/models.py:143
+#: documents/models.py:144
 msgid "document types"
 msgstr "tipuri de document"
 
-#: documents/models.py:148
+#: documents/models.py:149
 msgid "path"
 msgstr "cale"
 
-#: documents/models.py:152 documents/models.py:179
+#: documents/models.py:153 documents/models.py:175
 msgid "storage path"
 msgstr "cale de stocare"
 
-#: documents/models.py:153
+#: documents/models.py:154
 msgid "storage paths"
 msgstr "căi de stocare"
 
-#: documents/models.py:160
-msgid "Unencrypted"
-msgstr "Necriptat"
-
-#: documents/models.py:161
-msgid "Encrypted with GNU Privacy Guard"
-msgstr "Criptat cu GNU Privacy Guard"
-
-#: documents/models.py:182
+#: documents/models.py:178
 msgid "title"
 msgstr "titlu"
 
-#: documents/models.py:194 documents/models.py:682
+#: documents/models.py:190 documents/models.py:830
 msgid "content"
 msgstr "conținut"
 
-#: documents/models.py:197
+#: documents/models.py:193
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
 msgstr "Textul brut al documentului. Acest camp este folosit in principal pentru căutare."
 
-#: documents/models.py:202
+#: documents/models.py:207
 msgid "mime type"
 msgstr "tip MIME"
 
-#: documents/models.py:212
+#: documents/models.py:217
 msgid "checksum"
 msgstr "sumă de control"
 
-#: documents/models.py:216
+#: documents/models.py:220
 msgid "The checksum of the original document."
 msgstr "Suma de control a documentului original."
 
-#: documents/models.py:220
+#: documents/models.py:224
 msgid "archive checksum"
 msgstr "suma de control a arhivei"
 
-#: documents/models.py:225
+#: documents/models.py:229
 msgid "The checksum of the archived document."
 msgstr "Suma de control a documentului arhivat."
 
-#: documents/models.py:229
+#: documents/models.py:233
 msgid "page count"
-msgstr ""
+msgstr "număr de pagini"
 
-#: documents/models.py:236
+#: documents/models.py:240
 msgid "The number of pages of the document."
-msgstr ""
+msgstr "Numărul de pagini ale documentului."
 
-#: documents/models.py:241 documents/models.py:688 documents/models.py:726
-#: documents/models.py:798 documents/models.py:857
+#: documents/models.py:245 documents/models.py:836 documents/models.py:874
+#: documents/models.py:936 documents/models.py:1054 documents/models.py:1113
 msgid "created"
 msgstr "creat"
 
-#: documents/models.py:247
+#: documents/models.py:251
 msgid "modified"
 msgstr "modificat"
 
-#: documents/models.py:254
-msgid "storage type"
-msgstr "tip de stocare"
-
-#: documents/models.py:262
+#: documents/models.py:258
 msgid "added"
 msgstr "adăugat"
 
-#: documents/models.py:269
+#: documents/models.py:265
 msgid "filename"
 msgstr "nume fișier"
 
-#: documents/models.py:275
+#: documents/models.py:271
 msgid "Current filename in storage"
 msgstr "Numele curent al fișierului stocat"
 
-#: documents/models.py:279
+#: documents/models.py:275
 msgid "archive filename"
 msgstr "nume fișier arhiva"
 
-#: documents/models.py:285
+#: documents/models.py:281
 msgid "Current archive filename in storage"
 msgstr "Numele curent al arhivei stocate"
 
-#: documents/models.py:289
+#: documents/models.py:285
 msgid "original filename"
 msgstr "numele original al fișierului"
 
-#: documents/models.py:295
+#: documents/models.py:291
 msgid "The original name of the file when it was uploaded"
 msgstr "Numele original al fișierului când a fost încărcat"
 
-#: documents/models.py:302
+#: documents/models.py:298
 msgid "archive serial number"
 msgstr "număr serial in arhiva"
 
-#: documents/models.py:312
+#: documents/models.py:308
 msgid "The position of this document in your physical document archive."
 msgstr "Poziția acestui document in arhiva fizica."
 
-#: documents/models.py:318 documents/models.py:699 documents/models.py:753
-#: documents/models.py:1569
+#: documents/models.py:318
+msgid "root document for this version"
+msgstr ""
+
+#: documents/models.py:322
+msgid "version index"
+msgstr ""
+
+#: documents/models.py:326
+msgid "Index of this version within the root document."
+msgstr ""
+
+#: documents/models.py:330
+msgid "version label"
+msgstr ""
+
+#: documents/models.py:334
+msgid "Optional short label for a document version."
+msgstr ""
+
+#: documents/models.py:339 documents/models.py:847 documents/models.py:901
+#: documents/models.py:1872
 msgid "document"
 msgstr "document"
 
-#: documents/models.py:319
+#: documents/models.py:340 documents/models.py:1007
 msgid "documents"
 msgstr "documente"
 
-#: documents/models.py:437
+#: documents/models.py:519
 msgid "Table"
-msgstr ""
+msgstr "Tabel"
 
-#: documents/models.py:438
+#: documents/models.py:520
 msgid "Small Cards"
-msgstr ""
+msgstr "Carduri Mici"
 
-#: documents/models.py:439
+#: documents/models.py:521
 msgid "Large Cards"
-msgstr ""
+msgstr "Carduri mari"
 
-#: documents/models.py:442
+#: documents/models.py:524
 msgid "Title"
-msgstr ""
+msgstr "Titlu"
 
-#: documents/models.py:443 documents/models.py:1004
+#: documents/models.py:525 documents/models.py:746 documents/models.py:1267
 msgid "Created"
-msgstr ""
+msgstr "Creat"
 
-#: documents/models.py:444 documents/models.py:1003
+#: documents/models.py:526 documents/models.py:1266
 msgid "Added"
-msgstr ""
+msgstr "Adăugat"
 
-#: documents/models.py:445
+#: documents/models.py:527
 msgid "Tags"
-msgstr ""
+msgstr "Etichete"
 
-#: documents/models.py:446
+#: documents/models.py:528
 msgid "Correspondent"
-msgstr ""
+msgstr "Corespondent"
 
-#: documents/models.py:447
+#: documents/models.py:529
 msgid "Document Type"
-msgstr ""
+msgstr "Tipul de document"
 
-#: documents/models.py:448
+#: documents/models.py:530
 msgid "Storage Path"
-msgstr ""
+msgstr "Cale de stocare"
 
-#: documents/models.py:449
+#: documents/models.py:531
 msgid "Note"
-msgstr ""
+msgstr "Notă"
 
-#: documents/models.py:450
+#: documents/models.py:532
 msgid "Owner"
-msgstr ""
+msgstr "Proprietar"
 
-#: documents/models.py:451
+#: documents/models.py:533
 msgid "Shared"
-msgstr ""
+msgstr "Distribuit"
 
-#: documents/models.py:452
+#: documents/models.py:534
 msgid "ASN"
-msgstr ""
+msgstr "ASN"
 
-#: documents/models.py:453
+#: documents/models.py:535
 msgid "Pages"
-msgstr ""
+msgstr "Pagini"
 
-#: documents/models.py:459
-msgid "show on dashboard"
-msgstr "afișează pe tabloul de bord"
-
-#: documents/models.py:462
-msgid "show in sidebar"
-msgstr "afișează in bara laterala"
-
-#: documents/models.py:466
+#: documents/models.py:541
 msgid "sort field"
 msgstr "sortează camp"
 
-#: documents/models.py:471
+#: documents/models.py:546
 msgid "sort reverse"
 msgstr "sortează invers"
 
-#: documents/models.py:474
+#: documents/models.py:549
 msgid "View page size"
-msgstr ""
+msgstr "Vezi dimensiunea paginii"
 
-#: documents/models.py:482
+#: documents/models.py:557
 msgid "View display mode"
-msgstr ""
+msgstr "Vezi modul de afişare"
 
-#: documents/models.py:489
+#: documents/models.py:564
 msgid "Document display fields"
-msgstr ""
+msgstr "Afișare câmpuri document"
 
-#: documents/models.py:496 documents/models.py:559
+#: documents/models.py:571 documents/models.py:636
 msgid "saved view"
 msgstr "vizualizare"
 
-#: documents/models.py:497
+#: documents/models.py:572
 msgid "saved views"
 msgstr "vizualizări"
 
-#: documents/models.py:505
+#: documents/models.py:580
 msgid "title contains"
 msgstr "titlul conține"
 
-#: documents/models.py:506
+#: documents/models.py:581
 msgid "content contains"
 msgstr "conținutul conține"
 
-#: documents/models.py:507
+#: documents/models.py:582
 msgid "ASN is"
 msgstr "Avizul prealabil de expediție este"
 
-#: documents/models.py:508
+#: documents/models.py:583
 msgid "correspondent is"
 msgstr "corespondentul este"
 
-#: documents/models.py:509
+#: documents/models.py:584
 msgid "document type is"
 msgstr "tipul documentului este"
 
-#: documents/models.py:510
+#: documents/models.py:585
 msgid "is in inbox"
 msgstr "este în inbox"
 
-#: documents/models.py:511
+#: documents/models.py:586
 msgid "has tag"
 msgstr "are eticheta"
 
-#: documents/models.py:512
+#: documents/models.py:587
 msgid "has any tag"
 msgstr "are orice eticheta"
 
-#: documents/models.py:513
+#: documents/models.py:588
 msgid "created before"
 msgstr "creat înainte de"
 
-#: documents/models.py:514
+#: documents/models.py:589
 msgid "created after"
 msgstr "creat după"
 
-#: documents/models.py:515
+#: documents/models.py:590
 msgid "created year is"
 msgstr "anul creării este"
 
-#: documents/models.py:516
+#: documents/models.py:591
 msgid "created month is"
 msgstr "luna creării este"
 
-#: documents/models.py:517
+#: documents/models.py:592
 msgid "created day is"
 msgstr "ziua creării este"
 
-#: documents/models.py:518
+#: documents/models.py:593
 msgid "added before"
 msgstr "adăugat înainte de"
 
-#: documents/models.py:519
+#: documents/models.py:594
 msgid "added after"
 msgstr "adăugat după"
 
-#: documents/models.py:520
+#: documents/models.py:595
 msgid "modified before"
 msgstr "modificat înainte de"
 
-#: documents/models.py:521
+#: documents/models.py:596
 msgid "modified after"
 msgstr "modificat după"
 
-#: documents/models.py:522
+#: documents/models.py:597
 msgid "does not have tag"
 msgstr "nu are etichetă"
 
-#: documents/models.py:523
+#: documents/models.py:598
 msgid "does not have ASN"
 msgstr "nu are aviz prealabil de expediție"
 
-#: documents/models.py:524
+#: documents/models.py:599
 msgid "title or content contains"
 msgstr "titlul sau conținutul conține"
 
-#: documents/models.py:525
+#: documents/models.py:600
 msgid "fulltext query"
 msgstr "query fulltext"
 
-#: documents/models.py:526
+#: documents/models.py:601
 msgid "more like this"
 msgstr "mai multe ca aceasta"
 
-#: documents/models.py:527
+#: documents/models.py:602
 msgid "has tags in"
 msgstr "are etichete în"
 
-#: documents/models.py:528
+#: documents/models.py:603
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN mai mare decât"
 
-#: documents/models.py:529
+#: documents/models.py:604
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN mai mic decât"
 
-#: documents/models.py:530
+#: documents/models.py:605
 msgid "storage path is"
 msgstr "calea de stocare este"
 
-#: documents/models.py:531
+#: documents/models.py:606
 msgid "has correspondent in"
 msgstr "are corespondent în"
 
-#: documents/models.py:532
+#: documents/models.py:607
 msgid "does not have correspondent in"
 msgstr "nu are corespondent în"
 
-#: documents/models.py:533
+#: documents/models.py:608
 msgid "has document type in"
 msgstr "are tip de document în"
 
-#: documents/models.py:534
+#: documents/models.py:609
 msgid "does not have document type in"
 msgstr "nu are tip document în"
 
-#: documents/models.py:535
+#: documents/models.py:610
 msgid "has storage path in"
 msgstr "are cale de stocare în"
 
-#: documents/models.py:536
+#: documents/models.py:611
 msgid "does not have storage path in"
 msgstr "nu are cale de stocare în"
 
-#: documents/models.py:537
+#: documents/models.py:612
 msgid "owner is"
 msgstr "proprietarul este"
 
-#: documents/models.py:538
+#: documents/models.py:613
 msgid "has owner in"
 msgstr "are proprietar în"
 
-#: documents/models.py:539
+#: documents/models.py:614
 msgid "does not have owner"
 msgstr "nu are proprietar"
 
-#: documents/models.py:540
+#: documents/models.py:615
 msgid "does not have owner in"
 msgstr "nu are proprietar în"
 
-#: documents/models.py:541
+#: documents/models.py:616
 msgid "has custom field value"
-msgstr ""
+msgstr "are valoare câmp personalizat"
 
-#: documents/models.py:542
+#: documents/models.py:617
 msgid "is shared by me"
-msgstr ""
+msgstr "este partajat de mine"
 
-#: documents/models.py:543
+#: documents/models.py:618
 msgid "has custom fields"
-msgstr ""
+msgstr "are câmpuri personalizate"
 
-#: documents/models.py:544
+#: documents/models.py:619
 msgid "has custom field in"
-msgstr ""
+msgstr "are câmp personalizat în"
 
-#: documents/models.py:545
+#: documents/models.py:620
 msgid "does not have custom field in"
-msgstr ""
+msgstr "nu are câmp personalizat în"
 
-#: documents/models.py:546
+#: documents/models.py:621
 msgid "does not have custom field"
-msgstr ""
+msgstr "nu are câmp personalizat"
 
-#: documents/models.py:547
+#: documents/models.py:622
 msgid "custom fields query"
-msgstr ""
+msgstr "interogare câmpuri personalizate"
 
-#: documents/models.py:548
+#: documents/models.py:623
 msgid "created to"
-msgstr ""
+msgstr "creat pentru"
 
-#: documents/models.py:549
+#: documents/models.py:624
 msgid "created from"
-msgstr ""
+msgstr "creat din"
 
-#: documents/models.py:550
+#: documents/models.py:625
 msgid "added to"
-msgstr ""
+msgstr "adăugat în"
 
-#: documents/models.py:551
+#: documents/models.py:626
 msgid "added from"
-msgstr ""
+msgstr "adăugat din"
 
-#: documents/models.py:552
+#: documents/models.py:627
 msgid "mime type is"
+msgstr "tipul mime este"
+
+#: documents/models.py:628
+msgid "simple title search"
 msgstr ""
 
-#: documents/models.py:562
+#: documents/models.py:629
+msgid "simple text search"
+msgstr ""
+
+#: documents/models.py:639
 msgid "rule type"
 msgstr "tip de regula"
 
-#: documents/models.py:564
+#: documents/models.py:641
 msgid "value"
 msgstr "valoare"
 
-#: documents/models.py:567
+#: documents/models.py:644
 msgid "filter rule"
 msgstr "regulă de filtrare"
 
-#: documents/models.py:568
+#: documents/models.py:645
 msgid "filter rules"
 msgstr "reguli de filtrare"
 
-#: documents/models.py:592
-msgid "Auto Task"
+#: documents/models.py:675 documents/models.py:930
+msgid "Pending"
 msgstr ""
 
-#: documents/models.py:593
-msgid "Scheduled Task"
+#: documents/models.py:676 documents/models.py:753
+msgid "Started"
 msgstr ""
 
-#: documents/models.py:594
-msgid "Manual Task"
+#: documents/models.py:677
+msgid "Success"
 msgstr ""
 
-#: documents/models.py:597
+#: documents/models.py:678
+msgid "Failure"
+msgstr ""
+
+#: documents/models.py:679
+msgid "Revoked"
+msgstr ""
+
+#: documents/models.py:682
 msgid "Consume File"
-msgstr ""
+msgstr "Consumați fișierul"
 
-#: documents/models.py:598
+#: documents/models.py:683
 msgid "Train Classifier"
+msgstr "Clasificator tren"
+
+#: documents/models.py:684
+msgid "Sanity Check"
 msgstr ""
 
-#: documents/models.py:599
-msgid "Check Sanity"
-msgstr ""
-
-#: documents/models.py:600
+#: documents/models.py:685
 msgid "Index Optimize"
+msgstr "Optimizare Index"
+
+#: documents/models.py:686 documents/models.py:1262
+msgid "Mail Fetch"
+msgstr "Preluare email"
+
+#: documents/models.py:687
+msgid "LLM Index"
 msgstr ""
 
-#: documents/models.py:605
+#: documents/models.py:688
+msgid "Empty Trash"
+msgstr ""
+
+#: documents/models.py:689
+msgid "Check Workflows"
+msgstr ""
+
+#: documents/models.py:690
+msgid "Bulk Update"
+msgstr ""
+
+#: documents/models.py:691
+msgid "Reprocess Document"
+msgstr ""
+
+#: documents/models.py:692
+msgid "Build Share Link"
+msgstr ""
+
+#: documents/models.py:693
+msgid "Bulk Delete"
+msgstr ""
+
+#: documents/models.py:702 documents/models.py:1257
+msgid "Scheduled"
+msgstr "Programat"
+
+#: documents/models.py:703 documents/models.py:1263
+msgid "Web UI"
+msgstr "UI Web"
+
+#: documents/models.py:704
+msgid "API Upload"
+msgstr ""
+
+#: documents/models.py:705
+msgid "Folder Consume"
+msgstr ""
+
+#: documents/models.py:706
+msgid "Email Consume"
+msgstr ""
+
+#: documents/models.py:707
+msgid "System"
+msgstr ""
+
+#: documents/models.py:708
+msgid "Manual"
+msgstr ""
+
+#: documents/models.py:714
 msgid "Task ID"
 msgstr "ID Sarcină"
 
-#: documents/models.py:606
-msgid "Celery ID for the Task that was run"
-msgstr "ID-ul sarcinii Celery care a fost rulată"
-
-#: documents/models.py:611
-msgid "Acknowledged"
-msgstr "Confirmat"
-
-#: documents/models.py:612
-msgid "If the task is acknowledged via the frontend or API"
-msgstr "Dacă sarcina este confirmată prin frontend sau API"
-
-#: documents/models.py:618
-msgid "Task Filename"
-msgstr "Numele fișierului sarcină"
-
-#: documents/models.py:619
-msgid "Name of the file which the Task was run for"
-msgstr "Numele fișierului pentru care sarcina a fost executată"
-
-#: documents/models.py:626
-msgid "Task Name"
-msgstr "Nume sarcină"
-
-#: documents/models.py:627
-msgid "Name of the task that was run"
+#: documents/models.py:715
+msgid "Celery task ID"
 msgstr ""
 
-#: documents/models.py:634
-msgid "Task State"
-msgstr "Stare sarcină"
+#: documents/models.py:721
+msgid "Task Type"
+msgstr "Tip de sarcină"
 
-#: documents/models.py:635
-msgid "Current state of the task being run"
-msgstr "Stadiul actual al sarcinii în curs de desfășurare"
-
-#: documents/models.py:641
-msgid "Created DateTime"
-msgstr "Data creării"
-
-#: documents/models.py:642
-msgid "Datetime field when the task result was created in UTC"
+#: documents/models.py:722
+msgid "The kind of work being performed"
 msgstr ""
 
-#: documents/models.py:648
-msgid "Started DateTime"
-msgstr "Data începerii"
-
-#: documents/models.py:649
-msgid "Datetime field when the task was started in UTC"
+#: documents/models.py:729
+msgid "Trigger Source"
 msgstr ""
 
-#: documents/models.py:655
-msgid "Completed DateTime"
-msgstr "Data finalizării"
-
-#: documents/models.py:656
-msgid "Datetime field when the task was completed in UTC"
+#: documents/models.py:730
+msgid "What initiated this task"
 msgstr ""
 
-#: documents/models.py:662
+#: documents/models.py:739
+msgid "Status"
+msgstr ""
+
+#: documents/models.py:759
+msgid "Completed"
+msgstr ""
+
+#: documents/models.py:767
+msgid "Duration (seconds)"
+msgstr ""
+
+#: documents/models.py:768
+msgid "Elapsed time from start to completion"
+msgstr ""
+
+#: documents/models.py:774
+msgid "Wait Time (seconds)"
+msgstr ""
+
+#: documents/models.py:775
+msgid "Time from task creation to worker pickup"
+msgstr ""
+
+#: documents/models.py:782
+msgid "Input Data"
+msgstr ""
+
+#: documents/models.py:783
+msgid "Structured input parameters for the task"
+msgstr ""
+
+#: documents/models.py:789
 msgid "Result Data"
 msgstr "Datele rezultatului"
 
-#: documents/models.py:664
-msgid "The data returned by the task"
-msgstr "Datele returnate de sarcină"
-
-#: documents/models.py:672
-msgid "Task Type"
+#: documents/models.py:790
+msgid "Structured result data from task execution"
 msgstr ""
 
-#: documents/models.py:673
-msgid "The type of task that was run"
+#: documents/models.py:796
+msgid "Acknowledged"
+msgstr "Confirmat"
+
+#: documents/models.py:801
+msgid "Task"
 msgstr ""
 
-#: documents/models.py:684
+#: documents/models.py:802
+msgid "Tasks"
+msgstr ""
+
+#: documents/models.py:832
 msgid "Note for the document"
 msgstr "Notă pentru document"
 
-#: documents/models.py:708
+#: documents/models.py:856
 msgid "user"
 msgstr "utilizator"
 
-#: documents/models.py:713
+#: documents/models.py:861
 msgid "note"
 msgstr "notă"
 
-#: documents/models.py:714
+#: documents/models.py:862
 msgid "notes"
 msgstr "note"
 
-#: documents/models.py:722
+#: documents/models.py:870
 msgid "Archive"
 msgstr "Arhivă"
 
-#: documents/models.py:723
+#: documents/models.py:871
 msgid "Original"
 msgstr "Original"
 
-#: documents/models.py:734 paperless_mail/models.py:75
+#: documents/models.py:882 documents/models.py:944 paperless_mail/models.py:75
 msgid "expiration"
 msgstr "expirare"
 
-#: documents/models.py:741
+#: documents/models.py:889 documents/models.py:951
 msgid "slug"
-msgstr ""
+msgstr "nume scurt"
 
-#: documents/models.py:773
+#: documents/models.py:921
 msgid "share link"
 msgstr "link de partajare"
 
-#: documents/models.py:774
+#: documents/models.py:922
 msgid "share links"
 msgstr "link-uri de partajare"
 
-#: documents/models.py:786
-msgid "String"
-msgstr "Şir de caractere"
-
-#: documents/models.py:787
-msgid "URL"
-msgstr "Adresă URL"
-
-#: documents/models.py:788
-msgid "Date"
-msgstr "Dată"
-
-#: documents/models.py:789
-msgid "Boolean"
-msgstr "Boolean"
-
-#: documents/models.py:790
-msgid "Integer"
-msgstr "Număr întreg"
-
-#: documents/models.py:791
-msgid "Float"
-msgstr "Număr zecimal"
-
-#: documents/models.py:792
-msgid "Monetary"
+#: documents/models.py:931
+msgid "Processing"
 msgstr ""
 
-#: documents/models.py:793
-msgid "Document Link"
-msgstr "Link document"
-
-#: documents/models.py:794
-msgid "Select"
+#: documents/models.py:932
+msgid "Ready"
 msgstr ""
 
-#: documents/models.py:795
-msgid "Long Text"
+#: documents/models.py:933
+msgid "Failed"
 msgstr ""
 
-#: documents/models.py:807
-msgid "data type"
-msgstr "tip date"
-
-#: documents/models.py:814
-msgid "extra data"
+#: documents/models.py:980
+msgid "size (bytes)"
 msgstr ""
 
-#: documents/models.py:818
-msgid "Extra data for the custom field, such as select options"
-msgstr ""
-
-#: documents/models.py:824
-msgid "custom field"
-msgstr ""
-
-#: documents/models.py:825
-msgid "custom fields"
-msgstr ""
-
-#: documents/models.py:925
-msgid "custom field instance"
-msgstr ""
-
-#: documents/models.py:926
-msgid "custom field instances"
-msgstr ""
-
-#: documents/models.py:991
-msgid "Consumption Started"
-msgstr ""
-
-#: documents/models.py:992
-msgid "Document Added"
+#: documents/models.py:986
+msgid "last error"
 msgstr ""
 
 #: documents/models.py:993
-msgid "Document Updated"
-msgstr ""
-
-#: documents/models.py:994
-msgid "Scheduled"
-msgstr ""
-
-#: documents/models.py:997
-msgid "Consume Folder"
-msgstr ""
-
-#: documents/models.py:998
-msgid "Api Upload"
+msgid "file path"
 msgstr ""
 
 #: documents/models.py:999
-msgid "Mail Fetch"
+msgid "built at"
 msgstr ""
 
-#: documents/models.py:1000
-msgid "Web UI"
+#: documents/models.py:1012
+msgid "share link bundle"
 msgstr ""
 
-#: documents/models.py:1005
+#: documents/models.py:1013
+msgid "share link bundles"
+msgstr ""
+
+#: documents/models.py:1016
+#, python-format
+msgid "Share link bundle %(slug)s"
+msgstr ""
+
+#: documents/models.py:1042
+msgid "String"
+msgstr "Şir de caractere"
+
+#: documents/models.py:1043
+msgid "URL"
+msgstr "Adresă URL"
+
+#: documents/models.py:1044
+msgid "Date"
+msgstr "Dată"
+
+#: documents/models.py:1045
+msgid "Boolean"
+msgstr "Boolean"
+
+#: documents/models.py:1046
+msgid "Integer"
+msgstr "Număr întreg"
+
+#: documents/models.py:1047
+msgid "Float"
+msgstr "Număr zecimal"
+
+#: documents/models.py:1048
+msgid "Monetary"
+msgstr "Monetară"
+
+#: documents/models.py:1049
+msgid "Document Link"
+msgstr "Link document"
+
+#: documents/models.py:1050
+msgid "Select"
+msgstr "Selectează"
+
+#: documents/models.py:1051
+msgid "Long Text"
+msgstr "Text Lung"
+
+#: documents/models.py:1063
+msgid "data type"
+msgstr "tip date"
+
+#: documents/models.py:1070
+msgid "extra data"
+msgstr "date extra"
+
+#: documents/models.py:1074
+msgid "Extra data for the custom field, such as select options"
+msgstr "Date suplimentare pentru câmpul personalizat, cum ar fi opţiunile selectate"
+
+#: documents/models.py:1080
+msgid "custom field"
+msgstr "câmp personalizat"
+
+#: documents/models.py:1081
+msgid "custom fields"
+msgstr "câmpuri personalizate"
+
+#: documents/models.py:1181
+msgid "custom field instance"
+msgstr "instanță câmp personalizat"
+
+#: documents/models.py:1182
+msgid "custom field instances"
+msgstr "instanțe câmpuri personalizate"
+
+#: documents/models.py:1254
+msgid "Consumption Started"
+msgstr "Consumul a început"
+
+#: documents/models.py:1255
+msgid "Document Added"
+msgstr "Document Adăugat"
+
+#: documents/models.py:1256
+msgid "Document Updated"
+msgstr "Document Actualizat"
+
+#: documents/models.py:1260
+msgid "Consume Folder"
+msgstr "Consumați Dosarul"
+
+#: documents/models.py:1261
+msgid "Api Upload"
+msgstr "Încărcare Api"
+
+#: documents/models.py:1268
 msgid "Modified"
-msgstr ""
+msgstr "Modificat"
 
-#: documents/models.py:1006
+#: documents/models.py:1269
 msgid "Custom Field"
-msgstr ""
+msgstr "Câmp Personalizat"
 
-#: documents/models.py:1009
+#: documents/models.py:1272
 msgid "Workflow Trigger Type"
-msgstr ""
+msgstr "Tipul de declanșator flux de lucru"
 
-#: documents/models.py:1021
+#: documents/models.py:1284
 msgid "filter path"
-msgstr ""
+msgstr "cale de filtrare"
 
-#: documents/models.py:1026
+#: documents/models.py:1289
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "Se vor procesa doar documentele cu o cale care corespunde acesteia, dacă este specificată. Sunt permise metacaracterele *. Nu se face distincție între majuscule și minuscule."
 
-#: documents/models.py:1033
+#: documents/models.py:1296
 msgid "filter filename"
-msgstr ""
+msgstr "filtru nume fișier"
 
-#: documents/models.py:1038 paperless_mail/models.py:200
+#: documents/models.py:1301 paperless_mail/models.py:200
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "Consumă doar documentele care se potrivesc în întregime cu acest nume de fișier, dacă este specificat. Simbolul * ține locul oricărui șir de caractere. Majusculele nu contează."
 
-#: documents/models.py:1049
+#: documents/models.py:1312
 msgid "filter documents from this mail rule"
-msgstr ""
+msgstr "filtrează documentele din această regulă de mail"
 
-#: documents/models.py:1065
+#: documents/models.py:1328
 msgid "has these tag(s)"
-msgstr ""
+msgstr "are aceste etichete(ă)"
 
-#: documents/models.py:1072
+#: documents/models.py:1335
 msgid "has all of these tag(s)"
-msgstr ""
+msgstr "are toate aceste etichete(ă)"
 
-#: documents/models.py:1079
+#: documents/models.py:1342
 msgid "does not have these tag(s)"
-msgstr ""
+msgstr "nu are aceste etichete(ă)"
 
-#: documents/models.py:1087
+#: documents/models.py:1350
 msgid "has this document type"
+msgstr "are acest tip document"
+
+#: documents/models.py:1357
+msgid "has one of these document types"
 msgstr ""
 
-#: documents/models.py:1094
+#: documents/models.py:1364
 msgid "does not have these document type(s)"
-msgstr ""
+msgstr "nu are aceste tip(uri) de documente"
 
-#: documents/models.py:1102
+#: documents/models.py:1372
 msgid "has this correspondent"
-msgstr ""
+msgstr "are acest corespondent"
 
-#: documents/models.py:1109
+#: documents/models.py:1379
 msgid "does not have these correspondent(s)"
+msgstr "nu are acești corespondent(ți)"
+
+#: documents/models.py:1386
+msgid "has one of these correspondents"
 msgstr ""
 
-#: documents/models.py:1117
+#: documents/models.py:1394
 msgid "has this storage path"
+msgstr "are această cale de stocare"
+
+#: documents/models.py:1401
+msgid "has one of these storage paths"
 msgstr ""
 
-#: documents/models.py:1124
+#: documents/models.py:1408
 msgid "does not have these storage path(s)"
-msgstr ""
+msgstr "nu are aceste căi (cale) de stocare"
 
-#: documents/models.py:1128
+#: documents/models.py:1412
 msgid "filter custom field query"
-msgstr ""
-
-#: documents/models.py:1131
-msgid "JSON-encoded custom field query expression."
-msgstr ""
-
-#: documents/models.py:1135
-msgid "schedule offset days"
-msgstr ""
-
-#: documents/models.py:1138
-msgid "The number of days to offset the schedule trigger by."
-msgstr ""
-
-#: documents/models.py:1143
-msgid "schedule is recurring"
-msgstr ""
-
-#: documents/models.py:1146
-msgid "If the schedule should be recurring."
-msgstr ""
-
-#: documents/models.py:1151
-msgid "schedule recurring delay in days"
-msgstr ""
-
-#: documents/models.py:1155
-msgid "The number of days between recurring schedule triggers."
-msgstr ""
-
-#: documents/models.py:1160
-msgid "schedule date field"
-msgstr ""
-
-#: documents/models.py:1165
-msgid "The field to check for a schedule trigger."
-msgstr ""
-
-#: documents/models.py:1174
-msgid "schedule date custom field"
-msgstr ""
-
-#: documents/models.py:1178
-msgid "workflow trigger"
-msgstr ""
-
-#: documents/models.py:1179
-msgid "workflow triggers"
-msgstr ""
-
-#: documents/models.py:1187
-msgid "email subject"
-msgstr ""
-
-#: documents/models.py:1191
-msgid "The subject of the email, can include some placeholders, see documentation."
-msgstr ""
-
-#: documents/models.py:1197
-msgid "email body"
-msgstr ""
-
-#: documents/models.py:1200
-msgid "The body (message) of the email, can include some placeholders, see documentation."
-msgstr ""
-
-#: documents/models.py:1206
-msgid "emails to"
-msgstr ""
-
-#: documents/models.py:1209
-msgid "The destination email addresses, comma separated."
-msgstr ""
-
-#: documents/models.py:1215
-msgid "include document in email"
-msgstr ""
-
-#: documents/models.py:1226
-msgid "webhook url"
-msgstr ""
-
-#: documents/models.py:1229
-msgid "The destination URL for the notification."
-msgstr ""
-
-#: documents/models.py:1234
-msgid "use parameters"
-msgstr ""
-
-#: documents/models.py:1239
-msgid "send as JSON"
-msgstr ""
-
-#: documents/models.py:1243
-msgid "webhook parameters"
-msgstr ""
-
-#: documents/models.py:1246
-msgid "The parameters to send with the webhook URL if body not used."
-msgstr ""
-
-#: documents/models.py:1250
-msgid "webhook body"
-msgstr ""
-
-#: documents/models.py:1253
-msgid "The body to send with the webhook URL if parameters not used."
-msgstr ""
-
-#: documents/models.py:1257
-msgid "webhook headers"
-msgstr ""
-
-#: documents/models.py:1260
-msgid "The headers to send with the webhook URL."
-msgstr ""
-
-#: documents/models.py:1265
-msgid "include document in webhook"
-msgstr ""
-
-#: documents/models.py:1276
-msgid "Assignment"
-msgstr ""
-
-#: documents/models.py:1280
-msgid "Removal"
-msgstr ""
-
-#: documents/models.py:1284 documents/templates/account/password_reset.html:15
-msgid "Email"
-msgstr ""
-
-#: documents/models.py:1288
-msgid "Webhook"
-msgstr ""
-
-#: documents/models.py:1292
-msgid "Workflow Action Type"
-msgstr ""
-
-#: documents/models.py:1298
-msgid "assign title"
-msgstr ""
-
-#: documents/models.py:1302
-msgid "Assign a document title, must  be a Jinja2 template, see documentation."
-msgstr ""
-
-#: documents/models.py:1310 paperless_mail/models.py:274
-msgid "assign this tag"
-msgstr "atribuie această etichetă"
-
-#: documents/models.py:1319 paperless_mail/models.py:282
-msgid "assign this document type"
-msgstr "atribuie acest tip"
-
-#: documents/models.py:1328 paperless_mail/models.py:296
-msgid "assign this correspondent"
-msgstr "atribuie acest corespondent"
-
-#: documents/models.py:1337
-msgid "assign this storage path"
-msgstr ""
-
-#: documents/models.py:1346
-msgid "assign this owner"
-msgstr ""
-
-#: documents/models.py:1353
-msgid "grant view permissions to these users"
-msgstr ""
-
-#: documents/models.py:1360
-msgid "grant view permissions to these groups"
-msgstr ""
-
-#: documents/models.py:1367
-msgid "grant change permissions to these users"
-msgstr ""
-
-#: documents/models.py:1374
-msgid "grant change permissions to these groups"
-msgstr ""
-
-#: documents/models.py:1381
-msgid "assign these custom fields"
-msgstr ""
-
-#: documents/models.py:1385
-msgid "custom field values"
-msgstr ""
-
-#: documents/models.py:1389
-msgid "Optional values to assign to the custom fields."
-msgstr ""
-
-#: documents/models.py:1398
-msgid "remove these tag(s)"
-msgstr ""
-
-#: documents/models.py:1403
-msgid "remove all tags"
-msgstr ""
-
-#: documents/models.py:1410
-msgid "remove these document type(s)"
-msgstr ""
+msgstr "filtrează interogarea câmpurilor personalizate"
 
 #: documents/models.py:1415
-msgid "remove all document types"
-msgstr ""
+msgid "JSON-encoded custom field query expression."
+msgstr "Expresie câmp personalizat de interogare JSON."
+
+#: documents/models.py:1419
+msgid "schedule offset days"
+msgstr "decalaj de programare în zile"
 
 #: documents/models.py:1422
-msgid "remove these correspondent(s)"
-msgstr ""
+msgid "The number of days to offset the schedule trigger by."
+msgstr "Numărul de zile cu care este decalat declanșatorul programării."
 
 #: documents/models.py:1427
-msgid "remove all correspondents"
-msgstr ""
+msgid "schedule is recurring"
+msgstr "programarea este recurentă"
 
-#: documents/models.py:1434
-msgid "remove these storage path(s)"
-msgstr ""
+#: documents/models.py:1430
+msgid "If the schedule should be recurring."
+msgstr "Dacă programarea trebuie să se repete."
+
+#: documents/models.py:1435
+msgid "schedule recurring delay in days"
+msgstr "interval de repetare al programării în zile"
 
 #: documents/models.py:1439
-msgid "remove all storage paths"
-msgstr ""
+msgid "The number of days between recurring schedule triggers."
+msgstr "Numărul de zile între declanșatorii programării recurente."
 
-#: documents/models.py:1446
-msgid "remove these owner(s)"
-msgstr ""
+#: documents/models.py:1444
+msgid "schedule date field"
+msgstr "câmp de dată al programării"
 
-#: documents/models.py:1451
-msgid "remove all owners"
-msgstr ""
+#: documents/models.py:1449
+msgid "The field to check for a schedule trigger."
+msgstr "Câmpul pentru a verifica un declanșator de planificare."
 
 #: documents/models.py:1458
-msgid "remove view permissions for these users"
-msgstr ""
+msgid "schedule date custom field"
+msgstr "orar data câmp personalizat"
 
-#: documents/models.py:1465
-msgid "remove view permissions for these groups"
-msgstr ""
+#: documents/models.py:1462
+msgid "workflow trigger"
+msgstr "declanșator flux de lucru"
 
-#: documents/models.py:1472
-msgid "remove change permissions for these users"
-msgstr ""
+#: documents/models.py:1463
+msgid "workflow triggers"
+msgstr "declanșatoare flux de lucru"
 
-#: documents/models.py:1479
-msgid "remove change permissions for these groups"
-msgstr ""
+#: documents/models.py:1471
+msgid "email subject"
+msgstr "subiect email"
+
+#: documents/models.py:1475
+msgid "The subject of the email, can include some placeholders, see documentation."
+msgstr "Subiectul e-mailului, poate include unii substituenți, puteți vedea documentația."
+
+#: documents/models.py:1481
+msgid "email body"
+msgstr "corp email"
 
 #: documents/models.py:1484
-msgid "remove all permissions"
-msgstr ""
+msgid "The body (message) of the email, can include some placeholders, see documentation."
+msgstr "Corpul (mesajul) e-mailului poate include anumiți substituenți, se poate vedea documentația."
 
-#: documents/models.py:1491
-msgid "remove these custom fields"
-msgstr ""
+#: documents/models.py:1490
+msgid "emails to"
+msgstr "emailuri către"
 
-#: documents/models.py:1496
-msgid "remove all custom fields"
-msgstr ""
+#: documents/models.py:1493
+msgid "The destination email addresses, comma separated."
+msgstr "Adrese de e-mail destinație, separate prin virgulă."
 
-#: documents/models.py:1505
-msgid "email"
-msgstr ""
+#: documents/models.py:1499
+msgid "include document in email"
+msgstr "include documentul în email"
 
-#: documents/models.py:1514
-msgid "webhook"
-msgstr ""
+#: documents/models.py:1510
+msgid "webhook url"
+msgstr "url webhook"
+
+#: documents/models.py:1513
+msgid "The destination URL for the notification."
+msgstr "URL-ul destinației pentru notificare."
 
 #: documents/models.py:1518
-msgid "workflow action"
-msgstr ""
+msgid "use parameters"
+msgstr "utilizează parametrii"
 
-#: documents/models.py:1519
-msgid "workflow actions"
-msgstr ""
+#: documents/models.py:1523
+msgid "send as JSON"
+msgstr "trimite ca JSON"
 
-#: documents/models.py:1528 paperless_mail/models.py:145
-msgid "order"
-msgstr "ordonează"
+#: documents/models.py:1527
+msgid "webhook parameters"
+msgstr "parametri webhook"
+
+#: documents/models.py:1530
+msgid "The parameters to send with the webhook URL if body not used."
+msgstr "Parametrii de trimis cu URL-ul webhook dacă corpul nu este utilizat."
 
 #: documents/models.py:1534
-msgid "triggers"
-msgstr ""
+msgid "webhook body"
+msgstr "corp webhook"
+
+#: documents/models.py:1537
+msgid "The body to send with the webhook URL if parameters not used."
+msgstr "Corpul de trimis cu URL-ul webhook dacă parametrii nu sunt folosiți."
 
 #: documents/models.py:1541
-msgid "actions"
-msgstr ""
+msgid "webhook headers"
+msgstr "anteturi webhook"
 
-#: documents/models.py:1544 paperless_mail/models.py:154
-msgid "enabled"
-msgstr ""
+#: documents/models.py:1544
+msgid "The headers to send with the webhook URL."
+msgstr "Antetele de trimis folosind URL-ul webhook."
 
-#: documents/models.py:1555
-msgid "workflow"
-msgstr ""
+#: documents/models.py:1549
+msgid "include document in webhook"
+msgstr "include documentul în webhook"
 
-#: documents/models.py:1559
-msgid "workflow trigger type"
-msgstr ""
+#: documents/models.py:1560
+msgid "Assignment"
+msgstr "Atribuire"
 
-#: documents/models.py:1573
-msgid "date run"
-msgstr ""
+#: documents/models.py:1564
+msgid "Removal"
+msgstr "Eliminare"
 
-#: documents/models.py:1579
-msgid "workflow run"
+#: documents/models.py:1568 documents/templates/account/password_reset.html:15
+msgid "Email"
+msgstr "Email"
+
+#: documents/models.py:1572
+msgid "Webhook"
+msgstr "Webhook"
+
+#: documents/models.py:1576
+msgid "Password removal"
 msgstr ""
 
 #: documents/models.py:1580
-msgid "workflow runs"
+msgid "Move to trash"
 msgstr ""
 
-#: documents/serialisers.py:640
+#: documents/models.py:1584
+msgid "Workflow Action Type"
+msgstr "Tip Acțiune flux de lucru"
+
+#: documents/models.py:1589 documents/models.py:1831
+#: paperless_mail/models.py:145
+msgid "order"
+msgstr "ordonează"
+
+#: documents/models.py:1592
+msgid "assign title"
+msgstr "atribuie titlu"
+
+#: documents/models.py:1596
+msgid "Assign a document title, must  be a Jinja2 template, see documentation."
+msgstr "Atribuirea unui titlu de document trebuie să fie un model Jinja2, a se vedea documentaţia."
+
+#: documents/models.py:1604 paperless_mail/models.py:274
+msgid "assign this tag"
+msgstr "atribuie această etichetă"
+
+#: documents/models.py:1613 paperless_mail/models.py:282
+msgid "assign this document type"
+msgstr "atribuie acest tip"
+
+#: documents/models.py:1622 paperless_mail/models.py:296
+msgid "assign this correspondent"
+msgstr "atribuie acest corespondent"
+
+#: documents/models.py:1631
+msgid "assign this storage path"
+msgstr "atribuie această cale de stocare"
+
+#: documents/models.py:1640
+msgid "assign this owner"
+msgstr "atribuie acest proprietar"
+
+#: documents/models.py:1647
+msgid "grant view permissions to these users"
+msgstr "acordă permisiuni de vizualizare acestor utilizatori"
+
+#: documents/models.py:1654
+msgid "grant view permissions to these groups"
+msgstr "acordă permisiuni de vizualizare acestor grupuri"
+
+#: documents/models.py:1661
+msgid "grant change permissions to these users"
+msgstr "acordă permisiuni de schimbare acestor utilizatori"
+
+#: documents/models.py:1668
+msgid "grant change permissions to these groups"
+msgstr "acordă permisiuni de modificare acestor grupuri"
+
+#: documents/models.py:1675
+msgid "assign these custom fields"
+msgstr "atribuie aceste câmpuri personalizate"
+
+#: documents/models.py:1679
+msgid "custom field values"
+msgstr "valori ale câmpurilor personalizate"
+
+#: documents/models.py:1683
+msgid "Optional values to assign to the custom fields."
+msgstr "Valori opţionale de atribuit ale câmpurilor personalizate."
+
+#: documents/models.py:1692
+msgid "remove these tag(s)"
+msgstr "elimină aceste etichetă(e)"
+
+#: documents/models.py:1697
+msgid "remove all tags"
+msgstr "elimină toate etichetele"
+
+#: documents/models.py:1704
+msgid "remove these document type(s)"
+msgstr "elimină tipul (tipurile) de document"
+
+#: documents/models.py:1709
+msgid "remove all document types"
+msgstr "elimină toate tipurile de documente"
+
+#: documents/models.py:1716
+msgid "remove these correspondent(s)"
+msgstr "elimină acești corespondent(ți)"
+
+#: documents/models.py:1721
+msgid "remove all correspondents"
+msgstr "elimină toți corespondenții"
+
+#: documents/models.py:1728
+msgid "remove these storage path(s)"
+msgstr "eliminați aceste căi (cale) de stocare"
+
+#: documents/models.py:1733
+msgid "remove all storage paths"
+msgstr "îndepărtaţi toate căile de stocare"
+
+#: documents/models.py:1740
+msgid "remove these owner(s)"
+msgstr "elimină acești proprietar(i)"
+
+#: documents/models.py:1745
+msgid "remove all owners"
+msgstr "elimină toți proprietarii"
+
+#: documents/models.py:1752
+msgid "remove view permissions for these users"
+msgstr "elimină permisiunile de vizualizare pentru acești utilizatori"
+
+#: documents/models.py:1759
+msgid "remove view permissions for these groups"
+msgstr "elimină permisiunile de vizualizare pentru aceste grupuri"
+
+#: documents/models.py:1766
+msgid "remove change permissions for these users"
+msgstr "elimină permisiunile de vizualizare pentru acești utilizatori"
+
+#: documents/models.py:1773
+msgid "remove change permissions for these groups"
+msgstr "elimină permisiunile de modificare pentru aceste grupuri"
+
+#: documents/models.py:1778
+msgid "remove all permissions"
+msgstr "elimină toate permisiunile"
+
+#: documents/models.py:1785
+msgid "remove these custom fields"
+msgstr "elimină aceste câmpuri personalizate"
+
+#: documents/models.py:1790
+msgid "remove all custom fields"
+msgstr "elimină toate câmpurile personalizate"
+
+#: documents/models.py:1799
+msgid "email"
+msgstr "email"
+
+#: documents/models.py:1808
+msgid "webhook"
+msgstr "webhook"
+
+#: documents/models.py:1812
+msgid "passwords"
+msgstr ""
+
+#: documents/models.py:1816
+msgid "Passwords to try when removing PDF protection. Separate with commas or new lines."
+msgstr ""
+
+#: documents/models.py:1821
+msgid "workflow action"
+msgstr "acțiune flux de lucru"
+
+#: documents/models.py:1822
+msgid "workflow actions"
+msgstr "acțiuni flux de lucru"
+
+#: documents/models.py:1837
+msgid "triggers"
+msgstr "declanșatoare"
+
+#: documents/models.py:1844
+msgid "actions"
+msgstr "acțiuni"
+
+#: documents/models.py:1847 paperless_mail/models.py:154
+msgid "enabled"
+msgstr "activat"
+
+#: documents/models.py:1858
+msgid "workflow"
+msgstr "flux de lucru"
+
+#: documents/models.py:1862
+msgid "workflow trigger type"
+msgstr "tip declanșator flux de lucru"
+
+#: documents/models.py:1876
+msgid "date run"
+msgstr "dată execuție"
+
+#: documents/models.py:1882
+msgid "workflow run"
+msgstr "rulare flux de lucru"
+
+#: documents/models.py:1883
+msgid "workflow runs"
+msgstr "rulări flux de lucru"
+
+#: documents/serialisers.py:463 documents/serialisers.py:815
+#: documents/serialisers.py:2681 documents/views.py:2264
+#: documents/views.py:2333 paperless_mail/serialisers.py:155
+msgid "Insufficient permissions."
+msgstr ""
+
+#: documents/serialisers.py:651
 msgid "Invalid color."
 msgstr "Culoare invalidă."
 
-#: documents/serialisers.py:1826
+#: documents/serialisers.py:2175
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Tip de fișier %(type)s nesuportat"
 
-#: documents/serialisers.py:1870
+#: documents/serialisers.py:2219
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
-msgstr ""
+msgstr "Id-ul câmpului personalizat trebuie să fie un număr întreg: %(id)s"
 
-#: documents/serialisers.py:1877
+#: documents/serialisers.py:2226
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
-msgstr ""
+msgstr "Câmp personalizat cu id %(id)s nu există"
 
-#: documents/serialisers.py:1894 documents/serialisers.py:1904
+#: documents/serialisers.py:2243 documents/serialisers.py:2253
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
-msgstr ""
+msgstr "Câmpurile personalizate trebuie să fie o listă de numere întregi sau un obiect mapping ids la valori."
 
-#: documents/serialisers.py:1899
+#: documents/serialisers.py:2248
 msgid "Some custom fields don't exist or were specified twice."
+msgstr "Unele câmpuri personalizate nu există sau au fost specificate de două ori."
+
+#: documents/serialisers.py:2395
+msgid "Invalid variable detected."
+msgstr "Variabilă nevalidă detectată."
+
+#: documents/serialisers.py:2737
+msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2014
-msgid "Invalid variable detected."
+#: documents/serialisers.py:2767 documents/views.py:4158
+#, python-format
+msgid "Documents not found: %(ids)s"
 msgstr ""
 
 #: documents/templates/account/account_inactive.html:5
 msgid "Paperless-ngx account inactive"
-msgstr ""
+msgstr "Contul Paperless-ngx nu este activ"
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
-msgstr ""
+msgstr "Cont inactiv."
 
 #: documents/templates/account/account_inactive.html:14
 msgid "This account is inactive."
-msgstr ""
+msgstr "Acest cont este inactiv."
 
 #: documents/templates/account/account_inactive.html:16
 msgid "Return to login"
-msgstr ""
+msgstr "Revenire la autentificare"
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "Salut din %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr ""
+msgstr "Vă mulțumim pentru utilizarea %(site_name)s!\n"
+"%(site_domain)s"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
@@ -1275,13 +1421,18 @@ msgid "Please sign in."
 msgstr "Vă rugăm conectați-vă."
 
 #: documents/templates/account/login.html:12
-#, python-format
-msgid "Don't have an account yet? <a href=\"%(signup_url)s\">Sign up</a>"
+msgid "Don't have an account yet?"
 msgstr ""
+
+#: documents/templates/account/login.html:12
+#: documents/templates/account/signup.html:43
+#: documents/templates/socialaccount/signup.html:29
+msgid "Sign up"
+msgstr "Înregistrare"
 
 #: documents/templates/account/login.html:25
 #: documents/templates/account/signup.html:22
-#: documents/templates/socialaccount/signup.html:13
+#: documents/templates/socialaccount/signup.html:15
 msgid "Username"
 msgstr "Nume"
 
@@ -1291,30 +1442,31 @@ msgid "Password"
 msgstr "Parolă"
 
 #: documents/templates/account/login.html:36
+#: documents/templates/account/signup.html:11
 #: documents/templates/mfa/authenticate.html:23
 msgid "Sign in"
 msgstr "Conectare"
 
 #: documents/templates/account/login.html:40
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Ai uitat parola?"
 
 #: documents/templates/account/login.html:51
 #: documents/templates/account/signup.html:57
 msgid "or sign in via"
-msgstr ""
+msgstr "sau autentifică-te prin"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Confirmarea resetării parolei Paperless-ngx"
 
 #: documents/templates/account/password_reset.html:9
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "Introdu adresa ta de email mai jos și vom trimite instrucțiuni pentru a seta una nouă."
 
 #: documents/templates/account/password_reset.html:12
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "A apărut o eroare. Te rugăm să încerci din nou."
 
 #: documents/templates/account/password_reset.html:21
 msgid "Send me instructions!"
@@ -1322,7 +1474,7 @@ msgstr "Trimite-mi instrucţiunile!"
 
 #: documents/templates/account/password_reset_done.html:5
 msgid "Paperless-ngx reset password sent"
-msgstr ""
+msgstr "Confirmarea resetării parolei Paperless-ngx"
 
 #: documents/templates/account/password_reset_done.html:9
 msgid "Check your inbox."
@@ -1330,7 +1482,7 @@ msgstr "Verifică-ți căsuța poștală."
 
 #: documents/templates/account/password_reset_done.html:13
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr ""
+msgstr "Ți-am trimis prin e-mail instrucțiunile pentru setarea parolei. Ar trebui să primești e-mailul în curând!"
 
 #: documents/templates/account/password_reset_from_key.html:5
 msgid "Paperless-ngx reset password confirmation"
@@ -1338,63 +1490,60 @@ msgstr "Confirmarea resetării parolei Paperless-ngx"
 
 #: documents/templates/account/password_reset_from_key.html:9
 msgid "Set a new password."
-msgstr ""
+msgstr "Setează o parolă nouă."
 
 #: documents/templates/account/password_reset_from_key.html:15
 msgid "request a new password reset"
-msgstr ""
+msgstr "solicită o nouă parolă de resetare"
 
 #: documents/templates/account/password_reset_from_key.html:17
 msgid "New Password"
-msgstr ""
+msgstr "Parola Nouă"
 
 #: documents/templates/account/password_reset_from_key.html:18
 msgid "Confirm Password"
-msgstr ""
+msgstr "Confirmă parola"
 
 #: documents/templates/account/password_reset_from_key.html:28
 msgid "Change my password"
-msgstr ""
+msgstr "Schimbă-mi parola"
 
 #: documents/templates/account/password_reset_from_key_done.html:5
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "Confirmarea resetării parolei Paperless-ngx completă"
 
 #: documents/templates/account/password_reset_from_key_done.html:9
 msgid "Password reset complete."
+msgstr "Resetarea parolei este completă."
+
+#: documents/templates/account/password_reset_from_key_done.html:14
+msgid "Your new password has been set. You can now"
 msgstr ""
 
 #: documents/templates/account/password_reset_from_key_done.html:14
-#, python-format
-msgid "Your new password has been set. You can now <a href=\"%(login_url)s\">log in</a>"
+msgid "log in"
 msgstr ""
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "Înregistrare tip Paperless-ngx"
 
 #: documents/templates/account/signup.html:11
-#, python-format
-msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
+msgid "Already have an account?"
 msgstr ""
 
 #: documents/templates/account/signup.html:19
 msgid "Note: This is the first user account for this installation and will be granted superuser privileges."
-msgstr ""
+msgstr "Notă: Acesta este primul cont de utilizator pentru această instalare și i se vor acorda privilegii de superutilizator."
 
 #: documents/templates/account/signup.html:23
-#: documents/templates/socialaccount/signup.html:14
+#: documents/templates/socialaccount/signup.html:16
 msgid "Email (optional)"
-msgstr ""
+msgstr "Email (opţional)"
 
 #: documents/templates/account/signup.html:25
 msgid "Password (again)"
-msgstr ""
-
-#: documents/templates/account/signup.html:43
-#: documents/templates/socialaccount/signup.html:27
-msgid "Sign up"
-msgstr ""
+msgstr "Parolă (din nou)"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
@@ -1402,424 +1551,500 @@ msgstr "Paperless-ngx se încarcă..."
 
 #: documents/templates/index.html:62
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Încă aici?! Hmm, ceva s-ar putea să fie greșit."
 
 #: documents/templates/index.html:62
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Iată un link către documente."
 
 #: documents/templates/mfa/authenticate.html:7
 msgid "Paperless-ngx Two-Factor Authentication"
-msgstr ""
+msgstr "Autentificare prin doi factori Paperless-ngx"
 
 #: documents/templates/mfa/authenticate.html:12
 msgid "Your account is protected by two-factor authentication. Please enter an authenticator code:"
-msgstr ""
+msgstr "Contul tău este protejat de autentificarea cu doi factori. Te rugăm să introduci un cod de autentificare:"
 
 #: documents/templates/mfa/authenticate.html:17
 msgid "Code"
-msgstr ""
+msgstr "Cod"
 
 #: documents/templates/mfa/authenticate.html:24
 msgid "Cancel"
-msgstr ""
+msgstr "Anulare"
 
 #: documents/templates/paperless-ngx/base.html:58
 msgid "Share link was not found."
-msgstr ""
+msgstr "Link-ul partajat nu a fost găsit."
 
 #: documents/templates/paperless-ngx/base.html:62
 msgid "Share link has expired."
-msgstr ""
+msgstr "Link-ul de partajare a expirat."
 
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
+msgstr "Conectare cont social Paperless-ngx"
+
+#: documents/templates/socialaccount/authentication_error.html:10
+msgid "An error occurred while attempting to login via your social network account. Back to the"
 msgstr ""
 
 #: documents/templates/socialaccount/authentication_error.html:10
-#, python-format
-msgid "An error occurred while attempting to login via your social network account. Back to the <a href=\"%(login_url)s\">login page</a>"
+msgid "login page"
 msgstr ""
 
-#: documents/templates/socialaccount/login.html:10
+#: documents/templates/socialaccount/login.html:11
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
 msgstr "Ești pe cale să conectezi un nou cont terț de la %(provider)s."
 
-#: documents/templates/socialaccount/login.html:13
+#: documents/templates/socialaccount/login.html:15
 msgid "Continue"
-msgstr ""
+msgstr "Continuă"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
-msgstr ""
-
-#: documents/templates/socialaccount/signup.html:10
-#, python-format
-msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "Înregistrare cont social Paperess-ngx"
 
 #: documents/templates/socialaccount/signup.html:11
+#, python-format
+msgid "You are about to use your %(provider_name)s account to login."
+msgstr "Sunteți pe cale să vă utilizați contul %(provider_name)s pentru a vă autentifica."
+
+#: documents/templates/socialaccount/signup.html:13
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "În etapa finală, vă rugăm să completați următorul formular:"
 
 #: documents/validators.py:24
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr ""
+msgstr "Imposibil de analizat URI {value}, schemă lipsă"
 
 #: documents/validators.py:29
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr ""
+msgstr "Imposibil de analizat URI {value}, lipsă locație sau cale"
 
 #: documents/validators.py:36
 msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
-msgstr ""
+msgstr "Schema URI '{parts.scheme}' nu este permisă. Schemele permise: {', '.join(allowed_schemes)}"
 
 #: documents/validators.py:45
 #, python-brace-format
 msgid "Unable to parse URI {value}"
+msgstr "Nu se poate analiza URI {value}"
+
+#: documents/views.py:1333
+msgid "Invalid AI configuration."
+msgstr ""
+
+#: documents/views.py:2144
+msgid "Specify only one of text, title_search, query, or more_like_id."
+msgstr ""
+
+#: documents/views.py:2257 documents/views.py:2330
+msgid "Invalid more_like_id"
+msgstr ""
+
+#: documents/views.py:4170
+#, python-format
+msgid "Insufficient permissions to share document %(id)s."
+msgstr ""
+
+#: documents/views.py:4216
+msgid "Bundle is already being processed."
+msgstr ""
+
+#: documents/views.py:4276
+msgid "The share link bundle is still being prepared. Please try again later."
+msgstr ""
+
+#: documents/views.py:4286
+msgid "The share link bundle is unavailable."
 msgstr ""
 
 #: paperless/apps.py:11
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/models.py:26
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:27
 msgid "pdfa"
-msgstr ""
+msgstr "pdfa"
 
 #: paperless/models.py:28
 msgid "pdfa-1"
-msgstr ""
+msgstr "pdfa-1"
 
 #: paperless/models.py:29
 msgid "pdfa-2"
-msgstr ""
+msgstr "pdfa-2"
 
 #: paperless/models.py:30
 msgid "pdfa-3"
-msgstr ""
+msgstr "pdfa-3"
 
-#: paperless/models.py:39
-msgid "skip"
+#: paperless/models.py:39 paperless/models.py:50
+msgid "auto"
 msgstr ""
 
 #: paperless/models.py:40
-msgid "redo"
-msgstr ""
+msgid "force"
+msgstr "forțează"
 
 #: paperless/models.py:41
-msgid "force"
-msgstr ""
+msgid "redo"
+msgstr "refă"
 
 #: paperless/models.py:42
-msgid "skip_noarchive"
-msgstr ""
-
-#: paperless/models.py:50
-msgid "never"
+msgid "off"
 msgstr ""
 
 #: paperless/models.py:51
-msgid "with_text"
-msgstr ""
+msgid "always"
+msgstr "întotdeauna"
 
 #: paperless/models.py:52
-msgid "always"
-msgstr ""
+msgid "never"
+msgstr "niciodată"
 
 #: paperless/models.py:60
 msgid "clean"
-msgstr ""
+msgstr "curățat"
 
 #: paperless/models.py:61
 msgid "clean-final"
-msgstr ""
+msgstr "clean-final"
 
 #: paperless/models.py:62
 msgid "none"
-msgstr ""
+msgstr "niciunul"
 
 #: paperless/models.py:70
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "Păstrează culoarea neschimbată"
 
 #: paperless/models.py:71
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "Utilizează culori independente de dispozitiv"
 
 #: paperless/models.py:73
 msgid "Gray"
-msgstr ""
+msgstr "Gri"
 
 #: paperless/models.py:74
 msgid "CMYK"
+msgstr "CMYK"
+
+#: paperless/models.py:78 paperless/models.py:87
+msgid "OpenAI-compatible"
 msgstr ""
 
-#: paperless/models.py:83
+#: paperless/models.py:79
+msgid "Huggingface"
+msgstr "Huggingface"
+
+#: paperless/models.py:88
+msgid "Ollama"
+msgstr "Ollama"
+
+#: paperless/models.py:97
 msgid "Sets the output PDF type"
-msgstr ""
+msgstr "Setează tipul de PDF de ieșire"
 
-#: paperless/models.py:95
+#: paperless/models.py:109
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "Faceți OCR de la pagina 1 la această valoare"
 
-#: paperless/models.py:101
+#: paperless/models.py:115
 msgid "Do OCR using these languages"
-msgstr ""
+msgstr "Faceți OCR folosind aceste limbi"
 
-#: paperless/models.py:108
+#: paperless/models.py:122
 msgid "Sets the OCR mode"
-msgstr ""
+msgstr "Stabilește modul OCR"
 
-#: paperless/models.py:116
-msgid "Controls the generation of an archive file"
-msgstr ""
-
-#: paperless/models.py:124
-msgid "Sets image DPI fallback value"
-msgstr ""
-
-#: paperless/models.py:131
-msgid "Controls the unpaper cleaning"
+#: paperless/models.py:130
+msgid "Controls archive file generation"
 msgstr ""
 
 #: paperless/models.py:138
-msgid "Enables deskew"
-msgstr ""
+msgid "Sets image DPI fallback value"
+msgstr "Setează valoarea de rezervă DPI a imaginii"
 
-#: paperless/models.py:141
-msgid "Enables page rotation"
-msgstr ""
-
-#: paperless/models.py:146
-msgid "Sets the threshold for rotation of pages"
-msgstr ""
+#: paperless/models.py:145
+msgid "Controls the unpaper cleaning"
+msgstr "Controlează curățarea nehârtiei"
 
 #: paperless/models.py:152
-msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgid "Enables deskew"
+msgstr "Activează deskew"
 
-#: paperless/models.py:158
-msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+#: paperless/models.py:155
+msgid "Enables page rotation"
+msgstr "Activează rotirea paginii"
+
+#: paperless/models.py:160
+msgid "Sets the threshold for rotation of pages"
+msgstr "Setează pragul pentru rotaţia paginilor"
 
 #: paperless/models.py:166
+msgid "Sets the maximum image size for decompression"
+msgstr "Setează dimensiunea maximă a imaginii pentru decompresie"
+
+#: paperless/models.py:172
+msgid "Sets the Ghostscript color conversion strategy"
+msgstr "Setează strategia de conversie a culorilor pentru Ghostscript"
+
+#: paperless/models.py:180
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "Adaugă argumente suplimentare ale utilizatorului pentru OCRMyPDF"
 
-#: paperless/models.py:175
+#: paperless/models.py:189
 msgid "Application title"
-msgstr ""
+msgstr "Titlu aplicație"
 
-#: paperless/models.py:182
+#: paperless/models.py:196
 msgid "Application logo"
-msgstr ""
+msgstr "Logo aplicație"
 
-#: paperless/models.py:197
+#: paperless/models.py:211
 msgid "Enables barcode scanning"
-msgstr ""
-
-#: paperless/models.py:203
-msgid "Enables barcode TIFF support"
-msgstr ""
-
-#: paperless/models.py:209
-msgid "Sets the barcode string"
-msgstr ""
+msgstr "Activează scanarea codului de bare"
 
 #: paperless/models.py:217
-msgid "Retains split pages"
-msgstr ""
+msgid "Enables barcode TIFF support"
+msgstr "Permite suportul TIFF pentru codul de bare"
 
 #: paperless/models.py:223
-msgid "Enables ASN barcode"
-msgstr ""
+msgid "Sets the barcode string"
+msgstr "Setează șirul codului de bare"
 
-#: paperless/models.py:229
-msgid "Sets the ASN barcode prefix"
-msgstr ""
+#: paperless/models.py:231
+msgid "Retains split pages"
+msgstr "Păstrează pagini divizate"
 
 #: paperless/models.py:237
-msgid "Sets the barcode upscale factor"
-msgstr ""
+msgid "Enables ASN barcode"
+msgstr "Activează codul de bare ASN"
 
-#: paperless/models.py:244
-msgid "Sets the barcode DPI"
-msgstr ""
+#: paperless/models.py:243
+msgid "Sets the ASN barcode prefix"
+msgstr "Setează prefixul codului de bare ASN"
 
 #: paperless/models.py:251
-msgid "Sets the maximum pages for barcode"
-msgstr ""
+msgid "Sets the barcode upscale factor"
+msgstr "Setează factorul de mărire a codului de bare"
 
 #: paperless/models.py:258
+msgid "Sets the barcode DPI"
+msgstr "Setează DPI-ul codului de bare"
+
+#: paperless/models.py:265
+msgid "Sets the maximum pages for barcode"
+msgstr "Setează paginile maxime pentru codul de bare"
+
+#: paperless/models.py:272
 msgid "Enables tag barcode"
-msgstr ""
+msgstr "Activează codul de bare al tag-ului"
 
-#: paperless/models.py:264
+#: paperless/models.py:278
 msgid "Sets the tag barcode mapping"
+msgstr "Setează maparea codului de bare al tag-ului"
+
+#: paperless/models.py:284
+msgid "Enables splitting on tag barcodes"
 msgstr ""
 
-#: paperless/models.py:269
+#: paperless/models.py:293
+msgid "Enables AI features"
+msgstr "Activează funcțiile IA"
+
+#: paperless/models.py:299
+msgid "Sets the LLM embedding backend"
+msgstr "Setează sistemul backend de încorporare LLM"
+
+#: paperless/models.py:307
+msgid "Sets the LLM embedding model"
+msgstr "Setează modelul de încorporare LLM"
+
+#: paperless/models.py:314
+msgid "Sets the LLM backend"
+msgstr "Setează backend-ul LLM"
+
+#: paperless/models.py:322
+msgid "Sets the LLM model"
+msgstr "Setează modelul LLM"
+
+#: paperless/models.py:329
+msgid "Sets the LLM API key"
+msgstr "Setează cheia API LLM"
+
+#: paperless/models.py:336
+msgid "Sets the LLM endpoint, optional"
+msgstr "Setează endpoint-ul LLM, opţional"
+
+#: paperless/models.py:343
 msgid "paperless application settings"
-msgstr ""
+msgstr "setări ale aplicației paperless"
 
-#: paperless/settings.py:773
+#: paperless/settings/__init__.py:532
 msgid "English (US)"
 msgstr "Engleză (Americană)"
 
-#: paperless/settings.py:774
+#: paperless/settings/__init__.py:533
 msgid "Arabic"
-msgstr ""
+msgstr "Arabă"
 
-#: paperless/settings.py:775
+#: paperless/settings/__init__.py:534
 msgid "Afrikaans"
-msgstr ""
+msgstr "Africană"
 
-#: paperless/settings.py:776
+#: paperless/settings/__init__.py:535
 msgid "Belarusian"
-msgstr ""
+msgstr "Bielorusă"
 
-#: paperless/settings.py:777
+#: paperless/settings/__init__.py:536
 msgid "Bulgarian"
-msgstr ""
+msgstr "Bulgară"
 
-#: paperless/settings.py:778
+#: paperless/settings/__init__.py:537
 msgid "Catalan"
-msgstr ""
+msgstr "Catalană"
 
-#: paperless/settings.py:779
+#: paperless/settings/__init__.py:538
 msgid "Czech"
 msgstr "Cehă"
 
-#: paperless/settings.py:780
+#: paperless/settings/__init__.py:539
 msgid "Danish"
 msgstr "Daneză"
 
-#: paperless/settings.py:781
+#: paperless/settings/__init__.py:540
 msgid "German"
 msgstr "Germană"
 
-#: paperless/settings.py:782
+#: paperless/settings/__init__.py:541
 msgid "Greek"
-msgstr ""
+msgstr "Greacă"
 
-#: paperless/settings.py:783
+#: paperless/settings/__init__.py:542
 msgid "English (GB)"
 msgstr "Engleză (Britanică)"
 
-#: paperless/settings.py:784
+#: paperless/settings/__init__.py:543
 msgid "Spanish"
 msgstr "Spaniolă"
 
-#: paperless/settings.py:785
+#: paperless/settings/__init__.py:544
 msgid "Persian"
-msgstr ""
+msgstr "Persană"
 
-#: paperless/settings.py:786
+#: paperless/settings/__init__.py:545
 msgid "Finnish"
-msgstr ""
+msgstr "Finlandeză"
 
-#: paperless/settings.py:787
+#: paperless/settings/__init__.py:546
 msgid "French"
 msgstr "Franceză"
 
-#: paperless/settings.py:788
+#: paperless/settings/__init__.py:547
 msgid "Hungarian"
-msgstr ""
+msgstr "Maghiară"
 
-#: paperless/settings.py:789
+#: paperless/settings/__init__.py:548
+msgid "Indonesian"
+msgstr "Indoneziană"
+
+#: paperless/settings/__init__.py:549
 msgid "Italian"
 msgstr "Italiană"
 
-#: paperless/settings.py:790
+#: paperless/settings/__init__.py:550
 msgid "Japanese"
-msgstr ""
+msgstr "Japoneză"
 
-#: paperless/settings.py:791
+#: paperless/settings/__init__.py:551
 msgid "Korean"
-msgstr ""
+msgstr "Coreeană"
 
-#: paperless/settings.py:792
+#: paperless/settings/__init__.py:552
 msgid "Luxembourgish"
 msgstr "Luxemburgheză"
 
-#: paperless/settings.py:793
+#: paperless/settings/__init__.py:553
 msgid "Norwegian"
-msgstr ""
+msgstr "Norvegiană"
 
-#: paperless/settings.py:794
+#: paperless/settings/__init__.py:554
 msgid "Dutch"
 msgstr "Olandeză"
 
-#: paperless/settings.py:795
+#: paperless/settings/__init__.py:555
 msgid "Polish"
 msgstr "Poloneză"
 
-#: paperless/settings.py:796
+#: paperless/settings/__init__.py:556
 msgid "Portuguese (Brazil)"
 msgstr "Portugheză (Brazilia)"
 
-#: paperless/settings.py:797
+#: paperless/settings/__init__.py:557
 msgid "Portuguese"
 msgstr "Portugheză"
 
-#: paperless/settings.py:798
+#: paperless/settings/__init__.py:558
 msgid "Romanian"
 msgstr "Română"
 
-#: paperless/settings.py:799
+#: paperless/settings/__init__.py:559
 msgid "Russian"
 msgstr "Rusă"
 
-#: paperless/settings.py:800
+#: paperless/settings/__init__.py:560
 msgid "Slovak"
-msgstr ""
+msgstr "Slovacă"
 
-#: paperless/settings.py:801
+#: paperless/settings/__init__.py:561
 msgid "Slovenian"
-msgstr ""
+msgstr "Slovenă"
 
-#: paperless/settings.py:802
+#: paperless/settings/__init__.py:562
 msgid "Serbian"
-msgstr ""
+msgstr "Sârbă"
 
-#: paperless/settings.py:803
+#: paperless/settings/__init__.py:563
 msgid "Swedish"
 msgstr "Suedeză"
 
-#: paperless/settings.py:804
+#: paperless/settings/__init__.py:564
 msgid "Turkish"
-msgstr ""
+msgstr "Turcă"
 
-#: paperless/settings.py:805
+#: paperless/settings/__init__.py:565
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ucrainiană"
 
-#: paperless/settings.py:806
+#: paperless/settings/__init__.py:566
 msgid "Vietnamese"
-msgstr ""
+msgstr "Vietnameză"
 
-#: paperless/settings.py:807
+#: paperless/settings/__init__.py:567
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Chineză simplificată"
 
-#: paperless/settings.py:808
+#: paperless/settings/__init__.py:568
 msgid "Chinese Traditional"
-msgstr ""
+msgstr "Chineză Tradițională"
 
-#: paperless/urls.py:370
+#: paperless/urls.py:429
 msgid "Paperless-ngx administration"
 msgstr "Administrare Paperless-ngx"
 
@@ -1845,7 +2070,7 @@ msgstr "Acțiuni"
 
 #: paperless_mail/admin.py:81
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "Actiunea aplicata mesajului. Aceasta actiune este efectuata numai cand corpul sau atasamentele au fost consumate din mail."
 
 #: paperless_mail/admin.py:89
 msgid "Metadata"
@@ -1855,7 +2080,7 @@ msgstr "Metadate"
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
 msgstr "Atribuie metadate documentelor consumate prin aceasta regula în mod automat. Chiar dacă nu sunt atribuite etichete, tipuri sau corespondenți, Paperless va procesa toate regulile definite care se potrivesc."
 
-#: paperless_mail/apps.py:11
+#: paperless_mail/apps.py:8
 msgid "Paperless mail"
 msgstr "Email Paperless"
 
@@ -1881,15 +2106,15 @@ msgstr "Folosește STARTTLS"
 
 #: paperless_mail/models.py:19
 msgid "IMAP"
-msgstr ""
+msgstr "IMAP"
 
 #: paperless_mail/models.py:20
 msgid "Gmail OAuth"
-msgstr ""
+msgstr "Gmail OAuth"
 
 #: paperless_mail/models.py:21
 msgid "Outlook OAuth"
-msgstr ""
+msgstr "Outlook OAuth"
 
 #: paperless_mail/models.py:25
 msgid "IMAP server"
@@ -1917,7 +2142,7 @@ msgstr "parolă"
 
 #: paperless_mail/models.py:47
 msgid "Is token authentication"
-msgstr ""
+msgstr "Este autentificare token"
 
 #: paperless_mail/models.py:50
 msgid "character set"
@@ -1929,19 +2154,19 @@ msgstr "Setul de caractere folosit la comunicarea cu serverul de e-mail, cum ar 
 
 #: paperless_mail/models.py:60
 msgid "account type"
-msgstr ""
+msgstr "tipul contului"
 
 #: paperless_mail/models.py:66
 msgid "refresh token"
-msgstr ""
+msgstr "reîmprospătare token"
 
 #: paperless_mail/models.py:70
 msgid "The refresh token to use for token authentication e.g. with oauth2."
-msgstr ""
+msgstr "Reîmprospătarea token-ului pentru autentificarea token, de ex. cu oauth2."
 
 #: paperless_mail/models.py:79
 msgid "The expiration date of the refresh token. "
-msgstr ""
+msgstr "Data de expirare a token-ului de reîmprospătare. "
 
 #: paperless_mail/models.py:89
 msgid "mail rule"
@@ -1957,11 +2182,11 @@ msgstr "Procesează doar atașamentele."
 
 #: paperless_mail/models.py:105
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "Procesează Mail complet (cu atașamentele încorporate în fișier) ca .eml"
 
 #: paperless_mail/models.py:109
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "Procesează Mail complet (cu atașamentele încorporate în fișier) ca .eml + proces atașate ca documente separate"
 
 #: paperless_mail/models.py:116
 msgid "Process all files, including 'inline' attachments."
@@ -1969,23 +2194,23 @@ msgstr "Procesează toate fișierele, inclusiv atașamentele „inline”."
 
 #: paperless_mail/models.py:119
 msgid "System default"
-msgstr ""
+msgstr "Setări implicite sistem"
 
 #: paperless_mail/models.py:120
 msgid "Text, then HTML"
-msgstr ""
+msgstr "Text, apoi HTML"
 
 #: paperless_mail/models.py:121
 msgid "HTML, then text"
-msgstr ""
+msgstr "HTML, apoi text"
 
 #: paperless_mail/models.py:122
 msgid "HTML only"
-msgstr ""
+msgstr "Doar HTML"
 
 #: paperless_mail/models.py:123
 msgid "Text only"
-msgstr ""
+msgstr "Doar text"
 
 #: paperless_mail/models.py:126
 msgid "Delete"
@@ -2005,7 +2230,7 @@ msgstr "Marchează, nu procesa email-uri marcate"
 
 #: paperless_mail/models.py:130
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "Etichetați e-mailul cu eticheta specificată, nu procesați e-mailurile marcate"
 
 #: paperless_mail/models.py:133
 msgid "Use subject as title"
@@ -2017,7 +2242,7 @@ msgstr "Utilizează numele fișierului atașat ca titlu"
 
 #: paperless_mail/models.py:135
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "Nu atribui titlul de la regulă"
 
 #: paperless_mail/models.py:138
 msgid "Do not assign a correspondent"
@@ -2039,13 +2264,13 @@ msgstr "Folosește corespondentul selectat mai jos"
 msgid "account"
 msgstr "cont"
 
-#: paperless_mail/models.py:157 paperless_mail/models.py:318
+#: paperless_mail/models.py:157 paperless_mail/models.py:326
 msgid "folder"
 msgstr "director"
 
 #: paperless_mail/models.py:161
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "Subdosarele trebuie separate printr-un delimitator, adesea un punct ('.') sau slash ('/'), dar variază de la serverul de mail."
 
 #: paperless_mail/models.py:167
 msgid "filter from"
@@ -2053,7 +2278,7 @@ msgstr "filtrează de la"
 
 #: paperless_mail/models.py:174
 msgid "filter to"
-msgstr ""
+msgstr "filtrează către"
 
 #: paperless_mail/models.py:181
 msgid "filter subject"
@@ -2065,15 +2290,15 @@ msgstr "filtrează corpul email-ului"
 
 #: paperless_mail/models.py:195
 msgid "filter attachment filename inclusive"
-msgstr ""
+msgstr "filtrare după numele fișierului atașat inclusiv"
 
 #: paperless_mail/models.py:207
 msgid "filter attachment filename exclusive"
-msgstr ""
+msgstr "filtrare după numele fișierului atașat exclusiv"
 
 #: paperless_mail/models.py:212
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Nu procesa documentele care se potrivesc integral cu acest nume de fișier, dacă este specificat. Sunt permise metacaractere Wildcards precum *.pdf sau *factură*. Nu se face diferență între majuscule și minuscule."
 
 #: paperless_mail/models.py:219
 msgid "maximum age"
@@ -2093,11 +2318,11 @@ msgstr "Atașamentele \"inline\" includ și imaginile încorporate, deci aceast�
 
 #: paperless_mail/models.py:235
 msgid "consumption scope"
-msgstr ""
+msgstr "sfera de consum"
 
 #: paperless_mail/models.py:241
 msgid "pdf layout"
-msgstr ""
+msgstr "aspect pdf"
 
 #: paperless_mail/models.py:247
 msgid "action"
@@ -2121,29 +2346,37 @@ msgstr "atribuie corespondent din"
 
 #: paperless_mail/models.py:300
 msgid "Assign the rule owner to documents"
+msgstr "Setează proprietarul regulii pentru documente"
+
+#: paperless_mail/models.py:305
+msgid "Stop processing further rules"
 msgstr ""
 
-#: paperless_mail/models.py:326
-msgid "uid"
+#: paperless_mail/models.py:308
+msgid "If True, no further rules will be processed after this one if any document is queued."
 msgstr ""
 
 #: paperless_mail/models.py:334
-msgid "subject"
-msgstr ""
+msgid "uid"
+msgstr "uid"
 
 #: paperless_mail/models.py:342
+msgid "subject"
+msgstr "subiect"
+
+#: paperless_mail/models.py:350
 msgid "received"
-msgstr ""
+msgstr "primit"
 
-#: paperless_mail/models.py:349
+#: paperless_mail/models.py:357
 msgid "processed"
-msgstr ""
-
-#: paperless_mail/models.py:355
-msgid "status"
-msgstr ""
+msgstr "procesat"
 
 #: paperless_mail/models.py:363
+msgid "status"
+msgstr "stare"
+
+#: paperless_mail/models.py:371
 msgid "error"
 msgstr "eroare"
 
