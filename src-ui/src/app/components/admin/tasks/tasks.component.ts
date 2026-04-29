@@ -374,7 +374,7 @@ export class TasksComponent
 
     const documentId = task.result_data?.['document_id']
     if (typeof documentId === 'number') {
-      return `Success. New document id ${documentId} created`
+      return $localize`Success. New document id ${documentId} created`
     }
 
     const reason = task.result_data?.['reason']
@@ -384,7 +384,7 @@ export class TasksComponent
 
     const duplicateOf = task.result_data?.['duplicate_of']
     if (typeof duplicateOf === 'number') {
-      return `Duplicate of document #${duplicateOf}`
+      return $localize`Duplicate of document #${duplicateOf}`
     }
 
     const errorMessage = task.result_data?.['error_message']
