@@ -4,7 +4,7 @@ title: Home
 
 <div class="grid-left" markdown>
 ![image](assets/logo_full_black.svg#only-light){.index-logo}
-![image](assets/logo_full_white.svg#only-dark){.index-logo}
+![image](assets/logo_full_eee.svg#only-dark){.index-logo}
 
 **Paperless-ngx** is a _community-supported_ open-source document management system that transforms your
 physical documents into a searchable online archive so you can keep, well, _less paper_.
