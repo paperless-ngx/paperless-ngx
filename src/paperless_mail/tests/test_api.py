@@ -22,8 +22,10 @@ if TYPE_CHECKING:
 
 
 MAIL_ACCOUNTS_ENDPOINT = "/api/mail_accounts/"
+MAIL_ACCOUNTS_TEST_ENDPOINT = f"{MAIL_ACCOUNTS_ENDPOINT}test/"
 MAIL_RULES_ENDPOINT = "/api/mail_rules/"
 PROCESSED_MAIL_ENDPOINT = "/api/processed_mail/"
+PROCESSED_MAIL_BULK_DELETE_ENDPOINT = f"{PROCESSED_MAIL_ENDPOINT}bulk_delete/"
 
 
 @pytest.mark.django_db
@@ -119,7 +121,7 @@ class TestAPIMailAccounts:
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
-        assert len(MailAccount.objects.all()) == 0
+        assert MailAccount.objects.count() == 0
 
     def test_update_mail_account(
         self,
@@ -170,14 +172,14 @@ class TestAPIMailAccounts:
     ) -> None:
         """
         GIVEN:
-            - Errnoeous mail account details
+            - Erroneous mail account details
         WHEN:
             - API call is made to test account
         THEN:
             - API returns 400 bad request
         """
         response = mail_api_client.post(
-            f"{MAIL_ACCOUNTS_ENDPOINT}test/",
+            MAIL_ACCOUNTS_TEST_ENDPOINT,
             json.dumps(
                 {
                     "imap_server": "server.example.com",
@@ -206,7 +208,7 @@ class TestAPIMailAccounts:
             - API returns success
         """
         response = mail_api_client.post(
-            f"{MAIL_ACCOUNTS_ENDPOINT}test/",
+            MAIL_ACCOUNTS_TEST_ENDPOINT,
             json.dumps(
                 {
                     "imap_server": "server.example.com",
@@ -242,7 +244,7 @@ class TestAPIMailAccounts:
         )
 
         response = mail_api_client.post(
-            f"{MAIL_ACCOUNTS_ENDPOINT}test/",
+            MAIL_ACCOUNTS_TEST_ENDPOINT,
             json.dumps(
                 {
                     "id": account.pk,
@@ -264,7 +266,7 @@ class TestAPIMailAccounts:
         bogus_mailbox: "BogusMailBox",
     ) -> None:
         response = mail_api_client.post(
-            f"{MAIL_ACCOUNTS_ENDPOINT}test/",
+            MAIL_ACCOUNTS_TEST_ENDPOINT,
             json.dumps(
                 {
                     "id": 999999,
@@ -464,7 +466,7 @@ class TestAPIMailRules:
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
-        assert len(MailRule.objects.all()) == 0
+        assert MailRule.objects.count() == 0
 
     def test_update_mail_rule(
         self,
@@ -751,7 +753,7 @@ class TestAPIProcessedMails:
 
         # Success for allowed items
         response = mail_api_client.post(
-            f"{PROCESSED_MAIL_ENDPOINT}bulk_delete/",
+            PROCESSED_MAIL_BULK_DELETE_ENDPOINT,
             data={
                 "mail_ids": [pm_unowned.id, pm_owned.id, pm_granted.id],
             },
@@ -771,7 +773,7 @@ class TestAPIProcessedMails:
 
         # 403 and not deleted
         response = mail_api_client.post(
-            f"{PROCESSED_MAIL_ENDPOINT}bulk_delete/",
+            PROCESSED_MAIL_BULK_DELETE_ENDPOINT,
             data={
                 "mail_ids": [pm_forbidden.id],
             },
@@ -782,7 +784,7 @@ class TestAPIProcessedMails:
 
         # missing mail_ids
         response = mail_api_client.post(
-            f"{PROCESSED_MAIL_ENDPOINT}bulk_delete/",
+            PROCESSED_MAIL_BULK_DELETE_ENDPOINT,
             data={"mail_ids": "not-a-list"},
             format="json",
         )
