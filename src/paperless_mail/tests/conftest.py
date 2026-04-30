@@ -63,3 +63,20 @@ def oauth_settings(settings):
     settings.OUTLOOK_OAUTH_CLIENT_ID = "test_outlook_client_id"
     settings.OUTLOOK_OAUTH_CLIENT_SECRET = "test_outlook_client_secret"
     return settings
+
+
+@pytest.fixture()
+def mail_mocker(db: None):
+    """
+    Provides a MailMocker instance with its `MailBox` and
+    `queue_consumption_tasks` patches active. Cleanups registered via
+    TestCase.addCleanup are run on teardown by calling doCleanups().
+    """
+    from paperless_mail.tests.test_mail import MailMocker
+
+    mocker = MailMocker()
+    mocker.setUp()
+    try:
+        yield mocker
+    finally:
+        mocker.doCleanups()
