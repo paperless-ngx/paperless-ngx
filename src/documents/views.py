@@ -782,6 +782,43 @@ class EmailDocumentDetailSchema(EmailSerializer):
             404: None,
         },
     ),
+    ai_suggestions=extend_schema(
+        description="View AI suggestions for the document",
+        responses={
+            200: inline_serializer(
+                name="AISuggestions",
+                fields={
+                    "title": serializers.CharField(allow_null=True),
+                    "correspondents": serializers.ListField(
+                        child=serializers.IntegerField(),
+                    ),
+                    "suggested_correspondents": serializers.ListField(
+                        child=serializers.CharField(),
+                    ),
+                    "tags": serializers.ListField(child=serializers.IntegerField()),
+                    "suggested_tags": serializers.ListField(
+                        child=serializers.CharField(),
+                    ),
+                    "document_types": serializers.ListField(
+                        child=serializers.IntegerField(),
+                    ),
+                    "suggested_document_types": serializers.ListField(
+                        child=serializers.CharField(),
+                    ),
+                    "storage_paths": serializers.ListField(
+                        child=serializers.IntegerField(),
+                    ),
+                    "suggested_storage_paths": serializers.ListField(
+                        child=serializers.CharField(),
+                    ),
+                    "dates": serializers.ListField(child=serializers.CharField()),
+                },
+            ),
+            400: None,
+            403: None,
+            404: None,
+        },
+    ),
     thumb=extend_schema(
         description="View the document thumbnail",
         responses={200: OpenApiTypes.BINARY},
@@ -1308,114 +1345,134 @@ class DocumentViewSet(
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
-        ai_config = AIConfig()
+        document_suggestions = get_suggestion_cache(doc.pk)
 
-        if ai_config.ai_enabled:
-            cached_llm_suggestions = get_llm_suggestion_cache(
-                doc.pk,
-                backend=ai_config.llm_backend,
-            )
+        if document_suggestions is not None:
+            refresh_suggestions_cache(doc.pk)
+            return Response(document_suggestions.suggestions)
 
-            if cached_llm_suggestions:
-                refresh_suggestions_cache(doc.pk)
-                return Response(cached_llm_suggestions.suggestions)
+        classifier = load_classifier()
 
-            try:
-                llm_suggestions = get_ai_document_classification(doc, request.user)
-            except ValueError as exc:
-                logger.exception(
-                    "Invalid AI configuration while generating suggestions for "
-                    "document %s: %s",
-                    doc.pk,
-                    exc,
-                    exc_info=True,
+        dates = []
+        if settings.NUMBER_OF_SUGGESTED_DATES > 0:
+            with get_date_parser() as date_parser:
+                gen = date_parser.parse(doc.filename, doc.content)
+                dates = sorted(
+                    {
+                        i
+                        for i in itertools.islice(
+                            gen,
+                            settings.NUMBER_OF_SUGGESTED_DATES,
+                        )
+                    },
                 )
-                raise ValidationError({"ai": [_("Invalid AI configuration.")]}) from exc
 
-            matched_tags = match_tags_by_name(
+        resp_data = {
+            "correspondents": [
+                c.id for c in match_correspondents(doc, classifier, request.user)
+            ],
+            "tags": [t.id for t in match_tags(doc, classifier, request.user)],
+            "document_types": [
+                dt.id for dt in match_document_types(doc, classifier, request.user)
+            ],
+            "storage_paths": [
+                dt.id for dt in match_storage_paths(doc, classifier, request.user)
+            ],
+            "dates": [date.strftime("%Y-%m-%d") for date in dates if date is not None],
+        }
+
+        # Cache the suggestions and the classifier hash for later
+        set_suggestions_cache(doc.pk, resp_data, classifier)
+
+        return Response(resp_data)
+
+    @action(
+        methods=["get"],
+        detail=True,
+        filter_backends=[],
+        url_path="ai_suggestions",
+    )
+    @method_decorator(cache_control(no_cache=True))
+    def ai_suggestions(self, request, pk=None):
+        doc = get_object_or_404(
+            Document.objects.select_related("owner").prefetch_related("versions"),
+            pk=pk,
+        )
+        if request.user is not None and not has_perms_owner_aware(
+            request.user,
+            "view_document",
+            doc,
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        ai_config = AIConfig()
+        if not ai_config.ai_enabled:
+            return HttpResponseBadRequest("AI is required for this feature")
+
+        cached_llm_suggestions = get_llm_suggestion_cache(
+            doc.pk,
+            backend=ai_config.llm_backend,
+        )
+
+        if cached_llm_suggestions:
+            refresh_suggestions_cache(doc.pk)
+            return Response(cached_llm_suggestions.suggestions)
+
+        try:
+            llm_suggestions = get_ai_document_classification(doc, request.user)
+        except ValueError as exc:
+            logger.exception(
+                "Invalid AI configuration while generating suggestions for "
+                "document %s: %s",
+                doc.pk,
+                exc,
+                exc_info=True,
+            )
+            raise ValidationError({"ai": [_("Invalid AI configuration.")]}) from exc
+
+        matched_tags = match_tags_by_name(
+            llm_suggestions.get("tags", []),
+            request.user,
+        )
+        matched_correspondents = match_correspondents_by_name(
+            llm_suggestions.get("correspondents", []),
+            request.user,
+        )
+        matched_types = match_document_types_by_name(
+            llm_suggestions.get("document_types", []),
+            request.user,
+        )
+        matched_paths = match_storage_paths_by_name(
+            llm_suggestions.get("storage_paths", []),
+            request.user,
+        )
+
+        resp_data = {
+            "title": llm_suggestions.get("title"),
+            "tags": [t.id for t in matched_tags],
+            "suggested_tags": extract_unmatched_names(
                 llm_suggestions.get("tags", []),
-                request.user,
-            )
-            matched_correspondents = match_correspondents_by_name(
+                matched_tags,
+            ),
+            "correspondents": [c.id for c in matched_correspondents],
+            "suggested_correspondents": extract_unmatched_names(
                 llm_suggestions.get("correspondents", []),
-                request.user,
-            )
-            matched_types = match_document_types_by_name(
+                matched_correspondents,
+            ),
+            "document_types": [d.id for d in matched_types],
+            "suggested_document_types": extract_unmatched_names(
                 llm_suggestions.get("document_types", []),
-                request.user,
-            )
-            matched_paths = match_storage_paths_by_name(
+                matched_types,
+            ),
+            "storage_paths": [s.id for s in matched_paths],
+            "suggested_storage_paths": extract_unmatched_names(
                 llm_suggestions.get("storage_paths", []),
-                request.user,
-            )
+                matched_paths,
+            ),
+            "dates": llm_suggestions.get("dates", []),
+        }
 
-            resp_data = {
-                "title": llm_suggestions.get("title"),
-                "tags": [t.id for t in matched_tags],
-                "suggested_tags": extract_unmatched_names(
-                    llm_suggestions.get("tags", []),
-                    matched_tags,
-                ),
-                "correspondents": [c.id for c in matched_correspondents],
-                "suggested_correspondents": extract_unmatched_names(
-                    llm_suggestions.get("correspondents", []),
-                    matched_correspondents,
-                ),
-                "document_types": [d.id for d in matched_types],
-                "suggested_document_types": extract_unmatched_names(
-                    llm_suggestions.get("document_types", []),
-                    matched_types,
-                ),
-                "storage_paths": [s.id for s in matched_paths],
-                "suggested_storage_paths": extract_unmatched_names(
-                    llm_suggestions.get("storage_paths", []),
-                    matched_paths,
-                ),
-                "dates": llm_suggestions.get("dates", []),
-            }
-
-            set_llm_suggestions_cache(doc.pk, resp_data, backend=ai_config.llm_backend)
-        else:
-            document_suggestions = get_suggestion_cache(doc.pk)
-
-            if document_suggestions is not None:
-                refresh_suggestions_cache(doc.pk)
-                return Response(document_suggestions.suggestions)
-
-            classifier = load_classifier()
-
-            dates = []
-            if settings.NUMBER_OF_SUGGESTED_DATES > 0:
-                with get_date_parser() as date_parser:
-                    gen = date_parser.parse(doc.filename, doc.content)
-                    dates = sorted(
-                        {
-                            i
-                            for i in itertools.islice(
-                                gen,
-                                settings.NUMBER_OF_SUGGESTED_DATES,
-                            )
-                        },
-                    )
-
-            resp_data = {
-                "correspondents": [
-                    c.id for c in match_correspondents(doc, classifier, request.user)
-                ],
-                "tags": [t.id for t in match_tags(doc, classifier, request.user)],
-                "document_types": [
-                    dt.id for dt in match_document_types(doc, classifier, request.user)
-                ],
-                "storage_paths": [
-                    dt.id for dt in match_storage_paths(doc, classifier, request.user)
-                ],
-                "dates": [
-                    date.strftime("%Y-%m-%d") for date in dates if date is not None
-                ],
-            }
-
-            # Cache the suggestions and the classifier hash for later
-            set_suggestions_cache(doc.pk, resp_data, classifier)
+        set_llm_suggestions_cache(doc.pk, resp_data, backend=ai_config.llm_backend)
 
         return Response(resp_data)
 
