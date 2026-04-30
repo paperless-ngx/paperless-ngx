@@ -1,6 +1,7 @@
 from collections.abc import Generator
 
 import pytest
+from django.test import Client
 
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.models import MailAccount
@@ -27,3 +28,38 @@ def greenmail_mail_account(db: None) -> Generator[MailAccount, None, None]:
 @pytest.fixture()
 def mail_account_handler() -> MailAccountHandler:
     return MailAccountHandler()
+
+
+@pytest.fixture()
+def mail_user(
+    db: None,
+    django_user_model,
+    client: Client,
+):
+    """
+    Create a user with the `add_mailaccount` permission and log them in via
+    the test client. Returned so tests can mutate permissions if needed.
+    """
+    from django.contrib.auth.models import Permission
+
+    user = django_user_model.objects.create_user("testuser")
+    user.user_permissions.add(
+        *Permission.objects.filter(codename__in=["add_mailaccount"]),
+    )
+    user.save()
+    client.force_login(user)
+    return user
+
+
+@pytest.fixture()
+def oauth_settings(settings):
+    """
+    Apply the OAuth callback / client-id settings the OAuth flow needs. Uses
+    pytest-django's `settings` fixture so values are reverted automatically.
+    """
+    settings.OAUTH_CALLBACK_BASE_URL = "http://localhost:8000"
+    settings.GMAIL_OAUTH_CLIENT_ID = "test_gmail_client_id"
+    settings.GMAIL_OAUTH_CLIENT_SECRET = "test_gmail_client_secret"
+    settings.OUTLOOK_OAUTH_CLIENT_ID = "test_outlook_client_id"
+    settings.OUTLOOK_OAUTH_CLIENT_SECRET = "test_outlook_client_secret"
+    return settings
