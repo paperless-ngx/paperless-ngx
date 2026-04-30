@@ -404,6 +404,12 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     )
   }
 
+  getAiSuggestions(id: number): Observable<DocumentSuggestions> {
+    return this.http.get<DocumentSuggestions>(
+      this.getResourceUrl(id, 'ai_suggestions')
+    )
+  }
+
   getHistory(id: number): Observable<AuditLogEntry[]> {
     return this.http.get<AuditLogEntry[]>(this.getResourceUrl(id, 'history'))
   }

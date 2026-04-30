@@ -193,6 +193,14 @@ describe(`DocumentService`, () => {
     expect(req.request.method).toEqual('GET')
   })
 
+  it('should call appropriate api endpoint for getting AI suggestions', () => {
+    subscription = service.getAiSuggestions(documents[0].id).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/ai_suggestions/`
+    )
+    expect(req.request.method).toEqual('GET')
+  })
+
   it('should call appropriate api endpoint for bulk download', () => {
     const ids = [1, 2, 3]
     const content = 'both'
