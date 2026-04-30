@@ -1,12 +1,11 @@
 import email
 import email.contentmanager
-import shutil
 import subprocess
-import tempfile
 from collections.abc import Generator
 from email.message import Message
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
+from pathlib import Path
 
 import gnupg
 import pytest
@@ -22,11 +21,11 @@ from paperless_mail.tests.test_mail import _AttachmentDef
 class MessageEncryptor:
     """
     Test helper: generates a throwaway GPG keypair in a tempdir and exposes
-    `encrypt(MailMessage) -> MailMessage` plus `cleanup()`.
+    `encrypt(MailMessage) -> MailMessage`.
     """
 
-    def __init__(self) -> None:
-        self.gpg_home = tempfile.mkdtemp()
+    def __init__(self, gpg_home: Path) -> None:
+        self.gpg_home = str(gpg_home)
         self.gpg = gnupg.GPG(gnupghome=self.gpg_home)
         self._testUser = "testuser@example.com"
         # Generate a new key
@@ -40,9 +39,9 @@ class MessageEncryptor:
         )
         self.gpg.gen_key(input_data)
 
-    def cleanup(self) -> None:
+    def kill_agent(self) -> None:
         """
-        Kill the gpg-agent process and clean up the temporary GPG home directory.
+        Kill the gpg-agent so pytest can remove the GPG home.
 
         This uses gpgconf to properly terminate the agent, which is the officially
         recommended cleanup method from the GnuPG project. python-gnupg does not
@@ -60,9 +59,6 @@ class MessageEncryptor:
         except (FileNotFoundError, subprocess.TimeoutExpired):
             # gpgconf not found or hung - agent will timeout eventually
             pass
-
-        # Clean up the temporary directory
-        shutil.rmtree(self.gpg_home, ignore_errors=True)
 
     @staticmethod
     def get_email_body_without_headers(email_message: Message) -> bytes:
@@ -114,14 +110,19 @@ class MessageEncryptor:
 
 
 @pytest.fixture(scope="session")
-def message_encryptor() -> Generator[MessageEncryptor, None, None]:
+def message_encryptor(
+    tmp_path_factory: pytest.TempPathFactory,
+) -> Generator[MessageEncryptor, None, None]:
     """
     Session-scoped: GPG keypair generation is slow (~1s+), and nothing in
-    these tests mutates the keyring after creation.
+    these tests mutates the keyring after creation. The GPG home directory
+    comes from `tmp_path_factory` so pytest cleans it up at session end;
+    we still kill the gpg-agent ourselves so the dir is removable.
     """
-    encryptor = MessageEncryptor()
+    gpg_home = tmp_path_factory.mktemp("gpg-home")
+    encryptor = MessageEncryptor(gpg_home)
     yield encryptor
-    encryptor.cleanup()
+    encryptor.kill_agent()
 
 
 @pytest.fixture()
@@ -212,35 +213,34 @@ class TestMailMessageDecryptor:
 
         assert len(handler._message_preprocessors) == 0
 
-    def test_decrypt_fails(self, settings, encrypted_pair) -> None:
+    def test_decrypt_fails(self, settings, encrypted_pair, tmp_path: Path) -> None:
         """
         A decryptor pointed at a fresh empty GPG home cannot decrypt the
         message — ensure it surfaces an exception rather than silently passing
         bytes through.
         """
         encrypted_message, _ = encrypted_pair
-        # This test creates its own empty GPG home to test decryption failure
-        empty_gpg_home = tempfile.mkdtemp()
-        try:
-            settings.EMAIL_ENABLE_GPG_DECRYPTOR = True
-            settings.EMAIL_GNUPG_HOME = empty_gpg_home
+        empty_gpg_home = tmp_path / "empty-gpg-home"
+        empty_gpg_home.mkdir()
 
-            decryptor = MailMessageDecryptor()
+        settings.EMAIL_ENABLE_GPG_DECRYPTOR = True
+        settings.EMAIL_GNUPG_HOME = str(empty_gpg_home)
+
+        decryptor = MailMessageDecryptor()
+        try:
             with pytest.raises(Exception):
                 decryptor.run(encrypted_message)
         finally:
-            # Clean up the temporary GPG home used only by this test
             try:
                 subprocess.run(
                     ["gpgconf", "--kill", "gpg-agent"],
-                    env={"GNUPGHOME": empty_gpg_home},
+                    env={"GNUPGHOME": str(empty_gpg_home)},
                     check=False,
                     capture_output=True,
                     timeout=5,
                 )
             except (FileNotFoundError, subprocess.TimeoutExpired):
                 pass
-            shutil.rmtree(empty_gpg_home, ignore_errors=True)
 
     def test_decrypt_encrypted_mail(self, gpg_settings, encrypted_pair) -> None:
         """
