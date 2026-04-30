@@ -17,12 +17,12 @@ from paperless_mail.oauth import PaperlessMailOAuth2Manager
 from paperless_mail.tests.factories import MailAccountFactory
 
 
-@pytest.fixture()
+@pytest.fixture
 def oauth_manager() -> PaperlessMailOAuth2Manager:
     return PaperlessMailOAuth2Manager()
 
 
-@pytest.fixture()
+@pytest.fixture
 def oauth_session(client: Client) -> Client:
     """Seed the test client session with a known oauth_state."""
     session = client.session
@@ -130,10 +130,7 @@ class TestOAuthCallbackView:
         """
         response = client.get("/api/oauth/callback/")
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert not MailAccount.objects.filter(imap_server="imap.gmail.com").exists()
-        assert not MailAccount.objects.filter(
-            imap_server="outlook.office365.com",
-        ).exists()
+        assert not MailAccount.objects.exists()
 
     def test_invalid_state(
         self,
@@ -153,10 +150,7 @@ class TestOAuthCallbackView:
             "/api/oauth/callback/?code=test_code&state=invalid_state",
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert not MailAccount.objects.filter(imap_server="imap.gmail.com").exists()
-        assert not MailAccount.objects.filter(
-            imap_server="outlook.office365.com",
-        ).exists()
+        assert not MailAccount.objects.exists()
 
     def test_insufficient_permissions(
         self,
@@ -173,20 +167,15 @@ class TestOAuthCallbackView:
         THEN:
             - 400 Bad Request is returned and no mail account is created
         """
-
         mail_user.user_permissions.remove(
-            *Permission.objects.filter(codename__in=["add_mailaccount"]),
+            *Permission.objects.filter(codename="add_mailaccount"),
         )
-        mail_user.save()
 
         response = client.get(
             "/api/oauth/callback/?code=test_code&scope=https://mail.google.com/",
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert not MailAccount.objects.filter(imap_server="imap.gmail.com").exists()
-        assert not MailAccount.objects.filter(
-            imap_server="outlook.office365.com",
-        ).exists()
+        assert not MailAccount.objects.exists()
 
     @pytest.mark.parametrize(
         ("provider", "callback_query", "expected_imap"),
@@ -232,12 +221,10 @@ class TestOAuthCallbackView:
             "refresh_token": "test_refresh_token",
             "expires_in": 3600,
         }
-        target = (
-            "paperless_mail.oauth.PaperlessMailOAuth2Manager.get_gmail_access_token"
-            if provider == "gmail"
-            else "paperless_mail.oauth.PaperlessMailOAuth2Manager.get_outlook_access_token"
+        mocked = mocker.patch(
+            f"paperless_mail.oauth.PaperlessMailOAuth2Manager.get_{provider}_access_token",
+            return_value=token_payload,
         )
-        mocked = mocker.patch(target, return_value=token_payload)
 
         response = client.get(f"/api/oauth/callback/?{callback_query}")
 
@@ -300,31 +287,45 @@ class TestOAuthCallbackView:
         )
 
 
+@pytest.fixture
+def expired_oauth_account_factory(db: None, mocker: pytest_mock.MockerFixture):
+    """
+    Build an OAuth-backed MailAccount whose access token has already expired,
+    while patching `get_mailbox` so no real IMAP connection is attempted.
+    """
+    mocker.patch(
+        "paperless_mail.mail.get_mailbox",
+    ).return_value.__enter__.return_value = mocker.MagicMock()
+
+    def _make(account_type: MailAccount.MailAccountType) -> MailAccount:
+        return MailAccountFactory(
+            username="test_username",
+            account_type=account_type,
+            is_token=True,
+            refresh_token="test_refresh_token",
+            expiration=timezone.now() - timedelta(days=1),
+        )
+
+    return _make
+
+
 @pytest.mark.django_db
 class TestRefreshTokenOnHandleMailAccount:
     """OAuth refresh-token flow exercised through MailAccountHandler.handle_mail_account."""
 
     @pytest.mark.parametrize(
-        ("account_type", "name"),
+        "account_type",
         [
-            pytest.param(
-                MailAccount.MailAccountType.GMAIL_OAUTH,
-                "Test Gmail",
-                id="gmail",
-            ),
-            pytest.param(
-                MailAccount.MailAccountType.OUTLOOK_OAUTH,
-                "Test Outlook",
-                id="outlook",
-            ),
+            pytest.param(MailAccount.MailAccountType.GMAIL_OAUTH, id="gmail"),
+            pytest.param(MailAccount.MailAccountType.OUTLOOK_OAUTH, id="outlook"),
         ],
     )
     def test_refresh_token_called(
         self,
         mocker: pytest_mock.MockerFixture,
         mail_account_handler: MailAccountHandler,
+        expired_oauth_account_factory,
         account_type: MailAccount.MailAccountType,
-        name: str,
     ) -> None:
         """
         GIVEN:
@@ -334,10 +335,6 @@ class TestRefreshTokenOnHandleMailAccount:
         THEN:
             - The OAuth refresh_token endpoint is invoked exactly once
         """
-        mock_mailbox = mocker.MagicMock()
-        mocker.patch(
-            "paperless_mail.mail.get_mailbox",
-        ).return_value.__enter__.return_value = mock_mailbox
         mock_refresh = mocker.patch(
             "httpx_oauth.oauth2.BaseOAuth2.refresh_token",
             return_value={
@@ -347,16 +344,9 @@ class TestRefreshTokenOnHandleMailAccount:
             },
         )
 
-        account = MailAccountFactory(
-            name=name,
-            username="test_username",
-            account_type=account_type,
-            is_token=True,
-            refresh_token="test_refresh_token",
-            expiration=timezone.now() - timedelta(days=1),
+        mail_account_handler.handle_mail_account(
+            expired_oauth_account_factory(account_type),
         )
-
-        mail_account_handler.handle_mail_account(account)
         mock_refresh.assert_called_once()
 
     def test_refresh_token_failure(
@@ -364,6 +354,7 @@ class TestRefreshTokenOnHandleMailAccount:
         mocker: pytest_mock.MockerFixture,
         caplog: pytest.LogCaptureFixture,
         mail_account_handler: MailAccountHandler,
+        expired_oauth_account_factory,
     ) -> None:
         """
         GIVEN:
@@ -375,22 +366,13 @@ class TestRefreshTokenOnHandleMailAccount:
             - 0 processed mails is returned
             - The failure is logged at ERROR level with the account context
         """
-        mock_mailbox = mocker.MagicMock()
-        mocker.patch(
-            "paperless_mail.mail.get_mailbox",
-        ).return_value.__enter__.return_value = mock_mailbox
         mock_refresh = mocker.patch(
             "httpx_oauth.oauth2.BaseOAuth2.refresh_token",
             side_effect=RefreshTokenError("test_error"),
         )
 
-        account = MailAccountFactory(
-            name="Test Gmail Mail Account",
-            username="test_username",
-            account_type=MailAccount.MailAccountType.GMAIL_OAUTH,
-            is_token=True,
-            refresh_token="test_refresh_token",
-            expiration=timezone.now() - timedelta(days=1),
+        account = expired_oauth_account_factory(
+            MailAccount.MailAccountType.GMAIL_OAUTH,
         )
 
         with caplog.at_level("ERROR", logger="paperless_mail"):
