@@ -12,6 +12,7 @@ from pytest_django.fixtures import SettingsWrapper
 from rest_framework.test import APIClient
 
 from documents.tests.factories import DocumentFactory
+from documents.tests.factories import UserFactory
 
 UserModelT = get_user_model()
 
@@ -129,9 +130,9 @@ def rest_api_client():
 
 
 @pytest.fixture()
-def regular_user(django_user_model: type[UserModelT]) -> UserModelT:
+def regular_user(db) -> UserModelT:
     """Unprivileged authenticated user for permission boundary tests."""
-    return django_user_model.objects.create_user(username="regular", password="regular")
+    return UserFactory.create()
 
 
 @pytest.fixture()

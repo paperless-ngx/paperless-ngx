@@ -649,7 +649,7 @@ class TestDocumentConsumptionFinishedSignal:
         assert doc_with_keyword.correspondent == correspondent
 
     def test_correspondent_not_applied(self, doc_with_keyword: Document) -> None:
-        TagFactory.create(
+        CorrespondentFactory.create(
             match="no-match",
             matching_algorithm=MatchingModel.MATCH_ANY,
         )

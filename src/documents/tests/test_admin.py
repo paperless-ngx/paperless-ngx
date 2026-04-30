@@ -35,7 +35,7 @@ def user_admin() -> PaperlessUserAdmin:
 
 @pytest.fixture
 def staff_user(db) -> User:
-    return UserFactory.create(username="staff", staff=True)
+    return UserFactory.create(staff=True)
 
 
 class TestDocumentAdmin(DirectoriesMixin, TestCase):
