@@ -2145,6 +2145,29 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         response = self.client.get("/api/documents/34676/suggestions/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    @mock.patch("documents.views.get_ai_document_classification")
+    @override_settings(AI_ENABLED=True)
+    def test_suggestions_still_uses_classifier_when_ai_enabled(
+        self,
+        mock_get_ai_classification,
+    ) -> None:
+        doc = Document.objects.create(title="test", mime_type="application/pdf")
+
+        response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data,
+            {
+                "correspondents": [],
+                "tags": [],
+                "document_types": [],
+                "storage_paths": [],
+                "dates": [],
+            },
+        )
+        mock_get_ai_classification.assert_not_called()
+
     @mock.patch("documents.views.match_storage_paths")
     @mock.patch("documents.views.match_document_types")
     @mock.patch("documents.views.match_tags")

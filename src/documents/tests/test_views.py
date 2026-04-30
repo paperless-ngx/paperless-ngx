@@ -306,7 +306,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
     )
-    def test_suggestions_with_cached_llm(
+    def test_ai_suggestions_with_cached_llm(
         self,
         mock_refresh_cache,
         mock_get_cache,
@@ -314,7 +314,9 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         mock_get_cache.return_value = MagicMock(suggestions={"tags": ["tag1", "tag2"]})
 
         self.client.force_login(user=self.user)
-        response = self.client.get(f"/api/documents/{self.document.pk}/suggestions/")
+        response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), {"tags": ["tag1", "tag2"]})
         mock_refresh_cache.assert_called_once_with(self.document.pk)
@@ -324,7 +326,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
     )
-    def test_suggestions_with_ai_enabled(
+    def test_ai_suggestions_with_ai_enabled(
         self,
         mock_get_ai_classification,
     ) -> None:
@@ -338,7 +340,9 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         }
 
         self.client.force_login(user=self.user)
-        response = self.client.get(f"/api/documents/{self.document.pk}/suggestions/")
+        response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             response.json(),
@@ -361,7 +365,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         AI_ENABLED=True,
         LLM_BACKEND="openai-like",
     )
-    def test_suggestions_with_invalid_ai_configuration(
+    def test_ai_suggestions_with_invalid_ai_configuration(
         self,
         mock_get_ai_classification,
     ) -> None:
@@ -370,7 +374,9 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         )
 
         self.client.force_login(user=self.user)
-        response = self.client.get(f"/api/documents/{self.document.pk}/suggestions/")
+        response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(

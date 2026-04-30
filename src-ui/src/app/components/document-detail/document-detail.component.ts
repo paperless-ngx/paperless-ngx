@@ -981,8 +981,10 @@ export class DocumentDetailComponent
 
   getSuggestions() {
     this.suggestionsLoading = true
-    this.documentsService
-      .getSuggestions(this.documentId)
+    const suggestionsObservable = this.aiEnabled
+      ? this.documentsService.getAiSuggestions(this.documentId)
+      : this.documentsService.getSuggestions(this.documentId)
+    suggestionsObservable
       .pipe(
         first(),
         takeUntil(this.unsubscribeNotifier),
