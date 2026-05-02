@@ -1122,7 +1122,6 @@ def before_task_publish_handler(
         return
 
     try:
-        close_old_connections()
         _, task_kwargs, _ = body
         task_id = headers["id"]
 
