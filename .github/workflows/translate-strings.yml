@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - dev
+env:
+  DEFAULT_UV_VERSION: "0.11.x"
 jobs:
   generate-translate-strings:
     name: Generate Translation Strings
@@ -29,6 +31,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
       - name: Install backend python dependencies
         run: |

@@ -11,7 +11,7 @@ concurrency:
 permissions:
   contents: read
 env:
-  DEFAULT_UV_VERSION: "0.10.x"
+  DEFAULT_UV_VERSION: "0.11.x"
   DEFAULT_PYTHON_VERSION: "3.12"
 jobs:
   changes:
