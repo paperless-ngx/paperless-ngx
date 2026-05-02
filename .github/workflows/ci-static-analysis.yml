@@ -41,8 +41,10 @@ jobs:
         uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
       - name: Export all requirements from lockfile
         run: |
-          uv export --all-groups --format requirements-txt -o /tmp/requirements-all.txt
-          grep -v " @ git+" /tmp/requirements-all.txt > /tmp/requirements-auditable.txt
+          uv export --all-groups --no-hashes --format requirements-txt \
+            | grep -v " @ git+" \
+            | sed 's/==\([0-9][0-9.]*\)+[a-zA-Z0-9_]*/==\1/g' \
+            > /tmp/requirements-auditable.txt
       - name: Run pip-audit
         uses: pypa/gh-action-pip-audit@1220774d901786e6f652ae159f7b6bc8fea6d266 # v1.1.0
         with:
