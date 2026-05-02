@@ -46,6 +46,13 @@ jobs:
         uses: pypa/gh-action-pip-audit@1220774d901786e6f652ae159f7b6bc8fea6d266 # v1.1.0
         with:
           inputs: /tmp/requirements-all.txt
+          format: sarif
+          output: results.sarif
+      - name: Upload results to GitHub code scanning
+        uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
+        if: always()
+        with:
+          sarif_file: results.sarif
   semgrep:
     name: Semgrep CE
     runs-on: ubuntu-24.04
