@@ -1,5 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core'
 import { MatchingModel } from '../data/matching-model'
+import { textMatchesTokens } from '../utils/text-match'
 
 @Pipe({
   name: 'filter',
@@ -21,9 +22,7 @@ export class FilterPipe implements PipeTransform {
               typeof item[key] === 'string' || typeof item[key] === 'number'
           )
       return keys.some((key) => {
-        return String(item[key])
-          .toLowerCase()
-          .includes(searchText.toLowerCase())
+        return textMatchesTokens(String(item[key]), searchText)
       })
     })
   }

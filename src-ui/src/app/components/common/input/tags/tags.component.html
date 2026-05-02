@@ -13,6 +13,7 @@
           [closeOnSelect]="false"
           [clearSearchOnAdd]="true"
           [hideSelected]="tags.length > 0"
+          [searchFn]="tagSearchFn"
           [addTag]="allowCreate ? createTagRef : false"
           addTagText="Add tag"
           i18n-addTagText
