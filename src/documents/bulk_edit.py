@@ -218,7 +218,7 @@ def modify_tags(
     doc_ids: list[int],
     add_tags: list[int],
     remove_tags: list[int],
-) -> Literal["OK"]:
+) -> Literal["OK"] | Literal["ERROR"]:
     qs = Document.objects.filter(id__in=doc_ids).only("pk")
     affected_docs = list(qs.values_list("pk", flat=True))
     DocumentTagRelationship = Document.tags.through
@@ -267,14 +267,15 @@ def modify_tags(
                         ignore_conflicts=True,
                     )
 
-            if affected_docs:
-                bulk_update_documents.apply_async(
-                    kwargs={"document_ids": affected_docs},
-                    headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
-                )
     except Exception as e:
         logger.error(f"Error modifying tags: {e}")
         return "ERROR"
+
+    if affected_docs:
+        bulk_update_documents.apply_async(
+            kwargs={"document_ids": affected_docs},
+            headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
+        )
 
     return "OK"
 
