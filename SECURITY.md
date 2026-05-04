@@ -57,6 +57,7 @@ We may close reports that are:
 The following are not generally considered vulnerabilities unless accompanied by a concrete, reproducible impact in Paperless-ngx:
 
 - large uploads or resource usage that do not bypass documented limits or privileges
+- IDOR / access control claims regarding the ability to attach an un-viewable object to a document. This is expected behavior.
 - claims based solely on the presence of a library, framework feature or code pattern without a working exploit
 - reports that rely on admin-level access, workflow-editing privileges, shell access, or other high-trust roles unless they demonstrate an unintended privilege boundary bypass
 - optional webhook, mail, AI, OCR, or integration behavior described without a product-level vulnerability
