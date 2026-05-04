@@ -275,6 +275,25 @@ def _get_tantivy_query_and_mode(params):
     return None
 
 
+def _get_more_like_id(query_params: dict[str, Any], user: User) -> int:
+    try:
+        more_like_doc_id = int(query_params["more_like_id"])
+        more_like_doc = Document.objects.select_related("owner").get(
+            pk=more_like_doc_id,
+        )
+    except (TypeError, ValueError, Document.DoesNotExist):
+        raise PermissionDenied(_("Invalid more_like_id"))
+
+    if not has_perms_owner_aware(
+        user,
+        "view_document",
+        more_like_doc,
+    ):
+        raise PermissionDenied(_("Insufficient permissions."))
+
+    return more_like_doc_id
+
+
 class IndexView(TemplateView):
     template_name = "index.html"
 
@@ -2309,20 +2328,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
             filtered_qs: QuerySet[Document],
         ) -> tuple[list[int], list[SearchHit], int]:
             """Handle more_like_id search: permission check, IDs, stub hits."""
-            try:
-                more_like_doc_id = int(request.query_params["more_like_id"])
-                more_like_doc = Document.objects.select_related("owner").get(
-                    pk=more_like_doc_id,
-                )
-            except (TypeError, ValueError, Document.DoesNotExist):
-                raise PermissionDenied(_("Invalid more_like_id"))
-
-            if not has_perms_owner_aware(
-                request.user,
-                "view_document",
-                more_like_doc,
-            ):
-                raise PermissionDenied(_("Insufficient permissions."))
+            more_like_doc_id = _get_more_like_id(request.query_params, user)
 
             all_ids = backend.more_like_this_ids(more_like_doc_id, user=user)
             ordered_ids = intersect_and_order(
@@ -2541,16 +2547,7 @@ class DocumentSelectionMixin:
         search_user = None if user.is_superuser else user
 
         if filter_name == "more_like_id":
-            try:
-                more_like_doc_id = int(filters[filter_name])
-                more_like_doc = Document.objects.select_related("owner").get(
-                    pk=more_like_doc_id,
-                )
-            except (TypeError, ValueError, Document.DoesNotExist):
-                raise PermissionDenied(_("Invalid more_like_id"))
-
-            if not has_perms_owner_aware(user, "view_document", more_like_doc):
-                raise PermissionDenied(_("Insufficient permissions."))
+            more_like_doc_id = _get_more_like_id(filters, user)
 
             search_ids = backend.more_like_this_ids(more_like_doc_id, user=search_user)
         else:
