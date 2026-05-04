@@ -241,18 +241,18 @@
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">90</context>
+          <context context-type="linenumber">93</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">99</context>
+          <context context-type="linenumber">102</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">92</context>
+          <context context-type="linenumber">95</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
@@ -279,21 +279,21 @@
         <source>Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">114</context>
+          <context context-type="linenumber">117</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1218124467712564468" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">129</context>
+          <context context-type="linenumber">132</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6570363013146073520" datatype="html">
         <source>Dashboard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">139</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -312,7 +312,7 @@
         <source>Documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">147</context>
+          <context context-type="linenumber">150</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
@@ -367,7 +367,7 @@
         <source>Settings</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">162</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
@@ -390,49 +390,49 @@
         <source>The dashboard can be used to show saved views, such as an &apos;Inbox&apos;. Views are found under Manage &gt; Saved Views once you have created some.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">168</context>
+          <context context-type="linenumber">171</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9075755296812854717" datatype="html">
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">175</context>
+          <context context-type="linenumber">178</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7495498057594070122" datatype="html">
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">180</context>
+          <context context-type="linenumber">183</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1334220418719920556" datatype="html">
         <source>The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">187</context>
+          <context context-type="linenumber">190</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5427326625898532358" datatype="html">
         <source>Any combination of filters can be saved as a &apos;view&apos; which can then be displayed on the dashboard and / or sidebar.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">193</context>
+          <context context-type="linenumber">196</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5010312032259162639" datatype="html">
         <source>Attributes like tags, correspondents, document types, storage paths and custom fields can all be managed here. They can also be created from the document edit view.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">198</context>
+          <context context-type="linenumber">201</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7851939076947092983" datatype="html">
         <source>Manage e-mail accounts and rules for automatically importing documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">206</context>
+          <context context-type="linenumber">209</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
@@ -443,42 +443,42 @@
         <source>Workflows give you more control over the document pipeline.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">214</context>
+          <context context-type="linenumber">217</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2685141468866020893" datatype="html">
         <source>Tasks helps you track background work, what needs attention, and what recently completed.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">222</context>
+          <context context-type="linenumber">225</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2755033621682206902" datatype="html">
         <source>Check out the settings for various tweaks to the web app.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">230</context>
+          <context context-type="linenumber">233</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7172877665285340082" datatype="html">
         <source>Thank you! 🙏</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">238</context>
+          <context context-type="linenumber">241</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7354947513482088740" datatype="html">
         <source>There are &lt;em&gt;tons&lt;/em&gt; more features and info we didn&apos;t cover here, but this should get you started. Check out the documentation or visit the project on GitHub to learn more or to report issues.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">240</context>
+          <context context-type="linenumber">243</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4270528545616947218" datatype="html">
         <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">242</context>
+          <context context-type="linenumber">245</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9063918187161876141" datatype="html">
