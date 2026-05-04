@@ -8,7 +8,7 @@ concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 env:
-  DEFAULT_UV_VERSION: "0.10.x"
+  DEFAULT_UV_VERSION: "0.11.x"
   DEFAULT_PYTHON_VERSION: "3.12"
 permissions: {}
 jobs:
