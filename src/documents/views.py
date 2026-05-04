@@ -263,6 +263,18 @@ _TANTIVY_INTERSECT_THRESHOLD = 5_000
 _TANTIVY_SEARCH_PARAM_NAMES = ("text", "title_search", "query", "more_like_id")
 
 
+def _get_tantivy_query_and_mode(params):
+    from documents.search import SearchMode
+
+    if "text" in params:
+        return str(params["text"]), SearchMode.TEXT
+    if "title_search" in params:
+        return str(params["title_search"]), SearchMode.TITLE
+    if "query" in params:
+        return str(params["query"]), SearchMode.QUERY
+    return None
+
+
 class IndexView(TemplateView):
     template_name = "index.html"
 
@@ -2187,7 +2199,6 @@ class UnifiedSearchViewSet(DocumentViewSet):
             return super().list(request)
 
         from documents.search import SearchHit
-        from documents.search import SearchMode
         from documents.search import TantivyBackend
         from documents.search import TantivyRelevanceList
         from documents.search import get_backend
@@ -2258,15 +2269,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
             filtered_qs: QuerySet[Document],
         ) -> tuple[list[int], list[SearchHit], int]:
             """Handle text/title/query search: IDs, ORM intersection, page highlights."""
-            if "text" in request.query_params:
-                search_mode = SearchMode.TEXT
-                query_str = request.query_params["text"]
-            elif "title_search" in request.query_params:
-                search_mode = SearchMode.TITLE
-                query_str = request.query_params["title_search"]
-            else:
-                search_mode = SearchMode.QUERY
-                query_str = request.query_params["query"]
+            query_str, search_mode = _get_tantivy_query_and_mode(request.query_params)
 
             # "score" is not a real Tantivy sort field — it means relevance order,
             # which is Tantivy's default when no sort field is specified.
@@ -2531,7 +2534,6 @@ class DocumentSelectionMixin:
                 },
             )
 
-        from documents.search import SearchMode
         from documents.search import get_backend
 
         filter_name = search_filters[0]
@@ -2552,13 +2554,9 @@ class DocumentSelectionMixin:
 
             search_ids = backend.more_like_this_ids(more_like_doc_id, user=search_user)
         else:
-            search_mode = {
-                "text": SearchMode.TEXT,
-                "title_search": SearchMode.TITLE,
-                "query": SearchMode.QUERY,
-            }[filter_name]
+            query_str, search_mode = _get_tantivy_query_and_mode(filters)
             search_ids = backend.search_ids(
-                str(filters[filter_name]),
+                query_str,
                 user=search_user,
                 search_mode=search_mode,
             )
