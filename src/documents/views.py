@@ -275,7 +275,7 @@ def _get_tantivy_query_and_mode(params):
     return None
 
 
-def _get_more_like_id(query_params: dict[str, Any], user: User) -> int:
+def _get_more_like_id(query_params: dict[str, Any], user: User | None) -> int:
     try:
         more_like_doc_id = int(query_params["more_like_id"])
         more_like_doc = Document.objects.select_related("owner").get(
@@ -284,7 +284,7 @@ def _get_more_like_id(query_params: dict[str, Any], user: User) -> int:
     except (TypeError, ValueError, Document.DoesNotExist):
         raise PermissionDenied(_("Invalid more_like_id"))
 
-    if not has_perms_owner_aware(
+    if user and not has_perms_owner_aware(
         user,
         "view_document",
         more_like_doc,
