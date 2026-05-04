@@ -726,6 +726,26 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         get_backend.return_value.more_like_this_ids.assert_called_once()
 
+    def test_api_bulk_edit_with_all_true_rejects_multiple_filters(self) -> None:
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "all": True,
+                    "filters": {
+                        "text": "B",
+                        "query": "c1",
+                    },
+                    "method": "set_storage_path",
+                    "parameters": {"storage_path": self.sp1.id},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"Specify only one of", response.content)
+
     def test_api_bulk_edit_with_all_true_rejects_unsupported_methods(self) -> None:
         response = self.client.post(
             "/api/documents/bulk_edit/",
