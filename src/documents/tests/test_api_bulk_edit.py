@@ -683,6 +683,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         for filters in (
             {"text": "new doc 2017-03-16"},
             {"title_search": "apple"},
+            {"more_like_id": self.doc2.id},
         ):
             with self.subTest(filters=filters):
                 get_backend.return_value.search_ids.return_value = [self.doc2.id]
