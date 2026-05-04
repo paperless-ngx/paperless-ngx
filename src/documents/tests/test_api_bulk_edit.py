@@ -683,7 +683,6 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         for filters in (
             {"text": "new doc 2017-03-16"},
             {"title_search": "apple"},
-            {"more_like_id": self.doc2.id},
         ):
             with self.subTest(filters=filters):
                 get_backend.return_value.search_ids.return_value = [self.doc2.id]
@@ -709,6 +708,23 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
                 m.reset_mock()
                 get_backend.return_value.search_ids.reset_mock()
+
+        # more_like_id is a different path
+        get_backend.return_value.more_like_this_ids.return_value = [self.doc2.id]
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "all": True,
+                    "filters": {"more_like_id": self.doc1.id},
+                    "method": "set_storage_path",
+                    "parameters": {"storage_path": self.sp1.id},
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        get_backend.return_value.more_like_this_ids.assert_called_once()
 
     def test_api_bulk_edit_with_all_true_rejects_unsupported_methods(self) -> None:
         response = self.client.post(
