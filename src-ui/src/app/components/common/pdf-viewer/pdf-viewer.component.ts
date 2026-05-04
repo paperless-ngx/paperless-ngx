@@ -1,8 +1,10 @@
 import {
   AfterViewInit,
   Component,
+  DOCUMENT,
   ElementRef,
   EventEmitter,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -39,6 +41,8 @@ import {
 export class PngxPdfViewerComponent
   implements AfterViewInit, OnChanges, OnDestroy
 {
+  private readonly document = inject<Document>(DOCUMENT)
+
   @Input() src!: PdfSource
   @Input() page?: number
   @Output() pageChange = new EventEmitter<number>()
@@ -166,7 +170,10 @@ export class PngxPdfViewerComponent
     this.lastFindQuery = ''
     this.loadingTask?.destroy()
 
-    GlobalWorkerOptions.workerSrc = '/assets/js/pdf.worker.min.mjs'
+    GlobalWorkerOptions.workerSrc = new URL(
+      'assets/js/pdf.worker.min.mjs',
+      this.document.baseURI
+    ).toString()
     this.loadingTask = getDocument(this.src)
 
     try {
