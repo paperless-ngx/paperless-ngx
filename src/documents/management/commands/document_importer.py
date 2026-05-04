@@ -2,13 +2,16 @@ import json
 import logging
 import os
 import tempfile
+from collections import defaultdict
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
+from typing import TypeAlias
 from zipfile import ZipFile
 from zipfile import is_zipfile
 
 import ijson
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -16,9 +19,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldDoesNotExist
 from django.core.management import call_command
 from django.core.management.base import CommandError
+from django.core.management.color import no_style
 from django.core.serializers.base import DeserializationError
 from django.db import IntegrityError
+from django.db import connection
+from django.db import models as django_models
 from django.db import transaction
+from django.db.models import GeneratedField
+from django.db.models import Model
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save
 from filelock import FileLock
@@ -47,6 +55,9 @@ from paperless import version
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
+# Maps M2M field names to the list of related PKs to apply after bulk_create.
+M2MData: TypeAlias = dict[str, list[int]]
+
 
 def iter_manifest_records(path: Path) -> Generator[dict, None, None]:
     """Yield records one at a time from a manifest JSON array via ijson."""
@@ -55,6 +66,107 @@ def iter_manifest_records(path: Path) -> Generator[dict, None, None]:
             yield from ijson.items(f, "item")
     except ijson.JSONError as e:
         raise CommandError(f"Failed to parse manifest file {path}: {e}") from e
+
+
+def _deserialize_record(
+    record: dict,
+) -> tuple[type[Model], Model, M2MData]:
+    """
+    Convert a single manifest record dict into a model instance and M2M data.
+
+    Returns (Model class, unsaved instance, m2m_data) where m2m_data maps
+    M2M field names to lists of integer PKs to be applied after the instance
+    is saved via bulk_create.
+
+    Raises DeserializationError for unknown models or bad field values.
+    Raises FieldDoesNotExist for fields not present on the model.
+
+    Note: CommandError from iter_manifest_records (malformed JSON mid-stream)
+    propagates through the caller unchanged, it is not caught here.
+    """
+    model_label = record["model"]
+    pk_value = record.get("pk")
+
+    try:
+        Model = apps.get_model(model_label)
+    except (LookupError, TypeError) as e:
+        raise DeserializationError(
+            f"Invalid model identifier: {model_label}",
+        ) from e
+
+    data: dict = {}
+    m2m_data: M2MData = {}
+
+    try:
+        data[Model._meta.pk.attname] = Model._meta.pk.to_python(pk_value)
+    except Exception as e:
+        raise DeserializationError(
+            f"Could not coerce pk={pk_value} for {model_label}: {e}",
+        ) from e
+
+    for field_name, field_value in record.get("fields", {}).items():
+        field = Model._meta.get_field(field_name)
+        remote = field.remote_field
+
+        if isinstance(remote, django_models.ManyToManyRel):
+            # Collect M2M PKs; .set() is called after bulk_create in flush_model.
+            target_pk = field.related_model._meta.pk
+            m2m_data[field.name] = [
+                target_pk.to_python(pk) for pk in (field_value or [])
+            ]
+
+        elif isinstance(remote, django_models.ManyToOneRel):
+            # FK: store the integer PK on field.attname (e.g. correspondent_id)
+            # to avoid triggering the descriptor and avoid an extra DB lookup.
+            if field_value is None:
+                data[field.attname] = None
+            else:
+                data[field.attname] = field.related_model._meta.pk.to_python(
+                    field_value,
+                )
+
+        else:
+            try:
+                data[field.name] = field.to_python(field_value)
+            except Exception as e:
+                raise DeserializationError(
+                    f"Could not coerce {field_name}={field_value!r} "
+                    f"for {model_label}(pk={pk_value}): {e}",
+                ) from e
+
+    return Model, Model(**data), m2m_data
+
+
+def _iter_document_copy_records(
+    manifest_paths: list[Path],
+) -> Generator[dict, None, None]:
+    """Yield one lightweight dict per Document record without buffering all records."""
+    for manifest_path in manifest_paths:
+        for record in iter_manifest_records(manifest_path):
+            if record["model"] == "documents.document":
+                yield {
+                    "pk": record["pk"],
+                    EXPORTER_FILE_NAME: record[EXPORTER_FILE_NAME],
+                    EXPORTER_THUMBNAIL_NAME: record.get(EXPORTER_THUMBNAIL_NAME),
+                    EXPORTER_ARCHIVE_NAME: record.get(EXPORTER_ARCHIVE_NAME),
+                }
+
+
+def _iter_share_link_bundle_copy_records(
+    manifest_paths: list[Path],
+) -> Generator[dict, None, None]:
+    """Yield one dict per ShareLinkBundle record that has a bundle file."""
+    for manifest_path in manifest_paths:
+        for record in iter_manifest_records(manifest_path):
+            if record["model"] == "documents.sharelinkbundle" and record.get(
+                EXPORTER_SHARE_LINK_BUNDLE_NAME,
+            ):
+                yield {
+                    "pk": record["pk"],
+                    EXPORTER_SHARE_LINK_BUNDLE_NAME: record[
+                        EXPORTER_SHARE_LINK_BUNDLE_NAME
+                    ],
+                }
 
 
 @contextmanager
@@ -90,6 +202,14 @@ class Command(CryptMixin, PaperlessCommand):
         parser.add_argument(
             "--passphrase",
             help="If provided, is used to sensitive fields in the export",
+        )
+
+        parser.add_argument(
+            "--batch-size",
+            type=int,
+            default=500,
+            help="Number of records to insert per batch during database load. "
+            "Lower values reduce peak memory usage.",
         )
 
     def pre_check(self) -> None:
@@ -197,36 +317,117 @@ class Command(CryptMixin, PaperlessCommand):
                 ),
             )
 
+    def _finalize_db_load(self, loaded_models: set[type[Model]]) -> None:
+        """Verify referential integrity and reset auto-increment sequences."""
+        through_tables = {
+            field.remote_field.through._meta.db_table
+            for model in loaded_models
+            for field in model._meta.many_to_many
+            if field.remote_field.through is not None
+            and field.remote_field.through._meta.auto_created
+        }
+        table_names = [m._meta.db_table for m in loaded_models] + list(through_tables)
+        if table_names:
+            connection.check_constraints(table_names=table_names)
+
+        if loaded_models:
+            sequence_sql = connection.ops.sequence_reset_sql(
+                no_style(),
+                list(loaded_models),
+            )
+            with connection.cursor() as cursor:
+                for sql in sequence_sql:
+                    cursor.execute(sql)  # pragma: no cover
+
+    def _import_error_context_message(self) -> str:
+        """Return a diagnostic string explaining a DB import failure."""
+        if (  # pragma: no cover
+            self.version is not None and self.version != version.__full_version_str__
+        ):
+            return (  # pragma: no cover
+                "Version mismatch: "
+                f"Currently {version.__full_version_str__},"
+                f" importing {self.version}"
+            )
+        return "No version information present"
+
     def load_data_to_database(self) -> None:
         """
-        As the name implies, loads data from the JSON file(s) into the database
+        Streams records from each manifest path and loads them into the database
+        using bulk_create with bounded batch sizes, avoiding holding the entire
+        manifest in memory at once.
+
+        Memory bound: at most batch_size * (number of distinct model types
+        present simultaneously in the manifest) instances at any time.
+        For the standard non-split manifest, records are grouped by model, so
+        in practice only one model's batch accumulates at a time.
         """
+        # Maps model class -> list of (instance, m2m_data) waiting to be flushed
+        pending: defaultdict[type[Model], list[tuple[Model, M2MData]]] = defaultdict(
+            list,
+        )
+        # All model classes inserted (needed for sequence reset after the load)
+        loaded_models: set[type[Model]] = set()
+
+        def flush_model(model: type[Model]) -> None:
+            """bulk_create the pending batch for model, then apply M2M."""
+            batch = pending.pop(model, [])
+            if not batch:  # pragma: no cover
+                return
+            instances = [inst for inst, _ in batch]
+            # GeneratedField is excluded because it is generated and trying to insert it will fail
+            update_fields = [
+                f.attname
+                for f in model._meta.concrete_fields
+                if not f.primary_key and not isinstance(f, GeneratedField)
+            ]
+            if not update_fields:  # pragma: no cover
+                raise DeserializationError(
+                    f"{model.__name__} has no updatable fields; PK-only models are not supported by the importer",
+                )
+            model.objects.bulk_create(  # type: ignore[attr-defined]
+                instances,
+                update_conflicts=True,
+                unique_fields=[model._meta.pk.attname],
+                update_fields=update_fields,
+            )
+            loaded_models.add(model)
+            for instance, m2m_data in batch:
+                for field_name, pk_list in m2m_data.items():
+                    getattr(instance, field_name).set(pk_list)
+
+        def flush_all() -> None:
+            for model in list(pending):
+                flush_model(model)
+
         try:
             with transaction.atomic():
-                # delete these since pk can change, re-created from import
+                # ContentType and Permission have auto-assigned PKs on a fresh
+                # install that conflict with exported PKs. Delete and re-import.
                 ContentType.objects.all().delete()
                 Permission.objects.all().delete()
-                for manifest_path in self.manifest_paths:
-                    call_command("loaddata", manifest_path, skip_checks=True)
-        except (FieldDoesNotExist, DeserializationError, IntegrityError) as e:
+
+                # Constraint checks are disabled so FK/M2M inserts succeed
+                # regardless of record order within the manifest.
+                # Note: on SQLite inside a transaction this context manager is a
+                # no-op; the constraint-deferral path is only exercised on
+                # PostgreSQL in production.
+                with connection.constraint_checks_disabled():
+                    for manifest_path in self.manifest_paths:
+                        for record in iter_manifest_records(manifest_path):
+                            model, instance, m2m_data = _deserialize_record(record)
+                            pending[model].append((instance, m2m_data))
+                            if len(pending[model]) >= self.batch_size:
+                                flush_model(model)
+
+                    flush_all()
+
+                self._finalize_db_load(loaded_models)
+
+        except (FieldDoesNotExist, DeserializationError, IntegrityError):
             self.stdout.write(self.style.ERROR("Database import failed"))
-            if (
-                self.version is not None
-                and self.version != version.__full_version_str__
-            ):  # pragma: no cover
-                self.stdout.write(
-                    self.style.ERROR(
-                        "Version mismatch: "
-                        f"Currently {version.__full_version_str__},"
-                        f" importing {self.version}",
-                    ),
-                )
-                raise e
-            else:
-                self.stdout.write(
-                    self.style.ERROR("No version information present"),
-                )
-                raise e
+            self.stdout.write(self.style.ERROR(self._import_error_context_message()))
+            raise
 
     def handle(self, *args, **options) -> None:
         logging.getLogger().handlers[0].level = logging.ERROR
@@ -234,6 +435,7 @@ class Command(CryptMixin, PaperlessCommand):
         self.source = Path(options["source"]).resolve()
         self.data_only: bool = options["data_only"]
         self.passphrase: str | None = options.get("passphrase")
+        self.batch_size: int = options["batch_size"]
         self.version: str | None = None
         self.salt: str | None = None
         self.manifest_paths = []
@@ -389,31 +591,10 @@ class Command(CryptMixin, PaperlessCommand):
 
         self.stdout.write("Copy files into paperless...")
 
-        document_records = [
-            {
-                "pk": record["pk"],
-                EXPORTER_FILE_NAME: record[EXPORTER_FILE_NAME],
-                EXPORTER_THUMBNAIL_NAME: record.get(EXPORTER_THUMBNAIL_NAME),
-                EXPORTER_ARCHIVE_NAME: record.get(EXPORTER_ARCHIVE_NAME),
-            }
-            for manifest_path in self.manifest_paths
-            for record in iter_manifest_records(manifest_path)
-            if record["model"] == "documents.document"
-        ]
-        share_link_bundle_records = [
-            {
-                "pk": record["pk"],
-                EXPORTER_SHARE_LINK_BUNDLE_NAME: record.get(
-                    EXPORTER_SHARE_LINK_BUNDLE_NAME,
-                ),
-            }
-            for manifest_path in self.manifest_paths
-            for record in iter_manifest_records(manifest_path)
-            if record["model"] == "documents.sharelinkbundle"
-            and record.get(EXPORTER_SHARE_LINK_BUNDLE_NAME)
-        ]
-
-        for record in self.track(document_records, description="Copying files..."):
+        for record in self.track(
+            _iter_document_copy_records(self.manifest_paths),
+            description="Copying files...",
+        ):
             document = Document.global_objects.get(pk=record["pk"])
 
             doc_file = record[EXPORTER_FILE_NAME]
@@ -452,10 +633,8 @@ class Command(CryptMixin, PaperlessCommand):
                     #  archived files
                     copy_file_with_basic_stats(archive_path, document.archive_path)
 
-            document.save()
-
         for record in self.track(
-            share_link_bundle_records,
+            _iter_share_link_bundle_copy_records(self.manifest_paths),
             description="Copying share link bundles...",
         ):
             bundle = ShareLinkBundle.objects.get(pk=record["pk"])
