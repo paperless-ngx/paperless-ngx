@@ -41,7 +41,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor() {
     let anyWindow = window as any
-    anyWindow.pdfWorkerSrc = 'assets/js/pdf.worker.min.mjs'
+    anyWindow.pdfWorkerSrc = new URL(
+      'assets/js/pdf.worker.min.mjs',
+      document.baseURI
+    ).toString()
     this.settings.updateAppearanceSettings()
   }
 

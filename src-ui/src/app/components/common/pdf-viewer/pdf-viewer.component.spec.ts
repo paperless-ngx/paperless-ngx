@@ -9,6 +9,15 @@ describe('PngxPdfViewerComponent', () => {
   let fixture: ComponentFixture<PngxPdfViewerComponent>
   let component: PngxPdfViewerComponent
 
+  const setBaseHref = (href: string) => {
+    let base = document.querySelector('base')
+    if (!base) {
+      base = document.createElement('base')
+      document.head.appendChild(base)
+    }
+    base.setAttribute('href', href)
+  }
+
   const initComponent = async (src = 'test.pdf') => {
     component.src = src
     fixture.detectChanges()
@@ -24,6 +33,10 @@ describe('PngxPdfViewerComponent', () => {
     component = fixture.componentInstance
   })
 
+  afterEach(() => {
+    setBaseHref('/')
+  })
+
   it('loads a document and emits events', async () => {
     const loadSpy = jest.fn()
     const renderedSpy = jest.fn()
@@ -33,7 +46,7 @@ describe('PngxPdfViewerComponent', () => {
     await initComponent()
 
     expect(pdfjs.GlobalWorkerOptions.workerSrc).toBe(
-      '/assets/js/pdf.worker.min.mjs'
+      new URL('assets/js/pdf.worker.min.mjs', document.baseURI).toString()
     )
     const isVisible = (component as any).findController.onIsPageVisible as
       | (() => boolean)
@@ -44,6 +57,19 @@ describe('PngxPdfViewerComponent', () => {
     )
     expect(renderedSpy).toHaveBeenCalled()
     expect((component as any).pdfViewer).toBeInstanceOf(PDFViewer)
+  })
+
+  it('resolves the worker source relative to the document base URI', async () => {
+    setBaseHref('/paperless/')
+
+    await initComponent()
+
+    expect(pdfjs.GlobalWorkerOptions.workerSrc).toBe(
+      new URL('assets/js/pdf.worker.min.mjs', document.baseURI).toString()
+    )
+    expect(pdfjs.GlobalWorkerOptions.workerSrc).toContain(
+      '/paperless/assets/js/pdf.worker.min.mjs'
+    )
   })
 
   it('initializes single-page viewer and disables text layer', async () => {
