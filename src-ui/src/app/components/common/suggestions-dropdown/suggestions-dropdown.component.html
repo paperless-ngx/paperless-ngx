@@ -25,19 +25,19 @@
             </div>
           }
           @if (suggestions?.suggested_tags.length > 0) {
-            <small class="list-group-item text-uppercase text-muted small">Tags</small>
+            <small class="list-group-item text-uppercase text-muted small"><i-bs class="me-2" name="tags"></i-bs>Tags</small>
             @for (tag of suggestions.suggested_tags; track tag) {
               <button type="button" class="list-group-item list-group-item-action bg-light" (click)="addTag.emit(tag)" i18n>{{ tag }}</button>
             }
           }
           @if (suggestions?.suggested_document_types.length > 0) {
-            <div class="list-group-item text-uppercase text-muted small">Document Types</div>
+            <div class="list-group-item text-uppercase text-muted small"><i-bs class="me-2" name="hash"></i-bs>Document Types</div>
             @for (type of suggestions.suggested_document_types; track type) {
               <button type="button" class="list-group-item list-group-item-action bg-light" (click)="addDocumentType.emit(type)" i18n>{{ type }}</button>
             }
           }
           @if (suggestions?.suggested_correspondents.length > 0) {
-            <div class="list-group-item text-uppercase text-muted small">Correspondents</div>
+            <div class="list-group-item text-uppercase text-muted small"><i-bs class="me-2" name="person"></i-bs>Correspondents</div>
             @for (correspondent of suggestions.suggested_correspondents; track correspondent) {
               <button type="button" class="list-group-item list-group-item-action bg-light" (click)="addCorrespondent.emit(correspondent)" i18n>{{ correspondent }}</button>
             }
