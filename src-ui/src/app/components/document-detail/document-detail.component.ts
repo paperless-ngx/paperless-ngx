@@ -1873,31 +1873,39 @@ export class DocumentDetailComponent
         next: (blob) => {
           const blobUrl = URL.createObjectURL(blob)
           const iframe = document.createElement('iframe')
-          iframe.style.display = 'none'
+          iframe.style.position = 'fixed'
+          iframe.style.right = '0'
+          iframe.style.bottom = '0'
+          iframe.style.width = '0'
+          iframe.style.height = '0'
+          iframe.style.border = '0'
+          iframe.style.visibility = 'hidden'
           iframe.src = blobUrl
           document.body.appendChild(iframe)
           iframe.onload = () => {
-            try {
-              iframe.contentWindow.focus()
-              iframe.contentWindow.print()
-              iframe.contentWindow.onafterprint = () => {
-                document.body.removeChild(iframe)
-                URL.revokeObjectURL(blobUrl)
+            timer(0).subscribe(() => {
+              try {
+                iframe.contentWindow.focus()
+                iframe.contentWindow.print()
+                iframe.contentWindow.onafterprint = () => {
+                  document.body.removeChild(iframe)
+                  URL.revokeObjectURL(blobUrl)
+                }
+              } catch (err) {
+                // FF throws cross-origin error on onafterprint
+                const isCrossOriginAfterPrintError =
+                  err instanceof DOMException &&
+                  err.message.includes('onafterprint')
+                if (!isCrossOriginAfterPrintError) {
+                  this.toastService.showError($localize`Print failed.`, err)
+                }
+                timer(100).subscribe(() => {
+                  // delay to avoid FF print failure
+                  document.body.removeChild(iframe)
+                  URL.revokeObjectURL(blobUrl)
+                })
               }
-            } catch (err) {
-              // FF throws cross-origin error on onafterprint
-              const isCrossOriginAfterPrintError =
-                err instanceof DOMException &&
-                err.message.includes('onafterprint')
-              if (!isCrossOriginAfterPrintError) {
-                this.toastService.showError($localize`Print failed.`, err)
-              }
-              timer(100).subscribe(() => {
-                // delay to avoid FF print failure
-                document.body.removeChild(iframe)
-                URL.revokeObjectURL(blobUrl)
-              })
-            }
+            })
           }
         },
         error: () => {
