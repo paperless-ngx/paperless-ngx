@@ -40,6 +40,10 @@ class TestWriteBatch:
 class TestSearch:
     """Test search query parsing and matching via search_ids."""
 
+    def test_empty_index_returns_no_ids(self, backend: TantivyBackend) -> None:
+        """Empty indexes must not pass a zero limit to Tantivy."""
+        assert backend.search_ids("missing", user=None) == []
+
     def test_text_mode_limits_default_search_to_title_and_content(
         self,
         backend: TantivyBackend,
