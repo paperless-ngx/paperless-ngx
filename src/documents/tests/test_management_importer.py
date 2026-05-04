@@ -592,3 +592,62 @@ class TestDeserializeRecord:
         record = {"model": "documents.doesnotexist", "pk": 1, "fields": {}}
         with pytest.raises(DeserializationError):
             _deserialize_record(record)
+
+    def test_invalid_pk_raises_deserialization_error(self) -> None:
+        """
+        GIVEN:
+            - A manifest record whose pk value cannot be coerced to the field type
+        WHEN:
+            - _deserialize_record is called
+        THEN:
+            - DeserializationError is raised mentioning the bad pk value
+        """
+        from django.core.serializers.base import DeserializationError
+
+        record = {"model": "documents.correspondent", "pk": "not-an-int", "fields": {}}
+        with pytest.raises(
+            DeserializationError,
+            match="Could not coerce pk=not-an-int",
+        ):
+            _deserialize_record(record)
+
+    def test_invalid_scalar_field_value_raises_deserialization_error(self) -> None:
+        """
+        GIVEN:
+            - A manifest record with a scalar field whose value cannot be coerced
+        WHEN:
+            - _deserialize_record is called
+        THEN:
+            - DeserializationError is raised mentioning the field and bad value
+        """
+        from django.core.serializers.base import DeserializationError
+
+        record = {
+            "model": "documents.correspondent",
+            "pk": 1,
+            "fields": {"matching_algorithm": "not-an-int"},
+        }
+        with pytest.raises(
+            DeserializationError,
+            match="Could not coerce matching_algorithm=",
+        ):
+            _deserialize_record(record)
+
+    def test_unknown_field_name_raises_field_does_not_exist(self) -> None:
+        """
+        GIVEN:
+            - A manifest record with a field name that does not exist on the model
+        WHEN:
+            - _deserialize_record is called
+        THEN:
+            - FieldDoesNotExist is raised
+        """
+        from django.core.exceptions import FieldDoesNotExist
+
+        record = {
+            "model": "documents.correspondent",
+            "pk": 1,
+            "fields": {"no_such_field_on_correspondent": "value"},
+        }
+        with pytest.raises(FieldDoesNotExist):
+            _deserialize_record(record)

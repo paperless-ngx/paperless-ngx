@@ -6,10 +6,12 @@ from collections import defaultdict
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
+from typing import TypeAlias
 from zipfile import ZipFile
 from zipfile import is_zipfile
 
 import ijson
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -21,6 +23,7 @@ from django.core.management.color import no_style
 from django.core.serializers.base import DeserializationError
 from django.db import IntegrityError
 from django.db import connection
+from django.db import models as django_models
 from django.db import transaction
 from django.db.models import GeneratedField
 from django.db.models import Model
@@ -52,6 +55,9 @@ from paperless import version
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
 
+# Maps M2M field names to the list of related PKs to apply after bulk_create.
+M2MData: TypeAlias = dict[str, list[int]]
+
 
 def iter_manifest_records(path: Path) -> Generator[dict, None, None]:
     """Yield records one at a time from a manifest JSON array via ijson."""
@@ -64,7 +70,7 @@ def iter_manifest_records(path: Path) -> Generator[dict, None, None]:
 
 def _deserialize_record(
     record: dict,
-) -> tuple[type[Model], Model, dict[str, list[int]]]:
+) -> tuple[type[Model], Model, M2MData]:
     """
     Convert a single manifest record dict into a model instance and M2M data.
 
@@ -78,9 +84,6 @@ def _deserialize_record(
     Note: CommandError from iter_manifest_records (malformed JSON mid-stream)
     propagates through the caller unchanged, it is not caught here.
     """
-    from django.apps import apps
-    from django.db import models as django_models
-
     model_label = record["model"]
     pk_value = record.get("pk")
 
@@ -92,7 +95,7 @@ def _deserialize_record(
         ) from e
 
     data: dict = {}
-    m2m_data: dict[str, list[int]] = {}
+    m2m_data: M2MData = {}
 
     try:
         data[Model._meta.pk.attname] = Model._meta.pk.to_python(pk_value)
@@ -360,8 +363,8 @@ class Command(CryptMixin, PaperlessCommand):
         in practice only one model's batch accumulates at a time.
         """
         # Maps model class -> list of (instance, m2m_data) waiting to be flushed
-        pending: defaultdict[type[Model], list[tuple[Model, dict[str, list[int]]]]] = (
-            defaultdict(list)
+        pending: defaultdict[type[Model], list[tuple[Model, M2MData]]] = defaultdict(
+            list,
         )
         # All model classes inserted (needed for sequence reset after the load)
         loaded_models: set[type[Model]] = set()
@@ -369,26 +372,25 @@ class Command(CryptMixin, PaperlessCommand):
         def flush_model(model: type[Model]) -> None:
             """bulk_create the pending batch for model, then apply M2M."""
             batch = pending.pop(model, [])
-            if not batch:
+            if not batch:  # pragma: no cover
                 return
             instances = [inst for inst, _ in batch]
-            # GeneratedField is excluded because SQLite cannot UPDATE generated columns.
+            # GeneratedField is excluded because it is generated and trying to insert it will fail
             update_fields = [
                 f.attname
                 for f in model._meta.concrete_fields
                 if not f.primary_key and not isinstance(f, GeneratedField)
             ]
-            # Models with only a PK have no fields to update on conflict; fall
-            # back to plain bulk_create which will error on PK collision.
-            if update_fields:
-                model.objects.bulk_create(  # type: ignore[attr-defined]
-                    instances,
-                    update_conflicts=True,
-                    unique_fields=[model._meta.pk.attname],
-                    update_fields=update_fields,
+            if not update_fields:  # pragma: no cover
+                raise DeserializationError(
+                    f"{model.__name__} has no updatable fields; PK-only models are not supported by the importer",
                 )
-            else:
-                model.objects.bulk_create(instances)  # type: ignore[attr-defined]
+            model.objects.bulk_create(  # type: ignore[attr-defined]
+                instances,
+                update_conflicts=True,
+                unique_fields=[model._meta.pk.attname],
+                update_fields=update_fields,
+            )
             loaded_models.add(model)
             for instance, m2m_data in batch:
                 for field_name, pk_list in m2m_data.items():
