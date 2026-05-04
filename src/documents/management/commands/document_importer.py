@@ -23,6 +23,7 @@ from django.db import IntegrityError
 from django.db import connection
 from django.db import transaction
 from django.db.models import GeneratedField
+from django.db.models import Model
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save
 from filelock import FileLock
@@ -63,7 +64,7 @@ def iter_manifest_records(path: Path) -> Generator[dict, None, None]:
 
 def _deserialize_record(
     record: dict,
-) -> tuple[type, object, dict[str, list[int]]]:
+) -> tuple[type[Model], Model, dict[str, list[int]]]:
     """
     Convert a single manifest record dict into a model instance and M2M data.
 
@@ -313,13 +314,14 @@ class Command(CryptMixin, PaperlessCommand):
                 ),
             )
 
-    def _finalize_db_load(self, loaded_models: set[type]) -> None:
+    def _finalize_db_load(self, loaded_models: set[type[Model]]) -> None:
         """Verify referential integrity and reset auto-increment sequences."""
         through_tables = {
             field.remote_field.through._meta.db_table
             for model in loaded_models
             for field in model._meta.many_to_many
-            if field.remote_field.through._meta.auto_created
+            if field.remote_field.through is not None
+            and field.remote_field.through._meta.auto_created
         }
         table_names = [m._meta.db_table for m in loaded_models] + list(through_tables)
         if table_names:
@@ -358,11 +360,13 @@ class Command(CryptMixin, PaperlessCommand):
         in practice only one model's batch accumulates at a time.
         """
         # Maps model class -> list of (instance, m2m_data) waiting to be flushed
-        pending: dict[type, list[tuple]] = defaultdict(list)
+        pending: defaultdict[type[Model], list[tuple[Model, dict[str, list[int]]]]] = (
+            defaultdict(list)
+        )
         # All model classes inserted (needed for sequence reset after the load)
-        loaded_models: set[type] = set()
+        loaded_models: set[type[Model]] = set()
 
-        def flush_model(model: type) -> None:
+        def flush_model(model: type[Model]) -> None:
             """bulk_create the pending batch for model, then apply M2M."""
             batch = pending.pop(model, [])
             if not batch:
@@ -377,14 +381,14 @@ class Command(CryptMixin, PaperlessCommand):
             # Models with only a PK have no fields to update on conflict; fall
             # back to plain bulk_create which will error on PK collision.
             if update_fields:
-                model.objects.bulk_create(
+                model.objects.bulk_create(  # type: ignore[attr-defined]
                     instances,
                     update_conflicts=True,
                     unique_fields=[model._meta.pk.attname],
                     update_fields=update_fields,
                 )
             else:
-                model.objects.bulk_create(instances)
+                model.objects.bulk_create(instances)  # type: ignore[attr-defined]
             loaded_models.add(model)
             for instance, m2m_data in batch:
                 for field_name, pk_list in m2m_data.items():
