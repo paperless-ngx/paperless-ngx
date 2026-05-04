@@ -237,44 +237,40 @@ def modify_tags(
         expanded_remove_tags.add(int(t.id))
         expanded_remove_tags.update(int(pk) for pk in t.get_descendants_pks())
 
-    try:
-        with transaction.atomic():
-            if expanded_remove_tags:
+    with transaction.atomic():
+        if expanded_remove_tags:
+            DocumentTagRelationship.objects.filter(
+                document_id__in=affected_docs,
+                tag_id__in=expanded_remove_tags,
+            ).delete()
+
+        to_create = []
+        if expanded_add_tags:
+            existing_pairs = set(
                 DocumentTagRelationship.objects.filter(
                     document_id__in=affected_docs,
-                    tag_id__in=expanded_remove_tags,
-                ).delete()
+                    tag_id__in=expanded_add_tags,
+                ).values_list("document_id", "tag_id"),
+            )
 
-            to_create = []
-            if expanded_add_tags:
-                existing_pairs = set(
-                    DocumentTagRelationship.objects.filter(
-                        document_id__in=affected_docs,
-                        tag_id__in=expanded_add_tags,
-                    ).values_list("document_id", "tag_id"),
+            to_create = [
+                DocumentTagRelationship(document_id=doc, tag_id=tag)
+                for doc in affected_docs
+                for tag in expanded_add_tags
+                if (doc, tag) not in existing_pairs
+            ]
+
+            if to_create:
+                DocumentTagRelationship.objects.bulk_create(
+                    to_create,
+                    ignore_conflicts=True,
                 )
 
-                to_create = [
-                    DocumentTagRelationship(document_id=doc, tag_id=tag)
-                    for doc in affected_docs
-                    for tag in expanded_add_tags
-                    if (doc, tag) not in existing_pairs
-                ]
-
-                if to_create:
-                    DocumentTagRelationship.objects.bulk_create(
-                        to_create,
-                        ignore_conflicts=True,
-                    )
-
-            if affected_docs:
-                bulk_update_documents.apply_async(
-                    kwargs={"document_ids": affected_docs},
-                    headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
-                )
-    except Exception as e:
-        logger.error(f"Error modifying tags: {e}")
-        return "ERROR"
+    if affected_docs:
+        bulk_update_documents.apply_async(
+            kwargs={"document_ids": affected_docs},
+            headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
+        )
 
     return "OK"
 
