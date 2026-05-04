@@ -52,7 +52,7 @@
     "@angular/build": "^21.2.8",
     "@angular/cli": "~21.2.8",
     "@angular/compiler-cli": "~21.2.10",
-    "@codecov/webpack-plugin": "^1.9.1",
+    "@codecov/webpack-plugin": "^2.0.1",
     "@playwright/test": "^1.59.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.6.0",
