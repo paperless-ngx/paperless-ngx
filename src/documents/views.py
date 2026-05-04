@@ -272,7 +272,7 @@ def _get_tantivy_query_and_mode(params):
         return str(params["title_search"]), SearchMode.TITLE
     if "query" in params:
         return str(params["query"]), SearchMode.QUERY
-    return None
+    return None  # pragma: no cover
 
 
 def _get_more_like_id(query_params: dict[str, Any], user: User | None) -> int:
