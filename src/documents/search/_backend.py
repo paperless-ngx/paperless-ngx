@@ -681,6 +681,8 @@ class TantivyBackend:
 
         searcher = self._index.searcher()
         effective_limit = limit if limit is not None else searcher.num_docs
+        if effective_limit <= 0:
+            return []
 
         if sort_field and sort_field in self.SORT_FIELD_MAP:
             mapped_field = self.SORT_FIELD_MAP[sort_field]
