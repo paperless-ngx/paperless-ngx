@@ -191,7 +191,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-    container: mcr.microsoft.com/playwright:v1.59.0-noble
+    container: mcr.microsoft.com/playwright:v1.59.1-noble
     env:
       PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
