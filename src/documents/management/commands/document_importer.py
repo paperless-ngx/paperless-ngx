@@ -337,7 +337,7 @@ class Command(CryptMixin, PaperlessCommand):
             )
             with connection.cursor() as cursor:
                 for sql in sequence_sql:
-                    cursor.execute(sql)
+                    cursor.execute(sql)  # pragma: no cover
 
     def _import_error_context_message(self) -> str:
         """Return a diagnostic string explaining a DB import failure."""

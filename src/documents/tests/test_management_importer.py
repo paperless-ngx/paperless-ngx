@@ -474,6 +474,57 @@ class TestCommandImport(
         self.assertEqual(doc.tags.count(), 1)
         self.assertEqual(doc.tags.first().name, "imported-tag")
 
+    def test_mid_batch_flush_triggered_by_small_batch_size(self) -> None:
+        """
+        GIVEN:
+            - A manifest with two records (Tag + Document)
+            - --batch-size 1 so each record fills a batch immediately
+        WHEN:
+            - Import is performed
+        THEN:
+            - flush_model() fires mid-loop (before flush_all) and the import
+              completes correctly with the M2M relation intact
+        """
+        tag_record = {
+            "model": "documents.tag",
+            "pk": 200,
+            "fields": {"name": "batch-flush-tag"},
+        }
+        doc_record = {
+            "model": "documents.document",
+            "pk": 200,
+            "fields": {
+                "title": "Batch Flush Doc",
+                "content": "test",
+                "checksum": "2093cf6e32adbd16b06969df09215d42c4a3a8938cc18b39455953f08d1ff2ab",
+                "filename": "0002000.pdf",
+                "mime_type": "application/pdf",
+                "modified": "2024-01-01T00:00:00Z",
+                "added": "2024-01-01T00:00:00Z",
+                "tags": [200],
+                "correspondent": None,
+                "document_type": None,
+                "storage_path": None,
+            },
+        }
+
+        manifest_file = self.dirs.scratch_dir / "manifest.json"
+        manifest_file.write_text(json.dumps([tag_record, doc_record]))
+
+        call_command(
+            "document_importer",
+            "--no-progress-bar",
+            "--data-only",
+            "--batch-size",
+            "1",
+            str(self.dirs.scratch_dir),
+            skip_checks=True,
+        )
+
+        doc = Document.objects.get(pk=200)
+        self.assertEqual(doc.tags.count(), 1)
+        self.assertEqual(doc.tags.first().name, "batch-flush-tag")
+
 
 @pytest.mark.management
 @pytest.mark.django_db
