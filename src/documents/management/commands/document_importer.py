@@ -383,13 +383,19 @@ class Command(CryptMixin, PaperlessCommand):
 
                     flush_all()
 
-                # Stale ContentType objects cached in Python would cause lookups
-                # against the freshly re-imported rows to return wrong PKs.
-                ContentType.objects.clear_cache()
-
                 # Verify referential integrity now that all rows are inserted,
                 # including M2M through tables written by .set() above.
-                connection.check_constraints()
+                through_tables = {
+                    field.remote_field.through._meta.db_table
+                    for model in loaded_models
+                    for field in model._meta.many_to_many
+                    if field.remote_field.through._meta.auto_created
+                }
+                table_names = [m._meta.db_table for m in loaded_models] + list(
+                    through_tables,
+                )
+                if table_names:
+                    connection.check_constraints(table_names=table_names)
 
                 # Sequences must be reset after inserting rows with explicit PKs
                 # or the next auto-increment insert will collide with an existing PK.
