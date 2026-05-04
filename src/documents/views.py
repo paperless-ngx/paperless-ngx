@@ -2588,16 +2588,18 @@ class DocumentSelectionMixin:
             permission_codename,
             Document,
         )
+        # orm-filtered docs
         filtered_documents = DocumentFilterSet(
             data=orm_filters,
             queryset=permitted_documents,
         ).qs.distinct()
-        search_ids = self._get_search_document_ids(
+        # tantivy-filtered docs (if search params provided)
+        search_filtered_ids = self._get_search_document_ids(
             user=user,
             filters=filters,
         )
-        if search_ids is not None:
-            filtered_documents = filtered_documents.filter(pk__in=search_ids)
+        if search_filtered_ids is not None:
+            filtered_documents = filtered_documents.filter(pk__in=search_filtered_ids)
         return list(filtered_documents.values_list("pk", flat=True))
 
 
