@@ -2508,6 +2508,64 @@ class SavedViewViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[SavedVie
 
 
 class DocumentSelectionMixin:
+    SEARCH_FILTER_NAMES = ("text", "title_search", "query", "more_like_id")
+
+    def _get_search_document_ids(
+        self,
+        *,
+        user: User,
+        filters: dict[str, Any],
+    ) -> list[int] | None:
+        search_filters = [
+            filter_name
+            for filter_name in self.SEARCH_FILTER_NAMES
+            if filter_name in filters
+        ]
+        if not search_filters:
+            return None
+        if len(search_filters) > 1:
+            raise ValidationError(
+                {
+                    "detail": _(
+                        "Specify only one of text, title_search, query, or more_like_id.",
+                    ),
+                },
+            )
+
+        from documents.search import SearchMode
+        from documents.search import get_backend
+
+        filter_name = search_filters[0]
+        backend = get_backend()
+        search_user = None if user.is_superuser else user
+
+        if filter_name == "more_like_id":
+            try:
+                more_like_doc_id = int(filters[filter_name])
+                more_like_doc = Document.objects.select_related("owner").get(
+                    pk=more_like_doc_id,
+                )
+            except (TypeError, ValueError, Document.DoesNotExist):
+                raise PermissionDenied(_("Invalid more_like_id"))
+
+            if not has_perms_owner_aware(user, "view_document", more_like_doc):
+                raise PermissionDenied(_("Insufficient permissions."))
+
+            search_ids = backend.more_like_this_ids(more_like_doc_id, user=search_user)
+        else:
+            search_mode = {
+                "text": SearchMode.TEXT,
+                "title_search": SearchMode.TITLE,
+                "query": SearchMode.QUERY,
+            }[filter_name]
+            search_ids = backend.search_ids(
+                str(filters[filter_name]),
+                user=search_user,
+                search_mode=search_mode,
+            )
+
+        return search_ids
+
     def _resolve_document_ids(
         self,
         *,
@@ -2521,19 +2579,27 @@ class DocumentSelectionMixin:
 
         # otherwise, reconstruct the document list based on the provided filters
         filters = validated_data.get("filters") or {}
+        orm_filters = {
+            key: value
+            for key, value in filters.items()
+            if key not in self.SEARCH_FILTER_NAMES
+        }
         permitted_documents = get_objects_for_user_owner_aware(
             user,
             permission_codename,
             Document,
         )
-        return list(
-            DocumentFilterSet(
-                data=filters,
-                queryset=permitted_documents,
-            )
-            .qs.distinct()
-            .values_list("pk", flat=True),
+        filtered_documents = DocumentFilterSet(
+            data=orm_filters,
+            queryset=permitted_documents,
+        ).qs.distinct()
+        search_ids = self._get_search_document_ids(
+            user=user,
+            filters=filters,
         )
+        if search_ids is not None:
+            filtered_documents = filtered_documents.filter(pk__in=search_ids)
+        return list(filtered_documents.values_list("pk", flat=True))
 
 
 class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
