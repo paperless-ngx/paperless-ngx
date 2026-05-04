@@ -260,6 +260,38 @@ logger = logging.getLogger("paperless.api")
 # degrades on SQLite with thousands of parameters.  PostgreSQL handles large IN
 # clauses efficiently, so this threshold mainly protects SQLite users.
 _TANTIVY_INTERSECT_THRESHOLD = 5_000
+_TANTIVY_SEARCH_PARAM_NAMES = ("text", "title_search", "query", "more_like_id")
+
+
+def _get_tantivy_query_and_mode(params):
+    from documents.search import SearchMode
+
+    if "text" in params:
+        return str(params["text"]), SearchMode.TEXT
+    if "title_search" in params:
+        return str(params["title_search"]), SearchMode.TITLE
+    if "query" in params:
+        return str(params["query"]), SearchMode.QUERY
+    return None  # pragma: no cover
+
+
+def _get_more_like_id(query_params: dict[str, Any], user: User | None) -> int:
+    try:
+        more_like_doc_id = int(query_params["more_like_id"])
+        more_like_doc = Document.objects.select_related("owner").get(
+            pk=more_like_doc_id,
+        )
+    except (TypeError, ValueError, Document.DoesNotExist):
+        raise PermissionDenied(_("Invalid more_like_id"))
+
+    if user and not has_perms_owner_aware(
+        user,
+        "view_document",
+        more_like_doc,
+    ):
+        raise PermissionDenied(_("Insufficient permissions."))
+
+    return more_like_doc_id
 
 
 class IndexView(TemplateView):
@@ -2165,8 +2197,6 @@ class ChatStreamingView(GenericAPIView[Any]):
     ),
 )
 class UnifiedSearchViewSet(DocumentViewSet):
-    SEARCH_PARAM_NAMES = ("text", "title_search", "query", "more_like_id")
-
     def get_serializer_class(self):
         if self._is_search_request():
             return SearchResultSerializer
@@ -2175,7 +2205,9 @@ class UnifiedSearchViewSet(DocumentViewSet):
     def _get_active_search_params(self, request: Request | None = None) -> list[str]:
         request = request or self.request
         return [
-            param for param in self.SEARCH_PARAM_NAMES if param in request.query_params
+            param
+            for param in _TANTIVY_SEARCH_PARAM_NAMES
+            if param in request.query_params
         ]
 
     def _is_search_request(self):
@@ -2186,7 +2218,6 @@ class UnifiedSearchViewSet(DocumentViewSet):
             return super().list(request)
 
         from documents.search import SearchHit
-        from documents.search import SearchMode
         from documents.search import TantivyBackend
         from documents.search import TantivyRelevanceList
         from documents.search import get_backend
@@ -2257,15 +2288,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
             filtered_qs: QuerySet[Document],
         ) -> tuple[list[int], list[SearchHit], int]:
             """Handle text/title/query search: IDs, ORM intersection, page highlights."""
-            if "text" in request.query_params:
-                search_mode = SearchMode.TEXT
-                query_str = request.query_params["text"]
-            elif "title_search" in request.query_params:
-                search_mode = SearchMode.TITLE
-                query_str = request.query_params["title_search"]
-            else:
-                search_mode = SearchMode.QUERY
-                query_str = request.query_params["query"]
+            query_str, search_mode = _get_tantivy_query_and_mode(request.query_params)
 
             # "score" is not a real Tantivy sort field — it means relevance order,
             # which is Tantivy's default when no sort field is specified.
@@ -2305,20 +2328,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
             filtered_qs: QuerySet[Document],
         ) -> tuple[list[int], list[SearchHit], int]:
             """Handle more_like_id search: permission check, IDs, stub hits."""
-            try:
-                more_like_doc_id = int(request.query_params["more_like_id"])
-                more_like_doc = Document.objects.select_related("owner").get(
-                    pk=more_like_doc_id,
-                )
-            except (TypeError, ValueError, Document.DoesNotExist):
-                raise PermissionDenied(_("Invalid more_like_id"))
-
-            if not has_perms_owner_aware(
-                request.user,
-                "view_document",
-                more_like_doc,
-            ):
-                raise PermissionDenied(_("Insufficient permissions."))
+            more_like_doc_id = _get_more_like_id(request.query_params, user)
 
             all_ids = backend.more_like_this_ids(more_like_doc_id, user=user)
             ordered_ids = intersect_and_order(
@@ -2508,6 +2518,48 @@ class SavedViewViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[SavedVie
 
 
 class DocumentSelectionMixin:
+    def _get_search_document_ids(
+        self,
+        *,
+        user: User,
+        filters: dict[str, Any],
+    ) -> list[int] | None:
+        search_filters = [
+            filter_name
+            for filter_name in _TANTIVY_SEARCH_PARAM_NAMES
+            if filter_name in filters
+        ]
+        if not search_filters:
+            return None
+        if len(search_filters) > 1:
+            raise ValidationError(
+                {
+                    "detail": _(
+                        "Specify only one of text, title_search, query, or more_like_id.",
+                    ),
+                },
+            )
+
+        from documents.search import get_backend
+
+        filter_name = search_filters[0]
+        backend = get_backend()
+        search_user = None if user.is_superuser else user
+
+        if filter_name == "more_like_id":
+            more_like_doc_id = _get_more_like_id(filters, user)
+
+            search_ids = backend.more_like_this_ids(more_like_doc_id, user=search_user)
+        else:
+            query_str, search_mode = _get_tantivy_query_and_mode(filters)
+            search_ids = backend.search_ids(
+                query_str,
+                user=search_user,
+                search_mode=search_mode,
+            )
+
+        return search_ids
+
     def _resolve_document_ids(
         self,
         *,
@@ -2521,19 +2573,29 @@ class DocumentSelectionMixin:
 
         # otherwise, reconstruct the document list based on the provided filters
         filters = validated_data.get("filters") or {}
+        orm_filters = {
+            key: value
+            for key, value in filters.items()
+            if key not in _TANTIVY_SEARCH_PARAM_NAMES
+        }
         permitted_documents = get_objects_for_user_owner_aware(
             user,
             permission_codename,
             Document,
         )
-        return list(
-            DocumentFilterSet(
-                data=filters,
-                queryset=permitted_documents,
-            )
-            .qs.distinct()
-            .values_list("pk", flat=True),
+        # orm-filtered docs
+        filtered_documents = DocumentFilterSet(
+            data=orm_filters,
+            queryset=permitted_documents,
+        ).qs.distinct()
+        # tantivy-filtered docs (if search params provided)
+        search_filtered_ids = self._get_search_document_ids(
+            user=user,
+            filters=filters,
         )
+        if search_filtered_ids is not None:
+            filtered_documents = filtered_documents.filter(pk__in=search_filtered_ids)
+        return list(filtered_documents.values_list("pk", flat=True))
 
 
 class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):

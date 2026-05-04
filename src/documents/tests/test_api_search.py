@@ -1028,6 +1028,19 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertIn(d3.id, result_ids)
         self.assertNotIn(d4.id, result_ids)
 
+    def test_more_like_requires_id_of_existing_document(self) -> None:
+        """
+        GIVEN:
+            - No document with the given ID exists
+        WHEN:
+            - API request for more like a given document is made with a non-existent document ID
+        THEN:
+            - 403 Forbidden is returned with an appropriate error message
+        """
+        response = self.client.get("/api/documents/?more_like_id=9999")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.content, b"Invalid more_like_id")
+
     def test_search_more_like_requires_view_permission_on_seed_document(
         self,
     ) -> None:
