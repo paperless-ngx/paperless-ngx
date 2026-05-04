@@ -260,6 +260,7 @@ logger = logging.getLogger("paperless.api")
 # degrades on SQLite with thousands of parameters.  PostgreSQL handles large IN
 # clauses efficiently, so this threshold mainly protects SQLite users.
 _TANTIVY_INTERSECT_THRESHOLD = 5_000
+_TANTIVY_SEARCH_PARAM_NAMES = ("text", "title_search", "query", "more_like_id")
 
 
 class IndexView(TemplateView):
@@ -2165,8 +2166,6 @@ class ChatStreamingView(GenericAPIView[Any]):
     ),
 )
 class UnifiedSearchViewSet(DocumentViewSet):
-    SEARCH_PARAM_NAMES = ("text", "title_search", "query", "more_like_id")
-
     def get_serializer_class(self):
         if self._is_search_request():
             return SearchResultSerializer
@@ -2175,7 +2174,9 @@ class UnifiedSearchViewSet(DocumentViewSet):
     def _get_active_search_params(self, request: Request | None = None) -> list[str]:
         request = request or self.request
         return [
-            param for param in self.SEARCH_PARAM_NAMES if param in request.query_params
+            param
+            for param in _TANTIVY_SEARCH_PARAM_NAMES
+            if param in request.query_params
         ]
 
     def _is_search_request(self):
@@ -2508,8 +2509,6 @@ class SavedViewViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[SavedVie
 
 
 class DocumentSelectionMixin:
-    SEARCH_FILTER_NAMES = ("text", "title_search", "query", "more_like_id")
-
     def _get_search_document_ids(
         self,
         *,
@@ -2518,7 +2517,7 @@ class DocumentSelectionMixin:
     ) -> list[int] | None:
         search_filters = [
             filter_name
-            for filter_name in self.SEARCH_FILTER_NAMES
+            for filter_name in _TANTIVY_SEARCH_PARAM_NAMES
             if filter_name in filters
         ]
         if not search_filters:
@@ -2582,7 +2581,7 @@ class DocumentSelectionMixin:
         orm_filters = {
             key: value
             for key, value in filters.items()
-            if key not in self.SEARCH_FILTER_NAMES
+            if key not in _TANTIVY_SEARCH_PARAM_NAMES
         }
         permitted_documents = get_objects_for_user_owner_aware(
             user,
