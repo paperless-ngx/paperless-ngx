@@ -4164,7 +4164,7 @@ class TestWorkflows(
         )
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
-            passwords="wrong, right\n extra ",
+            passwords=["wrong", "right", "extra"],
         )
         workflow = Workflow.objects.create(name="Password workflow")
         workflow.triggers.add(trigger)
@@ -4218,7 +4218,7 @@ class TestWorkflows(
         )
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
-            passwords=" \n , ",
+            passwords=[" ", "  "],
         )
         workflow = Workflow.objects.create(name="Password workflow missing passwords")
         workflow.triggers.add(trigger)
@@ -4276,7 +4276,7 @@ class TestWorkflows(
         """
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
-            passwords="first, second",
+            passwords=["first", "second"],
         )
 
         temp_dir = Path(tempfile.mkdtemp())
