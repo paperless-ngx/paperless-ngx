@@ -177,7 +177,7 @@ jobs:
           version: ${{ steps.get-version.outputs.version }}
           prerelease: ${{ steps.get-version.outputs.prerelease }}
           publish: true
-          commitish: main
+          commitish: ${{ steps.get-version.outputs.prerelease == 'true' && 'dev' || 'main' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload release archive
