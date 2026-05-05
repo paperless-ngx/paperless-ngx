@@ -73,6 +73,7 @@ class AIClient:
             tools=[tool],
             user_msg=user_msg,
             chat_history=[],
+            allow_parallel_tool_calls=True,
         )
         tool_calls = self.llm.get_tool_calls_from_response(
             result,
