@@ -23,7 +23,7 @@ jobs:
         uses: lewagon/wait-on-check-action@9312864dfbc9fd208e9c0417843430751c042800 # v1.7.0
         with:
           ref: ${{ github.sha }}
-          check-name: 'Build Docker Image'
+          check-name: 'Merge and Push Manifest'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 60
   build-release:
