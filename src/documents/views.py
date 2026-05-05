@@ -15,6 +15,7 @@ from time import mktime
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Literal
+from typing import NamedTuple
 from unicodedata import normalize
 from urllib.parse import quote
 from urllib.parse import urlparse
@@ -176,6 +177,7 @@ from documents.permissions import has_system_status_permission
 from documents.permissions import set_permissions_for_object
 from documents.plugins.date_parsing import get_date_parser
 from documents.schema import generate_object_with_permissions_schema
+from documents.search import SearchHit
 from documents.serialisers import AcknowledgeTasksViewSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
@@ -252,6 +254,7 @@ from paperless_mail.serialisers import MailRuleSerializer
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
 
+
 logger = logging.getLogger("paperless.api")
 
 # Crossover point for intersect_and_order: below this count use a targeted
@@ -292,6 +295,25 @@ def _get_more_like_id(query_params: dict[str, Any], user: User | None) -> int:
         raise PermissionDenied(_("Insufficient permissions."))
 
     return more_like_doc_id
+
+
+class SearchParams(NamedTuple):
+    sort_field_name: str | None
+    sort_reverse: bool
+    use_tantivy_sort: bool
+    page_num: int
+    page_size: int
+
+
+class SearchResultPage(NamedTuple):
+    ordered_ids: list[int]
+    hits: list[SearchHit]
+    page_offset: int
+
+
+class ResolvedRequestDocs(NamedTuple):
+    request_doc: Document
+    root_doc: Document
 
 
 class IndexView(TemplateView):
@@ -1234,7 +1256,7 @@ class DocumentViewSet(
         request: Request,
         *,
         include_deleted: bool = False,
-    ) -> tuple[Document, Document] | HttpResponseForbidden:
+    ) -> ResolvedRequestDocs | HttpResponseForbidden:
         manager = Document.global_objects if include_deleted else Document.objects
         try:
             request_doc = manager.select_related(
@@ -1254,7 +1276,7 @@ class DocumentViewSet(
             root_doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
-        return request_doc, root_doc
+        return ResolvedRequestDocs(request_doc=request_doc, root_doc=root_doc)
 
     def file_response(self, pk, request, disposition):
         resolved = self._resolve_request_and_root_doc(
@@ -1264,8 +1286,11 @@ class DocumentViewSet(
         )
         if isinstance(resolved, HttpResponseForbidden):
             return resolved
-        request_doc, root_doc = resolved
-        file_doc = self._get_effective_file_doc(request_doc, root_doc, request)
+        file_doc = self._get_effective_file_doc(
+            resolved.request_doc,
+            resolved.root_doc,
+            request,
+        )
         return serve_file(
             doc=file_doc,
             use_archive=not self.original_requested(request)
@@ -1308,11 +1333,14 @@ class DocumentViewSet(
         resolved = self._resolve_request_and_root_doc(pk, request)
         if isinstance(resolved, HttpResponseForbidden):
             return resolved
-        request_doc, root_doc = resolved
 
         # Choose the effective document (newest version by default,
         # or explicit via ?version=).
-        doc = self._get_effective_file_doc(request_doc, root_doc, request)
+        doc = self._get_effective_file_doc(
+            resolved.request_doc,
+            resolved.root_doc,
+            request,
+        )
 
         document_cached_metadata = get_metadata_cache(doc.pk)
 
@@ -1517,10 +1545,13 @@ class DocumentViewSet(
         resolved = self._resolve_request_and_root_doc(pk, request)
         if isinstance(resolved, HttpResponseForbidden):
             return resolved
-        request_doc, root_doc = resolved
 
         try:
-            file_doc = self._get_effective_file_doc(request_doc, root_doc, request)
+            file_doc = self._get_effective_file_doc(
+                resolved.request_doc,
+                resolved.root_doc,
+                request,
+            )
 
             return serve_file(
                 doc=file_doc,
@@ -1538,10 +1569,13 @@ class DocumentViewSet(
         resolved = self._resolve_request_and_root_doc(pk, request)
         if isinstance(resolved, HttpResponseForbidden):
             return resolved
-        request_doc, root_doc = resolved
 
         try:
-            file_doc = self._get_effective_file_doc(request_doc, root_doc, request)
+            file_doc = self._get_effective_file_doc(
+                resolved.request_doc,
+                resolved.root_doc,
+                request,
+            )
             handle = file_doc.thumbnail_file
 
             return FileResponse(handle, content_type="image/webp")
@@ -2222,7 +2256,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
         from documents.search import TantivyRelevanceList
         from documents.search import get_backend
 
-        def parse_search_params() -> tuple[str | None, bool, bool, int, int]:
+        def parse_search_params() -> SearchParams:
             """Extract query string, search mode, and ordering from request."""
             active = self._get_active_search_params(request)
             if len(active) > 1:
@@ -2254,7 +2288,13 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 self.paginator.get_page_size(request) or self.paginator.page_size
             )
 
-            return sort_field_name, sort_reverse, use_tantivy_sort, page_num, page_size
+            return SearchParams(
+                sort_field_name=sort_field_name,
+                sort_reverse=sort_reverse,
+                use_tantivy_sort=use_tantivy_sort,
+                page_num=page_num,
+                page_size=page_size,
+            )
 
         def intersect_and_order(
             all_ids: list[int],
@@ -2286,7 +2326,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
             backend: TantivyBackend,
             user: User | None,
             filtered_qs: QuerySet[Document],
-        ) -> tuple[list[int], list[SearchHit], int]:
+        ) -> SearchResultPage:
             """Handle text/title/query search: IDs, ORM intersection, page highlights."""
             query_str, search_mode = _get_tantivy_query_and_mode(request.query_params)
 
@@ -2320,13 +2360,17 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 search_mode=search_mode,
                 rank_start=page_offset + 1,
             )
-            return ordered_ids, page_hits, page_offset
+            return SearchResultPage(
+                ordered_ids=ordered_ids,
+                hits=page_hits,
+                page_offset=page_offset,
+            )
 
         def run_more_like_this(
             backend: TantivyBackend,
             user: User | None,
             filtered_qs: QuerySet[Document],
-        ) -> tuple[list[int], list[SearchHit], int]:
+        ) -> SearchResultPage:
             """Handle more_like_id search: permission check, IDs, stub hits."""
             more_like_doc_id = _get_more_like_id(request.query_params, user)
 
@@ -2343,7 +2387,11 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 SearchHit(id=doc_id, score=0.0, rank=rank, highlights={})
                 for rank, doc_id in enumerate(page_ids, start=page_offset + 1)
             ]
-            return ordered_ids, page_hits, page_offset
+            return SearchResultPage(
+                ordered_ids=ordered_ids,
+                hits=page_hits,
+                page_offset=page_offset,
+            )
 
         try:
             sort_field_name, sort_reverse, use_tantivy_sort, page_num, page_size = (
@@ -2355,19 +2403,15 @@ class UnifiedSearchViewSet(DocumentViewSet):
             user = None if request.user.is_superuser else request.user
 
             if "more_like_id" in request.query_params:
-                ordered_ids, page_hits, page_offset = run_more_like_this(
-                    backend,
-                    user,
-                    filtered_qs,
-                )
+                result = run_more_like_this(backend, user, filtered_qs)
             else:
-                ordered_ids, page_hits, page_offset = run_text_search(
-                    backend,
-                    user,
-                    filtered_qs,
-                )
+                result = run_text_search(backend, user, filtered_qs)
 
-            rl = TantivyRelevanceList(ordered_ids, page_hits, page_offset)
+            rl = TantivyRelevanceList(
+                result.ordered_ids,
+                result.hits,
+                result.page_offset,
+            )
             page = self.paginate_queryset(rl)
 
             if page is not None:
@@ -2383,12 +2427,12 @@ class UnifiedSearchViewSet(DocumentViewSet):
                     # at scale (tens of thousands of matching documents).
                     response.data["selection_data"] = (
                         self._get_selection_data_for_queryset(
-                            filtered_qs.filter(pk__in=ordered_ids),
+                            filtered_qs.filter(pk__in=result.ordered_ids),
                         )
                     )
                 return response
 
-            serializer = self.get_serializer(page_hits, many=True)
+            serializer = self.get_serializer(result.hits, many=True)
             return Response(serializer.data)
 
         except NotFound:
