@@ -1,6 +1,6 @@
 {
   "name": "paperless-ngx-ui",
-  "version": "2.20.15",
+  "version": "3.0.0",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "ng": "ng",
