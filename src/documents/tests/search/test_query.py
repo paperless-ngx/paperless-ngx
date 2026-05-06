@@ -444,6 +444,83 @@ class TestParseUserQuery:
         assert isinstance(q, tantivy.Query)
 
 
+class TestYearRangeRewriting:
+    """Whoosh-style year-only date ranges must be rewritten to ISO 8601."""
+
+    @pytest.mark.parametrize(
+        ("query", "field", "expected_lo", "expected_hi"),
+        [
+            pytest.param(
+                "created:[2020 TO 2020]",
+                "created",
+                "2020-01-01T00:00:00Z",
+                "2021-01-01T00:00:00Z",
+                id="single_year_created",
+            ),
+            pytest.param(
+                "created:[2018 TO 2021]",
+                "created",
+                "2018-01-01T00:00:00Z",
+                "2022-01-01T00:00:00Z",
+                id="multi_year_range_created",
+            ),
+            pytest.param(
+                "added:[2022 TO 2023]",
+                "added",
+                "2022-01-01T00:00:00Z",
+                "2024-01-01T00:00:00Z",
+                id="added_field",
+            ),
+            pytest.param(
+                "modified:[2021 TO 2021]",
+                "modified",
+                "2021-01-01T00:00:00Z",
+                "2022-01-01T00:00:00Z",
+                id="modified_field",
+            ),
+            pytest.param(
+                "created:[2020 to 2020]",
+                "created",
+                "2020-01-01T00:00:00Z",
+                "2021-01-01T00:00:00Z",
+                id="lowercase_to_keyword",
+            ),
+        ],
+    )
+    def test_year_range_rewritten(
+        self,
+        query: str,
+        field: str,
+        expected_lo: str,
+        expected_hi: str,
+    ) -> None:
+        result = rewrite_natural_date_keywords(query, UTC)
+        lo, hi = _range(result, field)
+        assert lo == expected_lo
+        assert hi == expected_hi
+
+    def test_year_range_in_complex_boolean_query(self) -> None:
+        query = "tag:steuer AND (title:2020 OR (NOT title:2019 AND NOT title:2018 AND created:[2020 TO 2020]))"
+        result = rewrite_natural_date_keywords(query, UTC)
+        lo, hi = _range(result, "created")
+        assert lo == "2020-01-01T00:00:00Z"
+        assert hi == "2021-01-01T00:00:00Z"
+        assert "title:2020" in result
+        assert "title:2019" in result
+        assert "title:2018" in result
+
+    def test_already_iso_date_range_passes_through_unchanged(self) -> None:
+        original = "created:[2020-01-01T00:00:00Z TO 2021-01-01T00:00:00Z]"
+        assert rewrite_natural_date_keywords(original, UTC) == original
+
+    def test_8digit_in_brackets_not_matched_as_year_range(self) -> None:
+        # [YYYYMMDD TO YYYYMMDD] has 8-digit values - must not be caught by year rewriter
+        original = "created:[20200101 TO 20201231]"
+        result = rewrite_natural_date_keywords(original, UTC)
+        assert "20200101" in result or "2020-01-01" in result
+        assert "20201231" in result or "2020-12-31" in result
+
+
 class TestPassthrough:
     """Queries without field prefixes or unrelated content pass through unchanged."""
 
@@ -474,7 +551,7 @@ class TestNormalizeQuery:
 
 class TestPermissionFilter:
     """
-    build_permission_filter tests use an in-memory index — no DB access needed.
+    build_permission_filter tests use an in-memory index - no DB access needed.
 
     Users are constructed as unsaved model instances (django_user_model(pk=N))
     so no database round-trip occurs; only .pk is read by build_permission_filter.
