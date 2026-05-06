@@ -236,6 +236,8 @@ RUN set -eux \
     && mkdir -m700 --verbose /usr/src/paperless/.gnupg \
   && echo "Adjusting all permissions" \
     && chown --from root:root --changes --recursive paperless:paperless /usr/src/paperless \
+  && echo "Making fontconfig cache writable for arbitrary container UIDs" \
+    && chmod 1777 /var/cache/fontconfig \
   && echo "Collecting static files" \
     && PAPERLESS_SECRET_KEY=build-time-dummy s6-setuidgid paperless python3 manage.py collectstatic --clear --no-input --link \
     && PAPERLESS_SECRET_KEY=build-time-dummy s6-setuidgid paperless python3 manage.py compilemessages \
