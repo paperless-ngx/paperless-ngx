@@ -71,6 +71,10 @@ _WHOOSH_REL_RANGE_RE = regex.compile(
 )
 # Whoosh-style 8-digit date: field:YYYYMMDD — field-aware so timezone can be applied correctly
 _DATE8_RE = regex.compile(r"(?P<field>\w+):(?P<date8>\d{8})\b")
+_YEAR_RANGE_RE = regex.compile(
+    r"(?P<field>\w+):\[(?P<y1>\d{4})\s+TO\s+(?P<y2>\d{4})\]",
+    regex.IGNORECASE,
+)
 _SIMPLE_QUERY_TOKEN_RE = regex.compile(r"\S+")
 
 
@@ -336,6 +340,26 @@ def _rewrite_8digit_date(query: str, tz: tzinfo) -> str:
         )
 
 
+def _rewrite_year_range(query: str) -> str:
+    """Rewrite Whoosh-style year-only date ranges to ISO 8601 UTC boundaries.
+
+    Converts ``field:[YYYY TO YYYY]`` to a full ISO 8601 datetime range.
+    The upper bound is the start of the year after the end year (exclusive),
+    matching the Whoosh convention of treating year-only ranges as full-year spans.
+    """
+
+    def _sub(m: regex.Match[str]) -> str:
+        field = m.group("field")
+        lo = datetime(int(m.group("y1")), 1, 1, tzinfo=UTC)
+        hi = datetime(int(m.group("y2")) + 1, 1, 1, tzinfo=UTC)
+        return f"{field}:[{_fmt(lo)} TO {_fmt(hi)}]"
+
+    try:
+        return _YEAR_RANGE_RE.sub(_sub, query, timeout=_REGEX_TIMEOUT)
+    except TimeoutError:  # pragma: no cover
+        raise ValueError("Query too complex to process (year range rewrite timed out)")
+
+
 def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
     """
     Rewrite natural date syntax to ISO 8601 format for Tantivy compatibility.
@@ -359,6 +383,7 @@ def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
     """
     query = _rewrite_compact_date(query)
     query = _rewrite_whoosh_relative_range(query)
+    query = _rewrite_year_range(query)
     query = _rewrite_8digit_date(query, tz)
     query = _rewrite_relative_range(query)
 
