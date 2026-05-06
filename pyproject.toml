@@ -25,7 +25,7 @@ dependencies = [
   # WARNING: django does not use semver.
   #          Only patch versions are guaranteed to not introduce breaking changes.
   "django~=5.2.13",
-  "django-allauth[mfa,socialaccount]~=65.15.0",
+  "django-allauth[mfa,socialaccount]~=65.16.0",
   "django-auditlog~=3.4.1",
   "django-cachalot~=2.9.0",
   "django-compression-middleware~=0.5.0",
@@ -40,7 +40,7 @@ dependencies = [
   "djangorestframework~=3.16",
   "djangorestframework-guardian~=0.4.0",
   "drf-spectacular~=0.28",
-  "drf-spectacular-sidecar~=2026.4.14",
+  "drf-spectacular-sidecar~=2026.5.1",
   "drf-writable-nested~=0.7.1",
   "faiss-cpu>=1.10",
   "filelock~=3.29.0",
