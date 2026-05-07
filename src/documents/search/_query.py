@@ -76,6 +76,11 @@ _YEAR_RANGE_RE = regex.compile(
     regex.IGNORECASE,
 )
 _SIMPLE_QUERY_TOKEN_RE = regex.compile(r"\S+")
+# Tantivy syntax error: " - " and " + " with spaces on both sides are invalid because
+# the NOT/MUST operators require no space between the operator and the term.
+# In natural-language queries (e.g., "H52.1 - Kurzsichtigkeit"), the dash is a separator.
+_SPACED_OPERATOR_RE = regex.compile(r"\s+[-+]\s+")
+_TRAILING_OPERATOR_RE = regex.compile(r"\s+[-+]+\s*$")
 
 
 def _fmt(dt: datetime) -> str:
@@ -430,7 +435,14 @@ def normalize_query(query: str) -> str:
             query,
             timeout=_REGEX_TIMEOUT,
         )
-        return regex.sub(r" {2,}", " ", query, timeout=_REGEX_TIMEOUT).strip()
+        query = regex.sub(r" {2,}", " ", query, timeout=_REGEX_TIMEOUT).strip()
+        # Strip trailing dangling operators before Tantivy sees them.
+        query = _TRAILING_OPERATOR_RE.sub("", query, timeout=_REGEX_TIMEOUT).strip()
+        # Replace " - " / " + " with a space: Tantivy requires no space between
+        # the operator and its operand (-term / +term), so spaces on both sides
+        # means this is a natural-language separator, not a query operator.
+        query = _SPACED_OPERATOR_RE.sub(" ", query, timeout=_REGEX_TIMEOUT).strip()
+        return query
     except TimeoutError:  # pragma: no cover
         raise ValueError("Query too complex to process (normalization timed out)")
 
