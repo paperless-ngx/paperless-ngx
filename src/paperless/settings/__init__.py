@@ -650,6 +650,11 @@ logging.config.dictConfig(LOGGING)
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html
 
 CELERY_BROKER_URL = _CELERY_REDIS_URL
+CELERY_RESULT_BACKEND = _CELERY_REDIS_URL
+CELERY_RESULT_SERIALIZER = "signed-pickle"
+# Results are only needed for chord synchronization
+# a short TTL avoids Redis memory accumulation.
+CELERY_RESULT_EXPIRES = 3600
 CELERY_TIMEZONE = TIME_ZONE
 
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
