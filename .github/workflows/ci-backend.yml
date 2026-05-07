@@ -106,7 +106,7 @@ jobs:
           enable-cache: true
           python-version: ${{ steps.setup-python.outputs.python-version }}
       - name: Install system dependencies
-        timeout-minutes: 5
+        timeout-minutes: 10
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends \
