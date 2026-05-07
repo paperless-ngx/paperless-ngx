@@ -3614,7 +3614,7 @@ class StatisticsView(GenericAPIView[Any]):
                 "documents.view_document",
                 Document,
             )
-        )
+        ).filter(root_document__isnull=True)
         tags = (
             Tag.objects.all()
             if can_view_global_stats
