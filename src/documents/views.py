@@ -67,7 +67,6 @@ from django.views import View
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import condition
-from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.openapi import AutoSchema
@@ -124,6 +123,7 @@ from documents.conditionals import preview_etag
 from documents.conditionals import preview_last_modified
 from documents.conditionals import suggestions_etag
 from documents.conditionals import suggestions_last_modified
+from documents.conditionals import thumbnail_etag
 from documents.conditionals import thumbnail_last_modified
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
@@ -1564,7 +1564,12 @@ class DocumentViewSet(
 
     @action(methods=["get"], detail=True, filter_backends=[])
     @method_decorator(cache_control(no_cache=True))
-    @method_decorator(last_modified(thumbnail_last_modified))
+    @method_decorator(
+        condition(
+            etag_func=thumbnail_etag,
+            last_modified_func=thumbnail_last_modified,
+        ),
+    )
     def thumb(self, request, pk=None):
         resolved = self._resolve_request_and_root_doc(pk, request)
         if isinstance(resolved, HttpResponseForbidden):

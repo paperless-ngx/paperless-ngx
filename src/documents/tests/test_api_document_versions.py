@@ -464,6 +464,40 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(read_streaming_response(resp), b"thumb")
 
+    def test_thumb_etag_changes_when_latest_version_is_deleted(self) -> None:
+        root = self._create_pdf(title="root", checksum="root")
+        v1 = self._create_pdf(
+            title="v1",
+            checksum="v1",
+            root_document=root,
+        )
+        v2 = self._create_pdf(
+            title="v2",
+            checksum="v2",
+            root_document=root,
+        )
+        self._write_file(v1.thumbnail_path, b"thumb-v1")
+        self._write_file(v2.thumbnail_path, b"thumb-v2")
+
+        resp = self.client.get(f"/api/documents/{root.id}/thumb/")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(read_streaming_response(resp), b"thumb-v2")
+        self.assertEqual(resp.headers["ETag"], '"v2"')
+
+        with mock.patch("documents.search.get_backend"):
+            delete_resp = self.client.delete(
+                f"/api/documents/{root.id}/versions/{v2.id}/",
+            )
+        self.assertEqual(delete_resp.status_code, status.HTTP_200_OK)
+
+        resp = self.client.get(
+            f"/api/documents/{root.id}/thumb/",
+            HTTP_IF_NONE_MATCH='"v2"',
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.headers["ETag"], '"v1"')
+        self.assertEqual(read_streaming_response(resp), b"thumb-v1")
+
     def test_metadata_version_param_uses_version(self) -> None:
         root = Document.objects.create(
             title="root",
