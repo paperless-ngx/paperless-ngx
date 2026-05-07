@@ -1542,7 +1542,7 @@ class DocumentViewSet(
         condition(etag_func=preview_etag, last_modified_func=preview_last_modified),
     )
     def preview(self, request, pk=None):
-        resolved = self._resolve_request_and_root_doc(pk, request)
+        resolved = self._resolve_request_and_root_doc(pk, request, include_deleted=True)
         if isinstance(resolved, HttpResponseForbidden):
             return resolved
 
@@ -1566,7 +1566,7 @@ class DocumentViewSet(
     @method_decorator(cache_control(no_cache=True))
     @method_decorator(last_modified(thumbnail_last_modified))
     def thumb(self, request, pk=None):
-        resolved = self._resolve_request_and_root_doc(pk, request)
+        resolved = self._resolve_request_and_root_doc(pk, request, include_deleted=True)
         if isinstance(resolved, HttpResponseForbidden):
             return resolved
 

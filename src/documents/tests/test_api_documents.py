@@ -485,6 +485,42 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_document_actions_trashed_document(self) -> None:
+        """
+        GIVEN:
+            - Document with files exists
+        WHEN:
+            - Document is soft-deleted (moved to trash)
+            - Preview and thumb endpoints are requested
+        THEN:
+            - HTTP 200 OK for both (trashed documents remain previewable)
+        """
+        _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
+        content = b"This is a test"
+        content_thumbnail = b"thumbnail content"
+
+        with Path(filename).open("wb") as f:
+            f.write(content)
+
+        doc = Document.objects.create(
+            title="none",
+            filename=Path(filename).name,
+            mime_type="application/pdf",
+        )
+
+        with (self.dirs.thumbnail_dir / f"{doc.pk:07d}.webp").open("wb") as f:
+            f.write(content_thumbnail)
+
+        doc.delete()
+
+        response = self.client.get(f"/api/documents/{doc.pk}/preview/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(read_streaming_response(response), content)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(read_streaming_response(response), content_thumbnail)
+
     def test_document_history_action(self) -> None:
         """
         GIVEN:
