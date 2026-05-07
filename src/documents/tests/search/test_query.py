@@ -443,6 +443,25 @@ class TestParseUserQuery:
             q = parse_user_query(query_index, "created:today", UTC)
         assert isinstance(q, tantivy.Query)
 
+    @pytest.mark.parametrize(
+        "raw_query",
+        [
+            pytest.param("h52.1 - kurzsichtigkeit", id="icd_code_dash_description"),
+            pytest.param("H52.1 - asd", id="icd_code_uppercase"),
+            pytest.param("h52.1 -", id="trailing_minus"),
+            pytest.param(". -", id="dot_trailing_minus"),
+            pytest.param("h52. -", id="partial_code_trailing_minus"),
+            pytest.param(".12 -", id="dot_number_trailing_minus"),
+            pytest.param("h52.1 - ku", id="partial_word_after_dash"),
+        ],
+    )
+    def test_spaced_dash_queries_do_not_raise(
+        self,
+        query_index: tantivy.Index,
+        raw_query: str,
+    ) -> None:
+        assert isinstance(parse_user_query(query_index, raw_query, UTC), tantivy.Query)
+
 
 class TestYearRangeRewriting:
     """Whoosh-style year-only date ranges must be rewritten to ISO 8601."""
@@ -547,6 +566,61 @@ class TestNormalizeQuery:
 
     def test_normalize_no_commas_unchanged(self) -> None:
         assert normalize_query("bank statement") == "bank statement"
+
+    @pytest.mark.parametrize(
+        ("raw", "expected"),
+        [
+            pytest.param(
+                "h52.1 - kurzsichtigkeit",
+                "h52.1 kurzsichtigkeit",
+                id="icd_code_dash_description",
+            ),
+            pytest.param(
+                "H52.1 - asd",
+                "H52.1 asd",
+                id="icd_code_uppercase_dash",
+            ),
+            pytest.param(
+                "h52.1 -",
+                "h52.1",
+                id="trailing_minus",
+            ),
+            pytest.param(
+                ". -",
+                ".",
+                id="dot_trailing_minus",
+            ),
+            pytest.param(
+                "h52. -",
+                "h52.",
+                id="partial_code_trailing_minus",
+            ),
+            pytest.param(
+                "foo - bar - baz",
+                "foo bar baz",
+                id="multiple_dashes",
+            ),
+            pytest.param(
+                "foo + bar",
+                "foo bar",
+                id="spaced_plus_operator",
+            ),
+        ],
+    )
+    def test_normalize_strips_dangling_operators(self, raw: str, expected: str) -> None:
+        assert normalize_query(raw) == expected
+
+    @pytest.mark.parametrize(
+        "query",
+        [
+            pytest.param("term -other", id="adjacent_not_operator"),
+            pytest.param("-term", id="leading_not_operator"),
+            pytest.param("+term", id="leading_must_operator"),
+            pytest.param("foo -bar +baz", id="mixed_adjacent_operators"),
+        ],
+    )
+    def test_normalize_preserves_valid_operators(self, query: str) -> None:
+        assert normalize_query(query) == query
 
 
 class TestPermissionFilter:
