@@ -1305,6 +1305,35 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(response.data["document_type_count"], 1)
         self.assertEqual(response.data["storage_path_count"], 2)
 
+    def test_statistics_excludes_document_versions(self) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="A",
+            mime_type="application/pdf",
+            content="root",
+        )
+        version = Document.objects.create(
+            title="version",
+            checksum="B",
+            mime_type="application/pdf",
+            content="version",
+            root_document=root,
+            version_index=1,
+        )
+        tag_inbox = Tag.objects.create(name="t1", is_inbox_tag=True)
+        version.tags.add(tag_inbox)
+
+        response = self.client.get("/api/statistics/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["documents_total"], 1)
+        self.assertEqual(response.data["documents_inbox"], 0)
+        self.assertEqual(response.data["character_count"], 4)
+        self.assertEqual(
+            response.data["document_file_type_counts"][0]["mime_type_count"],
+            1,
+        )
+
     def test_statistics_no_inbox_tag(self) -> None:
         Document.objects.create(title="none1", checksum="A")
 
