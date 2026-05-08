@@ -25,4 +25,14 @@ class Migration(migrations.Migration):
                 verbose_name="Sets the LLM embedding backend",
             ),
         ),
+        migrations.AddField(
+            model_name="applicationconfiguration",
+            name="llm_embedding_endpoint",
+            field=models.CharField(
+                blank=True,
+                max_length=256,
+                null=True,
+                verbose_name="Sets the LLM embedding endpoint, optional",
+            ),
+        ),
     ]

@@ -74,6 +74,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 "ai_enabled": False,
                 "llm_embedding_backend": None,
                 "llm_embedding_model": None,
+                "llm_embedding_endpoint": None,
                 "llm_backend": None,
                 "llm_model": None,
                 "llm_api_key": None,
@@ -862,6 +863,22 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
             json.dumps(
                 {
                     "llm_endpoint": "http://127.0.0.1:11434",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("non-public address", str(response.data).lower())
+
+    @override_settings(LLM_ALLOW_INTERNAL_ENDPOINTS=False)
+    def test_update_llm_embedding_endpoint_blocks_internal_endpoint_when_disallowed(
+        self,
+    ) -> None:
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            json.dumps(
+                {
+                    "llm_embedding_endpoint": "http://127.0.0.1:11434",
                 },
             ),
             content_type="application/json",
