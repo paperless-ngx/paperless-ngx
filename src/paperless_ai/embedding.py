@@ -40,6 +40,18 @@ def get_embedding_model() -> "BaseEmbedding":
                 model_name=config.llm_embedding_model
                 or "sentence-transformers/all-MiniLM-L6-v2",
             )
+        case LLMEmbeddingBackend.OLLAMA:
+            from llama_index.embeddings.ollama import OllamaEmbedding
+
+            endpoint = config.llm_endpoint or "http://localhost:11434"
+            validate_outbound_http_url(
+                endpoint,
+                allow_internal=config.llm_allow_internal_endpoints,
+            )
+            return OllamaEmbedding(
+                model_name=config.llm_embedding_model or "embeddinggemma",
+                base_url=endpoint,
+            )
         case _:
             raise ValueError(
                 f"Unsupported embedding backend: {config.llm_embedding_backend}",
@@ -52,11 +64,12 @@ def get_embedding_dim() -> int:
     from a dummy embedding and stores it for future use.
     """
     config = AIConfig()
-    model = config.llm_embedding_model or (
-        "text-embedding-3-small"
-        if config.llm_embedding_backend == LLMEmbeddingBackend.OPENAI_LIKE
-        else "sentence-transformers/all-MiniLM-L6-v2"
-    )
+    default_model = {
+        LLMEmbeddingBackend.OPENAI_LIKE: "text-embedding-3-small",
+        LLMEmbeddingBackend.HUGGINGFACE: "sentence-transformers/all-MiniLM-L6-v2",
+        LLMEmbeddingBackend.OLLAMA: "embeddinggemma",
+    }.get(config.llm_embedding_backend)
+    model = config.llm_embedding_model or default_model
 
     meta_path: Path = settings.LLM_INDEX_DIR / "meta.json"
     if meta_path.exists():
