@@ -5,6 +5,7 @@ from django.test import TestCase
 
 from documents.conditionals import metadata_etag
 from documents.conditionals import preview_etag
+from documents.conditionals import thumbnail_etag
 from documents.conditionals import thumbnail_last_modified
 from documents.models import Document
 from documents.tests.utils import DirectoriesMixin
@@ -30,6 +31,7 @@ class TestConditionals(DirectoriesMixin, TestCase):
 
         self.assertEqual(metadata_etag(request, root.id), latest.checksum)
         self.assertEqual(preview_etag(request, root.id), latest.archive_checksum)
+        self.assertEqual(thumbnail_etag(request, root.id), latest.checksum)
 
     def test_resolve_effective_doc_returns_none_for_invalid_or_unrelated_version(
         self,
