@@ -64,6 +64,7 @@ def get_or_create_storage_context(*, rebuild=False):
         settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
 
     if rebuild or not settings.LLM_INDEX_DIR.exists():
+        settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
         import faiss
         from llama_index.core import StorageContext
         from llama_index.core.storage.docstore import SimpleDocumentStore
