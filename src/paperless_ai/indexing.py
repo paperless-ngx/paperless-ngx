@@ -64,13 +64,13 @@ def get_or_create_storage_context(*, rebuild=False):
         settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
 
     if rebuild or not settings.LLM_INDEX_DIR.exists():
-        settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
         import faiss
         from llama_index.core import StorageContext
         from llama_index.core.storage.docstore import SimpleDocumentStore
         from llama_index.core.storage.index_store import SimpleIndexStore
         from llama_index.vector_stores.faiss import FaissVectorStore
 
+        settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
         embedding_dim = get_embedding_dim()
         faiss_index = faiss.IndexFlatL2(embedding_dim)
         vector_store = FaissVectorStore(faiss_index=faiss_index)
