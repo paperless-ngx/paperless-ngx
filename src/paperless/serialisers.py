@@ -291,6 +291,22 @@ class ApplicationConfigurationSerializer(
 
         return value
 
+    def validate_llm_embedding_endpoint(self, value: str | None) -> str | None:
+        if not value:
+            return value
+
+        try:
+            validate_outbound_http_url(
+                value,
+                allow_internal=settings.LLM_ALLOW_INTERNAL_ENDPOINTS,
+            )
+        except ValueError as e:
+            raise serializers.ValidationError(
+                f"Invalid LLM embedding endpoint: {e.args[0]}, see logs for details",
+            ) from e
+
+        return value
+
     class Meta:
         model = ApplicationConfiguration
         fields = "__all__"

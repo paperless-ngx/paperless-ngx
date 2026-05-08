@@ -2068,6 +2068,14 @@ used with the OpenAI-compatible backend to target a custom provider or local gat
 
     Defaults to None.
 
+#### [`PAPERLESS_AI_LLM_EMBEDDING_ENDPOINT=<str>`](#PAPERLESS_AI_LLM_EMBEDDING_ENDPOINT) {#PAPERLESS_AI_LLM_EMBEDDING_ENDPOINT}
+
+: The endpoint / url to use specifically for embedding calls. When set, this takes precedence over
+`PAPERLESS_AI_LLM_ENDPOINT` for embedding requests, allowing completion and embedding models to be
+served from different endpoints (e.g. different local servers or ports).
+
+    Defaults to None, falling back to `PAPERLESS_AI_LLM_ENDPOINT`.
+
 #### [`PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS=<bool>`](#PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS) {#PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS}
 
 : If set to false, Paperless blocks AI endpoint URLs that resolve to non-public addresses (e.g., localhost, etc).

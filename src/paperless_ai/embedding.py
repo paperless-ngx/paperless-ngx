@@ -22,7 +22,7 @@ def get_embedding_model() -> "BaseEmbedding":
         case LLMEmbeddingBackend.OPENAI_LIKE:
             from llama_index.embeddings.openai_like import OpenAILikeEmbedding
 
-            endpoint = config.llm_endpoint or None
+            endpoint = config.llm_embedding_endpoint or config.llm_endpoint or None
             if endpoint:
                 validate_outbound_http_url(
                     endpoint,

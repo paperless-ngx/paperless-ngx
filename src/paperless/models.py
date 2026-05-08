@@ -339,6 +339,13 @@ class ApplicationConfiguration(AbstractSingletonModel):
         max_length=256,
     )
 
+    llm_embedding_endpoint = models.CharField(
+        verbose_name=_("Sets the LLM embedding endpoint, optional"),
+        blank=True,
+        null=True,
+        max_length=256,
+    )
+
     class Meta:
         verbose_name = _("paperless application settings")
         permissions = [
