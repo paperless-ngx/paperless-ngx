@@ -4,14 +4,14 @@ import sys
 
 from documents.models import Document
 from paperless_ai.client import AIClient
+from paperless_ai.indexing import get_rag_prompt_helper
 from paperless_ai.indexing import load_or_build_index
 
 logger = logging.getLogger("paperless_ai.chat")
 
-MAX_SINGLE_DOC_CONTEXT_CHARS = 15000
-SINGLE_DOC_SNIPPET_CHARS = 800
 CHAT_METADATA_DELIMITER = "\n\n__PAPERLESS_CHAT_METADATA__"
 MAX_CHAT_REFERENCES = 3
+CHAT_RETRIEVER_TOP_K = 5
 
 CHAT_PROMPT_TMPL = """Context information is below.
     ---------------------
@@ -89,66 +89,39 @@ def stream_chat_with_documents(query_str: str, documents: list[Document]):
     from llama_index.core import VectorStoreIndex
     from llama_index.core.prompts import PromptTemplate
     from llama_index.core.query_engine import RetrieverQueryEngine
+    from llama_index.core.response_synthesizers import get_response_synthesizer
 
     local_index = VectorStoreIndex(nodes=nodes)
     retriever = local_index.as_retriever(
-        similarity_top_k=3 if len(documents) == 1 else 5,
+        similarity_top_k=CHAT_RETRIEVER_TOP_K,
     )
 
-    if len(documents) == 1:
-        # Just one doc — provide full content
-        doc = documents[0]
-        references = [_build_document_reference(doc)]
-        # TODO: include document metadata in the context
-        content = doc.content or ""
-        context_body = content
+    top_nodes = retriever.retrieve(query_str)
+    if len(top_nodes) == 0:
+        logger.warning("Retriever returned no nodes for the given documents.")
+        yield "Sorry, I couldn't find any content to answer your question."
+        return
 
-        if len(content) > MAX_SINGLE_DOC_CONTEXT_CHARS:
-            logger.info(
-                "Truncating single-document context from %s to %s characters",
-                len(content),
-                MAX_SINGLE_DOC_CONTEXT_CHARS,
-            )
-            context_body = content[:MAX_SINGLE_DOC_CONTEXT_CHARS]
-
-            top_nodes = retriever.retrieve(query_str)
-            if len(top_nodes) > 0:
-                snippets = "\n\n".join(
-                    f"TITLE: {node.metadata.get('title')}\n{node.text[:SINGLE_DOC_SNIPPET_CHARS]}"
-                    for node in top_nodes
-                )
-                context_body = f"{context_body}\n\nTOP MATCHES:\n{snippets}"
-
-        context = f"TITLE: {doc.title or doc.filename}\n{context_body}"
-    else:
-        top_nodes = retriever.retrieve(query_str)
-
-        if len(top_nodes) == 0:
-            logger.warning("Retriever returned no nodes for the given documents.")
-            yield "Sorry, I couldn't find any content to answer your question."
-            return
-
-        references = _get_document_references(documents, top_nodes)
-        context = "\n\n".join(
-            f"TITLE: {node.metadata.get('title')}\n{node.text[:SINGLE_DOC_SNIPPET_CHARS]}"
-            for node in top_nodes
-        )
+    references = _get_document_references(documents, top_nodes)
 
     prompt_template = PromptTemplate(template=CHAT_PROMPT_TMPL)
-    prompt = prompt_template.partial_format(
-        context_str=context,
-        query_str=query_str,
-    ).format(llm=client.llm)
+    response_synthesizer = get_response_synthesizer(
+        llm=client.llm,
+        prompt_helper=get_rag_prompt_helper(),
+        text_qa_template=prompt_template,
+        streaming=True,
+    )
 
     query_engine = RetrieverQueryEngine.from_args(
         retriever=retriever,
         llm=client.llm,
+        response_synthesizer=response_synthesizer,
         streaming=True,
     )
 
-    logger.debug("Document chat prompt: %s", prompt)
+    logger.debug("Document chat query: %s", query_str)
 
-    response_stream = query_engine.query(prompt)
+    response_stream = query_engine.query(query_str)
 
     for chunk in response_stream.response_gen:
         yield chunk

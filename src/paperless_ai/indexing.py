@@ -22,6 +22,11 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("paperless_ai.indexing")
 
+RAG_CONTEXT_WINDOW = 8192
+RAG_NUM_OUTPUT = 512
+RAG_CHUNK_SIZE = 1024
+RAG_CHUNK_OVERLAP = 200
+
 
 def queue_llm_index_update_if_needed(*, rebuild: bool, reason: str) -> bool:
     from documents.tasks import llmindex_index
@@ -111,7 +116,10 @@ def build_document_node(document: Document) -> list["BaseNode"]:
     from llama_index.core.node_parser import SimpleNodeParser
 
     doc = LlamaDocument(text=text, metadata=metadata)
-    parser = SimpleNodeParser()
+    parser = SimpleNodeParser(
+        chunk_size=RAG_CHUNK_SIZE,
+        chunk_overlap=get_rag_chunk_overlap(),
+    )
     return parser.get_nodes_from_documents([doc])
 
 
@@ -166,6 +174,21 @@ def vector_store_file_exists():
     Check if the vector store file exists in the LLM index directory.
     """
     return Path(settings.LLM_INDEX_DIR / "default__vector_store.json").exists()
+
+
+def get_rag_chunk_overlap() -> int:
+    return min(RAG_CHUNK_OVERLAP, RAG_CHUNK_SIZE - 1)
+
+
+def get_rag_prompt_helper():
+    from llama_index.core.indices.prompt_helper import PromptHelper
+
+    return PromptHelper(
+        context_window=RAG_CONTEXT_WINDOW,
+        num_output=RAG_NUM_OUTPUT,
+        chunk_overlap_ratio=0.1,
+        chunk_size_limit=RAG_CHUNK_SIZE,
+    )
 
 
 def update_llm_index(
@@ -277,17 +300,15 @@ def llm_index_remove_document(document: Document):
 
 
 def truncate_content(content: str) -> str:
-    from llama_index.core.indices.prompt_helper import PromptHelper
     from llama_index.core.prompts import PromptTemplate
     from llama_index.core.text_splitter import TokenTextSplitter
 
-    prompt_helper = PromptHelper(
-        context_window=8192,
-        num_output=512,
-        chunk_overlap_ratio=0.1,
-        chunk_size_limit=None,
+    prompt_helper = get_rag_prompt_helper()
+    splitter = TokenTextSplitter(
+        separator=" ",
+        chunk_size=RAG_CHUNK_SIZE,
+        chunk_overlap=get_rag_chunk_overlap(),
     )
-    splitter = TokenTextSplitter(separator=" ", chunk_size=512, chunk_overlap=50)
     content_chunks = splitter.split_text(content)
     truncated_chunks = prompt_helper.truncate(
         prompt=PromptTemplate(template="{content}"),

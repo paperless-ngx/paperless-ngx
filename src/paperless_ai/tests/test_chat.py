@@ -57,7 +57,7 @@ def assert_chat_output(
     }
 
 
-def test_stream_chat_with_one_document_full_content(mock_document) -> None:
+def test_stream_chat_with_one_document_retrieval(mock_document) -> None:
     with (
         patch("paperless_ai.chat.AIClient") as mock_client_cls,
         patch("paperless_ai.chat.load_or_build_index") as mock_load_index,
@@ -85,6 +85,7 @@ def test_stream_chat_with_one_document_full_content(mock_document) -> None:
 
         output = list(stream_chat_with_documents("What is this?", [mock_document]))
 
+        mock_query_engine.query.assert_called_once_with("What is this?")
         assert_chat_output(
             output,
             expected_chunks=["chunk1", "chunk2"],
@@ -154,6 +155,7 @@ def test_stream_chat_with_multiple_documents_retrieval(patch_embed_nodes) -> Non
 
         output = list(stream_chat_with_documents("What's up?", [doc1, doc2]))
 
+        mock_query_engine.query.assert_called_once_with("What's up?")
         assert_chat_output(
             output,
             expected_chunks=["chunk1", "chunk2"],
