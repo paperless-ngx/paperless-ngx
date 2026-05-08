@@ -59,6 +59,24 @@ def test_build_document_node(real_document) -> None:
 
 
 @pytest.mark.django_db
+def test_build_document_node_uses_rag_chunk_settings(real_document) -> None:
+    with patch("llama_index.core.node_parser.SimpleNodeParser") as mock_parser:
+        mock_parser.return_value.get_nodes_from_documents.return_value = []
+
+        indexing.build_document_node(real_document)
+
+        mock_parser.assert_called_once_with(chunk_size=1024, chunk_overlap=200)
+
+
+def test_get_rag_chunk_overlap_clamps_to_chunk_size() -> None:
+    with (
+        patch("paperless_ai.indexing.RAG_CHUNK_SIZE", 64),
+        patch("paperless_ai.indexing.RAG_CHUNK_OVERLAP", 128),
+    ):
+        assert indexing.get_rag_chunk_overlap() == 63
+
+
+@pytest.mark.django_db
 def test_update_llm_index(
     temp_llm_index_dir,
     real_document,
