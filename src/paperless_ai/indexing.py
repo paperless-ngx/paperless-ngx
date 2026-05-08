@@ -70,6 +70,7 @@ def get_or_create_storage_context(*, rebuild=False):
         from llama_index.core.storage.index_store import SimpleIndexStore
         from llama_index.vector_stores.faiss import FaissVectorStore
 
+        settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
         embedding_dim = get_embedding_dim()
         faiss_index = faiss.IndexFlatL2(embedding_dim)
         vector_store = FaissVectorStore(faiss_index=faiss_index)
