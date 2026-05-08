@@ -72,7 +72,10 @@ def get_embedding_dim() -> int:
         LLMEmbeddingBackend.OPENAI_LIKE: "text-embedding-3-small",
         LLMEmbeddingBackend.HUGGINGFACE: "sentence-transformers/all-MiniLM-L6-v2",
         LLMEmbeddingBackend.OLLAMA: "embeddinggemma",
-    }.get(config.llm_embedding_backend)
+    }.get(
+        config.llm_embedding_backend,
+        "sentence-transformers/all-MiniLM-L6-v2",
+    )
     model = config.llm_embedding_model or default_model
 
     meta_path: Path = settings.LLM_INDEX_DIR / "meta.json"
