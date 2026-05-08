@@ -1,5 +1,9 @@
 # v3 Migration Guide
 
+## Pre-Requisites
+
+Upgrading to Paperless-ngx v3 can only be performed from version 2.20.15. If you are running an older version, please upgrade to v2.20.15 before proceeding with the v3 upgrade.
+
 ## Secret Key is Now Required
 
 The `PAPERLESS_SECRET_KEY` environment variable is now required. This is a critical security setting used for cryptographic signing and should be set to a long, random value.
@@ -36,6 +40,10 @@ separating the directory ignore from the file ignore.
 | `CONSUMER_POLLING_RETRY_COUNT` | _Removed_                                                                           | Automatic with stability tracking                                                    |
 | `CONSUMER_IGNORE_PATTERNS`     | [`CONSUMER_IGNORE_PATTERNS`](configuration.md#PAPERLESS_CONSUMER_IGNORE_PATTERNS)   | **Now regex, not fnmatch**; user patterns are added to (not replacing) default ones  |
 | _New_                          | [`CONSUMER_IGNORE_DIRS`](configuration.md#PAPERLESS_CONSUMER_IGNORE_DIRS)           | Additional directories to ignore; user entries are added to (not replacing) defaults |
+
+## Duplicate Handling Changes
+
+Paperless-ngx v3 no longer rejects duplicate documents by default. Instead, it now allows duplicates but adds a way to identify them via the UI. To (re-)enable duplicate rejection, set `PAPERLESS_CONSUMER_DELETE_DUPLICATES=true` in your environment.
 
 ## Encryption Support
 
