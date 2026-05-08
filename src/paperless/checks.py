@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import stat
@@ -239,12 +240,21 @@ def check_v3_minimum_upgrade_version(
     except (DatabaseError, OperationalError):
         return []
 
+    logger = logging.getLogger(__name__)
+    last_applied = sorted(applied)[-1] if applied else "(none)"
+    logger.error(
+        "V3 upgrade check failed: last applied documents migration is %r. "
+        "Expected '1075_workflowaction_order' (v2.20.15). "
+        "Ensure you have upgraded to v2.20.15 and run 'manage.py migrate' before upgrading to v3.",
+        last_applied,
+    )
+
     return [
         Error(
             "Cannot upgrade to Paperless-ngx v3 from this version.",
             hint=(
-                "Upgrading to v3 can only be performed from v2.20.15."
-                "Please upgrade to v2.20.15, run migrations, then upgrade to v3."
+                "Upgrading to v3 can only be performed from v2.20.15. "
+                "Please upgrade to v2.20.15, run migrations, then upgrade to v3. "
                 "See https://docs.paperless-ngx.com/setup/#upgrading for details."
             ),
             id="paperless.E002",
