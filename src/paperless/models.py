@@ -77,6 +77,7 @@ class ColorConvertChoices(models.TextChoices):
 class LLMEmbeddingBackend(models.TextChoices):
     OPENAI_LIKE = ("openai-like", _("OpenAI-compatible"))
     HUGGINGFACE = ("huggingface", _("Huggingface"))
+    OLLAMA = ("ollama", _("Ollama"))
 
 
 class LLMBackend(models.TextChoices):
