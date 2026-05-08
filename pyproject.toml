@@ -53,6 +53,7 @@ dependencies = [
   "langdetect~=1.0.9",
   "llama-index-core>=0.14.21",
   "llama-index-embeddings-huggingface>=0.6.1",
+  "llama-index-embeddings-ollama>=0.9",
   "llama-index-embeddings-openai-like>=0.2.2",
   "llama-index-llms-ollama>=0.9.1",
   "llama-index-llms-openai-like>=0.7.1",
