@@ -22,7 +22,7 @@ def get_embedding_model() -> "BaseEmbedding":
         case LLMEmbeddingBackend.OPENAI_LIKE:
             from llama_index.embeddings.openai_like import OpenAILikeEmbedding
 
-            endpoint = config.llm_endpoint or None
+            endpoint = config.llm_embedding_endpoint or config.llm_endpoint or None
             if endpoint:
                 validate_outbound_http_url(
                     endpoint,
@@ -43,7 +43,11 @@ def get_embedding_model() -> "BaseEmbedding":
         case LLMEmbeddingBackend.OLLAMA:
             from llama_index.embeddings.ollama import OllamaEmbedding
 
-            endpoint = config.llm_endpoint or "http://localhost:11434"
+            endpoint = (
+                config.llm_embedding_endpoint
+                or config.llm_endpoint
+                or "http://localhost:11434"
+            )
             validate_outbound_http_url(
                 endpoint,
                 allow_internal=config.llm_allow_internal_endpoints,
