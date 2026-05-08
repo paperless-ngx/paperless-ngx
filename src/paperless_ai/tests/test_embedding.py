@@ -100,6 +100,34 @@ def test_get_embedding_model_huggingface(mock_ai_config):
         assert model == MockHuggingFaceEmbedding.return_value
 
 
+def test_get_embedding_model_ollama(mock_ai_config):
+    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OLLAMA
+    mock_ai_config.return_value.llm_embedding_model = "embeddinggemma"
+    mock_ai_config.return_value.llm_endpoint = "http://test-url"
+
+    with patch(
+        "llama_index.embeddings.ollama.OllamaEmbedding",
+    ) as MockOllamaEmbedding:
+        model = get_embedding_model()
+        MockOllamaEmbedding.assert_called_once_with(
+            model_name="embeddinggemma",
+            base_url="http://test-url",
+        )
+        assert model == MockOllamaEmbedding.return_value
+
+
+def test_get_embedding_model_ollama_blocks_internal_endpoint_when_disallowed(
+    mock_ai_config,
+):
+    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OLLAMA
+    mock_ai_config.return_value.llm_embedding_model = "embeddinggemma"
+    mock_ai_config.return_value.llm_endpoint = "http://127.0.0.1:11434"
+    mock_ai_config.return_value.llm_allow_internal_endpoints = False
+
+    with pytest.raises(ValueError, match="non-public address"):
+        get_embedding_model()
+
+
 def test_get_embedding_model_invalid_backend(mock_ai_config):
     mock_ai_config.return_value.llm_embedding_backend = "INVALID_BACKEND"
 
