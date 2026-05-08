@@ -584,11 +584,11 @@ class TestV3MinimumUpgradeVersionCheck:
     ) -> None:
         """
         GIVEN:
-            - DB is on an old v2 version (pre-v2.20.10)
+            - DB is on an old v2 version (pre-v2.20.15)
         WHEN:
             - The v3 upgrade check runs
         THEN:
-            - The error hint explicitly references v2.20.10 so users know what to do
+            - The error hint explicitly references v2.20.15 so users know what to do
         """
         mocker.patch.dict(
             "paperless.checks.connections",
@@ -596,7 +596,7 @@ class TestV3MinimumUpgradeVersionCheck:
         )
         result = check_v3_minimum_upgrade_version(None)
         assert len(result) == 1
-        assert "v2.20.10" in result[0].hint
+        assert "v2.20.15" in result[0].hint
 
     def test_db_error_is_swallowed(self, mocker: MockerFixture) -> None:
         """
