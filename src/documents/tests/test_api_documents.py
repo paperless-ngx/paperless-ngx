@@ -3112,6 +3112,46 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         # modified was updated to today
         self.assertEqual(doc.modified.day, timezone.now().day)
 
+    def test_create_note_only_saves_document_modified_field(self) -> None:
+        """
+        GIVEN:
+            - Existing document with a created date
+        WHEN:
+            - API request is made to add a note
+        THEN:
+            - Only the document modified field is persisted by the note endpoint
+            - Other document fields are not rewritten by the note endpoint
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have notes added",
+            created=datetime.date(2026, 3, 31),
+        )
+        original_save = Document.save
+
+        with mock.patch.object(
+            Document,
+            "save",
+            autospec=True,
+            side_effect=original_save,
+        ) as save_mock:
+            resp = self.client.post(
+                f"/api/documents/{doc.pk}/notes/",
+                data={"note": "this is a posted note"},
+            )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        doc.refresh_from_db()
+        self.assertEqual(doc.created, datetime.date(2026, 3, 31))
+        self.assertTrue(
+            any(
+                call.kwargs.get("update_fields") == ["modified"]
+                for call in save_mock.call_args_list
+                if call.args and call.args[0].pk == doc.pk
+            ),
+        )
+
     def test_notes_permissions_aware(self) -> None:
         """
         GIVEN:
