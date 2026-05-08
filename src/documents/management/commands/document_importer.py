@@ -30,6 +30,7 @@ from django.db.models import Model
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save
 from filelock import FileLock
+from guardian.shortcuts import clear_ct_cache
 
 from documents.file_handling import create_source_path_directory
 from documents.management.commands.base import PaperlessCommand
@@ -428,6 +429,12 @@ class Command(CryptMixin, PaperlessCommand):
             self.stdout.write(self.style.ERROR("Database import failed"))
             self.stdout.write(self.style.ERROR(self._import_error_context_message()))
             raise
+
+        # ContentType/Permission rows were deleted and reinserted above; stale
+        # in-process caches must be invalidated so permission checks use the
+        # new IDs rather than pre-import PKs.
+        ContentType.objects.clear_cache()
+        clear_ct_cache()
 
     def handle(self, *args, **options) -> None:
         logging.getLogger().handlers[0].level = logging.ERROR
