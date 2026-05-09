@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
+from django.conf import settings
 
 from documents.models import Document
 from paperless.models import LLMEmbeddingBackend
@@ -116,6 +117,7 @@ def test_get_embedding_model_huggingface(mock_ai_config):
         model = get_embedding_model()
         MockHuggingFaceEmbedding.assert_called_once_with(
             model_name="sentence-transformers/all-MiniLM-L6-v2",
+            cache_folder=str(settings.DATA_DIR / "hf_cache"),
         )
         assert model == MockHuggingFaceEmbedding.return_value
 
