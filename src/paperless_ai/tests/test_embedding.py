@@ -14,6 +14,7 @@ from paperless_ai.embedding import get_embedding_model
 @pytest.fixture
 def mock_ai_config():
     with patch("paperless_ai.embedding.AIConfig") as MockAIConfig:
+        MockAIConfig.return_value.llm_embedding_endpoint = None
         MockAIConfig.return_value.llm_allow_internal_endpoints = True
         yield MockAIConfig
 
@@ -71,6 +72,25 @@ def test_get_embedding_model_openai(mock_ai_config):
         assert model == MockOpenAIEmbedding.return_value
 
 
+def test_get_embedding_model_openai_prefers_embedding_endpoint(mock_ai_config):
+    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OPENAI_LIKE
+    mock_ai_config.return_value.llm_embedding_model = "text-embedding-3-small"
+    mock_ai_config.return_value.llm_api_key = "test_api_key"
+    mock_ai_config.return_value.llm_embedding_endpoint = "http://embedding-url"
+    mock_ai_config.return_value.llm_endpoint = "http://test-url"
+
+    with patch(
+        "llama_index.embeddings.openai_like.OpenAILikeEmbedding",
+    ) as MockOpenAIEmbedding:
+        model = get_embedding_model()
+        MockOpenAIEmbedding.assert_called_once_with(
+            model_name="text-embedding-3-small",
+            api_key="test_api_key",
+            api_base="http://embedding-url",
+        )
+        assert model == MockOpenAIEmbedding.return_value
+
+
 def test_get_embedding_model_openai_blocks_internal_endpoint_when_disallowed(
     mock_ai_config,
 ):
@@ -98,6 +118,51 @@ def test_get_embedding_model_huggingface(mock_ai_config):
             model_name="sentence-transformers/all-MiniLM-L6-v2",
         )
         assert model == MockHuggingFaceEmbedding.return_value
+
+
+def test_get_embedding_model_ollama(mock_ai_config):
+    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OLLAMA
+    mock_ai_config.return_value.llm_embedding_model = "embeddinggemma"
+    mock_ai_config.return_value.llm_endpoint = "http://test-url"
+
+    with patch(
+        "llama_index.embeddings.ollama.OllamaEmbedding",
+    ) as MockOllamaEmbedding:
+        model = get_embedding_model()
+        MockOllamaEmbedding.assert_called_once_with(
+            model_name="embeddinggemma",
+            base_url="http://test-url",
+        )
+        assert model == MockOllamaEmbedding.return_value
+
+
+def test_get_embedding_model_ollama_prefers_embedding_endpoint(mock_ai_config):
+    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OLLAMA
+    mock_ai_config.return_value.llm_embedding_model = "embeddinggemma"
+    mock_ai_config.return_value.llm_embedding_endpoint = "http://embedding-url"
+    mock_ai_config.return_value.llm_endpoint = "http://test-url"
+
+    with patch(
+        "llama_index.embeddings.ollama.OllamaEmbedding",
+    ) as MockOllamaEmbedding:
+        model = get_embedding_model()
+        MockOllamaEmbedding.assert_called_once_with(
+            model_name="embeddinggemma",
+            base_url="http://embedding-url",
+        )
+        assert model == MockOllamaEmbedding.return_value
+
+
+def test_get_embedding_model_ollama_blocks_internal_endpoint_when_disallowed(
+    mock_ai_config,
+):
+    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OLLAMA
+    mock_ai_config.return_value.llm_embedding_model = "embeddinggemma"
+    mock_ai_config.return_value.llm_endpoint = "http://127.0.0.1:11434"
+    mock_ai_config.return_value.llm_allow_internal_endpoints = False
+
+    with pytest.raises(ValueError, match="non-public address"):
+        get_embedding_model()
 
 
 def test_get_embedding_model_invalid_backend(mock_ai_config):

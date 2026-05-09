@@ -2014,8 +2014,8 @@ suggestions. This setting is required to be set to true in order to use the AI f
 
 #### [`PAPERLESS_AI_LLM_EMBEDDING_BACKEND=<str>`](#PAPERLESS_AI_LLM_EMBEDDING_BACKEND) {#PAPERLESS_AI_LLM_EMBEDDING_BACKEND}
 
-: The embedding backend to use for RAG. This can be either "openai-like" or "huggingface". The
-"openai-like" backend uses an OpenAI-compatible embeddings API.
+: The embedding backend to use for RAG. This can be "openai-like", "huggingface", or
+"ollama". The "openai-like" backend uses an OpenAI-compatible embeddings API.
 
     Defaults to None.
 
@@ -2023,8 +2023,15 @@ suggestions. This setting is required to be set to true in order to use the AI f
 
 : The model to use for the embedding backend for RAG. This can be set to any of the embedding
 models supported by the current embedding backend. If not supplied, defaults to
-"text-embedding-3-small" for the OpenAI-compatible backend and
-"sentence-transformers/all-MiniLM-L6-v2" for Huggingface.
+"text-embedding-3-small" for the OpenAI-compatible backend,
+"sentence-transformers/all-MiniLM-L6-v2" for Huggingface, and "embeddinggemma" for Ollama.
+
+    Defaults to None.
+
+#### [`PAPERLESS_AI_LLM_EMBEDDING_ENDPOINT=<str>`](#PAPERLESS_AI_LLM_EMBEDDING_ENDPOINT) {#PAPERLESS_AI_LLM_EMBEDDING_ENDPOINT}
+
+: The endpoint / url to use for the embedding backend. If not supplied, embeddings use
+`PAPERLESS_AI_LLM_ENDPOINT`.
 
     Defaults to None.
 

@@ -77,6 +77,7 @@ class ColorConvertChoices(models.TextChoices):
 class LLMEmbeddingBackend(models.TextChoices):
     OPENAI_LIKE = ("openai-like", _("OpenAI-compatible"))
     HUGGINGFACE = ("huggingface", _("Huggingface"))
+    OLLAMA = ("ollama", _("Ollama"))
 
 
 class LLMBackend(models.TextChoices):
@@ -308,6 +309,13 @@ class ApplicationConfiguration(AbstractSingletonModel):
         blank=True,
         null=True,
         max_length=128,
+    )
+
+    llm_embedding_endpoint = models.CharField(
+        verbose_name=_("Sets the LLM embedding endpoint, optional"),
+        blank=True,
+        null=True,
+        max_length=256,
     )
 
     llm_backend = models.CharField(

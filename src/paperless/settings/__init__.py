@@ -1178,8 +1178,9 @@ REMOTE_OCR_ENDPOINT = os.getenv("PAPERLESS_REMOTE_OCR_ENDPOINT")
 AI_ENABLED = get_bool_from_env("PAPERLESS_AI_ENABLED", "NO")
 LLM_EMBEDDING_BACKEND = os.getenv(
     "PAPERLESS_AI_LLM_EMBEDDING_BACKEND",
-)  # "huggingface" or "openai-like"
+)  # "huggingface", "openai-like", or "ollama"
 LLM_EMBEDDING_MODEL = os.getenv("PAPERLESS_AI_LLM_EMBEDDING_MODEL")
+LLM_EMBEDDING_ENDPOINT = os.getenv("PAPERLESS_AI_LLM_EMBEDDING_ENDPOINT")
 LLM_BACKEND = os.getenv("PAPERLESS_AI_LLM_BACKEND")  # "ollama" or "openai-like"
 LLM_MODEL = os.getenv("PAPERLESS_AI_LLM_MODEL")
 LLM_API_KEY = os.getenv("PAPERLESS_AI_LLM_API_KEY")

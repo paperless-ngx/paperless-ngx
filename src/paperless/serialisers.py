@@ -291,6 +291,8 @@ class ApplicationConfigurationSerializer(
 
         return value
 
+    validate_llm_embedding_endpoint = validate_llm_endpoint
+
     class Meta:
         model = ApplicationConfiguration
         fields = "__all__"
