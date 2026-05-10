@@ -39,6 +39,7 @@ def get_embedding_model() -> "BaseEmbedding":
             return HuggingFaceEmbedding(
                 model_name=config.llm_embedding_model
                 or "sentence-transformers/all-MiniLM-L6-v2",
+                cache_folder=str(settings.DATA_DIR / "hf_cache"),
             )
         case LLMEmbeddingBackend.OLLAMA:
             from llama_index.embeddings.ollama import OllamaEmbedding
