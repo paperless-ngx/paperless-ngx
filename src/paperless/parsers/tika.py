@@ -265,9 +265,7 @@ class TikaDocumentParser:
                 f"{settings.TIKA_ENDPOINT}: {err}",
             ) from err
 
-        self._text = parsed.content
-        if self._text is not None:
-            self._text = self._text.strip()
+        self._text = (parsed.content or "").strip()
 
         self._date = parsed.created
         if self._date is not None and timezone.is_naive(self._date):
@@ -281,15 +279,15 @@ class TikaDocumentParser:
     # Result accessors
     # ------------------------------------------------------------------
 
-    def get_text(self) -> str | None:
+    def get_text(self) -> str:
         """Return the plain-text content extracted during parse.
 
         Returns
         -------
-        str | None
-            Extracted text, or None if parse has not been called yet.
+        str
+            Extracted text, or an empty string if no text could be found.
         """
-        return self._text
+        return self._text or ""
 
     def get_date(self) -> datetime.datetime | None:
         """Return the document date detected during parse.
