@@ -312,6 +312,7 @@ def update_document_content_maybe_archive_file(document_id) -> None:
                 mime_type,
                 produce_archive=produce_archive,
             )
+            parsed_content = parser.get_text() or ""
 
             thumbnail = parser.get_thumbnail(document.source_path, mime_type)
 
@@ -329,7 +330,7 @@ def update_document_content_maybe_archive_file(document_id) -> None:
                     )
                     Document.objects.filter(pk=document.pk).update(
                         archive_checksum=checksum,
-                        content=parser.get_text(),
+                        content=parsed_content,
                         archive_filename=document.archive_filename,
                     )
                     newDocument = Document.objects.get(pk=document.pk)
@@ -354,14 +355,14 @@ def update_document_content_maybe_archive_file(document_id) -> None:
                         )
                 else:
                     Document.objects.filter(pk=document.pk).update(
-                        content=parser.get_text(),
+                        content=parsed_content,
                     )
 
                     if settings.AUDIT_LOG_ENABLED:
                         LogEntry.objects.log_create(
                             instance=oldDocument,
                             changes={
-                                "content": [oldDocument.content, parser.get_text()],
+                                "content": [oldDocument.content, parsed_content],
                             },
                             additional_data={
                                 "reason": "Update document content",
