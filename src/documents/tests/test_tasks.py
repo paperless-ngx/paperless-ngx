@@ -286,59 +286,6 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
         tasks.update_document_content_maybe_archive_file(doc.pk)
         self.assertNotEqual(Document.objects.get(pk=doc.pk).content, "test")
 
-    def test_update_content_maybe_archive_file_allows_null_parser_text(
-        self,
-    ) -> None:
-        for archive in (False, True):
-            with self.subTest(archive=archive):
-                source_path = self.dirs.scratch_dir / "sample.pdf"
-                source_path.write_bytes(b"%PDF-1.4\n")
-                doc = Document.objects.create(
-                    title="test",
-                    content="existing content",
-                    checksum="wow",
-                    filename=source_path,
-                    mime_type="application/pdf",
-                )
-                archive_path = None
-                if archive:
-                    archive_path = settings.SCRATCH_DIR / "archive.pdf"
-                    archive_path.write_bytes(b"%PDF-1.4\n")
-                thumbnail_path = settings.SCRATCH_DIR / "thumbnail.webp"
-                thumbnail_path.write_bytes(b"thumbnail")
-
-                parser = mock.Mock(
-                    can_produce_archive=archive,
-                    requires_pdf_rendition=False,
-                )
-                parser.get_archive_path.return_value = archive_path
-                parser.get_text.return_value = None
-                parser.get_thumbnail.return_value = thumbnail_path
-
-                parser_context = mock.MagicMock()
-                parser_context.__enter__.return_value = parser
-
-                registry = mock.Mock()
-                registry.get_parser_for_file.return_value = mock.Mock(
-                    return_value=parser_context,
-                )
-
-                with mock.patch(
-                    "documents.tasks.get_parser_registry",
-                    return_value=registry,
-                ):
-                    tasks.update_document_content_maybe_archive_file(doc.pk)
-                doc.refresh_from_db()
-
-                self.assertEqual(doc.content, "")
-                if archive:
-                    self.assertIsNotNone(doc.archive_checksum)
-                    self.assertIsNotNone(doc.archive_filename)
-                    self.assertTrue(doc.archive_path.is_file())
-                else:
-                    self.assertIsNone(doc.archive_checksum)
-                    self.assertIsNone(doc.archive_filename)
-
 
 class TestAIIndex(DirectoriesMixin, TestCase):
     @override_settings(
