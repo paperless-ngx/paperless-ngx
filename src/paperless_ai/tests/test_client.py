@@ -1,38 +1,35 @@
 from unittest.mock import MagicMock
-from unittest.mock import patch
 
 import pytest
 from llama_index.core.llms import ChatMessage
 from llama_index.core.llms.llm import ToolSelection
+from pytest_mock import MockerFixture
 
+from paperless.config import AIConfig
 from paperless_ai.client import AIClient
 
 
 @pytest.fixture
-def mock_ai_config():
-    with patch("paperless_ai.client.AIConfig") as MockAIConfig:
-        mock_config = MagicMock()
-        mock_config.llm_allow_internal_endpoints = True
-        MockAIConfig.return_value = mock_config
-        yield mock_config
+def mock_ai_config(mocker: MockerFixture) -> MagicMock:
+    mock = mocker.patch("paperless_ai.client.AIConfig", spec=AIConfig)
+    mock.return_value.llm_allow_internal_endpoints = True
+    return mock
 
 
 @pytest.fixture
-def mock_ollama_llm():
-    with patch("llama_index.llms.ollama.Ollama") as MockOllama:
-        yield MockOllama
+def mock_ollama_llm(mocker: MockerFixture) -> MagicMock:
+    return mocker.patch("llama_index.llms.ollama.Ollama")
 
 
 @pytest.fixture
-def mock_openai_llm():
-    with patch("llama_index.llms.openai_like.OpenAILike") as MockOpenAILike:
-        yield MockOpenAILike
+def mock_openai_llm(mocker: MockerFixture) -> MagicMock:
+    return mocker.patch("llama_index.llms.openai_like.OpenAILike")
 
 
-def test_get_llm_ollama(mock_ai_config, mock_ollama_llm):
-    mock_ai_config.llm_backend = "ollama"
-    mock_ai_config.llm_model = "test_model"
-    mock_ai_config.llm_endpoint = "http://test-url"
+def test_get_llm_ollama(mock_ai_config: MagicMock, mock_ollama_llm: MagicMock) -> None:
+    mock_ai_config.return_value.llm_backend = "ollama"
+    mock_ai_config.return_value.llm_model = "test_model"
+    mock_ai_config.return_value.llm_endpoint = "http://test-url"
 
     client = AIClient()
 
@@ -44,11 +41,11 @@ def test_get_llm_ollama(mock_ai_config, mock_ollama_llm):
     assert client.llm == mock_ollama_llm.return_value
 
 
-def test_get_llm_openai(mock_ai_config, mock_openai_llm):
-    mock_ai_config.llm_backend = "openai-like"
-    mock_ai_config.llm_model = "test_model"
-    mock_ai_config.llm_api_key = "test_api_key"
-    mock_ai_config.llm_endpoint = "http://test-url"
+def test_get_llm_openai(mock_ai_config: MagicMock, mock_openai_llm: MagicMock) -> None:
+    mock_ai_config.return_value.llm_backend = "openai-like"
+    mock_ai_config.return_value.llm_model = "test_model"
+    mock_ai_config.return_value.llm_api_key = "test_api_key"
+    mock_ai_config.return_value.llm_endpoint = "http://test-url"
 
     client = AIClient()
 
@@ -62,31 +59,32 @@ def test_get_llm_openai(mock_ai_config, mock_openai_llm):
     assert client.llm == mock_openai_llm.return_value
 
 
-def test_get_llm_openai_blocks_internal_endpoint_when_disallowed(mock_ai_config):
-    mock_ai_config.llm_backend = "openai-like"
-    mock_ai_config.llm_model = "test_model"
-    mock_ai_config.llm_api_key = "test_api_key"
-    mock_ai_config.llm_endpoint = "http://127.0.0.1:1234"
-    mock_ai_config.llm_allow_internal_endpoints = False
+def test_get_llm_openai_blocks_internal_endpoint_when_disallowed(
+    mock_ai_config: MagicMock,
+) -> None:
+    mock_ai_config.return_value.llm_backend = "openai-like"
+    mock_ai_config.return_value.llm_model = "test_model"
+    mock_ai_config.return_value.llm_api_key = "test_api_key"
+    mock_ai_config.return_value.llm_endpoint = "http://127.0.0.1:1234"
+    mock_ai_config.return_value.llm_allow_internal_endpoints = False
 
     with pytest.raises(ValueError, match="non-public address"):
         AIClient()
 
 
-def test_get_llm_unsupported_backend(mock_ai_config):
-    mock_ai_config.llm_backend = "unsupported"
+def test_get_llm_unsupported_backend(mock_ai_config: MagicMock) -> None:
+    mock_ai_config.return_value.llm_backend = "unsupported"
 
     with pytest.raises(ValueError, match="Unsupported LLM backend: unsupported"):
         AIClient()
 
 
-def test_run_llm_query(mock_ai_config, mock_ollama_llm):
-    mock_ai_config.llm_backend = "ollama"
-    mock_ai_config.llm_model = "test_model"
-    mock_ai_config.llm_endpoint = "http://test-url"
+def test_run_llm_query(mock_ai_config: MagicMock, mock_ollama_llm: MagicMock) -> None:
+    mock_ai_config.return_value.llm_backend = "ollama"
+    mock_ai_config.return_value.llm_model = "test_model"
+    mock_ai_config.return_value.llm_endpoint = "http://test-url"
 
     mock_llm_instance = mock_ollama_llm.return_value
-
     tool_selection = ToolSelection(
         tool_id="call_test",
         tool_name="DocumentClassifierSchema",
@@ -99,7 +97,6 @@ def test_run_llm_query(mock_ai_config, mock_ollama_llm):
             "dates": ["2023-01-01"],
         },
     )
-
     mock_llm_instance.chat_with_tools.return_value = MagicMock()
     mock_llm_instance.get_tool_calls_from_response.return_value = [tool_selection]
 
@@ -109,10 +106,10 @@ def test_run_llm_query(mock_ai_config, mock_ollama_llm):
     assert result["title"] == "Test Title"
 
 
-def test_run_chat(mock_ai_config, mock_ollama_llm):
-    mock_ai_config.llm_backend = "ollama"
-    mock_ai_config.llm_model = "test_model"
-    mock_ai_config.llm_endpoint = "http://test-url"
+def test_run_chat(mock_ai_config: MagicMock, mock_ollama_llm: MagicMock) -> None:
+    mock_ai_config.return_value.llm_backend = "ollama"
+    mock_ai_config.return_value.llm_model = "test_model"
+    mock_ai_config.return_value.llm_endpoint = "http://test-url"
 
     mock_llm_instance = mock_ollama_llm.return_value
     mock_llm_instance.chat.return_value = "test_chat_result"

@@ -95,7 +95,9 @@ def build_llm_index_text(doc: Document) -> str:
     ]
 
     for instance in doc.custom_fields.all():
-        lines.append(f"Custom Field - {instance.field.name}: {instance}")
+        lines.append(
+            f"Custom Field - {instance.field.name}: {instance.value_for_search}",
+        )
 
     lines.append("\nContent:\n")
     lines.append(doc.content or "")
