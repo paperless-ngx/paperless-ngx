@@ -23,7 +23,7 @@
   <div class="visually-hidden" i18n>Loading...</div>
 }
 
-<div class="task-controls mb-3 btn-toolbar align-items-center" role="toolbar">
+<div class="task-controls mb-3 gap-2 btn-toolbar align-items-center" role="toolbar">
   <div class="task-view-scope btn-group btn-group-sm me-3" role="group">
     <input
       type="radio"
@@ -43,7 +43,7 @@
         id="section-{{section}}"
         (click)="setSection(section)"
         (keydown)="setSection(section)" />
-      <label class="btn btn-outline-primary" for="section-{{section}}">
+      <label class="btn btn-outline-primary d-flex flex-row align-items-center" for="section-{{section}}">
         {{ sectionLabel(section) }}
         @if (sectionCount(section) > 0) {
           <span class="badge ms-2" [class.bg-danger]="section === TaskSection.NeedsAttention" [class.bg-secondary]="section !== TaskSection.NeedsAttention">{{sectionCount(section)}}</span>
@@ -52,24 +52,26 @@
     }
   </div>
 
-  <div class="ms-3 me-2 text-muted"><ng-container i18n>Filter by</ng-container>:</div>
+  <div class="d-flex align-items-center gap-2">
+    <div class="text-muted"><ng-container i18n>Filter by</ng-container>:</div>
 
-  <div ngbDropdown>
-    <button class="btn btn-sm btn-outline-primary me-3" ngbDropdownToggle>{{selectedTaskTypeLabel}}</button>
-    <div class="dropdown-menu shadow" ngbDropdownMenu>
-      <button ngbDropdownItem [class.active]="selectedTaskType === null" (click)="setTaskType(null)" i18n>All types</button>
-      @for (option of taskTypeOptions; track option.value) {
-        <button ngbDropdownItem [class.active]="selectedTaskType === option.value" [disabled]="isTaskTypeOptionDisabled(option.value)" (click)="setTaskType(option.value)">{{option.label}}</button>
-      }
+    <div ngbDropdown>
+      <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{selectedTaskTypeLabel}}</button>
+      <div class="dropdown-menu shadow" ngbDropdownMenu>
+        <button ngbDropdownItem [class.active]="selectedTaskType === null" (click)="setTaskType(null)" i18n>All types</button>
+        @for (option of taskTypeOptions; track option.value) {
+          <button ngbDropdownItem [class.active]="selectedTaskType === option.value" [disabled]="isTaskTypeOptionDisabled(option.value)" (click)="setTaskType(option.value)">{{option.label}}</button>
+        }
+      </div>
     </div>
-  </div>
-  <div ngbDropdown>
-    <button class="btn btn-sm btn-outline-primary me-3" ngbDropdownToggle>{{selectedTriggerSourceLabel}}</button>
-    <div class="dropdown-menu shadow" ngbDropdownMenu>
-      <button ngbDropdownItem [class.active]="selectedTriggerSource === null" (click)="setTriggerSource(null)" i18n>All sources</button>
-      @for (option of triggerSourceOptions; track option.value) {
-        <button ngbDropdownItem [class.active]="selectedTriggerSource === option.value" [disabled]="isTriggerSourceOptionDisabled(option.value)" (click)="setTriggerSource(option.value)">{{option.label}}</button>
-      }
+    <div ngbDropdown>
+      <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{selectedTriggerSourceLabel}}</button>
+      <div class="dropdown-menu shadow" ngbDropdownMenu>
+        <button ngbDropdownItem [class.active]="selectedTriggerSource === null" (click)="setTriggerSource(null)" i18n>All sources</button>
+        @for (option of triggerSourceOptions; track option.value) {
+          <button ngbDropdownItem [class.active]="selectedTriggerSource === option.value" [disabled]="isTriggerSourceOptionDisabled(option.value)" (click)="setTriggerSource(option.value)">{{option.label}}</button>
+        }
+      </div>
     </div>
   </div>
 
