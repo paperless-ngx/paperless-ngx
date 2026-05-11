@@ -319,11 +319,11 @@ class TestRemoteParserParse:
         assert remote_parser.get_text() == ""
         assert remote_parser.get_archive_path() is None
 
-    def test_get_text_none_before_parse(
+    def test_get_text_empty_before_parse(
         self,
         remote_parser: RemoteDocumentParser,
     ) -> None:
-        assert remote_parser.get_text() is None
+        assert remote_parser.get_text() == ""
 
     def test_get_date_always_none(
         self,
@@ -342,7 +342,7 @@ class TestRemoteParserParse:
 
 
 class TestRemoteParserParseError:
-    def test_parse_returns_none_on_azure_error(
+    def test_parse_returns_empty_on_azure_error(
         self,
         remote_parser: RemoteDocumentParser,
         simple_digital_pdf_file: Path,
@@ -350,7 +350,7 @@ class TestRemoteParserParseError:
     ) -> None:
         remote_parser.parse(simple_digital_pdf_file, "application/pdf")
 
-        assert remote_parser.get_text() is None
+        assert remote_parser.get_text() == ""
 
     def test_parse_closes_client_on_error(
         self,
