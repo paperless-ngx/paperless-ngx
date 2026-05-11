@@ -277,18 +277,19 @@ wheels = [
 
 [[package]]
 name = "banks"
-version = "2.3.0"
+version = "2.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "deprecated", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "filetype", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "griffe", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "jinja2", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "platformdirs", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "pydantic", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ca/64/9a4e17dfe7dc172594ffb877a287859edb40d59e0564bc930941e6c5df9d/banks-2.3.0.tar.gz", hash = "sha256:1ecb439a0b340588fcf9a8072d806540aad03c4b874ab9aff59ac8bc08c112ff", size = 182736, upload-time = "2026-01-21T10:03:15.114Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/bd/51/08fb68d23f4b0f6256fe85dc86e9576941550f890b079352fba719e07b39/banks-2.4.2.tar.gz", hash = "sha256:cda6013bd377ea7b701933578bfb9370fc21ad70bc13cedfc3f5cb2c034ca3dc", size = 188633, upload-time = "2026-04-27T12:15:22.021Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/27/d6/ccceb03dd5193d180e28411c9f880f2cc9a574251de94b9b8a21ebdf51ec/banks-2.3.0-py3-none-any.whl", hash = "sha256:ac6a5800d468f26a0d80e091c0c6971b69457d580ce34c0217ee2bf6c3f07271", size = 32748, upload-time = "2026-01-21T10:03:14.251Z" },
+    { url = "https://files.pythonhosted.org/packages/00/b6/8dc5477681b782e2f99de703e7a99828883364b9e03a60d3e2c47053d56a/banks-2.4.2-py3-none-any.whl", hash = "sha256:5fe407cc48c101f3e13d1cf732b83b8246003337612f13c0705d2e81f6faffb7", size = 35050, upload-time = "2026-04-27T12:15:20.785Z" },
 ]
 
 [[package]]
@@ -2189,6 +2190,20 @@ wheels = [
 ]
 
 [[package]]
+name = "llama-index-embeddings-ollama"
+version = "0.9.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "llama-index-core", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "ollama", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "pytest-asyncio", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8b/cd/2cff1feac66368a4c60ea7afbdbb3f3fdd49ee8c279fc105457e726a3ad2/llama_index_embeddings_ollama-0.9.0.tar.gz", hash = "sha256:19d2d2a0e3f0934480eae31243ac5f1ce171319578b9c0adad25cf1b6c35659e", size = 6575, upload-time = "2026-03-12T20:21:18.81Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9a/36/53674403380483510a7f657c5d6f0bdac5b7f9ec5a1a8d06cdfdd6dc47f2/llama_index_embeddings_ollama-0.9.0-py3-none-any.whl", hash = "sha256:92e0ce481e60a9bcbddbe2c369d2f72c6fdd7158d03a34ab9b35d80869b673c3", size = 6250, upload-time = "2026-03-12T20:21:19.441Z" },
+]
+
+[[package]]
 name = "llama-index-embeddings-openai"
 version = "0.6.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2211,20 +2226,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b2/df/79e4748196213b55931d5f8377141fff41135f5988d5501860824cc95390/llama_index_embeddings_openai_like-0.3.1.tar.gz", hash = "sha256:cef7af4bce284e8e6730532dbd0aa325e77398a5d5524edb2d2e3acb122fb5b6", size = 3854, upload-time = "2026-03-13T16:15:20.647Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/01/8e/b9ea889f88318f2faa20b615989e12a15a133c9273630f9266fcf69f35a6/llama_index_embeddings_openai_like-0.3.1-py3-none-any.whl", hash = "sha256:167c7e462cde7d53ea907ceaffbbf10a750676c7c9f7bcc9bc9686a41921387a", size = 3631, upload-time = "2026-03-13T16:15:19.58Z" },
-]
-
-[[package]]
-name = "llama-index-embeddings-ollama"
-version = "0.9.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "llama-index-core", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
-    { name = "ollama", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
-    { name = "pytest-asyncio", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/8b/cd/2cff1feac66368a4c60ea7afbdbb3f3fdd49ee8c279fc105457e726a3ad2/llama_index_embeddings_ollama-0.9.0.tar.gz", hash = "sha256:19d2d2a0e3f0934480eae31243ac5f1ce171319578b9c0adad25cf1b6c35659e", size = 6575, upload-time = "2026-03-12T20:21:18.810Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/9a/36/53674403380483510a7f657c5d6f0bdac5b7f9ec5a1a8d06cdfdd6dc47f2/llama_index_embeddings_ollama-0.9.0-py3-none-any.whl", hash = "sha256:92e0ce481e60a9bcbddbe2c369d2f72c6fdd7158d03a34ab9b35d80869b673c3", size = 6250, upload-time = "2026-03-12T20:21:19.441Z" },
 ]
 
 [[package]]
@@ -2922,8 +2923,8 @@ dependencies = [
     { name = "langdetect", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "llama-index-core", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "llama-index-embeddings-huggingface", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
-    { name = "llama-index-embeddings-openai-like", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "llama-index-embeddings-ollama", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "llama-index-embeddings-openai-like", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "llama-index-llms-ollama", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "llama-index-llms-openai-like", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "llama-index-vector-stores-faiss", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -3073,8 +3074,8 @@ requires-dist = [
     { name = "langdetect", specifier = "~=1.0.9" },
     { name = "llama-index-core", specifier = ">=0.14.21" },
     { name = "llama-index-embeddings-huggingface", specifier = ">=0.6.1" },
+    { name = "llama-index-embeddings-ollama", specifier = ">=0.9" },
     { name = "llama-index-embeddings-openai-like", specifier = ">=0.2.2" },
-    { name = "llama-index-embeddings-ollama", specifier = ">=0.9.0" },
     { name = "llama-index-llms-ollama", specifier = ">=0.9.1" },
     { name = "llama-index-llms-openai-like", specifier = ">=0.7.1" },
     { name = "llama-index-vector-stores-faiss", specifier = ">=0.5.2" },
@@ -5076,7 +5077,7 @@ wheels = [
 
 [[package]]
 name = "twisted"
-version = "25.5.0"
+version = "26.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -5087,9 +5088,9 @@ dependencies = [
     { name = "typing-extensions", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "zope-interface", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/13/0f/82716ed849bf7ea4984c21385597c949944f0f9b428b5710f79d0afc084d/twisted-25.5.0.tar.gz", hash = "sha256:1deb272358cb6be1e3e8fc6f9c8b36f78eb0fa7c2233d2dbe11ec6fee04ea316", size = 3545725, upload-time = "2025-06-07T09:52:24.858Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/db/97/6e9beb1e78247ae6dc34114f27d538cf2cb183c4afcd3609dfdf2b0439c8/twisted-26.4.0.tar.gz", hash = "sha256:dbfd0fe1ee409d0243fdd7a6a6ff14f4948cec1fd78e0376291f805e1501fae9", size = 3575095, upload-time = "2026-05-11T11:24:51.861Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/eb/66/ab7efd8941f0bc7b2bd555b0f0471bff77df4c88e0cc31120c82737fec77/twisted-25.5.0-py3-none-any.whl", hash = "sha256:8559f654d01a54a8c3efe66d533d43f383531ebf8d81d9f9ab4769d91ca15df7", size = 3204767, upload-time = "2025-06-07T09:52:21.428Z" },
+    { url = "https://files.pythonhosted.org/packages/a6/57/bcf4e2370dd218c9aa68a9140a65d86729c73f1d529f7e94786c2766fc72/twisted-26.4.0-py3-none-any.whl", hash = "sha256:dc25ea0ebf6511c24f03232ee9f4afa54b291c5d897990e3a39cc4d14a1ef4c0", size = 3230362, upload-time = "2026-05-11T11:24:49.5Z" },
 ]
 
 [package.optional-dependencies]
