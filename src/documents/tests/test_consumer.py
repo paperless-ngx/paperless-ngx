@@ -1120,12 +1120,14 @@ class TestConsumer(
             self.assertEqual(command[1], "--replace-input")
 
     @mock.patch("paperless_mail.models.MailRule.objects.get")
+    @mock.patch("paperless.parsers.mail.MailDocumentParser.get_thumbnail")
     @mock.patch("paperless.parsers.mail.MailDocumentParser.parse")
     @mock.patch("documents.consumer.get_parser_registry")
     def test_mail_parser_receives_mailrule(
         self,
         mock_get_parser_registry: mock.Mock,
         mock_mail_parser_parse: mock.Mock,
+        mock_get_thumbnail: mock.Mock,
         mock_mailrule_get: mock.Mock,
     ) -> None:
         """
@@ -1136,6 +1138,7 @@ class TestConsumer(
         THEN:
             - The mail parser should receive the mail rule
         """
+        from documents.parsers import ParseError
         from paperless.parsers.mail import MailDocumentParser
 
         mock_get_parser_registry.return_value.get_parser_for_file.return_value = (
@@ -1144,19 +1147,24 @@ class TestConsumer(
         mock_mailrule_get.return_value = mock.Mock(
             pdf_layout=MailRule.PdfLayout.HTML_ONLY,
         )
+        mock_get_thumbnail.side_effect = ParseError("no thumbnail")
+
+        src = (
+            Path(__file__).parent.parent.parent
+            / Path("paperless")
+            / Path("tests")
+            / Path("samples")
+            / Path("mail")
+            / "html.eml"
+        )
+        dst = self.dirs.scratch_dir / "html.eml"
+        shutil.copy(src, dst)
+
         with self.get_consumer(
-            filepath=(
-                Path(__file__).parent.parent.parent
-                / Path("paperless")
-                / Path("tests")
-                / Path("samples")
-                / Path("mail")
-            ).resolve()
-            / "html.eml",
+            filepath=dst,
             source=DocumentSource.MailFetch,
             mailrule_id=1,
         ) as consumer:
-            # fails because no gotenberg
             with self.assertRaises(
                 ConsumerError,
             ):
