@@ -149,7 +149,6 @@ jobs:
       pull-requests: write
     outputs:
       prerelease: ${{ steps.get-version.outputs.prerelease }}
-      changelog: ${{ steps.create-release.outputs.body }}
       version: ${{ steps.get-version.outputs.version }}
     steps:
       - name: Download release artifact
@@ -168,26 +167,42 @@ jobs:
           else
             echo "prerelease=false" >> $GITHUB_OUTPUT
           fi
-      - name: Create release and changelog
-        id: create-release
-        uses: release-drafter/release-drafter@5de93583980a40bd78603b6dfdcda5b4df377b32 # v7.2.0
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          name: Paperless-ngx ${{ steps.get-version.outputs.version }}
-          tag: ${{ steps.get-version.outputs.version }}
-          version: ${{ steps.get-version.outputs.version }}
-          prerelease: ${{ steps.get-version.outputs.prerelease }}
-          publish: true
-          commitish: main
+          persist-credentials: true
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+      - name: Draft release notes
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Upload release archive
-        uses: shogo82148/actions-upload-release-asset@ee2ae851dc5d938b90075b3ef12c540abfd1ee72 # v1.10.1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./paperless-ngx.tar.xz
-          asset_name: paperless-ngx-${{ steps.get-version.outputs.version }}.tar.xz
-          asset_content_type: application/x-xz
+          VERSION: ${{ steps.get-version.outputs.version }}
+        run: |
+          uv run --group changelog towncrier build \
+            --draft \
+            --version "${VERSION#v}" \
+            > RELEASE_NOTES.md
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.get-version.outputs.version }}
+          PRERELEASE: ${{ steps.get-version.outputs.prerelease }}
+        run: |
+          prerelease_flag=""
+          if [[ "${PRERELEASE}" == "true" ]]; then
+            prerelease_flag="--prerelease"
+          fi
+          mv paperless-ngx.tar.xz "paperless-ngx-${VERSION}.tar.xz"
+          gh release create "${VERSION}" \
+            --title "Paperless-ngx ${VERSION}" \
+            --notes-file RELEASE_NOTES.md \
+            ${prerelease_flag} \
+            "./paperless-ngx-${VERSION}.tar.xz"
   # ---------------------------------------------------------------------------
   # Append changelog to docs (only on non-prerelease)
   # ---------------------------------------------------------------------------
@@ -216,38 +231,24 @@ jobs:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: false
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-      - name: Update changelog
-        working-directory: docs
+      - name: Build changelog
         env:
-          CHANGELOG: ${{ needs.publish-release.outputs.changelog }}
-          PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}
+          VERSION: ${{ needs.publish-release.outputs.version }}
+        run: |
+          uv run --group changelog towncrier build \
+            --version "${VERSION#v}" \
+            --yes
+          uv run --dev prek run --files docs/changelog.md || true
+      - name: Commit and push
+        env:
           VERSION: ${{ needs.publish-release.outputs.version }}
         run: |
           branch_name="${VERSION}-changelog"
-
-          git branch "${branch_name}"
-          git checkout "${branch_name}"
-
-          printf '# Changelog\n\n%s\n' "${CHANGELOG}" > changelog-new.md
-
-          echo "Manually linking usernames"
-          sed -i -r 's|@([a-zA-Z0-9_]+) \(\[#|[@\1](https://github.com/\1) ([#|g' changelog-new.md
-
-          echo "Removing unneeded comment tags"
-          sed -i -r 's|@<!---->|@|g' changelog-new.md
-
-          CURRENT_CHANGELOG=$(tail --lines +2 changelog.md)
-          echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
-          mv changelog-new.md changelog.md
-
-          uv run \
-            --python "${PYTHON_VERSION}" \
-            --dev \
-            prek run --files changelog.md || true
-
-          git config --global user.name "github-actions"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "Changelog ${VERSION} - GHA"
+          git checkout -b "${branch_name}"
+          git config user.name "github-actions"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/changelog.md docs/changelog.d/
+          git commit -m "Changelog ${VERSION} - GHA"
           git push origin "${branch_name}"
       - name: Create pull request
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0

@@ -83,3 +83,7 @@ repos:
         exclude: "^src-ui/pnpm-lock.yaml"
         types:
           - yaml
+  - repo: https://github.com/twisted/towncrier
+    rev: 25.8.0
+    hooks:
+      - id: towncrier-check

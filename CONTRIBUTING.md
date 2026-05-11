@@ -33,6 +33,50 @@ To test your code, execute `pytest` in the src/ directory. This also generates a
 
 Before you can run `pytest`, ensure to [properly set up your local environment](https://docs.paperless-ngx.com/development/#initial-setup-and-first-start).
 
+### Changelog Fragments
+
+Every pull request that changes behavior, adds a feature, or fixes a bug
+must include a news fragment. Fragments live in `docs/changelog.d/` and are
+named `<pr-number>.<type>.md`.
+
+For example, if your PR number is 1234 and it fixes a bug, create
+`docs/changelog.d/1234.bugfix.md` with content describing what changed.
+
+If you haven't opened the PR yet, use a `+` prefix as a placeholder:
+
+```
+docs/changelog.d/+my-change.bugfix.md
+```
+
+Rename it to the real PR number once the PR exists. The `+`-prefixed fragment
+is valid and will pass CI, but the rendered changelog entry won't include a PR
+link until it's renamed.
+
+**Fragment types:**
+
+| Type       | Changelog section        | Use for                                          |
+| ---------- | ------------------------ | ------------------------------------------------ |
+| `breaking` | Breaking Changes         | Anything that breaks existing behavior           |
+| `notable`  | Notable Changes          | Significant changes worth calling out separately |
+| `feature`  | Features / Enhancements  | New features and enhancements                    |
+| `bugfix`   | Bug Fixes                | Bug fixes                                        |
+| `doc`      | Documentation            | Documentation-only changes                       |
+| `misc`     | Maintenance (count only) | Chores, CI changes, refactoring                  |
+
+Write the fragment content as a complete sentence describing the change
+from the user's perspective. You may include attribution at the end:
+
+```
+Fixed the crash when importing documents with long filenames. By @yourusername
+```
+
+**You do not need a fragment if:**
+
+- Your PR is from an automated bot (Dependabot, Crowdin)
+- Your PR is labeled `skip-changelog`
+
+CI will fail on PRs that require a fragment but don't have one.
+
 ## More info:
 
 ... is available [in the documentation](https://docs.paperless-ngx.com/development).

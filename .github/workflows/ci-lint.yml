@@ -26,3 +26,33 @@ jobs:
           python-version: "3.14"
       - name: Run prek
         uses: j178/prek-action@cbc2f23eb5539cf20d82d1aabd0d0ecbcc56f4e3 # v2.0.2
+      - name: Fetch base branch for fragment check
+        if: |
+          github.event_name == 'pull_request' &&
+          !contains(github.actor, '[bot]') &&
+          !contains(join(github.event.pull_request.labels.*.name, ','), 'skip-changelog')
+        run: git fetch origin ${{ github.base_ref }} --depth=1
+      - name: Check changelog fragment
+        if: |
+          github.event_name == 'pull_request' &&
+          !contains(github.actor, '[bot]') &&
+          !contains(join(github.event.pull_request.labels.*.name, ','), 'skip-changelog')
+        run: |
+          pip install towncrier
+          towncrier check --compare-with origin/${{ github.base_ref }}
+      - name: Check fragment is single line
+        if: |
+          github.event_name == 'pull_request' &&
+          !contains(github.actor, '[bot]') &&
+          !contains(join(github.event.pull_request.labels.*.name, ','), 'skip-changelog')
+        run: |
+          failed=0
+          while IFS= read -r fragment; do
+            lines=$(grep -c . "$fragment" || true)
+            if [ "$lines" -ne 1 ]; then
+              echo "Error: $fragment must contain exactly one line (found $lines)"
+              failed=1
+            fi
+          done < <(git diff --name-only --diff-filter=AM "origin/${{ github.base_ref }}...HEAD" \
+                     | grep -E '^docs/changelog\.d/[0-9]+\.[a-z]+\.md$')
+          exit $failed

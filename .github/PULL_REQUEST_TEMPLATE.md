@@ -40,3 +40,4 @@ NOTE: PRs that do not address the following will not be merged, please do not sk
 - [ ] I have run all Git `pre-commit` hooks, see [documentation](https://docs.paperless-ngx.com/development/#code-formatting-with-pre-commit-hooks).
 - [ ] I have made corresponding changes to the documentation as needed.
 - [ ] In the description of the PR above I have disclosed the use of AI tools in the coding of this PR.
+- [ ] I have added a changelog fragment in `docs/changelog.d/` (see [contributing guidelines](CONTRIBUTING.md#changelog-fragments)), or this PR does not require one (bot PR or labeled `skip-changelog`).

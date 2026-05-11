@@ -2953,6 +2953,9 @@ webserver = [
 ]
 
 [package.dev-dependencies]
+changelog = [
+    { name = "towncrier", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+]
 dev = [
     { name = "daphne", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "factory-boy", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -2970,6 +2973,7 @@ dev = [
     { name = "pytest-xdist", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "ruff", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "time-machine", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "towncrier", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "zensical", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
 docs = [
@@ -3094,6 +3098,7 @@ requires-dist = [
 provides-extras = ["mariadb", "postgres", "webserver"]
 
 [package.metadata.requires-dev]
+changelog = [{ name = "towncrier", specifier = ">=25.8.0" }]
 dev = [
     { name = "daphne" },
     { name = "factory-boy", specifier = "~=3.3.1" },
@@ -3111,6 +3116,7 @@ dev = [
     { name = "pytest-xdist", specifier = "~=3.8.0" },
     { name = "ruff", specifier = "~=0.15.12" },
     { name = "time-machine", specifier = ">=2.13" },
+    { name = "towncrier", specifier = ">=25.8.0" },
     { name = "zensical", specifier = ">=0.0.36" },
 ]
 docs = [{ name = "zensical", specifier = ">=0.0.36" }]
@@ -5013,6 +5019,19 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/34/01/74e034a30ef59afb4097ef8659515e96a39d910b712a89af76f5e4e1f93c/tornado-6.5.5-cp39-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:435319e9e340276428bbdb4e7fa732c2d399386d1de5686cb331ec8eee754f07", size = 448192, upload-time = "2026-03-10T21:30:51.22Z" },
     { url = "https://files.pythonhosted.org/packages/be/00/fe9e02c5a96429fce1a1d15a517f5d8444f9c412e0bb9eadfbe3b0fc55bf/tornado-6.5.5-cp39-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:3f54aa540bdbfee7b9eb268ead60e7d199de5021facd276819c193c0fb28ea4e", size = 448039, upload-time = "2026-03-10T21:30:53.52Z" },
     { url = "https://files.pythonhosted.org/packages/82/9e/656ee4cec0398b1d18d0f1eb6372c41c6b889722641d84948351ae19556d/tornado-6.5.5-cp39-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:36abed1754faeb80fbd6e64db2758091e1320f6bba74a4cf8c09cd18ccce8aca", size = 447445, upload-time = "2026-03-10T21:30:55.541Z" },
+]
+
+[[package]]
+name = "towncrier"
+version = "25.8.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "click", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "jinja2", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c2/eb/5bf25a34123698d3bbab39c5bc5375f8f8bcbcc5a136964ade66935b8b9d/towncrier-25.8.0.tar.gz", hash = "sha256:eef16d29f831ad57abb3ae32a0565739866219f1ebfbdd297d32894eb9940eb1", size = 76322, upload-time = "2025-08-30T11:41:55.393Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/42/06/8ba22ec32c74ac1be3baa26116e3c28bc0e76a5387476921d20b6fdade11/towncrier-25.8.0-py3-none-any.whl", hash = "sha256:b953d133d98f9aeae9084b56a3563fd2519dfc6ec33f61c9cd2c61ff243fb513", size = 65101, upload-time = "2025-08-30T11:41:53.644Z" },
 ]
 
 [[package]]

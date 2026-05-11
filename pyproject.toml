@@ -96,12 +96,16 @@ webserver = [
 
 [dependency-groups]
 dev = [
+  { include-group = "changelog" },
   { include-group = "docs" },
   { include-group = "lint" },
   { include-group = "testing" },
 ]
 docs = [
   "zensical>=0.0.36",
+]
+changelog = [
+  "towncrier>=25.8",
 ]
 lint = [
   "prek~=0.3.10",
@@ -341,6 +345,38 @@ omit = [
   "paperless/wsgi.py",
   "paperless/auth.py",
 ]
+
+[tool.towncrier]
+directory = "docs/changelog.d"
+filename = "docs/changelog.md"
+title_format = "## paperless-ngx {version}"
+issue_format = "[#{issue}](https://github.com/paperless-ngx/paperless-ngx/pull/{issue})"
+underlines = [ "", "", "" ]
+start_string = "<!-- towncrier release notes start -->\n"
+[[tool.towncrier.type]]
+directory = "breaking"
+name = "Breaking Changes"
+showcontent = true
+[[tool.towncrier.type]]
+directory = "notable"
+name = "Notable Changes"
+showcontent = true
+[[tool.towncrier.type]]
+directory = "feature"
+name = "Features / Enhancements"
+showcontent = true
+[[tool.towncrier.type]]
+directory = "bugfix"
+name = "Bug Fixes"
+showcontent = true
+[[tool.towncrier.type]]
+directory = "doc"
+name = "Documentation"
+showcontent = true
+[[tool.towncrier.type]]
+directory = "misc"
+name = "Maintenance"
+showcontent = false
 
 [tool.mypy-baseline]
 baseline_path = ".mypy-baseline.txt"

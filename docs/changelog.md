@@ -1,5 +1,7 @@
 # Changelog
 
+<!-- towncrier release notes start -->
+
 ## paperless-ngx 2.20.15
 
 ### Security
