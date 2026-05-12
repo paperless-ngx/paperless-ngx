@@ -6,9 +6,6 @@ declare -r log_prefix="[svc-flower]"
 echo "${log_prefix} Checking if we should start flower..."
 
 if [[ -n "${PAPERLESS_ENABLE_FLOWER}" ]]; then
-	# Small delay to allow celery to be up first
-	echo "${log_prefix} Starting flower in 5s"
-	sleep 5
 	cd ${PAPERLESS_SRC_DIR}
 
 	if [[ -n "${USER_IS_NON_ROOT}" ]]; then

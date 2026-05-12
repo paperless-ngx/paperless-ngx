@@ -1,0 +1,8 @@
+#!/command/with-contenv /usr/bin/bash
+# shellcheck shell=bash
+
+if [[ $1 -eq 0 ]]; then
+	echo "[svc-worker] Service stopped cleanly (exit code: $1, signal: $2)"
+else
+	echo "[svc-worker] Service exited with error (exit code: $1, signal: $2)" >&2
+fi

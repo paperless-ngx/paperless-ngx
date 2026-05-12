@@ -37,7 +37,9 @@ WORKDIR /usr/src/s6
 # https://github.com/just-containers/s6-overlay#customizing-s6-overlay-behaviour
 ENV \
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
-    S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \
+    S6_CMD_WAIT_FOR_SERVICES_MAXTIME=60000 \
+    S6_KILL_GRACETIME=30000 \
+    S6_SERVICES_GRACETIME=30000 \
     S6_VERBOSITY=1 \
     PATH=/command:$PATH
 

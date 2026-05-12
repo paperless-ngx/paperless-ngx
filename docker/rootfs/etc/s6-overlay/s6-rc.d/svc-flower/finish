@@ -1,0 +1,16 @@
+#!/command/with-contenv /usr/bin/bash
+# shellcheck shell=bash
+
+if [[ -z "${PAPERLESS_ENABLE_FLOWER}" ]]; then
+	if [[ $1 -eq 0 ]]; then
+		echo "[svc-flower] Flower is disabled, service did not run"
+	else
+		echo "[svc-flower] Flower is disabled, but service exited with error (exit code: $1, signal: $2)" >&2
+	fi
+else
+	if [[ $1 -eq 0 ]]; then
+		echo "[svc-flower] Service stopped cleanly (exit code: $1, signal: $2)"
+	else
+		echo "[svc-flower] Service exited with error (exit code: $1, signal: $2)" >&2
+	fi
+fi
