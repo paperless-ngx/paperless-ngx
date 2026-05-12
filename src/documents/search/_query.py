@@ -618,7 +618,11 @@ def parse_simple_text_highlight_query(
     SnippetGenerator we build a plain term query over the content field instead.
     """
 
-    tokens = _simple_query_tokens(raw_query)
+    # Strip Tantivy operator chars before tokenizing: this is a plain-text
+    # highlight query, not a structured boolean query, so +/- are separators.
+    tokens = _simple_query_tokens(
+        regex.sub(r"[-+]", " ", raw_query, timeout=_REGEX_TIMEOUT),
+    )
     if not tokens:
         return tantivy.Query.empty_query()
 

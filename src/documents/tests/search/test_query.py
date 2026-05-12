@@ -16,6 +16,7 @@ from documents.search._query import _datetime_range
 from documents.search._query import _rewrite_compact_date
 from documents.search._query import build_permission_filter
 from documents.search._query import normalize_query
+from documents.search._query import parse_simple_text_highlight_query
 from documents.search._query import parse_user_query
 from documents.search._query import rewrite_natural_date_keywords
 from documents.search._schema import build_schema
@@ -621,6 +622,49 @@ class TestNormalizeQuery:
     )
     def test_normalize_preserves_valid_operators(self, query: str) -> None:
         assert normalize_query(query) == query
+
+
+class TestParseSimpleTextHighlightQuery:
+    """parse_simple_text_highlight_query must not raise on natural-language queries."""
+
+    @pytest.fixture
+    def query_index(self) -> tantivy.Index:
+        schema = build_schema()
+        idx = tantivy.Index(schema, path=None)
+        register_tokenizers(idx, "")
+        return idx
+
+    @pytest.mark.parametrize(
+        "raw_query",
+        [
+            pytest.param("h52.1 - kurzsichtigkeit", id="icd_code_dash_description"),
+            pytest.param("H52.1 - asd", id="icd_code_uppercase"),
+            pytest.param("h52.1 -", id="trailing_minus"),
+            pytest.param(". -", id="dot_trailing_minus"),
+            pytest.param(".12 -", id="dot_number_trailing_minus"),
+            pytest.param("f84.0 - v.a. autismusspektrumstorung", id="complex_icd_dash"),
+        ],
+    )
+    def test_spaced_dash_queries_do_not_raise(
+        self,
+        query_index: tantivy.Index,
+        raw_query: str,
+    ) -> None:
+        assert isinstance(
+            parse_simple_text_highlight_query(query_index, raw_query),
+            tantivy.Query,
+        )
+
+    def test_empty_query_returns_empty_query(self, query_index: tantivy.Index) -> None:
+        result = parse_simple_text_highlight_query(query_index, "")
+        assert isinstance(result, tantivy.Query)
+
+    def test_all_operators_returns_empty_query(
+        self,
+        query_index: tantivy.Index,
+    ) -> None:
+        result = parse_simple_text_highlight_query(query_index, "- +")
+        assert isinstance(result, tantivy.Query)
 
 
 class TestPermissionFilter:
