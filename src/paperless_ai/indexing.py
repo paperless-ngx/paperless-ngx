@@ -116,7 +116,15 @@ def build_document_node(document: Document) -> list["BaseNode"]:
     from llama_index.core import Document as LlamaDocument
     from llama_index.core.node_parser import SimpleNodeParser
 
-    doc = LlamaDocument(text=text, metadata=metadata)
+    # Exclude all metadata keys from the embedding text — build_llm_index_text
+    # already encodes this info in the body, so prepending it again would double
+    # the token count and exceed embedding models with small context windows
+    # (e.g. nomic-embed-text via Ollama defaults to num_ctx=2048).
+    doc = LlamaDocument(
+        text=text,
+        metadata=metadata,
+        excluded_embed_metadata_keys=list(metadata.keys()),
+    )
     parser = SimpleNodeParser(
         chunk_size=RAG_CHUNK_SIZE,
         chunk_overlap=get_rag_chunk_overlap(),

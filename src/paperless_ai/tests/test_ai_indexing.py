@@ -59,6 +59,26 @@ def test_build_document_node(real_document) -> None:
 
 
 @pytest.mark.django_db
+def test_build_document_node_excludes_metadata_from_embedding(real_document) -> None:
+    """Metadata keys must not be prepended to the embedding text.
+
+    build_llm_index_text already encodes all metadata in the body text, so
+    including it again via llama_index's default MetadataMode.EMBED would
+    double the token count and exceed embedding models with small context
+    windows (e.g. nomic-embed-text via Ollama defaults to num_ctx=2048).
+    """
+    from llama_index.core.schema import MetadataMode
+
+    nodes = indexing.build_document_node(real_document)
+    for node in nodes:
+        embed_text = node.get_content(metadata_mode=MetadataMode.EMBED)
+        for key in node.metadata:
+            assert key not in embed_text, (
+                f"Metadata key '{key}' should not appear in embedding text"
+            )
+
+
+@pytest.mark.django_db
 def test_build_document_node_uses_rag_chunk_settings(real_document) -> None:
     with patch("llama_index.core.node_parser.SimpleNodeParser") as mock_parser:
         mock_parser.return_value.get_nodes_from_documents.return_value = []
