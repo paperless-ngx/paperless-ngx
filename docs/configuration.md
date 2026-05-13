@@ -707,6 +707,33 @@ for a list of provider configurations. You will also need to include the relevan
 : For OpenID Connect providers, set `settings.token_auth_method` if your identity provider
 requires a specific token endpoint authentication method.
 
+: Example using authentik as an OpenID Connect provider:
+
+    ```yaml
+    # docker-compose environment variable
+    PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
+    PAPERLESS_SOCIALACCOUNT_PROVIDERS: >
+        {
+          "openid_connect": {
+            "OAUTH_PKCE_ENABLED": true,
+            "SCOPE": ["openid", "profile", "email"],
+            "APPS": [
+              {
+                "provider_id": "authentik",
+                "name": "authentik",
+                "client_id": "<client_id>",
+                "secret": "<client_secret>",
+                "settings": {
+                  "server_url": "https://authentik.example.com/application/o/<application_slug>/.well-known/openid-configuration",
+                  "fetch_userinfo": true
+                }
+              }
+            ]
+          }
+        }
+    PAPERLESS_LOGOUT_REDIRECT_URL: "https://authentik.example.com/application/o/<application_slug>/end-session/"
+    ```
+
     Defaults to None, which does not enable any third party authentication systems.
 
 #### [`PAPERLESS_SOCIAL_AUTO_SIGNUP=<bool>`](#PAPERLESS_SOCIAL_AUTO_SIGNUP) {#PAPERLESS_SOCIAL_AUTO_SIGNUP}
