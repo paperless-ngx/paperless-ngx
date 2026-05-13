@@ -318,3 +318,11 @@ echo "Document ${DOCUMENT_ID} from ${DOCUMENT_CORRESPONDENT} tagged: ${DOCUMENT_
 Update any pre- or post-consumption scripts that read `$1`, `$2`, etc. to use the
 corresponding environment variables instead. Environment variables have been the preferred
 option since v1.8.0.
+
+## Reverse Proxy and Login Rate Limiting
+
+Allauth changed how it determines the client IP address for login rate limiting. Users running
+behind a reverse proxy may need to set
+[`PAPERLESS_TRUSTED_PROXIES`](configuration.md#PAPERLESS_TRUSTED_PROXIES),
+[`PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER`](configuration.md#PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER),
+or both, to avoid `403 Forbidden` errors on login.
