@@ -35,6 +35,8 @@ from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_root_document
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from django.contrib.auth.models import User
 
 logger: logging.Logger = logging.getLogger("paperless.bulk_edit")
@@ -882,6 +884,7 @@ def remove_password(
     source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
     trigger_source: PaperlessTask.TriggerSource = PaperlessTask.TriggerSource.WEB_UI,
+    source_paths_by_id: Mapping[int, Path] | None = None,
 ) -> Literal["OK"]:
     """
     Remove password protection from PDF documents.
@@ -893,9 +896,14 @@ def remove_password(
         pair = _resolve_root_and_source_doc(doc, source_mode=source_mode)
         try:
             logger.info(
-                f"Attempting password removal from document {doc_ids[0]}",
+                f"Attempting password removal from document {pair.root_doc.id}",
             )
-            with pikepdf.open(pair.source_doc.source_path, password=password) as pdf:
+            source_path = (
+                source_paths_by_id.get(doc.id, pair.source_doc.source_path)
+                if source_paths_by_id is not None
+                else pair.source_doc.source_path
+            )
+            with pikepdf.open(source_path, password=password) as pdf:
                 filepath: Path = (
                     Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
                     / f"{pair.root_doc.id}_unprotected.pdf"
