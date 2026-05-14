@@ -518,7 +518,24 @@ do CORS calls. Set this to your public domain name.
 fail2ban with log entries for failed authorization attempts. Value should be
 IP address(es).
 
+    This setting also controls allauth's
+    [`ALLAUTH_TRUSTED_PROXY_COUNT`](https://docs.allauth.org/en/latest/account/configuration.html),
+    which is set to the number of proxies listed here. Without this,
+    allauth cannot determine the client IP address for rate limiting when
+    running behind a reverse proxy, resulting in a `403 Forbidden` on login.
+
     Defaults to empty string.
+
+#### [`PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER=<header-name>`](#PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER) {#PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER}
+
+: Sets allauth's
+[`ALLAUTH_TRUSTED_CLIENT_IP_HEADER`](https://docs.allauth.org/en/latest/account/configuration.html).
+Use this when your reverse proxy sets a dedicated header for the real
+client IP instead of `X-Forwarded-For`, for example `X-Real-IP` (nginx)
+or `CF-Connecting-IP` (Cloudflare). When set, this takes precedence over
+[`PAPERLESS_TRUSTED_PROXIES`](#PAPERLESS_TRUSTED_PROXIES).
+
+    Defaults to none.
 
 #### [`PAPERLESS_FORCE_SCRIPT_NAME=<path>`](#PAPERLESS_FORCE_SCRIPT_NAME) {#PAPERLESS_FORCE_SCRIPT_NAME}
 
