@@ -1480,6 +1480,44 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertEqual(task_kwargs["input_doc"].root_document_id, doc.id)
         self.assertIsNotNone(task_kwargs["overrides"])
 
+    @mock.patch("documents.bulk_edit.update_document_content_maybe_archive_file.delay")
+    @mock.patch("documents.tasks.consume_file.apply_async")
+    @mock.patch("documents.bulk_edit.tempfile.mkdtemp")
+    @mock.patch("pikepdf.open")
+    def test_remove_password_update_document_uses_source_paths(
+        self,
+        mock_open,
+        mock_mkdtemp,
+        mock_consume_delay,
+        mock_update_document,
+    ) -> None:
+        doc = self.doc1
+        source_file = self.dirs.scratch_dir / "consumption-source.pdf"
+        source_file.write_bytes(b"protected pdf content")
+        temp_dir = self.dirs.scratch_dir / "remove-password-source-file"
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        mock_mkdtemp.return_value = str(temp_dir)
+
+        fake_pdf = mock.MagicMock()
+
+        def save_side_effect(target_path):
+            Path(target_path).write_bytes(b"new pdf content")
+
+        fake_pdf.save.side_effect = save_side_effect
+        mock_open.return_value.__enter__.return_value = fake_pdf
+
+        result = bulk_edit.remove_password(
+            [doc.id],
+            password="secret",
+            update_document=True,
+            source_paths_by_id={doc.id: source_file},
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(source_file, password="secret")
+        mock_update_document.assert_not_called()
+        mock_consume_delay.assert_called_once()
+
     @mock.patch("documents.data_models.magic.from_file", return_value="application/pdf")
     @mock.patch("documents.tasks.consume_file.apply_async")
     @mock.patch("pikepdf.open")

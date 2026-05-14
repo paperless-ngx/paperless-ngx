@@ -4304,6 +4304,7 @@ class TestWorkflows(
         document_consumption_finished.send(
             sender=self.__class__,
             document=doc,
+            original_file=original_file,
         )
 
         assert mock_remove_password.call_count == 2
@@ -4314,12 +4315,14 @@ class TestWorkflows(
                     password="first",
                     update_document=True,
                     user=doc.owner,
+                    source_paths_by_id={doc.id: original_file},
                 ),
                 mock.call(
                     [doc.id],
                     password="second",
                     update_document=True,
                     user=doc.owner,
+                    source_paths_by_id={doc.id: original_file},
                 ),
             ],
         )
