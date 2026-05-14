@@ -4,6 +4,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import transaction
 from django.utils import timezone
 
 from documents.data_models import ConsumableDocument
@@ -295,13 +296,15 @@ def execute_password_removal_action(
         # hook the consumption-finished signal to attempt password removal later
         def handler(sender, **kwargs):
             consumed_document: Document = kwargs.get("document")
-            if consumed_document is not None:
-                execute_password_removal_action(
-                    action,
-                    consumed_document,
-                    logging_group,
-                )
             document_consumption_finished.disconnect(handler)
+            if consumed_document is not None:
+                transaction.on_commit(
+                    lambda: execute_password_removal_action(
+                        action,
+                        consumed_document,
+                        logging_group,
+                    ),
+                )
 
         document_consumption_finished.connect(handler, weak=False)
         return
