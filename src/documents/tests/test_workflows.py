@@ -4185,12 +4185,14 @@ class TestWorkflows(
                     password="wrong",
                     update_document=True,
                     user=doc.owner,
+                    source_paths_by_id=None,
                 ),
                 mock.call(
                     [doc.id],
                     password="right",
                     update_document=True,
                     user=doc.owner,
+                    source_paths_by_id=None,
                 ),
             ],
         )
