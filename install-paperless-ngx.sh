@@ -85,6 +85,35 @@ fi
 
 set -e
 
+wait_for_db_ready() {
+	local -r max_wait_seconds=90
+	local -r wait_interval_seconds=3
+	local elapsed_seconds=0
+
+	echo "Waiting for database to become ready (timeout: ${max_wait_seconds}s)..."
+
+	while (( elapsed_seconds < max_wait_seconds )); do
+		if [[ "$DATABASE_BACKEND" == "postgres" ]] ; then
+			if docker compose exec -T db pg_isready --username paperless &> /dev/null ; then
+				echo "Database is ready."
+				return
+			fi
+		elif [[ "$DATABASE_BACKEND" == "mariadb" ]] ; then
+			if docker compose exec -T db mariadb-admin --skip-ssl ping --silent &> /dev/null ; then
+				echo "Database is ready."
+				return
+			fi
+		fi
+
+		sleep "$wait_interval_seconds"
+		elapsed_seconds=$((elapsed_seconds + wait_interval_seconds))
+	done
+
+	echo "Database was not ready after ${max_wait_seconds}s."
+	echo "Please check your Docker logs and try again."
+	exit 1
+}
+
 echo ""
 echo "#############################################"
 echo "###   paperless-ngx docker installation   ###"
@@ -397,8 +426,7 @@ docker compose pull
 if [ "$DATABASE_BACKEND" == "postgres" ] || [ "$DATABASE_BACKEND" == "mariadb" ] ; then
 	echo "Starting DB first for initialization"
 	docker compose up --detach db
-	# hopefully enough time for even the slower systems
-	sleep 15
+	wait_for_db_ready
 	docker compose stop
 fi
 
