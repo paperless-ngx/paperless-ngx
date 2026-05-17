@@ -4301,10 +4301,11 @@ class TestWorkflows(
             title="Protected",
         )
 
-        document_consumption_finished.send(
-            sender=self.__class__,
-            document=doc,
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
 
         assert mock_remove_password.call_count == 2
         mock_remove_password.assert_has_calls(
@@ -4325,11 +4326,63 @@ class TestWorkflows(
         )
 
         # ensure handler disconnected after first run
-        document_consumption_finished.send(
-            sender=self.__class__,
-            document=doc,
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
         assert mock_remove_password.call_count == 2
+
+    @mock.patch("documents.bulk_edit.remove_password")
+    def test_password_removal_deferred_until_transaction_commit(
+        self,
+        mock_remove_password,
+    ) -> None:
+        """
+        GIVEN:
+            - Workflow password removal action triggered during consumption
+            - document_consumption_finished signal fires inside a transaction
+        WHEN:
+            - Signal fires but transaction has not yet committed
+        THEN:
+            - Password removal is not attempted until the transaction commits
+        """
+        from django.db import transaction
+
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+            passwords=["secret"],
+        )
+
+        temp_dir = Path(tempfile.mkdtemp())
+        original_file = temp_dir / "file.pdf"
+        original_file.write_bytes(b"pdf content")
+        consumable = ConsumableDocument(
+            source=DocumentSource.ApiUpload,
+            original_file=original_file,
+        )
+
+        execute_password_removal_action(action, consumable, logging_group=None)
+
+        doc = Document.objects.create(
+            checksum="pw-checksum-on-commit",
+            title="Protected",
+        )
+
+        with self.captureOnCommitCallbacks(execute=True):
+            with transaction.atomic():
+                document_consumption_finished.send(
+                    sender=self.__class__,
+                    document=doc,
+                )
+                mock_remove_password.assert_not_called()
+
+        mock_remove_password.assert_called_once_with(
+            [doc.id],
+            password="secret",
+            update_document=True,
+            user=doc.owner,
+        )
 
     def test_workflow_trash_action_soft_delete(self) -> None:
         """
