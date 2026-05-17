@@ -1874,11 +1874,11 @@ wheels = [
 
 [[package]]
 name = "imap-tools"
-version = "1.12.1"
+version = "1.13.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a0/f1/0cfb0496d141a2fd960bb512d462c9e0bbc10c99d75210e303cc3938f7e6/imap_tools-1.12.1.tar.gz", hash = "sha256:f70169e4efcf2fafcc9fc48b391e9a69b6f40c45faca92f2723b991194906ac9", size = 47492, upload-time = "2026-04-20T06:44:46.194Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f7/cb/76d8697739439be6dd0261db5a27c945fb6a43e054f2d2e90283be502058/imap_tools-1.13.0.tar.gz", hash = "sha256:0da0d72c921a724cba09b959bad9bfaf60bca537a697e69a076fdf607ef5775c", size = 47683, upload-time = "2026-05-12T07:14:54.488Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4b/5e/982243b6b2a52c09cd0006c5c014cae27e36bf36215b9541b9c0d235b5fc/imap_tools-1.12.1-py3-none-any.whl", hash = "sha256:ed73cdfe266b09c9b6c3d5a28fb0b8608566c20def10fec18760c315dccb9b6e", size = 35722, upload-time = "2026-04-20T06:44:44.491Z" },
+    { url = "https://files.pythonhosted.org/packages/19/a8/0f58c13d2660d5fc8f808ce8b46828d2941752ec21e4015bde99c08b37d7/imap_tools-1.13.0-py3-none-any.whl", hash = "sha256:656c37beba22ab2929b73c07d0ca397ae8805b670d390b1127723e3335244e6d", size = 35849, upload-time = "2026-05-12T07:14:52.669Z" },
 ]
 
 [[package]]
@@ -3069,7 +3069,7 @@ requires-dist = [
     { name = "granian", extras = ["uvloop"], marker = "extra == 'webserver'", specifier = "~=2.7.0" },
     { name = "httpx-oauth", specifier = "~=0.16" },
     { name = "ijson", specifier = ">=3.2" },
-    { name = "imap-tools", specifier = "~=1.12.1" },
+    { name = "imap-tools", specifier = "~=1.13.0" },
     { name = "jinja2", specifier = "~=3.1.5" },
     { name = "langdetect", specifier = "~=1.0.9" },
     { name = "llama-index-core", specifier = ">=0.14.21" },
