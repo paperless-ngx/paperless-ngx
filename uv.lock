@@ -2256,15 +2256,15 @@ wheels = [
 
 [[package]]
 name = "llama-index-llms-openai"
-version = "0.7.5"
+version = "0.7.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "llama-index-core", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "openai", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/65/27/18a7fd0873023aed145332dab5a09b95b298e4fff1c21685eaf22b629d87/llama_index_llms_openai-0.7.5.tar.gz", hash = "sha256:54123e679a7cddc1f2e969f278a4654050730daf84691731a0c53ae14feac3c7", size = 27423, upload-time = "2026-03-30T16:30:33.973Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/00/d5/2de9c05f1f1d21eb678a6044c59e943063e70099ac39b8b6f835e6e39511/llama_index_llms_openai-0.7.8.tar.gz", hash = "sha256:3352aed617ee5b7aefeb12719609ff84b4b590a1f49aa1e2e9c383d67ea88b0e", size = 27539, upload-time = "2026-05-08T20:02:09.42Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/63/62/a847e9a94c2f92926c30188259f9f86e019dcc45122bbb222dea35a74c02/llama_index_llms_openai-0.7.5-py3-none-any.whl", hash = "sha256:c302c6386873420df3714c3d538f45379b6de27ab6a531f30c67419b39a538f5", size = 28492, upload-time = "2026-03-30T16:30:32.979Z" },
+    { url = "https://files.pythonhosted.org/packages/32/49/4250108a76f4f7622109ecb9c57861829f508aba0ffdc502b27134378505/llama_index_llms_openai-0.7.8-py3-none-any.whl", hash = "sha256:967aac1f4ceff99185b2cc425c2757d4fefaf3fac0a35ace247f87a212a29359", size = 28617, upload-time = "2026-05-08T20:02:10.583Z" },
 ]
 
 [[package]]
