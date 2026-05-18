@@ -21,6 +21,8 @@ ExecStart=/bin/sh -c '\
   [ -n "$PAPERLESS_PORT" ] && export GRANIAN_PORT=$PAPERLESS_PORT; \
   # Workers: GRANIAN_WORKERS -> PAPERLESS_WEBSERVER_WORKERS -> default \
   [ -n "$PAPERLESS_WEBSERVER_WORKERS" ] && export GRANIAN_WORKERS=$PAPERLESS_WEBSERVER_WORKERS; \
+  # Worker lifetime: restart workers after N seconds to reclaim memory \
+  [ -n "$PAPERLESS_WEBSERVER_LIFETIME" ] && export GRANIAN_WORKERS_LIFETIME=${GRANIAN_WORKERS_LIFETIME:-$PAPERLESS_WEBSERVER_LIFETIME} && export GRANIAN_RESPAWN_FAILED_WORKERS=${GRANIAN_RESPAWN_FAILED_WORKERS:-true}; \
   # URL path prefix: only set if PAPERLESS_FORCE_SCRIPT_NAME exists \
   [ -n "$PAPERLESS_FORCE_SCRIPT_NAME" ] && export GRANIAN_URL_PATH_PREFIX=$PAPERLESS_FORCE_SCRIPT_NAME; \
   exec granian --interface asginl --ws --loop uvloop "paperless.asgi:application"'

@@ -1820,6 +1820,25 @@ increase RAM usage.
          This option may also be set with `GRANIAN_WORKERS` and
          this option may be removed in the future
 
+#### [`PAPERLESS_WEBSERVER_LIFETIME=<seconds>`](#PAPERLESS_WEBSERVER_LIFETIME) {#PAPERLESS_WEBSERVER_LIFETIME}
+
+: The maximum duration in seconds a webserver worker process will be
+kept alive before being gracefully restarted. This is useful on
+resource-constrained systems where long-running Python processes
+accumulate memory over time due to CPython's memory allocator not
+returning freed memory to the OS.
+
+    When a worker is restarted, a new worker is started first before
+    the old one is stopped, so there is no downtime. Active
+    connections are drained gracefully.
+
+    Disabled by default.
+
+    !!! note
+
+         This option may also be set with `GRANIAN_WORKERS_LIFETIME` and
+         this option may be removed in the future
+
 #### [`PAPERLESS_BIND_ADDR=<ip address>`](#PAPERLESS_BIND_ADDR) {#PAPERLESS_BIND_ADDR}
 
 : The IP address the webserver will listen on inside the container.
