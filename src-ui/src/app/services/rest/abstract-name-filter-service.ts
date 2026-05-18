@@ -37,12 +37,21 @@ export abstract class AbstractNameFilterService<
     objects: Array<number>,
     operation: BulkEditObjectOperation,
     permissions: { owner: number; set_permissions: PermissionsObject } = null,
-    merge: boolean = null
+    merge: boolean = null,
+    all: boolean = false,
+    filters: { [key: string]: any } = null
   ): Observable<string> {
-    const params = {
-      objects,
+    const params: any = {
       object_type: this.resourceName,
       operation,
+    }
+    if (all) {
+      params['all'] = true
+      if (filters) {
+        params['filters'] = filters
+      }
+    } else {
+      params['objects'] = objects
     }
     if (operation === BulkEditObjectOperation.SetPermissions) {
       params['owner'] = permissions?.owner

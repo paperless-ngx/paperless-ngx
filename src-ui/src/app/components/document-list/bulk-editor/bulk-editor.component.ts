@@ -12,10 +12,11 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { saveAs } from 'file-saver'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { first, map, Subject, switchMap, takeUntil } from 'rxjs'
+import { first, map, Observable, Subject, switchMap, takeUntil } from 'rxjs'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
 import { CustomField } from 'src/app/data/custom-field'
 import { MatchingModel } from 'src/app/data/matching-model'
+import { SelectionDataItem } from 'src/app/data/results'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
@@ -29,15 +30,19 @@ import { CorrespondentService } from 'src/app/services/rest/correspondent.servic
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import {
+  DocumentBulkEditMethod,
+  DocumentSelectionQuery,
   DocumentService,
-  SelectionDataItem,
+  MergeDocumentsRequest,
 } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { flattenTags } from 'src/app/utils/flatten-tags'
+import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
 import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
 import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
@@ -54,6 +59,8 @@ import {
 } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
+import { ShareLinkBundleDialogComponent } from '../../common/share-link-bundle-dialog/share-link-bundle-dialog.component'
+import { ShareLinkBundleManageDialogComponent } from '../../common/share-link-bundle-manage-dialog/share-link-bundle-manage-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { CustomFieldsBulkEditDialogComponent } from './custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component'
 
@@ -87,6 +94,7 @@ export class BulkEditorComponent
   private customFieldService = inject(CustomFieldsService)
   private permissionService = inject(PermissionsService)
   private savedViewService = inject(SavedViewService)
+  private readonly shareLinkBundleService = inject(ShareLinkBundleService)
 
   tagSelectionModel = new FilterableDropdownSelectionModel(true)
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
@@ -251,47 +259,66 @@ export class BulkEditorComponent
     this.unsubscribeNotifier.complete()
   }
 
-  private executeBulkOperation(
+  private executeBulkEditMethod(
     modal: NgbModalRef,
-    method: string,
+    method: DocumentBulkEditMethod,
     args: any,
-    overrideDocumentIDs?: number[]
+    overrideSelection?: DocumentSelectionQuery
   ) {
     if (modal) {
       modal.componentInstance.buttonsEnabled = false
     }
     this.documentService
-      .bulkEdit(
-        overrideDocumentIDs ?? Array.from(this.list.selected),
-        method,
-        args
-      )
+      .bulkEdit(overrideSelection ?? this.getSelectionQuery(), method, args)
       .pipe(first())
       .subscribe({
-        next: () => {
-          if (args['delete_originals']) {
-            this.list.selected.clear()
-          }
-          this.list.reload()
-          this.list.reduceSelectionToFilter()
-          this.list.selected.forEach((id) => {
-            this.openDocumentService.refreshDocument(id)
-          })
-          this.savedViewService.maybeRefreshDocumentCounts()
-          if (modal) {
-            modal.close()
-          }
-        },
-        error: (error) => {
-          if (modal) {
-            modal.componentInstance.buttonsEnabled = true
-          }
-          this.toastService.showError(
-            $localize`Error executing bulk operation`,
-            error
-          )
-        },
+        next: () => this.handleOperationSuccess(modal),
+        error: (error) => this.handleOperationError(modal, error),
       })
+  }
+
+  private executeDocumentAction(
+    modal: NgbModalRef,
+    request: Observable<any>,
+    options: { deleteOriginals?: boolean } = {}
+  ) {
+    if (modal) {
+      modal.componentInstance.buttonsEnabled = false
+    }
+    request.pipe(first()).subscribe({
+      next: () => {
+        this.handleOperationSuccess(modal, options.deleteOriginals ?? false)
+      },
+      error: (error) => this.handleOperationError(modal, error),
+    })
+  }
+
+  private handleOperationSuccess(
+    modal: NgbModalRef,
+    clearSelection: boolean = false
+  ) {
+    if (clearSelection) {
+      this.list.selected.clear()
+    }
+    this.list.reload()
+    this.list.reduceSelectionToFilter()
+    this.list.selected.forEach((id) => {
+      this.openDocumentService.refreshDocument(id)
+    })
+    this.savedViewService.maybeRefreshDocumentCounts()
+    if (modal) {
+      modal.close()
+    }
+  }
+
+  private handleOperationError(modal: NgbModalRef, error: any) {
+    if (modal) {
+      modal.componentInstance.buttonsEnabled = true
+    }
+    this.toastService.showError(
+      $localize`Error executing bulk operation`,
+      error
+    )
   }
 
   private applySelectionData(
@@ -300,7 +327,7 @@ export class BulkEditorComponent
   ) {
     let selectionData = new Map<number, ToggleableItemState>()
     items.forEach((i) => {
-      if (i.document_count == this.list.selected.size) {
+      if (i.document_count == this.list.selectedCount) {
         selectionData.set(i.id, ToggleableItemState.Selected)
       } else if (i.document_count > 0) {
         selectionData.set(i.id, ToggleableItemState.PartiallySelected)
@@ -309,7 +336,31 @@ export class BulkEditorComponent
     selectionModel.init(selectionData)
   }
 
+  private getSelectionQuery(): DocumentSelectionQuery {
+    if (this.list.allSelected) {
+      return {
+        all: true,
+        filters: queryParamsFromFilterRules(this.list.filterRules),
+      }
+    }
+
+    return {
+      documents: Array.from(this.list.selected),
+    }
+  }
+
+  private getSelectionSize(): number {
+    return this.list.selectedCount
+  }
+
   openTagsDropdown() {
+    if (this.list.allSelected) {
+      const selectionData = this.list.selectionData
+      this.tagDocumentCounts = selectionData?.selected_tags ?? []
+      this.applySelectionData(this.tagDocumentCounts, this.tagSelectionModel)
+      return
+    }
+
     this.documentService
       .getSelectionData(Array.from(this.list.selected))
       .pipe(first())
@@ -320,6 +371,17 @@ export class BulkEditorComponent
   }
 
   openDocumentTypeDropdown() {
+    if (this.list.allSelected) {
+      const selectionData = this.list.selectionData
+      this.documentTypeDocumentCounts =
+        selectionData?.selected_document_types ?? []
+      this.applySelectionData(
+        this.documentTypeDocumentCounts,
+        this.documentTypeSelectionModel
+      )
+      return
+    }
+
     this.documentService
       .getSelectionData(Array.from(this.list.selected))
       .pipe(first())
@@ -333,6 +395,17 @@ export class BulkEditorComponent
   }
 
   openCorrespondentDropdown() {
+    if (this.list.allSelected) {
+      const selectionData = this.list.selectionData
+      this.correspondentDocumentCounts =
+        selectionData?.selected_correspondents ?? []
+      this.applySelectionData(
+        this.correspondentDocumentCounts,
+        this.correspondentSelectionModel
+      )
+      return
+    }
+
     this.documentService
       .getSelectionData(Array.from(this.list.selected))
       .pipe(first())
@@ -346,6 +419,17 @@ export class BulkEditorComponent
   }
 
   openStoragePathDropdown() {
+    if (this.list.allSelected) {
+      const selectionData = this.list.selectionData
+      this.storagePathDocumentCounts =
+        selectionData?.selected_storage_paths ?? []
+      this.applySelectionData(
+        this.storagePathDocumentCounts,
+        this.storagePathsSelectionModel
+      )
+      return
+    }
+
     this.documentService
       .getSelectionData(Array.from(this.list.selected))
       .pipe(first())
@@ -359,6 +443,17 @@ export class BulkEditorComponent
   }
 
   openCustomFieldsDropdown() {
+    if (this.list.allSelected) {
+      const selectionData = this.list.selectionData
+      this.customFieldDocumentCounts =
+        selectionData?.selected_custom_fields ?? []
+      this.applySelectionData(
+        this.customFieldDocumentCounts,
+        this.customFieldsSelectionModel
+      )
+      return
+    }
+
     this.documentService
       .getSelectionData(Array.from(this.list.selected))
       .pipe(first())
@@ -408,33 +503,33 @@ export class BulkEditorComponent
         changedTags.itemsToRemove.length == 0
       ) {
         let tag = changedTags.itemsToAdd[0]
-        modal.componentInstance.message = $localize`This operation will add the tag "${tag.name}" to ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will add the tag "${tag.name}" to ${this.getSelectionSize()} selected document(s).`
       } else if (
         changedTags.itemsToAdd.length > 1 &&
         changedTags.itemsToRemove.length == 0
       ) {
         modal.componentInstance.message = $localize`This operation will add the tags ${this._localizeList(
           changedTags.itemsToAdd
-        )} to ${this.list.selected.size} selected document(s).`
+        )} to ${this.getSelectionSize()} selected document(s).`
       } else if (
         changedTags.itemsToAdd.length == 0 &&
         changedTags.itemsToRemove.length == 1
       ) {
         let tag = changedTags.itemsToRemove[0]
-        modal.componentInstance.message = $localize`This operation will remove the tag "${tag.name}" from ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will remove the tag "${tag.name}" from ${this.getSelectionSize()} selected document(s).`
       } else if (
         changedTags.itemsToAdd.length == 0 &&
         changedTags.itemsToRemove.length > 1
       ) {
         modal.componentInstance.message = $localize`This operation will remove the tags ${this._localizeList(
           changedTags.itemsToRemove
-        )} from ${this.list.selected.size} selected document(s).`
+        )} from ${this.getSelectionSize()} selected document(s).`
       } else {
         modal.componentInstance.message = $localize`This operation will add the tags ${this._localizeList(
           changedTags.itemsToAdd
         )} and remove the tags ${this._localizeList(
           changedTags.itemsToRemove
-        )} on ${this.list.selected.size} selected document(s).`
+        )} on ${this.getSelectionSize()} selected document(s).`
       }
 
       modal.componentInstance.btnClass = 'btn-warning'
@@ -442,13 +537,13 @@ export class BulkEditorComponent
       modal.componentInstance.confirmClicked
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
-          this.executeBulkOperation(modal, 'modify_tags', {
+          this.executeBulkEditMethod(modal, 'modify_tags', {
             add_tags: changedTags.itemsToAdd.map((t) => t.id),
             remove_tags: changedTags.itemsToRemove.map((t) => t.id),
           })
         })
     } else {
-      this.executeBulkOperation(null, 'modify_tags', {
+      this.executeBulkEditMethod(null, 'modify_tags', {
         add_tags: changedTags.itemsToAdd.map((t) => t.id),
         remove_tags: changedTags.itemsToRemove.map((t) => t.id),
       })
@@ -473,21 +568,21 @@ export class BulkEditorComponent
       })
       modal.componentInstance.title = $localize`Confirm correspondent assignment`
       if (correspondent) {
-        modal.componentInstance.message = $localize`This operation will assign the correspondent "${correspondent.name}" to ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will assign the correspondent "${correspondent.name}" to ${this.getSelectionSize()} selected document(s).`
       } else {
-        modal.componentInstance.message = $localize`This operation will remove the correspondent from ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will remove the correspondent from ${this.getSelectionSize()} selected document(s).`
       }
       modal.componentInstance.btnClass = 'btn-warning'
       modal.componentInstance.btnCaption = $localize`Confirm`
       modal.componentInstance.confirmClicked
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
-          this.executeBulkOperation(modal, 'set_correspondent', {
+          this.executeBulkEditMethod(modal, 'set_correspondent', {
             correspondent: correspondent ? correspondent.id : null,
           })
         })
     } else {
-      this.executeBulkOperation(null, 'set_correspondent', {
+      this.executeBulkEditMethod(null, 'set_correspondent', {
         correspondent: correspondent ? correspondent.id : null,
       })
     }
@@ -511,21 +606,21 @@ export class BulkEditorComponent
       })
       modal.componentInstance.title = $localize`Confirm document type assignment`
       if (documentType) {
-        modal.componentInstance.message = $localize`This operation will assign the document type "${documentType.name}" to ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will assign the document type "${documentType.name}" to ${this.getSelectionSize()} selected document(s).`
       } else {
-        modal.componentInstance.message = $localize`This operation will remove the document type from ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will remove the document type from ${this.getSelectionSize()} selected document(s).`
       }
       modal.componentInstance.btnClass = 'btn-warning'
       modal.componentInstance.btnCaption = $localize`Confirm`
       modal.componentInstance.confirmClicked
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
-          this.executeBulkOperation(modal, 'set_document_type', {
+          this.executeBulkEditMethod(modal, 'set_document_type', {
             document_type: documentType ? documentType.id : null,
           })
         })
     } else {
-      this.executeBulkOperation(null, 'set_document_type', {
+      this.executeBulkEditMethod(null, 'set_document_type', {
         document_type: documentType ? documentType.id : null,
       })
     }
@@ -549,21 +644,21 @@ export class BulkEditorComponent
       })
       modal.componentInstance.title = $localize`Confirm storage path assignment`
       if (storagePath) {
-        modal.componentInstance.message = $localize`This operation will assign the storage path "${storagePath.name}" to ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will assign the storage path "${storagePath.name}" to ${this.getSelectionSize()} selected document(s).`
       } else {
-        modal.componentInstance.message = $localize`This operation will remove the storage path from ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will remove the storage path from ${this.getSelectionSize()} selected document(s).`
       }
       modal.componentInstance.btnClass = 'btn-warning'
       modal.componentInstance.btnCaption = $localize`Confirm`
       modal.componentInstance.confirmClicked
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
-          this.executeBulkOperation(modal, 'set_storage_path', {
+          this.executeBulkEditMethod(modal, 'set_storage_path', {
             storage_path: storagePath ? storagePath.id : null,
           })
         })
     } else {
-      this.executeBulkOperation(null, 'set_storage_path', {
+      this.executeBulkEditMethod(null, 'set_storage_path', {
         storage_path: storagePath ? storagePath.id : null,
       })
     }
@@ -586,33 +681,33 @@ export class BulkEditorComponent
         changedCustomFields.itemsToRemove.length == 0
       ) {
         let customField = changedCustomFields.itemsToAdd[0]
-        modal.componentInstance.message = $localize`This operation will assign the custom field "${customField.name}" to ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will assign the custom field "${customField.name}" to ${this.getSelectionSize()} selected document(s).`
       } else if (
         changedCustomFields.itemsToAdd.length > 1 &&
         changedCustomFields.itemsToRemove.length == 0
       ) {
         modal.componentInstance.message = $localize`This operation will assign the custom fields ${this._localizeList(
           changedCustomFields.itemsToAdd
-        )} to ${this.list.selected.size} selected document(s).`
+        )} to ${this.getSelectionSize()} selected document(s).`
       } else if (
         changedCustomFields.itemsToAdd.length == 0 &&
         changedCustomFields.itemsToRemove.length == 1
       ) {
         let customField = changedCustomFields.itemsToRemove[0]
-        modal.componentInstance.message = $localize`This operation will remove the custom field "${customField.name}" from ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will remove the custom field "${customField.name}" from ${this.getSelectionSize()} selected document(s).`
       } else if (
         changedCustomFields.itemsToAdd.length == 0 &&
         changedCustomFields.itemsToRemove.length > 1
       ) {
         modal.componentInstance.message = $localize`This operation will remove the custom fields ${this._localizeList(
           changedCustomFields.itemsToRemove
-        )} from ${this.list.selected.size} selected document(s).`
+        )} from ${this.getSelectionSize()} selected document(s).`
       } else {
         modal.componentInstance.message = $localize`This operation will assign the custom fields ${this._localizeList(
           changedCustomFields.itemsToAdd
         )} and remove the custom fields ${this._localizeList(
           changedCustomFields.itemsToRemove
-        )} on ${this.list.selected.size} selected document(s).`
+        )} on ${this.getSelectionSize()} selected document(s).`
       }
 
       modal.componentInstance.btnClass = 'btn-warning'
@@ -620,7 +715,7 @@ export class BulkEditorComponent
       modal.componentInstance.confirmClicked
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
-          this.executeBulkOperation(modal, 'modify_custom_fields', {
+          this.executeBulkEditMethod(modal, 'modify_custom_fields', {
             add_custom_fields: changedCustomFields.itemsToAdd.map((f) => f.id),
             remove_custom_fields: changedCustomFields.itemsToRemove.map(
               (f) => f.id
@@ -628,7 +723,7 @@ export class BulkEditorComponent
           })
         })
     } else {
-      this.executeBulkOperation(null, 'modify_custom_fields', {
+      this.executeBulkEditMethod(null, 'modify_custom_fields', {
         add_custom_fields: changedCustomFields.itemsToAdd.map((f) => f.id),
         remove_custom_fields: changedCustomFields.itemsToRemove.map(
           (f) => f.id
@@ -750,7 +845,7 @@ export class BulkEditorComponent
         backdrop: 'static',
       })
       modal.componentInstance.title = $localize`Confirm`
-      modal.componentInstance.messageBold = $localize`Move ${this.list.selected.size} selected document(s) to the trash?`
+      modal.componentInstance.messageBold = $localize`Move ${this.getSelectionSize()} selected document(s) to the trash?`
       modal.componentInstance.message = $localize`Documents can be restored prior to permanent deletion.`
       modal.componentInstance.btnClass = 'btn-danger'
       modal.componentInstance.btnCaption = $localize`Move to trash`
@@ -758,10 +853,16 @@ export class BulkEditorComponent
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
           modal.componentInstance.buttonsEnabled = false
-          this.executeBulkOperation(modal, 'delete', {})
+          this.executeDocumentAction(
+            modal,
+            this.documentService.deleteDocuments(this.getSelectionQuery())
+          )
         })
     } else {
-      this.executeBulkOperation(null, 'delete', {})
+      this.executeDocumentAction(
+        null,
+        this.documentService.deleteDocuments(this.getSelectionQuery())
+      )
     }
   }
 
@@ -776,7 +877,7 @@ export class BulkEditorComponent
           : 'originals'
     this.documentService
       .bulkDownload(
-        Array.from(this.list.selected),
+        this.getSelectionQuery(),
         downloadFileType,
         this.downloadForm.get('downloadUseFormatting').value
       )
@@ -792,7 +893,7 @@ export class BulkEditorComponent
       backdrop: 'static',
     })
     modal.componentInstance.title = $localize`Reprocess confirm`
-    modal.componentInstance.messageBold = $localize`This operation will permanently recreate the archive files for ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.messageBold = $localize`This operation will permanently recreate the archive files for ${this.getSelectionSize()} selected document(s).`
     modal.componentInstance.message = $localize`The archive files will be re-generated with the current settings.`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
@@ -800,7 +901,10 @@ export class BulkEditorComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         modal.componentInstance.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'reprocess', {})
+        this.executeDocumentAction(
+          modal,
+          this.documentService.reprocessDocuments(this.getSelectionQuery())
+        )
       })
   }
 
@@ -811,7 +915,7 @@ export class BulkEditorComponent
     modal.componentInstance.confirmClicked.subscribe(
       ({ permissions, merge }) => {
         modal.componentInstance.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'set_permissions', {
+        this.executeBulkEditMethod(modal, 'set_permissions', {
           ...permissions,
           merge,
         })
@@ -826,7 +930,7 @@ export class BulkEditorComponent
     })
     const rotateDialog = modal.componentInstance as RotateConfirmDialogComponent
     rotateDialog.title = $localize`Rotate confirm`
-    rotateDialog.messageBold = $localize`This operation will permanently rotate the original version of ${this.list.selected.size} document(s).`
+    rotateDialog.messageBold = $localize`This operation will add rotated versions of the ${this.getSelectionSize()} document(s).`
     rotateDialog.btnClass = 'btn-danger'
     rotateDialog.btnCaption = $localize`Proceed`
     rotateDialog.documentID = Array.from(this.list.selected)[0]
@@ -834,9 +938,13 @@ export class BulkEditorComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         rotateDialog.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'rotate', {
-          degrees: rotateDialog.degrees,
-        })
+        this.executeDocumentAction(
+          modal,
+          this.documentService.rotateDocuments(
+            this.getSelectionQuery(),
+            rotateDialog.degrees
+          )
+        )
       })
   }
 
@@ -846,24 +954,28 @@ export class BulkEditorComponent
     })
     const mergeDialog = modal.componentInstance as MergeConfirmDialogComponent
     mergeDialog.title = $localize`Merge confirm`
-    mergeDialog.messageBold = $localize`This operation will merge ${this.list.selected.size} selected documents into a new document.`
+    mergeDialog.messageBold = $localize`This operation will merge ${this.getSelectionSize()} selected documents into a new document.`
     mergeDialog.btnCaption = $localize`Proceed`
     mergeDialog.documentIDs = Array.from(this.list.selected)
     mergeDialog.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        const args = {}
+        const args: MergeDocumentsRequest = {}
         if (mergeDialog.metadataDocumentID > -1) {
-          args['metadata_document_id'] = mergeDialog.metadataDocumentID
+          args.metadata_document_id = mergeDialog.metadataDocumentID
         }
         if (mergeDialog.deleteOriginals) {
-          args['delete_originals'] = true
+          args.delete_originals = true
         }
         if (mergeDialog.archiveFallback) {
-          args['archive_fallback'] = true
+          args.archive_fallback = true
         }
         mergeDialog.buttonsEnabled = false
-        this.executeBulkOperation(modal, 'merge', args, mergeDialog.documentIDs)
+        this.executeDocumentAction(
+          modal,
+          this.documentService.mergeDocuments(mergeDialog.documentIDs, args),
+          { deleteOriginals: !!args.delete_originals }
+        )
         this.toastService.showInfo(
           $localize`Merged document will be queued for consumption.`
         )
@@ -887,7 +999,7 @@ export class BulkEditorComponent
       (item) => item.id
     )
 
-    dialog.documents = Array.from(this.list.selected)
+    dialog.selection = this.getSelectionQuery()
     dialog.succeeded.subscribe((result) => {
       this.toastService.showInfo($localize`Custom fields updated.`)
       this.list.reload()
@@ -906,6 +1018,58 @@ export class BulkEditorComponent
 
   public get emailEnabled(): boolean {
     return this.settings.get(SETTINGS_KEYS.EMAIL_ENABLED)
+  }
+
+  createShareLinkBundle() {
+    const modal = this.modalService.open(ShareLinkBundleDialogComponent, {
+      backdrop: 'static',
+      size: 'lg',
+    })
+    const dialog = modal.componentInstance as ShareLinkBundleDialogComponent
+    const selectedDocuments = this.list.documents.filter((d) =>
+      this.list.selected.has(d.id)
+    )
+    dialog.documents = selectedDocuments
+    dialog.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        dialog.loading = true
+        dialog.buttonsEnabled = false
+        this.shareLinkBundleService
+          .createBundle(dialog.payload)
+          .pipe(first())
+          .subscribe({
+            next: (result) => {
+              dialog.loading = false
+              dialog.buttonsEnabled = false
+              dialog.createdBundle = result
+              dialog.copied = false
+              dialog.payload = null
+              dialog.onOpenManage = () => {
+                modal.close()
+                this.manageShareLinkBundles()
+              }
+              this.toastService.showInfo(
+                $localize`Share link bundle creation requested.`
+              )
+            },
+            error: (error) => {
+              dialog.loading = false
+              dialog.buttonsEnabled = true
+              this.toastService.showError(
+                $localize`Share link bundle creation is not available yet.`,
+                error
+              )
+            },
+          })
+      })
+  }
+
+  manageShareLinkBundles() {
+    this.modalService.open(ShareLinkBundleManageDialogComponent, {
+      backdrop: 'static',
+      size: 'lg',
+    })
   }
 
   emailSelected() {

@@ -49,17 +49,13 @@
                 [disabled]="disablePrimaryButton(type, item)"
                 (mouseenter)="onButtonHover($event)">
                     @if (type === DataType.Document) {
-                        <i-bs width="1em" height="1em" name="file-earmark-richtext"></i-bs>
-                        <span>&nbsp;<ng-container i18n>Open</ng-container></span>
+                        <i-bs width="1em" height="1em" name="file-earmark-richtext" class="me-1"></i-bs><span><ng-container i18n>Open</ng-container></span>
                     } @else if (type === DataType.SavedView) {
-                        <i-bs width="1em" height="1em" name="eye"></i-bs>
-                        <span>&nbsp;<ng-container i18n>Open</ng-container></span>
+                        <i-bs width="1em" height="1em" name="eye" class="me-1"></i-bs><span><ng-container i18n>Open</ng-container></span>
                     } @else if (type === DataType.Workflow || type === DataType.CustomField || type === DataType.Group || type === DataType.User || type === DataType.MailAccount || type === DataType.MailRule) {
-                        <i-bs width="1em" height="1em" name="pencil"></i-bs>
-                        <span>&nbsp;<ng-container i18n>Open</ng-container></span>
+                        <i-bs width="1em" height="1em" name="pencil" class="me-1"></i-bs><span><ng-container i18n>Open</ng-container></span>
                     } @else {
-                        <i-bs width="1em" height="1em" name="filter"></i-bs>
-                        <span>&nbsp;<ng-container i18n>Filter documents</ng-container></span>
+                        <i-bs width="1em" height="1em" name="filter" class="me-1"></i-bs><span><ng-container i18n>Filter documents</ng-container></span>
                     }
                 </button>
                 @if (type !== DataType.SavedView && type !== DataType.Workflow && type !== DataType.CustomField && type !== DataType.Group && type !== DataType.User && type !== DataType.MailAccount && type !== DataType.MailRule) {
@@ -69,11 +65,9 @@
                     [disabled]="disableSecondaryButton(type, item)"
                     (mouseenter)="onButtonHover($event)">
                         @if (type === DataType.Document) {
-                            <i-bs width="1em" height="1em" name="download"></i-bs>
-                            <span>&nbsp;<ng-container i18n>Download</ng-container></span>
+                            <i-bs width="1em" height="1em" name="download" class="me-1"></i-bs><span><ng-container i18n>Download</ng-container></span>
                         } @else {
-                            <i-bs width="1em" height="1em" name="file-earmark-richtext"></i-bs>
-                            <span>&nbsp;<ng-container i18n>Open</ng-container></span>
+                            <i-bs width="1em" height="1em" name="file-earmark-richtext" class="me-1"></i-bs><span><ng-container i18n>Open</ng-container></span>
                         }
                     </button>
                 }

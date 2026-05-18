@@ -3,10 +3,6 @@ on:
   schedule:
     - cron: '0 3 * * *'
   workflow_dispatch:
-permissions:
-  issues: write
-  pull-requests: write
-  discussions: write
 concurrency:
   group: lock
 jobs:
@@ -14,8 +10,11 @@ jobs:
     name: 'Stale'
     if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-24.04
+    permissions:
+      issues: write
+      pull-requests: write
     steps:
-      - uses: actions/stale@v10
+      - uses: actions/stale@b5d41d4e1d5dceea10e7104786b73624c18a190f # v10.2.0
         with:
           days-before-stale: 7
           days-before-close: 14
@@ -36,8 +35,12 @@ jobs:
     name: 'Lock Old Threads'
     if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-24.04
+    permissions:
+      issues: write
+      pull-requests: write
+      discussions: write
     steps:
-      - uses: dessant/lock-threads@v5
+      - uses: dessant/lock-threads@7266a7ce5c1df01b1c6db85bf8cd86c737dadbe7 # v6.0.0
         with:
           issue-inactive-days: '30'
           pr-inactive-days: '30'
@@ -56,8 +59,10 @@ jobs:
     name: 'Close Answered Discussions'
     if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-24.04
+    permissions:
+      discussions: write
     steps:
-      - uses: actions/github-script@v8
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             function sleep(ms) {
@@ -113,8 +118,10 @@ jobs:
     name: 'Close Outdated Discussions'
     if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-24.04
+    permissions:
+      discussions: write
     steps:
-      - uses: actions/github-script@v8
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             function sleep(ms) {
@@ -205,8 +212,10 @@ jobs:
     name: 'Close Unsupported Feature Requests'
     if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-24.04
+    permissions:
+      discussions: write
     steps:
-      - uses: actions/github-script@v8
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             function sleep(ms) {

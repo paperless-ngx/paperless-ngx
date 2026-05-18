@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Component, inject, Input, OnDestroy, ViewChild } from '@angular/core'
 import { NgbPopover, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
-import { PdfViewerComponent, PdfViewerModule } from 'ng2-pdf-viewer'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first, Subject, takeUntil } from 'rxjs'
 import { Document } from 'src/app/data/document'
@@ -10,6 +9,8 @@ import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { PngxPdfViewerComponent } from '../pdf-viewer/pdf-viewer.component'
+import { PdfRenderMode } from '../pdf-viewer/pdf-viewer.types'
 
 @Component({
   selector: 'pngx-preview-popup',
@@ -18,14 +19,15 @@ import { SettingsService } from 'src/app/services/settings.service'
   imports: [
     NgbPopoverModule,
     DocumentTitlePipe,
-    PdfViewerModule,
+    PngxPdfViewerComponent,
     SafeUrlPipe,
     NgxBootstrapIconsModule,
   ],
 })
 export class PreviewPopupComponent implements OnDestroy {
+  PdfRenderMode = PdfRenderMode
   private settingsService = inject(SettingsService)
-  private documentService = inject(DocumentService)
+  public readonly documentService = inject(DocumentService)
   private http = inject(HttpClient)
 
   private _document: Document
@@ -61,8 +63,6 @@ export class PreviewPopupComponent implements OnDestroy {
 
   @ViewChild('popover') popover: NgbPopover
 
-  @ViewChild('pdfViewer') pdfViewer: PdfViewerComponent
-
   mouseOnPreview: boolean = false
 
   popoverClass: string = 'shadow popover-preview'
@@ -71,7 +71,7 @@ export class PreviewPopupComponent implements OnDestroy {
     return (this.isPdf && this.useNativePdfViewer) || !this.isPdf
   }
 
-  get previewURL() {
+  get previewUrl() {
     return this.documentService.getPreviewUrl(this.document.id)
   }
 
@@ -93,7 +93,7 @@ export class PreviewPopupComponent implements OnDestroy {
   init() {
     if (this.document.mime_type?.includes('text')) {
       this.http
-        .get(this.previewURL, { responseType: 'text' })
+        .get(this.previewUrl, { responseType: 'text' })
         .pipe(first(), takeUntil(this.unsubscribeNotifier))
         .subscribe({
           next: (res) => {
@@ -112,22 +112,6 @@ export class PreviewPopupComponent implements OnDestroy {
     } else {
       this.error = true
     }
-  }
-
-  onPageRendered() {
-    // Only triggered by the pngx pdf viewer
-    if (this.documentService.searchQuery) {
-      this.pdfViewer.eventBus.dispatch('find', {
-        query: this.documentService.searchQuery,
-        caseSensitive: false,
-        highlightAll: true,
-        phraseSearch: true,
-      })
-    }
-  }
-
-  get previewUrl() {
-    return this.documentService.getPreviewUrl(this.document.id)
   }
 
   mouseEnterPreview() {

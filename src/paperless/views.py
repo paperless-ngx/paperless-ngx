@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from pathlib import Path
+from typing import Any
 
 from allauth.mfa import signals
 from allauth.mfa.adapter import get_adapter as get_mfa_adapter
@@ -9,6 +10,7 @@ from allauth.mfa.recovery_codes.internal.flows import auto_generate_recovery_cod
 from allauth.mfa.totp.internal import auth as totp_auth
 from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialAccount
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -33,10 +35,12 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.viewsets import ModelViewSet
 
-from documents.index import DelayedQuery
+from documents.models import PaperlessTask
 from documents.permissions import PaperlessObjectPermissions
+from documents.tasks import llmindex_index
 from paperless.filters import GroupFilterSet
 from paperless.filters import UserFilterSet
 from paperless.models import ApplicationConfiguration
@@ -45,10 +49,13 @@ from paperless.serialisers import GroupSerializer
 from paperless.serialisers import PaperlessAuthTokenSerializer
 from paperless.serialisers import ProfileSerializer
 from paperless.serialisers import UserSerializer
+from paperless_ai.indexing import vector_store_file_exists
 
 
 class PaperlessObtainAuthTokenView(ObtainAuthToken):
     serializer_class = PaperlessAuthTokenSerializer
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "login"
 
 
 class StandardPagination(PageNumberPagination):
@@ -56,42 +63,47 @@ class StandardPagination(PageNumberPagination):
     page_size_query_param = "page_size"
     max_page_size = 100000
 
+    def _get_api_version(self) -> int:
+        request = getattr(self, "request", None)
+        default_version = settings.REST_FRAMEWORK["DEFAULT_VERSION"]
+        return int(request.version if request else default_version)
+
+    def _should_include_all(self) -> bool:
+        # TODO: remove legacy `all` support when API v9 is dropped.
+        return self._get_api_version() < 10
+
     def get_paginated_response(self, data):
+        response_data = [
+            ("count", self.page.paginator.count),
+            ("next", self.get_next_link()),
+            ("previous", self.get_previous_link()),
+        ]
+        if self._should_include_all():
+            response_data.append(("all", self.get_all_result_ids()))
+        response_data.append(("results", data))
+
         return Response(
-            OrderedDict(
-                [
-                    ("count", self.page.paginator.count),
-                    ("next", self.get_next_link()),
-                    ("previous", self.get_previous_link()),
-                    ("all", self.get_all_result_ids()),
-                    ("results", data),
-                ],
-            ),
+            OrderedDict(response_data),
         )
 
     def get_all_result_ids(self):
+        from documents.search import TantivyRelevanceList
+
         query = self.page.paginator.object_list
-        if isinstance(query, DelayedQuery):
-            try:
-                ids = [
-                    query.searcher.ixreader.stored_fields(
-                        doc_num,
-                    )["id"]
-                    for doc_num in query.saved_results.get(0).results.docs()
-                ]
-            except Exception:
-                pass
-        else:
-            ids = self.page.paginator.object_list.values_list("pk", flat=True)
-        return ids
+        if isinstance(query, TantivyRelevanceList):
+            return query.get_all_ids()
+        return self.page.paginator.object_list.values_list("pk", flat=True)
 
     def get_paginated_response_schema(self, schema):
         response_schema = super().get_paginated_response_schema(schema)
-        response_schema["properties"]["all"] = {
-            "type": "array",
-            "example": "[1, 2, 3]",
-            "items": {"type": "integer"},
-        }
+        if self._should_include_all():
+            response_schema["properties"]["all"] = {
+                "type": "array",
+                "example": "[1, 2, 3]",
+                "items": {"type": "integer"},
+            }
+        else:
+            response_schema["properties"].pop("all", None)
         return response_schema
 
 
@@ -104,7 +116,7 @@ class FaviconView(View):
             return HttpResponseNotFound("favicon.ico not found")
 
 
-class UserViewSet(ModelViewSet):
+class UserViewSet(ModelViewSet[User]):
     _BOOL_NOT_PROVIDED = object()
     model = User
 
@@ -216,7 +228,7 @@ class UserViewSet(ModelViewSet):
             return HttpResponseNotFound("TOTP not found")
 
 
-class GroupViewSet(ModelViewSet):
+class GroupViewSet(ModelViewSet[Group]):
     model = Group
 
     queryset = Group.objects.order_by(Lower("name"))
@@ -229,7 +241,7 @@ class GroupViewSet(ModelViewSet):
     ordering_fields = ("name",)
 
 
-class ProfileView(GenericAPIView):
+class ProfileView(GenericAPIView[Any]):
     """
     User profile view, only available when logged in
     """
@@ -288,7 +300,7 @@ class ProfileView(GenericAPIView):
         },
     ),
 )
-class TOTPView(GenericAPIView):
+class TOTPView(GenericAPIView[Any]):
     """
     TOTP views
     """
@@ -368,7 +380,7 @@ class TOTPView(GenericAPIView):
         },
     ),
 )
-class GenerateAuthTokenView(GenericAPIView):
+class GenerateAuthTokenView(GenericAPIView[Any]):
     """
     Generates (or re-generates) an auth token, requires a logged in user
     unlike the default DRF endpoint
@@ -397,7 +409,7 @@ class GenerateAuthTokenView(GenericAPIView):
         },
     ),
 )
-class ApplicationConfigurationViewSet(ModelViewSet):
+class ApplicationConfigurationViewSet(ModelViewSet[ApplicationConfiguration]):
     model = ApplicationConfiguration
 
     queryset = ApplicationConfiguration.objects
@@ -408,6 +420,28 @@ class ApplicationConfigurationViewSet(ModelViewSet):
     @extend_schema(exclude=True)
     def create(self, request, *args, **kwargs):
         return Response(status=405)  # Not Allowed
+
+    def perform_update(self, serializer):
+        old_instance = ApplicationConfiguration.objects.all().first()
+        old_ai_index_enabled = (
+            old_instance.ai_enabled and old_instance.llm_embedding_backend
+        )
+
+        new_instance: ApplicationConfiguration = serializer.save()
+        new_ai_index_enabled = (
+            new_instance.ai_enabled and new_instance.llm_embedding_backend
+        )
+
+        if (
+            not old_ai_index_enabled
+            and new_ai_index_enabled
+            and not vector_store_file_exists()
+        ):
+            # AI index was just enabled and vector store file does not exist
+            llmindex_index.apply_async(
+                kwargs={"rebuild": True},
+                headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
+            )
 
 
 @extend_schema_view(
@@ -427,7 +461,7 @@ class ApplicationConfigurationViewSet(ModelViewSet):
         },
     ),
 )
-class DisconnectSocialAccountView(GenericAPIView):
+class DisconnectSocialAccountView(GenericAPIView[Any]):
     """
     Disconnects a social account provider from the user account
     """
@@ -453,7 +487,7 @@ class DisconnectSocialAccountView(GenericAPIView):
         },
     ),
 )
-class SocialAccountProvidersView(GenericAPIView):
+class SocialAccountProvidersView(GenericAPIView[Any]):
     """
     List of social account providers
     """

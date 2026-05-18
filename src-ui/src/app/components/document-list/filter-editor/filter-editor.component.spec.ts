@@ -21,6 +21,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideUiTour } from 'ngx-ui-tour-ng-bootstrap'
 import { of, throwError } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
@@ -66,6 +67,8 @@ import {
   FILTER_OWNER_DOES_NOT_INCLUDE,
   FILTER_OWNER_ISNULL,
   FILTER_SHARED_BY_USER,
+  FILTER_SIMPLE_TEXT,
+  FILTER_SIMPLE_TITLE,
   FILTER_STORAGE_PATH,
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
@@ -251,6 +254,7 @@ describe('FilterEditorComponent', () => {
         SettingsService,
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
+        provideUiTour(),
       ],
     }).compileComponents()
 
@@ -310,11 +314,23 @@ describe('FilterEditorComponent', () => {
     expect(component.textFilter).toEqual(null)
     component.filterRules = [
       {
-        rule_type: FILTER_TITLE_CONTENT,
+        rule_type: FILTER_SIMPLE_TEXT,
         value: 'foo',
       },
     ]
     expect(component.textFilter).toEqual('foo')
+    expect(component.textFilterTarget).toEqual('title-content') // TEXT_FILTER_TARGET_TITLE_CONTENT
+  }))
+
+  it('should ingest legacy text filter rules for doc title + content', fakeAsync(() => {
+    expect(component.textFilter).toEqual(null)
+    component.filterRules = [
+      {
+        rule_type: FILTER_TITLE_CONTENT,
+        value: 'legacy foo',
+      },
+    ]
+    expect(component.textFilter).toEqual('legacy foo')
     expect(component.textFilterTarget).toEqual('title-content') // TEXT_FILTER_TARGET_TITLE_CONTENT
   }))
 
@@ -1115,7 +1131,7 @@ describe('FilterEditorComponent', () => {
     expect(component.textFilter).toEqual('foo')
     expect(component.filterRules).toEqual([
       {
-        rule_type: FILTER_TITLE_CONTENT,
+        rule_type: FILTER_SIMPLE_TEXT,
         value: 'foo',
       },
     ])
@@ -1134,7 +1150,7 @@ describe('FilterEditorComponent', () => {
     expect(component.textFilterTarget).toEqual('title')
     expect(component.filterRules).toEqual([
       {
-        rule_type: FILTER_TITLE,
+        rule_type: FILTER_SIMPLE_TITLE,
         value: 'foo',
       },
     ])
@@ -1248,30 +1264,12 @@ describe('FilterEditorComponent', () => {
     ])
   }))
 
-  it('should convert user input to correct filter rules on custom fields query', fakeAsync(() => {
-    component.textFilterInput.nativeElement.value = 'foo'
-    component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
-    const textFieldTargetDropdown = fixture.debugElement.queryAll(
-      By.directive(NgbDropdownItem)
-    )[3]
-    textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_CUSTOM_FIELDS
-    fixture.detectChanges()
-    tick(400)
-    expect(component.textFilterTarget).toEqual('custom-fields')
-    expect(component.filterRules).toEqual([
-      {
-        rule_type: FILTER_CUSTOM_FIELDS_TEXT,
-        value: 'foo',
-      },
-    ])
-  }))
-
   it('should convert user input to correct filter rules on mime type', fakeAsync(() => {
     component.textFilterInput.nativeElement.value = 'pdf'
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
-    )[4]
+    )[3]
     textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_MIME_TYPE
     fixture.detectChanges()
     tick(400)
@@ -1289,8 +1287,8 @@ describe('FilterEditorComponent', () => {
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
-    )[5]
-    textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_ASN
+    )[4]
+    textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_FULLTEXT_QUERY
     fixture.detectChanges()
     tick(400)
     expect(component.textFilterTarget).toEqual('fulltext-query')
@@ -1306,7 +1304,8 @@ describe('FilterEditorComponent', () => {
     const tagsFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[0]
-    tagsFilterableDropdown.triggerEventHandler('opened')
+    tagsFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const tagButton = tagsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
@@ -1324,7 +1323,8 @@ describe('FilterEditorComponent', () => {
     const tagsFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[0] // Tags dropdown
-    tagsFilterableDropdown.triggerEventHandler('opened')
+    tagsFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const tagButtons = tagsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
@@ -1375,7 +1375,8 @@ describe('FilterEditorComponent', () => {
     const correspondentsFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[1] // Corresp dropdown
-    correspondentsFilterableDropdown.triggerEventHandler('opened')
+    correspondentsFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const correspondentButtons = correspondentsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
@@ -1414,7 +1415,8 @@ describe('FilterEditorComponent', () => {
     const correspondentsFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[1]
-    correspondentsFilterableDropdown.triggerEventHandler('opened')
+    correspondentsFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const notAssignedButton = correspondentsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
@@ -1445,7 +1447,8 @@ describe('FilterEditorComponent', () => {
     const documentTypesFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[2] // DocType dropdown
-    documentTypesFilterableDropdown.triggerEventHandler('opened')
+    documentTypesFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const documentTypeButtons = documentTypesFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
@@ -1484,7 +1487,8 @@ describe('FilterEditorComponent', () => {
     const docTypesFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[2]
-    docTypesFilterableDropdown.triggerEventHandler('opened')
+    docTypesFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const notAssignedButton = docTypesFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
@@ -1515,7 +1519,8 @@ describe('FilterEditorComponent', () => {
     const storagePathFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[3] // StoragePath dropdown
-    storagePathFilterableDropdown.triggerEventHandler('opened')
+    storagePathFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const storagePathButtons = storagePathFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
@@ -1554,7 +1559,8 @@ describe('FilterEditorComponent', () => {
     const storagePathsFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[3]
-    storagePathsFilterableDropdown.triggerEventHandler('opened')
+    storagePathsFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const notAssignedButton = storagePathsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
@@ -1686,12 +1692,56 @@ describe('FilterEditorComponent', () => {
     ])
   }))
 
+  it('should convert legacy title filters into full text query when adding a created relative date', fakeAsync(() => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_TITLE,
+        value: 'foo',
+      },
+    ]
+    const dateCreatedDropdown = fixture.debugElement.queryAll(
+      By.directive(DatesDropdownComponent)
+    )[0]
+    component.dateCreatedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    dateCreatedDropdown.triggerEventHandler('datesSet')
+    fixture.detectChanges()
+    tick(400)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'foo,created:[-1 week to now]',
+      },
+    ])
+  }))
+
+  it('should convert simple title filters into full text query when adding a created relative date', fakeAsync(() => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_SIMPLE_TITLE,
+        value: 'foo',
+      },
+    ]
+    const dateCreatedDropdown = fixture.debugElement.queryAll(
+      By.directive(DatesDropdownComponent)
+    )[0]
+    component.dateCreatedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    dateCreatedDropdown.triggerEventHandler('datesSet')
+    fixture.detectChanges()
+    tick(400)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'foo,created:[-1 week to now]',
+      },
+    ])
+  }))
+
   it('should leave relative dates not in quick list intact', fakeAsync(() => {
     component.textFilterInput.nativeElement.value = 'created:[-2 week to now]'
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
-    )[5]
+    )[4]
     textFieldTargetDropdown.triggerEventHandler('click')
     fixture.detectChanges()
     tick(400)
@@ -2021,11 +2071,29 @@ describe('FilterEditorComponent', () => {
 
     component.filterRules = [
       {
-        rule_type: FILTER_TITLE,
+        rule_type: FILTER_SIMPLE_TITLE,
         value: 'foo',
       },
     ]
     expect(component.generateFilterName()).toEqual('Title: foo')
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_TITLE_CONTENT,
+        value: 'legacy foo',
+      },
+    ]
+    expect(component.generateFilterName()).toEqual(
+      'Title & content: legacy foo'
+    )
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_SIMPLE_TEXT,
+        value: 'foo',
+      },
+    ]
+    expect(component.generateFilterName()).toEqual('Title & content: foo')
 
     component.filterRules = [
       {
@@ -2097,6 +2165,22 @@ describe('FilterEditorComponent', () => {
     expect(component.filterRules).toEqual(rules)
   })
 
+  it('should emit reset filter rules when resetting', () => {
+    const rules = [{ rule_type: FILTER_HAS_TAGS_ANY, value: '2' }]
+    component.unmodifiedFilterRules = rules
+    component.filterRules = [
+      { rule_type: FILTER_DOES_NOT_HAVE_TAG, value: '2' },
+    ]
+
+    const resetFilterRulesSpy = jest.spyOn(component.resetFilterRules, 'next')
+    const filterRulesChangeSpy = jest.spyOn(component.filterRulesChange, 'next')
+
+    component.resetSelected()
+
+    expect(resetFilterRulesSpy).toHaveBeenCalledWith(rules)
+    expect(filterRulesChangeSpy).not.toHaveBeenCalled()
+  })
+
   it('should support resetting text field', () => {
     component.textFilter = 'foo'
     component.resetTextField()
@@ -2129,6 +2213,36 @@ describe('FilterEditorComponent', () => {
       name: $localize`More like`,
     })
   })
+
+  it('should hide deprecated custom fields target from default text filter targets', () => {
+    expect(component.textFilterTargets).not.toContainEqual({
+      id: 'custom-fields',
+      name: $localize`Custom fields (Deprecated)`,
+    })
+  })
+
+  it('should keep deprecated custom fields target available for legacy filters', fakeAsync(() => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_CUSTOM_FIELDS_TEXT,
+        value: 'foo',
+      },
+    ]
+    fixture.detectChanges()
+    tick()
+
+    expect(component.textFilterTarget).toEqual('custom-fields')
+    expect(component.textFilterTargets).toContainEqual({
+      id: 'custom-fields',
+      name: $localize`Custom fields (Deprecated)`,
+    })
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_CUSTOM_FIELDS_TEXT,
+        value: 'foo',
+      },
+    ])
+  }))
 
   it('should call autocomplete endpoint on input', fakeAsync(() => {
     component.textFilterTarget = 'fulltext-query' // TEXT_FILTER_TARGET_FULLTEXT_QUERY

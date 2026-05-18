@@ -1,0 +1,46 @@
+
+<li ngbDropdown class="nav-item me-n2" (openChange)="onOpenChange($event)">
+  <button class="btn border-0" id="chatDropdown" ngbDropdownToggle>
+    <i-bs width="1.3em" height="1.3em" name="chatSquareDots"></i-bs>
+  </button>
+  <div ngbDropdownMenu class="dropdown-menu-end shadow p-3" aria-labelledby="chatDropdown">
+    <div class="chat-container bg-light p-2">
+      <div class="chat-messages font-monospace small">
+        @for (message of messages; track message) {
+          <div class="message d-flex flex-row small" [class.justify-content-end]="message.role === 'user'">
+            <div class="p-2 m-2" [class.bg-dark]="message.role === 'user'">
+              <span>
+                {{ message.content }}
+                @if (message.isStreaming) { <span class="blinking-cursor">|</span> }
+              </span>
+              @if (message.role === 'assistant' && message.references?.length) {
+                <div class="chat-references list-group mt-3">
+                  @for (reference of message.references; track reference.id) {
+                    <a class="list-group-item list-group-item-action text-primary" [routerLink]="['/documents', reference.id]">
+                      <i-bs width="0.9em" height="0.9em" name="file-text" class="me-1"></i-bs><span>{{ reference.title }}</span>
+                    </a>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+        <div #scrollAnchor></div>
+      </div>
+
+      <form class="chat-input">
+        <div class="input-group">
+          <input
+            #chatInput
+            class="form-control form-control-sm" name="chatInput" type="text"
+            [placeholder]="placeholder"
+            [disabled]="loading"
+            [(ngModel)]="input"
+            (keydown)="searchInputKeyDown($event)"
+            />
+          <button class="btn btn-sm btn-secondary" type="button" (click)="sendMessage()" [disabled]="loading">Send</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</li>

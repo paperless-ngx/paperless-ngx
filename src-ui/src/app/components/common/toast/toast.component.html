@@ -35,10 +35,10 @@
                     <div class="col offset-sm-3">
                     <button class="btn btn-sm btn-outline-secondary" (click)="copyError(toast.error)">
                         @if (!copied) {
-                        <i-bs name="clipboard"></i-bs>&nbsp;
+                        <i-bs name="clipboard" class="me-1"></i-bs>
                         }
                         @if (copied) {
-                        <i-bs name="clipboard-check"></i-bs>&nbsp;
+                        <i-bs name="clipboard-check" class="me-1"></i-bs>
                         }
                         <ng-container i18n>Copy Raw Error</ng-container>
                     </button>

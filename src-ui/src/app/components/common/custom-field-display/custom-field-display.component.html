@@ -20,7 +20,7 @@
                     @for (docId of value; track docId) {
                       @if (getDocumentTitle(docId)) {
                           <a routerLink="/documents/{{docId}}" class="badge bg-body text-primary" title="View" i18n-title>
-                              <i-bs width="0.9em" height="0.9em" name="file-text"></i-bs>&nbsp;<span>{{ getDocumentTitle(docId) }}</span>
+                              <i-bs width="0.9em" height="0.9em" name="file-text" class="me-1"></i-bs><span>{{ getDocumentTitle(docId) }}</span>
                           </a>
                       }
                     }

@@ -119,6 +119,10 @@ table .btn-link {
   font-size: 1em;
 }
 
+.fs-7 {
+  font-size: 0.75rem !important;
+}
+
 .bg-body {
   background-color: var(--bs-body-bg);
 }
@@ -126,6 +130,10 @@ table .btn-link {
 .bg-primary {
   background-color: var(--bs-primary) !important;
   color: var(--pngx-primary-text-contrast);
+}
+
+.bg-darker {
+  background-color: var(--pngx-bg-darker) !important;
 }
 
 .navbar-brand {

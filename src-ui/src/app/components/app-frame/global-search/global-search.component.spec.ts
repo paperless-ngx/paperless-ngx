@@ -24,7 +24,7 @@ import {
   FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
-  FILTER_TITLE_CONTENT,
+  FILTER_SIMPLE_TEXT,
 } from 'src/app/data/filter-rule-type'
 import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
@@ -545,7 +545,7 @@ describe('GlobalSearchComponent', () => {
     component.query = 'test'
     component.runFullSearch()
     expect(qfSpy).toHaveBeenCalledWith([
-      { rule_type: FILTER_TITLE_CONTENT, value: 'test' },
+      { rule_type: FILTER_SIMPLE_TEXT, value: 'test' },
     ])
 
     settingsService.set(

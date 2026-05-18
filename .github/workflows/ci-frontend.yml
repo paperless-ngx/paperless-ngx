@@ -1,0 +1,314 @@
+name: Frontend Tests
+on:
+  push:
+    branches-ignore:
+      - 'translations**'
+  pull_request:
+    branches-ignore:
+      - 'translations**'
+  workflow_dispatch:
+concurrency:
+  group: frontend-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+permissions: {}
+jobs:
+  changes:
+    name: Detect Frontend Changes
+    runs-on: ubuntu-slim
+    permissions:
+      contents: read
+    outputs:
+      frontend_changed: ${{ steps.force.outputs.run_all == 'true' || steps.filter.outputs.frontend == 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Decide run mode
+        id: force
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [[ "${EVENT_NAME}" == "workflow_dispatch" ]]; then
+            echo "run_all=true" >> "$GITHUB_OUTPUT"
+          elif [[ "${EVENT_NAME}" == "push" && ( "${REF_NAME}" == "main" || "${REF_NAME}" == "dev" ) ]]; then
+            echo "run_all=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_all=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Set diff range
+        id: range
+        if: steps.force.outputs.run_all != 'true'
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          EVENT_CREATED: ${{ github.event.created }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          SHA: ${{ github.sha }}
+        run: |
+          if [[ "${EVENT_NAME}" == "pull_request" ]]; then
+            echo "base=${PR_BASE_SHA}" >> "$GITHUB_OUTPUT"
+          elif [[ "${EVENT_CREATED}" == "true" ]]; then
+            echo "base=${DEFAULT_BRANCH}" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=${BEFORE_SHA}" >> "$GITHUB_OUTPUT"
+          fi
+          echo "ref=${SHA}" >> "$GITHUB_OUTPUT"
+      - name: Detect changes
+        id: filter
+        if: steps.force.outputs.run_all != 'true'
+        uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
+        with:
+          base: ${{ steps.range.outputs.base }}
+          ref: ${{ steps.range.outputs.ref }}
+          filters: |
+            frontend:
+              - 'src-ui/**'
+              - '.github/workflows/ci-frontend.yml'
+  install-dependencies:
+    needs: changes
+    if: needs.changes.outputs.frontend_changed == 'true'
+    name: Install Dependencies
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Install pnpm
+        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
+        with:
+          version: 10
+      - name: Use Node.js 24
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24.x
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
+      - name: Cache frontend dependencies
+        id: cache-frontend-deps
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ~/.pnpm-store
+            ~/.cache
+          key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
+      - name: Install dependencies
+        run: cd src-ui && pnpm install
+  lint:
+    name: Lint
+    needs: [changes, install-dependencies]
+    if: needs.changes.outputs.frontend_changed == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Install pnpm
+        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
+        with:
+          version: 10
+      - name: Use Node.js 24
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24.x
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
+      - name: Cache frontend dependencies
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ~/.pnpm-store
+            ~/.cache
+          key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
+      - name: Re-link Angular CLI
+        run: cd src-ui && pnpm link @angular/cli
+      - name: Run lint
+        run: cd src-ui && pnpm run lint
+  unit-tests:
+    name: "Unit Tests (${{ matrix.shard-index }}/${{ matrix.shard-count }})"
+    needs: [changes, install-dependencies]
+    if: needs.changes.outputs.frontend_changed == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [24.x]
+        shard-index: [1, 2, 3, 4]
+        shard-count: [4]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Install pnpm
+        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
+        with:
+          version: 10
+      - name: Use Node.js 24
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24.x
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
+      - name: Cache frontend dependencies
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ~/.pnpm-store
+            ~/.cache
+          key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
+      - name: Re-link Angular CLI
+        run: cd src-ui && pnpm link @angular/cli
+      - name: Run Jest unit tests
+        run: cd src-ui && pnpm run test --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
+      - name: Upload test results to Codecov
+        if: always()
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
+        with:
+          flags: frontend-node-${{ matrix.node-version }}
+          directory: src-ui/
+          report_type: test_results
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
+        with:
+          flags: frontend-node-${{ matrix.node-version }}
+          directory: src-ui/coverage/
+  e2e-tests:
+    name: "E2E Tests (${{ matrix.shard-index }}/${{ matrix.shard-count }})"
+    needs: [changes, install-dependencies]
+    if: needs.changes.outputs.frontend_changed == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    container: mcr.microsoft.com/playwright:v1.59.1-noble
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [24.x]
+        shard-index: [1, 2]
+        shard-count: [2]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Install pnpm
+        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
+        with:
+          version: 10
+      - name: Use Node.js 24
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24.x
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
+      - name: Cache frontend dependencies
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ~/.pnpm-store
+            ~/.cache
+          key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
+      - name: Re-link Angular CLI
+        run: cd src-ui && pnpm link @angular/cli
+      - name: Install dependencies
+        run: cd src-ui && pnpm install --no-frozen-lockfile
+      - name: Run Playwright E2E tests
+        run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
+  bundle-analysis:
+    name: Bundle Analysis
+    needs: [changes, unit-tests, e2e-tests]
+    if: needs.changes.outputs.frontend_changed == 'true'
+    runs-on: ubuntu-24.04
+    environment: bundle-analysis
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Install pnpm
+        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
+        with:
+          version: 10
+      - name: Use Node.js 24
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24.x
+          cache: 'pnpm'
+          cache-dependency-path: 'src-ui/pnpm-lock.yaml'
+      - name: Cache frontend dependencies
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ~/.pnpm-store
+            ~/.cache
+          key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
+      - name: Re-link Angular CLI
+        run: cd src-ui && pnpm link @angular/cli
+      - name: Build and analyze
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: cd src-ui && pnpm run build --configuration=production
+  gate:
+    name: Frontend CI Gate
+    needs: [changes, install-dependencies, lint, unit-tests, e2e-tests, bundle-analysis]
+    if: always()
+    runs-on: ubuntu-slim
+    steps:
+      - name: Check gate
+        env:
+          BUNDLE_ANALYSIS_RESULT: ${{ needs['bundle-analysis'].result }}
+          E2E_RESULT: ${{ needs['e2e-tests'].result }}
+          FRONTEND_CHANGED: ${{ needs.changes.outputs.frontend_changed }}
+          INSTALL_RESULT: ${{ needs['install-dependencies'].result }}
+          LINT_RESULT: ${{ needs.lint.result }}
+          UNIT_RESULT: ${{ needs['unit-tests'].result }}
+        run: |
+          if [[ "${FRONTEND_CHANGED}" != "true" ]]; then
+            echo "No frontend-relevant changes detected."
+            exit 0
+          fi
+
+          if [[ "${INSTALL_RESULT}" != "success" ]]; then
+            echo "::error::Frontend install job result: ${INSTALL_RESULT}"
+            exit 1
+          fi
+
+          if [[ "${LINT_RESULT}" != "success" ]]; then
+            echo "::error::Frontend lint job result: ${LINT_RESULT}"
+            exit 1
+          fi
+
+          if [[ "${UNIT_RESULT}" != "success" ]]; then
+            echo "::error::Frontend unit-tests job result: ${UNIT_RESULT}"
+            exit 1
+          fi
+
+          if [[ "${E2E_RESULT}" != "success" ]]; then
+            echo "::error::Frontend e2e-tests job result: ${E2E_RESULT}"
+            exit 1
+          fi
+
+          if [[ "${BUNDLE_ANALYSIS_RESULT}" != "success" ]]; then
+            echo "::error::Frontend bundle-analysis job result: ${BUNDLE_ANALYSIS_RESULT}"
+            exit 1
+          fi
+
+          echo "Frontend checks passed."

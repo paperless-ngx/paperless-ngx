@@ -1,7 +1,6 @@
 from datetime import timedelta
 from unittest import mock
 
-from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -14,8 +13,16 @@ from rest_framework import status
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.models import MailAccount
 from paperless_mail.oauth import PaperlessMailOAuth2Manager
+from paperless_mail.tests.factories import MailAccountFactory
 
 
+@override_settings(
+    OAUTH_CALLBACK_BASE_URL="http://localhost:8000",
+    GMAIL_OAUTH_CLIENT_ID="test_gmail_client_id",
+    GMAIL_OAUTH_CLIENT_SECRET="test_gmail_client_secret",
+    OUTLOOK_OAUTH_CLIENT_ID="test_outlook_client_id",
+    OUTLOOK_OAUTH_CLIENT_SECRET="test_outlook_client_secret",
+)
 class TestMailOAuth(
     TestCase,
 ):
@@ -31,15 +38,9 @@ class TestMailOAuth(
         self.user.save()
         self.client.force_login(self.user)
         self.mail_account_handler = MailAccountHandler()
-        # Mock settings
-        settings.OAUTH_CALLBACK_BASE_URL = "http://localhost:8000"
-        settings.GMAIL_OAUTH_CLIENT_ID = "test_gmail_client_id"
-        settings.GMAIL_OAUTH_CLIENT_SECRET = "test_gmail_client_secret"
-        settings.OUTLOOK_OAUTH_CLIENT_ID = "test_outlook_client_id"
-        settings.OUTLOOK_OAUTH_CLIENT_SECRET = "test_outlook_client_secret"
         super().setUp()
 
-    def test_generate_paths(self):
+    def test_generate_paths(self) -> None:
         """
         GIVEN:
             - Mocked settings for OAuth callback and base URLs
@@ -95,7 +96,7 @@ class TestMailOAuth(
         self,
         mock_get_outlook_access_token,
         mock_get_gmail_access_token,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Mocked settings for Gmail and Outlook OAuth client IDs and secrets
@@ -148,7 +149,7 @@ class TestMailOAuth(
         )
 
     @mock.patch("httpx_oauth.oauth2.BaseOAuth2.get_access_token")
-    def test_oauth_callback_view_fails(self, mock_get_access_token):
+    def test_oauth_callback_view_fails(self, mock_get_access_token) -> None:
         """
         GIVEN:
             - Mocked settings for Gmail and Outlook OAuth client IDs and secrets
@@ -191,9 +192,12 @@ class TestMailOAuth(
                 ).exists(),
             )
 
-            self.assertIn("Error getting access token: test_error", cm.output[0])
+            self.assertIn(
+                "Error getting access token from OAuth provider",
+                cm.output[0],
+            )
 
-    def test_oauth_callback_view_insufficient_permissions(self):
+    def test_oauth_callback_view_insufficient_permissions(self) -> None:
         """
         GIVEN:
             - Mocked settings for Gmail and Outlook OAuth client IDs and secrets
@@ -223,7 +227,7 @@ class TestMailOAuth(
             MailAccount.objects.filter(imap_server="outlook.office365.com").exists(),
         )
 
-    def test_oauth_callback_view_no_code(self):
+    def test_oauth_callback_view_no_code(self) -> None:
         """
         GIVEN:
             - Mocked settings for Gmail and Outlook OAuth client IDs and secrets
@@ -244,7 +248,7 @@ class TestMailOAuth(
             MailAccount.objects.filter(imap_server="outlook.office365.com").exists(),
         )
 
-    def test_oauth_callback_view_invalid_state(self):
+    def test_oauth_callback_view_invalid_state(self) -> None:
         """
         GIVEN:
             - Mocked settings for Gmail and Outlook OAuth client IDs and secrets
@@ -273,7 +277,7 @@ class TestMailOAuth(
         self,
         mock_refresh_token,
         mock_get_mailbox,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Mail account with refresh token and expiration
@@ -286,11 +290,9 @@ class TestMailOAuth(
         mock_mailbox = mock.MagicMock()
         mock_get_mailbox.return_value.__enter__.return_value = mock_mailbox
 
-        mail_account = MailAccount.objects.create(
+        mail_account = MailAccountFactory(
             name="Test Gmail Mail Account",
             username="test_username",
-            imap_security=MailAccount.ImapSecurity.SSL,
-            imap_port=993,
             account_type=MailAccount.MailAccountType.GMAIL_OAUTH,
             is_token=True,
             refresh_token="test_refresh_token",
@@ -312,11 +314,9 @@ class TestMailOAuth(
             "refresh_token": "test_refresh",
             "expires_in": 3600,
         }
-        outlook_mail_account = MailAccount.objects.create(
+        outlook_mail_account = MailAccountFactory(
             name="Test Outlook Mail Account",
             username="test_username",
-            imap_security=MailAccount.ImapSecurity.SSL,
-            imap_port=993,
             account_type=MailAccount.MailAccountType.OUTLOOK_OAUTH,
             is_token=True,
             refresh_token="test_refresh_token",
@@ -334,7 +334,7 @@ class TestMailOAuth(
         self,
         mock_refresh_token,
         mock_get_mailbox,
-    ):
+    ) -> None:
         """
         GIVEN:
             - Mail account with refresh token and expiration
@@ -349,11 +349,9 @@ class TestMailOAuth(
         mock_mailbox = mock.MagicMock()
         mock_get_mailbox.return_value.__enter__.return_value = mock_mailbox
 
-        mail_account = MailAccount.objects.create(
+        mail_account = MailAccountFactory(
             name="Test Gmail Mail Account",
             username="test_username",
-            imap_security=MailAccount.ImapSecurity.SSL,
-            imap_port=993,
             account_type=MailAccount.MailAccountType.GMAIL_OAUTH,
             is_token=True,
             refresh_token="test_refresh_token",

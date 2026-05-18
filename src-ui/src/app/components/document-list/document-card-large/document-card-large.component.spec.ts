@@ -127,6 +127,19 @@ describe('DocumentCardLargeComponent', () => {
     expect(component.searchNoteHighlights).toContain('<span>bananas</span>')
   })
 
+  it('should fall back to document content when a search hit has no highlights', () => {
+    component.document.__search_hit__ = {
+      score: 0.9,
+      rank: 1,
+      highlights: '',
+      note_highlights: null,
+    }
+    fixture.detectChanges()
+
+    expect(fixture.nativeElement.textContent).toContain('Cupcake ipsum')
+    expect(component.shouldShowContentFallback).toBe(true)
+  })
+
   it('should try to close the preview on mouse leave', () => {
     component.popupPreview = {
       close: jest.fn(),

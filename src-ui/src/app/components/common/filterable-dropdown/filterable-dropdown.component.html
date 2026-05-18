@@ -1,7 +1,6 @@
 <div class="btn-group w-100" ngbDropdown role="group" (openChange)="dropdownOpenChange($event)" #dropdown="ngbDropdown" (keydown)="listKeyDown($event)" [popperOptions]="popperOptions">
   <button class="btn btn-sm" id="dropdown_{{name}}" ngbDropdownToggle [ngClass]="!editing && selectionModel.selectionSize() > 0 ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled">
-    <i-bs name="{{icon}}"></i-bs>
-    <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
+    <i-bs name="{{icon}}"></i-bs><div class="d-none d-sm-inline ms-1">{{title}}</div>
     @if (!editing && selectionModel.totalCount > 0) {
       <pngx-clearable-badge [number]="selectionModel.totalCount" [selected]="selectionModel.selectionSize() > 0" (cleared)="reset()"></pngx-clearable-badge>
     }
@@ -34,8 +33,8 @@
         </div>
       </div>
       @if (selectionModel.items) {
-        <div class="items" #buttonItems>
-          @for (item of selectionModel.items | filter: filterText:'name'; track item; let i = $index) {
+        <cdk-virtual-scroll-viewport class="items" [itemSize]="FILTERABLE_BUTTON_HEIGHT_PX" #buttonsViewport [style.height.px]="scrollViewportHeight">
+          <div *cdkVirtualFor="let item of selectionModel.items | filter: filterText:'name'; trackBy: trackByItem; let i = index">
             @if (allowSelectNone || item.id) {
               <pngx-toggleable-dropdown-button
                 [item]="item"
@@ -45,12 +44,11 @@
                 [count]="getUpdatedDocumentCount(item.id)"
                 (toggled)="selectionModel.toggle(item.id)"
                 (exclude)="excludeClicked(item.id)"
-                (click)="setButtonItemIndex(i - 1)"
                 [disabled]="disabled">
               </pngx-toggleable-dropdown-button>
             }
-          }
-        </div>
+          </div>
+        </cdk-virtual-scroll-viewport>
       }
       @if (editing) {
         @if ((selectionModel.items | filter: filterText:'name').length === 0 && createRef !== undefined) {

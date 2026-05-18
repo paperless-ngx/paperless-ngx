@@ -1,4 +1,5 @@
 import logging
+from io import BytesIO
 
 import magic
 from allauth.mfa.adapter import get_adapter as get_mfa_adapter
@@ -6,16 +7,21 @@ from allauth.mfa.models import Authenticator
 from allauth.mfa.totp.internal.auth import TOTP
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.models import SocialApp
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files.uploadedfile import UploadedFile
+from PIL import Image
 from rest_framework import serializers
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 from paperless.models import ApplicationConfiguration
+from paperless.network import validate_outbound_http_url
 from paperless.validators import reject_dangerous_svg
+from paperless.validators import validate_raster_image
 from paperless_mail.serialisers import ObfuscatedPasswordField
 
 logger = logging.getLogger("paperless.settings")
@@ -68,7 +74,7 @@ class PaperlessAuthTokenSerializer(AuthTokenSerializer):
         return attrs
 
 
-class UserSerializer(PasswordValidationMixin, serializers.ModelSerializer):
+class UserSerializer(PasswordValidationMixin, serializers.ModelSerializer[User]):
     password = ObfuscatedPasswordField(required=False)
     user_permissions = serializers.SlugRelatedField(
         many=True,
@@ -136,7 +142,7 @@ class UserSerializer(PasswordValidationMixin, serializers.ModelSerializer):
         return user
 
 
-class GroupSerializer(serializers.ModelSerializer):
+class GroupSerializer(serializers.ModelSerializer[Group]):
     permissions = serializers.SlugRelatedField(
         many=True,
         queryset=Permission.objects.exclude(content_type__app_label="admin"),
@@ -152,7 +158,7 @@ class GroupSerializer(serializers.ModelSerializer):
         )
 
 
-class SocialAccountSerializer(serializers.ModelSerializer):
+class SocialAccountSerializer(serializers.ModelSerializer[SocialAccount]):
     name = serializers.SerializerMethodField()
 
     class Meta:
@@ -170,7 +176,7 @@ class SocialAccountSerializer(serializers.ModelSerializer):
             return "Unknown App"
 
 
-class ProfileSerializer(PasswordValidationMixin, serializers.ModelSerializer):
+class ProfileSerializer(PasswordValidationMixin, serializers.ModelSerializer[User]):
     email = serializers.EmailField(allow_blank=True, required=False)
     password = ObfuscatedPasswordField(required=False, allow_null=False)
     auth_token = serializers.SlugRelatedField(read_only=True, slug_field="key")
@@ -203,9 +209,15 @@ class ProfileSerializer(PasswordValidationMixin, serializers.ModelSerializer):
         )
 
 
-class ApplicationConfigurationSerializer(serializers.ModelSerializer):
+class ApplicationConfigurationSerializer(
+    serializers.ModelSerializer[ApplicationConfiguration],
+):
     user_args = serializers.JSONField(binary=True, allow_null=True)
     barcode_tag_mapping = serializers.JSONField(binary=True, allow_null=True)
+    llm_api_key = ObfuscatedPasswordField(
+        required=False,
+        allow_null=True,
+    )
 
     def run_validation(self, data):
         # Empty strings treated as None to avoid unexpected behavior
@@ -215,6 +227,11 @@ class ApplicationConfigurationSerializer(serializers.ModelSerializer):
             data["barcode_tag_mapping"] = None
         if "language" in data and data["language"] == "":
             data["language"] = None
+        if "llm_api_key" in data and data["llm_api_key"] is not None:
+            if data["llm_api_key"] == "":
+                data["llm_api_key"] = None
+            elif len(data["llm_api_key"].replace("*", "")) == 0:
+                del data["llm_api_key"]
         return super().run_validation(data)
 
     def update(self, instance, validated_data):
@@ -222,10 +239,59 @@ class ApplicationConfigurationSerializer(serializers.ModelSerializer):
             instance.app_logo.delete()
         return super().update(instance, validated_data)
 
+    def _sanitize_raster_image(self, file: UploadedFile) -> UploadedFile:
+        try:
+            data = BytesIO()
+            image = Image.open(file)
+            image.save(data, format=image.format)
+            data.seek(0)
+
+            return InMemoryUploadedFile(
+                file=data,
+                field_name=file.field_name,
+                name=file.name,
+                content_type=file.content_type,
+                size=data.getbuffer().nbytes,
+                charset=getattr(file, "charset", None),
+            )
+        finally:
+            image.close()
+
     def validate_app_logo(self, file: UploadedFile):
-        if file and magic.from_buffer(file.read(2048), mime=True) == "image/svg+xml":
-            reject_dangerous_svg(file)
+        """
+        Validates and sanitizes the uploaded app logo image. Model field already restricts to
+        jpg/png/gif/svg.
+        """
+        if file:
+            mime_type = magic.from_buffer(file.read(2048), mime=True)
+
+            if mime_type == "image/svg+xml":
+                reject_dangerous_svg(file)
+            else:
+                validate_raster_image(file)
+
+                if mime_type in {"image/jpeg", "image/png"}:
+                    file = self._sanitize_raster_image(file)
+
         return file
+
+    def validate_llm_endpoint(self, value: str | None) -> str | None:
+        if not value:
+            return value
+
+        try:
+            validate_outbound_http_url(
+                value,
+                allow_internal=settings.LLM_ALLOW_INTERNAL_ENDPOINTS,
+            )
+        except ValueError as e:
+            raise serializers.ValidationError(
+                f"Invalid LLM endpoint: {e.args[0]}, see logs for details",
+            ) from e
+
+        return value
+
+    validate_llm_embedding_endpoint = validate_llm_endpoint
 
     class Meta:
         model = ApplicationConfiguration

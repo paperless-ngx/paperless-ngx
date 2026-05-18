@@ -1,3 +1,4 @@
+import { ScrollingModule } from '@angular/cdk/scrolling'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import {
@@ -64,7 +65,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
-      imports: [NgxBootstrapIconsModule.pick(allIcons)],
+      imports: [NgxBootstrapIconsModule.pick(allIcons), ScrollingModule],
     }).compileComponents()
 
     hotkeyService = TestBed.inject(HotKeyService)
@@ -265,18 +266,11 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     expect(document.activeElement).toEqual(
       component.listFilterTextInput.nativeElement
     )
-    expect(
-      Array.from(
-        (fixture.nativeElement as HTMLDivElement).querySelectorAll('button')
-      ).filter((b) => b.textContent.includes('Tag'))
-    ).toHaveLength(2)
+    expect(component.buttonsViewport.getRenderedRange().end).toEqual(3) // all items shown
+
     component.filterText = 'Tag2'
     fixture.detectChanges()
-    expect(
-      Array.from(
-        (fixture.nativeElement as HTMLDivElement).querySelectorAll('button')
-      ).filter((b) => b.textContent.includes('Tag'))
-    ).toHaveLength(1)
+    expect(component.buttonsViewport.getRenderedRange().end).toEqual(1) // filtered
     component.dropdown.close()
     expect(component.filterText).toHaveLength(0)
   }))
@@ -331,6 +325,8 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       .dispatchEvent(new MouseEvent('click')) // open
     fixture.detectChanges()
     tick(100)
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
     const filterInputEl: HTMLInputElement =
       component.listFilterTextInput.nativeElement
     expect(document.activeElement).toEqual(filterInputEl)
@@ -376,6 +372,8 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       .dispatchEvent(new MouseEvent('click')) // open
     fixture.detectChanges()
     tick(100)
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
     const filterInputEl: HTMLInputElement =
       component.listFilterTextInput.nativeElement
     expect(document.activeElement).toEqual(filterInputEl)
@@ -412,6 +410,8 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       .dispatchEvent(new MouseEvent('click')) // open
     fixture.detectChanges()
     tick(100)
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
     const filterInputEl: HTMLInputElement =
       component.listFilterTextInput.nativeElement
     expect(document.activeElement).toEqual(filterInputEl)

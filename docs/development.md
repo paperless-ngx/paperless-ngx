@@ -6,23 +6,23 @@ on Paperless-ngx.
 Check out the source from GitHub. The repository is organized in the
 following way:
 
--   `main` always represents the latest release and will only see
-    changes when a new release is made.
--   `dev` contains the code that will be in the next release.
--   `feature-X` contains bigger changes that will be in some release, but
-    not necessarily the next one.
+- `main` always represents the latest release and will only see
+  changes when a new release is made.
+- `dev` contains the code that will be in the next release.
+- `feature-X` contains bigger changes that will be in some release, but
+  not necessarily the next one.
 
 When making functional changes to Paperless-ngx, _always_ make your changes
 on the `dev` branch.
 
 Apart from that, the folder structure is as follows:
 
--   `docs/` - Documentation.
--   `src-ui/` - Code of the front end.
--   `src/` - Code of the back end.
--   `scripts/` - Various scripts that help with different parts of
-    development.
--   `docker/` - Files required to build the docker image.
+- `docs/` - Documentation.
+- `src-ui/` - Code of the front end.
+- `src/` - Code of the back end.
+- `scripts/` - Various scripts that help with different parts of
+  development.
+- `docker/` - Files required to build the docker image.
 
 ## Contributing to Paperless-ngx
 
@@ -75,13 +75,13 @@ first-time setup.
 4.  Install the Python dependencies:
 
     ```bash
-    $ uv sync --group dev
+    uv sync --group dev
     ```
 
 5.  Install pre-commit hooks:
 
     ```bash
-    $ uv run pre-commit install
+    uv run prek install
     ```
 
 6.  Apply migrations and create a superuser (also can be done via the web UI) for your development instance:
@@ -89,23 +89,22 @@ first-time setup.
     ```bash
     # src/
 
-    $ uv run manage.py migrate
-    $ uv run manage.py createsuperuser
+    uv run manage.py migrate
+    uv run manage.py createsuperuser
     ```
 
 7.  You can now either ...
+    - install Redis or
 
-    -   install Redis or
+    - use the included `scripts/start_services.sh` to use Docker to fire
+      up a Redis instance (and some other services such as Tika,
+      Gotenberg and a database server) or
 
-    -   use the included `scripts/start_services.sh` to use Docker to fire
-        up a Redis instance (and some other services such as Tika,
-        Gotenberg and a database server) or
+    - spin up a bare Redis container
 
-    -   spin up a bare Redis container
-
-        ```
-        docker run -d -p 6379:6379 --restart unless-stopped redis:latest
-        ```
+      ```bash
+      docker run -d -p 6379:6379 --restart unless-stopped redis:latest
+      ```
 
 8.  Continue with either back-end or front-end development – or both :-).
 
@@ -118,18 +117,18 @@ work well for development, but you can use whatever you want.
 Configure the IDE to use the `src/`-folder as the base source folder.
 Configure the following launch configurations in your IDE:
 
--   `python3 manage.py runserver`
--   `python3 manage.py document_consumer`
--   `celery --app paperless worker -l DEBUG` (or any other log level)
+- `uv run manage.py runserver`
+- `uv run manage.py document_consumer`
+- `uv run celery --app paperless worker -l DEBUG` (or any other log level)
 
 To start them all:
 
 ```bash
 # src/
 
-$ python3 manage.py runserver & \
-  python3 manage.py document_consumer & \
-  celery --app paperless worker -l DEBUG
+uv run manage.py runserver & \
+  uv run manage.py document_consumer & \
+  uv run celery --app paperless worker -l DEBUG
 ```
 
 You might need the front end to test your back end code.
@@ -140,17 +139,17 @@ To build the front end once use this command:
 ```bash
 # src-ui/
 
-$ pnpm install
-$ ng build --configuration production
+pnpm install
+pnpm ng build --configuration production
 ```
 
 ### Testing
 
--   Run `pytest` in the `src/` directory to execute all tests. This also
-    generates a HTML coverage report. When running tests, `paperless.conf`
-    is loaded as well. However, the tests rely on the default
-    configuration. This is not ideal. But for now, make sure no settings
-    except for DEBUG are overridden when testing.
+- Run `pytest` in the `src/` directory to execute all tests. This also
+  generates a HTML coverage report. When running tests, `paperless.conf`
+  is loaded as well. However, the tests rely on the default
+  configuration. This is not ideal. But for now, make sure no settings
+  except for DEBUG are overridden when testing.
 
 !!! note
 
@@ -175,7 +174,7 @@ To add a new development package `uv add --dev <package>`
 
 ## Front end development
 
-The front end is built using AngularJS. In order to get started, you need Node.js (version 14.15+) and
+The front end is built using AngularJS. In order to get started, you need Node.js (version 24+) and
 `pnpm`.
 
 !!! note
@@ -199,7 +198,7 @@ The front end is built using AngularJS. In order to get started, you need Node.j
 4.  You can launch a development server by running:
 
     ```bash
-    ng serve
+    pnpm ng serve
     ```
 
     This will automatically update whenever you save. However, in-place
@@ -217,21 +216,21 @@ commit. See [above](#code-formatting-with-pre-commit-hooks) for installation ins
 command such as
 
 ```bash
-$ git ls-files -- '*.ts' | xargs pre-commit run prettier --files
+git ls-files -- '*.ts' | xargs uv run prek run prettier --files
 ```
 
 Front end testing uses Jest and Playwright. Unit tests and e2e tests,
 respectively, can be run non-interactively with:
 
 ```bash
-$ ng test
-$ npx playwright test
+pnpm ng test
+pnpm playwright test
 ```
 
 Playwright also includes a UI which can be run with:
 
 ```bash
-$ npx playwright test --ui
+pnpm playwright test --ui
 ```
 
 ### Building the frontend
@@ -239,7 +238,7 @@ $ npx playwright test --ui
 In order to build the front end and serve it as part of Django, execute:
 
 ```bash
-$ ng build --configuration production
+pnpm ng build --configuration production
 ```
 
 This will build the front end and put it in a location from which the
@@ -254,14 +253,14 @@ these parts have to be translated separately.
 
 ### Front end localization
 
--   The AngularJS front end does localization according to the [Angular
-    documentation](https://angular.io/guide/i18n).
--   The source language of the project is "en_US".
--   The source strings end up in the file `src-ui/messages.xlf`.
--   The translated strings need to be placed in the
-    `src-ui/src/locale/` folder.
--   In order to extract added or changed strings from the source files,
-    call `ng extract-i18n`.
+- The AngularJS front end does localization according to the [Angular
+  documentation](https://angular.io/guide/i18n).
+- The source language of the project is "en_US".
+- The source strings end up in the file `src-ui/messages.xlf`.
+- The translated strings need to be placed in the
+  `src-ui/src/locale/` folder.
+- In order to extract added or changed strings from the source files,
+  call `ng extract-i18n`.
 
 Adding new languages requires adding the translated files in the
 `src-ui/src/locale/` folder and adjusting a couple files.
@@ -307,18 +306,18 @@ A majority of the strings that appear in the back end appear only when
 the admin is used. However, some of these are still shown on the front
 end (such as error messages).
 
--   The django application does localization according to the [Django
-    documentation](https://docs.djangoproject.com/en/3.1/topics/i18n/translation/).
--   The source language of the project is "en_US".
--   Localization files end up in the folder `src/locale/`.
--   In order to extract strings from the application, call
-    `python3 manage.py makemessages -l en_US`. This is important after
-    making changes to translatable strings.
--   The message files need to be compiled for them to show up in the
-    application. Call `python3 manage.py compilemessages` to do this.
-    The generated files don't get committed into git, since these are
-    derived artifacts. The build pipeline takes care of executing this
-    command.
+- The django application does localization according to the [Django
+  documentation](https://docs.djangoproject.com/en/3.1/topics/i18n/translation/).
+- The source language of the project is "en_US".
+- Localization files end up in the folder `src/locale/`.
+- In order to extract strings from the application, call
+  `uv run manage.py makemessages -l en_US`. This is important after
+  making changes to translatable strings.
+- The message files need to be compiled for them to show up in the
+  application. Call `uv run manage.py compilemessages` to do this.
+  The generated files don't get committed into git, since these are
+  derived artifacts. The build pipeline takes care of executing this
+  command.
 
 Adding new languages requires adding the translated files in the
 `src/locale/`-folder and adjusting the file
@@ -371,88 +370,505 @@ docker build --file Dockerfile --tag paperless:local .
 
 ## Extending Paperless-ngx
 
-Paperless-ngx does not have any fancy plugin systems and will probably never
-have. However, some parts of the application have been designed to allow
-easy integration of additional features without any modification to the
-base code.
+Paperless-ngx supports third-party document parsers via a Python entry point
+plugin system. Plugins are distributed as ordinary Python packages and
+discovered automatically at startup — no changes to the Paperless-ngx source
+are required.
+
+!!! warning "Third-party plugins are not officially supported"
+
+    The Paperless-ngx maintainers do not provide support for third-party
+    plugins. Issues that are caused by or require changes to a third-party
+    plugin will be closed without further investigation. If you believe you
+    have found a bug in Paperless-ngx itself (not in a plugin), please
+    reproduce it with all third-party plugins removed before filing an issue.
 
 ### Making custom parsers
 
-Paperless-ngx uses parsers to add documents. A parser is
-responsible for:
+Paperless-ngx uses parsers to add documents. A parser is responsible for:
 
--   Retrieving the content from the original
--   Creating a thumbnail
--   _optional:_ Retrieving a created date from the original
--   _optional:_ Creating an archived document from the original
+- Extracting plain-text content from the document
+- Generating a thumbnail image
+- _optional:_ Detecting the document's creation date
+- _optional:_ Producing a searchable PDF archive copy
 
-Custom parsers can be added to Paperless-ngx to support more file types. In
-order to do that, you need to write the parser itself and announce its
-existence to Paperless-ngx.
+Custom parsers are distributed as ordinary Python packages and registered
+via a [setuptools entry point](https://setuptools.pypa.io/en/latest/userguide/entry_point.html).
+No changes to the Paperless-ngx source are required.
 
-The parser itself must extend `documents.parsers.DocumentParser` and
-must implement the methods `parse` and `get_thumbnail`. You can provide
-your own implementation to `get_date` if you don't want to rely on
-Paperless-ngx' default date guessing mechanisms.
+#### 1. Implementing the parser class
+
+Your parser must satisfy the `ParserProtocol` structural interface defined in
+`paperless.parsers`. The simplest approach is to write a plain class — no base
+class is required, only the right attributes and methods.
+
+**Class-level identity attributes**
+
+The registry reads these before instantiating the parser, so they must be
+plain class attributes (not instance attributes or properties):
 
 ```python
-class MyCustomParser(DocumentParser):
-
-    def parse(self, document_path, mime_type):
-        # This method does not return anything. Rather, you should assign
-        # whatever you got from the document to the following fields:
-
-        # The content of the document.
-        self.text = "content"
-
-        # Optional: path to a PDF document that you created from the original.
-        self.archive_path = os.path.join(self.tempdir, "archived.pdf")
-
-        # Optional: "created" date of the document.
-        self.date = get_created_from_metadata(document_path)
-
-    def get_thumbnail(self, document_path, mime_type):
-        # This should return the path to a thumbnail you created for this
-        # document.
-        return os.path.join(self.tempdir, "thumb.webp")
+class MyCustomParser:
+    name    = "My Format Parser"   # human-readable name shown in logs
+    version = "1.0.0"              # semantic version string
+    author  = "Acme Corp"          # author / organisation
+    url     = "https://example.com/my-parser"  # docs or issue tracker
 ```
 
-If you encounter any issues during parsing, raise a
-`documents.parsers.ParseError`.
+**Declaring supported MIME types**
 
-The `self.tempdir` directory is a temporary directory that is guaranteed
-to be empty and removed after consumption finished. You can use that
-directory to store any intermediate files and also use it to store the
-thumbnail / archived document.
-
-After that, you need to announce your parser to Paperless-ngx. You need to
-connect a handler to the `document_consumer_declaration` signal. Have a
-look in the file `src/paperless_tesseract/apps.py` on how that's done.
-The handler is a method that returns information about your parser:
+Return a `dict` mapping MIME type strings to preferred file extensions
+(including the leading dot). Paperless-ngx uses the extension when storing
+archive copies and serving files for download.
 
 ```python
-def myparser_consumer_declaration(sender, **kwargs):
+@classmethod
+def supported_mime_types(cls) -> dict[str, str]:
     return {
-        "parser": MyCustomParser,
-        "weight": 0,
-        "mime_types": {
-            "application/pdf": ".pdf",
-            "image/jpeg": ".jpg",
-        }
+        "application/x-my-format": ".myf",
+        "application/x-my-format-alt": ".myf",
     }
 ```
 
--   `parser` is a reference to a class that extends `DocumentParser`.
--   `weight` is used whenever two or more parsers are able to parse a
-    file: The parser with the higher weight wins. This can be used to
-    override the parsers provided by Paperless-ngx.
--   `mime_types` is a dictionary. The keys are the mime types your
-    parser supports and the value is the default file extension that
-    Paperless-ngx should use when storing files and serving them for
-    download. We could guess that from the file extensions, but some
-    mime types have many extensions associated with them and the Python
-    methods responsible for guessing the extension do not always return
-    the same value.
+**Scoring**
+
+When more than one parser can handle a file, the registry calls `score()` on
+each candidate and picks the one with the highest result and equal scores favor third-party parsers over built-ins. Return `None` to
+decline handling a file even though the MIME type is listed as supported (for
+example, when a required external service is not configured).
+
+| Score  | Meaning                                                                           |
+| ------ | --------------------------------------------------------------------------------- |
+| `None` | Decline — do not handle this file                                                 |
+| `10`   | Default priority used by all built-in parsers                                     |
+| `20`   | Priority used by the remote OCR built-in parser, allowing it to replace Tesseract |
+| `> 10` | Override a built-in parser for the same MIME type                                 |
+
+```python
+@classmethod
+def score(
+    cls,
+    mime_type: str,
+    filename: str,
+    path: "Path | None" = None,
+) -> int | None:
+    # Inspect filename or file bytes here if needed.
+    return 10
+```
+
+**Archive and rendition flags**
+
+```python
+@property
+def can_produce_archive(self) -> bool:
+    """True if parse() can produce a searchable PDF archive copy."""
+    return True   # or False if your parser doesn't produce PDFs
+
+@property
+def requires_pdf_rendition(self) -> bool:
+    """True if the original format cannot be displayed by a browser
+    (e.g. DOCX, ODT) and the PDF output must always be kept."""
+    return False
+```
+
+**Context manager — temp directory lifecycle**
+
+Paperless-ngx always uses parsers as context managers. Create a temporary
+working directory in `__enter__` (or `__init__`) and remove it in `__exit__`
+regardless of whether an exception occurred. Store intermediate files,
+thumbnails, and archive PDFs inside this directory.
+
+```python
+import shutil
+import tempfile
+from pathlib import Path
+from typing import Self
+from types import TracebackType
+
+from django.conf import settings
+
+class MyCustomParser:
+    ...
+
+    def __init__(self, logging_group: object = None) -> None:
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
+        self._tempdir = Path(
+            tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
+        )
+        self._text: str | None = None
+        self._archive_path: Path | None = None
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        shutil.rmtree(self._tempdir, ignore_errors=True)
+```
+
+**Optional context — `configure()`**
+
+The consumer calls `configure()` with a `ParserContext` after instantiation
+and before `parse()`. If your parser doesn't need context, a no-op
+implementation is fine:
+
+```python
+from paperless.parsers import ParserContext
+
+def configure(self, context: ParserContext) -> None:
+    pass   # override if you need context.mailrule_id, etc.
+```
+
+**Parsing**
+
+`parse()` is the core method. It must not return a value; instead, store
+results in instance attributes and expose them via the accessor methods below.
+Raise `documents.parsers.ParseError` on any unrecoverable failure.
+
+```python
+from documents.parsers import ParseError
+
+def parse(
+    self,
+    document_path: Path,
+    mime_type: str,
+    *,
+    produce_archive: bool = True,
+) -> None:
+    try:
+        self._text = extract_text_from_my_format(document_path)
+    except Exception as e:
+        raise ParseError(f"Failed to parse {document_path}: {e}") from e
+
+    if produce_archive and self.can_produce_archive:
+        archive = self._tempdir / "archived.pdf"
+        convert_to_pdf(document_path, archive)
+        self._archive_path = archive
+```
+
+**Result accessors**
+
+```python
+def get_text(self) -> str | None:
+    return self._text
+
+def get_date(self) -> "datetime.datetime | None":
+    # Return a datetime extracted from the document, or None to let
+    # Paperless-ngx use its default date-guessing logic.
+    return None
+
+def get_archive_path(self) -> Path | None:
+    return self._archive_path
+
+def get_page_count(self, document_path: Path, mime_type: str) -> int | None:
+    # If the format doesn't have the concept of pages, return None
+    return count_pages(document_path)
+
+```
+
+**Thumbnail**
+
+`get_thumbnail()` may be called independently of `parse()`. Return the path
+to a WebP image inside `self._tempdir`. The image should be roughly 500 × 700
+pixels.
+
+```python
+def get_thumbnail(self, document_path: Path, mime_type: str) -> Path:
+    thumb = self._tempdir / "thumb.webp"
+    render_thumbnail(document_path, thumb)
+    return thumb
+```
+
+**Optional methods**
+
+These are called by the API on demand, not during the consumption pipeline.
+Implement them if your format supports the information; otherwise return
+`None` / `[]`.
+
+```python
+
+def extract_metadata(
+    self,
+    document_path: Path,
+    mime_type: str,
+) -> "list[MetadataEntry]":
+    # Must never raise. Return [] if metadata cannot be read.
+    from paperless.parsers import MetadataEntry
+    return [
+        MetadataEntry(
+            namespace="https://example.com/ns/",
+            prefix="ex",
+            key="Author",
+            value="Alice",
+        )
+    ]
+```
+
+#### 2. Registering via entry point
+
+Add the following to your package's `pyproject.toml`. The key (left of `=`)
+is an arbitrary name used only in log output; the value is the
+`module:ClassName` import path.
+
+```toml
+[project.entry-points."paperless_ngx.parsers"]
+my_parser = "my_package.parsers:MyCustomParser"
+```
+
+Install your package into the same Python environment as Paperless-ngx (or
+add it to the Docker image), and the parser will be discovered automatically
+on the next startup. No configuration changes are needed.
+
+To verify discovery, check the application logs at startup for a line like:
+
+```
+Loaded third-party parser 'My Format Parser' v1.0.0 by Acme Corp (entrypoint: 'my_parser').
+```
+
+#### 3. Utilities
+
+`paperless.parsers.utils` provides helpers you can import directly:
+
+| Function                                | Description                                                      |
+| --------------------------------------- | ---------------------------------------------------------------- |
+| `read_file_handle_unicode_errors(path)` | Read a file as UTF-8, replacing invalid bytes instead of raising |
+| `get_page_count_for_pdf(path)`          | Count pages in a PDF using pikepdf                               |
+| `extract_pdf_metadata(path)`            | Extract XMP metadata from a PDF as a `list[MetadataEntry]`       |
+
+#### Minimal example
+
+A complete, working parser for a hypothetical plain-XML format:
+
+```python
+from __future__ import annotations
+
+import shutil
+import tempfile
+from pathlib import Path
+from typing import Self
+from types import TracebackType
+import xml.etree.ElementTree as ET
+
+from django.conf import settings
+
+from documents.parsers import ParseError
+from paperless.parsers import ParserContext
+
+
+class XmlDocumentParser:
+    name    = "XML Parser"
+    version = "1.0.0"
+    author  = "Acme Corp"
+    url     = "https://example.com/xml-parser"
+
+    @classmethod
+    def supported_mime_types(cls) -> dict[str, str]:
+        return {"application/xml": ".xml", "text/xml": ".xml"}
+
+    @classmethod
+    def score(cls, mime_type: str, filename: str, path: Path | None = None) -> int | None:
+        return 10
+
+    @property
+    def can_produce_archive(self) -> bool:
+        return False
+
+    @property
+    def requires_pdf_rendition(self) -> bool:
+        return False
+
+    def __init__(self, logging_group: object = None) -> None:
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
+        self._tempdir = Path(tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR))
+        self._text: str | None = None
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        shutil.rmtree(self._tempdir, ignore_errors=True)
+
+    def configure(self, context: ParserContext) -> None:
+        pass
+
+    def parse(self, document_path: Path, mime_type: str, *, produce_archive: bool = True) -> None:
+        try:
+            tree = ET.parse(document_path)
+            self._text = " ".join(tree.getroot().itertext())
+        except ET.ParseError as e:
+            raise ParseError(f"XML parse error: {e}") from e
+
+    def get_text(self) -> str | None:
+        return self._text
+
+    def get_date(self):
+        return None
+
+    def get_archive_path(self) -> Path | None:
+        return None
+
+    def get_thumbnail(self, document_path: Path, mime_type: str) -> Path:
+        from PIL import Image, ImageDraw
+        img = Image.new("RGB", (500, 700), color="white")
+        ImageDraw.Draw(img).text((10, 10), "XML Document", fill="black")
+        out = self._tempdir / "thumb.webp"
+        img.save(out, format="WEBP")
+        return out
+
+    def get_page_count(self, document_path: Path, mime_type: str) -> int | None:
+        return None
+
+    def extract_metadata(self, document_path: Path, mime_type: str) -> list:
+        return []
+```
+
+### Developing date parser plugins
+
+Paperless-ngx uses a plugin system for date parsing, allowing you to extend or replace the default date parsing behavior. Plugins are discovered using [Python entry points](https://setuptools.pypa.io/en/latest/userguide/entry_point.html).
+
+#### Creating a Date Parser Plugin
+
+To create a custom date parser plugin, you need to:
+
+1. Create a class that inherits from `DateParserPluginBase`
+2. Implement the required abstract method
+3. Register your plugin via an entry point
+
+##### 1. Implementing the Parser Class
+
+Your parser must extend `documents.plugins.date_parsing.DateParserPluginBase` and implement the `parse` method:
+
+```python
+from collections.abc import Iterator
+import datetime
+
+from documents.plugins.date_parsing import DateParserPluginBase
+
+
+class MyDateParserPlugin(DateParserPluginBase):
+    """
+    Custom date parser implementation.
+    """
+
+    def parse(self, filename: str, content: str) -> Iterator[datetime.datetime]:
+        """
+        Parse dates from the document's filename and content.
+
+        Args:
+            filename: The original filename of the document
+            content: The extracted text content of the document
+
+        Yields:
+            datetime.datetime: Valid datetime objects found in the document
+        """
+        # Your parsing logic here
+        # Use self.config to access configuration settings
+
+        # Example: parse dates from filename first
+        if self.config.filename_date_order:
+            # Your filename parsing logic
+            yield some_datetime
+
+        # Then parse dates from content
+        # Your content parsing logic
+        yield another_datetime
+```
+
+##### 2. Configuration and Helper Methods
+
+Your parser instance is initialized with a `DateParserConfig` object accessible via `self.config`. This provides:
+
+- `languages: list[str]` - List of language codes for date parsing
+- `timezone_str: str` - Timezone string for date localization
+- `ignore_dates: set[datetime.date]` - Dates that should be filtered out
+- `reference_time: datetime.datetime` - Current time for filtering future dates
+- `filename_date_order: str | None` - Date order preference for filenames (e.g., "DMY", "MDY")
+- `content_date_order: str` - Date order preference for content
+
+The base class provides two helper methods you can use:
+
+```python
+def _parse_string(
+    self,
+    date_string: str,
+    date_order: str,
+) -> datetime.datetime | None:
+    """
+    Parse a single date string using dateparser with configured settings.
+    """
+
+def _filter_date(
+    self,
+    date: datetime.datetime | None,
+) -> datetime.datetime | None:
+    """
+    Validate a parsed datetime against configured rules.
+    Filters out dates before 1900, future dates, and ignored dates.
+    """
+```
+
+##### 3. Resource Management (Optional)
+
+If your plugin needs to acquire or release resources (database connections, API clients, etc.), override the context manager methods. Paperless-ngx will always use plugins as context managers, ensuring resources can be released even in the event of errors.
+
+##### 4. Registering Your Plugin
+
+Register your plugin using a setuptools entry point in your package's `pyproject.toml`:
+
+```toml
+[project.entry-points."paperless_ngx.date_parsers"]
+my_parser = "my_package.parsers:MyDateParserPlugin"
+```
+
+The entry point name (e.g., `"my_parser"`) is used for sorting when multiple plugins are found. Paperless-ngx will use the first plugin alphabetically by name if multiple plugins are discovered.
+
+#### Plugin Discovery
+
+Paperless-ngx automatically discovers and loads date parser plugins at runtime. The discovery process:
+
+1. Queries the `paperless_ngx.date_parsers` entry point group
+2. Validates that each plugin is a subclass of `DateParserPluginBase`
+3. Sorts valid plugins alphabetically by entry point name
+4. Uses the first valid plugin, or falls back to the default `RegexDateParserPlugin` if none are found
+
+If multiple plugins are installed, a warning is logged indicating which plugin was selected.
+
+#### Example: Simple Date Parser
+
+Here's a minimal example that only looks for ISO 8601 dates:
+
+```python
+import datetime
+import re
+from collections.abc import Iterator
+
+from documents.plugins.date_parsing.base import DateParserPluginBase
+
+
+class ISODateParserPlugin(DateParserPluginBase):
+    """
+    Parser that only matches ISO 8601 formatted dates (YYYY-MM-DD).
+    """
+
+    ISO_REGEX = re.compile(r"\b(\d{4}-\d{2}-\d{2})\b")
+
+    def parse(self, filename: str, content: str) -> Iterator[datetime.datetime]:
+        # Combine filename and content for searching
+        text = f"{filename} {content}"
+
+        for match in self.ISO_REGEX.finditer(text):
+            date_string = match.group(1)
+            # Use helper method to parse with configured timezone
+            date = self._parse_string(date_string, "YMD")
+            # Use helper method to validate the date
+            filtered_date = self._filter_date(date)
+            if filtered_date is not None:
+                yield filtered_date
+```
 
 ## Using Visual Studio Code devcontainer
 
@@ -471,9 +887,8 @@ To get started:
 2. VS Code will prompt you with "Reopen in container". Do so and wait for the environment to start.
 
 3. In case your host operating system is Windows:
-
-    - The Source Control view in Visual Studio Code might show: "The detected Git repository is potentially unsafe as the folder is owned by someone other than the current user." Use "Manage Unsafe Repositories" to fix this.
-    - Git might have detecteded modifications for all files, because Windows is using CRLF line endings. Run `git checkout .` in the containers terminal to fix this issue.
+   - The Source Control view in Visual Studio Code might show: "The detected Git repository is potentially unsafe as the folder is owned by someone other than the current user." Use "Manage Unsafe Repositories" to fix this.
+   - Git might have detecteded modifications for all files, because Windows is using CRLF line endings. Run `git checkout .` in the containers terminal to fix this issue.
 
 4. Initialize the project by running the task **Project Setup: Run all Init Tasks**. This
    will initialize the database tables and create a superuser. Then you can compile the front end

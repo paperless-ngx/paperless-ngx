@@ -19,6 +19,4 @@ following additional information about it:
 * Correspondent: ${DOCUMENT_CORRESPONDENT}
 * Tags: ${DOCUMENT_TAGS}
 
-It was consumed with the passphrase ${PASSPHRASE}
-
 "

@@ -1,0 +1,136 @@
+name: Documentation
+on:
+  push:
+    branches-ignore:
+      - 'translations**'
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: docs-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+env:
+  DEFAULT_UV_VERSION: "0.11.x"
+  DEFAULT_PYTHON_VERSION: "3.12"
+jobs:
+  changes:
+    name: Detect Docs Changes
+    runs-on: ubuntu-slim
+    outputs:
+      docs_changed: ${{ steps.force.outputs.run_all == 'true' || steps.filter.outputs.docs == 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Decide run mode
+        id: force
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "run_all=true" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event_name }}" == "push" && ( "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "dev" ) ]]; then
+            echo "run_all=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_all=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Set diff range
+        id: range
+        if: steps.force.outputs.run_all != 'true'
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "base=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event.created }}" == "true" ]]; then
+            echo "base=${{ github.event.repository.default_branch }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
+          fi
+          echo "ref=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+      - name: Detect changes
+        id: filter
+        if: steps.force.outputs.run_all != 'true'
+        uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
+        with:
+          base: ${{ steps.range.outputs.base }}
+          ref: ${{ steps.range.outputs.ref }}
+          filters: |
+            docs:
+              - 'docs/**'
+              - 'zensical.toml'
+              - 'pyproject.toml'
+              - 'uv.lock'
+              - '.github/workflows/ci-docs.yml'
+  build:
+    needs: changes
+    if: needs.changes.outputs.docs_changed == 'true'
+    name: Build Documentation
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Install Python dependencies
+        run: |
+          uv sync --python ${{ steps.setup-python.outputs.python-version }} --dev --frozen
+      - name: Build documentation
+        run: |
+          uv run \
+            --python ${{ steps.setup-python.outputs.python-version }} \
+            --dev \
+            --frozen \
+            zensical build --clean
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: site
+          name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+  deploy:
+    name: Deploy Documentation
+    needs: [changes, build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.docs_changed == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy GitHub Pages
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+        id: deployment
+        with:
+          artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+  gate:
+    name: Docs CI Gate
+    needs: [changes, build]
+    if: always()
+    runs-on: ubuntu-slim
+    steps:
+      - name: Check gate
+        run: |
+          if [[ "${{ needs.changes.outputs.docs_changed }}" != "true" ]]; then
+            echo "No docs-relevant changes detected."
+            exit 0
+          fi
+
+          if [[ "${{ needs.build.result }}" != "success" ]]; then
+            echo "::error::Docs build job result: ${{ needs.build.result }}"
+            exit 1
+          fi
+
+          echo "Docs checks passed."

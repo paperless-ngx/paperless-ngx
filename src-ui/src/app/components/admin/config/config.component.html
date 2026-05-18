@@ -40,8 +40,12 @@
                                                     @case (ConfigOptionType.String) { <pngx-input-text [formControlName]="option.key" [error]="errors[option.key]"></pngx-input-text> }
                                                     @case (ConfigOptionType.JSON) { <pngx-input-text [formControlName]="option.key" [error]="errors[option.key]"></pngx-input-text> }
                                                     @case (ConfigOptionType.File) { <pngx-input-file [formControlName]="option.key" (upload)="uploadFile($event, option.key)" [error]="errors[option.key]"></pngx-input-file> }
+                                                    @case (ConfigOptionType.Password) { <pngx-input-password [formControlName]="option.key" [error]="errors[option.key]"></pngx-input-password> }
                                                 }
                                             </div>
+                                            @if (option.note) {
+                                                <div class="form-text fst-italic">{{option.note}}</div>
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -55,7 +59,7 @@
     <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
     <div class="btn-toolbar" role="toolbar">
         <div class="btn-group me-2">
-            <button type="button" (click)="discardChanges()" class="btn btn-outline-secondary" [disabled]="loading || (isDirty$ | async) === false" i18n>Discard</button>
+            <button type="button" (click)="discardChanges()" class="btn btn-outline-secondary" [disabled]="loading || (isDirty$ | async) === false" i18n>Cancel</button>
         </div>
         <div class="btn-group">
             <button type="submit" class="btn btn-primary" [disabled]="loading || !configForm.valid || (isDirty$ | async) === false" i18n>Save</button>

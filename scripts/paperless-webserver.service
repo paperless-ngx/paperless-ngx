@@ -23,7 +23,7 @@ ExecStart=/bin/sh -c '\
   [ -n "$PAPERLESS_WEBSERVER_WORKERS" ] && export GRANIAN_WORKERS=$PAPERLESS_WEBSERVER_WORKERS; \
   # URL path prefix: only set if PAPERLESS_FORCE_SCRIPT_NAME exists \
   [ -n "$PAPERLESS_FORCE_SCRIPT_NAME" ] && export GRANIAN_URL_PATH_PREFIX=$PAPERLESS_FORCE_SCRIPT_NAME; \
-  exec granian --interface asginl --ws "paperless.asgi:application"'
+  exec granian --interface asginl --ws --loop uvloop "paperless.asgi:application"'
 
 [Install]
 WantedBy=multi-user.target

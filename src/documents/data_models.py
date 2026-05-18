@@ -2,6 +2,7 @@ import dataclasses
 import datetime
 from enum import IntEnum
 from pathlib import Path
+from typing import TypedDict
 
 import magic
 from guardian.shortcuts import get_groups_with_perms
@@ -30,6 +31,9 @@ class DocumentMetadataOverrides:
     change_users: list[int] | None = None
     change_groups: list[int] | None = None
     custom_fields: dict | None = None
+    skip_asn_if_exists: bool = False
+    version_label: str | None = None
+    actor_id: int | None = None
 
     def update(self, other: "DocumentMetadataOverrides") -> "DocumentMetadataOverrides":
         """
@@ -49,6 +53,12 @@ class DocumentMetadataOverrides:
             self.storage_path_id = other.storage_path_id
         if other.owner_id is not None:
             self.owner_id = other.owner_id
+        if other.actor_id is not None:
+            self.actor_id = other.actor_id
+        if other.skip_asn_if_exists:
+            self.skip_asn_if_exists = True
+        if other.version_label is not None:
+            self.version_label = other.version_label
 
         # merge
         if self.tag_ids is None:
@@ -157,11 +167,12 @@ class ConsumableDocument:
 
     source: DocumentSource
     original_file: Path
+    root_document_id: int | None = None
     original_path: Path | None = None
     mailrule_id: int | None = None
     mime_type: str = dataclasses.field(init=False, default=None)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """
         After a dataclass is initialized, this is called to finalize some data
         1. Make sure the original path is an absolute, fully qualified path
@@ -174,3 +185,26 @@ class ConsumableDocument:
         # Get the file type once at init
         # Note this function isn't called when the object is unpickled
         self.mime_type = magic.from_file(self.original_file, mime=True)
+
+
+class ConsumeFileDuplicateResult(TypedDict):
+    """Returned by consume_file when the file is rejected as a duplicate."""
+
+    duplicate_of: int
+    duplicate_in_trash: bool
+
+
+class ConsumeFileSuccessResult(TypedDict):
+    """Returned by consume_file when the document is created successfully."""
+
+    document_id: int
+
+
+class ConsumeFileStoppedResult(TypedDict):
+    """Returned by consume_file when a plugin raises StopConsumeTaskError.
+
+    Examples: barcode split dispatched child tasks, double-sided scan waiting
+    for the second half, workflow deleted the document during consumption.
+    """
+
+    reason: str

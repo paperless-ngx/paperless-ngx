@@ -58,7 +58,7 @@ class MailAccountSerializer(OwnedObjectSerializer):
         return instance
 
 
-class AccountField(serializers.PrimaryKeyRelatedField):
+class AccountField(serializers.PrimaryKeyRelatedField[MailAccount]):
     def get_queryset(self):
         user = getattr(self.context.get("request"), "user", None)
         if user is None:
@@ -117,6 +117,7 @@ class MailRuleSerializer(OwnedObjectSerializer):
             "user_can_change",
             "permissions",
             "set_permissions",
+            "stop_processing",
         ]
 
     def update(self, instance, validated_data):

@@ -42,6 +42,7 @@ services:
     env_file: docker-compose.env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBENGINE: sqlite
 volumes:
   data:
   media:

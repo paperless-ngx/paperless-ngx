@@ -3,11 +3,16 @@ from __future__ import annotations
 import functools
 import inspect
 import json
+import logging
 import operator
 from contextlib import contextmanager
+from decimal import Decimal
+from decimal import InvalidOperation
 from typing import TYPE_CHECKING
+from typing import Any
 
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import FieldError
 from django.db.models import Case
 from django.db.models import CharField
 from django.db.models import Count
@@ -23,8 +28,10 @@ from django.db.models.functions import Cast
 from django.utils.translation import gettext_lazy as _
 from django_filters import DateFilter
 from django_filters.rest_framework import BooleanFilter
+from django_filters.rest_framework import DateTimeFilter
 from django_filters.rest_framework import Filter
 from django_filters.rest_framework import FilterSet
+from django_filters.rest_framework import MultipleChoiceFilter
 from drf_spectacular.utils import extend_schema_field
 from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
@@ -39,6 +46,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import PaperlessTask
 from documents.models import ShareLink
+from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 
@@ -73,6 +81,8 @@ DATETIME_KWARGS = [
 
 CUSTOM_FIELD_QUERY_MAX_DEPTH = 10
 CUSTOM_FIELD_QUERY_MAX_ATOMS = 20
+
+logger = logging.getLogger("paperless.api")
 
 
 class CorrespondentFilterSet(FilterSet):
@@ -119,7 +129,7 @@ class StoragePathFilterSet(FilterSet):
 
 
 class ObjectFilter(Filter):
-    def __init__(self, *, exclude=False, in_list=False, field_name=""):
+    def __init__(self, *, exclude=False, in_list=False, field_name="") -> None:
         super().__init__()
         self.exclude = exclude
         self.in_list = in_list
@@ -159,12 +169,39 @@ class InboxFilter(Filter):
 
 @extend_schema_field(serializers.CharField)
 class TitleContentFilter(Filter):
-    def filter(self, qs, value):
+    # Deprecated but retained for existing saved views. UI uses Tantivy-backed `text` / `title_search` params.
+    def filter(self, qs: Any, value: Any) -> Any:
         value = value.strip() if isinstance(value, str) else value
         if value:
-            return qs.filter(Q(title__icontains=value) | Q(content__icontains=value))
+            logger.warning(
+                "Deprecated document filter parameter 'title_content' used; use `text` instead.",
+            )
+            try:
+                return qs.filter(
+                    Q(title__icontains=value) | Q(effective_content__icontains=value),
+                )
+            except FieldError:
+                return qs.filter(
+                    Q(title__icontains=value) | Q(content__icontains=value),
+                )
         else:
             return qs
+
+
+@extend_schema_field(serializers.CharField)
+class EffectiveContentFilter(Filter):
+    def filter(self, qs: Any, value: Any) -> Any:
+        value = value.strip() if isinstance(value, str) else value
+        if not value:
+            return qs
+        try:
+            return qs.filter(
+                **{f"effective_content__{self.lookup_expr}": value},
+            )
+        except FieldError:
+            return qs.filter(
+                **{f"content__{self.lookup_expr}": value},
+            )
 
 
 @extend_schema_field(serializers.BooleanField)
@@ -217,6 +254,9 @@ class CustomFieldsFilter(Filter):
     def filter(self, qs, value):
         value = value.strip() if isinstance(value, str) else value
         if value:
+            logger.warning(
+                "Deprecated document filter parameter 'custom_fields__icontains' used; use `custom_field_query` or advanced Tantivy field syntax instead.",
+            )
             fields_with_matching_selects = CustomField.objects.filter(
                 extra_data__icontains=value,
             )
@@ -253,8 +293,36 @@ class MimeTypeFilter(Filter):
             return qs
 
 
+class MonetaryAmountField(serializers.Field):
+    """
+    Accepts either a plain decimal string ("100", "100.00") or a currency-prefixed
+    string ("USD100.00") and returns the numeric amount as a Decimal.
+
+    Mirrors the logic of the value_monetary_amount generated field: if the value
+    starts with a non-digit, the first 3 characters are treated as a currency code
+    (ISO 4217) and stripped before parsing. This preserves backwards compatibility
+    with saved views that stored a currency-prefixed string as the filter value.
+    """
+
+    default_error_messages = {"invalid": "A valid number is required."}
+
+    def to_internal_value(self, data):
+        if not isinstance(data, str | int | float):
+            self.fail("invalid")
+        value = str(data).strip()
+        if value and not value[0].isdigit() and value[0] != "-":
+            value = value[3:]  # strip 3-char ISO 4217 currency code
+        try:
+            return Decimal(value)
+        except InvalidOperation:
+            self.fail("invalid")
+
+    def to_representation(self, value):
+        return str(value)
+
+
 class SelectField(serializers.CharField):
-    def __init__(self, custom_field: CustomField):
+    def __init__(self, custom_field: CustomField) -> None:
         self._options = custom_field.extra_data["select_options"]
         super().__init__(max_length=16)
 
@@ -478,9 +546,8 @@ class CustomFieldQueryParser:
         value_field_name = CustomFieldInstance.get_value_field_name(
             custom_field.data_type,
         )
-        if (
-            custom_field.data_type == CustomField.FieldDataType.MONETARY
-            and op in self.EXPR_BY_CATEGORY["arithmetic"]
+        if custom_field.data_type == CustomField.FieldDataType.MONETARY and (
+            op in self.EXPR_BY_CATEGORY["arithmetic"] or op in {"exact", "in"}
         ):
             value_field_name = "value_monetary_amount"
         has_field = Q(custom_fields__field=custom_field)
@@ -590,6 +657,13 @@ class CustomFieldQueryParser:
         elif custom_field.data_type == CustomField.FieldDataType.URL:
             # For URL fields we don't need to be strict about validation (e.g., for istartswith).
             field = serializers.CharField()
+        elif custom_field.data_type == CustomField.FieldDataType.MONETARY and (
+            op in self.EXPR_BY_CATEGORY["arithmetic"] or op in {"exact", "in"}
+        ):
+            # These ops compare against value_monetary_amount (a DecimalField).
+            # MonetaryAmountField accepts both "100" and "USD100.00" for backwards
+            # compatibility with saved views that stored currency-prefixed values.
+            field = MonetaryAmountField()
         else:
             # The general case: inferred from the corresponding field in CustomFieldInstance.
             value_field_name = CustomFieldInstance.get_value_field_name(
@@ -675,7 +749,7 @@ class CustomFieldQueryParser:
 
 @extend_schema_field(serializers.CharField)
 class CustomFieldQueryFilter(Filter):
-    def __init__(self, validation_prefix):
+    def __init__(self, validation_prefix) -> None:
         """
         A filter that filters documents based on custom field name and value.
 
@@ -721,10 +795,17 @@ class DocumentFilterSet(FilterSet):
 
     is_in_inbox = InboxFilter()
 
+    # Deprecated, but keep for now for existing saved views
     title_content = TitleContentFilter()
+
+    content__istartswith = EffectiveContentFilter(lookup_expr="istartswith")
+    content__iendswith = EffectiveContentFilter(lookup_expr="iendswith")
+    content__icontains = EffectiveContentFilter(lookup_expr="icontains")
+    content__iexact = EffectiveContentFilter(lookup_expr="iexact")
 
     owner__id__none = ObjectFilter(field_name="owner", exclude=True)
 
+    # Deprecated, UI no longer includes CF text-search mode, but keep for now for existing saved views
     custom_fields__icontains = CustomFieldsFilter()
 
     custom_fields__id__all = ObjectFilter(field_name="custom_fields__field")
@@ -763,7 +844,6 @@ class DocumentFilterSet(FilterSet):
         fields = {
             "id": ID_KWARGS,
             "title": CHAR_KWARGS,
-            "content": CHAR_KWARGS,
             "archive_serial_number": INT_KWARGS,
             "created": DATE_KWARGS,
             "added": DATETIME_KWARGS,
@@ -796,19 +876,75 @@ class ShareLinkFilterSet(FilterSet):
         }
 
 
+class ShareLinkBundleFilterSet(FilterSet):
+    documents = Filter(method="filter_documents")
+
+    class Meta:
+        model = ShareLinkBundle
+        fields = {
+            "created": DATETIME_KWARGS,
+            "expiration": DATETIME_KWARGS,
+            "status": ["exact"],
+        }
+
+    def filter_documents(self, queryset, name, value):
+        ids = []
+        if value:
+            try:
+                ids = [int(item) for item in value.split(",") if item]
+            except ValueError:
+                return queryset.none()
+        if not ids:
+            return queryset
+        return queryset.filter(documents__in=ids).distinct()
+
+
 class PaperlessTaskFilterSet(FilterSet):
+    task_type = MultipleChoiceFilter(
+        choices=PaperlessTask.TaskType.choices,
+        label="Task Type",
+    )
+
+    trigger_source = MultipleChoiceFilter(
+        choices=PaperlessTask.TriggerSource.choices,
+        label="Trigger Source",
+    )
+
+    status = MultipleChoiceFilter(
+        choices=PaperlessTask.Status.choices,
+        label="Status",
+    )
+
+    is_complete = BooleanFilter(
+        method="filter_is_complete",
+        label="Is Complete",
+    )
+
     acknowledged = BooleanFilter(
         label="Acknowledged",
         field_name="acknowledged",
     )
 
+    date_created_after = DateTimeFilter(
+        field_name="date_created",
+        lookup_expr="gte",
+        label="Created After",
+    )
+
+    date_created_before = DateTimeFilter(
+        field_name="date_created",
+        lookup_expr="lte",
+        label="Created Before",
+    )
+
     class Meta:
         model = PaperlessTask
-        fields = {
-            "type": ["exact"],
-            "task_name": ["exact"],
-            "status": ["exact"],
-        }
+        fields = ["task_type", "trigger_source", "status", "acknowledged", "owner"]
+
+    def filter_is_complete(self, queryset, name, value):
+        if value:
+            return queryset.filter(status__in=PaperlessTask.COMPLETE_STATUSES)
+        return queryset.exclude(status__in=PaperlessTask.COMPLETE_STATUSES)
 
 
 class ObjectOwnedOrGrantedPermissionsFilter(ObjectPermissionsFilter):

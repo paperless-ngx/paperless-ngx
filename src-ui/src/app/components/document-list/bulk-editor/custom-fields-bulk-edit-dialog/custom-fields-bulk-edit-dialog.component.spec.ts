@@ -48,7 +48,7 @@ describe('CustomFieldsBulkEditDialogComponent', () => {
       .mockReturnValue(of('Success'))
     const successSpy = jest.spyOn(component.succeeded, 'emit')
 
-    component.documents = [1, 2]
+    component.selection = [1, 2]
     component.fieldsToAddIds = [1]
     component.form.controls['1'].setValue('Value 1')
     component.save()
@@ -63,7 +63,7 @@ describe('CustomFieldsBulkEditDialogComponent', () => {
       .mockReturnValue(throwError(new Error('Error')))
     const failSpy = jest.spyOn(component.failed, 'emit')
 
-    component.documents = [1, 2]
+    component.selection = [1, 2]
     component.fieldsToAddIds = [1]
     component.form.controls['1'].setValue('Value 1')
     component.save()

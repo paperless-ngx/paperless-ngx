@@ -128,15 +128,15 @@ export interface Document extends ObjectWithPermissions {
   checksum?: string
 
   // UTC
-  created?: Date
+  created?: string // ISO string
 
-  modified?: Date
+  modified?: string // ISO string
 
-  added?: Date
+  added?: string // ISO string
 
   mime_type?: string
 
-  deleted_at?: Date
+  deleted_at?: string // ISO string
 
   original_file_name?: string
 
@@ -159,6 +159,20 @@ export interface Document extends ObjectWithPermissions {
 
   page_count?: number
 
+  duplicate_documents?: Document[]
+
+  // Versioning
+  root_document?: number
+  versions?: DocumentVersionInfo[]
+
   // Frontend only
   __changedFields?: string[]
+}
+
+export interface DocumentVersionInfo {
+  id: number
+  added?: Date
+  version_label?: string
+  checksum?: string
+  is_root: boolean
 }

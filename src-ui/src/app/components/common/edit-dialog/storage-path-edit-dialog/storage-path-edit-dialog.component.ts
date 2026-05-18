@@ -23,7 +23,7 @@ import {
 } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Document } from 'src/app/data/document'
-import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
+import { FILTER_SIMPLE_TITLE } from 'src/app/data/filter-rule-type'
 import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
 import { StoragePath } from 'src/app/data/storage-path'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
@@ -146,7 +146,7 @@ export class StoragePathEditDialogComponent
               null,
               'created',
               true,
-              [{ rule_type: FILTER_TITLE, value: title }],
+              [{ rule_type: FILTER_SIMPLE_TITLE, value: title }],
               { truncate_content: true }
             )
             .pipe(

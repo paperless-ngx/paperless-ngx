@@ -3,28 +3,35 @@ on:
   push:
     branches:
       - dev
+env:
+  DEFAULT_UV_VERSION: "0.11.x"
 jobs:
   generate-translate-strings:
     name: Generate Translation Strings
     runs-on: ubuntu-latest
+    environment: translation-sync
     permissions:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        env:
+          GH_REF: ${{ github.ref }} # sonar rule:githubactions:S7630 - avoid injection
         with:
           token: ${{ secrets.PNGX_BOT_PAT }}
-          ref: ${{ github.head_ref }}
+          ref: ${{ env.GH_REF }}
+          persist-credentials: true # for pushing translation branch
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
       - name: Install system dependencies
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends gettext
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
+          version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
       - name: Install backend python dependencies
         run: |
@@ -32,20 +39,22 @@ jobs:
             --group dev \
             --frozen
       - name: Generate backend translation strings
+        env:
+          PAPERLESS_SECRET_KEY: "ci-translate-not-a-real-secret"
         run: cd src/ && uv run manage.py makemessages -l en_US -i "samples*"
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
         with:
           version: 10
-      - name: Use Node.js 20
-        uses: actions/setup-node@v6
+      - name: Use Node.js 24
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
-          node-version: 20.x
+          node-version: 24.x
           cache: 'pnpm'
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
         id: cache-frontend-deps
-        uses: actions/cache@v4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: |
             ~/.pnpm-store
@@ -61,7 +70,7 @@ jobs:
           cd src-ui
           pnpm run ng extract-i18n
       - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v7
+        uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7.1.0
         with:
           file_pattern: 'src-ui/messages.xlf src/locale/en_US/LC_MESSAGES/django.po'
           commit_message: "Auto translate strings"

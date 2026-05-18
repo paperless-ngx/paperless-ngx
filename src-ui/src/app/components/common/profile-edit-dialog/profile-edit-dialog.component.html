@@ -90,7 +90,7 @@
             <div class="list-group">
               @for (provider of socialAccountProviders; track provider.name) {
                 <a class="list-group-item list-group-item-action text-primary d-flex align-items-center" href="{{ provider.login_url }}" rel="noopener noreferrer">
-                  {{provider.name}}&nbsp;<i-bs class="pb-1 ps-1" name="box-arrow-up-right"></i-bs>
+                  {{provider.name}}<i-bs class="pb-1 ms-2" name="box-arrow-up-right"></i-bs>
                 </a>
               }
             </div>
@@ -139,7 +139,7 @@
           <label class="d-block mb-2" i18n>Two-factor Authentication</label>
           @if (recoveryCodes) {
             <div class="alert alert-warning" role="alert">
-              <i-bs name="exclamation-triangle"></i-bs>&nbsp;<ng-container i18n>Recovery codes will not be shown again, make sure to save them.</ng-container>
+              <i-bs name="exclamation-triangle" class="me-1"></i-bs><ng-container i18n>Recovery codes will not be shown again, make sure to save them.</ng-container>
             </div>
             <div class="d-flex flex-row align-items-start mb-3">
               <ul class="list-group w-50">
@@ -156,12 +156,10 @@
               </ul>
               <button type="button" class="btn btn-sm btn-outline-secondary ms-2" (click)="copyRecoveryCodes()" i18n-title title="Copy">
                 @if (!codesCopied) {
-                  <i-bs width="1em" height="1em" name="clipboard-fill"></i-bs>
-                  &nbsp;<span i18n>Copy codes</span>
+                  <i-bs width="1em" height="1em" name="clipboard-fill" class="me-1"></i-bs><span i18n>Copy codes</span>
                 }
                 @if (codesCopied) {
-                  <i-bs width="1em" height="1em" name="clipboard-check-fill" class="text-primary"></i-bs>
-                  &nbsp;<span class="text-primary" i18n>Copied!</span>
+                  <i-bs width="1em" height="1em" name="clipboard-check-fill" class="text-primary me-1"></i-bs><span class="text-primary" i18n>Copied!</span>
                 }
               </button>
             </div>

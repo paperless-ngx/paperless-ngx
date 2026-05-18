@@ -11,16 +11,16 @@ export enum OutputTypeConfig {
 }
 
 export enum ModeConfig {
-  SKIP = 'skip',
-  REDO = 'redo',
+  AUTO = 'auto',
   FORCE = 'force',
-  SKIP_NO_ARCHIVE = 'skip_noarchive',
+  REDO = 'redo',
+  OFF = 'off',
 }
 
 export enum ArchiveFileConfig {
-  NEVER = 'never',
-  WITH_TEXT = 'with_text',
+  AUTO = 'auto',
   ALWAYS = 'always',
+  NEVER = 'never',
 }
 
 export enum CleanConfig {
@@ -44,12 +44,25 @@ export enum ConfigOptionType {
   Boolean = 'boolean',
   JSON = 'json',
   File = 'file',
+  Password = 'password',
 }
 
 export const ConfigCategory = {
   General: $localize`General Settings`,
   OCR: $localize`OCR Settings`,
   Barcode: $localize`Barcode Settings`,
+  AI: $localize`AI Settings`,
+}
+
+export const LLMEmbeddingBackendConfig = {
+  OPENAI_LIKE: 'openai-like',
+  HUGGINGFACE: 'huggingface',
+  OLLAMA: 'ollama',
+}
+
+export const LLMBackendConfig = {
+  OPENAI_LIKE: 'openai-like',
+  OLLAMA: 'ollama',
 }
 
 export interface ConfigOption {
@@ -59,6 +72,7 @@ export interface ConfigOption {
   choices?: Array<{ id: string; name: string }>
   config_key?: string
   category: string
+  note?: string
 }
 
 function mapToItems(enumObj: Object): Array<{ id: string; name: string }> {
@@ -102,11 +116,11 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     category: ConfigCategory.OCR,
   },
   {
-    key: 'skip_archive_file',
-    title: $localize`Skip Archive File`,
+    key: 'archive_file_generation',
+    title: $localize`Archive File Generation`,
     type: ConfigOptionType.Select,
     choices: mapToItems(ArchiveFileConfig),
-    config_key: 'PAPERLESS_OCR_SKIP_ARCHIVE_FILE',
+    config_key: 'PAPERLESS_ARCHIVE_FILE_GENERATION',
     category: ConfigCategory.OCR,
   },
   {
@@ -258,6 +272,72 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     config_key: 'PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING',
     category: ConfigCategory.Barcode,
   },
+  {
+    key: 'barcode_tag_split',
+    title: $localize`Split on Tag Barcodes`,
+    type: ConfigOptionType.Boolean,
+    config_key: 'PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT',
+    category: ConfigCategory.Barcode,
+  },
+  {
+    key: 'ai_enabled',
+    title: $localize`AI Enabled`,
+    type: ConfigOptionType.Boolean,
+    config_key: 'PAPERLESS_AI_ENABLED',
+    category: ConfigCategory.AI,
+    note: $localize`Consider privacy implications when enabling AI features, especially if using a remote model.`,
+  },
+  {
+    key: 'llm_embedding_backend',
+    title: $localize`LLM Embedding Backend`,
+    type: ConfigOptionType.Select,
+    choices: mapToItems(LLMEmbeddingBackendConfig),
+    config_key: 'PAPERLESS_AI_LLM_EMBEDDING_BACKEND',
+    category: ConfigCategory.AI,
+  },
+  {
+    key: 'llm_embedding_model',
+    title: $localize`LLM Embedding Model`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_AI_LLM_EMBEDDING_MODEL',
+    category: ConfigCategory.AI,
+  },
+  {
+    key: 'llm_embedding_endpoint',
+    title: $localize`LLM Embedding Endpoint`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_AI_LLM_EMBEDDING_ENDPOINT',
+    category: ConfigCategory.AI,
+  },
+  {
+    key: 'llm_backend',
+    title: $localize`LLM Backend`,
+    type: ConfigOptionType.Select,
+    choices: mapToItems(LLMBackendConfig),
+    config_key: 'PAPERLESS_AI_LLM_BACKEND',
+    category: ConfigCategory.AI,
+  },
+  {
+    key: 'llm_model',
+    title: $localize`LLM Model`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_AI_LLM_MODEL',
+    category: ConfigCategory.AI,
+  },
+  {
+    key: 'llm_api_key',
+    title: $localize`LLM API Key`,
+    type: ConfigOptionType.Password,
+    config_key: 'PAPERLESS_AI_LLM_API_KEY',
+    category: ConfigCategory.AI,
+  },
+  {
+    key: 'llm_endpoint',
+    title: $localize`LLM Endpoint`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_AI_LLM_ENDPOINT',
+    category: ConfigCategory.AI,
+  },
 ]
 
 export interface PaperlessConfig extends ObjectWithId {
@@ -265,7 +345,7 @@ export interface PaperlessConfig extends ObjectWithId {
   pages: number
   language: string
   mode: ModeConfig
-  skip_archive_file: ArchiveFileConfig
+  archive_file_generation: ArchiveFileConfig
   image_dpi: number
   unpaper_clean: CleanConfig
   deskew: boolean
@@ -287,4 +367,13 @@ export interface PaperlessConfig extends ObjectWithId {
   barcode_max_pages: number
   barcode_enable_tag: boolean
   barcode_tag_mapping: object
+  barcode_tag_split: boolean
+  ai_enabled: boolean
+  llm_embedding_backend: string
+  llm_embedding_model: string
+  llm_embedding_endpoint: string
+  llm_backend: string
+  llm_model: string
+  llm_api_key: string
+  llm_endpoint: string
 }

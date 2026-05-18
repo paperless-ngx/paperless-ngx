@@ -1,0 +1,30 @@
+// hide caret on mobile dropdown
+.d-block.d-sm-none .dropdown-toggle::after {
+    display: none;
+}
+
+tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+.form-check {
+    min-height: 0;
+}
+
+td.name-cell {
+    padding-left: calc(calc(var(--depth) - 1) * 1.1rem);
+
+    .indicator {
+        display: inline-block;
+        width: .8rem;
+        height: .8rem;
+        border-left: 1px solid var(--bs-secondary);
+        border-bottom: 1px solid var(--bs-secondary);
+        margin-right: .25rem;
+        margin-left: .5rem;
+    }
+}
+
+select.small {
+    font-size: 0.875rem !important; // 14px
+}

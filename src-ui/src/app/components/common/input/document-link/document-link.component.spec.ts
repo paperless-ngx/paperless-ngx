@@ -3,7 +3,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
 import { of, throwError } from 'rxjs'
-import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
+import { FILTER_SIMPLE_TITLE } from 'src/app/data/filter-rule-type'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { DocumentLinkComponent } from './document-link.component'
 
@@ -99,7 +99,7 @@ describe('DocumentLinkComponent', () => {
       null,
       'created',
       true,
-      [{ rule_type: FILTER_TITLE, value: 'bar' }],
+      [{ rule_type: FILTER_SIMPLE_TITLE, value: 'bar' }],
       { truncate_content: true }
     )
     listSpy.mockReturnValueOnce(throwError(() => new Error()))

@@ -1,0 +1,50 @@
+name: Static Analysis
+on:
+  push:
+    branches-ignore:
+      - 'translations**'
+  pull_request:
+    branches-ignore:
+      - 'translations**'
+  workflow_dispatch:
+concurrency:
+  group: static-analysis-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  zizmor:
+    name: Run zizmor
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@b1d7e1fb5de872772f31590499237e7cce841e8e # v0.5.3
+  semgrep:
+    name: Semgrep CE
+    runs-on: ubuntu-24.04
+    container:
+      image: semgrep/semgrep:1.155.0@sha256:cc869c685dcc0fe497c86258da9f205397d8108e56d21a86082ea4886e52784d
+    if: github.actor != 'dependabot[bot]'
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Run Semgrep
+        run: semgrep scan --config auto --sarif-output results.sarif
+      - name: Upload results to GitHub code scanning
+        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2
+        if: always()
+        with:
+          sarif_file: results.sarif

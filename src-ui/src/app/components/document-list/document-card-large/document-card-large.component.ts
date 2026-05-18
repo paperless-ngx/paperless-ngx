@@ -164,6 +164,17 @@ export class DocumentCardLargeComponent
     )
   }
 
+  get hasSearchHighlights() {
+    return Boolean(this.document?.__search_hit__?.highlights?.trim()?.length)
+  }
+
+  get shouldShowContentFallback() {
+    return (
+      this.document?.__search_hit__?.score == null ||
+      (!this.hasSearchHighlights && this.searchNoteHighlights.length === 0)
+    )
+  }
+
   get notesEnabled(): boolean {
     return this.settingsService.get(SETTINGS_KEYS.NOTES_ENABLED)
   }

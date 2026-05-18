@@ -25,7 +25,7 @@ import {
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject, of, throwError } from 'rxjs'
-import { PaperlessTaskName } from 'src/app/data/paperless-task'
+import { PaperlessTaskType } from 'src/app/data/paperless-task'
 import {
   InstallType,
   SystemStatus,
@@ -68,6 +68,16 @@ const status: SystemStatus = {
     sanity_check_status: SystemStatusItemStatus.OK,
     sanity_check_last_run: new Date().toISOString(),
     sanity_check_error: null,
+    llmindex_status: SystemStatusItemStatus.OK,
+    llmindex_last_modified: new Date().toISOString(),
+    llmindex_error: null,
+    summary: {
+      days: 30,
+      total_count: 12,
+      pending_count: 1,
+      success_count: 10,
+      failure_count: 1,
+    },
   },
 }
 
@@ -135,9 +145,9 @@ describe('SystemStatusDialogComponent', () => {
   })
 
   it('should check if task is running', () => {
-    component.runTask(PaperlessTaskName.IndexOptimize)
-    expect(component.isRunning(PaperlessTaskName.IndexOptimize)).toBeTruthy()
-    expect(component.isRunning(PaperlessTaskName.SanityCheck)).toBeFalsy()
+    component.runTask(PaperlessTaskType.SanityCheck)
+    expect(component.isRunning(PaperlessTaskType.SanityCheck)).toBeTruthy()
+    expect(component.isRunning(PaperlessTaskType.TrainClassifier)).toBeFalsy()
   })
 
   it('should support running tasks, refresh status and show toasts', () => {
@@ -148,22 +158,22 @@ describe('SystemStatusDialogComponent', () => {
 
     // fail first
     runSpy.mockReturnValue(throwError(() => new Error('error')))
-    component.runTask(PaperlessTaskName.IndexOptimize)
-    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskName.IndexOptimize)
+    component.runTask(PaperlessTaskType.SanityCheck)
+    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskType.SanityCheck)
     expect(toastErrorSpy).toHaveBeenCalledWith(
-      `Failed to start task ${PaperlessTaskName.IndexOptimize}, see the logs for more details`,
+      `Failed to start task ${PaperlessTaskType.SanityCheck}, see the logs for more details`,
       expect.any(Error)
     )
 
     // succeed
     runSpy.mockReturnValue(of({}))
     getStatusSpy.mockReturnValue(of(status))
-    component.runTask(PaperlessTaskName.IndexOptimize)
-    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskName.IndexOptimize)
+    component.runTask(PaperlessTaskType.SanityCheck)
+    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskType.SanityCheck)
 
     expect(getStatusSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith(
-      `Task ${PaperlessTaskName.IndexOptimize} started`
+      `Task ${PaperlessTaskType.SanityCheck} started`
     )
   })
 

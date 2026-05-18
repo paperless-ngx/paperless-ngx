@@ -14,42 +14,42 @@ for finding and managing your documents.
 Paperless essentially consists of two different parts for managing your
 documents:
 
--   The _consumer_ watches a specified folder and adds all documents in
-    that folder to paperless.
--   The _web server_ (web UI) provides a UI that you use to manage and
-    search documents.
+- The _consumer_ watches a specified folder and adds all documents in
+  that folder to paperless.
+- The _web server_ (web UI) provides a UI that you use to manage and
+  search documents.
 
 Each document has data fields that you can assign to them:
 
--   A _Document_ is a piece of paper that sometimes contains valuable
-    information.
--   The _correspondent_ of a document is the person, institution or
-    company that a document either originates from, or is sent to.
--   A _tag_ is a label that you can assign to documents. Think of labels
-    as more powerful folders: Multiple documents can be grouped together
-    with a single tag, however, a single document can also have multiple
-    tags. This is not possible with folders. The reason folders are not
-    implemented in paperless is simply that tags are much more versatile
-    than folders.
--   A _document type_ is used to demarcate the type of a document such
-    as letter, bank statement, invoice, contract, etc. It is used to
-    identify what a document is about.
--   The document _storage path_ is the location where the document files
-    are stored. See [Storage Paths](advanced_usage.md#storage-paths) for
-    more information.
--   The _date added_ of a document is the date the document was scanned
-    into paperless. You cannot and should not change this date.
--   The _date created_ of a document is the date the document was
-    initially issued. This can be the date you bought a product, the
-    date you signed a contract, or the date a letter was sent to you.
--   The _archive serial number_ (short: ASN) of a document is the
-    identifier of the document in your physical document binders. See
-    [recommended workflow](#usage-recommended-workflow) below.
--   The _content_ of a document is the text that was OCR'ed from the
-    document. This text is fed into the search engine and is used for
-    matching tags, correspondents and document types.
--   Paperless-ngx also supports _custom fields_ which can be used to
-    store additional metadata about a document.
+- A _Document_ is a piece of paper that sometimes contains valuable
+  information.
+- The _correspondent_ of a document is the person, institution or
+  company that a document either originates from, or is sent to.
+- A _tag_ is a label that you can assign to documents. Think of labels
+  as more powerful folders: Multiple documents can be grouped together
+  with a single tag, however, a single document can also have multiple
+  tags. This is not possible with folders. The reason folders are not
+  implemented in paperless is simply that tags are much more versatile
+  than folders.
+- A _document type_ is used to demarcate the type of a document such
+  as letter, bank statement, invoice, contract, etc. It is used to
+  identify what a document is about.
+- The document _storage path_ is the location where the document files
+  are stored. See [Storage Paths](advanced_usage.md#storage-paths) for
+  more information.
+- The _date added_ of a document is the date the document was scanned
+  into paperless. You cannot and should not change this date.
+- The _date created_ of a document is the date the document was
+  initially issued. This can be the date you bought a product, the
+  date you signed a contract, or the date a letter was sent to you.
+- The _archive serial number_ (short: ASN) of a document is the
+  identifier of the document in your physical document binders. See
+  [recommended workflow](#usage-recommended-workflow) below.
+- The _content_ of a document is the text that was OCR'ed from the
+  document. This text is fed into the search engine and is used for
+  matching tags, correspondents and document types.
+- Paperless-ngx also supports _custom fields_ which can be used to
+  store additional metadata about a document.
 
 ## The Web UI
 
@@ -89,6 +89,17 @@ You can view the document, edit its metadata, assign tags, correspondents,
 document types, and custom fields. You can also view the document history,
 download the document or share it via a share link.
 
+### Document File Versions
+
+Think of versions as **file history** for a document.
+
+- Versions track the underlying file and extracted text content (OCR/text).
+- Metadata such as tags, correspondent, document type, storage path and custom fields stay on the "root" document.
+- Version files follow normal filename formatting (including storage paths) and add a `_vN` suffix (for example `_v1`, `_v2`).
+- By default, search and document content use the latest version.
+- In document detail, selecting a version switches the preview, file metadata and content (and download etc buttons) to that version.
+- Deleting a non-root version keeps metadata and falls back to the latest remaining version.
+
 ### Management Lists
 
 Paperless-ngx includes management lists for tags, correspondents, document types
@@ -123,9 +134,9 @@ following operations on your documents:
 !!! tip
 
     This process can be configured to fit your needs. If you don't want
-    paperless to create archived versions for digital documents, you can
-    configure that by configuring
-    `PAPERLESS_OCR_SKIP_ARCHIVE_FILE=with_text`. Please read the
+    paperless to create archived versions for born-digital documents, set
+    [`PAPERLESS_ARCHIVE_FILE_GENERATION=auto`](configuration.md#PAPERLESS_ARCHIVE_FILE_GENERATION)
+    (the default). To skip archives entirely, use `never`. Please read the
     [relevant section in the documentation](configuration.md#ocr).
 
 !!! note
@@ -207,21 +218,20 @@ patterns can include wildcards and multiple patterns separated by a comma.
 The actions all ensure that the same mail is not consumed twice by
 different means. These are as follows:
 
--   **Delete:** Immediately deletes mail that paperless has consumed
-    documents from. Use with caution.
--   **Mark as read:** Mark consumed mail as read. Paperless will not
-    consume documents from already read mails. If you read a mail before
-    paperless sees it, it will be ignored.
--   **Flag:** Sets the 'important' flag on mails with consumed
-    documents. Paperless will not consume flagged mails.
--   **Move to folder:** Moves consumed mails out of the way so that
-    paperless won't consume them again.
--   **Add custom Tag:** Adds a custom tag to mails with consumed
-    documents (the IMAP standard calls these "keywords"). Paperless
-    will not consume mails already tagged. Not all mail servers support
-    this feature!
-
-    -   **Apple Mail support:** Apple Mail clients allow differently colored tags. For this to work use `apple:<color>` (e.g. _apple:green_) as a custom tag. Available colors are _red_, _orange_, _yellow_, _blue_, _green_, _violet_ and _grey_.
+- **Delete:** Immediately deletes mail that paperless has consumed
+  documents from. Use with caution.
+- **Mark as read:** Mark consumed mail as read. Paperless will not
+  consume documents from already read mails. If you read a mail before
+  paperless sees it, it will be ignored.
+- **Flag:** Sets the 'important' flag on mails with consumed
+  documents. Paperless will not consume flagged mails.
+- **Move to folder:** Moves consumed mails out of the way so that
+  paperless won't consume them again.
+- **Add custom Tag:** Adds a custom tag to mails with consumed
+  documents (the IMAP standard calls these "keywords"). Paperless
+  will not consume mails already tagged. Not all mail servers support
+  this feature!
+  - **Apple Mail support:** Apple Mail clients allow differently colored tags. For this to work use `apple:<color>` (e.g. _apple:green_) as a custom tag. Available colors are _red_, _orange_, _yellow_, _blue_, _green_, _violet_ and _grey_.
 
 !!! warning
 
@@ -282,6 +292,34 @@ Once setup, navigating to the email settings page in Paperless-ngx will allow yo
 You can also submit a document using the REST API, see [POSTing documents](api.md#file-uploads)
 for details.
 
+## Document Suggestions
+
+Paperless-ngx can suggest tags, correspondents, document types and storage paths for documents based on the content of the document. This is done using a (non-LLM) machine learning model that is trained on the documents in your database. The suggestions are shown in the document detail page and can be accepted or rejected by the user.
+
+## AI Features
+
+Paperless-ngx includes several features that use AI to enhance the document management experience. These features are optional and can be enabled or disabled in the settings. If you are using the AI features, you may want to also enable the "LLM index" feature, which supports Retrieval-Augmented Generation (RAG) designed to improve the quality of AI responses. The LLM index feature is not enabled by default and requires additional configuration.
+
+!!! warning
+
+    Remember that Paperless-ngx will send document content to the AI provider you have configured,
+    so consider the privacy implications of using these features, especially if using a remote
+    model or API provider instead of the default local model.
+
+The AI features work by creating an embedding of the text content and metadata of documents, which is then used for various tasks such as similarity search and question answering. This uses the FAISS vector store.
+
+### AI-Enhanced Suggestions
+
+If enabled, Paperless-ngx can use an AI LLM model to suggest document titles, dates, tags,
+correspondents and document types for documents. This feature will always be "opt-in" and does not
+disable the existing classifier-based suggestion system. Currently, both remote
+(via OpenAI-compatible APIs) and local (via Ollama) models are supported, see
+[configuration](configuration.md#ai) for details.
+
+### Document Chat
+
+Paperless-ngx can use an AI LLM model to answer questions about a document or across multiple documents. Again, this feature works best when RAG is enabled. The chat feature is available in the upper app toolbar and will switch between chatting across multiple documents or a single document based on the current view.
+
 ## Sharing documents from Paperless-ngx
 
 Paperless-ngx supports sharing documents with other users by assigning them [permissions](#object-permissions)
@@ -290,12 +328,14 @@ or using [email](#workflow-action-email) or [webhook](#workflow-action-webhook) 
 
 ### Share Links
 
-"Share links" are shareable public links to files and can be created and managed under the 'Send' button on the document detail screen.
+"Share links" are public links to files (or an archive of files) and can be created and managed under the 'Send' button on the document detail screen or from the bulk editor.
 
--   Share links do not require a user to login and thus link directly to a file.
--   Links are unique and are of the form `{paperless-url}/share/{randomly-generated-slug}`.
--   Links can optionally have an expiration time set.
--   After a link expires or is deleted users will be redirected to the regular paperless-ngx login.
+- Share links do not require a user to login and thus link directly to a file or bundled download.
+- Links are unique and are of the form `{paperless-url}/share/{randomly-generated-slug}`.
+- Links can optionally have an expiration time set.
+- After a link expires or is deleted users will be redirected to the regular paperless-ngx login.
+- From the document detail screen you can create a share link for that single document.
+- From the bulk editor you can create a **share link bundle** for any selection. Paperless-ngx prepares a ZIP archive in the background and exposes a single share link. You can revisit the "Manage share link bundles" dialog to monitor progress, retry failed bundles, or delete links.
 
 !!! tip
 
@@ -364,25 +404,27 @@ Global permissions define what areas of the app and API endpoints users can acce
 determine if a user can create, edit, delete or view _any_ documents, but individual documents themselves
 still have "object-level" permissions.
 
-| Type          | Details                                                                                                                                                                                                                         |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| AppConfig     | _Change_ or higher permissions grants access to the "Application Configuration" area.                                                                                                                                           |
-| Correspondent | Add, edit, delete or view Correspondents.                                                                                                                                                                                       |
-| CustomField   | Add, edit, delete or view Custom Fields.                                                                                                                                                                                        |
-| Document      | Add, edit, delete or view Documents.                                                                                                                                                                                            |
-| DocumentType  | Add, edit, delete or view Document Types.                                                                                                                                                                                       |
-| Group         | Add, edit, delete or view Groups.                                                                                                                                                                                               |
-| MailAccount   | Add, edit, delete or view Mail Accounts.                                                                                                                                                                                        |
-| MailRule      | Add, edit, delete or view Mail Rules.                                                                                                                                                                                           |
-| Note          | Add, edit, delete or view Notes.                                                                                                                                                                                                |
-| PaperlessTask | View or dismiss (_Change_) File Tasks.                                                                                                                                                                                          |
-| SavedView     | Add, edit, delete or view Saved Views.                                                                                                                                                                                          |
-| ShareLink     | Add, delete or view Share Links.                                                                                                                                                                                                |
-| StoragePath   | Add, edit, delete or view Storage Paths.                                                                                                                                                                                        |
-| Tag           | Add, edit, delete or view Tags.                                                                                                                                                                                                 |
-| UISettings    | Add, edit, delete or view the UI settings that are used by the web app.<br/>:warning: **Users that will access the web UI must be granted at least _View_ permissions.**                                                        |
-| User          | Add, edit, delete or view other user accounts via Settings > Users & Groups and `/api/users/`. These permissions are not needed for users to edit their own profile via "My Profile" or `/api/profile/`.                        |
-| Workflow      | Add, edit, delete or view Workflows.<br/>Note that Workflows are global; all users who can access workflows see the same set. Workflows have other permission implications — see [Workflow permissions](#workflow-permissions). |
+| Type             | Details                                                                                                                                                                                                                         |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AppConfig        | _Change_ or higher permissions grants access to the "Application Configuration" area.                                                                                                                                           |
+| Correspondent    | Add, edit, delete or view Correspondents.                                                                                                                                                                                       |
+| CustomField      | Add, edit, delete or view Custom Fields.                                                                                                                                                                                        |
+| Document         | Add, edit, delete or view Documents.                                                                                                                                                                                            |
+| DocumentType     | Add, edit, delete or view Document Types.                                                                                                                                                                                       |
+| Group            | Add, edit, delete or view Groups.                                                                                                                                                                                               |
+| GlobalStatistics | View aggregate object counts and statistics. This does not grant access to view individual documents.                                                                                                                           |
+| MailAccount      | Add, edit, delete or view Mail Accounts.                                                                                                                                                                                        |
+| MailRule         | Add, edit, delete or view Mail Rules.                                                                                                                                                                                           |
+| Note             | Add, edit, delete or view Notes.                                                                                                                                                                                                |
+| PaperlessTask    | View or dismiss (_Change_) File Tasks.                                                                                                                                                                                          |
+| SavedView        | Add, edit, delete or view Saved Views.                                                                                                                                                                                          |
+| ShareLink        | Add, delete or view Share Links.                                                                                                                                                                                                |
+| StoragePath      | Add, edit, delete or view Storage Paths.                                                                                                                                                                                        |
+| SystemMonitoring | View the system status dialog, tasks summary and their API endpoints. Admin users also retain system status access.                                                                                                             |
+| Tag              | Add, edit, delete or view Tags.                                                                                                                                                                                                 |
+| UISettings       | Add, edit, delete or view the UI settings that are used by the web app.<br/>:warning: **Users that will access the web UI must be granted at least _View_ permissions.**                                                        |
+| User             | Add, edit, delete or view other user accounts via Settings > Users & Groups and `/api/users/`. These permissions are not needed for users to edit their own profile via "My Profile" or `/api/profile/`.                        |
+| Workflow         | Add, edit, delete or view Workflows.<br/>Note that Workflows are global; all users who can access workflows see the same set. Workflows have other permission implications — see [Workflow permissions](#workflow-permissions). |
 
 #### Detailed Explanation of Object Permissions {#object-permissions}
 
@@ -481,25 +523,25 @@ flowchart TD
 
 Workflows allow you to filter by:
 
--   Source, e.g. documents uploaded via consume folder, API (& the web UI) and mail fetch
--   File name, including wildcards e.g. \*.pdf will apply to all pdfs.
--   File path, including wildcards. Note that enabling `PAPERLESS_CONSUMER_RECURSIVE` would allow, for
-    example, automatically assigning documents to different owners based on the upload directory.
--   Mail rule. Choosing this option will force 'mail fetch' to be the workflow source.
--   Content matching (`Added`, `Updated` and `Scheduled` triggers only). Filter document content using the matching settings.
+- Source, e.g. documents uploaded via consume folder, API (& the web UI) and mail fetch
+- File name, including wildcards e.g. \*.pdf will apply to all pdfs.
+- File path, including wildcards. Note that enabling `PAPERLESS_CONSUMER_RECURSIVE` would allow, for
+  example, automatically assigning documents to different owners based on the upload directory.
+- Mail rule. Choosing this option will force 'mail fetch' to be the workflow source.
+- Content matching (`Added`, `Updated` and `Scheduled` triggers only). Filter document content using the matching settings.
 
 There are also 'advanced' filters available for `Added`, `Updated` and `Scheduled` triggers:
 
--   Any Tags: Filter for documents with any of the specified tags.
--   All Tags: Filter for documents with all of the specified tags.
--   No Tags: Filter for documents with none of the specified tags.
--   Document type: Filter documents with this document type.
--   Not Document types: Filter documents without any of these document types.
--   Correspondent: Filter documents with this correspondent.
--   Not Correspondents: Filter documents without any of these correspondents.
--   Storage path: Filter documents with this storage path.
--   Not Storage paths: Filter documents without any of these storage paths.
--   Custom field query: Filter documents with a custom field query (the same as used for the document list filters).
+- Any Tags: Filter for documents with any of the specified tags.
+- All Tags: Filter for documents with all of the specified tags.
+- No Tags: Filter for documents with none of the specified tags.
+- Document type: Filter documents with this document type.
+- Not Document types: Filter documents without any of these document types.
+- Correspondent: Filter documents with this correspondent.
+- Not Correspondents: Filter documents without any of these correspondents.
+- Storage path: Filter documents with this storage path.
+- Not Storage paths: Filter documents without any of these storage paths.
+- Custom field query: Filter documents with a custom field query (the same as used for the document list filters).
 
 ### Workflow Actions
 
@@ -511,81 +553,94 @@ The following workflow action types are available:
 
 "Assignment" actions can assign:
 
--   Title, see [workflow placeholders](usage.md#workflow-placeholders) below
--   Tags, correspondent, document type and storage path
--   Document owner
--   View and / or edit permissions to users or groups
--   Custom fields. Note that no value for the field will be set
+- Title, see [workflow placeholders](usage.md#workflow-placeholders) below
+- Tags, correspondent, document type and storage path
+- Document owner
+- View and / or edit permissions to users or groups
+- Custom fields. Note that no value for the field will be set
 
 ##### Removal {#workflow-action-removal}
 
 "Removal" actions can remove either all of or specific sets of the following:
 
--   Tags, correspondents, document types or storage paths
--   Document owner
--   View and / or edit permissions
--   Custom fields
+- Tags, correspondents, document types or storage paths
+- Document owner
+- View and / or edit permissions
+- Custom fields
 
 ##### Email {#workflow-action-email}
 
 "Email" actions can send documents via email. This action requires a mail server to be [configured](configuration.md#email-sending). You can specify:
 
--   The recipient email address(es) separated by commas
--   The subject and body of the email, which can include placeholders, see [placeholders](usage.md#workflow-placeholders) below
--   Whether to include the document as an attachment
+- The recipient email address(es) separated by commas
+- The subject and body of the email, which can include placeholders, see [placeholders](usage.md#workflow-placeholders) below
+- Whether to include the document as an attachment
 
 ##### Webhook {#workflow-action-webhook}
 
 "Webhook" actions send a POST request to a specified URL. You can specify:
 
--   The URL to send the request to
--   The request body as text or as key-value pairs, which can include placeholders, see [placeholders](usage.md#workflow-placeholders) below.
--   Encoding for the request body, either JSON or form data
--   The request headers as key-value pairs
+- The URL to send the request to
+- The request body as text or as key-value pairs, which can include placeholders, see [placeholders](usage.md#workflow-placeholders) below.
+- Encoding for the request body, either JSON or form data
+- The request headers as key-value pairs
 
 For security reasons, webhooks can be limited to specific ports and disallowed from connecting to local URLs. See the relevant
 [configuration settings](configuration.md#workflow-webhooks) to change this behavior. If you are allowing non-admins to create workflows,
 you may want to adjust these settings to prevent abuse.
 
+##### Move to Trash {#workflow-action-move-to-trash}
+
+"Move to Trash" actions move the document to the trash. The document can be restored
+from the trash until the trash is emptied (after the configured delay or manually).
+
+The "Move to Trash" action will always be executed at the end of the workflow run,
+regardless of its position in the action list. After a "Move to Trash" action is executed
+no other workflow will be executed on the document.
+
+If a "Move to Trash" action is executed in a consume pipeline, the consumption
+will be aborted and the file will be deleted.
+
 #### Workflow placeholders
 
-Titles can be assigned by workflows using [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/templates/).
-This allows for complex logic to be used to generate the title, including [logical structures](https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-control-structures)
+Titles and webhook payloads can be generated by workflows using [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/templates/).
+This allows for complex logic to be used, including [logical structures](https://jinja.palletsprojects.com/en/3.1.x/templates/#list-of-control-structures)
 and [filters](https://jinja.palletsprojects.com/en/3.1.x/templates/#id11).
 The template is provided as a string.
 
-Using Jinja2 Templates is also useful for [Date localization](advanced_usage.md#Date-Localization) in the title.
+Using Jinja2 Templates is also useful for [Date localization](advanced_usage.md#date-localization) in the title.
 
 The available inputs differ depending on the type of workflow trigger.
 This is because at the time of consumption (when the text is to be set), no automatic tags etc. have been
 applied. You can use the following placeholders in the template with any trigger type:
 
--   `{{correspondent}}`: assigned correspondent name
--   `{{document_type}}`: assigned document type name
--   `{{owner_username}}`: assigned owner username
--   `{{added}}`: added datetime
--   `{{added_year}}`: added year
--   `{{added_year_short}}`: added year
--   `{{added_month}}`: added month
--   `{{added_month_name}}`: added month name
--   `{{added_month_name_short}}`: added month short name
--   `{{added_day}}`: added day
--   `{{added_time}}`: added time in HH:MM format
--   `{{original_filename}}`: original file name without extension
--   `{{filename}}`: current file name without extension (for "added" workflows this may not be final yet, you can use `{{original_filename}}`)
--   `{{doc_title}}`: current document title
+- `{{correspondent}}`: assigned correspondent name
+- `{{document_type}}`: assigned document type name
+- `{{owner_username}}`: assigned owner username
+- `{{added}}`: added datetime
+- `{{added_year}}`: added year
+- `{{added_year_short}}`: added year
+- `{{added_month}}`: added month
+- `{{added_month_name}}`: added month name
+- `{{added_month_name_short}}`: added month short name
+- `{{added_day}}`: added day
+- `{{added_time}}`: added time in HH:MM format
+- `{{original_filename}}`: original file name without extension
+- `{{filename}}`: current file name without extension (for "added" workflows this may not be final yet, you can use `{{original_filename}}`)
+- `{{doc_title}}`: current document title (cannot be used in title assignment)
 
 The following placeholders are only available for "added" or "updated" triggers
 
--   `{{created}}`: created datetime
--   `{{created_year}}`: created year
--   `{{created_year_short}}`: created year
--   `{{created_month}}`: created month
--   `{{created_month_name}}`: created month name
--   `{created_month_name_short}}`: created month short name
--   `{{created_day}}`: created day
--   `{{created_time}}`: created time in HH:MM format
--   `{{doc_url}}`: URL to the document in the web UI. Requires the `PAPERLESS_URL` setting to be set.
+- `{{created}}`: created datetime
+- `{{created_year}}`: created year
+- `{{created_year_short}}`: created year
+- `{{created_month}}`: created month
+- `{{created_month_name}}`: created month name
+- `{{created_month_name_short}}`: created month short name
+- `{{created_day}}`: created day
+- `{{created_time}}`: created time in HH:MM format
+- `{{doc_url}}`: URL to the document in the web UI. Requires the `PAPERLESS_URL` setting to be set.
+- `{{doc_id}}`: Document ID
 
 ##### Examples
 
@@ -630,26 +685,26 @@ Multiple fields may be attached to a document but the same field name cannot be 
 
 The following custom field types are supported:
 
--   `Text`: any text
--   `Boolean`: true / false (check / unchecked) field
--   `Date`: date
--   `URL`: a valid url
--   `Integer`: integer number e.g. 12
--   `Number`: float number e.g. 12.3456
--   `Monetary`: [ISO 4217 currency code](https://en.wikipedia.org/wiki/ISO_4217#List_of_ISO_4217_currency_codes) and a number with exactly two decimals, e.g. USD12.30
--   `Document Link`: reference(s) to other document(s) displayed as links, automatically creates a symmetrical link in reverse
--   `Select`: a pre-defined list of strings from which the user can choose
+- `Text`: any text
+- `Boolean`: true / false (check / unchecked) field
+- `Date`: date
+- `URL`: a valid url
+- `Integer`: integer number e.g. 12
+- `Number`: float number e.g. 12.3456
+- `Monetary`: [ISO 4217 currency code](https://en.wikipedia.org/wiki/ISO_4217#List_of_ISO_4217_currency_codes) and a number with exactly two decimals, e.g. USD12.30
+- `Document Link`: reference(s) to other document(s) displayed as links, automatically creates a symmetrical link in reverse
+- `Select`: a pre-defined list of strings from which the user can choose
 
 ## PDF Actions
 
 Paperless-ngx supports basic editing operations for PDFs (these operations currently cannot be performed on non-PDF files). When viewing an individual document you can
 open the 'PDF Editor' to use a simple UI for re-arranging, rotating, deleting pages and splitting documents.
 
--   Merging documents: available when selecting multiple documents for 'bulk editing'.
--   Rotating documents: available when selecting multiple documents for 'bulk editing' and via the pdf editor on an individual document's details page.
--   Splitting documents: via the pdf editor on an individual document's details page.
--   Deleting pages: via the pdf editor on an individual document's details page.
--   Re-arranging pages: via the pdf editor on an individual document's details page.
+- Merging documents: available when selecting multiple documents for 'bulk editing'.
+- Rotating documents: available when selecting multiple documents for 'bulk editing' and via the pdf editor on an individual document's details page.
+- Splitting documents: via the pdf editor on an individual document's details page.
+- Deleting pages: via the pdf editor on an individual document's details page.
+- Re-arranging pages: via the pdf editor on an individual document's details page.
 
 !!! important
 
@@ -727,18 +782,18 @@ the system.
 Here are a couple examples of tags and types that you could use in your
 collection.
 
--   An `inbox` tag for newly added documents that you haven't manually
-    edited yet.
--   A tag `car` for everything car related (repairs, registration,
-    insurance, etc)
--   A tag `todo` for documents that you still need to do something with,
-    such as reply, or perform some task online.
--   A tag `bank account x` for all bank statement related to that
-    account.
--   A tag `mail` for anything that you added to paperless via its mail
-    processing capabilities.
--   A tag `missing_metadata` when you still need to add some metadata to
-    a document, but can't or don't want to do this right now.
+- An `inbox` tag for newly added documents that you haven't manually
+  edited yet.
+- A tag `car` for everything car related (repairs, registration,
+  insurance, etc)
+- A tag `todo` for documents that you still need to do something with,
+  such as reply, or perform some task online.
+- A tag `bank account x` for all bank statement related to that
+  account.
+- A tag `mail` for anything that you added to paperless via its mail
+  processing capabilities.
+- A tag `missing_metadata` when you still need to add some metadata to
+  a document, but can't or don't want to do this right now.
 
 ## Searching {#basic-usage_searching}
 
@@ -759,13 +814,20 @@ contract you signed 8 years ago).
 
 When you search paperless for a document, it tries to match this query
 against your documents. Paperless will look for matching documents by
-inspecting their content, title, correspondent, type and tags. Paperless
-returns a scored list of results, so that documents matching your query
-better will appear further up in the search results.
+inspecting their content, title, correspondent, type, tags, notes, and
+custom field values. Paperless returns a scored list of results, so that
+documents matching your query better will appear further up in the search
+results.
 
 By default, paperless returns only documents which contain all words
-typed in the search bar. However, paperless also offers advanced search
-syntax if you want to drill down the results further.
+typed in the search bar. A few things to know about how matching works:
+
+- **Word-order-independent**: "invoice unpaid" and "unpaid invoice" return the same results.
+- **Accent-insensitive**: searching `resume` also finds `résumé`, `cafe` finds `café`.
+- **Separator-agnostic**: punctuation and separators are stripped during indexing, so
+  searching a partial number like `1312` finds documents containing `A-1312/B`.
+
+Paperless also offers advanced search syntax if you want to drill down further.
 
 Matching documents with logical expressions:
 
@@ -794,18 +856,70 @@ Matching inexact words:
 produ*name
 ```
 
+Matching natural date keywords:
+
+```
+added:today
+modified:yesterday
+created:"previous week"
+added:"previous month"
+modified:"this year"
+```
+
+Supported date keywords: `today`, `yesterday`, `previous week`,
+`this month`, `previous month`, `this year`, `previous year`,
+`previous quarter`.
+
+#### Searching custom fields
+
+Custom field values are included in the full-text index, so a plain search
+already matches documents whose custom field values contain your search terms.
+To narrow by field name or value specifically:
+
+```
+custom_fields.value:policy
+custom_fields.name:"Contract Number"
+custom_fields.name:Insurance custom_fields.value:policy
+```
+
+- `custom_fields.value` matches against the value of any custom field.
+- `custom_fields.name` matches the name of the field (use quotes for multi-word names).
+- Combine both to find documents where a specific named field contains a specific value.
+
+Because separators are stripped during indexing, individual parts of formatted
+codes are searchable on their own. A value stored as `A-1312/99.50` produces the
+tokens `a`, `1312`, `99`, `50` — each searchable independently:
+
+```
+custom_fields.value:1312
+custom_fields.name:"Contract Number" custom_fields.value:1312
+```
+
 !!! note
 
-    Inexact terms are hard for search indexes. These queries might take a
-    while to execute. That's why paperless offers auto complete and query
-    correction.
+    Custom date fields do not support relative date syntax (e.g. `[now to 2 weeks]`).
+    For date ranges on custom date fields, use the document list filters in the web UI.
+
+#### Searching notes
+
+Notes content is included in full-text search automatically. To search
+by note author or content specifically:
+
+```
+notes.user:alice
+notes.note:reminder
+notes.user:alice notes.note:insurance
+```
 
 All of these constructs can be combined as you see fit. If you want to
-learn more about the query language used by paperless, paperless uses
-Whoosh's default query language. Head over to [Whoosh query
-language](https://whoosh.readthedocs.io/en/latest/querylang.html). For
-details on what date parsing utilities are available, see [Date
-parsing](https://whoosh.readthedocs.io/en/latest/dates.html#parsing-date-queries).
+learn more about the query language used by paperless, see the
+[Tantivy query language documentation](https://docs.rs/tantivy/latest/tantivy/query/struct.QueryParser.html).
+
+!!! note
+
+    Fuzzy (approximate) matching can be enabled by setting
+    [`PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD`](configuration.md#PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD).
+    When enabled, paperless will include near-miss results ranked below exact matches.
 
 ## Keyboard shortcuts / hotkeys
 
@@ -827,8 +941,8 @@ The following diagram shows how easy it is to manage your documents.
 
 ### Preparations in paperless
 
--   Create an inbox tag that gets assigned to all new documents.
--   Create a TODO tag.
+- Create an inbox tag that gets assigned to all new documents.
+- Create a TODO tag.
 
 ### Processing of the physical documents
 
@@ -902,78 +1016,92 @@ Some documents require attention and require you to act on the document.
 You may take two different approaches to handle these documents based on
 how regularly you intend to scan documents and use paperless.
 
--   If you scan and process your documents in paperless regularly,
-    assign a TODO tag to all scanned documents that you need to process.
-    Create a saved view on the dashboard that shows all documents with
-    this tag.
--   If you do not scan documents regularly and use paperless solely for
-    archiving, create a physical todo box next to your physical inbox
-    and put documents you need to process in the TODO box. When you
-    performed the task associated with the document, move it to the
-    inbox.
+- If you scan and process your documents in paperless regularly,
+  assign a TODO tag to all scanned documents that you need to process.
+  Create a saved view on the dashboard that shows all documents with
+  this tag.
+- If you do not scan documents regularly and use paperless solely for
+  archiving, create a physical todo box next to your physical inbox
+  and put documents you need to process in the TODO box. When you
+  performed the task associated with the document, move it to the
+  inbox.
+
+## Remote OCR
+
+!!! important
+
+    This feature is disabled by default and will always remain strictly "opt-in".
+
+Paperless-ngx supports performing OCR on documents using remote services. At the moment, this is limited to
+[Microsoft's Azure "Document Intelligence" service](https://azure.microsoft.com/en-us/products/ai-services/ai-document-intelligence).
+This is of course a paid service (with a free tier) which requires an Azure account and subscription. Azure AI is not affiliated with
+Paperless-ngx in any way. When enabled, Paperless-ngx will automatically send appropriate documents to Azure for OCR processing, bypassing
+the local OCR engine. See the [configuration](configuration.md#PAPERLESS_REMOTE_OCR_ENGINE) options for more details.
+
+Additionally, when using a commercial service with this feature, consider both potential costs as well as any associated file size
+or page limitations (e.g. with a free tier).
 
 ## Architecture
 
 Paperless-ngx consists of the following components:
 
--   **The webserver:** This serves the administration pages, the API,
-    and the new frontend. This is the main tool you'll be using to interact
-    with paperless. You may start the webserver directly with
+- **The webserver:** This serves the administration pages, the API,
+  and the new frontend. This is the main tool you'll be using to interact
+  with paperless. You may start the webserver directly with
 
-    ```shell-session
-    cd /path/to/paperless/src/
-    granian --interface asginl --ws "paperless.asgi:application"
-    ```
+  ```shell-session
+  cd /path/to/paperless/src/
+  granian --interface asginl --ws "paperless.asgi:application"
+  ```
 
-    or by any other means such as Apache `mod_wsgi`.
+  or by any other means such as Apache `mod_wsgi`.
 
--   **The consumer:** This is what watches your consumption folder for
-    documents. However, the consumer itself does not really consume your
-    documents. Now it notifies a task processor that a new file is ready
-    for consumption. I suppose it should be named differently. This was
-    also used to check your emails, but that's now done elsewhere as
-    well.
+- **The consumer:** This is what watches your consumption folder for
+  documents. However, the consumer itself does not really consume your
+  documents. Now it notifies a task processor that a new file is ready
+  for consumption. I suppose it should be named differently. This was
+  also used to check your emails, but that's now done elsewhere as
+  well.
 
-    Start the consumer with the management command `document_consumer`:
+  Start the consumer with the management command `document_consumer`:
 
-    ```shell-session
-    cd /path/to/paperless/src/
-    python3 manage.py document_consumer
-    ```
+  ```shell-session
+  cd /path/to/paperless/src/
+  python3 manage.py document_consumer
+  ```
 
--   **The task processor:** Paperless relies on [Celery - Distributed
-    Task Queue](https://docs.celeryq.dev/en/stable/index.html) for doing
-    most of the heavy lifting. This is a task queue that accepts tasks
-    from multiple sources and processes these in parallel. It also comes
-    with a scheduler that executes certain commands periodically.
+- **The task processor:** Paperless relies on [Celery - Distributed
+  Task Queue](https://docs.celeryq.dev/en/stable/index.html) for doing
+  most of the heavy lifting. This is a task queue that accepts tasks
+  from multiple sources and processes these in parallel. It also comes
+  with a scheduler that executes certain commands periodically.
 
-    This task processor is responsible for:
+  This task processor is responsible for:
+  - Consuming documents. When the consumer finds new documents, it
+    notifies the task processor to start a consumption task.
+  - The task processor also performs the consumption of any
+    documents you upload through the web interface.
+  - Consuming emails. It periodically checks your configured
+    accounts for new emails and notifies the task processor to
+    consume the attachment of an email.
+  - Maintaining the search index and the automatic matching
+    algorithm. These are things that paperless needs to do from time
+    to time in order to operate properly.
 
-    -   Consuming documents. When the consumer finds new documents, it
-        notifies the task processor to start a consumption task.
-    -   The task processor also performs the consumption of any
-        documents you upload through the web interface.
-    -   Consuming emails. It periodically checks your configured
-        accounts for new emails and notifies the task processor to
-        consume the attachment of an email.
-    -   Maintaining the search index and the automatic matching
-        algorithm. These are things that paperless needs to do from time
-        to time in order to operate properly.
+  This allows paperless to process multiple documents from your
+  consumption folder in parallel! On a modern multi core system, this
+  makes the consumption process with full OCR blazingly fast.
 
-    This allows paperless to process multiple documents from your
-    consumption folder in parallel! On a modern multi core system, this
-    makes the consumption process with full OCR blazingly fast.
+  The task processor comes with a built-in admin interface that you
+  can use to check whenever any of the tasks fail and inspect the
+  errors (i.e., wrong email credentials, errors during consuming a
+  specific file, etc).
 
-    The task processor comes with a built-in admin interface that you
-    can use to check whenever any of the tasks fail and inspect the
-    errors (i.e., wrong email credentials, errors during consuming a
-    specific file, etc).
+- A [redis](https://redis.io/) message broker: This is a really
+  lightweight service that is responsible for getting the tasks from
+  the webserver and the consumer to the task scheduler. These run in a
+  different process (maybe even on different machines!), and
+  therefore, this is necessary.
 
--   A [redis](https://redis.io/) message broker: This is a really
-    lightweight service that is responsible for getting the tasks from
-    the webserver and the consumer to the task scheduler. These run in a
-    different process (maybe even on different machines!), and
-    therefore, this is necessary.
-
--   Optional: A database server. Paperless supports PostgreSQL, MariaDB
-    and SQLite for storing its data.
+- Optional: A database server. Paperless supports PostgreSQL, MariaDB
+  and SQLite for storing its data.

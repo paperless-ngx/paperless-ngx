@@ -1,4 +1,3 @@
-{% autoescape off %}
 <!doctype html>
 <html>
 
@@ -13,36 +12,34 @@
     <!-- Header -->
     <div class="grid gap-x-2 bg-slate-200 p-4">
 
-      <div class="col-start-9 col-span-4 row-start-1 text-right">{{ date }}</div>
+      <div class="col-start-9 col-span-4 row-start-1 text-right">{{ date|safe }}</div>
 
       <div class="col-start-1 row-start-1 text-slate-400 text-right">{{ from_label }}</div>
-      <div class="col-start-2 col-span-7 row-start-1">{{ from }}</div>
+      <div class="col-start-2 col-span-7 row-start-1">{{ from|safe }}</div>
 
       <div class="col-start-1 row-start-2 text-slate-400 text-right">{{ subject_label }}</div>
-      <div class=" col-start-2 col-span-10 row-start-2 font-bold">{{ subject }}</div>
+      <div class=" col-start-2 col-span-10 row-start-2 font-bold">{{ subject|safe }}</div>
 
       <div class="col-start-1 row-start-3 text-slate-400 text-right">{{ to_label }}</div>
-      <div class="col-start-2 col-span-10 row-start-3 text-sm my-0.5">{{ to }}</div>
+      <div class="col-start-2 col-span-10 row-start-3 text-sm my-0.5">{{ to|safe }}</div>
 
       <div class="col-start-1 row-start-4 text-slate-400 text-right">{{ cc_label }}</div>
-      <div class="col-start-2 col-span-10 row-start-4 text-sm my-0.5">{{ cc }}</div>
+      <div class="col-start-2 col-span-10 row-start-4 text-sm my-0.5">{{ cc|safe }}</div>
 
       <div class="col-start-1 row-start-5 text-slate-400 text-right">{{ bcc_label }}</div>
-      <div class="col-start-2 col-span-10 row-start-5" text-sm my-0.5>{{ bcc }}</div>
+      <div class="col-start-2 col-span-10 row-start-5" text-sm my-0.5>{{ bcc|safe }}</div>
 
 			<div class="col-start-1 row-start-6	 text-slate-400 text-right">{{ attachments_label }}</div>
-      <div class="col-start-2 col-span-10 row-start-6">{{ attachments }}</div>
+      <div class="col-start-2 col-span-10 row-start-6">{{ attachments|safe }}</div>
     </div>
 
     <!-- Separator-->
     <div class="border-t border-solid border-b w-full h-[1px] box-content border-black mb-5 bg-slate-200"></div>
 
     <!-- Content-->
-    <div class="w-full break-words">{{ content }}</div>
+    <div class="w-full break-words">{{ content|safe }}</div>
 	</div>
 
 </body>
 
 </html>
-
-{% endautoescape %}

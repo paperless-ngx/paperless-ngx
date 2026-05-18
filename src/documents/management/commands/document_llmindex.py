@@ -1,0 +1,24 @@
+from typing import Any
+
+from documents.management.commands.base import PaperlessCommand
+from documents.tasks import llmindex_index
+
+
+class Command(PaperlessCommand):
+    help = "Manages the LLM-based vector index for Paperless."
+
+    supports_progress_bar = True
+    supports_multiprocessing = False
+
+    def add_arguments(self, parser: Any) -> None:
+        super().add_arguments(parser)
+        parser.add_argument("command", choices=["rebuild", "update"])
+
+    def handle(self, *args: Any, **options: Any) -> None:
+        llmindex_index(
+            rebuild=options["command"] == "rebuild",
+            iter_wrapper=lambda docs: self.track(
+                docs,
+                description="Indexing documents...",
+            ),
+        )

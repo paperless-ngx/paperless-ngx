@@ -142,6 +142,31 @@
                   }
                 </ng-template>
               </dd>
+              <dt i18n>Recent Task Activity <span class="small text-muted fw-light">({{status.tasks.summary.days}} days)</span></dt>
+              <dd class="mb-0">
+                @if (status.tasks.summary.total_count > 0) {
+                  <ul class="list-group border-light mt-2">
+                    <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                      <span class="small"><ng-container i18n>Total</ng-container>:</span>
+                      <span class="badge bg-light rounded-pill">{{status.tasks.summary.total_count}}</span>
+                    </li>
+                    <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                      <span class="small"><ng-container i18n>Successful</ng-container>:</span>
+                      <span class="badge bg-primary rounded-pill">{{status.tasks.summary.success_count}}</span>
+                    </li>
+                    <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                      <span class="small"><ng-container i18n>Failed</ng-container>:</span>
+                      <span class="badge bg-danger rounded-pill">{{status.tasks.summary.failure_count}}</span>
+                    </li>
+                    <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                      <span class="small"><ng-container i18n>Pending</ng-container>:</span>
+                      <span class="badge bg-warning rounded-pill">{{status.tasks.summary.pending_count}}</span>
+                    </li>
+                  </ul>
+                } @else {
+                  <span class="small text-muted" i18n>No recent tasks</span>
+                }
+              </dd>
             </dl>
           </div>
         </div>
@@ -159,25 +184,11 @@
                 <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="indexStatus" triggers="click mouseenter:mouseleave">
                   {{status.tasks.index_status}}
                   @if (status.tasks.index_status === 'OK') {
-                    @if (isStale(status.tasks.index_last_modified)) {
-                      <i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></i-bs>
-                    } @else {
-                      <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
-                    }
+                    <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
                   } @else {
                     <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
                   }
                 </button>
-                @if (currentUserIsSuperUser) {
-                  @if (isRunning(PaperlessTaskName.IndexOptimize)) {
-                    <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
-                  } @else {
-                    <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskName.IndexOptimize)">
-                      <i-bs name="play-fill"></i-bs>&nbsp;
-                      <ng-container i18n>Run Task</ng-container>
-                    </button>
-                  }
-                }
               </dd>
               <ng-template #indexStatus>
                 @if (status.tasks.index_status === 'OK') {
@@ -203,11 +214,11 @@
                   }
                 </button>
                 @if (currentUserIsSuperUser) {
-                  @if (isRunning(PaperlessTaskName.TrainClassifier)) {
+                  @if (isRunning(PaperlessTaskType.TrainClassifier)) {
                     <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
                   } @else {
-                    <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskName.TrainClassifier)">
-                      <i-bs name="play-fill"></i-bs>&nbsp;
+                    <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskType.TrainClassifier)">
+                      <i-bs name="play-fill" class="me-1"></i-bs>
                       <ng-container i18n>Run Task</ng-container>
                     </button>
                   }
@@ -237,11 +248,11 @@
                   }
                 </button>
                 @if (currentUserIsSuperUser) {
-                  @if (isRunning(PaperlessTaskName.SanityCheck)) {
+                  @if (isRunning(PaperlessTaskType.SanityCheck)) {
                     <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
                   } @else {
-                    <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskName.SanityCheck)">
-                      <i-bs name="play-fill"></i-bs>&nbsp;
+                    <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskType.SanityCheck)">
+                      <i-bs name="play-fill" class="me-1"></i-bs>
                       <ng-container i18n>Run Task</ng-container>
                     </button>
                   }
@@ -266,6 +277,43 @@
                   }
                 </span>
               </dd>
+              @if (aiEnabled) {
+                <dt i18n>AI Index</dt>
+                <dd class="d-flex align-items-center">
+                  <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="llmIndexStatus" triggers="click mouseenter:mouseleave">
+                    {{status.tasks.llmindex_status}}
+                    @if (status.tasks.llmindex_status === 'OK') {
+                      @if (isStale(status.tasks.llmindex_last_modified)) {
+                        <i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></i-bs>
+                      } @else {
+                        <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
+                      }
+                    } @else {
+                      <i-bs name="exclamation-triangle-fill" class="ms-2 lh-1"
+                      [class.text-danger]="status.tasks.llmindex_status === SystemStatusItemStatus.ERROR"
+                      [class.text-warning]="status.tasks.llmindex_status === SystemStatusItemStatus.WARNING"
+                      [class.text-muted]="status.tasks.llmindex_status === SystemStatusItemStatus.DISABLED"></i-bs>
+                    }
+                  </button>
+                  @if (currentUserIsSuperUser) {
+                    @if (isRunning(PaperlessTaskType.LlmIndex)) {
+                      <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
+                    } @else {
+                      <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskType.LlmIndex)">
+                        <i-bs name="play-fill" class="me-1"></i-bs>
+                        <ng-container i18n>Run Task</ng-container>
+                      </button>
+                    }
+                  }
+                </dd>
+                <ng-template #llmIndexStatus>
+                  @if (status.tasks.llmindex_status === 'OK') {
+                    <h6><ng-container i18n>Last Run</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.llmindex_last_modified | customDate:'medium'}}</span>
+                  } @else {
+                    <h6><ng-container i18n>Error</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.llmindex_error}}</span>
+                  }
+                </ng-template>
+              }
             </dl>
           </div>
         </div>
@@ -276,10 +324,10 @@
 <div class="modal-footer">
   <button class="btn btn-sm d-flex align-items-center btn-dark btn btn-sm d-flex align-items-center btn-dark btn-outline-secondary" (click)="copy()">
     @if (!copied) {
-      <i-bs name="clipboard-fill"></i-bs>&nbsp;
+      <i-bs name="clipboard-fill" class="me-1"></i-bs>
     }
     @if (copied) {
-      <i-bs name="clipboard-check-fill"></i-bs>&nbsp;
+      <i-bs name="clipboard-check-fill" class="me-1"></i-bs>
     }
     <ng-container i18n>Copy</ng-container>
   </button>

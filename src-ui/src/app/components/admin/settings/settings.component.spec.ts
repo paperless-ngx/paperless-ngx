@@ -16,6 +16,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideUiTour } from 'ngx-ui-tour-ng-bootstrap'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import {
@@ -28,7 +29,11 @@ import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
-import { PermissionsService } from 'src/app/services/permissions.service'
+import {
+  PermissionAction,
+  PermissionType,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { UserService } from 'src/app/services/rest/user.service'
@@ -91,6 +96,9 @@ const status: SystemStatus = {
     sanity_check_status: SystemStatusItemStatus.ERROR,
     sanity_check_last_run: new Date().toISOString(),
     sanity_check_error: 'Error running sanity check.',
+    llmindex_status: SystemStatusItemStatus.DISABLED,
+    llmindex_last_modified: new Date().toISOString(),
+    llmindex_error: null,
   },
 }
 
@@ -144,6 +152,7 @@ describe('SettingsComponent', () => {
         PermissionsGuard,
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
+        provideUiTour(),
       ],
     }).compileComponents()
 
@@ -198,9 +207,9 @@ describe('SettingsComponent', () => {
     const navigateSpy = jest.spyOn(router, 'navigate')
     const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
     tabButtons[1].nativeElement.dispatchEvent(new MouseEvent('click'))
-    expect(navigateSpy).toHaveBeenCalledWith(['settings', 'permissions'])
+    expect(navigateSpy).toHaveBeenCalledWith(['settings', 'documents'])
     tabButtons[2].nativeElement.dispatchEvent(new MouseEvent('click'))
-    expect(navigateSpy).toHaveBeenCalledWith(['settings', 'notifications'])
+    expect(navigateSpy).toHaveBeenCalledWith(['settings', 'permissions'])
 
     const initSpy = jest.spyOn(component, 'initialize')
     component.isDirty = true // mock dirty
@@ -210,8 +219,8 @@ describe('SettingsComponent', () => {
     expect(initSpy).not.toHaveBeenCalled()
 
     navigateSpy.mockResolvedValueOnce(true) // nav accepted even though dirty
-    tabButtons[1].nativeElement.dispatchEvent(new MouseEvent('click'))
-    expect(navigateSpy).toHaveBeenCalledWith(['settings', 'notifications'])
+    tabButtons[2].nativeElement.dispatchEvent(new MouseEvent('click'))
+    expect(navigateSpy).toHaveBeenCalledWith(['settings', 'permissions'])
     expect(initSpy).toHaveBeenCalled()
   })
 
@@ -223,7 +232,7 @@ describe('SettingsComponent', () => {
     activatedRoute.snapshot.fragment = '#notifications'
     const scrollSpy = jest.spyOn(viewportScroller, 'scrollToAnchor')
     component.ngOnInit()
-    expect(component.activeNavID).toEqual(3) // Notifications
+    expect(component.activeNavID).toEqual(4) // Notifications
     component.ngAfterViewInit()
     expect(scrollSpy).toHaveBeenCalledWith('#notifications')
   })
@@ -248,7 +257,7 @@ describe('SettingsComponent', () => {
     expect(toastErrorSpy).toHaveBeenCalled()
     expect(storeSpy).toHaveBeenCalled()
     expect(appearanceSettingsSpy).not.toHaveBeenCalled()
-    expect(setSpy).toHaveBeenCalledTimes(30)
+    expect(setSpy).toHaveBeenCalledTimes(32)
 
     // succeed
     storeSpy.mockReturnValueOnce(of(true))
@@ -323,7 +332,13 @@ describe('SettingsComponent', () => {
 
   it('should load system status on initialize, show errors if needed', () => {
     jest.spyOn(systemStatusService, 'get').mockReturnValue(of(status))
-    jest.spyOn(permissionsService, 'isAdmin').mockReturnValue(true)
+    jest
+      .spyOn(permissionsService, 'currentUserCan')
+      .mockImplementation(
+        (action, type) =>
+          action === PermissionAction.View &&
+          type === PermissionType.SystemMonitoring
+      )
     completeSetup()
     expect(component['systemStatus']).toEqual(status) // private
     expect(component.systemStatusHasErrors).toBeTruthy()
@@ -339,7 +354,13 @@ describe('SettingsComponent', () => {
   it('should open system status dialog', () => {
     const modalOpenSpy = jest.spyOn(modalService, 'open')
     jest.spyOn(systemStatusService, 'get').mockReturnValue(of(status))
-    jest.spyOn(permissionsService, 'isAdmin').mockReturnValue(true)
+    jest
+      .spyOn(permissionsService, 'currentUserCan')
+      .mockImplementation(
+        (action, type) =>
+          action === PermissionAction.View &&
+          type === PermissionType.SystemMonitoring
+      )
     completeSetup()
     component.showSystemStatus()
     expect(modalOpenSpy).toHaveBeenCalledWith(SystemStatusDialogComponent, {
@@ -362,5 +383,23 @@ describe('SettingsComponent', () => {
     )
     settingsService.settingsSaved.emit(true)
     expect(maybeRefreshSpy).toHaveBeenCalled()
+  })
+
+  it('should support toggling document detail fields', () => {
+    completeSetup()
+    const field = 'storage_path'
+    expect(
+      component.settingsForm.get('documentDetailsHiddenFields').value.length
+    ).toEqual(0)
+    component.toggleDocumentDetailField(field, false)
+    expect(
+      component.settingsForm.get('documentDetailsHiddenFields').value.length
+    ).toEqual(1)
+    expect(component.isDocumentDetailFieldShown(field)).toBeFalsy()
+    component.toggleDocumentDetailField(field, true)
+    expect(
+      component.settingsForm.get('documentDetailsHiddenFields').value.length
+    ).toEqual(0)
+    expect(component.isDocumentDetailFieldShown(field)).toBeTruthy()
   })
 })
