@@ -1828,7 +1828,7 @@ class WorkflowAction(models.Model):
 class Workflow(models.Model):
     name = models.CharField(_("name"), max_length=256, unique=True)
 
-    order = models.SmallIntegerField(_("order"), default=0)
+    order = models.IntegerField(_("order"), default=0)
 
     triggers = models.ManyToManyField(
         WorkflowTrigger,

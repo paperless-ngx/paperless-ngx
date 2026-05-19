@@ -137,11 +137,6 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AlterField(
-            model_name="workflow",
-            name="order",
-            field=models.SmallIntegerField(default=0, verbose_name="order"),
-        ),
-        migrations.AlterField(
             model_name="workflowaction",
             name="order",
             field=models.PositiveSmallIntegerField(default=0, verbose_name="order"),
