@@ -898,10 +898,11 @@ def remove_password(
             logger.info(
                 f"Attempting password removal from document {pair.root_doc.id}",
             )
-            source_path = (
-                source_paths_by_id.get(doc.id, pair.source_doc.source_path)
-                if source_paths_by_id is not None
-                else pair.source_doc.source_path
+            # The caller may supply an explicit source path (e.g. the staged
+            # file during consumption, before source_path is populated).
+            source_path = (source_paths_by_id or {}).get(
+                doc.id,
+                pair.source_doc.source_path,
             )
             with pikepdf.open(source_path, password=password) as pdf:
                 filepath: Path = (
