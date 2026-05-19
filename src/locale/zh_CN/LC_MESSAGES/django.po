@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-05 01:01+0000\n"
-"PO-Revision-Date: 2026-05-05 01:03\n"
+"PO-Revision-Date: 2026-05-08 01:05\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -1377,7 +1377,7 @@ msgstr "检测到无效变量。"
 
 #: documents/serialisers.py:2737
 msgid "Duplicate document identifiers are not allowed."
-msgstr ""
+msgstr "不允许重复文档标识符。"
 
 #: documents/serialisers.py:2767 documents/views.py:4321
 #, python-format
@@ -1894,7 +1894,7 @@ msgstr "设置 LLM 端点，可选"
 
 #: paperless/models.py:343
 msgid "paperless application settings"
-msgstr "无纸应用设置"
+msgstr "paperless 应用设置"
 
 #: paperless/settings/__init__.py:531
 msgid "English (US)"

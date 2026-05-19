@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-05 01:01+0000\n"
-"PO-Revision-Date: 2026-05-05 01:03\n"
+"PO-Revision-Date: 2026-05-13 12:57\n"
 "Last-Translator: \n"
 "Language-Team: Serbian (Latin)\n"
 "Language: sr_CS\n"
@@ -1641,7 +1641,7 @@ msgstr "Nevažeći more_like_id"
 
 #: documents/views.py:1491
 msgid "Invalid AI configuration."
-msgstr ""
+msgstr "Nevažeća konfiguracija veštačke inteligencije."
 
 #: documents/views.py:2266 documents/views.py:2582
 msgid "Specify only one of text, title_search, query, or more_like_id."
@@ -1746,7 +1746,7 @@ msgstr "CMYK"
 
 #: paperless/models.py:78 paperless/models.py:87
 msgid "OpenAI-compatible"
-msgstr ""
+msgstr "Kompatibilno sa OpenAI-om"
 
 #: paperless/models.py:79
 msgid "Huggingface"

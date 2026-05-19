@@ -7254,7 +7254,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">274</context>
         </context-group>
-        <target state="translated">獲取TOTP 設定時出錯</target>
+        <target state="translated">获取TOTP 设置时出错</target>
       </trans-unit>
       <trans-unit id="1030314492414713260" datatype="html">
         <source>TOTP activated successfully</source>
@@ -7262,7 +7262,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">295</context>
         </context-group>
-        <target state="translated">TOTP 啟動成功</target>
+        <target state="translated">TOTP 启动成功</target>
       </trans-unit>
       <trans-unit id="3755006064892435830" datatype="html">
         <source>Error activating TOTP</source>
@@ -7274,7 +7274,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">303</context>
         </context-group>
-        <target state="translated">啟動TOTP時錯誤</target>
+        <target state="translated">启动TOTP时错误</target>
       </trans-unit>
       <trans-unit id="5919827473541889422" datatype="html">
         <source>TOTP deactivated successfully</source>
@@ -7294,7 +7294,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
           <context context-type="linenumber">326</context>
         </context-group>
-        <target state="translated">停用TOTP時錯誤</target>
+        <target state="translated">停用TOTP时错误</target>
       </trans-unit>
       <trans-unit id="4452415362871534100" datatype="html">
         <source>Selected documents:</source>
@@ -8036,7 +8036,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="translated">提示：已保存的试图可以从 <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/documents&quot;&gt;"/> 文档列表 <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> 创建</target>
+        <target state="translated">提示：已保存的视图可以从 <x id="START_LINK" ctype="x-a" equiv-text="&lt;a routerLink=&quot;/documents&quot;&gt;"/> 文档列表 <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> 创建</target>
       </trans-unit>
       <trans-unit id="6581372518205328477" datatype="html">
         <source>Hello <x id="PH" equiv-text="this.settingsService.displayName"/>, welcome to <x id="PH_1" equiv-text="environment.appTitle"/></source>

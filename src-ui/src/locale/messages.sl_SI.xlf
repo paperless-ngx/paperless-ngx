@@ -2668,7 +2668,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">377</context>
         </context-group>
-        <target state="needs-translation">Success. New document id <x id="PH" equiv-text="documentId"/> created</target>
+        <target state="translated">Uspeh. Nov dokument z ID-jem <x id="PH" equiv-text="documentId"/> ustvarjen</target>
       </trans-unit>
       <trans-unit id="8760066891202884337" datatype="html">
         <source>Duplicate of document #<x id="PH" equiv-text="duplicateOf"/></source>
@@ -2680,7 +2680,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">421</context>
         </context-group>
-        <target state="needs-translation">Duplicate of document #<x id="PH" equiv-text="duplicateOf"/></target>
+        <target state="translated">Kopija dokumenta št. <x id="PH" equiv-text="duplicateOf"/></target>
       </trans-unit>
       <trans-unit id="3418677553313974490" datatype="html">
         <source>Trash</source>
