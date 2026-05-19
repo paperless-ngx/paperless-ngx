@@ -879,6 +879,11 @@ def run_workflows(
         )
         return None
 
+    # Track whether the caller supplied original_file. When set explicitly (e.g. by
+    # run_workflows_added during consumption), it points at the staged file that has
+    # not yet been moved into its final storage location. This matters for password
+    # removal, which must read from the staged path rather than document.source_path.
+    caller_supplied_original_file = original_file is not None
     if original_file is None:
         original_file = (
             document.source_path if not use_overrides else document.original_file
@@ -956,7 +961,14 @@ def run_workflows(
                         original_file,
                     )
                 elif action.type == WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL:
-                    execute_password_removal_action(action, document, logging_group)
+                    execute_password_removal_action(
+                        action,
+                        document,
+                        logging_group,
+                        source_file=(
+                            original_file if caller_supplied_original_file else None
+                        ),
+                    )
                 elif action.type == WorkflowAction.WorkflowActionType.MOVE_TO_TRASH:
                     has_move_to_trash_action = True
 
