@@ -5,6 +5,25 @@ from django.db import migrations
 from django.db import models
 
 
+def clamp_small_integer_fields(apps, schema_editor):
+    Workflow = apps.get_model("documents", "Workflow")
+    WorkflowAction = apps.get_model("documents", "WorkflowAction")
+    WorkflowTrigger = apps.get_model("documents", "WorkflowTrigger")
+
+    Workflow.objects.filter(order__gt=32767).update(order=32767)
+    Workflow.objects.filter(order__lt=-32768).update(order=-32768)
+    WorkflowAction.objects.filter(order__gt=32767).update(order=32767)
+    WorkflowTrigger.objects.filter(schedule_offset_days__gt=32767).update(
+        schedule_offset_days=32767,
+    )
+    WorkflowTrigger.objects.filter(schedule_offset_days__lt=-32768).update(
+        schedule_offset_days=-32768,
+    )
+    WorkflowTrigger.objects.filter(schedule_recurring_interval_days__gt=32767).update(
+        schedule_recurring_interval_days=32767,
+    )
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ("documents", "0009_alter_document_content_length"),
@@ -135,6 +154,10 @@ class Migration(migrations.Migration):
                 default=1,
                 verbose_name="matching algorithm",
             ),
+        ),
+        migrations.RunPython(
+            clamp_small_integer_fields,
+            migrations.RunPython.noop,
         ),
         migrations.AlterField(
             model_name="workflow",
