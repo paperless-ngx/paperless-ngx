@@ -1415,7 +1415,7 @@ class WorkflowTrigger(models.Model):
         help_text=_("JSON-encoded custom field query expression."),
     )
 
-    schedule_offset_days = models.SmallIntegerField(
+    schedule_offset_days = models.IntegerField(
         _("schedule offset days"),
         default=0,
         help_text=_(
@@ -1431,7 +1431,7 @@ class WorkflowTrigger(models.Model):
         ),
     )
 
-    schedule_recurring_interval_days = models.PositiveSmallIntegerField(
+    schedule_recurring_interval_days = models.PositiveIntegerField(
         _("schedule recurring delay in days"),
         default=1,
         validators=[MinValueValidator(1)],
@@ -1586,7 +1586,7 @@ class WorkflowAction(models.Model):
         default=WorkflowActionType.ASSIGNMENT,
     )
 
-    order = models.PositiveSmallIntegerField(_("order"), default=0)
+    order = models.PositiveIntegerField(_("order"), default=0)
 
     assign_title = models.TextField(
         _("assign title"),
