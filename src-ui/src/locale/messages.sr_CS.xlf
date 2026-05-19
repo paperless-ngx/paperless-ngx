@@ -500,7 +500,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">225</context>
         </context-group>
-        <target state="needs-translation">Tasks helps you track background work, what needs attention, and what recently completed.</target>
+        <target state="translated">Zadaci vam pomažu da pratite rad u pozadini, šta zahteva pažnju i šta je nedavno završeno.</target>
       </trans-unit>
       <trans-unit id="2755033621682206902" datatype="html">
         <source>Check out the settings for various tweaks to the web app.</source>
@@ -1960,7 +1960,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">297</context>
         </context-group>
-        <target state="needs-translation">Tasks</target>
+        <target state="translated">Zadaci</target>
       </trans-unit>
       <trans-unit id="8492095365580052820" datatype="html">
         <source>Tasks shows detailed information about document consumption and system tasks.</source>
@@ -1968,7 +1968,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Tasks shows detailed information about document consumption and system tasks.</target>
+        <target state="translated">Zadaci prikazuju detaljne informacije o potrošnji dokumenata i sistemskim zadacima.</target>
       </trans-unit>
       <trans-unit id="103921551219467537" datatype="html">
         <source>Clear selection</source>
@@ -2044,7 +2044,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">209</context>
         </context-group>
-        <target state="needs-translation">All types</target>
+        <target state="translated">Svi tipovi</target>
       </trans-unit>
       <trans-unit id="131016739441837046" datatype="html">
         <source>All sources</source>
@@ -2056,7 +2056,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">221</context>
         </context-group>
-        <target state="needs-translation">All sources</target>
+        <target state="translated">Svi izvori</target>
       </trans-unit>
       <trans-unit id="6849725902312323996" datatype="html">
         <source>Reset filters</source>
@@ -2080,7 +2080,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">121</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {1 task} other {<x id="INTERPOLATION"/> tasks}}</target>
+        <target state="translated">{VAR_PLURAL, plural, one {} few {<x id="INTERPOLATION"/> zadataka}=1 {1 zadataka} other {<x id="INTERPOLATION"/> zadataka}}</target>
       </trans-unit>
       <trans-unit id="8953033926734869941" datatype="html">
         <source>Name</source>
@@ -2356,7 +2356,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">231</context>
         </context-group>
-        <target state="needs-translation">Result message</target>
+        <target state="translated">Poruka rezultata</target>
       </trans-unit>
       <trans-unit id="6621329748219109148" datatype="html">
         <source>Duplicate</source>
@@ -2364,7 +2364,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">238</context>
         </context-group>
-        <target state="needs-translation">Duplicate</target>
+        <target state="translated">Dupliraj</target>
       </trans-unit>
       <trans-unit id="7593555694782789615" datatype="html">
         <source>Open</source>
@@ -2404,7 +2404,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">256</context>
         </context-group>
-        <target state="needs-translation">Input data</target>
+        <target state="translated">Ulazni podaci</target>
       </trans-unit>
       <trans-unit id="1585185618099050920" datatype="html">
         <source>Result data</source>
@@ -2412,7 +2412,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">262</context>
         </context-group>
-        <target state="needs-translation">Result data</target>
+        <target state="translated">Podaci o rezultatu</target>
       </trans-unit>
       <trans-unit id="7976920528153858271" datatype="html">
         <source>No tasks match the current filters.</source>
@@ -2420,7 +2420,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">284</context>
         </context-group>
-        <target state="needs-translation">No tasks match the current filters.</target>
+        <target state="translated">Nijedan zadatak ne odgovara trenutnim filterima.</target>
       </trans-unit>
       <trans-unit id="2525230676386818985" datatype="html">
         <source>Result</source>
@@ -2436,7 +2436,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="needs-translation">Needs attention</target>
+        <target state="translated">Potrebna je pažnja</target>
       </trans-unit>
       <trans-unit id="3307214558906712688" datatype="html">
         <source>In progress</source>
@@ -2444,7 +2444,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="needs-translation">In progress</target>
+        <target state="translated">U toku</target>
       </trans-unit>
       <trans-unit id="1371178633976505412" datatype="html">
         <source>Recently completed</source>
@@ -2452,7 +2452,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">57</context>
         </context-group>
-        <target state="needs-translation">Recently completed</target>
+        <target state="translated">Nedavno završeno</target>
       </trans-unit>
       <trans-unit id="2936452645673957909" datatype="html">
         <source>Consume File</source>
@@ -2460,7 +2460,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="needs-translation">Consume File</target>
+        <target state="translated">Obradi fajl</target>
       </trans-unit>
       <trans-unit id="5622386857946132209" datatype="html">
         <source>Train Classifier</source>
@@ -2468,7 +2468,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">70</context>
         </context-group>
-        <target state="needs-translation">Train Classifier</target>
+        <target state="translated">Treniraj klasifikator</target>
       </trans-unit>
       <trans-unit id="776309955507105337" datatype="html">
         <source>Sanity Check</source>
@@ -2476,7 +2476,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="needs-translation">Sanity Check</target>
+        <target state="translated">Proveri ispravnost</target>
       </trans-unit>
       <trans-unit id="7502272564743467653" datatype="html">
         <source>Mail Fetch</source>
@@ -2496,7 +2496,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">LLM Index</target>
+        <target state="translated">LLM Indeks</target>
       </trans-unit>
       <trans-unit id="6402092370576716734" datatype="html">
         <source>Empty Trash</source>
@@ -2504,7 +2504,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="needs-translation">Empty Trash</target>
+        <target state="translated">Isprazni Otpad</target>
       </trans-unit>
       <trans-unit id="4173754487295857311" datatype="html">
         <source>Check Workflows</source>
@@ -2512,7 +2512,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">84</context>
         </context-group>
-        <target state="needs-translation">Check Workflows</target>
+        <target state="translated">Proverite tokove rada</target>
       </trans-unit>
       <trans-unit id="2065831805515896240" datatype="html">
         <source>Bulk Update</source>
@@ -2520,7 +2520,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">88</context>
         </context-group>
-        <target state="needs-translation">Bulk Update</target>
+        <target state="translated">Masovno ažuriranje</target>
       </trans-unit>
       <trans-unit id="5062348912423871240" datatype="html">
         <source>Reprocess Document</source>
@@ -2528,7 +2528,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="needs-translation">Reprocess Document</target>
+        <target state="translated">Ponovna obrada dokumenta</target>
       </trans-unit>
       <trans-unit id="6903696804811148799" datatype="html">
         <source>Build Share Link</source>
@@ -2536,7 +2536,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">Build Share Link</target>
+        <target state="translated">Napravi link za deljenje</target>
       </trans-unit>
       <trans-unit id="6581973658756561124" datatype="html">
         <source>Bulk Delete</source>
@@ -2544,7 +2544,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">100</context>
         </context-group>
-        <target state="needs-translation">Bulk Delete</target>
+        <target state="translated">Masovno brisanje</target>
       </trans-unit>
       <trans-unit id="9172233176401579786" datatype="html">
         <source>Scheduled</source>
@@ -2588,7 +2588,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">119</context>
         </context-group>
-        <target state="needs-translation">Folder Consume</target>
+        <target state="translated">Konzumiranje fascikle</target>
       </trans-unit>
       <trans-unit id="1456901843819961615" datatype="html">
         <source>Email Consume</source>
@@ -2596,7 +2596,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">123</context>
         </context-group>
-        <target state="needs-translation">Email Consume</target>
+        <target state="translated">Potrošnja imejlova</target>
       </trans-unit>
       <trans-unit id="29832309535656200" datatype="html">
         <source>System</source>
@@ -2604,7 +2604,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">125</context>
         </context-group>
-        <target state="needs-translation">System</target>
+        <target state="translated">Sistem</target>
       </trans-unit>
       <trans-unit id="2233560223291461480" datatype="html">
         <source>Manual</source>
@@ -2612,7 +2612,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="needs-translation">Manual</target>
+        <target state="translated">Ručno</target>
       </trans-unit>
       <trans-unit id="5404910960991552159" datatype="html">
         <source>Dismiss selected</source>
@@ -2628,7 +2628,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">234</context>
         </context-group>
-        <target state="needs-translation">Dismiss visible</target>
+        <target state="translated">Odbaci vidljivo</target>
       </trans-unit>
       <trans-unit id="3169751690815214293" datatype="html">
         <source>Confirm Dismiss</source>
@@ -2636,7 +2636,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">307</context>
         </context-group>
-        <target state="needs-translation">Confirm Dismiss</target>
+        <target state="translated">Potvrdi odbacivanje</target>
       </trans-unit>
       <trans-unit id="5029621907742319073" datatype="html">
         <source>Dismiss <x id="PH" equiv-text="tasks.size"/> tasks?</source>
@@ -2644,7 +2644,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">308</context>
         </context-group>
-        <target state="needs-translation">Dismiss <x id="PH" equiv-text="tasks.size"/> tasks?</target>
+        <target state="translated">Želite li da odbacite <x id="PH" equiv-text="tasks.size"/> zadataka?</target>
       </trans-unit>
       <trans-unit id="3597309129998924778" datatype="html">
         <source>Error dismissing tasks</source>
@@ -2668,7 +2668,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">377</context>
         </context-group>
-        <target state="needs-translation">Success. New document id <x id="PH" equiv-text="documentId"/> created</target>
+        <target state="translated">Uspeh. Novi ID dokumenta <x id="PH" equiv-text="documentId"/> je kreiran</target>
       </trans-unit>
       <trans-unit id="8760066891202884337" datatype="html">
         <source>Duplicate of document #<x id="PH" equiv-text="duplicateOf"/></source>
@@ -2680,7 +2680,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">421</context>
         </context-group>
-        <target state="needs-translation">Duplicate of document #<x id="PH" equiv-text="duplicateOf"/></target>
+        <target state="translated">Duplikat dokumenta br. <x id="PH" equiv-text="duplicateOf"/></target>
       </trans-unit>
       <trans-unit id="3418677553313974490" datatype="html">
         <source>Trash</source>
@@ -7872,7 +7872,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">145</context>
         </context-group>
-        <target state="needs-translation">Recent Task Activity <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;small text-muted fw-light&quot;&gt;"/>(<x id="INTERPOLATION" equiv-text="{{status.tasks.summary.days}}"/> days)<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">Nedavna aktivnost zadataka <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;small text-muted fw-light&quot;&gt;"/>(<x id="INTERPOLATION" equiv-text="{{status.tasks.summary.days}}"/> dana)<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="3448462145758383019" datatype="html">
         <source>Total</source>
@@ -7880,7 +7880,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">150</context>
         </context-group>
-        <target state="needs-translation">Total</target>
+        <target state="translated">Ukupno</target>
       </trans-unit>
       <trans-unit id="3521084103654700903" datatype="html">
         <source>Successful</source>
@@ -7888,7 +7888,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">154</context>
         </context-group>
-        <target state="needs-translation">Successful</target>
+        <target state="translated">Uspešno</target>
       </trans-unit>
       <trans-unit id="7256395947475975935" datatype="html">
         <source>Failed</source>
@@ -7920,7 +7920,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">167</context>
         </context-group>
-        <target state="needs-translation">No recent tasks</target>
+        <target state="translated">Nema skorašnjih zadataka</target>
       </trans-unit>
       <trans-unit id="2041675390931385838" datatype="html">
         <source>Health</source>

@@ -2628,7 +2628,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">234</context>
         </context-group>
-        <target state="translated">Sichtbare entfernen</target>
+        <target state="translated">Angezeigte entfernen</target>
       </trans-unit>
       <trans-unit id="3169751690815214293" datatype="html">
         <source>Confirm Dismiss</source>
@@ -7330,7 +7330,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dialog/share-links-dialog.component.html</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="final">Läuft ab</target>
+        <target state="final">Gültigkeit</target>
       </trans-unit>
       <trans-unit id="5490987011403825190" datatype="html">
         <source>Share archive version (if available)</source>
@@ -7452,13 +7452,13 @@
         </context-group>
         <target state="final">Größe</target>
       </trans-unit>
-      <trans-unit id="1937312492123744642" datatype="html">
+      <trans-unit id="1937312492123744642" datatype="html" approved="yes">
         <source>A zip file containing the selected documents will be created for this share link bundle. This process happens in the background and may take some time, especially for large bundles.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-link-bundle-dialog/share-link-bundle-dialog.component.html</context>
           <context context-type="linenumber">109</context>
         </context-group>
-        <target state="translated">Für dieses Link-Paket wird eine ZIP-Datei mit den ausgewählten Dokumenten erstellt. Dieser Vorgang wird im Hintergrund ausgeführt und kann vor allem für große Bündel einige Zeit dauern.</target>
+        <target state="final">Für dieses Link-Paket wird eine ZIP-Datei mit den ausgewählten Dokumenten erstellt. Dieser Vorgang wird im Hintergrund ausgeführt und kann vor allem für große Pakete einige Zeit dauern.</target>
       </trans-unit>
       <trans-unit id="7274497464693086242" datatype="html">
         <source>Manage share link bundles</source>
@@ -8414,7 +8414,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="final">Verwende formatierten Dateinamen</target>
+        <target state="final">Formatierten Dateinamen verwenden</target>
       </trans-unit>
       <trans-unit id="2696010339872056565" datatype="html" approved="yes">
         <source>Reprocess</source>
@@ -11037,7 +11037,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">143</context>
         </context-group>
-        <target state="final">Verarbeitete Mail anzeigen</target>
+        <target state="final">Verarbeitete E-Mails anzeigen</target>
       </trans-unit>
       <trans-unit id="6751234988479444294" datatype="html" approved="yes">
         <source>No mail rules defined.</source>

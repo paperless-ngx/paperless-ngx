@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-05 01:01+0000\n"
-"PO-Revision-Date: 2026-05-05 12:38\n"
+"PO-Revision-Date: 2026-05-17 01:11\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -257,11 +257,11 @@ msgstr "Versionsindex"
 
 #: documents/models.py:326
 msgid "Index of this version within the root document."
-msgstr "Index dieser Version innerhalb des Stammdokuments."
+msgstr "Index dieser Version innerhalb des Hauptdokuments."
 
 #: documents/models.py:330
 msgid "version label"
-msgstr "Versionsbezeichnung"
+msgstr "Version"
 
 #: documents/models.py:334
 msgid "Optional short label for a document version."
