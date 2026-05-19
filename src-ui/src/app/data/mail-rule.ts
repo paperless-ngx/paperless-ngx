@@ -9,6 +9,7 @@ export enum MailRuleConsumptionScope {
   Attachments = 1,
   EmailOnly = 2,
   Everything = 3,
+  Combined = 4,
 }
 
 export enum MailRulePdfLayout {

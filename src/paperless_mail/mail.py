@@ -737,7 +737,13 @@ class MailAccountHandler(LoggingMixin):
         if (
             rule.consumption_scope == MailRule.ConsumptionScope.EML_ONLY
             or rule.consumption_scope == MailRule.ConsumptionScope.EVERYTHING
+            or rule.consumption_scope == MailRule.ConsumptionScope.COMBINED
         ):
+            # COMBINED, like EML_ONLY, hands the full message to the parser as
+            # a single .eml. The semantic difference is intent: COMBINED is
+            # for parsers that render body + attachments into one merged
+            # document; EML_ONLY stores the raw .eml verbatim. Attachments
+            # are not re-extracted as separate documents in either case.
             processed_elements += self._process_eml(
                 message,
                 rule,

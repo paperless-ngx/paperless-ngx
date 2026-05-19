@@ -56,6 +56,10 @@ const CONSUMPTION_SCOPE_OPTIONS = [
     id: MailRuleConsumptionScope.Everything,
     name: $localize`Process message as .eml and attachments separately`,
   },
+  {
+    id: MailRuleConsumptionScope.Combined,
+    name: $localize`Process body + attachments as a single document`,
+  },
 ]
 
 const PDF_LAYOUT_OPTIONS = [

@@ -110,6 +110,13 @@ class MailRule(document_models.ModelWithOwner):
                 "+ process attachments as separate documents",
             ),
         )
+        COMBINED = (
+            4,
+            _(
+                "Process body + attachments merged into a single document "
+                "(parser is expected to merge attachments into the body)",
+            ),
+        )
 
     class AttachmentProcessing(models.IntegerChoices):
         ATTACHMENTS_ONLY = 1, _("Only process attachments.")

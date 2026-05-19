@@ -533,6 +533,80 @@ class TestMail(
             ],
         )
 
+    def test_handle_message_consumption_scope_combined(self) -> None:
+        """COMBINED routes the full mail through _process_eml as a single
+        document (parser is expected to merge body + attachments); the
+        per-attachment path is NOT taken so attachments do not become
+        separate documents."""
+        message = self.mailMocker.messageBuilder.create_message(
+            subject="combined-scope mail",
+            from_="Myself",
+            attachments=2,
+        )
+
+        account = MailAccount.objects.create()
+        rule = MailRule(
+            assign_title_from=MailRule.TitleSource.FROM_FILENAME,
+            account=account,
+            consumption_scope=MailRule.ConsumptionScope.COMBINED,
+        )
+        rule.save()
+
+        with (
+            mock.patch.object(
+                self.mail_account_handler,
+                "_process_eml",
+                return_value=1,
+            ) as eml_mock,
+            mock.patch.object(
+                self.mail_account_handler,
+                "_process_attachments",
+                return_value=0,
+            ) as att_mock,
+        ):
+            result = self.mail_account_handler._handle_message(message, rule)
+
+        self.assertEqual(result, 1)
+        eml_mock.assert_called_once()
+        att_mock.assert_not_called()
+
+    def test_handle_message_consumption_scope_combined_no_attachments(self) -> None:
+        """COMBINED on a body-only message (no attachments) still routes
+        through _process_eml so the body becomes a document. Unlike
+        ATTACHMENTS_ONLY, COMBINED does not short-circuit when there are
+        no attachments."""
+        message = self.mailMocker.messageBuilder.create_message(
+            subject="combined-scope body-only",
+            from_="Myself",
+            attachments=0,
+        )
+
+        account = MailAccount.objects.create()
+        rule = MailRule(
+            assign_title_from=MailRule.TitleSource.FROM_SUBJECT,
+            account=account,
+            consumption_scope=MailRule.ConsumptionScope.COMBINED,
+        )
+        rule.save()
+
+        with (
+            mock.patch.object(
+                self.mail_account_handler,
+                "_process_eml",
+                return_value=1,
+            ) as eml_mock,
+            mock.patch.object(
+                self.mail_account_handler,
+                "_process_attachments",
+                return_value=0,
+            ) as att_mock,
+        ):
+            result = self.mail_account_handler._handle_message(message, rule)
+
+        self.assertEqual(result, 1)
+        eml_mock.assert_called_once()
+        att_mock.assert_not_called()
+
     def test_handle_empty_message(self) -> None:
         message = namedtuple("MailMessage", [])
 
