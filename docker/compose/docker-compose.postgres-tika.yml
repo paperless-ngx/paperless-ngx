@@ -34,6 +34,8 @@ services:
     restart: unless-stopped
     volumes:
       - redisdata:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG || exit 1"]
   db:
     image: docker.io/library/postgres:18
     restart: unless-stopped
@@ -43,14 +45,20 @@ services:
       POSTGRES_DB: paperless
       POSTGRES_USER: paperless
       POSTGRES_PASSWORD: paperless
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "paperless"]
   webserver:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
     depends_on:
-      - db
-      - broker
-      - gotenberg
-      - tika
+      db:
+        condition: service_healthy
+      broker:
+        condition: service_healthy
+      gotenberg:
+        condition: service_healthy
+      tika:
+        condition: service_started
     ports:
       - "8000:8000"
     volumes:
@@ -75,6 +83,8 @@ services:
       - "gotenberg"
       - "--chromium-disable-javascript=true"
       - "--chromium-allow-list=file:///tmp/.*"
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:3000/health | grep -q '\"status\":\"up\"'"]
   tika:
     image: docker.io/apache/tika:latest
     restart: unless-stopped
