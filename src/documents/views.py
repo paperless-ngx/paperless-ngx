@@ -2150,7 +2150,7 @@ class ChatStreamingSerializer(serializers.Serializer[dict[str, Any]]):
     name="dispatch",
 )
 class ChatStreamingView(GenericAPIView[Any]):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, ViewDocumentsPermissions)
     serializer_class = ChatStreamingSerializer
 
     def post(self, request, *args, **kwargs):
