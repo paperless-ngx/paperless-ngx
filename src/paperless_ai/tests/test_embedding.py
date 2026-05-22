@@ -1,4 +1,5 @@
 import json
+from unittest.mock import ANY
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
@@ -70,6 +71,8 @@ def test_get_embedding_model_openai(mock_ai_config):
             model_name="text-embedding-3-small",
             api_key="test_api_key",
             api_base="http://test-url",
+            http_client=ANY,
+            async_http_client=ANY,
         )
         assert model == MockOpenAIEmbedding.return_value
 
@@ -89,6 +92,8 @@ def test_get_embedding_model_openai_prefers_embedding_endpoint(mock_ai_config):
             model_name="text-embedding-3-small",
             api_key="test_api_key",
             api_base="http://embedding-url",
+            http_client=ANY,
+            async_http_client=ANY,
         )
         assert model == MockOpenAIEmbedding.return_value
 
