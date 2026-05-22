@@ -198,6 +198,7 @@ class ShareLinksAdmin(GuardedModelAdmin):
 class ShareLinkBundleAdmin(GuardedModelAdmin):
     list_display = ("created", "status", "expiration", "owner", "slug")
     list_filter = ("status", "created", "expiration", "owner")
+    readonly_fields = ("file_path",)
     search_fields = ("slug",)
 
     def get_queryset(self, request):  # pragma: no cover
