@@ -54,11 +54,15 @@ class _AttachmentDef:
 
 class BogusFolderManager:
     current_folder = "INBOX"
+    uidvalidity = "1"
 
     def set(self, new_folder) -> None:
         if new_folder not in ["INBOX", "spam"]:
             raise MailboxFolderSelectError(None, "uhm")
         self.current_folder = new_folder
+
+    def status(self, folder, options):
+        return {"UIDVALIDITY": self.uidvalidity}
 
 
 class BogusClient:
@@ -941,6 +945,90 @@ class TestMail(
 
         self.mail_account_handler.handle_mail_account(account)
         self.mailMocker.apply_mail_actions()
+
+        self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 1)
+
+    def test_handle_mail_account_skips_mail_already_processed_in_same_uidvalidity(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A ProcessedMail row recorded under the mailbox's current UIDVALIDITY
+        WHEN:
+            - A mail with the same UID is fetched from the same UIDVALIDITY epoch
+        THEN:
+            - The mail is skipped as a duplicate.
+        """
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        rule = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.DELETE,
+        )
+
+        message = self.mailMocker.messageBuilder.create_message()
+        self.mailMocker.bogus_mailbox.messages = [message]
+        self.mailMocker.bogus_mailbox.updateClient()
+
+        self.mailMocker.bogus_mailbox.folder.uidvalidity = "SAME"
+        ProcessedMail.objects.create(
+            rule=rule,
+            folder=rule.folder,
+            uid=message.uid,
+            uid_validity="SAME",
+            subject="Previously processed mail",
+            status="SUCCESS",
+            received=timezone.make_aware(timezone.datetime(2023, 1, 1, 12, 0, 0)),
+        )
+
+        self.mail_account_handler.handle_mail_account(account)
+
+        self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 0)
+
+    def test_handle_mail_account_processes_mail_after_uidvalidity_change(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A ProcessedMail row recorded under a previous UIDVALIDITY epoch
+        WHEN:
+            - A mail with the same UID is fetched after UIDVALIDITY has changed
+        THEN:
+            - The mail is processed, not skipped as a duplicate.
+        """
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        rule = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.DELETE,
+        )
+
+        message = self.mailMocker.messageBuilder.create_message()
+        self.mailMocker.bogus_mailbox.messages = [message]
+        self.mailMocker.bogus_mailbox.updateClient()
+
+        self.mailMocker.bogus_mailbox.folder.uidvalidity = "NEW"
+        ProcessedMail.objects.create(
+            rule=rule,
+            folder=rule.folder,
+            uid=message.uid,
+            uid_validity="OLD",
+            subject="Previously processed mail",
+            status="SUCCESS",
+            received=timezone.make_aware(timezone.datetime(2023, 1, 1, 12, 0, 0)),
+        )
+
+        self.mail_account_handler.handle_mail_account(account)
 
         self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 1)
 
