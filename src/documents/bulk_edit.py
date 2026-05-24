@@ -676,9 +676,9 @@ def split(
                     chord(
                         header=consume_tasks,
                         body=delete.si([doc.id]),
-                    ).apply_async(
-                        link_error=[restore_archive_serial_numbers_task.s(backup)],
-                    )
+                    ).on_error(
+                        restore_archive_serial_numbers_task.s(backup),
+                    ).apply_async()
                 except Exception:
                     restore_archive_serial_numbers(backup)
                     raise
@@ -856,9 +856,9 @@ def edit_pdf(
                     chord(
                         header=consume_tasks,
                         body=delete.si([doc.id]),
-                    ).apply_async(
-                        link_error=[restore_archive_serial_numbers_task.s(backup)],
-                    )
+                    ).on_error(
+                        restore_archive_serial_numbers_task.s(backup),
+                    ).apply_async()
                 except Exception:
                     restore_archive_serial_numbers(backup)
                     raise

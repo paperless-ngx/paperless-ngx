@@ -945,6 +945,10 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         pages = [[1, 2], [3]]
         self.doc2.archive_serial_number = 200
         self.doc2.save()
+        errback = bulk_edit.restore_archive_serial_numbers_task.s(
+            {self.doc2.id: 200},
+        )
+        mock_chord.return_value.on_error.return_value = mock_chord.return_value
 
         result = bulk_edit.split(doc_ids, pages, delete_originals=True)
         self.assertEqual(result, "OK")
@@ -957,6 +961,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         mock_delete_documents.assert_called()
         mock_chord.assert_called_once()
+        mock_chord.return_value.on_error.assert_called_once_with(errback)
+        mock_chord.return_value.apply_async.assert_called_once_with()
 
         delete_documents_args, _ = mock_delete_documents.call_args
         self.assertEqual(
@@ -991,6 +997,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.doc2.save()
 
         sig = mock.Mock()
+        sig.on_error.return_value = sig
         sig.apply_async.side_effect = Exception("boom")
         mock_chord.return_value = sig
 
@@ -1256,10 +1263,16 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         operations = [{"page": 1}, {"page": 2}]
         self.doc2.archive_serial_number = 250
         self.doc2.save()
+        errback = bulk_edit.restore_archive_serial_numbers_task.s(
+            {self.doc2.id: 250},
+        )
+        mock_chord.return_value.on_error.return_value = mock_chord.return_value
 
         result = bulk_edit.edit_pdf(doc_ids, operations, delete_original=True)
         self.assertEqual(result, "OK")
         mock_chord.assert_called_once()
+        mock_chord.return_value.on_error.assert_called_once_with(errback)
+        mock_chord.return_value.apply_async.assert_called_once_with()
         self.assertEqual(mock_consume_file.call_args.kwargs["overrides"].asn, 250)
         self.doc2.refresh_from_db()
         self.assertIsNone(self.doc2.archive_serial_number)
@@ -1288,6 +1301,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.doc2.save()
 
         sig = mock.Mock()
+        sig.on_error.return_value = sig
         sig.apply_async.side_effect = Exception("boom")
         mock_chord.return_value = sig
 
