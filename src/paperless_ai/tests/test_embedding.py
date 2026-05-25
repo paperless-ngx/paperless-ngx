@@ -7,6 +7,7 @@ from django.conf import settings
 
 from documents.models import Document
 from paperless.models import LLMEmbeddingBackend
+from paperless_ai.embedding import _normalize_llm_index_text
 from paperless_ai.embedding import build_llm_index_text
 from paperless_ai.embedding import get_embedding_dim
 from paperless_ai.embedding import get_embedding_model
@@ -243,3 +244,23 @@ def test_build_llm_index_text(mock_document):
         assert "Notes: Note1,Note2" in result
         assert "Content:\n\nThis is the document content." in result
         assert "Custom Field - Field1: Value1\nCustom Field - Field2: Value2" in result
+
+
+def test_build_llm_index_text_normalizes_ocr_punctuation_runs(mock_document):
+    mock_document.content = (
+        "Introduction ................................................ 7\n"
+        "Hardware Limitation ________________________________________ 9\n"
+        "Keep short punctuation like INV-100 and ellipses..."
+    )
+
+    with patch("documents.models.Note.objects.filter", return_value=[]):
+        result = build_llm_index_text(mock_document)
+
+    assert "Introduction 7" in result
+    assert "Hardware Limitation 9" in result
+    assert "INV-100" in result
+    assert "ellipses..." in result
+
+
+def test_normalize_llm_index_text_collapses_ocr_leaders_without_joining_lines():
+    assert _normalize_llm_index_text("A........B\nC____D----E") == "A B\nC D E"
