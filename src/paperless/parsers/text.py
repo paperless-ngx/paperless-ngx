@@ -301,7 +301,7 @@ class TextDocumentParser:
     # ------------------------------------------------------------------
 
     def _read_text(self, filepath: Path) -> str:
-        """Read file content, replacing invalid UTF-8 bytes rather than failing.
+        """Read file content, detecting encoding via BOM and stripping NUL bytes.
 
         Parameters
         ----------
@@ -311,14 +311,27 @@ class TextDocumentParser:
         Returns
         -------
         str
-            File content as a string.
+            File content as a string, with NUL bytes removed so the result
+            is safe to store in PostgreSQL text fields.
         """
+        raw = filepath.read_bytes()
+
+        if raw[:2] in (b"\xff\xfe", b"\xfe\xff"):
+            encoding = "utf-16"
+        elif raw[:3] == b"\xef\xbb\xbf":
+            encoding = "utf-8-sig"
+        else:
+            encoding = "utf-8"
+
         try:
-            return filepath.read_text(encoding="utf-8")
+            text = raw.decode(encoding)
         except UnicodeDecodeError as exc:
             logger.warning(
                 "Unicode error reading %s, replacing bad bytes: %s",
                 filepath,
                 exc,
             )
-            return filepath.read_bytes().decode("utf-8", errors="replace")
+            text = raw.decode("utf-8", errors="replace")
+
+        # PostgreSQL rejects NUL (0x00) bytes in text fields
+        return text.replace("\x00", "")
