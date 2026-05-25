@@ -15,7 +15,8 @@ from paperless.config import AIConfig
 from paperless.models import LLMEmbeddingBackend
 from paperless.network import validate_outbound_http_url
 
-WHITESPACE_AND_PUNCTUATION_REGEX = re.compile(r"[ \t]*[._\-\u00b7]{4,}[ \t]*")
+OCR_LEADER_REGEX = re.compile(r"[._\-\u00b7]{4,}")
+HORIZONTAL_WHITESPACE_REGEX = re.compile(r"[ \t]{2,}")
 
 
 def get_embedding_model() -> "BaseEmbedding":
@@ -104,7 +105,8 @@ def get_embedding_dim() -> int:
 
 
 def _normalize_llm_index_text(text: str) -> str:
-    return WHITESPACE_AND_PUNCTUATION_REGEX.sub(" ", text)
+    text = OCR_LEADER_REGEX.sub(" ", text)
+    return HORIZONTAL_WHITESPACE_REGEX.sub(" ", text)
 
 
 def build_llm_index_text(doc: Document) -> str:
