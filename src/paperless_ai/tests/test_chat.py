@@ -3,7 +3,6 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
-from llama_index.core import VectorStoreIndex
 from llama_index.core.schema import TextNode
 
 from paperless_ai.chat import CHAT_METADATA_DELIMITER
@@ -29,7 +28,7 @@ def patch_embed_nodes():
         mock_embed_nodes.side_effect = lambda nodes, *_args, **_kwargs: {
             node.node_id: [0.1] * 1536 for node in nodes
         }
-        yield
+        yield mock_embed_nodes
 
 
 @pytest.fixture
@@ -57,7 +56,25 @@ def assert_chat_output(
     }
 
 
-def test_stream_chat_with_one_document_retrieval(mock_document) -> None:
+def add_vector_query_results(mock_index, nodes: list[TextNode]) -> None:
+    mock_index.index_struct.nodes_dict = {
+        str(vector_id): node.node_id for vector_id, node in enumerate(nodes)
+    }
+    mock_index.docstore.docs.get.side_effect = {
+        node.node_id: node for node in nodes
+    }.get
+    mock_index.vector_store._faiss_index.ntotal = len(nodes)
+    mock_index.vector_store.query.return_value = MagicMock(
+        ids=list(mock_index.index_struct.nodes_dict),
+        similarities=[0.1] * len(nodes),
+    )
+    mock_index._embed_model.get_agg_embedding_from_queries.return_value = [0.1] * 1536
+
+
+def test_stream_chat_with_one_document_retrieval(
+    mock_document,
+    patch_embed_nodes,
+) -> None:
     with (
         patch("paperless_ai.chat.AIClient") as mock_client_cls,
         patch("paperless_ai.chat.load_or_build_index") as mock_load_index,
@@ -75,6 +92,7 @@ def test_stream_chat_with_one_document_retrieval(mock_document) -> None:
         )
         mock_index = MagicMock()
         mock_index.docstore.docs.values.return_value = [mock_node]
+        add_vector_query_results(mock_index, [mock_node])
         mock_load_index.return_value = mock_index
 
         mock_response_stream = MagicMock()
@@ -86,6 +104,7 @@ def test_stream_chat_with_one_document_retrieval(mock_document) -> None:
         output = list(stream_chat_with_documents("What is this?", [mock_document]))
 
         mock_query_engine.query.assert_called_once_with("What is this?")
+        patch_embed_nodes.assert_not_called()
         assert_chat_output(
             output,
             expected_chunks=["chunk1", "chunk2"],
@@ -102,7 +121,6 @@ def test_stream_chat_with_multiple_documents_retrieval(patch_embed_nodes) -> Non
         patch(
             "llama_index.core.query_engine.RetrieverQueryEngine.from_args",
         ) as mock_query_engine_cls,
-        patch.object(VectorStoreIndex, "as_retriever") as mock_as_retriever,
     ):
         # Mock AIClient and LLM
         mock_client = MagicMock()
@@ -118,12 +136,6 @@ def test_stream_chat_with_multiple_documents_retrieval(patch_embed_nodes) -> Non
             text="Content for doc 2.",
             metadata={"document_id": "2", "title": "Document 2"},
         )
-        mock_index = MagicMock()
-        mock_index.docstore.docs.values.return_value = [mock_node1, mock_node2]
-        mock_load_index.return_value = mock_index
-
-        # Patch as_retriever to return a retriever whose retrieve() returns mock_node1 and mock_node2
-        mock_retriever = MagicMock()
         mock_duplicate_node = TextNode(
             text="More content for doc 1.",
             metadata={"document_id": "1", "title": "Document 1 Duplicate"},
@@ -132,13 +144,18 @@ def test_stream_chat_with_multiple_documents_retrieval(patch_embed_nodes) -> Non
             text="Content for doc 3.",
             metadata={"document_id": "3", "title": "Document 3"},
         )
-        mock_retriever.retrieve.return_value = [
+        mock_index = MagicMock()
+        mock_index.docstore.docs.values.return_value = [
             mock_node1,
-            mock_duplicate_node,
             mock_node2,
+            mock_duplicate_node,
             mock_foreign_node,
         ]
-        mock_as_retriever.return_value = mock_retriever
+        add_vector_query_results(
+            mock_index,
+            [mock_node1, mock_duplicate_node, mock_node2, mock_foreign_node],
+        )
+        mock_load_index.return_value = mock_index
 
         # Mock response stream
         mock_response_stream = MagicMock()
@@ -156,6 +173,7 @@ def test_stream_chat_with_multiple_documents_retrieval(patch_embed_nodes) -> Non
         output = list(stream_chat_with_documents("What's up?", [doc1, doc2]))
 
         mock_query_engine.query.assert_called_once_with("What's up?")
+        patch_embed_nodes.assert_not_called()
         assert_chat_output(
             output,
             expected_chunks=["chunk1", "chunk2"],
