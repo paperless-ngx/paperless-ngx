@@ -6,6 +6,7 @@ import pytest
 from llama_index.core.schema import TextNode
 
 from paperless_ai.chat import CHAT_METADATA_DELIMITER
+from paperless_ai.chat import _get_document_filtered_retriever
 from paperless_ai.chat import stream_chat_with_documents
 
 
@@ -69,6 +70,76 @@ def add_vector_query_results(mock_index, nodes: list[TextNode]) -> None:
         similarities=[0.1] * len(nodes),
     )
     mock_index._embed_model.get_agg_embedding_from_queries.return_value = [0.1] * 1536
+
+
+def test_document_filtered_retriever_expands_filters_and_caches() -> None:
+    allowed_node1 = TextNode(
+        text="Allowed content 1.",
+        metadata={"document_id": "1", "title": "Allowed 1"},
+    )
+    allowed_node2 = TextNode(
+        text="Allowed content 2.",
+        metadata={"document_id": "2", "title": "Allowed 2"},
+    )
+    foreign_node = TextNode(
+        text="Foreign content.",
+        metadata={"document_id": "3", "title": "Foreign"},
+    )
+    missing_node = TextNode(
+        text="Missing content.",
+        metadata={"document_id": "1", "title": "Missing"},
+    )
+
+    mock_index = MagicMock()
+    mock_index.index_struct.nodes_dict = {
+        "0": foreign_node.node_id,
+        "1": missing_node.node_id,
+        "2": allowed_node1.node_id,
+        "3": allowed_node2.node_id,
+    }
+    mock_index.docstore.docs.get.side_effect = {
+        allowed_node1.node_id: allowed_node1,
+        allowed_node2.node_id: allowed_node2,
+        foreign_node.node_id: foreign_node,
+    }.get
+    mock_index.vector_store._faiss_index.ntotal = 4
+    mock_index.vector_store.query.side_effect = [
+        MagicMock(ids=["0", "1"], similarities=[0.9, 0.8]),
+        MagicMock(ids=["0", "1", "2", "3"], similarities=[0.9, 0.8, 0.7, 0.6]),
+    ]
+    mock_index._embed_model.get_agg_embedding_from_queries.return_value = [0.1] * 1536
+
+    retriever = _get_document_filtered_retriever(
+        mock_index,
+        {"1", "2"},
+        similarity_top_k=2,
+    )
+
+    nodes = retriever.retrieve("question")
+    cached_nodes = retriever.retrieve("question")
+
+    assert [node.node.node_id for node in nodes] == [
+        allowed_node1.node_id,
+        allowed_node2.node_id,
+    ]
+    assert cached_nodes == nodes
+    assert mock_index.vector_store.query.call_count == 2
+    assert mock_index._embed_model.get_agg_embedding_from_queries.call_count == 1
+
+
+def test_document_filtered_retriever_handles_empty_faiss_index() -> None:
+    mock_index = MagicMock()
+    mock_index.vector_store._faiss_index.ntotal = 0
+    mock_index._embed_model.get_agg_embedding_from_queries.return_value = [0.1] * 1536
+
+    retriever = _get_document_filtered_retriever(
+        mock_index,
+        {"1"},
+        similarity_top_k=2,
+    )
+
+    assert retriever.retrieve("question") == []
+    mock_index.vector_store.query.assert_not_called()
 
 
 def test_stream_chat_with_one_document_retrieval(
