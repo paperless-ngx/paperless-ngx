@@ -10,6 +10,7 @@ from paperless_ai.indexing import load_or_build_index
 logger = logging.getLogger("paperless_ai.chat")
 
 CHAT_METADATA_DELIMITER = "\n\n__PAPERLESS_CHAT_METADATA__"
+CHAT_ERROR_MESSAGE = "Sorry, something went wrong while generating a response."
 MAX_CHAT_REFERENCES = 3
 CHAT_RETRIEVER_TOP_K = 5
 
@@ -69,6 +70,14 @@ def _format_chat_metadata_trailer(references: list[dict[str, int | str]]) -> str
 
 
 def stream_chat_with_documents(query_str: str, documents: list[Document]):
+    try:
+        yield from _stream_chat_with_documents(query_str, documents)
+    except Exception as e:
+        logger.exception(f"Failed to stream document chat response: {e}", exc_info=True)
+        yield CHAT_ERROR_MESSAGE
+
+
+def _stream_chat_with_documents(query_str: str, documents: list[Document]):
     client = AIClient()
     index = load_or_build_index()
 
