@@ -8,12 +8,14 @@ from typing import TYPE_CHECKING
 import filelock
 import pytest
 
-from documents.models import Document
 from documents.search._backend import _LOCK_BACKOFF_CAP
 from documents.search._backend import _LOCK_RETRY_ATTEMPTS
 from documents.search._backend import _LOCK_TIMEOUT_SECONDS
 from documents.search._backend import SearchIndexLockError
 from documents.search._backend import TantivyBackend
+from documents.tasks import index_document
+from documents.tasks import remove_document_from_index
+from documents.tests.factories import DocumentFactory
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -21,7 +23,7 @@ if TYPE_CHECKING:
 
     from pytest_mock import MockerFixture
 
-pytestmark = [pytest.mark.search, pytest.mark.django_db]
+pytestmark = pytest.mark.search
 
 
 @pytest.fixture
@@ -38,18 +40,14 @@ def disk_backend(tmp_path: Path) -> Generator[TantivyBackend, None, None]:
 class TestWriteBatchLockRetry:
     """Test WriteBatch retry loop with backoff + full jitter."""
 
+    @pytest.mark.django_db
     def test_lock_retries_then_succeeds(
         self,
         disk_backend: TantivyBackend,
         mocker: MockerFixture,
     ) -> None:
         """Timeout on first 3 attempts then success on 4th — document must be indexed."""
-        doc = Document.objects.create(
-            title="Retry Success",
-            content="eventually indexed",
-            checksum="RS001",
-            pk=501,
-        )
+        doc = DocumentFactory()
 
         acquire_calls = 0
 
@@ -130,18 +128,14 @@ class TestWriteBatchLockRetry:
 class TestAddOrUpdateDeferredScheduling:
     """Test that add_or_update() and remove() defer to Celery on lock exhaustion."""
 
+    @pytest.mark.django_db
     def test_lock_exhaustion_schedules_deferred_task(
         self,
         disk_backend: TantivyBackend,
         mocker: MockerFixture,
     ) -> None:
         """Lock exhaustion in add_or_update must schedule index_document task, not raise."""
-        doc = Document.objects.create(
-            title="Deferred Doc",
-            content="deferred content",
-            checksum="DD001",
-            pk=502,
-        )
+        doc = DocumentFactory()
 
         mocker.patch(
             "documents.search._backend.filelock.FileLock.acquire",
@@ -178,6 +172,7 @@ class TestAddOrUpdateDeferredScheduling:
         mock_apply.assert_called_once_with(args=[doc_id], countdown=60)
 
 
+@pytest.mark.django_db
 class TestIndexDocumentTask:
     """Test the deferred index_document and remove_document_from_index Celery tasks."""
 
@@ -186,8 +181,6 @@ class TestIndexDocumentTask:
         caplog: pytest.LogCaptureFixture,
     ) -> None:
         """index_document with a non-existent doc_id must return cleanly and log INFO."""
-        from documents.tasks import index_document
-
         nonexistent_id = 999999
 
         with caplog.at_level(logging.INFO, logger="paperless.tasks"):
@@ -203,14 +196,7 @@ class TestIndexDocumentTask:
         mocker: MockerFixture,
     ) -> None:
         """index_document task must add the document to the index via batch_update."""
-        from documents.tasks import index_document
-
-        doc = Document.objects.create(
-            title="Task Indexed",
-            content="via deferred task",
-            checksum="TI001",
-            pk=504,
-        )
+        doc = DocumentFactory(content="via deferred task")
 
         # get_backend is imported lazily inside the task: `from documents.search import get_backend`
         mocker.patch(
@@ -222,6 +208,21 @@ class TestIndexDocumentTask:
         ids = backend.search_ids("deferred task", user=None)
         assert doc.pk in ids
 
+    def test_remove_document_from_index_task_removes_existing_document(
+        self,
+        backend: TantivyBackend,
+        mocker: MockerFixture,
+    ) -> None:
+        """remove_document_from_index task must remove the document from the index."""
+        doc = DocumentFactory(content="will be removed by deferred task")
+        backend.add_or_update(doc)
+        assert doc.pk in backend.search_ids("removed", user=None)
+
+        mocker.patch("documents.search.get_backend", return_value=backend)
+        remove_document_from_index(doc.pk)
+
+        assert doc.pk not in backend.search_ids("removed", user=None)
+
     def test_task_does_not_swallow_lock_error(
         self,
         mocker: MockerFixture,
@@ -229,14 +230,7 @@ class TestIndexDocumentTask:
         """Verifies the task body propagates SearchIndexLockError so Celery's
         autoretry_for can catch it (rather than the task swallowing the error
         and silently succeeding)."""
-        from documents.tasks import index_document
-
-        doc = Document.objects.create(
-            title="Exhausted Retry",
-            content="will not be indexed",
-            checksum="ER001",
-            pk=505,
-        )
+        doc = DocumentFactory()
 
         mock_batch = mocker.MagicMock()
         mock_batch.__enter__ = mocker.MagicMock(
