@@ -124,7 +124,7 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         self.assertIn("document_ids", response.data)
 
     def test_download_ready_bundle_streams_file(self) -> None:
-        bundle_file = Path(self.dirs.media_dir) / "bundles" / "ready.zip"
+        bundle_file = settings.SHARE_LINK_BUNDLE_DIR / "bundles" / "ready.zip"
         bundle_file.parent.mkdir(parents=True, exist_ok=True)
         bundle_file.write_bytes(b"binary-zip-content")
 
@@ -132,7 +132,7 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
             slug="readyslug",
             file_version=ShareLink.FileVersion.ARCHIVE,
             status=ShareLinkBundle.Status.READY,
-            file_path=str(bundle_file),
+            file_path=str(bundle_file.relative_to(settings.SHARE_LINK_BUNDLE_DIR)),
         )
         bundle.documents.set([self.document])
 
@@ -199,11 +199,11 @@ class ShareLinkBundleTaskTests(DirectoriesMixin, APITestCase):
         self.document = DocumentFactory.create()
 
     def test_cleanup_expired_share_link_bundles(self) -> None:
-        expired_path = Path(self.dirs.media_dir) / "expired.zip"
+        expired_path = settings.SHARE_LINK_BUNDLE_DIR / "expired.zip"
         expired_path.parent.mkdir(parents=True, exist_ok=True)
         expired_path.write_bytes(b"expired")
 
-        active_path = Path(self.dirs.media_dir) / "active.zip"
+        active_path = settings.SHARE_LINK_BUNDLE_DIR / "active.zip"
         active_path.write_bytes(b"active")
 
         expired_bundle = ShareLinkBundle.objects.create(
@@ -211,7 +211,7 @@ class ShareLinkBundleTaskTests(DirectoriesMixin, APITestCase):
             file_version=ShareLink.FileVersion.ARCHIVE,
             status=ShareLinkBundle.Status.READY,
             expiration=timezone.now() - timedelta(days=1),
-            file_path=str(expired_path),
+            file_path=expired_path.name,
         )
         expired_bundle.documents.set([self.document])
 
@@ -220,7 +220,7 @@ class ShareLinkBundleTaskTests(DirectoriesMixin, APITestCase):
             file_version=ShareLink.FileVersion.ARCHIVE,
             status=ShareLinkBundle.Status.READY,
             expiration=timezone.now() + timedelta(days=1),
-            file_path=str(active_path),
+            file_path=active_path.name,
         )
         active_bundle.documents.set([self.document])
 
@@ -424,7 +424,7 @@ class ShareLinkBundleFilterSetTests(DirectoriesMixin, APITestCase):
 
 
 class ShareLinkBundleModelTests(DirectoriesMixin, APITestCase):
-    def test_absolute_file_path_handles_relative_and_absolute(self) -> None:
+    def test_absolute_file_path_handles_relative_path(self) -> None:
         relative_path = Path("relative.zip")
         bundle = ShareLinkBundle.objects.create(
             slug="relative-bundle",
@@ -437,10 +437,23 @@ class ShareLinkBundleModelTests(DirectoriesMixin, APITestCase):
             (settings.SHARE_LINK_BUNDLE_DIR / relative_path).resolve(),
         )
 
-        absolute_path = Path(self.dirs.media_dir) / "absolute.zip"
-        bundle.file_path = str(absolute_path)
+    def test_absolute_file_path_rejects_absolute_path(self) -> None:
+        bundle = ShareLinkBundle.objects.create(
+            slug="absolute-bundle",
+            file_version=ShareLink.FileVersion.ORIGINAL,
+            file_path=str(Path(self.dirs.media_dir) / "absolute.zip"),
+        )
 
-        self.assertEqual(bundle.absolute_file_path.resolve(), absolute_path.resolve())
+        self.assertIsNone(bundle.absolute_file_path)
+
+    def test_absolute_file_path_rejects_traversal_outside_bundle_dir(self) -> None:
+        bundle = ShareLinkBundle.objects.create(
+            slug="traversal-bundle",
+            file_version=ShareLink.FileVersion.ORIGINAL,
+            file_path="../escaped.zip",
+        )
+
+        self.assertIsNone(bundle.absolute_file_path)
 
     def test_str_returns_translated_slug(self) -> None:
         bundle = ShareLinkBundle.objects.create(

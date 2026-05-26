@@ -9,6 +9,10 @@ if TYPE_CHECKING:
     from llama_index.llms.openai_like import OpenAILike
 
 from paperless.config import AIConfig
+from paperless.network import PinnedHostAsyncHTTPTransport
+from paperless.network import PinnedHostHTTPTransport
+from paperless.network import create_pinned_async_httpx_client
+from paperless.network import create_pinned_httpx_client
 from paperless.network import validate_outbound_http_url
 from paperless_ai.base_model import DocumentClassifierSchema
 
@@ -27,23 +31,47 @@ class AIClient:
     def get_llm(self) -> "Ollama | OpenAILike":
         if self.settings.llm_backend == LLMBackend.OLLAMA:
             from llama_index.llms.ollama import Ollama
+            from ollama import AsyncClient
+            from ollama import Client
 
             endpoint = self.settings.llm_endpoint or "http://localhost:11434"
             validate_outbound_http_url(
                 endpoint,
                 allow_internal=self.settings.llm_allow_internal_endpoints,
             )
+            transport = PinnedHostHTTPTransport(
+                allow_internal=self.settings.llm_allow_internal_endpoints,
+            )
+            async_transport = PinnedHostAsyncHTTPTransport(
+                allow_internal=self.settings.llm_allow_internal_endpoints,
+            )
             return Ollama(
                 model=self.settings.llm_model or "llama3.1",
                 base_url=endpoint,
                 request_timeout=120,
+                client=Client(
+                    host=endpoint,
+                    timeout=120,
+                    transport=transport,
+                ),
+                async_client=AsyncClient(
+                    host=endpoint,
+                    timeout=120,
+                    transport=async_transport,
+                ),
             )
         elif self.settings.llm_backend == LLMBackend.OPENAI_LIKE:
             from llama_index.llms.openai_like import OpenAILike
 
             endpoint = self.settings.llm_endpoint or None
+            http_client = None
+            async_http_client = None
             if endpoint:
-                validate_outbound_http_url(
+                http_client = create_pinned_httpx_client(
+                    endpoint,
+                    allow_internal=self.settings.llm_allow_internal_endpoints,
+                )
+                async_http_client = create_pinned_async_httpx_client(
                     endpoint,
                     allow_internal=self.settings.llm_allow_internal_endpoints,
                 )
@@ -53,6 +81,8 @@ class AIClient:
                 api_key=self.settings.llm_api_key,
                 is_chat_model=True,
                 is_function_calling_model=True,
+                http_client=http_client,
+                async_http_client=async_http_client,
             )
         else:
             raise ValueError(f"Unsupported LLM backend: {self.settings.llm_backend}")

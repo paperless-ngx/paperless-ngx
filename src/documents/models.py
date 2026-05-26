@@ -1019,7 +1019,17 @@ class ShareLinkBundle(models.Model):
     def absolute_file_path(self) -> Path | None:
         if not self.file_path:
             return None
-        return (settings.SHARE_LINK_BUNDLE_DIR / Path(self.file_path)).resolve()
+        relative_path = Path(self.file_path)
+        if relative_path.is_absolute():
+            return None
+
+        bundle_dir = settings.SHARE_LINK_BUNDLE_DIR.resolve()
+        absolute_path = (bundle_dir / relative_path).resolve()
+        try:
+            absolute_path.relative_to(bundle_dir)
+        except ValueError:
+            return None
+        return absolute_path
 
     def remove_file(self) -> None:
         if self.absolute_file_path is not None and self.absolute_file_path.exists():

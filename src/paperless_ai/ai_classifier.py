@@ -60,11 +60,14 @@ def get_context_for_document(
         if user
         else None
     )
+    visible_document_ids = (
+        list(visible_documents.values_list("pk", flat=True))
+        if visible_documents is not None
+        else None
+    )
     similar_docs = query_similar_documents(
         document=doc,
-        document_ids=[document.pk for document in visible_documents]
-        if visible_documents
-        else None,
+        document_ids=visible_document_ids,
     )[:max_docs]
     context_blocks = []
     for similar in similar_docs:

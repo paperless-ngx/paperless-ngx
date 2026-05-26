@@ -437,8 +437,14 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         )
         super().setUp()
 
+    def grant_view_document_permission(self) -> None:
+        self.user.user_permissions.add(
+            *Permission.objects.filter(codename="view_document"),
+        )
+
     @override_settings(AI_ENABLED=False)
     def test_post_ai_disabled(self) -> None:
+        self.grant_view_document_permission()
         response = self.client.post(
             self.ENDPOINT,
             data='{"q": "question"}',
@@ -451,6 +457,7 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
     @patch("documents.views.get_objects_for_user_owner_aware")
     @override_settings(AI_ENABLED=True)
     def test_post_no_document_id(self, mock_get_objects, mock_stream_chat) -> None:
+        self.grant_view_document_permission()
         mock_get_objects.return_value = [self.document]
         mock_stream_chat.return_value = iter([b"data"])
         response = self.client.post(
@@ -464,6 +471,7 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
     @patch("documents.views.stream_chat_with_documents")
     @override_settings(AI_ENABLED=True)
     def test_post_with_document_id(self, mock_stream_chat) -> None:
+        self.grant_view_document_permission()
         mock_stream_chat.return_value = iter([b"data"])
         response = self.client.post(
             self.ENDPOINT,
@@ -475,6 +483,7 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
 
     @override_settings(AI_ENABLED=True)
     def test_post_with_invalid_document_id(self) -> None:
+        self.grant_view_document_permission()
         response = self.client.post(
             self.ENDPOINT,
             data='{"q": "question", "document_id": 999999}',
@@ -486,6 +495,7 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
     @patch("documents.views.has_perms_owner_aware")
     @override_settings(AI_ENABLED=True)
     def test_post_with_document_id_no_permission(self, mock_has_perms) -> None:
+        self.grant_view_document_permission()
         mock_has_perms.return_value = False
         response = self.client.post(
             self.ENDPOINT,
@@ -494,3 +504,31 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         )
         self.assertEqual(response.status_code, 403)
         self.assertIn(b"Insufficient permissions", response.content)
+
+    @patch("documents.views.stream_chat_with_documents")
+    @override_settings(AI_ENABLED=True)
+    def test_post_no_document_id_requires_view_document_permission(
+        self,
+        mock_stream_chat,
+    ) -> None:
+        response = self.client.post(
+            self.ENDPOINT,
+            data='{"q": "question"}',
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 403)
+        mock_stream_chat.assert_not_called()
+
+    @patch("documents.views.stream_chat_with_documents")
+    @override_settings(AI_ENABLED=True)
+    def test_post_with_document_id_requires_view_document_permission(
+        self,
+        mock_stream_chat,
+    ) -> None:
+        response = self.client.post(
+            self.ENDPOINT,
+            data=f'{{"q": "question", "document_id": {self.document.pk}}}',
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 403)
+        mock_stream_chat.assert_not_called()
