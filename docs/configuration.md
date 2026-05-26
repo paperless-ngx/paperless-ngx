@@ -852,7 +852,7 @@ pages being rotated as well.
 
 #### [`PAPERLESS_OCR_OUTPUT_TYPE=<type>`](#PAPERLESS_OCR_OUTPUT_TYPE) {#PAPERLESS_OCR_OUTPUT_TYPE}
 
-: Specify the the type of PDF documents that paperless should produce.
+: Specify the type of PDF documents that paperless should produce.
 
     -   `pdf`: Modify the PDF document as little as possible.
     -   `pdfa`: Convert PDF documents into PDF/A-2b documents, which is

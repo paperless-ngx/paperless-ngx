@@ -313,7 +313,7 @@ class TestCommandImport(
         WHEN:
             - An import is attempted
         THEN:
-            - Warning about the the version mismatch is output
+            - Warning about the version mismatch is output
         """
         stdout = StringIO()
 
