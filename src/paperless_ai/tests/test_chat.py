@@ -211,5 +211,5 @@ def test_stream_chat_unexpected_failure_returns_generic_error(caplog) -> None:
         output = list(stream_chat_with_documents("Any info?", [MagicMock(pk=1)]))
 
         assert output == [CHAT_ERROR_MESSAGE]
-        assert "Failed to stream document chat response." in caplog.text
+        assert "Failed to stream document chat response" in caplog.text
         assert "private provider detail" in caplog.text
