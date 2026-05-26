@@ -264,3 +264,7 @@ def test_build_llm_index_text_normalizes_ocr_punctuation_runs(mock_document):
 
 def test_normalize_llm_index_text_collapses_ocr_leaders_without_joining_lines():
     assert _normalize_llm_index_text("A........B\nC____D----E") == "A B\nC D E"
+
+
+def test_normalize_llm_index_text_collapses_non_breaking_spaces():
+    assert _normalize_llm_index_text("A\u00a0........\u00a0B") == "A B"

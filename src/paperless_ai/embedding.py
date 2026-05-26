@@ -16,7 +16,7 @@ from paperless.models import LLMEmbeddingBackend
 from paperless.network import validate_outbound_http_url
 
 OCR_LEADER_REGEX = re.compile(r"[._\-\u00b7]{4,}")
-HORIZONTAL_WHITESPACE_REGEX = re.compile(r"[ \t]{2,}")
+HORIZONTAL_WHITESPACE_REGEX = re.compile(r"[ \t\u00a0]+")
 
 
 def get_embedding_model() -> "BaseEmbedding":
