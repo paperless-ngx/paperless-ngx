@@ -110,12 +110,13 @@ class TestWriteBatchLockRetry:
             "documents.search._backend.filelock.FileLock.acquire",
             side_effect=filelock.Timeout(""),
         )
+        sleep_values: list[float] = []
+        mocker.patch(
+            "documents.search._backend.time.sleep",
+            side_effect=lambda s: sleep_values.append(s),
+        )
         for _ in range(50):
-            sleep_values: list[float] = []
-            mocker.patch(
-                "documents.search._backend.time.sleep",
-                side_effect=lambda s: sleep_values.append(s),
-            )
+            sleep_values.clear()
             with pytest.raises(SearchIndexLockError):
                 with disk_backend.batch_update(lock_timeout=_LOCK_TIMEOUT_SECONDS):
                     pass
@@ -221,18 +222,13 @@ class TestIndexDocumentTask:
         ids = backend.search_ids("deferred task", user=None)
         assert doc.pk in ids
 
-    def test_deferred_task_exhaustion_raises_search_index_lock_error(
+    def test_task_does_not_swallow_lock_error(
         self,
         mocker: MockerFixture,
     ) -> None:
-        """
-        When index_document exhausts Celery max_retries, SearchIndexLockError
-        must surface (not be silently swallowed).
-
-        Simulate by calling the task body directly with a backend whose
-        batch_update always raises SearchIndexLockError, and verify the error
-        propagates rather than being caught.
-        """
+        """Verifies the task body propagates SearchIndexLockError so Celery's
+        autoretry_for can catch it (rather than the task swallowing the error
+        and silently succeeding)."""
         from documents.tasks import index_document
 
         doc = Document.objects.create(
