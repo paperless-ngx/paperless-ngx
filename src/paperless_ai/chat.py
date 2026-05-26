@@ -99,6 +99,7 @@ def _get_document_filtered_retriever(index, doc_ids: set[str], similarity_top_k:
 
             query_top_k = min(max(similarity_top_k, 1), max_top_k)
             allowed_nodes: list[NodeWithScore] = []
+            seen_node_ids: set[str] = set()
 
             while query_top_k <= max_top_k:
                 query_result = index.vector_store.query(
@@ -108,8 +109,6 @@ def _get_document_filtered_retriever(index, doc_ids: set[str], similarity_top_k:
                     ),
                 )
 
-                allowed_nodes = []
-                seen_node_ids = set()
                 for vector_id, score in zip(
                     query_result.ids or [],
                     query_result.similarities or [],

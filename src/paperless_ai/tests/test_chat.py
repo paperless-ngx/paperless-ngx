@@ -104,8 +104,8 @@ def test_document_filtered_retriever_expands_filters_and_caches() -> None:
     }.get
     mock_index.vector_store._faiss_index.ntotal = 4
     mock_index.vector_store.query.side_effect = [
-        MagicMock(ids=["0", "1"], similarities=[0.9, 0.8]),
-        MagicMock(ids=["0", "1", "2", "3"], similarities=[0.9, 0.8, 0.7, 0.6]),
+        MagicMock(ids=["0", "2"], similarities=[0.9, 0.8]),
+        MagicMock(ids=["0", "1", "3"], similarities=[0.9, 0.7, 0.6]),
     ]
     mock_index._embed_model.get_agg_embedding_from_queries.return_value = [0.1] * 1536
 
