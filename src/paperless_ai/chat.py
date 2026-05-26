@@ -11,6 +11,7 @@ logger = logging.getLogger("paperless_ai.chat")
 
 CHAT_METADATA_DELIMITER = "\n\n__PAPERLESS_CHAT_METADATA__"
 CHAT_ERROR_MESSAGE = "Sorry, something went wrong while generating a response."
+CHAT_NO_CONTENT_MESSAGE = "Sorry, I couldn't find any content to answer your question."
 MAX_CHAT_REFERENCES = 3
 CHAT_RETRIEVER_TOP_K = 5
 
@@ -92,7 +93,7 @@ def _stream_chat_with_documents(query_str: str, documents: list[Document]):
 
     if len(nodes) == 0:
         logger.warning("No nodes found for the given documents.")
-        yield "Sorry, I couldn't find any content to answer your question."
+        yield CHAT_NO_CONTENT_MESSAGE
         return
 
     from llama_index.core import VectorStoreIndex
@@ -108,7 +109,7 @@ def _stream_chat_with_documents(query_str: str, documents: list[Document]):
     top_nodes = retriever.retrieve(query_str)
     if len(top_nodes) == 0:
         logger.warning("Retriever returned no nodes for the given documents.")
-        yield "Sorry, I couldn't find any content to answer your question."
+        yield CHAT_NO_CONTENT_MESSAGE
         return
 
     references = _get_document_references(documents, top_nodes)
