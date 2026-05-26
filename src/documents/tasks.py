@@ -56,6 +56,7 @@ from documents.plugins.base import StopConsumeTaskError
 from documents.plugins.helpers import ProgressManager
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.sanity_checker import SanityCheckFailedException
+from documents.search._backend import SearchIndexLockError
 from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
@@ -82,6 +83,63 @@ def index_optimize() -> None:
     logger.info(
         "index_optimize is a no-op — Tantivy manages segment merging automatically.",
     )
+
+
+@shared_task(
+    bind=True,
+    ignore_result=True,
+    autoretry_for=(SearchIndexLockError,),
+    max_retries=5,
+    retry_backoff=60,
+    retry_jitter=True,
+)
+def index_document(self, document_id: int) -> None:
+    """
+    Deferred single-document index write.
+
+    Used as a self-healing fallback when add_or_update() exhausts its lock retry
+    budget during high-concurrency consumption. Runs via batch_update() directly
+    to avoid re-entering the deferred scheduling path in add_or_update().
+
+    If the document was deleted before this task runs, it exits cleanly.
+    """
+    from documents.search import get_backend
+
+    try:
+        document = Document.objects.get(pk=document_id)
+    except Document.DoesNotExist:
+        logger.info(
+            "index_document: document %d no longer exists; skipping",
+            document_id,
+        )
+        return
+    with get_backend().batch_update() as batch:
+        batch.add_or_update(
+            document,
+            effective_content=document.get_effective_content(),
+        )
+
+
+@shared_task(
+    bind=True,
+    ignore_result=True,
+    autoretry_for=(SearchIndexLockError,),
+    max_retries=5,
+    retry_backoff=60,
+    retry_jitter=True,
+)
+def remove_document_from_index(self, doc_id: int) -> None:
+    """
+    Deferred single-document index removal.
+
+    Used as a self-healing fallback when remove() exhausts its lock retry budget.
+    Operates only on the Tantivy index; no database lookup required.
+    If the document has already been removed, the term-query delete is a no-op.
+    """
+    from documents.search import get_backend
+
+    with get_backend().batch_update() as batch:
+        batch.remove(doc_id)
 
 
 @shared_task

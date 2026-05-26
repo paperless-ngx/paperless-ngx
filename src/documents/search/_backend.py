@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import logging
+import random
 import re
 import threading
+import time
 from datetime import UTC
 from datetime import datetime
 from enum import StrEnum
 from typing import TYPE_CHECKING
+from typing import Final
 from typing import Self
 from typing import TypedDict
 from typing import TypeVar
@@ -42,6 +45,11 @@ if TYPE_CHECKING:
     from documents.models import Document
 
 logger = logging.getLogger("paperless.search")
+
+_LOCK_TIMEOUT_SECONDS: Final[float] = 10.0  # per-attempt acquire timeout
+_LOCK_RETRY_ATTEMPTS: Final[int] = 4  # total attempts (1 initial + 3 retries)
+_LOCK_BACKOFF_BASE: Final[float] = 1.0  # seconds
+_LOCK_BACKOFF_CAP: Final[float] = 10.0  # seconds
 
 _WORD_RE = regex.compile(r"\w+")
 _AUTOCOMPLETE_REGEX_TIMEOUT = 1.0  # seconds; guards against ReDoS on untrusted content
@@ -183,12 +191,27 @@ class WriteBatch:
         if self._backend._path is not None:
             lock_path = self._backend._path / ".tantivy.lock"
             self._lock = filelock.FileLock(str(lock_path))
-            try:
-                self._lock.acquire(timeout=self._lock_timeout)
-            except filelock.Timeout as e:  # pragma: no cover
-                raise SearchIndexLockError(
-                    f"Could not acquire index lock within {self._lock_timeout}s",
-                ) from e
+            for attempt in range(_LOCK_RETRY_ATTEMPTS):
+                try:
+                    self._lock.acquire(timeout=self._lock_timeout)
+                    break
+                except filelock.Timeout:
+                    if attempt == _LOCK_RETRY_ATTEMPTS - 1:
+                        raise SearchIndexLockError(
+                            f"Could not acquire index lock after {_LOCK_RETRY_ATTEMPTS} "
+                            f"attempts (timeout={self._lock_timeout}s each)",
+                        )
+                    sleep_s = random.uniform(
+                        0,
+                        min(_LOCK_BACKOFF_CAP, _LOCK_BACKOFF_BASE * (2**attempt)),
+                    )
+                    logger.debug(
+                        "Index lock contention; retrying in %.2fs (attempt %d/%d)",
+                        sleep_s,
+                        attempt + 1,
+                        _LOCK_RETRY_ATTEMPTS,
+                    )
+                    time.sleep(sleep_s)
 
         self._raw_writer = self._backend._index.writer()
         return self
@@ -490,13 +513,28 @@ class TantivyBackend:
         Convenience method for single-document updates. For bulk operations,
         use batch_update() context manager for better performance.
 
+        On lock exhaustion after all retry attempts, schedules a deferred
+        index_document Celery task and returns normally. Callers will NOT
+        receive a SearchIndexLockError; the index write is deferred silently.
+
         Args:
             document: Django Document instance to index
             effective_content: Override document.content for indexing
         """
         self._ensure_open()
-        with self.batch_update(lock_timeout=5.0) as batch:
-            batch.add_or_update(document, effective_content)
+        try:
+            with self.batch_update(lock_timeout=_LOCK_TIMEOUT_SECONDS) as batch:
+                batch.add_or_update(document, effective_content)
+        except SearchIndexLockError:
+            logger.error(
+                "Search index lock exhausted for document %d after %d attempts; "
+                "scheduling deferred index write",
+                document.pk,
+                _LOCK_RETRY_ATTEMPTS,
+            )
+            from documents.tasks import index_document
+
+            index_document.apply_async(args=[document.pk], countdown=60)
 
     def remove(self, doc_id: int) -> None:
         """
@@ -505,12 +543,27 @@ class TantivyBackend:
         Convenience method for single-document removal. For bulk operations,
         use batch_update() context manager for better performance.
 
+        On lock exhaustion after all retry attempts, schedules a deferred
+        remove_document_from_index Celery task and returns normally.
+        Callers will NOT receive a SearchIndexLockError.
+
         Args:
             doc_id: Primary key of the document to remove
         """
         self._ensure_open()
-        with self.batch_update(lock_timeout=5.0) as batch:
-            batch.remove(doc_id)
+        try:
+            with self.batch_update(lock_timeout=_LOCK_TIMEOUT_SECONDS) as batch:
+                batch.remove(doc_id)
+        except SearchIndexLockError:
+            logger.error(
+                "Search index lock exhausted for doc_id %d after %d attempts; "
+                "scheduling deferred index removal",
+                doc_id,
+                _LOCK_RETRY_ATTEMPTS,
+            )
+            from documents.tasks import remove_document_from_index
+
+            remove_document_from_index.apply_async(args=[doc_id], countdown=60)
 
     def highlight_hits(
         self,
