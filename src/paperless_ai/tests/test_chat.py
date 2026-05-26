@@ -279,7 +279,9 @@ def test_stream_chat_unexpected_failure_returns_generic_error(caplog) -> None:
     with (
         patch("paperless_ai.chat.AIClient") as mock_client_cls,
         patch("paperless_ai.chat.load_or_build_index") as mock_load_index,
-        patch.object(VectorStoreIndex, "as_retriever") as mock_as_retriever,
+        patch(
+            "paperless_ai.chat._get_document_filtered_retriever",
+        ) as mock_get_retriever,
     ):
         mock_client = MagicMock()
         mock_client_cls.return_value = mock_client
@@ -295,7 +297,7 @@ def test_stream_chat_unexpected_failure_returns_generic_error(caplog) -> None:
 
         mock_retriever = MagicMock()
         mock_retriever.retrieve.side_effect = RuntimeError("private provider detail")
-        mock_as_retriever.return_value = mock_retriever
+        mock_get_retriever.return_value = mock_retriever
 
         output = list(stream_chat_with_documents("Any info?", [MagicMock(pk=1)]))
 
