@@ -70,6 +70,82 @@ def _format_chat_metadata_trailer(references: list[dict[str, int | str]]) -> str
     )
 
 
+def _get_document_filtered_retriever(index, doc_ids: set[str], similarity_top_k: int):
+    from llama_index.core.base.base_retriever import BaseRetriever
+    from llama_index.core.schema import NodeWithScore
+    from llama_index.core.vector_stores import VectorStoreQuery
+
+    class DocumentFilteredFaissRetriever(BaseRetriever):
+        def __init__(self):
+            super().__init__()
+            self._cached_query_str = None
+            self._cached_nodes = []
+
+        def _retrieve(self, query_bundle):
+            if query_bundle.query_str == self._cached_query_str:
+                return self._cached_nodes
+
+            if query_bundle.embedding is None:
+                query_bundle.embedding = (
+                    index._embed_model.get_agg_embedding_from_queries(
+                        query_bundle.embedding_strs,
+                    )
+                )
+
+            faiss_index = index.vector_store._faiss_index
+            max_top_k = faiss_index.ntotal
+            if max_top_k == 0:
+                self._cached_query_str = query_bundle.query_str
+                self._cached_nodes = []
+                return []
+
+            query_top_k = min(max(similarity_top_k, 1), max_top_k)
+            allowed_nodes: list[NodeWithScore] = []
+            seen_node_ids: set[str] = set()
+
+            while query_top_k <= max_top_k:
+                query_result = index.vector_store.query(
+                    VectorStoreQuery(
+                        query_embedding=query_bundle.embedding,
+                        similarity_top_k=query_top_k,
+                    ),
+                )
+
+                for vector_id, score in zip(
+                    query_result.ids or [],
+                    query_result.similarities or [],
+                    strict=False,
+                ):
+                    node_id = index.index_struct.nodes_dict.get(vector_id)
+                    if node_id is None or node_id in seen_node_ids:
+                        continue
+
+                    node = index.docstore.docs.get(node_id)
+                    if node is None or node.metadata.get("document_id") not in doc_ids:
+                        continue
+
+                    seen_node_ids.add(node_id)
+                    allowed_nodes.append(NodeWithScore(node=node, score=score))
+
+                    if len(allowed_nodes) >= similarity_top_k:
+                        self._cached_query_str = query_bundle.query_str
+                        self._cached_nodes = allowed_nodes
+                        return allowed_nodes
+
+                if query_top_k == max_top_k:
+                    self._cached_query_str = query_bundle.query_str
+                    self._cached_nodes = allowed_nodes
+                    return allowed_nodes
+
+                query_top_k = min(query_top_k * 2, max_top_k)
+
+            self._cached_query_str = query_bundle.query_str
+            self._cached_nodes = allowed_nodes
+            return allowed_nodes
+
+    return DocumentFilteredFaissRetriever()
+
+
 def stream_chat_with_documents(query_str: str, documents: list[Document]):
     try:
         yield from _stream_chat_with_documents(query_str, documents)
@@ -96,14 +172,14 @@ def _stream_chat_with_documents(query_str: str, documents: list[Document]):
         yield CHAT_NO_CONTENT_MESSAGE
         return
 
-    from llama_index.core import VectorStoreIndex
     from llama_index.core.prompts import PromptTemplate
     from llama_index.core.query_engine import RetrieverQueryEngine
     from llama_index.core.response_synthesizers import get_response_synthesizer
 
-    local_index = VectorStoreIndex(nodes=nodes)
-    retriever = local_index.as_retriever(
-        similarity_top_k=CHAT_RETRIEVER_TOP_K,
+    retriever = _get_document_filtered_retriever(
+        index,
+        set(doc_ids),
+        CHAT_RETRIEVER_TOP_K,
     )
 
     top_nodes = retriever.retrieve(query_str)

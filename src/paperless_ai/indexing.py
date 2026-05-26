@@ -1,5 +1,6 @@
 import logging
 import shutil
+from collections.abc import Iterable
 from datetime import timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -327,14 +328,24 @@ def truncate_content(content: str) -> str:
     return " ".join(truncated_chunks)
 
 
+def normalize_document_ids(document_ids: Iterable[int | str] | None) -> set[str] | None:
+    if document_ids is None:
+        return None
+    return {str(document_id) for document_id in document_ids}
+
+
 def query_similar_documents(
     document: Document,
     top_k: int = 5,
-    document_ids: list[int] | None = None,
+    document_ids: Iterable[int | str] | None = None,
 ) -> list[Document]:
     """
     Runs a similarity query and returns top-k similar Document objects.
     """
+    allowed_document_ids = normalize_document_ids(document_ids)
+    if allowed_document_ids is not None and not allowed_document_ids:
+        return []
+
     if not vector_store_file_exists():
         queue_llm_index_update_if_needed(
             rebuild=False,
@@ -349,11 +360,13 @@ def query_similar_documents(
         [
             node.node_id
             for node in index.docstore.docs.values()
-            if node.metadata.get("document_id") in document_ids
+            if node.metadata.get("document_id") in allowed_document_ids
         ]
-        if document_ids
+        if allowed_document_ids is not None
         else None
     )
+    if doc_node_ids is not None and not doc_node_ids:
+        return []
 
     from llama_index.core.retrievers import VectorIndexRetriever
 
@@ -368,10 +381,23 @@ def query_similar_documents(
     )
     results = retriever.retrieve(query_text)
 
-    document_ids = [
-        int(node.metadata["document_id"])
-        for node in results
-        if "document_id" in node.metadata
-    ]
+    retrieved_document_ids: list[int] = []
+    for node in results:
+        document_id = node.metadata.get("document_id")
+        if document_id is None:
+            continue
+        normalized_document_id = str(document_id)
+        if (
+            allowed_document_ids is not None
+            and normalized_document_id not in allowed_document_ids
+        ):
+            continue
+        try:
+            retrieved_document_ids.append(int(normalized_document_id))
+        except ValueError:
+            logger.warning(
+                "Skipping LLM index result with invalid document_id %r.",
+                document_id,
+            )
 
-    return list(Document.objects.filter(pk__in=document_ids))
+    return list(Document.objects.filter(pk__in=retrieved_document_ids))

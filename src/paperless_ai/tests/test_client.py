@@ -1,3 +1,4 @@
+from unittest.mock import ANY
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
@@ -40,6 +41,8 @@ def test_get_llm_ollama(mock_ai_config, mock_ollama_llm):
         model="test_model",
         base_url="http://test-url",
         request_timeout=120,
+        client=ANY,
+        async_client=ANY,
     )
     assert client.llm == mock_ollama_llm.return_value
 
@@ -58,6 +61,8 @@ def test_get_llm_openai(mock_ai_config, mock_openai_llm):
         api_key="test_api_key",
         is_chat_model=True,
         is_function_calling_model=True,
+        http_client=ANY,
+        async_http_client=ANY,
     )
     assert client.llm == mock_openai_llm.return_value
 

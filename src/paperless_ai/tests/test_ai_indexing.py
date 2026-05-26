@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
+from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
 from llama_index.core.base.embeddings.base import BaseEmbedding
@@ -428,3 +429,78 @@ def test_query_similar_documents_triggers_update_when_index_missing(
     )
     mock_load.assert_not_called()
     assert result == []
+
+
+@pytest.mark.django_db
+def test_query_similar_documents_normalizes_and_post_filters_allowed_ids(
+    real_document,
+) -> None:
+    real_document.owner = User.objects.create_user(username="rag-owner")
+    real_document.save()
+    private_owner = User.objects.create_user(username="rag-private-owner")
+    private_document = Document.objects.create(
+        title="Private similar document",
+        content="Similar private content that must not reach RAG.",
+        owner=private_owner,
+        added=timezone.now(),
+    )
+
+    with (
+        patch(
+            "paperless_ai.indexing.vector_store_file_exists",
+            return_value=True,
+        ),
+        patch("paperless_ai.indexing.load_or_build_index") as mock_load_or_build_index,
+        patch("llama_index.core.retrievers.VectorIndexRetriever") as mock_retriever_cls,
+    ):
+        allowed_node = MagicMock()
+        allowed_node.node_id = "allowed-node"
+        allowed_node.metadata = {"document_id": str(real_document.pk)}
+        private_node = MagicMock()
+        private_node.node_id = "private-node"
+        private_node.metadata = {"document_id": str(private_document.pk)}
+
+        mock_index = MagicMock()
+        mock_index.docstore.docs.values.return_value = [allowed_node, private_node]
+        mock_load_or_build_index.return_value = mock_index
+
+        mock_retriever = MagicMock()
+        mock_retriever.retrieve.return_value = [private_node, allowed_node]
+        mock_retriever_cls.return_value = mock_retriever
+
+        result = indexing.query_similar_documents(
+            real_document,
+            top_k=2,
+            document_ids=[real_document.pk],
+        )
+
+    mock_retriever_cls.assert_called_once_with(
+        index=mock_index,
+        similarity_top_k=2,
+        doc_ids=["allowed-node"],
+    )
+    assert result == [real_document]
+    assert private_document not in result
+
+
+@pytest.mark.django_db
+def test_query_similar_documents_empty_allow_list_fails_closed(
+    real_document,
+) -> None:
+    with (
+        patch(
+            "paperless_ai.indexing.vector_store_file_exists",
+            return_value=True,
+        ) as mock_vector_store_exists,
+        patch("paperless_ai.indexing.load_or_build_index") as mock_load_or_build_index,
+        patch("llama_index.core.retrievers.VectorIndexRetriever") as mock_retriever_cls,
+    ):
+        result = indexing.query_similar_documents(
+            real_document,
+            document_ids=[],
+        )
+
+    assert result == []
+    mock_vector_store_exists.assert_not_called()
+    mock_load_or_build_index.assert_not_called()
+    mock_retriever_cls.assert_not_called()

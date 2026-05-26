@@ -1,4 +1,5 @@
 import json
+import re
 from typing import TYPE_CHECKING
 
 from django.conf import settings
@@ -12,7 +13,14 @@ from documents.models import Document
 from documents.models import Note
 from paperless.config import AIConfig
 from paperless.models import LLMEmbeddingBackend
+from paperless.network import PinnedHostAsyncHTTPTransport
+from paperless.network import PinnedHostHTTPTransport
+from paperless.network import create_pinned_async_httpx_client
+from paperless.network import create_pinned_httpx_client
 from paperless.network import validate_outbound_http_url
+
+OCR_LEADER_REGEX = re.compile(r"[._\-\u00b7]{4,}")
+HORIZONTAL_WHITESPACE_REGEX = re.compile(r"[ \t\u00a0]+")
 
 
 def get_embedding_model() -> "BaseEmbedding":
@@ -23,8 +31,14 @@ def get_embedding_model() -> "BaseEmbedding":
             from llama_index.embeddings.openai_like import OpenAILikeEmbedding
 
             endpoint = config.llm_embedding_endpoint or config.llm_endpoint or None
+            http_client = None
+            async_http_client = None
             if endpoint:
-                validate_outbound_http_url(
+                http_client = create_pinned_httpx_client(
+                    endpoint,
+                    allow_internal=config.llm_allow_internal_endpoints,
+                )
+                async_http_client = create_pinned_async_httpx_client(
                     endpoint,
                     allow_internal=config.llm_allow_internal_endpoints,
                 )
@@ -32,6 +46,8 @@ def get_embedding_model() -> "BaseEmbedding":
                 model_name=config.llm_embedding_model or "text-embedding-3-small",
                 api_key=config.llm_api_key,
                 api_base=endpoint,
+                http_client=http_client,
+                async_http_client=async_http_client,
             )
         case LLMEmbeddingBackend.HUGGINGFACE:
             from llama_index.embeddings.huggingface import HuggingFaceEmbedding
@@ -43,6 +59,8 @@ def get_embedding_model() -> "BaseEmbedding":
             )
         case LLMEmbeddingBackend.OLLAMA:
             from llama_index.embeddings.ollama import OllamaEmbedding
+            from ollama import AsyncClient
+            from ollama import Client
 
             endpoint = (
                 config.llm_embedding_endpoint
@@ -53,10 +71,23 @@ def get_embedding_model() -> "BaseEmbedding":
                 endpoint,
                 allow_internal=config.llm_allow_internal_endpoints,
             )
-            return OllamaEmbedding(
+            embedding = OllamaEmbedding(
                 model_name=config.llm_embedding_model or "embeddinggemma",
                 base_url=endpoint,
             )
+            embedding._client = Client(
+                host=endpoint,
+                transport=PinnedHostHTTPTransport(
+                    allow_internal=config.llm_allow_internal_endpoints,
+                ),
+            )
+            embedding._async_client = AsyncClient(
+                host=endpoint,
+                transport=PinnedHostAsyncHTTPTransport(
+                    allow_internal=config.llm_allow_internal_endpoints,
+                ),
+            )
+            return embedding
         case _:
             raise ValueError(
                 f"Unsupported embedding backend: {config.llm_embedding_backend}",
@@ -100,6 +131,11 @@ def get_embedding_dim() -> int:
     return dim
 
 
+def _normalize_llm_index_text(text: str) -> str:
+    text = OCR_LEADER_REGEX.sub(" ", text)
+    return HORIZONTAL_WHITESPACE_REGEX.sub(" ", text)
+
+
 def build_llm_index_text(doc: Document) -> str:
     lines = [
         f"Title: {doc.title}",
@@ -121,4 +157,4 @@ def build_llm_index_text(doc: Document) -> str:
     lines.append("\nContent:\n")
     lines.append(doc.content or "")
 
-    return "\n".join(lines)
+    return _normalize_llm_index_text("\n".join(lines))
