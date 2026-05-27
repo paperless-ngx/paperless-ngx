@@ -24,6 +24,7 @@ from typing import Self
 
 from bleach import clean
 from bleach import linkify
+from bleach.css_sanitizer import CSSSanitizer
 from django.conf import settings
 from django.utils import timezone
 from django.utils.timezone import is_naive
@@ -109,6 +110,7 @@ _EMAIL_HTML_GLOBAL_ATTRIBUTES = {
     "align",
     "alt",
     "height",
+    "style",
     "title",
     "width",
 }
@@ -120,6 +122,46 @@ _EMAIL_HTML_TAG_ATTRIBUTES = {
     "th": {"colspan", "headers", "rowspan", "scope"},
     "ul": {"type"},
 }
+_EMAIL_CSS_PROPERTIES = {
+    "background-color",
+    "border",
+    "border-bottom",
+    "border-collapse",
+    "border-color",
+    "border-left",
+    "border-right",
+    "border-spacing",
+    "border-style",
+    "border-top",
+    "border-width",
+    "color",
+    "display",
+    "font",
+    "font-family",
+    "font-size",
+    "font-style",
+    "font-weight",
+    "height",
+    "line-height",
+    "margin",
+    "margin-bottom",
+    "margin-left",
+    "margin-right",
+    "margin-top",
+    "max-width",
+    "min-width",
+    "padding",
+    "padding-bottom",
+    "padding-left",
+    "padding-right",
+    "padding-top",
+    "text-align",
+    "text-decoration",
+    "vertical-align",
+    "white-space",
+    "width",
+}
+_EMAIL_CSS_SANITIZER = CSSSanitizer(allowed_css_properties=_EMAIL_CSS_PROPERTIES)
 
 
 def _linkify_text_as_html(text: object) -> str:
@@ -159,6 +201,7 @@ def _clean_email_html(text: str) -> str:
             tags=_EMAIL_HTML_TAGS,
             attributes=_allow_email_html_attribute,
             protocols=_EMAIL_HTML_PROTOCOLS,
+            css_sanitizer=_EMAIL_CSS_SANITIZER,
             strip=True,
             strip_comments=True,
         ),
