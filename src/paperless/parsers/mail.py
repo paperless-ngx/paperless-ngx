@@ -39,6 +39,10 @@ from humanize import naturalsize
 from imap_tools import MailAttachment
 from imap_tools import MailMessage
 from tika_client import TikaClient
+from tinycss2 import parse_declaration_list
+from tinycss2 import parse_rule_list
+from tinycss2 import parse_stylesheet
+from tinycss2 import serialize
 
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
@@ -91,6 +95,7 @@ _EMAIL_HTML_TAGS = {
     "s",
     "small",
     "span",
+    "style",
     "strong",
     "sub",
     "sup",
@@ -161,7 +166,39 @@ _EMAIL_CSS_PROPERTIES = {
     "white-space",
     "width",
 }
-_EMAIL_CSS_SANITIZER = CSSSanitizer(allowed_css_properties=_EMAIL_CSS_PROPERTIES)
+
+
+def _has_unsafe_css_value(tokens: list) -> bool:
+    for token in tokens:
+        if token.type == "url":
+            return True
+        if token.type == "function" and token.lower_name in {"expression", "url"}:
+            return True
+        if hasattr(token, "content") and _has_unsafe_css_value(token.content):
+            return True
+    return False
+
+
+class EmailCSSSanitizer(CSSSanitizer):
+    def sanitize_css(self, style: str) -> str:
+        declarations = parse_declaration_list(
+            style,
+            skip_comments=True,
+            skip_whitespace=True,
+        )
+        sanitized = [
+            declaration
+            for declaration in declarations
+            if declaration.type == "declaration"
+            and declaration.lower_name in self.allowed_css_properties
+            and not _has_unsafe_css_value(declaration.value)
+        ]
+        return serialize(sanitized).strip()
+
+
+_EMAIL_CSS_SANITIZER = EmailCSSSanitizer(
+    allowed_css_properties=_EMAIL_CSS_PROPERTIES,
+)
 
 
 def _linkify_text_as_html(text: object) -> str:
@@ -191,10 +228,60 @@ def _allow_email_html_attribute(tag: str, name: str, value: str) -> bool:
     return True
 
 
+def _sanitize_email_css_rules(rules: list) -> str:
+    sanitized_rules = []
+
+    for rule in rules:
+        if rule.type == "qualified-rule":
+            selector = serialize(rule.prelude).strip()
+            declarations = _EMAIL_CSS_SANITIZER.sanitize_css(
+                serialize(rule.content),
+            )
+            if selector and declarations:
+                sanitized_rules.append(f"{selector}{{{declarations}}}")
+
+        elif (
+            rule.type == "at-rule" and rule.lower_at_keyword == "media" and rule.content
+        ):
+            media_query = serialize(rule.prelude).strip()
+            nested_rules = _sanitize_email_css_rules(
+                parse_rule_list(
+                    rule.content,
+                    skip_comments=True,
+                    skip_whitespace=True,
+                ),
+            )
+            if media_query and nested_rules:
+                sanitized_rules.append(f"@media {media_query}{{{nested_rules}}}")
+
+    return "".join(sanitized_rules)
+
+
+def _sanitize_email_css_stylesheet(css: str) -> str:
+    return _sanitize_email_css_rules(
+        parse_stylesheet(css, skip_comments=True, skip_whitespace=True),
+    )
+
+
 def _clean_email_html(text: str) -> str:
     """Sanitize email HTML before rendering it with Chromium."""
-    text = re.sub(r"(?is)<(script|style)\b[^>]*>.*?</\1\s*>", "", text)
+    sanitized_style_blocks = []
+
+    def sanitize_style_block(match: re.Match[str]) -> str:
+        sanitized_style_blocks.append(
+            f"<style>{_sanitize_email_css_stylesheet(match.group(1))}</style>",
+        )
+        return f"__PAPERLESS_SANITIZED_STYLE_{len(sanitized_style_blocks) - 1}__"
+
+    text = re.sub(r"(?is)<script\b[^>]*>.*?</script\s*>", "", text)
+    text = re.sub(
+        r"(?is)<style\b[^>]*>(.*?)</style\s*>",
+        sanitize_style_block,
+        text,
+    )
     text = re.sub(r"(?is)</?(script|style)\b[^>]*>", "", text)
+    for index, style_block in enumerate(sanitized_style_blocks):
+        text = text.replace(f"__PAPERLESS_SANITIZED_STYLE_{index}__", style_block)
     return linkify(
         clean(
             text,
