@@ -14,7 +14,14 @@ jobs:
         with:
           max-failures: 4
           failure-add-pr-labels: 'ai'
+          failure-pr-message: |
+            This pull request was automatically closed because it matched multiple low-quality or automated-PR signals.
           require-pr-template: true
+          optional-pr-template-sections: 'Checklist:'
+          blocked-source-branches: |
+            main
+          blocked-terms: |
+            ASLOP-PR-VERIFY
   pr-bot:
     name: Automated PR Bot
     runs-on: ubuntu-latest
