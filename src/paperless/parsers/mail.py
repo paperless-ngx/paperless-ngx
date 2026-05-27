@@ -58,6 +58,113 @@ _SUPPORTED_MIME_TYPES: dict[str, str] = {
     "message/rfc822": ".eml",
 }
 
+_EMAIL_HTML_TAGS = {
+    "a",
+    "abbr",
+    "acronym",
+    "address",
+    "b",
+    "blockquote",
+    "br",
+    "caption",
+    "code",
+    "dd",
+    "del",
+    "div",
+    "dl",
+    "dt",
+    "em",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "hr",
+    "i",
+    "img",
+    "li",
+    "ol",
+    "p",
+    "pre",
+    "s",
+    "small",
+    "span",
+    "strong",
+    "sub",
+    "sup",
+    "table",
+    "tbody",
+    "td",
+    "tfoot",
+    "th",
+    "thead",
+    "tr",
+    "u",
+    "ul",
+}
+_EMAIL_HTML_PROTOCOLS = {"cid", "http", "https", "mailto"}
+_EMAIL_HTML_GLOBAL_ATTRIBUTES = {
+    "abbr",
+    "align",
+    "alt",
+    "height",
+    "title",
+    "width",
+}
+_EMAIL_HTML_TAG_ATTRIBUTES = {
+    "a": {"href", "name", "title"},
+    "img": {"alt", "height", "src", "title", "width"},
+    "ol": {"start", "type"},
+    "td": {"colspan", "headers", "rowspan", "scope"},
+    "th": {"colspan", "headers", "rowspan", "scope"},
+    "ul": {"type"},
+}
+
+
+def _linkify_text_as_html(text: object) -> str:
+    """Escape plain text and linkify URLs/email addresses for safe HTML output."""
+    if isinstance(text, list):
+        text = "\n".join([str(e) for e in text])
+    if not isinstance(text, str):
+        text = str(text)
+    text = escape(text)
+    text = linkify(text, parse_email=True)
+    return text.replace("\n", "<br>")
+
+
+def _allow_email_html_attribute(tag: str, name: str, value: str) -> bool:
+    if name not in _EMAIL_HTML_GLOBAL_ATTRIBUTES | _EMAIL_HTML_TAG_ATTRIBUTES.get(
+        tag,
+        set(),
+    ):
+        return False
+
+    if tag == "img" and name == "src":
+        return value.lower().startswith("cid:")
+
+    if tag == "a" and name == "href":
+        return value.lower().startswith(("http://", "https://", "mailto:"))
+
+    return True
+
+
+def _clean_email_html(text: str) -> str:
+    """Sanitize email HTML before rendering it with Chromium."""
+    text = re.sub(r"(?is)<(script|style)\b[^>]*>.*?</\1\s*>", "", text)
+    text = re.sub(r"(?is)</?(script|style)\b[^>]*>", "", text)
+    return linkify(
+        clean(
+            text,
+            tags=_EMAIL_HTML_TAGS,
+            attributes=_allow_email_html_attribute,
+            protocols=_EMAIL_HTML_PROTOCOLS,
+            strip=True,
+            strip_comments=True,
+        ),
+        parse_email=True,
+    )
+
 
 class MailDocumentParser:
     """Parse .eml email files for Paperless-ngx.
@@ -619,33 +726,29 @@ class MailDocumentParser:
             Path to the rendered HTML file inside the temporary directory.
         """
 
-        def clean_html(text: str) -> str:
-            """Attempt to clean, escape, and linkify the given HTML string."""
-            if isinstance(text, list):
-                text = "\n".join([str(e) for e in text])
-            if not isinstance(text, str):
-                text = str(text)
-            text = escape(text)
-            text = clean(text)
-            text = linkify(text, parse_email=True)
-            text = text.replace("\n", "<br>")
-            return text
-
         data = {}
 
-        data["subject"] = clean_html(mail.subject)
+        data["subject"] = _linkify_text_as_html(mail.subject)
         if data["subject"]:
             data["subject_label"] = "Subject"
-        data["from"] = clean_html(mail.from_values.full if mail.from_values else "")
+        data["from"] = _linkify_text_as_html(
+            mail.from_values.full if mail.from_values else "",
+        )
         if data["from"]:
             data["from_label"] = "From"
-        data["to"] = clean_html(", ".join(address.full for address in mail.to_values))
+        data["to"] = _linkify_text_as_html(
+            ", ".join(address.full for address in mail.to_values),
+        )
         if data["to"]:
             data["to_label"] = "To"
-        data["cc"] = clean_html(", ".join(address.full for address in mail.cc_values))
+        data["cc"] = _linkify_text_as_html(
+            ", ".join(address.full for address in mail.cc_values),
+        )
         if data["cc"]:
             data["cc_label"] = "CC"
-        data["bcc"] = clean_html(", ".join(address.full for address in mail.bcc_values))
+        data["bcc"] = _linkify_text_as_html(
+            ", ".join(address.full for address in mail.bcc_values),
+        )
         if data["bcc"]:
             data["bcc_label"] = "BCC"
 
@@ -654,14 +757,14 @@ class MailDocumentParser:
             att.append(
                 f"{a.filename} ({naturalsize(a.size, binary=True, format='%.2f')})",
             )
-        data["attachments"] = clean_html(", ".join(att))
+        data["attachments"] = _linkify_text_as_html(", ".join(att))
         if data["attachments"]:
             data["attachments_label"] = "Attachments"
 
-        data["date"] = clean_html(
+        data["date"] = _linkify_text_as_html(
             timezone.localtime(mail.date).strftime("%Y-%m-%d %H:%M"),
         )
-        data["content"] = clean_html(mail.text.strip())
+        data["content"] = _linkify_text_as_html(mail.text.strip())
 
         from django.template.loader import render_to_string
 
@@ -761,19 +864,11 @@ class MailDocumentParser:
             If Gotenberg returns an error.
         """
 
-        def clean_html_script(text: str) -> str:
-            compiled_open = re.compile(re.escape("<script"), re.IGNORECASE)
-            text = compiled_open.sub("<div hidden ", text)
-
-            compiled_close = re.compile(re.escape("</script"), re.IGNORECASE)
-            text = compiled_close.sub("</div", text)
-            return text
-
         logger.info("Converting message html to PDF")
 
         tempdir = Path(self._tempdir)
 
-        html_clean = clean_html_script(orig_html)
+        html_clean = _clean_email_html(orig_html)
         html_clean_file = tempdir / "index.html"
         html_clean_file.write_text(html_clean)
 

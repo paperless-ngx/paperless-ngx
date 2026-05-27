@@ -15,6 +15,8 @@ from documents.parsers import ParseError
 from paperless.parsers import ParserContext
 from paperless.parsers import ParserProtocol
 from paperless.parsers.mail import MailDocumentParser
+from paperless.parsers.mail import _clean_email_html
+from paperless.parsers.mail import _linkify_text_as_html
 
 
 class TestMailParserProtocol:
@@ -70,6 +72,54 @@ class TestMailParserProtocol:
         count = mail_parser.get_page_count(simple_txt_email_pdf_file, "message/rfc822")
         assert isinstance(count, int)
         assert count > 0
+
+
+class TestMailHtmlCleaning:
+    def test_text_fields_are_escaped_before_linkifying(self) -> None:
+        result = _linkify_text_as_html(
+            "Hello <b>bold</b>\nhttps://example.com?a=1&b=2",
+        )
+
+        assert "&lt;b&gt;bold&lt;/b&gt;" in result
+        assert "<br>" in result
+        assert '<a href="https://example.com?a=1&amp;b=2"' in result
+
+    def test_email_html_preserves_safe_structure(self) -> None:
+        result = _clean_email_html(
+            """
+            <div><p>Hello <strong>there</strong></p></div>
+            <table><tr><td colspan="2">Total</td></tr></table>
+            <img src="cid:logo" width="100" alt="Logo">
+            Visit https://example.com
+            """,
+        )
+
+        assert "<div><p>Hello <strong>there</strong></p></div>" in result
+        assert '<td colspan="2">Total</td>' in result
+        assert '<img src="cid:logo" width="100" alt="Logo">' in result
+        assert '<a href="https://example.com"' in result
+
+    def test_email_html_removes_executable_content(self) -> None:
+        result = _clean_email_html(
+            """
+            <div onclick="alert('x')">Message</div>
+            <script>alert('script')</script>
+            <style>body { background: url("https://example.com/x"); }</style>
+            <a href="javascript:alert('x')">bad link</a>
+            <a href="cid:logo">bad cid link</a>
+            <img src="https://example.com/logo.png" onerror="alert('x')" alt="Logo">
+            """,
+        )
+
+        assert "Message" in result
+        assert "script" not in result
+        assert "background" not in result
+        assert "onclick" not in result
+        assert "onerror" not in result
+        assert "javascript:" not in result
+        assert "<a>bad link</a>" in result
+        assert "<a>bad cid link</a>" in result
+        assert '<img alt="Logo">' in result
 
 
 class TestEmailFileParsing:
