@@ -57,6 +57,17 @@ def build_schema() -> tantivy.Schema:
     # CJK support - not stored, indexed only
     sb.add_text_field("bigram_content", stored=False, tokenizer_name="bigram_analyzer")
     sb.add_text_field("bigram_title", stored=False, tokenizer_name="bigram_analyzer")
+    sb.add_text_field(
+        "bigram_correspondent",
+        stored=False,
+        tokenizer_name="bigram_analyzer",
+    )
+    sb.add_text_field(
+        "bigram_document_type",
+        stored=False,
+        tokenizer_name="bigram_analyzer",
+    )
+    sb.add_text_field("bigram_tag", stored=False, tokenizer_name="bigram_analyzer")
 
     # Simple substring search support for title/content - not stored, indexed only
     sb.add_text_field(

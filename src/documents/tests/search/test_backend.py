@@ -9,7 +9,10 @@ from documents.search._backend import SearchMode
 from documents.search._backend import TantivyBackend
 from documents.search._backend import get_backend
 from documents.search._backend import reset_backend
+from documents.tests.factories import CorrespondentFactory
 from documents.tests.factories import DocumentFactory
+from documents.tests.factories import DocumentTypeFactory
+from documents.tests.factories import TagFactory
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
 
@@ -281,6 +284,39 @@ class TestSearch:
             len(backend.search_ids("東京", user=None, search_mode=SearchMode.TITLE))
             == 0
         )
+
+    @pytest.mark.parametrize(
+        ("field", "query", "miss"),
+        [
+            pytest.param("correspondent", "東京", "大阪", id="cjk_correspondent"),
+            pytest.param("document_type", "請求書", "領収書", id="cjk_document_type"),
+            pytest.param("tag", "重要", "普通", id="cjk_tag"),
+        ],
+    )
+    def test_cjk_metadata_search_via_query_mode(
+        self,
+        backend: TantivyBackend,
+        field: str,
+        query: str,
+        miss: str,
+    ) -> None:
+        """CJK in correspondent/document_type/tag names must be searchable via global search."""
+        if field == "correspondent":
+            doc = DocumentFactory(correspondent=CorrespondentFactory(name=query))
+        elif field == "document_type":
+            doc = DocumentFactory(document_type=DocumentTypeFactory(name=query))
+        else:
+            tag = TagFactory(name=query)
+            doc = DocumentFactory()
+            doc.tags.add(tag)
+        backend.add_or_update(doc)
+
+        assert (
+            len(backend.search_ids(query, user=None, search_mode=SearchMode.QUERY)) == 1
+        ), f"Expected CJK {field} name {query!r} to match"
+        assert (
+            len(backend.search_ids(miss, user=None, search_mode=SearchMode.QUERY)) == 0
+        ), f"Expected {miss!r} not to match"
 
     def test_sort_field_ascending(self, backend: TantivyBackend) -> None:
         """Searching with sort_reverse=False must return results in ascending ASN order."""

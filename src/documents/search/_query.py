@@ -519,7 +519,13 @@ DEFAULT_SEARCH_FIELDS = [
 ]
 SIMPLE_SEARCH_FIELDS = ["simple_title", "simple_content"]
 TITLE_SEARCH_FIELDS = ["simple_title"]
-_CJK_ALL_FIELDS: Final[list[str]] = ["bigram_content", "bigram_title"]
+_CJK_ALL_FIELDS: Final[list[str]] = [
+    "bigram_content",
+    "bigram_title",
+    "bigram_correspondent",
+    "bigram_document_type",
+    "bigram_tag",
+]
 _CJK_CONTENT_FIELDS: Final[list[str]] = ["bigram_content"]
 _CJK_TITLE_FIELDS: Final[list[str]] = ["bigram_title"]
 _FIELD_BOOSTS = {"title": 2.0}

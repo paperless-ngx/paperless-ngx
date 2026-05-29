@@ -416,12 +416,14 @@ class TantivyBackend:
         if document.correspondent:
             doc.add_text("correspondent", document.correspondent.name)
             doc.add_text("correspondent_sort", document.correspondent.name)
+            doc.add_text("bigram_correspondent", document.correspondent.name)
             doc.add_unsigned("correspondent_id", document.correspondent_id)
 
         # Document type
         if document.document_type:
             doc.add_text("document_type", document.document_type.name)
             doc.add_text("type_sort", document.document_type.name)
+            doc.add_text("bigram_document_type", document.document_type.name)
             doc.add_unsigned("document_type_id", document.document_type_id)
 
         # Storage path
@@ -433,6 +435,7 @@ class TantivyBackend:
         tag_names: list[str] = []
         for tag in document.tags.all():
             doc.add_text("tag", tag.name)
+            doc.add_text("bigram_tag", tag.name)
             doc.add_unsigned("tag_id", tag.pk)
             tag_names.append(tag.name)
 
