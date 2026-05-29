@@ -390,8 +390,13 @@ def _rewrite_year_range(query: str) -> str:
 
     def _sub(m: regex.Match[str]) -> str:
         field = m.group("field")
-        lo = datetime(int(m.group("y1")), 1, 1, tzinfo=UTC)
-        hi = datetime(int(m.group("y2")) + 1, 1, 1, tzinfo=UTC)
+        y1, y2 = int(m.group("y1")), int(m.group("y2"))
+        # Whoosh swaps a reversed range when both years are explicit
+        # (whoosh.util.times.timespan.disambiguated); match that so a backwards
+        # range spans the intended years instead of matching nothing.
+        lo_year, hi_year = min(y1, y2), max(y1, y2)
+        lo = datetime(lo_year, 1, 1, tzinfo=UTC)
+        hi = datetime(hi_year + 1, 1, 1, tzinfo=UTC)
         return f"{field}:[{_fmt(lo)} TO {_fmt(hi)}]"
 
     try:

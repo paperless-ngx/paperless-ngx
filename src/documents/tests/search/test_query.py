@@ -519,6 +519,14 @@ class TestYearRangeRewriting:
         assert lo == expected_lo
         assert hi == expected_hi
 
+    def test_reversed_year_range_is_swapped(self) -> None:
+        # A reversed range must not yield lo > hi, which Tantivy treats as an
+        # empty range (silently zero results). The bounds are swapped instead.
+        result = rewrite_natural_date_keywords("created:[2025 TO 2020]", UTC)
+        lo, hi = _range(result, "created")
+        assert lo == "2020-01-01T00:00:00Z"
+        assert hi == "2026-01-01T00:00:00Z"
+
     def test_year_range_in_complex_boolean_query(self) -> None:
         query = "tag:steuer AND (title:2020 OR (NOT title:2019 AND NOT title:2018 AND created:[2020 TO 2020]))"
         result = rewrite_natural_date_keywords(query, UTC)
