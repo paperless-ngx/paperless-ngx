@@ -541,6 +541,45 @@ class TestYearRangeRewriting:
         assert "20201231" in result or "2020-12-31" in result
 
 
+class TestNonDateFieldsNotRewritten:
+    """Date rewriters must only fire on the date fields (created/modified/added).
+
+    Integer fields like asn/id/page_count and unknown fields would otherwise be
+    rewritten into date ranges and rejected by Tantivy as type mismatches.
+    """
+
+    @pytest.mark.parametrize(
+        "query",
+        [
+            pytest.param("asn:20240101", id="asn_8digit"),
+            pytest.param("id:20240101", id="id_8digit"),
+            pytest.param("page_count:12345678", id="page_count_8digit"),
+            pytest.param("num_notes:20231201", id="num_notes_8digit"),
+        ],
+    )
+    def test_8digit_on_integer_field_passes_through_unchanged(self, query: str) -> None:
+        assert rewrite_natural_date_keywords(query, EASTERN) == query
+
+    @pytest.mark.parametrize(
+        "query",
+        [
+            pytest.param("asn:[2000 TO 2024]", id="asn_year_range"),
+            pytest.param("id:[2000 TO 2024]", id="id_year_range"),
+            pytest.param("page_count:[2000 TO 2024]", id="page_count_year_range"),
+        ],
+    )
+    def test_year_range_on_integer_field_passes_through_unchanged(
+        self,
+        query: str,
+    ) -> None:
+        assert rewrite_natural_date_keywords(query, UTC) == query
+
+    def test_unknown_field_keyword_passes_through_unchanged(self) -> None:
+        # foobar is not a date field: 'foobar:today' must not become a date range,
+        # which Tantivy would otherwise reject as an unknown/typed field.
+        assert rewrite_natural_date_keywords("foobar:today", UTC) == "foobar:today"
+
+
 class TestPassthrough:
     """Queries without field prefixes or unrelated content pass through unchanged."""
 

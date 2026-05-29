@@ -52,7 +52,7 @@ _DATE_KEYWORD_PATTERN = "|".join(
 )
 
 _FIELD_DATE_RE = regex.compile(
-    rf"""(?P<field>\w+)\s*:\s*(?:
+    rf"""(?<!\w)(?P<field>created|modified|added)\s*:\s*(?:
     (?P<quote>["'])(?P<quoted>{_DATE_KEYWORD_PATTERN})(?P=quote)
     |
     (?P<bare>{_DATE_KEYWORD_PATTERN})(?![\w-])
@@ -69,10 +69,13 @@ _WHOOSH_REL_RANGE_RE = regex.compile(
     r"\[-(?P<n>\d+)\s+(?P<unit>second|minute|hour|day|week|month|year)s?\s+to\s+now\]",
     regex.IGNORECASE,
 )
-# Whoosh-style 8-digit date: field:YYYYMMDD — field-aware so timezone can be applied correctly
-_DATE8_RE = regex.compile(r"(?P<field>\w+):(?P<date8>\d{8})\b")
+# Whoosh-style 8-digit date: field:YYYYMMDD — field-aware so timezone can be applied correctly.
+# Scoped to date fields only; numeric fields (asn, id, page_count, ...) must not be rewritten.
+_DATE8_RE = regex.compile(
+    r"(?<!\w)(?P<field>created|modified|added):(?P<date8>\d{8})\b",
+)
 _YEAR_RANGE_RE = regex.compile(
-    r"(?P<field>\w+):\[(?P<y1>\d{4})\s+TO\s+(?P<y2>\d{4})\]",
+    r"(?<!\w)(?P<field>created|modified|added):\[(?P<y1>\d{4})\s+TO\s+(?P<y2>\d{4})\]",
     regex.IGNORECASE,
 )
 _SIMPLE_QUERY_TOKEN_RE = regex.compile(r"\S+")
