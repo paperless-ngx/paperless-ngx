@@ -81,8 +81,10 @@ def build_schema() -> tantivy.Schema:
         tokenizer_name="simple_search_analyzer",
     )
 
-    # Autocomplete prefix scan - stored, not indexed
-    sb.add_text_field("autocomplete_word", stored=True, tokenizer_name="raw")
+    # Autocomplete prefix scan via terms_with_prefix, which walks the field's
+    # term dictionary - so the field must be indexed (term dict), not stored.
+    # The stored value is never read back, so storing it only wastes space.
+    sb.add_text_field("autocomplete_word", stored=False, tokenizer_name="raw")
 
     sb.add_text_field("tag", stored=True, tokenizer_name="paperless_text")
 
