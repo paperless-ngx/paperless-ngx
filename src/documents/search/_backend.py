@@ -926,6 +926,9 @@ class TantivyBackend:
                 )
                 writer.add_document(doc)
             writer.commit()
+            # Wait for background merge threads to finish so all segments are
+            # fully merged and persisted before the index is considered rebuilt.
+            writer.wait_merging_threads()
             new_index.reload()
         except BaseException:  # pragma: no cover
             # Restore old index on failure so the backend remains usable
