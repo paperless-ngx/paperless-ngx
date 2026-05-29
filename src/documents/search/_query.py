@@ -84,17 +84,9 @@ _SIMPLE_QUERY_TOKEN_RE = regex.compile(r"\S+")
 # In natural-language queries (e.g., "H52.1 - Kurzsichtigkeit"), the dash is a separator.
 _SPACED_OPERATOR_RE = regex.compile(r"\s+[-+]\s+")
 _TRAILING_OPERATOR_RE = regex.compile(r"\s+[-+]+\s*$")
-# Matches any character in the major CJK blocks so CJK queries can be routed to
-# the bigram fields, which use an ngram tokenizer rather than ascii_fold.
-_CJK_RE: Final = regex.compile(
-    r"[⺀-⻿"  # CJK Radicals Supplement
-    r"⼀-⿟"  # Kangxi Radicals
-    r"぀-ヿ"  # Hiragana + Katakana
-    r"㐀-䶿"  # CJK Extension A
-    r"一-鿿"  # CJK Unified Ideographs
-    r"가-힯"  # Hangul Syllables
-    r"豈-﫿]",  # CJK Compatibility Ideographs
-)
+# Matches CJK/Hangul characters so queries can be routed to bigram fields.
+# Uses Unicode properties to cover all blocks including Extension B+ planes.
+_CJK_RE: Final = regex.compile(r"[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]+")
 
 
 def _has_cjk(text: str) -> bool:
