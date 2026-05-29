@@ -8,6 +8,13 @@ export GRANIAN_HOST=${GRANIAN_HOST:-${PAPERLESS_BIND_ADDR:-"::"}}
 export GRANIAN_PORT=${GRANIAN_PORT:-${PAPERLESS_PORT:-8000}}
 export GRANIAN_WORKERS=${GRANIAN_WORKERS:-${PAPERLESS_WEBSERVER_WORKERS:-1}}
 
+# Static file serving: Granian matches against the raw URI path (before any
+# SCRIPT_NAME stripping), so the route must include the subpath prefix.
+_static_dir="${PAPERLESS_STATICDIR:-/usr/src/paperless/static}"
+_static_route="${PAPERLESS_FORCE_SCRIPT_NAME}/static"
+export GRANIAN_STATIC_PATH_MOUNT=${GRANIAN_STATIC_PATH_MOUNT:-${_static_dir}}
+export GRANIAN_STATIC_PATH_ROUTE=${GRANIAN_STATIC_PATH_ROUTE:-${_static_route:-/static}}
+
 # Only set GRANIAN_URL_PATH_PREFIX if PAPERLESS_FORCE_SCRIPT_NAME is set
 if [[ -n "${PAPERLESS_FORCE_SCRIPT_NAME}" ]]; then
 	export GRANIAN_URL_PATH_PREFIX=${PAPERLESS_FORCE_SCRIPT_NAME}

@@ -118,7 +118,6 @@ SCRATCH_DIR = get_path_from_env(
 env_apps = get_list_from_env("PAPERLESS_APPS")
 
 INSTALLED_APPS = [
-    "whitenoise.runserver_nostatic",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -173,7 +172,6 @@ if DEBUG:
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.locale.LocaleMiddleware",
@@ -232,7 +230,6 @@ WSGI_APPLICATION = "paperless.wsgi.application"
 ASGI_APPLICATION = "paperless.asgi.application"
 
 STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", BASE_URL + "static/")
-WHITENOISE_STATIC_PREFIX = "/static/"
 
 STORAGES = {
     "staticfiles": {

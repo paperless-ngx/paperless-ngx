@@ -23,6 +23,10 @@ ExecStart=/bin/sh -c '\
   [ -n "$PAPERLESS_WEBSERVER_WORKERS" ] && export GRANIAN_WORKERS=$PAPERLESS_WEBSERVER_WORKERS; \
   # URL path prefix: only set if PAPERLESS_FORCE_SCRIPT_NAME exists \
   [ -n "$PAPERLESS_FORCE_SCRIPT_NAME" ] && export GRANIAN_URL_PATH_PREFIX=$PAPERLESS_FORCE_SCRIPT_NAME; \
+  # Static file serving: Granian matches the raw URI path (before SCRIPT_NAME stripping), \
+  # so the route must include any subpath prefix. \
+  [ -z "$GRANIAN_STATIC_PATH_MOUNT" ] && export GRANIAN_STATIC_PATH_MOUNT=${PAPERLESS_STATICDIR:-/opt/paperless/static}; \
+  [ -z "$GRANIAN_STATIC_PATH_ROUTE" ] && export GRANIAN_STATIC_PATH_ROUTE="${PAPERLESS_FORCE_SCRIPT_NAME}/static"; \
   exec granian --interface asginl --ws --loop uvloop "paperless.asgi:application"'
 
 [Install]
