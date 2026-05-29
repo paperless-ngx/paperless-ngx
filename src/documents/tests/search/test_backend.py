@@ -385,6 +385,29 @@ class TestSearch:
             == 1
         )
 
+    @pytest.mark.parametrize(
+        "query",
+        [
+            pytest.param("Straße", id="eszett"),
+            pytest.param("Ærøskøbing", id="ae_and_oslash"),
+            pytest.param("strasse", id="ascii_fold_form"),
+        ],
+    )
+    def test_simple_search_folds_special_letters_like_index(
+        self,
+        backend: TantivyBackend,
+        query: str,
+    ) -> None:
+        """Query-side folding must match index-side folding for non-decomposable
+        letters (ß→ss, ø→o, ...). Searching the accented form must find the doc.
+        A naive NFD fold deletes these letters and silently fails to match."""
+        doc = DocumentFactory(title="report", content="Straße Ærøskøbing")
+        backend.add_or_update(doc)
+
+        assert (
+            len(backend.search_ids(query, user=None, search_mode=SearchMode.TEXT)) == 1
+        )
+
     def test_sort_field_ascending(self, backend: TantivyBackend) -> None:
         """Searching with sort_reverse=False must return results in ascending ASN order."""
         for asn in [30, 10, 20]:
@@ -563,6 +586,18 @@ class TestAutocomplete:
 
         results = backend.autocomplete("pay", limit=10)
         assert results.index("payment") < results.index("payslip")
+
+    def test_folds_special_letters_consistently(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """Autocomplete words must fold the same way as content (ß→ss), so a
+        prefix of the folded form finds them. A naive NFD fold would store the
+        word as 'strae' and the prefix 'stras' would never match it."""
+        doc = DocumentFactory(title="Straße", content="details")
+        backend.add_or_update(doc)
+
+        assert "strasse" in backend.autocomplete("stras", limit=10)
 
 
 class TestMoreLikeThis:

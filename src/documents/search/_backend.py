@@ -22,7 +22,6 @@ from django.conf import settings
 from django.utils.timezone import get_current_timezone
 from guardian.shortcuts import get_users_with_perms
 
-from documents.search._normalize import ascii_fold
 from documents.search._query import build_permission_filter
 from documents.search._query import parse_simple_text_highlight_query
 from documents.search._query import parse_simple_text_query
@@ -32,6 +31,7 @@ from documents.search._schema import _write_sentinels
 from documents.search._schema import build_schema
 from documents.search._schema import open_or_rebuild_index
 from documents.search._schema import wipe_index
+from documents.search._tokenizer import ascii_fold
 from documents.search._tokenizer import register_tokenizers
 from documents.utils import IterWrapper
 from documents.utils import identity

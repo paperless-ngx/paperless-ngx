@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Final
 
 import tantivy
 
@@ -128,3 +129,36 @@ def _simple_search_analyzer() -> tantivy.TextAnalyzer:
         .filter(tantivy.Filter.ascii_fold())
         .build()
     )
+
+
+# Shared analyzers for query-side normalization. They reuse the exact filters
+# applied at index time so query terms fold identically (single source of truth
+# for ASCII folding, instead of a separate Python implementation). tantivy-py's
+# TextAnalyzer.analyze clones internally per call, so these are safe to share.
+_SIMPLE_SEARCH_ANALYZER: Final = _simple_search_analyzer()
+# raw tokenizer keeps the whole input as one token, so this folds an arbitrary
+# string to ASCII exactly like the content tokenizers (ß->ss, ø->o, æ->ae, ...)
+# without splitting it - used for autocomplete words and prefixes.
+_ASCII_FOLD_ANALYZER: Final = (
+    tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.raw())
+    .filter(tantivy.Filter.ascii_fold())
+    .build()
+)
+
+
+def simple_search_tokens(text: str) -> list[str]:
+    """Tokenize a query string exactly as simple_title/simple_content are indexed."""
+    return _SIMPLE_SEARCH_ANALYZER.analyze(text)
+
+
+def ascii_fold(text: str) -> str:
+    """Fold text to ASCII using the same mapping as the content tokenizers.
+
+    Maps non-decomposable letters (ß->ss, ø->o, æ->ae, ...) identically to
+    Tantivy's ascii_fold filter used at index time, so query/autocomplete terms
+    agree with the folded content. A naive NFD strip would instead delete those
+    letters, causing silent search misses. Callers lowercase first, matching the
+    index pipeline's lowercase -> ascii_fold order.
+    """
+    tokens = _ASCII_FOLD_ANALYZER.analyze(text)
+    return tokens[0] if tokens else ""

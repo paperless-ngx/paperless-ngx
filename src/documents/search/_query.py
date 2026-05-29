@@ -12,7 +12,7 @@ import tantivy
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 
-from documents.search._normalize import ascii_fold
+from documents.search._tokenizer import simple_search_tokens
 
 if TYPE_CHECKING:
     from datetime import tzinfo
@@ -78,7 +78,6 @@ _YEAR_RANGE_RE = regex.compile(
     r"(?<!\w)(?P<field>created|modified|added):\[(?P<y1>\d{4})\s+TO\s+(?P<y2>\d{4})\]",
     regex.IGNORECASE,
 )
-_SIMPLE_QUERY_TOKEN_RE = regex.compile(r"\S+")
 # Tantivy syntax error: " - " and " + " with spaces on both sides are invalid because
 # the NOT/MUST operators require no space between the operator and the term.
 # In natural-language queries (e.g., "H52.1 - Kurzsichtigkeit"), the dash is a separator.
@@ -542,11 +541,10 @@ _SIMPLE_FIELD_BOOSTS = {"simple_title": 2.0}
 
 
 def _simple_query_tokens(raw_query: str) -> list[str]:
-    tokens = [
-        ascii_fold(token.lower())
-        for token in _SIMPLE_QUERY_TOKEN_RE.findall(raw_query, timeout=_REGEX_TIMEOUT)
-    ]
-    return [token for token in tokens if token]
+    # Tokenize and fold via the same analyzer used to index simple_title /
+    # simple_content, so query terms fold identically to the indexed terms
+    # (single source of truth for ASCII folding).
+    return simple_search_tokens(raw_query)
 
 
 def _build_simple_field_query(
@@ -614,9 +612,10 @@ def parse_user_query(
         field_boosts=_FIELD_BOOSTS,
     )
 
-    # CJK characters are stripped by ascii_fold in the standard tokenizer, so
-    # they would never match content/title. Route CJK queries to the bigram
-    # fields, which use an ngram tokenizer that preserves non-ASCII text.
+    # The standard analyzer keeps a whitespace-free CJK run as a single token,
+    # so substring queries can't match content/title (and long runs are dropped
+    # by remove_long). Route CJK queries to the bigram fields, whose ngram
+    # tokenizer indexes overlapping 2-grams for substring matching.
     cjk_query = (
         _build_cjk_query(index, raw_query, _CJK_ALL_FIELDS)
         if _has_cjk(raw_query)
@@ -658,8 +657,9 @@ def parse_simple_query(
 
     Query string is escaped and normalized to be treated as "simple" text query.
     When cjk_fields is provided and the query contains CJK characters, an
-    additional Should clause searches those bigram-tokenized fields so that
-    CJK text is not silently dropped by ascii_fold.
+    additional Should clause searches those bigram-tokenized fields, which match
+    CJK substrings the simple analyzer can't (long whitespace-free runs are
+    dropped by remove_long).
     """
     tokens = _simple_query_tokens(raw_query)
 
