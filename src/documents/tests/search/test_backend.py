@@ -1,5 +1,6 @@
 import pytest
 from django.contrib.auth.models import User
+from pytest_mock import MockerFixture
 
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -7,6 +8,7 @@ from documents.models import Document
 from documents.models import Note
 from documents.search._backend import SearchMode
 from documents.search._backend import TantivyBackend
+from documents.search._backend import WriteBatch
 from documents.search._backend import get_backend
 from documents.search._backend import reset_backend
 from documents.tests.factories import CorrespondentFactory
@@ -39,6 +41,47 @@ class TestWriteBatch:
 
         ids = backend.search_ids("should survive", user=None)
         assert len(ids) == 1
+
+    def test_writer_released_when_commit_fails(
+        self,
+        backend: TantivyBackend,
+        mocker: MockerFixture,
+    ) -> None:
+        """A commit failure must still dispose the writer (released in finally).
+
+        Otherwise the Tantivy IndexWriter lingers holding its internal lock and
+        the next batch fails with LockBusy. The real writer is created in
+        __enter__; here commit() is forced to raise via a mocked _writer.
+        """
+        doc = Document.objects.create(
+            title="Commit Fail",
+            content="indexable text",
+            checksum="WBCF1",
+            pk=42,
+        )
+
+        failing = mocker.MagicMock()
+        failing.commit.side_effect = RuntimeError("simulated commit failure")
+        mocker.patch.object(
+            WriteBatch,
+            "_writer",
+            new_callable=mocker.PropertyMock,
+            return_value=failing,
+        )
+
+        batch = backend.batch_update()
+        with pytest.raises(RuntimeError, match="simulated commit failure"):
+            with batch as b:
+                b.add_or_update(doc)
+
+        # Writer disposed despite the commit failure.
+        assert batch._raw_writer is None
+
+        # Drop the patch so a real writer can be created; a fresh batch must
+        # succeed (would raise LockBusy if the previous writer had leaked).
+        mocker.stopall()
+        backend.add_or_update(doc)
+        assert len(backend.search_ids("indexable", user=None)) == 1
 
 
 class TestSearch:
