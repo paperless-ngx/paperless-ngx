@@ -519,6 +519,9 @@ DEFAULT_SEARCH_FIELDS = [
 ]
 SIMPLE_SEARCH_FIELDS = ["simple_title", "simple_content"]
 TITLE_SEARCH_FIELDS = ["simple_title"]
+_CJK_ALL_FIELDS: Final[list[str]] = ["bigram_content", "bigram_title"]
+_CJK_CONTENT_FIELDS: Final[list[str]] = ["bigram_content"]
+_CJK_TITLE_FIELDS: Final[list[str]] = ["bigram_title"]
 _FIELD_BOOSTS = {"title": 2.0}
 _SIMPLE_FIELD_BOOSTS = {"simple_title": 2.0}
 
@@ -600,10 +603,14 @@ def parse_user_query(
     # they would never match content/title. Route CJK queries to the bigram
     # fields, which use an ngram tokenizer that preserves non-ASCII text.
     cjk_query = (
-        _build_cjk_query(index, raw_query, ["bigram_content", "bigram_title"])
+        _build_cjk_query(index, raw_query, _CJK_ALL_FIELDS)
         if _has_cjk(raw_query)
         else None
     )
+
+    clauses: list[tuple[tantivy.Occur, tantivy.Query]] = [
+        (tantivy.Occur.Should, exact),
+    ]
 
     threshold = settings.ADVANCED_FUZZY_SEARCH_THRESHOLD
     if threshold is not None:
@@ -614,24 +621,15 @@ def parse_user_query(
             # (prefix=True, distance=1, transposition_cost_one=True) — edit-distance fuzziness
             fuzzy_fields={f: (True, 1, True) for f in DEFAULT_SEARCH_FIELDS},
         )
-        clauses = [
-            (tantivy.Occur.Should, exact),
-            # 0.1 boost keeps fuzzy hits ranked below exact matches (intentional)
-            (tantivy.Occur.Should, tantivy.Query.boost_query(fuzzy, 0.1)),
-        ]
-        if cjk_query is not None:
-            clauses.append((tantivy.Occur.Should, cjk_query))
-        return tantivy.Query.boolean_query(clauses)
+        # 0.1 boost keeps fuzzy hits ranked below exact matches (intentional)
+        clauses.append((tantivy.Occur.Should, tantivy.Query.boost_query(fuzzy, 0.1)))
 
     if cjk_query is not None:
-        return tantivy.Query.boolean_query(
-            [
-                (tantivy.Occur.Should, exact),
-                (tantivy.Occur.Should, cjk_query),
-            ],
-        )
+        clauses.append((tantivy.Occur.Should, cjk_query))
 
-    return exact
+    if len(clauses) == 1:
+        return exact
+    return tantivy.Query.boolean_query(clauses)
 
 
 def parse_simple_query(
@@ -650,11 +648,12 @@ def parse_simple_query(
     """
     tokens = _simple_query_tokens(raw_query)
 
-    clauses: list[tuple[tantivy.Occur, tantivy.Query]] = [
-        (tantivy.Occur.Should, _build_simple_field_query(index, field, tokens))
-        for field in fields
-        if tokens
-    ]
+    clauses: list[tuple[tantivy.Occur, tantivy.Query]] = []
+    if tokens:
+        clauses = [
+            (tantivy.Occur.Should, _build_simple_field_query(index, field, tokens))
+            for field in fields
+        ]
 
     if cjk_fields and _has_cjk(raw_query):
         cjk_q = _build_cjk_query(index, raw_query, cjk_fields)
@@ -701,7 +700,7 @@ def parse_simple_text_query(
         index,
         raw_query,
         SIMPLE_SEARCH_FIELDS,
-        cjk_fields=["bigram_content"],
+        cjk_fields=_CJK_CONTENT_FIELDS,
     )
 
 
@@ -717,5 +716,5 @@ def parse_simple_title_query(
         index,
         raw_query,
         TITLE_SEARCH_FIELDS,
-        cjk_fields=["bigram_title"],
+        cjk_fields=_CJK_TITLE_FIELDS,
     )
