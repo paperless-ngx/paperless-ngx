@@ -9,6 +9,7 @@ from documents.search._backend import SearchMode
 from documents.search._backend import TantivyBackend
 from documents.search._backend import get_backend
 from documents.search._backend import reset_backend
+from documents.tests.factories import DocumentFactory
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
 
@@ -212,6 +213,73 @@ class TestSearch:
         assert (
             len(backend.search_ids("sswo gu", user=None, search_mode=SearchMode.TITLE))
             == 1
+        )
+
+    @pytest.mark.parametrize(
+        ("mode", "title", "content", "hits", "misses"),
+        [
+            pytest.param(
+                SearchMode.QUERY,
+                "CJK document",
+                "東京都の人口は約1400万人です",
+                ["東京", "人口"],
+                ["大阪"],
+                id="query_mode_cjk_content",
+            ),
+            pytest.param(
+                SearchMode.TEXT,
+                "CJK document",
+                "東京都の人口は約1400万人です",
+                ["東京"],
+                ["大阪"],
+                id="text_mode_cjk_content",
+            ),
+            pytest.param(
+                SearchMode.TITLE,
+                "東京都の報告書",
+                "This document is about Tokyo.",
+                ["東京", "報告"],
+                ["大阪"],
+                id="title_mode_cjk_title",
+            ),
+        ],
+    )
+    def test_cjk_search_finds_matching_documents(
+        self,
+        backend: TantivyBackend,
+        mode: SearchMode,
+        title: str,
+        content: str,
+        hits: list[str],
+        misses: list[str],
+    ) -> None:
+        """CJK queries must match documents via bigram fields in all three search modes."""
+        doc = DocumentFactory(title=title, content=content)
+        backend.add_or_update(doc)
+
+        for query in hits:
+            assert len(backend.search_ids(query, user=None, search_mode=mode)) == 1, (
+                f"Expected {query!r} to match in {mode} mode"
+            )
+        for query in misses:
+            assert len(backend.search_ids(query, user=None, search_mode=mode)) == 0, (
+                f"Expected {query!r} not to match in {mode} mode"
+            )
+
+    def test_title_mode_cjk_does_not_match_content_only(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """Title-only CJK search must not return docs where CJK appears only in content."""
+        doc = DocumentFactory(
+            title="Tokyo report",
+            content="東京都の人口は約1400万人です",
+        )
+        backend.add_or_update(doc)
+
+        assert (
+            len(backend.search_ids("東京", user=None, search_mode=SearchMode.TITLE))
+            == 0
         )
 
     def test_sort_field_ascending(self, backend: TantivyBackend) -> None:
