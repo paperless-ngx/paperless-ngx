@@ -99,9 +99,21 @@ def _build_cjk_query(
     raw_query: str,
     fields: list[str],
 ) -> tantivy.Query | None:
-    """Parse raw_query against bigram fields, returning None on failure or empty query."""
+    """Build a bigram-field query from the CJK runs in ``raw_query``.
+
+    Only the CJK character runs are extracted and parsed; ASCII field prefixes,
+    boolean operators and date keywords are discarded. This keeps the CJK clause
+    plain-text and consistent across query/simple modes (no leaked ``field:``
+    semantics, no parse failures from spaced ``-``/``+``), and avoids feeding
+    Latin tokens into the character-bigram matcher (which would produce spurious
+    matches against unrelated Latin text). Returns None when there is no CJK
+    text or the parse fails.
+    """
+    cjk_text = " ".join(_CJK_RE.findall(raw_query))
+    if not cjk_text:
+        return None
     try:
-        return index.parse_query(raw_query, fields)
+        return index.parse_query(cjk_text, fields)
     except Exception:
         return None
 

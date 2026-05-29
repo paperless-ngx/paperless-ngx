@@ -318,6 +318,30 @@ class TestSearch:
             len(backend.search_ids(miss, user=None, search_mode=SearchMode.QUERY)) == 0
         ), f"Expected {miss!r} not to match"
 
+    def test_cjk_text_mode_does_not_leak_field_query_semantics(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """TEXT mode is plain-text over content: a 'field:CJK' input must not be
+        parsed as a structured query against that field. A doc tagged 重要 with
+        no 重要 in its content must NOT match the TEXT-mode query 'tag:重要'."""
+        tag = TagFactory(name="重要")
+        doc = DocumentFactory(title="report", content="just english content")
+        doc.tags.add(tag)
+        backend.add_or_update(doc)
+
+        assert (
+            len(backend.search_ids("tag:重要", user=None, search_mode=SearchMode.TEXT))
+            == 0
+        )
+        # Sanity: the CJK run still matches when it is actually in the content.
+        doc2 = DocumentFactory(title="report2", content="本文に重要な情報")
+        backend.add_or_update(doc2)
+        assert (
+            len(backend.search_ids("tag:重要", user=None, search_mode=SearchMode.TEXT))
+            == 1
+        )
+
     def test_sort_field_ascending(self, backend: TantivyBackend) -> None:
         """Searching with sort_reverse=False must return results in ascending ASN order."""
         for asn in [30, 10, 20]:
