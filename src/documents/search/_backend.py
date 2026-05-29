@@ -220,6 +220,10 @@ class WriteBatch:
         try:
             if exc_type is None:
                 self._writer.commit()
+                # Wait for background merge threads to finish before releasing
+                # the file lock so the next writer doesn't race against an
+                # in-progress merge on the same index files.
+                self._writer.wait_merging_threads()
                 self._backend._index.reload()
             # Explicitly delete writer to release tantivy's internal lock.
             # On exception the uncommitted writer is simply discarded.
