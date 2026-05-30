@@ -42,6 +42,7 @@ class AIClient:
             from llama_index.llms.openai_like import OpenAILike
 
             endpoint = self.settings.llm_endpoint or None
+            api_key = self.settings.llm_api_key
             if endpoint:
                 validate_outbound_http_url(
                     endpoint,
@@ -50,7 +51,7 @@ class AIClient:
             return OpenAILike(
                 model=self.settings.llm_model or "gpt-3.5-turbo",
                 api_base=endpoint,
-                api_key=self.settings.llm_api_key,
+                api_key=api_key,  # Ensure api_key is not None
                 is_chat_model=True,
                 is_function_calling_model=True,
             )
