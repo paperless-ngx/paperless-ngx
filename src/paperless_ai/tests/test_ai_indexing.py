@@ -6,10 +6,12 @@ import pytest
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
+from faker import Faker
 from llama_index.core.base.embeddings.base import BaseEmbedding
 
 from documents.models import Document
 from documents.models import PaperlessTask
+from documents.tests.factories import DocumentFactory
 from documents.tests.factories import PaperlessTaskFactory
 from paperless.models import ApplicationConfiguration
 from paperless_ai import indexing
@@ -503,6 +505,61 @@ def test_query_similar_documents_normalizes_and_post_filters_allowed_ids(
     )
     assert result == [real_document]
     assert private_document not in result
+
+
+class TestUpdateLlmIndexStaleNodes:
+    """Tests that update_llm_index removes ALL nodes for a multi-chunk document."""
+
+    @pytest.mark.django_db
+    def test_incremental_update_removes_all_old_nodes_for_multi_chunk_document(
+        self,
+        temp_llm_index_dir,
+        mock_embed_model: MagicMock,
+    ) -> None:
+        """Ghost nodes from all chunks of a modified document must be removed.
+
+        When a document is split into multiple chunks (chunk_size=1024), the
+        incremental update path must delete every old node, not just the last
+        one captured by a dict comprehension keyed on document_id.
+        """
+        # Content long enough to produce at least two chunks at chunk_size=1024.
+        # Generate many paragraphs so the token count comfortably exceeds 1024.
+        fake = Faker()
+        long_content = "\n\n".join(fake.paragraph(nb_sentences=20) for _ in range(20))
+        doc = DocumentFactory(content=long_content)
+
+        # Build the initial index (rebuild=True) so it has multiple nodes
+        indexing.update_llm_index(rebuild=True)
+
+        # Verify the initial index has more than one node for this document
+        initial_index = indexing.load_or_build_index()
+        initial_node_ids = [
+            nid
+            for nid, node in initial_index.docstore.docs.items()
+            if node.metadata.get("document_id") == str(doc.id)
+        ]
+        assert len(initial_node_ids) > 1, (
+            f"Expected multiple chunks but got {len(initial_node_ids)}; "
+            "increase long_content length"
+        )
+
+        # Simulate a modification so the incremental path treats it as changed.
+        # Use queryset.update() to bypass auto_now and actually change the DB value.
+        new_modified = timezone.now()
+        Document.objects.filter(pk=doc.pk).update(modified=new_modified)
+
+        # Run incremental update (rebuild=False) with the modified document
+        indexing.update_llm_index(rebuild=False)
+
+        # Reload the persisted index and check that no OLD node ids remain
+        updated_index = indexing.load_or_build_index()
+        remaining_old_node_ids = [
+            nid for nid in initial_node_ids if nid in updated_index.docstore.docs
+        ]
+        assert remaining_old_node_ids == [], (
+            f"Ghost nodes still present after incremental update: "
+            f"{remaining_old_node_ids}"
+        )
 
 
 @pytest.mark.django_db
