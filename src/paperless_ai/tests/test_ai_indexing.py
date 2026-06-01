@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
+import pytest_mock
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
@@ -11,6 +12,7 @@ from llama_index.core.base.embeddings.base import BaseEmbedding
 
 from documents.models import Document
 from documents.models import PaperlessTask
+from documents.signals import document_updated
 from documents.tests.factories import DocumentFactory
 from documents.tests.factories import PaperlessTaskFactory
 from paperless.models import ApplicationConfiguration
@@ -583,3 +585,21 @@ def test_query_similar_documents_empty_allow_list_fails_closed(
     mock_vector_store_exists.assert_not_called()
     mock_load_or_build_index.assert_not_called()
     mock_retriever_cls.assert_not_called()
+
+
+class TestDocumentUpdatedSignalTriggersLlmReindex:
+    """document_updated must enqueue an LLM index update, just like document_consumption_finished."""
+
+    @pytest.mark.django_db
+    @override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="huggingface")
+    def test_document_updated_enqueues_llm_reindex(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """Firing document_updated should call update_document_in_llm_index.apply_async."""
+        mock_task = mocker.patch("documents.tasks.update_document_in_llm_index")
+
+        doc = DocumentFactory()
+        document_updated.send(sender=object, document=doc)
+
+        mock_task.apply_async.assert_called_once_with(kwargs={"document": doc})
