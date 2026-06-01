@@ -319,6 +319,7 @@ def bulk_update_documents(document_ids) -> None:
             sender=None,
             document=doc,
             logging_group=uuid.uuid4(),
+            skip_ai_index=True,  # bulk path calls update_llm_index once below
         )
         post_save.send(Document, instance=doc, created=False)
 

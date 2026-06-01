@@ -97,6 +97,8 @@ MODEL_FILE = get_path_from_env(
     DATA_DIR / "classification_model.pickle",
 )
 LLM_INDEX_DIR = DATA_DIR / "llm_index"
+LLM_INDEX_LOCK = DATA_DIR / "locks" / "llm_index.lock"
+(DATA_DIR / "locks").mkdir(parents=True, exist_ok=True)
 
 LOGGING_DIR = get_path_from_env("PAPERLESS_LOGGING_DIR", DATA_DIR / "log")
 

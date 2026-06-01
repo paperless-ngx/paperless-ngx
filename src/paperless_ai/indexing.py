@@ -31,8 +31,13 @@ RAG_CHUNK_OVERLAP = 200
 
 
 def _index_lock_path() -> Path:
-    """Return the path used as the file lock for FAISS index mutations."""
-    return settings.LLM_INDEX_DIR / "index.lock"
+    """Return the path used as the file lock for FAISS index mutations.
+
+    The lock file lives in DATA_DIR/locks/ (not inside LLM_INDEX_DIR) so that a
+    rebuild — which calls shutil.rmtree(LLM_INDEX_DIR) — cannot delete the lock
+    while another worker still holds it.
+    """
+    return settings.LLM_INDEX_LOCK
 
 
 def queue_llm_index_update_if_needed(*, rebuild: bool, reason: str) -> bool:
