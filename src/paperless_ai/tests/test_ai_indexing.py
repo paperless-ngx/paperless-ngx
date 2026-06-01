@@ -13,6 +13,7 @@ from llama_index.core.base.embeddings.base import BaseEmbedding
 
 from documents.models import Document
 from documents.models import PaperlessTask
+from documents.signals import document_consumption_finished
 from documents.signals import document_updated
 from documents.tests.factories import DocumentFactory
 from documents.tests.factories import PaperlessTaskFactory
@@ -678,6 +679,27 @@ class TestDocumentUpdatedSignalTriggersLlmReindex:
         document_updated.send(sender=object, document=doc)
 
         mock_task.apply_async.assert_called_once_with(kwargs={"document": doc})
+
+    @pytest.mark.django_db
+    @override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="huggingface")
+    def test_version_addition_consumption_enqueues_llm_index_once(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """When a new version is consumed, the root document must be enqueued exactly once."""
+        mock_task = mocker.patch("documents.tasks.update_document_in_llm_index")
+
+        root_doc = DocumentFactory()
+        document_consumption_finished.send(
+            sender=object,
+            document=root_doc,
+            logging_group=None,
+            classifier=None,
+            original_file=None,
+        )
+        document_updated.send(sender=object, document=root_doc, skip_ai_index=True)
+
+        assert mock_task.apply_async.call_count == 1
 
 
 @pytest.mark.django_db
