@@ -54,6 +54,7 @@ from django.http import HttpRequest
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
+from django.http import HttpResponseNotFound
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseServerError
 from django.http import StreamingHttpResponse
@@ -2166,13 +2167,17 @@ class ChatStreamingView(GenericAPIView[Any]):
         doc_id = serializer.validated_data.get("document_id")
 
         if doc_id:
-            try:
-                document = Document.objects.get(id=doc_id)
-            except Document.DoesNotExist:
-                return HttpResponseBadRequest("Document not found")
-
-            if not has_perms_owner_aware(request.user, "view_document", document):
-                return HttpResponseForbidden("Insufficient permissions")
+            document = (
+                get_objects_for_user_owner_aware(
+                    request.user,
+                    "view_document",
+                    Document,
+                )
+                .filter(id=doc_id)
+                .first()
+            )
+            if document is None:
+                return HttpResponseNotFound("Document not found")
 
             documents = [document]
         else:
