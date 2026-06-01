@@ -1,3 +1,4 @@
+import json
 from unittest.mock import ANY
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -90,12 +91,42 @@ def test_get_llm_unsupported_backend(mock_ai_config):
         AIClient()
 
 
-def test_run_llm_query(mock_ai_config, mock_ollama_llm):
+def test_run_llm_query_ollama_uses_structured_json(mock_ai_config, mock_ollama_llm):
     mock_ai_config.llm_backend = "ollama"
     mock_ai_config.llm_model = "test_model"
     mock_ai_config.llm_endpoint = "http://test-url"
 
     mock_llm_instance = mock_ollama_llm.return_value
+    mock_llm_instance.chat.return_value = MagicMock()
+    mock_llm_instance.chat.return_value.message.content = json.dumps(
+        {
+            "title": "Test Title",
+            "tags": ["test", "document"],
+            "correspondents": ["John Doe"],
+            "document_types": ["report"],
+            "storage_paths": ["Reports"],
+            "dates": ["2023-01-01"],
+        },
+    )
+
+    client = AIClient()
+    result = client.run_llm_query("test_prompt")
+
+    assert result["title"] == "Test Title"
+    mock_llm_instance.chat.assert_called_once_with(
+        [ANY],
+        format=ANY,
+        think=False,
+    )
+
+
+def test_run_llm_query_openai_uses_tools(mock_ai_config, mock_openai_llm):
+    mock_ai_config.llm_backend = "openai-like"
+    mock_ai_config.llm_model = "test_model"
+    mock_ai_config.llm_api_key = "test_api_key"
+    mock_ai_config.llm_endpoint = "http://test-url"
+
+    mock_llm_instance = mock_openai_llm.return_value
 
     tool_selection = ToolSelection(
         tool_id="call_test",
@@ -117,6 +148,7 @@ def test_run_llm_query(mock_ai_config, mock_ollama_llm):
     result = client.run_llm_query("test_prompt")
 
     assert result["title"] == "Test Title"
+    mock_llm_instance.chat_with_tools.assert_called_once()
 
 
 def test_run_chat(mock_ai_config, mock_ollama_llm):

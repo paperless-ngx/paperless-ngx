@@ -1,3 +1,4 @@
+import json
 import logging
 from typing import TYPE_CHECKING
 
@@ -109,9 +110,20 @@ class AIClient:
         )
 
         from llama_index.core.llms import ChatMessage
-        from llama_index.core.program.function_program import get_function_tool
 
         user_msg = ChatMessage(role="user", content=prompt)
+        if self.settings.llm_backend == LLMBackend.OLLAMA:
+            result = self.llm.chat(
+                [user_msg],
+                format=DocumentClassifierSchema.model_json_schema(),
+                think=False,
+            )
+            logger.debug("LLM query result: %s", result)
+            parsed = DocumentClassifierSchema(**json.loads(result.message.content))
+            return parsed.model_dump()
+
+        from llama_index.core.program.function_program import get_function_tool
+
         tool = get_function_tool(DocumentClassifierSchema)
         result = self.llm.chat_with_tools(
             tools=[tool],
