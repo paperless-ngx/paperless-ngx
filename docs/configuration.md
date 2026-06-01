@@ -2060,6 +2060,14 @@ retrieval quality.
 
     Defaults to 1024.
 
+#### [`PAPERLESS_AI_LLM_CONTEXT_SIZE=<int>`](#PAPERLESS_AI_LLM_CONTEXT_SIZE) {#PAPERLESS_AI_LLM_CONTEXT_SIZE}
+
+: The context size to use for AI prompts and RAG retrieval. For Ollama backends, this is also sent
+as `num_ctx` so models with very large native context windows are not loaded at their maximum
+context by default.
+
+    Defaults to 8192.
+
 #### [`PAPERLESS_AI_LLM_BACKEND=<str>`](#PAPERLESS_AI_LLM_BACKEND) {#PAPERLESS_AI_LLM_BACKEND}
 
 : The AI backend to use. This can be either "openai-like" or "ollama". If set to "ollama", the AI
