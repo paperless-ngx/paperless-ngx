@@ -2138,7 +2138,7 @@ class DocumentViewSet(
 
 
 class ChatStreamingSerializer(serializers.Serializer[dict[str, Any]]):
-    q = serializers.CharField(required=True)
+    q = serializers.CharField(required=True, max_length=4000)
     document_id = serializers.IntegerField(required=False, allow_null=True)
 
 
@@ -2159,12 +2159,11 @@ class ChatStreamingView(GenericAPIView[Any]):
         if not ai_config.ai_enabled:
             return HttpResponseBadRequest("AI is required for this feature")
 
-        try:
-            question = request.data["q"]
-        except KeyError:
-            return HttpResponseBadRequest("Invalid request")
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        question = serializer.validated_data["q"]
 
-        doc_id = request.data.get("document_id")
+        doc_id = serializer.validated_data.get("document_id")
 
         if doc_id:
             try:
