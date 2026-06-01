@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.utils import timezone
+from filelock import FileLock
 
 from documents.models import Document
 from documents.models import PaperlessTask
@@ -29,7 +30,17 @@ RAG_NUM_OUTPUT = 512
 RAG_CHUNK_OVERLAP = 200
 
 
+def _index_lock_path() -> Path:
+    """Return the path used as the file lock for FAISS index mutations."""
+    return settings.LLM_INDEX_DIR / "index.lock"
+
+
 def queue_llm_index_update_if_needed(*, rebuild: bool, reason: str) -> bool:
+    # NOTE: The check-then-enqueue sequence below is non-atomic (TOCTOU): two
+    # concurrent workers can both observe no running task and both enqueue a
+    # full rebuild. This is wasteful but not data-corrupting — update_llm_index
+    # is itself protected by _index_lock_path(), so only one rebuild runs at a
+    # time and the second one is serialised after the first completes.
     from documents.tasks import llmindex_index
 
     has_running = PaperlessTask.objects.filter(
@@ -245,68 +256,69 @@ def update_llm_index(
     config = AIConfig()
     chunk_size = config.llm_embedding_chunk_size
 
-    if rebuild or not vector_store_file_exists():
-        # remove meta.json to force re-detection of embedding dim
-        (settings.LLM_INDEX_DIR / "meta.json").unlink(missing_ok=True)
-        # Rebuild index from scratch
-        logger.info("Rebuilding LLM index.")
-        import llama_index.core.settings as llama_settings
+    with FileLock(_index_lock_path()):
+        if rebuild or not vector_store_file_exists():
+            # remove meta.json to force re-detection of embedding dim
+            (settings.LLM_INDEX_DIR / "meta.json").unlink(missing_ok=True)
+            # Rebuild index from scratch
+            logger.info("Rebuilding LLM index.")
+            import llama_index.core.settings as llama_settings
 
-        embed_model = get_embedding_model()
-        llama_settings.Settings.embed_model = embed_model
-        storage_context = get_or_create_storage_context(rebuild=True)
-        for document in iter_wrapper(documents):
-            document_nodes = build_document_node(document, chunk_size=chunk_size)
-            nodes.extend(document_nodes)
+            embed_model = get_embedding_model()
+            llama_settings.Settings.embed_model = embed_model
+            storage_context = get_or_create_storage_context(rebuild=True)
+            for document in iter_wrapper(documents):
+                document_nodes = build_document_node(document, chunk_size=chunk_size)
+                nodes.extend(document_nodes)
 
-        index = VectorStoreIndex(
-            nodes=nodes,
-            storage_context=storage_context,
-            embed_model=embed_model,
-            show_progress=False,
-        )
-        msg = "LLM index rebuilt successfully."
-    else:
-        # Update existing index
-        index = load_or_build_index()
-        all_node_ids = list(index.docstore.docs.keys())
-        existing_nodes: defaultdict[str, list] = defaultdict(list)
-        for node in index.docstore.get_nodes(all_node_ids):
-            doc_id = node.metadata.get("document_id")
-            if doc_id is not None:
-                existing_nodes[doc_id].append(node)
-
-        for document in iter_wrapper(documents):
-            doc_id = str(document.id)
-            document_modified = document.modified.isoformat()
-
-            if doc_id in existing_nodes:
-                doc_nodes = existing_nodes[doc_id]
-                node_modified = doc_nodes[0].metadata.get("modified")
-
-                if node_modified == document_modified:
-                    continue
-
-                # Again, delete from docstore, FAISS IndexFlatL2 are append-only
-                for node in doc_nodes:
-                    index.docstore.delete_document(node.node_id)
-                nodes.extend(build_document_node(document, chunk_size=chunk_size))
-            else:
-                # New document, add it
-                nodes.extend(build_document_node(document, chunk_size=chunk_size))
-
-        if nodes:
-            msg = "LLM index updated successfully."
-            logger.info(
-                "Updating %d nodes in LLM index.",
-                len(nodes),
+            index = VectorStoreIndex(
+                nodes=nodes,
+                storage_context=storage_context,
+                embed_model=embed_model,
+                show_progress=False,
             )
-            index.insert_nodes(nodes)
+            msg = "LLM index rebuilt successfully."
         else:
-            msg = "No changes detected in LLM index."
-            logger.info(msg)
+            # Update existing index
+            index = load_or_build_index()
+            all_node_ids = list(index.docstore.docs.keys())
+            existing_nodes: defaultdict[str, list] = defaultdict(list)
+            for node in index.docstore.get_nodes(all_node_ids):
+                doc_id = node.metadata.get("document_id")
+                if doc_id is not None:
+                    existing_nodes[doc_id].append(node)
 
-    index.storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
+            for document in iter_wrapper(documents):
+                doc_id = str(document.id)
+                document_modified = document.modified.isoformat()
+
+                if doc_id in existing_nodes:
+                    doc_nodes = existing_nodes[doc_id]
+                    node_modified = doc_nodes[0].metadata.get("modified")
+
+                    if node_modified == document_modified:
+                        continue
+
+                    # Again, delete from docstore, FAISS IndexFlatL2 are append-only
+                    for node in doc_nodes:
+                        index.docstore.delete_document(node.node_id)
+                    nodes.extend(build_document_node(document, chunk_size=chunk_size))
+                else:
+                    # New document, add it
+                    nodes.extend(build_document_node(document, chunk_size=chunk_size))
+
+            if nodes:
+                msg = "LLM index updated successfully."
+                logger.info(
+                    "Updating %d nodes in LLM index.",
+                    len(nodes),
+                )
+                index.insert_nodes(nodes)
+            else:
+                msg = "No changes detected in LLM index."
+                logger.info(msg)
+
+        index.storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
     return msg
 
 
@@ -317,24 +329,26 @@ def llm_index_add_or_update_document(document: Document):
     """
     new_nodes = build_document_node(document, chunk_size=get_rag_chunk_size())
 
-    index = load_or_build_index(nodes=new_nodes)
+    with FileLock(_index_lock_path()):
+        index = load_or_build_index(nodes=new_nodes)
 
-    remove_document_docstore_nodes(document, index)
+        remove_document_docstore_nodes(document, index)
 
-    index.insert_nodes(new_nodes)
+        index.insert_nodes(new_nodes)
 
-    index.storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
+        index.storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
 
 
 def llm_index_remove_document(document: Document):
     """
     Removes a document from the LLM index.
     """
-    index = load_or_build_index()
+    with FileLock(_index_lock_path()):
+        index = load_or_build_index()
 
-    remove_document_docstore_nodes(document, index)
+        remove_document_docstore_nodes(document, index)
 
-    index.storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
+        index.storage_context.persist(persist_dir=settings.LLM_INDEX_DIR)
 
 
 def truncate_content(

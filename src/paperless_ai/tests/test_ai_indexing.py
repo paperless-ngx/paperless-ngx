@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
@@ -603,3 +604,124 @@ class TestDocumentUpdatedSignalTriggersLlmReindex:
         document_updated.send(sender=object, document=doc)
 
         mock_task.apply_async.assert_called_once_with(kwargs={"document": doc})
+
+
+@pytest.mark.django_db
+class TestLlmIndexLocking:
+    """The FAISS index mutation functions must acquire the index lock before touching the index.
+
+    Without locking, two concurrent Celery workers can each load the same
+    on-disk index, make independent modifications, and the last writer silently
+    overwrites the first's changes.
+    """
+
+    def test_add_or_update_document_acquires_lock(
+        self,
+        temp_llm_index_dir: Path,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """llm_index_add_or_update_document must enter the file lock before touching the index."""
+        call_order: list[str] = []
+
+        mock_lock_instance = MagicMock()
+        mock_lock_instance.__enter__ = MagicMock(
+            side_effect=lambda *_: call_order.append("lock_acquired"),
+        )
+        mock_lock_instance.__exit__ = MagicMock(return_value=False)
+
+        mock_file_lock_cls = mocker.patch(
+            "paperless_ai.indexing.FileLock",
+            return_value=mock_lock_instance,
+        )
+
+        mock_load = mocker.patch(
+            "paperless_ai.indexing.load_or_build_index",
+            side_effect=lambda *_a, **_kw: (
+                call_order.append("index_loaded") or MagicMock()
+            ),
+        )
+        mocker.patch(
+            "paperless_ai.indexing.build_document_node",
+            return_value=[MagicMock()],
+        )
+        mocker.patch("paperless_ai.indexing.remove_document_docstore_nodes")
+
+        doc = MagicMock(spec=Document)
+        indexing.llm_index_add_or_update_document(doc)
+
+        mock_file_lock_cls.assert_called_once()
+        mock_lock_instance.__enter__.assert_called_once()
+        mock_load.assert_called_once()
+        assert call_order.index("lock_acquired") < call_order.index("index_loaded"), (
+            "Lock must be acquired before the index is loaded"
+        )
+
+    def test_remove_document_acquires_lock(
+        self,
+        temp_llm_index_dir: Path,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """llm_index_remove_document must enter the file lock before loading the index."""
+        call_order: list[str] = []
+
+        mock_lock_instance = MagicMock()
+        mock_lock_instance.__enter__ = MagicMock(
+            side_effect=lambda *_: call_order.append("lock_acquired"),
+        )
+        mock_lock_instance.__exit__ = MagicMock(return_value=False)
+
+        mock_file_lock_cls = mocker.patch(
+            "paperless_ai.indexing.FileLock",
+            return_value=mock_lock_instance,
+        )
+
+        mock_load = mocker.patch(
+            "paperless_ai.indexing.load_or_build_index",
+            side_effect=lambda *_a, **_kw: (
+                call_order.append("index_loaded") or MagicMock()
+            ),
+        )
+        mocker.patch("paperless_ai.indexing.remove_document_docstore_nodes")
+
+        doc = MagicMock(spec=Document)
+        indexing.llm_index_remove_document(doc)
+
+        mock_file_lock_cls.assert_called_once()
+        mock_lock_instance.__enter__.assert_called_once()
+        mock_load.assert_called_once()
+        assert call_order.index("lock_acquired") < call_order.index("index_loaded"), (
+            "Lock must be acquired before the index is loaded"
+        )
+
+    def test_update_llm_index_rebuild_acquires_lock(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: MagicMock,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """update_llm_index must enter the file lock during the rebuild/persist cycle."""
+        mock_lock_instance = MagicMock()
+        mock_lock_instance.__enter__ = MagicMock(return_value=None)
+        mock_lock_instance.__exit__ = MagicMock(return_value=False)
+
+        mock_file_lock_cls = mocker.patch(
+            "paperless_ai.indexing.FileLock",
+            return_value=mock_lock_instance,
+        )
+
+        # exists=True so the code reaches the lock; iterate over an empty
+        # queryset so VectorStoreIndex is called with no nodes (still exercises
+        # the lock path without needing heavy FAISS fixture data)
+        mock_qs = MagicMock()
+        mock_qs.exists.return_value = True
+        mock_qs.__iter__ = MagicMock(return_value=iter([]))
+        mocker.patch("paperless_ai.indexing.Document.objects.all", return_value=mock_qs)
+        mocker.patch(
+            "paperless_ai.indexing.get_or_create_storage_context",
+            return_value=MagicMock(),
+        )
+
+        indexing.update_llm_index(rebuild=True)
+
+        mock_file_lock_cls.assert_called_once()
+        mock_lock_instance.__enter__.assert_called_once()
