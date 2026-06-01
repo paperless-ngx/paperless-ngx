@@ -281,9 +281,8 @@ def update_llm_index(
         else:
             # Update existing index
             index = load_or_build_index()
-            all_node_ids = list(index.docstore.docs.keys())
             existing_nodes: defaultdict[str, list] = defaultdict(list)
-            for node in index.docstore.get_nodes(all_node_ids):
+            for node in index.docstore.docs.values():
                 doc_id = node.metadata.get("document_id")
                 if doc_id is not None:
                     existing_nodes[doc_id].append(node)
@@ -299,13 +298,11 @@ def update_llm_index(
                     if node_modified == document_modified:
                         continue
 
-                    # Again, delete from docstore, FAISS IndexFlatL2 are append-only
+                    # Delete from docstore, FAISS IndexFlatL2 are append-only
                     for node in doc_nodes:
                         index.docstore.delete_document(node.node_id)
-                    nodes.extend(build_document_node(document, chunk_size=chunk_size))
-                else:
-                    # New document, add it
-                    nodes.extend(build_document_node(document, chunk_size=chunk_size))
+
+                nodes.extend(build_document_node(document, chunk_size=chunk_size))
 
             if nodes:
                 msg = "LLM index updated successfully."
