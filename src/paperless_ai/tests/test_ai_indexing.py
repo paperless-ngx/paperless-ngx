@@ -116,13 +116,22 @@ def test_update_llm_index(
     real_document,
     mock_embed_model,
 ) -> None:
-    with patch("documents.models.Document.objects.all") as mock_all:
+    mock_config = MagicMock()
+    mock_config.llm_embedding_chunk_size = 512
+    with (
+        patch("documents.models.Document.objects.all") as mock_all,
+        patch("paperless_ai.indexing.AIConfig", return_value=mock_config) as ai_config,
+        patch("paperless_ai.indexing.build_document_node") as build_document_node,
+    ):
         mock_queryset = MagicMock()
         mock_queryset.exists.return_value = True
         mock_queryset.__iter__.return_value = iter([real_document])
         mock_all.return_value = mock_queryset
+        build_document_node.return_value = []
         indexing.update_llm_index(rebuild=True)
 
+        ai_config.assert_called_once()
+        build_document_node.assert_called_once_with(real_document, chunk_size=512)
         assert any(temp_llm_index_dir.glob("*.json"))
 
 
