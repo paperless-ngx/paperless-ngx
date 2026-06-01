@@ -143,6 +143,7 @@ def test_document_filtered_retriever_handles_empty_faiss_index() -> None:
     mock_index.vector_store.query.assert_not_called()
 
 
+@pytest.mark.django_db
 def test_stream_chat_with_one_document_retrieval(
     mock_document,
     patch_embed_nodes,
@@ -186,6 +187,7 @@ def test_stream_chat_with_one_document_retrieval(
         )
 
 
+@pytest.mark.django_db
 def test_stream_chat_with_multiple_documents_retrieval(patch_embed_nodes) -> None:
     with (
         patch("paperless_ai.chat.AIClient") as mock_client_cls,
