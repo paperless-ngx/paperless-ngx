@@ -19,6 +19,7 @@ def mock_ai_config():
     with patch("paperless_ai.embedding.AIConfig") as MockAIConfig:
         MockAIConfig.return_value.llm_embedding_endpoint = None
         MockAIConfig.return_value.llm_allow_internal_endpoints = True
+        MockAIConfig.return_value.llm_context_size = 8192
         yield MockAIConfig
 
 
@@ -140,6 +141,7 @@ def test_get_embedding_model_ollama(mock_ai_config):
         MockOllamaEmbedding.assert_called_once_with(
             model_name="embeddinggemma",
             base_url="http://test-url",
+            ollama_additional_kwargs={"num_ctx": 8192},
         )
         assert model == MockOllamaEmbedding.return_value
 
@@ -157,6 +159,7 @@ def test_get_embedding_model_ollama_prefers_embedding_endpoint(mock_ai_config):
         MockOllamaEmbedding.assert_called_once_with(
             model_name="embeddinggemma",
             base_url="http://embedding-url",
+            ollama_additional_kwargs={"num_ctx": 8192},
         )
         assert model == MockOllamaEmbedding.return_value
 

@@ -14,6 +14,7 @@ def mock_ai_config():
     with patch("paperless_ai.client.AIConfig") as MockAIConfig:
         mock_config = MagicMock()
         mock_config.llm_allow_internal_endpoints = True
+        mock_config.llm_context_size = 8192
         MockAIConfig.return_value = mock_config
         yield mock_config
 
@@ -40,6 +41,7 @@ def test_get_llm_ollama(mock_ai_config, mock_ollama_llm):
     mock_ollama_llm.assert_called_once_with(
         model="test_model",
         base_url="http://test-url",
+        context_window=8192,
         request_timeout=120,
         client=ANY,
         async_client=ANY,

@@ -100,6 +100,17 @@ def test_get_rag_chunk_overlap_clamps_to_chunk_size() -> None:
 
 
 @pytest.mark.django_db
+def test_get_rag_prompt_helper_uses_context_setting() -> None:
+    app_config, _ = ApplicationConfiguration.objects.get_or_create()
+    app_config.llm_context_size = 4096
+    app_config.save()
+
+    prompt_helper = indexing.get_rag_prompt_helper()
+
+    assert prompt_helper.context_window == 4096
+
+
+@pytest.mark.django_db
 def test_update_llm_index(
     temp_llm_index_dir,
     real_document,
