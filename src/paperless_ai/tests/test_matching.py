@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+import pytest
 from django.test import TestCase
 
 from documents.models import Correspondent
@@ -84,3 +85,17 @@ class TestAIMatching(TestCase):
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0].name, "Test Tag 1")
         self.assertEqual(result[1].name, "Test Tag 2")
+
+
+@pytest.mark.django_db
+class TestExtractUnmatchedNamesNormalization:
+    def test_punctuated_name_already_matched_is_not_returned_as_unmatched(
+        self,
+    ) -> None:
+        correspondent = Correspondent.objects.create(name="J Smith")
+        llm_names = ["J. Smith"]
+        matched_objects: list[Correspondent] = [correspondent]
+
+        unmatched = extract_unmatched_names(llm_names, matched_objects)
+
+        assert "J. Smith" not in unmatched
