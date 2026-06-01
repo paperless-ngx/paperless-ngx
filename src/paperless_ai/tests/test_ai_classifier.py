@@ -6,6 +6,7 @@ import pytest
 from django.test import override_settings
 
 from documents.models import Document
+from paperless_ai.ai_classifier import build_localization_prompt
 from paperless_ai.ai_classifier import build_prompt_with_rag
 from paperless_ai.ai_classifier import build_prompt_without_rag
 from paperless_ai.ai_classifier import get_ai_document_classification
@@ -75,14 +76,68 @@ def mock_similar_documents():
     LLM_MODEL="some_model",
 )
 def test_get_ai_document_classification_success(mock_run_llm_query, mock_document):
-    mock_run_llm_query.return_value = {
-        "title": "Test Title",
-        "tags": ["test", "document"],
-        "correspondents": ["John Doe"],
-        "document_types": ["report"],
-        "storage_paths": ["Reports"],
-        "dates": ["2023-01-01"],
-    }
+    mock_run_llm_query.side_effect = [
+        {
+            "title": "Test Title",
+            "tags": ["test", "document"],
+            "correspondents": ["John Doe"],
+            "document_types": ["report"],
+            "storage_paths": ["Reports"],
+            "dates": ["2023-01-01"],
+        },
+        {
+            "title": "Testtitel",
+            "tags": ["Test", "Document"],
+            "correspondents": ["Jane Doe"],
+            "document_types": ["Bericht"],
+            "storage_paths": ["Berichte"],
+            "dates": ["2024-01-01"],
+        },
+    ]
+
+    result = get_ai_document_classification(mock_document, output_language="de-de")
+
+    assert result["title"] == "Testtitel"
+    assert result["tags"] == ["Test", "Document"]
+    assert result["correspondents"] == ["John Doe"]
+    assert result["document_types"] == ["Bericht"]
+    assert result["storage_paths"] == ["Berichte"]
+    assert result["dates"] == ["2023-01-01"]
+    classification_prompt = mock_run_llm_query.call_args_list[0].args[0]
+    localization_prompt = mock_run_llm_query.call_args_list[1].args[0]
+    assert "Write suggested titles" not in classification_prompt
+    assert "Rewrite only these generated fields in German" in localization_prompt
+    assert "Do not translate correspondents or dates" in localization_prompt
+
+
+@pytest.mark.django_db
+@patch("paperless_ai.client.AIClient.run_llm_query")
+@override_settings(
+    LLM_BACKEND="ollama",
+    LLM_MODEL="some_model",
+)
+def test_get_ai_document_classification_keeps_originals_when_localization_empty(
+    mock_run_llm_query,
+    mock_document,
+):
+    mock_run_llm_query.side_effect = [
+        {
+            "title": "Test Title",
+            "tags": ["test", "document"],
+            "correspondents": ["John Doe"],
+            "document_types": ["report"],
+            "storage_paths": ["Reports"],
+            "dates": ["2023-01-01"],
+        },
+        {
+            "title": "",
+            "tags": [],
+            "correspondents": [],
+            "document_types": [],
+            "storage_paths": [],
+            "dates": [],
+        },
+    ]
 
     result = get_ai_document_classification(mock_document, output_language="de-de")
 
@@ -92,11 +147,6 @@ def test_get_ai_document_classification_success(mock_run_llm_query, mock_documen
     assert result["document_types"] == ["report"]
     assert result["storage_paths"] == ["Reports"]
     assert result["dates"] == ["2023-01-01"]
-    prompt = mock_run_llm_query.call_args.args[0]
-    assert (
-        "Write suggested titles, tags, document types, and storage paths in" in prompt
-    )
-    assert "German" in prompt
 
 
 @pytest.mark.django_db
@@ -168,12 +218,19 @@ def test_prompt_with_without_rag(mock_document):
         prompt = build_prompt_with_rag(mock_document)
         assert "Additional context from similar documents" in prompt
 
-        prompt = build_prompt_with_rag(mock_document, output_language="de-de")
-        assert (
-            "Write suggested titles, tags, document types, and storage paths in"
-            in prompt
+        prompt = build_localization_prompt(
+            {
+                "title": "Test Title",
+                "tags": ["test", "document"],
+                "correspondents": ["John Doe"],
+                "document_types": ["report"],
+                "storage_paths": ["Reports"],
+                "dates": ["2023-01-01"],
+            },
+            output_language="de-de",
         )
-        assert "German" in prompt
+        assert "Rewrite only these generated fields in German" in prompt
+        assert "Do not translate correspondents or dates" in prompt
 
 
 def test_get_language_name_falls_back_to_language_code():
