@@ -2052,6 +2052,14 @@ models supported by the current embedding backend. If not supplied, defaults to
 
     Defaults to None.
 
+#### [`PAPERLESS_AI_LLM_EMBEDDING_CHUNK_SIZE=<int>`](#PAPERLESS_AI_LLM_EMBEDDING_CHUNK_SIZE) {#PAPERLESS_AI_LLM_EMBEDDING_CHUNK_SIZE}
+
+: The chunk size to use when splitting document text for RAG embeddings. Lower this value if your
+embedding backend or model rejects larger inputs, or silently truncates inputs in a way that harms
+retrieval quality.
+
+    Defaults to 1024.
+
 #### [`PAPERLESS_AI_LLM_BACKEND=<str>`](#PAPERLESS_AI_LLM_BACKEND) {#PAPERLESS_AI_LLM_BACKEND}
 
 : The AI backend to use. This can be either "openai-like" or "ollama". If set to "ollama", the AI

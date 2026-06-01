@@ -426,10 +426,16 @@ class ApplicationConfigurationViewSet(ModelViewSet[ApplicationConfiguration]):
         old_ai_index_enabled = (
             old_instance.ai_enabled and old_instance.llm_embedding_backend
         )
+        old_llm_embedding_chunk_size = (
+            old_instance.llm_embedding_chunk_size or settings.LLM_EMBEDDING_CHUNK_SIZE
+        )
 
         new_instance: ApplicationConfiguration = serializer.save()
         new_ai_index_enabled = (
             new_instance.ai_enabled and new_instance.llm_embedding_backend
+        )
+        new_llm_embedding_chunk_size = (
+            new_instance.llm_embedding_chunk_size or settings.LLM_EMBEDDING_CHUNK_SIZE
         )
 
         if (
@@ -438,6 +444,17 @@ class ApplicationConfigurationViewSet(ModelViewSet[ApplicationConfiguration]):
             and not vector_store_file_exists()
         ):
             # AI index was just enabled and vector store file does not exist
+            llmindex_index.apply_async(
+                kwargs={"rebuild": True},
+                headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
+            )
+        elif (
+            old_ai_index_enabled
+            and new_ai_index_enabled
+            and old_llm_embedding_chunk_size != new_llm_embedding_chunk_size
+            and vector_store_file_exists()
+        ):
+            # Existing index nodes were built with the previous chunk size.
             llmindex_index.apply_async(
                 kwargs={"rebuild": True},
                 headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},

@@ -75,6 +75,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 "llm_embedding_backend": None,
                 "llm_embedding_model": None,
                 "llm_embedding_endpoint": None,
+                "llm_embedding_chunk_size": None,
                 "llm_backend": None,
                 "llm_model": None,
                 "llm_api_key": None,
@@ -855,6 +856,27 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 content_type="application/json",
             )
             mock_update.assert_called_once()
+
+    def test_update_llm_embedding_chunk_size_triggers_rebuild(self) -> None:
+        config = ApplicationConfiguration.objects.first()
+        assert config is not None
+        config.ai_enabled = True
+        config.llm_embedding_backend = "openai-like"
+        config.llm_embedding_chunk_size = 1024
+        config.save()
+
+        with (
+            patch("documents.tasks.llmindex_index.apply_async") as mock_update,
+            patch("paperless.views.vector_store_file_exists") as mock_exists,
+        ):
+            mock_exists.return_value = True
+            self.client.patch(
+                f"{self.ENDPOINT}1/",
+                json.dumps({"llm_embedding_chunk_size": 512}),
+                content_type="application/json",
+            )
+            mock_update.assert_called_once()
+            self.assertEqual(mock_update.call_args.kwargs["kwargs"], {"rebuild": True})
 
     @override_settings(LLM_ALLOW_INTERNAL_ENDPOINTS=False)
     def test_update_llm_endpoint_blocks_internal_endpoint_when_disallowed(self) -> None:

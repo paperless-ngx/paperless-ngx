@@ -11,6 +11,7 @@ from llama_index.core.base.embeddings.base import BaseEmbedding
 from documents.models import Document
 from documents.models import PaperlessTask
 from documents.tests.factories import PaperlessTaskFactory
+from paperless.models import ApplicationConfiguration
 from paperless_ai import indexing
 
 
@@ -81,20 +82,21 @@ def test_build_document_node_excludes_metadata_from_embedding(real_document) -> 
 
 @pytest.mark.django_db
 def test_build_document_node_uses_rag_chunk_settings(real_document) -> None:
+    app_config, _ = ApplicationConfiguration.objects.get_or_create()
+    app_config.llm_embedding_chunk_size = 512
+    app_config.save()
+
     with patch("llama_index.core.node_parser.SimpleNodeParser") as mock_parser:
         mock_parser.return_value.get_nodes_from_documents.return_value = []
 
         indexing.build_document_node(real_document)
 
-        mock_parser.assert_called_once_with(chunk_size=1024, chunk_overlap=200)
+        mock_parser.assert_called_once_with(chunk_size=512, chunk_overlap=200)
 
 
 def test_get_rag_chunk_overlap_clamps_to_chunk_size() -> None:
-    with (
-        patch("paperless_ai.indexing.RAG_CHUNK_SIZE", 64),
-        patch("paperless_ai.indexing.RAG_CHUNK_OVERLAP", 128),
-    ):
-        assert indexing.get_rag_chunk_overlap() == 63
+    with patch("paperless_ai.indexing.RAG_CHUNK_OVERLAP", 128):
+        assert indexing.get_rag_chunk_overlap(64) == 63
 
 
 @pytest.mark.django_db

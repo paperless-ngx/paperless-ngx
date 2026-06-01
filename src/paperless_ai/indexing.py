@@ -12,6 +12,7 @@ from documents.models import Document
 from documents.models import PaperlessTask
 from documents.utils import IterWrapper
 from documents.utils import identity
+from paperless.config import AIConfig
 from paperless_ai.embedding import build_llm_index_text
 from paperless_ai.embedding import get_embedding_dim
 from paperless_ai.embedding import get_embedding_model
@@ -25,7 +26,6 @@ logger = logging.getLogger("paperless_ai.indexing")
 
 RAG_CONTEXT_WINDOW = 8192
 RAG_NUM_OUTPUT = 512
-RAG_CHUNK_SIZE = 1024
 RAG_CHUNK_OVERLAP = 200
 
 
@@ -126,9 +126,10 @@ def build_document_node(document: Document) -> list["BaseNode"]:
         metadata=metadata,
         excluded_embed_metadata_keys=list(metadata.keys()),
     )
+    chunk_size = get_rag_chunk_size()
     parser = SimpleNodeParser(
-        chunk_size=RAG_CHUNK_SIZE,
-        chunk_overlap=get_rag_chunk_overlap(),
+        chunk_size=chunk_size,
+        chunk_overlap=get_rag_chunk_overlap(chunk_size),
     )
     return parser.get_nodes_from_documents([doc])
 
@@ -186,8 +187,13 @@ def vector_store_file_exists():
     return Path(settings.LLM_INDEX_DIR / "default__vector_store.json").exists()
 
 
-def get_rag_chunk_overlap() -> int:
-    return min(RAG_CHUNK_OVERLAP, RAG_CHUNK_SIZE - 1)
+def get_rag_chunk_size() -> int:
+    return AIConfig().llm_embedding_chunk_size
+
+
+def get_rag_chunk_overlap(chunk_size: int | None = None) -> int:
+    chunk_size = chunk_size or get_rag_chunk_size()
+    return min(RAG_CHUNK_OVERLAP, chunk_size - 1)
 
 
 def get_rag_prompt_helper():
@@ -197,7 +203,7 @@ def get_rag_prompt_helper():
         context_window=RAG_CONTEXT_WINDOW,
         num_output=RAG_NUM_OUTPUT,
         chunk_overlap_ratio=0.1,
-        chunk_size_limit=RAG_CHUNK_SIZE,
+        chunk_size_limit=get_rag_chunk_size(),
     )
 
 
@@ -314,10 +320,11 @@ def truncate_content(content: str) -> str:
     from llama_index.core.text_splitter import TokenTextSplitter
 
     prompt_helper = get_rag_prompt_helper()
+    chunk_size = get_rag_chunk_size()
     splitter = TokenTextSplitter(
         separator=" ",
-        chunk_size=RAG_CHUNK_SIZE,
-        chunk_overlap=get_rag_chunk_overlap(),
+        chunk_size=chunk_size,
+        chunk_overlap=get_rag_chunk_overlap(chunk_size),
     )
     content_chunks = splitter.split_text(content)
     truncated_chunks = prompt_helper.truncate(

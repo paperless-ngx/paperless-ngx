@@ -310,6 +310,13 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     category: ConfigCategory.AI,
   },
   {
+    key: 'llm_embedding_chunk_size',
+    title: $localize`LLM Embedding Chunk Size`,
+    type: ConfigOptionType.Number,
+    config_key: 'PAPERLESS_AI_LLM_EMBEDDING_CHUNK_SIZE',
+    category: ConfigCategory.AI,
+  },
+  {
     key: 'llm_backend',
     title: $localize`LLM Backend`,
     type: ConfigOptionType.Select,
@@ -372,6 +379,7 @@ export interface PaperlessConfig extends ObjectWithId {
   llm_embedding_backend: string
   llm_embedding_model: string
   llm_embedding_endpoint: string
+  llm_embedding_chunk_size: number
   llm_backend: string
   llm_model: string
   llm_api_key: string
