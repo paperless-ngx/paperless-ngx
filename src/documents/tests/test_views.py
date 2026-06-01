@@ -322,7 +322,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         self.assertEqual(response.json(), {"tags": ["tag1", "tag2"]})
         mock_get_cache.assert_called_once_with(
             self.document.pk,
-            backend="mock_backend:en-us",
+            backend="mock_backend",
         )
         mock_refresh_cache.assert_called_once_with(self.document.pk)
 
@@ -367,7 +367,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         mock_get_ai_classification.assert_called_once_with(
             self.document,
             self.user,
-            "en-us",
+            None,
         )
 
     @patch("documents.views.get_ai_document_classification")
@@ -434,7 +434,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             },
         )
         self.assertIsNone(
-            get_llm_suggestion_cache(self.document.pk, backend="openai-like:en-us"),
+            get_llm_suggestion_cache(self.document.pk, backend="openai-like"),
         )
 
     def test_invalidate_suggestions_cache(self) -> None:

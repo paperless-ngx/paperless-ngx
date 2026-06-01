@@ -93,8 +93,7 @@ def test_get_ai_document_classification_success(mock_run_llm_query, mock_documen
     assert result["storage_paths"] == ["Reports"]
     assert result["dates"] == ["2023-01-01"]
     prompt = mock_run_llm_query.call_args.args[0]
-    assert "Return only these response fields: title, tags, correspondents" in prompt
-    assert "use German for generated" in prompt
+    assert "Use German for suggested" in prompt
 
 
 @pytest.mark.django_db
@@ -165,7 +164,7 @@ def test_prompt_with_without_rag(mock_document):
 
         prompt = build_prompt_with_rag(mock_document)
         assert "Additional context from similar documents:" in prompt
-        assert "use German for generated" in prompt
+        assert "Use German for suggested" in prompt
 
 
 def test_get_language_name_falls_back_to_language_code():

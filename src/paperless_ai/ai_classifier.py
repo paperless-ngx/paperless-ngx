@@ -32,9 +32,9 @@ def build_prompt_without_rag(
         language_name = get_language_name(output_language)
         language_instruction = f"""
 
-    For the existing response fields only, use {language_name} for generated
-    human-readable values when translation is appropriate. Preserve proper
-    nouns, organization names, and official document names.
+    Use {language_name} for suggested human-readable labels when translation is
+    appropriate. Preserve proper nouns, organization names, and official
+    document names.
         """.rstrip()
 
     return f"""
@@ -47,9 +47,6 @@ def build_prompt_without_rag(
     - The type or category of the document
     - Suggested folder paths for storing the document
     - Up to 3 relevant dates in YYYY-MM-DD format
-    Return only these response fields: title, tags, correspondents,
-    document_types, storage_paths, dates. Do not return filename, content, or
-    nested metadata fields.
     {language_instruction}
 
     Filename:
