@@ -444,17 +444,12 @@ class ApplicationConfigurationViewSet(ModelViewSet[ApplicationConfiguration]):
             new_instance.llm_context_size or settings.LLM_CONTEXT_SIZE
         )
 
-        if (
+        rebuild_needed = (
             not old_ai_index_enabled
             and new_ai_index_enabled
             and not vector_store_file_exists()
-        ):
-            # AI index was just enabled and vector store file does not exist
-            llmindex_index.apply_async(
-                kwargs={"rebuild": True},
-                headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
-            )
-        elif (
+            # AI index is being enabled for the first time and no existing index file is present, so build the index immediately.
+        ) or (
             old_ai_index_enabled
             and new_ai_index_enabled
             and (
@@ -462,8 +457,10 @@ class ApplicationConfigurationViewSet(ModelViewSet[ApplicationConfiguration]):
                 or old_llm_context_size != new_llm_context_size
             )
             and vector_store_file_exists()
-        ):
-            # Existing index nodes were built with the previous chunk/context size.
+            # AI index is enabled and the embedding chunk/context size has changed
+        )
+
+        if rebuild_needed:
             llmindex_index.apply_async(
                 kwargs={"rebuild": True},
                 headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
