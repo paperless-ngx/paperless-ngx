@@ -198,6 +198,15 @@ def remove_document_docstore_nodes(document: Document, index: "VectorStoreIndex"
     for node_id in existing_nodes:
         # Delete from docstore, FAISS IndexFlatL2 are append-only
         index.docstore.delete_document(node_id)
+        # Also purge the FAISS position -> UUID mapping so subsequent similarity
+        # queries don't raise KeyError on ghost vector positions.
+        stale_keys = [
+            k for k, v in index.index_struct.nodes_dict.items() if v == node_id
+        ]
+        for key in stale_keys:
+            del index.index_struct.nodes_dict[key]
+    # Re-sync the mutated index_struct so persist() writes the updated nodes_dict.
+    index.storage_context.index_store.add_index_struct(index.index_struct)
 
 
 def vector_store_file_exists():
@@ -444,7 +453,12 @@ def query_similar_documents(
         chunk_size=config.llm_embedding_chunk_size,
         context_size=config.llm_context_size,
     )
-    results = retriever.retrieve(query_text)
+    try:
+        results = retriever.retrieve(query_text)
+    except KeyError:
+        # Ghost FAISS positions remain after deletion because IndexFlatL2 is
+        # append-only. Treat them as absent and return no results.
+        return []
 
     retrieved_document_ids: list[int] = []
     for node in results:

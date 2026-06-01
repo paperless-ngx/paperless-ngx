@@ -330,6 +330,26 @@ def test_remove_document_deletes_node_from_docstore(
 
 
 @pytest.mark.django_db
+def test_query_after_remove_does_not_raise_key_error(
+    temp_llm_index_dir,
+    real_document,
+    mock_embed_model,
+) -> None:
+    indexing.update_llm_index(rebuild=True)
+
+    query_doc = Document.objects.create(
+        title="Query",
+        content="query content",
+        added=timezone.now(),
+    )
+
+    indexing.llm_index_remove_document(real_document)
+
+    result = indexing.query_similar_documents(query_doc, top_k=5)
+    assert isinstance(result, list)
+
+
+@pytest.mark.django_db
 def test_update_llm_index_no_documents(
     temp_llm_index_dir,
     mock_embed_model,
