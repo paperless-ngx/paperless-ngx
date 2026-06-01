@@ -1469,9 +1469,23 @@ class DocumentViewSet(
         if not ai_config.ai_enabled:
             return HttpResponseBadRequest("AI is required for this feature")
 
+        output_language = get_language()
+        if hasattr(request.user, "ui_settings") and isinstance(
+            request.user.ui_settings.settings,
+            dict,
+        ):
+            output_language = (
+                request.user.ui_settings.settings.get(
+                    "language",
+                    output_language,
+                )
+                or output_language
+            )
+        llm_cache_backend = f"{ai_config.llm_backend}:{output_language}"
+
         cached_llm_suggestions = get_llm_suggestion_cache(
             doc.pk,
-            backend=ai_config.llm_backend,
+            backend=llm_cache_backend,
         )
 
         if cached_llm_suggestions:
@@ -1479,7 +1493,11 @@ class DocumentViewSet(
             return Response(cached_llm_suggestions.suggestions)
 
         try:
-            llm_suggestions = get_ai_document_classification(doc, request.user)
+            llm_suggestions = get_ai_document_classification(
+                doc,
+                request.user,
+                output_language,
+            )
         except ValueError as exc:
             logger.exception(
                 "Invalid AI configuration while generating suggestions for "
@@ -1532,7 +1550,7 @@ class DocumentViewSet(
             "dates": llm_suggestions.get("dates", []),
         }
 
-        set_llm_suggestions_cache(doc.pk, resp_data, backend=ai_config.llm_backend)
+        set_llm_suggestions_cache(doc.pk, resp_data, backend=llm_cache_backend)
 
         return Response(resp_data)
 

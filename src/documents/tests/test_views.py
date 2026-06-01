@@ -25,6 +25,7 @@ from documents.models import DocumentType
 from documents.models import ShareLink
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import UiSettings
 from documents.signals.handlers import update_llm_suggestions_cache
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import read_streaming_response
@@ -319,6 +320,10 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), {"tags": ["tag1", "tag2"]})
+        mock_get_cache.assert_called_once_with(
+            self.document.pk,
+            backend="mock_backend:en-us",
+        )
         mock_refresh_cache.assert_called_once_with(self.document.pk)
 
     @patch("documents.views.get_ai_document_classification")
@@ -359,6 +364,49 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
                 "dates": ["2023-01-01"],
             },
         )
+        mock_get_ai_classification.assert_called_once_with(
+            self.document,
+            self.user,
+            "en-us",
+        )
+
+    @patch("documents.views.get_ai_document_classification")
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_BACKEND="mock_backend",
+    )
+    def test_ai_suggestions_uses_user_display_language(
+        self,
+        mock_get_ai_classification,
+    ) -> None:
+        UiSettings.objects.create(user=self.user, settings={"language": "de-de"})
+        mock_get_ai_classification.return_value = {
+            "title": "KI Title",
+            "tags": [],
+            "correspondents": [],
+            "document_types": [],
+            "storage_paths": [],
+            "dates": [],
+        }
+
+        self.client.force_login(user=self.user)
+        response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        mock_get_ai_classification.assert_called_once_with(
+            self.document,
+            self.user,
+            "de-de",
+        )
+        self.assertEqual(
+            get_llm_suggestion_cache(
+                self.document.pk,
+                backend="mock_backend:de-de",
+            ).suggestions["title"],
+            "KI Title",
+        )
 
     @patch("documents.views.get_ai_document_classification")
     @override_settings(
@@ -386,7 +434,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             },
         )
         self.assertIsNone(
-            get_llm_suggestion_cache(self.document.pk, backend="openai-like"),
+            get_llm_suggestion_cache(self.document.pk, backend="openai-like:en-us"),
         )
 
     def test_invalidate_suggestions_cache(self) -> None:

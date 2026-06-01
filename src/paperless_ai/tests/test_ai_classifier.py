@@ -10,6 +10,7 @@ from paperless_ai.ai_classifier import build_prompt_with_rag
 from paperless_ai.ai_classifier import build_prompt_without_rag
 from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.ai_classifier import get_context_for_document
+from paperless_ai.ai_classifier import get_language_name
 
 
 @pytest.fixture
@@ -83,7 +84,7 @@ def test_get_ai_document_classification_success(mock_run_llm_query, mock_documen
         "dates": ["2023-01-01"],
     }
 
-    result = get_ai_document_classification(mock_document)
+    result = get_ai_document_classification(mock_document, output_language="de-de")
 
     assert result["title"] == "Test Title"
     assert result["tags"] == ["test", "document"]
@@ -91,6 +92,8 @@ def test_get_ai_document_classification_success(mock_run_llm_query, mock_documen
     assert result["document_types"] == ["report"]
     assert result["storage_paths"] == ["Reports"]
     assert result["dates"] == ["2023-01-01"]
+    prompt = mock_run_llm_query.call_args.args[0]
+    assert "User display language: German (de-de)" in prompt
 
 
 @pytest.mark.django_db
@@ -157,9 +160,10 @@ def test_prompt_with_without_rag(mock_document):
     ):
         prompt = build_prompt_without_rag(mock_document)
         assert "Additional context from similar documents" not in prompt
+        assert "User display language:" not in prompt
 
         prompt = build_prompt_with_rag(mock_document)
-        assert "Additional context from similar documents" in prompt
+        assert "Additional context from similar documents:" in prompt
 
 
 @patch("paperless_ai.ai_classifier.query_similar_documents")

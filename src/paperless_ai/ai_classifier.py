@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.contrib.auth.models import User
 
 from documents.models import Document
@@ -12,9 +13,31 @@ from paperless_ai.indexing import truncate_content
 logger = logging.getLogger("paperless_ai.rag_classifier")
 
 
-def build_prompt_without_rag(document: Document) -> str:
+def get_language_name(language_code: str) -> str:
+    normalized_language_code = language_code.lower()
+    for code, name in settings.LANGUAGES:
+        if code.lower() == normalized_language_code:
+            return f"{name} ({language_code})"
+    return language_code
+
+
+def build_prompt_without_rag(
+    document: Document,
+    output_language: str | None = None,
+) -> str:
     filename = document.filename or ""
     content = truncate_content(document.content[:4000] or "")
+    language_instruction = ""
+    if output_language:
+        language_name = get_language_name(output_language)
+        language_instruction = f"""
+
+    Return generated human-readable strings, such as title, tags, document types,
+    storage paths, and correspondents, in the user's display language when a
+    translation is appropriate. Preserve proper nouns, organization names, and
+    official document names.
+    User display language: {language_name}
+        """.rstrip()
 
     return f"""
     You are a document classification assistant.
@@ -26,6 +49,7 @@ def build_prompt_without_rag(document: Document) -> str:
     - The type or category of the document
     - Suggested folder paths for storing the document
     - Up to 3 relevant dates in YYYY-MM-DD format
+    {language_instruction}
 
     Filename:
     {filename}
@@ -35,8 +59,12 @@ def build_prompt_without_rag(document: Document) -> str:
     """.strip()
 
 
-def build_prompt_with_rag(document: Document, user: User | None = None) -> str:
-    base_prompt = build_prompt_without_rag(document)
+def build_prompt_with_rag(
+    document: Document,
+    user: User | None = None,
+    output_language: str | None = None,
+) -> str:
+    base_prompt = build_prompt_without_rag(document, output_language)
     context = truncate_content(get_context_for_document(document, user))
 
     return f"""{base_prompt}
@@ -91,13 +119,14 @@ def parse_ai_response(raw: dict) -> dict:
 def get_ai_document_classification(
     document: Document,
     user: User | None = None,
+    output_language: str | None = None,
 ) -> dict:
     ai_config = AIConfig()
 
     prompt = (
-        build_prompt_with_rag(document, user)
+        build_prompt_with_rag(document, user, output_language)
         if ai_config.llm_embedding_backend
-        else build_prompt_without_rag(document)
+        else build_prompt_without_rag(document, output_language)
     )
 
     client = AIClient()
