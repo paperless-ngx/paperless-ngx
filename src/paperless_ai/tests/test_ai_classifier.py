@@ -156,10 +156,10 @@ def test_prompt_with_without_rag(mock_document):
         return_value="Context from similar documents",
     ):
         prompt = build_prompt_without_rag(mock_document)
-        assert "Additional context from similar documents:" not in prompt
+        assert "Additional context from similar documents" not in prompt
 
         prompt = build_prompt_with_rag(mock_document)
-        assert "Additional context from similar documents:" in prompt
+        assert "Additional context from similar documents" in prompt
 
 
 @patch("paperless_ai.ai_classifier.query_similar_documents")
