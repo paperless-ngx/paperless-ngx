@@ -328,6 +328,12 @@ def llm_index_add_or_update_document(document: Document):
     If the document already exists, it will be replaced.
     """
     new_nodes = build_document_node(document, chunk_size=get_rag_chunk_size())
+    if not new_nodes:
+        logger.warning(
+            "No indexable content for document %s; skipping LLM index update.",
+            document.pk,
+        )
+        return
 
     with FileLock(_index_lock_path()):
         index = load_or_build_index(nodes=new_nodes)

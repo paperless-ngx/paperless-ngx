@@ -607,6 +607,30 @@ class TestDocumentUpdatedSignalTriggersLlmReindex:
 
 
 @pytest.mark.django_db
+class TestLlmIndexAddOrUpdateDocumentEmptyContent:
+    """llm_index_add_or_update_document must handle empty node lists gracefully."""
+
+    def test_returns_without_error_when_build_document_node_returns_empty(
+        self,
+        temp_llm_index_dir: Path,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """When build_document_node returns [], the function must return without error
+        and must not call load_or_build_index at all."""
+        mocker.patch(
+            "paperless_ai.indexing.build_document_node",
+            return_value=[],
+        )
+        mock_load = mocker.patch("paperless_ai.indexing.load_or_build_index")
+
+        doc = MagicMock(spec=Document)
+        # Must not raise
+        indexing.llm_index_add_or_update_document(doc)
+
+        mock_load.assert_not_called()
+
+
+@pytest.mark.django_db
 class TestLlmIndexLocking:
     """The FAISS index mutation functions must acquire the index lock before touching the index.
 
