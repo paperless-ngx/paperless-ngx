@@ -48,6 +48,7 @@ class AIClient:
             return Ollama(
                 model=self.settings.llm_model or "llama3.1",
                 base_url=endpoint,
+                context_window=self.settings.llm_context_size,
                 request_timeout=120,
                 client=Client(
                     host=endpoint,

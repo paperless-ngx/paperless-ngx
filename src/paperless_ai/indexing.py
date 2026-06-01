@@ -24,7 +24,6 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("paperless_ai.indexing")
 
-RAG_CONTEXT_WINDOW = 8192
 RAG_NUM_OUTPUT = 512
 RAG_CHUNK_OVERLAP = 200
 
@@ -191,6 +190,10 @@ def get_rag_chunk_size() -> int:
     return AIConfig().llm_embedding_chunk_size
 
 
+def get_rag_context_size() -> int:
+    return AIConfig().llm_context_size
+
+
 def get_rag_chunk_overlap(chunk_size: int | None = None) -> int:
     chunk_size = chunk_size or get_rag_chunk_size()
     return min(RAG_CHUNK_OVERLAP, chunk_size - 1)
@@ -200,7 +203,7 @@ def get_rag_prompt_helper():
     from llama_index.core.indices.prompt_helper import PromptHelper
 
     return PromptHelper(
-        context_window=RAG_CONTEXT_WINDOW,
+        context_window=get_rag_context_size(),
         num_output=RAG_NUM_OUTPUT,
         chunk_overlap_ratio=0.1,
         chunk_size_limit=get_rag_chunk_size(),

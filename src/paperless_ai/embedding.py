@@ -74,6 +74,7 @@ def get_embedding_model() -> "BaseEmbedding":
             embedding = OllamaEmbedding(
                 model_name=config.llm_embedding_model or "embeddinggemma",
                 base_url=endpoint,
+                ollama_additional_kwargs={"num_ctx": config.llm_context_size},
             )
             embedding._client = Client(
                 host=endpoint,
