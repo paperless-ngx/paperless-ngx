@@ -900,6 +900,49 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
             mock_update.assert_called_once()
             self.assertEqual(mock_update.call_args.kwargs["kwargs"], {"rebuild": True})
 
+    def test_update_llm_embedding_model_triggers_rebuild(self) -> None:
+        config = ApplicationConfiguration.objects.first()
+        assert config is not None
+        config.ai_enabled = True
+        config.llm_embedding_backend = "openai-like"
+        config.llm_embedding_model = "text-embedding-3-small"
+        config.save()
+
+        with patch("documents.tasks.llmindex_index.apply_async") as mock_update:
+            self.client.patch(
+                f"{self.ENDPOINT}1/",
+                json.dumps({"llm_embedding_model": "text-embedding-3-large"}),
+                content_type="application/json",
+            )
+            mock_update.assert_called_once()
+            self.assertEqual(mock_update.call_args.kwargs["kwargs"], {"rebuild": True})
+
+    def test_enable_ai_index_with_config_change_triggers_rebuild(self) -> None:
+        config = ApplicationConfiguration.objects.first()
+        assert config is not None
+        config.ai_enabled = False
+        config.llm_embedding_backend = "openai-like"
+        config.llm_embedding_model = "text-embedding-3-small"
+        config.save()
+
+        with (
+            patch("documents.tasks.llmindex_index.apply_async") as mock_update,
+            patch("paperless.views.vector_store_file_exists") as mock_exists,
+        ):
+            mock_exists.return_value = True
+            self.client.patch(
+                f"{self.ENDPOINT}1/",
+                json.dumps(
+                    {
+                        "ai_enabled": True,
+                        "llm_embedding_model": "text-embedding-3-large",
+                    },
+                ),
+                content_type="application/json",
+            )
+            mock_update.assert_called_once()
+            self.assertEqual(mock_update.call_args.kwargs["kwargs"], {"rebuild": True})
+
     @override_settings(LLM_ALLOW_INTERNAL_ENDPOINTS=False)
     def test_update_llm_endpoint_blocks_internal_endpoint_when_disallowed(self) -> None:
         response = self.client.patch(
