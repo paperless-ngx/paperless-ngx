@@ -32,8 +32,8 @@ def build_prompt_without_rag(
         language_name = get_language_name(output_language)
         language_instruction = f"""
 
-    Use {language_name} for suggested human-readable labels when translation is
-    appropriate. Preserve proper nouns, organization names, and official
+    Write suggested titles, tags, document types, and storage paths in
+    {language_name}. Preserve proper nouns, organization names, and official
     document names.
         """.rstrip()
 
