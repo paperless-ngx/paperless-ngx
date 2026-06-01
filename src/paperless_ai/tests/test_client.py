@@ -6,6 +6,7 @@ import pytest
 from llama_index.core.llms import ChatMessage
 from llama_index.core.llms.llm import ToolSelection
 
+from paperless_ai.client import LLM_SYSTEM_PROMPT
 from paperless_ai.client import AIClient
 
 
@@ -43,6 +44,7 @@ def test_get_llm_ollama(mock_ai_config, mock_ollama_llm):
         base_url="http://test-url",
         context_window=8192,
         request_timeout=120,
+        system_prompt=LLM_SYSTEM_PROMPT,
         client=ANY,
         async_client=ANY,
     )
@@ -63,6 +65,7 @@ def test_get_llm_openai(mock_ai_config, mock_openai_llm):
         api_key="test_api_key",
         is_chat_model=True,
         is_function_calling_model=True,
+        system_prompt=LLM_SYSTEM_PROMPT,
         http_client=ANY,
         async_http_client=ANY,
     )
