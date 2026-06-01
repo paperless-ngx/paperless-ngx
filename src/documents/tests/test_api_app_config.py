@@ -76,6 +76,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 "llm_embedding_model": None,
                 "llm_embedding_endpoint": None,
                 "llm_embedding_chunk_size": None,
+                "llm_context_size": None,
                 "llm_backend": None,
                 "llm_model": None,
                 "llm_api_key": None,
@@ -842,7 +843,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
 
         with (
             patch("documents.tasks.llmindex_index.apply_async") as mock_update,
-            patch("paperless_ai.indexing.vector_store_file_exists") as mock_exists,
+            patch("paperless.views.vector_store_file_exists") as mock_exists,
         ):
             mock_exists.return_value = False
             self.client.patch(
@@ -873,6 +874,27 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
             self.client.patch(
                 f"{self.ENDPOINT}1/",
                 json.dumps({"llm_embedding_chunk_size": 512}),
+                content_type="application/json",
+            )
+            mock_update.assert_called_once()
+            self.assertEqual(mock_update.call_args.kwargs["kwargs"], {"rebuild": True})
+
+    def test_update_llm_context_size_triggers_rebuild(self) -> None:
+        config = ApplicationConfiguration.objects.first()
+        assert config is not None
+        config.ai_enabled = True
+        config.llm_embedding_backend = "openai-like"
+        config.llm_context_size = 8192
+        config.save()
+
+        with (
+            patch("documents.tasks.llmindex_index.apply_async") as mock_update,
+            patch("paperless.views.vector_store_file_exists") as mock_exists,
+        ):
+            mock_exists.return_value = True
+            self.client.patch(
+                f"{self.ENDPOINT}1/",
+                json.dumps({"llm_context_size": 4096}),
                 content_type="application/json",
             )
             mock_update.assert_called_once()
