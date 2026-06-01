@@ -163,7 +163,7 @@ def test_prompt_with_without_rag(mock_document):
         assert "for generated" not in prompt
 
         prompt = build_prompt_with_rag(mock_document)
-        assert "Additional context from similar documents:" in prompt
+        assert "Additional context from similar documents" in prompt
         assert "Use German for suggested" in prompt
 
 
