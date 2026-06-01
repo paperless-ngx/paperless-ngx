@@ -823,3 +823,54 @@ class TestLlmIndexLocking:
 
         mock_file_lock_cls.assert_called_once()
         mock_lock_instance.__enter__.assert_called_once()
+
+    def test_query_similar_documents_acquires_lock(
+        self,
+        temp_llm_index_dir: Path,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """query_similar_documents must enter the file lock before loading the index."""
+        call_order: list[str] = []
+
+        mock_lock_instance = MagicMock()
+        mock_lock_instance.__enter__ = MagicMock(
+            side_effect=lambda *_: call_order.append("lock_acquired"),
+        )
+        mock_lock_instance.__exit__ = MagicMock(return_value=False)
+
+        mock_file_lock_cls = mocker.patch(
+            "paperless_ai.indexing.FileLock",
+            return_value=mock_lock_instance,
+        )
+
+        mocker.patch(
+            "paperless_ai.indexing.vector_store_file_exists",
+            return_value=True,
+        )
+
+        mock_index = MagicMock()
+        mock_index.docstore.docs = {}
+
+        mocker.patch(
+            "paperless_ai.indexing.load_or_build_index",
+            side_effect=lambda *_a, **_kw: (
+                call_order.append("index_loaded") or mock_index
+            ),
+        )
+
+        mock_retriever = MagicMock()
+        mock_retriever.retrieve.return_value = []
+        mocker.patch(
+            "llama_index.core.retrievers.VectorIndexRetriever",
+            return_value=mock_retriever,
+        )
+
+        mocker.patch("paperless_ai.indexing.truncate_content", return_value="")
+
+        indexing.query_similar_documents(MagicMock(spec=Document))
+
+        mock_file_lock_cls.assert_called()
+        mock_lock_instance.__enter__.assert_called()
+        assert call_order.index("lock_acquired") < call_order.index("index_loaded"), (
+            "Lock must be acquired before the index is loaded"
+        )

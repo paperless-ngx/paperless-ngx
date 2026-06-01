@@ -424,41 +424,42 @@ def query_similar_documents(
         )
         return []
 
-    index = load_or_build_index()
+    with FileLock(_index_lock_path()):
+        index = load_or_build_index()
 
-    # constrain only the node(s) that match the document IDs, if given
-    doc_node_ids = (
-        [
-            node.node_id
-            for node in index.docstore.docs.values()
-            if node.metadata.get("document_id") in allowed_document_ids
-        ]
-        if allowed_document_ids is not None
-        else None
-    )
-    if doc_node_ids is not None and not doc_node_ids:
-        return []
+        # constrain only the node(s) that match the document IDs, if given
+        doc_node_ids = (
+            [
+                node.node_id
+                for node in index.docstore.docs.values()
+                if node.metadata.get("document_id") in allowed_document_ids
+            ]
+            if allowed_document_ids is not None
+            else None
+        )
+        if doc_node_ids is not None and not doc_node_ids:
+            return []
 
-    from llama_index.core.retrievers import VectorIndexRetriever
+        from llama_index.core.retrievers import VectorIndexRetriever
 
-    retriever = VectorIndexRetriever(
-        index=index,
-        similarity_top_k=top_k,
-        doc_ids=doc_node_ids,
-    )
+        retriever = VectorIndexRetriever(
+            index=index,
+            similarity_top_k=top_k,
+            doc_ids=doc_node_ids,
+        )
 
-    config = AIConfig()
-    query_text = truncate_content(
-        (document.title or "") + "\n" + (document.content or ""),
-        chunk_size=config.llm_embedding_chunk_size,
-        context_size=config.llm_context_size,
-    )
-    try:
-        results = retriever.retrieve(query_text)
-    except KeyError:
-        # Ghost FAISS positions remain after deletion because IndexFlatL2 is
-        # append-only. Treat them as absent and return no results.
-        return []
+        config = AIConfig()
+        query_text = truncate_content(
+            (document.title or "") + "\n" + (document.content or ""),
+            chunk_size=config.llm_embedding_chunk_size,
+            context_size=config.llm_context_size,
+        )
+        try:
+            results = retriever.retrieve(query_text)
+        except KeyError:
+            # Ghost FAISS positions remain after deletion because IndexFlatL2 is
+            # append-only. Treat them as absent and return no results.
+            return []
 
     retrieved_document_ids: list[int] = []
     for node in results:
