@@ -93,7 +93,7 @@ def test_get_ai_document_classification_success(mock_run_llm_query, mock_documen
     assert result["storage_paths"] == ["Reports"]
     assert result["dates"] == ["2023-01-01"]
     prompt = mock_run_llm_query.call_args.args[0]
-    assert "User display language: German (de-de)" in prompt
+    assert "use German for generated" in prompt
 
 
 @pytest.mark.django_db
@@ -160,10 +160,15 @@ def test_prompt_with_without_rag(mock_document):
     ):
         prompt = build_prompt_without_rag(mock_document)
         assert "Additional context from similar documents" not in prompt
-        assert "User display language:" not in prompt
+        assert "for generated" not in prompt
 
         prompt = build_prompt_with_rag(mock_document)
         assert "Additional context from similar documents:" in prompt
+        assert "use German for generated" in prompt
+
+
+def test_get_language_name_falls_back_to_language_code():
+    assert get_language_name("zz-zz") == "zz-zz"
 
 
 @patch("paperless_ai.ai_classifier.query_similar_documents")

@@ -17,7 +17,7 @@ def get_language_name(language_code: str) -> str:
     normalized_language_code = language_code.lower()
     for code, name in settings.LANGUAGES:
         if code.lower() == normalized_language_code:
-            return f"{name} ({language_code})"
+            return str(name)
     return language_code
 
 
@@ -32,11 +32,9 @@ def build_prompt_without_rag(
         language_name = get_language_name(output_language)
         language_instruction = f"""
 
-    Return generated human-readable strings, such as title, tags, document types,
-    storage paths, and correspondents, in the user's display language when a
-    translation is appropriate. Preserve proper nouns, organization names, and
-    official document names.
-    User display language: {language_name}
+    For the existing response fields only, use {language_name} for generated
+    human-readable values when translation is appropriate. Preserve proper
+    nouns, organization names, and official document names.
         """.rstrip()
 
     return f"""
