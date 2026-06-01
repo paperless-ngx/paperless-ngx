@@ -20,4 +20,13 @@ class Migration(migrations.Migration):
                 verbose_name="Sets the LLM embedding chunk size",
             ),
         ),
+        migrations.AddField(
+            model_name="applicationconfiguration",
+            name="llm_context_size",
+            field=models.PositiveIntegerField(
+                null=True,
+                validators=[MinValueValidator(1)],
+                verbose_name="Sets the LLM context size",
+            ),
+        ),
     ]

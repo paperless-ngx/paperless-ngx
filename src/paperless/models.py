@@ -324,6 +324,12 @@ class ApplicationConfiguration(AbstractSingletonModel):
         validators=[MinValueValidator(1)],
     )
 
+    llm_context_size = models.PositiveIntegerField(
+        verbose_name=_("Sets the LLM context size"),
+        null=True,
+        validators=[MinValueValidator(1)],
+    )
+
     llm_backend = models.CharField(
         verbose_name=_("Sets the LLM backend"),
         blank=True,
