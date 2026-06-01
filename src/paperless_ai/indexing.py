@@ -249,9 +249,9 @@ def update_llm_index(
 
     documents = Document.objects.all()
     if not documents.exists():
-        msg = "No documents found to index."
-        logger.warning(msg)
-        return msg
+        logger.warning("No documents found to index.")
+        if not rebuild and not vector_store_file_exists():
+            return "No documents found to index."
 
     config = AIConfig()
     chunk_size = config.llm_embedding_chunk_size

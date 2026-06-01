@@ -588,6 +588,60 @@ def test_query_similar_documents_empty_allow_list_fails_closed(
     mock_retriever_cls.assert_not_called()
 
 
+class TestUpdateLlmIndexEmptyDocumentSet:
+    """update_llm_index must persist an empty index when all documents are deleted.
+
+    Without this, the stale on-disk FAISS vectors are never cleared and
+    subsequent similarity searches return phantom hits for document IDs that
+    no longer exist in the DB.
+    """
+
+    @pytest.mark.django_db
+    def test_rebuild_clears_stale_index_when_no_documents_exist(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: MagicMock,
+    ) -> None:
+        """After deleting all documents, rebuild=True must persist an empty index.
+
+        Steps:
+        1. Build an index with one document so the on-disk state is non-empty.
+        2. Delete all documents from the DB.
+        3. Call update_llm_index(rebuild=True).
+        4. Reload the index from disk.
+        5. Assert the reloaded index has zero nodes (no phantom vectors).
+        """
+        # Step 1: create a document and build a non-empty index
+        Document.objects.create(
+            title="Soon-to-be-deleted document",
+            content="Some content that will become a phantom vector.",
+            added=timezone.now(),
+        )
+        indexing.update_llm_index(rebuild=True)
+
+        initial_index = indexing.load_or_build_index()
+        assert len(initial_index.docstore.docs) > 0, (
+            "Precondition failed: expected at least one node before deletion"
+        )
+
+        # Step 2: delete all documents
+        Document.objects.all().delete()
+        assert not Document.objects.exists()
+
+        # Step 3: rebuild with no documents
+        indexing.update_llm_index(rebuild=True)
+
+        # Step 4: reload the persisted index from disk
+        reloaded_index = indexing.load_or_build_index()
+
+        # Step 5: phantom vectors must be gone
+        assert len(reloaded_index.docstore.docs) == 0, (
+            f"Expected 0 nodes after clearing all documents, "
+            f"but found {len(reloaded_index.docstore.docs)}: "
+            f"{list(reloaded_index.docstore.docs.keys())}"
+        )
+
+
 class TestDocumentUpdatedSignalTriggersLlmReindex:
     """document_updated must enqueue an LLM index update, just like document_consumption_finished."""
 
