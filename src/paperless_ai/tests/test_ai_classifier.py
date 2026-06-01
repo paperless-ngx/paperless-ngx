@@ -93,6 +93,7 @@ def test_get_ai_document_classification_success(mock_run_llm_query, mock_documen
     assert result["storage_paths"] == ["Reports"]
     assert result["dates"] == ["2023-01-01"]
     prompt = mock_run_llm_query.call_args.args[0]
+    assert "Return only these response fields: title, tags, correspondents" in prompt
     assert "use German for generated" in prompt
 
 

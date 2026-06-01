@@ -47,6 +47,9 @@ def build_prompt_without_rag(
     - The type or category of the document
     - Suggested folder paths for storing the document
     - Up to 3 relevant dates in YYYY-MM-DD format
+    Return only these response fields: title, tags, correspondents,
+    document_types, storage_paths, dates. Do not return filename, content, or
+    nested metadata fields.
     {language_instruction}
 
     Filename:
