@@ -130,6 +130,7 @@ jobs:
             type=raw,value=${{ steps.ref.outputs.name }},enable=${{ github.event_name == 'pull_request' }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
       - name: Build and push by digest
         id: build
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
@@ -213,6 +214,7 @@ jobs:
             type=raw,value=${{ needs.build-arch.outputs.ref-name }},enable=${{ github.event_name == 'pull_request' }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
       - name: Create manifest list and push
         working-directory: /tmp/digests
         env:
