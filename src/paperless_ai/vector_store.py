@@ -239,7 +239,10 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
                 "vector" in (getattr(idx, "columns", []) or [])
                 for idx in self._table.list_indices()
             )
-        except Exception:  # pragma: no cover - older lancedb without list_indices
+        except (
+            Exception
+        ) as exc:  # pragma: no cover - older lancedb without list_indices
+            logger.debug("Could not check for vector index (assuming absent): %s", exc)
             return False
 
     def maybe_create_ann_index(self, min_rows: int = ANN_INDEX_MIN_ROWS) -> None:
