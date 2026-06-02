@@ -142,6 +142,7 @@ def build_document_node(
     # the token count and exceed embedding models with small context windows
     # (e.g. nomic-embed-text via Ollama defaults to num_ctx=2048).
     doc = LlamaDocument(
+        id_=str(document.id),
         text=text,
         metadata=metadata,
         excluded_embed_metadata_keys=list(metadata.keys()),

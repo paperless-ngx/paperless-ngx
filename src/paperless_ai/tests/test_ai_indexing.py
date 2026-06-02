@@ -67,6 +67,18 @@ def test_build_document_node(real_document) -> None:
 
 
 @pytest.mark.django_db
+def test_build_document_node_sets_ref_doc_id(real_document: Document) -> None:
+    """Every node produced by build_document_node must carry the paperless document id
+    as its ref_doc_id so that the LanceDB adapter's delete(str(doc.id)) works correctly."""
+    nodes = indexing.build_document_node(real_document)
+    assert len(nodes) > 0, "Expected at least one node"
+    for node in nodes:
+        assert node.ref_doc_id == str(real_document.id), (
+            f"Expected ref_doc_id={real_document.id!r}, got {node.ref_doc_id!r}"
+        )
+
+
+@pytest.mark.django_db
 def test_build_document_node_excludes_metadata_from_embedding(real_document) -> None:
     """Metadata keys must not be prepended to the embedding text.
 
