@@ -234,16 +234,7 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         return VectorStoreQueryResult(nodes=nodes, similarities=sims, ids=ids)
 
     def _has_vector_index(self) -> bool:
-        try:
-            return any(
-                "vector" in (getattr(idx, "columns", []) or [])
-                for idx in self._table.list_indices()
-            )
-        except (
-            Exception
-        ) as exc:  # pragma: no cover - older lancedb without list_indices
-            logger.debug("Could not check for vector index (assuming absent): %s", exc)
-            return False
+        return any("vector" in idx.columns for idx in self._table.list_indices())
 
     def maybe_create_ann_index(self, min_rows: int = ANN_INDEX_MIN_ROWS) -> None:
         """Best-effort: build an IVF index once the table is large enough.
