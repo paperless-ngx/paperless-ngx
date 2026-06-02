@@ -456,9 +456,15 @@ def query_similar_documents(
         )
         try:
             results = retriever.retrieve(query_text)
-        except KeyError:
+        except KeyError as e:
             # Ghost FAISS positions remain after deletion because IndexFlatL2 is
             # append-only. Treat them as absent and return no results.
+            logger.debug(
+                "Skipping LLM similarity query for document %s due to a stale "
+                "FAISS position with no docstore node: %s",
+                document.pk,
+                e,
+            )
             return []
 
     retrieved_document_ids: list[int] = []
