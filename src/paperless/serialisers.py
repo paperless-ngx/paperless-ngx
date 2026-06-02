@@ -227,6 +227,8 @@ class ApplicationConfigurationSerializer(
             data["barcode_tag_mapping"] = None
         if "language" in data and data["language"] == "":
             data["language"] = None
+        if "llm_output_language" in data and data["llm_output_language"] == "":
+            data["llm_output_language"] = None
         if "llm_api_key" in data and data["llm_api_key"] is not None:
             if data["llm_api_key"] == "":
                 data["llm_api_key"] = None

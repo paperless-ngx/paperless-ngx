@@ -411,6 +411,45 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
     @patch("documents.views.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
+        LLM_BACKEND="mock_backend",
+        LLM_OUTPUT_LANGUAGE="fr-fr",
+    )
+    def test_ai_suggestions_configured_language_takes_precedence(
+        self,
+        mock_get_ai_classification,
+    ) -> None:
+        UiSettings.objects.create(user=self.user, settings={"language": "de-de"})
+        mock_get_ai_classification.return_value = {
+            "title": "Titre IA",
+            "tags": [],
+            "correspondents": [],
+            "document_types": [],
+            "storage_paths": [],
+            "dates": [],
+        }
+
+        self.client.force_login(user=self.user)
+        response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        mock_get_ai_classification.assert_called_once_with(
+            self.document,
+            self.user,
+            "fr-fr",
+        )
+        self.assertEqual(
+            get_llm_suggestion_cache(
+                self.document.pk,
+                backend="mock_backend:fr-fr",
+            ).suggestions["title"],
+            "Titre IA",
+        )
+
+    @patch("documents.views.get_ai_document_classification")
+    @override_settings(
+        AI_ENABLED=True,
         LLM_BACKEND="openai-like",
     )
     def test_ai_suggestions_with_invalid_ai_configuration(

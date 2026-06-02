@@ -1469,10 +1469,14 @@ class DocumentViewSet(
         if not ai_config.ai_enabled:
             return HttpResponseBadRequest("AI is required for this feature")
 
-        output_language = None
-        if hasattr(request.user, "ui_settings") and isinstance(
-            request.user.ui_settings.settings,
-            dict,
+        output_language = ai_config.llm_output_language
+        if (
+            not output_language
+            and hasattr(request.user, "ui_settings")
+            and isinstance(
+                request.user.ui_settings.settings,
+                dict,
+            )
         ):
             output_language = request.user.ui_settings.settings.get("language") or None
         llm_cache_backend = (

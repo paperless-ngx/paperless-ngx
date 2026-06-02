@@ -352,6 +352,14 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     config_key: 'PAPERLESS_AI_LLM_ENDPOINT',
     category: ConfigCategory.AI,
   },
+  {
+    key: 'llm_output_language',
+    title: $localize`LLM Output Language`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_AI_LLM_OUTPUT_LANGUAGE',
+    category: ConfigCategory.AI,
+    note: $localize`Language to use for generated AI suggestions. When unset, AI suggestions use the user's display language if explicitly set.`,
+  },
 ]
 
 export interface PaperlessConfig extends ObjectWithId {
@@ -392,4 +400,5 @@ export interface PaperlessConfig extends ObjectWithId {
   llm_model: string
   llm_api_key: string
   llm_endpoint: string
+  llm_output_language: string
 }

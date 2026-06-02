@@ -359,6 +359,13 @@ class ApplicationConfiguration(AbstractSingletonModel):
         max_length=256,
     )
 
+    llm_output_language = models.CharField(
+        verbose_name=_("Sets the LLM output language"),
+        blank=True,
+        null=True,
+        max_length=32,
+    )
+
     class Meta:
         verbose_name = _("paperless application settings")
         permissions = [
