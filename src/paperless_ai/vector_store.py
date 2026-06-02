@@ -20,6 +20,12 @@ logger = logging.getLogger("paperless_ai.vector_store")
 
 DEFAULT_TABLE_NAME = "documents"
 
+# Below this many chunks, LanceDB's exact (brute-force) search is sufficient and
+# faster than building an ANN index (per LanceDB guidance, ~100K vectors).
+ANN_INDEX_MIN_ROWS = 100_000
+# IVF_PQ default; num_sub_vectors must evenly divide the embedding dimension.
+ANN_PQ_SUB_VECTORS = 96
+
 
 def _escape(value: str) -> str:
     return str(value).replace("'", "''")
@@ -226,3 +232,62 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         sims = [1.0 / (1.0 + float(row["_distance"])) for row in rows]
         ids = [row["id"] for row in rows]
         return VectorStoreQueryResult(nodes=nodes, similarities=sims, ids=ids)
+
+    def _has_vector_index(self) -> bool:
+        try:
+            return any(
+                "vector" in (getattr(idx, "columns", []) or [])
+                for idx in self._table.list_indices()
+            )
+        except Exception:  # pragma: no cover - older lancedb without list_indices
+            return False
+
+    def maybe_create_ann_index(self, min_rows: int = ANN_INDEX_MIN_ROWS) -> None:
+        """Best-effort: build an IVF index once the table is large enough.
+
+        IVF_PQ is used when ``num_sub_vectors`` divides the embedding dimension,
+        otherwise IVF_FLAT (no divisor constraint). Any failure is logged and
+        leaves the table on exact search, which is always correct.
+        """
+        if self._table is None:
+            return
+        rows = self._table.count_rows()
+        if rows < min_rows or self._has_vector_index():
+            return
+        num_partitions = max(1, rows // 4096)
+        # Embedding dim from the schema's fixed-size list column.
+        dim = self._table.schema.field("vector").type.list_size
+        try:
+            if dim % ANN_PQ_SUB_VECTORS == 0:
+                self._table.create_index(
+                    metric="l2",
+                    num_partitions=num_partitions,
+                    num_sub_vectors=ANN_PQ_SUB_VECTORS,
+                    index_type="IVF_PQ",
+                )
+            else:
+                self._table.create_index(
+                    metric="l2",
+                    num_partitions=num_partitions,
+                    index_type="IVF_FLAT",
+                )
+        except Exception as e:  # pragma: no cover - depends on data/dim
+            logger.warning("Skipping ANN index creation: %s", e)
+
+    def ensure_document_id_scalar_index(self) -> None:
+        """Create a scalar index on the filter column (never on the merge key
+        ``id`` — see LanceDB #3177)."""
+        if self._table is None:
+            return
+        try:
+            self._table.create_scalar_index("document_id", replace=True)
+        except Exception as e:  # pragma: no cover
+            logger.warning("Skipping document_id scalar index: %s", e)
+
+    def compact(self, retention_seconds: int) -> None:
+        """Compact fragments and prune old MVCC versions in one call."""
+        if self._table is None:
+            return
+        from datetime import timedelta
+
+        self._table.optimize(cleanup_older_than=timedelta(seconds=retention_seconds))

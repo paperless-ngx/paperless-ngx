@@ -218,3 +218,70 @@ class TestPaperlessLanceVectorStoreUpsert:
         remaining = sorted(r["document_id"] for r in table.search().to_list())
         assert "1" not in remaining
         assert "2" in remaining
+
+
+class TestPaperlessLanceVectorStoreMaintenance:
+    @pytest.fixture
+    def store(self, tmp_path: Path) -> PaperlessLanceVectorStore:
+        return PaperlessLanceVectorStore(uri=str(tmp_path / "idx"))
+
+    def test_maybe_create_ann_index_noop_below_threshold(
+        self,
+        store: PaperlessLanceVectorStore,
+    ) -> None:
+        store.add([_node("1-0", "1", "a", 0.1)])
+        # Threshold far above row count -> no index attempted, no error.
+        store.maybe_create_ann_index(min_rows=1000)
+        # Still queryable.
+        result = store.query(
+            VectorStoreQuery(query_embedding=[0.1] * DIM, similarity_top_k=1),
+        )
+        assert len(result.nodes) == 1
+
+    def test_maybe_create_ann_index_non_divisible_dim_falls_back(
+        self,
+        store: PaperlessLanceVectorStore,
+    ) -> None:
+        # DIM=8 is not divisible by the PQ default sub-vectors; must not raise
+        # and must leave the table queryable (IVF_FLAT fallback or skipped).
+        for i in range(40):
+            store.add([_node(f"1-{i}", "1", f"t{i}", float(i))])
+        store.maybe_create_ann_index(min_rows=10)
+        result = store.query(
+            VectorStoreQuery(query_embedding=[1.0] * DIM, similarity_top_k=3),
+        )
+        assert len(result.nodes) == 3
+
+    def test_compact_reduces_to_single_version(
+        self,
+        store: PaperlessLanceVectorStore,
+    ) -> None:
+        for i in range(5):
+            store.add([_node(f"1-{i}", "1", f"t{i}", float(i))])
+        assert len(store.client.open_table("documents").list_versions()) > 1
+        store.compact(retention_seconds=0)
+        assert len(store.client.open_table("documents").list_versions()) == 1
+
+    def test_upsert_after_optimize_with_scalar_index(
+        self,
+        store: PaperlessLanceVectorStore,
+    ) -> None:
+        store.add(
+            [
+                _node("1-0", "1", "old0", 0.1),
+                _node("1-1", "1", "old1", 0.2),
+                _node("1-2", "1", "old2", 0.3),
+                _node("2-0", "2", "keep", 0.9),
+            ],
+        )
+        store.ensure_document_id_scalar_index()
+        store.compact(retention_seconds=0)
+
+        store.upsert_document("1", [_node("1-0", "1", "new0", 0.1)])
+
+        table = store.client.open_table("documents")
+        doc1 = sorted(
+            r["id"] for r in table.search().where("document_id = '1'").to_list()
+        )
+        assert doc1 == ["1-0"]
+        assert table.count_rows() == 2
