@@ -143,3 +143,27 @@ class TestPaperlessLanceVectorStoreCrud:
         assert store.vector_dim() == DIM
         store.drop_table()
         assert store.table_exists() is False
+
+    def test_build_where_or_condition(self) -> None:
+        from llama_index.core.vector_stores.types import FilterCondition
+
+        from paperless_ai.vector_store import _build_where
+
+        where = _build_where(
+            MetadataFilters(
+                filters=[
+                    MetadataFilter(
+                        key="document_id",
+                        operator=FilterOperator.EQ,
+                        value="1",
+                    ),
+                    MetadataFilter(
+                        key="document_id",
+                        operator=FilterOperator.EQ,
+                        value="2",
+                    ),
+                ],
+                condition=FilterCondition.OR,
+            ),
+        )
+        assert where == "document_id = '1' OR document_id = '2'"
