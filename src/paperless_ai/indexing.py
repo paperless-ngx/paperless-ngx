@@ -314,7 +314,7 @@ def update_llm_index(
 
                     # Delete from docstore, FAISS IndexFlatL2 are append-only
                     for node in doc_nodes:
-                        index.docstore.delete_document(node.node_id)
+remove_document_docstore_nodes(document, index)
 
                 nodes.extend(build_document_node(document, chunk_size=chunk_size))
 
