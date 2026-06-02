@@ -129,6 +129,39 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
             self._table.add(rows)
         return [node.node_id for node in nodes]
 
+    def upsert_document(self, document_id: str, nodes: list[BaseNode]) -> list[str]:
+        """Atomically replace all stored chunks of ``document_id`` with ``nodes``.
+
+        A single ``merge_insert`` commit: matching node ids are updated, new ids
+        inserted, and any existing rows for this document that are not in the new
+        set are deleted (``when_not_matched_by_source_delete``). This prunes stale
+        trailing chunks when an edit reduces a document's chunk count, with no
+        transient empty state for concurrent lock-free readers.
+        """
+        if not nodes:
+            # No indexable content: treat as a removal.
+            self.delete(document_id)
+            return []
+        rows = [self._row(node) for node in nodes]
+        if self._table is None:
+            dim = len(nodes[0].get_embedding())
+            self._table = self._conn.create_table(
+                self._table_name,
+                rows,
+                schema=self._schema(dim),
+            )
+            return [node.node_id for node in nodes]
+        (
+            self._table.merge_insert("id")
+            .when_matched_update_all()
+            .when_not_matched_insert_all()
+            .when_not_matched_by_source_delete(
+                f"document_id = '{_escape(document_id)}'",
+            )
+            .execute(rows)
+        )
+        return [node.node_id for node in nodes]
+
     def delete(self, ref_doc_id: str, **delete_kwargs: Any) -> None:
         if self._table is not None:
             self._table.delete(f"doc_id = '{_escape(ref_doc_id)}'")

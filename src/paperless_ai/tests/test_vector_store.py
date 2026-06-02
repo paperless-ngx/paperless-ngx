@@ -145,6 +145,7 @@ class TestPaperlessLanceVectorStoreCrud:
         assert store.table_exists() is False
 
     def test_build_where_or_condition(self) -> None:
+
         from llama_index.core.vector_stores.types import FilterCondition
 
         from paperless_ai.vector_store import _build_where
@@ -167,3 +168,43 @@ class TestPaperlessLanceVectorStoreCrud:
             ),
         )
         assert where == "document_id = '1' OR document_id = '2'"
+
+
+class TestPaperlessLanceVectorStoreUpsert:
+    @pytest.fixture
+    def store(self, tmp_path: Path) -> PaperlessLanceVectorStore:
+        s = PaperlessLanceVectorStore(uri=str(tmp_path / "idx"))
+        s.add(
+            [
+                _node("1-0", "1", "old0", 0.1),
+                _node("1-1", "1", "old1", 0.2),
+                _node("1-2", "1", "old2", 0.3),
+                _node("2-0", "2", "keep", 0.9),
+            ],
+        )
+        return s
+
+    def test_upsert_prunes_stale_chunks_and_keeps_others(
+        self,
+        store: PaperlessLanceVectorStore,
+    ) -> None:
+        store.upsert_document(
+            "1",
+            [_node("1-0", "1", "new0", 0.1), _node("1-1", "1", "new1", 0.2)],
+        )
+
+        table = store.client.open_table("documents")
+        doc1 = sorted(
+            r["id"] for r in table.search().where("document_id = '1'").to_list()
+        )
+        assert doc1 == ["1-0", "1-1"]  # 1-2 pruned
+        assert table.count_rows() == 3  # 2 new doc1 + 1 doc2
+
+    def test_upsert_is_single_commit(
+        self,
+        store: PaperlessLanceVectorStore,
+    ) -> None:
+        table = store.client.open_table("documents")
+        before = table.version
+        store.upsert_document("1", [_node("1-0", "1", "new0", 0.1)])
+        assert store.client.open_table("documents").version == before + 1
