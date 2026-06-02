@@ -145,7 +145,6 @@ class TestPaperlessLanceVectorStoreCrud:
         assert store.table_exists() is False
 
     def test_build_where_or_condition(self) -> None:
-
         from llama_index.core.vector_stores.types import FilterCondition
 
         from paperless_ai.vector_store import _build_where
@@ -208,3 +207,14 @@ class TestPaperlessLanceVectorStoreUpsert:
         before = table.version
         store.upsert_document("1", [_node("1-0", "1", "new0", 0.1)])
         assert store.client.open_table("documents").version == before + 1
+
+    def test_upsert_empty_nodes_removes_document(
+        self,
+        store: PaperlessLanceVectorStore,
+    ) -> None:
+        store.upsert_document("1", [])
+
+        table = store.client.open_table("documents")
+        remaining = sorted(r["document_id"] for r in table.search().to_list())
+        assert "1" not in remaining
+        assert "2" in remaining

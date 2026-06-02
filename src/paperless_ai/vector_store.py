@@ -139,8 +139,9 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         transient empty state for concurrent lock-free readers.
         """
         if not nodes:
-            # No indexable content: treat as a removal.
-            self.delete(document_id)
+            # No indexable content: remove any existing chunks for this document.
+            if self._table is not None:
+                self._table.delete(f"document_id = '{_escape(document_id)}'")
             return []
         rows = [self._row(node) for node in nodes]
         if self._table is None:
