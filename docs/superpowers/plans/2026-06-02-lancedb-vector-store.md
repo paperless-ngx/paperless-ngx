@@ -1641,6 +1641,75 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 
 ---
 
+## Task 13: Type-check the new/changed AI code against pyrefly
+
+**Goal:** the code this branch adds/changes passes `pyrefly` cleanly **without growing
+`.pyrefly-baseline.json`**. The baseline (~600 KB) suppresses pre-existing repo errors; our
+new code must not add to it. Run this **last**, once all implementation tasks are done, so
+every new file/symbol exists.
+
+**Files (likely to need annotations/fixes):**
+
+- `src/paperless_ai/vector_store.py`, `src/paperless_ai/indexing.py`,
+  `src/paperless_ai/chat.py`, `src/paperless_ai/embedding.py`, and the new test modules.
+
+**Environment:** pyrefly needs the dependencies installed to resolve third-party types, so
+run it **on the Linux VM** (where the venv has `lancedb`/`pyarrow`/`llama_index`). The
+`[tool.pyrefly]` config already sets `search-path = ["src"]`, `python-platform = "linux"`,
+and `baseline = ".pyrefly-baseline.json"`, so `pyrefly check` from the repo root applies
+the baseline automatically and reports only non-baselined (i.e. new) errors.
+
+- [ ] **Step 1: Run pyrefly on the VM and capture NEW errors**
+
+```bash
+tar czf - src pyproject.toml uv.lock .pyrefly-baseline.json \
+  | ssh -o BatchMode=yes -p 2244 trenton@localhost 'tar xzf - -C ~/projects/paperless-ngx'
+ssh -o BatchMode=yes -p 2244 trenton@localhost \
+  'bash -lc "cd ~/projects/paperless-ngx && uv run pyrefly check"'
+```
+
+Expected at first: a list of errors located in the changed `paperless_ai` files (anything
+already in the baseline is suppressed). Note each `file:line` + error code.
+
+- [ ] **Step 2: Fix the type errors at the source**
+
+Prefer real fixes over suppressions:
+
+- Add/repair annotations on our functions, fixtures, and the adapter methods so signatures
+  match `BasePydanticVectorStore` (e.g. `Sequence[BaseNode]`, `list[str]`, the
+  `MetadataFilters | None` params, `VectorStoreQueryResult` return).
+- Annotate `PrivateAttr` fields and the lazy `get_vector_store() -> "PaperlessLanceVectorStore"`
+  (string annotation under `TYPE_CHECKING`).
+- For genuine third-party stub gaps (`lancedb`/`pyarrow` ship little/no type info; some
+  `llama_index` returns are dynamic), use a **targeted, commented** suppression on that exact
+  line — `# type: ignore[<code>]  # lancedb has no type stubs` — not a blanket file-level
+  ignore.
+
+- [ ] **Step 3: Do NOT grow the baseline**
+
+Do not regenerate or append `.pyrefly-baseline.json`. The goal is zero new baseline entries.
+If — and only if — an error is genuinely impossible to fix or suppress inline (rare), stop
+and report it as DONE_WITH_CONCERNS describing the specific error, rather than silently
+baselining it.
+
+- [ ] **Step 4: Re-run until clean**
+
+Re-run the Step 1 command. Expected: no errors in the `paperless_ai` files we touched (the
+overall run still passes via the unchanged baseline for the rest of the repo).
+
+- [ ] **Step 5: Lint and commit**
+
+```bash
+ruff check src/paperless_ai
+ruff format src/paperless_ai
+git add src/paperless_ai
+git commit -m "types(ai): pass pyrefly for the LanceDB vector store code
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
+```
+
+---
+
 ## Self-Review notes (for the implementer)
 
 - **Lazy imports are a hard requirement** (see the constraint section). After Tasks 6, 7, and 10, the guard test (`test_lazy_imports.py`) must stay green: importing `documents.tasks` must not load `lancedb` / `pyarrow` / `llama_index`. Every `llama_index` symbol in `indexing.py`/`chat.py` (retrievers, filters, `MetadataMode`) and the `vector_store` import itself must be function-local; only `vector_store.py` and test modules import these at top level.
