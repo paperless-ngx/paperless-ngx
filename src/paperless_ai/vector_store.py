@@ -194,6 +194,11 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         filters: MetadataFilters | None = None,
         **kwargs: Any,
     ) -> list[BaseNode]:
+        if node_ids is not None:
+            # node_ids lookup is not implemented; see class docstring.
+            raise NotImplementedError(
+                "PaperlessLanceVectorStore does not support node_ids lookup",
+            )
         if self._table is None:
             return []
         where = _build_where(filters)
@@ -201,6 +206,16 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         if where:
             query = query.where(where)
         return self._rows_to_nodes(query.to_list())
+
+    def has_nodes(self, filters: MetadataFilters | None = None) -> bool:
+        """Return True if at least one matching node exists (cheap existence check)."""
+        if self._table is None:
+            return False
+        where = _build_where(filters)
+        query = self._table.search()
+        if where:
+            query = query.where(where)
+        return len(query.limit(1).to_list()) > 0
 
     def query(
         self,

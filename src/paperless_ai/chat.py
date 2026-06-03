@@ -106,7 +106,7 @@ def _stream_chat_with_documents(query_str: str, documents: list[Document]):
     )
 
     # No indexed content for these documents -> bail early (before touching the LLM).
-    if not index.vector_store.get_nodes(filters=filters):
+    if not index.vector_store.has_nodes(filters=filters):
         logger.warning("No nodes found for the given documents.")
         yield CHAT_NO_CONTENT_MESSAGE
         return

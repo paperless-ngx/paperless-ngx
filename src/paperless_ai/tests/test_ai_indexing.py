@@ -287,7 +287,7 @@ def test_query_similar_documents(
     with (
         patch("paperless_ai.indexing.load_or_build_index") as mock_load_or_build_index,
         patch(
-            "paperless_ai.indexing.vector_store_file_exists",
+            "paperless_ai.indexing.llm_index_exists",
         ) as mock_vector_store_exists,
         patch("llama_index.core.retrievers.VectorIndexRetriever") as mock_retriever_cls,
         patch("paperless_ai.indexing.Document.objects.filter") as mock_filter,
@@ -330,7 +330,7 @@ def test_query_similar_documents_triggers_update_when_index_missing(
 ) -> None:
     with (
         patch(
-            "paperless_ai.indexing.vector_store_file_exists",
+            "paperless_ai.indexing.llm_index_exists",
             return_value=False,
         ),
         patch(
@@ -357,7 +357,7 @@ def test_query_similar_documents_empty_allow_list_fails_closed(
 ) -> None:
     with (
         patch(
-            "paperless_ai.indexing.vector_store_file_exists",
+            "paperless_ai.indexing.llm_index_exists",
             return_value=True,
         ) as mock_vector_store_exists,
         patch("paperless_ai.indexing.load_or_build_index") as mock_load_or_build_index,

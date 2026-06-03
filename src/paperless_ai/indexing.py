@@ -2,7 +2,6 @@ import json
 import logging
 from collections.abc import Iterable
 from datetime import timedelta
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 from django.conf import settings
@@ -31,21 +30,11 @@ RAG_NUM_OUTPUT = 512
 RAG_CHUNK_OVERLAP = 200
 
 
-def _index_lock_path() -> Path:
-    """Return the path used as the file lock for LanceDB index mutations.
-
-    The lock file lives in DATA_DIR/locks/ (not inside LLM_INDEX_DIR) so that a
-    rebuild — which calls store.drop_table() — cannot interfere with another
-    worker that still holds the lock.
-    """
-    return settings.LLM_INDEX_LOCK
-
-
 def queue_llm_index_update_if_needed(*, rebuild: bool, reason: str) -> bool:
     # NOTE: The check-then-enqueue sequence below is non-atomic (TOCTOU): two
     # concurrent workers can both observe no running task and both enqueue a
     # full rebuild. This is wasteful but not data-corrupting — update_llm_index
-    # is itself protected by _index_lock_path(), so only one rebuild runs at a
+    # is itself protected by settings.LLM_INDEX_LOCK, so only one rebuild runs at a
     # time and the second one is serialised after the first completes.
     from documents.tasks import llmindex_index
 
@@ -73,11 +62,6 @@ def queue_llm_index_update_if_needed(*, rebuild: bool, reason: str) -> bool:
 
 
 def get_vector_store() -> "PaperlessLanceVectorStore":
-    """Open (or lazily create) the LanceDB-backed vector store.
-
-    Imports ``vector_store`` lazily so that importing ``indexing`` (which
-    ``documents.tasks`` does at module top) never drags in lancedb/llama_index.
-    """
     from paperless_ai.vector_store import PaperlessLanceVectorStore
 
     settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
@@ -132,11 +116,10 @@ def build_document_node(
 
 
 def load_or_build_index(nodes=None):
-    """Load the VectorStoreIndex backed by the LanceDB store.
+    """Return a VectorStoreIndex backed by the vector store.
 
-    With ``stores_text=True`` the index runs off the vector store alone — no
-    docstore or index store. ``nodes`` is accepted for signature compatibility
-    but unused; the store is the source of truth.
+    ``nodes`` is accepted for signature compatibility but unused; the store
+    is the source of truth.
     """
     import llama_index.core.settings as llama_settings
     from llama_index.core import VectorStoreIndex
@@ -150,8 +133,8 @@ def load_or_build_index(nodes=None):
     )
 
 
-def vector_store_file_exists() -> bool:
-    """True when the LanceDB table exists."""
+def llm_index_exists() -> bool:
+    """True when the index table exists on disk."""
     return get_vector_store().table_exists()
 
 
@@ -161,9 +144,9 @@ def embedding_dim_mismatch() -> bool:
     stored = store.vector_dim()
     if stored is None:
         return False
-    from paperless_ai.embedding import current_embedding_dim
+    from paperless_ai.embedding import get_embedding_dim
 
-    return stored != current_embedding_dim()
+    return stored != get_embedding_dim()
 
 
 def get_rag_chunk_size() -> int:
@@ -199,14 +182,28 @@ def get_rag_prompt_helper(
     )
 
 
-def _iter_existing_modified(store: "PaperlessLanceVectorStore") -> list[dict]:
-    """One representative row per document_id, for modified-time comparison."""
+def _stored_modified_times(store: "PaperlessLanceVectorStore") -> dict[str, str]:
+    """Return {document_id: stored_modified_isoformat} for incremental update.
+
+    One representative chunk per document is enough to read the stored
+    ``modified`` timestamp (all chunks for a document share the same value).
+    Only the two scalar columns needed for comparison are fetched; the vector
+    column is excluded to avoid unnecessary deserialization.
+    """
     if not store.table_exists():
-        return []
-    seen: dict[str, dict] = {}
-    for row in store.client.open_table(LLM_INDEX_TABLE).search().to_list():
-        seen.setdefault(str(row["document_id"]), row)
-    return list(seen.values())
+        return {}
+    result: dict[str, str] = {}
+    for row in (
+        store.client.open_table(LLM_INDEX_TABLE)
+        .search()
+        .select(["document_id", "node_content"])
+        .to_list()
+    ):
+        doc_id = str(row["document_id"])
+        if doc_id not in result:
+            meta = json.loads(row["node_content"])
+            result[doc_id] = meta.get("modified", "")
+    return result
 
 
 def get_llm_index_compaction_retention() -> int:
@@ -222,52 +219,52 @@ def update_llm_index(
     """Rebuild or incrementally update the LLM index."""
     from llama_index.core.schema import MetadataMode
 
-    if not rebuild and vector_store_file_exists() and embedding_dim_mismatch():
+    if not rebuild and llm_index_exists() and embedding_dim_mismatch():
         logger.warning("Embedding dimension changed; forcing LLM index rebuild.")
         rebuild = True
 
     documents = Document.objects.all()
     if not documents.exists():
         logger.warning("No documents found to index.")
-        if not rebuild and not vector_store_file_exists():
+        if not rebuild and not llm_index_exists():
             return "No documents found to index."
 
     chunk_size = AIConfig().llm_embedding_chunk_size
     embed_model = get_embedding_model()
 
-    with FileLock(_index_lock_path()):
-        if rebuild or not vector_store_file_exists():
+    with FileLock(settings.LLM_INDEX_LOCK):
+        if rebuild or not llm_index_exists():
             (settings.LLM_INDEX_DIR / "meta.json").unlink(missing_ok=True)
             logger.info("Rebuilding LLM index.")
             store = get_vector_store()
             store.drop_table()
             for document in iter_wrapper(documents):
                 nodes = build_document_node(document, chunk_size=chunk_size)
-                for node in nodes:
-                    node.embedding = embed_model.get_text_embedding(
-                        node.get_content(metadata_mode=MetadataMode.EMBED),
-                    )
+                texts = [n.get_content(metadata_mode=MetadataMode.EMBED) for n in nodes]
+                for node, emb in zip(
+                    nodes,
+                    embed_model.get_text_embedding_batch(texts),
+                    strict=True,
+                ):
+                    node.embedding = emb
                 store.add(nodes)
             msg = "LLM index rebuilt successfully."
         else:
             store = get_vector_store()
-            existing = {
-                str(row["document_id"]): json.loads(row["node_content"])
-                for row in _iter_existing_modified(store)
-            }
+            existing = _stored_modified_times(store)
             changed = 0
             for document in iter_wrapper(documents):
                 doc_id = str(document.id)
-                node_meta = existing.get(doc_id)
-                if node_meta is not None:
-                    stored_modified = node_meta.get("modified")
-                    if stored_modified == document.modified.isoformat():
-                        continue
+                if existing.get(doc_id) == document.modified.isoformat():
+                    continue
                 nodes = build_document_node(document, chunk_size=chunk_size)
-                for node in nodes:
-                    node.embedding = embed_model.get_text_embedding(
-                        node.get_content(metadata_mode=MetadataMode.EMBED),
-                    )
+                texts = [n.get_content(metadata_mode=MetadataMode.EMBED) for n in nodes]
+                for node, emb in zip(
+                    nodes,
+                    embed_model.get_text_embedding_batch(texts),
+                    strict=True,
+                ):
+                    node.embedding = emb
                 store.upsert_document(doc_id, nodes)
                 changed += 1
             msg = (
@@ -283,18 +280,21 @@ def update_llm_index(
 
 
 def llm_index_add_or_update_document(document: Document):
-    """Add or atomically replace a document's chunks in the LLM index."""
+    """Add or atomically replace a document's chunks in the index."""
     from llama_index.core.schema import MetadataMode
 
     new_nodes = build_document_node(document, chunk_size=get_rag_chunk_size())
+    if new_nodes:
+        embed_model = get_embedding_model()
+        texts = [n.get_content(metadata_mode=MetadataMode.EMBED) for n in new_nodes]
+        for node, emb in zip(
+            new_nodes,
+            embed_model.get_text_embedding_batch(texts),
+            strict=True,
+        ):
+            node.embedding = emb
 
-    embed_model = get_embedding_model()
-    for node in new_nodes:
-        node.embedding = embed_model.get_text_embedding(
-            node.get_content(metadata_mode=MetadataMode.EMBED),
-        )
-
-    with FileLock(_index_lock_path()):
+    with FileLock(settings.LLM_INDEX_LOCK):
         store = get_vector_store()
         store.upsert_document(str(document.id), new_nodes)
         store.ensure_document_id_scalar_index()
@@ -302,7 +302,7 @@ def llm_index_add_or_update_document(document: Document):
 
 def llm_index_remove_document(document: Document):
     """Remove a document's chunks from the LLM index."""
-    with FileLock(_index_lock_path()):
+    with FileLock(settings.LLM_INDEX_LOCK):
         store = get_vector_store()
         store.delete(str(document.id))
 
@@ -354,7 +354,7 @@ def query_similar_documents(
     if allowed_document_ids is not None and not allowed_document_ids:
         return []
 
-    if not vector_store_file_exists():
+    if not llm_index_exists():
         queue_llm_index_update_if_needed(
             rebuild=False,
             reason="LLM index not found for similarity query.",

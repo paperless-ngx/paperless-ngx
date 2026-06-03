@@ -1,7 +1,7 @@
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
+import pytest_mock
 from llama_index.core.base.embeddings.base import BaseEmbedding
 from pytest_django.fixtures import SettingsWrapper
 
@@ -9,6 +9,7 @@ from pytest_django.fixtures import SettingsWrapper
 @pytest.fixture
 def temp_llm_index_dir(tmp_path: Path, settings: SettingsWrapper) -> Path:
     settings.LLM_INDEX_DIR = tmp_path
+    settings.LLM_INDEX_LOCK = tmp_path / "index.lock"
     return tmp_path
 
 
@@ -27,14 +28,8 @@ class FakeEmbedding(BaseEmbedding):
 
 
 @pytest.fixture
-def mock_embed_model():
+def mock_embed_model(mocker: pytest_mock.MockerFixture) -> pytest_mock.MockType:
     fake = FakeEmbedding()
-    with (
-        patch("paperless_ai.indexing.get_embedding_model") as mock_index,
-        patch(
-            "paperless_ai.embedding.get_embedding_model",
-        ) as mock_embedding,
-    ):
-        mock_index.return_value = fake
-        mock_embedding.return_value = fake
-        yield mock_index
+    mocker.patch("paperless_ai.indexing.get_embedding_model", return_value=fake)
+    mocker.patch("paperless_ai.embedding.get_embedding_model", return_value=fake)
+    return fake
