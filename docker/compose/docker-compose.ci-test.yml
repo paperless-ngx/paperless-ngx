@@ -18,7 +18,7 @@ services:
       - "--log-level=warn"
       - "--log-format=text"
   tika:
-    image: docker.io/apache/tika:3.2.3.0
+    image: docker.io/apache/tika:3.3.1.0
     hostname: tika
     container_name: tika
     network_mode: host
