@@ -911,47 +911,47 @@ class TestLlmIndexLocking:
 
 
 @pytest.mark.django_db
-def test_get_vector_store_roundtrip(
-    temp_llm_index_dir,
-    mock_embed_model,
-) -> None:
-    from paperless_ai.vector_store import PaperlessLanceVectorStore
+class TestLanceDbIndexing:
+    def test_get_vector_store_roundtrip(
+        self,
+        temp_llm_index_dir,
+        mock_embed_model,
+    ) -> None:
+        from paperless_ai.vector_store import PaperlessLanceVectorStore
 
-    store = indexing.get_vector_store()
-    assert isinstance(store, PaperlessLanceVectorStore)
+        store = indexing.get_vector_store()
+        assert isinstance(store, PaperlessLanceVectorStore)
 
+    def test_add_then_remove_document(
+        self,
+        temp_llm_index_dir,
+        mock_embed_model,
+        real_document: Document,
+    ) -> None:
+        indexing.llm_index_add_or_update_document(real_document)
+        store = indexing.get_vector_store()
+        table = store.client.open_table(indexing.LLM_INDEX_TABLE)
+        assert table.count_rows() >= 1
 
-@pytest.mark.django_db
-def test_add_then_remove_document(
-    temp_llm_index_dir,
-    mock_embed_model,
-    real_document,
-) -> None:
-    indexing.llm_index_add_or_update_document(real_document)
-    store = indexing.get_vector_store()
-    table = store.client.open_table(indexing.LLM_INDEX_TABLE)
-    assert table.count_rows() >= 1
+        indexing.llm_index_remove_document(real_document)
+        assert store.client.open_table(indexing.LLM_INDEX_TABLE).count_rows() == 0
 
-    indexing.llm_index_remove_document(real_document)
-    assert store.client.open_table(indexing.LLM_INDEX_TABLE).count_rows() == 0
+    def test_update_shrinks_chunks_without_orphans(
+        self,
+        temp_llm_index_dir,
+        mock_embed_model,
+        real_document: Document,
+    ) -> None:
+        real_document.content = "word " * 4000  # many chunks
+        real_document.save()
+        indexing.llm_index_add_or_update_document(real_document)
+        store = indexing.get_vector_store()
+        big = store.client.open_table(indexing.LLM_INDEX_TABLE).count_rows()
 
+        real_document.content = "short"  # one chunk
+        real_document.save()
+        indexing.llm_index_add_or_update_document(real_document)
 
-@pytest.mark.django_db
-def test_update_shrinks_chunks_without_orphans(
-    temp_llm_index_dir,
-    mock_embed_model,
-    real_document,
-) -> None:
-    real_document.content = "word " * 4000  # many chunks
-    real_document.save()
-    indexing.llm_index_add_or_update_document(real_document)
-    store = indexing.get_vector_store()
-    big = store.client.open_table(indexing.LLM_INDEX_TABLE).count_rows()
-
-    real_document.content = "short"  # one chunk
-    real_document.save()
-    indexing.llm_index_add_or_update_document(real_document)
-
-    rows = store.client.open_table(indexing.LLM_INDEX_TABLE).count_rows()
-    assert rows < big
-    assert rows >= 1
+        rows = store.client.open_table(indexing.LLM_INDEX_TABLE).count_rows()
+        assert rows < big
+        assert rows >= 1
