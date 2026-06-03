@@ -132,6 +132,11 @@ def get_embedding_dim() -> int:
     return dim
 
 
+def current_embedding_dim() -> int:
+    """Embedding dimension for the configured model (probes if not cached)."""
+    return get_embedding_dim()
+
+
 def _normalize_llm_index_text(text: str) -> str:
     text = OCR_LEADER_REGEX.sub(" ", text)
     return HORIZONTAL_WHITESPACE_REGEX.sub(" ", text)

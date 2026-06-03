@@ -911,6 +911,18 @@ class TestLlmIndexLocking:
 
 
 @pytest.mark.django_db
+class TestFaissMigration:
+    def test_migration_wipes_stale_faiss_files(
+        self,
+        temp_llm_index_dir: Path,
+    ) -> None:
+        stale = temp_llm_index_dir / "default__vector_store.json"
+        stale.write_text("{}")
+        indexing.migrate_stale_faiss_index()
+        assert not stale.exists()
+
+
+@pytest.mark.django_db
 class TestLanceDbIndexing:
     def test_get_vector_store_roundtrip(
         self,
