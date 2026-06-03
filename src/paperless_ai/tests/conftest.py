@@ -13,7 +13,7 @@ def temp_llm_index_dir(tmp_path: Path, settings: SettingsWrapper) -> Path:
 
 
 class FakeEmbedding(BaseEmbedding):
-    def _aget_query_embedding(self, query: str) -> list[float]:
+    async def _aget_query_embedding(self, query: str) -> list[float]:
         return [0.1] * self.get_query_embedding_dim()
 
     def _get_query_embedding(self, query: str) -> list[float]:

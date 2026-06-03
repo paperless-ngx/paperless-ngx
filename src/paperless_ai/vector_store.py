@@ -75,7 +75,7 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
     _table: Any = PrivateAttr()
 
     def __init__(self, uri: str, table_name: str = DEFAULT_TABLE_NAME) -> None:
-        super().__init__()
+        super().__init__(stores_text=True, flat_metadata=False)
         self._uri = uri
         self._table_name = table_name
         self._conn = lancedb.connect(uri)
