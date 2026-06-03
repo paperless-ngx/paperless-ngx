@@ -57,6 +57,13 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
     ``document_id``), the embedding, and the serialised node (text + metadata)
     as JSON. ``stores_text`` lets llama-index run off this store alone, with no
     separate docstore or index store.
+
+    Implemented surface of ``BasePydanticVectorStore``
+    ---------------------------------------------------
+    Only the methods actively used by this codebase are implemented.
+    ``delete_nodes`` and the ``node_ids`` lookup path of ``get_nodes`` are
+    part of the llama-index interface contract and may be needed if a future
+    retriever or extension invokes them — add them then, with tests.
     """
 
     stores_text: bool = True
@@ -173,22 +180,6 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         if self._table is not None:
             self._table.delete(f"doc_id = '{_escape(ref_doc_id)}'")
 
-    def delete_nodes(
-        self,
-        node_ids: list[str] | None = None,
-        filters: MetadataFilters | None = None,
-        **delete_kwargs: Any,
-    ) -> None:
-        if self._table is None:
-            return
-        if node_ids:
-            ids = ",".join(f'"{_escape(n)}"' for n in node_ids)
-            self._table.delete(f"id IN ({ids})")
-        elif filters is not None:
-            where = _build_where(filters)
-            if where:
-                self._table.delete(where)
-
     def _rows_to_nodes(self, rows: list[dict[str, Any]]) -> list[BaseNode]:
         nodes: list[BaseNode] = []
         for row in rows:
@@ -205,12 +196,9 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
     ) -> list[BaseNode]:
         if self._table is None:
             return []
-        query = self._table.search()
         where = _build_where(filters)
-        if node_ids:
-            ids = ",".join(f'"{_escape(n)}"' for n in node_ids)
-            query = query.where(f"id IN ({ids})")
-        elif where:
+        query = self._table.search()
+        if where:
             query = query.where(where)
         return self._rows_to_nodes(query.to_list())
 
