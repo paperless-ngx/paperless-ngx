@@ -258,32 +258,52 @@ def get_list_from_env(
         return []
 
 
+@overload
+def get_choice_from_env(
+    env_key: str,
+    choices: set[str] | frozenset[str],
+) -> str | None: ...
+
+
+@overload
+def get_choice_from_env(
+    env_key: str,
+    choices: set[str] | frozenset[str],
+    default: None,
+) -> str | None: ...
+
+
+@overload
+def get_choice_from_env(
+    env_key: str,
+    choices: set[str] | frozenset[str],
+    default: str,
+) -> str: ...
+
+
 def get_choice_from_env(
     env_key: str,
     choices: set[str] | frozenset[str],
     default: str | None = None,
-) -> str:
+) -> str | None:
     """
     Gets and validates an environment variable against a set of allowed choices.
 
     Args:
         env_key: The environment variable key to validate
         choices: Set of valid choices for the environment variable
-        default: Optional default value if environment variable is not set
+        default: Default value if environment variable is not set; None means optional
 
     Returns:
-        The validated environment variable value
+        The validated environment variable value, or None if not set and no default
 
     Raises:
         ValueError: If the environment variable value is not in choices
-                             or if no default is provided and env var is missing
     """
     value = os.environ.get(env_key, default)
 
     if value is None:
-        raise ValueError(
-            f"Environment variable '{env_key}' is required but not set.",
-        )
+        return None
 
     if value not in choices:
         raise ValueError(

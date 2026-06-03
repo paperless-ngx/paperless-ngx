@@ -509,20 +509,17 @@ class TestGetEnvChoice:
 
         assert result == "staging"
 
-    def test_raises_error_when_env_not_set_and_no_default(
+    def test_returns_none_when_env_not_set_and_no_default(
         self,
         mocker: MockerFixture,
         valid_choices: set[str],
     ) -> None:
-        """Test that function raises ValueError when env var is missing and no default."""
+        """Test that function returns None when env var is missing and no default given."""
         mocker.patch.dict("os.environ", {}, clear=True)
 
-        with pytest.raises(ValueError) as exc_info:
-            get_choice_from_env("TEST_ENV", valid_choices)
+        result = get_choice_from_env("TEST_ENV", valid_choices)
 
-        assert "Environment variable 'TEST_ENV' is required but not set" in str(
-            exc_info.value,
-        )
+        assert result is None
 
     def test_raises_error_when_env_value_invalid(
         self,
