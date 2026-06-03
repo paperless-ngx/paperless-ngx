@@ -3039,7 +3039,7 @@ requires-dist = [
     { name = "azure-ai-documentintelligence", specifier = ">=1.0.2" },
     { name = "babel", specifier = ">=2.17" },
     { name = "bleach", specifier = "~=6.3.0" },
-    { name = "celery", extras = ["redis"], specifier = "~=5.6.2" },
+    { name = "celery", extras = ["redis"], specifier = "~=5.6.3" },
     { name = "channels", specifier = "~=4.2" },
     { name = "channels-redis", specifier = "~=4.2" },
     { name = "concurrent-log-handler", specifier = "~=0.9.25" },
