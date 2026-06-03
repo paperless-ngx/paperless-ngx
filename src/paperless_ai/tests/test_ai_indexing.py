@@ -911,15 +911,14 @@ class TestLlmIndexLocking:
 
 
 @pytest.mark.django_db
-class TestFaissMigration:
-    def test_migration_wipes_stale_faiss_files(
+class TestDimensionGuard:
+    def test_embedding_dim_mismatch_false_when_no_table(
         self,
         temp_llm_index_dir: Path,
+        mock_embed_model,
     ) -> None:
-        stale = temp_llm_index_dir / "default__vector_store.json"
-        stale.write_text("{}")
-        indexing.migrate_stale_faiss_index()
-        assert not stale.exists()
+        """No table yet — dim mismatch must return False (nothing to compare)."""
+        assert not indexing.embedding_dim_mismatch()
 
 
 @pytest.mark.django_db

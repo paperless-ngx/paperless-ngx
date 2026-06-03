@@ -1,6 +1,5 @@
 import json
 import logging
-import shutil
 from collections.abc import Iterable
 from datetime import timedelta
 from pathlib import Path
@@ -156,15 +155,6 @@ def vector_store_file_exists() -> bool:
     return get_vector_store().table_exists()
 
 
-def migrate_stale_faiss_index() -> None:
-    """Remove a pre-LanceDB FAISS index directory so it is rebuilt fresh."""
-    stale_marker = settings.LLM_INDEX_DIR / "default__vector_store.json"
-    if stale_marker.exists():
-        logger.info("Removing stale FAISS LLM index; it will be rebuilt.")
-        shutil.rmtree(settings.LLM_INDEX_DIR, ignore_errors=True)
-        settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
-
-
 def embedding_dim_mismatch() -> bool:
     """True when the stored table's vector dim differs from the current model."""
     store = get_vector_store()
@@ -232,7 +222,6 @@ def update_llm_index(
     """Rebuild or incrementally update the LLM index."""
     from llama_index.core.schema import MetadataMode
 
-    migrate_stale_faiss_index()
     if not rebuild and vector_store_file_exists() and embedding_dim_mismatch():
         logger.warning("Embedding dimension changed; forcing LLM index rebuild.")
         rebuild = True
