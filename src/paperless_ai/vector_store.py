@@ -60,7 +60,7 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
     """
 
     stores_text: bool = True
-    flat_metadata: bool = True
+    flat_metadata: bool = False
 
     _uri: str = PrivateAttr()
     _table_name: str = PrivateAttr()
