@@ -955,3 +955,21 @@ class TestLanceDbIndexing:
         rows = store.client.open_table(indexing.LLM_INDEX_TABLE).count_rows()
         assert rows < big
         assert rows >= 1
+
+
+@pytest.mark.django_db
+class TestQuerySimilarDocuments:
+    def test_query_similar_documents_respects_allowed_ids(
+        self,
+        temp_llm_index_dir,
+        mock_embed_model,
+    ) -> None:
+        a = DocumentFactory.create(content="alpha shared content here")
+        b = DocumentFactory.create(content="beta shared content here")
+        c = DocumentFactory.create(content="gamma shared content here")
+        for doc in (a, b, c):
+            indexing.llm_index_add_or_update_document(doc)
+
+        results = indexing.query_similar_documents(a, document_ids=[b.id])
+
+        assert all(doc.id == b.id for doc in results)
