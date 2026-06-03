@@ -16,10 +16,11 @@ from documents.tests.factories import DocumentFactory
 from documents.tests.factories import PaperlessTaskFactory
 from paperless.models import ApplicationConfiguration
 from paperless_ai import indexing
+from paperless_ai.tests.conftest import FakeEmbedding
 
 
 @pytest.fixture
-def real_document(db):
+def real_document(db: None) -> Document:
     return Document.objects.create(
         title="Test Document",
         content="This is some test content.",
@@ -28,7 +29,7 @@ def real_document(db):
 
 
 @pytest.mark.django_db
-def test_build_document_node(real_document) -> None:
+def test_build_document_node(real_document: Document) -> None:
     nodes = indexing.build_document_node(real_document)
     assert len(nodes) > 0
     assert nodes[0].metadata["document_id"] == str(real_document.id)
@@ -47,7 +48,9 @@ def test_build_document_node_sets_ref_doc_id(real_document: Document) -> None:
 
 
 @pytest.mark.django_db
-def test_build_document_node_excludes_metadata_from_embedding(real_document) -> None:
+def test_build_document_node_excludes_metadata_from_embedding(
+    real_document: Document,
+) -> None:
     """Metadata keys must not be prepended to the embedding text.
 
     build_llm_index_text already encodes all metadata in the body text, so
@@ -67,7 +70,7 @@ def test_build_document_node_excludes_metadata_from_embedding(real_document) -> 
 
 
 @pytest.mark.django_db
-def test_build_document_node_uses_rag_chunk_settings(real_document) -> None:
+def test_build_document_node_uses_rag_chunk_settings(real_document: Document) -> None:
     app_config, _ = ApplicationConfiguration.objects.get_or_create()
     app_config.llm_embedding_chunk_size = 512
     app_config.save()
@@ -98,9 +101,9 @@ def test_get_rag_prompt_helper_uses_context_setting() -> None:
 
 @pytest.mark.django_db
 def test_update_llm_index(
-    temp_llm_index_dir,
-    real_document,
-    mock_embed_model,
+    temp_llm_index_dir: Path,
+    real_document: Document,
+    mock_embed_model: FakeEmbedding,
 ) -> None:
     mock_config = MagicMock()
     mock_config.llm_embedding_chunk_size = 512
@@ -122,9 +125,9 @@ def test_update_llm_index(
 
 @pytest.mark.django_db
 def test_update_llm_index_removes_meta(
-    temp_llm_index_dir,
-    real_document,
-    mock_embed_model,
+    temp_llm_index_dir: Path,
+    real_document: Document,
+    mock_embed_model: FakeEmbedding,
 ) -> None:
     # Pre-create a meta.json — the new LanceDB-backed rebuild must delete it so
     # that stale FAISS-era metadata does not accumulate on disk.
@@ -145,9 +148,9 @@ def test_update_llm_index_removes_meta(
 
 @pytest.mark.django_db
 def test_update_llm_index_partial_update(
-    temp_llm_index_dir,
-    real_document,
-    mock_embed_model,
+    temp_llm_index_dir: Path,
+    real_document: Document,
+    mock_embed_model: FakeEmbedding,
 ) -> None:
     doc2 = Document.objects.create(
         title="Test Document 2",
@@ -192,9 +195,9 @@ def test_update_llm_index_partial_update(
 
 @pytest.mark.django_db
 def test_add_or_update_document_updates_existing_entry(
-    temp_llm_index_dir,
-    real_document,
-    mock_embed_model,
+    temp_llm_index_dir: Path,
+    real_document: Document,
+    mock_embed_model: FakeEmbedding,
 ) -> None:
     indexing.update_llm_index(rebuild=True)
     indexing.llm_index_add_or_update_document(real_document)
@@ -207,9 +210,9 @@ def test_add_or_update_document_updates_existing_entry(
 
 @pytest.mark.django_db
 def test_query_after_remove_does_not_raise_key_error(
-    temp_llm_index_dir,
-    real_document,
-    mock_embed_model,
+    temp_llm_index_dir: Path,
+    real_document: Document,
+    mock_embed_model: FakeEmbedding,
 ) -> None:
     indexing.update_llm_index(rebuild=True)
 
@@ -227,8 +230,8 @@ def test_query_after_remove_does_not_raise_key_error(
 
 @pytest.mark.django_db
 def test_update_llm_index_no_documents(
-    temp_llm_index_dir,
-    mock_embed_model,
+    temp_llm_index_dir: Path,
+    mock_embed_model: FakeEmbedding,
 ) -> None:
     with patch("documents.models.Document.objects.all") as mock_all:
         mock_queryset = MagicMock()
@@ -281,8 +284,8 @@ def test_queue_llm_index_update_if_needed_enqueues_when_idle_or_skips_recent() -
     LLM_BACKEND="ollama",
 )
 def test_query_similar_documents(
-    temp_llm_index_dir,
-    real_document,
+    temp_llm_index_dir: Path,
+    real_document: Document,
 ) -> None:
     with (
         patch("paperless_ai.indexing.load_or_build_index") as mock_load_or_build_index,
@@ -325,8 +328,8 @@ def test_query_similar_documents(
 
 @pytest.mark.django_db
 def test_query_similar_documents_triggers_update_when_index_missing(
-    temp_llm_index_dir,
-    real_document,
+    temp_llm_index_dir: Path,
+    real_document: Document,
 ) -> None:
     with (
         patch(
@@ -353,7 +356,7 @@ def test_query_similar_documents_triggers_update_when_index_missing(
 
 @pytest.mark.django_db
 def test_query_similar_documents_empty_allow_list_fails_closed(
-    real_document,
+    real_document: Document,
 ) -> None:
     with (
         patch(
@@ -385,7 +388,7 @@ class TestUpdateLlmIndexEmptyDocumentSet:
     def test_rebuild_clears_stale_index_when_no_documents_exist(
         self,
         temp_llm_index_dir: Path,
-        mock_embed_model: MagicMock,
+        mock_embed_model: FakeEmbedding,
     ) -> None:
         """After deleting all documents, rebuild=True must produce a table with zero rows.
 
@@ -493,37 +496,24 @@ class TestLlmIndexAddOrUpdateDocumentEmptyContent:
 
 @pytest.mark.django_db
 class TestLlmIndexLocking:
-    """Index mutation functions must acquire the file lock before touching the store.
+    """Index mutation functions must go through write_store(), which holds the lock.
 
-    Without locking, two concurrent Celery workers can each open the same
-    LanceDB store, make independent modifications, and overwrite each other.
+    Without locking, two concurrent Celery workers can open the same store,
+    make independent modifications, and trigger CommitConflictError.
     """
 
-    def test_add_or_update_document_acquires_lock(
+    def test_add_or_update_document_uses_write_store(
         self,
         temp_llm_index_dir: Path,
-        mock_embed_model: MagicMock,
+        mock_embed_model: FakeEmbedding,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
-        """llm_index_add_or_update_document must enter the file lock before upsert."""
-        call_order: list[str] = []
-
-        mock_lock_instance = MagicMock()
-        mock_lock_instance.__enter__ = MagicMock(
-            side_effect=lambda *_: call_order.append("lock_acquired"),
-        )
-        mock_lock_instance.__exit__ = MagicMock(return_value=False)
-
-        mock_file_lock_cls = mocker.patch(
-            "paperless_ai.indexing.FileLock",
-            return_value=mock_lock_instance,
-        )
-
         mock_store = MagicMock()
-        mock_get_store = mocker.patch(
-            "paperless_ai.indexing.get_vector_store",
-            side_effect=lambda *_a, **_kw: (
-                call_order.append("store_opened") or mock_store
+        mocker.patch(
+            "paperless_ai.indexing.write_store",
+            return_value=mocker.MagicMock(
+                __enter__=mocker.MagicMock(return_value=mock_store),
+                __exit__=mocker.MagicMock(return_value=False),
             ),
         )
         mock_node = MagicMock()
@@ -537,37 +527,19 @@ class TestLlmIndexLocking:
         doc.id = 1
         indexing.llm_index_add_or_update_document(doc)
 
-        mock_file_lock_cls.assert_called_once()
-        mock_lock_instance.__enter__.assert_called_once()
-        mock_get_store.assert_called()
-        assert call_order.index("lock_acquired") < call_order.index("store_opened"), (
-            "Lock must be acquired before the store is opened"
-        )
+        mock_store.upsert_document.assert_called_once()
 
-    def test_remove_document_acquires_lock(
+    def test_remove_document_uses_write_store(
         self,
         temp_llm_index_dir: Path,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
-        """llm_index_remove_document must enter the file lock before deleting from the store."""
-        call_order: list[str] = []
-
-        mock_lock_instance = MagicMock()
-        mock_lock_instance.__enter__ = MagicMock(
-            side_effect=lambda *_: call_order.append("lock_acquired"),
-        )
-        mock_lock_instance.__exit__ = MagicMock(return_value=False)
-
-        mock_file_lock_cls = mocker.patch(
-            "paperless_ai.indexing.FileLock",
-            return_value=mock_lock_instance,
-        )
-
         mock_store = MagicMock()
-        mock_get_store = mocker.patch(
-            "paperless_ai.indexing.get_vector_store",
-            side_effect=lambda *_a, **_kw: (
-                call_order.append("store_opened") or mock_store
+        mocker.patch(
+            "paperless_ai.indexing.write_store",
+            return_value=mocker.MagicMock(
+                __enter__=mocker.MagicMock(return_value=mock_store),
+                __exit__=mocker.MagicMock(return_value=False),
             ),
         )
 
@@ -575,31 +547,22 @@ class TestLlmIndexLocking:
         doc.id = 1
         indexing.llm_index_remove_document(doc)
 
-        mock_file_lock_cls.assert_called_once()
-        mock_lock_instance.__enter__.assert_called_once()
-        mock_get_store.assert_called()
-        assert call_order.index("lock_acquired") < call_order.index("store_opened"), (
-            "Lock must be acquired before the store is opened"
-        )
+        mock_store.delete.assert_called_once_with("1")
 
-    def test_update_llm_index_rebuild_acquires_lock(
+    def test_update_llm_index_rebuild_uses_write_store(
         self,
         temp_llm_index_dir: Path,
-        mock_embed_model: MagicMock,
+        mock_embed_model: FakeEmbedding,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
-        """update_llm_index must enter the file lock during the rebuild/persist cycle."""
-        mock_lock_instance = MagicMock()
-        mock_lock_instance.__enter__ = MagicMock(return_value=None)
-        mock_lock_instance.__exit__ = MagicMock(return_value=False)
-
-        mock_file_lock_cls = mocker.patch(
-            "paperless_ai.indexing.FileLock",
-            return_value=mock_lock_instance,
+        mock_store = MagicMock()
+        mocker.patch(
+            "paperless_ai.indexing.write_store",
+            return_value=mocker.MagicMock(
+                __enter__=mocker.MagicMock(return_value=mock_store),
+                __exit__=mocker.MagicMock(return_value=False),
+            ),
         )
-
-        # exists=True so the code reaches the lock; iterate over an empty
-        # queryset so the rebuild path runs without needing heavy fixture data.
         mock_qs = MagicMock()
         mock_qs.exists.return_value = True
         mock_qs.__iter__ = MagicMock(return_value=iter([]))
@@ -607,8 +570,7 @@ class TestLlmIndexLocking:
 
         indexing.update_llm_index(rebuild=True)
 
-        mock_file_lock_cls.assert_called_once()
-        mock_lock_instance.__enter__.assert_called_once()
+        mock_store.drop_table.assert_called_once()
 
 
 @pytest.mark.django_db
@@ -616,7 +578,7 @@ class TestDimensionGuard:
     def test_embedding_dim_mismatch_false_when_no_table(
         self,
         temp_llm_index_dir: Path,
-        mock_embed_model,
+        mock_embed_model: FakeEmbedding,
     ) -> None:
         """No table yet — dim mismatch must return False (nothing to compare)."""
         assert not indexing.embedding_dim_mismatch()
@@ -626,8 +588,8 @@ class TestDimensionGuard:
 class TestLanceDbIndexing:
     def test_get_vector_store_roundtrip(
         self,
-        temp_llm_index_dir,
-        mock_embed_model,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
     ) -> None:
         from paperless_ai.vector_store import PaperlessLanceVectorStore
 
@@ -636,8 +598,8 @@ class TestLanceDbIndexing:
 
     def test_add_then_remove_document(
         self,
-        temp_llm_index_dir,
-        mock_embed_model,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
         real_document: Document,
     ) -> None:
         indexing.llm_index_add_or_update_document(real_document)
@@ -650,8 +612,8 @@ class TestLanceDbIndexing:
 
     def test_update_shrinks_chunks_without_orphans(
         self,
-        temp_llm_index_dir,
-        mock_embed_model,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
         real_document: Document,
     ) -> None:
         real_document.content = "word " * 4000  # many chunks
@@ -673,8 +635,8 @@ class TestLanceDbIndexing:
 class TestQuerySimilarDocuments:
     def test_query_similar_documents_respects_allowed_ids(
         self,
-        temp_llm_index_dir,
-        mock_embed_model,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
     ) -> None:
         a = DocumentFactory.create(content="alpha shared content here")
         b = DocumentFactory.create(content="beta shared content here")
