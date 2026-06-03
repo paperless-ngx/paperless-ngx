@@ -9,7 +9,6 @@ from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
 from faker import Faker
-from llama_index.core.base.embeddings.base import BaseEmbedding
 
 from documents.models import Document
 from documents.models import PaperlessTask
@@ -28,35 +27,6 @@ def real_document(db):
         content="This is some test content.",
         added=timezone.now(),
     )
-
-
-@pytest.fixture
-def mock_embed_model():
-    fake = FakeEmbedding()
-    with (
-        patch("paperless_ai.indexing.get_embedding_model") as mock_index,
-        patch(
-            "paperless_ai.embedding.get_embedding_model",
-        ) as mock_embedding,
-    ):
-        mock_index.return_value = fake
-        mock_embedding.return_value = fake
-        yield mock_index
-
-
-class FakeEmbedding(BaseEmbedding):
-    # TODO: maybe a better way to do this?
-    def _aget_query_embedding(self, query: str) -> list[float]:
-        return [0.1] * self.get_query_embedding_dim()
-
-    def _get_query_embedding(self, query: str) -> list[float]:
-        return [0.1] * self.get_query_embedding_dim()
-
-    def _get_text_embedding(self, text: str) -> list[float]:
-        return [0.1] * self.get_query_embedding_dim()
-
-    def get_query_embedding_dim(self) -> int:
-        return 384  # Match your real FAISS config
 
 
 @pytest.mark.django_db
