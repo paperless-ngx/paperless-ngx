@@ -94,7 +94,7 @@ def _stream_chat_with_documents(query_str: str, documents: list[Document]):
 
     index = load_or_build_index()
 
-    doc_ids = [str(doc.pk) for doc in documents]
+    doc_ids = sorted(str(doc.pk) for doc in documents)
     filters = MetadataFilters(
         filters=[
             MetadataFilter(
