@@ -99,7 +99,7 @@ class CollatePlugin(NoCleanupPluginMixin, NoSetupPluginMixin, ConsumeTaskPlugin)
                             "two uploaded files don't belong to the same double-"
                             "sided scan. Please retry, starting with the odd "
                             "numbered pages again.",
-                        )
+                        ) from None
                     # Merged file has the same path, but without the
                     # double-sided subdir. Therefore, it is also in the
                     # consumption dir and will be picked up for processing

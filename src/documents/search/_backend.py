@@ -204,12 +204,12 @@ class WriteBatch:
                 try:
                     self._lock.acquire(timeout=self._lock_timeout)
                     break
-                except filelock.Timeout:
+                except filelock.Timeout as exc:
                     if attempt == _LOCK_RETRY_ATTEMPTS - 1:
                         raise SearchIndexLockError(
                             f"Could not acquire index lock after {_LOCK_RETRY_ATTEMPTS} "
                             f"attempts (timeout={self._lock_timeout}s each)",
-                        )
+                        ) from exc
                     sleep_s = random.uniform(
                         0,
                         min(_LOCK_BACKOFF_CAP, _LOCK_BACKOFF_BASE * (2**attempt)),
@@ -702,7 +702,11 @@ class TantivyBackend:
         result_ids = cast("list[int]", searcher.fast_field_values("id", result_addrs))
         addr_by_id: dict[int, tuple[float, tantivy.DocAddress]] = {
             doc_id: (score, addr)
-            for (score, addr), doc_id in zip(batch_results.hits, result_ids)
+            for (score, addr), doc_id in zip(
+                batch_results.hits,
+                result_ids,
+                strict=False,
+            )
         }
 
         snippet_generator = None

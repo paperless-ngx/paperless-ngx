@@ -353,9 +353,10 @@ class MailMocker(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             len(expected_call_args),
         )
 
-        for (mock_args, mock_kwargs), expected_signatures in zip(
+        for (_, mock_kwargs), expected_signatures in zip(
             self._queue_consumption_tasks_mock.call_args_list,
             expected_call_args,
+            strict=False,
         ):
             consume_tasks = mock_kwargs["consume_tasks"]
 
@@ -365,6 +366,7 @@ class MailMocker(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             for consume_task, expected_signature in zip(
                 consume_tasks,
                 expected_signatures,
+                strict=False,
             ):
                 input_doc = consume_task.kwargs["input_doc"]
                 overrides = consume_task.kwargs["overrides"]
@@ -387,7 +389,7 @@ class MailMocker(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
         Applies pending actions to mails by inspecting calls to the queue_consumption_tasks method.
         """
-        for args, kwargs in self._queue_consumption_tasks_mock.call_args_list:
+        for _, kwargs in self._queue_consumption_tasks_mock.call_args_list:
             message = kwargs["message"]
             rule = kwargs["rule"]
             apply_mail_action([], rule.pk, message.uid, message.subject, message.date)

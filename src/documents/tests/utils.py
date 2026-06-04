@@ -129,11 +129,12 @@ def util_call_with_backoff(
                 status_codes.append(cause_exec.response.status_code)
                 warnings.warn(
                     f"HTTP Exception for {cause_exec.request.url} - {cause_exec}",
+                    stacklevel=2,
                 )
             else:
-                warnings.warn(f"Unexpected error: {e}")
+                warnings.warn(f"Unexpected error: {e}", stacklevel=2)
         except Exception as e:  # pragma: no cover
-            warnings.warn(f"Unexpected error: {e}")
+            warnings.warn(f"Unexpected error: {e}", stacklevel=2)
 
         retry_count = retry_count + 1
 

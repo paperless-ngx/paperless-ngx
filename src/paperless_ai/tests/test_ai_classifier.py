@@ -156,7 +156,7 @@ def test_get_ai_document_classification_failure(mock_run_llm_query, mock_documen
     mock_run_llm_query.side_effect = Exception("LLM query failed")
 
     # assert raises an exception
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError, match="Unsupported LLM backend"):
         get_ai_document_classification(mock_document)
 
 

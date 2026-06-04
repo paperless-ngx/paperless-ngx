@@ -184,6 +184,7 @@ line-ending = "lf"
 [tool.ruff.lint]
 # https://docs.astral.sh/ruff/rules/
 extend-select = [
+  "B",   # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
   "COM", # https://docs.astral.sh/ruff/rules/#flake8-commas-com
   "DJ",  # https://docs.astral.sh/ruff/rules/#flake8-django-dj
   "EXE", # https://docs.astral.sh/ruff/rules/#flake8-executable-exe

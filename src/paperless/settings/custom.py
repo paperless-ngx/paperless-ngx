@@ -334,7 +334,7 @@ def parse_dateparser_languages(languages: str | None) -> list[str]:
     language_list = languages.split("+") if languages else []
     # There is an unfixed issue in zh-Hant and zh-Hans locales in the dateparser lib.
     # See: https://github.com/scrapinghub/dateparser/issues/875
-    for index, language in enumerate(language_list):
+    for _, language in enumerate(language_list):
         if language.startswith("zh-") and "zh" not in language_list:
             logger.warning(
                 f"Chinese locale detected: {language}. dateparser might fail to parse"

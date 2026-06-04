@@ -67,8 +67,7 @@ class DateParserPluginBase(ABC):
 
         Subclasses can override this to release resources.
         """
-        # Default implementation does nothing.
-        # Returning None implies exceptions are propagated.
+        return None
 
     def _parse_string(
         self,

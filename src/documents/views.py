@@ -288,7 +288,7 @@ def _get_more_like_id(query_params: dict[str, Any], user: User | None) -> int:
             pk=more_like_doc_id,
         )
     except (TypeError, ValueError, Document.DoesNotExist):
-        raise PermissionDenied(_("Invalid more_like_id"))
+        raise PermissionDenied(_("Invalid more_like_id")) from None
 
     if user and not has_perms_owner_aware(
         user,
@@ -1146,7 +1146,7 @@ class DocumentViewSet(
                 "root_document",
             ).get(pk=pk)
         except Document.DoesNotExist:
-            raise Http404
+            raise Http404 from None
 
         root_doc = get_root_document(doc)
         if request.user is not None and not has_perms_owner_aware(
@@ -1309,7 +1309,7 @@ class DocumentViewSet(
                 "root_document",
             ).get(id=pk)
         except Document.DoesNotExist:
-            raise Http404
+            raise Http404 from None
 
         root_doc = get_root_document(
             request_doc,
@@ -1558,7 +1558,6 @@ class DocumentViewSet(
                 "AI backend timed out while generating suggestions for document %s: %s",
                 doc.pk,
                 exc,
-                exc_info=True,
             )
             return Response(
                 {"ai": [_("AI backend request timed out.")]},
@@ -1635,7 +1634,7 @@ class DocumentViewSet(
                 disposition="inline",
             )
         except FileNotFoundError:
-            raise Http404
+            raise Http404 from None
 
     @action(methods=["get"], detail=True, filter_backends=[])
     @method_decorator(cache_control(no_cache=True))
@@ -1660,14 +1659,14 @@ class DocumentViewSet(
 
             return FileResponse(handle, content_type="image/webp")
         except FileNotFoundError:
-            raise Http404
+            raise Http404 from None
 
     @action(methods=["get"], detail=True)
     def download(self, request, pk=None):
         try:
             return self.file_response(pk, request, "attachment")
         except (FileNotFoundError, Document.DoesNotExist):
-            raise Http404
+            raise Http404 from None
 
     @action(
         methods=["get", "post", "delete"],
@@ -1692,7 +1691,7 @@ class DocumentViewSet(
             ):
                 return HttpResponseForbidden("Insufficient permissions to view notes")
         except Document.DoesNotExist:
-            raise Http404
+            raise Http404 from None
 
         serializer = self.get_serializer(doc)
 
@@ -1763,7 +1762,7 @@ class DocumentViewSet(
             try:
                 note_id_int = int(note_id)
             except ValueError:
-                raise ValidationError({"id": "A valid integer is required."})
+                raise ValidationError({"id": "A valid integer is required."}) from None
             note = get_object_or_404(Note, id=note_id_int, document=doc)
             if settings.AUDIT_LOG_ENABLED:
                 LogEntry.objects.log_create(
@@ -1807,7 +1806,7 @@ class DocumentViewSet(
                     "Insufficient permissions to add share link",
                 )
         except Document.DoesNotExist:
-            raise Http404
+            raise Http404 from None
 
         if request.method == "GET":
             now = timezone.now()
@@ -1835,7 +1834,7 @@ class DocumentViewSet(
                     "Insufficient permissions",
                 )
         except Document.DoesNotExist:  # pragma: no cover
-            raise Http404
+            raise Http404 from None
 
         # documents
         entries = [
@@ -1988,7 +1987,7 @@ class DocumentViewSet(
             ):
                 return HttpResponseForbidden("Insufficient permissions")
         except Document.DoesNotExist:
-            raise Http404
+            raise Http404 from None
 
         try:
             doc_name, doc_data = serializer.validated_data.get("document")
@@ -2039,7 +2038,7 @@ class DocumentViewSet(
                 "root_document",
             ).get(pk=pk)
         except Document.DoesNotExist:
-            raise Http404
+            raise Http404 from None
         return get_root_document(root_doc)
 
     def _get_version_doc_for_root(self, root_doc: Document, version_id) -> Document:
@@ -2048,7 +2047,7 @@ class DocumentViewSet(
                 pk=version_id,
             )
         except Document.DoesNotExist:
-            raise Http404
+            raise Http404 from None
 
         if (
             version_doc.id != root_doc.id
@@ -2622,7 +2621,7 @@ class LogViewSet(ViewSet):
             try:
                 limit = int(limit_param)
             except (TypeError, ValueError):
-                raise ValidationError({"limit": "Must be a positive integer"})
+                raise ValidationError({"limit": "Must be a positive integer"}) from None
             if limit < 1:
                 raise ValidationError({"limit": "Must be a positive integer"})
         else:
