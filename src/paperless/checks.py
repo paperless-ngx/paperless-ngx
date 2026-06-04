@@ -84,10 +84,11 @@ def binaries_check(app_configs: Any, **kwargs: Any) -> list[Error]:
 
     binaries = (settings.CONVERT_BINARY, "tesseract", "gs")
 
-    check_messages = []
-    for binary in binaries:
-        if shutil.which(binary) is None:
-            check_messages.append(Warning(error.format(binary), hint))
+    check_messages = [
+        Warning(error.format(binary), hint)
+        for binary in binaries
+        if shutil.which(binary) is None
+    ]
 
     return check_messages
 
@@ -383,14 +384,14 @@ def check_default_language_available(app_configs: Any, **kwargs: Any) -> list[Er
 
         specified_langs = [x.strip() for x in settings.OCR_LANGUAGE.split("+")]
 
-        for lang in specified_langs:
-            if lang not in installed_langs:
-                errs.append(
-                    Error(
-                        f"The selected ocr language {lang} is "
-                        f"not installed. Paperless cannot OCR your documents "
-                        f"without it. Please fix PAPERLESS_OCR_LANGUAGE.",
-                    ),
-                )
+        errs.extend(
+            Error(
+                f"The selected ocr language {lang} is "
+                f"not installed. Paperless cannot OCR your documents "
+                f"without it. Please fix PAPERLESS_OCR_LANGUAGE.",
+            )
+            for lang in specified_langs
+            if lang not in installed_langs
+        )
 
     return errs

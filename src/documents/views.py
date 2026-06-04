@@ -1799,28 +1799,28 @@ class DocumentViewSet(
         ]
 
         # custom fields
-        for entry in LogEntry.objects.get_for_objects(
-            doc.custom_fields.all(),
-        ).select_related("actor"):
-            entries.append(
-                {
-                    "id": entry.id,
-                    "timestamp": entry.timestamp,
-                    "action": entry.get_action_display(),
-                    "changes": {
-                        "custom_fields": {
-                            "type": "custom_field",
-                            "field": str(entry.object_repr).split(":")[0].strip(),
-                            "value": str(entry.object_repr).split(":")[1].strip(),
-                        },
+        entries.extend(
+            {
+                "id": entry.id,
+                "timestamp": entry.timestamp,
+                "action": entry.get_action_display(),
+                "changes": {
+                    "custom_fields": {
+                        "type": "custom_field",
+                        "field": str(entry.object_repr).split(":")[0].strip(),
+                        "value": str(entry.object_repr).split(":")[1].strip(),
                     },
-                    "actor": (
-                        {"id": entry.actor.id, "username": entry.actor.username}
-                        if entry.actor
-                        else None
-                    ),
                 },
-            )
+                "actor": (
+                    {"id": entry.actor.id, "username": entry.actor.username}
+                    if entry.actor
+                    else None
+                ),
+            }
+            for entry in LogEntry.objects.get_for_objects(
+                doc.custom_fields.all(),
+            ).select_related("actor")
+        )
 
         return Response(sorted(entries, key=lambda x: x["timestamp"], reverse=True))
 

@@ -649,11 +649,10 @@ class MailDocumentParser:
         if data["bcc"]:
             data["bcc_label"] = "BCC"
 
-        att = []
-        for a in mail.attachments:
-            att.append(
-                f"{a.filename} ({naturalsize(a.size, binary=True, format='%.2f')})",
-            )
+        att = [
+            f"{a.filename} ({naturalsize(a.size, binary=True, format='%.2f')})"
+            for a in mail.attachments
+        ]
         data["attachments"] = clean_html(", ".join(att))
         if data["attachments"]:
             data["attachments_label"] = "Attachments"
