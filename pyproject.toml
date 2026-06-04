@@ -188,6 +188,7 @@ extend-select = [
   "COM",  # https://docs.astral.sh/ruff/rules/#flake8-commas-com
   "DTZ",  # https://docs.astral.sh/ruff/rules/#flake8-datetimez-dtz
   "PERF", # https://docs.astral.sh/ruff/rules/#perflint-perf
+  "S324", # https://docs.astral.sh/ruff/rules/hashlib-insecure-hash-functions/
   "DJ",   # https://docs.astral.sh/ruff/rules/#flake8-django-dj
   "EXE",  # https://docs.astral.sh/ruff/rules/#flake8-executable-exe
   "FBT",  # https://docs.astral.sh/ruff/rules/#flake8-boolean-trap-fbt
