@@ -133,11 +133,14 @@ def _build_suggestion_table(
         else:
             doc_cell = Text(f"{doc} [{doc.pk}]")
 
-        tag_parts: list[str] = []
-        for tag in sorted(suggestion.tags_to_add, key=lambda t: t.name):
-            tag_parts.append(f"[green]+{tag.name}[/green]")
-        for tag in sorted(suggestion.tags_to_remove, key=lambda t: t.name):
-            tag_parts.append(f"[red]-{tag.name}[/red]")
+        tag_parts: list[str] = [
+            f"[green]+{tag.name}[/green]"
+            for tag in sorted(suggestion.tags_to_add, key=lambda t: t.name)
+        ]
+        tag_parts.extend(
+            f"[red]-{tag.name}[/red]"
+            for tag in sorted(suggestion.tags_to_remove, key=lambda t: t.name)
+        )
         tag_cell = Text.from_markup(", ".join(tag_parts)) if tag_parts else Text("-")
 
         table.add_row(

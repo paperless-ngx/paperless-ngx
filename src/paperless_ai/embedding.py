@@ -129,8 +129,10 @@ def build_llm_index_text(doc: Document) -> str:
         f"Notes: {','.join([str(c.note) for c in Note.objects.filter(document=doc)])}",
     ]
 
-    for instance in doc.custom_fields.all():
-        lines.append(f"Custom Field - {instance.field.name}: {instance}")
+    lines.extend(
+        f"Custom Field - {instance.field.name}: {instance}"
+        for instance in doc.custom_fields.all()
+    )
 
     lines.append("\nContent:\n")
     lines.append(doc.content or "")
