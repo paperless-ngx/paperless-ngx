@@ -411,7 +411,7 @@ def _path_matches_checksum(path: Path, checksum: str | None) -> bool:
         return False
 
     with path.open("rb") as f:
-        return hashlib.md5(f.read()).hexdigest() == checksum
+        return hashlib.md5(f.read(), usedforsecurity=False).hexdigest() == checksum
 
 
 def _filename_template_uses_custom_fields(doc: Document) -> bool:
