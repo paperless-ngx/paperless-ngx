@@ -350,7 +350,7 @@ def handle_validation_prefix(func: Callable):
         try:
             return func(*args, **kwargs)
         except serializers.ValidationError as e:
-            raise serializers.ValidationError({validation_prefix: e.detail})
+            raise serializers.ValidationError({validation_prefix: e.detail}) from e
 
     # Update the signature to include the validation_prefix argument
     old_sig = inspect.signature(func)
@@ -461,7 +461,7 @@ class CustomFieldQueryParser:
         except json.JSONDecodeError:
             raise serializers.ValidationError(
                 {self._validation_prefix: [_("Value must be valid JSON.")]},
-            )
+            ) from None
         return (
             self._parse_expr(expr, validation_prefix=self._validation_prefix),
             self._annotations,
@@ -589,7 +589,7 @@ class CustomFieldQueryParser:
         except CustomField.DoesNotExist:
             raise serializers.ValidationError(
                 [_("{name!r} is not a valid custom field.").format(name=id_or_name)],
-            )
+            ) from None
         self._custom_fields[custom_field.id] = custom_field
         self._custom_fields[custom_field.name] = custom_field
         return custom_field
@@ -988,7 +988,7 @@ class DocumentsOrderingFilter(OrderingFilter):
             except CustomField.DoesNotExist:
                 raise serializers.ValidationError(
                     {self.prefix + str(custom_field_id): [_("Custom field not found")]},
-                )
+                ) from None
 
             annotation = None
             match field.data_type:

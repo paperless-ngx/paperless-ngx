@@ -163,7 +163,7 @@ class MatchingModelSerializer(serializers.ModelSerializer[Any]):
                 logger.debug(f"Invalid regular expression: {e!s}")
                 raise serializers.ValidationError(
                     "Invalid regular expression, see log for details.",
-                )
+                ) from None
         return match
 
 
@@ -867,7 +867,9 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer[CustomFieldInsta
                 try:
                     value_int = int(data["value"])
                 except (TypeError, ValueError):
-                    raise serializers.ValidationError("Enter a valid integer.")
+                    raise serializers.ValidationError(
+                        "Enter a valid integer.",
+                    ) from None
                 # Keep values within the PostgreSQL integer range
                 MinValueValidator(-2147483648)(value_int)
                 MaxValueValidator(2147483647)(value_int)
@@ -899,7 +901,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer[CustomFieldInsta
                 except Exception:
                     raise serializers.ValidationError(
                         f"Value must be an id of an element in {select_options}",
-                    )
+                    ) from None
             elif field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
                 if not (isinstance(data["value"], list) or data["value"] is None):
                     raise serializers.ValidationError(
@@ -1090,7 +1092,7 @@ class DocumentSerializer(
     def to_representation(self, instance):
         doc = super().to_representation(instance)
         if "content" in self.fields and hasattr(instance, "effective_content"):
-            doc["content"] = getattr(instance, "effective_content") or ""
+            doc["content"] = instance.effective_content or ""
         if self.truncate_content and "content" in self.fields:
             doc["content"] = doc.get("content")[0:550]
         return doc
@@ -1452,7 +1454,7 @@ class SavedViewSerializer(OwnedObjectSerializer):
                         )
                     )
                 except serializers.ValidationError as exc:
-                    raise serializers.ValidationError({field_name: exc.detail})
+                    raise serializers.ValidationError({field_name: exc.detail}) from exc
                 del normalized_data[field_name]
 
         ret = super().to_internal_value(normalized_data)
@@ -1756,7 +1758,7 @@ class BulkEditSerializer(
                 logger.exception(f"Error validating custom fields: {e}")
                 raise serializers.ValidationError(
                     f"{name} must be a list of integers or a dict of id:value pairs, see the log for details",
-                )
+                ) from None
         elif not isinstance(custom_fields, list) or not all(
             isinstance(i, int) for i in ids
         ):
@@ -1824,7 +1826,7 @@ class BulkEditSerializer(
             try:
                 Tag.objects.get(id=tag_id)
             except Tag.DoesNotExist:
-                raise serializers.ValidationError("Tag does not exist")
+                raise serializers.ValidationError("Tag does not exist") from None
         else:
             raise serializers.ValidationError("tag not specified")
 
@@ -1837,7 +1839,9 @@ class BulkEditSerializer(
             try:
                 DocumentType.objects.get(id=document_type_id)
             except DocumentType.DoesNotExist:
-                raise serializers.ValidationError("Document type does not exist")
+                raise serializers.ValidationError(
+                    "Document type does not exist",
+                ) from None
         else:
             raise serializers.ValidationError("document_type not specified")
 
@@ -1849,7 +1853,9 @@ class BulkEditSerializer(
             try:
                 Correspondent.objects.get(id=correspondent_id)
             except Correspondent.DoesNotExist:
-                raise serializers.ValidationError("Correspondent does not exist")
+                raise serializers.ValidationError(
+                    "Correspondent does not exist",
+                ) from None
         else:
             raise serializers.ValidationError("correspondent not specified")
 
@@ -1863,7 +1869,7 @@ class BulkEditSerializer(
             except StoragePath.DoesNotExist:
                 raise serializers.ValidationError(
                     "Storage path does not exist",
-                )
+                ) from None
         else:
             raise serializers.ValidationError("storage path not specified")
 
@@ -1918,7 +1924,7 @@ class BulkEditSerializer(
             ):
                 raise serializers.ValidationError("invalid rotation degrees")
         except ValueError:
-            raise serializers.ValidationError("invalid rotation degrees")
+            raise serializers.ValidationError("invalid rotation degrees") from None
 
     def _validate_source_mode(self, parameters) -> None:
         source_mode = parameters.get(
@@ -1948,7 +1954,7 @@ class BulkEditSerializer(
                     pages.append([int(doc)])
             parameters["pages"] = pages
         except ValueError:
-            raise serializers.ValidationError("invalid pages specified")
+            raise serializers.ValidationError("invalid pages specified") from None
 
         if "delete_originals" in parameters:
             if not isinstance(parameters["delete_originals"], bool):
@@ -2218,14 +2224,14 @@ class PostDocumentSerializer(serializers.Serializer[dict[str, Any]]):
                     raise serializers.ValidationError(
                         _("Custom field id must be an integer: %(id)s")
                         % {"id": field_id},
-                    )
+                    ) from None
                 try:
                     field = CustomField.objects.get(id=field_id_int)
                 except CustomField.DoesNotExist:
                     raise serializers.ValidationError(
                         _("Custom field with id %(id)s does not exist")
                         % {"id": field_id_int},
-                    )
+                    ) from None
                 custom_field_serializer.validate(
                     {
                         "field": field,
@@ -2242,7 +2248,7 @@ class PostDocumentSerializer(serializers.Serializer[dict[str, Any]]):
                     _(
                         "Custom fields must be a list of integers or an object mapping ids to values.",
                     ),
-                )
+                ) from None
             if CustomField.objects.filter(id__in=ids).count() != len(set(ids)):
                 raise serializers.ValidationError(
                     _("Some custom fields don't exist or were specified twice."),
@@ -2353,7 +2359,9 @@ class EmailSerializer(DocumentListSerializer):
             for address in address_list:
                 email_validator(address)
         except ValidationError:
-            raise serializers.ValidationError(f"Invalid email address: {address}")
+            raise serializers.ValidationError(
+                f"Invalid email address: {address}",
+            ) from None
 
         return ",".join(address_list)
 
@@ -2777,7 +2785,7 @@ class ShareLinkBundleSerializer(OwnedObjectSerializer):
         return share_link_bundle
 
     def get_document_count(self, obj: ShareLinkBundle) -> int:
-        return getattr(obj, "document_total") or obj.documents.count()
+        return obj.document_total or obj.documents.count()
 
 
 class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
@@ -3125,7 +3133,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer[WorkflowAction]):
                 except (ValueError, KeyError) as e:
                     raise serializers.ValidationError(
                         {"assign_title": f'Invalid f-string detected: "{e.args[0]}"'},
-                    )
+                    ) from None
 
         if (
             "type" in attrs

@@ -193,7 +193,7 @@ def reject_dangerous_svg(file: UploadedFile) -> None:
         tree = etree.parse(file, parser)
         root = tree.getroot()
     except etree.XMLSyntaxError:
-        raise ValidationError("Invalid SVG file.")
+        raise ValidationError("Invalid SVG file.") from None
 
     for element in root.iter():
         tag: str = etree.QName(element.tag).localname.lower()

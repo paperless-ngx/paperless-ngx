@@ -226,7 +226,7 @@ def test_get_or_create_storage_context_raises_exception(
     temp_llm_index_dir,
     mock_embed_model,
 ) -> None:
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         indexing.get_or_create_storage_context(rebuild=False)
 
 
@@ -273,7 +273,7 @@ def test_load_or_build_index_raises_exception_when_no_nodes(
             return_value=MagicMock(),
         ),
     ):
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: B017
             indexing.load_or_build_index()
 
 

@@ -480,7 +480,7 @@ class Command(CryptMixin, PaperlessCommand):
             }
 
             # 3. Export files from each document
-            for index, document_dict in enumerate(
+            for _, document_dict in enumerate(
                 self.track(
                     document_manifest,
                     description="Exporting documents...",

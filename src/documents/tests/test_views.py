@@ -243,7 +243,7 @@ class TestViews(DirectoriesMixin, TestCase):
                     "change": {"users": [], "groups": []},
                 }
             else:
-                assert False, f"Unexpected tag found: {tag['name']}"
+                raise AssertionError(f"Unexpected tag found: {tag['name']}")
 
     def test_list_no_n_plus_1_queries(self) -> None:
         """

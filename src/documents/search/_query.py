@@ -270,7 +270,7 @@ def _rewrite_compact_date(query: str) -> str:
     except TimeoutError:  # pragma: no cover
         raise ValueError(
             "Query too complex to process (compact date rewrite timed out)",
-        )
+        ) from None
 
 
 def _rewrite_relative_range(query: str) -> str:
@@ -303,7 +303,7 @@ def _rewrite_relative_range(query: str) -> str:
     except TimeoutError:  # pragma: no cover
         raise ValueError(
             "Query too complex to process (relative range rewrite timed out)",
-        )
+        ) from None
 
 
 def _rewrite_whoosh_relative_range(query: str) -> str:
@@ -334,7 +334,7 @@ def _rewrite_whoosh_relative_range(query: str) -> str:
     except TimeoutError:  # pragma: no cover
         raise ValueError(
             "Query too complex to process (Whoosh relative range rewrite timed out)",
-        )
+        ) from None
 
 
 def _rewrite_8digit_date(query: str, tz: tzinfo) -> str:
@@ -376,7 +376,7 @@ def _rewrite_8digit_date(query: str, tz: tzinfo) -> str:
     except TimeoutError:  # pragma: no cover
         raise ValueError(
             "Query too complex to process (8-digit date rewrite timed out)",
-        )
+        ) from None
 
 
 def _rewrite_year_range(query: str) -> str:
@@ -401,7 +401,9 @@ def _rewrite_year_range(query: str) -> str:
     try:
         return _YEAR_RANGE_RE.sub(_sub, query, timeout=_REGEX_TIMEOUT)
     except TimeoutError:  # pragma: no cover
-        raise ValueError("Query too complex to process (year range rewrite timed out)")
+        raise ValueError(
+            "Query too complex to process (year range rewrite timed out)",
+        ) from None
 
 
 def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
@@ -443,7 +445,7 @@ def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
     except TimeoutError:  # pragma: no cover
         raise ValueError(
             "Query too complex to process (date keyword rewrite timed out)",
-        )
+        ) from None
 
 
 def normalize_query(query: str) -> str:
@@ -483,7 +485,9 @@ def normalize_query(query: str) -> str:
         query = _SPACED_OPERATOR_RE.sub(" ", query, timeout=_REGEX_TIMEOUT).strip()
         return query
     except TimeoutError:  # pragma: no cover
-        raise ValueError("Query too complex to process (normalization timed out)")
+        raise ValueError(
+            "Query too complex to process (normalization timed out)",
+        ) from None
 
 
 def build_permission_filter(

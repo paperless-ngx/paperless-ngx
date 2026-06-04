@@ -782,8 +782,8 @@ class TestClassifier(DirectoriesMixin, TestCase):
             load_classifier(raise_exception=True)
 
         Path(settings.MODEL_FILE).touch()
-        mock_load.side_effect = Exception()
-        with self.assertRaises(Exception):
+        mock_load.side_effect = RuntimeError()
+        with self.assertRaises(RuntimeError):
             load_classifier(raise_exception=True)
 
 

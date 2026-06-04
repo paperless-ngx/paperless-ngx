@@ -369,7 +369,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         If the queryset already annotated ``effective_content``, that value is used.
         """
         if hasattr(self, "effective_content"):
-            return getattr(self, "effective_content")
+            return self.effective_content
 
         if self.root_document_id is not None or self.pk is None:
             return self.content
@@ -1204,8 +1204,8 @@ class CustomFieldInstance(SoftDeleteModel):
     def get_value_field_name(cls, data_type: CustomField.FieldDataType):
         try:
             return cls.TYPE_TO_DATA_STORE_NAME_MAP[data_type]
-        except KeyError:  # pragma: no cover
-            raise NotImplementedError(data_type)
+        except KeyError as exc:  # pragma: no cover
+            raise NotImplementedError(data_type) from exc
 
     @property
     def value(self):

@@ -2760,7 +2760,14 @@ class TestWorkflows(
         doc = Document.objects.create(
             title="test",
         )
-        self.assertRaises(Exception, document_matches_workflow, doc, w, 99)
+        self.assertRaisesRegex(
+            Exception,
+            "not yet supported",
+            document_matches_workflow,
+            doc,
+            w,
+            99,
+        )
 
     def test_removal_action_document_updated_workflow(self) -> None:
         """
