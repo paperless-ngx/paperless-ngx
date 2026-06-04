@@ -26,7 +26,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Run zizmor
-        uses: zizmorcore/zizmor-action@b1d7e1fb5de872772f31590499237e7cce841e8e # v0.5.3
+        uses: zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d # v0.5.6
   semgrep:
     name: Semgrep CE
     runs-on: ubuntu-24.04
@@ -44,7 +44,7 @@ jobs:
       - name: Run Semgrep
         run: semgrep scan --config auto --sarif-output results.sarif
       - name: Upload results to GitHub code scanning
-        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2
+        uses: github/codeql-action/upload-sarif@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
         if: always()
         with:
           sarif_file: results.sarif
