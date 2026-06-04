@@ -265,7 +265,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             created=date(2023, 1, 1),
         )
 
-        created_datetime = datetime.datetime(2023, 2, 1, 12, 0, 0)
+        created_datetime = datetime.datetime(2023, 2, 1, 12, 0, 0, tzinfo=datetime.UTC)
         response = self.client.patch(
             f"/api/documents/{doc.pk}/",
             {"created": created_datetime},

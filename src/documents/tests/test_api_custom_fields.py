@@ -1,5 +1,5 @@
+import datetime
 import json
-from datetime import date
 from unittest import mock
 from unittest.mock import ANY
 
@@ -456,7 +456,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             },
         )
 
-        date_value = date.today()
+        date_value = datetime.datetime.now(tz=datetime.UTC).date()
 
         resp = self.client.patch(
             f"/api/documents/{doc.id}/",
@@ -618,7 +618,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             data_type=CustomField.FieldDataType.DATE,
         )
 
-        date_value = date.today()
+        date_value = datetime.datetime.now(tz=datetime.UTC).date()
 
         resp = self.client.patch(
             f"/api/documents/{doc.id}/",

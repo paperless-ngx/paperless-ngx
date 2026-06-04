@@ -4,7 +4,6 @@ import logging
 import ssl
 import tempfile
 import traceback
-from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
 from pathlib import Path
@@ -385,7 +384,7 @@ def make_criterias(rule: MailRule, *, supports_gmail_labels: bool):
     Returns criteria to be applied to MailBox.fetch for the given rule.
     """
 
-    maximum_age = date.today() - timedelta(days=rule.maximum_age)
+    maximum_age = timezone.now().date() - timedelta(days=rule.maximum_age)
     criterias = {}
     if rule.maximum_age > 0:
         criterias["date_gte"] = maximum_age
