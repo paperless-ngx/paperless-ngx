@@ -663,8 +663,8 @@ class MailAccountHandler(LoggingMixin):
                     self.log.info(f"Located folder: {folder_info.name}")
             except Exception as e:
                 self.log.error(
-                    "Exception during folder listing, unable to provide list folders: "
-                    + str(e),
+                    "Exception during folder listing, unable to provide list folders: %s",
+                    e,
                 )
 
             raise MailError(
