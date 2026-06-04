@@ -59,7 +59,7 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def create_staging_file(self, src="double-sided-odd.pdf", datetime=None) -> None:
         shutil.copy(self.SAMPLE_DIR / src, self.staging_file)
         if datetime is None:
-            datetime = dt.datetime.now()
+            datetime = dt.datetime.now(tz=dt.UTC)
         os.utime(str(self.staging_file), (datetime.timestamp(),) * 2)
 
     def test_odd_numbered_moved_to_staging(self) -> None:
@@ -79,8 +79,8 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertIsFile(self.staging_file)
         self.assertAlmostEqual(
-            dt.datetime.fromtimestamp(self.staging_file.stat().st_mtime),
-            dt.datetime.now(),
+            dt.datetime.fromtimestamp(self.staging_file.stat().st_mtime, tz=dt.UTC),
+            dt.datetime.now(tz=dt.UTC),
             delta=dt.timedelta(seconds=5),
         )
         self.assertIn("Received odd numbered pages", msg["reason"])
@@ -124,7 +124,7 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         """
 
         self.create_staging_file(
-            datetime=dt.datetime.now()
+            datetime=dt.datetime.now(tz=dt.UTC)
             - dt.timedelta(minutes=TIMEOUT_MINUTES, seconds=1),
         )
         msg = self.consume_file("double-sided-odd.pdf")

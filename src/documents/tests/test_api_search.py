@@ -700,7 +700,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             pk=3,
             checksum="C",
             # specific time zone aware date
-            added=timezone.make_aware(datetime.datetime(2023, 12, 1)),
+            added=datetime.datetime(2023, 12, 1, tzinfo=datetime.UTC),
         )
         # refresh doc instance to ensure we operate on date objects that Django uses
         # Django converts dates to UTC
@@ -1022,25 +1022,25 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             title="invoice",
             content="the thing i bought at a shop and paid with bank account",
             created=datetime.date(2018, 1, 1),
-            added=timezone.make_aware(datetime.datetime(2018, 1, 1)),
+            added=datetime.datetime(2018, 1, 1, tzinfo=datetime.UTC),
         )
         d2 = DocumentFactory(
             title="bank statement 1",
             content="things i paid for in august",
             created=datetime.date(2019, 3, 4),
-            added=timezone.make_aware(datetime.datetime(2019, 3, 4)),
+            added=datetime.datetime(2019, 3, 4, tzinfo=datetime.UTC),
         )
         d3 = DocumentFactory(
             title="bank statement 3",
             content="things i paid for in september",
             created=datetime.date(2020, 7, 9),
-            added=timezone.make_aware(datetime.datetime(2020, 7, 9)),
+            added=datetime.datetime(2020, 7, 9, tzinfo=datetime.UTC),
         )
         d4 = DocumentFactory(
             title="Quarterly Report",
             content="quarterly revenue profit margin earnings growth",
             created=datetime.date(2021, 11, 30),
-            added=timezone.make_aware(datetime.datetime(2021, 11, 30)),
+            added=datetime.datetime(2021, 11, 30, tzinfo=datetime.UTC),
         )
         backend = get_backend()
         backend.add_or_update(d1)
@@ -1159,7 +1159,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         d4.tags.add(t2)
         d5 = Document.objects.create(
             checksum="5",
-            added=timezone.make_aware(datetime.datetime(2020, 7, 13)),
+            added=datetime.datetime(2020, 7, 13, tzinfo=datetime.UTC),
             content="test",
             original_filename="doc5.pdf",
         )
@@ -1269,14 +1269,18 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             d4.id,
             search_query(
                 "&created__date__lt="
-                + datetime.datetime(2020, 9, 2).strftime("%Y-%m-%d"),
+                + datetime.datetime(2020, 9, 2, tzinfo=datetime.UTC).strftime(
+                    "%Y-%m-%d",
+                ),
             ),
         )
         self.assertNotIn(
             d4.id,
             search_query(
                 "&created__date__gt="
-                + datetime.datetime(2020, 9, 2).strftime("%Y-%m-%d"),
+                + datetime.datetime(2020, 9, 2, tzinfo=datetime.UTC).strftime(
+                    "%Y-%m-%d",
+                ),
             ),
         )
 
@@ -1284,14 +1288,18 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             d4.id,
             search_query(
                 "&created__date__lt="
-                + datetime.datetime(2020, 1, 2).strftime("%Y-%m-%d"),
+                + datetime.datetime(2020, 1, 2, tzinfo=datetime.UTC).strftime(
+                    "%Y-%m-%d",
+                ),
             ),
         )
         self.assertIn(
             d4.id,
             search_query(
                 "&created__date__gt="
-                + datetime.datetime(2020, 1, 2).strftime("%Y-%m-%d"),
+                + datetime.datetime(2020, 1, 2, tzinfo=datetime.UTC).strftime(
+                    "%Y-%m-%d",
+                ),
             ),
         )
 
@@ -1299,14 +1307,18 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             d5.id,
             search_query(
                 "&added__date__lt="
-                + datetime.datetime(2020, 9, 2).strftime("%Y-%m-%d"),
+                + datetime.datetime(2020, 9, 2, tzinfo=datetime.UTC).strftime(
+                    "%Y-%m-%d",
+                ),
             ),
         )
         self.assertNotIn(
             d5.id,
             search_query(
                 "&added__date__gt="
-                + datetime.datetime(2020, 9, 2).strftime("%Y-%m-%d"),
+                + datetime.datetime(2020, 9, 2, tzinfo=datetime.UTC).strftime(
+                    "%Y-%m-%d",
+                ),
             ),
         )
 
@@ -1314,7 +1326,9 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             d5.id,
             search_query(
                 "&added__date__lt="
-                + datetime.datetime(2020, 1, 2).strftime("%Y-%m-%d"),
+                + datetime.datetime(2020, 1, 2, tzinfo=datetime.UTC).strftime(
+                    "%Y-%m-%d",
+                ),
             ),
         )
 
@@ -1322,7 +1336,9 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             d5.id,
             search_query(
                 "&added__date__gt="
-                + datetime.datetime(2020, 1, 2).strftime("%Y-%m-%d"),
+                + datetime.datetime(2020, 1, 2, tzinfo=datetime.UTC).strftime(
+                    "%Y-%m-%d",
+                ),
             ),
         )
 

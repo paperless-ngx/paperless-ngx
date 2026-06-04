@@ -7,11 +7,11 @@ import tempfile
 import zipfile
 from collections import defaultdict
 from collections import deque
+from datetime import UTC
 from datetime import datetime
 from datetime import timedelta
 from http import HTTPStatus
 from pathlib import Path
-from time import mktime
 from time import sleep
 from typing import TYPE_CHECKING
 from typing import Any
@@ -61,7 +61,6 @@ from django.http import StreamingHttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.utils.timezone import make_aware
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -1993,7 +1992,7 @@ class DocumentViewSet(
             doc_name, doc_data = serializer.validated_data.get("document")
             version_label = serializer.validated_data.get("version_label")
 
-            t = int(mktime(datetime.now().timetuple()))
+            t = int(timezone.now().timestamp())
 
             settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -3218,7 +3217,7 @@ class PostDocumentView(GenericAPIView[Any]):
         cf = serializer.validated_data.get("custom_fields")
         from_webui = serializer.validated_data.get("from_webui")
 
-        t = int(mktime(datetime.now().timetuple()))
+        t = int(timezone.now().timestamp())
 
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -5120,7 +5119,7 @@ class SystemStatusView(PassUserMixin):
             index_dir = settings.INDEX_DIR
             mtimes = [p.stat().st_mtime for p in index_dir.iterdir() if p.is_file()]
             index_last_modified = (
-                make_aware(datetime.fromtimestamp(max(mtimes))) if mtimes else None
+                datetime.fromtimestamp(max(mtimes), tz=UTC) if mtimes else None
             )
         except Exception as e:
             index_status = "ERROR"

@@ -12,7 +12,6 @@ from django.contrib.auth.models import User
 from django.db import DatabaseError
 from django.test import TestCase
 from django.test import override_settings
-from django.utils import timezone
 
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
@@ -452,7 +451,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         FILENAME_FORMAT="{created_year}-{created_month}-{created_day}",
     )
     def test_created_year_month_day(self) -> None:
-        d1 = timezone.make_aware(datetime.datetime(2020, 3, 6, 1, 1, 1))
+        d1 = datetime.datetime(2020, 3, 6, 1, 1, 1, tzinfo=datetime.UTC)
         doc1 = Document.objects.create(
             title="doc1",
             mime_type="application/pdf",
@@ -469,7 +468,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         FILENAME_FORMAT="{added_year}-{added_month}-{added_day}",
     )
     def test_added_year_month_day(self) -> None:
-        d1 = timezone.make_aware(datetime.datetime(1232, 1, 9, 1, 1, 1))
+        d1 = datetime.datetime(1232, 1, 9, 1, 1, 1, tzinfo=datetime.UTC)
         doc1 = Document.objects.create(
             title="doc1",
             mime_type="application/pdf",
@@ -482,7 +481,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         self.assertEqual(generate_filename(doc1), expected_filename)
 
-        doc1.added = timezone.make_aware(datetime.datetime(2020, 11, 16, 1, 1, 1))
+        doc1.added = datetime.datetime(2020, 11, 16, 1, 1, 1, tzinfo=datetime.UTC)
 
         self.assertEqual(generate_filename(doc1), Path("2020-11-16.pdf"))
 
@@ -1266,7 +1265,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
     def test_short_names_added(self) -> None:
         doc = Document.objects.create(
             title="The Title",
-            added=timezone.make_aware(datetime.datetime(1984, 8, 21, 7, 36, 51, 153)),
+            added=datetime.datetime(1984, 8, 21, 7, 36, 51, 153, tzinfo=datetime.UTC),
             mime_type="application/pdf",
             pk=2,
             checksum="2",
@@ -1505,7 +1504,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         doc_a = Document.objects.create(
             title="Does Matter",
             created=datetime.date(2020, 6, 25),
-            added=timezone.make_aware(datetime.datetime(2024, 10, 1, 7, 36, 51, 153)),
+            added=datetime.datetime(2024, 10, 1, 7, 36, 51, 153, tzinfo=datetime.UTC),
             mime_type="application/pdf",
             pk=2,
             checksum="2",
@@ -1577,7 +1576,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         doc = Document.objects.create(
             title="scan_017562",
             created=datetime.date(2025, 7, 2),
-            added=timezone.make_aware(datetime.datetime(2026, 3, 3, 11, 53, 16)),
+            added=datetime.datetime(2026, 3, 3, 11, 53, 16, tzinfo=datetime.UTC),
             mime_type="application/pdf",
             checksum="test-checksum",
             storage_path=sp,
@@ -1606,7 +1605,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         doc_a = Document.objects.create(
             title="Does Matter",
             created=datetime.date(2020, 6, 25),
-            added=timezone.make_aware(datetime.datetime(2024, 10, 1, 7, 36, 51, 153)),
+            added=datetime.datetime(2024, 10, 1, 7, 36, 51, 153, tzinfo=datetime.UTC),
             mime_type="application/pdf",
             pk=2,
             checksum="2",
@@ -1641,7 +1640,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         doc_a = Document.objects.create(
             title="Does Matter",
             created=datetime.date(2020, 6, 25),
-            added=timezone.make_aware(datetime.datetime(2024, 10, 1, 7, 36, 51, 153)),
+            added=datetime.datetime(2024, 10, 1, 7, 36, 51, 153, tzinfo=datetime.UTC),
             mime_type="application/pdf",
             pk=2,
             checksum="2",
@@ -1673,7 +1672,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         doc_a = Document.objects.create(
             title="Some Title",
             created=datetime.date(2020, 6, 25),
-            added=timezone.make_aware(datetime.datetime(2024, 10, 1, 7, 36, 51, 153)),
+            added=datetime.datetime(2024, 10, 1, 7, 36, 51, 153, tzinfo=datetime.UTC),
             mime_type="application/pdf",
             pk=2,
             checksum="2",
@@ -1778,7 +1777,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         doc_a = Document.objects.create(
             title="Some Title",
             created=datetime.date(2020, 6, 25),
-            added=timezone.make_aware(datetime.datetime(2024, 10, 1, 7, 36, 51, 153)),
+            added=datetime.datetime(2024, 10, 1, 7, 36, 51, 153, tzinfo=datetime.UTC),
             mime_type="application/pdf",
             pk=2,
             checksum="2",
@@ -1792,8 +1791,15 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         CustomFieldInstance.objects.create(
             document=doc_a,
             field=CustomField.objects.get(name="Invoice Date"),
-            value_date=timezone.make_aware(
-                datetime.datetime(2024, 10, 1, 7, 36, 51, 153),
+            value_date=datetime.datetime(
+                2024,
+                10,
+                1,
+                7,
+                36,
+                51,
+                153,
+                tzinfo=datetime.UTC,
             ),
         )
 
@@ -1833,7 +1839,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         doc = Document.objects.create(
             title="Some Title! With @ Special # Characters",
             created=datetime.date(2020, 6, 25),
-            added=timezone.make_aware(datetime.datetime(2024, 10, 1, 7, 36, 51, 153)),
+            added=datetime.datetime(2024, 10, 1, 7, 36, 51, 153, tzinfo=datetime.UTC),
             mime_type="application/pdf",
             pk=2,
             checksum="2",

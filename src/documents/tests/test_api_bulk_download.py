@@ -6,7 +6,6 @@ import zipfile
 
 from django.contrib.auth.models import User
 from django.test import override_settings
-from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -33,21 +32,21 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
             filename="docA.pdf",
             mime_type="application/pdf",
             checksum="B",
-            created=timezone.make_aware(datetime.datetime(2021, 1, 1)),
+            created=datetime.datetime(2021, 1, 1, tzinfo=datetime.UTC),
         )
         self.doc2b = Document.objects.create(
             title="document A",
             filename="docA2.pdf",
             mime_type="application/pdf",
             checksum="D",
-            created=timezone.make_aware(datetime.datetime(2021, 1, 1)),
+            created=datetime.datetime(2021, 1, 1, tzinfo=datetime.UTC),
         )
         self.doc3 = Document.objects.create(
             title="document B",
             filename="docB.jpg",
             mime_type="image/jpeg",
             checksum="C",
-            created=timezone.make_aware(datetime.datetime(2020, 3, 21)),
+            created=datetime.datetime(2020, 3, 21, tzinfo=datetime.UTC),
             archive_filename="docB.pdf",
             archive_checksum="D",
         )

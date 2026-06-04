@@ -1,4 +1,3 @@
-import datetime
 import logging
 from datetime import timedelta
 from http import HTTPStatus
@@ -86,7 +85,7 @@ class MailAccountViewSet(PassUserMixin, ModelViewSet[MailAccount]):
     @action(methods=["post"], detail=False)
     def test(self, request):
         logger = logging.getLogger("paperless_mail")
-        request.data["name"] = datetime.datetime.now().isoformat()
+        request.data["name"] = timezone.now().isoformat()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         existing_account = None

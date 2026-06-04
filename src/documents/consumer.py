@@ -839,8 +839,9 @@ class ConsumerPlugin(
             self.log.debug(f"Creation date from parse_date: {create_date}")
         else:
             stats = Path(self.input_doc.original_file).stat()
-            create_date = timezone.make_aware(
-                datetime.datetime.fromtimestamp(stats.st_mtime),
+            create_date = datetime.datetime.fromtimestamp(
+                stats.st_mtime,
+                tz=datetime.UTC,
             )
             self.log.debug(f"Creation date from st_mtime: {create_date}")
 
