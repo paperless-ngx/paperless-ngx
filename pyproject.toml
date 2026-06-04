@@ -185,32 +185,33 @@ line-ending = "lf"
 [tool.ruff.lint]
 # https://docs.astral.sh/ruff/rules/
 extend-select = [
-  "COM",  # https://docs.astral.sh/ruff/rules/#flake8-commas-com
-  "DJ",   # https://docs.astral.sh/ruff/rules/#flake8-django-dj
-  "EXE",  # https://docs.astral.sh/ruff/rules/#flake8-executable-exe
-  "FBT",  # https://docs.astral.sh/ruff/rules/#flake8-boolean-trap-fbt
-  "FLY",  # https://docs.astral.sh/ruff/rules/#flynt-fly
-  "G201", # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
-  "I",    # https://docs.astral.sh/ruff/rules/#isort-i
-  "ICN",  # https://docs.astral.sh/ruff/rules/#flake8-import-conventions-icn
-  "INP",  # https://docs.astral.sh/ruff/rules/#flake8-no-pep420-inp
-  "ISC",  # https://docs.astral.sh/ruff/rules/#flake8-implicit-str-concat-isc
-  "PIE",  # https://docs.astral.sh/ruff/rules/#flake8-pie-pie
-  "PLC",  # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PLE",  # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PTH",  # https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
-  "Q",    # https://docs.astral.sh/ruff/rules/#flake8-quotes-q
-  "RSE",  # https://docs.astral.sh/ruff/rules/#flake8-raise-rse
-  "RUF",  # https://docs.astral.sh/ruff/rules/#ruff-specific-rules-ruf
-  "SIM",  # https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
-  "T20",  # https://docs.astral.sh/ruff/rules/#flake8-print-t20
-  "TC",   # https://docs.astral.sh/ruff/rules/#flake8-type-checking-tc
-  "TID",  # https://docs.astral.sh/ruff/rules/#flake8-tidy-imports-tid
-  "UP",   # https://docs.astral.sh/ruff/rules/#pyupgrade-up
-  "W",    # https://docs.astral.sh/ruff/rules/#pycodestyle-e-w
+  "COM", # https://docs.astral.sh/ruff/rules/#flake8-commas-com
+  "DJ",  # https://docs.astral.sh/ruff/rules/#flake8-django-dj
+  "EXE", # https://docs.astral.sh/ruff/rules/#flake8-executable-exe
+  "FBT", # https://docs.astral.sh/ruff/rules/#flake8-boolean-trap-fbt
+  "FLY", # https://docs.astral.sh/ruff/rules/#flynt-fly
+  "G",   # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
+  "I",   # https://docs.astral.sh/ruff/rules/#isort-i
+  "ICN", # https://docs.astral.sh/ruff/rules/#flake8-import-conventions-icn
+  "INP", # https://docs.astral.sh/ruff/rules/#flake8-no-pep420-inp
+  "ISC", # https://docs.astral.sh/ruff/rules/#flake8-implicit-str-concat-isc
+  "PIE", # https://docs.astral.sh/ruff/rules/#flake8-pie-pie
+  "PLC", # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLE", # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PTH", # https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
+  "Q",   # https://docs.astral.sh/ruff/rules/#flake8-quotes-q
+  "RSE", # https://docs.astral.sh/ruff/rules/#flake8-raise-rse
+  "RUF", # https://docs.astral.sh/ruff/rules/#ruff-specific-rules-ruf
+  "SIM", # https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
+  "T20", # https://docs.astral.sh/ruff/rules/#flake8-print-t20
+  "TC",  # https://docs.astral.sh/ruff/rules/#flake8-type-checking-tc
+  "TID", # https://docs.astral.sh/ruff/rules/#flake8-tidy-imports-tid
+  "UP",  # https://docs.astral.sh/ruff/rules/#pyupgrade-up
+  "W",   # https://docs.astral.sh/ruff/rules/#pycodestyle-e-w
 ]
 ignore = [
   "DJ001",
+  "G004",    # f-strings in logging: accepted style in this codebase
   "PLC0415",
   "RUF012",
   "SIM105",

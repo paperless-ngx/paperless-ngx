@@ -1506,7 +1506,6 @@ class DocumentViewSet(
                 "document %s: %s",
                 doc.pk,
                 exc,
-                exc_info=True,
             )
             raise ValidationError({"ai": [_("Invalid AI configuration.")]}) from exc
 

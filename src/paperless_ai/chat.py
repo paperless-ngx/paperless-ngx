@@ -155,7 +155,7 @@ def stream_chat_with_documents(query_str: str, documents: list[Document]):
     try:
         yield from _stream_chat_with_documents(query_str, documents)
     except Exception as e:
-        logger.exception(f"Failed to stream document chat response: {e}", exc_info=True)
+        logger.exception("Failed to stream document chat response: %s", e)
         yield CHAT_ERROR_MESSAGE
 
 
