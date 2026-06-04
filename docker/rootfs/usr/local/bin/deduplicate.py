@@ -61,7 +61,7 @@ def replace_with_symlinks(
     total_duplicates = 0
     space_saved = 0
 
-    for file_hash, file_list in duplicate_groups.items():
+    for file_list in duplicate_groups.values():
         # Keep the first file as the original, replace others with symlinks
         original_file = file_list[0]
         duplicates = file_list[1:]
