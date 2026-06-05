@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import hashlib
 import logging
 import shutil
 import traceback as _tb
@@ -54,6 +53,7 @@ from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.plugins.helpers import DocumentsStatusManager
 from documents.templating.utils import convert_format_str_to_template_format
+from documents.utils import compute_checksum
 from documents.workflows.actions import build_workflow_action_context
 from documents.workflows.actions import execute_email_action
 from documents.workflows.actions import execute_move_to_trash_action
@@ -410,8 +410,7 @@ def _path_matches_checksum(path: Path, checksum: str | None) -> bool:
     if checksum is None or not path.is_file():
         return False
 
-    with path.open("rb") as f:
-        return hashlib.md5(f.read()).hexdigest() == checksum
+    return compute_checksum(path) == checksum
 
 
 def _filename_template_uses_custom_fields(doc: Document) -> bool:

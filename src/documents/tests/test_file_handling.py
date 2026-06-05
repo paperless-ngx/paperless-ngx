@@ -221,8 +221,8 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         doc = Document.objects.create(
             title="document",
             mime_type="application/pdf",
-            checksum=hashlib.md5(original_bytes).hexdigest(),
-            archive_checksum=hashlib.md5(archive_bytes).hexdigest(),
+            checksum=hashlib.sha256(original_bytes).hexdigest(),
+            archive_checksum=hashlib.sha256(archive_bytes).hexdigest(),
             filename="old/document.pdf",
             archive_filename="old/document.pdf",
             storage_path=old_storage_path,
