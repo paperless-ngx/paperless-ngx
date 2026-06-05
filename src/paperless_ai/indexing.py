@@ -130,12 +130,8 @@ def build_document_node(
     return parser.get_nodes_from_documents([doc])
 
 
-def load_or_build_index(nodes=None):
-    """Return a VectorStoreIndex backed by the vector store.
-
-    ``nodes`` is accepted for signature compatibility but unused; the store
-    is the source of truth.
-    """
+def load_or_build_index():
+    """Return a VectorStoreIndex backed by the vector store."""
     import llama_index.core.settings as llama_settings
     from llama_index.core import VectorStoreIndex
 
