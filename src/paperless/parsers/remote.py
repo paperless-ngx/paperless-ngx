@@ -1,9 +1,16 @@
 """
 Built-in remote-OCR document parser.
 
-Handles documents by sending them to a configured remote OCR engine
-(currently Azure AI Vision / Document Intelligence) and retrieving both
-the extracted text and a searchable PDF with an embedded text layer.
+Handles documents by sending them to a configured remote OCR engine and
+retrieving the extracted text. Two engines are supported:
+
+* ``azureai`` — Azure AI Vision / Document Intelligence. Returns both the
+  extracted text and a searchable PDF with an embedded text layer, which
+  is stored as the archive copy.
+* ``mineru`` — a self-hosted `MinerU <https://github.com/opendatalab/mineru>`_
+  server. Returns Markdown text only via the synchronous ``/file_parse``
+  API; no archive PDF is produced (text-only), so the original file remains
+  the viewable document.
 
 When no engine is configured, ``score()`` returns ``None`` so the parser
 is effectively invisible to the registry — the tesseract parser handles
@@ -32,6 +39,10 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("paperless.parsing.remote")
 
+# MinerU document parsing can take a while for large documents; allow a
+# generous timeout for the synchronous /file_parse call.
+_MINERU_TIMEOUT_SECONDS: int = 600
+
 _SUPPORTED_MIME_TYPES: dict[str, str] = {
     "application/pdf": ".pdf",
     "image/png": ".png",
@@ -57,12 +68,21 @@ class RemoteEngineConfig:
         self.endpoint = endpoint
 
     def engine_is_valid(self) -> bool:
-        """Return True when the engine is known and fully configured."""
-        return (
-            self.engine in ("azureai",)
-            and self.api_key is not None
-            and not (self.engine == "azureai" and self.endpoint is None)
-        )
+        """Return True when the engine is known and fully configured.
+
+        ``azureai`` requires both an API key and an endpoint. ``mineru`` is
+        self-hosted and only requires an endpoint (the MinerU API base URL).
+
+        Returns
+        -------
+        bool
+            True when the configured engine has all required settings.
+        """
+        if self.engine == "azureai":
+            return self.api_key is not None and self.endpoint is not None
+        if self.engine == "mineru":
+            return self.endpoint is not None
+        return False
 
 
 class RemoteDocumentParser:
@@ -159,10 +179,11 @@ class RemoteDocumentParser:
         Returns
         -------
         bool
-            Always True — the remote engine always returns a PDF with an
-            embedded text layer that serves as the archive copy.
+            True for the Azure engine, which returns a PDF with an embedded
+            text layer that serves as the archive copy. False for the MinerU
+            engine, which is text-only and produces no archive PDF.
         """
-        return True
+        return settings.REMOTE_OCR_ENGINE != "mineru"
 
     @property
     def requires_pdf_rendition(self) -> bool:
@@ -224,8 +245,9 @@ class RemoteDocumentParser:
         mime_type:
             Detected MIME type of the document.
         produce_archive:
-            Ignored — the remote engine always returns a searchable PDF,
-            which is stored as the archive copy regardless of this flag.
+            Ignored. The Azure engine always returns a searchable PDF that
+            is stored as the archive copy; the MinerU engine is text-only and
+            never produces an archive.
         """
         config = RemoteEngineConfig(
             engine=settings.REMOTE_OCR_ENGINE,
@@ -242,6 +264,8 @@ class RemoteDocumentParser:
 
         if config.engine == "azureai":
             self._text = self._azure_ai_vision_parse(document_path, config)
+        elif config.engine == "mineru":
+            self._text = self._mineru_parse(document_path, config)
 
     # ------------------------------------------------------------------
     # Result accessors
@@ -429,5 +453,74 @@ class RemoteDocumentParser:
 
         finally:
             client.close()
+
+        return None
+
+    def _mineru_parse(
+        self,
+        file: Path,
+        config: RemoteEngineConfig,
+    ) -> str | None:
+        """Send ``file`` to a self-hosted MinerU server and return its text.
+
+        Performs a synchronous ``POST {endpoint}/file_parse`` request and
+        returns the Markdown content extracted by MinerU. No archive PDF is
+        produced — MinerU returns text only, so ``self._archive_path`` is left
+        unset and the original file remains the viewable document.
+
+        Parameters
+        ----------
+        file:
+            Absolute path to the document to parse.
+        config:
+            Validated remote engine configuration. ``config.endpoint`` is the
+            MinerU API base URL (e.g. ``http://host:8000``).
+
+        Returns
+        -------
+        str | None
+            Extracted Markdown text, or None if the MinerU call failed (the
+            error is logged).
+
+        Examples
+        --------
+        >>> # With PAPERLESS_REMOTE_OCR_ENGINE=mineru and
+        >>> # PAPERLESS_REMOTE_OCR_ENDPOINT=http://host:8000 configured:
+        >>> parser._mineru_parse(Path("/tmp/doc.pdf"), config)  # doctest: +SKIP
+        '# Document title\\n\\nBody text...'
+        """
+        if TYPE_CHECKING:
+            # Callers must have validated config via engine_is_valid(), which
+            # asserts endpoint is not None for the mineru engine.
+            assert config.endpoint is not None
+
+        import httpx
+
+        url = f"{config.endpoint.rstrip('/')}/file_parse"
+
+        try:
+            with file.open("rb") as fh:
+                response = httpx.post(
+                    url,
+                    files={"files": (file.name, fh, "application/octet-stream")},
+                    data={
+                        "return_md": "true",
+                        "response_format_zip": "false",
+                    },
+                    timeout=_MINERU_TIMEOUT_SECONDS,
+                )
+            response.raise_for_status()
+
+            results = response.json().get("results", {})
+            for entry in results.values():
+                md_content = entry.get("md_content")
+                if md_content is not None:
+                    return md_content
+
+            logger.warning("MinerU response contained no markdown content.")
+            return ""
+
+        except Exception as e:
+            logger.exception("MinerU parsing failed: %s", e)
 
         return None

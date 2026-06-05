@@ -147,6 +147,25 @@ def no_engine_settings(settings: SettingsWrapper) -> SettingsWrapper:
     return settings
 
 
+@pytest.fixture()
+def mineru_settings(settings: SettingsWrapper) -> SettingsWrapper:
+    """Configure Django settings for a valid self-hosted MinerU OCR engine.
+
+    Sets ``REMOTE_OCR_ENGINE`` to ``"mineru"`` and ``REMOTE_OCR_ENDPOINT`` to
+    a test base URL. No API key is required for MinerU. Settings are restored
+    automatically after the test by pytest-django.
+
+    Returns
+    -------
+    SettingsWrapper
+        The modified settings object (for chaining further overrides).
+    """
+    settings.REMOTE_OCR_ENGINE = "mineru"
+    settings.REMOTE_OCR_API_KEY = None
+    settings.REMOTE_OCR_ENDPOINT = "http://mineru.test:8000"
+    return settings
+
+
 # ------------------------------------------------------------------
 # Tika parser sample files
 # ------------------------------------------------------------------

@@ -930,10 +930,11 @@ for display in the web interface.
 
     !!! note
 
-        The **remote OCR parser** (Azure AI) always produces a searchable
-        PDF and stores it as the archive copy, regardless of this setting.
-        `ARCHIVE_FILE_GENERATION=never` has no effect when the remote
-        parser handles a document.
+        The **remote OCR parser** with the Azure AI engine always produces a
+        searchable PDF and stores it as the archive copy, regardless of this
+        setting. `ARCHIVE_FILE_GENERATION=never` has no effect when the Azure
+        engine handles a document. The MinerU engine is text-only and never
+        produces an archive copy.
 
 #### [`PAPERLESS_OCR_CLEAN=<mode>`](#PAPERLESS_OCR_CLEAN) {#PAPERLESS_OCR_CLEAN}
 
@@ -2004,19 +2005,28 @@ password. All of these options come from their similarly-named [Django settings]
 
 #### [`PAPERLESS_REMOTE_OCR_ENGINE=<str>`](#PAPERLESS_REMOTE_OCR_ENGINE) {#PAPERLESS_REMOTE_OCR_ENGINE}
 
-: The remote OCR engine to use. Currently only Azure AI is supported as "azureai".
+: The remote OCR engine to use. Supported values:
+
+    - `azureai`: Microsoft Azure AI "Document Intelligence" (cloud, paid). Returns a
+      searchable PDF that is stored as the archive copy.
+    - `mineru`: a self-hosted [MinerU](https://github.com/opendatalab/mineru) server
+      (fully local). Returns Markdown text only via the synchronous `/file_parse`
+      API; no archive PDF is produced, so the original file remains the viewable
+      document and there is no selectable text layer.
 
     Defaults to None, which disables remote OCR.
 
 #### [`PAPERLESS_REMOTE_OCR_API_KEY=<str>`](#PAPERLESS_REMOTE_OCR_API_KEY) {#PAPERLESS_REMOTE_OCR_API_KEY}
 
-: The API key to use for the remote OCR engine.
+: The API key to use for the remote OCR engine. Required for `azureai`, not used
+by `mineru`.
 
     Defaults to None.
 
 #### [`PAPERLESS_REMOTE_OCR_ENDPOINT=<str>`](#PAPERLESS_REMOTE_OCR_ENDPOINT) {#PAPERLESS_REMOTE_OCR_ENDPOINT}
 
-: The endpoint to use for the remote OCR engine. This is required for Azure AI.
+: The endpoint to use for the remote OCR engine. Required for both engines. For
+`mineru` this is the MinerU API base URL, e.g. `http://192.168.1.10:8000`.
 
     Defaults to None.
 

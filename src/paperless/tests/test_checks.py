@@ -655,6 +655,27 @@ class TestRemoteParserChecks:
             in msg.msg
         )
 
+    def test_mineru_no_endpoint(self, settings: SettingsWrapper) -> None:
+        settings.REMOTE_OCR_ENGINE = "mineru"
+        settings.REMOTE_OCR_API_KEY = None
+        settings.REMOTE_OCR_ENDPOINT = None
+
+        msgs = check_remote_parser_configured(None)
+
+        assert len(msgs) == 1
+        assert "MinerU remote parser requires an endpoint to be configured." in (
+            msgs[0].msg
+        )
+
+    def test_mineru_with_endpoint_ok(self, settings: SettingsWrapper) -> None:
+        settings.REMOTE_OCR_ENGINE = "mineru"
+        settings.REMOTE_OCR_API_KEY = None
+        settings.REMOTE_OCR_ENDPOINT = "http://mineru.test:8000"
+
+        msgs = check_remote_parser_configured(None)
+
+        assert len(msgs) == 0
+
 
 class TestTesseractChecks:
     def test_default_language(self) -> None:

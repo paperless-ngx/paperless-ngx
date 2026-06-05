@@ -1032,10 +1032,16 @@ how regularly you intend to scan documents and use paperless.
 
     This feature is disabled by default and will always remain strictly "opt-in".
 
-Paperless-ngx supports performing OCR on documents using remote services. At the moment, this is limited to
-[Microsoft's Azure "Document Intelligence" service](https://azure.microsoft.com/en-us/products/ai-services/ai-document-intelligence).
-This is of course a paid service (with a free tier) which requires an Azure account and subscription. Azure AI is not affiliated with
-Paperless-ngx in any way. When enabled, Paperless-ngx will automatically send appropriate documents to Azure for OCR processing, bypassing
+Paperless-ngx supports performing OCR on documents using remote services. Two engines are available:
+
+- [Microsoft's Azure "Document Intelligence" service](https://azure.microsoft.com/en-us/products/ai-services/ai-document-intelligence).
+  This is a paid service (with a free tier) which requires an Azure account and subscription. Azure AI is not affiliated with
+  Paperless-ngx in any way. It returns a searchable PDF that is stored as the archive copy.
+- A self-hosted [MinerU](https://github.com/opendatalab/mineru) server, as a fully local alternative. Point Paperless-ngx at
+  the MinerU API base URL (e.g. `http://192.168.1.10:8000`); no API key is required. MinerU returns extracted text only, so the
+  original file remains the viewable document and no archive PDF with a text layer is produced.
+
+When enabled, Paperless-ngx will automatically send appropriate documents to the configured engine for OCR processing, bypassing
 the local OCR engine. See the [configuration](configuration.md#PAPERLESS_REMOTE_OCR_ENGINE) options for more details.
 
 Additionally, when using a commercial service with this feature, consider both potential costs as well as any associated file size

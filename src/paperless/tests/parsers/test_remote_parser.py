@@ -378,6 +378,134 @@ class TestRemoteParserParseError:
 
 
 # ---------------------------------------------------------------------------
+# MinerU engine
+# ---------------------------------------------------------------------------
+
+_MINERU_URL = "http://mineru.test:8000/file_parse"
+_MINERU_TEXT = "# Title\n\nExtracted markdown."
+
+
+class TestRemoteParserMineruScore:
+    """score()/config logic for the self-hosted MinerU engine."""
+
+    @pytest.mark.usefixtures("mineru_settings")
+    @pytest.mark.parametrize(
+        "mime_type",
+        [
+            pytest.param("application/pdf", id="pdf"),
+            pytest.param("image/png", id="png"),
+            pytest.param("image/jpeg", id="jpeg"),
+        ],
+    )
+    def test_score_returns_20_when_configured(self, mime_type: str) -> None:
+        assert RemoteDocumentParser.score(mime_type, "doc.pdf") == 20
+
+    def test_score_returns_none_when_endpoint_missing(
+        self,
+        settings: SettingsWrapper,
+    ) -> None:
+        settings.REMOTE_OCR_ENGINE = "mineru"
+        settings.REMOTE_OCR_API_KEY = None
+        settings.REMOTE_OCR_ENDPOINT = None
+        assert RemoteDocumentParser.score("application/pdf", "doc.pdf") is None
+
+    @pytest.mark.usefixtures("mineru_settings")
+    def test_score_does_not_require_api_key(self) -> None:
+        """MinerU is self-hosted: a missing API key must not disable it."""
+        assert RemoteDocumentParser.score("application/pdf", "doc.pdf") == 20
+
+
+class TestRemoteParserMineruProperties:
+    @pytest.mark.usefixtures("mineru_settings")
+    def test_can_produce_archive_is_false(
+        self,
+        remote_parser: RemoteDocumentParser,
+    ) -> None:
+        """MinerU is text-only and never produces an archive copy."""
+        assert remote_parser.can_produce_archive is False
+
+
+class TestRemoteParserMineruParse:
+    @pytest.mark.usefixtures("mineru_settings")
+    def test_parse_returns_markdown_text(
+        self,
+        remote_parser: RemoteDocumentParser,
+        simple_digital_pdf_file: Path,
+        httpx_mock,
+    ) -> None:
+        httpx_mock.add_response(
+            url=_MINERU_URL,
+            json={
+                "backend": "pipeline",
+                "version": "test",
+                "results": {"simple-digital": {"md_content": _MINERU_TEXT}},
+            },
+        )
+
+        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
+
+        assert remote_parser.get_text() == _MINERU_TEXT
+
+    @pytest.mark.usefixtures("mineru_settings")
+    def test_parse_produces_no_archive(
+        self,
+        remote_parser: RemoteDocumentParser,
+        simple_digital_pdf_file: Path,
+        httpx_mock,
+    ) -> None:
+        httpx_mock.add_response(
+            url=_MINERU_URL,
+            json={"results": {"simple-digital": {"md_content": _MINERU_TEXT}}},
+        )
+
+        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
+
+        assert remote_parser.get_archive_path() is None
+
+    @pytest.mark.usefixtures("mineru_settings")
+    def test_parse_empty_when_no_markdown_in_response(
+        self,
+        remote_parser: RemoteDocumentParser,
+        simple_digital_pdf_file: Path,
+        httpx_mock,
+    ) -> None:
+        httpx_mock.add_response(url=_MINERU_URL, json={"results": {}})
+
+        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
+
+        assert remote_parser.get_text() == ""
+
+    @pytest.mark.usefixtures("mineru_settings")
+    def test_parse_returns_empty_on_http_error(
+        self,
+        remote_parser: RemoteDocumentParser,
+        simple_digital_pdf_file: Path,
+        httpx_mock,
+    ) -> None:
+        httpx_mock.add_response(url=_MINERU_URL, status_code=500)
+
+        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
+
+        assert remote_parser.get_text() == ""
+
+    @pytest.mark.usefixtures("mineru_settings")
+    def test_parse_logs_error_on_failure(
+        self,
+        remote_parser: RemoteDocumentParser,
+        simple_digital_pdf_file: Path,
+        httpx_mock,
+        mocker: MockerFixture,
+    ) -> None:
+        httpx_mock.add_response(url=_MINERU_URL, status_code=500)
+        mock_log = mocker.patch("paperless.parsers.remote.logger")
+
+        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
+
+        mock_log.exception.assert_called_once()
+        assert "MinerU parsing failed" in mock_log.exception.call_args[0][0]
+
+
+# ---------------------------------------------------------------------------
 # get_page_count()
 # ---------------------------------------------------------------------------
 
