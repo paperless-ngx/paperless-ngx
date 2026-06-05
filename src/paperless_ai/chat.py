@@ -4,6 +4,7 @@ import sys
 
 from documents.models import Document
 from paperless_ai.client import AIClient
+from paperless_ai.indexing import _document_id_filters
 from paperless_ai.indexing import get_rag_prompt_helper
 from paperless_ai.indexing import load_or_build_index
 
@@ -79,7 +80,7 @@ def stream_chat_with_documents(query_str: str, documents: list[Document]):
     try:
         yield from _stream_chat_with_documents(query_str, documents)
     except Exception as e:
-        logger.exception(f"Failed to stream document chat response: {e}", exc_info=True)
+        logger.exception("Failed to stream document chat response: %s", e)
         yield CHAT_ERROR_MESSAGE
 
 
@@ -88,30 +89,9 @@ def _stream_chat_with_documents(query_str: str, documents: list[Document]):
     from llama_index.core.query_engine import RetrieverQueryEngine
     from llama_index.core.response_synthesizers import get_response_synthesizer
     from llama_index.core.retrievers import VectorIndexRetriever
-    from llama_index.core.vector_stores.types import FilterOperator
-    from llama_index.core.vector_stores.types import MetadataFilter
-    from llama_index.core.vector_stores.types import MetadataFilters
 
     index = load_or_build_index()
-
-    doc_ids = sorted(str(doc.pk) for doc in documents)
-    filters = MetadataFilters(
-        filters=[
-            MetadataFilter(
-                key="document_id",
-                operator=FilterOperator.IN,
-                value=doc_ids,
-            ),
-        ],
-    )
-
-    # No indexed content for these documents -> bail early (before touching the LLM).
-    if not index.vector_store.has_nodes(filters=filters):
-        logger.warning("No nodes found for the given documents.")
-        yield CHAT_NO_CONTENT_MESSAGE
-        return
-
-    client = AIClient()
+    filters = _document_id_filters(str(doc.pk) for doc in documents)
 
     retriever = VectorIndexRetriever(
         index=index,
@@ -120,10 +100,12 @@ def _stream_chat_with_documents(query_str: str, documents: list[Document]):
     )
 
     top_nodes = retriever.retrieve(query_str)
-    if len(top_nodes) == 0:
-        logger.warning("Retriever returned no nodes for the given documents.")
+    if not top_nodes:
+        logger.warning("No nodes found for the given documents.")
         yield CHAT_NO_CONTENT_MESSAGE
         return
+
+    client = AIClient()
 
     references = _get_document_references(documents, top_nodes)
 
