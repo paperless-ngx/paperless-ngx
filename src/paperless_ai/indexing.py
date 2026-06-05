@@ -80,6 +80,7 @@ def write_store():
     this context manager to serialise concurrent Celery writers.
     Read paths use ``get_vector_store()`` directly — no lock needed.
     """
+    settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
     with FileLock(settings.LLM_INDEX_LOCK):
         yield get_vector_store()
 
