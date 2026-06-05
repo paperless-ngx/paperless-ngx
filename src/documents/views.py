@@ -1400,7 +1400,7 @@ class DocumentViewSet(
         )
         if request.user is not None and not has_perms_owner_aware(
             request.user,
-            "view_document",
+            "change_document",
             doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
@@ -1460,7 +1460,7 @@ class DocumentViewSet(
         )
         if request.user is not None and not has_perms_owner_aware(
             request.user,
-            "view_document",
+            "change_document",
             doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
