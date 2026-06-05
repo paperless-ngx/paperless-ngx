@@ -1,4 +1,3 @@
-import json
 import logging
 from collections.abc import Iterable
 from contextlib import contextmanager
@@ -193,30 +192,6 @@ def get_rag_prompt_helper(
     )
 
 
-def _stored_modified_times(store: "PaperlessLanceVectorStore") -> dict[str, str]:
-    """Return {document_id: stored_modified_isoformat} for incremental update.
-
-    One representative chunk per document is enough to read the stored
-    ``modified`` timestamp (all chunks for a document share the same value).
-    Only the two scalar columns needed for comparison are fetched; the vector
-    column is excluded to avoid unnecessary deserialization.
-    """
-    if not store.table_exists():
-        return {}
-    result: dict[str, str] = {}
-    for row in (
-        store.client.open_table(LLM_INDEX_TABLE)
-        .search()
-        .select(["document_id", "node_content"])
-        .to_list()
-    ):
-        doc_id = str(row["document_id"])
-        if doc_id not in result:
-            meta = json.loads(row["node_content"])
-            result[doc_id] = meta.get("modified", "")
-    return result
-
-
 def get_llm_index_compaction_retention() -> int:
     """Seconds of MVCC version history to keep during compaction."""
     return 60 * 60  # 1 hour: safe for in-flight readers, reclaims daily
@@ -260,7 +235,7 @@ def update_llm_index(
                 store.add(nodes)
             msg = "LLM index rebuilt successfully."
         else:
-            existing = _stored_modified_times(store)
+            existing = store.get_modified_times()
             changed = 0
             for document in iter_wrapper(documents):
                 doc_id = str(document.id)

@@ -274,6 +274,24 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         except Exception as e:  # pragma: no cover - depends on data/dim
             logger.warning("Skipping ANN index creation: %s", e)
 
+    def get_modified_times(self) -> dict[str, str]:
+        """Return {document_id: stored_modified_isoformat} for all indexed documents.
+
+        One representative chunk per document is fetched; all chunks share the
+        same ``modified`` value so the first one seen is sufficient.
+        """
+        if self._table is None:
+            return {}
+        result: dict[str, str] = {}
+        for row in (
+            self._table.search().select(["document_id", "node_content"]).to_list()
+        ):
+            doc_id = str(row["document_id"])
+            if doc_id not in result:
+                meta = json.loads(row["node_content"])
+                result[doc_id] = meta.get("modified", "")
+        return result
+
     def ensure_document_id_scalar_index(self) -> None:
         """Create a scalar index on the filter column (never on the merge key
         ``id`` — see https://github.com/lancedb/lancedb/issues/3177).

@@ -318,3 +318,49 @@ class TestPaperlessLanceVectorStoreMaintenance:
         store: PaperlessLanceVectorStore,
     ) -> None:
         store.ensure_document_id_scalar_index()  # no table yet — must not raise
+
+
+class TestGetModifiedTimes:
+    @pytest.fixture
+    def store(self, tmp_path: Path) -> PaperlessLanceVectorStore:
+        return PaperlessLanceVectorStore(uri=str(tmp_path / "idx"))
+
+    def _node_with_modified(
+        self,
+        node_id: str,
+        doc_id: str,
+        modified: str,
+    ) -> TextNode:
+        node = TextNode(
+            id_=node_id,
+            text="text",
+            metadata={"document_id": doc_id, "modified": modified},
+        )
+        node.embedding = [0.1] * DIM
+        node.relationships = {
+            NodeRelationship.SOURCE: RelatedNodeInfo(node_id=doc_id),
+        }
+        return node
+
+    def test_empty_store_returns_empty_dict(
+        self,
+        store: PaperlessLanceVectorStore,
+    ) -> None:
+        assert store.get_modified_times() == {}
+
+    def test_returns_one_entry_per_document(
+        self,
+        store: PaperlessLanceVectorStore,
+    ) -> None:
+        store.add(
+            [
+                self._node_with_modified("1-0", "1", "2024-01-01T00:00:00"),
+                self._node_with_modified("1-1", "1", "2024-01-01T00:00:00"),
+                self._node_with_modified("2-0", "2", "2024-06-01T00:00:00"),
+            ],
+        )
+        result = store.get_modified_times()
+        assert result == {
+            "1": "2024-01-01T00:00:00",
+            "2": "2024-06-01T00:00:00",
+        }
