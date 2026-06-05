@@ -239,6 +239,9 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
     def _has_vector_index(self) -> bool:
         return any("vector" in idx.columns for idx in self._table.list_indices())
 
+    def _has_scalar_index(self) -> bool:
+        return any("document_id" in idx.columns for idx in self._table.list_indices())
+
     def maybe_create_ann_index(self, min_rows: int = ANN_INDEX_MIN_ROWS) -> None:
         """Best-effort: build an IVF index once the table is large enough.
 
@@ -273,11 +276,14 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
 
     def ensure_document_id_scalar_index(self) -> None:
         """Create a scalar index on the filter column (never on the merge key
-        ``id`` — see LanceDB #3177)."""
+        ``id`` — see https://github.com/lancedb/lancedb/issues/3177).
+        No-op if the index already exists."""
         if self._table is None:
             return
+        if self._has_scalar_index():
+            return
         try:
-            self._table.create_scalar_index("document_id", replace=True)
+            self._table.create_scalar_index("document_id")
         except Exception as e:  # pragma: no cover
             logger.warning("Skipping document_id scalar index: %s", e)
 

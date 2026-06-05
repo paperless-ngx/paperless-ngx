@@ -302,3 +302,19 @@ class TestPaperlessLanceVectorStoreMaintenance:
         )
         assert doc1 == ["1-0"]
         assert table.count_rows() == 2
+
+    def test_ensure_scalar_index_is_idempotent(
+        self,
+        store: PaperlessLanceVectorStore,
+    ) -> None:
+        store.add([_node("1-0", "1", "text", 0.5)])
+        store.ensure_document_id_scalar_index()
+        # Second call must not raise and must not replace the existing index.
+        store.ensure_document_id_scalar_index()
+        assert store._has_scalar_index()
+
+    def test_ensure_scalar_index_noop_on_empty_store(
+        self,
+        store: PaperlessLanceVectorStore,
+    ) -> None:
+        store.ensure_document_id_scalar_index()  # no table yet — must not raise
