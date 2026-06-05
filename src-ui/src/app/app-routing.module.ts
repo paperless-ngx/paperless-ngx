@@ -11,6 +11,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component'
 import { DocumentListComponent } from './components/document-list/document-list.component'
+import { FoldersComponent } from './components/folders/folders.component'
 import { DocumentAttributesComponent } from './components/manage/document-attributes/document-attributes.component'
 import { MailComponent } from './components/manage/mail/mail.component'
 import { SavedViewsComponent } from './components/manage/saved-views/saved-views.component'
@@ -63,6 +64,30 @@ export const routes: Routes = [
             type: PermissionType.SavedView,
           },
           componentName: 'DocumentListComponent',
+        },
+      },
+      {
+        path: 'folders',
+        component: FoldersComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Folder,
+          },
+          componentName: 'FoldersComponent',
+        },
+      },
+      {
+        path: 'folders/:id',
+        component: FoldersComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Folder,
+          },
+          componentName: 'FoldersComponent',
         },
       },
       {

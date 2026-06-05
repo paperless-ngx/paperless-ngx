@@ -61,6 +61,7 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import Folder
 from documents.models import MatchingModel
 from documents.models import Note
 from documents.models import PaperlessTask
@@ -76,6 +77,7 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowActionEmail
 from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowTrigger
+from documents.models import get_default_folder
 from documents.parsers import is_mime_type_supported
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_groups_with_only_permission
@@ -682,6 +684,128 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         return super().validate(attrs)
 
 
+class FolderSerializer(OwnedObjectSerializer):
+    document_count = serializers.IntegerField(read_only=True)
+
+    full_path = serializers.CharField(read_only=True)
+
+    def get_slug(self, obj) -> str:
+        return slugify(obj.name)
+
+    slug = SerializerMethodField()
+
+    parent = serializers.PrimaryKeyRelatedField(
+        queryset=Folder.objects.all(),
+        allow_null=True,
+        required=False,
+    )
+
+    @extend_schema_field(
+        field=serializers.ListSerializer(
+            child=serializers.PrimaryKeyRelatedField(
+                queryset=Folder.objects.all(),
+            ),
+        ),
+    )
+    def get_children(self, obj):
+        children_map = self.context.get("folder_children_map")
+        if children_map is not None:
+            children = children_map.get(obj.pk, [])
+        else:
+            filter_q = self.context.get("document_count_filter")
+            request = self.context.get("request")
+            if filter_q is None:
+                user = getattr(request, "user", None) if request else None
+                filter_q = get_document_count_filter_for_user(user)
+                self.context["document_count_filter"] = filter_q
+
+            children = (
+                obj.children.select_related("owner")
+                .annotate(document_count=Count("documents", filter=filter_q))
+                .order_by(Lower("name"))
+            )
+
+        serializer = FolderSerializer(
+            children,
+            many=True,
+            user=self.user,
+            full_perms=self.full_perms,
+            all_fields=self.all_fields,
+            context=self.context,
+        )
+        return serializer.data
+
+    children = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Folder
+        fields = (
+            "id",
+            "slug",
+            "name",
+            "parent",
+            "children",
+            "is_default",
+            "full_path",
+            "document_count",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "set_permissions",
+        )
+
+    def get_unique_together_validators(self):
+        # The model has a (name, parent, owner) unique constraint. DRF would
+        # auto-generate a UniqueTogetherValidator from it, which forces `parent`
+        # to be a required field. Parent-aware uniqueness is enforced manually in
+        # validate(), so we disable the auto-generated validators here.
+        return []
+
+    def validate_unique_together(self, validated_data, instance=None) -> None:
+        # Folders are unique on (name, parent, owner); parent-aware uniqueness
+        # is enforced in validate(), so disable the parent-unaware base check.
+        return
+
+    def validate(self, attrs):
+        instance = self.instance
+        parent = attrs.get("parent", instance.parent if instance else None)
+
+        # Validate hierarchy (cycles / depth) using the model's clean()
+        if instance:
+            original_parent = instance.parent
+            try:
+                instance.parent = parent
+                instance.clean()
+            except ValidationError as e:
+                raise e
+            finally:
+                instance.parent = original_parent
+        else:
+            Folder(parent=parent, name=attrs.get("name", "")).clean()
+
+        # Parent-aware (name, parent, owner) uniqueness
+        name = attrs.get("name", instance.name if instance else None)
+        owner = (
+            attrs["owner"]
+            if "owner" in attrs
+            else (
+                instance.owner
+                if instance
+                else (self.user if hasattr(self, "user") else None)
+            )
+        )
+        if name is not None:
+            qs = Folder.objects.filter(name=name, parent=parent, owner=owner)
+            if instance:
+                qs = qs.exclude(pk=instance.pk)
+            if qs.exists():
+                raise serializers.ValidationError(
+                    {"error": "A folder with this name already exists here."},
+                )
+
+        return attrs
+
+
 class CorrespondentField(serializers.PrimaryKeyRelatedField[Correspondent]):
     def get_queryset(self):
         return Correspondent.objects.all()
@@ -700,6 +824,11 @@ class DocumentTypeField(serializers.PrimaryKeyRelatedField[DocumentType]):
 class StoragePathField(serializers.PrimaryKeyRelatedField[StoragePath]):
     def get_queryset(self):
         return StoragePath.objects.all()
+
+
+class FolderField(serializers.PrimaryKeyRelatedField[Folder]):
+    def get_queryset(self):
+        return Folder.objects.all()
 
 
 class CustomFieldSerializer(serializers.ModelSerializer[CustomField]):
@@ -995,6 +1124,7 @@ class DocumentSerializer(
     tags = TagsField(many=True)
     document_type = DocumentTypeField(allow_null=True)
     storage_path = StoragePathField(allow_null=True)
+    folder = FolderField(allow_null=True, required=False)
 
     original_file_name = SerializerMethodField()
     archived_file_name = SerializerMethodField()
@@ -1125,6 +1255,10 @@ class DocumentSerializer(
                     ],
                 },
             )
+        # Every document must belong to a folder; an explicit null falls back
+        # to the default folder rather than leaving the document unfiled.
+        if "folder" in attrs and attrs["folder"] is None:
+            attrs["folder"] = get_default_folder()
         return super().validate(attrs)
 
     def update(self, instance: Document, validated_data):
@@ -1230,6 +1364,7 @@ class DocumentSerializer(
             "correspondent",
             "document_type",
             "storage_path",
+            "folder",
             "title",
             "content",
             "tags",
@@ -1718,6 +1853,7 @@ class BulkEditSerializer(
             "set_correspondent",
             "set_document_type",
             "set_storage_path",
+            "set_folder",
             "add_tag",
             "remove_tag",
             "modify_tags",
@@ -1789,6 +1925,8 @@ class BulkEditSerializer(
             return bulk_edit.set_document_type
         elif method == "set_storage_path":
             return bulk_edit.set_storage_path
+        elif method == "set_folder":
+            return bulk_edit.set_folder
         elif method == "add_tag":
             return bulk_edit.add_tag
         elif method == "remove_tag":
@@ -1866,6 +2004,19 @@ class BulkEditSerializer(
                 )
         else:
             raise serializers.ValidationError("storage path not specified")
+
+    def _validate_folder(self, parameters) -> None:
+        if "folder" in parameters:
+            folder_id = parameters["folder"]
+            if folder_id is None:
+                # None falls back to the default folder
+                return
+            try:
+                Folder.objects.get(id=folder_id)
+            except Folder.DoesNotExist:
+                raise serializers.ValidationError("Folder does not exist")
+        else:
+            raise serializers.ValidationError("folder not specified")
 
     def _validate_parameters_modify_tags(self, parameters) -> None:
         if "add_tags" in parameters:
@@ -2053,6 +2204,8 @@ class BulkEditSerializer(
             self._validate_parameters_modify_tags(parameters)
         elif method == bulk_edit.set_storage_path:
             self._validate_storage_path(parameters)
+        elif method == bulk_edit.set_folder:
+            self._validate_folder(parameters)
         elif method == bulk_edit.modify_custom_fields:
             self._validate_parameters_modify_custom_fields(parameters)
         elif method == bulk_edit.set_permissions:

@@ -134,6 +134,7 @@ from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
 from documents.filters import DocumentsOrderingFilter
 from documents.filters import DocumentTypeFilterSet
+from documents.filters import FolderFilterSet
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
 from documents.filters import ObjectOwnedPermissionsFilter
 from documents.filters import PaperlessTaskFilterSet
@@ -152,6 +153,7 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import Folder
 from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
@@ -163,6 +165,7 @@ from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
+from documents.models import get_default_folder
 from documents.permissions import AcknowledgeTasksPermissions
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessNotePermissions
@@ -192,6 +195,7 @@ from documents.serialisers import DocumentVersionLabelSerializer
 from documents.serialisers import DocumentVersionSerializer
 from documents.serialisers import EditPdfDocumentsSerializer
 from documents.serialisers import EmailSerializer
+from documents.serialisers import FolderSerializer
 from documents.serialisers import MergeDocumentsSerializer
 from documents.serialisers import NotesSerializer
 from documents.serialisers import PostDocumentSerializer
@@ -3871,6 +3875,77 @@ class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Storag
             result_path = Path(result)
             result = str(result_path.with_name(f"{result_path.name}{extension}"))
         return Response(result)
+
+
+@extend_schema_view(**generate_object_with_permissions_schema(FolderSerializer))
+class FolderViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Folder]):
+    model = Folder
+
+    queryset = Folder.objects.select_related("owner").order_by(
+        Lower("name"),
+    )
+
+    serializer_class = FolderSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+        ObjectOwnedOrGrantedPermissionsFilter,
+    )
+    filterset_class = FolderFilterSet
+    ordering_fields = ("name", "document_count")
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["document_count_filter"] = self.get_document_count_filter()
+        if hasattr(self, "_folder_children_map"):
+            context["folder_children_map"] = self._folder_children_map
+        return context
+
+    def _build_children_map(self, request):
+        """
+        Build a parent_id -> [child folders] map across every folder the user
+        can see (independent of the is_root filter) so that nested children can
+        be serialized without per-folder queries.
+        """
+        base_qs = self.get_queryset()
+        visible = ObjectOwnedOrGrantedPermissionsFilter().filter_queryset(
+            request,
+            base_qs,
+            self,
+        )
+        ordering = OrderingFilter().get_ordering(request, visible, self) or (
+            Lower("name"),
+        )
+        children_map: dict = {}
+        for folder in visible.order_by(*ordering):
+            children_map.setdefault(folder.parent_id, []).append(folder)
+        return children_map
+
+    def list(self, request, *args, **kwargs):
+        self._folder_children_map = self._build_children_map(request)
+        return super().list(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        Deleting a folder must never leave its documents unfiled. All documents
+        in the folder and any descendant folders are first moved to the folder's
+        parent (or the default folder for a root folder); the folder subtree is
+        then removed via CASCADE. The default folder cannot be deleted.
+        """
+        instance = self.get_object()
+        if instance.is_default:
+            return Response(
+                {"error": "The default folder cannot be deleted."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        target = instance.parent or get_default_folder()
+        folder_ids = [instance.pk, *[f.pk for f in instance.get_descendants()]]
+        Document.objects.filter(folder_id__in=folder_ids).update(folder=target)
+
+        return super().destroy(request, *args, **kwargs)
 
 
 class UiSettingsView(GenericAPIView[Any]):

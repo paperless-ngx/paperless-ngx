@@ -23,9 +23,11 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import Folder
 from documents.models import PaperlessTask
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import get_default_folder
 from documents.permissions import set_permissions_for_object
 from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
@@ -151,6 +153,27 @@ def set_storage_path(doc_ids: list[int], storage_path: StoragePath) -> Literal["
         kwargs={"document_ids": affected_docs},
         headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
     )
+
+    return "OK"
+
+
+def set_folder(doc_ids: list[int], folder) -> Literal["OK"]:
+    """
+    Move the given documents into a folder.
+
+    A folder is a logical organization layer, so this only changes the
+    association (it does not move files on disk). Every document must belong to
+    a folder, so a ``None`` folder falls back to the default folder.
+    """
+    if folder:
+        folder = Folder.objects.only("pk").get(id=folder)
+    else:
+        folder = get_default_folder()
+
+    qs = Document.objects.filter(
+        Q(id__in=doc_ids) & ~Q(folder=folder),
+    ).only("pk")
+    qs.update(folder=folder)
 
     return "OK"
 

@@ -24,7 +24,10 @@ nav = [
   ] },
   "advanced_usage.md",
   "api.md",
-  "development.md",
+  { Development = [
+    "development.md",
+    { "Folders (maintainer guide)" = "folders.md" },
+  ] },
   "faq.md",
   "troubleshooting.md",
   "changelog.md",

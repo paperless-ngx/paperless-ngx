@@ -24,6 +24,15 @@ Apart from that, the folder structure is as follows:
   development.
 - `docker/` - Files required to build the docker image.
 
+## Feature-specific documentation
+
+Some larger or fork-specific features have dedicated maintainer guides in
+`docs/`:
+
+- **[Folders (folder navigation)](folders.md)** — architecture, API, frontend
+  components, invariants, tests, and a change checklist for the folder
+  explorer feature.
+
 ## Contributing to Paperless-ngx
 
 Maybe you've been using Paperless-ngx for a while and want to add a feature

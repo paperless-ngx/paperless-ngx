@@ -1,0 +1,30 @@
+.folder-tree {
+  max-height: calc(100vh - 12rem);
+  overflow-y: auto;
+
+  .list-group-item {
+    cursor: pointer;
+    border-radius: 0;
+  }
+}
+
+.folder-card {
+  cursor: pointer;
+}
+
+.folder-move-menu {
+  max-height: 20rem;
+  overflow-y: auto;
+}
+
+table {
+  th.fit,
+  td.fit {
+    width: 1px;
+    white-space: nowrap;
+  }
+
+  tr[draggable='true'] {
+    cursor: grab;
+  }
+}

@@ -15,6 +15,7 @@ export enum PermissionType {
   Correspondent = '%s_correspondent',
   DocumentType = '%s_documenttype',
   StoragePath = '%s_storagepath',
+  Folder = '%s_folder',
   SavedView = '%s_savedview',
   PaperlessTask = '%s_paperlesstask',
   AppConfig = '%s_applicationconfiguration',

@@ -33,6 +33,7 @@ export type DocumentBulkEditMethod =
   | 'set_correspondent'
   | 'set_document_type'
   | 'set_storage_path'
+  | 'set_folder'
   | 'add_tag'
   | 'remove_tag'
   | 'modify_tags'

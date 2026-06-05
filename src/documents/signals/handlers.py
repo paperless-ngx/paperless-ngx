@@ -51,6 +51,7 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
+from documents.models import get_default_folder
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.plugins.helpers import DocumentsStatusManager
 from documents.templating.utils import convert_format_str_to_template_format
@@ -336,6 +337,32 @@ def set_storage_path(
         document.save(update_fields=("storage_path",))
 
     return selected
+
+
+def set_folder(
+    sender: object,
+    document: Document,
+    *,
+    logging_group: object = None,
+    **kwargs: Any,
+) -> None:
+    """
+    Ensure every newly consumed document belongs to a folder.
+
+    If the document already has a folder (e.g. assigned explicitly), it is left
+    untouched. Otherwise it is placed into the default ("Inbox") folder so that
+    no document is ever left unfiled.
+    """
+    if document.folder_id is not None:
+        return
+
+    folder = get_default_folder()
+    logger.info(
+        f"Assigning default folder {folder} to {document}",
+        extra={"group": logging_group},
+    )
+    document.folder = folder
+    document.save(update_fields=("folder",))
 
 
 # see empty_trash in documents/tasks.py for signal handling

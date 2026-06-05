@@ -1,0 +1,262 @@
+<pngx-page-header title="Folders" i18n-title>
+  <button
+    type="button"
+    class="btn btn-sm btn-outline-primary"
+    (click)="createFolder(currentFolder)"
+    *pngxIfPermissions="{
+      action: PermissionAction.Add,
+      type: PermissionType.Folder,
+    }"
+  >
+    <i-bs name="folder-plus"></i-bs>&nbsp;<ng-container i18n
+      >New folder</ng-container
+    >
+  </button>
+</pngx-page-header>
+
+<div class="row">
+  <!-- Folder tree sidebar -->
+  <div class="col-md-3 mb-3">
+    <div class="list-group folder-tree">
+      <button
+        type="button"
+        class="list-group-item list-group-item-action d-flex align-items-center"
+        [class.active]="!currentFolder"
+        (click)="openFolder(null)"
+      >
+        <i-bs name="hdd-stack" class="me-2"></i-bs>
+        <span i18n>All folders</span>
+      </button>
+      @for (folder of flatFolders; track trackByFolderId($index, folder)) {
+        <button
+          type="button"
+          class="list-group-item list-group-item-action d-flex align-items-center"
+          [class.active]="currentFolder?.id === folder.id"
+          [style.padding-left.rem]="0.75 + folder.depth * 1.1"
+          (click)="openFolder(folder)"
+          (dragover)="onFolderDragOver($event)"
+          (drop)="onFolderDrop($event, folder)"
+        >
+          <i-bs
+            [name]="folder.is_default ? 'inbox' : 'folder'"
+            class="me-2"
+          ></i-bs>
+          <span class="text-truncate">{{ folder.name }}</span>
+          @if (folder.document_count) {
+            <span class="badge bg-secondary ms-auto">{{
+              folder.document_count
+            }}</span>
+          }
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Main panel -->
+  <div class="col-md-9">
+    @if (loading) {
+      <div class="d-flex justify-content-center p-5">
+        <div class="spinner-border" role="status"></div>
+      </div>
+    } @else {
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="javascript:void(0)" (click)="openFolder(null)" i18n
+              >All folders</a
+            >
+          </li>
+          @for (crumb of breadcrumb; track crumb.id; let last = $last) {
+            <li class="breadcrumb-item" [class.active]="last">
+              @if (last) {
+                {{ crumb.name }}
+              } @else {
+                <a href="javascript:void(0)" (click)="openFolder(crumb)">{{
+                  crumb.name
+                }}</a>
+              }
+            </li>
+          }
+        </ol>
+      </nav>
+
+      <!-- Folder toolbar -->
+      @if (currentFolder) {
+        <div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            (click)="createFolder(currentFolder)"
+            *pngxIfPermissions="{
+              action: PermissionAction.Add,
+              type: PermissionType.Folder,
+            }"
+          >
+            <i-bs name="folder-plus"></i-bs>&nbsp;<ng-container i18n
+              >New subfolder</ng-container
+            >
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            (click)="renameFolder(currentFolder)"
+            *pngxIfPermissions="{
+              action: PermissionAction.Change,
+              type: PermissionType.Folder,
+            }"
+          >
+            <i-bs name="pencil"></i-bs>&nbsp;<ng-container i18n
+              >Rename</ng-container
+            >
+          </button>
+          @if (canDeleteFolder(currentFolder)) {
+            <pngx-confirm-button
+              label="Delete"
+              i18n-label
+              iconName="trash"
+              buttonClasses="btn-sm btn-outline-danger"
+              confirmMessage="This will move any documents in this folder (and its subfolders) to the parent folder. Continue?"
+              i18n-confirmMessage
+              (confirm)="deleteFolder(currentFolder)"
+            >
+            </pngx-confirm-button>
+          }
+
+          <!-- Move selected -->
+          @if (selected.size > 0) {
+            <div class="ms-auto" ngbDropdown>
+              <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                <i-bs name="folder-symlink"></i-bs>&nbsp;<ng-container i18n
+                  >Move {{ selected.size }} selected to…</ng-container
+                >
+              </button>
+              <div ngbDropdownMenu class="folder-move-menu">
+                @for (
+                  folder of flatFolders;
+                  track trackByFolderId($index, folder)
+                ) {
+                  <button
+                    type="button"
+                    ngbDropdownItem
+                    [disabled]="folder.id === currentFolder.id"
+                    [style.padding-left.rem]="1 + folder.depth * 1"
+                    (click)="moveSelectedTo(folder)"
+                  >
+                    <i-bs
+                      [name]="folder.is_default ? 'inbox' : 'folder'"
+                      class="me-2"
+                    ></i-bs
+                    >{{ folder.name }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Subfolders -->
+      @if (subfolders.length) {
+        <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-2 mb-3">
+          @for (folder of subfolders; track trackByFolderId($index, folder)) {
+            <div class="col">
+              <button
+                type="button"
+                class="btn btn-light w-100 text-start d-flex align-items-center folder-card"
+                (click)="openFolder(folder)"
+                (dragover)="onFolderDragOver($event)"
+                (drop)="onFolderDrop($event, folder)"
+              >
+                <i-bs
+                  [name]="folder.is_default ? 'inbox' : 'folder-fill'"
+                  class="me-2 text-primary"
+                ></i-bs>
+                <span class="text-truncate">{{ folder.name }}</span>
+                @if (folder.document_count) {
+                  <span class="badge bg-secondary ms-auto">{{
+                    folder.document_count
+                  }}</span>
+                }
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Documents -->
+      @if (currentFolder) {
+        @if (documentsLoading) {
+          <div class="d-flex justify-content-center p-4">
+            <div class="spinner-border spinner-border-sm" role="status"></div>
+          </div>
+        } @else if (documents.length) {
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th scope="col" class="fit">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    [checked]="allSelected"
+                    (change)="toggleSelectAll()"
+                  />
+                </th>
+                <th scope="col" i18n>Title</th>
+                <th scope="col" i18n>Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (doc of documents; track trackByDocId($index, doc)) {
+                <tr
+                  [class.table-active]="isSelected(doc)"
+                  draggable="true"
+                  (dragstart)="onDocDragStart($event, doc)"
+                >
+                  <td class="fit">
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      [checked]="isSelected(doc)"
+                      (change)="toggleSelected(doc)"
+                    />
+                  </td>
+                  <td>
+                    <a routerLink="/documents/{{ doc.id }}">{{ doc.title }}</a>
+                  </td>
+                  <td>{{ doc.created | customDate: 'mediumDate' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          @if (documentsCount > pageSize) {
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted small" i18n
+                >{{ documentsCount }} documents</span
+              >
+              <ngb-pagination
+                [collectionSize]="documentsCount"
+                [pageSize]="pageSize"
+                [(page)]="page"
+                [maxSize]="5"
+                (pageChange)="onPageChange($event)"
+              >
+              </ngb-pagination>
+            </div>
+          }
+        } @else if (!subfolders.length) {
+          <div class="text-center text-muted p-5">
+            <i-bs name="folder2-open" width="2em" height="2em"></i-bs>
+            <p class="mt-2" i18n>This folder is empty.</p>
+          </div>
+        }
+      } @else if (!roots.length) {
+        <div class="text-center text-muted p-5">
+          <i-bs name="folder2-open" width="2em" height="2em"></i-bs>
+          <p class="mt-2" i18n>No folders yet. Create one to get started.</p>
+        </div>
+      }
+    }
+  </div>
+</div>

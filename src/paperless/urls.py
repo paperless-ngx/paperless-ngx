@@ -24,6 +24,7 @@ from documents.views import CustomFieldViewSet
 from documents.views import DeleteDocumentsView
 from documents.views import DocumentTypeViewSet
 from documents.views import EditPdfDocumentsView
+from documents.views import FolderViewSet
 from documents.views import GlobalSearchView
 from documents.views import IndexView
 from documents.views import LogViewSet
@@ -75,6 +76,7 @@ api_router.register(r"logs", LogViewSet, basename="logs")
 api_router.register(r"tags", TagViewSet)
 api_router.register(r"saved_views", SavedViewViewSet)
 api_router.register(r"storage_paths", StoragePathViewSet)
+api_router.register(r"folders", FolderViewSet)
 api_router.register(r"tasks", TasksViewSet, basename="tasks")
 api_router.register(r"users", UserViewSet, basename="users")
 api_router.register(r"groups", GroupViewSet, basename="groups")

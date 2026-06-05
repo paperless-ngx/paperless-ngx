@@ -154,6 +154,127 @@ class StoragePath(MatchingModel):
         verbose_name_plural = _("storage paths")
 
 
+class Folder(ModelWithOwner):
+    """
+    A user-facing, navigable folder that documents can be organized into,
+    similar to a file-explorer hierarchy.
+
+    Unlike :class:`StoragePath` (a filename template), a folder is an explicit
+    entity the user creates, renames, nests and moves documents between. Every
+    document is expected to belong to exactly one folder. Folders are a logical
+    organization layer: assigning a folder does not change where the underlying
+    file lives on disk (that remains governed by storage paths / filename
+    format), mirroring how correspondents, document types and tags behave.
+    """
+
+    # Maximum allowed nesting depth (root = 1).
+    MAX_NESTING_DEPTH: Final[int] = 10
+
+    name = models.CharField(_("name"), max_length=128)
+
+    parent = models.ForeignKey(
+        "self",
+        blank=True,
+        null=True,
+        related_name="children",
+        on_delete=models.CASCADE,
+        verbose_name=_("parent folder"),
+    )
+
+    is_default = models.BooleanField(
+        _("is default folder"),
+        default=False,
+        help_text=_(
+            "Marks this folder as the default folder. Newly consumed or "
+            "unclassified documents are placed here.",
+        ),
+    )
+
+    class Meta(ModelWithOwner.Meta):
+        ordering = ("name",)
+        verbose_name = _("folder")
+        verbose_name_plural = _("folders")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "parent", "owner"],
+                name="documents_folder_unique_name_parent_owner",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return self.full_path
+
+    @property
+    def full_path(self) -> str:
+        """Human readable path from the root folder down to this one."""
+        names = [self.name]
+        for ancestor in self.get_ancestors():
+            names.append(ancestor.name)
+        return "/".join(reversed(names))
+
+    def get_ancestors(self) -> "list[Folder]":
+        ancestors: list = []
+        parent = self.parent
+        seen: set[int] = {self.pk} if self.pk else set()
+        while parent is not None and parent.pk not in seen:
+            seen.add(parent.pk)
+            ancestors.append(parent)
+            parent = parent.parent
+        return ancestors
+
+    def get_descendants(self) -> "list[Folder]":
+        descendants: list = []
+        stack = list(self.children.all())
+        while stack:
+            child = stack.pop()
+            descendants.append(child)
+            stack.extend(child.children.all())
+        return descendants
+
+    def clean(self) -> None:
+        parent = self.parent
+        if parent is not None:
+            if self.pk is not None and parent.pk == self.pk:
+                raise ValidationError({"parent": _("Cannot set itself as parent.")})
+
+            # Walk up from the proposed parent; if we reach self it's a cycle
+            ancestor = parent
+            seen: set[int] = set()
+            depth = 1  # the proposed parent itself
+            while ancestor is not None and ancestor.pk not in seen:
+                seen.add(ancestor.pk)
+                if self.pk is not None and ancestor.pk == self.pk:
+                    raise ValidationError(
+                        {"parent": _("Cannot set parent to a descendant.")},
+                    )
+                ancestor = ancestor.parent
+                depth += 1
+
+            # depth now counts ancestors + parent; +1 for this folder itself
+            if depth + 1 > self.MAX_NESTING_DEPTH:
+                raise ValidationError({"parent": _("Maximum nesting depth exceeded.")})
+
+        return super().clean()
+
+
+def get_default_folder() -> Folder:
+    """
+    Return the default ("Inbox") folder, creating it if it does not exist.
+
+    Every document must belong to a folder; this is the fallback used for newly
+    consumed documents, for documents whose folder was removed, and during data
+    migration of pre-existing documents.
+    """
+    folder = Folder.objects.filter(is_default=True).order_by("pk").first()
+    if folder is None:
+        folder = Folder.objects.create(name="Inbox", is_default=True)
+    return folder
+
+
+def get_default_folder_id() -> int:
+    return get_default_folder().pk
+
+
 class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-missing]
     MAX_STORED_FILENAME_LENGTH: Final[int] = 1024
 
@@ -173,6 +294,20 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         related_name="documents",
         on_delete=models.SET_NULL,
         verbose_name=_("storage path"),
+    )
+
+    folder = models.ForeignKey(
+        Folder,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("folder"),
+        help_text=_(
+            "The folder this document is organized into. Every document "
+            "should belong to a folder; unclassified documents fall back to "
+            "the default folder.",
+        ),
     )
 
     title = models.CharField(_("title"), max_length=128, blank=True, db_index=True)
