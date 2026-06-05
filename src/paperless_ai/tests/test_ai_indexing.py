@@ -526,6 +526,26 @@ class TestLlmIndexAddOrUpdateDocumentEmptyContent:
 
 
 @pytest.mark.django_db
+def test_llm_index_compact_uses_zero_retention(
+    temp_llm_index_dir: Path,
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """compact must use retention_seconds=0 to clear all MVCC history immediately."""
+    mock_store = mocker.MagicMock()
+    mocker.patch(
+        "paperless_ai.indexing.write_store",
+        return_value=mocker.MagicMock(
+            __enter__=mocker.MagicMock(return_value=mock_store),
+            __exit__=mocker.MagicMock(return_value=False),
+        ),
+    )
+
+    indexing.llm_index_compact()
+
+    mock_store.compact.assert_called_once_with(retention_seconds=0)
+
+
+@pytest.mark.django_db
 class TestLlmIndexLocking:
     """Index mutation functions must go through write_store(), which holds the lock.
 

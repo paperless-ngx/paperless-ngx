@@ -311,6 +311,12 @@ def llm_index_add_or_update_document(document: Document):
         store.ensure_document_id_scalar_index()
 
 
+def llm_index_compact() -> None:
+    """Compact the index immediately, clearing all MVCC version history."""
+    with write_store() as store:
+        store.compact(retention_seconds=0)
+
+
 def llm_index_remove_document(document: Document):
     """Remove a document's chunks from the LLM index."""
     with write_store() as store:
