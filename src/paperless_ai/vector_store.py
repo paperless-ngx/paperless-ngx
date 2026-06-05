@@ -108,6 +108,7 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
                 pa.field("id", pa.string()),
                 pa.field("doc_id", pa.string()),
                 pa.field("document_id", pa.string()),
+                pa.field("modified", pa.string()),
                 pa.field("vector", pa.list_(pa.float32(), dim)),
                 pa.field("node_content", pa.string()),
             ],
@@ -123,6 +124,7 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
             "id": node.node_id,
             "doc_id": node.ref_doc_id,
             "document_id": str(node.metadata.get("document_id")),
+            "modified": str(node.metadata.get("modified", "")),
             "vector": node.get_embedding(),
             "node_content": json.dumps(meta),
         }
@@ -284,13 +286,10 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         if self._table is None:
             return {}
         result: dict[str, str] = {}
-        for row in (
-            self._table.search().select(["document_id", "node_content"]).to_list()
-        ):
+        for row in self._table.search().select(["document_id", "modified"]).to_list():
             doc_id = str(row["document_id"])
             if doc_id not in result:
-                meta = json.loads(row["node_content"])
-                result[doc_id] = meta.get("modified", "")
+                result[doc_id] = str(row["modified"] or "")
         return result
 
     def ensure_document_id_scalar_index(self) -> None:
