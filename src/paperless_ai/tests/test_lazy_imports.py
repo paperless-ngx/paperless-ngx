@@ -1,5 +1,8 @@
 import subprocess
 import sys
+from pathlib import Path
+
+_SRC_DIR = Path(__file__).parent.parent.parent
 
 
 class TestLazyAiImports:
@@ -17,6 +20,6 @@ class TestLazyAiImports:
             [sys.executable, "-c", code],
             capture_output=True,
             text=True,
-            cwd="src",
+            cwd=_SRC_DIR,
         )
         assert result.returncode == 0, result.stdout + result.stderr
