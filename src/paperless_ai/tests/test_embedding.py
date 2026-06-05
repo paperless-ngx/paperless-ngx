@@ -243,12 +243,15 @@ def test_build_llm_index_text(mock_document):
 
         result = build_llm_index_text(mock_document)
 
-        assert "Title: Test Title" in result
+        # Structured fields live in node.metadata for LLM context — not body text
+        assert "Title: Test Title" not in result
+        assert "Created: 2023-01-01" not in result
+        assert "Tags: Tag1, Tag2" not in result
+        assert "Document Type: Invoice" not in result
+        assert "Correspondent: Test Correspondent" not in result
+
+        # Fields without a metadata equivalent stay in body text
         assert "Filename: test_file.pdf" in result
-        assert "Created: 2023-01-01" in result
-        assert "Tags: Tag1, Tag2" in result
-        assert "Document Type: Invoice" in result
-        assert "Correspondent: Test Correspondent" in result
         assert "Notes: Note1,Note2" in result
         assert "Content:\n\nThis is the document content." in result
         assert "Custom Field - Field1: Value1\nCustom Field - Field2: Value2" in result

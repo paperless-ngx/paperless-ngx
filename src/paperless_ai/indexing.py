@@ -119,6 +119,7 @@ def build_document_node(
         text=text,
         metadata=metadata,
         excluded_embed_metadata_keys=list(metadata.keys()),
+        excluded_llm_metadata_keys=["document_id"],
     )
     chunk_size = chunk_size or get_rag_chunk_size()
     parser = SimpleNodeParser(

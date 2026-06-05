@@ -70,6 +70,37 @@ def test_build_document_node_excludes_metadata_from_embedding(
 
 
 @pytest.mark.django_db
+def test_build_document_node_structured_fields_in_metadata(
+    real_document: Document,
+) -> None:
+    """Structured fields must be in node.metadata so the LLM receives them via metadata prepend."""
+    nodes = indexing.build_document_node(real_document)
+    assert len(nodes) > 0
+    for node in nodes:
+        assert "title" in node.metadata
+        assert "tags" in node.metadata
+        assert "correspondent" in node.metadata
+        assert "document_type" in node.metadata
+        assert "created" in node.metadata
+        assert "added" in node.metadata
+        assert "modified" in node.metadata
+
+
+@pytest.mark.django_db
+def test_build_document_node_excludes_document_id_from_llm_context(
+    real_document: Document,
+) -> None:
+    """document_id is an internal key and must not appear in LLM context text."""
+    from llama_index.core.schema import MetadataMode
+
+    nodes = indexing.build_document_node(real_document)
+    assert len(nodes) > 0
+    for node in nodes:
+        assert "document_id" in node.excluded_llm_metadata_keys
+        assert "document_id" not in node.get_content(metadata_mode=MetadataMode.LLM)
+
+
+@pytest.mark.django_db
 def test_build_document_node_uses_rag_chunk_settings(real_document: Document) -> None:
     app_config, _ = ApplicationConfiguration.objects.get_or_create()
     app_config.llm_embedding_chunk_size = 512

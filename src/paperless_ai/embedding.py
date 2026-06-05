@@ -138,15 +138,13 @@ def _normalize_llm_index_text(text: str) -> str:
 
 
 def build_llm_index_text(doc: Document) -> str:
+    # TODO: Filename, Storage Path, and Archive Serial Number are short structured
+    # values that could move to node.metadata (excluded from embeddings, visible to
+    # LLM via metadata prepend) — same pattern as title/tags/correspondent. Notes
+    # and Custom Fields should stay here: Notes can be long free text, Custom Fields
+    # are dynamic in count and best kept in the embedding.
     lines = [
-        f"Title: {doc.title}",
         f"Filename: {doc.filename}",
-        f"Created: {doc.created}",
-        f"Added: {doc.added}",
-        f"Modified: {doc.modified}",
-        f"Tags: {', '.join(tag.name for tag in doc.tags.all())}",
-        f"Document Type: {doc.document_type.name if doc.document_type else ''}",
-        f"Correspondent: {doc.correspondent.name if doc.correspondent else ''}",
         f"Storage Path: {doc.storage_path.name if doc.storage_path else ''}",
         f"Archive Serial Number: {doc.archive_serial_number or ''}",
         f"Notes: {','.join([str(c.note) for c in Note.objects.filter(document=doc)])}",
