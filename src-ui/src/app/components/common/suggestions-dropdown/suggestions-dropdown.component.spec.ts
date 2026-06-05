@@ -37,6 +37,18 @@ describe('SuggestionsDropdownComponent', () => {
     expect(component.getSuggestions.emit).toHaveBeenCalled()
   })
 
+  it('should not emit getSuggestions when disabled', () => {
+    jest.spyOn(component.getSuggestions, 'emit')
+    component.disabled = true
+    component.suggestions = null
+    fixture.detectChanges()
+
+    component.clickSuggest()
+
+    expect(component.getSuggestions.emit).not.toHaveBeenCalled()
+    expect(fixture.nativeElement.querySelector('button').disabled).toBeTruthy()
+  })
+
   it('should toggle dropdown when clickSuggest is called and suggestions are not null', () => {
     component.aiEnabled = true
     fixture.detectChanges()
