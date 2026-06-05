@@ -311,7 +311,7 @@ class TestPaperlessLanceVectorStoreMaintenance:
         store.ensure_document_id_scalar_index()
         # Second call must not raise and must not replace the existing index.
         store.ensure_document_id_scalar_index()
-        assert store._has_scalar_index()
+        assert store._has_index_on("document_id")
 
     def test_ensure_scalar_index_noop_on_empty_store(
         self,

@@ -89,7 +89,7 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         return self._conn
 
     def table_exists(self) -> bool:
-        return self._table_name in self._conn.list_tables().tables
+        return self._table is not None
 
     def vector_dim(self) -> int | None:
         if self._table is None:
@@ -127,18 +127,27 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
             "node_content": json.dumps(meta),
         }
 
+    def _ensure_table(self, rows: list[dict[str, Any]], dim: int) -> bool:
+        """Create the table from ``rows`` if it does not exist yet.
+
+        Returns True if the table was just created (caller can skip the
+        separate add/merge step), False if the table already existed.
+        """
+        if self._table is not None:
+            return False
+        self._table = self._conn.create_table(
+            self._table_name,
+            rows,
+            schema=self._schema(dim),
+        )
+        return True
+
     def add(self, nodes: Sequence[BaseNode], **add_kwargs: Any) -> list[str]:
         if not nodes:
             return []
         rows = [self._row(node) for node in nodes]
-        if self._table is None:
-            dim = len(nodes[0].get_embedding())
-            self._table = self._conn.create_table(
-                self._table_name,
-                rows,
-                schema=self._schema(dim),
-            )
-        else:
+        dim = len(nodes[0].get_embedding())
+        if not self._ensure_table(rows, dim):
             self._table.add(rows)
         return [node.node_id for node in nodes]
 
@@ -157,13 +166,8 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
                 self._table.delete(f"document_id = '{_escape(document_id)}'")
             return []
         rows = [self._row(node) for node in nodes]
-        if self._table is None:
-            dim = len(nodes[0].get_embedding())
-            self._table = self._conn.create_table(
-                self._table_name,
-                rows,
-                schema=self._schema(dim),
-            )
+        dim = len(nodes[0].get_embedding())
+        if self._ensure_table(rows, dim):
             return [node.node_id for node in nodes]
         (
             self._table.merge_insert("id")
@@ -236,11 +240,8 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         ids = [row["id"] for row in rows]
         return VectorStoreQueryResult(nodes=nodes, similarities=sims, ids=ids)
 
-    def _has_vector_index(self) -> bool:
-        return any("vector" in idx.columns for idx in self._table.list_indices())
-
-    def _has_scalar_index(self) -> bool:
-        return any("document_id" in idx.columns for idx in self._table.list_indices())
+    def _has_index_on(self, column: str) -> bool:
+        return any(column in idx.columns for idx in self._table.list_indices())
 
     def maybe_create_ann_index(self, min_rows: int = ANN_INDEX_MIN_ROWS) -> None:
         """Best-effort: build an IVF index once the table is large enough.
@@ -252,7 +253,7 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         if self._table is None:
             return
         rows = self._table.count_rows()
-        if rows < min_rows or self._has_vector_index():
+        if rows < min_rows or self._has_index_on("vector"):
             return
         num_partitions = max(1, rows // 4096)
         # Embedding dim from the schema's fixed-size list column.
@@ -298,7 +299,7 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         No-op if the index already exists."""
         if self._table is None:
             return
-        if self._has_scalar_index():
+        if self._has_index_on("document_id"):
             return
         try:
             self._table.create_scalar_index("document_id")
