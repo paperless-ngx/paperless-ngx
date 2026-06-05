@@ -279,6 +279,22 @@ def test_update_llm_index_no_documents(
 
 
 @pytest.mark.django_db
+def test_update_no_documents_no_index_returns_early(
+    temp_llm_index_dir: Path,
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """update with no documents and no existing index must return early."""
+    mock_qs = MagicMock()
+    mock_qs.exists.return_value = False
+    mock_qs.__iter__ = MagicMock(return_value=iter([]))
+    mocker.patch("paperless_ai.indexing.Document.objects.all", return_value=mock_qs)
+
+    result = indexing.update_llm_index(rebuild=False)
+
+    assert result == "No documents found to index."
+
+
+@pytest.mark.django_db
 def test_queue_llm_index_update_if_needed_enqueues_when_idle_or_skips_recent() -> None:
     # No existing tasks
     with patch("documents.tasks.llmindex_index") as mock_task:
@@ -633,6 +649,32 @@ class TestDimensionGuard:
     ) -> None:
         """No table yet — dim mismatch must return False (nothing to compare)."""
         assert not indexing.embedding_dim_mismatch()
+
+    def test_update_llm_index_forces_rebuild_on_dim_mismatch(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """When the stored dim differs from the current model, update must force a rebuild."""
+        mocker.patch("paperless_ai.indexing.embedding_dim_mismatch", return_value=True)
+        mocker.patch("paperless_ai.indexing.llm_index_exists", return_value=True)
+        mock_store = MagicMock()
+        mocker.patch(
+            "paperless_ai.indexing.write_store",
+            return_value=mocker.MagicMock(
+                __enter__=mocker.MagicMock(return_value=mock_store),
+                __exit__=mocker.MagicMock(return_value=False),
+            ),
+        )
+        mock_qs = MagicMock()
+        mock_qs.exists.return_value = True
+        mock_qs.__iter__ = MagicMock(return_value=iter([]))
+        mocker.patch("paperless_ai.indexing.Document.objects.all", return_value=mock_qs)
+
+        indexing.update_llm_index(rebuild=False)
+
+        mock_store.drop_table.assert_called_once()
 
 
 @pytest.mark.django_db

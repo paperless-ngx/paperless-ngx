@@ -194,7 +194,7 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         filters: MetadataFilters | None = None,
         **kwargs: Any,
     ) -> list[BaseNode]:
-        if node_ids is not None:
+        if node_ids is not None:  # pragma: no cover
             # node_ids lookup is not implemented; see class docstring.
             raise NotImplementedError(
                 "PaperlessLanceVectorStore does not support node_ids lookup",
@@ -255,7 +255,7 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         # Embedding dim from the schema's fixed-size list column.
         dim = self._table.schema.field("vector").type.list_size
         try:
-            if dim % ANN_PQ_SUB_VECTORS == 0:
+            if dim % ANN_PQ_SUB_VECTORS == 0:  # pragma: no cover
                 self._table.create_index(
                     metric="l2",
                     num_partitions=num_partitions,

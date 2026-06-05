@@ -106,6 +106,23 @@ class TestPaperlessLanceVectorStoreCrud:
         )
         assert nodes == []
 
+    def test_get_nodes_returns_empty_when_no_table(
+        self,
+        store: PaperlessLanceVectorStore,
+    ) -> None:
+        result = store.get_nodes(
+            filters=MetadataFilters(
+                filters=[
+                    MetadataFilter(
+                        key="document_id",
+                        operator=FilterOperator.IN,
+                        value=["1"],
+                    ),
+                ],
+            ),
+        )
+        assert result == []
+
     def test_fresh_instance_filters_existing_table(
         self,
         tmp_path: Path,

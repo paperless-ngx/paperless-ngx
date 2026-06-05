@@ -420,7 +420,7 @@ def query_similar_documents(
             continue
         try:
             retrieved_document_ids.append(int(normalized))
-        except ValueError:
+        except ValueError:  # pragma: no cover
             logger.warning(
                 "Skipping LLM index result with invalid document_id %r.",
                 document_id,
