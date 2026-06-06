@@ -782,6 +782,9 @@ describe('TasksComponent', () => {
   })
 
   it('should keep clearing selection independent from resetting filters', () => {
+    component.resetFilter()
+    expect(component.filterText).toBe('')
+
     component.setTaskType(PaperlessTaskType.ConsumeFile)
     component.toggleSelected(tasks[0])
     expect(component.selectedTasks.size).toBe(1)
