@@ -295,6 +295,7 @@ describe('TasksComponent', () => {
     const headerText = header.nativeElement.textContent
 
     expect(headerText).toContain('Dismiss visible')
+    expect(headerText).toContain('Dismiss all')
     expect(headerText).toContain('Auto refresh')
     expect(headerText).not.toContain('All types')
     expect(headerText).not.toContain('All sources')
@@ -493,6 +494,19 @@ describe('TasksComponent', () => {
     expect(modal).not.toBeUndefined()
     modal.componentInstance.confirmClicked.emit()
     expect(dismissSpy).toHaveBeenCalledWith(new Set([467, 466]))
+  })
+
+  it('should support dismiss all tasks', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+    const dismissSpy = jest.spyOn(tasksService, 'dismissAllTasks')
+
+    component.dismissAllTasks()
+
+    expect(modal).not.toBeUndefined()
+    expect(modal.componentInstance.messageBold).toBe('Dismiss all 7 tasks?')
+    modal.componentInstance.confirmClicked.emit()
+    expect(dismissSpy).toHaveBeenCalled()
   })
 
   it('should dismiss the currently visible scoped and filtered tasks', () => {
