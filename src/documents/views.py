@@ -4011,7 +4011,7 @@ class RemoteVersionView(GenericAPIView[Any]):
 
 
 class _TasksViewSetSchema(AutoSchema):
-    _UNPAGINATED_ACTIONS = frozenset({"summary", "active"})
+    _UNPAGINATED_ACTIONS = frozenset({"summary", "active", "status_counts"})
 
     def _get_paginator(self):
         if getattr(self.view, "action", None) in self._UNPAGINATED_ACTIONS:
@@ -4070,6 +4070,19 @@ class _TasksViewSetSchema(AutoSchema):
                 description="Number of days to include in aggregation (default 30, min 1, max 365)",
             ),
         ],
+    ),
+    status_counts=extend_schema(
+        responses={
+            200: inline_serializer(
+                name="TaskStatusCounts",
+                fields={
+                    "all": serializers.IntegerField(),
+                    "needs_attention": serializers.IntegerField(),
+                    "in_progress": serializers.IntegerField(),
+                    "completed": serializers.IntegerField(),
+                },
+            ),
+        },
     ),
     active=extend_schema(
         description="Currently pending and running tasks (capped at 50).",
@@ -4225,6 +4238,34 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
         )
         serializer = TaskSummarySerializer(data, many=True)
         return Response(serializer.data)
+
+    @action(methods=["get"], detail=False)
+    def status_counts(self, request):
+        """Aggregated task counts for task UI sections."""
+        queryset = self.filter_queryset(self.get_queryset())
+        counts = queryset.aggregate(
+            all=Count("id"),
+            needs_attention=Count(
+                "id",
+                filter=Q(
+                    status__in=[
+                        PaperlessTask.Status.FAILURE,
+                        PaperlessTask.Status.REVOKED,
+                    ],
+                ),
+            ),
+            in_progress=Count(
+                "id",
+                filter=Q(
+                    status__in=[
+                        PaperlessTask.Status.PENDING,
+                        PaperlessTask.Status.STARTED,
+                    ],
+                ),
+            ),
+            completed=Count("id", filter=Q(status=PaperlessTask.Status.SUCCESS)),
+        )
+        return Response(counts)
 
     @action(methods=["get"], detail=False)
     def active(self, request):
