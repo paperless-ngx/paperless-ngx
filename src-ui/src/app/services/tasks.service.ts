@@ -5,6 +5,7 @@ import { first, map, takeUntil, tap } from 'rxjs/operators'
 import {
   PaperlessTask,
   PaperlessTaskStatus,
+  PaperlessTaskStatusCounts,
   PaperlessTaskType,
 } from 'src/app/data/paperless-task'
 import { Results } from 'src/app/data/results'
@@ -98,6 +99,17 @@ export class TasksService {
           page_size: pageSize,
           ...extraParams,
         },
+      }
+    )
+  }
+
+  public statusCounts(
+    extraParams?: Record<string, string | number | boolean | readonly string[]>
+  ): Observable<PaperlessTaskStatusCounts> {
+    return this.http.get<PaperlessTaskStatusCounts>(
+      `${this.baseUrl}${this.endpoint}/status_counts/`,
+      {
+        params: extraParams,
       }
     )
   }

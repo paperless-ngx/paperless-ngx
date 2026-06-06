@@ -221,4 +221,34 @@ describe('TasksService', () => {
       task_id: 'abc-123',
     })
   })
+
+  it('loads filtered task status counts', () => {
+    tasksService
+      .statusCounts({
+        acknowledged: false,
+        task_type: PaperlessTaskType.ConsumeFile,
+      })
+      .subscribe((res) => {
+        expect(res).toEqual({
+          all: 10,
+          needs_attention: 2,
+          in_progress: 3,
+          completed: 5,
+        })
+      })
+
+    const req = httpTestingController.expectOne(
+      (req: HttpRequest<unknown>) =>
+        req.url === `${environment.apiBaseUrl}tasks/status_counts/` &&
+        req.params.get('acknowledged') === 'false' &&
+        req.params.get('task_type') === PaperlessTaskType.ConsumeFile
+    )
+    expect(req.request.method).toEqual('GET')
+    req.flush({
+      all: 10,
+      needs_attention: 2,
+      in_progress: 3,
+      completed: 5,
+    })
+  })
 })
