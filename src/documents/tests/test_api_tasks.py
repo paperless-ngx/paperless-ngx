@@ -224,6 +224,57 @@ class TestGetTasksV10:
         assert response.data["count"] == 1
         assert response.data["results"][0]["task_id"] == document_task.task_id
 
+    def test_status_counts_respects_filters(self, admin_client: APIClient) -> None:
+        """status_counts/ returns section counts for the filtered task queryset."""
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.FAILURE,
+            input_data={"filename": "invoice-a.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.REVOKED,
+            input_data={"filename": "invoice-b.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.PENDING,
+            input_data={"filename": "invoice-c.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.STARTED,
+            input_data={"filename": "invoice-d.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.SUCCESS,
+            input_data={"filename": "invoice-e.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=True,
+            status=PaperlessTask.Status.SUCCESS,
+            input_data={"filename": "invoice-acknowledged.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.SUCCESS,
+            input_data={"filename": "unrelated.pdf"},
+        )
+
+        response = admin_client.get(
+            f"{ENDPOINT}status_counts/",
+            {"acknowledged": "false", "name": "invoice"},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == {
+            "all": 5,
+            "needs_attention": 2,
+            "in_progress": 2,
+            "completed": 1,
+        }
+
     def test_default_ordering_is_newest_first(self, admin_client: APIClient) -> None:
         """Tasks are returned in descending date_created order (newest first)."""
         base = timezone.now()
