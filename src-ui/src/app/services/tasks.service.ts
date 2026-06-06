@@ -88,7 +88,7 @@ export class TasksService {
   public list(
     page: number,
     pageSize: number,
-    extraParams?: Record<string, string | number | boolean>
+    extraParams?: Record<string, string | number | boolean | readonly string[]>
   ): Observable<Results<PaperlessTask>> {
     return this.http.get<Results<PaperlessTask>>(
       `${this.baseUrl}${this.endpoint}/`,
