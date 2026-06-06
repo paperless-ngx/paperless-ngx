@@ -28,6 +28,7 @@ from django.db.models.functions import Cast
 from django.utils.translation import gettext_lazy as _
 from django_filters import DateFilter
 from django_filters.rest_framework import BooleanFilter
+from django_filters.rest_framework import CharFilter
 from django_filters.rest_framework import DateTimeFilter
 from django_filters.rest_framework import Filter
 from django_filters.rest_framework import FilterSet
@@ -900,12 +901,12 @@ class ShareLinkBundleFilterSet(FilterSet):
 
 
 class PaperlessTaskFilterSet(FilterSet):
-    name = Filter(
+    name = CharFilter(
         method="filter_name",
         label="Name",
     )
 
-    result = Filter(
+    result = CharFilter(
         method="filter_result",
         label="Result",
     )
