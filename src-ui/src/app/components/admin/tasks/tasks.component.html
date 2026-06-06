@@ -81,7 +81,7 @@
         <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{filterTargetName}}</button>
         <div class="dropdown-menu shadow" ngbDropdownMenu>
           @for (t of filterTargets; track t.id) {
-            <button ngbDropdownItem [class.active]="filterTargetID === t.id" (click)="filterTargetID = t.id">{{t.name}}</button>
+            <button ngbDropdownItem [class.active]="filterTargetID === t.id" (click)="setFilterTarget(t.id)">{{t.name}}</button>
           }
         </div>
       </div>
