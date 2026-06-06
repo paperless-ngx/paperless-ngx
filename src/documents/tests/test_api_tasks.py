@@ -18,6 +18,7 @@ from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from documents.filters import PaperlessTaskFilterSet
 from documents.models import PaperlessTask
 from documents.tests.factories import DocumentFactory
 from documents.tests.factories import PaperlessTaskFactory
@@ -223,6 +224,15 @@ class TestGetTasksV10:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["count"] == 1
         assert response.data["results"][0]["task_id"] == document_task.task_id
+
+    def test_empty_task_name_and_result_filters(self) -> None:
+        """Empty name/result values leave the queryset unchanged."""
+        PaperlessTaskFactory.create_batch(2)
+        queryset = PaperlessTask.objects.all()
+        filterset = PaperlessTaskFilterSet()
+
+        assert filterset.filter_name(queryset, "name", "").count() == 2
+        assert filterset.filter_result(queryset, "result", "").count() == 2
 
     def test_status_counts_respects_filters(self, admin_client: APIClient) -> None:
         """status_counts/ returns section counts for the filtered task queryset."""
