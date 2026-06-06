@@ -176,6 +176,13 @@ def test_stream_chat_with_multiple_documents_retrieval(patch_embed_nodes) -> Non
         )
 
 
+def test_stream_chat_empty_document_list() -> None:
+    with patch("paperless_ai.chat.load_or_build_index") as mock_load_index:
+        output = list(stream_chat_with_documents("Any info?", []))
+        mock_load_index.assert_not_called()
+        assert output == ["Sorry, I couldn't find any content to answer your question."]
+
+
 def test_stream_chat_no_matching_nodes() -> None:
     with (
         patch("paperless_ai.chat.AIClient") as mock_client_cls,

@@ -85,6 +85,10 @@ def stream_chat_with_documents(query_str: str, documents: list[Document]):
 
 
 def _stream_chat_with_documents(query_str: str, documents: list[Document]):
+    if not documents:
+        yield CHAT_NO_CONTENT_MESSAGE
+        return
+
     from llama_index.core.prompts import PromptTemplate
     from llama_index.core.query_engine import RetrieverQueryEngine
     from llama_index.core.response_synthesizers import get_response_synthesizer
