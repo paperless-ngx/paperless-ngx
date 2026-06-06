@@ -169,6 +169,61 @@ class TestGetTasksV10:
             PaperlessTask.Status.STARTED,
         }
 
+    def test_filter_by_task_name(self, admin_client: APIClient) -> None:
+        """?name= searches task filenames, task types, and trigger sources."""
+        filename_task = PaperlessTaskFactory(input_data={"filename": "invoice-123.pdf"})
+        type_task = PaperlessTaskFactory(task_type=PaperlessTask.TaskType.SANITY_CHECK)
+        source_task = PaperlessTaskFactory(
+            trigger_source=PaperlessTask.TriggerSource.EMAIL_CONSUME,
+        )
+        PaperlessTaskFactory(input_data={"filename": "unrelated.pdf"})
+
+        response = admin_client.get(ENDPOINT, {"name": "invoice"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["task_id"] == filename_task.task_id
+
+        response = admin_client.get(ENDPOINT, {"name": "sanity"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["task_id"] == type_task.task_id
+
+        response = admin_client.get(ENDPOINT, {"name": "email"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["task_id"] == source_task.task_id
+
+    def test_filter_by_task_result(self, admin_client: APIClient) -> None:
+        """?result= searches common structured task result messages."""
+        reason_task = PaperlessTaskFactory(result_data={"reason": "Manual review"})
+        error_task = PaperlessTaskFactory(
+            result_data={"error_message": "Duplicate detected"},
+        )
+        document_task = PaperlessTaskFactory(result_data={"document_id": 321})
+        duplicate_task = PaperlessTaskFactory(result_data={"duplicate_of": 123})
+        PaperlessTaskFactory(result_data={"reason": "unrelated"})
+
+        response = admin_client.get(ENDPOINT, {"result": "manual"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["task_id"] == reason_task.task_id
+
+        response = admin_client.get(ENDPOINT, {"result": "duplicate"})
+
+        assert response.status_code == status.HTTP_200_OK
+        returned_ids = {task["task_id"] for task in response.data["results"]}
+        assert returned_ids == {error_task.task_id, duplicate_task.task_id}
+
+        response = admin_client.get(ENDPOINT, {"result": "321"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["task_id"] == document_task.task_id
+
     def test_default_ordering_is_newest_first(self, admin_client: APIClient) -> None:
         """Tasks are returned in descending date_created order (newest first)."""
         base = timezone.now()
