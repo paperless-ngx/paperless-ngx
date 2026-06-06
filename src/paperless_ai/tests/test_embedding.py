@@ -1,4 +1,3 @@
-import json
 from unittest.mock import ANY
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -10,7 +9,7 @@ from documents.models import Document
 from paperless.models import LLMEmbeddingBackend
 from paperless_ai.embedding import _normalize_llm_index_text
 from paperless_ai.embedding import build_llm_index_text
-from paperless_ai.embedding import get_embedding_dim
+from paperless_ai.embedding import get_configured_model_name
 from paperless_ai.embedding import get_embedding_model
 
 
@@ -186,52 +185,32 @@ def test_get_embedding_model_invalid_backend(mock_ai_config):
         get_embedding_model()
 
 
-def test_get_embedding_dim_infers_and_saves(temp_llm_index_dir, mock_ai_config):
-    mock_ai_config.return_value.llm_embedding_backend = "openai-like"
+@pytest.mark.parametrize(
+    ("backend", "expected_default"),
+    [
+        (LLMEmbeddingBackend.OPENAI_LIKE, "text-embedding-3-small"),
+        (LLMEmbeddingBackend.HUGGINGFACE, "sentence-transformers/all-MiniLM-L6-v2"),
+        (LLMEmbeddingBackend.OLLAMA, "embeddinggemma"),
+    ],
+)
+def test_get_configured_model_name_falls_back_to_backend_default(
+    mock_ai_config,
+    backend,
+    expected_default,
+):
+    """When no model is explicitly configured, each backend has a distinct default."""
+    mock_ai_config.return_value.llm_embedding_backend = backend
     mock_ai_config.return_value.llm_embedding_model = None
-
-    class DummyEmbedding:
-        def get_text_embedding(self, text):
-            return [0.0] * 7
-
-    with patch(
-        "paperless_ai.embedding.get_embedding_model",
-        return_value=DummyEmbedding(),
-    ) as mock_get:
-        dim = get_embedding_dim()
-        mock_get.assert_called_once()
-
-    assert dim == 7
-    meta = json.loads((temp_llm_index_dir / "meta.json").read_text())
-    assert meta == {"embedding_model": "text-embedding-3-small", "dim": 7}
+    assert get_configured_model_name() == expected_default
 
 
-def test_get_embedding_dim_reads_existing_meta(temp_llm_index_dir, mock_ai_config):
-    mock_ai_config.return_value.llm_embedding_backend = "openai-like"
-    mock_ai_config.return_value.llm_embedding_model = None
-
-    (temp_llm_index_dir / "meta.json").write_text(
-        json.dumps({"embedding_model": "text-embedding-3-small", "dim": 11}),
-    )
-
-    with patch("paperless_ai.embedding.get_embedding_model") as mock_get:
-        assert get_embedding_dim() == 11
-        mock_get.assert_not_called()
-
-
-def test_get_embedding_dim_raises_on_model_change(temp_llm_index_dir, mock_ai_config):
-    mock_ai_config.return_value.llm_embedding_backend = "openai-like"
-    mock_ai_config.return_value.llm_embedding_model = None
-
-    (temp_llm_index_dir / "meta.json").write_text(
-        json.dumps({"embedding_model": "old", "dim": 11}),
-    )
-
-    with pytest.raises(
-        RuntimeError,
-        match="Embedding model changed from old to text-embedding-3-small",
-    ):
-        get_embedding_dim()
+def test_get_configured_model_name_explicit_overrides_default(mock_ai_config):
+    """An explicit model name overrides the backend default for all backends."""
+    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OPENAI_LIKE
+    mock_ai_config.return_value.llm_embedding_model = "my-custom-model"
+    # The backend default for OPENAI_LIKE is "text-embedding-3-small", so if
+    # the explicit name was ignored we'd get the wrong result.
+    assert get_configured_model_name() == "my-custom-model"
 
 
 def test_build_llm_index_text(mock_document):

@@ -14,6 +14,7 @@ from documents.utils import IterWrapper
 from documents.utils import identity
 from paperless.config import AIConfig
 from paperless_ai.embedding import build_llm_index_text
+from paperless_ai.embedding import get_configured_model_name
 from paperless_ai.embedding import get_embedding_model
 
 if TYPE_CHECKING:
@@ -72,16 +73,25 @@ def get_vector_store() -> "PaperlessLanceVectorStore":
 
 
 @contextmanager
-def write_store():
+def write_store(embed_model_name: str | None = None):
     """Acquire the write lock and yield the vector store.
 
     All mutating operations (upsert, delete, rebuild, compact) must go through
     this context manager to serialise concurrent Celery writers.
     Read paths use ``get_vector_store()`` directly — no lock needed.
+
+    Pass ``embed_model_name`` whenever the operation may create the table so
+    the model name is recorded in the schema metadata for future mismatch checks.
     """
+    from paperless_ai.vector_store import PaperlessLanceVectorStore
+
     settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
     with FileLock(settings.LLM_INDEX_LOCK):
-        yield get_vector_store()
+        yield PaperlessLanceVectorStore(
+            uri=str(settings.LLM_INDEX_DIR),
+            table_name=LLM_INDEX_TABLE,
+            embed_model_name=embed_model_name,
+        )
 
 
 def build_document_node(
@@ -148,23 +158,8 @@ def llm_index_exists() -> bool:
     return get_vector_store().table_exists()
 
 
-def embedding_dim_mismatch() -> bool:
-    """True when the stored table's vector dim differs from the current model."""
-    store = get_vector_store()
-    stored = store.vector_dim()
-    if stored is None:
-        return False
-    from paperless_ai.embedding import get_embedding_dim
-
-    return stored != get_embedding_dim()
-
-
 def get_rag_chunk_size() -> int:
     return AIConfig().llm_embedding_chunk_size
-
-
-def get_rag_context_size() -> int:
-    return AIConfig().llm_context_size
 
 
 def get_rag_chunk_overlap(chunk_size: int | None = None) -> int:
@@ -222,19 +217,20 @@ def _document_id_filters(doc_ids):
     )
 
 
-def get_llm_index_compaction_retention() -> int:
-    """Seconds of MVCC version history to keep during compaction."""
-    return 60 * 60  # 1 hour: safe for in-flight readers, reclaims daily
-
-
 def update_llm_index(
     *,
     iter_wrapper: IterWrapper[Document] = identity,
     rebuild=False,
 ) -> str:
     """Rebuild or incrementally update the LLM index."""
-    if not rebuild and llm_index_exists() and embedding_dim_mismatch():
-        logger.warning("Embedding dimension changed; forcing LLM index rebuild.")
+    model_name = get_configured_model_name()
+
+    if (
+        not rebuild
+        and llm_index_exists()
+        and get_vector_store().config_mismatch(model_name)
+    ):
+        logger.warning("Embedding model changed; forcing LLM index rebuild.")
         rebuild = True
 
     documents = Document.objects.all()
@@ -246,7 +242,7 @@ def update_llm_index(
     chunk_size = AIConfig().llm_embedding_chunk_size
     embed_model = get_embedding_model()
 
-    with write_store() as store:
+    with write_store(embed_model_name=model_name) as store:
         if rebuild or not store.table_exists():
             (settings.LLM_INDEX_DIR / "meta.json").unlink(missing_ok=True)
             logger.info("Rebuilding LLM index.")
@@ -275,7 +271,7 @@ def update_llm_index(
 
         store.ensure_document_id_scalar_index()
         store.maybe_create_ann_index()
-        store.compact(retention_seconds=get_llm_index_compaction_retention())
+        store.compact(retention_seconds=60 * 60)  # 1 hour: safe for in-flight readers
     return msg
 
 
@@ -285,7 +281,7 @@ def llm_index_add_or_update_document(document: Document):
     if new_nodes:
         _embed_nodes(new_nodes, get_embedding_model())
 
-    with write_store() as store:
+    with write_store(embed_model_name=get_configured_model_name()) as store:
         store.upsert_document(str(document.id), new_nodes)
         store.ensure_document_id_scalar_index()
 

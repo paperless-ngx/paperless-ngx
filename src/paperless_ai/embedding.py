@@ -1,12 +1,9 @@
-import json
 import re
 from typing import TYPE_CHECKING
 
 from django.conf import settings
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from llama_index.core.base.embeddings.base import BaseEmbedding
 
 from documents.models import Document
@@ -95,41 +92,21 @@ def get_embedding_model() -> "BaseEmbedding":
             )
 
 
-def get_embedding_dim() -> int:
-    """
-    Loads embedding dimension from meta.json if available, otherwise infers it
-    from a dummy embedding and stores it for future use.
-    """
+_DEFAULT_MODEL_NAMES = {
+    LLMEmbeddingBackend.OPENAI_LIKE: "text-embedding-3-small",
+    LLMEmbeddingBackend.HUGGINGFACE: "sentence-transformers/all-MiniLM-L6-v2",
+    LLMEmbeddingBackend.OLLAMA: "embeddinggemma",
+}
+
+
+def get_configured_model_name() -> str:
+    """Return the canonical name of the currently configured embedding model."""
     config = AIConfig()
-    default_model = {
-        LLMEmbeddingBackend.OPENAI_LIKE: "text-embedding-3-small",
-        LLMEmbeddingBackend.HUGGINGFACE: "sentence-transformers/all-MiniLM-L6-v2",
-        LLMEmbeddingBackend.OLLAMA: "embeddinggemma",
-    }.get(
+    default = _DEFAULT_MODEL_NAMES.get(
         config.llm_embedding_backend,
         "sentence-transformers/all-MiniLM-L6-v2",
     )
-    model = config.llm_embedding_model or default_model
-
-    meta_path: Path = settings.LLM_INDEX_DIR / "meta.json"
-    if meta_path.exists():
-        with meta_path.open() as f:
-            meta = json.load(f)
-        if meta.get("embedding_model") != model:
-            raise RuntimeError(
-                f"Embedding model changed from {meta.get('embedding_model')} to {model}. "
-                "You must rebuild the index.",
-            )
-        return meta["dim"]
-
-    embedding_model = get_embedding_model()
-    test_embed = embedding_model.get_text_embedding("test")
-    dim = len(test_embed)
-
-    with meta_path.open("w") as f:
-        json.dump({"embedding_model": model, "dim": dim}, f)
-
-    return dim
+    return config.llm_embedding_model or default
 
 
 def _normalize_llm_index_text(text: str) -> str:

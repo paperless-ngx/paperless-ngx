@@ -320,6 +320,57 @@ class TestPaperlessLanceVectorStoreMaintenance:
         store.ensure_document_id_scalar_index()  # no table yet — must not raise
 
 
+class TestConfigMismatch:
+    @pytest.fixture
+    def uri(self, tmp_path: Path) -> str:
+        return str(tmp_path / "idx")
+
+    def test_stored_model_name_returns_none_when_no_table(self, uri: str) -> None:
+        store = PaperlessLanceVectorStore(uri=uri)
+        assert store.stored_model_name() is None
+
+    def test_model_name_stored_in_schema_after_add(self, uri: str) -> None:
+        store = PaperlessLanceVectorStore(uri=uri, embed_model_name="all-MiniLM-L6-v2")
+        store.add([_node("1-0", "1", "text", 0.1)])
+        assert store.stored_model_name() == "all-MiniLM-L6-v2"
+
+    def test_model_name_stored_in_schema_after_upsert(self, uri: str) -> None:
+        store = PaperlessLanceVectorStore(uri=uri, embed_model_name="nomic-embed")
+        store.upsert_document("1", [_node("1-0", "1", "text", 0.1)])
+        assert store.stored_model_name() == "nomic-embed"
+
+    def test_model_name_persists_after_reopen(self, uri: str) -> None:
+        PaperlessLanceVectorStore(uri=uri, embed_model_name="all-MiniLM-L6-v2").add(
+            [_node("1-0", "1", "text", 0.1)],
+        )
+        reopened = PaperlessLanceVectorStore(uri=uri)
+        assert reopened.stored_model_name() == "all-MiniLM-L6-v2"
+
+    def test_config_mismatch_returns_false_when_no_table(self, uri: str) -> None:
+        store = PaperlessLanceVectorStore(uri=uri)
+        assert store.config_mismatch("any-model") is False
+
+    def test_config_mismatch_returns_false_when_model_matches(self, uri: str) -> None:
+        store = PaperlessLanceVectorStore(uri=uri, embed_model_name="all-MiniLM-L6-v2")
+        store.add([_node("1-0", "1", "text", 0.1)])
+        assert store.config_mismatch("all-MiniLM-L6-v2") is False
+
+    def test_config_mismatch_returns_true_when_model_differs(self, uri: str) -> None:
+        store = PaperlessLanceVectorStore(uri=uri, embed_model_name="old-model")
+        store.add([_node("1-0", "1", "text", 0.1)])
+        assert store.config_mismatch("new-model") is True
+
+    def test_config_mismatch_returns_false_when_no_metadata_stored(
+        self,
+        uri: str,
+    ) -> None:
+        # Tables created before model-name tracking was added have no schema metadata.
+        # Conservative default: assume compatible rather than force a rebuild.
+        store = PaperlessLanceVectorStore(uri=uri)
+        store.add([_node("1-0", "1", "text", 0.1)])
+        assert store.config_mismatch("any-model") is False
+
+
 class TestGetModifiedTimes:
     @pytest.fixture
     def store(self, tmp_path: Path) -> PaperlessLanceVectorStore:

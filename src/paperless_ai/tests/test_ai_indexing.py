@@ -155,13 +155,13 @@ def test_update_llm_index(
 
 
 @pytest.mark.django_db
-def test_update_llm_index_removes_meta(
+def test_update_llm_index_cleans_stale_meta_on_rebuild(
     temp_llm_index_dir: Path,
     real_document: Document,
     mock_embed_model: FakeEmbedding,
 ) -> None:
-    # Pre-create a meta.json — the new LanceDB-backed rebuild must delete it so
-    # that stale FAISS-era metadata does not accumulate on disk.
+    # A meta.json left over from the FAISS era (or written by older code) must be
+    # deleted on rebuild so stale artifacts don't accumulate on disk.
     stale_meta = temp_llm_index_dir / "meta.json"
     stale_meta.write_text(json.dumps({"embedding_model": "old", "dim": 1}))
 
@@ -175,6 +175,42 @@ def test_update_llm_index_removes_meta(
     assert not stale_meta.exists(), (
         "update_llm_index(rebuild=True) must remove stale meta.json"
     )
+
+
+@pytest.mark.django_db
+def test_update_llm_index_rebuilds_on_model_name_change(
+    temp_llm_index_dir: Path,
+    real_document: Document,
+    mock_embed_model: FakeEmbedding,
+) -> None:
+    # Build initial index with model "model-a".
+    with patch("documents.models.Document.objects.all") as mock_all:
+        mock_queryset = MagicMock()
+        mock_queryset.exists.return_value = True
+        mock_queryset.__iter__.return_value = iter([real_document])
+        mock_all.return_value = mock_queryset
+        with patch(
+            "paperless_ai.indexing.get_configured_model_name",
+            return_value="model-a",
+        ):
+            indexing.update_llm_index(rebuild=True)
+
+    # Simulate config change to "model-b"; the incremental run must force a rebuild.
+    with patch("documents.models.Document.objects.all") as mock_all:
+        mock_queryset = MagicMock()
+        mock_queryset.exists.return_value = True
+        mock_queryset.__iter__.return_value = iter([real_document])
+        mock_all.return_value = mock_queryset
+        with patch(
+            "paperless_ai.indexing.get_configured_model_name",
+            return_value="model-b",
+        ):
+            indexing.update_llm_index(rebuild=False)
+
+    store = indexing.get_vector_store()
+    # Schema metadata only updates when the table is dropped and recreated, never on
+    # incremental writes -- so "model-b" here proves a full rebuild happened.
+    assert store.stored_model_name() == "model-b"
 
 
 @pytest.mark.django_db
@@ -641,42 +677,6 @@ class TestLlmIndexLocking:
 
 
 @pytest.mark.django_db
-class TestDimensionGuard:
-    def test_embedding_dim_mismatch_false_when_no_table(
-        self,
-        temp_llm_index_dir: Path,
-        mock_embed_model: FakeEmbedding,
-    ) -> None:
-        """No table yet — dim mismatch must return False (nothing to compare)."""
-        assert not indexing.embedding_dim_mismatch()
-
-    def test_update_llm_index_forces_rebuild_on_dim_mismatch(
-        self,
-        temp_llm_index_dir: Path,
-        mock_embed_model: FakeEmbedding,
-        mocker: pytest_mock.MockerFixture,
-    ) -> None:
-        """When the stored dim differs from the current model, update must force a rebuild."""
-        mocker.patch("paperless_ai.indexing.embedding_dim_mismatch", return_value=True)
-        mocker.patch("paperless_ai.indexing.llm_index_exists", return_value=True)
-        mock_store = MagicMock()
-        mocker.patch(
-            "paperless_ai.indexing.write_store",
-            return_value=mocker.MagicMock(
-                __enter__=mocker.MagicMock(return_value=mock_store),
-                __exit__=mocker.MagicMock(return_value=False),
-            ),
-        )
-        mock_qs = MagicMock()
-        mock_qs.exists.return_value = True
-        mock_qs.__iter__ = MagicMock(return_value=iter([]))
-        mocker.patch("paperless_ai.indexing.Document.objects.all", return_value=mock_qs)
-
-        indexing.update_llm_index(rebuild=False)
-
-        mock_store.drop_table.assert_called_once()
-
-
 @pytest.mark.django_db
 class TestLanceDbIndexing:
     def test_get_vector_store_roundtrip(

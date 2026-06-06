@@ -71,13 +71,20 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
 
     _uri: str = PrivateAttr()
     _table_name: str = PrivateAttr()
+    _embed_model_name: str | None = PrivateAttr()
     _conn: Any = PrivateAttr()
     _table: Any = PrivateAttr()
 
-    def __init__(self, uri: str, table_name: str = DEFAULT_TABLE_NAME) -> None:
+    def __init__(
+        self,
+        uri: str,
+        table_name: str = DEFAULT_TABLE_NAME,
+        embed_model_name: str | None = None,
+    ) -> None:
         super().__init__(stores_text=True, flat_metadata=False)
         self._uri = uri
         self._table_name = table_name
+        self._embed_model_name = embed_model_name
         self._conn = lancedb.connect(uri)
         existing = self._conn.list_tables().tables
         self._table = (
@@ -101,8 +108,29 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
             self._conn.drop_table(self._table_name)
         self._table = None
 
+    def stored_model_name(self) -> str | None:
+        """Return the embedding model name stored in table schema metadata, or None."""
+        if self._table is None:
+            return None
+        meta = self._table.schema.metadata or {}
+        value = meta.get(b"embed_model")
+        return value.decode() if value else None
+
+    def config_mismatch(self, model_name: str) -> bool:
+        """True when the stored model name differs from ``model_name``.
+
+        Returns False when no table exists or when the table predates model-name
+        tracking (schema has no metadata) — conservative default avoids spurious
+        rebuilds on upgrade.
+        """
+        stored = self.stored_model_name()
+        if stored is None:
+            return False
+        return stored != model_name
+
     @staticmethod
-    def _schema(dim: int) -> pa.Schema:
+    def _schema(dim: int, model_name: str | None = None) -> pa.Schema:
+        meta = {b"embed_model": model_name.encode()} if model_name else None
         return pa.schema(
             [
                 pa.field("id", pa.string()),
@@ -112,6 +140,7 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
                 pa.field("vector", pa.list_(pa.float32(), dim)),
                 pa.field("node_content", pa.string()),
             ],
+            metadata=meta,
         )
 
     def _row(self, node: BaseNode) -> dict[str, Any]:
@@ -140,7 +169,7 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         self._table = self._conn.create_table(
             self._table_name,
             rows,
-            schema=self._schema(dim),
+            schema=self._schema(dim, self._embed_model_name),
         )
         return True
 
