@@ -1494,6 +1494,33 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertEqual(task_kwargs["input_doc"].root_document_id, doc.id)
         self.assertIsNotNone(task_kwargs["overrides"])
 
+    @mock.patch("documents.tasks.consume_file.apply_async")
+    @mock.patch("documents.bulk_edit.tempfile.mkdtemp")
+    @mock.patch("pikepdf.open")
+    def test_remove_password_update_document_skips_unencrypted_pdf(
+        self,
+        mock_open,
+        mock_mkdtemp,
+        mock_consume_delay,
+    ) -> None:
+        doc = self.doc1
+        fake_pdf = mock.MagicMock()
+        fake_pdf.is_encrypted = False
+        mock_open.return_value.__enter__.return_value = fake_pdf
+
+        result = bulk_edit.remove_password(
+            [doc.id],
+            password="secret",
+            update_document=True,
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(doc.source_path, password="secret")
+        fake_pdf.remove_unreferenced_resources.assert_not_called()
+        fake_pdf.save.assert_not_called()
+        mock_mkdtemp.assert_not_called()
+        mock_consume_delay.assert_not_called()
+
     @mock.patch("documents.bulk_edit.update_document_content_maybe_archive_file.delay")
     @mock.patch("documents.tasks.consume_file.apply_async")
     @mock.patch("documents.bulk_edit.tempfile.mkdtemp")
@@ -1617,6 +1644,43 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         )
         mock_group.return_value.delay.assert_called_once()
         mock_chord.assert_not_called()
+
+    @mock.patch("documents.bulk_edit.delete")
+    @mock.patch("documents.bulk_edit.chord")
+    @mock.patch("documents.bulk_edit.group")
+    @mock.patch("documents.tasks.consume_file.s")
+    @mock.patch("documents.bulk_edit.tempfile.mkdtemp")
+    @mock.patch("pikepdf.open")
+    def test_remove_password_skips_unencrypted_pdf_without_queueing(
+        self,
+        mock_open: mock.Mock,
+        mock_mkdtemp: mock.Mock,
+        mock_consume_file: mock.Mock,
+        mock_group: mock.Mock,
+        mock_chord: mock.Mock,
+        mock_delete: mock.Mock,
+    ) -> None:
+        doc = self.doc2
+        fake_pdf = mock.MagicMock()
+        fake_pdf.is_encrypted = False
+        mock_open.return_value.__enter__.return_value = fake_pdf
+
+        result = bulk_edit.remove_password(
+            [doc.id],
+            password="secret",
+            update_document=False,
+            delete_original=True,
+        )
+
+        self.assertEqual(result, "OK")
+        mock_open.assert_called_once_with(doc.source_path, password="secret")
+        fake_pdf.remove_unreferenced_resources.assert_not_called()
+        fake_pdf.save.assert_not_called()
+        mock_mkdtemp.assert_not_called()
+        mock_consume_file.assert_not_called()
+        mock_group.assert_not_called()
+        mock_chord.assert_not_called()
+        mock_delete.si.assert_not_called()
 
     @mock.patch("documents.bulk_edit.delete")
     @mock.patch("documents.bulk_edit.chord")
