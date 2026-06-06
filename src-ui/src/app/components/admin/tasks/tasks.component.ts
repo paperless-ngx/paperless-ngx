@@ -335,10 +335,6 @@ export class TasksComponent
   }
 
   dismissAllTasks() {
-    if (this.totalTasks === 0) {
-      return
-    }
-
     let modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
