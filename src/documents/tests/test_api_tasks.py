@@ -522,6 +522,27 @@ class TestAcknowledge:
         assert response.status_code == status.HTTP_200_OK
         assert response.data == {"result": 2}
 
+    def test_acknowledge_all_returns_count(self, admin_client: APIClient) -> None:
+        """POST acknowledge/ with all=true acknowledges all unacknowledged tasks."""
+        unacknowledged_task1 = PaperlessTaskFactory(acknowledged=False)
+        unacknowledged_task2 = PaperlessTaskFactory(acknowledged=False)
+        acknowledged_task = PaperlessTaskFactory(acknowledged=True)
+
+        response = admin_client.post(
+            ENDPOINT + "acknowledge/",
+            {"all": True},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == {"result": 2}
+        unacknowledged_task1.refresh_from_db()
+        unacknowledged_task2.refresh_from_db()
+        acknowledged_task.refresh_from_db()
+        assert unacknowledged_task1.acknowledged
+        assert unacknowledged_task2.acknowledged
+        assert acknowledged_task.acknowledged
+
     def test_acknowledged_tasks_excluded_from_unacked_filter(
         self,
         admin_client: APIClient,
