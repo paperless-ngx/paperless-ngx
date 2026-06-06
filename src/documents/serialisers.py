@@ -2649,7 +2649,8 @@ class AcknowledgeTasksViewSerializer(serializers.Serializer[dict[str, Any]]):
             raise serializers.ValidationError(f"{name} must be a list")
         if not all(isinstance(i, int) for i in tasks):
             raise serializers.ValidationError(f"{name} must be a list of integers")
-        count = PaperlessTask.objects.filter(id__in=tasks).count()
+        queryset = self.context.get("queryset", PaperlessTask.objects.all())
+        count = queryset.filter(id__in=tasks).count()
         if not count == len(tasks):
             raise serializers.ValidationError(
                 f"Some tasks in {name} don't exist or were specified twice.",

@@ -4170,13 +4170,17 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
         permission_classes=[IsAuthenticated, AcknowledgeTasksPermissions],
     )
     def acknowledge(self, request):
-        serializer = AcknowledgeTasksViewSerializer(data=request.data)
+        queryset = self.get_queryset()
+        serializer = AcknowledgeTasksViewSerializer(
+            data=request.data,
+            context={"queryset": queryset},
+        )
         serializer.is_valid(raise_exception=True)
         if serializer.validated_data.get("all", False):
-            tasks = self.get_queryset().filter(acknowledged=False)
+            tasks = queryset.filter(acknowledged=False)
         else:
             task_ids = serializer.validated_data.get("tasks")
-            tasks = self.get_queryset().filter(id__in=task_ids)
+            tasks = queryset.filter(id__in=task_ids)
         count = tasks.update(acknowledged=True)
         return Response({"result": count})
 
