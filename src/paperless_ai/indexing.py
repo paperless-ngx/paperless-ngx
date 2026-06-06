@@ -139,12 +139,12 @@ def build_document_node(
     return parser.get_nodes_from_documents([doc])
 
 
-def load_or_build_index():
+def load_or_build_index(config: AIConfig):
     """Return a VectorStoreIndex backed by the vector store."""
     import llama_index.core.settings as llama_settings
     from llama_index.core import VectorStoreIndex
 
-    embed_model = get_embedding_model()
+    embed_model = get_embedding_model(config)
     llama_settings.Settings.embed_model = embed_model
     vector_store = get_vector_store()
     return VectorStoreIndex.from_vector_store(
@@ -223,7 +223,16 @@ def update_llm_index(
     rebuild=False,
 ) -> str:
     """Rebuild or incrementally update the LLM index."""
-    model_name = get_configured_model_name()
+    documents = Document.objects.all()
+    no_documents = not documents.exists()
+
+    # Fast exit before touching config: nothing to index and no existing index.
+    if no_documents and not rebuild and not llm_index_exists():
+        logger.warning("No documents found to index.")
+        return "No documents found to index."
+
+    config = AIConfig()
+    model_name = get_configured_model_name(config)
 
     if (
         not rebuild
@@ -233,14 +242,11 @@ def update_llm_index(
         logger.warning("Embedding model changed; forcing LLM index rebuild.")
         rebuild = True
 
-    documents = Document.objects.all()
-    if not documents.exists():
+    if no_documents:
         logger.warning("No documents found to index.")
-        if not rebuild and not llm_index_exists():
-            return "No documents found to index."
 
-    chunk_size = AIConfig().llm_embedding_chunk_size
-    embed_model = get_embedding_model()
+    chunk_size = config.llm_embedding_chunk_size
+    embed_model = get_embedding_model(config)
 
     with write_store(embed_model_name=model_name) as store:
         if rebuild or not store.table_exists():
@@ -277,11 +283,15 @@ def update_llm_index(
 
 def llm_index_add_or_update_document(document: Document):
     """Add or atomically replace a document's chunks in the index."""
-    new_nodes = build_document_node(document, chunk_size=get_rag_chunk_size())
+    config = AIConfig()
+    new_nodes = build_document_node(
+        document,
+        chunk_size=config.llm_embedding_chunk_size,
+    )
     if new_nodes:
-        _embed_nodes(new_nodes, get_embedding_model())
+        _embed_nodes(new_nodes, get_embedding_model(config))
 
-    with write_store(embed_model_name=get_configured_model_name()) as store:
+    with write_store(embed_model_name=get_configured_model_name(config)) as store:
         store.upsert_document(str(document.id), new_nodes)
         store.ensure_document_id_scalar_index()
 
@@ -352,9 +362,11 @@ def query_similar_documents(
         )
         return []
 
+    config = AIConfig()
+
     from llama_index.core.retrievers import VectorIndexRetriever
 
-    index = load_or_build_index()
+    index = load_or_build_index(config)
 
     filters = (
         _document_id_filters(allowed_document_ids)
@@ -368,7 +380,6 @@ def query_similar_documents(
         filters=filters,
     )
 
-    config = AIConfig()
     query_text = truncate_content(
         (document.title or "") + "\n" + (document.content or ""),
         chunk_size=config.llm_embedding_chunk_size,

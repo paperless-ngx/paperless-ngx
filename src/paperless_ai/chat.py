@@ -3,6 +3,7 @@ import logging
 import sys
 
 from documents.models import Document
+from paperless.config import AIConfig
 from paperless_ai.client import AIClient
 from paperless_ai.indexing import _document_id_filters
 from paperless_ai.indexing import get_rag_prompt_helper
@@ -94,7 +95,8 @@ def _stream_chat_with_documents(query_str: str, documents: list[Document]):
     from llama_index.core.response_synthesizers import get_response_synthesizer
     from llama_index.core.retrievers import VectorIndexRetriever
 
-    index = load_or_build_index()
+    config = AIConfig()
+    index = load_or_build_index(config)
     filters = _document_id_filters(str(doc.pk) for doc in documents)
 
     retriever = VectorIndexRetriever(
@@ -116,7 +118,10 @@ def _stream_chat_with_documents(query_str: str, documents: list[Document]):
     prompt_template = PromptTemplate(template=CHAT_PROMPT_TMPL)
     response_synthesizer = get_response_synthesizer(
         llm=client.llm,
-        prompt_helper=get_rag_prompt_helper(),
+        prompt_helper=get_rag_prompt_helper(
+            chunk_size=config.llm_embedding_chunk_size,
+            context_size=config.llm_context_size,
+        ),
         text_qa_template=prompt_template,
         streaming=True,
     )

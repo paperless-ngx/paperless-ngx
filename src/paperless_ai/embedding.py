@@ -20,9 +20,7 @@ OCR_LEADER_REGEX = re.compile(r"[._\-\u00b7]{4,}")
 HORIZONTAL_WHITESPACE_REGEX = re.compile(r"[ \t\u00a0]+")
 
 
-def get_embedding_model() -> "BaseEmbedding":
-    config = AIConfig()
-
+def get_embedding_model(config: AIConfig) -> "BaseEmbedding":
     match config.llm_embedding_backend:
         case LLMEmbeddingBackend.OPENAI_LIKE:
             from llama_index.embeddings.openai_like import OpenAILikeEmbedding
@@ -99,9 +97,8 @@ _DEFAULT_MODEL_NAMES = {
 }
 
 
-def get_configured_model_name() -> str:
+def get_configured_model_name(config: AIConfig) -> str:
     """Return the canonical name of the currently configured embedding model."""
-    config = AIConfig()
     default = _DEFAULT_MODEL_NAMES.get(
         config.llm_embedding_backend,
         "sentence-transformers/all-MiniLM-L6-v2",

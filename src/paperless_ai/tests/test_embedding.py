@@ -66,7 +66,7 @@ def test_get_embedding_model_openai(mock_ai_config):
     with patch(
         "llama_index.embeddings.openai_like.OpenAILikeEmbedding",
     ) as MockOpenAIEmbedding:
-        model = get_embedding_model()
+        model = get_embedding_model(mock_ai_config.return_value)
         MockOpenAIEmbedding.assert_called_once_with(
             model_name="text-embedding-3-small",
             api_key="test_api_key",
@@ -87,7 +87,7 @@ def test_get_embedding_model_openai_prefers_embedding_endpoint(mock_ai_config):
     with patch(
         "llama_index.embeddings.openai_like.OpenAILikeEmbedding",
     ) as MockOpenAIEmbedding:
-        model = get_embedding_model()
+        model = get_embedding_model(mock_ai_config.return_value)
         MockOpenAIEmbedding.assert_called_once_with(
             model_name="text-embedding-3-small",
             api_key="test_api_key",
@@ -108,7 +108,7 @@ def test_get_embedding_model_openai_blocks_internal_endpoint_when_disallowed(
     mock_ai_config.return_value.llm_allow_internal_endpoints = False
 
     with pytest.raises(ValueError, match="non-public address"):
-        get_embedding_model()
+        get_embedding_model(mock_ai_config.return_value)
 
 
 def test_get_embedding_model_huggingface(mock_ai_config):
@@ -120,7 +120,7 @@ def test_get_embedding_model_huggingface(mock_ai_config):
     with patch(
         "llama_index.embeddings.huggingface.HuggingFaceEmbedding",
     ) as MockHuggingFaceEmbedding:
-        model = get_embedding_model()
+        model = get_embedding_model(mock_ai_config.return_value)
         MockHuggingFaceEmbedding.assert_called_once_with(
             model_name="sentence-transformers/all-MiniLM-L6-v2",
             cache_folder=str(settings.DATA_DIR / "hf_cache"),
@@ -136,7 +136,7 @@ def test_get_embedding_model_ollama(mock_ai_config):
     with patch(
         "llama_index.embeddings.ollama.OllamaEmbedding",
     ) as MockOllamaEmbedding:
-        model = get_embedding_model()
+        model = get_embedding_model(mock_ai_config.return_value)
         MockOllamaEmbedding.assert_called_once_with(
             model_name="embeddinggemma",
             base_url="http://test-url",
@@ -154,7 +154,7 @@ def test_get_embedding_model_ollama_prefers_embedding_endpoint(mock_ai_config):
     with patch(
         "llama_index.embeddings.ollama.OllamaEmbedding",
     ) as MockOllamaEmbedding:
-        model = get_embedding_model()
+        model = get_embedding_model(mock_ai_config.return_value)
         MockOllamaEmbedding.assert_called_once_with(
             model_name="embeddinggemma",
             base_url="http://embedding-url",
@@ -172,7 +172,7 @@ def test_get_embedding_model_ollama_blocks_internal_endpoint_when_disallowed(
     mock_ai_config.return_value.llm_allow_internal_endpoints = False
 
     with pytest.raises(ValueError, match="non-public address"):
-        get_embedding_model()
+        get_embedding_model(mock_ai_config.return_value)
 
 
 def test_get_embedding_model_invalid_backend(mock_ai_config):
@@ -182,7 +182,7 @@ def test_get_embedding_model_invalid_backend(mock_ai_config):
         ValueError,
         match="Unsupported embedding backend: INVALID_BACKEND",
     ):
-        get_embedding_model()
+        get_embedding_model(mock_ai_config.return_value)
 
 
 @pytest.mark.parametrize(
@@ -199,18 +199,20 @@ def test_get_configured_model_name_falls_back_to_backend_default(
     expected_default,
 ):
     """When no model is explicitly configured, each backend has a distinct default."""
-    mock_ai_config.return_value.llm_embedding_backend = backend
-    mock_ai_config.return_value.llm_embedding_model = None
-    assert get_configured_model_name() == expected_default
+    config = mock_ai_config.return_value
+    config.llm_embedding_backend = backend
+    config.llm_embedding_model = None
+    assert get_configured_model_name(config) == expected_default
 
 
 def test_get_configured_model_name_explicit_overrides_default(mock_ai_config):
     """An explicit model name overrides the backend default for all backends."""
-    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OPENAI_LIKE
-    mock_ai_config.return_value.llm_embedding_model = "my-custom-model"
+    config = mock_ai_config.return_value
+    config.llm_embedding_backend = LLMEmbeddingBackend.OPENAI_LIKE
+    config.llm_embedding_model = "my-custom-model"
     # The backend default for OPENAI_LIKE is "text-embedding-3-small", so if
     # the explicit name was ignored we'd get the wrong result.
-    assert get_configured_model_name() == "my-custom-model"
+    assert get_configured_model_name(config) == "my-custom-model"
 
 
 def test_build_llm_index_text(mock_document):

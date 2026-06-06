@@ -24,9 +24,14 @@ def get_language_name(language_code: str) -> str:
 
 def build_prompt_without_rag(
     document: Document,
+    config: AIConfig,
 ) -> str:
     filename = document.filename or ""
-    content = truncate_content(document.content[:4000] or "")
+    content = truncate_content(
+        document.content[:4000] or "",
+        chunk_size=config.llm_embedding_chunk_size,
+        context_size=config.llm_context_size,
+    )
 
     return f"""
     You are a document classification assistant.
@@ -49,10 +54,15 @@ def build_prompt_without_rag(
 
 def build_prompt_with_rag(
     document: Document,
+    config: AIConfig,
     user: User | None = None,
 ) -> str:
-    base_prompt = build_prompt_without_rag(document)
-    context = truncate_content(get_context_for_document(document, user))
+    base_prompt = build_prompt_without_rag(document, config)
+    context = truncate_content(
+        get_context_for_document(document, user),
+        chunk_size=config.llm_embedding_chunk_size,
+        context_size=config.llm_context_size,
+    )
 
     return f"""{base_prompt}
 
@@ -130,9 +140,9 @@ def get_ai_document_classification(
     ai_config = AIConfig()
 
     prompt = (
-        build_prompt_with_rag(document, user)
+        build_prompt_with_rag(document, ai_config, user)
         if ai_config.llm_embedding_backend
-        else build_prompt_without_rag(document)
+        else build_prompt_without_rag(document, ai_config)
     )
 
     client = AIClient()

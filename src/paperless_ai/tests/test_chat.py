@@ -185,6 +185,7 @@ def test_stream_chat_empty_document_list() -> None:
 
 def test_stream_chat_no_matching_nodes() -> None:
     with (
+        patch("paperless_ai.chat.AIConfig"),
         patch("paperless_ai.chat.AIClient") as mock_client_cls,
         patch("paperless_ai.chat.load_or_build_index") as mock_load_index,
     ):
@@ -204,6 +205,7 @@ def test_stream_chat_no_matching_nodes() -> None:
 
 def test_stream_chat_unexpected_failure_returns_generic_error(caplog) -> None:
     with (
+        patch("paperless_ai.chat.AIConfig"),
         patch("paperless_ai.chat.AIClient") as mock_client_cls,
         patch("paperless_ai.chat.load_or_build_index") as mock_load_index,
     ):
