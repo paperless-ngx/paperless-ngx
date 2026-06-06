@@ -17,6 +17,7 @@ from celery import shared_task
 from celery.canvas import Signature
 from django.conf import settings
 from django.db import DatabaseError
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.timezone import is_naive
 from django.utils.timezone import make_aware
@@ -244,7 +245,7 @@ def apply_mail_action(
     message_uid: str,
     message_subject: str,
     message_date: datetime.datetime,
-    uid_validity: str = "",
+    uid_validity: str | None = None,
 ) -> None:
     """
     This shared task applies the mail action of a particular mail rule to the
@@ -316,7 +317,7 @@ def error_callback(
     message_uid: str,
     message_subject: str,
     message_date: datetime.datetime,
-    uid_validity: str = "",
+    uid_validity: str | None = None,
 ) -> None:
     """
     A shared task that is called whenever something goes wrong during
@@ -341,7 +342,7 @@ def queue_consumption_tasks(
     consume_tasks: list[Signature],
     rule: MailRule,
     message: MailMessage,
-    uid_validity: str,
+    uid_validity: str | None,
 ) -> None:
     """
     Queue a list of consumption tasks (Signatures for the consume_file shared
@@ -518,6 +519,21 @@ class MailAccountHandler(LoggingMixin):
                 "Unknown title selector.",
             )  # pragma: no cover
 
+    def _get_uid_validity(self, M: MailBox, folder: str) -> str | None:
+        try:
+            uid_validity = M.folder.status(folder, ["UIDVALIDITY"]).get("UIDVALIDITY")
+            if uid_validity is not None:
+                return str(uid_validity)
+        except errors.MailboxFolderStatusError as e:
+            self.log.warning(
+                f"Server does not support retrieving UIDVALIDITY for folder {folder}: {e}",
+            )
+        except Exception as e:
+            self.log.warning(
+                f"Unable to retrieve UIDVALIDITY for folder {folder}: {e}",
+            )
+        return None
+
     def _get_correspondent(
         self,
         message: MailMessage,
@@ -655,9 +671,7 @@ class MailAccountHandler(LoggingMixin):
                 f"does not exist in account {rule.account}",
             ) from err
 
-        self._current_uid_validity = str(
-            M.folder.status(rule.folder, ["UIDVALIDITY"])["UIDVALIDITY"],
-        )
+        self._current_uid_validity = self._get_uid_validity(M, rule.folder)
 
         criterias = make_criterias(rule, supports_gmail_labels=supports_gmail_labels)
 
@@ -699,12 +713,18 @@ class MailAccountHandler(LoggingMixin):
                 )
                 continue
 
-            if ProcessedMail.objects.filter(
-                rule=rule,
-                uid=message.uid,
-                folder=rule.folder,
-                uid_validity=self._current_uid_validity,
-            ).exists():
+            if (
+                ProcessedMail.objects.filter(
+                    rule=rule,
+                    uid=message.uid,
+                    folder=rule.folder,
+                )
+                .filter(
+                    Q(uid_validity=self._current_uid_validity)
+                    | Q(uid_validity__isnull=True),
+                )
+                .exists()
+            ):
                 self.log.debug(
                     f"Skipping mail '{message.uid}' subject '{message.subject}' from '{message.from_}', already processed.",
                 )
