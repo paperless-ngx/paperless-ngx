@@ -49,7 +49,7 @@ from paperless.serialisers import GroupSerializer
 from paperless.serialisers import PaperlessAuthTokenSerializer
 from paperless.serialisers import ProfileSerializer
 from paperless.serialisers import UserSerializer
-from paperless_ai.indexing import vector_store_file_exists
+from paperless_ai.indexing import llm_index_exists
 
 
 class PaperlessObtainAuthTokenView(ObtainAuthToken):
@@ -467,7 +467,7 @@ class ApplicationConfigurationViewSet(ModelViewSet[ApplicationConfiguration]):
             or old_llm_context_size != new_llm_context_size
         )
         rebuild_needed = new_ai_index_enabled and (
-            not vector_store_file_exists() or embedding_config_changed
+            not llm_index_exists() or embedding_config_changed
         )
 
         if rebuild_needed:

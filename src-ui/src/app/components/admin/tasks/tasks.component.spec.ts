@@ -11,7 +11,7 @@ import { Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { throwError } from 'rxjs'
+import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import {
   PaperlessTask,
@@ -295,6 +295,7 @@ describe('TasksComponent', () => {
     const headerText = header.nativeElement.textContent
 
     expect(headerText).toContain('Dismiss visible')
+    expect(headerText).toContain('Dismiss all')
     expect(headerText).toContain('Auto refresh')
     expect(headerText).not.toContain('All types')
     expect(headerText).not.toContain('All sources')
@@ -493,6 +494,46 @@ describe('TasksComponent', () => {
     expect(modal).not.toBeUndefined()
     modal.componentInstance.confirmClicked.emit()
     expect(dismissSpy).toHaveBeenCalledWith(new Set([467, 466]))
+  })
+
+  it('should support dismiss all tasks', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+    const dismissSpy = jest
+      .spyOn(tasksService, 'dismissAllTasks')
+      .mockReturnValue(of({}))
+    const reloadPageSpy = jest
+      .spyOn(component as any, 'reloadPage')
+      .mockImplementation(() => undefined)
+
+    component.dismissAllTasks()
+
+    expect(modal).not.toBeUndefined()
+    expect(modal.componentInstance.messageBold).toBe('Dismiss all 7 tasks?')
+    modal.componentInstance.confirmClicked.emit()
+    expect(dismissSpy).toHaveBeenCalled()
+    expect(reloadPageSpy).toHaveBeenCalledWith(false)
+    expect(component.selectedTasks.size).toBe(0)
+  })
+
+  it('should show an error and re-enable modal buttons when dismissing all tasks fails', () => {
+    const error = new Error('dismiss all failed')
+    const toastSpy = jest.spyOn(toastService, 'showError')
+    const dismissSpy = jest
+      .spyOn(tasksService, 'dismissAllTasks')
+      .mockReturnValue(throwError(() => error))
+
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+
+    component.dismissAllTasks()
+    expect(modal).not.toBeUndefined()
+
+    modal.componentInstance.confirmClicked.emit()
+
+    expect(dismissSpy).toHaveBeenCalled()
+    expect(toastSpy).toHaveBeenCalledWith('Error dismissing tasks', error)
+    expect(modal.componentInstance.buttonsEnabled).toBe(true)
   })
 
   it('should dismiss the currently visible scoped and filtered tasks', () => {

@@ -4033,7 +4033,7 @@ class _TasksViewSetSchema(AutoSchema):
     ),
     acknowledge=extend_schema(
         operation_id="acknowledge_tasks",
-        description="Acknowledge a list of tasks",
+        description="Acknowledge a list of tasks, or all visible unacknowledged tasks",
         request=AcknowledgeTasksViewSerializer,
         responses={
             (200, "application/json"): inline_serializer(
@@ -4170,10 +4170,17 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
         permission_classes=[IsAuthenticated, AcknowledgeTasksPermissions],
     )
     def acknowledge(self, request):
-        serializer = AcknowledgeTasksViewSerializer(data=request.data)
+        queryset = self.get_queryset()
+        serializer = AcknowledgeTasksViewSerializer(
+            data=request.data,
+            context={"queryset": queryset},
+        )
         serializer.is_valid(raise_exception=True)
-        task_ids = serializer.validated_data.get("tasks")
-        tasks = self.get_queryset().filter(id__in=task_ids)
+        if serializer.validated_data.get("all", False):
+            tasks = queryset.filter(acknowledged=False)
+        else:
+            task_ids = serializer.validated_data.get("tasks")
+            tasks = queryset.filter(id__in=task_ids)
         count = tasks.update(acknowledged=True)
         return Response({"result": count})
 

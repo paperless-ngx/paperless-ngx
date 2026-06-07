@@ -334,6 +334,30 @@ export class TasksComponent
     }
   }
 
+  dismissAllTasks() {
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm Dismiss All`
+    modal.componentInstance.messageBold = $localize`Dismiss all ${this.totalTasks} tasks?`
+    modal.componentInstance.btnClass = 'btn-warning'
+    modal.componentInstance.btnCaption = $localize`Dismiss`
+    modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      modal.close()
+      this.tasksService.dismissAllTasks().subscribe({
+        next: () => {
+          this.reloadPage(false)
+        },
+        error: (e) => {
+          this.toastService.showError($localize`Error dismissing tasks`, e)
+          modal.componentInstance.buttonsEnabled = true
+        },
+      })
+      this.clearSelection()
+    })
+  }
+
   expandTask(task: PaperlessTask) {
     this.expandedTask = this.expandedTask == task.id ? undefined : task.id
   }
