@@ -80,6 +80,27 @@ describe('TasksService', () => {
       .flush({ count: 0, results: [] })
   })
 
+  it('calls acknowledge_tasks api endpoint on dismiss all and reloads', () => {
+    tasksService.dismissAllTasks().subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}tasks/acknowledge/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toEqual({
+      all: true,
+    })
+    req.flush([])
+    // reload is then called
+    httpTestingController
+      .expectOne(
+        (req: HttpRequest<unknown>) =>
+          req.url === `${environment.apiBaseUrl}tasks/` &&
+          req.params.get('acknowledged') === 'false' &&
+          req.params.get('page_size') === '1000'
+      )
+      .flush({ count: 0, results: [] })
+  })
+
   it('groups mixed task types by status when reloading', () => {
     expect(tasksService.total).toEqual(0)
     const mockTasks = [

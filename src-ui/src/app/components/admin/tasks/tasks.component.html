@@ -11,6 +11,9 @@
     <button class="btn btn-sm btn-outline-primary me-2" (click)="dismissTasks()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="visibleTasks.length === 0">
       <i-bs name="check2-all" class="me-1"></i-bs>{{dismissButtonText}}
     </button>
+    <button class="btn btn-sm btn-outline-primary me-2" (click)="dismissAllTasks()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="totalTasks === 0">
+      <i-bs name="check2-all" class="me-1"></i-bs><ng-container i18n>Dismiss all</ng-container>
+    </button>
     <div class="form-check form-switch mb-0 ms-2">
       <input class="form-check-input" type="checkbox" role="switch" [(ngModel)]="autoRefreshEnabled">
       <label class="form-check-label" for="autoRefreshSwitch" i18n>Auto refresh</label>

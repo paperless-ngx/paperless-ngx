@@ -904,6 +904,19 @@ def remove_password(
                 doc.id,
                 pair.source_doc.source_path,
             )
+            try:
+                with pikepdf.open(source_path) as pdf:
+                    if not pdf.is_encrypted:
+                        logger.info(
+                            "Skipping password removal for document %s because the "
+                            "source PDF is not encrypted",
+                            pair.root_doc.id,
+                        )
+                        continue
+            except pikepdf.PasswordError:
+                # Password-protected PDFs need the supplied password below.
+                pass
+
             with pikepdf.open(source_path, password=password) as pdf:
                 filepath: Path = (
                     Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))

@@ -844,7 +844,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
 
         with (
             patch("documents.tasks.llmindex_index.apply_async") as mock_update,
-            patch("paperless.views.vector_store_file_exists") as mock_exists,
+            patch("paperless.views.llm_index_exists") as mock_exists,
         ):
             mock_exists.return_value = False
             self.client.patch(
@@ -869,7 +869,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
 
         with (
             patch("documents.tasks.llmindex_index.apply_async") as mock_update,
-            patch("paperless.views.vector_store_file_exists") as mock_exists,
+            patch("paperless.views.llm_index_exists") as mock_exists,
         ):
             mock_exists.return_value = True
             self.client.patch(
@@ -890,7 +890,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
 
         with (
             patch("documents.tasks.llmindex_index.apply_async") as mock_update,
-            patch("paperless.views.vector_store_file_exists") as mock_exists,
+            patch("paperless.views.llm_index_exists") as mock_exists,
         ):
             mock_exists.return_value = True
             self.client.patch(
@@ -928,7 +928,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
 
         with (
             patch("documents.tasks.llmindex_index.apply_async") as mock_update,
-            patch("paperless.views.vector_store_file_exists") as mock_exists,
+            patch("paperless.views.llm_index_exists") as mock_exists,
         ):
             mock_exists.return_value = True
             self.client.patch(

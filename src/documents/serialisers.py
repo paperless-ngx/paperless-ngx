@@ -2632,10 +2632,16 @@ class RunTaskSerializer(serializers.Serializer[dict[str, str]]):
 
 class AcknowledgeTasksViewSerializer(serializers.Serializer[dict[str, Any]]):
     tasks = serializers.ListField(
-        required=True,
+        required=False,
         label="Tasks",
         write_only=True,
         child=serializers.IntegerField(),
+    )
+    all = serializers.BooleanField(
+        required=False,
+        default=False,
+        label="All",
+        write_only=True,
     )
 
     def _validate_task_id_list(self, tasks, name="tasks") -> None:
@@ -2643,7 +2649,8 @@ class AcknowledgeTasksViewSerializer(serializers.Serializer[dict[str, Any]]):
             raise serializers.ValidationError(f"{name} must be a list")
         if not all(isinstance(i, int) for i in tasks):
             raise serializers.ValidationError(f"{name} must be a list of integers")
-        count = PaperlessTask.objects.filter(id__in=tasks).count()
+        queryset = self.context.get("queryset", PaperlessTask.objects.all())
+        count = queryset.filter(id__in=tasks).count()
         if not count == len(tasks):
             raise serializers.ValidationError(
                 f"Some tasks in {name} don't exist or were specified twice.",
@@ -2652,6 +2659,21 @@ class AcknowledgeTasksViewSerializer(serializers.Serializer[dict[str, Any]]):
     def validate_tasks(self, tasks):
         self._validate_task_id_list(tasks)
         return tasks
+
+    def validate(self, attrs):
+        acknowledge_all = attrs.get("all", False)
+        task_ids = attrs.get("tasks")
+
+        if acknowledge_all and task_ids is not None:
+            raise serializers.ValidationError(
+                "Set either all or tasks, not both.",
+            )
+        if not acknowledge_all and task_ids is None:
+            raise serializers.ValidationError(
+                "Either all must be true or tasks must be provided.",
+            )
+
+        return attrs
 
 
 class ShareLinkSerializer(OwnedObjectSerializer):

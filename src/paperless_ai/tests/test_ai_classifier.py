@@ -6,6 +6,7 @@ import pytest
 from django.test import override_settings
 
 from documents.models import Document
+from paperless.config import AIConfig
 from paperless_ai.ai_classifier import build_localization_prompt
 from paperless_ai.ai_classifier import build_prompt_with_rag
 from paperless_ai.ai_classifier import build_prompt_without_rag
@@ -211,11 +212,12 @@ def test_prompt_with_without_rag(mock_document):
         "paperless_ai.ai_classifier.get_context_for_document",
         return_value="Context from similar documents",
     ):
-        prompt = build_prompt_without_rag(mock_document)
+        config = AIConfig()
+        prompt = build_prompt_without_rag(mock_document, config)
         assert "Additional context from similar documents" not in prompt
         assert "for generated" not in prompt
 
-        prompt = build_prompt_with_rag(mock_document)
+        prompt = build_prompt_with_rag(mock_document, config)
         assert "Additional context from similar documents" in prompt
 
         prompt = build_localization_prompt(
