@@ -5207,11 +5207,11 @@ wheels = [
 
 [[package]]
 name = "types-markdown"
-version = "3.10.2.20260211"
+version = "3.10.2.20260518"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/6d/2e/35b30a09f6ee8a69142408d3ceb248c4454aa638c0a414d8704a3ef79563/types_markdown-3.10.2.20260211.tar.gz", hash = "sha256:66164310f88c11a58c6c706094c6f8c537c418e3525d33b76276a5fbd66b01ce", size = 19768, upload-time = "2026-02-11T04:19:29.497Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/93/82/c605b9c9cfa244922449af20b93f8c4ecdc936b926d3340830036e0f87f1/types_markdown-3.10.2.20260518.tar.gz", hash = "sha256:206b044dd55a02ed66dfb9cfc02b1e500005d60370834cee5b41d26a3d8f0f72", size = 19865, upload-time = "2026-05-18T06:01:32.268Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/54/c9/659fa2df04b232b0bfcd05d2418e683080e91ec68f636f3c0a5a267350e7/types_markdown-3.10.2.20260211-py3-none-any.whl", hash = "sha256:2d94d08587e3738203b3c4479c449845112b171abe8b5cadc9b0c12fcf3e99da", size = 25854, upload-time = "2026-02-11T04:19:28.647Z" },
+    { url = "https://files.pythonhosted.org/packages/bf/db/fa5eef03f646f507d078a382ff8b239871ea847460f79effcfc44977865d/types_markdown-3.10.2.20260518-py3-none-any.whl", hash = "sha256:146fa9997a7d3aa3de1e3a51c56f3875d3947b7c545e58691e79f65fb56a663f", size = 25821, upload-time = "2026-05-18T06:01:31.35Z" },
 ]
 
 [[package]]
