@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import tempfile
-import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Literal
@@ -905,13 +904,8 @@ def remove_password(
                 doc.id,
                 pair.source_doc.source_path,
             )
-            with warnings.catch_warnings():
-                warnings.filterwarnings(
-                    "ignore",
-                    message="A password was provided, but no password was needed to open this PDF.",
-                    category=UserWarning,
-                )
-                with pikepdf.open(source_path, password=password) as pdf:
+            try:
+                with pikepdf.open(source_path) as pdf:
                     if not pdf.is_encrypted:
                         logger.info(
                             "Skipping password removal for document %s because the "
@@ -919,63 +913,67 @@ def remove_password(
                             pair.root_doc.id,
                         )
                         continue
+            except pikepdf.PasswordError:
+                # Password-protected PDFs need the supplied password below.
+                pass
 
-                    filepath: Path = (
-                        Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
-                        / f"{pair.root_doc.id}_unprotected.pdf"
+            with pikepdf.open(source_path, password=password) as pdf:
+                filepath: Path = (
+                    Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
+                    / f"{pair.root_doc.id}_unprotected.pdf"
+                )
+                pdf.remove_unreferenced_resources()
+                pdf.save(filepath)
+
+                if update_document:
+                    # Create a new version rather than modifying the root/original in place.
+                    overrides = (
+                        DocumentMetadataOverrides().from_document(pair.root_doc)
+                        if include_metadata
+                        else DocumentMetadataOverrides()
                     )
-                    pdf.remove_unreferenced_resources()
-                    pdf.save(filepath)
+                    if user is not None:
+                        overrides.owner_id = user.id
+                        overrides.actor_id = user.id
+                    consume_file.apply_async(
+                        kwargs={
+                            "input_doc": ConsumableDocument(
+                                source=DocumentSource.ConsumeFolder,
+                                original_file=filepath,
+                                root_document_id=pair.root_doc.id,
+                            ),
+                            "overrides": overrides,
+                        },
+                        headers={"trigger_source": trigger_source},
+                    )
+                else:
+                    consume_tasks = []
+                    overrides = (
+                        DocumentMetadataOverrides().from_document(pair.root_doc)
+                        if include_metadata
+                        else DocumentMetadataOverrides()
+                    )
+                    if user is not None:
+                        overrides.owner_id = user.id
+                        overrides.actor_id = user.id
 
-                    if update_document:
-                        # Create a new version rather than modifying the root/original in place.
-                        overrides = (
-                            DocumentMetadataOverrides().from_document(pair.root_doc)
-                            if include_metadata
-                            else DocumentMetadataOverrides()
-                        )
-                        if user is not None:
-                            overrides.owner_id = user.id
-                            overrides.actor_id = user.id
-                        consume_file.apply_async(
-                            kwargs={
-                                "input_doc": ConsumableDocument(
-                                    source=DocumentSource.ConsumeFolder,
-                                    original_file=filepath,
-                                    root_document_id=pair.root_doc.id,
-                                ),
-                                "overrides": overrides,
-                            },
-                            headers={"trigger_source": trigger_source},
-                        )
+                    consume_tasks.append(
+                        consume_file.s(
+                            input_doc=ConsumableDocument(
+                                source=DocumentSource.ConsumeFolder,
+                                original_file=filepath,
+                            ),
+                            overrides=overrides,
+                        ).set(headers={"trigger_source": trigger_source}),
+                    )
+
+                    if delete_original:
+                        chord(
+                            header=consume_tasks,
+                            body=delete.si([doc.id]),
+                        ).delay()
                     else:
-                        consume_tasks = []
-                        overrides = (
-                            DocumentMetadataOverrides().from_document(pair.root_doc)
-                            if include_metadata
-                            else DocumentMetadataOverrides()
-                        )
-                        if user is not None:
-                            overrides.owner_id = user.id
-                            overrides.actor_id = user.id
-
-                        consume_tasks.append(
-                            consume_file.s(
-                                input_doc=ConsumableDocument(
-                                    source=DocumentSource.ConsumeFolder,
-                                    original_file=filepath,
-                                ),
-                                overrides=overrides,
-                            ).set(headers={"trigger_source": trigger_source}),
-                        )
-
-                        if delete_original:
-                            chord(
-                                header=consume_tasks,
-                                body=delete.si([doc.id]),
-                            ).delay()
-                        else:
-                            group(consume_tasks).delay()
+                        group(consume_tasks).delay()
 
         except Exception as e:
             logger.exception(
