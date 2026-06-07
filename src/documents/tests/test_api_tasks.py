@@ -285,6 +285,50 @@ class TestGetTasksV10:
             "completed": 1,
         }
 
+    def test_status_counts_ignores_section_filters(
+        self,
+        admin_client: APIClient,
+    ) -> None:
+        """status_counts/ ignores status-like filters for the sections it counts."""
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.FAILURE,
+            input_data={"filename": "invoice-a.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.PENDING,
+            input_data={"filename": "invoice-b.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.SUCCESS,
+            input_data={"filename": "invoice-c.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.FAILURE,
+            input_data={"filename": "unrelated.pdf"},
+        )
+
+        response = admin_client.get(
+            f"{ENDPOINT}status_counts/",
+            {
+                "acknowledged": "false",
+                "name": "invoice",
+                "status": PaperlessTask.Status.FAILURE,
+                "is_complete": "false",
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == {
+            "all": 3,
+            "needs_attention": 1,
+            "in_progress": 1,
+            "completed": 1,
+        }
+
     def test_default_ordering_is_newest_first(self, admin_client: APIClient) -> None:
         """Tasks are returned in descending date_created order (newest first)."""
         base = timezone.now()
