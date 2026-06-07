@@ -51,7 +51,7 @@ dependencies = [
   "imap-tools~=1.13.0",
   "jinja2~=3.1.5",
   "langdetect~=1.0.9",
-  "llama-index-core>=0.14.21",
+  "llama-index-core>=0.14.22",
   "llama-index-embeddings-huggingface>=0.6.1",
   "llama-index-embeddings-ollama>=0.9",
   "llama-index-embeddings-openai-like>=0.2.2",
@@ -89,7 +89,7 @@ postgres = [
   "psycopg[c,pool]==3.3",
   # Direct dependency for proper resolution of the pre-built wheels
   "psycopg-c==3.3",
-  "psycopg-pool==3.3",
+  "psycopg-pool==3.3.1",
 ]
 webserver = [
   "granian[uvloop]~=2.7.0",
@@ -102,11 +102,11 @@ dev = [
   { include-group = "testing" },
 ]
 docs = [
-  "zensical>=0.0.36",
+  "zensical>=0.0.43",
 ]
 lint = [
   "prek~=0.3.10",
-  "ruff~=0.15.12",
+  "ruff~=0.15.15",
 ]
 testing = [
   "daphne",
