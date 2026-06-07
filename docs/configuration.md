@@ -30,21 +30,21 @@ or applicable default will be utilized instead.
 fetching, index optimization and for training the automatic document
 matcher.
 
-    -   If your Redis server needs login credentials PAPERLESS_REDIS =
+    -   If your Valkey/Redis server needs login credentials PAPERLESS_REDIS =
         `redis://<username>:<password>@<host>:<port>`
     -   With the requirepass option PAPERLESS_REDIS =
         `redis://:<password>@<host>:<port>`
     -   To include the redis database index PAPERLESS_REDIS =
         `redis://<username>:<password>@<host>:<port>/<DBIndex>`
 
-    [More information on securing your Redis
-    Instance](https://redis.io/docs/latest/operate/oss_and_stack/management/security).
+    [More information on securing your Valkey
+    Instance](https://valkey.io/topics/security/)).
 
     Defaults to `redis://localhost:6379`.
 
 #### [`PAPERLESS_REDIS_PREFIX=<prefix>`](#PAPERLESS_REDIS_PREFIX) {#PAPERLESS_REDIS_PREFIX}
 
-: Prefix to be used in Redis for keys and channels. Useful for sharing one Redis server among multiple Paperless instances.
+: Prefix to be used in Valkey/Redis for keys and channels. Useful for sharing one Valkey/Redis server among multiple Paperless instances.
 
     Defaults to no prefix.
 
@@ -264,7 +264,7 @@ For more details, refer to the [Redis eviction policy documentation](https://red
 
 #### [`PAPERLESS_READ_CACHE_REDIS_URL=<url>`](#PAPERLESS_READ_CACHE_REDIS_URL) {#PAPERLESS_READ_CACHE_REDIS_URL}
 
-: Defines the Redis instance used for the read cache.
+: Defines the Valkey/Redis instance used for the read cache.
 
     Defaults to `None`.
 
