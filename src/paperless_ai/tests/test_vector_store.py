@@ -13,6 +13,7 @@ from llama_index.core.vector_stores.types import MetadataFilters
 from llama_index.core.vector_stores.types import VectorStoreQuery
 
 from paperless_ai.vector_store import CURRENT_SCHEMA_VERSION
+from paperless_ai.vector_store import Migration
 from paperless_ai.vector_store import PaperlessLanceVectorStore
 
 DIM = 8
@@ -473,9 +474,6 @@ class TestSchemaVersioning:
 
 class TestMigrationRegistry:
     def test_pending_migrations_empty_at_current_version(self, uri: str) -> None:
-        from paperless_ai.vector_store import CURRENT_SCHEMA_VERSION
-        from paperless_ai.vector_store import Migration  # noqa: F401
-
         store = _store_at_version(uri, CURRENT_SCHEMA_VERSION)
         assert store.pending_migrations() == []
 
@@ -484,7 +482,6 @@ class TestMigrationRegistry:
         uri: str,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
-        from paperless_ai.vector_store import Migration
 
         m2 = Migration(
             version=2,
@@ -509,7 +506,6 @@ class TestMigrationRegistry:
         uri: str,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
-        from paperless_ai.vector_store import Migration
 
         m2 = Migration(
             version=2,
@@ -542,7 +538,6 @@ class TestMigrationRegistry:
         uri: str,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
-        from paperless_ai.vector_store import Migration
 
         m2 = Migration(
             version=2,
@@ -560,7 +555,6 @@ class TestMigrationRegistry:
         uri: str,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
-        from paperless_ai.vector_store import Migration
 
         m2 = Migration(
             version=2,
@@ -580,7 +574,6 @@ class TestApplyStructuralMigrations:
         uri: str,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
-        from paperless_ai.vector_store import Migration
 
         def _add_extra(table: Any) -> None:
             table.add_columns({"extra": "CAST(NULL AS string)"})
@@ -608,7 +601,6 @@ class TestApplyStructuralMigrations:
         uri: str,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
-        from paperless_ai.vector_store import Migration
 
         m2 = Migration(
             version=2,
@@ -628,7 +620,6 @@ class TestApplyStructuralMigrations:
         uri: str,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
-        from paperless_ai.vector_store import Migration
 
         applied_versions: list[int] = []
         m2 = Migration(
@@ -672,7 +663,6 @@ class TestApplyStructuralMigrations:
         mocker: pytest_mock.MockerFixture,
     ) -> None:
         """After add_columns the in-memory table object must reflect the new schema."""
-        from paperless_ai.vector_store import Migration
 
         m2 = Migration(
             version=2,
