@@ -175,6 +175,35 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         """True when any pending migration requires a full re-embedding."""
         return any(m.requires_reembed for m in self.pending_migrations())
 
+    def apply_structural_migrations(self) -> list[Migration]:
+        """Apply all pending structural (non-reembed) migrations in version order.
+
+        Each applied migration's ``apply`` callable receives the live LanceDB table
+        object and should call ``add_columns``, ``alter_columns``, or ``drop_columns``
+        as needed.  After all structural migrations run, the version file is updated
+        to the highest version applied and the in-memory table reference is refreshed.
+
+        Migrations with ``requires_reembed=True`` are skipped — the caller is
+        responsible for detecting them via ``requires_reembed_migration()`` and
+        triggering a full rebuild.
+        """
+        if self._table is None:
+            return []
+        structural = [m for m in self.pending_migrations() if not m.requires_reembed]
+        if not structural:
+            return []
+        for migration in structural:
+            logger.info(
+                "Applying schema migration v%d: %s",
+                migration.version,
+                migration.description,
+            )
+            migration.apply(self._table)
+        # Refresh the in-memory table so subsequent operations see the new schema.
+        self._table = self._conn.open_table(self._table_name)
+        self._write_schema_version(structural[-1].version)
+        return structural
+
     def config_mismatch(self, model_name: str) -> bool:
         """True when the stored model name differs from ``model_name``.
 
