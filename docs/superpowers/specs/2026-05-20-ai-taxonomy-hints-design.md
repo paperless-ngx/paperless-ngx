@@ -70,14 +70,22 @@ if none of the existing names fits.
 
 ### `paperless_ai/ai_classifier.py` (modify)
 
-Required signature change (the v1 spec missed this — flagged by code review):
+> **Note (updated 2026-06-09):** Since this spec was written, two commits changed this file:
+>
+> - `27426c04b` (#12894) added `llm_output_language` to `AIConfig`, added a new `build_localization_prompt(suggestions, output_language)` function that runs _after_ the LLM call (post-classification localization step), and added `output_language: str | None = None` to `get_ai_document_classification`.
+> - `eb292baa6` (#12944) switched the vector store to LanceDB (minor changes to this file).
+>
+> The current signatures are:
+>
+> - `build_prompt_without_rag(document: Document, config: AIConfig) -> str`
+> - `build_prompt_with_rag(document: Document, config: AIConfig, user: User | None = None) -> str`
+> - `get_ai_document_classification(document, user, output_language: str | None = None) -> dict`
+>
+> `build_localization_prompt` is a separate downstream step and does **not** interact with taxonomy hints — hints inject into the base prompt only, before the LLM call.
 
-- `build_prompt_without_rag(document, user: User | None = None)` — currently takes only `document`; add `user` with `None` default to keep call sites simple.
-- `build_prompt_with_rag(document, user: User | None = None)` — already takes `user`; its existing call to `build_prompt_without_rag(document)` at `ai_classifier.py:39` is updated to pass `user` through.
+Current signatures already take `config: AIConfig`; no `user` addition is needed in `build_prompt_without_rag` (the view owns hint construction). Both prompt builders accept a new optional `hints: TaxonomyHints | None = None` parameter. When non-`None`, `format_hints_for_prompt(hints)` is spliced in before the "Analyze the following document" instruction. When `None` (default), the prompt is built as today.
 
-Both prompt builders accept an optional `hints: TaxonomyHints | None = None` parameter. When non-`None`, `format_hints_for_prompt(hints)` is spliced in before the "Analyze the following document" instruction. When `None` (default), the prompt is built as today.
-
-`get_ai_document_classification(document, user, hints: TaxonomyHints | None = None)` accepts the same optional `hints` and forwards it to the prompt builder. Return shape is **unchanged** (`dict`). The view layer owns hint construction so the same `TaxonomyHints` object can be used both for the prompt and for `hinted_names` in matching — no need to thread it back out of the classifier. Callers in tests pass `hints=None` (or omit) to preserve existing behavior.
+`get_ai_document_classification(document, user, output_language: str | None = None, hints: TaxonomyHints | None = None)` accepts the same optional `hints` and forwards it to the prompt builder. Return shape is **unchanged** (`dict`). The view layer owns hint construction so the same `TaxonomyHints` object can be used both for the prompt and for `hinted_names` in matching — no need to thread it back out of the classifier. Callers in tests pass `hints=None` (or omit) to preserve existing behavior.
 
 ### `paperless_ai/matching.py` (modify)
 
@@ -93,7 +101,7 @@ Both prompt builders accept an optional `hints: TaxonomyHints | None = None` par
 The suggestion endpoint (around line 1482) is the single production caller of `get_ai_document_classification` and the call site for `match_*_by_name`. Update it to:
 
 1. Build hints once: `hints = build_taxonomy_hints(document, request.user)` (when `AIConfig().taxonomy_hints_enabled` and `max_per_category > 0`; otherwise `hints = None`).
-2. Pass `hints` into the classifier: `parsed = get_ai_document_classification(document, request.user, hints=hints)`.
+2. Pass `hints` into the classifier: `parsed = get_ai_document_classification(document, request.user, output_language, hints=hints)` — `output_language` is already resolved at this point (added in #12894, `views.py:1472`).
 3. Pass `hinted_names=set(hints["tags"])` (etc., one per category, or `None` when `hints` is `None`) into each `match_*_by_name` call.
 
 **Cache interaction:** the AI suggestion path is wrapped by `cached_llm_suggestions` / `refresh_suggestions_cache` (views.py:1477). A cached response bypasses the LLM call entirely — so changes to hints config don't take effect until the cache entry is invalidated. Acceptable for v1 (cache is short-lived). If experience shows users change the toggle and expect immediate effect, follow up by including a hash of the hint-relevant config (`taxonomy_hints_enabled`, `_max`) in the cache key.
