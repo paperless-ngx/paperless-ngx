@@ -1,7 +1,9 @@
 import json
 import logging
 from collections.abc import Sequence
+from pathlib import Path
 from typing import Any
+from typing import Final
 
 import lancedb
 import pyarrow as pa
@@ -18,7 +20,8 @@ from llama_index.core.vector_stores.utils import node_to_metadata_dict
 
 logger = logging.getLogger("paperless_ai.vector_store")
 
-DEFAULT_TABLE_NAME = "documents"
+DEFAULT_TABLE_NAME: Final = "documents"
+CURRENT_SCHEMA_VERSION: Final[int] = 1
 
 # Below this many chunks, LanceDB's exact (brute-force) search is sufficient and
 # faster than building an ANN index (per LanceDB guidance, ~100K vectors).
@@ -107,6 +110,7 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         if self.table_exists():
             self._conn.drop_table(self._table_name)
         self._table = None
+        self._schema_version_path.unlink(missing_ok=True)
 
     def stored_model_name(self) -> str | None:
         """Return the embedding model name stored in table schema metadata, or None."""
@@ -115,6 +119,25 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         meta = self._table.schema.metadata or {}
         value = meta.get(b"embed_model")
         return value.decode() if value else None
+
+    @property
+    def _schema_version_path(self) -> Path:
+        return Path(self._uri) / "schema_version.json"
+
+    def stored_schema_version(self) -> int:
+        """Return the schema version recorded on disk, or CURRENT_SCHEMA_VERSION if missing.
+
+        Missing means either the table predates versioning or was just created and the
+        write hasn't happened yet — treat conservatively as already current.
+        """
+        try:
+            return int(json.loads(self._schema_version_path.read_text())["version"])
+        except (FileNotFoundError, KeyError, ValueError):
+            return CURRENT_SCHEMA_VERSION
+
+    def _write_schema_version(self, version: int) -> None:
+        self._schema_version_path.parent.mkdir(parents=True, exist_ok=True)
+        self._schema_version_path.write_text(json.dumps({"version": version}))
 
     def config_mismatch(self, model_name: str) -> bool:
         """True when the stored model name differs from ``model_name``.
@@ -171,6 +194,7 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
             rows,
             schema=self._schema(dim, self._embed_model_name),
         )
+        self._write_schema_version(CURRENT_SCHEMA_VERSION)
         return True
 
     def add(self, nodes: Sequence[BaseNode], **add_kwargs: Any) -> list[str]:

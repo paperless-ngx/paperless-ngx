@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -9,9 +10,15 @@ from llama_index.core.vector_stores.types import MetadataFilter
 from llama_index.core.vector_stores.types import MetadataFilters
 from llama_index.core.vector_stores.types import VectorStoreQuery
 
+from paperless_ai.vector_store import CURRENT_SCHEMA_VERSION
 from paperless_ai.vector_store import PaperlessLanceVectorStore
 
 DIM = 8
+
+
+@pytest.fixture
+def store(tmp_path: Path) -> PaperlessLanceVectorStore:
+    return PaperlessLanceVectorStore(uri=str(tmp_path / "idx"))
 
 
 def _node(node_id: str, document_id: str, text: str, vec: float) -> TextNode:
@@ -26,10 +33,6 @@ def _node(node_id: str, document_id: str, text: str, vec: float) -> TextNode:
 
 
 class TestPaperlessLanceVectorStoreCrud:
-    @pytest.fixture
-    def store(self, tmp_path: Path) -> PaperlessLanceVectorStore:
-        return PaperlessLanceVectorStore(uri=str(tmp_path / "idx"))
-
     def test_add_then_query_returns_node(
         self,
         store: PaperlessLanceVectorStore,
@@ -188,9 +191,11 @@ class TestPaperlessLanceVectorStoreCrud:
 
 class TestPaperlessLanceVectorStoreUpsert:
     @pytest.fixture
-    def store(self, tmp_path: Path) -> PaperlessLanceVectorStore:
-        s = PaperlessLanceVectorStore(uri=str(tmp_path / "idx"))
-        s.add(
+    def filled_store(
+        self,
+        store: PaperlessLanceVectorStore,
+    ) -> PaperlessLanceVectorStore:
+        store.add(
             [
                 _node("1-0", "1", "old0", 0.1),
                 _node("1-1", "1", "old1", 0.2),
@@ -198,18 +203,18 @@ class TestPaperlessLanceVectorStoreUpsert:
                 _node("2-0", "2", "keep", 0.9),
             ],
         )
-        return s
+        return store
 
     def test_upsert_prunes_stale_chunks_and_keeps_others(
         self,
-        store: PaperlessLanceVectorStore,
+        filled_store: PaperlessLanceVectorStore,
     ) -> None:
-        store.upsert_document(
+        filled_store.upsert_document(
             "1",
             [_node("1-0", "1", "new0", 0.1), _node("1-1", "1", "new1", 0.2)],
         )
 
-        table = store.client.open_table("documents")
+        table = filled_store.client.open_table("documents")
         doc1 = sorted(
             r["id"] for r in table.search().where("document_id = '1'").to_list()
         )
@@ -218,30 +223,26 @@ class TestPaperlessLanceVectorStoreUpsert:
 
     def test_upsert_is_single_commit(
         self,
-        store: PaperlessLanceVectorStore,
+        filled_store: PaperlessLanceVectorStore,
     ) -> None:
-        table = store.client.open_table("documents")
+        table = filled_store.client.open_table("documents")
         before = table.version
-        store.upsert_document("1", [_node("1-0", "1", "new0", 0.1)])
-        assert store.client.open_table("documents").version == before + 1
+        filled_store.upsert_document("1", [_node("1-0", "1", "new0", 0.1)])
+        assert filled_store.client.open_table("documents").version == before + 1
 
     def test_upsert_empty_nodes_removes_document(
         self,
-        store: PaperlessLanceVectorStore,
+        filled_store: PaperlessLanceVectorStore,
     ) -> None:
-        store.upsert_document("1", [])
+        filled_store.upsert_document("1", [])
 
-        table = store.client.open_table("documents")
+        table = filled_store.client.open_table("documents")
         remaining = sorted(r["document_id"] for r in table.search().to_list())
         assert "1" not in remaining
         assert "2" in remaining
 
 
 class TestPaperlessLanceVectorStoreMaintenance:
-    @pytest.fixture
-    def store(self, tmp_path: Path) -> PaperlessLanceVectorStore:
-        return PaperlessLanceVectorStore(uri=str(tmp_path / "idx"))
-
     def test_maybe_create_ann_index_noop_below_threshold(
         self,
         store: PaperlessLanceVectorStore,
@@ -415,3 +416,53 @@ class TestGetModifiedTimes:
             "1": "2024-01-01T00:00:00",
             "2": "2024-06-01T00:00:00",
         }
+
+
+class TestSchemaVersioning:
+    @pytest.fixture
+    def uri(self, tmp_path: Path) -> str:
+        return str(tmp_path / "idx")
+
+    def test_version_file_written_on_table_creation(self, uri: str) -> None:
+
+        store = PaperlessLanceVectorStore(uri=uri)
+        store.add([_node("1-0", "1", "text", 0.1)])
+
+        version_file = Path(uri) / "schema_version.json"
+        assert version_file.exists()
+        assert json.loads(version_file.read_text())["version"] == CURRENT_SCHEMA_VERSION
+
+    def test_stored_schema_version_returns_current_when_file_missing(
+        self,
+        uri: str,
+    ) -> None:
+
+        store = PaperlessLanceVectorStore(uri=uri)
+        store.add([_node("1-0", "1", "text", 0.1)])
+        (Path(uri) / "schema_version.json").unlink()
+
+        reopened = PaperlessLanceVectorStore(uri=uri)
+        assert reopened.stored_schema_version() == CURRENT_SCHEMA_VERSION
+
+    def test_stored_schema_version_persists_after_reopen(self, uri: str) -> None:
+
+        PaperlessLanceVectorStore(uri=uri).add([_node("1-0", "1", "text", 0.1)])
+
+        reopened = PaperlessLanceVectorStore(uri=uri)
+        assert reopened.stored_schema_version() == CURRENT_SCHEMA_VERSION
+
+    def test_drop_table_removes_version_file(self, uri: str) -> None:
+        store = PaperlessLanceVectorStore(uri=uri)
+        store.add([_node("1-0", "1", "text", 0.1)])
+        assert (Path(uri) / "schema_version.json").exists()
+
+        store.drop_table()
+        assert not (Path(uri) / "schema_version.json").exists()
+
+    def test_version_file_written_on_upsert_creation(self, uri: str) -> None:
+
+        store = PaperlessLanceVectorStore(uri=uri)
+        store.upsert_document("1", [_node("1-0", "1", "text", 0.1)])
+
+        version_file = Path(uri) / "schema_version.json"
+        assert json.loads(version_file.read_text())["version"] == CURRENT_SCHEMA_VERSION
