@@ -9,8 +9,11 @@
         <label class="form-label" for="metadataDocumentID" i18n>Documents:</label>
         <ul class="list-group"
             cdkDropList
+            [cdkDropListData]="documentIDs"
             (cdkDropListDropped)="onDrop($event)">
-            @for (document of documents; track document.id) {
+            @for (documentID of documentIDs; track documentID) {
+              @let document = getDocument(documentID);
+              @if (document) {
                 <li class="list-group-item d-flex align-items-center" cdkDrag>
                     <i-bs name="grip-vertical" class="me-2"></i-bs>
                     <div class="d-flex flex-column">
@@ -27,6 +30,7 @@
                         </small>
                     </div>
                 </li>
+              }
             }
         </ul>
         </div>
