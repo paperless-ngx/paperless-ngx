@@ -214,6 +214,93 @@ def test_update_llm_index_rebuilds_on_model_name_change(
 
 
 @pytest.mark.django_db
+def test_update_llm_index_applies_structural_migration_without_rebuild(
+    temp_llm_index_dir: Path,
+    real_document: Document,
+    mock_embed_model: FakeEmbedding,
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """Structural migrations are applied in-place; no full rebuild (drop) occurs."""
+    from paperless_ai.vector_store import Migration
+    from paperless_ai.vector_store import PaperlessLanceVectorStore
+
+    column_added: list[bool] = []
+
+    def _add_extra(table) -> None:
+        table.add_columns({"extra": "CAST(NULL AS string)"})
+        column_added.append(True)
+
+    # Build the initial index at version 1 (the real CURRENT_SCHEMA_VERSION; no patches needed).
+    with patch("documents.models.Document.objects.all") as mock_all:
+        mock_queryset = MagicMock()
+        mock_queryset.exists.return_value = True
+        mock_queryset.__iter__.return_value = iter([real_document])
+        mock_all.return_value = mock_queryset
+        indexing.update_llm_index(rebuild=True)
+
+    # Simulate a new v2 structural migration being introduced after the initial index was built.
+    m2 = Migration(
+        version=2,
+        description="add extra col",
+        requires_reembed=False,
+        apply=_add_extra,
+    )
+    mocker.patch("paperless_ai.vector_store.MIGRATIONS", [m2])
+    mocker.patch("paperless_ai.vector_store.CURRENT_SCHEMA_VERSION", 2)
+    drop_spy = mocker.spy(PaperlessLanceVectorStore, "drop_table")
+
+    with patch("documents.models.Document.objects.all") as mock_all:
+        mock_queryset = MagicMock()
+        mock_queryset.exists.return_value = True
+        mock_queryset.__iter__.return_value = iter([real_document])
+        mock_all.return_value = mock_queryset
+        indexing.update_llm_index(rebuild=False)
+
+    assert column_added, "Structural migration apply() was not called"
+    drop_spy.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_update_llm_index_forces_rebuild_on_reembed_migration(
+    temp_llm_index_dir: Path,
+    real_document: Document,
+    mock_embed_model: FakeEmbedding,
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """A pending reembed migration causes a full drop+rebuild on next update."""
+    from paperless_ai.vector_store import Migration
+    from paperless_ai.vector_store import PaperlessLanceVectorStore
+
+    # Build the initial index at version 1 (the real CURRENT_SCHEMA_VERSION; no patches needed).
+    with patch("documents.models.Document.objects.all") as mock_all:
+        mock_queryset = MagicMock()
+        mock_queryset.exists.return_value = True
+        mock_queryset.__iter__.return_value = iter([real_document])
+        mock_all.return_value = mock_queryset
+        indexing.update_llm_index(rebuild=True)
+
+    # Simulate a reembed migration at v2 being introduced after the initial index was built.
+    m2 = Migration(
+        version=2,
+        description="requires reembed",
+        requires_reembed=True,
+        apply=lambda t: None,
+    )
+    mocker.patch("paperless_ai.vector_store.MIGRATIONS", [m2])
+    mocker.patch("paperless_ai.vector_store.CURRENT_SCHEMA_VERSION", 2)
+    drop_spy = mocker.spy(PaperlessLanceVectorStore, "drop_table")
+
+    with patch("documents.models.Document.objects.all") as mock_all:
+        mock_queryset = MagicMock()
+        mock_queryset.exists.return_value = True
+        mock_queryset.__iter__.return_value = iter([real_document])
+        mock_all.return_value = mock_queryset
+        indexing.update_llm_index(rebuild=False)
+
+    drop_spy.assert_called()
+
+
+@pytest.mark.django_db
 def test_update_llm_index_partial_update(
     temp_llm_index_dir: Path,
     real_document: Document,

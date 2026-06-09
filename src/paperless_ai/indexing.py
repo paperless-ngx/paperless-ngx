@@ -249,6 +249,13 @@ def update_llm_index(
     embed_model = get_embedding_model(config)
 
     with write_store(embed_model_name=model_name) as store:
+        if not rebuild and store.table_exists():
+            store.apply_structural_migrations()
+            if store.requires_reembed_migration():
+                logger.warning(
+                    "Schema migration requires re-embedding; forcing LLM index rebuild.",
+                )
+                rebuild = True
         if rebuild or not store.table_exists():
             (settings.LLM_INDEX_DIR / "meta.json").unlink(missing_ok=True)
             logger.info("Rebuilding LLM index.")
