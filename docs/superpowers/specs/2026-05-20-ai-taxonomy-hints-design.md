@@ -1,9 +1,11 @@
 # AI Suggestions: Inject existing taxonomy as candidates
 
-**Status:** Design (v2 — frequency-only)
+**Status:** Design (v3 — RAG-sourced, node metadata)
 **Date:** 2026-05-20
+**Updated:** 2026-06-09 (v3: switch from frequency DB queries to node metadata from RAG retrieval)
 **Related:** [Discussion #12787](https://github.com/paperless-ngx/paperless-ngx/discussions/12787)
 **Branch target:** `dev`
+**Depends on:** `2026-06-09-node-metadata-enrichment.md` (adds `storage_path`, `filename`, `asn` to node metadata; must land first)
 
 ## Problem
 
@@ -19,20 +21,40 @@ Result: the LLM invents new metadata names that duplicate existing taxonomy entr
 
 Tell the LLM what already exists, so it can prefer existing names verbatim. Fuzzy matching becomes the fallback for typos and for legitimately novel suggestions, not the primary semantic-equivalence mechanism.
 
-Non-goals: changing the LLM client, embedding model selection, or RAG retrieval. Replacing fuzzy matching entirely. Custom-field option values. Embedding-based shortlisting (deferred to a v2 if frequency proves insufficient).
+Non-goals: changing the LLM client, embedding model selection, or RAG retrieval. Replacing fuzzy matching entirely. Custom-field option values. Frequency-based DB queries (superseded by RAG-sourced approach).
 
 ## Approach
 
-For each of Tags, DocumentTypes, Correspondents, StoragePaths:
+Hints are sourced from the LanceDB node metadata of the similar documents already retrieved for RAG context — no separate DB queries, no new user-facing configuration. The feature is **gated on `llm_embedding_backend`**: when no embedding backend is configured, no hints are built and today's behavior is unchanged.
 
-1. Take the user-visible queryset (owner-aware, matching `matching.py`).
-2. Annotate by document-usage count and take the top `X` names by frequency. `X` is configurable per category cap (single setting, applied to all four categories).
-3. Inject those names into the LLM prompt as "Available <category>" blocks, with the instruction to prefer them verbatim.
-4. When the LLM responds, tell `matching.py` which names were hinted so an exact normalized match short-circuits past fuzzy. Names not in the hint list keep today's fuzzy fallback.
+LanceDB nodes already store `tags`, `correspondent`, `document_type`, `title`, and date fields per document (see `indexing.py:build_document_node`). `storage_path` is not currently stored; this feature adds it via a structural schema migration (no re-embed required).
 
-No FAISS index, no signals, no Celery tasks, no locks. Pure DB-side queries on each suggestion request.
+For each suggestion request (when embedding backend is on):
+
+1. Run the ANN retrieval once → get raw `NodeWithScore` results.
+2. Extract taxonomy from the node metadata: `tags` (list), `document_type`, `correspondent`, `storage_path`.
+3. Inject the unique names into the LLM prompt as "Available <category>" blocks.
+4. Pass the same name sets to `matching.py` as `hinted_names` so an exact normalized match short-circuits past fuzzy.
+
+When embedding backend is off → `hints = None` → prompt and matching are identical to today.
 
 ## Components
+
+### `paperless_ai/indexing.py` (modify — `retrieve_similar_nodes`)
+
+Extract the shared retriever logic from `query_similar_documents` into a new lower-level function:
+
+```python
+def retrieve_similar_nodes(
+    document: Document,
+    document_ids: Iterable[int | str] | None = None,
+    top_k: int = 5,
+) -> list["NodeWithScore"]:
+    """Run ANN retrieval and return raw NodeWithScore results."""
+    ...
+```
+
+Refactor `query_similar_documents` to call `retrieve_similar_nodes` and convert to ORM objects (behavior unchanged). The taxonomy hints path calls `retrieve_similar_nodes` directly — no DB round-trip, no second ANN query.
 
 ### `paperless_ai/taxonomy.py` (new)
 
@@ -43,23 +65,23 @@ class TaxonomyHints(TypedDict):
     correspondents: list[str]
     storage_paths: list[str]
 
-def build_taxonomy_hints(document: Document, user: User | None) -> TaxonomyHints: ...
+def build_taxonomy_hints_from_nodes(nodes: list["NodeWithScore"]) -> TaxonomyHints: ...
+def get_taxonomy_hints_for_document(document: Document, user: User | None) -> TaxonomyHints | None: ...
 def format_hints_for_prompt(hints: TaxonomyHints) -> str: ...
 ```
 
-Internals:
+`get_taxonomy_hints_for_document`:
 
-- `_visible_queryset(model_cls, perm: str, user)` — wraps `get_objects_for_user_owner_aware` exactly as `matching.py` does. If `user` is `None`, returns the unfiltered manager queryset (parity with how `matching.py` behaves today).
-- `_shortlist_by_frequency(queryset, max_per_category)` — DB-side:
-  ```python
-  return list(
-      queryset
-      .annotate(usage=Count("documents"))
-      .order_by("-usage", "name")
-      .values_list("name", flat=True)[:max_per_category]
-  )
-  ```
-  Confirmed reverse relation name is `documents` for all four models (`documents/models.py:164,173,184,211`). Secondary order by `name` keeps results stable when usage ties (common with 0-usage tails). `StoragePath` uses the human `name` field, not the `path` template.
+- Returns `None` immediately if `AIConfig().llm_embedding_backend` is falsy.
+- Applies the same owner-aware document ID filter as `get_context_for_document` (`get_objects_for_user_owner_aware(user, "view_document", Document)` when `user` is not `None`; unfiltered otherwise).
+- Calls `retrieve_similar_nodes(document=document, document_ids=visible_document_ids)`.
+- Passes results to `build_taxonomy_hints_from_nodes`.
+
+`build_taxonomy_hints_from_nodes(nodes)`:
+
+- Extracts from each `node.metadata`: `tags` (list), `document_type` (str | None), `correspondent` (str | None), `storage_path` (str | None).
+- Collects unique values across all nodes, sorted. Empty/`None` values skipped.
+- Returns a `TaxonomyHints`. No cap — naturally bounded by `top_k=5` in retrieval.
 
 `format_hints_for_prompt` emits one `Available <category>:` block per non-empty category. Empty categories produce no block (avoid prompting the LLM with "Available tags: (none)"). A single instruction line follows:
 
@@ -70,22 +92,17 @@ if none of the existing names fits.
 
 ### `paperless_ai/ai_classifier.py` (modify)
 
-> **Note (updated 2026-06-09):** Since this spec was written, two commits changed this file:
->
-> - `27426c04b` (#12894) added `llm_output_language` to `AIConfig`, added a new `build_localization_prompt(suggestions, output_language)` function that runs _after_ the LLM call (post-classification localization step), and added `output_language: str | None = None` to `get_ai_document_classification`.
-> - `eb292baa6` (#12944) switched the vector store to LanceDB (minor changes to this file).
->
-> The current signatures are:
+> **Note (updated 2026-06-09):** Current signatures after #12894 and #12944:
 >
 > - `build_prompt_without_rag(document: Document, config: AIConfig) -> str`
 > - `build_prompt_with_rag(document: Document, config: AIConfig, user: User | None = None) -> str`
 > - `get_ai_document_classification(document, user, output_language: str | None = None) -> dict`
 >
-> `build_localization_prompt` is a separate downstream step and does **not** interact with taxonomy hints — hints inject into the base prompt only, before the LLM call.
+> `build_localization_prompt` (added in #12894) runs after the LLM call and does **not** interact with taxonomy hints — hints inject into the base prompt only, before the LLM call.
 
-Current signatures already take `config: AIConfig`; no `user` addition is needed in `build_prompt_without_rag` (the view owns hint construction). Both prompt builders accept a new optional `hints: TaxonomyHints | None = None` parameter. When non-`None`, `format_hints_for_prompt(hints)` is spliced in before the "Analyze the following document" instruction. When `None` (default), the prompt is built as today.
+Both `build_prompt_without_rag` and `build_prompt_with_rag` accept a new optional `hints: TaxonomyHints | None = None` parameter. When non-`None`, `format_hints_for_prompt(hints)` is spliced in before the "Analyze the following document" instruction. When `None` (default), the prompt is built as today.
 
-`get_ai_document_classification(document, user, output_language: str | None = None, hints: TaxonomyHints | None = None)` accepts the same optional `hints` and forwards it to the prompt builder. Return shape is **unchanged** (`dict`). The view layer owns hint construction so the same `TaxonomyHints` object can be used both for the prompt and for `hinted_names` in matching — no need to thread it back out of the classifier. Callers in tests pass `hints=None` (or omit) to preserve existing behavior.
+`get_ai_document_classification(document, user, output_language: str | None = None, hints: TaxonomyHints | None = None)` accepts the same optional `hints` and forwards it to the prompt builder. Return shape **unchanged** (`dict`). Callers in tests pass `hints=None` (or omit) to preserve existing behavior.
 
 ### `paperless_ai/matching.py` (modify)
 
@@ -98,82 +115,61 @@ Current signatures already take `config: AIConfig`; no `user` addition is needed
 
 ### `documents/views.py` (modify)
 
-The suggestion endpoint (around line 1482) is the single production caller of `get_ai_document_classification` and the call site for `match_*_by_name`. Update it to:
+The suggestion endpoint (around line 1498) is the single production caller of `get_ai_document_classification` and the call site for `match_*_by_name`. Update it to:
 
-1. Build hints once: `hints = build_taxonomy_hints(document, request.user)` (when `AIConfig().taxonomy_hints_enabled` and `max_per_category > 0`; otherwise `hints = None`).
-2. Pass `hints` into the classifier: `parsed = get_ai_document_classification(document, request.user, output_language, hints=hints)` — `output_language` is already resolved at this point (added in #12894, `views.py:1472`).
+1. Build hints: `hints = get_taxonomy_hints_for_document(doc, request.user)` — returns `None` when embedding backend is off; no additional config check needed in the view.
+2. Pass `hints` into the classifier: `parsed = get_ai_document_classification(doc, request.user, output_language, hints=hints)` — `output_language` is already resolved at this point (`views.py:1472`).
 3. Pass `hinted_names=set(hints["tags"])` (etc., one per category, or `None` when `hints` is `None`) into each `match_*_by_name` call.
 
-**Cache interaction:** the AI suggestion path is wrapped by `cached_llm_suggestions` / `refresh_suggestions_cache` (views.py:1477). A cached response bypasses the LLM call entirely — so changes to hints config don't take effect until the cache entry is invalidated. Acceptable for v1 (cache is short-lived). If experience shows users change the toggle and expect immediate effect, follow up by including a hash of the hint-relevant config (`taxonomy_hints_enabled`, `_max`) in the cache key.
+**Cache interaction:** the AI suggestion path is wrapped by `cached_llm_suggestions` / `refresh_suggestions_cache` (views.py:1488). A cached response bypasses both the LLM call and hint construction entirely. Acceptable for v1.
 
-### `paperless/config.py` (`AIConfig`) + DB model + settings
+### No `AIConfig` / DB model / settings changes
 
-`AIConfig.__post_init__` reads values from the `ApplicationConfiguration` DB row **and** falls back to `settings.*` constants (pattern at `paperless/config.py:207` for `ai_enabled`). Both layers are needed.
-
-Two new fields, threaded through three places:
-
-1. **`paperless/settings/*.py`** — add module-level constants read from env:
-   - `AI_TAXONOMY_HINTS: bool = __get_boolean("PAPERLESS_AI_TAXONOMY_HINTS", "yes")` (default on)
-   - `AI_TAXONOMY_HINTS_MAX: int = int(os.getenv("PAPERLESS_AI_TAXONOMY_HINTS_MAX", "30"))`
-
-2. **`paperless/models.py` (`ApplicationConfiguration`)** — add two nullable columns:
-   - `taxonomy_hints_enabled = models.BooleanField(null=True)`
-   - `taxonomy_hints_max_per_category = models.PositiveSmallIntegerField(null=True)` (range 0–32767; `PositiveSmallIntegerField` is sufficient)
-   - One Django migration.
-
-3. **`paperless/config.py` (`AIConfig`)** — read with **explicit None check, not `or`** (because `0` and `False` are legitimate user values that would otherwise silently fall back to the settings default):
-   ```python
-   self.taxonomy_hints_enabled = (
-       app_config.taxonomy_hints_enabled
-       if app_config.taxonomy_hints_enabled is not None
-       else settings.AI_TAXONOMY_HINTS
-   )
-   self.taxonomy_hints_max_per_category = (
-       app_config.taxonomy_hints_max_per_category
-       if app_config.taxonomy_hints_max_per_category is not None
-       else settings.AI_TAXONOMY_HINTS_MAX
-   )
-   ```
-   (Other fields in this file use `or`; we deliberately diverge here to support `0` and `False`. A short comment in code records why.)
-
-**Frontend** (`src-ui/src/app/data/paperless-config.ts`): add two entries to the `PaperlessConfigOptions` declarative list (one `Boolean`, one `Number`, `category: ConfigCategory.AI`) plus two fields on the `PaperlessConfig` interface. No component changes; the form is generated from this list.
-
-`paperless.conf.example` and the configuration docs page get entries.
+No new configuration fields, DB columns, Django migrations, env vars, or frontend changes. The feature is automatically active for users who have an embedding backend configured and invisible to everyone else.
 
 ## Data flow
 
-Suggestion request:
+Suggestion request (embedding backend on):
 
-1. View checks `AIConfig().taxonomy_hints_enabled`; if enabled, calls `hints = build_taxonomy_hints(document, user)`; otherwise `hints = None`.
-2. View calls `parsed = get_ai_document_classification(document, user, hints=hints)`.
-3. Classifier splices `format_hints_for_prompt(hints)` into the prompt (when non-`None`), calls LLM, returns parsed dict.
-4. View calls `match_*_by_name(names, user, hinted_names=set(hints[<category>]) if hints else None)` per category. Exact-on-hint short-circuit; fuzzy fallback unchanged for misses.
+1. View calls `get_taxonomy_hints_for_document(doc, user)` → `retrieve_similar_nodes` → extract metadata → `TaxonomyHints`.
+2. View calls `get_ai_document_classification(doc, user, output_language, hints=hints)`.
+3. Classifier builds RAG prompt via `build_prompt_with_rag` (internally calls `query_similar_documents` → `retrieve_similar_nodes` for context text) + splices hints block → LLM → parsed dict.
+4. View calls `match_*_by_name(names, user, hinted_names=set(hints[<category>]))` per category.
 
-No background processing. No persisted state. Each suggestion request runs four lightweight `Count("documents")` queries (could be combined into a single query per model via `.annotate().order_by().values_list()`, no joins beyond the existing reverse relation).
+Suggestion request (embedding backend off):
+
+- `get_taxonomy_hints_for_document` returns `None` immediately (no retrieval runs).
+- Rest of the flow identical to today.
+
+**Note on retrieval calls:** `retrieve_similar_nodes` is called once directly (for hints) and once indirectly via `build_prompt_with_rag` → `get_context_for_document` → `query_similar_documents`. Both calls use identical parameters. Acceptable for v1; can be eliminated later by lifting `retrieve_similar_nodes` up to `get_ai_document_classification` and threading results to both callers.
 
 ## Error handling
 
-- **Empty visible queryset for a category:** omit that category's block from the prompt.
-- **`taxonomy_hints_enabled = False` or `max_per_category = 0`:** `build_taxonomy_hints` returns an empty `TaxonomyHints`; prompt is identical to today; matching is called without `hinted_names`; behavior identical to today.
-- **LLM returns a name not in hints but exactly matching an existing visible name:** still treated as exact match. `_match_names_to_queryset` always tries exact-on-full-queryset before fuzzy; `hinted_names` only governs whether fuzzy is consulted for that specific name.
-- **DB query failure during shortlist build:** propagate. Suggestion failures already surface as 5xx; adding silent fallbacks here would mask real problems.
+- **Embedding backend off:** `get_taxonomy_hints_for_document` returns `None`; no hints; behavior identical to today.
+- **No similar documents found:** `build_taxonomy_hints_from_nodes([])` returns all-empty `TaxonomyHints`; `format_hints_for_prompt` produces no blocks; effectively `hints = None`.
+- **Node missing `storage_path` key** (index predates the metadata enrichment prerequisite): `node.metadata.get("storage_path")` returns `None`; skipped gracefully. Storage path hints absent until rebuild completes.
+- **LLM returns a name not in hints but exactly matching an existing visible name:** still treated as exact match — `_match_names_to_queryset` always tries exact-on-full-queryset before fuzzy.
+- **Retrieval failure:** propagates; suggestion failures already surface as 5xx.
 
 ## Testing
 
-All new and modified tests use pytest style — functions/classes, no `unittest.TestCase` subclasses; `pytest-django` with per-class `@pytest.mark.django_db`; `pytest-mock`'s `mocker` fixture for patching; every fixture parameter, fixture return, and test signature type-annotated. Tests grouped under classes (`class TestBuildTaxonomyHints:`), not flat free functions. Shared fixtures live in `paperless_ai/tests/conftest.py`. Format with `ruff` directly (not `uv run ruff`).
+All tests use pytest style — grouped under classes, `@pytest.mark.django_db` on the class, `pytest-mock`'s `mocker` fixture, every fixture parameter/return/test signature type-annotated. Format with `ruff` directly (not `uv run ruff`).
 
 ### `paperless_ai/tests/test_taxonomy.py` (new)
 
-- `class TestBuildTaxonomyHints:`
+- `class TestBuildTaxonomyHintsFromNodes:`
   - Returns a `TaxonomyHints` with all four keys.
-  - Top-K limit respected (`max_per_category` honored from `AIConfig`).
-  - Frequency ordering: tag used on 5 docs ranks above tag used on 2 docs.
-  - Tie-break by name (alphabetical) for stable output.
-  - Owner-aware: user lacking `view_tag` perm gets `tags=[]`; `view_documenttype` likewise per category.
-  - Empty queryset for a category → empty list; `format_hints_for_prompt` omits the block.
-  - `taxonomy_hints_enabled=False` returns zero-filled `TaxonomyHints` and runs no taxonomy DB queries (`django_assert_num_queries`).
-  - `max_per_category=0` same behavior as disabled.
-  - `StoragePath` shortlist uses the `name` field, not `path` template (asserted on returned values).
+  - Deduplicates tag names shared across multiple nodes.
+  - `None` values in node metadata skipped gracefully.
+  - Missing `storage_path` key in metadata handled gracefully (pre-migration nodes).
+  - Empty node list → all-empty `TaxonomyHints`.
+  - Sorted output is stable across calls.
+
+- `class TestGetTaxonomyHintsForDocument:`
+  - Returns `None` when `AIConfig().llm_embedding_backend` is falsy; `retrieve_similar_nodes` not called (`mocker.spy`).
+  - Calls `retrieve_similar_nodes` with owner-aware document ID filter when user is provided.
+  - Returns populated `TaxonomyHints` when nodes are found.
+  - Returns all-empty `TaxonomyHints` (not `None`) when `retrieve_similar_nodes` returns `[]`.
 
 - `class TestFormatHintsForPrompt:`
   - All four blocks present when all categories non-empty.
@@ -184,40 +180,34 @@ All new and modified tests use pytest style — functions/classes, no `unittest.
 ### `paperless_ai/tests/test_ai_classifier.py` (extend)
 
 - `class TestBuildPrompt:`
-  - `build_prompt_without_rag(doc, user)` now accepts `user`; produces a prompt containing the hints block when hints are non-empty.
-  - `build_prompt_with_rag(doc, user)` includes both the RAG context block (unchanged) and the hints block.
-  - `taxonomy_hints_enabled=False`: prompt matches today's baseline (string equality against a fixture).
-  - `get_ai_document_classification(doc, user, hints=...)` forwards hints into the prompt; return shape unchanged (still `dict`).
+  - `build_prompt_without_rag(doc, config, hints=hints)` produces a prompt containing the hints block when hints are non-empty.
+  - `build_prompt_with_rag(doc, config, user, hints=hints)` includes both the RAG context block (unchanged) and the hints block.
+  - `hints=None`: prompt matches today's baseline (string equality against a fixture).
+  - `get_ai_document_classification(doc, user, hints=...)` forwards hints into the prompt; return shape unchanged.
 
 ### `paperless_ai/tests/test_matching.py` (extend)
 
 - `class TestHintedMatching:`
-  - LLM returns `"Bloodwork"` verbatim, `hinted_names={"Bloodwork", ...}` → exact match returned; `difflib.get_close_matches` not called (`mocker.spy` on `difflib.get_close_matches`).
+  - LLM returns `"Bloodwork"` verbatim, `hinted_names={"Bloodwork"}` → exact match returned; `difflib.get_close_matches` not called (`mocker.spy`).
   - LLM returns `"blood test"` not in `hinted_names`, no existing exact → fuzzy fallback runs; behavior unchanged from today (regression guard).
-  - LLM returns `"Bloodwork "` (whitespace) with hinted_names containing `"Bloodwork"` → normalized exact match wins, fuzzy not consulted.
-  - Backward compatibility: `match_tags_by_name(names, user)` without the kwarg behaves identically to today (snapshot of an existing test, parameterized).
-
-Markers: no `live` marker needed.
+  - LLM returns `"Bloodwork "` (whitespace) with `hinted_names={"Bloodwork"}` → normalized exact match wins, fuzzy not consulted.
+  - Backward compatibility: `match_tags_by_name(names, user)` without the kwarg behaves identically to today.
 
 ## Migration / rollout
 
-- One Django migration adding two columns to `ApplicationConfiguration` (`taxonomy_hints_enabled BooleanField`, `taxonomy_hints_max_per_category PositiveSmallIntegerField`). Both nullable with sensible defaults so existing rows aren't broken.
-- Feature defaults to on for new and existing installs. Set `PAPERLESS_AI_TAXONOMY_HINTS=false` (or via the Application Configuration UI) to restore today's behavior.
-- Frontend admin form updated to expose the two fields under the existing AI section.
+No migration in this feature. The prerequisite spec (`2026-06-09-node-metadata-enrichment.md`) handles the LanceDB schema migration (v2, `requires_reembed=True`) and the resulting index rebuild. Once that lands, `storage_path` is in every node's metadata and this feature needs no additional migration steps.
 
-## Open questions deferred to implementation
-
-- `paperless_ai/tests/conftest.py` already exists — verify fixture-naming conventions match before adding new fixtures.
-- Confirm `parse_ai_response` doesn't need to know about hints (it's a pure parser; hints flow alongside, not through it).
-- The view layer applying `hinted_names` needs to read the same `AIConfig` instance the classifier used; pass the `TaxonomyHints` through the response tuple (chosen) rather than re-deriving in the view.
+No Django migration. No new config. Users with an embedding backend get taxonomy hints automatically once both specs are shipped; users without one see no change.
 
 ## Interplay with `extract_unmatched_names`
 
-`extract_unmatched_names` (used downstream of matching) surfaces LLM-returned names that didn't match any existing taxonomy entry — the UI uses these to offer "create new tag?" affordances. With hints in place, fewer names will be unmatched, which is the desired outcome. No behavior change is required: a hinted name that the LLM repeats verbatim will exact-match and not appear in the unmatched list; a name the LLM invents anyway (despite the hint instruction) still flows through fuzzy and, if no match, surfaces as "new" exactly as today. Out of scope: filtering unmatched results based on what was in the hint set.
+`extract_unmatched_names` surfaces LLM-returned names that didn't match any existing taxonomy entry — the UI uses these to offer "create new tag?" affordances. With hints in place, fewer names will be unmatched. No behavior change required: a hinted name the LLM returns verbatim will exact-match and not appear in the unmatched list; a name the LLM invents anyway still flows through fuzzy and, if no match, surfaces as "new" exactly as today.
 
 ## Out of scope (potential v2)
 
-- Embedding-based shortlisting (for users with very large taxonomies where frequency misses the right tag). Would re-introduce a FAISS-shaped subsystem with signals, debounce, and locks. Defer until evidence frequency is insufficient.
-- Tag hierarchy awareness — hinting `Medical/Bloodwork` vs `Bloodwork` when tags are nested.
+- Capping hint list length per category (currently unbounded within `top_k=5` retrieved nodes; revisit if prompt length becomes a concern).
+- Eliminating the double `retrieve_similar_nodes` call by threading nodes through `get_ai_document_classification`.
+- Frequency-based hints as a fallback for users without an embedding backend.
+- Structured output / JSON schema enum constraints as an alternative to prompt injection.
+- Tag hierarchy awareness.
 - Custom field option values.
-- `StoragePath` template-expression hinting (vs raw `name`).
