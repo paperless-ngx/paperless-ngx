@@ -23,6 +23,19 @@ def store(tmp_path: Path) -> PaperlessLanceVectorStore:
     return PaperlessLanceVectorStore(uri=str(tmp_path / "idx"))
 
 
+@pytest.fixture
+def uri(tmp_path: Path) -> str:
+    return str(tmp_path / "idx")
+
+
+def _store_at_version(uri: str, version: int) -> PaperlessLanceVectorStore:
+    """Create a store with a table and then fake its on-disk version."""
+    store = PaperlessLanceVectorStore(uri=uri)
+    store.add([_node("1-0", "1", "text", 0.1)])
+    store._write_schema_version(version)
+    return PaperlessLanceVectorStore(uri=uri)  # reopen to pick up written version
+
+
 def _node(node_id: str, document_id: str, text: str, vec: float) -> TextNode:
     node = TextNode(id_=node_id, text=text, metadata={"document_id": document_id})
     node.set_content(text)
@@ -324,10 +337,6 @@ class TestPaperlessLanceVectorStoreMaintenance:
 
 
 class TestConfigMismatch:
-    @pytest.fixture
-    def uri(self, tmp_path: Path) -> str:
-        return str(tmp_path / "idx")
-
     def test_stored_model_name_returns_none_when_no_table(self, uri: str) -> None:
         store = PaperlessLanceVectorStore(uri=uri)
         assert store.stored_model_name() is None
@@ -375,10 +384,6 @@ class TestConfigMismatch:
 
 
 class TestGetModifiedTimes:
-    @pytest.fixture
-    def store(self, tmp_path: Path) -> PaperlessLanceVectorStore:
-        return PaperlessLanceVectorStore(uri=str(tmp_path / "idx"))
-
     def _node_with_modified(
         self,
         node_id: str,
@@ -421,10 +426,6 @@ class TestGetModifiedTimes:
 
 
 class TestSchemaVersioning:
-    @pytest.fixture
-    def uri(self, tmp_path: Path) -> str:
-        return str(tmp_path / "idx")
-
     def test_version_file_written_on_table_creation(self, uri: str) -> None:
 
         store = PaperlessLanceVectorStore(uri=uri)
@@ -471,22 +472,11 @@ class TestSchemaVersioning:
 
 
 class TestMigrationRegistry:
-    @pytest.fixture
-    def uri(self, tmp_path: Path) -> str:
-        return str(tmp_path / "idx")
-
-    def _store_at_version(self, uri: str, version: int) -> PaperlessLanceVectorStore:
-        """Create a store with a table and then fake its on-disk version."""
-        store = PaperlessLanceVectorStore(uri=uri)
-        store.add([_node("1-0", "1", "text", 0.1)])
-        store._write_schema_version(version)
-        return PaperlessLanceVectorStore(uri=uri)  # reopen to pick up written version
-
     def test_pending_migrations_empty_at_current_version(self, uri: str) -> None:
         from paperless_ai.vector_store import CURRENT_SCHEMA_VERSION
         from paperless_ai.vector_store import Migration  # noqa: F401
 
-        store = self._store_at_version(uri, CURRENT_SCHEMA_VERSION)
+        store = _store_at_version(uri, CURRENT_SCHEMA_VERSION)
         assert store.pending_migrations() == []
 
     def test_pending_migrations_returns_migrations_above_stored_version(
@@ -510,7 +500,7 @@ class TestMigrationRegistry:
         )
         mocker.patch("paperless_ai.vector_store.MIGRATIONS", [m2, m3])
 
-        store = self._store_at_version(uri, 1)
+        store = _store_at_version(uri, 1)
         pending = store.pending_migrations()
         assert pending == [m2, m3]
 
@@ -535,7 +525,7 @@ class TestMigrationRegistry:
         )
         mocker.patch("paperless_ai.vector_store.MIGRATIONS", [m2, m3])
 
-        store = self._store_at_version(uri, 2)
+        store = _store_at_version(uri, 2)
         pending = store.pending_migrations()
         assert pending == [m3]
 
@@ -544,7 +534,7 @@ class TestMigrationRegistry:
         assert store.pending_migrations() == []
 
     def test_requires_reembed_migration_false_when_none_pending(self, uri: str) -> None:
-        store = self._store_at_version(uri, 1)
+        store = _store_at_version(uri, 1)
         assert store.requires_reembed_migration() is False
 
     def test_requires_reembed_migration_false_when_only_structural_pending(
@@ -562,7 +552,7 @@ class TestMigrationRegistry:
         )
         mocker.patch("paperless_ai.vector_store.MIGRATIONS", [m2])
 
-        store = self._store_at_version(uri, 1)
+        store = _store_at_version(uri, 1)
         assert store.requires_reembed_migration() is False
 
     def test_requires_reembed_migration_true_when_reembed_migration_pending(
@@ -580,21 +570,11 @@ class TestMigrationRegistry:
         )
         mocker.patch("paperless_ai.vector_store.MIGRATIONS", [m2])
 
-        store = self._store_at_version(uri, 1)
+        store = _store_at_version(uri, 1)
         assert store.requires_reembed_migration() is True
 
 
 class TestApplyStructuralMigrations:
-    @pytest.fixture
-    def uri(self, tmp_path: Path) -> str:
-        return str(tmp_path / "idx")
-
-    def _store_at_version(self, uri: str, version: int) -> PaperlessLanceVectorStore:
-        store = PaperlessLanceVectorStore(uri=uri)
-        store.add([_node("1-0", "1", "text", 0.1)])
-        store._write_schema_version(version)
-        return PaperlessLanceVectorStore(uri=uri)
-
     def test_apply_structural_adds_column_via_lancedb(
         self,
         uri: str,
@@ -613,7 +593,7 @@ class TestApplyStructuralMigrations:
         )
         mocker.patch("paperless_ai.vector_store.MIGRATIONS", [m2])
 
-        store = self._store_at_version(uri, 1)
+        store = _store_at_version(uri, 1)
         applied = store.apply_structural_migrations()
 
         assert len(applied) == 1
@@ -638,7 +618,7 @@ class TestApplyStructuralMigrations:
         )
         mocker.patch("paperless_ai.vector_store.MIGRATIONS", [m2])
 
-        store = self._store_at_version(uri, 1)
+        store = _store_at_version(uri, 1)
         store.apply_structural_migrations()
 
         assert store.stored_schema_version() == 2
@@ -668,7 +648,7 @@ class TestApplyStructuralMigrations:
         )
         mocker.patch("paperless_ai.vector_store.MIGRATIONS", [m2, m3])
 
-        store = self._store_at_version(uri, 1)
+        store = _store_at_version(uri, 1)
         applied = store.apply_structural_migrations()
 
         assert [m.version for m in applied] == [2]
@@ -677,7 +657,7 @@ class TestApplyStructuralMigrations:
         assert store.stored_schema_version() == 2
 
     def test_apply_structural_noop_at_current_version(self, uri: str) -> None:
-        store = self._store_at_version(uri, 1)
+        store = _store_at_version(uri, 1)
         applied = store.apply_structural_migrations()
         assert applied == []
 
@@ -702,7 +682,7 @@ class TestApplyStructuralMigrations:
         )
         mocker.patch("paperless_ai.vector_store.MIGRATIONS", [m2])
 
-        store = self._store_at_version(uri, 1)
+        store = _store_at_version(uri, 1)
         store.apply_structural_migrations()
 
         # The store's own _table reference (not a re-open) must see the new column.
