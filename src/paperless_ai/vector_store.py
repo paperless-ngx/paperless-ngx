@@ -35,17 +35,10 @@ class Migration:
     apply: Callable[[Any], None] = field(compare=False, hash=False)
 
 
-# Ordered list of schema migrations. Each entry upgrades the table to `version`.
-# Structural migrations (requires_reembed=False) are applied in-place via LanceDB's
-# add_columns/alter_columns/drop_columns APIs — no re-embedding needed.
-# Migrations with requires_reembed=True cause a full rebuild on next index update,
-# exactly like a model-name change does today.
-#
-# To add a migration:
-#   1. Increment CURRENT_SCHEMA_VERSION.
-#   2. Append a Migration entry here with the new version number.
-#   3. For structural changes, call table.add_columns/alter_columns/drop_columns in apply().
-#   4. For embedding-invalidating changes, set requires_reembed=True; apply() can be a no-op.
+# Ordered schema migrations, each upgrading the table to its `version`. To add one,
+# bump CURRENT_SCHEMA_VERSION and append a Migration. Structural migrations
+# (requires_reembed=False) run in-place via the table's add/alter/drop_columns in
+# apply(); requires_reembed=True forces a full rebuild and apply() can be a no-op.
 MIGRATIONS: list[Migration] = []
 
 # Below this many chunks, brute-force exact search is fast enough that building
@@ -150,15 +143,16 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         return Path(self._uri) / "schema_version.json"
 
     def stored_schema_version(self) -> int:
-        """Return the schema version recorded on disk, or CURRENT_SCHEMA_VERSION if missing.
+        """Return the schema version recorded on disk, or 0 if the file is missing.
 
-        Missing means either the table predates versioning or was just created and the
-        write hasn't happened yet — treat conservatively as already current.
+        0 causes all registered migrations to be treated as pending, which is safe
+        for tables that predate versioning. Fresh tables always have the file written
+        by _ensure_table, so they never fall through to this default.
         """
         try:
             return int(json.loads(self._schema_version_path.read_text())["version"])
         except (FileNotFoundError, KeyError, ValueError):
-            return CURRENT_SCHEMA_VERSION
+            return 0
 
     def _write_schema_version(self, version: int) -> None:
         self._schema_version_path.parent.mkdir(parents=True, exist_ok=True)
@@ -178,18 +172,20 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
     def apply_structural_migrations(self) -> list[Migration]:
         """Apply all pending structural (non-reembed) migrations in version order.
 
-        Each applied migration's ``apply`` callable receives the live LanceDB table
-        object and should call ``add_columns``, ``alter_columns``, or ``drop_columns``
-        as needed.  After all structural migrations run, the version file is updated
-        to the highest version applied and the in-memory table reference is refreshed.
-
-        Migrations with ``requires_reembed=True`` are skipped — the caller is
-        responsible for detecting them via ``requires_reembed_migration()`` and
-        triggering a full rebuild.
+        Each migration's ``apply`` callable receives the live LanceDB table and runs
+        in-place. Migrations with ``requires_reembed=True`` are skipped — the caller
+        detects them via ``requires_reembed_migration()`` and rebuilds instead.
         """
         if self._table is None:
             return []
-        structural = [m for m in self.pending_migrations() if not m.requires_reembed]
+        # Stop at the first reembed boundary so the version counter never jumps past
+        # a pending reembed migration, which would cause requires_reembed_migration()
+        # to return False and silently skip the rebuild.
+        structural: list[Migration] = []
+        for m in self.pending_migrations():
+            if m.requires_reembed:
+                break
+            structural.append(m)
         if not structural:
             return []
         for migration in structural:

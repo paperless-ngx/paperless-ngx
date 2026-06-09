@@ -436,7 +436,7 @@ class TestSchemaVersioning:
         assert version_file.exists()
         assert json.loads(version_file.read_text())["version"] == CURRENT_SCHEMA_VERSION
 
-    def test_stored_schema_version_returns_current_when_file_missing(
+    def test_stored_schema_version_returns_zero_when_file_missing(
         self,
         uri: str,
     ) -> None:
@@ -446,7 +446,7 @@ class TestSchemaVersioning:
         (Path(uri) / "schema_version.json").unlink()
 
         reopened = PaperlessLanceVectorStore(uri=uri)
-        assert reopened.stored_schema_version() == CURRENT_SCHEMA_VERSION
+        assert reopened.stored_schema_version() == 0
 
     def test_stored_schema_version_persists_after_reopen(self, uri: str) -> None:
 
