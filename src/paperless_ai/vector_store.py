@@ -1,6 +1,9 @@
 import json
 import logging
+from collections.abc import Callable
 from collections.abc import Sequence
+from dataclasses import dataclass
+from dataclasses import field
 from pathlib import Path
 from typing import Any
 from typing import Final
@@ -22,6 +25,28 @@ logger = logging.getLogger("paperless_ai.vector_store")
 
 DEFAULT_TABLE_NAME: Final = "documents"
 CURRENT_SCHEMA_VERSION: Final[int] = 1
+
+
+@dataclass(frozen=True)
+class Migration:
+    version: int
+    description: str
+    requires_reembed: bool
+    apply: Callable[[Any], None] = field(compare=False, hash=False)
+
+
+# Ordered list of schema migrations. Each entry upgrades the table to `version`.
+# Structural migrations (requires_reembed=False) are applied in-place via LanceDB's
+# add_columns/alter_columns/drop_columns APIs — no re-embedding needed.
+# Migrations with requires_reembed=True cause a full rebuild on next index update,
+# exactly like a model-name change does today.
+#
+# To add a migration:
+#   1. Increment CURRENT_SCHEMA_VERSION.
+#   2. Append a Migration entry here with the new version number.
+#   3. For structural changes, call table.add_columns/alter_columns/drop_columns in apply().
+#   4. For embedding-invalidating changes, set requires_reembed=True; apply() can be a no-op.
+MIGRATIONS: list[Migration] = []
 
 # Below this many chunks, LanceDB's exact (brute-force) search is sufficient and
 # faster than building an ANN index (per LanceDB guidance, ~100K vectors).
@@ -138,6 +163,17 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
     def _write_schema_version(self, version: int) -> None:
         self._schema_version_path.parent.mkdir(parents=True, exist_ok=True)
         self._schema_version_path.write_text(json.dumps({"version": version}))
+
+    def pending_migrations(self) -> list[Migration]:
+        """Return migrations not yet applied to this table, in version order."""
+        if self._table is None:
+            return []
+        current = self.stored_schema_version()
+        return [m for m in MIGRATIONS if m.version > current]
+
+    def requires_reembed_migration(self) -> bool:
+        """True when any pending migration requires a full re-embedding."""
+        return any(m.requires_reembed for m in self.pending_migrations())
 
     def config_mismatch(self, model_name: str) -> bool:
         """True when the stored model name differs from ``model_name``.

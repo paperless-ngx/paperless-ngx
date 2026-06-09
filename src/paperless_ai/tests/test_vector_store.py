@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import pytest
+import pytest_mock
 from llama_index.core.schema import NodeRelationship
 from llama_index.core.schema import RelatedNodeInfo
 from llama_index.core.schema import TextNode
@@ -466,3 +467,117 @@ class TestSchemaVersioning:
 
         version_file = Path(uri) / "schema_version.json"
         assert json.loads(version_file.read_text())["version"] == CURRENT_SCHEMA_VERSION
+
+
+class TestMigrationRegistry:
+    @pytest.fixture
+    def uri(self, tmp_path: Path) -> str:
+        return str(tmp_path / "idx")
+
+    def _store_at_version(self, uri: str, version: int) -> PaperlessLanceVectorStore:
+        """Create a store with a table and then fake its on-disk version."""
+        store = PaperlessLanceVectorStore(uri=uri)
+        store.add([_node("1-0", "1", "text", 0.1)])
+        store._write_schema_version(version)
+        return PaperlessLanceVectorStore(uri=uri)  # reopen to pick up written version
+
+    def test_pending_migrations_empty_at_current_version(self, uri: str) -> None:
+        from paperless_ai.vector_store import CURRENT_SCHEMA_VERSION
+        from paperless_ai.vector_store import Migration  # noqa: F401
+
+        store = self._store_at_version(uri, CURRENT_SCHEMA_VERSION)
+        assert store.pending_migrations() == []
+
+    def test_pending_migrations_returns_migrations_above_stored_version(
+        self,
+        uri: str,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        from paperless_ai.vector_store import Migration
+
+        m2 = Migration(
+            version=2,
+            description="add col",
+            requires_reembed=False,
+            apply=lambda t: None,
+        )
+        m3 = Migration(
+            version=3,
+            description="reindex",
+            requires_reembed=True,
+            apply=lambda t: None,
+        )
+        mocker.patch("paperless_ai.vector_store.MIGRATIONS", [m2, m3])
+
+        store = self._store_at_version(uri, 1)
+        pending = store.pending_migrations()
+        assert pending == [m2, m3]
+
+    def test_pending_migrations_excludes_already_applied(
+        self,
+        uri: str,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        from paperless_ai.vector_store import Migration
+
+        m2 = Migration(
+            version=2,
+            description="add col",
+            requires_reembed=False,
+            apply=lambda t: None,
+        )
+        m3 = Migration(
+            version=3,
+            description="reindex",
+            requires_reembed=True,
+            apply=lambda t: None,
+        )
+        mocker.patch("paperless_ai.vector_store.MIGRATIONS", [m2, m3])
+
+        store = self._store_at_version(uri, 2)
+        pending = store.pending_migrations()
+        assert pending == [m3]
+
+    def test_pending_migrations_empty_when_no_table(self, uri: str) -> None:
+        store = PaperlessLanceVectorStore(uri=uri)
+        assert store.pending_migrations() == []
+
+    def test_requires_reembed_migration_false_when_none_pending(self, uri: str) -> None:
+        store = self._store_at_version(uri, 1)
+        assert store.requires_reembed_migration() is False
+
+    def test_requires_reembed_migration_false_when_only_structural_pending(
+        self,
+        uri: str,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        from paperless_ai.vector_store import Migration
+
+        m2 = Migration(
+            version=2,
+            description="add col",
+            requires_reembed=False,
+            apply=lambda t: None,
+        )
+        mocker.patch("paperless_ai.vector_store.MIGRATIONS", [m2])
+
+        store = self._store_at_version(uri, 1)
+        assert store.requires_reembed_migration() is False
+
+    def test_requires_reembed_migration_true_when_reembed_migration_pending(
+        self,
+        uri: str,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        from paperless_ai.vector_store import Migration
+
+        m2 = Migration(
+            version=2,
+            description="reindex",
+            requires_reembed=True,
+            apply=lambda t: None,
+        )
+        mocker.patch("paperless_ai.vector_store.MIGRATIONS", [m2])
+
+        store = self._store_at_version(uri, 1)
+        assert store.requires_reembed_migration() is True
