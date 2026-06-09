@@ -48,8 +48,8 @@ class Migration:
 #   4. For embedding-invalidating changes, set requires_reembed=True; apply() can be a no-op.
 MIGRATIONS: list[Migration] = []
 
-# Below this many chunks, LanceDB's exact (brute-force) search is sufficient and
-# faster than building an ANN index (per LanceDB guidance, ~100K vectors).
+# Below this many chunks, brute-force exact search is fast enough that building
+# an ANN index is not worth the overhead.
 ANN_INDEX_MIN_ROWS = 100_000
 # IVF_PQ default; num_sub_vectors must evenly divide the embedding dimension.
 ANN_PQ_SUB_VECTORS = 96
