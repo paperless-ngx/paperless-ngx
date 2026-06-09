@@ -17,6 +17,8 @@ from documents.tests.factories import PaperlessTaskFactory
 from paperless.models import ApplicationConfiguration
 from paperless_ai import indexing
 from paperless_ai.tests.conftest import FakeEmbedding
+from paperless_ai.vector_store import Migration
+from paperless_ai.vector_store import PaperlessLanceVectorStore
 
 
 @pytest.fixture
@@ -221,9 +223,6 @@ def test_update_llm_index_applies_structural_migration_without_rebuild(
     mocker: pytest_mock.MockerFixture,
 ) -> None:
     """Structural migrations are applied in-place; no full rebuild (drop) occurs."""
-    from paperless_ai.vector_store import Migration
-    from paperless_ai.vector_store import PaperlessLanceVectorStore
-
     column_added: list[bool] = []
 
     def _add_extra(table) -> None:
@@ -268,9 +267,6 @@ def test_update_llm_index_forces_rebuild_on_reembed_migration(
     mocker: pytest_mock.MockerFixture,
 ) -> None:
     """A pending reembed migration causes a full drop+rebuild on next update."""
-    from paperless_ai.vector_store import Migration
-    from paperless_ai.vector_store import PaperlessLanceVectorStore
-
     # Build the initial index at version 1 (the real CURRENT_SCHEMA_VERSION; no patches needed).
     with patch("documents.models.Document.objects.all") as mock_all:
         mock_queryset = MagicMock()
@@ -771,8 +767,6 @@ class TestLanceDbIndexing:
         temp_llm_index_dir: Path,
         mock_embed_model: FakeEmbedding,
     ) -> None:
-        from paperless_ai.vector_store import PaperlessLanceVectorStore
-
         store = indexing.get_vector_store()
         assert isinstance(store, PaperlessLanceVectorStore)
 
