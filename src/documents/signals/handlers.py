@@ -15,6 +15,7 @@ from celery.signals import task_postrun
 from celery.signals import task_prerun
 from celery.signals import task_revoked
 from celery.signals import worker_process_init
+from celery.signals import worker_process_shutdown
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -1333,6 +1334,20 @@ def close_connection_pool_on_worker_init(**kwargs) -> None:
     initializes connection pools then forks.
 
     Closing these pools after forking ensures child processes have a valid connection.
+    """
+    for conn in connections.all(initialized_only=True):
+        if conn.alias == "default" and hasattr(conn, "pool") and conn.pool:
+            conn.close_pool()
+
+
+@worker_process_shutdown.connect
+def close_connection_pool_on_worker_shutdown(**kwargs) -> None:  # pragma: no cover
+    """
+    Close the DB connection pool when a Celery child process exits.
+
+    With CELERY_WORKER_MAX_TASKS_PER_CHILD=1 each child is replaced after a
+    single task. Without closing the pool on shutdown, its connections linger
+    on the server until TCP keepalive reaps them, accumulating over time.
     """
     for conn in connections.all(initialized_only=True):
         if conn.alias == "default" and hasattr(conn, "pool") and conn.pool:

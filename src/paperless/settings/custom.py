@@ -252,6 +252,9 @@ def parse_db_settings(data_dir: Path) -> dict[str, dict[str, Any]]:
                 "NAME": os.getenv("PAPERLESS_DBNAME", "paperless"),
                 "USER": os.getenv("PAPERLESS_DBUSER", "paperless"),
                 "PASSWORD": os.getenv("PAPERLESS_DBPASS", "paperless"),
+                # Validate pooled connections so a connection closed server-side
+                # is replaced rather than handed out as "the connection is closed".
+                "CONN_HEALTH_CHECKS": True,
             }
 
             base_options = {
