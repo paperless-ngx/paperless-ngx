@@ -2973,6 +2973,7 @@ dependencies = [
     { name = "scikit-learn", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "sentence-transformers", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "setproctitle", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+    { name = "sqlite-vec", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "tantivy", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "tika-client", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "torch", version = "2.11.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
@@ -3130,6 +3131,7 @@ requires-dist = [
     { name = "scikit-learn", specifier = "~=1.8.0" },
     { name = "sentence-transformers", specifier = ">=5.4.1" },
     { name = "setproctitle", specifier = "~=1.3.4" },
+    { name = "sqlite-vec", specifier = "==0.1.9" },
     { name = "tantivy", specifier = "~=0.26.0" },
     { name = "tika-client", specifier = "~=0.11.0" },
     { name = "torch", specifier = "~=2.11.0", index = "https://download.pytorch.org/whl/cpu" },
@@ -4770,6 +4772,17 @@ wheels = [
 [package.optional-dependencies]
 asyncio = [
     { name = "greenlet", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
+]
+
+[[package]]
+name = "sqlite-vec"
+version = "0.1.9"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/68/85/9fad0045d8e7c8df3e0fa5a56c630e8e15ad6e5ca2e6106fceb666aa6638/sqlite_vec-0.1.9-py3-none-macosx_10_6_x86_64.whl", hash = "sha256:1b62a7f0a060d9475575d4e599bbf94a13d85af896bc1ce86ee80d1b5b48e5fb", size = 131171, upload-time = "2026-03-31T08:02:31.717Z" },
+    { url = "https://files.pythonhosted.org/packages/a4/3d/3677e0cd2f92e5ebc43cd29fbf565b75582bff1ccfa0b8327c7508e1084f/sqlite_vec-0.1.9-py3-none-macosx_11_0_arm64.whl", hash = "sha256:1d52e30513bae4cc9778ddbf6145610434081be4c3afe57cd877893bad9f6b6c", size = 165434, upload-time = "2026-03-31T08:02:32.712Z" },
+    { url = "https://files.pythonhosted.org/packages/00/d4/f2b936d3bdc38eadcbd2a87875815db36430fab0363182ba5d12cd8e0b51/sqlite_vec-0.1.9-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:4e921e592f24a5f9a18f590b6ddd530eb637e2d474e3b1972f9bbeb773aa3cb9", size = 160076, upload-time = "2026-03-31T08:02:33.796Z" },
+    { url = "https://files.pythonhosted.org/packages/6f/ad/6afd073b0f817b3e03f9e37ad626ae341805891f23c74b5292818f49ac63/sqlite_vec-0.1.9-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux1_x86_64.whl", hash = "sha256:1515727990b49e79bcaf75fdee2ffc7d461f8b66905013231251f1c8938e7786", size = 163388, upload-time = "2026-03-31T08:02:34.888Z" },
 ]
 
 [[package]]
