@@ -5,6 +5,7 @@ import sys
 from documents.models import Document
 from paperless.config import AIConfig
 from paperless_ai.client import AIClient
+from paperless_ai.db import db_connection_released
 from paperless_ai.indexing import _document_id_filters
 from paperless_ai.indexing import get_rag_prompt_helper
 from paperless_ai.indexing import load_or_build_index
@@ -105,7 +106,10 @@ def _stream_chat_with_documents(query_str: str, documents: list[Document]):
         filters=filters,
     )
 
-    top_nodes = retriever.retrieve(query_str)
+    # Slow query-embedding + vector search; no Django ORM access happens during
+    # it, so release the pooled DB connection for its duration. See #12976.
+    with db_connection_released():
+        top_nodes = retriever.retrieve(query_str)
     if not top_nodes:
         logger.warning("No nodes found for the given documents.")
         yield CHAT_NO_CONTENT_MESSAGE
@@ -133,10 +137,13 @@ def _stream_chat_with_documents(query_str: str, documents: list[Document]):
     )
 
     logger.debug("Document chat query: %s", query_str)
-    response_stream = query_engine.query(query_str)
-    for chunk in response_stream.response_gen:
-        yield chunk
-        sys.stdout.flush()
+    # Release the pooled DB connection for the slow streaming LLM response so it
+    # is not pinned for the whole stream; see paperless_ai.db and #12976.
+    with db_connection_released():
+        response_stream = query_engine.query(query_str)
+        for chunk in response_stream.response_gen:
+            yield chunk
+            sys.stdout.flush()
 
-    if references:
-        yield _format_chat_metadata_trailer(references)
+        if references:
+            yield _format_chat_metadata_trailer(references)

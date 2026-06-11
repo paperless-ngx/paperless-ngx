@@ -13,6 +13,7 @@ from documents.models import PaperlessTask
 from documents.utils import IterWrapper
 from documents.utils import identity
 from paperless.config import AIConfig
+from paperless_ai.db import db_connection_released
 from paperless_ai.embedding import build_llm_index_text
 from paperless_ai.embedding import get_configured_model_name
 from paperless_ai.embedding import get_embedding_model
@@ -385,7 +386,11 @@ def query_similar_documents(
         chunk_size=config.llm_embedding_chunk_size,
         context_size=config.llm_context_size,
     )
-    results = retriever.retrieve(query_text)
+    # The retrieve() call generates a query embedding (a slow external request)
+    # and searches the vector store; no Django ORM access happens during it, so
+    # release the pooled DB connection for its duration. See #12976.
+    with db_connection_released():
+        results = retriever.retrieve(query_text)
 
     retrieved_document_ids: list[int] = []
     for node in results:
