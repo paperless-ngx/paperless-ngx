@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+import unicodedata
 from collections.abc import Iterable
 from pathlib import PurePath
 
@@ -36,10 +37,12 @@ class FilePathTemplate(Template):
         def clean_filepath(value: str) -> str:
             """
             Clean up a filepath by:
-            1. Removing newlines and carriage returns
-            2. Removing extra spaces before and after forward slashes
-            3. Preserving spaces in other parts of the path
+            1. Normalizing Unicode to NFC form to prevent byte-level mismatches
+            2. Removing newlines and carriage returns
+            3. Removing extra spaces before and after forward slashes
+            4. Preserving spaces in other parts of the path
             """
+            value = unicodedata.normalize("NFC", value)
             value = value.replace("\n", "").replace("\r", "")
             value = re.sub(r"\s*/\s*", "/", value)
 
