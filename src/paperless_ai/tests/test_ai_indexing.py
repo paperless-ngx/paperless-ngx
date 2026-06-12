@@ -163,8 +163,6 @@ def test_update_llm_index(
         build_document_node.assert_called_once_with(real_document, chunk_size=512)
 
 
-
-
 @pytest.mark.django_db
 def test_update_llm_index_rebuilds_on_model_name_change(
     temp_llm_index_dir: Path,

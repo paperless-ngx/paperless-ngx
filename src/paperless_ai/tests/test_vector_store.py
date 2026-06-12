@@ -32,7 +32,12 @@ def store(tmp_path: Path) -> PaperlessSqliteVecVectorStore:
     return PaperlessSqliteVecVectorStore(uri=str(tmp_path))
 
 
-def _query(store: PaperlessSqliteVecVectorStore, embedding: list[float], top_k: int = 5, filters=None):
+def _query(
+    store: PaperlessSqliteVecVectorStore,
+    embedding: list[float],
+    top_k: int = 5,
+    filters=None,
+):
     from llama_index.core.vector_stores.types import VectorStoreQuery
 
     return store.query(
@@ -52,7 +57,9 @@ def _in_filter(document_ids: list[str]):
     return MetadataFilters(
         filters=[
             MetadataFilter(
-                key="document_id", operator=FilterOperator.IN, value=document_ids,
+                key="document_id",
+                operator=FilterOperator.IN,
+                value=document_ids,
             ),
         ],
     )
@@ -100,7 +107,10 @@ class TestCrud:
             [make_node(f"n{i}", str(i % 4), seed=float(i)) for i in range(12)],
         )
         result = _query(
-            store, [0.0] * DIM, top_k=3, filters=_in_filter(["0", "1", "2", "3"]),
+            store,
+            [0.0] * DIM,
+            top_k=3,
+            filters=_in_filter(["0", "1", "2", "3"]),
         )
         assert len(result.ids) == 3
         assert result.similarities == sorted(result.similarities, reverse=True)
@@ -151,7 +161,11 @@ class TestUpsert:
         store.upsert_document("1", [])
         assert _query(store, [0.0] * DIM, top_k=10).ids == ["b1"]
 
-    def test_upsert_is_atomic_for_concurrent_readers(self, store, tmp_path: Path) -> None:
+    def test_upsert_is_atomic_for_concurrent_readers(
+        self,
+        store,
+        tmp_path: Path,
+    ) -> None:
         """A second connection must never observe document 1 half-replaced."""
         store.add([make_node("a1", "1"), make_node("a2", "1")])
         reader = PaperlessSqliteVecVectorStore(uri=str(tmp_path))
@@ -171,13 +185,15 @@ class TestMetadataCoercion:
 class TestModelNameTracking:
     def test_stored_model_name_none_without_table(self, tmp_path: Path) -> None:
         store = PaperlessSqliteVecVectorStore(
-            uri=str(tmp_path), embed_model_name="model-a",
+            uri=str(tmp_path),
+            embed_model_name="model-a",
         )
         assert store.stored_model_name() is None
 
     def test_model_name_stored_after_add_and_persists(self, tmp_path: Path) -> None:
         store = PaperlessSqliteVecVectorStore(
-            uri=str(tmp_path), embed_model_name="model-a",
+            uri=str(tmp_path),
+            embed_model_name="model-a",
         )
         store.add([make_node("a1", "1")])
         assert store.stored_model_name() == "model-a"
@@ -186,7 +202,8 @@ class TestModelNameTracking:
 
     def test_config_mismatch_semantics(self, tmp_path: Path) -> None:
         store = PaperlessSqliteVecVectorStore(
-            uri=str(tmp_path), embed_model_name="model-a",
+            uri=str(tmp_path),
+            embed_model_name="model-a",
         )
         assert not store.config_mismatch("anything")  # no table yet
         store.add([make_node("a1", "1")])
@@ -194,7 +211,8 @@ class TestModelNameTracking:
         assert store.config_mismatch("model-b")
 
     def test_config_mismatch_false_when_table_predates_tracking(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         store = PaperlessSqliteVecVectorStore(uri=str(tmp_path))  # no model name
         store.add([make_node("a1", "1")])
@@ -235,7 +253,8 @@ class TestCompact:
     def _churn(self, store, cycles: int) -> None:
         for i in range(cycles):
             store.upsert_document(
-                "1", [make_node(f"gen{i}-{j}", "1", seed=float(j)) for j in range(20)],
+                "1",
+                [make_node(f"gen{i}-{j}", "1", seed=float(j)) for j in range(20)],
             )
 
     def test_compact_noop_below_threshold(self, store) -> None:
@@ -247,11 +266,13 @@ class TestCompact:
         store.add([make_node("a1", "1"), make_node("b1", "2", seed=3.0)])
         self._churn(store, 5)
         before = {
-            n.node_id: n.metadata for n in store.get_nodes(filters=_in_filter(["1", "2"]))
+            n.node_id: n.metadata
+            for n in store.get_nodes(filters=_in_filter(["1", "2"]))
         }
         store.compact(force=True)
         after = {
-            n.node_id: n.metadata for n in store.get_nodes(filters=_in_filter(["1", "2"]))
+            n.node_id: n.metadata
+            for n in store.get_nodes(filters=_in_filter(["1", "2"]))
         }
         assert after == before
         assert self._bloat_ratio(store) == pytest.approx(1.0)

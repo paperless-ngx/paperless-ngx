@@ -353,7 +353,10 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         # vec0 returns None distance when the query embedding is the zero vector
         # (no meaningful cosine angle); treat that as maximum distance (1.0) so
         # the row is included but ranked last.
-        sims = [1.0 - float(row["distance"] if row["distance"] is not None else 1.0) for row in rows]
+        sims = [
+            1.0 - float(row["distance"] if row["distance"] is not None else 1.0)
+            for row in rows
+        ]
         ids = [row["id"] for row in rows]
         return VectorStoreQueryResult(nodes=nodes, similarities=sims, ids=ids)
 
@@ -442,7 +445,16 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
                 f"INSERT INTO {self._table_name} "
                 f"(id, document_id, modified, node_content, embedding) "
                 f"VALUES (?, ?, ?, ?, ?)",
-                [(r["id"], r["document_id"], r["modified"], r["node_content"], bytes(r["embedding"])) for r in rows],
+                [
+                    (
+                        r["id"],
+                        r["document_id"],
+                        r["modified"],
+                        r["node_content"],
+                        bytes(r["embedding"]),
+                    )
+                    for r in rows
+                ],
             )
             # Reset the cumulative counter: after compact, total_inserts == live.
             new_conn.execute(
