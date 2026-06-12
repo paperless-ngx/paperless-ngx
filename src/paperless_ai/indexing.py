@@ -23,6 +23,7 @@ from paperless_ai.embedding import get_embedding_model
 
 if TYPE_CHECKING:
     from llama_index.core.schema import BaseNode
+    from llama_index.core.schema import NodeWithScore
 
     from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
 
@@ -505,12 +506,19 @@ def normalize_document_ids(document_ids: Iterable[int | str] | None) -> set[str]
     return {str(document_id) for document_id in document_ids}
 
 
-def query_similar_documents(
+def retrieve_similar_nodes(
     document: Document,
-    top_k: int = 5,
     document_ids: Iterable[int | str] | None = None,
-) -> list[Document]:
-    """Return up to ``top_k`` Documents most similar to ``document``."""
+    top_k: int = 5,
+) -> list["NodeWithScore"]:
+    """Run ANN retrieval and return the raw NodeWithScore results.
+
+    Returns ``[]`` when the allow-list normalizes to empty, or when no index
+    exists yet (queuing a build in that case). The ``retrieve()`` call is a slow
+    embedding request, so it runs inside ``db_connection_released()`` to avoid
+    pinning the pooled DB connection (#12976). Both ``query_similar_documents``
+    and the taxonomy-hints path go through here, so they share that behavior.
+    """
     allowed_document_ids = normalize_document_ids(document_ids)
     if allowed_document_ids is not None and not allowed_document_ids:
         return []
@@ -557,7 +565,21 @@ def query_similar_documents(
             filters=filters,
         )
         with db_connection_released():
-            results = retriever.retrieve(query_text)
+            return retriever.retrieve(query_text)
+
+
+def query_similar_documents(
+    document: Document,
+    top_k: int = 5,
+    document_ids: Iterable[int | str] | None = None,
+) -> list[Document]:
+    """Return up to ``top_k`` Documents most similar to ``document``."""
+    allowed_document_ids = normalize_document_ids(document_ids)
+    results = retrieve_similar_nodes(
+        document=document,
+        document_ids=allowed_document_ids,
+        top_k=top_k,
+    )
 
     retrieved_document_ids: list[int] = []
     for node in results:

@@ -1,4 +1,5 @@
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
@@ -895,3 +896,58 @@ class TestQuerySimilarDocuments:
         results = indexing.query_similar_documents(a, top_k=3)
 
         assert [doc.id for doc in results] == [b.id]
+
+
+class TestRetrieveSimilarNodes:
+    @pytest.mark.django_db
+    def test_returns_raw_nodes_from_retriever(
+        self,
+        temp_llm_index_dir: Path,
+        real_document: Document,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        mocker.patch("paperless_ai.indexing.llm_index_exists", return_value=True)
+        mocker.patch("paperless_ai.indexing.load_or_build_index")
+        node1 = SimpleNamespace(metadata={"document_id": "1"})
+        node2 = SimpleNamespace(metadata={"document_id": "2"})
+        retriever = mocker.MagicMock()
+        retriever.retrieve.return_value = [node1, node2]
+        mocker.patch(
+            "llama_index.core.retrievers.VectorIndexRetriever",
+            return_value=retriever,
+        )
+
+        result = indexing.retrieve_similar_nodes(real_document, top_k=3)
+
+        assert result == [node1, node2]
+
+    @pytest.mark.django_db
+    def test_empty_allow_list_fails_closed(
+        self,
+        real_document: Document,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        load = mocker.patch("paperless_ai.indexing.load_or_build_index")
+
+        result = indexing.retrieve_similar_nodes(real_document, document_ids=[])
+
+        assert result == []
+        load.assert_not_called()
+
+    @pytest.mark.django_db
+    def test_queues_update_when_index_missing(
+        self,
+        temp_llm_index_dir: Path,
+        real_document: Document,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        mocker.patch("paperless_ai.indexing.llm_index_exists", return_value=False)
+        queue = mocker.patch("paperless_ai.indexing.queue_llm_index_update_if_needed")
+
+        result = indexing.retrieve_similar_nodes(real_document, top_k=2)
+
+        assert result == []
+        queue.assert_called_once_with(
+            rebuild=False,
+            reason="LLM index not found for similarity query.",
+        )
