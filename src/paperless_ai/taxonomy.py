@@ -55,3 +55,35 @@ def build_taxonomy_hints_from_nodes(
         correspondents=sorted(correspondents),
         storage_paths=sorted(storage_paths),
     )
+
+
+_HINT_INSTRUCTION = (
+    "Prefer existing names from these lists verbatim. Only propose a new value "
+    "if none of the existing names fits."
+)
+
+
+def format_hints_for_prompt(hints: TaxonomyHints) -> str:
+    """Render non-empty hint categories as labelled blocks plus one instruction.
+
+    Returns "" when every category is empty, so callers can treat the result
+    the same as no hints at all.
+    """
+    # Literal-key access keeps this TypedDict-safe for mypy; the order here is
+    # the order the blocks appear in the prompt.
+    labelled_values: list[tuple[str, list[str]]] = [
+        ("Available tags", hints["tags"]),
+        ("Available document types", hints["document_types"]),
+        ("Available correspondents", hints["correspondents"]),
+        ("Available storage paths", hints["storage_paths"]),
+    ]
+    blocks: list[str] = []
+    for label, values in labelled_values:
+        if values:
+            listing = "\n".join(f"- {value}" for value in values)
+            blocks.append(f"{label}:\n{listing}")
+
+    if not blocks:
+        return ""
+
+    return "\n\n".join([*blocks, _HINT_INSTRUCTION])

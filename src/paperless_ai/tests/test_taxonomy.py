@@ -1,6 +1,8 @@
 from types import SimpleNamespace
 
+from paperless_ai.taxonomy import TaxonomyHints
 from paperless_ai.taxonomy import build_taxonomy_hints_from_nodes
+from paperless_ai.taxonomy import format_hints_for_prompt
 
 
 def make_node(**metadata: object) -> SimpleNamespace:
@@ -77,3 +79,51 @@ class TestBuildTaxonomyHintsFromNodes:
         assert build_taxonomy_hints_from_nodes(
             nodes,
         ) == build_taxonomy_hints_from_nodes(nodes)
+
+
+class TestFormatHintsForPrompt:
+    def test_all_blocks_present_when_all_categories_nonempty(self) -> None:
+        hints: TaxonomyHints = {
+            "tags": ["Bloodwork"],
+            "document_types": ["Invoice"],
+            "correspondents": ["IRS"],
+            "storage_paths": ["Financial"],
+        }
+        result = format_hints_for_prompt(hints)
+        assert "Available tags:" in result
+        assert "Available document types:" in result
+        assert "Available correspondents:" in result
+        assert "Available storage paths:" in result
+        assert "- Bloodwork" in result
+
+    def test_empty_category_produces_no_block(self) -> None:
+        hints: TaxonomyHints = {
+            "tags": ["Bloodwork"],
+            "document_types": [],
+            "correspondents": [],
+            "storage_paths": [],
+        }
+        result = format_hints_for_prompt(hints)
+        assert "Available tags:" in result
+        assert "Available document types:" not in result
+        assert "Available correspondents:" not in result
+        assert "Available storage paths:" not in result
+
+    def test_all_empty_produces_empty_string(self) -> None:
+        hints: TaxonomyHints = {
+            "tags": [],
+            "document_types": [],
+            "correspondents": [],
+            "storage_paths": [],
+        }
+        assert format_hints_for_prompt(hints) == ""
+
+    def test_instruction_line_appears_once(self) -> None:
+        hints: TaxonomyHints = {
+            "tags": ["Bloodwork"],
+            "document_types": ["Invoice"],
+            "correspondents": [],
+            "storage_paths": [],
+        }
+        result = format_hints_for_prompt(hints)
+        assert result.count("Prefer existing names from these lists verbatim") == 1
