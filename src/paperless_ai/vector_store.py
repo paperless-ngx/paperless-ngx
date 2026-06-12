@@ -2,11 +2,15 @@ import json
 import logging
 import sqlite3
 import struct
+from collections.abc import Callable
 from collections.abc import Iterator
 from collections.abc import Sequence
 from contextlib import contextmanager
+from dataclasses import dataclass
+from dataclasses import field
 from pathlib import Path
 from typing import Any
+from typing import Literal
 
 import sqlite_vec
 from llama_index.core.bridge.pydantic import PrivateAttr
@@ -26,6 +30,11 @@ logger = logging.getLogger("paperless_ai.vector_store")
 DB_FILENAME = "llmindex.db"
 DEFAULT_TABLE_NAME = "documents"
 
+# Current schema version. Written to index_meta at table creation and bumped
+# whenever a Migration is added to MIGRATIONS. check_and_run_migrations() uses
+# this to decide which migrations to run on an existing store.
+SCHEMA_VERSION = 1
+
 # compact(): rebuild when the cumulative rowid count exceeds this multiple of
 # the live row count. DELETEs on vec0 tables never reclaim space (upstream
 # asg017/sqlite-vec#54), so per-document re-index churn grows the file until
@@ -36,6 +45,38 @@ COMPACT_BLOAT_RATIO = 2.0
 # keys we construct ourselves, but allowlisting keeps SQL identifiers safe by
 # construction.
 _FILTER_COLUMNS = frozenset({"document_id", "modified"})
+
+
+@dataclass
+class Migration:
+    """A schema migration for the sqlite-vec vector store.
+
+    kind="structural": rows are copied into a new-schema file with no
+    re-embedding needed.  Supply ``apply(src_conn, dst_conn, dim)`` which
+    must create the vec0 table in ``dst_conn``, copy all rows from
+    ``src_conn``, and write ``dim`` / ``embed_model`` / ``total_inserts`` to
+    ``dst_conn``'s ``index_meta``.  ``schema_version`` is written by the
+    migration runner after ``apply`` returns.
+
+    kind="re-embed": the new schema requires fresh embeddings.
+    ``check_and_run_migrations()`` returns True when it encounters one of
+    these so the caller can force a full rebuild (which recreates the table
+    at the current SCHEMA_VERSION).
+    """
+
+    from_version: int
+    to_version: int
+    kind: Literal["structural", "re-embed"]
+    description: str
+    apply: Callable[[sqlite3.Connection, sqlite3.Connection, int], None] | None = field(
+        default=None,
+        repr=False,
+    )
+
+
+# Registry of all schema migrations in order. Empty at v1 -- this is the
+# baseline. Add entries here (and bump SCHEMA_VERSION) when the schema changes.
+MIGRATIONS: list[Migration] = []
 
 
 def _pack(embedding: Sequence[float]) -> bytes:
@@ -217,6 +258,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             )""",
         )
         self._meta_set("dim", str(dim))
+        self._meta_set("schema_version", str(SCHEMA_VERSION))
         if self._embed_model_name:
             self._meta_set("embed_model", self._embed_model_name)
 
@@ -432,13 +474,14 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
                 "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
                 ("dim", str(dim)),
             )
-            stored_model = self._meta_get("embed_model")
-            if stored_model:
-                new_conn.execute(
-                    "INSERT INTO index_meta (key, value) VALUES (?, ?) "
-                    "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
-                    ("embed_model", stored_model),
-                )
+            for key in ("embed_model", "schema_version"):
+                value = self._meta_get(key)
+                if value is not None:
+                    new_conn.execute(
+                        "INSERT INTO index_meta (key, value) VALUES (?, ?) "
+                        "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                        (key, value),
+                    )
             rows = self._conn.execute(
                 "SELECT id, document_id, modified, node_content, embedding "
                 "FROM " + DEFAULT_TABLE_NAME,
@@ -476,6 +519,81 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         # Close the current connection, atomically replace the file, reconnect.
         self._conn.close()
         # Remove any stale WAL/SHM for the compact file before the replace.
+        for suffix in ["-wal", "-shm"]:
+            stale = Path(compact_path + suffix)
+            if stale.exists():
+                stale.unlink()
+        Path(compact_path).replace(db_path)
+        self._conn = self._open_connection(db_path)
+
+    def check_and_run_migrations(self) -> bool:
+        """Apply any pending schema migrations to the store.
+
+        Structural migrations copy live rows into a new-schema file with no
+        re-embedding.  Re-embed migrations cannot be applied automatically;
+        this method returns True when one is encountered so the caller can
+        force a full rebuild (which recreates the table at SCHEMA_VERSION).
+
+        Must be called under the write FileLock.  No-op when the table does
+        not exist or is already at SCHEMA_VERSION.
+        """
+        if not self.table_exists():
+            return False
+
+        raw = self._meta_get("schema_version")
+        current = int(raw) if raw is not None else SCHEMA_VERSION
+        if current >= SCHEMA_VERSION:
+            return False
+
+        pending = sorted(
+            [m for m in MIGRATIONS if current <= m.from_version < SCHEMA_VERSION],
+            key=lambda m: m.from_version,
+        )
+
+        for migration in pending:
+            if migration.kind == "re-embed":
+                logger.warning(
+                    "LLM index schema v%d -> v%d requires re-embedding (%s); "
+                    "forcing full rebuild.",
+                    migration.from_version,
+                    migration.to_version,
+                    migration.description,
+                )
+                return True
+            logger.info(
+                "Running structural LLM index migration v%d -> v%d: %s",
+                migration.from_version,
+                migration.to_version,
+                migration.description,
+            )
+            self._run_structural_migration(migration)
+            current = migration.to_version
+
+        return False
+
+    def _run_structural_migration(self, migration: Migration) -> None:
+        """Execute a structural migration using the same file-swap as compact()."""
+        assert migration.apply is not None, "structural migration must have apply()"
+        dim = self.vector_dim()
+        if dim is None:  # pragma: no cover
+            raise RuntimeError("Cannot migrate: no stored vector dimension")
+        db_path = str(Path(self._uri) / DB_FILENAME)
+        compact_path = db_path + ".compact"
+        new_conn = self._open_connection(compact_path)
+        try:
+            migration.apply(self._conn, new_conn, dim)
+            new_conn.execute(
+                "INSERT INTO index_meta (key, value) VALUES (?, ?) "
+                "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                ("schema_version", str(migration.to_version)),
+            )
+        except BaseException:
+            new_conn.close()
+            for p in [compact_path, compact_path + "-wal", compact_path + "-shm"]:
+                Path(p).unlink(missing_ok=True)
+            raise
+        new_conn.close()
+        self._conn.close()
         for suffix in ["-wal", "-shm"]:
             stale = Path(compact_path + suffix)
             if stale.exists():

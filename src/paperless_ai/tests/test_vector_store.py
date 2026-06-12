@@ -1,9 +1,14 @@
+import sqlite3
 from pathlib import Path
 
 import pytest
 from llama_index.core.schema import TextNode
 
 from paperless_ai.vector_store import DB_FILENAME
+from paperless_ai.vector_store import DEFAULT_TABLE_NAME
+from paperless_ai.vector_store import MIGRATIONS
+from paperless_ai.vector_store import SCHEMA_VERSION
+from paperless_ai.vector_store import Migration
 from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
 
 DIM = 16
@@ -303,3 +308,123 @@ class TestDbFile:
         assert (
             store.client.execute("PRAGMA journal_mode").fetchone()[0].lower() == "wal"
         )
+
+
+class TestMigrations:
+    """Tests for the schema migration machinery."""
+
+    def _schema_version(self, store: PaperlessSqliteVecVectorStore) -> int | None:
+        row = store.client.execute(
+            "SELECT value FROM index_meta WHERE key = 'schema_version'",
+        ).fetchone()
+        return int(row[0]) if row else None
+
+    def test_new_table_records_schema_version(self, store) -> None:
+        store.add([make_node("a1", "1")])
+        assert self._schema_version(store) == SCHEMA_VERSION
+
+    def test_check_migrations_no_table_returns_false(self, store) -> None:
+        assert store.check_and_run_migrations() is False
+
+    def test_check_migrations_current_version_returns_false(self, store) -> None:
+        store.add([make_node("a1", "1")])
+        assert store.check_and_run_migrations() is False
+
+    def test_reembed_migration_returns_true(self, store, tmp_path: Path) -> None:
+        store.add([make_node("a1", "1")])
+        migration = Migration(
+            from_version=1,
+            to_version=2,
+            kind="re-embed",
+            description="test re-embed",
+        )
+        MIGRATIONS.append(migration)
+        try:
+            from paperless_ai import vector_store as vs_mod
+
+            original = vs_mod.SCHEMA_VERSION
+            vs_mod.SCHEMA_VERSION = 2
+            result = store.check_and_run_migrations()
+        finally:
+            MIGRATIONS.remove(migration)
+            vs_mod.SCHEMA_VERSION = original
+        assert result is True
+
+    def test_structural_migration_copies_rows_and_updates_version(
+        self,
+        store,
+        tmp_path: Path,
+    ) -> None:
+        store.add([make_node("a1", "1"), make_node("b1", "2")])
+
+        def apply(
+            src: sqlite3.Connection,
+            dst: sqlite3.Connection,
+            dim: int,
+        ) -> None:
+            dst.execute(  # nosemgrep
+                f"CREATE VIRTUAL TABLE {DEFAULT_TABLE_NAME} USING vec0("
+                "id TEXT PRIMARY KEY, document_id TEXT, modified TEXT,"
+                f" +node_content TEXT, embedding float[{dim}] distance_metric=cosine"
+                ")",
+            )
+            dst.execute(
+                "INSERT INTO index_meta (key, value) VALUES ('dim', ?) "
+                "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                (str(dim),),
+            )
+            rows = src.execute(
+                "SELECT id, document_id, modified, node_content, embedding "
+                f"FROM {DEFAULT_TABLE_NAME}",
+            ).fetchall()
+            dst.execute("BEGIN IMMEDIATE")
+            dst.executemany(
+                f"INSERT INTO {DEFAULT_TABLE_NAME} "
+                "(id, document_id, modified, node_content, embedding) "
+                "VALUES (?, ?, ?, ?, ?)",
+                [
+                    (
+                        r["id"],
+                        r["document_id"],
+                        r["modified"],
+                        r["node_content"],
+                        bytes(r["embedding"]),
+                    )
+                    for r in rows
+                ],
+            )
+            dst.execute(
+                "INSERT INTO index_meta (key, value) VALUES ('total_inserts', ?) "
+                "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                (str(len(rows)),),
+            )
+            dst.execute("COMMIT")
+
+        migration = Migration(
+            from_version=1,
+            to_version=2,
+            kind="structural",
+            description="test structural",
+            apply=apply,
+        )
+        MIGRATIONS.append(migration)
+        try:
+            from paperless_ai import vector_store as vs_mod
+
+            original = vs_mod.SCHEMA_VERSION
+            vs_mod.SCHEMA_VERSION = 2
+            result = store.check_and_run_migrations()
+        finally:
+            MIGRATIONS.remove(migration)
+            vs_mod.SCHEMA_VERSION = original
+
+        assert result is False
+        assert self._schema_version(store) == 2
+        ids = {n.node_id for n in store.get_nodes()}
+        assert ids == {"a1", "b1"}
+
+    def test_compact_preserves_schema_version(self, store) -> None:
+        store.add([make_node("a1", "1")])
+        assert self._schema_version(store) == SCHEMA_VERSION
+        store.compact(force=True)
+        assert self._schema_version(store) == SCHEMA_VERSION

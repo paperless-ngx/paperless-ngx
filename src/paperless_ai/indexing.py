@@ -227,6 +227,12 @@ def update_llm_index(
     rebuild=False,
 ) -> str:
     """Rebuild or incrementally update the LLM index."""
+    with write_store() as store:
+        if store.check_and_run_migrations():
+            logger.warning(
+                "LLM index migration requires re-embedding; forcing rebuild.",
+            )
+            rebuild = True
     documents = Document.objects.all()
     no_documents = not documents.exists()
 
