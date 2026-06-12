@@ -3126,6 +3126,7 @@ class PostDocumentView(GenericAPIView[Any]):
         serializer.is_valid(raise_exception=True)
 
         doc_name, doc_data = serializer.validated_data.get("document")
+        doc_name = normalize("NFC", doc_name)
         correspondent_id = serializer.validated_data.get("correspondent")
         document_type_id = serializer.validated_data.get("document_type")
         storage_path_id = serializer.validated_data.get("storage_path")
