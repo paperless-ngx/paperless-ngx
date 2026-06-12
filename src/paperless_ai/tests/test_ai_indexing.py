@@ -33,6 +33,16 @@ def test_build_document_node(real_document: Document) -> None:
     nodes = indexing.build_document_node(real_document)
     assert len(nodes) > 0
     assert nodes[0].metadata["document_id"] == str(real_document.id)
+    assert nodes[0].metadata["filename"] == real_document.filename
+    assert nodes[0].metadata["storage_path"] == (
+        real_document.storage_path.name if real_document.storage_path else None
+    )
+    assert (
+        nodes[0].metadata["archive_serial_number"]
+        == real_document.archive_serial_number
+    )
+    assert "filename" in nodes[0].excluded_embed_metadata_keys
+    assert "filename" not in nodes[0].excluded_llm_metadata_keys
 
 
 @pytest.mark.django_db

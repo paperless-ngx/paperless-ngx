@@ -130,6 +130,9 @@ def build_document_node(
         "document_type": document.document_type.name
         if document.document_type
         else None,
+        "filename": document.filename,
+        "storage_path": document.storage_path.name if document.storage_path else None,
+        "archive_serial_number": document.archive_serial_number,
         "created": document.created.isoformat() if document.created else None,
         "added": document.added.isoformat() if document.added else None,
         "modified": document.modified.isoformat(),
