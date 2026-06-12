@@ -200,12 +200,16 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         ).fetchone()
         return row["value"] if row else None
 
-    def _meta_set(self, key: str, value: str) -> None:
-        self._conn.execute(
+    @staticmethod
+    def _meta_set_on(conn: sqlite3.Connection, key: str, value: str) -> None:
+        conn.execute(
             "INSERT INTO index_meta (key, value) VALUES (?, ?) "
             "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
             (key, value),
         )
+
+    def _meta_set(self, key: str, value: str) -> None:
+        self._meta_set_on(self._conn, key, value)
 
     def table_exists(self) -> bool:
         return (
@@ -243,12 +247,13 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             return False
         return stored != model_name
 
-    def _create_table(self, dim: int) -> None:
+    @staticmethod
+    def _create_vec_table(conn: sqlite3.Connection, dim: int) -> None:
         # document_id is deliberately a metadata column, NOT a partition key:
         # partition keys change KNN `k` to per-partition semantics under IN
         # filters (asg017/sqlite-vec#142); metadata columns give a correct
         # global top-k.
-        self._conn.execute(  # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+        conn.execute(  # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
             f"""CREATE VIRTUAL TABLE {DEFAULT_TABLE_NAME} USING vec0(
                 id TEXT PRIMARY KEY,
                 document_id TEXT,
@@ -257,6 +262,9 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
                 embedding float[{dim}] distance_metric=cosine
             )""",
         )
+
+    def _create_table(self, dim: int) -> None:
+        self._create_vec_table(self._conn, dim)
         self._meta_set("dim", str(dim))
         self._meta_set("schema_version", str(SCHEMA_VERSION))
         if self._embed_model_name:
@@ -460,28 +468,12 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         # Copy all live rows into a fresh database file.
         new_conn = self._open_connection(compact_path)
         try:
-            new_conn.execute(  # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
-                f"""CREATE VIRTUAL TABLE {DEFAULT_TABLE_NAME} USING vec0(
-                    id TEXT PRIMARY KEY,
-                    document_id TEXT,
-                    modified TEXT,
-                    +node_content TEXT,
-                    embedding float[{dim}] distance_metric=cosine
-                )""",
-            )
-            new_conn.execute(
-                "INSERT INTO index_meta (key, value) VALUES (?, ?) "
-                "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
-                ("dim", str(dim)),
-            )
+            self._create_vec_table(new_conn, dim)
+            self._meta_set_on(new_conn, "dim", str(dim))
             for key in ("embed_model", "schema_version"):
                 value = self._meta_get(key)
                 if value is not None:
-                    new_conn.execute(
-                        "INSERT INTO index_meta (key, value) VALUES (?, ?) "
-                        "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
-                        (key, value),
-                    )
+                    self._meta_set_on(new_conn, key, value)
             rows = self._conn.execute(
                 "SELECT id, document_id, modified, node_content, embedding "
                 "FROM " + DEFAULT_TABLE_NAME,
@@ -501,24 +493,18 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
                 ],
             )
             # Reset the cumulative counter: after compact, total_inserts == live.
-            new_conn.execute(
-                "INSERT INTO index_meta (key, value) VALUES (?, ?) "
-                "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
-                ("total_inserts", str(live)),
-            )
+            self._meta_set_on(new_conn, "total_inserts", str(live))
             new_conn.execute("COMMIT")
         except BaseException:
             new_conn.close()
-            try:
-                Path(compact_path).unlink()
-            except OSError:
-                pass
+            Path(compact_path).unlink(missing_ok=True)
             raise
         new_conn.close()
+        self._swap_in_compact(compact_path, db_path)
 
-        # Close the current connection, atomically replace the file, reconnect.
+    def _swap_in_compact(self, compact_path: str, db_path: str) -> None:
+        """Atomically replace the live database with the compacted copy."""
         self._conn.close()
-        # Remove any stale WAL/SHM for the compact file before the replace.
         for suffix in ["-wal", "-shm"]:
             stale = Path(compact_path + suffix)
             if stale.exists():
@@ -582,21 +568,11 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         new_conn = self._open_connection(compact_path)
         try:
             migration.apply(self._conn, new_conn, dim)
-            new_conn.execute(
-                "INSERT INTO index_meta (key, value) VALUES (?, ?) "
-                "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
-                ("schema_version", str(migration.to_version)),
-            )
+            self._meta_set_on(new_conn, "schema_version", str(migration.to_version))
         except BaseException:
             new_conn.close()
             for p in [compact_path, compact_path + "-wal", compact_path + "-shm"]:
                 Path(p).unlink(missing_ok=True)
             raise
         new_conn.close()
-        self._conn.close()
-        for suffix in ["-wal", "-shm"]:
-            stale = Path(compact_path + suffix)
-            if stale.exists():
-                stale.unlink()
-        Path(compact_path).replace(db_path)
-        self._conn = self._open_connection(db_path)
+        self._swap_in_compact(compact_path, db_path)
