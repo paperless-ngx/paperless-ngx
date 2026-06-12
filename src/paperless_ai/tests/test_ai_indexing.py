@@ -6,6 +6,7 @@ import pytest
 import pytest_mock
 from django.test import override_settings
 from django.utils import timezone
+from llama_index.core.schema import MetadataMode
 
 from documents.models import Document
 from documents.models import PaperlessTask
@@ -16,6 +17,7 @@ from documents.tests.factories import PaperlessTaskFactory
 from paperless.models import ApplicationConfiguration
 from paperless_ai import indexing
 from paperless_ai.tests.conftest import FakeEmbedding
+from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
 
 
 @pytest.fixture
@@ -67,8 +69,6 @@ def test_build_document_node_excludes_metadata_from_embedding(
     double the token count and exceed embedding models with small context
     windows (e.g. nomic-embed-text via Ollama defaults to num_ctx=2048).
     """
-    from llama_index.core.schema import MetadataMode
-
     nodes = indexing.build_document_node(real_document)
     for node in nodes:
         embed_text = node.get_content(metadata_mode=MetadataMode.EMBED)
@@ -100,8 +100,6 @@ def test_build_document_node_excludes_document_id_from_llm_context(
     real_document: Document,
 ) -> None:
     """document_id is an internal key and must not appear in LLM context text."""
-    from llama_index.core.schema import MetadataMode
-
     nodes = indexing.build_document_node(real_document)
     assert len(nodes) > 0
     for node in nodes:
@@ -670,8 +668,6 @@ class TestVectorStoreIndexing:
         temp_llm_index_dir: Path,
         mock_embed_model: FakeEmbedding,
     ) -> None:
-        from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
-
         store = indexing.get_vector_store()
         assert isinstance(store, PaperlessSqliteVecVectorStore)
 

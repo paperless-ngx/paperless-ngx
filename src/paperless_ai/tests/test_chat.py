@@ -3,9 +3,13 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
+from llama_index.core import settings as llama_settings
+from llama_index.core.embeddings.mock_embed_model import MockEmbedding
 from llama_index.core.schema import TextNode
 
+from documents.tests.factories import DocumentFactory
 from paperless_ai import chat
+from paperless_ai import indexing
 from paperless_ai.chat import CHAT_ERROR_MESSAGE
 from paperless_ai.chat import CHAT_METADATA_DELIMITER
 from paperless_ai.chat import stream_chat_with_documents
@@ -13,9 +17,6 @@ from paperless_ai.chat import stream_chat_with_documents
 
 @pytest.fixture(autouse=True)
 def patch_embed_model():
-    from llama_index.core import settings as llama_settings
-    from llama_index.core.embeddings.mock_embed_model import MockEmbedding
-
     # Use a real BaseEmbedding subclass to satisfy llama-index 0.14 validation
     llama_settings.Settings.embed_model = MockEmbedding(embed_dim=1536)
     yield
@@ -241,8 +242,6 @@ class TestStreamChatRetrieval:
         temp_llm_index_dir,
         mock_embed_model,
     ) -> None:
-        from documents.tests.factories import DocumentFactory
-
         doc = DocumentFactory.create(content="hello world")
         # Nothing indexed for this document yet.
         out = list(chat.stream_chat_with_documents("question?", [doc]))
@@ -258,9 +257,6 @@ class TestStreamChatRetrieval:
         requested documents only — content from other indexed documents must
         not be surfaced.
         """
-        from documents.tests.factories import DocumentFactory
-        from paperless_ai import indexing
-
         included = DocumentFactory.create(content="included document content")
         excluded = DocumentFactory.create(content="excluded document content")
         indexing.llm_index_add_or_update_document(included)

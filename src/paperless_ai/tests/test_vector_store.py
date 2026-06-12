@@ -3,6 +3,10 @@ from pathlib import Path
 
 import pytest
 from llama_index.core.schema import TextNode
+from llama_index.core.vector_stores.types import FilterOperator
+from llama_index.core.vector_stores.types import MetadataFilter
+from llama_index.core.vector_stores.types import MetadataFilters
+from llama_index.core.vector_stores.types import VectorStoreQuery
 
 from paperless_ai.vector_store import DB_FILENAME
 from paperless_ai.vector_store import DEFAULT_TABLE_NAME
@@ -43,8 +47,6 @@ def _query(
     top_k: int = 5,
     filters=None,
 ):
-    from llama_index.core.vector_stores.types import VectorStoreQuery
-
     return store.query(
         VectorStoreQuery(
             query_embedding=embedding,
@@ -55,20 +57,12 @@ def _query(
 
 
 def _eq_filter(key: str, value: str):
-    from llama_index.core.vector_stores.types import FilterOperator
-    from llama_index.core.vector_stores.types import MetadataFilter
-    from llama_index.core.vector_stores.types import MetadataFilters
-
     return MetadataFilters(
         filters=[MetadataFilter(key=key, operator=FilterOperator.EQ, value=value)],
     )
 
 
 def _in_filter(document_ids: list[str]):
-    from llama_index.core.vector_stores.types import FilterOperator
-    from llama_index.core.vector_stores.types import MetadataFilter
-    from llama_index.core.vector_stores.types import MetadataFilters
-
     return MetadataFilters(
         filters=[
             MetadataFilter(
@@ -454,3 +448,84 @@ class TestMigrations:
         assert self._schema_version(store) == SCHEMA_VERSION
         store.compact(force=True)
         assert self._schema_version(store) == SCHEMA_VERSION
+
+    def test_stop_at_reembed_boundary(self, store) -> None:
+        # Registry: structural v2, re-embed v3, structural v4.
+        # Only v2 should apply; the re-embed boundary must stop execution
+        # before v4 runs, and the stored version must stay at 2.
+        store.add([make_node("a1", "1"), make_node("b1", "2")])
+
+        def copy_apply(
+            src: sqlite3.Connection,
+            dst: sqlite3.Connection,
+            dim: int,
+        ) -> None:
+            dst.execute(  # nosemgrep
+                f"CREATE VIRTUAL TABLE {DEFAULT_TABLE_NAME} USING vec0("
+                "id TEXT PRIMARY KEY, document_id TEXT, modified TEXT,"
+                f" +node_content TEXT, embedding float[{dim}] distance_metric=cosine"
+                ")",
+            )
+            dst.execute(
+                "INSERT INTO index_meta (key, value) VALUES ('dim', ?) "
+                "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                (str(dim),),
+            )
+            rows = src.execute(
+                "SELECT id, document_id, modified, node_content, embedding "
+                f"FROM {DEFAULT_TABLE_NAME}",
+            ).fetchall()
+            dst.execute("BEGIN IMMEDIATE")
+            dst.executemany(
+                f"INSERT INTO {DEFAULT_TABLE_NAME} "
+                "(id, document_id, modified, node_content, embedding) "
+                "VALUES (?, ?, ?, ?, ?)",
+                [
+                    (
+                        r["id"],
+                        r["document_id"],
+                        r["modified"],
+                        r["node_content"],
+                        bytes(r["embedding"]),
+                    )
+                    for r in rows
+                ],
+            )
+            dst.execute("COMMIT")
+
+        migrations = [
+            Migration(
+                from_version=1,
+                to_version=2,
+                kind="structural",
+                description="v2 structural",
+                apply=copy_apply,
+            ),
+            Migration(
+                from_version=2,
+                to_version=3,
+                kind="re-embed",
+                description="v3 re-embed boundary",
+            ),
+            Migration(
+                from_version=3,
+                to_version=4,
+                kind="structural",
+                description="v4 structural - must not run",
+                apply=copy_apply,
+            ),
+        ]
+        MIGRATIONS.extend(migrations)
+        try:
+            from paperless_ai import vector_store as vs_mod
+
+            original = vs_mod.SCHEMA_VERSION
+            vs_mod.SCHEMA_VERSION = 4
+            result = store.check_and_run_migrations()
+        finally:
+            for m in migrations:
+                MIGRATIONS.remove(m)
+            vs_mod.SCHEMA_VERSION = original
+
+        assert result is True
+        assert self._schema_version(store) == 2
