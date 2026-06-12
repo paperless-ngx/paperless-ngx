@@ -122,6 +122,45 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer[Any]):
                 self.fields.pop(field_name)
 
 
+class DocumentUpdateFieldsModelSerializer(DynamicFieldsModelSerializer):
+    stale_update_excluded_fields = frozenset({"filename", "archive_filename"})
+
+    def _get_update_fields(self, validated_data) -> list[str]:
+        model_fields = {
+            field.name
+            for field in self.Meta.model._meta.concrete_fields
+            if field.name not in self.stale_update_excluded_fields
+        }
+        update_fields = [
+            field_name for field_name in validated_data if field_name in model_fields
+        ]
+        if "modified" in model_fields and "modified" not in update_fields:
+            update_fields.append("modified")
+        return update_fields
+
+    def update(self, instance, validated_data):
+        serializers.raise_errors_on_nested_writes("update", self, validated_data)
+        info = model_meta.get_field_info(instance)
+
+        m2m_fields = []
+        for attr, value in validated_data.items():
+            if attr in info.relations and info.relations[attr].to_many:
+                m2m_fields.append((attr, value))
+            else:
+                setattr(instance, attr, value)
+
+        # File names are managed by post-save file handling.  Saving only the
+        # serializer-updated fields prevents stale in-memory path values from
+        # overwriting a concurrent move.
+        instance.save(update_fields=self._get_update_fields(validated_data))
+
+        for attr, value in m2m_fields:
+            field = getattr(instance, attr)
+            field.set(value)
+
+        return instance
+
+
 class MatchingModelSerializer(serializers.ModelSerializer[Any]):
     document_count = serializers.IntegerField(read_only=True)
 
@@ -990,7 +1029,7 @@ class DocumentVersionInfoSerializer(serializers.Serializer[_DocumentVersionInfo]
 class DocumentSerializer(
     OwnedObjectSerializer,
     NestedUpdateMixin,
-    DynamicFieldsModelSerializer,
+    DocumentUpdateFieldsModelSerializer,
 ):
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
@@ -1128,38 +1167,6 @@ class DocumentSerializer(
             )
         return super().validate(attrs)
 
-    def _get_update_fields(self, validated_data) -> list[str]:
-        model_fields = {
-            field.name
-            for field in self.Meta.model._meta.concrete_fields
-            if field.name not in {"filename", "archive_filename"}
-        }
-        update_fields = [
-            field_name for field_name in validated_data if field_name in model_fields
-        ]
-        if "modified" not in update_fields:
-            update_fields.append("modified")
-        return update_fields
-
-    def _update_instance(self, instance: Document, validated_data) -> Document:
-        update_fields = self._get_update_fields(validated_data)
-        info = model_meta.get_field_info(instance)
-        m2m_fields = []
-
-        for attr, value in validated_data.items():
-            if attr in info.relations and info.relations[attr].to_many:
-                m2m_fields.append((attr, value))
-            else:
-                setattr(instance, attr, value)
-
-        instance.save(update_fields=update_fields)
-
-        for attr, value in m2m_fields:
-            field = getattr(instance, attr)
-            field.set(value)
-
-        return instance
-
     def update(self, instance: Document, validated_data):
         if "created_date" in validated_data:
             if "created" not in validated_data:
@@ -1234,22 +1241,12 @@ class DocumentSerializer(
                     if tag not in inbox_tags_not_being_added
                 ]
 
-        # Mirrors drf-writable-nested's NestedUpdateMixin and DRF's ModelSerializer.update,
-        # except for the model save below. The default update path calls instance.save()
-        # without update_fields, which can write stale non-serializer fields such as
-        # filename/archive_filename from an old in-memory Document while another request
-        # has already moved the underlying files.
-        relations, reverse_relations = self._extract_relations(validated_data)
-        self.update_or_create_direct_relations(validated_data, relations)
         if settings.AUDIT_LOG_ENABLED:
             with set_actor(self.user):
-                instance = self._update_instance(instance, validated_data)
+                super().update(instance, validated_data)
         else:
-            instance = self._update_instance(instance, validated_data)
+            super().update(instance, validated_data)
 
-        self.update_or_create_reverse_relations(instance, reverse_relations)
-        self.delete_reverse_relations_if_need(instance, reverse_relations)
-        instance.refresh_from_db()
         # hard delete custom field instances that were soft deleted
         CustomFieldInstance.deleted_objects.filter(document=instance).delete()
         return instance
