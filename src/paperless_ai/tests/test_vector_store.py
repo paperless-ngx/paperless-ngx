@@ -54,6 +54,16 @@ def _query(
     )
 
 
+def _eq_filter(key: str, value: str):
+    from llama_index.core.vector_stores.types import FilterOperator
+    from llama_index.core.vector_stores.types import MetadataFilter
+    from llama_index.core.vector_stores.types import MetadataFilters
+
+    return MetadataFilters(
+        filters=[MetadataFilter(key=key, operator=FilterOperator.EQ, value=value)],
+    )
+
+
 def _in_filter(document_ids: list[str]):
     from llama_index.core.vector_stores.types import FilterOperator
     from llama_index.core.vector_stores.types import MetadataFilter
@@ -127,6 +137,22 @@ class TestCrud:
         assert [n.node_id for n in nodes] == ["a1"]
         assert nodes[0].embedding is not None
         assert store.get_nodes(filters=_in_filter(["999"])) == []
+
+    def test_query_with_eq_filter_scopes_results(self, store) -> None:
+        store.add(
+            [
+                make_node("a1", "1", seed=0.0),
+                make_node("b1", "2", seed=1.0),
+                make_node("c1", "3", seed=2.0),
+            ],
+        )
+        result = _query(
+            store,
+            [0.0] * DIM,
+            top_k=10,
+            filters=_eq_filter("document_id", "2"),
+        )
+        assert result.ids == ["b1"]
 
     def test_get_nodes_node_ids_not_implemented(self, store) -> None:
         with pytest.raises(NotImplementedError):

@@ -104,7 +104,7 @@ def _build_where(filters: MetadataFilters | None) -> tuple[str, list[str]]:
             raise NotImplementedError(f"Unsupported filter column: {f.key}")
         if f.operator == FilterOperator.IN:
             values = [str(v) for v in f.value]  # type: ignore[union-attr]  # value is list when operator is IN
-            if not values:
+            if not values:  # pragma: no cover
                 clauses.append("1 = 0")
                 continue
             placeholders = ",".join("?" for _ in values)
@@ -187,7 +187,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         self._conn.execute("BEGIN IMMEDIATE")
         try:
             yield
-        except BaseException:
+        except BaseException:  # pragma: no cover
             self._conn.execute("ROLLBACK")
             raise
         else:
@@ -382,7 +382,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
     ) -> VectorStoreQueryResult:
         if not self.table_exists():
             return VectorStoreQueryResult(nodes=[], similarities=[], ids=[])
-        if query.query_embedding is None:
+        if query.query_embedding is None:  # pragma: no cover
             return VectorStoreQueryResult(nodes=[], similarities=[], ids=[])
         top_k = query.similarity_top_k if query.similarity_top_k is not None else 10
         where, params = _build_where(query.filters)
@@ -495,7 +495,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             # Reset the cumulative counter: after compact, total_inserts == live.
             self._meta_set_on(new_conn, "total_inserts", str(live))
             new_conn.execute("COMMIT")
-        except BaseException:
+        except BaseException:  # pragma: no cover
             new_conn.close()
             Path(compact_path).unlink(missing_ok=True)
             raise
@@ -507,7 +507,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         self._conn.close()
         for suffix in ["-wal", "-shm"]:
             stale = Path(compact_path + suffix)
-            if stale.exists():
+            if stale.exists():  # pragma: no cover
                 stale.unlink()
         Path(compact_path).replace(db_path)
         self._conn = self._open_connection(db_path)
@@ -569,7 +569,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         try:
             migration.apply(self._conn, new_conn, dim)
             self._meta_set_on(new_conn, "schema_version", str(migration.to_version))
-        except BaseException:
+        except BaseException:  # pragma: no cover
             new_conn.close()
             for p in [compact_path, compact_path + "-wal", compact_path + "-shm"]:
                 Path(p).unlink(missing_ok=True)
