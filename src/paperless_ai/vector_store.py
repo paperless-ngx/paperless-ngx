@@ -254,13 +254,17 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         # filters (asg017/sqlite-vec#142); metadata columns give a correct
         # global top-k.
         conn.execute(  # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
-            f"""CREATE VIRTUAL TABLE {DEFAULT_TABLE_NAME} USING vec0(
-                id TEXT PRIMARY KEY,
-                document_id TEXT,
-                modified TEXT,
-                +node_content TEXT,
-                embedding float[{dim}] distance_metric=cosine
-            )""",
+            "CREATE VIRTUAL TABLE "
+            + DEFAULT_TABLE_NAME
+            + " USING vec0("
+            + "id TEXT PRIMARY KEY,"
+            + " document_id TEXT,"
+            + " modified TEXT,"
+            + " +node_content TEXT,"
+            + " embedding float["
+            + str(int(dim))
+            + "] distance_metric=cosine"
+            + ")",
         )
 
     def _create_table(self, dim: int) -> None:
