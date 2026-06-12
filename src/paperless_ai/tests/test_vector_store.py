@@ -1,5 +1,3 @@
-import json
-import sqlite3
 from pathlib import Path
 
 import pytest
@@ -47,17 +45,15 @@ def _query(store: PaperlessSqliteVecVectorStore, embedding: list[float], top_k: 
 
 
 def _in_filter(document_ids: list[str]):
-    from llama_index.core.vector_stores.types import (
-        FilterOperator,
-        MetadataFilter,
-        MetadataFilters,
-    )
+    from llama_index.core.vector_stores.types import FilterOperator
+    from llama_index.core.vector_stores.types import MetadataFilter
+    from llama_index.core.vector_stores.types import MetadataFilters
 
     return MetadataFilters(
         filters=[
             MetadataFilter(
-                key="document_id", operator=FilterOperator.IN, value=document_ids
-            )
+                key="document_id", operator=FilterOperator.IN, value=document_ids,
+            ),
         ],
     )
 
@@ -104,7 +100,7 @@ class TestCrud:
             [make_node(f"n{i}", str(i % 4), seed=float(i)) for i in range(12)],
         )
         result = _query(
-            store, [0.0] * DIM, top_k=3, filters=_in_filter(["0", "1", "2", "3"])
+            store, [0.0] * DIM, top_k=3, filters=_in_filter(["0", "1", "2", "3"]),
         )
         assert len(result.ids) == 3
         assert result.similarities == sorted(result.similarities, reverse=True)
@@ -175,13 +171,13 @@ class TestMetadataCoercion:
 class TestModelNameTracking:
     def test_stored_model_name_none_without_table(self, tmp_path: Path) -> None:
         store = PaperlessSqliteVecVectorStore(
-            uri=str(tmp_path), embed_model_name="model-a"
+            uri=str(tmp_path), embed_model_name="model-a",
         )
         assert store.stored_model_name() is None
 
     def test_model_name_stored_after_add_and_persists(self, tmp_path: Path) -> None:
         store = PaperlessSqliteVecVectorStore(
-            uri=str(tmp_path), embed_model_name="model-a"
+            uri=str(tmp_path), embed_model_name="model-a",
         )
         store.add([make_node("a1", "1")])
         assert store.stored_model_name() == "model-a"
@@ -190,7 +186,7 @@ class TestModelNameTracking:
 
     def test_config_mismatch_semantics(self, tmp_path: Path) -> None:
         store = PaperlessSqliteVecVectorStore(
-            uri=str(tmp_path), embed_model_name="model-a"
+            uri=str(tmp_path), embed_model_name="model-a",
         )
         assert not store.config_mismatch("anything")  # no table yet
         store.add([make_node("a1", "1")])
@@ -198,7 +194,7 @@ class TestModelNameTracking:
         assert store.config_mismatch("model-b")
 
     def test_config_mismatch_false_when_table_predates_tracking(
-        self, tmp_path: Path
+        self, tmp_path: Path,
     ) -> None:
         store = PaperlessSqliteVecVectorStore(uri=str(tmp_path))  # no model name
         store.add([make_node("a1", "1")])
@@ -226,17 +222,20 @@ class TestGetModifiedTimes:
 class TestCompact:
     def _bloat_ratio(self, store) -> float:
         live = store.client.execute(
-            f"SELECT count(*) FROM {store._table_name}"  # noqa: SLF001
+            f"SELECT count(*) FROM {store._table_name}",
         ).fetchone()[0]
-        total = store.client.execute(
-            f"SELECT count(*) FROM {store._table_name}_rowids"  # noqa: SLF001
-        ).fetchone()[0]
+        # vec0 0.1.9 does not accumulate deleted rows in the _rowids shadow
+        # table, so we track cumulative inserts in index_meta instead.
+        row = store.client.execute(
+            "SELECT value FROM index_meta WHERE key = 'total_inserts'",
+        ).fetchone()
+        total = int(row["value"]) if row else live
         return total / max(live, 1)
 
     def _churn(self, store, cycles: int) -> None:
         for i in range(cycles):
             store.upsert_document(
-                "1", [make_node(f"gen{i}-{j}", "1", seed=float(j)) for j in range(20)]
+                "1", [make_node(f"gen{i}-{j}", "1", seed=float(j)) for j in range(20)],
             )
 
     def test_compact_noop_below_threshold(self, store) -> None:
@@ -256,9 +255,11 @@ class TestCompact:
         }
         assert after == before
         assert self._bloat_ratio(store) == pytest.approx(1.0)
-        # store remains fully usable after the rebuild
-        store.upsert_document("3", [make_node("c1", "3", seed=9.0)])
-        assert "c1" in _query(store, [9.0] * DIM, top_k=1).ids
+        # store remains fully usable after the rebuild; use a seed far from all
+        # existing nodes (gen4-0..gen4-19 have seeds 0..19) so cosine KNN is
+        # unambiguous at top_k=1.
+        store.upsert_document("3", [make_node("c1", "3", seed=100.0)])
+        assert "c1" in _query(store, [100.0] * DIM, top_k=1).ids
 
     def test_auto_compact_triggers_on_churn(self, store) -> None:
         store.add([make_node(f"s{j}", "1", seed=float(j)) for j in range(20)])

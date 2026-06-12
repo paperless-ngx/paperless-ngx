@@ -1,10 +1,14 @@
 import json
 import logging
+import sqlite3
+import struct
+from collections.abc import Iterator
 from collections.abc import Sequence
+from contextlib import contextmanager
+from pathlib import Path
 from typing import Any
 
-import lancedb
-import pyarrow as pa
+import sqlite_vec
 from llama_index.core.bridge.pydantic import PrivateAttr
 from llama_index.core.schema import BaseNode
 from llama_index.core.vector_stores.types import BasePydanticVectorStore
@@ -18,45 +22,71 @@ from llama_index.core.vector_stores.utils import node_to_metadata_dict
 
 logger = logging.getLogger("paperless_ai.vector_store")
 
+DB_FILENAME = "llmindex.db"
 DEFAULT_TABLE_NAME = "documents"
 
-# Below this many chunks, LanceDB's exact (brute-force) search is sufficient and
-# faster than building an ANN index (per LanceDB guidance, ~100K vectors).
-ANN_INDEX_MIN_ROWS = 100_000
-# IVF_PQ default; num_sub_vectors must evenly divide the embedding dimension.
-ANN_PQ_SUB_VECTORS = 96
+# compact(): rebuild when the cumulative rowid count exceeds this multiple of
+# the live row count. DELETEs on vec0 tables never reclaim space (upstream
+# asg017/sqlite-vec#54), so per-document re-index churn grows the file until
+# a rebuild copies the live rows into a fresh table.
+COMPACT_BLOAT_RATIO = 2.0
+
+# Filterable vec0 metadata columns. _build_where() only ever receives filter
+# keys we construct ourselves, but allowlisting keeps SQL identifiers safe by
+# construction.
+_FILTER_COLUMNS = frozenset({"document_id", "modified"})
 
 
-def _escape(value: str) -> str:
-    return str(value).replace("'", "''")
+def _pack(embedding: Sequence[float]) -> bytes:
+    return struct.pack(f"{len(embedding)}f", *embedding)
 
 
-def _build_where(filters: MetadataFilters | None) -> str | None:
-    """Translate the EQ / IN filters we use into a Lance SQL predicate on the
-    top-level ``document_id`` column."""
+def _unpack(blob: bytes) -> list[float]:
+    return list(struct.unpack(f"{len(blob) // 4}f", blob))
+
+
+def _build_where(filters: MetadataFilters | None) -> tuple[str, list[str]]:
+    """Translate the EQ / IN filters we use into a parameterized SQL clause
+    on vec0 metadata columns. Returns ("", []) when there is nothing to filter.
+    """
     if filters is None or not filters.filters:
-        return None
+        return "", []
     clauses: list[str] = []
+    params: list[str] = []
     for f in filters.filters:
+        if f.key not in _FILTER_COLUMNS:  # pragma: no cover - we build the keys
+            raise NotImplementedError(f"Unsupported filter column: {f.key}")
         if f.operator == FilterOperator.IN:
-            vals = ",".join(f"'{_escape(v)}'" for v in f.value)
-            clauses.append(f"{f.key} IN ({vals})")
+            values = [str(v) for v in f.value]
+            if not values:
+                clauses.append("1 = 0")
+                continue
+            placeholders = ",".join("?" for _ in values)
+            clauses.append(f"{f.key} IN ({placeholders})")
+            params.extend(values)
         elif f.operator == FilterOperator.EQ:
-            clauses.append(f"{f.key} = '{_escape(f.value)}'")
+            clauses.append(f"{f.key} = ?")
+            params.append(str(f.value))
         else:  # pragma: no cover - we only ever build EQ/IN filters
             raise NotImplementedError(f"Unsupported filter operator: {f.operator}")
     joiner = " OR " if filters.condition == FilterCondition.OR else " AND "
-    return joiner.join(clauses)
+    return "(" + joiner.join(clauses) + ")", params
 
 
-class PaperlessLanceVectorStore(BasePydanticVectorStore):
-    """A llama-index vector store backed directly by a LanceDB table.
+class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
+    """A llama-index vector store backed by a sqlite-vec vec0 table.
 
-    Stores one row per node with the node id, its document id (both as the
-    ``ref_doc_id`` delete key ``doc_id`` and a top-level filter column
-    ``document_id``), the embedding, and the serialised node (text + metadata)
-    as JSON. ``stores_text`` lets llama-index run off this store alone, with no
+    Stores one row per node: the node id (TEXT primary key), its document id
+    (metadata column, used for EQ/IN filtering and per-document delete), the
+    document's modified timestamp, the embedding (float32, cosine metric), and
+    the serialized node (text + metadata) as JSON in an auxiliary column.
+    ``stores_text`` lets llama-index run off this store alone, with no
     separate docstore or index store.
+
+    Everything lives in one SQLite database file (``DB_FILENAME``) inside the
+    directory given as ``uri`` (kept as a directory for compatibility with the
+    previous LanceDB layout). WAL mode allows readers in other processes to
+    proceed while the (FileLock-serialized) writer holds a transaction.
 
     Implemented surface of ``BasePydanticVectorStore``
     ---------------------------------------------------
@@ -73,7 +103,6 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
     _table_name: str = PrivateAttr()
     _embed_model_name: str | None = PrivateAttr()
     _conn: Any = PrivateAttr()
-    _table: Any = PrivateAttr()
 
     def __init__(
         self,
@@ -85,141 +114,188 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         self._uri = uri
         self._table_name = table_name
         self._embed_model_name = embed_model_name
-        self._conn = lancedb.connect(uri)
-        existing = self._conn.list_tables().tables
-        self._table = (
-            self._conn.open_table(table_name) if table_name in existing else None
+        self._conn = self._open_connection(str(Path(uri) / DB_FILENAME))
+
+    @staticmethod
+    def _open_connection(db_path: str) -> sqlite3.Connection:
+        conn = sqlite3.connect(
+            db_path,
+            timeout=30,
+            isolation_level=None,  # autocommit; explicit transactions below
         )
+        conn.row_factory = sqlite3.Row
+        conn.enable_load_extension(True)  # noqa: FBT003
+        sqlite_vec.load(conn)
+        conn.enable_load_extension(False)  # noqa: FBT003
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA synchronous=NORMAL")
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS index_meta (key TEXT PRIMARY KEY, value TEXT)",
+        )
+        return conn
 
     @property
     def client(self) -> Any:
         return self._conn
 
+    @contextmanager
+    def _transaction(self) -> Iterator[None]:
+        self._conn.execute("BEGIN IMMEDIATE")
+        try:
+            yield
+        except BaseException:
+            self._conn.execute("ROLLBACK")
+            raise
+        else:
+            self._conn.execute("COMMIT")
+
+    def _meta_get(self, key: str) -> str | None:
+        row = self._conn.execute(
+            "SELECT value FROM index_meta WHERE key = ?",
+            (key,),
+        ).fetchone()
+        return row["value"] if row else None
+
+    def _meta_set(self, key: str, value: str) -> None:
+        self._conn.execute(
+            "INSERT INTO index_meta (key, value) VALUES (?, ?) "
+            "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+            (key, value),
+        )
+
     def table_exists(self) -> bool:
-        return self._table is not None
+        return (
+            self._conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+                (self._table_name,),
+            ).fetchone()
+            is not None
+        )
 
     def vector_dim(self) -> int | None:
-        if self._table is None:
+        if not self.table_exists():
             return None
-        return self._table.schema.field("vector").type.list_size
+        value = self._meta_get("dim")
+        return int(value) if value else None
 
     def drop_table(self) -> None:
-        if self.table_exists():
-            self._conn.drop_table(self._table_name)
-        self._table = None
+        self._conn.execute(f"DROP TABLE IF EXISTS {self._table_name}")
+        self._conn.execute("DELETE FROM index_meta")
 
     def stored_model_name(self) -> str | None:
-        """Return the embedding model name stored in table schema metadata, or None."""
-        if self._table is None:
+        """Return the embedding model name recorded at table creation, or None."""
+        if not self.table_exists():
             return None
-        meta = self._table.schema.metadata or {}
-        value = meta.get(b"embed_model")
-        return value.decode() if value else None
+        return self._meta_get("embed_model")
 
     def config_mismatch(self, model_name: str) -> bool:
         """True when the stored model name differs from ``model_name``.
 
-        Returns False when no table exists or when the table predates model-name
-        tracking (schema has no metadata) — conservative default avoids spurious
-        rebuilds on upgrade.
+        Returns False when no table exists or when the table predates
+        model-name tracking — conservative default avoids spurious rebuilds.
         """
         stored = self.stored_model_name()
         if stored is None:
             return False
         return stored != model_name
 
-    @staticmethod
-    def _schema(dim: int, model_name: str | None = None) -> pa.Schema:
-        meta = {b"embed_model": model_name.encode()} if model_name else None
-        return pa.schema(
-            [
-                pa.field("id", pa.string()),
-                pa.field("doc_id", pa.string()),
-                pa.field("document_id", pa.string()),
-                pa.field("modified", pa.string()),
-                pa.field("vector", pa.list_(pa.float32(), dim)),
-                pa.field("node_content", pa.string()),
-            ],
-            metadata=meta,
+    def _create_table(self, dim: int) -> None:
+        # document_id is deliberately a metadata column, NOT a partition key:
+        # partition keys change KNN `k` to per-partition semantics under IN
+        # filters (asg017/sqlite-vec#142); metadata columns give a correct
+        # global top-k.
+        self._conn.execute(
+            f"""CREATE VIRTUAL TABLE {self._table_name} USING vec0(
+                id TEXT PRIMARY KEY,
+                document_id TEXT,
+                modified TEXT,
+                +node_content TEXT,
+                embedding float[{dim}] distance_metric=cosine
+            )""",
         )
+        self._meta_set("dim", str(dim))
+        if self._embed_model_name:
+            self._meta_set("embed_model", self._embed_model_name)
 
-    def _row(self, node: BaseNode) -> dict[str, Any]:
+    def _ensure_table(self, dim: int) -> None:
+        if not self.table_exists():
+            self._create_table(dim)
+
+    def _row(self, node: BaseNode) -> tuple[str, str, str, str, bytes]:
         meta = node_to_metadata_dict(
             node,
             remove_text=False,
             flat_metadata=self.flat_metadata,
         )
-        return {
-            "id": node.node_id,
-            "doc_id": node.ref_doc_id,
-            "document_id": str(node.metadata.get("document_id")),
-            "modified": str(node.metadata.get("modified", "")),
-            "vector": node.get_embedding(),
-            "node_content": json.dumps(meta),
-        }
-
-    def _ensure_table(self, rows: list[dict[str, Any]], dim: int) -> bool:
-        """Create the table from ``rows`` if it does not exist yet.
-
-        Returns True if the table was just created (caller can skip the
-        separate add/merge step), False if the table already existed.
-        """
-        if self._table is not None:
-            return False
-        self._table = self._conn.create_table(
-            self._table_name,
-            rows,
-            schema=self._schema(dim, self._embed_model_name),
+        # vec0 metadata columns reject NULL (asg017/sqlite-vec#141): coerce
+        # every value to a string, with "" as the absent sentinel.
+        document_id = node.ref_doc_id or node.metadata.get("document_id")
+        return (
+            node.node_id,
+            str(document_id or ""),
+            str(node.metadata.get("modified") or ""),
+            json.dumps(meta),
+            _pack(node.get_embedding()),
         )
-        return True
+
+    _INSERT = "INSERT INTO {t} (id, document_id, modified, node_content, embedding) VALUES (?, ?, ?, ?, ?)"
+
+    def _increment_total_inserts(self, count: int) -> None:
+        """Increment the cumulative insert counter stored in index_meta.
+
+        This counter never decreases (DELETEs do not decrement it) and is
+        used by compact() to estimate the bloat ratio: when total_inserts /
+        live_rows exceeds COMPACT_BLOAT_RATIO the table has accumulated
+        enough deleted-but-not-freed rows to warrant a rebuild.
+        """
+        current = int(self._meta_get("total_inserts") or "0")
+        self._meta_set("total_inserts", str(current + count))
 
     def add(self, nodes: Sequence[BaseNode], **add_kwargs: Any) -> list[str]:
         if not nodes:
             return []
         rows = [self._row(node) for node in nodes]
-        dim = len(nodes[0].get_embedding())
-        if not self._ensure_table(rows, dim):
-            self._table.add(rows)
+        with self._transaction():
+            self._ensure_table(len(nodes[0].get_embedding()))
+            self._conn.executemany(self._INSERT.format(t=self._table_name), rows)
+            self._increment_total_inserts(len(rows))
         return [node.node_id for node in nodes]
 
     def upsert_document(self, document_id: str, nodes: list[BaseNode]) -> list[str]:
         """Atomically replace all stored chunks of ``document_id`` with ``nodes``.
 
-        A single ``merge_insert`` commit: matching node ids are updated, new ids
-        inserted, and any existing rows for this document that are not in the new
-        set are deleted (``when_not_matched_by_source_delete``). This prunes stale
-        trailing chunks when an edit reduces a document's chunk count, with no
-        transient empty state for concurrent lock-free readers.
+        One transaction deletes the document's existing rows and inserts the
+        new set (vec0's INSERT OR REPLACE is broken upstream, #259, so
+        delete+insert it is). WAL readers in other processes see either the
+        old or the new chunk set, never a partial state.
         """
-        if not nodes:
-            # No indexable content: remove any existing chunks for this document.
-            if self._table is not None:
-                self._table.delete(f"document_id = '{_escape(document_id)}'")
-            return []
         rows = [self._row(node) for node in nodes]
-        dim = len(nodes[0].get_embedding())
-        if self._ensure_table(rows, dim):
-            return [node.node_id for node in nodes]
-        (
-            self._table.merge_insert("id")
-            .when_matched_update_all()
-            .when_not_matched_insert_all()
-            .when_not_matched_by_source_delete(
-                f"document_id = '{_escape(document_id)}'",
-            )
-            .execute(rows)
-        )
+        with self._transaction():
+            if nodes:
+                self._ensure_table(len(nodes[0].get_embedding()))
+            if self.table_exists():
+                self._conn.execute(
+                    f"DELETE FROM {self._table_name} WHERE document_id = ?",
+                    (str(document_id),),
+                )
+            if rows:
+                self._conn.executemany(self._INSERT.format(t=self._table_name), rows)
+                self._increment_total_inserts(len(rows))
         return [node.node_id for node in nodes]
 
     def delete(self, ref_doc_id: str, **delete_kwargs: Any) -> None:
-        if self._table is not None:
-            self._table.delete(f"doc_id = '{_escape(ref_doc_id)}'")
+        if self.table_exists():
+            with self._transaction():
+                self._conn.execute(
+                    f"DELETE FROM {self._table_name} WHERE document_id = ?",
+                    (str(ref_doc_id),),
+                )
 
-    def _rows_to_nodes(self, rows: list[dict[str, Any]]) -> list[BaseNode]:
+    def _rows_to_nodes(self, rows: list[sqlite3.Row]) -> list[BaseNode]:
         nodes: list[BaseNode] = []
         for row in rows:
             node = metadata_dict_to_node(json.loads(row["node_content"]))
-            node.embedding = list(row["vector"])
+            node.embedding = _unpack(row["embedding"])
             nodes.append(node)
         return nodes
 
@@ -232,102 +308,157 @@ class PaperlessLanceVectorStore(BasePydanticVectorStore):
         if node_ids is not None:  # pragma: no cover
             # node_ids lookup is not implemented; see class docstring.
             raise NotImplementedError(
-                "PaperlessLanceVectorStore does not support node_ids lookup",
+                "PaperlessSqliteVecVectorStore does not support node_ids lookup",
             )
-        if self._table is None:
+        if not self.table_exists():
             return []
-        where = _build_where(filters)
-        query = self._table.search()
+        where, params = _build_where(filters)
+        sql = f"SELECT node_content, embedding FROM {self._table_name}"
         if where:
-            query = query.where(where)
-        return self._rows_to_nodes(query.to_list())
+            sql += f" WHERE {where}"
+        return self._rows_to_nodes(self._conn.execute(sql, params).fetchall())
 
     def query(
         self,
         query: VectorStoreQuery,
         **kwargs: Any,
     ) -> VectorStoreQueryResult:
-        if self._table is None:
+        if not self.table_exists():
             return VectorStoreQueryResult(nodes=[], similarities=[], ids=[])
         top_k = query.similarity_top_k if query.similarity_top_k is not None else 10
-        search = self._table.search(query.query_embedding).limit(top_k)
-        where = _build_where(query.filters)
+        where, params = _build_where(query.filters)
+        sql = (
+            f"SELECT id, node_content, embedding, distance FROM {self._table_name} "
+            "WHERE embedding MATCH ? AND k = ?"
+        )
         if where:
-            search = search.where(where)
-        rows = search.to_list()
+            sql += f" AND {where}"
+        rows = self._conn.execute(
+            sql,
+            [_pack(query.query_embedding), top_k, *params],
+        ).fetchall()
+        # vec0 returns rows distance-sorted ascending; slice defensively in
+        # case future schema changes alter k semantics (e.g. partition keys
+        # return k rows per partition).
+        rows = rows[:top_k]
         nodes = self._rows_to_nodes(rows)
-        # LanceDB returns an L2 distance (smaller = closer); map to a descending similarity.
-        sims = [1.0 / (1.0 + float(row["_distance"])) for row in rows]
+        # Cosine distance in [0, 2]; map to a descending similarity.
+        # vec0 returns None distance when the query embedding is the zero vector
+        # (no meaningful cosine angle); treat that as maximum distance (1.0) so
+        # the row is included but ranked last.
+        sims = [1.0 - float(row["distance"] if row["distance"] is not None else 1.0) for row in rows]
         ids = [row["id"] for row in rows]
         return VectorStoreQueryResult(nodes=nodes, similarities=sims, ids=ids)
-
-    def _has_index_on(self, column: str) -> bool:
-        return any(column in idx.columns for idx in self._table.list_indices())
-
-    def maybe_create_ann_index(self, min_rows: int = ANN_INDEX_MIN_ROWS) -> None:
-        """Best-effort: build an IVF index once the table is large enough.
-
-        IVF_PQ is used when ``num_sub_vectors`` divides the embedding dimension,
-        otherwise IVF_FLAT (no divisor constraint). Any failure is logged and
-        leaves the table on exact search, which is always correct.
-        """
-        if self._table is None:
-            return
-        rows = self._table.count_rows()
-        if rows < min_rows or self._has_index_on("vector"):
-            return
-        num_partitions = max(1, rows // 4096)
-        # Embedding dim from the schema's fixed-size list column.
-        dim = self._table.schema.field("vector").type.list_size
-        try:
-            if dim % ANN_PQ_SUB_VECTORS == 0:  # pragma: no cover
-                self._table.create_index(
-                    metric="l2",
-                    num_partitions=num_partitions,
-                    num_sub_vectors=ANN_PQ_SUB_VECTORS,
-                    index_type="IVF_PQ",
-                )
-            else:
-                self._table.create_index(
-                    metric="l2",
-                    num_partitions=num_partitions,
-                    index_type="IVF_FLAT",
-                )
-        except Exception as e:  # pragma: no cover - depends on data/dim
-            logger.warning("Skipping ANN index creation: %s", e)
 
     def get_modified_times(self) -> dict[str, str]:
         """Return {document_id: stored_modified_isoformat} for all indexed documents.
 
-        One representative chunk per document is fetched; all chunks share the
-        same ``modified`` value so the first one seen is sufficient.
+        All chunks of a document share the same ``modified`` value, so the
+        first row seen per document is sufficient.
         """
-        if self._table is None:
+        if not self.table_exists():
             return {}
         result: dict[str, str] = {}
-        for row in self._table.search().select(["document_id", "modified"]).to_list():
+        for row in self._conn.execute(
+            f"SELECT document_id, modified FROM {self._table_name}",
+        ):
             doc_id = str(row["document_id"])
             if doc_id not in result:
                 result[doc_id] = str(row["modified"] or "")
         return result
 
-    def ensure_document_id_scalar_index(self) -> None:
-        """Create a scalar index on the filter column (never on the merge key
-        ``id`` — see https://github.com/lancedb/lancedb/issues/3177).
-        No-op if the index already exists."""
-        if self._table is None:
+    def compact(self, *, force: bool = False) -> None:
+        """Rebuild the database file to reclaim space left behind by DELETEs.
+
+        vec0 DELETE only invalidates rows; the vector data stays in the file
+        forever (asg017/sqlite-vec#54), and per-document re-indexing is a
+        delete+insert. The cumulative insert counter in ``index_meta`` tracks
+        total rows ever written; when that exceeds ``COMPACT_BLOAT_RATIO`` x
+        the live row count (or when forced), live rows are copied into a fresh
+        database file and swapped in via ``os.replace``.
+
+        Note: ``ALTER TABLE ... RENAME TO`` on vec0 virtual tables does NOT
+        rename the shadow tables (sqlite-vec upstream limitation), so
+        an in-place rename-based rebuild is not safe.  The file-swap approach
+        is the maintainer-endorsed workaround (asg017/sqlite-vec#205).
+        """
+        if not self.table_exists():
             return
-        if self._has_index_on("document_id"):
+        live = self._conn.execute(
+            f"SELECT count(*) FROM {self._table_name}",
+        ).fetchone()[0]
+        total = int(self._meta_get("total_inserts") or str(live))
+        if not force and total <= max(live, 1) * COMPACT_BLOAT_RATIO:
             return
+        dim = self.vector_dim()
+        if dim is None:  # pragma: no cover - dim is written at creation
+            logger.warning("Skipping compact: no stored vector dimension")
+            return
+        logger.info(
+            "Compacting LLM index (%d live rows, %d cumulative inserts)",
+            live,
+            total,
+        )
+        db_path = str(Path(self._uri) / DB_FILENAME)
+        compact_path = db_path + ".compact"
+
+        # Copy all live rows into a fresh database file.
+        new_conn = self._open_connection(compact_path)
         try:
-            self._table.create_scalar_index("document_id")
-        except Exception as e:  # pragma: no cover
-            logger.warning("Skipping document_id scalar index: %s", e)
+            new_conn.execute(
+                f"""CREATE VIRTUAL TABLE {self._table_name} USING vec0(
+                    id TEXT PRIMARY KEY,
+                    document_id TEXT,
+                    modified TEXT,
+                    +node_content TEXT,
+                    embedding float[{dim}] distance_metric=cosine
+                )""",
+            )
+            new_conn.execute(
+                "INSERT INTO index_meta (key, value) VALUES (?, ?) "
+                "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                ("dim", str(dim)),
+            )
+            stored_model = self._meta_get("embed_model")
+            if stored_model:
+                new_conn.execute(
+                    "INSERT INTO index_meta (key, value) VALUES (?, ?) "
+                    "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                    ("embed_model", stored_model),
+                )
+            rows = self._conn.execute(
+                f"SELECT id, document_id, modified, node_content, embedding "
+                f"FROM {self._table_name}",
+            ).fetchall()
+            new_conn.execute("BEGIN IMMEDIATE")
+            new_conn.executemany(
+                f"INSERT INTO {self._table_name} "
+                f"(id, document_id, modified, node_content, embedding) "
+                f"VALUES (?, ?, ?, ?, ?)",
+                [(r["id"], r["document_id"], r["modified"], r["node_content"], bytes(r["embedding"])) for r in rows],
+            )
+            # Reset the cumulative counter: after compact, total_inserts == live.
+            new_conn.execute(
+                "INSERT INTO index_meta (key, value) VALUES (?, ?) "
+                "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                ("total_inserts", str(live)),
+            )
+            new_conn.execute("COMMIT")
+        except BaseException:
+            new_conn.close()
+            try:
+                Path(compact_path).unlink()
+            except OSError:
+                pass
+            raise
+        new_conn.close()
 
-    def compact(self, retention_seconds: int) -> None:
-        """Compact fragments and prune old MVCC versions in one call."""
-        if self._table is None:
-            return
-        from datetime import timedelta
-
-        self._table.optimize(cleanup_older_than=timedelta(seconds=retention_seconds))
+        # Close the current connection, atomically replace the file, reconnect.
+        self._conn.close()
+        # Remove any stale WAL/SHM for the compact file before the replace.
+        for suffix in ["-wal", "-shm"]:
+            stale = Path(compact_path + suffix)
+            if stale.exists():
+                stale.unlink()
+        Path(compact_path).replace(db_path)
+        self._conn = self._open_connection(db_path)
