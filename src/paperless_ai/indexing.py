@@ -1,4 +1,5 @@
 import logging
+import shutil
 from collections.abc import Iterable
 from contextlib import contextmanager
 from datetime import timedelta
@@ -21,7 +22,7 @@ from paperless_ai.embedding import get_embedding_model
 if TYPE_CHECKING:
     from llama_index.core.schema import BaseNode
 
-    from paperless_ai.vector_store import PaperlessLanceVectorStore
+    from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
 
 
 logger = logging.getLogger("paperless_ai.indexing")
@@ -63,14 +64,29 @@ def queue_llm_index_update_if_needed(*, rebuild: bool, reason: str) -> bool:
     return True
 
 
-def get_vector_store() -> "PaperlessLanceVectorStore":
-    from paperless_ai.vector_store import PaperlessLanceVectorStore
+def get_vector_store() -> "PaperlessSqliteVecVectorStore":
+    from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
 
     settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
-    return PaperlessLanceVectorStore(
+    return PaperlessSqliteVecVectorStore(
         uri=str(settings.LLM_INDEX_DIR),
         table_name=LLM_INDEX_TABLE,
     )
+
+
+def _cleanup_legacy_lance_index() -> bool:
+    """Delete a LanceDB index left by a pre-sqlite-vec version, if present.
+
+    Beta transition policy: no cross-store conversion; the caller forces a
+    full rebuild (re-embed) instead. Returns True when leftovers were found.
+    """
+    legacy_table = settings.LLM_INDEX_DIR / f"{LLM_INDEX_TABLE}.lance"
+    found = legacy_table.exists()
+    if found:
+        shutil.rmtree(legacy_table, ignore_errors=True)
+    # faiss-era metadata file, removed on the same occasion
+    (settings.LLM_INDEX_DIR / "meta.json").unlink(missing_ok=True)
+    return found
 
 
 @contextmanager
@@ -84,11 +100,11 @@ def write_store(embed_model_name: str | None = None):
     Pass ``embed_model_name`` whenever the operation may create the table so
     the model name is recorded in the schema metadata for future mismatch checks.
     """
-    from paperless_ai.vector_store import PaperlessLanceVectorStore
+    from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
 
     settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
     with FileLock(settings.LLM_INDEX_LOCK):
-        yield PaperlessLanceVectorStore(
+        yield PaperlessSqliteVecVectorStore(
             uri=str(settings.LLM_INDEX_DIR),
             table_name=LLM_INDEX_TABLE,
             embed_model_name=embed_model_name,
@@ -224,6 +240,11 @@ def update_llm_index(
     rebuild=False,
 ) -> str:
     """Rebuild or incrementally update the LLM index."""
+    if _cleanup_legacy_lance_index():
+        logger.warning(
+            "Found a LanceDB index from a previous version; forcing a full rebuild.",
+        )
+        rebuild = True
     documents = Document.objects.all()
     no_documents = not documents.exists()
 
@@ -251,7 +272,6 @@ def update_llm_index(
 
     with write_store(embed_model_name=model_name) as store:
         if rebuild or not store.table_exists():
-            (settings.LLM_INDEX_DIR / "meta.json").unlink(missing_ok=True)
             logger.info("Rebuilding LLM index.")
             store.drop_table()
             for document in iter_wrapper(documents):
@@ -276,9 +296,7 @@ def update_llm_index(
                 else "No changes detected in LLM index."
             )
 
-        store.ensure_document_id_scalar_index()
-        store.maybe_create_ann_index()
-        store.compact(retention_seconds=60 * 60)  # 1 hour: safe for in-flight readers
+        store.compact()
     return msg
 
 
@@ -294,13 +312,12 @@ def llm_index_add_or_update_document(document: Document):
 
     with write_store(embed_model_name=get_configured_model_name(config)) as store:
         store.upsert_document(str(document.id), new_nodes)
-        store.ensure_document_id_scalar_index()
 
 
 def llm_index_compact() -> None:
-    """Compact the index immediately, clearing all MVCC version history."""
+    """Compact the index immediately, rebuilding the table to reclaim space."""
     with write_store() as store:
-        store.compact(retention_seconds=0)
+        store.compact(force=True)
 
 
 def llm_index_remove_document(document: Document):

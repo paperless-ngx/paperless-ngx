@@ -38,7 +38,7 @@ def test_build_document_node(real_document: Document) -> None:
 @pytest.mark.django_db
 def test_build_document_node_sets_ref_doc_id(real_document: Document) -> None:
     """Every node produced by build_document_node must carry the paperless document id
-    as its ref_doc_id so that the LanceDB adapter's delete(str(doc.id)) works correctly."""
+    as its ref_doc_id so that the vector store's delete(str(doc.id)) works correctly."""
     nodes = indexing.build_document_node(real_document)
     assert len(nodes) > 0, "Expected at least one node"
     for node in nodes:
@@ -256,7 +256,7 @@ def test_update_llm_index_partial_update(
 
     store = indexing.get_vector_store()
     assert store.table_exists(), (
-        "Expected the LanceDB table to exist after incremental update"
+        "Expected the vector store table to exist after incremental update"
     )
 
 
@@ -271,7 +271,7 @@ def test_add_or_update_document_updates_existing_entry(
 
     store = indexing.get_vector_store()
     assert store.table_exists(), (
-        "Expected the LanceDB table to exist after add-or-update"
+        "Expected the vector store table to exist after add-or-update"
     )
 
 
@@ -461,7 +461,7 @@ def test_query_similar_documents_empty_allow_list_fails_closed(
 
 
 class TestUpdateLlmIndexEmptyDocumentSet:
-    """update_llm_index must clear the LanceDB table when all documents are deleted.
+    """update_llm_index must clear the vector store table when all documents are deleted.
 
     Without this, the stale vectors are never cleared and subsequent similarity
     searches return phantom hits for document IDs that no longer exist in the DB.
@@ -491,7 +491,7 @@ class TestUpdateLlmIndexEmptyDocumentSet:
 
         store = indexing.get_vector_store()
         assert store.table_exists(), (
-            "Precondition failed: expected the LanceDB table to exist before deletion"
+            "Precondition failed: expected the vector store table to exist before deletion"
         )
 
         # Step 2: delete all documents
@@ -505,7 +505,7 @@ class TestUpdateLlmIndexEmptyDocumentSet:
         # Step 4: the table must be absent (no rows) — phantom vectors gone
         store2 = indexing.get_vector_store()
         assert not store2.table_exists(), (
-            "Expected the LanceDB table to be absent after rebuilding with no documents"
+            "Expected the vector store table to be absent after rebuilding with no documents"
         )
 
 
@@ -578,11 +578,11 @@ class TestLlmIndexAddOrUpdateDocumentEmptyContent:
 
 
 @pytest.mark.django_db
-def test_llm_index_compact_uses_zero_retention(
+def test_llm_index_compact_uses_force(
     temp_llm_index_dir: Path,
     mocker: pytest_mock.MockerFixture,
 ) -> None:
-    """compact must use retention_seconds=0 to clear all MVCC history immediately."""
+    """compact must use force=True to rebuild the table and reclaim space immediately."""
     mock_store = mocker.MagicMock()
     mocker.patch(
         "paperless_ai.indexing.write_store",
@@ -594,7 +594,7 @@ def test_llm_index_compact_uses_zero_retention(
 
     indexing.llm_index_compact()
 
-    mock_store.compact.assert_called_once_with(retention_seconds=0)
+    mock_store.compact.assert_called_once_with(force=True)
 
 
 @pytest.mark.django_db
@@ -678,16 +678,16 @@ class TestLlmIndexLocking:
 
 @pytest.mark.django_db
 @pytest.mark.django_db
-class TestLanceDbIndexing:
+class TestVectorStoreIndexing:
     def test_get_vector_store_roundtrip(
         self,
         temp_llm_index_dir: Path,
         mock_embed_model: FakeEmbedding,
     ) -> None:
-        from paperless_ai.vector_store import PaperlessLanceVectorStore
+        from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
 
         store = indexing.get_vector_store()
-        assert isinstance(store, PaperlessLanceVectorStore)
+        assert isinstance(store, PaperlessSqliteVecVectorStore)
 
     def test_add_then_remove_document(
         self,
@@ -697,11 +697,11 @@ class TestLanceDbIndexing:
     ) -> None:
         indexing.llm_index_add_or_update_document(real_document)
         store = indexing.get_vector_store()
-        table = store.client.open_table(indexing.LLM_INDEX_TABLE)
-        assert table.count_rows() >= 1
+        assert store.table_exists()
+        assert store.client.execute("SELECT count(*) FROM documents").fetchone()[0] >= 1
 
         indexing.llm_index_remove_document(real_document)
-        assert store.client.open_table(indexing.LLM_INDEX_TABLE).count_rows() == 0
+        assert store.client.execute("SELECT count(*) FROM documents").fetchone()[0] == 0
 
     def test_update_shrinks_chunks_without_orphans(
         self,
@@ -713,13 +713,13 @@ class TestLanceDbIndexing:
         real_document.save()
         indexing.llm_index_add_or_update_document(real_document)
         store = indexing.get_vector_store()
-        big = store.client.open_table(indexing.LLM_INDEX_TABLE).count_rows()
+        big = store.client.execute("SELECT count(*) FROM documents").fetchone()[0]
 
         real_document.content = "short"  # one chunk
         real_document.save()
         indexing.llm_index_add_or_update_document(real_document)
 
-        rows = store.client.open_table(indexing.LLM_INDEX_TABLE).count_rows()
+        rows = store.client.execute("SELECT count(*) FROM documents").fetchone()[0]
         assert rows < big
         assert rows >= 1
 
