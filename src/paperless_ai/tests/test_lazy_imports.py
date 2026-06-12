@@ -12,7 +12,7 @@ class TestLazyAiImports:
             "os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'paperless.settings')\n"
             "django.setup()\n"
             "import documents.tasks  # noqa: F401\n"
-            "leaked = [m for m in ('lancedb', 'pyarrow', 'llama_index') "
+            "leaked = [m for m in ('lancedb', 'pyarrow', 'llama_index', 'sqlite_vec') "
             "if m in sys.modules]\n"
             "assert not leaked, f'AI libraries leaked into the light path: {leaked}'\n"
         )
