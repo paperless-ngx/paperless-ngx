@@ -99,10 +99,11 @@ _DEFAULT_MODEL_NAMES = {
 
 def get_configured_model_name(config: AIConfig) -> str:
     """Return the canonical name of the currently configured embedding model."""
+    # dict.get(key, default) overload resolution fails for TextChoices keys in some
+    # type checkers; use `or` fallback to avoid the ambiguity.
     default = _DEFAULT_MODEL_NAMES.get(
         config.llm_embedding_backend,
-        "sentence-transformers/all-MiniLM-L6-v2",
-    )
+    ) or "sentence-transformers/all-MiniLM-L6-v2"
     return config.llm_embedding_model or default
 
 

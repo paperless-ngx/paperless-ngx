@@ -14,6 +14,7 @@ from llama_index.core.schema import BaseNode
 from llama_index.core.vector_stores.types import BasePydanticVectorStore
 from llama_index.core.vector_stores.types import FilterCondition
 from llama_index.core.vector_stores.types import FilterOperator
+from llama_index.core.vector_stores.types import MetadataFilter
 from llama_index.core.vector_stores.types import MetadataFilters
 from llama_index.core.vector_stores.types import VectorStoreQuery
 from llama_index.core.vector_stores.types import VectorStoreQueryResult
@@ -54,10 +55,14 @@ def _build_where(filters: MetadataFilters | None) -> tuple[str, list[str]]:
     clauses: list[str] = []
     params: list[str] = []
     for f in filters.filters:
+        # filters.filters is Union[MetadataFilter, ExactMatchFilter, MetadataFilters];
+        # we only build MetadataFilter entries, so skip anything else at runtime.
+        if not isinstance(f, MetadataFilter):  # pragma: no cover
+            continue
         if f.key not in _FILTER_COLUMNS:  # pragma: no cover - we build the keys
             raise NotImplementedError(f"Unsupported filter column: {f.key}")
         if f.operator == FilterOperator.IN:
-            values = [str(v) for v in f.value]
+            values = [str(v) for v in f.value]  # type: ignore[union-attr]  # value is list when operator is IN
             if not values:
                 clauses.append("1 = 0")
                 continue
@@ -324,6 +329,8 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         **kwargs: Any,
     ) -> VectorStoreQueryResult:
         if not self.table_exists():
+            return VectorStoreQueryResult(nodes=[], similarities=[], ids=[])
+        if query.query_embedding is None:
             return VectorStoreQueryResult(nodes=[], similarities=[], ids=[])
         top_k = query.similarity_top_k if query.similarity_top_k is not None else 10
         where, params = _build_where(query.filters)
