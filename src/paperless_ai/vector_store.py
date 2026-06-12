@@ -105,7 +105,6 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
     flat_metadata: bool = False
 
     _uri: str = PrivateAttr()
-    _table_name: str = PrivateAttr()
     _embed_model_name: str | None = PrivateAttr()
     _conn: Any = PrivateAttr()
 
@@ -117,7 +116,6 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
     ) -> None:
         super().__init__(stores_text=True, flat_metadata=False)
         self._uri = uri
-        self._table_name = table_name
         self._embed_model_name = embed_model_name
         self._conn = self._open_connection(str(Path(uri) / DB_FILENAME))
 
@@ -172,7 +170,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         return (
             self._conn.execute(
                 "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
-                (self._table_name,),
+                (DEFAULT_TABLE_NAME,),
             ).fetchone()
             is not None
         )
@@ -184,7 +182,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         return int(value) if value else None
 
     def drop_table(self) -> None:
-        self._conn.execute(f"DROP TABLE IF EXISTS {self._table_name}")
+        self._conn.execute("DROP TABLE IF EXISTS " + DEFAULT_TABLE_NAME)
         self._conn.execute("DELETE FROM index_meta")
 
     def stored_model_name(self) -> str | None:
@@ -209,8 +207,8 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         # partition keys change KNN `k` to per-partition semantics under IN
         # filters (asg017/sqlite-vec#142); metadata columns give a correct
         # global top-k.
-        self._conn.execute(
-            f"""CREATE VIRTUAL TABLE {self._table_name} USING vec0(
+        self._conn.execute(  # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+            f"""CREATE VIRTUAL TABLE {DEFAULT_TABLE_NAME} USING vec0(
                 id TEXT PRIMARY KEY,
                 document_id TEXT,
                 modified TEXT,
@@ -243,7 +241,11 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             _pack(node.get_embedding()),
         )
 
-    _INSERT = "INSERT INTO {t} (id, document_id, modified, node_content, embedding) VALUES (?, ?, ?, ?, ?)"
+    _INSERT = (
+        "INSERT INTO "
+        + DEFAULT_TABLE_NAME
+        + " (id, document_id, modified, node_content, embedding) VALUES (?, ?, ?, ?, ?)"
+    )
 
     def _increment_total_inserts(self, count: int) -> None:
         """Increment the cumulative insert counter stored in index_meta.
@@ -262,7 +264,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         rows = [self._row(node) for node in nodes]
         with self._transaction():
             self._ensure_table(len(nodes[0].get_embedding()))
-            self._conn.executemany(self._INSERT.format(t=self._table_name), rows)
+            self._conn.executemany(self._INSERT, rows)
             self._increment_total_inserts(len(rows))
         return [node.node_id for node in nodes]
 
@@ -280,11 +282,11 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
                 self._ensure_table(len(nodes[0].get_embedding()))
             if self.table_exists():
                 self._conn.execute(
-                    f"DELETE FROM {self._table_name} WHERE document_id = ?",
+                    "DELETE FROM " + DEFAULT_TABLE_NAME + " WHERE document_id = ?",
                     (str(document_id),),
                 )
             if rows:
-                self._conn.executemany(self._INSERT.format(t=self._table_name), rows)
+                self._conn.executemany(self._INSERT, rows)
                 self._increment_total_inserts(len(rows))
         return [node.node_id for node in nodes]
 
@@ -292,7 +294,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         if self.table_exists():
             with self._transaction():
                 self._conn.execute(
-                    f"DELETE FROM {self._table_name} WHERE document_id = ?",
+                    "DELETE FROM " + DEFAULT_TABLE_NAME + " WHERE document_id = ?",
                     (str(ref_doc_id),),
                 )
 
@@ -318,9 +320,9 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         if not self.table_exists():
             return []
         where, params = _build_where(filters)
-        sql = f"SELECT node_content, embedding FROM {self._table_name}"
+        sql = "SELECT node_content, embedding FROM " + DEFAULT_TABLE_NAME
         if where:
-            sql += f" WHERE {where}"
+            sql += " WHERE " + where
         return self._rows_to_nodes(self._conn.execute(sql, params).fetchall())
 
     def query(
@@ -335,11 +337,12 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         top_k = query.similarity_top_k if query.similarity_top_k is not None else 10
         where, params = _build_where(query.filters)
         sql = (
-            f"SELECT id, node_content, embedding, distance FROM {self._table_name} "
-            "WHERE embedding MATCH ? AND k = ?"
+            "SELECT id, node_content, embedding, distance FROM "
+            + DEFAULT_TABLE_NAME
+            + " WHERE embedding MATCH ? AND k = ?"
         )
         if where:
-            sql += f" AND {where}"
+            sql += " AND " + where
         rows = self._conn.execute(
             sql,
             [_pack(query.query_embedding), top_k, *params],
@@ -370,7 +373,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             return {}
         result: dict[str, str] = {}
         for row in self._conn.execute(
-            f"SELECT document_id, modified FROM {self._table_name}",
+            "SELECT document_id, modified FROM " + DEFAULT_TABLE_NAME,
         ):
             doc_id = str(row["document_id"])
             if doc_id not in result:
@@ -395,7 +398,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         if not self.table_exists():
             return
         live = self._conn.execute(
-            f"SELECT count(*) FROM {self._table_name}",
+            "SELECT count(*) FROM " + DEFAULT_TABLE_NAME,
         ).fetchone()[0]
         total = int(self._meta_get("total_inserts") or str(live))
         if not force and total <= max(live, 1) * COMPACT_BLOAT_RATIO:
@@ -415,8 +418,8 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         # Copy all live rows into a fresh database file.
         new_conn = self._open_connection(compact_path)
         try:
-            new_conn.execute(
-                f"""CREATE VIRTUAL TABLE {self._table_name} USING vec0(
+            new_conn.execute(  # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+                f"""CREATE VIRTUAL TABLE {DEFAULT_TABLE_NAME} USING vec0(
                     id TEXT PRIMARY KEY,
                     document_id TEXT,
                     modified TEXT,
@@ -437,14 +440,12 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
                     ("embed_model", stored_model),
                 )
             rows = self._conn.execute(
-                f"SELECT id, document_id, modified, node_content, embedding "
-                f"FROM {self._table_name}",
+                "SELECT id, document_id, modified, node_content, embedding "
+                "FROM " + DEFAULT_TABLE_NAME,
             ).fetchall()
             new_conn.execute("BEGIN IMMEDIATE")
             new_conn.executemany(
-                f"INSERT INTO {self._table_name} "
-                f"(id, document_id, modified, node_content, embedding) "
-                f"VALUES (?, ?, ?, ?, ?)",
+                self._INSERT,
                 [
                     (
                         r["id"],

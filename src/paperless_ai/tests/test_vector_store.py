@@ -240,7 +240,7 @@ class TestGetModifiedTimes:
 class TestCompact:
     def _bloat_ratio(self, store) -> float:
         live = store.client.execute(
-            f"SELECT count(*) FROM {store._table_name}",
+            "SELECT count(*) FROM documents",
         ).fetchone()[0]
         # vec0 0.1.9 does not accumulate deleted rows in the _rowids shadow
         # table, so we track cumulative inserts in index_meta instead.
