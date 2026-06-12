@@ -48,6 +48,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.fields import SerializerMethodField
 from rest_framework.filters import OrderingFilter
+from rest_framework.utils import model_meta
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.context import set_actor
@@ -1127,11 +1128,42 @@ class DocumentSerializer(
             )
         return super().validate(attrs)
 
+    def _get_update_fields(self, validated_data) -> list[str]:
+        model_fields = {
+            field.name
+            for field in self.Meta.model._meta.concrete_fields
+            if field.name not in {"filename", "archive_filename"}
+        }
+        update_fields = [
+            field_name for field_name in validated_data if field_name in model_fields
+        ]
+        if "modified" not in update_fields:
+            update_fields.append("modified")
+        return update_fields
+
+    def _update_instance(self, instance: Document, validated_data) -> Document:
+        update_fields = self._get_update_fields(validated_data)
+        info = model_meta.get_field_info(instance)
+        m2m_fields = []
+
+        for attr, value in validated_data.items():
+            if attr in info.relations and info.relations[attr].to_many:
+                m2m_fields.append((attr, value))
+            else:
+                setattr(instance, attr, value)
+
+        instance.save(update_fields=update_fields)
+
+        for attr, value in m2m_fields:
+            field = getattr(instance, attr)
+            field.set(value)
+
+        return instance
+
     def update(self, instance: Document, validated_data):
-        if "created_date" in validated_data and "created" not in validated_data:
-            instance.created = validated_data.get("created_date")
-            instance.save()
         if "created_date" in validated_data:
+            if "created" not in validated_data:
+                validated_data["created"] = validated_data["created_date"]
             logger.warning(
                 "created_date is deprecated, use created instead",
             )
@@ -1201,11 +1233,23 @@ class DocumentSerializer(
                     for tag in instance.tags.all()
                     if tag not in inbox_tags_not_being_added
                 ]
+
+        # Mirrors drf-writable-nested's NestedUpdateMixin and DRF's ModelSerializer.update,
+        # except for the model save below. The default update path calls instance.save()
+        # without update_fields, which can write stale non-serializer fields such as
+        # filename/archive_filename from an old in-memory Document while another request
+        # has already moved the underlying files.
+        relations, reverse_relations = self._extract_relations(validated_data)
+        self.update_or_create_direct_relations(validated_data, relations)
         if settings.AUDIT_LOG_ENABLED:
             with set_actor(self.user):
-                super().update(instance, validated_data)
+                instance = self._update_instance(instance, validated_data)
         else:
-            super().update(instance, validated_data)
+            instance = self._update_instance(instance, validated_data)
+
+        self.update_or_create_reverse_relations(instance, reverse_relations)
+        self.delete_reverse_relations_if_need(instance, reverse_relations)
+        instance.refresh_from_db()
         # hard delete custom field instances that were soft deleted
         CustomFieldInstance.deleted_objects.filter(document=instance).delete()
         return instance
