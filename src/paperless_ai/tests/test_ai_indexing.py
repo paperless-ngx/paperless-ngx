@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -164,27 +163,6 @@ def test_update_llm_index(
         build_document_node.assert_called_once_with(real_document, chunk_size=512)
 
 
-@pytest.mark.django_db
-def test_update_llm_index_cleans_stale_meta_on_rebuild(
-    temp_llm_index_dir: Path,
-    real_document: Document,
-    mock_embed_model: FakeEmbedding,
-) -> None:
-    # A meta.json left over from the FAISS era (or written by older code) must be
-    # deleted on rebuild so stale artifacts don't accumulate on disk.
-    stale_meta = temp_llm_index_dir / "meta.json"
-    stale_meta.write_text(json.dumps({"embedding_model": "old", "dim": 1}))
-
-    with patch("documents.models.Document.objects.all") as mock_all:
-        mock_queryset = MagicMock()
-        mock_queryset.exists.return_value = True
-        mock_queryset.__iter__.return_value = iter([real_document])
-        mock_all.return_value = mock_queryset
-        indexing.update_llm_index(rebuild=True)
-
-    assert not stale_meta.exists(), (
-        "update_llm_index(rebuild=True) must remove stale meta.json"
-    )
 
 
 @pytest.mark.django_db

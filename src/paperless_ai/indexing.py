@@ -1,5 +1,4 @@
 import logging
-import shutil
 from collections.abc import Iterable
 from contextlib import contextmanager
 from datetime import timedelta
@@ -72,21 +71,6 @@ def get_vector_store() -> "PaperlessSqliteVecVectorStore":
         uri=str(settings.LLM_INDEX_DIR),
         table_name=LLM_INDEX_TABLE,
     )
-
-
-def _cleanup_legacy_lance_index() -> bool:
-    """Delete a LanceDB index left by a pre-sqlite-vec version, if present.
-
-    Beta transition policy: no cross-store conversion; the caller forces a
-    full rebuild (re-embed) instead. Returns True when leftovers were found.
-    """
-    legacy_table = settings.LLM_INDEX_DIR / f"{LLM_INDEX_TABLE}.lance"
-    found = legacy_table.exists()
-    if found:
-        shutil.rmtree(legacy_table, ignore_errors=True)
-    # faiss-era metadata file, removed on the same occasion
-    (settings.LLM_INDEX_DIR / "meta.json").unlink(missing_ok=True)
-    return found
 
 
 @contextmanager
@@ -243,11 +227,6 @@ def update_llm_index(
     rebuild=False,
 ) -> str:
     """Rebuild or incrementally update the LLM index."""
-    if _cleanup_legacy_lance_index():
-        logger.warning(
-            "Found a LanceDB index from a previous version; forcing a full rebuild.",
-        )
-        rebuild = True
     documents = Document.objects.all()
     no_documents = not documents.exists()
 
