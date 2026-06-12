@@ -11,9 +11,12 @@ import unicodedata
 import pytest
 
 from documents.file_handling import generate_filename
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.tests.factories import CorrespondentFactory
 from documents.tests.factories import DocumentFactory
 from documents.tests.factories import StoragePathFactory
+from documents.tests.factories import TagFactory
 
 
 @pytest.mark.django_db
@@ -80,3 +83,105 @@ class TestGenerateFilenameNFCNormalization:
 
         assert str(result) == f"{nfc}.pdf"
         assert str(result).encode() == f"{nfc}.pdf".encode()
+
+
+@pytest.mark.django_db
+class TestContextBuilderNFCNormalization:
+    """
+    Defense-in-depth: context builder functions must NFC-normalize string inputs
+    before passing them to sanitize_filename().  Task 1 already normalizes the
+    final rendered path via clean_filepath(), so these tests may already pass;
+    they exist as regression guards for the context-builder layer.
+    """
+
+    def test_nfd_tag_name_normalized_in_tag_list(self, settings):
+        """NFD tag name must appear as NFC bytes in the {{ tag_list }} shorthand."""
+        settings.FILENAME_FORMAT = "{{ tag_list }}/{{ title }}"
+        nfd = unicodedata.normalize("NFD", "Büro")
+        nfc = unicodedata.normalize("NFC", "Büro")
+        assert nfd != nfc  # confirm they differ at byte level
+
+        tag = TagFactory(name=nfd)
+        doc = DocumentFactory(title="doc", mime_type="application/pdf")
+        doc.tags.set([tag])
+
+        result = generate_filename(doc)
+
+        assert str(result).encode() == f"{nfc}/doc.pdf".encode()
+
+    def test_nfd_original_name_normalized_to_nfc(self, settings):
+        settings.FILENAME_FORMAT = "{{ original_name }}"
+        nfd = unicodedata.normalize("NFD", "Rechnung März")
+        nfc = unicodedata.normalize("NFC", "Rechnung März")
+
+        doc = DocumentFactory(
+            original_filename=f"{nfd}.pdf",
+            mime_type="application/pdf",
+        )
+        result = generate_filename(doc)
+
+        assert str(result).encode() == f"{nfc}.pdf".encode()
+
+    def test_nfd_custom_field_string_value_normalized(self, settings):
+        """NFD value in a STRING-type custom field must appear as NFC in the context."""
+        settings.FILENAME_FORMAT = (
+            "{{ custom_fields['Location']['value'] }}/{{ title }}"
+        )
+        nfd_value = unicodedata.normalize("NFD", "Düsseldorf")
+        nfc_value = unicodedata.normalize("NFC", "Düsseldorf")
+        assert nfd_value != nfc_value
+
+        doc = DocumentFactory(title="report", mime_type="application/pdf")
+        cf = CustomField.objects.create(
+            name="Location",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=cf,
+            value_text=nfd_value,
+        )
+
+        result = generate_filename(doc)
+
+        assert str(result).encode() == f"{nfc_value}/report.pdf".encode()
+
+    def test_nfd_custom_field_name_normalized_as_key(self, settings):
+        """NFD characters in a custom field name must appear as NFC in the context dict key."""
+        nfd_name = unicodedata.normalize("NFD", "Größe")
+        nfc_name = unicodedata.normalize("NFC", "Größe")
+        assert nfd_name != nfc_name
+
+        settings.FILENAME_FORMAT = f"{{% if custom_fields['{nfc_name}'] %}}{{{{ custom_fields['{nfc_name}']['value'] }}}}/{{{{ title }}}}{{% else %}}{{{{ title }}}}{{% endif %}}"
+
+        doc = DocumentFactory(title="letter", mime_type="application/pdf")
+        cf = CustomField.objects.create(
+            name=nfd_name,
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=cf,
+            value_text="Berlin",
+        )
+
+        result = generate_filename(doc)
+
+        # If field name key is NFC-normalized, the template condition succeeds
+        # and result is "Berlin/letter.pdf"; otherwise it falls back to "letter.pdf"
+        assert str(result) == "Berlin/letter.pdf"
+
+    def test_nfd_tag_name_list_normalized_to_nfc(self, settings):
+        """NFD tag names in tag_name_list must appear as NFC bytes when iterated."""
+        settings.FILENAME_FORMAT = (
+            "{% for t in tag_name_list %}{{ t }}{% endfor %}/{{ title }}"
+        )
+        nfd = unicodedata.normalize("NFD", "Büro")
+        nfc = unicodedata.normalize("NFC", "Büro")
+        assert nfd != nfc  # confirm byte-level difference
+
+        doc = DocumentFactory(title="doc", mime_type="application/pdf")
+        doc.tags.add(TagFactory(name=nfd))
+        result = generate_filename(doc)
+
+        assert str(result).encode() == f"{nfc}/doc.pdf".encode()

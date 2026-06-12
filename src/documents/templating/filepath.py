@@ -184,17 +184,17 @@ def get_basic_metadata_context(
     """
     return {
         "title": pathvalidate.sanitize_filename(
-            document.title,
+            unicodedata.normalize("NFC", document.title),
             replacement_text="-",
         ),
         "correspondent": pathvalidate.sanitize_filename(
-            document.correspondent.name,
+            unicodedata.normalize("NFC", document.correspondent.name),
             replacement_text="-",
         )
         if document.correspondent
         else no_value_default,
         "document_type": pathvalidate.sanitize_filename(
-            document.document_type.name,
+            unicodedata.normalize("NFC", document.document_type.name),
             replacement_text="-",
         )
         if document.document_type
@@ -205,7 +205,10 @@ def get_basic_metadata_context(
         "owner_username": document.owner.username
         if document.owner
         else no_value_default,
-        "original_name": PurePath(document.original_filename).with_suffix("").name
+        "original_name": unicodedata.normalize(
+            "NFC",
+            PurePath(document.original_filename).with_suffix("").name,
+        )
         if document.original_filename
         else no_value_default,
         "doc_pk": f"{document.pk:07}",
@@ -272,12 +275,12 @@ def get_tags_context(tags: Iterable[Tag]) -> dict[str, str | list[str]]:
     return {
         "tag_list": pathvalidate.sanitize_filename(
             ",".join(
-                sorted(tag.name for tag in tags),
+                sorted(unicodedata.normalize("NFC", tag.name) for tag in tags),
             ),
             replacement_text="-",
         ),
         # Assumed to be ordered, but a template could loop through to find what they want
-        "tag_name_list": [x.name for x in tags],
+        "tag_name_list": [unicodedata.normalize("NFC", x.name) for x in tags],
     }
 
 
@@ -304,7 +307,7 @@ def get_custom_fields_context(
             CustomField.FieldDataType.LONG_TEXT,
         }:
             value = pathvalidate.sanitize_filename(
-                field_instance.value,
+                unicodedata.normalize("NFC", field_instance.value),
                 replacement_text="-",
             )
         elif (
@@ -313,10 +316,13 @@ def get_custom_fields_context(
         ):
             options = field_instance.field.extra_data["select_options"]
             value = pathvalidate.sanitize_filename(
-                next(
-                    option["label"]
-                    for option in options
-                    if option["id"] == field_instance.value
+                unicodedata.normalize(
+                    "NFC",
+                    next(
+                        option["label"]
+                        for option in options
+                        if option["id"] == field_instance.value
+                    ),
                 ),
                 replacement_text="-",
             )
@@ -324,7 +330,7 @@ def get_custom_fields_context(
             value = field_instance.value
         field_data["custom_fields"][
             pathvalidate.sanitize_filename(
-                field_instance.field.name,
+                unicodedata.normalize("NFC", field_instance.field.name),
                 replacement_text="-",
             )
         ] = {
