@@ -1,6 +1,5 @@
 from types import SimpleNamespace
 
-import pytest
 import pytest_mock
 
 from paperless_ai.taxonomy import TaxonomyHints
@@ -133,7 +132,6 @@ class TestFormatHintsForPrompt:
         assert result.count("Prefer existing names from these lists verbatim") == 1
 
 
-@pytest.mark.django_db
 class TestGetTaxonomyHintsForDocument:
     def test_returns_none_when_embedding_backend_off(
         self,

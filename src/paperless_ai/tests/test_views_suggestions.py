@@ -11,11 +11,7 @@ from documents.models import Document
 @pytest.mark.django_db
 class TestSuggestionsHintWiring:
     @pytest.fixture
-    def user(self) -> User:
-        return User.objects.create_superuser(username="admin", password="pw")
-
-    @pytest.fixture
-    def document(self, user: User) -> Document:
+    def document(self) -> Document:
         return Document.objects.create(
             title="Doc",
             content="content",
@@ -24,9 +20,9 @@ class TestSuggestionsHintWiring:
         )
 
     @pytest.fixture
-    def api_client(self, user: User) -> APIClient:
+    def api_client(self, admin_user: User) -> APIClient:
         client = APIClient()
-        client.force_authenticate(user=user)
+        client.force_authenticate(user=admin_user)
         return client
 
     def test_hints_passed_to_classifier_and_matchers(

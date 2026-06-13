@@ -1,4 +1,5 @@
 import difflib
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
@@ -89,16 +90,14 @@ class TestAIMatching(TestCase):
         self.assertEqual(result[1].name, "Test Tag 2")
 
 
-@pytest.mark.django_db
 class TestHintedMatching:
     def test_hinted_verbatim_skips_fuzzy(
         self,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
-        Tag.objects.create(name="Bloodwork")
         mocker.patch(
             "paperless_ai.matching.get_objects_for_user_owner_aware",
-            return_value=Tag.objects.all(),
+            return_value=[SimpleNamespace(name="Bloodwork")],
         )
         spy = mocker.spy(difflib, "get_close_matches")
 
@@ -115,10 +114,9 @@ class TestHintedMatching:
         self,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
-        Tag.objects.create(name="Bloodwork")
         mocker.patch(
             "paperless_ai.matching.get_objects_for_user_owner_aware",
-            return_value=Tag.objects.all(),
+            return_value=[SimpleNamespace(name="Bloodwork")],
         )
 
         # "Bloodwrok" is a typo not in hints -> fuzzy still maps it to Bloodwork.
@@ -134,10 +132,9 @@ class TestHintedMatching:
         self,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
-        Tag.objects.create(name="Bloodwork")
         mocker.patch(
             "paperless_ai.matching.get_objects_for_user_owner_aware",
-            return_value=Tag.objects.all(),
+            return_value=[SimpleNamespace(name="Bloodwork")],
         )
         spy = mocker.spy(difflib, "get_close_matches")
 
@@ -155,10 +152,9 @@ class TestHintedMatching:
         mocker: pytest_mock.MockerFixture,
     ) -> None:
         # A hint with no exact object must not fall through to fuzzy.
-        Tag.objects.create(name="Bloodwork")
         mocker.patch(
             "paperless_ai.matching.get_objects_for_user_owner_aware",
-            return_value=Tag.objects.all(),
+            return_value=[SimpleNamespace(name="Bloodwork")],
         )
 
         result = match_tags_by_name(
@@ -173,10 +169,9 @@ class TestHintedMatching:
         self,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
-        Tag.objects.create(name="Test Tag 1")
         mocker.patch(
             "paperless_ai.matching.get_objects_for_user_owner_aware",
-            return_value=Tag.objects.all(),
+            return_value=[SimpleNamespace(name="Test Tag 1")],
         )
 
         result = match_tags_by_name(["Test Tag 1", "Nonexistent"], user=None)

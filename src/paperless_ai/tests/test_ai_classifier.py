@@ -1,5 +1,6 @@
 import json
 from types import SimpleNamespace
+from typing import cast
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
@@ -282,11 +283,15 @@ def test_get_context_for_document_no_similar_docs(mock_document):
         assert result == ""
 
 
-@pytest.mark.django_db
 class TestPromptHints:
     @pytest.fixture
     def config(self) -> AIConfig:
-        return AIConfig()
+        # build_prompt_* only read these two numeric settings off config;
+        # a stand-in avoids constructing a DB-backed AIConfig.
+        return cast(
+            "AIConfig",
+            SimpleNamespace(llm_embedding_chunk_size=1000, llm_context_size=8000),
+        )
 
     def test_without_rag_includes_hints_block(
         self,
