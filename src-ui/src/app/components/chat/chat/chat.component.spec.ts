@@ -188,4 +188,14 @@ describe('ChatComponent', () => {
     component.searchInputKeyDown(event)
     expect(component.sendMessage).toHaveBeenCalled()
   })
+
+  it('should not send message on Enter key press while composing with IME', () => {
+    jest.spyOn(component, 'sendMessage')
+    const event = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      isComposing: true,
+    })
+    component.searchInputKeyDown(event)
+    expect(component.sendMessage).not.toHaveBeenCalled()
+  })
 })
