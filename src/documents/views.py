@@ -249,6 +249,7 @@ from paperless_ai.matching import match_correspondents_by_name
 from paperless_ai.matching import match_document_types_by_name
 from paperless_ai.matching import match_storage_paths_by_name
 from paperless_ai.matching import match_tags_by_name
+from paperless_ai.taxonomy import get_taxonomy_hints_for_document
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.oauth import PaperlessMailOAuth2Manager
@@ -1545,11 +1546,14 @@ class DocumentViewSet(
             refresh_suggestions_cache(doc.pk)
             return Response(cached_llm_suggestions.suggestions)
 
+        hints = get_taxonomy_hints_for_document(doc, request.user)
+
         try:
             llm_suggestions = get_ai_document_classification(
                 doc,
                 request.user,
                 output_language,
+                hints=hints,
             )
         except ValueError as exc:
             logger.exception(
@@ -1575,18 +1579,22 @@ class DocumentViewSet(
         matched_tags = match_tags_by_name(
             llm_suggestions.get("tags", []),
             request.user,
+            hinted_names=set(hints["tags"]) if hints else None,
         )
         matched_correspondents = match_correspondents_by_name(
             llm_suggestions.get("correspondents", []),
             request.user,
+            hinted_names=set(hints["correspondents"]) if hints else None,
         )
         matched_types = match_document_types_by_name(
             llm_suggestions.get("document_types", []),
             request.user,
+            hinted_names=set(hints["document_types"]) if hints else None,
         )
         matched_paths = match_storage_paths_by_name(
             llm_suggestions.get("storage_paths", []),
             request.user,
+            hinted_names=set(hints["storage_paths"]) if hints else None,
         )
 
         resp_data = {

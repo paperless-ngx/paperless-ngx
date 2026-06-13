@@ -412,6 +412,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             self.document,
             self.user,
             None,
+            hints=None,
         )
 
     @patch("documents.views.get_ai_document_classification")
@@ -443,6 +444,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             self.document,
             self.user,
             "de-de",
+            hints=None,
         )
         self.assertEqual(
             get_llm_suggestion_cache(
@@ -482,6 +484,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             self.document,
             self.user,
             "fr-fr",
+            hints=None,
         )
         self.assertEqual(
             get_llm_suggestion_cache(
