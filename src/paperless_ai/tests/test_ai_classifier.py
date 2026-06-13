@@ -1,8 +1,10 @@
 import json
+from types import SimpleNamespace
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
+import pytest_mock
 from django.test import override_settings
 
 from documents.models import Document
@@ -278,3 +280,107 @@ def test_get_context_for_document_no_similar_docs(mock_document):
     with patch("paperless_ai.ai_classifier.query_similar_documents", return_value=[]):
         result = get_context_for_document(mock_document)
         assert result == ""
+
+
+@pytest.mark.django_db
+class TestPromptHints:
+    @pytest.fixture
+    def config(self) -> AIConfig:
+        return AIConfig()
+
+    def test_without_rag_includes_hints_block(
+        self,
+        mock_document: MagicMock,
+        config: AIConfig,
+    ) -> None:
+        hints = {
+            "tags": ["Bloodwork"],
+            "document_types": ["Invoice"],
+            "correspondents": [],
+            "storage_paths": [],
+        }
+        prompt = build_prompt_without_rag(mock_document, config, hints=hints)
+        assert "Available tags:" in prompt
+        assert "- Bloodwork" in prompt
+        assert "Prefer existing names from these lists verbatim" in prompt
+
+    def test_without_rag_none_matches_baseline(
+        self,
+        mock_document: MagicMock,
+        config: AIConfig,
+    ) -> None:
+        baseline = build_prompt_without_rag(mock_document, config)
+        with_none = build_prompt_without_rag(mock_document, config, hints=None)
+        assert with_none == baseline
+        assert "Available tags:" not in with_none
+
+    def test_with_rag_includes_context_and_hints(
+        self,
+        mock_document: MagicMock,
+        config: AIConfig,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        mocker.patch(
+            "paperless_ai.ai_classifier.get_context_for_document",
+            return_value="TITLE: Neighbour\nsome context",
+        )
+        hints = {
+            "tags": ["Bloodwork"],
+            "document_types": [],
+            "correspondents": [],
+            "storage_paths": [],
+        }
+        prompt = build_prompt_with_rag(mock_document, config, user=None, hints=hints)
+        assert "Additional context from similar documents" in prompt
+        assert "Available tags:" in prompt
+
+    def test_classification_forwards_hints(
+        self,
+        mock_document: MagicMock,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        mocker.patch(
+            "paperless_ai.ai_classifier.AIConfig",
+            return_value=SimpleNamespace(
+                llm_embedding_backend=None,
+                llm_embedding_chunk_size=1000,
+                llm_context_size=8000,
+            ),
+        )
+        build = mocker.patch(
+            "paperless_ai.ai_classifier.build_prompt_without_rag",
+            return_value="PROMPT",
+        )
+        mock_client = MagicMock()
+        mock_client.run_llm_query.return_value = {
+            "title": "t",
+            "tags": [],
+            "correspondents": [],
+            "document_types": [],
+            "storage_paths": [],
+            "dates": [],
+        }
+        mocker.patch("paperless_ai.ai_classifier.AIClient", return_value=mock_client)
+        hints = {
+            "tags": ["Bloodwork"],
+            "document_types": [],
+            "correspondents": [],
+            "storage_paths": [],
+        }
+
+        result = get_ai_document_classification(
+            mock_document,
+            user=None,
+            hints=hints,
+        )
+
+        _, build_kwargs = build.call_args
+        assert build_kwargs["hints"] == hints
+        assert set(result.keys()) == {
+            "title",
+            "tags",
+            "correspondents",
+            "document_types",
+            "storage_paths",
+            "dates",
+        }

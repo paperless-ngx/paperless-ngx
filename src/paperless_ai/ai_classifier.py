@@ -1,5 +1,6 @@
 import json
 import logging
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -11,6 +12,10 @@ from paperless_ai.client import AIClient
 from paperless_ai.db import db_connection_released
 from paperless_ai.indexing import query_similar_documents
 from paperless_ai.indexing import truncate_content
+from paperless_ai.taxonomy import format_hints_for_prompt
+
+if TYPE_CHECKING:
+    from paperless_ai.taxonomy import TaxonomyHints
 
 logger = logging.getLogger("paperless_ai.rag_classifier")
 
@@ -26,6 +31,7 @@ def get_language_name(language_code: str) -> str:
 def build_prompt_without_rag(
     document: Document,
     config: AIConfig,
+    hints: "TaxonomyHints | None" = None,
 ) -> str:
     filename = document.filename or ""
     content = truncate_content(
@@ -34,10 +40,16 @@ def build_prompt_without_rag(
         context_size=config.llm_context_size,
     )
 
+    hints_block = format_hints_for_prompt(hints) if hints else ""
+    # Splice the block (if any) immediately before the "Analyze ..." instruction.
+    # When there is no block this expands to nothing, so the prompt is identical
+    # to the pre-hints baseline.
+    hints_section = f"{hints_block}\n\n    " if hints_block else ""
+
     return f"""
     You are a document classification assistant.
 
-    Analyze the following document and extract the following information:
+    {hints_section}Analyze the following document and extract the following information:
     - A short descriptive title
     - Tags that reflect the content
     - Names of people or organizations mentioned
@@ -57,8 +69,9 @@ def build_prompt_with_rag(
     document: Document,
     config: AIConfig,
     user: User | None = None,
+    hints: "TaxonomyHints | None" = None,
 ) -> str:
-    base_prompt = build_prompt_without_rag(document, config)
+    base_prompt = build_prompt_without_rag(document, config, hints=hints)
     context = truncate_content(
         get_context_for_document(document, user),
         chunk_size=config.llm_embedding_chunk_size,
@@ -137,13 +150,14 @@ def get_ai_document_classification(
     document: Document,
     user: User | None = None,
     output_language: str | None = None,
+    hints: "TaxonomyHints | None" = None,
 ) -> dict:
     ai_config = AIConfig()
 
     prompt = (
-        build_prompt_with_rag(document, ai_config, user)
+        build_prompt_with_rag(document, ai_config, user, hints=hints)
         if ai_config.llm_embedding_backend
-        else build_prompt_without_rag(document, ai_config)
+        else build_prompt_without_rag(document, ai_config, hints=hints)
     )
 
     client = AIClient()
