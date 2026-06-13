@@ -15,40 +15,56 @@ MATCH_THRESHOLD = 0.8
 logger = logging.getLogger("paperless_ai.matching")
 
 
-def match_tags_by_name(names: list[str], user: User) -> list[Tag]:
+def match_tags_by_name(
+    names: list[str],
+    user: User,
+    hinted_names: set[str] | None = None,
+) -> list[Tag]:
     queryset = get_objects_for_user_owner_aware(
         user,
         ["view_tag"],
         Tag,
     )
-    return _match_names_to_queryset(names, queryset, "name")
+    return _match_names_to_queryset(names, queryset, "name", hinted_names)
 
 
-def match_correspondents_by_name(names: list[str], user: User) -> list[Correspondent]:
+def match_correspondents_by_name(
+    names: list[str],
+    user: User,
+    hinted_names: set[str] | None = None,
+) -> list[Correspondent]:
     queryset = get_objects_for_user_owner_aware(
         user,
         ["view_correspondent"],
         Correspondent,
     )
-    return _match_names_to_queryset(names, queryset, "name")
+    return _match_names_to_queryset(names, queryset, "name", hinted_names)
 
 
-def match_document_types_by_name(names: list[str], user: User) -> list[DocumentType]:
+def match_document_types_by_name(
+    names: list[str],
+    user: User,
+    hinted_names: set[str] | None = None,
+) -> list[DocumentType]:
     queryset = get_objects_for_user_owner_aware(
         user,
         ["view_documenttype"],
         DocumentType,
     )
-    return _match_names_to_queryset(names, queryset, "name")
+    return _match_names_to_queryset(names, queryset, "name", hinted_names)
 
 
-def match_storage_paths_by_name(names: list[str], user: User) -> list[StoragePath]:
+def match_storage_paths_by_name(
+    names: list[str],
+    user: User,
+    hinted_names: set[str] | None = None,
+) -> list[StoragePath]:
     queryset = get_objects_for_user_owner_aware(
         user,
         ["view_storagepath"],
         StoragePath,
     )
-    return _match_names_to_queryset(names, queryset, "name")
+    return _match_names_to_queryset(names, queryset, "name", hinted_names)
 
 
 def _normalize(s: str) -> str:
@@ -58,10 +74,18 @@ def _normalize(s: str) -> str:
     return s
 
 
-def _match_names_to_queryset(names: list[str], queryset, attr: str):
+def _match_names_to_queryset(
+    names: list[str],
+    queryset,
+    attr: str,
+    hinted_names: set[str] | None = None,
+):
     results = []
     objects = list(queryset)
     object_names = [_normalize(getattr(obj, attr)) for obj in objects]
+    normalized_hints = (
+        {_normalize(name) for name in hinted_names} if hinted_names else set()
+    )
 
     for name in names:
         if not name:
@@ -76,6 +100,11 @@ def _match_names_to_queryset(names: list[str], queryset, attr: str):
             results.append(matched)
             continue
 
+        # A hinted name that didn't exact-match came from existing taxonomy
+        # verbatim; do not fuzzy-map it onto a different object.
+        if target in normalized_hints:
+            continue
+
         # Fuzzy match fallback
         matches = difflib.get_close_matches(
             target,
@@ -88,8 +117,6 @@ def _match_names_to_queryset(names: list[str], queryset, attr: str):
             matched = objects.pop(index)
             object_names.pop(index)
             results.append(matched)
-        else:
-            pass
     return results
 
 

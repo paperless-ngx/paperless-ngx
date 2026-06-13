@@ -1,6 +1,8 @@
+import difflib
 from unittest.mock import patch
 
 import pytest
+import pytest_mock
 from django.test import TestCase
 
 from documents.models import Correspondent
@@ -85,6 +87,101 @@ class TestAIMatching(TestCase):
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0].name, "Test Tag 1")
         self.assertEqual(result[1].name, "Test Tag 2")
+
+
+@pytest.mark.django_db
+class TestHintedMatching:
+    def test_hinted_verbatim_skips_fuzzy(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        Tag.objects.create(name="Bloodwork")
+        mocker.patch(
+            "paperless_ai.matching.get_objects_for_user_owner_aware",
+            return_value=Tag.objects.all(),
+        )
+        spy = mocker.spy(difflib, "get_close_matches")
+
+        result = match_tags_by_name(
+            ["Bloodwork"],
+            user=None,
+            hinted_names={"Bloodwork"},
+        )
+
+        assert [t.name for t in result] == ["Bloodwork"]
+        spy.assert_not_called()
+
+    def test_unhinted_name_still_fuzzy_matches(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        Tag.objects.create(name="Bloodwork")
+        mocker.patch(
+            "paperless_ai.matching.get_objects_for_user_owner_aware",
+            return_value=Tag.objects.all(),
+        )
+
+        # "Bloodwrok" is a typo not in hints -> fuzzy still maps it to Bloodwork.
+        result = match_tags_by_name(
+            ["Bloodwrok"],
+            user=None,
+            hinted_names={"Taxes"},
+        )
+
+        assert [t.name for t in result] == ["Bloodwork"]
+
+    def test_hinted_name_with_whitespace_exact_matches(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        Tag.objects.create(name="Bloodwork")
+        mocker.patch(
+            "paperless_ai.matching.get_objects_for_user_owner_aware",
+            return_value=Tag.objects.all(),
+        )
+        spy = mocker.spy(difflib, "get_close_matches")
+
+        result = match_tags_by_name(
+            ["Bloodwork "],
+            user=None,
+            hinted_names={"Bloodwork"},
+        )
+
+        assert [t.name for t in result] == ["Bloodwork"]
+        spy.assert_not_called()
+
+    def test_hinted_name_absent_from_queryset_is_skipped_not_fuzzed(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        # A hint with no exact object must not fall through to fuzzy.
+        Tag.objects.create(name="Bloodwork")
+        mocker.patch(
+            "paperless_ai.matching.get_objects_for_user_owner_aware",
+            return_value=Tag.objects.all(),
+        )
+
+        result = match_tags_by_name(
+            ["Bloodwrok"],
+            user=None,
+            hinted_names={"Bloodwrok"},
+        )
+
+        assert result == []
+
+    def test_backward_compatible_without_kwarg(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        Tag.objects.create(name="Test Tag 1")
+        mocker.patch(
+            "paperless_ai.matching.get_objects_for_user_owner_aware",
+            return_value=Tag.objects.all(),
+        )
+
+        result = match_tags_by_name(["Test Tag 1", "Nonexistent"], user=None)
+
+        assert [t.name for t in result] == ["Test Tag 1"]
 
 
 @pytest.mark.django_db
