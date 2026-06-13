@@ -6,12 +6,12 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from documents.models import Document
-from documents.permissions import get_objects_for_user_owner_aware
 from paperless.config import AIConfig
 from paperless_ai.client import AIClient
 from paperless_ai.db import db_connection_released
 from paperless_ai.indexing import query_similar_documents
 from paperless_ai.indexing import truncate_content
+from paperless_ai.indexing import visible_document_ids_for_user
 from paperless_ai.taxonomy import format_hints_for_prompt
 
 if TYPE_CHECKING:
@@ -109,20 +109,7 @@ def get_context_for_document(
     user: User | None = None,
     max_docs: int = 5,
 ) -> str:
-    visible_documents = (
-        get_objects_for_user_owner_aware(
-            user,
-            "view_document",
-            Document,
-        )
-        if user
-        else None
-    )
-    visible_document_ids = (
-        list(visible_documents.values_list("pk", flat=True))
-        if visible_documents is not None
-        else None
-    )
+    visible_document_ids = visible_document_ids_for_user(user)
     similar_docs = query_similar_documents(
         document=doc,
         document_ids=visible_document_ids,

@@ -4,9 +4,9 @@ from typing import TypedDict
 from django.contrib.auth.models import User
 
 from documents.models import Document
-from documents.permissions import get_objects_for_user_owner_aware
 from paperless.config import AIConfig
 from paperless_ai.indexing import retrieve_similar_nodes
+from paperless_ai.indexing import visible_document_ids_for_user
 
 if TYPE_CHECKING:
     from llama_index.core.schema import NodeWithScore
@@ -108,23 +108,8 @@ def get_taxonomy_hints_for_document(
     if not AIConfig().llm_embedding_backend:
         return None
 
-    visible_documents = (
-        get_objects_for_user_owner_aware(
-            user,
-            "view_document",
-            Document,
-        )
-        if user
-        else None
-    )
-    visible_document_ids = (
-        list(visible_documents.values_list("pk", flat=True))
-        if visible_documents is not None
-        else None
-    )
-
     nodes = retrieve_similar_nodes(
         document=document,
-        document_ids=visible_document_ids,
+        document_ids=visible_document_ids_for_user(user),
     )
     return build_taxonomy_hints_from_nodes(nodes)

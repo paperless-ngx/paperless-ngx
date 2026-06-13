@@ -157,11 +157,9 @@ class TestGetTaxonomyHintsForDocument:
             "paperless_ai.taxonomy.AIConfig",
             return_value=SimpleNamespace(llm_embedding_backend="huggingface"),
         )
-        visible = mocker.MagicMock()
-        visible.values_list.return_value = [1, 2, 3]
         mocker.patch(
-            "paperless_ai.taxonomy.get_objects_for_user_owner_aware",
-            return_value=visible,
+            "paperless_ai.taxonomy.visible_document_ids_for_user",
+            return_value=[1, 2, 3],
         )
         retrieve = mocker.patch(
             "paperless_ai.taxonomy.retrieve_similar_nodes",

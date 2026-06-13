@@ -5,6 +5,7 @@ from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from filelock import FileLock
@@ -13,6 +14,7 @@ from filelock import Timeout
 
 from documents.models import Document
 from documents.models import PaperlessTask
+from documents.permissions import get_objects_for_user_owner_aware
 from documents.utils import IterWrapper
 from documents.utils import identity
 from paperless.config import AIConfig
@@ -504,6 +506,23 @@ def normalize_document_ids(document_ids: Iterable[int | str] | None) -> set[str]
     if document_ids is None:
         return None
     return {str(document_id) for document_id in document_ids}
+
+
+def visible_document_ids_for_user(user: User | None) -> list[int] | None:
+    """Return the pks of documents ``user`` may view, or ``None`` for no filter.
+
+    Returns ``None`` when ``user`` is ``None`` so retrieval runs unfiltered. Used
+    by both the similarity-context and taxonomy-hints paths to scope RAG
+    neighbours to documents the requesting user is allowed to see.
+    """
+    if user is None:
+        return None
+    visible_documents = get_objects_for_user_owner_aware(
+        user,
+        "view_document",
+        Document,
+    )
+    return list(visible_documents.values_list("pk", flat=True))
 
 
 def retrieve_similar_nodes(
