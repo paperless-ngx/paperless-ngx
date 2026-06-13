@@ -1,8 +1,12 @@
 from types import SimpleNamespace
 
+import pytest
+import pytest_mock
+
 from paperless_ai.taxonomy import TaxonomyHints
 from paperless_ai.taxonomy import build_taxonomy_hints_from_nodes
 from paperless_ai.taxonomy import format_hints_for_prompt
+from paperless_ai.taxonomy import get_taxonomy_hints_for_document
 
 
 def make_node(**metadata: object) -> SimpleNamespace:
@@ -127,3 +131,93 @@ class TestFormatHintsForPrompt:
         }
         result = format_hints_for_prompt(hints)
         assert result.count("Prefer existing names from these lists verbatim") == 1
+
+
+@pytest.mark.django_db
+class TestGetTaxonomyHintsForDocument:
+    def test_returns_none_when_embedding_backend_off(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        mocker.patch(
+            "paperless_ai.taxonomy.AIConfig",
+            return_value=SimpleNamespace(llm_embedding_backend=None),
+        )
+        retrieve = mocker.patch("paperless_ai.taxonomy.retrieve_similar_nodes")
+
+        result = get_taxonomy_hints_for_document(SimpleNamespace(), user=None)
+
+        assert result is None
+        retrieve.assert_not_called()
+
+    def test_passes_owner_aware_ids_when_user_present(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        mocker.patch(
+            "paperless_ai.taxonomy.AIConfig",
+            return_value=SimpleNamespace(llm_embedding_backend="huggingface"),
+        )
+        visible = mocker.MagicMock()
+        visible.values_list.return_value = [1, 2, 3]
+        mocker.patch(
+            "paperless_ai.taxonomy.get_objects_for_user_owner_aware",
+            return_value=visible,
+        )
+        retrieve = mocker.patch(
+            "paperless_ai.taxonomy.retrieve_similar_nodes",
+            return_value=[],
+        )
+        document = SimpleNamespace()
+        user = mocker.MagicMock()
+
+        get_taxonomy_hints_for_document(document, user=user)
+
+        retrieve.assert_called_once_with(
+            document=document,
+            document_ids=[1, 2, 3],
+        )
+
+    def test_returns_populated_hints_when_nodes_found(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        mocker.patch(
+            "paperless_ai.taxonomy.AIConfig",
+            return_value=SimpleNamespace(llm_embedding_backend="huggingface"),
+        )
+        mocker.patch(
+            "paperless_ai.taxonomy.retrieve_similar_nodes",
+            return_value=[make_node(tags=["Taxes"], document_type="Invoice")],
+        )
+
+        result = get_taxonomy_hints_for_document(SimpleNamespace(), user=None)
+
+        assert result == {
+            "tags": ["Taxes"],
+            "document_types": ["Invoice"],
+            "correspondents": [],
+            "storage_paths": [],
+        }
+
+    def test_returns_empty_hints_not_none_when_no_nodes(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        mocker.patch(
+            "paperless_ai.taxonomy.AIConfig",
+            return_value=SimpleNamespace(llm_embedding_backend="huggingface"),
+        )
+        mocker.patch(
+            "paperless_ai.taxonomy.retrieve_similar_nodes",
+            return_value=[],
+        )
+
+        result = get_taxonomy_hints_for_document(SimpleNamespace(), user=None)
+
+        assert result == {
+            "tags": [],
+            "document_types": [],
+            "correspondents": [],
+            "storage_paths": [],
+        }

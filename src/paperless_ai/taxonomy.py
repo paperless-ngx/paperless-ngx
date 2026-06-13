@@ -1,11 +1,15 @@
-import logging
 from typing import TYPE_CHECKING
 from typing import TypedDict
 
+from django.contrib.auth.models import User
+
+from documents.models import Document
+from documents.permissions import get_objects_for_user_owner_aware
+from paperless.config import AIConfig
+from paperless_ai.indexing import retrieve_similar_nodes
+
 if TYPE_CHECKING:
     from llama_index.core.schema import NodeWithScore
-
-logger = logging.getLogger("paperless_ai.taxonomy")
 
 
 class TaxonomyHints(TypedDict):
@@ -87,3 +91,40 @@ def format_hints_for_prompt(hints: TaxonomyHints) -> str:
         return ""
 
     return "\n\n".join([*blocks, _HINT_INSTRUCTION])
+
+
+def get_taxonomy_hints_for_document(
+    document: Document,
+    user: User | None,
+) -> TaxonomyHints | None:
+    """Build taxonomy hints from a document's RAG neighbours.
+
+    Returns ``None`` when no embedding backend is configured (the gate) so the
+    caller's prompt and matching are identical to today. Otherwise returns a
+    ``TaxonomyHints`` -- possibly all-empty when no similar documents exist.
+    Applies the same owner-aware visible-document filter as
+    ``get_context_for_document``.
+    """
+    if not AIConfig().llm_embedding_backend:
+        return None
+
+    visible_documents = (
+        get_objects_for_user_owner_aware(
+            user,
+            "view_document",
+            Document,
+        )
+        if user
+        else None
+    )
+    visible_document_ids = (
+        list(visible_documents.values_list("pk", flat=True))
+        if visible_documents is not None
+        else None
+    )
+
+    nodes = retrieve_similar_nodes(
+        document=document,
+        document_ids=visible_document_ids,
+    )
+    return build_taxonomy_hints_from_nodes(nodes)
