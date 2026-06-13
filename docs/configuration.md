@@ -1018,19 +1018,21 @@ still perform some basic text pre-processing before matching.
 
 #### [`PAPERLESS_DATE_PARSER_LANGUAGES=<lang>`](#PAPERLESS_DATE_PARSER_LANGUAGES) {#PAPERLESS_DATE_PARSER_LANGUAGES}
 
-Specifies which language Paperless should use when parsing dates from documents.
+: Specifies which language Paperless should use when parsing dates from documents.
 
-    This should be a language code supported by the dateparser library,
-    for example: "en", or a combination such as "en+de".
-    Locales are also supported (e.g., "en-AU").
-    Multiple languages can be combined using "+", for example: "en+de" or "en-AU+de".
-    For valid values, refer to the list of supported languages and locales in the [dateparser documentation](https://dateparser.readthedocs.io/en/latest/supported_locales.html).
+: This should be a language code supported by the dateparser library,
+for example: "en", or a combination such as "en+de".
+Locales are also supported (e.g., "en-AU").
+Multiple languages can be combined using "+", for example: "en+de" or "en-AU+de".
+For valid values, refer to the list of supported languages and locales in the [dateparser documentation](https://dateparser.readthedocs.io/en/latest/supported_locales.html).
 
-    Set this to match the languages in which most of your documents are written.
+: Set this to match the languages in which most of your documents are written.
+
     If not set, Paperless will attempt to infer the language(s) from the OCR configuration (`PAPERLESS_OCR_LANGUAGE`).
 
-!!! note
-This format differs from the `PAPERLESS_OCR_LANGUAGE` setting, which uses ISO 639-2 codes (3 letters, e.g., "eng+deu" for Tesseract OCR).
+    !!! note
+
+        This format differs from the `PAPERLESS_OCR_LANGUAGE` setting, which uses ISO 639-2 codes (3 letters, e.g., "eng+deu" for Tesseract OCR).
 
 #### [`PAPERLESS_EMAIL_TASK_CRON=<cron expression>`](#PAPERLESS_EMAIL_TASK_CRON) {#PAPERLESS_EMAIL_TASK_CRON}
 
