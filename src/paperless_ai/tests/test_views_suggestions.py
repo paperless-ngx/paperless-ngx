@@ -6,18 +6,14 @@ from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 
 from documents.models import Document
+from documents.tests.factories import DocumentFactory
 
 
 @pytest.mark.django_db
 class TestSuggestionsHintWiring:
     @pytest.fixture
     def document(self) -> Document:
-        return Document.objects.create(
-            title="Doc",
-            content="content",
-            checksum="abc123",
-            mime_type="application/pdf",
-        )
+        return DocumentFactory()  # type: ignore[return-value]
 
     @pytest.fixture
     def api_client(self, admin_user: User) -> APIClient:

@@ -2,6 +2,7 @@ from types import SimpleNamespace
 
 import pytest_mock
 
+from documents.tests.factories import DocumentFactory
 from paperless_ai.taxonomy import TaxonomyHints
 from paperless_ai.taxonomy import build_taxonomy_hints_from_nodes
 from paperless_ai.taxonomy import format_hints_for_prompt
@@ -143,7 +144,7 @@ class TestGetTaxonomyHintsForDocument:
         )
         retrieve = mocker.patch("paperless_ai.taxonomy.retrieve_similar_nodes")
 
-        result = get_taxonomy_hints_for_document(SimpleNamespace(), user=None)
+        result = get_taxonomy_hints_for_document(DocumentFactory.build(), user=None)
 
         assert result is None
         retrieve.assert_not_called()
@@ -166,7 +167,7 @@ class TestGetTaxonomyHintsForDocument:
             "paperless_ai.taxonomy.retrieve_similar_nodes",
             return_value=[],
         )
-        document = SimpleNamespace()
+        document = DocumentFactory.build()
         user = mocker.MagicMock()
 
         get_taxonomy_hints_for_document(document, user=user)
@@ -189,7 +190,7 @@ class TestGetTaxonomyHintsForDocument:
             return_value=[make_node(tags=["Taxes"], document_type="Invoice")],
         )
 
-        result = get_taxonomy_hints_for_document(SimpleNamespace(), user=None)
+        result = get_taxonomy_hints_for_document(DocumentFactory.build(), user=None)
 
         assert result == {
             "tags": ["Taxes"],
@@ -211,7 +212,7 @@ class TestGetTaxonomyHintsForDocument:
             return_value=[],
         )
 
-        result = get_taxonomy_hints_for_document(SimpleNamespace(), user=None)
+        result = get_taxonomy_hints_for_document(DocumentFactory.build(), user=None)
 
         assert result == {
             "tags": [],

@@ -1,5 +1,4 @@
 import difflib
-from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
@@ -10,6 +9,7 @@ from documents.models import Correspondent
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.tests.factories import TagFactory
 from paperless_ai.matching import extract_unmatched_names
 from paperless_ai.matching import match_correspondents_by_name
 from paperless_ai.matching import match_document_types_by_name
@@ -97,7 +97,7 @@ class TestHintedMatching:
     ) -> None:
         mocker.patch(
             "paperless_ai.matching.get_objects_for_user_owner_aware",
-            return_value=[SimpleNamespace(name="Bloodwork")],
+            return_value=[TagFactory.build(name="Bloodwork")],
         )
         spy = mocker.spy(difflib, "get_close_matches")
 
@@ -116,7 +116,7 @@ class TestHintedMatching:
     ) -> None:
         mocker.patch(
             "paperless_ai.matching.get_objects_for_user_owner_aware",
-            return_value=[SimpleNamespace(name="Bloodwork")],
+            return_value=[TagFactory.build(name="Bloodwork")],
         )
 
         # "Bloodwrok" is a typo not in hints -> fuzzy still maps it to Bloodwork.
@@ -134,7 +134,7 @@ class TestHintedMatching:
     ) -> None:
         mocker.patch(
             "paperless_ai.matching.get_objects_for_user_owner_aware",
-            return_value=[SimpleNamespace(name="Bloodwork")],
+            return_value=[TagFactory.build(name="Bloodwork")],
         )
         spy = mocker.spy(difflib, "get_close_matches")
 
@@ -154,7 +154,7 @@ class TestHintedMatching:
         # A hint with no exact object must not fall through to fuzzy.
         mocker.patch(
             "paperless_ai.matching.get_objects_for_user_owner_aware",
-            return_value=[SimpleNamespace(name="Bloodwork")],
+            return_value=[TagFactory.build(name="Bloodwork")],
         )
 
         result = match_tags_by_name(
@@ -171,7 +171,7 @@ class TestHintedMatching:
     ) -> None:
         mocker.patch(
             "paperless_ai.matching.get_objects_for_user_owner_aware",
-            return_value=[SimpleNamespace(name="Test Tag 1")],
+            return_value=[TagFactory.build(name="Test Tag 1")],
         )
 
         result = match_tags_by_name(["Test Tag 1", "Nonexistent"], user=None)
