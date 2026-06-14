@@ -151,3 +151,18 @@ class TestCommaResolution:
     def test_url_comma_is_literal_passthrough(self):
         toks = resolve_commas(scan("http://example.com/a,b"))
         assert toks == [Passthrough("http://example.com/a,b")]
+
+    def test_non_multi_value_comma_is_literal(self):
+        # title is not in MULTI_VALUE_FIELDS: comma stays inside the value.
+        toks = resolve_commas(scan("title:10,20"))
+        assert toks == [FieldValue("title", "10,20")]
+
+    def test_clause_separator_before_known_date_field(self):
+        # The comma between a bare value and a known date field acts as a
+        # clause separator; both sides survive as distinct tokens.
+        toks = resolve_commas(scan("correspondent:foo,created:[2020 TO 2021]"))
+        assert toks == [
+            FieldValue("correspondent", "foo"),
+            Comma(),
+            FieldRange("created", "[", "2020", "2021", "]"),
+        ]

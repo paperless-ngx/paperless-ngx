@@ -149,26 +149,16 @@ def scan(query: str) -> list[Token]:
                     while k < n and query[k] == ",":
                         nxt = k + 1
                         if _looks_like_known_field(query, nxt):
-                            # Clause separator: emit Comma() after this token.
+                            # Clause separator: stop here; _maybe_comma will emit Comma().
                             break
-                        # Not a clause separator: consume more.
-                        if field in MULTI_VALUE_FIELDS and (
-                            nxt >= n or query[nxt] not in "[{ \t),"
-                        ):
-                            # Multi-value field: accumulate as comma-joined value
-                            # (resolve_commas will split into FieldValueList).
-                            more = _consume_value(query, nxt)
-                            if more is None:
-                                break
-                            value = f"{value},{more[0]}"
-                            k = more[1]
-                        else:
-                            # Non-multi-value field: comma is literal, keep consuming.
-                            more = _consume_value(query, nxt)
-                            if more is None:
-                                break
-                            value = f"{value},{more[0]}"
-                            k = more[1]
+                        # Not a clause separator: accumulate comma-joined value.
+                        # resolve_commas will later split multi-value fields into
+                        # FieldValueList; for other fields the comma stays literal.
+                        more = _consume_value(query, nxt)
+                        if more is None:
+                            break
+                        value = f"{value},{more[0]}"
+                        k = more[1]
                     flush()
                     tokens.append(FieldValue(field, value))
                     i = k
