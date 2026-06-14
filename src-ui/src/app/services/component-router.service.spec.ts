@@ -99,4 +99,21 @@ describe('ComponentRouterService', () => {
 
     expect(service.getComponentURLBefore()).toBeNull()
   })
+
+  it('should preserve slash-separated URLs for multi-segment routes', () => {
+    eventsSubject.next(
+      new ActivationStart({
+        url: [{ path: 'folders' }, { path: '123' }],
+        data: { componentName: 'FoldersComponent' },
+      } as any)
+    )
+    eventsSubject.next(
+      new ActivationStart({
+        url: [{ path: 'documents' }, { path: '5' }, { path: 'details' }],
+        data: { componentName: 'DocumentDetailComponent' },
+      } as any)
+    )
+
+    expect(service.getComponentURLBefore()).toBe('folders/123')
+  })
 })

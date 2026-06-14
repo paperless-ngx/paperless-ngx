@@ -45,6 +45,7 @@ describe('FoldersComponent', () => {
   let documentService: DocumentService
   let toastService: ToastService
   let modalService: NgbModal
+  let permissionsService: PermissionsService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -76,6 +77,7 @@ describe('FoldersComponent', () => {
     documentService = TestBed.inject(DocumentService)
     toastService = TestBed.inject(ToastService)
     modalService = TestBed.inject(NgbModal)
+    permissionsService = TestBed.inject(PermissionsService)
 
     jest
       .spyOn(folderService, 'getTree')
@@ -92,8 +94,17 @@ describe('FoldersComponent', () => {
   it('should load and flatten the folder tree', () => {
     expect(component.roots.length).toEqual(2)
     expect(component.flatFolders.length).toEqual(3)
+    expect(component.visibleFlatFolders.length).toEqual(3)
     expect(component.foldersById.get(2)?.name).toEqual('Taxes')
     expect(component.foldersById.get(2)?.depth).toEqual(1)
+  })
+
+  it('should collapse and expand folder branches', () => {
+    const inbox = component.foldersById.get(1)!
+    component.toggleFolderCollapsed(inbox)
+    expect(component.visibleFlatFolders.map((f) => f.id)).toEqual([1, 3])
+    component.toggleFolderCollapsed(inbox)
+    expect(component.visibleFlatFolders.map((f) => f.id)).toEqual([1, 2, 3])
   })
 
   it('should show root folders when no folder is selected', () => {
@@ -146,6 +157,17 @@ describe('FoldersComponent', () => {
     expect(modalSpy).toHaveBeenCalled()
   })
 
+  it('should open a move dialog for folders', () => {
+    const modalSpy = jest.spyOn(modalService, 'open').mockReturnValue({
+      componentInstance: { succeeded: of(null) },
+    } as any)
+    component.moveFolder(component.foldersById.get(3)!)
+    expect(modalSpy).toHaveBeenCalled()
+    expect(
+      (modalSpy.mock.results[0].value as any).componentInstance.folders
+    ).toEqual(component.roots)
+  })
+
   it('should delete a folder', () => {
     const delSpy = jest
       .spyOn(folderService, 'delete')
@@ -159,5 +181,10 @@ describe('FoldersComponent', () => {
   it('should not allow deleting the default folder', () => {
     expect(component.canDeleteFolder(component.foldersById.get(1))).toBeFalsy()
     expect(component.canDeleteFolder(component.foldersById.get(3))).toBeTruthy()
+  })
+
+  it('should require global delete permission to delete folders', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(false)
+    expect(component.canDeleteFolder(component.foldersById.get(3))).toBeFalsy()
   })
 })

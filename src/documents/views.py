@@ -1010,6 +1010,13 @@ class DocumentViewSet(
                 distinct=True,
             ),
         )
+        folders = Folder.objects.annotate(
+            document_count=Count(
+                "documents",
+                filter=Q(documents__in=queryset),
+                distinct=True,
+            ),
+        )
         custom_fields = CustomField.objects.annotate(
             document_count=Count(
                 "fields__document",
@@ -1030,6 +1037,9 @@ class DocumentViewSet(
             ],
             "selected_storage_paths": [
                 {"id": t.id, "document_count": t.document_count} for t in storage_paths
+            ],
+            "selected_folders": [
+                {"id": t.id, "document_count": t.document_count} for t in folders
             ],
             "selected_custom_fields": [
                 {"id": t.id, "document_count": t.document_count} for t in custom_fields
@@ -3231,6 +3241,15 @@ class PostDocumentView(GenericAPIView[Any]):
                             },
                         ),
                     ),
+                    "selected_folders": serializers.ListSerializer(
+                        child=inline_serializer(
+                            name="FolderCounts",
+                            fields={
+                                "id": serializers.IntegerField(),
+                                "document_count": serializers.IntegerField(),
+                            },
+                        ),
+                    ),
                     "selected_custom_fields": serializers.ListSerializer(
                         child=inline_serializer(
                             name="CustomFieldCounts",
@@ -3287,6 +3306,12 @@ class SelectionDataView(GenericAPIView[Any]):
             ),
         )
 
+        folders = Folder.objects.annotate(
+            document_count=Count(
+                Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
+            ),
+        )
+
         custom_fields = CustomField.objects.annotate(
             document_count=Count(
                 Case(
@@ -3314,6 +3339,9 @@ class SelectionDataView(GenericAPIView[Any]):
                 "selected_storage_paths": [
                     {"id": t.id, "document_count": t.document_count}
                     for t in storage_paths
+                ],
+                "selected_folders": [
+                    {"id": t.id, "document_count": t.document_count} for t in folders
                 ],
                 "selected_custom_fields": [
                     {"id": t.id, "document_count": t.document_count}

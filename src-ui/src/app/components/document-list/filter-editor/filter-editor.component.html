@@ -3,91 +3,361 @@
     <div class="form-inline d-flex align-items-center fade" [class.show]="show">
       <div class="input-group input-group-sm flex-fill w-auto flex-nowrap">
         <div ngbDropdown>
-          <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>{{textFilterTargetName}}</button>
+          <button class="btn btn-sm btn-outline-primary" ngbDropdownToggle>
+            {{ textFilterTargetName }}
+          </button>
           <div class="dropdown-menu shadow" ngbDropdownMenu>
             @for (t of textFilterTargets; track t) {
-              <button ngbDropdownItem [class.active]="textFilterTarget === t.id" (click)="changeTextFilterTarget(t.id)">{{t.name}}</button>
+              <button
+                ngbDropdownItem
+                [class.active]="textFilterTarget === t.id"
+                (click)="changeTextFilterTarget(t.id)"
+              >
+                {{ t.name }}
+              </button>
             }
           </div>
         </div>
         @if (textFilterTarget === 'asn') {
-          <select class="form-select flex-grow-0 w-auto" [(ngModel)]="textFilterModifier" (change)="textFilterModifierChange()">
+          <select
+            class="form-select flex-grow-0 w-auto"
+            [(ngModel)]="textFilterModifier"
+            (change)="textFilterModifierChange()"
+          >
             @for (m of textFilterModifiers; track m) {
-              <option ngbDropdownItem [value]="m.id">{{m.label}}</option>
+              <option ngbDropdownItem [value]="m.id">{{ m.label }}</option>
             }
           </select>
         }
         @if (_textFilter) {
-          <button class="btn btn-link btn-sm px-2 position-absolute top-0 end-0 z-10" (click)="resetTextField()">
+          <button
+            class="btn btn-link btn-sm px-2 position-absolute top-0 end-0 z-10"
+            (click)="resetTextField()"
+          >
             <i-bs width="1em" height="1em" name="x"></i-bs>
           </button>
         }
-        <input #textFilterInput class="form-control form-control-sm" type="text"
-        [disabled]="textFilterModifierIsNull"
-        [(ngModel)]="textFilter"
-        (keyup)="textFilterKeyup($event)"
-        [ngbTypeahead]="searchAutoComplete"
-        (selectItem)="itemSelected($event)"
-        [readonly]="textFilterTarget === 'fulltext-morelike'">
+        <input
+          #textFilterInput
+          class="form-control form-control-sm"
+          type="text"
+          [disabled]="textFilterModifierIsNull"
+          [(ngModel)]="textFilter"
+          (keyup)="textFilterKeyup($event)"
+          [ngbTypeahead]="searchAutoComplete"
+          (selectItem)="itemSelected($event)"
+          [readonly]="textFilterTarget === 'fulltext-morelike'"
+        />
       </div>
     </div>
   </div>
   <div class="col-auto">
     <div class="d-flex flex-wrap gap-3">
       <div class="d-flex flex-wrap gap-2">
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Tag) && tagSelectionModel.items.length > 0) {
-          <pngx-filterable-dropdown class="flex-fill fade" [class.show]="show" title="Tags" icon="tag-fill" i18n-title
-          filterPlaceholder="Filter tags" i18n-filterPlaceholder
-          [(selectionModel)]="tagSelectionModel"
-          (selectionModelChange)="updateRules()"
-          (opened)="onTagsDropdownOpen()"
-          [documentCounts]="tagDocumentCounts"
-          [allowSelectNone]="true"
-          [disabled]="disabled"
-          shortcutKey="t"></pngx-filterable-dropdown>
+        @if (
+          permissionsService.currentUserCan(
+            PermissionAction.View,
+            PermissionType.Tag
+          ) && tagSelectionModel.items.length > 0
+        ) {
+          <pngx-filterable-dropdown
+            class="flex-fill fade"
+            [class.show]="show"
+            title="Tags"
+            icon="tag-fill"
+            i18n-title
+            filterPlaceholder="Filter tags"
+            i18n-filterPlaceholder
+            [(selectionModel)]="tagSelectionModel"
+            (selectionModelChange)="updateRules()"
+            (opened)="onTagsDropdownOpen()"
+            [documentCounts]="tagDocumentCounts"
+            [allowSelectNone]="true"
+            [disabled]="disabled"
+            shortcutKey="t"
+          ></pngx-filterable-dropdown>
         }
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.Correspondent) && correspondentSelectionModel.items.length > 0) {
-          <pngx-filterable-dropdown class="flex-fill fade" [class.show]="show" title="Correspondent" icon="person-fill" i18n-title
-          filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
-          [(selectionModel)]="correspondentSelectionModel"
-          (selectionModelChange)="updateRules()"
-          (opened)="onCorrespondentDropdownOpen()"
-          [documentCounts]="correspondentDocumentCounts"
-          [allowSelectNone]="true"
-          [disabled]="disabled"
-          shortcutKey="y"></pngx-filterable-dropdown>
+        @if (
+          permissionsService.currentUserCan(
+            PermissionAction.View,
+            PermissionType.Correspondent
+          ) && correspondentSelectionModel.items.length > 0
+        ) {
+          <pngx-filterable-dropdown
+            class="flex-fill fade"
+            [class.show]="show"
+            title="Correspondent"
+            icon="person-fill"
+            i18n-title
+            filterPlaceholder="Filter correspondents"
+            i18n-filterPlaceholder
+            [(selectionModel)]="correspondentSelectionModel"
+            (selectionModelChange)="updateRules()"
+            (opened)="onCorrespondentDropdownOpen()"
+            [documentCounts]="correspondentDocumentCounts"
+            [allowSelectNone]="true"
+            [disabled]="disabled"
+            shortcutKey="y"
+          ></pngx-filterable-dropdown>
         }
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.DocumentType) && documentTypeSelectionModel.items.length > 0) {
-            <pngx-filterable-dropdown class="flex-fill fade" [class.show]="show" title="Document type" icon="file-earmark-fill" i18n-title
-            filterPlaceholder="Filter document types" i18n-filterPlaceholder
+        @if (
+          permissionsService.currentUserCan(
+            PermissionAction.View,
+            PermissionType.DocumentType
+          ) && documentTypeSelectionModel.items.length > 0
+        ) {
+          <pngx-filterable-dropdown
+            class="flex-fill fade"
+            [class.show]="show"
+            title="Document type"
+            icon="file-earmark-fill"
+            i18n-title
+            filterPlaceholder="Filter document types"
+            i18n-filterPlaceholder
             [(selectionModel)]="documentTypeSelectionModel"
             (selectionModelChange)="updateRules()"
             (opened)="onDocumentTypeDropdownOpen()"
             [documentCounts]="documentTypeDocumentCounts"
             [allowSelectNone]="true"
             [disabled]="disabled"
-            shortcutKey="u"></pngx-filterable-dropdown>
+            shortcutKey="u"
+          ></pngx-filterable-dropdown>
         }
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.StoragePath) && storagePathSelectionModel.items.length > 0) {
-          <pngx-filterable-dropdown class="flex-fill fade" [class.show]="show" title="Storage path" icon="folder-fill" i18n-title
-          filterPlaceholder="Filter storage paths" i18n-filterPlaceholder
-          [(selectionModel)]="storagePathSelectionModel"
-          (selectionModelChange)="updateRules()"
-          (opened)="onStoragePathDropdownOpen()"
-          [documentCounts]="storagePathDocumentCounts"
-          [allowSelectNone]="true"
-          [disabled]="disabled"
-          shortcutKey="i"></pngx-filterable-dropdown>
+        @if (
+          permissionsService.currentUserCan(
+            PermissionAction.View,
+            PermissionType.StoragePath
+          ) && storagePathSelectionModel.items.length > 0
+        ) {
+          <pngx-filterable-dropdown
+            class="flex-fill fade"
+            [class.show]="show"
+            title="Storage path"
+            icon="folder-fill"
+            i18n-title
+            filterPlaceholder="Filter storage paths"
+            i18n-filterPlaceholder
+            [(selectionModel)]="storagePathSelectionModel"
+            (selectionModelChange)="updateRules()"
+            (opened)="onStoragePathDropdownOpen()"
+            [documentCounts]="storagePathDocumentCounts"
+            [allowSelectNone]="true"
+            [disabled]="disabled"
+            shortcutKey="i"
+          ></pngx-filterable-dropdown>
+        }
+        @if (
+          permissionsService.currentUserCan(
+            PermissionAction.View,
+            PermissionType.Folder
+          ) && folderSelectionModel.items.length > 0
+        ) {
+          <div
+            class="btn-group folder-filter-dropdown flex-fill fade"
+            [class.show]="show"
+            ngbDropdown
+            role="group"
+            (openChange)="$event && onFoldersDropdownOpen()"
+          >
+            <button
+              class="btn btn-sm"
+              ngbDropdownToggle
+              [ngClass]="
+                folderSelectionModel.selectionSize() > 0
+                  ? 'btn-primary'
+                  : 'btn-outline-primary'
+              "
+              [disabled]="disabled"
+            >
+              <i-bs name="folder2-open"></i-bs>
+              <div class="d-none d-sm-inline ms-1" i18n>Folders</div>
+              @if (folderSelectionModel.totalCount > 0) {
+                <pngx-clearable-badge
+                  [number]="folderSelectionModel.totalCount"
+                  [selected]="folderSelectionModel.selectionSize() > 0"
+                  (cleared)="folderSelectionModel.clear(); updateRules()"
+                ></pngx-clearable-badge>
+              }
+            </button>
+            <div class="dropdown-menu py-0 shadow" ngbDropdownMenu>
+              <div class="list-group list-group-flush">
+                <div class="list-group-item d-flex">
+                  <div class="btn-group btn-group-xs flex-fill" role="group">
+                    <input
+                      [(ngModel)]="folderSelectionModel.intersection"
+                      (ngModelChange)="
+                        folderSelectionModel.toggleIntersection(); updateRules()
+                      "
+                      type="radio"
+                      class="btn-check"
+                      id="folderFilterInclude"
+                      name="folderFilterIntersection"
+                      value="include"
+                    />
+                    <label
+                      class="btn btn-outline-primary"
+                      for="folderFilterInclude"
+                      i18n
+                      >Include</label
+                    >
+                    <input
+                      [(ngModel)]="folderSelectionModel.intersection"
+                      (ngModelChange)="
+                        folderSelectionModel.toggleIntersection(); updateRules()
+                      "
+                      type="radio"
+                      class="btn-check"
+                      id="folderFilterExclude"
+                      name="folderFilterIntersection"
+                      value="exclude"
+                    />
+                    <label
+                      class="btn btn-outline-primary"
+                      for="folderFilterExclude"
+                      i18n
+                      >Exclude</label
+                    >
+                  </div>
+                </div>
+                <div class="list-group-item">
+                  <div class="input-group input-group-sm">
+                    <input
+                      class="form-control"
+                      type="text"
+                      spellcheck="false"
+                      [(ngModel)]="folderFilterText"
+                      placeholder="Search folders"
+                      i18n-placeholder
+                    />
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      [disabled]="!folderFilterText"
+                      (click)="folderFilterText = ''"
+                      title="Clear search"
+                      i18n-title
+                    >
+                      <i-bs name="x"></i-bs>
+                    </button>
+                  </div>
+                  <div class="d-flex justify-content-between mt-2">
+                    <button
+                      type="button"
+                      class="btn btn-link btn-sm p-0"
+                      (click)="expandAllFolderFilterBranches()"
+                      [disabled]="!!folderFilterText"
+                      i18n
+                    >
+                      Expand all
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-link btn-sm p-0"
+                      (click)="collapseAllFolderFilterBranches()"
+                      [disabled]="!!folderFilterText"
+                      i18n
+                    >
+                      Collapse all
+                    </button>
+                  </div>
+                </div>
+                <div class="folder-filter-items">
+                  @for (folder of visibleFolderFilterItems; track folder.id) {
+                    <button
+                      type="button"
+                      class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom folder-filter-item"
+                      [class.opacity-50]="
+                        getFolderFilterDocumentCount(folder) === 0
+                      "
+                      [style.--depth]="(folder.depth ?? 0) + 1"
+                      (click)="toggleFolderFilterSelection(folder)"
+                      [disabled]="disabled"
+                    >
+                      <span
+                        class="folder-filter-expander me-1"
+                        [class.invisible]="!folderHasChildren(folder)"
+                        (click)="
+                          $event.stopPropagation();
+                          toggleFolderFilterBranch(folder)
+                        "
+                      >
+                        <i-bs
+                          [name]="
+                            folderIsCollapsed(folder)
+                              ? 'chevron-right'
+                              : 'chevron-down'
+                          "
+                        ></i-bs>
+                      </span>
+                      <span class="selected-icon me-1">
+                        @if (
+                          folderSelectionModel.get(folder.id) ===
+                          ToggleableItemState.Selected
+                        ) {
+                          <i-bs width="1em" height="1em" name="check"></i-bs>
+                        }
+                        @if (
+                          folderSelectionModel.get(folder.id) ===
+                          ToggleableItemState.Excluded
+                        ) {
+                          <i-bs width="1em" height="1em" name="x"></i-bs>
+                        }
+                      </span>
+                      <span class="folder-filter-name flex-grow-1 text-start">
+                        <i-bs
+                          [name]="folder.is_default ? 'inbox' : 'folder'"
+                          class="me-1"
+                        ></i-bs>
+                        <span>{{ folder.name }}</span>
+                        @if (folderFilterText && folder.full_path) {
+                          <small class="text-muted ms-1">{{
+                            folder.full_path
+                          }}</small>
+                        }
+                      </span>
+                      <span
+                        class="badge bg-light text-dark rounded-pill ms-auto"
+                      >
+                        {{ getFolderFilterDocumentCount(folder) }}
+                      </span>
+                    </button>
+                  } @empty {
+                    <div class="list-group-item text-muted small" i18n>
+                      No folders match your search.
+                    </div>
+                  }
+                </div>
+                <div class="list-group-item list-group-item-note pt-1 pb-2">
+                  <small i18n
+                    >Expand branches or search by folder name/path.</small
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
         }
 
-        @if (permissionsService.currentUserCan(PermissionAction.View, PermissionType.CustomField) && customFields.length > 0) {
-          <pngx-custom-fields-query-dropdown class="flex-fill fade" [class.show]="show" title="Custom fields" icon="ui-radios" i18n-title
-          [(selectionModel)]="customFieldQueriesModel"
-          (selectionModelChange)="updateRules()"
+        @if (
+          permissionsService.currentUserCan(
+            PermissionAction.View,
+            PermissionType.CustomField
+          ) && customFields.length > 0
+        ) {
+          <pngx-custom-fields-query-dropdown
+            class="flex-fill fade"
+            [class.show]="show"
+            title="Custom fields"
+            icon="ui-radios"
+            i18n-title
+            [(selectionModel)]="customFieldQueriesModel"
+            (selectionModelChange)="updateRules()"
           ></pngx-custom-fields-query-dropdown>
         }
-        <pngx-dates-dropdown class="flex-fill fade" [class.show]="show"
-          title="Dates" i18n-title
+        <pngx-dates-dropdown
+          class="flex-fill fade"
+          [class.show]="show"
+          title="Dates"
+          i18n-title
           placement="bottom-end"
           (datesSet)="updateRules()"
           [(createdDateTo)]="dateCreatedTo"
@@ -95,18 +365,28 @@
           [(createdRelativeDate)]="dateCreatedRelativeDate"
           [(addedDateTo)]="dateAddedTo"
           [(addedDateFrom)]="dateAddedFrom"
-          [(addedRelativeDate)]="dateAddedRelativeDate">
+          [(addedRelativeDate)]="dateAddedRelativeDate"
+        >
         </pngx-dates-dropdown>
-        <pngx-permissions-filter-dropdown class="flex-fill fade" [class.show]="show"
-          title="Permissions" i18n-title
+        <pngx-permissions-filter-dropdown
+          class="flex-fill fade"
+          [class.show]="show"
+          title="Permissions"
+          i18n-title
           (ownerFilterSet)="updateRules()"
-        [(selectionModel)]="permissionsSelectionModel"></pngx-permissions-filter-dropdown>
+          [(selectionModel)]="permissionsSelectionModel"
+        ></pngx-permissions-filter-dropdown>
       </div>
       <div class="d-flex flex-wrap d-none d-sm-inline-block">
-        <button class="btn btn-outline-secondary btn-sm" [disabled]="!rulesModified" (click)="resetSelected()">
-          <i-bs class="ms-n1" name="x"></i-bs><ng-container i18n>Reset filters</ng-container>
-          </button>
-        </div>
+        <button
+          class="btn btn-outline-secondary btn-sm"
+          [disabled]="!rulesModified"
+          (click)="resetSelected()"
+        >
+          <i-bs class="ms-n1" name="x"></i-bs
+          ><ng-container i18n>Reset filters</ng-container>
+        </button>
       </div>
     </div>
   </div>
+</div>

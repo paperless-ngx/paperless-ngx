@@ -3,6 +3,7 @@ export enum DataType {
   SavedView = 'saved_view',
   Correspondent = 'correspondent',
   DocumentType = 'document_type',
+  Folder = 'folder',
   StoragePath = 'storage_path',
   Tag = 'tag',
   User = 'user',

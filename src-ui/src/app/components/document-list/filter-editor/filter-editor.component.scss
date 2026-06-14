@@ -18,10 +18,44 @@
   column-gap: 0.7rem;
 }
 
-input[type="text"] {
+input[type='text'] {
   min-width: 120px;
 }
 
 .z-10 {
   z-index: 10;
+}
+
+.folder-filter-dropdown {
+  .dropdown-menu {
+    min-width: min(32rem, 90vw);
+  }
+
+  .folder-filter-items {
+    max-height: 24rem;
+    overflow-y: auto;
+  }
+
+  .folder-filter-item {
+    --depth: 1;
+
+    padding-left: calc(0.5rem + (var(--depth) - 1) * 1.1rem) !important;
+  }
+
+  .folder-filter-expander,
+  .selected-icon {
+    display: inline-flex;
+    width: 1rem;
+    min-width: 1rem;
+  }
+
+  .folder-filter-name {
+    min-width: 0;
+
+    > span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
 }

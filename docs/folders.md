@@ -148,8 +148,24 @@ Sigue los mismos patrones que tags/correspondents:
 ### API — documentos
 
 - `GET /api/documents/?folder__id=<id>` — documentos de una carpeta.
+- `GET /api/documents/?folder__id__in=<ids>` — documentos en cualquiera de varias carpetas (usado por el filtro de Documents).
+- `GET /api/documents/?folder__id__none=<ids>` — excluir documentos de carpetas concretas.
 - `PATCH /api/documents/<id>/` — campo `folder` (nunca queda `null` tras validación).
 - `POST /api/documents/bulk_edit/` — método `set_folder` con parámetro `folder` (id o `null` → Inbox).
+
+### Filtros guardables de Documents
+
+La integración con el editor de filtros de Documents usa tipos de regla nuevos para evitar reutilizar semánticas existentes:
+
+| Rule type | Constante frontend | Query param |
+|-----------|--------------------|-------------|
+| `50` | `FILTER_FOLDER` | `folder__id` / `folder__isnull` |
+| `51` | `FILTER_HAS_FOLDER_ANY` | `folder__id__in` |
+| `52` | `FILTER_DOES_NOT_HAVE_FOLDER` | `folder__id__none` |
+
+Estos IDs están registrados en `SavedViewFilterRule.RULE_TYPES` y en la migración `0023_add_folder_saved_view_filter_rules.py`. Si se cambian, también hay que actualizar saved views, frontend y tests.
+
+`DocumentViewSet._get_selection_data_for_queryset()` y `SelectionDataView` devuelven `selected_folders`, que alimenta los contadores del dropdown de carpetas.
 
 ### Serializer — detalle de mantenimiento
 
@@ -180,6 +196,7 @@ Si en el futuro la carpeta afectara rutas físicas, habría que reevaluar si enc
 | `services/permissions.service.ts` | `PermissionType.Folder` |
 | `components/folders/` | Vista principal del explorador |
 | `components/common/edit-dialog/folder-edit-dialog/` | Crear/editar carpeta |
+| `utils/flatten-folders.ts` | Aplana árboles de carpetas preservando orden jerárquico para dropdowns |
 | `app-routing.module.ts` | Rutas `/folders`, `/folders/:id` |
 | `app-frame.component.html` | Entrada en sidebar |
 | `main.ts` | Iconos Bootstrap (`inbox`, `folderPlus`, etc.) |
@@ -198,10 +215,35 @@ Responsabilidades:
 - Navegar por ruta (`ActivatedRoute` param `id`).
 - Listar documentos paginados (`documentService` con filtro `folder__id`).
 - CRUD de carpetas (modal `FolderEditDialogComponent`).
+- Mover carpetas cambiando `parent` desde el mismo modal, excluyendo self/descendientes en la UI.
+- Colapsar ramas del panel izquierdo con estado local (`collapsedFolders`).
+- Marcar profundidad con gradiente sutil por nivel (`--folder-hue`), manteniendo contraste en `active`.
 - Selección múltiple + mover (`bulk_edit` `set_folder`).
 - Drag & drop HTML5 de documentos sobre carpetas del árbol.
 
 Patrones reutilizados: `LoadingComponentWithPermissions`, `PageHeaderComponent`, `ConfirmButtonComponent`, `*pngxIfPermissions`.
+
+### Filtro de carpetas en Documents
+
+`FilterEditorComponent` carga `FolderService.getTree()`, lo aplana con `flattenFolders()` y presenta un dropdown **Folders** junto a Tags/Correspondent/Storage path.
+
+El dropdown de carpetas es específico, no una instancia de `FilterableDropdownComponent`, para poder soportar jerarquías largas sin afectar Tags/Correspondent/Storage path:
+
+- Por defecto colapsa ramas con hijos, reduciendo scroll inicial.
+- Muestra el nombre corto (`name`) en cada fila y usa `full_path` solo como contexto durante la búsqueda.
+- Permite `Expand all` / `Collapse all`.
+- Al buscar, muestra carpetas coincidentes y sus ancestros.
+- Al abrir, expande ancestros de carpetas ya seleccionadas o excluidas.
+
+Esto mantiene la feature aislada:
+
+- El backend ya filtra por `folder__id`, `folder__id__in` y `folder__id__none`.
+- La UI añade reglas nuevas y helpers locales del filtro; no toca el flujo de tags/storage paths.
+- Los filtros guardados usan IDs propios (`50–52`), sin modificar reglas upstream existentes.
+
+### Cierre de documentos abiertos desde Folders
+
+`DocumentDetailComponent.close()` reutiliza `ComponentRouterService.getComponentURLBefore()`. Para rutas multisegmento como `/folders/123`, `ComponentRouterService` debe serializar `event.snapshot.url` con `/` entre segmentos. No volver a usar `event.snapshot.url.toString()` porque puede producir `folders,123` y acabar en 404 al cerrar.
 
 ## Permisos
 
@@ -246,9 +288,11 @@ Cobertura principal:
 cd src-ui
 ng test --test-path-patterns=folder
 ng test --test-path-patterns=permissions.service
+ng test --test-path-patterns=filter-editor
+ng test --test-path-patterns=component-router
 ```
 
-Archivos: `folders.component.spec.ts`, `folder.service.spec.ts`.
+Archivos principales: `folders.component.spec.ts`, `folder.service.spec.ts`, `filter-editor.component.spec.ts`, `component-router.service.spec.ts`.
 
 ## Invariantes (no romper)
 
@@ -258,6 +302,7 @@ Archivos: `folders.component.spec.ts`, `folder.service.spec.ts`.
 4. **Mover documento no mueve disco** — salvo decisión explícita futura.
 5. **Folder ≠ StoragePath** — no mezclar responsabilidades sin rediseño.
 6. **Unicidad parent-aware** — no reactivar validadores DRF que exijan `parent` obligatorio.
+7. **Rutas de retorno válidas** — serializar rutas multisegmento con `/`, no con comas.
 
 ## Guía para cambios futuros
 
@@ -289,7 +334,7 @@ El listado actual hace una query para el mapa de hijos + serialización recursiv
 
 Puntos de extensión naturales:
 
-- Filtro `folder` en la vista de documentos principal (ya existe en API: `folder__id`).
+- Filtro `folder` en la vista de documentos principal (implementado con reglas `50–52`).
 - Columna o badge de carpeta en tablas de documentos.
 - Workflows: acción `assign_folder` (no implementado).
 
@@ -316,10 +361,13 @@ Puntos de extensión naturales:
 - `src/documents/apps.py`
 - `src/documents/management/commands/document_exporter.py`
 - `src/paperless/urls.py`
+- `src/documents/tests/test_api_documents.py`
+- `src/documents/tests/test_api_bulk_edit.py`
 
 ### Backend (nuevos)
 
 - `src/documents/migrations/0022_folder_document_folder.py`
+- `src/documents/migrations/0023_add_folder_saved_view_filter_rules.py`
 - `src/documents/tests/test_folders.py`
 - `src/documents/tests/test_api_folders.py`
 - `src/documents/tests/test_migration_folders.py`
@@ -328,10 +376,19 @@ Puntos de extensión naturales:
 
 - `src-ui/src/app/app-routing.module.ts`
 - `src-ui/src/app/components/app-frame/app-frame.component.html`
+- `src-ui/src/app/components/document-list/filter-editor/filter-editor.component.ts`
+- `src-ui/src/app/components/document-list/filter-editor/filter-editor.component.html`
+- `src-ui/src/app/components/document-list/filter-editor/filter-editor.component.spec.ts`
 - `src-ui/src/app/data/document.ts`
+- `src-ui/src/app/data/datatype.ts`
+- `src-ui/src/app/data/filter-rule-type.ts`
+- `src-ui/src/app/data/results.ts`
+- `src-ui/src/app/services/component-router.service.ts`
+- `src-ui/src/app/services/component-router.service.spec.ts`
 - `src-ui/src/app/services/permissions.service.ts`
 - `src-ui/src/app/services/permissions.service.spec.ts`
 - `src-ui/src/app/services/rest/document.service.ts`
+- `src-ui/src/app/components/document-list/bulk-editor/bulk-editor.component.spec.ts`
 - `src-ui/src/main.ts`
 
 ### Frontend (nuevos)
@@ -341,6 +398,7 @@ Puntos de extensión naturales:
 - `src-ui/src/app/services/rest/folder.service.spec.ts`
 - `src-ui/src/app/components/folders/` (component + template + styles + spec)
 - `src-ui/src/app/components/common/edit-dialog/folder-edit-dialog/`
+- `src-ui/src/app/utils/flatten-folders.ts`
 
 ## Diagrama de flujo (asignación de carpeta)
 

@@ -6,6 +6,35 @@
     cursor: pointer;
     border-radius: 0;
   }
+
+  .folder-tree-item {
+    --folder-hue: 205;
+
+    border-left: 0.25rem solid hsl(var(--folder-hue), 62%, 45%);
+    background-image: linear-gradient(
+      90deg,
+      hsla(var(--folder-hue), 72%, 48%, 0.16),
+      transparent 72%
+    );
+
+    &.active {
+      background-image: linear-gradient(
+        90deg,
+        hsla(var(--folder-hue), 72%, 35%, 0.28),
+        transparent 80%
+      );
+    }
+  }
+
+  .folder-collapse-toggle {
+    display: inline-flex;
+    width: 1rem;
+    color: var(--bs-secondary-color);
+
+    &:hover {
+      color: var(--bs-body-color);
+    }
+  }
 }
 
 .folder-card {

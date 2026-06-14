@@ -58,6 +58,7 @@ const selectionData: SelectionData = {
     { id: 66, document_count: 3 },
     { id: 55, document_count: 0 },
   ],
+  selected_folders: [],
   selected_custom_fields: [
     { id: 77, document_count: 3 },
     { id: 88, document_count: 0 },

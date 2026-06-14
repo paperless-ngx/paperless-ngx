@@ -15,4 +15,6 @@ export interface Folder extends ObjectWithPermissions {
 
   // UI only, computed during tree flattening
   depth?: number
+
+  orderIndex?: number
 }

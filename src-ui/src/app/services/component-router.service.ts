@@ -17,18 +17,27 @@ export class ComponentRouterService {
     this.router.events
       .pipe(filter((event: Event) => event instanceof ActivationStart))
       .subscribe((event: ActivationStart) => {
+        const url = this.getSnapshotUrl(event)
         if (
           this.componentHistory[this.componentHistory.length - 1] !==
             event.snapshot.data.componentName &&
           !EXCLUDE_COMPONENTS.includes(event.snapshot.data.componentName)
         ) {
-          this.history.push(event.snapshot.url.toString())
+          this.history.push(url)
           this.componentHistory.push(event.snapshot.data.componentName)
         } else {
           // Update the URL of the current component in case the same component was loaded via a different URL
-          this.history[this.history.length - 1] = event.snapshot.url.toString()
+          this.history[this.history.length - 1] = url
         }
       })
+  }
+
+  private getSnapshotUrl(event: ActivationStart): string {
+    const url: unknown = event.snapshot.url
+    if (Array.isArray(url)) {
+      return url.map((segment) => segment.path ?? segment.toString()).join('/')
+    }
+    return url?.toString() ?? ''
   }
 
   public getComponentURLBefore(): any {

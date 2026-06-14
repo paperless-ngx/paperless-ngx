@@ -49,8 +49,10 @@ import {
   FILTER_DOCUMENT_TYPE,
   FILTER_DOES_NOT_HAVE_CORRESPONDENT,
   FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
+  FILTER_DOES_NOT_HAVE_FOLDER,
   FILTER_DOES_NOT_HAVE_STORAGE_PATH,
   FILTER_DOES_NOT_HAVE_TAG,
+  FILTER_FOLDER,
   FILTER_FULLTEXT_MORELIKE,
   FILTER_FULLTEXT_QUERY,
   FILTER_HAS_ANY_TAG,
@@ -58,6 +60,7 @@ import {
   FILTER_HAS_CUSTOM_FIELDS_ALL,
   FILTER_HAS_CUSTOM_FIELDS_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
+  FILTER_HAS_FOLDER_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
   FILTER_HAS_TAGS_ANY,
@@ -74,6 +77,7 @@ import {
   FILTER_TITLE_CONTENT,
   NEGATIVE_NULL_FILTER_VALUE,
 } from 'src/app/data/filter-rule-type'
+import { Folder } from 'src/app/data/folder'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
 import { User } from 'src/app/data/user'
@@ -88,6 +92,7 @@ import { CorrespondentService } from 'src/app/services/rest/correspondent.servic
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { FolderService } from 'src/app/services/rest/folder.service'
 import { SearchService } from 'src/app/services/rest/search.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
@@ -157,6 +162,23 @@ const storage_paths: StoragePath[] = [
   {
     id: 33,
     name: 'StoragePath33',
+  },
+]
+
+const folders: Folder[] = [
+  {
+    id: 52,
+    name: 'Inbox',
+    full_path: 'Inbox',
+    children: [
+      {
+        id: 53,
+        name: 'Taxes',
+        full_path: 'Inbox/Taxes',
+        parent: 52,
+        children: [],
+      },
+    ],
   },
 ]
 
@@ -240,6 +262,12 @@ describe('FilterEditorComponent', () => {
           },
         },
         {
+          provide: FolderService,
+          useValue: {
+            getTree: () => of({ results: folders }),
+          },
+        },
+        {
           provide: CustomFieldsService,
           useValue: {
             listAll: () => of({ results: custom_fields }),
@@ -293,6 +321,9 @@ describe('FilterEditorComponent', () => {
     )
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/storage_paths/`
+    )
+    httpTestingController.expectNone(
+      `${environment.apiBaseUrl}documents/folders/`
     )
   })
 
@@ -954,6 +985,74 @@ describe('FilterEditorComponent', () => {
     ]
   }))
 
+  it('should ingest filter rules for has folder', fakeAsync(() => {
+    expect(component.folderSelectionModel.getSelectedItems()).toHaveLength(0)
+    component.filterRules = [
+      {
+        rule_type: FILTER_FOLDER,
+        value: '52',
+      },
+    ]
+    expect(component.folderSelectionModel.intersection).toEqual(
+      Intersection.Include
+    )
+    expect(component.folderSelectionModel.getSelectedItems()[0].id).toEqual(52)
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_FOLDER,
+        value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+      },
+    ]
+    expect(component.folderSelectionModel.intersection).toEqual(
+      Intersection.Exclude
+    )
+    expect(component.folderSelectionModel.getExcludedItems()).toEqual([
+      { id: NEGATIVE_NULL_FILTER_VALUE, name: 'Not assigned' },
+    ])
+  }))
+
+  it('should ingest filter rules for has any of folders', fakeAsync(() => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_FOLDER_ANY,
+        value: '52',
+      },
+      {
+        rule_type: FILTER_HAS_FOLDER_ANY,
+        value: '53',
+      },
+    ]
+    expect(component.folderSelectionModel.logicalOperator).toEqual(
+      LogicalOperator.Or
+    )
+    expect(component.folderSelectionModel.intersection).toEqual(
+      Intersection.Include
+    )
+    expect(
+      component.folderSelectionModel.getSelectedItems().map((f) => f.id)
+    ).toEqual([52, 53])
+  }))
+
+  it('should ingest filter rules for does not have any of folders', fakeAsync(() => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_DOES_NOT_HAVE_FOLDER,
+        value: '52',
+      },
+      {
+        rule_type: FILTER_DOES_NOT_HAVE_FOLDER,
+        value: '53',
+      },
+    ]
+    expect(component.folderSelectionModel.intersection).toEqual(
+      Intersection.Exclude
+    )
+    expect(
+      component.folderSelectionModel.getExcludedItems().map((f) => f.id)
+    ).toEqual([52, 53])
+  }))
+
   it('should ingest filter rules for custom fields all', fakeAsync(() => {
     expect(component.customFieldQueriesModel.isEmpty()).toBeTruthy()
     component.filterRules = [
@@ -1587,6 +1686,36 @@ describe('FilterEditorComponent', () => {
     ])
   }))
 
+  it('should convert user input to correct filter rules on folder selections', fakeAsync(() => {
+    component.toggleFolderFilterSelection(
+      component.folderSelectionModel.items[1]
+    )
+    fixture.detectChanges()
+
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_HAS_FOLDER_ANY,
+        value: folders[0].id.toString(),
+      },
+    ])
+  }))
+
+  it('should collapse and search folder filter branches', fakeAsync(() => {
+    expect(
+      component.visibleFolderFilterItems.map((folder) => folder.id)
+    ).toEqual([52])
+
+    component.expandAllFolderFilterBranches()
+    expect(
+      component.visibleFolderFilterItems.map((folder) => folder.id)
+    ).toEqual([52, 53])
+
+    component.folderFilterText = 'tax'
+    expect(
+      component.visibleFolderFilterItems.map((folder) => folder.id)
+    ).toEqual([52, 53])
+  }))
+
   it('should convert user input to correct filter rules on custom field selections', fakeAsync(() => {
     const customFieldsQueryDropdown = fixture.debugElement.queryAll(
       By.directive(CustomFieldsQueryDropdownComponent)
@@ -1983,6 +2112,10 @@ describe('FilterEditorComponent', () => {
         { id: 32, document_count: 1 },
         { id: 33, document_count: 0 },
       ],
+      selected_folders: [
+        { id: 52, document_count: 1 },
+        { id: 53, document_count: 0 },
+      ],
       selected_custom_fields: [
         { id: 42, document_count: 1 },
         { id: 43, document_count: 0 },
@@ -2044,6 +2177,22 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.generateFilterName()).toEqual('Without storage path')
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_FOLDER_ANY,
+        value: '52',
+      },
+    ]
+    expect(component.generateFilterName()).toEqual(`Folder: ${folders[0].name}`)
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_FOLDER,
+        value: null,
+      },
+    ]
+    expect(component.generateFilterName()).toEqual('Without folder')
 
     component.filterRules = [
       {

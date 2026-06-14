@@ -53,8 +53,10 @@ import {
   FILTER_DOCUMENT_TYPE,
   FILTER_DOES_NOT_HAVE_CORRESPONDENT,
   FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
+  FILTER_DOES_NOT_HAVE_FOLDER,
   FILTER_DOES_NOT_HAVE_STORAGE_PATH,
   FILTER_DOES_NOT_HAVE_TAG,
+  FILTER_FOLDER,
   FILTER_FULLTEXT_MORELIKE,
   FILTER_FULLTEXT_QUERY,
   FILTER_HAS_ANY_TAG,
@@ -62,6 +64,7 @@ import {
   FILTER_HAS_CUSTOM_FIELDS_ALL,
   FILTER_HAS_CUSTOM_FIELDS_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
+  FILTER_HAS_FOLDER_ANY,
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
   FILTER_HAS_TAGS_ANY,
@@ -88,6 +91,7 @@ import { CorrespondentService } from 'src/app/services/rest/correspondent.servic
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { FolderService } from 'src/app/services/rest/folder.service'
 import { SearchService } from 'src/app/services/rest/search.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
@@ -96,7 +100,9 @@ import {
   CustomFieldQueryExpression,
 } from 'src/app/utils/custom-field-query-element'
 import { filterRulesDiffer } from 'src/app/utils/filter-rules'
+import { flattenFolders } from 'src/app/utils/flatten-folders'
 import { flattenTags } from 'src/app/utils/flatten-tags'
+import { ClearableBadgeComponent } from '../../common/clearable-badge/clearable-badge.component'
 import {
   CustomFieldQueriesModel,
   CustomFieldsQueryDropdownComponent,
@@ -245,6 +251,7 @@ const DEFAULT_TEXT_FILTER_MODIFIER_OPTIONS = [
   imports: [
     FilterableDropdownComponent,
     CustomFieldsQueryDropdownComponent,
+    ClearableBadgeComponent,
     DatesDropdownComponent,
     PermissionsFilterDropdownComponent,
     NgxBootstrapIconsModule,
@@ -263,6 +270,7 @@ export class FilterEditorComponent
   private tagService = inject(TagService)
   private correspondentService = inject(CorrespondentService)
   private documentService = inject(DocumentService)
+  private folderService = inject(FolderService)
   private storagePathService = inject(StoragePathService)
   permissionsService = inject(PermissionsService)
   private customFieldService = inject(CustomFieldsService)
@@ -306,6 +314,17 @@ export class FilterEditorComponent
             }`
           } else {
             return $localize`Without storage path`
+          }
+
+        case FILTER_FOLDER:
+        case FILTER_HAS_FOLDER_ANY:
+          if (rule.value) {
+            return $localize`Folder: ${
+              this.folderSelectionModel.items.find((f) => f.id == +rule.value)
+                ?.name
+            }`
+          } else {
+            return $localize`Without folder`
           }
 
         case FILTER_HAS_TAGS_ALL:
@@ -355,6 +374,7 @@ export class FilterEditorComponent
   correspondentDocumentCounts: SelectionDataItem[]
   documentTypeDocumentCounts: SelectionDataItem[]
   storagePathDocumentCounts: SelectionDataItem[]
+  folderDocumentCounts: SelectionDataItem[]
   customFieldDocumentCounts: SelectionDataItem[]
 
   _textFilter = ''
@@ -397,7 +417,11 @@ export class FilterEditorComponent
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
   storagePathSelectionModel = new FilterableDropdownSelectionModel()
+  folderSelectionModel = new FilterableDropdownSelectionModel()
   customFieldQueriesModel = new CustomFieldQueriesModel()
+  folderFilterText: string = ''
+  collapsedFolderFilterBranches = new Set<number>()
+  private folderFilterCollapseInitialized = false
 
   dateCreatedTo: string
   dateCreatedFrom: string
@@ -407,6 +431,8 @@ export class FilterEditorComponent
   dateAddedRelativeDate: RelativeDate
 
   permissionsSelectionModel = new PermissionsSelectionModel()
+
+  public readonly ToggleableItemState = ToggleableItemState
 
   _unmodifiedFilterRules: FilterRule[] = []
   _filterRules: FilterRule[] = []
@@ -433,6 +459,7 @@ export class FilterEditorComponent
 
     this.documentTypeSelectionModel.clear(false)
     this.storagePathSelectionModel.clear(false)
+    this.folderSelectionModel.clear(false)
     this.tagSelectionModel.clear(false)
     this.correspondentSelectionModel.clear(false)
     this.customFieldQueriesModel.clear(false)
@@ -664,6 +691,36 @@ export class FilterEditorComponent
         case FILTER_DOES_NOT_HAVE_STORAGE_PATH:
           this.storagePathSelectionModel.intersection = Intersection.Exclude
           this.storagePathSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Excluded,
+            false
+          )
+          break
+        case FILTER_FOLDER:
+          this.folderSelectionModel.intersection =
+            rule.value == NEGATIVE_NULL_FILTER_VALUE.toString()
+              ? Intersection.Exclude
+              : Intersection.Include
+          this.folderSelectionModel.set(
+            rule.value ? +rule.value : null,
+            this.folderSelectionModel.intersection == Intersection.Include
+              ? ToggleableItemState.Selected
+              : ToggleableItemState.Excluded,
+            false
+          )
+          break
+        case FILTER_HAS_FOLDER_ANY:
+          this.folderSelectionModel.logicalOperator = LogicalOperator.Or
+          this.folderSelectionModel.intersection = Intersection.Include
+          this.folderSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Selected,
+            false
+          )
+          break
+        case FILTER_DOES_NOT_HAVE_FOLDER:
+          this.folderSelectionModel.intersection = Intersection.Exclude
+          this.folderSelectionModel.set(
             rule.value ? +rule.value : null,
             ToggleableItemState.Excluded,
             false
@@ -976,6 +1033,37 @@ export class FilterEditorComponent
           })
         })
     }
+    if (
+      this.folderSelectionModel.isNoneSelected() &&
+      this.folderSelectionModel.intersection == Intersection.Include
+    ) {
+      filterRules.push({ rule_type: FILTER_FOLDER, value: null })
+    } else {
+      if (
+        this.folderSelectionModel.isNoneSelected() &&
+        this.folderSelectionModel.intersection == Intersection.Exclude
+      ) {
+        filterRules.push({
+          rule_type: FILTER_FOLDER,
+          value: NEGATIVE_NULL_FILTER_VALUE.toString(),
+        })
+      }
+      this.folderSelectionModel.getSelectedItems().forEach((folder) => {
+        filterRules.push({
+          rule_type: FILTER_HAS_FOLDER_ANY,
+          value: folder.id?.toString(),
+        })
+      })
+      this.folderSelectionModel
+        .getExcludedItems()
+        .filter((folder) => folder.id > 0)
+        .forEach((folder) => {
+          filterRules.push({
+            rule_type: FILTER_DOES_NOT_HAVE_FOLDER,
+            value: folder.id?.toString(),
+          })
+        })
+    }
     let queries = this.customFieldQueriesModel.queries.map((query) =>
       query.serialize()
     )
@@ -1131,6 +1219,7 @@ export class FilterEditorComponent
       selectionData?.selected_correspondents ?? null
     this.storagePathDocumentCounts =
       selectionData?.selected_storage_paths ?? null
+    this.folderDocumentCounts = selectionData?.selected_folders ?? null
     this.customFieldDocumentCounts =
       selectionData?.selected_custom_fields ?? null
   }
@@ -1224,6 +1313,19 @@ export class FilterEditorComponent
     if (
       this.permissionsService.currentUserCan(
         PermissionAction.View,
+        PermissionType.Folder
+      )
+    ) {
+      this.loadingCountTotal++
+      this.folderService.getTree().subscribe((result) => {
+        this.folderSelectionModel.items = flattenFolders(result.results)
+        this.initializeFolderFilterCollapse()
+        this.maybeCompleteLoading()
+      })
+    }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
         PermissionType.CustomField
       )
     ) {
@@ -1298,6 +1400,138 @@ export class FilterEditorComponent
 
   onStoragePathDropdownOpen() {
     this.storagePathSelectionModel.apply()
+  }
+
+  onFoldersDropdownOpen() {
+    this.folderSelectionModel.apply()
+    this.expandSelectedFolderFilterAncestors()
+  }
+
+  get visibleFolderFilterItems() {
+    const folders = (this.folderSelectionModel.items ?? []).filter(
+      (folder) => typeof folder?.id === 'number' && folder.id > 0
+    )
+    const query = this.folderFilterText?.trim().toLowerCase()
+
+    if (query) {
+      return folders.filter(
+        (folder) =>
+          this.folderMatchesFilter(folder, query) ||
+          this.folderHasMatchingDescendant(folder, query)
+      )
+    }
+
+    return folders.filter((folder) => !this.folderHasCollapsedAncestor(folder))
+  }
+
+  get hasCollapsedFolderFilterBranches(): boolean {
+    return this.collapsedFolderFilterBranches.size > 0
+  }
+
+  toggleFolderFilterBranch(folder): void {
+    if (!this.folderHasChildren(folder)) return
+
+    if (this.collapsedFolderFilterBranches.has(folder.id)) {
+      this.collapsedFolderFilterBranches.delete(folder.id)
+    } else {
+      this.collapsedFolderFilterBranches.add(folder.id)
+    }
+  }
+
+  collapseAllFolderFilterBranches(): void {
+    this.collapsedFolderFilterBranches = new Set(
+      (this.folderSelectionModel.items ?? [])
+        .filter((folder) => this.folderHasChildren(folder))
+        .map((folder) => folder.id)
+    )
+  }
+
+  expandAllFolderFilterBranches(): void {
+    this.collapsedFolderFilterBranches.clear()
+  }
+
+  folderHasChildren(folder): boolean {
+    return (this.folderSelectionModel.items ?? []).some(
+      (candidate) => (candidate as any).parent === folder.id
+    )
+  }
+
+  folderIsCollapsed(folder): boolean {
+    return this.collapsedFolderFilterBranches.has(folder.id)
+  }
+
+  toggleFolderFilterSelection(folder): void {
+    this.folderSelectionModel.toggle(folder.id, false)
+    this.updateRules()
+  }
+
+  getFolderFilterDocumentCount(folder): number {
+    return (
+      this.folderSelectionModel.getDocumentCount(folder.id) ??
+      folder.document_count ??
+      0
+    )
+  }
+
+  private initializeFolderFilterCollapse(): void {
+    if (this.folderFilterCollapseInitialized) return
+    this.folderFilterCollapseInitialized = true
+    this.collapseAllFolderFilterBranches()
+    this.expandSelectedFolderFilterAncestors()
+  }
+
+  private expandSelectedFolderFilterAncestors(): void {
+    for (const folder of this.folderSelectionModel.getSelectedItems()) {
+      this.expandFolderFilterAncestors(folder)
+    }
+    for (const folder of this.folderSelectionModel.getExcludedItems()) {
+      this.expandFolderFilterAncestors(folder)
+    }
+  }
+
+  private expandFolderFilterAncestors(folder): void {
+    let parentId = (folder as any).parent
+    const seen = new Set<number>()
+    while (parentId && !seen.has(parentId)) {
+      seen.add(parentId)
+      this.collapsedFolderFilterBranches.delete(parentId)
+      parentId = (this.folderSelectionModel.items ?? []).find(
+        (candidate) => candidate.id === parentId
+      )?.['parent']
+    }
+  }
+
+  private folderHasCollapsedAncestor(folder): boolean {
+    let parentId = (folder as any).parent
+    const seen = new Set<number>()
+    while (parentId && !seen.has(parentId)) {
+      seen.add(parentId)
+      if (this.collapsedFolderFilterBranches.has(parentId)) {
+        return true
+      }
+      parentId = (this.folderSelectionModel.items ?? []).find(
+        (candidate) => candidate.id === parentId
+      )?.['parent']
+    }
+    return false
+  }
+
+  private folderMatchesFilter(folder, query: string): boolean {
+    return [folder.name, folder.full_path]
+      .filter(Boolean)
+      .some((value) => value.toLowerCase().includes(query))
+  }
+
+  private folderHasMatchingDescendant(folder, query: string): boolean {
+    const folders = this.folderSelectionModel.items ?? []
+    const descendants = folders.filter(
+      (candidate) => (candidate as any).parent === folder.id
+    )
+    return descendants.some(
+      (descendant) =>
+        this.folderMatchesFilter(descendant, query) ||
+        this.folderHasMatchingDescendant(descendant, query)
+    )
   }
 
   updateTextFilter(text, updateRules = true) {

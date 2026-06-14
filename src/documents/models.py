@@ -762,6 +762,9 @@ class SavedViewFilterRule(models.Model):
         (47, _("mime type is")),
         (48, _("simple title search")),
         (49, _("simple text search")),
+        (50, _("folder is")),
+        (51, _("has folder in")),
+        (52, _("does not have folder in")),
     ]
 
     saved_view = models.ForeignKey(

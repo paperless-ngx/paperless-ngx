@@ -63,8 +63,15 @@ export class FoldersComponent
   public documentsLoading: boolean = false
 
   public selected: Set<number> = new Set()
+  public collapsedFolders: Set<number> = new Set()
 
   private draggedDocIds: number[] = []
+
+  get visibleFlatFolders(): Folder[] {
+    return this.flatFolders.filter(
+      (folder) => !this.hasCollapsedAncestor(folder)
+    )
+  }
 
   ngOnInit(): void {
     this.reloadTree(() => {
@@ -92,6 +99,19 @@ export class FoldersComponent
     }
   }
 
+  private hasCollapsedAncestor(folder: Folder): boolean {
+    let parentId = folder.parent
+    const seen = new Set<number>()
+    while (parentId && !seen.has(parentId)) {
+      seen.add(parentId)
+      if (this.collapsedFolders.has(parentId)) {
+        return true
+      }
+      parentId = this.foldersById.get(parentId)?.parent
+    }
+    return false
+  }
+
   reloadTree(callback?: () => void): void {
     this.loading = true
     this.folderService.clearCache()
@@ -101,6 +121,11 @@ export class FoldersComponent
         this.foldersById = new Map()
         this.flatFolders = []
         this.flatten(this.roots, 0)
+        this.collapsedFolders.forEach((folderId) => {
+          if (!this.foldersById.has(folderId)) {
+            this.collapsedFolders.delete(folderId)
+          }
+        })
         this.loading = false
         this.show = true
         // Refresh the current folder reference / contents
@@ -187,6 +212,7 @@ export class FoldersComponent
     })
     modal.componentInstance.dialogMode = EditDialogMode.CREATE
     modal.componentInstance.object = { parent: parent ? parent.id : null }
+    modal.componentInstance.folders = this.roots
     modal.componentInstance.succeeded.subscribe(() => {
       this.toastService.showInfo($localize`Folder created.`)
       this.reloadTree()
@@ -199,10 +225,15 @@ export class FoldersComponent
     })
     modal.componentInstance.dialogMode = EditDialogMode.EDIT
     modal.componentInstance.object = folder
+    modal.componentInstance.folders = this.roots
     modal.componentInstance.succeeded.subscribe(() => {
       this.toastService.showInfo($localize`Folder updated.`)
       this.reloadTree()
     })
+  }
+
+  moveFolder(folder: Folder): void {
+    this.renameFolder(folder)
   }
 
   deleteFolder(folder: Folder): void {
@@ -225,11 +256,33 @@ export class FoldersComponent
   canDeleteFolder(folder: Folder): boolean {
     return (
       !folder.is_default &&
-      this.permissionsService.currentUserHasObjectPermissions(
+      this.permissionsService.currentUserCan(
         this.PermissionAction.Delete,
-        folder
-      )
+        this.PermissionType.Folder
+      ) &&
+      this.permissionsService.currentUserOwnsObject(folder)
     )
+  }
+
+  hasChildren(folder: Folder): boolean {
+    return (folder.children?.length ?? 0) > 0
+  }
+
+  isCollapsed(folder: Folder): boolean {
+    return this.collapsedFolders.has(folder.id)
+  }
+
+  toggleFolderCollapsed(folder: Folder): void {
+    if (!this.hasChildren(folder)) return
+    if (this.collapsedFolders.has(folder.id)) {
+      this.collapsedFolders.delete(folder.id)
+    } else {
+      this.collapsedFolders.add(folder.id)
+    }
+  }
+
+  getFolderHue(folder: Folder): number {
+    return 205 + (((folder.depth ?? 0) * 33) % 115)
   }
 
   // --- Document selection ----------------------------------------------------
