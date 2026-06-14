@@ -169,3 +169,45 @@ def _datetime_range(keyword: str, tz: tzinfo) -> str:
         last_quarter = this_quarter - relativedelta(months=3)
         return _iso_range(_midnight(last_quarter), _midnight(this_quarter))
     raise ValueError(f"Unknown keyword: {keyword}")
+
+
+def _precision_bounds(digits: str) -> tuple[date, date] | None:
+    """
+    Map a 4/6/8-digit date token to (start, exclusive_end) calendar dates.
+
+    YYYY -> whole year, YYYYMM -> whole month, YYYYMMDD -> single day.
+    Returns None for any unparseable or out-of-range value (e.g. month 23),
+    so callers can emit a no-match clause instead of erroring (Whoosh parity).
+    """
+    try:
+        if len(digits) == 4:
+            year = int(digits)
+            return date(year, 1, 1), date(year + 1, 1, 1)
+        if len(digits) == 6:
+            year, month = int(digits[:4]), int(digits[4:6])
+            start = date(year, month, 1)
+            end = date(year + 1, 1, 1) if month == 12 else date(year, month + 1, 1)
+            return start, end
+        if len(digits) == 8:
+            start = date(int(digits[:4]), int(digits[4:6]), int(digits[6:8]))
+            return start, start + timedelta(days=1)
+    except ValueError:
+        return None
+    return None
+
+
+def _field_range_from_dates(field: str, start: date, end: date, tz: tzinfo) -> str:
+    """
+    Build a Tantivy ``field:[lo TO hi]`` ISO range from calendar-date bounds.
+
+    For DateField (``created``) the bounds are UTC midnight (no offset). For
+    DateTimeField (``added``/``modified``) the bounds are local-tz midnight
+    converted to UTC, matching how each field is indexed.
+    """
+    if field in _DATE_ONLY_FIELDS:
+        lo = datetime(start.year, start.month, start.day, tzinfo=UTC)
+        hi = datetime(end.year, end.month, end.day, tzinfo=UTC)
+    else:
+        lo = datetime(start.year, start.month, start.day, tzinfo=tz).astimezone(UTC)
+        hi = datetime(end.year, end.month, end.day, tzinfo=tz).astimezone(UTC)
+    return f"{field}:{_iso_range(lo, hi)}"
