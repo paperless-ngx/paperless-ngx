@@ -366,6 +366,12 @@ class ApplicationConfiguration(AbstractSingletonModel):
         max_length=32,
     )
 
+    llm_request_timeout = models.PositiveSmallIntegerField(
+        verbose_name=_("Sets the LLM timeout in seconds"),
+        null=True,
+        validators=[MinValueValidator(1)],
+    )
+
     class Meta:
         verbose_name = _("paperless application settings")
         permissions = [
