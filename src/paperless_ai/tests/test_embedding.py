@@ -19,6 +19,7 @@ def mock_ai_config():
         MockAIConfig.return_value.llm_embedding_endpoint = None
         MockAIConfig.return_value.llm_allow_internal_endpoints = True
         MockAIConfig.return_value.llm_context_size = 8192
+        MockAIConfig.return_value.llm_request_timeout = 120
         yield MockAIConfig
 
 
@@ -71,6 +72,7 @@ def test_get_embedding_model_openai(mock_ai_config):
             model_name="text-embedding-3-small",
             api_key="test_api_key",
             api_base="http://test-url",
+            timeout=120,
             http_client=ANY,
             async_http_client=ANY,
         )
@@ -92,6 +94,7 @@ def test_get_embedding_model_openai_prefers_embedding_endpoint(mock_ai_config):
             model_name="text-embedding-3-small",
             api_key="test_api_key",
             api_base="http://embedding-url",
+            timeout=120,
             http_client=ANY,
             async_http_client=ANY,
         )

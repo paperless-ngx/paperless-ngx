@@ -1206,6 +1206,9 @@ if LLM_EMBEDDING_CHUNK_SIZE < 1:
 LLM_CONTEXT_SIZE = get_int_from_env("PAPERLESS_AI_LLM_CONTEXT_SIZE", 8192)
 if LLM_CONTEXT_SIZE < 1:
     raise ImproperlyConfigured("PAPERLESS_AI_LLM_CONTEXT_SIZE must be >= 1")
+LLM_REQUEST_TIMEOUT = get_int_from_env("PAPERLESS_AI_LLM_REQUEST_TIMEOUT", 120)
+if LLM_REQUEST_TIMEOUT < 1:
+    raise ImproperlyConfigured("PAPERLESS_AI_LLM_REQUEST_TIMEOUT must be >= 1")
 LLM_BACKEND = get_choice_from_env(
     "PAPERLESS_AI_LLM_BACKEND",
     {"ollama", "openai-like"},

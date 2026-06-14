@@ -17,6 +17,7 @@ def mock_ai_config():
         mock_config = MagicMock()
         mock_config.llm_allow_internal_endpoints = True
         mock_config.llm_context_size = 8192
+        mock_config.llm_request_timeout = 120
         MockAIConfig.return_value = mock_config
         yield mock_config
 
@@ -64,6 +65,7 @@ def test_get_llm_openai(mock_ai_config, mock_openai_llm):
         model="test_model",
         api_base="http://test-url",
         api_key="test_api_key",
+        timeout=120,
         is_chat_model=True,
         is_function_calling_model=True,
         system_prompt=LLM_SYSTEM_PROMPT,

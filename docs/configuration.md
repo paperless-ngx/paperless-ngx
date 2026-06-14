@@ -2068,6 +2068,13 @@ context by default.
 
     Defaults to 8192.
 
+#### [`PAPERLESS_AI_LLM_REQUEST_TIMEOUT=<int>`](#PAPERLESS_AI_LLM_REQUEST_TIMEOUT) {#PAPERLESS_AI_LLM_REQUEST_TIMEOUT}
+
+: The timeout, in seconds, for requests to the configured AI backend. Increase this when using
+local or slow inference servers that need more time to generate responses.
+
+    Defaults to 120.
+
 #### [`PAPERLESS_AI_LLM_BACKEND=<str>`](#PAPERLESS_AI_LLM_BACKEND) {#PAPERLESS_AI_LLM_BACKEND}
 
 : The AI backend to use. This can be either "openai-like" or "ollama". If set to "ollama", the AI

@@ -5,6 +5,8 @@ from pathlib import Path
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
+import httpx
+import openai
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
@@ -470,6 +472,61 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             response.json(),
             {
                 "ai": ["Invalid AI configuration."],
+            },
+        )
+        self.assertIsNone(
+            get_llm_suggestion_cache(self.document.pk, backend="openai-like"),
+        )
+
+    @patch("documents.views.get_ai_document_classification")
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_BACKEND="openai-like",
+    )
+    def test_ai_suggestions_with_llm_timeout(
+        self,
+        mock_get_ai_classification,
+    ) -> None:
+        mock_get_ai_classification.side_effect = httpx.ReadTimeout("timed out")
+
+        self.client.force_login(user=self.user)
+        response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
+        self.assertEqual(
+            response.json(),
+            {
+                "ai": ["AI backend request timed out."],
+            },
+        )
+        self.assertIsNone(
+            get_llm_suggestion_cache(self.document.pk, backend="openai-like"),
+        )
+
+    @patch("documents.views.get_ai_document_classification")
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_BACKEND="openai-like",
+    )
+    def test_ai_suggestions_with_openai_timeout(
+        self,
+        mock_get_ai_classification,
+    ) -> None:
+        request = httpx.Request("POST", "http://test-url/v1/chat/completions")
+        mock_get_ai_classification.side_effect = openai.APITimeoutError(request)
+
+        self.client.force_login(user=self.user)
+        response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
+        self.assertEqual(
+            response.json(),
+            {
+                "ai": ["AI backend request timed out."],
             },
         )
         self.assertIsNone(
