@@ -63,6 +63,7 @@ class FieldValue:
     value: str
 
 
+# Produced by the comma-resolution pass (not by scan()).
 @dataclass(frozen=True, slots=True)
 class FieldValueList:
     field: str
@@ -78,6 +79,7 @@ class FieldRange:
     close: str
 
 
+# Produced by the comma-resolution pass (not by scan()).
 @dataclass(frozen=True, slots=True)
 class Comma:
     pass
@@ -96,7 +98,9 @@ _CLOSE: dict[str, str] = {"[": "]", "{": "}"}
 def scan(query: str) -> list[Token]:
     """
     Tokenize a raw query into date/comma-aware tokens, leaving everything else
-    as verbatim ``Passthrough`` runs. Depth-aware over ``[]``/``{}`` and quotes.
+    as verbatim ``Passthrough`` runs. Non-recursive: finds the first matching
+    close bracket/quote. Nested brackets are not valid Tantivy range syntax and
+    pass through verbatim on mismatch.
     """
     tokens: list[Token] = []
     buf: list[str] = []  # accumulates passthrough chars
@@ -111,7 +115,11 @@ def scan(query: str) -> list[Token]:
         ch = query[i]
         # A field token can begin only at a word boundary outside any value.
         m = _FIELD_RE.match(query, i)
-        if m and (i == 0 or (not query[i - 1].isalnum() and query[i - 1] != "_")):
+        if (
+            m
+            and m.group("field") in KNOWN_FIELDS
+            and (i == 0 or not (query[i - 1].isalnum() or query[i - 1] == "_"))
+        ):
             field = m.group("field")
             j = m.end()
             if j < n and query[j] in "[{":

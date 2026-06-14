@@ -82,3 +82,29 @@ class TestScan:
         # No depth-0 comma here; the whole thing is one range token.
         toks = scan("created:[2020 TO 2021]")
         assert len(toks) == 1
+
+    # --- Edge-case / regression tests (scan must never raise) ---
+
+    def test_url_is_passthrough(self):
+        # "http" is not a known field; the whole URL must pass through verbatim.
+        assert scan("http://example.com") == [Passthrough("http://example.com")]
+
+    def test_unterminated_quote_is_passthrough(self):
+        # title is a known field but the quoted value has no closing quote;
+        # _consume_value returns None so the whole string falls into passthrough.
+        assert scan('title:"abc') == [Passthrough('title:"abc')]
+
+    def test_unterminated_bracket_is_passthrough(self):
+        # created is a known field but the range bracket is never closed;
+        # _consume_range returns None so the whole string falls into passthrough.
+        assert scan("created:[2020") == [Passthrough("created:[2020")]
+
+    def test_empty_value_at_end_is_passthrough(self):
+        # created is a known field but there is no value after the colon
+        # (_consume_value returns None for start >= n), so passthrough.
+        assert scan("created:") == [Passthrough("created:")]
+
+    def test_value_containing_colon(self):
+        # The bare-word value reader stops at whitespace/paren, not at colon,
+        # so "2020:30" is consumed as a single value token.
+        assert scan("created:2020:30") == [FieldValue("created", "2020:30")]
