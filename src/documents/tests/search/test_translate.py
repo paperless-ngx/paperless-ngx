@@ -1,9 +1,12 @@
 import pytest
 
 from documents.search._dates import _precision_bounds
+from documents.search._translate import Comma
 from documents.search._translate import FieldRange
 from documents.search._translate import FieldValue
+from documents.search._translate import FieldValueList
 from documents.search._translate import Passthrough
+from documents.search._translate import resolve_commas
 from documents.search._translate import scan
 
 
@@ -108,3 +111,43 @@ class TestScan:
         # The bare-word value reader stops at whitespace/paren, not at colon,
         # so "2020:30" is consumed as a single value token.
         assert scan("created:2020:30") == [FieldValue("created", "2020:30")]
+
+
+@pytest.mark.search
+class TestCommaResolution:
+    def test_value_list_multi_value_field(self):
+        toks = resolve_commas(scan("tag:foo,bar"))
+        assert toks == [FieldValueList("tag", ("foo", "bar"))]
+
+    def test_value_list_three(self):
+        toks = resolve_commas(scan("tag_id:1,2,3"))
+        assert toks == [FieldValueList("tag_id", ("1", "2", "3"))]
+
+    def test_text_field_comma_is_literal(self):
+        # correspondent is not multi-value: comma stays inside the value.
+        toks = resolve_commas(scan("correspondent:foo,bar"))
+        assert toks == [FieldValue("correspondent", "foo,bar")]
+
+    def test_clause_separator_before_known_field(self):
+        toks = resolve_commas(scan("tag:foo,type:bar"))
+        assert toks == [FieldValue("tag", "foo"), Comma(), FieldValue("type", "bar")]
+
+    def test_clause_separator_after_range(self):
+        toks = resolve_commas(scan("created:[2020 TO 2021],added:[2022 TO 2023]"))
+        assert toks == [
+            FieldRange("created", "[", "2020", "2021", "]"),
+            Comma(),
+            FieldRange("added", "[", "2022", "2023", "]"),
+        ]
+
+    def test_clause_separator_after_quote(self):
+        toks = resolve_commas(scan('correspondent:"A B",created:[2020 TO 2021]'))
+        assert toks == [
+            FieldValue("correspondent", '"A B"'),
+            Comma(),
+            FieldRange("created", "[", "2020", "2021", "]"),
+        ]
+
+    def test_url_comma_is_literal_passthrough(self):
+        toks = resolve_commas(scan("http://example.com/a,b"))
+        assert toks == [Passthrough("http://example.com/a,b")]

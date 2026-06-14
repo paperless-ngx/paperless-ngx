@@ -5,6 +5,17 @@ from typing import TypeAlias
 
 import regex
 
+# TODO: this module translates date queries into Tantivy *string* syntax, which
+# forces two workarounds for things Tantivy's string parser cannot express on
+# date fields: open-ended ranges use far-past/far-future string sentinels
+# (OPEN_LO/OPEN_HI), and unparseable dates use a degenerate no-match range
+# (NO_MATCH). Both can be replaced with real tantivy.Query objects
+# (Query.range_query(..., None) for open bounds, Query.empty_query() for
+# no-match) once tantivy-py accepts Python datetimes in range_query/term_query on
+# Date fields. That support exists on tantivy-py master (PRs #655 + #666) but
+# postdates the pinned 0.26.0 wheel, so it is blocked only on a published release
+# > 0.26.0 and a dependency bump.
+
 # Fields that store exact, non-analyzed comma-joined tokens in the index and so
 # need explicit comma->AND expansion (Whoosh KEYWORD(commas=True) set).
 MULTI_VALUE_FIELDS = frozenset({"tag", "tag_id", "viewer_id"})
@@ -128,13 +139,40 @@ def scan(query: str) -> list[Token]:
                     token, i = rng
                     flush()
                     tokens.append(token)
+                    i = _maybe_comma(query, i, tokens)
                     continue
             else:
                 val = _consume_value(query, j)
                 if val is not None:
-                    value, i = val
+                    value, k = val
+                    # Handle trailing comma semantics.
+                    while k < n and query[k] == ",":
+                        nxt = k + 1
+                        if _looks_like_known_field(query, nxt):
+                            # Clause separator: emit Comma() after this token.
+                            break
+                        # Not a clause separator: consume more.
+                        if field in MULTI_VALUE_FIELDS and (
+                            nxt >= n or query[nxt] not in "[{ \t),"
+                        ):
+                            # Multi-value field: accumulate as comma-joined value
+                            # (resolve_commas will split into FieldValueList).
+                            more = _consume_value(query, nxt)
+                            if more is None:
+                                break
+                            value = f"{value},{more[0]}"
+                            k = more[1]
+                        else:
+                            # Non-multi-value field: comma is literal, keep consuming.
+                            more = _consume_value(query, nxt)
+                            if more is None:
+                                break
+                            value = f"{value},{more[0]}"
+                            k = more[1]
                     flush()
                     tokens.append(FieldValue(field, value))
+                    i = k
+                    i = _maybe_comma(query, i, tokens)
                     continue
         buf.append(ch)
         i += 1
@@ -175,7 +213,7 @@ def _consume_range(
 
 
 def _consume_value(query: str, start: int) -> tuple[str, int] | None:
-    """Consume a bare or quoted field value from ``start``."""
+    """Consume a bare or quoted field value from ``start``, stopping at comma."""
     n = len(query)
     if start >= n or query[start] in " \t":
         return None
@@ -186,6 +224,40 @@ def _consume_value(query: str, start: int) -> tuple[str, int] | None:
             return None
         return query[start : end + 1], end + 1
     j = start
-    while j < n and query[j] not in " \t)":
+    while j < n and query[j] not in " \t),":
         j += 1
     return query[start:j], j
+
+
+def _looks_like_known_field(query: str, pos: int) -> bool:
+    """True if a known ``field:`` token starts at ``pos``."""
+    m = _FIELD_RE.match(query, pos)
+    return bool(m and m.group("field") in KNOWN_FIELDS)
+
+
+def _maybe_comma(query: str, i: int, tokens: list) -> int:
+    """If a clause-separator comma follows at ``i``, emit ``Comma()`` and advance."""
+    if i < len(query) and query[i] == "," and _looks_like_known_field(query, i + 1):
+        tokens.append(Comma())
+        return i + 1
+    return i
+
+
+def resolve_commas(tokens: list) -> list:
+    """
+    Collapse value-list commas into ``FieldValueList`` and keep clause-separator
+    commas as ``Comma``. (Clause-sep commas are already emitted by ``scan`` via
+    the value-stop logic; this pass folds value-lists.)
+    """
+    out: list = []
+    for tok in tokens:
+        if (
+            isinstance(tok, FieldValue)
+            and tok.field in MULTI_VALUE_FIELDS
+            and "," in tok.value
+        ):
+            values = tuple(v for v in tok.value.split(",") if v)
+            out.append(FieldValueList(tok.field, values))
+        else:
+            out.append(tok)
+    return out
