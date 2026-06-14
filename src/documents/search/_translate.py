@@ -1,9 +1,20 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 from typing import TypeAlias
 
 import regex
+
+from documents.search._dates import _DATE_KEYWORDS
+from documents.search._dates import _DATE_ONLY_FIELDS
+from documents.search._dates import _date_only_range
+from documents.search._dates import _datetime_range
+from documents.search._dates import _field_range_from_dates
+from documents.search._dates import _precision_bounds
+
+if TYPE_CHECKING:
+    from datetime import tzinfo
 
 # TODO: this module translates date queries into Tantivy *string* syntax, which
 # forces two workarounds for things Tantivy's string parser cannot express on
@@ -251,3 +262,30 @@ def resolve_commas(tokens: list) -> list:
         else:
             out.append(tok)
     return out
+
+
+# A valid Tantivy clause that parses but matches nothing (degenerate range on a
+# date field). Used for unparseable dates, matching Whoosh's NullQuery.
+# NOTE: This is a Phase 1 string-pipeline workaround. Phase 2 will replace this
+# with tantivy.Query.empty_query() once tantivy-py exposes it (see module TODO).
+NO_MATCH = "created:[9999-12-31T23:59:59Z TO 9999-12-31T23:59:59Z]"
+
+_DIGITS_RE = regex.compile(r"^\d{4}(?:\d{2}){0,2}$")
+_ISO_RE = regex.compile(r"^\d{4}(?:-\d{2}(?:-\d{2})?)?$")
+
+
+def translate_scalar(field: str, value: str, tz: tzinfo) -> str:
+    """Translate a bare date-field value to a Tantivy range string."""
+    bare = value.strip("\"'").lower()
+    if bare in _DATE_KEYWORDS:
+        if field in _DATE_ONLY_FIELDS:
+            return f"{field}:{_date_only_range(bare, tz)}"
+        return f"{field}:{_datetime_range(bare, tz)}"
+    digits = value.replace("-", "")
+    if _DIGITS_RE.match(value) or _ISO_RE.match(value):
+        bounds = _precision_bounds(digits)
+        if bounds is None:
+            return NO_MATCH
+        return _field_range_from_dates(field, bounds[0], bounds[1], tz)
+    # Unrecognized shape -> no-match rather than a Tantivy 400 (Whoosh parity).
+    return NO_MATCH

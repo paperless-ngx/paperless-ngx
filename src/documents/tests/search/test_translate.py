@@ -1,6 +1,11 @@
+from __future__ import annotations
+
+from datetime import UTC
+
 import pytest
 
 from documents.search._dates import _precision_bounds
+from documents.search._translate import NO_MATCH
 from documents.search._translate import Comma
 from documents.search._translate import FieldRange
 from documents.search._translate import FieldValue
@@ -8,6 +13,7 @@ from documents.search._translate import FieldValueList
 from documents.search._translate import Passthrough
 from documents.search._translate import resolve_commas
 from documents.search._translate import scan
+from documents.search._translate import translate_scalar
 
 
 @pytest.mark.search
@@ -166,3 +172,47 @@ class TestCommaResolution:
             Comma(),
             FieldRange("created", "[", "2020", "2021", "]"),
         ]
+
+
+@pytest.mark.search
+class TestTranslateScalar:
+    @pytest.mark.parametrize(
+        ("field", "value", "expected"),
+        [
+            (
+                "created",
+                "2020",
+                "created:[2020-01-01T00:00:00Z TO 2021-01-01T00:00:00Z]",
+            ),
+            (
+                "created",
+                "202003",
+                "created:[2020-03-01T00:00:00Z TO 2020-04-01T00:00:00Z]",
+            ),
+            (
+                "created",
+                "20200115",
+                "created:[2020-01-15T00:00:00Z TO 2020-01-16T00:00:00Z]",
+            ),
+            (
+                "created",
+                "2020-01-15",
+                "created:[2020-01-15T00:00:00Z TO 2020-01-16T00:00:00Z]",
+            ),
+            (
+                "created",
+                "2020-03",
+                "created:[2020-03-01T00:00:00Z TO 2020-04-01T00:00:00Z]",
+            ),
+        ],
+    )
+    def test_partial_and_iso_dates(self, field: str, value: str, expected: str) -> None:
+        assert translate_scalar(field, value, UTC) == expected
+
+    def test_invalid_date_is_no_match(self) -> None:
+        assert translate_scalar("created", "202023", UTC) == NO_MATCH
+
+    def test_keyword_delegates(self) -> None:
+        # keyword path produces a range; just assert it is a created range
+        out = translate_scalar("created", "today", UTC)
+        assert out.startswith("created:[") and out.endswith("]")
