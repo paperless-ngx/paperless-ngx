@@ -6,6 +6,8 @@ import pytest
 
 from documents.search._dates import _precision_bounds
 from documents.search._translate import NO_MATCH
+from documents.search._translate import OPEN_HI
+from documents.search._translate import OPEN_LO
 from documents.search._translate import Comma
 from documents.search._translate import FieldRange
 from documents.search._translate import FieldValue
@@ -13,6 +15,7 @@ from documents.search._translate import FieldValueList
 from documents.search._translate import Passthrough
 from documents.search._translate import resolve_commas
 from documents.search._translate import scan
+from documents.search._translate import translate_range
 from documents.search._translate import translate_scalar
 
 
@@ -225,3 +228,46 @@ class TestTranslateScalar:
 
     def test_14digit_invalid_month_is_no_match(self) -> None:
         assert translate_scalar("created", "20231300120000", UTC) == NO_MATCH
+
+
+@pytest.mark.search
+class TestTranslateRange:
+    @pytest.mark.parametrize(
+        ("lo", "hi", "expected"),
+        [
+            ("2005", "2009", "created:[2005-01-01T00:00:00Z TO 2010-01-01T00:00:00Z]"),
+            (
+                "202001",
+                "202006",
+                "created:[2020-01-01T00:00:00Z TO 2020-07-01T00:00:00Z]",
+            ),
+            (
+                "20200101",
+                "20201231",
+                "created:[2020-01-01T00:00:00Z TO 2021-01-01T00:00:00Z]",
+            ),
+            (
+                "2020-01-01",
+                "2020-12-31",
+                "created:[2020-01-01T00:00:00Z TO 2021-01-01T00:00:00Z]",
+            ),
+        ],
+    )
+    def test_absolute_ranges(self, lo, hi, expected):
+        assert translate_range("created", lo, hi, UTC) == expected
+
+    def test_reversed_swaps(self):
+        assert translate_range("created", "2009", "2005", UTC) == (
+            "created:[2005-01-01T00:00:00Z TO 2010-01-01T00:00:00Z]"
+        )
+
+    def test_open_upper(self):
+        out = translate_range("created", "2020", "", UTC)
+        assert out == f"created:[2020-01-01T00:00:00Z TO {OPEN_HI}]"
+
+    def test_open_lower(self):
+        out = translate_range("created", "", "2020", UTC)
+        assert out == f"created:[{OPEN_LO} TO 2021-01-01T00:00:00Z]"
+
+    def test_invalid_bound_is_no_match(self):
+        assert translate_range("created", "202023", "2025", UTC) == NO_MATCH

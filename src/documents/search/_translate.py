@@ -307,3 +307,70 @@ def translate_scalar(field: str, value: str, tz: tzinfo) -> str:
         return f"{field}:[{iso} TO {iso}]"
     # Unrecognized shape -> no-match rather than a Tantivy 400 (Whoosh parity).
     return NO_MATCH
+
+
+# Open-bound sentinels for date ranges. These far-past/far-future strings allow
+# open-ended ranges to be expressed as Tantivy string queries until tantivy-py
+# exposes Query.range_query(..., None) on Date fields (see module TODO).
+OPEN_LO = "0001-01-01T00:00:00Z"
+OPEN_HI = "9999-12-31T23:59:59Z"
+
+
+def _bound_datetimes(
+    field: str,
+    token: str,
+    tz: tzinfo,
+) -> tuple[datetime, datetime] | None:
+    """
+    Return (floor_dt, ceil_dt) UTC datetimes for a single range bound token, or
+    None if the token is unparseable. ``now`` resolves to the current instant.
+    """
+    token = token.strip()
+    if token.lower() == "now":
+        now = datetime.now(UTC)
+        return now, now
+    digits = token.replace("-", "")
+    bounds = _precision_bounds(digits)
+    if bounds is None:
+        return None
+    start, end = bounds
+    if field in _DATE_ONLY_FIELDS:
+        lo = datetime(start.year, start.month, start.day, tzinfo=UTC)
+        hi = datetime(end.year, end.month, end.day, tzinfo=UTC)
+    else:
+        lo = datetime(start.year, start.month, start.day, tzinfo=tz).astimezone(UTC)
+        hi = datetime(end.year, end.month, end.day, tzinfo=tz).astimezone(UTC)
+    return lo, hi
+
+
+def translate_range(field: str, lo: str, hi: str, tz: tzinfo) -> str:
+    """Translate a date-field ``[lo TO hi]`` range to a Tantivy ISO range string.
+
+    Handles partial-date bounds (YYYY, YYYYMM, YYYYMMDD, ISO dash variants),
+    open bounds (empty string -> OPEN_LO/OPEN_HI), ``now``, and reversed ranges
+    (swaps tokens before computing floor/ceil so the span is always correct).
+    """
+    lo_s = lo.strip()
+    hi_s = hi.strip()
+
+    # Parse both bounds to (floor, ceil) pairs when present.
+    lo_pair: tuple[datetime, datetime] | None = None
+    hi_pair: tuple[datetime, datetime] | None = None
+
+    if lo_s:
+        lo_pair = _bound_datetimes(field, lo_s, tz)
+        if lo_pair is None:
+            return NO_MATCH
+    if hi_s:
+        hi_pair = _bound_datetimes(field, hi_s, tz)
+        if hi_pair is None:
+            return NO_MATCH
+
+    # Detect a reversed range: only swap when BOTH bounds are present.
+    if lo_pair is not None and hi_pair is not None and lo_pair[0] > hi_pair[0]:
+        lo_pair, hi_pair = hi_pair, lo_pair
+
+    lo_iso = _fmt(lo_pair[0]) if lo_pair is not None else OPEN_LO
+    hi_iso = _fmt(hi_pair[1]) if hi_pair is not None else OPEN_HI
+
+    return f"{field}:[{lo_iso} TO {hi_iso}]"
