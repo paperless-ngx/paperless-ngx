@@ -305,9 +305,9 @@ def resolve_commas(tokens: list) -> list:
 
 
 # A valid Tantivy clause that parses but matches nothing (degenerate range on a
-# date field). Used for unparsable dates, matching Whoosh's NullQuery.
-# NOTE: This is a Phase 1 string-pipeline workaround. Phase 2 will replace this
-# with tantivy.Query.empty_query() once tantivy-py exposes it (see module TODO).
+# date field). Used for unparsable dates, matching Whoosh's NullQuery (an
+# unparsable date matched nothing rather than erroring). See the module-level
+# TODO about replacing the string sentinels with real Query objects.
 NO_MATCH = "created:[9999-12-31T23:59:59Z TO 9999-12-31T23:59:59Z]"
 
 _DIGITS_RE = regex.compile(r"^\d{4}(?:\d{2}){0,2}$")

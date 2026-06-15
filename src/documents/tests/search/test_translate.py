@@ -481,7 +481,7 @@ class TestOperatorNormalization:
 
 @pytest.mark.search
 class TestMultiWordDateKeywords:
-    """FIX A: scan() must consume multi-word date keywords as a single value."""
+    """scan() must consume multi-word date keywords as a single value."""
 
     def test_scan_previous_week_as_single_token(self) -> None:
         # "created:previous week" must produce one FieldValue with value "previous week",
@@ -535,7 +535,7 @@ class TestMultiWordDateKeywords:
 
 @pytest.mark.search
 class TestISODatetimeBounds:
-    """FIX B: full ISO datetime tokens in range bounds must be parsed directly."""
+    """Full ISO datetime tokens in range bounds must be parsed directly."""
 
     def test_translate_range_iso_bounds_passthrough(self) -> None:
         # Already-ISO datetime bounds must pass through as-is (exact instant).
