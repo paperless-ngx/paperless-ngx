@@ -77,6 +77,14 @@ aliasing, relative ranges, operator normalization, and the existing search tests
 validating the new pipeline). The old `_rewrite_*` regex helpers were left in place as
 delegation shims during the transition.
 
+Landed in 15 commits on `fix/search-query-translation` (`f1b92a493`..`816a078a4`):
+`_dates.py` extraction → partial-date helpers → scanner → comma resolution →
+scalar/range translation → field aliasing → relative ranges + operator normalization →
+`parse_user_query` wiring + delegation + tests. Key symbols in `_translate.py`:
+`scan`, `resolve_commas`, `translate_scalar`, `translate_range`, `translate_query`;
+constants `MULTI_VALUE_FIELDS`, `DATE_FIELDS`, `KNOWN_FIELDS`, `FIELD_ALIASES`,
+`NO_MATCH`, `OPEN_LO`, `OPEN_HI`.
+
 ## Phase 2 (pending — the thing being tracked)
 
 Replace the Phase-1 string workarounds with real `tantivy.Query` objects for date
