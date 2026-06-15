@@ -176,7 +176,7 @@ def _precision_bounds(digits: str) -> tuple[date, date] | None:
     Map a 4/6/8-digit date token to (start, exclusive_end) calendar dates.
 
     YYYY -> whole year, YYYYMM -> whole month, YYYYMMDD -> single day.
-    Returns None for any unparseable or out-of-range value (e.g. month 23),
+    Returns None for any unparsable or out-of-range value (e.g. month 23),
     so callers can emit a no-match clause instead of erroring (Whoosh parity).
     """
     try:
