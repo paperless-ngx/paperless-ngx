@@ -586,10 +586,11 @@ def _parse_remote_user_settings() -> str:
 
 HTTP_REMOTE_USER_HEADER_NAME = _parse_remote_user_settings()
 
-# X-Frame/HTTP CSP options for embedded PDF display and optional embedding into other ancestors 
+# X-Frame HTTP CSP options for embedded PDF display and optional embedding into other ancestors 
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
 from csp.constants import SELF
+
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
         "default-src": [SELF],
