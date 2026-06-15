@@ -42,6 +42,11 @@ SCHEMA_VERSION = 1
 # a rebuild copies the live rows into a fresh table.
 COMPACT_BLOAT_RATIO = 2.0
 
+# compact(): number of rows copied per executemany() when rebuilding the file.
+# Rows are streamed from the source cursor in batches of this size rather than
+# materialized all at once, keeping memory bounded regardless of index size.
+COMPACT_BATCH_SIZE = 500
+
 # Filterable vec0 metadata columns. _build_where() only ever receives filter
 # keys we construct ourselves, but allowlisting keeps SQL identifiers safe by
 # construction.
@@ -500,24 +505,28 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
                 value = self._meta_get(key)
                 if value is not None:
                     self._meta_set_on(new_conn, key, value)
-            rows = self._conn.execute(
+            src_cursor = self._conn.execute(
                 "SELECT id, document_id, modified, node_content, embedding "
                 "FROM " + DEFAULT_TABLE_NAME,
-            ).fetchall()
-            new_conn.execute("BEGIN IMMEDIATE")
-            new_conn.executemany(
-                self._INSERT,
-                [
-                    (
-                        r["id"],
-                        r["document_id"],
-                        r["modified"],
-                        r["node_content"],
-                        bytes(r["embedding"]),
-                    )
-                    for r in rows
-                ],
             )
+            new_conn.execute("BEGIN IMMEDIATE")
+            # Stream rows from the source cursor in batches instead of
+            # materializing the whole table in memory, so a large index does
+            # not cause an OOM during routine maintenance compactions.
+            while batch := src_cursor.fetchmany(COMPACT_BATCH_SIZE):
+                new_conn.executemany(
+                    self._INSERT,
+                    [
+                        (
+                            r["id"],
+                            r["document_id"],
+                            r["modified"],
+                            r["node_content"],
+                            bytes(r["embedding"]),
+                        )
+                        for r in batch
+                    ],
+                )
             # Reset the cumulative counter: after compact, total_inserts == live.
             self._meta_set_on(new_conn, "total_inserts", str(live))
             new_conn.execute("COMMIT")

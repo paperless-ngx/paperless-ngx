@@ -393,6 +393,23 @@ class TestCompact:
             for c in held:
                 c.close()
 
+    def test_force_compact_streams_rows_across_batches(
+        self,
+        store,
+        monkeypatch,
+    ) -> None:
+        """Rebuild must preserve every row when rows span multiple batches.
+
+        A tiny batch size forces several fetchmany()/executemany() cycles so a
+        regression in the streaming loop (dropped tail, off-by-one) surfaces.
+        """
+        monkeypatch.setattr("paperless_ai.vector_store.COMPACT_BATCH_SIZE", 3)
+        store.add([make_node(f"n{i}", "1", seed=float(i)) for i in range(10)])
+        store.compact(force=True)
+        ids = {n.node_id for n in store.get_nodes(filters=_in_filter(["1"]))}
+        assert ids == {f"n{i}" for i in range(10)}
+        assert self._bloat_ratio(store) == pytest.approx(1.0)
+
 
 class TestDbFile:
     def test_single_db_file_in_index_dir(self, store, tmp_path: Path) -> None:
