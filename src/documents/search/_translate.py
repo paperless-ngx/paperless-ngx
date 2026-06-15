@@ -3,10 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import UTC
 from datetime import datetime
+from datetime import timedelta
 from typing import TYPE_CHECKING
 from typing import TypeAlias
 
 import regex
+from dateutil.relativedelta import relativedelta
 
 from documents.search._dates import _DATE_KEYWORDS
 from documents.search._dates import _DATE_ONLY_FIELDS
@@ -22,7 +24,7 @@ if TYPE_CHECKING:
 # TODO: this module translates date queries into Tantivy *string* syntax, which
 # forces two workarounds for things Tantivy's string parser cannot express on
 # date fields: open-ended ranges use far-past/far-future string sentinels
-# (OPEN_LO/OPEN_HI), and unparseable dates use a degenerate no-match range
+# (OPEN_LO/OPEN_HI), and unparsable dates use a degenerate no-match range
 # (NO_MATCH). Both can be replaced with real tantivy.Query objects
 # (Query.range_query(..., None) for open bounds, Query.empty_query() for
 # no-match) once tantivy-py accepts Python datetimes in range_query/term_query on
@@ -86,12 +88,14 @@ _FIELD_RE = regex.compile(r"(?P<field>\w+):")
 #   middle:   "lo TO hi"   (either lo or hi may be empty)
 #   trailing: "lo TO"      (open upper bound)
 #   leading:  "TO hi"      (open lower bound)
+# Bounds MAY contain internal spaces (e.g. "-7 days"), so we use .*? / .+?
+# and split on the whitespace-delimited " TO " / " to " separator.
 _RANGE_RE = regex.compile(
-    r"^\s*(?P<lo>[^\s]*?)\s+[Tt][Oo]\s+(?P<hi>[^\s]*?)\s*$"
+    r"^\s*(?P<lo>.*?)\s+[Tt][Oo]\s+(?P<hi>.+?)\s*$"
     r"|"
-    r"^\s*(?P<lo2>[^\s]+)\s+[Tt][Oo]\s*$"
+    r"^\s*(?P<lo2>.+?)\s+[Tt][Oo]\s*$"
     r"|"
-    r"^\s*[Tt][Oo]\s+(?P<hi2>[^\s]+)\s*$",
+    r"^\s*[Tt][Oo]\s+(?P<hi2>.+?)\s*$",
 )
 
 
@@ -281,7 +285,7 @@ def resolve_commas(tokens: list) -> list:
 
 
 # A valid Tantivy clause that parses but matches nothing (degenerate range on a
-# date field). Used for unparseable dates, matching Whoosh's NullQuery.
+# date field). Used for unparsable dates, matching Whoosh's NullQuery.
 # NOTE: This is a Phase 1 string-pipeline workaround. Phase 2 will replace this
 # with tantivy.Query.empty_query() once tantivy-py exposes it (see module TODO).
 NO_MATCH = "created:[9999-12-31T23:59:59Z TO 9999-12-31T23:59:59Z]"
@@ -329,6 +333,71 @@ OPEN_LO = "0001-01-01T00:00:00Z"
 OPEN_HI = "9999-12-31T23:59:59Z"
 
 
+# Matches compact now-offset tokens like now-7d, now+1h, now-30m.
+_NOW_COMPACT_RE = regex.compile(
+    r"^now(?P<sign>[+-])(?P<n>\d+)(?P<unit>[dhm])$",
+    regex.IGNORECASE,
+)
+
+# Matches "±N <unit>" Whoosh-style offsets (e.g. -7 days, -1 week, +3 hours)
+# Unit is singular or plural; sign prefix is mandatory.
+_NOW_SPACED_RE = regex.compile(
+    r"^(?P<sign>[+-])(?P<n>\d+)\s*"
+    r"(?P<unit>second|minute|hour|day|week|month|year)s?$",
+    regex.IGNORECASE,
+)
+
+
+def _resolve_relative_bound(token: str) -> datetime | None:
+    """
+    Resolve a relative bound token to an exact UTC instant, or return None.
+
+    Supported forms:
+      - ``now``            -> current UTC instant
+      - ``now+/-<n>d/h/m`` -> now +/- timedelta (d=days, h=hours, m=minutes)
+      - ``±N <unit>``     -> now +/- delta; month/year use relativedelta
+    """
+    stripped = token.strip()
+    low = stripped.lower()
+    now = datetime.now(UTC)
+
+    if low == "now":
+        return now
+
+    m = _NOW_COMPACT_RE.match(stripped)
+    if m:
+        sign = 1 if m.group("sign") == "+" else -1
+        n = int(m.group("n"))
+        unit = m.group("unit").lower()
+        delta = (
+            sign
+            * {
+                "d": timedelta(days=n),
+                "h": timedelta(hours=n),
+                "m": timedelta(minutes=n),
+            }[unit]
+        )
+        return now + delta
+
+    m = _NOW_SPACED_RE.match(stripped)
+    if m:
+        sign = 1 if m.group("sign") == "+" else -1
+        n = int(m.group("n"))
+        unit = m.group("unit").lower()
+        delta_map: dict[str, timedelta | relativedelta] = {
+            "second": timedelta(seconds=n),
+            "minute": timedelta(minutes=n),
+            "hour": timedelta(hours=n),
+            "day": timedelta(days=n),
+            "week": timedelta(weeks=n),
+            "month": relativedelta(months=n),
+            "year": relativedelta(years=n),
+        }
+        return now - delta_map[unit] if sign == -1 else now + delta_map[unit]
+
+    return None
+
+
 def _bound_datetimes(
     field: str,
     token: str,
@@ -336,12 +405,16 @@ def _bound_datetimes(
 ) -> tuple[datetime, datetime] | None:
     """
     Return (floor_dt, ceil_dt) UTC datetimes for a single range bound token, or
-    None if the token is unparseable. ``now`` resolves to the current instant.
+    None if the token is unparsable. ``now`` and relative offsets resolve to the
+    current instant (floor == ceil == that instant; no day-flooring).
     """
     token = token.strip()
-    if token.lower() == "now":
-        now = datetime.now(UTC)
-        return now, now
+
+    # Try relative/now forms first (before stripping hyphens which would mangle them).
+    rel = _resolve_relative_bound(token)
+    if rel is not None:
+        return rel, rel
+
     digits = token.replace("-", "")
     bounds = _precision_bounds(digits)
     if bounds is None:
@@ -378,10 +451,34 @@ def _render(tok: Token, tz: tzinfo) -> str:
     return ""  # pragma: no cover
 
 
+# Post-render operator normalization patterns (mirrors normalize_query in _query.py,
+# defined locally so _translate has no import dependency on _query).
+_MULTI_SPACE_RE = regex.compile(r" {2,}")
+_TRAILING_OP_RE = regex.compile(r"\s+[-+]+\s*$")
+_SPACED_OP_RE = regex.compile(r"\s+[-+]\s+")
+
+
+def _normalize_operators(text: str) -> str:
+    """
+    Collapse multiple spaces, strip trailing dangling operators, and replace
+    spaced operators (`` - `` / `` + ``) with a single space.
+
+    Applied only to Passthrough fragments (the rendered output is scanned for
+    operator artifacts outside bracketed ranges) via a post-render pass on the
+    full rendered string. This preserves date ranges (``[... TO ...]``) verbatim
+    while cleaning natural-language separators in the surrounding text.
+    """
+    text = _MULTI_SPACE_RE.sub(" ", text)
+    text = _TRAILING_OP_RE.sub("", text).strip()
+    text = _SPACED_OP_RE.sub(" ", text).strip()
+    return text
+
+
 def translate_query(raw: str, tz: tzinfo) -> str:
     """Translate a raw Whoosh-style query into Tantivy-compatible syntax."""
     tokens = resolve_commas(scan(raw))
-    return "".join(_render(t, tz) for t in tokens)
+    rendered = "".join(_render(t, tz) for t in tokens)
+    return _normalize_operators(rendered)
 
 
 def translate_range(field: str, lo: str, hi: str, tz: tzinfo) -> str:

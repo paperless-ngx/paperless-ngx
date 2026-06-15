@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from datetime import UTC
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 import pytest
+import time_machine
 
 from documents.search._dates import _precision_bounds
 
@@ -364,4 +366,114 @@ class TestFieldAliasing:
 
     def test_parse_acceptance_path(self, index: tantivy.Index) -> None:
         translated = translate_query("path:foo", UTC)
+        index.parse_query(translated, DEFAULT_SEARCH_FIELDS, field_boosts=_FIELD_BOOSTS)
+
+
+# Freeze time so relative-date tests are deterministic.
+_FROZEN_NOW = datetime(2026, 3, 28, 12, 0, 0, tzinfo=UTC)
+
+
+@pytest.mark.search
+class TestRelativeRanges:
+    """Relative date-range tokens resolved against a frozen clock."""
+
+    @time_machine.travel(_FROZEN_NOW, tick=False)
+    def test_minus_7_days_to_now(self) -> None:
+        assert translate_query("added:[-7 days to now]", UTC) == (
+            "added:[2026-03-21T12:00:00Z TO 2026-03-28T12:00:00Z]"
+        )
+
+    @time_machine.travel(_FROZEN_NOW, tick=False)
+    def test_minus_1_week_to_now(self) -> None:
+        assert translate_query("added:[-1 week to now]", UTC) == (
+            "added:[2026-03-21T12:00:00Z TO 2026-03-28T12:00:00Z]"
+        )
+
+    @time_machine.travel(_FROZEN_NOW, tick=False)
+    def test_minus_1_month_to_now(self) -> None:
+        assert translate_query("created:[-1 month to now]", UTC) == (
+            "created:[2026-02-28T12:00:00Z TO 2026-03-28T12:00:00Z]"
+        )
+
+    @time_machine.travel(_FROZEN_NOW, tick=False)
+    def test_minus_1_year_to_now(self) -> None:
+        assert translate_query("modified:[-1 year to now]", UTC) == (
+            "modified:[2025-03-28T12:00:00Z TO 2026-03-28T12:00:00Z]"
+        )
+
+    @time_machine.travel(_FROZEN_NOW, tick=False)
+    def test_minus_3_hours_to_now(self) -> None:
+        assert translate_query("added:[-3 hours to now]", UTC) == (
+            "added:[2026-03-28T09:00:00Z TO 2026-03-28T12:00:00Z]"
+        )
+
+    @time_machine.travel(_FROZEN_NOW, tick=False)
+    def test_uppercase_units(self) -> None:
+        assert translate_query("added:[-1 WEEK TO NOW]", UTC) == (
+            "added:[2026-03-21T12:00:00Z TO 2026-03-28T12:00:00Z]"
+        )
+
+    @time_machine.travel(_FROZEN_NOW, tick=False)
+    def test_now_minus_7d_compact(self) -> None:
+        assert translate_query("added:[now-7d TO now]", UTC) == (
+            "added:[2026-03-21T12:00:00Z TO 2026-03-28T12:00:00Z]"
+        )
+
+    @time_machine.travel(_FROZEN_NOW, tick=False)
+    def test_reversed_range_swapped(self) -> None:
+        # now+1h TO now-1h is reversed; translate_range swaps -> lo=now-1h, hi=now+1h
+        assert translate_query("added:[now+1h TO now-1h]", UTC) == (
+            "added:[2026-03-28T11:00:00Z TO 2026-03-28T13:00:00Z]"
+        )
+
+    @pytest.mark.parametrize(
+        "raw",
+        [
+            "added:[-7 days to now]",
+            "added:[-1 week to now]",
+            "created:[-1 month to now]",
+            "modified:[-1 year to now]",
+            "added:[-3 hours to now]",
+            "added:[now-7d TO now]",
+            "added:[now+1h TO now-1h]",
+        ],
+    )
+    @time_machine.travel(_FROZEN_NOW, tick=False)
+    def test_parse_acceptance(self, index: tantivy.Index, raw: str) -> None:
+        translated = translate_query(raw, UTC)
+        index.parse_query(translated, DEFAULT_SEARCH_FIELDS, field_boosts=_FIELD_BOOSTS)
+
+
+@pytest.mark.search
+class TestOperatorNormalization:
+    """Post-render operator normalization in translate_query."""
+
+    def test_spaced_dash_removed(self) -> None:
+        assert (
+            translate_query("H52.1 - Kurzsichtigkeit", UTC) == "H52.1 Kurzsichtigkeit"
+        )
+
+    def test_spaced_dash_simple(self) -> None:
+        assert translate_query("bar - baz", UTC) == "bar baz"
+
+    def test_trailing_operator_stripped(self) -> None:
+        assert translate_query("foo -", UTC) == "foo"
+
+    def test_date_range_preserved(self) -> None:
+        out = translate_query("created:[2020 TO 2021]", UTC)
+        # Must not corrupt the ISO range
+        assert out == "created:[2020-01-01T00:00:00Z TO 2022-01-01T00:00:00Z]"
+
+    def test_date_scalar_with_or(self) -> None:
+        out = translate_query("created:2020 OR foo", UTC)
+        # The created scalar becomes a range; " OR foo" passes through verbatim.
+        assert out.startswith("created:[")
+        assert "OR foo" in out
+
+    def test_parse_acceptance_spaced_dash(self, index: tantivy.Index) -> None:
+        translated = translate_query("H52.1 - Kurzsichtigkeit", UTC)
+        index.parse_query(translated, DEFAULT_SEARCH_FIELDS, field_boosts=_FIELD_BOOSTS)
+
+    def test_parse_acceptance_trailing_op(self, index: tantivy.Index) -> None:
+        translated = translate_query("foo -", UTC)
         index.parse_query(translated, DEFAULT_SEARCH_FIELDS, field_boosts=_FIELD_BOOSTS)
