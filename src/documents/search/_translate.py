@@ -155,71 +155,83 @@ def scan(query: str) -> list[Token]:
     tokens: list[Token] = []
     buf: list[str] = []  # accumulates passthrough chars
     i, n = 0, len(query)
-
-    def flush() -> None:
-        if buf:
-            tokens.append(Passthrough("".join(buf)))
-            buf.clear()
-
     while i < n:
-        ch = query[i]
-        # A field token can begin only at a word boundary outside any value.
-        m = _FIELD_RE.match(query, i)
-        if (
-            m
-            and m.group("field") in KNOWN_FIELDS
-            and (i == 0 or not (query[i - 1].isalnum() or query[i - 1] == "_"))
-        ):
-            field = m.group("field")
-            j = m.end()
-            if j < n and query[j] in "[{":
-                rng = _consume_range(query, j, field)
-                if rng is not None:
-                    token, i = rng
-                    flush()
-                    tokens.append(token)
-                    i = _maybe_comma(query, i, tokens)
-                    continue
-            else:
-                # For date fields with an unquoted value, try to consume a known
-                # multi-word keyword phrase first (e.g. "previous week") before
-                # falling back to the whitespace-stopping _consume_value.
-                val = None
-                if field in DATE_FIELDS:
-                    km = _KEYWORD_VALUE_RE.match(query, j)
-                    if km is not None:
-                        kend = km.end()
-                        # Require match ends at a word/clause boundary.
-                        if kend >= len(query) or query[kend] in " \t),":
-                            val = (km.group(0), kend)
-                if val is None:
-                    val = _consume_value(query, j)
-                if val is not None:
-                    value, k = val
-                    # Handle trailing comma semantics.
-                    while k < n and query[k] == ",":
-                        nxt = k + 1
-                        if _looks_like_known_field(query, nxt):
-                            # Clause separator: stop here; _maybe_comma will emit Comma().
-                            break
-                        # Not a clause separator: accumulate comma-joined value.
-                        # resolve_commas will later split multi-value fields into
-                        # FieldValueList; for other fields the comma stays literal.
-                        more = _consume_value(query, nxt)
-                        if more is None:
-                            break
-                        value = f"{value},{more[0]}"
-                        k = more[1]
-                    flush()
-                    tokens.append(FieldValue(field, value))
-                    i = k
-                    i = _maybe_comma(query, i, tokens)
-                    continue
-        buf.append(ch)
-        i += 1
-
-    flush()
+        matched = _match_field_token(query, i)
+        if matched is None:
+            buf.append(query[i])
+            i += 1
+            continue
+        token, i = matched
+        _flush(buf, tokens)
+        tokens.append(token)
+        i = _maybe_comma(query, i, tokens)
+    _flush(buf, tokens)
     return tokens
+
+
+def _flush(buf: list[str], tokens: list[Token]) -> None:
+    """Emit any accumulated passthrough characters as a single token."""
+    if buf:
+        tokens.append(Passthrough("".join(buf)))
+        buf.clear()
+
+
+def _at_word_boundary(query: str, i: int) -> bool:
+    """A field token may begin only at the start or after a non-word character."""
+    return i == 0 or not (query[i - 1].isalnum() or query[i - 1] == "_")
+
+
+def _match_field_token(query: str, i: int) -> tuple[Token, int] | None:
+    """
+    If a known ``field:`` token starts at ``i``, consume it and return
+    ``(token, end_index)``; otherwise return None so the caller treats the
+    character as passthrough. Handles both ``field:[range]`` and ``field:value``,
+    and returns None when the range/value cannot be consumed.
+    """
+    m = _FIELD_RE.match(query, i)
+    if m is None or m.group("field") not in KNOWN_FIELDS:
+        return None
+    if not _at_word_boundary(query, i):
+        return None
+    field = m.group("field")
+    j = m.end()
+    if j < len(query) and query[j] in "[{":
+        return _consume_range(query, j, field)
+    consumed = _consume_field_value(query, field, j)
+    if consumed is None:
+        return None
+    value, end = consumed
+    return FieldValue(field, value), end
+
+
+def _consume_field_value(query: str, field: str, start: int) -> tuple[str, int] | None:
+    """
+    Consume a field value starting at ``start``: a multi-word date keyword phrase
+    (date fields only), or a bare/quoted value, then absorb any comma-joined
+    continuation that is not a clause separator. ``resolve_commas`` later splits a
+    multi-value field's joined value into a ``FieldValueList``; for other fields
+    the comma stays literal.
+    """
+    n = len(query)
+    consumed = None
+    if field in DATE_FIELDS:
+        km = _KEYWORD_VALUE_RE.match(query, start)
+        if km is not None and (km.end() >= n or query[km.end()] in " \t),"):
+            consumed = (km.group(0), km.end())
+    if consumed is None:
+        consumed = _consume_value(query, start)
+    if consumed is None:
+        return None
+    value, k = consumed
+    while k < n and query[k] == ",":
+        if _looks_like_known_field(query, k + 1):
+            break  # clause separator: left for _maybe_comma to emit a Comma()
+        more = _consume_value(query, k + 1)
+        if more is None:
+            break
+        value = f"{value},{more[0]}"
+        k = more[1]
+    return value, k
 
 
 def _consume_range(

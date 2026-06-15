@@ -130,6 +130,25 @@ class TestScan:
         # so "2020:30" is consumed as a single value token.
         assert scan("created:2020:30") == [FieldValue("created", "2020:30")]
 
+    def test_comma_followed_by_unconsumable_value_stops(self):
+        # A comma followed by whitespace is neither a value-list continuation nor a
+        # clause separator: the value stops and the comma stays as passthrough.
+        assert scan("tag:foo, bar") == [
+            FieldValue("tag", "foo"),
+            Passthrough(", bar"),
+        ]
+
+    def test_bracket_without_to_is_open_upper_bound(self):
+        # A bracketed value with no TO falls back to (value, "") -> open upper bound.
+        assert scan("created:[2020]") == [
+            FieldRange("created", "[", "2020", "", "]"),
+        ]
+
+    def test_known_field_name_midword_is_passthrough(self):
+        # A known field name embedded mid-word is not a field token (the
+        # word-boundary guard); the whole run stays passthrough.
+        assert scan("xtag:foo") == [Passthrough("xtag:foo")]
+
 
 @pytest.mark.search
 class TestCommaResolution:
@@ -238,6 +257,11 @@ class TestTranslateScalar:
     def test_14digit_invalid_month_is_no_match(self) -> None:
         assert translate_scalar("created", "20231300120000", UTC) == NO_MATCH
 
+    def test_unrecognized_value_is_no_match(self) -> None:
+        # A value that is not a keyword, digits, ISO date, or compact timestamp
+        # falls through to no-match rather than producing invalid Tantivy syntax.
+        assert translate_scalar("created", "garbage", UTC) == NO_MATCH
+
 
 @pytest.mark.search
 class TestTranslateRange:
@@ -280,6 +304,10 @@ class TestTranslateRange:
 
     def test_invalid_bound_is_no_match(self):
         assert translate_range("created", "202023", "2025", UTC) == NO_MATCH
+
+    def test_invalid_high_bound_is_no_match(self):
+        # Low bound parses, high bound does not -> no-match.
+        assert translate_range("created", "2020", "garbage", UTC) == NO_MATCH
 
 
 @pytest.mark.search
