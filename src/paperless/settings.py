@@ -589,11 +589,11 @@ HTTP_REMOTE_USER_HEADER_NAME = _parse_remote_user_settings()
 # X-Frame/HTTP CSP options for embedded PDF display and optional embedding into other ancestors 
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
-from csp.constants import NONE, SELF
+from csp.constants import SELF
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
         "default-src": [SELF],
-        "frame-ancestors": __get_list([SELF], "PAPERLESS_CSP_FRAME_ANCESTORS"),
+        "frame-ancestors": __get_list("PAPERLESS_CSP_FRAME_ANCESTORS", [SELF]),
     },
 }
 
