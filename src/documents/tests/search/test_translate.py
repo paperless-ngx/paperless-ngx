@@ -14,13 +14,13 @@ if TYPE_CHECKING:
     import tantivy
 from documents.search._query import _FIELD_BOOSTS
 from documents.search._query import DEFAULT_SEARCH_FIELDS
-from documents.search._translate import NO_MATCH
 from documents.search._translate import OPEN_HI
 from documents.search._translate import OPEN_LO
 from documents.search._translate import Comma
 from documents.search._translate import FieldRange
 from documents.search._translate import FieldValue
 from documents.search._translate import FieldValueList
+from documents.search._translate import InvalidDateQuery
 from documents.search._translate import Passthrough
 from documents.search._translate import resolve_commas
 from documents.search._translate import scan
@@ -241,8 +241,11 @@ class TestTranslateScalar:
     def test_partial_and_iso_dates(self, field: str, value: str, expected: str) -> None:
         assert translate_scalar(field, value, UTC) == expected
 
-    def test_invalid_date_is_no_match(self) -> None:
-        assert translate_scalar("created", "202023", UTC) == NO_MATCH
+    def test_invalid_date_raises(self) -> None:
+        with pytest.raises(InvalidDateQuery) as exc_info:
+            translate_scalar("created", "202023", UTC)
+        assert exc_info.value.field == "created"
+        assert exc_info.value.value == "202023"
 
     def test_keyword_delegates(self) -> None:
         # keyword path produces a range; just assert it is a created range
@@ -255,13 +258,20 @@ class TestTranslateScalar:
         assert out.startswith("created:")
         assert out == "created:[2024-01-15T12:00:00Z TO 2024-01-15T12:00:00Z]"
 
-    def test_14digit_invalid_month_is_no_match(self) -> None:
-        assert translate_scalar("created", "20231300120000", UTC) == NO_MATCH
+    def test_14digit_invalid_month_raises(self) -> None:
+        with pytest.raises(InvalidDateQuery) as exc_info:
+            translate_scalar("created", "20231300120000", UTC)
+        assert exc_info.value.field == "created"
+        assert exc_info.value.value == "20231300120000"
 
-    def test_unrecognized_value_is_no_match(self) -> None:
+    def test_unrecognized_value_raises(self) -> None:
         # A value that is not a keyword, digits, ISO date, or compact timestamp
-        # falls through to no-match rather than producing invalid Tantivy syntax.
-        assert translate_scalar("created", "garbage", UTC) == NO_MATCH
+        # raises rather than producing invalid Tantivy syntax or silently matching
+        # nothing.
+        with pytest.raises(InvalidDateQuery) as exc_info:
+            translate_scalar("created", "garbage", UTC)
+        assert exc_info.value.field == "created"
+        assert exc_info.value.value == "garbage"
 
 
 @pytest.mark.search
@@ -303,12 +313,18 @@ class TestTranslateRange:
         out = translate_range("created", "", "2020", UTC)
         assert out == f"created:[{OPEN_LO} TO 2021-01-01T00:00:00Z]"
 
-    def test_invalid_bound_is_no_match(self):
-        assert translate_range("created", "202023", "2025", UTC) == NO_MATCH
+    def test_invalid_bound_raises(self):
+        with pytest.raises(InvalidDateQuery) as exc_info:
+            translate_range("created", "202023", "2025", UTC)
+        assert exc_info.value.field == "created"
+        assert exc_info.value.value == "202023"
 
-    def test_invalid_high_bound_is_no_match(self):
-        # Low bound parses, high bound does not -> no-match.
-        assert translate_range("created", "2020", "garbage", UTC) == NO_MATCH
+    def test_invalid_high_bound_raises(self):
+        # Low bound parses, high bound does not -> raise on the high bound.
+        with pytest.raises(InvalidDateQuery) as exc_info:
+            translate_range("created", "2020", "garbage", UTC)
+        assert exc_info.value.field == "created"
+        assert exc_info.value.value == "garbage"
 
 
 @pytest.mark.search
@@ -349,7 +365,6 @@ class TestTranslateQuery:
             "created:2020 OR foo",
             "(created:2020 OR invoice)",
             "tag:foo,type:bar",
-            "created:202023",
             "bank statement",
         ],
     )
@@ -701,15 +716,17 @@ class TestISODatetimeBounds:
             "added:[2026-05-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
         )
 
-    def test_invalid_iso_datetime_is_no_match(self) -> None:
-        # A token with "T" that is not valid ISO datetime -> NO_MATCH.
-        result = translate_range(
-            "created",
-            "2020-01-01T99:00:00Z",
-            "2021-01-01T00:00:00Z",
-            UTC,
-        )
-        assert result == NO_MATCH
+    def test_invalid_iso_datetime_raises(self) -> None:
+        # A token with "T" that is not valid ISO datetime -> raise.
+        with pytest.raises(InvalidDateQuery) as exc_info:
+            translate_range(
+                "created",
+                "2020-01-01T99:00:00Z",
+                "2021-01-01T00:00:00Z",
+                UTC,
+            )
+        assert exc_info.value.field == "created"
+        assert exc_info.value.value == "2020-01-01T99:00:00Z"
 
     def test_parse_acceptance_iso_bounds(self, index: tantivy.Index) -> None:
         q = "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z]"

@@ -20,6 +20,7 @@ from documents.search._query import parse_user_query
 from documents.search._query import rewrite_natural_date_keywords
 from documents.search._schema import build_schema
 from documents.search._tokenizer import register_tokenizers
+from documents.search._translate import InvalidDateQuery
 
 if TYPE_CHECKING:
     from django.contrib.auth.base_user import AbstractBaseUser
@@ -404,13 +405,14 @@ class TestWhooshQueryRewriting:
         assert lo == "2023-12-01T05:00:00Z"
         assert hi == "2023-12-02T05:00:00Z"
 
-    def test_8digit_invalid_date_produces_no_match(self) -> None:
-        # The new translation pipeline produces NO_MATCH for invalid dates
-        # (e.g. month=13) instead of passing them through. This matches
-        # Whoosh's NullQuery semantics: zero results, no 400 error.
-        from documents.search._translate import NO_MATCH
-
-        assert rewrite_natural_date_keywords("added:20231340", UTC) == NO_MATCH
+    def test_8digit_invalid_date_raises(self) -> None:
+        # The translation pipeline raises InvalidDateQuery for unparsable dates
+        # (e.g. month=13) so the API can surface a 400 telling the user the date
+        # is malformed instead of silently returning zero results.
+        with pytest.raises(InvalidDateQuery) as exc_info:
+            rewrite_natural_date_keywords("added:20231340", UTC)
+        assert exc_info.value.field == "added"
+        assert exc_info.value.value == "20231340"
 
 
 class TestParseUserQuery:
@@ -511,6 +513,18 @@ class TestParseUserQuery:
                 parse_user_query(query_index, raw_query, UTC),
                 tantivy.Query,
             )
+
+    def test_invalid_date_propagates_not_swallowed(
+        self,
+        query_index: tantivy.Index,
+    ) -> None:
+        # parse_user_query falls back to the raw query on unexpected translation
+        # errors, but an InvalidDateQuery is intentional and must propagate so the
+        # view can return a 400 instead of silently parsing the raw (invalid) date.
+        with pytest.raises(InvalidDateQuery) as exc_info:
+            parse_user_query(query_index, "created:202023", UTC)
+        assert exc_info.value.field == "created"
+        assert exc_info.value.value == "202023"
 
 
 class TestYearRangeRewriting:

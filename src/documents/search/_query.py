@@ -16,6 +16,7 @@ from documents.search._dates import (
     _datetime_range,  # noqa: F401 — re-exported for test imports
 )
 from documents.search._tokenizer import simple_search_tokens
+from documents.search._translate import SearchQueryError
 from documents.search._translate import translate_query
 
 if TYPE_CHECKING:
@@ -218,6 +219,11 @@ def parse_user_query(
 
     try:
         query_str = translate_query(raw_query, tz)
+    except SearchQueryError:
+        # Intentional, user-fixable error (e.g. an unparsable date). Propagate so
+        # the view can return a 400 with a helpful message rather than falling
+        # back to the raw (still-invalid) query.
+        raise
     except Exception:  # pragma: no cover - defensive
         logger.warning("Query translation failed; using raw query", exc_info=True)
         query_str = raw_query

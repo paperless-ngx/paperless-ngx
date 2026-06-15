@@ -2277,6 +2277,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
             return super().list(request)
 
         from documents.search import SearchHit
+        from documents.search import SearchQueryError
         from documents.search import TantivyBackend
         from documents.search import TantivyRelevanceList
         from documents.search import get_backend
@@ -2469,6 +2470,11 @@ class UnifiedSearchViewSet(DocumentViewSet):
             return HttpResponseForbidden(_("Insufficient permissions."))
         except ValidationError:
             raise
+        except SearchQueryError as e:
+            # User-fixable query error (e.g. an unparsable date): surface the
+            # specific message so the user can correct it, rather than a generic
+            # 400 or silently empty results.
+            raise ValidationError({"query": [str(e)]}) from e
         except Exception as e:
             logger.warning(f"An error occurred listing search results: {e!s}")
             return HttpResponseBadRequest(

@@ -31,15 +31,15 @@ if TYPE_CHECKING:
     from datetime import tzinfo
 
 # TODO: this module translates date queries into Tantivy *string* syntax, which
-# forces two workarounds for things Tantivy's string parser cannot express on
+# forces a workaround for something Tantivy's string parser cannot express on
 # date fields: open-ended ranges use far-past/far-future string sentinels
-# (OPEN_LO/OPEN_HI), and unparsable dates use a degenerate no-match range
-# (NO_MATCH). Both can be replaced with real tantivy.Query objects
-# (Query.range_query(..., None) for open bounds, Query.empty_query() for
-# no-match) once tantivy-py accepts Python datetimes in range_query/term_query on
-# Date fields. That support exists on tantivy-py master (PRs #655 + #666) but
-# postdates the pinned 0.26.0 wheel, so it is blocked only on a published release
-# > 0.26.0 and a dependency bump.
+# (OPEN_LO/OPEN_HI). These can be replaced with a real tantivy.Query object
+# (Query.range_query(..., None) for open bounds) once tantivy-py accepts Python
+# datetimes in range_query/term_query on Date fields. That support exists on
+# tantivy-py master (PRs #655 + #666) but postdates the pinned 0.26.0 wheel, so
+# it is blocked only on a published release > 0.26.0 and a dependency bump.
+# (Unparsable dates now raise InvalidDateQuery -> HTTP 400 rather than using a
+# no-match string sentinel.)
 
 # Fields that store exact, non-analyzed comma-joined tokens in the index and so
 # need explicit comma->AND expansion (Whoosh KEYWORD(commas=True) set).
@@ -317,11 +317,24 @@ def resolve_commas(tokens: list) -> list:
     return out
 
 
-# A valid Tantivy clause that parses but matches nothing (degenerate range on a
-# date field). Used for unparsable dates, matching Whoosh's NullQuery (an
-# unparsable date matched nothing rather than erroring). See the module-level
-# TODO about replacing the string sentinels with real Query objects.
-NO_MATCH = "created:[9999-12-31T23:59:59Z TO 9999-12-31T23:59:59Z]"
+class SearchQueryError(ValueError):
+    """
+    Base for user-fixable search query errors.
+
+    Carries a message safe to surface to the user (no internal details). The view
+    layer catches this and returns an HTTP 400, so any future subclass (unknown
+    field, malformed range, wrapped parser errors) gets the same treatment.
+    """
+
+
+class InvalidDateQuery(SearchQueryError):
+    """Raised when a date field value or range bound cannot be parsed."""
+
+    def __init__(self, field: str, value: str) -> None:
+        self.field = field
+        self.value = value
+        super().__init__(f"Invalid date value {value!r} for field {field!r}.")
+
 
 _DIGITS_RE = regex.compile(r"^\d{4}(?:\d{2}){0,2}$")
 _ISO_RE = regex.compile(r"^\d{4}(?:-\d{2}(?:-\d{2})?)?$")
@@ -338,7 +351,7 @@ def translate_scalar(field: str, value: str, tz: tzinfo) -> str:
     if _DIGITS_RE.match(value) or _ISO_RE.match(value):
         bounds = _precision_bounds(digits)
         if bounds is None:
-            return NO_MATCH
+            raise InvalidDateQuery(field, value)
         return _field_range_from_dates(field, bounds[0], bounds[1], tz)
     if regex.fullmatch(r"\d{14}", value):
         try:
@@ -352,11 +365,12 @@ def translate_scalar(field: str, value: str, tz: tzinfo) -> str:
                 tzinfo=UTC,
             )
         except ValueError:
-            return NO_MATCH
+            raise InvalidDateQuery(field, value) from None
         iso = _fmt(dt)
         return f"{field}:[{iso} TO {iso}]"
-    # Unrecognized shape -> no-match rather than a Tantivy 400 (Whoosh parity).
-    return NO_MATCH
+    # Unrecognized shape -> tell the user their date is malformed rather than
+    # silently matching nothing or emitting invalid Tantivy syntax.
+    raise InvalidDateQuery(field, value)
 
 
 # Open-bound sentinels for date ranges. These far-past/far-future strings allow
@@ -536,11 +550,11 @@ def translate_range(field: str, lo: str, hi: str, tz: tzinfo) -> str:
     if lo_s:
         lo_pair = _bound_datetimes(field, lo_s, tz)
         if lo_pair is None:
-            return NO_MATCH
+            raise InvalidDateQuery(field, lo_s)
     if hi_s:
         hi_pair = _bound_datetimes(field, hi_s, tz)
         if hi_pair is None:
-            return NO_MATCH
+            raise InvalidDateQuery(field, hi_s)
 
     # Detect a reversed range: only swap when BOTH bounds are present.
     if lo_pair is not None and hi_pair is not None and lo_pair[0] > hi_pair[0]:
