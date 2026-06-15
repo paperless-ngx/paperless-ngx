@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import UTC
+from datetime import datetime
 from typing import TYPE_CHECKING
 from typing import TypeAlias
 
@@ -11,6 +13,7 @@ from documents.search._dates import _DATE_ONLY_FIELDS
 from documents.search._dates import _date_only_range
 from documents.search._dates import _datetime_range
 from documents.search._dates import _field_range_from_dates
+from documents.search._dates import _fmt
 from documents.search._dates import _precision_bounds
 
 if TYPE_CHECKING:
@@ -287,5 +290,20 @@ def translate_scalar(field: str, value: str, tz: tzinfo) -> str:
         if bounds is None:
             return NO_MATCH
         return _field_range_from_dates(field, bounds[0], bounds[1], tz)
+    if regex.fullmatch(r"\d{14}", value):
+        try:
+            dt = datetime(
+                int(value[0:4]),
+                int(value[4:6]),
+                int(value[6:8]),
+                int(value[8:10]),
+                int(value[10:12]),
+                int(value[12:14]),
+                tzinfo=UTC,
+            )
+        except ValueError:
+            return NO_MATCH
+        iso = _fmt(dt)
+        return f"{field}:[{iso} TO {iso}]"
     # Unrecognized shape -> no-match rather than a Tantivy 400 (Whoosh parity).
     return NO_MATCH

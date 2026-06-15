@@ -216,3 +216,12 @@ class TestTranslateScalar:
         # keyword path produces a range; just assert it is a created range
         out = translate_scalar("created", "today", UTC)
         assert out.startswith("created:[") and out.endswith("]")
+
+    def test_14digit_compact_datetime(self) -> None:
+        out = translate_scalar("created", "20240115120000", UTC)
+        assert "20240115120000" not in out
+        assert out.startswith("created:")
+        assert out == "created:[2024-01-15T12:00:00Z TO 2024-01-15T12:00:00Z]"
+
+    def test_14digit_invalid_month_is_no_match(self) -> None:
+        assert translate_scalar("created", "20231300120000", UTC) == NO_MATCH
