@@ -237,7 +237,7 @@ class TestSystemStatus(APITestCase):
         )
 
     @mock.patch("celery.app.control.Inspect.ping")
-    def test_system_status_celery_ping_unexpected_response(self, mock_ping) -> None:
+    def test_system_status_celery_ping_unexpected_responses(self, mock_ping) -> None:
         """
         GIVEN:
             - Celery ping returns an unexpected worker response
@@ -246,16 +246,22 @@ class TestSystemStatus(APITestCase):
         THEN:
             - The response contains a warning celery status
         """
-        mock_ping.return_value = {"hostname": {"ok": "not-pong"}}
         self.client.force_login(self.user)
-        response = self.client.get(self.ENDPOINT)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["tasks"]["celery_status"], "WARNING")
-        self.assertEqual(response.data["tasks"]["celery_url"], "hostname")
-        self.assertEqual(
-            response.data["tasks"]["celery_error"],
-            "Celery worker responded unexpectedly.",
-        )
+        for ping_response in (
+            {"hostname": {"ok": "not-pong"}},
+            {"hostname": {}},
+            {"hostname": "pong"},
+        ):
+            with self.subTest(ping_response=ping_response):
+                mock_ping.return_value = ping_response
+                response = self.client.get(self.ENDPOINT)
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(response.data["tasks"]["celery_status"], "WARNING")
+                self.assertEqual(response.data["tasks"]["celery_url"], "hostname")
+                self.assertEqual(
+                    response.data["tasks"]["celery_error"],
+                    "Celery worker responded unexpectedly.",
+                )
 
     @mock.patch("documents.views.sleep")
     @mock.patch("celery.app.control.Inspect.ping")
