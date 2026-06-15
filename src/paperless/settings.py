@@ -335,6 +335,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "drf_spectacular_sidecar",
     "treenode",
+    "csp",
     *env_apps,
 ]
 
@@ -374,6 +375,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "csp.middleware.CSPMiddleware",
 ]
 
 # Optional to enable compression
@@ -584,8 +586,16 @@ def _parse_remote_user_settings() -> str:
 
 HTTP_REMOTE_USER_HEADER_NAME = _parse_remote_user_settings()
 
-# X-Frame options for embedded PDF display:
+# X-Frame/HTTP CSP options for embedded PDF display and optional embedding into other ancestors 
 X_FRAME_OPTIONS = "SAMEORIGIN"
+
+from csp.constants import NONE, SELF
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": [SELF],
+        "frame-ancestors": __get_list([SELF], "PAPERLESS_CSP_FRAME_ANCESTORS"),
+    },
+}
 
 # The next 3 settings can also be set using just PAPERLESS_URL
 CSRF_TRUSTED_ORIGINS = __get_list("PAPERLESS_CSRF_TRUSTED_ORIGINS")
