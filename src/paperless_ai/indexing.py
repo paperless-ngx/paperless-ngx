@@ -26,8 +26,6 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("paperless_ai.indexing")
 
-LLM_INDEX_TABLE = "documents"
-
 RAG_NUM_OUTPUT = 512
 RAG_CHUNK_OVERLAP = 200
 
@@ -69,7 +67,6 @@ def get_vector_store() -> "PaperlessSqliteVecVectorStore":
     settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
     return PaperlessSqliteVecVectorStore(
         uri=str(settings.LLM_INDEX_DIR),
-        table_name=LLM_INDEX_TABLE,
     )
 
 
@@ -90,7 +87,6 @@ def write_store(embed_model_name: str | None = None):
     with FileLock(settings.LLM_INDEX_LOCK):
         yield PaperlessSqliteVecVectorStore(
             uri=str(settings.LLM_INDEX_DIR),
-            table_name=LLM_INDEX_TABLE,
             embed_model_name=embed_model_name,
         )
 

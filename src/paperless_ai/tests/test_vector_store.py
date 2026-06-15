@@ -14,6 +14,7 @@ from paperless_ai.vector_store import MIGRATIONS
 from paperless_ai.vector_store import SCHEMA_VERSION
 from paperless_ai.vector_store import Migration
 from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
+from paperless_ai.vector_store import _build_where
 
 DIM = 16
 
@@ -168,6 +169,41 @@ class TestCrud:
         assert store.vector_dim() is None
 
 
+class TestBuildWhere:
+    def test_fails_closed_when_no_filter_is_translatable(self) -> None:
+        # A nested MetadataFilters is not a MetadataFilter, so it is skipped.
+        # With no translatable clauses, the function must fail closed rather
+        # than emit "()" (invalid SQL) and never widen document access.
+        nested = MetadataFilters(
+            filters=[
+                MetadataFilter(
+                    key="document_id",
+                    operator=FilterOperator.EQ,
+                    value="1",
+                ),
+            ],
+        )
+        where, params = _build_where(MetadataFilters(filters=[nested]))
+        assert where == "1 = 0"
+        assert params == []
+
+    def test_query_with_untranslatable_filter_returns_no_rows(self, store) -> None:
+        store.add([make_node("a1", "1"), make_node("b1", "2")])
+        nested = MetadataFilters(
+            filters=[
+                MetadataFilter(
+                    key="document_id",
+                    operator=FilterOperator.EQ,
+                    value="1",
+                ),
+            ],
+        )
+        filters = MetadataFilters(filters=[nested])
+        # Must not raise (no "WHERE ()") and must return nothing (fail closed).
+        assert _query(store, [0.0] * DIM, top_k=5, filters=filters).ids == []
+        assert store.get_nodes(filters=filters) == []
+
+
 class TestUpsert:
     def test_upsert_replaces_and_prunes_stale_chunks(self, store) -> None:
         store.add(
@@ -317,6 +353,43 @@ class TestCompact:
     def test_compact_on_missing_table_is_noop(self, store) -> None:
         store.compact()
         store.compact(force=True)
+
+    def test_failed_compact_removes_temp_wal_and_shm(
+        self,
+        store,
+        tmp_path: Path,
+        monkeypatch,
+    ) -> None:
+        """A compact() that raises mid-rebuild must leave no .compact* files.
+
+        Normally the sole connection's close() checkpoints the temp WAL away,
+        but a concurrent reader keeps -wal/-shm alive, so the cleanup must
+        unlink them explicitly (as the structural-migration path does).
+        """
+        store.add([make_node("a1", "1")])
+        compact_path = str(tmp_path / DB_FILENAME) + ".compact"
+        held: list[sqlite3.Connection] = []
+
+        def boom(conn: sqlite3.Connection, dim: int) -> None:
+            # Hold an extra connection so close() of the rebuild connection is
+            # not the last one -> the temp -wal/-shm survive the checkpoint.
+            extra = sqlite3.connect(compact_path)
+            extra.execute("SELECT 1").fetchall()
+            held.append(extra)
+            raise RuntimeError("boom")
+
+        monkeypatch.setattr(
+            PaperlessSqliteVecVectorStore,
+            "_create_vec_table",
+            staticmethod(boom),
+        )
+        try:
+            with pytest.raises(RuntimeError):
+                store.compact(force=True)
+            assert sorted(p.name for p in tmp_path.glob("*.compact*")) == []
+        finally:
+            for c in held:
+                c.close()
 
 
 class TestDbFile:

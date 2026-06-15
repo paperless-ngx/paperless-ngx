@@ -98,7 +98,7 @@ def _build_where(filters: MetadataFilters | None) -> tuple[str, list[str]]:
     for f in filters.filters:
         # filters.filters is Union[MetadataFilter, ExactMatchFilter, MetadataFilters];
         # we only build MetadataFilter entries, so skip anything else at runtime.
-        if not isinstance(f, MetadataFilter):  # pragma: no cover
+        if not isinstance(f, MetadataFilter):
             continue
         if f.key not in _FILTER_COLUMNS:  # pragma: no cover - we build the keys
             raise NotImplementedError(f"Unsupported filter column: {f.key}")
@@ -115,6 +115,11 @@ def _build_where(filters: MetadataFilters | None) -> tuple[str, list[str]]:
             params.append(str(f.value))
         else:  # pragma: no cover - we only ever build EQ/IN filters
             raise NotImplementedError(f"Unsupported filter operator: {f.operator}")
+    if not clauses:
+        # Filters were requested but none could be translated. Fail closed
+        # rather than emit "()" (invalid SQL): filters scope document access,
+        # so an empty translation must match no rows, never widen the scope.
+        return "1 = 0", []
     joiner = " OR " if filters.condition == FilterCondition.OR else " AND "
     return "(" + joiner.join(clauses) + ")", params
 
@@ -152,7 +157,6 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
     def __init__(
         self,
         uri: str,
-        table_name: str = DEFAULT_TABLE_NAME,
         embed_model_name: str | None = None,
     ) -> None:
         super().__init__(stores_text=True, flat_metadata=False)
@@ -499,9 +503,10 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             # Reset the cumulative counter: after compact, total_inserts == live.
             self._meta_set_on(new_conn, "total_inserts", str(live))
             new_conn.execute("COMMIT")
-        except BaseException:  # pragma: no cover
+        except BaseException:
             new_conn.close()
-            Path(compact_path).unlink(missing_ok=True)
+            for p in [compact_path, compact_path + "-wal", compact_path + "-shm"]:
+                Path(p).unlink(missing_ok=True)
             raise
         new_conn.close()
         self._swap_in_compact(compact_path, db_path)
