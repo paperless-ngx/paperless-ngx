@@ -526,6 +526,16 @@ you're running two instances of paperless on the same host.
 
     Defaults to `""`, which does not alter the cookie names.
 
+#### [`PAPERLESS_CSP_FRAME_ANCESTORS=<comma-separated-list>`](#PAPERLESS_CSP_FRAME_ANCESTORS) {#PAPERLESS_CSP_FRAME_ANCESTORS}
+
+: Allows to emmbed your paperless instance to a different website in 
+a frame or iframe.
+
+Just remember that this is a comma-separated list, so "example.com" is fine, as is "example.com,www.example.com", but NOT " example.com" or "example.com,"
+
+Defaults to `""`, which does not allow to emmbed paperless into any other domain.
+
+
 #### [`PAPERLESS_ENABLE_HTTP_REMOTE_USER=<bool>`](#PAPERLESS_ENABLE_HTTP_REMOTE_USER) {#PAPERLESS_ENABLE_HTTP_REMOTE_USER}
 
 : Allows authentication via HTTP_REMOTE_USER which is used by some SSO
