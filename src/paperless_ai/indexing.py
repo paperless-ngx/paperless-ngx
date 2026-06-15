@@ -120,12 +120,8 @@ def read_store():
     """
     lock = _index_rwlock()
     try:
-        with lock.read_lock():
-            store = get_vector_store()
-            try:
-                yield store
-            finally:
-                store.client.close()
+        with lock.read_lock(), get_vector_store() as store:
+            yield store
     finally:
         lock.close()
 
@@ -161,11 +157,14 @@ def write_store(embed_model_name: str | None = None):
     from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
 
     settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
-    with FileLock(settings.LLM_INDEX_LOCK):
-        yield PaperlessSqliteVecVectorStore(
+    with (
+        FileLock(settings.LLM_INDEX_LOCK),
+        PaperlessSqliteVecVectorStore(
             uri=str(settings.LLM_INDEX_DIR),
             embed_model_name=embed_model_name,
-        )
+        ) as store,
+    ):
+        yield store
 
 
 def build_document_node(

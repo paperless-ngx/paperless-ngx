@@ -1,4 +1,5 @@
 import sqlite3
+from collections.abc import Generator
 from pathlib import Path
 
 import pytest
@@ -38,8 +39,9 @@ def make_node(
 
 
 @pytest.fixture
-def store(tmp_path: Path) -> PaperlessSqliteVecVectorStore:
-    return PaperlessSqliteVecVectorStore(uri=str(tmp_path))
+def store(tmp_path: Path) -> Generator[PaperlessSqliteVecVectorStore, None, None]:
+    with PaperlessSqliteVecVectorStore(uri=str(tmp_path)) as store:
+        yield store
 
 
 def _query(
@@ -155,10 +157,10 @@ class TestCrud:
 
     def test_fresh_instance_sees_existing_table(self, store, tmp_path: Path) -> None:
         store.add([make_node("a1", "1")])
-        reopened = PaperlessSqliteVecVectorStore(uri=str(tmp_path))
-        assert reopened.table_exists()
-        assert reopened.vector_dim() == DIM
-        assert _query(reopened, [0.0] * DIM, top_k=1).ids == ["a1"]
+        with PaperlessSqliteVecVectorStore(uri=str(tmp_path)) as reopened:
+            assert reopened.table_exists()
+            assert reopened.vector_dim() == DIM
+            assert _query(reopened, [0.0] * DIM, top_k=1).ids == ["a1"]
 
     def test_table_exists_and_drop(self, store) -> None:
         assert not store.table_exists()
@@ -229,10 +231,10 @@ class TestUpsert:
     ) -> None:
         """A second connection must never observe document 1 half-replaced."""
         store.add([make_node("a1", "1"), make_node("a2", "1")])
-        reader = PaperlessSqliteVecVectorStore(uri=str(tmp_path))
-        store.upsert_document("1", [make_node("a3", "1")])
-        ids = [n.node_id for n in reader.get_nodes(filters=_in_filter(["1"]))]
-        assert ids == ["a3"]
+        with PaperlessSqliteVecVectorStore(uri=str(tmp_path)) as reader:
+            store.upsert_document("1", [make_node("a3", "1")])
+            ids = [n.node_id for n in reader.get_nodes(filters=_in_filter(["1"]))]
+            assert ids == ["a3"]
 
 
 class TestMetadataCoercion:
@@ -245,39 +247,39 @@ class TestMetadataCoercion:
 
 class TestModelNameTracking:
     def test_stored_model_name_none_without_table(self, tmp_path: Path) -> None:
-        store = PaperlessSqliteVecVectorStore(
+        with PaperlessSqliteVecVectorStore(
             uri=str(tmp_path),
             embed_model_name="model-a",
-        )
-        assert store.stored_model_name() is None
+        ) as store:
+            assert store.stored_model_name() is None
 
     def test_model_name_stored_after_add_and_persists(self, tmp_path: Path) -> None:
-        store = PaperlessSqliteVecVectorStore(
+        with PaperlessSqliteVecVectorStore(
             uri=str(tmp_path),
             embed_model_name="model-a",
-        )
-        store.add([make_node("a1", "1")])
-        assert store.stored_model_name() == "model-a"
-        reopened = PaperlessSqliteVecVectorStore(uri=str(tmp_path))
-        assert reopened.stored_model_name() == "model-a"
+        ) as store:
+            store.add([make_node("a1", "1")])
+            assert store.stored_model_name() == "model-a"
+        with PaperlessSqliteVecVectorStore(uri=str(tmp_path)) as reopened:
+            assert reopened.stored_model_name() == "model-a"
 
     def test_config_mismatch_semantics(self, tmp_path: Path) -> None:
-        store = PaperlessSqliteVecVectorStore(
+        with PaperlessSqliteVecVectorStore(
             uri=str(tmp_path),
             embed_model_name="model-a",
-        )
-        assert not store.config_mismatch("anything")  # no table yet
-        store.add([make_node("a1", "1")])
-        assert not store.config_mismatch("model-a")
-        assert store.config_mismatch("model-b")
+        ) as store:
+            assert not store.config_mismatch("anything")  # no table yet
+            store.add([make_node("a1", "1")])
+            assert not store.config_mismatch("model-a")
+            assert store.config_mismatch("model-b")
 
     def test_config_mismatch_false_when_table_predates_tracking(
         self,
         tmp_path: Path,
     ) -> None:
-        store = PaperlessSqliteVecVectorStore(uri=str(tmp_path))  # no model name
-        store.add([make_node("a1", "1")])
-        assert not store.config_mismatch("model-a")
+        with PaperlessSqliteVecVectorStore(uri=str(tmp_path)) as store:  # no model name
+            store.add([make_node("a1", "1")])
+            assert not store.config_mismatch("model-a")
 
 
 class TestGetModifiedTimes:

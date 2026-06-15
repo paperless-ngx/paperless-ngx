@@ -191,10 +191,10 @@ def test_update_llm_index_rebuilds_on_model_name_change(
         ):
             indexing.update_llm_index(rebuild=False)
 
-    store = indexing.get_vector_store()
-    # Schema metadata only updates when the table is dropped and recreated, never on
-    # incremental writes -- so "model-b" here proves a full rebuild happened.
-    assert store.stored_model_name() == "model-b"
+    with indexing.get_vector_store() as store:
+        # Schema metadata only updates when the table is dropped and recreated, never
+        # on incremental writes -- so "model-b" here proves a full rebuild happened.
+        assert store.stored_model_name() == "model-b"
 
 
 @pytest.mark.django_db
@@ -238,10 +238,10 @@ def test_update_llm_index_partial_update(
 
         indexing.update_llm_index(rebuild=False)
 
-    store = indexing.get_vector_store()
-    assert store.table_exists(), (
-        "Expected the vector store table to exist after incremental update"
-    )
+    with indexing.get_vector_store() as store:
+        assert store.table_exists(), (
+            "Expected the vector store table to exist after incremental update"
+        )
 
 
 @pytest.mark.django_db
@@ -253,10 +253,10 @@ def test_add_or_update_document_updates_existing_entry(
     indexing.update_llm_index(rebuild=True)
     indexing.llm_index_add_or_update_document(real_document)
 
-    store = indexing.get_vector_store()
-    assert store.table_exists(), (
-        "Expected the vector store table to exist after add-or-update"
-    )
+    with indexing.get_vector_store() as store:
+        assert store.table_exists(), (
+            "Expected the vector store table to exist after add-or-update"
+        )
 
 
 @pytest.mark.django_db
@@ -473,10 +473,11 @@ class TestUpdateLlmIndexEmptyDocumentSet:
         )
         indexing.update_llm_index(rebuild=True)
 
-        store = indexing.get_vector_store()
-        assert store.table_exists(), (
-            "Precondition failed: expected the vector store table to exist before deletion"
-        )
+        with indexing.get_vector_store() as store:
+            assert store.table_exists(), (
+                "Precondition failed: expected the vector store table to exist "
+                "before deletion"
+            )
 
         # Step 2: delete all documents
         Document.objects.all().delete()
@@ -487,10 +488,11 @@ class TestUpdateLlmIndexEmptyDocumentSet:
         indexing.update_llm_index(rebuild=True)
 
         # Step 4: the table must be absent (no rows) — phantom vectors gone
-        store2 = indexing.get_vector_store()
-        assert not store2.table_exists(), (
-            "Expected the vector store table to be absent after rebuilding with no documents"
-        )
+        with indexing.get_vector_store() as store2:
+            assert not store2.table_exists(), (
+                "Expected the vector store table to be absent after rebuilding "
+                "with no documents"
+            )
 
 
 class TestDocumentUpdatedSignalTriggersLlmReindex:
@@ -668,8 +670,8 @@ class TestVectorStoreIndexing:
         temp_llm_index_dir: Path,
         mock_embed_model: FakeEmbedding,
     ) -> None:
-        store = indexing.get_vector_store()
-        assert isinstance(store, PaperlessSqliteVecVectorStore)
+        with indexing.get_vector_store() as store:
+            assert isinstance(store, PaperlessSqliteVecVectorStore)
 
     def test_add_then_remove_document(
         self,
@@ -678,12 +680,13 @@ class TestVectorStoreIndexing:
         real_document: Document,
     ) -> None:
         indexing.llm_index_add_or_update_document(real_document)
-        store = indexing.get_vector_store()
-        assert store.table_exists()
-        assert store.client.execute("SELECT count(*) FROM documents").fetchone()[0] >= 1
+        with indexing.get_vector_store() as store:
+            assert store.table_exists()
+            count_sql = "SELECT count(*) FROM documents"
+            assert store.client.execute(count_sql).fetchone()[0] >= 1
 
-        indexing.llm_index_remove_document(real_document)
-        assert store.client.execute("SELECT count(*) FROM documents").fetchone()[0] == 0
+            indexing.llm_index_remove_document(real_document)
+            assert store.client.execute(count_sql).fetchone()[0] == 0
 
     def test_update_shrinks_chunks_without_orphans(
         self,
@@ -694,16 +697,17 @@ class TestVectorStoreIndexing:
         real_document.content = "word " * 4000  # many chunks
         real_document.save()
         indexing.llm_index_add_or_update_document(real_document)
-        store = indexing.get_vector_store()
-        big = store.client.execute("SELECT count(*) FROM documents").fetchone()[0]
+        count_sql = "SELECT count(*) FROM documents"
+        with indexing.get_vector_store() as store:
+            big = store.client.execute(count_sql).fetchone()[0]
 
-        real_document.content = "short"  # one chunk
-        real_document.save()
-        indexing.llm_index_add_or_update_document(real_document)
+            real_document.content = "short"  # one chunk
+            real_document.save()
+            indexing.llm_index_add_or_update_document(real_document)
 
-        rows = store.client.execute("SELECT count(*) FROM documents").fetchone()[0]
-        assert rows < big
-        assert rows >= 1
+            rows = store.client.execute(count_sql).fetchone()[0]
+            assert rows < big
+            assert rows >= 1
 
 
 @pytest.mark.django_db

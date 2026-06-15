@@ -9,6 +9,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
+from types import TracebackType
 from typing import Any
 from typing import Literal
 
@@ -185,6 +186,23 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
     @property
     def client(self) -> Any:
         return self._conn
+
+    def close(self) -> None:
+        """Close the underlying SQLite connection (idempotent)."""
+        self._conn.close()
+
+    def __enter__(self) -> "PaperlessSqliteVecVectorStore":
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        # Deterministically release the connection (and its WAL/SHM handles) so
+        # it is never left open across a compaction/migration file swap.
+        self.close()
 
     @contextmanager
     def _transaction(self) -> Iterator[None]:
