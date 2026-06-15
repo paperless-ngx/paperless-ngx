@@ -405,8 +405,13 @@ class TestWhooshQueryRewriting:
         assert lo == "2023-12-01T05:00:00Z"
         assert hi == "2023-12-02T05:00:00Z"
 
-    def test_8digit_invalid_date_passes_through_unchanged(self) -> None:
-        assert rewrite_natural_date_keywords("added:20231340", UTC) == "added:20231340"
+    def test_8digit_invalid_date_produces_no_match(self) -> None:
+        # The new translation pipeline produces NO_MATCH for invalid dates
+        # (e.g. month=13) instead of passing them through. This matches
+        # Whoosh's NullQuery semantics: zero results, no 400 error.
+        from documents.search._translate import NO_MATCH
+
+        assert rewrite_natural_date_keywords("added:20231340", UTC) == NO_MATCH
 
     def test_compact_14digit_invalid_date_passes_through_unchanged(self) -> None:
         # Month=13 makes datetime() raise ValueError; the token must be left as-is
@@ -462,6 +467,55 @@ class TestParseUserQuery:
         raw_query: str,
     ) -> None:
         assert isinstance(parse_user_query(query_index, raw_query, UTC), tantivy.Query)
+
+    @pytest.mark.parametrize(
+        "raw_query",
+        [
+            # Partial date scalar (year only)
+            pytest.param("created:2020", id="created_year_scalar"),
+            # 8-digit compact date range in brackets
+            pytest.param(
+                "created:[20200101 TO 20201231]",
+                id="created_8digit_bracket_range",
+            ),
+            # Comma-separated field + date range (Whoosh v2 multi-clause syntax)
+            pytest.param(
+                "title:x,created:[2020 TO 2021]",
+                id="title_comma_created_range",
+            ),
+            # Field alias: type -> document_type
+            pytest.param("type:invoice", id="type_alias"),
+            # Multi-word date keyword
+            pytest.param("created:previous week", id="created_previous_week"),
+            # Full ISO datetime range
+            pytest.param(
+                "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z]",
+                id="created_iso_range",
+            ),
+            # Comma-separated ISO ranges (Whoosh v2 syntax)
+            pytest.param(
+                "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z],"
+                "added:[2026-05-01T00:00:00Z TO 2026-06-01T00:00:00Z]",
+                id="comma_iso_ranges",
+            ),
+        ],
+    )
+    def test_advanced_search_queries_do_not_raise(
+        self,
+        query_index: tantivy.Index,
+        raw_query: str,
+    ) -> None:
+        """
+        End-to-end: queries that the frontend sends must parse without raising.
+
+        This tests the full pipeline: translate_query -> tantivy parse_query.
+        Equivalent to asserting HTTP 200 (not 400) for each query form.
+        """
+        with time_machine.travel(datetime(2026, 6, 15, 12, 0, tzinfo=UTC), tick=False):
+            assert isinstance(
+                parse_user_query(query_index, raw_query, UTC),
+                tantivy.Query,
+            )
 
 
 class TestYearRangeRewriting:
@@ -542,11 +596,16 @@ class TestYearRangeRewriting:
         assert rewrite_natural_date_keywords(original, UTC) == original
 
     def test_8digit_in_brackets_not_matched_as_year_range(self) -> None:
-        # [YYYYMMDD TO YYYYMMDD] has 8-digit values - must not be caught by year rewriter
+        # [YYYYMMDD TO YYYYMMDD]: the translation layer converts 8-digit bounds to
+        # ISO day ranges. 20200101 -> 2020-01-01T00:00:00Z (lo of that day);
+        # 20201231 -> the ceil of Dec 31 = 2021-01-01T00:00:00Z (exclusive end).
+        # This is the correct and accepted behavior: old compact form becomes a
+        # proper Tantivy-parseable ISO range.
         original = "created:[20200101 TO 20201231]"
         result = rewrite_natural_date_keywords(original, UTC)
-        assert "20200101" in result or "2020-01-01" in result
-        assert "20201231" in result or "2020-12-31" in result
+        lo, hi = _range(result, "created")
+        assert lo == "2020-01-01T00:00:00Z"
+        assert hi == "2021-01-01T00:00:00Z"
 
 
 class TestNonDateFieldsNotRewritten:
@@ -605,6 +664,16 @@ class TestNormalizeQuery:
 
     def test_normalize_expands_comma_separated_tags(self) -> None:
         assert normalize_query("tag:foo,bar") == "tag:foo AND tag:bar"
+
+    def test_normalize_comma_between_range_expressions(self) -> None:
+        # Comma-separated field range expressions (Whoosh v2 syntax) must be
+        # converted to AND so Tantivy does not receive an invalid comma.
+        q = "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z],added:[2026-05-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
+        assert normalize_query(q) == (
+            "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
+            " AND "
+            "added:[2026-05-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
+        )
 
     def test_normalize_expands_three_values(self) -> None:
         assert normalize_query("tag:foo,bar,baz") == "tag:foo AND tag:bar AND tag:baz"

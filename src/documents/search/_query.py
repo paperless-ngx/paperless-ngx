@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from datetime import UTC
 from datetime import date
 from datetime import datetime
@@ -14,15 +15,22 @@ from django.conf import settings
 
 from documents.search._dates import _DATE_KEYWORD_PATTERN
 from documents.search._dates import _DATE_ONLY_FIELDS
-from documents.search._dates import _date_only_range
-from documents.search._dates import _datetime_range
+from documents.search._dates import (
+    _date_only_range,  # noqa: F401 — re-exported for test imports
+)
+from documents.search._dates import (
+    _datetime_range,  # noqa: F401 — re-exported for test imports
+)
 from documents.search._dates import _fmt
 from documents.search._tokenizer import simple_search_tokens
+from documents.search._translate import translate_query
 
 if TYPE_CHECKING:
     from datetime import tzinfo
 
     from django.contrib.auth.base_user import AbstractBaseUser
+
+logger = logging.getLogger("paperless.search")
 
 # Maximum seconds any single regex substitution may run.
 # Prevents ReDoS on adversarial user-supplied query strings.
@@ -256,12 +264,8 @@ def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
     """
     Rewrite natural date syntax to ISO 8601 format for Tantivy compatibility.
 
-    Performs the first stage of query preprocessing, converting various date
-    formats and keywords to ISO 8601 datetime ranges that Tantivy can parse:
-    - Compact 14-digit dates (YYYYMMDDHHmmss)
-    - Whoosh relative ranges ([-7 days to now], [now-1h TO now+2h])
-    - 8-digit dates with field awareness (created:20240115)
-    - Natural keywords (field:today, field:"previous quarter", etc.)
+    Delegates to ``translate_query`` which handles all date forms, comma
+    expansion, field aliasing, relative ranges, and operator normalization.
 
     Args:
         query: Raw user query string
@@ -273,35 +277,15 @@ def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
     Note:
         Bare keywords without field prefixes pass through unchanged.
     """
-    query = _rewrite_compact_date(query)
-    query = _rewrite_whoosh_relative_range(query)
-    query = _rewrite_year_range(query)
-    query = _rewrite_8digit_date(query, tz)
-    query = _rewrite_relative_range(query)
-
-    def _replace(m: regex.Match[str]) -> str:
-        field = m.group("field")
-        keyword = (m.group("quoted") or m.group("bare")).lower()
-        if field in _DATE_ONLY_FIELDS:
-            return f"{field}:{_date_only_range(keyword, tz)}"
-        return f"{field}:{_datetime_range(keyword, tz)}"
-
-    try:
-        return _FIELD_DATE_RE.sub(_replace, query, timeout=_REGEX_TIMEOUT)
-    except TimeoutError:  # pragma: no cover
-        raise ValueError(
-            "Query too complex to process (date keyword rewrite timed out)",
-        )
+    return translate_query(query, tz)
 
 
 def normalize_query(query: str) -> str:
     """
     Normalize query syntax for better search behavior.
 
-    Expands comma-separated field values to explicit AND clauses and
-    collapses excessive whitespace for cleaner parsing:
-    - tag:foo,bar → tag:foo AND tag:bar
-    - multiple spaces → single spaces
+    Delegates to ``translate_query`` which handles comma expansion, whitespace
+    collapsing, operator normalization, and field aliasing.
 
     Args:
         query: Query string after date rewriting
@@ -309,38 +293,7 @@ def normalize_query(query: str) -> str:
     Returns:
         Normalized query string ready for Tantivy parsing
     """
-
-    def _expand(m: regex.Match[str]) -> str:
-        field = m.group(1)
-        values = [v.strip() for v in m.group(2).split(",") if v.strip()]
-        return " AND ".join(f"{field}:{v}" for v in values)
-
-    try:
-        query = regex.sub(
-            r"(\w+):([^\s\[\]]+(?:,[^\s\[\]]+)+)",
-            _expand,
-            query,
-            timeout=_REGEX_TIMEOUT,
-        )
-        # Commas between field expressions (after a range `]` or closing `"`)
-        # are treated as AND — e.g. `created:[range],added:[range]` is valid
-        # v2/Whoosh syntax that Tantivy does not accept with a literal comma.
-        query = regex.sub(
-            r'(["\]])\s*,\s*(?=\w)',
-            r"\1 AND ",
-            query,
-            timeout=_REGEX_TIMEOUT,
-        )
-        query = regex.sub(r" {2,}", " ", query, timeout=_REGEX_TIMEOUT).strip()
-        # Strip trailing dangling operators before Tantivy sees them.
-        query = _TRAILING_OPERATOR_RE.sub("", query, timeout=_REGEX_TIMEOUT).strip()
-        # Replace " - " / " + " with a space: Tantivy requires no space between
-        # the operator and its operand (-term / +term), so spaces on both sides
-        # means this is a natural-language separator, not a query operator.
-        query = _SPACED_OPERATOR_RE.sub(" ", query, timeout=_REGEX_TIMEOUT).strip()
-        return query
-    except TimeoutError:  # pragma: no cover
-        raise ValueError("Query too complex to process (normalization timed out)")
+    return translate_query(query, UTC)
 
 
 def build_permission_filter(
@@ -460,8 +413,11 @@ def parse_user_query(
         as a post-search score filter, not during query construction.
     """
 
-    query_str = rewrite_natural_date_keywords(raw_query, tz)
-    query_str = normalize_query(query_str)
+    try:
+        query_str = translate_query(raw_query, tz)
+    except Exception:  # pragma: no cover - defensive
+        logger.warning("Query translation failed; using raw query", exc_info=True)
+        query_str = raw_query
 
     exact = index.parse_query(
         query_str,

@@ -477,3 +477,111 @@ class TestOperatorNormalization:
     def test_parse_acceptance_trailing_op(self, index: tantivy.Index) -> None:
         translated = translate_query("foo -", UTC)
         index.parse_query(translated, DEFAULT_SEARCH_FIELDS, field_boosts=_FIELD_BOOSTS)
+
+
+@pytest.mark.search
+class TestMultiWordDateKeywords:
+    """FIX A: scan() must consume multi-word date keywords as a single value."""
+
+    def test_scan_previous_week_as_single_token(self) -> None:
+        # "created:previous week" must produce one FieldValue with value "previous week",
+        # not FieldValue("created","previous") + Passthrough(" week").
+        toks = scan("created:previous week")
+        assert toks == [FieldValue("created", "previous week")]
+
+    def test_scan_this_month_as_single_token(self) -> None:
+        toks = scan("added:this month")
+        assert toks == [FieldValue("added", "this month")]
+
+    def test_scan_previous_month_as_single_token(self) -> None:
+        toks = scan("created:previous month")
+        assert toks == [FieldValue("created", "previous month")]
+
+    def test_scan_this_year_as_single_token(self) -> None:
+        toks = scan("added:this year")
+        assert toks == [FieldValue("added", "this year")]
+
+    def test_scan_previous_year_as_single_token(self) -> None:
+        toks = scan("created:previous year")
+        assert toks == [FieldValue("created", "previous year")]
+
+    def test_scan_previous_quarter_as_single_token(self) -> None:
+        toks = scan("created:previous quarter")
+        assert toks == [FieldValue("created", "previous quarter")]
+
+    def test_quoted_multi_word_keyword_still_works(self) -> None:
+        # The quoted form must continue to work as before.
+        toks = scan('created:"previous week"')
+        assert toks == [FieldValue("created", '"previous week"')]
+
+    def test_non_date_field_not_affected(self) -> None:
+        # "previous" stops at the space for non-date fields; " week" passes through.
+        toks = scan("correspondent:previous week")
+        assert toks == [
+            FieldValue("correspondent", "previous"),
+            Passthrough(" week"),
+        ]
+
+    def test_translate_query_created_previous_week(self) -> None:
+        out = translate_query("created:previous week", UTC)
+        assert out.startswith("created:[")
+        assert out != "created:[9999-12-31T23:59:59Z TO 9999-12-31T23:59:59Z]"
+
+    def test_translate_query_added_this_month(self) -> None:
+        out = translate_query("added:this month", UTC)
+        assert out.startswith("added:[")
+        assert out != "added:[9999-12-31T23:59:59Z TO 9999-12-31T23:59:59Z]"
+
+
+@pytest.mark.search
+class TestISODatetimeBounds:
+    """FIX B: full ISO datetime tokens in range bounds must be parsed directly."""
+
+    def test_translate_range_iso_bounds_passthrough(self) -> None:
+        # Already-ISO datetime bounds must pass through as-is (exact instant).
+        result = translate_range(
+            "created",
+            "2020-01-01T00:00:00Z",
+            "2021-01-01T00:00:00Z",
+            UTC,
+        )
+        assert result == "created:[2020-01-01T00:00:00Z TO 2021-01-01T00:00:00Z]"
+
+    def test_translate_query_iso_range_preserved(self) -> None:
+        q = "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
+        assert translate_query(q, UTC) == q
+
+    def test_translate_query_comma_separated_iso_ranges(self) -> None:
+        q = (
+            "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z],"
+            "added:[2026-05-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
+        )
+        result = translate_query(q, UTC)
+        assert result == (
+            "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
+            " AND "
+            "added:[2026-05-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
+        )
+
+    def test_invalid_iso_datetime_is_no_match(self) -> None:
+        # A token with "T" that is not valid ISO datetime -> NO_MATCH.
+        result = translate_range(
+            "created",
+            "2020-01-01T99:00:00Z",
+            "2021-01-01T00:00:00Z",
+            UTC,
+        )
+        assert result == NO_MATCH
+
+    def test_parse_acceptance_iso_bounds(self, index: tantivy.Index) -> None:
+        q = "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
+        translated = translate_query(q, UTC)
+        index.parse_query(translated, DEFAULT_SEARCH_FIELDS, field_boosts=_FIELD_BOOSTS)
+
+    def test_parse_acceptance_comma_iso_ranges(self, index: tantivy.Index) -> None:
+        q = (
+            "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z],"
+            "added:[2026-05-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
+        )
+        translated = translate_query(q, UTC)
+        index.parse_query(translated, DEFAULT_SEARCH_FIELDS, field_boosts=_FIELD_BOOSTS)

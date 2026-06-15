@@ -18,6 +18,14 @@ from documents.search._dates import _field_range_from_dates
 from documents.search._dates import _fmt
 from documents.search._dates import _precision_bounds
 
+# Compiled regex that matches any known multi-word (or single-word) date keyword
+# at the start of a match position, longest alternatives first so "previous week"
+# wins over a hypothetical shorter "previous".
+_KEYWORD_VALUE_RE = regex.compile(
+    "|".join(sorted((regex.escape(k) for k in _DATE_KEYWORDS), key=len, reverse=True)),
+    regex.IGNORECASE,
+)
+
 if TYPE_CHECKING:
     from datetime import tzinfo
 
@@ -173,7 +181,19 @@ def scan(query: str) -> list[Token]:
                     i = _maybe_comma(query, i, tokens)
                     continue
             else:
-                val = _consume_value(query, j)
+                # For date fields with an unquoted value, try to consume a known
+                # multi-word keyword phrase first (e.g. "previous week") before
+                # falling back to the whitespace-stopping _consume_value.
+                val = None
+                if field in DATE_FIELDS:
+                    km = _KEYWORD_VALUE_RE.match(query, j)
+                    if km is not None:
+                        kend = km.end()
+                        # Require match ends at a word/clause boundary.
+                        if kend >= len(query) or query[kend] in " \t),":
+                            val = (km.group(0), kend)
+                if val is None:
+                    val = _consume_value(query, j)
                 if val is not None:
                     value, k = val
                     # Handle trailing comma semantics.
@@ -414,6 +434,17 @@ def _bound_datetimes(
     rel = _resolve_relative_bound(token)
     if rel is not None:
         return rel, rel
+
+    # Full ISO datetime token (contains "T"): parse directly and return an exact
+    # instant (floor == ceil). Python 3.11+ datetime.fromisoformat accepts trailing Z.
+    if "T" in token:
+        try:
+            dt = datetime.fromisoformat(token)
+            # Ensure timezone-aware UTC result.
+            dt = dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt.astimezone(UTC)
+            return dt, dt
+        except ValueError:
+            return None
 
     digits = token.replace("-", "")
     bounds = _precision_bounds(digits)
