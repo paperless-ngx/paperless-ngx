@@ -37,6 +37,12 @@ MULTI_VALUE_FIELDS = frozenset({"tag", "tag_id", "viewer_id"})
 # Date fields whose values/ranges get rewritten to RFC3339 Tantivy ranges.
 DATE_FIELDS = frozenset({"created", "modified", "added"})
 
+# Field aliases: user-facing names that map to real Tantivy schema field names.
+# Applied by _render so translated output references valid schema fields.
+FIELD_ALIASES: dict[str, str] = {
+    "type": "document_type",
+}
+
 # Known schema fields: a comma immediately followed by ``<known>:`` is a clause
 # separator. Restricting to known fields prevents URL-like ``http:`` misfires.
 KNOWN_FIELDS = frozenset(
@@ -341,6 +347,34 @@ def _bound_datetimes(
         lo = datetime(start.year, start.month, start.day, tzinfo=tz).astimezone(UTC)
         hi = datetime(end.year, end.month, end.day, tzinfo=tz).astimezone(UTC)
     return lo, hi
+
+
+def _render(tok: Token, tz: tzinfo) -> str:
+    """Render a single token back to a Tantivy query string fragment."""
+    if isinstance(tok, Passthrough):
+        return tok.raw
+    if isinstance(tok, Comma):
+        return " AND "
+    if isinstance(tok, FieldValueList):
+        field = FIELD_ALIASES.get(tok.field, tok.field)
+        return " AND ".join(f"{field}:{v}" for v in tok.values)
+    if isinstance(tok, FieldValue):
+        field = FIELD_ALIASES.get(tok.field, tok.field)
+        if field in DATE_FIELDS:
+            return translate_scalar(field, tok.value, tz)
+        return f"{field}:{tok.value}"
+    if isinstance(tok, FieldRange):
+        field = FIELD_ALIASES.get(tok.field, tok.field)
+        if field in DATE_FIELDS:
+            return translate_range(field, tok.lo, tok.hi, tz)
+        return f"{field}:{tok.open}{tok.lo} TO {tok.hi}{tok.close}"
+    return ""  # pragma: no cover
+
+
+def translate_query(raw: str, tz: tzinfo) -> str:
+    """Translate a raw Whoosh-style query into Tantivy-compatible syntax."""
+    tokens = resolve_commas(scan(raw))
+    return "".join(_render(t, tz) for t in tokens)
 
 
 def translate_range(field: str, lo: str, hi: str, tz: tzinfo) -> str:

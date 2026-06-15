@@ -1,10 +1,16 @@
 from __future__ import annotations
 
 from datetime import UTC
+from typing import TYPE_CHECKING
 
 import pytest
 
 from documents.search._dates import _precision_bounds
+
+if TYPE_CHECKING:
+    import tantivy
+from documents.search._query import _FIELD_BOOSTS
+from documents.search._query import DEFAULT_SEARCH_FIELDS
 from documents.search._translate import NO_MATCH
 from documents.search._translate import OPEN_HI
 from documents.search._translate import OPEN_LO
@@ -15,6 +21,7 @@ from documents.search._translate import FieldValueList
 from documents.search._translate import Passthrough
 from documents.search._translate import resolve_commas
 from documents.search._translate import scan
+from documents.search._translate import translate_query
 from documents.search._translate import translate_range
 from documents.search._translate import translate_scalar
 
@@ -271,3 +278,51 @@ class TestTranslateRange:
 
     def test_invalid_bound_is_no_match(self):
         assert translate_range("created", "202023", "2025", UTC) == NO_MATCH
+
+
+@pytest.mark.search
+class TestTranslateQuery:
+    @pytest.mark.parametrize(
+        ("raw", "expected"),
+        [
+            (
+                "created:2020",
+                "created:[2020-01-01T00:00:00Z TO 2021-01-01T00:00:00Z]",
+            ),
+            ("tag:foo,bar", "tag:foo AND tag:bar"),
+            # 'type' is a user-facing alias rewritten to 'document_type' (the real schema field)
+            ("tag:foo,type:bar", "tag:foo AND document_type:bar"),
+            (
+                "created:[2020 TO 2021],added:[2022 TO 2023]",
+                "created:[2020-01-01T00:00:00Z TO 2022-01-01T00:00:00Z]"
+                " AND "
+                "added:[2022-01-01T00:00:00Z TO 2024-01-01T00:00:00Z]",
+            ),
+            # correspondent is not multi-value: comma stays literal inside the value
+            ("correspondent:foo,bar", "correspondent:foo,bar"),
+        ],
+    )
+    def test_golden(self, raw: str, expected: str) -> None:
+        assert translate_query(raw, UTC) == expected
+
+    @pytest.mark.parametrize(
+        "raw",
+        [
+            "created:2020",
+            "created:202003",
+            "created:[20200101 TO 20201231]",
+            "created:[2020-01-01 TO 2020-12-31]",
+            "created:[2020 to]",
+            "created:[to 2020]",
+            "title:x,created:[2020 TO 2021]",
+            "created:2020 OR foo",
+            "(created:2020 OR invoice)",
+            "tag:foo,type:bar",
+            "created:202023",
+            "bank statement",
+        ],
+    )
+    def test_parse_acceptance(self, index: tantivy.Index, raw: str) -> None:
+        translated = translate_query(raw, UTC)
+        # Must not raise:
+        index.parse_query(translated, DEFAULT_SEARCH_FIELDS, field_boosts=_FIELD_BOOSTS)
