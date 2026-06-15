@@ -246,50 +246,38 @@ per-file-ignores."src/documents/models.py" = [
 isort.force-single-line = true
 
 [tool.codespell]
-write-changes = true
 ignore-words-list = "criterias,afterall,valeu,ureue,equest,ure,assertIn,Oktober,commitish"
 skip = """\
   src-ui/src/locale/*,src-ui/pnpm-lock.yaml,src-ui/e2e/*,src/paperless_mail/tests/samples/*,src/paperless/tests/samples\
   /mail/*,src/documents/tests/samples/*,*.po,*.json\
   """
+write-changes = true
 
 [tool.pyproject-fmt]
 table_format = "long"
 
 [tool.mypy]
 mypy_path = "src"
+disallow_any_generics = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
 plugins = [
   "mypy_django_plugin.main",
   "mypy_drf_plugin.main",
 ]
-check_untyped_defs = true
-disallow_any_generics = true
-disallow_incomplete_defs = true
-disallow_untyped_defs = true
-warn_redundant_casts = true
-warn_unused_ignores = true
 
 [tool.pyrefly]
-search-path = [ "src" ]
 baseline = ".pyrefly-baseline.json"
 python-platform = "linux"
+search-path = [ "src" ]
 
 [tool.django-stubs]
 django_settings_module = "paperless.settings"
 
 [tool.pytest]
-minversion = "9.0"
-pythonpath = [ "src" ]
-strict_config = true
-strict_markers = true
-strict_parametrization_ids = true
-strict_xfail = true
-testpaths = [
-  "src/documents/tests/",
-  "src/paperless/tests/",
-  "src/paperless_mail/tests/",
-  "src/paperless_ai/tests",
-]
 addopts = [
   "--pythonwarnings=all",
   "--cov",
@@ -304,7 +292,6 @@ addopts = [
   "-o",
   "junit_family=legacy",
 ]
-norecursedirs = [ "src/locale/", ".venv/", "src-ui/" ]
 DJANGO_SETTINGS_MODULE = "paperless.settings"
 markers = [
   "live: Integration tests requiring external services (Gotenberg, Tika, nginx, etc)",
@@ -316,6 +303,19 @@ markers = [
   "management: Tests which cover management commands/functionality",
   "search: Tests for the Tantivy search backend",
   "api: Tests for REST API endpoints",
+]
+minversion = "9.0"
+norecursedirs = [ "src/locale/", ".venv/", "src-ui/" ]
+pythonpath = [ "src" ]
+strict_config = true
+strict_markers = true
+strict_parametrization_ids = true
+strict_xfail = true
+testpaths = [
+  "src/documents/tests/",
+  "src/paperless/tests/",
+  "src/paperless_mail/tests/",
+  "src/paperless_ai/tests",
 ]
 
 [tool.pytest_env]

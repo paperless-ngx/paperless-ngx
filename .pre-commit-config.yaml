@@ -38,7 +38,7 @@ repos:
           - json
   # See https://github.com/prettier/prettier/issues/15742 for the fork reason
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: 'v3.8.3'
+    rev: 'v3.8.4'
     hooks:
       - id: prettier
         types_or:
@@ -50,12 +50,12 @@ repos:
           - 'prettier-plugin-organize-imports@4.3.0'
   # Python hooks
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.15
+    rev: v0.15.17
     hooks:
       - id: ruff-check
       - id: ruff-format
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: "v2.21.2"
+    rev: "v2.24.1"
     hooks:
       - id: pyproject-fmt
   # Dockerfile hooks
