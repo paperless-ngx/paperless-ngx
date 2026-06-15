@@ -47,68 +47,56 @@ def _iso_range(lo: datetime, hi: datetime) -> str:
     return f"[{_fmt(lo)} TO {_fmt(hi)}]"
 
 
+def _quarter_start(d: date) -> date:
+    """Return the first day of the calendar quarter containing ``d``."""
+    return date(d.year, ((d.month - 1) // 3) * 3 + 1, 1)
+
+
+def _midnight(d: date, tz: tzinfo) -> datetime:
+    """Convert a calendar date at local-timezone midnight to a UTC datetime."""
+    return datetime(d.year, d.month, d.day, tzinfo=tz).astimezone(UTC)
+
+
+def _keyword_bounds(keyword: str, tz: tzinfo) -> tuple[date, date]:
+    """
+    Map a relative date keyword to ``(start, exclusive_end)`` calendar dates.
+
+    ``tz`` only determines what "today" is; the caller decides how the returned
+    dates become UTC datetime boundaries (date-only vs. local-midnight offset).
+    """
+    today = datetime.now(tz).date()
+    if keyword == _TODAY:
+        return today, today + timedelta(days=1)
+    if keyword == _YESTERDAY:
+        return today - timedelta(days=1), today
+    if keyword == _PREVIOUS_WEEK:
+        this_monday = today - timedelta(days=today.weekday())
+        return this_monday - timedelta(weeks=1), this_monday
+    if keyword == _THIS_MONTH:
+        first = today.replace(day=1)
+        return first, first + relativedelta(months=1)
+    if keyword == _PREVIOUS_MONTH:
+        this_first = today.replace(day=1)
+        return this_first - relativedelta(months=1), this_first
+    if keyword == _THIS_YEAR:
+        return date(today.year, 1, 1), date(today.year + 1, 1, 1)
+    if keyword == _PREVIOUS_YEAR:
+        return date(today.year - 1, 1, 1), date(today.year, 1, 1)
+    if keyword == _PREVIOUS_QUARTER:
+        this_quarter = _quarter_start(today)
+        return this_quarter - relativedelta(months=3), this_quarter
+    raise ValueError(f"Unknown keyword: {keyword}")
+
+
 def _date_only_range(keyword: str, tz: tzinfo) -> str:
     """
     For `created` (DateField): use the local calendar date, converted to
     midnight UTC boundaries. No offset arithmetic — date only.
     """
-
-    today = datetime.now(tz).date()
-
-    def _quarter_start(d: date) -> date:
-        return date(d.year, ((d.month - 1) // 3) * 3 + 1, 1)
-
-    if keyword == _TODAY:
-        lo = datetime(today.year, today.month, today.day, tzinfo=UTC)
-        return _iso_range(lo, lo + timedelta(days=1))
-    if keyword == _YESTERDAY:
-        y = today - timedelta(days=1)
-        lo = datetime(y.year, y.month, y.day, tzinfo=UTC)
-        hi = datetime(today.year, today.month, today.day, tzinfo=UTC)
-        return _iso_range(lo, hi)
-    if keyword == _PREVIOUS_WEEK:
-        this_mon = today - timedelta(days=today.weekday())
-        last_mon = this_mon - timedelta(weeks=1)
-        lo = datetime(last_mon.year, last_mon.month, last_mon.day, tzinfo=UTC)
-        hi = datetime(this_mon.year, this_mon.month, this_mon.day, tzinfo=UTC)
-        return _iso_range(lo, hi)
-    if keyword == _THIS_MONTH:
-        lo = datetime(today.year, today.month, 1, tzinfo=UTC)
-        if today.month == 12:
-            hi = datetime(today.year + 1, 1, 1, tzinfo=UTC)
-        else:
-            hi = datetime(today.year, today.month + 1, 1, tzinfo=UTC)
-        return _iso_range(lo, hi)
-    if keyword == _PREVIOUS_MONTH:
-        if today.month == 1:
-            lo = datetime(today.year - 1, 12, 1, tzinfo=UTC)
-        else:
-            lo = datetime(today.year, today.month - 1, 1, tzinfo=UTC)
-        hi = datetime(today.year, today.month, 1, tzinfo=UTC)
-        return _iso_range(lo, hi)
-    if keyword == _THIS_YEAR:
-        lo = datetime(today.year, 1, 1, tzinfo=UTC)
-        return _iso_range(lo, datetime(today.year + 1, 1, 1, tzinfo=UTC))
-    if keyword == _PREVIOUS_YEAR:
-        lo = datetime(today.year - 1, 1, 1, tzinfo=UTC)
-        return _iso_range(lo, datetime(today.year, 1, 1, tzinfo=UTC))
-    if keyword == _PREVIOUS_QUARTER:
-        this_quarter = _quarter_start(today)
-        last_quarter = this_quarter - relativedelta(months=3)
-        lo = datetime(
-            last_quarter.year,
-            last_quarter.month,
-            last_quarter.day,
-            tzinfo=UTC,
-        )
-        hi = datetime(
-            this_quarter.year,
-            this_quarter.month,
-            this_quarter.day,
-            tzinfo=UTC,
-        )
-        return _iso_range(lo, hi)
-    raise ValueError(f"Unknown keyword: {keyword}")
+    start, end = _keyword_bounds(keyword, tz)
+    lo = datetime(start.year, start.month, start.day, tzinfo=UTC)
+    hi = datetime(end.year, end.month, end.day, tzinfo=UTC)
+    return _iso_range(lo, hi)
 
 
 def _datetime_range(keyword: str, tz: tzinfo) -> str:
@@ -116,54 +104,8 @@ def _datetime_range(keyword: str, tz: tzinfo) -> str:
     For `added` / `modified` (DateTimeField, stored as UTC): convert local day
     boundaries to UTC — full offset arithmetic required.
     """
-
-    now_local = datetime.now(tz)
-    today = now_local.date()
-
-    def _midnight(d: date) -> datetime:
-        return datetime(d.year, d.month, d.day, tzinfo=tz).astimezone(UTC)
-
-    def _quarter_start(d: date) -> date:
-        return date(d.year, ((d.month - 1) // 3) * 3 + 1, 1)
-
-    if keyword == _TODAY:
-        return _iso_range(_midnight(today), _midnight(today + timedelta(days=1)))
-    if keyword == _YESTERDAY:
-        y = today - timedelta(days=1)
-        return _iso_range(_midnight(y), _midnight(today))
-    if keyword == _PREVIOUS_WEEK:
-        this_mon = today - timedelta(days=today.weekday())
-        last_mon = this_mon - timedelta(weeks=1)
-        return _iso_range(_midnight(last_mon), _midnight(this_mon))
-    if keyword == _THIS_MONTH:
-        first = today.replace(day=1)
-        if today.month == 12:
-            next_first = date(today.year + 1, 1, 1)
-        else:
-            next_first = date(today.year, today.month + 1, 1)
-        return _iso_range(_midnight(first), _midnight(next_first))
-    if keyword == _PREVIOUS_MONTH:
-        this_first = today.replace(day=1)
-        if today.month == 1:
-            last_first = date(today.year - 1, 12, 1)
-        else:
-            last_first = date(today.year, today.month - 1, 1)
-        return _iso_range(_midnight(last_first), _midnight(this_first))
-    if keyword == _THIS_YEAR:
-        return _iso_range(
-            _midnight(date(today.year, 1, 1)),
-            _midnight(date(today.year + 1, 1, 1)),
-        )
-    if keyword == _PREVIOUS_YEAR:
-        return _iso_range(
-            _midnight(date(today.year - 1, 1, 1)),
-            _midnight(date(today.year, 1, 1)),
-        )
-    if keyword == _PREVIOUS_QUARTER:
-        this_quarter = _quarter_start(today)
-        last_quarter = this_quarter - relativedelta(months=3)
-        return _iso_range(_midnight(last_quarter), _midnight(this_quarter))
-    raise ValueError(f"Unknown keyword: {keyword}")
+    start, end = _keyword_bounds(keyword, tz)
+    return _iso_range(_midnight(start, tz), _midnight(end, tz))
 
 
 def _precision_bounds(digits: str) -> tuple[date, date] | None:

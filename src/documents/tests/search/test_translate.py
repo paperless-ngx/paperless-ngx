@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import UTC
 from datetime import datetime
 from typing import TYPE_CHECKING
+from zoneinfo import ZoneInfo
 
 import pytest
 import time_machine
@@ -550,15 +551,124 @@ class TestMultiWordDateKeywords:
             Passthrough(" week"),
         ]
 
-    def test_translate_query_created_previous_week(self) -> None:
-        out = translate_query("created:previous week", UTC)
-        assert out.startswith("created:[")
-        assert out != "created:[9999-12-31T23:59:59Z TO 9999-12-31T23:59:59Z]"
 
-    def test_translate_query_added_this_month(self) -> None:
-        out = translate_query("added:this month", UTC)
-        assert out.startswith("added:[")
-        assert out != "added:[9999-12-31T23:59:59Z TO 9999-12-31T23:59:59Z]"
+@pytest.mark.search
+class TestKeywordDateResolution:
+    """Relative date keywords resolve to exact ISO ranges against a frozen clock.
+
+    Frozen at 2026-03-28 12:00 UTC (a Saturday in Q1) so the week, month,
+    quarter and year rollovers are all exercised by a single anchor.
+    """
+
+    # created is a DateField: bounds are UTC midnight, no timezone offset.
+    @pytest.mark.parametrize(
+        ("keyword", "expected"),
+        [
+            pytest.param(
+                "today",
+                "created:[2026-03-28T00:00:00Z TO 2026-03-29T00:00:00Z]",
+                id="today",
+            ),
+            pytest.param(
+                "yesterday",
+                "created:[2026-03-27T00:00:00Z TO 2026-03-28T00:00:00Z]",
+                id="yesterday",
+            ),
+            pytest.param(
+                "previous week",
+                "created:[2026-03-16T00:00:00Z TO 2026-03-23T00:00:00Z]",
+                id="previous-week",
+            ),
+            pytest.param(
+                "this month",
+                "created:[2026-03-01T00:00:00Z TO 2026-04-01T00:00:00Z]",
+                id="this-month",
+            ),
+            pytest.param(
+                "previous month",
+                "created:[2026-02-01T00:00:00Z TO 2026-03-01T00:00:00Z]",
+                id="previous-month",
+            ),
+            pytest.param(
+                "this year",
+                "created:[2026-01-01T00:00:00Z TO 2027-01-01T00:00:00Z]",
+                id="this-year",
+            ),
+            pytest.param(
+                "previous year",
+                "created:[2025-01-01T00:00:00Z TO 2026-01-01T00:00:00Z]",
+                id="previous-year",
+            ),
+            pytest.param(
+                "previous quarter",
+                "created:[2025-10-01T00:00:00Z TO 2026-01-01T00:00:00Z]",
+                id="previous-quarter",
+            ),
+        ],
+    )
+    @time_machine.travel(_FROZEN_NOW, tick=False)
+    def test_date_only_field_keyword_ranges(
+        self,
+        keyword: str,
+        expected: str,
+    ) -> None:
+        assert translate_query(f"created:{keyword}", UTC) == expected
+
+    # added is a DateTimeField: local-tz midnight converted to UTC. Tokyo
+    # (+09:00, no DST) shifts each midnight boundary back to 15:00Z the day
+    # before, so this also exercises the local-midnight offset path.
+    @pytest.mark.parametrize(
+        ("keyword", "expected"),
+        [
+            pytest.param(
+                "today",
+                "added:[2026-03-27T15:00:00Z TO 2026-03-28T15:00:00Z]",
+                id="today",
+            ),
+            pytest.param(
+                "yesterday",
+                "added:[2026-03-26T15:00:00Z TO 2026-03-27T15:00:00Z]",
+                id="yesterday",
+            ),
+            pytest.param(
+                "previous week",
+                "added:[2026-03-15T15:00:00Z TO 2026-03-22T15:00:00Z]",
+                id="previous-week",
+            ),
+            pytest.param(
+                "this month",
+                "added:[2026-02-28T15:00:00Z TO 2026-03-31T15:00:00Z]",
+                id="this-month",
+            ),
+            pytest.param(
+                "previous month",
+                "added:[2026-01-31T15:00:00Z TO 2026-02-28T15:00:00Z]",
+                id="previous-month",
+            ),
+            pytest.param(
+                "this year",
+                "added:[2025-12-31T15:00:00Z TO 2026-12-31T15:00:00Z]",
+                id="this-year",
+            ),
+            pytest.param(
+                "previous year",
+                "added:[2024-12-31T15:00:00Z TO 2025-12-31T15:00:00Z]",
+                id="previous-year",
+            ),
+            pytest.param(
+                "previous quarter",
+                "added:[2025-09-30T15:00:00Z TO 2025-12-31T15:00:00Z]",
+                id="previous-quarter",
+            ),
+        ],
+    )
+    @time_machine.travel(_FROZEN_NOW, tick=False)
+    def test_datetime_field_keyword_ranges_local_tz(
+        self,
+        keyword: str,
+        expected: str,
+    ) -> None:
+        assert translate_query(f"added:{keyword}", ZoneInfo("Asia/Tokyo")) == expected
 
 
 @pytest.mark.search
