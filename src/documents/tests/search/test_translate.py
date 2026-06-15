@@ -326,3 +326,42 @@ class TestTranslateQuery:
         translated = translate_query(raw, UTC)
         # Must not raise:
         index.parse_query(translated, DEFAULT_SEARCH_FIELDS, field_boosts=_FIELD_BOOSTS)
+
+
+@pytest.mark.search
+class TestFieldAliasing:
+    """Whoosh->Tantivy field-name aliasing (type/path -> document_type/storage_path)."""
+
+    def test_type_alias(self) -> None:
+        assert translate_query("type:invoice", UTC) == "document_type:invoice"
+
+    def test_path_alias(self) -> None:
+        assert translate_query("path:/foo/bar", UTC) == "storage_path:/foo/bar"
+
+    def test_type_id_alias(self) -> None:
+        assert translate_query("type_id:5", UTC) == "document_type_id:5"
+
+    def test_path_id_alias(self) -> None:
+        assert translate_query("path_id:7", UTC) == "storage_path_id:7"
+
+    def test_clause_separator_plus_alias(self) -> None:
+        # Comma between known fields acts as AND separator; alias still applied.
+        assert (
+            translate_query("tag:foo,type:bar", UTC) == "tag:foo AND document_type:bar"
+        )
+
+    def test_type_range_alias(self) -> None:
+        # type is not a date field; range passes through verbatim with alias applied.
+        assert (
+            translate_query("type:[2020 TO 2021]", UTC)
+            == "document_type:[2020 TO 2021]"
+        )
+
+    def test_parse_acceptance_type(self, index: tantivy.Index) -> None:
+        # Translated output must be accepted by the real Tantivy parser.
+        translated = translate_query("type:invoice", UTC)
+        index.parse_query(translated, DEFAULT_SEARCH_FIELDS, field_boosts=_FIELD_BOOSTS)
+
+    def test_parse_acceptance_path(self, index: tantivy.Index) -> None:
+        translated = translate_query("path:foo", UTC)
+        index.parse_query(translated, DEFAULT_SEARCH_FIELDS, field_boosts=_FIELD_BOOSTS)

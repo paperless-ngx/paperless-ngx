@@ -37,10 +37,14 @@ MULTI_VALUE_FIELDS = frozenset({"tag", "tag_id", "viewer_id"})
 # Date fields whose values/ranges get rewritten to RFC3339 Tantivy ranges.
 DATE_FIELDS = frozenset({"created", "modified", "added"})
 
-# Field aliases: user-facing names that map to real Tantivy schema field names.
-# Applied by _render so translated output references valid schema fields.
+# Field aliases: Whoosh (v2) field names that were renamed in the Tantivy schema.
+# Preserved here so v2 queries using the old names continue to work without 400
+# errors instead of silently failing. Applied by _render to non-date field tokens.
 FIELD_ALIASES: dict[str, str] = {
     "type": "document_type",
+    "type_id": "document_type_id",
+    "path": "storage_path",
+    "path_id": "storage_path_id",
 }
 
 # Known schema fields: a comma immediately followed by ``<known>:`` is a clause
@@ -51,13 +55,16 @@ KNOWN_FIELDS = frozenset(
         "content",
         "correspondent",
         "document_type",
-        "type",
+        "type",  # v2 alias -> document_type
         "storage_path",
+        "path",  # v2 alias -> storage_path
         "tag",
         "tag_id",
         "correspondent_id",
         "document_type_id",
+        "type_id",  # v2 alias -> document_type_id
         "storage_path_id",
+        "path_id",  # v2 alias -> storage_path_id
         "owner_id",
         "viewer_id",
         "asn",
