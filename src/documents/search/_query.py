@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC
-from datetime import datetime
 from typing import TYPE_CHECKING
 from typing import Final
 
@@ -30,7 +29,6 @@ logger = logging.getLogger("paperless.search")
 # Prevents ReDoS on adversarial user-supplied query strings.
 _REGEX_TIMEOUT: Final[float] = 1.0
 
-_COMPACT_DATE_RE = regex.compile(r"\b(\d{14})\b")
 # Matches CJK/Hangul characters so queries can be routed to bigram fields.
 # Uses Unicode properties to cover all blocks including Extension B+ planes.
 _CJK_RE: Final = regex.compile(r"[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]+")
@@ -63,33 +61,6 @@ def _build_cjk_query(
         return index.parse_query(cjk_text, fields)
     except Exception:
         return None
-
-
-def _rewrite_compact_date(query: str) -> str:
-    """Rewrite Whoosh compact date tokens (14-digit YYYYMMDDHHmmss) to ISO 8601."""
-
-    def _sub(m: regex.Match[str]) -> str:
-        raw = m.group(1)
-        try:
-            dt = datetime(
-                int(raw[0:4]),
-                int(raw[4:6]),
-                int(raw[6:8]),
-                int(raw[8:10]),
-                int(raw[10:12]),
-                int(raw[12:14]),
-                tzinfo=UTC,
-            )
-            return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
-        except ValueError:
-            return str(m.group(0))
-
-    try:
-        return _COMPACT_DATE_RE.sub(_sub, query, timeout=_REGEX_TIMEOUT)
-    except TimeoutError:  # pragma: no cover
-        raise ValueError(
-            "Query too complex to process (compact date rewrite timed out)",
-        )
 
 
 def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:

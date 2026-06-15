@@ -13,7 +13,6 @@ import time_machine
 
 from documents.search._query import _date_only_range
 from documents.search._query import _datetime_range
-from documents.search._query import _rewrite_compact_date
 from documents.search._query import build_permission_filter
 from documents.search._query import normalize_query
 from documents.search._query import parse_simple_text_highlight_query
@@ -412,10 +411,6 @@ class TestWhooshQueryRewriting:
         from documents.search._translate import NO_MATCH
 
         assert rewrite_natural_date_keywords("added:20231340", UTC) == NO_MATCH
-
-    def test_compact_14digit_invalid_date_passes_through_unchanged(self) -> None:
-        # Month=13 makes datetime() raise ValueError; the token must be left as-is
-        assert _rewrite_compact_date("20231300120000") == "20231300120000"
 
 
 class TestParseUserQuery:
