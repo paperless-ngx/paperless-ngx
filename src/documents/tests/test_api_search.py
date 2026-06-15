@@ -725,9 +725,10 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         GIVEN:
             - One document added right now
         WHEN:
-            - Query with invalid added date
+            - Query with an invalid added date
         THEN:
-            - 400 Bad Request returned (Tantivy rejects invalid date field syntax)
+            - 200 OK with no results (an unparsable date matches nothing rather
+              than erroring, matching the v2/Whoosh NullQuery behavior)
         """
         d1 = Document.objects.create(
             title="invoice",
@@ -740,8 +741,9 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
 
         response = self.client.get("/api/documents/?query=added:invalid-date")
 
-        # Tantivy rejects unparsable field queries with a 400
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        # An unparsable date is translated to a no-match clause, not a parse error.
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 0)
 
     @override_settings(
         TIME_ZONE="UTC",
