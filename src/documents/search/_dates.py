@@ -133,18 +133,31 @@ def _precision_bounds(digits: str) -> tuple[date, date] | None:
     return None
 
 
-def _field_range_from_dates(field: str, start: date, end: date, tz: tzinfo) -> str:
+def _utc_bounds_for_field(
+    field: str,
+    start: date,
+    end: date,
+    tz: tzinfo,
+) -> tuple[datetime, datetime]:
     """
-    Build a Tantivy ``field:[lo TO hi]`` ISO range from calendar-date bounds.
+    Convert calendar-date bounds to UTC datetimes per the field's storage type.
 
     For DateField (``created``) the bounds are UTC midnight (no offset). For
     DateTimeField (``added``/``modified``) the bounds are local-tz midnight
     converted to UTC, matching how each field is indexed.
     """
     if field in _DATE_ONLY_FIELDS:
-        lo = datetime(start.year, start.month, start.day, tzinfo=UTC)
-        hi = datetime(end.year, end.month, end.day, tzinfo=UTC)
-    else:
-        lo = datetime(start.year, start.month, start.day, tzinfo=tz).astimezone(UTC)
-        hi = datetime(end.year, end.month, end.day, tzinfo=tz).astimezone(UTC)
+        return (
+            datetime(start.year, start.month, start.day, tzinfo=UTC),
+            datetime(end.year, end.month, end.day, tzinfo=UTC),
+        )
+    return (
+        datetime(start.year, start.month, start.day, tzinfo=tz).astimezone(UTC),
+        datetime(end.year, end.month, end.day, tzinfo=tz).astimezone(UTC),
+    )
+
+
+def _field_range_from_dates(field: str, start: date, end: date, tz: tzinfo) -> str:
+    """Build a Tantivy ``field:[lo TO hi]`` ISO range from calendar-date bounds."""
+    lo, hi = _utc_bounds_for_field(field, start, end, tz)
     return f"{field}:{_iso_range(lo, hi)}"

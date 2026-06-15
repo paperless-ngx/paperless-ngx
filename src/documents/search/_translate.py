@@ -17,6 +17,7 @@ from documents.search._dates import _datetime_range
 from documents.search._dates import _field_range_from_dates
 from documents.search._dates import _fmt
 from documents.search._dates import _precision_bounds
+from documents.search._dates import _utc_bounds_for_field
 
 # Compiled regex that matches any known multi-word (or single-word) date keyword
 # at the start of a match position, longest alternatives first so "previous week"
@@ -463,13 +464,7 @@ def _bound_datetimes(
     if bounds is None:
         return None
     start, end = bounds
-    if field in _DATE_ONLY_FIELDS:
-        lo = datetime(start.year, start.month, start.day, tzinfo=UTC)
-        hi = datetime(end.year, end.month, end.day, tzinfo=UTC)
-    else:
-        lo = datetime(start.year, start.month, start.day, tzinfo=tz).astimezone(UTC)
-        hi = datetime(end.year, end.month, end.day, tzinfo=tz).astimezone(UTC)
-    return lo, hi
+    return _utc_bounds_for_field(field, start, end, tz)
 
 
 def _render(tok: Token, tz: tzinfo) -> str:
