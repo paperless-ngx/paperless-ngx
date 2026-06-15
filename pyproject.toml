@@ -1,6 +1,6 @@
 [project]
 name = "paperless-ngx"
-version = "2.20.15"
+version = "2.20.16"
 description = "A community-supported supercharged document management system: scan, index and archive all your physical documents"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -38,6 +38,7 @@ dependencies = [
   "django-multiselectfield~=1.0.1",
   "django-soft-delete~=1.0.18",
   "django-treenode>=0.23.2",
+	"django-csp~=4.0",
   "djangorestframework~=3.16",
   "djangorestframework-guardian~=0.4.0",
   "drf-spectacular~=0.28",
