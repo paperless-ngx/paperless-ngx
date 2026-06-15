@@ -98,6 +98,13 @@ MODEL_FILE = get_path_from_env(
 )
 LLM_INDEX_DIR = DATA_DIR / "llm_index"
 LLM_INDEX_LOCK = LLM_INDEX_DIR / "index.lock"
+# Cross-process read/write lock guarding the LLM index compaction/migration
+# file swap. Readers hold it shared; the swap takes it exclusively so it never
+# runs while a reader connection is open. Must be a SQLite (.db) file.
+LLM_INDEX_RWLOCK = LLM_INDEX_DIR / "llmindex.rwlock.db"
+# Seconds the compaction swap waits for active readers to drain before skipping
+# this cycle (it is a maintenance operation; the next run retries).
+LLM_INDEX_COMPACTION_LOCK_TIMEOUT = 30
 
 LOGGING_DIR = get_path_from_env("PAPERLESS_LOGGING_DIR", DATA_DIR / "log")
 

@@ -9,6 +9,7 @@ from paperless_ai.db import db_connection_released
 from paperless_ai.indexing import _document_id_filters
 from paperless_ai.indexing import get_rag_prompt_helper
 from paperless_ai.indexing import load_or_build_index
+from paperless_ai.indexing import read_store
 
 logger = logging.getLogger("paperless_ai.chat")
 
@@ -97,53 +98,59 @@ def _stream_chat_with_documents(query_str: str, documents: list[Document]):
     from llama_index.core.retrievers import VectorIndexRetriever
 
     config = AIConfig()
-    index = load_or_build_index(config)
     filters = _document_id_filters(str(doc.pk) for doc in documents)
 
-    retriever = VectorIndexRetriever(
-        index=index,
-        similarity_top_k=CHAT_RETRIEVER_TOP_K,
-        filters=filters,
-    )
+    # Hold the shared read lock for the whole operation: the query engine
+    # retrieves from the vector store again during synthesis, so the connection
+    # must stay open (and the swap must not run) until the stream finishes.
+    with read_store() as store:
+        index = load_or_build_index(config, store)
+        retriever = VectorIndexRetriever(
+            index=index,
+            similarity_top_k=CHAT_RETRIEVER_TOP_K,
+            filters=filters,
+        )
 
-    # Slow query-embedding + vector search; no Django ORM access happens during
-    # it, so release the pooled DB connection for its duration. See #12976.
-    with db_connection_released():
-        top_nodes = retriever.retrieve(query_str)
-    if not top_nodes:
-        logger.warning("No nodes found for the given documents.")
-        yield CHAT_NO_CONTENT_MESSAGE
-        return
+        # Slow query-embedding + vector search; no Django ORM access happens
+        # during it, so release the pooled DB connection for its duration. See
+        # #12976.
+        with db_connection_released():
+            top_nodes = retriever.retrieve(query_str)
+        if not top_nodes:
+            logger.warning("No nodes found for the given documents.")
+            yield CHAT_NO_CONTENT_MESSAGE
+            return
 
-    client = AIClient()
+        client = AIClient()
 
-    references = _get_document_references(documents, top_nodes)
+        references = _get_document_references(documents, top_nodes)
 
-    prompt_template = PromptTemplate(template=CHAT_PROMPT_TMPL)
-    response_synthesizer = get_response_synthesizer(
-        llm=client.llm,
-        prompt_helper=get_rag_prompt_helper(
-            chunk_size=config.llm_embedding_chunk_size,
-            context_size=config.llm_context_size,
-        ),
-        text_qa_template=prompt_template,
-        streaming=True,
-    )
-    query_engine = RetrieverQueryEngine.from_args(
-        retriever=retriever,
-        llm=client.llm,
-        response_synthesizer=response_synthesizer,
-        streaming=True,
-    )
+        prompt_template = PromptTemplate(template=CHAT_PROMPT_TMPL)
+        response_synthesizer = get_response_synthesizer(
+            llm=client.llm,
+            prompt_helper=get_rag_prompt_helper(
+                chunk_size=config.llm_embedding_chunk_size,
+                context_size=config.llm_context_size,
+            ),
+            text_qa_template=prompt_template,
+            streaming=True,
+        )
+        query_engine = RetrieverQueryEngine.from_args(
+            retriever=retriever,
+            llm=client.llm,
+            response_synthesizer=response_synthesizer,
+            streaming=True,
+        )
 
-    logger.debug("Document chat query: %s", query_str)
-    # Release the pooled DB connection for the slow streaming LLM response so it
-    # is not pinned for the whole stream; see paperless_ai.db and #12976.
-    with db_connection_released():
-        response_stream = query_engine.query(query_str)
-        for chunk in response_stream.response_gen:
-            yield chunk
-            sys.stdout.flush()
+        logger.debug("Document chat query: %s", query_str)
+        # Release the pooled DB connection for the slow streaming LLM response
+        # so it is not pinned for the whole stream; see paperless_ai.db and
+        # #12976.
+        with db_connection_released():
+            response_stream = query_engine.query(query_str)
+            for chunk in response_stream.response_gen:
+                yield chunk
+                sys.stdout.flush()
 
-        if references:
-            yield _format_chat_metadata_trailer(references)
+            if references:
+                yield _format_chat_metadata_trailer(references)

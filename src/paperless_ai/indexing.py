@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from django.utils import timezone
 from filelock import FileLock
+from filelock import ReadWriteLock
+from filelock import Timeout
 
 from documents.models import Document
 from documents.models import PaperlessTask
@@ -70,13 +72,88 @@ def get_vector_store() -> "PaperlessSqliteVecVectorStore":
     )
 
 
+# --- LLM index locking ---------------------------------------------------
+#
+# Two locks guard the index; they answer different questions and are NOT
+# interchangeable:
+#
+# * settings.LLM_INDEX_LOCK (FileLock, exclusive) -- serializes WRITERS against
+#   each other, so only one rebuild/upsert/delete/compaction runs at a time.
+#   Taken by write_store(). Readers never take it, so it never blocks reads.
+#
+# * settings.LLM_INDEX_RWLOCK (ReadWriteLock) -- coordinates readers against the
+#   compaction/migration file swap. read_store() takes it SHARED (readers run
+#   concurrently); _exclude_readers() takes it EXCLUSIVE, only for the swap, so
+#   the database file is never replaced while a reader connection is open (that
+#   would alias the old WAL onto the new file and corrupt it).
+#
+#                    | vs another writer | vs a reader
+#   -----------------+-------------------+----------------------------
+#   normal write     | LLM_INDEX_LOCK    | nothing (WAL gives MVCC)
+#   compaction/swap  | LLM_INDEX_LOCK    | LLM_INDEX_RWLOCK (exclusive)
+#   reader           | nothing (WAL)     | LLM_INDEX_RWLOCK (shared)
+#
+# They can't be merged into one ReadWriteLock: a normal write must exclude other
+# writers WITHOUT blocking readers (WAL already gives reader/writer concurrency),
+# and ReadWriteLock has no "exclusive vs writers, shared vs readers" mode. Only
+# the swap needs to exclude readers.
+def _index_rwlock() -> ReadWriteLock:
+    """Return a fresh read/write lock instance for the index swap.
+
+    ``is_singleton=False`` so reads and the swap always coordinate through
+    SQLite (the actual cross-process case) rather than hitting the in-process
+    reentrant-upgrade guard; callers must ``close()`` it (the context managers
+    below do).
+    """
+    settings.LLM_INDEX_DIR.mkdir(parents=True, exist_ok=True)
+    return ReadWriteLock(str(settings.LLM_INDEX_RWLOCK), is_singleton=False)
+
+
+@contextmanager
+def read_store():
+    """Acquire the shared read lock and yield the vector store for a read.
+
+    The shared lock is held for the whole lifetime of the connection (and
+    closed on exit) so the compaction/migration swap, which takes the exclusive
+    lock, never runs while this connection is open. Concurrent readers do not
+    block each other; only the swap does.
+    """
+    lock = _index_rwlock()
+    try:
+        with lock.read_lock():
+            store = get_vector_store()
+            try:
+                yield store
+            finally:
+                store.client.close()
+    finally:
+        lock.close()
+
+
+@contextmanager
+def _exclude_readers():
+    """Acquire exclusive index access, blocking until readers have drained.
+
+    The exclusive counterpart to ``read_store()``: a compaction or migration
+    must not run while any reader connection is open. Raises
+    :class:`filelock.Timeout` if active readers do not drain within
+    ``LLM_INDEX_COMPACTION_LOCK_TIMEOUT``; callers skip the operation on timeout.
+    """
+    lock = _index_rwlock()
+    try:
+        with lock.write_lock(timeout=settings.LLM_INDEX_COMPACTION_LOCK_TIMEOUT):
+            yield
+    finally:
+        lock.close()
+
+
 @contextmanager
 def write_store(embed_model_name: str | None = None):
     """Acquire the write lock and yield the vector store.
 
     All mutating operations (upsert, delete, rebuild, compact) must go through
     this context manager to serialise concurrent Celery writers.
-    Read paths use ``get_vector_store()`` directly — no lock needed.
+    Read paths use ``read_store()`` so they hold the shared read lock.
 
     Pass ``embed_model_name`` whenever the operation may create the table so
     the model name is recorded in the schema metadata for future mismatch checks.
@@ -139,23 +216,27 @@ def build_document_node(
     return parser.get_nodes_from_documents([doc])
 
 
-def load_or_build_index(config: AIConfig):
-    """Return a VectorStoreIndex backed by the vector store."""
+def load_or_build_index(config: AIConfig, store: "PaperlessSqliteVecVectorStore"):
+    """Return a VectorStoreIndex backed by ``store``.
+
+    ``store`` is supplied by the caller's ``read_store()`` context so the shared
+    read lock and the connection stay alive for the whole retrieval.
+    """
     import llama_index.core.settings as llama_settings
     from llama_index.core import VectorStoreIndex
 
     embed_model = get_embedding_model(config)
     llama_settings.Settings.embed_model = embed_model
-    vector_store = get_vector_store()
     return VectorStoreIndex.from_vector_store(
-        vector_store=vector_store,
+        vector_store=store,
         embed_model=embed_model,
     )
 
 
 def llm_index_exists() -> bool:
     """True when the index table exists on disk."""
-    return get_vector_store().table_exists()
+    with read_store() as store:
+        return store.table_exists()
 
 
 def get_rag_chunk_size() -> int:
@@ -224,7 +305,16 @@ def update_llm_index(
 ) -> str:
     """Rebuild or incrementally update the LLM index."""
     with write_store() as store:
-        if store.check_and_run_migrations():
+        try:
+            with _exclude_readers():
+                needs_reembed = store.check_and_run_migrations()
+        except Timeout:
+            logger.info(
+                "Skipping LLM index migration check: index readers are active; "
+                "will retry next run.",
+            )
+            needs_reembed = False
+        if needs_reembed:
             logger.warning(
                 "LLM index migration requires re-embedding; forcing rebuild.",
             )
@@ -240,13 +330,12 @@ def update_llm_index(
     config = AIConfig()
     model_name = get_configured_model_name(config)
 
-    if (
-        not rebuild
-        and llm_index_exists()
-        and get_vector_store().config_mismatch(model_name)
-    ):
-        logger.warning("Embedding model changed; forcing LLM index rebuild.")
-        rebuild = True
+    if not rebuild and llm_index_exists():
+        with read_store() as store:
+            config_mismatch = store.config_mismatch(model_name)
+        if config_mismatch:
+            logger.warning("Embedding model changed; forcing LLM index rebuild.")
+            rebuild = True
 
     if no_documents:
         logger.warning("No documents found to index.")
@@ -280,7 +369,14 @@ def update_llm_index(
                 else "No changes detected in LLM index."
             )
 
-        store.compact()
+        try:
+            with _exclude_readers():
+                store.compact()
+        except Timeout:
+            logger.info(
+                "Skipping LLM index compaction: index readers are active; "
+                "will retry next run.",
+            )
     return msg
 
 
@@ -301,7 +397,14 @@ def llm_index_add_or_update_document(document: Document):
 def llm_index_compact() -> None:
     """Compact the index immediately, rebuilding the table to reclaim space."""
     with write_store() as store:
-        store.compact(force=True)
+        try:
+            with _exclude_readers():
+                store.compact(force=True)
+        except Timeout:
+            logger.info(
+                "Skipping LLM index compaction: index readers are active; "
+                "will retry next run.",
+            )
 
 
 def llm_index_remove_document(document: Document):
@@ -368,18 +471,10 @@ def query_similar_documents(
 
     from llama_index.core.retrievers import VectorIndexRetriever
 
-    index = load_or_build_index(config)
-
     filters = (
         _document_id_filters(allowed_document_ids)
         if allowed_document_ids is not None
         else None
-    )
-
-    retriever = VectorIndexRetriever(
-        index=index,
-        similarity_top_k=top_k,
-        filters=filters,
     )
 
     query_text = truncate_content(
@@ -387,11 +482,20 @@ def query_similar_documents(
         chunk_size=config.llm_embedding_chunk_size,
         context_size=config.llm_context_size,
     )
-    # The retrieve() call generates a query embedding (a slow external request)
-    # and searches the vector store; no Django ORM access happens during it, so
-    # release the pooled DB connection for its duration. See #12976.
-    with db_connection_released():
-        results = retriever.retrieve(query_text)
+    # Hold the shared read lock for the whole retrieval so the connection is
+    # never open across a compaction swap. The retrieve() call generates a
+    # query embedding (a slow external request) and searches the vector store;
+    # no Django ORM access happens during it, so release the pooled DB
+    # connection for its duration. See #12976.
+    with read_store() as store:
+        index = load_or_build_index(config, store)
+        retriever = VectorIndexRetriever(
+            index=index,
+            similarity_top_k=top_k,
+            filters=filters,
+        )
+        with db_connection_released():
+            results = retriever.retrieve(query_text)
 
     retrieved_document_ids: list[int] = []
     for node in results:
