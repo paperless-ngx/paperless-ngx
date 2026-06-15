@@ -224,7 +224,7 @@ class TestSystemStatus(APITestCase):
         WHEN:
             - The user requests the system status
         THEN:
-            - The response contains an error celery status
+            - The response contains a warning celery status
         """
         mock_ping.return_value = None
         self.client.force_login(self.user)
@@ -234,6 +234,27 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(
             response.data["tasks"]["celery_error"],
             "No celery workers responded to ping. This may be temporary.",
+        )
+
+    @mock.patch("celery.app.control.Inspect.ping")
+    def test_system_status_celery_ping_unexpected_response(self, mock_ping) -> None:
+        """
+        GIVEN:
+            - Celery ping returns an unexpected worker response
+        WHEN:
+            - The user requests the system status
+        THEN:
+            - The response contains a warning celery status
+        """
+        mock_ping.return_value = {"hostname": {"ok": "not-pong"}}
+        self.client.force_login(self.user)
+        response = self.client.get(self.ENDPOINT)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["tasks"]["celery_status"], "WARNING")
+        self.assertEqual(response.data["tasks"]["celery_url"], "hostname")
+        self.assertEqual(
+            response.data["tasks"]["celery_error"],
+            "Celery worker responded unexpectedly.",
         )
 
     @mock.patch("documents.views.sleep")

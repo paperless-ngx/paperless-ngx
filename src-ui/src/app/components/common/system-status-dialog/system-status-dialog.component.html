@@ -131,7 +131,9 @@
                   @if (status.tasks.celery_status === 'OK') {
                     <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
                   } @else {
-                    <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
+                    <i-bs name="exclamation-triangle-fill" class="ms-2 lh-1"
+                    [class.text-danger]="status.tasks.celery_status === SystemStatusItemStatus.ERROR"
+                    [class.text-warning]="status.tasks.celery_status === SystemStatusItemStatus.WARNING"></i-bs>
                   }
                 </button>
                 <ng-template #celeryStatus>
