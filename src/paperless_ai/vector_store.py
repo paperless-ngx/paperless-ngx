@@ -557,7 +557,6 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
                 migration.description,
             )
             self._run_structural_migration(migration)
-            current = migration.to_version
 
         return False
 
