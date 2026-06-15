@@ -2,26 +2,20 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC
-from datetime import date
 from datetime import datetime
-from datetime import timedelta
 from typing import TYPE_CHECKING
 from typing import Final
 
 import regex
 import tantivy
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 
-from documents.search._dates import _DATE_KEYWORD_PATTERN
-from documents.search._dates import _DATE_ONLY_FIELDS
 from documents.search._dates import (
     _date_only_range,  # noqa: F401 — re-exported for test imports
 )
 from documents.search._dates import (
     _datetime_range,  # noqa: F401 — re-exported for test imports
 )
-from documents.search._dates import _fmt
 from documents.search._tokenizer import simple_search_tokens
 from documents.search._translate import translate_query
 
@@ -36,38 +30,7 @@ logger = logging.getLogger("paperless.search")
 # Prevents ReDoS on adversarial user-supplied query strings.
 _REGEX_TIMEOUT: Final[float] = 1.0
 
-_FIELD_DATE_RE = regex.compile(
-    rf"""(?<!\w)(?P<field>created|modified|added)\s*:\s*(?:
-    (?P<quote>["'])(?P<quoted>{_DATE_KEYWORD_PATTERN})(?P=quote)
-    |
-    (?P<bare>{_DATE_KEYWORD_PATTERN})(?![\w-])
-)""",
-    regex.IGNORECASE | regex.VERBOSE,
-)
 _COMPACT_DATE_RE = regex.compile(r"\b(\d{14})\b")
-_RELATIVE_RANGE_RE = regex.compile(
-    r"\[now([+-]\d+[dhm])?\s+TO\s+now([+-]\d+[dhm])?\]",
-    regex.IGNORECASE,
-)
-# Whoosh-style relative date range: e.g. [-1 week to now], [-7 days to now]
-_WHOOSH_REL_RANGE_RE = regex.compile(
-    r"\[-(?P<n>\d+)\s+(?P<unit>second|minute|hour|day|week|month|year)s?\s+to\s+now\]",
-    regex.IGNORECASE,
-)
-# Whoosh-style 8-digit date: field:YYYYMMDD — field-aware so timezone can be applied correctly.
-# Scoped to date fields only; numeric fields (asn, id, page_count, ...) must not be rewritten.
-_DATE8_RE = regex.compile(
-    r"(?<!\w)(?P<field>created|modified|added):(?P<date8>\d{8})\b",
-)
-_YEAR_RANGE_RE = regex.compile(
-    r"(?<!\w)(?P<field>created|modified|added):\[(?P<y1>\d{4})\s+TO\s+(?P<y2>\d{4})\]",
-    regex.IGNORECASE,
-)
-# Tantivy syntax error: " - " and " + " with spaces on both sides are invalid because
-# the NOT/MUST operators require no space between the operator and the term.
-# In natural-language queries (e.g., "H52.1 - Kurzsichtigkeit"), the dash is a separator.
-_SPACED_OPERATOR_RE = regex.compile(r"\s+[-+]\s+")
-_TRAILING_OPERATOR_RE = regex.compile(r"\s+[-+]+\s*$")
 # Matches CJK/Hangul characters so queries can be routed to bigram fields.
 # Uses Unicode properties to cover all blocks including Extension B+ planes.
 _CJK_RE: Final = regex.compile(r"[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]+")
@@ -127,137 +90,6 @@ def _rewrite_compact_date(query: str) -> str:
         raise ValueError(
             "Query too complex to process (compact date rewrite timed out)",
         )
-
-
-def _rewrite_relative_range(query: str) -> str:
-    """Rewrite Whoosh relative ranges ([now-7d TO now]) to concrete ISO 8601 UTC boundaries."""
-
-    def _sub(m: regex.Match[str]) -> str:
-        now = datetime.now(UTC)
-
-        def _offset(s: str | None) -> timedelta:
-            if not s:
-                return timedelta(0)
-            sign = 1 if s[0] == "+" else -1
-            n, unit = int(s[1:-1]), s[-1]
-            return (
-                sign
-                * {
-                    "d": timedelta(days=n),
-                    "h": timedelta(hours=n),
-                    "m": timedelta(minutes=n),
-                }[unit]
-            )
-
-        lo, hi = now + _offset(m.group(1)), now + _offset(m.group(2))
-        if lo > hi:
-            lo, hi = hi, lo
-        return f"[{_fmt(lo)} TO {_fmt(hi)}]"
-
-    try:
-        return _RELATIVE_RANGE_RE.sub(_sub, query, timeout=_REGEX_TIMEOUT)
-    except TimeoutError:  # pragma: no cover
-        raise ValueError(
-            "Query too complex to process (relative range rewrite timed out)",
-        )
-
-
-def _rewrite_whoosh_relative_range(query: str) -> str:
-    """Rewrite Whoosh-style relative date ranges ([-N unit to now]) to ISO 8601.
-
-    Supports: second, minute, hour, day, week, month, year (singular and plural).
-    Example: ``added:[-1 week to now]`` → ``added:[2025-01-01T… TO 2025-01-08T…]``
-    """
-    now = datetime.now(UTC)
-
-    def _sub(m: regex.Match[str]) -> str:
-        n = int(m.group("n"))
-        unit = m.group("unit").lower()
-        delta_map: dict[str, timedelta | relativedelta] = {
-            "second": timedelta(seconds=n),
-            "minute": timedelta(minutes=n),
-            "hour": timedelta(hours=n),
-            "day": timedelta(days=n),
-            "week": timedelta(weeks=n),
-            "month": relativedelta(months=n),
-            "year": relativedelta(years=n),
-        }
-        lo = now - delta_map[unit]
-        return f"[{_fmt(lo)} TO {_fmt(now)}]"
-
-    try:
-        return _WHOOSH_REL_RANGE_RE.sub(_sub, query, timeout=_REGEX_TIMEOUT)
-    except TimeoutError:  # pragma: no cover
-        raise ValueError(
-            "Query too complex to process (Whoosh relative range rewrite timed out)",
-        )
-
-
-def _rewrite_8digit_date(query: str, tz: tzinfo) -> str:
-    """Rewrite field:YYYYMMDD date tokens to an ISO 8601 day range.
-
-    Runs after ``_rewrite_compact_date`` so 14-digit timestamps are already
-    converted and won't spuriously match here.
-
-    For DateField fields (e.g. ``created``) uses UTC midnight boundaries.
-    For DateTimeField fields (e.g. ``added``, ``modified``) uses local TZ
-    midnight boundaries converted to UTC — matching the ``_datetime_range``
-    behaviour for keyword dates.
-    """
-
-    def _sub(m: regex.Match[str]) -> str:
-        field = m.group("field")
-        raw = m.group("date8")
-        try:
-            year, month, day = int(raw[0:4]), int(raw[4:6]), int(raw[6:8])
-            d = date(year, month, day)
-            if field in _DATE_ONLY_FIELDS:
-                lo = datetime(d.year, d.month, d.day, tzinfo=UTC)
-                hi = lo + timedelta(days=1)
-            else:
-                # DateTimeField: use local-timezone midnight → UTC
-                lo = datetime(d.year, d.month, d.day, tzinfo=tz).astimezone(UTC)
-                hi = datetime(
-                    (d + timedelta(days=1)).year,
-                    (d + timedelta(days=1)).month,
-                    (d + timedelta(days=1)).day,
-                    tzinfo=tz,
-                ).astimezone(UTC)
-            return f"{field}:[{_fmt(lo)} TO {_fmt(hi)}]"
-        except ValueError:
-            return m.group(0)
-
-    try:
-        return _DATE8_RE.sub(_sub, query, timeout=_REGEX_TIMEOUT)
-    except TimeoutError:  # pragma: no cover
-        raise ValueError(
-            "Query too complex to process (8-digit date rewrite timed out)",
-        )
-
-
-def _rewrite_year_range(query: str) -> str:
-    """Rewrite Whoosh-style year-only date ranges to ISO 8601 UTC boundaries.
-
-    Converts ``field:[YYYY TO YYYY]`` to a full ISO 8601 datetime range.
-    The upper bound is the start of the year after the end year (exclusive),
-    matching the Whoosh convention of treating year-only ranges as full-year spans.
-    """
-
-    def _sub(m: regex.Match[str]) -> str:
-        field = m.group("field")
-        y1, y2 = int(m.group("y1")), int(m.group("y2"))
-        # Whoosh swaps a reversed range when both years are explicit
-        # (whoosh.util.times.timespan.disambiguated); match that so a backwards
-        # range spans the intended years instead of matching nothing.
-        lo_year, hi_year = min(y1, y2), max(y1, y2)
-        lo = datetime(lo_year, 1, 1, tzinfo=UTC)
-        hi = datetime(hi_year + 1, 1, 1, tzinfo=UTC)
-        return f"{field}:[{_fmt(lo)} TO {_fmt(hi)}]"
-
-    try:
-        return _YEAR_RANGE_RE.sub(_sub, query, timeout=_REGEX_TIMEOUT)
-    except TimeoutError:  # pragma: no cover
-        raise ValueError("Query too complex to process (year range rewrite timed out)")
 
 
 def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
