@@ -7,7 +7,6 @@ from datetime import timedelta
 from typing import TYPE_CHECKING
 from typing import Final
 
-import regex as _regex
 from dateutil.relativedelta import relativedelta
 
 if TYPE_CHECKING:
@@ -35,10 +34,6 @@ _DATE_KEYWORDS = frozenset(
         _PREVIOUS_YEAR,
         _PREVIOUS_QUARTER,
     },
-)
-
-_DATE_KEYWORD_PATTERN = "|".join(
-    sorted((_regex.escape(k) for k in _DATE_KEYWORDS), key=len, reverse=True),
 )
 
 

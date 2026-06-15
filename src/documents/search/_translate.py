@@ -494,8 +494,8 @@ def _render(tok: Token, tz: tzinfo) -> str:
     return ""  # pragma: no cover
 
 
-# Post-render operator normalization patterns (mirrors normalize_query in _query.py,
-# defined locally so _translate has no import dependency on _query).
+# Post-render operator normalization patterns: collapse repeated whitespace and
+# strip spaced/trailing Tantivy boolean operators that would otherwise be invalid.
 _MULTI_SPACE_RE = regex.compile(r" {2,}")
 _TRAILING_OP_RE = regex.compile(r"\s+[-+]+\s*$")
 _SPACED_OP_RE = regex.compile(r"\s+[-+]\s+")
