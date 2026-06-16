@@ -2054,16 +2054,30 @@ class DocumentViewSet(
 
         # Collect results
         results = []
+        builtin_labels = {"title": "Title", "asn": "ASN", "created": "Created"}
         for template in templates.prefetch_related("zones", "zones__custom_field"):
             for zone in template.zones.all():
-                cf_instance = document.custom_fields.filter(
-                    field=zone.custom_field,
-                ).first()
+                target = getattr(zone, "target", None) or "custom_field"
+                if target == "custom_field" and zone.custom_field_id:
+                    cf_instance = document.custom_fields.filter(
+                        field=zone.custom_field,
+                    ).first()
+                    field_name = zone.custom_field.name
+                    value = cf_instance.value if cf_instance else None
+                else:
+                    field_name = builtin_labels.get(target, target)
+                    value = {
+                        "title": document.title,
+                        "asn": document.archive_serial_number,
+                        "created": document.created.isoformat()
+                        if document.created
+                        else None,
+                    }.get(target)
                 results.append({
                     "template": template.name,
                     "zone": zone.name,
-                    "custom_field": zone.custom_field.name,
-                    "value": cf_instance.value if cf_instance else None,
+                    "custom_field": field_name,
+                    "value": value,
                 })
 
         return Response({"results": results})

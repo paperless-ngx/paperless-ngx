@@ -129,15 +129,34 @@ class OcrTemplateViewSet(ModelViewSet):
         run_zone_extraction(document, Path(doc_path))
 
         # Refresh and return the extracted values
+        builtin_labels = {"title": "Title", "asn": "ASN", "created": "Created"}
         results = []
         for zone in template.zones.all():
-            cf_instance = document.custom_fields.filter(field=zone.custom_field).first()
-            results.append({
-                "zone": zone.name,
-                "custom_field": zone.custom_field.name,
-                "custom_field_type": zone.custom_field.data_type,
-                "value": cf_instance.value if cf_instance else None,
-            })
+            target = getattr(zone, "target", None) or "custom_field"
+            if target == "custom_field" and zone.custom_field_id:
+                cf_instance = document.custom_fields.filter(
+                    field=zone.custom_field,
+                ).first()
+                results.append({
+                    "zone": zone.name,
+                    "custom_field": zone.custom_field.name,
+                    "custom_field_type": zone.custom_field.data_type,
+                    "value": cf_instance.value if cf_instance else None,
+                })
+            else:
+                value = {
+                    "title": document.title,
+                    "asn": document.archive_serial_number,
+                    "created": document.created.isoformat()
+                    if document.created
+                    else None,
+                }.get(target)
+                results.append({
+                    "zone": zone.name,
+                    "custom_field": builtin_labels.get(target, target),
+                    "custom_field_type": target,
+                    "value": value,
+                })
 
         return Response({"results": results})
 

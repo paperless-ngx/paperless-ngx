@@ -93,7 +93,7 @@
                   <div class="flex-grow-1" role="button" style="cursor: pointer;" (click)="selectZone(i)">
                     <div><strong [class.text-primary]="selectedZoneIndex === i">{{ zone.name }}</strong></div>
                     <div class="small text-muted">
-                      {{ getCustomFieldName(zone.custom_field) }} · {{ zone.width }}×{{ zone.height }}px · <ng-container i18n>p.</ng-container>{{ zonePage(zone) + 1 }}
+                      {{ getZoneTargetName(zone) }} · {{ zone.width }}×{{ zone.height }}px · <ng-container i18n>p.</ng-container>{{ zonePage(zone) + 1 }}
                     </div>
                   </div>
                   <div class="btn-group">
@@ -153,23 +153,31 @@
               </div>
 
               <div class="mb-3">
-                <label class="form-label" i18n>Custom Field</label>
+                <label class="form-label" i18n>Field</label>
                 <div class="input-group">
-                  <select class="form-select" [(ngModel)]="zone.custom_field">
-                    @for (cf of customFields; track cf.id) {
-                      <option [ngValue]="cf.id">{{ cf.name }} ({{ cf.data_type }})</option>
-                    }
+                  <select class="form-select" [ngModel]="zoneFieldValue(zone)" (ngModelChange)="setZoneField(zone, $event)">
+                    <optgroup label="Built-in fields" i18n-label>
+                      @for (t of builtinTargets; track t.id) {
+                        <option [ngValue]="t.id">{{ t.name }}</option>
+                      }
+                    </optgroup>
+                    <optgroup label="Custom fields" i18n-label>
+                      @for (cf of customFields; track cf.id) {
+                        <option [ngValue]="cf.id">{{ cf.name }} ({{ cf.data_type }})</option>
+                      }
+                    </optgroup>
                   </select>
                   <button
                     class="btn btn-outline-secondary"
                     type="button"
                     (click)="openQuickCreate(selectedZoneIndex)"
-                    title="Create new field"
+                    title="Create new custom field"
                     i18n-title
                   >
                     <i-bs name="plus"></i-bs>
                   </button>
                 </div>
+                <small class="text-muted" i18n>Write the extracted value to a custom field, or to a built-in field (Title, ASN, Date created).</small>
               </div>
 
               @if (showQuickCreate) {

@@ -13,6 +13,7 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
+            "target",
             "custom_field",
             "page",
             "x",
@@ -38,6 +39,9 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
         return value
 
     def validate_custom_field(self, value):
+        if value is None:
+            # Built-in target (title/asn/created) — no custom field required.
+            return value
         unsupported = {
             CustomField.FieldDataType.DOCUMENTLINK,
             CustomField.FieldDataType.SELECT,

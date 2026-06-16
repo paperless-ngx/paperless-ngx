@@ -1,9 +1,16 @@
 import { ObjectWithId } from './object-with-id'
 
+export const OCR_BUILTIN_TARGETS = [
+  { id: 'title', name: $localize`Title` },
+  { id: 'asn', name: $localize`Archive serial number` },
+  { id: 'created', name: $localize`Date created` },
+]
+
 export interface OcrTemplateZone {
   id?: number
   name: string
-  custom_field: number
+  target?: string // 'custom_field' | 'title' | 'asn' | 'created'
+  custom_field: number | null
   page?: number
   x: number
   y: number

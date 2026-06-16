@@ -158,11 +158,11 @@ def _process_template(
                         )
                         continue
 
-                _write_custom_field(document, zone.custom_field, extracted)
+                _write_zone_value(document, zone, extracted)
                 logger.info(
                     "Zone OCR: '%s' → %s = %r",
                     zone.name,
-                    zone.custom_field.name,
+                    _zone_target_label(zone),
                     extracted[:100] if len(extracted) > 100 else extracted,
                 )
 
@@ -451,6 +451,84 @@ def _apply_transform(text: str, transform: str) -> str:
         # Return raw barcode content unmodified
         return text
     return text
+
+
+def _zone_target_label(zone: OcrTemplateZone) -> str:
+    """Human label of a zone's write target (for logging)."""
+    target = getattr(zone, "target", None) or "custom_field"
+    if target == "custom_field":
+        return zone.custom_field.name if zone.custom_field_id else "(no field)"
+    return {"title": "Title", "asn": "ASN", "created": "Created"}.get(target, target)
+
+
+def _parse_created_datetime(value: str):
+    """Parse an extracted value into a tz-aware datetime for document.created.
+
+    Prefers an ISO date (the zone should use a date transform); falls back to
+    dateparser. Returns None if no date can be parsed.
+    """
+    from django.utils import timezone as djtz
+
+    m = re.search(r"(\d{4})-(\d{2})-(\d{2})", value)
+    if m:
+        try:
+            dt = datetime(int(m[1]), int(m[2]), int(m[3]))
+            return djtz.make_aware(dt) if djtz.is_naive(dt) else dt
+        except ValueError:
+            pass
+    try:
+        import dateparser
+
+        parsed = dateparser.parse(
+            value,
+            settings={"RETURN_AS_TIMEZONE_AWARE": False},
+        )
+        if parsed:
+            return djtz.make_aware(parsed) if djtz.is_naive(parsed) else parsed
+    except Exception:
+        logger.debug("Zone OCR: dateparser failed for created value %r", value[:50])
+    return None
+
+
+def _write_zone_value(
+    document: Document,
+    zone: OcrTemplateZone,
+    value: str,
+) -> None:
+    """Write an extracted value to the zone's target — a custom field, or a
+    built-in document field (title / archive_serial_number / created)."""
+    target = getattr(zone, "target", None) or "custom_field"
+
+    if target == "custom_field":
+        if zone.custom_field_id:
+            _write_custom_field(document, zone.custom_field, value)
+        else:
+            logger.debug("Zone OCR: zone '%s' has no custom field set", zone.name)
+        return
+
+    if target == "title":
+        document.title = value[:128]
+        document.save(update_fields=["title"])
+    elif target == "asn":
+        digits = re.sub(r"[^\d]", "", value)
+        if not digits:
+            logger.debug(
+                "Zone OCR: ASN zone '%s' produced no digits (%r)", zone.name, value[:50],
+            )
+            return
+        document.archive_serial_number = int(digits)
+        document.save(update_fields=["archive_serial_number"])
+    elif target == "created":
+        parsed = _parse_created_datetime(value)
+        if parsed is None:
+            logger.debug(
+                "Zone OCR: created zone '%s' could not parse a date (%r)",
+                zone.name,
+                value[:50],
+            )
+            return
+        document.created = parsed
+        document.save(update_fields=["created"])
 
 
 def _write_custom_field(

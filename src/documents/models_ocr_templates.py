@@ -100,11 +100,31 @@ class OcrTemplateZone(models.Model):
         help_text=_("Descriptive name for this zone (e.g. 'Invoice Number')"),
     )
 
+    class TargetType(models.TextChoices):
+        CUSTOM_FIELD = ("custom_field", _("Custom field"))
+        TITLE = ("title", _("Title"))
+        ASN = ("asn", _("Archive serial number"))
+        CREATED = ("created", _("Date created"))
+
+    target = models.CharField(
+        _("target"),
+        max_length=20,
+        choices=TargetType.choices,
+        default=TargetType.CUSTOM_FIELD,
+        help_text=_(
+            "Where the extracted value is written: a custom field, or a "
+            "built-in document field (title, ASN, created date)",
+        ),
+    )
+
     custom_field = models.ForeignKey(
         "documents.CustomField",
         on_delete=models.CASCADE,
         related_name="ocr_zones",
         verbose_name=_("custom field"),
+        null=True,
+        blank=True,
+        help_text=_("Target custom field (only used when target is 'custom_field')"),
     )
 
     page = models.IntegerField(

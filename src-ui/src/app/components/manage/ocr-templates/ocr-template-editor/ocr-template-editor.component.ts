@@ -14,6 +14,7 @@ import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, takeUntil } from 'rxjs'
 import {
+  OCR_BUILTIN_TARGETS,
   OcrTemplate,
   OcrTemplateZone,
   TRANSFORM_OPTIONS,
@@ -77,6 +78,7 @@ export class OcrTemplateEditorComponent
   customFields: CustomField[] = []
   documentTypes: any[] = []
   transformOptions = TRANSFORM_OPTIONS
+  builtinTargets = OCR_BUILTIN_TARGETS
   isNew = true
   saving = false
 
@@ -365,6 +367,7 @@ export class OcrTemplateEditorComponent
 
     const zone: OcrTemplateZone = {
       name: `Zone ${this.template.zones.length + 1}`,
+      target: 'custom_field',
       custom_field: this.customFields.length > 0 ? this.customFields[0].id : null,
       x,
       y,
@@ -668,6 +671,34 @@ export class OcrTemplateEditorComponent
     return cf ? cf.name : `Field #${id}`
   }
 
+  /** Value bound to the field <select>: a built-in id string or a custom-field id. */
+  zoneFieldValue(zone: OcrTemplateZone): any {
+    const target = zone.target || 'custom_field'
+    return target === 'custom_field' ? zone.custom_field : target
+  }
+
+  /** Map a field <select> choice back onto the zone's target + custom_field. */
+  setZoneField(zone: OcrTemplateZone, value: any) {
+    if (value === 'title' || value === 'asn' || value === 'created') {
+      zone.target = value
+      zone.custom_field = null
+    } else {
+      zone.target = 'custom_field'
+      zone.custom_field = value
+    }
+  }
+
+  /** Display name of a zone's write target (built-in field or custom field). */
+  getZoneTargetName(zone: OcrTemplateZone): string {
+    const target = zone.target || 'custom_field'
+    if (target === 'custom_field') {
+      return zone.custom_field
+        ? this.getCustomFieldName(zone.custom_field)
+        : $localize`(no field)`
+    }
+    return this.builtinTargets.find((t) => t.id === target)?.name ?? target
+  }
+
   getDocumentTypeName(id: number): string {
     const dt = this.documentTypes.find((d) => d.id === id)
     return dt ? dt.name : `Type #${id}`
@@ -704,6 +735,7 @@ export class OcrTemplateEditorComponent
               // Assign the new field to the zone
               if (this.quickCreateForZoneIndex !== null) {
                 this.template.zones[this.quickCreateForZoneIndex].custom_field = result.id
+                this.template.zones[this.quickCreateForZoneIndex].target = 'custom_field'
               }
               this.showQuickCreate = false
               this.quickCreateForZoneIndex = null
