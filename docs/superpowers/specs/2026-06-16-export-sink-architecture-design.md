@@ -76,10 +76,15 @@ These were settled during brainstorming:
 
 1. **Scope is the `document_exporter` command only.** Design the interface so an
    S3 sink could be added later; do not refactor `bulk_download` or share bundles.
-2. **Incremental options are folder-only, with a hard error on misuse.**
-   `--compare-checksums`, `--compare-json`, and `--delete` are properties of the
-   folder sink. Passing any of them together with `--zip` raises a `CommandError`
-   up front (fail fast, not warn-and-ignore).
+2. **`--compare-*` are folder-only (hard error with `--zip`); `--delete` is kept
+   for both.** `--compare-checksums` / `--compare-json` are genuine no-ops in zip
+   mode today (the temp dir is always empty, so the compare always copies), so
+   combining either with `--zip` raises a `CommandError` up front. **`--delete`,
+   however, is an existing tested feature in zip mode** — it wipes the destination
+   directory of pre-existing files/dirs before the archive lands
+   (`test_export_zipped_with_delete`). Its meaning differs by destination: folder
+   `--delete` prunes stale exported files; zip `--delete` clears the target dir.
+   Both are preserved — `--delete` is a parameter of _both_ sinks, not an error.
 3. **The zip manifest spools to a temp file, not memory.** The sink exposes a
    streaming-write handle. The zip sink streams the manifest to a single temp
    file in `SCRATCH_DIR` and adds it as the manifest entry at finalize, keeping
@@ -126,8 +131,14 @@ class ExportSink(AbstractContextManager):
 
 **Contract / invariants** (the checklist a future sink author honors):
 
-- `arcname` is relative and POSIX-style; the sink maps it to its own namespace
-  (folder: joined under the target; zip: the entry name).
+- `arcname` is relative and **POSIX-style (forward slashes)**; the sink maps it to
+  its own namespace (folder: joined under the target; zip: the entry name). The
+  command must build arcnames with `Path(...).as_posix()` — `str(Path(...))`
+  yields backslashes on Windows, which corrupts zip entry names and makes the
+  manifest's stored paths non-portable. The same string is used both as the sink
+  key and as the value stored in the manifest (`EXPORTER_FILE_NAME` etc.), so it
+  must be POSIX at the point of construction. (The share-link bundle path already
+  uses `.as_posix()`; the document targets currently do not and must be fixed.)
 - At most one `stream()` is open at a time. It is the manifest. `add_file` /
   `add_json` may be interleaved with an open stream — implementations that can't
   interleave a real stream (zip, S3) must spool the stream to a side buffer and
@@ -156,29 +167,44 @@ Owns everything the command currently does for folder mode:
 The folder sink is inherently in-place/incremental, not atomic — that is its
 nature and is unchanged. Its safety is the per-file `.tmp`+rename it already does.
 
-### `ZipExportSink(target, zip_name)`
+### `ZipExportSink(target, zip_name, *, delete)`
 
-- On open: open a `zipfile.ZipFile` at `<target>/<zip_name>.zip.tmp`
-  (`ZIP_DEFLATED`, `allowZip64=True`).
+- On open: ensure `SCRATCH_DIR` exists (`mkdir(parents=True, exist_ok=True)` —
+  today's `handle()` does this before using it; the sink must do it now), then
+  open a `zipfile.ZipFile` at `<target>/<zip_name>.zip.tmp` (`ZIP_DEFLATED`,
+  `allowZip64=True`). The `.zip.tmp` lives in the same directory as the final
+  `.zip` so the finalize rename is atomic (same filesystem).
 - `add_file` / `add_json`: write the entry directly, first emitting directory
   marker entries for parent paths so every zip viewer shows the folder structure
-  (today's `_ensure_zip_dirs`).
+  (today's `_ensure_zip_dirs`). A _flat_ export (no `--use-folder-prefix`, no
+  nested arcnames) has no parent dirs, so it emits **zero** markers — matching
+  today's `make_archive` output for flat trees (keeps the `namelist()` count
+  assertions in `test_export_zipped` valid). Nested/prefixed exports gain marker
+  entries; any count assertion on those must be audited.
 - `stream`: yields a handle writing to a single temp file in `SCRATCH_DIR`.
 - `finalize()` (success only): add the spooled manifest temp file as its entry,
-  close the zip, then atomically rename `.zip.tmp` → `.zip`.
+  close the zip, then **if `delete`, wipe the destination directory** of every
+  pre-existing file/dir except the in-progress `.zip.tmp` and any prior `.zip`
+  (today's zip `--delete` behavior), then atomically rename `.zip.tmp` → `.zip`.
 - `abort()` (on exception): close the zip, unlink the `.zip.tmp`, delete the
   manifest temp file. **A `.zip` therefore exists only after a fully successful
-  run.**
-- Rejects `compare_*` / `delete` — but the command guards this before
-  constructing the sink (see below), so the sink simply has no such parameters.
+  run**, and on abort the destination is never wiped.
+- Rejects `compare_*` (the command guards this before constructing the sink). It
+  does **not** reject `delete` — that is a supported zip behavior (see above).
 
 ### Command changes (`document_exporter.py`)
 
-- **`handle()`**: validate the target, then _up front_ raise `CommandError` if any
-  of `--compare-checksums` / `--compare-json` / `--delete` is combined with
-  `--zip`. Construct the appropriate sink. Run the export as
-  `with sink: self.dump(sink)`. Delete the temp-dir / `shutil.make_archive`
-  block entirely.
+- **`handle()`**: validate the target, then _up front_ raise `CommandError` if
+  `--compare-checksums` or `--compare-json` is combined with `--zip` (those are
+  no-ops in zip mode). `--delete` is **not** rejected — it is passed to whichever
+  sink is built. Construct the appropriate sink (`delete=` passed to both). Run
+  the export as `with sink: self.dump(sink)`. Delete the temp-dir /
+  `shutil.make_archive` block entirely.
+- **`--data-only`**: unchanged in meaning — it simply skips every `sink.add_file`
+  call (no document/thumbnail/archive/bundle files) while the manifest stream and
+  `metadata.json` are still written. Works identically for both sinks; no sink
+  code is data-only-aware. (`test_export_data_only` and its zip equivalent stay
+  green.)
 - **`dump(sink)`**: destination-agnostic. Builds relative arcnames and calls
   `sink.add_file(...)`, `sink.add_json(...)`, and `sink.stream("manifest.json")`.
   `self.files_in_export_dir`, `check_and_copy`, `check_and_write_json`, and the
@@ -194,6 +220,18 @@ nature and is unchanged. Its safety is the per-file `.tmp`+rename it already doe
   behavior moved into each sink's `stream()`.
 - **Crypto / passphrase** handling stays in the command: it transforms record
   _contents_ before they reach the sink, which is independent of destination.
+- **Progress tracking stays in the command — the sinks know nothing about it.**
+  `PaperlessCommand.track()` wraps the _document iterable_ in `dump()` and ticks
+  the Rich bar once per document. That loop stays in the command; each iteration
+  calls `sink.add_file(...)`, so the per-document progress is preserved
+  unchanged. The sinks deliberately do **not** depend on `PaperlessCommand`,
+  `track()`, or Rich — coupling the destination abstraction to the command
+  framework would defeat the isolation goal and make the sinks impossible to unit
+  -test without a full command. (A sink is a plain context-managed I/O object; it
+  is constructed by `handle()` and exercised directly in `test_sinks.py`.) If
+  finer-grained progress is ever wanted for a single very large file, that is a
+  future enhancement layered via an optional callback — not a `PaperlessCommand`
+  dependency, and out of scope here.
 
 ### How `--split-manifest` fits (no sink special-casing)
 
@@ -216,8 +254,8 @@ manifest stream is open_ never collide with it.
 
 ```
 handle(options)
-  ├─ validate target; reject incremental flags + --zip  → CommandError
-  ├─ sink = DirectoryExportSink(...) | ZipExportSink(...)
+  ├─ validate target; reject --compare-* + --zip  → CommandError  (--delete allowed)
+  ├─ sink = DirectoryExportSink(..., delete=…) | ZipExportSink(..., delete=…)
   └─ with FileLock(MEDIA_LOCK), sink:
        dump(sink)
          ├─ with sink.stream("manifest.json") as mh:
@@ -237,12 +275,23 @@ handle(options)
 ## Error handling & atomicity
 
 - Any exception in `dump()` propagates through `with sink:` → `__exit__` →
-  `abort()`. Zip: the `.zip.tmp` and the manifest temp file are deleted; **no
-  `.zip` is produced.** Folder: in-flight `.tmp` files are discarded, existing
-  files are left intact, and the stale-prune does not run.
-- `finalize()` runs only on clean exit. For the zip that is the single
-  `.zip.tmp` → `.zip` rename (atomic on the same filesystem). For the folder it
-  is the optional stale-delete prune.
+  `abort()`. Zip: the `.zip.tmp` and the manifest temp file are deleted, and the
+  destination is **not** wiped; **no `.zip` is produced.** Folder: in-flight
+  `.tmp` files are discarded, existing files are left intact, and the stale-prune
+  does not run.
+- `finalize()` runs only on clean exit, after all contents are written. For the
+  zip: optionally wipe the destination (`--delete`), then the single `.zip.tmp` →
+  `.zip` rename (atomic on the same filesystem). For the folder: the optional
+  stale-delete prune.
+- **Honest limits of the atomicity guarantee.** The guarantee is "no
+  _complete-looking_ `.zip` after a failed run," not "no leftovers." If the
+  process is `SIGKILL`ed or the rename itself fails _after_ the zip is closed, a
+  `.zip.tmp` may be orphaned — that is the safe direction (no false-complete
+  `.zip`), but stale `.zip.tmp` files are **not** auto-cleaned on a later run
+  (matching the prior branch). `KeyboardInterrupt` is a `BaseException` but
+  `__exit__` still runs, so `abort()` fires normally. The rename being atomic and
+  these runs not racing each other both rely on `FileLock(settings.MEDIA_LOCK)`,
+  which serializes exports; concurrent same-`--zip-name` runs are out of scope.
 - The `FileLock(settings.MEDIA_LOCK)` wrapping is unchanged.
 
 ## Testing
@@ -257,16 +306,25 @@ type annotations; run on the Linux VM):
   under `compare_json`; `delete` prunes a snapshot file not written this run and
   removes emptied directories; without `delete`, stale files remain.
 - **Zip atomicity**: injecting an exception mid-export (via `mocker`) leaves no
-  `.zip` and no leftover `.zip.tmp`; a clean run yields exactly the `.zip` with
-  directory marker entries present.
+  `.zip` and no leftover `.zip.tmp`, and does not wipe the destination even with
+  `--delete`; a clean run yields exactly the `.zip`. A nested/prefixed export has
+  directory marker entries; a flat export has none.
+- **Zip `--delete`**: a clean `--zip --delete` run wipes pre-existing
+  files/dirs in the destination and produces the `.zip` (preserves
+  `test_export_zipped_with_delete`).
+- **POSIX arcnames**: nested arcnames are stored with forward slashes in both the
+  zip entry names and the manifest values, regardless of host OS (guards the
+  Windows backslash bug).
+- **`--data-only`**: both sinks produce only `manifest.json` + `metadata.json`,
+  no document files.
 - **Stream contract**: opening a second concurrent `stream()` is rejected;
   `add_file`/`add_json` while a stream is open succeed.
-- **Command guard**: `--zip` with each of `--compare-checksums` / `--compare-json`
-  / `--delete` raises `CommandError`.
+- **Command guard**: `--zip` with `--compare-checksums` or `--compare-json`
+  raises `CommandError`; `--zip --delete` does **not** error.
 
 Existing `test_management_exporter.py` and `test_management_importer.py` stay
 green unchanged — the export's external behavior (layout, manifest, round-trip
-import) is preserved.
+import, `--zip --delete`, `--data-only`) is preserved.
 
 ## Risks
 
