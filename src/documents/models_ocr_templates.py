@@ -181,11 +181,6 @@ class OcrTemplateZone(models.Model):
         LOWERCASE = ("lowercase", _("Lowercase"))
         NUMERIC = ("numeric", _("Numeric only"))
         DATE = ("date", _("Parse date"))
-        # Legacy date transforms kept for backwards compatibility with existing
-        # zones (the editor now offers "Parse date" + a date_format instead).
-        DATE_DMY = ("date_dmy", _("Parse date (DD.MM.YYYY)"))
-        DATE_YMD = ("date_ymd", _("Parse date (YYYY-MM-DD)"))
-        DATE_AUTO = ("date_auto", _("Parse date (auto-detect)"))
         QR_CODE = ("qr_code", _("Read QR/barcode"))
         QR_CODE_RAW = ("qr_code_raw", _("Read QR/barcode (raw)"))
 

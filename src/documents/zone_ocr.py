@@ -450,39 +450,6 @@ def _apply_transform(text: str, transform: str, date_format: str = "") -> str:
     elif transform == "numeric":
         result = re.sub(r"[^\d.,\-]", "", text)
         return result if result else text
-    elif transform == "date_dmy":
-        match = re.search(r"(\d{1,2})[./](\d{1,2})[./](\d{2,4})", text)
-        if match:
-            d, m, y = match.groups()
-            if len(y) == 2:
-                y = "20" + y
-            try:
-                return date(int(y), int(m), int(d)).isoformat()
-            except ValueError:
-                pass
-        return text
-    elif transform == "date_ymd":
-        match = re.search(r"(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})", text)
-        if match:
-            y, m, d = match.groups()
-            try:
-                return date(int(y), int(m), int(d)).isoformat()
-            except ValueError:
-                pass
-        return text
-    elif transform == "date_auto":
-        import dateparser
-
-        parsed = dateparser.parse(
-            text,
-            settings={
-                "PREFER_DAY_OF_MONTH": "first",
-                "RETURN_AS_TIMEZONE_AWARE": False,
-            },
-        )
-        if parsed:
-            return parsed.date().isoformat()
-        return text
     elif transform == "qr_code":
         # Return the full barcode/QR content as-is (already read by _read_barcode)
         return text
