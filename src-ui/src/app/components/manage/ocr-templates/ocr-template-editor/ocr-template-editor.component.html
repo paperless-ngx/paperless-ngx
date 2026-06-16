@@ -45,18 +45,30 @@
             <h6 i18n>Document Preview</h6>
             <div class="mb-3">
               <label class="form-label" i18n>Document</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="previewDocModel"
-                [ngbTypeahead]="searchDocuments"
-                [inputFormatter]="documentFormatter"
-                [resultFormatter]="documentFormatter"
-                (selectItem)="onPreviewDocSelected($event)"
-                [editable]="false"
-                placeholder="Search documents by title..."
-                i18n-placeholder
-              />
+              <div class="input-group">
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="previewDocModel"
+                  [ngbTypeahead]="searchDocuments"
+                  [inputFormatter]="documentFormatter"
+                  [resultFormatter]="documentFormatter"
+                  (selectItem)="onPreviewDocSelected($event)"
+                  [editable]="false"
+                  placeholder="Search documents by title..."
+                  i18n-placeholder
+                />
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  (click)="clearPreviewDoc()"
+                  [disabled]="!previewDocId && !previewDocModel"
+                  title="Clear"
+                  i18n-title
+                >
+                  <i-bs name="x"></i-bs>
+                </button>
+              </div>
               <small class="text-muted" i18n>Filtered by the document type above; if none is set, the selected document's type is used.</small>
             </div>
             <small class="text-muted" i18n>

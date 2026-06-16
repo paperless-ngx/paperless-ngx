@@ -251,6 +251,16 @@ export class OcrTemplateEditorComponent
     this.loadPreview()
   }
 
+  clearPreviewDoc() {
+    this.previewDocModel = ''
+    this.previewDocId = null
+    this.previewPageCount = null
+    this.pageCountForDoc = null
+    this.previewPage = 0
+    this.pageImageUrl = null
+    this.imageLoaded = false
+  }
+
   loadPreview() {
     if (!this.previewDocId) return
     if (this.pageCountForDoc !== this.previewDocId) {
