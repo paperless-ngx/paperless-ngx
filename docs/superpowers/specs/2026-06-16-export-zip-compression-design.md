@@ -2,8 +2,8 @@
 
 **Date:** 2026-06-16
 **Branch base:** `dev`
-**Status:** Draft — **depends on** `2026-06-16-export-sink-architecture-design.md`
-being implemented first.
+**Status:** Design complete (zstd facts verified on CPython 3.14.3) — **depends on**
+`2026-06-16-export-sink-architecture-design.md` being implemented first.
 
 ## Prerequisite
 
@@ -95,67 +95,77 @@ or account for marker entries (see Testing).
 - `--zip-compression {stored,deflated,bzip2,lzma}` — and `zstd` **when the
   runtime supports it** (see below). Maps to the matching `zipfile.ZIP_*`
   constant. Default `deflated`.
-- `--zip-compression-level N` — integer. Meaningful for `deflated` (0–9; `zlib`
-  also accepts `-1` meaning "default", which is the same as omitting the flag /
-  `compresslevel=None`) and `bzip2` (1–9; `0` is invalid for bzip2). For `zstd`,
-  **do not hardcode a numeric range** — defer to the stdlib and surface whatever
-  it raises (the accepted zstd range has shifted across libzstd versions; see the
-  zstd section). Combining the flag with `stored` or `lzma` (which ignore level)
-  is a `CommandError`, not a silent accept — consistent with the base refactor's
-  fail-fast posture. Default: unset → library default.
+- `--zip-compression-level N` — integer. Per-method accepted ranges (verified
+  against the [3.14 `zipfile` docs](https://docs.python.org/3.14/library/zipfile.html#zipfile.ZipFile)):
+  - `deflated`: **0–9** (`zlib` also accepts `-1` = "default", identical to
+    omitting the flag / `compresslevel=None`).
+  - `bzip2`: **1–9** (`0` is invalid for bzip2).
+  - `lzma`, `stored`: level has **no effect** — passing `--zip-compression-level`
+    with either is a `CommandError`, not a silent accept (consistent with the
+    base refactor's fail-fast posture).
+  - `zstd`: **-131072 … 22** (the documented commonly-accepted range; the
+    authoritative bounds are
+    `compression.zstd.CompressionParameter.compression_level.bounds()`).
+
+  Default: unset → library default (`compresslevel=None`).
 
 Both flags require `--zip`; passing either without `--zip` raises a
 `CommandError`, matching the incremental-flag rule from the base refactor.
 
-**Why validate up front (not let `zipfile` raise):** an invalid level does _not_
-fail at `ZipFile(...)` construction — it fails at the **first `write`/`writestr`
-call**, with an opaque message (`ValueError: Invalid initialization option` for
-deflated > 9, or `compresslevel must be between 1 and 9` for bzip2), and inside a
-`with ZipFile(...)` block that error is then _masked_ by a secondary
-`ValueError: Can't close the ZIP file while there is an open writing handle` on
-context exit. Up-front validation turns that into a clean `CommandError`.
+**Why validate up front (not let `zipfile` raise) — verified on 3.14.3:** an
+invalid level does _not_ fail at `ZipFile(...)` construction — it fails at the
+**first `write`/`writestr` call**, with an opaque message
+(`ValueError: Invalid initialization option` for deflated > 9, or
+`ValueError: compresslevel must be between 1 and 9` for bzip2). Worse, on context
+exit the half-initialized write handle emits a secondary
+`AttributeError: '_ZipWriteFile' object has no attribute '_compressor'` during GC
+finalization, so the user sees stack-trace noise unrelated to the real cause.
+Up-front validation turns all of that into a single clean `CommandError`.
 
 ### Validation (in `handle()`, before constructing the sink)
 
 1. **Requires `--zip`.** Either flag without `--zip` → `CommandError`.
 2. **Method availability — via a named, patchable seam.** Expose a module-level
-   helper (e.g. `compression_available(method) -> bool` or a capability map) that
-   does `try: import bz2 / import lzma except ImportError: return False` — **not**
-   `importlib.util.find_spec`, which can report a stdlib C-extension as present
-   when importing it actually fails. For `zstd`, the probe must also confirm the
-   codec is usable on 3.14+ (constant present _and_ `compression.zstd`
-   importable), not merely that the constant exists. Making this a named function
-   is also what lets the test patch "method unavailable" with `mocker`. If the
-   chosen method is unavailable, raise a `CommandError` naming the missing
-   capability.
+   helper `compression_available(method: str) -> bool` that does
+   `try: import bz2 / import lzma / from compression import zstd except ImportError:
+return False` — **not** `importlib.util.find_spec`, which can report a stdlib
+   C-extension as present when importing it actually fails. `stored`/`deflated`
+   are always available (`zlib` is a hard CPython dependency). For `zstd` the probe
+   must import `compression.zstd` (3.14+), not merely check that
+   `zipfile.ZIP_ZSTANDARD` exists. Making this a named function is also what lets
+   the test patch "method unavailable" with `mocker`. If the chosen method is
+   unavailable, raise a `CommandError` naming the missing capability — `zipfile`
+   itself would otherwise raise a bare `RuntimeError`
+   ("Compression requires the (missing) … module").
 3. **Level range.** Reject an out-of-range `--zip-compression-level` for the
    chosen method with a clear `CommandError`; reject the flag entirely for
    `stored`/`lzma` (see above).
 
 ### zstd (Python 3.14+)
 
-> ⚠️ **VERIFY before coding.** The following zstd specifics are stated from the
-> assistant's knowledge of the 3.14 reorganization and were **not** verifiable in
-> the dev environment (it runs 3.11, where `ZIP_ZSTANDARD` does not exist).
-> Confirm each against the real Python 3.14 / PEP 784 docs before implementing:
-> the exact constant name (`ZIP_ZSTANDARD` vs `ZIP_ZSTD`), the backing module
-> path (`compression.zstd`), that `zipfile` actually routes zstd through it, and
-> the accepted `compresslevel` bounds.
+**Verified empirically on CPython 3.14.3** (via `uv run --python 3.14 --no-project`)
+and against [PEP 784](https://peps.python.org/pep-0784/) +
+[the 3.14 `zipfile` docs](https://docs.python.org/3.14/library/zipfile.html):
 
-Python 3.14 is expected to add Zstandard support to `zipfile`
-(`ZIP_ZSTANDARD`, backed by the new `compression.zstd` module, PEP 784). Gate it
-at runtime so nothing zstd-related is imported or referenced on < 3.14 (the
-project targets Python ≥ 3.11):
+- The compression-method constant is **`zipfile.ZIP_ZSTANDARD`** (added 3.14; its
+  numeric value is `93`). It does **not** exist on < 3.14.
+- It is backed by the new **`compression.zstd`** stdlib module (PEP 784 added a
+  `compression` namespace package; legacy `bz2`/`lzma`/`zlib` imports are
+  unchanged). `zipfile` raises `RuntimeError` if `compression.zstd` is
+  unavailable when zstd is requested.
+- Accepted `compresslevel` is **`-131072 … 22`**, confirmed at runtime via
+  `compression.zstd.CompressionParameter.compression_level.bounds() == (-131072, 22)`.
+
+Gate everything zstd-related at runtime so nothing is imported or referenced on
+< 3.14 (the project targets Python ≥ 3.11):
 
 ```python
-_ZSTD = getattr(zipfile, "ZIP_ZSTANDARD", None)  # None before 3.14
+_ZSTD: int | None = getattr(zipfile, "ZIP_ZSTANDARD", None)  # None before 3.14
 ```
 
-Presence of the _constant_ does not guarantee the _codec_ is usable (same stripped
--build risk as `bz2`/`lzma`), so the availability probe (validation step 2) must
-attempt the codec, not just check the constant. Do **not** hardcode a zstd level
-range — pass the user's level through and let the stdlib raise, mapping any error
-to a `CommandError`.
+Presence of the _constant_ does not guarantee the _codec_ is usable, so the
+availability probe (validation step 2) imports `compression.zstd`, not merely
+checks the constant.
 
 Keep `zstd` in the `--zip-compression` `choices` **always** (even on < 3.14), and
 reject it in validation with a friendly "zstd requires Python 3.14+" message. If
