@@ -10,9 +10,24 @@ import {
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
-import { NgbNavModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
+import {
+  NgbNavModule,
+  NgbPopoverModule,
+  NgbTypeaheadModule,
+} from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { Subject, takeUntil } from 'rxjs'
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  of,
+  Observable,
+  Subject,
+  switchMap,
+  takeUntil,
+} from 'rxjs'
+import { Document } from 'src/app/data/document'
 import {
   DATE_FORMAT_OPTIONS,
   OCR_BUILTIN_TARGETS,
@@ -44,6 +59,7 @@ interface DrawingRect {
     RouterModule,
     NgbNavModule,
     NgbPopoverModule,
+    NgbTypeaheadModule,
     NgxBootstrapIconsModule,
     PageHeaderComponent,
   ],
@@ -96,6 +112,8 @@ export class OcrTemplateEditorComponent
   pageImageUrl: string | null = null
   imageLoaded = false
   zoom = 1
+  // Model bound to the document search typeahead (a Document once selected).
+  previewDocModel: any = ''
 
   // Tabs: 'settings' | 'zones' | 'zone'
   activeTab: string = 'settings'
@@ -195,6 +213,42 @@ export class OcrTemplateEditorComponent
 
   ngAfterViewInit() {}
 
+  // Document search typeahead: filter by the template's document type if set.
+  searchDocuments = (text$: Observable<string>): Observable<Document[]> =>
+    text$.pipe(
+      debounceTime(250),
+      distinctUntilChanged(),
+      switchMap((term) => {
+        if (!term || term.trim().length < 2) return of([])
+        const params: any = { title__icontains: term.trim() }
+        if (this.template.document_type) {
+          params['document_type__id'] = this.template.document_type
+        }
+        return this.documentService
+          .list(1, 10, 'created', true, params)
+          .pipe(
+            map((r) => r.results),
+            catchError(() => of([]))
+          )
+      })
+    )
+
+  documentFormatter = (doc: Document | string): string =>
+    typeof doc === 'string' ? doc : `#${doc.id} ${doc.title}`
+
+  onPreviewDocSelected(event: any) {
+    event.preventDefault()
+    const doc: Document = event.item
+    this.previewDocModel = doc
+    this.previewDocId = doc.id
+    // If no document type is set on the template, adopt the selected doc's type.
+    if (!this.template.document_type && doc.document_type) {
+      this.template.document_type = doc.document_type
+    }
+    this.previewPage = 0
+    this.loadPreview()
+  }
+
   loadPreview() {
     if (!this.previewDocId) return
     // Fetch the page count once per document, for the page navigation.
@@ -205,7 +259,11 @@ export class OcrTemplateEditorComponent
         .get(this.previewDocId)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: (doc) => (this.previewPageCount = doc?.page_count ?? null),
+          next: (doc) => {
+            this.previewPageCount = doc?.page_count ?? null
+            // Show the document's title in the search box (e.g. on template load).
+            if (doc && !this.previewDocModel) this.previewDocModel = doc
+          },
           error: () => (this.previewPageCount = null),
         })
     }
