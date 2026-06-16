@@ -1511,7 +1511,7 @@ class DocumentViewSet(
                 exc_info=True,
             )
             raise ValidationError({"ai": [_("Invalid AI configuration.")]}) from exc
-        except (httpx.TimeoutException, *LLMTimeoutError) as exc:
+        except (httpx.TimeoutException, LLMTimeoutError) as exc:
             logger.exception(
                 "AI backend timed out while generating suggestions for document %s: %s",
                 doc.pk,
