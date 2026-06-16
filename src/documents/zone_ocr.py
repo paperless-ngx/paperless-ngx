@@ -100,6 +100,19 @@ def _resolve_doc_path(
     return None
 
 
+def _resolve_page_idx(page_value, default_page, page_count) -> int:
+    """Resolve a 1-indexed page (1 = first, -1 = last) to a 0-indexed image
+    index. `page_value` may be None → fall back to the template's default_page."""
+    v = page_value if page_value is not None else default_page
+    if v is None:
+        return 0
+    if v == -1:
+        return (page_count - 1) if page_count else 0
+    if v >= 1:
+        return v - 1
+    return 0
+
+
 def _process_template(
     document: Document,
     doc_path: Path,
@@ -107,10 +120,10 @@ def _process_template(
     zones: list[OcrTemplateZone],
 ) -> None:
     """Process all zones in a template against a document."""
-    pages_needed: set[int] = set()
-    for zone in zones:
-        page = zone.page if zone.page is not None else template.default_page
-        pages_needed.add(page)
+    pages_needed: set[int] = {
+        _resolve_page_idx(zone.page, template.default_page, document.page_count)
+        for zone in zones
+    }
 
     with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
         tmp_path = Path(tmp_dir)
@@ -120,11 +133,9 @@ def _process_template(
         )
 
         for zone in zones:
-            page_idx = zone.page if zone.page is not None else template.default_page
-
-            # Resolve negative page indices
-            if page_idx < 0 and document.page_count:
-                page_idx = document.page_count + page_idx
+            page_idx = _resolve_page_idx(
+                zone.page, template.default_page, document.page_count,
+            )
 
             if page_idx not in page_images:
                 logger.warning(

@@ -70,7 +70,7 @@ export class OcrTemplateEditorComponent
     name: '',
     document_type: null,
     sample_document: null,
-    default_page: 0,
+    default_page: 1,
     source_width: 0,
     source_height: 0,
     enabled: true,
@@ -253,13 +253,17 @@ export class OcrTemplateEditorComponent
     setTimeout(() => this.redrawCanvas())
   }
 
-  /** The page a zone belongs to (falls back to the template default). */
+  /** The 1-indexed page a zone is on (1 = first, -1 = last). Resolves the
+   *  template default and the last-page sentinel to an actual page number. */
   zonePage(zone: OcrTemplateZone): number {
-    return zone.page ?? this.template.default_page ?? 0
+    const v = zone.page ?? this.template.default_page ?? 1
+    if (v === -1) return this.previewPageCount ?? this.previewPage + 1
+    return v >= 1 ? v : 1
   }
 
   private isOnCurrentPage(zone: OcrTemplateZone): boolean {
-    return this.zonePage(zone) === this.previewPage
+    // previewPage is the 0-indexed cursor; zonePage() is 1-indexed.
+    return this.zonePage(zone) === this.previewPage + 1
   }
 
   onImageLoad() {
@@ -410,7 +414,7 @@ export class OcrTemplateEditorComponent
       y,
       width: w,
       height: h,
-      page: this.previewPage,
+      page: this.previewPage + 1,
       ocr_language: 'deu+eng',
       transform: 'strip',
       date_format: '',
@@ -638,8 +642,8 @@ export class OcrTemplateEditorComponent
       this.dateFormatCustom =
         !!zone.date_format &&
         !this.dateFormatOptions.some((o) => o.id === zone.date_format)
-      // Jump the preview to the zone's page so it's actually visible.
-      this.goToPage(this.zonePage(zone))
+      // Jump the preview to the zone's page (zonePage is 1-indexed).
+      this.goToPage(this.zonePage(zone) - 1)
     }
     this.redrawCanvas()
   }

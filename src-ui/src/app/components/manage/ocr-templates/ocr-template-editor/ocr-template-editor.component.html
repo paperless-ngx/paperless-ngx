@@ -38,9 +38,9 @@
                 type="number"
                 class="form-control"
                 [(ngModel)]="template.default_page"
-                min="0"
+                min="-1"
               />
-              <small class="text-muted" i18n>0 = first page, -1 = last page</small>
+              <small class="text-muted" i18n>1 = first page, -1 = last page</small>
             </div>
 
             <div class="form-check mb-4">
@@ -93,7 +93,7 @@
                   <div class="flex-grow-1" role="button" style="cursor: pointer;" (click)="selectZone(i)">
                     <div><strong [class.text-primary]="selectedZoneIndex === i">{{ zone.name }}</strong></div>
                     <div class="small text-muted">
-                      {{ getZoneTargetName(zone) }} - {{ zone.width }}x{{ zone.height }}px  <ng-container i18n>p.</ng-container>{{ zonePage(zone) + 1 }}
+                      {{ getZoneTargetName(zone) }} - {{ zone.width }}x{{ zone.height }}px  <ng-container i18n>p.</ng-container>{{ zonePage(zone) }}
                     </div>
                   </div>
                   <div class="btn-group">
@@ -146,10 +146,10 @@
                   type="number"
                   class="form-control"
                   [(ngModel)]="zone.page"
-                  min="0"
+                  min="-1"
                   (ngModelChange)="redrawCanvas()"
                 />
-                <small class="text-muted" i18n>Page this zone is on (0 = first). Set automatically when you draw it.</small>
+                <small class="text-muted" i18n>Page this zone is on. Use -1 for the last page. Set automatically when you draw it.</small>
               </div>
 
               <div class="mb-3">

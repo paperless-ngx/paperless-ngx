@@ -32,8 +32,8 @@ class OcrTemplate(models.Model):
 
     default_page = models.IntegerField(
         _("default page"),
-        default=0,
-        help_text=_("Default page index for zones (0-indexed, -1 for last page)"),
+        default=1,
+        help_text=_("Default page for zones (1 = first page, -1 = last page)"),
     )
 
     source_width = models.PositiveIntegerField(
@@ -131,7 +131,7 @@ class OcrTemplateZone(models.Model):
         _("page"),
         null=True,
         blank=True,
-        help_text=_("Page index override (leave blank to use template default)"),
+        help_text=_("Page (1 = first, -1 = last; blank uses the template default)"),
     )
 
     x = models.PositiveIntegerField(_("x"), help_text=_("Left edge (px)"))
