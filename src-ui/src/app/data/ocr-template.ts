@@ -67,3 +67,36 @@ export interface OcrTemplate extends ObjectWithId {
   updated?: string
   zones: OcrTemplateZone[]
 }
+
+// Ad-hoc zone passed to the per-zone test endpoint (no id, just geometry + OCR opts).
+export interface ZoneTestRequest {
+  name: string
+  x: number
+  y: number
+  width: number
+  height: number
+  page: number
+  ocr_language: string
+  transform: string
+  date_format?: string
+  validation_regex: string
+  zone_source_width?: number
+  zone_source_height?: number
+}
+
+// Response of the per-zone test: raw OCR text, transformed value, regex outcome.
+export interface OcrZoneTestResult {
+  raw_text?: string | null
+  value?: string | null
+  regex?: string
+  regex_match?: boolean | null
+  error?: string
+}
+
+// One row of the run-zone-ocr response (per zone across the doc-type's templates).
+export interface OcrZoneRunResult {
+  template: string
+  zone: string
+  custom_field: string
+  value: string | number | null
+}

@@ -56,6 +56,7 @@ if settings.AUDIT_LOG_ENABLED:
 from documents import bulk_edit
 from documents.data_models import DocumentSource
 from documents.filters import CustomFieldQueryParser
+from documents.models import OCR_SUPPORTED_FIELD_TYPES
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -3478,11 +3479,7 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
         if value is None:
             # Built-in target (title/asn/created) — no custom field required.
             return value
-        unsupported = {
-            CustomField.FieldDataType.DOCUMENTLINK,
-            CustomField.FieldDataType.SELECT,
-        }
-        if value.data_type in unsupported:
+        if value.data_type not in OCR_SUPPORTED_FIELD_TYPES:
             raise serializers.ValidationError(
                 f"Custom field type '{value.data_type}' is not supported for OCR extraction. "
                 f"Use string, integer, float, date, monetary, boolean, URL, or long text."

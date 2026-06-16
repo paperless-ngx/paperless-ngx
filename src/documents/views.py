@@ -148,6 +148,7 @@ from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_storage_paths
 from documents.matching import match_tags
+from documents.models import OCR_SUPPORTED_FIELD_TYPES
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -5312,70 +5313,6 @@ class OcrTemplateViewSet(ModelViewSet):
 
         return HttpResponse(content, content_type="image/png")
 
-    @action(
-        detail=True,
-        methods=["post"],
-        url_path=r"test/(?P<doc_id>[0-9]+)",
-    )
-    def test_extraction(self, request, pk=None, doc_id=None):
-        """Run zone extraction on a specific document and return results.
-
-        This writes the extracted values to the document's custom fields
-        (via update_or_create) so the results are immediately visible.
-        """
-        from documents.zone_ocr import run_zone_extraction
-
-        template = self.get_object()
-
-        try:
-            document = Document.objects.get(pk=doc_id)
-        except Document.DoesNotExist:
-            return Response(
-                {"error": "Document not found"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        doc_path = document.archive_path or document.source_path
-        if not doc_path or not Path(doc_path).is_file():
-            return Response(
-                {"error": "Document file not found"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        run_zone_extraction(document, Path(doc_path))
-
-        # Refresh and return the extracted values
-        builtin_labels = {"title": "Title", "asn": "ASN", "created": "Created"}
-        results = []
-        for zone in template.zones.all():
-            target = getattr(zone, "target", None) or "custom_field"
-            if target == "custom_field" and zone.custom_field_id:
-                cf_instance = document.custom_fields.filter(
-                    field=zone.custom_field,
-                ).first()
-                results.append({
-                    "zone": zone.name,
-                    "custom_field": zone.custom_field.name,
-                    "custom_field_type": zone.custom_field.data_type,
-                    "value": cf_instance.value if cf_instance else None,
-                })
-            else:
-                value = {
-                    "title": document.title,
-                    "asn": document.archive_serial_number,
-                    "created": document.created.isoformat()
-                    if document.created
-                    else None,
-                }.get(target)
-                results.append({
-                    "zone": zone.name,
-                    "custom_field": builtin_labels.get(target, target),
-                    "custom_field_type": target,
-                    "value": value,
-                })
-
-        return Response({"results": results})
-
     @action(detail=False, methods=["post"], url_path="test-zone")
     def test_zone(self, request):
         """Run OCR on a single ad-hoc zone of a document and return what it
@@ -5474,21 +5411,11 @@ class OcrTemplateViewSet(ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        valid_types = {
-            CustomField.FieldDataType.STRING,
-            CustomField.FieldDataType.URL,
-            CustomField.FieldDataType.DATE,
-            CustomField.FieldDataType.INT,
-            CustomField.FieldDataType.FLOAT,
-            CustomField.FieldDataType.MONETARY,
-            CustomField.FieldDataType.LONG_TEXT,
-            CustomField.FieldDataType.BOOL,
-        }
-        if data_type not in valid_types:
+        if data_type not in OCR_SUPPORTED_FIELD_TYPES:
             return Response(
                 {
                     "error": f"Unsupported data type '{data_type}'. "
-                    f"Supported: {', '.join(sorted(t.value for t in valid_types))}",
+                    f"Supported: {', '.join(sorted(OCR_SUPPORTED_FIELD_TYPES))}",
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )

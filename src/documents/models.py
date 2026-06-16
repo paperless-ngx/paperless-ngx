@@ -2105,3 +2105,20 @@ class OcrTemplateZone(models.Model):
 
     def __str__(self) -> str:
         return f"{self.template.name} -> {self.name}"
+
+
+# Custom field data types that zone OCR can extract into. DOCUMENTLINK and
+# SELECT are excluded (they reference other objects, not free text). Single
+# source of truth for the serializer, the quick-create endpoint and the engine.
+OCR_SUPPORTED_FIELD_TYPES = frozenset(
+    {
+        CustomField.FieldDataType.STRING,
+        CustomField.FieldDataType.URL,
+        CustomField.FieldDataType.DATE,
+        CustomField.FieldDataType.INT,
+        CustomField.FieldDataType.FLOAT,
+        CustomField.FieldDataType.MONETARY,
+        CustomField.FieldDataType.LONG_TEXT,
+        CustomField.FieldDataType.BOOL,
+    },
+)

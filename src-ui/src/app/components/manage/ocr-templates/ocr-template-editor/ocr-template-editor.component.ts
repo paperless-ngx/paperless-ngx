@@ -14,6 +14,7 @@ import {
   NgbNavModule,
   NgbPopoverModule,
   NgbTypeaheadModule,
+  NgbTypeaheadSelectItemEvent,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -29,13 +30,16 @@ import {
   takeUntil,
 } from 'rxjs'
 import { Document } from 'src/app/data/document'
+import { DocumentType } from 'src/app/data/document-type'
 import {
   DATE_FORMAT_OPTIONS,
   OCR_BUILTIN_TARGETS,
   OCR_LANGUAGE_OPTIONS,
   OcrTemplate,
   OcrTemplateZone,
+  OcrZoneTestResult,
   TRANSFORM_OPTIONS,
+  ZoneTestRequest,
 } from 'src/app/data/ocr-template'
 import { CustomField } from 'src/app/data/custom-field'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
@@ -102,7 +106,7 @@ export class OcrTemplateEditorComponent
   }
 
   customFields: CustomField[] = []
-  documentTypes: any[] = []
+  documentTypes: DocumentType[] = []
   transformOptions = TRANSFORM_OPTIONS
   builtinTargets = OCR_BUILTIN_TARGETS
   dateFormatOptions = DATE_FORMAT_OPTIONS
@@ -118,7 +122,7 @@ export class OcrTemplateEditorComponent
   pageImageUrl: string | null = null
   imageLoaded = false
   zoom = 1
-  previewDocModel: any = ''
+  previewDocModel: Document | string = ''
   private correspondentNames = new Map<number, string>()
 
   activeTab: ActiveTab = 'settings'
@@ -136,10 +140,7 @@ export class OcrTemplateEditorComponent
   moveZoneIndex: number | null = null
   private moveStart = { mouseX: 0, mouseY: 0, zoneX: 0, zoneY: 0 }
 
-  testResults: any[] | null = null
-  testing = false
-
-  zoneTestResult: any | null = null
+  zoneTestResult: OcrZoneTestResult | null = null
   zoneTesting = false
 
   showQuickCreate = false
@@ -222,7 +223,8 @@ export class OcrTemplateEditorComponent
       distinctUntilChanged(),
       switchMap((term) => {
         if (!term || term.trim().length < 2) return of([])
-        const params: any = { title__icontains: term.trim() }
+        const params: { title__icontains: string; document_type__id?: number } =
+          { title__icontains: term.trim() }
         if (this.template.document_type) {
           params['document_type__id'] = this.template.document_type
         }
@@ -243,7 +245,7 @@ export class OcrTemplateEditorComponent
     return corr ? `#${doc.id} ${doc.title} (${corr})` : `#${doc.id} ${doc.title}`
   }
 
-  onPreviewDocSelected(event: any) {
+  onPreviewDocSelected(event: NgbTypeaheadSelectItemEvent<Document>) {
     event.preventDefault()
     const doc: Document = event.item
     this.previewDocModel = doc
@@ -706,21 +708,22 @@ export class OcrTemplateEditorComponent
     if (!zone || !this.previewDocId) return
     this.zoneTesting = true
     this.zoneTestResult = null
+    const payload: ZoneTestRequest = {
+      name: zone.name,
+      x: zone.x,
+      y: zone.y,
+      width: zone.width,
+      height: zone.height,
+      page: zone.page ?? 1,
+      ocr_language: zone.ocr_language,
+      transform: zone.transform,
+      date_format: zone.date_format,
+      validation_regex: zone.validation_regex,
+      zone_source_width: zone.zone_source_width,
+      zone_source_height: zone.zone_source_height,
+    }
     this.templateService
-      .testZone(this.previewDocId, {
-        name: zone.name,
-        x: zone.x,
-        y: zone.y,
-        width: zone.width,
-        height: zone.height,
-        page: zone.page ?? 1,
-        ocr_language: zone.ocr_language,
-        transform: zone.transform,
-        date_format: zone.date_format,
-        validation_regex: zone.validation_regex,
-        zone_source_width: zone.zone_source_width,
-        zone_source_height: zone.zone_source_height,
-      })
+      .testZone(this.previewDocId, payload)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
@@ -765,24 +768,6 @@ export class OcrTemplateEditorComponent
     })
   }
 
-  testOnDocument() {
-    if (!this.template.id || !this.previewDocId) return
-    this.testing = true
-    this.testResults = null
-    this.templateService
-      .testExtraction(this.template.id, this.previewDocId)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => {
-          this.testResults = res.results
-          this.testing = false
-        },
-        error: () => {
-          this.testing = false
-        },
-      })
-  }
-
   // Cache the split array per zone so the getter returns a STABLE reference
   // until ocr_language actually changes. Binding ng-select's [ngModel] to a
   // method that returns a fresh array every change-detection pass makes
@@ -816,12 +801,12 @@ export class OcrTemplateEditorComponent
   }
 
   /** Value bound to the field select: a built-in id string or a custom-field id. */
-  zoneFieldValue(zone: OcrTemplateZone): any {
+  zoneFieldValue(zone: OcrTemplateZone): number | string | null {
     const target = zone.target || 'custom_field'
     return target === 'custom_field' ? zone.custom_field : target
   }
 
-  setZoneField(zone: OcrTemplateZone, value: any) {
+  setZoneField(zone: OcrTemplateZone, value: number | string) {
     if (value === 'title' || value === 'asn' || value === 'created') {
       zone.target = value
       zone.custom_field = null

@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
-import { tap } from 'rxjs/operators'
-import { OcrTemplate } from '../../data/ocr-template'
+import {
+  OcrTemplate,
+  OcrZoneTestResult,
+  ZoneTestRequest,
+} from '../../data/ocr-template'
 import { AbstractPaperlessService } from './abstract-paperless-service'
 
 export interface QuickCreateFieldResult {
@@ -22,15 +25,11 @@ export class OcrTemplateService extends AbstractPaperlessService<OcrTemplate> {
     return `${this.baseUrl}${this.resourceName}/document-page-image/${docId}/${page}/`
   }
 
-  testExtraction(templateId: number, docId: number): Observable<any> {
-    return this.http.post(
-      this.getResourceUrl(templateId, `test/${docId}`),
-      {}
-    )
-  }
-
-  testZone(docId: number, zone: any): Observable<any> {
-    return this.http.post(
+  testZone(
+    docId: number,
+    zone: ZoneTestRequest
+  ): Observable<OcrZoneTestResult> {
+    return this.http.post<OcrZoneTestResult>(
       `${this.baseUrl}${this.resourceName}/test-zone/`,
       { document: docId, zone }
     )

@@ -17,7 +17,6 @@ import tempfile
 from datetime import date
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from django.conf import settings
 
@@ -26,9 +25,6 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
-
-if TYPE_CHECKING:
-    pass
 
 logger = logging.getLogger("paperless.zone_ocr")
 
@@ -142,7 +138,6 @@ def _process_template(
                 )
                 continue
 
-            # Use per-zone source dimensions if set, otherwise template default
             src_w = zone.zone_source_width or template.source_width
             src_h = zone.zone_source_height or template.source_height
 
@@ -155,7 +150,6 @@ def _process_template(
             )
 
             if extracted is not None:
-                # Validate against regex if configured
                 if zone.validation_regex:
                     if not re.fullmatch(zone.validation_regex, extracted):
                         logger.info(
@@ -186,17 +180,14 @@ def _render_pages(
     mime = _detect_mime(doc_path)
 
     if mime and mime.startswith("image/"):
-        # Document is already an image — use directly for page 0
+        # Single-image document — use it directly as page 0.
         result[0] = doc_path
         return result
 
-    for page_idx in pages:
-        actual_page = page_idx
-        if actual_page < 0 and page_count:
-            actual_page = page_count + actual_page
-
+    # Callers pass already-resolved 0-indexed page numbers (see _resolve_page_idx).
+    for actual_page in pages:
         if actual_page < 0:
-            logger.warning("Zone OCR: invalid page index %d", page_idx)
+            logger.warning("Zone OCR: invalid page index %d", actual_page)
             continue
 
         output_prefix = tmp_dir / f"page_{actual_page}"
@@ -232,7 +223,7 @@ def _render_pages(
         # pdftoppm names output as prefix-NNNN.png
         rendered = sorted(tmp_dir.glob(f"page_{actual_page}-*.png"))
         if rendered:
-            result[page_idx] = rendered[0]
+            result[actual_page] = rendered[0]
 
     return result
 
@@ -251,7 +242,6 @@ def _crop_zone(
         with Image.open(page_img) as img:
             img_width, img_height = img.size
 
-            # Scale zone coordinates from template dimensions to actual image
             scale_x = img_width / source_width
             scale_y = img_height / source_height
 
@@ -260,7 +250,7 @@ def _crop_zone(
             crop_right = int((zone.x + zone.width) * scale_x)
             crop_bottom = int((zone.y + zone.height) * scale_y)
 
-            # Clamp to image bounds
+            # Clamp to the image so an oversized zone can't crop out of bounds.
             crop_left = max(0, min(crop_left, img_width))
             crop_top = max(0, min(crop_top, img_height))
             crop_right = max(crop_left + 1, min(crop_right, img_width))
@@ -350,7 +340,6 @@ def _extract_zone(
             return None
         return _apply_transform(text, zone.transform, getattr(zone, "date_format", "") or "")
 
-    # Standard OCR path
     text = _ocr_text(cropped, zone, tmp_dir)
     if not text:
         return None
