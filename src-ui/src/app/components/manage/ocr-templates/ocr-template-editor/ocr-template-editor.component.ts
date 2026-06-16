@@ -29,6 +29,10 @@ import {
   switchMap,
   takeUntil,
 } from 'rxjs'
+import { SelectComponent } from 'src/app/components/common/input/select/select.component'
+import { SwitchComponent } from 'src/app/components/common/input/switch/switch.component'
+import { TextComponent } from 'src/app/components/common/input/text/text.component'
+import { PageHeaderComponent } from 'src/app/components/common/page-header/page-header.component'
 import { CustomField } from 'src/app/data/custom-field'
 import { Document } from 'src/app/data/document'
 import { DocumentType } from 'src/app/data/document-type'
@@ -48,7 +52,6 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { PageHeaderComponent } from '../../../common/page-header/page-header.component'
 
 interface DrawingRect {
   startX: number
@@ -65,6 +68,10 @@ type ActiveTab = 'settings' | 'zones' | 'zone'
   selector: 'pngx-ocr-template-editor',
   standalone: true,
   imports: [
+    PageHeaderComponent,
+    TextComponent,
+    SelectComponent,
+    SwitchComponent,
     CommonModule,
     FormsModule,
     RouterModule,
@@ -73,7 +80,6 @@ type ActiveTab = 'settings' | 'zones' | 'zone'
     NgbTypeaheadModule,
     NgSelectModule,
     NgxBootstrapIconsModule,
-    PageHeaderComponent,
   ],
   templateUrl: './ocr-template-editor.component.html',
   styleUrls: ['./ocr-template-editor.component.scss'],

@@ -38,30 +38,16 @@
         <li ngbNavItem="settings">
           <a ngbNavLink i18n>Settings</a>
           <ng-template ngbNavContent>
-            <div class="mb-3">
-              <label class="form-label" i18n>Name</label>
-              <input type="text" class="form-control" [(ngModel)]="template.name" />
+            <div class="row mb-3">
+              <div class="col-9">
+                <pngx-input-text [(ngModel)]="template.name" title="Template name" i18n-title></pngx-input-text>
+              </div>
+              <div class="col-3">
+                <pngx-input-switch [(ngModel)]="template.enabled" title="Enabled" i18n-title></pngx-input-switch>
+              </div>
             </div>
 
-            <div class="mb-3">
-              <label class="form-label" i18n>Document Type</label>
-              <select class="form-select" [(ngModel)]="template.document_type">
-                <option [ngValue]="null" i18n>-- Select --</option>
-                @for (dt of documentTypes; track dt.id) {
-                  <option [ngValue]="dt.id">{{ dt.name }}</option>
-                }
-              </select>
-            </div>
-
-            <div class="form-check mb-4">
-              <input
-                type="checkbox"
-                class="form-check-input"
-                id="templateEnabled"
-                [(ngModel)]="template.enabled"
-              />
-              <label class="form-check-label" for="templateEnabled" i18n>Enabled</label>
-            </div>
+            <pngx-input-select [(ngModel)]="template.document_type" [items]="documentTypes" bindLabel="name" bindValue="id" title="Document type" i18n-title></pngx-input-select>
 
             <h6 i18n>Document Preview</h6>
             <div class="mb-3">
