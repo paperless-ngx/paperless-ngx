@@ -24,8 +24,8 @@ from django.conf import settings
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
-from documents.models_ocr_templates import OcrTemplate
-from documents.models_ocr_templates import OcrTemplateZone
+from documents.models import OcrTemplate
+from documents.models import OcrTemplateZone
 
 if TYPE_CHECKING:
     pass

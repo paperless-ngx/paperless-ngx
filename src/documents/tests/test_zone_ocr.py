@@ -12,8 +12,8 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
-from documents.models_ocr_templates import OcrTemplate
-from documents.models_ocr_templates import OcrTemplateZone
+from documents.models import OcrTemplate
+from documents.models import OcrTemplateZone
 from documents.zone_ocr import _apply_transform
 from documents.zone_ocr import _convert_value
 from documents.zone_ocr import _detect_mime

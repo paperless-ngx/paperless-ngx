@@ -21,7 +21,6 @@ from documents.views import BulkEditView
 from documents.views import ChatStreamingView
 from documents.views import CorrespondentViewSet
 from documents.views import CustomFieldViewSet
-from documents.views_ocr_templates import OcrTemplateViewSet
 from documents.views import DeleteDocumentsView
 from documents.views import DocumentTypeViewSet
 from documents.views import EditPdfDocumentsView
@@ -29,6 +28,7 @@ from documents.views import GlobalSearchView
 from documents.views import IndexView
 from documents.views import LogViewSet
 from documents.views import MergeDocumentsView
+from documents.views import OcrTemplateViewSet
 from documents.views import PostDocumentView
 from documents.views import RemoteVersionView
 from documents.views import RemovePasswordDocumentsView

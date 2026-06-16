@@ -8,8 +8,8 @@ from rest_framework.test import APITestCase
 
 from documents.models import CustomField
 from documents.models import DocumentType
-from documents.models_ocr_templates import OcrTemplate
-from documents.models_ocr_templates import OcrTemplateZone
+from documents.models import OcrTemplate
+from documents.models import OcrTemplateZone
 from documents.tests.utils import DirectoriesMixin
 
 
