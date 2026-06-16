@@ -24,6 +24,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { EditDialogMode } from '../../edit-dialog/edit-dialog.component'
 import { TagEditDialogComponent } from '../../edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { TagComponent } from '../../tag/tag.component'
+import { normalizeString } from 'src/app/utils/normalize-string'
 
 @Component({
   providers: [
@@ -74,6 +75,11 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     this.tagService.listAll().subscribe((result) => {
       this.tags = result.results
     })
+  }
+
+  customSearchFn(term: string, item: any): boolean {
+    if (!term) return true
+    return normalizeString(item.name).includes(normalizeString(term))
   }
 
   @Input()

@@ -46,4 +46,28 @@ describe('FilterPipe', () => {
     itemsReturned = pipe.transform(items, 'slug', 'slug')
     expect(itemsReturned).toEqual([items[0]])
   })
+
+  it('should match ignoring diacritics', () => {
+    const pipe = new FilterPipe()
+    const items: MatchingModel[] = [
+      {
+        id: 1,
+        name: 'Cartão de Cidadão',
+        slug: 'slug-1',
+      },
+      {
+        id: 2,
+        name: 'Hello',
+        slug: 'slug-2',
+      },
+    ]
+    let itemsReturned = pipe.transform(items, 'cartao')
+    expect(itemsReturned).toEqual([items[0]])
+
+    itemsReturned = pipe.transform(items, 'cidadao')
+    expect(itemsReturned).toEqual([items[0]])
+
+    itemsReturned = pipe.transform(items, 'Cartão')
+    expect(itemsReturned).toEqual([items[0]])
+  })
 })
