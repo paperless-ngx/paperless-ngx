@@ -39,6 +39,7 @@ import { CustomField } from 'src/app/data/custom-field'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { PageHeaderComponent } from '../../../common/page-header/page-header.component'
@@ -78,6 +79,7 @@ export class OcrTemplateEditorComponent
   private readonly templateService = inject(OcrTemplateService)
   private readonly customFieldsService = inject(CustomFieldsService)
   private readonly documentTypeService = inject(DocumentTypeService)
+  private readonly correspondentService = inject(CorrespondentService)
   private readonly documentService = inject(DocumentService)
   private readonly toastService = inject(ToastService)
   private readonly destroy$ = new Subject<void>()
@@ -113,6 +115,7 @@ export class OcrTemplateEditorComponent
   imageLoaded = false
   zoom = 1
   previewDocModel: any = ''
+  private correspondentNames = new Map<number, string>()
 
   activeTab: ActiveTab = 'settings'
 
@@ -173,6 +176,13 @@ export class OcrTemplateEditorComponent
       .pipe(takeUntil(this.destroy$))
       .subscribe((r) => (this.documentTypes = r.results))
 
+    this.correspondentService
+      .listAll()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((r) => {
+        this.correspondentNames = new Map(r.results.map((c) => [c.id, c.name]))
+      })
+
     const id = this.route.snapshot.paramMap.get('id')
     if (id && id !== 'new') {
       this.isNew = false
@@ -221,8 +231,13 @@ export class OcrTemplateEditorComponent
       })
     )
 
-  documentFormatter = (doc: Document | string): string =>
-    typeof doc === 'string' ? doc : `#${doc.id} ${doc.title}`
+  documentFormatter = (doc: Document | string): string => {
+    if (typeof doc === 'string') return doc
+    const corr = doc.correspondent
+      ? this.correspondentNames.get(doc.correspondent)
+      : null
+    return corr ? `#${doc.id} ${doc.title} (${corr})` : `#${doc.id} ${doc.title}`
+  }
 
   onPreviewDocSelected(event: any) {
     event.preventDefault()
