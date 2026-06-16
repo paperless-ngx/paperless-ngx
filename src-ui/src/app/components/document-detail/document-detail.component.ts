@@ -1429,8 +1429,6 @@ export class DocumentDetailComponent
           } else {
             this.toastService.showInfo($localize`Zone OCR ran but no results extracted.`)
           }
-          // Refresh the document so the newly extracted values (custom fields,
-          // title, ASN, created) appear immediately, without a page reload.
           this.documentsService
             .get(this.documentId)
             .subscribe((doc) => this.updateComponent(doc))
