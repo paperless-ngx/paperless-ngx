@@ -101,11 +101,11 @@
               @for (zone of template.zones; track $index; let i = $index) {
                 <div
                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                  [class.active]="selectedZoneIndex === i"
+                  [style.box-shadow]="selectedZoneIndex === i ? 'inset 3px 0 0 0 var(--bs-primary)' : null"
                 >
                   <div class="flex-grow-1" role="button" style="cursor: pointer;" (click)="selectZone(i)">
-                    <div><strong>{{ zone.name }}</strong></div>
-                    <div class="small" [class.text-muted]="selectedZoneIndex !== i">
+                    <div><strong [class.text-primary]="selectedZoneIndex === i">{{ zone.name }}</strong></div>
+                    <div class="small text-muted">
                       {{ getCustomFieldName(zone.custom_field) }} · {{ zone.width }}×{{ zone.height }}px
                     </div>
                   </div>
