@@ -306,7 +306,7 @@ Paperless-ngx includes several features that use AI to enhance the document mana
     so consider the privacy implications of using these features, especially if using a remote
     model or API provider instead of the default local model.
 
-The AI features work by creating an embedding of the text content and metadata of documents, which is then used for various tasks such as similarity search and question answering. This uses the FAISS vector store.
+The AI features work by creating an embedding of the text content and metadata of documents, which is then used for various tasks such as similarity search and question answering.
 
 ### AI-Enhanced Suggestions
 

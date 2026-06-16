@@ -62,13 +62,13 @@ and the relevant connection variables.
 #### [`PAPERLESS_DBENGINE=<engine>`](#PAPERLESS_DBENGINE) {#PAPERLESS_DBENGINE}
 
 : Specifies the database engine to use. Accepted values are `sqlite`, `postgresql`,
-and `mariadb`.
-
-    Defaults to `sqlite` if not set.
+and `mariadb`. PostgreSQL and MariaDB users must set this explicitly.
 
     PostgreSQL and MariaDB both require [`PAPERLESS_DBHOST`](#PAPERLESS_DBHOST) to be
     set. SQLite does not use any other connection variables; the database file is always
     located at `<PAPERLESS_DATA_DIR>/db.sqlite3`.
+
+    Defaults to `sqlite`.
 
     !!! warning
         Using MariaDB comes with some caveats.
@@ -892,7 +892,7 @@ modes are available:
 
     The default is `auto`.
 
-    For the `skip`, `redo`, and `force` modes, read more about OCR
+    For the `redo` and `force` modes, read more about OCR
     behaviour in the [OCRmyPDF
     documentation](https://ocrmypdf.readthedocs.io/en/latest/advanced.html#when-ocr-is-skipped).
 
@@ -2131,7 +2131,7 @@ used with the OpenAI-compatible backend to target a custom provider or local gat
 
     Defaults to true, which allows internal endpoints.
 
-#### [`PAPERLESS_AI_LLM_INDEX_TASK_CRON=<cron expression>`](#PAPERLESS_AI_LLM_INDEX_TASK_CRON) {#PAPERLESS_AI_LLM_INDEX_TASK_CRON}
+#### [`PAPERLESS_LLM_INDEX_TASK_CRON=<cron expression>`](#PAPERLESS_LLM_INDEX_TASK_CRON) {#PAPERLESS_LLM_INDEX_TASK_CRON}
 
 : Configures the schedule to update the AI embeddings of text content and metadata for all documents. Only performed if
 AI is enabled and the LLM embedding backend is set.

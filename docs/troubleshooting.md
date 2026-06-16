@@ -149,37 +149,6 @@ operating system, if these are different from `1000`. See [Docker setup](setup.m
 Also ensure that you are able to read and write to the consumption
 directory on the host.
 
-## OSError: \[Errno 19\] No such device when consuming files
-
-If you experience errors such as:
-
-```shell-session
-File "/usr/local/lib/python3.7/site-packages/whoosh/codec/base.py", line 570, in open_compound_file
-return CompoundStorage(dbfile, use_mmap=storage.supports_mmap)
-File "/usr/local/lib/python3.7/site-packages/whoosh/filedb/compound.py", line 75, in __init__
-self._source = mmap.mmap(fileno, 0, access=mmap.ACCESS_READ)
-OSError: [Errno 19] No such device
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-File "/usr/local/lib/python3.7/site-packages/django_q/cluster.py", line 436, in worker
-res = f(*task["args"], **task["kwargs"])
-File "/usr/src/paperless/src/documents/tasks.py", line 73, in consume_file
-override_tag_ids=override_tag_ids)
-File "/usr/src/paperless/src/documents/consumer.py", line 271, in try_consume_file
-raise ConsumerError(e)
-```
-
-Paperless uses a search index to provide better and faster full text
-searching. This search index is stored inside the `data` folder. The
-search index uses memory-mapped files (mmap). The above error indicates
-that paperless was unable to create and open these files.
-
-This happens when you're trying to store the data directory on certain
-file systems (mostly network shares) that don't support memory-mapped
-files.
-
 ## Web-UI stuck at "Loading\..."
 
 This might have multiple reasons.

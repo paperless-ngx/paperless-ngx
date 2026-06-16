@@ -846,7 +846,7 @@ Paperless is able to utilize barcodes for automatically performing some tasks. B
 
 At this time, the library utilized for detection of barcodes supports the following types:
 
-- AN-13/UPC-A
+- EAN-13/UPC-A
 - UPC-E
 - EAN-8
 - Code 128
@@ -855,7 +855,9 @@ At this time, the library utilized for detection of barcodes supports the follow
 - Codabar
 - Interleaved 2 of 5
 - QR Code
-- SQ Code
+- Data Matrix
+- Aztec
+- PDF417
 
 For usage in Paperless, the type of barcode does not matter, only the contents of it.
 
