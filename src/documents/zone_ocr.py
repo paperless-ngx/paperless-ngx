@@ -372,7 +372,9 @@ def extract_zone_preview(
     OCR text and the transformed value so the user can see what the zone yields
     (and tune the validation regex) before saving.
     """
-    page_idx = zone.page if zone.page is not None else 0
+    # zone.page is 1-indexed (1 = first, -1 = last); resolve to a 0-indexed
+    # image index exactly like the production extraction path does.
+    page_idx = _resolve_page_idx(zone.page, page_count)
     with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
         tmp_path = Path(tmp_dir)
         page_images = _render_pages(doc_path, {page_idx}, tmp_path, page_count)
