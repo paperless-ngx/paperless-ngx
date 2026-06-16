@@ -308,6 +308,8 @@ Paperless-ngx includes several features that use AI to enhance the document mana
 
 The AI features work by creating an embedding of the text content and metadata of documents, which is then used for various tasks such as similarity search and question answering.
 
+See [AI features](advanced_usage.md#ai-features) for how to enable and configure these features, including choosing an LLM backend and setting up the LLM index for RAG.
+
 ### AI-Enhanced Suggestions
 
 If enabled, Paperless-ngx can use an AI LLM model to suggest document titles, dates, tags,
