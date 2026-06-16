@@ -70,7 +70,16 @@ elsewhere. Here are a couple notes about that.
 Paperless-ngx determines the type of a file by inspecting its content
 rather than its file extensions. However, files processed via the
 consumption directory will be rejected if they have a file extension that
-not supported by any of the available parsers.
+is not supported by any of the available parsers.
+
+## _Are duplicate documents rejected?_
+
+**A:** Not by default. As of v3, a file whose contents match an existing document is still
+consumed, and the duplicate is flagged in the UI — open the document and check the
+**Duplicates** tab to review documents that share the same content. If you prefer the old
+behavior of rejecting duplicates during consumption, set
+[`PAPERLESS_CONSUMER_DELETE_DUPLICATES`](configuration.md#PAPERLESS_CONSUMER_DELETE_DUPLICATES)
+to `true`.
 
 ## _Will paperless-ngx run on Raspberry Pi?_
 

@@ -292,6 +292,23 @@ Once setup, navigating to the email settings page in Paperless-ngx will allow yo
 You can also submit a document using the REST API, see [POSTing documents](api.md#file-uploads)
 for details.
 
+### Duplicate documents
+
+By default, Paperless-ngx **does not reject duplicates**. If you consume a file whose
+contents exactly match an existing document (same checksum), the new copy is still
+consumed and a warning is logged. The task entry for the upload also flags that a
+duplicate was detected and links to the existing document(s).
+
+To review duplicates, open a document and switch to the **Duplicates** tab on the
+document detail page. It lists other documents that share the same content, including any
+that are in the trash (shown with a badge), and links to each so you can decide which to
+keep.
+
+If you would rather reject duplicates at consumption time (the pre-v3 behavior), set
+[`PAPERLESS_CONSUMER_DELETE_DUPLICATES`](configuration.md#PAPERLESS_CONSUMER_DELETE_DUPLICATES)
+to `true`. The duplicate file is then deleted instead of consumed, and the task fails with
+a "document already exists" message.
+
 ## Document Suggestions
 
 Paperless-ngx can suggest tags, correspondents, document types and storage paths for documents based on the content of the document. This is done using a (non-LLM) machine learning model that is trained on the documents in your database. The suggestions are shown in the document detail page and can be accepted or rejected by the user.
