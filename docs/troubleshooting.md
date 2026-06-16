@@ -10,9 +10,9 @@ Check for the following issues:
   `CONSUMPTION_DIR` setting. Don't adjust this setting if you're
   using docker.
 
-- Ensure that redis is up and running. Paperless does its task
+- Ensure that the broker is up and running. Paperless does its task
   processing asynchronously, and for documents to arrive at the task
-  processor, it needs redis to run.
+  processor, it needs the broker to run.
 
 - Ensure that the task processor is running. Docker does this
   automatically. Manually invoke the task processor by executing

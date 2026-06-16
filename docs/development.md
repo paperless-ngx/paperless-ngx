@@ -94,16 +94,16 @@ first-time setup.
     ```
 
 7.  You can now either ...
-    - install Redis or
+    - install a Redis-compatible broker (e.g. Valkey or Redis) or
 
     - use the included `scripts/start_services.sh` to use Docker to fire
-      up a Redis instance (and some other services such as Tika,
+      up a broker instance (and some other services such as Tika,
       Gotenberg and a database server) or
 
-    - spin up a bare Redis container
+    - spin up a bare broker container
 
       ```bash
-      docker run -d -p 6379:6379 --restart unless-stopped redis:latest
+      docker run -d -p 6379:6379 --restart unless-stopped docker.io/valkey/valkey:9-alpine
       ```
 
 8.  Continue with either back-end or front-end development – or both :-).

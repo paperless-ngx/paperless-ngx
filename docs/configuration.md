@@ -22,7 +22,11 @@ or applicable default will be utilized instead.
 
 ## Required services
 
-### Redis Broker
+### Message Broker
+
+Paperless-ngx uses a Redis-compatible message broker. Any broker that
+speaks the Redis protocol works here, including [Valkey](https://valkey.io/)
+(the default in the bundled Docker Compose files) and Redis itself.
 
 #### [`PAPERLESS_REDIS=<url>`](#PAPERLESS_REDIS) {#PAPERLESS_REDIS}
 
@@ -30,21 +34,21 @@ or applicable default will be utilized instead.
 fetching, index optimization and for training the automatic document
 matcher.
 
-    -   If your Redis server needs login credentials PAPERLESS_REDIS =
+    -   If your broker needs login credentials PAPERLESS_REDIS =
         `redis://<username>:<password>@<host>:<port>`
     -   With the requirepass option PAPERLESS_REDIS =
         `redis://:<password>@<host>:<port>`
-    -   To include the redis database index PAPERLESS_REDIS =
+    -   To include the database index PAPERLESS_REDIS =
         `redis://<username>:<password>@<host>:<port>/<DBIndex>`
 
-    [More information on securing your Redis
-    Instance](https://valkey.io/topics/security/).
+    [More information on securing your broker
+    instance](https://valkey.io/topics/security/).
 
     Defaults to `redis://localhost:6379`.
 
 #### [`PAPERLESS_REDIS_PREFIX=<prefix>`](#PAPERLESS_REDIS_PREFIX) {#PAPERLESS_REDIS_PREFIX}
 
-: Prefix to be used in Redis for keys and channels. Useful for sharing one Redis server among multiple Paperless instances.
+: Prefix to be used in the broker for keys and channels. Useful for sharing one broker among multiple Paperless instances.
 
     Defaults to no prefix.
 
@@ -238,7 +242,7 @@ dictionaries; for example, `pool.max_size=20` sets
 
 #### [`PAPERLESS_DB_READ_CACHE_ENABLED=<bool>`](#PAPERLESS_DB_READ_CACHE_ENABLED) {#PAPERLESS_DB_READ_CACHE_ENABLED}
 
-: Caches the database read query results into Redis. This can significantly improve application response times by caching database queries, at the cost of slightly increased memory usage.
+: Caches the database read query results into the broker. This can significantly improve application response times by caching database queries, at the cost of slightly increased memory usage.
 
     Defaults to `false`.
 
@@ -258,18 +262,18 @@ dictionaries; for example, `pool.max_size=20` sets
 
         A high TTL increases memory usage over time. Memory may be used until end of TTL, even if the cache is invalidated with the `invalidate_cachalot` command.
 
-In case of an out-of-memory (OOM) situation, Redis may stop accepting new data — including cache entries, scheduled tasks, and documents to consume.
-If your system has limited RAM, consider configuring a dedicated Redis instance for the read cache, with a memory limit and the eviction policy set to `allkeys-lru`.
-For more details, refer to the [Redis eviction policy documentation](https://redis.io/docs/latest/develop/reference/eviction/), and see the `PAPERLESS_READ_CACHE_REDIS_URL` setting to specify a separate Redis broker.
+In case of an out-of-memory (OOM) situation, the broker may stop accepting new data — including cache entries, scheduled tasks, and documents to consume.
+If your system has limited RAM, consider configuring a dedicated broker instance for the read cache, with a memory limit and the eviction policy set to `allkeys-lru`.
+For more details, refer to the [Redis eviction policy documentation](https://redis.io/docs/latest/develop/reference/eviction/), and see the `PAPERLESS_READ_CACHE_REDIS_URL` setting to specify a separate broker.
 
 #### [`PAPERLESS_READ_CACHE_REDIS_URL=<url>`](#PAPERLESS_READ_CACHE_REDIS_URL) {#PAPERLESS_READ_CACHE_REDIS_URL}
 
-: Defines the Redis instance used for the read cache.
+: Defines the broker instance used for the read cache.
 
     Defaults to `None`.
 
     !!! Note
-    If this value is not set, the same Redis instance used for scheduled tasks will be used for caching as well.
+    If this value is not set, the same broker instance used for scheduled tasks will be used for caching as well.
 
 ## Optional Services
 

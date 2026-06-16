@@ -118,10 +118,14 @@ able to run paperless, you're a bit on your own. If you can't run the
 docker image, the documentation has instructions for bare metal
 installs.
 
-## _What about the Redis licensing change and using one of the open source forks_?
+## _Which message broker should I use_?
 
-Currently (October 2024), forks of Redis such as Valkey or Redirect are not officially supported by our upstream
-libraries, so using one of these to replace Redis is not officially supported.
+Paperless-ngx talks to a Redis-compatible message broker, so any broker that
+implements the Redis protocol will work. The bundled Docker Compose files
+default to [Valkey](https://valkey.io/), the open-source fork created after
+Redis' licensing change, but Redis itself and other wire-compatible brokers
+(such as Microsoft's Garnet) are equally fine.
 
-However, they do claim to be compatible with the Redis protocol and will likely work, but we will
-not be updating from using Redis as the broker officially just yet.
+Existing installs can switch broker implementations in place: point
+[`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS) at the new instance and
+reuse the same data volume.
