@@ -1,15 +1,40 @@
 <pngx-page-header [title]="pageTitle" [id]="template.id">
-  <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
-    <button class="btn btn-sm btn-outline-secondary" (click)="prevPage()" [disabled]="previewPage <= 0" i18n>Previous</button>
-    <span class="small">
-      <ng-container i18n>Page</ng-container> {{ previewPage + 1 }}@if (previewPageCount) { / {{ previewPageCount }} }
-    </span>
-    <button class="btn btn-sm btn-outline-secondary" (click)="nextPage()" [disabled]="previewPageCount && previewPage >= previewPageCount - 1" i18n>Next</button>
-    <div class="vr mx-1"></div>
-    <button class="btn btn-sm btn-outline-secondary" (click)="zoomOut()" [disabled]="zoom <= 0.5" title="Zoom out" i18n-title>&minus;</button>
-    <span class="small" style="min-width: 3em; text-align: center;">{{ zoom * 100 | number: '1.0-0' }}%</span>
-    <button class="btn btn-sm btn-outline-secondary" (click)="zoomIn()" [disabled]="zoom >= 4" title="Zoom in" i18n-title>+</button>
-    <button class="btn btn-sm btn-outline-secondary" (click)="resetZoom()" i18n>Reset</button>
+    <div class="input-group input-group-sm me-5 align-items-center">
+      <div class="input-group-text">
+        <i-bs name="file-text"></i-bs>
+      </div>
+        <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="previewDocModel"
+        [ngbTypeahead]="searchDocuments"
+        [inputFormatter]="documentFormatter"
+        [resultFormatter]="documentFormatter"
+        (selectItem)="onPreviewDocSelected($event)"
+        [editable]="false"
+        placeholder="Search documents by title..."
+        i18n-placeholder
+      />
+  </div>
+
+  <div class="d-flex align-items-center flex-wrap gap-2">
+    <div class="input-group input-group-sm ms-2 d-none d-md-flex">
+      <div class="input-group-text" i18n>Page</div>
+        <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewPageCount" [(ngModel)]="previewPageDisplay" />
+      <div class="input-group-text" i18n>of {{previewPageCount}}</div>
+    </div>
+    <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Previous" (click)="prevPage()" [disabled]="!pageImageUrl || previewPage <= 0">
+      <i-bs width="1.2em" height="1.2em" name="arrow-left"></i-bs>
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-secondary"  i18n-title title="Next" (click)="nextPage()" [disabled]="!pageImageUrl || previewPage >= (previewPageCount ?? 1) - 1">
+      <i-bs width="1.2em" height="1.2em" name="arrow-right"></i-bs>
+    </button>
+
+    <div class="input-group input-group-sm">
+      <button class="btn btn-outline-secondary" (click)="zoomOut()" i18n>-</button>
+      <span class="input-group-text">{{ zoom * 100 | number: '1.0-0' }}%</span>
+      <button class="btn btn-outline-secondary" (click)="zoomIn()" i18n>+</button>
+    </div>
   </div>
 </pngx-page-header>
 
@@ -49,35 +74,6 @@
 
             <pngx-input-select [(ngModel)]="template.document_type" [items]="documentTypes" bindLabel="name" bindValue="id" title="Document type" i18n-title></pngx-input-select>
 
-            <h6 i18n>Document Preview</h6>
-            <div class="mb-3">
-              <label class="form-label" i18n>Document</label>
-              <div class="input-group">
-                <input
-                  type="text"
-                  class="form-control"
-                  [(ngModel)]="previewDocModel"
-                  [ngbTypeahead]="searchDocuments"
-                  [inputFormatter]="documentFormatter"
-                  [resultFormatter]="documentFormatter"
-                  (selectItem)="onPreviewDocSelected($event)"
-                  [editable]="false"
-                  placeholder="Search documents by title..."
-                  i18n-placeholder
-                />
-                <button
-                  class="btn btn-outline-secondary"
-                  type="button"
-                  (click)="clearPreviewDoc()"
-                  [disabled]="!previewDocId && !previewDocModel"
-                  title="Clear"
-                  i18n-title
-                >
-                  <i-bs name="x"></i-bs>
-                </button>
-              </div>
-              <small class="text-muted" i18n>Filtered by the document type above; if none is set, the selected document's type is used.</small>
-            </div>
             <small class="text-muted" i18n>
               Draw rectangles on the preview to define extraction zones. Use the
               page controls above the preview to add zones on different pages.

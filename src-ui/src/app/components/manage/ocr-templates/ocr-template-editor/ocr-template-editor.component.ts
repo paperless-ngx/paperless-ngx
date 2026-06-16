@@ -132,6 +132,14 @@ export class OcrTemplateEditorComponent
   previewDocModel: Document | string = ''
   private correspondentNames = new Map<number, string>()
 
+  public get previewPageDisplay(): number {
+    return this.previewPage + 1
+  }
+
+  public set previewPageDisplay(value: number) {
+    this.previewPage = Math.max(0, value) - 1
+  }
+
   activeTab: ActiveTab = 'settings'
 
   isDrawing = false
