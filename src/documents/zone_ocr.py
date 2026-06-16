@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import logging
 import re
+import string
 import subprocess
 import tempfile
 from datetime import date
@@ -457,6 +458,8 @@ def _apply_transform(text: str, transform: str, date_format: str = "") -> str:
     elif transform == "numeric":
         result = re.sub(r"[^\d.,\-]", "", text)
         return result if result else text
+    elif transform == "strip_punctuation":
+        return text.strip(string.punctuation + " \t\r\n")
     elif transform == "qr_code":
         # Return the full barcode/QR content as-is (already read by _read_barcode)
         return text

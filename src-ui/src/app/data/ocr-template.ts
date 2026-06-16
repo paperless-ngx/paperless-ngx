@@ -31,9 +31,21 @@ export const TRANSFORM_OPTIONS = [
   { id: 'uppercase', name: $localize`Uppercase` },
   { id: 'lowercase', name: $localize`Lowercase` },
   { id: 'numeric', name: $localize`Numeric only` },
+  { id: 'strip_punctuation', name: $localize`Remove leading/trailing punctuation` },
   { id: 'date', name: $localize`Parse date` },
   { id: 'qr_code', name: $localize`Read QR/barcode` },
   { id: 'qr_code_raw', name: $localize`Read QR/barcode (raw)` },
+]
+
+// Common Tesseract OCR languages for the zone language picker.
+export const OCR_LANGUAGE_OPTIONS = [
+  { id: 'eng', name: $localize`English` },
+  { id: 'deu', name: $localize`German` },
+  { id: 'fra', name: $localize`French` },
+  { id: 'ita', name: $localize`Italian` },
+  { id: 'spa', name: $localize`Spanish` },
+  { id: 'por', name: $localize`Portuguese` },
+  { id: 'nld', name: $localize`Dutch` },
 ]
 
 // Date-format presets for the "Parse date" transform. Values are Python

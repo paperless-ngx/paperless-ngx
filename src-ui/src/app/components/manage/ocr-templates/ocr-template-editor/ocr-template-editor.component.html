@@ -215,12 +215,17 @@
 
               <div class="mb-3">
                 <label class="form-label" i18n>OCR Language</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  [(ngModel)]="zone.ocr_language"
-                  placeholder="deu+eng"
-                />
+                <ng-select
+                  [items]="ocrLanguageOptions"
+                  bindLabel="name"
+                  bindValue="id"
+                  [multiple]="true"
+                  [closeOnSelect]="false"
+                  [ngModel]="ocrLanguageArray(zone)"
+                  (ngModelChange)="setOcrLanguages(zone, $event)"
+                  placeholder="Select languages"
+                  i18n-placeholder
+                ></ng-select>
               </div>
 
               <div class="mb-3">

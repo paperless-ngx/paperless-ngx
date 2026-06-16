@@ -174,6 +174,10 @@ class OcrTemplateZone(models.Model):
         UPPERCASE = ("uppercase", _("Uppercase"))
         LOWERCASE = ("lowercase", _("Lowercase"))
         NUMERIC = ("numeric", _("Numeric only"))
+        STRIP_PUNCTUATION = (
+            "strip_punctuation",
+            _("Remove leading/trailing punctuation"),
+        )
         DATE = ("date", _("Parse date"))
         QR_CODE = ("qr_code", _("Read QR/barcode"))
         QR_CODE_RAW = ("qr_code_raw", _("Read QR/barcode (raw)"))

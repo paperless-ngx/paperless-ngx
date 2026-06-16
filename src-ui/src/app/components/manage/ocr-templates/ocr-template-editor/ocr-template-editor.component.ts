@@ -15,6 +15,7 @@ import {
   NgbPopoverModule,
   NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap'
+import { NgSelectModule } from '@ng-select/ng-select'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import {
   catchError,
@@ -31,6 +32,7 @@ import { Document } from 'src/app/data/document'
 import {
   DATE_FORMAT_OPTIONS,
   OCR_BUILTIN_TARGETS,
+  OCR_LANGUAGE_OPTIONS,
   OcrTemplate,
   OcrTemplateZone,
   TRANSFORM_OPTIONS,
@@ -65,6 +67,7 @@ type ActiveTab = 'settings' | 'zones' | 'zone'
     NgbNavModule,
     NgbPopoverModule,
     NgbTypeaheadModule,
+    NgSelectModule,
     NgxBootstrapIconsModule,
     PageHeaderComponent,
   ],
@@ -103,6 +106,7 @@ export class OcrTemplateEditorComponent
   transformOptions = TRANSFORM_OPTIONS
   builtinTargets = OCR_BUILTIN_TARGETS
   dateFormatOptions = DATE_FORMAT_OPTIONS
+  ocrLanguageOptions = OCR_LANGUAGE_OPTIONS
   dateFormatCustom = false
   isNew = true
   saving = false
@@ -777,6 +781,14 @@ export class OcrTemplateEditorComponent
           this.testing = false
         },
       })
+  }
+
+  ocrLanguageArray(zone: OcrTemplateZone): string[] {
+    return zone.ocr_language ? zone.ocr_language.split('+').filter(Boolean) : []
+  }
+
+  setOcrLanguages(zone: OcrTemplateZone, langs: string[]) {
+    zone.ocr_language = (langs || []).join('+')
   }
 
   getCustomFieldName(id: number): string {
