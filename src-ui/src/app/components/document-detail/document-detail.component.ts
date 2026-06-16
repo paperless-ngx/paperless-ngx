@@ -1411,9 +1411,21 @@ export class DocumentDetailComponent
       .post(`${environment.apiBaseUrl}documents/${this.document.id}/run-zone-ocr/`, {})
       .subscribe({
         next: (res: any) => {
-          if (res.results?.length) {
-            const summary = res.results.map((r: any) => `${r.zone}: ${r.value ?? '(empty)'}`).join(', ')
-            this.toastService.showInfo($localize`Zone OCR complete: ${summary}`)
+          const results = res.results ?? []
+          if (results.length) {
+            const failed = results.filter(
+              (r: any) =>
+                r.value === null ||
+                r.value === undefined ||
+                `${r.value}`.trim() === ''
+            )
+            const filled = results.length - failed.length
+            let msg = $localize`Filled ${filled} of ${results.length} fields`
+            if (failed.length) {
+              const names = failed.map((r: any) => r.zone).join(', ')
+              msg = `${msg}. ${$localize`Failed to match zones: ${names}`}`
+            }
+            this.toastService.showInfo(msg)
           } else {
             this.toastService.showInfo($localize`Zone OCR ran but no results extracted.`)
           }
