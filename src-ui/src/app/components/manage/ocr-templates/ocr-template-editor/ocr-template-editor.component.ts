@@ -558,10 +558,29 @@ export class OcrTemplateEditorComponent
       ctx.fillStyle = color + '20'
       ctx.fillRect(x, y, w, h)
 
-      // Label
-      ctx.fillStyle = color
+      // Name pill ABOVE the zone — an opaque rounded label so the zone's
+      // content stays fully visible (drawing it inside washed out over the text).
+      const label = zone.name || `Zone ${idx + 1}`
       ctx.font = '12px sans-serif'
-      ctx.fillText(zone.name, x + 4, y + 14)
+      ctx.textBaseline = 'middle'
+      const padX = 6
+      const pillH = 17
+      const pillW = ctx.measureText(label).width + padX * 2
+      const pillX = x
+      const pillY = Math.max(0, y - pillH - 2)
+      const r = 4
+      ctx.fillStyle = color
+      ctx.beginPath()
+      ctx.moveTo(pillX + r, pillY)
+      ctx.arcTo(pillX + pillW, pillY, pillX + pillW, pillY + pillH, r)
+      ctx.arcTo(pillX + pillW, pillY + pillH, pillX, pillY + pillH, r)
+      ctx.arcTo(pillX, pillY + pillH, pillX, pillY, r)
+      ctx.arcTo(pillX, pillY, pillX + pillW, pillY, r)
+      ctx.closePath()
+      ctx.fill()
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText(label, pillX + padX, pillY + pillH / 2 + 0.5)
+      ctx.textBaseline = 'alphabetic'
 
       // Draw resize handles on selected zone
       if (idx === this.selectedZoneIndex) {
