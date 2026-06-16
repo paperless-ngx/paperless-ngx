@@ -141,6 +141,89 @@ class OcrTemplateViewSet(ModelViewSet):
 
         return Response({"results": results})
 
+    @action(detail=False, methods=["post"], url_path="test-zone")
+    def test_zone(self, request):
+        """Run OCR on a single ad-hoc zone of a document and return what it
+        yields: the raw OCR text, the transformed value, and whether the
+        validation regex matches. Non-destructive — writes nothing. Used by the
+        editor's per-zone test so a user can tune the zone/regex before saving.
+
+        Accepts: {"document": <id>, "zone": {x, y, width, height, page,
+        ocr_language, transform, validation_regex, zone_source_width,
+        zone_source_height}}.
+        """
+        import re
+
+        from documents.models_ocr_templates import OcrTemplateZone
+        from documents.zone_ocr import extract_zone_preview
+
+        zone_data = request.data.get("zone") or {}
+
+        try:
+            document = Document.objects.get(pk=request.data.get("document"))
+        except (Document.DoesNotExist, ValueError, TypeError):
+            return Response(
+                {"error": "Document not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        doc_path = document.archive_path or document.source_path
+        if not doc_path or not Path(doc_path).is_file():
+            return Response(
+                {"error": "Document file not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        try:
+            zone = OcrTemplateZone(
+                name=zone_data.get("name") or "test",
+                x=int(zone_data.get("x", 0)),
+                y=int(zone_data.get("y", 0)),
+                width=int(zone_data.get("width", 0)),
+                height=int(zone_data.get("height", 0)),
+                page=zone_data.get("page"),
+                ocr_language=zone_data.get("ocr_language") or "eng",
+                transform=zone_data.get("transform") or "strip",
+                validation_regex=zone_data.get("validation_regex") or "",
+            )
+        except (ValueError, TypeError):
+            return Response(
+                {"error": "Invalid zone definition"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if zone.width < 2 or zone.height < 2:
+            return Response(
+                {"error": "Zone is too small to test"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        result = extract_zone_preview(
+            Path(doc_path),
+            zone,
+            int(zone_data.get("zone_source_width") or 0),
+            int(zone_data.get("zone_source_height") or 0),
+            document.page_count,
+        )
+
+        regex_match = None
+        if zone.validation_regex and result.get("value") is not None:
+            try:
+                regex_match = (
+                    re.fullmatch(zone.validation_regex, result["value"]) is not None
+                )
+            except re.error:
+                regex_match = None
+
+        return Response(
+            {
+                "raw_text": result.get("raw_text"),
+                "value": result.get("value"),
+                "regex": zone.validation_regex,
+                "regex_match": regex_match,
+            },
+        )
+
     @action(detail=False, methods=["post"], url_path="quick-create-field")
     def quick_create_field(self, request):
         """Create a custom field inline from the template editor.

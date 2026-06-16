@@ -29,6 +29,13 @@ export class OcrTemplateService extends AbstractPaperlessService<OcrTemplate> {
     )
   }
 
+  testZone(docId: number, zone: any): Observable<any> {
+    return this.http.post(
+      `${this.baseUrl}${this.resourceName}/test-zone/`,
+      { document: docId, zone }
+    )
+  }
+
   quickCreateField(name: string, dataType: string): Observable<QuickCreateFieldResult> {
     return this.http.post<QuickCreateFieldResult>(
       `${this.baseUrl}${this.resourceName}/quick-create-field/`,

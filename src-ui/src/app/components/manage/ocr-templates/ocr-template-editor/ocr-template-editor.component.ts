@@ -22,6 +22,7 @@ import { CustomField } from 'src/app/data/custom-field'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { PageHeaderComponent } from '../../../common/page-header/page-header.component'
 
 interface DrawingRect {
@@ -53,6 +54,7 @@ export class OcrTemplateEditorComponent
   private readonly templateService = inject(OcrTemplateService)
   private readonly customFieldsService = inject(CustomFieldsService)
   private readonly documentTypeService = inject(DocumentTypeService)
+  private readonly toastService = inject(ToastService)
   private readonly destroy$ = new Subject<void>()
 
   @ViewChild('zoneCanvas') canvasRef: ElementRef<HTMLCanvasElement>
@@ -111,6 +113,10 @@ export class OcrTemplateEditorComponent
   // Test results
   testResults: any[] | null = null
   testing = false
+
+  // Per-zone test (in the Zone tab)
+  zoneTestResult: any | null = null
+  zoneTesting = false
 
   // Quick create field
   showQuickCreate = false
@@ -185,7 +191,10 @@ export class OcrTemplateEditorComponent
     const img = this.imageRef.nativeElement
     this.template.source_width = img.naturalWidth
     this.template.source_height = img.naturalHeight
-    this.redrawCanvas()
+    // The canvas is rendered by @if(imageLoaded) — which only exists after the
+    // next change-detection pass — so defer the draw, otherwise the zones don't
+    // appear until the user interacts with the preview.
+    setTimeout(() => this.redrawCanvas())
   }
 
   // --- Canvas drawing ---
@@ -495,7 +504,40 @@ export class OcrTemplateEditorComponent
   selectZone(index: number) {
     this.selectedZoneIndex = index
     this.activeTab = 'zone'
+    this.zoneTestResult = null
     this.redrawCanvas()
+  }
+
+  testZone() {
+    const zone = this.selectedZone
+    if (!zone || !this.previewDocId) return
+    this.zoneTesting = true
+    this.zoneTestResult = null
+    this.templateService
+      .testZone(this.previewDocId, {
+        name: zone.name,
+        x: zone.x,
+        y: zone.y,
+        width: zone.width,
+        height: zone.height,
+        page: zone.page ?? this.template.default_page,
+        ocr_language: zone.ocr_language,
+        transform: zone.transform,
+        validation_regex: zone.validation_regex,
+        zone_source_width: zone.zone_source_width,
+        zone_source_height: zone.zone_source_height,
+      })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          this.zoneTestResult = res
+          this.zoneTesting = false
+        },
+        error: (err) => {
+          this.zoneTestResult = { error: err.error?.error || $localize`Test failed` }
+          this.zoneTesting = false
+        },
+      })
   }
 
   deleteSelectedZone() {
@@ -514,12 +556,20 @@ export class OcrTemplateEditorComponent
       : this.templateService.update(this.template)
 
     obs.pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => {
+      next: (saved) => {
+        // Keep the editor open so the user can keep tuning zones without having
+        // to reopen the template after every save.
+        const idx = this.selectedZoneIndex
+        this.template = saved
+        this.isNew = false
+        this.selectedZoneIndex = idx
         this.saving = false
-        this.router.navigate(['/ocr-templates'])
+        this.toastService.showInfo($localize`OCR template saved.`)
+        this.redrawCanvas()
       },
-      error: () => {
+      error: (e) => {
         this.saving = false
+        this.toastService.showError($localize`Error saving OCR template.`, e)
       },
     })
   }

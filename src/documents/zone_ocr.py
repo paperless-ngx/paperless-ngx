@@ -350,6 +350,52 @@ def _extract_zone(
     return _apply_transform(text, zone.transform)
 
 
+def extract_zone_preview(
+    doc_path: Path,
+    zone: OcrTemplateZone,
+    source_width: int,
+    source_height: int,
+    page_count: int | None,
+) -> dict:
+    """Non-destructive single-zone extraction for the editor's per-zone test.
+
+    Renders the zone's page, crops it, runs OCR (or the barcode reader) and
+    applies the transform — WITHOUT writing any custom field. Returns the raw
+    OCR text and the transformed value so the user can see what the zone yields
+    (and tune the validation regex) before saving.
+    """
+    page_idx = zone.page if zone.page is not None else 0
+    with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
+        tmp_path = Path(tmp_dir)
+        page_images = _render_pages(doc_path, {page_idx}, tmp_path, page_count)
+        if page_idx not in page_images:
+            return {"raw_text": None, "value": None}
+
+        if not source_width or not source_height:
+            from PIL import Image
+
+            with Image.open(page_images[page_idx]) as im:
+                source_width, source_height = im.size
+
+        cropped = _crop_zone(
+            page_images[page_idx],
+            zone,
+            source_width,
+            source_height,
+            tmp_path,
+        )
+        if cropped is None:
+            return {"raw_text": None, "value": None}
+
+        if zone.transform in ("qr_code", "qr_code_raw"):
+            raw_text = _read_barcode(cropped, zone.name)
+        else:
+            raw_text = _ocr_text(cropped, zone, tmp_path)
+
+        value = _apply_transform(raw_text, zone.transform) if raw_text else None
+        return {"raw_text": raw_text, "value": value}
+
+
 def _apply_transform(text: str, transform: str) -> str:
     """Apply post-processing transform to extracted text."""
     text = text.strip()

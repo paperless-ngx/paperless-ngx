@@ -5,19 +5,7 @@
     }
     <span i18n>Save</span>
   </button>
-  @if (!isNew && previewDocId) {
-    <button
-      class="btn btn-sm btn-outline-secondary"
-      (click)="testOnDocument()"
-      [disabled]="testing"
-    >
-      @if (testing) {
-        <span class="spinner-border spinner-border-sm me-1"></span>
-      }
-      <span i18n>Test Extraction</span>
-    </button>
-  }
-  <a routerLink="/ocr-templates" class="btn btn-sm btn-outline-secondary" i18n>Cancel</a>
+  <a routerLink="/ocr-templates" class="btn btn-sm btn-outline-secondary" i18n>Close</a>
 </pngx-page-header>
 
 <div class="row">
@@ -142,9 +130,17 @@
             @if (selectedZone; as zone) {
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <strong>{{ zone.name }}</strong>
-                <button class="btn btn-sm btn-outline-danger" (click)="deleteSelectedZone()">
-                  <i-bs name="trash" class="me-1"></i-bs><ng-container i18n>Delete zone</ng-container>
-                </button>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-sm btn-primary" (click)="save()" [disabled]="saving">
+                    @if (saving) {
+                      <span class="spinner-border spinner-border-sm me-1"></span>
+                    }
+                    <span i18n>Save</span>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="deleteSelectedZone()">
+                    <i-bs name="trash" class="me-1"></i-bs><ng-container i18n>Delete zone</ng-container>
+                  </button>
+                </div>
               </div>
 
               <div class="mb-3">
@@ -239,6 +235,43 @@
               <div class="text-muted small">
                 {{ zone.x }}, {{ zone.y }} — {{ zone.width }}×{{ zone.height }}px
               </div>
+
+              <hr class="my-3" />
+              <h6 i18n>Test</h6>
+              @if (!previewDocId) {
+                <p class="text-muted small mb-0" i18n>
+                  Load a document in the Settings tab to test this zone.
+                </p>
+              } @else {
+                <button class="btn btn-sm btn-outline-secondary" (click)="testZone()" [disabled]="zoneTesting">
+                  @if (zoneTesting) {
+                    <span class="spinner-border spinner-border-sm me-1"></span>
+                  }
+                  <span i18n>Test this zone</span>
+                </button>
+                @if (zoneTestResult) {
+                  @if (zoneTestResult.error) {
+                    <div class="alert alert-warning py-2 mt-2 mb-0 small">{{ zoneTestResult.error }}</div>
+                  } @else {
+                    <dl class="row small mt-2 mb-0">
+                      <dt class="col-sm-4" i18n>OCR text</dt>
+                      <dd class="col-sm-8"><code>{{ zoneTestResult.raw_text || '(nothing detected)' }}</code></dd>
+                      <dt class="col-sm-4" i18n>Value</dt>
+                      <dd class="col-sm-8"><code>{{ zoneTestResult.value || '(empty)' }}</code></dd>
+                      @if (zoneTestResult.regex) {
+                        <dt class="col-sm-4" i18n>Validation</dt>
+                        <dd class="col-sm-8">
+                          @if (zoneTestResult.regex_match) {
+                            <span class="badge bg-success" i18n>Regex matches</span>
+                          } @else {
+                            <span class="badge bg-danger" i18n>Regex does not match</span>
+                          }
+                        </dd>
+                      }
+                    </dl>
+                  }
+                }
+              }
             } @else {
               <p class="text-muted" i18n>
                 Select a zone from the Zones tab, or draw a rectangle on the document to create one.
@@ -249,21 +282,6 @@
       </ul>
 
       <div [ngbNavOutlet]="nav" class="mt-3"></div>
-
-      <!-- Test results -->
-      @if (testResults) {
-        <div class="card mt-3">
-          <div class="card-body">
-            <h5 class="card-title" i18n>Test Results</h5>
-            @for (r of testResults; track $index) {
-              <div class="mb-2">
-                <strong>{{ r.zone }}</strong> → {{ r.custom_field }}:
-                <code>{{ r.value ?? '(empty)' }}</code>
-              </div>
-            }
-          </div>
-        </div>
-      }
     </div>
 
     <!-- Right column: Document preview with zone overlay -->
