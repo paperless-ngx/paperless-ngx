@@ -127,6 +127,16 @@ able to run paperless, you're a bit on your own. If you can't run the
 docker image, the documentation has instructions for bare metal
 installs.
 
+## _Does Paperless-ngx use AI, and is my data private?_
+
+**A:** Paperless-ngx includes optional AI features — LLM-based suggestions, document chat,
+and similar-document retrieval — that are **disabled by default**. They only run when you
+enable them and configure an LLM backend. The built-in tag/correspondent suggestions use a
+local, non-LLM machine-learning model and do not send your data anywhere. If you enable the
+LLM features, document content is sent to whichever backend you configure — this can be a
+fully local backend (e.g. Ollama) or a remote provider. See
+[AI features](advanced_usage.md#ai-features) for details.
+
 ## _Which message broker should I use_?
 
 Paperless-ngx talks to a Redis-compatible message broker, so any broker that

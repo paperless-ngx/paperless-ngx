@@ -65,6 +65,11 @@ copies you created in the steps above.
 
     Please review the [migration instructions](migration-v3.md) before upgrading Paperless-ngx to v3.0, it includes some breaking changes that require manual intervention before upgrading.
 
+!!! note
+
+    Upgrading to v3 clears the existing task history; previously completed, failed, or
+    acknowledged tasks will no longer appear in the task list afterward. No action is required.
+
 ### Docker Route {#docker-updating}
 
 If a new release of paperless-ngx is available, upgrading depends on how
@@ -689,4 +694,14 @@ If you need to create a superuser, use the following command:
 
 ```shell
 createsuperuser
+```
+
+Alternatively, the `manage_superuser` command creates an `admin` superuser from
+environment variables — `PAPERLESS_ADMIN_USER` (default `admin`), `PAPERLESS_ADMIN_MAIL`
+(default `root@localhost`) and `PAPERLESS_ADMIN_PASSWORD`. This is what the Docker image
+uses to auto-provision an admin on first start. It does nothing if the user already exists,
+if any superuser already exists, or if `PAPERLESS_ADMIN_PASSWORD` is unset.
+
+```shell
+manage_superuser
 ```
