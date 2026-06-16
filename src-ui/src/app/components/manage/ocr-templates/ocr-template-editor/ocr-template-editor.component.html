@@ -1,43 +1,29 @@
-<div class="container-fluid">
-  <div class="row mb-3">
-    <div class="col">
-      <h3>
-        @if (isNew) {
-          <span i18n>New OCR Template</span>
-        } @else {
-          <span i18n>Edit OCR Template</span>: {{ template.name }}
-        }
-      </h3>
-    </div>
-  </div>
+<pngx-page-header [title]="pageTitle">
+  <button class="btn btn-sm btn-primary" (click)="save()" [disabled]="saving">
+    @if (saving) {
+      <span class="spinner-border spinner-border-sm me-1"></span>
+    }
+    <span i18n>Save</span>
+  </button>
+  @if (!isNew && previewDocId) {
+    <button
+      class="btn btn-sm btn-outline-secondary"
+      (click)="testOnDocument()"
+      [disabled]="testing"
+    >
+      @if (testing) {
+        <span class="spinner-border spinner-border-sm me-1"></span>
+      }
+      <span i18n>Test Extraction</span>
+    </button>
+  }
+  <a routerLink="/ocr-templates" class="btn btn-sm btn-outline-secondary" i18n>Cancel</a>
+</pngx-page-header>
 
-  <div class="row">
-    <!-- Left column: tabbed settings / zones / zone detail -->
-    <div class="col-md-4">
-      <!-- Actions (always visible, like the document view) -->
-      <div class="d-flex gap-2 mb-3">
-        <button class="btn btn-sm btn-primary" (click)="save()" [disabled]="saving">
-          @if (saving) {
-            <span class="spinner-border spinner-border-sm me-1"></span>
-          }
-          <span i18n>Save</span>
-        </button>
-        @if (!isNew && previewDocId) {
-          <button
-            class="btn btn-sm btn-outline-secondary"
-            (click)="testOnDocument()"
-            [disabled]="testing"
-          >
-            @if (testing) {
-              <span class="spinner-border spinner-border-sm me-1"></span>
-            }
-            <span i18n>Test Extraction</span>
-          </button>
-        }
-        <a routerLink="/ocr-templates" class="btn btn-sm btn-outline-secondary" i18n>Cancel</a>
-      </div>
-
-      <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs">
+<div class="row">
+  <!-- Left column: tabbed settings / zones / zone detail -->
+  <div class="col-md-4">
+    <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs">
 
         <!-- Tab 1: Template settings + preview controls -->
         <li ngbNavItem="settings">
@@ -320,4 +306,5 @@
       }
     </div>
   </div>
-</div>
+
+

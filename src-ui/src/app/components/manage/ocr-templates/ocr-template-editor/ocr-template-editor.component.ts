@@ -22,6 +22,7 @@ import { CustomField } from 'src/app/data/custom-field'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { PageHeaderComponent } from '../../../common/page-header/page-header.component'
 
 interface DrawingRect {
   startX: number
@@ -39,6 +40,7 @@ interface DrawingRect {
     RouterModule,
     NgbNavModule,
     NgxBootstrapIconsModule,
+    PageHeaderComponent,
   ],
   templateUrl: './ocr-template-editor.component.html',
   styleUrls: ['./ocr-template-editor.component.scss'],
@@ -92,6 +94,12 @@ export class OcrTemplateEditorComponent
     return this.selectedZoneIndex !== null
       ? (this.template.zones[this.selectedZoneIndex] ?? null)
       : null
+  }
+
+  get pageTitle(): string {
+    return this.isNew
+      ? $localize`New OCR Template`
+      : $localize`Edit OCR Template: ${this.template.name}`
   }
 
   // Resize state
