@@ -71,6 +71,9 @@ importers:
       ngx-ui-tour-ng-bootstrap:
         specifier: ^18.0.0
         version: 18.0.0(f910a33494d223bd6dd07ce1bf22a35e)
+      normalize-diacritics:
+        specifier: ^5.0.0
+        version: 5.0.0
       pdfjs-dist:
         specifier: ^5.7.284
         version: 5.7.284
@@ -5515,6 +5518,10 @@ packages:
     resolution: {integrity: sha512-Zhq3a+yFKrYwSBluL4H9XP3m3y5uvQkB/09CwDruCiRmR/UJYnn9W4R48ry0uGC70aeTPKLynBtscP9efFFcPw==}
     engines: {node: ^20.17.0 || >=22.9.0}
     hasBin: true
+
+  normalize-diacritics@5.0.0:
+    resolution: {integrity: sha512-t6czCJOpbAtckN1wCC2qPWnO3GQvNANb9bcUNbiOLEqojVuP31+ELIs5KhEG8jyz0TH7iD9BWxWz8O3ic2/rMQ==}
+    engines: {node: '>= 14.x', npm: '>= 6.x'}
 
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
@@ -12930,6 +12937,10 @@ snapshots:
   nopt@9.0.0:
     dependencies:
       abbrev: 4.0.0
+
+  normalize-diacritics@5.0.0:
+    dependencies:
+      tslib: 2.8.1
 
   normalize-path@3.0.0: {}
 
