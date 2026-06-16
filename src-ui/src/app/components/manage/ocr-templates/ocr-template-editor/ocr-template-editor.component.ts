@@ -267,8 +267,8 @@ export class OcrTemplateEditorComponent
     const img = this.imageRef.nativeElement
     this.template.source_width = img.naturalWidth
     this.template.source_height = img.naturalHeight
-    // The canvas is rendered by @if(imageLoaded) — which only exists after the
-    // next change-detection pass — so defer the draw, otherwise the zones don't
+    // The canvas is rendered by @if(imageLoaded) - which only exists after the
+    // next change-detection pass - so defer the draw, otherwise the zones don't
     // appear until the user interacts with the preview.
     setTimeout(() => this.redrawCanvas())
   }
@@ -291,7 +291,7 @@ export class OcrTemplateEditorComponent
       }
     }
 
-    // Click on an existing zone — select it and start dragging it (move).
+    // Click on an existing zone - select it and start dragging it (move).
     const clickedIdx = this.findZoneAt(x, y)
     if (clickedIdx !== null && !event.shiftKey) {
       this.selectZone(clickedIdx)
@@ -422,7 +422,7 @@ export class OcrTemplateEditorComponent
 
     this.template.zones.push(zone)
     this.currentRect = null
-    // Newly drawn zone → select it and open its detail tab.
+    // Newly drawn zone -> select it and open its detail tab.
     this.selectZone(this.template.zones.length - 1)
   }
 
@@ -565,7 +565,7 @@ export class OcrTemplateEditorComponent
       ctx.fillStyle = color + '20'
       ctx.fillRect(x, y, w, h)
 
-      // Name pill ABOVE the zone — an opaque rounded label so the zone's
+      // Name pill ABOVE the zone - an opaque rounded label so the zone's
       // content stays fully visible (drawing it inside washed out over the text).
       const label = zone.name || `Zone ${idx + 1}`
       ctx.font = '12px sans-serif'
