@@ -328,7 +328,6 @@ export class OcrTemplateEditorComponent
     setTimeout(() => this.redrawCanvas())
   }
 
-  /** The 1-indexed page a zone is on (1 = first, -1 = last). */
   zonePage(zone: OcrTemplateZone): number {
     const v = zone.page ?? 1
     if (v === -1) return this.previewPageCount ?? this.previewPage + 1
@@ -336,7 +335,6 @@ export class OcrTemplateEditorComponent
   }
 
   private isOnCurrentPage(zone: OcrTemplateZone): boolean {
-    // previewPage is the 0-indexed cursor; zonePage() is 1-indexed.
     return this.zonePage(zone) === this.previewPage + 1
   }
 
