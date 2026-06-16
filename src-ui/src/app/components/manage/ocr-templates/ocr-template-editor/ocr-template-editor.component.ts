@@ -816,7 +816,7 @@ export class OcrTemplateEditorComponent
       zone.custom_field = null
     } else {
       zone.target = 'custom_field'
-      zone.custom_field = value
+      zone.custom_field = typeof value === 'number' ? value : null
     }
     this.seedCombineDefault(zone)
   }
