@@ -1,4 +1,4 @@
-<pngx-page-header [title]="pageTitle">
+<pngx-page-header [title]="pageTitle" [id]="template.id">
   <button class="btn btn-sm btn-primary" (click)="save()" [disabled]="saving">
     @if (saving) {
       <span class="spinner-border spinner-border-sm me-1"></span>

@@ -99,7 +99,7 @@ export class OcrTemplateEditorComponent
   get pageTitle(): string {
     return this.isNew
       ? $localize`New OCR Template`
-      : $localize`Edit OCR Template: ${this.template.name}`
+      : $localize`Edit OCR Template`
   }
 
   // Resize state
