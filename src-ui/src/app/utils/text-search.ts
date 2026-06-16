@@ -1,10 +1,12 @@
 import { normalizeSync } from 'normalize-diacritics'
 
+export function normalizeSearchText(value: unknown): string {
+  return normalizeSync(String(value ?? '')).toLocaleLowerCase()
+}
+
 export function matchesSearchText(
   value: unknown,
   searchText: unknown
 ): boolean {
-  return normalizeSync(String(value))
-    .toLocaleLowerCase()
-    .includes(normalizeSync(String(searchText)).toLocaleLowerCase())
+  return normalizeSearchText(value).includes(normalizeSearchText(searchText))
 }
