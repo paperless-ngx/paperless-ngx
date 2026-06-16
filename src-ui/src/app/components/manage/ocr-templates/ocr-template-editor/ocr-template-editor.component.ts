@@ -597,17 +597,16 @@ export class OcrTemplateEditorComponent
       }
     })
 
-    // Draw current selection rect
+    // Draw the in-progress new zone in a light green reserved for new zones.
     if (this.currentRect) {
-      ctx.strokeStyle = '#ffffff'
+      const cw = this.currentRect.endX - this.currentRect.startX
+      const ch = this.currentRect.endY - this.currentRect.startY
+      ctx.fillStyle = 'rgba(105, 219, 124, 0.25)'
+      ctx.fillRect(this.currentRect.startX, this.currentRect.startY, cw, ch)
+      ctx.strokeStyle = '#69db7c'
       ctx.lineWidth = 2
       ctx.setLineDash([5, 5])
-      ctx.strokeRect(
-        this.currentRect.startX,
-        this.currentRect.startY,
-        this.currentRect.endX - this.currentRect.startX,
-        this.currentRect.endY - this.currentRect.startY
-      )
+      ctx.strokeRect(this.currentRect.startX, this.currentRect.startY, cw, ch)
       ctx.setLineDash([])
     }
   }
