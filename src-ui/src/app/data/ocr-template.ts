@@ -34,7 +34,6 @@ export const TRANSFORM_OPTIONS = [
   { id: 'strip_punctuation', name: $localize`Remove leading/trailing punctuation` },
   { id: 'date', name: $localize`Parse date` },
   { id: 'qr_code', name: $localize`Read QR/barcode` },
-  { id: 'qr_code_raw', name: $localize`Read QR/barcode (raw)` },
 ]
 
 // Common Tesseract OCR languages for the zone language picker.

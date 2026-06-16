@@ -180,7 +180,6 @@ class OcrTemplateZone(models.Model):
         )
         DATE = ("date", _("Parse date"))
         QR_CODE = ("qr_code", _("Read QR/barcode"))
-        QR_CODE_RAW = ("qr_code_raw", _("Read QR/barcode (raw)"))
 
     transform = models.CharField(
         _("transform"),

@@ -344,7 +344,7 @@ def _extract_zone(
         return None
 
     # QR/barcode zones skip Tesseract entirely
-    if zone.transform in ("qr_code", "qr_code_raw"):
+    if zone.transform == "qr_code":
         text = _read_barcode(cropped, zone.name)
         if not text:
             return None
@@ -395,7 +395,7 @@ def extract_zone_preview(
         if cropped is None:
             return {"raw_text": None, "value": None}
 
-        if zone.transform in ("qr_code", "qr_code_raw"):
+        if zone.transform == "qr_code":
             raw_text = _read_barcode(cropped, zone.name)
         else:
             raw_text = _ocr_text(cropped, zone, tmp_path)
@@ -461,10 +461,7 @@ def _apply_transform(text: str, transform: str, date_format: str = "") -> str:
     elif transform == "strip_punctuation":
         return text.strip(string.punctuation + " \t\r\n")
     elif transform == "qr_code":
-        # Return the full barcode/QR content as-is (already read by _read_barcode)
-        return text
-    elif transform == "qr_code_raw":
-        # Return raw barcode content unmodified
+        # Barcode/QR content as read by _read_barcode.
         return text
     return text
 
