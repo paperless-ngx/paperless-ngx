@@ -26,6 +26,11 @@ from django.db.models.functions import Substr
 from django_softdelete.models import SoftDeleteModel
 
 from documents.data_models import DocumentSource
+
+# Re-exported so Django discovers the OCR template models defined in a separate
+# module. The redundant `as` alias marks these as intentional re-exports.
+from documents.models_ocr_templates import OcrTemplate as OcrTemplate
+from documents.models_ocr_templates import OcrTemplateZone as OcrTemplateZone
 from documents.parsers import get_default_file_extension
 
 
@@ -1234,11 +1239,6 @@ class CustomFieldInstance(SoftDeleteModel):
                 None,
             )
         return str(self.value)
-
-
-# Import OCR template models so Django discovers them
-from documents.models_ocr_templates import OcrTemplate  # noqa: E402, F401
-from documents.models_ocr_templates import OcrTemplateZone  # noqa: E402, F401
 
 
 if settings.AUDIT_LOG_ENABLED:
