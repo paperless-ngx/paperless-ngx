@@ -3,12 +3,15 @@ from unittest.mock import ANY
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
+import httpx
+import openai
 import pytest
 from llama_index.core.llms import ChatMessage
 from llama_index.core.llms.llm import ToolSelection
 
 from paperless_ai.client import LLM_SYSTEM_PROMPT
 from paperless_ai.client import AIClient
+from paperless_ai.client import LLMTimeoutError
 
 
 @pytest.fixture
@@ -151,6 +154,26 @@ def test_run_llm_query_openai_uses_tools(mock_ai_config, mock_openai_llm):
 
     assert result["title"] == "Test Title"
     mock_llm_instance.chat_with_tools.assert_called_once()
+
+
+def test_run_llm_query_openai_timeout_raises_local_error(
+    mock_ai_config,
+    mock_openai_llm,
+):
+    mock_ai_config.llm_backend = "openai-like"
+    mock_ai_config.llm_model = "test_model"
+    mock_ai_config.llm_api_key = "test_api_key"
+    mock_ai_config.llm_endpoint = "http://test-url"
+
+    request = httpx.Request("POST", "http://test-url/v1/chat/completions")
+    mock_openai_llm.return_value.chat_with_tools.side_effect = openai.APITimeoutError(
+        request,
+    )
+
+    client = AIClient()
+
+    with pytest.raises(LLMTimeoutError):
+        client.run_llm_query("test_prompt")
 
 
 def test_run_chat(mock_ai_config, mock_ollama_llm):
