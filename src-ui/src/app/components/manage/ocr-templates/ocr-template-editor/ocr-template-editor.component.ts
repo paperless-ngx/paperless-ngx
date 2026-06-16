@@ -50,6 +50,10 @@ interface DrawingRect {
   endY: number
 }
 
+type ResizeHandle = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw'
+
+type ActiveTab = 'settings' | 'zones' | 'zone'
+
 @Component({
   selector: 'pngx-ocr-template-editor',
   standalone: true,
@@ -98,13 +102,10 @@ export class OcrTemplateEditorComponent
   transformOptions = TRANSFORM_OPTIONS
   builtinTargets = OCR_BUILTIN_TARGETS
   dateFormatOptions = DATE_FORMAT_OPTIONS
-  // UI-only: whether the selected zone's date format is "Custom" (a format not
-  // in the preset list). Recomputed when a zone is selected.
   dateFormatCustom = false
   isNew = true
   saving = false
 
-  // Preview state
   previewDocId: number | null = null
   previewPage = 0
   previewPageCount: number | null = null
@@ -112,49 +113,29 @@ export class OcrTemplateEditorComponent
   pageImageUrl: string | null = null
   imageLoaded = false
   zoom = 1
-  // Model bound to the document search typeahead (a Document once selected).
   previewDocModel: any = ''
 
-  // Tabs: 'settings' | 'zones' | 'zone'
-  activeTab: string = 'settings'
+  activeTab: ActiveTab = 'settings'
 
-  // Drawing state
   isDrawing = false
   currentRect: DrawingRect | null = null
   selectedZoneIndex: number | null = null
 
-  get selectedZone(): OcrTemplateZone | null {
-    return this.selectedZoneIndex !== null
-      ? (this.template.zones[this.selectedZoneIndex] ?? null)
-      : null
-  }
-
-  get pageTitle(): string {
-    return this.isNew
-      ? $localize`New OCR Template`
-      : $localize`Edit OCR Template`
-  }
-
-  // Resize state
   isResizing = false
-  resizeHandle: string | null = null // 'n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'
+  resizeHandle: ResizeHandle | null = null
   resizeZoneIndex: number | null = null
   private readonly HANDLE_SIZE = 8
 
-  // Move state (drag a whole zone)
   isMoving = false
   moveZoneIndex: number | null = null
   private moveStart = { mouseX: 0, mouseY: 0, zoneX: 0, zoneY: 0 }
 
-  // Test results
   testResults: any[] | null = null
   testing = false
 
-  // Per-zone test (in the Zone tab)
   zoneTestResult: any | null = null
   zoneTesting = false
 
-  // Quick create field
   showQuickCreate = false
   quickCreateName = ''
   quickCreateType = 'string'
@@ -170,8 +151,19 @@ export class OcrTemplateEditorComponent
     { id: 'longtext', name: $localize`Long Text` },
   ]
 
+  get selectedZone(): OcrTemplateZone | null {
+    return this.selectedZoneIndex !== null
+      ? (this.template.zones[this.selectedZoneIndex] ?? null)
+      : null
+  }
+
+  get pageTitle(): string {
+    return this.isNew
+      ? $localize`New OCR Template`
+      : $localize`Edit OCR Template`
+  }
+
   ngOnInit() {
-    // Load custom fields and document types
     this.customFieldsService
       .listAll()
       .pipe(takeUntil(this.destroy$))
@@ -182,7 +174,6 @@ export class OcrTemplateEditorComponent
       .pipe(takeUntil(this.destroy$))
       .subscribe((r) => (this.documentTypes = r.results))
 
-    // Load existing template or set up new
     const id = this.route.snapshot.paramMap.get('id')
     if (id && id !== 'new') {
       this.isNew = false
@@ -197,7 +188,6 @@ export class OcrTemplateEditorComponent
           }
         })
     } else {
-      // Pre-fill from query params (e.g. "Create OCR Template" from document detail)
       const qp = this.route.snapshot.queryParams
       if (qp['document_type']) {
         this.template.document_type = parseInt(qp['document_type'])
@@ -213,7 +203,6 @@ export class OcrTemplateEditorComponent
 
   ngAfterViewInit() {}
 
-  // Document search typeahead: filter by the template's document type if set.
   searchDocuments = (text$: Observable<string>): Observable<Document[]> =>
     text$.pipe(
       debounceTime(250),
@@ -241,7 +230,6 @@ export class OcrTemplateEditorComponent
     const doc: Document = event.item
     this.previewDocModel = doc
     this.previewDocId = doc.id
-    // If no document type is set on the template, adopt the selected doc's type.
     if (!this.template.document_type && doc.document_type) {
       this.template.document_type = doc.document_type
     }
@@ -251,7 +239,6 @@ export class OcrTemplateEditorComponent
 
   loadPreview() {
     if (!this.previewDocId) return
-    // Fetch the page count once per document, for the page navigation.
     if (this.pageCountForDoc !== this.previewDocId) {
       this.pageCountForDoc = this.previewDocId
       this.previewPageCount = null
@@ -261,7 +248,6 @@ export class OcrTemplateEditorComponent
         .subscribe({
           next: (doc) => {
             this.previewPageCount = doc?.page_count ?? null
-            // Show the document's title in the search box (e.g. on template load).
             if (doc && !this.previewDocModel) this.previewDocModel = doc
           },
           error: () => (this.previewPageCount = null),
@@ -306,13 +292,11 @@ export class OcrTemplateEditorComponent
   }
 
   private afterZoom() {
-    // Let the image/wrapper reflow to the new width, then resize+redraw the
-    // overlay canvas to match.
+    // Defer so the wrapper reflows to the new width before the canvas resizes.
     setTimeout(() => this.redrawCanvas())
   }
 
-  /** The 1-indexed page a zone is on (1 = first, -1 = last). Resolves the
-   *  template default and the last-page sentinel to an actual page number. */
+  /** The 1-indexed page a zone is on (1 = first, -1 = last). */
   zonePage(zone: OcrTemplateZone): number {
     const v = zone.page ?? this.template.default_page ?? 1
     if (v === -1) return this.previewPageCount ?? this.previewPage + 1
@@ -329,20 +313,15 @@ export class OcrTemplateEditorComponent
     const img = this.imageRef.nativeElement
     this.template.source_width = img.naturalWidth
     this.template.source_height = img.naturalHeight
-    // The canvas is rendered by @if(imageLoaded) - which only exists after the
-    // next change-detection pass - so defer the draw, otherwise the zones don't
-    // appear until the user interacts with the preview.
+    // The canvas only exists after @if(imageLoaded) renders, so defer the draw.
     setTimeout(() => this.redrawCanvas())
   }
-
-  // --- Canvas drawing ---
 
   onCanvasMouseDown(event: MouseEvent) {
     const rect = this.canvasRef.nativeElement.getBoundingClientRect()
     const x = event.clientX - rect.left
     const y = event.clientY - rect.top
 
-    // Check if clicking on a resize handle of the selected zone
     if (this.selectedZoneIndex !== null) {
       const handle = this.findHandleAt(x, y, this.selectedZoneIndex)
       if (handle) {
@@ -353,7 +332,6 @@ export class OcrTemplateEditorComponent
       }
     }
 
-    // Click on an existing zone - select it and start dragging it (move).
     const clickedIdx = this.findZoneAt(x, y)
     if (clickedIdx !== null && !event.shiftKey) {
       this.selectZone(clickedIdx)
@@ -364,7 +342,7 @@ export class OcrTemplateEditorComponent
       return
     }
 
-    // Start drawing new zone (shift+click or click on empty area)
+    // Shift+click or click on empty area starts a new zone.
     this.isDrawing = true
     this.currentRect = { startX: x, startY: y, endX: x, endY: y }
     this.selectedZoneIndex = null
@@ -409,7 +387,7 @@ export class OcrTemplateEditorComponent
     if (this.selectedZoneIndex !== null) {
       const handle = this.findHandleAt(mx, my, this.selectedZoneIndex)
       if (handle) {
-        const cursorMap: Record<string, string> = {
+        const cursorMap: Record<ResizeHandle, string> = {
           nw: 'nw-resize', ne: 'ne-resize', sw: 'sw-resize', se: 'se-resize',
           n: 'n-resize', s: 's-resize', w: 'w-resize', e: 'e-resize',
         }
@@ -440,7 +418,6 @@ export class OcrTemplateEditorComponent
     const canvas = this.canvasRef.nativeElement
     const img = this.imageRef.nativeElement
 
-    // Scale from display coordinates to image coordinates
     const scaleX = img.naturalWidth / canvas.width
     const scaleY = img.naturalHeight / canvas.height
 
@@ -457,7 +434,7 @@ export class OcrTemplateEditorComponent
       Math.abs(this.currentRect.endY - this.currentRect.startY) * scaleY
     )
 
-    // Ignore tiny accidental clicks
+    // Ignore tiny accidental clicks.
     if (w < 10 || h < 10) {
       this.currentRect = null
       this.redrawCanvas()
@@ -484,7 +461,6 @@ export class OcrTemplateEditorComponent
 
     this.template.zones.push(zone)
     this.currentRect = null
-    // Newly drawn zone -> select it and open its detail tab.
     this.selectZone(this.template.zones.length - 1)
   }
 
@@ -507,11 +483,11 @@ export class OcrTemplateEditorComponent
     }
   }
 
-  private findHandleAt(mx: number, my: number, zoneIdx: number): string | null {
+  private findHandleAt(mx: number, my: number, zoneIdx: number): ResizeHandle | null {
     const r = this.getZoneDisplayRect(zoneIdx)
     if (!r) return null
     const hs = this.HANDLE_SIZE
-    const handles: [string, number, number][] = [
+    const handles: [ResizeHandle, number, number][] = [
       ['nw', r.x, r.y], ['n', r.x + r.w / 2, r.y], ['ne', r.x + r.w, r.y],
       ['w', r.x, r.y + r.h / 2], ['e', r.x + r.w, r.y + r.h / 2],
       ['sw', r.x, r.y + r.h], ['s', r.x + r.w / 2, r.y + r.h], ['se', r.x + r.w, r.y + r.h],
@@ -561,7 +537,6 @@ export class OcrTemplateEditorComponent
     for (let i = this.template.zones.length - 1; i >= 0; i--) {
       const z = this.template.zones[i]
       if (!this.isOnCurrentPage(z)) continue
-      // Use per-zone source dimensions if available, otherwise current image
       const srcW = z.zone_source_width || img.naturalWidth
       const srcH = z.zone_source_height || img.naturalHeight
       const scaleX = canvas.width / srcW
@@ -588,13 +563,11 @@ export class OcrTemplateEditorComponent
     const img = this.imageRef.nativeElement
     const ctx = canvas.getContext('2d')
 
-    // Match canvas to displayed image size
     canvas.width = img.clientWidth
     canvas.height = img.clientHeight
 
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    // Draw existing zones
     const colors = [
       '#4f8ff7',
       '#ff6b6b',
@@ -607,10 +580,8 @@ export class OcrTemplateEditorComponent
     ]
 
     this.template.zones.forEach((zone, idx) => {
-      // Only draw zones that belong to the page currently shown.
       if (!this.isOnCurrentPage(zone)) return
       const color = colors[idx % colors.length]
-      // Use per-zone source dimensions for correct scaling
       const srcW = zone.zone_source_width || img.naturalWidth
       const srcH = zone.zone_source_height || img.naturalHeight
       const scaleX = canvas.width / srcW
@@ -627,8 +598,7 @@ export class OcrTemplateEditorComponent
       ctx.fillStyle = color + '20'
       ctx.fillRect(x, y, w, h)
 
-      // Name pill ABOVE the zone - an opaque rounded label so the zone's
-      // content stays fully visible (drawing it inside washed out over the text).
+      // Name pill above the zone, so it doesn't obscure the zone's content.
       const label = zone.name || `Zone ${idx + 1}`
       ctx.font = '12px sans-serif'
       ctx.textBaseline = 'middle'
@@ -651,7 +621,6 @@ export class OcrTemplateEditorComponent
       ctx.fillText(label, pillX + padX, pillY + pillH / 2 + 0.5)
       ctx.textBaseline = 'alphabetic'
 
-      // Draw resize handles on selected zone
       if (idx === this.selectedZoneIndex) {
         const hs = this.HANDLE_SIZE
         ctx.fillStyle = color
@@ -666,7 +635,7 @@ export class OcrTemplateEditorComponent
       }
     })
 
-    // Draw the in-progress new zone in a light green reserved for new zones.
+    // In-progress new zone, in a light green reserved for new zones.
     if (this.currentRect) {
       const cw = this.currentRect.endX - this.currentRect.startX
       const ch = this.currentRect.endY - this.currentRect.startY
@@ -696,11 +665,9 @@ export class OcrTemplateEditorComponent
     this.zoneTestResult = null
     const zone = this.template.zones[index]
     if (zone) {
-      // Custom date format = a non-empty format not in the preset list.
       this.dateFormatCustom =
         !!zone.date_format &&
         !this.dateFormatOptions.some((o) => o.id === zone.date_format)
-      // Jump the preview to the zone's page (zonePage is 1-indexed).
       this.goToPage(this.zonePage(zone) - 1)
     }
     this.redrawCanvas()
@@ -745,8 +712,6 @@ export class OcrTemplateEditorComponent
     this.activeTab = 'zones'
   }
 
-  // --- Save / Test ---
-
   save() {
     this.saving = true
     this.template.sample_document = this.previewDocId
@@ -756,8 +721,7 @@ export class OcrTemplateEditorComponent
 
     obs.pipe(takeUntil(this.destroy$)).subscribe({
       next: (saved) => {
-        // Keep the editor open so the user can keep tuning zones without having
-        // to reopen the template after every save.
+        // Stay open (keeping the selected zone) so the user can keep tuning.
         const idx = this.selectedZoneIndex
         this.template = saved
         this.isNew = false
@@ -796,13 +760,12 @@ export class OcrTemplateEditorComponent
     return cf ? cf.name : `Field #${id}`
   }
 
-  /** Value bound to the field <select>: a built-in id string or a custom-field id. */
+  /** Value bound to the field select: a built-in id string or a custom-field id. */
   zoneFieldValue(zone: OcrTemplateZone): any {
     const target = zone.target || 'custom_field'
     return target === 'custom_field' ? zone.custom_field : target
   }
 
-  /** Map a field <select> choice back onto the zone's target + custom_field. */
   setZoneField(zone: OcrTemplateZone, value: any) {
     if (value === 'title' || value === 'asn' || value === 'created') {
       zone.target = value
@@ -813,7 +776,7 @@ export class OcrTemplateEditorComponent
     }
   }
 
-  /** Value bound to the date-format <select>: a preset, '' (auto), or 'custom'. */
+  /** Value bound to the date-format select: a preset, '' (auto), or 'custom'. */
   dateFormatChoice(zone: OcrTemplateZone): string {
     if (this.dateFormatCustom) return 'custom'
     return zone.date_format || ''
@@ -821,7 +784,6 @@ export class OcrTemplateEditorComponent
 
   setDateFormatChoice(zone: OcrTemplateZone, value: string) {
     if (value === 'custom') {
-      // Keep whatever's there so the user can tweak a preset into a custom one.
       this.dateFormatCustom = true
     } else {
       this.dateFormatCustom = false
@@ -829,7 +791,6 @@ export class OcrTemplateEditorComponent
     }
   }
 
-  /** Display name of a zone's write target (built-in field or custom field). */
   getZoneTargetName(zone: OcrTemplateZone): string {
     const target = zone.target || 'custom_field'
     if (target === 'custom_field') {
@@ -866,14 +827,12 @@ export class OcrTemplateEditorComponent
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (result) => {
-          // Clear cache and refresh custom fields list
           this.customFieldsService.clearCache()
           this.customFieldsService
             .listAll()
             .pipe(takeUntil(this.destroy$))
             .subscribe((r) => {
               this.customFields = r.results
-              // Assign the new field to the zone
               if (this.quickCreateForZoneIndex !== null) {
                 this.template.zones[this.quickCreateForZoneIndex].custom_field = result.id
                 this.template.zones[this.quickCreateForZoneIndex].target = 'custom_field'
