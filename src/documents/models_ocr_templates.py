@@ -180,6 +180,9 @@ class OcrTemplateZone(models.Model):
         UPPERCASE = ("uppercase", _("Uppercase"))
         LOWERCASE = ("lowercase", _("Lowercase"))
         NUMERIC = ("numeric", _("Numeric only"))
+        DATE = ("date", _("Parse date"))
+        # Legacy date transforms kept for backwards compatibility with existing
+        # zones (the editor now offers "Parse date" + a date_format instead).
         DATE_DMY = ("date_dmy", _("Parse date (DD.MM.YYYY)"))
         DATE_YMD = ("date_ymd", _("Parse date (YYYY-MM-DD)"))
         DATE_AUTO = ("date_auto", _("Parse date (auto-detect)"))
@@ -191,6 +194,17 @@ class OcrTemplateZone(models.Model):
         max_length=20,
         choices=TransformType.choices,
         default=TransformType.STRIP,
+    )
+
+    date_format = models.CharField(
+        _("date format"),
+        max_length=64,
+        blank=True,
+        default="",
+        help_text=_(
+            "Python strptime format for the 'Parse date' transform "
+            "(e.g. %d.%m.%Y). Blank = auto-detect.",
+        ),
     )
 
     validation_regex = models.CharField(

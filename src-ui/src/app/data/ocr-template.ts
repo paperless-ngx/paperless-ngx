@@ -18,6 +18,7 @@ export interface OcrTemplateZone {
   height: number
   ocr_language: string
   transform: string
+  date_format?: string
   validation_regex: string
   order: number
   zone_source_width?: number
@@ -30,11 +31,18 @@ export const TRANSFORM_OPTIONS = [
   { id: 'uppercase', name: $localize`Uppercase` },
   { id: 'lowercase', name: $localize`Lowercase` },
   { id: 'numeric', name: $localize`Numeric only` },
-  { id: 'date_dmy', name: $localize`Parse date (DD.MM.YYYY)` },
-  { id: 'date_ymd', name: $localize`Parse date (YYYY-MM-DD)` },
-  { id: 'date_auto', name: $localize`Parse date (auto-detect)` },
+  { id: 'date', name: $localize`Parse date` },
   { id: 'qr_code', name: $localize`Read QR/barcode` },
   { id: 'qr_code_raw', name: $localize`Read QR/barcode (raw)` },
+]
+
+// Date-format presets for the "Parse date" transform. Values are Python
+// strptime format strings; '' = auto-detect. "Custom" is offered in the UI.
+export const DATE_FORMAT_OPTIONS = [
+  { id: '', name: $localize`Auto-detect` },
+  { id: '%d.%m.%Y', name: 'DD.MM.YYYY' },
+  { id: '%Y/%m/%d', name: 'YYYY/MM/DD' },
+  { id: '%d/%m/%Y', name: 'DD/MM/YYYY' },
 ]
 
 export interface OcrTemplate extends ObjectWithId {

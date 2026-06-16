@@ -340,14 +340,14 @@ def _extract_zone(
         text = _read_barcode(cropped, zone.name)
         if not text:
             return None
-        return _apply_transform(text, zone.transform)
+        return _apply_transform(text, zone.transform, getattr(zone, "date_format", "") or "")
 
     # Standard OCR path
     text = _ocr_text(cropped, zone, tmp_dir)
     if not text:
         return None
 
-    return _apply_transform(text, zone.transform)
+    return _apply_transform(text, zone.transform, getattr(zone, "date_format", "") or "")
 
 
 def extract_zone_preview(
@@ -392,11 +392,48 @@ def extract_zone_preview(
         else:
             raw_text = _ocr_text(cropped, zone, tmp_path)
 
-        value = _apply_transform(raw_text, zone.transform) if raw_text else None
+        value = (
+            _apply_transform(
+                raw_text,
+                zone.transform,
+                getattr(zone, "date_format", "") or "",
+            )
+            if raw_text
+            else None
+        )
         return {"raw_text": raw_text, "value": value}
 
 
-def _apply_transform(text: str, transform: str) -> str:
+def _parse_date(text: str, fmt: str) -> str:
+    """Parse a date from OCR text. With a Python strptime `fmt`, try that first;
+    otherwise (or on failure) fall back to dateparser auto-detection. Returns an
+    ISO date string, or the original text if nothing parses."""
+    text = text.strip()
+    if not text:
+        return text
+    if fmt:
+        try:
+            return datetime.strptime(text, fmt).date().isoformat()
+        except ValueError:
+            pass
+    try:
+        import dateparser
+
+        parsed = dateparser.parse(
+            text,
+            settings={
+                "PREFER_DAY_OF_MONTH": "first",
+                "RETURN_AS_TIMEZONE_AWARE": False,
+            },
+        )
+        if parsed:
+            return parsed.date().isoformat()
+    except Exception:
+        logger.debug("Zone OCR: dateparser failed for %r", text[:50])
+    return text
+
+
+def _apply_transform(text: str, transform: str, date_format: str = "") -> str:
     """Apply post-processing transform to extracted text."""
     text = text.strip()
     if not text:
@@ -404,6 +441,8 @@ def _apply_transform(text: str, transform: str) -> str:
 
     if transform in ("strip", "none"):
         return text
+    elif transform == "date":
+        return _parse_date(text, date_format)
     elif transform == "uppercase":
         return text.upper()
     elif transform == "lowercase":

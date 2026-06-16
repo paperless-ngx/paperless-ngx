@@ -10,10 +10,11 @@ import {
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
-import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgbNavModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, takeUntil } from 'rxjs'
 import {
+  DATE_FORMAT_OPTIONS,
   OCR_BUILTIN_TARGETS,
   OcrTemplate,
   OcrTemplateZone,
@@ -42,6 +43,7 @@ interface DrawingRect {
     FormsModule,
     RouterModule,
     NgbNavModule,
+    NgbPopoverModule,
     NgxBootstrapIconsModule,
     PageHeaderComponent,
   ],
@@ -79,6 +81,10 @@ export class OcrTemplateEditorComponent
   documentTypes: any[] = []
   transformOptions = TRANSFORM_OPTIONS
   builtinTargets = OCR_BUILTIN_TARGETS
+  dateFormatOptions = DATE_FORMAT_OPTIONS
+  // UI-only: whether the selected zone's date format is "Custom" (a format not
+  // in the preset list). Recomputed when a zone is selected.
+  dateFormatCustom = false
   isNew = true
   saving = false
 
@@ -407,6 +413,7 @@ export class OcrTemplateEditorComponent
       page: this.previewPage,
       ocr_language: 'deu+eng',
       transform: 'strip',
+      date_format: '',
       validation_regex: '',
       order: this.template.zones.length,
       zone_source_width: img.naturalWidth,
@@ -625,9 +632,15 @@ export class OcrTemplateEditorComponent
     this.selectedZoneIndex = index
     this.activeTab = 'zone'
     this.zoneTestResult = null
-    // Jump the preview to the zone's page so it's actually visible.
     const zone = this.template.zones[index]
-    if (zone) this.goToPage(this.zonePage(zone))
+    if (zone) {
+      // Custom date format = a non-empty format not in the preset list.
+      this.dateFormatCustom =
+        !!zone.date_format &&
+        !this.dateFormatOptions.some((o) => o.id === zone.date_format)
+      // Jump the preview to the zone's page so it's actually visible.
+      this.goToPage(this.zonePage(zone))
+    }
     this.redrawCanvas()
   }
 
@@ -646,6 +659,7 @@ export class OcrTemplateEditorComponent
         page: zone.page ?? this.template.default_page,
         ocr_language: zone.ocr_language,
         transform: zone.transform,
+        date_format: zone.date_format,
         validation_regex: zone.validation_regex,
         zone_source_width: zone.zone_source_width,
         zone_source_height: zone.zone_source_height,
@@ -734,6 +748,22 @@ export class OcrTemplateEditorComponent
     } else {
       zone.target = 'custom_field'
       zone.custom_field = value
+    }
+  }
+
+  /** Value bound to the date-format <select>: a preset, '' (auto), or 'custom'. */
+  dateFormatChoice(zone: OcrTemplateZone): string {
+    if (this.dateFormatCustom) return 'custom'
+    return zone.date_format || ''
+  }
+
+  setDateFormatChoice(zone: OcrTemplateZone, value: string) {
+    if (value === 'custom') {
+      // Keep whatever's there so the user can tweak a preset into a custom one.
+      this.dateFormatCustom = true
+    } else {
+      this.dateFormatCustom = false
+      zone.date_format = value
     }
   }
 

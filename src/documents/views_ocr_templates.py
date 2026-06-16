@@ -203,6 +203,7 @@ class OcrTemplateViewSet(ModelViewSet):
                 page=zone_data.get("page"),
                 ocr_language=zone_data.get("ocr_language") or "eng",
                 transform=zone_data.get("transform") or "strip",
+                date_format=zone_data.get("date_format") or "",
                 validation_regex=zone_data.get("validation_regex") or "",
             )
         except (ValueError, TypeError):

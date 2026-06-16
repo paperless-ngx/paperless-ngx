@@ -229,6 +229,37 @@
                 </select>
               </div>
 
+              @if (zone.transform === 'date') {
+                <div class="mb-3">
+                  <label class="form-label" i18n>Date format</label>
+                  <select class="form-select" [ngModel]="dateFormatChoice(zone)" (ngModelChange)="setDateFormatChoice(zone, $event)">
+                    @for (opt of dateFormatOptions; track opt.id) {
+                      <option [ngValue]="opt.id">{{ opt.name }}</option>
+                    }
+                    <option [ngValue]="'custom'" i18n>Custom…</option>
+                  </select>
+                  @if (dateFormatCustom) {
+                    <div class="input-group mt-2">
+                      <input type="text" class="form-control font-monospace" [(ngModel)]="zone.date_format" placeholder="%d.%m.%Y" />
+                      <button class="btn btn-outline-secondary" type="button" [ngbPopover]="dateFmtHelp" [autoClose]="true" title="Date format help" i18n-title>
+                        <i-bs name="question-circle"></i-bs>
+                      </button>
+                    </div>
+                    <ng-template #dateFmtHelp>
+                      <p class="mb-1" i18n>Python date codes:</p>
+                      <ul class="mb-1 ps-3">
+                        <li><code>%d</code> <ng-container i18n>day (01–31)</ng-container></li>
+                        <li><code>%m</code> <ng-container i18n>month (01–12)</ng-container></li>
+                        <li><code>%Y</code> <ng-container i18n>year, 4-digit</ng-container></li>
+                        <li><code>%y</code> <ng-container i18n>year, 2-digit</ng-container></li>
+                        <li><code>%b</code> <ng-container i18n>month name (Jan)</ng-container></li>
+                      </ul>
+                      <span i18n>Example:</span> <code>%d.%m.%Y</code> → 03.03.2026
+                    </ng-template>
+                  }
+                </div>
+              }
+
               <div class="mb-3">
                 <label class="form-label" i18n>Validation Regex</label>
                 <input

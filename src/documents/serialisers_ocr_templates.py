@@ -22,6 +22,7 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
             "height",
             "ocr_language",
             "transform",
+            "date_format",
             "order",
             "zone_source_width",
             "zone_source_height",
