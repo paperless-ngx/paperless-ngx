@@ -102,6 +102,7 @@ export class OcrTemplateEditorComponent
     source_width: 0,
     source_height: 0,
     enabled: true,
+    combine_formats: {},
     zones: [],
   }
 
@@ -196,6 +197,7 @@ export class OcrTemplateEditorComponent
         .pipe(takeUntil(this.destroy$))
         .subscribe((t) => {
           this.template = t
+          this.template.combine_formats ??= {}
           if (t.sample_document) {
             this.previewDocId = t.sample_document
             this.loadPreview()
@@ -698,6 +700,7 @@ export class OcrTemplateEditorComponent
       this.dateFormatCustom =
         !!zone.date_format &&
         !this.dateFormatOptions.some((o) => o.id === zone.date_format)
+      this.seedCombineDefault(zone)
       this.goToPage(this.zonePage(zone) - 1)
     }
     this.redrawCanvas()
@@ -745,6 +748,7 @@ export class OcrTemplateEditorComponent
 
   save() {
     this.saving = true
+    this.pruneCombineFormats()
     this.template.sample_document = this.previewDocId
     const obs = this.isNew
       ? this.templateService.create(this.template)
@@ -813,6 +817,75 @@ export class OcrTemplateEditorComponent
     } else {
       zone.target = 'custom_field'
       zone.custom_field = value
+    }
+    this.seedCombineDefault(zone)
+  }
+
+  // --- Multi-zone field combiner -------------------------------------------
+  // Several zones may target the same field; their values are combined into one
+  // via a per-field format string ({Zone Name} tokens + literal text) rather
+  // than overwriting each other. Keyed the same as the backend: custom field id
+  // as a string, or the built-in target name.
+
+  fieldKeyFor(zone: OcrTemplateZone): string | null {
+    const v = this.zoneFieldValue(zone)
+    return v === null || v === undefined || v === '' ? null : String(v)
+  }
+
+  zonesForField(zone: OcrTemplateZone): OcrTemplateZone[] {
+    const key = this.fieldKeyFor(zone)
+    if (!key) return []
+    return this.template.zones.filter((z) => this.fieldKeyFor(z) === key)
+  }
+
+  isFieldShared(zone: OcrTemplateZone): boolean {
+    return this.zonesForField(zone).length > 1
+  }
+
+  getCombineFormat(zone: OcrTemplateZone): string {
+    const key = this.fieldKeyFor(zone)
+    return (key && this.template.combine_formats?.[key]) || ''
+  }
+
+  setCombineFormat(zone: OcrTemplateZone, value: string) {
+    const key = this.fieldKeyFor(zone)
+    if (!key) return
+    this.template.combine_formats ??= {}
+    this.template.combine_formats[key] = value
+  }
+
+  insertCombineToken(zone: OcrTemplateZone, tokenZone: OcrTemplateZone) {
+    const token = `{${tokenZone.name}}`
+    const current = this.getCombineFormat(zone)
+    const sep = current && !current.endsWith(' ') ? ' ' : ''
+    this.setCombineFormat(zone, `${current}${sep}${token}`)
+  }
+
+  // Seed a sensible default ({A} {B}) the first time a field becomes shared.
+  private seedCombineDefault(zone: OcrTemplateZone) {
+    const key = this.fieldKeyFor(zone)
+    if (!key) return
+    const shared = this.zonesForField(zone)
+    if (shared.length <= 1) return
+    this.template.combine_formats ??= {}
+    if (!this.template.combine_formats[key]) {
+      this.template.combine_formats[key] = shared
+        .map((z) => `{${z.name}}`)
+        .join(' ')
+    }
+  }
+
+  // Drop format entries for fields that are no longer shared by >1 zone.
+  private pruneCombineFormats() {
+    const formats = this.template.combine_formats
+    if (!formats) return
+    const counts = new Map<string, number>()
+    for (const z of this.template.zones) {
+      const key = this.fieldKeyFor(z)
+      if (key) counts.set(key, (counts.get(key) ?? 0) + 1)
+    }
+    for (const key of Object.keys(formats)) {
+      if ((counts.get(key) ?? 0) <= 1) delete formats[key]
     }
   }
 

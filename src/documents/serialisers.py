@@ -3500,6 +3500,7 @@ class OcrTemplateSerializer(serializers.ModelSerializer):
             "source_height",
             "sample_document",
             "enabled",
+            "combine_formats",
             "created",
             "updated",
             "zones",

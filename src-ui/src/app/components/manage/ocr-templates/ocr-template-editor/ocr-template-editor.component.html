@@ -183,6 +183,47 @@
                 <small class="text-muted" i18n>Write the extracted value to a custom field, or to a built-in field (Title, ASN, Date created).</small>
               </div>
 
+              @if (isFieldShared(zone)) {
+                <div class="card mb-3 border-info">
+                  <div class="card-body">
+                    <h6 class="card-title d-flex align-items-center gap-2">
+                      <i-bs name="braces"></i-bs>
+                      <span i18n>Combine zones into this field</span>
+                    </h6>
+                    <p class="small text-muted mb-2" i18n>
+                      More than one zone writes to this field. Build the combined
+                      value below: click a zone to insert its token, and type any
+                      separators or literal text between tokens.
+                    </p>
+                    <div class="d-flex flex-wrap gap-1 mb-2">
+                      @for (z of zonesForField(zone); track $index) {
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-info"
+                          (click)="insertCombineToken(zone, z)"
+                          title="Insert token"
+                          i18n-title
+                        >
+                          + {{ z.name || 'Zone' }}
+                        </button>
+                      }
+                    </div>
+                    <input
+                      type="text"
+                      class="form-control font-monospace"
+                      [ngModel]="getCombineFormat(zone)"
+                      (ngModelChange)="setCombineFormat(zone, $event)"
+                      placeholder="{Zone 1} - {Zone 2}"
+                    />
+                    <small class="text-muted" i18n>
+                      Tokens are matched by zone name. An empty zone leaves its
+                      token blank and the stray separator is trimmed. Leave empty
+                      to just join the zones in order with a space.
+                    </small>
+                  </div>
+                </div>
+              }
+
               @if (showQuickCreate) {
                 <div class="card mb-3 border-primary">
                   <div class="card-body">

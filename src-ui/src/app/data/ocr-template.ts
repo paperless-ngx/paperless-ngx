@@ -63,6 +63,9 @@ export interface OcrTemplate extends ObjectWithId {
   source_width: number
   source_height: number
   enabled: boolean
+  // Per-target format strings for combining several zones into one field, keyed
+  // by target (custom field id as string, or 'title'/'asn'/'created').
+  combine_formats?: Record<string, string>
   created?: string
   updated?: string
   zones: OcrTemplateZone[]

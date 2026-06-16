@@ -1942,6 +1942,17 @@ class OcrTemplate(models.Model):
 
     enabled = models.BooleanField(_("enabled"), default=True)
 
+    combine_formats = models.JSONField(
+        _("combine formats"),
+        default=dict,
+        blank=True,
+        help_text=_(
+            "Per-target format strings for combining several zones into one "
+            "field, keyed by target (custom field id, or 'title'/'asn'/'created'). "
+            "Tokens like {Zone Name} are replaced with that zone's value.",
+        ),
+    )
+
     created = models.DateTimeField(
         _("created"),
         default=timezone.now,

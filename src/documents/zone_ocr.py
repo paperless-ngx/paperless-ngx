@@ -115,7 +115,14 @@ def _process_template(
     template: OcrTemplate,
     zones: list[OcrTemplateZone],
 ) -> None:
-    """Process all zones in a template against a document."""
+    """Process all zones in a template against a document.
+
+    Each zone is OCR'd independently, then zones are grouped by their target
+    field and each field is written exactly once. When several zones share a
+    field, their values are combined via the template's per-field format string
+    (or joined in order if none is set) — this avoids the zones overwriting each
+    other's value.
+    """
     pages_needed: set[int] = {
         _resolve_page_idx(zone.page, document.page_count) for zone in zones
     }
@@ -127,6 +134,8 @@ def _process_template(
             doc_path, pages_needed, tmp_path, document.page_count,
         )
 
+        # Pass 1: OCR every zone into a value (or None if it failed/was rejected).
+        zone_values: dict[int, str | None] = {}
         for zone in zones:
             page_idx = _resolve_page_idx(zone.page, document.page_count)
 
@@ -149,24 +158,78 @@ def _process_template(
                 tmp_path,
             )
 
-            if extracted is not None:
-                if zone.validation_regex:
-                    if not re.fullmatch(zone.validation_regex, extracted):
-                        logger.info(
-                            "Zone OCR: '%s' value %r rejected by regex '%s'",
-                            zone.name,
-                            extracted[:100],
-                            zone.validation_regex,
-                        )
-                        continue
+            if extracted is not None and zone.validation_regex:
+                if not re.fullmatch(zone.validation_regex, extracted):
+                    logger.info(
+                        "Zone OCR: '%s' value %r rejected by regex '%s'",
+                        zone.name,
+                        extracted[:100],
+                        zone.validation_regex,
+                    )
+                    extracted = None
 
-                _write_zone_value(document, zone, extracted)
-                logger.info(
-                    "Zone OCR: '%s' → %s = %r",
-                    zone.name,
-                    _zone_target_label(zone),
-                    extracted[:100] if len(extracted) > 100 else extracted,
-                )
+            zone_values[id(zone)] = extracted
+
+    # Pass 2: group zones by target field and write each field once.
+    grouped: dict[str, list[OcrTemplateZone]] = {}
+    for zone in zones:
+        grouped.setdefault(_field_key(zone), []).append(zone)
+
+    combine_formats = template.combine_formats or {}
+    for key, field_zones in grouped.items():
+        value = _combine_field_value(
+            combine_formats.get(key, ""),
+            field_zones,
+            zone_values,
+        )
+        if not value:
+            continue
+
+        target_zone = field_zones[0]
+        _write_zone_value(document, target_zone, value)
+        logger.info(
+            "Zone OCR: %s = %r (from %d zone(s))",
+            _zone_target_label(target_zone),
+            value[:100] if len(value) > 100 else value,
+            len(field_zones),
+        )
+
+
+def _field_key(zone: OcrTemplateZone) -> str:
+    """Identify a zone's target field. Custom fields key by id, built-in targets
+    by their name. Matches the key used in OcrTemplate.combine_formats and on the
+    frontend field select."""
+    target = getattr(zone, "target", None) or "custom_field"
+    if target == "custom_field" and zone.custom_field_id:
+        return str(zone.custom_field_id)
+    return target
+
+
+def _combine_field_value(
+    fmt: str,
+    field_zones: list[OcrTemplateZone],
+    zone_values: dict[int, str | None],
+) -> str:
+    """Combine the OCR values of all zones targeting one field.
+
+    With a format string, `{Zone Name}` tokens are replaced by that zone's value
+    and literal text is kept; separators left dangling by an empty token are
+    cleaned up. Without a format, the zone values are joined in order by a space.
+    """
+    values = {z.name: (zone_values.get(id(z)) or "") for z in field_zones}
+
+    if not fmt:
+        parts = [zone_values.get(id(z)) or "" for z in field_zones]
+        return " ".join(p for p in parts if p).strip()
+
+    def _replace(match: "re.Match") -> str:
+        return values.get(match.group(1).strip(), "")
+
+    combined = re.sub(r"\{([^{}]+)\}", _replace, fmt)
+    # Tidy up separators an empty token may have left behind.
+    combined = re.sub(r"\s{2,}", " ", combined)
+    combined = re.sub(r"([^\w\s])\s*\1+", r"\1", combined)
+    return combined.strip().strip("-/.,;:| \t")
 
 
 def _render_pages(
