@@ -630,7 +630,6 @@ export class OcrTemplateEditorComponent
       ctx.fillStyle = color + '20'
       ctx.fillRect(x, y, w, h)
 
-      // Name pill above the zone, so it doesn't obscure the zone's content.
       const label = zone.name || `Zone ${idx + 1}`
       ctx.font = '12px sans-serif'
       ctx.textBaseline = 'middle'
@@ -667,7 +666,6 @@ export class OcrTemplateEditorComponent
       }
     })
 
-    // In-progress new zone, in a light green reserved for new zones.
     if (this.currentRect) {
       const cw = this.currentRect.endX - this.currentRect.startX
       const ch = this.currentRect.endY - this.currentRect.startY
@@ -756,7 +754,6 @@ export class OcrTemplateEditorComponent
 
     obs.pipe(takeUntil(this.destroy$)).subscribe({
       next: (saved) => {
-        // Stay open (keeping the selected zone) so the user can keep tuning.
         const idx = this.selectedZoneIndex
         this.template = saved
         this.isNew = false
@@ -772,10 +769,6 @@ export class OcrTemplateEditorComponent
     })
   }
 
-  // Cache the split array per zone so the getter returns a STABLE reference
-  // until ocr_language actually changes. Binding ng-select's [ngModel] to a
-  // method that returns a fresh array every change-detection pass makes
-  // ng-select re-render endlessly and freezes the browser.
   private ocrLangCache = new WeakMap<
     OcrTemplateZone,
     { src: string; arr: string[] }
@@ -792,7 +785,6 @@ export class OcrTemplateEditorComponent
 
   setOcrLanguages(zone: OcrTemplateZone, langs: string[]) {
     zone.ocr_language = (langs || []).join('+')
-    // Refresh the cache so the next read matches the new string.
     this.ocrLangCache.set(zone, {
       src: zone.ocr_language,
       arr: langs ? [...langs] : [],
@@ -820,12 +812,6 @@ export class OcrTemplateEditorComponent
     }
     this.seedCombineDefault(zone)
   }
-
-  // --- Multi-zone field combiner -------------------------------------------
-  // Several zones may target the same field; their values are combined into one
-  // via a per-field format string ({Zone Name} tokens + literal text) rather
-  // than overwriting each other. Keyed the same as the backend: custom field id
-  // as a string, or the built-in target name.
 
   fieldKeyFor(zone: OcrTemplateZone): string | null {
     const v = this.zoneFieldValue(zone)
@@ -861,7 +847,6 @@ export class OcrTemplateEditorComponent
     this.setCombineFormat(zone, `${current}${sep}${token}`)
   }
 
-  // Seed a sensible default ({A} {B}) the first time a field becomes shared.
   private seedCombineDefault(zone: OcrTemplateZone) {
     const key = this.fieldKeyFor(zone)
     if (!key) return
@@ -875,7 +860,6 @@ export class OcrTemplateEditorComponent
     }
   }
 
-  // Drop format entries for fields that are no longer shared by >1 zone.
   private pruneCombineFormats() {
     const formats = this.template.combine_formats
     if (!formats) return
