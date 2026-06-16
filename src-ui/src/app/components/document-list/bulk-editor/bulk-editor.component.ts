@@ -12,7 +12,15 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { saveAs } from 'file-saver'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { first, map, Observable, Subject, switchMap, takeUntil } from 'rxjs'
+import {
+  first,
+  forkJoin,
+  map,
+  Observable,
+  Subject,
+  switchMap,
+  takeUntil,
+} from 'rxjs'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
 import { CustomField } from 'src/app/data/custom-field'
 import { MatchingModel } from 'src/app/data/matching-model'
@@ -904,6 +912,27 @@ export class BulkEditorComponent
         this.executeDocumentAction(
           modal,
           this.documentService.reprocessDocuments(this.getSelectionQuery())
+        )
+      })
+  }
+
+  runZoneOcrSelected() {
+    const ids = Array.from(this.list.selected)
+    if (!ids.length) return
+    const modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Run Zone OCR`
+    modal.componentInstance.messageBold = $localize`Run zone OCR on ${this.getSelectionSize()} selected document(s)?`
+    modal.componentInstance.message = $localize`Each document's type template (if it has one) is applied, overwriting the mapped fields.`
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        modal.componentInstance.buttonsEnabled = false
+        this.executeDocumentAction(
+          modal,
+          forkJoin(ids.map((id) => this.documentService.runZoneOcr(id)))
         )
       })
   }

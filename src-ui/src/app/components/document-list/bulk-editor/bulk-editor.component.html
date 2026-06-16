@@ -95,6 +95,9 @@
           <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanAdd || list.allSelected || list.selectedCount < 2">
             <i-bs name="journals" class="me-1"></i-bs><ng-container i18n>Merge</ng-container>
           </button>
+          <button ngbDropdownItem (click)="runZoneOcrSelected()" [disabled]="!userCanEditAll || list.allSelected">
+            <i-bs name="file-earmark-break" class="me-1"></i-bs><ng-container i18n>Run Zone OCR</ng-container>
+          </button>
         </div>
       </div>
     </div>

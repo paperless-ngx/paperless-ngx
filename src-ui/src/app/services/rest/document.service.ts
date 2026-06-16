@@ -355,6 +355,10 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     })
   }
 
+  runZoneOcr(id: number): Observable<any> {
+    return this.http.post(this.getResourceUrl(id, 'run-zone-ocr'), {})
+  }
+
   rotateDocuments(
     selection: DocumentSelectionQuery,
     degrees: number,
