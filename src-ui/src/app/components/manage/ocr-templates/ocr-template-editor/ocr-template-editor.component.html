@@ -58,8 +58,6 @@
     </div>
 
     <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-underline flex-nowrap flex-md-wrap overflow-auto">
-
-        <!-- Tab 1: Template settings + preview controls -->
         <li ngbNavItem="settings">
           <a ngbNavLink i18n>Settings</a>
           <ng-template ngbNavContent>
@@ -81,7 +79,6 @@
           </ng-template>
         </li>
 
-        <!-- Tab 2: Zone list -->
         <li ngbNavItem="zones">
           <a ngbNavLink><ng-container i18n>Zones</ng-container> <span class="badge bg-primary ms-2">{{ template.zones.length }}</span></a>
           <ng-template ngbNavContent>
@@ -116,7 +113,6 @@
           </ng-template>
         </li>
 
-        <!-- Tab 3: Selected zone detail -->
         <li ngbNavItem="zone">
           <a ngbNavLink i18n>Zone</a>
           <ng-template ngbNavContent>
