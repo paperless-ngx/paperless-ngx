@@ -10,6 +10,7 @@ import {
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
+import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, takeUntil } from 'rxjs'
 import {
@@ -32,7 +33,13 @@ interface DrawingRect {
 @Component({
   selector: 'pngx-ocr-template-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NgxBootstrapIconsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    NgbNavModule,
+    NgxBootstrapIconsModule,
+  ],
   templateUrl: './ocr-template-editor.component.html',
   styleUrls: ['./ocr-template-editor.component.scss'],
 })
@@ -73,10 +80,19 @@ export class OcrTemplateEditorComponent
   pageImageUrl: string | null = null
   imageLoaded = false
 
+  // Tabs: 'settings' | 'zones' | 'zone'
+  activeTab: string = 'settings'
+
   // Drawing state
   isDrawing = false
   currentRect: DrawingRect | null = null
   selectedZoneIndex: number | null = null
+
+  get selectedZone(): OcrTemplateZone | null {
+    return this.selectedZoneIndex !== null
+      ? (this.template.zones[this.selectedZoneIndex] ?? null)
+      : null
+  }
 
   // Resize state
   isResizing = false
@@ -182,11 +198,10 @@ export class OcrTemplateEditorComponent
       }
     }
 
-    // Check if clicking on an existing zone
+    // Check if clicking on an existing zone — select it and jump to its detail
     const clickedIdx = this.findZoneAt(x, y)
     if (clickedIdx !== null && !event.shiftKey) {
-      this.selectedZoneIndex = clickedIdx
-      this.redrawCanvas()
+      this.selectZone(clickedIdx)
       return
     }
 
@@ -284,9 +299,9 @@ export class OcrTemplateEditorComponent
     }
 
     this.template.zones.push(zone)
-    this.selectedZoneIndex = this.template.zones.length - 1
     this.currentRect = null
-    this.redrawCanvas()
+    // Newly drawn zone → select it and open its detail tab.
+    this.selectZone(this.template.zones.length - 1)
   }
 
   private getZoneDisplayRect(zoneIdx: number): { x: number; y: number; w: number; h: number } | null {
@@ -471,7 +486,14 @@ export class OcrTemplateEditorComponent
 
   selectZone(index: number) {
     this.selectedZoneIndex = index
+    this.activeTab = 'zone'
     this.redrawCanvas()
+  }
+
+  deleteSelectedZone() {
+    if (this.selectedZoneIndex === null) return
+    this.removeZone(this.selectedZoneIndex)
+    this.activeTab = 'zones'
   }
 
   // --- Save / Test ---
@@ -522,7 +544,8 @@ export class OcrTemplateEditorComponent
     return dt ? dt.name : `Type #${id}`
   }
 
-  openQuickCreate(zoneIndex: number) {
+  openQuickCreate(zoneIndex: number | null) {
+    if (zoneIndex === null) return
     this.quickCreateForZoneIndex = zoneIndex
     this.quickCreateName = this.template.zones[zoneIndex]?.name || ''
     this.quickCreateType = 'string'
