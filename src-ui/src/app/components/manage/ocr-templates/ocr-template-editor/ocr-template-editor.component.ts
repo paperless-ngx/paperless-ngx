@@ -117,6 +117,11 @@ export class OcrTemplateEditorComponent
   resizeZoneIndex: number | null = null
   private readonly HANDLE_SIZE = 8
 
+  // Move state (drag a whole zone)
+  isMoving = false
+  moveZoneIndex: number | null = null
+  private moveStart = { mouseX: 0, mouseY: 0, zoneX: 0, zoneY: 0 }
+
   // Test results
   testResults: any[] | null = null
   testing = false
@@ -280,10 +285,14 @@ export class OcrTemplateEditorComponent
       }
     }
 
-    // Check if clicking on an existing zone — select it and jump to its detail
+    // Click on an existing zone — select it and start dragging it (move).
     const clickedIdx = this.findZoneAt(x, y)
     if (clickedIdx !== null && !event.shiftKey) {
       this.selectZone(clickedIdx)
+      const zone = this.template.zones[clickedIdx]
+      this.isMoving = true
+      this.moveZoneIndex = clickedIdx
+      this.moveStart = { mouseX: x, mouseY: y, zoneX: zone.x, zoneY: zone.y }
       return
     }
 
@@ -304,6 +313,22 @@ export class OcrTemplateEditorComponent
       return
     }
 
+    if (this.isMoving && this.moveZoneIndex !== null) {
+      const zone = this.template.zones[this.moveZoneIndex]
+      const canvas = this.canvasRef.nativeElement
+      const img = this.imageRef.nativeElement
+      const srcW = zone.zone_source_width || img.naturalWidth
+      const srcH = zone.zone_source_height || img.naturalHeight
+      const scaleX = srcW / canvas.width
+      const scaleY = srcH / canvas.height
+      const dx = Math.round((mx - this.moveStart.mouseX) * scaleX)
+      const dy = Math.round((my - this.moveStart.mouseY) * scaleY)
+      zone.x = Math.max(0, Math.min(this.moveStart.zoneX + dx, srcW - zone.width))
+      zone.y = Math.max(0, Math.min(this.moveStart.zoneY + dy, srcH - zone.height))
+      this.redrawCanvas()
+      return
+    }
+
     if (this.isDrawing && this.currentRect) {
       this.currentRect.endX = mx
       this.currentRect.endY = my
@@ -311,23 +336,29 @@ export class OcrTemplateEditorComponent
       return
     }
 
-    // Update cursor based on handle proximity
+    // Cursor feedback: resize handle > move (over a zone) > crosshair.
+    const canvas = this.canvasRef.nativeElement
     if (this.selectedZoneIndex !== null) {
       const handle = this.findHandleAt(mx, my, this.selectedZoneIndex)
-      const canvas = this.canvasRef.nativeElement
       if (handle) {
         const cursorMap: Record<string, string> = {
           nw: 'nw-resize', ne: 'ne-resize', sw: 'sw-resize', se: 'se-resize',
           n: 'n-resize', s: 's-resize', w: 'w-resize', e: 'e-resize',
         }
         canvas.style.cursor = cursorMap[handle] || 'crosshair'
-      } else {
-        canvas.style.cursor = 'crosshair'
+        return
       }
     }
+    canvas.style.cursor = this.findZoneAt(mx, my) !== null ? 'move' : 'crosshair'
   }
 
   onCanvasMouseUp(event: MouseEvent) {
+    if (this.isMoving) {
+      this.isMoving = false
+      this.moveZoneIndex = null
+      return
+    }
+
     if (this.isResizing) {
       this.isResizing = false
       this.resizeHandle = null
