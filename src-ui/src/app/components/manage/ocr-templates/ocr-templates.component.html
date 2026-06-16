@@ -1,68 +1,75 @@
-<div class="container-fluid">
-  <div class="row mb-3">
-    <div class="col">
-      <h3 i18n>OCR Templates</h3>
-      <p class="text-muted" i18n>
-        Define extraction zones on document types to automatically populate custom fields via OCR.
-      </p>
-    </div>
-    <div class="col-auto">
-      <button class="btn btn-primary" (click)="createTemplate()">
-        <i-bs name="plus-circle"></i-bs>&nbsp;
-        <span i18n>Create Template</span>
-      </button>
-    </div>
-  </div>
+<pngx-page-header
+  title="OCR Templates"
+  i18n-title
+  info="Define extraction zones on document types to automatically populate custom fields via OCR."
+  i18n-info
+  >
+  <button type="button" class="btn btn-sm btn-outline-primary" (click)="createTemplate()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.OcrTemplate }">
+    <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Create Template</ng-container>
+  </button>
+</pngx-page-header>
 
-  @if (loading) {
-    <div class="spinner-border" role="status">
-      <span class="visually-hidden" i18n>Loading...</span>
+<ul class="list-group">
+
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col" i18n>Name</div>
+      <div class="col d-none d-sm-flex" i18n>Document Type</div>
+      <div class="col d-none d-sm-flex" i18n>Zones</div>
+      <div class="col" i18n>Status</div>
+      <div class="col" i18n>Actions</div>
     </div>
-  } @else if (templates.length === 0) {
-    <div class="alert alert-info" i18n>
-      No OCR templates defined yet. Create one to start extracting structured data from your documents.
-    </div>
-  } @else {
-    <table class="table table-striped align-middle">
-      <thead>
-        <tr>
-          <th i18n>Name</th>
-          <th i18n>Document Type</th>
-          <th i18n>Zones</th>
-          <th i18n>Status</th>
-          <th i18n>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (t of templates; track t.id) {
-          <tr>
-            <td>
-              <a [routerLink]="['/ocr-templates', t.id]">{{ t.name }}</a>
-            </td>
-            <td>{{ t.document_type }}</td>
-            <td>{{ t.zones?.length || 0 }}</td>
-            <td>
-              @if (t.enabled) {
-                <span class="badge bg-success" i18n>Enabled</span>
-              } @else {
-                <span class="badge bg-secondary" i18n>Disabled</span>
-              }
-            </td>
-            <td>
-              <button class="btn btn-sm btn-outline-secondary me-1" (click)="editTemplate(t)" title="Edit">
-                <i-bs name="pencil"></i-bs>
-              </button>
-              <button class="btn btn-sm btn-outline-secondary me-1" (click)="toggleTemplate(t)"
-                [title]="t.enabled ? 'Disable' : 'Enable'">
-                <i-bs [name]="t.enabled ? 'toggle-on' : 'toggle-off'"></i-bs>
-              </button>
-              <button class="btn btn-sm btn-outline-danger" (click)="deleteTemplate(t)" title="Delete">
-                <i-bs name="trash"></i-bs>
-              </button>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
+  </li>
+
+  @if (loading && templates.length === 0) {
+    <li class="list-group-item">
+      <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+      <ng-container i18n>Loading...</ng-container>
+    </li>
   }
-</div>
+
+  @for (t of templates; track t.id) {
+    <li class="list-group-item">
+      <div class="row fade" [class.show]="show">
+        <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editTemplate(t)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.OcrTemplate)">{{t.name}}</button></div>
+        <div class="col d-flex align-items-center d-none d-sm-flex">{{getDocumentTypeName(t)}}</div>
+        <div class="col d-flex align-items-center d-none d-sm-flex"><code>{{t.zones?.length || 0}}</code></div>
+        <div class="col d-flex align-items-center">
+          <div class="form-check form-switch mb-0">
+            <input type="checkbox" class="form-check-input cursor-pointer" [id]="t.id+'_enable'" [(ngModel)]="t.enabled" (change)="toggleTemplate(t)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.OcrTemplate }">
+            <label class="form-check-label cursor-pointer" [for]="t.id+'_enable'">
+              <code> @if(t.enabled) { <ng-container i18n>Enabled</ng-container> } @else { <span i18n class="text-muted">Disabled</span> }</code>
+            </label>
+          </div>
+        </div>
+        <div class="col">
+
+          <div class="btn-group d-block d-sm-none">
+            <div ngbDropdown container="body" class="d-inline-block">
+              <button type="button" class="btn btn-link" id="actionsMenuMobile{{t.id}}" (click)="$event.stopPropagation()" ngbDropdownToggle>
+                <i-bs name="three-dots-vertical"></i-bs>
+              </button>
+              <div ngbDropdownMenu aria-labelledby="actionsMenuMobile{{t.id}}">
+                <button (click)="editTemplate(t)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.OcrTemplate }" ngbDropdownItem i18n>Edit</button>
+                <button (click)="deleteTemplate(t)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.OcrTemplate }" ngbDropdownItem i18n>Delete</button>
+              </div>
+            </div>
+          </div>
+          <div class="btn-toolbar d-none d-sm-flex gap-2" role="toolbar">
+            <div class="btn-group">
+              <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.OcrTemplate }" class="btn btn-sm btn-outline-secondary" type="button" (click)="editTemplate(t)">
+                <i-bs width="1em" height="1em" name="pencil" class="me-1"></i-bs><ng-container i18n>Edit</ng-container>
+              </button>
+              <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.OcrTemplate }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteTemplate(t)">
+                <i-bs width="1em" height="1em" name="trash" class="me-1"></i-bs><ng-container i18n>Delete</ng-container>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+  }
+  @if (!loading && templates.length === 0) {
+    <li class="list-group-item" [class.show]="show" i18n>No OCR templates defined.</li>
+  }
+</ul>
