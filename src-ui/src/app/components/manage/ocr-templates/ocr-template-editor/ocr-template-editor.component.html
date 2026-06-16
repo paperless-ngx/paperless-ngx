@@ -80,7 +80,7 @@
 
         <!-- Tab 2: Zone list -->
         <li ngbNavItem="zones">
-          <a ngbNavLink><ng-container i18n>Zones</ng-container> ({{ template.zones.length }})</a>
+          <a ngbNavLink><ng-container i18n>Zones</ng-container> <span class="badge bg-primary ms-2">{{ template.zones.length }}</span></a>
           <ng-template ngbNavContent>
             @if (template.zones.length === 0) {
               <p class="text-muted" i18n>
