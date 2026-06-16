@@ -783,12 +783,31 @@ export class OcrTemplateEditorComponent
       })
   }
 
+  // Cache the split array per zone so the getter returns a STABLE reference
+  // until ocr_language actually changes. Binding ng-select's [ngModel] to a
+  // method that returns a fresh array every change-detection pass makes
+  // ng-select re-render endlessly and freezes the browser.
+  private ocrLangCache = new WeakMap<
+    OcrTemplateZone,
+    { src: string; arr: string[] }
+  >()
+
   ocrLanguageArray(zone: OcrTemplateZone): string[] {
-    return zone.ocr_language ? zone.ocr_language.split('+').filter(Boolean) : []
+    const src = zone.ocr_language || ''
+    const cached = this.ocrLangCache.get(zone)
+    if (cached && cached.src === src) return cached.arr
+    const arr = src ? src.split('+').filter(Boolean) : []
+    this.ocrLangCache.set(zone, { src, arr })
+    return arr
   }
 
   setOcrLanguages(zone: OcrTemplateZone, langs: string[]) {
     zone.ocr_language = (langs || []).join('+')
+    // Refresh the cache so the next read matches the new string.
+    this.ocrLangCache.set(zone, {
+      src: zone.ocr_language,
+      arr: langs ? [...langs] : [],
+    })
   }
 
   getCustomFieldName(id: number): string {
