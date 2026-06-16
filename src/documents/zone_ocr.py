@@ -100,16 +100,15 @@ def _resolve_doc_path(
     return None
 
 
-def _resolve_page_idx(page_value, default_page, page_count) -> int:
+def _resolve_page_idx(page_value, page_count) -> int:
     """Resolve a 1-indexed page (1 = first, -1 = last) to a 0-indexed image
-    index. `page_value` may be None → fall back to the template's default_page."""
-    v = page_value if page_value is not None else default_page
-    if v is None:
+    index. A blank page_value defaults to the first page."""
+    if page_value is None:
         return 0
-    if v == -1:
+    if page_value == -1:
         return (page_count - 1) if page_count else 0
-    if v >= 1:
-        return v - 1
+    if page_value >= 1:
+        return page_value - 1
     return 0
 
 
@@ -121,8 +120,7 @@ def _process_template(
 ) -> None:
     """Process all zones in a template against a document."""
     pages_needed: set[int] = {
-        _resolve_page_idx(zone.page, template.default_page, document.page_count)
-        for zone in zones
+        _resolve_page_idx(zone.page, document.page_count) for zone in zones
     }
 
     with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
@@ -133,9 +131,7 @@ def _process_template(
         )
 
         for zone in zones:
-            page_idx = _resolve_page_idx(
-                zone.page, template.default_page, document.page_count,
-            )
+            page_idx = _resolve_page_idx(zone.page, document.page_count)
 
             if page_idx not in page_images:
                 logger.warning(

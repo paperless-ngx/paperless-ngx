@@ -90,7 +90,6 @@ export class OcrTemplateEditorComponent
     name: '',
     document_type: null,
     sample_document: null,
-    default_page: 1,
     source_width: 0,
     source_height: 0,
     enabled: true,
@@ -298,7 +297,7 @@ export class OcrTemplateEditorComponent
 
   /** The 1-indexed page a zone is on (1 = first, -1 = last). */
   zonePage(zone: OcrTemplateZone): number {
-    const v = zone.page ?? this.template.default_page ?? 1
+    const v = zone.page ?? 1
     if (v === -1) return this.previewPageCount ?? this.previewPage + 1
     return v >= 1 ? v : 1
   }
@@ -685,7 +684,7 @@ export class OcrTemplateEditorComponent
         y: zone.y,
         width: zone.width,
         height: zone.height,
-        page: zone.page ?? this.template.default_page,
+        page: zone.page ?? 1,
         ocr_language: zone.ocr_language,
         transform: zone.transform,
         date_format: zone.date_format,

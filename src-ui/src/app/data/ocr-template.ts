@@ -49,7 +49,6 @@ export interface OcrTemplate extends ObjectWithId {
   name: string
   document_type: number
   sample_document: number | null
-  default_page: number
   source_width: number
   source_height: number
   enabled: boolean

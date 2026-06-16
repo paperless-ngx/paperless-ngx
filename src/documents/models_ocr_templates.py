@@ -30,12 +30,6 @@ class OcrTemplate(models.Model):
         db_index=True,
     )
 
-    default_page = models.IntegerField(
-        _("default page"),
-        default=1,
-        help_text=_("Default page for zones (1 = first page, -1 = last page)"),
-    )
-
     source_width = models.PositiveIntegerField(
         _("source width"),
         validators=[MinValueValidator(1)],
