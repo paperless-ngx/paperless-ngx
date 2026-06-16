@@ -1355,12 +1355,33 @@ def run_zone_ocr_extraction(sender, document, original_file=None, **kwargs):
         )
 
 
+def capture_old_document_type(sender, instance, **kwargs):
+    """pre_save: remember the document's previous type so the post_save handler
+    can tell whether the type actually changed (vs. every other save)."""
+    if instance.pk:
+        instance._old_document_type_id = (
+            Document.objects.filter(pk=instance.pk)
+            .values_list("document_type_id", flat=True)
+            .first()
+        )
+    else:
+        instance._old_document_type_id = None
+
+
 def run_zone_ocr_on_type_change(sender, instance, created=False, **kwargs):
     """
-    After a document is saved, check if its type has OCR templates and run
-    zone extraction. Skips newly created documents (handled by consumption signal).
+    Run zone OCR only when a document's TYPE actually changes (and the new type
+    has an enabled template). NOT on every save — zone OCR overwrites fields, so
+    re-running it on each edit would clobber the user's changes. Newly created
+    documents are handled by the consumption signal, and the user can always
+    trigger extraction manually via the run-zone-ocr action.
     """
     if created or not instance.pk or not instance.document_type_id:
+        return
+
+    # Only proceed if the type changed compared to what was in the DB before.
+    old_type = getattr(instance, "_old_document_type_id", None)
+    if old_type == instance.document_type_id:
         return
 
     from documents.models_ocr_templates import OcrTemplate
