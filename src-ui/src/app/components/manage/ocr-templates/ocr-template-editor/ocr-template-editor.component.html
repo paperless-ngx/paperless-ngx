@@ -68,22 +68,9 @@
                 </button>
               </div>
             </div>
-            <div class="mb-3">
-              <label class="form-label" i18n>Page</label>
-              <div class="input-group">
-                <input
-                  type="number"
-                  class="form-control"
-                  [(ngModel)]="previewPage"
-                  min="0"
-                />
-                <button class="btn btn-outline-secondary" (click)="loadPreview()" i18n>
-                  Go
-                </button>
-              </div>
-            </div>
             <small class="text-muted" i18n>
-              Draw rectangles on the preview to define extraction zones.
+              Draw rectangles on the preview to define extraction zones. Use the
+              page controls above the preview to add zones on different pages.
             </small>
           </ng-template>
         </li>
@@ -106,7 +93,7 @@
                   <div class="flex-grow-1" role="button" style="cursor: pointer;" (click)="selectZone(i)">
                     <div><strong [class.text-primary]="selectedZoneIndex === i">{{ zone.name }}</strong></div>
                     <div class="small text-muted">
-                      {{ getCustomFieldName(zone.custom_field) }} · {{ zone.width }}×{{ zone.height }}px
+                      {{ getCustomFieldName(zone.custom_field) }} · {{ zone.width }}×{{ zone.height }}px · <ng-container i18n>p.</ng-container>{{ zonePage(zone) + 1 }}
                     </div>
                   </div>
                   <div class="btn-group">
@@ -151,6 +138,18 @@
                   [(ngModel)]="zone.name"
                   (ngModelChange)="redrawCanvas()"
                 />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" i18n>Page</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  [(ngModel)]="zone.page"
+                  min="0"
+                  (ngModelChange)="redrawCanvas()"
+                />
+                <small class="text-muted" i18n>Page this zone is on (0 = first). Set automatically when you draw it.</small>
               </div>
 
               <div class="mb-3">
@@ -287,6 +286,13 @@
     <!-- Right column: Document preview with zone overlay -->
     <div class="col-md-8">
       @if (pageImageUrl) {
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <button class="btn btn-sm btn-outline-secondary" (click)="prevPage()" [disabled]="previewPage <= 0" i18n>Previous</button>
+          <span class="small">
+            <ng-container i18n>Page</ng-container> {{ previewPage + 1 }}@if (previewPageCount) { / {{ previewPageCount }} }
+          </span>
+          <button class="btn btn-sm btn-outline-secondary" (click)="nextPage()" [disabled]="previewPageCount && previewPage >= previewPageCount - 1" i18n>Next</button>
+        </div>
         <div class="position-relative" style="display: inline-block; width: 100%;">
           <img
             #pageImage

@@ -22,6 +22,7 @@ import { CustomField } from 'src/app/data/custom-field'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { PageHeaderComponent } from '../../../common/page-header/page-header.component'
 
@@ -54,6 +55,7 @@ export class OcrTemplateEditorComponent
   private readonly templateService = inject(OcrTemplateService)
   private readonly customFieldsService = inject(CustomFieldsService)
   private readonly documentTypeService = inject(DocumentTypeService)
+  private readonly documentService = inject(DocumentService)
   private readonly toastService = inject(ToastService)
   private readonly destroy$ = new Subject<void>()
 
@@ -81,6 +83,8 @@ export class OcrTemplateEditorComponent
   // Preview state
   previewDocId: number | null = null
   previewPage = 0
+  previewPageCount: number | null = null
+  private pageCountForDoc: number | null = null
   pageImageUrl: string | null = null
   imageLoaded = false
 
@@ -179,11 +183,48 @@ export class OcrTemplateEditorComponent
 
   loadPreview() {
     if (!this.previewDocId) return
+    // Fetch the page count once per document, for the page navigation.
+    if (this.pageCountForDoc !== this.previewDocId) {
+      this.pageCountForDoc = this.previewDocId
+      this.previewPageCount = null
+      this.documentService
+        .get(this.previewDocId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (doc) => (this.previewPageCount = doc?.page_count ?? null),
+          error: () => (this.previewPageCount = null),
+        })
+    }
     this.pageImageUrl = this.templateService.getPageImageUrl(
       this.previewDocId,
       this.previewPage
     )
     this.imageLoaded = false
+  }
+
+  goToPage(page: number) {
+    const max = this.previewPageCount ? this.previewPageCount - 1 : page
+    const clamped = Math.max(0, Math.min(page, max))
+    if (clamped === this.previewPage) return
+    this.previewPage = clamped
+    this.loadPreview()
+  }
+
+  prevPage() {
+    this.goToPage(this.previewPage - 1)
+  }
+
+  nextPage() {
+    this.goToPage(this.previewPage + 1)
+  }
+
+  /** The page a zone belongs to (falls back to the template default). */
+  zonePage(zone: OcrTemplateZone): number {
+    return zone.page ?? this.template.default_page ?? 0
+  }
+
+  private isOnCurrentPage(zone: OcrTemplateZone): boolean {
+    return this.zonePage(zone) === this.previewPage
   }
 
   onImageLoad() {
@@ -307,6 +348,7 @@ export class OcrTemplateEditorComponent
       y,
       width: w,
       height: h,
+      page: this.previewPage,
       ocr_language: 'deu+eng',
       transform: 'strip',
       validation_regex: '',
@@ -327,6 +369,7 @@ export class OcrTemplateEditorComponent
     if (!canvas || !img || !img.naturalWidth) return null
     const zone = this.template.zones[zoneIdx]
     if (!zone) return null
+    if (!this.isOnCurrentPage(zone)) return null
     const srcW = zone.zone_source_width || img.naturalWidth
     const srcH = zone.zone_source_height || img.naturalHeight
     const scaleX = canvas.width / srcW
@@ -392,6 +435,7 @@ export class OcrTemplateEditorComponent
 
     for (let i = this.template.zones.length - 1; i >= 0; i--) {
       const z = this.template.zones[i]
+      if (!this.isOnCurrentPage(z)) continue
       // Use per-zone source dimensions if available, otherwise current image
       const srcW = z.zone_source_width || img.naturalWidth
       const srcH = z.zone_source_height || img.naturalHeight
@@ -438,6 +482,8 @@ export class OcrTemplateEditorComponent
     ]
 
     this.template.zones.forEach((zone, idx) => {
+      // Only draw zones that belong to the page currently shown.
+      if (!this.isOnCurrentPage(zone)) return
       const color = colors[idx % colors.length]
       // Use per-zone source dimensions for correct scaling
       const srcW = zone.zone_source_width || img.naturalWidth
@@ -505,6 +551,9 @@ export class OcrTemplateEditorComponent
     this.selectedZoneIndex = index
     this.activeTab = 'zone'
     this.zoneTestResult = null
+    // Jump the preview to the zone's page so it's actually visible.
+    const zone = this.template.zones[index]
+    if (zone) this.goToPage(this.zonePage(zone))
     this.redrawCanvas()
   }
 
