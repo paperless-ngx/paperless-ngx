@@ -38,7 +38,6 @@ export const TRANSFORM_OPTIONS = [
   { id: 'qr_code', name: $localize`Read QR/barcode` },
 ]
 
-// Common Tesseract OCR languages for the zone language picker.
 export const OCR_LANGUAGE_OPTIONS = [
   { id: 'eng', name: $localize`English` },
   { id: 'deu', name: $localize`German` },
@@ -49,8 +48,6 @@ export const OCR_LANGUAGE_OPTIONS = [
   { id: 'nld', name: $localize`Dutch` },
 ]
 
-// Date-format presets for the "Parse date" transform. Values are Python
-// strptime format strings; '' = auto-detect. "Custom" is offered in the UI.
 export const DATE_FORMAT_OPTIONS = [
   { id: '', name: $localize`Auto-detect` },
   { id: '%d.%m.%Y', name: 'DD.MM.YYYY' },
@@ -65,15 +62,12 @@ export interface OcrTemplate extends ObjectWithId {
   source_width: number
   source_height: number
   enabled: boolean
-  // Per-target format strings for combining several zones into one field, keyed
-  // by target (custom field id as string, or 'title'/'asn'/'created').
   combine_formats?: Record<string, string>
   created?: string
   updated?: string
   zones: OcrTemplateZone[]
 }
 
-// Ad-hoc zone passed to the per-zone test endpoint (no id, just geometry + OCR opts).
 export interface ZoneTestRequest {
   name: string
   x: number
@@ -89,7 +83,6 @@ export interface ZoneTestRequest {
   zone_source_height?: number
 }
 
-// Response of the per-zone test: raw OCR text, transformed value, regex outcome.
 export interface OcrZoneTestResult {
   raw_text?: string | null
   value?: string | null
@@ -98,7 +91,6 @@ export interface OcrZoneTestResult {
   error?: string
 }
 
-// One row of the run-zone-ocr response (per zone across the doc-type's templates).
 export interface OcrZoneRunResult {
   template: string
   zone: string
