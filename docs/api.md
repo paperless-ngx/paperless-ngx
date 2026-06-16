@@ -445,3 +445,9 @@ Initial API version.
   large lists of object IDs for operations affecting many objects.
 - The legacy `title_content` document search parameter is deprecated and will be removed in a future version.
   Clients should use `text` for simple title-and-content search and `title_search` for title-only search.
+- The task tracking system was redesigned. The tasks list (`/api/tasks/`) is now paginated, and the
+  task object exposes `task_type` (formerly `task_name`) and `trigger_source` (formerly `type`). New
+  read-only endpoints `/api/tasks/summary/`, `/api/tasks/status_counts/`, and `/api/tasks/active/`
+  provide aggregate views, and `POST /api/tasks/run/` lets privileged users dispatch supported tasks.
+  API v9 continues to serve the unpaginated list with the legacy field names until support for v9 is
+  dropped.
