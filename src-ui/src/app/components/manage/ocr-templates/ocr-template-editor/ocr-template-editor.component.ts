@@ -1,13 +1,13 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  ViewChild,
-  ElementRef,
-  AfterViewInit,
-  inject,
-} from '@angular/core'
 import { CommonModule } from '@angular/common'
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import {
@@ -23,12 +23,13 @@ import {
   debounceTime,
   distinctUntilChanged,
   map,
-  of,
   Observable,
+  of,
   Subject,
   switchMap,
   takeUntil,
 } from 'rxjs'
+import { CustomField } from 'src/app/data/custom-field'
 import { Document } from 'src/app/data/document'
 import { DocumentType } from 'src/app/data/document-type'
 import {
@@ -41,12 +42,11 @@ import {
   TRANSFORM_OPTIONS,
   ZoneTestRequest,
 } from 'src/app/data/ocr-template'
-import { CustomField } from 'src/app/data/custom-field'
-import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
+import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { PageHeaderComponent } from '../../../common/page-header/page-header.component'
 
@@ -230,12 +230,10 @@ export class OcrTemplateEditorComponent
         if (this.template.document_type) {
           params['document_type__id'] = this.template.document_type
         }
-        return this.documentService
-          .list(1, 10, 'created', true, params)
-          .pipe(
-            map((r) => r.results),
-            catchError(() => of([]))
-          )
+        return this.documentService.list(1, 10, 'created', true, params).pipe(
+          map((r) => r.results),
+          catchError(() => of([]))
+        )
       })
     )
 
@@ -244,7 +242,9 @@ export class OcrTemplateEditorComponent
     const corr = doc.correspondent
       ? this.correspondentNames.get(doc.correspondent)
       : null
-    return corr ? `#${doc.id} ${doc.title} (${corr})` : `#${doc.id} ${doc.title}`
+    return corr
+      ? `#${doc.id} ${doc.title} (${corr})`
+      : `#${doc.id} ${doc.title}`
   }
 
   onPreviewDocSelected(event: NgbTypeaheadSelectItemEvent<Document>) {
@@ -399,8 +399,14 @@ export class OcrTemplateEditorComponent
       const scaleY = srcH / canvas.height
       const dx = Math.round((mx - this.moveStart.mouseX) * scaleX)
       const dy = Math.round((my - this.moveStart.mouseY) * scaleY)
-      zone.x = Math.max(0, Math.min(this.moveStart.zoneX + dx, srcW - zone.width))
-      zone.y = Math.max(0, Math.min(this.moveStart.zoneY + dy, srcH - zone.height))
+      zone.x = Math.max(
+        0,
+        Math.min(this.moveStart.zoneX + dx, srcW - zone.width)
+      )
+      zone.y = Math.max(
+        0,
+        Math.min(this.moveStart.zoneY + dy, srcH - zone.height)
+      )
       this.redrawCanvas()
       return
     }
@@ -418,14 +424,21 @@ export class OcrTemplateEditorComponent
       const handle = this.findHandleAt(mx, my, this.selectedZoneIndex)
       if (handle) {
         const cursorMap: Record<ResizeHandle, string> = {
-          nw: 'nw-resize', ne: 'ne-resize', sw: 'sw-resize', se: 'se-resize',
-          n: 'n-resize', s: 's-resize', w: 'w-resize', e: 'e-resize',
+          nw: 'nw-resize',
+          ne: 'ne-resize',
+          sw: 'sw-resize',
+          se: 'se-resize',
+          n: 'n-resize',
+          s: 's-resize',
+          w: 'w-resize',
+          e: 'e-resize',
         }
         canvas.style.cursor = cursorMap[handle] || 'crosshair'
         return
       }
     }
-    canvas.style.cursor = this.findZoneAt(mx, my) !== null ? 'move' : 'crosshair'
+    canvas.style.cursor =
+      this.findZoneAt(mx, my) !== null ? 'move' : 'crosshair'
   }
 
   onCanvasMouseUp(event: MouseEvent) {
@@ -474,7 +487,8 @@ export class OcrTemplateEditorComponent
     const zone: OcrTemplateZone = {
       name: `Zone ${this.template.zones.length + 1}`,
       target: 'custom_field',
-      custom_field: this.customFields.length > 0 ? this.customFields[0].id : null,
+      custom_field:
+        this.customFields.length > 0 ? this.customFields[0].id : null,
       x,
       y,
       width: w,
@@ -494,7 +508,9 @@ export class OcrTemplateEditorComponent
     this.selectZone(this.template.zones.length - 1)
   }
 
-  private getZoneDisplayRect(zoneIdx: number): { x: number; y: number; w: number; h: number } | null {
+  private getZoneDisplayRect(
+    zoneIdx: number
+  ): { x: number; y: number; w: number; h: number } | null {
     const canvas = this.canvasRef?.nativeElement
     const img = this.imageRef?.nativeElement
     if (!canvas || !img || !img.naturalWidth) return null
@@ -513,14 +529,23 @@ export class OcrTemplateEditorComponent
     }
   }
 
-  private findHandleAt(mx: number, my: number, zoneIdx: number): ResizeHandle | null {
+  private findHandleAt(
+    mx: number,
+    my: number,
+    zoneIdx: number
+  ): ResizeHandle | null {
     const r = this.getZoneDisplayRect(zoneIdx)
     if (!r) return null
     const hs = this.HANDLE_SIZE
     const handles: [ResizeHandle, number, number][] = [
-      ['nw', r.x, r.y], ['n', r.x + r.w / 2, r.y], ['ne', r.x + r.w, r.y],
-      ['w', r.x, r.y + r.h / 2], ['e', r.x + r.w, r.y + r.h / 2],
-      ['sw', r.x, r.y + r.h], ['s', r.x + r.w / 2, r.y + r.h], ['se', r.x + r.w, r.y + r.h],
+      ['nw', r.x, r.y],
+      ['n', r.x + r.w / 2, r.y],
+      ['ne', r.x + r.w, r.y],
+      ['w', r.x, r.y + r.h / 2],
+      ['e', r.x + r.w, r.y + r.h / 2],
+      ['sw', r.x, r.y + r.h],
+      ['s', r.x + r.w / 2, r.y + r.h],
+      ['se', r.x + r.w, r.y + r.h],
     ]
     for (const [name, hx, hy] of handles) {
       if (Math.abs(mx - hx) <= hs && Math.abs(my - hy) <= hs) return name
@@ -654,9 +679,14 @@ export class OcrTemplateEditorComponent
         const hs = this.HANDLE_SIZE
         ctx.fillStyle = color
         const handles = [
-          [x, y], [x + w / 2, y], [x + w, y],
-          [x, y + h / 2], [x + w, y + h / 2],
-          [x, y + h], [x + w / 2, y + h], [x + w, y + h],
+          [x, y],
+          [x + w / 2, y],
+          [x + w, y],
+          [x, y + h / 2],
+          [x + w, y + h / 2],
+          [x, y + h],
+          [x + w / 2, y + h],
+          [x + w, y + h],
         ]
         for (const [hx, hy] of handles) {
           ctx.fillRect(hx - hs / 2, hy - hs / 2, hs, hs)
@@ -730,7 +760,9 @@ export class OcrTemplateEditorComponent
           this.zoneTesting = false
         },
         error: (err) => {
-          this.zoneTestResult = { error: err.error?.error || $localize`Test failed` }
+          this.zoneTestResult = {
+            error: err.error?.error || $localize`Test failed`,
+          }
           this.zoneTesting = false
         },
       })
@@ -929,8 +961,10 @@ export class OcrTemplateEditorComponent
             .subscribe((r) => {
               this.customFields = r.results
               if (this.quickCreateForZoneIndex !== null) {
-                this.template.zones[this.quickCreateForZoneIndex].custom_field = result.id
-                this.template.zones[this.quickCreateForZoneIndex].target = 'custom_field'
+                this.template.zones[this.quickCreateForZoneIndex].custom_field =
+                  result.id
+                this.template.zones[this.quickCreateForZoneIndex].target =
+                  'custom_field'
               }
               this.showQuickCreate = false
               this.quickCreateForZoneIndex = null

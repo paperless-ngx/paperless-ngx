@@ -6,9 +6,9 @@ import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { delay, takeUntil, tap } from 'rxjs'
 import { OcrTemplate } from 'src/app/data/ocr-template'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { PermissionsService } from 'src/app/services/permissions.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
-import { PermissionsService } from 'src/app/services/permissions.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
@@ -65,7 +65,9 @@ export class OcrTemplatesComponent
   }
 
   getDocumentTypeName(t: OcrTemplate): string {
-    return this.documentTypeNames.get(t.document_type) ?? `${t.document_type ?? ''}`
+    return (
+      this.documentTypeNames.get(t.document_type) ?? `${t.document_type ?? ''}`
+    )
   }
 
   createTemplate() {

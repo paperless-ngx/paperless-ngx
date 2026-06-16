@@ -2035,7 +2035,8 @@ class DocumentViewSet(
             )
 
         templates = OcrTemplate.objects.filter(
-            document_type_id=document.document_type_id, enabled=True,
+            document_type_id=document.document_type_id,
+            enabled=True,
         )
         if not templates.exists():
             return Response(
@@ -2075,12 +2076,14 @@ class DocumentViewSet(
                         if document.created
                         else None,
                     }.get(target)
-                results.append({
-                    "template": template.name,
-                    "zone": zone.name,
-                    "custom_field": field_name,
-                    "value": value,
-                })
+                results.append(
+                    {
+                        "template": template.name,
+                        "zone": zone.name,
+                        "custom_field": field_name,
+                        "value": value,
+                    },
+                )
 
         return Response({"results": results})
 
@@ -5240,10 +5243,14 @@ def serve_logo(request: HttpRequest, filename: str | None = None) -> FileRespons
 class OcrTemplateViewSet(ModelViewSet):
     """CRUD for OCR templates with zone definitions."""
 
-    queryset = OcrTemplate.objects.all().prefetch_related(
-        "zones",
-        "zones__custom_field",
-    ).order_by("name")
+    queryset = (
+        OcrTemplate.objects.all()
+        .prefetch_related(
+            "zones",
+            "zones__custom_field",
+        )
+        .order_by("name")
+    )
     serializer_class = OcrTemplateSerializer
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     pagination_class = StandardPagination
@@ -5269,7 +5276,7 @@ class OcrTemplateViewSet(ModelViewSet):
         # Validate page number
         if document.page_count and page_num >= document.page_count:
             raise Http404(
-                f"Page {page_num} out of range (document has {document.page_count} pages)"
+                f"Page {page_num} out of range (document has {document.page_count} pages)",
             )
 
         doc_path = document.archive_path or document.source_path
@@ -5288,9 +5295,12 @@ class OcrTemplateViewSet(ModelViewSet):
                     [
                         "pdftoppm",
                         "-png",
-                        "-r", "150",  # Lower DPI for preview
-                        "-f", str(page_num + 1),
-                        "-l", str(page_num + 1),
+                        "-r",
+                        "150",  # Lower DPI for preview
+                        "-f",
+                        str(page_num + 1),
+                        "-l",
+                        str(page_num + 1),
                         str(doc_path),
                         str(output_prefix),
                     ],
@@ -5300,7 +5310,7 @@ class OcrTemplateViewSet(ModelViewSet):
                 )
             except subprocess.CalledProcessError as e:
                 raise Http404(
-                    f"Failed to render page: {e.stderr.decode(errors='replace')[:200]}"
+                    f"Failed to render page: {e.stderr.decode(errors='replace')[:200]}",
                 )
             except FileNotFoundError:
                 raise Http404("pdftoppm not available - is poppler-utils installed?")
@@ -5423,12 +5433,14 @@ class OcrTemplateViewSet(ModelViewSet):
         # Check if field already exists
         existing = CustomField.objects.filter(name=name).first()
         if existing:
-            return Response({
-                "id": existing.pk,
-                "name": existing.name,
-                "data_type": existing.data_type,
-                "created": False,
-            })
+            return Response(
+                {
+                    "id": existing.pk,
+                    "name": existing.name,
+                    "data_type": existing.data_type,
+                    "created": False,
+                },
+            )
 
         # Check user has permission to create custom fields
         if not request.user.has_perm("documents.add_customfield"):

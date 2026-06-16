@@ -3482,7 +3482,7 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
         if value.data_type not in OCR_SUPPORTED_FIELD_TYPES:
             raise serializers.ValidationError(
                 f"Custom field type '{value.data_type}' is not supported for OCR extraction. "
-                f"Use string, integer, float, date, monetary, boolean, URL, or long text."
+                f"Use string, integer, float, date, monetary, boolean, URL, or long text.",
             )
         return value
 
@@ -3520,13 +3520,11 @@ class OcrTemplateSerializer(serializers.ModelSerializer):
     def validate_zones(self, zones_data):
         """Validate zone coordinates are within the source dimensions."""
         # source_width/height may not be in initial_data during partial updates
-        source_width = (
-            self.initial_data.get("source_width")
-            or (self.instance.source_width if self.instance else None)
+        source_width = self.initial_data.get("source_width") or (
+            self.instance.source_width if self.instance else None
         )
-        source_height = (
-            self.initial_data.get("source_height")
-            or (self.instance.source_height if self.instance else None)
+        source_height = self.initial_data.get("source_height") or (
+            self.instance.source_height if self.instance else None
         )
 
         if source_width and source_height:
@@ -3538,12 +3536,12 @@ class OcrTemplateSerializer(serializers.ModelSerializer):
                 if x + w > int(source_width):
                     raise serializers.ValidationError(
                         f"Zone '{zone.get('name', '?')}' extends beyond source width "
-                        f"({x + w} > {source_width})."
+                        f"({x + w} > {source_width}).",
                     )
                 if y + h > int(source_height):
                     raise serializers.ValidationError(
                         f"Zone '{zone.get('name', '?')}' extends beyond source height "
-                        f"({y + h} > {source_height})."
+                        f"({y + h} > {source_height}).",
                     )
 
         return zones_data

@@ -33,7 +33,10 @@ export const TRANSFORM_OPTIONS = [
   { id: 'uppercase', name: $localize`Uppercase` },
   { id: 'lowercase', name: $localize`Lowercase` },
   { id: 'numeric', name: $localize`Numeric only` },
-  { id: 'strip_punctuation', name: $localize`Remove leading/trailing punctuation` },
+  {
+    id: 'strip_punctuation',
+    name: $localize`Remove leading/trailing punctuation`,
+  },
   { id: 'date', name: $localize`Parse date` },
   { id: 'qr_code', name: $localize`Read QR/barcode` },
 ]

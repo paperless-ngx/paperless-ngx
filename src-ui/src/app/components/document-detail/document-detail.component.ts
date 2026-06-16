@@ -1,6 +1,5 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
 import { HttpClient, HttpResponse } from '@angular/common/http'
-import { environment } from 'src/environments/environment'
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import {
   FormArray,
@@ -1425,7 +1424,9 @@ export class DocumentDetailComponent
           }
           this.toastService.showInfo(msg)
         } else {
-          this.toastService.showInfo($localize`Zone OCR ran but no results extracted.`)
+          this.toastService.showInfo(
+            $localize`Zone OCR ran but no results extracted.`
+          )
         }
         this.documentsService
           .get(this.documentId)

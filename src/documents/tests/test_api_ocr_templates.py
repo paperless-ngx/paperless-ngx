@@ -80,9 +80,21 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
             - The template and zone are created
         """
         data = self._make_template_data(
-            zones=[self._make_zone_data(name="Invoice Number", x=1500, y=200, width=800, height=100)],
+            zones=[
+                self._make_zone_data(
+                    name="Invoice Number",
+                    x=1500,
+                    y=200,
+                    width=800,
+                    height=100,
+                ),
+            ],
         )
-        resp = self.client.post(self.ENDPOINT, data=json.dumps(data), content_type="application/json")
+        resp = self.client.post(
+            self.ENDPOINT,
+            data=json.dumps(data),
+            content_type="application/json",
+        )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         result = resp.json()
@@ -104,11 +116,22 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         """
         data = self._make_template_data(
             zones=[
-                self._make_zone_data(name="Invoice Number", custom_field=self.custom_field_text.pk),
-                self._make_zone_data(name="Invoice Date", custom_field=self.custom_field_date.pk, order=1),
+                self._make_zone_data(
+                    name="Invoice Number",
+                    custom_field=self.custom_field_text.pk,
+                ),
+                self._make_zone_data(
+                    name="Invoice Date",
+                    custom_field=self.custom_field_date.pk,
+                    order=1,
+                ),
             ],
         )
-        resp = self.client.post(self.ENDPOINT, data=json.dumps(data), content_type="application/json")
+        resp = self.client.post(
+            self.ENDPOINT,
+            data=json.dumps(data),
+            content_type="application/json",
+        )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         self.assertEqual(len(resp.json()["zones"]), 2)
         self.assertEqual(OcrTemplateZone.objects.count(), 2)
@@ -123,7 +146,11 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
             - Template is created with no zones
         """
         data = self._make_template_data()
-        resp = self.client.post(self.ENDPOINT, data=json.dumps(data), content_type="application/json")
+        resp = self.client.post(
+            self.ENDPOINT,
+            data=json.dumps(data),
+            content_type="application/json",
+        )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         self.assertEqual(len(resp.json()["zones"]), 0)
 
@@ -139,26 +166,42 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
             - 400 error is returned
         """
         data = self._make_template_data(source_width=0)
-        resp = self.client.post(self.ENDPOINT, data=json.dumps(data), content_type="application/json")
+        resp = self.client.post(
+            self.ENDPOINT,
+            data=json.dumps(data),
+            content_type="application/json",
+        )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_template_zero_source_height_rejected(self):
         data = self._make_template_data(source_height=0)
-        resp = self.client.post(self.ENDPOINT, data=json.dumps(data), content_type="application/json")
+        resp = self.client.post(
+            self.ENDPOINT,
+            data=json.dumps(data),
+            content_type="application/json",
+        )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_zone_zero_width_rejected(self):
         data = self._make_template_data(
             zones=[self._make_zone_data(width=0)],
         )
-        resp = self.client.post(self.ENDPOINT, data=json.dumps(data), content_type="application/json")
+        resp = self.client.post(
+            self.ENDPOINT,
+            data=json.dumps(data),
+            content_type="application/json",
+        )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_zone_zero_height_rejected(self):
         data = self._make_template_data(
             zones=[self._make_zone_data(height=0)],
         )
-        resp = self.client.post(self.ENDPOINT, data=json.dumps(data), content_type="application/json")
+        resp = self.client.post(
+            self.ENDPOINT,
+            data=json.dumps(data),
+            content_type="application/json",
+        )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_zone_exceeds_source_width_rejected(self):
@@ -167,7 +210,11 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
             source_width=1000,
             zones=[self._make_zone_data(x=800, width=300)],  # 800+300 > 1000
         )
-        resp = self.client.post(self.ENDPOINT, data=json.dumps(data), content_type="application/json")
+        resp = self.client.post(
+            self.ENDPOINT,
+            data=json.dumps(data),
+            content_type="application/json",
+        )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_zone_exceeds_source_height_rejected(self):
@@ -175,7 +222,11 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
             source_height=1000,
             zones=[self._make_zone_data(y=900, height=200)],  # 900+200 > 1000
         )
-        resp = self.client.post(self.ENDPOINT, data=json.dumps(data), content_type="application/json")
+        resp = self.client.post(
+            self.ENDPOINT,
+            data=json.dumps(data),
+            content_type="application/json",
+        )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_zone_unsupported_custom_field_type_rejected(self):
@@ -183,7 +234,11 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         data = self._make_template_data(
             zones=[self._make_zone_data(custom_field=self.custom_field_doclink.pk)],
         )
-        resp = self.client.post(self.ENDPOINT, data=json.dumps(data), content_type="application/json")
+        resp = self.client.post(
+            self.ENDPOINT,
+            data=json.dumps(data),
+            content_type="application/json",
+        )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     # --- List ---
@@ -199,7 +254,10 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
             template=template,
             name="Zone 1",
             custom_field=self.custom_field_text,
-            x=100, y=100, width=200, height=50,
+            x=100,
+            y=100,
+            width=200,
+            height=50,
         )
 
         resp = self.client.get(self.ENDPOINT)
@@ -227,12 +285,20 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
             template=template,
             name="Old Zone",
             custom_field=self.custom_field_text,
-            x=0, y=0, width=100, height=100,
+            x=0,
+            y=0,
+            width=100,
+            height=100,
         )
 
         data = self._make_template_data(
             name="New Name",
-            zones=[self._make_zone_data(name="New Zone", custom_field=self.custom_field_date.pk)],
+            zones=[
+                self._make_zone_data(
+                    name="New Zone",
+                    custom_field=self.custom_field_date.pk,
+                ),
+            ],
         )
         resp = self.client.put(
             f"{self.ENDPOINT}{template.pk}/",
@@ -259,7 +325,10 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
             template=template,
             name="Zone",
             custom_field=self.custom_field_text,
-            x=0, y=0, width=100, height=100,
+            x=0,
+            y=0,
+            width=100,
+            height=100,
         )
 
         resp = self.client.delete(f"{self.ENDPOINT}{template.pk}/")
@@ -303,7 +372,10 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
             template=template,
             name="Existing Zone",
             custom_field=self.custom_field_text,
-            x=0, y=0, width=100, height=100,
+            x=0,
+            y=0,
+            width=100,
+            height=100,
         )
 
         resp = self.client.patch(
@@ -319,7 +391,10 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
     def test_unauthenticated_rejected(self):
         self.client.logout()
         resp = self.client.get(self.ENDPOINT)
-        self.assertIn(resp.status_code, (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN))
+        self.assertIn(
+            resp.status_code,
+            (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN),
+        )
 
     # --- Quick create field ---
 

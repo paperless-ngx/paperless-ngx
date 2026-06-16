@@ -1368,7 +1368,7 @@ def capture_old_document_type(sender, instance, **kwargs):
         instance._old_document_type_id = None
 
 
-def run_zone_ocr_on_type_change(sender, instance, created=False, **kwargs):
+def run_zone_ocr_on_type_change(sender, instance, *, created=False, **kwargs):
     """
     Run zone OCR only when a document's TYPE actually changes (and the new type
     has an enabled template). NOT on every save — zone OCR overwrites fields, so
@@ -1387,7 +1387,8 @@ def run_zone_ocr_on_type_change(sender, instance, created=False, **kwargs):
     from documents.models import OcrTemplate
 
     if not OcrTemplate.objects.filter(
-        document_type_id=instance.document_type_id, enabled=True,
+        document_type_id=instance.document_type_id,
+        enabled=True,
     ).exists():
         return
 

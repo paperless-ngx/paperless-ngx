@@ -1,7 +1,6 @@
 """Tests for the zone-based OCR extraction engine."""
 
 import tempfile
-from datetime import date
 from pathlib import Path
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -87,7 +86,8 @@ class TestConvertValue(TestCase):
 
     def test_string(self):
         self.assertEqual(
-            _convert_value("Hello", CustomField.FieldDataType.STRING), "Hello",
+            _convert_value("Hello", CustomField.FieldDataType.STRING),
+            "Hello",
         )
 
     def test_string_truncation(self):
@@ -103,7 +103,8 @@ class TestConvertValue(TestCase):
     def test_long_text(self):
         long = "x" * 500
         self.assertEqual(
-            _convert_value(long, CustomField.FieldDataType.LONG_TEXT), long,
+            _convert_value(long, CustomField.FieldDataType.LONG_TEXT),
+            long,
         )
 
     def test_int_simple(self):
@@ -123,22 +124,26 @@ class TestConvertValue(TestCase):
 
     def test_float_simple(self):
         self.assertAlmostEqual(
-            _convert_value("1234.56", CustomField.FieldDataType.FLOAT), 1234.56,
+            _convert_value("1234.56", CustomField.FieldDataType.FLOAT),
+            1234.56,
         )
 
     def test_float_european_format(self):
         self.assertAlmostEqual(
-            _convert_value("1.234,56", CustomField.FieldDataType.FLOAT), 1234.56,
+            _convert_value("1.234,56", CustomField.FieldDataType.FLOAT),
+            1234.56,
         )
 
     def test_float_us_format(self):
         self.assertAlmostEqual(
-            _convert_value("1,234.56", CustomField.FieldDataType.FLOAT), 1234.56,
+            _convert_value("1,234.56", CustomField.FieldDataType.FLOAT),
+            1234.56,
         )
 
     def test_float_comma_only(self):
         self.assertAlmostEqual(
-            _convert_value("1234,56", CustomField.FieldDataType.FLOAT), 1234.56,
+            _convert_value("1234,56", CustomField.FieldDataType.FLOAT),
+            1234.56,
         )
 
     def test_float_empty_returns_none(self):
@@ -149,7 +154,8 @@ class TestConvertValue(TestCase):
 
     def test_date_iso(self):
         self.assertEqual(
-            _convert_value("2026-04-13", CustomField.FieldDataType.DATE), "2026-04-13",
+            _convert_value("2026-04-13", CustomField.FieldDataType.DATE),
+            "2026-04-13",
         )
 
     def test_date_invalid_returns_none(self):
@@ -160,17 +166,20 @@ class TestConvertValue(TestCase):
 
     def test_monetary_simple(self):
         self.assertEqual(
-            _convert_value("123.45", CustomField.FieldDataType.MONETARY), "123.45",
+            _convert_value("123.45", CustomField.FieldDataType.MONETARY),
+            "123.45",
         )
 
     def test_monetary_european(self):
         self.assertEqual(
-            _convert_value("1.234,56", CustomField.FieldDataType.MONETARY), "1234.56",
+            _convert_value("1.234,56", CustomField.FieldDataType.MONETARY),
+            "1234.56",
         )
 
     def test_monetary_with_currency_symbol(self):
         self.assertEqual(
-            _convert_value("€1,234.56", CustomField.FieldDataType.MONETARY), "1234.56",
+            _convert_value("€1,234.56", CustomField.FieldDataType.MONETARY),
+            "1234.56",
         )
 
     def test_monetary_empty_returns_none(self):
@@ -195,10 +204,10 @@ class TestConvertValue(TestCase):
 
     def test_unsupported_type_returns_none(self):
         self.assertIsNone(
-            _convert_value("test", CustomField.FieldDataType.DOCUMENTLINK)
+            _convert_value("test", CustomField.FieldDataType.DOCUMENTLINK),
         )
         self.assertIsNone(
-            _convert_value("test", CustomField.FieldDataType.SELECT)
+            _convert_value("test", CustomField.FieldDataType.SELECT),
         )
 
     def test_empty_string_returns_none(self):
@@ -293,7 +302,10 @@ class TestRunZoneExtraction(TestCase):
             template=template,
             name="Zone",
             custom_field=self.custom_field,
-            x=0, y=0, width=100, height=50,
+            x=0,
+            y=0,
+            width=100,
+            height=50,
         )
 
         doc = Document.objects.create(
@@ -340,7 +352,10 @@ class TestRunZoneExtraction(TestCase):
             template=template,
             name="Zone",
             custom_field=self.custom_field,
-            x=0, y=0, width=100, height=50,
+            x=0,
+            y=0,
+            width=100,
+            height=50,
         )
 
         doc = Document.objects.create(
@@ -373,7 +388,10 @@ class TestRunZoneExtraction(TestCase):
             template=template,
             name="Zone",
             custom_field=self.custom_field,
-            x=0, y=0, width=100, height=50,
+            x=0,
+            y=0,
+            width=100,
+            height=50,
         )
 
         doc = Document.objects.create(
@@ -415,7 +433,10 @@ class TestRunZoneExtraction(TestCase):
                 template=template,
                 name=f"Zone {i}",
                 custom_field=self.custom_field,
-                x=0, y=0, width=100, height=50,
+                x=0,
+                y=0,
+                width=100,
+                height=50,
             )
 
         doc = Document.objects.create(

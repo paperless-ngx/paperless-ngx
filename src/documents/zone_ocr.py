@@ -19,6 +19,7 @@ from datetime import datetime
 from pathlib import Path
 
 from django.conf import settings
+from PIL import Image
 
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -131,7 +132,10 @@ def _process_template(
         tmp_path = Path(tmp_dir)
 
         page_images = _render_pages(
-            doc_path, pages_needed, tmp_path, document.page_count,
+            doc_path,
+            pages_needed,
+            tmp_path,
+            document.page_count,
         )
 
         # Pass 1: OCR every zone into a value (or None if it failed/was rejected).
@@ -158,15 +162,18 @@ def _process_template(
                 tmp_path,
             )
 
-            if extracted is not None and zone.validation_regex:
-                if not re.fullmatch(zone.validation_regex, extracted):
-                    logger.info(
-                        "Zone OCR: '%s' value %r rejected by regex '%s'",
-                        zone.name,
-                        extracted[:100],
-                        zone.validation_regex,
-                    )
-                    extracted = None
+            if (
+                extracted is not None
+                and zone.validation_regex
+                and not re.fullmatch(zone.validation_regex, extracted)
+            ):
+                logger.info(
+                    "Zone OCR: '%s' value %r rejected by regex '%s'",
+                    zone.name,
+                    extracted[:100],
+                    zone.validation_regex,
+                )
+                extracted = None
 
             zone_values[id(zone)] = extracted
 
@@ -222,7 +229,7 @@ def _combine_field_value(
         parts = [zone_values.get(id(z)) or "" for z in field_zones]
         return " ".join(p for p in parts if p).strip()
 
-    def _replace(match: "re.Match") -> str:
+    def _replace(match: re.Match) -> str:
         return values.get(match.group(1).strip(), "")
 
     combined = re.sub(r"\{([^{}]+)\}", _replace, fmt)
@@ -259,9 +266,12 @@ def _render_pages(
                 [
                     "pdftoppm",
                     "-png",
-                    "-r", "300",
-                    "-f", str(actual_page + 1),  # pdftoppm is 1-indexed
-                    "-l", str(actual_page + 1),
+                    "-r",
+                    "300",
+                    "-f",
+                    str(actual_page + 1),  # pdftoppm is 1-indexed
+                    "-l",
+                    str(actual_page + 1),
                     str(doc_path),
                     str(output_prefix),
                 ],
@@ -297,10 +307,8 @@ def _crop_zone(
     source_width: int,
     source_height: int,
     tmp_dir: Path,
-) -> "Image.Image | None":
+) -> Image.Image | None:
     """Crop a zone from the page image and return the PIL Image."""
-    from PIL import Image
-
     try:
         with Image.open(page_img) as img:
             img_width, img_height = img.size
@@ -329,7 +337,7 @@ def _crop_zone(
         return None
 
 
-def _read_barcode(cropped: "Image.Image", zone_name: str) -> str | None:
+def _read_barcode(cropped: Image.Image, zone_name: str) -> str | None:
     """Read QR/barcode from a cropped image using zxingcpp."""
     try:
         import zxingcpp
@@ -337,7 +345,11 @@ def _read_barcode(cropped: "Image.Image", zone_name: str) -> str | None:
         results = zxingcpp.read_barcodes(cropped)
         if results:
             text = results[0].text
-            logger.debug("Zone OCR: barcode found in zone '%s': %s", zone_name, text[:100])
+            logger.debug(
+                "Zone OCR: barcode found in zone '%s': %s",
+                zone_name,
+                text[:100],
+            )
             return text
         logger.debug("Zone OCR: no barcode found in zone '%s'", zone_name)
         return None
@@ -349,7 +361,7 @@ def _read_barcode(cropped: "Image.Image", zone_name: str) -> str | None:
         return None
 
 
-def _ocr_text(cropped: "Image.Image", zone: OcrTemplateZone, tmp_dir: Path) -> str | None:
+def _ocr_text(cropped: Image.Image, zone: OcrTemplateZone, tmp_dir: Path) -> str | None:
     """OCR a cropped image with Tesseract."""
     crop_path = tmp_dir / f"zone_{zone.pk}.png"
     cropped.save(crop_path)
@@ -360,8 +372,10 @@ def _ocr_text(cropped: "Image.Image", zone: OcrTemplateZone, tmp_dir: Path) -> s
                 "tesseract",
                 str(crop_path),
                 "stdout",
-                "-l", zone.ocr_language,
-                "--psm", "6",  # Assume uniform block of text
+                "-l",
+                zone.ocr_language,
+                "--psm",
+                "6",  # Assume uniform block of text
             ],
             capture_output=True,
             text=True,
@@ -401,13 +415,21 @@ def _extract_zone(
         text = _read_barcode(cropped, zone.name)
         if not text:
             return None
-        return _apply_transform(text, zone.transform, getattr(zone, "date_format", "") or "")
+        return _apply_transform(
+            text,
+            zone.transform,
+            getattr(zone, "date_format", "") or "",
+        )
 
     text = _ocr_text(cropped, zone, tmp_dir)
     if not text:
         return None
 
-    return _apply_transform(text, zone.transform, getattr(zone, "date_format", "") or "")
+    return _apply_transform(
+        text,
+        zone.transform,
+        getattr(zone, "date_format", "") or "",
+    )
 
 
 def extract_zone_preview(
@@ -434,8 +456,6 @@ def extract_zone_preview(
             return {"raw_text": None, "value": None}
 
         if not source_width or not source_height:
-            from PIL import Image
-
             with Image.open(page_images[page_idx]) as im:
                 source_width, source_height = im.size
 
@@ -580,7 +600,9 @@ def _write_zone_value(
         digits = re.sub(r"[^\d]", "", value)
         if not digits:
             logger.debug(
-                "Zone OCR: ASN zone '%s' produced no digits (%r)", zone.name, value[:50],
+                "Zone OCR: ASN zone '%s' produced no digits (%r)",
+                zone.name,
+                value[:50],
             )
             return
         document.archive_serial_number = int(digits)

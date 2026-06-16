@@ -2050,15 +2050,19 @@ class OcrTemplateZone(models.Model):
         _("zone source width"),
         null=True,
         blank=True,
-        help_text=_("Width of the page image this zone was drawn on (px). "
-                     "Falls back to template source_width if unset."),
+        help_text=_(
+            "Width of the page image this zone was drawn on (px). "
+            "Falls back to template source_width if unset.",
+        ),
     )
     zone_source_height = models.PositiveIntegerField(
         _("zone source height"),
         null=True,
         blank=True,
-        help_text=_("Height of the page image this zone was drawn on (px). "
-                     "Falls back to template source_height if unset."),
+        help_text=_(
+            "Height of the page image this zone was drawn on (px). "
+            "Falls back to template source_height if unset.",
+        ),
     )
 
     ocr_language = models.CharField(
@@ -2104,7 +2108,9 @@ class OcrTemplateZone(models.Model):
         max_length=256,
         blank=True,
         default="",
-        help_text=_("Optional regex pattern — extracted text is only accepted if it matches"),
+        help_text=_(
+            "Optional regex pattern — extracted text is only accepted if it matches",
+        ),
     )
 
     order = models.PositiveIntegerField(_("order"), default=0)

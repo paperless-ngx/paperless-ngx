@@ -35,7 +35,10 @@ export class OcrTemplateService extends AbstractPaperlessService<OcrTemplate> {
     )
   }
 
-  quickCreateField(name: string, dataType: string): Observable<QuickCreateFieldResult> {
+  quickCreateField(
+    name: string,
+    dataType: string
+  ): Observable<QuickCreateFieldResult> {
     return this.http.post<QuickCreateFieldResult>(
       `${this.baseUrl}${this.resourceName}/quick-create-field/`,
       { name, data_type: dataType }
