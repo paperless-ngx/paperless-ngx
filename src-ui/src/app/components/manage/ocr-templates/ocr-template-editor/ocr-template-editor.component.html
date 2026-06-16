@@ -286,14 +286,20 @@
     <!-- Right column: Document preview with zone overlay -->
     <div class="col-md-8">
       @if (pageImageUrl) {
-        <div class="d-flex align-items-center gap-2 mb-2">
+        <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
           <button class="btn btn-sm btn-outline-secondary" (click)="prevPage()" [disabled]="previewPage <= 0" i18n>Previous</button>
           <span class="small">
             <ng-container i18n>Page</ng-container> {{ previewPage + 1 }}@if (previewPageCount) { / {{ previewPageCount }} }
           </span>
           <button class="btn btn-sm btn-outline-secondary" (click)="nextPage()" [disabled]="previewPageCount && previewPage >= previewPageCount - 1" i18n>Next</button>
+          <div class="vr mx-1"></div>
+          <button class="btn btn-sm btn-outline-secondary" (click)="zoomOut()" [disabled]="zoom <= 0.5" title="Zoom out" i18n-title>&minus;</button>
+          <span class="small" style="min-width: 3em; text-align: center;">{{ zoom * 100 | number: '1.0-0' }}%</span>
+          <button class="btn btn-sm btn-outline-secondary" (click)="zoomIn()" [disabled]="zoom >= 4" title="Zoom in" i18n-title>+</button>
+          <button class="btn btn-sm btn-outline-secondary" (click)="resetZoom()" i18n>Reset</button>
         </div>
-        <div class="position-relative" style="display: inline-block; width: 100%;">
+        <div class="border rounded" style="overflow: auto; max-height: 78vh;">
+        <div class="position-relative" style="display: inline-block;" [style.width.%]="zoom * 100">
           <img
             #pageImage
             [src]="pageImageUrl"
@@ -319,6 +325,7 @@
               </div>
             </div>
           }
+        </div>
         </div>
       } @else {
         <div class="border rounded p-5 text-center text-muted">

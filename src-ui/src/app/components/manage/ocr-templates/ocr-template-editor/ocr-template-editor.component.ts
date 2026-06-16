@@ -87,6 +87,7 @@ export class OcrTemplateEditorComponent
   private pageCountForDoc: number | null = null
   pageImageUrl: string | null = null
   imageLoaded = false
+  zoom = 1
 
   // Tabs: 'settings' | 'zones' | 'zone'
   activeTab: string = 'settings'
@@ -216,6 +217,27 @@ export class OcrTemplateEditorComponent
 
   nextPage() {
     this.goToPage(this.previewPage + 1)
+  }
+
+  zoomIn() {
+    this.zoom = Math.min(4, Math.round((this.zoom + 0.25) * 100) / 100)
+    this.afterZoom()
+  }
+
+  zoomOut() {
+    this.zoom = Math.max(0.5, Math.round((this.zoom - 0.25) * 100) / 100)
+    this.afterZoom()
+  }
+
+  resetZoom() {
+    this.zoom = 1
+    this.afterZoom()
+  }
+
+  private afterZoom() {
+    // Let the image/wrapper reflow to the new width, then resize+redraw the
+    // overlay canvas to match.
+    setTimeout(() => this.redrawCanvas())
   }
 
   /** The page a zone belongs to (falls back to the template default). */
