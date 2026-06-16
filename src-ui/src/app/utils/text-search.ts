@@ -8,5 +8,8 @@ export function matchesSearchText(
   value: unknown,
   searchText: unknown
 ): boolean {
-  return normalizeSearchText(value).includes(normalizeSearchText(searchText))
+  const normalizedValue = normalizeSearchText(value)
+  const searchTerms = normalizeSearchText(searchText).trim().split(/\s+/)
+
+  return searchTerms.every((term) => normalizedValue.includes(term))
 }
