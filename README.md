@@ -17,6 +17,16 @@
 
 # Paperless-ngx
 
+<!-- Keep these links, translations synced daily. -->
+[Deutsch](https://zdoc.app/de/paperless-ngx/paperless-ngx) |
+[Español](https://zdoc.app/es/paperless-ngx/paperless-ngx) |
+[français](https://zdoc.app/fr/paperless-ngx/paperless-ngx) |
+[日本語](https://zdoc.app/ja/paperless-ngx/paperless-ngx) |
+[한국어](https://zdoc.app/ko/paperless-ngx/paperless-ngx) |
+[Português](https://zdoc.app/pt/paperless-ngx/paperless-ngx) |
+[Русский](https://zdoc.app/ru/paperless-ngx/paperless-ngx) |
+[中文](https://zdoc.app/zh/paperless-ngx/paperless-ngx)
+
 Paperless-ngx is a document management system that transforms your physical documents into a searchable online archive so you can keep, well, _less paper_.
 
 Paperless-ngx is the official successor to the original [Paperless](https://github.com/the-paperless-project/paperless) & [Paperless-ng](https://github.com/jonaswinkler/paperless-ng) projects and is designed to distribute the responsibility of advancing and supporting the project among a team of people. [Consider joining us!](#community-support)
