@@ -112,6 +112,15 @@ describe('SelectComponent', () => {
     expect(createNewVal).toEqual('baz')
   })
 
+  it('should search items by independent normalized terms', () => {
+    expect(
+      component.searchFn('tax 26', { id: 11, name: 'Tax\u00e9s 2026' })
+    ).toBeTruthy()
+    expect(
+      component.searchFn('tax receipt', { id: 11, name: 'Tax\u00e9s 2026' })
+    ).toBeFalsy()
+  })
+
   it('should clear search term on blur after delay', fakeAsync(() => {
     const clearSpy = jest.spyOn(component, 'clearLastSearchTerm')
     component.onBlur()
