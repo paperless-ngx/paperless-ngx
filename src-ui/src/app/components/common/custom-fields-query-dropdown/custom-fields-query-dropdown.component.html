@@ -63,6 +63,7 @@
       [(ngModel)]="atom.value"
       [disabled]="disabled"
       [virtualScroll]="getSelectOptionsForField(atom.field)?.length > 100"
+      [searchFn]="selectOptionSearchFn"
       (mousedown)="$event.stopImmediatePropagation()"
     ></ng-select>
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.DocumentLink) {
@@ -81,6 +82,7 @@
       [disabled]="disabled"
       bindLabel="name"
       bindValue="id"
+      [searchFn]="customFieldSearchFn"
       (mousedown)="$event.stopImmediatePropagation()"
     ></ng-select>
     <select class="w-25 form-select" [(ngModel)]="atom.operator" [disabled]="disabled">
@@ -125,6 +127,7 @@
           [(ngModel)]="atom.value"
           [disabled]="disabled"
           [multiple]="true"
+          [searchFn]="selectOptionSearchFn"
           (mousedown)="$event.stopImmediatePropagation()"
         ></ng-select>
       }
