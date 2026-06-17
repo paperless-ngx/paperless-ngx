@@ -443,6 +443,18 @@ def truncate_content(
     return " ".join(truncated_chunks)
 
 
+def truncate_embedding_query(content: str, *, chunk_size: int) -> str:
+    from llama_index.core.text_splitter import TokenTextSplitter
+
+    splitter = TokenTextSplitter(
+        separator=" ",
+        chunk_size=chunk_size,
+        chunk_overlap=0,
+    )
+    content_chunks = splitter.split_text(content)
+    return content_chunks[0] if content_chunks else ""
+
+
 def normalize_document_ids(document_ids: Iterable[int | str] | None) -> set[str] | None:
     if document_ids is None:
         return None
@@ -476,10 +488,9 @@ def query_similar_documents(
         else None
     )
 
-    query_text = truncate_content(
+    query_text = truncate_embedding_query(
         (document.title or "") + "\n" + (document.content or ""),
         chunk_size=config.llm_embedding_chunk_size,
-        context_size=config.llm_context_size,
     )
     # Hold the shared read lock for the whole retrieval so the connection is
     # never open across a compaction swap. The retrieve() call generates a
