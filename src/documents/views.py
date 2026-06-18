@@ -241,7 +241,7 @@ from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
 from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.chat import stream_chat_with_documents
-from paperless_ai.client import LLMTimeoutError
+from paperless_ai.exceptions import LLMTimeoutError
 from paperless_ai.matching import extract_unmatched_names
 from paperless_ai.matching import match_correspondents_by_name
 from paperless_ai.matching import match_document_types_by_name
@@ -1511,7 +1511,7 @@ class DocumentViewSet(
                 exc_info=True,
             )
             raise ValidationError({"ai": [_("Invalid AI configuration.")]}) from exc
-        except (httpx.TimeoutException, LLMTimeoutError) as exc:
+        except LLMTimeoutError as exc:
             logger.exception(
                 "AI backend timed out while generating suggestions for document %s: %s",
                 doc.pk,

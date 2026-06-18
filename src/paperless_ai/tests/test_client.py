@@ -6,12 +6,11 @@ from unittest.mock import patch
 import httpx
 import openai
 import pytest
-from llama_index.core.llms import ChatMessage
 from llama_index.core.llms.llm import ToolSelection
 
 from paperless_ai.client import LLM_SYSTEM_PROMPT
 from paperless_ai.client import AIClient
-from paperless_ai.client import LLMTimeoutError
+from paperless_ai.exceptions import LLMTimeoutError
 
 
 @pytest.fixture
@@ -176,17 +175,18 @@ def test_run_llm_query_openai_timeout_raises_local_error(
         client.run_llm_query("test_prompt")
 
 
-def test_run_chat(mock_ai_config, mock_ollama_llm):
+def test_run_llm_query_httpx_timeout_raises_local_error(
+    mock_ai_config,
+    mock_ollama_llm,
+):
     mock_ai_config.llm_backend = "ollama"
     mock_ai_config.llm_model = "test_model"
     mock_ai_config.llm_endpoint = "http://test-url"
 
     mock_llm_instance = mock_ollama_llm.return_value
-    mock_llm_instance.chat.return_value = "test_chat_result"
+    mock_llm_instance.chat.side_effect = httpx.ReadTimeout("timed out")
 
     client = AIClient()
-    messages = [ChatMessage(role="user", content="Hello")]
-    result = client.run_chat(messages)
 
-    mock_llm_instance.chat.assert_called_once_with(messages)
-    assert result == "test_chat_result"
+    with pytest.raises(LLMTimeoutError):
+        client.run_llm_query("test_prompt")
