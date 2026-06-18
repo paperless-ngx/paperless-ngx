@@ -32,15 +32,18 @@ def get_embedding_model(config: AIConfig) -> "BaseEmbedding":
                 http_client = create_pinned_httpx_client(
                     endpoint,
                     allow_internal=config.llm_allow_internal_endpoints,
+                    timeout=config.llm_request_timeout,
                 )
                 async_http_client = create_pinned_async_httpx_client(
                     endpoint,
                     allow_internal=config.llm_allow_internal_endpoints,
+                    timeout=config.llm_request_timeout,
                 )
             return OpenAILikeEmbedding(
                 model_name=config.llm_embedding_model or "text-embedding-3-small",
                 api_key=config.llm_api_key,
                 api_base=endpoint,
+                timeout=config.llm_request_timeout,
                 http_client=http_client,
                 async_http_client=async_http_client,
             )
@@ -73,12 +76,14 @@ def get_embedding_model(config: AIConfig) -> "BaseEmbedding":
             )
             embedding._client = Client(
                 host=endpoint,
+                timeout=config.llm_request_timeout,
                 transport=PinnedHostHTTPTransport(
                     allow_internal=config.llm_allow_internal_endpoints,
                 ),
             )
             embedding._async_client = AsyncClient(
                 host=endpoint,
+                timeout=config.llm_request_timeout,
                 transport=PinnedHostAsyncHTTPTransport(
                     allow_internal=config.llm_allow_internal_endpoints,
                 ),

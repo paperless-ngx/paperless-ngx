@@ -82,6 +82,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 "llm_api_key": None,
                 "llm_endpoint": None,
                 "llm_output_language": None,
+                "llm_request_timeout": None,
             },
         )
 
