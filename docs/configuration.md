@@ -485,7 +485,7 @@ not include a trailing slash. E.g. [`https://paperless.domain.com`](https://pape
         Example:
         
         `PAPERLESS_CSRF_TRUSTED_ORIGINS=https://domain1.com,https://domain2.com`
-        `PAPERLESS_ALLOWED_HOSTS=domain1.com,domain2.com`        
+        `PAPERLESS_ALLOWED_HOSTS=domain1.com,domain2.com`
 
 #### [`PAPERLESS_CSRF_TRUSTED_ORIGINS=<comma-separated-list>`](#PAPERLESS_CSRF_TRUSTED_ORIGINS) {#PAPERLESS_CSRF_TRUSTED_ORIGINS}
 
