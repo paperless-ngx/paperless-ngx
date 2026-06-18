@@ -168,10 +168,9 @@ about your documents. It operates over a single document or across multiple docu
 depending on the current view, and its answers include links to the source documents it
 drew from.
 
-### Security notes
+### AI Security notes
 
-- Document content is passed to the LLM as **untrusted data**; prompts instruct the model
-  not to follow instructions embedded in your documents, but treat LLM output accordingly.
+- Document content is passed to the LLM as **untrusted data**.
 - By default Paperless-ngx allows AI endpoints that resolve to private/loopback addresses
   (for local backends). Set
   [`PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS`](configuration.md#PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS)
