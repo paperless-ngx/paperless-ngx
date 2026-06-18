@@ -222,7 +222,9 @@ class AIConfig(BaseConfig):
             app_config.llm_embedding_chunk_size or settings.LLM_EMBEDDING_CHUNK_SIZE
         )
         self.llm_context_size = app_config.llm_context_size or settings.LLM_CONTEXT_SIZE
-        self.llm_request_timeout = settings.LLM_REQUEST_TIMEOUT
+        self.llm_request_timeout = (
+            app_config.llm_request_timeout or settings.LLM_REQUEST_TIMEOUT
+        )
         self.llm_backend = app_config.llm_backend or settings.LLM_BACKEND
         self.llm_model = app_config.llm_model or settings.LLM_MODEL
         self.llm_api_key = app_config.llm_api_key or settings.LLM_API_KEY
