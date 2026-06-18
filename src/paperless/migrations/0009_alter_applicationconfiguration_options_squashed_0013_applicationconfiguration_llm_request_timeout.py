@@ -11,6 +11,7 @@ class Migration(migrations.Migration):
         ("paperless", "0010_alter_applicationconfiguration_llm_embedding_backend"),
         ("paperless", "0011_applicationconfiguration_llm_embedding_chunk_size"),
         ("paperless", "0012_applicationconfiguration_llm_output_language"),
+        ("paperless", "0013_applicationconfiguration_llm_request_timeout"),
     ]
 
     dependencies = [
@@ -79,6 +80,15 @@ class Migration(migrations.Migration):
                 max_length=32,
                 null=True,
                 verbose_name="Sets the LLM output language",
+            ),
+        ),
+        migrations.AddField(
+            model_name="applicationconfiguration",
+            name="llm_request_timeout",
+            field=models.PositiveSmallIntegerField(
+                null=True,
+                validators=[django.core.validators.MinValueValidator(1)],
+                verbose_name="Sets the LLM request timeout in seconds",
             ),
         ),
     ]
