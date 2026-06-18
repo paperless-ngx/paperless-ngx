@@ -463,17 +463,29 @@ sensitive data. Paperless will refuse to start if this is not set.
 
 #### [`PAPERLESS_URL=<url>`](#PAPERLESS_URL) {#PAPERLESS_URL}
 
-: This setting can be used to set the three options below
+: This setting can be used to set all three options below
 (ALLOWED_HOSTS, CORS_ALLOWED_HOSTS and CSRF_TRUSTED_ORIGINS). If the
-other options are set the values will be combined with this one. Do
-not include a trailing slash. E.g. <https://paperless.domain.com>
+other options are set, the values will be combined with this one. Do
+not include a trailing slash. E.g. [`https://paperless.domain.com`](https://paperless.domain.com).
 
     Defaults to empty string, leaving the other settings unaffected.
+
+    Do not use quotes or spaces.
 
     !!! note
 
         This value cannot contain a path (e.g. domain.com/path), even if
         you are installing paperless-ngx at a subpath.
+
+        If you need to reach paperless under multiple domains, leave this variable empty / do not use it, but use both [`PAPERLESS_CSRF_TRUSTED_ORIGINS=<comma-separated-list>`](#PAPERLESS_CSRF_TRUSTED_ORIGINS) and [`PAPERLESS_ALLOWED_HOSTS=<comma-separated-list>`](#PAPERLESS_ALLOWED_HOSTS) as follows:
+        
+        `PAPERLESS_CSRF_TRUSTED_ORIGINS=[URL domain 1],[URL domain 2],...`
+        `PAPERLESS_ALLOWED_HOSTS=[domain 1],[domain 2],...`
+        
+        Example:
+        
+        `PAPERLESS_CSRF_TRUSTED_ORIGINS=https://domain1.com,https://domain2.com`
+        `PAPERLESS_ALLOWED_HOSTS=domain1.com,domain2.com`        
 
 #### [`PAPERLESS_CSRF_TRUSTED_ORIGINS=<comma-separated-list>`](#PAPERLESS_CSRF_TRUSTED_ORIGINS) {#PAPERLESS_CSRF_TRUSTED_ORIGINS}
 
@@ -481,6 +493,8 @@ not include a trailing slash. E.g. <https://paperless.domain.com>
 Django 4.0 this is required to access the Django admin via the web.
 See the [Django project documentation on the settings](https://docs.djangoproject.com/en/4.1/ref/settings/#csrf-trusted-origins)
 
+    Do not use quotes or spaces.
+    
     Can also be set using PAPERLESS_URL (see above).
 
     Defaults to empty string, which does not add any origins to the
@@ -494,12 +508,12 @@ Failing to do so leaves you open to HTTP host header attacks.
 You can read more about this in [the Django project's documentation](https://docs.djangoproject.com/en/4.1/topics/security/#host-header-validation)
 
     Just remember that this is a comma-separated list, so
-    "example.com" is fine, as is "example.com,www.example.com", but
-    NOT " example.com" or "example.com,"
+    `example.com` is fine, as is `example.com,www.example.com`, but
+    NOT `example.com,`. Do not use quotes or spaces.
 
     Can also be set using PAPERLESS_URL (see above).
 
-    "localhost" is always allowed for docker healthcheck
+    `localhost` is always allowed for docker healthcheck.
 
     Defaults to "\*", which is all hosts.
 
@@ -508,9 +522,11 @@ You can read more about this in [the Django project's documentation](https://doc
 : You need to add your servers to the list of allowed hosts that can
 do CORS calls. Set this to your public domain name.
 
+    Do not use quotes or spaces.
+    
     Can also be set using PAPERLESS_URL (see above).
 
-    Defaults to "<http://localhost:8000>".
+    Defaults to `http://localhost:8000`.
 
 #### [`PAPERLESS_TRUSTED_PROXIES=<comma-separated-list>`](#PAPERLESS_TRUSTED_PROXIES) {#PAPERLESS_TRUSTED_PROXIES}
 
