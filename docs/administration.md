@@ -695,13 +695,3 @@ If you need to create a superuser, use the following command:
 ```shell
 createsuperuser
 ```
-
-Alternatively, the `manage_superuser` command creates an `admin` superuser from
-environment variables — `PAPERLESS_ADMIN_USER` (default `admin`), `PAPERLESS_ADMIN_MAIL`
-(default `root@localhost`) and `PAPERLESS_ADMIN_PASSWORD`. This is what the Docker image
-uses to auto-provision an admin on first start. It does nothing if the user already exists,
-if any superuser already exists, or if `PAPERLESS_ADMIN_PASSWORD` is unset.
-
-```shell
-manage_superuser
-```
