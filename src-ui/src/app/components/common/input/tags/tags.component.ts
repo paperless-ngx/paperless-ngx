@@ -21,6 +21,7 @@ import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first, firstValueFrom, tap } from 'rxjs'
 import { Tag } from 'src/app/data/tag'
 import { TagService } from 'src/app/services/rest/tag.service'
+import { matchesSearchText } from 'src/app/utils/text-search'
 import { EditDialogMode } from '../../edit-dialog/edit-dialog.component'
 import { TagEditDialogComponent } from '../../edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { TagComponent } from '../../tag/tag.component'
@@ -113,6 +114,14 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   tags: Tag[] = []
 
   public createTagRef: (name) => void
+
+  public searchFn = (term: string, tag: Tag): boolean =>
+    matchesSearchText(
+      [this.getParentChain(tag?.id).map((parent) => parent.name), tag?.name]
+        .flat()
+        .join(' '),
+      term
+    )
 
   getTag(id: number) {
     if (this.tags) {

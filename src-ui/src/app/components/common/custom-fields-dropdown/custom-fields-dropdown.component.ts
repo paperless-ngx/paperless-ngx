@@ -23,6 +23,7 @@ import {
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { pngxPopperOptions } from 'src/app/utils/popper-options'
+import { matchesSearchText } from 'src/app/utils/text-search'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 
@@ -69,9 +70,7 @@ export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissio
 
   public get filteredFields(): CustomField[] {
     return this.unusedFields.filter(
-      (f) =>
-        !this.filterText ||
-        f.name.toLowerCase().includes(this.filterText.toLowerCase())
+      (f) => !this.filterText || matchesSearchText(f.name, this.filterText)
     )
   }
 

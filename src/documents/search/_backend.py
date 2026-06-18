@@ -866,8 +866,24 @@ class TantivyBackend:
         final_query = self._apply_permission_filter(mlt_query, user)
 
         effective_limit = limit if limit is not None else searcher.num_docs
-        # Fetch one extra to account for excluding the original document
-        results = searcher.search(final_query, limit=effective_limit + 1)
+        try:
+            # Fetch one extra to account for excluding the original document
+            results = searcher.search(final_query, limit=effective_limit + 1)
+        except BaseException:  # pragma: no cover
+            # Tantivy 0.26 panics in BM25 idf scoring when the index holds
+            # soft-deleted documents (doc_freq can exceed the alive doc count),
+            # which only surfaces for the More Like This query. The panic crosses
+            # the pyo3 boundary as a `pyo3_runtime.PanicException` — a
+            # BaseException, not an Exception — so catch BaseException and degrade
+            # to "no similar documents" instead of bubbling a 500 to the client.
+            # Fixed upstream: https://github.com/quickwit-oss/tantivy/pull/2964
+            # Remove once the bundled tantivy includes that fix.
+            logger.warning(
+                "More Like This scoring panicked (likely stale tantivy segment "
+                "stats after deletions); returning no results. A search index "
+                "reindex will rebuild consistent statistics.",
+            )
+            return []
 
         addrs = [addr for _score, addr in results.hits]
         all_ids = cast("list[int]", searcher.fast_field_values("id", addrs))
