@@ -3,6 +3,7 @@ import logging
 import os
 import platform
 import re
+import subprocess
 import tempfile
 import zipfile
 from collections import defaultdict
@@ -148,12 +149,14 @@ from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_storage_paths
 from documents.matching import match_tags
+from documents.models import OCR_SUPPORTED_FIELD_TYPES
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
+from documents.models import OcrTemplate
 from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import ShareLink
@@ -195,6 +198,7 @@ from documents.serialisers import EditPdfDocumentsSerializer
 from documents.serialisers import EmailSerializer
 from documents.serialisers import MergeDocumentsSerializer
 from documents.serialisers import NotesSerializer
+from documents.serialisers import OcrTemplateSerializer
 from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RemovePasswordDocumentsSerializer
 from documents.serialisers import ReprocessDocumentsSerializer
@@ -2029,6 +2033,73 @@ class DocumentViewSet(
             },
         ),
     )
+    @action(methods=["post"], detail=True, url_path="run-zone-ocr")
+    def run_zone_ocr(self, request, pk=None):
+        """Run zone-based OCR extraction on this document."""
+        try:
+            document = Document.objects.get(pk=pk)
+        except Document.DoesNotExist:
+            raise Http404
+
+        if not document.document_type_id:
+            return Response(
+                {"error": "Document has no type assigned"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        templates = OcrTemplate.objects.filter(
+            document_type_id=document.document_type_id,
+            enabled=True,
+        )
+        if not templates.exists():
+            return Response(
+                {"error": "No OCR templates found for this document type"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        doc_path = document.archive_path or document.source_path
+        if not doc_path or not Path(doc_path).is_file():
+            return Response(
+                {"error": "Document file not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        from documents.zone_ocr import run_zone_extraction
+
+        run_zone_extraction(document, None)
+
+        # Collect results
+        results = []
+        builtin_labels = {"title": "Title", "asn": "ASN", "created": "Created"}
+        for template in templates.prefetch_related("zones", "zones__custom_field"):
+            for zone in template.zones.all():
+                target = getattr(zone, "target", None) or "custom_field"
+                if target == "custom_field" and zone.custom_field_id:
+                    cf_instance = document.custom_fields.filter(
+                        field=zone.custom_field,
+                    ).first()
+                    field_name = zone.custom_field.name
+                    value = cf_instance.value if cf_instance else None
+                else:
+                    field_name = builtin_labels.get(target, target)
+                    value = {
+                        "title": document.title,
+                        "asn": document.archive_serial_number,
+                        "created": document.created.isoformat()
+                        if document.created
+                        else None,
+                    }.get(target)
+                results.append(
+                    {
+                        "template": template.name,
+                        "zone": zone.name,
+                        "custom_field": field_name,
+                        "value": value,
+                    },
+                )
+
+        return Response({"results": results})
+
     @action(
         methods=["delete"],
         detail=True,
@@ -5269,3 +5340,224 @@ def serve_logo(request: HttpRequest, filename: str | None = None) -> FileRespons
         filename=app_logo.name,
         as_attachment=True,
     )
+
+
+class OcrTemplateViewSet(ModelViewSet):
+    """CRUD for OCR templates with zone definitions."""
+
+    queryset = (
+        OcrTemplate.objects.all()
+        .prefetch_related(
+            "zones",
+            "zones__custom_field",
+        )
+        .order_by("name")
+    )
+    serializer_class = OcrTemplateSerializer
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    pagination_class = StandardPagination
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path=r"document-page-image/(?P<doc_id>[0-9]+)/(?P<page>[0-9]+)",
+    )
+    def document_page_image(self, request, doc_id=None, page=None):
+        """Render a specific page of a document as a PNG image.
+
+        Used by the frontend template editor to display document pages
+        as images that users can draw zones on.
+        """
+        try:
+            document = Document.objects.get(pk=doc_id)
+        except Document.DoesNotExist:
+            raise Http404("Document not found")
+
+        page_num = int(page)
+
+        # Validate page number
+        if document.page_count and page_num >= document.page_count:
+            raise Http404(
+                f"Page {page_num} out of range (document has {document.page_count} pages)",
+            )
+
+        doc_path = document.archive_path or document.source_path
+        if not doc_path or not Path(doc_path).is_file():
+            raise Http404("Document file not found")
+
+        # Check if document is an image (single page, no PDF rendering needed)
+        if document.mime_type and document.mime_type.startswith("image/"):
+            content = Path(doc_path).read_bytes()
+            return HttpResponse(content, content_type=document.mime_type)
+
+        with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
+            output_prefix = Path(tmp_dir) / "page"
+            try:
+                subprocess.run(
+                    [
+                        "pdftoppm",
+                        "-png",
+                        "-r",
+                        "150",  # Lower DPI for preview
+                        "-f",
+                        str(page_num + 1),
+                        "-l",
+                        str(page_num + 1),
+                        str(doc_path),
+                        str(output_prefix),
+                    ],
+                    check=True,
+                    capture_output=True,
+                    timeout=30,
+                )
+            except subprocess.CalledProcessError as e:
+                raise Http404(
+                    f"Failed to render page: {e.stderr.decode(errors='replace')[:200]}",
+                )
+            except FileNotFoundError:
+                raise Http404("pdftoppm not available - is poppler-utils installed?")
+
+            rendered = sorted(Path(tmp_dir).glob("page-*.png"))
+            if not rendered:
+                raise Http404("No rendered page found")
+
+            content = rendered[0].read_bytes()
+
+        return HttpResponse(content, content_type="image/png")
+
+    @action(detail=False, methods=["post"], url_path="test-zone")
+    def test_zone(self, request):
+        """Run OCR on a single ad-hoc zone of a document and return what it
+        yields: the raw OCR text, the transformed value, and whether the
+        validation regex matches. Non-destructive - writes nothing. Used by the
+        editor's per-zone test so a user can tune the zone/regex before saving.
+
+        Accepts: {"document": <id>, "zone": {x, y, width, height, page,
+        ocr_language, transform, validation_regex, zone_source_width,
+        zone_source_height}}.
+        """
+        from documents.models import OcrTemplateZone
+        from documents.zone_ocr import extract_zone_preview
+
+        zone_data = request.data.get("zone") or {}
+
+        try:
+            document = Document.objects.get(pk=request.data.get("document"))
+        except (Document.DoesNotExist, ValueError, TypeError):
+            return Response(
+                {"error": "Document not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        doc_path = document.archive_path or document.source_path
+        if not doc_path or not Path(doc_path).is_file():
+            return Response(
+                {"error": "Document file not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        try:
+            zone = OcrTemplateZone(
+                name=zone_data.get("name") or "test",
+                x=int(zone_data.get("x", 0)),
+                y=int(zone_data.get("y", 0)),
+                width=int(zone_data.get("width", 0)),
+                height=int(zone_data.get("height", 0)),
+                page=zone_data.get("page"),
+                ocr_language=zone_data.get("ocr_language") or "eng",
+                transform=zone_data.get("transform") or "strip",
+                date_format=zone_data.get("date_format") or "",
+                validation_regex=zone_data.get("validation_regex") or "",
+            )
+        except (ValueError, TypeError):
+            return Response(
+                {"error": "Invalid zone definition"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if zone.width < 2 or zone.height < 2:
+            return Response(
+                {"error": "Zone is too small to test"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        result = extract_zone_preview(
+            Path(doc_path),
+            zone,
+            int(zone_data.get("zone_source_width") or 0),
+            int(zone_data.get("zone_source_height") or 0),
+            document.page_count,
+        )
+
+        regex_match = None
+        if zone.validation_regex and result.get("value") is not None:
+            try:
+                regex_match = (
+                    re.fullmatch(zone.validation_regex, result["value"]) is not None
+                )
+            except re.error:
+                regex_match = None
+
+        return Response(
+            {
+                "raw_text": result.get("raw_text"),
+                "value": result.get("value"),
+                "regex": zone.validation_regex,
+                "regex_match": regex_match,
+            },
+        )
+
+    @action(detail=False, methods=["post"], url_path="quick-create-field")
+    def quick_create_field(self, request):
+        """Create a custom field inline from the template editor.
+
+        Accepts: {"name": "Invoice Number", "data_type": "string"}
+        Returns the created field so the frontend can immediately use it.
+        """
+        name = request.data.get("name", "").strip()
+        data_type = request.data.get("data_type", "").strip()
+
+        if not name:
+            return Response(
+                {"error": "Field name is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if data_type not in OCR_SUPPORTED_FIELD_TYPES:
+            return Response(
+                {
+                    "error": f"Unsupported data type '{data_type}'. "
+                    f"Supported: {', '.join(sorted(OCR_SUPPORTED_FIELD_TYPES))}",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Check if field already exists
+        existing = CustomField.objects.filter(name=name).first()
+        if existing:
+            return Response(
+                {
+                    "id": existing.pk,
+                    "name": existing.name,
+                    "data_type": existing.data_type,
+                    "created": False,
+                },
+            )
+
+        # Check user has permission to create custom fields
+        if not request.user.has_perm("documents.add_customfield"):
+            return Response(
+                {"error": "You don't have permission to create custom fields"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        field = CustomField.objects.create(name=name, data_type=data_type)
+        return Response(
+            {
+                "id": field.pk,
+                "name": field.name,
+                "data_type": field.data_type,
+                "created": True,
+            },
+            status=status.HTTP_201_CREATED,
+        )

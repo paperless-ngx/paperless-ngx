@@ -82,6 +82,14 @@
         <i-bs name="pencil" class="me-1"></i-bs><ng-container i18n>PDF Editor</ng-container>
       </button>
 
+      <button ngbDropdownItem (click)="runZoneOcr()" [disabled]="!userCanEdit || !document?.document_type">
+        <i-bs width="1em" height="1em" name="file-earmark-ruled" class="me-1"></i-bs><span i18n>Run Zone OCR</span>
+      </button>
+
+      <button ngbDropdownItem (click)="createOcrTemplate()">
+        <i-bs width="1em" height="1em" name="file-earmark-medical" class="me-1"></i-bs><span i18n>Create OCR Template</span>
+      </button>
+
       @if (userIsOwner && (requiresPassword || password)) {
         <button ngbDropdownItem (click)="removePassword()" [disabled]="!password">
           <i-bs name="unlock" class="me-1"></i-bs><ng-container i18n>Remove Password</ng-container>

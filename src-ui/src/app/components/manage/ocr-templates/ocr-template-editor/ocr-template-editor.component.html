@@ -1,0 +1,414 @@
+<pngx-page-header [title]="pageTitle" [id]="template.id">
+    <div class="input-group input-group-sm me-5 align-items-center">
+      <div class="input-group-text">
+        <i-bs name="file-text"></i-bs>
+      </div>
+        <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="previewDocModel"
+        [ngbTypeahead]="searchDocuments"
+        [inputFormatter]="documentFormatter"
+        [resultFormatter]="documentFormatter"
+        (selectItem)="onPreviewDocSelected($event)"
+        [editable]="false"
+        placeholder="Search documents by title..."
+        i18n-placeholder
+      />
+  </div>
+
+  <div class="d-flex align-items-center flex-wrap gap-2">
+    <div class="input-group input-group-sm ms-2 d-none d-md-flex">
+      <div class="input-group-text" i18n>Page</div>
+        <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewPageCount" [(ngModel)]="previewPageDisplay" />
+      <div class="input-group-text" i18n>of {{previewPageCount}}</div>
+    </div>
+    <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Previous" (click)="prevPage()" [disabled]="!pageImageUrl || previewPage <= 0">
+      <i-bs width="1.2em" height="1.2em" name="arrow-left"></i-bs>
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-secondary"  i18n-title title="Next" (click)="nextPage()" [disabled]="!pageImageUrl || previewPage >= (previewPageCount ?? 1) - 1">
+      <i-bs width="1.2em" height="1.2em" name="arrow-right"></i-bs>
+    </button>
+
+    <div class="input-group input-group-sm">
+      <button class="btn btn-outline-secondary" (click)="zoomOut()" i18n>-</button>
+      <span class="input-group-text">{{ zoom * 100 | number: '1.0-0' }}%</span>
+      <button class="btn btn-outline-secondary" (click)="zoomIn()" i18n>+</button>
+    </div>
+  </div>
+</pngx-page-header>
+
+<div class="row">
+  <div class="col-md-4">
+    <div class="btn-toolbar mb-1 border-bottom">
+        <div class="btn-group pb-3">
+          <a routerLink="/ocr-templates" class="btn btn-sm btn-outline-secondary">
+            <i-bs width="1.2em" height="1.2em" name="x"></i-bs>
+            <span class="ms-1" i18n>Close</span>
+          </a>
+        </div>
+        <div class="btn-group ms-auto pb-3">
+          <button class="btn btn-sm btn-primary" (click)="save()" [disabled]="saving">
+          @if (saving) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+          }
+          <span i18n>Save</span>
+          </button>
+      </div>
+    </div>
+
+    <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-underline flex-nowrap flex-md-wrap overflow-auto">
+        <li ngbNavItem="settings">
+          <a ngbNavLink i18n>Settings</a>
+          <ng-template ngbNavContent>
+            <div class="row mb-3">
+              <div class="col-9">
+                <pngx-input-text [(ngModel)]="template.name" title="Template name" i18n-title></pngx-input-text>
+              </div>
+              <div class="col-3">
+                <pngx-input-switch [(ngModel)]="template.enabled" title="Enabled" i18n-title></pngx-input-switch>
+              </div>
+            </div>
+
+            <pngx-input-select [(ngModel)]="template.document_type" [items]="documentTypes" bindLabel="name" bindValue="id" title="Document type" i18n-title></pngx-input-select>
+
+            <small class="text-muted" i18n>
+              Draw rectangles on the preview to define extraction zones. Use the
+              page controls above the preview to add zones on different pages.
+            </small>
+          </ng-template>
+        </li>
+
+        <li ngbNavItem="zones">
+          <a ngbNavLink><ng-container i18n>Zones</ng-container> <span class="badge bg-primary ms-2">{{ template.zones.length }}</span></a>
+          <ng-template ngbNavContent>
+            @if (template.zones.length === 0) {
+              <p class="text-muted" i18n>
+                No zones defined. Load a document preview and draw rectangles to add zones.
+              </p>
+            }
+            <div class="list-group">
+              @for (zone of template.zones; track $index; let i = $index) {
+                <div
+                  class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                  [style.box-shadow]="selectedZoneIndex === i ? 'inset 3px 0 0 0 var(--bs-primary)' : null"
+                >
+                  <div class="flex-grow-1" role="button" style="cursor: pointer;" (click)="selectZone(i)">
+                    <div><strong [class.text-primary]="selectedZoneIndex === i">{{ zone.name }}</strong></div>
+                    <div class="small text-muted">
+                      {{ getZoneTargetName(zone) }} - {{ zone.width }}x{{ zone.height }}px  <ng-container i18n>p.</ng-container>{{ zonePage(zone) }}
+                    </div>
+                  </div>
+                  <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-secondary" type="button" (click)="selectZone(i)" title="Edit" i18n-title>
+                      <i-bs name="pencil"></i-bs>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" type="button" (click)="removeZone(i)" title="Delete" i18n-title>
+                      <i-bs name="trash"></i-bs>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </ng-template>
+        </li>
+
+        <li ngbNavItem="zone">
+          <a ngbNavLink i18n>Zone</a>
+          <ng-template ngbNavContent>
+            @if (selectedZone; as zone) {
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <strong>{{ zone.name }}</strong>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-sm btn-primary" (click)="save()" [disabled]="saving">
+                    @if (saving) {
+                      <span class="spinner-border spinner-border-sm me-1"></span>
+                    }
+                    <span i18n>Save</span>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="deleteSelectedZone()">
+                    <i-bs name="trash" class="me-1"></i-bs><ng-container i18n>Delete zone</ng-container>
+                  </button>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" i18n>Zone Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="zone.name"
+                  (ngModelChange)="redrawCanvas()"
+                />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" i18n>Page</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  [(ngModel)]="zone.page"
+                  min="-1"
+                  (ngModelChange)="redrawCanvas()"
+                />
+                <small class="text-muted" i18n>Page this zone is on. Use -1 for the last page. Set automatically when you draw it.</small>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" i18n>Field</label>
+                <div class="input-group">
+                  <select class="form-select" [ngModel]="zoneFieldValue(zone)" (ngModelChange)="setZoneField(zone, $event)">
+                    <optgroup label="Built-in fields" i18n-label>
+                      @for (t of builtinTargets; track t.id) {
+                        <option [ngValue]="t.id">{{ t.name }}</option>
+                      }
+                    </optgroup>
+                    <optgroup label="Custom fields" i18n-label>
+                      @for (cf of customFields; track cf.id) {
+                        <option [ngValue]="cf.id">{{ cf.name }} ({{ cf.data_type }})</option>
+                      }
+                    </optgroup>
+                  </select>
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    (click)="openQuickCreate(selectedZoneIndex)"
+                    title="Create new custom field"
+                    i18n-title
+                  >
+                    <i-bs name="plus"></i-bs>
+                  </button>
+                </div>
+                <small class="text-muted" i18n>Write the extracted value to a custom field, or to a built-in field (Title, ASN, Date created).</small>
+              </div>
+
+              @if (isFieldShared(zone)) {
+                <div class="card mb-3 border-info">
+                  <div class="card-body">
+                    <h6 class="card-title d-flex align-items-center gap-2">
+                      <i-bs name="braces"></i-bs>
+                      <span i18n>Combine zones into this field</span>
+                    </h6>
+                    <p class="small text-muted mb-2" i18n>
+                      More than one zone writes to this field. Build the combined
+                      value below: click a zone to insert its token, and type any
+                      separators or literal text between tokens.
+                    </p>
+                    <div class="d-flex flex-wrap gap-1 mb-2">
+                      @for (z of zonesForField(zone); track $index) {
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-info"
+                          (click)="insertCombineToken(zone, z)"
+                          title="Insert token"
+                          i18n-title
+                        >
+                          + {{ z.name || 'Zone' }}
+                        </button>
+                      }
+                    </div>
+                    <input
+                      type="text"
+                      class="form-control font-monospace"
+                      [ngModel]="getCombineFormat(zone)"
+                      (ngModelChange)="setCombineFormat(zone, $event)"
+                      placeholder="{Zone 1} - {Zone 2}"
+                    />
+                    <small class="text-muted" i18n>
+                      Tokens are matched by zone name. An empty zone leaves its
+                      token blank and the stray separator is trimmed. Leave empty
+                      to just join the zones in order with a space.
+                    </small>
+                  </div>
+                </div>
+              }
+
+              @if (showQuickCreate) {
+                <div class="card mb-3 border-primary">
+                  <div class="card-body">
+                    <h6 class="card-title" i18n>Create Custom Field</h6>
+                    <div class="mb-2">
+                      <label class="form-label small" i18n>Field Name</label>
+                      <input type="text" class="form-control form-control-sm"
+                        [(ngModel)]="quickCreateName" placeholder="e.g. Invoice Number" />
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label small" i18n>Field Type</label>
+                      <select class="form-select form-select-sm" [(ngModel)]="quickCreateType">
+                        @for (t of quickCreateTypes; track t.id) {
+                          <option [ngValue]="t.id">{{ t.name }}</option>
+                        }
+                      </select>
+                    </div>
+                    <div class="d-flex gap-2">
+                      <button class="btn btn-primary btn-sm" (click)="submitQuickCreate()"
+                        [disabled]="!quickCreateName.trim()" i18n>
+                        Create & Assign
+                      </button>
+                      <button class="btn btn-outline-secondary btn-sm" (click)="cancelQuickCreate()" i18n>
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <div class="mb-3">
+                <label class="form-label" i18n>OCR Language</label>
+                <ng-select
+                  [items]="ocrLanguageOptions"
+                  bindLabel="name"
+                  bindValue="id"
+                  [multiple]="true"
+                  [closeOnSelect]="false"
+                  [ngModel]="ocrLanguageArray(zone)"
+                  (ngModelChange)="setOcrLanguages(zone, $event)"
+                  placeholder="Select languages"
+                  i18n-placeholder
+                ></ng-select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" i18n>Transform</label>
+                <select class="form-select" [(ngModel)]="zone.transform">
+                  @for (opt of transformOptions; track opt.id) {
+                    <option [ngValue]="opt.id">{{ opt.name }}</option>
+                  }
+                </select>
+              </div>
+
+              @if (zone.transform === 'date') {
+                <div class="mb-3">
+                  <label class="form-label" i18n>Date format</label>
+                  <select class="form-select" [ngModel]="dateFormatChoice(zone)" (ngModelChange)="setDateFormatChoice(zone, $event)">
+                    @for (opt of dateFormatOptions; track opt.id) {
+                      <option [ngValue]="opt.id">{{ opt.name }}</option>
+                    }
+                    <option [ngValue]="'custom'" i18n>Custom...</option>
+                  </select>
+                  @if (dateFormatCustom) {
+                    <div class="input-group mt-2">
+                      <input type="text" class="form-control font-monospace" [(ngModel)]="zone.date_format" placeholder="%d.%m.%Y" />
+                      <button class="btn btn-outline-secondary" type="button" [ngbPopover]="dateFmtHelp" [autoClose]="true" title="Date format help" i18n-title>
+                        <i-bs name="question-circle"></i-bs>
+                      </button>
+                    </div>
+                    <ng-template #dateFmtHelp>
+                      <p class="mb-1" i18n>Python date codes:</p>
+                      <ul class="mb-1 ps-3">
+                        <li><code>%d</code> <ng-container i18n>day (01-31)</ng-container></li>
+                        <li><code>%m</code> <ng-container i18n>month (01-12)</ng-container></li>
+                        <li><code>%Y</code> <ng-container i18n>year, 4-digit</ng-container></li>
+                        <li><code>%y</code> <ng-container i18n>year, 2-digit</ng-container></li>
+                        <li><code>%b</code> <ng-container i18n>month name (Jan)</ng-container></li>
+                      </ul>
+                      <span i18n>Example:</span> <code>%d.%m.%Y</code> -> 03.03.2026
+                    </ng-template>
+                  }
+                </div>
+              }
+
+              <div class="mb-3">
+                <label class="form-label" i18n>Validation Regex</label>
+                <input
+                  type="text"
+                  class="form-control font-monospace"
+                  [(ngModel)]="zone.validation_regex"
+                  placeholder="e.g. \d{2}\.\d{2}\.\d{4}"
+                >
+              </div>
+
+              <div class="text-muted small">
+                {{ zone.x }}, {{ zone.y }} - {{ zone.width }}x{{ zone.height }}px
+              </div>
+
+              <hr class="my-3" />
+              <h6 i18n>Test</h6>
+              @if (!previewDocId) {
+                <p class="text-muted small mb-0" i18n>
+                  Load a document in the Settings tab to test this zone.
+                </p>
+              } @else {
+                <button class="btn btn-sm btn-outline-secondary" (click)="testZone()" [disabled]="zoneTesting">
+                  @if (zoneTesting) {
+                    <span class="spinner-border spinner-border-sm me-1"></span>
+                  }
+                  <span i18n>Test this zone</span>
+                </button>
+                @if (zoneTestResult) {
+                  @if (zoneTestResult.error) {
+                    <div class="alert alert-warning py-2 mt-2 mb-0 small">{{ zoneTestResult.error }}</div>
+                  } @else {
+                    <dl class="row small mt-2 mb-0">
+                      <dt class="col-sm-4" i18n>OCR text</dt>
+                      <dd class="col-sm-8"><code>{{ zoneTestResult.raw_text || '(nothing detected)' }}</code></dd>
+                      <dt class="col-sm-4" i18n>Value</dt>
+                      <dd class="col-sm-8"><code>{{ zoneTestResult.value || '(empty)' }}</code></dd>
+                      @if (zoneTestResult.regex) {
+                        <dt class="col-sm-4" i18n>Validation</dt>
+                        <dd class="col-sm-8">
+                          @if (zoneTestResult.regex_match) {
+                            <span class="badge bg-success" i18n>Regex matches</span>
+                          } @else {
+                            <span class="badge bg-danger" i18n>Regex does not match</span>
+                          }
+                        </dd>
+                      }
+                    </dl>
+                  }
+                }
+              }
+            } @else {
+              <p class="text-muted" i18n>
+                Select a zone from the Zones tab, or draw a rectangle on the document to create one.
+              </p>
+            }
+          </ng-template>
+        </li>
+      </ul>
+
+      <div [ngbNavOutlet]="nav" class="mt-3"></div>
+    </div>
+
+    <!-- Right column: Document preview with zone overlay -->
+    <div class="col-md-8">
+      @if (pageImageUrl) {
+        <div class="border" style="overflow: auto; max-height: 78vh;">
+        <div class="position-relative d-inline-block" [style.width.%]="zoom * 100">
+          <img
+            #pageImage
+            [src]="pageImageUrl"
+            (load)="onImageLoad()"
+            style="width: 100%; display: block;"
+            [style.visibility]="imageLoaded ? 'visible' : 'hidden'"
+            crossorigin="use-credentials"
+          />
+          @if (imageLoaded) {
+            <canvas
+              #zoneCanvas
+              class="position-absolute top-0 start-0"
+              style="width: 100%; height: 100%; cursor: crosshair;"
+              (mousedown)="onCanvasMouseDown($event)"
+              (mousemove)="onCanvasMouseMove($event)"
+              (mouseup)="onCanvasMouseUp($event)"
+            ></canvas>
+          }
+          @if (!imageLoaded) {
+            <div class="d-flex justify-content-center p-5">
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden" i18n>Loading page...</span>
+              </div>
+            </div>
+          }
+        </div>
+        </div>
+      } @else {
+        <div class="border rounded p-5 text-center text-muted">
+          <i-bs name="file-earmark-image" width="48" height="48"></i-bs>
+          <p class="mt-3" i18n>
+            Enter a document ID and click "Load" to preview a page and draw extraction zones.
+          </p>
+        </div>
+      }
+    </div>
+  </div>

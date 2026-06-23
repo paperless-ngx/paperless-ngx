@@ -1340,6 +1340,75 @@ def close_connection_pool_on_worker_init(**kwargs) -> None:
             conn.close_pool()
 
 
+def run_zone_ocr_extraction(sender, document, original_file=None, **kwargs):
+    """
+    Run zone-based OCR extraction if the document's type has an active template.
+    """
+    try:
+        from documents.zone_ocr import run_zone_extraction
+
+        run_zone_extraction(document, Path(original_file) if original_file else None)
+    except Exception:
+        logger.exception(
+            "Zone OCR extraction failed for document %s",
+            document.pk,
+        )
+
+
+def capture_old_document_type(sender, instance, **kwargs):
+    """pre_save: remember the document's previous type so the post_save handler
+    can tell whether the type actually changed (vs. every other save)."""
+    if instance.pk:
+        instance._old_document_type_id = (
+            Document.objects.filter(pk=instance.pk)
+            .values_list("document_type_id", flat=True)
+            .first()
+        )
+    else:
+        instance._old_document_type_id = None
+
+
+def run_zone_ocr_on_type_change(sender, instance, *, created=False, **kwargs):
+    """
+    Run zone OCR only when a document's TYPE actually changes (and the new type
+    has an enabled template). NOT on every save — zone OCR overwrites fields, so
+    re-running it on each edit would clobber the user's changes. Newly created
+    documents are handled by the consumption signal, and the user can always
+    trigger extraction manually via the run-zone-ocr action.
+    """
+    if created or not instance.pk or not instance.document_type_id:
+        return
+
+    # Only proceed if the type changed compared to what was in the DB before.
+    old_type = getattr(instance, "_old_document_type_id", None)
+    if old_type == instance.document_type_id:
+        return
+
+    from documents.models import OcrTemplate
+
+    if not OcrTemplate.objects.filter(
+        document_type_id=instance.document_type_id,
+        enabled=True,
+    ).exists():
+        return
+
+    try:
+        from documents.zone_ocr import run_zone_extraction
+
+        doc_path = instance.archive_path or instance.source_path
+        if doc_path and Path(doc_path).is_file():
+            logger.info(
+                "Zone OCR: running extraction for document %d (type %d)",
+                instance.pk,
+                instance.document_type_id,
+            )
+            run_zone_extraction(instance, None)
+    except Exception:
+        logger.exception(
+            "Zone OCR extraction failed for document %s",
+            instance.pk,
+        )
+
 @worker_process_shutdown.connect
 def close_connection_pool_on_worker_shutdown(**kwargs) -> None:  # pragma: no cover
     """
