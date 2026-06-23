@@ -35,9 +35,8 @@ def build_schema() -> tantivy.Schema:
     sb.add_unsigned_field("id", stored=True, indexed=True, fast=True)
     sb.add_text_field("checksum", stored=True, tokenizer_name="raw")
 
-    sb.add_text_field("title", stored=True, tokenizer_name="paperless_title_text")
-
     for field in (
+        "title",
         "correspondent",
         "document_type",
         "storage_path",
@@ -74,7 +73,7 @@ def build_schema() -> tantivy.Schema:
     sb.add_text_field(
         "simple_title",
         stored=False,
-        tokenizer_name="simple_title_search_analyzer",
+        tokenizer_name="simple_search_analyzer",
     )
     sb.add_text_field(
         "simple_content",

@@ -265,8 +265,8 @@ class TestSearch:
         self,
         backend: TantivyBackend,
     ) -> None:
-        """Title mode must not drop filename-like title tokens longer than 64 chars."""
-        long_title = "1234567890" * 6 + "12345"
+        """Title mode must keep filename-like title tokens up to the model limit."""
+        long_title = "1234567890" * 12 + "12345678"
         doc = Document.objects.create(
             title=long_title,
             content="ordinary content",
@@ -285,8 +285,8 @@ class TestSearch:
         self,
         backend: TantivyBackend,
     ) -> None:
-        """Text mode includes title matches even when a title token exceeds 64 chars."""
-        long_title = "abcdefghij" * 6 + "abcde"
+        """Text mode includes title matches for title tokens up to the model limit."""
+        long_title = "abcdefghij" * 12 + "abcdefgh"
         doc = Document.objects.create(
             title=long_title,
             content="ordinary content",
@@ -305,8 +305,8 @@ class TestSearch:
         self,
         backend: TantivyBackend,
     ) -> None:
-        """Advanced title queries must not drop title tokens longer than 64 chars."""
-        long_title = "9876543210" * 6 + "98765"
+        """Advanced title queries must keep title tokens up to the model limit."""
+        long_title = "9876543210" * 12 + "98765432"
         doc = Document.objects.create(
             title=long_title,
             content="ordinary content",

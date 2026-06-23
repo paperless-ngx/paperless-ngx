@@ -16,7 +16,6 @@ from documents.search._dates import (
     _datetime_range,  # noqa: F401 — re-exported for test imports
 )
 from documents.search._tokenizer import simple_search_tokens
-from documents.search._tokenizer import simple_title_search_tokens
 from documents.search._translate import SearchQueryError
 from documents.search._translate import translate_query
 
@@ -140,6 +139,7 @@ DEFAULT_SEARCH_FIELDS = [
     "document_type",
     "tag",
 ]
+SIMPLE_SEARCH_FIELDS = ["simple_title", "simple_content"]
 TITLE_SEARCH_FIELDS = ["simple_title"]
 _CJK_ALL_FIELDS: Final[list[str]] = [
     "bigram_content",
@@ -155,15 +155,10 @@ _SIMPLE_FIELD_BOOSTS = {"simple_title": 2.0}
 
 
 def _simple_query_tokens(raw_query: str) -> list[str]:
-    # Tokenize and fold via the same analyzer used to index simple_content, so
-    # query terms fold identically to the indexed terms (single source of truth
-    # for ASCII folding).
+    # Tokenize and fold via the same analyzer used to index simple_title /
+    # simple_content, so query terms fold identically to the indexed terms
+    # (single source of truth for ASCII folding).
     return simple_search_tokens(raw_query)
-
-
-def _simple_title_query_tokens(raw_query: str) -> list[str]:
-    # Tokenize and fold via the same analyzer used to index simple_title.
-    return simple_title_search_tokens(raw_query)
 
 
 def _build_simple_field_query(
@@ -278,7 +273,6 @@ def parse_simple_query(
     raw_query: str,
     fields: list[str],
     cjk_fields: list[str] | None = None,
-    tokens: list[str] | None = None,
 ) -> tantivy.Query:
     """
     Parse a plain-text query using Tantivy over a restricted field set.
@@ -289,7 +283,7 @@ def parse_simple_query(
     CJK substrings the simple analyzer can't (long whitespace-free runs are
     dropped by remove_long).
     """
-    tokens = _simple_query_tokens(raw_query) if tokens is None else tokens
+    tokens = _simple_query_tokens(raw_query)
 
     clauses: list[tuple[tantivy.Occur, tantivy.Query]] = []
     if tokens:
@@ -339,36 +333,12 @@ def parse_simple_text_query(
     Parse a plain-text query over title/content for simple search inputs.
     """
 
-    clauses: list[tuple[tantivy.Occur, tantivy.Query]] = []
-
-    title_tokens = _simple_title_query_tokens(raw_query)
-    if title_tokens:
-        clauses.append(
-            (
-                tantivy.Occur.Should,
-                _build_simple_field_query(index, "simple_title", title_tokens),
-            ),
-        )
-
-    content_tokens = _simple_query_tokens(raw_query)
-    if content_tokens:
-        clauses.append(
-            (
-                tantivy.Occur.Should,
-                _build_simple_field_query(index, "simple_content", content_tokens),
-            ),
-        )
-
-    if _has_cjk(raw_query):
-        cjk_q = _build_cjk_query(index, raw_query, _CJK_CONTENT_FIELDS)
-        if cjk_q is not None:
-            clauses.append((tantivy.Occur.Should, cjk_q))
-
-    if not clauses:
-        return tantivy.Query.empty_query()
-    if len(clauses) == 1:
-        return clauses[0][1]
-    return tantivy.Query.boolean_query(clauses)
+    return parse_simple_query(
+        index,
+        raw_query,
+        SIMPLE_SEARCH_FIELDS,
+        cjk_fields=_CJK_CONTENT_FIELDS,
+    )
 
 
 def parse_simple_title_query(
@@ -384,5 +354,4 @@ def parse_simple_title_query(
         raw_query,
         TITLE_SEARCH_FIELDS,
         cjk_fields=_CJK_TITLE_FIELDS,
-        tokens=_simple_title_query_tokens(raw_query),
     )

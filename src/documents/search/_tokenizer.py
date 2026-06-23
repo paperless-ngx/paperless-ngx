@@ -48,6 +48,9 @@ _LANGUAGE_MAP: dict[str, str] = {
 }
 
 SUPPORTED_LANGUAGES: frozenset[str] = frozenset(_LANGUAGE_MAP)
+# Document.title is max_length=128, so use 129 as the limit for
+# Tantivy's remove_long filter
+_TOKEN_REMOVE_LONG_LIMIT: Final[int] = 129
 
 
 def register_tokenizers(index: tantivy.Index, language: str | None) -> None:
@@ -69,43 +72,18 @@ def register_tokenizers(index: tantivy.Index, language: str | None) -> None:
         even for documents that omit those fields.
     """
     index.register_tokenizer("paperless_text", _paperless_text(language))
-    index.register_tokenizer("paperless_title_text", _paperless_title_text(language))
     index.register_tokenizer("simple_analyzer", _simple_analyzer())
     index.register_tokenizer("bigram_analyzer", _bigram_analyzer())
     index.register_tokenizer("simple_search_analyzer", _simple_search_analyzer())
-    index.register_tokenizer(
-        "simple_title_search_analyzer",
-        _simple_title_search_analyzer(),
-    )
     # Fast-field tokenizer required for fast=True text fields in the schema
     index.register_fast_field_tokenizer("simple_analyzer", _simple_analyzer())
 
 
 def _paperless_text(language: str | None) -> tantivy.TextAnalyzer:
-    """Main full-text tokenizer for content, title, etc: simple -> remove_long(65) -> lowercase -> ascii_fold [-> stemmer]"""
+    """Main full-text tokenizer for content, title, etc: simple -> remove_long(129) -> lowercase -> ascii_fold [-> stemmer]"""
     builder = (
         tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.simple())
-        .filter(tantivy.Filter.remove_long(65))
-        .filter(tantivy.Filter.lowercase())
-        .filter(tantivy.Filter.ascii_fold())
-    )
-    if language:
-        tantivy_lang = _LANGUAGE_MAP.get(language.lower())
-        if tantivy_lang:
-            builder = builder.filter(tantivy.Filter.stemmer(tantivy_lang))
-        else:
-            logger.warning(
-                "Unsupported search language '%s' - stemming disabled. Supported: %s",
-                language,
-                ", ".join(sorted(SUPPORTED_LANGUAGES)),
-            )
-    return builder.build()
-
-
-def _paperless_title_text(language: str | None) -> tantivy.TextAnalyzer:
-    """Title full-text tokenizer: simple -> lowercase -> ascii_fold."""
-    builder = (
-        tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.simple())
+        .filter(tantivy.Filter.remove_long(_TOKEN_REMOVE_LONG_LIMIT))
         .filter(tantivy.Filter.lowercase())
         .filter(tantivy.Filter.ascii_fold())
     )
@@ -144,24 +122,12 @@ def _bigram_analyzer() -> tantivy.TextAnalyzer:
 
 
 def _simple_search_analyzer() -> tantivy.TextAnalyzer:
-    """Tokenizer for simple substring search fields: non-whitespace chunks -> remove_long(65) -> lowercase -> ascii_fold."""
+    """Tokenizer for simple substring search fields: non-whitespace chunks -> remove_long(129) -> lowercase -> ascii_fold."""
     return (
         tantivy.TextAnalyzerBuilder(
             tantivy.Tokenizer.regex(r"\S+"),
         )
-        .filter(tantivy.Filter.remove_long(65))
-        .filter(tantivy.Filter.lowercase())
-        .filter(tantivy.Filter.ascii_fold())
-        .build()
-    )
-
-
-def _simple_title_search_analyzer() -> tantivy.TextAnalyzer:
-    """Tokenizer for title substring search: non-whitespace chunks -> lowercase -> ascii_fold."""
-    return (
-        tantivy.TextAnalyzerBuilder(
-            tantivy.Tokenizer.regex(r"\S+"),
-        )
+        .filter(tantivy.Filter.remove_long(_TOKEN_REMOVE_LONG_LIMIT))
         .filter(tantivy.Filter.lowercase())
         .filter(tantivy.Filter.ascii_fold())
         .build()
@@ -173,7 +139,6 @@ def _simple_title_search_analyzer() -> tantivy.TextAnalyzer:
 # for ASCII folding, instead of a separate Python implementation). tantivy-py's
 # TextAnalyzer.analyze clones internally per call, so these are safe to share.
 _SIMPLE_SEARCH_ANALYZER: Final = _simple_search_analyzer()
-_SIMPLE_TITLE_SEARCH_ANALYZER: Final = _simple_title_search_analyzer()
 # raw tokenizer keeps the whole input as one token, so this folds an arbitrary
 # string to ASCII exactly like the content tokenizers (ß->ss, ø->o, æ->ae, ...)
 # without splitting it - used for autocomplete words and prefixes.
@@ -185,13 +150,8 @@ _ASCII_FOLD_ANALYZER: Final = (
 
 
 def simple_search_tokens(text: str) -> list[str]:
-    """Tokenize a query string exactly as simple_content is indexed."""
+    """Tokenize a query string exactly as simple_title/simple_content are indexed."""
     return _SIMPLE_SEARCH_ANALYZER.analyze(text)
-
-
-def simple_title_search_tokens(text: str) -> list[str]:
-    """Tokenize a query string exactly as simple_title is indexed."""
-    return _SIMPLE_TITLE_SEARCH_ANALYZER.analyze(text)
 
 
 def ascii_fold(text: str) -> str:
