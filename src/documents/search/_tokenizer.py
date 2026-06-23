@@ -48,6 +48,9 @@ _LANGUAGE_MAP: dict[str, str] = {
 }
 
 SUPPORTED_LANGUAGES: frozenset[str] = frozenset(_LANGUAGE_MAP)
+# Document.title is max_length=128, so use 129 as the limit for
+# Tantivy's remove_long filter
+_TOKEN_REMOVE_LONG_LIMIT: Final[int] = 129
 
 
 def register_tokenizers(index: tantivy.Index, language: str | None) -> None:
@@ -77,10 +80,10 @@ def register_tokenizers(index: tantivy.Index, language: str | None) -> None:
 
 
 def _paperless_text(language: str | None) -> tantivy.TextAnalyzer:
-    """Main full-text tokenizer for content, title, etc: simple -> remove_long(65) -> lowercase -> ascii_fold [-> stemmer]"""
+    """Main full-text tokenizer for content, title, etc: simple -> remove_long(129) -> lowercase -> ascii_fold [-> stemmer]"""
     builder = (
         tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.simple())
-        .filter(tantivy.Filter.remove_long(65))
+        .filter(tantivy.Filter.remove_long(_TOKEN_REMOVE_LONG_LIMIT))
         .filter(tantivy.Filter.lowercase())
         .filter(tantivy.Filter.ascii_fold())
     )
@@ -119,12 +122,12 @@ def _bigram_analyzer() -> tantivy.TextAnalyzer:
 
 
 def _simple_search_analyzer() -> tantivy.TextAnalyzer:
-    """Tokenizer for simple substring search fields: non-whitespace chunks -> remove_long(65) -> lowercase -> ascii_fold."""
+    """Tokenizer for simple substring search fields: non-whitespace chunks -> remove_long(129) -> lowercase -> ascii_fold."""
     return (
         tantivy.TextAnalyzerBuilder(
             tantivy.Tokenizer.regex(r"\S+"),
         )
-        .filter(tantivy.Filter.remove_long(65))
+        .filter(tantivy.Filter.remove_long(_TOKEN_REMOVE_LONG_LIMIT))
         .filter(tantivy.Filter.lowercase())
         .filter(tantivy.Filter.ascii_fold())
         .build()
