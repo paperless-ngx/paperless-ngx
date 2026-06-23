@@ -261,6 +261,66 @@ class TestSearch:
             == 1
         )
 
+    def test_title_mode_matches_substrings_in_long_title_tokens(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """Title mode must not drop filename-like title tokens longer than 64 chars."""
+        long_title = "1234567890" * 6 + "12345"
+        doc = Document.objects.create(
+            title=long_title,
+            content="ordinary content",
+            checksum="TXT12",
+            pk=18,
+        )
+        backend.add_or_update(doc)
+
+        assert backend.search_ids(
+            "12345",
+            user=None,
+            search_mode=SearchMode.TITLE,
+        ) == [doc.pk]
+
+    def test_text_mode_matches_substrings_in_long_title_tokens(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """Text mode includes title matches even when a title token exceeds 64 chars."""
+        long_title = "abcdefghij" * 6 + "abcde"
+        doc = Document.objects.create(
+            title=long_title,
+            content="ordinary content",
+            checksum="TXT13",
+            pk=19,
+        )
+        backend.add_or_update(doc)
+
+        assert backend.search_ids(
+            "cdefg",
+            user=None,
+            search_mode=SearchMode.TEXT,
+        ) == [doc.pk]
+
+    def test_query_mode_matches_long_title_tokens(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """Advanced title queries must not drop title tokens longer than 64 chars."""
+        long_title = "9876543210" * 6 + "98765"
+        doc = Document.objects.create(
+            title=long_title,
+            content="ordinary content",
+            checksum="TXT14",
+            pk=20,
+        )
+        backend.add_or_update(doc)
+
+        assert backend.search_ids(
+            f"title:{long_title}",
+            user=None,
+            search_mode=SearchMode.QUERY,
+        ) == [doc.pk]
+
     @pytest.mark.parametrize(
         ("mode", "title", "content", "hits", "misses"),
         [
