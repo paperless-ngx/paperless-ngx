@@ -70,21 +70,6 @@ class TestTokenizers:
         q = content_index.parse_query("cafe resume", ["content"])
         assert content_index.searcher().search(q, limit=5).count == 1
 
-    def test_paperless_text_analyzer_keeps_128_character_tokens(
-        self,
-        content_index: tantivy.Index,
-    ) -> None:
-        """Full-text search keeps tokens up to Document.title's model limit."""
-        long_token = "1234567890" * 12 + "12345678"
-        writer = content_index.writer()
-        doc = tantivy.Document()
-        doc.add_text("content", long_token)
-        writer.add_document(doc)
-        writer.commit()
-        content_index.reload()
-        q = content_index.parse_query(long_token, ["content"])
-        assert content_index.searcher().search(q, limit=5).count == 1
-
     def test_bigram_finds_cjk_substring(self, bigram_index: tantivy.Index) -> None:
         """Bigram tokenizer enables substring search in CJK languages without whitespace delimiters."""
         writer = bigram_index.writer()
@@ -114,7 +99,7 @@ class TestTokenizers:
         )
         assert simple_search_index.searcher().search(q, limit=5).count == 1
 
-    def test_simple_search_analyzer_supports_128_character_token_substrings(
+    def test_simple_search_analyzer_supports_model_limit_token_substrings(
         self,
         simple_search_index: tantivy.Index,
     ) -> None:

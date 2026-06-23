@@ -261,11 +261,21 @@ class TestSearch:
             == 1
         )
 
-    def test_title_mode_matches_substrings_in_long_title_tokens(
+    @pytest.mark.parametrize(
+        ("search_mode", "query"),
+        [
+            pytest.param(SearchMode.TITLE, "12345", id="title_search"),
+            pytest.param(SearchMode.TEXT, "12345", id="text_search"),
+            pytest.param(SearchMode.QUERY, None, id="query_title_exact"),
+        ],
+    )
+    def test_search_modes_match_model_limit_title_tokens(
         self,
         backend: TantivyBackend,
+        search_mode: SearchMode,
+        query: str | None,
     ) -> None:
-        """Title mode must keep filename-like title tokens up to the model limit."""
+        """Search must keep filename-like title tokens up to the model limit."""
         long_title = "1234567890" * 12 + "12345678"
         doc = Document.objects.create(
             title=long_title,
@@ -276,49 +286,9 @@ class TestSearch:
         backend.add_or_update(doc)
 
         assert backend.search_ids(
-            "12345",
+            query or f"title:{long_title}",
             user=None,
-            search_mode=SearchMode.TITLE,
-        ) == [doc.pk]
-
-    def test_text_mode_matches_substrings_in_long_title_tokens(
-        self,
-        backend: TantivyBackend,
-    ) -> None:
-        """Text mode includes title matches for title tokens up to the model limit."""
-        long_title = "abcdefghij" * 12 + "abcdefgh"
-        doc = Document.objects.create(
-            title=long_title,
-            content="ordinary content",
-            checksum="TXT13",
-            pk=19,
-        )
-        backend.add_or_update(doc)
-
-        assert backend.search_ids(
-            "cdefg",
-            user=None,
-            search_mode=SearchMode.TEXT,
-        ) == [doc.pk]
-
-    def test_query_mode_matches_long_title_tokens(
-        self,
-        backend: TantivyBackend,
-    ) -> None:
-        """Advanced title queries must keep title tokens up to the model limit."""
-        long_title = "9876543210" * 12 + "98765432"
-        doc = Document.objects.create(
-            title=long_title,
-            content="ordinary content",
-            checksum="TXT14",
-            pk=20,
-        )
-        backend.add_or_update(doc)
-
-        assert backend.search_ids(
-            f"title:{long_title}",
-            user=None,
-            search_mode=SearchMode.QUERY,
+            search_mode=search_mode,
         ) == [doc.pk]
 
     @pytest.mark.parametrize(
