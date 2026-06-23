@@ -725,9 +725,11 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         GIVEN:
             - One document added right now
         WHEN:
-            - Query with invalid added date
+            - Query with an invalid added date
         THEN:
-            - 400 Bad Request returned (Tantivy rejects invalid date field syntax)
+            - 400 Bad Request with a message naming the malformed date, so the
+              user knows their date is invalid rather than silently getting zero
+              results
         """
         d1 = Document.objects.create(
             title="invoice",
@@ -740,8 +742,9 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
 
         response = self.client.get("/api/documents/?query=added:invalid-date")
 
-        # Tantivy rejects unparsable field queries with a 400
+        # An unparsable date is reported as a malformed query, not silently empty.
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("invalid-date", str(response.data["query"]))
 
     @override_settings(
         TIME_ZONE="UTC",

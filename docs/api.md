@@ -227,6 +227,7 @@ Version-aware endpoints:
 - `PATCH /api/documents/{id}/`: content updates target the selected version (`?version={version_id}`) or latest version by default; non-content metadata updates target the root document.
 - `GET /api/documents/{id}/download/`, `GET /api/documents/{id}/preview/`, `GET /api/documents/{id}/thumb/`, `GET /api/documents/{id}/metadata/`: accept `?version={version_id}`.
 - `POST /api/documents/{id}/update_version/`: uploads a new version using multipart form field `document` and optional `version_label`.
+- `PATCH /api/documents/{id}/versions/{version_id}/`: updates the `version_label` of a specific version.
 - `DELETE /api/documents/{root_id}/versions/{version_id}/`: deletes a non-root version.
 
 ## Permissions
@@ -445,3 +446,9 @@ Initial API version.
   large lists of object IDs for operations affecting many objects.
 - The legacy `title_content` document search parameter is deprecated and will be removed in a future version.
   Clients should use `text` for simple title-and-content search and `title_search` for title-only search.
+- The task tracking system was redesigned. The tasks list (`/api/tasks/`) is now paginated, and the
+  task object exposes `task_type` (formerly `task_name`) and `trigger_source` (formerly `type`). New
+  read-only endpoints `/api/tasks/summary/`, `/api/tasks/status_counts/`, and `/api/tasks/active/`
+  provide aggregate views, and `POST /api/tasks/run/` lets privileged users dispatch supported tasks.
+  API v9 continues to serve the unpaginated list with the legacy field names until support for v9 is
+  dropped.

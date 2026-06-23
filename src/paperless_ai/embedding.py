@@ -1,12 +1,9 @@
-import json
 import re
 from typing import TYPE_CHECKING
 
 from django.conf import settings
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from llama_index.core.base.embeddings.base import BaseEmbedding
 
 from documents.models import Document
@@ -23,9 +20,7 @@ OCR_LEADER_REGEX = re.compile(r"[._\-\u00b7]{4,}")
 HORIZONTAL_WHITESPACE_REGEX = re.compile(r"[ \t\u00a0]+")
 
 
-def get_embedding_model() -> "BaseEmbedding":
-    config = AIConfig()
-
+def get_embedding_model(config: AIConfig) -> "BaseEmbedding":
     match config.llm_embedding_backend:
         case LLMEmbeddingBackend.OPENAI_LIKE:
             from llama_index.embeddings.openai_like import OpenAILikeEmbedding
@@ -37,15 +32,18 @@ def get_embedding_model() -> "BaseEmbedding":
                 http_client = create_pinned_httpx_client(
                     endpoint,
                     allow_internal=config.llm_allow_internal_endpoints,
+                    timeout=config.llm_request_timeout,
                 )
                 async_http_client = create_pinned_async_httpx_client(
                     endpoint,
                     allow_internal=config.llm_allow_internal_endpoints,
+                    timeout=config.llm_request_timeout,
                 )
             return OpenAILikeEmbedding(
                 model_name=config.llm_embedding_model or "text-embedding-3-small",
                 api_key=config.llm_api_key,
                 api_base=endpoint,
+                timeout=config.llm_request_timeout,
                 http_client=http_client,
                 async_http_client=async_http_client,
             )
@@ -78,12 +76,14 @@ def get_embedding_model() -> "BaseEmbedding":
             )
             embedding._client = Client(
                 host=endpoint,
+                timeout=config.llm_request_timeout,
                 transport=PinnedHostHTTPTransport(
                     allow_internal=config.llm_allow_internal_endpoints,
                 ),
             )
             embedding._async_client = AsyncClient(
                 host=endpoint,
+                timeout=config.llm_request_timeout,
                 transport=PinnedHostAsyncHTTPTransport(
                     allow_internal=config.llm_allow_internal_endpoints,
                 ),
@@ -95,41 +95,24 @@ def get_embedding_model() -> "BaseEmbedding":
             )
 
 
-def get_embedding_dim() -> int:
-    """
-    Loads embedding dimension from meta.json if available, otherwise infers it
-    from a dummy embedding and stores it for future use.
-    """
-    config = AIConfig()
-    default_model = {
-        LLMEmbeddingBackend.OPENAI_LIKE: "text-embedding-3-small",
-        LLMEmbeddingBackend.HUGGINGFACE: "sentence-transformers/all-MiniLM-L6-v2",
-        LLMEmbeddingBackend.OLLAMA: "embeddinggemma",
-    }.get(
-        config.llm_embedding_backend,
-        "sentence-transformers/all-MiniLM-L6-v2",
+_DEFAULT_MODEL_NAMES = {
+    LLMEmbeddingBackend.OPENAI_LIKE: "text-embedding-3-small",
+    LLMEmbeddingBackend.HUGGINGFACE: "sentence-transformers/all-MiniLM-L6-v2",
+    LLMEmbeddingBackend.OLLAMA: "embeddinggemma",
+}
+
+
+def get_configured_model_name(config: AIConfig) -> str:
+    """Return the canonical name of the currently configured embedding model."""
+    # dict.get(key, default) overload resolution fails for TextChoices keys in some
+    # type checkers; use `or` fallback to avoid the ambiguity.
+    default = (
+        _DEFAULT_MODEL_NAMES.get(
+            config.llm_embedding_backend,
+        )
+        or "sentence-transformers/all-MiniLM-L6-v2"
     )
-    model = config.llm_embedding_model or default_model
-
-    meta_path: Path = settings.LLM_INDEX_DIR / "meta.json"
-    if meta_path.exists():
-        with meta_path.open() as f:
-            meta = json.load(f)
-        if meta.get("embedding_model") != model:
-            raise RuntimeError(
-                f"Embedding model changed from {meta.get('embedding_model')} to {model}. "
-                "You must rebuild the index.",
-            )
-        return meta["dim"]
-
-    embedding_model = get_embedding_model()
-    test_embed = embedding_model.get_text_embedding("test")
-    dim = len(test_embed)
-
-    with meta_path.open("w") as f:
-        json.dump({"embedding_model": model, "dim": dim}, f)
-
-    return dim
+    return config.llm_embedding_model or default
 
 
 def _normalize_llm_index_text(text: str) -> str:
@@ -138,17 +121,11 @@ def _normalize_llm_index_text(text: str) -> str:
 
 
 def build_llm_index_text(doc: Document) -> str:
+    # Short structured fields (filename, storage path, ASN, title, tags, ...) live
+    # in node.metadata: excluded from embeddings, shown to the LLM via metadata
+    # prepend. Notes and Custom Fields stay in the body: Notes can be long free
+    # text, Custom Fields are dynamic in count and best kept in the embedding.
     lines = [
-        f"Title: {doc.title}",
-        f"Filename: {doc.filename}",
-        f"Created: {doc.created}",
-        f"Added: {doc.added}",
-        f"Modified: {doc.modified}",
-        f"Tags: {', '.join(tag.name for tag in doc.tags.all())}",
-        f"Document Type: {doc.document_type.name if doc.document_type else ''}",
-        f"Correspondent: {doc.correspondent.name if doc.correspondent else ''}",
-        f"Storage Path: {doc.storage_path.name if doc.storage_path else ''}",
-        f"Archive Serial Number: {doc.archive_serial_number or ''}",
         f"Notes: {','.join([str(c.note) for c in Note.objects.filter(document=doc)])}",
     ]
 

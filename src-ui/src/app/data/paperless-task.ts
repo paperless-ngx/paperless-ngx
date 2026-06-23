@@ -64,3 +64,10 @@ export interface PaperlessTaskSummary {
   last_success: Date | null
   last_failure: Date | null
 }
+
+export interface PaperlessTaskStatusCounts {
+  all: number
+  needs_attention: number
+  in_progress: number
+  completed: number
+}

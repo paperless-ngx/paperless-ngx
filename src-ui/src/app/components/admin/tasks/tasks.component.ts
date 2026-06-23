@@ -40,7 +40,7 @@ export enum TaskSection {
   Completed = 'completed',
 }
 
-enum TaskFilterTargetID {
+export enum TaskFilterTargetID {
   Name,
   Result,
 }
@@ -167,6 +167,12 @@ export class TasksComponent
   public readonly pageSize = 25
   public page: number = 1
   public totalTasks: number = 0
+  public sectionCounts: Record<TaskSection, number> = {
+    [TaskSection.All]: 0,
+    [TaskSection.NeedsAttention]: 0,
+    [TaskSection.InProgress]: 0,
+    [TaskSection.Completed]: 0,
+  }
   public pagedTasks: PaperlessTask[] = []
   public selectedSection: TaskSection = TaskSection.All
   public selectedTaskType: PaperlessTaskType | null = null
@@ -282,6 +288,7 @@ export class TasksComponent
       .subscribe((query) => {
         this._filterText = query
         this.clearSelection()
+        this.reloadPage(true)
       })
   }
 
@@ -332,6 +339,30 @@ export class TasksComponent
       })
       this.clearSelection()
     }
+  }
+
+  dismissAllTasks() {
+    let modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm Dismiss All`
+    modal.componentInstance.messageBold = $localize`Dismiss all ${this.totalTasks} tasks?`
+    modal.componentInstance.btnClass = 'btn-warning'
+    modal.componentInstance.btnCaption = $localize`Dismiss`
+    modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
+      modal.close()
+      this.tasksService.dismissAllTasks().subscribe({
+        next: () => {
+          this.reloadPage(false)
+        },
+        error: (e) => {
+          this.toastService.showError($localize`Error dismissing tasks`, e)
+          modal.componentInstance.buttonsEnabled = true
+        },
+      })
+      this.clearSelection()
+    })
   }
 
   expandTask(task: PaperlessTask) {
@@ -446,9 +477,7 @@ export class TasksComponent
   }
 
   sectionCount(section: TaskSection): number {
-    return this.pagedTasks.filter((task) =>
-      this.taskBelongsToSection(task, section)
-    ).length
+    return this.sectionCounts[section]
   }
 
   sectionShowsResults(section: TaskSection): boolean {
@@ -458,16 +487,27 @@ export class TasksComponent
   setSection(section: TaskSection) {
     this.selectedSection = section
     this.clearSelection()
+    this.reloadPage(true)
   }
 
   setTaskType(taskType: PaperlessTaskType | null) {
     this.selectedTaskType = taskType
     this.clearSelection()
+    this.reloadPage(true)
   }
 
   setTriggerSource(triggerSource: PaperlessTaskTriggerSource | null) {
     this.selectedTriggerSource = triggerSource
     this.clearSelection()
+    this.reloadPage(true)
+  }
+
+  setFilterTarget(filterTargetID: TaskFilterTargetID) {
+    this.filterTargetID = filterTargetID
+    if (this._filterText.length) {
+      this.clearSelection()
+      this.reloadPage(true)
+    }
   }
 
   taskTypeOptionCount(taskType: PaperlessTaskType | null): number {
@@ -505,19 +545,32 @@ export class TasksComponent
   }
 
   public resetFilter() {
+    if (!this._filterText.length) {
+      return
+    }
+
     this._filterText = ''
+    this.clearSelection()
+    this.reloadPage(true)
   }
 
   public resetFilters() {
+    const hadFilter = this.isFiltered
     this.selectedTaskType = null
     this.selectedTriggerSource = null
-    this.resetFilter()
+    this._filterText = ''
     this.clearSelection()
+
+    if (hadFilter) {
+      this.reloadPage(true)
+    }
   }
 
   filterInputKeyup(event: KeyboardEvent) {
     if (event.key == 'Enter') {
       this._filterText = (event.target as HTMLInputElement).value
+      this.clearSelection()
+      this.reloadPage(true)
     } else if (event.key === 'Escape') {
       this.resetFilter()
     }
@@ -606,19 +659,86 @@ export class TasksComponent
     )
   }
 
+  private reloadSectionCounts() {
+    this.tasksService
+      .statusCounts(this.getParamsForSection(TaskSection.All))
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe((counts) => {
+        this.sectionCounts[TaskSection.All] = counts.all
+        this.sectionCounts[TaskSection.NeedsAttention] = counts.needs_attention
+        this.sectionCounts[TaskSection.InProgress] = counts.in_progress
+        this.sectionCounts[TaskSection.Completed] = counts.completed
+      })
+  }
+
+  private getParamsForSection(
+    section: TaskSection
+  ): Record<string, string | number | boolean | readonly string[]> {
+    const params: Record<
+      string,
+      string | number | boolean | readonly string[]
+    > = {
+      acknowledged: false,
+    }
+
+    const statuses = this.statusesForSection(section)
+    if (statuses.length) {
+      params.status = statuses
+    }
+
+    if (this.selectedTaskType !== null) {
+      params.task_type = this.selectedTaskType
+    }
+
+    if (this.selectedTriggerSource !== null) {
+      params.trigger_source = this.selectedTriggerSource
+    }
+
+    if (this._filterText.length) {
+      params[
+        this.filterTargetID === TaskFilterTargetID.Name ? 'name' : 'result'
+      ] = this._filterText
+    }
+
+    return params
+  }
+
+  private statusesForSection(section: TaskSection): PaperlessTaskStatus[] {
+    switch (section) {
+      case TaskSection.NeedsAttention:
+        return [PaperlessTaskStatus.Failure, PaperlessTaskStatus.Revoked]
+      case TaskSection.InProgress:
+        return [PaperlessTaskStatus.Pending, PaperlessTaskStatus.Started]
+      case TaskSection.Completed:
+        return [PaperlessTaskStatus.Success]
+      default:
+        return []
+    }
+  }
+
   private reloadPage(resetToFirstPage: boolean = false) {
     if (resetToFirstPage) {
       this.page = 1
     }
 
+    this.reloadSectionCounts()
+
     this.loading = true
     this.tasksService
-      .list(this.page, this.pageSize, { acknowledged: false })
+      .list(
+        this.page,
+        this.pageSize,
+        this.getParamsForSection(this.selectedSection)
+      )
       .pipe(first(), takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
           this.pagedTasks = result.results
           this.totalTasks = result.count
+          this.sectionCounts[TaskSection.All] = result.count
+          if (this.selectedSection !== TaskSection.All) {
+            this.sectionCounts[this.selectedSection] = result.count
+          }
           this.loading = false
           if (
             this.page > 1 &&

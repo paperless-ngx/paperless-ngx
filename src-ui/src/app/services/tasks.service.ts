@@ -5,6 +5,7 @@ import { first, map, takeUntil, tap } from 'rxjs/operators'
 import {
   PaperlessTask,
   PaperlessTaskStatus,
+  PaperlessTaskStatusCounts,
   PaperlessTaskType,
 } from 'src/app/data/paperless-task'
 import { Results } from 'src/app/data/results'
@@ -88,7 +89,7 @@ export class TasksService {
   public list(
     page: number,
     pageSize: number,
-    extraParams?: Record<string, string | number | boolean>
+    extraParams?: Record<string, string | number | boolean | readonly string[]>
   ): Observable<Results<PaperlessTask>> {
     return this.http.get<Results<PaperlessTask>>(
       `${this.baseUrl}${this.endpoint}/`,
@@ -102,10 +103,35 @@ export class TasksService {
     )
   }
 
+  public statusCounts(
+    extraParams?: Record<string, string | number | boolean | readonly string[]>
+  ): Observable<PaperlessTaskStatusCounts> {
+    return this.http.get<PaperlessTaskStatusCounts>(
+      `${this.baseUrl}${this.endpoint}/status_counts/`,
+      {
+        params: extraParams,
+      }
+    )
+  }
+
   public dismissTasks(task_ids: Set<number>): Observable<any> {
     return this.http
       .post(`${this.baseUrl}tasks/acknowledge/`, {
         tasks: [...task_ids],
+      })
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifer),
+        tap(() => {
+          this.reload()
+        })
+      )
+  }
+
+  public dismissAllTasks(): Observable<any> {
+    return this.http
+      .post(`${this.baseUrl}tasks/acknowledge/`, {
+        all: true,
       })
       .pipe(
         first(),

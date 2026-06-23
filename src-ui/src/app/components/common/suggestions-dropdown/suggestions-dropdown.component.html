@@ -1,5 +1,5 @@
 <div class="btn-group">
-  <button type="button" class="btn btn-sm btn-outline-primary" (click)="clickSuggest()" [disabled]="loading || (suggestions && !aiEnabled)">
+  <button type="button" class="btn btn-sm btn-outline-primary" (click)="clickSuggest()" [disabled]="disabled || loading || (suggestions && !aiEnabled)">
     @if (loading) {
       <div class="spinner-border spinner-border-sm" role="status"></div>
     } @else {
@@ -13,7 +13,7 @@
 
   @if (aiEnabled) {
     <div class="btn-group" ngbDropdown #dropdown="ngbDropdown" [popperOptions]="popperOptions">
-      <button type="button" class="btn btn-sm btn-outline-primary" ngbDropdownToggle [disabled]="loading || !suggestions" aria-expanded="false" aria-controls="suggestionsDropdown" aria-label="Suggestions dropdown">
+      <button type="button" class="btn btn-sm btn-outline-primary" ngbDropdownToggle [disabled]="disabled || loading || !suggestions" aria-expanded="false" aria-controls="suggestionsDropdown" aria-label="Suggestions dropdown">
         <span class="visually-hidden" i18n>Show suggestions</span>
       </button>
 

@@ -8,6 +8,7 @@ from documents.models import Document
 from documents.permissions import get_objects_for_user_owner_aware
 from paperless.config import AIConfig
 from paperless_ai.client import AIClient
+from paperless_ai.db import db_connection_released
 from paperless_ai.indexing import query_similar_documents
 from paperless_ai.indexing import truncate_content
 
@@ -24,9 +25,14 @@ def get_language_name(language_code: str) -> str:
 
 def build_prompt_without_rag(
     document: Document,
+    config: AIConfig,
 ) -> str:
     filename = document.filename or ""
-    content = truncate_content(document.content[:4000] or "")
+    content = truncate_content(
+        document.content[:4000] or "",
+        chunk_size=config.llm_embedding_chunk_size,
+        context_size=config.llm_context_size,
+    )
 
     return f"""
     You are a document classification assistant.
@@ -49,10 +55,15 @@ def build_prompt_without_rag(
 
 def build_prompt_with_rag(
     document: Document,
+    config: AIConfig,
     user: User | None = None,
 ) -> str:
-    base_prompt = build_prompt_without_rag(document)
-    context = truncate_content(get_context_for_document(document, user))
+    base_prompt = build_prompt_without_rag(document, config)
+    context = truncate_content(
+        get_context_for_document(document, user),
+        chunk_size=config.llm_embedding_chunk_size,
+        context_size=config.llm_context_size,
+    )
 
     return f"""{base_prompt}
 
@@ -130,26 +141,29 @@ def get_ai_document_classification(
     ai_config = AIConfig()
 
     prompt = (
-        build_prompt_with_rag(document, user)
+        build_prompt_with_rag(document, ai_config, user)
         if ai_config.llm_embedding_backend
-        else build_prompt_without_rag(document)
+        else build_prompt_without_rag(document, ai_config)
     )
 
     client = AIClient()
-    result = client.run_llm_query(prompt)
-    suggestions = parse_ai_response(result)
-    if output_language:
-        localized = client.run_llm_query(
-            build_localization_prompt(suggestions, output_language),
-        )
-        localized_suggestions = parse_ai_response(localized)
-        suggestions = {
-            **suggestions,
-            "title": localized_suggestions["title"] or suggestions["title"],
-            "tags": localized_suggestions["tags"] or suggestions["tags"],
-            "document_types": localized_suggestions["document_types"]
-            or suggestions["document_types"],
-            "storage_paths": localized_suggestions["storage_paths"]
-            or suggestions["storage_paths"],
-        }
+    # Hand the pooled DB connection back while the (slow) LLM query runs so it
+    # is not pinned for the call's duration; see paperless_ai.db and #12976.
+    with db_connection_released():
+        result = client.run_llm_query(prompt)
+        suggestions = parse_ai_response(result)
+        if output_language:
+            localized = client.run_llm_query(
+                build_localization_prompt(suggestions, output_language),
+            )
+            localized_suggestions = parse_ai_response(localized)
+            suggestions = {
+                **suggestions,
+                "title": localized_suggestions["title"] or suggestions["title"],
+                "tags": localized_suggestions["tags"] or suggestions["tags"],
+                "document_types": localized_suggestions["document_types"]
+                or suggestions["document_types"],
+                "storage_paths": localized_suggestions["storage_paths"]
+                or suggestions["storage_paths"],
+            }
     return suggestions

@@ -47,6 +47,14 @@ export class SuggestionsDropdownComponent {
   addCorrespondent: EventEmitter<string> = new EventEmitter()
 
   public clickSuggest(): void {
+    if (
+      this.disabled ||
+      this.loading ||
+      (this.suggestions && !this.aiEnabled)
+    ) {
+      return
+    }
+
     if (!this.suggestions) {
       this.getSuggestions.emit(this)
     } else {

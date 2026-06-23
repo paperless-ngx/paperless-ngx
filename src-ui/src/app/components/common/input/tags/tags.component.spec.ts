@@ -171,6 +171,15 @@ describe('TagsComponent', () => {
     expect(component.getTag(4)).toBeUndefined()
   })
 
+  it('should search tags by independent normalized terms including parents', () => {
+    const parent: Tag = { id: 11, name: 'Financ\u00e9' }
+    const child: Tag = { id: 12, name: 'Taxes 2026', parent: parent.id }
+    component.tags = [parent, child]
+
+    expect(component.searchFn('finance 26', child)).toBeTruthy()
+    expect(component.searchFn('finance receipt', child)).toBeFalsy()
+  })
+
   it('should emit filtered documents', () => {
     component.value = [10]
     component.tags = tags

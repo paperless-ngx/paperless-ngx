@@ -360,6 +360,14 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     category: ConfigCategory.AI,
     note: $localize`Language to use for generated AI suggestions. When unset, AI suggestions use the user's display language if explicitly set.`,
   },
+  {
+    key: 'llm_request_timeout',
+    title: $localize`LLM Request Timeout`,
+    type: ConfigOptionType.Number,
+    config_key: 'PAPERLESS_AI_LLM_REQUEST_TIMEOUT',
+    category: ConfigCategory.AI,
+    note: $localize`Timeout in seconds for LLM requests.`,
+  },
 ]
 
 export interface PaperlessConfig extends ObjectWithId {
@@ -401,4 +409,5 @@ export interface PaperlessConfig extends ObjectWithId {
   llm_api_key: string
   llm_endpoint: string
   llm_output_language: string
+  llm_request_timeout: number
 }

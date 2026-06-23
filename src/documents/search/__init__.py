@@ -8,11 +8,15 @@ from documents.search._backend import get_backend
 from documents.search._backend import reset_backend
 from documents.search._schema import needs_rebuild
 from documents.search._schema import wipe_index
+from documents.search._translate import InvalidDateQuery
+from documents.search._translate import SearchQueryError
 
 __all__ = [
+    "InvalidDateQuery",
     "SearchHit",
     "SearchIndexLockError",
     "SearchMode",
+    "SearchQueryError",
     "TantivyBackend",
     "TantivyRelevanceList",
     "WriteBatch",

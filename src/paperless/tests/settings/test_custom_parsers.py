@@ -398,6 +398,7 @@ class TestParseDbSettings:
                 {
                     "default": {
                         "ENGINE": "django.db.backends.postgresql",
+                        "CONN_HEALTH_CHECKS": True,
                         "HOST": "localhost",
                         "NAME": "paperless",
                         "USER": "paperless",
@@ -426,6 +427,7 @@ class TestParseDbSettings:
                 {
                     "default": {
                         "ENGINE": "django.db.backends.postgresql",
+                        "CONN_HEALTH_CHECKS": True,
                         "HOST": "paperless-db-host",
                         "PORT": 1111,
                         "NAME": "customdb",
@@ -455,6 +457,7 @@ class TestParseDbSettings:
                 {
                     "default": {
                         "ENGINE": "django.db.backends.postgresql",
+                        "CONN_HEALTH_CHECKS": True,
                         "HOST": "pghost",
                         "NAME": "paperless",
                         "USER": "paperless",
@@ -485,6 +488,7 @@ class TestParseDbSettings:
                 {
                     "default": {
                         "ENGINE": "django.db.backends.postgresql",
+                        "CONN_HEALTH_CHECKS": True,
                         "HOST": "pghost",
                         "NAME": "paperless",
                         "USER": "paperless",
