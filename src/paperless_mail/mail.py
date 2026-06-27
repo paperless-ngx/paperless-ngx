@@ -713,18 +713,17 @@ class MailAccountHandler(LoggingMixin):
                 )
                 continue
 
-            if (
-                ProcessedMail.objects.filter(
-                    rule=rule,
-                    uid=message.uid,
-                    folder=rule.folder,
-                )
-                .filter(
+            already_processed = ProcessedMail.objects.filter(
+                rule=rule,
+                uid=message.uid,
+                folder=rule.folder,
+            )
+            if self._current_uid_validity is not None:
+                already_processed = already_processed.filter(
                     Q(uid_validity=self._current_uid_validity)
                     | Q(uid_validity__isnull=True),
                 )
-                .exists()
-            ):
+            if already_processed.exists():
                 self.log.debug(
                     f"Skipping mail '{message.uid}' subject '{message.subject}' from '{message.from_}', already processed.",
                 )
