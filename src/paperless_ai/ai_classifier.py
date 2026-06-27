@@ -87,7 +87,7 @@ def build_localization_prompt(suggestions: dict, output_language: str) -> str:
     Return the same JSON schema with all fields present.
 
     Suggestions:
-    {json.dumps(suggestions)}
+    {json.dumps(suggestions, ensure_ascii=False)}
     """.strip()
 
 
