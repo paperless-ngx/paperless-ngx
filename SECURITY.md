@@ -63,6 +63,7 @@ The following are not generally considered vulnerabilities unless accompanied by
 - optional webhook, mail, AI, OCR, or integration behavior described without a product-level vulnerability
 - missing limits or hardening settings presented without concrete impact
 - generic AI or static-analysis output that is not confirmed against the current codebase and a real deployment scenario
+- the ability to attach objects that a user cannot access to a document by ID is an intentional design choice, and not considered a vulnerability
 
 ## Transparency
 
