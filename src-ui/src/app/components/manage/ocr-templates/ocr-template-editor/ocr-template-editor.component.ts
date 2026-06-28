@@ -33,13 +33,20 @@ import { SelectComponent } from 'src/app/components/common/input/select/select.c
 import { SwitchComponent } from 'src/app/components/common/input/switch/switch.component'
 import { TextComponent } from 'src/app/components/common/input/text/text.component'
 import { PageHeaderComponent } from 'src/app/components/common/page-header/page-header.component'
-import { CustomField } from 'src/app/data/custom-field'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { Document } from 'src/app/data/document'
 import { DocumentType } from 'src/app/data/document-type'
 import {
   DATE_FORMAT_OPTIONS,
+  DEFAULT_OCR_ZONE_LANGUAGE,
+  DEFAULT_OCR_ZONE_TARGET,
+  DEFAULT_OCR_ZONE_TRANSFORM,
+  isOcrBuiltinTarget,
   OCR_BUILTIN_TARGETS,
   OCR_LANGUAGE_OPTIONS,
+  OCR_ZONE_TARGET,
+  OCR_ZONE_TRANSFORM,
+  OcrBuiltinTarget,
   OcrTemplate,
   OcrTemplateZone,
   OcrZoneTestResult,
@@ -70,6 +77,10 @@ import {
 } from './zone-geometry'
 
 type ActiveTab = 'settings' | 'zones' | 'zone'
+type ZoneFieldSelection = OcrBuiltinTarget | number | null
+
+const CUSTOM_DATE_FORMAT_CHOICE = 'custom'
+const MIN_DRAWN_ZONE_SIZE = 10
 
 @Component({
   selector: 'pngx-ocr-template-editor',
@@ -125,6 +136,8 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   builtinTargets = OCR_BUILTIN_TARGETS
   dateFormatOptions = DATE_FORMAT_OPTIONS
   ocrLanguageOptions = OCR_LANGUAGE_OPTIONS
+  dateTransform = OCR_ZONE_TRANSFORM.Date
+  customDateFormatChoice = CUSTOM_DATE_FORMAT_CHOICE
   isNew = true
   saving = false
 
@@ -165,17 +178,17 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   showQuickCreate = false
   quickCreateName = ''
-  quickCreateType = 'string'
+  quickCreateType = CustomFieldDataType.String
   quickCreateForZoneIndex: number | null = null
   quickCreateTypes = [
-    { id: 'string', name: $localize`String` },
-    { id: 'integer', name: $localize`Integer` },
-    { id: 'float', name: $localize`Float` },
-    { id: 'date', name: $localize`Date` },
-    { id: 'monetary', name: $localize`Monetary` },
-    { id: 'boolean', name: $localize`Boolean` },
-    { id: 'url', name: $localize`URL` },
-    { id: 'longtext', name: $localize`Long Text` },
+    { id: CustomFieldDataType.String, name: $localize`String` },
+    { id: CustomFieldDataType.Integer, name: $localize`Integer` },
+    { id: CustomFieldDataType.Float, name: $localize`Float` },
+    { id: CustomFieldDataType.Date, name: $localize`Date` },
+    { id: CustomFieldDataType.Monetary, name: $localize`Monetary` },
+    { id: CustomFieldDataType.Boolean, name: $localize`Boolean` },
+    { id: CustomFieldDataType.Url, name: $localize`URL` },
+    { id: CustomFieldDataType.LongText, name: $localize`Long Text` },
   ]
 
   get selectedZone(): OcrTemplateZone | null {
@@ -461,7 +474,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     if (!this.isDrawing || !this.currentRect) return
     this.isDrawing = false
 
-    const img = this.imageRef.nativeElement
     const rect = sourceRectFromDrawing(
       this.currentRect,
       this.canvasSize(),
@@ -469,34 +481,40 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     )
 
     // Ignore tiny accidental clicks.
-    if (rect.w < 10 || rect.h < 10) {
+    if (rect.w < MIN_DRAWN_ZONE_SIZE || rect.h < MIN_DRAWN_ZONE_SIZE) {
       this.currentRect = null
       this.redrawCanvas()
       return
     }
 
-    const zone: OcrTemplateZone = {
+    this.template.zones.push(this.createZoneFromRect(rect))
+    this.currentRect = null
+    this.selectZone(this.template.zones.length - 1)
+  }
+
+  private createZoneFromRect(rect: DisplayRect): OcrTemplateZone {
+    const imageSize = this.imageNaturalSize()
+    return {
       name: `Zone ${this.template.zones.length + 1}`,
-      target: 'custom_field',
-      custom_field:
-        this.customFields.length > 0 ? this.customFields[0].id : null,
+      target: DEFAULT_OCR_ZONE_TARGET,
+      custom_field: this.defaultCustomFieldId(),
       x: rect.x,
       y: rect.y,
       width: rect.w,
       height: rect.h,
-      page: this.previewPage + 1,
-      ocr_language: 'deu+eng',
-      transform: 'strip',
+      page: this.previewPageDisplay,
+      ocr_language: DEFAULT_OCR_ZONE_LANGUAGE,
+      transform: DEFAULT_OCR_ZONE_TRANSFORM,
       date_format: '',
       validation_regex: '',
       order: this.template.zones.length,
-      zone_source_width: img.naturalWidth,
-      zone_source_height: img.naturalHeight,
+      zone_source_width: imageSize.width,
+      zone_source_height: imageSize.height,
     }
+  }
 
-    this.template.zones.push(zone)
-    this.currentRect = null
-    this.selectZone(this.template.zones.length - 1)
+  private defaultCustomFieldId(): number | null {
+    return this.customFields[0]?.id ?? null
   }
 
   @HostListener('document:mouseup')
@@ -699,22 +717,8 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     if (!zone || !this.previewDocId) return
     this.zoneTesting = true
     this.zoneTestResult = null
-    const payload: ZoneTestRequest = {
-      name: zone.name,
-      x: zone.x,
-      y: zone.y,
-      width: zone.width,
-      height: zone.height,
-      page: zone.page ?? 1,
-      ocr_language: zone.ocr_language,
-      transform: zone.transform,
-      date_format: zone.date_format,
-      validation_regex: zone.validation_regex,
-      zone_source_width: zone.zone_source_width,
-      zone_source_height: zone.zone_source_height,
-    }
     this.templateService
-      .testZone(this.previewDocId, payload)
+      .testZone(this.previewDocId, this.zoneTestRequest(zone))
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
@@ -728,6 +732,23 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
           this.zoneTesting = false
         },
       })
+  }
+
+  private zoneTestRequest(zone: OcrTemplateZone): ZoneTestRequest {
+    return {
+      name: zone.name,
+      x: zone.x,
+      y: zone.y,
+      width: zone.width,
+      height: zone.height,
+      page: zone.page ?? 1,
+      ocr_language: zone.ocr_language,
+      transform: zone.transform,
+      date_format: zone.date_format,
+      validation_regex: zone.validation_regex,
+      zone_source_width: zone.zone_source_width,
+      zone_source_height: zone.zone_source_height,
+    }
   }
 
   deleteSelectedZone() {
@@ -789,17 +810,17 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   /** Value bound to the field select: a built-in id string or a custom-field id. */
-  zoneFieldValue(zone: OcrTemplateZone): number | string | null {
-    const target = zone.target || 'custom_field'
-    return target === 'custom_field' ? zone.custom_field : target
+  zoneFieldValue(zone: OcrTemplateZone): ZoneFieldSelection {
+    const target = zone.target || DEFAULT_OCR_ZONE_TARGET
+    return target === OCR_ZONE_TARGET.CustomField ? zone.custom_field : target
   }
 
-  setZoneField(zone: OcrTemplateZone, value: number | string) {
-    if (value === 'title' || value === 'asn' || value === 'created') {
+  setZoneField(zone: OcrTemplateZone, value: ZoneFieldSelection) {
+    if (isOcrBuiltinTarget(value)) {
       zone.target = value
       zone.custom_field = null
     } else {
-      zone.target = 'custom_field'
+      zone.target = OCR_ZONE_TARGET.CustomField
       zone.custom_field = typeof value === 'number' ? value : null
     }
     this.seedCombineDefault(zone)
@@ -807,7 +828,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   fieldKeyFor(zone: OcrTemplateZone): string | null {
     const v = this.zoneFieldValue(zone)
-    return v === null || v === undefined || v === '' ? null : String(v)
+    return v === null || v === undefined ? null : String(v)
   }
 
   zonesForField(zone: OcrTemplateZone): OcrTemplateZone[] {
@@ -867,11 +888,13 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   /** Value bound to the date-format select: a preset, '' (auto), or 'custom'. */
   dateFormatChoice(zone: OcrTemplateZone): string {
-    return this.usesCustomDateFormat(zone) ? 'custom' : zone.date_format || ''
+    return this.usesCustomDateFormat(zone)
+      ? CUSTOM_DATE_FORMAT_CHOICE
+      : zone.date_format || ''
   }
 
   setDateFormatChoice(zone: OcrTemplateZone, value: string) {
-    if (value === 'custom') {
+    if (value === CUSTOM_DATE_FORMAT_CHOICE) {
       this.customDateFormatZones.add(zone)
       zone.date_format ||= ''
     } else {
@@ -891,8 +914,8 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   getZoneTargetName(zone: OcrTemplateZone): string {
-    const target = zone.target || 'custom_field'
-    if (target === 'custom_field') {
+    const target = zone.target || DEFAULT_OCR_ZONE_TARGET
+    if (target === OCR_ZONE_TARGET.CustomField) {
       return zone.custom_field
         ? this.getCustomFieldName(zone.custom_field)
         : $localize`(no field)`
@@ -909,7 +932,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     if (zoneIndex === null) return
     this.quickCreateForZoneIndex = zoneIndex
     this.quickCreateName = this.template.zones[zoneIndex]?.name || ''
-    this.quickCreateType = 'string'
+    this.quickCreateType = CustomFieldDataType.String
     this.showQuickCreate = true
   }
 
@@ -936,7 +959,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
                 this.template.zones[this.quickCreateForZoneIndex].custom_field =
                   result.id
                 this.template.zones[this.quickCreateForZoneIndex].target =
-                  'custom_field'
+                  OCR_ZONE_TARGET.CustomField
               }
               this.showQuickCreate = false
               this.quickCreateForZoneIndex = null

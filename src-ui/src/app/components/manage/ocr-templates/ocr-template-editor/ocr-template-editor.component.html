@@ -258,14 +258,14 @@
                 </select>
               </div>
 
-              @if (zone.transform === 'date') {
+              @if (zone.transform === dateTransform) {
                 <div class="mb-3">
                   <label class="form-label" i18n>Date format</label>
                   <select class="form-select" [ngModel]="dateFormatChoice(zone)" (ngModelChange)="setDateFormatChoice(zone, $event)">
                     @for (opt of dateFormatOptions; track opt.id) {
                       <option [ngValue]="opt.id">{{ opt.name }}</option>
                     }
-                    <option [ngValue]="'custom'" i18n>Custom...</option>
+                    <option [ngValue]="customDateFormatChoice" i18n>Custom...</option>
                   </select>
                   @if (usesCustomDateFormat(zone)) {
                     <div class="input-group mt-2">
