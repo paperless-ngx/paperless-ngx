@@ -52,15 +52,21 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
 import { ToastService } from 'src/app/services/toast.service'
-
-interface DrawingRect {
-  startX: number
-  startY: number
-  endX: number
-  endY: number
-}
-
-type ResizeHandle = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw'
+import {
+  DisplayRect,
+  DrawingRect,
+  findHandleAt,
+  findZoneAt,
+  getZoneDisplayRect,
+  getZonePage,
+  HANDLE_SIZE,
+  isZoneOnPage,
+  MoveStart,
+  moveZone,
+  ResizeHandle,
+  resizeZone,
+  sourceRectFromDrawing,
+} from './zone-geometry'
 
 type ActiveTab = 'settings' | 'zones' | 'zone'
 
@@ -147,11 +153,10 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   isResizing = false
   resizeHandle: ResizeHandle | null = null
   resizeZoneIndex: number | null = null
-  private readonly HANDLE_SIZE = 8
 
   isMoving = false
   moveZoneIndex: number | null = null
-  private moveStart = { mouseX: 0, mouseY: 0, zoneX: 0, zoneY: 0 }
+  private moveStart: MoveStart = { mouseX: 0, mouseY: 0, zoneX: 0, zoneY: 0 }
 
   zoneTestResult: OcrZoneTestResult | null = null
   zoneTesting = false
@@ -340,13 +345,11 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   zonePage(zone: OcrTemplateZone): number {
-    const v = zone.page ?? 1
-    if (v === -1) return this.previewPageCount ?? this.previewPage + 1
-    return v >= 1 ? v : 1
+    return getZonePage(zone, this.previewPage, this.previewPageCount)
   }
 
   private isOnCurrentPage(zone: OcrTemplateZone): boolean {
-    return this.zonePage(zone) === this.previewPage + 1
+    return isZoneOnPage(zone, this.previewPage, this.previewPageCount)
   }
 
   onImageLoad() {
@@ -364,7 +367,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     const y = event.clientY - rect.top
 
     if (this.selectedZoneIndex !== null) {
-      const handle = this.findHandleAt(x, y, this.selectedZoneIndex)
+      const handle = this.findHandleAt({ x, y }, this.selectedZoneIndex)
       if (handle) {
         this.isResizing = true
         this.resizeHandle = handle
@@ -373,7 +376,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       }
     }
 
-    const clickedIdx = this.findZoneAt(x, y)
+    const clickedIdx = this.findZoneAt({ x, y })
     if (clickedIdx !== null && !event.shiftKey) {
       this.selectZone(clickedIdx)
       const zone = this.template.zones[clickedIdx]
@@ -401,22 +404,12 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     }
 
     if (this.isMoving && this.moveZoneIndex !== null) {
-      const zone = this.template.zones[this.moveZoneIndex]
-      const canvas = this.canvasRef.nativeElement
-      const img = this.imageRef.nativeElement
-      const srcW = zone.zone_source_width || img.naturalWidth
-      const srcH = zone.zone_source_height || img.naturalHeight
-      const scaleX = srcW / canvas.width
-      const scaleY = srcH / canvas.height
-      const dx = Math.round((mx - this.moveStart.mouseX) * scaleX)
-      const dy = Math.round((my - this.moveStart.mouseY) * scaleY)
-      zone.x = Math.max(
-        0,
-        Math.min(this.moveStart.zoneX + dx, srcW - zone.width)
-      )
-      zone.y = Math.max(
-        0,
-        Math.min(this.moveStart.zoneY + dy, srcH - zone.height)
+      moveZone(
+        this.template.zones[this.moveZoneIndex],
+        { x: mx, y: my },
+        this.moveStart,
+        this.canvasSize(),
+        this.imageNaturalSize()
       )
       this.redrawCanvas()
       return
@@ -432,7 +425,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     // Cursor feedback: resize handle > move (over a zone) > crosshair.
     const canvas = this.canvasRef.nativeElement
     if (this.selectedZoneIndex !== null) {
-      const handle = this.findHandleAt(mx, my, this.selectedZoneIndex)
+      const handle = this.findHandleAt({ x: mx, y: my }, this.selectedZoneIndex)
       if (handle) {
         const cursorMap: Record<ResizeHandle, string> = {
           nw: 'nw-resize',
@@ -449,7 +442,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       }
     }
     canvas.style.cursor =
-      this.findZoneAt(mx, my) !== null ? 'move' : 'crosshair'
+      this.findZoneAt({ x: mx, y: my }) !== null ? 'move' : 'crosshair'
   }
 
   onCanvasMouseUp(event: MouseEvent) {
@@ -466,27 +459,15 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     if (!this.isDrawing || !this.currentRect) return
     this.isDrawing = false
 
-    const canvas = this.canvasRef.nativeElement
     const img = this.imageRef.nativeElement
-
-    const scaleX = img.naturalWidth / canvas.width
-    const scaleY = img.naturalHeight / canvas.height
-
-    const x = Math.round(
-      Math.min(this.currentRect.startX, this.currentRect.endX) * scaleX
-    )
-    const y = Math.round(
-      Math.min(this.currentRect.startY, this.currentRect.endY) * scaleY
-    )
-    const w = Math.round(
-      Math.abs(this.currentRect.endX - this.currentRect.startX) * scaleX
-    )
-    const h = Math.round(
-      Math.abs(this.currentRect.endY - this.currentRect.startY) * scaleY
+    const rect = sourceRectFromDrawing(
+      this.currentRect,
+      this.canvasSize(),
+      this.imageNaturalSize()
     )
 
     // Ignore tiny accidental clicks.
-    if (w < 10 || h < 10) {
+    if (rect.w < 10 || rect.h < 10) {
       this.currentRect = null
       this.redrawCanvas()
       return
@@ -497,10 +478,10 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       target: 'custom_field',
       custom_field:
         this.customFields.length > 0 ? this.customFields[0].id : null,
-      x,
-      y,
-      width: w,
-      height: h,
+      x: rect.x,
+      y: rect.y,
+      width: rect.w,
+      height: rect.h,
       page: this.previewPage + 1,
       ocr_language: 'deu+eng',
       transform: 'strip',
@@ -533,110 +514,51 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     this.currentRect = null
   }
 
-  private getZoneDisplayRect(
-    zoneIdx: number
-  ): { x: number; y: number; w: number; h: number } | null {
+  private getZoneDisplayRect(zoneIdx: number): DisplayRect | null {
     const canvas = this.canvasRef?.nativeElement
     const img = this.imageRef?.nativeElement
     if (!canvas || !img || !img.naturalWidth) return null
     const zone = this.template.zones[zoneIdx]
     if (!zone) return null
     if (!this.isOnCurrentPage(zone)) return null
-    const srcW = zone.zone_source_width || img.naturalWidth
-    const srcH = zone.zone_source_height || img.naturalHeight
-    const scaleX = canvas.width / srcW
-    const scaleY = canvas.height / srcH
-    return {
-      x: zone.x * scaleX,
-      y: zone.y * scaleY,
-      w: zone.width * scaleX,
-      h: zone.height * scaleY,
-    }
+    return getZoneDisplayRect(zone, this.canvasSize(), this.imageNaturalSize())
   }
 
   private findHandleAt(
-    mx: number,
-    my: number,
+    point: { x: number; y: number },
     zoneIdx: number
   ): ResizeHandle | null {
     const r = this.getZoneDisplayRect(zoneIdx)
     if (!r) return null
-    const hs = this.HANDLE_SIZE
-    const handles: [ResizeHandle, number, number][] = [
-      ['nw', r.x, r.y],
-      ['n', r.x + r.w / 2, r.y],
-      ['ne', r.x + r.w, r.y],
-      ['w', r.x, r.y + r.h / 2],
-      ['e', r.x + r.w, r.y + r.h / 2],
-      ['sw', r.x, r.y + r.h],
-      ['s', r.x + r.w / 2, r.y + r.h],
-      ['se', r.x + r.w, r.y + r.h],
-    ]
-    for (const [name, hx, hy] of handles) {
-      if (Math.abs(mx - hx) <= hs && Math.abs(my - hy) <= hs) return name
-    }
-    return null
+    return findHandleAt(point, r)
   }
 
   private applyResize(mx: number, my: number) {
     if (this.resizeZoneIndex === null || !this.resizeHandle) return
 
-    const canvas = this.canvasRef.nativeElement
-    const img = this.imageRef.nativeElement
     const zone = this.template.zones[this.resizeZoneIndex]
     if (!zone) return
-    const srcW = zone.zone_source_width || img.naturalWidth
-    const srcH = zone.zone_source_height || img.naturalHeight
-    const scaleX = srcW / canvas.width
-    const scaleY = srcH / canvas.height
-    const imgX = Math.max(0, Math.min(srcW, Math.round(mx * scaleX)))
-    const imgY = Math.max(0, Math.min(srcH, Math.round(my * scaleY)))
-    const handle = this.resizeHandle
-
-    if (handle.includes('w')) {
-      const right = Math.min(zone.x + zone.width, srcW)
-      zone.x = Math.max(0, Math.min(imgX, right - 10))
-      zone.width = right - zone.x
-    }
-    if (handle.includes('e')) {
-      zone.width = Math.max(10, imgX - zone.x)
-    }
-    if (handle.includes('n')) {
-      const bottom = Math.min(zone.y + zone.height, srcH)
-      zone.y = Math.max(0, Math.min(imgY, bottom - 10))
-      zone.height = bottom - zone.y
-    }
-    if (handle.includes('s')) {
-      zone.height = Math.max(10, imgY - zone.y)
-    }
+    resizeZone(
+      zone,
+      this.resizeHandle,
+      { x: mx, y: my },
+      this.canvasSize(),
+      this.imageNaturalSize()
+    )
   }
 
-  private findZoneAt(displayX: number, displayY: number): number | null {
-    const canvas = this.canvasRef.nativeElement
+  private findZoneAt(point: { x: number; y: number }): number | null {
     const img = this.imageRef.nativeElement
     if (!img.naturalWidth) return null
 
-    for (let i = this.template.zones.length - 1; i >= 0; i--) {
-      const z = this.template.zones[i]
-      if (!this.isOnCurrentPage(z)) continue
-      const srcW = z.zone_source_width || img.naturalWidth
-      const srcH = z.zone_source_height || img.naturalHeight
-      const scaleX = canvas.width / srcW
-      const scaleY = canvas.height / srcH
-      const zx = z.x * scaleX
-      const zy = z.y * scaleY
-      const zw = z.width * scaleX
-      const zh = z.height * scaleY
-      if (
-        displayX >= zx &&
-        displayX <= zx + zw &&
-        displayY >= zy &&
-        displayY <= zy + zh
-      ) {
-        return i
-      }
-    }
-    return null
+    return findZoneAt(
+      point,
+      this.template.zones,
+      this.previewPage,
+      this.previewPageCount,
+      this.canvasSize(),
+      this.imageNaturalSize()
+    )
   }
 
   redrawCanvas() {
@@ -703,7 +625,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       ctx.textBaseline = 'alphabetic'
 
       if (idx === this.selectedZoneIndex) {
-        const hs = this.HANDLE_SIZE
         ctx.fillStyle = color
         const handles = [
           [x, y],
@@ -716,7 +637,12 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
           [x + w, y + h],
         ]
         for (const [hx, hy] of handles) {
-          ctx.fillRect(hx - hs / 2, hy - hs / 2, hs, hs)
+          ctx.fillRect(
+            hx - HANDLE_SIZE / 2,
+            hy - HANDLE_SIZE / 2,
+            HANDLE_SIZE,
+            HANDLE_SIZE
+          )
         }
       }
     })
@@ -732,6 +658,16 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       ctx.strokeRect(this.currentRect.startX, this.currentRect.startY, cw, ch)
       ctx.setLineDash([])
     }
+  }
+
+  private canvasSize() {
+    const canvas = this.canvasRef.nativeElement
+    return { width: canvas.width, height: canvas.height }
+  }
+
+  private imageNaturalSize() {
+    const img = this.imageRef.nativeElement
+    return { width: img.naturalWidth, height: img.naturalHeight }
   }
 
   removeZone(index: number) {
