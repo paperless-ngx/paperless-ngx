@@ -966,7 +966,10 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
             })
         },
         error: (err) => {
-          alert(err.error?.error || 'Failed to create custom field')
+          this.toastService.showError(
+            $localize`Failed to create custom field.`,
+            err
+          )
         },
       })
   }
