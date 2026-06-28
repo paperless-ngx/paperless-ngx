@@ -286,7 +286,7 @@
                     }
                     <option [ngValue]="'custom'" i18n>Custom...</option>
                   </select>
-                  @if (dateFormatCustom) {
+                  @if (usesCustomDateFormat(zone)) {
                     <div class="input-group mt-2">
                       <input type="text" class="form-control font-monospace" [(ngModel)]="zone.date_format" placeholder="%d.%m.%Y" />
                       <button class="btn btn-outline-secondary" type="button" [ngbPopover]="dateFmtHelp" [autoClose]="true" title="Date format help" i18n-title>

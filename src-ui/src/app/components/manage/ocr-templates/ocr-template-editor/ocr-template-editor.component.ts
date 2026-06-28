@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common'
 import {
-  AfterViewInit,
   Component,
   ElementRef,
+  HostListener,
   inject,
   OnDestroy,
   OnInit,
@@ -84,9 +84,7 @@ type ActiveTab = 'settings' | 'zones' | 'zone'
   templateUrl: './ocr-template-editor.component.html',
   styleUrls: ['./ocr-template-editor.component.scss'],
 })
-export class OcrTemplateEditorComponent
-  implements OnInit, OnDestroy, AfterViewInit
-{
+export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute)
   private readonly router = inject(Router)
   private readonly templateService = inject(OcrTemplateService)
@@ -96,6 +94,7 @@ export class OcrTemplateEditorComponent
   private readonly documentService = inject(DocumentService)
   private readonly toastService = inject(ToastService)
   private readonly destroy$ = new Subject<void>()
+  private readonly customDateFormatZones = new WeakSet<OcrTemplateZone>()
 
   @ViewChild('zoneCanvas') canvasRef: ElementRef<HTMLCanvasElement>
   @ViewChild('pageImage') imageRef: ElementRef<HTMLImageElement>
@@ -118,7 +117,6 @@ export class OcrTemplateEditorComponent
   builtinTargets = OCR_BUILTIN_TARGETS
   dateFormatOptions = DATE_FORMAT_OPTIONS
   ocrLanguageOptions = OCR_LANGUAGE_OPTIONS
-  dateFormatCustom = false
   isNew = true
   saving = false
 
@@ -137,7 +135,7 @@ export class OcrTemplateEditorComponent
   }
 
   public set previewPageDisplay(value: number) {
-    this.previewPage = Math.max(0, value) - 1
+    this.goToPage(value - 1)
   }
 
   activeTab: ActiveTab = 'settings'
@@ -231,8 +229,6 @@ export class OcrTemplateEditorComponent
     }
   }
 
-  ngAfterViewInit() {}
-
   searchDocuments = (text$: Observable<string>): Observable<Document[]> =>
     text$.pipe(
       debounceTime(250),
@@ -307,6 +303,7 @@ export class OcrTemplateEditorComponent
   }
 
   goToPage(page: number) {
+    if (!Number.isFinite(page)) return
     const max = this.previewPageCount ? this.previewPageCount - 1 : page
     const clamped = Math.max(0, Math.min(page, max))
     if (clamped === this.previewPage) return
@@ -457,15 +454,12 @@ export class OcrTemplateEditorComponent
 
   onCanvasMouseUp(event: MouseEvent) {
     if (this.isMoving) {
-      this.isMoving = false
-      this.moveZoneIndex = null
+      this.stopCanvasInteraction()
       return
     }
 
     if (this.isResizing) {
-      this.isResizing = false
-      this.resizeHandle = null
-      this.resizeZoneIndex = null
+      this.stopCanvasInteraction()
       return
     }
 
@@ -522,6 +516,23 @@ export class OcrTemplateEditorComponent
     this.selectZone(this.template.zones.length - 1)
   }
 
+  @HostListener('document:mouseup')
+  onDocumentMouseUp() {
+    if (!this.isMoving && !this.isResizing && !this.isDrawing) return
+    this.stopCanvasInteraction()
+    this.redrawCanvas()
+  }
+
+  private stopCanvasInteraction() {
+    this.isMoving = false
+    this.moveZoneIndex = null
+    this.isResizing = false
+    this.resizeHandle = null
+    this.resizeZoneIndex = null
+    this.isDrawing = false
+    this.currentRect = null
+  }
+
   private getZoneDisplayRect(
     zoneIdx: number
   ): { x: number; y: number; w: number; h: number } | null {
@@ -568,6 +579,8 @@ export class OcrTemplateEditorComponent
   }
 
   private applyResize(mx: number, my: number) {
+    if (this.resizeZoneIndex === null || !this.resizeHandle) return
+
     const canvas = this.canvasRef.nativeElement
     const img = this.imageRef.nativeElement
     const zone = this.template.zones[this.resizeZoneIndex]
@@ -576,12 +589,12 @@ export class OcrTemplateEditorComponent
     const srcH = zone.zone_source_height || img.naturalHeight
     const scaleX = srcW / canvas.width
     const scaleY = srcH / canvas.height
-    const imgX = Math.round(mx * scaleX)
-    const imgY = Math.round(my * scaleY)
+    const imgX = Math.max(0, Math.min(srcW, Math.round(mx * scaleX)))
+    const imgY = Math.max(0, Math.min(srcH, Math.round(my * scaleY)))
     const handle = this.resizeHandle
 
     if (handle.includes('w')) {
-      const right = zone.x + zone.width
+      const right = Math.min(zone.x + zone.width, srcW)
       zone.x = Math.max(0, Math.min(imgX, right - 10))
       zone.width = right - zone.x
     }
@@ -589,7 +602,7 @@ export class OcrTemplateEditorComponent
       zone.width = Math.max(10, imgX - zone.x)
     }
     if (handle.includes('n')) {
-      const bottom = zone.y + zone.height
+      const bottom = Math.min(zone.y + zone.height, srcH)
       zone.y = Math.max(0, Math.min(imgY, bottom - 10))
       zone.height = bottom - zone.y
     }
@@ -737,9 +750,6 @@ export class OcrTemplateEditorComponent
     this.zoneTestResult = null
     const zone = this.template.zones[index]
     if (zone) {
-      this.dateFormatCustom =
-        !!zone.date_format &&
-        !this.dateFormatOptions.some((o) => o.id === zone.date_format)
       this.seedCombineDefault(zone)
       this.goToPage(this.zonePage(zone) - 1)
     }
@@ -919,17 +929,27 @@ export class OcrTemplateEditorComponent
 
   /** Value bound to the date-format select: a preset, '' (auto), or 'custom'. */
   dateFormatChoice(zone: OcrTemplateZone): string {
-    if (this.dateFormatCustom) return 'custom'
-    return zone.date_format || ''
+    return this.usesCustomDateFormat(zone) ? 'custom' : zone.date_format || ''
   }
 
   setDateFormatChoice(zone: OcrTemplateZone, value: string) {
     if (value === 'custom') {
-      this.dateFormatCustom = true
+      this.customDateFormatZones.add(zone)
+      zone.date_format ||= ''
     } else {
-      this.dateFormatCustom = false
+      this.customDateFormatZones.delete(zone)
       zone.date_format = value
     }
+  }
+
+  usesCustomDateFormat(zone: OcrTemplateZone): boolean {
+    return (
+      this.customDateFormatZones.has(zone) ||
+      (!!zone.date_format &&
+        !this.dateFormatOptions.some(
+          (option) => option.id === zone.date_format
+        ))
+    )
   }
 
   getZoneTargetName(zone: OcrTemplateZone): string {
