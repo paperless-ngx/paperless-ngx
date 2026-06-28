@@ -1,0 +1,34 @@
+@if (zones.length === 0) {
+  <p class="text-muted" i18n>
+    No zones defined. Load a document preview and draw rectangles to add zones.
+  </p>
+}
+
+<div class="list-group">
+  @for (zone of zones; track $index; let i = $index) {
+    <div
+      class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+      [style.box-shadow]="selectedZoneIndex === i ? 'inset 3px 0 0 0 var(--bs-primary)' : null"
+    >
+      <div class="flex-grow-1" role="button" style="cursor: pointer;" (click)="zoneSelected.emit(i)">
+        <div>
+          <strong [class.text-primary]="selectedZoneIndex === i">
+            {{ zone.name }}
+          </strong>
+        </div>
+        <div class="small text-muted">
+          {{ getZoneTargetName(zone) }} - {{ zone.width }}x{{ zone.height }}px
+          <ng-container i18n>p.</ng-container>{{ zonePage(zone) }}
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-sm btn-outline-secondary" type="button" (click)="zoneSelected.emit(i)" title="Edit" i18n-title>
+          <i-bs name="pencil"></i-bs>
+        </button>
+        <button class="btn btn-sm btn-outline-danger" type="button" (click)="zoneRemoved.emit(i)" title="Delete" i18n-title>
+          <i-bs name="trash"></i-bs>
+        </button>
+      </div>
+    </div>
+  }
+</div>

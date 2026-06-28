@@ -52,6 +52,7 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { OcrTemplateEditorZoneListComponent } from './ocr-template-editor-zone-list/ocr-template-editor-zone-list.component'
 import {
   DisplayRect,
   DrawingRect,
@@ -86,6 +87,7 @@ type ActiveTab = 'settings' | 'zones' | 'zone'
     NgbTypeaheadModule,
     NgSelectModule,
     NgxBootstrapIconsModule,
+    OcrTemplateEditorZoneListComponent,
   ],
   templateUrl: './ocr-template-editor.component.html',
   styleUrls: ['./ocr-template-editor.component.scss'],
