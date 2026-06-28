@@ -9,6 +9,7 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
@@ -32,6 +33,7 @@ export class OcrTemplatesComponent
   private readonly documentTypeService = inject(DocumentTypeService)
   private readonly router = inject(Router)
   private readonly modalService = inject(NgbModal)
+  private readonly toastService = inject(ToastService)
   permissionsService = inject(PermissionsService)
 
   public templates: OcrTemplate[] = []
@@ -79,8 +81,17 @@ export class OcrTemplatesComponent
   }
 
   toggleTemplate(t: OcrTemplate) {
-    // ngModel has already flipped t.enabled — just persist it.
-    this.service.patch(t).subscribe()
+    // ngModel has already flipped t.enabled; restore it if persistence fails.
+    const enabled = t.enabled
+    this.service.patch(t).subscribe({
+      error: (error) => {
+        t.enabled = !enabled
+        this.toastService.showError(
+          $localize`Error updating OCR template.`,
+          error
+        )
+      },
+    })
   }
 
   deleteTemplate(t: OcrTemplate) {
