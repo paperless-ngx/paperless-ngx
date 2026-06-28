@@ -78,9 +78,15 @@ import {
 
 type ActiveTab = 'settings' | 'zones' | 'zone'
 type ZoneFieldSelection = OcrBuiltinTarget | number | null
+type CanvasInteraction =
+  | { kind: 'idle' }
+  | { kind: 'drawing'; rect: DrawingRect }
+  | { kind: 'moving'; zoneIndex: number; start: MoveStart }
+  | { kind: 'resizing'; zoneIndex: number; handle: ResizeHandle }
 
 const CUSTOM_DATE_FORMAT_CHOICE = 'custom'
 const MIN_DRAWN_ZONE_SIZE = 10
+const NO_CANVAS_INTERACTION: CanvasInteraction = { kind: 'idle' }
 
 @Component({
   selector: 'pngx-ocr-template-editor',
@@ -161,17 +167,8 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   activeTab: ActiveTab = 'settings'
 
-  isDrawing = false
-  currentRect: DrawingRect | null = null
   selectedZoneIndex: number | null = null
-
-  isResizing = false
-  resizeHandle: ResizeHandle | null = null
-  resizeZoneIndex: number | null = null
-
-  isMoving = false
-  moveZoneIndex: number | null = null
-  private moveStart: MoveStart = { mouseX: 0, mouseY: 0, zoneX: 0, zoneY: 0 }
+  private canvasInteraction: CanvasInteraction = NO_CANVAS_INTERACTION
 
   zoneTestResult: OcrZoneTestResult | null = null
   zoneTesting = false
@@ -384,9 +381,11 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     if (this.selectedZoneIndex !== null) {
       const handle = this.findHandleAt({ x, y }, this.selectedZoneIndex)
       if (handle) {
-        this.isResizing = true
-        this.resizeHandle = handle
-        this.resizeZoneIndex = this.selectedZoneIndex
+        this.canvasInteraction = {
+          kind: 'resizing',
+          zoneIndex: this.selectedZoneIndex,
+          handle,
+        }
         return
       }
     }
@@ -395,15 +394,19 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     if (clickedIdx !== null && !event.shiftKey) {
       this.selectZone(clickedIdx)
       const zone = this.template.zones[clickedIdx]
-      this.isMoving = true
-      this.moveZoneIndex = clickedIdx
-      this.moveStart = { mouseX: x, mouseY: y, zoneX: zone.x, zoneY: zone.y }
+      this.canvasInteraction = {
+        kind: 'moving',
+        zoneIndex: clickedIdx,
+        start: { mouseX: x, mouseY: y, zoneX: zone.x, zoneY: zone.y },
+      }
       return
     }
 
     // Shift+click or click on empty area starts a new zone.
-    this.isDrawing = true
-    this.currentRect = { startX: x, startY: y, endX: x, endY: y }
+    this.canvasInteraction = {
+      kind: 'drawing',
+      rect: { startX: x, startY: y, endX: x, endY: y },
+    }
     this.selectedZoneIndex = null
   }
 
@@ -412,17 +415,22 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     const mx = event.clientX - rect.left
     const my = event.clientY - rect.top
 
-    if (this.isResizing && this.resizeZoneIndex !== null && this.resizeHandle) {
-      this.applyResize(mx, my)
+    if (this.canvasInteraction.kind === 'resizing') {
+      this.applyResize(
+        this.canvasInteraction.zoneIndex,
+        this.canvasInteraction.handle,
+        mx,
+        my
+      )
       this.redrawCanvas()
       return
     }
 
-    if (this.isMoving && this.moveZoneIndex !== null) {
+    if (this.canvasInteraction.kind === 'moving') {
       moveZone(
-        this.template.zones[this.moveZoneIndex],
+        this.template.zones[this.canvasInteraction.zoneIndex],
         { x: mx, y: my },
-        this.moveStart,
+        this.canvasInteraction.start,
         this.canvasSize(),
         this.imageNaturalSize()
       )
@@ -430,9 +438,9 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       return
     }
 
-    if (this.isDrawing && this.currentRect) {
-      this.currentRect.endX = mx
-      this.currentRect.endY = my
+    if (this.canvasInteraction.kind === 'drawing') {
+      this.canvasInteraction.rect.endX = mx
+      this.canvasInteraction.rect.endY = my
       this.redrawCanvas()
       return
     }
@@ -460,35 +468,32 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       this.findZoneAt({ x: mx, y: my }) !== null ? 'move' : 'crosshair'
   }
 
-  onCanvasMouseUp(event: MouseEvent) {
-    if (this.isMoving) {
+  onCanvasMouseUp(_event: MouseEvent) {
+    if (
+      this.canvasInteraction.kind === 'moving' ||
+      this.canvasInteraction.kind === 'resizing'
+    ) {
       this.stopCanvasInteraction()
       return
     }
 
-    if (this.isResizing) {
-      this.stopCanvasInteraction()
-      return
-    }
-
-    if (!this.isDrawing || !this.currentRect) return
-    this.isDrawing = false
+    if (this.canvasInteraction.kind !== 'drawing') return
+    const drawingRect = this.canvasInteraction.rect
+    this.stopCanvasInteraction()
 
     const rect = sourceRectFromDrawing(
-      this.currentRect,
+      drawingRect,
       this.canvasSize(),
       this.imageNaturalSize()
     )
 
     // Ignore tiny accidental clicks.
     if (rect.w < MIN_DRAWN_ZONE_SIZE || rect.h < MIN_DRAWN_ZONE_SIZE) {
-      this.currentRect = null
       this.redrawCanvas()
       return
     }
 
     this.template.zones.push(this.createZoneFromRect(rect))
-    this.currentRect = null
     this.selectZone(this.template.zones.length - 1)
   }
 
@@ -519,19 +524,19 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   @HostListener('document:mouseup')
   onDocumentMouseUp() {
-    if (!this.isMoving && !this.isResizing && !this.isDrawing) return
+    if (this.canvasInteraction.kind === 'idle') return
     this.stopCanvasInteraction()
     this.redrawCanvas()
   }
 
   private stopCanvasInteraction() {
-    this.isMoving = false
-    this.moveZoneIndex = null
-    this.isResizing = false
-    this.resizeHandle = null
-    this.resizeZoneIndex = null
-    this.isDrawing = false
-    this.currentRect = null
+    this.canvasInteraction = NO_CANVAS_INTERACTION
+  }
+
+  private drawingRect(): DrawingRect | null {
+    return this.canvasInteraction.kind === 'drawing'
+      ? this.canvasInteraction.rect
+      : null
   }
 
   private getZoneDisplayRect(zoneIdx: number): DisplayRect | null {
@@ -553,14 +558,17 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     return findHandleAt(point, r)
   }
 
-  private applyResize(mx: number, my: number) {
-    if (this.resizeZoneIndex === null || !this.resizeHandle) return
-
-    const zone = this.template.zones[this.resizeZoneIndex]
+  private applyResize(
+    zoneIndex: number,
+    handle: ResizeHandle,
+    mx: number,
+    my: number
+  ) {
+    const zone = this.template.zones[zoneIndex]
     if (!zone) return
     resizeZone(
       zone,
-      this.resizeHandle,
+      handle,
       { x: mx, y: my },
       this.canvasSize(),
       this.imageNaturalSize()
@@ -667,15 +675,16 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       }
     })
 
-    if (this.currentRect) {
-      const cw = this.currentRect.endX - this.currentRect.startX
-      const ch = this.currentRect.endY - this.currentRect.startY
+    const drawingRect = this.drawingRect()
+    if (drawingRect) {
+      const cw = drawingRect.endX - drawingRect.startX
+      const ch = drawingRect.endY - drawingRect.startY
       ctx.fillStyle = 'rgba(105, 219, 124, 0.25)'
-      ctx.fillRect(this.currentRect.startX, this.currentRect.startY, cw, ch)
+      ctx.fillRect(drawingRect.startX, drawingRect.startY, cw, ch)
       ctx.strokeStyle = '#69db7c'
       ctx.lineWidth = 2
       ctx.setLineDash([5, 5])
-      ctx.strokeRect(this.currentRect.startX, this.currentRect.startY, cw, ch)
+      ctx.strokeRect(drawingRect.startX, drawingRect.startY, cw, ch)
       ctx.setLineDash([])
     }
   }
