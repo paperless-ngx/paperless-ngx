@@ -119,7 +119,6 @@
                   type="text"
                   class="form-control"
                   [(ngModel)]="zone.name"
-                  (ngModelChange)="redrawCanvas()"
                 />
               </div>
 
@@ -130,7 +129,6 @@
                   class="form-control"
                   [(ngModel)]="zone.page"
                   min="-1"
-                  (ngModelChange)="redrawCanvas()"
                 />
                 <small class="text-muted" i18n>Page this zone is on. Use -1 for the last page. Set automatically when you draw it.</small>
               </div>
@@ -354,25 +352,74 @@
     <!-- Right column: Document preview with zone overlay -->
     <div class="col-md-8">
       @if (pageImageUrl) {
-        <div class="border" style="overflow: auto; max-height: 78vh;">
-        <div class="position-relative d-inline-block" [style.width.%]="zoom * 100">
+        <div class="zone-preview-scroll border">
+        <div class="zone-preview-stage" [style.width.%]="zoom * 100">
           <img
             #pageImage
             [src]="pageImageUrl"
             (load)="onImageLoad()"
-            style="width: 100%; display: block;"
+            class="zone-preview-image"
             [style.visibility]="imageLoaded ? 'visible' : 'hidden'"
             crossorigin="use-credentials"
           />
           @if (imageLoaded) {
-            <canvas
-              #zoneCanvas
-              class="position-absolute top-0 start-0"
-              style="width: 100%; height: 100%; cursor: crosshair;"
-              (mousedown)="onCanvasMouseDown($event)"
-              (mousemove)="onCanvasMouseMove($event)"
-              (mouseup)="onCanvasMouseUp($event)"
-            ></canvas>
+            <svg
+              #zoneOverlay
+              class="zone-overlay"
+              [attr.viewBox]="overlayViewBox()"
+              preserveAspectRatio="none"
+              [style.cursor]="overlayCursor"
+              (mousedown)="onOverlayMouseDown($event)"
+              (mousemove)="onOverlayMouseMove($event)"
+              (mouseup)="onOverlayMouseUp($event)"
+            >
+              @for (zone of template.zones; track $index; let i = $index) {
+                @if (zoneDisplayRect(i); as rect) {
+                  <g>
+                    <rect
+                      class="zone-rect"
+                      [class.zone-rect-selected]="selectedZoneIndex === i"
+                      [attr.x]="rect.x"
+                      [attr.y]="rect.y"
+                      [attr.width]="rect.w"
+                      [attr.height]="rect.h"
+                      [attr.stroke]="zoneColor(i)"
+                      [attr.fill]="zoneFill(i)"
+                    ></rect>
+                    <text
+                      class="zone-label"
+                      [attr.x]="rect.x + overlayUnitSize(6)"
+                      [attr.y]="zoneLabelY(rect)"
+                      [attr.font-size]="overlayFontSize()"
+                      [attr.fill]="zoneColor(i)"
+                    >{{ zoneLabel(zone, i) }}</text>
+
+                    @if (selectedZoneIndex === i) {
+                      @for (handle of resizeHandles(rect); track handle.handle) {
+                        <rect
+                          class="zone-resize-handle"
+                          [attr.x]="handle.x - overlayHandleSize() / 2"
+                          [attr.y]="handle.y - overlayHandleSize() / 2"
+                          [attr.width]="overlayHandleSize()"
+                          [attr.height]="overlayHandleSize()"
+                          [attr.fill]="zoneColor(i)"
+                        ></rect>
+                      }
+                    }
+                  </g>
+                }
+              }
+
+              @if (drawingRect(); as rect) {
+                <rect
+                  class="zone-drawing-rect"
+                  [attr.x]="rect.x"
+                  [attr.y]="rect.y"
+                  [attr.width]="rect.w"
+                  [attr.height]="rect.h"
+                ></rect>
+              }
+            </svg>
           }
           @if (!imageLoaded) {
             <div class="d-flex justify-content-center p-5">

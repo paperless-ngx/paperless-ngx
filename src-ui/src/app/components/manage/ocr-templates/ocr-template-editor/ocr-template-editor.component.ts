@@ -71,22 +71,45 @@ import {
   isZoneOnPage,
   MoveStart,
   moveZone,
+  Point,
   ResizeHandle,
   resizeZone,
-  sourceRectFromDrawing,
 } from './zone-geometry'
 
 type ActiveTab = 'settings' | 'zones' | 'zone'
 type ZoneFieldSelection = OcrBuiltinTarget | number | null
-type CanvasInteraction =
+type OverlayInteraction =
   | { kind: 'idle' }
   | { kind: 'drawing'; rect: DrawingRect }
   | { kind: 'moving'; zoneIndex: number; start: MoveStart }
   | { kind: 'resizing'; zoneIndex: number; handle: ResizeHandle }
+interface ResizeHandleMarker extends Point {
+  handle: ResizeHandle
+}
 
 const CUSTOM_DATE_FORMAT_CHOICE = 'custom'
 const MIN_DRAWN_ZONE_SIZE = 10
-const NO_CANVAS_INTERACTION: CanvasInteraction = { kind: 'idle' }
+const NO_OVERLAY_INTERACTION: OverlayInteraction = { kind: 'idle' }
+const ZONE_COLORS = [
+  '#4f8ff7',
+  '#ff6b6b',
+  '#51cf66',
+  '#ffd43b',
+  '#cc5de8',
+  '#ff922b',
+  '#20c997',
+  '#e599f7',
+]
+const RESIZE_CURSOR: Record<ResizeHandle, string> = {
+  nw: 'nw-resize',
+  ne: 'ne-resize',
+  sw: 'sw-resize',
+  se: 'se-resize',
+  n: 'n-resize',
+  s: 's-resize',
+  w: 'w-resize',
+  e: 'e-resize',
+}
 
 @Component({
   selector: 'pngx-ocr-template-editor',
@@ -121,7 +144,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>()
   private readonly customDateFormatZones = new WeakSet<OcrTemplateZone>()
 
-  @ViewChild('zoneCanvas') canvasRef: ElementRef<HTMLCanvasElement>
+  @ViewChild('zoneOverlay') overlayRef: ElementRef<SVGSVGElement>
   @ViewChild('pageImage') imageRef: ElementRef<HTMLImageElement>
 
   template: OcrTemplate = {
@@ -168,7 +191,8 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   activeTab: ActiveTab = 'settings'
 
   selectedZoneIndex: number | null = null
-  private canvasInteraction: CanvasInteraction = NO_CANVAS_INTERACTION
+  private overlayInteraction: OverlayInteraction = NO_OVERLAY_INTERACTION
+  overlayCursor = 'crosshair'
 
   zoneTestResult: OcrZoneTestResult | null = null
   zoneTesting = false
@@ -338,22 +362,14 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   zoomIn() {
     this.zoom = Math.min(4, Math.round((this.zoom + 0.25) * 100) / 100)
-    this.afterZoom()
   }
 
   zoomOut() {
     this.zoom = Math.max(0.5, Math.round((this.zoom - 0.25) * 100) / 100)
-    this.afterZoom()
   }
 
   resetZoom() {
     this.zoom = 1
-    this.afterZoom()
-  }
-
-  private afterZoom() {
-    // Defer so the wrapper reflows to the new width before the canvas resizes.
-    setTimeout(() => this.redrawCanvas())
   }
 
   zonePage(zone: OcrTemplateZone): number {
@@ -369,19 +385,17 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     const img = this.imageRef.nativeElement
     this.template.source_width = img.naturalWidth
     this.template.source_height = img.naturalHeight
-    // The canvas only exists after @if(imageLoaded) renders, so defer the draw.
-    setTimeout(() => this.redrawCanvas())
   }
 
-  onCanvasMouseDown(event: MouseEvent) {
-    const rect = this.canvasRef.nativeElement.getBoundingClientRect()
-    const x = event.clientX - rect.left
-    const y = event.clientY - rect.top
+  onOverlayMouseDown(event: MouseEvent) {
+    const point = this.svgPointFromEvent(event)
+    if (!point) return
+    event.preventDefault()
 
     if (this.selectedZoneIndex !== null) {
-      const handle = this.findHandleAt({ x, y }, this.selectedZoneIndex)
+      const handle = this.findHandleAt(point, this.selectedZoneIndex)
       if (handle) {
-        this.canvasInteraction = {
+        this.overlayInteraction = {
           kind: 'resizing',
           zoneIndex: this.selectedZoneIndex,
           handle,
@@ -390,106 +404,97 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       }
     }
 
-    const clickedIdx = this.findZoneAt({ x, y })
+    const clickedIdx = this.findZoneAt(point)
     if (clickedIdx !== null && !event.shiftKey) {
       this.selectZone(clickedIdx)
       const zone = this.template.zones[clickedIdx]
-      this.canvasInteraction = {
+      this.overlayInteraction = {
         kind: 'moving',
         zoneIndex: clickedIdx,
-        start: { mouseX: x, mouseY: y, zoneX: zone.x, zoneY: zone.y },
+        start: {
+          mouseX: point.x,
+          mouseY: point.y,
+          zoneX: zone.x,
+          zoneY: zone.y,
+        },
       }
       return
     }
 
     // Shift+click or click on empty area starts a new zone.
-    this.canvasInteraction = {
+    this.overlayInteraction = {
       kind: 'drawing',
-      rect: { startX: x, startY: y, endX: x, endY: y },
+      rect: {
+        startX: point.x,
+        startY: point.y,
+        endX: point.x,
+        endY: point.y,
+      },
     }
     this.selectedZoneIndex = null
   }
 
-  onCanvasMouseMove(event: MouseEvent) {
-    const rect = this.canvasRef.nativeElement.getBoundingClientRect()
-    const mx = event.clientX - rect.left
-    const my = event.clientY - rect.top
+  onOverlayMouseMove(event: MouseEvent) {
+    const point = this.svgPointFromEvent(event)
+    if (!point) return
 
-    if (this.canvasInteraction.kind === 'resizing') {
+    if (this.overlayInteraction.kind === 'resizing') {
       this.applyResize(
-        this.canvasInteraction.zoneIndex,
-        this.canvasInteraction.handle,
-        mx,
-        my
+        this.overlayInteraction.zoneIndex,
+        this.overlayInteraction.handle,
+        point
       )
-      this.redrawCanvas()
       return
     }
 
-    if (this.canvasInteraction.kind === 'moving') {
+    if (this.overlayInteraction.kind === 'moving') {
       moveZone(
-        this.template.zones[this.canvasInteraction.zoneIndex],
-        { x: mx, y: my },
-        this.canvasInteraction.start,
-        this.canvasSize(),
+        this.template.zones[this.overlayInteraction.zoneIndex],
+        point,
+        this.overlayInteraction.start,
+        this.imageNaturalSize(),
         this.imageNaturalSize()
       )
-      this.redrawCanvas()
       return
     }
 
-    if (this.canvasInteraction.kind === 'drawing') {
-      this.canvasInteraction.rect.endX = mx
-      this.canvasInteraction.rect.endY = my
-      this.redrawCanvas()
+    if (this.overlayInteraction.kind === 'drawing') {
+      this.overlayInteraction.rect.endX = point.x
+      this.overlayInteraction.rect.endY = point.y
       return
     }
 
-    // Cursor feedback: resize handle > move (over a zone) > crosshair.
-    const canvas = this.canvasRef.nativeElement
+    this.updateOverlayCursor(point)
+  }
+
+  private updateOverlayCursor(point: Point) {
     if (this.selectedZoneIndex !== null) {
-      const handle = this.findHandleAt({ x: mx, y: my }, this.selectedZoneIndex)
+      const handle = this.findHandleAt(point, this.selectedZoneIndex)
       if (handle) {
-        const cursorMap: Record<ResizeHandle, string> = {
-          nw: 'nw-resize',
-          ne: 'ne-resize',
-          sw: 'sw-resize',
-          se: 'se-resize',
-          n: 'n-resize',
-          s: 's-resize',
-          w: 'w-resize',
-          e: 'e-resize',
-        }
-        canvas.style.cursor = cursorMap[handle] || 'crosshair'
+        this.overlayCursor = RESIZE_CURSOR[handle] || 'crosshair'
         return
       }
     }
-    canvas.style.cursor =
-      this.findZoneAt({ x: mx, y: my }) !== null ? 'move' : 'crosshair'
+    this.overlayCursor = this.findZoneAt(point) !== null ? 'move' : 'crosshair'
   }
 
-  onCanvasMouseUp(_event: MouseEvent) {
+  onOverlayMouseUp(_event: MouseEvent) {
     if (
-      this.canvasInteraction.kind === 'moving' ||
-      this.canvasInteraction.kind === 'resizing'
+      this.overlayInteraction.kind === 'moving' ||
+      this.overlayInteraction.kind === 'resizing'
     ) {
-      this.stopCanvasInteraction()
+      this.stopOverlayInteraction()
       return
     }
 
-    if (this.canvasInteraction.kind !== 'drawing') return
-    const drawingRect = this.canvasInteraction.rect
-    this.stopCanvasInteraction()
+    if (this.overlayInteraction.kind !== 'drawing') return
+    const drawingRect = this.overlayInteraction.rect
+    this.stopOverlayInteraction()
 
-    const rect = sourceRectFromDrawing(
-      drawingRect,
-      this.canvasSize(),
-      this.imageNaturalSize()
-    )
+    const rect = this.sourceRectFromDrawing(drawingRect)
 
     // Ignore tiny accidental clicks.
     if (rect.w < MIN_DRAWN_ZONE_SIZE || rect.h < MIN_DRAWN_ZONE_SIZE) {
-      this.redrawCanvas()
       return
     }
 
@@ -524,58 +529,53 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   @HostListener('document:mouseup')
   onDocumentMouseUp() {
-    if (this.canvasInteraction.kind === 'idle') return
-    this.stopCanvasInteraction()
-    this.redrawCanvas()
+    if (this.overlayInteraction.kind === 'idle') return
+    this.stopOverlayInteraction()
   }
 
-  private stopCanvasInteraction() {
-    this.canvasInteraction = NO_CANVAS_INTERACTION
+  private stopOverlayInteraction() {
+    this.overlayInteraction = NO_OVERLAY_INTERACTION
+    this.overlayCursor = 'crosshair'
   }
 
-  private drawingRect(): DrawingRect | null {
-    return this.canvasInteraction.kind === 'drawing'
-      ? this.canvasInteraction.rect
+  drawingRect(): DisplayRect | null {
+    return this.overlayInteraction.kind === 'drawing'
+      ? this.displayRectFromDrawing(this.overlayInteraction.rect)
       : null
   }
 
-  private getZoneDisplayRect(zoneIdx: number): DisplayRect | null {
-    const canvas = this.canvasRef?.nativeElement
+  zoneDisplayRect(zoneIdx: number): DisplayRect | null {
     const img = this.imageRef?.nativeElement
-    if (!canvas || !img || !img.naturalWidth) return null
+    if (!img || !img.naturalWidth) return null
     const zone = this.template.zones[zoneIdx]
     if (!zone) return null
     if (!this.isOnCurrentPage(zone)) return null
-    return getZoneDisplayRect(zone, this.canvasSize(), this.imageNaturalSize())
+    return getZoneDisplayRect(
+      zone,
+      this.imageNaturalSize(),
+      this.imageNaturalSize()
+    )
   }
 
-  private findHandleAt(
-    point: { x: number; y: number },
-    zoneIdx: number
-  ): ResizeHandle | null {
-    const r = this.getZoneDisplayRect(zoneIdx)
+  private findHandleAt(point: Point, zoneIdx: number): ResizeHandle | null {
+    const r = this.zoneDisplayRect(zoneIdx)
     if (!r) return null
-    return findHandleAt(point, r)
+    return findHandleAt(point, r, this.overlayHandleSize())
   }
 
-  private applyResize(
-    zoneIndex: number,
-    handle: ResizeHandle,
-    mx: number,
-    my: number
-  ) {
+  private applyResize(zoneIndex: number, handle: ResizeHandle, point: Point) {
     const zone = this.template.zones[zoneIndex]
     if (!zone) return
     resizeZone(
       zone,
       handle,
-      { x: mx, y: my },
-      this.canvasSize(),
+      point,
+      this.imageNaturalSize(),
       this.imageNaturalSize()
     )
   }
 
-  private findZoneAt(point: { x: number; y: number }): number | null {
+  private findZoneAt(point: Point): number | null {
     const img = this.imageRef.nativeElement
     if (!img.naturalWidth) return null
 
@@ -584,114 +584,89 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       this.template.zones,
       this.previewPage,
       this.previewPageCount,
-      this.canvasSize(),
+      this.imageNaturalSize(),
       this.imageNaturalSize()
     )
   }
 
-  redrawCanvas() {
-    if (!this.canvasRef || !this.imageRef) return
-    const canvas = this.canvasRef.nativeElement
-    const img = this.imageRef.nativeElement
-    const ctx = canvas.getContext('2d')
+  overlayViewBox(): string {
+    const imageSize = this.imageNaturalSize()
+    return `0 0 ${imageSize.width} ${imageSize.height}`
+  }
 
-    canvas.width = img.clientWidth
-    canvas.height = img.clientHeight
+  zoneColor(index: number): string {
+    return ZONE_COLORS[index % ZONE_COLORS.length]
+  }
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
+  zoneFill(index: number): string {
+    return `${this.zoneColor(index)}33`
+  }
 
-    const colors = [
-      '#4f8ff7',
-      '#ff6b6b',
-      '#51cf66',
-      '#ffd43b',
-      '#cc5de8',
-      '#ff922b',
-      '#20c997',
-      '#e599f7',
+  zoneLabel(zone: OcrTemplateZone, index: number): string {
+    return zone.name || `Zone ${index + 1}`
+  }
+
+  zoneLabelY(rect: DisplayRect): number {
+    return Math.max(this.overlayUnitSize(14), rect.y - this.overlayUnitSize(4))
+  }
+
+  resizeHandles(rect: DisplayRect): ResizeHandleMarker[] {
+    return [
+      { handle: 'nw', x: rect.x, y: rect.y },
+      { handle: 'n', x: rect.x + rect.w / 2, y: rect.y },
+      { handle: 'ne', x: rect.x + rect.w, y: rect.y },
+      { handle: 'w', x: rect.x, y: rect.y + rect.h / 2 },
+      { handle: 'e', x: rect.x + rect.w, y: rect.y + rect.h / 2 },
+      { handle: 'sw', x: rect.x, y: rect.y + rect.h },
+      { handle: 's', x: rect.x + rect.w / 2, y: rect.y + rect.h },
+      { handle: 'se', x: rect.x + rect.w, y: rect.y + rect.h },
     ]
+  }
 
-    this.template.zones.forEach((zone, idx) => {
-      if (!this.isOnCurrentPage(zone)) return
-      const color = colors[idx % colors.length]
-      const srcW = zone.zone_source_width || img.naturalWidth
-      const srcH = zone.zone_source_height || img.naturalHeight
-      const scaleX = canvas.width / srcW
-      const scaleY = canvas.height / srcH
-      const x = zone.x * scaleX
-      const y = zone.y * scaleY
-      const w = zone.width * scaleX
-      const h = zone.height * scaleY
+  overlayHandleSize(): number {
+    return this.overlayUnitSize(HANDLE_SIZE)
+  }
 
-      ctx.strokeStyle = color
-      ctx.lineWidth = idx === this.selectedZoneIndex ? 3 : 2
-      ctx.strokeRect(x, y, w, h)
+  overlayFontSize(): number {
+    return this.overlayUnitSize(12)
+  }
 
-      ctx.fillStyle = color + '20'
-      ctx.fillRect(x, y, w, h)
+  overlayUnitSize(screenPixels: number): number {
+    const img = this.imageRef?.nativeElement
+    if (!img?.naturalWidth || !img.clientWidth) return screenPixels
+    return (screenPixels * img.naturalWidth) / img.clientWidth
+  }
 
-      const label = zone.name || `Zone ${idx + 1}`
-      ctx.font = '12px sans-serif'
-      ctx.textBaseline = 'middle'
-      const padX = 6
-      const pillH = 17
-      const pillW = ctx.measureText(label).width + padX * 2
-      const pillX = x
-      const pillY = Math.max(0, y - pillH - 2)
-      const r = 4
-      ctx.fillStyle = color
-      ctx.beginPath()
-      ctx.moveTo(pillX + r, pillY)
-      ctx.arcTo(pillX + pillW, pillY, pillX + pillW, pillY + pillH, r)
-      ctx.arcTo(pillX + pillW, pillY + pillH, pillX, pillY + pillH, r)
-      ctx.arcTo(pillX, pillY + pillH, pillX, pillY, r)
-      ctx.arcTo(pillX, pillY, pillX + pillW, pillY, r)
-      ctx.closePath()
-      ctx.fill()
-      ctx.fillStyle = '#ffffff'
-      ctx.fillText(label, pillX + padX, pillY + pillH / 2 + 0.5)
-      ctx.textBaseline = 'alphabetic'
+  private svgPointFromEvent(event: MouseEvent): Point | null {
+    const svg = this.overlayRef?.nativeElement
+    const matrix = svg?.getScreenCTM()
+    if (!svg || !matrix) return null
 
-      if (idx === this.selectedZoneIndex) {
-        ctx.fillStyle = color
-        const handles = [
-          [x, y],
-          [x + w / 2, y],
-          [x + w, y],
-          [x, y + h / 2],
-          [x + w, y + h / 2],
-          [x, y + h],
-          [x + w / 2, y + h],
-          [x + w, y + h],
-        ]
-        for (const [hx, hy] of handles) {
-          ctx.fillRect(
-            hx - HANDLE_SIZE / 2,
-            hy - HANDLE_SIZE / 2,
-            HANDLE_SIZE,
-            HANDLE_SIZE
-          )
-        }
-      }
-    })
+    const point = svg.createSVGPoint()
+    point.x = event.clientX
+    point.y = event.clientY
 
-    const drawingRect = this.drawingRect()
-    if (drawingRect) {
-      const cw = drawingRect.endX - drawingRect.startX
-      const ch = drawingRect.endY - drawingRect.startY
-      ctx.fillStyle = 'rgba(105, 219, 124, 0.25)'
-      ctx.fillRect(drawingRect.startX, drawingRect.startY, cw, ch)
-      ctx.strokeStyle = '#69db7c'
-      ctx.lineWidth = 2
-      ctx.setLineDash([5, 5])
-      ctx.strokeRect(drawingRect.startX, drawingRect.startY, cw, ch)
-      ctx.setLineDash([])
+    const svgPoint = point.matrixTransform(matrix.inverse())
+    return { x: svgPoint.x, y: svgPoint.y }
+  }
+
+  private displayRectFromDrawing(rect: DrawingRect): DisplayRect {
+    return {
+      x: Math.min(rect.startX, rect.endX),
+      y: Math.min(rect.startY, rect.endY),
+      w: Math.abs(rect.endX - rect.startX),
+      h: Math.abs(rect.endY - rect.startY),
     }
   }
 
-  private canvasSize() {
-    const canvas = this.canvasRef.nativeElement
-    return { width: canvas.width, height: canvas.height }
+  private sourceRectFromDrawing(rect: DrawingRect): DisplayRect {
+    const displayRect = this.displayRectFromDrawing(rect)
+    return {
+      x: Math.round(displayRect.x),
+      y: Math.round(displayRect.y),
+      w: Math.round(displayRect.w),
+      h: Math.round(displayRect.h),
+    }
   }
 
   private imageNaturalSize() {
@@ -706,7 +681,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     } else if (this.selectedZoneIndex > index) {
       this.selectedZoneIndex--
     }
-    this.redrawCanvas()
   }
 
   selectZone(index: number) {
@@ -718,7 +692,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       this.seedCombineDefault(zone)
       this.goToPage(this.zonePage(zone) - 1)
     }
-    this.redrawCanvas()
   }
 
   testZone() {
@@ -782,7 +755,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
         this.selectedZoneIndex = idx
         this.saving = false
         this.toastService.showInfo($localize`OCR template saved.`)
-        this.redrawCanvas()
       },
       error: (e) => {
         this.saving = false

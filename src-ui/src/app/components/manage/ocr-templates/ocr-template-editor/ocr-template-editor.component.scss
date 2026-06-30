@@ -1,3 +1,63 @@
 :host {
   display: block;
 }
+
+.zone-preview-scroll {
+  max-height: 78vh;
+  overflow: auto;
+}
+
+.zone-preview-stage {
+  display: inline-block;
+  position: relative;
+}
+
+.zone-preview-image {
+  display: block;
+  width: 100%;
+}
+
+.zone-overlay {
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  touch-action: none;
+  width: 100%;
+}
+
+.zone-rect,
+.zone-drawing-rect {
+  vector-effect: non-scaling-stroke;
+}
+
+.zone-rect {
+  stroke-width: 2;
+}
+
+.zone-rect-selected {
+  stroke-width: 3;
+}
+
+.zone-label {
+  font-family: var(--bs-font-sans-serif);
+  font-weight: 600;
+  paint-order: stroke;
+  pointer-events: none;
+  stroke: #fff;
+  stroke-linejoin: round;
+  stroke-width: 4px;
+  vector-effect: non-scaling-stroke;
+}
+
+.zone-resize-handle {
+  stroke: #fff;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.zone-drawing-rect {
+  fill: rgba(105, 219, 124, 0.25);
+  stroke: #69db7c;
+  stroke-dasharray: 5 5;
+  stroke-width: 2;
+}
