@@ -2796,7 +2796,7 @@ wheels = [
 
 [[package]]
 name = "ocrmypdf"
-version = "17.4.2"
+version = "17.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "deprecation", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -2813,9 +2813,9 @@ dependencies = [
     { name = "rich", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "uharfbuzz", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6a/ba/26dd03706f5f387acb5d0e11d33dbe716f5cbce95e033e68404636eb3de5/ocrmypdf-17.4.2.tar.gz", hash = "sha256:b564557411c9a2695137cdc34e0a1a5084c5f33d7b3ef593f2659aa6a6a1c3cd", size = 7392178, upload-time = "2026-04-20T19:33:33.572Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/0e/f4/7d8fcd1f255ce098ecb8daf40ae20eb3fd940ac0f40c5bc22f10711352f6/ocrmypdf-17.7.0.tar.gz", hash = "sha256:c0a351910e8fee09bdbfee6cc7ba0299b9d561bba42afbbf4df29edcc7d58bc6", size = 7431306, upload-time = "2026-06-18T02:59:40.938Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d8/cb/e98af5616f3627dcef5b3c15cc28e566f77e96fb6f9b7592c24ff063cf5d/ocrmypdf-17.4.2-py3-none-any.whl", hash = "sha256:486d783dad386826ce052269111b1e9847f2e236a20465de0688af8c7a9bf7ad", size = 489269, upload-time = "2026-04-20T19:33:31.271Z" },
+    { url = "https://files.pythonhosted.org/packages/d5/e5/293574a8645948aebfdcf6fd2d723720882625403b6e54c5f0e896c1e57d/ocrmypdf-17.7.0-py3-none-any.whl", hash = "sha256:a9e297d5b33749b34efbb1221675ea487348a08157c08def6d9ac1711bec0af0", size = 504897, upload-time = "2026-06-18T02:59:38.851Z" },
 ]
 
 [[package]]
@@ -3056,7 +3056,7 @@ requires-dist = [
     { name = "llama-index-llms-openai-like", specifier = ">=0.7.1" },
     { name = "mysqlclient", marker = "extra == 'mariadb'", specifier = "~=2.2.7" },
     { name = "nltk", specifier = "~=3.9.1" },
-    { name = "ocrmypdf", specifier = "~=17.4.2" },
+    { name = "ocrmypdf", specifier = "~=17.7.0" },
     { name = "openai", specifier = ">=2.32" },
     { name = "pathvalidate", specifier = "~=3.3.1" },
     { name = "pdf2image", specifier = "~=1.17.0" },
