@@ -46,16 +46,16 @@ repos:
           - ts
           - markdown
         additional_dependencies:
-          - prettier@3.8.3
+          - prettier@3.8.4
           - 'prettier-plugin-organize-imports@4.3.0'
   # Python hooks
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.17
+    rev: v0.15.19
     hooks:
       - id: ruff-check
       - id: ruff-format
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: "v2.24.1"
+    rev: "v2.25.0"
     hooks:
       - id: pyproject-fmt
         additional_dependencies: [tomli]
