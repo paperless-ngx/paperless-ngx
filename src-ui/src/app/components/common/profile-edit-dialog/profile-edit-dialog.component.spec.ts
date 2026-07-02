@@ -69,7 +69,6 @@ describe('ProfileEditDialogComponent', () => {
     clipboard = TestBed.inject(Clipboard)
     fixture = TestBed.createComponent(ProfileEditDialogComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
   })
 
   it('should get profile on init, display in form', () => {

@@ -28,7 +28,7 @@ export function paramsFromViewState(
   viewState: ListViewState,
   pageOnly: boolean = false
 ): Params {
-  let params = queryParamsFromFilterRules(viewState.filterRules)
+  let params = queryParamsFromFilterRules(viewState.filterRules) ?? {}
   params[SORT_FIELD_PARAMETER] = viewState.sortField
   params[SORT_REVERSE_PARAMETER] = viewState.sortReverse ? 1 : undefined
   if (pageOnly) params = {}
@@ -148,11 +148,14 @@ export function filterRulesFromQueryParams(
   return filterRulesFromQueryParams
 }
 
-export function queryParamsFromFilterRules(filterRules: FilterRule[]): Params {
+export function queryParamsFromFilterRules(
+  filterRules: FilterRule[] | null
+): Params | null {
   if (filterRules) {
-    let params = {}
+    let params: Params = {}
     for (let rule of filterRules) {
       let ruleType = FILTER_RULE_TYPES.find((t) => t.id == rule.rule_type)
+      if (!ruleType) continue
       if (
         rule.rule_type === FILTER_TITLE_CONTENT ||
         rule.rule_type === FILTER_SIMPLE_TEXT

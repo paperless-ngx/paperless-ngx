@@ -12,6 +12,8 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "es2020",
+    "strict": false,
+    "ignoreDeprecations": "6.0",
     "lib": [
       "es2020",
       "dom"
@@ -20,5 +22,6 @@
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
+    "strictTemplates": false
   }
 }

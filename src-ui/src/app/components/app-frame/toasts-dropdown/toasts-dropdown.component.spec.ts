@@ -61,8 +61,6 @@ describe('ToastsDropdownComponent', () => {
     jest.spyOn(toastService, 'getToasts').mockReturnValue(toastsSubject)
 
     component = fixture.componentInstance
-
-    fixture.detectChanges()
   })
 
   it('should call getToasts and return toasts', fakeAsync(() => {

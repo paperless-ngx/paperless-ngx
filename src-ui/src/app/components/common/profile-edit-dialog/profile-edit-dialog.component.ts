@@ -148,10 +148,12 @@ export class ProfileEditDialogComponent
         this.error.email_confirm = $localize`Emails must match`
       } else {
         delete this.error?.email_confirm
+        this.clearEmptyConfirmationErrors()
       }
     } else {
       this.form.get('email_confirm').disable()
       delete this.error?.email_confirm
+      this.clearEmptyConfirmationErrors()
     }
   }
 
@@ -176,10 +178,18 @@ export class ProfileEditDialogComponent
         this.error.password_confirm = $localize`Passwords must match`
       } else {
         delete this.error?.password_confirm
+        this.clearEmptyConfirmationErrors()
       }
     } else {
       this.form.get('password_confirm').disable()
       delete this.error?.password_confirm
+      this.clearEmptyConfirmationErrors()
+    }
+  }
+
+  private clearEmptyConfirmationErrors(): void {
+    if (this.error && Object.keys(this.error).length === 0) {
+      this.error = null
     }
   }
 
