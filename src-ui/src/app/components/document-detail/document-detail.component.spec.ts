@@ -1530,11 +1530,13 @@ describe('DocumentDetailComponent', () => {
   })
 
   it('should clear pdf source if preview URL is empty', () => {
-    component.pdfSource = { url: '/preview', password: 'secret' } as any
+    component.pdfSource = '/preview'
+    component.pdfPassword = 'secret'
     component.previewUrl = null
     ;(component as any).updatePdfSource()
 
-    expect(component.pdfSource).toEqual({ url: null, password: undefined })
+    expect(component.pdfSource).toEqual(null)
+    expect(component.pdfPassword).toBeUndefined()
   })
 
   it('should close incoming update modal if one is open', () => {
@@ -1871,9 +1873,8 @@ describe('DocumentDetailComponent', () => {
     expect(component.thumbUrl).toBe('thumb-version')
     expect(component.previewText).toBe('version text')
     expect(component.documentForm.get('content').value).toBe('version-content')
-    const pdfSource = component.pdfSource as { url: string; password?: string }
-    expect(pdfSource.url).toBe('preview-version')
-    expect(pdfSource.password).toBeUndefined()
+    expect(component.pdfSource).toBe('preview-version')
+    expect(component.pdfPassword).toBeUndefined()
 
     previewSpy.mockReturnValueOnce('preview-error')
     component.selectVersion(11)
