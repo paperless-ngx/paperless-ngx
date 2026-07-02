@@ -64,7 +64,7 @@
     "jest": "30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "jest-junit": "^17.0.0",
-    "jest-preset-angular": "^16.1.5",
+    "jest-preset-angular": "^17.0.0",
     "jest-websocket-mock": "^2.5.0",
     "prettier-plugin-organize-imports": "^4.3.0",
     "ts-node": "~10.9.1",
