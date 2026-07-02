@@ -54,7 +54,7 @@
     "@angular/cli": "~21.2.12",
     "@angular/compiler-cli": "~21.2.14",
     "@codecov/webpack-plugin": "^2.0.1",
-    "@playwright/test": "^1.60.0",
+    "@playwright/test": "^1.61.1",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.0.0",
     "@typescript-eslint/eslint-plugin": "^8.60.0",
