@@ -2,8 +2,6 @@ export type PngxPdfDocumentProxy = {
   numPages: number
 }
 
-export type PdfSource = string | { url: string; password?: string }
-
 export enum PdfRenderMode {
   Single = 'single',
   All = 'all',
