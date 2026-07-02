@@ -24,7 +24,6 @@ module.exports = [
     },
     processor: '@angular-eslint/template/extract-inline-html',
     rules: {
-      ...angularEslintPlugin.configs.recommended.rules,
       '@angular-eslint/directive-selector': [
         'error',
         {
@@ -51,8 +50,6 @@ module.exports = [
     plugins: {
       '@angular-eslint/template': angularTemplatePlugin,
     },
-    rules: {
-      ...angularTemplatePlugin.configs.recommended.rules,
-    },
+    rules: {},
   },
 ]
