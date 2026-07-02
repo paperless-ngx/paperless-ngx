@@ -115,7 +115,6 @@ import { PDFEditorComponent } from '../common/pdf-editor/pdf-editor.component'
 import { PngxPdfViewerComponent } from '../common/pdf-viewer/pdf-viewer.component'
 import {
   PdfRenderMode,
-  PdfSource,
   PdfZoomLevel,
   PdfZoomScale,
   PngxPdfDocumentProxy,
@@ -242,7 +241,8 @@ export class DocumentDetailComponent
   title: string
   titleSubject: Subject<string> = new Subject()
   previewUrl: string
-  pdfSource?: PdfSource
+  pdfSource?: string
+  pdfPassword?: string
   thumbUrl: string
   previewText: string
   previewLoaded: boolean = false
@@ -375,10 +375,8 @@ export class DocumentDetailComponent
   }
 
   private updatePdfSource() {
-    this.pdfSource = {
-      url: this.previewUrl,
-      password: this.password,
-    }
+    this.pdfSource = this.previewUrl
+    this.pdfPassword = this.password
   }
 
   private loadMetadataForSelectedVersion() {
