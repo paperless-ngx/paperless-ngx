@@ -716,6 +716,12 @@ class TestISODatetimeBounds:
             "added:[2026-05-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
         )
 
+    def test_translate_query_text_before_comma_separated_date_clause(self) -> None:
+        result = translate_query("schäfersee,created:previous year", UTC)
+        assert result == (
+            "schäfersee AND created:[2025-01-01T00:00:00Z TO 2026-01-01T00:00:00Z]"
+        )
+
     def test_invalid_iso_datetime_raises(self) -> None:
         # A token with "T" that is not valid ISO datetime -> raise.
         with pytest.raises(InvalidDateQuery) as exc_info:
