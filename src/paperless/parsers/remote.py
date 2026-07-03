@@ -1,9 +1,16 @@
 """
 Built-in remote-OCR document parser.
 
-Handles documents by sending them to a configured remote OCR engine
-(currently Azure AI Vision / Document Intelligence) and retrieving both
-the extracted text and a searchable PDF with an embedded text layer.
+Handles documents by sending them to a configured remote OCR engine and
+retrieving both the extracted text and a searchable PDF with an embedded
+text layer.  Two engines are supported:
+
+* ``azureai`` — Azure AI Vision / Document Intelligence, which returns a
+  ready-made searchable PDF.
+* ``mistral`` — Mistral OCR (``mistral-ocr-latest``), which returns markdown
+  text plus paragraph-level bounding boxes.  Because Mistral does not return
+  a PDF, the searchable archive is assembled locally by rendering an
+  invisible text layer over the page image via ocrmypdf's fpdf2 renderer.
 
 When no engine is configured, ``score()`` returns ``None`` so the parser
 is effectively invisible to the registry — the tesseract parser handles
@@ -27,6 +34,9 @@ if TYPE_CHECKING:
     import datetime
     from types import TracebackType
 
+    from ocrmypdf.models.ocr_element import BoundingBox
+    from ocrmypdf.models.ocr_element import OcrElement
+
     from paperless.parsers import MetadataEntry
     from paperless.parsers import ParserContext
 
@@ -41,6 +51,21 @@ _SUPPORTED_MIME_TYPES: dict[str, str] = {
     "image/gif": ".gif",
     "image/webp": ".webp",
 }
+
+#: Default base URL for the hosted Mistral OCR API.  Overridable via
+#: ``PAPERLESS_REMOTE_OCR_ENDPOINT`` for self-hosted deployments.
+MISTRAL_DEFAULT_ENDPOINT: str = "https://api.mistral.ai"
+
+#: Mistral OCR model identifier.
+MISTRAL_OCR_MODEL: str = "mistral-ocr-latest"
+
+#: Request timeout (seconds) for a single Mistral OCR call.  OCR of large
+#: documents can take a while, so this is intentionally generous.
+MISTRAL_OCR_TIMEOUT: float = 600.0
+
+#: DPI used to rasterise PDF pages before overlaying the invisible text
+#: layer.  Only relevant for the Mistral engine.
+_RENDER_DPI: int = 200
 
 
 class RemoteEngineConfig:
@@ -57,12 +82,17 @@ class RemoteEngineConfig:
         self.endpoint = endpoint
 
     def engine_is_valid(self) -> bool:
-        """Return True when the engine is known and fully configured."""
-        return (
-            self.engine in ("azureai",)
-            and self.api_key is not None
-            and not (self.engine == "azureai" and self.endpoint is None)
-        )
+        """Return True when the engine is known and fully configured.
+
+        Both engines require an API key.  ``azureai`` additionally requires
+        an endpoint; ``mistral`` defaults to the hosted endpoint when none is
+        given, so an endpoint is optional there.
+        """
+        if self.api_key is None:
+            return False
+        if self.engine == "azureai":
+            return self.endpoint is not None
+        return self.engine == "mistral"
 
 
 class RemoteDocumentParser:
@@ -242,6 +272,8 @@ class RemoteDocumentParser:
 
         if config.engine == "azureai":
             self._text = self._azure_ai_vision_parse(document_path, config)
+        elif config.engine == "mistral":
+            self._text = self._mistral_ocr_parse(document_path, mime_type, config)
 
     # ------------------------------------------------------------------
     # Result accessors
@@ -431,3 +463,353 @@ class RemoteDocumentParser:
             client.close()
 
         return None
+
+    def _mistral_ocr_parse(
+        self,
+        file: Path,
+        mime_type: str,
+        config: RemoteEngineConfig,
+    ) -> str | None:
+        """Send ``file`` to the Mistral OCR API and return the extracted text.
+
+        Mistral returns markdown text plus paragraph-level bounding boxes but
+        no PDF, so a searchable archive is assembled locally and stored at
+        ``self._archive_path``.  Returns the extracted text, or ``None`` on
+        failure (the error is logged and the archive path is cleared).
+
+        Parameters
+        ----------
+        file:
+            Absolute path to the document to analyse.
+        mime_type:
+            Detected MIME type of the document.
+        config:
+            Validated remote engine configuration.
+
+        Returns
+        -------
+        str | None
+            Extracted text, or None if the Mistral call failed.
+        """
+        if TYPE_CHECKING:
+            # engine_is_valid() guarantees api_key is not None for mistral.
+            assert config.api_key is not None
+
+        import httpx
+
+        endpoint = (config.endpoint or MISTRAL_DEFAULT_ENDPOINT).rstrip("/")
+        url = f"{endpoint}/v1/ocr"
+
+        document_uri = _data_uri(mime_type, file.read_bytes())
+        if mime_type == "application/pdf":
+            document = {"type": "document_url", "document_url": document_uri}
+        else:
+            document = {"type": "image_url", "image_url": document_uri}
+
+        payload = {
+            "model": MISTRAL_OCR_MODEL,
+            "document": document,
+            "include_blocks": True,
+        }
+        headers = {
+            "Authorization": f"Bearer {config.api_key}",
+            "Content-Type": "application/json",
+        }
+
+        try:
+            response = httpx.post(
+                url,
+                json=payload,
+                headers=headers,
+                timeout=MISTRAL_OCR_TIMEOUT,
+            )
+            response.raise_for_status()
+            pages = response.json().get("pages", [])
+
+            self._archive_path = self._tempdir / "archive.pdf"
+            self._build_searchable_pdf(file, mime_type, pages, self._archive_path)
+
+            return _mistral_pages_to_text(pages)
+
+        except Exception as e:
+            logger.exception("Mistral OCR parsing failed: %s", e)
+            self._archive_path = None
+
+        return None
+
+    def _build_searchable_pdf(
+        self,
+        source: Path,
+        mime_type: str,
+        pages: list[dict],
+        out_path: Path,
+    ) -> None:
+        """Assemble a searchable PDF from the original file and OCR results.
+
+        Each page image (rasterised from PDF input, or the image itself) is
+        rendered with an invisible text layer positioned using Mistral's
+        paragraph-level bounding boxes, using ocrmypdf's fpdf2 renderer and
+        its bundled Unicode font.  The per-page PDFs are merged into
+        ``out_path``.
+
+        Parameters
+        ----------
+        source:
+            Absolute path to the original document.
+        mime_type:
+            Detected MIME type of the original document.
+        pages:
+            The ``pages`` array returned by the Mistral OCR API.
+        out_path:
+            Destination path for the merged searchable PDF.
+        """
+        import ocrmypdf
+        import pikepdf
+        from ocrmypdf.font import MultiFontManager
+        from ocrmypdf.fpdf_renderer import Fpdf2PdfRenderer
+
+        images = _load_page_images(source, mime_type, _RENDER_DPI)
+        font_dir = Path(ocrmypdf.__file__).parent / "data"
+        font_manager = MultiFontManager(font_dir)
+
+        merged = pikepdf.Pdf.new()
+        opened: list = []
+        try:
+            for index, image in enumerate(images):
+                page_data = pages[index] if index < len(pages) else {}
+
+                image_path = self._tempdir / f"page-{index}.png"
+                image.save(image_path)
+
+                ocr_page = _build_ocr_page(
+                    page_data,
+                    image.width,
+                    image.height,
+                    _RENDER_DPI,
+                )
+
+                page_pdf_path = self._tempdir / f"page-{index}.pdf"
+                Fpdf2PdfRenderer(
+                    page=ocr_page,
+                    dpi=_RENDER_DPI,
+                    multi_font_manager=font_manager,
+                    invisible_text=True,
+                    image=image_path,
+                ).render(page_pdf_path)
+
+                page_pdf = pikepdf.open(page_pdf_path)
+                opened.append(page_pdf)
+                merged.pages.extend(page_pdf.pages)
+
+            merged.save(out_path)
+        finally:
+            for page_pdf in opened:
+                page_pdf.close()
+            merged.close()
+
+
+# ----------------------------------------------------------------------
+# Mistral OCR helpers (pure, framework-independent)
+# ----------------------------------------------------------------------
+
+
+def _data_uri(mime_type: str, data: bytes) -> str:
+    """Encode ``data`` as a ``data:`` URI for the given MIME type."""
+    import base64
+
+    encoded = base64.b64encode(data).decode("ascii")
+    return f"data:{mime_type};base64,{encoded}"
+
+
+def _mistral_pages_to_text(pages: list[dict]) -> str:
+    """Concatenate the markdown content of every page, blank pages dropped."""
+    parts = [str(page.get("markdown", "")).strip() for page in pages]
+    return "\n\n".join(part for part in parts if part)
+
+
+def _block_text(block: dict) -> str:
+    """Best-effort extraction of a block's text content."""
+    for key in ("markdown", "text", "content"):
+        value = block.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return ""
+
+
+def _block_bounding_box(block: dict) -> tuple[float, float, float, float] | None:
+    """Best-effort extraction of a block bbox as ``(left, top, right, bottom)``.
+
+    Supports the bounding-box shapes Mistral has used across API revisions:
+    a ``bbox`` list ``[x0, y0, x1, y1]``, a ``bbox`` dict with
+    ``left/top/right/bottom``, or the image-style
+    ``top_left_x/top_left_y/bottom_right_x/bottom_right_y`` keys (either nested
+    under ``bbox`` or directly on the block).  Returns ``None`` when no usable
+    box is present.
+    """
+    corner_keys = ("top_left_x", "top_left_y", "bottom_right_x", "bottom_right_y")
+    edge_keys = ("left", "top", "right", "bottom")
+
+    candidates = [block.get("bbox"), block]
+    for candidate in candidates:
+        if isinstance(candidate, (list, tuple)) and len(candidate) == 4:
+            try:
+                return tuple(float(v) for v in candidate)  # type: ignore[return-value]
+            except (TypeError, ValueError):
+                continue
+        if isinstance(candidate, dict):
+            for keys in (edge_keys, corner_keys):
+                if all(k in candidate for k in keys):
+                    try:
+                        return tuple(float(candidate[k]) for k in keys)  # type: ignore[return-value]
+                    except (TypeError, ValueError):
+                        continue
+    return None
+
+
+def _clamp_bbox(
+    left: float,
+    top: float,
+    right: float,
+    bottom: float,
+    max_width: float,
+    max_height: float,
+) -> BoundingBox | None:
+    """Clamp a bbox to the page and return a valid ``BoundingBox`` or ``None``.
+
+    ``BoundingBox`` rejects degenerate boxes (``right <= left`` etc.), so this
+    also filters out empty or inverted boxes.
+    """
+    from ocrmypdf.models.ocr_element import BoundingBox
+
+    left = max(0.0, min(left, max_width))
+    right = max(0.0, min(right, max_width))
+    top = max(0.0, min(top, max_height))
+    bottom = max(0.0, min(bottom, max_height))
+    if right <= left or bottom <= top:
+        return None
+    return BoundingBox(left, top, right, bottom)
+
+
+def _text_band_elements(
+    text: str,
+    left: float,
+    top: float,
+    right: float,
+    bottom: float,
+    max_width: float,
+    max_height: float,
+    dpi: float,
+) -> list[OcrElement]:
+    """Lay ``text`` into one thin invisible ``ocr_line`` band per text line.
+
+    A single tall box makes the fpdf2 renderer scale text so aggressively that
+    the glyphs become unrecoverable, so the box is divided into one horizontal
+    band per line of text and each band's height is capped to roughly a single
+    line.  Returns the resulting ``ocr_line`` elements (each wrapping one
+    ``ocrx_word``); an empty list when there is no usable text.
+    """
+    from ocrmypdf.models.ocr_element import OcrElement
+
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    if not lines:
+        return []
+
+    band_cap = dpi * 0.3
+    slot = (bottom - top) / len(lines)
+    elements: list[OcrElement] = []
+    for index, line in enumerate(lines):
+        band_top = top + index * slot
+        band_bottom = band_top + min(slot, band_cap)
+        bbox = _clamp_bbox(left, band_top, right, band_bottom, max_width, max_height)
+        if bbox is None:
+            continue
+        word = OcrElement(ocr_class="ocrx_word", text=line, bbox=bbox)
+        elements.append(OcrElement(ocr_class="ocr_line", bbox=bbox, children=[word]))
+    return elements
+
+
+def _build_ocr_page(
+    page_data: dict,
+    image_width: int,
+    image_height: int,
+    dpi: float,
+) -> OcrElement:
+    """Build an ``OcrElement`` page tree from a Mistral OCR page result.
+
+    Each content block's text is laid into thin invisible bands positioned at
+    the block's (scaled) bounding box.  When no usable blocks are present, the
+    whole page markdown is laid across the full page instead, so the archive
+    stays searchable either way.
+    """
+    from ocrmypdf.models.ocr_element import BoundingBox
+    from ocrmypdf.models.ocr_element import OcrElement
+
+    dimensions = page_data.get("dimensions") or {}
+    source_width = dimensions.get("width") or image_width
+    source_height = dimensions.get("height") or image_height
+    scale_x = image_width / source_width if source_width else 1.0
+    scale_y = image_height / source_height if source_height else 1.0
+
+    children: list[OcrElement] = []
+    for block in page_data.get("blocks") or []:
+        if not isinstance(block, dict):
+            continue
+        text = _block_text(block)
+        box = _block_bounding_box(block)
+        if not text or box is None:
+            continue
+        left, top, right, bottom = box
+        children.extend(
+            _text_band_elements(
+                text,
+                left * scale_x,
+                top * scale_y,
+                right * scale_x,
+                bottom * scale_y,
+                image_width,
+                image_height,
+                dpi,
+            ),
+        )
+
+    if not children:
+        # Fallback: no positioned blocks — keep the page searchable by laying
+        # the full markdown text across the whole page as invisible text.
+        children.extend(
+            _text_band_elements(
+                str(page_data.get("markdown", "")).strip(),
+                0,
+                0,
+                image_width,
+                image_height,
+                image_width,
+                image_height,
+                dpi,
+            ),
+        )
+
+    return OcrElement(
+        ocr_class="ocr_page",
+        bbox=BoundingBox(0, 0, image_width, image_height),
+        dpi=dpi,
+        page_number=page_data.get("index", 0),
+        children=children,
+    )
+
+
+def _load_page_images(source: Path, mime_type: str, dpi: int) -> list:
+    """Return one RGB ``PIL.Image`` per page of the source document.
+
+    PDF input is rasterised with pdf2image; image input (including multi-frame
+    TIFF) is loaded directly, one entry per frame.
+    """
+    from PIL import Image
+    from PIL import ImageSequence
+
+    if mime_type == "application/pdf":
+        from pdf2image import convert_from_path
+
+        return convert_from_path(source, dpi=dpi)
+
+    with Image.open(source) as opened:
+        return [frame.convert("RGB") for frame in ImageSequence.Iterator(opened)]

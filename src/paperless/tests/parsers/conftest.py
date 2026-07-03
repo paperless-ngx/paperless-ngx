@@ -133,6 +133,24 @@ def azure_settings(settings: SettingsWrapper) -> SettingsWrapper:
 
 
 @pytest.fixture()
+def mistral_settings(settings: SettingsWrapper) -> SettingsWrapper:
+    """Configure Django settings for a valid Mistral OCR engine.
+
+    Sets ``REMOTE_OCR_ENGINE`` and ``REMOTE_OCR_API_KEY`` and leaves
+    ``REMOTE_OCR_ENDPOINT`` as ``None`` (Mistral defaults to the hosted API).
+
+    Returns
+    -------
+    SettingsWrapper
+        The modified settings object (for chaining further overrides).
+    """
+    settings.REMOTE_OCR_ENGINE = "mistral"
+    settings.REMOTE_OCR_API_KEY = "test-api-key"
+    settings.REMOTE_OCR_ENDPOINT = None
+    return settings
+
+
+@pytest.fixture()
 def no_engine_settings(settings: SettingsWrapper) -> SettingsWrapper:
     """Configure Django settings with no remote engine configured.
 

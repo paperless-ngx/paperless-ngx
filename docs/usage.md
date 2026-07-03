@@ -1051,11 +1051,20 @@ how regularly you intend to scan documents and use paperless.
 
     This feature is disabled by default and will always remain strictly "opt-in".
 
-Paperless-ngx supports performing OCR on documents using remote services. At the moment, this is limited to
-[Microsoft's Azure "Document Intelligence" service](https://azure.microsoft.com/en-us/products/ai-services/ai-document-intelligence).
-This is of course a paid service (with a free tier) which requires an Azure account and subscription. Azure AI is not affiliated with
-Paperless-ngx in any way. When enabled, Paperless-ngx will automatically send appropriate documents to Azure for OCR processing, bypassing
-the local OCR engine. See the [configuration](configuration.md#PAPERLESS_REMOTE_OCR_ENGINE) options for more details.
+Paperless-ngx supports performing OCR on documents using remote services. Two engines are currently supported:
+
+- [Microsoft's Azure "Document Intelligence" service](https://azure.microsoft.com/en-us/products/ai-services/ai-document-intelligence),
+  selected with `PAPERLESS_REMOTE_OCR_ENGINE=azureai`.
+- [Mistral OCR](https://mistral.ai/news/mistral-ocr) (`mistral-ocr-latest`), selected with `PAPERLESS_REMOTE_OCR_ENGINE=mistral`.
+  Mistral returns markdown text plus paragraph-level bounding boxes; Paperless-ngx assembles the searchable PDF archive locally by
+  overlaying an invisible text layer on the page images. Highlighting therefore works at paragraph rather than word granularity.
+  Mistral OCR can also be [self-hosted](https://mistral.ai/news/mistral-ocr) via a container, in which case point
+  `PAPERLESS_REMOTE_OCR_ENDPOINT` at your instance.
+
+These are of course paid services (with free tiers) which require an account and API key with the respective provider. Neither provider is
+affiliated with Paperless-ngx in any way. When enabled, Paperless-ngx will automatically send appropriate documents to the configured
+service for OCR processing, bypassing the local OCR engine. See the [configuration](configuration.md#PAPERLESS_REMOTE_OCR_ENGINE) options
+for more details.
 
 Additionally, when using a commercial service with this feature, consider both potential costs as well as any associated file size
 or page limitations (e.g. with a free tier).

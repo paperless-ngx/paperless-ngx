@@ -348,6 +348,13 @@ def check_remote_parser_configured(app_configs: Any, **kwargs: Any) -> list[Erro
             ),
         ]
 
+    if settings.REMOTE_OCR_ENGINE == "mistral" and not settings.REMOTE_OCR_API_KEY:
+        return [
+            Error(
+                "Mistral remote parser requires an API key to be configured.",
+            ),
+        ]
+
     return []
 
 

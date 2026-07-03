@@ -501,3 +501,254 @@ class TestRemoteParserRegistry:
         )
 
         assert parser_cls is None
+
+
+# ---------------------------------------------------------------------------
+# Mistral engine — helpers
+# ---------------------------------------------------------------------------
+
+_MISTRAL_URL = "https://api.mistral.ai/v1/ocr"
+
+
+def _mistral_response(text: str = _DEFAULT_TEXT) -> dict:
+    """Build a minimal Mistral OCR API response with one positioned block."""
+    return {
+        "pages": [
+            {
+                "index": 0,
+                "markdown": text,
+                "dimensions": {"dpi": 200, "width": 800, "height": 1000},
+                "blocks": [{"bbox": [50, 50, 700, 120], "markdown": text}],
+            },
+        ],
+        "model": "mistral-ocr-latest",
+        "usage_info": {},
+    }
+
+
+class TestMistralHelpers:
+    """Unit tests for the pure, framework-independent Mistral helpers."""
+
+    def test_pages_to_text_joins_and_skips_blank(self) -> None:
+        from paperless.parsers.remote import _mistral_pages_to_text
+
+        pages = [
+            {"markdown": "Page one."},
+            {"markdown": "   "},
+            {"markdown": "Page two."},
+            {},
+        ]
+        assert _mistral_pages_to_text(pages) == "Page one.\n\nPage two."
+
+    def test_data_uri_roundtrip(self) -> None:
+        import base64
+
+        from paperless.parsers.remote import _data_uri
+
+        uri = _data_uri("application/pdf", b"%PDF-1.4 hello")
+        assert uri.startswith("data:application/pdf;base64,")
+        payload = uri.split(",", 1)[1]
+        assert base64.b64decode(payload) == b"%PDF-1.4 hello"
+
+    @pytest.mark.parametrize(
+        "block",
+        [
+            pytest.param({"bbox": [1, 2, 3, 4]}, id="list"),
+            pytest.param(
+                {"bbox": {"left": 1, "top": 2, "right": 3, "bottom": 4}},
+                id="edge-dict",
+            ),
+            pytest.param(
+                {
+                    "top_left_x": 1,
+                    "top_left_y": 2,
+                    "bottom_right_x": 3,
+                    "bottom_right_y": 4,
+                },
+                id="corner-keys",
+            ),
+        ],
+    )
+    def test_block_bounding_box_variants(self, block: dict) -> None:
+        from paperless.parsers.remote import _block_bounding_box
+
+        assert _block_bounding_box(block) == (1.0, 2.0, 3.0, 4.0)
+
+    def test_block_bounding_box_missing_returns_none(self) -> None:
+        from paperless.parsers.remote import _block_bounding_box
+
+        assert _block_bounding_box({"markdown": "no box"}) is None
+
+    def test_build_ocr_page_uses_blocks(self) -> None:
+        from paperless.parsers.remote import _build_ocr_page
+
+        page = _build_ocr_page(_mistral_response()["pages"][0], 800, 1000, 200)
+        assert page.ocr_class == "ocr_page"
+        words = page.words
+        assert words and words[0].text == _DEFAULT_TEXT
+
+    def test_build_ocr_page_falls_back_to_markdown(self) -> None:
+        from paperless.parsers.remote import _build_ocr_page
+
+        page_data = {"index": 0, "markdown": "Only text, no boxes."}
+        page = _build_ocr_page(page_data, 800, 1000, 200)
+        assert any(w.text == "Only text, no boxes." for w in page.words)
+
+
+# ---------------------------------------------------------------------------
+# Mistral engine — score()
+# ---------------------------------------------------------------------------
+
+
+class TestMistralScore:
+    @pytest.mark.usefixtures("mistral_settings")
+    def test_score_returns_20_when_configured(self) -> None:
+        assert RemoteDocumentParser.score("application/pdf", "doc.pdf") == 20
+
+    def test_score_returns_20_without_endpoint(
+        self,
+        settings: SettingsWrapper,
+    ) -> None:
+        """Mistral does not require an endpoint (it defaults to the hosted API)."""
+        settings.REMOTE_OCR_ENGINE = "mistral"
+        settings.REMOTE_OCR_API_KEY = "key"
+        settings.REMOTE_OCR_ENDPOINT = None
+        assert RemoteDocumentParser.score("application/pdf", "doc.pdf") == 20
+
+    def test_score_returns_none_when_api_key_missing(
+        self,
+        settings: SettingsWrapper,
+    ) -> None:
+        settings.REMOTE_OCR_ENGINE = "mistral"
+        settings.REMOTE_OCR_API_KEY = None
+        settings.REMOTE_OCR_ENDPOINT = None
+        assert RemoteDocumentParser.score("application/pdf", "doc.pdf") is None
+
+
+# ---------------------------------------------------------------------------
+# Mistral engine — parse()
+# ---------------------------------------------------------------------------
+
+
+class TestMistralParse:
+    def test_parse_returns_text(
+        self,
+        remote_parser: RemoteDocumentParser,
+        simple_png_file: Path,
+        mistral_settings: SettingsWrapper,
+        httpx_mock,
+    ) -> None:
+        httpx_mock.add_response(url=_MISTRAL_URL, json=_mistral_response())
+
+        remote_parser.parse(simple_png_file, "image/png")
+
+        assert remote_parser.get_text() == _DEFAULT_TEXT
+
+    def test_parse_builds_valid_archive_pdf(
+        self,
+        remote_parser: RemoteDocumentParser,
+        simple_png_file: Path,
+        mistral_settings: SettingsWrapper,
+        httpx_mock,
+    ) -> None:
+        import pikepdf
+
+        httpx_mock.add_response(url=_MISTRAL_URL, json=_mistral_response())
+
+        remote_parser.parse(simple_png_file, "image/png")
+
+        archive = remote_parser.get_archive_path()
+        assert archive is not None
+        assert archive.exists()
+        assert archive.suffix == ".pdf"
+        with pikepdf.open(archive) as pdf:
+            assert len(pdf.pages) == 1
+
+    def test_parse_archive_is_searchable(
+        self,
+        remote_parser: RemoteDocumentParser,
+        simple_png_file: Path,
+        mistral_settings: SettingsWrapper,
+        httpx_mock,
+    ) -> None:
+        extract_text = pytest.importorskip("pdfminer.high_level").extract_text
+
+        httpx_mock.add_response(
+            url=_MISTRAL_URL,
+            json=_mistral_response("Rechnung Grüße"),
+        )
+
+        remote_parser.parse(simple_png_file, "image/png")
+
+        archive = remote_parser.get_archive_path()
+        assert archive is not None
+        assert "Rechnung Grüße" in extract_text(str(archive))
+
+    def test_parse_sends_expected_request(
+        self,
+        remote_parser: RemoteDocumentParser,
+        simple_png_file: Path,
+        mistral_settings: SettingsWrapper,
+        httpx_mock,
+    ) -> None:
+        import json
+
+        httpx_mock.add_response(url=_MISTRAL_URL, json=_mistral_response())
+
+        remote_parser.parse(simple_png_file, "image/png")
+
+        request = httpx_mock.get_requests()[0]
+        assert request.headers["Authorization"] == "Bearer test-api-key"
+        body = json.loads(request.content)
+        assert body["model"] == "mistral-ocr-latest"
+        assert body["include_blocks"] is True
+        assert body["document"]["type"] == "image_url"
+        assert body["document"]["image_url"].startswith("data:image/png;base64,")
+
+    @pytest.mark.usefixtures("no_engine_settings")
+    def test_parse_sets_empty_text_when_not_configured(
+        self,
+        remote_parser: RemoteDocumentParser,
+        simple_png_file: Path,
+    ) -> None:
+        remote_parser.parse(simple_png_file, "image/png")
+
+        assert remote_parser.get_text() == ""
+        assert remote_parser.get_archive_path() is None
+
+
+# ---------------------------------------------------------------------------
+# Mistral engine — failure path
+# ---------------------------------------------------------------------------
+
+
+class TestMistralParseError:
+    def test_parse_returns_empty_on_http_error(
+        self,
+        remote_parser: RemoteDocumentParser,
+        simple_png_file: Path,
+        mistral_settings: SettingsWrapper,
+        httpx_mock,
+    ) -> None:
+        httpx_mock.add_response(url=_MISTRAL_URL, status_code=500)
+
+        remote_parser.parse(simple_png_file, "image/png")
+
+        assert remote_parser.get_text() == ""
+        assert remote_parser.get_archive_path() is None
+
+    def test_parse_logs_error_on_failure(
+        self,
+        remote_parser: RemoteDocumentParser,
+        simple_png_file: Path,
+        mistral_settings: SettingsWrapper,
+        httpx_mock,
+        mocker: MockerFixture,
+    ) -> None:
+        httpx_mock.add_response(url=_MISTRAL_URL, status_code=500)
+        mock_log = mocker.patch("paperless.parsers.remote.logger")
+
+        remote_parser.parse(simple_png_file, "image/png")
+
+        mock_log.exception.assert_called_once()
+        assert "Mistral OCR parsing failed" in mock_log.exception.call_args[0][0]

@@ -1183,6 +1183,10 @@ WEBHOOKS_ALLOW_INTERNAL_REQUESTS = get_bool_from_env(
 ###############################################################################
 # Remote Parser                                                               #
 ###############################################################################
+# Supported engines: "azureai" (Azure AI Document Intelligence) and "mistral"
+# (Mistral OCR). Both require REMOTE_OCR_API_KEY. "azureai" also requires
+# REMOTE_OCR_ENDPOINT; for "mistral" the endpoint is optional and only needed
+# to target a self-hosted deployment.
 REMOTE_OCR_ENGINE = os.getenv("PAPERLESS_REMOTE_OCR_ENGINE")
 REMOTE_OCR_API_KEY = os.getenv("PAPERLESS_REMOTE_OCR_API_KEY")
 REMOTE_OCR_ENDPOINT = os.getenv("PAPERLESS_REMOTE_OCR_ENDPOINT")
