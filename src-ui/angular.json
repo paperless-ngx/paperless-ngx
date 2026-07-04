@@ -155,7 +155,9 @@
           "builder": "@angular-builders/jest:run",
           "options": {
             "tsConfig": "tsconfig.spec.json",
-            "zoneless": false
+            "zoneless": false,
+            "watch": false,
+            "coverage": true
           }
         },
         "lint": {
