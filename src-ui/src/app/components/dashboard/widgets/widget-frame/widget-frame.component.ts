@@ -16,13 +16,20 @@ export class WidgetFrameComponent
 {
   constructor() {
     super()
+    this.loading = false
   }
 
   @Input()
   title: string
 
   @Input()
-  loading: boolean = false
+  override set loading(value: boolean) {
+    super.loading = value
+  }
+
+  override get loading(): boolean {
+    return super.loading
+  }
 
   @Input()
   draggable: any

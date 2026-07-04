@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core'
+import { Component, inject, Input, signal } from '@angular/core'
 import { Tag } from 'src/app/data/tag'
 import {
   PermissionAction,
@@ -16,16 +16,16 @@ export class TagComponent {
   private permissionsService = inject(PermissionsService)
   private tagService = inject(TagService)
 
-  private _tag: Tag
+  private tagSignal = signal<Tag>(null)
   private _tagID: number
 
   @Input()
   public set tag(tag: Tag) {
-    this._tag = tag
+    this.tagSignal.set(tag)
   }
 
   public get tag(): Tag {
-    return this._tag
+    return this.tagSignal()
   }
 
   @Input()

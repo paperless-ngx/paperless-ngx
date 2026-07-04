@@ -1,6 +1,6 @@
 import { DecimalPipe } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
-import { Component, inject, OnDestroy, OnInit } from '@angular/core'
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
 import * as mimeTypeNames from 'mime-names'
@@ -55,9 +55,24 @@ export class StatisticsWidgetComponent
   private websocketConnectionService = inject(WebsocketStatusService)
   private documentListViewService = inject(DocumentListViewService)
 
-  loading: boolean = false
+  private loadingSignal = signal(false)
+  private statisticsSignal = signal<Statistics>({})
 
-  statistics: Statistics = {}
+  get loading(): boolean {
+    return this.loadingSignal()
+  }
+
+  set loading(value: boolean) {
+    this.loadingSignal.set(value)
+  }
+
+  get statistics(): Statistics {
+    return this.statisticsSignal()
+  }
+
+  set statistics(value: Statistics) {
+    this.statisticsSignal.set(value)
+  }
 
   subscription: Subscription
   private unsubscribeNotifer: Subject<any> = new Subject()

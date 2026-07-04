@@ -5,7 +5,7 @@ import {
   DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
-import { Component, inject } from '@angular/core'
+import { Component, inject, signal } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { TourNgBootstrap, TourService } from 'ngx-ui-tour-ng-bootstrap'
@@ -47,7 +47,15 @@ export class DashboardComponent extends ComponentWithPermissions {
   private tourService = inject(TourService)
   private toastService = inject(ToastService)
 
-  public dashboardViews: SavedView[] = []
+  private dashboardViewsSignal = signal<SavedView[]>([])
+
+  get dashboardViews(): SavedView[] {
+    return this.dashboardViewsSignal()
+  }
+
+  set dashboardViews(value: SavedView[]) {
+    this.dashboardViewsSignal.set(value)
+  }
   constructor() {
     super()
 

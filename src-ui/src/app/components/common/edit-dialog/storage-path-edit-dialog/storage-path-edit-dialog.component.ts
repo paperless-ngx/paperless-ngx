@@ -67,11 +67,11 @@ export class StoragePathEditDialogComponent
   private testDocument: Document
   public testResult: string
   public testFailed: boolean = false
-  public loading = false
   public testLoading = false
 
   constructor() {
     super()
+    this.loading = false
     this.service = inject(StoragePathService)
     this.userService = inject(UserService)
     this.settingsService = inject(SettingsService)
