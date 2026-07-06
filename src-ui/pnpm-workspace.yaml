@@ -1,0 +1,19 @@
+packages:
+  - "."
+allowBuilds:
+  "@parcel/watcher": true
+  canvas: true
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true
+  normalize-diacritics: false
+  unrs-resolver: false
+onlyBuiltDependencies:
+  - "@parcel/watcher"
+  - canvas
+  - esbuild
+  - lmdb
+  - msgpackr-extract
+ignoredBuiltDependencies:
+  - normalize-diacritics
+  - unrs-resolver

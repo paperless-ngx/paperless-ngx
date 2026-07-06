@@ -71,14 +71,5 @@
     "typescript": "^6.0.3",
     "webpack": "^5.107.2"
   },
-  "packageManager": "pnpm@10.17.1",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@parcel/watcher",
-      "canvas",
-      "esbuild",
-      "lmdb",
-      "msgpackr-extract"
-    ]
-  }
+  "packageManager": "pnpm@10.17.1"
 }
