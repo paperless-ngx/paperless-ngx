@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable, inject } from '@angular/core'
+import { Injectable, inject, signal } from '@angular/core'
 import { Observable, Subject } from 'rxjs'
 import { first, map, takeUntil, tap } from 'rxjs/operators'
 import {
@@ -23,9 +23,17 @@ export class TasksService {
 
   public loading: boolean = false
 
-  private fileTasks: PaperlessTask[] = []
+  private fileTasksSignal = signal<PaperlessTask[]>([])
 
   private unsubscribeNotifer: Subject<any> = new Subject()
+
+  private get fileTasks(): PaperlessTask[] {
+    return this.fileTasksSignal()
+  }
+
+  private set fileTasks(tasks: PaperlessTask[]) {
+    this.fileTasksSignal.set(tasks)
+  }
 
   public get total(): number {
     return this.fileTasks.length

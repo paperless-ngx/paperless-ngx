@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { inject, Injectable } from '@angular/core'
+import { inject, Injectable, signal } from '@angular/core'
 import { combineLatest, Observable, Subject } from 'rxjs'
 import { takeUntil, tap } from 'rxjs/operators'
 import { Results } from 'src/app/data/results'
@@ -17,13 +17,29 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
   private settingsService = inject(SettingsService)
   private documentService = inject(DocumentService)
 
-  private savedViews: SavedView[] = []
-  private savedViewDocumentCounts: Map<number, number> = new Map()
+  private savedViewsSignal = signal<SavedView[]>([])
+  private savedViewDocumentCountsSignal = signal<Map<number, number>>(new Map())
   private unsubscribeNotifier: Subject<void> = new Subject<void>()
 
   constructor() {
     super()
     this.resourceName = 'saved_views'
+  }
+
+  private get savedViews(): SavedView[] {
+    return this.savedViewsSignal()
+  }
+
+  private set savedViews(views: SavedView[]) {
+    this.savedViewsSignal.set(views)
+  }
+
+  private get savedViewDocumentCounts(): Map<number, number> {
+    return this.savedViewDocumentCountsSignal()
+  }
+
+  private set savedViewDocumentCounts(counts: Map<number, number>) {
+    this.savedViewDocumentCountsSignal.set(counts)
   }
 
   public list(
@@ -176,7 +192,9 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
   }
 
   public setDocumentCount(view: SavedView, count: number) {
-    this.savedViewDocumentCounts.set(view.id, count)
+    const counts = new Map(this.savedViewDocumentCounts)
+    counts.set(view.id, count)
+    this.savedViewDocumentCounts = counts
   }
 
   public getDocumentCount(view: SavedView): number {
