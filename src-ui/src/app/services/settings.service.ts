@@ -350,10 +350,11 @@ export class SettingsService {
     this.organizingSidebarSavedViewsSignal.set(value)
   }
 
-  private _allDisplayFields: Array<{ id: DisplayField; name: string }> =
-    DEFAULT_DISPLAY_FIELDS
+  private allDisplayFieldsSignal = signal<
+    Array<{ id: DisplayField; name: string }>
+  >(DEFAULT_DISPLAY_FIELDS)
   public get allDisplayFields(): Array<{ id: DisplayField; name: string }> {
-    return this._allDisplayFields
+    return this.allDisplayFieldsSignal()
   }
   public displayFieldsInit: EventEmitter<boolean> = new EventEmitter()
 
@@ -420,44 +421,39 @@ export class SettingsService {
   }
 
   public initializeDisplayFields() {
-    this._allDisplayFields = DEFAULT_DISPLAY_FIELDS
+    const displayFields = DEFAULT_DISPLAY_FIELDS?.map((field) => {
+      if (
+        field.id === DisplayField.NOTES &&
+        !this.get(SETTINGS_KEYS.NOTES_ENABLED)
+      ) {
+        return null
+      }
 
-    this._allDisplayFields = this._allDisplayFields
-      ?.map((field) => {
-        if (
-          field.id === DisplayField.NOTES &&
-          !this.get(SETTINGS_KEYS.NOTES_ENABLED)
-        ) {
-          return null
-        }
+      if (
+        [
+          DisplayField.TITLE,
+          DisplayField.CREATED,
+          DisplayField.ADDED,
+          DisplayField.ASN,
+          DisplayField.PAGE_COUNT,
+          DisplayField.SHARED,
+        ].includes(field.id)
+      ) {
+        return field
+      }
 
-        if (
-          [
-            DisplayField.TITLE,
-            DisplayField.CREATED,
-            DisplayField.ADDED,
-            DisplayField.ASN,
-            DisplayField.PAGE_COUNT,
-            DisplayField.SHARED,
-          ].includes(field.id)
-        ) {
-          return field
-        }
+      let type: PermissionType = Object.values(PermissionType).find((t) =>
+        t.includes(field.id)
+      )
+      if (field.id === DisplayField.OWNER) {
+        type = PermissionType.User
+      }
+      return this.permissionsService.currentUserCan(PermissionAction.View, type)
+        ? field
+        : null
+    }).filter((f) => f)
 
-        let type: PermissionType = Object.values(PermissionType).find((t) =>
-          t.includes(field.id)
-        )
-        if (field.id === DisplayField.OWNER) {
-          type = PermissionType.User
-        }
-        return this.permissionsService.currentUserCan(
-          PermissionAction.View,
-          type
-        )
-          ? field
-          : null
-      })
-      .filter((f) => f)
+    this.allDisplayFieldsSignal.set(displayFields)
 
     if (
       this.permissionsService.currentUserCan(
@@ -466,13 +462,15 @@ export class SettingsService {
       )
     ) {
       this.customFieldsService.listAll().subscribe((r) => {
-        this._allDisplayFields = this._allDisplayFields.concat(
-          r.results.map((field) => {
-            return {
-              id: `${DisplayField.CUSTOM_FIELD}${field.id}` as any,
-              name: field.name,
-            }
-          })
+        this.allDisplayFieldsSignal.set(
+          displayFields.concat(
+            r.results.map((field) => {
+              return {
+                id: `${DisplayField.CUSTOM_FIELD}${field.id}` as any,
+                name: field.name,
+              }
+            })
+          )
         )
         this.displayFieldsInit.emit(true)
       })
