@@ -1,8 +1,7 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { NgTemplateOutlet } from '@angular/common'
-import { AfterViewInit, Component, Input } from '@angular/core'
+import { AfterViewInit, Component, input, signal } from '@angular/core'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { LoadingComponentWithPermissions } from 'src/app/components/loading-component/loading.component'
 
 @Component({
   selector: 'pngx-widget-frame',
@@ -10,39 +9,28 @@ import { LoadingComponentWithPermissions } from 'src/app/components/loading-comp
   styleUrls: ['./widget-frame.component.scss'],
   imports: [DragDropModule, NgxBootstrapIconsModule, NgTemplateOutlet],
 })
-export class WidgetFrameComponent
-  extends LoadingComponentWithPermissions
-  implements AfterViewInit
-{
-  constructor() {
-    super()
-    this.loading = false
+export class WidgetFrameComponent implements AfterViewInit {
+  private showSignal = signal(false)
+
+  loading = input(false)
+
+  get show(): boolean {
+    return this.showSignal()
   }
 
-  @Input()
-  title: string
-
-  @Input()
-  override set loading(value: boolean) {
-    super.loading = value
+  set show(value: boolean) {
+    this.showSignal.set(value)
   }
 
-  override get loading(): boolean {
-    return super.loading
-  }
+  title = input<string>()
 
-  @Input()
-  draggable: any
+  draggable = input<any>()
 
-  @Input()
-  cardless: boolean = false
+  cardless = input(false)
 
-  @Input()
-  badge: string
+  badge = input<string | number>(null)
 
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.show = true
-    }, 100)
+    this.show = true
   }
 }

@@ -6,7 +6,7 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
 import { NgClass } from '@angular/common'
-import { Component, HostListener, inject, OnInit } from '@angular/core'
+import { Component, HostListener, inject, OnInit, signal } from '@angular/core'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import {
   NgbCollapseModule,
@@ -90,15 +90,47 @@ export class AppFrameComponent
   permissionsService = inject(PermissionsService)
   private djangoMessagesService = inject(DjangoMessagesService)
 
-  appRemoteVersion: AppRemoteVersion
+  private appRemoteVersionSignal = signal<AppRemoteVersion>(null)
 
-  isMenuCollapsed: boolean = true
+  private isMenuCollapsedSignal = signal(true)
 
-  slimSidebarAnimating: boolean = false
+  private slimSidebarAnimatingSignal = signal(false)
 
-  public mobileSearchHidden: boolean = false
+  private mobileSearchHiddenSignal = signal(false)
 
   private lastScrollY: number = 0
+
+  get appRemoteVersion(): AppRemoteVersion {
+    return this.appRemoteVersionSignal()
+  }
+
+  set appRemoteVersion(value: AppRemoteVersion) {
+    this.appRemoteVersionSignal.set(value)
+  }
+
+  get isMenuCollapsed(): boolean {
+    return this.isMenuCollapsedSignal()
+  }
+
+  set isMenuCollapsed(value: boolean) {
+    this.isMenuCollapsedSignal.set(value)
+  }
+
+  get slimSidebarAnimating(): boolean {
+    return this.slimSidebarAnimatingSignal()
+  }
+
+  set slimSidebarAnimating(value: boolean) {
+    this.slimSidebarAnimatingSignal.set(value)
+  }
+
+  get mobileSearchHidden(): boolean {
+    return this.mobileSearchHiddenSignal()
+  }
+
+  set mobileSearchHidden(value: boolean) {
+    this.mobileSearchHiddenSignal.set(value)
+  }
 
   constructor() {
     super()

@@ -14,8 +14,6 @@ import {
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { of } from 'rxjs'
-import { delay } from 'rxjs/operators'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
@@ -101,11 +99,7 @@ export class DocumentCardSmallComponent
   @ViewChild('popupPreview') popupPreview: PreviewPopupComponent
 
   ngAfterViewInit(): void {
-    of(true)
-      .pipe(delay(50))
-      .subscribe(() => {
-        this.show = true
-      })
+    this.show = true
   }
 
   getIsThumbInverted() {

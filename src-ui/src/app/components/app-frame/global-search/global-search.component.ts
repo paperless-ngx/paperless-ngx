@@ -7,6 +7,7 @@ import {
   ViewChild,
   ViewChildren,
   inject,
+  signal,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
@@ -82,12 +83,36 @@ export class GlobalSearchComponent implements OnInit {
   private locationStrategy = inject(LocationStrategy)
 
   public DataType = DataType
-  public query: string
+  private querySignal = signal<string>(null)
   public queryDebounce: Subject<string>
-  public searchResults: GlobalSearchResult
+  private searchResultsSignal = signal<GlobalSearchResult>(null)
   private currentItemIndex: number = -1
   private domIndex: number = -1
-  public loading: boolean = false
+  private loadingSignal = signal(false)
+
+  public get query(): string {
+    return this.querySignal()
+  }
+
+  public set query(value: string) {
+    this.querySignal.set(value)
+  }
+
+  public get searchResults(): GlobalSearchResult {
+    return this.searchResultsSignal()
+  }
+
+  public set searchResults(value: GlobalSearchResult) {
+    this.searchResultsSignal.set(value)
+  }
+
+  public get loading(): boolean {
+    return this.loadingSignal()
+  }
+
+  public set loading(value: boolean) {
+    this.loadingSignal.set(value)
+  }
 
   @ViewChild('searchInput') searchInput: ElementRef
   @ViewChild('resultsDropdown') resultsDropdown: NgbDropdown

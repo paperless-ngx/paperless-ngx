@@ -14,7 +14,6 @@ import {
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { delay, of } from 'rxjs'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
@@ -108,11 +107,7 @@ export class DocumentCardLargeComponent
   popoverHidden = true
 
   ngAfterViewInit(): void {
-    of(true)
-      .pipe(delay(50))
-      .subscribe(() => {
-        this.show = true
-      })
+    this.show = true
   }
 
   get searchScoreClass() {
