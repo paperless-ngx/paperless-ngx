@@ -5,13 +5,13 @@ import {
   OnDestroy,
   OnInit,
   QueryList,
+  signal,
   ViewChildren,
 } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject } from 'rxjs'
 import {
   debounceTime,
-  delay,
   distinctUntilChanged,
   takeUntil,
   tap,
@@ -88,25 +88,89 @@ export abstract class ManagementListComponent<T extends MatchingModel>
 
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
 
-  public data: T[] = []
-  private unfilteredData: T[] = []
+  private dataSignal = signal<T[]>([])
+  private unfilteredDataSignal = signal<T[]>([])
   private currentExtraParams: { [key: string]: any } = null
   private allSelectionActive = false
 
-  public page = 1
+  private pageSignal = signal(1)
 
-  public collectionSize = 0
-  public displayCollectionSize = 0
+  private collectionSizeSignal = signal(0)
+  private displayCollectionSizeSignal = signal(0)
 
-  public sortField: string
-  public sortReverse: boolean
+  private sortFieldSignal = signal<string>(undefined)
+  private sortReverseSignal = signal<boolean>(undefined)
 
   private nameFilterDebounce: Subject<string>
   protected unsubscribeNotifier: Subject<any> = new Subject()
   protected _nameFilter: string
 
   public selectedObjects: Set<number> = new Set()
-  public togggleAll: boolean = false
+  private togggleAllSignal = signal(false)
+
+  public get data(): T[] {
+    return this.dataSignal()
+  }
+
+  public set data(data: T[]) {
+    this.dataSignal.set(data)
+  }
+
+  private get unfilteredData(): T[] {
+    return this.unfilteredDataSignal()
+  }
+
+  private set unfilteredData(data: T[]) {
+    this.unfilteredDataSignal.set(data)
+  }
+
+  public get page(): number {
+    return this.pageSignal()
+  }
+
+  public set page(page: number) {
+    this.pageSignal.set(page)
+  }
+
+  public get collectionSize(): number {
+    return this.collectionSizeSignal()
+  }
+
+  public set collectionSize(collectionSize: number) {
+    this.collectionSizeSignal.set(collectionSize)
+  }
+
+  public get displayCollectionSize(): number {
+    return this.displayCollectionSizeSignal()
+  }
+
+  public set displayCollectionSize(displayCollectionSize: number) {
+    this.displayCollectionSizeSignal.set(displayCollectionSize)
+  }
+
+  public get sortField(): string {
+    return this.sortFieldSignal()
+  }
+
+  public set sortField(sortField: string) {
+    this.sortFieldSignal.set(sortField)
+  }
+
+  public get sortReverse(): boolean {
+    return this.sortReverseSignal()
+  }
+
+  public set sortReverse(sortReverse: boolean) {
+    this.sortReverseSignal.set(sortReverse)
+  }
+
+  public get togggleAll(): boolean {
+    return this.togggleAllSignal()
+  }
+
+  public set togggleAll(togggleAll: boolean) {
+    this.togggleAllSignal.set(togggleAll)
+  }
 
   public get hasSelection(): boolean {
     return this.selectedObjects.size > 0 || this.allSelectionActive
@@ -201,8 +265,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
           this.data = this.filterData(c.results)
           this.collectionSize = this.getCollectionSize(c)
           this.displayCollectionSize = this.getDisplayCollectionSize(c)
-        }),
-        delay(100)
+        })
       )
       .subscribe({
         error: (error: HttpErrorResponse) => {
