@@ -1,9 +1,9 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { Subject, delay, first, takeUntil, tap } from 'rxjs'
+import { Subject, first, takeUntil, tap } from 'rxjs'
 import { MailAccount, MailAccountType } from 'src/app/data/mail-account'
 import { MailRule } from 'src/app/data/mail-rule'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
@@ -56,19 +56,32 @@ export class MailComponent
 
   public MailAccountType = MailAccountType
 
-  private _mailAccounts: MailAccount[] = []
+  private mailAccountsSignal = signal<MailAccount[]>([])
 
   public get mailAccounts() {
-    return this._mailAccounts
+    return this.mailAccountsSignal()
   }
   private set mailAccounts(accounts: MailAccount[]) {
-    this._mailAccounts = accounts
+    this.mailAccountsSignal.set(accounts)
     this.mailAccountsById = new Map(
       accounts.map((account) => [account.id, account])
     )
   }
-  public mailAccountsById: Map<number, MailAccount> = new Map()
-  public mailRules: MailRule[] = []
+  private mailAccountsByIdSignal = signal<Map<number, MailAccount>>(new Map())
+  public get mailAccountsById(): Map<number, MailAccount> {
+    return this.mailAccountsByIdSignal()
+  }
+  private set mailAccountsById(value: Map<number, MailAccount>) {
+    this.mailAccountsByIdSignal.set(value)
+  }
+
+  private mailRulesSignal = signal<MailRule[]>([])
+  public get mailRules(): MailRule[] {
+    return this.mailRulesSignal()
+  }
+  public set mailRules(value: MailRule[]) {
+    this.mailRulesSignal.set(value)
+  }
 
   unsubscribeNotifier: Subject<any> = new Subject()
   oAuthAccountId: number
@@ -81,10 +94,35 @@ export class MailComponent
     return this.settingsService.get(SETTINGS_KEYS.OUTLOOK_OAUTH_URL)
   }
 
-  public loadingRules: boolean = true
-  public showRules: boolean = false
-  public loadingAccounts: boolean = true
-  public showAccounts: boolean = false
+  private loadingRulesSignal = signal(true)
+  private showRulesSignal = signal(false)
+  private loadingAccountsSignal = signal(true)
+  private showAccountsSignal = signal(false)
+
+  public get loadingRules(): boolean {
+    return this.loadingRulesSignal()
+  }
+  public set loadingRules(value: boolean) {
+    this.loadingRulesSignal.set(value)
+  }
+  public get showRules(): boolean {
+    return this.showRulesSignal()
+  }
+  public set showRules(value: boolean) {
+    this.showRulesSignal.set(value)
+  }
+  public get loadingAccounts(): boolean {
+    return this.loadingAccountsSignal()
+  }
+  public set loadingAccounts(value: boolean) {
+    this.loadingAccountsSignal.set(value)
+  }
+  public get showAccounts(): boolean {
+    return this.showAccountsSignal()
+  }
+  public set showAccounts(value: boolean) {
+    this.showAccountsSignal.set(value)
+  }
 
   ngOnInit(): void {
     this.mailAccountService
@@ -94,6 +132,8 @@ export class MailComponent
         takeUntil(this.unsubscribeNotifier),
         tap((r) => {
           this.mailAccounts = r.results
+          this.loadingAccounts = false
+          this.showAccounts = true
           if (this.oAuthAccountId) {
             this.editMailAccount(
               this.mailAccounts.find(
@@ -101,15 +141,11 @@ export class MailComponent
               )
             )
           }
-        }),
-        delay(100)
+        })
       )
       .subscribe({
-        next: () => {
-          this.loadingAccounts = false
-          this.showAccounts = true
-        },
         error: (e) => {
+          this.loadingAccounts = false
           this.toastService.showError(
             $localize`Error retrieving mail accounts`,
             e
@@ -124,15 +160,13 @@ export class MailComponent
         takeUntil(this.unsubscribeNotifier),
         tap((r) => {
           this.mailRules = r.results
-        }),
-        delay(100)
-      )
-      .subscribe({
-        next: (r) => {
           this.loadingRules = false
           this.showRules = true
-        },
+        })
+      )
+      .subscribe({
         error: (e) => {
+          this.loadingRules = false
           this.toastService.showError($localize`Error retrieving mail rules`, e)
         },
       })

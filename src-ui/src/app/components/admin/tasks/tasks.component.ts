@@ -1,5 +1,5 @@
 import { JsonPipe, NgTemplateOutlet } from '@angular/common'
-import { Component, inject, OnDestroy, OnInit } from '@angular/core'
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import {
@@ -166,17 +166,41 @@ export class TasksComponent
   public autoRefreshEnabled: boolean = true
   public readonly pageSize = 25
   public page: number = 1
-  public totalTasks: number = 0
-  public sectionCounts: Record<TaskSection, number> = {
+  private totalTasksSignal = signal(0)
+  private sectionCountsSignal = signal<Record<TaskSection, number>>({
     [TaskSection.All]: 0,
     [TaskSection.NeedsAttention]: 0,
     [TaskSection.InProgress]: 0,
     [TaskSection.Completed]: 0,
-  }
-  public pagedTasks: PaperlessTask[] = []
+  })
+  private pagedTasksSignal = signal<PaperlessTask[]>([])
   public selectedSection: TaskSection = TaskSection.All
   public selectedTaskType: PaperlessTaskType | null = null
   public selectedTriggerSource: PaperlessTaskTriggerSource | null = null
+
+  public get totalTasks(): number {
+    return this.totalTasksSignal()
+  }
+
+  public set totalTasks(value: number) {
+    this.totalTasksSignal.set(value)
+  }
+
+  public get sectionCounts(): Record<TaskSection, number> {
+    return this.sectionCountsSignal()
+  }
+
+  public set sectionCounts(value: Record<TaskSection, number>) {
+    this.sectionCountsSignal.set(value)
+  }
+
+  public get pagedTasks(): PaperlessTask[] {
+    return this.pagedTasksSignal()
+  }
+
+  public set pagedTasks(value: PaperlessTask[]) {
+    this.pagedTasksSignal.set(value)
+  }
 
   private _filterText: string = ''
   get filterText() {
@@ -480,6 +504,13 @@ export class TasksComponent
     return this.sectionCounts[section]
   }
 
+  private setSectionCount(section: TaskSection, count: number) {
+    this.sectionCountsSignal.update((counts) => ({
+      ...counts,
+      [section]: count,
+    }))
+  }
+
   sectionShowsResults(section: TaskSection): boolean {
     return section !== TaskSection.InProgress
   }
@@ -664,10 +695,12 @@ export class TasksComponent
       .statusCounts(this.getParamsForSection(TaskSection.All))
       .pipe(first(), takeUntil(this.unsubscribeNotifier))
       .subscribe((counts) => {
-        this.sectionCounts[TaskSection.All] = counts.all
-        this.sectionCounts[TaskSection.NeedsAttention] = counts.needs_attention
-        this.sectionCounts[TaskSection.InProgress] = counts.in_progress
-        this.sectionCounts[TaskSection.Completed] = counts.completed
+        this.sectionCounts = {
+          [TaskSection.All]: counts.all,
+          [TaskSection.NeedsAttention]: counts.needs_attention,
+          [TaskSection.InProgress]: counts.in_progress,
+          [TaskSection.Completed]: counts.completed,
+        }
       })
   }
 
@@ -735,9 +768,9 @@ export class TasksComponent
         next: (result) => {
           this.pagedTasks = result.results
           this.totalTasks = result.count
-          this.sectionCounts[TaskSection.All] = result.count
+          this.setSectionCount(TaskSection.All, result.count)
           if (this.selectedSection !== TaskSection.All) {
-            this.sectionCounts[this.selectedSection] = result.count
+            this.setSectionCount(this.selectedSection, result.count)
           }
           this.loading = false
           if (

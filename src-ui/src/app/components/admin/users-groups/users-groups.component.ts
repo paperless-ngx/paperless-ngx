@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, first, takeUntil } from 'rxjs'
@@ -43,8 +43,24 @@ export class UsersAndGroupsComponent
   permissionsService = inject(PermissionsService)
   private settings = inject(SettingsService)
 
-  users: User[]
-  groups: Group[]
+  private usersSignal = signal<User[]>(null)
+  private groupsSignal = signal<Group[]>(null)
+
+  get users(): User[] {
+    return this.usersSignal()
+  }
+
+  set users(value: User[]) {
+    this.usersSignal.set(value)
+  }
+
+  get groups(): Group[] {
+    return this.groupsSignal()
+  }
+
+  set groups(value: Group[]) {
+    this.groupsSignal.set(value)
+  }
 
   unsubscribeNotifier: Subject<any> = new Subject()
 
