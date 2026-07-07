@@ -7,6 +7,7 @@ import {
   LOCALE_ID,
   Renderer2,
   RendererFactory2,
+  signal,
 } from '@angular/core'
 import { Meta } from '@angular/platform-browser'
 import { CookieService } from 'ngx-cookie-service'
@@ -294,6 +295,7 @@ export class SettingsService {
   protected baseUrl: string = environment.apiBaseUrl + 'ui_settings/'
 
   private settings: Record<string, any> = {}
+  private settingsVersion = signal(0)
   currentUser: User
 
   public settingsSaved: EventEmitter<any> = new EventEmitter()
@@ -324,6 +326,10 @@ export class SettingsService {
 
   private isSafeObjectKey(key: string): boolean {
     return !UNSAFE_OBJECT_KEYS.has(key)
+  }
+
+  public trackChanges(): void {
+    this.settingsVersion()
   }
 
   private assignSafeSettings(source: Record<string, any>) {
@@ -606,6 +612,7 @@ export class SettingsService {
       if (index == keys.length - 1) settingObj[keyPart] = value
       else settingObj = settingObj[keyPart]
     })
+    this.settingsVersion.update((version) => version + 1)
   }
 
   private settingIsSet(key: string): boolean {

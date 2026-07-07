@@ -853,6 +853,7 @@ describe('DocumentDetailComponent', () => {
         .find((b) => b.nativeElement.textContent === 'Save & next')
     ).toBeUndefined()
     nextSpy.mockReturnValue(true)
+    component.networkActive = true
     fixture.detectChanges()
     expect(
       fixture.debugElement

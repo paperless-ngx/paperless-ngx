@@ -5,6 +5,7 @@ import {
   Input,
   OnInit,
   Output,
+  signal,
   ViewChild,
 } from '@angular/core'
 import { ControlValueAccessor } from '@angular/forms'
@@ -61,7 +62,15 @@ export class AbstractInputComponent<T> implements OnInit, ControlValueAccessor {
   @Output()
   removed: EventEmitter<AbstractInputComponent<any>> = new EventEmitter()
 
-  value: T
+  private valueSignal = signal<T>(undefined)
+
+  get value(): T {
+    return this.valueSignal()
+  }
+
+  set value(value: T) {
+    this.valueSignal.set(value)
+  }
 
   ngOnInit(): void {
     this.inputId = uuidv4()

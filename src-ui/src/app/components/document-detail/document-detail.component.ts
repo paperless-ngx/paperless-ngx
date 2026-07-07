@@ -1,6 +1,13 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
 import { HttpClient, HttpResponse } from '@angular/common/http'
-import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core'
+import {
+  Component,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  ViewChild,
+} from '@angular/core'
 import {
   FormArray,
   FormControl,
@@ -227,34 +234,34 @@ export class DocumentDetailComponent
   expandOriginalMetadata = false
   expandArchivedMetadata = false
 
-  error: any
+  private errorSignal = signal<any>(undefined)
 
-  networkActive = false
+  private networkActiveSignal = signal(false)
 
-  documentId: number
-  document: Document
-  metadata: DocumentMetadata
-  suggestions: DocumentSuggestions
-  suggestionsLoading: boolean = false
-  users: User[]
+  private documentIdSignal = signal<number>(undefined)
+  private documentSignal = signal<Document>(undefined)
+  private metadataSignal = signal<DocumentMetadata>(undefined)
+  private suggestionsSignal = signal<DocumentSuggestions>(undefined)
+  private suggestionsLoadingSignal = signal(false)
+  private usersSignal = signal<User[]>(undefined)
 
-  title: string
+  private titleSignal = signal<string>(undefined)
   titleSubject: Subject<string> = new Subject()
-  previewUrl: string
-  pdfSource?: string
-  pdfPassword?: string
-  thumbUrl: string
-  previewText: string
-  previewLoaded: boolean = false
-  tiffURL: string
-  tiffError: string
+  private previewUrlSignal = signal<string>(undefined)
+  private pdfSourceSignal = signal<string>(undefined)
+  private pdfPasswordSignal = signal<string>(undefined)
+  private thumbUrlSignal = signal<string>(undefined)
+  private previewTextSignal = signal<string>(undefined)
+  private previewLoadedSignal = signal(false)
+  private tiffURLSignal = signal<string>(undefined)
+  private tiffErrorSignal = signal<string>(undefined)
 
   // Versioning
-  selectedVersionId: number
+  private selectedVersionIdSignal = signal<number>(undefined)
 
-  correspondents: Correspondent[]
-  documentTypes: DocumentType[]
-  storagePaths: StoragePath[]
+  private correspondentsSignal = signal<Correspondent[]>(undefined)
+  private documentTypesSignal = signal<DocumentType[]>(undefined)
+  private storagePathsSignal = signal<StoragePath[]>(undefined)
 
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
@@ -269,10 +276,10 @@ export class DocumentDetailComponent
     custom_fields: new FormArray([]),
   })
 
-  previewCurrentPage: number = 1
-  previewNumPages: number
-  previewZoomSetting: PdfZoomLevel = PdfZoomLevel.One
-  previewZoomScale: PdfZoomScale = PdfZoomScale.PageWidth
+  private previewCurrentPageSignal = signal(1)
+  private previewNumPagesSignal = signal<number>(undefined)
+  private previewZoomSettingSignal = signal<PdfZoomLevel>(PdfZoomLevel.One)
+  private previewZoomScaleSignal = signal<PdfZoomScale>(PdfZoomScale.PageWidth)
 
   store: BehaviorSubject<any>
   isDirty$: Observable<boolean>
@@ -287,9 +294,9 @@ export class DocumentDetailComponent
 
   ogDate: Date
 
-  customFields: CustomField[]
+  private customFieldsSignal = signal<CustomField[]>(undefined)
 
-  public downloading: boolean = false
+  private downloadingSignal = signal(false)
   public useFormattedFilename: boolean = false
 
   public readonly CustomFieldDataType = CustomFieldDataType
@@ -314,13 +321,238 @@ export class DocumentDetailComponent
   }
 
   DocumentDetailNavIDs = DocumentDetailNavIDs
-  activeNavID: number
+  private activeNavIDSignal = signal<number>(undefined)
+
+  get error(): any {
+    return this.errorSignal()
+  }
+
+  set error(value: any) {
+    this.errorSignal.set(value)
+  }
+
+  get networkActive(): boolean {
+    return this.networkActiveSignal()
+  }
+
+  set networkActive(value: boolean) {
+    this.networkActiveSignal.set(value)
+  }
+
+  get documentId(): number {
+    return this.documentIdSignal()
+  }
+
+  set documentId(value: number) {
+    this.documentIdSignal.set(value)
+  }
+
+  get document(): Document {
+    return this.documentSignal()
+  }
+
+  set document(value: Document) {
+    this.documentSignal.set(value)
+  }
+
+  get metadata(): DocumentMetadata {
+    return this.metadataSignal()
+  }
+
+  set metadata(value: DocumentMetadata) {
+    this.metadataSignal.set(value)
+  }
+
+  get suggestions(): DocumentSuggestions {
+    return this.suggestionsSignal()
+  }
+
+  set suggestions(value: DocumentSuggestions) {
+    this.suggestionsSignal.set(value)
+  }
+
+  get suggestionsLoading(): boolean {
+    return this.suggestionsLoadingSignal()
+  }
+
+  set suggestionsLoading(value: boolean) {
+    this.suggestionsLoadingSignal.set(value)
+  }
+
+  get users(): User[] {
+    return this.usersSignal()
+  }
+
+  set users(value: User[]) {
+    this.usersSignal.set(value)
+  }
+
+  get title(): string {
+    return this.titleSignal()
+  }
+
+  set title(value: string) {
+    this.titleSignal.set(value)
+  }
+
+  get previewUrl(): string {
+    return this.previewUrlSignal()
+  }
+
+  set previewUrl(value: string) {
+    this.previewUrlSignal.set(value)
+  }
+
+  get pdfSource(): string {
+    return this.pdfSourceSignal()
+  }
+
+  set pdfSource(value: string) {
+    this.pdfSourceSignal.set(value)
+  }
+
+  get pdfPassword(): string {
+    return this.pdfPasswordSignal()
+  }
+
+  set pdfPassword(value: string) {
+    this.pdfPasswordSignal.set(value)
+  }
+
+  get thumbUrl(): string {
+    return this.thumbUrlSignal()
+  }
+
+  set thumbUrl(value: string) {
+    this.thumbUrlSignal.set(value)
+  }
+
+  get previewText(): string {
+    return this.previewTextSignal()
+  }
+
+  set previewText(value: string) {
+    this.previewTextSignal.set(value)
+  }
+
+  get previewLoaded(): boolean {
+    return this.previewLoadedSignal()
+  }
+
+  set previewLoaded(value: boolean) {
+    this.previewLoadedSignal.set(value)
+  }
+
+  get tiffURL(): string {
+    return this.tiffURLSignal()
+  }
+
+  set tiffURL(value: string) {
+    this.tiffURLSignal.set(value)
+  }
+
+  get tiffError(): string {
+    return this.tiffErrorSignal()
+  }
+
+  set tiffError(value: string) {
+    this.tiffErrorSignal.set(value)
+  }
+
+  get selectedVersionId(): number {
+    return this.selectedVersionIdSignal()
+  }
+
+  set selectedVersionId(value: number) {
+    this.selectedVersionIdSignal.set(value)
+  }
+
+  get correspondents(): Correspondent[] {
+    return this.correspondentsSignal()
+  }
+
+  set correspondents(value: Correspondent[]) {
+    this.correspondentsSignal.set(value)
+  }
+
+  get documentTypes(): DocumentType[] {
+    return this.documentTypesSignal()
+  }
+
+  set documentTypes(value: DocumentType[]) {
+    this.documentTypesSignal.set(value)
+  }
+
+  get storagePaths(): StoragePath[] {
+    return this.storagePathsSignal()
+  }
+
+  set storagePaths(value: StoragePath[]) {
+    this.storagePathsSignal.set(value)
+  }
+
+  get previewCurrentPage(): number {
+    return this.previewCurrentPageSignal()
+  }
+
+  set previewCurrentPage(value: number) {
+    this.previewCurrentPageSignal.set(value)
+  }
+
+  get previewNumPages(): number {
+    return this.previewNumPagesSignal()
+  }
+
+  set previewNumPages(value: number) {
+    this.previewNumPagesSignal.set(value)
+  }
+
+  get previewZoomSetting(): PdfZoomLevel {
+    return this.previewZoomSettingSignal()
+  }
+
+  set previewZoomSetting(value: PdfZoomLevel) {
+    this.previewZoomSettingSignal.set(value)
+  }
+
+  get previewZoomScale(): PdfZoomScale {
+    return this.previewZoomScaleSignal()
+  }
+
+  set previewZoomScale(value: PdfZoomScale) {
+    this.previewZoomScaleSignal.set(value)
+  }
+
+  get downloading(): boolean {
+    return this.downloadingSignal()
+  }
+
+  set downloading(value: boolean) {
+    this.downloadingSignal.set(value)
+  }
+
+  get activeNavID(): number {
+    return this.activeNavIDSignal()
+  }
+
+  set activeNavID(value: number) {
+    this.activeNavIDSignal.set(value)
+  }
+
+  get customFields(): CustomField[] {
+    return this.customFieldsSignal()
+  }
+
+  set customFields(value: CustomField[]) {
+    this.customFieldsSignal.set(value)
+  }
 
   titleKeyUp(event) {
     this.titleSubject.next(event.target?.value)
   }
 
   get useNativePdfViewer(): boolean {
+    this.settings.trackChanges()
     return this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
   }
 
@@ -329,10 +561,12 @@ export class DocumentDetailComponent
   }
 
   get aiEnabled(): boolean {
+    this.settings.trackChanges()
     return this.settings.get(SETTINGS_KEYS.AI_ENABLED)
   }
 
   get archiveContentRenderType(): ContentRenderType {
+    this.settings.trackChanges()
     const hasArchiveVersion =
       this.metadata?.has_archive_version ?? !!this.document?.archived_file_name
     return hasArchiveVersion
@@ -343,16 +577,19 @@ export class DocumentDetailComponent
   }
 
   get originalContentRenderType(): ContentRenderType {
+    this.settings.trackChanges()
     return this.getRenderType(
       this.metadata?.original_mime_type || this.document?.mime_type
     )
   }
 
   get showThumbnailOverlay(): boolean {
+    this.settings.trackChanges()
     return this.settings.get(SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL)
   }
 
   isFieldHidden(fieldId: DocumentDetailFieldID): boolean {
+    this.settings.trackChanges()
     return this.settings
       .get(SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS)
       .includes(fieldId)
@@ -1492,9 +1729,7 @@ export class DocumentDetailComponent
   pdfPreviewLoaded(pdf: PngxPdfDocumentProxy) {
     this.previewNumPages = pdf.numPages
     if (this.password) this.requiresPassword = false
-    setTimeout(() => {
-      this.previewLoaded = true
-    }, 300)
+    this.previewLoaded = true
   }
 
   onError(event) {

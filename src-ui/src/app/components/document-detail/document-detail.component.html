@@ -445,8 +445,7 @@
       <button type="submit" class="order-3 btn btn-sm btn-primary" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save</button>
       @if (hasNext()) {
         <button type="button" class="order-1 btn btn-sm btn-outline-primary" (click)="saveEditNext()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; next</button>
-      }
-      @if (!hasNext()) {
+      } @else {
         <button type="button" class="order-2 btn btn-sm btn-outline-primary" (click)="save(true)" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; close</button>
       }
       <button type="button" class="order-0 btn btn-sm btn-outline-secondary" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Discard</button>
