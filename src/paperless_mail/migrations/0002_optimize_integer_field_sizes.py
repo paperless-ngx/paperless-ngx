@@ -4,6 +4,12 @@ from django.db import migrations
 from django.db import models
 
 
+def clamp_mailrule_maximum_age(apps, schema_editor):
+    # Clamp the maximum_age field of MailRule because of PositiveIntegerField --> PositiveSmallIntegerField
+    MailRule = apps.get_model("paperless_mail", "MailRule")
+    MailRule.objects.filter(maximum_age__gt=32767).update(maximum_age=32767)
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ("paperless_mail", "0001_squashed"),
@@ -111,6 +117,10 @@ class Migration(migrations.Migration):
                 default=1,
                 verbose_name="consumption scope",
             ),
+        ),
+        migrations.RunPython(
+            clamp_mailrule_maximum_age,
+            migrations.RunPython.noop,
         ),
         migrations.AlterField(
             model_name="mailrule",
