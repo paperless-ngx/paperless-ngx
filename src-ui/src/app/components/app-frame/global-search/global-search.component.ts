@@ -121,6 +121,7 @@ export class GlobalSearchComponent implements OnInit {
   @ViewChildren('secondaryButton') secondaryButtons: QueryList<ElementRef>
 
   get useAdvancedForFullSearch(): boolean {
+    this.settingsService.trackChanges()
     return (
       this.settingsService.get(SETTINGS_KEYS.SEARCH_FULL_TYPE) ===
       GlobalSearchType.ADVANCED

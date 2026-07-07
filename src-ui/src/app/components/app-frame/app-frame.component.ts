@@ -210,10 +210,12 @@ export class AppFrameComponent
   }
 
   get versionString(): string {
+    this.settingsService.trackChanges()
     return `${environment.appTitle} v${this.settingsService.get(SETTINGS_KEYS.VERSION)}${environment.tag === 'prod' ? '' : ` #${environment.tag}`}`
   }
 
   get customAppTitle(): string {
+    this.settingsService.trackChanges()
     return this.settingsService.get(SETTINGS_KEYS.APP_TITLE)
   }
 
@@ -256,6 +258,7 @@ export class AppFrameComponent
   }
 
   get slimSidebarEnabled(): boolean {
+    this.settingsService.trackChanges()
     return this.settingsService.get(SETTINGS_KEYS.SLIM_SIDEBAR)
   }
 
@@ -275,6 +278,7 @@ export class AppFrameComponent
   }
 
   get attributesSectionsCollapsed(): boolean {
+    this.settingsService.trackChanges()
     return this.settingsService
       .get(SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED)
       ?.includes(CollapsibleSection.ATTRIBUTES)
@@ -300,6 +304,7 @@ export class AppFrameComponent
   }
 
   get aiEnabled(): boolean {
+    this.settingsService.trackChanges()
     return this.settingsService.get(SETTINGS_KEYS.AI_ENABLED)
   }
 
@@ -451,6 +456,7 @@ export class AppFrameComponent
   }
 
   get showSidebarCounts(): boolean {
+    this.settingsService.trackChanges()
     return (
       this.settingsService.get(SETTINGS_KEYS.SIDEBAR_VIEWS_SHOW_COUNT) &&
       !this.settingsService.organizingSidebarSavedViews

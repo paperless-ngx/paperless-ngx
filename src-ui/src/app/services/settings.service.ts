@@ -296,7 +296,15 @@ export class SettingsService {
 
   private settings: Record<string, any> = {}
   private settingsVersion = signal(0)
-  currentUser: User
+  private currentUserSignal = signal<User>(undefined)
+
+  get currentUser(): User {
+    return this.currentUserSignal()
+  }
+
+  set currentUser(value: User) {
+    this.currentUserSignal.set(value)
+  }
 
   public settingsSaved: EventEmitter<any> = new EventEmitter()
 
@@ -305,11 +313,42 @@ export class SettingsService {
     return this._renderer
   }
 
-  public dashboardIsEmpty: boolean = false
+  private dashboardIsEmptySignal = signal(false)
+  private globalDropzoneEnabledSignal = signal(true)
+  private globalDropzoneActiveSignal = signal(false)
+  private organizingSidebarSavedViewsSignal = signal(false)
 
-  public globalDropzoneEnabled: boolean = true
-  public globalDropzoneActive: boolean = false
-  public organizingSidebarSavedViews: boolean = false
+  public get dashboardIsEmpty(): boolean {
+    return this.dashboardIsEmptySignal()
+  }
+
+  public set dashboardIsEmpty(value: boolean) {
+    this.dashboardIsEmptySignal.set(value)
+  }
+
+  public get globalDropzoneEnabled(): boolean {
+    return this.globalDropzoneEnabledSignal()
+  }
+
+  public set globalDropzoneEnabled(value: boolean) {
+    this.globalDropzoneEnabledSignal.set(value)
+  }
+
+  public get globalDropzoneActive(): boolean {
+    return this.globalDropzoneActiveSignal()
+  }
+
+  public set globalDropzoneActive(value: boolean) {
+    this.globalDropzoneActiveSignal.set(value)
+  }
+
+  public get organizingSidebarSavedViews(): boolean {
+    return this.organizingSidebarSavedViewsSignal()
+  }
+
+  public set organizingSidebarSavedViews(value: boolean) {
+    this.organizingSidebarSavedViewsSignal.set(value)
+  }
 
   private _allDisplayFields: Array<{ id: DisplayField; name: string }> =
     DEFAULT_DISPLAY_FIELDS
@@ -444,8 +483,8 @@ export class SettingsService {
 
   get displayName(): string {
     return (
-      this.currentUser.first_name ??
-      this.currentUser.username ??
+      this.currentUser?.first_name ??
+      this.currentUser?.username ??
       ''
     ).trim()
   }
@@ -578,7 +617,7 @@ export class SettingsService {
 
     // special case to fallback
     if (key === SETTINGS_KEYS.DEFAULT_PERMS_OWNER && value === undefined) {
-      return this.currentUser.id
+      return this.currentUser?.id
     }
 
     if (value !== undefined) {
