@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common'
-import { Component, OnDestroy, OnInit, inject } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -56,7 +56,7 @@ export class SavedViewsComponent
 
   DisplayMode = DisplayMode
 
-  public savedViews: SavedView[]
+  private savedViewsSignal = signal<SavedView[]>(undefined)
   private savedViewsGroup = new FormGroup({})
   public savedViewsForm: FormGroup = new FormGroup({
     savedViews: this.savedViewsGroup,
@@ -67,6 +67,14 @@ export class SavedViewsComponent
 
   get displayFields() {
     return this.settings.allDisplayFields
+  }
+
+  public get savedViews(): SavedView[] {
+    return this.savedViewsSignal()
+  }
+
+  public set savedViews(savedViews: SavedView[]) {
+    this.savedViewsSignal.set(savedViews)
   }
 
   constructor() {
