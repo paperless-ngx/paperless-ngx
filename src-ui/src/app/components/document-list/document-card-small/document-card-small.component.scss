@@ -2,6 +2,26 @@
   font-size: 90%;
 }
 
+.fade.show {
+  animation: pngx-entry-fade 160ms ease-out;
+}
+
+@keyframes pngx-entry-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade.show {
+    animation: none;
+  }
+}
+
 .doc-img {
   object-fit: cover;
   object-position: top left;
