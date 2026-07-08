@@ -10,17 +10,9 @@ import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
   imports: [DragDropModule, NgxBootstrapIconsModule, NgTemplateOutlet],
 })
 export class WidgetFrameComponent implements AfterViewInit {
-  private showSignal = signal(false)
+  readonly show = signal(false)
 
   loading = input(false)
-
-  get show(): boolean {
-    return this.showSignal()
-  }
-
-  set show(value: boolean) {
-    this.showSignal.set(value)
-  }
 
   title = input<string>()
 
@@ -31,6 +23,6 @@ export class WidgetFrameComponent implements AfterViewInit {
   badge = input<string | number>(null)
 
   ngAfterViewInit(): void {
-    this.show = true
+    this.show.set(true)
   }
 }

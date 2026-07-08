@@ -29,7 +29,7 @@ import { Toast } from 'src/app/services/toast.service'
 })
 export class ToastComponent {
   private clipboard = inject(Clipboard)
-  private copiedSignal = signal(false)
+  readonly copied = signal(false)
 
   @Input() toast: Toast
 
@@ -38,14 +38,6 @@ export class ToastComponent {
   @Output() hidden: EventEmitter<Toast> = new EventEmitter<Toast>()
 
   @Output() closed: EventEmitter<Toast> = new EventEmitter<Toast>()
-
-  public get copied(): boolean {
-    return this.copiedSignal()
-  }
-
-  public set copied(copied: boolean) {
-    this.copiedSignal.set(copied)
-  }
 
   onShown(toast: Toast) {
     if (!this.autohide) return
@@ -76,9 +68,9 @@ export class ToastComponent {
 
   public copyError(error: any) {
     this.clipboard.copy(JSON.stringify(error))
-    this.copied = true
+    this.copied.set(true)
     setTimeout(() => {
-      this.copied = false
+      this.copied.set(false)
     }, 3000)
   }
 

@@ -55,36 +55,20 @@ export class StatisticsWidgetComponent
   private websocketConnectionService = inject(WebsocketStatusService)
   private documentListViewService = inject(DocumentListViewService)
 
-  private loadingSignal = signal(false)
-  private statisticsSignal = signal<Statistics>({})
-
-  get loading(): boolean {
-    return this.loadingSignal()
-  }
-
-  set loading(value: boolean) {
-    this.loadingSignal.set(value)
-  }
-
-  get statistics(): Statistics {
-    return this.statisticsSignal()
-  }
-
-  set statistics(value: Statistics) {
-    this.statisticsSignal.set(value)
-  }
+  readonly loading = signal(false)
+  readonly statistics = signal<Statistics>({})
 
   subscription: Subscription
   private unsubscribeNotifer: Subject<any> = new Subject()
 
   reload() {
-    if (this.loading) return
-    this.loading = true
+    if (this.loading()) return
+    this.loading.set(true)
     this.http
       .get<Statistics>(`${environment.apiBaseUrl}statistics/`)
       .pipe(takeUntil(this.unsubscribeNotifer), first())
       .subscribe((statistics) => {
-        this.loading = false
+        this.loading.set(false)
         const fileTypeMax = 5
         if (statistics.document_file_type_counts?.length > fileTypeMax) {
           const others = statistics.document_file_type_counts.slice(fileTypeMax)
@@ -100,7 +84,7 @@ export class StatisticsWidgetComponent
             ),
           })
         }
-        this.statistics = statistics
+        this.statistics.set(statistics)
       })
   }
 
@@ -116,11 +100,11 @@ export class StatisticsWidgetComponent
   }
 
   getFileTypePercent(filetype: DocumentFileType): number {
-    return (filetype.mime_type_count / this.statistics?.documents_total) * 100
+    return (filetype.mime_type_count / this.statistics()?.documents_total) * 100
   }
 
   getItemOpacity(i: number): number {
-    return 1 - i / this.statistics?.document_file_type_counts.length
+    return 1 - i / this.statistics()?.document_file_type_counts.length
   }
 
   ngOnInit(): void {
@@ -142,8 +126,8 @@ export class StatisticsWidgetComponent
     this.documentListViewService.quickFilter([
       {
         rule_type: FILTER_HAS_TAGS_ANY,
-        value: this.statistics.inbox_tags
-          .map((tagID) => tagID.toString())
+        value: this.statistics()
+          .inbox_tags.map((tagID) => tagID.toString())
           .join(','),
       },
     ])

@@ -61,7 +61,7 @@ describe('FileDropComponent', () => {
     component.onDragOver(new Event('dragover') as DragEvent)
     tick(1)
     fixture.detectChanges()
-    expect(component.fileIsOver).toBeFalsy()
+    expect(component.fileIsOver()).toBeFalsy()
     const dropzone = fixture.debugElement.query(
       By.css('.global-dropzone-overlay')
     )
@@ -85,13 +85,13 @@ describe('FileDropComponent', () => {
 
   it('should support drag drop, initiate upload', fakeAsync(() => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
-    expect(component.fileIsOver).toBeFalsy()
+    expect(component.fileIsOver()).toBeFalsy()
     const overEvent = new Event('dragover') as DragEvent
     ;(overEvent as any).dataTransfer = { types: ['Files'] }
     component.onDragOver(overEvent)
     tick(1)
     fixture.detectChanges()
-    expect(component.fileIsOver).toBeTruthy()
+    expect(component.fileIsOver()).toBeTruthy()
     component.onDragLeave(new Event('dragleave') as DragEvent)
     tick(700)
     fixture.detectChanges()
@@ -121,13 +121,13 @@ describe('FileDropComponent', () => {
 
   it('should support drag drop, initiate upload with webkitGetAsEntry', fakeAsync(() => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
-    expect(component.fileIsOver).toBeFalsy()
+    expect(component.fileIsOver()).toBeFalsy()
     const overEvent = new Event('dragover') as DragEvent
     ;(overEvent as any).dataTransfer = { types: ['Files'] }
     component.onDragOver(overEvent)
     tick(1)
     fixture.detectChanges()
-    expect(component.fileIsOver).toBeTruthy()
+    expect(component.fileIsOver()).toBeTruthy()
     component.onDragLeave(new Event('dragleave') as DragEvent)
     tick(700)
     fixture.detectChanges()
@@ -202,13 +202,13 @@ describe('FileDropComponent', () => {
 
   it('should support drag drop, initiate upload without DataTransfer API support', fakeAsync(() => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
-    expect(component.fileIsOver).toBeFalsy()
+    expect(component.fileIsOver()).toBeFalsy()
     const overEvent = new Event('dragover') as DragEvent
     ;(overEvent as any).dataTransfer = { types: ['Files'] }
     component.onDragOver(overEvent)
     tick(1)
     fixture.detectChanges()
-    expect(component.fileIsOver).toBeTruthy()
+    expect(component.fileIsOver()).toBeTruthy()
     component.onDragLeave(new Event('dragleave') as DragEvent)
     tick(700)
     fixture.detectChanges()
@@ -315,8 +315,8 @@ describe('FileDropComponent', () => {
     ;(overEvent as any).dataTransfer = { types: ['Files'] }
     component.onDragOver(overEvent)
     tick(1)
-    expect(component.hidden).toBeFalsy()
-    expect(component.fileIsOver).toBeTruthy()
+    expect(component.hidden()).toBeFalsy()
+    expect(component.fileIsOver()).toBeTruthy()
     jest.spyOn(document, 'hidden', 'get').mockReturnValue(true)
     component.onVisibilityChange()
     expect(leaveSpy).toHaveBeenCalled()
@@ -331,8 +331,8 @@ describe('FileDropComponent', () => {
     ;(overEvent as any).dataTransfer = { types: ['Files'] }
     component.onDragOver(overEvent)
     tick(1)
-    expect(component.hidden).toBeFalsy()
-    expect(component.fileIsOver).toBeTruthy()
+    expect(component.hidden()).toBeFalsy()
+    expect(component.fileIsOver()).toBeTruthy()
     jest.spyOn(document, 'hidden', 'get').mockReturnValue(true)
     component.onWindowBlur()
     expect(leaveSpy).toHaveBeenCalled()

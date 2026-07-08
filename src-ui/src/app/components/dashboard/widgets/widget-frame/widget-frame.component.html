@@ -1,5 +1,5 @@
 @if (!cardless()) {
-  <div class="card shadow-sm bg-light fade" [class.show]="show" cdkDrag [cdkDragDisabled]="!draggable()" cdkDragPreviewContainer="parent">
+  <div class="card shadow-sm bg-light fade" [class.show]="show()" cdkDrag [cdkDragDisabled]="!draggable()" cdkDragPreviewContainer="parent">
     <div class="card-header">
       <div class="d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
@@ -26,7 +26,7 @@
     </div>
   </div>
 } @else {
-  <div class="fade" [class.show]="show">
+  <div class="fade" [class.show]="show()">
     <ng-container [ngTemplateOutlet]="content"></ng-container>
   </div>
 }

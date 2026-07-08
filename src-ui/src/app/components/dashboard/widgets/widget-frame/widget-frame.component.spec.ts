@@ -58,6 +58,6 @@ describe('WidgetFrameComponent', () => {
   })
 
   it('should show', () => {
-    expect(component.show).toBeTruthy()
+    expect(component.show()).toBeTruthy()
   })
 })

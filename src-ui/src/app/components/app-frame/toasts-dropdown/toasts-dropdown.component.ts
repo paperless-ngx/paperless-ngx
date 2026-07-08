@@ -1,10 +1,11 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core'
+import { Component, inject } from '@angular/core'
+import { toSignal } from '@angular/core/rxjs-interop'
 import {
   NgbDropdownModule,
   NgbProgressbarModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { Subscription } from 'rxjs'
+import { map } from 'rxjs'
 import { Toast, ToastService } from 'src/app/services/toast.service'
 import { ToastComponent } from '../../common/toast/toast.component'
 
@@ -19,30 +20,13 @@ import { ToastComponent } from '../../common/toast/toast.component'
     NgxBootstrapIconsModule,
   ],
 })
-export class ToastsDropdownComponent implements OnInit, OnDestroy {
+export class ToastsDropdownComponent {
   toastService = inject(ToastService)
 
-  private subscription: Subscription
-
-  private toastsSignal = signal<Toast[]>([])
-
-  public get toasts(): Toast[] {
-    return this.toastsSignal()
-  }
-
-  public set toasts(toasts: Toast[]) {
-    this.toastsSignal.set(toasts)
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe()
-  }
-
-  ngOnInit(): void {
-    this.subscription = this.toastService.getToasts().subscribe((toasts) => {
-      this.toasts = [...toasts]
-    })
-  }
+  readonly toasts = toSignal(
+    this.toastService.getToasts().pipe(map((toasts) => [...toasts])),
+    { initialValue: [] as Toast[] }
+  )
 
   onOpenChange(open: boolean): void {
     this.toastService.suppressPopupToasts = open

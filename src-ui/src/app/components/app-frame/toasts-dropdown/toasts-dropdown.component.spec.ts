@@ -42,7 +42,8 @@ describe('ToastsDropdownComponent', () => {
   let component: ToastsDropdownComponent
   let fixture: ComponentFixture<ToastsDropdownComponent>
   let toastService: ToastService
-  let toastsSubject: Subject<Toast[]> = new Subject()
+  let toastsSubject: Subject<Toast[]>
+  let getToastsSpy: jest.SpyInstance
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -56,48 +57,43 @@ describe('ToastsDropdownComponent', () => {
       ],
     }).compileComponents()
 
-    fixture = TestBed.createComponent(ToastsDropdownComponent)
     toastService = TestBed.inject(ToastService)
-    jest.spyOn(toastService, 'getToasts').mockReturnValue(toastsSubject)
+    toastsSubject = new Subject()
+    getToastsSpy = jest
+      .spyOn(toastService, 'getToasts')
+      .mockReturnValue(toastsSubject)
 
+    fixture = TestBed.createComponent(ToastsDropdownComponent)
     component = fixture.componentInstance
 
     fixture.detectChanges()
   })
 
   it('should call getToasts and return toasts', fakeAsync(() => {
-    const spy = jest.spyOn(toastService, 'getToasts')
-
-    component.ngOnInit()
     toastsSubject.next(toasts)
     fixture.detectChanges()
 
-    expect(spy).toHaveBeenCalled()
-    expect(component.toasts).toContainEqual({
+    expect(getToastsSpy).toHaveBeenCalled()
+    expect(component.toasts()).toContainEqual({
       id: 'abc-123',
       content: 'foo bar',
       delay: 5000,
     })
-
-    component.ngOnDestroy()
     flush()
     discardPeriodicTasks()
   }))
 
   it('should show a toast', fakeAsync(() => {
-    component.ngOnInit()
     toastsSubject.next(toasts)
     fixture.detectChanges()
 
     expect(fixture.nativeElement.textContent).toContain('foo bar')
 
-    component.ngOnDestroy()
     flush()
     discardPeriodicTasks()
   }))
 
   it('should toggle suppressPopupToasts', fakeAsync((finish) => {
-    component.ngOnInit()
     fixture.detectChanges()
     toastsSubject.next(toasts)
 
@@ -105,7 +101,6 @@ describe('ToastsDropdownComponent', () => {
     component.onOpenChange(true)
     expect(spy).toHaveBeenCalledWith(true)
 
-    component.ngOnDestroy()
     flush()
     discardPeriodicTasks()
   }))
