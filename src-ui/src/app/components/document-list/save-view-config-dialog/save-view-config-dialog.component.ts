@@ -5,6 +5,7 @@ import {
   OnInit,
   Output,
   inject,
+  signal,
 } from '@angular/core'
 import {
   FormControl,
@@ -32,29 +33,42 @@ import { TextComponent } from '../../common/input/text/text.component'
 })
 export class SaveViewConfigDialogComponent implements OnInit {
   private modal = inject(NgbActiveModal)
+  private errorSignal = signal(undefined)
+  private buttonsEnabledSignal = signal(true)
+  private defaultNameSignal = signal('')
 
   @Output()
   public saveClicked = new EventEmitter()
 
   @Input()
-  error
+  get error() {
+    return this.errorSignal()
+  }
+
+  set error(error) {
+    this.errorSignal.set(error)
+  }
 
   @Input()
-  buttonsEnabled = true
+  get buttonsEnabled(): boolean {
+    return this.buttonsEnabledSignal()
+  }
+
+  set buttonsEnabled(buttonsEnabled: boolean) {
+    this.buttonsEnabledSignal.set(buttonsEnabled)
+  }
 
   closeEnabled = false
 
   users: User[]
 
-  _defaultName = ''
-
   get defaultName() {
-    return this._defaultName
+    return this.defaultNameSignal()
   }
 
   @Input()
   set defaultName(value: string) {
-    this._defaultName = value
+    this.defaultNameSignal.set(value)
     this.saveViewConfigForm.patchValue({ name: value })
   }
 

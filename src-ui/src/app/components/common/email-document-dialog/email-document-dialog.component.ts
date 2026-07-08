@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core'
+import { Component, Input, inject, signal } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -17,22 +17,36 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
   private documentService = inject(DocumentService)
   private toastService = inject(ToastService)
 
-  @Input()
-  documentIds: number[]
+  private documentIdsSignal = signal<number[]>(undefined)
+  private hasArchiveVersionSignal = signal(true)
+  private useArchiveVersionSignal = signal(true)
 
-  private _hasArchiveVersion: boolean = true
+  @Input()
+  get documentIds(): number[] {
+    return this.documentIdsSignal()
+  }
+
+  set documentIds(documentIds: number[]) {
+    this.documentIdsSignal.set(documentIds)
+  }
+
+  get useArchiveVersion(): boolean {
+    return this.useArchiveVersionSignal()
+  }
+
+  set useArchiveVersion(useArchiveVersion: boolean) {
+    this.useArchiveVersionSignal.set(useArchiveVersion)
+  }
 
   @Input()
   set hasArchiveVersion(value: boolean) {
-    this._hasArchiveVersion = value
+    this.hasArchiveVersionSignal.set(value)
     this.useArchiveVersion = value
   }
 
   get hasArchiveVersion(): boolean {
-    return this._hasArchiveVersion
+    return this.hasArchiveVersionSignal()
   }
-
-  public useArchiveVersion: boolean = true
 
   public emailAddress: string = ''
   public emailSubject: string = ''

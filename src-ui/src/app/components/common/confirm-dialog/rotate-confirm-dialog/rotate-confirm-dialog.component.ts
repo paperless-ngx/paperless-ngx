@@ -1,5 +1,5 @@
 import { NgStyle } from '@angular/common'
-import { Component, inject } from '@angular/core'
+import { Component, inject, signal } from '@angular/core'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { ConfirmDialogComponent } from '../confirm-dialog.component'
@@ -13,11 +13,30 @@ import { ConfirmDialogComponent } from '../confirm-dialog.component'
 export class RotateConfirmDialogComponent extends ConfirmDialogComponent {
   documentService = inject(DocumentService)
 
-  public documentID: number
-  public showPDFNote: boolean = true
+  private documentIDSignal = signal<number>(undefined)
+  private showPDFNoteSignal = signal(true)
+  private rotationSignal = signal(0)
+
+  public get documentID(): number {
+    return this.documentIDSignal()
+  }
+
+  public set documentID(documentID: number) {
+    this.documentIDSignal.set(documentID)
+  }
+
+  public get showPDFNote(): boolean {
+    return this.showPDFNoteSignal()
+  }
+
+  public set showPDFNote(showPDFNote: boolean) {
+    this.showPDFNoteSignal.set(showPDFNote)
+  }
 
   // animation is better if we dont normalize yet
-  public rotation: number = 0
+  public get rotation(): number {
+    return this.rotationSignal()
+  }
 
   public get degrees(): number {
     let degrees = this.rotation % 360
@@ -30,6 +49,6 @@ export class RotateConfirmDialogComponent extends ConfirmDialogComponent {
   }
 
   rotate(clockwise: boolean = true) {
-    this.rotation += clockwise ? 90 : -90
+    this.rotationSignal.update((rotation) => rotation + (clockwise ? 90 : -90))
   }
 }

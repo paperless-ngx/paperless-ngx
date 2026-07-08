@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core'
+import { Component, inject, signal } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -158,9 +158,33 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
   private correspondentService: CorrespondentService
   private documentTypeService: DocumentTypeService
 
-  accounts: MailAccount[]
-  correspondents: Correspondent[]
-  documentTypes: DocumentType[]
+  private accountsSignal = signal<MailAccount[]>(undefined)
+  private correspondentsSignal = signal<Correspondent[]>(undefined)
+  private documentTypesSignal = signal<DocumentType[]>(undefined)
+
+  get accounts(): MailAccount[] {
+    return this.accountsSignal()
+  }
+
+  set accounts(accounts: MailAccount[]) {
+    this.accountsSignal.set(accounts)
+  }
+
+  get correspondents(): Correspondent[] {
+    return this.correspondentsSignal()
+  }
+
+  set correspondents(correspondents: Correspondent[]) {
+    this.correspondentsSignal.set(correspondents)
+  }
+
+  get documentTypes(): DocumentType[] {
+    return this.documentTypesSignal()
+  }
+
+  set documentTypes(documentTypes: DocumentType[]) {
+    this.documentTypesSignal.set(documentTypes)
+  }
 
   constructor() {
     super()

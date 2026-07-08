@@ -35,6 +35,8 @@ export class PermissionsDialogComponent {
   private userService = inject(UserService)
 
   private usersSignal = signal<User[]>(undefined)
+  private titleSignal = signal($localize`Set permissions`)
+  private noteSignal = signal<string>(null)
   private buttonsEnabledSignal = signal(true)
   private o: ObjectWithPermissions = undefined
 
@@ -54,10 +56,22 @@ export class PermissionsDialogComponent {
   public confirmClicked = new EventEmitter()
 
   @Input()
-  title = $localize`Set permissions`
+  get title(): string {
+    return this.titleSignal()
+  }
+
+  set title(title: string) {
+    this.titleSignal.set(title)
+  }
 
   @Input()
-  note: string = null
+  get note(): string {
+    return this.noteSignal()
+  }
+
+  set note(note: string) {
+    this.noteSignal.set(note)
+  }
 
   @Input()
   set object(o: ObjectWithPermissions) {

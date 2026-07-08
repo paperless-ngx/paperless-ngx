@@ -4,7 +4,7 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
 import { NgTemplateOutlet } from '@angular/common'
-import { Component, OnInit, inject } from '@angular/core'
+import { Component, OnInit, inject, signal } from '@angular/core'
 import {
   AbstractControl,
   FormArray,
@@ -476,17 +476,73 @@ export class WorkflowEditDialogComponent
   private mailRuleService: MailRuleService
   private customFieldsService: CustomFieldsService
 
-  templates: Workflow[]
-  correspondents: Correspondent[]
-  documentTypes: DocumentType[]
-  storagePaths: StoragePath[]
-  mailRules: MailRule[]
-  customFields: CustomField[]
-  dateCustomFields: CustomField[]
+  private templatesSignal = signal<Workflow[]>(undefined)
+  private correspondentsSignal = signal<Correspondent[]>(undefined)
+  private documentTypesSignal = signal<DocumentType[]>(undefined)
+  private storagePathsSignal = signal<StoragePath[]>(undefined)
+  private mailRulesSignal = signal<MailRule[]>(undefined)
+  private customFieldsSignal = signal<CustomField[]>(undefined)
+  private dateCustomFieldsSignal = signal<CustomField[]>(undefined)
+
+  get templates(): Workflow[] {
+    return this.templatesSignal()
+  }
+
+  set templates(templates: Workflow[]) {
+    this.templatesSignal.set(templates)
+  }
+
+  get correspondents(): Correspondent[] {
+    return this.correspondentsSignal()
+  }
+
+  set correspondents(correspondents: Correspondent[]) {
+    this.correspondentsSignal.set(correspondents)
+  }
+
+  get documentTypes(): DocumentType[] {
+    return this.documentTypesSignal()
+  }
+
+  set documentTypes(documentTypes: DocumentType[]) {
+    this.documentTypesSignal.set(documentTypes)
+  }
+
+  get storagePaths(): StoragePath[] {
+    return this.storagePathsSignal()
+  }
+
+  set storagePaths(storagePaths: StoragePath[]) {
+    this.storagePathsSignal.set(storagePaths)
+  }
+
+  get mailRules(): MailRule[] {
+    return this.mailRulesSignal()
+  }
+
+  set mailRules(mailRules: MailRule[]) {
+    this.mailRulesSignal.set(mailRules)
+  }
+
+  get customFields(): CustomField[] {
+    return this.customFieldsSignal()
+  }
+
+  set customFields(customFields: CustomField[]) {
+    this.customFieldsSignal.set(customFields)
+  }
+
+  get dateCustomFields(): CustomField[] {
+    return this.dateCustomFieldsSignal()
+  }
+
+  set dateCustomFields(dateCustomFields: CustomField[]) {
+    this.dateCustomFieldsSignal.set(dateCustomFields)
+  }
 
   expandedItem: number = null
 
-  private allowedActionTypes = []
+  private allowedActionTypesSignal = signal([])
 
   private readonly triggerFilterOptionsMap = new WeakMap<
     FormArray,
@@ -1294,7 +1350,16 @@ export class WorkflowEditDialogComponent
   }
 
   get actionTypeOptions() {
+    this.settingsService.trackChanges()
     return this.allowedActionTypes
+  }
+
+  get allowedActionTypes() {
+    return this.allowedActionTypesSignal()
+  }
+
+  set allowedActionTypes(allowedActionTypes) {
+    this.allowedActionTypesSignal.set(allowedActionTypes)
   }
 
   getActionTypeOptionName(type: WorkflowActionType): string {

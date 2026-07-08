@@ -1,5 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard'
-import { Component, Input, OnInit, inject } from '@angular/core'
+import { Component, Input, OnInit, inject, signal } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -27,50 +27,74 @@ export class ShareLinksDialogComponent implements OnInit {
 
   readonly expirationOptions = SHARE_LINK_EXPIRATION_OPTIONS
 
-  @Input()
-  title = $localize`Share Links`
+  private titleSignal = signal($localize`Share Links`)
+  private documentIdSignal = signal<number>(undefined)
+  private hasArchiveVersionSignal = signal(true)
+  private shareLinksSignal = signal<ShareLink[]>(undefined)
+  private copiedSignal = signal<number>(undefined)
 
-  _documentId: number
+  @Input()
+  get title(): string {
+    return this.titleSignal()
+  }
+
+  set title(title: string) {
+    this.titleSignal.set(title)
+  }
 
   @Input()
   set documentId(id: number) {
     if (id !== undefined) {
-      this._documentId = id
+      this.documentIdSignal.set(id)
       this.refresh()
     }
   }
 
-  private _hasArchiveVersion: boolean = true
+  get documentId(): number {
+    return this.documentIdSignal()
+  }
 
   @Input()
   set hasArchiveVersion(value: boolean) {
-    this._hasArchiveVersion = value
+    this.hasArchiveVersionSignal.set(value)
     this.useArchiveVersion = value
   }
 
   get hasArchiveVersion(): boolean {
-    return this._hasArchiveVersion
+    return this.hasArchiveVersionSignal()
   }
 
-  shareLinks: ShareLink[]
+  get shareLinks(): ShareLink[] {
+    return this.shareLinksSignal()
+  }
+
+  set shareLinks(shareLinks: ShareLink[]) {
+    this.shareLinksSignal.set(shareLinks)
+  }
 
   loading: boolean = false
 
-  copied: number
+  get copied(): number {
+    return this.copiedSignal()
+  }
+
+  set copied(copied: number) {
+    this.copiedSignal.set(copied)
+  }
 
   expirationDays: number = 7
 
   useArchiveVersion: boolean = true
 
   ngOnInit(): void {
-    if (this._documentId !== undefined) this.refresh()
+    if (this.documentId !== undefined) this.refresh()
   }
 
   refresh() {
-    if (this._documentId === undefined) return
+    if (this.documentId === undefined) return
     this.loading = true
     this.shareLinkService
-      .getLinksForDocument(this._documentId)
+      .getLinksForDocument(this.documentId)
       .pipe(first())
       .subscribe({
         next: (results) => {
@@ -141,7 +165,7 @@ export class ShareLinksDialogComponent implements OnInit {
     this.loading = true
     this.shareLinkService
       .createLinkForDocument(
-        this._documentId,
+        this.documentId,
         this.useArchiveVersion ? FileVersion.Archive : FileVersion.Original,
         expiration
       )

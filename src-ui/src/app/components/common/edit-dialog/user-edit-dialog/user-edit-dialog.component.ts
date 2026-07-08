@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core'
+import { Component, OnInit, inject, signal } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -40,9 +40,33 @@ export class UserEditDialogComponent
   private toastService = inject(ToastService)
   private groupsService: GroupService
 
-  groups: Group[]
-  passwordIsSet: boolean = false
-  public totpLoading: boolean = false
+  private groupsSignal = signal<Group[]>(undefined)
+  private passwordIsSetSignal = signal(false)
+  private totpLoadingSignal = signal(false)
+
+  get groups(): Group[] {
+    return this.groupsSignal()
+  }
+
+  set groups(groups: Group[]) {
+    this.groupsSignal.set(groups)
+  }
+
+  get passwordIsSet(): boolean {
+    return this.passwordIsSetSignal()
+  }
+
+  set passwordIsSet(passwordIsSet: boolean) {
+    this.passwordIsSetSignal.set(passwordIsSet)
+  }
+
+  public get totpLoading(): boolean {
+    return this.totpLoadingSignal()
+  }
+
+  public set totpLoading(totpLoading: boolean) {
+    this.totpLoadingSignal.set(totpLoading)
+  }
 
   constructor() {
     super()
@@ -103,7 +127,7 @@ export class UserEditDialogComponent
     if (!groupsVal) return []
     else
       return groupsVal.flatMap(
-        (id) => this.groups.find((g) => g.id == id)?.permissions
+        (id) => this.groups?.find((g) => g.id == id)?.permissions
       )
   }
 

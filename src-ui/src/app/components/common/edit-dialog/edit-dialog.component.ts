@@ -5,6 +5,7 @@ import {
   OnInit,
   Output,
   inject,
+  signal,
 } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
@@ -45,10 +46,20 @@ export abstract class EditDialogComponent<
   protected settingsService = inject(SettingsService)
   protected permissionsService = inject(PermissionsService)
 
-  users: User[]
+  private usersSignal = signal<User[]>(undefined)
+
+  private dialogModeSignal = signal(EditDialogMode.CREATE, {
+    equal: () => false,
+  })
 
   @Input()
-  dialogMode: EditDialogMode = EditDialogMode.CREATE
+  get dialogMode(): EditDialogMode {
+    return this.dialogModeSignal()
+  }
+
+  set dialogMode(dialogMode: EditDialogMode) {
+    this.dialogModeSignal.set(dialogMode)
+  }
 
   @Input()
   object: T
@@ -59,11 +70,43 @@ export abstract class EditDialogComponent<
   @Output()
   failed = new EventEmitter()
 
-  networkActive = false
+  private networkActiveSignal = signal(false)
 
-  closeEnabled = false
+  private closeEnabledSignal = signal(false)
 
-  error = null
+  private errorSignal = signal<any>(null)
+
+  get users(): User[] {
+    return this.usersSignal()
+  }
+
+  set users(users: User[]) {
+    this.usersSignal.set(users)
+  }
+
+  get networkActive(): boolean {
+    return this.networkActiveSignal()
+  }
+
+  set networkActive(networkActive: boolean) {
+    this.networkActiveSignal.set(networkActive)
+  }
+
+  get closeEnabled(): boolean {
+    return this.closeEnabledSignal()
+  }
+
+  set closeEnabled(closeEnabled: boolean) {
+    this.closeEnabledSignal.set(closeEnabled)
+  }
+
+  get error(): any {
+    return this.errorSignal()
+  }
+
+  set error(error: any) {
+    this.errorSignal.set(error)
+  }
 
   abstract getForm(): FormGroup
 
