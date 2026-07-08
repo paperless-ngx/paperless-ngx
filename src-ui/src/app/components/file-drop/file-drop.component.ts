@@ -1,4 +1,4 @@
-import { Component, HostListener, inject } from '@angular/core'
+import { Component, HostListener, inject, signal } from '@angular/core'
 import {
   PermissionAction,
   PermissionsService,
@@ -21,8 +21,8 @@ export class FileDropComponent {
   private permissionsService = inject(PermissionsService)
 
   private fileLeaveTimeoutID: any
-  fileIsOver: boolean = false
-  hidden: boolean = true
+  fileIsOver = signal<boolean>(false)
+  hidden = signal<boolean>(true)
 
   public get dragDropEnabled(): boolean {
     return (
@@ -42,9 +42,9 @@ export class FileDropComponent {
     this.settings.globalDropzoneActive = true
     // allows transition
     setTimeout(() => {
-      this.fileIsOver = true
+      this.fileIsOver.set(true)
     }, 1)
-    this.hidden = false
+    this.hidden.set(false)
     // stop fileLeave timeout
     clearTimeout(this.fileLeaveTimeoutID)
   }
@@ -61,10 +61,10 @@ export class FileDropComponent {
     const ms = immediate ? 0 : 500
 
     this.fileLeaveTimeoutID = setTimeout(() => {
-      this.fileIsOver = false
+      this.fileIsOver.set(false)
       // await transition completed
       setTimeout(() => {
-        this.hidden = true
+        this.hidden.set(true)
       }, 150)
     }, ms)
   }
