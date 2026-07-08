@@ -1,6 +1,6 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { CommonModule } from '@angular/common'
-import { Component, Input, inject } from '@angular/core'
+import { Component, Input, inject, signal } from '@angular/core'
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Document } from 'src/app/data/document'
@@ -38,10 +38,27 @@ export class ShareLinkBundleDialogComponent extends ConfirmDialogComponent {
   private readonly clipboard = inject(Clipboard)
   private readonly toastService = inject(ToastService)
 
-  private _documents: Document[] = []
+  private documentsSignal = signal<Document[]>([])
+  private selectionCountSignal = signal(0)
+  private documentPreviewSignal = signal<Document[]>([])
+  private copiedSignal = signal(false)
 
-  selectionCount = 0
-  documentPreview: Document[] = []
+  get selectionCount(): number {
+    return this.selectionCountSignal()
+  }
+
+  get documentPreview(): Document[] {
+    return this.documentPreviewSignal()
+  }
+
+  get copied(): boolean {
+    return this.copiedSignal()
+  }
+
+  set copied(copied: boolean) {
+    this.copiedSignal.set(copied)
+  }
+
   form: FormGroup = this.formBuilder.group({
     shareArchiveVersion: true,
     expirationDays: [7],
@@ -51,7 +68,6 @@ export class ShareLinkBundleDialogComponent extends ConfirmDialogComponent {
   readonly expirationOptions = SHARE_LINK_EXPIRATION_OPTIONS
 
   createdBundle: ShareLinkBundleSummary | null = null
-  copied = false
   onOpenManage?: () => void
   readonly statuses = ShareLinkBundleStatus
 
@@ -64,15 +80,16 @@ export class ShareLinkBundleDialogComponent extends ConfirmDialogComponent {
 
   @Input()
   set documents(docs: Document[]) {
-    this._documents = docs.concat()
-    this.selectionCount = this._documents.length
-    this.documentPreview = this._documents.slice(0, 10)
+    const documents = docs.concat()
+    this.documentsSignal.set(documents)
+    this.selectionCountSignal.set(documents.length)
+    this.documentPreviewSignal.set(documents.slice(0, 10))
   }
 
   submit() {
     if (this.createdBundle) return
     this.payload = {
-      document_ids: this._documents.map((doc) => doc.id),
+      document_ids: this.documentsSignal().map((doc) => doc.id),
       file_version: this.form.value.shareArchiveVersion
         ? FileVersion.Archive
         : FileVersion.Original,

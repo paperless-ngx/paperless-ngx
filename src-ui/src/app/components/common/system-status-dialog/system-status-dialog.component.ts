@@ -1,5 +1,12 @@
 import { Clipboard, ClipboardModule } from '@angular/cdk/clipboard'
-import { Component, OnDestroy, OnInit, inject } from '@angular/core'
+import {
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core'
 import {
   NgbActiveModal,
   NgbModalModule,
@@ -50,14 +57,39 @@ export class SystemStatusDialogComponent implements OnInit, OnDestroy {
 
   public SystemStatusItemStatus = SystemStatusItemStatus
   public PaperlessTaskType = PaperlessTaskType
-  public status: SystemStatus
+  private statusSignal = signal<SystemStatus>(undefined)
   public frontendVersion: string = environment.version
-  public versionMismatch: boolean = false
+  private versionMismatchSignal = signal(false)
 
-  public copied: boolean = false
+  private copiedSignal = signal(false)
 
-  private runningTasks: Set<PaperlessTaskType> = new Set()
+  private runningTasksSignal = signal<Set<PaperlessTaskType>>(new Set())
   private unsubscribeNotifier: Subject<any> = new Subject()
+
+  @Input()
+  get status(): SystemStatus {
+    return this.statusSignal()
+  }
+
+  set status(status: SystemStatus) {
+    this.statusSignal.set(status)
+  }
+
+  get versionMismatch(): boolean {
+    return this.versionMismatchSignal()
+  }
+
+  set versionMismatch(versionMismatch: boolean) {
+    this.versionMismatchSignal.set(versionMismatch)
+  }
+
+  get copied(): boolean {
+    return this.copiedSignal()
+  }
+
+  set copied(copied: boolean) {
+    this.copiedSignal.set(copied)
+  }
 
   get currentUserIsSuperUser(): boolean {
     return this.permissionsService.isSuperUser()
@@ -68,25 +100,23 @@ export class SystemStatusDialogComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit() {
+    const status = this.status
     this.versionMismatch =
       environment.production &&
-      this.status.pngx_version &&
+      status.pngx_version &&
       this.frontendVersion &&
-      this.status.pngx_version !== this.frontendVersion
+      status.pngx_version !== this.frontendVersion
     if (this.versionMismatch) {
-      this.status.pngx_version = `${this.status.pngx_version} (frontend: ${this.frontendVersion})`
+      this.status = {
+        ...status,
+        pngx_version: `${status.pngx_version} (frontend: ${this.frontendVersion})`,
+      }
     }
-    this.status.websocket_connected = this.websocketStatusService.isConnected()
-      ? SystemStatusItemStatus.OK
-      : SystemStatusItemStatus.ERROR
+    this.updateWebsocketStatus(this.websocketStatusService.isConnected())
     this.websocketStatusService
       .onConnectionStatus()
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((connected) => {
-        this.status.websocket_connected = connected
-          ? SystemStatusItemStatus.OK
-          : SystemStatusItemStatus.ERROR
-      })
+      .subscribe((connected) => this.updateWebsocketStatus(connected))
   }
 
   public close() {
@@ -108,29 +138,51 @@ export class SystemStatusDialogComponent implements OnInit, OnDestroy {
   }
 
   public isRunning(taskName: PaperlessTaskType): boolean {
-    return this.runningTasks.has(taskName)
+    return this.runningTasksSignal().has(taskName)
   }
 
   public runTask(taskName: PaperlessTaskType) {
-    this.runningTasks.add(taskName)
+    this.setTaskRunning(taskName, true)
     this.toastService.showInfo(`Task ${taskName} started`)
     this.tasksService.run(taskName).subscribe({
       next: () => {
-        this.runningTasks.delete(taskName)
+        this.setTaskRunning(taskName, false)
         this.systemStatusService.get().subscribe({
           next: (status) => {
-            Object.assign(this.status, status)
+            this.status = {
+              ...this.status,
+              ...status,
+            }
           },
         })
       },
       error: (err) => {
-        this.runningTasks.delete(taskName)
+        this.setTaskRunning(taskName, false)
         this.toastService.showError(
           `Failed to start task ${taskName}, see the logs for more details`,
           err
         )
       },
     })
+  }
+
+  private updateWebsocketStatus(connected: boolean): void {
+    this.status = {
+      ...this.status,
+      websocket_connected: connected
+        ? SystemStatusItemStatus.OK
+        : SystemStatusItemStatus.ERROR,
+    }
+  }
+
+  private setTaskRunning(taskName: PaperlessTaskType, running: boolean): void {
+    const runningTasks = new Set(this.runningTasksSignal())
+    if (running) {
+      runningTasks.add(taskName)
+    } else {
+      runningTasks.delete(taskName)
+    }
+    this.runningTasksSignal.set(runningTasks)
   }
 
   ngOnDestroy(): void {

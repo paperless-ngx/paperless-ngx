@@ -1,5 +1,5 @@
 import { SlicePipe } from '@angular/common'
-import { Component, inject, Input, OnInit } from '@angular/core'
+import { Component, inject, Input, OnInit, signal } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
   NgbActiveModal,
@@ -36,15 +36,50 @@ export class ProcessedMailDialogComponent implements OnInit {
   private readonly processedMailService = inject(ProcessedMailService)
   private readonly toastService = inject(ToastService)
 
-  public processedMails: ProcessedMail[] = []
+  private ruleSignal = signal<MailRule>(undefined)
+  private processedMailsSignal = signal<ProcessedMail[]>([])
+  private loadingSignal = signal(true)
+  private toggleAllEnabledSignal = signal(false)
+  private selectedMailIdsSignal = signal<Set<number>>(new Set())
 
-  public loading: boolean = true
-  public toggleAllEnabled: boolean = false
-  public readonly selectedMailIds: Set<number> = new Set<number>()
+  public get processedMails(): ProcessedMail[] {
+    return this.processedMailsSignal()
+  }
+
+  public set processedMails(processedMails: ProcessedMail[]) {
+    this.processedMailsSignal.set(processedMails)
+  }
+
+  public get loading(): boolean {
+    return this.loadingSignal()
+  }
+
+  public set loading(loading: boolean) {
+    this.loadingSignal.set(loading)
+  }
+
+  public get toggleAllEnabled(): boolean {
+    return this.toggleAllEnabledSignal()
+  }
+
+  public set toggleAllEnabled(toggleAllEnabled: boolean) {
+    this.toggleAllEnabledSignal.set(toggleAllEnabled)
+  }
+
+  public get selectedMailIds(): Set<number> {
+    return this.selectedMailIdsSignal()
+  }
 
   public page: number = 1
 
-  @Input() rule: MailRule
+  @Input()
+  get rule(): MailRule {
+    return this.ruleSignal()
+  }
+
+  set rule(rule: MailRule) {
+    this.ruleSignal.set(rule)
+  }
 
   ngOnInit(): void {
     this.loadProcessedMails()
@@ -75,9 +110,10 @@ export class ProcessedMailDialogComponent implements OnInit {
   }
 
   public toggleAll(event: PointerEvent) {
+    const selectedMailIds = new Set<number>()
     if ((event.target as HTMLInputElement).checked) {
-      this.selectedMailIds.clear()
-      this.processedMails.forEach((mail) => this.selectedMailIds.add(mail.id))
+      this.processedMails.forEach((mail) => selectedMailIds.add(mail.id))
+      this.selectedMailIdsSignal.set(selectedMailIds)
     } else {
       this.clearSelection()
     }
@@ -85,12 +121,14 @@ export class ProcessedMailDialogComponent implements OnInit {
 
   public clearSelection() {
     this.toggleAllEnabled = false
-    this.selectedMailIds.clear()
+    this.selectedMailIdsSignal.set(new Set())
   }
 
   public toggleSelected(mail: ProcessedMail) {
-    this.selectedMailIds.has(mail.id)
-      ? this.selectedMailIds.delete(mail.id)
-      : this.selectedMailIds.add(mail.id)
+    const selectedMailIds = new Set(this.selectedMailIds)
+    selectedMailIds.has(mail.id)
+      ? selectedMailIds.delete(mail.id)
+      : selectedMailIds.add(mail.id)
+    this.selectedMailIdsSignal.set(selectedMailIds)
   }
 }
