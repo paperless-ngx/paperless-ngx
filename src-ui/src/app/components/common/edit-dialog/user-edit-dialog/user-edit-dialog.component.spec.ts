@@ -73,7 +73,7 @@ describe('UserEditDialogComponent', () => {
 
     fixture = TestBed.createComponent(UserEditDialogComponent)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = { id: 99, username: 'user99' }
+    settingsService.currentUser.set({ id: 99, username: 'user99' })
     permissionsService = TestBed.inject(PermissionsService)
     toastService = TestBed.inject(ToastService)
     component = fixture.componentInstance

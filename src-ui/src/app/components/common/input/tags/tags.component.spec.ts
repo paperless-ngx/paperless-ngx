@@ -136,7 +136,7 @@ describe('TagsComponent', () => {
   })
 
   it('should support create new using last search term and open a modal', () => {
-    settingsService.currentUser = { id: 1 }
+    settingsService.currentUser.set({ id: 1 })
     let activeInstances: NgbModalRef[]
     modalService.activeInstances.subscribe((v) => (activeInstances = v))
     component.select.filter('foobar')

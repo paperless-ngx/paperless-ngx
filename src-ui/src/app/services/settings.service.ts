@@ -296,15 +296,7 @@ export class SettingsService {
 
   private settings: Record<string, any> = {}
   private settingsVersion = signal(0)
-  private currentUserSignal = signal<User>(undefined)
-
-  get currentUser(): User {
-    return this.currentUserSignal()
-  }
-
-  set currentUser(value: User) {
-    this.currentUserSignal.set(value)
-  }
+  readonly currentUser = signal<User>(undefined)
 
   public settingsSaved: EventEmitter<any> = new EventEmitter()
 
@@ -313,49 +305,14 @@ export class SettingsService {
     return this._renderer
   }
 
-  private dashboardIsEmptySignal = signal(false)
-  private globalDropzoneEnabledSignal = signal(true)
-  private globalDropzoneActiveSignal = signal(false)
-  private organizingSidebarSavedViewsSignal = signal(false)
+  readonly dashboardIsEmpty = signal(false)
+  readonly globalDropzoneEnabled = signal(true)
+  readonly globalDropzoneActive = signal(false)
+  readonly organizingSidebarSavedViews = signal(false)
 
-  public get dashboardIsEmpty(): boolean {
-    return this.dashboardIsEmptySignal()
-  }
-
-  public set dashboardIsEmpty(value: boolean) {
-    this.dashboardIsEmptySignal.set(value)
-  }
-
-  public get globalDropzoneEnabled(): boolean {
-    return this.globalDropzoneEnabledSignal()
-  }
-
-  public set globalDropzoneEnabled(value: boolean) {
-    this.globalDropzoneEnabledSignal.set(value)
-  }
-
-  public get globalDropzoneActive(): boolean {
-    return this.globalDropzoneActiveSignal()
-  }
-
-  public set globalDropzoneActive(value: boolean) {
-    this.globalDropzoneActiveSignal.set(value)
-  }
-
-  public get organizingSidebarSavedViews(): boolean {
-    return this.organizingSidebarSavedViewsSignal()
-  }
-
-  public set organizingSidebarSavedViews(value: boolean) {
-    this.organizingSidebarSavedViewsSignal.set(value)
-  }
-
-  private allDisplayFieldsSignal = signal<
-    Array<{ id: DisplayField; name: string }>
-  >(DEFAULT_DISPLAY_FIELDS)
-  public get allDisplayFields(): Array<{ id: DisplayField; name: string }> {
-    return this.allDisplayFieldsSignal()
-  }
+  readonly allDisplayFields = signal<Array<{ id: DisplayField; name: string }>>(
+    DEFAULT_DISPLAY_FIELDS
+  )
   public displayFieldsInit: EventEmitter<boolean> = new EventEmitter()
 
   constructor() {
@@ -409,7 +366,7 @@ export class SettingsService {
         // to update lang cookie
         if (this.settings['language']?.length)
           this.setLanguage(this.settings['language'])
-        this.currentUser = uisettings.user
+        this.currentUser.set(uisettings.user)
         this.permissionsService.initialize(
           uisettings.permissions,
           this.currentUser
@@ -453,7 +410,7 @@ export class SettingsService {
         : null
     }).filter((f) => f)
 
-    this.allDisplayFieldsSignal.set(displayFields)
+    this.allDisplayFields.set(displayFields)
 
     if (
       this.permissionsService.currentUserCan(
@@ -481,8 +438,8 @@ export class SettingsService {
 
   get displayName(): string {
     return (
-      this.currentUser?.first_name ??
-      this.currentUser?.username ??
+      this.currentUser()?.first_name ??
+      this.currentUser()?.username ??
       ''
     ).trim()
   }
@@ -615,7 +572,7 @@ export class SettingsService {
 
     // special case to fallback
     if (key === SETTINGS_KEYS.DEFAULT_PERMS_OWNER && value === undefined) {
-      return this.currentUser?.id
+      return this.currentUser()?.id
     }
 
     if (value !== undefined) {

@@ -74,7 +74,7 @@ describe('CustomFieldsDropdownComponent', () => {
       })
     )
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = { id: 1, username: 'test' }
+    settingsService.currentUser.set({ id: 1, username: 'test' })
     fixture = TestBed.createComponent(CustomFieldsDropdownComponent)
     component = fixture.componentInstance
     fixture.detectChanges()

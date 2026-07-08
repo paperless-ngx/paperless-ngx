@@ -161,7 +161,7 @@ describe('SettingsComponent', () => {
     viewportScroller = TestBed.inject(ViewportScroller)
     toastService = TestBed.inject(ToastService)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = users[0]
+    settingsService.currentUser.set(users[0])
     userService = TestBed.inject(UserService)
     permissionsService = TestBed.inject(PermissionsService)
     modalService = TestBed.inject(NgbModal)

@@ -113,7 +113,7 @@ describe('MailComponent', () => {
     permissionsService = TestBed.inject(PermissionsService)
     activatedRoute = TestBed.inject(ActivatedRoute)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = { id: 1 }
+    settingsService.currentUser.set({ id: 1 })
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest
       .spyOn(permissionsService, 'currentUserHasObjectPermissions')

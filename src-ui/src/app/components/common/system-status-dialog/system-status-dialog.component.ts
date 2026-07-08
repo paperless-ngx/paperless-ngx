@@ -57,39 +57,12 @@ export class SystemStatusDialogComponent implements OnInit, OnDestroy {
 
   public SystemStatusItemStatus = SystemStatusItemStatus
   public PaperlessTaskType = PaperlessTaskType
-  private statusSignal = signal<SystemStatus>(undefined)
+  @Input() status = signal<SystemStatus>(undefined)
   public frontendVersion: string = environment.version
-  private versionMismatchSignal = signal(false)
-
-  private copiedSignal = signal(false)
-
-  private runningTasksSignal = signal<Set<PaperlessTaskType>>(new Set())
+  readonly versionMismatch = signal(false)
+  readonly copied = signal(false)
+  readonly runningTasks = signal<Set<PaperlessTaskType>>(new Set())
   private unsubscribeNotifier: Subject<any> = new Subject()
-
-  @Input()
-  get status(): SystemStatus {
-    return this.statusSignal()
-  }
-
-  set status(status: SystemStatus) {
-    this.statusSignal.set(status)
-  }
-
-  get versionMismatch(): boolean {
-    return this.versionMismatchSignal()
-  }
-
-  set versionMismatch(versionMismatch: boolean) {
-    this.versionMismatchSignal.set(versionMismatch)
-  }
-
-  get copied(): boolean {
-    return this.copiedSignal()
-  }
-
-  set copied(copied: boolean) {
-    this.copiedSignal.set(copied)
-  }
 
   get currentUserIsSuperUser(): boolean {
     return this.permissionsService.isSuperUser()
@@ -100,17 +73,18 @@ export class SystemStatusDialogComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit() {
-    const status = this.status
-    this.versionMismatch =
+    const status = this.status()
+    this.versionMismatch.set(
       environment.production &&
-      status.pngx_version &&
-      this.frontendVersion &&
-      status.pngx_version !== this.frontendVersion
-    if (this.versionMismatch) {
-      this.status = {
+        status.pngx_version &&
+        this.frontendVersion &&
+        status.pngx_version !== this.frontendVersion
+    )
+    if (this.versionMismatch()) {
+      this.status.set({
         ...status,
         pngx_version: `${status.pngx_version} (frontend: ${this.frontendVersion})`,
-      }
+      })
     }
     this.updateWebsocketStatus(this.websocketStatusService.isConnected())
     this.websocketStatusService
@@ -124,10 +98,10 @@ export class SystemStatusDialogComponent implements OnInit, OnDestroy {
   }
 
   public copy() {
-    this.clipboard.copy(JSON.stringify(this.status, null, 4))
-    this.copied = true
+    this.clipboard.copy(JSON.stringify(this.status(), null, 4))
+    this.copied.set(true)
     setTimeout(() => {
-      this.copied = false
+      this.copied.set(false)
     }, 3000)
   }
 
@@ -138,7 +112,7 @@ export class SystemStatusDialogComponent implements OnInit, OnDestroy {
   }
 
   public isRunning(taskName: PaperlessTaskType): boolean {
-    return this.runningTasksSignal().has(taskName)
+    return this.runningTasks().has(taskName)
   }
 
   public runTask(taskName: PaperlessTaskType) {
@@ -148,11 +122,11 @@ export class SystemStatusDialogComponent implements OnInit, OnDestroy {
       next: () => {
         this.setTaskRunning(taskName, false)
         this.systemStatusService.get().subscribe({
-          next: (status) => {
-            this.status = {
-              ...this.status,
-              ...status,
-            }
+          next: (statusUpdate) => {
+            this.status.set({
+              ...this.status(),
+              ...statusUpdate,
+            })
           },
         })
       },
@@ -167,22 +141,22 @@ export class SystemStatusDialogComponent implements OnInit, OnDestroy {
   }
 
   private updateWebsocketStatus(connected: boolean): void {
-    this.status = {
-      ...this.status,
+    this.status.set({
+      ...this.status(),
       websocket_connected: connected
         ? SystemStatusItemStatus.OK
         : SystemStatusItemStatus.ERROR,
-    }
+    })
   }
 
   private setTaskRunning(taskName: PaperlessTaskType, running: boolean): void {
-    const runningTasks = new Set(this.runningTasksSignal())
+    const runningTasks = new Set(this.runningTasks())
     if (running) {
       runningTasks.add(taskName)
     } else {
       runningTasks.delete(taskName)
     }
-    this.runningTasksSignal.set(runningTasks)
+    this.runningTasks.set(runningTasks)
   }
 
   ngOnDestroy(): void {

@@ -255,7 +255,7 @@ export class DocumentListComponent
   }
 
   public getDisplayCustomFieldTitle(field: string) {
-    return this.settingsService.allDisplayFields.find((f) => f.id === field)
+    return this.settingsService.allDisplayFields().find((f) => f.id === field)
       ?.name
   }
 

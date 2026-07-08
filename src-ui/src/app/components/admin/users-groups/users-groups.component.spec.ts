@@ -109,7 +109,7 @@ describe('UsersAndGroupsComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     editDialog.failed.emit()
     expect(toastErrorSpy).toHaveBeenCalled()
-    settingsService.currentUser = users[1] // simulate logged in as different user
+    settingsService.currentUser.set(users[1]) // simulate logged in as different user
     editDialog.succeeded.emit(users[0])
     expect(toastInfoSpy).toHaveBeenCalledWith(
       `Saved user "${users[0].username}".`
@@ -148,7 +148,7 @@ describe('UsersAndGroupsComponent', () => {
       .mockImplementation(() => {})
     const editDialog = modal.componentInstance as UserEditDialogComponent
     editDialog.passwordIsSet = true
-    settingsService.currentUser = users[0] // simulate logged in as same user
+    settingsService.currentUser.set(users[0]) // simulate logged in as same user
     editDialog.succeeded.emit(users[0])
     fixture.detectChanges()
     tick(2600)

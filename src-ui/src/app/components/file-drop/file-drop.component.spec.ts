@@ -55,7 +55,7 @@ describe('FileDropComponent', () => {
 
   it('should disable drag-drop if disabled in settings', fakeAsync(() => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
-    settingsService.globalDropzoneEnabled = false
+    settingsService.globalDropzoneEnabled.set(false)
     expect(component.dragDropEnabled).toBeFalsy()
 
     component.onDragOver(new Event('dragover') as DragEvent)
@@ -296,21 +296,21 @@ describe('FileDropComponent', () => {
   })
 
   it('should ignore events if disabled', fakeAsync(() => {
-    settingsService.globalDropzoneEnabled = false
-    expect(settingsService.globalDropzoneActive).toBeFalsy()
+    settingsService.globalDropzoneEnabled.set(false)
+    expect(settingsService.globalDropzoneActive()).toBeFalsy()
     component.onDragOver(new Event('dragover') as DragEvent)
-    expect(settingsService.globalDropzoneActive).toBeFalsy()
-    settingsService.globalDropzoneActive = true
+    expect(settingsService.globalDropzoneActive()).toBeFalsy()
+    settingsService.globalDropzoneActive.set(true)
     component.onDragLeave(new Event('dragleave') as DragEvent)
-    expect(settingsService.globalDropzoneActive).toBeTruthy()
+    expect(settingsService.globalDropzoneActive()).toBeTruthy()
     component.onDrop(new Event('drop') as DragEvent)
-    expect(settingsService.globalDropzoneActive).toBeTruthy()
+    expect(settingsService.globalDropzoneActive()).toBeTruthy()
   }))
 
   it('should hide if app loses focus', fakeAsync(() => {
     const leaveSpy = jest.spyOn(component, 'onDragLeave')
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
-    settingsService.globalDropzoneEnabled = true
+    settingsService.globalDropzoneEnabled.set(true)
     const overEvent = new Event('dragover') as DragEvent
     ;(overEvent as any).dataTransfer = { types: ['Files'] }
     component.onDragOver(overEvent)
@@ -326,7 +326,7 @@ describe('FileDropComponent', () => {
   it('should hide on window blur', fakeAsync(() => {
     const leaveSpy = jest.spyOn(component, 'onDragLeave')
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
-    settingsService.globalDropzoneEnabled = true
+    settingsService.globalDropzoneEnabled.set(true)
     const overEvent = new Event('dragover') as DragEvent
     ;(overEvent as any).dataTransfer = { types: ['Files'] }
     component.onDragOver(overEvent)

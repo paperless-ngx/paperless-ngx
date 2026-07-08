@@ -63,25 +63,13 @@ export class MailComponent
   }
   private set mailAccounts(accounts: MailAccount[]) {
     this.mailAccountsSignal.set(accounts)
-    this.mailAccountsById = new Map(
-      accounts.map((account) => [account.id, account])
+    this.mailAccountsById.set(
+      new Map(accounts.map((account) => [account.id, account]))
     )
   }
-  private mailAccountsByIdSignal = signal<Map<number, MailAccount>>(new Map())
-  public get mailAccountsById(): Map<number, MailAccount> {
-    return this.mailAccountsByIdSignal()
-  }
-  private set mailAccountsById(value: Map<number, MailAccount>) {
-    this.mailAccountsByIdSignal.set(value)
-  }
+  readonly mailAccountsById = signal<Map<number, MailAccount>>(new Map())
 
-  private mailRulesSignal = signal<MailRule[]>([])
-  public get mailRules(): MailRule[] {
-    return this.mailRulesSignal()
-  }
-  public set mailRules(value: MailRule[]) {
-    this.mailRulesSignal.set(value)
-  }
+  readonly mailRules = signal<MailRule[]>([])
 
   unsubscribeNotifier: Subject<any> = new Subject()
   oAuthAccountId: number
@@ -94,35 +82,10 @@ export class MailComponent
     return this.settingsService.get(SETTINGS_KEYS.OUTLOOK_OAUTH_URL)
   }
 
-  private loadingRulesSignal = signal(true)
-  private showRulesSignal = signal(false)
-  private loadingAccountsSignal = signal(true)
-  private showAccountsSignal = signal(false)
-
-  public get loadingRules(): boolean {
-    return this.loadingRulesSignal()
-  }
-  public set loadingRules(value: boolean) {
-    this.loadingRulesSignal.set(value)
-  }
-  public get showRules(): boolean {
-    return this.showRulesSignal()
-  }
-  public set showRules(value: boolean) {
-    this.showRulesSignal.set(value)
-  }
-  public get loadingAccounts(): boolean {
-    return this.loadingAccountsSignal()
-  }
-  public set loadingAccounts(value: boolean) {
-    this.loadingAccountsSignal.set(value)
-  }
-  public get showAccounts(): boolean {
-    return this.showAccountsSignal()
-  }
-  public set showAccounts(value: boolean) {
-    this.showAccountsSignal.set(value)
-  }
+  readonly loadingRules = signal(true)
+  readonly showRules = signal(false)
+  readonly loadingAccounts = signal(true)
+  readonly showAccounts = signal(false)
 
   ngOnInit(): void {
     this.mailAccountService
@@ -132,8 +95,8 @@ export class MailComponent
         takeUntil(this.unsubscribeNotifier),
         tap((r) => {
           this.mailAccounts = r.results
-          this.loadingAccounts = false
-          this.showAccounts = true
+          this.loadingAccounts.set(false)
+          this.showAccounts.set(true)
           if (this.oAuthAccountId) {
             this.editMailAccount(
               this.mailAccounts.find(
@@ -145,7 +108,7 @@ export class MailComponent
       )
       .subscribe({
         error: (e) => {
-          this.loadingAccounts = false
+          this.loadingAccounts.set(false)
           this.toastService.showError(
             $localize`Error retrieving mail accounts`,
             e
@@ -159,14 +122,14 @@ export class MailComponent
         first(),
         takeUntil(this.unsubscribeNotifier),
         tap((r) => {
-          this.mailRules = r.results
-          this.loadingRules = false
-          this.showRules = true
+          this.mailRules.set(r.results)
+          this.loadingRules.set(false)
+          this.showRules.set(true)
         })
       )
       .subscribe({
         error: (e) => {
-          this.loadingRules = false
+          this.loadingRules.set(false)
           this.toastService.showError($localize`Error retrieving mail rules`, e)
         },
       })
@@ -292,7 +255,7 @@ export class MailComponent
         this.mailRuleService
           .listAll(null, null, { full_perms: true })
           .subscribe((r) => {
-            this.mailRules = r.results
+            this.mailRules.set(r.results)
           })
       })
     modal.componentInstance.failed
@@ -348,7 +311,7 @@ export class MailComponent
           this.mailRuleService
             .listAll(null, null, { full_perms: true })
             .subscribe((r) => {
-              this.mailRules = r.results
+              this.mailRules.set(r.results)
             })
         },
         error: (e) => {

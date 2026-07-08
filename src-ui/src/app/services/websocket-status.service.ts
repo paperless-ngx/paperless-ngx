@@ -211,7 +211,7 @@ export class WebsocketStatusService {
     groups_can_view?: number[]
   }): boolean {
     // see paperless.consumers.StatusConsumer._can_view
-    const user: User = this.settingsService.currentUser
+    const user: User = this.settingsService.currentUser()
     return (
       !messageData.owner_id ||
       user.is_superuser ||

@@ -90,47 +90,11 @@ export class AppFrameComponent
   permissionsService = inject(PermissionsService)
   private djangoMessagesService = inject(DjangoMessagesService)
 
-  private appRemoteVersionSignal = signal<AppRemoteVersion>(null)
-
-  private isMenuCollapsedSignal = signal(true)
-
-  private slimSidebarAnimatingSignal = signal(false)
-
-  private mobileSearchHiddenSignal = signal(false)
-
+  readonly appRemoteVersion = signal<AppRemoteVersion>(null)
+  readonly isMenuCollapsed = signal(true)
+  readonly slimSidebarAnimating = signal(false)
+  readonly mobileSearchHidden = signal(false)
   private lastScrollY: number = 0
-
-  get appRemoteVersion(): AppRemoteVersion {
-    return this.appRemoteVersionSignal()
-  }
-
-  set appRemoteVersion(value: AppRemoteVersion) {
-    this.appRemoteVersionSignal.set(value)
-  }
-
-  get isMenuCollapsed(): boolean {
-    return this.isMenuCollapsedSignal()
-  }
-
-  set isMenuCollapsed(value: boolean) {
-    this.isMenuCollapsedSignal.set(value)
-  }
-
-  get slimSidebarAnimating(): boolean {
-    return this.slimSidebarAnimatingSignal()
-  }
-
-  set slimSidebarAnimating(value: boolean) {
-    this.slimSidebarAnimatingSignal.set(value)
-  }
-
-  get mobileSearchHidden(): boolean {
-    return this.mobileSearchHiddenSignal()
-  }
-
-  set mobileSearchHidden(value: boolean) {
-    this.mobileSearchHiddenSignal.set(value)
-  }
 
   constructor() {
     super()
@@ -179,7 +143,7 @@ export class AppFrameComponent
   }
 
   toggleSlimSidebar(): void {
-    this.slimSidebarAnimating = true
+    this.slimSidebarAnimating.set(true)
     const slimSidebarEnabled = !this.slimSidebarEnabled
     this.settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, slimSidebarEnabled)
     if (slimSidebarEnabled) {
@@ -199,7 +163,7 @@ export class AppFrameComponent
         },
       })
     setTimeout(() => {
-      this.slimSidebarAnimating = false
+      this.slimSidebarAnimating.set(false)
     }, 200) // slightly longer than css animation for slim sidebar
   }
 
@@ -207,6 +171,18 @@ export class AppFrameComponent
     event?.preventDefault()
     event?.stopPropagation()
     this.attributesSectionsCollapsed = !this.attributesSectionsCollapsed
+  }
+
+  toggleMenuCollapsed(): void {
+    this.isMenuCollapsed.set(!this.isMenuCollapsed())
+  }
+
+  closeMobileSearch(): void {
+    this.mobileSearchHidden.set(false)
+  }
+
+  setMobileSearchHidden(hidden: boolean): void {
+    this.mobileSearchHidden.set(hidden)
   }
 
   get versionString(): string {
@@ -311,7 +287,7 @@ export class AppFrameComponent
   @HostListener('window:resize')
   onWindowResize(): void {
     if (!this.isMobileViewport()) {
-      this.mobileSearchHidden = false
+      this.mobileSearchHidden.set(false)
     }
   }
 
@@ -319,8 +295,8 @@ export class AppFrameComponent
   onWindowScroll(): void {
     const currentScrollY = window.scrollY
 
-    if (!this.isMobileViewport() || this.isMenuCollapsed === false) {
-      this.mobileSearchHidden = false
+    if (!this.isMobileViewport() || this.isMenuCollapsed() === false) {
+      this.mobileSearchHidden.set(false)
       this.lastScrollY = currentScrollY
       return
     }
@@ -328,9 +304,9 @@ export class AppFrameComponent
     const delta = currentScrollY - this.lastScrollY
 
     if (currentScrollY <= 0 || delta < -SCROLL_THRESHOLD) {
-      this.mobileSearchHidden = false
+      this.mobileSearchHidden.set(false)
     } else if (currentScrollY > SCROLL_THRESHOLD && delta > SCROLL_THRESHOLD) {
-      this.mobileSearchHidden = true
+      this.mobileSearchHidden.set(true)
     }
 
     this.lastScrollY = currentScrollY
@@ -341,7 +317,7 @@ export class AppFrameComponent
   }
 
   closeMenu() {
-    this.isMenuCollapsed = true
+    this.isMenuCollapsed.set(true)
   }
 
   editProfile() {
@@ -404,11 +380,11 @@ export class AppFrameComponent
   }
 
   onDragStart(event: CdkDragStart) {
-    this.settingsService.globalDropzoneEnabled = false
+    this.settingsService.globalDropzoneEnabled.set(false)
   }
 
   onDragEnd(event: CdkDragEnd) {
-    this.settingsService.globalDropzoneEnabled = true
+    this.settingsService.globalDropzoneEnabled.set(true)
   }
 
   onDrop(event: CdkDragDrop<SavedView[]>) {
@@ -429,7 +405,7 @@ export class AppFrameComponent
     this.remoteVersionService
       .checkForUpdates()
       .subscribe((appRemoteVersion: AppRemoteVersion) => {
-        this.appRemoteVersion = appRemoteVersion
+        this.appRemoteVersion.set(appRemoteVersion)
       })
   }
 
@@ -459,7 +435,7 @@ export class AppFrameComponent
     this.settingsService.trackChanges()
     return (
       this.settingsService.get(SETTINGS_KEYS.SIDEBAR_VIEWS_SHOW_COUNT) &&
-      !this.settingsService.organizingSidebarSavedViews
+      !this.settingsService.organizingSidebarSavedViews()
     )
   }
 }

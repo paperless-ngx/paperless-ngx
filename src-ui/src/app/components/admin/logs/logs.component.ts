@@ -61,7 +61,7 @@ export class LogsComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((result) => {
         this.logFiles.set(result)
-        this.loading = false
+        this.loading.set(false)
         if (this.logFiles().length > 0) {
           this.activeLog.set(this.logFiles()[0])
           this.reloadLogs()
@@ -86,14 +86,14 @@ export class LogsComponent
   }
 
   reloadLogs() {
-    this.loading = true
+    this.loading.set(true)
     const shouldStickToBottom = this.isNearBottom()
     this.logService
       .get(this.activeLog(), this.limit())
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
-          this.loading = false
+          this.loading.set(false)
           const parsed = this.parseLogsWithLevel(result)
           const hasChanges =
             parsed.length !== this.logs().length ||
@@ -115,7 +115,7 @@ export class LogsComponent
         },
         error: () => {
           this.logs.set([])
-          this.loading = false
+          this.loading.set(false)
         },
       })
   }

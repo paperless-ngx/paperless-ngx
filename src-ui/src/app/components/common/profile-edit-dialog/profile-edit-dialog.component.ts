@@ -50,28 +50,12 @@ export class ProfileEditDialogComponent
   private toastService = inject(ToastService)
   private clipboard = inject(Clipboard)
 
-  private networkActiveSignal = signal(false)
-  private errorSignal = signal<any>(undefined)
-  private showPasswordConfirmSignal = signal(false)
-  private showEmailConfirmSignal = signal(false)
-  private copiedSignal = signal(false)
-  private codesCopiedSignal = signal(false)
-
-  public get networkActive(): boolean {
-    return this.networkActiveSignal()
-  }
-
-  public set networkActive(networkActive: boolean) {
-    this.networkActiveSignal.set(networkActive)
-  }
-
-  public get error(): any {
-    return this.errorSignal()
-  }
-
-  public set error(error: any) {
-    this.errorSignal.set(error)
-  }
+  readonly networkActive = signal(false)
+  readonly error = signal<any>(undefined)
+  readonly showPasswordConfirm = signal(false)
+  readonly showEmailConfirm = signal(false)
+  readonly copied = signal(false)
+  readonly codesCopied = signal(false)
 
   public form = new FormGroup({
     email: new FormControl(''),
@@ -87,49 +71,18 @@ export class ProfileEditDialogComponent
   private currentPassword: string
   private newPassword: string
   private passwordConfirm: string
-  public get showPasswordConfirm(): boolean {
-    return this.showPasswordConfirmSignal()
-  }
-
-  public set showPasswordConfirm(showPasswordConfirm: boolean) {
-    this.showPasswordConfirmSignal.set(showPasswordConfirm)
-  }
 
   public hasUsablePassword: boolean = false
 
   private currentEmail: string
   private newEmail: string
   private emailConfirm: string
-  public get showEmailConfirm(): boolean {
-    return this.showEmailConfirmSignal()
-  }
-
-  public set showEmailConfirm(showEmailConfirm: boolean) {
-    this.showEmailConfirmSignal.set(showEmailConfirm)
-  }
 
   public isTotpEnabled: boolean = false
   public totpSettings: TotpSettings
   public totpSettingsLoading: boolean = false
   public totpLoading: boolean = false
   public recoveryCodes: string[]
-
-  public get copied(): boolean {
-    return this.copiedSignal()
-  }
-
-  public set copied(copied: boolean) {
-    this.copiedSignal.set(copied)
-  }
-
-  public get codesCopied(): boolean {
-    return this.codesCopiedSignal()
-  }
-
-  public set codesCopied(codesCopied: boolean) {
-    this.codesCopiedSignal.set(codesCopied)
-  }
-
   public socialAccounts: SocialAccount[] = []
   public socialAccountProviders: SocialAccountProvider[] = []
 
@@ -141,12 +94,12 @@ export class ProfileEditDialogComponent
   }
 
   ngOnInit(): void {
-    this.networkActive = true
+    this.networkActive.set(true)
     this.profileService
       .get()
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((profile) => {
-        this.networkActive = false
+        this.networkActive.set(false)
         this.form.patchValue(profile)
         this.currentEmail = profile.email
         this.form.get('email').valueChanges.subscribe((newEmail) => {
@@ -186,7 +139,7 @@ export class ProfileEditDialogComponent
   }
 
   onEmailChange(): void {
-    this.showEmailConfirm = this.currentEmail !== this.newEmail
+    this.showEmailConfirm.set(this.currentEmail !== this.newEmail)
     if (this.showEmailConfirm) {
       this.form.get('email_confirm').enable()
       if (this.newEmail !== this.emailConfirm) {
@@ -212,7 +165,7 @@ export class ProfileEditDialogComponent
   }
 
   onPasswordChange(): void {
-    this.showPasswordConfirm = this.currentPassword !== this.newPassword
+    this.showPasswordConfirm.set(this.currentPassword !== this.newPassword)
 
     if (this.showPasswordConfirm) {
       this.form.get('password_confirm').enable()
@@ -228,17 +181,17 @@ export class ProfileEditDialogComponent
   }
 
   private setFieldError(fieldName: string, message: string): void {
-    this.error = {
-      ...(this.error ?? {}),
+    this.error.set({
+      ...(this.error() ?? {}),
       [fieldName]: message,
-    }
+    })
   }
 
   private clearFieldError(fieldName: string): void {
-    if (!this.error) return
-    const error = { ...this.error }
+    if (!this.error()) return
+    const error = { ...this.error() }
     delete error[fieldName]
-    this.error = Object.keys(error).length ? error : undefined
+    this.error.set(Object.keys(error).length ? error : undefined)
   }
 
   save(): void {

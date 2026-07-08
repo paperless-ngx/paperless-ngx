@@ -107,7 +107,7 @@ export class SavedViewWidgetComponent
   @Input()
   savedView: SavedView
 
-  private documentsSignal = signal<Document[]>([])
+  readonly documents = signal<Document[]>([])
 
   unsubscribeNotifier: Subject<any> = new Subject()
 
@@ -117,47 +117,15 @@ export class SavedViewWidgetComponent
   mouseOnPreview = false
   popoverHidden = true
 
-  private displayModeSignal = signal<DisplayMode>(null)
+  readonly displayMode = signal<DisplayMode>(null)
 
-  private displayFieldsSignal = signal<DisplayField[]>(
+  readonly displayFields = signal<DisplayField[]>(
     DEFAULT_DASHBOARD_DISPLAY_FIELDS
   )
 
-  private countSignal = signal<number>(null)
+  readonly count = signal<number>(null)
 
   placeholderRows: number[] = []
-
-  get documents(): Document[] {
-    return this.documentsSignal()
-  }
-
-  set documents(value: Document[]) {
-    this.documentsSignal.set(value)
-  }
-
-  get displayMode(): DisplayMode {
-    return this.displayModeSignal()
-  }
-
-  set displayMode(value: DisplayMode) {
-    this.displayModeSignal.set(value)
-  }
-
-  get displayFields(): DisplayField[] {
-    return this.displayFieldsSignal()
-  }
-
-  set displayFields(value: DisplayField[]) {
-    this.displayFieldsSignal.set(value)
-  }
-
-  get count(): number {
-    return this.countSignal()
-  }
-
-  set count(value: number) {
-    this.countSignal.set(value)
-  }
 
   ngOnInit(): void {
     this.placeholderRows = Array.from(
@@ -166,7 +134,7 @@ export class SavedViewWidgetComponent
       },
       (_, index) => index
     )
-    this.displayMode = this.savedView.display_mode ?? DisplayMode.TABLE
+    this.displayMode.set(this.savedView.display_mode ?? DisplayMode.TABLE)
 
     if (
       this.permissionsService.currentUserCan(
@@ -192,7 +160,7 @@ export class SavedViewWidgetComponent
     // filter by perms etc
     this.displayFields = this.displayFields.filter(
       (field) =>
-        this.settingsService.allDisplayFields.find((f) => f.id === field) !==
+        this.settingsService.allDisplayFields().find((f) => f.id === field) !==
         undefined
     )
 
@@ -224,8 +192,8 @@ export class SavedViewWidgetComponent
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((result) => {
-        this.documents = result.results
-        this.count = result.count
+        this.documents.set(result.results)
+        this.count.set(result.count)
         this.savedViewService.setDocumentCount(this.savedView, result.count)
         this.loading = false
         this.show = true

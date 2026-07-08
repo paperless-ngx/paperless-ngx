@@ -17,29 +17,15 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
   private settingsService = inject(SettingsService)
   private documentService = inject(DocumentService)
 
-  private savedViewsSignal = signal<SavedView[]>([])
-  private savedViewDocumentCountsSignal = signal<Map<number, number>>(new Map())
+  private readonly savedViews = signal<SavedView[]>([])
+  private readonly savedViewDocumentCounts = signal<Map<number, number>>(
+    new Map()
+  )
   private unsubscribeNotifier: Subject<void> = new Subject<void>()
 
   constructor() {
     super()
     this.resourceName = 'saved_views'
-  }
-
-  private get savedViews(): SavedView[] {
-    return this.savedViewsSignal()
-  }
-
-  private set savedViews(views: SavedView[]) {
-    this.savedViewsSignal.set(views)
-  }
-
-  private get savedViewDocumentCounts(): Map<number, number> {
-    return this.savedViewDocumentCountsSignal()
-  }
-
-  private set savedViewDocumentCounts(counts: Map<number, number>) {
-    this.savedViewDocumentCountsSignal.set(counts)
   }
 
   public list(
@@ -53,15 +39,16 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
       tap({
         next: (r) => {
           const views = r.results.map((view) => this.withUserVisibility(view))
-          this.savedViews = views
+          this.savedViews.set(views)
           r.results = views
           this._loading = false
-          this.settingsService.dashboardIsEmpty =
+          this.settingsService.dashboardIsEmpty.set(
             this.dashboardViews.length === 0
+          )
         },
         error: () => {
           this._loading = false
-          this.settingsService.dashboardIsEmpty = true
+          this.settingsService.dashboardIsEmpty.set(true)
         },
       })
     )
@@ -79,8 +66,8 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
       .subscribe()
   }
 
-  get allViews() {
-    return this.savedViews
+  get allViews(): SavedView[] {
+    return this.savedViews()
   }
 
   private getVisibleViewIds(setting: string): number[] {
@@ -111,7 +98,9 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
   }
 
   get sidebarViews(): SavedView[] {
-    const sidebarViews = this.savedViews.filter((v) => this.isSidebarVisible(v))
+    const sidebarViews = this.savedViews().filter((v) =>
+      this.isSidebarVisible(v)
+    )
 
     const sorted: number[] = this.settingsService.get(
       SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER
@@ -126,7 +115,7 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
   }
 
   get dashboardViews(): SavedView[] {
-    const dashboardViews = this.savedViews.filter((v) =>
+    const dashboardViews = this.savedViews().filter((v) =>
       this.isDashboardVisible(v)
     )
 
@@ -192,12 +181,12 @@ export class SavedViewService extends AbstractPaperlessService<SavedView> {
   }
 
   public setDocumentCount(view: SavedView, count: number) {
-    const counts = new Map(this.savedViewDocumentCounts)
+    const counts = new Map(this.savedViewDocumentCounts())
     counts.set(view.id, count)
-    this.savedViewDocumentCounts = counts
+    this.savedViewDocumentCounts.set(counts)
   }
 
   public getDocumentCount(view: SavedView): number {
-    return this.savedViewDocumentCounts.get(view.id)
+    return this.savedViewDocumentCounts().get(view.id)
   }
 }

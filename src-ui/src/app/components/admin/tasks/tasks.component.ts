@@ -732,7 +732,7 @@ export class TasksComponent
 
     this.reloadSectionCounts()
 
-    this.loading = true
+    this.loading.set(true)
     this.tasksService
       .list(
         this.page,
@@ -748,7 +748,7 @@ export class TasksComponent
           if (this.selectedSection !== TaskSection.All) {
             this.setSectionCount(this.selectedSection, result.count)
           }
-          this.loading = false
+          this.loading.set(false)
           if (
             this.page > 1 &&
             this.pagedTasks().length === 0 &&
@@ -759,7 +759,7 @@ export class TasksComponent
           }
         },
         error: () => {
-          this.loading = false
+          this.loading.set(false)
         },
       })
   }

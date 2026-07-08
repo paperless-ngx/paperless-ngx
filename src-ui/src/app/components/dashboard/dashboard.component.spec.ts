@@ -120,10 +120,10 @@ describe('DashboardComponent', () => {
     }).compileComponents()
 
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = {
+    settingsService.currentUser.set({
       first_name: 'Foo',
       last_name: 'Bar',
-    }
+    })
     jest.spyOn(settingsService, 'get').mockImplementation((key) => {
       if (key === SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER) return [0, 2, 3]
     })
@@ -137,9 +137,9 @@ describe('DashboardComponent', () => {
 
   it('should show a welcome message', () => {
     expect(component.subtitle).toEqual(`Hello Foo, welcome to Paperless-ngx`)
-    settingsService.currentUser = {
+    settingsService.currentUser.set({
       id: 1,
-    }
+    })
     expect(component.subtitle).toEqual(`Welcome to Paperless-ngx`)
   })
 

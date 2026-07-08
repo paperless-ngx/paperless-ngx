@@ -260,7 +260,7 @@ describe('FilterEditorComponent', () => {
 
     documentService = TestBed.inject(DocumentService)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = users[0]
+    settingsService.currentUser.set(users[0])
     permissionsService = TestBed.inject(PermissionsService)
     searchService = TestBed.inject(SearchService)
     jest

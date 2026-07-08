@@ -54,7 +54,7 @@ export class TrashComponent
   }
 
   reload() {
-    this.loading = true
+    this.loading.set(true)
     this.trashService
       .getTrash(this.page())
       .pipe(
@@ -62,11 +62,11 @@ export class TrashComponent
           this.documentsInTrash.set(r.results)
           this.totalDocuments.set(r.count)
           this.selectedDocuments.set(new Set())
-          this.loading = false
+          this.loading.set(false)
         })
       )
       .subscribe(() => {
-        this.show = true
+        this.show.set(true)
       })
   }
 

@@ -34,7 +34,7 @@
       </div>
     </li>
 
-    @if (loadingAccounts) {
+    @if (loadingAccounts()) {
       <li class="list-group-item">
         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
         <ng-container i18n>Loading...</ng-container>
@@ -43,7 +43,7 @@
 
     @for (account of mailAccounts; track account) {
       <li class="list-group-item">
-        <div class="row fade" [class.show]="showAccounts">
+        <div class="row fade" [class.show]="showAccounts()">
           <div class="col d-flex align-items-center">
             <button class="btn btn-link p-0 text-start" type="button" (click)="editMailAccount(account)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailAccount) || !userCanEdit(account)">
               {{account.name}}@switch (account.account_type) {
@@ -91,7 +91,7 @@
         </div>
       </li>
     }
-    @if (!loadingAccounts && mailAccounts.length === 0) {
+    @if (!loadingAccounts() && mailAccounts.length === 0) {
       <li class="list-group-item" i18n>No mail accounts defined.</li>
     }
   </ul>
@@ -117,19 +117,19 @@
       </div>
     </li>
 
-    @if (loadingRules) {
+    @if (loadingRules()) {
       <li class="list-group-item">
         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
         <ng-container i18n>Loading...</ng-container>
       </li>
     }
 
-    @for (rule of mailRules; track rule) {
+    @for (rule of mailRules(); track rule) {
       <li class="list-group-item">
-        <div class="row fade" [class.show]="showRules">
+        <div class="row fade" [class.show]="showRules()">
           <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editMailRule(rule)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.MailRule) || !userCanEdit(rule)">{{rule.name}}</button></div>
           <div class="col-1 d-flex align-items-center d-none d-sm-flex">{{rule.order}}</div>
-          <div class="col-2 d-flex align-items-center">{{ mailAccountsById.get(rule.account)?.name }}</div>
+          <div class="col-2 d-flex align-items-center">{{ mailAccountsById().get(rule.account)?.name }}</div>
           <div class="col-2 d-flex align-items-center d-none d-sm-flex">
             <div class="form-check form-switch mb-0">
               <input #inputField type="checkbox" class="form-check-input cursor-pointer" [id]="rule.id+'_enable'" [(ngModel)]="rule.enabled" (change)="onMailRuleEnableToggled(rule)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.MailRule }">
@@ -179,7 +179,7 @@
         </div>
       </li>
     }
-    @if (!loadingRules && mailRules.length === 0) {
+    @if (!loadingRules() && mailRules().length === 0) {
       <li class="list-group-item" i18n>No mail rules defined.</li>
     }
   </ul>

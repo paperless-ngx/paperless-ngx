@@ -75,7 +75,7 @@ describe('MailRuleEditDialogComponent', () => {
 
     fixture = TestBed.createComponent(MailRuleEditDialogComponent)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = { id: 99, username: 'user99' }
+    settingsService.currentUser.set({ id: 99, username: 'user99' })
     component = fixture.componentInstance
 
     fixture.detectChanges()

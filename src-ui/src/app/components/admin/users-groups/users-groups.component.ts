@@ -109,7 +109,7 @@ export class UsersAndGroupsComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((newUser: User) => {
         if (
-          newUser.id === this.settings.currentUser.id &&
+          newUser.id === this.settings.currentUser().id &&
           (modal.componentInstance as UserEditDialogComponent).passwordIsSet
         ) {
           this.toastService.showInfo(
