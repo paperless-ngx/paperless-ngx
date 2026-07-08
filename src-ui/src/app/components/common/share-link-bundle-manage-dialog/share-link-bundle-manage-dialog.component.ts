@@ -1,6 +1,6 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { CommonModule } from '@angular/common'
-import { Component, OnDestroy, OnInit, inject } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core'
 import { NgbActiveModal, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, catchError, of, switchMap, takeUntil, timer } from 'rxjs'
@@ -40,10 +40,33 @@ export class ShareLinkBundleManageDialogComponent
   private readonly clipboard = inject(Clipboard)
 
   title = $localize`Share link bundles`
+  private bundlesSignal = signal<ShareLinkBundleSummary[]>([])
+  private errorSignal = signal<string | null>(null)
+  private copiedSlugSignal = signal<string | null>(null)
 
-  bundles: ShareLinkBundleSummary[] = []
-  error: string | null = null
-  copiedSlug: string | null = null
+  get bundles(): ShareLinkBundleSummary[] {
+    return this.bundlesSignal()
+  }
+
+  set bundles(bundles: ShareLinkBundleSummary[]) {
+    this.bundlesSignal.set(bundles)
+  }
+
+  get error(): string | null {
+    return this.errorSignal()
+  }
+
+  set error(error: string | null) {
+    this.errorSignal.set(error)
+  }
+
+  get copiedSlug(): string | null {
+    return this.copiedSlugSignal()
+  }
+
+  set copiedSlug(copiedSlug: string | null) {
+    this.copiedSlugSignal.set(copiedSlug)
+  }
 
   readonly statuses = ShareLinkBundleStatus
   readonly fileVersions = FileVersion
