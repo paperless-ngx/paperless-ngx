@@ -4,6 +4,7 @@ import {
   Input,
   Output,
   ViewChild,
+  signal,
 } from '@angular/core'
 import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -20,18 +21,46 @@ export class SuggestionsDropdownComponent {
   public popperOptions = pngxPopperOptions
 
   @ViewChild('dropdown') dropdown: NgbDropdown
+  private suggestionsSignal = signal<DocumentSuggestions>(null)
+  private aiEnabledSignal = signal(false)
+  private loadingSignal = signal(false)
+  private disabledSignal = signal(false)
 
   @Input()
-  suggestions: DocumentSuggestions = null
+  get suggestions(): DocumentSuggestions {
+    return this.suggestionsSignal()
+  }
+
+  set suggestions(suggestions: DocumentSuggestions) {
+    this.suggestionsSignal.set(suggestions)
+  }
 
   @Input()
-  aiEnabled: boolean = false
+  get aiEnabled(): boolean {
+    return this.aiEnabledSignal()
+  }
+
+  set aiEnabled(aiEnabled: boolean) {
+    this.aiEnabledSignal.set(aiEnabled)
+  }
 
   @Input()
-  loading: boolean = false
+  get loading(): boolean {
+    return this.loadingSignal()
+  }
+
+  set loading(loading: boolean) {
+    this.loadingSignal.set(loading)
+  }
 
   @Input()
-  disabled: boolean = false
+  get disabled(): boolean {
+    return this.disabledSignal()
+  }
+
+  set disabled(disabled: boolean) {
+    this.disabledSignal.set(disabled)
+  }
 
   @Output()
   getSuggestions: EventEmitter<SuggestionsDropdownComponent> =
