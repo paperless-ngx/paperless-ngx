@@ -42,51 +42,11 @@ export class TrashComponent
   private settingsService = inject(SettingsService)
   private router = inject(Router)
 
-  private documentsInTrashSignal = signal<Document[]>([])
-  private selectedDocumentsSignal = signal<Set<number>>(new Set())
-  private allToggledSignal = signal(false)
-  private pageSignal = signal(1)
-  private totalDocumentsSignal = signal<number>(undefined)
-
-  public get documentsInTrash(): Document[] {
-    return this.documentsInTrashSignal()
-  }
-
-  public set documentsInTrash(documentsInTrash: Document[]) {
-    this.documentsInTrashSignal.set(documentsInTrash)
-  }
-
-  public get selectedDocuments(): Set<number> {
-    return this.selectedDocumentsSignal()
-  }
-
-  public set selectedDocuments(selectedDocuments: Set<number>) {
-    this.selectedDocumentsSignal.set(selectedDocuments)
-  }
-
-  public get allToggled(): boolean {
-    return this.allToggledSignal()
-  }
-
-  public set allToggled(allToggled: boolean) {
-    this.allToggledSignal.set(allToggled)
-  }
-
-  public get page(): number {
-    return this.pageSignal()
-  }
-
-  public set page(page: number) {
-    this.pageSignal.set(page)
-  }
-
-  public get totalDocuments(): number {
-    return this.totalDocumentsSignal()
-  }
-
-  public set totalDocuments(totalDocuments: number) {
-    this.totalDocumentsSignal.set(totalDocuments)
-  }
+  readonly documentsInTrash = signal<Document[]>([])
+  readonly selectedDocuments = signal<Set<number>>(new Set())
+  readonly allToggled = signal(false)
+  readonly page = signal(1)
+  readonly totalDocuments = signal<number>(undefined)
 
   constructor() {
     super()
@@ -96,12 +56,12 @@ export class TrashComponent
   reload() {
     this.loading = true
     this.trashService
-      .getTrash(this.page)
+      .getTrash(this.page())
       .pipe(
         tap((r) => {
-          this.documentsInTrash = r.results
-          this.totalDocuments = r.count
-          this.selectedDocuments = new Set()
+          this.documentsInTrash.set(r.results)
+          this.totalDocuments.set(r.count)
+          this.selectedDocuments.set(new Set())
           this.loading = false
         })
       )
@@ -161,7 +121,7 @@ export class TrashComponent
           .subscribe({
             next: () => {
               this.toastService.showInfo($localize`Document(s) deleted`)
-              this.allToggled = false
+              this.allToggled.set(false)
               modal.close()
               this.reload()
             },
@@ -204,7 +164,7 @@ export class TrashComponent
       .subscribe({
         next: () => {
           this.toastService.showInfo($localize`Document(s) restored`)
-          this.allToggled = false
+          this.allToggled.set(false)
           this.reload()
         },
         error: (err) => {
@@ -218,23 +178,25 @@ export class TrashComponent
 
   toggleAll(event: PointerEvent) {
     if ((event.target as HTMLInputElement).checked) {
-      this.selectedDocuments = new Set(this.documentsInTrash.map((t) => t.id))
+      this.selectedDocuments.set(
+        new Set(this.documentsInTrash().map((t) => t.id))
+      )
     } else {
       this.clearSelection()
     }
   }
 
   toggleSelected(object: Document) {
-    const selectedDocuments = new Set(this.selectedDocuments)
+    const selectedDocuments = new Set(this.selectedDocuments())
     selectedDocuments.has(object.id)
       ? selectedDocuments.delete(object.id)
       : selectedDocuments.add(object.id)
-    this.selectedDocuments = selectedDocuments
+    this.selectedDocuments.set(selectedDocuments)
   }
 
   clearSelection() {
-    this.allToggled = false
-    this.selectedDocuments = new Set()
+    this.allToggled.set(false)
+    this.selectedDocuments.set(new Set())
   }
 
   getDaysRemaining(document: Document): number {
