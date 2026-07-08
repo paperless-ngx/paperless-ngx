@@ -1,4 +1,4 @@
-import { Component, forwardRef, inject } from '@angular/core'
+import { Component, forwardRef, inject, signal } from '@angular/core'
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
@@ -24,7 +24,15 @@ import { AbstractInputComponent } from '../../abstract-input'
   imports: [NgSelectComponent, FormsModule, ReactiveFormsModule],
 })
 export class PermissionsGroupComponent extends AbstractInputComponent<Group> {
-  groups: Group[]
+  private groupsSignal = signal<Group[]>(undefined)
+
+  get groups(): Group[] {
+    return this.groupsSignal()
+  }
+
+  set groups(groups: Group[]) {
+    this.groupsSignal.set(groups)
+  }
 
   constructor() {
     const groupService = inject(GroupService)

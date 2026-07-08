@@ -1,4 +1,4 @@
-import { Component, forwardRef, inject } from '@angular/core'
+import { Component, forwardRef, inject, signal } from '@angular/core'
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
@@ -24,7 +24,15 @@ import { AbstractInputComponent } from '../../abstract-input'
   imports: [NgSelectComponent, FormsModule, ReactiveFormsModule],
 })
 export class PermissionsUserComponent extends AbstractInputComponent<User[]> {
-  users: User[]
+  private usersSignal = signal<User[]>(undefined)
+
+  get users(): User[] {
+    return this.usersSignal()
+  }
+
+  set users(users: User[]) {
+    this.usersSignal.set(users)
+  }
 
   constructor() {
     const userService = inject(UserService)

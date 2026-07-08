@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  inject,
+  signal,
+} from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -27,11 +34,20 @@ export class PermissionsDialogComponent {
   activeModal = inject(NgbActiveModal)
   private userService = inject(UserService)
 
-  users: User[]
+  private usersSignal = signal<User[]>(undefined)
+  private buttonsEnabledSignal = signal(true)
   private o: ObjectWithPermissions = undefined
 
   constructor() {
     this.userService.listAll().subscribe((r) => (this.users = r.results))
+  }
+
+  get users(): User[] {
+    return this.usersSignal()
+  }
+
+  set users(users: User[]) {
+    this.usersSignal.set(users)
   }
 
   @Output()
@@ -65,7 +81,13 @@ export class PermissionsDialogComponent {
     merge: new FormControl(true),
   })
 
-  buttonsEnabled: boolean = true
+  get buttonsEnabled(): boolean {
+    return this.buttonsEnabledSignal()
+  }
+
+  set buttonsEnabled(buttonsEnabled: boolean) {
+    this.buttonsEnabledSignal.set(buttonsEnabled)
+  }
 
   get permissions() {
     return {
