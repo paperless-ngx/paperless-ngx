@@ -16,7 +16,12 @@ export class PageHeaderComponent {
   private titleService = inject(Title)
   private clipboard = inject(Clipboard)
 
-  private _title = ''
+  private titleSignal = signal('')
+  private idSignal = signal<number>(undefined)
+  private subTitleSignal = signal('')
+  private infoSignal = signal<string>(undefined)
+  private infoLinkSignal = signal<string>(undefined)
+  private loadingSignal = signal(false)
   private copiedSignal = signal(false)
   private copyTimeout: any
 
@@ -30,28 +35,58 @@ export class PageHeaderComponent {
 
   @Input()
   set title(title: string) {
-    this._title = title
+    this.titleSignal.set(title)
     this.titleService.setTitle(`${this.title} - ${environment.appTitle}`)
   }
 
   get title() {
-    return this._title
+    return this.titleSignal()
   }
 
   @Input()
-  id: number
+  get id(): number {
+    return this.idSignal()
+  }
+
+  set id(id: number) {
+    this.idSignal.set(id)
+  }
 
   @Input()
-  subTitle: string = ''
+  get subTitle(): string {
+    return this.subTitleSignal()
+  }
+
+  set subTitle(subTitle: string) {
+    this.subTitleSignal.set(subTitle)
+  }
 
   @Input()
-  info: string
+  get info(): string {
+    return this.infoSignal()
+  }
+
+  set info(info: string) {
+    this.infoSignal.set(info)
+  }
 
   @Input()
-  infoLink: string
+  get infoLink(): string {
+    return this.infoLinkSignal()
+  }
+
+  set infoLink(infoLink: string) {
+    this.infoLinkSignal.set(infoLink)
+  }
 
   @Input()
-  loading: boolean = false
+  get loading(): boolean {
+    return this.loadingSignal()
+  }
+
+  set loading(loading: boolean) {
+    this.loadingSignal.set(loading)
+  }
 
   public copyID() {
     this.copied = this.clipboard.copy(this.id.toString())
