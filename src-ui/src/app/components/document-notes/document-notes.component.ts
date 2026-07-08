@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  inject,
+  signal,
+} from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -31,22 +38,51 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
   private notesService = inject(DocumentNotesService)
   private toastService = inject(ToastService)
   private usersService = inject(UserService)
+  private documentIdSignal = signal<number>(undefined)
+  private notesSignal = signal<DocumentNote[]>([])
+  private addDisabledSignal = signal(false)
+  private networkActiveSignal = signal(false)
 
   noteForm: FormGroup = new FormGroup({
     newNote: new FormControl(''),
   })
 
-  networkActive = false
+  get networkActive(): boolean {
+    return this.networkActiveSignal()
+  }
+
+  set networkActive(networkActive: boolean) {
+    this.networkActiveSignal.set(networkActive)
+  }
+
   newNoteError: boolean = false
 
   @Input()
-  documentId: number
+  get documentId(): number {
+    return this.documentIdSignal()
+  }
+
+  set documentId(documentId: number) {
+    this.documentIdSignal.set(documentId)
+  }
 
   @Input()
-  notes: DocumentNote[] = []
+  get notes(): DocumentNote[] {
+    return this.notesSignal()
+  }
+
+  set notes(notes: DocumentNote[]) {
+    this.notesSignal.set(notes)
+  }
 
   @Input()
-  addDisabled: boolean = false
+  get addDisabled(): boolean {
+    return this.addDisabledSignal()
+  }
+
+  set addDisabled(addDisabled: boolean) {
+    this.addDisabledSignal.set(addDisabled)
+  }
 
   @Output()
   updated: EventEmitter<DocumentNote[]> = new EventEmitter()
