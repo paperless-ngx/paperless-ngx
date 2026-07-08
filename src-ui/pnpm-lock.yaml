@@ -177,6 +177,9 @@ importers:
       webpack:
         specifier: ^5.107.2
         version: 5.107.2(postcss@8.5.15)
+      zone.js:
+        specifier: ^0.16.2
+        version: 0.16.2
 
 packages:
 
