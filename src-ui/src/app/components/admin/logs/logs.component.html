@@ -24,17 +24,17 @@
 </pngx-page-header>
 
 <ul ngbNav #nav="ngbNav" [(activeId)]="activeLog" (activeIdChange)="reloadLogs()" class="nav-tabs">
-  @for (logFile of logFiles; track logFile) {
+  @for (logFile of logFiles(); track logFile) {
     <li [ngbNavItem]="logFile">
       <a ngbNavLink>
         {{logFile}}.log
       </a>
     </li>
   }
-  @if (loading || !logFiles.length) {
+  @if (loading || !logFiles().length) {
     <div class="ps-2 d-flex align-items-center">
       <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-      @if (!logFiles.length) {
+      @if (!logFiles().length) {
         <ng-container i18n>Loading...</ng-container>
       }
     </div>
@@ -42,13 +42,13 @@
 </ul>
 
 <div #logContainer class="bg-dark text-light font-monospace log-container p-3" (scroll)="onScroll()">
-  @if (loading && !logFiles.length) {
+  @if (loading && !logFiles().length) {
     <div>
       <div class="spinner-border spinner-border-sm me-2" role="status"></div>
       <ng-container i18n>Loading...</ng-container>
     </div>
   } @else {
-    @for (log of logs; track log) {
+    @for (log of logs(); track log) {
       <p class="m-0 p-0" [ngClass]="'log-entry-' + log.level">{{log.message}}</p>
     }
   }
@@ -56,7 +56,7 @@
 <button
   type="button"
   class="btn btn-sm btn-secondary jump-to-bottom position-fixed bottom-0 end-0 m-5"
-  [class.visible]="showJumpToBottom"
+  [class.visible]="showJumpToBottom()"
   (click)="scrollToBottom()"
 >
   ↓ <span i18n>Jump to bottom</span>

@@ -35,69 +35,21 @@ export class LogsComponent
   private logService = inject(LogService)
   private changedetectorRef = inject(ChangeDetectorRef)
 
-  private logsSignal = signal<Array<{ message: string; level: number }>>([])
+  private readonly logs = signal<Array<{ message: string; level: number }>>([])
 
-  private logFilesSignal = signal<string[]>([])
+  private readonly logFiles = signal<string[]>([])
 
-  private activeLogSignal = signal<string>(undefined)
+  private readonly activeLog = signal<string>(undefined)
 
-  private autoRefreshEnabledSignal = signal(true)
+  private readonly autoRefreshEnabled = signal<boolean>(true)
 
-  private limitSignal = signal(5000)
+  private readonly limit = signal<number>(5000)
 
-  private showJumpToBottomSignal = signal(false)
+  private readonly showJumpToBottom = signal<boolean>(false)
 
   private readonly limitChange$ = new Subject<number>()
 
   @ViewChild('logContainer') logContainer: ElementRef<HTMLElement>
-
-  public get logs(): Array<{ message: string; level: number }> {
-    return this.logsSignal()
-  }
-
-  public set logs(logs: Array<{ message: string; level: number }>) {
-    this.logsSignal.set(logs)
-  }
-
-  public get logFiles(): string[] {
-    return this.logFilesSignal()
-  }
-
-  public set logFiles(logFiles: string[]) {
-    this.logFilesSignal.set(logFiles)
-  }
-
-  public get activeLog(): string {
-    return this.activeLogSignal()
-  }
-
-  public set activeLog(activeLog: string) {
-    this.activeLogSignal.set(activeLog)
-  }
-
-  public get autoRefreshEnabled(): boolean {
-    return this.autoRefreshEnabledSignal()
-  }
-
-  public set autoRefreshEnabled(autoRefreshEnabled: boolean) {
-    this.autoRefreshEnabledSignal.set(autoRefreshEnabled)
-  }
-
-  public get limit(): number {
-    return this.limitSignal()
-  }
-
-  public set limit(limit: number) {
-    this.limitSignal.set(limit)
-  }
-
-  public get showJumpToBottom(): boolean {
-    return this.showJumpToBottomSignal()
-  }
-
-  public set showJumpToBottom(showJumpToBottom: boolean) {
-    this.showJumpToBottomSignal.set(showJumpToBottom)
-  }
 
   ngOnInit(): void {
     this.limitChange$
@@ -108,15 +60,15 @@ export class LogsComponent
       .list()
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((result) => {
-        this.logFiles = result
+        this.logFiles.set(result)
         this.loading = false
-        if (this.logFiles.length > 0) {
-          this.activeLog = this.logFiles[0]
+        if (this.logFiles().length > 0) {
+          this.activeLog.set(this.logFiles()[0])
           this.reloadLogs()
         }
         timer(5000, 5000)
           .pipe(
-            filter(() => this.autoRefreshEnabled),
+            filter(() => this.autoRefreshEnabled()),
             takeUntil(this.unsubscribeNotifier)
           )
           .subscribe(() => {
@@ -137,16 +89,16 @@ export class LogsComponent
     this.loading = true
     const shouldStickToBottom = this.isNearBottom()
     this.logService
-      .get(this.activeLog, this.limit)
+      .get(this.activeLog(), this.limit())
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
           this.loading = false
           const parsed = this.parseLogsWithLevel(result)
           const hasChanges =
-            parsed.length !== this.logs.length ||
+            parsed.length !== this.logs().length ||
             parsed.some((log, idx) => {
-              const current = this.logs[idx]
+              const current = this.logs()[idx]
               return (
                 !current ||
                 current.message !== log.message ||
@@ -154,15 +106,15 @@ export class LogsComponent
               )
             })
           if (hasChanges) {
-            this.logs = parsed
+            this.logs.set(parsed)
             if (shouldStickToBottom) {
               this.scrollToBottom()
             }
-            this.showJumpToBottom = !shouldStickToBottom
+            this.showJumpToBottom.set(!shouldStickToBottom)
           }
         },
         error: () => {
-          this.logs = []
+          this.logs.set([])
           this.loading = false
         },
       })
@@ -198,7 +150,7 @@ export class LogsComponent
     }
     this.changedetectorRef.detectChanges()
     viewport.scrollTop = viewport.scrollHeight
-    this.showJumpToBottom = false
+    this.showJumpToBottom.set(false)
   }
 
   private isNearBottom(): boolean {
@@ -211,6 +163,6 @@ export class LogsComponent
   }
 
   onScroll(): void {
-    this.showJumpToBottom = !this.isNearBottom()
+    this.showJumpToBottom.set(!this.isNearBottom())
   }
 }
