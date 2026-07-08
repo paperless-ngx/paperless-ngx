@@ -20,24 +20,8 @@ const SYMBOLS = {
 })
 export class HotkeyDialogComponent {
   activeModal = inject(NgbActiveModal)
-  private titleSignal = signal($localize`Keyboard shortcuts`)
-  private hotkeysSignal = signal<Map<string, string>>(new Map())
-
-  public get title(): string {
-    return this.titleSignal()
-  }
-
-  public set title(title: string) {
-    this.titleSignal.set(title)
-  }
-
-  public get hotkeys(): Map<string, string> {
-    return this.hotkeysSignal()
-  }
-
-  public set hotkeys(hotkeys: Map<string, string>) {
-    this.hotkeysSignal.set(hotkeys)
-  }
+  readonly title = signal($localize`Keyboard shortcuts`)
+  readonly hotkeys = signal<Map<string, string>>(new Map())
 
   public close(): void {
     this.activeModal.close()
