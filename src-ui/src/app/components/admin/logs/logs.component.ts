@@ -7,6 +7,7 @@ import {
   OnInit,
   ViewChild,
   inject,
+  signal,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
@@ -34,21 +35,69 @@ export class LogsComponent
   private logService = inject(LogService)
   private changedetectorRef = inject(ChangeDetectorRef)
 
-  public logs: Array<{ message: string; level: number }> = []
+  private logsSignal = signal<Array<{ message: string; level: number }>>([])
 
-  public logFiles: string[] = []
+  private logFilesSignal = signal<string[]>([])
 
-  public activeLog: string
+  private activeLogSignal = signal<string>(undefined)
 
-  public autoRefreshEnabled: boolean = true
+  private autoRefreshEnabledSignal = signal(true)
 
-  public limit: number = 5000
+  private limitSignal = signal(5000)
 
-  public showJumpToBottom = false
+  private showJumpToBottomSignal = signal(false)
 
   private readonly limitChange$ = new Subject<number>()
 
   @ViewChild('logContainer') logContainer: ElementRef<HTMLElement>
+
+  public get logs(): Array<{ message: string; level: number }> {
+    return this.logsSignal()
+  }
+
+  public set logs(logs: Array<{ message: string; level: number }>) {
+    this.logsSignal.set(logs)
+  }
+
+  public get logFiles(): string[] {
+    return this.logFilesSignal()
+  }
+
+  public set logFiles(logFiles: string[]) {
+    this.logFilesSignal.set(logFiles)
+  }
+
+  public get activeLog(): string {
+    return this.activeLogSignal()
+  }
+
+  public set activeLog(activeLog: string) {
+    this.activeLogSignal.set(activeLog)
+  }
+
+  public get autoRefreshEnabled(): boolean {
+    return this.autoRefreshEnabledSignal()
+  }
+
+  public set autoRefreshEnabled(autoRefreshEnabled: boolean) {
+    this.autoRefreshEnabledSignal.set(autoRefreshEnabled)
+  }
+
+  public get limit(): number {
+    return this.limitSignal()
+  }
+
+  public set limit(limit: number) {
+    this.limitSignal.set(limit)
+  }
+
+  public get showJumpToBottom(): boolean {
+    return this.showJumpToBottomSignal()
+  }
+
+  public set showJumpToBottom(showJumpToBottom: boolean) {
+    this.showJumpToBottomSignal.set(showJumpToBottom)
+  }
 
   ngOnInit(): void {
     this.limitChange$

@@ -1,8 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core'
+import { Component, OnInit, inject, signal } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { delay, takeUntil, tap } from 'rxjs'
+import { takeUntil, tap } from 'rxjs'
 import { Workflow } from 'src/app/data/workflow'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsService } from 'src/app/services/permissions.service'
@@ -39,7 +39,15 @@ export class WorkflowsComponent
   private modalService = inject(NgbModal)
   private toastService = inject(ToastService)
 
-  public workflows: Workflow[] = []
+  private workflowsSignal = signal<Workflow[]>([])
+
+  public get workflows(): Workflow[] {
+    return this.workflowsSignal()
+  }
+
+  public set workflows(workflows: Workflow[]) {
+    this.workflowsSignal.set(workflows)
+  }
 
   ngOnInit() {
     this.reload()
@@ -51,8 +59,7 @@ export class WorkflowsComponent
       .listAll()
       .pipe(
         takeUntil(this.unsubscribeNotifier),
-        tap((r) => (this.workflows = r.results)),
-        delay(100)
+        tap((r) => (this.workflows = r.results))
       )
       .subscribe(() => {
         this.show = true
