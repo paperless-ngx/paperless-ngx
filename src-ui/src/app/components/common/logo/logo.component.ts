@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core'
+import { Component, Input, inject, signal } from '@angular/core'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { SettingsService } from 'src/app/services/settings.service'
 import { environment } from 'src/environments/environment'
@@ -10,12 +10,26 @@ import { environment } from 'src/environments/environment'
 })
 export class LogoComponent {
   private settingsService = inject(SettingsService)
+  private extraClassesSignal = signal<string>(undefined)
+  private heightSignal = signal('6em')
 
   @Input()
-  extra_classes: string
+  get extra_classes(): string {
+    return this.extraClassesSignal()
+  }
+
+  set extra_classes(extraClasses: string) {
+    this.extraClassesSignal.set(extraClasses)
+  }
 
   @Input()
-  height = '6em'
+  get height(): string {
+    return this.heightSignal()
+  }
+
+  set height(height: string) {
+    this.heightSignal.set(height)
+  }
 
   get customLogo(): string {
     return this.settingsService.get(SETTINGS_KEYS.APP_LOGO)?.length
