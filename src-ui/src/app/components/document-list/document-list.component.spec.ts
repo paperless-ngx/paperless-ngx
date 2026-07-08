@@ -777,7 +777,7 @@ describe('DocumentListComponent', () => {
   })
 
   it('should hide columns if no perms or notes disabled', () => {
-    jest.spyOn(permissionService, 'currentUserCan').mockReturnValue(true)
+    permissionService.initialize([], { is_superuser: true } as any)
     jest.spyOn(documentListService, 'documents', 'get').mockReturnValue(docs)
     expect(documentListService.sortField).toEqual('created')
 
@@ -798,7 +798,7 @@ describe('DocumentListComponent', () => {
     ).toHaveLength(9)
 
     // insufficient perms
-    jest.spyOn(permissionService, 'currentUserCan').mockReturnValue(false)
+    permissionService.initialize([], { is_superuser: false } as any)
     fixture.detectChanges()
     expect(
       fixture.debugElement.queryAll(By.directive(SortableDirective))

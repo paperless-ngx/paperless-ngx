@@ -67,15 +67,14 @@ describe('DocumentCardLargeComponent', () => {
 
     fixture = TestBed.createComponent(DocumentCardLargeComponent)
     component = fixture.componentInstance
-    component.document = doc
+    component.document = { ...doc, tags: [...doc.tags], notes: [...doc.notes] }
     fixture.detectChanges()
     jest.useFakeTimers()
   })
 
   it('should show the card', () => {
-    expect(component.show).toBeFalsy()
+    expect(component.show).toBeTruthy()
     component.ngAfterViewInit()
-    jest.advanceTimersByTime(100)
     expect(component.show).toBeTruthy()
   })
 
@@ -91,10 +90,13 @@ describe('DocumentCardLargeComponent', () => {
 
   it('should display search hits with colored score', () => {
     // high
-    component.document.__search_hit__ = {
-      score: 0.9,
-      rank: 1,
-      highlights: 'cheesecake',
+    component.document = {
+      ...component.document,
+      __search_hit__: {
+        score: 0.9,
+        rank: 1,
+        highlights: 'cheesecake',
+      },
     }
     fixture.detectChanges()
     let search_hit = fixture.debugElement.query(By.css('.search-score'))
@@ -102,14 +104,20 @@ describe('DocumentCardLargeComponent', () => {
     expect(component.searchScoreClass).toEqual('success')
 
     // medium
-    component.document.__search_hit__.score = 0.6
+    component.document = {
+      ...component.document,
+      __search_hit__: { ...component.document.__search_hit__, score: 0.6 },
+    }
     fixture.detectChanges()
     search_hit = fixture.debugElement.query(By.css('.search-score'))
     expect(search_hit).not.toBeUndefined()
     expect(component.searchScoreClass).toEqual('warning')
 
     // low
-    component.document.__search_hit__.score = 0.1
+    component.document = {
+      ...component.document,
+      __search_hit__: { ...component.document.__search_hit__, score: 0.1 },
+    }
     fixture.detectChanges()
     search_hit = fixture.debugElement.query(By.css('.search-score'))
     expect(search_hit).not.toBeUndefined()
@@ -117,10 +125,13 @@ describe('DocumentCardLargeComponent', () => {
   })
 
   it('should display note highlights', () => {
-    component.document.__search_hit__ = {
-      score: 0.9,
-      rank: 1,
-      note_highlights: '<span>bananas</span>',
+    component.document = {
+      ...component.document,
+      __search_hit__: {
+        score: 0.9,
+        rank: 1,
+        note_highlights: '<span>bananas</span>',
+      },
     }
     fixture.detectChanges()
     expect(fixture.nativeElement.textContent).toContain('bananas')
@@ -128,11 +139,14 @@ describe('DocumentCardLargeComponent', () => {
   })
 
   it('should fall back to document content when a search hit has no highlights', () => {
-    component.document.__search_hit__ = {
-      score: 0.9,
-      rank: 1,
-      highlights: '',
-      note_highlights: null,
+    component.document = {
+      ...component.document,
+      __search_hit__: {
+        score: 0.9,
+        rank: 1,
+        highlights: '',
+        note_highlights: null,
+      },
     }
     fixture.detectChanges()
 

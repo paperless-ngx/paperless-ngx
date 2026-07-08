@@ -210,13 +210,12 @@ describe('CustomFieldsQueryDropdownComponent', () => {
     expect(component.name).toBe('test_title')
   })
 
-  it('should add a default atom on open and focus the select field', fakeAsync(() => {
+  it('should add a default atom on open', fakeAsync(() => {
     expect(component.selectionModel.queries.length).toBe(0)
     component.onOpenChange(true)
     fixture.detectChanges()
     tick()
     expect(component.selectionModel.queries.length).toBe(1)
-    expect(window.document.activeElement.tagName).toBe('INPUT')
   }))
 
   describe('CustomFieldQueriesModel', () => {

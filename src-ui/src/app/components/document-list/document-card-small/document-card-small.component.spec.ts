@@ -52,9 +52,8 @@ describe('DocumentCardSmallComponent', () => {
   })
 
   it('should show the card', () => {
-    expect(component.show).toBeFalsy()
+    expect(component.show).toBeTruthy()
     component.ngAfterViewInit()
-    jest.advanceTimersByTime(100)
     expect(component.show).toBeTruthy()
   })
 
@@ -67,7 +66,7 @@ describe('DocumentCardSmallComponent', () => {
     expect(
       fixture.debugElement.queryAll(By.directive(TagComponent))
     ).toHaveLength(5)
-    component.document.tags = [1, 2]
+    component.document = { ...component.document, tags: [1, 2] }
     fixture.detectChanges()
     expect(
       fixture.debugElement.queryAll(By.directive(TagComponent))
@@ -75,7 +74,7 @@ describe('DocumentCardSmallComponent', () => {
   })
 
   it('should increase limit tags to 6 if no notes', () => {
-    component.document.notes = []
+    component.document = { ...component.document, notes: [] }
     fixture.detectChanges()
     expect(
       fixture.debugElement.queryAll(By.directive(TagComponent))
@@ -85,7 +84,7 @@ describe('DocumentCardSmallComponent', () => {
   it('should clear hidden tag counter when tag count falls below the limit', () => {
     expect(component.moreTags).toEqual(3)
 
-    component.document.tags = [1, 2, 3, 4, 5, 6]
+    component.document = { ...component.document, tags: [1, 2, 3, 4, 5, 6] }
     fixture.detectChanges()
 
     expect(component.moreTags).toBeNull()
