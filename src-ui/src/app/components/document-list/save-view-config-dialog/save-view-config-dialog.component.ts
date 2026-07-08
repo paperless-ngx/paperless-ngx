@@ -36,6 +36,7 @@ export class SaveViewConfigDialogComponent implements OnInit {
   private errorSignal = signal(undefined)
   private buttonsEnabledSignal = signal(true)
   private defaultNameSignal = signal('')
+  private closeEnabledSignal = signal(false)
 
   @Output()
   public saveClicked = new EventEmitter()
@@ -58,7 +59,13 @@ export class SaveViewConfigDialogComponent implements OnInit {
     this.buttonsEnabledSignal.set(buttonsEnabled)
   }
 
-  closeEnabled = false
+  get closeEnabled(): boolean {
+    return this.closeEnabledSignal()
+  }
+
+  set closeEnabled(closeEnabled: boolean) {
+    this.closeEnabledSignal.set(closeEnabled)
+  }
 
   users: User[]
 
