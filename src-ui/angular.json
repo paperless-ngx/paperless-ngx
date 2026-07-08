@@ -155,7 +155,7 @@
           "builder": "@angular-builders/jest:run",
           "options": {
             "tsConfig": "tsconfig.spec.json",
-            "zoneless": false,
+            "zoneless": true,
             "watch": false,
             "coverage": true
           }
