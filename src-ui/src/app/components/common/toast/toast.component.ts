@@ -1,6 +1,13 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { DecimalPipe } from '@angular/common'
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  inject,
+  signal,
+} from '@angular/core'
 import {
   NgbProgressbarModule,
   NgbToastModule,
@@ -22,6 +29,7 @@ import { Toast } from 'src/app/services/toast.service'
 })
 export class ToastComponent {
   private clipboard = inject(Clipboard)
+  private copiedSignal = signal(false)
 
   @Input() toast: Toast
 
@@ -31,7 +39,13 @@ export class ToastComponent {
 
   @Output() closed: EventEmitter<Toast> = new EventEmitter<Toast>()
 
-  public copied: boolean = false
+  public get copied(): boolean {
+    return this.copiedSignal()
+  }
+
+  public set copied(copied: boolean) {
+    this.copiedSignal.set(copied)
+  }
 
   onShown(toast: Toast) {
     if (!this.autohide) return
