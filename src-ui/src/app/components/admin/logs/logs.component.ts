@@ -35,17 +35,17 @@ export class LogsComponent
   private logService = inject(LogService)
   private changedetectorRef = inject(ChangeDetectorRef)
 
-  private readonly logs = signal<Array<{ message: string; level: number }>>([])
+  readonly logs = signal<Array<{ message: string; level: number }>>([])
 
-  private readonly logFiles = signal<string[]>([])
+  readonly logFiles = signal<string[]>([])
 
-  private readonly activeLog = signal<string>(undefined)
+  readonly activeLog = signal<string>(undefined)
 
-  private readonly autoRefreshEnabled = signal<boolean>(true)
+  readonly autoRefreshEnabled = signal<boolean>(true)
 
-  private readonly limit = signal<number>(5000)
+  readonly limit = signal<number>(5000)
 
-  private readonly showJumpToBottom = signal<boolean>(false)
+  readonly showJumpToBottom = signal<boolean>(false)
 
   private readonly limitChange$ = new Subject<number>()
 

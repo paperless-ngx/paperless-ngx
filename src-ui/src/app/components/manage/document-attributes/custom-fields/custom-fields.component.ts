@@ -51,15 +51,7 @@ export class CustomFieldsComponent
   private readonly documentService = inject(DocumentService)
   private readonly savedViewService = inject(SavedViewService)
 
-  private fieldsSignal = signal<CustomField[]>([])
-
-  public get fields(): CustomField[] {
-    return this.fieldsSignal()
-  }
-
-  public set fields(fields: CustomField[]) {
-    this.fieldsSignal.set(fields)
-  }
+  readonly fields = signal<CustomField[]>([])
 
   ngOnInit() {
     this.reload()
@@ -72,7 +64,7 @@ export class CustomFieldsComponent
       .pipe(
         takeUntil(this.unsubscribeNotifier),
         tap((r) => {
-          this.fields = r.results
+          this.fields.set(r.results)
         })
       )
       .subscribe(() => {

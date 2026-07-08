@@ -45,7 +45,7 @@
             </div>
           </div>
         }
-        @for (v of dashboardViews; track v.id) {
+        @for (v of dashboardViews(); track v.id) {
           <div class="col">
             <pngx-saved-view-widget
               [savedView]="v"

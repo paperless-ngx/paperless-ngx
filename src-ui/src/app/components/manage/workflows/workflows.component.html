@@ -22,14 +22,14 @@
     </div>
   </li>
 
-  @if (loading && workflows.length === 0) {
+  @if (loading && workflows().length === 0) {
     <li class="list-group-item">
       <div class="spinner-border spinner-border-sm me-2" role="status"></div>
       <ng-container i18n>Loading...</ng-container>
     </li>
   }
 
-  @for (workflow of workflows; track workflow.id) {
+  @for (workflow of workflows(); track workflow.id) {
     <li class="list-group-item">
       <div class="row fade" [class.show]="show">
         <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editWorkflow(workflow)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.Workflow)">{{workflow.name}}</button></div>
@@ -76,7 +76,7 @@
       </div>
     </li>
   }
-  @if (!loading && workflows.length === 0) {
+  @if (!loading && workflows().length === 0) {
     <li class="list-group-item" [class.show]="show" i18n>No workflows defined.</li>
   }
 </ul>

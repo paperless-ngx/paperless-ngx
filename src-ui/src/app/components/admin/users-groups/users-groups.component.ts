@@ -43,24 +43,8 @@ export class UsersAndGroupsComponent
   permissionsService = inject(PermissionsService)
   private settings = inject(SettingsService)
 
-  private usersSignal = signal<User[]>(null)
-  private groupsSignal = signal<Group[]>(null)
-
-  get users(): User[] {
-    return this.usersSignal()
-  }
-
-  set users(value: User[]) {
-    this.usersSignal.set(value)
-  }
-
-  get groups(): Group[] {
-    return this.groupsSignal()
-  }
-
-  set groups(value: Group[]) {
-    this.groupsSignal.set(value)
-  }
+  readonly users = signal<User[]>(null)
+  readonly groups = signal<Group[]>(null)
 
   unsubscribeNotifier: Subject<any> = new Subject()
 
@@ -85,7 +69,7 @@ export class UsersAndGroupsComponent
         .pipe(first(), takeUntil(this.unsubscribeNotifier))
         .subscribe({
           next: (r) => {
-            this.users = r.results
+            this.users.set(r.results)
           },
           error: (e) => {
             this.toastService.showError($localize`Error retrieving users`, e)
@@ -99,7 +83,7 @@ export class UsersAndGroupsComponent
         .pipe(first(), takeUntil(this.unsubscribeNotifier))
         .subscribe({
           next: (r) => {
-            this.groups = r.results
+            this.groups.set(r.results)
           },
           error: (e) => {
             this.toastService.showError($localize`Error retrieving groups`, e)
@@ -141,7 +125,7 @@ export class UsersAndGroupsComponent
             $localize`Saved user "${newUser.username}".`
           )
           this.usersService.listAll().subscribe((r) => {
-            this.users = r.results
+            this.users.set(r.results)
           })
         }
       })
@@ -168,7 +152,7 @@ export class UsersAndGroupsComponent
           modal.close()
           this.toastService.showInfo($localize`Deleted user "${user.username}"`)
           this.usersService.listAll().subscribe((r) => {
-            this.users = r.results
+            this.users.set(r.results)
           })
         },
         error: (e) => {
@@ -195,7 +179,7 @@ export class UsersAndGroupsComponent
       .subscribe((newGroup) => {
         this.toastService.showInfo($localize`Saved group "${newGroup.name}".`)
         this.groupsService.listAll().subscribe((r) => {
-          this.groups = r.results
+          this.groups.set(r.results)
         })
       })
     modal.componentInstance.failed
@@ -221,7 +205,7 @@ export class UsersAndGroupsComponent
           modal.close()
           this.toastService.showInfo($localize`Deleted group "${group.name}"`)
           this.groupsService.listAll().subscribe((r) => {
-            this.groups = r.results
+            this.groups.set(r.results)
           })
         },
         error: (e) => {
@@ -235,6 +219,6 @@ export class UsersAndGroupsComponent
   }
 
   getGroupName(id: number): string {
-    return this.groups?.find((g) => g.id === id)?.name ?? ''
+    return this.groups()?.find((g) => g.id === id)?.name ?? ''
   }
 }

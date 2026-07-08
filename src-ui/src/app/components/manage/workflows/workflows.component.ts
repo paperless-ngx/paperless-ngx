@@ -39,15 +39,7 @@ export class WorkflowsComponent
   private modalService = inject(NgbModal)
   private toastService = inject(ToastService)
 
-  private workflowsSignal = signal<Workflow[]>([])
-
-  public get workflows(): Workflow[] {
-    return this.workflowsSignal()
-  }
-
-  public set workflows(workflows: Workflow[]) {
-    this.workflowsSignal.set(workflows)
-  }
+  readonly workflows = signal<Workflow[]>([])
 
   ngOnInit() {
     this.reload()
@@ -59,7 +51,7 @@ export class WorkflowsComponent
       .listAll()
       .pipe(
         takeUntil(this.unsubscribeNotifier),
-        tap((r) => (this.workflows = r.results))
+        tap((r) => this.workflows.set(r.results))
       )
       .subscribe(() => {
         this.show = true

@@ -47,20 +47,12 @@ export class DashboardComponent extends ComponentWithPermissions {
   private tourService = inject(TourService)
   private toastService = inject(ToastService)
 
-  private dashboardViewsSignal = signal<SavedView[]>([])
-
-  get dashboardViews(): SavedView[] {
-    return this.dashboardViewsSignal()
-  }
-
-  set dashboardViews(value: SavedView[]) {
-    this.dashboardViewsSignal.set(value)
-  }
+  readonly dashboardViews = signal<SavedView[]>([])
   constructor() {
     super()
 
     this.savedViewService.listAll().subscribe(() => {
-      this.dashboardViews = this.savedViewService.dashboardViews
+      this.dashboardViews.set(this.savedViewService.dashboardViews)
     })
   }
 
@@ -89,14 +81,12 @@ export class DashboardComponent extends ComponentWithPermissions {
   }
 
   onDrop(event: CdkDragDrop<SavedView[]>) {
-    moveItemInArray(
-      this.dashboardViews,
-      event.previousIndex,
-      event.currentIndex
-    )
+    const dashboardViews = [...this.dashboardViews()]
+    moveItemInArray(dashboardViews, event.previousIndex, event.currentIndex)
+    this.dashboardViews.set(dashboardViews)
 
     this.settingsService
-      .updateDashboardViewsSort(this.dashboardViews)
+      .updateDashboardViewsSort(this.dashboardViews())
       .subscribe({
         next: () => {
           this.toastService.showInfo($localize`Dashboard updated`)
