@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core'
 import {
   NgbDropdownModule,
   NgbProgressbarModule,
@@ -24,7 +24,15 @@ export class ToastsDropdownComponent implements OnInit, OnDestroy {
 
   private subscription: Subscription
 
-  public toasts: Toast[] = []
+  private toastsSignal = signal<Toast[]>([])
+
+  public get toasts(): Toast[] {
+    return this.toastsSignal()
+  }
+
+  public set toasts(toasts: Toast[]) {
+    this.toastsSignal.set(toasts)
+  }
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe()
