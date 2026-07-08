@@ -1,5 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard'
-import { Component, Input, inject } from '@angular/core'
+import { Component, Input, inject, signal } from '@angular/core'
 import { Title } from '@angular/platform-browser'
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -17,8 +17,16 @@ export class PageHeaderComponent {
   private clipboard = inject(Clipboard)
 
   private _title = ''
-  public copied: boolean = false
+  private copiedSignal = signal(false)
   private copyTimeout: any
+
+  public get copied(): boolean {
+    return this.copiedSignal()
+  }
+
+  public set copied(copied: boolean) {
+    this.copiedSignal.set(copied)
+  }
 
   @Input()
   set title(title: string) {
