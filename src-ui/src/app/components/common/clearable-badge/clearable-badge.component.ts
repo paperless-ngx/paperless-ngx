@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 
 @Component({
@@ -8,13 +8,26 @@ import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
   imports: [NgxBootstrapIconsModule],
 })
 export class ClearableBadgeComponent {
-  constructor() {}
+  private numberSignal = signal<number>(undefined)
+  private selectedSignal = signal<boolean>(undefined)
 
   @Input()
-  number: number
+  get number(): number {
+    return this.numberSignal()
+  }
+
+  set number(number: number) {
+    this.numberSignal.set(number)
+  }
 
   @Input()
-  selected: boolean
+  get selected(): boolean {
+    return this.selectedSignal()
+  }
+
+  set selected(selected: boolean) {
+    this.selectedSignal.set(selected)
+  }
 
   @Output()
   cleared: EventEmitter<boolean> = new EventEmitter()
