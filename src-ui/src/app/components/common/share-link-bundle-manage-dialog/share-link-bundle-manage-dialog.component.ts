@@ -78,13 +78,13 @@ export class ShareLinkBundleManageDialogComponent
       .pipe(
         switchMap((silent) => {
           if (!silent) {
-            this.loading = true
+            this.loading.set(true)
           }
           this.error = null
           return this.shareLinkBundleService.listAllBundles().pipe(
             catchError((error) => {
               if (!silent) {
-                this.loading = false
+                this.loading.set(false)
               }
               this.error = $localize`Failed to load share link bundles.`
               this.toastService.showError(
@@ -102,7 +102,7 @@ export class ShareLinkBundleManageDialogComponent
           this.bundles = results
           this.copiedSlug = null
         }
-        this.loading = false
+        this.loading.set(false)
       })
 
     this.triggerRefresh(false)
@@ -138,14 +138,14 @@ export class ShareLinkBundleManageDialogComponent
 
   delete(bundle: ShareLinkBundleSummary): void {
     this.error = null
-    this.loading = true
+    this.loading.set(true)
     this.shareLinkBundleService.delete(bundle).subscribe({
       next: () => {
         this.toastService.showInfo($localize`Share link bundle deleted.`)
         this.triggerRefresh(false)
       },
       error: (e) => {
-        this.loading = false
+        this.loading.set(false)
         this.toastService.showError(
           $localize`Error deleting share link bundle.`,
           e

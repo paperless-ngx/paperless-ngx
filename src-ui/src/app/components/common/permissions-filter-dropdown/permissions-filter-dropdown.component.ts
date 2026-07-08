@@ -132,7 +132,7 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
     } else if (
       this.selectionModel.ownerFilter === OwnerFilterType.SHARED_BY_ME
     ) {
-      this.selectionModel.userID = this.settingsService.currentUser.id
+      this.selectionModel.userID = this.settingsService.currentUser()?.id
       this.selectionModel.includeUsers = []
       this.selectionModel.excludeUsers = []
       this.selectionModel.hideUnowned = false

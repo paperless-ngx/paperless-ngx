@@ -73,11 +73,11 @@ export class DashboardComponent extends ComponentWithPermissions {
   }
 
   onDragStart(event: CdkDragStart) {
-    this.settingsService.globalDropzoneEnabled = false
+    this.settingsService.globalDropzoneEnabled.set(false)
   }
 
   onDragEnd(event: CdkDragEnd) {
-    this.settingsService.globalDropzoneEnabled = true
+    this.settingsService.globalDropzoneEnabled.set(true)
   }
 
   onDrop(event: CdkDragDrop<SavedView[]>) {

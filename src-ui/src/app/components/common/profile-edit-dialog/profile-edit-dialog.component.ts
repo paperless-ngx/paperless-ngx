@@ -125,7 +125,7 @@ export class ProfileEditDialogComponent
   }
 
   get saveDisabled(): boolean {
-    return this.error?.password_confirm || this.error?.email_confirm
+    return this.error()?.password_confirm || this.error()?.email_confirm
   }
 
   onEmailKeyUp(event: KeyboardEvent): void {
@@ -199,8 +199,8 @@ export class ProfileEditDialogComponent
       this.newPassword && this.currentPassword !== this.newPassword
     const profile = Object.assign({}, this.form.value)
     delete profile.totp_code
-    this.error = null
-    this.networkActive = true
+    this.error.set(null)
+    this.networkActive.set(true)
     this.profileService
       .update(profile)
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -221,8 +221,8 @@ export class ProfileEditDialogComponent
         },
         error: (error) => {
           this.toastService.showError($localize`Error saving profile`, error)
-          this.error = error?.error
-          this.networkActive = false
+          this.error.set(error?.error)
+          this.networkActive.set(false)
         },
       })
   }
@@ -247,9 +247,9 @@ export class ProfileEditDialogComponent
 
   copyAuthToken(): void {
     this.clipboard.copy(this.form.get('auth_token').value)
-    this.copied = true
+    this.copied.set(true)
     setTimeout(() => {
-      this.copied = false
+      this.copied.set(false)
     }, 3000)
   }
 
@@ -341,9 +341,9 @@ export class ProfileEditDialogComponent
 
   public copyRecoveryCodes(): void {
     this.clipboard.copy(this.recoveryCodes.join('\n'))
-    this.codesCopied = true
+    this.codesCopied.set(true)
     setTimeout(() => {
-      this.codesCopied = false
+      this.codesCopied.set(false)
     }, 3000)
   }
 }

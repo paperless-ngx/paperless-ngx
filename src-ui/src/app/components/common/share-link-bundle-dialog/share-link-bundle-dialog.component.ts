@@ -73,7 +73,7 @@ export class ShareLinkBundleDialogComponent extends ConfirmDialogComponent {
 
   constructor() {
     super()
-    this.loading = false
+    this.loading.set(false)
     this.title = $localize`Create share link bundle`
     this.btnCaption = $localize`Create link`
   }

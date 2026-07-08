@@ -54,11 +54,11 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
 
   constructor() {
     super()
-    this.loading = false
+    this.loading.set(false)
   }
 
   public emailDocuments() {
-    this.loading = true
+    this.loading.set(true)
     this.documentService
       .emailDocuments(
         this.documentIds,
@@ -69,7 +69,7 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
       )
       .subscribe({
         next: () => {
-          this.loading = false
+          this.loading.set(false)
           this.emailAddress = ''
           this.emailSubject = ''
           this.emailMessage = ''
@@ -77,7 +77,7 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
           this.toastService.showInfo($localize`Email sent`)
         },
         error: (e) => {
-          this.loading = false
+          this.loading.set(false)
           const errorMessage =
             this.documentIds.length > 1
               ? $localize`Error emailing documents`

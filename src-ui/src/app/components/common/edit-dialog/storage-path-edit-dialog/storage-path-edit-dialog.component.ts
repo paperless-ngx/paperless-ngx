@@ -71,7 +71,7 @@ export class StoragePathEditDialogComponent
 
   constructor() {
     super()
-    this.loading = false
+    this.loading.set(false)
     this.service = inject(StoragePathService)
     this.userService = inject(UserService)
     this.settingsService = inject(SettingsService)
@@ -138,7 +138,7 @@ export class StoragePathEditDialogComponent
       this.documentsInput$.pipe(
         distinctUntilChanged(),
         takeUntil(this.unsubscribeNotifier),
-        tap(() => (this.loading = true)),
+        tap(() => this.loading.set(true)),
         switchMap((title) =>
           this.documentsService
             .listFiltered(
@@ -152,7 +152,7 @@ export class StoragePathEditDialogComponent
             .pipe(
               map((result) => result.results),
               catchError(() => of([])), // empty on error
-              tap(() => (this.loading = false))
+              tap(() => this.loading.set(false))
             )
         )
       )
