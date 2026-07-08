@@ -7,6 +7,7 @@ import {
   Output,
   ViewChild,
   inject,
+  signal,
 } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import {
@@ -64,20 +65,43 @@ export class DocumentCardSmallComponent
 {
   private documentService = inject(DocumentService)
   settingsService = inject(SettingsService)
+  private selectedSignal = signal(false)
+  private documentSignal = signal<Document>(undefined)
+  private displayFieldsSignal = signal<string[]>(
+    DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
+  )
 
   DisplayField = DisplayField
 
   @Input()
-  selected = false
+  get selected(): boolean {
+    return this.selectedSignal()
+  }
+
+  set selected(selected: boolean) {
+    this.selectedSignal.set(selected)
+  }
 
   @Output()
   toggleSelected = new EventEmitter()
 
   @Input()
-  document: Document
+  get document(): Document {
+    return this.documentSignal()
+  }
+
+  set document(document: Document) {
+    this.documentSignal.set(document)
+  }
 
   @Input()
-  displayFields: string[] = DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
+  get displayFields(): string[] {
+    return this.displayFieldsSignal()
+  }
+
+  set displayFields(displayFields: string[]) {
+    this.displayFieldsSignal.set(displayFields)
+  }
 
   @Output()
   dblClickDocument = new EventEmitter()
@@ -94,7 +118,12 @@ export class DocumentCardSmallComponent
   @Output()
   clickStoragePath = new EventEmitter<number>()
 
-  moreTags: number = null
+  get moreTags(): number {
+    const limit = this.document?.notes.length > 0 ? 6 : 7
+    return this.document?.tags.length > limit
+      ? this.document.tags.length - (limit - 1)
+      : null
+  }
 
   @ViewChild('popupPreview') popupPreview: PreviewPopupComponent
 
@@ -117,10 +146,8 @@ export class DocumentCardSmallComponent
   get tagIDs() {
     const limit = this.document.notes.length > 0 ? 6 : 7
     if (this.document.tags.length > limit) {
-      this.moreTags = this.document.tags.length - (limit - 1)
       return this.document.tags.slice(0, limit - 1)
     } else {
-      this.moreTags = null
       return this.document.tags
     }
   }

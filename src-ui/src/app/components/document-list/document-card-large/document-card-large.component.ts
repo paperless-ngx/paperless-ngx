@@ -7,6 +7,7 @@ import {
   Output,
   ViewChild,
   inject,
+  signal,
 } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import {
@@ -64,14 +65,31 @@ export class DocumentCardLargeComponent
 {
   private documentService = inject(DocumentService)
   settingsService = inject(SettingsService)
+  private selectedSignal = signal(false)
+  private displayFieldsSignal = signal<string[]>(
+    DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
+  )
+  private documentSignal = signal<Document>(undefined)
 
   DisplayField = DisplayField
 
   @Input()
-  selected = false
+  get selected(): boolean {
+    return this.selectedSignal()
+  }
+
+  set selected(selected: boolean) {
+    this.selectedSignal.set(selected)
+  }
 
   @Input()
-  displayFields: string[] = DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
+  get displayFields(): string[] {
+    return this.displayFieldsSignal()
+  }
+
+  set displayFields(displayFields: string[]) {
+    this.displayFieldsSignal.set(displayFields)
+  }
 
   @Output()
   toggleSelected = new EventEmitter()
@@ -81,7 +99,13 @@ export class DocumentCardLargeComponent
   }
 
   @Input()
-  document: Document
+  get document(): Document {
+    return this.documentSignal()
+  }
+
+  set document(document: Document) {
+    this.documentSignal.set(document)
+  }
 
   @Output()
   dblClickDocument = new EventEmitter()
