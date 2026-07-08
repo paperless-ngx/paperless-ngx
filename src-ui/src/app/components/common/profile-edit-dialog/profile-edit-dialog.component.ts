@@ -1,5 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard'
-import { Component, OnInit, inject } from '@angular/core'
+import { Component, OnInit, inject, signal } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -50,8 +50,28 @@ export class ProfileEditDialogComponent
   private toastService = inject(ToastService)
   private clipboard = inject(Clipboard)
 
-  public networkActive: boolean = false
-  public error: any
+  private networkActiveSignal = signal(false)
+  private errorSignal = signal<any>(undefined)
+  private showPasswordConfirmSignal = signal(false)
+  private showEmailConfirmSignal = signal(false)
+  private copiedSignal = signal(false)
+  private codesCopiedSignal = signal(false)
+
+  public get networkActive(): boolean {
+    return this.networkActiveSignal()
+  }
+
+  public set networkActive(networkActive: boolean) {
+    this.networkActiveSignal.set(networkActive)
+  }
+
+  public get error(): any {
+    return this.errorSignal()
+  }
+
+  public set error(error: any) {
+    this.errorSignal.set(error)
+  }
 
   public form = new FormGroup({
     email: new FormControl(''),
@@ -67,13 +87,26 @@ export class ProfileEditDialogComponent
   private currentPassword: string
   private newPassword: string
   private passwordConfirm: string
-  public showPasswordConfirm: boolean = false
+  public get showPasswordConfirm(): boolean {
+    return this.showPasswordConfirmSignal()
+  }
+
+  public set showPasswordConfirm(showPasswordConfirm: boolean) {
+    this.showPasswordConfirmSignal.set(showPasswordConfirm)
+  }
+
   public hasUsablePassword: boolean = false
 
   private currentEmail: string
   private newEmail: string
   private emailConfirm: string
-  public showEmailConfirm: boolean = false
+  public get showEmailConfirm(): boolean {
+    return this.showEmailConfirmSignal()
+  }
+
+  public set showEmailConfirm(showEmailConfirm: boolean) {
+    this.showEmailConfirmSignal.set(showEmailConfirm)
+  }
 
   public isTotpEnabled: boolean = false
   public totpSettings: TotpSettings
@@ -81,8 +114,21 @@ export class ProfileEditDialogComponent
   public totpLoading: boolean = false
   public recoveryCodes: string[]
 
-  public copied: boolean = false
-  public codesCopied: boolean = false
+  public get copied(): boolean {
+    return this.copiedSignal()
+  }
+
+  public set copied(copied: boolean) {
+    this.copiedSignal.set(copied)
+  }
+
+  public get codesCopied(): boolean {
+    return this.codesCopiedSignal()
+  }
+
+  public set codesCopied(codesCopied: boolean) {
+    this.codesCopiedSignal.set(codesCopied)
+  }
 
   public socialAccounts: SocialAccount[] = []
   public socialAccountProviders: SocialAccountProvider[] = []
@@ -144,14 +190,13 @@ export class ProfileEditDialogComponent
     if (this.showEmailConfirm) {
       this.form.get('email_confirm').enable()
       if (this.newEmail !== this.emailConfirm) {
-        if (!this.error) this.error = {}
-        this.error.email_confirm = $localize`Emails must match`
+        this.setFieldError('email_confirm', $localize`Emails must match`)
       } else {
-        delete this.error?.email_confirm
+        this.clearFieldError('email_confirm')
       }
     } else {
       this.form.get('email_confirm').disable()
-      delete this.error?.email_confirm
+      this.clearFieldError('email_confirm')
     }
   }
 
@@ -172,15 +217,28 @@ export class ProfileEditDialogComponent
     if (this.showPasswordConfirm) {
       this.form.get('password_confirm').enable()
       if (this.newPassword !== this.passwordConfirm) {
-        if (!this.error) this.error = {}
-        this.error.password_confirm = $localize`Passwords must match`
+        this.setFieldError('password_confirm', $localize`Passwords must match`)
       } else {
-        delete this.error?.password_confirm
+        this.clearFieldError('password_confirm')
       }
     } else {
       this.form.get('password_confirm').disable()
-      delete this.error?.password_confirm
+      this.clearFieldError('password_confirm')
     }
+  }
+
+  private setFieldError(fieldName: string, message: string): void {
+    this.error = {
+      ...(this.error ?? {}),
+      [fieldName]: message,
+    }
+  }
+
+  private clearFieldError(fieldName: string): void {
+    if (!this.error) return
+    const error = { ...this.error }
+    delete error[fieldName]
+    this.error = Object.keys(error).length ? error : undefined
   }
 
   save(): void {

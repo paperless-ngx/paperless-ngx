@@ -1,4 +1,4 @@
-import { Component, ViewChild, inject } from '@angular/core'
+import { Component, ViewChild, inject, signal } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -38,8 +38,16 @@ const IMAP_SECURITY_OPTIONS = [
 })
 export class MailAccountEditDialogComponent extends EditDialogComponent<MailAccount> {
   testActive: boolean = false
-  testResult: string
+  private testResultSignal = signal<string>(undefined)
   alertTimeout
+
+  get testResult(): string {
+    return this.testResultSignal()
+  }
+
+  set testResult(testResult: string) {
+    this.testResultSignal.set(testResult)
+  }
 
   @ViewChild('testResultAlert', { static: false }) testResultAlert: NgbAlert
 
