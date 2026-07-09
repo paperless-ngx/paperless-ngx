@@ -914,7 +914,7 @@ export class BulkEditorComponent
     })
     modal.componentInstance.confirmClicked.subscribe(
       ({ permissions, merge }) => {
-        modal.componentInstance.buttonsEnabled = false
+        modal.componentInstance.buttonsEnabled.set(false)
         this.executeBulkEditMethod(modal, 'set_permissions', {
           ...permissions,
           merge,

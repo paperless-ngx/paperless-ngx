@@ -4,7 +4,8 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
 import { NgTemplateOutlet } from '@angular/common'
-import { Component, OnInit, inject, signal } from '@angular/core'
+import { Component, OnInit, computed, inject, signal } from '@angular/core'
+import { toSignal } from '@angular/core/rxjs-interop'
 import {
   AbstractControl,
   FormArray,
@@ -15,7 +16,7 @@ import {
 } from '@angular/forms'
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { Subscription, first, takeUntil } from 'rxjs'
+import { Subscription, map, takeUntil } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentType } from 'src/app/data/document-type'
@@ -470,79 +471,40 @@ export class WorkflowEditDialogComponent
   public TriggerFilterType = TriggerFilterType
   public filterDefinitions = TRIGGER_FILTER_DEFINITIONS
 
-  private correspondentService: CorrespondentService
-  private documentTypeService: DocumentTypeService
-  private storagePathService: StoragePathService
-  private mailRuleService: MailRuleService
-  private customFieldsService: CustomFieldsService
+  private correspondentService = inject(CorrespondentService)
+  private documentTypeService = inject(DocumentTypeService)
+  private storagePathService = inject(StoragePathService)
+  private mailRuleService = inject(MailRuleService)
+  private customFieldsService = inject(CustomFieldsService)
 
-  private templatesSignal = signal<Workflow[]>(undefined)
-  private correspondentsSignal = signal<Correspondent[]>(undefined)
-  private documentTypesSignal = signal<DocumentType[]>(undefined)
-  private storagePathsSignal = signal<StoragePath[]>(undefined)
-  private mailRulesSignal = signal<MailRule[]>(undefined)
-  private customFieldsSignal = signal<CustomField[]>(undefined)
-  private dateCustomFieldsSignal = signal<CustomField[]>(undefined)
-
-  get templates(): Workflow[] {
-    return this.templatesSignal()
-  }
-
-  set templates(templates: Workflow[]) {
-    this.templatesSignal.set(templates)
-  }
-
-  get correspondents(): Correspondent[] {
-    return this.correspondentsSignal()
-  }
-
-  set correspondents(correspondents: Correspondent[]) {
-    this.correspondentsSignal.set(correspondents)
-  }
-
-  get documentTypes(): DocumentType[] {
-    return this.documentTypesSignal()
-  }
-
-  set documentTypes(documentTypes: DocumentType[]) {
-    this.documentTypesSignal.set(documentTypes)
-  }
-
-  get storagePaths(): StoragePath[] {
-    return this.storagePathsSignal()
-  }
-
-  set storagePaths(storagePaths: StoragePath[]) {
-    this.storagePathsSignal.set(storagePaths)
-  }
-
-  get mailRules(): MailRule[] {
-    return this.mailRulesSignal()
-  }
-
-  set mailRules(mailRules: MailRule[]) {
-    this.mailRulesSignal.set(mailRules)
-  }
-
-  get customFields(): CustomField[] {
-    return this.customFieldsSignal()
-  }
-
-  set customFields(customFields: CustomField[]) {
-    this.customFieldsSignal.set(customFields)
-  }
-
-  get dateCustomFields(): CustomField[] {
-    return this.dateCustomFieldsSignal()
-  }
-
-  set dateCustomFields(dateCustomFields: CustomField[]) {
-    this.dateCustomFieldsSignal.set(dateCustomFields)
-  }
+  readonly templates = signal<Workflow[]>(undefined)
+  readonly correspondents = toSignal(
+    this.correspondentService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as Correspondent[] }
+  )
+  readonly documentTypes = toSignal(
+    this.documentTypeService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as DocumentType[] }
+  )
+  readonly storagePaths = toSignal(
+    this.storagePathService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as StoragePath[] }
+  )
+  readonly mailRules = toSignal(
+    this.mailRuleService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as MailRule[] }
+  )
+  readonly customFields = toSignal(
+    this.customFieldsService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as CustomField[] }
+  )
+  readonly dateCustomFields = computed(() =>
+    this.customFields()?.filter((f) => f.data_type === CustomFieldDataType.Date)
+  )
 
   expandedItem: number = null
 
-  private allowedActionTypesSignal = signal([])
+  readonly allowedActionTypes = signal([])
 
   private readonly triggerFilterOptionsMap = new WeakMap<
     FormArray,
@@ -552,43 +514,8 @@ export class WorkflowEditDialogComponent
   constructor() {
     super()
     this.service = inject(WorkflowService)
-    this.correspondentService = inject(CorrespondentService)
-    this.documentTypeService = inject(DocumentTypeService)
-    this.storagePathService = inject(StoragePathService)
-    this.mailRuleService = inject(MailRuleService)
     this.userService = inject(UserService)
     this.settingsService = inject(SettingsService)
-    this.customFieldsService = inject(CustomFieldsService)
-
-    this.correspondentService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.correspondents = result.results))
-
-    this.documentTypeService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.documentTypes = result.results))
-
-    this.storagePathService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.storagePaths = result.results))
-
-    this.mailRuleService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.mailRules = result.results))
-
-    this.customFieldsService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => {
-        this.customFields = result.results
-        this.dateCustomFields = this.customFields?.filter(
-          (f) => f.data_type === CustomFieldDataType.Date
-        )
-      })
   }
 
   getCreateTitle() {
@@ -621,11 +548,13 @@ export class WorkflowEditDialogComponent
       this.checkRemovalActionFields.bind(this)
     )
     this.checkRemovalActionFields(this.objectForm.value)
-    this.allowedActionTypes = this.settingsService.get(
-      SETTINGS_KEYS.EMAIL_ENABLED
+    this.allowedActionTypes.set(
+      this.settingsService.get(SETTINGS_KEYS.EMAIL_ENABLED)
+        ? WORKFLOW_ACTION_OPTIONS
+        : WORKFLOW_ACTION_OPTIONS.filter(
+            (a) => a.id !== WorkflowActionType.Email
+          )
     )
-      ? WORKFLOW_ACTION_OPTIONS
-      : WORKFLOW_ACTION_OPTIONS.filter((a) => a.id !== WorkflowActionType.Email)
   }
 
   private checkRemovalActionFields(formWorkflow: Workflow) {
@@ -1010,11 +939,11 @@ export class WorkflowEditDialogComponent
 
     switch (definition.selectItems) {
       case 'correspondents':
-        return this.correspondents
+        return this.correspondents()
       case 'documentTypes':
-        return this.documentTypes
+        return this.documentTypes()
       case 'storagePaths':
-        return this.storagePaths
+        return this.storagePaths()
       default:
         return []
     }
@@ -1351,15 +1280,7 @@ export class WorkflowEditDialogComponent
 
   get actionTypeOptions() {
     this.settingsService.trackChanges()
-    return this.allowedActionTypes
-  }
-
-  get allowedActionTypes() {
-    return this.allowedActionTypesSignal()
-  }
-
-  set allowedActionTypes(allowedActionTypes) {
-    this.allowedActionTypesSignal.set(allowedActionTypes)
+    return this.allowedActionTypes()
   }
 
   getActionTypeOptionName(type: WorkflowActionType): string {

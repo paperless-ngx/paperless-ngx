@@ -771,25 +771,21 @@ describe('WorkflowEditDialogComponent', () => {
       false
     )
 
-    component.correspondents = [{ id: 1, name: 'C1' } as any]
-    component.documentTypes = [{ id: 2, name: 'DT' } as any]
-    component.storagePaths = [{ id: 3, name: 'SP' } as any]
-
     expect(
       component.getFilterSelectItems(TriggerFilterType.CorrespondentIs)
-    ).toEqual(component.correspondents)
+    ).toEqual(component.correspondents())
     expect(
       component.getFilterSelectItems(TriggerFilterType.DocumentTypeIs)
-    ).toEqual(component.documentTypes)
+    ).toEqual(component.documentTypes())
     expect(
       component.getFilterSelectItems(TriggerFilterType.DocumentTypeAny)
-    ).toEqual(component.documentTypes)
+    ).toEqual(component.documentTypes())
     expect(
       component.getFilterSelectItems(TriggerFilterType.StoragePathIs)
-    ).toEqual(component.storagePaths)
+    ).toEqual(component.storagePaths())
     expect(
       component.getFilterSelectItems(TriggerFilterType.StoragePathAny)
-    ).toEqual(component.storagePaths)
+    ).toEqual(component.storagePaths())
     expect(component.getFilterSelectItems(TriggerFilterType.TagsAll)).toEqual(
       []
     )

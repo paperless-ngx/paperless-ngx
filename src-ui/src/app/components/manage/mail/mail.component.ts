@@ -330,7 +330,7 @@ export class MailComponent
     dialog.object = object
     modal.componentInstance.confirmClicked.subscribe(
       ({ permissions, merge }) => {
-        modal.componentInstance.buttonsEnabled = false
+        modal.componentInstance.buttonsEnabled.set(false)
         const service: AbstractPaperlessService<MailRule | MailAccount> =
           'account' in object ? this.mailRuleService : this.mailAccountService
         object.owner = permissions['owner']

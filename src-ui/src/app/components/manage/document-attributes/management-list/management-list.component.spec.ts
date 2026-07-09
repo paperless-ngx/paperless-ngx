@@ -147,7 +147,7 @@ describe('ManagementListComponent', () => {
     component.nameFilter = 'foo' // subject normally triggered by ngModel
     tick(400) // debounce
     fixture.detectChanges()
-    expect(component.data).toEqual([tags[0]])
+    expect(component.data()).toEqual([tags[0]])
 
     nameFilterInput.nativeElement.dispatchEvent(
       new KeyboardEvent('keyup', { code: 'Escape' })
@@ -155,7 +155,7 @@ describe('ManagementListComponent', () => {
     tick(400) // debounce
     fixture.detectChanges()
     expect(component.nameFilter).toBeNull()
-    expect(component.data).toEqual(tags)
+    expect(component.data()).toEqual(tags)
     tick(100) // load
   }))
 
@@ -242,8 +242,8 @@ describe('ManagementListComponent', () => {
     component.reloadData()
     tick(100)
 
-    expect(component.collectionSize).toBe(1)
-    expect(component.displayCollectionSize).toBe(3)
+    expect(component.collectionSize()).toBe(1)
+    expect(component.displayCollectionSize()).toBe(3)
   }))
 
   it('should support quick filter for objects', () => {
@@ -275,9 +275,9 @@ describe('ManagementListComponent', () => {
           })
       )
     )
-    component.page = 2
+    component.page.set(2)
     component.reloadData()
-    expect(component.page).toEqual(1)
+    expect(component.page()).toEqual(1)
   })
 
   it('should support toggle select page in vew', () => {
@@ -295,28 +295,28 @@ describe('ManagementListComponent', () => {
 
   it('selectNone should clear selection and reset toggle flag', () => {
     component.selectedObjects = new Set([tags[0].id, tags[1].id])
-    component.togggleAll = true
+    component.togggleAll.set(true)
 
     component.selectNone()
 
     expect(component.selectedObjects.size).toBe(0)
-    expect(component.togggleAll).toBe(false)
+    expect(component.togggleAll()).toBe(false)
   })
 
   it('selectPage should select current page items or clear selection', () => {
     component.selectPage()
     expect(component.selectedObjects).toEqual(new Set(tags.map((t) => t.id)))
-    expect(component.togggleAll).toBe(true)
+    expect(component.togggleAll()).toBe(true)
 
-    component.togggleAll = true
+    component.togggleAll.set(true)
     component.clearSelection()
     expect(component.selectedObjects.size).toBe(0)
-    expect(component.togggleAll).toBe(false)
+    expect(component.togggleAll()).toBe(false)
   })
 
   it('selectAll should activate all-selection mode', () => {
     ;(tagService.listFiltered as jest.Mock).mockClear()
-    component.collectionSize = tags.length
+    component.collectionSize.set(tags.length)
 
     component.selectAll()
 
@@ -325,41 +325,41 @@ describe('ManagementListComponent', () => {
     expect((component as any).allSelectionActive).toBe(true)
     expect(component.hasSelection).toBe(true)
     expect(component.selectedCount).toBe(tags.length)
-    expect(component.togggleAll).toBe(true)
+    expect(component.togggleAll()).toBe(true)
   })
 
   it('selectAll should clear selection when collection size is zero', () => {
     component.selectedObjects = new Set([1])
-    component.collectionSize = 0
-    component.togggleAll = true
+    component.collectionSize.set(0)
+    component.togggleAll.set(true)
 
     component.selectAll()
 
     expect(component.selectedObjects.size).toBe(0)
-    expect(component.togggleAll).toBe(false)
+    expect(component.togggleAll()).toBe(false)
   })
 
   it('toggleSelected should toggle object selection and update toggle state', () => {
     component.toggleSelected(tags[0])
     expect(component.selectedObjects.has(tags[0].id)).toBe(true)
-    expect(component.togggleAll).toBe(false)
+    expect(component.togggleAll()).toBe(false)
 
     component.toggleSelected(tags[1])
     component.toggleSelected(tags[2])
-    expect(component.togggleAll).toBe(true)
+    expect(component.togggleAll()).toBe(true)
 
     component.toggleSelected(tags[1])
     expect(component.selectedObjects.has(tags[1].id)).toBe(false)
-    expect(component.togggleAll).toBe(false)
+    expect(component.togggleAll()).toBe(false)
   })
 
   it('areAllPageItemsSelected should return false when page has no selectable items', () => {
-    component.data = []
+    component.data.set([])
     component.selectedObjects.clear()
 
     expect((component as any).areAllPageItemsSelected()).toBe(false)
 
-    component.data = tags
+    component.data.set(tags)
   })
 
   it('should support bulk edit permissions', () => {
@@ -498,7 +498,7 @@ describe('ManagementListComponent', () => {
       document_count: 10,
       parent: 1,
     }
-    component['unfilteredData'].push(childTag)
+    component['unfilteredData'].update((data) => [...data, childTag])
     const original = component.getOriginalObject({ id: 4 } as Tag)
     expect(original).toEqual(childTag)
   })
@@ -536,7 +536,7 @@ describe('ManagementListComponent', () => {
       .mockReturnValue(of({ success: true }))
 
     component.typeNamePlural = 'tags'
-    component.page = 2
+    component.page.set(2)
     component.pageSize = 100
 
     tick()
@@ -545,7 +545,7 @@ describe('ManagementListComponent', () => {
       SETTINGS_KEYS.OBJECT_LIST_SIZES,
       { tags: 100 }
     )
-    expect(component.page).toBe(1)
+    expect(component.page()).toBe(1)
     expect(reloadSpy).toHaveBeenCalled()
     expect(toastErrorSpy).not.toHaveBeenCalled()
   }))

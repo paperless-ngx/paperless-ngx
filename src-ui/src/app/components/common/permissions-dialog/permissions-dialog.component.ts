@@ -6,6 +6,7 @@ import {
   inject,
   signal,
 } from '@angular/core'
+import { toSignal } from '@angular/core/rxjs-interop'
 import {
   FormControl,
   FormGroup,
@@ -13,6 +14,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { map } from 'rxjs'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { User } from 'src/app/data/user'
 import { UserService } from 'src/app/services/rest/user.service'
@@ -34,49 +36,22 @@ export class PermissionsDialogComponent {
   activeModal = inject(NgbActiveModal)
   private userService = inject(UserService)
 
-  private usersSignal = signal<User[]>(undefined)
-  private titleSignal = signal($localize`Set permissions`)
-  private noteSignal = signal<string>(null)
-  private buttonsEnabledSignal = signal(true)
+  readonly users = toSignal(
+    this.userService.listAll().pipe(map((r) => r.results)),
+    { initialValue: undefined as User[] }
+  )
+  readonly title = signal($localize`Set permissions`)
+  readonly note = signal<string>(null)
+  readonly buttonsEnabled = signal(true)
   private o: ObjectWithPermissions = undefined
-
-  constructor() {
-    this.userService.listAll().subscribe((r) => (this.users = r.results))
-  }
-
-  get users(): User[] {
-    return this.usersSignal()
-  }
-
-  set users(users: User[]) {
-    this.usersSignal.set(users)
-  }
 
   @Output()
   public confirmClicked = new EventEmitter()
 
   @Input()
-  get title(): string {
-    return this.titleSignal()
-  }
-
-  set title(title: string) {
-    this.titleSignal.set(title)
-  }
-
-  @Input()
-  get note(): string {
-    return this.noteSignal()
-  }
-
-  set note(note: string) {
-    this.noteSignal.set(note)
-  }
-
-  @Input()
   set object(o: ObjectWithPermissions) {
     this.o = o
-    this.title = $localize`Edit permissions for ` + o['name']
+    this.title.set($localize`Edit permissions for ` + o['name'])
     this.form.patchValue({
       merge: true,
       permissions_form: {
@@ -94,14 +69,6 @@ export class PermissionsDialogComponent {
     permissions_form: new FormControl(),
     merge: new FormControl(true),
   })
-
-  get buttonsEnabled(): boolean {
-    return this.buttonsEnabledSignal()
-  }
-
-  set buttonsEnabled(buttonsEnabled: boolean) {
-    this.buttonsEnabledSignal.set(buttonsEnabled)
-  }
 
   get permissions() {
     return {
