@@ -96,9 +96,9 @@ describe('ShareLinkBundleManageDialogComponent', () => {
     tick()
 
     expect(service.listAllBundles).toHaveBeenCalledTimes(1)
-    expect(component.bundles).toEqual(bundles)
+    expect(component.bundles()).toEqual(bundles)
     expect(component.loading()).toBe(false)
-    expect(component.error).toBeNull()
+    expect(component.error()).toBeNull()
 
     tick(5000)
     expect(service.listAllBundles).toHaveBeenCalledTimes(2)
@@ -113,7 +113,7 @@ describe('ShareLinkBundleManageDialogComponent', () => {
     fixture.detectChanges()
     tick()
 
-    expect(component.error).toContain('Failed to load share link bundles.')
+    expect(component.error()).toContain('Failed to load share link bundles.')
     expect(toastService.showError).toHaveBeenCalled()
     expect(component.loading()).toBe(false)
 
@@ -135,11 +135,11 @@ describe('ShareLinkBundleManageDialogComponent', () => {
     expect(clipboard.copy).toHaveBeenCalledWith(
       component.getShareUrl(readyBundle)
     )
-    expect(component.copiedSlug).toBe('ready-slug')
+    expect(component.copiedSlug()).toBe('ready-slug')
     expect(toastService.showInfo).toHaveBeenCalled()
 
     tick(3000)
-    expect(component.copiedSlug).toBeNull()
+    expect(component.copiedSlug()).toBeNull()
   }))
 
   it('ignores copy requests for non-ready bundles', fakeAsync(() => {
@@ -190,12 +190,12 @@ describe('ShareLinkBundleManageDialogComponent', () => {
     fixture.detectChanges()
     tick()
 
-    component.bundles = [sampleBundle()]
-    component.retry(component.bundles[0])
+    component.bundles.set([sampleBundle()])
+    component.retry(component.bundles()[0])
     tick()
 
     expect(service.rebuildBundle).toHaveBeenCalledWith(updated.id)
-    expect(component.bundles[0].status).toBe(ShareLinkBundleStatus.Ready)
+    expect(component.bundles()[0].status).toBe(ShareLinkBundleStatus.Ready)
     expect(toastService.showInfo).toHaveBeenCalled()
   }))
 
@@ -208,11 +208,11 @@ describe('ShareLinkBundleManageDialogComponent', () => {
     fixture.detectChanges()
     tick()
 
-    component.bundles = [sampleBundle()]
+    component.bundles.set([sampleBundle()])
     component.retry({ id: 99 } as ShareLinkBundleSummary)
     tick()
 
-    expect(component.bundles.find((bundle) => bundle.id === 99)).toBeTruthy()
+    expect(component.bundles().find((bundle) => bundle.id === 99)).toBeTruthy()
   }))
 
   it('handles retry errors', fakeAsync(() => {

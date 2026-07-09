@@ -1,11 +1,12 @@
-import { Component, forwardRef, inject, signal } from '@angular/core'
+import { Component, forwardRef, inject } from '@angular/core'
+import { toSignal } from '@angular/core/rxjs-interop'
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgSelectComponent } from '@ng-select/ng-select'
-import { first } from 'rxjs/operators'
+import { map } from 'rxjs/operators'
 import { User } from 'src/app/data/user'
 import { UserService } from 'src/app/services/rest/user.service'
 import { AbstractInputComponent } from '../../abstract-input'
@@ -24,23 +25,9 @@ import { AbstractInputComponent } from '../../abstract-input'
   imports: [NgSelectComponent, FormsModule, ReactiveFormsModule],
 })
 export class PermissionsUserComponent extends AbstractInputComponent<User[]> {
-  private usersSignal = signal<User[]>(undefined)
-
-  get users(): User[] {
-    return this.usersSignal()
-  }
-
-  set users(users: User[]) {
-    this.usersSignal.set(users)
-  }
-
-  constructor() {
-    const userService = inject(UserService)
-
-    super()
-    userService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.users = result.results))
-  }
+  private readonly userService = inject(UserService)
+  readonly users = toSignal(
+    this.userService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as User[] }
+  )
 }

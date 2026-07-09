@@ -45,24 +45,8 @@ export class PDFEditorComponent extends ConfirmDialogComponent {
   private readonly settingsService = inject(SettingsService)
   activeModal: NgbActiveModal = inject(NgbActiveModal)
 
-  private documentIDSignal = signal<number>(undefined)
-  private versionIDSignal = signal<number>(undefined)
-
-  get documentID(): number {
-    return this.documentIDSignal()
-  }
-
-  set documentID(documentID: number) {
-    this.documentIDSignal.set(documentID)
-  }
-
-  get versionID(): number {
-    return this.versionIDSignal()
-  }
-
-  set versionID(versionID: number) {
-    this.versionIDSignal.set(versionID)
-  }
+  readonly documentID = signal<number>(undefined)
+  readonly versionID = signal<number>(undefined)
 
   pages: PageOperation[] = []
   totalPages = 0
@@ -74,9 +58,9 @@ export class PDFEditorComponent extends ConfirmDialogComponent {
 
   get pdfSrc(): string {
     return this.documentService.getPreviewUrl(
-      this.documentID,
+      this.documentID(),
       false,
-      this.versionID
+      this.versionID()
     )
   }
 

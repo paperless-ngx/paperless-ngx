@@ -41,7 +41,7 @@
       </li>
     }
 
-    @for (account of mailAccounts; track account) {
+    @for (account of mailAccounts(); track account) {
       <li class="list-group-item">
         <div class="row fade" [class.show]="showAccounts()">
           <div class="col d-flex align-items-center">
@@ -91,7 +91,7 @@
         </div>
       </li>
     }
-    @if (!loadingAccounts() && mailAccounts.length === 0) {
+    @if (!loadingAccounts() && mailAccounts().length === 0) {
       <li class="list-group-item" i18n>No mail accounts defined.</li>
     }
   </ul>
@@ -186,7 +186,7 @@
 
 </ng-container>
 
-@if (!mailAccounts || !mailRules) {
+@if (!mailAccounts() || !mailRules()) {
   <div>
     <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
     <div class="visually-hidden" i18n>Loading...</div>

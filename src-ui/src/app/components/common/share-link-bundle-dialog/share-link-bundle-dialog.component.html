@@ -8,18 +8,18 @@
       <div>
         <p class="mb-1">
           <ng-container i18n>Selected documents:</ng-container>
-          {{ selectionCount }}
+          {{ selectionCount() }}
         </p>
-        @if (documentPreview.length > 0) {
+        @if (documentPreview().length > 0) {
           <ul class="list-unstyled small mb-0">
-            @for (doc of documentPreview; track doc.id) {
+            @for (doc of documentPreview(); track doc.id) {
               <li>
                 <strong>{{ doc.title | documentTitle }}</strong>
               </li>
             }
-            @if (selectionCount > documentPreview.length) {
+            @if (selectionCount() > documentPreview().length) {
               <li>
-                <ng-container i18n>+ {{ selectionCount - documentPreview.length }} more…</ng-container>
+                <ng-container i18n>+ {{ selectionCount() - documentPreview().length }} more…</ng-container>
               </li>
             }
           </ul>
@@ -72,10 +72,10 @@
               type="button"
               (click)="copy(createdBundle)"
             >
-              @if (copied) {
+              @if (copied()) {
                 <i-bs name="clipboard-check"></i-bs>
               }
-              @if (!copied) {
+              @if (!copied()) {
                 <i-bs name="clipboard"></i-bs>
               }
               <span class="visually-hidden" i18n>Copy link</span>
@@ -118,7 +118,7 @@
         type="button"
         class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2 text-nowrap"
         (click)="submit()"
-        [disabled]="loading || !buttonsEnabled">
+        [disabled]="loading() || !buttonsEnabled">
         @if (loading()) {
           <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
         }

@@ -1994,8 +1994,8 @@ export class DocumentDetailComponent
     const sourceDocumentId = this.selectedVersionId ?? this.document.id
     modal.componentInstance.title = $localize`PDF Editor`
     modal.componentInstance.btnCaption = $localize`Proceed`
-    modal.componentInstance.documentID = this.document.id
-    modal.componentInstance.versionID = sourceDocumentId
+    modal.componentInstance.documentID.set(this.document.id)
+    modal.componentInstance.versionID.set(sourceDocumentId)
     modal.componentInstance.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {

@@ -1,11 +1,12 @@
-import { Component, inject, signal } from '@angular/core'
+import { Component, inject } from '@angular/core'
+import { toSignal } from '@angular/core/rxjs-interop'
 import {
   FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { first } from 'rxjs'
+import { map } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
@@ -154,61 +155,28 @@ const METADATA_CORRESPONDENT_OPTIONS = [
   ],
 })
 export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
-  private accountService: MailAccountService
-  private correspondentService: CorrespondentService
-  private documentTypeService: DocumentTypeService
+  private accountService = inject(MailAccountService)
+  private correspondentService = inject(CorrespondentService)
+  private documentTypeService = inject(DocumentTypeService)
 
-  private accountsSignal = signal<MailAccount[]>(undefined)
-  private correspondentsSignal = signal<Correspondent[]>(undefined)
-  private documentTypesSignal = signal<DocumentType[]>(undefined)
-
-  get accounts(): MailAccount[] {
-    return this.accountsSignal()
-  }
-
-  set accounts(accounts: MailAccount[]) {
-    this.accountsSignal.set(accounts)
-  }
-
-  get correspondents(): Correspondent[] {
-    return this.correspondentsSignal()
-  }
-
-  set correspondents(correspondents: Correspondent[]) {
-    this.correspondentsSignal.set(correspondents)
-  }
-
-  get documentTypes(): DocumentType[] {
-    return this.documentTypesSignal()
-  }
-
-  set documentTypes(documentTypes: DocumentType[]) {
-    this.documentTypesSignal.set(documentTypes)
-  }
+  readonly accounts = toSignal(
+    this.accountService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as MailAccount[] }
+  )
+  readonly correspondents = toSignal(
+    this.correspondentService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as Correspondent[] }
+  )
+  readonly documentTypes = toSignal(
+    this.documentTypeService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as DocumentType[] }
+  )
 
   constructor() {
     super()
     this.service = inject(MailRuleService)
-    this.accountService = inject(MailAccountService)
-    this.correspondentService = inject(CorrespondentService)
-    this.documentTypeService = inject(DocumentTypeService)
     this.userService = inject(UserService)
     this.settingsService = inject(SettingsService)
-
-    this.accountService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.accounts = result.results))
-
-    this.correspondentService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.correspondents = result.results))
-
-    this.documentTypeService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.documentTypes = result.results))
   }
 
   getCreateTitle() {

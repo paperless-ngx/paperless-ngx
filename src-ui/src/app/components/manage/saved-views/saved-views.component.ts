@@ -56,7 +56,7 @@ export class SavedViewsComponent
 
   DisplayMode = DisplayMode
 
-  private savedViewsSignal = signal<SavedView[]>(undefined)
+  readonly savedViews = signal<SavedView[]>(undefined)
   private savedViewsGroup = new FormGroup({})
   public savedViewsForm: FormGroup = new FormGroup({
     savedViews: this.savedViewsGroup,
@@ -67,14 +67,6 @@ export class SavedViewsComponent
 
   get displayFields() {
     return this.settings.allDisplayFields()
-  }
-
-  public get savedViews(): SavedView[] {
-    return this.savedViewsSignal()
-  }
-
-  public set savedViews(savedViews: SavedView[]) {
-    this.savedViewsSignal.set(savedViews)
   }
 
   constructor() {
@@ -91,7 +83,7 @@ export class SavedViewsComponent
     this.savedViewService
       .list(null, null, null, false, { full_perms: true })
       .subscribe((r) => {
-        this.savedViews = r.results
+        this.savedViews.set(r.results)
         this.initialize()
       })
   }
@@ -109,7 +101,7 @@ export class SavedViewsComponent
       savedViews: {},
     }
 
-    for (let view of this.savedViews) {
+    for (let view of this.savedViews()) {
       storeData.savedViews[view.id.toString()] = {
         id: view.id,
         name: view.name,
@@ -156,7 +148,9 @@ export class SavedViewsComponent
   public deleteSavedView(savedView: SavedView) {
     this.savedViewService.delete(savedView).subscribe(() => {
       this.savedViewsGroup.removeControl(savedView.id.toString())
-      this.savedViews.splice(this.savedViews.indexOf(savedView), 1)
+      this.savedViews.update((savedViews) =>
+        savedViews.filter((view) => view !== savedView)
+      )
       this.toastService.showInfo(
         $localize`Saved view "${savedView.name}" deleted.`
       )

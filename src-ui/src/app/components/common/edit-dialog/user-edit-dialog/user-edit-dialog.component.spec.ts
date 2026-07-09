@@ -114,17 +114,17 @@ describe('UserEditDialogComponent', () => {
   it('should detect whether password was changed in form on save', () => {
     component.objectForm.get('password').setValue(null)
     component.save()
-    expect(component.passwordIsSet).toBeFalsy()
+    expect(component.passwordIsSet()).toBeFalsy()
 
     // unchanged pw
     component.objectForm.get('password').setValue('*******')
     component.save()
-    expect(component.passwordIsSet).toBeFalsy()
+    expect(component.passwordIsSet()).toBeFalsy()
 
     // unchanged pw
     component.objectForm.get('password').setValue('helloworld')
     component.save()
-    expect(component.passwordIsSet).toBeTruthy()
+    expect(component.passwordIsSet()).toBeTruthy()
   })
 
   it('should support deactivation of TOTP', () => {

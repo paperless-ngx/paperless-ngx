@@ -449,9 +449,11 @@ export class DocumentListComponent
     let modal = this.modalService.open(SaveViewConfigDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.defaultName = this.filterEditor.generateFilterName()
+    modal.componentInstance.setDefaultName(
+      this.filterEditor.generateFilterName()
+    )
     modal.componentInstance.saveClicked.pipe(first()).subscribe((formValue) => {
-      modal.componentInstance.buttonsEnabled = false
+      modal.componentInstance.buttonsEnabled.set(false)
       let savedView: SavedView = {
         name: formValue.name,
         filter_rules: this.list.filterRules,
@@ -502,8 +504,8 @@ export class DocumentListComponent
             if (error.filter_rules) {
               error.filter_rules = error.filter_rules.map((r) => r.value)
             }
-            modal.componentInstance.error = error
-            modal.componentInstance.buttonsEnabled = true
+            modal.componentInstance.error.set(error)
+            modal.componentInstance.buttonsEnabled.set(true)
           },
         })
     })

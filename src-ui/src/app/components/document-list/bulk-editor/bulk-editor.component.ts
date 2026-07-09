@@ -956,24 +956,24 @@ export class BulkEditorComponent
     mergeDialog.title = $localize`Merge confirm`
     mergeDialog.messageBold = $localize`This operation will merge ${this.getSelectionSize()} selected documents into a new document.`
     mergeDialog.btnCaption = $localize`Proceed`
-    mergeDialog.documentIDs = Array.from(this.list.selected)
+    mergeDialog.documentIDs.set(Array.from(this.list.selected))
     mergeDialog.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         const args: MergeDocumentsRequest = {}
-        if (mergeDialog.metadataDocumentID > -1) {
-          args.metadata_document_id = mergeDialog.metadataDocumentID
+        if (mergeDialog.metadataDocumentID() > -1) {
+          args.metadata_document_id = mergeDialog.metadataDocumentID()
         }
-        if (mergeDialog.deleteOriginals) {
+        if (mergeDialog.deleteOriginals()) {
           args.delete_originals = true
         }
-        if (mergeDialog.archiveFallback) {
+        if (mergeDialog.archiveFallback()) {
           args.archive_fallback = true
         }
         mergeDialog.buttonsEnabled = false
         this.executeDocumentAction(
           modal,
-          this.documentService.mergeDocuments(mergeDialog.documentIDs, args),
+          this.documentService.mergeDocuments(mergeDialog.documentIDs(), args),
           { deleteOriginals: !!args.delete_originals }
         )
         this.toastService.showInfo(
@@ -1029,7 +1029,7 @@ export class BulkEditorComponent
     const selectedDocuments = this.list.documents.filter((d) =>
       this.list.selected.has(d.id)
     )
-    dialog.documents = selectedDocuments
+    dialog.setDocuments(selectedDocuments)
     dialog.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
@@ -1043,7 +1043,7 @@ export class BulkEditorComponent
               dialog.loading.set(false)
               dialog.buttonsEnabled = false
               dialog.createdBundle = result
-              dialog.copied = false
+              dialog.copied.set(false)
               dialog.payload = null
               dialog.onOpenManage = () => {
                 modal.close()

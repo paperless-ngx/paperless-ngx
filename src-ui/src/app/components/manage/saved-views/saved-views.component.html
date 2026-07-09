@@ -7,7 +7,7 @@
 </pngx-page-header>
 <form [formGroup]="savedViewsForm" (ngSubmit)="save()">
   <ul class="list-group mb-3" formGroupName="savedViews">
-    @for (view of savedViews; track view) {
+    @for (view of savedViews(); track view) {
       <li class="list-group-item py-3">
       <div [formGroupName]="view.id">
         <div class="row">
@@ -65,7 +65,7 @@
       </li>
     }
 
-    @if (savedViews && savedViews.length === 0) {
+    @if (savedViews() && savedViews().length === 0) {
       <li class="list-group-item">
         <div i18n>No saved views defined.</div>
       </li>

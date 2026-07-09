@@ -63,9 +63,9 @@ describe('SaveViewConfigDialogComponent', () => {
     const name = 'Tag: Inbox'
     let result
     component.saveClicked.subscribe((saveResult) => (result = saveResult))
-    component.defaultName = name
+    component.setDefaultName(name)
     component.save()
-    expect(component.defaultName).toEqual(name)
+    expect(component.defaultName()).toEqual(name)
     expect(result).toEqual({
       name,
       showInSideBar: false,

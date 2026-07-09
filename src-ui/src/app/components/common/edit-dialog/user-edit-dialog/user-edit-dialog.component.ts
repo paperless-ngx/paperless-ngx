@@ -1,11 +1,12 @@
 import { Component, OnInit, inject, signal } from '@angular/core'
+import { toSignal } from '@angular/core/rxjs-interop'
 import {
   FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { first } from 'rxjs'
+import { first, map } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Group } from 'src/app/data/group'
 import { User } from 'src/app/data/user'
@@ -38,46 +39,19 @@ export class UserEditDialogComponent
   implements OnInit
 {
   private toastService = inject(ToastService)
-  private groupsService: GroupService
+  private groupsService = inject(GroupService)
 
-  private groupsSignal = signal<Group[]>(undefined)
-  private passwordIsSetSignal = signal(false)
-  private totpLoadingSignal = signal(false)
-
-  get groups(): Group[] {
-    return this.groupsSignal()
-  }
-
-  set groups(groups: Group[]) {
-    this.groupsSignal.set(groups)
-  }
-
-  get passwordIsSet(): boolean {
-    return this.passwordIsSetSignal()
-  }
-
-  set passwordIsSet(passwordIsSet: boolean) {
-    this.passwordIsSetSignal.set(passwordIsSet)
-  }
-
-  public get totpLoading(): boolean {
-    return this.totpLoadingSignal()
-  }
-
-  public set totpLoading(totpLoading: boolean) {
-    this.totpLoadingSignal.set(totpLoading)
-  }
+  readonly groups = toSignal(
+    this.groupsService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as Group[] }
+  )
+  readonly passwordIsSet = signal(false)
+  readonly totpLoading = signal(false)
 
   constructor() {
     super()
     this.service = inject(UserService)
-    this.groupsService = inject(GroupService)
     this.settingsService = inject(SettingsService)
-
-    this.groupsService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.groups = result.results))
   }
 
   ngOnInit(): void {
@@ -127,14 +101,15 @@ export class UserEditDialogComponent
     if (!groupsVal) return []
     else
       return groupsVal.flatMap(
-        (id) => this.groups?.find((g) => g.id == id)?.permissions
+        (id) => this.groups()?.find((g) => g.id == id)?.permissions
       )
   }
 
   save(): void {
-    this.passwordIsSet =
+    this.passwordIsSet.set(
       this.objectForm.get('password').value?.toString().replaceAll('*', '')
         .length > 0
+    )
     super.save()
   }
 
@@ -143,13 +118,13 @@ export class UserEditDialogComponent
   }
 
   deactivateTotp() {
-    this.totpLoading = true
+    this.totpLoading.set(true)
     ;(this.service as UserService)
       .deactivateTotp(this.object)
       .pipe(first())
       .subscribe({
         next: (result) => {
-          this.totpLoading = false
+          this.totpLoading.set(false)
           if (result) {
             this.toastService.showInfo($localize`Totp deactivated`)
             this.object.is_mfa_enabled = false
@@ -158,7 +133,7 @@ export class UserEditDialogComponent
           }
         },
         error: (e) => {
-          this.totpLoading = false
+          this.totpLoading.set(false)
           this.toastService.showError($localize`Totp deactivation failed`, e)
         },
       })

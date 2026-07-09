@@ -40,33 +40,9 @@ export class ShareLinkBundleManageDialogComponent
   private readonly clipboard = inject(Clipboard)
 
   title = $localize`Share link bundles`
-  private bundlesSignal = signal<ShareLinkBundleSummary[]>([])
-  private errorSignal = signal<string | null>(null)
-  private copiedSlugSignal = signal<string | null>(null)
-
-  get bundles(): ShareLinkBundleSummary[] {
-    return this.bundlesSignal()
-  }
-
-  set bundles(bundles: ShareLinkBundleSummary[]) {
-    this.bundlesSignal.set(bundles)
-  }
-
-  get error(): string | null {
-    return this.errorSignal()
-  }
-
-  set error(error: string | null) {
-    this.errorSignal.set(error)
-  }
-
-  get copiedSlug(): string | null {
-    return this.copiedSlugSignal()
-  }
-
-  set copiedSlug(copiedSlug: string | null) {
-    this.copiedSlugSignal.set(copiedSlug)
-  }
+  readonly bundles = signal<ShareLinkBundleSummary[]>([])
+  readonly error = signal<string | null>(null)
+  readonly copiedSlug = signal<string | null>(null)
 
   readonly statuses = ShareLinkBundleStatus
   readonly fileVersions = FileVersion
@@ -80,13 +56,13 @@ export class ShareLinkBundleManageDialogComponent
           if (!silent) {
             this.loading.set(true)
           }
-          this.error = null
+          this.error.set(null)
           return this.shareLinkBundleService.listAllBundles().pipe(
             catchError((error) => {
               if (!silent) {
                 this.loading.set(false)
               }
-              this.error = $localize`Failed to load share link bundles.`
+              this.error.set($localize`Failed to load share link bundles.`)
               this.toastService.showError(
                 $localize`Error retrieving share link bundles.`,
                 error
@@ -99,8 +75,8 @@ export class ShareLinkBundleManageDialogComponent
       )
       .subscribe((results) => {
         if (results) {
-          this.bundles = results
-          this.copiedSlug = null
+          this.bundles.set(results)
+          this.copiedSlug.set(null)
         }
         this.loading.set(false)
       })
@@ -128,16 +104,16 @@ export class ShareLinkBundleManageDialogComponent
     }
     const success = this.clipboard.copy(this.getShareUrl(bundle))
     if (success) {
-      this.copiedSlug = bundle.slug
+      this.copiedSlug.set(bundle.slug)
       setTimeout(() => {
-        this.copiedSlug = null
+        this.copiedSlug.set(null)
       }, 3000)
       this.toastService.showInfo($localize`Share link copied to clipboard.`)
     }
   }
 
   delete(bundle: ShareLinkBundleSummary): void {
-    this.error = null
+    this.error.set(null)
     this.loading.set(true)
     this.shareLinkBundleService.delete(bundle).subscribe({
       next: () => {
@@ -155,7 +131,7 @@ export class ShareLinkBundleManageDialogComponent
   }
 
   retry(bundle: ShareLinkBundleSummary): void {
-    this.error = null
+    this.error.set(null)
     this.shareLinkBundleService.rebuildBundle(bundle.id).subscribe({
       next: (updated) => {
         this.toastService.showInfo(
@@ -182,15 +158,16 @@ export class ShareLinkBundleManageDialogComponent
   }
 
   private replaceBundle(updated: ShareLinkBundleSummary): void {
-    const index = this.bundles.findIndex((bundle) => bundle.id === updated.id)
+    const bundles = this.bundles()
+    const index = bundles.findIndex((bundle) => bundle.id === updated.id)
     if (index >= 0) {
-      this.bundles = [
-        ...this.bundles.slice(0, index),
+      this.bundles.set([
+        ...bundles.slice(0, index),
         updated,
-        ...this.bundles.slice(index + 1),
-      ]
+        ...bundles.slice(index + 1),
+      ])
     } else {
-      this.bundles = [updated, ...this.bundles]
+      this.bundles.set([updated, ...bundles])
     }
   }
 

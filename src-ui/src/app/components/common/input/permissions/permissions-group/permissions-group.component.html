@@ -3,7 +3,7 @@
       <ng-select name="inputId" [(ngModel)]="value"
         [disabled]="disabled"
         clearable="true"
-        [items]="groups"
+        [items]="groups()"
         multiple="true"
         bindLabel="name"
         bindValue="id"

@@ -730,7 +730,9 @@ describe('DocumentListComponent', () => {
       showInSideBar: true,
     })
     expect(updateVisibilitySpy).not.toHaveBeenCalled()
-    expect(openModal.componentInstance.error).toEqual({ filter_rules: ['11'] })
+    expect(openModal.componentInstance.error()).toEqual({
+      filter_rules: ['11'],
+    })
   })
 
   it('should detect saved view changes', () => {

@@ -1,9 +1,10 @@
 import {
   Component,
   EventEmitter,
-  Input,
   Output,
   inject,
+  input,
+  model,
   signal,
 } from '@angular/core'
 import {
@@ -38,51 +39,16 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
   private notesService = inject(DocumentNotesService)
   private toastService = inject(ToastService)
   private usersService = inject(UserService)
-  private documentIdSignal = signal<number>(undefined)
-  private notesSignal = signal<DocumentNote[]>([])
-  private addDisabledSignal = signal(false)
-  private networkActiveSignal = signal(false)
+  readonly documentId = model<number>(undefined)
+  readonly notes = model<DocumentNote[]>([])
+  readonly addDisabled = input(false)
+  readonly networkActive = signal(false)
 
   noteForm: FormGroup = new FormGroup({
     newNote: new FormControl(''),
   })
 
-  get networkActive(): boolean {
-    return this.networkActiveSignal()
-  }
-
-  set networkActive(networkActive: boolean) {
-    this.networkActiveSignal.set(networkActive)
-  }
-
   newNoteError: boolean = false
-
-  @Input()
-  get documentId(): number {
-    return this.documentIdSignal()
-  }
-
-  set documentId(documentId: number) {
-    this.documentIdSignal.set(documentId)
-  }
-
-  @Input()
-  get notes(): DocumentNote[] {
-    return this.notesSignal()
-  }
-
-  set notes(notes: DocumentNote[]) {
-    this.notesSignal.set(notes)
-  }
-
-  @Input()
-  get addDisabled(): boolean {
-    return this.addDisabledSignal()
-  }
-
-  set addDisabled(addDisabled: boolean) {
-    this.addDisabledSignal.set(addDisabled)
-  }
 
   @Output()
   updated: EventEmitter<DocumentNote[]> = new EventEmitter()
@@ -104,30 +70,30 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
       return
     }
     this.newNoteError = false
-    this.networkActive = true
-    this.notesService.addNote(this.documentId, note).subscribe({
+    this.networkActive.set(true)
+    this.notesService.addNote(this.documentId(), note).subscribe({
       next: (result) => {
-        this.notes = result
+        this.notes.set(result)
         this.noteForm.get('newNote').reset()
-        this.networkActive = false
-        this.updated.emit(this.notes)
+        this.networkActive.set(false)
+        this.updated.emit(this.notes())
       },
       error: (e) => {
-        this.networkActive = false
+        this.networkActive.set(false)
         this.toastService.showError($localize`Error saving note`, e)
       },
     })
   }
 
   deleteNote(noteId: number) {
-    this.notesService.deleteNote(this.documentId, noteId).subscribe({
+    this.notesService.deleteNote(this.documentId(), noteId).subscribe({
       next: (result) => {
-        this.notes = result
-        this.networkActive = false
-        this.updated.emit(this.notes)
+        this.notes.set(result)
+        this.networkActive.set(false)
+        this.updated.emit(this.notes())
       },
       error: (e) => {
-        this.networkActive = false
+        this.networkActive.set(false)
         this.toastService.showError($localize`Error deleting note`, e)
       },
     })

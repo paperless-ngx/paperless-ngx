@@ -1697,8 +1697,8 @@ describe('DocumentDetailComponent', () => {
     component.selectedVersionId = 10
     component.editPdf()
     expect(modal).not.toBeUndefined()
-    modal.componentInstance.documentID = doc.id
-    expect(modal.componentInstance.versionID).toBe(10)
+    modal.componentInstance.documentID.set(doc.id)
+    expect(modal.componentInstance.versionID()).toBe(10)
     modal.componentInstance.pages = [{ page: 1, rotate: 0, splitAfter: false }]
     modal.componentInstance.confirm()
     let req = httpTestingController.expectOne(
@@ -1716,7 +1716,7 @@ describe('DocumentDetailComponent', () => {
     expect(errorSpy).toHaveBeenCalled()
 
     component.editPdf()
-    modal.componentInstance.documentID = doc.id
+    modal.componentInstance.documentID.set(doc.id)
     modal.componentInstance.pages = [{ page: 1, rotate: 0, splitAfter: true }]
     modal.componentInstance.deleteOriginal = true
     modal.componentInstance.confirm()

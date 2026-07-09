@@ -1146,7 +1146,7 @@ describe('BulkEditorComponent', () => {
     fixture.detectChanges()
     component.mergeSelected()
     expect(modal).not.toBeUndefined()
-    modal.componentInstance.metadataDocumentID = 3
+    modal.componentInstance.metadataDocumentID.set(3)
     modal.componentInstance.confirm()
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/merge/`
@@ -1164,7 +1164,7 @@ describe('BulkEditorComponent', () => {
     ) // listAllFilteredIds
 
     // Test with Delete Originals enabled
-    modal.componentInstance.deleteOriginals = true
+    modal.componentInstance.deleteOriginals.set(true)
     modal.componentInstance.confirm()
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/merge/`
@@ -1184,8 +1184,8 @@ describe('BulkEditorComponent', () => {
     expect(documentListViewService.selected.size).toEqual(0)
 
     // Test with archiveFallback enabled
-    modal.componentInstance.deleteOriginals = false
-    modal.componentInstance.archiveFallback = true
+    modal.componentInstance.deleteOriginals.set(false)
+    modal.componentInstance.archiveFallback.set(true)
     modal.componentInstance.confirm()
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/merge/`
@@ -1629,6 +1629,9 @@ describe('BulkEditorComponent', () => {
       close: jest.fn(),
       componentInstance: {
         documents: [],
+        setDocuments(docs) {
+          this.documents = docs
+        },
         confirmClicked,
         payload: {
           document_ids: [5, 7],
@@ -1637,7 +1640,7 @@ describe('BulkEditorComponent', () => {
         },
         loading: signal(false),
         buttonsEnabled: true,
-        copied: false,
+        copied: signal(false),
       },
     }
 
@@ -1698,6 +1701,9 @@ describe('BulkEditorComponent', () => {
     const modalRef: Partial<NgbModalRef> = {
       componentInstance: {
         documents: [],
+        setDocuments(docs) {
+          this.documents = docs
+        },
         confirmClicked,
         payload: {
           document_ids: [9],

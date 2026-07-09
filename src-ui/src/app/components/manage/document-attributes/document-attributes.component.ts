@@ -133,19 +133,11 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
 
   @ViewChild('activeOutlet', { read: NgComponentOutlet })
   set activeOutlet(outlet: NgComponentOutlet | undefined) {
-    this.activeComponentSignal.set(outlet?.componentInstance ?? null)
+    this.activeComponent.set(outlet?.componentInstance ?? null)
   }
 
-  private activeComponentSignal = signal<unknown>(null)
-  private activeNavIDSignal = signal<number>(null)
-
-  get activeNavID(): number {
-    return this.activeNavIDSignal()
-  }
-
-  set activeNavID(activeNavID: number) {
-    this.activeNavIDSignal.set(activeNavID)
-  }
+  readonly activeComponent = signal<unknown>(null)
+  readonly activeNavID = signal<number>(null)
 
   get visibleSections(): DocumentAttributesSection[] {
     return this.sections.filter((section) =>
@@ -158,8 +150,9 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
 
   get activeSection(): DocumentAttributesSection | null {
     return (
-      this.visibleSections.find((section) => section.id === this.activeNavID) ??
-      null
+      this.visibleSections.find(
+        (section) => section.id === this.activeNavID()
+      ) ?? null
     )
   }
 
@@ -168,14 +161,14 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
       this.activeSection?.kind !== DocumentAttributesSectionKind.ManagementList
     )
       return null
-    const instance = this.activeComponentSignal()
+    const instance = this.activeComponent()
     return instance instanceof ManagementListComponent ? instance : null
   }
 
   get activeCustomFields(): CustomFieldsComponent | null {
     if (this.activeSection?.kind !== DocumentAttributesSectionKind.CustomFields)
       return null
-    const instance = this.activeComponentSignal()
+    const instance = this.activeComponent()
     return instance instanceof CustomFieldsComponent ? instance : null
   }
 
@@ -208,13 +201,13 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
           return
         }
 
-        if (this.activeNavID !== navIDFromSection) {
-          this.activeNavID = navIDFromSection
+        if (this.activeNavID() !== navIDFromSection) {
+          this.activeNavID.set(navIDFromSection)
         }
 
         if (!section || this.getNavIDForSection(section) == null) {
           this.router.navigate(
-            ['attributes', this.getSectionForNavID(this.activeNavID)],
+            ['attributes', this.getSectionForNavID(this.activeNavID())],
             { replaceUrl: true }
           )
         }

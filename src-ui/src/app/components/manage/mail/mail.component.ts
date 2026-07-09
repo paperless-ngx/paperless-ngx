@@ -56,13 +56,10 @@ export class MailComponent
 
   public MailAccountType = MailAccountType
 
-  private mailAccountsSignal = signal<MailAccount[]>([])
+  readonly mailAccounts = signal<MailAccount[]>([])
 
-  public get mailAccounts() {
-    return this.mailAccountsSignal()
-  }
-  private set mailAccounts(accounts: MailAccount[]) {
-    this.mailAccountsSignal.set(accounts)
+  private setMailAccounts(accounts: MailAccount[]) {
+    this.mailAccounts.set(accounts)
     this.mailAccountsById.set(
       new Map(accounts.map((account) => [account.id, account]))
     )
@@ -94,12 +91,12 @@ export class MailComponent
         first(),
         takeUntil(this.unsubscribeNotifier),
         tap((r) => {
-          this.mailAccounts = r.results
+          this.setMailAccounts(r.results)
           this.loadingAccounts.set(false)
           this.showAccounts.set(true)
           if (this.oAuthAccountId) {
             this.editMailAccount(
-              this.mailAccounts.find(
+              this.mailAccounts().find(
                 (account) => account.id === this.oAuthAccountId
               )
             )
@@ -140,9 +137,9 @@ export class MailComponent
         if (success) {
           this.toastService.showInfo($localize`OAuth2 authentication success`)
           this.oAuthAccountId = parseInt(params.get('account_id'))
-          if (this.mailAccounts.length > 0) {
+          if (this.mailAccounts().length > 0) {
             this.editMailAccount(
-              this.mailAccounts.find(
+              this.mailAccounts().find(
                 (account) => account.id === this.oAuthAccountId
               )
             )
@@ -179,7 +176,7 @@ export class MailComponent
         this.mailAccountService
           .listAll(null, null, { full_perms: true })
           .subscribe((r) => {
-            this.mailAccounts = r.results
+            this.setMailAccounts(r.results)
           })
       })
     modal.componentInstance.failed
@@ -210,7 +207,7 @@ export class MailComponent
           this.mailAccountService
             .listAll(null, null, { full_perms: true })
             .subscribe((r) => {
-              this.mailAccounts = r.results
+              this.setMailAccounts(r.results)
             })
         },
         error: (e) => {
