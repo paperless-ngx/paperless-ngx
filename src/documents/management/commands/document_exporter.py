@@ -22,7 +22,6 @@ from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 from django.db import transaction
 from django.utils import timezone
-from filelock import FileLock
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
 
@@ -58,6 +57,7 @@ from documents.utils import copy_file_with_basic_stats
 from paperless import version
 from paperless.db import GnuPG
 from paperless.models import ApplicationConfiguration
+from paperless.storage import get_storage
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
@@ -229,7 +229,7 @@ class Command(CryptMixin, BaseCommand):
 
         try:
             # Prevent any ongoing changes in the documents
-            with FileLock(settings.MEDIA_LOCK):
+            with get_storage().acquire_lock():
                 self.dump()
 
                 # We've written everything to the temporary directory in this case,

@@ -283,6 +283,17 @@ EMPTY_TRASH_DIR = (
 # Lock file for synchronizing changes to the MEDIA directory across multiple
 # threads.
 MEDIA_LOCK = MEDIA_ROOT / "media.lock"
+
+# Storage backend for documents (default: local filesystem)
+# Supported values: "file" (local), "s3" (S3-compatible, requires s3fs)
+PAPERLESS_STORAGE_BACKEND = os.getenv("PAPERLESS_STORAGE_BACKEND", "file")
+
+# Backend-specific options passed directly to fsspec.filesystem(), as JSON.
+# For S3: {"key": "...", "secret": "...", "client_kwargs": {"endpoint_url": "..."}}
+PAPERLESS_STORAGE_BACKEND_OPTIONS: dict = json.loads(
+    os.getenv("PAPERLESS_STORAGE_BACKEND_OPTIONS", "{}"),
+)
+
 INDEX_DIR = DATA_DIR / "index"
 MODEL_FILE = __get_path(
     "PAPERLESS_MODEL_FILE",

@@ -22,9 +22,7 @@ from django.db import IntegrityError
 from django.db import transaction
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save
-from filelock import FileLock
 
-from documents.file_handling import create_source_path_directory
 from documents.management.commands.mixins import CryptMixin
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -40,8 +38,8 @@ from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.signals.handlers import check_paths_and_prune_custom_fields
 from documents.signals.handlers import update_filename_and_move_files
-from documents.utils import copy_file_with_basic_stats
 from paperless import version
+from paperless.storage import get_storage
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
@@ -385,13 +383,14 @@ class Command(CryptMixin, BaseCommand):
 
             document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
-            with FileLock(settings.MEDIA_LOCK):
-                if Path(document.source_path).is_file():
+            storage = get_storage()
+            with storage.acquire_lock():
+                if storage.exists(document.source_path):
                     raise FileExistsError(document.source_path)
 
-                create_source_path_directory(document.source_path)
+                storage.makedirs(document.source_path)
 
-                copy_file_with_basic_stats(document_path, document.source_path)
+                storage.write(document.source_path, document_path)
 
                 if thumbnail_path:
                     if thumbnail_path.suffix in {".png", ".PNG"}:
@@ -406,17 +405,14 @@ class Command(CryptMixin, BaseCommand):
                             output_file=str(document.thumbnail_path),
                         )
                     else:
-                        copy_file_with_basic_stats(
-                            thumbnail_path,
-                            document.thumbnail_path,
-                        )
+                        storage.write(document.thumbnail_path, thumbnail_path)
 
                 if archive_path:
-                    create_source_path_directory(document.archive_path)
+                    storage.makedirs(document.archive_path)
                     # TODO: this assumes that the export is valid and
                     #  archive_filename is present on all documents with
                     #  archived files
-                    copy_file_with_basic_stats(archive_path, document.archive_path)
+                    storage.write(document.archive_path, archive_path)
 
             document.save()
 

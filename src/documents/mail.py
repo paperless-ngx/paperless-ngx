@@ -45,6 +45,7 @@ def send_email(
     used_filenames: set[str] = set()
 
     # Something could be renaming the file concurrently so it can't be attached
+    # TODO: S3 — migrate FileLock to storage.acquire_lock()
     with FileLock(settings.MEDIA_LOCK):
         for attachment in attachments:
             filename = _get_unique_filename(

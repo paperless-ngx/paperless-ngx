@@ -93,6 +93,7 @@ def generate_unique_filename(doc, *, archive_filename=False) -> Path:
             # still the same as before.
             return new_filename
 
+        # TODO: S3 — replace (root / new_filename).exists() with storage.exists()
         if (root / new_filename).exists():
             counter += 1
         else:

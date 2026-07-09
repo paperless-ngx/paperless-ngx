@@ -139,6 +139,7 @@ def thumbnail_last_modified(request, pk: int) -> datetime | None:
             return cache_hit
 
         # No cache, get the timestamp and cache the datetime
+        # TODO: S3 — replace stat().st_mtime with storage.size() + ETag for remote backends
         last_modified = datetime.fromtimestamp(
             doc.thumbnail_path.stat().st_mtime,
             tz=timezone.utc,

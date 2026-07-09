@@ -27,6 +27,7 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.parsers import ParseError
 from documents.plugins.helpers import ProgressStatusOptions
+from paperless.storage import reset_storage
 
 
 def setup_directories():
@@ -149,7 +150,22 @@ def util_call_with_backoff(
     return succeeded, result
 
 
-class DirectoriesMixin:
+class StorageBackendMixin:
+    """
+    Resets the PaperlessStorage singleton before and after each test to
+    prevent singleton state from leaking across tests.
+    """
+
+    def setUp(self) -> None:
+        reset_storage()
+        super().setUp()
+
+    def tearDown(self) -> None:
+        super().tearDown()
+        reset_storage()
+
+
+class DirectoriesMixin(StorageBackendMixin):
     """
     Creates and overrides settings for all folders and paths, then ensures
     they are cleaned up on exit

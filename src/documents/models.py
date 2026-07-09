@@ -365,6 +365,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
     @property
     def source_file(self):
+        # TODO: S3 — replace with storage.open(self.source_path)
         return Path(self.source_path).open("rb")
 
     @property
@@ -380,6 +381,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
     @property
     def archive_file(self):
+        # TODO: S3 — replace with storage.open(self.archive_path)
         return Path(self.archive_path).open("rb")
 
     def get_public_filename(self, *, archive=False, counter=0, suffix=None) -> str:
@@ -417,6 +419,7 @@ class Document(SoftDeleteModel, ModelWithOwner):
 
     @property
     def thumbnail_file(self):
+        # TODO: S3 — replace with storage.open(self.thumbnail_path)
         return Path(self.thumbnail_path).open("rb")
 
     @property

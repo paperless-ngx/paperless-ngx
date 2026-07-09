@@ -1,7 +1,6 @@
 import datetime
 import hashlib
 import logging
-import shutil
 import uuid
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -16,7 +15,6 @@ from django.db import models
 from django.db import transaction
 from django.db.models.signals import post_save
 from django.utils import timezone
-from filelock import FileLock
 from whoosh.writing import AsyncWriter
 
 from documents import index
@@ -31,7 +29,6 @@ from documents.consumer import WorkflowTriggerPlugin
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.double_sided import CollatePlugin
-from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.matching import prefilter_documents_by_workflowtrigger
 from documents.models import Correspondent
@@ -54,6 +51,7 @@ from documents.signals import document_updated
 from documents.signals.handlers import cleanup_document_deletion
 from documents.signals.handlers import run_workflows
 from documents.workflows.utils import get_workflows_for_trigger
+from paperless.storage import get_storage
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -328,11 +326,12 @@ def update_document_content_maybe_archive_file(document_id):
                         action=LogEntry.Action.UPDATE,
                     )
 
-            with FileLock(settings.MEDIA_LOCK):
+            storage = get_storage()
+            with storage.acquire_lock():
                 if parser.get_archive_path():
-                    create_source_path_directory(document.archive_path)
-                    shutil.move(parser.get_archive_path(), document.archive_path)
-                shutil.move(thumbnail, document.thumbnail_path)
+                    storage.makedirs(document.archive_path)
+                    storage.move(parser.get_archive_path(), document.archive_path)
+                storage.move(thumbnail, document.thumbnail_path)
 
         document.refresh_from_db()
         logger.info(

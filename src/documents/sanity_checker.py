@@ -75,6 +75,7 @@ def check_sanity(*, progress=False, scheduled=True) -> SanityCheckMessages:
     )
     messages = SanityCheckMessages()
 
+    # TODO: S3 — replace with storage.glob() for remote backends
     present_files = {
         x.resolve()
         for x in Path(settings.MEDIA_ROOT).glob("**/*")

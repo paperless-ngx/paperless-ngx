@@ -197,6 +197,7 @@ from paperless.db import GnuPG
 from paperless.models import ApplicationConfiguration
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import UserSerializer
+from paperless.storage import get_storage
 from paperless.views import StandardPagination
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -881,10 +882,7 @@ class DocumentViewSet(
             return []
 
     def get_filesize(self, filename):
-        if Path(filename).is_file():
-            return Path(filename).stat().st_size
-        else:
-            return None
+        return get_storage().size(filename)
 
     @action(methods=["get"], detail=True, filter_backends=[])
     @method_decorator(cache_control(no_cache=True))

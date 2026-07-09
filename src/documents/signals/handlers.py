@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import hashlib
 import logging
-import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -23,12 +22,9 @@ from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import timezone
-from filelock import FileLock
 
 from documents import matching
 from documents.caching import clear_document_caches
-from documents.file_handling import create_source_path_directory
-from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
 from documents.file_handling import generate_unique_filename
 from documents.models import CustomField
@@ -53,6 +49,7 @@ from documents.workflows.mutations import apply_assignment_to_overrides
 from documents.workflows.mutations import apply_removal_to_document
 from documents.workflows.mutations import apply_removal_to_overrides
 from documents.workflows.utils import get_workflows_for_trigger
+from paperless.storage import get_storage
 
 if TYPE_CHECKING:
     from documents.classifier import DocumentClassifier
@@ -325,8 +322,9 @@ def set_storage_path(
 
 
 # see empty_trash in documents/tasks.py for signal handling
-def cleanup_document_deletion(sender, instance, **kwargs):
-    with FileLock(settings.MEDIA_LOCK):
+def cleanup_document_deletion(sender, instance, **kwargs) -> None:
+    storage = get_storage()
+    with storage.acquire_lock():
         if settings.EMPTY_TRASH_DIR:
             # Find a non-conflicting filename in case a document with the same
             # name was moved to trash earlier
@@ -347,7 +345,7 @@ def cleanup_document_deletion(sender, instance, **kwargs):
 
             logger.debug(f"Moving {instance.source_path} to trash at {new_file_path}")
             try:
-                shutil.move(instance.source_path, new_file_path)
+                storage.move(instance.source_path, new_file_path)
             except OSError as e:
                 logger.error(
                     f"Failed to move {instance.source_path} to trash at "
@@ -355,37 +353,18 @@ def cleanup_document_deletion(sender, instance, **kwargs):
                 )
                 return
 
-        files = (
-            instance.archive_path,
-            instance.thumbnail_path,
-        )
-        if not settings.EMPTY_TRASH_DIR:
-            # Only delete the original file if we are not moving it to trash dir
-            files += (instance.source_path,)
+        if settings.EMPTY_TRASH_DIR:
+            storage.delete(instance.archive_path)
+            storage.delete(instance.thumbnail_path)
+        else:
+            storage.delete(instance.source_path)
+            storage.delete(instance.archive_path)
+            storage.delete(instance.thumbnail_path)
 
-        for filename in files:
-            if filename and filename.is_file():
-                try:
-                    filename.unlink()
-                    logger.debug(f"Deleted file {filename}.")
-                except OSError as e:
-                    logger.warning(
-                        f"While deleting document {instance!s}, the file "
-                        f"{filename} could not be deleted: {e}",
-                    )
-            elif filename and not filename.is_file():
-                logger.warning(f"Expected {filename} to exist, but it did not")
-
-        delete_empty_directories(
-            Path(instance.source_path).parent,
-            root=settings.ORIGINALS_DIR,
-        )
+        storage.delete_empty_dirs(instance.source_path, settings.ORIGINALS_DIR)
 
         if instance.has_archive_version:
-            delete_empty_directories(
-                Path(instance.archive_path).parent,
-                root=settings.ARCHIVE_DIR,
-            )
+            storage.delete_empty_dirs(instance.archive_path, settings.ARCHIVE_DIR)
 
 
 class CannotMoveFilesException(Exception):
@@ -427,7 +406,9 @@ def update_filename_and_move_files(
             return
         instance = instance.document
 
-    def validate_move(instance, old_path: Path, new_path: Path, root: Path):
+    def validate_move(instance, old_path: Path, new_path: Path, root: Path) -> None:
+        # TODO: S3 — replace is_relative_to(root) + is_file() checks with
+        #  key-prefix check and storage.exists() for remote backends
         if not new_path.is_relative_to(root):
             msg = (
                 f"Document {instance!s}: Refusing to move file outside root {root}: "
@@ -459,7 +440,8 @@ def update_filename_and_move_files(
         # This will in turn cause this logic to move the file where it belongs.
         return
 
-    with FileLock(settings.MEDIA_LOCK):
+    storage = get_storage()
+    with storage.acquire_lock():
         try:
             # If this was waiting for the lock, the filename or archive_filename
             # of this document may have been updated.  This happens if multiple updates
@@ -574,8 +556,8 @@ def update_filename_and_move_files(
                     instance.source_path,
                     settings.ORIGINALS_DIR,
                 )
-                create_source_path_directory(instance.source_path)
-                shutil.move(old_source_path, instance.source_path)
+                storage.makedirs(instance.source_path)
+                storage.move(old_source_path, instance.source_path)
 
             if move_archive:
                 validate_move(
@@ -584,8 +566,8 @@ def update_filename_and_move_files(
                     instance.archive_path,
                     settings.ARCHIVE_DIR,
                 )
-                create_source_path_directory(instance.archive_path)
-                shutil.move(old_archive_path, instance.archive_path)
+                storage.makedirs(instance.archive_path)
+                storage.move(old_archive_path, instance.archive_path)
 
             # Don't save() here to prevent infinite recursion.
             Document.global_objects.filter(pk=instance.pk).update(
@@ -607,11 +589,11 @@ def update_filename_and_move_files(
             try:
                 if move_original and instance.source_path.is_file():
                     logger.info("Restoring previous original path")
-                    shutil.move(instance.source_path, old_source_path)
+                    storage.move(instance.source_path, old_source_path)
 
                 if move_archive and instance.archive_path.is_file():
                     logger.info("Restoring previous archive path")
-                    shutil.move(instance.archive_path, old_archive_path)
+                    storage.move(instance.archive_path, old_archive_path)
 
             except Exception:
                 # This is fine, since:
@@ -631,16 +613,10 @@ def update_filename_and_move_files(
         # finally, remove any empty sub folders. This will do nothing if
         # something has failed above.
         if not old_source_path.is_file():
-            delete_empty_directories(
-                Path(old_source_path).parent,
-                root=settings.ORIGINALS_DIR,
-            )
+            storage.delete_empty_dirs(old_source_path, settings.ORIGINALS_DIR)
 
         if instance.has_archive_version and not old_archive_path.is_file():
-            delete_empty_directories(
-                Path(old_archive_path).parent,
-                root=settings.ARCHIVE_DIR,
-            )
+            storage.delete_empty_dirs(old_archive_path, settings.ARCHIVE_DIR)
 
 
 @shared_task

@@ -44,6 +44,7 @@ dependencies = [
   "drf-spectacular-sidecar~=2025.10.1",
   "drf-writable-nested~=0.7.1",
   "filelock~=3.20.0",
+  "fsspec>=2024.1.0",
   "flower~=2.0.1",
   "gotenberg-client~=0.12.0",
   "httpx-oauth~=0.16",
@@ -82,6 +83,9 @@ optional-dependencies.postgres = [
   # Direct dependency for proper resolution of the pre-built wheels
   "psycopg-c==3.2.12",
   "psycopg-pool==3.2.7",
+]
+optional-dependencies.s3 = [
+  "s3fs>=2024.1.0",
 ]
 optional-dependencies.webserver = [
   "granian[uvloop]~=2.5.1",

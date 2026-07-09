@@ -12,13 +12,11 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
-from filelock import FileLock
 from rest_framework.reverse import reverse
 
 from documents.classifier import load_classifier
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
-from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_filename
 from documents.file_handling import generate_unique_filename
 from documents.loggers import LoggingMixin
@@ -45,9 +43,9 @@ from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
 from documents.signals.handlers import run_workflows
 from documents.templating.workflows import parse_w_workflow_placeholders
-from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
+from paperless.storage import get_storage
 from paperless_mail.parsers import MailDocumentParser
 
 
@@ -493,7 +491,8 @@ class ConsumerPlugin(
 
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
-                with FileLock(settings.MEDIA_LOCK):
+                storage = get_storage()
+                with storage.acquire_lock():
                     generated_filename = generate_unique_filename(document)
                     if (
                         len(str(generated_filename))
@@ -507,7 +506,7 @@ class ConsumerPlugin(
                             use_format=False,
                         )
                     document.filename = generated_filename
-                    create_source_path_directory(document.source_path)
+                    storage.makedirs(document.source_path)
 
                     self._write(
                         document.storage_type,
@@ -541,7 +540,7 @@ class ConsumerPlugin(
                                 use_format=False,
                             )
                         document.archive_filename = generated_archive_filename
-                        create_source_path_directory(document.archive_path)
+                        storage.makedirs(document.archive_path)
                         self._write(
                             document.storage_type,
                             archive_path,
@@ -762,18 +761,8 @@ class ConsumerPlugin(
                 }
                 CustomFieldInstance.objects.create(**args)  # adds to document
 
-    def _write(self, storage_type, source, target):
-        with (
-            Path(source).open("rb") as read_file,
-            Path(target).open("wb") as write_file,
-        ):
-            write_file.write(read_file.read())
-
-        # Attempt to copy file's original stats, but it's ok if we can't
-        try:
-            copy_basic_file_stats(source, target)
-        except Exception:  # pragma: no cover
-            pass
+    def _write(self, storage_type, source, target) -> None:
+        get_storage().write(target, source)
 
 
 class ConsumerPreflightPlugin(

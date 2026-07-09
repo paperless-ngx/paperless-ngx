@@ -75,6 +75,7 @@ class BulkArchiveStrategy:
 
 class OriginalsOnlyStrategy(BulkArchiveStrategy):
     def add_document(self, doc: Document) -> None:
+        # TODO: S3 — use storage.get() to stage file locally before zipf.write()
         self.zipf.write(doc.source_path, self.make_unique_filename(doc))
 
 

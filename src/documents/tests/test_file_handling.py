@@ -543,7 +543,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
     @override_settings(FILENAME_FORMAT="{title}")
     @mock.patch("documents.signals.handlers.Document.objects.filter")
-    @mock.patch("documents.signals.handlers.shutil.move")
+    @mock.patch("paperless.storage.PaperlessStorage.move")
     def test_no_move_only_save(self, mock_move, mock_filter):
         """
         GIVEN:
@@ -769,7 +769,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
         self.assertIsFile(doc.archive_path)
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
-    @mock.patch("documents.signals.handlers.shutil.move")
+    @mock.patch("paperless.storage.PaperlessStorage.move")
     def test_move_archive_error(self, m):
         def fake_rename(src, dst):
             if "archive" in str(src):
@@ -820,7 +820,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
         self.assertIsFile(doc.archive_path)
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
-    @mock.patch("documents.signals.handlers.shutil.move")
+    @mock.patch("paperless.storage.PaperlessStorage.move")
     def test_move_file_error(self, m):
         def fake_rename(src, dst):
             if "original" in str(src):
