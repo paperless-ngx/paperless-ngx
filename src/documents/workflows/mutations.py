@@ -40,7 +40,7 @@ def apply_assignment_to_document(
 
     if action.assign_title:
         try:
-            document.title = parse_w_workflow_placeholders(
+            title = parse_w_workflow_placeholders(
                 action.assign_title,
                 document.correspondent.name if document.correspondent else "",
                 document.document_type.name if document.document_type else "",
@@ -53,6 +53,8 @@ def apply_assignment_to_document(
                 "",  # no urls in titles
                 document.pk,
             )
+            if title:
+                document.title = title
         except Exception:  # pragma: no cover
             logger.exception(
                 f"Error occurred parsing title assignment '{action.assign_title}', falling back to original",
