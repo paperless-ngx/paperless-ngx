@@ -689,7 +689,7 @@ export class SettingsService {
   }
 
   offerTour(): boolean {
-    return this.dashboardIsEmpty && !this.get(SETTINGS_KEYS.TOUR_COMPLETE)
+    return this.dashboardIsEmpty() && !this.get(SETTINGS_KEYS.TOUR_COMPLETE)
   }
 
   completeTour() {
