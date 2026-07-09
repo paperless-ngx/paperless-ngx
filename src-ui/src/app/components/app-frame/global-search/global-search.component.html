@@ -9,16 +9,16 @@
                     autocomplete="off"
                     spellcheck="false"
                     [(ngModel)]="query"
-                    (ngModelChange)="this.queryDebounce.next($event)"
+                    (ngModelChange)="queryDebounce.next($event)"
                     (keydown)="searchInputKeyDown($event)"
                     ngbDropdownAnchor>
                 <div class="position-absolute top-50 end-0 translate-middle">
-                    @if (loading) {
+                    @if (loading()) {
                         <div class="spinner-border spinner-border-sm text-muted mt-1"></div>
                     }
                 </div>
             </div>
-            @if (query) {
+            @if (query()) {
                 <button class="btn btn-sm btn-outline-secondary" type="button" (click)="runFullSearch()">
                     @if (useAdvancedForFullSearch) {
                         <ng-container i18n>Advanced search</ng-container>
@@ -77,88 +77,88 @@
 
     <div ngbDropdownMenu class="w-100 mh-75 overflow-y-scroll shadow-lg">
         <div (keydown)="dropdownKeyDown($event)">
-            @if (searchResults?.total === 0) {
+            @if (searchResults()?.total === 0) {
                 <h6 class="dropdown-header" i18n="@@searchResults.noResults">No results</h6>
             } @else {
-                @if (searchResults?.documents.length) {
+                @if (searchResults()?.documents.length) {
                     <h6 class="dropdown-header" i18n="@@searchResults.documents">Documents</h6>
-                    @for (document of searchResults.documents; track document.id) {
+                    @for (document of searchResults().documents; track document.id) {
                         <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: document, nameProp: 'title', type: DataType.Document, icon: 'file-text', date: document.created}"></ng-container>
                     }
                 }
-                @if (searchResults?.saved_views.length) {
+                @if (searchResults()?.saved_views.length) {
                     <h6 class="dropdown-header" i18n="@@searchResults.saved_views">Saved Views</h6>
-                    @for (saved_view of searchResults.saved_views; track saved_view.id) {
+                    @for (saved_view of searchResults().saved_views; track saved_view.id) {
                         <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: saved_view, nameProp: 'name', type: DataType.SavedView, icon: 'funnel'}"></ng-container>
                     }
                 }
 
-                @if (searchResults?.tags.length) {
+                @if (searchResults()?.tags.length) {
                     <h6 class="dropdown-header" i18n="@@searchResults.tags">Tags</h6>
-                    @for (tag of searchResults.tags; track tag.id) {
+                    @for (tag of searchResults().tags; track tag.id) {
                         <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: tag, nameProp: 'name', type: DataType.Tag, icon: 'tag'}"></ng-container>
                     }
                 }
 
-                @if (searchResults?.correspondents.length) {
+                @if (searchResults()?.correspondents.length) {
                     <h6 class="dropdown-header" i18n="@@searchResults.correspondents">Correspondents</h6>
-                    @for (correspondent of searchResults.correspondents; track correspondent.id) {
+                    @for (correspondent of searchResults().correspondents; track correspondent.id) {
                         <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: correspondent, nameProp: 'name', type: DataType.Correspondent, icon: 'person'}"></ng-container>
                     }
                 }
 
-                @if (searchResults?.document_types.length) {
+                @if (searchResults()?.document_types.length) {
                     <h6 class="dropdown-header" i18n="@@searchResults.documentTypes">Document types</h6>
-                    @for (documentType of searchResults.document_types; track documentType.id) {
+                    @for (documentType of searchResults().document_types; track documentType.id) {
                         <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: documentType, nameProp: 'name', type: DataType.DocumentType, icon: 'file-earmark'}"></ng-container>
                     }
                 }
 
-                @if (searchResults?.storage_paths.length) {
+                @if (searchResults()?.storage_paths.length) {
                     <h6 class="dropdown-header" i18n="@@searchResults.storagePaths">Storage paths</h6>
-                    @for (storagePath of searchResults.storage_paths; track storagePath.id) {
+                    @for (storagePath of searchResults().storage_paths; track storagePath.id) {
                         <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: storagePath, nameProp: 'name', type: DataType.StoragePath, icon: 'folder'}"></ng-container>
                     }
                 }
 
-                @if (searchResults?.users.length) {
+                @if (searchResults()?.users.length) {
                     <h6 class="dropdown-header" i18n="@@searchResults.users">Users</h6>
-                    @for (user of searchResults.users; track user.id) {
+                    @for (user of searchResults().users; track user.id) {
                         <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: user, nameProp: 'username', type: DataType.User, icon: 'person-square'}"></ng-container>
                     }
                 }
 
-                @if (searchResults?.groups.length) {
+                @if (searchResults()?.groups.length) {
                     <h6 class="dropdown-header" i18n="@@searchResults.groups">Groups</h6>
-                    @for (group of searchResults.groups; track group.id) {
+                    @for (group of searchResults().groups; track group.id) {
                         <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: group, nameProp: 'name', type: DataType.Group, icon: 'people'}"></ng-container>
                     }
                 }
 
-                @if (searchResults?.custom_fields.length) {
+                @if (searchResults()?.custom_fields.length) {
                     <h6 class="dropdown-header" i18n="@@searchResults.customFields">Custom fields</h6>
-                    @for (customField of searchResults.custom_fields; track customField.id) {
+                    @for (customField of searchResults().custom_fields; track customField.id) {
                         <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: customField, nameProp: 'name', type: DataType.CustomField, icon: 'ui-radios'}"></ng-container>
                     }
                 }
 
-                @if (searchResults?.mail_accounts.length) {
+                @if (searchResults()?.mail_accounts.length) {
                     <h6 class="dropdown-header" i18n="@@searchResults.mailAccounts">Mail accounts</h6>
-                    @for (mailAccount of searchResults.mail_accounts; track mailAccount.id) {
+                    @for (mailAccount of searchResults().mail_accounts; track mailAccount.id) {
                         <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: mailAccount, nameProp: 'name', type: DataType.MailAccount, icon: 'envelope-at'}"></ng-container>
                     }
                 }
 
-                @if (searchResults?.mail_rules.length) {
+                @if (searchResults()?.mail_rules.length) {
                     <h6 class="dropdown-header" i18n="@@searchResults.mailRules">Mail rules</h6>
-                    @for (mailRule of searchResults.mail_rules; track mailRule.id) {
+                    @for (mailRule of searchResults().mail_rules; track mailRule.id) {
                         <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: mailRule, nameProp: 'name', type: DataType.MailRule, icon: 'envelope'}"></ng-container>
                     }
                 }
 
-                @if (searchResults?.workflows.length) {
+                @if (searchResults()?.workflows.length) {
                     <h6 class="dropdown-header" i18n="@@searchResults.workflows">Workflows</h6>
-                    @for (workflow of searchResults.workflows; track workflow.id) {
+                    @for (workflow of searchResults().workflows; track workflow.id) {
                         <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: workflow, nameProp: 'name', type: DataType.Workflow, icon: 'boxes'}"></ng-container>
                     }
                 }

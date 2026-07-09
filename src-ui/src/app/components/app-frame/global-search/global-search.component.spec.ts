@@ -170,7 +170,7 @@ describe('GlobalSearchComponent', () => {
     document.dispatchEvent(new KeyboardEvent('keydown', { key: '/' }))
     expect(focusSpy).toHaveBeenCalled()
 
-    component.searchResults = searchResults as any
+    component.searchResults.set(searchResults as any)
     component.resultsDropdown.open()
     fixture.detectChanges()
 
@@ -238,26 +238,26 @@ describe('GlobalSearchComponent', () => {
     )
     expect(component['currentItemIndex']).toBe(0)
 
-    component.searchResults = { total: 1 } as any
+    component.searchResults.set({ total: 1 } as any)
     const primaryActionSpy = jest.spyOn(component, 'primaryAction')
     component.searchInputKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }))
     expect(primaryActionSpy).toHaveBeenCalled()
 
-    component.query = 'test'
+    component.query.set('test')
     const resetSpy = jest.spyOn(GlobalSearchComponent.prototype as any, 'reset')
     component.searchInputKeyDown(
       new KeyboardEvent('keydown', { key: 'Escape' })
     )
     expect(resetSpy).toHaveBeenCalled()
 
-    component.query = ''
+    component.query.set('')
     const blurSpy = jest.spyOn(component.searchInput.nativeElement, 'blur')
     component.searchInputKeyDown(
       new KeyboardEvent('keydown', { key: 'Escape' })
     )
     expect(blurSpy).toHaveBeenCalled()
 
-    component.searchResults = { total: 1 } as any
+    component.searchResults.set({ total: 1 } as any)
     component.resultsDropdown.open()
 
     component.searchInputKeyDown(
@@ -268,9 +268,9 @@ describe('GlobalSearchComponent', () => {
     component.dropdownKeyDown(new KeyboardEvent('keydown', { key: 'Escape' }))
     expect(closeSpy).toHaveBeenCalled()
 
-    component.searchResults = searchResults as any
+    component.searchResults.set(searchResults as any)
     component.resultsDropdown.open()
-    component.query = 'test'
+    component.query.set('test')
     const advancedSearchSpy = jest.spyOn(component, 'runFullSearch')
     component.searchInputKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }))
     expect(advancedSearchSpy).toHaveBeenCalled()
@@ -471,7 +471,7 @@ describe('GlobalSearchComponent', () => {
   })
 
   it('should support focus current item', () => {
-    component.searchResults = searchResults as any
+    component.searchResults.set(searchResults as any)
     fixture.detectChanges()
     const focusSpy = jest.spyOn(
       component.primaryButtons.get(0).nativeElement,
@@ -489,7 +489,7 @@ describe('GlobalSearchComponent', () => {
   })
 
   it('should focus button on dropdown item hover', () => {
-    component.searchResults = searchResults as any
+    component.searchResults.set(searchResults as any)
     fixture.detectChanges()
     const item: ElementRef = component.resultItems.first
     const focusSpy = jest.spyOn(
@@ -515,7 +515,7 @@ describe('GlobalSearchComponent', () => {
     component.primaryAction(DataType.Document, { id: 2 }, event as any)
     expect(openSpy).toHaveBeenCalledWith('/documents/2', '_blank')
 
-    component.searchResults = searchResults as any
+    component.searchResults.set(searchResults as any)
     component.resultsDropdown.open()
     fixture.detectChanges()
 
@@ -542,7 +542,7 @@ describe('GlobalSearchComponent', () => {
 
   it('should support title content search and advanced search', () => {
     const qfSpy = jest.spyOn(documentListViewService, 'quickFilter')
-    component.query = 'test'
+    component.query.set('test')
     component.runFullSearch()
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_SIMPLE_TEXT, value: 'test' },
@@ -552,7 +552,7 @@ describe('GlobalSearchComponent', () => {
       SETTINGS_KEYS.SEARCH_FULL_TYPE,
       GlobalSearchType.ADVANCED
     )
-    component.query = 'test'
+    component.query.set('test')
     component.runFullSearch()
     expect(qfSpy).toHaveBeenCalledWith([
       { rule_type: FILTER_FULLTEXT_QUERY, value: 'test' },

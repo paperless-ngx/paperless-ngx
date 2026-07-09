@@ -1,10 +1,9 @@
 import {
   Component,
   EventEmitter,
-  Input,
   Output,
   ViewChild,
-  signal,
+  input,
 } from '@angular/core'
 import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -21,46 +20,10 @@ export class SuggestionsDropdownComponent {
   public popperOptions = pngxPopperOptions
 
   @ViewChild('dropdown') dropdown: NgbDropdown
-  private suggestionsSignal = signal<DocumentSuggestions>(null)
-  private aiEnabledSignal = signal(false)
-  private loadingSignal = signal(false)
-  private disabledSignal = signal(false)
-
-  @Input()
-  get suggestions(): DocumentSuggestions {
-    return this.suggestionsSignal()
-  }
-
-  set suggestions(suggestions: DocumentSuggestions) {
-    this.suggestionsSignal.set(suggestions)
-  }
-
-  @Input()
-  get aiEnabled(): boolean {
-    return this.aiEnabledSignal()
-  }
-
-  set aiEnabled(aiEnabled: boolean) {
-    this.aiEnabledSignal.set(aiEnabled)
-  }
-
-  @Input()
-  get loading(): boolean {
-    return this.loadingSignal()
-  }
-
-  set loading(loading: boolean) {
-    this.loadingSignal.set(loading)
-  }
-
-  @Input()
-  get disabled(): boolean {
-    return this.disabledSignal()
-  }
-
-  set disabled(disabled: boolean) {
-    this.disabledSignal.set(disabled)
-  }
+  readonly suggestions = input<DocumentSuggestions>(null)
+  readonly aiEnabled = input(false)
+  readonly loading = input(false)
+  readonly disabled = input(false)
 
   @Output()
   getSuggestions: EventEmitter<SuggestionsDropdownComponent> =
@@ -77,14 +40,14 @@ export class SuggestionsDropdownComponent {
 
   public clickSuggest(): void {
     if (
-      this.disabled ||
-      this.loading ||
-      (this.suggestions && !this.aiEnabled)
+      this.disabled() ||
+      this.loading() ||
+      (this.suggestions() && !this.aiEnabled())
     ) {
       return
     }
 
-    if (!this.suggestions) {
+    if (!this.suggestions()) {
       this.getSuggestions.emit(this)
     } else {
       this.dropdown?.toggle()
@@ -93,9 +56,9 @@ export class SuggestionsDropdownComponent {
 
   get totalSuggestions(): number {
     return (
-      this.suggestions?.suggested_correspondents?.length +
-        this.suggestions?.suggested_tags?.length +
-        this.suggestions?.suggested_document_types?.length || 0
+      this.suggestions()?.suggested_correspondents?.length +
+        this.suggestions()?.suggested_tags?.length +
+        this.suggestions()?.suggested_document_types?.length || 0
     )
   }
 }
