@@ -66,7 +66,7 @@ export class SavedViewsComponent
   public isDirty$: Observable<boolean>
 
   get displayFields() {
-    return this.settings.allDisplayFields
+    return this.settings.allDisplayFields()
   }
 
   public get savedViews(): SavedView[] {

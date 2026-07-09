@@ -106,7 +106,7 @@ describe('TagsComponent', () => {
 
     modalService = TestBed.inject(NgbModal)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = { id: 1 }
+    settingsService.currentUser.set({ id: 1 } as any)
     fixture = TestBed.createComponent(TagsComponent)
     fixture.debugElement.injector.get(NG_VALUE_ACCESSOR)
     component = fixture.componentInstance

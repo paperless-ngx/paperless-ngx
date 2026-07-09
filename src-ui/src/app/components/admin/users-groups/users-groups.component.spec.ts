@@ -57,7 +57,7 @@ describe('UsersAndGroupsComponent', () => {
     }).compileComponents()
     fixture = TestBed.createComponent(UsersAndGroupsComponent)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = users[0]
+    settingsService.currentUser.set(users[0])
     userService = TestBed.inject(UserService)
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)

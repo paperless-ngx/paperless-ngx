@@ -392,22 +392,22 @@ describe('SettingsService', () => {
     req.flush(ui_settings)
     settingsService.initializeDisplayFields()
     expect(
-      settingsService.allDisplayFields.includes(DEFAULT_DISPLAY_FIELDS[0])
+      settingsService.allDisplayFields().includes(DEFAULT_DISPLAY_FIELDS[0])
     ).toBeTruthy() // title
     expect(
-      settingsService.allDisplayFields.includes(DEFAULT_DISPLAY_FIELDS[4])
+      settingsService.allDisplayFields().includes(DEFAULT_DISPLAY_FIELDS[4])
     ).toBeFalsy() // correspondent
 
     settingsService.set(SETTINGS_KEYS.NOTES_ENABLED, false)
     settingsService.initializeDisplayFields()
     expect(
-      settingsService.allDisplayFields.includes(DEFAULT_DISPLAY_FIELDS[8])
+      settingsService.allDisplayFields().includes(DEFAULT_DISPLAY_FIELDS[8])
     ).toBeFalsy() // notes
 
     jest.spyOn(permissionService, 'currentUserCan').mockReturnValue(true)
     settingsService.initializeDisplayFields()
     expect(
-      settingsService.allDisplayFields.includes(DEFAULT_DISPLAY_FIELDS[4])
+      settingsService.allDisplayFields().includes(DEFAULT_DISPLAY_FIELDS[4])
     ).toBeTruthy() // correspondent
   })
 
@@ -422,12 +422,14 @@ describe('SettingsService', () => {
     )
     settingsService.initializeDisplayFields()
     expect(
-      settingsService.allDisplayFields.includes(DEFAULT_DISPLAY_FIELDS[0])
+      settingsService.allDisplayFields().includes(DEFAULT_DISPLAY_FIELDS[0])
     ).toBeTruthy()
     expect(
-      settingsService.allDisplayFields.find(
-        (f) => f.id === `${DisplayField.CUSTOM_FIELD}${customFields[0].id}`
-      ).name
+      settingsService
+        .allDisplayFields()
+        .find(
+          (f) => f.id === `${DisplayField.CUSTOM_FIELD}${customFields[0].id}`
+        ).name
     ).toEqual(customFields[0].name)
   })
 })

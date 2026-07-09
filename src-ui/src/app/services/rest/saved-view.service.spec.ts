@@ -96,7 +96,7 @@ describe(`Additional service tests for SavedViewService`, () => {
   })
 
   it('should sort dashboard views', () => {
-    service['savedViews'] = saved_views
+    service['savedViews'].set(saved_views)
     jest.spyOn(settingsService, 'get').mockImplementation((key) => {
       if (key === SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS) return [1, 2, 3]
       if (key === SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER) return [3, 1, 2]
@@ -110,7 +110,7 @@ describe(`Additional service tests for SavedViewService`, () => {
   })
 
   it('should use user-specific dashboard visibility when configured', () => {
-    service['savedViews'] = saved_views
+    service['savedViews'].set(saved_views)
     jest.spyOn(settingsService, 'get').mockImplementation((key) => {
       if (key === SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS) return [4, 2]
       if (key === SETTINGS_KEYS.DASHBOARD_VIEWS_SORT_ORDER) return []
@@ -119,7 +119,7 @@ describe(`Additional service tests for SavedViewService`, () => {
   })
 
   it('should sort sidebar views', () => {
-    service['savedViews'] = saved_views
+    service['savedViews'].set(saved_views)
     jest.spyOn(settingsService, 'get').mockImplementation((key) => {
       if (key === SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS) return [1, 2, 3]
       if (key === SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER) return [3, 1, 2]
@@ -133,7 +133,7 @@ describe(`Additional service tests for SavedViewService`, () => {
   })
 
   it('should use user-specific sidebar visibility when configured', () => {
-    service['savedViews'] = saved_views
+    service['savedViews'].set(saved_views)
     jest.spyOn(settingsService, 'get').mockImplementation((key) => {
       if (key === SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS) return [4, 2]
       if (key === SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER) return []

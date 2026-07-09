@@ -122,7 +122,7 @@ describe('EditDialogComponent', () => {
     tagService = TestBed.inject(TagService)
     permissionsService = TestBed.inject(PermissionsService)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = currentUser
+    settingsService.currentUser.set(currentUser as any)
     permissionsService.initialize([], currentUser as any)
     activeModal = TestBed.inject(NgbActiveModal)
     httpTestingController = TestBed.inject(HttpTestingController)
