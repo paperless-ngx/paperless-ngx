@@ -27,7 +27,7 @@
             <label class="form-check-label w-100 text-start" for="useArchiveVersion" i18n>Use archive version</label>
         </div>
         <button type="submit" class="btn btn-outline-primary" (click)="emailDocuments()" [disabled]="loading || emailAddress.length === 0 || emailMessage.length === 0 || emailSubject.length === 0">
-            @if (loading) {
+            @if (loading()) {
                 <div class="spinner-border spinner-border-sm me-2" role="status"></div>
             }
             <ng-container i18n>Send email</ng-container>

@@ -4,7 +4,7 @@
 </div>
 
 <div class="modal-body">
-  @if (loading) {
+  @if (loading()) {
     <div class="d-flex align-items-center gap-2">
       <div class="spinner-border spinner-border-sm" role="status"></div>
       <span i18n>Loading share link bundles…</span>
