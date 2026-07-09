@@ -1847,6 +1847,45 @@ class TestWorkflows(
 
         self.assertEqual(doc.title, "Doc {created_year]")
 
+    def test_document_added_malformed_title_template_falls_back(self) -> None:
+        """
+        GIVEN:
+            - Existing workflow with added trigger type
+            - Assign title field is malformed Jinja2 syntax
+        WHEN:
+            - File that matches is added
+        THEN:
+            - Title assignment is skipped and the original title is kept
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_filename="*sample*",
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc {{ unclosed",
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            original_filename="sample.pdf",
+            title="sample test",
+            content="Hello world bar",
+        )
+
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=doc,
+        )
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.title, "sample test")
+
     def test_document_updated_workflow_ignores_version_documents(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
