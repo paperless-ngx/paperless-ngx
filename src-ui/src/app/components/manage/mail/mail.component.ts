@@ -359,7 +359,7 @@ export class MailComponent
       backdrop: 'static',
       size: 'xl',
     })
-    modal.componentInstance.rule = rule
+    modal.componentInstance.rule.set(rule)
   }
 
   userCanEdit(obj: ObjectWithPermissions): boolean {

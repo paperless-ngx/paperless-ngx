@@ -28,8 +28,8 @@ export class ShareLinksDialogComponent implements OnInit {
   readonly expirationOptions = SHARE_LINK_EXPIRATION_OPTIONS
 
   readonly title = input($localize`Share Links`)
-  readonly documentId = input<number>(undefined)
-  readonly hasArchiveVersion = input(true)
+  readonly documentId = signal<number>(undefined)
+  readonly hasArchiveVersion = signal(true)
   readonly shareLinks = signal<ShareLink[]>(undefined)
   readonly loading = signal(false)
   readonly copied = signal<number>(undefined)

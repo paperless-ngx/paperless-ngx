@@ -56,7 +56,7 @@ describe('ShareLinksDialogComponent', () => {
 
   it('should support refresh to retrieve links', () => {
     const getSpy = jest.spyOn(shareLinkService, 'getLinksForDocument')
-    fixture.componentRef.setInput('documentId', 99)
+    component.documentId.set(99)
 
     const now = new Date()
     const expiration7days = new Date()
@@ -96,7 +96,7 @@ describe('ShareLinksDialogComponent', () => {
     jest
       .spyOn(shareLinkService, 'getLinksForDocument')
       .mockReturnValueOnce(throwError(() => new Error('Unable to get links')))
-    fixture.componentRef.setInput('documentId', 99)
+    component.documentId.set(99)
 
     component.ngOnInit()
     fixture.detectChanges()
@@ -105,7 +105,7 @@ describe('ShareLinksDialogComponent', () => {
 
   it('should support link creation then refresh & copy url', fakeAsync(() => {
     const createSpy = jest.spyOn(shareLinkService, 'createLinkForDocument')
-    fixture.componentRef.setInput('documentId', 99)
+    component.documentId.set(99)
     component.expirationDays = 7
     component.useArchiveVersion = false
 
@@ -135,7 +135,7 @@ describe('ShareLinksDialogComponent', () => {
   }))
 
   it('should show error on link creation if needed', () => {
-    fixture.componentRef.setInput('documentId', 99)
+    component.documentId.set(99)
     component.expirationDays = 7
 
     const expiration = new Date()
@@ -227,7 +227,7 @@ describe('ShareLinksDialogComponent', () => {
   })
 
   it('should disable archive switch & option if no archive available', (done) => {
-    fixture.componentRef.setInput('hasArchiveVersion', false)
+    component.hasArchiveVersion.set(false)
     component.ngOnInit()
     fixture.detectChanges()
     expect(component.useArchiveVersion).toBeFalsy()

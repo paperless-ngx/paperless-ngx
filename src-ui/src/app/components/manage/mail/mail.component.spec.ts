@@ -414,6 +414,6 @@ describe('MailComponent', () => {
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
     component.viewProcessedMail(mailRules[0] as MailRule)
     const dialog = modal.componentInstance as any
-    expect(dialog.rule).toEqual(mailRules[0])
+    expect(dialog.rule()).toEqual(mailRules[0])
   })
 })

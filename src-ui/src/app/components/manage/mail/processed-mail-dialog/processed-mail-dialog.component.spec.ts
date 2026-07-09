@@ -64,7 +64,7 @@ describe('ProcessedMailDialogComponent', () => {
     toastService = TestBed.inject(ToastService)
     fixture = TestBed.createComponent(ProcessedMailDialogComponent)
     component = fixture.componentInstance
-    fixture.componentRef.setInput('rule', rule)
+    component.rule.set(rule)
   })
 
   afterEach(() => {

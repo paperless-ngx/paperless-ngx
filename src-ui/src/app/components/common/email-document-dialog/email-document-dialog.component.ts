@@ -1,4 +1,4 @@
-import { Component, Input, inject, signal } from '@angular/core'
+import { Component, effect, inject, signal } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -17,36 +17,9 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
   private documentService = inject(DocumentService)
   private toastService = inject(ToastService)
 
-  private documentIdsSignal = signal<number[]>(undefined)
-  private hasArchiveVersionSignal = signal(true)
-  private useArchiveVersionSignal = signal(true)
-
-  @Input()
-  get documentIds(): number[] {
-    return this.documentIdsSignal()
-  }
-
-  set documentIds(documentIds: number[]) {
-    this.documentIdsSignal.set(documentIds)
-  }
-
-  get useArchiveVersion(): boolean {
-    return this.useArchiveVersionSignal()
-  }
-
-  set useArchiveVersion(useArchiveVersion: boolean) {
-    this.useArchiveVersionSignal.set(useArchiveVersion)
-  }
-
-  @Input()
-  set hasArchiveVersion(value: boolean) {
-    this.hasArchiveVersionSignal.set(value)
-    this.useArchiveVersion = value
-  }
-
-  get hasArchiveVersion(): boolean {
-    return this.hasArchiveVersionSignal()
-  }
+  readonly documentIds = signal<number[]>(undefined)
+  readonly hasArchiveVersion = signal(true)
+  readonly useArchiveVersion = signal(true)
 
   public emailAddress: string = ''
   public emailSubject: string = ''
@@ -55,17 +28,20 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
   constructor() {
     super()
     this.loading.set(false)
+    effect(() => {
+      this.useArchiveVersion.set(this.hasArchiveVersion())
+    })
   }
 
   public emailDocuments() {
     this.loading.set(true)
     this.documentService
       .emailDocuments(
-        this.documentIds,
+        this.documentIds(),
         this.emailAddress,
         this.emailSubject,
         this.emailMessage,
-        this.useArchiveVersion
+        this.useArchiveVersion()
       )
       .subscribe({
         next: () => {
@@ -79,7 +55,7 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
         error: (e) => {
           this.loading.set(false)
           const errorMessage =
-            this.documentIds.length > 1
+            this.documentIds().length > 1
               ? $localize`Error emailing documents`
               : $localize`Error emailing document`
           this.toastService.showError(errorMessage, e)

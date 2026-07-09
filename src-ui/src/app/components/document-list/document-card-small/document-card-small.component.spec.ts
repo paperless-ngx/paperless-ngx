@@ -46,15 +46,15 @@ describe('DocumentCardSmallComponent', () => {
 
     fixture = TestBed.createComponent(DocumentCardSmallComponent)
     component = fixture.componentInstance
-    component.document = Object.assign({}, doc)
+    fixture.componentRef.setInput('document', Object.assign({}, doc))
     fixture.detectChanges()
     jest.useFakeTimers()
   })
 
   it('should show the card', () => {
-    expect(component.show).toBeTruthy()
+    expect(component.show()).toBeTruthy()
     component.ngAfterViewInit()
-    expect(component.show).toBeTruthy()
+    expect(component.show()).toBeTruthy()
   })
 
   it('should display page count', () => {
@@ -66,7 +66,10 @@ describe('DocumentCardSmallComponent', () => {
     expect(
       fixture.debugElement.queryAll(By.directive(TagComponent))
     ).toHaveLength(5)
-    component.document = { ...component.document, tags: [1, 2] }
+    fixture.componentRef.setInput('document', {
+      ...component.document(),
+      tags: [1, 2],
+    })
     fixture.detectChanges()
     expect(
       fixture.debugElement.queryAll(By.directive(TagComponent))
@@ -74,7 +77,10 @@ describe('DocumentCardSmallComponent', () => {
   })
 
   it('should increase limit tags to 6 if no notes', () => {
-    component.document = { ...component.document, notes: [] }
+    fixture.componentRef.setInput('document', {
+      ...component.document(),
+      notes: [],
+    })
     fixture.detectChanges()
     expect(
       fixture.debugElement.queryAll(By.directive(TagComponent))
@@ -84,7 +90,10 @@ describe('DocumentCardSmallComponent', () => {
   it('should clear hidden tag counter when tag count falls below the limit', () => {
     expect(component.moreTags).toEqual(3)
 
-    component.document = { ...component.document, tags: [1, 2, 3, 4, 5, 6] }
+    fixture.componentRef.setInput('document', {
+      ...component.document(),
+      tags: [1, 2, 3, 4, 5, 6],
+    })
     fixture.detectChanges()
 
     expect(component.moreTags).toBeNull()

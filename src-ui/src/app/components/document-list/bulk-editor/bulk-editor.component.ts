@@ -933,7 +933,7 @@ export class BulkEditorComponent
     rotateDialog.messageBold = $localize`This operation will add rotated versions of the ${this.getSelectionSize()} document(s).`
     rotateDialog.btnClass = 'btn-danger'
     rotateDialog.btnCaption = $localize`Proceed`
-    rotateDialog.documentID = Array.from(this.list.selected)[0]
+    rotateDialog.documentID.set(Array.from(this.list.selected)[0])
     rotateDialog.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
@@ -1080,7 +1080,7 @@ export class BulkEditorComponent
     const modal = this.modalService.open(EmailDocumentDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.documentIds = Array.from(this.list.selected)
-    modal.componentInstance.hasArchiveVersion = allHaveArchiveVersion
+    modal.componentInstance.documentIds.set(Array.from(this.list.selected))
+    modal.componentInstance.hasArchiveVersion.set(allHaveArchiveVersion)
   }
 }

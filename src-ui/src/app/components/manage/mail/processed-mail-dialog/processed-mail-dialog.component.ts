@@ -1,5 +1,5 @@
 import { SlicePipe } from '@angular/common'
-import { Component, inject, Input, OnInit, signal } from '@angular/core'
+import { Component, inject, OnInit, signal } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
   NgbActiveModal,
@@ -36,22 +36,13 @@ export class ProcessedMailDialogComponent implements OnInit {
   private readonly processedMailService = inject(ProcessedMailService)
   private readonly toastService = inject(ToastService)
 
-  private readonly ruleSignal = signal<MailRule>(undefined)
+  readonly rule = signal<MailRule>(undefined)
   readonly processedMails = signal<ProcessedMail[]>([])
   readonly loading = signal(true)
   readonly toggleAllEnabled = signal(false)
   readonly selectedMailIds = signal<Set<number>>(new Set())
 
   public page: number = 1
-
-  @Input()
-  get rule(): MailRule {
-    return this.ruleSignal()
-  }
-
-  set rule(rule: MailRule) {
-    this.ruleSignal.set(rule)
-  }
 
   ngOnInit(): void {
     this.loadProcessedMails()
@@ -65,7 +56,7 @@ export class ProcessedMailDialogComponent implements OnInit {
     this.loading.set(true)
     this.clearSelection()
     this.processedMailService
-      .list(this.page, 50, 'processed_at', true, { rule: this.rule.id })
+      .list(this.page, 50, 'processed_at', true, { rule: this.rule().id })
       .subscribe((result) => {
         this.processedMails.set(result.results)
         this.loading.set(false)

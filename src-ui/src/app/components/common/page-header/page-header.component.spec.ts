@@ -34,6 +34,7 @@ describe('PageHeaderComponent', () => {
   it('should set html title', () => {
     const titleSpy = jest.spyOn(titleService, 'setTitle')
     fixture.componentRef.setInput('title', 'Foo Bar')
+    fixture.detectChanges()
     expect(titleSpy).toHaveBeenCalledWith(`Foo Bar - ${environment.appTitle}`)
   })
 

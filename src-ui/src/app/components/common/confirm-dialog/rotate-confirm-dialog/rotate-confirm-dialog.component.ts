@@ -13,33 +13,12 @@ import { ConfirmDialogComponent } from '../confirm-dialog.component'
 export class RotateConfirmDialogComponent extends ConfirmDialogComponent {
   documentService = inject(DocumentService)
 
-  private documentIDSignal = signal<number>(undefined)
-  private showPDFNoteSignal = signal(true)
-  private rotationSignal = signal(0)
-
-  public get documentID(): number {
-    return this.documentIDSignal()
-  }
-
-  public set documentID(documentID: number) {
-    this.documentIDSignal.set(documentID)
-  }
-
-  public get showPDFNote(): boolean {
-    return this.showPDFNoteSignal()
-  }
-
-  public set showPDFNote(showPDFNote: boolean) {
-    this.showPDFNoteSignal.set(showPDFNote)
-  }
-
-  // animation is better if we dont normalize yet
-  public get rotation(): number {
-    return this.rotationSignal()
-  }
+  readonly documentID = signal<number>(undefined)
+  readonly showPDFNote = signal(true)
+  readonly rotation = signal(0)
 
   public get degrees(): number {
-    let degrees = this.rotation % 360
+    let degrees = this.rotation() % 360
     if (degrees < 0) degrees += 360
     return degrees
   }
@@ -49,6 +28,6 @@ export class RotateConfirmDialogComponent extends ConfirmDialogComponent {
   }
 
   rotate(clockwise: boolean = true) {
-    this.rotationSignal.update((rotation) => rotation + (clockwise ? 90 : -90))
+    this.rotation.update((rotation) => rotation + (clockwise ? 90 : -90))
   }
 }

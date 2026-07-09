@@ -11,8 +11,8 @@
             </button>
         </div>
         <div class="col-8 d-flex align-items-center">
-            @if (documentID) {
-                <img class="w-75 m-auto" [ngStyle]="{'transform': 'rotate('+rotation+'deg)'}" [src]="documentService.getThumbUrl(documentID)" />
+            @if (documentID()) {
+                <img class="w-75 m-auto" [ngStyle]="{'transform': 'rotate('+rotation()+'deg)'}" [src]="documentService.getThumbUrl(documentID())" />
             }
         </div>
         <div class="col-2 d-flex">
@@ -21,7 +21,7 @@
             </button>
         </div>
     </div>
-    @if (showPDFNote) {
+    @if (showPDFNote()) {
         <p class="small text-muted fst-italic mt-4" i18n>Note that only PDFs will be rotated.</p>
     }
 </div>

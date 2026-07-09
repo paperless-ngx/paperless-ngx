@@ -2151,9 +2151,10 @@ export class DocumentDetailComponent
 
   public openShareLinks() {
     const modal = this.modalService.open(ShareLinksDialogComponent)
-    modal.componentInstance.documentId = this.document.id
-    modal.componentInstance.hasArchiveVersion =
+    modal.componentInstance.documentId.set(this.document.id)
+    modal.componentInstance.hasArchiveVersion.set(
       this.metadata?.has_archive_version ?? !!this.document?.archived_file_name
+    )
   }
 
   get emailEnabled(): boolean {
@@ -2164,9 +2165,10 @@ export class DocumentDetailComponent
     const modal = this.modalService.open(EmailDocumentDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.documentIds = [this.document.id]
-    modal.componentInstance.hasArchiveVersion =
+    modal.componentInstance.documentIds.set([this.document.id])
+    modal.componentInstance.hasArchiveVersion.set(
       this.metadata?.has_archive_version ?? !!this.document?.archived_file_name
+    )
   }
 
   private tryRenderTiff() {
