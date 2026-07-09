@@ -128,7 +128,7 @@ export class DocumentCardSmallComponent
   @ViewChild('popupPreview') popupPreview: PreviewPopupComponent
 
   ngAfterViewInit(): void {
-    this.show = true
+    this.show.set(true)
   }
 
   getIsThumbInverted() {

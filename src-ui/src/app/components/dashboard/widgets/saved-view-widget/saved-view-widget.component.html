@@ -33,7 +33,7 @@
         </tr>
       </thead>
       <tbody>
-        @if (loading && !documents.length) {
+        @if (loading && !documents().length) {
           @for (row of placeholderRows; track row) {
             <tr>
               @for (field of displayFields; track field; let j = $index) {
@@ -52,7 +52,7 @@
               <td class="py-2 py-md-3 position-relative" [ngClass]="{ 'd-none d-md-table-cell': j > 1 }">
                 @if (loading && !documents().length) {
                   <div class="placeholder-glow text-start">
-                    <span class="placeholder bg-secondary w-50" [ngStyle]="{ opacity: 1 - (i * 1/documents().length) }\"></span>
+                    <span class="placeholder bg-secondary w-50" [ngStyle]="{ opacity: 1 - (i * 1/documents().length) }"></span>
                   </div>
                 } @else {
                   @switch (field) {
@@ -131,23 +131,23 @@
     </table>
   } @else if (displayMode() === DisplayMode.SMALL_CARDS) {
     <div class="row row-cols-paperless-cards my-n2">
-      @if (loading && !documents.length) {
+      @if (loading && !documents().length) {
         @for (row of placeholderRows; track row) {
           <pngx-document-card-small
             class="p-0"
             [ngStyle]="{ opacity: 1 - (row * 1/placeholderRows.length) }"
             [document]="null"
-            [displayFields]="displayFields">
+            [displayFields]="displayFields()">
           </pngx-document-card-small>
         }
       }
-      @for (d of documents; track d.id; let i = $index) {
+      @for (d of documents(); track d.id; let i = $index) {
         <pngx-document-card-small
           class="p-0"
-          [ngStyle]="{ opacity: show ? 1 : 1 - (i * 1/documents.length) }"
+          [ngStyle]="{ opacity: show() ? 1 : 1 - (i * 1/documents().length) }"
           (dblClickDocument)="openDocumentDetail(d)"
           [document]="d"
-          [displayFields]="displayFields"
+          [displayFields]="displayFields()"
           (clickTag)="clickTag($event)"
           (clickCorrespondent)="clickCorrespondent($event)"
           (clickStoragePath)="clickStoragePath($event)"
@@ -155,9 +155,9 @@
         </pngx-document-card-small>
       }
     </div>
-  } @else if (displayMode === DisplayMode.LARGE_CARDS) {
+  } @else if (displayMode() === DisplayMode.LARGE_CARDS) {
     <div class="row my-n2">
-      @if (loading && !documents.length) {
+      @if (loading && !documents().length) {
         @for (row of placeholderRows; track row) {
           <pngx-document-card-large
             [document]="null"
@@ -166,12 +166,12 @@
           </pngx-document-card-large>
         }
       }
-      @for (d of documents; track d.id; let i = $index) {
+      @for (d of documents(); track d.id; let i = $index) {
         <pngx-document-card-large
           (dblClickDocument)="openDocumentDetail(d)"
           [document]="d"
-          [ngStyle]="{ opacity: show ? 1 : 1 - (i * 1/documents.length) }"
-          [displayFields]="displayFields"
+          [ngStyle]="{ opacity: show() ? 1 : 1 - (i * 1/documents().length) }"
+          [displayFields]="displayFields()"
           (clickTag)="clickTag($event)"
           (clickCorrespondent)="clickCorrespondent($event)"
           (clickStoragePath)="clickStoragePath($event)"

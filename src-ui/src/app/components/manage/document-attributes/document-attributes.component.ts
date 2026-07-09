@@ -189,8 +189,8 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
 
   get activeHeaderLoading(): boolean {
     return (
-      this.activeManagementList?.loading ??
-      this.activeCustomFields?.loading ??
+      this.activeManagementList?.loading() ??
+      this.activeCustomFields?.loading() ??
       false
     )
   }

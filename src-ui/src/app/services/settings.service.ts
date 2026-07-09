@@ -369,7 +369,7 @@ export class SettingsService {
         this.currentUser.set(uisettings.user)
         this.permissionsService.initialize(
           uisettings.permissions,
-          this.currentUser
+          this.currentUser()
         )
 
         this.initializeDisplayFields()
@@ -419,7 +419,7 @@ export class SettingsService {
       )
     ) {
       this.customFieldsService.listAll().subscribe((r) => {
-        this.allDisplayFieldsSignal.set(
+        this.allDisplayFields.set(
           displayFields.concat(
             r.results.map((field) => {
               return {

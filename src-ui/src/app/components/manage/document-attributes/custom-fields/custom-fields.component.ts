@@ -58,7 +58,7 @@ export class CustomFieldsComponent
   }
 
   reload() {
-    this.loading = true
+    this.loading.set(true)
     this.customFieldsService
       .listAll()
       .pipe(
@@ -68,8 +68,8 @@ export class CustomFieldsComponent
         })
       )
       .subscribe(() => {
-        this.show = true
-        this.loading = false
+        this.show.set(true)
+        this.loading.set(false)
       })
   }
 

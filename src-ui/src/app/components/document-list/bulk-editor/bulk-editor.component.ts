@@ -1033,14 +1033,14 @@ export class BulkEditorComponent
     dialog.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        dialog.loading = true
+        dialog.loading.set(true)
         dialog.buttonsEnabled = false
         this.shareLinkBundleService
           .createBundle(dialog.payload)
           .pipe(first())
           .subscribe({
             next: (result) => {
-              dialog.loading = false
+              dialog.loading.set(false)
               dialog.buttonsEnabled = false
               dialog.createdBundle = result
               dialog.copied = false
@@ -1054,7 +1054,7 @@ export class BulkEditorComponent
               )
             },
             error: (error) => {
-              dialog.loading = false
+              dialog.loading.set(false)
               dialog.buttonsEnabled = true
               this.toastService.showError(
                 $localize`Share link bundle creation is not available yet.`,

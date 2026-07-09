@@ -39,7 +39,7 @@ export class FileDropComponent {
       return
     event.preventDefault()
     event.stopImmediatePropagation()
-    this.settings.globalDropzoneActive = true
+    this.settings.globalDropzoneActive.set(true)
     // allows transition
     setTimeout(() => {
       this.fileIsOver.set(true)
@@ -56,7 +56,7 @@ export class FileDropComponent {
     if (!this.dragDropEnabled) return
     event?.preventDefault()
     event?.stopImmediatePropagation()
-    this.settings.globalDropzoneActive = false
+    this.settings.globalDropzoneActive.set(false)
 
     const ms = immediate ? 0 : 500
 

@@ -131,7 +131,7 @@ export class DocumentCardLargeComponent
   popoverHidden = true
 
   ngAfterViewInit(): void {
-    this.show = true
+    this.show.set(true)
   }
 
   get searchScoreClass() {

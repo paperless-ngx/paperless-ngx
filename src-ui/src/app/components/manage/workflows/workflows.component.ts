@@ -46,7 +46,7 @@ export class WorkflowsComponent
   }
 
   reload() {
-    this.loading = true
+    this.loading.set(true)
     this.workflowService
       .listAll()
       .pipe(
@@ -54,8 +54,8 @@ export class WorkflowsComponent
         tap((r) => this.workflows.set(r.results))
       )
       .subscribe(() => {
-        this.show = true
-        this.loading = false
+        this.show.set(true)
+        this.loading.set(false)
       })
   }
 

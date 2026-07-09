@@ -79,7 +79,7 @@ export class SavedViewsComponent
 
   constructor() {
     super()
-    this.settings.organizingSidebarSavedViews = true
+    this.settings.organizingSidebarSavedViews.set(true)
   }
 
   ngOnInit(): void {
@@ -87,7 +87,7 @@ export class SavedViewsComponent
   }
 
   private reloadViews(): void {
-    this.loading = true
+    this.loading.set(true)
     this.savedViewService
       .list(null, null, null, false, { full_perms: true })
       .subscribe((r) => {
@@ -97,12 +97,12 @@ export class SavedViewsComponent
   }
 
   ngOnDestroy(): void {
-    this.settings.organizingSidebarSavedViews = false
+    this.settings.organizingSidebarSavedViews.set(false)
     super.ngOnDestroy()
   }
 
   private initialize() {
-    this.loading = false
+    this.loading.set(false)
     this.emptyGroup(this.savedViewsGroup)
 
     let storeData = {

@@ -154,14 +154,17 @@ export class SavedViewWidgetComponent
       this.savedView.display_fields &&
       this.savedView.display_fields.length > 0
     ) {
-      this.displayFields = this.savedView.display_fields
+      this.displayFields.set(this.savedView.display_fields)
     }
 
     // filter by perms etc
-    this.displayFields = this.displayFields.filter(
-      (field) =>
-        this.settingsService.allDisplayFields().find((f) => f.id === field) !==
-        undefined
+    this.displayFields.set(
+      this.displayFields().filter(
+        (field) =>
+          this.settingsService
+            .allDisplayFields()
+            .find((f) => f.id === field) !== undefined
+      )
     )
 
     this.reload()
@@ -179,8 +182,8 @@ export class SavedViewWidgetComponent
   }
 
   reload() {
-    this.loading = this.documents.length == 0
-    this.show = true
+    this.loading.set(this.documents.length == 0)
+    this.show.set(true)
     this.documentService
       .listFiltered(
         1,
@@ -195,8 +198,8 @@ export class SavedViewWidgetComponent
         this.documents.set(result.results)
         this.count.set(result.count)
         this.savedViewService.setDocumentCount(this.savedView, result.count)
-        this.loading = false
-        this.show = true
+        this.loading.set(false)
+        this.show.set(true)
       })
   }
 

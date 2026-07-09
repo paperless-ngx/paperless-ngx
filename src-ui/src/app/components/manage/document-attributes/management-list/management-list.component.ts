@@ -245,7 +245,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   }
 
   reloadData(extraParams: { [key: string]: any } = null) {
-    this.loading = true
+    this.loading.set(true)
     this.currentExtraParams = extraParams
     this.clearSelection()
     this.service
@@ -275,8 +275,8 @@ export abstract class ManagementListComponent<T extends MatchingModel>
           }
         },
         next: () => {
-          this.show = true
-          this.loading = false
+          this.show.set(true)
+          this.loading.set(false)
         },
       })
   }
