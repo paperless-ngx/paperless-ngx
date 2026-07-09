@@ -1,12 +1,5 @@
 import { DecimalPipe } from '@angular/common'
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  inject,
-  signal,
-} from '@angular/core'
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject } from 'rxjs'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
@@ -20,17 +13,6 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
 export class ConfirmDialogComponent extends LoadingComponentWithPermissions {
   activeModal = inject(NgbActiveModal)
 
-  private titleSignal = signal($localize`Confirmation`)
-  private messageBoldSignal = signal<string>(undefined)
-  private messageSignal = signal<string>(undefined)
-  private btnClassSignal = signal('btn-primary')
-  private btnCaptionSignal = signal($localize`Confirm`)
-  private alternativeBtnClassSignal = signal('btn-secondary')
-  private alternativeBtnCaptionSignal = signal<string>(undefined)
-  private cancelBtnClassSignal = signal('btn-outline-secondary')
-  private cancelBtnCaptionSignal = signal($localize`Cancel`)
-  private buttonsEnabledSignal = signal(true)
-
   @Output()
   public confirmClicked = new EventEmitter()
 
@@ -38,94 +20,34 @@ export class ConfirmDialogComponent extends LoadingComponentWithPermissions {
   public alternativeClicked = new EventEmitter()
 
   @Input()
-  get title(): string {
-    return this.titleSignal()
-  }
-
-  set title(title: string) {
-    this.titleSignal.set(title)
-  }
+  title = $localize`Confirmation`
 
   @Input()
-  get messageBold(): string {
-    return this.messageBoldSignal()
-  }
-
-  set messageBold(messageBold: string) {
-    this.messageBoldSignal.set(messageBold)
-  }
+  messageBold: string
 
   @Input()
-  get message(): string {
-    return this.messageSignal()
-  }
-
-  set message(message: string) {
-    this.messageSignal.set(message)
-  }
+  message: string
 
   @Input()
-  get btnClass(): string {
-    return this.btnClassSignal()
-  }
-
-  set btnClass(btnClass: string) {
-    this.btnClassSignal.set(btnClass)
-  }
+  btnClass = 'btn-primary'
 
   @Input()
-  get btnCaption(): string {
-    return this.btnCaptionSignal()
-  }
-
-  set btnCaption(btnCaption: string) {
-    this.btnCaptionSignal.set(btnCaption)
-  }
+  btnCaption = $localize`Confirm`
 
   @Input()
-  get alternativeBtnClass(): string {
-    return this.alternativeBtnClassSignal()
-  }
-
-  set alternativeBtnClass(alternativeBtnClass: string) {
-    this.alternativeBtnClassSignal.set(alternativeBtnClass)
-  }
+  alternativeBtnClass = 'btn-secondary'
 
   @Input()
-  get alternativeBtnCaption(): string {
-    return this.alternativeBtnCaptionSignal()
-  }
-
-  set alternativeBtnCaption(alternativeBtnCaption: string) {
-    this.alternativeBtnCaptionSignal.set(alternativeBtnCaption)
-  }
+  alternativeBtnCaption: string
 
   @Input()
-  get cancelBtnClass(): string {
-    return this.cancelBtnClassSignal()
-  }
-
-  set cancelBtnClass(cancelBtnClass: string) {
-    this.cancelBtnClassSignal.set(cancelBtnClass)
-  }
+  cancelBtnClass = 'btn-outline-secondary'
 
   @Input()
-  get cancelBtnCaption(): string {
-    return this.cancelBtnCaptionSignal()
-  }
-
-  set cancelBtnCaption(cancelBtnCaption: string) {
-    this.cancelBtnCaptionSignal.set(cancelBtnCaption)
-  }
+  cancelBtnCaption = $localize`Cancel`
 
   @Input()
-  get buttonsEnabled(): boolean {
-    return this.buttonsEnabledSignal()
-  }
-
-  set buttonsEnabled(buttonsEnabled: boolean) {
-    this.buttonsEnabledSignal.set(buttonsEnabled)
-  }
+  buttonsEnabled = true
 
   confirmButtonEnabled = true
   alternativeButtonEnabled = true

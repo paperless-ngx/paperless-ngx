@@ -234,34 +234,34 @@ export class DocumentDetailComponent
   expandOriginalMetadata = false
   expandArchivedMetadata = false
 
-  private errorSignal = signal<any>(undefined)
+  private errorState = signal<any>(undefined)
 
-  private networkActiveSignal = signal(false)
+  private networkActiveState = signal(false)
 
-  private documentIdSignal = signal<number>(undefined)
-  private documentSignal = signal<Document>(undefined)
-  private metadataSignal = signal<DocumentMetadata>(undefined)
-  private suggestionsSignal = signal<DocumentSuggestions>(undefined)
-  private suggestionsLoadingSignal = signal(false)
-  private usersSignal = signal<User[]>(undefined)
+  private documentIdState = signal<number>(undefined)
+  private documentState = signal<Document>(undefined)
+  private metadataState = signal<DocumentMetadata>(undefined)
+  private suggestionsState = signal<DocumentSuggestions>(undefined)
+  private suggestionsLoadingState = signal(false)
+  private usersState = signal<User[]>(undefined)
 
-  private titleSignal = signal<string>(undefined)
+  private titleState = signal<string>(undefined)
   titleSubject: Subject<string> = new Subject()
-  private previewUrlSignal = signal<string>(undefined)
-  private pdfSourceSignal = signal<string>(undefined)
-  private pdfPasswordSignal = signal<string>(undefined)
-  private thumbUrlSignal = signal<string>(undefined)
-  private previewTextSignal = signal<string>(undefined)
-  private previewLoadedSignal = signal(false)
-  private tiffURLSignal = signal<string>(undefined)
-  private tiffErrorSignal = signal<string>(undefined)
+  private previewUrlState = signal<string>(undefined)
+  private pdfSourceState = signal<string>(undefined)
+  private pdfPasswordState = signal<string>(undefined)
+  private thumbUrlState = signal<string>(undefined)
+  private previewTextState = signal<string>(undefined)
+  private previewLoadedState = signal(false)
+  private tiffURLState = signal<string>(undefined)
+  private tiffErrorState = signal<string>(undefined)
 
   // Versioning
-  private selectedVersionIdSignal = signal<number>(undefined)
+  private selectedVersionIdState = signal<number>(undefined)
 
-  private correspondentsSignal = signal<Correspondent[]>(undefined)
-  private documentTypesSignal = signal<DocumentType[]>(undefined)
-  private storagePathsSignal = signal<StoragePath[]>(undefined)
+  private correspondentsState = signal<Correspondent[]>(undefined)
+  private documentTypesState = signal<DocumentType[]>(undefined)
+  private storagePathsState = signal<StoragePath[]>(undefined)
 
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
@@ -276,10 +276,10 @@ export class DocumentDetailComponent
     custom_fields: new FormArray([]),
   })
 
-  private previewCurrentPageSignal = signal(1)
-  private previewNumPagesSignal = signal<number>(undefined)
-  private previewZoomSettingSignal = signal<PdfZoomLevel>(PdfZoomLevel.One)
-  private previewZoomScaleSignal = signal<PdfZoomScale>(PdfZoomScale.PageWidth)
+  private previewCurrentPageState = signal(1)
+  private previewNumPagesState = signal<number>(undefined)
+  private previewZoomSettingState = signal<PdfZoomLevel>(PdfZoomLevel.One)
+  private previewZoomScaleState = signal<PdfZoomScale>(PdfZoomScale.PageWidth)
 
   store: BehaviorSubject<any>
   isDirty$: Observable<boolean>
@@ -294,9 +294,9 @@ export class DocumentDetailComponent
 
   ogDate: Date
 
-  private customFieldsSignal = signal<CustomField[]>(undefined)
+  private customFieldsState = signal<CustomField[]>(undefined)
 
-  private downloadingSignal = signal(false)
+  private downloadingState = signal(false)
   public useFormattedFilename: boolean = false
 
   public readonly CustomFieldDataType = CustomFieldDataType
@@ -321,230 +321,230 @@ export class DocumentDetailComponent
   }
 
   DocumentDetailNavIDs = DocumentDetailNavIDs
-  private activeNavIDSignal = signal<number>(undefined)
+  private activeNavIDState = signal<number>(undefined)
 
   get error(): any {
-    return this.errorSignal()
+    return this.errorState()
   }
 
   set error(value: any) {
-    this.errorSignal.set(value)
+    this.errorState.set(value)
   }
 
   get networkActive(): boolean {
-    return this.networkActiveSignal()
+    return this.networkActiveState()
   }
 
   set networkActive(value: boolean) {
-    this.networkActiveSignal.set(value)
+    this.networkActiveState.set(value)
   }
 
   get documentId(): number {
-    return this.documentIdSignal()
+    return this.documentIdState()
   }
 
   set documentId(value: number) {
-    this.documentIdSignal.set(value)
+    this.documentIdState.set(value)
   }
 
   get document(): Document {
-    return this.documentSignal()
+    return this.documentState()
   }
 
   set document(value: Document) {
-    this.documentSignal.set(value)
+    this.documentState.set(value)
   }
 
   get metadata(): DocumentMetadata {
-    return this.metadataSignal()
+    return this.metadataState()
   }
 
   set metadata(value: DocumentMetadata) {
-    this.metadataSignal.set(value)
+    this.metadataState.set(value)
   }
 
   get suggestions(): DocumentSuggestions {
-    return this.suggestionsSignal()
+    return this.suggestionsState()
   }
 
   set suggestions(value: DocumentSuggestions) {
-    this.suggestionsSignal.set(value)
+    this.suggestionsState.set(value)
   }
 
   get suggestionsLoading(): boolean {
-    return this.suggestionsLoadingSignal()
+    return this.suggestionsLoadingState()
   }
 
   set suggestionsLoading(value: boolean) {
-    this.suggestionsLoadingSignal.set(value)
+    this.suggestionsLoadingState.set(value)
   }
 
   get users(): User[] {
-    return this.usersSignal()
+    return this.usersState()
   }
 
   set users(value: User[]) {
-    this.usersSignal.set(value)
+    this.usersState.set(value)
   }
 
   get title(): string {
-    return this.titleSignal()
+    return this.titleState()
   }
 
   set title(value: string) {
-    this.titleSignal.set(value)
+    this.titleState.set(value)
   }
 
   get previewUrl(): string {
-    return this.previewUrlSignal()
+    return this.previewUrlState()
   }
 
   set previewUrl(value: string) {
-    this.previewUrlSignal.set(value)
+    this.previewUrlState.set(value)
   }
 
   get pdfSource(): string {
-    return this.pdfSourceSignal()
+    return this.pdfSourceState()
   }
 
   set pdfSource(value: string) {
-    this.pdfSourceSignal.set(value)
+    this.pdfSourceState.set(value)
   }
 
   get pdfPassword(): string {
-    return this.pdfPasswordSignal()
+    return this.pdfPasswordState()
   }
 
   set pdfPassword(value: string) {
-    this.pdfPasswordSignal.set(value)
+    this.pdfPasswordState.set(value)
   }
 
   get thumbUrl(): string {
-    return this.thumbUrlSignal()
+    return this.thumbUrlState()
   }
 
   set thumbUrl(value: string) {
-    this.thumbUrlSignal.set(value)
+    this.thumbUrlState.set(value)
   }
 
   get previewText(): string {
-    return this.previewTextSignal()
+    return this.previewTextState()
   }
 
   set previewText(value: string) {
-    this.previewTextSignal.set(value)
+    this.previewTextState.set(value)
   }
 
   get previewLoaded(): boolean {
-    return this.previewLoadedSignal()
+    return this.previewLoadedState()
   }
 
   set previewLoaded(value: boolean) {
-    this.previewLoadedSignal.set(value)
+    this.previewLoadedState.set(value)
   }
 
   get tiffURL(): string {
-    return this.tiffURLSignal()
+    return this.tiffURLState()
   }
 
   set tiffURL(value: string) {
-    this.tiffURLSignal.set(value)
+    this.tiffURLState.set(value)
   }
 
   get tiffError(): string {
-    return this.tiffErrorSignal()
+    return this.tiffErrorState()
   }
 
   set tiffError(value: string) {
-    this.tiffErrorSignal.set(value)
+    this.tiffErrorState.set(value)
   }
 
   get selectedVersionId(): number {
-    return this.selectedVersionIdSignal()
+    return this.selectedVersionIdState()
   }
 
   set selectedVersionId(value: number) {
-    this.selectedVersionIdSignal.set(value)
+    this.selectedVersionIdState.set(value)
   }
 
   get correspondents(): Correspondent[] {
-    return this.correspondentsSignal()
+    return this.correspondentsState()
   }
 
   set correspondents(value: Correspondent[]) {
-    this.correspondentsSignal.set(value)
+    this.correspondentsState.set(value)
   }
 
   get documentTypes(): DocumentType[] {
-    return this.documentTypesSignal()
+    return this.documentTypesState()
   }
 
   set documentTypes(value: DocumentType[]) {
-    this.documentTypesSignal.set(value)
+    this.documentTypesState.set(value)
   }
 
   get storagePaths(): StoragePath[] {
-    return this.storagePathsSignal()
+    return this.storagePathsState()
   }
 
   set storagePaths(value: StoragePath[]) {
-    this.storagePathsSignal.set(value)
+    this.storagePathsState.set(value)
   }
 
   get previewCurrentPage(): number {
-    return this.previewCurrentPageSignal()
+    return this.previewCurrentPageState()
   }
 
   set previewCurrentPage(value: number) {
-    this.previewCurrentPageSignal.set(value)
+    this.previewCurrentPageState.set(value)
   }
 
   get previewNumPages(): number {
-    return this.previewNumPagesSignal()
+    return this.previewNumPagesState()
   }
 
   set previewNumPages(value: number) {
-    this.previewNumPagesSignal.set(value)
+    this.previewNumPagesState.set(value)
   }
 
   get previewZoomSetting(): PdfZoomLevel {
-    return this.previewZoomSettingSignal()
+    return this.previewZoomSettingState()
   }
 
   set previewZoomSetting(value: PdfZoomLevel) {
-    this.previewZoomSettingSignal.set(value)
+    this.previewZoomSettingState.set(value)
   }
 
   get previewZoomScale(): PdfZoomScale {
-    return this.previewZoomScaleSignal()
+    return this.previewZoomScaleState()
   }
 
   set previewZoomScale(value: PdfZoomScale) {
-    this.previewZoomScaleSignal.set(value)
+    this.previewZoomScaleState.set(value)
   }
 
   get downloading(): boolean {
-    return this.downloadingSignal()
+    return this.downloadingState()
   }
 
   set downloading(value: boolean) {
-    this.downloadingSignal.set(value)
+    this.downloadingState.set(value)
   }
 
   get activeNavID(): number {
-    return this.activeNavIDSignal()
+    return this.activeNavIDState()
   }
 
   set activeNavID(value: number) {
-    this.activeNavIDSignal.set(value)
+    this.activeNavIDState.set(value)
   }
 
   get customFields(): CustomField[] {
-    return this.customFieldsSignal()
+    return this.customFieldsState()
   }
 
   set customFields(value: CustomField[]) {
-    this.customFieldsSignal.set(value)
+    this.customFieldsState.set(value)
   }
 
   titleKeyUp(event) {

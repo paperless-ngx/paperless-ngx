@@ -6,7 +6,6 @@ import {
   Input,
   OnInit,
   Output,
-  signal,
   ViewChild,
 } from '@angular/core'
 import {
@@ -110,15 +109,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   @ViewChild('tagSelect') select: NgSelectComponent
 
-  private valueSignal = signal<number[]>([])
-
-  get value(): number[] {
-    return this.valueSignal()
-  }
-
-  set value(value: number[]) {
-    this.valueSignal.set(value)
-  }
+  value: number[] = []
 
   tags: Tag[] = []
 

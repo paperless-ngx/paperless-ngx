@@ -46,19 +46,17 @@ export abstract class EditDialogComponent<
   protected settingsService = inject(SettingsService)
   protected permissionsService = inject(PermissionsService)
 
-  private usersSignal = signal<User[]>(undefined)
-
-  private dialogModeSignal = signal(EditDialogMode.CREATE, {
+  private dialogModeState = signal(EditDialogMode.CREATE, {
     equal: () => false,
   })
 
   @Input()
   get dialogMode(): EditDialogMode {
-    return this.dialogModeSignal()
+    return this.dialogModeState()
   }
 
   set dialogMode(dialogMode: EditDialogMode) {
-    this.dialogModeSignal.set(dialogMode)
+    this.dialogModeState.set(dialogMode)
   }
 
   @Input()
@@ -70,43 +68,13 @@ export abstract class EditDialogComponent<
   @Output()
   failed = new EventEmitter()
 
-  private networkActiveSignal = signal(false)
+  users: User[]
 
-  private closeEnabledSignal = signal(false)
+  networkActive = false
 
-  private errorSignal = signal<any>(null)
+  closeEnabled = false
 
-  get users(): User[] {
-    return this.usersSignal()
-  }
-
-  set users(users: User[]) {
-    this.usersSignal.set(users)
-  }
-
-  get networkActive(): boolean {
-    return this.networkActiveSignal()
-  }
-
-  set networkActive(networkActive: boolean) {
-    this.networkActiveSignal.set(networkActive)
-  }
-
-  get closeEnabled(): boolean {
-    return this.closeEnabledSignal()
-  }
-
-  set closeEnabled(closeEnabled: boolean) {
-    this.closeEnabledSignal.set(closeEnabled)
-  }
-
-  get error(): any {
-    return this.errorSignal()
-  }
-
-  set error(error: any) {
-    this.errorSignal.set(error)
-  }
+  error: any = null
 
   abstract getForm(): FormGroup
 
