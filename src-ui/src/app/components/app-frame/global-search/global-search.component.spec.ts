@@ -465,7 +465,7 @@ describe('GlobalSearchComponent', () => {
     const closeSpy = jest.spyOn(component.resultsDropdown, 'close')
     component['reset'](true)
     expect(debounce).toHaveBeenCalledWith(null)
-    expect(component.searchResults).toBeNull()
+    expect(component.searchResults()).toBeNull()
     expect(component['currentItemIndex']).toBe(-1)
     expect(closeSpy).toHaveBeenCalled()
   })

@@ -56,7 +56,7 @@ describe('ShareLinksDialogComponent', () => {
 
   it('should support refresh to retrieve links', () => {
     const getSpy = jest.spyOn(shareLinkService, 'getLinksForDocument')
-    component.documentId = 99
+    fixture.componentRef.setInput('documentId', 99)
 
     const now = new Date()
     const expiration7days = new Date()
@@ -88,7 +88,7 @@ describe('ShareLinksDialogComponent', () => {
 
     fixture.detectChanges()
 
-    expect(component.shareLinks).toHaveLength(2)
+    expect(component.shareLinks()).toHaveLength(2)
   })
 
   it('should show error on refresh if needed', () => {
@@ -96,7 +96,7 @@ describe('ShareLinksDialogComponent', () => {
     jest
       .spyOn(shareLinkService, 'getLinksForDocument')
       .mockReturnValueOnce(throwError(() => new Error('Unable to get links')))
-    component.documentId = 99
+    fixture.componentRef.setInput('documentId', 99)
 
     component.ngOnInit()
     fixture.detectChanges()
@@ -105,7 +105,7 @@ describe('ShareLinksDialogComponent', () => {
 
   it('should support link creation then refresh & copy url', fakeAsync(() => {
     const createSpy = jest.spyOn(shareLinkService, 'createLinkForDocument')
-    component.documentId = 99
+    fixture.componentRef.setInput('documentId', 99)
     component.expirationDays = 7
     component.useArchiveVersion = false
 
@@ -130,12 +130,12 @@ describe('ShareLinksDialogComponent', () => {
 
     expect(refreshSpy).toHaveBeenCalled()
     expect(copySpy).toHaveBeenCalled()
-    expect(component.copied).toEqual(1)
+    expect(component.copied()).toEqual(1)
     tick(100) // copy timeout
   }))
 
   it('should show error on link creation if needed', () => {
-    component.documentId = 99
+    fixture.componentRef.setInput('documentId', 99)
     component.expirationDays = 7
 
     const expiration = new Date()
@@ -227,7 +227,7 @@ describe('ShareLinksDialogComponent', () => {
   })
 
   it('should disable archive switch & option if no archive available', (done) => {
-    component.hasArchiveVersion = false
+    fixture.componentRef.setInput('hasArchiveVersion', false)
     component.ngOnInit()
     fixture.detectChanges()
     expect(component.useArchiveVersion).toBeFalsy()
