@@ -229,9 +229,9 @@ describe('ProfileEditDialogComponent', () => {
     const copySpy = jest.spyOn(clipboard, 'copy')
     component.copyAuthToken()
     expect(copySpy).toHaveBeenCalledWith(profile.auth_token)
-    expect(component.copied).toBeTruthy()
+    expect(component.copied()).toBeTruthy()
     tick(3000)
-    expect(component.copied).toBeFalsy()
+    expect(component.copied()).toBeFalsy()
   }))
 
   it('should support generate token, display error if needed', () => {

@@ -229,7 +229,7 @@ describe('SavedViewWidgetComponent', () => {
       }
     )
     fixture.detectChanges()
-    expect(component.documents).toEqual(documentResults)
+    expect(component.documents()).toEqual(documentResults)
   })
 
   it('should reload on document consumption finished', () => {

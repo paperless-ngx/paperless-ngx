@@ -1,7 +1,7 @@
 <div class="row pt-3 pb-3 pb-md-2 align-items-center">
   <div class="col-md text-truncate">
     <h3 class="d-flex align-items-center mb-1" style="line-height: 1.4">
-      <span class="text-truncate">{{title}}</span>
+      <span class="text-truncate">{{title()}}</span>
       @if (id()) {
         <span class="badge bg-primary text-primary-text-contrast ms-3 small fs-normal cursor-pointer" (click)="copyID()">
           @if (copied()) {

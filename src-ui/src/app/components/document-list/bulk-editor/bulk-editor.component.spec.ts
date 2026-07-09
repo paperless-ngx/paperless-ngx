@@ -4,7 +4,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import { EventEmitter } from '@angular/core'
+import { EventEmitter, signal } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
@@ -1635,7 +1635,7 @@ describe('BulkEditorComponent', () => {
           file_version: 'archive',
           expiration_days: 7,
         },
-        loading: false,
+        loading: signal(false),
         buttonsEnabled: true,
         copied: false,
       },
@@ -1667,7 +1667,7 @@ describe('BulkEditorComponent', () => {
       file_version: 'archive',
       expiration_days: 7,
     })
-    expect(dialogInstance.loading).toBe(false)
+    expect(dialogInstance.loading()).toBe(false)
     expect(dialogInstance.buttonsEnabled).toBe(false)
     expect(dialogInstance.createdBundle).toEqual({ id: 42 })
     expect(typeof dialogInstance.onOpenManage).toBe('function')
@@ -1704,7 +1704,7 @@ describe('BulkEditorComponent', () => {
           file_version: 'original',
           expiration_days: null,
         },
-        loading: false,
+        loading: signal(false),
         buttonsEnabled: true,
       },
     }
@@ -1726,7 +1726,7 @@ describe('BulkEditorComponent', () => {
       $localize`Share link bundle creation is not available yet.`,
       expect.any(Error)
     )
-    expect(dialogInstance.loading).toBe(false)
+    expect(dialogInstance.loading()).toBe(false)
     expect(dialogInstance.buttonsEnabled).toBe(true)
     openSpy.mockRestore()
   })

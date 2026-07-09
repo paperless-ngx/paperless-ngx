@@ -3,11 +3,10 @@ import {
   AfterViewInit,
   Component,
   EventEmitter,
-  Input,
   Output,
   ViewChild,
   inject,
-  signal,
+  input,
 } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import {
@@ -65,46 +64,19 @@ export class DocumentCardLargeComponent
 {
   private documentService = inject(DocumentService)
   settingsService = inject(SettingsService)
-  private selectedSignal = signal(false)
-  private displayFieldsSignal = signal<string[]>(
+  readonly selected = input(false)
+  readonly displayFields = input<string[]>(
     DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
   )
-  private documentSignal = signal<Document>(undefined)
+  readonly document = input<Document>(undefined)
 
   DisplayField = DisplayField
-
-  @Input()
-  get selected(): boolean {
-    return this.selectedSignal()
-  }
-
-  set selected(selected: boolean) {
-    this.selectedSignal.set(selected)
-  }
-
-  @Input()
-  get displayFields(): string[] {
-    return this.displayFieldsSignal()
-  }
-
-  set displayFields(displayFields: string[]) {
-    this.displayFieldsSignal.set(displayFields)
-  }
 
   @Output()
   toggleSelected = new EventEmitter()
 
   get selectable() {
     return this.toggleSelected.observers.length > 0
-  }
-
-  @Input()
-  get document(): Document {
-    return this.documentSignal()
-  }
-
-  set document(document: Document) {
-    this.documentSignal.set(document)
   }
 
   @Output()
@@ -135,10 +107,11 @@ export class DocumentCardLargeComponent
   }
 
   get searchScoreClass() {
-    if (this.document.__search_hit__) {
-      if (this.document.__search_hit__.score > 0.7) {
+    const document = this.document()
+    if (document.__search_hit__) {
+      if (document.__search_hit__.score > 0.7) {
         return 'success'
-      } else if (this.document.__search_hit__.score > 0.3) {
+      } else if (document.__search_hit__.score > 0.3) {
         return 'warning'
       } else {
         return 'danger'
@@ -148,12 +121,13 @@ export class DocumentCardLargeComponent
 
   get searchNoteHighlights() {
     let highlights = []
+    const document = this.document()
     if (
-      this.document['__search_hit__'] &&
-      this.document['__search_hit__'].note_highlights
+      document['__search_hit__'] &&
+      document['__search_hit__'].note_highlights
     ) {
       // only show notes with a match
-      highlights = (this.document['__search_hit__'].note_highlights as string)
+      highlights = (document['__search_hit__'].note_highlights as string)
         .split(',')
         .filter((highlight) => highlight.includes('<span'))
     }
@@ -165,11 +139,11 @@ export class DocumentCardLargeComponent
   }
 
   getThumbUrl() {
-    return this.documentService.getThumbUrl(this.document.id)
+    return this.documentService.getThumbUrl(this.document().id)
   }
 
   getDownloadUrl() {
-    return this.documentService.getDownloadUrl(this.document.id)
+    return this.documentService.getDownloadUrl(this.document().id)
   }
 
   mouseLeaveCard() {
@@ -177,19 +151,21 @@ export class DocumentCardLargeComponent
   }
 
   get contentTrimmed() {
+    const document = this.document()
     return (
-      this.document.content.substring(0, 500) +
-      (this.document.content.length > 500 ? '...' : '')
+      document.content.substring(0, 500) +
+      (document.content.length > 500 ? '...' : '')
     )
   }
 
   get hasSearchHighlights() {
-    return Boolean(this.document?.__search_hit__?.highlights?.trim()?.length)
+    return Boolean(this.document()?.__search_hit__?.highlights?.trim()?.length)
   }
 
   get shouldShowContentFallback() {
+    const document = this.document()
     return (
-      this.document?.__search_hit__?.score == null ||
+      document?.__search_hit__?.score == null ||
       (!this.hasSearchHighlights && this.searchNoteHighlights.length === 0)
     )
   }

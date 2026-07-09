@@ -164,11 +164,11 @@ describe('DashboardComponent', () => {
   })
 
   it('should disable global dropzone on start drag + drop, re-enable after', () => {
-    expect(settingsService.globalDropzoneEnabled).toBeTruthy()
+    expect(settingsService.globalDropzoneEnabled()).toBeTruthy()
     component.onDragStart(null)
-    expect(settingsService.globalDropzoneEnabled).toBeFalsy()
+    expect(settingsService.globalDropzoneEnabled()).toBeFalsy()
     component.onDragEnd(null)
-    expect(settingsService.globalDropzoneEnabled).toBeTruthy()
+    expect(settingsService.globalDropzoneEnabled()).toBeTruthy()
   })
 
   it('should update saved view sorting on drag + drop, show info', () => {

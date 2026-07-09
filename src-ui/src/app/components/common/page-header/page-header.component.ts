@@ -1,5 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard'
-import { Component, Input, inject, input, signal } from '@angular/core'
+import { Component, effect, inject, input, signal } from '@angular/core'
 import { Title } from '@angular/platform-browser'
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -21,19 +21,14 @@ export class PageHeaderComponent {
   readonly info = input<string>(undefined)
   readonly infoLink = input<string>(undefined)
   readonly loading = input(false)
+  readonly title = input('')
   readonly copied = signal(false)
   private copyTimeout: any
 
-  private readonly titleSignal = signal('')
-
-  @Input()
-  set title(title: string) {
-    this.titleSignal.set(title)
-    this.titleService.setTitle(`${title} - ${environment.appTitle}`)
-  }
-
-  get title() {
-    return this.titleSignal()
+  constructor() {
+    effect(() => {
+      this.titleService.setTitle(`${this.title()} - ${environment.appTitle}`)
+    })
   }
 
   public copyID() {

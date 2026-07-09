@@ -97,7 +97,7 @@ describe('ShareLinkBundleManageDialogComponent', () => {
 
     expect(service.listAllBundles).toHaveBeenCalledTimes(1)
     expect(component.bundles).toEqual(bundles)
-    expect(component.loading).toBe(false)
+    expect(component.loading()).toBe(false)
     expect(component.error).toBeNull()
 
     tick(5000)
@@ -115,7 +115,7 @@ describe('ShareLinkBundleManageDialogComponent', () => {
 
     expect(component.error).toContain('Failed to load share link bundles.')
     expect(toastService.showError).toHaveBeenCalled()
-    expect(component.loading).toBe(false)
+    expect(component.loading()).toBe(false)
 
     tick(5000)
     expect(service.listAllBundles).toHaveBeenCalledTimes(2)
@@ -165,7 +165,7 @@ describe('ShareLinkBundleManageDialogComponent', () => {
       expect.stringContaining('deleted.')
     )
     expect(service.listAllBundles).toHaveBeenCalledTimes(2)
-    expect(component.loading).toBe(false)
+    expect(component.loading()).toBe(false)
   }))
 
   it('handles delete errors gracefully', fakeAsync(() => {
@@ -179,7 +179,7 @@ describe('ShareLinkBundleManageDialogComponent', () => {
     tick()
 
     expect(toastService.showError).toHaveBeenCalled()
-    expect(component.loading).toBe(false)
+    expect(component.loading()).toBe(false)
   }))
 
   it('retries bundle build and replaces existing entry', fakeAsync(() => {

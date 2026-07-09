@@ -182,7 +182,7 @@ export class SavedViewWidgetComponent
   }
 
   reload() {
-    this.loading.set(this.documents.length == 0)
+    this.loading.set(this.documents().length == 0)
     this.show.set(true)
     this.documentService
       .listFiltered(

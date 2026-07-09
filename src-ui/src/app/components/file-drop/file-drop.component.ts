@@ -26,7 +26,7 @@ export class FileDropComponent {
 
   public get dragDropEnabled(): boolean {
     return (
-      this.settings.globalDropzoneEnabled &&
+      this.settings.globalDropzoneEnabled() &&
       this.permissionsService.currentUserCan(
         PermissionAction.Add,
         PermissionType.Document

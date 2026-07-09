@@ -36,7 +36,7 @@
         @if (loading && !documents().length) {
           @for (row of placeholderRows; track row) {
             <tr>
-              @for (field of displayFields; track field; let j = $index) {
+              @for (field of displayFields(); track field; let j = $index) {
                 <td class="py-2 py-md-3 position-relative" [ngClass]="{ 'd-none d-md-table-cell': j > 1 }">
                   <div class="placeholder-glow text-start">
                     <span class="placeholder bg-secondary w-50" [ngStyle]="{ opacity: 1 - (row * 1/placeholderRows.length) }"></span>

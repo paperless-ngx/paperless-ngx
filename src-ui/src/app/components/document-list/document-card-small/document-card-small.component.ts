@@ -3,11 +3,10 @@ import {
   AfterViewInit,
   Component,
   EventEmitter,
-  Input,
   Output,
   ViewChild,
   inject,
-  signal,
+  input,
 } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import {
@@ -65,43 +64,16 @@ export class DocumentCardSmallComponent
 {
   private documentService = inject(DocumentService)
   settingsService = inject(SettingsService)
-  private selectedSignal = signal(false)
-  private documentSignal = signal<Document>(undefined)
-  private displayFieldsSignal = signal<string[]>(
+  readonly selected = input(false)
+  readonly document = input<Document>(undefined)
+  readonly displayFields = input<string[]>(
     DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
   )
 
   DisplayField = DisplayField
 
-  @Input()
-  get selected(): boolean {
-    return this.selectedSignal()
-  }
-
-  set selected(selected: boolean) {
-    this.selectedSignal.set(selected)
-  }
-
   @Output()
   toggleSelected = new EventEmitter()
-
-  @Input()
-  get document(): Document {
-    return this.documentSignal()
-  }
-
-  set document(document: Document) {
-    this.documentSignal.set(document)
-  }
-
-  @Input()
-  get displayFields(): string[] {
-    return this.displayFieldsSignal()
-  }
-
-  set displayFields(displayFields: string[]) {
-    this.displayFieldsSignal.set(displayFields)
-  }
 
   @Output()
   dblClickDocument = new EventEmitter()
@@ -119,9 +91,10 @@ export class DocumentCardSmallComponent
   clickStoragePath = new EventEmitter<number>()
 
   get moreTags(): number {
-    const limit = this.document?.notes.length > 0 ? 6 : 7
-    return this.document?.tags.length > limit
-      ? this.document.tags.length - (limit - 1)
+    const document = this.document()
+    const limit = document?.notes.length > 0 ? 6 : 7
+    return document?.tags.length > limit
+      ? document.tags.length - (limit - 1)
       : null
   }
 
@@ -136,19 +109,20 @@ export class DocumentCardSmallComponent
   }
 
   getThumbUrl() {
-    return this.documentService.getThumbUrl(this.document.id)
+    return this.documentService.getThumbUrl(this.document().id)
   }
 
   getDownloadUrl() {
-    return this.documentService.getDownloadUrl(this.document.id)
+    return this.documentService.getDownloadUrl(this.document().id)
   }
 
   get tagIDs() {
-    const limit = this.document.notes.length > 0 ? 6 : 7
-    if (this.document.tags.length > limit) {
-      return this.document.tags.slice(0, limit - 1)
+    const document = this.document()
+    const limit = document.notes.length > 0 ? 6 : 7
+    if (document.tags.length > limit) {
+      return document.tags.slice(0, limit - 1)
     } else {
-      return this.document.tags
+      return document.tags
     }
   }
 

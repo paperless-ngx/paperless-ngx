@@ -16,6 +16,7 @@ jest.mock('src/environments/environment', () => ({
 import { Clipboard } from '@angular/cdk/clipboard'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { signal } from '@angular/core'
 import {
   ComponentFixture,
   TestBed,
@@ -106,7 +107,7 @@ describe('SystemStatusDialogComponent', () => {
 
     fixture = TestBed.createComponent(SystemStatusDialogComponent)
     component = fixture.componentInstance
-    component.status = status
+    component.status = signal({ ...status })
     clipboard = TestBed.inject(Clipboard)
     tasksService = TestBed.inject(TasksService)
     systemStatusService = TestBed.inject(SystemStatusService)
@@ -130,11 +131,11 @@ describe('SystemStatusDialogComponent', () => {
     jest.spyOn(clipboard, 'copy')
     component.copy()
     expect(clipboard.copy).toHaveBeenCalledWith(
-      JSON.stringify(component.status, null, 4)
+      JSON.stringify(component.status(), null, 4)
     )
-    expect(component.copied).toBeTruthy()
+    expect(component.copied()).toBeTruthy()
     tick(3000)
-    expect(component.copied).toBeFalsy()
+    expect(component.copied()).toBeFalsy()
   }))
 
   it('should calculate if date is stale', () => {
@@ -180,25 +181,28 @@ describe('SystemStatusDialogComponent', () => {
   it('shoduld handle version mismatch', () => {
     component.frontendVersion = '2.4.2'
     component.ngOnInit()
-    expect(component.versionMismatch).toBeTruthy()
-    expect(component.status.pngx_version).toContain('(frontend: 2.4.2)')
+    expect(component.versionMismatch()).toBeTruthy()
+    expect(component.status().pngx_version).toContain('(frontend: 2.4.2)')
     component.frontendVersion = '2.4.3'
-    component.status.pngx_version = '2.4.3'
+    component.status.update((status) => ({
+      ...status,
+      pngx_version: '2.4.3',
+    }))
     component.ngOnInit()
-    expect(component.versionMismatch).toBeFalsy()
+    expect(component.versionMismatch()).toBeFalsy()
   })
 
   it('should update websocket connection status', () => {
     websocketSubject.next(true)
-    expect(component.status.websocket_connected).toEqual(
+    expect(component.status().websocket_connected).toEqual(
       SystemStatusItemStatus.OK
     )
     websocketSubject.next(false)
-    expect(component.status.websocket_connected).toEqual(
+    expect(component.status().websocket_connected).toEqual(
       SystemStatusItemStatus.ERROR
     )
     websocketSubject.next(true)
-    expect(component.status.websocket_connected).toEqual(
+    expect(component.status().websocket_connected).toEqual(
       SystemStatusItemStatus.OK
     )
   })

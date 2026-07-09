@@ -140,7 +140,7 @@ export class ProfileEditDialogComponent
 
   onEmailChange(): void {
     this.showEmailConfirm.set(this.currentEmail !== this.newEmail)
-    if (this.showEmailConfirm) {
+    if (this.showEmailConfirm()) {
       this.form.get('email_confirm').enable()
       if (this.newEmail !== this.emailConfirm) {
         this.setFieldError('email_confirm', $localize`Emails must match`)
@@ -167,7 +167,7 @@ export class ProfileEditDialogComponent
   onPasswordChange(): void {
     this.showPasswordConfirm.set(this.currentPassword !== this.newPassword)
 
-    if (this.showPasswordConfirm) {
+    if (this.showPasswordConfirm()) {
       this.form.get('password_confirm').enable()
       if (this.newPassword !== this.passwordConfirm) {
         this.setFieldError('password_confirm', $localize`Passwords must match`)
