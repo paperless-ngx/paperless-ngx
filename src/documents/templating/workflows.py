@@ -41,7 +41,7 @@ def parse_w_workflow_placeholders(
     doc_title: str | None = None,
     doc_url: str | None = None,
     doc_id: int | None = None,
-) -> str:
+) -> str | None:
     """
     Available title placeholders for Workflows depend on what has already been assigned,
     e.g. for pre-consumption triggers created will not have been parsed yet, but it will
@@ -98,6 +98,7 @@ def parse_w_workflow_placeholders(
         raise e
     except TemplateSyntaxError as e:
         logger.warning(f"Template syntax error in title generation: {e}")
+        raise e
     except SecurityError as e:
         logger.warning(f"Template attempted restricted operation: {e}")
     except Exception as e:

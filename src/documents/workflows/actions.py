@@ -83,6 +83,45 @@ def build_workflow_action_context(
     }
 
 
+def _render_email_field(
+    template_text: str,
+    field_name: str,
+    context: dict,
+    logging_group,
+) -> str:
+    """
+    Renders a single email subject/body template, falling back to the raw,
+    unrendered template text if rendering fails so the email still goes out
+    and the broken template is visible to whoever reads it.
+    """
+    if not template_text:
+        return ""
+    try:
+        return (
+            parse_w_workflow_placeholders(
+                template_text,
+                context["correspondent"],
+                context["document_type"],
+                context["owner_username"],
+                context["added"],
+                context["filename"],
+                context["current_filename"],
+                context["created"],
+                context["title"],
+                context["doc_url"],
+                context["id"],
+            )
+            or template_text
+        )
+    except Exception as e:
+        logger.warning(
+            f"Error occurred parsing notification email {field_name} template, "
+            f"falling back to unrendered text: {e}",
+            extra={"group": logging_group},
+        )
+        return template_text
+
+
 def execute_email_action(
     action: WorkflowAction,
     document: Document | ConsumableDocument,
@@ -102,39 +141,17 @@ def execute_email_action(
         )
         return
 
-    subject = (
-        parse_w_workflow_placeholders(
-            action.email.subject,
-            context["correspondent"],
-            context["document_type"],
-            context["owner_username"],
-            context["added"],
-            context["filename"],
-            context["current_filename"],
-            context["created"],
-            context["title"],
-            context["doc_url"],
-            context["id"],
-        )
-        if action.email.subject
-        else ""
+    subject = _render_email_field(
+        action.email.subject,
+        "subject",
+        context,
+        logging_group,
     )
-    body = (
-        parse_w_workflow_placeholders(
-            action.email.body,
-            context["correspondent"],
-            context["document_type"],
-            context["owner_username"],
-            context["added"],
-            context["filename"],
-            context["current_filename"],
-            context["created"],
-            context["title"],
-            context["doc_url"],
-            context["id"],
-        )
-        if action.email.body
-        else ""
+    body = _render_email_field(
+        action.email.body,
+        "body",
+        context,
+        logging_group,
     )
 
     try:

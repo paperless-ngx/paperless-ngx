@@ -23,6 +23,7 @@ from guardian.shortcuts import get_users_with_perms
 from httpx import ConnectError
 from httpx import HTTPError
 from httpx import HTTPStatusError
+from jinja2 import TemplateSyntaxError
 from pytest_httpx import HTTPXMock
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
@@ -61,10 +62,12 @@ from documents.models import WorkflowTrigger
 from documents.plugins.base import StopConsumeTaskError
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_consumption_finished
+from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
+from documents.workflows.actions import _render_email_field
 from documents.workflows.actions import execute_password_removal_action
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -1847,6 +1850,48 @@ class TestWorkflows(
 
         self.assertEqual(doc.title, "Doc {created_year]")
 
+    def test_document_added_malformed_title_template_falls_back(self) -> None:
+        """
+        GIVEN:
+            - Existing workflow with added trigger type
+            - Assign title field is not valid Jinja2 syntax (unclosed tag)
+        WHEN:
+            - File that matches is added
+        THEN:
+            - Title assignment is skipped and the original title is kept,
+              instead of the workflow crashing the whole trigger
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_filename="*sample*",
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc {{ unclosed",
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        now = timezone.localtime(timezone.now())
+        created = now - timedelta(weeks=520)
+        doc = Document.objects.create(
+            original_filename="sample.pdf",
+            title="sample test",
+            content="Hello world bar",
+            created=created,
+        )
+
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=doc,
+        )
+
+        self.assertEqual(doc.title, "sample test")
+
     def test_document_updated_workflow_ignores_version_documents(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
@@ -1960,6 +2005,53 @@ class TestWorkflows(
                 document.title,
                 r"Doc added in \w{3,}",
             )  # Match any 3-letter month name
+
+    def test_document_consumption_malformed_title_template_falls_back(self) -> None:
+        """
+        GIVEN:
+            - Existing workflow with consumption trigger type
+            - Assign title field is not valid Jinja2 syntax (unclosed tag)
+        WHEN:
+            - File that matches is consumed
+        THEN:
+            - Consumption succeeds, using the filename-derived fallback title,
+              instead of crashing the whole consumption
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            sources=f"{DocumentSource.ApiUpload}",
+            filter_filename="simple*",
+        )
+
+        action = WorkflowAction.objects.create(
+            assign_title="Doc {{ unclosed",
+        )
+
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
+        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ApiUpload,
+                    original_file=test_file,
+                ),
+                None,
+            )
+            document = Document.objects.first()
+            assert document is not None
+            self.assertEqual(document.title, "simple")
 
     def test_document_updated_workflow_existing_custom_field(self) -> None:
         """
@@ -3391,6 +3483,73 @@ class TestWorkflows(
         EMAIL_ENABLED=True,
         PAPERLESS_URL="http://localhost:8000",
     )
+    @mock.patch("httpx.post")
+    @mock.patch("django.core.mail.message.EmailMessage.send")
+    def test_workflow_email_action_malformed_template(
+        self,
+        mock_email_send,
+        mock_post,
+    ) -> None:
+        """
+        GIVEN:
+            - Document updated workflow with email action whose subject is
+              malformed Jinja2
+        WHEN:
+            - Document that matches is updated
+        THEN:
+            - No exception propagates and the email is still sent
+            - The subject falls back to the raw, unrendered template text
+            - The parsing error is logged
+        """
+        mock_post.return_value = mock.Mock(
+            status_code=200,
+            json=mock.Mock(return_value={"status": "ok"}),
+        )
+        mock_email_send.return_value = 1
+
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        email_action = WorkflowActionEmail.objects.create(
+            subject="Test {{ unclosed",
+            body="Test message",
+            to="user@example.com",
+            include_document=False,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.EMAIL,
+            email=email_action,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        with self.assertLogs("paperless.workflows.actions", level="WARNING") as cm:
+            run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
+
+        self.assertTrue(
+            any(
+                "Error occurred parsing notification email subject template" in message
+                for message in cm.output
+            ),
+        )
+        mock_email_send.assert_called_once()
+
+    @override_settings(
+        PAPERLESS_EMAIL_HOST="localhost",
+        EMAIL_ENABLED=True,
+        PAPERLESS_URL="http://localhost:8000",
+    )
     @mock.patch("django.core.mail.message.EmailMessage.send")
     def test_workflow_email_include_file(self, mock_email_send) -> None:
         """
@@ -4803,6 +4962,103 @@ class TestWorkflows(
 
         # No document should be created
         self.assertEqual(Document.objects.count(), 0)
+
+
+class TestParseWWorkflowPlaceholders:
+    def test_raises_on_malformed_template(self) -> None:
+        """
+        GIVEN:
+            - A title template with invalid Jinja2 syntax (unclosed tag)
+        WHEN:
+            - The template is rendered
+        THEN:
+            - A TemplateSyntaxError is raised, not swallowed into a None return
+        """
+        with pytest.raises(TemplateSyntaxError):
+            parse_w_workflow_placeholders(
+                "Doc {{ unclosed",
+                "correspondent",
+                "document_type",
+                "owner",
+                timezone.localtime(timezone.now()),
+                "original_filename",
+                "filename",
+            )
+
+    def test_security_error_does_not_raise(self) -> None:
+        """
+        GIVEN:
+            - A title template that attempts a sandbox-restricted operation
+        WHEN:
+            - The template is rendered
+        THEN:
+            - No exception is raised, and None is returned instead
+        """
+        result = parse_w_workflow_placeholders(
+            "{{ ''.__class__ }}",
+            "correspondent",
+            "document_type",
+            "owner",
+            timezone.localtime(timezone.now()),
+            "original_filename",
+            "filename",
+        )
+        assert result is None
+
+
+class TestRenderEmailField:
+    def _context(self) -> dict:
+        return {
+            "correspondent": "correspondent",
+            "document_type": "document_type",
+            "owner_username": "owner",
+            "added": timezone.localtime(timezone.now()),
+            "filename": "original_filename",
+            "current_filename": "filename",
+            "created": None,
+            "title": "title",
+            "doc_url": "http://localhost:8000",
+            "id": 1,
+        }
+
+    def test_falls_back_to_raw_text_on_syntax_error(self) -> None:
+        """
+        GIVEN:
+            - An email subject/body template with invalid Jinja2 syntax
+        WHEN:
+            - The field is rendered
+        THEN:
+            - No exception is raised, and the raw unrendered text is returned
+        """
+        result = _render_email_field(
+            "Doc {{ unclosed",
+            "subject",
+            self._context(),
+            None,
+        )
+        assert result == "Doc {{ unclosed"
+
+    def test_falls_back_to_raw_text_on_security_error(self) -> None:
+        """
+        GIVEN:
+            - An email subject/body template attempting a sandbox-restricted
+              operation
+        WHEN:
+            - The field is rendered
+        THEN:
+            - No exception is raised, and the raw unrendered text is returned
+        """
+        result = _render_email_field(
+            "{{ ''.__class__ }}",
+            "subject",
+            self._context(),
+            None,
+        )
+        assert result == "{{ ''.__class__ }}"
+
+    def test_returns_empty_string_for_empty_template(self) -> None:
+        result = _render_email_field("", "subject", self._context(), None)
+        assert result == ""
 
 
 class TestWebhookSend:
