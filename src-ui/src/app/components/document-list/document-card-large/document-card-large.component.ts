@@ -122,10 +122,7 @@ export class DocumentCardLargeComponent
   get searchNoteHighlights() {
     let highlights = []
     const document = this.document()
-    if (
-      document['__search_hit__'] &&
-      document['__search_hit__'].note_highlights
-    ) {
+    if (document?.['__search_hit__']?.note_highlights) {
       // only show notes with a match
       highlights = (document['__search_hit__'].note_highlights as string)
         .split(',')

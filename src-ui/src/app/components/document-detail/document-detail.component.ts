@@ -428,7 +428,7 @@ export class DocumentDetailComponent
   }
 
   get isRTL() {
-    if (!this.metadata() || !this.metadata().lang) return false
+    if (!this.metadata()?.lang) return false
     else {
       return ['ar', 'he', 'fe'].includes(this.metadata().lang)
     }
@@ -1627,7 +1627,7 @@ export class DocumentDetailComponent
   }
 
   get userIsOwner(): boolean {
-    let doc: Document = Object.assign({}, this.document())
+    let doc: Document = { ...this.document() }
     // dont disable while editing
     if (
       this.document() &&
@@ -1641,7 +1641,7 @@ export class DocumentDetailComponent
   }
 
   get userCanEdit(): boolean {
-    let doc: Document = Object.assign({}, this.document())
+    let doc: Document = { ...this.document() }
     // dont disable while editing
     if (
       this.document() &&

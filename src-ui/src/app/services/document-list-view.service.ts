@@ -195,10 +195,8 @@ export class DocumentListViewService {
       this.displayFieldsInitialized = true
       if (this.activeListViewState.displayFields) {
         this.activeListViewState.displayFields =
-          this.activeListViewState.displayFields.filter(
-            (field) =>
-              this.settings.allDisplayFields().find((f) => f.id === field) !==
-              undefined
+          this.activeListViewState.displayFields.filter((field) =>
+            this.settings.allDisplayFields().some((f) => f.id === field)
           )
         this.saveDocumentListView()
       }
@@ -371,9 +369,9 @@ export class DocumentListViewService {
             this.reload()
           } else if (
             activeListViewState.sortField.indexOf('custom_field') === 0 &&
-            this.settings
+            !this.settings
               .allDisplayFields()
-              .find((f) => f.id === activeListViewState.sortField) === undefined
+              .some((f) => f.id === activeListViewState.sortField)
           ) {
             // e.g. field was deleted
             this.sortField = 'created'
@@ -549,10 +547,8 @@ export class DocumentListViewService {
 
   set displayFields(fields: DisplayField[]) {
     this.activeListViewState.displayFields = this.displayFieldsInitialized
-      ? fields?.filter(
-          (field) =>
-            this.settings.allDisplayFields().find((f) => f.id === field) !==
-            undefined
+      ? fields?.filter((field) =>
+          this.settings.allDisplayFields().some((f) => f.id === field)
         )
       : fields
     this.markChanged()

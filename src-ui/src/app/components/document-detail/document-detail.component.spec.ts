@@ -1538,7 +1538,7 @@ describe('DocumentDetailComponent', () => {
     component.previewUrl.set(null)
     ;(component as any).updatePdfSource()
 
-    expect(component.pdfSource()).toEqual(null)
+    expect(component.pdfSource()).toBeNull()
     expect(component.pdfPassword()).toBeUndefined()
   })
 

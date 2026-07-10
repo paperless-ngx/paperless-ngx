@@ -182,7 +182,7 @@ export class ProfileEditDialogComponent
 
   private setFieldError(fieldName: string, message: string): void {
     this.error.set({
-      ...(this.error() ?? {}),
+      ...this.error(),
       [fieldName]: message,
     })
   }

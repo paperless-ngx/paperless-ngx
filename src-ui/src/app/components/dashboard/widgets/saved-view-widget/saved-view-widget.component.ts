@@ -159,11 +159,8 @@ export class SavedViewWidgetComponent
 
     // filter by perms etc
     this.displayFields.set(
-      this.displayFields().filter(
-        (field) =>
-          this.settingsService
-            .allDisplayFields()
-            .find((f) => f.id === field) !== undefined
+      this.displayFields().filter((field) =>
+        this.settingsService.allDisplayFields().some((f) => f.id === field)
       )
     )
 

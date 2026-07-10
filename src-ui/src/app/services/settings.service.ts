@@ -408,7 +408,7 @@ export class SettingsService {
       return this.permissionsService.currentUserCan(PermissionAction.View, type)
         ? field
         : null
-    }).filter((f) => f)
+    }).filter(Boolean)
 
     this.allDisplayFields.set(displayFields)
 
