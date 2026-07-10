@@ -1,9 +1,9 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { Subject, delay, first, takeUntil, tap } from 'rxjs'
+import { Subject, first, takeUntil, tap } from 'rxjs'
 import { MailAccount, MailAccountType } from 'src/app/data/mail-account'
 import { MailRule } from 'src/app/data/mail-rule'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
@@ -56,19 +56,17 @@ export class MailComponent
 
   public MailAccountType = MailAccountType
 
-  private _mailAccounts: MailAccount[] = []
+  readonly mailAccounts = signal<MailAccount[]>([])
 
-  public get mailAccounts() {
-    return this._mailAccounts
-  }
-  private set mailAccounts(accounts: MailAccount[]) {
-    this._mailAccounts = accounts
-    this.mailAccountsById = new Map(
-      accounts.map((account) => [account.id, account])
+  private setMailAccounts(accounts: MailAccount[]) {
+    this.mailAccounts.set(accounts)
+    this.mailAccountsById.set(
+      new Map(accounts.map((account) => [account.id, account]))
     )
   }
-  public mailAccountsById: Map<number, MailAccount> = new Map()
-  public mailRules: MailRule[] = []
+  readonly mailAccountsById = signal<Map<number, MailAccount>>(new Map())
+
+  readonly mailRules = signal<MailRule[]>([])
 
   unsubscribeNotifier: Subject<any> = new Subject()
   oAuthAccountId: number
@@ -81,10 +79,10 @@ export class MailComponent
     return this.settingsService.get(SETTINGS_KEYS.OUTLOOK_OAUTH_URL)
   }
 
-  public loadingRules: boolean = true
-  public showRules: boolean = false
-  public loadingAccounts: boolean = true
-  public showAccounts: boolean = false
+  readonly loadingRules = signal(true)
+  readonly showRules = signal(false)
+  readonly loadingAccounts = signal(true)
+  readonly showAccounts = signal(false)
 
   ngOnInit(): void {
     this.mailAccountService
@@ -93,23 +91,21 @@ export class MailComponent
         first(),
         takeUntil(this.unsubscribeNotifier),
         tap((r) => {
-          this.mailAccounts = r.results
+          this.setMailAccounts(r.results)
+          this.loadingAccounts.set(false)
+          this.showAccounts.set(true)
           if (this.oAuthAccountId) {
             this.editMailAccount(
-              this.mailAccounts.find(
+              this.mailAccounts().find(
                 (account) => account.id === this.oAuthAccountId
               )
             )
           }
-        }),
-        delay(100)
+        })
       )
       .subscribe({
-        next: () => {
-          this.loadingAccounts = false
-          this.showAccounts = true
-        },
         error: (e) => {
+          this.loadingAccounts.set(false)
           this.toastService.showError(
             $localize`Error retrieving mail accounts`,
             e
@@ -123,16 +119,14 @@ export class MailComponent
         first(),
         takeUntil(this.unsubscribeNotifier),
         tap((r) => {
-          this.mailRules = r.results
-        }),
-        delay(100)
+          this.mailRules.set(r.results)
+          this.loadingRules.set(false)
+          this.showRules.set(true)
+        })
       )
       .subscribe({
-        next: (r) => {
-          this.loadingRules = false
-          this.showRules = true
-        },
         error: (e) => {
+          this.loadingRules.set(false)
           this.toastService.showError($localize`Error retrieving mail rules`, e)
         },
       })
@@ -143,9 +137,9 @@ export class MailComponent
         if (success) {
           this.toastService.showInfo($localize`OAuth2 authentication success`)
           this.oAuthAccountId = parseInt(params.get('account_id'))
-          if (this.mailAccounts.length > 0) {
+          if (this.mailAccounts().length > 0) {
             this.editMailAccount(
-              this.mailAccounts.find(
+              this.mailAccounts().find(
                 (account) => account.id === this.oAuthAccountId
               )
             )
@@ -168,9 +162,9 @@ export class MailComponent
       backdrop: 'static',
       size: 'xl',
     })
-    modal.componentInstance.dialogMode = account
-      ? EditDialogMode.EDIT
-      : EditDialogMode.CREATE
+    modal.componentInstance.dialogMode.set(
+      account ? EditDialogMode.EDIT : EditDialogMode.CREATE
+    )
     modal.componentInstance.object = account
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -182,7 +176,7 @@ export class MailComponent
         this.mailAccountService
           .listAll(null, null, { full_perms: true })
           .subscribe((r) => {
-            this.mailAccounts = r.results
+            this.setMailAccounts(r.results)
           })
       })
     modal.componentInstance.failed
@@ -213,7 +207,7 @@ export class MailComponent
           this.mailAccountService
             .listAll(null, null, { full_perms: true })
             .subscribe((r) => {
-              this.mailAccounts = r.results
+              this.setMailAccounts(r.results)
             })
         },
         error: (e) => {
@@ -247,8 +241,9 @@ export class MailComponent
       backdrop: 'static',
       size: 'xl',
     })
-    modal.componentInstance.dialogMode =
+    modal.componentInstance.dialogMode.set(
       rule && !forceCreate ? EditDialogMode.EDIT : EditDialogMode.CREATE
+    )
     modal.componentInstance.object = rule
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -258,7 +253,7 @@ export class MailComponent
         this.mailRuleService
           .listAll(null, null, { full_perms: true })
           .subscribe((r) => {
-            this.mailRules = r.results
+            this.mailRules.set(r.results)
           })
       })
     modal.componentInstance.failed
@@ -314,7 +309,7 @@ export class MailComponent
           this.mailRuleService
             .listAll(null, null, { full_perms: true })
             .subscribe((r) => {
-              this.mailRules = r.results
+              this.mailRules.set(r.results)
             })
         },
         error: (e) => {
@@ -336,7 +331,7 @@ export class MailComponent
     dialog.object = object
     modal.componentInstance.confirmClicked.subscribe(
       ({ permissions, merge }) => {
-        modal.componentInstance.buttonsEnabled = false
+        modal.componentInstance.buttonsEnabled.set(false)
         const service: AbstractPaperlessService<MailRule | MailAccount> =
           'account' in object ? this.mailRuleService : this.mailAccountService
         object.owner = permissions['owner']
@@ -362,7 +357,7 @@ export class MailComponent
       backdrop: 'static',
       size: 'xl',
     })
-    modal.componentInstance.rule = rule
+    modal.componentInstance.rule.set(rule)
   }
 
   userCanEdit(obj: ObjectWithPermissions): boolean {

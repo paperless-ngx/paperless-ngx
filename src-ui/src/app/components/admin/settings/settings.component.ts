@@ -6,6 +6,7 @@ import {
   OnDestroy,
   OnInit,
   inject,
+  signal,
 } from '@angular/core'
 import {
   FormControl,
@@ -189,10 +190,10 @@ export class SettingsComponent
   unsubscribeNotifier: Subject<any> = new Subject()
   savePending: boolean = false
 
-  users: User[]
-  groups: Group[]
+  readonly users = signal<User[]>(undefined)
+  readonly groups = signal<Group[]>(undefined)
 
-  public systemStatus: SystemStatus
+  public readonly systemStatus = signal<SystemStatus>(undefined)
 
   public readonly GlobalSearchType = GlobalSearchType
 
@@ -203,16 +204,18 @@ export class SettingsComponent
   public readonly documentDetailFieldOptions = documentDetailFieldOptions
 
   get systemStatusHasErrors(): boolean {
+    const status = this.systemStatus()
+    if (!status) {
+      return false
+    }
     return (
-      this.systemStatus.database.status === SystemStatusItemStatus.ERROR ||
-      this.systemStatus.tasks.redis_status === SystemStatusItemStatus.ERROR ||
-      this.systemStatus.tasks.celery_status === SystemStatusItemStatus.ERROR ||
-      this.systemStatus.tasks.index_status === SystemStatusItemStatus.ERROR ||
-      this.systemStatus.tasks.classifier_status ===
-        SystemStatusItemStatus.ERROR ||
-      this.systemStatus.tasks.sanity_check_status ===
-        SystemStatusItemStatus.ERROR ||
-      this.systemStatus.websocket_connected === SystemStatusItemStatus.ERROR
+      status.database.status === SystemStatusItemStatus.ERROR ||
+      status.tasks.redis_status === SystemStatusItemStatus.ERROR ||
+      status.tasks.celery_status === SystemStatusItemStatus.ERROR ||
+      status.tasks.index_status === SystemStatusItemStatus.ERROR ||
+      status.tasks.classifier_status === SystemStatusItemStatus.ERROR ||
+      status.tasks.sanity_check_status === SystemStatusItemStatus.ERROR ||
+      status.websocket_connected === SystemStatusItemStatus.ERROR
     )
   }
 
@@ -246,7 +249,7 @@ export class SettingsComponent
         .pipe(first())
         .subscribe({
           next: (r) => {
-            this.users = r.results
+            this.users.set(r.results)
           },
           error: (e) => {
             this.toastService.showError($localize`Error retrieving users`, e)
@@ -265,7 +268,7 @@ export class SettingsComponent
         .pipe(first())
         .subscribe({
           next: (r) => {
-            this.groups = r.results
+            this.groups.set(r.results)
           },
           error: (e) => {
             this.toastService.showError($localize`Error retrieving groups`, e)
@@ -431,7 +434,7 @@ export class SettingsComponent
 
     if (this.canViewSystemStatus) {
       this.systemStatusService.get().subscribe((status) => {
-        this.systemStatus = status
+        this.systemStatus.set(status)
       })
     }
   }
@@ -664,6 +667,6 @@ export class SettingsComponent
         size: 'xl',
       }
     )
-    modal.componentInstance.status = this.systemStatus
+    modal.componentInstance.status.set(this.systemStatus())
   }
 }

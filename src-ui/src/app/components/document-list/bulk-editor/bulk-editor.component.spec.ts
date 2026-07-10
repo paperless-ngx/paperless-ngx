@@ -4,7 +4,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import { EventEmitter } from '@angular/core'
+import { EventEmitter, signal } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
@@ -38,7 +38,6 @@ import { environment } from 'src/environments/environment'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
-import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { FilterableDropdownComponent } from '../../common/filterable-dropdown/filterable-dropdown.component'
@@ -1146,7 +1145,7 @@ describe('BulkEditorComponent', () => {
     fixture.detectChanges()
     component.mergeSelected()
     expect(modal).not.toBeUndefined()
-    modal.componentInstance.metadataDocumentID = 3
+    modal.componentInstance.metadataDocumentID.set(3)
     modal.componentInstance.confirm()
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/merge/`
@@ -1164,7 +1163,7 @@ describe('BulkEditorComponent', () => {
     ) // listAllFilteredIds
 
     // Test with Delete Originals enabled
-    modal.componentInstance.deleteOriginals = true
+    modal.componentInstance.deleteOriginals.set(true)
     modal.componentInstance.confirm()
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/merge/`
@@ -1184,8 +1183,8 @@ describe('BulkEditorComponent', () => {
     expect(documentListViewService.selected.size).toEqual(0)
 
     // Test with archiveFallback enabled
-    modal.componentInstance.deleteOriginals = false
-    modal.componentInstance.archiveFallback = true
+    modal.componentInstance.deleteOriginals.set(false)
+    modal.componentInstance.archiveFallback.set(true)
     modal.componentInstance.confirm()
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/merge/`
@@ -1339,7 +1338,7 @@ describe('BulkEditorComponent', () => {
 
     const modalInstance = {
       componentInstance: {
-        dialogMode: EditDialogMode.CREATE,
+        dialogMode: { set: jest.fn() },
         object: { name },
         succeeded: of(newTag),
       },
@@ -1382,7 +1381,7 @@ describe('BulkEditorComponent', () => {
 
     const modalInstance = {
       componentInstance: {
-        dialogMode: EditDialogMode.CREATE,
+        dialogMode: { set: jest.fn() },
         object: { name },
         succeeded: of(newCorrespondent),
       },
@@ -1431,7 +1430,7 @@ describe('BulkEditorComponent', () => {
 
     const modalInstance = {
       componentInstance: {
-        dialogMode: EditDialogMode.CREATE,
+        dialogMode: { set: jest.fn() },
         object: { name },
         succeeded: of(newDocumentType),
       },
@@ -1477,7 +1476,7 @@ describe('BulkEditorComponent', () => {
 
     const modalInstance = {
       componentInstance: {
-        dialogMode: EditDialogMode.CREATE,
+        dialogMode: { set: jest.fn() },
         object: { name },
         succeeded: of(newStoragePath),
       },
@@ -1531,7 +1530,7 @@ describe('BulkEditorComponent', () => {
 
     const modalInstance = {
       componentInstance: {
-        dialogMode: EditDialogMode.CREATE,
+        dialogMode: { set: jest.fn() },
         object: { name },
         succeeded: of(newCustomField),
       },
@@ -1629,15 +1628,18 @@ describe('BulkEditorComponent', () => {
       close: jest.fn(),
       componentInstance: {
         documents: [],
+        setDocuments(docs) {
+          this.documents = docs
+        },
         confirmClicked,
         payload: {
           document_ids: [5, 7],
           file_version: 'archive',
           expiration_days: 7,
         },
-        loading: false,
+        loading: signal(false),
         buttonsEnabled: true,
-        copied: false,
+        copied: signal(false),
       },
     }
 
@@ -1667,7 +1669,7 @@ describe('BulkEditorComponent', () => {
       file_version: 'archive',
       expiration_days: 7,
     })
-    expect(dialogInstance.loading).toBe(false)
+    expect(dialogInstance.loading()).toBe(false)
     expect(dialogInstance.buttonsEnabled).toBe(false)
     expect(dialogInstance.createdBundle).toEqual({ id: 42 })
     expect(typeof dialogInstance.onOpenManage).toBe('function')
@@ -1698,13 +1700,16 @@ describe('BulkEditorComponent', () => {
     const modalRef: Partial<NgbModalRef> = {
       componentInstance: {
         documents: [],
+        setDocuments(docs) {
+          this.documents = docs
+        },
         confirmClicked,
         payload: {
           document_ids: [9],
           file_version: 'original',
           expiration_days: null,
         },
-        loading: false,
+        loading: signal(false),
         buttonsEnabled: true,
       },
     }
@@ -1726,7 +1731,7 @@ describe('BulkEditorComponent', () => {
       $localize`Share link bundle creation is not available yet.`,
       expect.any(Error)
     )
-    expect(dialogInstance.loading).toBe(false)
+    expect(dialogInstance.loading()).toBe(false)
     expect(dialogInstance.buttonsEnabled).toBe(true)
     openSpy.mockRestore()
   })

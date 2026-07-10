@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core'
+import { Injectable, inject, signal } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Observable, Subject, of } from 'rxjs'
 import { first } from 'rxjs/operators'
@@ -15,6 +15,7 @@ export class OpenDocumentsService {
   private modalService = inject(NgbModal)
 
   private MAX_OPEN_DOCUMENTS = 5
+  private readonly stateVersion = signal(0)
 
   constructor() {
     this.load()
@@ -36,6 +37,14 @@ export class OpenDocumentsService {
   private openDocuments: Document[] = []
   private dirtyDocuments: Set<number> = new Set<number>()
 
+  private trackState(): void {
+    this.stateVersion()
+  }
+
+  private markChanged(): void {
+    this.stateVersion.update((version) => version + 1)
+  }
+
   refreshDocument(id: number) {
     let index = this.openDocuments.findIndex((doc) => doc.id == id)
     if (index > -1) {
@@ -53,10 +62,12 @@ export class OpenDocumentsService {
   }
 
   getOpenDocuments(): Document[] {
+    this.trackState()
     return this.openDocuments
   }
 
   getOpenDocument(id: number): Document {
+    this.trackState()
     return this.openDocuments.find((d) => d.id == id)
   }
 
@@ -101,10 +112,12 @@ export class OpenDocumentsService {
   }
 
   hasDirty(): boolean {
+    this.trackState()
     return this.dirtyDocuments.size > 0
   }
 
   isDirty(doc: Document): boolean {
+    this.trackState()
     return this.dirtyDocuments.has(doc.id)
   }
 
@@ -170,6 +183,7 @@ export class OpenDocumentsService {
   }
 
   save() {
+    this.markChanged()
     try {
       sessionStorage.setItem(
         OPEN_DOCUMENT_SERVICE.DOCUMENTS,

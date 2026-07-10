@@ -2,7 +2,7 @@ import {
   importProvidersFrom,
   inject,
   provideAppInitializer,
-  provideZoneChangeDetection,
+  provideZonelessChangeDetection,
 } from '@angular/core'
 
 import { DragDropModule } from '@angular/cdk/drag-drop'
@@ -378,7 +378,7 @@ const icons = {
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideZoneChangeDetection(),
+    provideZonelessChangeDetection(),
     importProvidersFrom(
       BrowserModule,
       AppRoutingModule,

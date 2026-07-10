@@ -1166,13 +1166,13 @@ export class FilterEditorComponent
   private maybeCompleteLoading() {
     this.loadingCount++
     if (this.loadingCount == this.loadingCountTotal) {
-      this.loading = false
-      this.show = true
+      this.loading.set(false)
+      this.show.set(true)
     }
   }
 
   ngOnInit() {
-    this.loading = true
+    this.loading.set(true)
     if (
       this.permissionsService.currentUserCan(
         PermissionAction.View,

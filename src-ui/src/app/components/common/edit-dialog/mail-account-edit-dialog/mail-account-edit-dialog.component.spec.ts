@@ -3,12 +3,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
@@ -58,25 +53,26 @@ describe('MailAccountEditDialogComponent', () => {
 
     fixture = TestBed.createComponent(MailAccountEditDialogComponent)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = { id: 99, username: 'user99' }
+    settingsService.currentUser.set({ id: 99, username: 'user99' })
     component = fixture.componentInstance
 
     fixture.detectChanges()
   })
 
   it('should support create and edit modes', () => {
-    component.dialogMode = EditDialogMode.CREATE
+    component.dialogMode.set(EditDialogMode.CREATE)
     const createTitleSpy = jest.spyOn(component, 'getCreateTitle')
     const editTitleSpy = jest.spyOn(component, 'getEditTitle')
     fixture.detectChanges()
     expect(createTitleSpy).toHaveBeenCalled()
     expect(editTitleSpy).not.toHaveBeenCalled()
-    component.dialogMode = EditDialogMode.EDIT
+    component.dialogMode.set(EditDialogMode.EDIT)
     fixture.detectChanges()
     expect(editTitleSpy).toHaveBeenCalled()
   })
 
-  it('should support test mail account and show appropriate expiring alert', fakeAsync(() => {
+  it('should support test mail account and show appropriate expiring alert', () => {
+    jest.useFakeTimers()
     component.object = {
       name: 'example',
       imap_server: 'imap.example.com',
@@ -97,7 +93,7 @@ describe('MailAccountEditDialogComponent', () => {
     expect(fixture.nativeElement.textContent).toContain(
       'Successfully connected'
     )
-    tick(6000)
+    jest.advanceTimersByTime(6000)
     fixture.detectChanges()
     expect(fixture.nativeElement.textContent).not.toContain(
       'Successfully connected'
@@ -118,6 +114,7 @@ describe('MailAccountEditDialogComponent', () => {
       .flush({}, { status: 500, statusText: 'error' })
     fixture.detectChanges()
     expect(fixture.nativeElement.textContent).toContain('Unable to connect')
-    tick(6000)
-  }))
+    jest.advanceTimersByTime(6000)
+    jest.useRealTimers()
+  })
 })

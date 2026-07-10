@@ -362,7 +362,7 @@ describe('TasksComponent', () => {
     )
 
     req.flush({ count: 2, results: [tasks[0], tasks[1]] })
-    expect(component.totalTasks).toBe(2)
+    expect(component.totalTasks()).toBe(2)
   })
 
   it('should apply task type and trigger source filters to the server-side task query', () => {
@@ -435,8 +435,8 @@ describe('TasksComponent', () => {
       .flush(pageTwoTasks)
 
     expect(component.page).toBe(2)
-    expect(component.totalTasks).toBe(30)
-    expect(component.pagedTasks).toEqual([tasks[0]])
+    expect(component.totalTasks()).toBe(30)
+    expect(component.pagedTasks()).toEqual([tasks[0]])
   })
 
   it('should not replace section counts with current-page counts', () => {

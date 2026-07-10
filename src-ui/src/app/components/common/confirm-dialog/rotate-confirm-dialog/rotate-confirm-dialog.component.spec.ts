@@ -28,7 +28,7 @@ describe('RotateConfirmDialogComponent', () => {
   })
 
   it('should support rotating the image', () => {
-    component.documentID = 1
+    component.documentID.set(1)
     fixture.detectChanges()
     component.rotate()
     fixture.detectChanges()

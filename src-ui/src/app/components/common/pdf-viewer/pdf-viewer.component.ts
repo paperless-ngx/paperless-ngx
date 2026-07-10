@@ -27,7 +27,6 @@ import {
 } from 'pdfjs-dist/web/pdf_viewer.mjs'
 import {
   PdfRenderMode,
-  PdfSource,
   PdfZoomLevel,
   PdfZoomScale,
   PngxPdfDocumentProxy,
@@ -43,7 +42,8 @@ export class PngxPdfViewerComponent
 {
   private readonly document = inject<Document>(DOCUMENT)
 
-  @Input() src!: PdfSource
+  @Input() src!: string
+  @Input() password?: string
   @Input() page?: number
   @Output() pageChange = new EventEmitter<number>()
   @Input() rotation?: number
@@ -93,7 +93,7 @@ export class PngxPdfViewerComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['src']) {
+    if (changes['src'] || changes['password']) {
       this.resetViewerState()
       if (this.src) {
         this.loadDocument()
@@ -174,8 +174,12 @@ export class PngxPdfViewerComponent
       'assets/js/pdf.worker.min.mjs',
       this.document.baseURI
     ).toString()
-    this.loadingTask = getDocument(this.src)
-
+    let initOptions = {
+      url: this.src,
+      password: this.password,
+      withCredentials: true,
+    }
+    this.loadingTask = getDocument(initOptions)
     try {
       const pdf = await this.loadingTask.promise
       this.pdf = pdf
@@ -287,7 +291,7 @@ export class PngxPdfViewerComponent
     this.eventBus.dispatch('find', {
       query,
       caseSensitive: false,
-      highlightAll: query.length > 0,
+      highlightAll: query?.length > 0,
       phraseSearch: true,
     })
   }

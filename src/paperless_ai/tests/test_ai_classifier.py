@@ -239,6 +239,23 @@ def test_get_language_name_falls_back_to_language_code():
     assert get_language_name("zz-zz") == "zz-zz"
 
 
+def test_build_localization_prompt_preserves_unicode_characters():
+    prompt = build_localization_prompt(
+        {
+            "title": "Gebührenbescheid",
+            "tags": [],
+            "correspondents": [],
+            "document_types": [],
+            "storage_paths": [],
+            "dates": [],
+        },
+        output_language="de-de",
+    )
+
+    assert "Gebührenbescheid" in prompt
+    assert "\\u00fc" not in prompt
+
+
 @patch("paperless_ai.ai_classifier.query_similar_documents")
 def test_get_context_for_document(
     mock_query_similar_documents,

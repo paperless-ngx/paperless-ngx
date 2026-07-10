@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable, inject } from '@angular/core'
+import { Injectable, inject, signal } from '@angular/core'
 import { Observable, Subject } from 'rxjs'
 import { first, map, takeUntil, tap } from 'rxjs/operators'
 import {
@@ -23,44 +23,44 @@ export class TasksService {
 
   public loading: boolean = false
 
-  private fileTasks: PaperlessTask[] = []
+  private readonly fileTasks = signal<PaperlessTask[]>([])
 
   private unsubscribeNotifer: Subject<any> = new Subject()
 
   public get total(): number {
-    return this.fileTasks.length
+    return this.fileTasks().length
   }
 
   public get allFileTasks(): PaperlessTask[] {
-    return this.fileTasks.slice(0)
+    return this.fileTasks().slice(0)
   }
 
   public get queuedFileTasks(): PaperlessTask[] {
-    return this.fileTasks.filter(
+    return this.fileTasks().filter(
       (t) => t.status === PaperlessTaskStatus.Pending
     )
   }
 
   public get startedFileTasks(): PaperlessTask[] {
-    return this.fileTasks.filter(
+    return this.fileTasks().filter(
       (t) => t.status === PaperlessTaskStatus.Started
     )
   }
 
   public get completedFileTasks(): PaperlessTask[] {
-    return this.fileTasks.filter(
+    return this.fileTasks().filter(
       (t) => t.status === PaperlessTaskStatus.Success
     )
   }
 
   public get failedFileTasks(): PaperlessTask[] {
-    return this.fileTasks.filter(
+    return this.fileTasks().filter(
       (t) => t.status === PaperlessTaskStatus.Failure
     )
   }
 
   public get needsAttentionTasks(): PaperlessTask[] {
-    return this.fileTasks.filter((t) =>
+    return this.fileTasks().filter((t) =>
       [PaperlessTaskStatus.Failure, PaperlessTaskStatus.Revoked].includes(
         t.status
       )
@@ -81,7 +81,7 @@ export class TasksService {
       .pipe(map((r) => r.results))
       .pipe(takeUntil(this.unsubscribeNotifer), first())
       .subscribe((r) => {
-        this.fileTasks = r
+        this.fileTasks.set(r)
         this.loading = false
       })
   }

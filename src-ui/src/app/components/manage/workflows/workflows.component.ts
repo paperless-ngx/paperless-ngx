@@ -1,8 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core'
+import { Component, OnInit, inject, signal } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { delay, takeUntil, tap } from 'rxjs'
+import { takeUntil, tap } from 'rxjs'
 import { Workflow } from 'src/app/data/workflow'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsService } from 'src/app/services/permissions.service'
@@ -39,24 +39,23 @@ export class WorkflowsComponent
   private modalService = inject(NgbModal)
   private toastService = inject(ToastService)
 
-  public workflows: Workflow[] = []
+  readonly workflows = signal<Workflow[]>([])
 
   ngOnInit() {
     this.reload()
   }
 
   reload() {
-    this.loading = true
+    this.loading.set(true)
     this.workflowService
       .listAll()
       .pipe(
         takeUntil(this.unsubscribeNotifier),
-        tap((r) => (this.workflows = r.results)),
-        delay(100)
+        tap((r) => this.workflows.set(r.results))
       )
       .subscribe(() => {
-        this.show = true
-        this.loading = false
+        this.show.set(true)
+        this.loading.set(false)
       })
   }
 
@@ -74,8 +73,9 @@ export class WorkflowsComponent
       backdrop: 'static',
       size: 'xl',
     })
-    modal.componentInstance.dialogMode =
+    modal.componentInstance.dialogMode.set(
       workflow && !forceCreate ? EditDialogMode.EDIT : EditDialogMode.CREATE
+    )
     if (workflow) {
       // quick "deep" clone so original doesn't get modified
       const clone = Object.assign({}, workflow)
