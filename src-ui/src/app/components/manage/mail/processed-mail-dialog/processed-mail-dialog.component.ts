@@ -1,5 +1,5 @@
 import { SlicePipe } from '@angular/common'
-import { Component, inject, Input, OnInit } from '@angular/core'
+import { Component, inject, OnInit, signal } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
   NgbActiveModal,
@@ -36,15 +36,13 @@ export class ProcessedMailDialogComponent implements OnInit {
   private readonly processedMailService = inject(ProcessedMailService)
   private readonly toastService = inject(ToastService)
 
-  public processedMails: ProcessedMail[] = []
-
-  public loading: boolean = true
-  public toggleAllEnabled: boolean = false
-  public readonly selectedMailIds: Set<number> = new Set<number>()
+  readonly rule = signal<MailRule>(undefined)
+  readonly processedMails = signal<ProcessedMail[]>([])
+  readonly loading = signal(true)
+  readonly toggleAllEnabled = signal(false)
+  readonly selectedMailIds = signal<Set<number>>(new Set())
 
   public page: number = 1
-
-  @Input() rule: MailRule
 
   ngOnInit(): void {
     this.loadProcessedMails()
@@ -55,19 +53,19 @@ export class ProcessedMailDialogComponent implements OnInit {
   }
 
   private loadProcessedMails(): void {
-    this.loading = true
+    this.loading.set(true)
     this.clearSelection()
     this.processedMailService
-      .list(this.page, 50, 'processed_at', true, { rule: this.rule.id })
+      .list(this.page, 50, 'processed_at', true, { rule: this.rule().id })
       .subscribe((result) => {
-        this.processedMails = result.results
-        this.loading = false
+        this.processedMails.set(result.results)
+        this.loading.set(false)
       })
   }
 
   public deleteSelected(): void {
     this.processedMailService
-      .bulk_delete(Array.from(this.selectedMailIds))
+      .bulk_delete(Array.from(this.selectedMailIds()))
       .subscribe(() => {
         this.toastService.showInfo($localize`Processed mail(s) deleted`)
         this.loadProcessedMails()
@@ -75,22 +73,25 @@ export class ProcessedMailDialogComponent implements OnInit {
   }
 
   public toggleAll(event: PointerEvent) {
+    const selectedMailIds = new Set<number>()
     if ((event.target as HTMLInputElement).checked) {
-      this.selectedMailIds.clear()
-      this.processedMails.forEach((mail) => this.selectedMailIds.add(mail.id))
+      this.processedMails().forEach((mail) => selectedMailIds.add(mail.id))
+      this.selectedMailIds.set(selectedMailIds)
     } else {
       this.clearSelection()
     }
   }
 
   public clearSelection() {
-    this.toggleAllEnabled = false
-    this.selectedMailIds.clear()
+    this.toggleAllEnabled.set(false)
+    this.selectedMailIds.set(new Set())
   }
 
   public toggleSelected(mail: ProcessedMail) {
-    this.selectedMailIds.has(mail.id)
-      ? this.selectedMailIds.delete(mail.id)
-      : this.selectedMailIds.add(mail.id)
+    const selectedMailIds = new Set(this.selectedMailIds())
+    selectedMailIds.has(mail.id)
+      ? selectedMailIds.delete(mail.id)
+      : selectedMailIds.add(mail.id)
+    this.selectedMailIds.set(selectedMailIds)
   }
 }

@@ -9,8 +9,8 @@
   </button>
   @if (canViewSystemStatus) {
     <button class="btn btn-sm btn-outline-primary position-relative ms-md-5 me-1" (click)="showSystemStatus()"
-      [disabled]="!systemStatus">
-      @if (!systemStatus) {
+      [disabled]="!systemStatus()">
+      @if (!systemStatus()) {
         <div class="spinner-border spinner-border-sm me-2 h-75" role="status"></div>
       } @else {
         <i-bs class="me-2" name="card-checklist"></i-bs>
@@ -313,7 +313,7 @@
             <span i18n>Default Owner</span>
           </div>
           <div class="col-md-5">
-            <pngx-input-select [items]="users" bindLabel="username" formControlName="defaultPermsOwner" [allowNull]="true"></pngx-input-select>
+            <pngx-input-select [items]="users()" bindLabel="username" formControlName="defaultPermsOwner" [allowNull]="true"></pngx-input-select>
             <small class="form-text text-muted text-end d-block mt-n2" i18n>Objects without an owner can be viewed and edited by all users</small>
           </div>
         </div>

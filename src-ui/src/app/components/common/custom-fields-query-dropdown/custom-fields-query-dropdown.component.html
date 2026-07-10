@@ -75,7 +75,7 @@
 
 <ng-template #queryAtom let-atom="atom">
   <div class="input-group input-group-sm">
-    <ng-select
+    <ng-select #fieldSelects
       class="paperless-input-select"
       [items]="customFields"
       [(ngModel)]="atom.field"

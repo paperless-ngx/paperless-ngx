@@ -1,5 +1,5 @@
 <div class="modal-header">
-  <h6 class="modal-title" id="modal-basic-title" i18n>Processed Mail for <em>{{ rule.name }}</em></h6>
+  <h6 class="modal-title" id="modal-basic-title" i18n>Processed Mail for <em>{{ rule().name }}</em></h6>
   <button class="btn btn-sm btn-link text-muted me-auto p-0 p-md-2" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true">
     <i-bs name="question-circle"></i-bs>
   </button>
@@ -10,13 +10,13 @@
   <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
 </div>
 <div class="modal-body">
-  @if (loading) {
+  @if (loading()) {
     <div class="text-center my-5">
       <div class="spinner-border" role="status">
         <span class="visually-hidden" i18n>Loading...</span>
       </div>
     </div>
-  } @else if (processedMails.length === 0) {
+  } @else if (processedMails().length === 0) {
     <span i18n>No processed email messages found.</span>
   } @else {
     <div class="table-responsive">
@@ -25,7 +25,7 @@
           <tr>
             <th scope="col" style="width: 40px;">
               <div class="form-check m-0 ms-2 me-n2">
-                <input type="checkbox" class="form-check-input" id="all-objects" [(ngModel)]="toggleAllEnabled" [disabled]="processedMails.length === 0" (click)="toggleAll($event); $event.stopPropagation();">
+                <input type="checkbox" class="form-check-input" id="all-objects" [ngModel]="toggleAllEnabled()" (ngModelChange)="toggleAllEnabled.set($event)" [disabled]="processedMails().length === 0" (click)="toggleAll($event); $event.stopPropagation();">
                 <label class="form-check-label" for="all-objects"></label>
               </div>
             </th>
@@ -37,7 +37,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (mail of processedMails; track mail.id) {
+          @for (mail of processedMails(); track mail.id) {
             <ng-template #statusTooltip>
               <div class="small text-light font-monospace">
                   {{mail.status}}
@@ -46,7 +46,7 @@
             <tr>
               <td>
                 <div class="form-check m-0 ms-2 me-n2">
-                  <input type="checkbox" class="form-check-input" [id]="mail.id" [checked]="selectedMailIds.has(mail.id)" (click)="toggleSelected(mail); $event.stopPropagation();">
+                  <input type="checkbox" class="form-check-input" [id]="mail.id" [checked]="selectedMailIds().has(mail.id)" (click)="toggleSelected(mail); $event.stopPropagation();">
                   <label class="form-check-label" [for]="mail.id"></label>
                 </div>
               </td>
@@ -82,7 +82,7 @@
       </table>
     </div>
     <div class="btn-toolbar">
-      <button type="button" class="btn btn-outline-secondary me-2" (click)="clearSelection()" [disabled]="selectedMailIds.size === 0" i18n>Clear</button>
+      <button type="button" class="btn btn-outline-secondary me-2" (click)="clearSelection()" [disabled]="selectedMailIds().size === 0" i18n>Clear</button>
       <pngx-confirm-button
         label="Delete selected"
         i18n-label
@@ -90,12 +90,12 @@
         i18n-title
         buttonClasses="btn-outline-danger"
         iconName="trash"
-        [disabled]="selectedMailIds.size === 0"
+        [disabled]="selectedMailIds().size === 0"
         (confirm)="deleteSelected()">
       </pngx-confirm-button>
       <div class="ms-auto">
         <ngb-pagination
-          [collectionSize]="processedMails.length"
+          [collectionSize]="processedMails().length"
           [(page)]="page"
           [pageSize]="50"
           [maxSize]="5"

@@ -1,9 +1,9 @@
 import '@angular/localize/init'
 import { jest } from '@jest/globals'
-import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone'
+import { setupZonelessTestEnv } from 'jest-preset-angular/setup-env/zoneless'
 import { TextDecoder, TextEncoder } from 'node:util'
 if (process.env.NODE_ENV === 'test') {
-  setupZoneTestEnv()
+  setupZonelessTestEnv()
 }
 ;(globalThis as any).TextEncoder = TextEncoder as unknown as {
   new (): TextEncoder

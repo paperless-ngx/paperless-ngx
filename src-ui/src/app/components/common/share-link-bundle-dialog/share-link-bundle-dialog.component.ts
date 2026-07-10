@@ -1,6 +1,6 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { CommonModule } from '@angular/common'
-import { Component, Input, inject } from '@angular/core'
+import { Component, inject, signal } from '@angular/core'
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Document } from 'src/app/data/document'
@@ -38,10 +38,11 @@ export class ShareLinkBundleDialogComponent extends ConfirmDialogComponent {
   private readonly clipboard = inject(Clipboard)
   private readonly toastService = inject(ToastService)
 
-  private _documents: Document[] = []
+  readonly documents = signal<Document[]>([])
+  readonly selectionCount = signal(0)
+  readonly documentPreview = signal<Document[]>([])
+  readonly copied = signal(false)
 
-  selectionCount = 0
-  documentPreview: Document[] = []
   form: FormGroup = this.formBuilder.group({
     shareArchiveVersion: true,
     expirationDays: [7],
@@ -51,28 +52,27 @@ export class ShareLinkBundleDialogComponent extends ConfirmDialogComponent {
   readonly expirationOptions = SHARE_LINK_EXPIRATION_OPTIONS
 
   createdBundle: ShareLinkBundleSummary | null = null
-  copied = false
   onOpenManage?: () => void
   readonly statuses = ShareLinkBundleStatus
 
   constructor() {
     super()
-    this.loading = false
+    this.loading.set(false)
     this.title = $localize`Create share link bundle`
     this.btnCaption = $localize`Create link`
   }
 
-  @Input()
-  set documents(docs: Document[]) {
-    this._documents = docs.concat()
-    this.selectionCount = this._documents.length
-    this.documentPreview = this._documents.slice(0, 10)
+  setDocuments(docs: Document[]) {
+    const documents = docs.concat()
+    this.documents.set(documents)
+    this.selectionCount.set(documents.length)
+    this.documentPreview.set(documents.slice(0, 10))
   }
 
   submit() {
     if (this.createdBundle) return
     this.payload = {
-      document_ids: this._documents.map((doc) => doc.id),
+      document_ids: this.documents().map((doc) => doc.id),
       file_version: this.form.value.shareArchiveVersion
         ? FileVersion.Archive
         : FileVersion.Original,
@@ -92,10 +92,10 @@ export class ShareLinkBundleDialogComponent extends ConfirmDialogComponent {
   copy(bundle: ShareLinkBundleSummary): void {
     const success = this.clipboard.copy(this.getShareUrl(bundle))
     if (success) {
-      this.copied = true
+      this.copied.set(true)
       this.toastService.showInfo($localize`Share link copied to clipboard.`)
       setTimeout(() => {
-        this.copied = false
+        this.copied.set(false)
       }, 3000)
     }
   }

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core'
+import { Component, OnInit, inject, signal } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import {
   NgbDropdownModule,
@@ -6,7 +6,7 @@ import {
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { delay, takeUntil, tap } from 'rxjs'
+import { takeUntil, tap } from 'rxjs'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
 import { CustomFieldEditDialogComponent } from 'src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { EditDialogMode } from 'src/app/components/common/edit-dialog/edit-dialog.component'
@@ -51,33 +51,33 @@ export class CustomFieldsComponent
   private readonly documentService = inject(DocumentService)
   private readonly savedViewService = inject(SavedViewService)
 
-  public fields: CustomField[] = []
+  readonly fields = signal<CustomField[]>([])
 
   ngOnInit() {
     this.reload()
   }
 
   reload() {
+    this.loading.set(true)
     this.customFieldsService
       .listAll()
       .pipe(
         takeUntil(this.unsubscribeNotifier),
         tap((r) => {
-          this.fields = r.results
-        }),
-        delay(100)
+          this.fields.set(r.results)
+        })
       )
       .subscribe(() => {
-        this.show = true
-        this.loading = false
+        this.show.set(true)
+        this.loading.set(false)
       })
   }
 
   editField(field: CustomField) {
     const modal = this.modalService.open(CustomFieldEditDialogComponent)
-    modal.componentInstance.dialogMode = field
-      ? EditDialogMode.EDIT
-      : EditDialogMode.CREATE
+    modal.componentInstance.dialogMode.set(
+      field ? EditDialogMode.EDIT : EditDialogMode.CREATE
+    )
     modal.componentInstance.object = field
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))

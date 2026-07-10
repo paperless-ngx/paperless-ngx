@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common'
-import { Component, OnDestroy, OnInit, inject } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -56,7 +56,7 @@ export class SavedViewsComponent
 
   DisplayMode = DisplayMode
 
-  public savedViews: SavedView[]
+  readonly savedViews = signal<SavedView[]>(undefined)
   private savedViewsGroup = new FormGroup({})
   public savedViewsForm: FormGroup = new FormGroup({
     savedViews: this.savedViewsGroup,
@@ -66,12 +66,12 @@ export class SavedViewsComponent
   public isDirty$: Observable<boolean>
 
   get displayFields() {
-    return this.settings.allDisplayFields
+    return this.settings.allDisplayFields()
   }
 
   constructor() {
     super()
-    this.settings.organizingSidebarSavedViews = true
+    this.settings.organizingSidebarSavedViews.set(true)
   }
 
   ngOnInit(): void {
@@ -79,29 +79,29 @@ export class SavedViewsComponent
   }
 
   private reloadViews(): void {
-    this.loading = true
+    this.loading.set(true)
     this.savedViewService
       .list(null, null, null, false, { full_perms: true })
       .subscribe((r) => {
-        this.savedViews = r.results
+        this.savedViews.set(r.results)
         this.initialize()
       })
   }
 
   ngOnDestroy(): void {
-    this.settings.organizingSidebarSavedViews = false
+    this.settings.organizingSidebarSavedViews.set(false)
     super.ngOnDestroy()
   }
 
   private initialize() {
-    this.loading = false
+    this.loading.set(false)
     this.emptyGroup(this.savedViewsGroup)
 
     let storeData = {
       savedViews: {},
     }
 
-    for (let view of this.savedViews) {
+    for (let view of this.savedViews()) {
       storeData.savedViews[view.id.toString()] = {
         id: view.id,
         name: view.name,
@@ -148,7 +148,9 @@ export class SavedViewsComponent
   public deleteSavedView(savedView: SavedView) {
     this.savedViewService.delete(savedView).subscribe(() => {
       this.savedViewsGroup.removeControl(savedView.id.toString())
-      this.savedViews.splice(this.savedViews.indexOf(savedView), 1)
+      this.savedViews.update((savedViews) =>
+        savedViews.filter((view) => view !== savedView)
+      )
       this.toastService.showInfo(
         $localize`Saved view "${savedView.name}" deleted.`
       )
@@ -254,10 +256,12 @@ export class SavedViewsComponent
     })
     const dialog = modal.componentInstance as PermissionsDialogComponent
     dialog.object = savedView
-    dialog.note = $localize`Note: Sharing saved views does not share the underlying documents.`
+    dialog.note.set(
+      $localize`Note: Sharing saved views does not share the underlying documents.`
+    )
 
     modal.componentInstance.confirmClicked.subscribe(({ permissions }) => {
-      modal.componentInstance.buttonsEnabled = false
+      modal.componentInstance.buttonsEnabled.set(false)
       const view = {
         id: savedView.id,
         owner: permissions.owner,

@@ -1,5 +1,5 @@
 import { JsonPipe, NgTemplateOutlet } from '@angular/common'
-import { Component, inject, OnDestroy, OnInit } from '@angular/core'
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 import {
@@ -166,14 +166,14 @@ export class TasksComponent
   public autoRefreshEnabled: boolean = true
   public readonly pageSize = 25
   public page: number = 1
-  public totalTasks: number = 0
-  public sectionCounts: Record<TaskSection, number> = {
+  readonly totalTasks = signal(0)
+  readonly sectionCounts = signal<Record<TaskSection, number>>({
     [TaskSection.All]: 0,
     [TaskSection.NeedsAttention]: 0,
     [TaskSection.InProgress]: 0,
     [TaskSection.Completed]: 0,
-  }
-  public pagedTasks: PaperlessTask[] = []
+  })
+  readonly pagedTasks = signal<PaperlessTask[]>([])
   public selectedSection: TaskSection = TaskSection.All
   public selectedTaskType: PaperlessTaskType | null = null
   public selectedTriggerSource: PaperlessTaskTriggerSource | null = null
@@ -346,7 +346,7 @@ export class TasksComponent
       backdrop: 'static',
     })
     modal.componentInstance.title = $localize`Confirm Dismiss All`
-    modal.componentInstance.messageBold = $localize`Dismiss all ${this.totalTasks} tasks?`
+    modal.componentInstance.messageBold = $localize`Dismiss all ${this.totalTasks()} tasks?`
     modal.componentInstance.btnClass = 'btn-warning'
     modal.componentInstance.btnCaption = $localize`Dismiss`
     modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
@@ -465,7 +465,7 @@ export class TasksComponent
   }
 
   tasksForSection(section: TaskSection): PaperlessTask[] {
-    let tasks = this.pagedTasks.filter((task) =>
+    let tasks = this.pagedTasks().filter((task) =>
       this.taskBelongsToSection(task, section)
     )
 
@@ -477,7 +477,14 @@ export class TasksComponent
   }
 
   sectionCount(section: TaskSection): number {
-    return this.sectionCounts[section]
+    return this.sectionCounts()[section]
+  }
+
+  private setSectionCount(section: TaskSection, count: number) {
+    this.sectionCounts.update((counts) => ({
+      ...counts,
+      [section]: count,
+    }))
   }
 
   sectionShowsResults(section: TaskSection): boolean {
@@ -652,7 +659,7 @@ export class TasksComponent
         ? this.sections
         : [this.selectedSection]
 
-    return this.pagedTasks.filter(
+    return this.pagedTasks().filter(
       (task) =>
         sections.some((section) => this.taskBelongsToSection(task, section)) &&
         this.taskMatchesFilters(task, { taskType, triggerSource })
@@ -664,10 +671,12 @@ export class TasksComponent
       .statusCounts(this.getParamsForSection(TaskSection.All))
       .pipe(first(), takeUntil(this.unsubscribeNotifier))
       .subscribe((counts) => {
-        this.sectionCounts[TaskSection.All] = counts.all
-        this.sectionCounts[TaskSection.NeedsAttention] = counts.needs_attention
-        this.sectionCounts[TaskSection.InProgress] = counts.in_progress
-        this.sectionCounts[TaskSection.Completed] = counts.completed
+        this.sectionCounts.set({
+          [TaskSection.All]: counts.all,
+          [TaskSection.NeedsAttention]: counts.needs_attention,
+          [TaskSection.InProgress]: counts.in_progress,
+          [TaskSection.Completed]: counts.completed,
+        })
       })
   }
 
@@ -723,7 +732,7 @@ export class TasksComponent
 
     this.reloadSectionCounts()
 
-    this.loading = true
+    this.loading.set(true)
     this.tasksService
       .list(
         this.page,
@@ -733,24 +742,24 @@ export class TasksComponent
       .pipe(first(), takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
-          this.pagedTasks = result.results
-          this.totalTasks = result.count
-          this.sectionCounts[TaskSection.All] = result.count
+          this.pagedTasks.set(result.results)
+          this.totalTasks.set(result.count)
+          this.setSectionCount(TaskSection.All, result.count)
           if (this.selectedSection !== TaskSection.All) {
-            this.sectionCounts[this.selectedSection] = result.count
+            this.setSectionCount(this.selectedSection, result.count)
           }
-          this.loading = false
+          this.loading.set(false)
           if (
             this.page > 1 &&
-            this.pagedTasks.length === 0 &&
-            this.totalTasks > 0
+            this.pagedTasks().length === 0 &&
+            this.totalTasks() > 0
           ) {
             this.page -= 1
             this.reloadPage()
           }
         },
         error: () => {
-          this.loading = false
+          this.loading.set(false)
         },
       })
   }

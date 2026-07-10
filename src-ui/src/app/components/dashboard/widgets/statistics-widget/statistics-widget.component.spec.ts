@@ -74,7 +74,7 @@ describe('StatisticsWidgetComponent', () => {
 
   it('should not call statistics endpoint on reload if already loading', () => {
     httpTestingController.expectOne(`${environment.apiBaseUrl}statistics/`)
-    component.loading = true
+    component.loading.set(true)
     component.reload()
     httpTestingController.expectNone(`${environment.apiBaseUrl}statistics/`)
   })
