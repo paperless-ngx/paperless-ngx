@@ -6,7 +6,7 @@
   <div class="col-12 col-lg-8 col-xl-9 mb-4">
     <div class="row row-cols-1 g-4"
       cdkDropList
-      [cdkDropListDisabled]="settingsService.globalDropzoneActive"
+      [cdkDropListDisabled]="settingsService.globalDropzoneActive()"
       (cdkDropListDropped)="onDrop($event)"
       >
       @if (savedViewService.loading) {
