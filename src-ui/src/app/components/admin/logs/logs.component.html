@@ -31,7 +31,7 @@
       </a>
     </li>
   }
-  @if (loading || !logFiles().length) {
+  @if (loading() || !logFiles().length) {
     <div class="ps-2 d-flex align-items-center">
       <div class="spinner-border spinner-border-sm me-2" role="status"></div>
       @if (!logFiles().length) {
