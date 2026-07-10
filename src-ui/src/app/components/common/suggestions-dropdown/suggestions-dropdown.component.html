@@ -11,7 +11,7 @@
     }
   </button>
 
-  @if (aiEnabled) {
+  @if (aiEnabled()) {
     <div class="btn-group" ngbDropdown #dropdown="ngbDropdown" [popperOptions]="popperOptions">
       <button type="button" class="btn btn-sm btn-outline-primary" ngbDropdownToggle [disabled]="disabled() || loading() || !suggestions()" aria-expanded="false" aria-controls="suggestionsDropdown" aria-label="Suggestions dropdown">
         <span class="visually-hidden" i18n>Show suggestions</span>
