@@ -136,7 +136,7 @@ describe('EditDialogComponent', () => {
   it('should interpolate object permissions', () => {
     component.getMatchingAlgorithms() // coverage
     component.object = tag
-    component.dialogMode = EditDialogMode.EDIT
+    component.dialogMode.set(EditDialogMode.EDIT)
     component.ngOnInit()
 
     expect(component.objectForm.get('permissions_form').value).toEqual({
@@ -153,7 +153,7 @@ describe('EditDialogComponent', () => {
   }))
 
   it('should set default owner when in create mode if unset', () => {
-    component.dialogMode = EditDialogMode.CREATE
+    component.dialogMode.set(EditDialogMode.CREATE)
     component.ngOnInit()
     expect(component.objectForm.get('permissions_form').value.owner).toEqual(
       currentUser.id
@@ -164,7 +164,7 @@ describe('EditDialogComponent', () => {
   })
 
   it('should set default perms when in create mode if set', () => {
-    component.dialogMode = EditDialogMode.CREATE
+    component.dialogMode.set(EditDialogMode.CREATE)
     settingsService.set(SETTINGS_KEYS.DEFAULT_PERMS_OWNER, 11)
     settingsService.set(SETTINGS_KEYS.DEFAULT_PERMS_VIEW_USERS, [1, 2])
     settingsService.set(SETTINGS_KEYS.DEFAULT_PERMS_VIEW_GROUPS, [3])
@@ -203,18 +203,18 @@ describe('EditDialogComponent', () => {
   })
 
   it('should support create and edit modes', () => {
-    component.dialogMode = EditDialogMode.CREATE
+    component.dialogMode.set(EditDialogMode.CREATE)
     const createTitleSpy = jest.spyOn(component, 'getCreateTitle')
     const editTitleSpy = jest.spyOn(component, 'getEditTitle')
-    fixture.detectChanges()
+    component.getTitle()
     expect(createTitleSpy).toHaveBeenCalled()
     expect(editTitleSpy).not.toHaveBeenCalled()
-    component.dialogMode = EditDialogMode.EDIT
-    fixture.detectChanges()
+    component.dialogMode.set(EditDialogMode.EDIT)
+    component.getTitle()
     expect(editTitleSpy).toHaveBeenCalled()
     // coverage
-    component.dialogMode = null
-    fixture.detectChanges()
+    component.dialogMode.set(null)
+    component.getTitle()
   })
 
   it('should close on cancel', () => {
@@ -225,14 +225,14 @@ describe('EditDialogComponent', () => {
 
   it('should update an object on save in edit mode', () => {
     const updateSpy = jest.spyOn(tagService, 'update')
-    component.dialogMode = EditDialogMode.EDIT
+    component.dialogMode.set(EditDialogMode.EDIT)
     component.save()
     expect(updateSpy).toHaveBeenCalled()
   })
 
   it('should not submit owner or permissions for non-owner edits', () => {
     component.object = tag
-    component.dialogMode = EditDialogMode.EDIT
+    component.dialogMode.set(EditDialogMode.EDIT)
     component.ngOnInit()
 
     component.objectForm.get('name').setValue('Updated tag')
@@ -251,7 +251,7 @@ describe('EditDialogComponent', () => {
 
   it('should create an object on save in edit mode', () => {
     const createSpy = jest.spyOn(tagService, 'create')
-    component.dialogMode = EditDialogMode.CREATE
+    component.dialogMode.set(EditDialogMode.CREATE)
     component.save()
     expect(createSpy).toHaveBeenCalled()
   })

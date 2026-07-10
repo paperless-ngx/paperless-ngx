@@ -194,7 +194,7 @@ describe('WorkflowEditDialogComponent', () => {
   })
 
   it('should support create and edit modes, support adding triggers and actions on new workflow', () => {
-    component.dialogMode = EditDialogMode.CREATE
+    component.dialogMode.set(EditDialogMode.CREATE)
     const createTitleSpy = jest.spyOn(component, 'getCreateTitle')
     const editTitleSpy = jest.spyOn(component, 'getEditTitle')
     fixture.detectChanges()
@@ -209,7 +209,7 @@ describe('WorkflowEditDialogComponent', () => {
     expect(component.object).not.toBeUndefined()
     expect(component.object.triggers).toHaveLength(1)
 
-    component.dialogMode = EditDialogMode.EDIT
+    component.dialogMode.set(EditDialogMode.EDIT)
     fixture.detectChanges()
     expect(editTitleSpy).toHaveBeenCalled()
   })
