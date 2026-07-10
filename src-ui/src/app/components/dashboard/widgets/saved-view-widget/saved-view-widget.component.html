@@ -13,7 +13,7 @@
     <a class="btn-link text-decoration-none" header-buttons [routerLink]="[]" (click)="showAll()" i18n>Show all</a>
   }
 
-  <div content class="wrapper fade" [class.show]="show">
+  <div content class="wrapper fade" [class.show]="show()">
   @if (displayMode() === DisplayMode.TABLE) {
     <table class="table table-hover mb-0 mt-n2 align-middle">
       <thead>
@@ -33,7 +33,7 @@
         </tr>
       </thead>
       <tbody>
-        @if (loading && !documents().length) {
+        @if (loading() && !documents().length) {
           @for (row of placeholderRows; track row) {
             <tr>
               @for (field of displayFields(); track field; let j = $index) {
@@ -50,7 +50,7 @@
           <tr>
             @for (field of displayFields(); track field; let j = $index) {
               <td class="py-2 py-md-3 position-relative" [ngClass]="{ 'd-none d-md-table-cell': j > 1 }">
-                @if (loading && !documents().length) {
+                @if (loading() && !documents().length) {
                   <div class="placeholder-glow text-start">
                     <span class="placeholder bg-secondary w-50" [ngStyle]="{ opacity: 1 - (i * 1/documents().length) }"></span>
                   </div>
@@ -131,7 +131,7 @@
     </table>
   } @else if (displayMode() === DisplayMode.SMALL_CARDS) {
     <div class="row row-cols-paperless-cards my-n2">
-      @if (loading && !documents().length) {
+      @if (loading() && !documents().length) {
         @for (row of placeholderRows; track row) {
           <pngx-document-card-small
             class="p-0"
@@ -157,7 +157,7 @@
     </div>
   } @else if (displayMode() === DisplayMode.LARGE_CARDS) {
     <div class="row my-n2">
-      @if (loading && !documents().length) {
+      @if (loading() && !documents().length) {
         @for (row of placeholderRows; track row) {
           <pngx-document-card-large
             [document]="null"

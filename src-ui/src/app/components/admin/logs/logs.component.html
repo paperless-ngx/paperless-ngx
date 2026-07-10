@@ -42,7 +42,7 @@
 </ul>
 
 <div #logContainer class="bg-dark text-light font-monospace log-container p-3" (scroll)="onScroll()">
-  @if (loading && !logFiles().length) {
+  @if (loading() && !logFiles().length) {
     <div>
       <div class="spinner-border spinner-border-sm me-2" role="status"></div>
       <ng-container i18n>Loading...</ng-container>

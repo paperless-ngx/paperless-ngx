@@ -125,7 +125,7 @@
                       <button
                         type="button"
                         class="btn btn-outline-warning"
-                        [disabled]="loading"
+                        [disabled]="loading()"
                         (click)="retry(bundle)"
                       >
                         <i-bs name="arrow-clockwise"></i-bs>
@@ -134,7 +134,7 @@
                     }
                     <pngx-confirm-button
                       buttonClasses="btn btn-sm btn-outline-danger"
-                      [disabled]="loading"
+                      [disabled]="loading()"
                       (confirm)="delete(bundle)"
                       iconName="trash"
                     >

@@ -8,7 +8,7 @@
                     placeholder="Search" aria-label="Search" i18n-placeholder
                     autocomplete="off"
                     spellcheck="false"
-                    [(ngModel)]="query"
+                    [ngModel]="query()"
                     (ngModelChange)="queryDebounce.next($event)"
                     (keydown)="searchInputKeyDown($event)"
                     ngbDropdownAnchor>
