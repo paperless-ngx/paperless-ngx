@@ -229,12 +229,11 @@ jobs:
         run: cd src-ui && pnpm install --no-frozen-lockfile
       - name: Run Playwright E2E tests
         run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
-  bundle-analysis:
-    name: Bundle Analysis
+  frontend-build:
+    name: Frontend Build
     needs: [changes, unit-tests, e2e-tests]
     if: needs.changes.outputs.frontend_changed == 'true'
     runs-on: ubuntu-24.04
-    environment: bundle-analysis
     permissions:
       contents: read
     steps:
@@ -262,19 +261,17 @@ jobs:
           key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
       - name: Re-link Angular CLI
         run: cd src-ui && pnpm link @angular/cli
-      - name: Build and analyze
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Build
         run: cd src-ui && pnpm run build --configuration=production
   gate:
     name: Frontend CI Gate
-    needs: [changes, install-dependencies, lint, unit-tests, e2e-tests, bundle-analysis]
+    needs: [changes, install-dependencies, lint, unit-tests, e2e-tests, frontend-build]
     if: always()
     runs-on: ubuntu-slim
     steps:
       - name: Check gate
         env:
-          BUNDLE_ANALYSIS_RESULT: ${{ needs['bundle-analysis'].result }}
+          BUILD_RESULT: ${{ needs['frontend-build'].result }}
           E2E_RESULT: ${{ needs['e2e-tests'].result }}
           FRONTEND_CHANGED: ${{ needs.changes.outputs.frontend_changed }}
           INSTALL_RESULT: ${{ needs['install-dependencies'].result }}
@@ -306,8 +303,8 @@ jobs:
             exit 1
           fi
 
-          if [[ "${BUNDLE_ANALYSIS_RESULT}" != "success" ]]; then
-            echo "::error::Frontend bundle-analysis job result: ${BUNDLE_ANALYSIS_RESULT}"
+          if [[ "${BUILD_RESULT}" != "success" ]]; then
+            echo "::error::Frontend build job result: ${BUILD_RESULT}"
             exit 1
           fi
 
