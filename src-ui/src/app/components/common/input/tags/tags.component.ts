@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   forwardRef,
@@ -49,6 +50,7 @@ import { TagComponent } from '../../tag/tag.component'
 export class TagsComponent implements OnInit, ControlValueAccessor {
   private tagService = inject(TagService)
   private modalService = inject(NgbModal)
+  private readonly changeDetector = inject(ChangeDetectorRef)
 
   constructor() {
     this.createTagRef = this.createTag.bind(this)
@@ -60,6 +62,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   writeValue(newValue: number[]): void {
     this.value = newValue
+    this.changeDetector.markForCheck()
   }
   registerOnChange(fn: any): void {
     this.onChange = fn
@@ -69,11 +72,13 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   }
   setDisabledState?(isDisabled: boolean): void {
     this.disabled = isDisabled
+    this.changeDetector.markForCheck()
   }
 
   ngOnInit(): void {
     this.tagService.listAll().subscribe((result) => {
       this.tags = result.results
+      this.changeDetector.markForCheck()
     })
   }
 
