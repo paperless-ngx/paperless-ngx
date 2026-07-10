@@ -1,10 +1,10 @@
-<pngx-page-header [(title)]="title" [id]="documentId">
+<pngx-page-header [title]="title()" [id]="documentId()">
   @if (archiveContentRenderType === ContentRenderType.PDF && !useNativePdfViewer) {
-    @if (previewNumPages) {
+    @if (previewNumPages()) {
       <div class="input-group input-group-sm ms-2 d-none d-md-flex">
         <div class="input-group-text" i18n>Page</div>
-          <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
-        <div class="input-group-text" i18n>of {{previewNumPages}}</div>
+          <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages()" [ngModel]="previewCurrentPage()" (ngModelChange)="previewCurrentPage.set($event)" />
+        <div class="input-group-text" i18n>of {{previewNumPages()}}</div>
       </div>
     }
     <div class="input-group input-group-sm me-md-5 d-none d-md-flex">
@@ -25,9 +25,9 @@
   </button>
 
   <pngx-document-version-dropdown
-    [documentId]="documentId"
-    [versions]="document?.versions ?? []"
-    [selectedVersionId]="selectedVersionId"
+    [documentId]="documentId()"
+    [versions]="document()?.versions ?? []"
+    [selectedVersionId]="selectedVersionId()"
     [userIsOwner]="userIsOwner"
     [userCanEdit]="userCanEdit"
     (versionSelected)="onVersionSelected($event)"
@@ -35,8 +35,8 @@
   />
 
   <div class="btn-group">
-    <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading">
-      @if (downloading) {
+    <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading()">
+      @if (downloading()) {
         <div class="spinner-border spinner-border-sm" role="status"></div>
       } @else {
         <i-bs width="1.2em" height="1.2em" name="download"></i-bs>
@@ -45,10 +45,10 @@
     </button>
 
     <div class="btn-group" ngbDropdown role="group">
-      <button class="btn btn-sm btn-outline-primary dropdown-toggle" [disabled]="downloading" ngbDropdownToggle></button>
+      <button class="btn btn-sm btn-outline-primary dropdown-toggle" [disabled]="downloading()" ngbDropdownToggle></button>
       <div class="dropdown-menu shadow" ngbDropdownMenu>
-        @if (metadata?.has_archive_version) {
-          <button ngbDropdownItem (click)="download(true)" [disabled]="downloading" i18n>Download original</button>
+        @if (metadata()?.has_archive_version) {
+          <button ngbDropdownItem (click)="download(true)" [disabled]="downloading()" i18n>Download original</button>
           <div class="dropdown-divider"></div>
         }
         <form class="px-3 py-1">
@@ -129,9 +129,9 @@
         <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
           <div class="btn-group pb-3 ms-auto">
             <pngx-suggestions-dropdown *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }"
-              [disabled]="!userCanEdit || suggestionsLoading"
-              [loading]="suggestionsLoading"
-              [suggestions]="suggestions"
+              [disabled]="!userCanEdit || suggestionsLoading()"
+              [loading]="suggestionsLoading()"
+              [suggestions]="suggestions()"
               [aiEnabled]="aiEnabled"
               (getSuggestions)="getSuggestions()"
               (addTag)="createTag($event)"
@@ -143,9 +143,9 @@
           <div class="btn-group pb-3 ms-2">
             <pngx-custom-fields-dropdown
               *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
-              [documentId]="documentId"
+              [documentId]="documentId()"
               [disabled]="!userCanEdit"
-              [existingFields]="document?.custom_fields"
+              [existingFields]="document()?.custom_fields"
               (created)="refreshCustomFields()"
               (added)="addField($event)">
             </pngx-custom-fields-dropdown>
@@ -155,33 +155,33 @@
         <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
       </div>
 
-      <ul ngbNav #nav="ngbNav" class="nav-underline flex-nowrap flex-md-wrap overflow-auto" (navChange)="onNavChange($event)" [(activeId)]="activeNavID">
+      <ul ngbNav #nav="ngbNav" class="nav-underline flex-nowrap flex-md-wrap overflow-auto" (navChange)="onNavChange($event)" [activeId]="activeNavID()" (activeIdChange)="activeNavID.set($event)">
         <li [ngbNavItem]="DocumentDetailNavIDs.Details">
           <a ngbNavLink i18n>Details</a>
           <ng-template ngbNavContent>
             <div>
-              <pngx-input-text #inputTitle i18n-title title="Title" formControlName="title" [horizontal]="true" [suggestion]="suggestions?.title" (keyup)="titleKeyUp($event)" [error]="error?.title"></pngx-input-text>
+              <pngx-input-text #inputTitle i18n-title title="Title" formControlName="title" [horizontal]="true" [suggestion]="suggestions()?.title" (keyup)="titleKeyUp($event)" [error]="error()?.title"></pngx-input-text>
               @if (!isFieldHidden(DocumentDetailFieldID.ArchiveSerialNumber)) {
-                <pngx-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number" [horizontal]="true" formControlName='archive_serial_number'></pngx-input-number>
+                <pngx-input-number i18n-title title="Archive serial number" [error]="error()?.archive_serial_number" [horizontal]="true" formControlName='archive_serial_number'></pngx-input-number>
               }
-              <pngx-input-date i18n-title title="Date created" formControlName="created" [suggestions]="suggestions?.dates" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
-              [error]="error?.created"></pngx-input-date>
+              <pngx-input-date i18n-title title="Date created" formControlName="created" [suggestions]="suggestions()?.dates" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
+              [error]="error()?.created"></pngx-input-date>
               @if (!isFieldHidden(DocumentDetailFieldID.Correspondent)) {
-                <pngx-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.Correspondent)"
-                (createNew)="createCorrespondent($event)" [hideAddButton]="createDisabled(DataType.Correspondent)" [suggestions]="suggestions?.correspondents" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }"></pngx-input-select>
+                <pngx-input-select [items]="correspondents()" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.Correspondent)"
+                (createNew)="createCorrespondent($event)" [hideAddButton]="createDisabled(DataType.Correspondent)" [suggestions]="suggestions()?.correspondents" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }"></pngx-input-select>
               }
               @if (!isFieldHidden(DocumentDetailFieldID.DocumentType)) {
-                <pngx-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.DocumentType)"
-                (createNew)="createDocumentType($event)" [hideAddButton]="createDisabled(DataType.DocumentType)" [suggestions]="suggestions?.document_types" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }"></pngx-input-select>
+                <pngx-input-select [items]="documentTypes()" i18n-title title="Document type" formControlName="document_type" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.DocumentType)"
+                (createNew)="createDocumentType($event)" [hideAddButton]="createDisabled(DataType.DocumentType)" [suggestions]="suggestions()?.document_types" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }"></pngx-input-select>
               }
               @if (!isFieldHidden(DocumentDetailFieldID.StoragePath)) {
-                <pngx-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.StoragePath)"
-                (createNew)="createStoragePath($event)" [hideAddButton]="createDisabled(DataType.StoragePath)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></pngx-input-select>
+                <pngx-input-select [items]="storagePaths()" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.StoragePath)"
+                (createNew)="createStoragePath($event)" [hideAddButton]="createDisabled(DataType.StoragePath)" [suggestions]="suggestions()?.storage_paths" i18n-placeholder placeholder="Default" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }"></pngx-input-select>
               }
               @if (!isFieldHidden(DocumentDetailFieldID.Tags)) {
-                <pngx-input-tags #tagsInput formControlName="tags" [suggestions]="suggestions?.tags" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.Tag)" [hideAddButton]="createDisabled(DataType.Tag)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>
+                <pngx-input-tags #tagsInput formControlName="tags" [suggestions]="suggestions()?.tags" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event, DataType.Tag)" [hideAddButton]="createDisabled(DataType.Tag)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }"></pngx-input-tags>
               }
-              @for (fieldInstance of document?.custom_fields; track fieldInstance.field; let i = $index) {
+              @for (fieldInstance of document()?.custom_fields; track fieldInstance.field; let i = $index) {
                 <div [formGroup]="customFieldFormFields.controls[i]">
                   @switch (getCustomFieldFromInstance(fieldInstance)?.data_type) {
                     @case (CustomFieldDataType.String) {
@@ -246,7 +246,7 @@
                     @case (CustomFieldDataType.DocumentLink) {
                       <pngx-input-document-link formControlName="value"
                       [title]="getCustomFieldFromInstance(fieldInstance)?.name"
-                      [parentDocumentID]="documentId"
+                      [parentDocumentID]="documentId()"
                       [removable]="userCanEdit"
                       (removed)="removeField(fieldInstance)"
                       [horizontal]="true"
@@ -295,58 +295,58 @@
           <a ngbNavLink i18n>Metadata</a>
           <ng-template ngbNavContent>
 
-            @if (document) {
+            @if (document()) {
               <table class="table table-borderless">
                 <tbody>
                   <tr>
                     <td i18n>Date modified</td>
-                    <td>{{document.modified | customDate}}</td>
+                    <td>{{document().modified | customDate}}</td>
                   </tr>
                   <tr>
                     <td i18n>Date added</td>
-                    <td>{{document.added | customDate}}</td>
+                    <td>{{document().added | customDate}}</td>
                   </tr>
                   <tr>
                     <td i18n>Media filename</td>
-                    <td>{{metadata?.media_filename}}</td>
+                    <td>{{metadata()?.media_filename}}</td>
                   </tr>
                   <tr>
                     <td i18n>Original filename</td>
-                    <td>{{metadata?.original_filename}}</td>
+                    <td>{{metadata()?.original_filename}}</td>
                   </tr>
                   <tr>
                     <td i18n>Original MD5 checksum</td>
-                    <td>{{metadata?.original_checksum}}</td>
+                    <td>{{metadata()?.original_checksum}}</td>
                   </tr>
                   <tr>
                     <td i18n>Original file size</td>
-                    <td>{{metadata?.original_size | fileSize}}</td>
+                    <td>{{metadata()?.original_size | fileSize}}</td>
                   </tr>
                   <tr>
                     <td i18n>Original mime type</td>
-                    <td>{{metadata?.original_mime_type}}</td>
+                    <td>{{metadata()?.original_mime_type}}</td>
                   </tr>
-                  @if (metadata?.has_archive_version) {
+                  @if (metadata()?.has_archive_version) {
                     <tr>
                       <td i18n>Archive MD5 checksum</td>
-                      <td>{{metadata?.archive_checksum}}</td>
+                      <td>{{metadata()?.archive_checksum}}</td>
                     </tr>
                   }
-                  @if (metadata?.has_archive_version) {
+                  @if (metadata()?.has_archive_version) {
                     <tr>
                       <td i18n>Archive file size</td>
-                      <td>{{metadata?.archive_size | fileSize}}</td>
+                      <td>{{metadata()?.archive_size | fileSize}}</td>
                     </tr>
                   }
                 </tbody>
               </table>
             }
 
-            @if (metadata?.original_metadata?.length > 0) {
-              <pngx-metadata-collapse i18n-title title="Original document metadata" [metadata]="metadata.original_metadata"></pngx-metadata-collapse>
+            @if (metadata()?.original_metadata?.length > 0) {
+              <pngx-metadata-collapse i18n-title title="Original document metadata" [metadata]="metadata()?.original_metadata"></pngx-metadata-collapse>
             }
-            @if (metadata?.archive_metadata?.length > 0) {
-              <pngx-metadata-collapse i18n-title title="Archived document metadata" [metadata]="metadata.archive_metadata"></pngx-metadata-collapse>
+            @if (metadata()?.archive_metadata?.length > 0) {
+              <pngx-metadata-collapse i18n-title title="Archived document metadata" [metadata]="metadata()?.archive_metadata"></pngx-metadata-collapse>
             }
 
           </ng-template>
@@ -365,11 +365,11 @@
 
         @if (notesEnabled) {
           <li [ngbNavItem]="DocumentDetailNavIDs.Notes">
-            <a class="text-nowrap" ngbNavLink i18n>Notes @if (document?.notes.length) {
-              <span class="badge text-bg-secondary ms-1">{{document.notes.length}}</span>
+            <a class="text-nowrap" ngbNavLink i18n>Notes @if (document()?.notes.length) {
+              <span class="badge text-bg-secondary ms-1">{{document().notes.length}}</span>
             }</a>
             <ng-template ngbNavContent>
-              <pngx-document-notes [documentId]="documentId" [notes]="document?.notes" [addDisabled]="!userCanEdit" (updated)="notesUpdated($event)"></pngx-document-notes>
+              <pngx-document-notes [documentId]="documentId()" [notes]="document()?.notes" [addDisabled]="!userCanEdit" (updated)="notesUpdated($event)"></pngx-document-notes>
             </ng-template>
           </li>
         }
@@ -379,7 +379,7 @@
             <a ngbNavLink i18n>History</a>
             <ng-template ngbNavContent>
               <div class="mb-3">
-                <pngx-document-history [documentId]="documentId"></pngx-document-history>
+                <pngx-document-history [documentId]="documentId()"></pngx-document-history>
               </div>
             </ng-template>
           </li>
@@ -390,23 +390,23 @@
             <a ngbNavLink i18n>Permissions</a>
             <ng-template ngbNavContent>
               <div class="mb-3">
-                <pngx-permissions-form [users]="users" formControlName="permissions_form"></pngx-permissions-form>
+                <pngx-permissions-form [users]="users()" formControlName="permissions_form"></pngx-permissions-form>
               </div>
             </ng-template>
           </li>
         }
 
-        @if (document?.duplicate_documents?.length) {
+        @if (document()?.duplicate_documents?.length) {
           <li [ngbNavItem]="DocumentDetailNavIDs.Duplicates">
             <a class="text-nowrap" ngbNavLink i18n>
               Duplicates
-              <span class="badge text-bg-secondary ms-1">{{ document.duplicate_documents.length }}</span>
+              <span class="badge text-bg-secondary ms-1">{{ document().duplicate_documents.length }}</span>
             </a>
             <ng-template ngbNavContent>
               <div class="d-flex flex-column gap-2">
                 <div class="fst-italic" i18n>Duplicate documents detected:</div>
                 <div class="list-group">
-                  @for (duplicate of document.duplicate_documents; track duplicate.id) {
+                  @for (duplicate of document()?.duplicate_documents; track duplicate.id) {
                     <a
                       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
                       [routerLink]="['/documents', duplicate.id, 'details']"
@@ -442,22 +442,21 @@
 <ng-template #saveButtons>
   <div class="btn-group pb-3 ms-4">
     <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-      <button type="submit" class="order-3 btn btn-sm btn-primary" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save</button>
+      <button type="submit" class="order-3 btn btn-sm btn-primary" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Save</button>
       @if (hasNext()) {
-        <button type="button" class="order-1 btn btn-sm btn-outline-primary" (click)="saveEditNext()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; next</button>
+        <button type="button" class="order-1 btn btn-sm btn-outline-primary" (click)="saveEditNext()" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Save &amp; next</button>
+      } @else {
+        <button type="button" class="order-2 btn btn-sm btn-outline-primary" (click)="save(true)" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Save &amp; close</button>
       }
-      @if (!hasNext()) {
-        <button type="button" class="order-2 btn btn-sm btn-outline-primary" (click)="save(true)" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Save &amp; close</button>
-      }
-      <button type="button" class="order-0 btn btn-sm btn-outline-secondary" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive || (isDirty$ | async) !== true">Discard</button>
+      <button type="button" class="order-0 btn btn-sm btn-outline-secondary" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Discard</button>
     </ng-container>
   </div>
 </ng-template>
 
 <ng-template #previewContent>
-  <div class="thumb-preview position-absolute pe-none text-center" [class.fade]="previewLoaded">
+  <div class="thumb-preview position-absolute pe-none text-center" [class.fade]="previewLoaded()">
     @if (showThumbnailOverlay) {
-      <img [src]="thumbUrl" class="mx-auto" [attr.width]="previewZoomScale === 'page-fit' ? 'auto' : '100%'" [attr.height]="previewZoomScale === 'page-fit' ? '100%' : 'auto'" alt="Document loading..." i18n-alt />
+      <img [src]="thumbUrl()" class="mx-auto" [attr.width]="previewZoomScale() === 'page-fit' ? 'auto' : '100%'" [attr.height]="previewZoomScale() === 'page-fit' ? '100%' : 'auto'" alt="Document loading..." i18n-alt />
     }
     <div class="position-absolute top-0 start-0 m-2 p-2 d-flex align-items-center justify-content-center">
       <div>
@@ -466,45 +465,49 @@
       </div>
     </div>
   </div>
-  @if (document) {
+  @if (document()) {
     @switch (archiveContentRenderType) {
       @case (ContentRenderType.PDF) {
         @if (!useNativePdfViewer) {
           <div class="preview-sticky pdf-viewer-container">
             <pngx-pdf-viewer
-              [src]="pdfSource"
-              [password]="pdfPassword"
+              [src]="pdfSource()"
+              [password]="pdfPassword()"
               [renderMode]="PdfRenderMode.All"
-              [(page)]="previewCurrentPage"
-              [zoomScale]="previewZoomScale"
-              [zoom]="previewZoomSetting"
+              [page]="previewCurrentPage()" (pageChange)="previewCurrentPage.set($event)"
+              [zoomScale]="previewZoomScale()"
+              [zoom]="previewZoomSetting()"
               (loadError)="onError($event)"
               (afterLoadComplete)="pdfPreviewLoaded($event)">
             </pngx-pdf-viewer>
           </div>
         } @else {
-          <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
+          <object [data]="previewUrl() | safeUrl" class="preview-sticky" width="100%">
+            <span>Preview is unavailable.</span>
+          </object>
         }
       }
       @case (ContentRenderType.Text) {
-        <div class="preview-sticky bg-light p-3 overflow-auto whitespace-preserve" width="100%">{{previewText}}</div>
+        <div class="preview-sticky bg-light p-3 overflow-auto whitespace-preserve" width="100%">{{previewText()}}</div>
       }
       @case (ContentRenderType.Image) {
         <div class="preview-sticky">
-          <img [src]="previewUrl" width="100%" height="100%" alt="{{title}}" />
+          <img [src]="previewUrl()" width="100%" height="100%" alt="{{title()}}" />
         </div>
       }
       @case (ContentRenderType.TIFF) {
-        @if (!tiffError) {
+        @if (!tiffError()) {
           <div class="preview-sticky">
-            <img [src]="tiffURL" width="100%" height="100%" alt="{{title}}" />
+            <img [src]="tiffURL()" width="100%" height="100%" alt="{{title()}}" />
           </div>
         } @else {
-          <div class="preview-sticky bg-light p-3 overflow-auto whitespace-preserve" width="100%">{{tiffError}}</div>
+          <div class="preview-sticky bg-light p-3 overflow-auto whitespace-preserve" width="100%">{{tiffError()}}</div>
         }
       }
       @case (ContentRenderType.Other) {
-        <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
+        <object [data]="previewUrl() | safeUrl" class="preview-sticky" width="100%">
+          <span>Preview is unavailable.</span>
+        </object>
       }
     }
     @if (requiresPassword) {

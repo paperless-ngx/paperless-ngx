@@ -110,7 +110,7 @@ describe('DocumentNotesComponent', () => {
   })
 
   it('should display notes with user name / username', () => {
-    component.notes = notes
+    component.notes.set(notes)
     fixture.detectChanges()
     expect(fixture.debugElement.nativeElement.textContent).toContain(
       notes[0].note
@@ -154,7 +154,7 @@ describe('DocumentNotesComponent', () => {
   })
 
   it('should support note entry, show error if fails', () => {
-    component.documentId = 12
+    component.documentId.set(12)
     const note = 'This is the new note.'
     const noteTextArea = fixture.debugElement.query(By.css('textarea'))
     noteTextArea.nativeElement.value = note
@@ -177,7 +177,7 @@ describe('DocumentNotesComponent', () => {
   })
 
   it('should support note save on ctrl+Enter', () => {
-    component.documentId = 12
+    component.documentId.set(12)
     const note = 'This is the new note.'
     const noteTextArea = fixture.debugElement.query(By.css('textarea'))
     noteTextArea.nativeElement.value = note
@@ -189,8 +189,8 @@ describe('DocumentNotesComponent', () => {
   })
 
   it('should support delete note, show error if fails', () => {
-    component.documentId = 12
-    component.notes = notes
+    component.documentId.set(12)
+    component.notes.set(notes)
     fixture.detectChanges()
     const deleteButton = fixture.debugElement.queryAll(By.css('button'))[1] // 0 is add button
     const deleteSpy = jest.spyOn(notesService, 'deleteNote')

@@ -1,5 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard'
-import { Component, OnInit, inject } from '@angular/core'
+import { Component, OnInit, inject, signal } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -50,8 +50,12 @@ export class ProfileEditDialogComponent
   private toastService = inject(ToastService)
   private clipboard = inject(Clipboard)
 
-  public networkActive: boolean = false
-  public error: any
+  readonly networkActive = signal(false)
+  readonly error = signal<any>(undefined)
+  readonly showPasswordConfirm = signal(false)
+  readonly showEmailConfirm = signal(false)
+  readonly copied = signal(false)
+  readonly codesCopied = signal(false)
 
   public form = new FormGroup({
     email: new FormControl(''),
@@ -67,23 +71,18 @@ export class ProfileEditDialogComponent
   private currentPassword: string
   private newPassword: string
   private passwordConfirm: string
-  public showPasswordConfirm: boolean = false
+
   public hasUsablePassword: boolean = false
 
   private currentEmail: string
   private newEmail: string
   private emailConfirm: string
-  public showEmailConfirm: boolean = false
 
   public isTotpEnabled: boolean = false
   public totpSettings: TotpSettings
   public totpSettingsLoading: boolean = false
   public totpLoading: boolean = false
   public recoveryCodes: string[]
-
-  public copied: boolean = false
-  public codesCopied: boolean = false
-
   public socialAccounts: SocialAccount[] = []
   public socialAccountProviders: SocialAccountProvider[] = []
 
@@ -95,12 +94,12 @@ export class ProfileEditDialogComponent
   }
 
   ngOnInit(): void {
-    this.networkActive = true
+    this.networkActive.set(true)
     this.profileService
       .get()
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((profile) => {
-        this.networkActive = false
+        this.networkActive.set(false)
         this.form.patchValue(profile)
         this.currentEmail = profile.email
         this.form.get('email').valueChanges.subscribe((newEmail) => {
@@ -126,7 +125,7 @@ export class ProfileEditDialogComponent
   }
 
   get saveDisabled(): boolean {
-    return this.error?.password_confirm || this.error?.email_confirm
+    return this.error()?.password_confirm || this.error()?.email_confirm
   }
 
   onEmailKeyUp(event: KeyboardEvent): void {
@@ -140,18 +139,17 @@ export class ProfileEditDialogComponent
   }
 
   onEmailChange(): void {
-    this.showEmailConfirm = this.currentEmail !== this.newEmail
-    if (this.showEmailConfirm) {
+    this.showEmailConfirm.set(this.currentEmail !== this.newEmail)
+    if (this.showEmailConfirm()) {
       this.form.get('email_confirm').enable()
       if (this.newEmail !== this.emailConfirm) {
-        if (!this.error) this.error = {}
-        this.error.email_confirm = $localize`Emails must match`
+        this.setFieldError('email_confirm', $localize`Emails must match`)
       } else {
-        delete this.error?.email_confirm
+        this.clearFieldError('email_confirm')
       }
     } else {
       this.form.get('email_confirm').disable()
-      delete this.error?.email_confirm
+      this.clearFieldError('email_confirm')
     }
   }
 
@@ -167,20 +165,33 @@ export class ProfileEditDialogComponent
   }
 
   onPasswordChange(): void {
-    this.showPasswordConfirm = this.currentPassword !== this.newPassword
+    this.showPasswordConfirm.set(this.currentPassword !== this.newPassword)
 
-    if (this.showPasswordConfirm) {
+    if (this.showPasswordConfirm()) {
       this.form.get('password_confirm').enable()
       if (this.newPassword !== this.passwordConfirm) {
-        if (!this.error) this.error = {}
-        this.error.password_confirm = $localize`Passwords must match`
+        this.setFieldError('password_confirm', $localize`Passwords must match`)
       } else {
-        delete this.error?.password_confirm
+        this.clearFieldError('password_confirm')
       }
     } else {
       this.form.get('password_confirm').disable()
-      delete this.error?.password_confirm
+      this.clearFieldError('password_confirm')
     }
+  }
+
+  private setFieldError(fieldName: string, message: string): void {
+    this.error.set({
+      ...this.error(),
+      [fieldName]: message,
+    })
+  }
+
+  private clearFieldError(fieldName: string): void {
+    if (!this.error()) return
+    const error = { ...this.error() }
+    delete error[fieldName]
+    this.error.set(Object.keys(error).length ? error : undefined)
   }
 
   save(): void {
@@ -188,8 +199,8 @@ export class ProfileEditDialogComponent
       this.newPassword && this.currentPassword !== this.newPassword
     const profile = Object.assign({}, this.form.value)
     delete profile.totp_code
-    this.error = null
-    this.networkActive = true
+    this.error.set(null)
+    this.networkActive.set(true)
     this.profileService
       .update(profile)
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -210,8 +221,8 @@ export class ProfileEditDialogComponent
         },
         error: (error) => {
           this.toastService.showError($localize`Error saving profile`, error)
-          this.error = error?.error
-          this.networkActive = false
+          this.error.set(error?.error)
+          this.networkActive.set(false)
         },
       })
   }
@@ -236,9 +247,9 @@ export class ProfileEditDialogComponent
 
   copyAuthToken(): void {
     this.clipboard.copy(this.form.get('auth_token').value)
-    this.copied = true
+    this.copied.set(true)
     setTimeout(() => {
-      this.copied = false
+      this.copied.set(false)
     }, 3000)
   }
 
@@ -330,9 +341,9 @@ export class ProfileEditDialogComponent
 
   public copyRecoveryCodes(): void {
     this.clipboard.copy(this.recoveryCodes.join('\n'))
-    this.codesCopied = true
+    this.codesCopied.set(true)
     setTimeout(() => {
-      this.codesCopied = false
+      this.codesCopied.set(false)
     }, 3000)
   }
 }

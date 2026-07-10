@@ -100,7 +100,7 @@ describe('DocumentAttributesComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['attributes', 'tags'], {
       replaceUrl: true,
     })
-    expect(component.activeNavID).toBe(1)
+    expect(component.activeNavID()).toBe(1)
   })
 
   it('should set active section from route param when valid', () => {
@@ -116,7 +116,7 @@ describe('DocumentAttributesComponent', () => {
     fixture.detectChanges()
     paramMapSubject.next(convertToParamMap({ section: 'customfields' }))
 
-    expect(component.activeNavID).toBe(2)
+    expect(component.activeNavID()).toBe(2)
     expect(router.navigate).not.toHaveBeenCalled()
   })
 
@@ -124,10 +124,10 @@ describe('DocumentAttributesComponent', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
 
     fixture.detectChanges()
-    component.activeNavID = 1
+    component.activeNavID.set(1)
     paramMapSubject.next(convertToParamMap({ section: 'customfields' }))
 
-    expect(component.activeNavID).toBe(2)
+    expect(component.activeNavID()).toBe(2)
   })
 
   it('should redirect to dashboard when no sections are visible', () => {
@@ -169,7 +169,7 @@ describe('DocumentAttributesComponent', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     expect(component.activeManagementList).toBeNull()
 
-    component.activeNavID = 1
+    component.activeNavID.set(1)
     expect(component.activeSection.kind).toBe(
       DocumentAttributesSectionKind.ManagementList
     )
@@ -180,7 +180,7 @@ describe('DocumentAttributesComponent', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     expect(component.activeCustomFields).toBeNull()
 
-    component.activeNavID = 2
+    component.activeNavID.set(2)
     expect(component.activeSection.kind).toBe(
       DocumentAttributesSectionKind.CustomFields
     )

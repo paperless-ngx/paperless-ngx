@@ -4,12 +4,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -244,11 +239,12 @@ describe('AppFrameComponent', () => {
     expect(toastSpy).toHaveBeenCalled()
   })
 
-  it('should support toggling slim sidebar and saving', fakeAsync(() => {
+  it('should support toggling slim sidebar and saving', () => {
+    jest.useFakeTimers()
     const saveSettingSpy = jest.spyOn(settingsService, 'set')
     settingsService.set(SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED, [])
     expect(component.slimSidebarEnabled).toBeFalsy()
-    expect(component.slimSidebarAnimating).toBeFalsy()
+    expect(component.slimSidebarAnimating()).toBeFalsy()
     component.toggleSlimSidebar()
     const requests = httpTestingController.match(
       `${environment.apiBaseUrl}ui_settings/`
@@ -259,9 +255,9 @@ describe('AppFrameComponent', () => {
       requests[0].request.body.settings.attributes_sections_collapsed
     ).toEqual(['attributes'])
     requests[0].flush({ success: true })
-    expect(component.slimSidebarAnimating).toBeTruthy()
-    tick(200)
-    expect(component.slimSidebarAnimating).toBeFalsy()
+    expect(component.slimSidebarAnimating()).toBeTruthy()
+    jest.advanceTimersByTime(200)
+    expect(component.slimSidebarAnimating()).toBeFalsy()
     expect(component.slimSidebarEnabled).toBeTruthy()
     expect(saveSettingSpy).toHaveBeenCalledWith(
       SETTINGS_KEYS.SLIM_SIDEBAR,
@@ -271,7 +267,8 @@ describe('AppFrameComponent', () => {
       SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED,
       ['attributes']
     )
-  }))
+    jest.useRealTimers()
+  })
 
   it('should show error on toggle slim sidebar if store settings fails', () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {})
@@ -291,9 +288,9 @@ describe('AppFrameComponent', () => {
       fixture.nativeElement as HTMLDivElement
     ).querySelector('button[data-toggle=collapse]')
     button.dispatchEvent(new MouseEvent('click'))
-    expect(component.isMenuCollapsed).toBeFalsy()
+    expect(component.isMenuCollapsed()).toBeFalsy()
     component.closeMenu()
-    expect(component.isMenuCollapsed).toBeTruthy()
+    expect(component.isMenuCollapsed()).toBeTruthy()
   })
 
   it('should hide mobile search when scrolling down and show it when scrolling up', () => {
@@ -308,14 +305,14 @@ describe('AppFrameComponent', () => {
       value: 40,
     })
     component.onWindowScroll()
-    expect(component.mobileSearchHidden).toBe(true)
+    expect(component.mobileSearchHidden()).toBe(true)
 
     Object.defineProperty(globalThis, 'scrollY', {
       configurable: true,
       value: 0,
     })
     component.onWindowScroll()
-    expect(component.mobileSearchHidden).toBe(false)
+    expect(component.mobileSearchHidden()).toBe(false)
   })
 
   it('should keep mobile search visible on desktop scroll or resize', () => {
@@ -323,13 +320,13 @@ describe('AppFrameComponent', () => {
       value: 1024,
     })
     component.ngOnInit()
-    component.mobileSearchHidden = true
+    component.mobileSearchHidden.set(true)
 
     component.onWindowScroll()
 
-    expect(component.mobileSearchHidden).toBe(false)
+    expect(component.mobileSearchHidden()).toBe(false)
 
-    component.mobileSearchHidden = true
+    component.mobileSearchHidden.set(true)
     component.onWindowResize()
   })
 
@@ -338,7 +335,7 @@ describe('AppFrameComponent', () => {
       value: 767,
     })
     component.ngOnInit()
-    component.isMenuCollapsed = false
+    component.isMenuCollapsed.set(false)
 
     Object.defineProperty(globalThis, 'scrollY', {
       configurable: true,
@@ -346,7 +343,7 @@ describe('AppFrameComponent', () => {
     })
     component.onWindowScroll()
 
-    expect(component.mobileSearchHidden).toBe(false)
+    expect(component.mobileSearchHidden()).toBe(false)
   })
 
   it('should support close document & navigate on close current doc', () => {
@@ -379,11 +376,11 @@ describe('AppFrameComponent', () => {
   })
 
   it('should disable global dropzone on start drag + drop, re-enable after', () => {
-    expect(settingsService.globalDropzoneEnabled).toBeTruthy()
+    expect(settingsService.globalDropzoneEnabled()).toBeTruthy()
     component.onDragStart(null)
-    expect(settingsService.globalDropzoneEnabled).toBeFalsy()
+    expect(settingsService.globalDropzoneEnabled()).toBeFalsy()
     component.onDragEnd(null)
-    expect(settingsService.globalDropzoneEnabled).toBeTruthy()
+    expect(settingsService.globalDropzoneEnabled()).toBeTruthy()
   })
 
   it('should update saved view sorting on drag + drop, show info', () => {

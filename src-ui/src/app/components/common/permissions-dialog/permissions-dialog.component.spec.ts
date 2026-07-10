@@ -109,7 +109,7 @@ describe('PermissionsDialogComponent', () => {
       permissions: set_permissions.set_permissions,
     }
     component.object = obj
-    expect(component.title).toEqual(`Edit permissions for ${obj.name}`)
+    expect(component.title()).toEqual(`Edit permissions for ${obj.name}`)
     expect(component.permissions).toEqual(set_permissions)
   })
 

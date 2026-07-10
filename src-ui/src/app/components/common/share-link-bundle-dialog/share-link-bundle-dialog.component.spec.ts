@@ -1,10 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { FileVersion } from 'src/app/data/share-link'
@@ -58,10 +53,10 @@ describe('ShareLinkBundleDialogComponent', () => {
 
   it('builds payload and emits confirm on submit', () => {
     const confirmSpy = jest.spyOn(component.confirmClicked, 'emit')
-    component.documents = [
+    component.setDocuments([
       { id: 1, title: 'Doc 1' } as any,
       { id: 2, title: 'Doc 2' } as any,
-    ]
+    ])
     component.form.setValue({
       shareArchiveVersion: false,
       expirationDays: 3,
@@ -101,14 +96,15 @@ describe('ShareLinkBundleDialogComponent', () => {
     const docs = Array.from({ length: 12 }).map((_, index) => ({
       id: index + 1,
     }))
-    component.documents = docs as any
+    component.setDocuments(docs as any)
 
-    expect(component.selectionCount).toBe(12)
-    expect(component.documentPreview).toHaveLength(10)
-    expect(component.documentPreview[0].id).toBe(1)
+    expect(component.selectionCount()).toBe(12)
+    expect(component.documentPreview()).toHaveLength(10)
+    expect(component.documentPreview()[0].id).toBe(1)
   })
 
-  it('copies share link and resets state after timeout', fakeAsync(() => {
+  it('copies share link and resets state after timeout', () => {
+    jest.useFakeTimers()
     const copySpy = jest.spyOn(clipboard, 'copy').mockReturnValue(true)
     const bundle = {
       slug: 'bundle-slug',
@@ -118,12 +114,13 @@ describe('ShareLinkBundleDialogComponent', () => {
     component.copy(bundle)
 
     expect(copySpy).toHaveBeenCalledWith(component.getShareUrl(bundle))
-    expect(component.copied).toBe(true)
+    expect(component.copied()).toBe(true)
     expect(toastService.showInfo).toHaveBeenCalled()
 
-    tick(3000)
-    expect(component.copied).toBe(false)
-  }))
+    jest.advanceTimersByTime(3000)
+    expect(component.copied()).toBe(false)
+    jest.useRealTimers()
+  })
 
   it('generates share URLs based on API base URL', () => {
     environment.apiBaseUrl = 'https://example.com/api/'

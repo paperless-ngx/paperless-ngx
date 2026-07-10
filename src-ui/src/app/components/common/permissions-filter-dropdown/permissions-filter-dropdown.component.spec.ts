@@ -64,9 +64,9 @@ describe('PermissionsFilterDropdownComponent', () => {
         {
           provide: SettingsService,
           useValue: {
-            currentUser: {
+            currentUser: () => ({
               id: currentUserID,
-            },
+            }),
           },
         },
         provideHttpClient(withInterceptorsFromDi()),

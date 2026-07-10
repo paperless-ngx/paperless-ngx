@@ -5,13 +5,13 @@ import {
   OnDestroy,
   OnInit,
   QueryList,
+  signal,
   ViewChildren,
 } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject } from 'rxjs'
 import {
   debounceTime,
-  delay,
   distinctUntilChanged,
   takeUntil,
   tap,
@@ -88,25 +88,25 @@ export abstract class ManagementListComponent<T extends MatchingModel>
 
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
 
-  public data: T[] = []
-  private unfilteredData: T[] = []
+  readonly data = signal<T[]>([])
+  private readonly unfilteredData = signal<T[]>([])
   private currentExtraParams: { [key: string]: any } = null
   private allSelectionActive = false
 
-  public page = 1
+  readonly page = signal(1)
 
-  public collectionSize = 0
-  public displayCollectionSize = 0
+  readonly collectionSize = signal(0)
+  readonly displayCollectionSize = signal(0)
 
-  public sortField: string
-  public sortReverse: boolean
+  readonly sortField = signal<string>(undefined)
+  readonly sortReverse = signal<boolean>(undefined)
 
   private nameFilterDebounce: Subject<string>
   protected unsubscribeNotifier: Subject<any> = new Subject()
   protected _nameFilter: string
 
   public selectedObjects: Set<number> = new Set()
-  public togggleAll: boolean = false
+  readonly togggleAll = signal(false)
 
   public get hasSelection(): boolean {
     return this.selectedObjects.size > 0 || this.allSelectionActive
@@ -114,7 +114,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
 
   public get selectedCount(): number {
     return this.allSelectionActive
-      ? this.displayCollectionSize
+      ? this.displayCollectionSize()
       : this.selectedObjects.size
   }
 
@@ -131,7 +131,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
       )
       .subscribe((title) => {
         this._nameFilter = title
-        this.page = 1
+        this.page.set(1)
         this.reloadData()
       })
   }
@@ -151,8 +151,8 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   }
 
   onSort(event: SortEvent) {
-    this.sortField = event.column
-    this.sortReverse = event.reverse
+    this.sortField.set(event.column)
+    this.sortReverse.set(event.reverse)
     this.reloadData()
   }
 
@@ -171,25 +171,25 @@ export abstract class ManagementListComponent<T extends MatchingModel>
   getDocumentCount(object: MatchingModel): number {
     return (
       object.document_count ??
-      this.unfilteredData.find((d) => d.id == object.id)?.document_count ??
+      this.unfilteredData().find((d) => d.id == object.id)?.document_count ??
       0
     )
   }
 
   public getOriginalObject(object: T): T {
-    return this.unfilteredData.find((d) => d?.id == object?.id) || object
+    return this.unfilteredData().find((d) => d?.id == object?.id) || object
   }
 
   reloadData(extraParams: { [key: string]: any } = null) {
-    this.loading = true
+    this.loading.set(true)
     this.currentExtraParams = extraParams
     this.clearSelection()
     this.service
       .listFiltered(
-        this.page,
+        this.page(),
         this.pageSize,
-        this.sortField,
-        this.sortReverse,
+        this.sortField(),
+        this.sortReverse(),
         this._nameFilter,
         true,
         extraParams
@@ -197,23 +197,22 @@ export abstract class ManagementListComponent<T extends MatchingModel>
       .pipe(
         takeUntil(this.unsubscribeNotifier),
         tap((c) => {
-          this.unfilteredData = c.results
-          this.data = this.filterData(c.results)
-          this.collectionSize = this.getCollectionSize(c)
-          this.displayCollectionSize = this.getDisplayCollectionSize(c)
-        }),
-        delay(100)
+          this.unfilteredData.set(c.results)
+          this.data.set(this.filterData(c.results))
+          this.collectionSize.set(this.getCollectionSize(c))
+          this.displayCollectionSize.set(this.getDisplayCollectionSize(c))
+        })
       )
       .subscribe({
         error: (error: HttpErrorResponse) => {
           if (error.error?.detail?.includes('Invalid page')) {
-            this.page = 1
+            this.page.set(1)
             this.reloadData()
           }
         },
         next: () => {
-          this.show = true
-          this.loading = false
+          this.show.set(true)
+          this.loading.set(false)
         },
       })
   }
@@ -222,7 +221,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     const activeModal = this.modalService.open(this.editDialogComponent, {
       backdrop: 'static',
     })
-    activeModal.componentInstance.dialogMode = EditDialogMode.CREATE
+    activeModal.componentInstance.dialogMode.set(EditDialogMode.CREATE)
     activeModal.componentInstance.succeeded.subscribe(() => {
       this.reloadData()
       this.toastService.showInfo(
@@ -242,7 +241,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
       backdrop: 'static',
     })
     activeModal.componentInstance.object = object
-    activeModal.componentInstance.dialogMode = EditDialogMode.EDIT
+    activeModal.componentInstance.dialogMode.set(EditDialogMode.EDIT)
     activeModal.componentInstance.succeeded.subscribe(() => {
       this.reloadData()
       this.toastService.showInfo(
@@ -322,7 +321,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     })
     this.settingsService.storeSettings().subscribe({
       next: () => {
-        this.page = 1
+        this.page.set(1)
         this.reloadData()
       },
       error: (error) => {
@@ -346,7 +345,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     if (!this.permissionsService.currentUserCan(action, this.permissionType))
       return false
     let ownsAll: boolean = true
-    const objects = this.data.filter((o) => this.selectedObjects.has(o.id))
+    const objects = this.data().filter((o) => this.selectedObjects.has(o.id))
     ownsAll = objects.every((o) =>
       this.permissionsService.currentUserOwnsObject(o)
     )
@@ -367,7 +366,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
 
   clearSelection() {
     this.allSelectionActive = false
-    this.togggleAll = false
+    this.togggleAll.set(false)
     this.selectedObjects.clear()
   }
 
@@ -377,19 +376,19 @@ export abstract class ManagementListComponent<T extends MatchingModel>
 
   selectPage() {
     this.allSelectionActive = false
-    this.selectedObjects = new Set(this.getSelectableIDs(this.data))
-    this.togggleAll = this.areAllPageItemsSelected()
+    this.selectedObjects = new Set(this.getSelectableIDs(this.data()))
+    this.togggleAll.set(this.areAllPageItemsSelected())
   }
 
   selectAll() {
-    if (!this.collectionSize) {
+    if (!this.collectionSize()) {
       this.clearSelection()
       return
     }
 
     this.allSelectionActive = true
-    this.selectedObjects = new Set(this.getSelectableIDs(this.data))
-    this.togggleAll = this.areAllPageItemsSelected()
+    this.selectedObjects = new Set(this.getSelectableIDs(this.data()))
+    this.togggleAll.set(this.areAllPageItemsSelected())
   }
 
   toggleSelected(object) {
@@ -399,14 +398,14 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     this.selectedObjects.has(object.id)
       ? this.selectedObjects.delete(object.id)
       : this.selectedObjects.add(object.id)
-    this.togggleAll = this.areAllPageItemsSelected()
+    this.togggleAll.set(this.areAllPageItemsSelected())
   }
 
   protected areAllPageItemsSelected(): boolean {
     if (this.allSelectionActive) {
-      return this.data.length > 0
+      return this.data().length > 0
     }
-    const ids = this.getSelectableIDs(this.data)
+    const ids = this.getSelectableIDs(this.data())
     return ids.length > 0 && ids.every((id) => this.selectedObjects.has(id))
   }
 
@@ -416,7 +415,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     })
     modal.componentInstance.confirmClicked.subscribe(
       ({ permissions, merge }) => {
-        modal.componentInstance.buttonsEnabled = false
+        modal.componentInstance.buttonsEnabled.set(false)
         this.service
           .bulk_edit_objects(
             this.allSelectionActive ? [] : Array.from(this.selectedObjects),
@@ -435,7 +434,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
               this.reloadData()
             },
             error: (error) => {
-              modal.componentInstance.buttonsEnabled = true
+              modal.componentInstance.buttonsEnabled.set(true)
               this.toastService.showError(
                 $localize`Error updating permissions`,
                 error

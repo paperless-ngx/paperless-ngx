@@ -291,7 +291,7 @@ export class PngxPdfViewerComponent
     this.eventBus.dispatch('find', {
       query,
       caseSensitive: false,
-      highlightAll: query.length > 0,
+      highlightAll: query?.length > 0,
       phraseSearch: true,
     })
   }
