@@ -190,8 +190,8 @@ export class SettingsComponent
   unsubscribeNotifier: Subject<any> = new Subject()
   savePending: boolean = false
 
-  users: User[]
-  groups: Group[]
+  readonly users = signal<User[]>(undefined)
+  readonly groups = signal<Group[]>(undefined)
 
   public readonly systemStatus = signal<SystemStatus>(undefined)
 
@@ -249,7 +249,7 @@ export class SettingsComponent
         .pipe(first())
         .subscribe({
           next: (r) => {
-            this.users = r.results
+            this.users.set(r.results)
           },
           error: (e) => {
             this.toastService.showError($localize`Error retrieving users`, e)
@@ -268,7 +268,7 @@ export class SettingsComponent
         .pipe(first())
         .subscribe({
           next: (r) => {
-            this.groups = r.results
+            this.groups.set(r.results)
           },
           error: (e) => {
             this.toastService.showError($localize`Error retrieving groups`, e)
