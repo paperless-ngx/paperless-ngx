@@ -9,8 +9,8 @@
   </button>
   @if (canViewSystemStatus) {
     <button class="btn btn-sm btn-outline-primary position-relative ms-md-5 me-1" (click)="showSystemStatus()"
-      [disabled]="!systemStatus">
-      @if (!systemStatus) {
+      [disabled]="!systemStatus()">
+      @if (!systemStatus()) {
         <div class="spinner-border spinner-border-sm me-2 h-75" role="status"></div>
       } @else {
         <i-bs class="me-2" name="card-checklist"></i-bs>

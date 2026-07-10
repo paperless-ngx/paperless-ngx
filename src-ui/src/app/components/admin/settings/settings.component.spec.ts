@@ -350,13 +350,13 @@ describe('SettingsComponent', () => {
           type === PermissionType.SystemMonitoring
       )
     completeSetup()
-    expect(component['systemStatus']).toEqual(status) // private
+    expect(component.systemStatus()).toEqual(status)
     expect(component.systemStatusHasErrors).toBeTruthy()
     // coverage
-    component['systemStatus'].database.status = SystemStatusItemStatus.OK
-    component['systemStatus'].tasks.redis_status = SystemStatusItemStatus.OK
-    component['systemStatus'].tasks.celery_status = SystemStatusItemStatus.OK
-    component['systemStatus'].tasks.sanity_check_status =
+    component.systemStatus().database.status = SystemStatusItemStatus.OK
+    component.systemStatus().tasks.redis_status = SystemStatusItemStatus.OK
+    component.systemStatus().tasks.celery_status = SystemStatusItemStatus.OK
+    component.systemStatus().tasks.sanity_check_status =
       SystemStatusItemStatus.OK
     expect(component.systemStatusHasErrors).toBeFalsy()
   })
