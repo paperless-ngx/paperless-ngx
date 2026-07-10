@@ -482,7 +482,9 @@
             </pngx-pdf-viewer>
           </div>
         } @else {
-          <object [data]="previewUrl() | safeUrl" class="preview-sticky" width="100%"></object>
+          <object [data]="previewUrl() | safeUrl" class="preview-sticky" width="100%">
+            <span>Preview is unavailable.</span>
+          </object>
         }
       }
       @case (ContentRenderType.Text) {
@@ -503,7 +505,9 @@
         }
       }
       @case (ContentRenderType.Other) {
-        <object [data]="previewUrl() | safeUrl" class="preview-sticky" width="100%"></object>
+        <object [data]="previewUrl() | safeUrl" class="preview-sticky" width="100%">
+          <span>Preview is unavailable.</span>
+        </object>
       }
     }
     @if (requiresPassword) {
