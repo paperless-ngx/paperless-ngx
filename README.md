@@ -65,6 +65,8 @@ bash -c "$(curl -L https://raw.githubusercontent.com/paperless-ngx/paperless-ngx
 
 More details and step-by-step guides for alternative installation methods can be found in [the documentation](https://docs.paperless-ngx.com/setup/#installation).
 
+Prefer not to run a server yourself? [![Deploy with Zenith](https://cdn.zenith.hosting/buttons/deploy-with-zenith.svg)](https://zenith.hosting/host/paperless-ngx) offers one-click managed hosting with storage, backups, email and a free subdomain included, and a share of every subscription goes back to Paperless-ngx.
+
 Migrating from Paperless-ng is easy, just drop in the new docker image! See the [documentation on migrating](https://docs.paperless-ngx.com/setup/#migrating-to-paperless-ngx) for more details.
 
 <!-- omit in toc -->
