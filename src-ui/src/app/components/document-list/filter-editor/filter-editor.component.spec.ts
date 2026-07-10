@@ -1862,21 +1862,6 @@ describe('FilterEditorComponent', () => {
     const permissionsDropdown = fixture.debugElement.query(
       By.directive(PermissionsFilterDropdownComponent)
     )
-    const sharedWithMe = permissionsDropdown.queryAll(By.css('button'))[3]
-    sharedWithMe.triggerEventHandler('click')
-    fixture.detectChanges()
-    expect(component.filterRules).toEqual([
-      {
-        rule_type: FILTER_OWNER_DOES_NOT_INCLUDE,
-        value: '1',
-      },
-    ])
-  })
-
-  it('should convert user input to correct filter on permissions select shared with me', () => {
-    const permissionsDropdown = fixture.debugElement.query(
-      By.directive(PermissionsFilterDropdownComponent)
-    )
     const sharedWithMeButton = permissionsDropdown.queryAll(By.css('button'))[3]
     sharedWithMeButton.triggerEventHandler('click')
     fixture.detectChanges()
