@@ -325,7 +325,9 @@ describe('DocumentDetailComponent', () => {
       .spyOn(openDocumentsService, 'openDocument')
       .mockReturnValueOnce(of(true))
     fixture.detectChanges()
-    expect(component.activeNavID).toEqual(component.DocumentDetailNavIDs.Notes)
+    expect(component.activeNavID()).toEqual(
+      component.DocumentDetailNavIDs.Notes
+    )
   })
 
   it('should switch from preview to details when pdf preview enters the DOM', fakeAsync(() => {
@@ -396,7 +398,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should load non-open document via param', () => {
     initNormally()
-    expect(component.document).toEqual(doc)
+    expect(component.document()).toEqual(doc)
   })
 
   it('should redirect to root when opening a version document id', () => {
@@ -423,7 +425,7 @@ describe('DocumentDetailComponent', () => {
     )
 
     fixture.detectChanges()
-    httpTestingController.expectOne(component.previewUrl).flush('preview')
+    httpTestingController.expectOne(component.previewUrl()).flush('preview')
 
     expect(getRootSpy).toHaveBeenCalledWith(10)
     expect(navigateSpy).toHaveBeenCalledWith(['documents', 3, 'details'], {
@@ -455,7 +457,7 @@ describe('DocumentDetailComponent', () => {
     )
 
     fixture.detectChanges()
-    httpTestingController.expectOne(component.previewUrl).flush('preview')
+    httpTestingController.expectOne(component.previewUrl()).flush('preview')
 
     expect(navigateSpy).toHaveBeenCalledWith(['404'], { replaceUrl: true })
   })
@@ -501,7 +503,7 @@ describe('DocumentDetailComponent', () => {
     )
 
     fixture.detectChanges()
-    httpTestingController.expectOne(component.previewUrl).flush('preview')
+    httpTestingController.expectOne(component.previewUrl()).flush('preview')
     fixture.detectChanges()
 
     const deleteButtons = fixture.debugElement.queryAll(
@@ -512,12 +514,12 @@ describe('DocumentDetailComponent', () => {
 
   it('should fall back to details tab when duplicates tab is active but no duplicates', () => {
     initNormally()
-    component.activeNavID = component.DocumentDetailNavIDs.Duplicates
+    component.activeNavID.set(component.DocumentDetailNavIDs.Duplicates)
     const noDupDoc = { ...doc, duplicate_documents: [] }
 
     component.updateComponent(noDupDoc)
 
-    expect(component.activeNavID).toEqual(
+    expect(component.activeNavID()).toEqual(
       component.DocumentDetailNavIDs.Details
     )
   })
@@ -534,7 +536,7 @@ describe('DocumentDetailComponent', () => {
       })
     )
     fixture.detectChanges() // calls ngOnInit
-    expect(component.document).toEqual(doc)
+    expect(component.document()).toEqual(doc)
   })
 
   it('should update cached open document duplicates when reloading an open doc', () => {
@@ -578,10 +580,10 @@ describe('DocumentDetailComponent', () => {
   it('should not attempt to retrieve objects if user does not have permissions', () => {
     currentUserCan = false
     initNormally()
-    expect(component.correspondents).toBeUndefined()
-    expect(component.documentTypes).toBeUndefined()
-    expect(component.storagePaths).toBeUndefined()
-    expect(component.users).toBeUndefined()
+    expect(component.correspondents()).toBeUndefined()
+    expect(component.documentTypes()).toBeUndefined()
+    expect(component.storagePaths()).toBeUndefined()
+    expect(component.users()).toBeUndefined()
     httpTestingController.expectNone(`${environment.apiBaseUrl}documents/tags/`)
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/correspondents/`
@@ -597,9 +599,9 @@ describe('DocumentDetailComponent', () => {
 
   it('should support creating tag, remove from suggestions', () => {
     initNormally()
-    component.suggestions = {
+    component.suggestions.set({
       suggested_tags: ['Tag1', 'NewTag12'],
-    }
+    })
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
@@ -613,14 +615,14 @@ describe('DocumentDetailComponent', () => {
       text_color: '#000000',
     })
     expect(component.tagsInput.value).toContain(12)
-    expect(component.suggestions.suggested_tags).not.toContain('NewTag12')
+    expect(component.suggestions().suggested_tags).not.toContain('NewTag12')
   })
 
   it('should support creating document type, remove from suggestions', () => {
     initNormally()
-    component.suggestions = {
+    component.suggestions.set({
       suggested_document_types: ['DocumentType1', 'NewDocType2'],
-    }
+    })
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
@@ -628,16 +630,16 @@ describe('DocumentDetailComponent', () => {
     expect(modalSpy).toHaveBeenCalled()
     openModal.componentInstance.succeeded.next({ id: 12, name: 'NewDocType12' })
     expect(component.documentForm.get('document_type').value).toEqual(12)
-    expect(component.suggestions.suggested_document_types).not.toContain(
+    expect(component.suggestions().suggested_document_types).not.toContain(
       'NewDocType2'
     )
   })
 
   it('should support creating correspondent, remove from suggestions', () => {
     initNormally()
-    component.suggestions = {
+    component.suggestions.set({
       suggested_correspondents: ['Correspondent1', 'NewCorrrespondent12'],
-    }
+    })
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
@@ -648,7 +650,7 @@ describe('DocumentDetailComponent', () => {
       name: 'NewCorrrespondent12',
     })
     expect(component.documentForm.get('correspondent').value).toEqual(12)
-    expect(component.suggestions.suggested_correspondents).not.toContain(
+    expect(component.suggestions().suggested_correspondents).not.toContain(
       'NewCorrrespondent12'
     )
   })
@@ -669,15 +671,15 @@ describe('DocumentDetailComponent', () => {
 
   it('should allow dischard changes', () => {
     initNormally()
-    component.title = 'Foo Bar'
+    component.title.set('Foo Bar')
     fixture.detectChanges()
     jest.spyOn(documentService, 'get').mockReturnValueOnce(of(doc))
     component.discard()
     fixture.detectChanges()
-    expect(component.title).toEqual(doc.title)
+    expect(component.title()).toEqual(doc.title)
     expect(openDocumentsService.hasDirty()).toBeFalsy()
     // this time with error, mostly for coverage
-    component.title = 'Foo Bar'
+    component.title.set('Foo Bar')
     fixture.detectChanges()
     const navigateSpy = jest.spyOn(router, 'navigate')
     jest
@@ -694,10 +696,10 @@ describe('DocumentDetailComponent', () => {
     getSpy.mockClear()
     getSpy.mockReturnValueOnce(of(doc))
 
-    component.selectedVersionId = 10
+    component.selectedVersionId.set(10)
     component.discard()
 
-    expect(getSpy).toHaveBeenCalledWith(component.documentId, 10)
+    expect(getSpy).toHaveBeenCalledWith(component.documentId(), 10)
   })
 
   it('should 404 on invalid id', () => {
@@ -724,7 +726,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should support save, close and show success toast', () => {
     initNormally()
-    component.title = 'Foo Bar'
+    component.title.set('Foo Bar')
     const closeSpy = jest.spyOn(component, 'close')
     const patchSpy = jest.spyOn(documentService, 'patch')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
@@ -739,7 +741,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should support save without close and show success toast', () => {
     initNormally()
-    component.title = 'Foo Bar'
+    component.title.set('Foo Bar')
     const closeSpy = jest.spyOn(component, 'close')
     const patchSpy = jest.spyOn(documentService, 'patch')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
@@ -754,7 +756,7 @@ describe('DocumentDetailComponent', () => {
 
   it('save should target currently selected version', () => {
     initNormally()
-    component.selectedVersionId = 10
+    component.selectedVersionId.set(10)
     const patchSpy = jest.spyOn(documentService, 'patch')
     patchSpy.mockReturnValue(of(doc))
 
@@ -767,7 +769,7 @@ describe('DocumentDetailComponent', () => {
   it('should show toast error on save if error occurs', () => {
     currentUserHasObjectPermissions = true
     initNormally()
-    component.title = 'Foo Bar'
+    component.title.set('Foo Bar')
     const closeSpy = jest.spyOn(component, 'close')
     const patchSpy = jest.spyOn(documentService, 'patch')
     const toastSpy = jest.spyOn(toastService, 'showError')
@@ -785,7 +787,7 @@ describe('DocumentDetailComponent', () => {
   it('should show error toast on save but close if user can no longer edit', () => {
     currentUserHasObjectPermissions = false
     initNormally()
-    component.title = 'Foo Bar'
+    component.title.set('Foo Bar')
     const closeSpy = jest.spyOn(component, 'close')
     const patchSpy = jest.spyOn(documentService, 'patch')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
@@ -803,7 +805,7 @@ describe('DocumentDetailComponent', () => {
   it('should allow save and next', () => {
     initNormally()
     const nextDocId = 100
-    component.title = 'Foo Bar'
+    component.title.set('Foo Bar')
     const patchSpy = jest.spyOn(documentService, 'patch')
     patchSpy.mockReturnValue(of(doc))
     const nextSpy = jest.spyOn(documentListViewService, 'getNext')
@@ -821,7 +823,7 @@ describe('DocumentDetailComponent', () => {
   it('should show toast error on save & next if error occurs', () => {
     currentUserHasObjectPermissions = true
     initNormally()
-    component.title = 'Foo Bar'
+    component.title.set('Foo Bar')
     const closeSpy = jest.spyOn(component, 'close')
     const patchSpy = jest.spyOn(documentService, 'patch')
     const toastSpy = jest.spyOn(toastService, 'showError')
@@ -853,7 +855,7 @@ describe('DocumentDetailComponent', () => {
         .find((b) => b.nativeElement.textContent === 'Save & next')
     ).toBeUndefined()
     nextSpy.mockReturnValue(true)
-    component.networkActive = true
+    component.networkActive.set(true)
     fixture.detectChanges()
     expect(
       fixture.debugElement
@@ -1015,7 +1017,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should support Enter key in password field', () => {
     initNormally()
-    component.metadata = { has_archive_version: true }
+    component.metadata.set({ has_archive_version: true })
     component.onError({ name: 'PasswordException' }) // normally dispatched by pdf viewer
     fixture.detectChanges()
     expect(component.password).toBeUndefined()
@@ -1030,45 +1032,45 @@ describe('DocumentDetailComponent', () => {
   it('should update n pages after pdf loaded', () => {
     initNormally()
     component.pdfPreviewLoaded({ numPages: 1000 } as any)
-    expect(component.previewNumPages).toEqual(1000)
+    expect(component.previewNumPages()).toEqual(1000)
   })
 
   it('should include delay of 300ms after previewloaded before showing pdf', fakeAsync(() => {
     initNormally()
-    expect(component.previewLoaded).toBeFalsy()
+    expect(component.previewLoaded()).toBeFalsy()
     component.pdfPreviewLoaded({ numPages: 1000 } as any)
-    expect(component.previewNumPages).toEqual(1000)
+    expect(component.previewNumPages()).toEqual(1000)
     tick(300)
-    expect(component.previewLoaded).toBeTruthy()
+    expect(component.previewLoaded()).toBeTruthy()
   }))
 
   it('should support zoom controls', () => {
     initNormally()
     component.setZoom(PdfZoomLevel.One) // from select
-    expect(component.previewZoomSetting).toEqual('1')
+    expect(component.previewZoomSetting()).toEqual('1')
     component.increaseZoom()
-    expect(component.previewZoomSetting).toEqual('1.5')
+    expect(component.previewZoomSetting()).toEqual('1.5')
     component.increaseZoom()
-    expect(component.previewZoomSetting).toEqual('2')
+    expect(component.previewZoomSetting()).toEqual('2')
     component.decreaseZoom()
-    expect(component.previewZoomSetting).toEqual('1.5')
+    expect(component.previewZoomSetting()).toEqual('1.5')
     component.setZoom(PdfZoomLevel.One) // from select
     component.decreaseZoom()
-    expect(component.previewZoomSetting).toEqual('.75')
+    expect(component.previewZoomSetting()).toEqual('.75')
 
     component.setZoom(PdfZoomScale.PageFit) // from select
-    expect(component.previewZoomScale).toEqual('page-fit')
-    expect(component.previewZoomSetting).toEqual('1')
+    expect(component.previewZoomScale()).toEqual('page-fit')
+    expect(component.previewZoomSetting()).toEqual('1')
     component.increaseZoom()
-    expect(component.previewZoomSetting).toEqual('1.5')
-    expect(component.previewZoomScale).toEqual('page-width')
+    expect(component.previewZoomSetting()).toEqual('1.5')
+    expect(component.previewZoomScale()).toEqual('page-width')
 
     component.setZoom(PdfZoomScale.PageFit) // from select
-    expect(component.previewZoomScale).toEqual('page-fit')
-    expect(component.previewZoomSetting).toEqual('1')
+    expect(component.previewZoomScale()).toEqual('page-fit')
+    expect(component.previewZoomSetting()).toEqual('1')
     component.decreaseZoom()
-    expect(component.previewZoomSetting).toEqual('.5')
-    expect(component.previewZoomScale).toEqual('page-width')
+    expect(component.previewZoomSetting()).toEqual('.5')
+    expect(component.previewZoomScale()).toEqual('page-width')
   })
 
   it('should select correct zoom setting in dropdown', () => {
@@ -1089,7 +1091,7 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     const refreshSpy = jest.spyOn(openDocumentsService, 'refreshDocument')
     component.notesUpdated(notes) // called by notes component
-    expect(component.document.notes).toEqual(notes)
+    expect(component.document().notes).toEqual(notes)
     expect(refreshSpy).toHaveBeenCalled()
   })
 
@@ -1188,7 +1190,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should detect RTL languages and add css class to content textarea', () => {
     initNormally()
-    component.metadata = { lang: 'he' }
+    component.metadata.set({ lang: 'he' })
     component.nav.select(2) // content
     fixture.detectChanges()
     expect(component.isRTL).toBeTruthy()
@@ -1197,7 +1199,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should display built-in pdf viewer if not disabled', () => {
     initNormally()
-    component.document.archived_file_name = 'file.pdf'
+    component.document().archived_file_name = 'file.pdf'
     settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, false)
     expect(component.useNativePdfViewer).toBeFalsy()
     fixture.detectChanges()
@@ -1206,7 +1208,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should display native pdf viewer if enabled', () => {
     initNormally()
-    component.document.archived_file_name = 'file.pdf'
+    component.document().archived_file_name = 'file.pdf'
     settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, true)
     expect(component.useNativePdfViewer).toBeTruthy()
     fixture.detectChanges()
@@ -1224,12 +1226,12 @@ describe('DocumentDetailComponent', () => {
     const metadataSpy = jest.spyOn(documentService, 'getMetadata')
     metadataSpy.mockReturnValue(of({ has_archive_version: true }))
     initNormally()
-    httpTestingController.expectOne(component.previewUrl).flush('preview')
+    httpTestingController.expectOne(component.previewUrl()).flush('preview')
 
     expect(metadataSpy).toHaveBeenCalledWith(doc.id, null)
 
     metadataSpy.mockClear()
-    component.document.versions = [
+    component.document().versions = [
       { id: doc.id, is_root: true },
       { id: 10, is_root: false },
     ] as any
@@ -1268,7 +1270,7 @@ describe('DocumentDetailComponent', () => {
     expect(component.customFieldFormFields).toHaveLength(initialLength)
     component.addField(customFields[1])
     fixture.detectChanges()
-    expect(component.document.custom_fields).toHaveLength(initialLength + 1)
+    expect(component.document().custom_fields).toHaveLength(initialLength + 1)
     expect(component.customFieldFormFields).toHaveLength(initialLength + 1)
     expect(fixture.debugElement.nativeElement.textContent).toContain(
       customFields[1].name
@@ -1288,7 +1290,7 @@ describe('DocumentDetailComponent', () => {
     expect(component.customFieldFormFields).toHaveLength(initialLength)
     component.removeField(doc.custom_fields[0])
     fixture.detectChanges()
-    expect(component.document.custom_fields).toHaveLength(initialLength - 1)
+    expect(component.document().custom_fields).toHaveLength(initialLength - 1)
     expect(component.customFieldFormFields).toHaveLength(initialLength - 1)
     expect(
       fixture.debugElement.query(By.css('form ul')).nativeElement.textContent
@@ -1356,7 +1358,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should show custom field errors', () => {
     initNormally()
-    component.error = {
+    component.error.set({
       custom_fields: [
         {},
         {},
@@ -1364,7 +1366,7 @@ describe('DocumentDetailComponent', () => {
         {},
         { non_field_errors: ['Enter a valid URL.'] },
       ],
-    }
+    })
     expect(component.getCustomFieldError(2)).toEqual([
       'This field may not be null.',
     ])
@@ -1394,7 +1396,7 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     expect(suggestionsSpy).toHaveBeenCalled()
     expect(aiSuggestionsSpy).not.toHaveBeenCalled()
-    expect(component.suggestions).toEqual({
+    expect(component.suggestions()).toEqual({
       tags: [42, 43],
       suggested_tags: [],
       suggested_document_types: [],
@@ -1422,7 +1424,7 @@ describe('DocumentDetailComponent', () => {
     initNormally()
     expect(suggestionsSpy).not.toHaveBeenCalled()
     expect(aiSuggestionsSpy).toHaveBeenCalled()
-    expect(component.suggestions).toEqual({
+    expect(component.suggestions()).toEqual({
       tags: [42, 43],
       suggested_tags: [],
       suggested_document_types: [],
@@ -1475,7 +1477,7 @@ describe('DocumentDetailComponent', () => {
   it('should react to websocket document updated notifications', () => {
     initNormally()
     const updateMessage = {
-      document_id: component.documentId,
+      document_id: component.documentId(),
       modified: '2026-02-17T00:00:00Z',
       owner_id: 1,
     }
@@ -1494,18 +1496,18 @@ describe('DocumentDetailComponent', () => {
     const loadSpy = jest.spyOn(component as any, 'loadDocument')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
 
-    component.networkActive = true
+    component.networkActive.set(true)
     ;(component as any).handleIncomingDocumentUpdated({
-      document_id: component.documentId,
+      document_id: component.documentId(),
       modified: '2026-02-17T00:00:00Z',
     })
 
     expect(loadSpy).not.toHaveBeenCalled()
 
-    component.networkActive = false
+    component.networkActive.set(false)
     ;(component as any).flushPendingIncomingUpdate()
 
-    expect(loadSpy).toHaveBeenCalledWith(component.documentId, true)
+    expect(loadSpy).toHaveBeenCalledWith(component.documentId(), true)
     expect(toastSpy).toHaveBeenCalledWith(
       'Document reloaded with latest changes.'
     )
@@ -1516,14 +1518,14 @@ describe('DocumentDetailComponent', () => {
     const loadSpy = jest.spyOn(component as any, 'loadDocument')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
 
-    component.networkActive = true
+    component.networkActive.set(true)
     ;(component as any).lastLocalSaveModified = '2026-02-17T00:00:00+00:00'
     ;(component as any).handleIncomingDocumentUpdated({
-      document_id: component.documentId,
+      document_id: component.documentId(),
       modified: '2026-02-17T00:00:00+00:00',
     })
 
-    component.networkActive = false
+    component.networkActive.set(false)
     ;(component as any).flushPendingIncomingUpdate()
 
     expect(loadSpy).not.toHaveBeenCalled()
@@ -1531,13 +1533,13 @@ describe('DocumentDetailComponent', () => {
   })
 
   it('should clear pdf source if preview URL is empty', () => {
-    component.pdfSource = '/preview'
-    component.pdfPassword = 'secret'
-    component.previewUrl = null
+    component.pdfSource.set('/preview')
+    component.pdfPassword.set('secret')
+    component.previewUrl.set(null)
     ;(component as any).updatePdfSource()
 
-    expect(component.pdfSource).toEqual(null)
-    expect(component.pdfPassword).toBeUndefined()
+    expect(component.pdfSource()).toEqual(null)
+    expect(component.pdfPassword()).toBeUndefined()
   })
 
   it('should close incoming update modal if one is open', () => {
@@ -1607,7 +1609,7 @@ describe('DocumentDetailComponent', () => {
     const loadSpy = jest.spyOn(component as any, 'loadDocument')
 
     ;(component as any).handleIncomingDocumentUpdated({
-      document_id: component.documentId + 1,
+      document_id: component.documentId() + 1,
       modified: '2026-02-17T00:00:00Z',
     })
 
@@ -1622,7 +1624,7 @@ describe('DocumentDetailComponent', () => {
       .mockImplementation(() => {})
 
     ;(component as any).handleIncomingDocumentUpdated({
-      document_id: component.documentId,
+      document_id: component.documentId(),
       modified: '2026-02-17T00:00:00Z',
     })
 
@@ -1630,7 +1632,7 @@ describe('DocumentDetailComponent', () => {
   })
 
   it('should reload current document and show toast when reloading remote version', () => {
-    component.documentId = doc.id
+    component.documentId.set(doc.id)
     const closeModalSpy = jest
       .spyOn(component as any, 'closeIncomingUpdateModal')
       .mockImplementation(() => {})
@@ -1650,7 +1652,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should change preview element by render type', () => {
     initNormally()
-    component.document.archived_file_name = 'file.pdf'
+    component.document().archived_file_name = 'file.pdf'
     fixture.detectChanges()
     expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.PDF
@@ -1659,8 +1661,8 @@ describe('DocumentDetailComponent', () => {
       fixture.debugElement.query(By.css('pdf-viewer-container'))
     ).not.toBeUndefined()
 
-    component.document.archived_file_name = undefined
-    component.document.mime_type = 'text/plain'
+    component.document().archived_file_name = undefined
+    component.document().mime_type = 'text/plain'
     fixture.detectChanges()
     expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.Text
@@ -1669,7 +1671,7 @@ describe('DocumentDetailComponent', () => {
       fixture.debugElement.query(By.css('div.preview-sticky'))
     ).not.toBeUndefined()
 
-    component.document.mime_type = 'image/jpeg'
+    component.document().mime_type = 'image/jpeg'
     fixture.detectChanges()
     expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.Image
@@ -1677,7 +1679,7 @@ describe('DocumentDetailComponent', () => {
     expect(
       fixture.debugElement.query(By.css('.preview-sticky img'))
     ).not.toBeUndefined()
-    ;((component.document.mime_type =
+    ;((component.document().mime_type =
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
       fixture.detectChanges())
     expect(component.archiveContentRenderType).toEqual(
@@ -1694,7 +1696,7 @@ describe('DocumentDetailComponent', () => {
     const closeSpy = jest.spyOn(openDocumentsService, 'closeDocument')
     const errorSpy = jest.spyOn(toastService, 'showError')
     initNormally()
-    component.selectedVersionId = 10
+    component.selectedVersionId.set(10)
     component.editPdf()
     expect(modal).not.toBeUndefined()
     modal.componentInstance.documentID.set(doc.id)
@@ -1731,7 +1733,7 @@ describe('DocumentDetailComponent', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[0]))
     initNormally()
-    component.selectedVersionId = 10
+    component.selectedVersionId.set(10)
     component.password = 'secret'
     component.removePassword()
     const dialog =
@@ -1785,7 +1787,7 @@ describe('DocumentDetailComponent', () => {
     req.error(new ErrorEvent('failed'))
 
     expect(errorSpy).toHaveBeenCalled()
-    expect(component.networkActive).toBe(false)
+    expect(component.networkActive()).toBe(false)
     expect(dialog.buttonsEnabled).toBe(true)
   })
 
@@ -1859,7 +1861,7 @@ describe('DocumentDetailComponent', () => {
   it('selectVersion should update preview and handle preview failures', () => {
     const previewSpy = jest.spyOn(documentService, 'getPreviewUrl')
     initNormally()
-    httpTestingController.expectOne(component.previewUrl).flush('preview')
+    httpTestingController.expectOne(component.previewUrl()).flush('preview')
 
     previewSpy.mockReturnValueOnce('preview-version')
     jest.spyOn(documentService, 'getThumbUrl').mockReturnValue('thumb-version')
@@ -1870,12 +1872,12 @@ describe('DocumentDetailComponent', () => {
     component.selectVersion(10)
     httpTestingController.expectOne('preview-version').flush('version text')
 
-    expect(component.previewUrl).toBe('preview-version')
-    expect(component.thumbUrl).toBe('thumb-version')
-    expect(component.previewText).toBe('version text')
+    expect(component.previewUrl()).toBe('preview-version')
+    expect(component.thumbUrl()).toBe('thumb-version')
+    expect(component.previewText()).toBe('version text')
     expect(component.documentForm.get('content').value).toBe('version-content')
-    expect(component.pdfSource).toBe('preview-version')
-    expect(component.pdfPassword).toBeUndefined()
+    expect(component.pdfSource()).toBe('preview-version')
+    expect(component.pdfPassword()).toBeUndefined()
 
     previewSpy.mockReturnValueOnce('preview-error')
     component.selectVersion(11)
@@ -1883,12 +1885,14 @@ describe('DocumentDetailComponent', () => {
       .expectOne('preview-error')
       .error(new ErrorEvent('fail'))
 
-    expect(component.previewText).toContain('An error occurred loading content')
+    expect(component.previewText()).toContain(
+      'An error occurred loading content'
+    )
   })
 
   it('selectVersion should show toast if version content retrieval fails', () => {
     initNormally()
-    httpTestingController.expectOne(component.previewUrl).flush('preview')
+    httpTestingController.expectOne(component.previewUrl()).flush('preview')
 
     jest.spyOn(documentService, 'getPreviewUrl').mockReturnValue('preview-ok')
     jest.spyOn(documentService, 'getThumbUrl').mockReturnValue('thumb-ok')
@@ -1921,8 +1925,8 @@ describe('DocumentDetailComponent', () => {
   })
 
   it('onVersionsUpdated should sync open document versions and save', () => {
-    component.documentId = doc.id
-    component.document = { ...doc, versions: [] } as Document
+    component.documentId.set(doc.id)
+    component.document.set({ ...doc, versions: [] } as Document)
     const updatedVersions = [
       { id: doc.id, is_root: true },
       { id: 10, is_root: false },
@@ -1933,7 +1937,7 @@ describe('DocumentDetailComponent', () => {
 
     component.onVersionsUpdated(updatedVersions)
 
-    expect(component.document.versions).toEqual(updatedVersions)
+    expect(component.document().versions).toEqual(updatedVersions)
     expect(openDoc.versions).toEqual(updatedVersions)
     expect(saveSpy).toHaveBeenCalled()
   })
@@ -1968,7 +1972,7 @@ describe('DocumentDetailComponent', () => {
       DocumentDetailComponent.prototype as any,
       'tryRenderTiff'
     )
-    const doc = Object.assign({}, component.document)
+    const doc = Object.assign({}, component.document())
     doc.archived_file_name = null
     doc.mime_type = 'image/tiff'
     jest
@@ -1987,21 +1991,21 @@ describe('DocumentDetailComponent', () => {
   it('should try to render tiff and show error if failed', () => {
     initNormally()
     // just the text request
-    httpTestingController.expectOne(component.previewUrl)
+    httpTestingController.expectOne(component.previewUrl())
 
     // invalid tiff
     component['tryRenderTiff']()
     httpTestingController
-      .expectOne(component.previewUrl)
+      .expectOne(component.previewUrl())
       .flush(new ArrayBuffer(100)) // arraybuffer
-    expect(component.tiffError).not.toBeUndefined()
+    expect(component.tiffError()).not.toBeUndefined()
 
     // http error
     component['tryRenderTiff']()
     httpTestingController
-      .expectOne(component.previewUrl)
+      .expectOne(component.previewUrl())
       .error(new ErrorEvent('failed'))
-    expect(component.tiffError).not.toBeUndefined()
+    expect(component.tiffError()).not.toBeUndefined()
   })
 
   it('should support download using share sheet on mobile, direct download otherwise', () => {
@@ -2040,7 +2044,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should include version in download and print only for non-latest selected version', () => {
     initNormally()
-    component.document.versions = [
+    component.document().versions = [
       { id: doc.id, is_root: true },
       { id: 10, is_root: false },
     ] as any
@@ -2052,7 +2056,7 @@ describe('DocumentDetailComponent', () => {
       .mockReturnValueOnce('download-non-latest')
       .mockReturnValueOnce('print-non-latest')
 
-    component.selectedVersionId = 10
+    component.selectedVersionId.set(10)
     component.download()
     expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(
       1,
@@ -2071,7 +2075,7 @@ describe('DocumentDetailComponent', () => {
       .expectOne('print-latest')
       .error(new ProgressEvent('failed'))
 
-    component.selectedVersionId = doc.id
+    component.selectedVersionId.set(doc.id)
     component.download()
     expect(getDownloadUrlSpy).toHaveBeenNthCalledWith(
       3,
@@ -2093,7 +2097,7 @@ describe('DocumentDetailComponent', () => {
 
   it('should omit version in download and print when no version is selected', () => {
     initNormally()
-    component.document.versions = [] as any
+    component.document().versions = [] as any
     ;(component as any).selectedVersionId = undefined
 
     const getDownloadUrlSpy = jest
@@ -2130,7 +2134,7 @@ describe('DocumentDetailComponent', () => {
     })
 
     const downloadUrl = 'http://example.com/download'
-    component.documentId = 123
+    component.documentId.set(123)
     jest.spyOn(documentService, 'getDownloadUrl').mockReturnValue(downloadUrl)
 
     const createSpy = jest.spyOn(document, 'createElement')
@@ -2165,16 +2169,18 @@ describe('DocumentDetailComponent', () => {
   it('should set previewText', () => {
     initNormally()
     const previewText = 'Hello world, this is a test'
-    httpTestingController.expectOne(component.previewUrl).flush(previewText)
-    expect(component.previewText).toEqual(previewText)
+    httpTestingController.expectOne(component.previewUrl()).flush(previewText)
+    expect(component.previewText()).toEqual(previewText)
   })
 
   it('should set previewText to error message if preview fails', () => {
     initNormally()
     httpTestingController
-      .expectOne(component.previewUrl)
+      .expectOne(component.previewUrl())
       .flush('fail', { status: 500, statusText: 'Server Error' })
-    expect(component.previewText).toContain('An error occurred loading content')
+    expect(component.previewText()).toContain(
+      'An error occurred loading content'
+    )
   })
 
   it('should print document successfully', fakeAsync(() => {

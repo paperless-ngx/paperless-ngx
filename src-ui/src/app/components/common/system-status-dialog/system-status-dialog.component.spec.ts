@@ -16,7 +16,6 @@ jest.mock('src/environments/environment', () => ({
 import { Clipboard } from '@angular/cdk/clipboard'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { signal } from '@angular/core'
 import {
   ComponentFixture,
   TestBed,
@@ -107,7 +106,7 @@ describe('SystemStatusDialogComponent', () => {
 
     fixture = TestBed.createComponent(SystemStatusDialogComponent)
     component = fixture.componentInstance
-    component.status = signal({ ...status })
+    component.status.set({ ...status })
     clipboard = TestBed.inject(Clipboard)
     tasksService = TestBed.inject(TasksService)
     systemStatusService = TestBed.inject(SystemStatusService)

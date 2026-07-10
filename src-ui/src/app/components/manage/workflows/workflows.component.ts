@@ -73,8 +73,9 @@ export class WorkflowsComponent
       backdrop: 'static',
       size: 'xl',
     })
-    modal.componentInstance.dialogMode =
+    modal.componentInstance.dialogMode.set(
       workflow && !forceCreate ? EditDialogMode.EDIT : EditDialogMode.CREATE
+    )
     if (workflow) {
       // quick "deep" clone so original doesn't get modified
       const clone = Object.assign({}, workflow)

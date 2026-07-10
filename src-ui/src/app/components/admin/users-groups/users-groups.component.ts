@@ -101,9 +101,9 @@ export class UsersAndGroupsComponent
       backdrop: 'static',
       size: 'xl',
     })
-    modal.componentInstance.dialogMode = user
-      ? EditDialogMode.EDIT
-      : EditDialogMode.CREATE
+    modal.componentInstance.dialogMode.set(
+      user ? EditDialogMode.EDIT : EditDialogMode.CREATE
+    )
     modal.componentInstance.object = user
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -170,9 +170,9 @@ export class UsersAndGroupsComponent
       backdrop: 'static',
       size: 'lg',
     })
-    modal.componentInstance.dialogMode = group
-      ? EditDialogMode.EDIT
-      : EditDialogMode.CREATE
+    modal.componentInstance.dialogMode.set(
+      group ? EditDialogMode.EDIT : EditDialogMode.CREATE
+    )
     modal.componentInstance.object = group
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))

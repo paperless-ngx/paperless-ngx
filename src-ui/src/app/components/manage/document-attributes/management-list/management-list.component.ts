@@ -221,7 +221,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     const activeModal = this.modalService.open(this.editDialogComponent, {
       backdrop: 'static',
     })
-    activeModal.componentInstance.dialogMode = EditDialogMode.CREATE
+    activeModal.componentInstance.dialogMode.set(EditDialogMode.CREATE)
     activeModal.componentInstance.succeeded.subscribe(() => {
       this.reloadData()
       this.toastService.showInfo(
@@ -241,7 +241,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
       backdrop: 'static',
     })
     activeModal.componentInstance.object = object
-    activeModal.componentInstance.dialogMode = EditDialogMode.EDIT
+    activeModal.componentInstance.dialogMode.set(EditDialogMode.EDIT)
     activeModal.componentInstance.succeeded.subscribe(() => {
       this.reloadData()
       this.toastService.showInfo(

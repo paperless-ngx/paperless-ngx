@@ -46,9 +46,7 @@ export abstract class EditDialogComponent<
   protected settingsService = inject(SettingsService)
   protected permissionsService = inject(PermissionsService)
 
-  dialogMode = model(EditDialogMode.CREATE, {
-    equal: () => false,
-  })
+  dialogMode = model(EditDialogMode.CREATE)
 
   @Input()
   object: T

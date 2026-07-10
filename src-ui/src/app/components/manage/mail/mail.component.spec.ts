@@ -261,7 +261,7 @@ describe('MailComponent', () => {
     const editDialog = modal.componentInstance as MailRuleEditDialogComponent
     expect(editDialog.object.id).toBeNull()
     expect(editDialog.object.name).toEqual(`${mailRules[0].name} (copy)`)
-    expect(editDialog.dialogMode).toEqual(EditDialogMode.CREATE)
+    expect(editDialog.dialogMode()).toEqual(EditDialogMode.CREATE)
   })
 
   it('should support delete mail rule, show error if needed', () => {

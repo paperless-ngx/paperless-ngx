@@ -162,9 +162,9 @@ export class MailComponent
       backdrop: 'static',
       size: 'xl',
     })
-    modal.componentInstance.dialogMode = account
-      ? EditDialogMode.EDIT
-      : EditDialogMode.CREATE
+    modal.componentInstance.dialogMode.set(
+      account ? EditDialogMode.EDIT : EditDialogMode.CREATE
+    )
     modal.componentInstance.object = account
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
@@ -241,8 +241,9 @@ export class MailComponent
       backdrop: 'static',
       size: 'xl',
     })
-    modal.componentInstance.dialogMode =
+    modal.componentInstance.dialogMode.set(
       rule && !forceCreate ? EditDialogMode.EDIT : EditDialogMode.CREATE
+    )
     modal.componentInstance.object = rule
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))

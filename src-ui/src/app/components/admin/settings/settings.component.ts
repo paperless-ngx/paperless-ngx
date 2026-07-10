@@ -664,6 +664,6 @@ export class SettingsComponent
         size: 'xl',
       }
     )
-    modal.componentInstance.status = this.systemStatus
+    modal.componentInstance.status.set(this.systemStatus)
   }
 }

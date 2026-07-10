@@ -38,7 +38,6 @@ import { environment } from 'src/environments/environment'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
-import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { FilterableDropdownComponent } from '../../common/filterable-dropdown/filterable-dropdown.component'
@@ -1339,7 +1338,7 @@ describe('BulkEditorComponent', () => {
 
     const modalInstance = {
       componentInstance: {
-        dialogMode: EditDialogMode.CREATE,
+        dialogMode: { set: jest.fn() },
         object: { name },
         succeeded: of(newTag),
       },
@@ -1382,7 +1381,7 @@ describe('BulkEditorComponent', () => {
 
     const modalInstance = {
       componentInstance: {
-        dialogMode: EditDialogMode.CREATE,
+        dialogMode: { set: jest.fn() },
         object: { name },
         succeeded: of(newCorrespondent),
       },
@@ -1431,7 +1430,7 @@ describe('BulkEditorComponent', () => {
 
     const modalInstance = {
       componentInstance: {
-        dialogMode: EditDialogMode.CREATE,
+        dialogMode: { set: jest.fn() },
         object: { name },
         succeeded: of(newDocumentType),
       },
@@ -1477,7 +1476,7 @@ describe('BulkEditorComponent', () => {
 
     const modalInstance = {
       componentInstance: {
-        dialogMode: EditDialogMode.CREATE,
+        dialogMode: { set: jest.fn() },
         object: { name },
         succeeded: of(newStoragePath),
       },
@@ -1531,7 +1530,7 @@ describe('BulkEditorComponent', () => {
 
     const modalInstance = {
       componentInstance: {
-        dialogMode: EditDialogMode.CREATE,
+        dialogMode: { set: jest.fn() },
         object: { name },
         succeeded: of(newCustomField),
       },

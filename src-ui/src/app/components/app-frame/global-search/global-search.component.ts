@@ -207,7 +207,7 @@ export class GlobalSearchComponent implements OnInit {
         editDialogComponent,
         { size }
       )
-      modalRef.componentInstance.dialogMode = EditDialogMode.EDIT
+      modalRef.componentInstance.dialogMode.set(EditDialogMode.EDIT)
       modalRef.componentInstance.object = object
       modalRef.componentInstance.succeeded.subscribe(() => {
         this.toastService.showInfo($localize`Successfully updated object.`)
@@ -245,7 +245,7 @@ export class GlobalSearchComponent implements OnInit {
         editDialogComponent,
         { size }
       )
-      modalRef.componentInstance.dialogMode = EditDialogMode.EDIT
+      modalRef.componentInstance.dialogMode.set(EditDialogMode.EDIT)
       modalRef.componentInstance.object = object
       modalRef.componentInstance.succeeded.subscribe(() => {
         this.toastService.showInfo($localize`Successfully updated object.`)

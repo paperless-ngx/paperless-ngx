@@ -266,7 +266,7 @@ export class BulkEditorComponent
     overrideSelection?: DocumentSelectionQuery
   ) {
     if (modal) {
-      modal.componentInstance.buttonsEnabled = false
+      this.setModalButtonsEnabled(modal, false)
     }
     this.documentService
       .bulkEdit(overrideSelection ?? this.getSelectionQuery(), method, args)
@@ -283,7 +283,7 @@ export class BulkEditorComponent
     options: { deleteOriginals?: boolean } = {}
   ) {
     if (modal) {
-      modal.componentInstance.buttonsEnabled = false
+      this.setModalButtonsEnabled(modal, false)
     }
     request.pipe(first()).subscribe({
       next: () => {
@@ -313,12 +313,21 @@ export class BulkEditorComponent
 
   private handleOperationError(modal: NgbModalRef, error: any) {
     if (modal) {
-      modal.componentInstance.buttonsEnabled = true
+      this.setModalButtonsEnabled(modal, true)
     }
     this.toastService.showError(
       $localize`Error executing bulk operation`,
       error
     )
+  }
+
+  private setModalButtonsEnabled(modal: NgbModalRef, enabled: boolean) {
+    const buttonsEnabled = modal.componentInstance.buttonsEnabled
+    if (typeof buttonsEnabled?.set === 'function') {
+      buttonsEnabled.set(enabled)
+    } else {
+      modal.componentInstance.buttonsEnabled = enabled
+    }
   }
 
   private applySelectionData(
@@ -736,7 +745,7 @@ export class BulkEditorComponent
     let modal = this.modalService.open(TagEditDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.dialogMode.set(EditDialogMode.CREATE)
     modal.componentInstance.object = { name }
     modal.componentInstance.succeeded
       .pipe(
@@ -757,7 +766,7 @@ export class BulkEditorComponent
     let modal = this.modalService.open(CorrespondentEditDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.dialogMode.set(EditDialogMode.CREATE)
     modal.componentInstance.object = { name }
     modal.componentInstance.succeeded
       .pipe(
@@ -780,7 +789,7 @@ export class BulkEditorComponent
     let modal = this.modalService.open(DocumentTypeEditDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.dialogMode.set(EditDialogMode.CREATE)
     modal.componentInstance.object = { name }
     modal.componentInstance.succeeded
       .pipe(
@@ -801,7 +810,7 @@ export class BulkEditorComponent
     let modal = this.modalService.open(StoragePathEditDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.dialogMode.set(EditDialogMode.CREATE)
     modal.componentInstance.object = { name }
     modal.componentInstance.succeeded
       .pipe(
@@ -822,7 +831,7 @@ export class BulkEditorComponent
     let modal = this.modalService.open(CustomFieldEditDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.dialogMode.set(EditDialogMode.CREATE)
     modal.componentInstance.object = { name }
     modal.componentInstance.succeeded
       .pipe(

@@ -75,9 +75,9 @@ export class CustomFieldsComponent
 
   editField(field: CustomField) {
     const modal = this.modalService.open(CustomFieldEditDialogComponent)
-    modal.componentInstance.dialogMode = field
-      ? EditDialogMode.EDIT
-      : EditDialogMode.CREATE
+    modal.componentInstance.dialogMode.set(
+      field ? EditDialogMode.EDIT : EditDialogMode.CREATE
+    )
     modal.componentInstance.object = field
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))

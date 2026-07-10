@@ -176,7 +176,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     var modal = this.modalService.open(TagEditDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.dialogMode.set(EditDialogMode.CREATE)
     if (name) modal.componentInstance.object = { name: name }
     else if (this.select.searchTerm)
       modal.componentInstance.object = { name: this.select.searchTerm }
