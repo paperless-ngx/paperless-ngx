@@ -28,7 +28,7 @@ export class TasksService {
   private unsubscribeNotifer: Subject<any> = new Subject()
 
   public get total(): number {
-    return this.fileTasks.length
+    return this.fileTasks().length
   }
 
   public get allFileTasks(): PaperlessTask[] {
