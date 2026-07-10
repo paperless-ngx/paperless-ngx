@@ -471,11 +471,11 @@ export class WorkflowEditDialogComponent
   public TriggerFilterType = TriggerFilterType
   public filterDefinitions = TRIGGER_FILTER_DEFINITIONS
 
-  private correspondentService = inject(CorrespondentService)
-  private documentTypeService = inject(DocumentTypeService)
-  private storagePathService = inject(StoragePathService)
-  private mailRuleService = inject(MailRuleService)
-  private customFieldsService = inject(CustomFieldsService)
+  private readonly correspondentService = inject(CorrespondentService)
+  private readonly documentTypeService = inject(DocumentTypeService)
+  private readonly storagePathService = inject(StoragePathService)
+  private readonly mailRuleService = inject(MailRuleService)
+  private readonly customFieldsService = inject(CustomFieldsService)
 
   readonly templates = signal<Workflow[]>(undefined)
   readonly correspondents = toSignal(

@@ -39,7 +39,7 @@ export enum PermissionType {
 export class PermissionsService {
   private permissions: string[]
   private currentUser: User
-  private permissionsVersion = signal(0)
+  private readonly permissionsVersion = signal(0)
 
   public initialize(permissions: string[], currentUser: User) {
     this.permissions = permissions

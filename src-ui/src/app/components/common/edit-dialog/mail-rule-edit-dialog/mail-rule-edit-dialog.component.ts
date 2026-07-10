@@ -155,9 +155,9 @@ const METADATA_CORRESPONDENT_OPTIONS = [
   ],
 })
 export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
-  private accountService = inject(MailAccountService)
-  private correspondentService = inject(CorrespondentService)
-  private documentTypeService = inject(DocumentTypeService)
+  private readonly accountService = inject(MailAccountService)
+  private readonly correspondentService = inject(CorrespondentService)
+  private readonly documentTypeService = inject(DocumentTypeService)
 
   readonly accounts = toSignal(
     this.accountService.listAll().pipe(map((result) => result.results)),

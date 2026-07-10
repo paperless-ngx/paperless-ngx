@@ -118,7 +118,7 @@ export class DocumentListViewService {
   isReloading: boolean = false
   initialized: boolean = false
   error: string = null
-  private stateVersion = signal(0)
+  private readonly stateVersion = signal(0)
 
   rangeSelectionAnchorIndex: number
   lastRangeSelectionToIndex: number

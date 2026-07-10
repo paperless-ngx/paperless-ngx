@@ -295,7 +295,7 @@ export class SettingsService {
   protected baseUrl: string = environment.apiBaseUrl + 'ui_settings/'
 
   private settings: Record<string, any> = {}
-  private settingsVersion = signal(0)
+  private readonly settingsVersion = signal(0)
   readonly currentUser = signal<User>(undefined)
 
   public settingsSaved: EventEmitter<any> = new EventEmitter()

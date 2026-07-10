@@ -15,7 +15,7 @@ export class OpenDocumentsService {
   private modalService = inject(NgbModal)
 
   private MAX_OPEN_DOCUMENTS = 5
-  private stateVersion = signal(0)
+  private readonly stateVersion = signal(0)
 
   constructor() {
     this.load()

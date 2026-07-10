@@ -39,7 +39,7 @@ export class UserEditDialogComponent
   implements OnInit
 {
   private toastService = inject(ToastService)
-  private groupsService = inject(GroupService)
+  private readonly groupsService = inject(GroupService)
 
   readonly groups = toSignal(
     this.groupsService.listAll().pipe(map((result) => result.results)),
