@@ -61,10 +61,7 @@ jobs:
             ~/.cache
           key: ${{ runner.os }}-frontenddeps-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
       - name: Install frontend dependencies
-        if: steps.cache-frontend-deps.outputs.cache-hit != 'true'
-        run: cd src-ui && pnpm install
-      - name: Re-link Angular cli
-        run: cd src-ui && pnpm link @angular/cli
+        run: cd src-ui && pnpm install --frozen-lockfile
       - name: Generate frontend translation strings
         run: |
           cd src-ui

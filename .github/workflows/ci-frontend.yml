@@ -129,8 +129,8 @@ jobs:
             ~/.pnpm-store
             ~/.cache
           key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
-      - name: Re-link Angular CLI
-        run: cd src-ui && pnpm link @angular/cli
+      - name: Install dependencies
+        run: cd src-ui && pnpm install --frozen-lockfile
       - name: Run lint
         run: cd src-ui && pnpm run lint
   unit-tests:
@@ -168,8 +168,8 @@ jobs:
             ~/.pnpm-store
             ~/.cache
           key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
-      - name: Re-link Angular CLI
-        run: cd src-ui && pnpm link @angular/cli
+      - name: Install dependencies
+        run: cd src-ui && pnpm install --frozen-lockfile
       - name: Run Jest unit tests
         run: cd src-ui && pnpm run test --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
       - name: Upload test results to Codecov
@@ -223,10 +223,8 @@ jobs:
             ~/.pnpm-store
             ~/.cache
           key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
-      - name: Re-link Angular CLI
-        run: cd src-ui && pnpm link @angular/cli
       - name: Install dependencies
-        run: cd src-ui && pnpm install --no-frozen-lockfile
+        run: cd src-ui && pnpm install --frozen-lockfile
       - name: Run Playwright E2E tests
         run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
   frontend-build:
@@ -259,8 +257,8 @@ jobs:
             ~/.pnpm-store
             ~/.cache
           key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
-      - name: Re-link Angular CLI
-        run: cd src-ui && pnpm link @angular/cli
+      - name: Install dependencies
+        run: cd src-ui && pnpm install --frozen-lockfile
       - name: Build
         run: cd src-ui && pnpm run build --configuration=production
   gate:
