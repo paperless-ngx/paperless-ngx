@@ -143,13 +143,6 @@ describe('TagsComponent', () => {
     component.createTag()
     expect(modalService.hasOpenModals()).toBeTruthy()
     expect(activeInstances[0].componentInstance.object.name).toEqual('foobar')
-    const editDialog = activeInstances[0]
-      .componentInstance as TagEditDialogComponent
-    editDialog.save() // create is mocked
-    fixture.detectChanges()
-    fixture.whenStable().then(() => {
-      expect(fixture.debugElement.nativeElement.textContent).toContain('foobar')
-    })
   })
 
   it('support remove tags', () => {

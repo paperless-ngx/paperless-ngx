@@ -1,13 +1,6 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  discardPeriodicTasks,
-  fakeAsync,
-  flush,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -24,8 +17,18 @@ describe('FileDropComponent', () => {
   let settingsService: SettingsService
   let uploadDocumentsService: UploadDocumentsService
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
+  const advanceTimers = (ms: number) => {
+    jest.advanceTimersByTime(ms)
+    fixture.detectChanges()
+  }
+
+  const flushPromises = async () => {
+    await Promise.resolve()
+    await Promise.resolve()
+  }
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       imports: [FileDropComponent, ToastsComponent],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
@@ -43,6 +46,10 @@ describe('FileDropComponent', () => {
     fixture.detectChanges()
   })
 
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
   it('should enable drag-drop if user has permissions', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     expect(component.dragDropEnabled).toBeTruthy()
@@ -53,22 +60,21 @@ describe('FileDropComponent', () => {
     expect(component.dragDropEnabled).toBeFalsy()
   })
 
-  it('should disable drag-drop if disabled in settings', fakeAsync(() => {
+  it('should disable drag-drop if disabled in settings', () => {
+    jest.useFakeTimers()
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     settingsService.globalDropzoneEnabled.set(false)
     expect(component.dragDropEnabled).toBeFalsy()
 
     component.onDragOver(new Event('dragover') as DragEvent)
-    tick(1)
-    fixture.detectChanges()
+    advanceTimers(1)
     expect(component.fileIsOver()).toBeFalsy()
     const dropzone = fixture.debugElement.query(
       By.css('.global-dropzone-overlay')
     )
     expect(dropzone.classes['active']).toBeFalsy()
     component.onDragLeave(new Event('dragleave') as DragEvent)
-    tick(700)
-    fixture.detectChanges()
+    advanceTimers(700)
     // drop
     const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFile')
     const dragEvent = new Event('drop')
@@ -79,22 +85,21 @@ describe('FileDropComponent', () => {
       },
     }
     component.onDrop(dragEvent as DragEvent)
-    tick(3000)
+    advanceTimers(3000)
     expect(uploadSpy).not.toHaveBeenCalled()
-  }))
+  })
 
-  it('should support drag drop, initiate upload', fakeAsync(() => {
+  it('should support drag drop, initiate upload', () => {
+    jest.useFakeTimers()
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     expect(component.fileIsOver()).toBeFalsy()
     const overEvent = new Event('dragover') as DragEvent
     ;(overEvent as any).dataTransfer = { types: ['Files'] }
     component.onDragOver(overEvent)
-    tick(1)
-    fixture.detectChanges()
+    advanceTimers(1)
     expect(component.fileIsOver()).toBeTruthy()
     component.onDragLeave(new Event('dragleave') as DragEvent)
-    tick(700)
-    fixture.detectChanges()
+    advanceTimers(700)
     // drop
     const toastSpy = jest.spyOn(toastService, 'show')
     const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFile')
@@ -113,24 +118,22 @@ describe('FileDropComponent', () => {
       ],
     }
     component.onDrop(dragEvent as DragEvent)
-    tick(3000)
+    advanceTimers(3000)
     expect(toastSpy).toHaveBeenCalled()
     expect(uploadSpy).toHaveBeenCalled()
-    discardPeriodicTasks()
-  }))
+  })
 
-  it('should support drag drop, initiate upload with webkitGetAsEntry', fakeAsync(() => {
+  it('should support drag drop, initiate upload with webkitGetAsEntry', async () => {
+    jest.useFakeTimers()
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     expect(component.fileIsOver()).toBeFalsy()
     const overEvent = new Event('dragover') as DragEvent
     ;(overEvent as any).dataTransfer = { types: ['Files'] }
     component.onDragOver(overEvent)
-    tick(1)
-    fixture.detectChanges()
+    advanceTimers(1)
     expect(component.fileIsOver()).toBeTruthy()
     component.onDragLeave(new Event('dragleave') as DragEvent)
-    tick(700)
-    fixture.detectChanges()
+    advanceTimers(700)
     // drop
     const toastSpy = jest.spyOn(toastService, 'show')
     const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFile')
@@ -154,13 +157,14 @@ describe('FileDropComponent', () => {
       files: [],
     }
     component.onDrop(dragEvent as DragEvent)
-    tick(3000)
+    await flushPromises()
+    advanceTimers(3000)
     expect(toastSpy).toHaveBeenCalled()
     expect(uploadSpy).toHaveBeenCalled()
-    discardPeriodicTasks()
-  }))
+  })
 
-  it('should show an error on traverseFileTree error', fakeAsync(() => {
+  it('should show an error on traverseFileTree error', async () => {
+    jest.useFakeTimers()
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     const toastSpy = jest.spyOn(toastService, 'showError')
     const traverseSpy = jest
@@ -190,28 +194,25 @@ describe('FileDropComponent', () => {
 
     component.onDrop(event)
 
-    tick() // flush microtasks (e.g., Promise.reject)
+    await flushPromises()
 
     expect(traverseSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith(
       $localize`Failed to read dropped items: Error traversing file tree`
     )
+  })
 
-    discardPeriodicTasks()
-  }))
-
-  it('should support drag drop, initiate upload without DataTransfer API support', fakeAsync(() => {
+  it('should support drag drop, initiate upload without DataTransfer API support', () => {
+    jest.useFakeTimers()
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     expect(component.fileIsOver()).toBeFalsy()
     const overEvent = new Event('dragover') as DragEvent
     ;(overEvent as any).dataTransfer = { types: ['Files'] }
     component.onDragOver(overEvent)
-    tick(1)
-    fixture.detectChanges()
+    advanceTimers(1)
     expect(component.fileIsOver()).toBeTruthy()
     component.onDragLeave(new Event('dragleave') as DragEvent)
-    tick(700)
-    fixture.detectChanges()
+    advanceTimers(700)
     // drop
     const toastSpy = jest.spyOn(toastService, 'show')
     const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFile')
@@ -225,11 +226,10 @@ describe('FileDropComponent', () => {
       files: [file],
     }
     component.onDrop(dragEvent as DragEvent)
-    tick(3000)
+    advanceTimers(3000)
     expect(toastSpy).toHaveBeenCalled()
     expect(uploadSpy).toHaveBeenCalled()
-    discardPeriodicTasks()
-  }))
+  })
 
   it('should resolve a single file when entry isFile', () => {
     const mockFile = new File(['data'], 'test.txt', { type: 'text/plain' })
@@ -295,7 +295,7 @@ describe('FileDropComponent', () => {
       })
   })
 
-  it('should ignore events if disabled', fakeAsync(() => {
+  it('should ignore events if disabled', () => {
     settingsService.globalDropzoneEnabled.set(false)
     expect(settingsService.globalDropzoneActive()).toBeFalsy()
     component.onDragOver(new Event('dragover') as DragEvent)
@@ -305,37 +305,37 @@ describe('FileDropComponent', () => {
     expect(settingsService.globalDropzoneActive()).toBeTruthy()
     component.onDrop(new Event('drop') as DragEvent)
     expect(settingsService.globalDropzoneActive()).toBeTruthy()
-  }))
+  })
 
-  it('should hide if app loses focus', fakeAsync(() => {
+  it('should hide if app loses focus', () => {
+    jest.useFakeTimers()
     const leaveSpy = jest.spyOn(component, 'onDragLeave')
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     settingsService.globalDropzoneEnabled.set(true)
     const overEvent = new Event('dragover') as DragEvent
     ;(overEvent as any).dataTransfer = { types: ['Files'] }
     component.onDragOver(overEvent)
-    tick(1)
+    advanceTimers(1)
     expect(component.hidden()).toBeFalsy()
     expect(component.fileIsOver()).toBeTruthy()
     jest.spyOn(document, 'hidden', 'get').mockReturnValue(true)
     component.onVisibilityChange()
     expect(leaveSpy).toHaveBeenCalled()
-    flush()
-  }))
+  })
 
-  it('should hide on window blur', fakeAsync(() => {
+  it('should hide on window blur', () => {
+    jest.useFakeTimers()
     const leaveSpy = jest.spyOn(component, 'onDragLeave')
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     settingsService.globalDropzoneEnabled.set(true)
     const overEvent = new Event('dragover') as DragEvent
     ;(overEvent as any).dataTransfer = { types: ['Files'] }
     component.onDragOver(overEvent)
-    tick(1)
+    advanceTimers(1)
     expect(component.hidden()).toBeFalsy()
     expect(component.fileIsOver()).toBeTruthy()
     jest.spyOn(document, 'hidden', 'get').mockReturnValue(true)
     component.onWindowBlur()
     expect(leaveSpy).toHaveBeenCalled()
-    flush()
-  }))
+  })
 })

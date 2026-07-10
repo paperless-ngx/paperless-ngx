@@ -4,12 +4,7 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
 import { Component } from '@angular/core'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
   FormControl,
   FormGroup,
@@ -145,12 +140,14 @@ describe('EditDialogComponent', () => {
     })
   })
 
-  it('should delay close enabled', fakeAsync(() => {
+  it('should delay close enabled', () => {
+    jest.useFakeTimers()
     expect(component.closeEnabled).toBeFalsy()
     component.ngOnInit()
-    tick(100)
+    jest.advanceTimersByTime(100)
     expect(component.closeEnabled).toBeTruthy()
-  }))
+    jest.useRealTimers()
+  })
 
   it('should set default owner when in create mode if unset', () => {
     component.dialogMode.set(EditDialogMode.CREATE)

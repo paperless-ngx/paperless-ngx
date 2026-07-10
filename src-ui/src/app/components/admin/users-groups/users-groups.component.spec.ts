@@ -1,12 +1,7 @@
 import { DatePipe } from '@angular/common'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
@@ -138,7 +133,8 @@ describe('UsersAndGroupsComponent', () => {
     expect(toastInfoSpy).toHaveBeenCalledWith('Deleted user "user1"')
   })
 
-  it('should logout current user if password changed, after delay', fakeAsync(() => {
+  it('should logout current user if password changed, after delay', () => {
+    jest.useFakeTimers()
     completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
@@ -151,11 +147,12 @@ describe('UsersAndGroupsComponent', () => {
     settingsService.currentUser.set(users[0]) // simulate logged in as same user
     editDialog.succeeded.emit(users[0])
     fixture.detectChanges()
-    tick(2600)
+    jest.advanceTimersByTime(2600)
     expect(navSpy).toHaveBeenCalledWith(
       `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
     )
-  }))
+    jest.useRealTimers()
+  })
 
   it('should support edit / create group, show error if needed', () => {
     completeSetup()

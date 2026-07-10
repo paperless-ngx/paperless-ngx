@@ -2,12 +2,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop'
 import { DatePipe } from '@angular/common'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
@@ -186,7 +181,8 @@ describe('SavedViewWidgetComponent', () => {
     fixture.detectChanges()
   })
 
-  it('should show a list of documents', fakeAsync(() => {
+  it('should show a list of documents', async () => {
+    jest.useFakeTimers()
     jest.spyOn(documentService, 'listFiltered').mockReturnValue(
       of({
         all: [2, 3],
@@ -195,7 +191,8 @@ describe('SavedViewWidgetComponent', () => {
       })
     )
     component.ngOnInit()
-    tick(500)
+    jest.advanceTimersByTime(500)
+    await fixture.whenStable()
     fixture.detectChanges()
     expect(fixture.debugElement.nativeElement.textContent).toContain('doc2')
     expect(fixture.debugElement.nativeElement.textContent).toContain('doc3')
@@ -206,7 +203,8 @@ describe('SavedViewWidgetComponent', () => {
     expect(
       fixture.debugElement.queryAll(By.css('td a.btn'))[1].attributes['href']
     ).toEqual(component.getDownloadUrl(documentResults[0]))
-  }))
+    jest.useRealTimers()
+  })
 
   it('should call api endpoint and load results', () => {
     const listAllSpy = jest.spyOn(documentService, 'listFiltered')

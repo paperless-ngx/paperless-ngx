@@ -4,12 +4,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -244,7 +239,8 @@ describe('AppFrameComponent', () => {
     expect(toastSpy).toHaveBeenCalled()
   })
 
-  it('should support toggling slim sidebar and saving', fakeAsync(() => {
+  it('should support toggling slim sidebar and saving', () => {
+    jest.useFakeTimers()
     const saveSettingSpy = jest.spyOn(settingsService, 'set')
     settingsService.set(SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED, [])
     expect(component.slimSidebarEnabled).toBeFalsy()
@@ -260,7 +256,7 @@ describe('AppFrameComponent', () => {
     ).toEqual(['attributes'])
     requests[0].flush({ success: true })
     expect(component.slimSidebarAnimating()).toBeTruthy()
-    tick(200)
+    jest.advanceTimersByTime(200)
     expect(component.slimSidebarAnimating()).toBeFalsy()
     expect(component.slimSidebarEnabled).toBeTruthy()
     expect(saveSettingSpy).toHaveBeenCalledWith(
@@ -271,7 +267,8 @@ describe('AppFrameComponent', () => {
       SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED,
       ['attributes']
     )
-  }))
+    jest.useRealTimers()
+  })
 
   it('should show error on toggle slim sidebar if store settings fails', () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {})

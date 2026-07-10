@@ -16,12 +16,7 @@ jest.mock('src/environments/environment', () => ({
 import { Clipboard } from '@angular/cdk/clipboard'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject, of, throwError } from 'rxjs'
@@ -126,16 +121,18 @@ describe('SystemStatusDialogComponent', () => {
     expect(closeSpy).toHaveBeenCalled()
   })
 
-  it('should copy the system status to clipboard', fakeAsync(() => {
+  it('should copy the system status to clipboard', () => {
+    jest.useFakeTimers()
     jest.spyOn(clipboard, 'copy')
     component.copy()
     expect(clipboard.copy).toHaveBeenCalledWith(
       JSON.stringify(component.status(), null, 4)
     )
     expect(component.copied()).toBeTruthy()
-    tick(3000)
+    jest.advanceTimersByTime(3000)
     expect(component.copied()).toBeFalsy()
-  }))
+    jest.useRealTimers()
+  })
 
   it('should calculate if date is stale', () => {
     const date = new Date()

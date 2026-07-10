@@ -109,6 +109,7 @@ describe('DocumentListViewService', () => {
     documentListViewService = TestBed.inject(DocumentListViewService)
     settingsService = TestBed.inject(SettingsService)
     router = TestBed.inject(Router)
+    jest.spyOn(router, 'navigate').mockResolvedValue(true)
   })
 
   afterEach(() => {

@@ -1,10 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { FileVersion } from 'src/app/data/share-link'
@@ -108,7 +103,8 @@ describe('ShareLinkBundleDialogComponent', () => {
     expect(component.documentPreview()[0].id).toBe(1)
   })
 
-  it('copies share link and resets state after timeout', fakeAsync(() => {
+  it('copies share link and resets state after timeout', () => {
+    jest.useFakeTimers()
     const copySpy = jest.spyOn(clipboard, 'copy').mockReturnValue(true)
     const bundle = {
       slug: 'bundle-slug',
@@ -121,9 +117,10 @@ describe('ShareLinkBundleDialogComponent', () => {
     expect(component.copied()).toBe(true)
     expect(toastService.showInfo).toHaveBeenCalled()
 
-    tick(3000)
+    jest.advanceTimersByTime(3000)
     expect(component.copied()).toBe(false)
-  }))
+    jest.useRealTimers()
+  })
 
   it('generates share URLs based on API base URL', () => {
     environment.apiBaseUrl = 'https://example.com/api/'

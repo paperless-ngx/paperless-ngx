@@ -1,6 +1,7 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { Title } from '@angular/platform-browser'
+import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { environment } from 'src/environments/environment'
 import { PageHeaderComponent } from './page-header.component'
 
@@ -13,7 +14,7 @@ describe('PageHeaderComponent', () => {
   beforeEach(async () => {
     TestBed.configureTestingModule({
       providers: [],
-      imports: [PageHeaderComponent],
+      imports: [NgxBootstrapIconsModule.pick(allIcons), PageHeaderComponent],
     }).compileComponents()
 
     titleService = TestBed.inject(Title)
@@ -21,6 +22,10 @@ describe('PageHeaderComponent', () => {
     fixture = TestBed.createComponent(PageHeaderComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
   })
 
   it('should display title + subtitle', () => {

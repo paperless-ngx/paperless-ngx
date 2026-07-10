@@ -1,9 +1,4 @@
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap'
@@ -22,8 +17,8 @@ describe('SaveViewConfigDialogComponent', () => {
   let fixture: ComponentFixture<SaveViewConfigDialogComponent>
   let modal: NgbActiveModal
 
-  beforeEach(fakeAsync(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       providers: [
         NgbActiveModal,
         {
@@ -56,8 +51,8 @@ describe('SaveViewConfigDialogComponent', () => {
     fixture = TestBed.createComponent(SaveViewConfigDialogComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
-    tick()
-  }))
+    await fixture.whenStable()
+  })
 
   it('should support default name', () => {
     const name = 'Tag: Inbox'

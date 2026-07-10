@@ -1,12 +1,7 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ElementRef } from '@angular/core'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
 import {
@@ -154,6 +149,7 @@ describe('GlobalSearchComponent', () => {
 
     searchService = TestBed.inject(SearchService)
     router = TestBed.inject(Router)
+    jest.spyOn(router, 'navigate').mockResolvedValue(true)
     modalService = TestBed.inject(NgbModal)
     documentService = TestBed.inject(DocumentService)
     documentListViewService = TestBed.inject(DocumentListViewService)
@@ -276,20 +272,22 @@ describe('GlobalSearchComponent', () => {
     expect(advancedSearchSpy).toHaveBeenCalled()
   })
 
-  it('should search on query debounce', fakeAsync(() => {
+  it('should search on query debounce', () => {
+    jest.useFakeTimers()
     const query = 'test'
     const searchSpy = jest.spyOn(searchService, 'globalSearch')
     searchSpy.mockReturnValue(of({} as any))
     const dropdownOpenSpy = jest.spyOn(component.resultsDropdown, 'open')
     component.queryDebounce.next(query)
-    tick(401)
+    jest.advanceTimersByTime(401)
     expect(searchSpy).toHaveBeenCalledWith(query)
     expect(dropdownOpenSpy).toHaveBeenCalled()
-  }))
+    jest.useRealTimers()
+  })
 
   it('should support primary action', () => {
     const object = { id: 1 }
-    const routerSpy = jest.spyOn(router, 'navigate')
+    const routerSpy = jest.mocked(router.navigate)
     const modalSpy = jest.spyOn(modalService, 'open')
 
     let modal: NgbModalRef

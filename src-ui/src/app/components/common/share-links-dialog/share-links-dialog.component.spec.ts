@@ -4,12 +4,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
@@ -103,7 +98,8 @@ describe('ShareLinksDialogComponent', () => {
     expect(toastSpy).toHaveBeenCalled()
   })
 
-  it('should support link creation then refresh & copy url', fakeAsync(() => {
+  it('should support link creation then refresh & copy url', () => {
+    jest.useFakeTimers()
     const createSpy = jest.spyOn(shareLinkService, 'createLinkForDocument')
     component.documentId.set(99)
     component.expirationDays = 7
@@ -126,13 +122,14 @@ describe('ShareLinksDialogComponent', () => {
       expiration: expiration.toISOString(),
     })
     fixture.detectChanges()
-    tick(3000)
+    jest.advanceTimersByTime(3000)
 
     expect(refreshSpy).toHaveBeenCalled()
     expect(copySpy).toHaveBeenCalled()
     expect(component.copied()).toEqual(1)
-    tick(100) // copy timeout
-  }))
+    jest.advanceTimersByTime(100) // copy timeout
+    jest.useRealTimers()
+  })
 
   it('should show error on link creation if needed', () => {
     component.documentId.set(99)

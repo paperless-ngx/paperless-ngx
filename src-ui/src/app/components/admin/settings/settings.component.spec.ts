@@ -209,7 +209,7 @@ describe('SettingsComponent', () => {
     fixture.detectChanges()
   }
 
-  it('should support tabbed settings & change URL, prevent navigation if dirty confirmation rejected', () => {
+  it('should support tabbed settings & change URL, prevent navigation if dirty confirmation rejected', async () => {
     completeSetup()
     const navigateSpy = jest.spyOn(router, 'navigate')
     const tabButtons = fixture.debugElement.queryAll(By.directive(NgbNavLink))
@@ -217,16 +217,19 @@ describe('SettingsComponent', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['settings', 'documents'])
     tabButtons[2].nativeElement.dispatchEvent(new MouseEvent('click'))
     expect(navigateSpy).toHaveBeenCalledWith(['settings', 'permissions'])
+    await fixture.whenStable()
 
     const initSpy = jest.spyOn(component, 'initialize')
     component.isDirty = true // mock dirty
     navigateSpy.mockResolvedValueOnce(false) // nav rejected cause dirty
     tabButtons[0].nativeElement.dispatchEvent(new MouseEvent('click'))
+    await fixture.whenStable()
     expect(navigateSpy).toHaveBeenCalledWith(['settings', 'general'])
     expect(initSpy).not.toHaveBeenCalled()
 
     navigateSpy.mockResolvedValueOnce(true) // nav accepted even though dirty
     tabButtons[2].nativeElement.dispatchEvent(new MouseEvent('click'))
+    await fixture.whenStable()
     expect(navigateSpy).toHaveBeenCalledWith(['settings', 'permissions'])
     expect(initSpy).toHaveBeenCalled()
   })

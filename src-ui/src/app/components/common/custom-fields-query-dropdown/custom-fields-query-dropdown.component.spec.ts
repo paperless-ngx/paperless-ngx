@@ -1,11 +1,6 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
@@ -210,13 +205,13 @@ describe('CustomFieldsQueryDropdownComponent', () => {
     expect(component.name).toBe('test_title')
   })
 
-  it('should add a default atom on open', fakeAsync(() => {
+  it('should add a default atom on open', async () => {
     expect(component.selectionModel.queries.length).toBe(0)
     component.onOpenChange(true)
     fixture.detectChanges()
-    tick()
+    await fixture.whenStable()
     expect(component.selectionModel.queries.length).toBe(1)
-  }))
+  })
 
   describe('CustomFieldQueriesModel', () => {
     let model: CustomFieldQueriesModel

@@ -1,9 +1,4 @@
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { Clipboard } from '@angular/cdk/clipboard'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
@@ -191,7 +186,8 @@ describe('ProfileEditDialogComponent', () => {
     expect(component.saveDisabled).toBeFalsy()
   })
 
-  it('should logout on save if password changed', fakeAsync(() => {
+  it('should logout on save if password changed', () => {
+    jest.useFakeTimers()
     const getSpy = jest.spyOn(profileService, 'get')
     getSpy.mockReturnValue(of(profile))
     const getProvidersSpy = jest.spyOn(
@@ -211,13 +207,15 @@ describe('ProfileEditDialogComponent', () => {
       .mockImplementation(() => {})
     component.save()
     expect(updateSpy).toHaveBeenCalled()
-    tick(2600)
+    jest.advanceTimersByTime(2600)
     expect(navSpy).toHaveBeenCalledWith(
       `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
     )
-  }))
+    jest.useRealTimers()
+  })
 
-  it('should support auth token copy', fakeAsync(() => {
+  it('should support auth token copy', () => {
+    jest.useFakeTimers()
     const getSpy = jest.spyOn(profileService, 'get')
     getSpy.mockReturnValue(of(profile))
     const getProvidersSpy = jest.spyOn(
@@ -230,9 +228,10 @@ describe('ProfileEditDialogComponent', () => {
     component.copyAuthToken()
     expect(copySpy).toHaveBeenCalledWith(profile.auth_token)
     expect(component.copied()).toBeTruthy()
-    tick(3000)
+    jest.advanceTimersByTime(3000)
     expect(component.copied()).toBeFalsy()
-  }))
+    jest.useRealTimers()
+  })
 
   it('should support generate token, display error if needed', () => {
     const getSpy = jest.spyOn(profileService, 'get')
@@ -366,11 +365,13 @@ describe('ProfileEditDialogComponent', () => {
     expect(component.isTotpEnabled).toBeFalsy()
   })
 
-  it('should copy recovery codes', fakeAsync(() => {
+  it('should copy recovery codes', () => {
+    jest.useFakeTimers()
     const copySpy = jest.spyOn(clipboard, 'copy')
     component.recoveryCodes = ['1', '2', '3']
     component.copyRecoveryCodes()
     expect(copySpy).toHaveBeenCalledWith('1\n2\n3')
-    tick(3000)
-  }))
+    jest.advanceTimersByTime(3000)
+    jest.useRealTimers()
+  })
 })

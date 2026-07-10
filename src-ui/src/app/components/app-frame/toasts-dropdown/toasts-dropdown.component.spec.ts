@@ -1,12 +1,6 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  discardPeriodicTasks,
-  fakeAsync,
-  flush,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject } from 'rxjs'
 import { Toast, ToastService } from 'src/app/services/toast.service'
@@ -69,7 +63,7 @@ describe('ToastsDropdownComponent', () => {
     fixture.detectChanges()
   })
 
-  it('should call getToasts and return toasts', fakeAsync(() => {
+  it('should call getToasts and return toasts', () => {
     toastsSubject.next(toasts)
     fixture.detectChanges()
 
@@ -79,29 +73,21 @@ describe('ToastsDropdownComponent', () => {
       content: 'foo bar',
       delay: 5000,
     })
-    flush()
-    discardPeriodicTasks()
-  }))
+  })
 
-  it('should show a toast', fakeAsync(() => {
+  it('should show a toast', () => {
     toastsSubject.next(toasts)
     fixture.detectChanges()
 
     expect(fixture.nativeElement.textContent).toContain('foo bar')
+  })
 
-    flush()
-    discardPeriodicTasks()
-  }))
-
-  it('should toggle suppressPopupToasts', fakeAsync((finish) => {
+  it('should toggle suppressPopupToasts', () => {
     fixture.detectChanges()
     toastsSubject.next(toasts)
 
     const spy = jest.spyOn(toastService, 'suppressPopupToasts', 'set')
     component.onOpenChange(true)
     expect(spy).toHaveBeenCalledWith(true)
-
-    flush()
-    discardPeriodicTasks()
-  }))
+  })
 })

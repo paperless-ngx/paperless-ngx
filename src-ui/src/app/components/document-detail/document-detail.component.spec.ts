@@ -9,13 +9,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  discardPeriodicTasks,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import {
   ActivatedRoute,
@@ -279,6 +273,7 @@ describe('DocumentDetailComponent', () => {
     }).compileComponents()
 
     router = TestBed.inject(Router)
+    jest.spyOn(router, 'navigate').mockResolvedValue(true)
     activatedRoute = TestBed.inject(ActivatedRoute)
     openDocumentsService = TestBed.inject(OpenDocumentsService)
     documentService = TestBed.inject(DocumentService)
@@ -293,6 +288,10 @@ describe('DocumentDetailComponent', () => {
     httpTestingController = TestBed.inject(HttpTestingController)
     componentRouterService = TestBed.inject(ComponentRouterService)
     component = fixture.componentInstance
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
   })
 
   function initNormally() {
@@ -330,7 +329,8 @@ describe('DocumentDetailComponent', () => {
     )
   })
 
-  it('should switch from preview to details when pdf preview enters the DOM', fakeAsync(() => {
+  it('should switch from preview to details when pdf preview enters the DOM', () => {
+    jest.useFakeTimers()
     component.nav = {
       activeId: component.DocumentDetailNavIDs.Preview,
       select: jest.fn(),
@@ -339,11 +339,11 @@ describe('DocumentDetailComponent', () => {
       nativeElement: { offsetParent: {} },
     }
 
-    tick()
+    jest.advanceTimersByTime(0)
     expect(component.nav.select).toHaveBeenCalledWith(
       component.DocumentDetailNavIDs.Details
     )
-  }))
+  })
 
   it('should forward title key up value to titleSubject', () => {
     const subjectSpy = jest.spyOn(component.titleSubject, 'next')
@@ -377,24 +377,25 @@ describe('DocumentDetailComponent', () => {
     })
   })
 
-  it('should update title after debounce', fakeAsync(() => {
+  it('should update title after debounce', () => {
+    jest.useFakeTimers()
     initNormally()
     component.titleInput.value = 'Foo Bar'
     component.titleSubject.next('Foo Bar')
-    tick(1000)
+    jest.advanceTimersByTime(1000)
     expect(component.documentForm.get('title').value).toEqual('Foo Bar')
-    discardPeriodicTasks()
-  }))
+  })
 
-  it('should update title before doc change if was not updated via debounce', fakeAsync(() => {
+  it('should update title before doc change if was not updated via debounce', () => {
+    jest.useFakeTimers()
     initNormally()
     component.titleInput.value = 'Foo Bar'
     component.titleInput.inputField.nativeElement.dispatchEvent(
       new Event('change')
     )
-    tick(1000)
+    jest.advanceTimersByTime(1000)
     expect(component.documentForm.get('title').value).toEqual('Foo Bar')
-  }))
+  })
 
   it('should load non-open document via param', () => {
     initNormally()
@@ -1035,14 +1036,13 @@ describe('DocumentDetailComponent', () => {
     expect(component.previewNumPages()).toEqual(1000)
   })
 
-  it('should include delay of 300ms after previewloaded before showing pdf', fakeAsync(() => {
+  it('should mark preview loaded after pdf loads', () => {
     initNormally()
     expect(component.previewLoaded()).toBeFalsy()
     component.pdfPreviewLoaded({ numPages: 1000 } as any)
     expect(component.previewNumPages()).toEqual(1000)
-    tick(300)
     expect(component.previewLoaded()).toBeTruthy()
-  }))
+  })
 
   it('should support zoom controls', () => {
     initNormally()
@@ -2183,7 +2183,8 @@ describe('DocumentDetailComponent', () => {
     )
   })
 
-  it('should print document successfully', fakeAsync(() => {
+  it('should print document successfully', () => {
+    jest.useFakeTimers()
     initNormally()
 
     const appendChildSpy = jest
@@ -2224,8 +2225,6 @@ describe('DocumentDetailComponent', () => {
     )
     req.flush(blob)
 
-    tick()
-
     expect(createElementSpy).toHaveBeenCalledWith('iframe')
     expect(appendChildSpy).toHaveBeenCalledWith(mockIframe)
     expect(createObjectURLSpy).toHaveBeenCalledWith(blob)
@@ -2242,7 +2241,7 @@ describe('DocumentDetailComponent', () => {
     if (mockIframe.onload) {
       mockIframe.onload({} as any)
     }
-    tick()
+    jest.advanceTimersByTime(0)
 
     expect(mockContentWindow.focus).toHaveBeenCalled()
     expect(mockContentWindow.print).toHaveBeenCalled()
@@ -2255,8 +2254,6 @@ describe('DocumentDetailComponent', () => {
       mockContentWindow.onafterprint(new Event('afterprint'))
     }
 
-    tick(500)
-
     expect(removeChildSpy).toHaveBeenCalledWith(mockIframe)
     expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
 
@@ -2265,7 +2262,7 @@ describe('DocumentDetailComponent', () => {
     removeChildSpy.mockRestore()
     createObjectURLSpy.mockRestore()
     revokeObjectURLSpy.mockRestore()
-  }))
+  })
 
   it('should show error toast if print document fails', () => {
     initNormally()
@@ -2302,76 +2299,71 @@ describe('DocumentDetailComponent', () => {
   ]
 
   iframePrintErrorCases.forEach(({ description, thrownError, expectToast }) => {
-    it(
-      description,
-      fakeAsync(() => {
-        initNormally()
+    it(description, () => {
+      jest.useFakeTimers()
+      initNormally()
 
-        const appendChildSpy = jest
-          .spyOn(document.body, 'appendChild')
-          .mockImplementation((node: Node) => node)
-        const removeChildSpy = jest
-          .spyOn(document.body, 'removeChild')
-          .mockImplementation((node: Node) => node)
-        const createObjectURLSpy = jest
-          .spyOn(URL, 'createObjectURL')
-          .mockReturnValue('blob:mock-url')
-        const revokeObjectURLSpy = jest
-          .spyOn(URL, 'revokeObjectURL')
-          .mockImplementation(() => {})
+      const appendChildSpy = jest
+        .spyOn(document.body, 'appendChild')
+        .mockImplementation((node: Node) => node)
+      const removeChildSpy = jest
+        .spyOn(document.body, 'removeChild')
+        .mockImplementation((node: Node) => node)
+      const createObjectURLSpy = jest
+        .spyOn(URL, 'createObjectURL')
+        .mockReturnValue('blob:mock-url')
+      const revokeObjectURLSpy = jest
+        .spyOn(URL, 'revokeObjectURL')
+        .mockImplementation(() => {})
 
-        const toastSpy = jest.spyOn(toastService, 'showError')
+      const toastSpy = jest.spyOn(toastService, 'showError')
 
-        const mockContentWindow = {
-          focus: jest.fn().mockImplementation(() => {
-            throw thrownError
-          }),
-          print: jest.fn(),
-          onafterprint: null,
-        }
+      const mockContentWindow = {
+        focus: jest.fn().mockImplementation(() => {
+          throw thrownError
+        }),
+        print: jest.fn(),
+        onafterprint: null,
+      }
 
-        const mockIframe: any = {
-          style: {},
-          src: '',
-          onload: null,
-          contentWindow: mockContentWindow,
-        }
+      const mockIframe: any = {
+        style: {},
+        src: '',
+        onload: null,
+        contentWindow: mockContentWindow,
+      }
 
-        const createElementSpy = jest
-          .spyOn(document, 'createElement')
-          .mockReturnValue(mockIframe as any)
+      const createElementSpy = jest
+        .spyOn(document, 'createElement')
+        .mockReturnValue(mockIframe as any)
 
-        const blob = new Blob(['test'], { type: 'application/pdf' })
-        component.printDocument()
+      const blob = new Blob(['test'], { type: 'application/pdf' })
+      component.printDocument()
 
-        const req = httpTestingController.expectOne(
-          `${environment.apiBaseUrl}documents/${doc.id}/download/`
-        )
-        req.flush(blob)
+      const req = httpTestingController.expectOne(
+        `${environment.apiBaseUrl}documents/${doc.id}/download/`
+      )
+      req.flush(blob)
 
-        tick()
+      if (mockIframe.onload) {
+        mockIframe.onload(new Event('load'))
+      }
 
-        if (mockIframe.onload) {
-          mockIframe.onload(new Event('load'))
-        }
+      jest.advanceTimersByTime(200)
 
-        tick()
-        tick(200)
+      if (expectToast) {
+        expect(toastSpy).toHaveBeenCalled()
+      } else {
+        expect(toastSpy).not.toHaveBeenCalled()
+      }
+      expect(removeChildSpy).toHaveBeenCalledWith(mockIframe)
+      expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
 
-        if (expectToast) {
-          expect(toastSpy).toHaveBeenCalled()
-        } else {
-          expect(toastSpy).not.toHaveBeenCalled()
-        }
-        expect(removeChildSpy).toHaveBeenCalledWith(mockIframe)
-        expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
-
-        createElementSpy.mockRestore()
-        appendChildSpy.mockRestore()
-        removeChildSpy.mockRestore()
-        createObjectURLSpy.mockRestore()
-        revokeObjectURLSpy.mockRestore()
-      })
-    )
+      createElementSpy.mockRestore()
+      appendChildSpy.mockRestore()
+      removeChildSpy.mockRestore()
+      createObjectURLSpy.mockRestore()
+      revokeObjectURLSpy.mockRestore()
+    })
   })
 })

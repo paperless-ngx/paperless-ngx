@@ -3,12 +3,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
@@ -76,7 +71,8 @@ describe('MailAccountEditDialogComponent', () => {
     expect(editTitleSpy).toHaveBeenCalled()
   })
 
-  it('should support test mail account and show appropriate expiring alert', fakeAsync(() => {
+  it('should support test mail account and show appropriate expiring alert', () => {
+    jest.useFakeTimers()
     component.object = {
       name: 'example',
       imap_server: 'imap.example.com',
@@ -97,7 +93,7 @@ describe('MailAccountEditDialogComponent', () => {
     expect(fixture.nativeElement.textContent).toContain(
       'Successfully connected'
     )
-    tick(6000)
+    jest.advanceTimersByTime(6000)
     fixture.detectChanges()
     expect(fixture.nativeElement.textContent).not.toContain(
       'Successfully connected'
@@ -118,6 +114,7 @@ describe('MailAccountEditDialogComponent', () => {
       .flush({}, { status: 500, statusText: 'error' })
     fixture.detectChanges()
     expect(fixture.nativeElement.textContent).toContain('Unable to connect')
-    tick(6000)
-  }))
+    jest.advanceTimersByTime(6000)
+    jest.useRealTimers()
+  })
 })

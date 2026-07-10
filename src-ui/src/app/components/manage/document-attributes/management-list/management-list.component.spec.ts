@@ -5,12 +5,7 @@ import {
   withInterceptorsFromDi,
 } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import { RouterLinkWithHref } from '@angular/router'
@@ -140,24 +135,26 @@ describe('ManagementListComponent', () => {
 
   // These tests are shared among all management list components
 
-  it('should support filtering, clear on Esc key', fakeAsync(() => {
+  it('should support filtering, clear on Esc key', () => {
+    jest.useFakeTimers()
     const nameFilterInput = fixture.debugElement.query(By.css('input'))
     nameFilterInput.nativeElement.value = 'foo'
     // nameFilterInput.nativeElement.dispatchEvent(new Event('input'))
     component.nameFilter = 'foo' // subject normally triggered by ngModel
-    tick(400) // debounce
+    jest.advanceTimersByTime(400) // debounce
     fixture.detectChanges()
     expect(component.data()).toEqual([tags[0]])
 
     nameFilterInput.nativeElement.dispatchEvent(
       new KeyboardEvent('keyup', { code: 'Escape' })
     )
-    tick(400) // debounce
+    jest.advanceTimersByTime(400) // debounce
     fixture.detectChanges()
     expect(component.nameFilter).toBeNull()
     expect(component.data()).toEqual(tags)
-    tick(100) // load
-  }))
+    jest.advanceTimersByTime(100) // load
+    jest.useRealTimers()
+  })
 
   it('should support create, show notification on error / success', () => {
     let modal: NgbModalRef
@@ -230,7 +227,8 @@ describe('ManagementListComponent', () => {
     expect(reloadSpy).toHaveBeenCalled()
   })
 
-  it('should use API count for pagination and nested ids for displayed total', fakeAsync(() => {
+  it('should use API count for pagination and nested ids for displayed total', () => {
+    jest.useFakeTimers()
     jest.spyOn(tagService, 'listFiltered').mockReturnValueOnce(
       of({
         count: 1,
@@ -240,11 +238,12 @@ describe('ManagementListComponent', () => {
     )
 
     component.reloadData()
-    tick(100)
+    jest.advanceTimersByTime(100)
 
     expect(component.collectionSize()).toBe(1)
     expect(component.displayCollectionSize()).toBe(3)
-  }))
+    jest.useRealTimers()
+  })
 
   it('should support quick filter for objects', () => {
     const expectedUrl = documentListViewService.getQuickFilterUrl([
@@ -525,7 +524,7 @@ describe('ManagementListComponent', () => {
     expect(component.pageSize).toBe(25)
   })
 
-  it('pageSize setter should update settings, reset page and reload data on success', fakeAsync(() => {
+  it('pageSize setter should update settings, reset page and reload data on success', () => {
     const reloadSpy = jest.spyOn(component, 'reloadData')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
 
@@ -539,8 +538,6 @@ describe('ManagementListComponent', () => {
     component.page.set(2)
     component.pageSize = 100
 
-    tick()
-
     expect(settingsService.set).toHaveBeenCalledWith(
       SETTINGS_KEYS.OBJECT_LIST_SIZES,
       { tags: 100 }
@@ -548,9 +545,9 @@ describe('ManagementListComponent', () => {
     expect(component.page()).toBe(1)
     expect(reloadSpy).toHaveBeenCalled()
     expect(toastErrorSpy).not.toHaveBeenCalled()
-  }))
+  })
 
-  it('pageSize setter should show error toast on settings store failure', fakeAsync(() => {
+  it('pageSize setter should show error toast on settings store failure', () => {
     const reloadSpy = jest.spyOn(component, 'reloadData')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
 
@@ -563,12 +560,10 @@ describe('ManagementListComponent', () => {
     component.typeNamePlural = 'tags'
     component.pageSize = 50
 
-    tick()
-
     expect(toastErrorSpy).toHaveBeenCalledWith(
       'Error saving settings',
       expect.any(Error)
     )
     expect(reloadSpy).not.toHaveBeenCalled()
-  }))
+  })
 })
