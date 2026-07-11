@@ -7817,8 +7817,8 @@
           <context context-type="linenumber">314</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="7985558498848210210" datatype="html">
-        <source>Original MD5 checksum</source>
+      <trans-unit id="2659735245739197634" datatype="html">
+        <source>Original SHA256 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">318</context>
@@ -7838,8 +7838,8 @@
           <context context-type="linenumber">326</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="342875990758166588" datatype="html">
-        <source>Archive MD5 checksum</source>
+      <trans-unit id="6714358112223607756" datatype="html">
+        <source>Archive SHA256 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">331</context>
