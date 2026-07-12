@@ -79,6 +79,16 @@
                 "glob": "{pdf.worker.min.mjs,pdf.min.mjs}",
                 "input": "node_modules/pdfjs-dist/legacy/build/",
                 "output": "/assets/js/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/pdfjs-dist/wasm/",
+                "output": "/assets/wasm/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/pdfjs-dist/iccs/",
+                "output": "/assets/iccs/"
               }
             ],
             "styles": [
