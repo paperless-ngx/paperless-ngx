@@ -174,6 +174,10 @@ export class PngxPdfViewerComponent
       'assets/js/pdf.worker.min.mjs',
       this.document.baseURI
     ).toString()
+    GlobalWorkerOptions.wasmUrl = new URL(
+      'assets/js/pdf.worker.min.wasm',
+      this.document.baseURI
+    ).toString()
     let initOptions = {
       url: this.src,
       password: this.password,
