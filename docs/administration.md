@@ -664,7 +664,7 @@ At this time, other metadata (such as correspondent or type) is not
 taken into account by the detection.
 
 ```
-document_fuzzy_match [--ratio] [--processes N] 
+document_fuzzy_match [--ratio] [--processes N]
 ```
 
 | Option      | Required | Default             | Description                                                                                                                    |
