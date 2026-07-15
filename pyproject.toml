@@ -101,11 +101,11 @@ dev = [
   { include-group = "testing" },
 ]
 docs = [
-  "zensical>=0.0.43",
+  "zensical>=0.0.47",
 ]
 lint = [
   "prek~=0.3.10",
-  "ruff~=0.15.15",
+  "ruff~=0.15.20",
 ]
 testing = [
   "daphne",
