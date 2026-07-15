@@ -258,7 +258,7 @@ while true; do
 	read -r -sp "Paperless password (again): " PASSWORD_REPEAT
 	echo ""
 
-	if [[ ! "$PASSWORD" == "$PASSWORD_REPEAT" ]] ; then
+	if [[ "$PASSWORD" != "$PASSWORD_REPEAT" ]] ; then
 		echo "Passwords did not match"
 	else
 		break
@@ -342,10 +342,10 @@ read -r -a install_langs_array <<< "${install_langs}"
 	if [[ -n $URL ]] ; then
 		echo "PAPERLESS_URL=$URL"
 	fi
-	if [[ ! $USERMAP_UID == "1000" ]] ; then
+	if [[ $USERMAP_UID != "1000" ]] ; then
 		echo "USERMAP_UID=$USERMAP_UID"
 	fi
-	if [[ ! $USERMAP_GID == "1000" ]] ; then
+	if [[ $USERMAP_GID != "1000" ]] ; then
 		echo "USERMAP_GID=$USERMAP_GID"
 	fi
 	echo "PAPERLESS_TIME_ZONE=$TIME_ZONE"
