@@ -292,6 +292,23 @@ Once setup, navigating to the email settings page in Paperless-ngx will allow yo
 You can also submit a document using the REST API, see [POSTing documents](api.md#file-uploads)
 for details.
 
+### Duplicate documents
+
+By default, Paperless-ngx **does not reject duplicates**. If you consume a file whose
+contents exactly match an existing document (same checksum), the new copy is still
+consumed and a warning is logged. The task entry for the upload also flags that a
+duplicate was detected and links to the existing document(s).
+
+To review duplicates, open a document and switch to the **Duplicates** tab on the
+document detail page. It lists other documents that share the same content, including any
+that are in the trash (shown with a badge), and links to each so you can decide which to
+keep.
+
+If you would rather reject duplicates at consumption time (the pre-v3 behavior), set
+[`PAPERLESS_CONSUMER_DELETE_DUPLICATES`](configuration.md#PAPERLESS_CONSUMER_DELETE_DUPLICATES)
+to `true`. The duplicate file is then deleted instead of consumed, and the task fails with
+a "document already exists" message.
+
 ## Document Suggestions
 
 Paperless-ngx can suggest tags, correspondents, document types and storage paths for documents based on the content of the document. This is done using a (non-LLM) machine learning model that is trained on the documents in your database. The suggestions are shown in the document detail page and can be accepted or rejected by the user.
@@ -306,7 +323,9 @@ Paperless-ngx includes several features that use AI to enhance the document mana
     so consider the privacy implications of using these features, especially if using a remote
     model or API provider instead of the default local model.
 
-The AI features work by creating an embedding of the text content and metadata of documents, which is then used for various tasks such as similarity search and question answering. This uses the FAISS vector store.
+The AI features work by creating an embedding of the text content and metadata of documents, which is then used for various tasks such as similarity search and question answering.
+
+See [AI features](advanced_usage.md#ai-features) for how to enable and configure these features, including choosing an LLM backend and setting up the LLM index for RAG.
 
 ### AI-Enhanced Suggestions
 
@@ -1097,7 +1116,7 @@ Paperless-ngx consists of the following components:
   errors (i.e., wrong email credentials, errors during consuming a
   specific file, etc).
 
-- A [redis](https://redis.io/) message broker: This is a really
+- A message broker (such as Valkey or Redis): This is a really
   lightweight service that is responsible for getting the tasks from
   the webserver and the consumer to the task scheduler. These run in a
   different process (maybe even on different machines!), and

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import hashlib
 import logging
 import shutil
 import traceback as _tb
@@ -16,6 +15,7 @@ from celery.signals import task_postrun
 from celery.signals import task_prerun
 from celery.signals import task_revoked
 from celery.signals import worker_process_init
+from celery.signals import worker_process_shutdown
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -54,6 +54,7 @@ from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.plugins.helpers import DocumentsStatusManager
 from documents.templating.utils import convert_format_str_to_template_format
+from documents.utils import compute_checksum
 from documents.workflows.actions import build_workflow_action_context
 from documents.workflows.actions import execute_email_action
 from documents.workflows.actions import execute_move_to_trash_action
@@ -410,8 +411,7 @@ def _path_matches_checksum(path: Path, checksum: str | None) -> bool:
     if checksum is None or not path.is_file():
         return False
 
-    with path.open("rb") as f:
-        return hashlib.md5(f.read()).hexdigest() == checksum
+    return compute_checksum(path) == checksum
 
 
 def _filename_template_uses_custom_fields(doc: Document) -> bool:
@@ -879,6 +879,11 @@ def run_workflows(
         )
         return None
 
+    # Track whether the caller supplied original_file. When set explicitly (e.g. by
+    # run_workflows_added during consumption), it points at the staged file that has
+    # not yet been moved into its final storage location. This matters for password
+    # removal, which must read from the staged path rather than document.source_path.
+    caller_supplied_original_file = original_file is not None
     if original_file is None:
         original_file = (
             document.source_path if not use_overrides else document.original_file
@@ -956,7 +961,14 @@ def run_workflows(
                         original_file,
                     )
                 elif action.type == WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL:
-                    execute_password_removal_action(action, document, logging_group)
+                    execute_password_removal_action(
+                        action,
+                        document,
+                        logging_group,
+                        source_file=(
+                            original_file if caller_supplied_original_file else None
+                        ),
+                    )
                 elif action.type == WorkflowAction.WorkflowActionType.MOVE_TO_TRASH:
                     has_move_to_trash_action = True
 
@@ -1328,10 +1340,26 @@ def close_connection_pool_on_worker_init(**kwargs) -> None:
             conn.close_pool()
 
 
+@worker_process_shutdown.connect
+def close_connection_pool_on_worker_shutdown(**kwargs) -> None:  # pragma: no cover
+    """
+    Close the DB connection pool when a Celery child process exits.
+
+    With CELERY_WORKER_MAX_TASKS_PER_CHILD=1 each child is replaced after a
+    single task. Without closing the pool on shutdown, its connections linger
+    on the server until TCP keepalive reaps them, accumulating over time.
+    """
+    for conn in connections.all(initialized_only=True):
+        if conn.alias == "default" and hasattr(conn, "pool") and conn.pool:
+            conn.close_pool()
+
+
 def add_or_update_document_in_llm_index(sender, document, **kwargs):
     """
     Add or update a document in the LLM index when it is created or updated.
     """
+    if kwargs.get("skip_ai_index"):
+        return
     ai_config = AIConfig()
     if ai_config.llm_index_enabled:
         from documents.tasks import update_document_in_llm_index

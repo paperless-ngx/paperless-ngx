@@ -485,6 +485,42 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_document_actions_trashed_document(self) -> None:
+        """
+        GIVEN:
+            - Document with files exists
+        WHEN:
+            - Document is soft-deleted (moved to trash)
+            - Preview and thumb endpoints are requested
+        THEN:
+            - HTTP 200 OK for both (trashed documents remain previewable)
+        """
+        _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
+        content = b"This is a test"
+        content_thumbnail = b"thumbnail content"
+
+        with Path(filename).open("wb") as f:
+            f.write(content)
+
+        doc = Document.objects.create(
+            title="none",
+            filename=Path(filename).name,
+            mime_type="application/pdf",
+        )
+
+        with (self.dirs.thumbnail_dir / f"{doc.pk:07d}.webp").open("wb") as f:
+            f.write(content_thumbnail)
+
+        doc.delete()
+
+        response = self.client.get(f"/api/documents/{doc.pk}/preview/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(read_streaming_response(response), content)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(read_streaming_response(response), content_thumbnail)
+
     def test_document_history_action(self) -> None:
         """
         GIVEN:
@@ -1304,6 +1340,35 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(response.data["correspondent_count"], 2)
         self.assertEqual(response.data["document_type_count"], 1)
         self.assertEqual(response.data["storage_path_count"], 2)
+
+    def test_statistics_excludes_document_versions(self) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="A",
+            mime_type="application/pdf",
+            content="root",
+        )
+        version = Document.objects.create(
+            title="version",
+            checksum="B",
+            mime_type="application/pdf",
+            content="version",
+            root_document=root,
+            version_index=1,
+        )
+        tag_inbox = Tag.objects.create(name="t1", is_inbox_tag=True)
+        version.tags.add(tag_inbox)
+
+        response = self.client.get("/api/statistics/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["documents_total"], 1)
+        self.assertEqual(response.data["documents_inbox"], 0)
+        self.assertEqual(response.data["character_count"], 4)
+        self.assertEqual(
+            response.data["document_file_type_counts"][0]["mime_type_count"],
+            1,
+        )
 
     def test_statistics_no_inbox_tag(self) -> None:
         Document.objects.create(title="none1", checksum="A")
@@ -3046,6 +3111,46 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         doc = Document.objects.get(pk=doc.pk)
         # modified was updated to today
         self.assertEqual(doc.modified.day, timezone.now().day)
+
+    def test_create_note_only_saves_document_modified_field(self) -> None:
+        """
+        GIVEN:
+            - Existing document with a created date
+        WHEN:
+            - API request is made to add a note
+        THEN:
+            - Only the document modified field is persisted by the note endpoint
+            - Other document fields are not rewritten by the note endpoint
+        """
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have notes added",
+            created=datetime.date(2026, 3, 31),
+        )
+        original_save = Document.save
+
+        with mock.patch.object(
+            Document,
+            "save",
+            autospec=True,
+            side_effect=original_save,
+        ) as save_mock:
+            resp = self.client.post(
+                f"/api/documents/{doc.pk}/notes/",
+                data={"note": "this is a posted note"},
+            )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        doc.refresh_from_db()
+        self.assertEqual(doc.created, datetime.date(2026, 3, 31))
+        self.assertTrue(
+            any(
+                call.kwargs.get("update_fields") == ["modified"]
+                for call in save_mock.call_args_list
+                if call.args and call.args[0].pk == doc.pk
+            ),
+        )
 
     def test_notes_permissions_aware(self) -> None:
         """

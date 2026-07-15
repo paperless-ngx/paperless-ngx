@@ -6,10 +6,13 @@ import pytest
 from django.test import override_settings
 
 from documents.models import Document
+from paperless.config import AIConfig
+from paperless_ai.ai_classifier import build_localization_prompt
 from paperless_ai.ai_classifier import build_prompt_with_rag
 from paperless_ai.ai_classifier import build_prompt_without_rag
 from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.ai_classifier import get_context_for_document
+from paperless_ai.ai_classifier import get_language_name
 
 
 @pytest.fixture
@@ -74,16 +77,70 @@ def mock_similar_documents():
     LLM_MODEL="some_model",
 )
 def test_get_ai_document_classification_success(mock_run_llm_query, mock_document):
-    mock_run_llm_query.return_value = {
-        "title": "Test Title",
-        "tags": ["test", "document"],
-        "correspondents": ["John Doe"],
-        "document_types": ["report"],
-        "storage_paths": ["Reports"],
-        "dates": ["2023-01-01"],
-    }
+    mock_run_llm_query.side_effect = [
+        {
+            "title": "Test Title",
+            "tags": ["test", "document"],
+            "correspondents": ["John Doe"],
+            "document_types": ["report"],
+            "storage_paths": ["Reports"],
+            "dates": ["2023-01-01"],
+        },
+        {
+            "title": "Testtitel",
+            "tags": ["Test", "Document"],
+            "correspondents": ["Jane Doe"],
+            "document_types": ["Bericht"],
+            "storage_paths": ["Berichte"],
+            "dates": ["2024-01-01"],
+        },
+    ]
 
-    result = get_ai_document_classification(mock_document)
+    result = get_ai_document_classification(mock_document, output_language="de-de")
+
+    assert result["title"] == "Testtitel"
+    assert result["tags"] == ["Test", "Document"]
+    assert result["correspondents"] == ["John Doe"]
+    assert result["document_types"] == ["Bericht"]
+    assert result["storage_paths"] == ["Berichte"]
+    assert result["dates"] == ["2023-01-01"]
+    classification_prompt = mock_run_llm_query.call_args_list[0].args[0]
+    localization_prompt = mock_run_llm_query.call_args_list[1].args[0]
+    assert "Write suggested titles" not in classification_prompt
+    assert "Rewrite only these generated fields in German" in localization_prompt
+    assert "Do not translate correspondents or dates" in localization_prompt
+
+
+@pytest.mark.django_db
+@patch("paperless_ai.client.AIClient.run_llm_query")
+@override_settings(
+    LLM_BACKEND="ollama",
+    LLM_MODEL="some_model",
+)
+def test_get_ai_document_classification_keeps_originals_when_localization_empty(
+    mock_run_llm_query,
+    mock_document,
+):
+    mock_run_llm_query.side_effect = [
+        {
+            "title": "Test Title",
+            "tags": ["test", "document"],
+            "correspondents": ["John Doe"],
+            "document_types": ["report"],
+            "storage_paths": ["Reports"],
+            "dates": ["2023-01-01"],
+        },
+        {
+            "title": "",
+            "tags": [],
+            "correspondents": [],
+            "document_types": [],
+            "storage_paths": [],
+            "dates": [],
+        },
+    ]
+
+    result = get_ai_document_classification(mock_document, output_language="de-de")
 
     assert result["title"] == "Test Title"
     assert result["tags"] == ["test", "document"]
@@ -155,11 +212,48 @@ def test_prompt_with_without_rag(mock_document):
         "paperless_ai.ai_classifier.get_context_for_document",
         return_value="Context from similar documents",
     ):
-        prompt = build_prompt_without_rag(mock_document)
-        assert "Additional context from similar documents:" not in prompt
+        config = AIConfig()
+        prompt = build_prompt_without_rag(mock_document, config)
+        assert "Additional context from similar documents" not in prompt
+        assert "for generated" not in prompt
 
-        prompt = build_prompt_with_rag(mock_document)
-        assert "Additional context from similar documents:" in prompt
+        prompt = build_prompt_with_rag(mock_document, config)
+        assert "Additional context from similar documents" in prompt
+
+        prompt = build_localization_prompt(
+            {
+                "title": "Test Title",
+                "tags": ["test", "document"],
+                "correspondents": ["John Doe"],
+                "document_types": ["report"],
+                "storage_paths": ["Reports"],
+                "dates": ["2023-01-01"],
+            },
+            output_language="de-de",
+        )
+        assert "Rewrite only these generated fields in German" in prompt
+        assert "Do not translate correspondents or dates" in prompt
+
+
+def test_get_language_name_falls_back_to_language_code():
+    assert get_language_name("zz-zz") == "zz-zz"
+
+
+def test_build_localization_prompt_preserves_unicode_characters():
+    prompt = build_localization_prompt(
+        {
+            "title": "Gebührenbescheid",
+            "tags": [],
+            "correspondents": [],
+            "document_types": [],
+            "storage_paths": [],
+            "dates": [],
+        },
+        output_language="de-de",
+    )
+
+    assert "Gebührenbescheid" in prompt
+    assert "\\u00fc" not in prompt
 
 
 @patch("paperless_ai.ai_classifier.query_similar_documents")

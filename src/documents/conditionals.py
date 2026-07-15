@@ -70,13 +70,13 @@ def suggestions_last_modified(request, pk: int) -> datetime | None:
 
 def metadata_etag(request, pk: int) -> str | None:
     """
-    Metadata is extracted from the original file, so use its checksum as the
-    ETag
+    Metadata responses include metadata as well as document fields, so include
+    the modification time with the checksum so metadata-only changes invalidate cache.
     """
     doc = resolve_effective_document_by_pk(pk, request).document
     if doc is None:
         return None
-    return doc.checksum
+    return f"{doc.checksum}:{doc.modified.isoformat()}"
 
 
 def metadata_last_modified(request, pk: int) -> datetime | None:
@@ -115,6 +115,17 @@ def preview_last_modified(request, pk: int) -> datetime | None:
     if doc is None:
         return None
     return doc.modified
+
+
+def thumbnail_etag(request: Any, pk: int) -> str | None:
+    """
+    Thumbnails are version-dependent, so use the effective document checksum as
+    the ETag to invalidate cache when the latest version changes.
+    """
+    doc = resolve_effective_document_by_pk(pk, request).document
+    if doc is None:
+        return None
+    return doc.checksum
 
 
 def thumbnail_last_modified(request: Any, pk: int) -> datetime | None:

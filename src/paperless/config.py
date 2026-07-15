@@ -194,10 +194,15 @@ class AIConfig(BaseConfig):
     ai_enabled: bool = dataclasses.field(init=False)
     llm_embedding_backend: str = dataclasses.field(init=False)
     llm_embedding_model: str = dataclasses.field(init=False)
+    llm_embedding_endpoint: str = dataclasses.field(init=False)
+    llm_embedding_chunk_size: int = dataclasses.field(init=False)
+    llm_context_size: int = dataclasses.field(init=False)
+    llm_request_timeout: int = dataclasses.field(init=False)
     llm_backend: str = dataclasses.field(init=False)
     llm_model: str = dataclasses.field(init=False)
     llm_api_key: str = dataclasses.field(init=False)
     llm_endpoint: str = dataclasses.field(init=False)
+    llm_output_language: str = dataclasses.field(init=False)
     llm_allow_internal_endpoints: bool = dataclasses.field(init=False)
 
     def __post_init__(self) -> None:
@@ -210,10 +215,23 @@ class AIConfig(BaseConfig):
         self.llm_embedding_model = (
             app_config.llm_embedding_model or settings.LLM_EMBEDDING_MODEL
         )
+        self.llm_embedding_endpoint = (
+            app_config.llm_embedding_endpoint or settings.LLM_EMBEDDING_ENDPOINT
+        )
+        self.llm_embedding_chunk_size = (
+            app_config.llm_embedding_chunk_size or settings.LLM_EMBEDDING_CHUNK_SIZE
+        )
+        self.llm_context_size = app_config.llm_context_size or settings.LLM_CONTEXT_SIZE
+        self.llm_request_timeout = (
+            app_config.llm_request_timeout or settings.LLM_REQUEST_TIMEOUT
+        )
         self.llm_backend = app_config.llm_backend or settings.LLM_BACKEND
         self.llm_model = app_config.llm_model or settings.LLM_MODEL
         self.llm_api_key = app_config.llm_api_key or settings.LLM_API_KEY
         self.llm_endpoint = app_config.llm_endpoint or settings.LLM_ENDPOINT
+        self.llm_output_language = (
+            app_config.llm_output_language or settings.LLM_OUTPUT_LANGUAGE
+        )
         self.llm_allow_internal_endpoints = settings.LLM_ALLOW_INTERNAL_ENDPOINTS
 
     @property

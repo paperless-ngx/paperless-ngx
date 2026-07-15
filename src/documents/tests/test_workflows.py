@@ -1847,6 +1847,45 @@ class TestWorkflows(
 
         self.assertEqual(doc.title, "Doc {created_year]")
 
+    def test_document_added_malformed_title_template_falls_back(self) -> None:
+        """
+        GIVEN:
+            - Existing workflow with added trigger type
+            - Assign title field is malformed Jinja2 syntax
+        WHEN:
+            - File that matches is added
+        THEN:
+            - Title assignment is skipped and the original title is kept
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_filename="*sample*",
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Doc {{ unclosed",
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            original_filename="sample.pdf",
+            title="sample test",
+            content="Hello world bar",
+        )
+
+        document_consumption_finished.send(
+            sender=self.__class__,
+            document=doc,
+        )
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.title, "sample test")
+
     def test_document_updated_workflow_ignores_version_documents(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
@@ -4164,7 +4203,7 @@ class TestWorkflows(
         )
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
-            passwords="wrong, right\n extra ",
+            passwords=["wrong", "right", "extra"],
         )
         workflow = Workflow.objects.create(name="Password workflow")
         workflow.triggers.add(trigger)
@@ -4185,12 +4224,14 @@ class TestWorkflows(
                     password="wrong",
                     update_document=True,
                     user=doc.owner,
+                    source_paths_by_id=None,
                 ),
                 mock.call(
                     [doc.id],
                     password="right",
                     update_document=True,
                     user=doc.owner,
+                    source_paths_by_id=None,
                 ),
             ],
         )
@@ -4218,7 +4259,7 @@ class TestWorkflows(
         )
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
-            passwords=" \n , ",
+            passwords=[" ", "  "],
         )
         workflow = Workflow.objects.create(name="Password workflow missing passwords")
         workflow.triggers.add(trigger)
@@ -4276,7 +4317,7 @@ class TestWorkflows(
         """
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
-            passwords="first, second",
+            passwords=["first", "second"],
         )
 
         temp_dir = Path(tempfile.mkdtemp())
@@ -4304,6 +4345,7 @@ class TestWorkflows(
         document_consumption_finished.send(
             sender=self.__class__,
             document=doc,
+            original_file=original_file,
         )
 
         assert mock_remove_password.call_count == 2
@@ -4314,12 +4356,14 @@ class TestWorkflows(
                     password="first",
                     update_document=True,
                     user=doc.owner,
+                    source_paths_by_id={doc.id: original_file},
                 ),
                 mock.call(
                     [doc.id],
                     password="second",
                     update_document=True,
                     user=doc.owner,
+                    source_paths_by_id={doc.id: original_file},
                 ),
             ],
         )
@@ -4330,6 +4374,53 @@ class TestWorkflows(
             document=doc,
         )
         assert mock_remove_password.call_count == 2
+
+    @mock.patch("documents.bulk_edit.remove_password")
+    def test_password_removal_document_added_uses_original_file(
+        self,
+        mock_remove_password,
+    ) -> None:
+        """
+        GIVEN:
+            - Workflow password removal action on a DOCUMENT_ADDED trigger
+            - run_workflows called with an explicit original_file (staged file
+              from the consumer, before the source path is populated)
+        WHEN:
+            - The workflow runs
+        THEN:
+            - remove_password is called with source_paths_by_id pointing at the
+              staged file rather than the not-yet-existing source_path
+        """
+        doc = Document.objects.create(
+            title="Protected",
+            checksum="pw-checksum-added",
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+            passwords=["secret"],
+        )
+        workflow = Workflow.objects.create(name="Password workflow added")
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        mock_remove_password.return_value = "OK"
+
+        temp_dir = Path(tempfile.mkdtemp())
+        original_file = temp_dir / "staged.pdf"
+        original_file.write_bytes(b"pdf content")
+
+        run_workflows(trigger.type, doc, original_file=original_file)
+
+        mock_remove_password.assert_called_once_with(
+            [doc.id],
+            password="secret",
+            update_document=True,
+            user=doc.owner,
+            source_paths_by_id={doc.id: original_file},
+        )
 
     def test_workflow_trash_action_soft_delete(self) -> None:
         """

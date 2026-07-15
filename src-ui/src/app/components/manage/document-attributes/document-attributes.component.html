@@ -59,7 +59,7 @@
   }
 </pngx-page-header>
 
-<ul ngbNav #nav="ngbNav" (navChange)="onNavChange($event)" [(activeId)]="activeNavID" class="nav-underline">
+<ul ngbNav #nav="ngbNav" (navChange)="onNavChange($event)" [activeId]="activeNavID()" (activeIdChange)="activeNavID.set($event)" class="nav-underline">
   @for (section of visibleSections; track section.id) {
     <li [ngbNavItem]="section.id">
       <a ngbNavLink >

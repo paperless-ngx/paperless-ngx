@@ -377,3 +377,30 @@ class TestAIIndex(DirectoriesMixin, TestCase):
         ) as llm_index_remove_document:
             tasks.remove_document_from_llm_index(doc)
             llm_index_remove_document.assert_called_once_with(doc)
+
+    @override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="huggingface")
+    def test_bulk_update_does_not_enqueue_per_doc_llm_tasks(self) -> None:
+        """bulk_update_documents must not enqueue a per-document LLM task for each document.
+
+        The bulk path calls update_llm_index once at the end; per-doc tasks would
+        be redundant work amplification.
+        """
+        docs = [
+            Document.objects.create(
+                title=f"doc{i}",
+                content="content",
+                checksum=f"checksum{i}",
+            )
+            for i in range(3)
+        ]
+        with (
+            mock.patch(
+                "documents.tasks.update_document_in_llm_index",
+            ) as update_document_in_llm_index,
+            mock.patch(
+                "documents.tasks.update_llm_index",
+            ) as update_llm_index,
+        ):
+            tasks.bulk_update_documents([doc.pk for doc in docs])
+            self.assertEqual(update_document_in_llm_index.apply_async.call_count, 0)
+            update_llm_index.assert_called_once()

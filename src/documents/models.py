@@ -1019,7 +1019,17 @@ class ShareLinkBundle(models.Model):
     def absolute_file_path(self) -> Path | None:
         if not self.file_path:
             return None
-        return (settings.SHARE_LINK_BUNDLE_DIR / Path(self.file_path)).resolve()
+        relative_path = Path(self.file_path)
+        if relative_path.is_absolute():
+            return None
+
+        bundle_dir = settings.SHARE_LINK_BUNDLE_DIR.resolve()
+        absolute_path = (bundle_dir / relative_path).resolve()
+        try:
+            absolute_path.relative_to(bundle_dir)
+        except ValueError:
+            return None
+        return absolute_path
 
     def remove_file(self) -> None:
         if self.absolute_file_path is not None and self.absolute_file_path.exists():
@@ -1415,7 +1425,7 @@ class WorkflowTrigger(models.Model):
         help_text=_("JSON-encoded custom field query expression."),
     )
 
-    schedule_offset_days = models.SmallIntegerField(
+    schedule_offset_days = models.IntegerField(
         _("schedule offset days"),
         default=0,
         help_text=_(
@@ -1431,7 +1441,7 @@ class WorkflowTrigger(models.Model):
         ),
     )
 
-    schedule_recurring_interval_days = models.PositiveSmallIntegerField(
+    schedule_recurring_interval_days = models.PositiveIntegerField(
         _("schedule recurring delay in days"),
         default=1,
         validators=[MinValueValidator(1)],
@@ -1586,7 +1596,7 @@ class WorkflowAction(models.Model):
         default=WorkflowActionType.ASSIGNMENT,
     )
 
-    order = models.PositiveSmallIntegerField(_("order"), default=0)
+    order = models.PositiveIntegerField(_("order"), default=0)
 
     assign_title = models.TextField(
         _("assign title"),
@@ -1828,7 +1838,7 @@ class WorkflowAction(models.Model):
 class Workflow(models.Model):
     name = models.CharField(_("name"), max_length=256, unique=True)
 
-    order = models.SmallIntegerField(_("order"), default=0)
+    order = models.IntegerField(_("order"), default=0)
 
     triggers = models.ManyToManyField(
         WorkflowTrigger,

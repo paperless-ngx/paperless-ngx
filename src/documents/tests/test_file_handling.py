@@ -24,6 +24,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
+from documents.serialisers import DocumentSerializer
 from documents.tasks import empty_trash
 from documents.tests.factories import DocumentFactory
 from documents.tests.utils import DirectoriesMixin
@@ -221,8 +222,8 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         doc = Document.objects.create(
             title="document",
             mime_type="application/pdf",
-            checksum=hashlib.md5(original_bytes).hexdigest(),
-            archive_checksum=hashlib.md5(archive_bytes).hexdigest(),
+            checksum=hashlib.sha256(original_bytes).hexdigest(),
+            archive_checksum=hashlib.sha256(archive_bytes).hexdigest(),
             filename="old/document.pdf",
             archive_filename="old/document.pdf",
             storage_path=old_storage_path,
@@ -250,6 +251,46 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(doc.archive_path)
         self.assertIsNotFile(settings.ORIGINALS_DIR / "old" / "document.pdf")
         self.assertIsNotFile(settings.ARCHIVE_DIR / "old" / "document.pdf")
+
+    @override_settings(FILENAME_FORMAT="{title}")
+    def test_serializer_stale_update_does_not_clobber_filename(self) -> None:
+        old_path = settings.ORIGINALS_DIR / "original.pdf"
+        old_path.touch()
+        doc = Document.objects.create(
+            title="original",
+            mime_type="application/pdf",
+            checksum=hashlib.sha256(b"").hexdigest(),
+            filename="original.pdf",
+        )
+
+        first_instance = Document.objects.get(pk=doc.pk)
+        stale_instance = Document.objects.get(pk=doc.pk)
+
+        serializer = DocumentSerializer(
+            first_instance,
+            data={"title": "first"},
+            partial=True,
+        )
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        serializer.save()
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.filename, "first.pdf")
+        self.assertIsFile(settings.ORIGINALS_DIR / "first.pdf")
+
+        serializer = DocumentSerializer(
+            stale_instance,
+            data={"title": "second"},
+            partial=True,
+        )
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        serializer.save()
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.filename, "second.pdf")
+        self.assertIsFile(settings.ORIGINALS_DIR / "second.pdf")
+        self.assertIsNotFile(settings.ORIGINALS_DIR / "first.pdf")
+        self.assertIsNotFile(old_path)
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_document_delete(self) -> None:

@@ -13,13 +13,14 @@ import time_machine
 
 from documents.search._query import _date_only_range
 from documents.search._query import _datetime_range
-from documents.search._query import _rewrite_compact_date
 from documents.search._query import build_permission_filter
 from documents.search._query import normalize_query
+from documents.search._query import parse_simple_text_highlight_query
 from documents.search._query import parse_user_query
 from documents.search._query import rewrite_natural_date_keywords
 from documents.search._schema import build_schema
 from documents.search._tokenizer import register_tokenizers
+from documents.search._translate import InvalidDateQuery
 
 if TYPE_CHECKING:
     from django.contrib.auth.base_user import AbstractBaseUser
@@ -404,12 +405,14 @@ class TestWhooshQueryRewriting:
         assert lo == "2023-12-01T05:00:00Z"
         assert hi == "2023-12-02T05:00:00Z"
 
-    def test_8digit_invalid_date_passes_through_unchanged(self) -> None:
-        assert rewrite_natural_date_keywords("added:20231340", UTC) == "added:20231340"
-
-    def test_compact_14digit_invalid_date_passes_through_unchanged(self) -> None:
-        # Month=13 makes datetime() raise ValueError; the token must be left as-is
-        assert _rewrite_compact_date("20231300120000") == "20231300120000"
+    def test_8digit_invalid_date_raises(self) -> None:
+        # The translation pipeline raises InvalidDateQuery for unparsable dates
+        # (e.g. month=13) so the API can surface a 400 telling the user the date
+        # is malformed instead of silently returning zero results.
+        with pytest.raises(InvalidDateQuery) as exc_info:
+            rewrite_natural_date_keywords("added:20231340", UTC)
+        assert exc_info.value.field == "added"
+        assert exc_info.value.value == "20231340"
 
 
 class TestParseUserQuery:
@@ -443,6 +446,215 @@ class TestParseUserQuery:
             q = parse_user_query(query_index, "created:today", UTC)
         assert isinstance(q, tantivy.Query)
 
+    @pytest.mark.parametrize(
+        "raw_query",
+        [
+            pytest.param("h52.1 - kurzsichtigkeit", id="icd_code_dash_description"),
+            pytest.param("H52.1 - asd", id="icd_code_uppercase"),
+            pytest.param("h52.1 -", id="trailing_minus"),
+            pytest.param(". -", id="dot_trailing_minus"),
+            pytest.param("h52. -", id="partial_code_trailing_minus"),
+            pytest.param(".12 -", id="dot_number_trailing_minus"),
+            pytest.param("h52.1 - ku", id="partial_word_after_dash"),
+        ],
+    )
+    def test_spaced_dash_queries_do_not_raise(
+        self,
+        query_index: tantivy.Index,
+        raw_query: str,
+    ) -> None:
+        assert isinstance(parse_user_query(query_index, raw_query, UTC), tantivy.Query)
+
+    @pytest.mark.parametrize(
+        "raw_query",
+        [
+            # Partial date scalar (year only)
+            pytest.param("created:2020", id="created_year_scalar"),
+            # 8-digit compact date range in brackets
+            pytest.param(
+                "created:[20200101 TO 20201231]",
+                id="created_8digit_bracket_range",
+            ),
+            # Comma-separated field + date range (Whoosh v2 multi-clause syntax)
+            pytest.param(
+                "title:x,created:[2020 TO 2021]",
+                id="title_comma_created_range",
+            ),
+            # Field alias: type -> document_type
+            pytest.param("type:invoice", id="type_alias"),
+            # Multi-word date keyword
+            pytest.param("created:previous week", id="created_previous_week"),
+            # Full ISO datetime range
+            pytest.param(
+                "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z]",
+                id="created_iso_range",
+            ),
+            # Comma-separated ISO ranges (Whoosh v2 syntax)
+            pytest.param(
+                "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z],"
+                "added:[2026-05-01T00:00:00Z TO 2026-06-01T00:00:00Z]",
+                id="comma_iso_ranges",
+            ),
+        ],
+    )
+    def test_advanced_search_queries_do_not_raise(
+        self,
+        query_index: tantivy.Index,
+        raw_query: str,
+    ) -> None:
+        """
+        End-to-end: queries that the frontend sends must parse without raising.
+
+        This tests the full pipeline: translate_query -> tantivy parse_query.
+        Equivalent to asserting HTTP 200 (not 400) for each query form.
+        """
+        with time_machine.travel(datetime(2026, 6, 15, 12, 0, tzinfo=UTC), tick=False):
+            assert isinstance(
+                parse_user_query(query_index, raw_query, UTC),
+                tantivy.Query,
+            )
+
+    def test_invalid_date_propagates_not_swallowed(
+        self,
+        query_index: tantivy.Index,
+    ) -> None:
+        # parse_user_query falls back to the raw query on unexpected translation
+        # errors, but an InvalidDateQuery is intentional and must propagate so the
+        # view can return a 400 instead of silently parsing the raw (invalid) date.
+        with pytest.raises(InvalidDateQuery) as exc_info:
+            parse_user_query(query_index, "created:202023", UTC)
+        assert exc_info.value.field == "created"
+        assert exc_info.value.value == "202023"
+
+
+class TestYearRangeRewriting:
+    """Whoosh-style year-only date ranges must be rewritten to ISO 8601."""
+
+    @pytest.mark.parametrize(
+        ("query", "field", "expected_lo", "expected_hi"),
+        [
+            pytest.param(
+                "created:[2020 TO 2020]",
+                "created",
+                "2020-01-01T00:00:00Z",
+                "2021-01-01T00:00:00Z",
+                id="single_year_created",
+            ),
+            pytest.param(
+                "created:[2018 TO 2021]",
+                "created",
+                "2018-01-01T00:00:00Z",
+                "2022-01-01T00:00:00Z",
+                id="multi_year_range_created",
+            ),
+            pytest.param(
+                "added:[2022 TO 2023]",
+                "added",
+                "2022-01-01T00:00:00Z",
+                "2024-01-01T00:00:00Z",
+                id="added_field",
+            ),
+            pytest.param(
+                "modified:[2021 TO 2021]",
+                "modified",
+                "2021-01-01T00:00:00Z",
+                "2022-01-01T00:00:00Z",
+                id="modified_field",
+            ),
+            pytest.param(
+                "created:[2020 to 2020]",
+                "created",
+                "2020-01-01T00:00:00Z",
+                "2021-01-01T00:00:00Z",
+                id="lowercase_to_keyword",
+            ),
+        ],
+    )
+    def test_year_range_rewritten(
+        self,
+        query: str,
+        field: str,
+        expected_lo: str,
+        expected_hi: str,
+    ) -> None:
+        result = rewrite_natural_date_keywords(query, UTC)
+        lo, hi = _range(result, field)
+        assert lo == expected_lo
+        assert hi == expected_hi
+
+    def test_reversed_year_range_is_swapped(self) -> None:
+        # A reversed range must not yield lo > hi, which Tantivy treats as an
+        # empty range (silently zero results). The bounds are swapped instead.
+        result = rewrite_natural_date_keywords("created:[2025 TO 2020]", UTC)
+        lo, hi = _range(result, "created")
+        assert lo == "2020-01-01T00:00:00Z"
+        assert hi == "2026-01-01T00:00:00Z"
+
+    def test_year_range_in_complex_boolean_query(self) -> None:
+        query = "tag:steuer AND (title:2020 OR (NOT title:2019 AND NOT title:2018 AND created:[2020 TO 2020]))"
+        result = rewrite_natural_date_keywords(query, UTC)
+        lo, hi = _range(result, "created")
+        assert lo == "2020-01-01T00:00:00Z"
+        assert hi == "2021-01-01T00:00:00Z"
+        assert "title:2020" in result
+        assert "title:2019" in result
+        assert "title:2018" in result
+
+    def test_already_iso_date_range_passes_through_unchanged(self) -> None:
+        original = "created:[2020-01-01T00:00:00Z TO 2021-01-01T00:00:00Z]"
+        assert rewrite_natural_date_keywords(original, UTC) == original
+
+    def test_8digit_in_brackets_not_matched_as_year_range(self) -> None:
+        # [YYYYMMDD TO YYYYMMDD]: the translation layer converts 8-digit bounds to
+        # ISO day ranges. 20200101 -> 2020-01-01T00:00:00Z (lo of that day);
+        # 20201231 -> the ceil of Dec 31 = 2021-01-01T00:00:00Z (exclusive end).
+        # This is the correct and accepted behavior: old compact form becomes a
+        # proper Tantivy-parseable ISO range.
+        original = "created:[20200101 TO 20201231]"
+        result = rewrite_natural_date_keywords(original, UTC)
+        lo, hi = _range(result, "created")
+        assert lo == "2020-01-01T00:00:00Z"
+        assert hi == "2021-01-01T00:00:00Z"
+
+
+class TestNonDateFieldsNotRewritten:
+    """Date rewriters must only fire on the date fields (created/modified/added).
+
+    Integer fields like asn/id/page_count and unknown fields would otherwise be
+    rewritten into date ranges and rejected by Tantivy as type mismatches.
+    """
+
+    @pytest.mark.parametrize(
+        "query",
+        [
+            pytest.param("asn:20240101", id="asn_8digit"),
+            pytest.param("id:20240101", id="id_8digit"),
+            pytest.param("page_count:12345678", id="page_count_8digit"),
+            pytest.param("num_notes:20231201", id="num_notes_8digit"),
+        ],
+    )
+    def test_8digit_on_integer_field_passes_through_unchanged(self, query: str) -> None:
+        assert rewrite_natural_date_keywords(query, EASTERN) == query
+
+    @pytest.mark.parametrize(
+        "query",
+        [
+            pytest.param("asn:[2000 TO 2024]", id="asn_year_range"),
+            pytest.param("id:[2000 TO 2024]", id="id_year_range"),
+            pytest.param("page_count:[2000 TO 2024]", id="page_count_year_range"),
+        ],
+    )
+    def test_year_range_on_integer_field_passes_through_unchanged(
+        self,
+        query: str,
+    ) -> None:
+        assert rewrite_natural_date_keywords(query, UTC) == query
+
+    def test_unknown_field_keyword_passes_through_unchanged(self) -> None:
+        # foobar is not a date field: 'foobar:today' must not become a date range,
+        # which Tantivy would otherwise reject as an unknown/typed field.
+        assert rewrite_natural_date_keywords("foobar:today", UTC) == "foobar:today"
+
 
 class TestPassthrough:
     """Queries without field prefixes or unrelated content pass through unchanged."""
@@ -462,6 +674,16 @@ class TestNormalizeQuery:
     def test_normalize_expands_comma_separated_tags(self) -> None:
         assert normalize_query("tag:foo,bar") == "tag:foo AND tag:bar"
 
+    def test_normalize_comma_between_range_expressions(self) -> None:
+        # Comma-separated field range expressions (Whoosh v2 syntax) must be
+        # converted to AND so Tantivy does not receive an invalid comma.
+        q = "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z],added:[2026-05-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
+        assert normalize_query(q) == (
+            "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
+            " AND "
+            "added:[2026-05-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
+        )
+
     def test_normalize_expands_three_values(self) -> None:
         assert normalize_query("tag:foo,bar,baz") == "tag:foo AND tag:bar AND tag:baz"
 
@@ -471,10 +693,108 @@ class TestNormalizeQuery:
     def test_normalize_no_commas_unchanged(self) -> None:
         assert normalize_query("bank statement") == "bank statement"
 
+    @pytest.mark.parametrize(
+        ("raw", "expected"),
+        [
+            pytest.param(
+                "h52.1 - kurzsichtigkeit",
+                "h52.1 kurzsichtigkeit",
+                id="icd_code_dash_description",
+            ),
+            pytest.param(
+                "H52.1 - asd",
+                "H52.1 asd",
+                id="icd_code_uppercase_dash",
+            ),
+            pytest.param(
+                "h52.1 -",
+                "h52.1",
+                id="trailing_minus",
+            ),
+            pytest.param(
+                ". -",
+                ".",
+                id="dot_trailing_minus",
+            ),
+            pytest.param(
+                "h52. -",
+                "h52.",
+                id="partial_code_trailing_minus",
+            ),
+            pytest.param(
+                "foo - bar - baz",
+                "foo bar baz",
+                id="multiple_dashes",
+            ),
+            pytest.param(
+                "foo + bar",
+                "foo bar",
+                id="spaced_plus_operator",
+            ),
+        ],
+    )
+    def test_normalize_strips_dangling_operators(self, raw: str, expected: str) -> None:
+        assert normalize_query(raw) == expected
+
+    @pytest.mark.parametrize(
+        "query",
+        [
+            pytest.param("term -other", id="adjacent_not_operator"),
+            pytest.param("-term", id="leading_not_operator"),
+            pytest.param("+term", id="leading_must_operator"),
+            pytest.param("foo -bar +baz", id="mixed_adjacent_operators"),
+        ],
+    )
+    def test_normalize_preserves_valid_operators(self, query: str) -> None:
+        assert normalize_query(query) == query
+
+
+class TestParseSimpleTextHighlightQuery:
+    """parse_simple_text_highlight_query must not raise on natural-language queries."""
+
+    @pytest.fixture
+    def query_index(self) -> tantivy.Index:
+        schema = build_schema()
+        idx = tantivy.Index(schema, path=None)
+        register_tokenizers(idx, "")
+        return idx
+
+    @pytest.mark.parametrize(
+        "raw_query",
+        [
+            pytest.param("h52.1 - kurzsichtigkeit", id="icd_code_dash_description"),
+            pytest.param("H52.1 - asd", id="icd_code_uppercase"),
+            pytest.param("h52.1 -", id="trailing_minus"),
+            pytest.param(". -", id="dot_trailing_minus"),
+            pytest.param(".12 -", id="dot_number_trailing_minus"),
+            pytest.param("f84.0 - v.a. autismusspektrumstorung", id="complex_icd_dash"),
+        ],
+    )
+    def test_spaced_dash_queries_do_not_raise(
+        self,
+        query_index: tantivy.Index,
+        raw_query: str,
+    ) -> None:
+        assert isinstance(
+            parse_simple_text_highlight_query(query_index, raw_query),
+            tantivy.Query,
+        )
+
+    def test_empty_query_returns_empty_query(self, query_index: tantivy.Index) -> None:
+        result = parse_simple_text_highlight_query(query_index, "")
+        assert isinstance(result, tantivy.Query)
+
+    def test_all_operators_returns_empty_query(
+        self,
+        query_index: tantivy.Index,
+    ) -> None:
+        result = parse_simple_text_highlight_query(query_index, "- +")
+        assert isinstance(result, tantivy.Query)
+
 
 class TestPermissionFilter:
     """
-    build_permission_filter tests use an in-memory index — no DB access needed.
+    build_permission_filter tests use an in-memory index - no DB access needed.
 
     Users are constructed as unsaved model instances (django_user_model(pk=N))
     so no database round-trip occurs; only .pk is read by build_permission_filter.

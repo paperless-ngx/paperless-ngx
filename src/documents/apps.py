@@ -31,6 +31,7 @@ class DocumentsConfig(AppConfig):
         document_consumption_finished.connect(add_or_update_document_in_llm_index)
         document_updated.connect(run_workflows_updated)
         document_updated.connect(send_websocket_document_updated)
+        document_updated.connect(add_or_update_document_in_llm_index)
 
         import documents.schema  # noqa: F401
 

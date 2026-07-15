@@ -74,8 +74,8 @@ def dummy_parser_cls() -> type:
             Required to exist, but doesn't need to do anything
             """
 
-        def get_text(self) -> str | None:
-            return None
+        def get_text(self) -> str:
+            return ""
 
         def get_date(self) -> None:
             return None

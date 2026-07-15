@@ -732,6 +732,7 @@ class ConsumerPlugin(
                             document_updated.send(
                                 sender=self.__class__,
                                 document=document.root_document,
+                                skip_ai_index=True,  # document_consumption_finished already enqueues the LLM update
                             )
 
                         # Delete the file only if it was successfully consumed

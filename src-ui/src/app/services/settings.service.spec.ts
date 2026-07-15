@@ -3,7 +3,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import { fakeAsync, TestBed, tick } from '@angular/core/testing'
+import { TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
@@ -122,7 +122,8 @@ describe('SettingsService', () => {
     expect(req.request.method).toEqual('GET')
   })
 
-  it('should catch error and show toast on retrieve ui_settings error', fakeAsync(() => {
+  it('should catch error and show toast on retrieve ui_settings error', () => {
+    jest.useFakeTimers()
     const toastSpy = jest.spyOn(toastService, 'showError')
     httpTestingController
       .expectOne(`${environment.apiBaseUrl}ui_settings/`)
@@ -130,9 +131,10 @@ describe('SettingsService', () => {
         { detail: 'You do not have permission to perform this action.' },
         { status: 403, statusText: 'Forbidden' }
       )
-    tick(500)
+    jest.advanceTimersByTime(500)
     expect(toastSpy).toHaveBeenCalled()
-  }))
+    jest.useRealTimers()
+  })
 
   it('calls ui_settings api endpoint with POST on store', () => {
     let req = httpTestingController.expectOne(
@@ -392,22 +394,22 @@ describe('SettingsService', () => {
     req.flush(ui_settings)
     settingsService.initializeDisplayFields()
     expect(
-      settingsService.allDisplayFields.includes(DEFAULT_DISPLAY_FIELDS[0])
+      settingsService.allDisplayFields().includes(DEFAULT_DISPLAY_FIELDS[0])
     ).toBeTruthy() // title
     expect(
-      settingsService.allDisplayFields.includes(DEFAULT_DISPLAY_FIELDS[4])
+      settingsService.allDisplayFields().includes(DEFAULT_DISPLAY_FIELDS[4])
     ).toBeFalsy() // correspondent
 
     settingsService.set(SETTINGS_KEYS.NOTES_ENABLED, false)
     settingsService.initializeDisplayFields()
     expect(
-      settingsService.allDisplayFields.includes(DEFAULT_DISPLAY_FIELDS[8])
+      settingsService.allDisplayFields().includes(DEFAULT_DISPLAY_FIELDS[8])
     ).toBeFalsy() // notes
 
     jest.spyOn(permissionService, 'currentUserCan').mockReturnValue(true)
     settingsService.initializeDisplayFields()
     expect(
-      settingsService.allDisplayFields.includes(DEFAULT_DISPLAY_FIELDS[4])
+      settingsService.allDisplayFields().includes(DEFAULT_DISPLAY_FIELDS[4])
     ).toBeTruthy() // correspondent
   })
 
@@ -422,12 +424,14 @@ describe('SettingsService', () => {
     )
     settingsService.initializeDisplayFields()
     expect(
-      settingsService.allDisplayFields.includes(DEFAULT_DISPLAY_FIELDS[0])
+      settingsService.allDisplayFields().includes(DEFAULT_DISPLAY_FIELDS[0])
     ).toBeTruthy()
     expect(
-      settingsService.allDisplayFields.find(
-        (f) => f.id === `${DisplayField.CUSTOM_FIELD}${customFields[0].id}`
-      ).name
+      settingsService
+        .allDisplayFields()
+        .find(
+          (f) => f.id === `${DisplayField.CUSTOM_FIELD}${customFields[0].id}`
+        ).name
     ).toEqual(customFields[0].name)
   })
 })

@@ -247,9 +247,9 @@ class RemoteDocumentParser:
     # Result accessors
     # ------------------------------------------------------------------
 
-    def get_text(self) -> str | None:
+    def get_text(self) -> str:
         """Return the plain-text content extracted during parse."""
-        return self._text
+        return self._text or ""
 
     def get_date(self) -> datetime.datetime | None:
         """Return the document date detected during parse.
@@ -425,7 +425,7 @@ class RemoteDocumentParser:
             return result.content
 
         except Exception as e:
-            logger.error("Azure AI Vision parsing failed: %s", e)
+            logger.exception("Azure AI Vision parsing failed: %s", e)
 
         finally:
             client.close()

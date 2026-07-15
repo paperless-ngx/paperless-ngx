@@ -98,5 +98,5 @@ def extract_unmatched_names(
     matched_objects: list,
     attr="name",
 ) -> list[str]:
-    matched_names = {getattr(obj, attr).lower() for obj in matched_objects}
-    return [name for name in names if name.lower() not in matched_names]
+    matched_names = {_normalize(getattr(obj, attr)) for obj in matched_objects}
+    return [name for name in names if _normalize(name) not in matched_names]

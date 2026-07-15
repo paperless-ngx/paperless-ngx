@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core'
+import { Component, effect, inject, signal } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -17,22 +17,9 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
   private documentService = inject(DocumentService)
   private toastService = inject(ToastService)
 
-  @Input()
-  documentIds: number[]
-
-  private _hasArchiveVersion: boolean = true
-
-  @Input()
-  set hasArchiveVersion(value: boolean) {
-    this._hasArchiveVersion = value
-    this.useArchiveVersion = value
-  }
-
-  get hasArchiveVersion(): boolean {
-    return this._hasArchiveVersion
-  }
-
-  public useArchiveVersion: boolean = true
+  readonly documentIds = signal<number[]>(undefined)
+  readonly hasArchiveVersion = signal(true)
+  readonly useArchiveVersion = signal(true)
 
   public emailAddress: string = ''
   public emailSubject: string = ''
@@ -40,22 +27,25 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
 
   constructor() {
     super()
-    this.loading = false
+    this.loading.set(false)
+    effect(() => {
+      this.useArchiveVersion.set(this.hasArchiveVersion())
+    })
   }
 
   public emailDocuments() {
-    this.loading = true
+    this.loading.set(true)
     this.documentService
       .emailDocuments(
-        this.documentIds,
+        this.documentIds(),
         this.emailAddress,
         this.emailSubject,
         this.emailMessage,
-        this.useArchiveVersion
+        this.useArchiveVersion()
       )
       .subscribe({
         next: () => {
-          this.loading = false
+          this.loading.set(false)
           this.emailAddress = ''
           this.emailSubject = ''
           this.emailMessage = ''
@@ -63,9 +53,9 @@ export class EmailDocumentDialogComponent extends LoadingComponentWithPermission
           this.toastService.showInfo($localize`Email sent`)
         },
         error: (e) => {
-          this.loading = false
+          this.loading.set(false)
           const errorMessage =
-            this.documentIds.length > 1
+            this.documentIds().length > 1
               ? $localize`Error emailing documents`
               : $localize`Error emailing document`
           this.toastService.showError(errorMessage, e)

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   forwardRef,
@@ -21,6 +22,7 @@ import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first, firstValueFrom, tap } from 'rxjs'
 import { Tag } from 'src/app/data/tag'
 import { TagService } from 'src/app/services/rest/tag.service'
+import { matchesSearchText } from 'src/app/utils/text-search'
 import { EditDialogMode } from '../../edit-dialog/edit-dialog.component'
 import { TagEditDialogComponent } from '../../edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { TagComponent } from '../../tag/tag.component'
@@ -48,6 +50,7 @@ import { TagComponent } from '../../tag/tag.component'
 export class TagsComponent implements OnInit, ControlValueAccessor {
   private tagService = inject(TagService)
   private modalService = inject(NgbModal)
+  private readonly changeDetector = inject(ChangeDetectorRef)
 
   constructor() {
     this.createTagRef = this.createTag.bind(this)
@@ -59,6 +62,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   writeValue(newValue: number[]): void {
     this.value = newValue
+    this.changeDetector.markForCheck()
   }
   registerOnChange(fn: any): void {
     this.onChange = fn
@@ -68,11 +72,13 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   }
   setDisabledState?(isDisabled: boolean): void {
     this.disabled = isDisabled
+    this.changeDetector.markForCheck()
   }
 
   ngOnInit(): void {
     this.tagService.listAll().subscribe((result) => {
       this.tags = result.results
+      this.changeDetector.markForCheck()
     })
   }
 
@@ -113,6 +119,14 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   tags: Tag[] = []
 
   public createTagRef: (name) => void
+
+  public searchFn = (term: string, tag: Tag): boolean =>
+    matchesSearchText(
+      [this.getParentChain(tag?.id).map((parent) => parent.name), tag?.name]
+        .flat()
+        .join(' '),
+      term
+    )
 
   getTag(id: number) {
     if (this.tags) {
@@ -167,7 +181,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     var modal = this.modalService.open(TagEditDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.dialogMode = EditDialogMode.CREATE
+    modal.componentInstance.dialogMode.set(EditDialogMode.CREATE)
     if (name) modal.componentInstance.object = { name: name }
     else if (this.select.searchTerm)
       modal.componentInstance.object = { name: this.select.searchTerm }

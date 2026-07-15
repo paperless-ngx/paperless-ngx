@@ -1,5 +1,4 @@
 import logging
-import re
 import uuid
 from pathlib import Path
 
@@ -277,6 +276,7 @@ def execute_password_removal_action(
     action: WorkflowAction,
     document: Document | ConsumableDocument,
     logging_group,
+    source_file: Path | None = None,
 ) -> None:
     """
     Try to remove a password from a document using the configured list.
@@ -290,11 +290,7 @@ def execute_password_removal_action(
         )
         return
 
-    passwords = [
-        password.strip()
-        for password in re.split(r"[,\n]", passwords)
-        if password.strip()
-    ]
+    passwords = [p.strip() for p in passwords if p.strip()]
 
     if isinstance(document, ConsumableDocument):
         # hook the consumption-finished signal to attempt password removal later
@@ -305,6 +301,7 @@ def execute_password_removal_action(
                     action,
                     consumed_document,
                     logging_group,
+                    source_file=kwargs.get("original_file"),
                 )
             document_consumption_finished.disconnect(handler)
 
@@ -321,6 +318,7 @@ def execute_password_removal_action(
                 password=password,
                 update_document=True,
                 user=document.owner,
+                source_paths_by_id={document.id: source_file} if source_file else None,
             )
             logger.info(
                 "Unlocked document %s using workflow action %s",

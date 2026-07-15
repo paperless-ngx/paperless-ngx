@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Final
 
 import tantivy
 
@@ -47,6 +48,9 @@ _LANGUAGE_MAP: dict[str, str] = {
 }
 
 SUPPORTED_LANGUAGES: frozenset[str] = frozenset(_LANGUAGE_MAP)
+# Document.title is max_length=128, so use 129 as the limit for
+# Tantivy's remove_long filter
+_TOKEN_REMOVE_LONG_LIMIT: Final[int] = 129
 
 
 def register_tokenizers(index: tantivy.Index, language: str | None) -> None:
@@ -76,10 +80,10 @@ def register_tokenizers(index: tantivy.Index, language: str | None) -> None:
 
 
 def _paperless_text(language: str | None) -> tantivy.TextAnalyzer:
-    """Main full-text tokenizer for content, title, etc: simple -> remove_long(65) -> lowercase -> ascii_fold [-> stemmer]"""
+    """Main full-text tokenizer for content, title, etc: simple -> remove_long(129) -> lowercase -> ascii_fold [-> stemmer]"""
     builder = (
         tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.simple())
-        .filter(tantivy.Filter.remove_long(65))
+        .filter(tantivy.Filter.remove_long(_TOKEN_REMOVE_LONG_LIMIT))
         .filter(tantivy.Filter.lowercase())
         .filter(tantivy.Filter.ascii_fold())
     )
@@ -118,13 +122,46 @@ def _bigram_analyzer() -> tantivy.TextAnalyzer:
 
 
 def _simple_search_analyzer() -> tantivy.TextAnalyzer:
-    """Tokenizer for simple substring search fields: non-whitespace chunks -> remove_long(65) -> lowercase -> ascii_fold."""
+    """Tokenizer for simple substring search fields: non-whitespace chunks -> remove_long(129) -> lowercase -> ascii_fold."""
     return (
         tantivy.TextAnalyzerBuilder(
             tantivy.Tokenizer.regex(r"\S+"),
         )
-        .filter(tantivy.Filter.remove_long(65))
+        .filter(tantivy.Filter.remove_long(_TOKEN_REMOVE_LONG_LIMIT))
         .filter(tantivy.Filter.lowercase())
         .filter(tantivy.Filter.ascii_fold())
         .build()
     )
+
+
+# Shared analyzers for query-side normalization. They reuse the exact filters
+# applied at index time so query terms fold identically (single source of truth
+# for ASCII folding, instead of a separate Python implementation). tantivy-py's
+# TextAnalyzer.analyze clones internally per call, so these are safe to share.
+_SIMPLE_SEARCH_ANALYZER: Final = _simple_search_analyzer()
+# raw tokenizer keeps the whole input as one token, so this folds an arbitrary
+# string to ASCII exactly like the content tokenizers (ß->ss, ø->o, æ->ae, ...)
+# without splitting it - used for autocomplete words and prefixes.
+_ASCII_FOLD_ANALYZER: Final = (
+    tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.raw())
+    .filter(tantivy.Filter.ascii_fold())
+    .build()
+)
+
+
+def simple_search_tokens(text: str) -> list[str]:
+    """Tokenize a query string exactly as simple_title/simple_content are indexed."""
+    return _SIMPLE_SEARCH_ANALYZER.analyze(text)
+
+
+def ascii_fold(text: str) -> str:
+    """Fold text to ASCII using the same mapping as the content tokenizers.
+
+    Maps non-decomposable letters (ß->ss, ø->o, æ->ae, ...) identically to
+    Tantivy's ascii_fold filter used at index time, so query/autocomplete terms
+    agree with the folded content. A naive NFD strip would instead delete those
+    letters, causing silent search misses. Callers lowercase first, matching the
+    index pipeline's lowercase -> ascii_fold order.
+    """
+    tokens = _ASCII_FOLD_ANALYZER.analyze(text)
+    return tokens[0] if tokens else ""

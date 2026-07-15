@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import logging
+import random
 import re
 import threading
+import time
 from datetime import UTC
 from datetime import datetime
 from enum import StrEnum
 from typing import TYPE_CHECKING
+from typing import Final
 from typing import Self
 from typing import TypedDict
 from typing import TypeVar
@@ -19,7 +22,6 @@ from django.conf import settings
 from django.utils.timezone import get_current_timezone
 from guardian.shortcuts import get_users_with_perms
 
-from documents.search._normalize import ascii_fold
 from documents.search._query import build_permission_filter
 from documents.search._query import parse_simple_text_highlight_query
 from documents.search._query import parse_simple_text_query
@@ -29,6 +31,7 @@ from documents.search._schema import _write_sentinels
 from documents.search._schema import build_schema
 from documents.search._schema import open_or_rebuild_index
 from documents.search._schema import wipe_index
+from documents.search._tokenizer import ascii_fold
 from documents.search._tokenizer import register_tokenizers
 from documents.utils import IterWrapper
 from documents.utils import identity
@@ -42,6 +45,11 @@ if TYPE_CHECKING:
     from documents.models import Document
 
 logger = logging.getLogger("paperless.search")
+
+_LOCK_TIMEOUT_SECONDS: Final[float] = 10.0  # per-attempt acquire timeout
+_LOCK_RETRY_ATTEMPTS: Final[int] = 4  # total attempts (1 initial + 3 retries)
+_LOCK_BACKOFF_BASE: Final[float] = 1.0  # seconds
+_LOCK_BACKOFF_CAP: Final[float] = 10.0  # seconds
 
 _WORD_RE = regex.compile(r"\w+")
 _AUTOCOMPLETE_REGEX_TIMEOUT = 1.0  # seconds; guards against ReDoS on untrusted content
@@ -183,12 +191,27 @@ class WriteBatch:
         if self._backend._path is not None:
             lock_path = self._backend._path / ".tantivy.lock"
             self._lock = filelock.FileLock(str(lock_path))
-            try:
-                self._lock.acquire(timeout=self._lock_timeout)
-            except filelock.Timeout as e:  # pragma: no cover
-                raise SearchIndexLockError(
-                    f"Could not acquire index lock within {self._lock_timeout}s",
-                ) from e
+            for attempt in range(_LOCK_RETRY_ATTEMPTS):
+                try:
+                    self._lock.acquire(timeout=self._lock_timeout)
+                    break
+                except filelock.Timeout:
+                    if attempt == _LOCK_RETRY_ATTEMPTS - 1:
+                        raise SearchIndexLockError(
+                            f"Could not acquire index lock after {_LOCK_RETRY_ATTEMPTS} "
+                            f"attempts (timeout={self._lock_timeout}s each)",
+                        )
+                    sleep_s = random.uniform(
+                        0,
+                        min(_LOCK_BACKOFF_CAP, _LOCK_BACKOFF_BASE * (2**attempt)),
+                    )
+                    logger.debug(
+                        "Index lock contention; retrying in %.2fs (attempt %d/%d)",
+                        sleep_s,
+                        attempt + 1,
+                        _LOCK_RETRY_ATTEMPTS,
+                    )
+                    time.sleep(sleep_s)
 
         self._raw_writer = self._backend._index.writer()
         return self
@@ -197,13 +220,19 @@ class WriteBatch:
         try:
             if exc_type is None:
                 self._writer.commit()
+                # Wait for background merge threads to finish before releasing
+                # the file lock so the next writer doesn't race against an
+                # in-progress merge on the same index files.
+                self._writer.wait_merging_threads()
                 self._backend._index.reload()
-            # Explicitly delete writer to release tantivy's internal lock.
-            # On exception the uncommitted writer is simply discarded.
+        finally:
+            # Always release the writer (and Tantivy's internal writer lock),
+            # even if commit/merge/reload raised, so the next batch can acquire
+            # a writer instead of failing with LockBusy. An uncommitted writer
+            # is simply discarded.
             if self._raw_writer is not None:
                 del self._raw_writer
                 self._raw_writer = None
-        finally:
             if self._lock is not None:
                 self._lock.release()
 
@@ -376,6 +405,7 @@ class TantivyBackend:
         doc.add_text("title", document.title)
         doc.add_text("title_sort", document.title)
         doc.add_text("simple_title", document.title)
+        doc.add_text("bigram_title", document.title)
         doc.add_text("content", content)
         doc.add_text("bigram_content", content)
         doc.add_text("simple_content", content)
@@ -388,12 +418,14 @@ class TantivyBackend:
         if document.correspondent:
             doc.add_text("correspondent", document.correspondent.name)
             doc.add_text("correspondent_sort", document.correspondent.name)
+            doc.add_text("bigram_correspondent", document.correspondent.name)
             doc.add_unsigned("correspondent_id", document.correspondent_id)
 
         # Document type
         if document.document_type:
             doc.add_text("document_type", document.document_type.name)
             doc.add_text("type_sort", document.document_type.name)
+            doc.add_text("bigram_document_type", document.document_type.name)
             doc.add_unsigned("document_type_id", document.document_type_id)
 
         # Storage path
@@ -405,6 +437,7 @@ class TantivyBackend:
         tag_names: list[str] = []
         for tag in document.tags.all():
             doc.add_text("tag", tag.name)
+            doc.add_text("bigram_tag", tag.name)
             doc.add_unsigned("tag_id", tag.pk)
             tag_names.append(tag.name)
 
@@ -490,13 +523,28 @@ class TantivyBackend:
         Convenience method for single-document updates. For bulk operations,
         use batch_update() context manager for better performance.
 
+        On lock exhaustion after all retry attempts, schedules a deferred
+        index_document Celery task and returns normally. Callers will NOT
+        receive a SearchIndexLockError; the index write is deferred silently.
+
         Args:
             document: Django Document instance to index
             effective_content: Override document.content for indexing
         """
         self._ensure_open()
-        with self.batch_update(lock_timeout=5.0) as batch:
-            batch.add_or_update(document, effective_content)
+        try:
+            with self.batch_update(lock_timeout=_LOCK_TIMEOUT_SECONDS) as batch:
+                batch.add_or_update(document, effective_content)
+        except SearchIndexLockError:
+            logger.error(
+                "Search index lock exhausted for document %d after %d attempts; "
+                "scheduling deferred index write",
+                document.pk,
+                _LOCK_RETRY_ATTEMPTS,
+            )
+            from documents.tasks import index_document
+
+            index_document.apply_async(args=[document.pk], countdown=60)
 
     def remove(self, doc_id: int) -> None:
         """
@@ -505,12 +553,27 @@ class TantivyBackend:
         Convenience method for single-document removal. For bulk operations,
         use batch_update() context manager for better performance.
 
+        On lock exhaustion after all retry attempts, schedules a deferred
+        remove_document_from_index Celery task and returns normally.
+        Callers will NOT receive a SearchIndexLockError.
+
         Args:
             doc_id: Primary key of the document to remove
         """
         self._ensure_open()
-        with self.batch_update(lock_timeout=5.0) as batch:
-            batch.remove(doc_id)
+        try:
+            with self.batch_update(lock_timeout=_LOCK_TIMEOUT_SECONDS) as batch:
+                batch.remove(doc_id)
+        except SearchIndexLockError:
+            logger.error(
+                "Search index lock exhausted for doc_id %d after %d attempts; "
+                "scheduling deferred index removal",
+                doc_id,
+                _LOCK_RETRY_ATTEMPTS,
+            )
+            from documents.tasks import remove_document_from_index
+
+            remove_document_from_index.apply_async(args=[doc_id], countdown=60)
 
     def highlight_hits(
         self,
@@ -803,8 +866,24 @@ class TantivyBackend:
         final_query = self._apply_permission_filter(mlt_query, user)
 
         effective_limit = limit if limit is not None else searcher.num_docs
-        # Fetch one extra to account for excluding the original document
-        results = searcher.search(final_query, limit=effective_limit + 1)
+        try:
+            # Fetch one extra to account for excluding the original document
+            results = searcher.search(final_query, limit=effective_limit + 1)
+        except BaseException:  # pragma: no cover
+            # Tantivy 0.26 panics in BM25 idf scoring when the index holds
+            # soft-deleted documents (doc_freq can exceed the alive doc count),
+            # which only surfaces for the More Like This query. The panic crosses
+            # the pyo3 boundary as a `pyo3_runtime.PanicException` — a
+            # BaseException, not an Exception — so catch BaseException and degrade
+            # to "no similar documents" instead of bubbling a 500 to the client.
+            # Fixed upstream: https://github.com/quickwit-oss/tantivy/pull/2964
+            # Remove once the bundled tantivy includes that fix.
+            logger.warning(
+                "More Like This scoring panicked (likely stale tantivy segment "
+                "stats after deletions); returning no results. A search index "
+                "reindex will rebuild consistent statistics.",
+            )
+            return []
 
         addrs = [addr for _score, addr in results.hits]
         all_ids = cast("list[int]", searcher.fast_field_values("id", addrs))
@@ -869,6 +948,9 @@ class TantivyBackend:
                 )
                 writer.add_document(doc)
             writer.commit()
+            # Wait for background merge threads to finish so all segments are
+            # fully merged and persisted before the index is considered rebuilt.
+            writer.wait_merging_threads()
             new_index.reload()
         except BaseException:  # pragma: no cover
             # Restore old index on failure so the backend remains usable

@@ -138,11 +138,11 @@ class TestTextParserParse:
 
         assert text_parser.get_text() == "Pantothens\ufffdure\n"
 
-    def test_get_text_none_before_parse(
+    def test_get_text_empty_before_parse(
         self,
         text_parser: TextDocumentParser,
     ) -> None:
-        assert text_parser.get_text() is None
+        assert text_parser.get_text() == ""
 
 
 class TestTextParserThumbnail:

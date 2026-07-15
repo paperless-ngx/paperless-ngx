@@ -281,13 +281,13 @@ class ParserProtocol(Protocol):
     # Result accessors
     # ------------------------------------------------------------------
 
-    def get_text(self) -> str | None:
+    def get_text(self) -> str:
         """Return the plain-text content extracted during parse.
 
         Returns
         -------
-        str | None
-            Extracted text, or None if no text could be found.
+        str
+            Extracted text, or an empty string if no text could be found.
         """
         ...
 

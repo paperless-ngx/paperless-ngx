@@ -4,6 +4,7 @@ import logging
 import ssl
 import tempfile
 import traceback
+import unicodedata
 from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
@@ -506,10 +507,10 @@ class MailAccountHandler(LoggingMixin):
         rule: MailRule,
     ) -> str | None:
         if rule.assign_title_from == MailRule.TitleSource.FROM_SUBJECT:
-            return message.subject
+            return unicodedata.normalize("NFC", message.subject)
 
         elif rule.assign_title_from == MailRule.TitleSource.FROM_FILENAME:
-            return Path(att.filename).stem
+            return unicodedata.normalize("NFC", Path(att.filename).stem)
 
         elif rule.assign_title_from == MailRule.TitleSource.NONE:
             return None
@@ -899,7 +900,9 @@ class MailAccountHandler(LoggingMixin):
                     ),
                 )
 
-                attachment_name = pathvalidate.sanitize_filename(att.filename)
+                attachment_name = pathvalidate.sanitize_filename(
+                    unicodedata.normalize("NFC", att.filename),
+                )
                 if attachment_name:
                     temp_filename = temp_dir / attachment_name
                 else:  # pragma: no cover
@@ -915,7 +918,7 @@ class MailAccountHandler(LoggingMixin):
                 )
                 doc_overrides = DocumentMetadataOverrides(
                     title=title,
-                    filename=pathvalidate.sanitize_filename(att.filename),
+                    filename=attachment_name,
                     correspondent_id=correspondent.id if correspondent else None,
                     document_type_id=doc_type.id if doc_type else None,
                     tag_ids=tag_ids,
@@ -1024,7 +1027,9 @@ class MailAccountHandler(LoggingMixin):
         )
         doc_overrides = DocumentMetadataOverrides(
             title=message.subject,
-            filename=pathvalidate.sanitize_filename(f"{message.subject}.eml"),
+            filename=pathvalidate.sanitize_filename(
+                unicodedata.normalize("NFC", f"{message.subject}.eml"),
+            ),
             correspondent_id=correspondent.id if correspondent else None,
             document_type_id=doc_type.id if doc_type else None,
             tag_ids=tag_ids,

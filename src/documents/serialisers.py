@@ -48,6 +48,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.fields import SerializerMethodField
 from rest_framework.filters import OrderingFilter
+from rest_framework.utils import model_meta
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.context import set_actor
@@ -119,6 +120,45 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer[Any]):
             existing = set(self.fields)
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
+
+
+class DocumentUpdateFieldsModelSerializer(DynamicFieldsModelSerializer):
+    stale_update_excluded_fields = frozenset({"filename", "archive_filename"})
+
+    def _get_update_fields(self, validated_data) -> list[str]:
+        model_fields = {
+            field.name
+            for field in self.Meta.model._meta.concrete_fields
+            if field.name not in self.stale_update_excluded_fields
+        }
+        update_fields = [
+            field_name for field_name in validated_data if field_name in model_fields
+        ]
+        if "modified" in model_fields and "modified" not in update_fields:
+            update_fields.append("modified")
+        return update_fields
+
+    def update(self, instance, validated_data):
+        serializers.raise_errors_on_nested_writes("update", self, validated_data)
+        info = model_meta.get_field_info(instance)
+
+        m2m_fields = []
+        for attr, value in validated_data.items():
+            if attr in info.relations and info.relations[attr].to_many:
+                m2m_fields.append((attr, value))
+            else:
+                setattr(instance, attr, value)
+
+        # File names are managed by post-save file handling.  Saving only the
+        # serializer-updated fields prevents stale in-memory path values from
+        # overwriting a concurrent move.
+        instance.save(update_fields=self._get_update_fields(validated_data))
+
+        for attr, value in m2m_fields:
+            field = getattr(instance, attr)
+            field.set(value)
+
+        return instance
 
 
 class MatchingModelSerializer(serializers.ModelSerializer[Any]):
@@ -989,7 +1029,7 @@ class DocumentVersionInfoSerializer(serializers.Serializer[_DocumentVersionInfo]
 class DocumentSerializer(
     OwnedObjectSerializer,
     NestedUpdateMixin,
-    DynamicFieldsModelSerializer,
+    DocumentUpdateFieldsModelSerializer,
 ):
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
@@ -1128,10 +1168,9 @@ class DocumentSerializer(
         return super().validate(attrs)
 
     def update(self, instance: Document, validated_data):
-        if "created_date" in validated_data and "created" not in validated_data:
-            instance.created = validated_data.get("created_date")
-            instance.save()
         if "created_date" in validated_data:
+            if "created" not in validated_data:
+                validated_data["created"] = validated_data["created_date"]
             logger.warning(
                 "created_date is deprecated, use created instead",
             )
@@ -1201,11 +1240,13 @@ class DocumentSerializer(
                     for tag in instance.tags.all()
                     if tag not in inbox_tags_not_being_added
                 ]
+
         if settings.AUDIT_LOG_ENABLED:
             with set_actor(self.user):
                 super().update(instance, validated_data)
         else:
             super().update(instance, validated_data)
+
         # hard delete custom field instances that were soft deleted
         CustomFieldInstance.deleted_objects.filter(document=instance).delete()
         return instance
@@ -2632,10 +2673,16 @@ class RunTaskSerializer(serializers.Serializer[dict[str, str]]):
 
 class AcknowledgeTasksViewSerializer(serializers.Serializer[dict[str, Any]]):
     tasks = serializers.ListField(
-        required=True,
+        required=False,
         label="Tasks",
         write_only=True,
         child=serializers.IntegerField(),
+    )
+    all = serializers.BooleanField(
+        required=False,
+        default=False,
+        label="All",
+        write_only=True,
     )
 
     def _validate_task_id_list(self, tasks, name="tasks") -> None:
@@ -2643,7 +2690,8 @@ class AcknowledgeTasksViewSerializer(serializers.Serializer[dict[str, Any]]):
             raise serializers.ValidationError(f"{name} must be a list")
         if not all(isinstance(i, int) for i in tasks):
             raise serializers.ValidationError(f"{name} must be a list of integers")
-        count = PaperlessTask.objects.filter(id__in=tasks).count()
+        queryset = self.context.get("queryset", PaperlessTask.objects.all())
+        count = queryset.filter(id__in=tasks).count()
         if not count == len(tasks):
             raise serializers.ValidationError(
                 f"Some tasks in {name} don't exist or were specified twice.",
@@ -2652,6 +2700,21 @@ class AcknowledgeTasksViewSerializer(serializers.Serializer[dict[str, Any]]):
     def validate_tasks(self, tasks):
         self._validate_task_id_list(tasks)
         return tasks
+
+    def validate(self, attrs):
+        acknowledge_all = attrs.get("all", False)
+        task_ids = attrs.get("tasks")
+
+        if acknowledge_all and task_ids is not None:
+            raise serializers.ValidationError(
+                "Set either all or tasks, not both.",
+            )
+        if not acknowledge_all and task_ids is None:
+            raise serializers.ValidationError(
+                "Either all must be true or tasks must be provided.",
+            )
+
+        return attrs
 
 
 class ShareLinkSerializer(OwnedObjectSerializer):

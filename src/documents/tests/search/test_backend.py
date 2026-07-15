@@ -1,5 +1,6 @@
 import pytest
 from django.contrib.auth.models import User
+from pytest_mock import MockerFixture
 
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -7,8 +8,13 @@ from documents.models import Document
 from documents.models import Note
 from documents.search._backend import SearchMode
 from documents.search._backend import TantivyBackend
+from documents.search._backend import WriteBatch
 from documents.search._backend import get_backend
 from documents.search._backend import reset_backend
+from documents.tests.factories import CorrespondentFactory
+from documents.tests.factories import DocumentFactory
+from documents.tests.factories import DocumentTypeFactory
+from documents.tests.factories import TagFactory
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
 
@@ -35,6 +41,47 @@ class TestWriteBatch:
 
         ids = backend.search_ids("should survive", user=None)
         assert len(ids) == 1
+
+    def test_writer_released_when_commit_fails(
+        self,
+        backend: TantivyBackend,
+        mocker: MockerFixture,
+    ) -> None:
+        """A commit failure must still dispose the writer (released in finally).
+
+        Otherwise the Tantivy IndexWriter lingers holding its internal lock and
+        the next batch fails with LockBusy. The real writer is created in
+        __enter__; here commit() is forced to raise via a mocked _writer.
+        """
+        doc = Document.objects.create(
+            title="Commit Fail",
+            content="indexable text",
+            checksum="WBCF1",
+            pk=42,
+        )
+
+        failing = mocker.MagicMock()
+        failing.commit.side_effect = RuntimeError("simulated commit failure")
+        mocker.patch.object(
+            WriteBatch,
+            "_writer",
+            new_callable=mocker.PropertyMock,
+            return_value=failing,
+        )
+
+        batch = backend.batch_update()
+        with pytest.raises(RuntimeError, match="simulated commit failure"):
+            with batch as b:
+                b.add_or_update(doc)
+
+        # Writer disposed despite the commit failure.
+        assert batch._raw_writer is None
+
+        # Drop the patch so a real writer can be created; a fresh batch must
+        # succeed (would raise LockBusy if the previous writer had leaked).
+        mocker.stopall()
+        backend.add_or_update(doc)
+        assert len(backend.search_ids("indexable", user=None)) == 1
 
 
 class TestSearch:
@@ -212,6 +259,183 @@ class TestSearch:
         assert (
             len(backend.search_ids("sswo gu", user=None, search_mode=SearchMode.TITLE))
             == 1
+        )
+
+    @pytest.mark.parametrize(
+        ("search_mode", "query"),
+        [
+            pytest.param(SearchMode.TITLE, "12345", id="title_search"),
+            pytest.param(SearchMode.TEXT, "12345", id="text_search"),
+            pytest.param(SearchMode.QUERY, None, id="query_title_exact"),
+        ],
+    )
+    def test_search_modes_match_model_limit_title_tokens(
+        self,
+        backend: TantivyBackend,
+        search_mode: SearchMode,
+        query: str | None,
+    ) -> None:
+        """Search must keep filename-like title tokens up to the model limit."""
+        long_title = "1234567890" * 12 + "12345678"
+        doc = Document.objects.create(
+            title=long_title,
+            content="ordinary content",
+            checksum="TXT12",
+            pk=18,
+        )
+        backend.add_or_update(doc)
+
+        assert backend.search_ids(
+            query or f"title:{long_title}",
+            user=None,
+            search_mode=search_mode,
+        ) == [doc.pk]
+
+    @pytest.mark.parametrize(
+        ("mode", "title", "content", "hits", "misses"),
+        [
+            pytest.param(
+                SearchMode.QUERY,
+                "CJK document",
+                "東京都の人口は約1400万人です",
+                ["東京", "人口"],
+                ["大阪"],
+                id="query_mode_cjk_content",
+            ),
+            pytest.param(
+                SearchMode.TEXT,
+                "CJK document",
+                "東京都の人口は約1400万人です",
+                ["東京"],
+                ["大阪"],
+                id="text_mode_cjk_content",
+            ),
+            pytest.param(
+                SearchMode.TITLE,
+                "東京都の報告書",
+                "This document is about Tokyo.",
+                ["東京", "報告"],
+                ["大阪"],
+                id="title_mode_cjk_title",
+            ),
+        ],
+    )
+    def test_cjk_search_finds_matching_documents(
+        self,
+        backend: TantivyBackend,
+        mode: SearchMode,
+        title: str,
+        content: str,
+        hits: list[str],
+        misses: list[str],
+    ) -> None:
+        """CJK queries must match documents via bigram fields in all three search modes."""
+        doc = DocumentFactory(title=title, content=content)
+        backend.add_or_update(doc)
+
+        for query in hits:
+            assert len(backend.search_ids(query, user=None, search_mode=mode)) == 1, (
+                f"Expected {query!r} to match in {mode} mode"
+            )
+        for query in misses:
+            assert len(backend.search_ids(query, user=None, search_mode=mode)) == 0, (
+                f"Expected {query!r} not to match in {mode} mode"
+            )
+
+    def test_title_mode_cjk_does_not_match_content_only(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """Title-only CJK search must not return docs where CJK appears only in content."""
+        doc = DocumentFactory(
+            title="Tokyo report",
+            content="東京都の人口は約1400万人です",
+        )
+        backend.add_or_update(doc)
+
+        assert (
+            len(backend.search_ids("東京", user=None, search_mode=SearchMode.TITLE))
+            == 0
+        )
+
+    @pytest.mark.parametrize(
+        ("field", "query", "miss"),
+        [
+            pytest.param("correspondent", "東京", "大阪", id="cjk_correspondent"),
+            pytest.param("document_type", "請求書", "領収書", id="cjk_document_type"),
+            pytest.param("tag", "重要", "普通", id="cjk_tag"),
+        ],
+    )
+    def test_cjk_metadata_search_via_query_mode(
+        self,
+        backend: TantivyBackend,
+        field: str,
+        query: str,
+        miss: str,
+    ) -> None:
+        """CJK in correspondent/document_type/tag names must be searchable via global search."""
+        if field == "correspondent":
+            doc = DocumentFactory(correspondent=CorrespondentFactory(name=query))
+        elif field == "document_type":
+            doc = DocumentFactory(document_type=DocumentTypeFactory(name=query))
+        else:
+            tag = TagFactory(name=query)
+            doc = DocumentFactory()
+            doc.tags.add(tag)
+        backend.add_or_update(doc)
+
+        assert (
+            len(backend.search_ids(query, user=None, search_mode=SearchMode.QUERY)) == 1
+        ), f"Expected CJK {field} name {query!r} to match"
+        assert (
+            len(backend.search_ids(miss, user=None, search_mode=SearchMode.QUERY)) == 0
+        ), f"Expected {miss!r} not to match"
+
+    def test_cjk_text_mode_does_not_leak_field_query_semantics(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """TEXT mode is plain-text over content: a 'field:CJK' input must not be
+        parsed as a structured query against that field. A doc tagged 重要 with
+        no 重要 in its content must NOT match the TEXT-mode query 'tag:重要'."""
+        tag = TagFactory(name="重要")
+        doc = DocumentFactory(title="report", content="just english content")
+        doc.tags.add(tag)
+        backend.add_or_update(doc)
+
+        assert (
+            len(backend.search_ids("tag:重要", user=None, search_mode=SearchMode.TEXT))
+            == 0
+        )
+        # Sanity: the CJK run still matches when it is actually in the content.
+        doc2 = DocumentFactory(title="report2", content="本文に重要な情報")
+        backend.add_or_update(doc2)
+        assert (
+            len(backend.search_ids("tag:重要", user=None, search_mode=SearchMode.TEXT))
+            == 1
+        )
+
+    @pytest.mark.parametrize(
+        "query",
+        [
+            pytest.param("Straße", id="eszett"),
+            pytest.param("Ærøskøbing", id="ae_and_oslash"),
+            pytest.param("strasse", id="ascii_fold_form"),
+        ],
+    )
+    def test_simple_search_folds_special_letters_like_index(
+        self,
+        backend: TantivyBackend,
+        query: str,
+    ) -> None:
+        """Query-side folding must match index-side folding for non-decomposable
+        letters (ß→ss, ø→o, ...). Searching the accented form must find the doc.
+        A naive NFD fold deletes these letters and silently fails to match."""
+        doc = DocumentFactory(title="report", content="Straße Ærøskøbing")
+        backend.add_or_update(doc)
+
+        assert (
+            len(backend.search_ids(query, user=None, search_mode=SearchMode.TEXT)) == 1
         )
 
     def test_sort_field_ascending(self, backend: TantivyBackend) -> None:
@@ -392,6 +616,18 @@ class TestAutocomplete:
 
         results = backend.autocomplete("pay", limit=10)
         assert results.index("payment") < results.index("payslip")
+
+    def test_folds_special_letters_consistently(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """Autocomplete words must fold the same way as content (ß→ss), so a
+        prefix of the folded form finds them. A naive NFD fold would store the
+        word as 'strae' and the prefix 'stras' would never match it."""
+        doc = DocumentFactory(title="Straße", content="details")
+        backend.add_or_update(doc)
+
+        assert "strasse" in backend.autocomplete("stras", limit=10)
 
 
 class TestMoreLikeThis:

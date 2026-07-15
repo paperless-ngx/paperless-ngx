@@ -10,12 +10,12 @@
                 </div>
             </div>
             @for (field of filteredFields; track field.id) {
-                <button class="list-group-item list-group-item-action bg-light" (click)="addField(field)" #button>
+                <button type="button" class="list-group-item list-group-item-action bg-light" (click)="addField(field)" #button>
                     <small class="d-flex">{{field.name}} <small class="ms-auto text-muted">{{getDataTypeLabel(field.data_type)}}</small></small>
                 </button>
             }
             @if (!filterText?.length || filteredFields.length === 0) {
-                <button class="list-group-item list-group-item-action bg-light" (click)="createField(filterText)" [disabled]="!canCreateFields" #button>
+                <button type="button" class="list-group-item list-group-item-action bg-light" (click)="createField(filterText)" [disabled]="!canCreateFields" #button>
                     <small>
                         <i-bs width=".9em" height=".9em" name="asterisk" class="me-1"></i-bs><ng-container i18n>Create new field</ng-container>
                     </small>

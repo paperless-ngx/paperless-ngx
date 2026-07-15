@@ -144,8 +144,8 @@ class RasterisedDocumentParser:
     # Result accessors
     # ------------------------------------------------------------------
 
-    def get_text(self) -> str | None:
-        return self.text
+    def get_text(self) -> str:
+        return self.text or ""
 
     def get_date(self) -> datetime.datetime | None:
         return self.date

@@ -22,7 +22,11 @@ or applicable default will be utilized instead.
 
 ## Required services
 
-### Redis Broker
+### Message Broker
+
+Paperless-ngx uses a Redis-compatible message broker. Any broker that
+speaks the Redis protocol works here, including [Valkey](https://valkey.io/)
+(the default in the bundled Docker Compose files) and Redis itself.
 
 #### [`PAPERLESS_REDIS=<url>`](#PAPERLESS_REDIS) {#PAPERLESS_REDIS}
 
@@ -30,21 +34,21 @@ or applicable default will be utilized instead.
 fetching, index optimization and for training the automatic document
 matcher.
 
-    -   If your Redis server needs login credentials PAPERLESS_REDIS =
+    -   If your broker needs login credentials PAPERLESS_REDIS =
         `redis://<username>:<password>@<host>:<port>`
     -   With the requirepass option PAPERLESS_REDIS =
         `redis://:<password>@<host>:<port>`
-    -   To include the redis database index PAPERLESS_REDIS =
+    -   To include the database index PAPERLESS_REDIS =
         `redis://<username>:<password>@<host>:<port>/<DBIndex>`
 
-    [More information on securing your Redis
-    Instance](https://redis.io/docs/latest/operate/oss_and_stack/management/security).
+    [More information on securing your broker
+    instance](https://valkey.io/topics/security/).
 
     Defaults to `redis://localhost:6379`.
 
 #### [`PAPERLESS_REDIS_PREFIX=<prefix>`](#PAPERLESS_REDIS_PREFIX) {#PAPERLESS_REDIS_PREFIX}
 
-: Prefix to be used in Redis for keys and channels. Useful for sharing one Redis server among multiple Paperless instances.
+: Prefix to be used in the broker for keys and channels. Useful for sharing one broker among multiple Paperless instances.
 
     Defaults to no prefix.
 
@@ -58,13 +62,13 @@ and the relevant connection variables.
 #### [`PAPERLESS_DBENGINE=<engine>`](#PAPERLESS_DBENGINE) {#PAPERLESS_DBENGINE}
 
 : Specifies the database engine to use. Accepted values are `sqlite`, `postgresql`,
-and `mariadb`.
-
-    Defaults to `sqlite` if not set.
+and `mariadb`. PostgreSQL and MariaDB users must set this explicitly.
 
     PostgreSQL and MariaDB both require [`PAPERLESS_DBHOST`](#PAPERLESS_DBHOST) to be
     set. SQLite does not use any other connection variables; the database file is always
     located at `<PAPERLESS_DATA_DIR>/db.sqlite3`.
+
+    Defaults to `sqlite`.
 
     !!! warning
         Using MariaDB comes with some caveats.
@@ -238,7 +242,7 @@ dictionaries; for example, `pool.max_size=20` sets
 
 #### [`PAPERLESS_DB_READ_CACHE_ENABLED=<bool>`](#PAPERLESS_DB_READ_CACHE_ENABLED) {#PAPERLESS_DB_READ_CACHE_ENABLED}
 
-: Caches the database read query results into Redis. This can significantly improve application response times by caching database queries, at the cost of slightly increased memory usage.
+: Caches the database read query results into the broker. This can significantly improve application response times by caching database queries, at the cost of slightly increased memory usage.
 
     Defaults to `false`.
 
@@ -258,18 +262,18 @@ dictionaries; for example, `pool.max_size=20` sets
 
         A high TTL increases memory usage over time. Memory may be used until end of TTL, even if the cache is invalidated with the `invalidate_cachalot` command.
 
-In case of an out-of-memory (OOM) situation, Redis may stop accepting new data — including cache entries, scheduled tasks, and documents to consume.
-If your system has limited RAM, consider configuring a dedicated Redis instance for the read cache, with a memory limit and the eviction policy set to `allkeys-lru`.
-For more details, refer to the [Redis eviction policy documentation](https://redis.io/docs/latest/develop/reference/eviction/), and see the `PAPERLESS_READ_CACHE_REDIS_URL` setting to specify a separate Redis broker.
+In case of an out-of-memory (OOM) situation, the broker may stop accepting new data — including cache entries, scheduled tasks, and documents to consume.
+If your system has limited RAM, consider configuring a dedicated broker instance for the read cache, with a memory limit and the eviction policy set to `allkeys-lru`.
+For more details, refer to the [Redis eviction policy documentation](https://redis.io/docs/latest/develop/reference/eviction/), and see the `PAPERLESS_READ_CACHE_REDIS_URL` setting to specify a separate broker.
 
 #### [`PAPERLESS_READ_CACHE_REDIS_URL=<url>`](#PAPERLESS_READ_CACHE_REDIS_URL) {#PAPERLESS_READ_CACHE_REDIS_URL}
 
-: Defines the Redis instance used for the read cache.
+: Defines the broker instance used for the read cache.
 
     Defaults to `None`.
 
     !!! Note
-    If this value is not set, the same Redis instance used for scheduled tasks will be used for caching as well.
+    If this value is not set, the same broker instance used for scheduled tasks will be used for caching as well.
 
 ## Optional Services
 
@@ -518,7 +522,24 @@ do CORS calls. Set this to your public domain name.
 fail2ban with log entries for failed authorization attempts. Value should be
 IP address(es).
 
+    This setting also controls allauth's
+    [`ALLAUTH_TRUSTED_PROXY_COUNT`](https://docs.allauth.org/en/latest/account/configuration.html),
+    which is set to the number of proxies listed here. Without this,
+    allauth cannot determine the client IP address for rate limiting when
+    running behind a reverse proxy, resulting in a `403 Forbidden` on login.
+
     Defaults to empty string.
+
+#### [`PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER=<header-name>`](#PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER) {#PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER}
+
+: Sets allauth's
+[`ALLAUTH_TRUSTED_CLIENT_IP_HEADER`](https://docs.allauth.org/en/latest/account/configuration.html).
+Use this when your reverse proxy sets a dedicated header for the real
+client IP instead of `X-Forwarded-For`, for example `X-Real-IP` (nginx)
+or `CF-Connecting-IP` (Cloudflare). When set, this takes precedence over
+[`PAPERLESS_TRUSTED_PROXIES`](#PAPERLESS_TRUSTED_PROXIES).
+
+    Defaults to none.
 
 #### [`PAPERLESS_FORCE_SCRIPT_NAME=<path>`](#PAPERLESS_FORCE_SCRIPT_NAME) {#PAPERLESS_FORCE_SCRIPT_NAME}
 
@@ -871,7 +892,7 @@ modes are available:
 
     The default is `auto`.
 
-    For the `skip`, `redo`, and `force` modes, read more about OCR
+    For the `redo` and `force` modes, read more about OCR
     behaviour in the [OCRmyPDF
     documentation](https://ocrmypdf.readthedocs.io/en/latest/advanced.html#when-ocr-is-skipped).
 
@@ -972,7 +993,7 @@ pages being rotated as well.
 
 #### [`PAPERLESS_OCR_OUTPUT_TYPE=<type>`](#PAPERLESS_OCR_OUTPUT_TYPE) {#PAPERLESS_OCR_OUTPUT_TYPE}
 
-: Specify the the type of PDF documents that paperless should produce.
+: Specify the type of PDF documents that paperless should produce.
 
     -   `pdf`: Modify the PDF document as little as possible.
     -   `pdfa`: Convert PDF documents into PDF/A-2b documents, which is
@@ -2014,8 +2035,8 @@ suggestions. This setting is required to be set to true in order to use the AI f
 
 #### [`PAPERLESS_AI_LLM_EMBEDDING_BACKEND=<str>`](#PAPERLESS_AI_LLM_EMBEDDING_BACKEND) {#PAPERLESS_AI_LLM_EMBEDDING_BACKEND}
 
-: The embedding backend to use for RAG. This can be either "openai-like" or "huggingface". The
-"openai-like" backend uses an OpenAI-compatible embeddings API.
+: The embedding backend to use for RAG. This can be "openai-like", "huggingface", or
+"ollama". The "openai-like" backend uses an OpenAI-compatible embeddings API.
 
     Defaults to None.
 
@@ -2023,10 +2044,40 @@ suggestions. This setting is required to be set to true in order to use the AI f
 
 : The model to use for the embedding backend for RAG. This can be set to any of the embedding
 models supported by the current embedding backend. If not supplied, defaults to
-"text-embedding-3-small" for the OpenAI-compatible backend and
-"sentence-transformers/all-MiniLM-L6-v2" for Huggingface.
+"text-embedding-3-small" for the OpenAI-compatible backend,
+"sentence-transformers/all-MiniLM-L6-v2" for Huggingface, and "embeddinggemma" for Ollama.
 
     Defaults to None.
+
+#### [`PAPERLESS_AI_LLM_EMBEDDING_ENDPOINT=<str>`](#PAPERLESS_AI_LLM_EMBEDDING_ENDPOINT) {#PAPERLESS_AI_LLM_EMBEDDING_ENDPOINT}
+
+: The endpoint / url to use for the embedding backend. If not supplied, embeddings use
+`PAPERLESS_AI_LLM_ENDPOINT`.
+
+    Defaults to None.
+
+#### [`PAPERLESS_AI_LLM_EMBEDDING_CHUNK_SIZE=<int>`](#PAPERLESS_AI_LLM_EMBEDDING_CHUNK_SIZE) {#PAPERLESS_AI_LLM_EMBEDDING_CHUNK_SIZE}
+
+: The chunk size to use when splitting document text for RAG embeddings. Lower this value if your
+embedding backend or model rejects larger inputs, or silently truncates inputs in a way that harms
+retrieval quality.
+
+    Defaults to 1024.
+
+#### [`PAPERLESS_AI_LLM_CONTEXT_SIZE=<int>`](#PAPERLESS_AI_LLM_CONTEXT_SIZE) {#PAPERLESS_AI_LLM_CONTEXT_SIZE}
+
+: The context size to use for AI prompts and RAG retrieval. For Ollama backends, this is also sent
+as `num_ctx` so models with very large native context windows are not loaded at their maximum
+context by default.
+
+    Defaults to 8192.
+
+#### [`PAPERLESS_AI_LLM_REQUEST_TIMEOUT=<int>`](#PAPERLESS_AI_LLM_REQUEST_TIMEOUT) {#PAPERLESS_AI_LLM_REQUEST_TIMEOUT}
+
+: The timeout, in seconds, for requests to the configured AI backend. Increase this when using
+local or slow inference servers that need more time to generate responses.
+
+    Defaults to 120.
 
 #### [`PAPERLESS_AI_LLM_BACKEND=<str>`](#PAPERLESS_AI_LLM_BACKEND) {#PAPERLESS_AI_LLM_BACKEND}
 
@@ -2068,13 +2119,19 @@ used with the OpenAI-compatible backend to target a custom provider or local gat
 
     Defaults to None.
 
+### [`PAPERLESS_AI_LLM_OUTPUT_LANGUAGE=<str>`](#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE) {#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE}
+
+: The language to use for AI suggestions (results may vary by LLM model). If not supplied, defaults to the user's UI language setting or None.
+
+    Defaults to None.
+
 #### [`PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS=<bool>`](#PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS) {#PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS}
 
 : If set to false, Paperless blocks AI endpoint URLs that resolve to non-public addresses (e.g., localhost, etc).
 
     Defaults to true, which allows internal endpoints.
 
-#### [`PAPERLESS_AI_LLM_INDEX_TASK_CRON=<cron expression>`](#PAPERLESS_AI_LLM_INDEX_TASK_CRON) {#PAPERLESS_AI_LLM_INDEX_TASK_CRON}
+#### [`PAPERLESS_LLM_INDEX_TASK_CRON=<cron expression>`](#PAPERLESS_LLM_INDEX_TASK_CRON) {#PAPERLESS_LLM_INDEX_TASK_CRON}
 
 : Configures the schedule to update the AI embeddings of text content and metadata for all documents. Only performed if
 AI is enabled and the LLM embedding backend is set.

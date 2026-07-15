@@ -1,20 +1,27 @@
-import json
+from pathlib import Path
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
+import pytest_mock
 from django.test import override_settings
 from django.utils import timezone
-from llama_index.core.base.embeddings.base import BaseEmbedding
+from llama_index.core.schema import MetadataMode
 
 from documents.models import Document
 from documents.models import PaperlessTask
+from documents.signals import document_consumption_finished
+from documents.signals import document_updated
+from documents.tests.factories import DocumentFactory
 from documents.tests.factories import PaperlessTaskFactory
+from paperless.models import ApplicationConfiguration
 from paperless_ai import indexing
+from paperless_ai.tests.conftest import FakeEmbedding
+from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
 
 
 @pytest.fixture
-def real_document(db):
+def real_document(db: None) -> Document:
     return Document.objects.create(
         title="Test Document",
         content="This is some test content.",
@@ -22,93 +29,189 @@ def real_document(db):
     )
 
 
-@pytest.fixture
-def mock_embed_model():
-    fake = FakeEmbedding()
-    with (
-        patch("paperless_ai.indexing.get_embedding_model") as mock_index,
-        patch(
-            "paperless_ai.embedding.get_embedding_model",
-        ) as mock_embedding,
-    ):
-        mock_index.return_value = fake
-        mock_embedding.return_value = fake
-        yield mock_index
-
-
-class FakeEmbedding(BaseEmbedding):
-    # TODO: maybe a better way to do this?
-    def _aget_query_embedding(self, query: str) -> list[float]:
-        return [0.1] * self.get_query_embedding_dim()
-
-    def _get_query_embedding(self, query: str) -> list[float]:
-        return [0.1] * self.get_query_embedding_dim()
-
-    def _get_text_embedding(self, text: str) -> list[float]:
-        return [0.1] * self.get_query_embedding_dim()
-
-    def get_query_embedding_dim(self) -> int:
-        return 384  # Match your real FAISS config
-
-
 @pytest.mark.django_db
-def test_build_document_node(real_document) -> None:
+def test_build_document_node(real_document: Document) -> None:
     nodes = indexing.build_document_node(real_document)
     assert len(nodes) > 0
     assert nodes[0].metadata["document_id"] == str(real_document.id)
+    assert nodes[0].metadata["filename"] == real_document.filename
+    assert nodes[0].metadata["storage_path"] == (
+        real_document.storage_path.name if real_document.storage_path else None
+    )
+    assert (
+        nodes[0].metadata["archive_serial_number"]
+        == real_document.archive_serial_number
+    )
+    assert "filename" in nodes[0].excluded_embed_metadata_keys
+    assert "filename" not in nodes[0].excluded_llm_metadata_keys
+
+
+@pytest.mark.django_db
+def test_build_document_node_sets_ref_doc_id(real_document: Document) -> None:
+    """Every node produced by build_document_node must carry the paperless document id
+    as its ref_doc_id so that the vector store's delete(str(doc.id)) works correctly."""
+    nodes = indexing.build_document_node(real_document)
+    assert len(nodes) > 0, "Expected at least one node"
+    for node in nodes:
+        assert node.ref_doc_id == str(real_document.id), (
+            f"Expected ref_doc_id={real_document.id!r}, got {node.ref_doc_id!r}"
+        )
+
+
+@pytest.mark.django_db
+def test_build_document_node_excludes_metadata_from_embedding(
+    real_document: Document,
+) -> None:
+    """Metadata keys must not be prepended to the embedding text.
+
+    build_llm_index_text already encodes all metadata in the body text, so
+    including it again via llama_index's default MetadataMode.EMBED would
+    double the token count and exceed embedding models with small context
+    windows (e.g. nomic-embed-text via Ollama defaults to num_ctx=2048).
+    """
+    nodes = indexing.build_document_node(real_document)
+    for node in nodes:
+        embed_text = node.get_content(metadata_mode=MetadataMode.EMBED)
+        for key in node.metadata:
+            assert key not in embed_text, (
+                f"Metadata key '{key}' should not appear in embedding text"
+            )
+
+
+@pytest.mark.django_db
+def test_build_document_node_structured_fields_in_metadata(
+    real_document: Document,
+) -> None:
+    """Structured fields must be in node.metadata so the LLM receives them via metadata prepend."""
+    nodes = indexing.build_document_node(real_document)
+    assert len(nodes) > 0
+    for node in nodes:
+        assert "title" in node.metadata
+        assert "tags" in node.metadata
+        assert "correspondent" in node.metadata
+        assert "document_type" in node.metadata
+        assert "created" in node.metadata
+        assert "added" in node.metadata
+        assert "modified" in node.metadata
+
+
+@pytest.mark.django_db
+def test_build_document_node_excludes_document_id_from_llm_context(
+    real_document: Document,
+) -> None:
+    """document_id is an internal key and must not appear in LLM context text."""
+    nodes = indexing.build_document_node(real_document)
+    assert len(nodes) > 0
+    for node in nodes:
+        assert "document_id" in node.excluded_llm_metadata_keys
+        assert "document_id" not in node.get_content(metadata_mode=MetadataMode.LLM)
+
+
+@pytest.mark.django_db
+def test_build_document_node_uses_rag_chunk_settings(real_document: Document) -> None:
+    app_config, _ = ApplicationConfiguration.objects.get_or_create()
+    app_config.llm_embedding_chunk_size = 512
+    app_config.save()
+
+    with patch("llama_index.core.node_parser.SimpleNodeParser") as mock_parser:
+        mock_parser.return_value.get_nodes_from_documents.return_value = []
+
+        indexing.build_document_node(real_document)
+
+        mock_parser.assert_called_once_with(chunk_size=512, chunk_overlap=200)
+
+
+def test_get_rag_chunk_overlap_clamps_to_chunk_size() -> None:
+    with patch("paperless_ai.indexing.RAG_CHUNK_OVERLAP", 128):
+        assert indexing.get_rag_chunk_overlap(64) == 63
+
+
+@pytest.mark.django_db
+def test_get_rag_prompt_helper_uses_context_setting() -> None:
+    app_config, _ = ApplicationConfiguration.objects.get_or_create()
+    app_config.llm_context_size = 4096
+    app_config.save()
+
+    prompt_helper = indexing.get_rag_prompt_helper()
+
+    assert prompt_helper.context_window == 4096
+
+
+def test_truncate_embedding_query_returns_single_chunk() -> None:
+    content = " ".join(f"word{i}" for i in range(200))
+
+    result = indexing.truncate_embedding_query(content, chunk_size=32)
+
+    assert result
+    assert result != content
+    assert "word199" not in result
 
 
 @pytest.mark.django_db
 def test_update_llm_index(
-    temp_llm_index_dir,
-    real_document,
-    mock_embed_model,
+    temp_llm_index_dir: Path,
+    real_document: Document,
+    mock_embed_model: FakeEmbedding,
 ) -> None:
-    with patch("documents.models.Document.objects.all") as mock_all:
+    mock_config = MagicMock()
+    mock_config.llm_embedding_chunk_size = 512
+    with (
+        patch("documents.models.Document.objects.all") as mock_all,
+        patch("paperless_ai.indexing.AIConfig", return_value=mock_config) as ai_config,
+        patch("paperless_ai.indexing.build_document_node") as build_document_node,
+    ):
         mock_queryset = MagicMock()
         mock_queryset.exists.return_value = True
         mock_queryset.__iter__.return_value = iter([real_document])
         mock_all.return_value = mock_queryset
+        build_document_node.return_value = []
         indexing.update_llm_index(rebuild=True)
 
-        assert any(temp_llm_index_dir.glob("*.json"))
+        ai_config.assert_called_once()
+        build_document_node.assert_called_once_with(real_document, chunk_size=512)
 
 
 @pytest.mark.django_db
-def test_update_llm_index_removes_meta(
-    temp_llm_index_dir,
-    real_document,
-    mock_embed_model,
+def test_update_llm_index_rebuilds_on_model_name_change(
+    temp_llm_index_dir: Path,
+    real_document: Document,
+    mock_embed_model: FakeEmbedding,
 ) -> None:
-    # Pre-create a meta.json with incorrect data
-    (temp_llm_index_dir / "meta.json").write_text(
-        json.dumps({"embedding_model": "old", "dim": 1}),
-    )
-
+    # Build initial index with model "model-a".
     with patch("documents.models.Document.objects.all") as mock_all:
         mock_queryset = MagicMock()
         mock_queryset.exists.return_value = True
         mock_queryset.__iter__.return_value = iter([real_document])
         mock_all.return_value = mock_queryset
-        indexing.update_llm_index(rebuild=True)
+        with patch(
+            "paperless_ai.indexing.get_configured_model_name",
+            return_value="model-a",
+        ):
+            indexing.update_llm_index(rebuild=True)
 
-    meta = json.loads((temp_llm_index_dir / "meta.json").read_text())
-    from paperless.config import AIConfig
+    # Simulate config change to "model-b"; the incremental run must force a rebuild.
+    with patch("documents.models.Document.objects.all") as mock_all:
+        mock_queryset = MagicMock()
+        mock_queryset.exists.return_value = True
+        mock_queryset.__iter__.return_value = iter([real_document])
+        mock_all.return_value = mock_queryset
+        with patch(
+            "paperless_ai.indexing.get_configured_model_name",
+            return_value="model-b",
+        ):
+            indexing.update_llm_index(rebuild=False)
 
-    config = AIConfig()
-    expected_model = config.llm_embedding_model or (
-        "text-embedding-3-small"
-        if config.llm_embedding_backend == "openai-like"
-        else "sentence-transformers/all-MiniLM-L6-v2"
-    )
-    assert meta == {"embedding_model": expected_model, "dim": 384}
+    with indexing.get_vector_store() as store:
+        # Schema metadata only updates when the table is dropped and recreated, never
+        # on incremental writes -- so "model-b" here proves a full rebuild happened.
+        assert store.stored_model_name() == "model-b"
 
 
 @pytest.mark.django_db
 def test_update_llm_index_partial_update(
-    temp_llm_index_dir,
-    real_document,
-    mock_embed_model,
+    temp_llm_index_dir: Path,
+    real_document: Document,
+    mock_embed_model: FakeEmbedding,
 ) -> None:
     doc2 = Document.objects.create(
         title="Test Document 2",
@@ -143,130 +246,53 @@ def test_update_llm_index_partial_update(
         mock_queryset.__iter__.return_value = iter([updated_document, doc2, doc3])
         mock_all.return_value = mock_queryset
 
-        # assert logs "Updating LLM index with %d new nodes and removing %d old nodes."
-        with patch("paperless_ai.indexing.logger") as mock_logger:
-            indexing.update_llm_index(rebuild=False)
-            mock_logger.info.assert_called_once_with(
-                "Updating %d nodes in LLM index.",
-                2,
-            )
         indexing.update_llm_index(rebuild=False)
 
-    assert any(temp_llm_index_dir.glob("*.json"))
-
-
-def test_get_or_create_storage_context_raises_exception(
-    temp_llm_index_dir,
-    mock_embed_model,
-) -> None:
-    with pytest.raises(Exception):
-        indexing.get_or_create_storage_context(rebuild=False)
-
-
-@override_settings(
-    LLM_EMBEDDING_BACKEND="huggingface",
-)
-def test_load_or_build_index_builds_when_nodes_given(
-    temp_llm_index_dir,
-    real_document,
-    mock_embed_model,
-) -> None:
-    with (
-        patch(
-            "llama_index.core.load_index_from_storage",
-            side_effect=ValueError("Index not found"),
-        ),
-        patch(
-            "llama_index.core.VectorStoreIndex",
-            return_value=MagicMock(),
-        ) as mock_index_cls,
-        patch(
-            "paperless_ai.indexing.get_or_create_storage_context",
-            return_value=MagicMock(),
-        ) as mock_storage,
-    ):
-        mock_storage.return_value.persist_dir = temp_llm_index_dir
-        indexing.load_or_build_index(
-            nodes=[indexing.build_document_node(real_document)],
+    with indexing.get_vector_store() as store:
+        assert store.table_exists(), (
+            "Expected the vector store table to exist after incremental update"
         )
-        mock_index_cls.assert_called_once()
-
-
-def test_load_or_build_index_raises_exception_when_no_nodes(
-    temp_llm_index_dir,
-    mock_embed_model,
-) -> None:
-    with (
-        patch(
-            "llama_index.core.load_index_from_storage",
-            side_effect=ValueError("Index not found"),
-        ),
-        patch(
-            "paperless_ai.indexing.get_or_create_storage_context",
-            return_value=MagicMock(),
-        ),
-    ):
-        with pytest.raises(Exception):
-            indexing.load_or_build_index()
-
-
-@pytest.mark.django_db
-def test_load_or_build_index_succeeds_when_nodes_given(
-    temp_llm_index_dir,
-    mock_embed_model,
-) -> None:
-    with (
-        patch(
-            "llama_index.core.load_index_from_storage",
-            side_effect=ValueError("Index not found"),
-        ),
-        patch(
-            "llama_index.core.VectorStoreIndex",
-            return_value=MagicMock(),
-        ) as mock_index_cls,
-        patch(
-            "paperless_ai.indexing.get_or_create_storage_context",
-            return_value=MagicMock(),
-        ) as mock_storage,
-    ):
-        mock_storage.return_value.persist_dir = temp_llm_index_dir
-        indexing.load_or_build_index(
-            nodes=[MagicMock()],
-        )
-        mock_index_cls.assert_called_once()
 
 
 @pytest.mark.django_db
 def test_add_or_update_document_updates_existing_entry(
-    temp_llm_index_dir,
-    real_document,
-    mock_embed_model,
+    temp_llm_index_dir: Path,
+    real_document: Document,
+    mock_embed_model: FakeEmbedding,
 ) -> None:
     indexing.update_llm_index(rebuild=True)
     indexing.llm_index_add_or_update_document(real_document)
 
-    assert any(temp_llm_index_dir.glob("*.json"))
+    with indexing.get_vector_store() as store:
+        assert store.table_exists(), (
+            "Expected the vector store table to exist after add-or-update"
+        )
 
 
 @pytest.mark.django_db
-def test_remove_document_deletes_node_from_docstore(
-    temp_llm_index_dir,
-    real_document,
-    mock_embed_model,
+def test_query_after_remove_does_not_raise_key_error(
+    temp_llm_index_dir: Path,
+    real_document: Document,
+    mock_embed_model: FakeEmbedding,
 ) -> None:
     indexing.update_llm_index(rebuild=True)
-    index = indexing.load_or_build_index()
-    assert len(index.docstore.docs) == 1
+
+    query_doc = Document.objects.create(
+        title="Query",
+        content="query content",
+        added=timezone.now(),
+    )
 
     indexing.llm_index_remove_document(real_document)
-    index = indexing.load_or_build_index()
-    assert len(index.docstore.docs) == 0
+
+    result = indexing.query_similar_documents(query_doc, top_k=5)
+    assert isinstance(result, list)
 
 
 @pytest.mark.django_db
 def test_update_llm_index_no_documents(
-    temp_llm_index_dir,
-    mock_embed_model,
+    temp_llm_index_dir: Path,
+    mock_embed_model: FakeEmbedding,
 ) -> None:
     with patch("documents.models.Document.objects.all") as mock_all:
         mock_queryset = MagicMock()
@@ -280,6 +306,22 @@ def test_update_llm_index_no_documents(
             mock_logger.warning.assert_called_once_with(
                 "No documents found to index.",
             )
+
+
+@pytest.mark.django_db
+def test_update_no_documents_no_index_returns_early(
+    temp_llm_index_dir: Path,
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """update with no documents and no existing index must return early."""
+    mock_qs = MagicMock()
+    mock_qs.exists.return_value = False
+    mock_qs.__iter__ = MagicMock(return_value=iter([]))
+    mocker.patch("paperless_ai.indexing.Document.objects.all", return_value=mock_qs)
+
+    result = indexing.update_llm_index(rebuild=False)
+
+    assert result == "No documents found to index."
 
 
 @pytest.mark.django_db
@@ -319,20 +361,17 @@ def test_queue_llm_index_update_if_needed_enqueues_when_idle_or_skips_recent() -
     LLM_BACKEND="ollama",
 )
 def test_query_similar_documents(
-    temp_llm_index_dir,
-    real_document,
+    temp_llm_index_dir: Path,
+    real_document: Document,
 ) -> None:
     with (
-        patch("paperless_ai.indexing.get_or_create_storage_context") as mock_storage,
         patch("paperless_ai.indexing.load_or_build_index") as mock_load_or_build_index,
         patch(
-            "paperless_ai.indexing.vector_store_file_exists",
+            "paperless_ai.indexing.llm_index_exists",
         ) as mock_vector_store_exists,
         patch("llama_index.core.retrievers.VectorIndexRetriever") as mock_retriever_cls,
         patch("paperless_ai.indexing.Document.objects.filter") as mock_filter,
     ):
-        mock_storage.return_value = MagicMock()
-        mock_storage.return_value.persist_dir = temp_llm_index_dir
         mock_vector_store_exists.return_value = True
 
         mock_index = MagicMock()
@@ -364,14 +403,50 @@ def test_query_similar_documents(
         assert result == mock_filtered_docs
 
 
+@override_settings(
+    LLM_EMBEDDING_BACKEND="huggingface",
+    LLM_EMBEDDING_CHUNK_SIZE=32,
+    LLM_BACKEND="ollama",
+)
+def test_query_similar_documents_truncates_query_to_embedding_chunk_size(
+    temp_llm_index_dir: Path,
+    real_document: Document,
+) -> None:
+    real_document.content = " ".join(f"word{i}" for i in range(200))
+    with (
+        patch("paperless_ai.indexing.load_or_build_index") as mock_load_or_build_index,
+        patch(
+            "paperless_ai.indexing.llm_index_exists",
+        ) as mock_vector_store_exists,
+        patch("llama_index.core.retrievers.VectorIndexRetriever") as mock_retriever_cls,
+        patch("paperless_ai.indexing.Document.objects.filter") as mock_filter,
+        patch("paperless_ai.indexing.truncate_content") as mock_truncate_content,
+    ):
+        mock_vector_store_exists.return_value = True
+        mock_load_or_build_index.return_value = MagicMock()
+        mock_truncate_content.return_value = "wrong helper"
+
+        mock_retriever = MagicMock()
+        mock_retriever.retrieve.return_value = []
+        mock_retriever_cls.return_value = mock_retriever
+        mock_filter.return_value = []
+
+        indexing.query_similar_documents(real_document, top_k=3)
+
+        mock_truncate_content.assert_not_called()
+        query_text = mock_retriever.retrieve.call_args.args[0]
+        assert query_text
+        assert "word199" not in query_text
+
+
 @pytest.mark.django_db
 def test_query_similar_documents_triggers_update_when_index_missing(
-    temp_llm_index_dir,
-    real_document,
+    temp_llm_index_dir: Path,
+    real_document: Document,
 ) -> None:
     with (
         patch(
-            "paperless_ai.indexing.vector_store_file_exists",
+            "paperless_ai.indexing.llm_index_exists",
             return_value=False,
         ),
         patch(
@@ -390,3 +465,310 @@ def test_query_similar_documents_triggers_update_when_index_missing(
     )
     mock_load.assert_not_called()
     assert result == []
+
+
+@pytest.mark.django_db
+def test_query_similar_documents_empty_allow_list_fails_closed(
+    real_document: Document,
+) -> None:
+    with (
+        patch(
+            "paperless_ai.indexing.llm_index_exists",
+            return_value=True,
+        ) as mock_vector_store_exists,
+        patch("paperless_ai.indexing.load_or_build_index") as mock_load_or_build_index,
+        patch("llama_index.core.retrievers.VectorIndexRetriever") as mock_retriever_cls,
+    ):
+        result = indexing.query_similar_documents(
+            real_document,
+            document_ids=[],
+        )
+
+    assert result == []
+    mock_vector_store_exists.assert_not_called()
+    mock_load_or_build_index.assert_not_called()
+    mock_retriever_cls.assert_not_called()
+
+
+class TestUpdateLlmIndexEmptyDocumentSet:
+    """update_llm_index must clear the vector store table when all documents are deleted.
+
+    Without this, the stale vectors are never cleared and subsequent similarity
+    searches return phantom hits for document IDs that no longer exist in the DB.
+    """
+
+    @pytest.mark.django_db
+    def test_rebuild_clears_stale_index_when_no_documents_exist(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+    ) -> None:
+        """After deleting all documents, rebuild=True must produce a table with zero rows.
+
+        Steps:
+        1. Build an index with one document so the on-disk state is non-empty.
+        2. Delete all documents from the DB.
+        3. Call update_llm_index(rebuild=True).
+        4. Open the LanceDB table directly and assert zero rows.
+        """
+        # Step 1: create a document and build a non-empty index
+        Document.objects.create(
+            title="Soon-to-be-deleted document",
+            content="Some content that will become a phantom vector.",
+            added=timezone.now(),
+        )
+        indexing.update_llm_index(rebuild=True)
+
+        with indexing.get_vector_store() as store:
+            assert store.table_exists(), (
+                "Precondition failed: expected the vector store table to exist "
+                "before deletion"
+            )
+
+        # Step 2: delete all documents
+        Document.objects.all().delete()
+        assert not Document.objects.exists()
+
+        # Step 3: rebuild with no documents — drop_table is called so the table
+        # is removed (no rows to re-insert, so it stays absent).
+        indexing.update_llm_index(rebuild=True)
+
+        # Step 4: the table must be absent (no rows) — phantom vectors gone
+        with indexing.get_vector_store() as store2:
+            assert not store2.table_exists(), (
+                "Expected the vector store table to be absent after rebuilding "
+                "with no documents"
+            )
+
+
+class TestDocumentUpdatedSignalTriggersLlmReindex:
+    """document_updated must enqueue an LLM index update, just like document_consumption_finished."""
+
+    @pytest.mark.django_db
+    @override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="huggingface")
+    def test_document_updated_enqueues_llm_reindex(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """Firing document_updated should call update_document_in_llm_index.apply_async."""
+        mock_task = mocker.patch("documents.tasks.update_document_in_llm_index")
+
+        doc = DocumentFactory()
+        document_updated.send(sender=object, document=doc)
+
+        mock_task.apply_async.assert_called_once_with(kwargs={"document": doc})
+
+    @pytest.mark.django_db
+    @override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="huggingface")
+    def test_version_addition_consumption_enqueues_llm_index_once(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """When a new version is consumed, the root document must be enqueued exactly once."""
+        mock_task = mocker.patch("documents.tasks.update_document_in_llm_index")
+
+        root_doc = DocumentFactory()
+        document_consumption_finished.send(
+            sender=object,
+            document=root_doc,
+            logging_group=None,
+            classifier=None,
+            original_file=None,
+        )
+        document_updated.send(sender=object, document=root_doc, skip_ai_index=True)
+
+        assert mock_task.apply_async.call_count == 1
+
+
+@pytest.mark.django_db
+class TestLlmIndexAddOrUpdateDocumentEmptyContent:
+    """llm_index_add_or_update_document must handle empty node lists gracefully."""
+
+    def test_returns_without_error_when_build_document_node_returns_empty(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: MagicMock,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """When build_document_node returns [], the function must return without error.
+
+        The store's upsert_document treats an empty node list as a removal (no-op
+        delete), so load_or_build_index must not be called.
+        """
+        mocker.patch(
+            "paperless_ai.indexing.build_document_node",
+            return_value=[],
+        )
+        mock_load = mocker.patch("paperless_ai.indexing.load_or_build_index")
+
+        doc = MagicMock(spec=Document)
+        doc.id = 42
+        # Must not raise
+        indexing.llm_index_add_or_update_document(doc)
+
+        mock_load.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_llm_index_compact_uses_force(
+    temp_llm_index_dir: Path,
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """compact must use force=True to rebuild the table and reclaim space immediately."""
+    mock_store = mocker.MagicMock()
+    mocker.patch(
+        "paperless_ai.indexing.write_store",
+        return_value=mocker.MagicMock(
+            __enter__=mocker.MagicMock(return_value=mock_store),
+            __exit__=mocker.MagicMock(return_value=False),
+        ),
+    )
+
+    indexing.llm_index_compact()
+
+    mock_store.compact.assert_called_once_with(force=True)
+
+
+@pytest.mark.django_db
+class TestLlmIndexLocking:
+    """Index mutation functions must go through write_store(), which holds the lock.
+
+    Without locking, two concurrent Celery workers can open the same store,
+    make independent modifications, and trigger CommitConflictError.
+    """
+
+    def test_add_or_update_document_uses_write_store(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        mock_store = MagicMock()
+        mocker.patch(
+            "paperless_ai.indexing.write_store",
+            return_value=mocker.MagicMock(
+                __enter__=mocker.MagicMock(return_value=mock_store),
+                __exit__=mocker.MagicMock(return_value=False),
+            ),
+        )
+        mock_node = MagicMock()
+        mock_node.get_content.return_value = "fake node text"
+        mocker.patch(
+            "paperless_ai.indexing.build_document_node",
+            return_value=[mock_node],
+        )
+
+        doc = MagicMock(spec=Document)
+        doc.id = 1
+        indexing.llm_index_add_or_update_document(doc)
+
+        mock_store.upsert_document.assert_called_once()
+
+    def test_remove_document_uses_write_store(
+        self,
+        temp_llm_index_dir: Path,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        mock_store = MagicMock()
+        mocker.patch(
+            "paperless_ai.indexing.write_store",
+            return_value=mocker.MagicMock(
+                __enter__=mocker.MagicMock(return_value=mock_store),
+                __exit__=mocker.MagicMock(return_value=False),
+            ),
+        )
+
+        doc = MagicMock(spec=Document)
+        doc.id = 1
+        indexing.llm_index_remove_document(doc)
+
+        mock_store.delete.assert_called_once_with("1")
+
+    def test_update_llm_index_rebuild_uses_write_store(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        mock_store = MagicMock()
+        mocker.patch(
+            "paperless_ai.indexing.write_store",
+            return_value=mocker.MagicMock(
+                __enter__=mocker.MagicMock(return_value=mock_store),
+                __exit__=mocker.MagicMock(return_value=False),
+            ),
+        )
+        mock_qs = MagicMock()
+        mock_qs.exists.return_value = True
+        mock_qs.__iter__ = MagicMock(return_value=iter([]))
+        mocker.patch("paperless_ai.indexing.Document.objects.all", return_value=mock_qs)
+
+        indexing.update_llm_index(rebuild=True)
+
+        mock_store.drop_table.assert_called_once()
+
+
+@pytest.mark.django_db
+@pytest.mark.django_db
+class TestVectorStoreIndexing:
+    def test_get_vector_store_roundtrip(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+    ) -> None:
+        with indexing.get_vector_store() as store:
+            assert isinstance(store, PaperlessSqliteVecVectorStore)
+
+    def test_add_then_remove_document(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+        real_document: Document,
+    ) -> None:
+        indexing.llm_index_add_or_update_document(real_document)
+        with indexing.get_vector_store() as store:
+            assert store.table_exists()
+            count_sql = "SELECT count(*) FROM documents"
+            assert store.client.execute(count_sql).fetchone()[0] >= 1
+
+            indexing.llm_index_remove_document(real_document)
+            assert store.client.execute(count_sql).fetchone()[0] == 0
+
+    def test_update_shrinks_chunks_without_orphans(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+        real_document: Document,
+    ) -> None:
+        real_document.content = "word " * 4000  # many chunks
+        real_document.save()
+        indexing.llm_index_add_or_update_document(real_document)
+        count_sql = "SELECT count(*) FROM documents"
+        with indexing.get_vector_store() as store:
+            big = store.client.execute(count_sql).fetchone()[0]
+
+            real_document.content = "short"  # one chunk
+            real_document.save()
+            indexing.llm_index_add_or_update_document(real_document)
+
+            rows = store.client.execute(count_sql).fetchone()[0]
+            assert rows < big
+            assert rows >= 1
+
+
+@pytest.mark.django_db
+class TestQuerySimilarDocuments:
+    def test_query_similar_documents_respects_allowed_ids(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+    ) -> None:
+        a = DocumentFactory.create(content="alpha shared content here")
+        b = DocumentFactory.create(content="beta shared content here")
+        c = DocumentFactory.create(content="gamma shared content here")
+        for doc in (a, b, c):
+            indexing.llm_index_add_or_update_document(doc)
+
+        results = indexing.query_similar_documents(a, document_ids=[b.id])
+
+        assert all(doc.id == b.id for doc in results)

@@ -94,16 +94,16 @@ first-time setup.
     ```
 
 7.  You can now either ...
-    - install Redis or
+    - install a Redis-compatible broker (e.g. Valkey or Redis) or
 
     - use the included `scripts/start_services.sh` to use Docker to fire
-      up a Redis instance (and some other services such as Tika,
+      up a broker instance (and some other services such as Tika,
       Gotenberg and a database server) or
 
-    - spin up a bare Redis container
+    - spin up a bare broker container
 
       ```bash
-      docker run -d -p 6379:6379 --restart unless-stopped redis:latest
+      docker run -d -p 6379:6379 --restart unless-stopped docker.io/valkey/valkey:9-alpine
       ```
 
 8.  Continue with either back-end or front-end development – or both :-).
@@ -132,7 +132,7 @@ uv run manage.py runserver & \
 ```
 
 You might need the front end to test your back end code.
-This assumes that you have AngularJS installed on your system.
+This assumes that you have Angular installed on your system.
 Go to the [Front end development](#front-end-development) section for further details.
 To build the front end once use this command:
 
@@ -174,7 +174,7 @@ To add a new development package `uv add --dev <package>`
 
 ## Front end development
 
-The front end is built using AngularJS. In order to get started, you need Node.js (version 24+) and
+The front end is built using Angular. In order to get started, you need Node.js (version 24+) and
 `pnpm`.
 
 !!! note
@@ -248,12 +248,12 @@ that authentication is working.
 ## Localization
 
 Paperless-ngx is available in many different languages. Since Paperless-ngx
-consists both of a Django application and an AngularJS front end, both
+consists both of a Django application and an Angular front end, both
 these parts have to be translated separately.
 
 ### Front end localization
 
-- The AngularJS front end does localization according to the [Angular
+- The Angular front end does localization according to the [Angular
   documentation](https://angular.io/guide/i18n).
 - The source language of the project is "en_US".
 - The source strings end up in the file `src-ui/messages.xlf`.
@@ -495,7 +495,7 @@ class MyCustomParser:
         self._tempdir = Path(
             tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
         )
-        self._text: str | None = None
+        self._text: str = ""
         self._archive_path: Path | None = None
 
     def __enter__(self) -> Self:
@@ -553,7 +553,8 @@ def parse(
 **Result accessors**
 
 ```python
-def get_text(self) -> str | None:
+def get_text(self) -> str:
+    # Return the extracted text, or an empty string if none was found.
     return self._text
 
 def get_date(self) -> "datetime.datetime | None":
@@ -684,7 +685,7 @@ class XmlDocumentParser:
     def __init__(self, logging_group: object = None) -> None:
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
         self._tempdir = Path(tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR))
-        self._text: str | None = None
+        self._text: str = ""
 
     def __enter__(self) -> Self:
         return self
@@ -702,7 +703,7 @@ class XmlDocumentParser:
         except ET.ParseError as e:
             raise ParseError(f"XML parse error: {e}") from e
 
-    def get_text(self) -> str | None:
+    def get_text(self) -> str:
         return self._text
 
     def get_date(self):

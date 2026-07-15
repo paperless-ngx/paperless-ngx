@@ -45,11 +45,11 @@ describe('ConsumerStatusService', () => {
 
     httpTestingController = TestBed.inject(HttpTestingController)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = {
+    settingsService.currentUser.set({
       id: 1,
       username: 'testuser',
       is_superuser: false,
-    }
+    })
     websocketStatusService = TestBed.inject(WebsocketStatusService)
     documentService = TestBed.inject(DocumentService)
   })
@@ -356,12 +356,12 @@ describe('ConsumerStatusService', () => {
   })
 
   it('should notify user if user can view or is in group', () => {
-    settingsService.currentUser = {
+    settingsService.currentUser.set({
       id: 1,
       username: 'testuser',
       is_superuser: false,
       groups: [1],
-    }
+    })
     websocketStatusService.connect()
     server.send({
       type: WebsocketStatusType.STATUS_UPDATE,

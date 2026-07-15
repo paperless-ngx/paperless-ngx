@@ -65,6 +65,11 @@ copies you created in the steps above.
 
     Please review the [migration instructions](migration-v3.md) before upgrading Paperless-ngx to v3.0, it includes some breaking changes that require manual intervention before upgrading.
 
+!!! note
+
+    Upgrading to v3 clears the existing task history; previously completed, failed, or
+    acknowledged tasks will no longer appear in the task list afterward. No action is required.
+
 ### Docker Route {#docker-updating}
 
 If a new release of paperless-ngx is available, upgrading depends on how
@@ -499,6 +504,33 @@ task scheduler.
     cd src
     python3 manage.py document_index reindex --if-needed
     ```
+
+### Managing the LLM (AI) index {#llm-index}
+
+When the [AI features](advanced_usage.md#ai-features) are enabled with an embedding
+backend, Paperless-ngx maintains a vector index of your documents used for
+Retrieval-Augmented Generation (RAG), similar-document retrieval, and document chat. The
+index is updated automatically on the schedule set by
+[`PAPERLESS_LLM_INDEX_TASK_CRON`](configuration.md#PAPERLESS_LLM_INDEX_TASK_CRON), but you
+can manage it manually:
+
+```
+document_llmindex {rebuild,update,compact}
+```
+
+Specify `rebuild` to build the index from scratch from all documents in the database. Use
+this the first time you enable the feature, or after changing the embedding backend or
+model.
+
+Specify `update` to incrementally index new and changed documents. This is what the
+scheduled task runs.
+
+Specify `compact` to reclaim space and optimize the on-disk vector store.
+
+!!! note
+
+    These commands have no effect unless AI is enabled and an embedding backend is
+    configured.
 
 ### Clearing the database read cache
 

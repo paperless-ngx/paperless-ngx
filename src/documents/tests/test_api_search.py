@@ -725,9 +725,11 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         GIVEN:
             - One document added right now
         WHEN:
-            - Query with invalid added date
+            - Query with an invalid added date
         THEN:
-            - 400 Bad Request returned (Tantivy rejects invalid date field syntax)
+            - 400 Bad Request with a message naming the malformed date, so the
+              user knows their date is invalid rather than silently getting zero
+              results
         """
         d1 = Document.objects.create(
             title="invoice",
@@ -740,8 +742,9 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
 
         response = self.client.get("/api/documents/?query=added:invalid-date")
 
-        # Tantivy rejects unparsable field queries with a 400
+        # An unparsable date is reported as a malformed query, not silently empty.
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("invalid-date", str(response.data["query"]))
 
     @override_settings(
         TIME_ZONE="UTC",
@@ -987,29 +990,32 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         THEN:
             - The similar documents are returned from the API request
         """
-        d1 = Document.objects.create(
+        # Distinct created/added dates: documents created at the same instant
+        # share a timestamp term, and more_like_this (which cannot be scoped to
+        # content fields) would then match on it, surfacing unrelated documents.
+        d1 = DocumentFactory(
             title="invoice",
             content="the thing i bought at a shop and paid with bank account",
-            checksum="A",
-            pk=1,
+            created=datetime.date(2018, 1, 1),
+            added=timezone.make_aware(datetime.datetime(2018, 1, 1)),
         )
-        d2 = Document.objects.create(
+        d2 = DocumentFactory(
             title="bank statement 1",
             content="things i paid for in august",
-            pk=2,
-            checksum="B",
+            created=datetime.date(2019, 3, 4),
+            added=timezone.make_aware(datetime.datetime(2019, 3, 4)),
         )
-        d3 = Document.objects.create(
+        d3 = DocumentFactory(
             title="bank statement 3",
             content="things i paid for in september",
-            pk=3,
-            checksum="C",
+            created=datetime.date(2020, 7, 9),
+            added=timezone.make_aware(datetime.datetime(2020, 7, 9)),
         )
-        d4 = Document.objects.create(
+        d4 = DocumentFactory(
             title="Quarterly Report",
             content="quarterly revenue profit margin earnings growth",
-            pk=4,
-            checksum="ABC",
+            created=datetime.date(2021, 11, 30),
+            added=timezone.make_aware(datetime.datetime(2021, 11, 30)),
         )
         backend = get_backend()
         backend.add_or_update(d1)

@@ -92,7 +92,7 @@ class DateParserPluginBase(ABC):
                 locales=self.config.languages,
             )
         except Exception as e:
-            logger.error(f"Error while parsing date string '{date_string}': {e}")
+            logger.exception(f"Error while parsing date string '{date_string}': {e}")
             return None
 
     def _filter_date(

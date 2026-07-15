@@ -1,351 +1,75 @@
 from __future__ import annotations
 
+import logging
 from datetime import UTC
-from datetime import date
-from datetime import datetime
-from datetime import timedelta
 from typing import TYPE_CHECKING
 from typing import Final
 
 import regex
 import tantivy
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 
-from documents.search._normalize import ascii_fold
+from documents.search._dates import (
+    _date_only_range,  # noqa: F401 — re-exported for test imports
+)
+from documents.search._dates import (
+    _datetime_range,  # noqa: F401 — re-exported for test imports
+)
+from documents.search._tokenizer import simple_search_tokens
+from documents.search._translate import SearchQueryError
+from documents.search._translate import translate_query
 
 if TYPE_CHECKING:
     from datetime import tzinfo
 
     from django.contrib.auth.base_user import AbstractBaseUser
 
+logger = logging.getLogger("paperless.search")
+
 # Maximum seconds any single regex substitution may run.
 # Prevents ReDoS on adversarial user-supplied query strings.
 _REGEX_TIMEOUT: Final[float] = 1.0
 
-_DATE_ONLY_FIELDS = frozenset({"created"})
-
-_TODAY: Final[str] = "today"
-_YESTERDAY: Final[str] = "yesterday"
-_PREVIOUS_WEEK: Final[str] = "previous week"
-_THIS_MONTH: Final[str] = "this month"
-_PREVIOUS_MONTH: Final[str] = "previous month"
-_THIS_YEAR: Final[str] = "this year"
-_PREVIOUS_YEAR: Final[str] = "previous year"
-_PREVIOUS_QUARTER: Final[str] = "previous quarter"
-
-_DATE_KEYWORDS = frozenset(
-    {
-        _TODAY,
-        _YESTERDAY,
-        _PREVIOUS_WEEK,
-        _THIS_MONTH,
-        _PREVIOUS_MONTH,
-        _THIS_YEAR,
-        _PREVIOUS_YEAR,
-        _PREVIOUS_QUARTER,
-    },
-)
-
-_DATE_KEYWORD_PATTERN = "|".join(
-    sorted((regex.escape(k) for k in _DATE_KEYWORDS), key=len, reverse=True),
-)
-
-_FIELD_DATE_RE = regex.compile(
-    rf"""(?P<field>\w+)\s*:\s*(?:
-    (?P<quote>["'])(?P<quoted>{_DATE_KEYWORD_PATTERN})(?P=quote)
-    |
-    (?P<bare>{_DATE_KEYWORD_PATTERN})(?![\w-])
-)""",
-    regex.IGNORECASE | regex.VERBOSE,
-)
-_COMPACT_DATE_RE = regex.compile(r"\b(\d{14})\b")
-_RELATIVE_RANGE_RE = regex.compile(
-    r"\[now([+-]\d+[dhm])?\s+TO\s+now([+-]\d+[dhm])?\]",
-    regex.IGNORECASE,
-)
-# Whoosh-style relative date range: e.g. [-1 week to now], [-7 days to now]
-_WHOOSH_REL_RANGE_RE = regex.compile(
-    r"\[-(?P<n>\d+)\s+(?P<unit>second|minute|hour|day|week|month|year)s?\s+to\s+now\]",
-    regex.IGNORECASE,
-)
-# Whoosh-style 8-digit date: field:YYYYMMDD — field-aware so timezone can be applied correctly
-_DATE8_RE = regex.compile(r"(?P<field>\w+):(?P<date8>\d{8})\b")
-_SIMPLE_QUERY_TOKEN_RE = regex.compile(r"\S+")
+# Matches CJK/Hangul characters so queries can be routed to bigram fields.
+# Uses Unicode properties to cover all blocks including Extension B+ planes.
+_CJK_RE: Final = regex.compile(r"[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]+")
 
 
-def _fmt(dt: datetime) -> str:
-    """Format a datetime as an ISO 8601 UTC string for use in Tantivy range queries."""
-    return dt.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+def _has_cjk(text: str) -> bool:
+    """Return True if text contains any CJK characters."""
+    return bool(_CJK_RE.search(text))
 
 
-def _iso_range(lo: datetime, hi: datetime) -> str:
-    """Format a [lo TO hi] range string in ISO 8601 for Tantivy query syntax."""
-    return f"[{_fmt(lo)} TO {_fmt(hi)}]"
+def _build_cjk_query(
+    index: tantivy.Index,
+    raw_query: str,
+    fields: list[str],
+) -> tantivy.Query | None:
+    """Build a bigram-field query from the CJK runs in ``raw_query``.
 
-
-def _date_only_range(keyword: str, tz: tzinfo) -> str:
+    Only the CJK character runs are extracted and parsed; ASCII field prefixes,
+    boolean operators and date keywords are discarded. This keeps the CJK clause
+    plain-text and consistent across query/simple modes (no leaked ``field:``
+    semantics, no parse failures from spaced ``-``/``+``), and avoids feeding
+    Latin tokens into the character-bigram matcher (which would produce spurious
+    matches against unrelated Latin text). Returns None when there is no CJK
+    text or the parse fails.
     """
-    For `created` (DateField): use the local calendar date, converted to
-    midnight UTC boundaries. No offset arithmetic — date only.
-    """
-
-    today = datetime.now(tz).date()
-
-    def _quarter_start(d: date) -> date:
-        return date(d.year, ((d.month - 1) // 3) * 3 + 1, 1)
-
-    if keyword == _TODAY:
-        lo = datetime(today.year, today.month, today.day, tzinfo=UTC)
-        return _iso_range(lo, lo + timedelta(days=1))
-    if keyword == _YESTERDAY:
-        y = today - timedelta(days=1)
-        lo = datetime(y.year, y.month, y.day, tzinfo=UTC)
-        hi = datetime(today.year, today.month, today.day, tzinfo=UTC)
-        return _iso_range(lo, hi)
-    if keyword == _PREVIOUS_WEEK:
-        this_mon = today - timedelta(days=today.weekday())
-        last_mon = this_mon - timedelta(weeks=1)
-        lo = datetime(last_mon.year, last_mon.month, last_mon.day, tzinfo=UTC)
-        hi = datetime(this_mon.year, this_mon.month, this_mon.day, tzinfo=UTC)
-        return _iso_range(lo, hi)
-    if keyword == _THIS_MONTH:
-        lo = datetime(today.year, today.month, 1, tzinfo=UTC)
-        if today.month == 12:
-            hi = datetime(today.year + 1, 1, 1, tzinfo=UTC)
-        else:
-            hi = datetime(today.year, today.month + 1, 1, tzinfo=UTC)
-        return _iso_range(lo, hi)
-    if keyword == _PREVIOUS_MONTH:
-        if today.month == 1:
-            lo = datetime(today.year - 1, 12, 1, tzinfo=UTC)
-        else:
-            lo = datetime(today.year, today.month - 1, 1, tzinfo=UTC)
-        hi = datetime(today.year, today.month, 1, tzinfo=UTC)
-        return _iso_range(lo, hi)
-    if keyword == _THIS_YEAR:
-        lo = datetime(today.year, 1, 1, tzinfo=UTC)
-        return _iso_range(lo, datetime(today.year + 1, 1, 1, tzinfo=UTC))
-    if keyword == _PREVIOUS_YEAR:
-        lo = datetime(today.year - 1, 1, 1, tzinfo=UTC)
-        return _iso_range(lo, datetime(today.year, 1, 1, tzinfo=UTC))
-    if keyword == _PREVIOUS_QUARTER:
-        this_quarter = _quarter_start(today)
-        last_quarter = this_quarter - relativedelta(months=3)
-        lo = datetime(
-            last_quarter.year,
-            last_quarter.month,
-            last_quarter.day,
-            tzinfo=UTC,
-        )
-        hi = datetime(
-            this_quarter.year,
-            this_quarter.month,
-            this_quarter.day,
-            tzinfo=UTC,
-        )
-        return _iso_range(lo, hi)
-    raise ValueError(f"Unknown keyword: {keyword}")
-
-
-def _datetime_range(keyword: str, tz: tzinfo) -> str:
-    """
-    For `added` / `modified` (DateTimeField, stored as UTC): convert local day
-    boundaries to UTC — full offset arithmetic required.
-    """
-
-    now_local = datetime.now(tz)
-    today = now_local.date()
-
-    def _midnight(d: date) -> datetime:
-        return datetime(d.year, d.month, d.day, tzinfo=tz).astimezone(UTC)
-
-    def _quarter_start(d: date) -> date:
-        return date(d.year, ((d.month - 1) // 3) * 3 + 1, 1)
-
-    if keyword == _TODAY:
-        return _iso_range(_midnight(today), _midnight(today + timedelta(days=1)))
-    if keyword == _YESTERDAY:
-        y = today - timedelta(days=1)
-        return _iso_range(_midnight(y), _midnight(today))
-    if keyword == _PREVIOUS_WEEK:
-        this_mon = today - timedelta(days=today.weekday())
-        last_mon = this_mon - timedelta(weeks=1)
-        return _iso_range(_midnight(last_mon), _midnight(this_mon))
-    if keyword == _THIS_MONTH:
-        first = today.replace(day=1)
-        if today.month == 12:
-            next_first = date(today.year + 1, 1, 1)
-        else:
-            next_first = date(today.year, today.month + 1, 1)
-        return _iso_range(_midnight(first), _midnight(next_first))
-    if keyword == _PREVIOUS_MONTH:
-        this_first = today.replace(day=1)
-        if today.month == 1:
-            last_first = date(today.year - 1, 12, 1)
-        else:
-            last_first = date(today.year, today.month - 1, 1)
-        return _iso_range(_midnight(last_first), _midnight(this_first))
-    if keyword == _THIS_YEAR:
-        return _iso_range(
-            _midnight(date(today.year, 1, 1)),
-            _midnight(date(today.year + 1, 1, 1)),
-        )
-    if keyword == _PREVIOUS_YEAR:
-        return _iso_range(
-            _midnight(date(today.year - 1, 1, 1)),
-            _midnight(date(today.year, 1, 1)),
-        )
-    if keyword == _PREVIOUS_QUARTER:
-        this_quarter = _quarter_start(today)
-        last_quarter = this_quarter - relativedelta(months=3)
-        return _iso_range(_midnight(last_quarter), _midnight(this_quarter))
-    raise ValueError(f"Unknown keyword: {keyword}")
-
-
-def _rewrite_compact_date(query: str) -> str:
-    """Rewrite Whoosh compact date tokens (14-digit YYYYMMDDHHmmss) to ISO 8601."""
-
-    def _sub(m: regex.Match[str]) -> str:
-        raw = m.group(1)
-        try:
-            dt = datetime(
-                int(raw[0:4]),
-                int(raw[4:6]),
-                int(raw[6:8]),
-                int(raw[8:10]),
-                int(raw[10:12]),
-                int(raw[12:14]),
-                tzinfo=UTC,
-            )
-            return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
-        except ValueError:
-            return str(m.group(0))
-
+    cjk_text = " ".join(_CJK_RE.findall(raw_query))
+    if not cjk_text:
+        return None
     try:
-        return _COMPACT_DATE_RE.sub(_sub, query, timeout=_REGEX_TIMEOUT)
-    except TimeoutError:  # pragma: no cover
-        raise ValueError(
-            "Query too complex to process (compact date rewrite timed out)",
-        )
-
-
-def _rewrite_relative_range(query: str) -> str:
-    """Rewrite Whoosh relative ranges ([now-7d TO now]) to concrete ISO 8601 UTC boundaries."""
-
-    def _sub(m: regex.Match[str]) -> str:
-        now = datetime.now(UTC)
-
-        def _offset(s: str | None) -> timedelta:
-            if not s:
-                return timedelta(0)
-            sign = 1 if s[0] == "+" else -1
-            n, unit = int(s[1:-1]), s[-1]
-            return (
-                sign
-                * {
-                    "d": timedelta(days=n),
-                    "h": timedelta(hours=n),
-                    "m": timedelta(minutes=n),
-                }[unit]
-            )
-
-        lo, hi = now + _offset(m.group(1)), now + _offset(m.group(2))
-        if lo > hi:
-            lo, hi = hi, lo
-        return f"[{_fmt(lo)} TO {_fmt(hi)}]"
-
-    try:
-        return _RELATIVE_RANGE_RE.sub(_sub, query, timeout=_REGEX_TIMEOUT)
-    except TimeoutError:  # pragma: no cover
-        raise ValueError(
-            "Query too complex to process (relative range rewrite timed out)",
-        )
-
-
-def _rewrite_whoosh_relative_range(query: str) -> str:
-    """Rewrite Whoosh-style relative date ranges ([-N unit to now]) to ISO 8601.
-
-    Supports: second, minute, hour, day, week, month, year (singular and plural).
-    Example: ``added:[-1 week to now]`` → ``added:[2025-01-01T… TO 2025-01-08T…]``
-    """
-    now = datetime.now(UTC)
-
-    def _sub(m: regex.Match[str]) -> str:
-        n = int(m.group("n"))
-        unit = m.group("unit").lower()
-        delta_map: dict[str, timedelta | relativedelta] = {
-            "second": timedelta(seconds=n),
-            "minute": timedelta(minutes=n),
-            "hour": timedelta(hours=n),
-            "day": timedelta(days=n),
-            "week": timedelta(weeks=n),
-            "month": relativedelta(months=n),
-            "year": relativedelta(years=n),
-        }
-        lo = now - delta_map[unit]
-        return f"[{_fmt(lo)} TO {_fmt(now)}]"
-
-    try:
-        return _WHOOSH_REL_RANGE_RE.sub(_sub, query, timeout=_REGEX_TIMEOUT)
-    except TimeoutError:  # pragma: no cover
-        raise ValueError(
-            "Query too complex to process (Whoosh relative range rewrite timed out)",
-        )
-
-
-def _rewrite_8digit_date(query: str, tz: tzinfo) -> str:
-    """Rewrite field:YYYYMMDD date tokens to an ISO 8601 day range.
-
-    Runs after ``_rewrite_compact_date`` so 14-digit timestamps are already
-    converted and won't spuriously match here.
-
-    For DateField fields (e.g. ``created``) uses UTC midnight boundaries.
-    For DateTimeField fields (e.g. ``added``, ``modified``) uses local TZ
-    midnight boundaries converted to UTC — matching the ``_datetime_range``
-    behaviour for keyword dates.
-    """
-
-    def _sub(m: regex.Match[str]) -> str:
-        field = m.group("field")
-        raw = m.group("date8")
-        try:
-            year, month, day = int(raw[0:4]), int(raw[4:6]), int(raw[6:8])
-            d = date(year, month, day)
-            if field in _DATE_ONLY_FIELDS:
-                lo = datetime(d.year, d.month, d.day, tzinfo=UTC)
-                hi = lo + timedelta(days=1)
-            else:
-                # DateTimeField: use local-timezone midnight → UTC
-                lo = datetime(d.year, d.month, d.day, tzinfo=tz).astimezone(UTC)
-                hi = datetime(
-                    (d + timedelta(days=1)).year,
-                    (d + timedelta(days=1)).month,
-                    (d + timedelta(days=1)).day,
-                    tzinfo=tz,
-                ).astimezone(UTC)
-            return f"{field}:[{_fmt(lo)} TO {_fmt(hi)}]"
-        except ValueError:
-            return m.group(0)
-
-    try:
-        return _DATE8_RE.sub(_sub, query, timeout=_REGEX_TIMEOUT)
-    except TimeoutError:  # pragma: no cover
-        raise ValueError(
-            "Query too complex to process (8-digit date rewrite timed out)",
-        )
+        return index.parse_query(cjk_text, fields)
+    except Exception:
+        return None
 
 
 def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
     """
     Rewrite natural date syntax to ISO 8601 format for Tantivy compatibility.
 
-    Performs the first stage of query preprocessing, converting various date
-    formats and keywords to ISO 8601 datetime ranges that Tantivy can parse:
-    - Compact 14-digit dates (YYYYMMDDHHmmss)
-    - Whoosh relative ranges ([-7 days to now], [now-1h TO now+2h])
-    - 8-digit dates with field awareness (created:20240115)
-    - Natural keywords (field:today, field:"previous quarter", etc.)
+    Delegates to ``translate_query`` which handles all date forms, comma
+    expansion, field aliasing, relative ranges, and operator normalization.
 
     Args:
         query: Raw user query string
@@ -357,34 +81,15 @@ def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
     Note:
         Bare keywords without field prefixes pass through unchanged.
     """
-    query = _rewrite_compact_date(query)
-    query = _rewrite_whoosh_relative_range(query)
-    query = _rewrite_8digit_date(query, tz)
-    query = _rewrite_relative_range(query)
-
-    def _replace(m: regex.Match[str]) -> str:
-        field = m.group("field")
-        keyword = (m.group("quoted") or m.group("bare")).lower()
-        if field in _DATE_ONLY_FIELDS:
-            return f"{field}:{_date_only_range(keyword, tz)}"
-        return f"{field}:{_datetime_range(keyword, tz)}"
-
-    try:
-        return _FIELD_DATE_RE.sub(_replace, query, timeout=_REGEX_TIMEOUT)
-    except TimeoutError:  # pragma: no cover
-        raise ValueError(
-            "Query too complex to process (date keyword rewrite timed out)",
-        )
+    return translate_query(query, tz)
 
 
 def normalize_query(query: str) -> str:
     """
     Normalize query syntax for better search behavior.
 
-    Expands comma-separated field values to explicit AND clauses and
-    collapses excessive whitespace for cleaner parsing:
-    - tag:foo,bar → tag:foo AND tag:bar
-    - multiple spaces → single spaces
+    Delegates to ``translate_query`` which handles comma expansion, whitespace
+    collapsing, operator normalization, and field aliasing.
 
     Args:
         query: Query string after date rewriting
@@ -392,22 +97,7 @@ def normalize_query(query: str) -> str:
     Returns:
         Normalized query string ready for Tantivy parsing
     """
-
-    def _expand(m: regex.Match[str]) -> str:
-        field = m.group(1)
-        values = [v.strip() for v in m.group(2).split(",") if v.strip()]
-        return " AND ".join(f"{field}:{v}" for v in values)
-
-    try:
-        query = regex.sub(
-            r"(\w+):([^\s\[\]]+(?:,[^\s\[\]]+)+)",
-            _expand,
-            query,
-            timeout=_REGEX_TIMEOUT,
-        )
-        return regex.sub(r" {2,}", " ", query, timeout=_REGEX_TIMEOUT).strip()
-    except TimeoutError:  # pragma: no cover
-        raise ValueError("Query too complex to process (normalization timed out)")
+    return translate_query(query, UTC)
 
 
 def build_permission_filter(
@@ -451,16 +141,24 @@ DEFAULT_SEARCH_FIELDS = [
 ]
 SIMPLE_SEARCH_FIELDS = ["simple_title", "simple_content"]
 TITLE_SEARCH_FIELDS = ["simple_title"]
+_CJK_ALL_FIELDS: Final[list[str]] = [
+    "bigram_content",
+    "bigram_title",
+    "bigram_correspondent",
+    "bigram_document_type",
+    "bigram_tag",
+]
+_CJK_CONTENT_FIELDS: Final[list[str]] = ["bigram_content"]
+_CJK_TITLE_FIELDS: Final[list[str]] = ["bigram_title"]
 _FIELD_BOOSTS = {"title": 2.0}
 _SIMPLE_FIELD_BOOSTS = {"simple_title": 2.0}
 
 
 def _simple_query_tokens(raw_query: str) -> list[str]:
-    tokens = [
-        ascii_fold(token.lower())
-        for token in _SIMPLE_QUERY_TOKEN_RE.findall(raw_query, timeout=_REGEX_TIMEOUT)
-    ]
-    return [token for token in tokens if token]
+    # Tokenize and fold via the same analyzer used to index simple_title /
+    # simple_content, so query terms fold identically to the indexed terms
+    # (single source of truth for ASCII folding).
+    return simple_search_tokens(raw_query)
 
 
 def _build_simple_field_query(
@@ -519,14 +217,36 @@ def parse_user_query(
         as a post-search score filter, not during query construction.
     """
 
-    query_str = rewrite_natural_date_keywords(raw_query, tz)
-    query_str = normalize_query(query_str)
+    try:
+        query_str = translate_query(raw_query, tz)
+    except SearchQueryError:
+        # Intentional, user-fixable error (e.g. an unparsable date). Propagate so
+        # the view can return a 400 with a helpful message rather than falling
+        # back to the raw (still-invalid) query.
+        raise
+    except Exception:  # pragma: no cover - defensive
+        logger.warning("Query translation failed; using raw query", exc_info=True)
+        query_str = raw_query
 
     exact = index.parse_query(
         query_str,
         DEFAULT_SEARCH_FIELDS,
         field_boosts=_FIELD_BOOSTS,
     )
+
+    # The standard analyzer keeps a whitespace-free CJK run as a single token,
+    # so substring queries can't match content/title (and long runs are dropped
+    # by remove_long). Route CJK queries to the bigram fields, whose ngram
+    # tokenizer indexes overlapping 2-grams for substring matching.
+    cjk_query = (
+        _build_cjk_query(index, raw_query, _CJK_ALL_FIELDS)
+        if _has_cjk(raw_query)
+        else None
+    )
+
+    clauses: list[tuple[tantivy.Occur, tantivy.Query]] = [
+        (tantivy.Occur.Should, exact),
+    ]
 
     threshold = settings.ADVANCED_FUZZY_SEARCH_THRESHOLD
     if threshold is not None:
@@ -537,38 +257,51 @@ def parse_user_query(
             # (prefix=True, distance=1, transposition_cost_one=True) — edit-distance fuzziness
             fuzzy_fields={f: (True, 1, True) for f in DEFAULT_SEARCH_FIELDS},
         )
-        return tantivy.Query.boolean_query(
-            [
-                (tantivy.Occur.Should, exact),
-                # 0.1 boost keeps fuzzy hits ranked below exact matches (intentional)
-                (tantivy.Occur.Should, tantivy.Query.boost_query(fuzzy, 0.1)),
-            ],
-        )
+        # 0.1 boost keeps fuzzy hits ranked below exact matches (intentional)
+        clauses.append((tantivy.Occur.Should, tantivy.Query.boost_query(fuzzy, 0.1)))
 
-    return exact
+    if cjk_query is not None:
+        clauses.append((tantivy.Occur.Should, cjk_query))
+
+    if len(clauses) == 1:
+        return exact
+    return tantivy.Query.boolean_query(clauses)
 
 
 def parse_simple_query(
     index: tantivy.Index,
     raw_query: str,
     fields: list[str],
+    cjk_fields: list[str] | None = None,
 ) -> tantivy.Query:
     """
     Parse a plain-text query using Tantivy over a restricted field set.
 
     Query string is escaped and normalized to be treated as "simple" text query.
+    When cjk_fields is provided and the query contains CJK characters, an
+    additional Should clause searches those bigram-tokenized fields, which match
+    CJK substrings the simple analyzer can't (long whitespace-free runs are
+    dropped by remove_long).
     """
     tokens = _simple_query_tokens(raw_query)
-    if not tokens:
-        return tantivy.Query.empty_query()
 
-    field_queries = [
-        (tantivy.Occur.Should, _build_simple_field_query(index, field, tokens))
-        for field in fields
-    ]
-    if len(field_queries) == 1:
-        return field_queries[0][1]
-    return tantivy.Query.boolean_query(field_queries)
+    clauses: list[tuple[tantivy.Occur, tantivy.Query]] = []
+    if tokens:
+        clauses = [
+            (tantivy.Occur.Should, _build_simple_field_query(index, field, tokens))
+            for field in fields
+        ]
+
+    if cjk_fields and _has_cjk(raw_query):
+        cjk_q = _build_cjk_query(index, raw_query, cjk_fields)
+        if cjk_q is not None:
+            clauses.append((tantivy.Occur.Should, cjk_q))
+
+    if not clauses:
+        return tantivy.Query.empty_query()
+    if len(clauses) == 1:
+        return clauses[0][1]
+    return tantivy.Query.boolean_query(clauses)
 
 
 def parse_simple_text_highlight_query(
@@ -581,7 +314,11 @@ def parse_simple_text_highlight_query(
     SnippetGenerator we build a plain term query over the content field instead.
     """
 
-    tokens = _simple_query_tokens(raw_query)
+    # Strip Tantivy operator chars before tokenizing: this is a plain-text
+    # highlight query, not a structured boolean query, so +/- are separators.
+    tokens = _simple_query_tokens(
+        regex.sub(r"[-+]", " ", raw_query, timeout=_REGEX_TIMEOUT),
+    )
     if not tokens:
         return tantivy.Query.empty_query()
 
@@ -596,7 +333,12 @@ def parse_simple_text_query(
     Parse a plain-text query over title/content for simple search inputs.
     """
 
-    return parse_simple_query(index, raw_query, SIMPLE_SEARCH_FIELDS)
+    return parse_simple_query(
+        index,
+        raw_query,
+        SIMPLE_SEARCH_FIELDS,
+        cjk_fields=_CJK_CONTENT_FIELDS,
+    )
 
 
 def parse_simple_title_query(
@@ -607,4 +349,9 @@ def parse_simple_title_query(
     Parse a plain-text query over the title field only.
     """
 
-    return parse_simple_query(index, raw_query, TITLE_SEARCH_FIELDS)
+    return parse_simple_query(
+        index,
+        raw_query,
+        TITLE_SEARCH_FIELDS,
+        cjk_fields=_CJK_TITLE_FIELDS,
+    )

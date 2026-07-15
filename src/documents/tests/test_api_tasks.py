@@ -18,6 +18,7 @@ from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from documents.filters import PaperlessTaskFilterSet
 from documents.models import PaperlessTask
 from documents.tests.factories import DocumentFactory
 from documents.tests.factories import PaperlessTaskFactory
@@ -167,6 +168,165 @@ class TestGetTasksV10:
         assert returned_statuses == {
             PaperlessTask.Status.PENDING,
             PaperlessTask.Status.STARTED,
+        }
+
+    def test_filter_by_task_name(self, admin_client: APIClient) -> None:
+        """?name= searches task filenames, task types, and trigger sources."""
+        filename_task = PaperlessTaskFactory(input_data={"filename": "invoice-123.pdf"})
+        type_task = PaperlessTaskFactory(task_type=PaperlessTask.TaskType.SANITY_CHECK)
+        source_task = PaperlessTaskFactory(
+            trigger_source=PaperlessTask.TriggerSource.EMAIL_CONSUME,
+        )
+        PaperlessTaskFactory(input_data={"filename": "unrelated.pdf"})
+
+        response = admin_client.get(ENDPOINT, {"name": "invoice"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["task_id"] == filename_task.task_id
+
+        response = admin_client.get(ENDPOINT, {"name": "sanity"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["task_id"] == type_task.task_id
+
+        response = admin_client.get(ENDPOINT, {"name": "email"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["task_id"] == source_task.task_id
+
+    def test_filter_by_task_result(self, admin_client: APIClient) -> None:
+        """?result= searches common structured task result messages."""
+        reason_task = PaperlessTaskFactory(result_data={"reason": "Manual review"})
+        error_task = PaperlessTaskFactory(
+            result_data={"error_message": "Duplicate detected"},
+        )
+        document_task = PaperlessTaskFactory(result_data={"document_id": 321})
+        duplicate_task = PaperlessTaskFactory(result_data={"duplicate_of": 123})
+        PaperlessTaskFactory(result_data={"reason": "unrelated"})
+
+        response = admin_client.get(ENDPOINT, {"result": "manual"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["task_id"] == reason_task.task_id
+
+        response = admin_client.get(ENDPOINT, {"result": "duplicate"})
+
+        assert response.status_code == status.HTTP_200_OK
+        returned_ids = {task["task_id"] for task in response.data["results"]}
+        assert returned_ids == {error_task.task_id, duplicate_task.task_id}
+
+        response = admin_client.get(ENDPOINT, {"result": "321"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["task_id"] == document_task.task_id
+
+    def test_empty_task_name_and_result_filters(self) -> None:
+        """Empty name/result values leave the queryset unchanged."""
+        PaperlessTaskFactory.create_batch(2)
+        queryset = PaperlessTask.objects.all()
+        filterset = PaperlessTaskFilterSet()
+
+        assert filterset.filter_name(queryset, "name", "").count() == 2
+        assert filterset.filter_result(queryset, "result", "").count() == 2
+
+    def test_status_counts_respects_filters(self, admin_client: APIClient) -> None:
+        """status_counts/ returns section counts for the filtered task queryset."""
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.FAILURE,
+            input_data={"filename": "invoice-a.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.REVOKED,
+            input_data={"filename": "invoice-b.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.PENDING,
+            input_data={"filename": "invoice-c.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.STARTED,
+            input_data={"filename": "invoice-d.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.SUCCESS,
+            input_data={"filename": "invoice-e.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=True,
+            status=PaperlessTask.Status.SUCCESS,
+            input_data={"filename": "invoice-acknowledged.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.SUCCESS,
+            input_data={"filename": "unrelated.pdf"},
+        )
+
+        response = admin_client.get(
+            f"{ENDPOINT}status_counts/",
+            {"acknowledged": "false", "name": "invoice"},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == {
+            "all": 5,
+            "needs_attention": 2,
+            "in_progress": 2,
+            "completed": 1,
+        }
+
+    def test_status_counts_ignores_section_filters(
+        self,
+        admin_client: APIClient,
+    ) -> None:
+        """status_counts/ ignores status-like filters for the sections it counts."""
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.FAILURE,
+            input_data={"filename": "invoice-a.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.PENDING,
+            input_data={"filename": "invoice-b.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.SUCCESS,
+            input_data={"filename": "invoice-c.pdf"},
+        )
+        PaperlessTaskFactory(
+            acknowledged=False,
+            status=PaperlessTask.Status.FAILURE,
+            input_data={"filename": "unrelated.pdf"},
+        )
+
+        response = admin_client.get(
+            f"{ENDPOINT}status_counts/",
+            {
+                "acknowledged": "false",
+                "name": "invoice",
+                "status": PaperlessTask.Status.FAILURE,
+                "is_complete": "false",
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == {
+            "all": 3,
+            "needs_attention": 1,
+            "in_progress": 1,
+            "completed": 1,
         }
 
     def test_default_ordering_is_newest_first(self, admin_client: APIClient) -> None:
@@ -521,6 +681,27 @@ class TestAcknowledge:
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data == {"result": 2}
+
+    def test_acknowledge_all_returns_count(self, admin_client: APIClient) -> None:
+        """POST acknowledge/ with all=true acknowledges all unacknowledged tasks."""
+        unacknowledged_task1 = PaperlessTaskFactory(acknowledged=False)
+        unacknowledged_task2 = PaperlessTaskFactory(acknowledged=False)
+        acknowledged_task = PaperlessTaskFactory(acknowledged=True)
+
+        response = admin_client.post(
+            ENDPOINT + "acknowledge/",
+            {"all": True},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == {"result": 2}
+        unacknowledged_task1.refresh_from_db()
+        unacknowledged_task2.refresh_from_db()
+        acknowledged_task.refresh_from_db()
+        assert unacknowledged_task1.acknowledged
+        assert unacknowledged_task2.acknowledged
+        assert acknowledged_task.acknowledged
 
     def test_acknowledged_tasks_excluded_from_unacked_filter(
         self,

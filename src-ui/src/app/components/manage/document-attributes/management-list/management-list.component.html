@@ -19,7 +19,7 @@
         </select>
         <span class="input-group-text text-muted d-none d-md-flex" i18n>per page</span>
       </div>
-      <ngb-pagination [pageSize]="pageSize" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
+      <ngb-pagination [pageSize]="pageSize" [collectionSize]="collectionSize()" [page]="page()" [maxSize]="5" (pageChange)="page.set($event); reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
     </div>
   </div>
 
@@ -31,21 +31,21 @@
       <tr>
         <th>
           <div class="form-check m-0 ms-2 me-n2">
-            <input type="checkbox" class="form-check-input" id="all-objects" [(ngModel)]="togggleAll" [disabled]="data.length === 0" (change)="$event.target.checked ? selectPage() : clearSelection(); $event.stopPropagation();">
+            <input type="checkbox" class="form-check-input" id="all-objects" [ngModel]="togggleAll()" [disabled]="data().length === 0" (change)="$event.target.checked ? selectPage() : clearSelection(); $event.stopPropagation();">
             <label class="form-check-label" for="all-objects"></label>
           </div>
         </th>
-        <th class="fw-normal" pngxSortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
-        <th class="fw-normal d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th>
-        <th class="fw-normal" pngxSortable="document_count" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count</th>
+        <th class="fw-normal" pngxSortable="name" [currentSortField]="sortField()" [currentSortReverse]="sortReverse()" (sort)="onSort($event)" i18n>Name</th>
+        <th class="fw-normal d-none d-sm-table-cell" pngxSortable="matching_algorithm" [currentSortField]="sortField()" [currentSortReverse]="sortReverse()" (sort)="onSort($event)" i18n>Matching</th>
+        <th class="fw-normal" pngxSortable="document_count" [currentSortField]="sortField()" [currentSortReverse]="sortReverse()" (sort)="onSort($event)" i18n>Document count</th>
         @for (column of extraColumns; track column) {
-          <th class="fw-normal" [ngClass]="{ 'd-none d-sm-table-cell' : column.hideOnMobile }" pngxSortable="{{column.key}}" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)">{{column.name}}</th>
+          <th class="fw-normal" [ngClass]="{ 'd-none d-sm-table-cell' : column.hideOnMobile }" pngxSortable="{{column.key}}" [currentSortField]="sortField()" [currentSortReverse]="sortReverse()" (sort)="onSort($event)">{{column.name}}</th>
         }
         <th class="fw-normal" i18n>Actions</th>
       </tr>
     </thead>
     <tbody>
-      @if (loading && data.length === 0) {
+      @if (loading() && data().length === 0) {
         <tr>
           <td colspan="5">
             <div class="spinner-border spinner-border-sm me-2" role="status"></div>
@@ -53,31 +53,31 @@
           </td>
         </tr>
       }
-      @for (object of data; track object) {
+      @for (object of data(); track object) {
         <ng-container [ngTemplateOutlet]="objectRow" [ngTemplateOutletContext]="{ object: object, depth: 0 }"></ng-container>
       }
     </tbody>
   </table>
 </div>
 
-@if (!loading || data.length > 0) {
+@if (!loading() || data().length > 0) {
   <div class="d-flex mb-2">
-    @if (displayCollectionSize > 0) {
+    @if (displayCollectionSize() > 0) {
       <div>
-        <ng-container i18n>{displayCollectionSize, plural, =1 {One {{typeName}}} other {{{displayCollectionSize || 0}} total {{typeNamePlural}}}}</ng-container>
+        <ng-container i18n>{displayCollectionSize(), plural, =1 {One {{typeName}}} other {{{displayCollectionSize() || 0}} total {{typeNamePlural}}}}</ng-container>
         @if (hasSelection) {
           &nbsp;({{selectedCount}} selected)
         }
       </div>
     }
-    @if (collectionSize > 20) {
-      <ngb-pagination class="ms-auto" [pageSize]="pageSize" [collectionSize]="collectionSize" [(page)]="page" [maxSize]="5" (pageChange)="reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
+    @if (collectionSize() > 20) {
+      <ngb-pagination class="ms-auto" [pageSize]="pageSize" [collectionSize]="collectionSize()" [page]="page()" [maxSize]="5" (pageChange)="page.set($event); reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
     }
   </div>
 }
 
 <ng-template #objectRow let-object="object" let-depth="depth">
-  <tr (click)="toggleSelected(object); $event.stopPropagation();" class="data-row fade" [class.show]="show">
+  <tr (click)="toggleSelected(object); $event.stopPropagation();" class="data-row fade" [class.show]="show()">
     <td>
       <div class="form-check m-0 ms-2 me-n2">
         <input type="checkbox" class="form-check-input" id="{{typeName}}{{object.id}}" [checked]="selectedObjects.has(object.id)" (click)="toggleSelected(object); $event.stopPropagation();">

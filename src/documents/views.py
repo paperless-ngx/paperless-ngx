@@ -12,6 +12,7 @@ from datetime import timedelta
 from http import HTTPStatus
 from pathlib import Path
 from time import mktime
+from time import sleep
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Literal
@@ -67,7 +68,6 @@ from django.views import View
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import condition
-from django.views.decorators.http import last_modified
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.openapi import AutoSchema
@@ -124,6 +124,7 @@ from documents.conditionals import preview_etag
 from documents.conditionals import preview_last_modified
 from documents.conditionals import suggestions_etag
 from documents.conditionals import suggestions_last_modified
+from documents.conditionals import thumbnail_etag
 from documents.conditionals import thumbnail_last_modified
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
@@ -240,6 +241,7 @@ from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
 from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.chat import stream_chat_with_documents
+from paperless_ai.exceptions import LLMTimeoutError
 from paperless_ai.matching import extract_unmatched_names
 from paperless_ai.matching import match_correspondents_by_name
 from paperless_ai.matching import match_document_types_by_name
@@ -1400,7 +1402,7 @@ class DocumentViewSet(
         )
         if request.user is not None and not has_perms_owner_aware(
             request.user,
-            "view_document",
+            "change_document",
             doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
@@ -1460,7 +1462,7 @@ class DocumentViewSet(
         )
         if request.user is not None and not has_perms_owner_aware(
             request.user,
-            "view_document",
+            "change_document",
             doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
@@ -1469,9 +1471,25 @@ class DocumentViewSet(
         if not ai_config.ai_enabled:
             return HttpResponseBadRequest("AI is required for this feature")
 
+        output_language = ai_config.llm_output_language
+        if (
+            not output_language
+            and hasattr(request.user, "ui_settings")
+            and isinstance(
+                request.user.ui_settings.settings,
+                dict,
+            )
+        ):
+            output_language = request.user.ui_settings.settings.get("language") or None
+        llm_cache_backend = (
+            f"{ai_config.llm_backend}:{output_language}"
+            if output_language
+            else ai_config.llm_backend
+        )
+
         cached_llm_suggestions = get_llm_suggestion_cache(
             doc.pk,
-            backend=ai_config.llm_backend,
+            backend=llm_cache_backend,
         )
 
         if cached_llm_suggestions:
@@ -1479,7 +1497,11 @@ class DocumentViewSet(
             return Response(cached_llm_suggestions.suggestions)
 
         try:
-            llm_suggestions = get_ai_document_classification(doc, request.user)
+            llm_suggestions = get_ai_document_classification(
+                doc,
+                request.user,
+                output_language,
+            )
         except ValueError as exc:
             logger.exception(
                 "Invalid AI configuration while generating suggestions for "
@@ -1489,6 +1511,17 @@ class DocumentViewSet(
                 exc_info=True,
             )
             raise ValidationError({"ai": [_("Invalid AI configuration.")]}) from exc
+        except LLMTimeoutError as exc:
+            logger.exception(
+                "AI backend timed out while generating suggestions for document %s: %s",
+                doc.pk,
+                exc,
+                exc_info=True,
+            )
+            return Response(
+                {"ai": [_("AI backend request timed out.")]},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
 
         matched_tags = match_tags_by_name(
             llm_suggestions.get("tags", []),
@@ -1532,7 +1565,7 @@ class DocumentViewSet(
             "dates": llm_suggestions.get("dates", []),
         }
 
-        set_llm_suggestions_cache(doc.pk, resp_data, backend=ai_config.llm_backend)
+        set_llm_suggestions_cache(doc.pk, resp_data, backend=llm_cache_backend)
 
         return Response(resp_data)
 
@@ -1542,7 +1575,7 @@ class DocumentViewSet(
         condition(etag_func=preview_etag, last_modified_func=preview_last_modified),
     )
     def preview(self, request, pk=None):
-        resolved = self._resolve_request_and_root_doc(pk, request)
+        resolved = self._resolve_request_and_root_doc(pk, request, include_deleted=True)
         if isinstance(resolved, HttpResponseForbidden):
             return resolved
 
@@ -1564,9 +1597,14 @@ class DocumentViewSet(
 
     @action(methods=["get"], detail=True, filter_backends=[])
     @method_decorator(cache_control(no_cache=True))
-    @method_decorator(last_modified(thumbnail_last_modified))
+    @method_decorator(
+        condition(
+            etag_func=thumbnail_etag,
+            last_modified_func=thumbnail_last_modified,
+        ),
+    )
     def thumb(self, request, pk=None):
-        resolved = self._resolve_request_and_root_doc(pk, request)
+        resolved = self._resolve_request_and_root_doc(pk, request, include_deleted=True)
         if isinstance(resolved, HttpResponseForbidden):
             return resolved
 
@@ -1653,7 +1691,7 @@ class DocumentViewSet(
                     )
 
                 doc.modified = timezone.now()
-                doc.save()
+                doc.save(update_fields=["modified"])
 
                 from documents.search import get_backend
 
@@ -1697,7 +1735,7 @@ class DocumentViewSet(
             note.delete()
 
             doc.modified = timezone.now()
-            doc.save()
+            doc.save(update_fields=["modified"])
 
             from documents.search import get_backend
 
@@ -2133,7 +2171,7 @@ class DocumentViewSet(
 
 
 class ChatStreamingSerializer(serializers.Serializer[dict[str, Any]]):
-    q = serializers.CharField(required=True)
+    q = serializers.CharField(required=True, max_length=4000)
     document_id = serializers.IntegerField(required=False, allow_null=True)
 
 
@@ -2145,7 +2183,7 @@ class ChatStreamingSerializer(serializers.Serializer[dict[str, Any]]):
     name="dispatch",
 )
 class ChatStreamingView(GenericAPIView[Any]):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, ViewDocumentsPermissions)
     serializer_class = ChatStreamingSerializer
 
     def post(self, request, *args, **kwargs):
@@ -2154,12 +2192,11 @@ class ChatStreamingView(GenericAPIView[Any]):
         if not ai_config.ai_enabled:
             return HttpResponseBadRequest("AI is required for this feature")
 
-        try:
-            question = request.data["q"]
-        except KeyError:
-            return HttpResponseBadRequest("Invalid request")
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        question = serializer.validated_data["q"]
 
-        doc_id = request.data.get("document_id")
+        doc_id = serializer.validated_data.get("document_id")
 
         if doc_id:
             try:
@@ -2252,6 +2289,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
             return super().list(request)
 
         from documents.search import SearchHit
+        from documents.search import SearchQueryError
         from documents.search import TantivyBackend
         from documents.search import TantivyRelevanceList
         from documents.search import get_backend
@@ -2444,6 +2482,11 @@ class UnifiedSearchViewSet(DocumentViewSet):
             return HttpResponseForbidden(_("Insufficient permissions."))
         except ValidationError:
             raise
+        except SearchQueryError as e:
+            # User-fixable query error (e.g. an unparsable date): surface the
+            # specific message so the user can correct it, rather than a generic
+            # 400 or silently empty results.
+            raise ValidationError({"query": [str(e)]}) from e
         except Exception as e:
             logger.warning(f"An error occurred listing search results: {e!s}")
             return HttpResponseBadRequest(
@@ -3102,6 +3145,7 @@ class PostDocumentView(GenericAPIView[Any]):
         serializer.is_valid(raise_exception=True)
 
         doc_name, doc_data = serializer.validated_data.get("document")
+        doc_name = normalize("NFC", doc_name)
         correspondent_id = serializer.validated_data.get("correspondent")
         document_type_id = serializer.validated_data.get("document_type")
         storage_path_id = serializer.validated_data.get("storage_path")
@@ -3614,7 +3658,7 @@ class StatisticsView(GenericAPIView[Any]):
                 "documents.view_document",
                 Document,
             )
-        )
+        ).filter(root_document__isnull=True)
         tags = (
             Tag.objects.all()
             if can_view_global_stats
@@ -3725,13 +3769,20 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
             validated_data=serializer.validated_data,
         )
         documents = Document.objects.filter(pk__in=ids)
+        versioned_documents = []
         compression = serializer.validated_data.get("compression")
         content = serializer.validated_data.get("content")
         follow_filename_format = serializer.validated_data.get("follow_formatting")
 
         for document in documents:
-            if not has_perms_owner_aware(request.user, "change_document", document):
+            root_doc = get_root_document(document)
+            if not has_perms_owner_aware(request.user, "view_document", root_doc):
                 return HttpResponseForbidden("Insufficient permissions")
+            versioned_documents.append(
+                get_latest_version_for_root(
+                    root_doc,
+                ),
+            )
 
         if content == "both":
             strategy_class = OriginalAndArchiveStrategy
@@ -3754,7 +3805,7 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
                     zipf,
                     follow_formatting=follow_filename_format,
                 )
-                for document in documents:
+                for document in versioned_documents:
                     strategy.add_document(document)
 
             f = temp_path.open("rb")
@@ -3987,7 +4038,7 @@ class RemoteVersionView(GenericAPIView[Any]):
 
 
 class _TasksViewSetSchema(AutoSchema):
-    _UNPAGINATED_ACTIONS = frozenset({"summary", "active"})
+    _UNPAGINATED_ACTIONS = frozenset({"summary", "active", "status_counts"})
 
     def _get_paginator(self):
         if getattr(self.view, "action", None) in self._UNPAGINATED_ACTIONS:
@@ -4009,7 +4060,7 @@ class _TasksViewSetSchema(AutoSchema):
     ),
     acknowledge=extend_schema(
         operation_id="acknowledge_tasks",
-        description="Acknowledge a list of tasks",
+        description="Acknowledge a list of tasks, or all visible unacknowledged tasks",
         request=AcknowledgeTasksViewSerializer,
         responses={
             (200, "application/json"): inline_serializer(
@@ -4046,6 +4097,19 @@ class _TasksViewSetSchema(AutoSchema):
                 description="Number of days to include in aggregation (default 30, min 1, max 365)",
             ),
         ],
+    ),
+    status_counts=extend_schema(
+        responses={
+            200: inline_serializer(
+                name="TaskStatusCounts",
+                fields={
+                    "all": serializers.IntegerField(),
+                    "needs_attention": serializers.IntegerField(),
+                    "in_progress": serializers.IntegerField(),
+                    "completed": serializers.IntegerField(),
+                },
+            ),
+        },
     ),
     active=extend_schema(
         description="Currently pending and running tasks (capped at 50).",
@@ -4100,6 +4164,7 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
         PaperlessTask.TaskType.SANITY_CHECK: (sanity_check, {"raise_on_error": False}),
         PaperlessTask.TaskType.LLM_INDEX: (llmindex_index, {"rebuild": False}),
     }
+    _STATUS_COUNT_EXCLUDED_FILTERS = frozenset({"status", "is_complete"})
 
     def get_serializer_class(self):
         # v9: use backwards-compatible serializer with old field names
@@ -4140,16 +4205,38 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
             queryset = queryset.filter(task_id=task_id)
         return queryset
 
+    def get_status_count_queryset(self):
+        """Apply task filters except the status dimensions represented by the counts."""
+        query_params = self.request.query_params.copy()
+        for param in self._STATUS_COUNT_EXCLUDED_FILTERS:
+            query_params.pop(param, None)
+
+        filterset = self.filterset_class(
+            data=query_params,
+            queryset=self.get_queryset(),
+            request=self.request,
+        )
+        if not filterset.is_valid():
+            raise ValidationError(filterset.errors)
+        return filterset.qs
+
     @action(
         methods=["post"],
         detail=False,
         permission_classes=[IsAuthenticated, AcknowledgeTasksPermissions],
     )
     def acknowledge(self, request):
-        serializer = AcknowledgeTasksViewSerializer(data=request.data)
+        queryset = self.get_queryset()
+        serializer = AcknowledgeTasksViewSerializer(
+            data=request.data,
+            context={"queryset": queryset},
+        )
         serializer.is_valid(raise_exception=True)
-        task_ids = serializer.validated_data.get("tasks")
-        tasks = self.get_queryset().filter(id__in=task_ids)
+        if serializer.validated_data.get("all", False):
+            tasks = queryset.filter(acknowledged=False)
+        else:
+            task_ids = serializer.validated_data.get("tasks")
+            tasks = queryset.filter(id__in=task_ids)
         count = tasks.update(acknowledged=True)
         return Response({"result": count})
 
@@ -4201,6 +4288,34 @@ class TasksViewSet(ReadOnlyModelViewSet[PaperlessTask]):
         )
         serializer = TaskSummarySerializer(data, many=True)
         return Response(serializer.data)
+
+    @action(methods=["get"], detail=False)
+    def status_counts(self, request):
+        """Aggregated task counts for task UI sections."""
+        queryset = self.get_status_count_queryset()
+        counts = queryset.aggregate(
+            all=Count("id"),
+            needs_attention=Count(
+                "id",
+                filter=Q(
+                    status__in=[
+                        PaperlessTask.Status.FAILURE,
+                        PaperlessTask.Status.REVOKED,
+                    ],
+                ),
+            ),
+            in_progress=Count(
+                "id",
+                filter=Q(
+                    status__in=[
+                        PaperlessTask.Status.PENDING,
+                        PaperlessTask.Status.STARTED,
+                    ],
+                ),
+            ),
+            completed=Count("id", filter=Q(status=PaperlessTask.Status.SUCCESS)),
+        )
+        return Response(counts)
 
     @action(methods=["get"], detail=False)
     def active(self, request):
@@ -4901,11 +5016,29 @@ class SystemStatusView(PassUserMixin):
         celery_error = None
         celery_url = None
         try:
-            celery_ping = celery_app.control.inspect().ping()
-            celery_url = next(iter(celery_ping.keys()))
-            first_worker_ping = celery_ping[celery_url]
-            if first_worker_ping["ok"] == "pong":
-                celery_active = "OK"
+            celery_ping = None
+            for ping_attempt in range(3):
+                celery_ping = celery_app.control.inspect().ping()
+                if celery_ping:
+                    break
+                if ping_attempt < 2:
+                    sleep(0.25)
+
+            if not celery_ping:
+                celery_active = "WARNING"
+                celery_error = (
+                    "No celery workers responded to ping. This may be temporary."
+                )
+            else:
+                celery_url, first_worker_ping = next(iter(celery_ping.items()))
+                if (
+                    isinstance(first_worker_ping, dict)
+                    and first_worker_ping.get("ok") == "pong"
+                ):
+                    celery_active = "OK"
+                else:
+                    celery_active = "WARNING"
+                    celery_error = "Celery worker responded unexpectedly."
         except Exception as e:
             celery_active = "ERROR"
             logger.exception(

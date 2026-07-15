@@ -36,6 +36,7 @@ import {
   CustomFieldQueryExpression,
 } from 'src/app/utils/custom-field-query-element'
 import { pngxPopperOptions } from 'src/app/utils/popper-options'
+import { matchesSearchText } from 'src/app/utils/text-search'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 import { DocumentLinkComponent } from '../input/document-link/document-link.component'
@@ -280,6 +281,14 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
   customFields: CustomField[] = []
 
   public readonly today: string = new Date().toLocaleDateString('en-CA')
+
+  public customFieldSearchFn = (term: string, field: CustomField): boolean =>
+    matchesSearchText(field?.name, term)
+
+  public selectOptionSearchFn = (
+    term: string,
+    option: { id: string; label: string }
+  ): boolean => matchesSearchText(option?.label, term)
 
   constructor() {
     super()

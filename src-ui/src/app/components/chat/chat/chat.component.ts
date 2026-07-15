@@ -155,7 +155,10 @@ export class ChatComponent implements OnInit {
   }
 
   public searchInputKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Enter') {
+    if (
+      event.key === 'Enter' &&
+      !(event.isComposing || event.keyCode === 229)
+    ) {
       event.preventDefault()
       this.sendMessage()
     }

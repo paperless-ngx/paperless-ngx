@@ -209,12 +209,11 @@ def parse_db_settings(data_dir: Path) -> dict[str, dict[str, Any]]:
     Returns:
         A databases dict suitable for Django DATABASES setting.
     """
-    try:
-        engine = get_choice_from_env(
-            "PAPERLESS_DBENGINE",
-            {"sqlite", "postgresql", "mariadb"},
-        )
-    except ValueError:
+    engine = get_choice_from_env(
+        "PAPERLESS_DBENGINE",
+        {"sqlite", "postgresql", "mariadb"},
+    )
+    if engine is None:
         # MariaDB users already had to set PAPERLESS_DBENGINE, so it was picked up above
         # SQLite users didn't need to set anything
         engine = "postgresql" if "PAPERLESS_DBHOST" in os.environ else "sqlite"
@@ -253,6 +252,9 @@ def parse_db_settings(data_dir: Path) -> dict[str, dict[str, Any]]:
                 "NAME": os.getenv("PAPERLESS_DBNAME", "paperless"),
                 "USER": os.getenv("PAPERLESS_DBUSER", "paperless"),
                 "PASSWORD": os.getenv("PAPERLESS_DBPASS", "paperless"),
+                # Validate pooled connections so a connection closed server-side
+                # is replaced rather than handed out as "the connection is closed".
+                "CONN_HEALTH_CHECKS": True,
             }
 
             base_options = {
