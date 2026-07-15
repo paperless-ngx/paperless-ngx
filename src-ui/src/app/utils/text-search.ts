@@ -1,12 +1,7 @@
 import { normalizeSync } from 'normalize-diacritics'
 
 export type SearchTextValue =
-  | string
-  | number
-  | boolean
-  | bigint
-  | null
-  | undefined
+  string | number | boolean | bigint | null | undefined
 
 export function normalizeSearchText(value: SearchTextValue): string {
   return normalizeSync(String(value ?? '')).toLocaleLowerCase()

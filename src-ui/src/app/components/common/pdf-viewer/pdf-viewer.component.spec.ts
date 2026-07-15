@@ -49,8 +49,7 @@ describe('PngxPdfViewerComponent', () => {
       new URL('assets/js/pdf.worker.min.mjs', document.baseURI).toString()
     )
     const isVisible = (component as any).findController.onIsPageVisible as
-      | (() => boolean)
-      | undefined
+      (() => boolean) | undefined
     expect(isVisible?.()).toBe(true)
     expect(loadSpy).toHaveBeenCalledWith(
       expect.objectContaining({ numPages: 1 })
