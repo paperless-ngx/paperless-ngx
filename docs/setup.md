@@ -142,7 +142,7 @@ a [superuser](usage.md#superusers) account.
 
     It is not possible to run the container rootless if additional languages are specified via `PAPERLESS_OCR_LANGUAGES`.
 
-If you want to run Paperless as a rootless container, set `user:` in `docker-compose.yml` to the UID and GID of your host user (use `id -u` and `id -g` to find these values). The container process starts directly as that user with no internal privilege remapping:
+If you want to run Paperless as a rootless container, set `user:` in `docker-compose.yml` to the UID and GID of your host user (use `id -u` and `id -g` to find these values). The container process starts directly as that user with no internal privilege remapping. Any UID and GID is supported:
 
 ```yaml
 webserver:
