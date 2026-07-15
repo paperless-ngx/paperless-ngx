@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core'
+import { Injectable, inject, signal } from '@angular/core'
 import { Subject } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { User } from '../data/user'
@@ -106,7 +106,7 @@ export class WebsocketStatusService {
 
   private statusWebSocket: WebSocket
 
-  private consumerStatus: FileStatus[] = []
+  private readonly consumerStatus = signal<FileStatus[]>([])
 
   private readonly documentDetectedSubject = new Subject<FileStatus>()
   private readonly documentConsumptionFinishedSubject =
@@ -119,14 +119,14 @@ export class WebsocketStatusService {
 
   private get(taskId: string, filename?: string) {
     let status =
-      this.consumerStatus.find((e) => e.taskId == taskId) ||
-      this.consumerStatus.find(
+      this.consumerStatus().find((e) => e.taskId == taskId) ||
+      this.consumerStatus().find(
         (e) => e.filename == filename && e.taskId == null
       )
     let created = false
     if (!status) {
       status = new FileStatus()
-      this.consumerStatus.push(status)
+      this.consumerStatus.update((statuses) => [...statuses, status])
       created = true
     }
     status.taskId = taskId
@@ -137,24 +137,30 @@ export class WebsocketStatusService {
   newFileUpload(filename: string): FileStatus {
     let status = new FileStatus()
     status.filename = filename
-    this.consumerStatus.push(status)
+    this.consumerStatus.update((statuses) => [...statuses, status])
     return status
+  }
+
+  statusChanged() {
+    this.consumerStatus.update((statuses) => [...statuses])
   }
 
   getConsumerStatus(phase?: FileStatusPhase) {
     if (phase != null) {
-      return this.consumerStatus.filter((s) => s.phase == phase)
+      return this.consumerStatus().filter((s) => s.phase == phase)
     } else {
-      return this.consumerStatus
+      return this.consumerStatus()
     }
   }
 
   getConsumerStatusNotCompleted() {
-    return this.consumerStatus.filter((s) => s.phase < FileStatusPhase.SUCCESS)
+    return this.consumerStatus().filter(
+      (s) => s.phase < FileStatusPhase.SUCCESS
+    )
   }
 
   getConsumerStatusCompleted() {
-    return this.consumerStatus.filter(
+    return this.consumerStatus().filter(
       (s) =>
         s.phase == FileStatusPhase.FAILED || s.phase == FileStatusPhase.SUCCESS
     )
@@ -211,7 +217,7 @@ export class WebsocketStatusService {
     groups_can_view?: number[]
   }): boolean {
     // see paperless.consumers.StatusConsumer._can_view
-    const user: User = this.settingsService.currentUser
+    const user: User = this.settingsService.currentUser()
     return (
       !messageData.owner_id ||
       user.is_superuser ||
@@ -250,6 +256,7 @@ export class WebsocketStatusService {
     if (messageData.status in FileStatusPhase) {
       status.phase = FileStatusPhase[messageData.status]
     }
+    this.statusChanged()
 
     switch (status.phase) {
       case FileStatusPhase.STARTED:
@@ -281,6 +288,7 @@ export class WebsocketStatusService {
   fail(status: FileStatus, message: string) {
     status.message = message
     status.phase = FileStatusPhase.FAILED
+    this.statusChanged()
     this.documentConsumptionFailedSubject.next(status)
   }
 
@@ -294,24 +302,28 @@ export class WebsocketStatusService {
   dismiss(status: FileStatus) {
     let index
     if (status.taskId != null) {
-      index = this.consumerStatus.findIndex((s) => s.taskId == status.taskId)
+      index = this.consumerStatus().findIndex((s) => s.taskId == status.taskId)
     } else {
-      index = this.consumerStatus.findIndex(
+      index = this.consumerStatus().findIndex(
         (s) => s.filename == status.filename
       )
     }
 
     if (index > -1) {
-      this.consumerStatus.splice(index, 1)
+      this.consumerStatus.update((statuses) =>
+        statuses.filter((_, statusIndex) => statusIndex !== index)
+      )
     }
   }
 
   dismissCompleted() {
-    this.consumerStatus = this.consumerStatus.filter(
-      (status) =>
-        ![FileStatusPhase.SUCCESS, FileStatusPhase.FAILED].includes(
-          status.phase
-        )
+    this.consumerStatus.update((statuses) =>
+      statuses.filter(
+        (status) =>
+          ![FileStatusPhase.SUCCESS, FileStatusPhase.FAILED].includes(
+            status.phase
+          )
+      )
     )
   }
 

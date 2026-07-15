@@ -1,5 +1,5 @@
 import { AsyncPipe, KeyValuePipe, TitleCasePipe } from '@angular/common'
-import { Component, Input, OnInit, inject } from '@angular/core'
+import { Component, Input, OnInit, inject, signal } from '@angular/core'
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Observable, first, map, of, shareReplay } from 'rxjs'
@@ -44,8 +44,8 @@ export class DocumentHistoryComponent implements OnInit {
     }
   }
 
-  public loading: boolean = true
-  public entries: AuditLogEntry[] = []
+  readonly loading = signal(true)
+  readonly entries = signal<AuditLogEntry[]>([])
 
   private readonly prettyNameCache = new Map<string, Observable<string>>()
 
@@ -55,10 +55,10 @@ export class DocumentHistoryComponent implements OnInit {
 
   private loadHistory(): void {
     if (this._documentId) {
-      this.loading = true
+      this.loading.set(true)
       this.documentService.getHistory(this._documentId).subscribe((entries) => {
-        this.entries = entries
-        this.loading = false
+        this.entries.set(entries)
+        this.loading.set(false)
       })
     }
   }

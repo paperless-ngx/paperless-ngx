@@ -163,7 +163,12 @@ def scan(query: str) -> list[Token]:
             i += 1
             continue
         token, i = matched
-        _flush(buf, tokens)
+        if buf and buf[-1] == ",":
+            buf.pop()
+            _flush(buf, tokens)
+            tokens.append(Comma())
+        else:
+            _flush(buf, tokens)
         tokens.append(token)
         i = _maybe_comma(query, i, tokens)
     _flush(buf, tokens)

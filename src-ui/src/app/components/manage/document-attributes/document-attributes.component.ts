@@ -1,11 +1,10 @@
 import { NgComponentOutlet } from '@angular/common'
 import {
-  AfterViewChecked,
-  ChangeDetectorRef,
   Component,
   inject,
   OnDestroy,
   OnInit,
+  signal,
   Type,
   ViewChild,
 } from '@angular/core'
@@ -70,13 +69,10 @@ interface DocumentAttributesSection {
     ClearableBadgeComponent,
   ],
 })
-export class DocumentAttributesComponent
-  implements OnInit, OnDestroy, AfterViewChecked
-{
+export class DocumentAttributesComponent implements OnInit, OnDestroy {
   private readonly permissionsService = inject(PermissionsService)
   private readonly activatedRoute = inject(ActivatedRoute)
   private readonly router = inject(Router)
-  private readonly cdr = inject(ChangeDetectorRef)
   private readonly unsubscribeNotifier = new Subject<void>()
 
   protected readonly PermissionAction = PermissionAction
@@ -136,11 +132,12 @@ export class DocumentAttributesComponent
   ]
 
   @ViewChild('activeOutlet', { read: NgComponentOutlet })
-  private readonly activeOutlet?: NgComponentOutlet
+  set activeOutlet(outlet: NgComponentOutlet | undefined) {
+    this.activeComponent.set(outlet?.componentInstance ?? null)
+  }
 
-  private lastHeaderLoading: boolean
-
-  activeNavID: number = null
+  readonly activeComponent = signal<unknown>(null)
+  readonly activeNavID = signal<number>(null)
 
   get visibleSections(): DocumentAttributesSection[] {
     return this.sections.filter((section) =>
@@ -153,8 +150,9 @@ export class DocumentAttributesComponent
 
   get activeSection(): DocumentAttributesSection | null {
     return (
-      this.visibleSections.find((section) => section.id === this.activeNavID) ??
-      null
+      this.visibleSections.find(
+        (section) => section.id === this.activeNavID()
+      ) ?? null
     )
   }
 
@@ -163,14 +161,14 @@ export class DocumentAttributesComponent
       this.activeSection?.kind !== DocumentAttributesSectionKind.ManagementList
     )
       return null
-    const instance = this.activeOutlet?.componentInstance
+    const instance = this.activeComponent()
     return instance instanceof ManagementListComponent ? instance : null
   }
 
   get activeCustomFields(): CustomFieldsComponent | null {
     if (this.activeSection?.kind !== DocumentAttributesSectionKind.CustomFields)
       return null
-    const instance = this.activeOutlet?.componentInstance
+    const instance = this.activeComponent()
     return instance instanceof CustomFieldsComponent ? instance : null
   }
 
@@ -184,8 +182,8 @@ export class DocumentAttributesComponent
 
   get activeHeaderLoading(): boolean {
     return (
-      this.activeManagementList?.loading ??
-      this.activeCustomFields?.loading ??
+      this.activeManagementList?.loading() ??
+      this.activeCustomFields?.loading() ??
       false
     )
   }
@@ -203,13 +201,13 @@ export class DocumentAttributesComponent
           return
         }
 
-        if (this.activeNavID !== navIDFromSection) {
-          this.activeNavID = navIDFromSection
+        if (this.activeNavID() !== navIDFromSection) {
+          this.activeNavID.set(navIDFromSection)
         }
 
         if (!section || this.getNavIDForSection(section) == null) {
           this.router.navigate(
-            ['attributes', this.getSectionForNavID(this.activeNavID)],
+            ['attributes', this.getSectionForNavID(this.activeNavID())],
             { replaceUrl: true }
           )
         }
@@ -219,14 +217,6 @@ export class DocumentAttributesComponent
   ngOnDestroy(): void {
     this.unsubscribeNotifier.next()
     this.unsubscribeNotifier.complete()
-  }
-
-  ngAfterViewChecked(): void {
-    const current = this.activeHeaderLoading
-    if (this.lastHeaderLoading !== current) {
-      this.lastHeaderLoading = current
-      this.cdr.detectChanges()
-    }
   }
 
   onNavChange(navChangeEvent: NgbNavChangeEvent): void {

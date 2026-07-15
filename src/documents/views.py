@@ -3769,13 +3769,20 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
             validated_data=serializer.validated_data,
         )
         documents = Document.objects.filter(pk__in=ids)
+        versioned_documents = []
         compression = serializer.validated_data.get("compression")
         content = serializer.validated_data.get("content")
         follow_filename_format = serializer.validated_data.get("follow_formatting")
 
         for document in documents:
-            if not has_perms_owner_aware(request.user, "change_document", document):
+            root_doc = get_root_document(document)
+            if not has_perms_owner_aware(request.user, "view_document", root_doc):
                 return HttpResponseForbidden("Insufficient permissions")
+            versioned_documents.append(
+                get_latest_version_for_root(
+                    root_doc,
+                ),
+            )
 
         if content == "both":
             strategy_class = OriginalAndArchiveStrategy
@@ -3798,7 +3805,7 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
                     zipf,
                     follow_formatting=follow_filename_format,
                 )
-                for document in documents:
+                for document in versioned_documents:
                     strategy.add_document(document)
 
             f = temp_path.open("rb")

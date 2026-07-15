@@ -7,7 +7,7 @@
   >
 </pngx-page-header>
 
-@if (canViewUsers && users) {
+@if (canViewUsers && users()) {
   <h4 class="d-flex">
     <ng-container i18n>Users</ng-container>
     <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editUser()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.User }">
@@ -23,7 +23,7 @@
         <div class="col" i18n>Actions</div>
       </div>
     </li>
-    @for (user of users; track user) {
+    @for (user of users(); track user) {
       <li class="list-group-item">
         <div class="row">
           <div class="col d-flex align-items-center" [class.opacity-50]="!user.is_active"><button class="btn btn-link p-0 text-start" type="button" (click)="editUser(user)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.User)">{{user.username}}</button></div>
@@ -45,7 +45,7 @@
   </ul>
 }
 
-@if (canViewGroups && groups) {
+@if (canViewGroups && groups()) {
   <h4 class="mt-4 d-flex">
     <ng-container i18n>Groups</ng-container>
     <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editGroup()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Group }">
@@ -61,7 +61,7 @@
         <div class="col" i18n>Actions</div>
       </div>
     </li>
-    @for (group of groups; track group) {
+    @for (group of groups(); track group) {
       <li class="list-group-item">
         <div class="row">
           <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editGroup(group)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.Group)">{{group.name}}</button></div>
@@ -80,13 +80,13 @@
         </div>
       </li>
     }
-    @if (groups.length === 0) {
+    @if (groups().length === 0) {
       <li class="list-group-item" i18n>No groups defined</li>
     }
   </ul>
 }
 
-@if ((canViewUsers && !users) || (canViewGroups && !groups)) {
+@if ((canViewUsers && !users()) || (canViewGroups && !groups())) {
   <div>
     <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
     <div class="visually-hidden" i18n>Loading...</div>

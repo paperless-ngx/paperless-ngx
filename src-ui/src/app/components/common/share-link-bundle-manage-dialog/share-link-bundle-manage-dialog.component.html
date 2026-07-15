@@ -4,27 +4,27 @@
 </div>
 
 <div class="modal-body">
-  @if (loading) {
+  @if (loading()) {
     <div class="d-flex align-items-center gap-2">
       <div class="spinner-border spinner-border-sm" role="status"></div>
       <span i18n>Loading share link bundles…</span>
     </div>
   }
-  @if (!loading && error) {
+  @if (!loading() && error()) {
     <div class="alert alert-danger mb-0" role="alert">
-      {{ error }}
+      {{ error() }}
     </div>
   }
-  @if (!loading && !error) {
+  @if (!loading() && !error()) {
     <div class="d-flex justify-content-between align-items-center mb-2">
       <p class="mb-0 text-muted small">
         <ng-container i18n>Status updates every few seconds while bundles are being prepared.</ng-container>
       </p>
     </div>
-    @if (bundles.length === 0) {
+    @if (bundles().length === 0) {
       <p class="mb-0 text-muted fst-italic" i18n>No share link bundles currently exist.</p>
     }
-    @if (bundles.length > 0) {
+    @if (bundles().length > 0) {
       <div class="table-responsive">
         <table class="table table-sm align-middle mb-0">
           <thead>
@@ -39,7 +39,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (bundle of bundles; track bundle.id) {
+            @for (bundle of bundles(); track bundle.id) {
               <tr>
                 <td>
                   <div>{{ bundle.created | date: 'short' }}</div>
@@ -113,10 +113,10 @@
                       title="Copy share link"
                       i18n-title
                     >
-                      @if (copiedSlug === bundle.slug) {
+                      @if (copiedSlug() === bundle.slug) {
                         <i-bs name="clipboard-check"></i-bs>
                       }
-                      @if (copiedSlug !== bundle.slug) {
+                      @if (copiedSlug() !== bundle.slug) {
                         <i-bs name="clipboard"></i-bs>
                       }
                       <span class="visually-hidden" i18n>Copy share link</span>
@@ -125,7 +125,7 @@
                       <button
                         type="button"
                         class="btn btn-outline-warning"
-                        [disabled]="loading"
+                        [disabled]="loading()"
                         (click)="retry(bundle)"
                       >
                         <i-bs name="arrow-clockwise"></i-bs>
@@ -134,7 +134,7 @@
                     }
                     <pngx-confirm-button
                       buttonClasses="btn btn-sm btn-outline-danger"
-                      [disabled]="loading"
+                      [disabled]="loading()"
                       (confirm)="delete(bundle)"
                       iconName="trash"
                     >

@@ -22,7 +22,7 @@ describe('ToastsComponent', () => {
   let component: ToastsComponent
   let fixture: ComponentFixture<ToastsComponent>
   let toastService: ToastService
-  let toastSubject: Subject<Toast> = new Subject()
+  let toastSubject: Subject<Toast>
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -33,10 +33,11 @@ describe('ToastsComponent', () => {
       ],
     }).compileComponents()
 
-    fixture = TestBed.createComponent(ToastsComponent)
     toastService = TestBed.inject(ToastService)
+    toastSubject = new Subject()
     jest.replaceProperty(toastService, 'showToast', toastSubject)
 
+    fixture = TestBed.createComponent(ToastsComponent)
     component = fixture.componentInstance
 
     fixture.detectChanges()
@@ -47,25 +48,15 @@ describe('ToastsComponent', () => {
   })
 
   it('should close toast', () => {
-    component.toasts = [toast]
+    toastSubject.next(toast)
     const closeToastSpy = jest.spyOn(toastService, 'closeToast')
     component.closeToast()
-    expect(component.toasts).toEqual([])
+    expect(component.toasts()).toEqual([])
     expect(closeToastSpy).toHaveBeenCalledWith(toast)
   })
 
-  it('should unsubscribe', () => {
-    const unsubscribeSpy = jest.spyOn(
-      (component as any).subscription,
-      'unsubscribe'
-    )
-    component.ngOnDestroy()
-    expect(unsubscribeSpy).toHaveBeenCalled()
-  })
-
-  it('should subscribe to toastService', () => {
-    component.ngOnInit()
+  it('should update from toastService', () => {
     toastSubject.next(toast)
-    expect(component.toasts).toEqual([toast])
+    expect(component.toasts()).toEqual([toast])
   })
 })

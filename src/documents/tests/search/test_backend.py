@@ -262,6 +262,36 @@ class TestSearch:
         )
 
     @pytest.mark.parametrize(
+        ("search_mode", "query"),
+        [
+            pytest.param(SearchMode.TITLE, "12345", id="title_search"),
+            pytest.param(SearchMode.TEXT, "12345", id="text_search"),
+            pytest.param(SearchMode.QUERY, None, id="query_title_exact"),
+        ],
+    )
+    def test_search_modes_match_model_limit_title_tokens(
+        self,
+        backend: TantivyBackend,
+        search_mode: SearchMode,
+        query: str | None,
+    ) -> None:
+        """Search must keep filename-like title tokens up to the model limit."""
+        long_title = "1234567890" * 12 + "12345678"
+        doc = Document.objects.create(
+            title=long_title,
+            content="ordinary content",
+            checksum="TXT12",
+            pk=18,
+        )
+        backend.add_or_update(doc)
+
+        assert backend.search_ids(
+            query or f"title:{long_title}",
+            user=None,
+            search_mode=search_mode,
+        ) == [doc.pk]
+
+    @pytest.mark.parametrize(
         ("mode", "title", "content", "hits", "misses"),
         [
             pytest.param(

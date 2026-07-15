@@ -3,10 +3,10 @@ import {
   AfterViewInit,
   Component,
   EventEmitter,
-  Input,
   Output,
   ViewChild,
   inject,
+  input,
 } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import {
@@ -14,8 +14,6 @@ import {
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { of } from 'rxjs'
-import { delay } from 'rxjs/operators'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
@@ -66,20 +64,16 @@ export class DocumentCardSmallComponent
 {
   private documentService = inject(DocumentService)
   settingsService = inject(SettingsService)
+  readonly selected = input(false)
+  readonly document = input<Document>(undefined)
+  readonly displayFields = input<string[]>(
+    DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
+  )
 
   DisplayField = DisplayField
 
-  @Input()
-  selected = false
-
   @Output()
   toggleSelected = new EventEmitter()
-
-  @Input()
-  document: Document
-
-  @Input()
-  displayFields: string[] = DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
 
   @Output()
   dblClickDocument = new EventEmitter()
@@ -96,16 +90,18 @@ export class DocumentCardSmallComponent
   @Output()
   clickStoragePath = new EventEmitter<number>()
 
-  moreTags: number = null
+  get moreTags(): number {
+    const document = this.document()
+    const limit = document?.notes.length > 0 ? 6 : 7
+    return document?.tags.length > limit
+      ? document.tags.length - (limit - 1)
+      : null
+  }
 
   @ViewChild('popupPreview') popupPreview: PreviewPopupComponent
 
   ngAfterViewInit(): void {
-    of(true)
-      .pipe(delay(50))
-      .subscribe(() => {
-        this.show = true
-      })
+    this.show.set(true)
   }
 
   getIsThumbInverted() {
@@ -113,21 +109,20 @@ export class DocumentCardSmallComponent
   }
 
   getThumbUrl() {
-    return this.documentService.getThumbUrl(this.document.id)
+    return this.documentService.getThumbUrl(this.document().id)
   }
 
   getDownloadUrl() {
-    return this.documentService.getDownloadUrl(this.document.id)
+    return this.documentService.getDownloadUrl(this.document().id)
   }
 
   get tagIDs() {
-    const limit = this.document.notes.length > 0 ? 6 : 7
-    if (this.document.tags.length > limit) {
-      this.moreTags = this.document.tags.length - (limit - 1)
-      return this.document.tags.slice(0, limit - 1)
+    const document = this.document()
+    const limit = document.notes.length > 0 ? 6 : 7
+    if (document.tags.length > limit) {
+      return document.tags.slice(0, limit - 1)
     } else {
-      this.moreTags = null
-      return this.document.tags
+      return document.tags
     }
   }
 

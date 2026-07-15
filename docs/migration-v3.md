@@ -326,3 +326,11 @@ behind a reverse proxy may need to set
 [`PAPERLESS_TRUSTED_PROXIES`](configuration.md#PAPERLESS_TRUSTED_PROXIES),
 [`PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER`](configuration.md#PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER),
 or both, to avoid `403 Forbidden` errors on login.
+
+## Database Migrations
+
+Some integer fields have been changed to smaller types to reduce database size. If you have any `MailRule` records with a `maximum_age` greater than 32767, they will be clamped to 32767 during the migration to avoid errors during migration.
+
+### Action Required
+
+No user action is required. The migration will automatically clamp any `MailRule.maximum_age` values greater than 32767 to 32767 during the migration process.

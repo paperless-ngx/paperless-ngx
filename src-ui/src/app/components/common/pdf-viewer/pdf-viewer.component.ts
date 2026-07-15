@@ -174,10 +174,12 @@ export class PngxPdfViewerComponent
       'assets/js/pdf.worker.min.mjs',
       this.document.baseURI
     ).toString()
-    let initOptions = {
+    const initOptions = {
       url: this.src,
       password: this.password,
       withCredentials: true,
+      wasmUrl: new URL('assets/wasm/', this.document.baseURI).toString(),
+      iccUrl: new URL('assets/iccs/', this.document.baseURI).toString(),
     }
     this.loadingTask = getDocument(initOptions)
     try {
@@ -291,7 +293,7 @@ export class PngxPdfViewerComponent
     this.eventBus.dispatch('find', {
       query,
       caseSensitive: false,
-      highlightAll: query.length > 0,
+      highlightAll: query?.length > 0,
       phraseSearch: true,
     })
   }

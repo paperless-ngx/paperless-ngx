@@ -136,7 +136,7 @@ describe('TagListComponent', () => {
       ],
     }
 
-    component.data = [parent as any]
+    component.data.set([parent as any])
     component.selectPage()
 
     expect(component.selectedObjects.has(10)).toBe(true)

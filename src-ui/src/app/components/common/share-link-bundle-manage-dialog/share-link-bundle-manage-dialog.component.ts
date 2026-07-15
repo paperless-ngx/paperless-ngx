@@ -1,6 +1,6 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { CommonModule } from '@angular/common'
-import { Component, OnDestroy, OnInit, inject } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core'
 import { NgbActiveModal, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, catchError, of, switchMap, takeUntil, timer } from 'rxjs'
@@ -40,10 +40,9 @@ export class ShareLinkBundleManageDialogComponent
   private readonly clipboard = inject(Clipboard)
 
   title = $localize`Share link bundles`
-
-  bundles: ShareLinkBundleSummary[] = []
-  error: string | null = null
-  copiedSlug: string | null = null
+  readonly bundles = signal<ShareLinkBundleSummary[]>([])
+  readonly error = signal<string | null>(null)
+  readonly copiedSlug = signal<string | null>(null)
 
   readonly statuses = ShareLinkBundleStatus
   readonly fileVersions = FileVersion
@@ -55,15 +54,15 @@ export class ShareLinkBundleManageDialogComponent
       .pipe(
         switchMap((silent) => {
           if (!silent) {
-            this.loading = true
+            this.loading.set(true)
           }
-          this.error = null
+          this.error.set(null)
           return this.shareLinkBundleService.listAllBundles().pipe(
             catchError((error) => {
               if (!silent) {
-                this.loading = false
+                this.loading.set(false)
               }
-              this.error = $localize`Failed to load share link bundles.`
+              this.error.set($localize`Failed to load share link bundles.`)
               this.toastService.showError(
                 $localize`Error retrieving share link bundles.`,
                 error
@@ -76,10 +75,10 @@ export class ShareLinkBundleManageDialogComponent
       )
       .subscribe((results) => {
         if (results) {
-          this.bundles = results
-          this.copiedSlug = null
+          this.bundles.set(results)
+          this.copiedSlug.set(null)
         }
-        this.loading = false
+        this.loading.set(false)
       })
 
     this.triggerRefresh(false)
@@ -105,24 +104,24 @@ export class ShareLinkBundleManageDialogComponent
     }
     const success = this.clipboard.copy(this.getShareUrl(bundle))
     if (success) {
-      this.copiedSlug = bundle.slug
+      this.copiedSlug.set(bundle.slug)
       setTimeout(() => {
-        this.copiedSlug = null
+        this.copiedSlug.set(null)
       }, 3000)
       this.toastService.showInfo($localize`Share link copied to clipboard.`)
     }
   }
 
   delete(bundle: ShareLinkBundleSummary): void {
-    this.error = null
-    this.loading = true
+    this.error.set(null)
+    this.loading.set(true)
     this.shareLinkBundleService.delete(bundle).subscribe({
       next: () => {
         this.toastService.showInfo($localize`Share link bundle deleted.`)
         this.triggerRefresh(false)
       },
       error: (e) => {
-        this.loading = false
+        this.loading.set(false)
         this.toastService.showError(
           $localize`Error deleting share link bundle.`,
           e
@@ -132,7 +131,7 @@ export class ShareLinkBundleManageDialogComponent
   }
 
   retry(bundle: ShareLinkBundleSummary): void {
-    this.error = null
+    this.error.set(null)
     this.shareLinkBundleService.rebuildBundle(bundle.id).subscribe({
       next: (updated) => {
         this.toastService.showInfo(
@@ -159,15 +158,16 @@ export class ShareLinkBundleManageDialogComponent
   }
 
   private replaceBundle(updated: ShareLinkBundleSummary): void {
-    const index = this.bundles.findIndex((bundle) => bundle.id === updated.id)
+    const bundles = this.bundles()
+    const index = bundles.findIndex((bundle) => bundle.id === updated.id)
     if (index >= 0) {
-      this.bundles = [
-        ...this.bundles.slice(0, index),
+      this.bundles.set([
+        ...bundles.slice(0, index),
         updated,
-        ...this.bundles.slice(index + 1),
-      ]
+        ...bundles.slice(index + 1),
+      ])
     } else {
-      this.bundles = [updated, ...this.bundles]
+      this.bundles.set([updated, ...bundles])
     }
   }
 
