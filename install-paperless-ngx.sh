@@ -75,7 +75,7 @@ fi
 # if neither timedatectl nor /etc/TZ is succeeding, defaulting to GMT.
 if  command -v timedatectl &> /dev/null ; then
 	default_time_zone=$(timedatectl show -p Timezone --value)
-elif [ -f /etc/TZ ] && [ -f /etc/tzlist ] ; then
+elif [[ -f /etc/TZ ]] && [[ -f /etc/tzlist ]] ; then
 	TZ=$(cat /etc/TZ)
 	default_time_zone=$(grep -B 1 -m 1 "$TZ" /etc/tzlist | head -1 | cut -f 2 -d =)
 else
@@ -387,14 +387,14 @@ sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' docker-compose.yml
 # if last line in file contains "volumes:", remove that line since no more named volumes are left
 l1=$(grep -n '^volumes:' docker-compose.yml | cut -d : -f 1)  # get line number containing volume: at begin of line
 l2=$(wc -l < docker-compose.yml)  # get total number of lines
-if [ "$l1" -eq "$l2" ] ; then
+if [[ "$l1" -eq "$l2" ]] ; then
 	sed -i "/^volumes:/d" docker-compose.yml
 fi
 
 
 docker compose pull
 
-if [ "$DATABASE_BACKEND" == "postgres" ] || [ "$DATABASE_BACKEND" == "mariadb" ] ; then
+if [[ "$DATABASE_BACKEND" == "postgres" ]] || [[ "$DATABASE_BACKEND" == "mariadb" ]] ; then
 	echo "Starting DB first for initialization"
 	docker compose up --detach db
 	# hopefully enough time for even the slower systems
