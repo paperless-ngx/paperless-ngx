@@ -150,7 +150,8 @@
                   [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave"
                   popoverClass="popover-slim">
                   <i-bs class="me-2" name="file-text"></i-bs><span>{{d.title | documentTitle}}</span>
-                  <span class="close flex-column justify-content-center" (click)="closeDocument(d); $event.preventDefault()">
+                  <span class="close flex-column justify-content-center"
+                    (click)="$event.preventDefault(); $event.stopPropagation(); closeDocument(d)">
                     <i-bs name="x"></i-bs>
                   </span>
                 </a>
