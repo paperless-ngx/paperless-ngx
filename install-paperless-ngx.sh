@@ -209,7 +209,7 @@ MEDIA_FOLDER=$ask_result
 echo ""
 echo "The data folder is where paperless stores other data, such as your"
 if [[ "$DATABASE_BACKEND" == "sqlite" ]] ; then
-	echo -n "SQLite database, the "
+	printf "SQLite database, the "
 fi
 echo "search index and other data."
 echo "As with the media folder, leave empty to have this managed by Docker."
