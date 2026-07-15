@@ -75,7 +75,7 @@ fi
 # if neither timedatectl nor /etc/TZ is succeeding, defaulting to GMT.
 if  command -v timedatectl &> /dev/null ; then
 	default_time_zone=$(timedatectl show -p Timezone --value)
-elif [[ -f /etc/TZ ]] && [[ -f /etc/tzlist ]] ; then
+elif [[ -f /etc/TZ && -f /etc/tzlist ]] ; then
 	TZ=$(cat /etc/TZ)
 	default_time_zone=$(grep -B 1 -m 1 "$TZ" /etc/tzlist | head -1 | cut -f 2 -d =)
 else
@@ -394,7 +394,7 @@ fi
 
 docker compose pull
 
-if [[ "$DATABASE_BACKEND" == "postgres" ]] || [[ "$DATABASE_BACKEND" == "mariadb" ]] ; then
+if [[ "$DATABASE_BACKEND" == "postgres" || "$DATABASE_BACKEND" == "mariadb" ]] ; then
 	echo "Starting DB first for initialization"
 	docker compose up --detach db
 	# hopefully enough time for even the slower systems
