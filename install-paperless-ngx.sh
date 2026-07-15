@@ -41,24 +41,25 @@ ask_docker_folder() {
 	done
 }
 
+die() {
+    echo "$@"
+    exit 1
+}
+
 if [[ $(id -u) == "0" ]] ; then
-	echo "Do not run this script as root."
-	exit 1
+	die "Do not run this script as root."
 fi
 
 if ! command -v wget &> /dev/null ; then
-	echo "wget executable not found. Is wget installed?"
-	exit 1
+	die "wget executable not found. Is wget installed?"
 fi
 
 if ! command -v docker &> /dev/null ; then
-	echo "docker executable not found. Is Docker installed?"
-	exit 1
+	die "docker executable not found. Is Docker installed?"
 fi
 
 if ! docker compose &> /dev/null ; then
-	echo "docker compose plugin not found. Is Docker Compose installed?"
-	exit 1
+	die "docker compose plugin not found. Is Docker Compose installed?"
 fi
 
 # Check if user has permissions to run Docker by trying to get the status of Docker (docker status).
