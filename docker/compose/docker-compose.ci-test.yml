@@ -24,7 +24,7 @@ services:
     network_mode: host
     restart: unless-stopped
   greenmail:
-    image: docker.io/greenmail/standalone:2.1.8
+    image: docker.io/greenmail/standalone:2.1.9
     hostname: greenmail
     container_name: greenmail
     environment:
