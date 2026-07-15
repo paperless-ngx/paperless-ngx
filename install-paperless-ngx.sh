@@ -339,7 +339,7 @@ install_langs=${install_langs//+/ }    # Then convert plus signs to spaces
 read -r -a install_langs_array <<< "${install_langs}"
 
 {
-	if [[ ! $URL == "" ]] ; then
+	if [[ -n $URL ]] ; then
 		echo "PAPERLESS_URL=$URL"
 	fi
 	if [[ ! $USERMAP_UID == "1000" ]] ; then
