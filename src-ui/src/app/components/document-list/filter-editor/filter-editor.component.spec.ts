@@ -328,7 +328,7 @@ describe('FilterEditorComponent', () => {
   })
 
   it('should ingest legacy text filter rules for doc title + content', () => {
-    expect(component.textFilter).toEqual(null)
+    expect(component.textFilter).toBeNull()
     component.filterRules = [
       {
         rule_type: FILTER_TITLE_CONTENT,

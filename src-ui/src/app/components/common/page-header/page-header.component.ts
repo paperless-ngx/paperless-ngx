@@ -14,7 +14,7 @@ import { environment } from 'src/environments/environment'
 })
 export class PageHeaderComponent {
   private titleService = inject(Title)
-  private clipboard = inject(Clipboard)
+  private readonly clipboard = inject(Clipboard)
 
   readonly id = input<number>(undefined)
   readonly subTitle = input('')

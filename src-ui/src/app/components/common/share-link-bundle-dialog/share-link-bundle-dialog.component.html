@@ -65,8 +65,9 @@
         <dd class="col-sm-8"><code>{{ createdBundle.slug }}</code></dd>
         <dt class="col-sm-4" i18n>Link</dt>
         <dd class="col-sm-8">
+          <label class="visually-hidden" for="shareBundleLink" i18n>Share link</label>
           <div class="input-group input-group-sm">
-            <input class="form-control" type="text" [value]="getShareUrl(createdBundle)" readonly>
+            <input id="shareBundleLink" class="form-control" type="text" [value]="getShareUrl(createdBundle)" readonly>
             <button
               class="btn btn-outline-primary"
               type="button"

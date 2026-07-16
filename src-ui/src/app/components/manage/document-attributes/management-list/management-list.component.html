@@ -1,18 +1,18 @@
 <div class="row mb-3">
   <div class="col mb-2 mb-xl-0">
     <div class="form-inline d-flex align-items-center">
-      <label class="text-muted me-2 mb-0" i18n>Filter by:</label>
-      <input class="form-control form-control-sm flex-fill w-auto" type="text" autofocus [(ngModel)]="nameFilter" (keyup)="onNameFilterKeyUp($event)" placeholder="Name" i18n-placeholder>
+      <label class="text-muted me-2 mb-0" for="managementNameFilter" i18n>Filter by:</label>
+      <input id="managementNameFilter" class="form-control form-control-sm flex-fill w-auto" type="text" autofocus [(ngModel)]="nameFilter" (keyup)="onNameFilterKeyUp($event)" placeholder="Name" i18n-placeholder>
     </div>
   </div>
 
   <div class="col-auto mb-2 mb-xl-0">
     <div class="form-inline d-flex align-items-center">
       <div class="input-group input-group-sm w-auto d-none d-md-flex">
-        <span class="input-group-text border-0" i18n>Show:</span>
+        <label class="input-group-text border-0" for="managementPageSize" i18n>Show:</label>
       </div>
       <div class="input-group input-group-sm w-auto me-3">
-        <select class="form-select form-select-sm small" [(ngModel)]="pageSize">
+        <select id="managementPageSize" class="form-select form-select-sm small" [(ngModel)]="pageSize">
           <option [ngValue]="25">25</option>
           <option [ngValue]="50">50</option>
           <option [ngValue]="100">100</option>

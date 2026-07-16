@@ -76,7 +76,7 @@ describe('ChatComponent', () => {
     component.input = 'Hello'
     component.sendMessage()
 
-    expect(component.messages.length).toBe(2)
+    expect(component.messages).toHaveLength(2)
     expect(component.messages[0].content).toBe('Hello')
     expect(component.loading).toBe(true)
 
@@ -158,7 +158,7 @@ describe('ChatComponent', () => {
     const message = { content: '', role: 'assistant', isStreaming: true }
     component.enqueueTypewriter(null, message as any) // coverage for null
     component.enqueueTypewriter('Hello', message as any)
-    expect(component['typewriterBuffer'].length).toBe(4)
+    expect(component['typewriterBuffer']).toHaveLength(4)
   })
 
   it('should scroll to bottom after sending a message', () => {
