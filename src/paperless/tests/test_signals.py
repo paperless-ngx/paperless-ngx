@@ -307,6 +307,11 @@ class TestSyncSocialLoginGroups(TestCase):
             is_superuser=True,
             is_staff=True,
         )
+        User.objects.create_user(
+            username="other_active_admin",
+            is_superuser=True,
+            is_active=True,
+        )
         sociallogin = Mock(
             user=user,
             account=Mock(
@@ -492,6 +497,160 @@ class TestSyncSocialLoginGroups(TestCase):
         )
         user.refresh_from_db()
         self.assertTrue(user.is_superuser)
+        self.assertTrue(user.is_staff)
+
+    @override_settings(
+        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP="admin-group",
+        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP=None,
+    )
+    def test_sync_superuser_disabled_local_user(self) -> None:
+        """
+        GIVEN:
+            - Configured superuser group sync
+            - User without the group, but who has a usable password (local override)
+        WHEN:
+            - Social login updated via signal
+        THEN:
+            - User's superuser status is not demoted
+        """
+        user = User.objects.create_user(
+            username="local_admin",
+            password="password123",
+            is_superuser=True,
+            is_staff=True,
+        )
+        User.objects.create_user(
+            username="other_admin",
+            password="password123",
+            is_superuser=True,
+            is_staff=True,
+        )
+        sociallogin = Mock(
+            user=user,
+            account=Mock(extra_data={"groups": ["other-group"]}),
+        )
+        handle_social_account_updated(
+            sender=None,
+            request=HttpRequest(),
+            sociallogin=sociallogin,
+        )
+        user.refresh_from_db()
+        self.assertTrue(user.is_superuser)
+        self.assertTrue(user.is_staff)
+
+    @override_settings(
+        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP="admin-group",
+        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP=None,
+    )
+    def test_sync_superuser_disabled_last_admin(self) -> None:
+        """
+        GIVEN:
+            - Configured superuser group sync
+            - User without the group, has no usable password, but is the last active admin
+        WHEN:
+            - Social login updated via signal
+        THEN:
+            - User's superuser status is not demoted to prevent lockout
+        """
+        user = User.objects.create_user(
+            username="last_admin",
+            is_superuser=True,
+            is_staff=True,
+        )
+        user.set_unusable_password()
+        user.save()
+
+        User.objects.create_user(
+            username="inactive_admin",
+            is_superuser=True,
+            is_staff=True,
+            is_active=False,
+        )
+
+        sociallogin = Mock(
+            user=user,
+            account=Mock(extra_data={"groups": ["other-group"]}),
+        )
+        handle_social_account_updated(
+            sender=None,
+            request=HttpRequest(),
+            sociallogin=sociallogin,
+        )
+        user.refresh_from_db()
+        self.assertTrue(user.is_superuser)
+
+    @override_settings(
+        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP="admin-group",
+        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP=None,
+    )
+    def test_sync_superuser_disabled_demote_if_other_admin_exists(self) -> None:
+        """
+        GIVEN:
+            - Configured superuser group sync
+            - User without the group, has no usable password
+            - Another active superuser exists in the system
+        WHEN:
+            - Social login updated via signal
+        THEN:
+            - User's superuser status is demoted
+        """
+        user = User.objects.create_user(
+            username="social_admin",
+            is_superuser=True,
+            is_staff=True,
+        )
+        user.set_unusable_password()
+        user.save()
+
+        User.objects.create_user(
+            username="other_active_admin",
+            is_superuser=True,
+            is_staff=True,
+            is_active=True,
+        )
+
+        sociallogin = Mock(
+            user=user,
+            account=Mock(extra_data={"groups": ["other-group"]}),
+        )
+        handle_social_account_updated(
+            sender=None,
+            request=HttpRequest(),
+            sociallogin=sociallogin,
+        )
+        user.refresh_from_db()
+        self.assertFalse(user.is_superuser)
+
+    @override_settings(
+        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP=None,
+        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP="staff-group",
+    )
+    def test_sync_staff_disabled_local_user(self) -> None:
+        """
+        GIVEN:
+            - Configured staff group sync
+            - User without the group, but who has a usable password (local override)
+        WHEN:
+            - Social login updated via signal
+        THEN:
+            - User's staff status is not demoted
+        """
+        user = User.objects.create_user(
+            username="local_staff",
+            password="password123",
+            is_superuser=False,
+            is_staff=True,
+        )
+        sociallogin = Mock(
+            user=user,
+            account=Mock(extra_data={"groups": ["other-group"]}),
+        )
+        handle_social_account_updated(
+            sender=None,
+            request=HttpRequest(),
+            sociallogin=sociallogin,
+        )
+        user.refresh_from_db()
         self.assertTrue(user.is_staff)
 
 
