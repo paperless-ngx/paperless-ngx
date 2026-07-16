@@ -108,6 +108,39 @@ class TestFuzzyMatchCommand(TestCase):
         stdout, _ = self.call_command("--processes", "1")
         self.assertIn("Found 1 matching pair(s)", stdout)
 
+    def test_with_matches_and_url(self) -> None:
+        """
+        GIVEN:
+            - 2 documents exist
+            - Similarity between content is 86.667
+            - --url is provided
+        WHEN:
+            - Command is called with --url
+        THEN:
+            - 1 match is returned from doc 1 to doc 2
+            - No match from doc 2 to doc 1 reported
+            - Output contains clickable links to the documents instead of titles
+        """
+        # Content similarity is 86.667
+        Document.objects.create(
+            checksum="BEEFCAFE",
+            title="A",
+            content="first document scanned by bob",
+            mime_type="application/pdf",
+            filename="test.pdf",
+        )
+        Document.objects.create(
+            checksum="DEADBEAF",
+            title="A",
+            content="first document scanned by alice",
+            mime_type="application/pdf",
+            filename="other_test.pdf",
+        )
+        stdout, _ = self.call_command("--processes","1","--url","http://localhost:8000",)
+        self.assertIn("Found 1 matching pair(s)", stdout)
+        self.assertIn("http://localhost:8000/documents/1/details", stdout)
+        self.assertIn("http://localhost:8000/documents/2/details", stdout)
+
     def test_with_3_matches(self) -> None:
         """
         GIVEN:
