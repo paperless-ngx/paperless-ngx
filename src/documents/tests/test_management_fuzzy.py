@@ -143,7 +143,7 @@ class TestFuzzyMatchCommand(TestCase):
                 "--processes",
                 "1",
                 "--url",
-                "http://localhost:8000"
+                "http://localhost:8000",
             )
         self.assertIn("Found 1 matching pair(s)", stdout)
         self.assertIn("http://localhost:8000/documents/1/details", stdout)
