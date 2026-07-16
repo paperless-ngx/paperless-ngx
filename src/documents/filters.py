@@ -771,7 +771,14 @@ class CustomFieldQueryFilter(Filter):
         )
         q, annotations = parser.parse(value)
 
-        return qs.annotate(**annotations).filter(q)
+        # The Count(...) annotations above require a GROUP BY/HAVING to evaluate.
+        # Applying them directly to `qs` mixes that HAVING with `qs`'s existing
+        # joins (e.g. repeated tag joins from tags__id__all, the object-permission
+        # OR-filter), which some backends (e.g. MariaDB) fail to plan correctly,
+        # raising "Unknown column ... in 'HAVING'". Evaluating the annotation on
+        # an isolated queryset keeps the GROUP BY/HAVING self-contained.
+        matching_ids = Document.objects.annotate(**annotations).filter(q).values("pk")
+        return qs.filter(pk__in=matching_ids)
 
 
 class DocumentFilterSet(FilterSet):
