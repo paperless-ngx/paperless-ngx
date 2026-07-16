@@ -136,7 +136,7 @@ class TestFuzzyMatchCommand(TestCase):
             mime_type="application/pdf",
             filename="other_test.pdf",
         )
-        stdout, _ = self.call_command("--processes","1","--url","http://localhost:8000")
+        stdout, _ = self.call_command("--processes", "1", "--url", "http://localhost:8000")
         self.assertIn("Found 1 matching pair(s)", stdout)
         self.assertIn("http://localhost:8000/documents/1/details", stdout)
         self.assertIn("http://localhost:8000/documents/2/details", stdout)
