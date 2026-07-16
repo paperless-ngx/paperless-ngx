@@ -41,7 +41,7 @@ class TestFuzzyMatchCommand(TestCase):
 
     def test_invalid_ratio_upper_limit(self) -> None:
         """
-        GIVEN:s
+        GIVEN:
             - Invalid ratio above upper
         WHEN:
             - Command is called
