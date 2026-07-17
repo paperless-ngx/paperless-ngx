@@ -937,14 +937,11 @@ class TantivyBackend:
         documents_stream = _DocumentViewerStream(documents, chunk_size=1000)
         try:
             writer = new_index.writer(heap_size=writer_heap_bytes)
-            for document in iter_wrapper(documents_stream):
+            for document, viewer_ids in iter_wrapper(documents_stream):
                 doc = self._build_tantivy_doc(
                     document,
                     document.get_effective_content(),
-                    viewer_ids=documents_stream.viewer_ids_by_pk.get(
-                        document.pk,
-                        [],
-                    ),
+                    viewer_ids=viewer_ids,
                 )
                 writer.add_document(doc)
             writer.commit()
@@ -966,34 +963,36 @@ def chunked(iterable, size):
 
 
 class _DocumentViewerStream:
-    """Yield documents one-by-one while batch-loading their viewer ids.
+    """Yield (document, viewer_ids) pairs while batch-loading viewer ids.
 
     Viewer permissions are fetched one SQL query per chunk (see
     ``_bulk_get_viewer_ids``), but documents are yielded individually so a
     progress bar wrapped around this stream advances per document rather than
     jumping a whole chunk at a time. ``__len__`` lets the progress helper still
-    discover the total (it inspects ``QuerySet``/``Sized``). The viewer ids for
-    the chunk currently being iterated are exposed via ``viewer_ids_by_pk``.
+    discover the total (it inspects ``QuerySet``/``Sized``).
+
+    The viewer ids travel with each document in the yielded pair rather than
+    through a separate mutable attribute, so the pairing survives regardless
+    of how ``iter_wrapper`` consumes the stream (buffering, batching, etc.) —
+    there is no reliance on the caller advancing this generator in lock-step.
     """
 
     def __init__(self, documents: QuerySet[Document], *, chunk_size: int) -> None:
         self._documents = documents
         self._chunk_size = chunk_size
-        self.viewer_ids_by_pk: dict[int, list[int]] = {}
 
     def __len__(self) -> int:
         return self._documents.count()
 
-    def __iter__(self) -> Iterator[Document]:
+    def __iter__(self) -> Iterator[tuple[Document, list[int]]]:
         # iterator(chunk_size=…) streams from a server-side cursor instead of
         # materialising the whole queryset in memory; since Django 4.1 it still
         # honours prefetch_related, running the prefetches one batch at a time.
         documents = self._documents.iterator(chunk_size=self._chunk_size)
         for chunk in chunked(documents, self._chunk_size):
-            self.viewer_ids_by_pk = _bulk_get_viewer_ids(
-                [doc.pk for doc in chunk],
-            )
-            yield from chunk
+            viewer_ids_by_pk = _bulk_get_viewer_ids([doc.pk for doc in chunk])
+            for doc in chunk:
+                yield doc, viewer_ids_by_pk.get(doc.pk, [])
 
 
 def _bulk_get_viewer_ids(doc_pks: Sequence[int]) -> dict[int, list[int]]:

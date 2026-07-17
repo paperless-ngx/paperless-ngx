@@ -534,13 +534,13 @@ class TestRebuild:
     """Test index rebuilding functionality."""
 
     def test_with_iter_wrapper_called(self, backend: TantivyBackend) -> None:
-        """Index rebuild must pass documents through iter_wrapper for progress tracking."""
+        """Index rebuild must pass (document, viewer_ids) pairs through iter_wrapper."""
         seen = []
 
-        def wrapper(docs):
-            for doc in docs:
+        def wrapper(pairs):
+            for doc, viewer_ids in pairs:
                 seen.append(doc.pk)
-                yield doc
+                yield doc, viewer_ids
 
         Document.objects.create(title="Tracked", content="x", checksum="TW1", pk=30)
         backend.rebuild(Document.objects.all(), iter_wrapper=wrapper)
