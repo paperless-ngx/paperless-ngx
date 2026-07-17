@@ -45,6 +45,18 @@ class Command(PaperlessCommand):
                 "Safe to run on every startup or upgrade."
             ),
         )
+        parser.add_argument(
+            "--heap-size-mb",
+            type=int,
+            default=None,
+            help=(
+                "Tantivy writer memory budget in MB for a full reindex "
+                "(split across writer threads). Defaults to 512MB; lower "
+                "this on memory-constrained hosts. Larger values buffer "
+                "more documents before flushing a segment, deferring "
+                "merge work rather than avoiding it."
+            ),
+        )
 
     def handle(self, *args, **options):
         with transaction.atomic():
@@ -60,13 +72,26 @@ class Command(PaperlessCommand):
                     "document_type",
                     "storage_path",
                     "owner",
-                ).prefetch_related("tags", "notes", "custom_fields", "versions")
+                ).prefetch_related(
+                    "tags",
+                    "notes__user",
+                    "custom_fields__field",
+                    "versions",
+                )
+                total = documents.count()
+                rebuild_kwargs = {}
+                if options.get("heap_size_mb") is not None:
+                    rebuild_kwargs["writer_heap_bytes"] = (
+                        options["heap_size_mb"] * 1_000_000
+                    )
                 get_backend().rebuild(
                     documents,
-                    iter_wrapper=lambda docs: self.track(
-                        docs,
+                    iter_wrapper=lambda pairs: self.track(
+                        pairs,
                         description="Indexing documents...",
+                        total=total,
                     ),
+                    **rebuild_kwargs,
                 )
                 reset_backend()
 

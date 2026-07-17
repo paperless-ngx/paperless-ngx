@@ -154,6 +154,23 @@ def simple_search_tokens(text: str) -> list[str]:
     return _SIMPLE_SEARCH_ANALYZER.analyze(text)
 
 
+# Autocomplete word extraction: tokenize -> lowercase -> ascii_fold in a single
+# Rust pass. Uses the simple tokenizer so extracted words match how document
+# content is actually indexed (the content tokenizer _paperless_text also uses
+# simple()), replacing a Python regex scan plus per-token folding.
+_AUTOCOMPLETE_ANALYZER: Final = (
+    tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.simple())
+    .filter(tantivy.Filter.lowercase())
+    .filter(tantivy.Filter.ascii_fold())
+    .build()
+)
+
+
+def autocomplete_tokens(text: str) -> list[str]:
+    """Tokenize text into normalized autocomplete words (lowercased, ascii-folded)."""
+    return _AUTOCOMPLETE_ANALYZER.analyze(text)
+
+
 def ascii_fold(text: str) -> str:
     """Fold text to ASCII using the same mapping as the content tokenizers.
 
