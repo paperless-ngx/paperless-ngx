@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-11 23:04+0000\n"
-"PO-Revision-Date: 2026-07-11 23:06\n"
+"POT-Creation-Date: 2026-07-15 20:44+0000\n"
+"PO-Revision-Date: 2026-07-15 20:45\n"
 "Last-Translator: \n"
 "Language-Team: Thai\n"
 "Language: th_TH\n"
@@ -2384,22 +2384,26 @@ msgid "uid"
 msgstr "uid"
 
 #: paperless_mail/models.py:342
+msgid "uid validity"
+msgstr ""
+
+#: paperless_mail/models.py:350
 msgid "subject"
 msgstr "หัวเรื่อง"
 
-#: paperless_mail/models.py:350
+#: paperless_mail/models.py:358
 msgid "received"
 msgstr "ได้รับเมื่อ"
 
-#: paperless_mail/models.py:357
+#: paperless_mail/models.py:365
 msgid "processed"
 msgstr "ประมวลผลเมื่อ"
 
-#: paperless_mail/models.py:363
+#: paperless_mail/models.py:371
 msgid "status"
 msgstr "สถานะ"
 
-#: paperless_mail/models.py:371
+#: paperless_mail/models.py:379
 msgid "error"
 msgstr "ข้อผิดพลาด"
 

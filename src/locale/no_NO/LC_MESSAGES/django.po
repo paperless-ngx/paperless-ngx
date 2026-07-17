@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-11 23:04+0000\n"
-"PO-Revision-Date: 2026-07-11 23:06\n"
+"POT-Creation-Date: 2026-07-15 20:44+0000\n"
+"PO-Revision-Date: 2026-07-15 20:45\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -1645,7 +1645,7 @@ msgstr "Invalid AI configuration. (NO)"
 
 #: documents/views.py:1522
 msgid "AI backend request timed out."
-msgstr ""
+msgstr "Forespørselen til KI-tjenesten fikk tidsavbrudd."
 
 #: documents/views.py:2304 documents/views.py:2625
 msgid "Specify only one of text, title_search, query, or more_like_id."
@@ -1914,7 +1914,7 @@ msgstr "Sets the LLM output language (NO)"
 
 #: paperless/models.py:370
 msgid "Sets the LLM timeout in seconds"
-msgstr ""
+msgstr "Setter tidsavbrudd for LLM i sekunder"
 
 #: paperless/models.py:376
 msgid "paperless application settings"
@@ -2385,22 +2385,26 @@ msgid "uid"
 msgstr "uid (NO)"
 
 #: paperless_mail/models.py:342
+msgid "uid validity"
+msgstr ""
+
+#: paperless_mail/models.py:350
 msgid "subject"
 msgstr "emne"
 
-#: paperless_mail/models.py:350
+#: paperless_mail/models.py:358
 msgid "received"
 msgstr "mottatt"
 
-#: paperless_mail/models.py:357
+#: paperless_mail/models.py:365
 msgid "processed"
 msgstr "behandlet"
 
-#: paperless_mail/models.py:363
+#: paperless_mail/models.py:371
 msgid "status"
 msgstr "status (NO)"
 
-#: paperless_mail/models.py:371
+#: paperless_mail/models.py:379
 msgid "error"
 msgstr "feil"
 

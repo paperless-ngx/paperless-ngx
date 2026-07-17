@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-11 23:04+0000\n"
-"PO-Revision-Date: 2026-07-11 23:06\n"
+"POT-Creation-Date: 2026-07-15 20:44+0000\n"
+"PO-Revision-Date: 2026-07-15 20:45\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -2386,22 +2386,26 @@ msgid "uid"
 msgstr "UID"
 
 #: paperless_mail/models.py:342
+msgid "uid validity"
+msgstr ""
+
+#: paperless_mail/models.py:350
 msgid "subject"
 msgstr "主旨"
 
-#: paperless_mail/models.py:350
+#: paperless_mail/models.py:358
 msgid "received"
 msgstr "已收到"
 
-#: paperless_mail/models.py:357
+#: paperless_mail/models.py:365
 msgid "processed"
 msgstr "已處理"
 
-#: paperless_mail/models.py:363
+#: paperless_mail/models.py:371
 msgid "status"
 msgstr "狀態"
 
-#: paperless_mail/models.py:371
+#: paperless_mail/models.py:379
 msgid "error"
 msgstr "錯誤"
 
