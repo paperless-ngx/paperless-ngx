@@ -76,7 +76,7 @@ describe('ChatComponent', () => {
     component.input = 'Hello'
     component.sendMessage()
 
-    expect(component.messages.length).toBe(2)
+    expect(component.messages).toHaveLength(2)
     expect(component.messages[0].content).toBe('Hello')
     expect(component.loading).toBe(true)
 
@@ -158,7 +158,7 @@ describe('ChatComponent', () => {
     const message = { content: '', role: 'assistant', isStreaming: true }
     component.enqueueTypewriter(null, message as any) // coverage for null
     component.enqueueTypewriter('Hello', message as any)
-    expect(component['typewriterBuffer'].length).toBe(4)
+    expect(component['typewriterBuffer']).toHaveLength(4)
   })
 
   it('should scroll to bottom after sending a message', () => {
@@ -187,5 +187,15 @@ describe('ChatComponent', () => {
     const event = new KeyboardEvent('keydown', { key: 'Enter' })
     component.searchInputKeyDown(event)
     expect(component.sendMessage).toHaveBeenCalled()
+  })
+
+  it('should not send message on Enter key press while composing with IME', () => {
+    jest.spyOn(component, 'sendMessage')
+    const event = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      isComposing: true,
+    })
+    component.searchInputKeyDown(event)
+    expect(component.sendMessage).not.toHaveBeenCalled()
   })
 })

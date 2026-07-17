@@ -117,12 +117,12 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
     if (this.selectionModel.ownerFilter === OwnerFilterType.SELF) {
       this.selectionModel.includeUsers = []
       this.selectionModel.excludeUsers = []
-      this.selectionModel.userID = this.settingsService.currentUser.id
+      this.selectionModel.userID = this.settingsService.currentUser().id
       this.selectionModel.hideUnowned = false
     } else if (this.selectionModel.ownerFilter === OwnerFilterType.NOT_SELF) {
       this.selectionModel.userID = null
       this.selectionModel.includeUsers = []
-      this.selectionModel.excludeUsers = [this.settingsService.currentUser.id]
+      this.selectionModel.excludeUsers = [this.settingsService.currentUser().id]
       this.selectionModel.hideUnowned = false
     } else if (this.selectionModel.ownerFilter === OwnerFilterType.NONE) {
       this.selectionModel.userID = null
@@ -132,7 +132,7 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
     } else if (
       this.selectionModel.ownerFilter === OwnerFilterType.SHARED_BY_ME
     ) {
-      this.selectionModel.userID = this.settingsService.currentUser.id
+      this.selectionModel.userID = this.settingsService.currentUser()?.id
       this.selectionModel.includeUsers = []
       this.selectionModel.excludeUsers = []
       this.selectionModel.hideUnowned = false

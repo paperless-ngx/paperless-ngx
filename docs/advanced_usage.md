@@ -97,6 +97,85 @@ when using this feature:
   of these correspondents to ANY new document, if both are set to
   automatic matching.
 
+## AI features {#ai-features}
+
+Paperless-ngx includes a set of optional features backed by a large language model
+(LLM): AI-assisted suggestions, similar-document retrieval, and a document chat. They
+are **off by default** and never replace the built-in, non-LLM
+[matching and suggestions](#matching).
+
+!!! warning
+
+    Enabling these features sends document content (and metadata) to the LLM backend you
+    configure. If that backend is a remote/hosted provider, your documents leave your
+    server and may incur usage charges. Consider the privacy implications before enabling,
+    and prefer a local backend (Ollama, or a self-hosted OpenAI-compatible gateway) if that
+    matters to you.
+
+All AI settings can be supplied as `PAPERLESS_AI_*` environment variables (see
+[configuration](configuration.md#ai)) or set in the admin under
+**Settings → Application Configuration**; the database value takes precedence over the
+environment.
+
+### Enabling the AI features
+
+At a minimum you need to enable AI and choose an LLM backend:
+
+- [`PAPERLESS_AI_ENABLED`](configuration.md#PAPERLESS_AI_ENABLED) — master switch.
+- [`PAPERLESS_AI_LLM_BACKEND`](configuration.md#PAPERLESS_AI_LLM_BACKEND) — `ollama`
+  (runs locally) or `openai-like` (OpenAI itself or any OpenAI-compatible API).
+- [`PAPERLESS_AI_LLM_MODEL`](configuration.md#PAPERLESS_AI_LLM_MODEL), and for
+  `openai-like` usually [`PAPERLESS_AI_LLM_API_KEY`](configuration.md#PAPERLESS_AI_LLM_API_KEY)
+  and/or [`PAPERLESS_AI_LLM_ENDPOINT`](configuration.md#PAPERLESS_AI_LLM_ENDPOINT). Ollama
+  requires `PAPERLESS_AI_LLM_ENDPOINT` pointing at your Ollama server.
+
+### AI-assisted suggestions
+
+With AI enabled, Paperless-ngx can suggest a title, tags, correspondent, document type,
+storage path and dates by sending the document to the LLM. This is **opt-in per request**
+and surfaces through the "Suggest" control on the document detail page, alongside the
+classic classifier-based suggestions — it does not disable them. Suggestion output
+language can be steered with
+[`PAPERLESS_AI_LLM_OUTPUT_LANGUAGE`](configuration.md#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE)
+(otherwise it follows the user's UI language).
+
+### The LLM index (RAG) and similar documents
+
+Setting an embedding backend turns on the **LLM index**, a vector index of your documents
+that enables Retrieval-Augmented Generation (RAG). When enabled, suggestions are grounded
+in similar existing documents, and the document chat can retrieve relevant context.
+
+Enable it by setting
+[`PAPERLESS_AI_LLM_EMBEDDING_BACKEND`](configuration.md#PAPERLESS_AI_LLM_EMBEDDING_BACKEND)
+(`huggingface` for fully-local embeddings, or `ollama` / `openai-like`). The index is only
+built when AI is enabled **and** an embedding backend is set.
+
+The index is updated automatically on a schedule controlled by
+[`PAPERLESS_LLM_INDEX_TASK_CRON`](configuration.md#PAPERLESS_LLM_INDEX_TASK_CRON) (daily by
+default), and can be rebuilt or compacted manually — see
+[Managing the LLM index](administration.md#llm-index).
+
+!!! note
+
+    Local embeddings via `huggingface` download the embedding model on first use into the
+    Paperless data directory. The first run therefore needs network access and some disk
+    space.
+
+### Document chat
+
+When the LLM index is enabled, the chat control in the top app toolbar answers questions
+about your documents. It operates over a single document or across multiple documents
+depending on the current view, and its answers include links to the source documents it
+drew from.
+
+### AI Security notes
+
+- Document content is passed to the LLM as **untrusted data**.
+- By default Paperless-ngx allows AI endpoints that resolve to private/loopback addresses
+  (for local backends). Set
+  [`PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS`](configuration.md#PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS)
+  to `false` to block them.
+
 ## Hooking into the consumption process {#consume-hooks}
 
 Sometimes you may want to do something arbitrary whenever a document is
@@ -846,7 +925,7 @@ Paperless is able to utilize barcodes for automatically performing some tasks. B
 
 At this time, the library utilized for detection of barcodes supports the following types:
 
-- AN-13/UPC-A
+- EAN-13/UPC-A
 - UPC-E
 - EAN-8
 - Code 128
@@ -855,7 +934,9 @@ At this time, the library utilized for detection of barcodes supports the follow
 - Codabar
 - Interleaved 2 of 5
 - QR Code
-- SQ Code
+- Data Matrix
+- Aztec
+- PDF417
 
 For usage in Paperless, the type of barcode does not matter, only the contents of it.
 

@@ -8,6 +8,7 @@ share implementation.
 
 from __future__ import annotations
 
+import codecs
 import logging
 import re
 import tempfile
@@ -114,7 +115,7 @@ def read_file_handle_unicode_errors(
     filepath: Path,
     log: logging.Logger | None = None,
 ) -> str:
-    """Read a file as UTF-8 text, replacing invalid bytes rather than raising.
+    """Read a file as text, detecting encoding via BOM and stripping NUL bytes.
 
     Parameters
     ----------
@@ -127,15 +128,27 @@ def read_file_handle_unicode_errors(
     Returns
     -------
     str
-        File content as a string, with any invalid UTF-8 sequences replaced
-        by the Unicode replacement character.
+        File content as a string, with NUL bytes removed so the result is
+        safe to store in PostgreSQL text fields.
     """
     _log = log or logger
+    raw = filepath.read_bytes()
+
+    if raw.startswith((codecs.BOM_UTF16_LE, codecs.BOM_UTF16_BE)):
+        encoding = "utf-16"
+    elif raw.startswith(codecs.BOM_UTF8):
+        encoding = "utf-8-sig"
+    else:
+        encoding = "utf-8"
+
     try:
-        return filepath.read_text(encoding="utf-8")
+        text = raw.decode(encoding)
     except UnicodeDecodeError as e:
         _log.warning("Unicode error during text reading, continuing: %s", e)
-        return filepath.read_bytes().decode("utf-8", errors="replace")
+        text = raw.decode("utf-8", errors="replace")
+
+    # PostgreSQL rejects NUL (0x00) bytes in text fields
+    return text.replace("\x00", "")
 
 
 def get_page_count_for_pdf(

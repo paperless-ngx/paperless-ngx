@@ -5,10 +5,10 @@
 </div>
 <div class="modal-body">
   @if (messageBold) {
-    <p><b>{{messageBold}}</b></p>
+    <p class="text-break"><b>{{messageBold}}</b></p>
   }
   @if (message) {
-    <p class="mb-0" [innerHTML]="message"></p>
+    <p class="mb-0 text-break" [innerHTML]="message"></p>
   }
 </div>
 <div class="modal-footer">

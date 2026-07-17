@@ -1,9 +1,9 @@
 import {
   Component,
   EventEmitter,
-  Input,
   Output,
   ViewChild,
+  input,
 } from '@angular/core'
 import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -20,18 +20,10 @@ export class SuggestionsDropdownComponent {
   public popperOptions = pngxPopperOptions
 
   @ViewChild('dropdown') dropdown: NgbDropdown
-
-  @Input()
-  suggestions: DocumentSuggestions = null
-
-  @Input()
-  aiEnabled: boolean = false
-
-  @Input()
-  loading: boolean = false
-
-  @Input()
-  disabled: boolean = false
+  readonly suggestions = input<DocumentSuggestions>(null)
+  readonly aiEnabled = input(false)
+  readonly loading = input(false)
+  readonly disabled = input(false)
 
   @Output()
   getSuggestions: EventEmitter<SuggestionsDropdownComponent> =
@@ -47,7 +39,15 @@ export class SuggestionsDropdownComponent {
   addCorrespondent: EventEmitter<string> = new EventEmitter()
 
   public clickSuggest(): void {
-    if (!this.suggestions) {
+    if (
+      this.disabled() ||
+      this.loading() ||
+      (this.suggestions() && !this.aiEnabled())
+    ) {
+      return
+    }
+
+    if (!this.suggestions()) {
       this.getSuggestions.emit(this)
     } else {
       this.dropdown?.toggle()
@@ -56,9 +56,9 @@ export class SuggestionsDropdownComponent {
 
   get totalSuggestions(): number {
     return (
-      this.suggestions?.suggested_correspondents?.length +
-        this.suggestions?.suggested_tags?.length +
-        this.suggestions?.suggested_document_types?.length || 0
+      this.suggestions()?.suggested_correspondents?.length +
+        this.suggestions()?.suggested_tags?.length +
+        this.suggestions()?.suggested_document_types?.length || 0
     )
   }
 }

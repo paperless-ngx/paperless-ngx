@@ -6,6 +6,7 @@ import pytest
 from django.test import override_settings
 
 from documents.models import Document
+from paperless.config import AIConfig
 from paperless_ai.ai_classifier import build_localization_prompt
 from paperless_ai.ai_classifier import build_prompt_with_rag
 from paperless_ai.ai_classifier import build_prompt_without_rag
@@ -211,11 +212,12 @@ def test_prompt_with_without_rag(mock_document):
         "paperless_ai.ai_classifier.get_context_for_document",
         return_value="Context from similar documents",
     ):
-        prompt = build_prompt_without_rag(mock_document)
+        config = AIConfig()
+        prompt = build_prompt_without_rag(mock_document, config)
         assert "Additional context from similar documents" not in prompt
         assert "for generated" not in prompt
 
-        prompt = build_prompt_with_rag(mock_document)
+        prompt = build_prompt_with_rag(mock_document, config)
         assert "Additional context from similar documents" in prompt
 
         prompt = build_localization_prompt(
@@ -235,6 +237,23 @@ def test_prompt_with_without_rag(mock_document):
 
 def test_get_language_name_falls_back_to_language_code():
     assert get_language_name("zz-zz") == "zz-zz"
+
+
+def test_build_localization_prompt_preserves_unicode_characters():
+    prompt = build_localization_prompt(
+        {
+            "title": "Gebührenbescheid",
+            "tags": [],
+            "correspondents": [],
+            "document_types": [],
+            "storage_paths": [],
+            "dates": [],
+        },
+        output_language="de-de",
+    )
+
+    assert "Gebührenbescheid" in prompt
+    assert "\\u00fc" not in prompt
 
 
 @patch("paperless_ai.ai_classifier.query_similar_documents")

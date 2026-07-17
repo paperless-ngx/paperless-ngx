@@ -7,8 +7,9 @@
     <div class="px-3 py-2 mb-2">
       @if (versionUploadState === UploadState.Idle) {
         <div class="input-group input-group-sm mb-2">
-          <span class="input-group-text" i18n>Label</span>
+          <label class="input-group-text" for="newVersionLabel" i18n>Label</label>
           <input
+            id="newVersionLabel"
             class="form-control"
             type="text"
             [(ngModel)]="newVersionLabel"
@@ -70,9 +71,13 @@
               }
             </div>
             <div class="d-flex flex-column">
+              @if (isEditingVersion(version.id)) {
+                <label class="visually-hidden" for="versionLabel{{ version.id }}" i18n>Version label</label>
+              }
               <div class="input-group input-group-sm mb-1">
                 @if (isEditingVersion(version.id)) {
                   <input
+                    id="versionLabel{{ version.id }}"
                     class="form-control"
                     type="text"
                     [(ngModel)]="versionLabelDraft"

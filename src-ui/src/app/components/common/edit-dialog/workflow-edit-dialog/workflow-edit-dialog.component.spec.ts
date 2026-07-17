@@ -187,14 +187,14 @@ describe('WorkflowEditDialogComponent', () => {
 
     fixture = TestBed.createComponent(WorkflowEditDialogComponent)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = { id: 99, username: 'user99' }
+    settingsService.currentUser.set({ id: 99, username: 'user99' })
     component = fixture.componentInstance
 
     fixture.detectChanges()
   })
 
   it('should support create and edit modes, support adding triggers and actions on new workflow', () => {
-    component.dialogMode = EditDialogMode.CREATE
+    component.dialogMode.set(EditDialogMode.CREATE)
     const createTitleSpy = jest.spyOn(component, 'getCreateTitle')
     const editTitleSpy = jest.spyOn(component, 'getEditTitle')
     fixture.detectChanges()
@@ -209,7 +209,7 @@ describe('WorkflowEditDialogComponent', () => {
     expect(component.object).not.toBeUndefined()
     expect(component.object.triggers).toHaveLength(1)
 
-    component.dialogMode = EditDialogMode.EDIT
+    component.dialogMode.set(EditDialogMode.EDIT)
     fixture.detectChanges()
     expect(editTitleSpy).toHaveBeenCalled()
   })
@@ -401,7 +401,7 @@ describe('WorkflowEditDialogComponent', () => {
     component.addFilter(triggerGroup as FormGroup)
 
     const filters = component.getFiltersFormArray(triggerGroup as FormGroup)
-    expect(filters.length).toBe(3)
+    expect(filters).toHaveLength(3)
 
     filters.at(0).get('values').setValue([1])
     filters.at(1).get('values').setValue([2, 3])
@@ -672,7 +672,7 @@ describe('WorkflowEditDialogComponent', () => {
     } as any
 
     const filters = component['buildFiltersFormArray'](trigger)
-    expect(filters.length).toBe(0)
+    expect(filters).toHaveLength(0)
 
     component.filterDefinitions = originalDefinitions
   })
@@ -739,7 +739,7 @@ describe('WorkflowEditDialogComponent', () => {
     component.ngOnInit()
     const triggerGroup = component.triggerFields.at(0) as FormGroup
     const filters = component.getFiltersFormArray(triggerGroup)
-    expect(filters.length).toBe(13)
+    expect(filters).toHaveLength(13)
     const customFieldFilter = filters.at(12) as FormGroup
     expect(customFieldFilter.get('type').value).toBe(
       TriggerFilterType.CustomFieldQuery
@@ -771,25 +771,21 @@ describe('WorkflowEditDialogComponent', () => {
       false
     )
 
-    component.correspondents = [{ id: 1, name: 'C1' } as any]
-    component.documentTypes = [{ id: 2, name: 'DT' } as any]
-    component.storagePaths = [{ id: 3, name: 'SP' } as any]
-
     expect(
       component.getFilterSelectItems(TriggerFilterType.CorrespondentIs)
-    ).toEqual(component.correspondents)
+    ).toEqual(component.correspondents())
     expect(
       component.getFilterSelectItems(TriggerFilterType.DocumentTypeIs)
-    ).toEqual(component.documentTypes)
+    ).toEqual(component.documentTypes())
     expect(
       component.getFilterSelectItems(TriggerFilterType.DocumentTypeAny)
-    ).toEqual(component.documentTypes)
+    ).toEqual(component.documentTypes())
     expect(
       component.getFilterSelectItems(TriggerFilterType.StoragePathIs)
-    ).toEqual(component.storagePaths)
+    ).toEqual(component.storagePaths())
     expect(
       component.getFilterSelectItems(TriggerFilterType.StoragePathAny)
-    ).toEqual(component.storagePaths)
+    ).toEqual(component.storagePaths())
     expect(component.getFilterSelectItems(TriggerFilterType.TagsAll)).toEqual(
       []
     )
@@ -973,12 +969,12 @@ describe('WorkflowEditDialogComponent', () => {
     component.addFilter(triggerGroup)
 
     component.removeFilter(triggerGroup, 0)
-    expect(component.getFiltersFormArray(triggerGroup).length).toBe(0)
+    expect(component.getFiltersFormArray(triggerGroup)).toHaveLength(0)
 
     component.addFilter(triggerGroup)
     const filterArrayAfterAdd = component.getFiltersFormArray(triggerGroup)
     filterArrayAfterAdd.at(0).get('type').setValue(TriggerFilterType.TagsAll)
-    expect(component.getFiltersFormArray(triggerGroup).length).toBe(1)
+    expect(component.getFiltersFormArray(triggerGroup)).toHaveLength(1)
   })
 
   it('should remove selected custom field from the form group', () => {

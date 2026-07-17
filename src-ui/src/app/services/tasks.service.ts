@@ -1,10 +1,11 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable, inject } from '@angular/core'
+import { Injectable, inject, signal } from '@angular/core'
 import { Observable, Subject } from 'rxjs'
 import { first, map, takeUntil, tap } from 'rxjs/operators'
 import {
   PaperlessTask,
   PaperlessTaskStatus,
+  PaperlessTaskStatusCounts,
   PaperlessTaskType,
 } from 'src/app/data/paperless-task'
 import { Results } from 'src/app/data/results'
@@ -22,44 +23,44 @@ export class TasksService {
 
   public loading: boolean = false
 
-  private fileTasks: PaperlessTask[] = []
+  private readonly fileTasks = signal<PaperlessTask[]>([])
 
   private unsubscribeNotifer: Subject<any> = new Subject()
 
   public get total(): number {
-    return this.fileTasks.length
+    return this.fileTasks().length
   }
 
   public get allFileTasks(): PaperlessTask[] {
-    return this.fileTasks.slice(0)
+    return this.fileTasks().slice(0)
   }
 
   public get queuedFileTasks(): PaperlessTask[] {
-    return this.fileTasks.filter(
+    return this.fileTasks().filter(
       (t) => t.status === PaperlessTaskStatus.Pending
     )
   }
 
   public get startedFileTasks(): PaperlessTask[] {
-    return this.fileTasks.filter(
+    return this.fileTasks().filter(
       (t) => t.status === PaperlessTaskStatus.Started
     )
   }
 
   public get completedFileTasks(): PaperlessTask[] {
-    return this.fileTasks.filter(
+    return this.fileTasks().filter(
       (t) => t.status === PaperlessTaskStatus.Success
     )
   }
 
   public get failedFileTasks(): PaperlessTask[] {
-    return this.fileTasks.filter(
+    return this.fileTasks().filter(
       (t) => t.status === PaperlessTaskStatus.Failure
     )
   }
 
   public get needsAttentionTasks(): PaperlessTask[] {
-    return this.fileTasks.filter((t) =>
+    return this.fileTasks().filter((t) =>
       [PaperlessTaskStatus.Failure, PaperlessTaskStatus.Revoked].includes(
         t.status
       )
@@ -80,7 +81,7 @@ export class TasksService {
       .pipe(map((r) => r.results))
       .pipe(takeUntil(this.unsubscribeNotifer), first())
       .subscribe((r) => {
-        this.fileTasks = r
+        this.fileTasks.set(r)
         this.loading = false
       })
   }
@@ -88,7 +89,7 @@ export class TasksService {
   public list(
     page: number,
     pageSize: number,
-    extraParams?: Record<string, string | number | boolean>
+    extraParams?: Record<string, string | number | boolean | readonly string[]>
   ): Observable<Results<PaperlessTask>> {
     return this.http.get<Results<PaperlessTask>>(
       `${this.baseUrl}${this.endpoint}/`,
@@ -102,10 +103,35 @@ export class TasksService {
     )
   }
 
+  public statusCounts(
+    extraParams?: Record<string, string | number | boolean | readonly string[]>
+  ): Observable<PaperlessTaskStatusCounts> {
+    return this.http.get<PaperlessTaskStatusCounts>(
+      `${this.baseUrl}${this.endpoint}/status_counts/`,
+      {
+        params: extraParams,
+      }
+    )
+  }
+
   public dismissTasks(task_ids: Set<number>): Observable<any> {
     return this.http
       .post(`${this.baseUrl}tasks/acknowledge/`, {
         tasks: [...task_ids],
+      })
+      .pipe(
+        first(),
+        takeUntil(this.unsubscribeNotifer),
+        tap(() => {
+          this.reload()
+        })
+      )
+  }
+
+  public dismissAllTasks(): Observable<any> {
+    return this.http
+      .post(`${this.baseUrl}tasks/acknowledge/`, {
+        all: true,
       })
       .pipe(
         first(),

@@ -28,6 +28,7 @@ from django.db.models.functions import Cast
 from django.utils.translation import gettext_lazy as _
 from django_filters import DateFilter
 from django_filters.rest_framework import BooleanFilter
+from django_filters.rest_framework import CharFilter
 from django_filters.rest_framework import DateTimeFilter
 from django_filters.rest_framework import Filter
 from django_filters.rest_framework import FilterSet
@@ -900,6 +901,16 @@ class ShareLinkBundleFilterSet(FilterSet):
 
 
 class PaperlessTaskFilterSet(FilterSet):
+    name = CharFilter(
+        method="filter_name",
+        label="Name",
+    )
+
+    result = CharFilter(
+        method="filter_result",
+        label="Result",
+    )
+
     task_type = MultipleChoiceFilter(
         choices=PaperlessTask.TaskType.choices,
         label="Task Type",
@@ -939,7 +950,58 @@ class PaperlessTaskFilterSet(FilterSet):
 
     class Meta:
         model = PaperlessTask
-        fields = ["task_type", "trigger_source", "status", "acknowledged", "owner"]
+        fields = [
+            "task_type",
+            "trigger_source",
+            "status",
+            "acknowledged",
+            "owner",
+            "name",
+            "result",
+        ]
+
+    def filter_name(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        matching_task_types = [
+            task_type
+            for task_type, label in PaperlessTask.TaskType.choices
+            if value.lower() in str(label).lower()
+        ]
+        matching_trigger_sources = [
+            trigger_source
+            for trigger_source, label in PaperlessTask.TriggerSource.choices
+            if value.lower() in str(label).lower()
+        ]
+
+        return queryset.filter(
+            Q(input_data__filename__icontains=value)
+            | Q(task_type__in=matching_task_types)
+            | Q(trigger_source__in=matching_trigger_sources),
+        )
+
+    def filter_result(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        query = Q(result_data__reason__icontains=value) | Q(
+            result_data__error_message__icontains=value,
+        )
+
+        try:
+            numeric_value = int(value)
+        except (TypeError, ValueError):
+            pass
+        else:
+            query |= Q(result_data__document_id=numeric_value) | Q(
+                result_data__duplicate_of=numeric_value,
+            )
+
+        if "duplicate" in value.lower():
+            query |= Q(result_data__duplicate_of__isnull=False)
+
+        return queryset.filter(query)
 
     def filter_is_complete(self, queryset, name, value):
         if value:

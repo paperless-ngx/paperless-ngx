@@ -1,6 +1,7 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { signal } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
@@ -226,7 +227,8 @@ describe('SavedViewsComponent', () => {
     const modalRef = {
       componentInstance: {
         confirmClicked,
-        buttonsEnabled: true,
+        buttonsEnabled: signal(true),
+        note: signal(null),
       },
       close: jest.fn(),
     } as any

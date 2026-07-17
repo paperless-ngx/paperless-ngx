@@ -4,6 +4,7 @@ import logging
 import ssl
 import tempfile
 import traceback
+import unicodedata
 from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
@@ -17,6 +18,7 @@ from celery import shared_task
 from celery.canvas import Signature
 from django.conf import settings
 from django.db import DatabaseError
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.timezone import is_naive
 from django.utils.timezone import make_aware
@@ -244,6 +246,7 @@ def apply_mail_action(
     message_uid: str,
     message_subject: str,
     message_date: datetime.datetime,
+    uid_validity: str | None = None,
 ) -> None:
     """
     This shared task applies the mail action of a particular mail rule to the
@@ -285,6 +288,7 @@ def apply_mail_action(
             rule=rule,
             folder=rule.folder,
             uid=message_uid,
+            uid_validity=uid_validity,
             subject=message_subject,
             received=message_date,
             status="SUCCESS",
@@ -296,6 +300,7 @@ def apply_mail_action(
             rule=rule,
             folder=rule.folder,
             uid=message_uid,
+            uid_validity=uid_validity,
             subject=message_subject,
             received=message_date,
             status="FAILED",
@@ -313,6 +318,7 @@ def error_callback(
     message_uid: str,
     message_subject: str,
     message_date: datetime.datetime,
+    uid_validity: str | None = None,
 ) -> None:
     """
     A shared task that is called whenever something goes wrong during
@@ -324,6 +330,7 @@ def error_callback(
         rule=rule,
         folder=rule.folder,
         uid=message_uid,
+        uid_validity=uid_validity,
         subject=message_subject,
         received=make_aware(message_date) if is_naive(message_date) else message_date,
         status="FAILED",
@@ -336,6 +343,7 @@ def queue_consumption_tasks(
     consume_tasks: list[Signature],
     rule: MailRule,
     message: MailMessage,
+    uid_validity: str | None,
 ) -> None:
     """
     Queue a list of consumption tasks (Signatures for the consume_file shared
@@ -347,6 +355,7 @@ def queue_consumption_tasks(
         message_uid=message.uid,
         message_subject=message.subject,
         message_date=message.date,
+        uid_validity=uid_validity,
     )
     chord(header=consume_tasks, body=mail_action_task).on_error(
         error_callback.s(
@@ -354,6 +363,7 @@ def queue_consumption_tasks(
             message_uid=message.uid,
             message_subject=message.subject,
             message_date=message.date,
+            uid_validity=uid_validity,
         ),
     ).delay()
 
@@ -459,6 +469,7 @@ class MailAccountHandler(LoggingMixin):
         super().__init__()
         self.renew_logging_group()
         self._init_preprocessors()
+        self._current_uid_validity: str | None = None
 
     def _init_preprocessors(self) -> None:
         self._message_preprocessors: list[MailMessagePreprocessor] = []
@@ -496,10 +507,10 @@ class MailAccountHandler(LoggingMixin):
         rule: MailRule,
     ) -> str | None:
         if rule.assign_title_from == MailRule.TitleSource.FROM_SUBJECT:
-            return message.subject
+            return unicodedata.normalize("NFC", message.subject)
 
         elif rule.assign_title_from == MailRule.TitleSource.FROM_FILENAME:
-            return Path(att.filename).stem
+            return unicodedata.normalize("NFC", Path(att.filename).stem)
 
         elif rule.assign_title_from == MailRule.TitleSource.NONE:
             return None
@@ -508,6 +519,21 @@ class MailAccountHandler(LoggingMixin):
             raise NotImplementedError(
                 "Unknown title selector.",
             )  # pragma: no cover
+
+    def _get_uid_validity(self, M: MailBox, folder: str) -> str | None:
+        try:
+            uid_validity = M.folder.status(folder, ["UIDVALIDITY"]).get("UIDVALIDITY")
+            if uid_validity is not None:
+                return str(uid_validity)
+        except errors.MailboxFolderStatusError as e:
+            self.log.warning(
+                f"Server does not support retrieving UIDVALIDITY for folder {folder}: {e}",
+            )
+        except Exception as e:
+            self.log.warning(
+                f"Unable to retrieve UIDVALIDITY for folder {folder}: {e}",
+            )
+        return None
 
     def _get_correspondent(
         self,
@@ -646,6 +672,8 @@ class MailAccountHandler(LoggingMixin):
                 f"does not exist in account {rule.account}",
             ) from err
 
+        self._current_uid_validity = self._get_uid_validity(M, rule.folder)
+
         criterias = make_criterias(rule, supports_gmail_labels=supports_gmail_labels)
 
         self.log.debug(
@@ -686,11 +714,17 @@ class MailAccountHandler(LoggingMixin):
                 )
                 continue
 
-            if ProcessedMail.objects.filter(
+            already_processed = ProcessedMail.objects.filter(
                 rule=rule,
                 uid=message.uid,
                 folder=rule.folder,
-            ).exists():
+            )
+            if self._current_uid_validity is not None:
+                already_processed = already_processed.filter(
+                    Q(uid_validity=self._current_uid_validity)
+                    | Q(uid_validity__isnull=True),
+                )
+            if already_processed.exists():
                 self.log.debug(
                     f"Skipping mail '{message.uid}' subject '{message.subject}' from '{message.from_}', already processed.",
                 )
@@ -866,7 +900,9 @@ class MailAccountHandler(LoggingMixin):
                     ),
                 )
 
-                attachment_name = pathvalidate.sanitize_filename(att.filename)
+                attachment_name = pathvalidate.sanitize_filename(
+                    unicodedata.normalize("NFC", att.filename),
+                )
                 if attachment_name:
                     temp_filename = temp_dir / attachment_name
                 else:  # pragma: no cover
@@ -882,7 +918,7 @@ class MailAccountHandler(LoggingMixin):
                 )
                 doc_overrides = DocumentMetadataOverrides(
                     title=title,
-                    filename=pathvalidate.sanitize_filename(att.filename),
+                    filename=attachment_name,
                     correspondent_id=correspondent.id if correspondent else None,
                     document_type_id=doc_type.id if doc_type else None,
                     tag_ids=tag_ids,
@@ -918,6 +954,7 @@ class MailAccountHandler(LoggingMixin):
                 consume_tasks=consume_tasks,
                 rule=rule,
                 message=message,
+                uid_validity=self._current_uid_validity,
             )
         else:
             # No files to consume, just mark as processed if it wasn't by .eml processing
@@ -925,11 +962,13 @@ class MailAccountHandler(LoggingMixin):
                 rule=rule,
                 uid=message.uid,
                 folder=rule.folder,
+                uid_validity=self._current_uid_validity,
             ).exists():
                 ProcessedMail.objects.create(
                     rule=rule,
                     folder=rule.folder,
                     uid=message.uid,
+                    uid_validity=self._current_uid_validity,
                     subject=message.subject,
                     received=make_aware(message.date)
                     if is_naive(message.date)
@@ -988,7 +1027,9 @@ class MailAccountHandler(LoggingMixin):
         )
         doc_overrides = DocumentMetadataOverrides(
             title=message.subject,
-            filename=pathvalidate.sanitize_filename(f"{message.subject}.eml"),
+            filename=pathvalidate.sanitize_filename(
+                unicodedata.normalize("NFC", f"{message.subject}.eml"),
+            ),
             correspondent_id=correspondent.id if correspondent else None,
             document_type_id=doc_type.id if doc_type else None,
             tag_ids=tag_ids,
@@ -1004,6 +1045,7 @@ class MailAccountHandler(LoggingMixin):
             consume_tasks=[consume_task],
             rule=rule,
             message=message,
+            uid_validity=self._current_uid_validity,
         )
 
         processed_elements = 1

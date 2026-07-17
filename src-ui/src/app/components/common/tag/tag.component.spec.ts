@@ -37,7 +37,7 @@ describe('TagComponent', () => {
   })
 
   it('should create tag with background color', () => {
-    component.tag = tag
+    component.tag.set(tag)
     fixture.detectChanges()
     expect(
       fixture.debugElement.query(By.css('span')).nativeElement.style
@@ -52,10 +52,10 @@ describe('TagComponent', () => {
   })
 
   it('should support clickable option', () => {
-    component.tag = tag
+    component.tag.set(tag)
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('a.badge'))).toBeNull()
-    component.clickable = true
+    fixture.componentRef.setInput('clickable', true)
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('a.badge'))).not.toBeNull()
   })
@@ -64,8 +64,9 @@ describe('TagComponent', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     const getCachedSpy = jest.spyOn(tagService, 'getCached')
     getCachedSpy.mockReturnValue(of(tag))
-    component.tagID = 1
+    fixture.componentRef.setInput('tagID', 1)
+    fixture.detectChanges()
     expect(getCachedSpy).toHaveBeenCalledWith(1)
-    expect(component.tag).toEqual(tag)
+    expect(component.tag()).toEqual(tag)
   })
 })

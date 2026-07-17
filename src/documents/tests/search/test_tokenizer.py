@@ -99,6 +99,25 @@ class TestTokenizers:
         )
         assert simple_search_index.searcher().search(q, limit=5).count == 1
 
+    def test_simple_search_analyzer_supports_model_limit_token_substrings(
+        self,
+        simple_search_index: tantivy.Index,
+    ) -> None:
+        """Simple substring search keeps tokens up to Document.title's model limit."""
+        long_token = "abcdefghij" * 12 + "abcdefgh"
+        writer = simple_search_index.writer()
+        doc = tantivy.Document()
+        doc.add_text("simple_content", long_token)
+        writer.add_document(doc)
+        writer.commit()
+        simple_search_index.reload()
+        q = tantivy.Query.regex_query(
+            simple_search_index.schema,
+            "simple_content",
+            ".*cdefg.*",
+        )
+        assert simple_search_index.searcher().search(q, limit=5).count == 1
+
     def test_unsupported_language_logs_warning(self, caplog: LogCaptureFixture) -> None:
         """Unsupported language codes should log a warning and disable stemming gracefully."""
         sb = tantivy.SchemaBuilder()

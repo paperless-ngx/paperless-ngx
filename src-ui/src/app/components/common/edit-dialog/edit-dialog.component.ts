@@ -5,6 +5,7 @@ import {
   OnInit,
   Output,
   inject,
+  model,
 } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
@@ -45,10 +46,7 @@ export abstract class EditDialogComponent<
   protected settingsService = inject(SettingsService)
   protected permissionsService = inject(PermissionsService)
 
-  users: User[]
-
-  @Input()
-  dialogMode: EditDialogMode = EditDialogMode.CREATE
+  dialogMode = model(EditDialogMode.CREATE)
 
   @Input()
   object: T
@@ -59,18 +57,20 @@ export abstract class EditDialogComponent<
   @Output()
   failed = new EventEmitter()
 
+  users: User[]
+
   networkActive = false
 
   closeEnabled = false
 
-  error = null
+  error: any = null
 
   abstract getForm(): FormGroup
 
   objectForm: FormGroup = this.getForm()
 
   ngOnInit(): void {
-    if (this.object != null && this.dialogMode !== EditDialogMode.CREATE) {
+    if (this.object != null && this.dialogMode() !== EditDialogMode.CREATE) {
       this.object['permissions_form'] = {
         owner: (this.object as ObjectWithPermissions).owner,
         set_permissions: (this.object as ObjectWithPermissions).permissions,
@@ -124,7 +124,7 @@ export abstract class EditDialogComponent<
   }
 
   getTitle() {
-    switch (this.dialogMode) {
+    switch (this.dialogMode()) {
       case EditDialogMode.CREATE:
         return this.getCreateTitle()
       case EditDialogMode.EDIT:
@@ -151,7 +151,7 @@ export abstract class EditDialogComponent<
 
   protected shouldSubmitPermissions(): boolean {
     return (
-      this.dialogMode === EditDialogMode.CREATE ||
+      this.dialogMode() === EditDialogMode.CREATE ||
       this.permissionsService.currentUserOwnsObject(this.object)
     )
   }
@@ -172,7 +172,7 @@ export abstract class EditDialogComponent<
       delete newObject['set_permissions']
     }
     var serverResponse: Observable<T>
-    switch (this.dialogMode) {
+    switch (this.dialogMode()) {
       case EditDialogMode.CREATE:
         serverResponse = this.service.create(newObject)
         break

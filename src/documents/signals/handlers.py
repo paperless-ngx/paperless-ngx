@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import hashlib
 import logging
 import shutil
 import traceback as _tb
@@ -16,6 +15,7 @@ from celery.signals import task_postrun
 from celery.signals import task_prerun
 from celery.signals import task_revoked
 from celery.signals import worker_process_init
+from celery.signals import worker_process_shutdown
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -54,6 +54,7 @@ from documents.models import WorkflowTrigger
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.plugins.helpers import DocumentsStatusManager
 from documents.templating.utils import convert_format_str_to_template_format
+from documents.utils import compute_checksum
 from documents.workflows.actions import build_workflow_action_context
 from documents.workflows.actions import execute_email_action
 from documents.workflows.actions import execute_move_to_trash_action
@@ -410,8 +411,7 @@ def _path_matches_checksum(path: Path, checksum: str | None) -> bool:
     if checksum is None or not path.is_file():
         return False
 
-    with path.open("rb") as f:
-        return hashlib.md5(f.read()).hexdigest() == checksum
+    return compute_checksum(path) == checksum
 
 
 def _filename_template_uses_custom_fields(doc: Document) -> bool:
@@ -1334,6 +1334,20 @@ def close_connection_pool_on_worker_init(**kwargs) -> None:
     initializes connection pools then forks.
 
     Closing these pools after forking ensures child processes have a valid connection.
+    """
+    for conn in connections.all(initialized_only=True):
+        if conn.alias == "default" and hasattr(conn, "pool") and conn.pool:
+            conn.close_pool()
+
+
+@worker_process_shutdown.connect
+def close_connection_pool_on_worker_shutdown(**kwargs) -> None:  # pragma: no cover
+    """
+    Close the DB connection pool when a Celery child process exits.
+
+    With CELERY_WORKER_MAX_TASKS_PER_CHILD=1 each child is replaced after a
+    single task. Without closing the pool on shutdown, its connections linger
+    on the server until TCP keepalive reaps them, accumulating over time.
     """
     for conn in connections.all(initialized_only=True):
         if conn.alias == "default" and hasattr(conn, "pool") and conn.pool:

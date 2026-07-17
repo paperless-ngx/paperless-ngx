@@ -1,7 +1,9 @@
+from datetime import timedelta
 from types import SimpleNamespace
 from unittest import mock
 
 from django.test import TestCase
+from django.utils import timezone
 
 from documents.conditionals import metadata_etag
 from documents.conditionals import preview_etag
@@ -29,9 +31,30 @@ class TestConditionals(DirectoriesMixin, TestCase):
         )
         request = SimpleNamespace(query_params={})
 
-        self.assertEqual(metadata_etag(request, root.id), latest.checksum)
+        self.assertEqual(
+            metadata_etag(request, root.id),
+            f"{latest.checksum}:{latest.modified.isoformat()}",
+        )
         self.assertEqual(preview_etag(request, root.id), latest.archive_checksum)
         self.assertEqual(thumbnail_etag(request, root.id), latest.checksum)
+
+    def test_metadata_etag_changes_when_document_modified_changes(self) -> None:
+        doc = Document.objects.create(
+            title="doc",
+            checksum="same-checksum",
+            mime_type="application/pdf",
+        )
+        request = SimpleNamespace(query_params={})
+
+        original_etag = metadata_etag(request, doc.id)
+        new_modified = timezone.now() + timedelta(seconds=5)
+        Document.objects.filter(id=doc.id).update(modified=new_modified)
+
+        self.assertNotEqual(metadata_etag(request, doc.id), original_etag)
+        self.assertEqual(
+            metadata_etag(request, doc.id),
+            f"{doc.checksum}:{new_modified.isoformat()}",
+        )
 
     def test_resolve_effective_doc_returns_none_for_invalid_or_unrelated_version(
         self,

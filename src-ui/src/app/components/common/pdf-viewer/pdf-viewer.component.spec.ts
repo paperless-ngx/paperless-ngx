@@ -49,8 +49,7 @@ describe('PngxPdfViewerComponent', () => {
       new URL('assets/js/pdf.worker.min.mjs', document.baseURI).toString()
     )
     const isVisible = (component as any).findController.onIsPageVisible as
-      | (() => boolean)
-      | undefined
+      (() => boolean) | undefined
     expect(isVisible?.()).toBe(true)
     expect(loadSpy).toHaveBeenCalledWith(
       expect.objectContaining({ numPages: 1 })
@@ -61,6 +60,7 @@ describe('PngxPdfViewerComponent', () => {
 
   it('resolves the worker source relative to the document base URI', async () => {
     setBaseHref('/paperless/')
+    const getDocumentSpy = jest.spyOn(pdfjs, 'getDocument')
 
     await initComponent()
 
@@ -70,6 +70,13 @@ describe('PngxPdfViewerComponent', () => {
     expect(pdfjs.GlobalWorkerOptions.workerSrc).toContain(
       '/paperless/assets/js/pdf.worker.min.mjs'
     )
+    expect(getDocumentSpy).toHaveBeenCalledWith({
+      url: 'test.pdf',
+      password: undefined,
+      withCredentials: true,
+      wasmUrl: expect.stringContaining('/paperless/assets/wasm/'),
+      iccUrl: expect.stringContaining('/paperless/assets/iccs/'),
+    })
   })
 
   it('initializes single-page viewer and disables text layer', async () => {

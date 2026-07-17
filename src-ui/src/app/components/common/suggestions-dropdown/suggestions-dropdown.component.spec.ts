@@ -22,29 +22,41 @@ describe('SuggestionsDropdownComponent', () => {
   })
 
   it('should calculate totalSuggestions', () => {
-    component.suggestions = {
+    fixture.componentRef.setInput('suggestions', {
       suggested_correspondents: ['John Doe'],
       suggested_tags: ['Tag1', 'Tag2'],
       suggested_document_types: ['Type1'],
-    }
+    })
     expect(component.totalSuggestions).toBe(4)
   })
 
   it('should emit getSuggestions when clickSuggest is called and suggestions are null', () => {
     jest.spyOn(component.getSuggestions, 'emit')
-    component.suggestions = null
+    fixture.componentRef.setInput('suggestions', null)
     component.clickSuggest()
     expect(component.getSuggestions.emit).toHaveBeenCalled()
   })
 
-  it('should toggle dropdown when clickSuggest is called and suggestions are not null', () => {
-    component.aiEnabled = true
+  it('should not emit getSuggestions when disabled', () => {
+    jest.spyOn(component.getSuggestions, 'emit')
+    fixture.componentRef.setInput('disabled', true)
+    fixture.componentRef.setInput('suggestions', null)
     fixture.detectChanges()
-    component.suggestions = {
+
+    component.clickSuggest()
+
+    expect(component.getSuggestions.emit).not.toHaveBeenCalled()
+    expect(fixture.nativeElement.querySelector('button').disabled).toBeTruthy()
+  })
+
+  it('should toggle dropdown when clickSuggest is called and suggestions are not null', () => {
+    fixture.componentRef.setInput('aiEnabled', true)
+    fixture.detectChanges()
+    fixture.componentRef.setInput('suggestions', {
       suggested_correspondents: [],
       suggested_tags: [],
       suggested_document_types: [],
-    }
+    })
     component.clickSuggest()
     expect(component.dropdown.open).toBeTruthy()
   })

@@ -7,6 +7,7 @@ import {
   ViewChild,
   ViewChildren,
   inject,
+  signal,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
@@ -82,12 +83,12 @@ export class GlobalSearchComponent implements OnInit {
   private locationStrategy = inject(LocationStrategy)
 
   public DataType = DataType
-  public query: string
+  readonly query = signal<string>(null)
   public queryDebounce: Subject<string>
-  public searchResults: GlobalSearchResult
+  readonly searchResults = signal<GlobalSearchResult>(null)
   private currentItemIndex: number = -1
   private domIndex: number = -1
-  public loading: boolean = false
+  readonly loading = signal(false)
 
   @ViewChild('searchInput') searchInput: ElementRef
   @ViewChild('resultsDropdown') resultsDropdown: NgbDropdown
@@ -96,6 +97,7 @@ export class GlobalSearchComponent implements OnInit {
   @ViewChildren('secondaryButton') secondaryButtons: QueryList<ElementRef>
 
   get useAdvancedForFullSearch(): boolean {
+    this.settingsService.trackChanges()
     return (
       this.settingsService.get(SETTINGS_KEYS.SEARCH_FULL_TYPE) ===
       GlobalSearchType.ADVANCED
@@ -112,7 +114,7 @@ export class GlobalSearchComponent implements OnInit {
         distinctUntilChanged()
       )
       .subscribe((text) => {
-        this.query = text
+        this.query.set(text)
         if (text) this.search(text)
       })
   }
@@ -126,10 +128,10 @@ export class GlobalSearchComponent implements OnInit {
   }
 
   private search(query: string) {
-    this.loading = true
+    this.loading.set(true)
     this.searchService.globalSearch(query.trim()).subscribe((results) => {
-      this.searchResults = results
-      this.loading = false
+      this.searchResults.set(results)
+      this.loading.set(false)
       this.resultsDropdown.open()
     })
   }
@@ -205,7 +207,7 @@ export class GlobalSearchComponent implements OnInit {
         editDialogComponent,
         { size }
       )
-      modalRef.componentInstance.dialogMode = EditDialogMode.EDIT
+      modalRef.componentInstance.dialogMode.set(EditDialogMode.EDIT)
       modalRef.componentInstance.object = object
       modalRef.componentInstance.succeeded.subscribe(() => {
         this.toastService.showInfo($localize`Successfully updated object.`)
@@ -243,7 +245,7 @@ export class GlobalSearchComponent implements OnInit {
         editDialogComponent,
         { size }
       )
-      modalRef.componentInstance.dialogMode = EditDialogMode.EDIT
+      modalRef.componentInstance.dialogMode.set(EditDialogMode.EDIT)
       modalRef.componentInstance.object = object
       modalRef.componentInstance.succeeded.subscribe(() => {
         this.toastService.showInfo($localize`Successfully updated object.`)
@@ -256,8 +258,8 @@ export class GlobalSearchComponent implements OnInit {
 
   private reset(close: boolean = false) {
     this.queryDebounce.next(null)
-    this.query = null
-    this.searchResults = null
+    this.query.set(null)
+    this.searchResults.set(null)
     this.currentItemIndex = -1
     if (close) {
       this.resultsDropdown.close()
@@ -292,7 +294,7 @@ export class GlobalSearchComponent implements OnInit {
   public searchInputKeyDown(event: KeyboardEvent) {
     if (
       event.key === 'ArrowDown' &&
-      this.searchResults?.total &&
+      this.searchResults()?.total &&
       this.resultsDropdown.isOpen()
     ) {
       event.preventDefault()
@@ -300,22 +302,22 @@ export class GlobalSearchComponent implements OnInit {
       this.setCurrentItem()
     } else if (
       event.key === 'ArrowUp' &&
-      this.searchResults?.total &&
+      this.searchResults()?.total &&
       this.resultsDropdown.isOpen()
     ) {
       event.preventDefault()
-      this.currentItemIndex = this.searchResults.total - 1
+      this.currentItemIndex = this.searchResults()?.total - 1
       this.setCurrentItem()
     } else if (event.key === 'Enter') {
-      if (this.searchResults?.total === 1 && this.resultsDropdown.isOpen()) {
+      if (this.searchResults()?.total === 1 && this.resultsDropdown.isOpen()) {
         this.primaryButtons.first.nativeElement.click()
         this.searchInput.nativeElement.blur()
-      } else if (this.query?.length) {
+      } else if (this.query()?.length) {
         this.runFullSearch()
         this.reset(true)
       }
     } else if (event.key === 'Escape' && !this.resultsDropdown.isOpen()) {
-      if (this.query?.length) {
+      if (this.query()?.length) {
         this.reset(true)
       } else {
         this.searchInput.nativeElement.blur()
@@ -325,14 +327,14 @@ export class GlobalSearchComponent implements OnInit {
 
   public dropdownKeyDown(event: KeyboardEvent) {
     if (
-      this.searchResults?.total &&
+      this.searchResults()?.total &&
       this.resultsDropdown.isOpen() &&
       document.activeElement !== this.searchInput.nativeElement
     ) {
       if (event.key === 'ArrowDown') {
         event.preventDefault()
         event.stopImmediatePropagation()
-        if (this.currentItemIndex < this.searchResults.total - 1) {
+        if (this.currentItemIndex < this.searchResults()?.total - 1) {
           this.currentItemIndex++
           this.setCurrentItem()
         } else {
@@ -412,10 +414,10 @@ export class GlobalSearchComponent implements OnInit {
       ? FILTER_FULLTEXT_QUERY
       : FILTER_SIMPLE_TEXT
     this.documentService.searchQuery = this.useAdvancedForFullSearch
-      ? this.query
+      ? this.query()
       : ''
     this.documentListViewService.quickFilter([
-      { rule_type: ruleType, value: this.query },
+      { rule_type: ruleType, value: this.query() },
     ])
     this.reset(true)
   }

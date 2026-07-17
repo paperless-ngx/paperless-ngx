@@ -1,10 +1,10 @@
 import {
   Component,
   EventEmitter,
-  Input,
   OnInit,
   Output,
   inject,
+  signal,
 } from '@angular/core'
 import {
   FormControl,
@@ -32,29 +32,18 @@ import { TextComponent } from '../../common/input/text/text.component'
 })
 export class SaveViewConfigDialogComponent implements OnInit {
   private modal = inject(NgbActiveModal)
+  readonly error = signal(undefined)
+  readonly buttonsEnabled = signal(true)
+  readonly defaultName = signal('')
+  readonly closeEnabled = signal(false)
 
   @Output()
   public saveClicked = new EventEmitter()
 
-  @Input()
-  error
-
-  @Input()
-  buttonsEnabled = true
-
-  closeEnabled = false
-
   users: User[]
 
-  _defaultName = ''
-
-  get defaultName() {
-    return this._defaultName
-  }
-
-  @Input()
-  set defaultName(value: string) {
-    this._defaultName = value
+  setDefaultName(value: string) {
+    this.defaultName.set(value)
     this.saveViewConfigForm.patchValue({ name: value })
   }
 
@@ -68,7 +57,7 @@ export class SaveViewConfigDialogComponent implements OnInit {
   ngOnInit(): void {
     // wait to enable close button so it doesn't steal focus from input since its the first clickable element in the DOM
     setTimeout(() => {
-      this.closeEnabled = true
+      this.closeEnabled.set(true)
     })
   }
 

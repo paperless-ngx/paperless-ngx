@@ -1,15 +1,15 @@
 <div class="modal-header">
-  <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
+  <h4 class="modal-title" id="modal-basic-title">{{title()}}</h4>
   <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
 </div>
 <div class="modal-body p-0">
   <ul class="list-group list-group-flush">
-    @if (!shareLinks || shareLinks.length === 0) {
+    @if (!shareLinks() || shareLinks().length === 0) {
       <li class="list-group-item fst-italic small text-center text-secondary" i18n>
         No existing links
       </li>
     }
-    @for (link of shareLinks; track link) {
+    @for (link of shareLinks(); track link) {
       <li class="list-group-item">
         <div class="input-group w-100">
           <input type="text" class="form-control" aria-label="Share link" [value]="getShareUrl(link)" readonly>
@@ -19,10 +19,10 @@
             </span>
           }
           <button type="button" class="btn btn-outline-primary" (click)="copy(link)">
-              @if (copied !== link.id) {
+              @if (copied() !== link.id) {
                 <i-bs width="1.2em" height="1.2em" name="clipboard-fill"></i-bs>
               }
-              @if (copied === link.id) {
+              @if (copied() === link.id) {
                 <i-bs width="1.2em" height="1.2em" name="clipboard-check-fill"></i-bs>
               }
               <span class="visually-hidden" i18n>Copy</span>
@@ -36,7 +36,7 @@
             <i-bs width="1.2em" height="1.2em" name="trash"></i-bs><span class="visually-hidden" i18n>Delete</span>
           </button>
         </div>
-        <span class="badge copied-badge bg-primary small fade ms-4 position-absolute top-50 translate-middle-y pe-none z-3" [class.show]="copied === link.id" i18n>Copied!</span>
+        <span class="badge copied-badge bg-primary small fade ms-4 position-absolute top-50 translate-middle-y pe-none z-3" [class.show]="copied() === link.id" i18n>Copied!</span>
       </li>
     }
   </ul>
@@ -44,7 +44,7 @@
 <div class="modal-footer">
   <div class="input-group w-100">
     <div class="form-check form-switch ms-auto">
-      <input class="form-check-input" type="checkbox" role="switch" id="versionSwitch" [disabled]="!hasArchiveVersion" [(ngModel)]="useArchiveVersion">
+      <input class="form-check-input" type="checkbox" role="switch" id="versionSwitch" [disabled]="!hasArchiveVersion()" [(ngModel)]="useArchiveVersion">
       <label class="form-check-label" for="versionSwitch" i18n>Share archive version</label>
     </div>
   </div>
@@ -55,11 +55,11 @@
         <option [ngValue]="option.value">{{ option.label }}</option>
       }
     </select>
-    <button class="btn btn-outline-primary ms-auto" type="button" (click)="createLink()" [disabled]="loading">
-      @if (loading) {
+    <button class="btn btn-outline-primary ms-auto" type="button" (click)="createLink()" [disabled]="loading()">
+      @if (loading()) {
         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
       }
-      @if (!loading) {
+      @if (!loading()) {
         <i-bs name="plus"></i-bs>
       }
       <ng-container i18n>Create</ng-container>

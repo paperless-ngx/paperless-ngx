@@ -1,7 +1,7 @@
 <nav class="navbar navbar-dark fixed-top bg-primary flex-md-nowrap p-0 shadow-sm">
   <button class="navbar-toggler d-md-none collapsed border-0" type="button" data-toggle="collapse"
     data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation"
-    (click)="mobileSearchHidden = false; isMenuCollapsed = !isMenuCollapsed">
+    (click)="closeMobileSearch(); toggleMenuCollapsed()">
     <span class="navbar-toggler-icon"></span>
   </button>
   <a class="navbar-brand d-flex align-items-center me-0 px-3 py-3 order-sm-0"
@@ -23,7 +23,7 @@
     </div>
   </a>
   <div class="search-container flex-grow-1 py-2 pb-3 pb-sm-2 px-3 ps-md-4 me-sm-auto order-3 order-sm-1"
-    [class.mobile-hidden]="mobileSearchHidden">
+    [class.mobile-hidden]="mobileSearchHidden()">
     <div class="col-12 col-md-7">
       <pngx-global-search></pngx-global-search>
     </div>
@@ -68,8 +68,8 @@
 <div class="container-fluid">
   <div class="row">
     <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse"
-      [ngClass]="slimSidebarEnabled ? 'slim' : 'col-md-3 col-lg-2 col-xxxl-1'" [class.animating]="slimSidebarAnimating"
-      [ngbCollapse]="isMenuCollapsed">
+      [ngClass]="slimSidebarEnabled ? 'slim' : 'col-md-3 col-lg-2 col-xxxl-1'" [class.animating]="slimSidebarAnimating()"
+      [ngbCollapse]="isMenuCollapsed()">
       @if (canSaveSettings) {
         <button class="btn btn-sm btn-dark sidebar-slim-toggler" (click)="toggleSlimSidebar()">
           @if (slimSidebarEnabled) {
@@ -104,7 +104,7 @@
             </h6>
             <ul class="nav flex-column mb-2" cdkDropList (cdkDropListDropped)="onDrop($event)">
               @for (view of savedViewService.sidebarViews; track view.id) {
-                <li class="nav-item w-100 app-link" cdkDrag [cdkDragDisabled]="!settingsService.organizingSidebarSavedViews"
+                <li class="nav-item w-100 app-link" cdkDrag [cdkDragDisabled]="!settingsService.organizingSidebarSavedViews()"
                   cdkDragPreviewContainer="parent" cdkDragPreviewClass="navItemDrag" (cdkDragStarted)="onDragStart($event)"
                   (cdkDragEnded)="onDragEnd($event)">
                   <a class="nav-link" routerLink="view/{{view.id}}"
@@ -120,7 +120,7 @@
                       <span class="badge bg-info text-dark position-absolute top-0 end-0 d-none d-md-block">{{ savedViewService.getDocumentCount(view) }}</span>
                     }
                   </a>
-                  @if (settingsService.organizingSidebarSavedViews) {
+                  @if (settingsService.organizingSidebarSavedViews()) {
                     <div class="position-absolute end-0 top-0 px-3 py-2" [class.me-n3]="slimSidebarEnabled" cdkDragHandle>
                       <i-bs name="grip-vertical"></i-bs>
                     </div>
@@ -150,7 +150,8 @@
                   [disablePopover]="!slimSidebarEnabled" placement="end" container="body" triggers="mouseenter:mouseleave"
                   popoverClass="popover-slim">
                   <i-bs class="me-2" name="file-text"></i-bs><span>{{d.title | documentTitle}}</span>
-                  <span class="close flex-column justify-content-center" (click)="closeDocument(d); $event.preventDefault()">
+                  <span class="close flex-column justify-content-center"
+                    (click)="$event.preventDefault(); $event.stopPropagation(); closeDocument(d)">
                     <i-bs name="x"></i-bs>
                   </span>
                 </a>
@@ -329,10 +330,10 @@
                     {{ versionString }}
                   </a>
                 </div>
-                @if (!settingsService.updateCheckingIsSet || appRemoteVersion) {
+                @if (!settingsService.updateCheckingIsSet || appRemoteVersion()) {
                   <div class="version-check">
                     <ng-template #updateAvailablePopContent>
-                      <span class="small">Paperless-ngx {{ appRemoteVersion.version }} <ng-container i18n>is
+                      <span class="small">Paperless-ngx {{ appRemoteVersion().version }} <ng-container i18n>is
                           available.</ng-container><br /><ng-container i18n>Click to view.</ng-container></span>
                     </ng-template>
                     <ng-template #updateCheckingNotEnabledPopContent>
@@ -350,13 +351,13 @@
                       </p>
                     </ng-template>
                     @if (settingsService.updateCheckingIsSet) {
-                      @if (appRemoteVersion.update_available) {
+                      @if (appRemoteVersion().update_available) {
                         <a class="small text-decoration-none" target="_blank" rel="noopener noreferrer"
                           href="https://github.com/paperless-ngx/paperless-ngx/releases"
                           [ngbPopover]="updateAvailablePopContent" popoverClass="shadow" triggers="mouseenter:mouseleave"
                           container="body">
                           <i-bs width="1.2em" height="1.2em" name="info-circle" class="me-1"></i-bs>
-                          @if (appRemoteVersion?.update_available) {
+                          @if (appRemoteVersion()?.update_available) {
                             <ng-container i18n>Update available</ng-container>
                           }
                         </a>
@@ -377,7 +378,7 @@
       </div>
     </nav>
 
-    <main role="main" class="ms-sm-auto px-md-4" [class.mobile-search-hidden]="mobileSearchHidden"
+    <main role="main" class="ms-sm-auto px-md-4" [class.mobile-search-hidden]="mobileSearchHidden()"
       [ngClass]="slimSidebarEnabled ? 'col-slim' : 'col-md-9 col-lg-10 col-xxxl-11'">
       <router-outlet></router-outlet>
     </main>

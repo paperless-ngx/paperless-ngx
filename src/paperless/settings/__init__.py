@@ -97,8 +97,14 @@ MODEL_FILE = get_path_from_env(
     DATA_DIR / "classification_model.pickle",
 )
 LLM_INDEX_DIR = DATA_DIR / "llm_index"
-LLM_INDEX_LOCK = DATA_DIR / "locks" / "llm_index.lock"
-(DATA_DIR / "locks").mkdir(parents=True, exist_ok=True)
+LLM_INDEX_LOCK = LLM_INDEX_DIR / "index.lock"
+# Cross-process read/write lock guarding the LLM index compaction/migration
+# file swap. Readers hold it shared; the swap takes it exclusively so it never
+# runs while a reader connection is open. Must be a SQLite (.db) file.
+LLM_INDEX_RWLOCK = LLM_INDEX_DIR / "llmindex.rwlock.db"
+# Seconds the compaction swap waits for active readers to drain before skipping
+# this cycle (it is a maintenance operation; the next run retries).
+LLM_INDEX_COMPACTION_LOCK_TIMEOUT = 30
 
 LOGGING_DIR = get_path_from_env("PAPERLESS_LOGGING_DIR", DATA_DIR / "log")
 
@@ -644,6 +650,7 @@ LOGGING = {
         "kombu": {"handlers": ["file_celery"], "level": "DEBUG"},
         "_granian": {"handlers": ["file_paperless"], "level": "DEBUG"},
         "granian.access": {"handlers": ["file_paperless"], "level": "DEBUG"},
+        "httpx": {"level": "WARNING"},
     },
 }
 
@@ -1199,6 +1206,9 @@ if LLM_EMBEDDING_CHUNK_SIZE < 1:
 LLM_CONTEXT_SIZE = get_int_from_env("PAPERLESS_AI_LLM_CONTEXT_SIZE", 8192)
 if LLM_CONTEXT_SIZE < 1:
     raise ImproperlyConfigured("PAPERLESS_AI_LLM_CONTEXT_SIZE must be >= 1")
+LLM_REQUEST_TIMEOUT = get_int_from_env("PAPERLESS_AI_LLM_REQUEST_TIMEOUT", 120)
+if LLM_REQUEST_TIMEOUT < 1:
+    raise ImproperlyConfigured("PAPERLESS_AI_LLM_REQUEST_TIMEOUT must be >= 1")
 LLM_BACKEND = get_choice_from_env(
     "PAPERLESS_AI_LLM_BACKEND",
     {"ollama", "openai-like"},

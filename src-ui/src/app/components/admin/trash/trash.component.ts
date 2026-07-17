@@ -1,4 +1,4 @@
-import { Component, OnDestroy, inject } from '@angular/core'
+import { Component, OnDestroy, inject, signal } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
 import {
@@ -7,7 +7,7 @@ import {
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { delay, takeUntil, tap } from 'rxjs'
+import { takeUntil, tap } from 'rxjs'
 import { Document } from 'src/app/data/document'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -42,11 +42,11 @@ export class TrashComponent
   private settingsService = inject(SettingsService)
   private router = inject(Router)
 
-  public documentsInTrash: Document[] = []
-  public selectedDocuments: Set<number> = new Set()
-  public allToggled: boolean = false
-  public page: number = 1
-  public totalDocuments: number
+  readonly documentsInTrash = signal<Document[]>([])
+  readonly selectedDocuments = signal<Set<number>>(new Set())
+  readonly allToggled = signal(false)
+  readonly page = signal(1)
+  readonly totalDocuments = signal<number>(undefined)
 
   constructor() {
     super()
@@ -54,20 +54,19 @@ export class TrashComponent
   }
 
   reload() {
-    this.loading = true
+    this.loading.set(true)
     this.trashService
-      .getTrash(this.page)
+      .getTrash(this.page())
       .pipe(
         tap((r) => {
-          this.documentsInTrash = r.results
-          this.totalDocuments = r.count
-          this.selectedDocuments.clear()
-          this.loading = false
-        }),
-        delay(100)
+          this.documentsInTrash.set(r.results)
+          this.totalDocuments.set(r.count)
+          this.selectedDocuments.set(new Set())
+          this.loading.set(false)
+        })
       )
       .subscribe(() => {
-        this.show = true
+        this.show.set(true)
       })
   }
 
@@ -122,7 +121,7 @@ export class TrashComponent
           .subscribe({
             next: () => {
               this.toastService.showInfo($localize`Document(s) deleted`)
-              this.allToggled = false
+              this.allToggled.set(false)
               modal.close()
               this.reload()
             },
@@ -165,7 +164,7 @@ export class TrashComponent
       .subscribe({
         next: () => {
           this.toastService.showInfo($localize`Document(s) restored`)
-          this.allToggled = false
+          this.allToggled.set(false)
           this.reload()
         },
         error: (err) => {
@@ -179,24 +178,29 @@ export class TrashComponent
 
   toggleAll(event: PointerEvent) {
     if ((event.target as HTMLInputElement).checked) {
-      this.selectedDocuments = new Set(this.documentsInTrash.map((t) => t.id))
+      this.selectedDocuments.set(
+        new Set(this.documentsInTrash().map((t) => t.id))
+      )
     } else {
       this.clearSelection()
     }
   }
 
   toggleSelected(object: Document) {
-    this.selectedDocuments.has(object.id)
-      ? this.selectedDocuments.delete(object.id)
-      : this.selectedDocuments.add(object.id)
+    const selectedDocuments = new Set(this.selectedDocuments())
+    selectedDocuments.has(object.id)
+      ? selectedDocuments.delete(object.id)
+      : selectedDocuments.add(object.id)
+    this.selectedDocuments.set(selectedDocuments)
   }
 
   clearSelection() {
-    this.allToggled = false
-    this.selectedDocuments.clear()
+    this.allToggled.set(false)
+    this.selectedDocuments.set(new Set())
   }
 
   getDaysRemaining(document: Document): number {
+    this.settingsService.trackChanges()
     const delay = this.settingsService.get(SETTINGS_KEYS.EMPTY_TRASH_DELAY)
     const diff = new Date().getTime() - new Date(document.deleted_at).getTime()
     const days = Math.ceil(diff / (1000 * 3600 * 24))
