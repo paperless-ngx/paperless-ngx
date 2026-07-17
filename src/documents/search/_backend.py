@@ -41,6 +41,7 @@ from documents.utils import identity
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+    from collections.abc import Sequence
     from pathlib import Path
 
     from django.contrib.auth.models import AbstractUser
@@ -995,31 +996,56 @@ class _DocumentViewerStream:
             yield from chunk
 
 
-def _bulk_get_viewer_ids(doc_pks):
-    """Fetch all view_document permissions for a batch of documents in one query."""
+def _bulk_get_viewer_ids(doc_pks: Sequence[int]) -> dict[int, list[int]]:
+    """Fetch all view_document permissions for a batch of documents in one query.
+
+    Mirrors get_users_with_perms(doc, only_with_perms_in=["view_document"])
+    (with_group_users defaults to True there): a user counts as a viewer if
+    they hold the permission directly, OR via membership in a group that
+    holds the permission. Missing the group case would silently drop search
+    access for group-only viewers.
+    """
     from collections import defaultdict
 
+    from guardian.models import GroupObjectPermission
     from guardian.models import UserObjectPermission
 
     from documents.models import Document
 
     # get_for_model is cached by Django, so this costs at most one query total.
     ct = ContentType.objects.get_for_model(Document)
+    str_pks = [str(pk) for pk in doc_pks]
+
+    viewer_map: dict[int, set[int]] = defaultdict(set)
 
     # Fold the permission lookup into the query via a join on codename instead
     # of a separate Permission.objects.get(), which would otherwise run once per
     # chunk during a full reindex.
-    qs = UserObjectPermission.objects.filter(
+    user_qs = UserObjectPermission.objects.filter(
         content_type=ct,
         permission__content_type=ct,
         permission__codename="view_document",
-        object_pk__in=[str(pk) for pk in doc_pks],
+        object_pk__in=str_pks,
     ).values_list("object_pk", "user_id")
+    for object_pk, user_id in user_qs:
+        viewer_map[int(object_pk)].add(user_id)
 
-    viewer_map = defaultdict(list)
-    for object_pk, user_id in qs:
-        viewer_map[int(object_pk)].append(user_id)
-    return viewer_map
+    # User.groups has related_query_name="user", so group__user__id joins
+    # through the group membership m2m to the member users' ids in the same
+    # single-query fashion as user_qs above (values_list compiles to one SQL
+    # JOIN; no per-row Python-side lookups follow, so select_related /
+    # prefetch_related do not apply here).
+    group_qs = GroupObjectPermission.objects.filter(
+        content_type=ct,
+        permission__content_type=ct,
+        permission__codename="view_document",
+        object_pk__in=str_pks,
+    ).values_list("object_pk", "group__user__id")
+    for object_pk, user_id in group_qs:
+        if user_id is not None:
+            viewer_map[int(object_pk)].add(user_id)
+
+    return {object_pk: list(user_ids) for object_pk, user_ids in viewer_map.items()}
 
 
 # Module-level singleton with proper thread safety
