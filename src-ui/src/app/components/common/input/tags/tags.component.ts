@@ -157,8 +157,8 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   private removeChildren(tagIDs: number[], tag: Tag) {
     if (tag.children?.length) {
-      const childIDs = tag.children.map((child) => child.id)
-      tagIDs = tagIDs.filter((id) => !childIDs.includes(id))
+      const childIDs = new Set(tag.children.map((child) => child.id))
+      tagIDs = tagIDs.filter((id) => !childIDs.has(id))
       for (const child of tag.children) {
         tagIDs = this.removeChildren(tagIDs, child)
       }

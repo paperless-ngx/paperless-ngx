@@ -29,9 +29,11 @@
       </div>
 
       <form class="chat-input">
+        <label class="visually-hidden" for="chatInput" i18n>Message</label>
         <div class="input-group">
           <input
             #chatInput
+            id="chatInput"
             class="form-control form-control-sm" name="chatInput" type="text"
             [placeholder]="placeholder"
             [disabled]="loading"

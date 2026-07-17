@@ -16,7 +16,7 @@ classifiers = [
 dependencies = [
   "azure-ai-documentintelligence>=1.0.2",
   "babel>=2.17",
-  "bleach~=6.3.0",
+  "bleach~=6.4.0",
   "celery[redis]~=5.6.2",
   "channels~=4.2",
   "channels-redis~=4.2",
@@ -56,7 +56,7 @@ dependencies = [
   "llama-index-embeddings-openai-like>=0.2.2",
   "llama-index-llms-ollama>=0.9.1",
   "llama-index-llms-openai-like>=0.7.1",
-  "nltk~=3.9.1",
+  "nltk~=3.10.0",
   "ocrmypdf~=17.4.2",
   "openai>=2.32",
   "pathvalidate~=3.3.1",
@@ -101,11 +101,11 @@ dev = [
   { include-group = "testing" },
 ]
 docs = [
-  "zensical>=0.0.43",
+  "zensical>=0.0.47",
 ]
 lint = [
   "prek~=0.3.10",
-  "ruff~=0.15.15",
+  "ruff~=0.15.20",
 ]
 testing = [
   "daphne",

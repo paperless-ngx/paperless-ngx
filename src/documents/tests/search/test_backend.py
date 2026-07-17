@@ -1,5 +1,7 @@
 import pytest
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from guardian.shortcuts import assign_perm
 from pytest_mock import MockerFixture
 
 from documents.models import CustomField
@@ -15,6 +17,7 @@ from documents.tests.factories import CorrespondentFactory
 from documents.tests.factories import DocumentFactory
 from documents.tests.factories import DocumentTypeFactory
 from documents.tests.factories import TagFactory
+from documents.tests.factories import UserFactory
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
 
@@ -561,17 +564,47 @@ class TestRebuild:
     """Test index rebuilding functionality."""
 
     def test_with_iter_wrapper_called(self, backend: TantivyBackend) -> None:
-        """Index rebuild must pass documents through iter_wrapper for progress tracking."""
+        """Index rebuild must pass (document, viewer_ids) pairs through iter_wrapper."""
         seen = []
 
-        def wrapper(docs):
-            for doc in docs:
+        def wrapper(pairs):
+            for doc, viewer_ids in pairs:
                 seen.append(doc.pk)
-                yield doc
+                yield doc, viewer_ids
 
         Document.objects.create(title="Tracked", content="x", checksum="TW1", pk=30)
         backend.rebuild(Document.objects.all(), iter_wrapper=wrapper)
         assert 30 in seen
+
+    def test_includes_group_granted_viewers(self, backend: TantivyBackend) -> None:
+        """Rebuild must index viewer ids for group-only grants, not just direct ones.
+
+        The batched viewer-id lookup used during rebuild() must mirror
+        get_users_with_perms(with_group_users=True), which is the default
+        used by the non-batched per-document indexing path. Without it, a
+        user who can only see a document via group membership would lose
+        search access to it after any full reindex.
+        """
+        owner = UserFactory()
+        group_member = UserFactory()
+        group = Group.objects.create(name="viewers")
+        group_member.groups.add(group)
+
+        doc = DocumentFactory(
+            title="Group shared doc",
+            content="group secret keyword",
+            owner=owner,
+        )
+        assign_perm("view_document", group, doc)
+
+        backend.rebuild(Document.objects.all())
+
+        ids = backend.search_ids(
+            "group secret",
+            user=group_member,
+            search_mode=SearchMode.QUERY,
+        )
+        assert ids == [doc.pk]
 
 
 class TestAutocomplete:

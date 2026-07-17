@@ -510,7 +510,7 @@ describe('DocumentDetailComponent', () => {
     const deleteButtons = fixture.debugElement.queryAll(
       By.css('pngx-confirm-button')
     )
-    expect(deleteButtons.length).toEqual(1)
+    expect(deleteButtons).toHaveLength(1)
   })
 
   it('should fall back to details tab when duplicates tab is active but no duplicates', () => {

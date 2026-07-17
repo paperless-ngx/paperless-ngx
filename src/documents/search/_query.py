@@ -40,6 +40,17 @@ def _has_cjk(text: str) -> bool:
     return bool(_CJK_RE.search(text))
 
 
+def extract_cjk_text(text: str) -> str:
+    """Join the CJK runs in ``text`` for indexing into bigram (char-ngram) fields.
+
+    Mirrors the query side (``_build_cjk_query``): only CJK runs are ever searched
+    against the bigram fields, so only CJK runs are worth indexing there. Latin
+    text fed to a character-bigram field is never matched and only bloats the
+    index and slows indexing/merge. Returns "" when there is no CJK text.
+    """
+    return " ".join(_CJK_RE.findall(text))
+
+
 def _build_cjk_query(
     index: tantivy.Index,
     raw_query: str,

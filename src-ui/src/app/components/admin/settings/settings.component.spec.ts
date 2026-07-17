@@ -399,17 +399,17 @@ describe('SettingsComponent', () => {
     completeSetup()
     const field = 'storage_path'
     expect(
-      component.settingsForm.get('documentDetailsHiddenFields').value.length
-    ).toEqual(0)
+      component.settingsForm.get('documentDetailsHiddenFields').value
+    ).toHaveLength(0)
     component.toggleDocumentDetailField(field, false)
     expect(
-      component.settingsForm.get('documentDetailsHiddenFields').value.length
-    ).toEqual(1)
+      component.settingsForm.get('documentDetailsHiddenFields').value
+    ).toHaveLength(1)
     expect(component.isDocumentDetailFieldShown(field)).toBeFalsy()
     component.toggleDocumentDetailField(field, true)
     expect(
-      component.settingsForm.get('documentDetailsHiddenFields').value.length
-    ).toEqual(0)
+      component.settingsForm.get('documentDetailsHiddenFields').value
+    ).toHaveLength(0)
     expect(component.isDocumentDetailFieldShown(field)).toBeTruthy()
   })
 })

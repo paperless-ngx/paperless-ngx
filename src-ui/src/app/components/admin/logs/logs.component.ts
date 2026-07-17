@@ -100,9 +100,7 @@ export class LogsComponent
             parsed.some((log, idx) => {
               const current = this.logs()[idx]
               return (
-                !current ||
-                current.message !== log.message ||
-                current.level !== log.level
+                current?.message !== log.message || current?.level !== log.level
               )
             })
           if (hasChanges) {
