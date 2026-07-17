@@ -16,7 +16,7 @@ classifiers = [
 dependencies = [
   "azure-ai-documentintelligence>=1.0.2",
   "babel>=2.17",
-  "bleach~=6.3.0",
+  "bleach~=6.4.0",
   "celery[redis]~=5.6.2",
   "channels~=4.2",
   "channels-redis~=4.2",
@@ -24,7 +24,7 @@ dependencies = [
   "dateparser~=1.2",
   # WARNING: django does not use semver.
   #          Only patch versions are guaranteed to not introduce breaking changes.
-  "django~=5.2.13",
+  "django~=5.2.15",
   "django-allauth[mfa,socialaccount]~=65.16.0",
   "django-auditlog~=3.4.1",
   "django-cachalot~=2.9.0",
@@ -56,7 +56,7 @@ dependencies = [
   "llama-index-embeddings-openai-like>=0.2.2",
   "llama-index-llms-ollama>=0.9.1",
   "llama-index-llms-openai-like>=0.7.1",
-  "nltk~=3.9.1",
+  "nltk~=3.10.0",
   "ocrmypdf~=17.4.2",
   "openai>=2.32",
   "pathvalidate~=3.3.1",
