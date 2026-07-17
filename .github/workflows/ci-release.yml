@@ -26,6 +26,7 @@ jobs:
           check-name: 'Merge and Push Manifest'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 60
+          checks-discovery-timeout: 1800
   build-release:
     name: Build Release
     needs: wait-for-docker
