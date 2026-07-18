@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-11 23:04+0000\n"
-"PO-Revision-Date: 2026-07-13 12:58\n"
+"POT-Creation-Date: 2026-07-15 20:44+0000\n"
+"PO-Revision-Date: 2026-07-17 12:35\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -27,7 +27,7 @@ msgstr "Wert muss gültiges JSON sein."
 
 #: documents/filters.py:483
 msgid "Invalid custom field query expression"
-msgstr "Ungültiger benutzerdefinierter Feldabfrageausdruck"
+msgstr "Ungültiger Zusatzfeld-Abfrageausdruck"
 
 #: documents/filters.py:493
 msgid "Invalid expression list. Must be nonempty."
@@ -43,7 +43,7 @@ msgstr "Maximale Anzahl an Abfragebedingungen überschritten."
 
 #: documents/filters.py:592
 msgid "{name!r} is not a valid custom field."
-msgstr "{name!r} ist kein gültiges benutzerdefiniertes Feld."
+msgstr "{name!r} ist kein gültiges Zusatzfeld."
 
 #: documents/filters.py:629
 msgid "{data_type} does not support query expr {expr!r}."
@@ -55,7 +55,7 @@ msgstr "Maximale Verschachtelungstiefe überschritten."
 
 #: documents/filters.py:1052
 msgid "Custom field not found"
-msgstr "Benutzerdefiniertes Feld nicht gefunden"
+msgstr "Zusatzfeld nicht gefunden"
 
 #: documents/models.py:39 documents/models.py:916 documents/models.py:964
 msgid "owner"
@@ -510,7 +510,7 @@ msgstr "hat keinen Eigentümer in"
 
 #: documents/models.py:616
 msgid "has custom field value"
-msgstr "Hat benutzerdefinierten Feld-Wert"
+msgstr "Hat Zusatzfeldwert"
 
 #: documents/models.py:617
 msgid "is shared by me"
@@ -518,23 +518,23 @@ msgstr "Ist von mir freigegeben"
 
 #: documents/models.py:618
 msgid "has custom fields"
-msgstr "hat benutzerdefinierte Felder"
+msgstr "hat Zusatzfelder"
 
 #: documents/models.py:619
 msgid "has custom field in"
-msgstr "hat die benutzerdefinierten Felder"
+msgstr "hat die Zusatzfelder"
 
 #: documents/models.py:620
 msgid "does not have custom field in"
-msgstr "hat nicht die benutzerdefinierten Felder"
+msgstr "hat nicht die Zusatzfelder"
 
 #: documents/models.py:621
 msgid "does not have custom field"
-msgstr "hat nicht das benutzerdefinierte Feld"
+msgstr "hat nicht das Zusatzfeld"
 
 #: documents/models.py:622
 msgid "custom fields query"
-msgstr "benutzerdefinierte Feldabfrage"
+msgstr "Zusatzfelderabfrage"
 
 #: documents/models.py:623
 msgid "created to"
@@ -558,11 +558,11 @@ msgstr "MIME-Typ ist"
 
 #: documents/models.py:628
 msgid "simple title search"
-msgstr "einfache Titel-Suche"
+msgstr "Einfache Titelsuche"
 
 #: documents/models.py:629
 msgid "simple text search"
-msgstr "einfache Text-Suche"
+msgstr "Einfache Textsuche"
 
 #: documents/models.py:639
 msgid "rule type"
@@ -694,7 +694,7 @@ msgstr "Die Art der durchzuführenden Arbeit"
 
 #: documents/models.py:729
 msgid "Trigger Source"
-msgstr "Trigger-Quelle"
+msgstr "Auslöserquelle"
 
 #: documents/models.py:730
 msgid "What initiated this task"
@@ -883,23 +883,23 @@ msgstr "Zusätzliche Daten"
 
 #: documents/models.py:1084
 msgid "Extra data for the custom field, such as select options"
-msgstr "Zusätzliche Daten für das benutzerdefinierte Feld, z. B. Auswahloptionen"
+msgstr "Zusätzliche Daten für das Zusatzfeld, z. B. Auswahloptionen"
 
 #: documents/models.py:1090
 msgid "custom field"
-msgstr "Benutzerdefiniertes Feld"
+msgstr "Zusatzfeld"
 
 #: documents/models.py:1091
 msgid "custom fields"
-msgstr "Benutzerdefinierte Felder"
+msgstr "Zusatzfelder"
 
 #: documents/models.py:1191
 msgid "custom field instance"
-msgstr "Benutzerdefinierte Feld-Instanz"
+msgstr "Zusatzfeldinstanz"
 
 #: documents/models.py:1192
 msgid "custom field instances"
-msgstr "Benutzerdefinierte Feld-Instanzen"
+msgstr "Zusatzfeldinstanzen"
 
 #: documents/models.py:1264
 msgid "Consumption Started"
@@ -927,7 +927,7 @@ msgstr "Geändert"
 
 #: documents/models.py:1279
 msgid "Custom Field"
-msgstr "Benutzerdefiniertes Feld"
+msgstr "Zusatzfeld"
 
 #: documents/models.py:1282
 msgid "Workflow Trigger Type"
@@ -1003,11 +1003,11 @@ msgstr "hat diese Speicherpfade nicht"
 
 #: documents/models.py:1422
 msgid "filter custom field query"
-msgstr "Benutzerdefinierte Feldabfrage filtern"
+msgstr "Zusatzfeldabfrage filtern"
 
 #: documents/models.py:1425
 msgid "JSON-encoded custom field query expression."
-msgstr "JSON-kodierte Abfrage eines benutzerdefinierten Felds."
+msgstr "JSON-kodierte Zusatzfeldabfrage."
 
 #: documents/models.py:1429
 msgid "schedule offset days"
@@ -1043,7 +1043,7 @@ msgstr "Das zu prüfende Feld für einen Zeitplanauslöser."
 
 #: documents/models.py:1468
 msgid "schedule date custom field"
-msgstr "Benutzerdefiniertes Zeitplan-Datumsfeld"
+msgstr "Zusatz-Zeitplandatumsfeld"
 
 #: documents/models.py:1472
 msgid "workflow trigger"
@@ -1204,15 +1204,15 @@ msgstr "Diesen Gruppen Bearbeitungsberechtigungen erteilen"
 
 #: documents/models.py:1685
 msgid "assign these custom fields"
-msgstr "Diese benutzerdefinierten Felder zuweisen"
+msgstr "Diese Zusatzfelder zuweisen"
 
 #: documents/models.py:1689
 msgid "custom field values"
-msgstr "Benutzerdefinierte Feldwerte"
+msgstr "Zusatzfeldwerte"
 
 #: documents/models.py:1693
 msgid "Optional values to assign to the custom fields."
-msgstr "Optionale Werte, die den benutzerdefinierten Feldern zugewiesen werden."
+msgstr "Optionale Werte, die den Zusatzfeldern zugewiesen werden."
 
 #: documents/models.py:1702
 msgid "remove these tag(s)"
@@ -1276,11 +1276,11 @@ msgstr "Alle Berechtigungen entfernen"
 
 #: documents/models.py:1795
 msgid "remove these custom fields"
-msgstr "Diese benutzerdefinierten Felder entfernen"
+msgstr "Diese Zusatzfelder entfernen"
 
 #: documents/models.py:1800
 msgid "remove all custom fields"
-msgstr "Alle benutzerdefinierten Felder entfernen"
+msgstr "Alle Zusatzfelder entfernen"
 
 #: documents/models.py:1809
 msgid "email"
@@ -1356,20 +1356,20 @@ msgstr "Dateityp %(type)s nicht unterstützt"
 #: documents/serialisers.py:2260
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
-msgstr "Feld-ID eines benutzerdefinierten Felds muss eine Ganzzahl sein: %(id)s"
+msgstr "Zusatzfeld-ID muss eine Ganzzahl sein: %(id)s"
 
 #: documents/serialisers.py:2267
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
-msgstr "Benutzerdefiniertes Feld mit ID %(id)s existiert nicht"
+msgstr "Zusatzfeld mit ID %(id)s existiert nicht"
 
 #: documents/serialisers.py:2284 documents/serialisers.py:2294
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
-msgstr "Benutzerdefinierte Felder müssen eine Liste von Ganzzahlen oder ein Objekt mit Zuordnung von IDs zu Werten sein."
+msgstr "Zusatzfelder müssen eine Liste von Ganzzahlen oder ein Objekt mit Zuordnung von IDs zu Werten sein."
 
 #: documents/serialisers.py:2289
 msgid "Some custom fields don't exist or were specified twice."
-msgstr "Einige benutzerdefinierte Felder existieren nicht oder wurden zweimal angegeben."
+msgstr "Einige Zusatzfelder existieren nicht oder wurden zweimal angegeben."
 
 #: documents/serialisers.py:2436
 msgid "Invalid variable detected."
@@ -2385,22 +2385,26 @@ msgid "uid"
 msgstr "UID"
 
 #: paperless_mail/models.py:342
+msgid "uid validity"
+msgstr "UID-Gültigkeit"
+
+#: paperless_mail/models.py:350
 msgid "subject"
 msgstr "Betreff"
 
-#: paperless_mail/models.py:350
+#: paperless_mail/models.py:358
 msgid "received"
 msgstr "Empfangen"
 
-#: paperless_mail/models.py:357
+#: paperless_mail/models.py:365
 msgid "processed"
 msgstr "Verarbeitet"
 
-#: paperless_mail/models.py:363
+#: paperless_mail/models.py:371
 msgid "status"
 msgstr "Status"
 
-#: paperless_mail/models.py:371
+#: paperless_mail/models.py:379
 msgid "error"
 msgstr "Fehler"
 
