@@ -156,6 +156,7 @@ import { PermissionsGuard } from './app/guards/permissions.guard'
 import { withApiVersionInterceptor } from './app/interceptors/api-version.interceptor'
 import { withAuthExpiryInterceptor } from './app/interceptors/auth-expiry.interceptor'
 import { withCsrfInterceptor } from './app/interceptors/csrf.interceptor'
+import { withIdentityInterceptor } from './app/interceptors/identity.interceptor'
 import { DocumentTitlePipe } from './app/pipes/document-title.pipe'
 import { FilterPipe } from './app/pipes/filter.pipe'
 import { UsernamePipe } from './app/pipes/username.pipe'
@@ -403,6 +404,7 @@ bootstrapApplication(AppComponent, {
       withInterceptors([
         withCsrfInterceptor,
         withApiVersionInterceptor,
+        withIdentityInterceptor,
         withAuthExpiryInterceptor,
       ]),
       withFetch()

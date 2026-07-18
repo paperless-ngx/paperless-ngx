@@ -25,3 +25,21 @@ export interface TotpSettings {
   qr_svg: string
   secret: string
 }
+
+export interface AccountSessionUser {
+  id: number
+  username: string
+  first_name?: string
+  last_name?: string
+  current: boolean
+  last_used: string
+}
+
+export interface AccountSessionsResponse {
+  enabled: boolean
+  accounts: AccountSessionUser[]
+}
+
+export interface AccountSessionRedirect {
+  redirect_url: string
+}

@@ -51,6 +51,15 @@ from documents.views import WorkflowActionViewSet
 from documents.views import WorkflowTriggerViewSet
 from documents.views import WorkflowViewSet
 from documents.views import serve_logo
+from paperless.account_sessions import AccountSessionAddView
+from paperless.account_sessions import AccountSessionCompleteView
+from paperless.account_sessions import AccountSessionLogoutAllView
+from paperless.account_sessions import AccountSessionLogoutCurrentView
+from paperless.account_sessions import AccountSessionRemoveView
+from paperless.account_sessions import AccountSessionsView
+from paperless.account_sessions import AccountSessionSwitchView
+from paperless.account_sessions import account_session_logout
+from paperless.account_sessions import cancel_account_session_add
 from paperless.consumers import StatusConsumer
 from paperless.views import ApplicationConfigurationViewSet
 from paperless.views import DisconnectSocialAccountView
@@ -107,7 +116,7 @@ urlpatterns = [
                                 ),
                                 path(
                                     "logout/",
-                                    allauth_account_views.logout,
+                                    account_session_logout,
                                     name="logout",
                                 ),
                             ],
@@ -245,6 +254,36 @@ urlpatterns = [
                                 TOTPView.as_view(),
                                 name="totp_view",
                             ),
+                            path(
+                                "sessions/",
+                                AccountSessionsView.as_view(),
+                                name="account_sessions",
+                            ),
+                            path(
+                                "sessions/add/",
+                                AccountSessionAddView.as_view(),
+                                name="account_session_add",
+                            ),
+                            path(
+                                "sessions/switch/",
+                                AccountSessionSwitchView.as_view(),
+                                name="account_session_switch",
+                            ),
+                            path(
+                                "sessions/<int:user_id>/",
+                                AccountSessionRemoveView.as_view(),
+                                name="account_session_remove",
+                            ),
+                            path(
+                                "sessions/logout/",
+                                AccountSessionLogoutCurrentView.as_view(),
+                                name="account_session_logout_current",
+                            ),
+                            path(
+                                "sessions/logout_all/",
+                                AccountSessionLogoutAllView.as_view(),
+                                name="account_session_logout_all",
+                            ),
                         ],
                     ),
                 ),
@@ -335,7 +374,7 @@ urlpatterns = [
                 # see allauth/account/urls.py
                 # login, logout, signup, account_inactive
                 path("login/", allauth_account_views.login, name="account_login"),
-                path("logout/", allauth_account_views.logout, name="account_logout"),
+                path("logout/", account_session_logout, name="account_logout"),
                 path("signup/", allauth_account_views.signup, name="account_signup"),
                 path(
                     "account_inactive/",
@@ -404,6 +443,16 @@ urlpatterns = [
                     "2fa/authenticate/",
                     allauth_mfa_views.authenticate,
                     name="mfa_authenticate",
+                ),
+                path(
+                    "switch/complete/",
+                    AccountSessionCompleteView.as_view(),
+                    name="account_switch_complete",
+                ),
+                path(
+                    "switch/cancel/",
+                    cancel_account_session_add,
+                    name="account_switch_cancel",
                 ),
             ],
         ),

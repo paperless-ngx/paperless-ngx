@@ -100,4 +100,53 @@ describe('ProfileService', () => {
     )
     expect(req.request.method).toEqual('DELETE')
   })
+
+  it('gets enrolled account sessions', () => {
+    service.getAccountSessions().subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}profile/sessions/`
+    )
+    expect(req.request.method).toEqual('GET')
+  })
+
+  it('starts adding an account session', () => {
+    service.addAccountSession().subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}profile/sessions/add/`
+    )
+    expect(req.request.method).toEqual('POST')
+  })
+
+  it('switches account sessions', () => {
+    service.switchAccountSession(42).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}profile/sessions/switch/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toEqual({ user_id: 42 })
+  })
+
+  it('removes account sessions', () => {
+    service.removeAccountSession(42).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}profile/sessions/42/`
+    )
+    expect(req.request.method).toEqual('DELETE')
+  })
+
+  it('logs out all account sessions', () => {
+    service.logoutAllAccountSessions().subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}profile/sessions/logout_all/`
+    )
+    expect(req.request.method).toEqual('POST')
+  })
+
+  it('logs out the current account session', () => {
+    service.logoutCurrentAccountSession().subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}profile/sessions/logout/`
+    )
+    expect(req.request.method).toEqual('POST')
+  })
 })

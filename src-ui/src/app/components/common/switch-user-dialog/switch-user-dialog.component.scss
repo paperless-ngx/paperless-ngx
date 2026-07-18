@@ -1,0 +1,8 @@
+.account-list {
+  max-height: min(60vh, 30rem);
+  overflow-y: auto;
+}
+
+.current-account {
+  background-color: var(--pngx-primary-faded);
+}

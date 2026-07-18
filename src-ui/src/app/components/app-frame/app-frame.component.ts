@@ -18,7 +18,7 @@ import {
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { TourNgBootstrap } from 'ngx-ui-tour-ng-bootstrap'
 import { Observable } from 'rxjs'
-import { first } from 'rxjs/operators'
+import { filter, first, switchMap } from 'rxjs/operators'
 import { Document } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
 import { CollapsibleSection, SETTINGS_KEYS } from 'src/app/data/ui-settings'
@@ -29,12 +29,14 @@ import {
   DjangoMessageLevel,
   DjangoMessagesService,
 } from 'src/app/services/django-messages.service'
+import { IdentityChangeService } from 'src/app/services/identity-change.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
   PermissionAction,
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
+import { ProfileService } from 'src/app/services/profile.service'
 import {
   AppRemoteVersion,
   RemoteVersionService,
@@ -46,6 +48,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ChatComponent } from '../chat/chat/chat.component'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
+import { SwitchUserDialogComponent } from '../common/switch-user-dialog/switch-user-dialog.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
@@ -81,6 +84,8 @@ export class AppFrameComponent
   router = inject(Router)
   private activatedRoute = inject(ActivatedRoute)
   private openDocumentsService = inject(OpenDocumentsService)
+  private identityChangeService = inject(IdentityChangeService)
+  private profileService = inject(ProfileService)
   savedViewService = inject(SavedViewService)
   private remoteVersionService = inject(RemoteVersionService)
   settingsService = inject(SettingsService)
@@ -328,6 +333,14 @@ export class AppFrameComponent
     this.closeMenu()
   }
 
+  /** Opens the quick-switch account dialog. */
+  switchUser() {
+    this.modalService.open(SwitchUserDialogComponent, {
+      backdrop: 'static',
+    })
+    this.closeMenu()
+  }
+
   get openDocuments(): Document[] {
     return this.openDocumentsService.getOpenDocuments()
   }
@@ -427,8 +440,24 @@ export class AppFrameComponent
     }
   }
 
-  onLogout() {
-    this.openDocumentsService.closeAll()
+  /** Logs out the active account after confirming open documents can close. */
+  onLogout(event?: Event) {
+    event?.preventDefault()
+    this.openDocumentsService
+      .closeAll()
+      .pipe(
+        first(),
+        filter((confirmed) => confirmed),
+        switchMap(() => this.profileService.logoutCurrentAccountSession())
+      )
+      .subscribe({
+        next: (response) => {
+          this.identityChangeService.finish(response.redirect_url)
+        },
+        error: (error) => {
+          this.toastService.showError($localize`Unable to log out.`, error)
+        },
+      })
   }
 
   get showSidebarCounts(): boolean {

@@ -14,6 +14,13 @@
         </title>
         <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
         <link href="{% static 'base.css' %}" rel="stylesheet">
+        <script>
+            window.addEventListener("storage", function(event) {
+                if (event.key === "paperless-account-session-changed") {
+                    window.location.reload();
+                }
+            });
+        </script>
     </head>
 
     <body class="text-center">

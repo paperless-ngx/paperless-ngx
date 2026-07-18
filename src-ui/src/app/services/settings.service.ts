@@ -27,6 +27,7 @@ import {
   UiSettings,
 } from '../data/ui-settings'
 import { User } from '../data/user'
+import { setExpectedUserId } from '../interceptors/identity.interceptor'
 import {
   PermissionAction,
   PermissionsService,
@@ -367,6 +368,7 @@ export class SettingsService {
         if (this.settings['language']?.length)
           this.setLanguage(this.settings['language'])
         this.currentUser.set(uisettings.user)
+        setExpectedUserId(this.currentUser()?.id)
         this.permissionsService.initialize(
           uisettings.permissions,
           this.currentUser()

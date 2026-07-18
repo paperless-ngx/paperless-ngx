@@ -52,7 +52,10 @@
           *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }">
           <i-bs class="me-2" name="gear"></i-bs><ng-container i18n>Settings</ng-container>
         </a>
-        <a ngbDropdownItem class="nav-link d-flex" href="accounts/logout/" (click)="onLogout()">
+        <button ngbDropdownItem class="nav-link d-flex" (click)="switchUser()">
+          <i-bs class="me-2" name="people"></i-bs><ng-container i18n>Switch User</ng-container>
+        </button>
+        <a ngbDropdownItem class="nav-link d-flex" href="accounts/logout/" (click)="onLogout($event)">
           <i-bs class="me-2" name="door-open"></i-bs><ng-container i18n>Logout</ng-container>
         </a>
         <div class="dropdown-divider"></div>

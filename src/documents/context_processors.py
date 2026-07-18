@@ -2,6 +2,7 @@ from django.conf import settings as django_settings
 from django.contrib.auth.models import User
 
 from documents.models import Document
+from paperless.account_sessions import ADD_CHALLENGE_SESSION_KEY
 from paperless.config import GeneralConfig
 
 
@@ -32,4 +33,7 @@ def settings(request):
         ).count()
         == 0
         and Document.global_objects.count() == 0,
+        "ACCOUNT_SWITCH_ADD_ACTIVE": bool(
+            request.session.get(ADD_CHALLENGE_SESSION_KEY),
+        ),
     }

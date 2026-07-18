@@ -1,3 +1,6 @@
+import uuid
+
+from django.conf import settings
 from django.core.validators import FileExtensionValidator
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -381,3 +384,58 @@ class ApplicationConfiguration(AbstractSingletonModel):
 
     def __str__(self) -> str:  # pragma: no cover
         return "ApplicationConfiguration"
+
+
+class AccountSessionGroup(models.Model):
+    """A set of authenticated sessions trusted by one browser profile."""
+
+    token_digest = models.CharField(max_length=64, unique=True)
+    created = models.DateTimeField(auto_now_add=True)
+    last_used = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        """Return a concise identifier for the browser-profile group."""
+
+        return f"Account session group {self.pk}"
+
+
+class AccountSession(models.Model):
+    """A Django session enrolled for quick switching on a browser profile."""
+
+    group = models.ForeignKey(
+        AccountSessionGroup,
+        related_name="account_sessions",
+        on_delete=models.CASCADE,
+    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    session_key = models.CharField(max_length=40, db_index=True)
+    created = models.DateTimeField(auto_now_add=True)
+    last_used = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("group", "user"),
+                name="unique_account_session_group_user",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        """Return the enrolled user and browser-profile group."""
+
+        return f"{self.user} in account session group {self.group_id}"
+
+
+class AccountSessionAddChallenge(models.Model):
+    """Short-lived state used while allauth authenticates an added account."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    group = models.ForeignKey(AccountSessionGroup, on_delete=models.CASCADE)
+    previous_session_key = models.CharField(max_length=40)
+    created = models.DateTimeField(auto_now_add=True)
+    expires = models.DateTimeField()
+
+    def __str__(self) -> str:
+        """Return the browser-profile group associated with the challenge."""
+
+        return f"Add-account challenge for session group {self.group_id}"

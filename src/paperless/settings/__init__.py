@@ -11,6 +11,7 @@ from typing import Final
 from urllib.parse import urlparse
 
 from compression_middleware.middleware import CompressionMiddleware
+from corsheaders.defaults import default_headers
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
@@ -189,6 +190,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "paperless.middleware.ApiVersionMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "paperless.account_sessions.AccountSessionMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
@@ -430,6 +432,7 @@ CORS_ALLOWED_ORIGINS = get_list_from_env(
     "PAPERLESS_CORS_ALLOWED_HOSTS",
     default=["http://localhost:8000"],
 )
+CORS_ALLOW_HEADERS = (*default_headers, "x-paperless-user-id")
 
 if DEBUG:
     # Allow access from the angular development server during debugging

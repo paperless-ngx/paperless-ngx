@@ -17,6 +17,7 @@ import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
 import { PermissionsGuard } from './guards/permissions.guard'
 import { HotKeyService } from './services/hot-key.service'
+import { IdentityChangeService } from './services/identity-change.service'
 import { PermissionsService } from './services/permissions.service'
 import { SettingsService } from './services/settings.service'
 import { Toast, ToastService } from './services/toast.service'
@@ -35,6 +36,7 @@ describe('AppComponent', () => {
   let router: Router
   let settingsService: SettingsService
   let hotKeyService: HotKeyService
+  let identityChangeService: IdentityChangeService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -63,8 +65,23 @@ describe('AppComponent', () => {
     toastService = TestBed.inject(ToastService)
     router = TestBed.inject(Router)
     hotKeyService = TestBed.inject(HotKeyService)
+    identityChangeService = TestBed.inject(IdentityChangeService)
     fixture = TestBed.createComponent(AppComponent)
     component = fixture.componentInstance
+  })
+
+  it('shows the active username after logout switches the account', () => {
+    settingsService.currentUser.set({ username: 'account-two' } as any)
+    jest
+      .spyOn(identityChangeService, 'handleReturnFromAccountChange')
+      .mockReturnValue('logout')
+    const toastSpy = jest.spyOn(toastService, 'showInfo')
+
+    component.ngOnInit()
+
+    expect(toastSpy).toHaveBeenCalledWith(
+      "Logged out. Switched to user 'account-two'."
+    )
   })
 
   it('should initialize the tour service & toggle class on body for styling', () => {

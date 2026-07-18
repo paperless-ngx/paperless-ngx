@@ -22,11 +22,13 @@ import {
   DjangoMessageLevel,
   DjangoMessagesService,
 } from 'src/app/services/django-messages.service'
+import { IdentityChangeService } from 'src/app/services/identity-change.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
   PermissionType,
   PermissionsService,
 } from 'src/app/services/permissions.service'
+import { ProfileService } from 'src/app/services/profile.service'
 import { RemoteVersionService } from 'src/app/services/rest/remote-version.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SearchService } from 'src/app/services/rest/search.service'
@@ -35,6 +37,7 @@ import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
+import { SwitchUserDialogComponent } from '../common/switch-user-dialog/switch-user-dialog.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { AppFrameComponent } from './app-frame.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
@@ -94,6 +97,8 @@ describe('AppFrameComponent', () => {
   let modalService: NgbModal
   let maybeRefreshSpy
   let tasksService: TasksService
+  let identityChangeService: IdentityChangeService
+  let profileService: ProfileService
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -172,6 +177,8 @@ describe('AppFrameComponent', () => {
     modalService = TestBed.inject(NgbModal)
     router = TestBed.inject(Router)
     tasksService = TestBed.inject(TasksService)
+    identityChangeService = TestBed.inject(IdentityChangeService)
+    profileService = TestBed.inject(ProfileService)
 
     jest
       .spyOn(settingsService, 'displayName', 'get')
@@ -365,9 +372,19 @@ describe('AppFrameComponent', () => {
   })
 
   it('should close all documents on logout', () => {
-    const closeAllSpy = jest.spyOn(openDocumentsService, 'closeAll')
+    const closeAllSpy = jest
+      .spyOn(openDocumentsService, 'closeAll')
+      .mockReturnValue(of(true))
+    const finishSpy = jest
+      .spyOn(identityChangeService, 'finish')
+      .mockImplementation(() => {})
+    const logoutSpy = jest
+      .spyOn(profileService, 'logoutCurrentAccountSession')
+      .mockReturnValue(of({ redirect_url: '/accounts/login/' }))
     component.onLogout()
     expect(closeAllSpy).toHaveBeenCalled()
+    expect(logoutSpy).toHaveBeenCalled()
+    expect(finishSpy).toHaveBeenCalled()
   })
 
   it('should warn before close if dirty documents', () => {
@@ -422,6 +439,14 @@ describe('AppFrameComponent', () => {
     expect(modalSpy).toHaveBeenCalledWith(ProfileEditDialogComponent, {
       backdrop: 'static',
       size: 'xl',
+    })
+  })
+
+  it('should support switching users', () => {
+    const modalSpy = jest.spyOn(modalService, 'open')
+    component.switchUser()
+    expect(modalSpy).toHaveBeenCalledWith(SwitchUserDialogComponent, {
+      backdrop: 'static',
     })
   })
 

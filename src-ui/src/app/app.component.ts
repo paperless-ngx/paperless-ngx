@@ -7,6 +7,7 @@ import { FileDropComponent } from './components/file-drop/file-drop.component'
 import { SETTINGS_KEYS } from './data/ui-settings'
 import { ComponentRouterService } from './services/component-router.service'
 import { HotKeyService } from './services/hot-key.service'
+import { IdentityChangeService } from './services/identity-change.service'
 import {
   PermissionAction,
   PermissionsService,
@@ -34,6 +35,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private permissionsService = inject(PermissionsService)
   private hotKeyService = inject(HotKeyService)
   private componentRouterService = inject(ComponentRouterService)
+  private identityChangeService = inject(IdentityChangeService)
 
   newDocumentSubscription: Subscription
   successSubscription: Subscription
@@ -74,6 +76,13 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    const identityChangeReason =
+      this.identityChangeService.handleReturnFromAccountChange()
+    if (identityChangeReason === 'logout') {
+      this.toastService.showInfo(
+        $localize`Logged out. Switched to user '${this.settings.currentUser()?.username}'.`
+      )
+    }
     this.websocketStatusService.connect()
 
     this.successSubscription = this.websocketStatusService

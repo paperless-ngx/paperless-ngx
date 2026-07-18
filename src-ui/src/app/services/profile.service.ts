@@ -3,6 +3,8 @@ import { Injectable, inject } from '@angular/core'
 import { Observable } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import {
+  AccountSessionRedirect,
+  AccountSessionsResponse,
   PaperlessUserProfile,
   SocialAccountProvider,
   TotpSettings,
@@ -71,6 +73,52 @@ export class ProfileService {
   deactivateTotp(): Observable<boolean> {
     return this.http.delete<boolean>(
       `${environment.apiBaseUrl}${this.endpoint}/totp/`,
+      {}
+    )
+  }
+
+  /** Loads the accounts available for quick switching. */
+  getAccountSessions(): Observable<AccountSessionsResponse> {
+    return this.http.get<AccountSessionsResponse>(
+      `${environment.apiBaseUrl}${this.endpoint}/sessions/`
+    )
+  }
+
+  /** Starts authentication for adding an account to quick switching. */
+  addAccountSession(): Observable<AccountSessionRedirect> {
+    return this.http.post<AccountSessionRedirect>(
+      `${environment.apiBaseUrl}${this.endpoint}/sessions/add/`,
+      {}
+    )
+  }
+
+  /** Requests activation of an enrolled user's session. */
+  switchAccountSession(userId: number): Observable<AccountSessionRedirect> {
+    return this.http.post<AccountSessionRedirect>(
+      `${environment.apiBaseUrl}${this.endpoint}/sessions/switch/`,
+      { user_id: userId }
+    )
+  }
+
+  /** Removes and logs out an account saved for quick switching. */
+  removeAccountSession(userId: number): Observable<AccountSessionRedirect> {
+    return this.http.delete<AccountSessionRedirect>(
+      `${environment.apiBaseUrl}${this.endpoint}/sessions/${userId}/`
+    )
+  }
+
+  /** Logs out the active account and returns the next destination. */
+  logoutCurrentAccountSession(): Observable<AccountSessionRedirect> {
+    return this.http.post<AccountSessionRedirect>(
+      `${environment.apiBaseUrl}${this.endpoint}/sessions/logout/`,
+      {}
+    )
+  }
+
+  /** Logs out every account enrolled for quick switching. */
+  logoutAllAccountSessions(): Observable<AccountSessionRedirect> {
+    return this.http.post<AccountSessionRedirect>(
+      `${environment.apiBaseUrl}${this.endpoint}/sessions/logout_all/`,
       {}
     )
   }

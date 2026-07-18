@@ -54,11 +54,11 @@
             {% for provider in socialaccount_providers %}
                 {% if provider.id == "openid" %}
                     {% for brand in provider.get_brands %}
-                        {% provider_login_url provider openid=brand.openid_url process=process as href %}
+                        {% provider_login_url provider openid=brand.openid_url process=process next=redirect_field_value as href %}
                     <li class="d-grid mt-3"><a class="btn btn-secondary oidc-url" href="{{ href }}">{{ brand.name }}</a></li>
                     {% endfor %}
                 {% else %}
-                    {% provider_login_url provider process=process scope=scope auth_params=auth_params as href %}
+                    {% provider_login_url provider process=process scope=scope auth_params=auth_params next=redirect_field_value as href %}
                         <li class="d-grid mt-3">
                             <form id="social-login" class="d-grid" method="POST" action="{{ href }}">
                                 {% csrf_token %}
@@ -80,5 +80,11 @@
                 {% endif %}
             {% endfor %}
         </ul>
+    {% endif %}
+    {% if ACCOUNT_SWITCH_ADD_ACTIVE %}
+        <form method="post" action="{% url 'account_switch_cancel' %}" class="d-grid mt-3">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-link">{% translate "Cancel and return to the current account" %}</button>
+        </form>
     {% endif %}
 {% endblock after_form_content %}

@@ -1,0 +1,103 @@
+<div class="modal-header">
+  <h4 class="modal-title" i18n>Switch User</h4>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    i18n-aria-label
+    [disabled]="loading()"
+    (click)="activeModal.dismiss()"
+  ></button>
+</div>
+<div class="modal-body">
+  @if (loading() && accounts().length === 0) {
+    <div class="d-flex justify-content-center p-4" role="status">
+      <div class="spinner-border text-primary">
+        <span class="visually-hidden" i18n>Loading...</span>
+      </div>
+    </div>
+  } @else if (!enabled()) {
+    <div class="alert alert-info mb-0" role="alert" i18n>
+      Quick account switching is unavailable when automatic or remote-user login
+      is enabled.
+    </div>
+  } @else {
+    <div class="list-group account-list">
+      @for (account of accounts(); track account.id) {
+        <div
+          class="list-group-item d-flex align-items-center gap-2"
+          [class.current-account]="account.current"
+        >
+          <button
+            type="button"
+            class="btn border-0 text-start flex-grow-1 d-flex align-items-center p-0"
+            [disabled]="account.current || loading()"
+            (click)="switchAccount(account)"
+          >
+            <i-bs
+              class="me-3 flex-shrink-0"
+              width="1.5em"
+              height="1.5em"
+              name="person-circle"
+            ></i-bs>
+            <span class="flex-grow-1 overflow-hidden">
+              <span class="d-block text-truncate fw-semibold">{{
+                displayName(account)
+              }}</span>
+              @if (displayName(account) !== account.username) {
+                <span class="d-block small text-muted text-truncate">{{
+                  account.username
+                }}</span>
+              }
+            </span>
+            @if (account.current) {
+              <span class="badge bg-primary ms-2" i18n>Current</span>
+            }
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-danger flex-shrink-0"
+            [disabled]="loading()"
+            (click)="removeAccount($event, account)"
+            aria-label="Remove account"
+            i18n-aria-label
+          >
+            <i-bs name="trash"></i-bs>
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>
+@if (enabled()) {
+  <div class="modal-footer justify-content-between">
+    <button
+      type="button"
+      class="btn btn-outline-danger"
+      [disabled]="loading() || accounts().length === 0"
+      (click)="logoutAll()"
+    >
+      <ng-container i18n>Log out all</ng-container>
+    </button>
+    <div>
+      <button
+        type="button"
+        class="btn btn-outline-secondary me-2"
+        [disabled]="loading()"
+        (click)="activeModal.dismiss()"
+        i18n
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="loading() || accounts().length >= 10"
+        (click)="addAccount()"
+      >
+        <i-bs class="me-2" name="plus-circle"></i-bs
+        ><ng-container i18n>Add Account</ng-container>
+      </button>
+    </div>
+  </div>
+}
