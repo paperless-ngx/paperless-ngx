@@ -142,7 +142,7 @@ export class SettingsComponent
   private systemStatusService = inject(SystemStatusService)
   private savedViewsService = inject(SavedViewService)
 
-  activeNavID: number
+  readonly activeNavID = signal<number>(undefined)
 
   settingsForm = new FormGroup({
     bulkEditConfirmationDialogs: new FormControl(null),
@@ -283,7 +283,7 @@ export class SettingsComponent
           (navID) => navID.toLowerCase() == section
         )
         if (navIDKey) {
-          this.activeNavID = SettingsNavIDs[navIDKey]
+          this.activeNavID.set(SettingsNavIDs[navIDKey])
         }
       }
     })
@@ -386,7 +386,7 @@ export class SettingsComponent
         .navigate(['settings', foundNavIDkey.toLowerCase()])
         .then((navigated) => {
           if (!navigated && this.isDirty) {
-            this.activeNavID = navChangeEvent.activeId
+            this.activeNavID.set(navChangeEvent.activeId)
           } else if (navigated && this.isDirty) {
             this.initialize()
           }

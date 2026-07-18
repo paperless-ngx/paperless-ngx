@@ -1,5 +1,12 @@
 import { CurrencyPipe, getLocaleCurrencyCode, SlicePipe } from '@angular/common'
-import { Component, inject, Input, LOCALE_ID, OnInit } from '@angular/core'
+import {
+  ChangeDetectorRef,
+  Component,
+  inject,
+  Input,
+  LOCALE_ID,
+  OnInit,
+} from '@angular/core'
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
 import { takeUntil } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
@@ -22,6 +29,7 @@ export class CustomFieldDisplayComponent
 {
   private customFieldService = inject(CustomFieldsService)
   private documentService = inject(DocumentService)
+  private changeDetector = inject(ChangeDetectorRef)
 
   CustomFieldDataType = CustomFieldDataType
 
@@ -74,6 +82,7 @@ export class CustomFieldDisplayComponent
     this.customFieldService.listAll().subscribe((r) => {
       this.customFields = r.results
       this.init()
+      this.changeDetector.markForCheck()
     })
   }
 
@@ -111,6 +120,7 @@ export class CustomFieldDisplayComponent
         this.docLinkDocuments = this.value
           .map((id) => result.results.find((d) => d.id === id))
           .filter((d) => d)
+        this.changeDetector.markForCheck()
       })
   }
 

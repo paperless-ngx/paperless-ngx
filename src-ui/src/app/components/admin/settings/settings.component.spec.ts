@@ -242,7 +242,7 @@ describe('SettingsComponent', () => {
     activatedRoute.snapshot.fragment = '#notifications'
     const scrollSpy = jest.spyOn(viewportScroller, 'scrollToAnchor')
     component.ngOnInit()
-    expect(component.activeNavID).toEqual(4) // Notifications
+    expect(component.activeNavID()).toEqual(4) // Notifications
     component.ngAfterViewInit()
     expect(scrollSpy).toHaveBeenCalledWith('#notifications')
   })

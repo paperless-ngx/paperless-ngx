@@ -58,8 +58,8 @@
           </button>
         }
         @if ((selectionModel.items | filter: filterText:'name').length > 0) {
-          <button class="list-group-item list-group-item-action bg-light d-flex align-items-center" (click)="applyClicked()" [disabled]="!modelIsDirty || disabled">
-            <small class="ms-2" [ngClass]="{'fw-bold': modelIsDirty}" i18n>Apply</small>
+          <button class="list-group-item list-group-item-action bg-light d-flex align-items-center" (click)="applyClicked()" [disabled]="!modelIsDirty() || disabled">
+            <small class="ms-2" [ngClass]="{'fw-bold': modelIsDirty()}" i18n>Apply</small>
             <i-bs width="1.5em" height="1em" name="arrow-right"></i-bs>
           </button>
         }

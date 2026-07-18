@@ -10,7 +10,7 @@
         [createRef]="createTag.bind(this)"
         (opened)="openTagsDropdown()"
         [(selectionModel)]="tagSelectionModel"
-        [documentCounts]="tagDocumentCounts"
+        [documentCounts]="tagDocumentCounts()"
         (apply)="setTags($event)"
         shortcutKey="t">
       </pngx-filterable-dropdown>
@@ -24,7 +24,7 @@
         [createRef]="createCorrespondent.bind(this)"
         (opened)="openCorrespondentDropdown()"
         [(selectionModel)]="correspondentSelectionModel"
-        [documentCounts]="correspondentDocumentCounts"
+        [documentCounts]="correspondentDocumentCounts()"
         (apply)="setCorrespondents($event)"
         shortcutKey="y">
       </pngx-filterable-dropdown>
@@ -38,7 +38,7 @@
         [createRef]="createDocumentType.bind(this)"
         (opened)="openDocumentTypeDropdown()"
         [(selectionModel)]="documentTypeSelectionModel"
-        [documentCounts]="documentTypeDocumentCounts"
+        [documentCounts]="documentTypeDocumentCounts()"
         (apply)="setDocumentTypes($event)"
         shortcutKey="u">
       </pngx-filterable-dropdown>
@@ -52,7 +52,7 @@
         [createRef]="createStoragePath.bind(this)"
         (opened)="openStoragePathDropdown()"
         [(selectionModel)]="storagePathsSelectionModel"
-        [documentCounts]="storagePathDocumentCounts"
+        [documentCounts]="storagePathDocumentCounts()"
         (apply)="setStoragePaths($event)"
         shortcutKey="i">
       </pngx-filterable-dropdown>
@@ -66,7 +66,7 @@
         [createRef]="createCustomField.bind(this)"
         (opened)="openCustomFieldsDropdown()"
         [(selectionModel)]="customFieldsSelectionModel"
-        [documentCounts]="customFieldDocumentCounts"
+        [documentCounts]="customFieldDocumentCounts()"
         extraButtonTitle="Set values"
         i18n-extraButtonTitle
         (extraButton)="setCustomFieldValues($event)"
@@ -124,11 +124,11 @@
       </div>
     </div>
     <div class="btn-group btn-group-sm">
-      <button class="btn btn-sm btn-outline-primary" [disabled]="awaitingDownload" (click)="downloadSelected()">
-        @if (!awaitingDownload) {
+      <button class="btn btn-sm btn-outline-primary" [disabled]="awaitingDownload()" (click)="downloadSelected()">
+        @if (!awaitingDownload()) {
           <i-bs name="arrow-down"></i-bs>
         }
-        @if (awaitingDownload) {
+        @if (awaitingDownload()) {
           <div class="spinner-border spinner-border-sm" role="status">
             <span class="visually-hidden">Preparing download...</span>
           </div>

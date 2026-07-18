@@ -37,7 +37,7 @@
 
 <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
 
-  <ul ngbNav #nav="ngbNav" (navChange)="onNavChange($event)" [(activeId)]="activeNavID" class="nav-tabs">
+  <ul ngbNav #nav="ngbNav" (navChange)="onNavChange($event)" [activeId]="activeNavID()" (activeIdChange)="activeNavID.set($event)" class="nav-tabs">
     <li [ngbNavItem]="SettingsNavIDs.General">
       <a ngbNavLink i18n>General</a>
       <ng-template ngbNavContent>

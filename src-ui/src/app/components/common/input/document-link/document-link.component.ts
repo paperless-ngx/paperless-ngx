@@ -6,6 +6,7 @@ import {
   Input,
   OnDestroy,
   OnInit,
+  signal,
 } from '@angular/core'
 import {
   FormsModule,
@@ -63,7 +64,7 @@ export class DocumentLinkComponent
 
   documentsInput$ = new Subject<string>()
   foundDocuments$: Observable<Document[]>
-  loading = false
+  readonly loading = signal(false)
   selectedDocuments: Document[] = []
 
   private unsubscribeNotifier: Subject<any> = new Subject()
@@ -93,12 +94,12 @@ export class DocumentLinkComponent
       this.selectedDocuments = []
       super.writeValue([])
     } else {
-      this.loading = true
+      this.loading.set(true)
       this.documentsService
         .getFew(documentIDs, { fields: 'id,title' })
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe((documentResults) => {
-          this.loading = false
+          this.loading.set(false)
           this.selectedDocuments = documentIDs.map(
             (id) => documentResults.results.find((d) => d.id === id) ?? {}
           )
@@ -113,7 +114,7 @@ export class DocumentLinkComponent
       this.documentsInput$.pipe(
         distinctUntilChanged(),
         takeUntil(this.unsubscribeNotifier),
-        tap(() => (this.loading = true)),
+        tap(() => this.loading.set(true)),
         switchMap((title) =>
           this.documentsService
             .listFiltered(
@@ -133,7 +134,7 @@ export class DocumentLinkComponent
                 )
               ),
               catchError(() => of([])), // empty on error
-              tap(() => (this.loading = false))
+              tap(() => this.loading.set(false))
             )
         )
       )

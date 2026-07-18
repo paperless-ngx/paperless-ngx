@@ -303,7 +303,7 @@ describe('BulkEditorComponent', () => {
     component.openDocumentTypeDropdown()
 
     expect(getSelectionDataSpy).not.toHaveBeenCalled()
-    expect(component.documentTypeDocumentCounts).toEqual(
+    expect(component.documentTypeDocumentCounts()).toEqual(
       selectionData.selected_document_types
     )
   })
@@ -320,7 +320,7 @@ describe('BulkEditorComponent', () => {
     component.openCorrespondentDropdown()
 
     expect(getSelectionDataSpy).not.toHaveBeenCalled()
-    expect(component.correspondentDocumentCounts).toEqual(
+    expect(component.correspondentDocumentCounts()).toEqual(
       selectionData.selected_correspondents
     )
   })
@@ -337,7 +337,7 @@ describe('BulkEditorComponent', () => {
     component.openStoragePathDropdown()
 
     expect(getSelectionDataSpy).not.toHaveBeenCalled()
-    expect(component.storagePathDocumentCounts).toEqual(
+    expect(component.storagePathDocumentCounts()).toEqual(
       selectionData.selected_storage_paths
     )
   })
@@ -354,7 +354,7 @@ describe('BulkEditorComponent', () => {
     component.openCustomFieldsDropdown()
 
     expect(getSelectionDataSpy).not.toHaveBeenCalled()
-    expect(component.customFieldDocumentCounts).toEqual(
+    expect(component.customFieldDocumentCounts()).toEqual(
       selectionData.selected_custom_fields
     )
   })

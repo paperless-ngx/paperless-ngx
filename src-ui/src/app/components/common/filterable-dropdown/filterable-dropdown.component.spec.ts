@@ -221,7 +221,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       .dispatchEvent(new MouseEvent('click')) // open
     selectionModel.toggle(items[0].id)
     fixture.detectChanges()
-    expect(component.modelIsDirty).toBeTruthy()
+    expect(component.modelIsDirty()).toBeTruthy()
     let applyResult: ChangedItems
     const closeSpy = jest.spyOn(component.dropdown, 'close')
     component.apply.subscribe((result) => (applyResult = result))
@@ -244,7 +244,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       .dispatchEvent(new MouseEvent('click')) // open
     selectionModel.toggle(items[0].id)
     fixture.detectChanges()
-    expect(component.modelIsDirty).toBeTruthy()
+    expect(component.modelIsDirty()).toBeTruthy()
     let applyResult: ChangedItems
     component.apply.subscribe((result) => (applyResult = result))
     component.dropdown.close()

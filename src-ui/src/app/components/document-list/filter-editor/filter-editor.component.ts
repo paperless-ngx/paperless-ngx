@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
@@ -9,6 +10,7 @@ import {
   Output,
   ViewChild,
   inject,
+  signal,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
@@ -349,7 +351,7 @@ export class FilterEditorComponent
   @ViewChild('textFilterInput')
   textFilterInput: ElementRef
 
-  customFields: CustomField[] = []
+  readonly customFields = signal<CustomField[]>([])
 
   tagDocumentCounts: SelectionDataItem[]
   correspondentDocumentCounts: SelectionDataItem[]
@@ -514,6 +516,7 @@ export class FilterEditorComponent
           this.documentService.get(this._moreLikeId).subscribe((result) => {
             this._moreLikeDoc = result
             this._textFilter = result.title
+            this.changeDetector.markForCheck()
           })
           break
         case FILTER_CREATED_AFTER:
@@ -1162,6 +1165,7 @@ export class FilterEditorComponent
 
   private loadingCountTotal: number = 0
   private loadingCount: number = 0
+  private readonly changeDetector = inject(ChangeDetectorRef)
 
   private maybeCompleteLoading() {
     this.loadingCount++
@@ -1229,7 +1233,7 @@ export class FilterEditorComponent
     ) {
       this.loadingCountTotal++
       this.customFieldService.listAll().subscribe((result) => {
-        this.customFields = result.results
+        this.customFields.set(result.results)
         this.maybeCompleteLoading()
       })
     }

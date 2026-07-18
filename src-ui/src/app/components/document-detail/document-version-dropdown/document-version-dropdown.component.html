@@ -5,7 +5,7 @@
   </button>
   <div class="dropdown-menu shadow" ngbDropdownMenu>
     <div class="px-3 py-2 mb-2">
-      @if (versionUploadState === UploadState.Idle) {
+      @if (versionUploadState() === UploadState.Idle) {
         <div class="input-group input-group-sm mb-2">
           <label class="input-group-text" for="newVersionLabel" i18n>Label</label>
           <input
@@ -32,7 +32,7 @@
           <i-bs name="file-earmark-plus"></i-bs><span class="ps-1" i18n>Add new version</span>
         </button>
       } @else {
-        @switch (versionUploadState) {
+        @switch (versionUploadState()) {
           @case (UploadState.Uploading) {
             <div class="small text-muted mt-1 d-flex align-items-center">
               <output class="spinner-border spinner-border-sm me-2" aria-hidden="true"></output>
@@ -50,8 +50,8 @@
               <span i18n>Version upload failed.</span>
               <button type="button" class="btn btn-link btn-sm p-0 ms-2" (click)="clearVersionUploadStatus()" i18n>Dismiss</button>
             </div>
-            @if (versionUploadError) {
-              <div class="small text-muted mt-1">{{ versionUploadError }}</div>
+            @if (versionUploadError()) {
+              <div class="small text-muted mt-1">{{ versionUploadError() }}</div>
             }
           }
         }
@@ -83,7 +83,7 @@
                     [(ngModel)]="versionLabelDraft"
                     i18n-placeholder
                     placeholder="Version label"
-                    [disabled]="savingVersionLabelId !== null"
+                    [disabled]="savingVersionLabelId() !== null"
                     (keydown.enter)="submitEditedVersionLabel(version, $event)"
                     (keydown.escape)="cancelEditingVersion($event)"
                     (click)="$event.stopPropagation()"
@@ -101,7 +101,7 @@
                   <button
                     type="button"
                     class="btn btn-outline-secondary"
-                    [disabled]="savingVersionLabelId !== null"
+                    [disabled]="savingVersionLabelId() !== null"
                     (click)="isEditingVersion(version.id) ? submitEditedVersionLabel(version, $event) : beginEditingVersion(version, $event)"
                   >
                     @if (isEditingVersion(version.id)) {

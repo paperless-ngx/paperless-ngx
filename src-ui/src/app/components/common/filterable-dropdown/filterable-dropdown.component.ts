@@ -12,6 +12,7 @@ import {
   Output,
   ViewChild,
   inject,
+  signal,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
@@ -796,7 +797,7 @@ export class FilterableDropdownComponent
     return this.title ? this.title.replace(/\s/g, '_').toLowerCase() : null
   }
 
-  modelIsDirty: boolean = false
+  readonly modelIsDirty = signal(false)
 
   private keyboardIndex: number
 
@@ -811,7 +812,7 @@ export class FilterableDropdownComponent
   constructor() {
     super()
     this.selectionModelChange.subscribe((updatedModel) => {
-      this.modelIsDirty = updatedModel.isDirty()
+      this.modelIsDirty.set(updatedModel.isDirty())
     })
   }
 
@@ -858,7 +859,7 @@ export class FilterableDropdownComponent
       }, 0)
       if (this.editing) {
         this.selectionModel.reset()
-        this.modelIsDirty = false
+        this.modelIsDirty.set(false)
       }
       this.selectionModel.singleSelect =
         this.editing && !this.selectionModel.manyToOne
