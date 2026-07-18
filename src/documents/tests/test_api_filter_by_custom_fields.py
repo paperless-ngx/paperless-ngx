@@ -138,7 +138,7 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
         title = str(kwargs)
         document = Document.objects.create(
             title=title,
-            checksum=title,
+            checksum=title[:64],
             archive_serial_number=len(self.documents) + 1,
         )
         data = {

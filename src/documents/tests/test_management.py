@@ -176,6 +176,35 @@ class TestMakeIndex:
         call_command("document_index", "reindex", if_needed=True, skip_checks=True)
         mock_get_backend.return_value.rebuild.assert_called_once()
 
+    def test_reindex_default_heap_size_not_overridden(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """Without --heap-size-mb, rebuild must use its own default heap size."""
+        mock_get_backend = mocker.patch(
+            "documents.management.commands.document_index.get_backend",
+        )
+        call_command("document_index", "reindex", skip_checks=True)
+        _, kwargs = mock_get_backend.return_value.rebuild.call_args
+        assert "writer_heap_bytes" not in kwargs
+
+    def test_reindex_heap_size_mb_passed_to_rebuild(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """--heap-size-mb must convert to bytes and pass through to rebuild."""
+        mock_get_backend = mocker.patch(
+            "documents.management.commands.document_index.get_backend",
+        )
+        call_command(
+            "document_index",
+            "reindex",
+            heap_size_mb=128,
+            skip_checks=True,
+        )
+        _, kwargs = mock_get_backend.return_value.rebuild.call_args
+        assert kwargs["writer_heap_bytes"] == 128_000_000
+
 
 @pytest.mark.management
 class TestRenamer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
