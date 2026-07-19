@@ -1212,7 +1212,9 @@ describe('DocumentDetailComponent', () => {
     settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, true)
     expect(component.useNativePdfViewer).toBeTruthy()
     fixture.detectChanges()
-    expect(fixture.debugElement.query(By.css('object'))).not.toBeNull()
+    const object = fixture.debugElement.query(By.css('object'))
+    expect(object).not.toBeNull()
+    expect(object.nativeElement.childElementCount).toEqual(0)
   })
 
   it('should attempt to retrieve metadata', () => {
