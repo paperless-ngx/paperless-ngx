@@ -40,6 +40,11 @@ export enum MailMetadataCorrespondentOption {
   FromCustom = 4,
 }
 
+export enum MailMetadataCreatedOption {
+  FromNothing = 1,
+  FromMessageDate = 2,
+}
+
 export interface MailRule extends ObjectWithPermissions {
   name: string
 
@@ -86,4 +91,14 @@ export interface MailRule extends ObjectWithPermissions {
   assign_owner_from_rule: boolean
 
   stop_processing: boolean
+
+  assign_created_from?: MailMetadataCreatedOption
+
+  assign_subject_to?: number // CustomField.id
+
+  assign_sender_to?: number // CustomField.id
+
+  assign_recipient_to?: number // CustomField.id
+
+  assign_message_date_to?: number // CustomField.id
 }

@@ -70,6 +70,18 @@
         @if (showCorrespondentField) {
           <pngx-input-select [horizontal]="true" i18n-title title="Assign correspondent" [items]="correspondents()" [allowNull]="true" formControlName="assign_correspondent"></pngx-input-select>
         }
+        <pngx-input-select [horizontal]="true" i18n-title title="Assign created date from" [items]="metadataCreatedOptions" formControlName="assign_created_from"></pngx-input-select>
+      </div>
+    </div>
+    <hr class="mt-0"/>
+    <div class="row">
+      <div class="col-md-6">
+        <pngx-input-select [horizontal]="true" i18n-title title="Assign email subject to custom field" [items]="stringCustomFieldOptions()" [allowNull]="true" formControlName="assign_subject_to" [error]="error?.assign_subject_to"></pngx-input-select>
+        <pngx-input-select [horizontal]="true" i18n-title title="Assign email sender to custom field" [items]="stringCustomFieldOptions()" [allowNull]="true" formControlName="assign_sender_to" [error]="error?.assign_sender_to"></pngx-input-select>
+      </div>
+      <div class="col-md-6">
+        <pngx-input-select [horizontal]="true" i18n-title title="Assign email recipient to custom field" [items]="stringCustomFieldOptions()" [allowNull]="true" formControlName="assign_recipient_to" [error]="error?.assign_recipient_to"></pngx-input-select>
+        <pngx-input-select [horizontal]="true" i18n-title title="Assign email message date to custom field" [items]="dateCustomFieldOptions()" [allowNull]="true" formControlName="assign_message_date_to" [error]="error?.assign_message_date_to" i18n-hint hint="The date the sender's mail client set, not when the server received it."></pngx-input-select>
       </div>
     </div>
   </div>

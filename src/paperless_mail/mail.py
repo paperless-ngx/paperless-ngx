@@ -39,6 +39,7 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.loggers import LoggingMixin
 from documents.models import Correspondent
+from documents.models import CustomFieldInstance
 from documents.models import PaperlessTask
 from documents.parsers import is_mime_type_supported
 from documents.tasks import consume_file
@@ -76,6 +77,17 @@ APPLE_MAIL_TAG_COLORS = {
 
 class MailError(Exception):
     pass
+
+
+# Bind to the CustomFieldInstance.value_text column limit so a schema change
+# there doesn't silently start raising DataError on Postgres consumes.
+MAIL_METADATA_STRING_TRUNCATE = CustomFieldInstance._meta.get_field(
+    "value_text",
+).max_length
+
+# imap_tools substitutes this whenever the Date: header is absent or unparsable;
+# no legitimate 1900-dated email exists in practice, so both cases are dropped.
+_IMAP_TOOLS_DATE_SENTINEL = datetime.datetime(1900, 1, 1)
 
 
 class BaseMailAction:
@@ -563,6 +575,70 @@ class MailAccountHandler(LoggingMixin):
                 "Unknown correspondent selector",
             )  # pragma: no cover
 
+    @staticmethod
+    def _message_date_from_header(message: MailMessage) -> date | None:
+        """
+        Return the parsed Date-header date, or None if the header is absent
+        or unparsable.
+        """
+        if not message.date_str:
+            return None
+        parsed = message.date
+        # The sentinel is always naive; an aware datetime that happens to land
+        # on 1900-01-01 is not it.
+        if parsed.tzinfo is None and parsed == _IMAP_TOOLS_DATE_SENTINEL:
+            return None
+        return parsed.date()
+
+    @staticmethod
+    def _message_created_override(
+        rule: MailRule,
+        message: MailMessage,
+    ) -> date | None:
+        """
+        Return the value for DocumentMetadataOverrides.created, or None to keep
+        the consumer's default (PDF-parsed date, else consume time).
+        """
+        if rule.assign_created_from != MailRule.CreatedSource.FROM_MESSAGE_DATE:
+            return None
+        return MailAccountHandler._message_date_from_header(message)
+
+    @staticmethod
+    def _get_email_custom_fields(
+        rule: MailRule,
+        message: MailMessage,
+    ) -> dict[int, str | date]:
+        """
+        Return {custom_field_id: value} for the metadata FKs the rule opts into.
+        Absent source headers are skipped so the field is not clobbered with "".
+        """
+        custom_fields: dict[int, str | date] = {}
+        truncate = MAIL_METADATA_STRING_TRUNCATE
+
+        if rule.assign_subject_to_id and message.subject:
+            subject = unicodedata.normalize("NFC", message.subject)
+            custom_fields[rule.assign_subject_to_id] = subject[:truncate]
+
+        if rule.assign_sender_to_id:
+            sender = message.from_values.full if message.from_values else ""
+            if sender:
+                sender = unicodedata.normalize("NFC", sender)
+                custom_fields[rule.assign_sender_to_id] = sender[:truncate]
+
+        if rule.assign_recipient_to_id and message.to_values:
+            recipients = ", ".join(
+                unicodedata.normalize("NFC", addr.full) for addr in message.to_values
+            )
+            if recipients:
+                custom_fields[rule.assign_recipient_to_id] = recipients[:truncate]
+
+        if rule.assign_message_date_to_id:
+            date_value = MailAccountHandler._message_date_from_header(message)
+            if date_value is not None:
+                custom_fields[rule.assign_message_date_to_id] = date_value
+
+        return custom_fields
+
     def handle_mail_account(self, account: MailAccount):
         """
         Main entry method to handle a specific mail account.
@@ -927,6 +1003,8 @@ class MailAccountHandler(LoggingMixin):
                         if (rule.assign_owner_from_rule and rule.owner)
                         else None
                     ),
+                    created=self._message_created_override(rule, message),
+                    custom_fields=self._get_email_custom_fields(rule, message),
                 )
 
                 consume_task = consume_file.s(
@@ -1034,6 +1112,8 @@ class MailAccountHandler(LoggingMixin):
             document_type_id=doc_type.id if doc_type else None,
             tag_ids=tag_ids,
             owner_id=rule.owner.id if rule.owner else None,
+            created=self._message_created_override(rule, message),
+            custom_fields=self._get_email_custom_fields(rule, message),
         )
 
         consume_task = consume_file.s(

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core'
+import { Component, computed, inject } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import {
   FormControl,
@@ -9,18 +9,21 @@ import {
 import { map } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Correspondent } from 'src/app/data/correspondent'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentType } from 'src/app/data/document-type'
 import { MailAccount } from 'src/app/data/mail-account'
 import {
   MailAction,
   MailFilterAttachmentType,
   MailMetadataCorrespondentOption,
+  MailMetadataCreatedOption,
   MailMetadataTitleOption,
   MailRule,
   MailRuleConsumptionScope,
   MailRulePdfLayout,
 } from 'src/app/data/mail-rule'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
@@ -139,6 +142,17 @@ const METADATA_CORRESPONDENT_OPTIONS = [
   },
 ]
 
+const METADATA_CREATED_OPTIONS = [
+  {
+    id: MailMetadataCreatedOption.FromNothing,
+    name: $localize`Do not assign a created date from the rule`,
+  },
+  {
+    id: MailMetadataCreatedOption.FromMessageDate,
+    name: $localize`Use the email's Date header`,
+  },
+]
+
 @Component({
   selector: 'pngx-mail-rule-edit-dialog',
   templateUrl: './mail-rule-edit-dialog.component.html',
@@ -158,6 +172,7 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
   private readonly accountService = inject(MailAccountService)
   private readonly correspondentService = inject(CorrespondentService)
   private readonly documentTypeService = inject(DocumentTypeService)
+  private readonly customFieldsService = inject(CustomFieldsService)
 
   readonly accounts = toSignal(
     this.accountService.listAll().pipe(map((result) => result.results)),
@@ -170,6 +185,10 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
   readonly documentTypes = toSignal(
     this.documentTypeService.listAll().pipe(map((result) => result.results)),
     { initialValue: undefined as DocumentType[] }
+  )
+  readonly customFields = toSignal(
+    this.customFieldsService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as CustomField[] }
   )
 
   constructor() {
@@ -215,6 +234,13 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
       assign_correspondent: new FormControl(null),
       assign_owner_from_rule: new FormControl(true),
       stop_processing: new FormControl(false),
+      assign_created_from: new FormControl(
+        MailMetadataCreatedOption.FromNothing
+      ),
+      assign_subject_to: new FormControl(null),
+      assign_sender_to: new FormControl(null),
+      assign_recipient_to: new FormControl(null),
+      assign_message_date_to: new FormControl(null),
     })
   }
 
@@ -247,6 +273,22 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
   get metadataCorrespondentOptions() {
     return METADATA_CORRESPONDENT_OPTIONS
   }
+
+  get metadataCreatedOptions() {
+    return METADATA_CREATED_OPTIONS
+  }
+
+  readonly stringCustomFieldOptions = computed(() =>
+    (this.customFields() ?? []).filter(
+      (f) => f.data_type === CustomFieldDataType.String
+    )
+  )
+
+  readonly dateCustomFieldOptions = computed(() =>
+    (this.customFields() ?? []).filter(
+      (f) => f.data_type === CustomFieldDataType.Date
+    )
+  )
 
   get consumptionScopeOptions() {
     return CONSUMPTION_SCOPE_OPTIONS
