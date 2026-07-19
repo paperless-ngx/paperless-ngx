@@ -1,8 +1,12 @@
 from datetime import timedelta
 from types import SimpleNamespace
+from typing import TYPE_CHECKING
+from typing import cast
 from unittest import mock
 
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 
 from documents.conditionals import metadata_etag
@@ -12,6 +16,9 @@ from documents.conditionals import thumbnail_last_modified
 from documents.models import Document
 from documents.tests.utils import DirectoriesMixin
 from documents.versioning import resolve_effective_document_by_pk
+
+if TYPE_CHECKING:
+    from rest_framework.request import Request
 
 
 class TestConditionals(DirectoriesMixin, TestCase):
@@ -29,14 +36,18 @@ class TestConditionals(DirectoriesMixin, TestCase):
             mime_type="application/pdf",
             root_document=root,
         )
-        request = SimpleNamespace(query_params={})
+        request = cast("Request", SimpleNamespace(query_params={}))
 
         self.assertEqual(
             metadata_etag(request, root.id),
             f"{latest.checksum}:{latest.modified.isoformat()}",
         )
-        self.assertEqual(preview_etag(request, root.id), latest.archive_checksum)
-        self.assertEqual(thumbnail_etag(request, root.id), latest.checksum)
+        # preview_etag/thumbnail_etag resolve the same (pk, request) and should
+        # reuse metadata_etag's cached resolution instead of re-querying.
+        with CaptureQueriesContext(connection) as ctx:
+            self.assertEqual(preview_etag(request, root.id), latest.archive_checksum)
+            self.assertEqual(thumbnail_etag(request, root.id), latest.checksum)
+        self.assertEqual(len(ctx.captured_queries), 0)
 
     def test_metadata_etag_changes_when_document_modified_changes(self) -> None:
         doc = Document.objects.create(
@@ -44,15 +55,20 @@ class TestConditionals(DirectoriesMixin, TestCase):
             checksum="same-checksum",
             mime_type="application/pdf",
         )
-        request = SimpleNamespace(query_params={})
-
-        original_etag = metadata_etag(request, doc.id)
+        # Each call simulates a separate incoming HTTP request, so it gets its
+        # own request object -- the per-request resolution cache must not leak
+        # a stale result across genuinely different requests.
+        original_etag = metadata_etag(
+            cast("Request", SimpleNamespace(query_params={})),
+            doc.id,
+        )
         new_modified = timezone.now() + timedelta(seconds=5)
         Document.objects.filter(id=doc.id).update(modified=new_modified)
 
-        self.assertNotEqual(metadata_etag(request, doc.id), original_etag)
+        second_request = cast("Request", SimpleNamespace(query_params={}))
+        self.assertNotEqual(metadata_etag(second_request, doc.id), original_etag)
         self.assertEqual(
-            metadata_etag(request, doc.id),
+            metadata_etag(second_request, doc.id),
             f"{doc.checksum}:{new_modified.isoformat()}",
         )
 
@@ -76,9 +92,13 @@ class TestConditionals(DirectoriesMixin, TestCase):
             root_document=other_root,
         )
 
-        invalid_request = SimpleNamespace(query_params={"version": "not-a-number"})
-        unrelated_request = SimpleNamespace(
-            query_params={"version": str(other_version.id)},
+        invalid_request = cast(
+            "Request",
+            SimpleNamespace(query_params={"version": "not-a-number"}),
+        )
+        unrelated_request = cast(
+            "Request",
+            SimpleNamespace(query_params={"version": str(other_version.id)}),
         )
 
         self.assertIsNone(
@@ -105,7 +125,7 @@ class TestConditionals(DirectoriesMixin, TestCase):
         latest.thumbnail_path.parent.mkdir(parents=True, exist_ok=True)
         latest.thumbnail_path.write_bytes(b"thumb")
 
-        request = SimpleNamespace(query_params={})
+        request = cast("Request", SimpleNamespace(query_params={}))
         with mock.patch(
             "documents.conditionals.get_thumbnail_modified_key",
             return_value="thumb-modified-key",

@@ -8,7 +8,7 @@ from typing import Any
 from documents.models import Document
 
 if TYPE_CHECKING:
-    from django.http import HttpRequest
+    from rest_framework.request import Request
 
 
 class VersionResolutionError(StrEnum):
@@ -26,7 +26,7 @@ def _document_manager(*, include_deleted: bool) -> Any:
     return Document.global_objects if include_deleted else Document.objects
 
 
-def get_request_version_param(request: HttpRequest) -> str | None:
+def get_request_version_param(request: Request) -> str | None:
     if hasattr(request, "query_params"):
         return request.query_params.get("version")
     return None
@@ -57,7 +57,7 @@ def get_latest_version_for_root(
 
 def resolve_requested_version_for_root(
     root_doc: Document,
-    request: Any,
+    request: Request,
     *,
     include_deleted: bool = False,
 ) -> VersionResolution:
@@ -86,7 +86,7 @@ def resolve_requested_version_for_root(
 
 def resolve_effective_document(
     request_doc: Document,
-    request: Any,
+    request: Request,
     *,
     include_deleted: bool = False,
 ) -> VersionResolution:
@@ -107,18 +107,41 @@ def resolve_effective_document(
     return VersionResolution(document=request_doc)
 
 
+_EFFECTIVE_DOCUMENT_CACHE_ATTR = "_effective_document_resolution_cache"
+
+
 def resolve_effective_document_by_pk(
     pk: int,
-    request: Any,
+    request: Request,
     *,
     include_deleted: bool = False,
 ) -> VersionResolution:
+    # Django's `condition()` decorator (used for ETag/Last-Modified) invokes the
+    # etag_func and last_modified_func separately, and the view itself may resolve
+    # again -- all against the same request. Cache per-request so a single thumb/
+    # metadata/preview request doesn't redo this resolution multiple times.
+    cache = getattr(request, _EFFECTIVE_DOCUMENT_CACHE_ATTR, None)
+    if cache is None:
+        cache = {}
+        setattr(request, _EFFECTIVE_DOCUMENT_CACHE_ATTR, cache)
+
+    key = (pk, include_deleted)
+    if key in cache:
+        return cache[key]
+
     manager = _document_manager(include_deleted=include_deleted)
     request_doc = manager.only("id", "root_document_id").filter(pk=pk).first()
     if request_doc is None:
-        return VersionResolution(document=None, error=VersionResolutionError.NOT_FOUND)
-    return resolve_effective_document(
-        request_doc,
-        request,
-        include_deleted=include_deleted,
-    )
+        resolution = VersionResolution(
+            document=None,
+            error=VersionResolutionError.NOT_FOUND,
+        )
+    else:
+        resolution = resolve_effective_document(
+            request_doc,
+            request,
+            include_deleted=include_deleted,
+        )
+
+    cache[key] = resolution
+    return resolution
