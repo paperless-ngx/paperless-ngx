@@ -1,4 +1,4 @@
-import { AsyncPipe } from '@angular/common'
+import { AsyncPipe, NgOptimizedImage } from '@angular/common'
 import {
   AfterViewInit,
   Component,
@@ -46,6 +46,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     TagComponent,
     CustomFieldDisplayComponent,
     AsyncPipe,
+    NgOptimizedImage,
     UsernamePipe,
     CorrespondentNamePipe,
     DocumentTypeNamePipe,

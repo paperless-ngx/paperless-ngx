@@ -177,6 +177,49 @@ class TestViews(DirectoriesMixin, TestCase):
         self.assertEqual(response.request["PATH_INFO"], "/accounts/login/")
         self.assertContains(response, b"Share link has expired")
 
+    def test_share_link_archive_falls_back_to_original(self) -> None:
+        """
+        GIVEN:
+            - A document without an archive version
+            - A share link using the default archive file version
+        WHEN:
+            - An unauthenticated request for the share link is made
+        THEN:
+            - The original document is returned
+        """
+        _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
+        content = b"This document has no archive"
+
+        with Path(filename).open("wb") as f:
+            f.write(content)
+
+        doc = Document.objects.create(
+            title="no archive",
+            filename=Path(filename).name,
+            mime_type="text/plain",
+        )
+
+        sharelink_permissions = Permission.objects.filter(
+            codename__contains="sharelink",
+        )
+        self.user.user_permissions.add(*sharelink_permissions)
+        self.client.force_login(self.user)
+
+        create_response = self.client.post(
+            "/api/share_links/",
+            {"document": doc.pk},
+        )
+        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
+        share_link = ShareLink.objects.get(document=doc)
+        self.assertEqual(share_link.file_version, ShareLink.FileVersion.ARCHIVE)
+
+        self.client.logout()
+
+        response = self.client.get(f"/share/{share_link.slug}")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(read_streaming_response(response), content)
+
     def test_list_with_full_permissions(self) -> None:
         """
         GIVEN:

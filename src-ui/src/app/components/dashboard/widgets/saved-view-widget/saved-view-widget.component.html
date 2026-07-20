@@ -14,7 +14,9 @@
   }
 
   <div content class="wrapper fade" [class.show]="show()">
-  @if (displayMode() === DisplayMode.TABLE) {
+  @if (error()) {
+    <div class="alert alert-danger mb-0" role="alert"><ng-container i18n>Error while loading documents</ng-container>: {{error()}}</div>
+  } @else if (displayMode() === DisplayMode.TABLE) {
     <table class="table table-hover mb-0 mt-n2 align-middle">
       <thead>
         <tr>
