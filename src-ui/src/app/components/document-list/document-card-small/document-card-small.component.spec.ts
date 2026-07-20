@@ -61,6 +61,12 @@ describe('DocumentCardSmallComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('12 pages')
   })
 
+  it('should lazy load the thumbnail', () => {
+    const thumbnail: HTMLImageElement =
+      fixture.nativeElement.querySelector('img.doc-img')
+    expect(thumbnail.getAttribute('loading')).toEqual('lazy')
+  })
+
   it('should display a document, limit tags to 5', () => {
     expect(fixture.nativeElement.textContent).toContain('Document 10')
     expect(
