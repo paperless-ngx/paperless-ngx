@@ -1182,6 +1182,16 @@ should be a valid crontab(5) expression describing when to run.
 
     Defaults to `*/10 * * * *` or every ten minutes.
 
+#### [`PAPERLESS_EMAIL_TASK_JITTER_SECONDS=<int>`](#PAPERLESS_EMAIL_TASK_JITTER_SECONDS) {#PAPERLESS_EMAIL_TASK_JITTER_SECONDS}
+
+: Delays each _scheduled_ email fetch by a random number of seconds between 0
+and this value. Because the fetch is scheduled with a plain crontab, every
+install would otherwise connect to its mail server at the exact same instant
+(e.g. on the minute); this spreads that load out. Manually triggered fetches
+are not delayed.
+
+    Defaults to 90. Set to 0 to disable the delay.
+
 #### [`PAPERLESS_TRAIN_TASK_CRON=<cron expression>`](#PAPERLESS_TRAIN_TASK_CRON) {#PAPERLESS_TRAIN_TASK_CRON}
 
 : Configures the scheduled automatic classifier training frequency. The value

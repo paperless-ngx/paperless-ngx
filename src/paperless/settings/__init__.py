@@ -703,6 +703,14 @@ CELERY_BEAT_SCHEDULE = parse_beat_schedule()
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-schedule-filename
 CELERY_BEAT_SCHEDULE_FILENAME = str(DATA_DIR / "celerybeat-schedule.db")
 
+# Every Paperless install runs the mail check on the same crontab boundary
+# (default "*/10 * * * *", i.e. exactly on the wall-clock minute). Without any
+# jitter, every instance in the world logs in to its mail server at the same
+# instant, which shows up as a thundering herd of simultaneous IMAP logins on
+# the X0:00 / X5:00 second. Delay the scheduled run by a random number of
+# seconds in [0, N] to spread that load out. Set to 0 to disable.
+EMAIL_TASK_JITTER_SECONDS = int(os.getenv("PAPERLESS_EMAIL_TASK_JITTER_SECONDS", 90))
+
 
 # Cachalot: Database read cache.
 def _parse_cachalot_settings():
