@@ -44,7 +44,10 @@ Each document has data fields that you can assign to them:
   date you signed a contract, or the date a letter was sent to you.
 - The _archive serial number_ (short: ASN) of a document is the
   identifier of the document in your physical document binders. See
-  [recommended workflow](#usage-recommended-workflow) below.
+  [recommended workflow](#usage-recommended-workflow) below. If you
+  maintain multiple independent archives, you can use
+  [named counters](#named-counters) to keep a separate ASN sequence
+  for each one.
 - The _content_ of a document is the text that was OCR'ed from the
   document. This text is fed into the search engine and is used for
   matching tags, correspondents and document types.
@@ -992,6 +995,21 @@ Over time, you will notice that your physical binder will fill up. If it
 is full, label the binder with the range of ASNs in this binder (i.e.,
 "Documents 1 to 343"), store the binder in your cellar or elsewhere,
 and start a new binder.
+
+#### Named counters
+
+If you maintain several distinct archives (e.g., personal documents in
+one binder and financial records in another), you can use **named
+counters** to give each archive its own independent ASN sequence. This
+way, both archives can start numbering from 1 without conflicting.
+
+You can manage named counters under **Attributes > Named counters**.
+When editing a document, select a counter from the dropdown above the
+ASN field. The "+1" button will then suggest the next available number
+within that counter's sequence instead of the global sequence.
+
+Documents with no counter assigned continue to use the default global
+sequence, so existing workflows are unaffected.
 
 The idea behind this process is that you will never have to use the
 physical binders to find a document. If you need a specific physical
