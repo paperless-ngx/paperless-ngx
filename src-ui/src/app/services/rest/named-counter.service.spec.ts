@@ -1,6 +1,7 @@
-import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
+import { commonAbstractNameFilterPaperlessServiceTests } from './abstract-name-filter-service.spec'
 import { NamedCounterService } from './named-counter.service'
 
-const endpoint = 'named_counters'
-
-commonAbstractPaperlessServiceTests(endpoint, NamedCounterService)
+commonAbstractNameFilterPaperlessServiceTests(
+  'named_counters',
+  NamedCounterService
+)

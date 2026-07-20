@@ -17,7 +17,7 @@ import { TextComponent } from '../../input/text/text.component'
 @Component({
   selector: 'pngx-named-counter-edit-dialog',
   templateUrl: './named-counter-edit-dialog.component.html',
-  styleUrls: ['./named-counter-edit-dialog.component.scss'],
+
   imports: [
     TextComponent,
     PermissionsFormComponent,
