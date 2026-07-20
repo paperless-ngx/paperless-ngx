@@ -621,6 +621,11 @@ class ConsumerPlugin(
                             else:
                                 original_document.save()
 
+                            # Adding a version changes the effective document, so update root modified
+                            Document.objects.filter(pk=root_doc.pk).update(
+                                modified=timezone.now(),
+                            )
+
                             # Create a log entry for the version addition, if enabled
                             if settings.AUDIT_LOG_ENABLED:
                                 from auditlog.models import (  # type: ignore[import-untyped]

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 from unittest import TestCase
 from unittest import mock
@@ -10,6 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -137,6 +139,8 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
             root_document=root,
             content="v2-content",
         )
+        original_modified = timezone.now() - datetime.timedelta(days=1)
+        Document.objects.filter(pk=root.pk).update(modified=original_modified)
 
         with mock.patch("documents.search.get_backend"):
             resp = self.client.delete(f"/api/documents/{root.id}/versions/{v2.id}/")
@@ -146,6 +150,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.data["current_version_id"], v1.id)
         root.refresh_from_db()
         self.assertEqual(root.content, "root-content")
+        self.assertGreater(root.modified, original_modified)
 
         with mock.patch("documents.search.get_backend"):
             resp = self.client.delete(f"/api/documents/{root.id}/versions/{v1.id}/")
@@ -326,6 +331,8 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
             root_document=root,
             version_label="old",
         )
+        original_modified = timezone.now() - datetime.timedelta(days=1)
+        Document.objects.filter(pk=root.pk).update(modified=original_modified)
 
         resp = self.client.patch(
             f"/api/documents/{root.id}/versions/{version.id}/",
@@ -339,6 +346,8 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.data["version_label"], "Label 1")
         self.assertEqual(resp.data["id"], version.id)
         self.assertFalse(resp.data["is_root"])
+        root.refresh_from_db()
+        self.assertGreater(root.modified, original_modified)
 
     def test_update_version_label_clears_on_blank(self) -> None:
         root = Document.objects.create(
