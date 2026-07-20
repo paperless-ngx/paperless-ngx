@@ -63,6 +63,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
+from documents.models import NamedCounter
 from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
@@ -742,6 +743,11 @@ class StoragePathField(serializers.PrimaryKeyRelatedField[StoragePath]):
         return StoragePath.objects.all()
 
 
+class NamedCounterField(serializers.PrimaryKeyRelatedField[NamedCounter]):
+    def get_queryset(self):
+        return NamedCounter.objects.all()
+
+
 class CustomFieldSerializer(serializers.ModelSerializer[CustomField]):
     data_type = serializers.ChoiceField(
         choices=CustomField.FieldDataType,
@@ -1035,6 +1041,16 @@ class DocumentSerializer(
     tags = TagsField(many=True)
     document_type = DocumentTypeField(allow_null=True)
     storage_path = StoragePathField(allow_null=True)
+    named_counter = NamedCounterField(allow_null=True)
+    # Explicitly declared to prevent DRF auto-generating a UniqueValidator from the
+    # conditional UniqueConstraints, which would fire without respecting the condition
+    # on the current instance. Counter-aware uniqueness is checked in validate() instead.
+    archive_serial_number = serializers.IntegerField(
+        allow_null=True,
+        required=False,
+        min_value=Document.ARCHIVE_SERIAL_NUMBER_MIN,
+        max_value=Document.ARCHIVE_SERIAL_NUMBER_MAX,
+    )
 
     original_file_name = SerializerMethodField()
     archived_file_name = SerializerMethodField()
@@ -1150,21 +1166,40 @@ class DocumentSerializer(
         return super().to_internal_value(data)
 
     def validate(self, attrs):
-        if (
-            "archive_serial_number" in attrs
-            and attrs["archive_serial_number"] is not None
-            and len(str(attrs["archive_serial_number"])) > 0
-            and Document.deleted_objects.filter(
-                archive_serial_number=attrs["archive_serial_number"],
-            ).exists()
-        ):
-            raise serializers.ValidationError(
-                {
-                    "archive_serial_number": [
-                        "Document with this Archive Serial Number already exists in the trash.",
-                    ],
-                },
+        asn = attrs.get("archive_serial_number")
+        if asn is not None and len(str(asn)) > 0:
+            counter = attrs.get("named_counter")
+            # Counter-aware live-document uniqueness check.
+            # Uses the partial indexes from documents_document_asn_unique_no_counter /
+            # documents_document_asn_unique_per_counter — this is a point lookup, not a scan.
+            live_qs = Document.objects.filter(
+                archive_serial_number=asn,
+                named_counter=counter,
             )
+            if self.instance is not None:
+                live_qs = live_qs.exclude(pk=self.instance.pk)
+            if live_qs.exists():
+                raise serializers.ValidationError(
+                    {
+                        "archive_serial_number": [
+                            _(
+                                "A document with this archive serial number already exists in this counter.",
+                            ),
+                        ],
+                    },
+                )
+            # Also check the trash in the same counter namespace.
+            if Document.deleted_objects.filter(
+                archive_serial_number=asn,
+                named_counter=counter,
+            ).exists():
+                raise serializers.ValidationError(
+                    {
+                        "archive_serial_number": [
+                            "Document with this Archive Serial Number already exists in the trash.",
+                        ],
+                    },
+                )
         return super().validate(attrs)
 
     def update(self, instance: Document, validated_data):
@@ -1271,6 +1306,7 @@ class DocumentSerializer(
             "correspondent",
             "document_type",
             "storage_path",
+            "named_counter",
             "title",
             "content",
             "tags",
@@ -2450,6 +2486,22 @@ class StoragePathSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             )
 
         return super().update(instance, validated_data)
+
+
+class NamedCounterSerializer(OwnedObjectSerializer):
+    document_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = NamedCounter
+        fields = (
+            "id",
+            "name",
+            "document_count",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "set_permissions",
+        )
 
 
 class UiSettingsViewSerializer(serializers.ModelSerializer[UiSettings]):

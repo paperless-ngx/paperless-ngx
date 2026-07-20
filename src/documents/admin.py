@@ -8,6 +8,7 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import NamedCounter
 from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
@@ -246,6 +247,7 @@ admin.site.register(ShareLink, ShareLinksAdmin)
 admin.site.register(ShareLinkBundle, ShareLinkBundleAdmin)
 admin.site.register(CustomField, CustomFieldsAdmin)
 admin.site.register(CustomFieldInstance, CustomFieldInstancesAdmin)
+admin.site.register(NamedCounter)
 
 if settings.AUDIT_LOG_ENABLED:
 

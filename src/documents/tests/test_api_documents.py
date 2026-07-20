@@ -37,6 +37,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
+from documents.models import NamedCounter
 from documents.models import Note
 from documents.models import SavedView
 from documents.models import ShareLink
@@ -3657,6 +3658,97 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.content, b"1")
+
+    def test_next_asn_with_named_counter(self) -> None:
+        """
+        GIVEN:
+            - Documents with and without a named counter
+        WHEN:
+            - API request to get next ASN for a specific counter
+        THEN:
+            - Returns max ASN within that counter + 1, ignoring other counters
+        """
+        user = User.objects.create_superuser(username="test1")
+        self.client.force_authenticate(user)
+
+        counter = NamedCounter.objects.create(name="Binder A")
+        Document.objects.create(
+            title="in counter",
+            mime_type="application/pdf",
+            content="doc in counter",
+            checksum="c1",
+            archive_serial_number=5,
+            named_counter=counter,
+        )
+        Document.objects.create(
+            title="global doc",
+            mime_type="application/pdf",
+            content="doc without counter",
+            checksum="c2",
+            archive_serial_number=999,
+        )
+
+        resp = self.client.get(f"/api/documents/next_asn/?counter={counter.pk}")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.content, b"6")
+
+    def test_next_asn_counter_empty(self) -> None:
+        """
+        GIVEN:
+            - Named counter exists but has no documents yet
+        WHEN:
+            - API request to get next ASN for that counter
+        THEN:
+            - Returns 1
+        """
+        user = User.objects.create_superuser(username="test1")
+        self.client.force_authenticate(user)
+
+        counter = NamedCounter.objects.create(name="Empty Binder")
+        Document.objects.create(
+            title="global",
+            mime_type="application/pdf",
+            content="content",
+            checksum="c1",
+            archive_serial_number=50,
+        )
+
+        resp = self.client.get(f"/api/documents/next_asn/?counter={counter.pk}")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.content, b"1")
+
+    def test_next_asn_default_ignores_counters(self) -> None:
+        """
+        GIVEN:
+            - Documents with and without a named counter
+        WHEN:
+            - API request to get next ASN with no counter param
+        THEN:
+            - Returns max ASN among documents without a counter + 1
+        """
+        user = User.objects.create_superuser(username="test1")
+        self.client.force_authenticate(user)
+
+        counter = NamedCounter.objects.create(name="Binder A")
+        Document.objects.create(
+            title="in counter",
+            mime_type="application/pdf",
+            content="content",
+            checksum="c1",
+            archive_serial_number=500,
+            named_counter=counter,
+        )
+        Document.objects.create(
+            title="global",
+            mime_type="application/pdf",
+            content="content2",
+            checksum="c2",
+            archive_serial_number=10,
+        )
+
+        resp = self.client.get("/api/documents/next_asn/")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.content, b"11")
 
     def test_asn_not_unique_with_trashed_doc(self) -> None:
         """

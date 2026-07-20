@@ -224,6 +224,11 @@
                         <i-bs class="me-2" name="ui-radios"></i-bs><span><ng-container i18n>Custom fields</ng-container></span>
                       </a>
                     </li>
+                    <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.NamedCounter }">
+                      <a class="nav-link py-1" routerLink="attributes/namedcounters" routerLinkActive="active" (click)="closeMenu()">
+                        <i-bs class="me-2" name="journals"></i-bs><span><ng-container i18n>Named counters</ng-container></span>
+                      </a>
+                    </li>
                   </ul>
                 </div>
               </li>

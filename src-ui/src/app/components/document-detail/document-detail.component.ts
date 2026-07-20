@@ -50,6 +50,7 @@ import { DocumentNote } from 'src/app/data/document-note'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import { DocumentType } from 'src/app/data/document-type'
 import { FilterRule } from 'src/app/data/filter-rule'
+import { NamedCounter } from 'src/app/data/named-counter'
 import {
   FILTER_CORRESPONDENT,
   FILTER_CREATED_AFTER,
@@ -80,6 +81,7 @@ import {
 } from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { NamedCounterService } from 'src/app/services/rest/named-counter.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import {
   BulkEditSourceMode,
@@ -216,6 +218,7 @@ export class DocumentDetailComponent
   private toastService = inject(ToastService)
   private settings = inject(SettingsService)
   private storagePathService = inject(StoragePathService)
+  private namedCounterService = inject(NamedCounterService)
   private permissionsService = inject(PermissionsService)
   private userService = inject(UserService)
   private customFieldsService = inject(CustomFieldsService)
@@ -262,6 +265,7 @@ export class DocumentDetailComponent
   readonly correspondents = signal<Correspondent[]>(undefined)
   readonly documentTypes = signal<DocumentType[]>(undefined)
   readonly storagePaths = signal<StoragePath[]>(undefined)
+  readonly namedCounters = signal<NamedCounter[]>(undefined)
 
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
@@ -270,6 +274,7 @@ export class DocumentDetailComponent
     correspondent: new FormControl(),
     document_type: new FormControl(),
     storage_path: new FormControl(),
+    named_counter: new FormControl(null),
     archive_serial_number: new FormControl(),
     tags: new FormControl([]),
     permissions_form: new FormControl(null),
@@ -478,6 +483,7 @@ export class DocumentDetailComponent
       correspondent: originalDocument.correspondent,
       document_type: originalDocument.document_type,
       storage_path: originalDocument.storage_path,
+      named_counter: originalDocument.named_counter,
       archive_serial_number: originalDocument.archive_serial_number,
       tags: [...originalDocument.tags],
       permissions_form: {
@@ -763,6 +769,23 @@ export class DocumentDetailComponent
         .pipe(first(), takeUntil(this.unsubscribeNotifier))
         .subscribe((result) => this.storagePaths.set(result.results))
     }
+    if (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.NamedCounter
+      )
+    ) {
+      this.namedCounterService
+        .listAll()
+        .pipe(first(), takeUntil(this.unsubscribeNotifier))
+        .subscribe((result) => this.namedCounters.set(result.results))
+    }
+    this.documentForm
+      .get('named_counter')
+      .valueChanges.pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        this.documentForm.get('archive_serial_number').setValue(null)
+      })
     if (
       this.permissionsService.currentUserCan(
         PermissionAction.View,

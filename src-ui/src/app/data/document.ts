@@ -148,6 +148,8 @@ export interface Document extends ObjectWithPermissions {
 
   archive_serial_number?: number
 
+  named_counter?: number
+
   notes?: DocumentNote[]
 
   __search_hit__?: SearchHit

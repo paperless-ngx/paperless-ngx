@@ -30,11 +30,14 @@ export class NumberComponent extends AbstractInputComponent<number> {
   @Input()
   step: number = 1
 
+  @Input()
+  counterId: number = undefined
+
   nextAsn() {
     if (this.value) {
       return
     }
-    this.documentService.getNextAsn().subscribe((nextAsn) => {
+    this.documentService.getNextAsn(this.counterId).subscribe((nextAsn) => {
       this.value = nextAsn
       this.onChange(this.value)
       this.changeDetector.markForCheck()

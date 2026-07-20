@@ -161,8 +161,9 @@
           <ng-template ngbNavContent>
             <div>
               <pngx-input-text #inputTitle i18n-title title="Title" formControlName="title" [horizontal]="true" [suggestion]="suggestions()?.title" (keyup)="titleKeyUp($event)" [error]="error()?.title"></pngx-input-text>
+              <pngx-input-select [items]="namedCounters()" i18n-title title="Named counter" formControlName="named_counter" [allowNull]="true" [horizontal]="true" i18n-placeholder placeholder="Default (global)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.NamedCounter }"></pngx-input-select>
               @if (!isFieldHidden(DocumentDetailFieldID.ArchiveSerialNumber)) {
-                <pngx-input-number i18n-title title="Archive serial number" [error]="error()?.archive_serial_number" [horizontal]="true" formControlName='archive_serial_number'></pngx-input-number>
+                <pngx-input-number i18n-title title="Archive serial number" [error]="error()?.archive_serial_number" [horizontal]="true" formControlName='archive_serial_number' [counterId]="documentForm.get('named_counter').value"></pngx-input-number>
               }
               <pngx-input-date i18n-title title="Date created" formControlName="created" [suggestions]="suggestions()?.dates" [showFilter]="true" [horizontal]="true" (filterDocuments)="filterDocuments($event)"
               [error]="error()?.created"></pngx-input-date>

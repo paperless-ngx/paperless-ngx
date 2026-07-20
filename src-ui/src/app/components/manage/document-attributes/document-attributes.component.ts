@@ -28,6 +28,7 @@ import { CustomFieldsComponent } from './custom-fields/custom-fields.component'
 import { CorrespondentListComponent } from './management-list/correspondent-list/correspondent-list.component'
 import { DocumentTypeListComponent } from './management-list/document-type-list/document-type-list.component'
 import { ManagementListComponent } from './management-list/management-list.component'
+import { NamedCounterListComponent } from './management-list/named-counter-list/named-counter-list.component'
 import { StoragePathListComponent } from './management-list/storage-path-list/storage-path-list.component'
 import { TagListComponent } from './management-list/tag-list/tag-list.component'
 
@@ -37,6 +38,7 @@ enum DocumentAttributesNavIDs {
   DocumentTypes = 3,
   StoragePaths = 4,
   CustomFields = 5,
+  NamedCounters = 6,
 }
 
 export enum DocumentAttributesSectionKind {
@@ -128,6 +130,15 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
       permissionType: PermissionType.CustomField,
       kind: DocumentAttributesSectionKind.CustomFields,
       component: CustomFieldsComponent,
+    },
+    {
+      id: DocumentAttributesNavIDs.NamedCounters,
+      path: 'namedcounters',
+      label: $localize`Named counters`,
+      icon: 'journals',
+      permissionType: PermissionType.NamedCounter,
+      kind: DocumentAttributesSectionKind.ManagementList,
+      component: NamedCounterListComponent,
     },
   ]
 

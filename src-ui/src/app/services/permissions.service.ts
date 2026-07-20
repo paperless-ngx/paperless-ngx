@@ -27,6 +27,7 @@ export enum PermissionType {
   Group = '%s_group',
   ShareLink = '%s_sharelink',
   CustomField = '%s_customfield',
+  NamedCounter = '%s_namedcounter',
   Workflow = '%s_workflow',
   ProcessedMail = '%s_processedmail',
   GlobalStatistics = '%s_global_statistics',

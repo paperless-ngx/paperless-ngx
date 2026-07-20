@@ -263,6 +263,11 @@ export const routes: Routes = [
         pathMatch: 'full',
       },
       {
+        path: 'namedcounters',
+        redirectTo: '/attributes/namedcounters',
+        pathMatch: 'full',
+      },
+      {
         path: 'workflows',
         component: WorkflowsComponent,
         canActivate: [PermissionsGuard],

@@ -153,6 +153,7 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import NamedCounter
 from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
@@ -194,6 +195,7 @@ from documents.serialisers import DocumentVersionSerializer
 from documents.serialisers import EditPdfDocumentsSerializer
 from documents.serialisers import EmailSerializer
 from documents.serialisers import MergeDocumentsSerializer
+from documents.serialisers import NamedCounterSerializer
 from documents.serialisers import NotesSerializer
 from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RemovePasswordDocumentsSerializer
@@ -2495,7 +2497,12 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
     @action(detail=False, methods=["GET"], name="Get Next ASN")
     def next_asn(self, request, *args, **kwargs):
-        max_asn = Document.objects.aggregate(
+        counter_id = request.query_params.get("counter")
+        if counter_id is not None:
+            qs = Document.objects.filter(named_counter_id=counter_id)
+        else:
+            qs = Document.objects.filter(named_counter__isnull=True)
+        max_asn = qs.aggregate(
             Max("archive_serial_number", default=0),
         ).get(
             "archive_serial_number__max",
@@ -4873,6 +4880,24 @@ class CustomFieldViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Custom
     document_count_source_field = "field_id"
 
     queryset = CustomField.objects.all().order_by("name")
+
+
+class NamedCounterViewSet(
+    PermissionsAwareDocumentCountMixin,
+    ModelViewSet[NamedCounter],
+):
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+
+    serializer_class = NamedCounterSerializer
+    pagination_class = StandardPagination
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+    )
+
+    model = NamedCounter
+
+    queryset = NamedCounter.objects.all().order_by("name")
 
 
 @extend_schema_view(

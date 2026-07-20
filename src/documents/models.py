@@ -93,6 +93,18 @@ class MatchingModel(ModelWithOwner):
         return self.name
 
 
+class NamedCounter(ModelWithOwner):
+    name = models.CharField(_("name"), max_length=128, unique=True)
+
+    class Meta(ModelWithOwner.Meta):
+        ordering = ("name",)
+        verbose_name = _("named counter")
+        verbose_name_plural = _("named counters")
+
+    def __str__(self):
+        return self.name
+
+
 class Correspondent(MatchingModel):
     class Meta(MatchingModel.Meta):
         verbose_name = _("correspondent")
@@ -298,7 +310,6 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         _("archive serial number"),
         blank=True,
         null=True,
-        unique=True,
         db_index=True,
         validators=[
             MaxValueValidator(ARCHIVE_SERIAL_NUMBER_MAX),
@@ -334,6 +345,15 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         help_text=_("Optional short label for a document version."),
     )
 
+    named_counter = models.ForeignKey(
+        "NamedCounter",
+        verbose_name=_("named counter"),
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="documents",
+    )
+
     class Meta:
         ordering = ("-created",)
         verbose_name = _("document")
@@ -346,6 +366,16 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
                     version_index__isnull=False,
                 ),
                 name="documents_document_root_version_index_uniq",
+            ),
+            models.UniqueConstraint(
+                fields=["archive_serial_number"],
+                condition=models.Q(named_counter__isnull=True),
+                name="documents_document_asn_unique_no_counter",
+            ),
+            models.UniqueConstraint(
+                fields=["archive_serial_number", "named_counter"],
+                condition=models.Q(named_counter__isnull=False),
+                name="documents_document_asn_unique_per_counter",
             ),
         ]
 

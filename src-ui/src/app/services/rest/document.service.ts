@@ -298,8 +298,11 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     )
   }
 
-  getNextAsn(): Observable<number> {
-    return this.http.get<number>(this.getResourceUrl(null, 'next_asn'))
+  getNextAsn(counterId?: number): Observable<number> {
+    const params = counterId != null ? { counter: String(counterId) } : {}
+    return this.http.get<number>(this.getResourceUrl(null, 'next_asn'), {
+      params,
+    })
   }
 
   patch(o: Document, versionID: number = null): Observable<Document> {
