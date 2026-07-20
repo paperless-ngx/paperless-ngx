@@ -73,6 +73,12 @@ APPLE_MAIL_TAG_COLORS = {
     "grey": ["$MailFlagBit1", "$MailFlagBit2"],
 }
 
+# Fetch new mail in batches rather than all at once. This caps peak memory use
+# and keeps each IMAP SEARCH/FETCH command within server line-length limits,
+# which matters on the first run against a large existing folder where there
+# can be tens of thousands of new UIDs to name in a single command.
+MAIL_FETCH_BATCH_SIZE = 500
+
 
 class MailError(Exception):
     pass
@@ -535,6 +541,75 @@ class MailAccountHandler(LoggingMixin):
             )
         return None
 
+    def _get_processed_uids(self, rule: MailRule) -> set[str]:
+        """
+        Return the set of message UIDs already handled for this rule + folder,
+        so their bodies don't need to be downloaded again.
+
+        Respects UIDVALIDITY: rows whose stored validity no longer matches the
+        folder's current value are ignored, since the same UID may now point at
+        a different message and should be treated as new.
+        """
+        processed = ProcessedMail.objects.filter(rule=rule, folder=rule.folder)
+        if self._current_uid_validity is not None:
+            processed = processed.filter(
+                Q(uid_validity=self._current_uid_validity)
+                | Q(uid_validity__isnull=True),
+            )
+        return set(processed.values_list("uid", flat=True))
+
+    def _fetch_messages_by_uid(
+        self,
+        M: MailBox,
+        rule: MailRule,
+        uids: list[str],
+    ):
+        """
+        Yield the full messages for the given UIDs, fetched in bounded batches
+        so a single IMAP command never has to name (or download) the whole set
+        at once.
+        """
+        for start in range(0, len(uids), MAIL_FETCH_BATCH_SIZE):
+            batch = uids[start : start + MAIL_FETCH_BATCH_SIZE]
+            yield from M.fetch(
+                criteria=AND(uid=",".join(batch)),
+                mark_seen=False,
+                charset=rule.account.character_set,
+                bulk=True,
+            )
+
+    def _mark_processed_without_consumption(
+        self,
+        message: MailMessage,
+        rule: MailRule,
+    ) -> None:
+        """
+        Record that a message was examined but produced nothing to consume, so
+        it isn't fetched and examined again on the next run.
+
+        Without this, a message that never yields a document (e.g. one with no
+        attachments under an attachments-only rule) is never recorded in the DB
+        and never flagged on the server, so it keeps matching the folder search
+        and gets re-downloaded in full every cycle.
+        """
+        if not ProcessedMail.objects.filter(
+            rule=rule,
+            uid=message.uid,
+            folder=rule.folder,
+            uid_validity=self._current_uid_validity,
+        ).exists():
+            ProcessedMail.objects.create(
+                rule=rule,
+                folder=rule.folder,
+                uid=message.uid,
+                uid_validity=self._current_uid_validity,
+                subject=message.subject,
+                received=make_aware(message.date)
+                if is_naive(message.date)
+                else message.date,
+                status="PROCESSED_WO_CONSUMPTION",
+            )
+
     def _get_correspondent(
         self,
         message: MailMessage,
@@ -680,23 +755,34 @@ class MailAccountHandler(LoggingMixin):
             f"Rule {rule}: Searching folder with criteria {criterias}",
         )
 
+        # Ask the server which messages match, then download the bodies of only
+        # the ones we haven't handled before. Previously the full body of every
+        # matching message was fetched on each run and de-duplicated in Python
+        # afterwards, so a large folder was re-downloaded in its entirety every
+        # scheduling cycle.
         try:
-            messages = M.fetch(
+            matching_uids = M.uids(
                 criteria=criterias,
-                mark_seen=False,
                 charset=rule.account.character_set,
-                bulk=True,
             )
         except Exception as err:
             raise MailError(
-                f"Rule {rule}: Error while fetching folder {rule.folder}",
+                f"Rule {rule}: Error while searching folder {rule.folder}",
             ) from err
+
+        already_processed_uids = self._get_processed_uids(rule)
+        new_uids = [uid for uid in matching_uids if uid not in already_processed_uids]
+
+        self.log.debug(
+            f"Rule {rule}: {len(matching_uids)} mail(s) matched search, "
+            f"{len(new_uids)} new to fetch",
+        )
 
         mails_processed = 0
         total_processed_files = 0
         rule_seen_messages: set[tuple[str, str | None]] = set()
 
-        for message in messages:
+        for message in self._fetch_messages_by_uid(M, rule, new_uids):
             if TYPE_CHECKING:
                 assert isinstance(message, MailMessage)
 
@@ -711,22 +797,6 @@ class MailAccountHandler(LoggingMixin):
             if message_key in consumed_messages:
                 self.log.debug(
                     f"Skipping mail '{message.uid}' subject '{message.subject}' from '{message.from_}', already queued by a previous rule in this run.",
-                )
-                continue
-
-            already_processed = ProcessedMail.objects.filter(
-                rule=rule,
-                uid=message.uid,
-                folder=rule.folder,
-            )
-            if self._current_uid_validity is not None:
-                already_processed = already_processed.filter(
-                    Q(uid_validity=self._current_uid_validity)
-                    | Q(uid_validity__isnull=True),
-                )
-            if already_processed.exists():
-                self.log.debug(
-                    f"Skipping mail '{message.uid}' subject '{message.subject}' from '{message.from_}', already processed.",
                 )
                 continue
 
@@ -752,11 +822,13 @@ class MailAccountHandler(LoggingMixin):
         processed_elements = 0
 
         # Skip Message handling when only attachments are to be processed but
-        # message doesn't have any.
+        # message doesn't have any. Record it as processed first, so it isn't
+        # fetched and re-examined on every subsequent run.
         if (
             not message.attachments
             and rule.consumption_scope == MailRule.ConsumptionScope.ATTACHMENTS_ONLY
         ):
+            self._mark_processed_without_consumption(message, rule)
             return processed_elements
 
         self.log.debug(
@@ -957,24 +1029,9 @@ class MailAccountHandler(LoggingMixin):
                 uid_validity=self._current_uid_validity,
             )
         else:
-            # No files to consume, just mark as processed if it wasn't by .eml processing
-            if not ProcessedMail.objects.filter(
-                rule=rule,
-                uid=message.uid,
-                folder=rule.folder,
-                uid_validity=self._current_uid_validity,
-            ).exists():
-                ProcessedMail.objects.create(
-                    rule=rule,
-                    folder=rule.folder,
-                    uid=message.uid,
-                    uid_validity=self._current_uid_validity,
-                    subject=message.subject,
-                    received=make_aware(message.date)
-                    if is_naive(message.date)
-                    else message.date,
-                    status="PROCESSED_WO_CONSUMPTION",
-                )
+            # No files to consume, just mark as processed so it isn't fetched
+            # and re-examined on every subsequent run.
+            self._mark_processed_without_consumption(message, rule)
 
         return processed_attachments
 

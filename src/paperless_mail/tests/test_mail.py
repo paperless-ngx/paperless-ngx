@@ -134,10 +134,15 @@ class BogusMailBox(AbstractContextManager):
         if username != self.USERNAME or access_token != self.ACCESS_TOKEN:
             raise MailboxLoginError("BAD", "OK")
 
-    def fetch(self, criteria, mark_seen, charset="", *, bulk=True):
+    def _search(self, criteria) -> list[MailMessage]:
         msg = self.messages
 
         criteria = str(criteria).strip("()").split(" ")
+
+        if "UID" in criteria:
+            # A fetch narrowed to an explicit set of UIDs, e.g. "UID 1,2,3"
+            wanted = criteria[criteria.index("UID") + 1].split(",")
+            msg = filter(lambda m: m.uid in wanted, msg)
 
         if "UNSEEN" in criteria:
             msg = filter(lambda m: not m.seen, msg)
@@ -169,6 +174,12 @@ class BogusMailBox(AbstractContextManager):
             msg = filter(lambda m: "processed" not in m.flags, msg)
 
         return list(msg)
+
+    def uids(self, criteria="ALL", charset="", sort=None) -> list[str]:
+        return [m.uid for m in self._search(criteria)]
+
+    def fetch(self, criteria, mark_seen, charset="", *, bulk=True):
+        return self._search(criteria)
 
     def delete(self, uid_list) -> None:
         self.messages = list(filter(lambda m: m.uid not in uid_list, self.messages))
@@ -538,15 +549,26 @@ class TestMail(
         )
 
     def test_handle_empty_message(self) -> None:
-        message = namedtuple("MailMessage", [])
+        # A message with no attachments under an attachments-only rule has
+        # nothing to consume, but it must still be recorded as processed so it
+        # isn't fetched and re-examined on every subsequent run.
+        message = self.mailMocker.messageBuilder.create_message(attachments=[])
 
-        message.attachments = []
-        rule = MailRule()
+        account = MailAccount.objects.create()
+        rule = MailRule(account=account)
+        rule.save()
 
         result = self.mail_account_handler._handle_message(message, rule)
 
         self.mailMocker._queue_consumption_tasks_mock.assert_not_called()
         self.assertEqual(result, 0)
+        self.assertTrue(
+            ProcessedMail.objects.filter(
+                rule=rule,
+                uid=message.uid,
+                status="PROCESSED_WO_CONSUMPTION",
+            ).exists(),
+        )
 
     def test_handle_unknown_mime_type(self) -> None:
         message = self.mailMocker.messageBuilder.create_message(
@@ -1645,6 +1667,80 @@ class TestMail(
                     self.mailMocker._queue_consumption_tasks_mock.call_count,
                     expected_mail_count,
                 )
+
+    def test_already_processed_mail_not_refetched(self) -> None:
+        """
+        GIVEN:
+            - A folder containing mail that yields no document (no attachments
+              under an attachments-only rule), which is therefore never flagged
+              on the server and keeps matching the folder search
+        WHEN:
+            - The account is handled a second time
+        THEN:
+            - The already-handled mail is recorded as processed on the first
+              run, and is not downloaded again on the second run even though it
+              still matches the server-side search
+        """
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username=BogusMailBox.USERNAME,
+            password=BogusMailBox.ASCII_PASSWORD,
+        )
+        rule = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.MARK_READ,
+            # Avoid a date-based search term so the criteria is purely UNSEEN
+            maximum_age=0,
+        )
+
+        with_attachment = self.mailMocker.messageBuilder.create_message(
+            subject="has attachment",
+            attachments=1,
+            seen=False,
+        )
+        without_attachment = self.mailMocker.messageBuilder.create_message(
+            subject="no attachment",
+            attachments=[],
+            seen=False,
+        )
+        self.mailMocker.bogus_mailbox.messages = [with_attachment, without_attachment]
+        self.mailMocker.bogus_mailbox.updateClient()
+
+        # First run: consume the one with an attachment and record the other as
+        # processed-without-consumption.
+        self.mail_account_handler.handle_mail_account(account)
+        self.mailMocker.apply_mail_actions()
+
+        self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 1)
+        self.assertEqual(ProcessedMail.objects.count(), 2)
+        self.assertTrue(
+            ProcessedMail.objects.filter(
+                rule=rule,
+                uid=without_attachment.uid,
+                status="PROCESSED_WO_CONSUMPTION",
+            ).exists(),
+        )
+
+        # The attachment-less mail was never marked \Seen, so it still matches
+        # the folder search...
+        self.assertIn(
+            without_attachment.uid,
+            self.mailMocker.bogus_mailbox.uids(criteria="UNSEEN"),
+        )
+
+        # ...but a second run must not download it (or anything) again.
+        self.mailMocker._queue_consumption_tasks_mock.reset_mock()
+        with mock.patch.object(
+            self.mailMocker.bogus_mailbox,
+            "fetch",
+            wraps=self.mailMocker.bogus_mailbox.fetch,
+        ) as fetch_spy:
+            self.mail_account_handler.handle_mail_account(account)
+
+        fetch_spy.assert_not_called()
+        self.mailMocker._queue_consumption_tasks_mock.assert_not_called()
 
     def test_auth_plain_fallback(self) -> None:
         """
