@@ -4538,7 +4538,8 @@ class SharedLinkView(View):
                 return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
             return serve_file(
                 doc=share_link.document,
-                use_archive=share_link.file_version == "archive",
+                use_archive=share_link.file_version == ShareLink.FileVersion.ARCHIVE
+                and share_link.document.has_archive_version,
                 disposition="inline",
             )
 
