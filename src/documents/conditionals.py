@@ -1,9 +1,9 @@
 from datetime import UTC
 from datetime import datetime
-from typing import Any
 
 from django.conf import settings
 from django.core.cache import cache
+from rest_framework.request import Request
 
 from documents.caching import CACHE_5_MINUTES
 from documents.caching import CACHE_50_MINUTES
@@ -117,7 +117,7 @@ def preview_last_modified(request, pk: int) -> datetime | None:
     return doc.modified
 
 
-def thumbnail_etag(request: Any, pk: int) -> str | None:
+def thumbnail_etag(request: Request, pk: int) -> str | None:
     """
     Thumbnails are version-dependent, so use the effective document checksum as
     the ETag to invalidate cache when the latest version changes.
@@ -128,7 +128,7 @@ def thumbnail_etag(request: Any, pk: int) -> str | None:
     return doc.checksum
 
 
-def thumbnail_last_modified(request: Any, pk: int) -> datetime | None:
+def thumbnail_last_modified(request: Request, pk: int) -> datetime | None:
     """
     Returns the filesystem last modified either from cache or from filesystem.
     Cache should be (slightly?) faster than filesystem
