@@ -1040,12 +1040,23 @@ class DocumentViewSet(
             .order_by("-id")
             .values("content")[:1],
         )
+        # A correlated subquery avoids the LEFT JOIN + Count() this used to
+        # be, which forced a GROUP BY aggregate over every matching document
+        # before the query could even be sorted or limited.
+        note_count = Subquery(
+            Note.objects.filter(document=OuterRef("pk"))
+            .order_by()
+            .values("document")
+            .annotate(count=Count("pk"))
+            .values("count"),
+            output_field=IntegerField(),
+        )
         return (
             Document.objects.filter(root_document__isnull=True)
             .distinct()
             .order_by("-created", "-id")
             .annotate(effective_content=Coalesce(latest_version_content, F("content")))
-            .annotate(num_notes=Count("notes"))
+            .annotate(num_notes=Coalesce(note_count, 0))
             .select_related("correspondent", "storage_path", "document_type", "owner")
             .prefetch_related(
                 Prefetch(
