@@ -54,6 +54,7 @@ import { CorrespondentService } from 'src/app/services/rest/correspondent.servic
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { NamedCounterService } from 'src/app/services/rest/named-counter.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
@@ -231,6 +232,20 @@ describe('DocumentDetailComponent', () => {
                   {
                     id: 31,
                     name: 'StoragePath31',
+                  },
+                ],
+              }),
+          },
+        },
+        {
+          provide: NamedCounterService,
+          useValue: {
+            listAll: () =>
+              of({
+                results: [
+                  {
+                    id: 51,
+                    name: 'Binder A',
                   },
                 ],
               }),
@@ -584,6 +599,7 @@ describe('DocumentDetailComponent', () => {
     expect(component.correspondents()).toBeUndefined()
     expect(component.documentTypes()).toBeUndefined()
     expect(component.storagePaths()).toBeUndefined()
+    expect(component.namedCounters()).toBeUndefined()
     expect(component.users()).toBeUndefined()
     httpTestingController.expectNone(`${environment.apiBaseUrl}documents/tags/`)
     httpTestingController.expectNone(

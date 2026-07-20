@@ -3750,6 +3750,148 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.content, b"11")
 
+    def test_asn_duplicate_in_global_pool_rejected(self) -> None:
+        """
+        GIVEN:
+            - Existing live document with ASN 5, no counter (global pool)
+        WHEN:
+            - Saving another document with the same ASN and no counter
+        THEN:
+            - 400 error; global pool uniqueness is preserved
+        """
+        user = User.objects.create_superuser(username="test1")
+        self.client.force_authenticate(user)
+
+        Document.objects.create(
+            title="existing",
+            mime_type="application/pdf",
+            content="content",
+            checksum="c1",
+            archive_serial_number=5,
+        )
+        doc2 = Document.objects.create(
+            title="new doc",
+            mime_type="application/pdf",
+            content="content2",
+            checksum="c2",
+        )
+        resp = self.client.patch(
+            f"/api/documents/{doc2.pk}/",
+            data={"archive_serial_number": 5},
+            format="json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("archive_serial_number", resp.data)
+
+    def test_same_asn_in_different_counters_allowed(self) -> None:
+        """
+        GIVEN:
+            - Document with ASN 5 in counter "Binder A"
+        WHEN:
+            - Saving another document with the same ASN in counter "Binder B"
+        THEN:
+            - Save succeeds; each counter has an independent sequence
+        """
+        user = User.objects.create_superuser(username="test1")
+        self.client.force_authenticate(user)
+
+        counter_a = NamedCounter.objects.create(name="Binder A")
+        counter_b = NamedCounter.objects.create(name="Binder B")
+        Document.objects.create(
+            title="in binder a",
+            mime_type="application/pdf",
+            content="content",
+            checksum="c1",
+            archive_serial_number=5,
+            named_counter=counter_a,
+        )
+        doc2 = Document.objects.create(
+            title="in binder b",
+            mime_type="application/pdf",
+            content="content2",
+            checksum="c2",
+        )
+        resp = self.client.patch(
+            f"/api/documents/{doc2.pk}/",
+            data={"archive_serial_number": 5, "named_counter": counter_b.pk},
+            format="json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        doc2.refresh_from_db()
+        self.assertEqual(doc2.archive_serial_number, 5)
+        self.assertEqual(doc2.named_counter, counter_b)
+
+    def test_asn_duplicate_in_same_counter_rejected(self) -> None:
+        """
+        GIVEN:
+            - Document with ASN 5 in counter "Binder A"
+        WHEN:
+            - Saving another document with the same ASN in the same counter
+        THEN:
+            - 400 error with archive_serial_number field error
+        """
+        user = User.objects.create_superuser(username="test1")
+        self.client.force_authenticate(user)
+
+        counter = NamedCounter.objects.create(name="Binder A")
+        Document.objects.create(
+            title="existing",
+            mime_type="application/pdf",
+            content="content",
+            checksum="c1",
+            archive_serial_number=5,
+            named_counter=counter,
+        )
+        doc2 = Document.objects.create(
+            title="new doc",
+            mime_type="application/pdf",
+            content="content2",
+            checksum="c2",
+        )
+        resp = self.client.patch(
+            f"/api/documents/{doc2.pk}/",
+            data={"archive_serial_number": 5, "named_counter": counter.pk},
+            format="json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("archive_serial_number", resp.data)
+
+    def test_asn_duplicate_in_trash_counter_rejected(self) -> None:
+        """
+        GIVEN:
+            - Trashed document with ASN 7 in counter "Binder A"
+        WHEN:
+            - Saving a new document with the same ASN in the same counter
+        THEN:
+            - 400 error indicating ASN exists in trash
+        """
+        user = User.objects.create_superuser(username="test1")
+        self.client.force_authenticate(user)
+
+        counter = NamedCounter.objects.create(name="Binder A")
+        trashed = Document.objects.create(
+            title="trashed",
+            mime_type="application/pdf",
+            content="content",
+            checksum="c1",
+            archive_serial_number=7,
+            named_counter=counter,
+        )
+        trashed.delete()
+        doc2 = Document.objects.create(
+            title="new doc",
+            mime_type="application/pdf",
+            content="content2",
+            checksum="c2",
+        )
+        resp = self.client.patch(
+            f"/api/documents/{doc2.pk}/",
+            data={"archive_serial_number": 7, "named_counter": counter.pk},
+            format="json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("archive_serial_number", resp.data)
+
     def test_asn_not_unique_with_trashed_doc(self) -> None:
         """
         GIVEN:

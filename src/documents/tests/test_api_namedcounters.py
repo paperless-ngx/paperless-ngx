@@ -133,3 +133,7 @@ class TestNamedCounterApi(DirectoriesMixin, APITestCase):
             format="json",
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+    def test_str_representation(self) -> None:
+        counter = NamedCounter.objects.create(name="Binder A")
+        self.assertEqual(str(counter), "Binder A")
