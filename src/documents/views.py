@@ -2057,6 +2057,8 @@ class DocumentViewSet(
         _backend.remove(version_doc.pk)
         version_doc_id = version_doc.id
         version_doc.delete()
+        root_doc.modified = timezone.now()
+        Document.objects.filter(pk=root_doc.pk).update(modified=root_doc.modified)
         _backend.add_or_update(root_doc)
         if settings.AUDIT_LOG_ENABLED:
             actor = (
@@ -2136,6 +2138,8 @@ class DocumentViewSet(
         old_label = version_doc.version_label
         version_doc.version_label = serializer.validated_data["version_label"]
         version_doc.save(update_fields=["version_label"])
+        root_doc.modified = timezone.now()
+        Document.objects.filter(pk=root_doc.pk).update(modified=root_doc.modified)
 
         if settings.AUDIT_LOG_ENABLED and old_label != version_doc.version_label:
             actor = (
