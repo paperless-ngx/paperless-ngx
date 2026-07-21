@@ -435,6 +435,54 @@ class TestMail(
 
         super().setUp()
 
+    @mock.patch("paperless_mail.mail.MAIL_FETCH_BATCH_SIZE", 5)
+    def test_handle_mail_account_batches_body_fetch_for_large_backlog(self) -> None:
+        """
+        GIVEN:
+            - More new/unprocessed mail than MAIL_FETCH_BATCH_SIZE
+        WHEN:
+            - The mail account is processed
+        THEN:
+            - The body fetch is issued in multiple batches
+            - Every message is still processed (none dropped at a batch boundary)
+        """
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        rule = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.MARK_READ,
+            consumption_scope=MailRule.ConsumptionScope.ATTACHMENTS_ONLY,
+        )
+
+        message_count = 12  # more than the patched batch size of 5
+        self.mailMocker.bogus_mailbox.messages = [
+            self.mailMocker.messageBuilder.create_message(
+                subject=f"No attachment {i}",
+                attachments=[],
+            )
+            for i in range(message_count)
+        ]
+        self.mailMocker.bogus_mailbox.updateClient()
+
+        with mock.patch.object(
+            self.mailMocker.bogus_mailbox,
+            "fetch",
+            wraps=self.mailMocker.bogus_mailbox.fetch,
+        ) as fetch_spy:
+            self.mail_account_handler.handle_mail_account(account)
+
+        # ceil(12 / 5) == 3 batches
+        self.assertEqual(fetch_spy.call_count, 3)
+        self.assertEqual(
+            ProcessedMail.objects.filter(rule=rule).count(),
+            message_count,
+        )
+
     def test_get_correspondent(self) -> None:
         message = namedtuple("MailMessage", [])
         message.from_ = "someone@somewhere.com"
