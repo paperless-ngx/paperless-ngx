@@ -1040,12 +1040,23 @@ class DocumentViewSet(
             .order_by("-id")
             .values("content")[:1],
         )
+        # A correlated subquery avoids the LEFT JOIN + Count() this used to
+        # be, which forced a GROUP BY aggregate over every matching document
+        # before the query could even be sorted or limited.
+        note_count = Subquery(
+            Note.objects.filter(document=OuterRef("pk"))
+            .order_by()
+            .values("document")
+            .annotate(count=Count("pk"))
+            .values("count"),
+            output_field=IntegerField(),
+        )
         return (
             Document.objects.filter(root_document__isnull=True)
             .distinct()
             .order_by("-created", "-id")
             .annotate(effective_content=Coalesce(latest_version_content, F("content")))
-            .annotate(num_notes=Count("notes"))
+            .annotate(num_notes=Coalesce(note_count, 0))
             .select_related("correspondent", "storage_path", "document_type", "owner")
             .prefetch_related(
                 Prefetch(
@@ -1936,10 +1947,13 @@ class DocumentViewSet(
                 "root_document",
             ).get(pk=pk)
             root_doc = get_root_document(request_doc)
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "change_document",
-                root_doc,
+            if request.user is not None and (
+                not request.user.has_perm("documents.change_document")
+                or not has_perms_owner_aware(
+                    request.user,
+                    "change_document",
+                    root_doc,
+                )
             ):
                 return HttpResponseForbidden("Insufficient permissions")
         except Document.DoesNotExist:
@@ -2057,6 +2071,8 @@ class DocumentViewSet(
         _backend.remove(version_doc.pk)
         version_doc_id = version_doc.id
         version_doc.delete()
+        root_doc.modified = timezone.now()
+        Document.objects.filter(pk=root_doc.pk).update(modified=root_doc.modified)
         _backend.add_or_update(root_doc)
         if settings.AUDIT_LOG_ENABLED:
             actor = (
@@ -2136,6 +2152,8 @@ class DocumentViewSet(
         old_label = version_doc.version_label
         version_doc.version_label = serializer.validated_data["version_label"]
         version_doc.save(update_fields=["version_label"])
+        root_doc.modified = timezone.now()
+        Document.objects.filter(pk=root_doc.pk).update(modified=root_doc.modified)
 
         if settings.AUDIT_LOG_ENABLED and old_label != version_doc.version_label:
             actor = (
@@ -2741,7 +2759,7 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
             )
             or (method == bulk_edit.edit_pdf and parameters.get("update_document"))
         ):
-            has_perms = user_is_owner_of_all_documents
+            has_perms = has_perms and user_is_owner_of_all_documents
 
         # check global add permissions for methods that create documents
         if (
@@ -2765,6 +2783,11 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
                 or (
                     method in [bulk_edit.merge, bulk_edit.split]
                     and parameters.get("delete_originals")
+                )
+                or (
+                    method in [bulk_edit.edit_pdf, bulk_edit.remove_password]
+                    and parameters.get("delete_original")
+                    and not parameters.get("update_document")
                 )
             )
             and not user.has_perm("documents.delete_document")

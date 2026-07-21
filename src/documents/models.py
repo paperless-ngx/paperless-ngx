@@ -217,6 +217,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         _("checksum"),
         max_length=64,
         editable=False,
+        db_index=True,
         help_text=_("The checksum of the original document."),
     )
 
@@ -234,7 +235,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         blank=False,
         null=True,
         unique=False,
-        db_index=False,
+        db_index=True,
         validators=[MinValueValidator(1)],
         help_text=_(
             "The number of pages of the document.",
@@ -338,6 +339,9 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         ordering = ("-created",)
         verbose_name = _("document")
         verbose_name_plural = _("documents")
+        indexes = [
+            models.Index(fields=["owner", "created"]),
+        ]
         constraints = [
             models.UniqueConstraint(
                 fields=["root_document", "version_index"],
@@ -1190,6 +1194,12 @@ class CustomFieldInstance(SoftDeleteModel):
         ordering = ("created",)
         verbose_name = _("custom field instance")
         verbose_name_plural = _("custom field instances")
+        indexes = [
+            models.Index(fields=["field", "value_date"]),
+            models.Index(fields=["field", "value_int"]),
+            models.Index(fields=["field", "value_float"]),
+            models.Index(fields=["field", "value_monetary_amount"]),
+        ]
         constraints = [
             models.UniqueConstraint(
                 fields=["document", "field"],
