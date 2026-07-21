@@ -566,15 +566,39 @@ class TestMail(
         self.assertEqual([m.uid for m in fetched], [target_uid])
 
     def test_handle_empty_message(self) -> None:
-        message = namedtuple("MailMessage", [])
+        message = self.mailMocker.messageBuilder.create_message(
+            subject="No attachments here",
+            attachments=[],
+        )
 
-        message.attachments = []
-        rule = MailRule()
+        account = MailAccount.objects.create()
+        rule = MailRule.objects.create(
+            account=account,
+            consumption_scope=MailRule.ConsumptionScope.ATTACHMENTS_ONLY,
+        )
 
         result = self.mail_account_handler._handle_message(message, rule)
 
         self.mailMocker._queue_consumption_tasks_mock.assert_not_called()
         self.assertEqual(result, 0)
+
+        processed = ProcessedMail.objects.get(
+            rule=rule,
+            uid=message.uid,
+            folder=rule.folder,
+        )
+        self.assertEqual(processed.status, "PROCESSED_WO_CONSUMPTION")
+
+        # Calling it again must not create a second row
+        self.mail_account_handler._handle_message(message, rule)
+        self.assertEqual(
+            ProcessedMail.objects.filter(
+                rule=rule,
+                uid=message.uid,
+                folder=rule.folder,
+            ).count(),
+            1,
+        )
 
     def test_handle_unknown_mime_type(self) -> None:
         message = self.mailMocker.messageBuilder.create_message(
