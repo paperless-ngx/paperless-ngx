@@ -1947,10 +1947,13 @@ class DocumentViewSet(
                 "root_document",
             ).get(pk=pk)
             root_doc = get_root_document(request_doc)
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "change_document",
-                root_doc,
+            if request.user is not None and (
+                not request.user.has_perm("documents.change_document")
+                or not has_perms_owner_aware(
+                    request.user,
+                    "change_document",
+                    root_doc,
+                )
             ):
                 return HttpResponseForbidden("Insufficient permissions")
         except Document.DoesNotExist:
