@@ -11,6 +11,7 @@ from enum import StrEnum
 from itertools import islice
 from typing import TYPE_CHECKING
 from typing import Final
+from typing import NamedTuple
 from typing import Self
 from typing import TypedDict
 from typing import TypeVar
@@ -60,7 +61,18 @@ _LOCK_BACKOFF_BASE: Final[float] = 1.0  # seconds
 _LOCK_BACKOFF_CAP: Final[float] = 10.0  # seconds
 
 T = TypeVar("T")
-ViewerPermissionIds = tuple[list[int], list[int]]
+
+
+class ViewerGrant(NamedTuple):
+    """Direct user and group view grants for a single document.
+
+    Named fields (rather than a bare 2-tuple) so ``viewer_ids`` and
+    ``viewer_group_ids`` can't be silently transposed at a call site — both
+    are ``list[int]``, so a positional swap would type-check cleanly.
+    """
+
+    viewer_ids: list[int]
+    viewer_group_ids: list[int]
 
 
 class SearchMode(StrEnum):
@@ -945,7 +957,7 @@ class TantivyBackend:
     def rebuild(
         self,
         documents: QuerySet[Document],
-        iter_wrapper: IterWrapper[tuple[Document, ViewerPermissionIds]] = identity,
+        iter_wrapper: IterWrapper[tuple[Document, ViewerGrant]] = identity,
         writer_heap_bytes: int = 512_000_000,
     ) -> None:
         """
@@ -1011,6 +1023,12 @@ def chunked(iterable, size):
         yield chunk
 
 
+_EMPTY_VIEWER_GRANT: Final[ViewerGrant] = ViewerGrant(
+    viewer_ids=[],
+    viewer_group_ids=[],
+)
+
+
 class _DocumentViewerStream:
     """Yield document permission data while batch-loading grants.
 
@@ -1034,29 +1052,21 @@ class _DocumentViewerStream:
     def __len__(self) -> int:
         return self._documents.count()
 
-    def __iter__(self) -> Iterator[tuple[Document, ViewerPermissionIds]]:
+    def __iter__(self) -> Iterator[tuple[Document, ViewerGrant]]:
         # iterator(chunk_size=…) streams from a server-side cursor instead of
         # materialising the whole queryset in memory; since Django 4.1 it still
         # honours prefetch_related, running the prefetches one batch at a time.
         documents = self._documents.iterator(chunk_size=self._chunk_size)
         for chunk in chunked(documents, self._chunk_size):
-            viewer_ids_by_pk, viewer_group_ids_by_pk = _bulk_get_viewer_permissions(
-                [doc.pk for doc in chunk],
-            )
+            grants_by_pk = _bulk_get_viewer_permissions([doc.pk for doc in chunk])
             for doc in chunk:
-                yield (
-                    doc,
-                    (
-                        viewer_ids_by_pk.get(doc.pk, []),
-                        viewer_group_ids_by_pk.get(doc.pk, []),
-                    ),
-                )
+                yield doc, grants_by_pk.get(doc.pk, _EMPTY_VIEWER_GRANT)
 
 
 def _bulk_get_viewer_permissions(
     doc_pks: Sequence[int],
-) -> tuple[dict[int, list[int]], dict[int, list[int]]]:
-    """Fetch direct user and group view grants for a batch of documents.
+) -> dict[int, ViewerGrant]:
+    """Fetch direct user and group view grants for a batch of documents, keyed by pk.
 
     Group grants remain group IDs in the index so permission checks use the
     requesting user's current memberships. Expanding groups to user IDs here
@@ -1097,13 +1107,13 @@ def _bulk_get_viewer_permissions(
     for object_pk, group_id in group_qs:
         viewer_group_map[int(object_pk)].add(group_id)
 
-    return (
-        {object_pk: list(user_ids) for object_pk, user_ids in viewer_map.items()},
-        {
-            object_pk: list(group_ids)
-            for object_pk, group_ids in viewer_group_map.items()
-        },
-    )
+    return {
+        object_pk: ViewerGrant(
+            viewer_ids=list(viewer_map.get(object_pk, ())),
+            viewer_group_ids=list(viewer_group_map.get(object_pk, ())),
+        )
+        for object_pk in viewer_map.keys() | viewer_group_map.keys()
+    }
 
 
 # Module-level singleton with proper thread safety
