@@ -1947,10 +1947,13 @@ class DocumentViewSet(
                 "root_document",
             ).get(pk=pk)
             root_doc = get_root_document(request_doc)
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "change_document",
-                root_doc,
+            if request.user is not None and (
+                not request.user.has_perm("documents.change_document")
+                or not has_perms_owner_aware(
+                    request.user,
+                    "change_document",
+                    root_doc,
+                )
             ):
                 return HttpResponseForbidden("Insufficient permissions")
         except Document.DoesNotExist:
@@ -2756,7 +2759,7 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
             )
             or (method == bulk_edit.edit_pdf and parameters.get("update_document"))
         ):
-            has_perms = user_is_owner_of_all_documents
+            has_perms = has_perms and user_is_owner_of_all_documents
 
         # check global add permissions for methods that create documents
         if (
@@ -2780,6 +2783,11 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
                 or (
                     method in [bulk_edit.merge, bulk_edit.split]
                     and parameters.get("delete_originals")
+                )
+                or (
+                    method in [bulk_edit.edit_pdf, bulk_edit.remove_password]
+                    and parameters.get("delete_original")
+                    and not parameters.get("update_document")
                 )
             )
             and not user.has_perm("documents.delete_document")

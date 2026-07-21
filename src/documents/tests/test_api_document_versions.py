@@ -669,6 +669,26 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_update_version_requires_global_change_permission(self) -> None:
+        user = User.objects.create_user(username="add-only")
+        user.user_permissions.add(Permission.objects.get(codename="add_document"))
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+        )
+        self.client.force_authenticate(user=user)
+
+        with mock.patch("documents.views.consume_file") as consume_mock:
+            resp = self.client.post(
+                f"/api/documents/{root.id}/update_version/",
+                {"document": self._make_pdf_upload()},
+                format="multipart",
+            )
+
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+        consume_mock.apply_async.assert_not_called()
+
     def test_update_version_returns_404_for_missing_document(self) -> None:
         resp = self.client.post(
             "/api/documents/9999/update_version/",
