@@ -21,6 +21,7 @@ import tantivy
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.utils.timezone import get_current_timezone
+from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
 
 from documents.search._query import build_permission_filter
@@ -45,6 +46,8 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from django.contrib.auth.models import AbstractUser
+    from django.contrib.auth.models import Group
+    from django.contrib.auth.models import User
     from django.db.models import QuerySet
 
     from documents.models import Document
@@ -57,6 +60,7 @@ _LOCK_BACKOFF_BASE: Final[float] = 1.0  # seconds
 _LOCK_BACKOFF_CAP: Final[float] = 10.0  # seconds
 
 T = TypeVar("T")
+ViewerPermissionIds = tuple[list[int], list[int]]
 
 
 class SearchMode(StrEnum):
@@ -367,7 +371,7 @@ class TantivyBackend:
     ) -> tantivy.Query:
         """Wrap a query with a permission filter if the user is not a superuser."""
         if user is not None:
-            permission_filter = build_permission_filter(self._schema, user)
+            permission_filter = self._build_permission_filter(user)
             return tantivy.Query.boolean_query(
                 [
                     (tantivy.Occur.Must, query),
@@ -376,11 +380,21 @@ class TantivyBackend:
             )
         return query
 
+    def _build_permission_filter(self, user: AbstractUser) -> tantivy.Query:
+        """Build a filter using the user's current group memberships."""
+        group_ids = user.groups.values_list("pk", flat=True)
+        return build_permission_filter(
+            self._schema,
+            user,
+            viewer_group_ids=group_ids,
+        )
+
     def _build_tantivy_doc(
         self,
         document: Document,
         effective_content: str | None = None,
         viewer_ids: list[int] | None = None,
+        viewer_group_ids: list[int] | None = None,
     ) -> tantivy.Document:
         """Build a tantivy Document from a Django Document instance.
 
@@ -497,10 +511,26 @@ class TantivyBackend:
             users_with_perms = get_users_with_perms(
                 document,
                 only_with_perms_in=["view_document"],
+                with_group_users=False,
             )
-            viewer_ids = [int(u.id) for u in users_with_perms]
+            viewer_ids = list(
+                cast("QuerySet[User]", users_with_perms).values_list("id", flat=True),
+            )
         for viewer_id in viewer_ids:
             doc.add_unsigned("viewer_id", viewer_id)
+        if viewer_group_ids is None:
+            groups_with_perms = get_groups_with_perms(
+                document,
+                only_with_perms_in=["view_document"],
+            )
+            viewer_group_ids = list(
+                cast("QuerySet[Group]", groups_with_perms).values_list(
+                    "id",
+                    flat=True,
+                ),
+            )
+        for viewer_group_id in viewer_group_ids:
+            doc.add_unsigned("viewer_group_id", viewer_group_id)
 
         # Autocomplete words
         text_sources = [document.title, content]
@@ -813,7 +843,7 @@ class TantivyBackend:
         # Intersect with permission filter so autocomplete words from
         # invisible documents don't leak to other users.
         if user is not None and not user.is_superuser:
-            permission_query = build_permission_filter(self._schema, user)
+            permission_query = self._build_permission_filter(user)
 
         matches = searcher.terms_with_prefix(
             "autocomplete_word",
@@ -915,7 +945,7 @@ class TantivyBackend:
     def rebuild(
         self,
         documents: QuerySet[Document],
-        iter_wrapper: IterWrapper[tuple[Document, list[int]]] = identity,
+        iter_wrapper: IterWrapper[tuple[Document, ViewerPermissionIds]] = identity,
         writer_heap_bytes: int = 512_000_000,
     ) -> None:
         """
@@ -928,8 +958,8 @@ class TantivyBackend:
             documents: QuerySet of Document instances to index
             iter_wrapper: Optional wrapper function for progress tracking
                 (e.g., progress bar). Wraps an iterable of
-                ``(document, viewer_ids)`` pairs and should yield each pair
-                unchanged, advancing one step per document.
+                ``(document, (viewer_ids, viewer_group_ids))`` pairs and should yield
+                each unchanged, advancing one step per document.
             writer_heap_bytes: Tantivy writer memory budget (split across the
                 writer's threads). Larger values buffer more docs in RAM before
                 flushing a segment, deferring merge work; they do not avoid it.
@@ -953,11 +983,14 @@ class TantivyBackend:
         documents_stream = _DocumentViewerStream(documents, chunk_size=1000)
         try:
             writer = new_index.writer(heap_size=writer_heap_bytes)
-            for document, viewer_ids in iter_wrapper(documents_stream):
+            for document, (viewer_ids, viewer_group_ids) in iter_wrapper(
+                documents_stream,
+            ):
                 doc = self._build_tantivy_doc(
                     document,
                     document.get_effective_content(),
                     viewer_ids=viewer_ids,
+                    viewer_group_ids=viewer_group_ids,
                 )
                 writer.add_document(doc)
             writer.commit()
@@ -979,18 +1012,19 @@ def chunked(iterable, size):
 
 
 class _DocumentViewerStream:
-    """Yield (document, viewer_ids) pairs while batch-loading viewer ids.
+    """Yield document permission data while batch-loading grants.
 
-    Viewer permissions are fetched one SQL query per chunk (see
-    ``_bulk_get_viewer_ids``), but documents are yielded individually so a
+    Viewer permissions are fetched in batches (see
+    ``_bulk_get_viewer_permissions``), but documents are yielded individually so a
     progress bar wrapped around this stream advances per document rather than
     jumping a whole chunk at a time. ``__len__`` lets the progress helper still
     discover the total (it inspects ``QuerySet``/``Sized``).
 
-    The viewer ids travel with each document in the yielded pair rather than
-    through a separate mutable attribute, so the pairing survives regardless
-    of how ``iter_wrapper`` consumes the stream (buffering, batching, etc.) —
-    there is no reliance on the caller advancing this generator in lock-step.
+    The viewer and group ids travel with each document in the yielded pair
+    rather than through a separate mutable attribute, so the pairing survives
+    regardless of how ``iter_wrapper`` consumes the stream (buffering,
+    batching, etc.) — there is no reliance on the caller advancing this
+    generator in lock-step.
     """
 
     def __init__(self, documents: QuerySet[Document], *, chunk_size: int) -> None:
@@ -1000,25 +1034,33 @@ class _DocumentViewerStream:
     def __len__(self) -> int:
         return self._documents.count()
 
-    def __iter__(self) -> Iterator[tuple[Document, list[int]]]:
+    def __iter__(self) -> Iterator[tuple[Document, ViewerPermissionIds]]:
         # iterator(chunk_size=…) streams from a server-side cursor instead of
         # materialising the whole queryset in memory; since Django 4.1 it still
         # honours prefetch_related, running the prefetches one batch at a time.
         documents = self._documents.iterator(chunk_size=self._chunk_size)
         for chunk in chunked(documents, self._chunk_size):
-            viewer_ids_by_pk = _bulk_get_viewer_ids([doc.pk for doc in chunk])
+            viewer_ids_by_pk, viewer_group_ids_by_pk = _bulk_get_viewer_permissions(
+                [doc.pk for doc in chunk],
+            )
             for doc in chunk:
-                yield doc, viewer_ids_by_pk.get(doc.pk, [])
+                yield (
+                    doc,
+                    (
+                        viewer_ids_by_pk.get(doc.pk, []),
+                        viewer_group_ids_by_pk.get(doc.pk, []),
+                    ),
+                )
 
 
-def _bulk_get_viewer_ids(doc_pks: Sequence[int]) -> dict[int, list[int]]:
-    """Fetch all view_document permissions for a batch of documents in one query.
+def _bulk_get_viewer_permissions(
+    doc_pks: Sequence[int],
+) -> tuple[dict[int, list[int]], dict[int, list[int]]]:
+    """Fetch direct user and group view grants for a batch of documents.
 
-    Mirrors get_users_with_perms(doc, only_with_perms_in=["view_document"])
-    (with_group_users defaults to True there): a user counts as a viewer if
-    they hold the permission directly, OR via membership in a group that
-    holds the permission. Missing the group case would silently drop search
-    access for group-only viewers.
+    Group grants remain group IDs in the index so permission checks use the
+    requesting user's current memberships. Expanding groups to user IDs here
+    would leave stale access behind after a user is removed from a group.
     """
     from collections import defaultdict
 
@@ -1032,6 +1074,7 @@ def _bulk_get_viewer_ids(doc_pks: Sequence[int]) -> dict[int, list[int]]:
     str_pks = [str(pk) for pk in doc_pks]
 
     viewer_map: dict[int, set[int]] = defaultdict(set)
+    viewer_group_map: dict[int, set[int]] = defaultdict(set)
 
     # Fold the permission lookup into the query via a join on codename instead
     # of a separate Permission.objects.get(), which would otherwise run once per
@@ -1045,22 +1088,22 @@ def _bulk_get_viewer_ids(doc_pks: Sequence[int]) -> dict[int, list[int]]:
     for object_pk, user_id in user_qs:
         viewer_map[int(object_pk)].add(user_id)
 
-    # User.groups has related_query_name="user", so group__user__id joins
-    # through the group membership m2m to the member users' ids in the same
-    # single-query fashion as user_qs above (values_list compiles to one SQL
-    # JOIN; no per-row Python-side lookups follow, so select_related /
-    # prefetch_related do not apply here).
     group_qs = GroupObjectPermission.objects.filter(
         content_type=ct,
         permission__content_type=ct,
         permission__codename="view_document",
         object_pk__in=str_pks,
-    ).values_list("object_pk", "group__user__id")
-    for object_pk, user_id in group_qs:
-        if user_id is not None:
-            viewer_map[int(object_pk)].add(user_id)
+    ).values_list("object_pk", "group_id")
+    for object_pk, group_id in group_qs:
+        viewer_group_map[int(object_pk)].add(group_id)
 
-    return {object_pk: list(user_ids) for object_pk, user_ids in viewer_map.items()}
+    return (
+        {object_pk: list(user_ids) for object_pk, user_ids in viewer_map.items()},
+        {
+            object_pk: list(group_ids)
+            for object_pk, group_ids in viewer_group_map.items()
+        },
+    )
 
 
 # Module-level singleton with proper thread safety

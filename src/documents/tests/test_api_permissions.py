@@ -131,6 +131,10 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
             self.client.get("/api/saved_views/").status_code,
             status.HTTP_403_FORBIDDEN,
         )
+        self.assertEqual(
+            self.client.get("/api/search/autocomplete/?term=test").status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
 
     def test_api_sufficient_permissions(self) -> None:
         user = User.objects.create_user(username="test")
