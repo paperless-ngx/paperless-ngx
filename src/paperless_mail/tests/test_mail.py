@@ -964,6 +964,62 @@ class TestMail(
         ]
         self.assertEqual(queued_rule.id, first_rule.id)
 
+    def test_handle_mail_account_skips_body_fetch_for_already_processed_mail(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - An attachment-less mail under an attachments-only mark-read rule,
+              already recorded as PROCESSED_WO_CONSUMPTION
+        WHEN:
+            - The mail account is processed again and the mail still matches the
+              search criteria (it was never marked read, since no mail action is
+              applied for the no-consumption case)
+        THEN:
+            - No IMAP body fetch happens for that mail; only the cheap UID search runs.
+        """
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        rule = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.MARK_READ,
+            consumption_scope=MailRule.ConsumptionScope.ATTACHMENTS_ONLY,
+        )
+
+        message = self.mailMocker.messageBuilder.create_message(
+            subject="No attachment",
+            attachments=[],
+        )
+        self.mailMocker.bogus_mailbox.messages = [message]
+        self.mailMocker.bogus_mailbox.updateClient()
+
+        # First run: records ProcessedMail without consuming anything.
+        self.mail_account_handler.handle_mail_account(account)
+        self.assertTrue(
+            ProcessedMail.objects.filter(
+                rule=rule,
+                uid=message.uid,
+                folder=rule.folder,
+            ).exists(),
+        )
+        self.mailMocker._queue_consumption_tasks_mock.assert_not_called()
+
+        # Second run: message still matches UNSEEN (mark-read action never ran),
+        # but its body must not be downloaded again.
+        with mock.patch.object(
+            self.mailMocker.bogus_mailbox,
+            "fetch",
+            wraps=self.mailMocker.bogus_mailbox.fetch,
+        ) as fetch_spy:
+            self.mail_account_handler.handle_mail_account(account)
+
+        fetch_spy.assert_not_called()
+
     def test_handle_mail_account_skip_duplicate_uids_from_fetch(self) -> None:
         """
         GIVEN:

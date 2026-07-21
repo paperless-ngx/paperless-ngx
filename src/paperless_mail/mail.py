@@ -681,8 +681,37 @@ class MailAccountHandler(LoggingMixin):
         )
 
         try:
+            all_uids = set(
+                M.uids(criteria=criterias, charset=rule.account.character_set),
+            )
+        except Exception as err:
+            raise MailError(
+                f"Rule {rule}: Error while searching folder {rule.folder}",
+            ) from err
+
+        processed_uids_qs = ProcessedMail.objects.filter(
+            rule=rule,
+            folder=rule.folder,
+            uid__in=all_uids,
+        )
+        if self._current_uid_validity is not None:
+            processed_uids_qs = processed_uids_qs.filter(
+                Q(uid_validity=self._current_uid_validity)
+                | Q(uid_validity__isnull=True),
+            )
+        processed_uids = set(processed_uids_qs.values_list("uid", flat=True))
+
+        new_uids = all_uids - processed_uids
+
+        if not new_uids:
+            self.log.debug(
+                f"Rule {rule}: No new mail matching criteria {criterias}",
+            )
+            return 0
+
+        try:
             messages = M.fetch(
-                criteria=criterias,
+                criteria=AND(uid=list(new_uids)),
                 mark_seen=False,
                 charset=rule.account.character_set,
                 bulk=True,
