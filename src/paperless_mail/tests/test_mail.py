@@ -135,6 +135,12 @@ class BogusMailBox(AbstractContextManager):
             raise MailboxLoginError("BAD", "OK")
 
     def fetch(self, criteria, mark_seen, charset="", *, bulk=True):
+        return self._filter_messages(criteria)
+
+    def uids(self, criteria, charset="") -> list[str]:
+        return [m.uid for m in self._filter_messages(criteria)]
+
+    def _filter_messages(self, criteria):
         msg = self.messages
 
         criteria = str(criteria).strip("()").split(" ")
@@ -167,6 +173,10 @@ class BogusMailBox(AbstractContextManager):
 
         if "(X-GM-LABELS" in criteria:  # ['NOT', '(X-GM-LABELS', '"processed"']
             msg = filter(lambda m: "processed" not in m.flags, msg)
+
+        if "UID" in criteria:
+            uid_list = criteria[criteria.index("UID") + 1].split(",")
+            msg = filter(lambda m: m.uid in uid_list, msg)
 
         return list(msg)
 
@@ -536,6 +546,24 @@ class TestMail(
                 ],
             ],
         )
+
+    def test_bogus_mailbox_uids_and_uid_criteria(self) -> None:
+        mailbox = self.mailMocker.bogus_mailbox
+        all_messages = list(mailbox.messages)
+
+        # uids() returns the UIDs of unseen messages, no bodies needed to call it
+        unseen_uids = mailbox.uids("(UNSEEN)")
+        self.assertEqual(
+            set(unseen_uids),
+            {m.uid for m in all_messages if not m.seen},
+        )
+
+        # fetch() with an explicit UID criteria returns only the matching messages
+        target_uid = all_messages[0].uid
+        from imap_tools import AND
+
+        fetched = mailbox.fetch(AND(uid=[target_uid]), mark_seen=False)
+        self.assertEqual([m.uid for m in fetched], [target_uid])
 
     def test_handle_empty_message(self) -> None:
         message = namedtuple("MailMessage", [])
