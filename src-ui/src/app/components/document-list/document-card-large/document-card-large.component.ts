@@ -66,6 +66,7 @@ export class DocumentCardLargeComponent
   private documentService = inject(DocumentService)
   settingsService = inject(SettingsService)
   readonly selected = input(false)
+  readonly priority = input(false)
   readonly displayFields = input<string[]>(
     DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
   )

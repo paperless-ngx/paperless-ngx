@@ -67,6 +67,15 @@ describe('DocumentCardSmallComponent', () => {
     expect(thumbnail.getAttribute('loading')).toEqual('lazy')
   })
 
+  it('should prioritize the thumbnail when requested', () => {
+    fixture.componentRef.setInput('priority', true)
+    fixture.detectChanges()
+    const thumbnail: HTMLImageElement =
+      fixture.nativeElement.querySelector('img.doc-img')
+    expect(thumbnail.getAttribute('loading')).toEqual('eager')
+    expect(thumbnail.getAttribute('fetchpriority')).toEqual('high')
+  })
+
   it('should display a document, limit tags to 5', () => {
     expect(fixture.nativeElement.textContent).toContain('Document 10')
     expect(
