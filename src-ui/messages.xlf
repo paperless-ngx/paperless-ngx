@@ -5906,7 +5906,7 @@
         <source>Create</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
-          <context context-type="linenumber">56</context>
+          <context context-type="linenumber">54</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-links-dialog/share-links-dialog.component.html</context>
@@ -5921,14 +5921,14 @@
         <source>Apply</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
-          <context context-type="linenumber">62</context>
+          <context context-type="linenumber">60</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7780041345210191160" datatype="html">
         <source>Click again to exclude items.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">73</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7593728289020204896" datatype="html">
@@ -5943,7 +5943,7 @@
         <source>Open <x id="PH" equiv-text="this.title"/> filter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.ts</context>
-          <context context-type="linenumber">824</context>
+          <context context-type="linenumber">829</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7005745151564974365" datatype="html">
@@ -8739,28 +8739,28 @@
         <source>Custom fields updated.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1024</context>
+          <context context-type="linenumber">1025</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3873496751167944011" datatype="html">
         <source>Error updating custom fields.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1033</context>
+          <context context-type="linenumber">1034</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6144801143088984138" datatype="html">
         <source>Share link bundle creation requested.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1073</context>
+          <context context-type="linenumber">1082</context>
         </context-group>
       </trans-unit>
       <trans-unit id="46019676931295023" datatype="html">
         <source>Share link bundle creation is not available yet.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1080</context>
+          <context context-type="linenumber">1089</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6307402210351946694" datatype="html">
