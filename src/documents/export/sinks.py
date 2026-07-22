@@ -3,10 +3,17 @@ from __future__ import annotations
 import abc
 import hashlib
 import json
+import os
+import shutil
+import tempfile
+import zipfile
 from contextlib import AbstractContextManager
 from contextlib import contextmanager
+from pathlib import Path
+from pathlib import PurePosixPath
 from typing import TYPE_CHECKING
 
+from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 
 from documents.file_handling import delete_empty_directories
@@ -15,7 +22,6 @@ from documents.utils import copy_file_with_basic_stats
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from pathlib import Path
     from typing import TextIO
 
 
@@ -216,3 +222,114 @@ class DirectoryExportSink(ExportSink):
         # Folder mode is in-place/incremental: streamed .tmp files are already
         # cleaned in stream(); leave everything else intact and skip the prune.
         return None
+
+
+class ZipExportSink(ExportSink):
+    """Writes a single zip archive, produced atomically only on success.
+
+    Builds into ``<target>/<zip_name>.zip.tmp`` and renames to ``.zip`` on clean
+    finalize. The manifest stream is spooled to a temp file in SCRATCH_DIR and
+    added as an entry at finalize (a zip entry cannot be interleaved with others).
+    """
+
+    def __init__(self, target: Path, zip_name: str, *, delete: bool = False) -> None:
+        self._target = target.resolve()
+        self._zip_path = (self._target / zip_name).with_suffix(".zip")
+        self._tmp_path = self._zip_path.with_name(self._zip_path.name + ".tmp")
+        self._delete = delete
+        self._zip: zipfile.ZipFile | None = None
+        self._dirs: set[str] = set()
+        self._pending_manifest: tuple[Path, str] | None = None
+        self._stream_open = False
+
+    def _open(self) -> None:
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
+        self._zip = zipfile.ZipFile(
+            self._tmp_path,
+            "w",
+            compression=zipfile.ZIP_DEFLATED,
+            allowZip64=True,
+        )
+
+    def _ensure_dirs(self, arcname: str) -> None:
+        parts = PurePosixPath(arcname).parts[:-1]
+        for i in range(len(parts)):
+            dir_arc = "/".join(parts[: i + 1]) + "/"
+            if dir_arc not in self._dirs:
+                self._dirs.add(dir_arc)
+                assert self._zip is not None
+                self._zip.mkdir(dir_arc)
+
+    def add_file(
+        self,
+        source: Path,
+        arcname: str,
+        *,
+        checksum: str | None = None,
+    ) -> None:
+        assert self._zip is not None
+        self._ensure_dirs(arcname)
+        self._zip.write(source, arcname=arcname)
+
+    def add_json(self, content: list | dict, arcname: str) -> None:
+        assert self._zip is not None
+        self._ensure_dirs(arcname)
+        self._zip.writestr(arcname, _dumps(content))
+
+    @contextmanager
+    def stream(self, arcname: str) -> Iterator[TextIO]:
+        if self._stream_open:
+            raise RuntimeError("A stream is already open on this sink")
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
+        fd, tmp_name = tempfile.mkstemp(
+            dir=settings.SCRATCH_DIR,
+            prefix="export-manifest-",
+            suffix=".json",
+        )
+        tmp = Path(tmp_name)
+        handle = os.fdopen(fd, "w", encoding="utf-8")
+        self._stream_open = True
+        try:
+            yield handle
+        except BaseException:
+            handle.close()
+            tmp.unlink(missing_ok=True)
+            raise
+        else:
+            handle.close()
+            self._pending_manifest = (tmp, arcname)
+        finally:
+            self._stream_open = False
+
+    def _finalize(self) -> None:
+        assert self._zip is not None
+        if self._pending_manifest is not None:
+            tmp, arcname = self._pending_manifest
+            self._ensure_dirs(arcname)
+            self._zip.write(tmp, arcname=arcname)
+            tmp.unlink(missing_ok=True)
+            self._pending_manifest = None
+        self._zip.close()
+        self._zip = None
+        if self._delete:
+            self._wipe_destination()
+        self._tmp_path.rename(self._zip_path)
+
+    def _wipe_destination(self) -> None:
+        skip = {self._zip_path.resolve(), self._tmp_path.resolve()}
+        for item in self._target.glob("*"):
+            if item.resolve() in skip:
+                continue
+            if item.is_dir():
+                shutil.rmtree(item)
+            else:
+                item.unlink()
+
+    def _abort(self) -> None:
+        if self._zip is not None:
+            self._zip.close()
+            self._zip = None
+        self._tmp_path.unlink(missing_ok=True)
+        if self._pending_manifest is not None:
+            self._pending_manifest[0].unlink(missing_ok=True)
+            self._pending_manifest = None

@@ -1,12 +1,15 @@
 import io
 import json
 import os
+import zipfile
 from pathlib import Path
 
 import pytest
 
 from documents.export.sinks import DirectoryExportSink
+from documents.export.sinks import ExportSink
 from documents.export.sinks import StreamingManifestWriter
+from documents.export.sinks import ZipExportSink
 from documents.export.sinks import _dumps
 
 
@@ -168,3 +171,125 @@ class TestDirectoryExportSink:
         ) as sink:
             sink.add_file(source_file, "originals/doc.pdf")
         assert stale.exists()
+
+
+class TestZipExportSink:
+    @pytest.fixture()
+    def source_file(self, tmp_path: Path) -> Path:
+        src: Path = tmp_path / "src" / "doc.pdf"
+        src.parent.mkdir(parents=True)
+        src.write_bytes(b"PDF-CONTENT")
+        return src
+
+    def test_round_trip_files_json_and_stream(
+        self,
+        tmp_path: Path,
+        source_file: Path,
+    ) -> None:
+        target: Path = tmp_path / "out"
+        target.mkdir()
+        with ZipExportSink(target, "export", delete=False) as sink:
+            sink.add_file(source_file, "originals/doc.pdf")
+            sink.add_json({"version": "x"}, "metadata.json")
+            with sink.stream("manifest.json") as handle:
+                writer = StreamingManifestWriter(handle)
+                writer.write_record({"pk": 1})
+                writer.close()
+        zip_path: Path = target / "export.zip"
+        assert zip_path.exists()
+        assert not (target / "export.zip.tmp").exists()
+        with zipfile.ZipFile(zip_path) as zf:
+            names = set(zf.namelist())
+            assert {"originals/doc.pdf", "metadata.json", "manifest.json"} <= names
+            assert zf.read("originals/doc.pdf") == b"PDF-CONTENT"
+            assert json.loads(zf.read("manifest.json")) == [{"pk": 1}]
+
+    def test_nested_arcname_emits_directory_marker(
+        self,
+        tmp_path: Path,
+        source_file: Path,
+    ) -> None:
+        target: Path = tmp_path / "out"
+        target.mkdir()
+        with ZipExportSink(target, "export", delete=False) as sink:
+            sink.add_file(source_file, "originals/doc.pdf")
+        with zipfile.ZipFile(target / "export.zip") as zf:
+            assert "originals/" in zf.namelist()
+
+    def test_flat_arcname_has_no_directory_markers(
+        self,
+        tmp_path: Path,
+        source_file: Path,
+    ) -> None:
+        target: Path = tmp_path / "out"
+        target.mkdir()
+        with ZipExportSink(target, "export", delete=False) as sink:
+            sink.add_file(source_file, "doc.pdf")
+        with zipfile.ZipFile(target / "export.zip") as zf:
+            assert all(not n.endswith("/") for n in zf.namelist())
+
+    def test_exception_leaves_no_zip_and_no_tmp(
+        self,
+        tmp_path: Path,
+        source_file: Path,
+    ) -> None:
+        target: Path = tmp_path / "out"
+        target.mkdir()
+        with pytest.raises(RuntimeError):
+            with ZipExportSink(target, "export", delete=False) as sink:
+                sink.add_file(source_file, "doc.pdf")
+                raise RuntimeError("boom")
+        assert not (target / "export.zip").exists()
+        assert not (target / "export.zip.tmp").exists()
+
+    def test_delete_wipes_destination_on_success(
+        self,
+        tmp_path: Path,
+        source_file: Path,
+    ) -> None:
+        target: Path = tmp_path / "out"
+        target.mkdir()
+        (target / "preexisting.txt").write_text("old")
+        (target / "olddir").mkdir()
+        with ZipExportSink(target, "export", delete=True) as sink:
+            sink.add_file(source_file, "doc.pdf")
+        assert (target / "export.zip").exists()
+        assert not (target / "preexisting.txt").exists()
+        assert not (target / "olddir").exists()
+
+    def test_abort_with_delete_does_not_wipe_destination(
+        self,
+        tmp_path: Path,
+        source_file: Path,
+    ) -> None:
+        target: Path = tmp_path / "out"
+        target.mkdir()
+        (target / "preexisting.txt").write_text("old")
+        with pytest.raises(RuntimeError):
+            with ZipExportSink(target, "export", delete=True) as sink:
+                sink.add_file(source_file, "doc.pdf")
+                raise RuntimeError("boom")
+        assert (target / "preexisting.txt").exists()
+        assert not (target / "export.zip").exists()
+
+
+class TestStreamContract:
+    @pytest.fixture(params=["dir", "zip"])
+    def sink(self, request: pytest.FixtureRequest, tmp_path: Path) -> ExportSink:
+        target: Path = tmp_path / "out"
+        target.mkdir()
+        if request.param == "dir":
+            return DirectoryExportSink(
+                target,
+                compare_checksums=False,
+                compare_json=False,
+                delete=False,
+            )
+        return ZipExportSink(target, "export", delete=False)
+
+    def test_second_concurrent_stream_is_rejected(self, sink: ExportSink) -> None:
+        with sink:
+            with sink.stream("manifest.json"):
+                with pytest.raises(RuntimeError, match="already open"):
+                    with sink.stream("other.json"):
+                        pass
