@@ -16,7 +16,7 @@
               @if (message.role === 'assistant' && message.references?.length) {
                 <div class="chat-references list-group mt-3">
                   @for (reference of message.references; track reference.id) {
-                    <a class="list-group-item list-group-item-action text-primary" [routerLink]="['/documents', reference.id]">
+                    <a class="list-group-item list-group-item-action d-flex text-primary text-break" [routerLink]="['/documents', reference.id]">
                       <i-bs width="0.9em" height="0.9em" name="file-text" class="me-1"></i-bs><span>{{ reference.title }}</span>
                     </a>
                   }
