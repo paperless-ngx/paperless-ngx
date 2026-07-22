@@ -5,10 +5,45 @@
 .chat-messages {
   max-height: 350px;
   overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.message {
+  // allow flex children to shrink below their content size so long,
+  // unbroken text wraps instead of forcing a horizontal scrollbar
+  min-width: 0;
+
+  > div {
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
 }
 
 .chat-references {
   font-family: var(--bs-font-sans-serif);
+
+  .list-group-item {
+    // keep the file icon on the same line as the title; only the title
+    // text should wrap, never break away from its leading icon
+    display: flex;
+    align-items: flex-start;
+
+    i-bs {
+      flex-shrink: 0;
+      // center the icon within the first line of the title (rather than
+      // against the whole, possibly multi-line, block)
+      display: flex;
+      align-items: center;
+      height: 1.5em; // one line-height of the adjacent text
+    }
+
+    span {
+      min-width: 0;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+  }
 }
 
 .dropdown-toggle::after {
