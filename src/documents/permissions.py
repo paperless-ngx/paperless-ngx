@@ -249,6 +249,11 @@ def annotate_document_count_for_related_queryset(
       check as a semi-join and instead re-checks subquery membership once per
       row of the (much larger) M2M join -- worse than the correlated subquery.
 
+    Aggregation is restricted to rows whose ``related_object_field`` is one of
+    ``queryset``'s pks, so passing a subset (e.g. a handful of tag descendants)
+    doesn't pay the cost of counting for every row matching the permission
+    filter.
+
     Args:
         queryset: base queryset to annotate (must contain pk)
         through_model: model representing the relation (e.g., Document.tags.through
@@ -260,7 +265,12 @@ def annotate_document_count_for_related_queryset(
 
     permitted_ids = _permitted_document_ids(user)
     counts = (
-        through_model.objects.filter(**{f"{target_field}__in": permitted_ids})
+        through_model.objects.filter(
+            **{
+                f"{related_object_field}__in": queryset.values("pk"),
+                f"{target_field}__in": permitted_ids,
+            },
+        )
         .values(related_object_field)
         .annotate(c=Count(target_field, distinct=True))
     )

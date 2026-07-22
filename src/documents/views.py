@@ -494,6 +494,15 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
     document_count_through: type[Model] | None = None
     document_count_source_field: str | None = None
 
+    def _get_document_count_source_field(self) -> str:
+        if self.document_count_source_field is None:
+            msg = (
+                "document_count_source_field must be set when "
+                "document_count_through is configured"
+            )
+            raise ValueError(msg)
+        return self.document_count_source_field
+
     def get_document_count_filter(self):
         request = getattr(self, "request", None)
         user = getattr(request, "user", None) if request else None
@@ -510,7 +519,7 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
             return annotate_document_count_for_related_queryset(
                 base_qs,
                 through_model=self.document_count_through,
-                related_object_field=self.document_count_source_field,
+                related_object_field=self._get_document_count_source_field(),
                 user=user,
             )
 
@@ -613,7 +622,7 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Tag]):
                         pk__in=descendant_pks | {t.pk for t in all_tags},
                     ).select_related("owner"),
                     through_model=self.document_count_through,
-                    related_object_field=self.document_count_source_field,
+                    related_object_field=self._get_document_count_source_field(),
                     user=user,
                 ).order_by(*ordering),
             )
