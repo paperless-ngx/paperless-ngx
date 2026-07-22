@@ -256,7 +256,9 @@ export class PngxPdfViewerComponent
         Math.max(Math.trunc(this.page), 1),
         this.pdfViewer.pagesCount
       )
-      this.pdfViewer.currentPageNumber = nextPage
+      if (nextPage !== this.pdfViewer.currentPageNumber) {
+        this.pdfViewer.currentPageNumber = nextPage
+      }
     }
     if (this.page === this.lastViewerPage) {
       this.lastViewerPage = undefined
