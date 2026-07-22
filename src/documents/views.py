@@ -2290,6 +2290,15 @@ class UnifiedSearchViewSet(DocumentViewSet):
             return SearchResultSerializer
         return DocumentSerializer
 
+    def get_serializer_context(self):
+        if self._is_search_request():
+            # BulkPermissionMixin.get_serializer_context() (inherited via
+            # DocumentViewSet) assumes it's batching permissions for a page of
+            # real Document instances. Tantivy search results are SearchHit/
+            # dict-like objects instead, so skip straight past it here.
+            return super(BulkPermissionMixin, self).get_serializer_context()
+        return super().get_serializer_context()
+
     def _get_active_search_params(self, request: Request | None = None) -> list[str]:
         request = request or self.request
         return [
