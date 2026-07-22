@@ -13,6 +13,14 @@ from documents.export.sinks import ZipExportSink
 from documents.export.sinks import _dumps
 
 
+@pytest.fixture()
+def source_file(tmp_path: Path) -> Path:
+    src: Path = tmp_path / "src" / "doc.pdf"
+    src.parent.mkdir(parents=True)
+    src.write_bytes(b"PDF-CONTENT")
+    return src
+
+
 class TestDumps:
     def test_dumps_is_indented_unicode_json(self) -> None:
         result: str = _dumps({"a": "é", "b": 1})
@@ -38,13 +46,6 @@ class TestStreamingManifestWriter:
 
 
 class TestDirectoryExportSink:
-    @pytest.fixture()
-    def source_file(self, tmp_path: Path) -> Path:
-        src: Path = tmp_path / "src" / "doc.pdf"
-        src.parent.mkdir(parents=True)
-        src.write_bytes(b"PDF-CONTENT")
-        return src
-
     def test_add_file_copies_to_relative_arcname(
         self,
         tmp_path: Path,
@@ -174,13 +175,6 @@ class TestDirectoryExportSink:
 
 
 class TestZipExportSink:
-    @pytest.fixture()
-    def source_file(self, tmp_path: Path) -> Path:
-        src: Path = tmp_path / "src" / "doc.pdf"
-        src.parent.mkdir(parents=True)
-        src.write_bytes(b"PDF-CONTENT")
-        return src
-
     def test_round_trip_files_json_and_stream(
         self,
         tmp_path: Path,
