@@ -7045,7 +7045,7 @@ primarily.
 
 ### paperless-ng 0.9.0
 
-- **Deprecated:** GnuPG. [See this note on the state of GnuPG in paperless-ng.](administration.md#encryption)
+- **Deprecated:** GnuPG. [See this note on the state of GnuPG in paperless-ng.](#paperless-ng-093)
   This features will most likely be removed in future versions.
 - **Added:** New frontend. Features:
   - Single page application: It's much more responsive than the
