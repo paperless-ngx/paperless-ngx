@@ -883,6 +883,62 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results), 3)
 
+    def test_is_in_inbox_filter_no_duplicates_with_multiple_inbox_tags(self) -> None:
+        """
+        GIVEN:
+            - A document tagged with two different inbox tags
+        WHEN:
+            - The document list is filtered by is_in_inbox=true
+        THEN:
+            - The document appears exactly once, not once per matching tag
+        """
+        doc = Document.objects.create(title="doc", checksum="c1")
+        inbox_1 = Tag.objects.create(name="inbox1", is_inbox_tag=True)
+        inbox_2 = Tag.objects.create(name="inbox2", is_inbox_tag=True)
+        doc.tags.add(inbox_1, inbox_2)
+
+        response = self.client.get("/api/documents/?is_in_inbox=true")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc.id)
+
+    def test_custom_fields_icontains_filter_no_duplicates(self) -> None:
+        """
+        GIVEN:
+            - A document with two custom field instances that both match the
+              same custom_fields__icontains search term
+        WHEN:
+            - The document list is filtered by custom_fields__icontains
+        THEN:
+            - The document appears exactly once, not once per matching field
+        """
+        doc = Document.objects.create(title="doc", checksum="c1")
+        field_1 = CustomField.objects.create(
+            name="apple",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        field_2 = CustomField.objects.create(
+            name="apricot",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=field_1,
+            value_text="something",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=field_2,
+            value_text="something else",
+        )
+
+        response = self.client.get("/api/documents/?custom_fields__icontains=ap")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc.id)
+
     def test_custom_field_select_filter(self) -> None:
         """
         GIVEN:
