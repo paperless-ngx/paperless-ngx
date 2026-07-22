@@ -138,6 +138,18 @@ describe('PngxPdfViewerComponent', () => {
     expect(applyScaleSpy).toHaveBeenCalled()
   })
 
+  it('does not reset the viewer when it is already on the requested page', async () => {
+    await initComponent()
+
+    const viewer = (component as any).pdfViewer as PDFViewer
+    const currentPageSpy = jest.spyOn(viewer, 'currentPageNumber', 'set')
+    component.page = viewer.currentPageNumber
+
+    ;(component as any).applyViewerState()
+
+    expect(currentPageSpy).not.toHaveBeenCalled()
+  })
+
   it('dispatches find when search query changes after render', async () => {
     await initComponent()
 
