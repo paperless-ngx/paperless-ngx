@@ -294,15 +294,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
-          <context context-type="linenumber">60</context>
+          <context context-type="linenumber">62</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
-          <context context-type="linenumber">63</context>
+          <context context-type="linenumber">65</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
-          <context context-type="linenumber">66</context>
+          <context context-type="linenumber">68</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
@@ -378,7 +378,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">211</context>
+          <context context-type="linenumber">212</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.html</context>
@@ -1174,7 +1174,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">203</context>
+          <context context-type="linenumber">205</context>
         </context-group>
         <target state="translated">חיפוש מתקדם</target>
       </trans-unit>
@@ -1442,7 +1442,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">236</context>
+          <context context-type="linenumber">237</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -1762,7 +1762,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">205</context>
+          <context context-type="linenumber">206</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
@@ -1794,7 +1794,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">245</context>
+          <context context-type="linenumber">246</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
@@ -1826,7 +1826,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">254</context>
+          <context context-type="linenumber">255</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
@@ -1866,7 +1866,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">218</context>
+          <context context-type="linenumber">219</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
@@ -2234,7 +2234,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">263</context>
+          <context context-type="linenumber">264</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -2414,11 +2414,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">72</context>
+          <context context-type="linenumber">76</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">143</context>
+          <context context-type="linenumber">147</context>
         </context-group>
         <target state="translated">פתח</target>
       </trans-unit>
@@ -3290,7 +3290,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">212</context>
+          <context context-type="linenumber">210</context>
         </context-group>
         <target state="translated">הסיסמה השתנתה. אתה תנותק מהמערכת בתוך זמן קצר</target>
       </trans-unit>
@@ -3346,15 +3346,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">908</context>
+          <context context-type="linenumber">919</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">944</context>
+          <context context-type="linenumber">955</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">967</context>
+          <context context-type="linenumber">978</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.ts</context>
@@ -3754,7 +3754,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
-          <context context-type="linenumber">120</context>
+          <context context-type="linenumber">122</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -3766,11 +3766,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">82</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">149</context>
+          <context context-type="linenumber">153</context>
         </context-group>
         <target state="final">הורד</target>
       </trans-unit>
@@ -3934,7 +3934,7 @@
         <source>Ask a question about this document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.ts</context>
-          <context context-type="linenumber">42</context>
+          <context context-type="linenumber">49</context>
         </context-group>
         <target state="translated">שאל שאלה לגבי מסמך זה...</target>
       </trans-unit>
@@ -3942,7 +3942,7 @@
         <source>Ask a question about a document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.ts</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">50</context>
         </context-group>
         <target state="translated">שאל שאלה לגבי מסמך...</target>
       </trans-unit>
@@ -3990,27 +3990,27 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">545</context>
+          <context context-type="linenumber">556</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">585</context>
+          <context context-type="linenumber">596</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">623</context>
+          <context context-type="linenumber">634</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">661</context>
+          <context context-type="linenumber">672</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">723</context>
+          <context context-type="linenumber">734</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">856</context>
+          <context context-type="linenumber">867</context>
         </context-group>
         <target state="translated">אשר</target>
       </trans-unit>
@@ -4162,7 +4162,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">79</context>
         </context-group>
         <target state="translated">צפייה</target>
       </trans-unit>
@@ -4194,7 +4194,7 @@
         <source>Saved field &quot;<x id="PH" equiv-text="newField.name"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.ts</context>
-          <context context-type="linenumber">129</context>
+          <context context-type="linenumber">132</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.ts</context>
@@ -4206,7 +4206,7 @@
         <source>Error saving field.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.ts</context>
-          <context context-type="linenumber">138</context>
+          <context context-type="linenumber">141</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.ts</context>
@@ -4414,7 +4414,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">272</context>
+          <context context-type="linenumber">273</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -5382,7 +5382,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/document-link/document-link.component.ts</context>
-          <context context-type="linenumber">72</context>
+          <context context-type="linenumber">73</context>
         </context-group>
         <target state="translated">לא נמצאו מסמכים</target>
       </trans-unit>
@@ -6262,7 +6262,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">860</context>
+          <context context-type="linenumber">871</context>
         </context-group>
         <target state="translated">העבר לסל המיחזור</target>
       </trans-unit>
@@ -6482,7 +6482,7 @@
         <source>Create</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
-          <context context-type="linenumber">56</context>
+          <context context-type="linenumber">54</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/share-links-dialog/share-links-dialog.component.html</context>
@@ -6498,7 +6498,7 @@
         <source>Apply</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
-          <context context-type="linenumber">62</context>
+          <context context-type="linenumber">60</context>
         </context-group>
         <target state="translated">החל</target>
       </trans-unit>
@@ -6506,7 +6506,7 @@
         <source>Click again to exclude items.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">73</context>
         </context-group>
         <target state="translated">לחץ שוב כדי לא לכלול פריטים.</target>
       </trans-unit>
@@ -6514,7 +6514,7 @@
         <source>Not assigned</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.ts</context>
-          <context context-type="linenumber">99</context>
+          <context context-type="linenumber">100</context>
         </context-group>
         <note priority="1" from="description">Filter drop down element to filter for documents with no correspondent/type/tag assigned</note>
         <target state="translated">לא הוקצה</target>
@@ -6523,7 +6523,7 @@
         <source>Open <x id="PH" equiv-text="this.title"/> filter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.ts</context>
-          <context context-type="linenumber">823</context>
+          <context context-type="linenumber">828</context>
         </context-group>
         <target state="translated">פתחו מסנן <x id="PH" equiv-text="this.title"/></target>
       </trans-unit>
@@ -6659,7 +6659,7 @@
         <source>Search for documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/document-link/document-link.component.ts</context>
-          <context context-type="linenumber">81</context>
+          <context context-type="linenumber">82</context>
         </context-group>
         <target state="translated">חפש מסמכים</target>
       </trans-unit>
@@ -7256,7 +7256,7 @@
         <source>Emails must match</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">146</context>
+          <context context-type="linenumber">144</context>
         </context-group>
         <target state="translated">שדות הדוא״ל אינם תואמים. תקן והקלד מחדש</target>
       </trans-unit>
@@ -7264,7 +7264,7 @@
         <source>Passwords must match</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">173</context>
+          <context context-type="linenumber">171</context>
         </context-group>
         <target state="translated">הסיסמאות חייבות להיות תואמות</target>
       </trans-unit>
@@ -7272,7 +7272,7 @@
         <source>Profile updated successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">209</context>
+          <context context-type="linenumber">207</context>
         </context-group>
         <target state="translated">פרופיל עודכן בהצלחה</target>
       </trans-unit>
@@ -7280,7 +7280,7 @@
         <source>Error saving profile</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">223</context>
+          <context context-type="linenumber">221</context>
         </context-group>
         <target state="translated">שגיאה בשמירת פרופיל</target>
       </trans-unit>
@@ -7288,7 +7288,7 @@
         <source>Error generating auth token</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">241</context>
+          <context context-type="linenumber">239</context>
         </context-group>
         <target state="translated">שגיאה ביצירת אסימון אימות</target>
       </trans-unit>
@@ -7312,7 +7312,7 @@
         <source>TOTP activated successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">306</context>
+          <context context-type="linenumber">309</context>
         </context-group>
         <target state="translated">TOTP הופעל בהצלחה</target>
       </trans-unit>
@@ -7320,11 +7320,11 @@
         <source>Error activating TOTP</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">308</context>
+          <context context-type="linenumber">311</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">314</context>
+          <context context-type="linenumber">317</context>
         </context-group>
         <target state="translated">שגיאה בהפעלת TOTP</target>
       </trans-unit>
@@ -7332,7 +7332,7 @@
         <source>TOTP deactivated successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">330</context>
+          <context context-type="linenumber">333</context>
         </context-group>
         <target state="translated">TOTP הושבת בהצלחה</target>
       </trans-unit>
@@ -7340,11 +7340,11 @@
         <source>Error deactivating TOTP</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">332</context>
+          <context context-type="linenumber">335</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.ts</context>
-          <context context-type="linenumber">337</context>
+          <context context-type="linenumber">340</context>
         </context-group>
         <target state="translated">שגיאה בהשבתת TOTP</target>
       </trans-unit>
@@ -8132,19 +8132,31 @@
         </context-group>
         <target state="translated">הצג הכל</target>
       </trans-unit>
+      <trans-unit id="1559883523769732271" datatype="html">
+        <source>Error while loading documents</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">163</context>
+        </context-group>
+        <target state="translated">שגיאה בעת טעינת מסמך</target>
+      </trans-unit>
       <trans-unit id="8076495233090006322" datatype="html">
         <source>Filter by correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">72</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">29</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">317</context>
+          <context context-type="linenumber">318</context>
         </context-group>
         <target state="translated">סינון לפי מכותב</target>
       </trans-unit>
@@ -8152,15 +8164,15 @@
         <source>Filter by document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
-          <context context-type="linenumber">80</context>
+          <context context-type="linenumber">82</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">96</context>
+          <context context-type="linenumber">100</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">357</context>
+          <context context-type="linenumber">358</context>
         </context-group>
         <target state="translated">סנן לפי סוגי מסמכים</target>
       </trans-unit>
@@ -8168,15 +8180,15 @@
         <source>Filter by storage path</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">87</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">106</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">364</context>
+          <context context-type="linenumber">365</context>
         </context-group>
         <target state="translated">סינון לפי נתיב אחסון</target>
       </trans-unit>
@@ -8184,7 +8196,7 @@
         <source>Filter by owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
-          <context context-type="linenumber">90</context>
+          <context context-type="linenumber">92</context>
         </context-group>
         <target state="translated">סינון לפי בעלים</target>
       </trans-unit>
@@ -8192,11 +8204,11 @@
         <source>Yes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
-          <context context-type="linenumber">100</context>
+          <context context-type="linenumber">102</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">385</context>
+          <context context-type="linenumber">386</context>
         </context-group>
         <target state="translated">כן</target>
       </trans-unit>
@@ -8204,11 +8216,11 @@
         <source>No</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
-          <context context-type="linenumber">100</context>
+          <context context-type="linenumber">102</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">385</context>
+          <context context-type="linenumber">386</context>
         </context-group>
         <target state="translated">לא</target>
       </trans-unit>
@@ -8216,7 +8228,7 @@
         <source>No documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
-          <context context-type="linenumber">184</context>
+          <context context-type="linenumber">186</context>
         </context-group>
         <target state="translated">אין מסמכים</target>
       </trans-unit>
@@ -8349,7 +8361,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">490</context>
+          <context context-type="linenumber">501</context>
         </context-group>
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
         <target state="translated">, </target>
@@ -8395,12 +8407,12 @@
         <target state="translated">התחל את הסיור</target>
       </trans-unit>
       <trans-unit id="7822640317427130239" datatype="html">
-        <source>Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></source>
+        <source>Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn()}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-asn/document-asn.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="translated">מחפש מסמכים עם מס"ד <x id="INTERPOLATION" equiv-text="{{asn}}"/></target>
+        <target state="needs-translation">Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn()}}"/></target>
       </trans-unit>
       <trans-unit id="1407560924967345762" datatype="html" approved="yes">
         <source>Page</source>
@@ -8490,7 +8502,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">69</context>
+          <context context-type="linenumber">73</context>
         </context-group>
         <target state="translated">עוד כמו זה</target>
       </trans-unit>
@@ -8550,11 +8562,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">215</context>
+          <context context-type="linenumber">216</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">194</context>
+          <context context-type="linenumber">196</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -8770,7 +8782,7 @@
         <source>Enter Password</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">516</context>
+          <context context-type="linenumber">512</context>
         </context-group>
         <target state="translated">הזן סיסמה</target>
       </trans-unit>
@@ -8946,7 +8958,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">858</context>
+          <context context-type="linenumber">869</context>
         </context-group>
         <target state="translated">ניתן לשחזר מסמכים לפני מחיקה סופית.</target>
       </trans-unit>
@@ -8966,7 +8978,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">904</context>
+          <context context-type="linenumber">915</context>
         </context-group>
         <target state="translated">אישור עיבוד מחדש</target>
       </trans-unit>
@@ -9190,7 +9202,7 @@
         <source>Error deleting version</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.ts</context>
-          <context context-type="linenumber">155</context>
+          <context context-type="linenumber">156</context>
         </context-group>
         <target state="translated">שגיאה במחיקת הגירסה</target>
       </trans-unit>
@@ -9198,7 +9210,7 @@
         <source>Error updating version label</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.ts</context>
-          <context context-type="linenumber">188</context>
+          <context context-type="linenumber">189</context>
         </context-group>
         <target state="translated">עדכון תווית הגירסה נכשל</target>
       </trans-unit>
@@ -9206,7 +9218,7 @@
         <source>Uploading new version. Processing will happen in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.ts</context>
-          <context context-type="linenumber">210</context>
+          <context context-type="linenumber">211</context>
         </context-group>
         <target state="translated">גירסה חדשה מועלת. העיבוד יתבצע ברקע.</target>
       </trans-unit>
@@ -9214,7 +9226,7 @@
         <source>Missing task ID.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.ts</context>
-          <context context-type="linenumber">223</context>
+          <context context-type="linenumber">224</context>
         </context-group>
         <target state="translated">חסר מזהה המשימה.</target>
       </trans-unit>
@@ -9222,11 +9234,11 @@
         <source>Upload failed.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.ts</context>
-          <context context-type="linenumber">245</context>
+          <context context-type="linenumber">246</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.ts</context>
-          <context context-type="linenumber">268</context>
+          <context context-type="linenumber">271</context>
         </context-group>
         <target state="translated">כשל בהעלאה.</target>
       </trans-unit>
@@ -9234,7 +9246,7 @@
         <source>Error uploading new version</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.ts</context>
-          <context context-type="linenumber">270</context>
+          <context context-type="linenumber">274</context>
         </context-group>
         <target state="translated">שגיאה בהעלאת גירסה חדשה</target>
       </trans-unit>
@@ -9362,7 +9374,7 @@
         <source>Error executing bulk operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">319</context>
+          <context context-type="linenumber">326</context>
         </context-group>
         <target state="translated">שגיאת הרצת קבוצת פקודות</target>
       </trans-unit>
@@ -9370,11 +9382,11 @@
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">482</context>
+          <context context-type="linenumber">493</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">488</context>
+          <context context-type="linenumber">499</context>
         </context-group>
         <target state="translated">"<x id="PH" equiv-text="items[0].name"/>"</target>
       </trans-unit>
@@ -9382,7 +9394,7 @@
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot; and &quot;<x id="PH_1" equiv-text="items[1].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">484</context>
+          <context context-type="linenumber">495</context>
         </context-group>
         <note priority="1" from="description">This is for messages like 'modify "tag1" and "tag2"'</note>
         <target state="translated">"<x id="PH" equiv-text="items[0].name"/>" ו- "<x id="PH_1" equiv-text="items[1].name"/>"</target>
@@ -9391,7 +9403,7 @@
         <source><x id="PH" equiv-text="list"/> and &quot;<x id="PH_1" equiv-text="items[items.length - 1].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">492,494</context>
+          <context context-type="linenumber">503,505</context>
         </context-group>
         <note priority="1" from="description">this is for messages like 'modify "tag1", "tag2" and "tag3"'</note>
         <target state="translated"><x id="PH" equiv-text="list"/> ו- "<x id="PH_1" equiv-text="items[items.length - 1].name"/>"</target>
@@ -9400,7 +9412,7 @@
         <source>Confirm tags assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">509</context>
+          <context context-type="linenumber">520</context>
         </context-group>
         <target state="translated">אשר שיוך תגיות</target>
       </trans-unit>
@@ -9408,7 +9420,7 @@
         <source>This operation will add the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">515</context>
+          <context context-type="linenumber">526</context>
         </context-group>
         <target state="translated">פעולה זו תוסיף את התגית "<x id="PH" equiv-text="tag.name"/>" ל־<x id="PH_1" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים.</target>
       </trans-unit>
@@ -9416,7 +9428,7 @@
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">520,522</context>
+          <context context-type="linenumber">531,533</context>
         </context-group>
         <target state="translated">פעולה זו תוסיף את התגיות <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> ל־<x id="PH_1" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים.</target>
       </trans-unit>
@@ -9424,7 +9436,7 @@
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">528</context>
+          <context context-type="linenumber">539</context>
         </context-group>
         <target state="translated">פעולה זו תסיר את התגית "<x id="PH" equiv-text="tag.name"/>" מ־<x id="PH_1" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים.</target>
       </trans-unit>
@@ -9432,7 +9444,7 @@
         <source>This operation will remove the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">533,535</context>
+          <context context-type="linenumber">544,546</context>
         </context-group>
         <target state="translated">פעולה זו תסיר את התגיות <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> מ־<x id="PH_1" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים.</target>
       </trans-unit>
@@ -9440,7 +9452,7 @@
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">537,541</context>
+          <context context-type="linenumber">548,552</context>
         </context-group>
         <target state="translated">פעולה זו תוסיף את התגיות <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> ותסיר את התגיות <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> מ־<x id="PH_2" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים.</target>
       </trans-unit>
@@ -9448,7 +9460,7 @@
         <source>Confirm correspondent assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">578</context>
+          <context context-type="linenumber">589</context>
         </context-group>
         <target state="translated">אשר שיוך כותב</target>
       </trans-unit>
@@ -9456,7 +9468,7 @@
         <source>This operation will assign the correspondent &quot;<x id="PH" equiv-text="correspondent.name"/>&quot; to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">580</context>
+          <context context-type="linenumber">591</context>
         </context-group>
         <target state="translated">פעולה זו תקצה את המכתב "<x id="PH" equiv-text="correspondent.name"/>" ל־<x id="PH_1" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים.</target>
       </trans-unit>
@@ -9464,7 +9476,7 @@
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">582</context>
+          <context context-type="linenumber">593</context>
         </context-group>
         <target state="translated">פעולה זו תסיר את המכתב מ־<x id="PH" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים.</target>
       </trans-unit>
@@ -9472,7 +9484,7 @@
         <source>Confirm document type assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">616</context>
+          <context context-type="linenumber">627</context>
         </context-group>
         <target state="translated">אשר שיוך סוג מסמך</target>
       </trans-unit>
@@ -9480,7 +9492,7 @@
         <source>This operation will assign the document type &quot;<x id="PH" equiv-text="documentType.name"/>&quot; to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">618</context>
+          <context context-type="linenumber">629</context>
         </context-group>
         <target state="translated">פעולה זו תקצה את סוג המסמך "<x id="PH" equiv-text="documentType.name"/>" ל־<x id="PH_1" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים.</target>
       </trans-unit>
@@ -9488,7 +9500,7 @@
         <source>This operation will remove the document type from <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">620</context>
+          <context context-type="linenumber">631</context>
         </context-group>
         <target state="translated">פעולה זו תסיר את סוג המסמך מ־<x id="PH" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים.</target>
       </trans-unit>
@@ -9496,7 +9508,7 @@
         <source>Confirm storage path assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">654</context>
+          <context context-type="linenumber">665</context>
         </context-group>
         <target state="translated">אשר שיוך נתיב אחסון</target>
       </trans-unit>
@@ -9504,7 +9516,7 @@
         <source>This operation will assign the storage path &quot;<x id="PH" equiv-text="storagePath.name"/>&quot; to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">656</context>
+          <context context-type="linenumber">667</context>
         </context-group>
         <target state="translated">פעולה זו תקצה את נתיב האחסון "<x id="PH" equiv-text="storagePath.name"/>" ל־<x id="PH_1" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים.</target>
       </trans-unit>
@@ -9512,7 +9524,7 @@
         <source>This operation will remove the storage path from <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">658</context>
+          <context context-type="linenumber">669</context>
         </context-group>
         <target state="translated">פעולה זו תסיר את נתיב האחסון מ־<x id="PH" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים.</target>
       </trans-unit>
@@ -9520,7 +9532,7 @@
         <source>Confirm custom field assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">687</context>
+          <context context-type="linenumber">698</context>
         </context-group>
         <target state="translated">אישור הקצאת שדה מותאם אישית</target>
       </trans-unit>
@@ -9528,7 +9540,7 @@
         <source>This operation will assign the custom field &quot;<x id="PH" equiv-text="customField.name"/>&quot; to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">693</context>
+          <context context-type="linenumber">704</context>
         </context-group>
         <target state="translated">פעולה זו תקצה את השדה המותאם אישית "<x id="PH" equiv-text="customField.name"/>" ל־<x id="PH_1" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים.</target>
       </trans-unit>
@@ -9536,7 +9548,7 @@
         <source>This operation will assign the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">698,700</context>
+          <context context-type="linenumber">709,711</context>
         </context-group>
         <target state="translated">פעולה זו תקצה את השדות המותאמים אישית <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> ל־<x id="PH_1" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים.</target>
       </trans-unit>
@@ -9544,7 +9556,7 @@
         <source>This operation will remove the custom field &quot;<x id="PH" equiv-text="customField.name"/>&quot; from <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">706</context>
+          <context context-type="linenumber">717</context>
         </context-group>
         <target state="translated">פעולה זו תסיר את השדה המותאם אישית "<x id="PH" equiv-text="customField.name"/>" מ־<x id="PH_1" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים.</target>
       </trans-unit>
@@ -9552,7 +9564,7 @@
         <source>This operation will remove the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">711,713</context>
+          <context context-type="linenumber">722,724</context>
         </context-group>
         <target state="translated">פעולה זו תסיר את השדות המותאמים אישית <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> מ־<x id="PH_1" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים.</target>
       </trans-unit>
@@ -9560,7 +9572,7 @@
         <source>This operation will assign the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> and remove the custom fields <x id="PH_1" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">715,719</context>
+          <context context-type="linenumber">726,730</context>
         </context-group>
         <target state="translated">פעולה זו תקצה את השדות המותאמים אישית <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> ותסיר את השדות המותאמים אישית <x id="PH_1" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> מ־<x id="PH_2" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים.</target>
       </trans-unit>
@@ -9568,7 +9580,7 @@
         <source>Move <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s) to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">857</context>
+          <context context-type="linenumber">868</context>
         </context-group>
         <target state="translated">להעביר <x id="PH" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים לאשפה?</target>
       </trans-unit>
@@ -9576,7 +9588,7 @@
         <source>This operation will permanently recreate the archive files for <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">905</context>
+          <context context-type="linenumber">916</context>
         </context-group>
         <target state="translated">פעולה זו תיצור מחדש באופן קבוע את קובצי הארכיון עבור <x id="PH" equiv-text="this.getSelectionSize()"/> מסמך(ים) נבחרים.</target>
       </trans-unit>
@@ -9584,7 +9596,7 @@
         <source>The archive files will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">906</context>
+          <context context-type="linenumber">917</context>
         </context-group>
         <target state="translated">קבצי הארכיון יווצרו מחדש עם ההגדרות הנוכחיות.</target>
       </trans-unit>
@@ -9592,7 +9604,7 @@
         <source>Rotate confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">941</context>
+          <context context-type="linenumber">952</context>
         </context-group>
         <target state="translated">אישור סיבוב</target>
       </trans-unit>
@@ -9600,7 +9612,7 @@
         <source>This operation will add rotated versions of the <x id="PH" equiv-text="this.getSelectionSize()"/> document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">942</context>
+          <context context-type="linenumber">953</context>
         </context-group>
         <target state="translated">פעולה זו תוסיף גרסאות מסובבות של <x id="PH" equiv-text="this.getSelectionSize()"/> מסמך(ים).</target>
       </trans-unit>
@@ -9608,7 +9620,7 @@
         <source>Merge confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">965</context>
+          <context context-type="linenumber">976</context>
         </context-group>
         <target state="translated">אישור מיזוג</target>
       </trans-unit>
@@ -9616,7 +9628,7 @@
         <source>This operation will merge <x id="PH" equiv-text="this.getSelectionSize()"/> selected documents into a new document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">966</context>
+          <context context-type="linenumber">977</context>
         </context-group>
         <target state="translated">פעולה זו תמזג <x id="PH" equiv-text="this.getSelectionSize()"/> מסמכים נבחרים למסמך חדש.</target>
       </trans-unit>
@@ -9624,7 +9636,7 @@
         <source>Merged document will be queued for consumption.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">989</context>
+          <context context-type="linenumber">1000</context>
         </context-group>
         <target state="translated">מיזוג מסמכים יכנס לתור לצורך שימוש.</target>
       </trans-unit>
@@ -9632,7 +9644,7 @@
         <source>Custom fields updated.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1013</context>
+          <context context-type="linenumber">1025</context>
         </context-group>
         <target state="translated">שדות מותאמים אישית עודכנו.</target>
       </trans-unit>
@@ -9640,7 +9652,7 @@
         <source>Error updating custom fields.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1022</context>
+          <context context-type="linenumber">1034</context>
         </context-group>
         <target state="translated">שגיאה בעת עדכון שדות מותאמים אישית.</target>
       </trans-unit>
@@ -9648,7 +9660,7 @@
         <source>Share link bundle creation requested.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1062</context>
+          <context context-type="linenumber">1082</context>
         </context-group>
         <target state="translated">נוצרה בקשה לחבילת קישורי שיתוף.</target>
       </trans-unit>
@@ -9656,7 +9668,7 @@
         <source>Share link bundle creation is not available yet.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1069</context>
+          <context context-type="linenumber">1089</context>
         </context-group>
         <target state="translated">בקשה לחבילת קישורי שיתוף עדיין אינה זמינה.</target>
       </trans-unit>
@@ -9685,15 +9697,35 @@
         </context-group>
         <target state="translated">{VAR_PLURAL, plural, =1 {פעולה זו תסיר גם שדה מותאם אישית אחד מהמסמכים שנבחרו.} other {פעולה זו תסיר גם <x id="INTERPOLATION"/> שדות מותאמים אישית מהמסמכים שנבחרו.}}</target>
       </trans-unit>
+      <trans-unit id="7575628227893972164" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="document().title | documentTitle }}"/> thumbnail</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="document().title | documentTitle }}"/> thumbnail</target>
+      </trans-unit>
       <trans-unit id="2784168796433474565" datatype="html">
         <source>Filter by tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">40</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">333</context>
+          <context context-type="linenumber">334</context>
         </context-group>
         <target state="translated">סינון לפי תג</target>
       </trans-unit>
@@ -9701,7 +9733,7 @@
         <source>View notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">91</context>
+          <context context-type="linenumber">95</context>
         </context-group>
         <target state="translated">הצגת הערות</target>
       </trans-unit>
@@ -9709,15 +9741,15 @@
         <source>Created: <x id="INTERPOLATION" equiv-text="{{ document().created | customDate }}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">115,116</context>
+          <context context-type="linenumber">119,120</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">76,77</context>
+          <context context-type="linenumber">80,81</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">91,92</context>
+          <context context-type="linenumber">95,96</context>
         </context-group>
         <target state="needs-translation">Created: <x id="INTERPOLATION" equiv-text="{{ document().created | customDate }}"/></target>
       </trans-unit>
@@ -9725,15 +9757,15 @@
         <source>Added: <x id="INTERPOLATION" equiv-text="{{ document().added | customDate }}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">116,117</context>
+          <context context-type="linenumber">120,121</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">77,78</context>
+          <context context-type="linenumber">81,82</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">92,93</context>
+          <context context-type="linenumber">96,97</context>
         </context-group>
         <target state="needs-translation">Added: <x id="INTERPOLATION" equiv-text="{{ document().added | customDate }}"/></target>
       </trans-unit>
@@ -9741,15 +9773,15 @@
         <source>Modified: <x id="INTERPOLATION" equiv-text="{{ document().modified | customDate }}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">117,118</context>
+          <context context-type="linenumber">121,122</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">78,79</context>
+          <context context-type="linenumber">82,83</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">93,94</context>
+          <context context-type="linenumber">97,98</context>
         </context-group>
         <target state="needs-translation">Modified: <x id="INTERPOLATION" equiv-text="{{ document().modified | customDate }}"/></target>
       </trans-unit>
@@ -9757,11 +9789,11 @@
         <source>{VAR_PLURAL, plural, =1 {1 page} other {<x id="INTERPOLATION"/> pages}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">138</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">110</context>
         </context-group>
         <target state="translated">{VAR_PLURAL, plural, =1 {עמוד אחד} other {<x id="INTERPOLATION"/> עמודים}}</target>
       </trans-unit>
@@ -9769,11 +9801,11 @@
         <source>Shared</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">144</context>
+          <context context-type="linenumber">148</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">129</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -9789,7 +9821,7 @@
         <source>Score:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">149</context>
+          <context context-type="linenumber">153</context>
         </context-group>
         <target state="translated">ניקוד:</target>
       </trans-unit>
@@ -9797,7 +9829,7 @@
         <source>Toggle tag filter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">20</context>
+          <context context-type="linenumber">24</context>
         </context-group>
         <target state="translated">הדלק/כבה סינון טגיות</target>
       </trans-unit>
@@ -9805,7 +9837,7 @@
         <source>Toggle correspondent filter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">47</context>
         </context-group>
         <target state="translated">הדלק/כבה סינון שולח</target>
       </trans-unit>
@@ -9813,7 +9845,7 @@
         <source>Toggle document type filter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">59</context>
+          <context context-type="linenumber">63</context>
         </context-group>
         <target state="translated">הדלק/כבה סינון סוג מסמך</target>
       </trans-unit>
@@ -9821,7 +9853,7 @@
         <source>Toggle storage path filter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">66</context>
+          <context context-type="linenumber">70</context>
         </context-group>
         <target state="translated">הדלק/כבה סינון נתיב אחסון</target>
       </trans-unit>
@@ -9861,7 +9893,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">345</context>
+          <context context-type="linenumber">346</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/document-attributes.component.html</context>
@@ -9877,7 +9909,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">338</context>
+          <context context-type="linenumber">339</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/document-attributes.component.html</context>
@@ -9981,19 +10013,11 @@
         </context-group>
         <target state="translated">(מסונן)</target>
       </trans-unit>
-      <trans-unit id="1559883523769732271" datatype="html">
-        <source>Error while loading documents</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">163</context>
-        </context-group>
-        <target state="translated">שגיאה בעת טעינת מסמך</target>
-      </trans-unit>
       <trans-unit id="494022736054110363" datatype="html">
         <source>Sort by ASN</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">192</context>
+          <context context-type="linenumber">193</context>
         </context-group>
         <target state="translated">מיון לפי ASN</target>
       </trans-unit>
@@ -10001,11 +10025,11 @@
         <source>ASN</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">196</context>
+          <context context-type="linenumber">197</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">199</context>
+          <context context-type="linenumber">201</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -10021,7 +10045,7 @@
         <source>Sort by correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">202</context>
         </context-group>
         <target state="translated">מיון לפי שולח</target>
       </trans-unit>
@@ -10029,7 +10053,7 @@
         <source>Sort by title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">210</context>
+          <context context-type="linenumber">211</context>
         </context-group>
         <target state="translated">מיון לפי כותרת</target>
       </trans-unit>
@@ -10037,7 +10061,7 @@
         <source>Sort by owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">223</context>
+          <context context-type="linenumber">224</context>
         </context-group>
         <target state="translated">מיון לפי בעלים</target>
       </trans-unit>
@@ -10045,7 +10069,7 @@
         <source>Owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">227</context>
+          <context context-type="linenumber">228</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -10061,7 +10085,7 @@
         <source>Sort by notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">232</context>
+          <context context-type="linenumber">233</context>
         </context-group>
         <target state="translated">מיון לפי הערות</target>
       </trans-unit>
@@ -10069,7 +10093,7 @@
         <source>Sort by document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">241</context>
+          <context context-type="linenumber">242</context>
         </context-group>
         <target state="translated">מיון לפי סוג מסמך</target>
       </trans-unit>
@@ -10077,7 +10101,7 @@
         <source>Sort by storage path</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">250</context>
+          <context context-type="linenumber">251</context>
         </context-group>
         <target state="translated">מיון לפי נתיב אחסון</target>
       </trans-unit>
@@ -10085,7 +10109,7 @@
         <source>Sort by created date</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">259</context>
+          <context context-type="linenumber">260</context>
         </context-group>
         <target state="translated">מיון לפי תאריך יצירה</target>
       </trans-unit>
@@ -10093,7 +10117,7 @@
         <source>Sort by added date</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">268</context>
+          <context context-type="linenumber">269</context>
         </context-group>
         <target state="translated">מיון לפי תאריך הוספה</target>
       </trans-unit>
@@ -10101,7 +10125,7 @@
         <source>Sort by number of pages</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">277</context>
+          <context context-type="linenumber">278</context>
         </context-group>
         <target state="translated">מיון לפי מספר עמודים</target>
       </trans-unit>
@@ -10109,7 +10133,7 @@
         <source>Pages</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">281</context>
+          <context context-type="linenumber">282</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -10129,7 +10153,7 @@
         <source> Shared </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">284,286</context>
+          <context context-type="linenumber">285,287</context>
         </context-group>
         <target state="translated"> משותף </target>
       </trans-unit>
@@ -10137,7 +10161,7 @@
         <source>Sort by <x id="INTERPOLATION" equiv-text="{{getDisplayCustomFieldTitle(field_id)}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">291,292</context>
+          <context context-type="linenumber">292,293</context>
         </context-group>
         <target state="translated">מיון לפי <x id="INTERPOLATION" equiv-text="{{getDisplayCustomFieldTitle(field_id)}}"/></target>
       </trans-unit>
@@ -10145,7 +10169,7 @@
         <source>Edit document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">325</context>
+          <context context-type="linenumber">326</context>
         </context-group>
         <target state="translated">עריכת מסמך</target>
       </trans-unit>
@@ -10153,7 +10177,7 @@
         <source>Preview document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">326</context>
+          <context context-type="linenumber">327</context>
         </context-group>
         <target state="translated">תצוגה מקדימה של המסמך</target>
       </trans-unit>
@@ -10161,7 +10185,7 @@
         <source>Reset filters / selection</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">326</context>
+          <context context-type="linenumber">327</context>
         </context-group>
         <target state="translated">איפוס סינון / בחירה</target>
       </trans-unit>
@@ -10169,7 +10193,7 @@
         <source>Open first [selected] document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">354</context>
+          <context context-type="linenumber">355</context>
         </context-group>
         <target state="translated">פתח את המסמך הראשון [הנבחר]</target>
       </trans-unit>
@@ -10177,7 +10201,7 @@
         <source>Previous page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">370</context>
+          <context context-type="linenumber">371</context>
         </context-group>
         <target state="translated">עמוד קודם</target>
       </trans-unit>
@@ -10185,7 +10209,7 @@
         <source>Next page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">382</context>
+          <context context-type="linenumber">383</context>
         </context-group>
         <target state="translated">עמוד הבא</target>
       </trans-unit>
@@ -10193,7 +10217,7 @@
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">416</context>
+          <context context-type="linenumber">417</context>
         </context-group>
         <target state="translated">תצוגה "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>" נשמרה בהצלחה.</target>
       </trans-unit>
@@ -10201,7 +10225,7 @@
         <source>Failed to save view &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">422</context>
+          <context context-type="linenumber">423</context>
         </context-group>
         <target state="translated">כישלון בעת שמירת תצוגה "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>".</target>
       </trans-unit>
@@ -10209,7 +10233,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">490</context>
+          <context context-type="linenumber">491</context>
         </context-group>
         <target state="translated">תצוגה "<x id="PH" equiv-text="savedView.name"/>" נוצרה בהצלחה.</target>
       </trans-unit>
@@ -10217,7 +10241,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully, but could not update visibility settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">496</context>
+          <context context-type="linenumber">497</context>
         </context-group>
         <target state="translated">התצוגה "<x id="PH" equiv-text="savedView.name"/>" נוצרה בהצלחה, אך לא ניתן היה לעדכן את הגדרות הנראות.</target>
       </trans-unit>
@@ -10233,7 +10257,7 @@
         <source>Title &amp; content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">197</context>
+          <context context-type="linenumber">199</context>
         </context-group>
         <target state="translated">כותרת &amp; תוכן</target>
       </trans-unit>
@@ -10241,7 +10265,7 @@
         <source>File type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">200</context>
+          <context context-type="linenumber">202</context>
         </context-group>
         <target state="translated">סוג קובץ</target>
       </trans-unit>
@@ -10249,7 +10273,7 @@
         <source>Custom fields (Deprecated)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">210</context>
+          <context context-type="linenumber">212</context>
         </context-group>
         <target state="translated">שדות מותאמים אישית (הוצא משימוש)</target>
       </trans-unit>
@@ -10257,7 +10281,7 @@
         <source>More like</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">215</context>
+          <context context-type="linenumber">217</context>
         </context-group>
         <target state="translated">עוד כמו</target>
       </trans-unit>
@@ -10265,7 +10289,7 @@
         <source>equals</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">221</context>
+          <context context-type="linenumber">223</context>
         </context-group>
         <target state="translated">שווה</target>
       </trans-unit>
@@ -10273,7 +10297,7 @@
         <source>is empty</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">225</context>
+          <context context-type="linenumber">227</context>
         </context-group>
         <target state="translated">הינו ריק</target>
       </trans-unit>
@@ -10281,7 +10305,7 @@
         <source>is not empty</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">229</context>
+          <context context-type="linenumber">231</context>
         </context-group>
         <target state="translated">אינו ריק</target>
       </trans-unit>
@@ -10289,7 +10313,7 @@
         <source>greater than</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">233</context>
+          <context context-type="linenumber">235</context>
         </context-group>
         <target state="translated">גדול מ</target>
       </trans-unit>
@@ -10297,7 +10321,7 @@
         <source>less than</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">237</context>
+          <context context-type="linenumber">239</context>
         </context-group>
         <target state="translated">קטן מ</target>
       </trans-unit>
@@ -10305,7 +10329,7 @@
         <source>Correspondent: <x id="PH" equiv-text="this.correspondentSelectionModel.items.find(                 (c) =&gt; c.id == +rule.value               )?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">278,282</context>
+          <context context-type="linenumber">280,284</context>
         </context-group>
         <target state="translated">שולח: <x id="PH" equiv-text="this.correspondentSelectionModel.items.find(                 (c) =&gt; c.id == +rule.value               )?.name"/></target>
       </trans-unit>
@@ -10313,7 +10337,7 @@
         <source>Without correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">284</context>
+          <context context-type="linenumber">286</context>
         </context-group>
         <target state="translated">ללא מכותבים</target>
       </trans-unit>
@@ -10321,7 +10345,7 @@
         <source>Document type: <x id="PH" equiv-text="this.documentTypeSelectionModel.items.find(                 (dt) =&gt; dt.id == +rule.value               )?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">290,294</context>
+          <context context-type="linenumber">292,296</context>
         </context-group>
         <target state="translated">סוג מסמך: <x id="PH" equiv-text="this.documentTypeSelectionModel.items.find(                 (dt) =&gt; dt.id == +rule.value               )?.name"/></target>
       </trans-unit>
@@ -10329,7 +10353,7 @@
         <source>Without document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">296</context>
+          <context context-type="linenumber">298</context>
         </context-group>
         <target state="translated">ללא סוג מסמך</target>
       </trans-unit>
@@ -10337,7 +10361,7 @@
         <source>Storage path: <x id="PH" equiv-text="this.storagePathSelectionModel.items.find(                 (sp) =&gt; sp.id == +rule.value               )?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">302,306</context>
+          <context context-type="linenumber">304,308</context>
         </context-group>
         <target state="translated">נתיב אחסון: <x id="PH" equiv-text="this.storagePathSelectionModel.items.find(                 (sp) =&gt; sp.id == +rule.value               )?.name"/></target>
       </trans-unit>
@@ -10345,7 +10369,7 @@
         <source>Without storage path</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">308</context>
+          <context context-type="linenumber">310</context>
         </context-group>
         <target state="translated">ללא נתיב אחסון</target>
       </trans-unit>
@@ -10353,7 +10377,7 @@
         <source>Tag: <x id="PH" equiv-text="this.tagSelectionModel.items.find((t) =&gt; t.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">312,314</context>
+          <context context-type="linenumber">314,316</context>
         </context-group>
         <target state="translated">תגית: <x id="PH" equiv-text="this.tagSelectionModel.items.find((t) =&gt; t.id == +rule.value)?.name"/></target>
       </trans-unit>
@@ -10361,7 +10385,7 @@
         <source>Without any tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">318</context>
+          <context context-type="linenumber">320</context>
         </context-group>
         <target state="translated">ללא תיוג</target>
       </trans-unit>
@@ -10369,7 +10393,7 @@
         <source>Custom fields query</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">322</context>
+          <context context-type="linenumber">324</context>
         </context-group>
         <target state="translated">שאילתת שדות מותאמים אישית</target>
       </trans-unit>
@@ -10377,7 +10401,7 @@
         <source>Title: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">326</context>
+          <context context-type="linenumber">328</context>
         </context-group>
         <target state="translated">כותרת: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -10385,7 +10409,7 @@
         <source>Title &amp; content: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">330</context>
+          <context context-type="linenumber">332</context>
         </context-group>
         <target state="translated">כותרת &amp; תוכן: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -10393,7 +10417,7 @@
         <source>ASN: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">333</context>
+          <context context-type="linenumber">335</context>
         </context-group>
         <target state="translated">מס"ד: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -10401,7 +10425,7 @@
         <source>Owner: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">336</context>
+          <context context-type="linenumber">338</context>
         </context-group>
         <target state="translated">בעלים: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -10409,7 +10433,7 @@
         <source>Owner not in: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">339</context>
+          <context context-type="linenumber">341</context>
         </context-group>
         <target state="translated">הבעלים לא נכלל בתוך: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
@@ -10417,7 +10441,7 @@
         <source>Without an owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">342</context>
+          <context context-type="linenumber">344</context>
         </context-group>
         <target state="translated">ללא בעלים</target>
       </trans-unit>
