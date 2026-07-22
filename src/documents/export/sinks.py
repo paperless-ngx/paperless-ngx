@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import abc
 import hashlib
 import json
+from contextlib import AbstractContextManager
 from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
@@ -51,7 +53,7 @@ class StreamingManifestWriter:
         self._file.write("\n]")
 
 
-class ExportSink:
+class ExportSink(AbstractContextManager, abc.ABC):
     """Destination for a document export.
 
     The command declares export contents via three verbs; the sink decides how to
@@ -65,31 +67,32 @@ class ExportSink:
         failed run leaves a complete-looking artifact.
     """
 
+    @abc.abstractmethod
     def add_file(
         self,
         source: Path,
         arcname: str,
         *,
         checksum: str | None = None,
-    ) -> None:
-        raise NotImplementedError  # pragma: no cover
+    ) -> None: ...
 
-    def add_json(self, content: list | dict, arcname: str) -> None:
-        raise NotImplementedError  # pragma: no cover
+    @abc.abstractmethod
+    def add_json(self, content: list | dict, arcname: str) -> None: ...
 
+    @abc.abstractmethod
     def stream(self, arcname: str):  # -> contextmanager yielding TextIO
-        raise NotImplementedError  # pragma: no cover
+        ...
 
     def _open(self) -> None:
         """Hook called on context entry. Override as needed."""
 
+    @abc.abstractmethod
     def _finalize(self) -> None:
         """Commit on clean exit."""
-        raise NotImplementedError  # pragma: no cover
 
+    @abc.abstractmethod
     def _abort(self) -> None:
         """Roll back on exception."""
-        raise NotImplementedError  # pragma: no cover
 
     def __enter__(self) -> ExportSink:
         self._open()
