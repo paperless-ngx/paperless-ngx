@@ -4,8 +4,8 @@
 
 ### Breaking Changes
 
-- Breaking: Remove the positional arguments from the pre/post consume scripts [@stumpylog](https://github.com/stumpylog) ([#12573](https://github.com/paperless-ngx/paperless-ngx/pull/12573))
-- Breaking: Decouple OCR control from archive file control [@stumpylog](https://github.com/stumpylog) ([#12448](https://github.com/paperless-ngx/paperless-ngx/pull/12448))
+- [BREAKING] Remove the positional arguments from the pre/post consume scripts [@stumpylog](https://github.com/stumpylog) ([#12573](https://github.com/paperless-ngx/paperless-ngx/pull/12573))
+- [BREAKING] Decouple OCR control from archive file control [@stumpylog](https://github.com/stumpylog) ([#12448](https://github.com/paperless-ngx/paperless-ngx/pull/12448))
 - [BREAKING] Chore: drop support for api versions \< 9 [@shamoon](https://github.com/shamoon) ([#12284](https://github.com/paperless-ngx/paperless-ngx/pull/12284))
 - [BREAKING] Chore: Drop support for Python 3.10 [@stumpylog](https://github.com/stumpylog) ([#12234](https://github.com/paperless-ngx/paperless-ngx/pull/12234))
 - [BREAKING] Chore: Refactor advanced database settings to allow more user configuration [@stumpylog](https://github.com/stumpylog) ([#12165](https://github.com/paperless-ngx/paperless-ngx/pull/12165))
@@ -623,7 +623,7 @@
 - Feature: Tune SQLite default settings for increased speed [@stumpylog](https://github.com/stumpylog) ([#12580](https://github.com/paperless-ngx/paperless-ngx/pull/12580))
 - Feature: Document fuzzy match improvements [@stumpylog](https://github.com/stumpylog) ([#12579](https://github.com/paperless-ngx/paperless-ngx/pull/12579))
 - Fix: reject invalid requests to API notes endpoint [@ggouzi](https://github.com/ggouzi) ([#12582](https://github.com/paperless-ngx/paperless-ngx/pull/12582))
-- Breaking: Remove the positional arguments from the pre/post consume scripts [@stumpylog](https://github.com/stumpylog) ([#12573](https://github.com/paperless-ngx/paperless-ngx/pull/12573))
+- [BREAKING] Remove the positional arguments from the pre/post consume scripts [@stumpylog](https://github.com/stumpylog) ([#12573](https://github.com/paperless-ngx/paperless-ngx/pull/12573))
 - Chore(deps): Bump follow-redirects from 1.15.11 to 1.16.0 in /src-ui in the npm\_and\_yarn group across 1 directory @[dependabot[bot]](https://github.com/apps/dependabot) ([#12575](https://github.com/paperless-ngx/paperless-ngx/pull/12575))
 - Chore(deps): Bump pillow from 12.1.1 to 12.2.0 in the uv group across 1 directory @[dependabot[bot]](https://github.com/apps/dependabot) ([#12574](https://github.com/paperless-ngx/paperless-ngx/pull/12574))
 - Chore(deps-dev): Bump pytest from 9.0.2 to 9.0.3 in the uv group across 1 directory @[dependabot[bot]](https://github.com/apps/dependabot) ([#12568](https://github.com/paperless-ngx/paperless-ngx/pull/12568))
@@ -641,7 +641,7 @@
 - Chore(deps-dev): Bump @playwright/test from 1.58.2 to 1.59.0 in /src-ui @[dependabot[bot]](https://github.com/apps/dependabot) ([#12537](https://github.com/paperless-ngx/paperless-ngx/pull/12537))
 - Enhancement: add view\_global\_statistics and view\_system\_status permissions [@shamoon](https://github.com/shamoon) ([#12530](https://github.com/paperless-ngx/paperless-ngx/pull/12530))
 - Chore(deps): Bump the npm\_and\_yarn group across 1 directory with 2 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#12531](https://github.com/paperless-ngx/paperless-ngx/pull/12531))
-- Breaking: Decouple OCR control from archive file control [@stumpylog](https://github.com/stumpylog) ([#12448](https://github.com/paperless-ngx/paperless-ngx/pull/12448))
+- [BREAKING] Decouple OCR control from archive file control [@stumpylog](https://github.com/stumpylog) ([#12448](https://github.com/paperless-ngx/paperless-ngx/pull/12448))
 - Fixhancement: include sharelinks + bundles in export/import [@shamoon](https://github.com/shamoon) ([#12479](https://github.com/paperless-ngx/paperless-ngx/pull/12479))
 - Chore: Better typed status manager messages [@stumpylog](https://github.com/stumpylog) ([#12509](https://github.com/paperless-ngx/paperless-ngx/pull/12509))
 - Enhancement: unify text search to use tantivy [@shamoon](https://github.com/shamoon) ([#12485](https://github.com/paperless-ngx/paperless-ngx/pull/12485))
