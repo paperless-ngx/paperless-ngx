@@ -3389,7 +3389,7 @@ class SelectionDataView(GenericAPIView[Any]):
     ),
 )
 class SearchAutoCompleteView(GenericAPIView[Any]):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, ViewDocumentsPermissions)
 
     def get(self, request, format=None):
         user = self.request.user if hasattr(self.request, "user") else None
