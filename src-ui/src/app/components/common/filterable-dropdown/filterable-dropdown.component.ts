@@ -801,12 +801,17 @@ export class FilterableDropdownComponent
 
   private keyboardIndex: number
 
+  public get filteredItems(): MatchingModel[] {
+    return this.filterPipe
+      .transform(this.items, this.filterText, 'name')
+      .filter((item) => this.allowSelectNone || Boolean(item.id))
+  }
+
   public get scrollViewportHeight(): number {
-    const filteredLength = this.filterPipe.transform(
-      this.items,
-      this.filterText
-    ).length
-    return Math.min(filteredLength * this.FILTERABLE_BUTTON_HEIGHT_PX, 400)
+    return Math.min(
+      this.filteredItems.length * this.FILTERABLE_BUTTON_HEIGHT_PX,
+      400
+    )
   }
 
   constructor() {
@@ -878,7 +883,7 @@ export class FilterableDropdownComponent
   }
 
   listFilterEnter(): void {
-    let filtered = this.filterPipe.transform(this.items, this.filterText)
+    const filtered = this.filteredItems
     if (filtered.length == 1) {
       this.selectionModel.toggle(filtered[0].id)
       setTimeout(() => {
