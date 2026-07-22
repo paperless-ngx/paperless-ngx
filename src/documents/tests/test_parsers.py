@@ -1,228 +1,127 @@
-from tempfile import TemporaryDirectory
-from unittest import mock
+from collections.abc import Generator
 
-from django.apps import apps
-from django.test import TestCase
-from django.test import override_settings
+import pytest
+from pytest_django.fixtures import SettingsWrapper
 
 from documents.parsers import get_default_file_extension
-from documents.parsers import get_parser_class_for_mime_type
 from documents.parsers import get_supported_file_extensions
 from documents.parsers import is_file_ext_supported
-from paperless_tesseract.parsers import RasterisedDocumentParser
-from paperless_text.parsers import TextDocumentParser
-from paperless_tika.parsers import TikaDocumentParser
+from paperless.parsers.registry import get_parser_registry
+from paperless.parsers.registry import reset_parser_registry
+from paperless.parsers.tesseract import RasterisedDocumentParser
+from paperless.parsers.text import TextDocumentParser
+from paperless.parsers.tika import TikaDocumentParser
 
 
-class TestParserDiscovery(TestCase):
-    @mock.patch("documents.parsers.document_consumer_declaration.send")
-    def test_get_parser_class_1_parser(self, m, *args):
-        """
-        GIVEN:
-            - Parser declared for a given mimetype
-        WHEN:
-            - Attempt to get parser for the mimetype
-        THEN:
-            - Declared parser class is returned
-        """
-
-        class DummyParser:
-            pass
-
-        m.return_value = (
-            (
-                None,
-                {
-                    "weight": 0,
-                    "parser": DummyParser,
-                    "mime_types": {"application/pdf": ".pdf"},
-                },
-            ),
-        )
-
-        self.assertEqual(get_parser_class_for_mime_type("application/pdf"), DummyParser)
-
-    @mock.patch("documents.parsers.document_consumer_declaration.send")
-    def test_get_parser_class_n_parsers(self, m, *args):
-        """
-        GIVEN:
-            - Two parsers declared for a given mimetype
-            - Second parser has a higher weight
-        WHEN:
-            - Attempt to get parser for the mimetype
-        THEN:
-            - Second parser class is returned
-        """
-
-        class DummyParser1:
-            pass
-
-        class DummyParser2:
-            pass
-
-        m.return_value = (
-            (
-                None,
-                {
-                    "weight": 0,
-                    "parser": DummyParser1,
-                    "mime_types": {"application/pdf": ".pdf"},
-                },
-            ),
-            (
-                None,
-                {
-                    "weight": 1,
-                    "parser": DummyParser2,
-                    "mime_types": {"application/pdf": ".pdf"},
-                },
-            ),
-        )
-
-        self.assertEqual(
-            get_parser_class_for_mime_type("application/pdf"),
-            DummyParser2,
-        )
-
-    @mock.patch("documents.parsers.document_consumer_declaration.send")
-    def test_get_parser_class_0_parsers(self, m, *args):
-        """
-        GIVEN:
-            - No parsers are declared
-        WHEN:
-            - Attempt to get parser for the mimetype
-        THEN:
-            - No parser class is returned
-        """
-        m.return_value = []
-        with TemporaryDirectory():
-            self.assertIsNone(get_parser_class_for_mime_type("application/pdf"))
-
-    @mock.patch("documents.parsers.document_consumer_declaration.send")
-    def test_get_parser_class_no_valid_parser(self, m, *args):
-        """
-        GIVEN:
-            - No parser declared for a given mimetype
-            - Parser declared for a different mimetype
-        WHEN:
-            - Attempt to get parser for the given mimetype
-        THEN:
-            - No parser class is returned
-        """
-
-        class DummyParser:
-            pass
-
-        m.return_value = (
-            (
-                None,
-                {
-                    "weight": 0,
-                    "parser": DummyParser,
-                    "mime_types": {"application/pdf": ".pdf"},
-                },
-            ),
-        )
-
-        self.assertIsNone(get_parser_class_for_mime_type("image/tiff"))
+@pytest.fixture()
+def _tika_registry(settings: SettingsWrapper) -> Generator[None, None, None]:
+    """
+    Rebuild the parser registry with Tika enabled for the duration of the
+    test, then reset on exit so other tests see the default (Tika-disabled)
+    registry.
+    """
+    settings.TIKA_ENABLED = True
+    reset_parser_registry()
+    yield
+    reset_parser_registry()
 
 
-class TestParserAvailability(TestCase):
-    def test_tesseract_parser(self):
+@pytest.mark.django_db
+class TestParserAvailability:
+    @pytest.mark.parametrize(
+        ("mime_type", "ext"),
+        [
+            pytest.param("application/pdf", ".pdf", id="pdf"),
+            pytest.param("image/png", ".png", id="png"),
+            pytest.param("image/jpeg", ".jpg", id="jpeg"),
+            pytest.param("image/tiff", ".tif", id="tiff"),
+            pytest.param("image/webp", ".webp", id="webp"),
+        ],
+    )
+    def test_tesseract_parser(self, mime_type: str, ext: str) -> None:
         """
         GIVEN:
             - Various mime types
         WHEN:
             - The parser class is instantiated
         THEN:
-            - The Tesseract based parser is return
+            - The Tesseract based parser is returned
         """
-        supported_mimes_and_exts = [
-            ("application/pdf", ".pdf"),
-            ("image/png", ".png"),
-            ("image/jpeg", ".jpg"),
-            ("image/tiff", ".tif"),
-            ("image/webp", ".webp"),
-        ]
+        assert ext in get_supported_file_extensions()
+        assert get_default_file_extension(mime_type) == ext
+        assert isinstance(
+            get_parser_registry().get_parser_for_file(mime_type, "")(),
+            RasterisedDocumentParser,
+        )
 
-        supported_exts = get_supported_file_extensions()
-
-        for mime_type, ext in supported_mimes_and_exts:
-            self.assertIn(ext, supported_exts)
-            self.assertEqual(get_default_file_extension(mime_type), ext)
-            self.assertIsInstance(
-                get_parser_class_for_mime_type(mime_type)(logging_group=None),
-                RasterisedDocumentParser,
-            )
-
-    def test_text_parser(self):
+    @pytest.mark.parametrize(
+        ("mime_type", "ext"),
+        [
+            pytest.param("text/plain", ".txt", id="plain"),
+            pytest.param("text/csv", ".csv", id="csv"),
+        ],
+    )
+    def test_text_parser(self, mime_type: str, ext: str) -> None:
         """
         GIVEN:
             - Various mime types of a text form
         WHEN:
             - The parser class is instantiated
         THEN:
-            - The text based parser is return
+            - The text based parser is returned
         """
-        supported_mimes_and_exts = [
-            ("text/plain", ".txt"),
-            ("text/csv", ".csv"),
-        ]
+        assert ext in get_supported_file_extensions()
+        assert get_default_file_extension(mime_type) == ext
+        assert isinstance(
+            get_parser_registry().get_parser_for_file(mime_type, "")(),
+            TextDocumentParser,
+        )
 
-        supported_exts = get_supported_file_extensions()
-
-        for mime_type, ext in supported_mimes_and_exts:
-            self.assertIn(ext, supported_exts)
-            self.assertEqual(get_default_file_extension(mime_type), ext)
-            self.assertIsInstance(
-                get_parser_class_for_mime_type(mime_type)(logging_group=None),
-                TextDocumentParser,
-            )
-
-    def test_tika_parser(self):
+    @pytest.mark.usefixtures("_tika_registry")
+    @pytest.mark.parametrize(
+        ("mime_type", "ext"),
+        [
+            pytest.param(
+                "application/vnd.oasis.opendocument.text",
+                ".odt",
+                id="odt",
+            ),
+            pytest.param("text/rtf", ".rtf", id="rtf"),
+            pytest.param("application/msword", ".doc", id="doc"),
+            pytest.param(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ".docx",
+                id="docx",
+            ),
+        ],
+    )
+    def test_tika_parser(self, mime_type: str, ext: str) -> None:
         """
         GIVEN:
-            - Various mime types of a office document form
+            - Various mime types of an office document form
         WHEN:
             - The parser class is instantiated
         THEN:
-            - The Tika/Gotenberg based parser is return
+            - The Tika/Gotenberg based parser is returned
         """
-        supported_mimes_and_exts = [
-            ("application/vnd.oasis.opendocument.text", ".odt"),
-            ("text/rtf", ".rtf"),
-            ("application/msword", ".doc"),
-            (
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                ".docx",
-            ),
-        ]
+        assert ext in get_supported_file_extensions()
+        assert get_default_file_extension(mime_type) == ext
+        assert isinstance(
+            get_parser_registry().get_parser_for_file(mime_type, "")(),
+            TikaDocumentParser,
+        )
 
-        # Force the app ready to notice the settings override
-        with override_settings(TIKA_ENABLED=True, INSTALLED_APPS=["paperless_tika"]):
-            app = apps.get_app_config("paperless_tika")
-            app.ready()
-            supported_exts = get_supported_file_extensions()
+    def test_no_parser_for_mime(self) -> None:
+        assert get_parser_registry().get_parser_for_file("text/sdgsdf", "") is None
 
-        for mime_type, ext in supported_mimes_and_exts:
-            self.assertIn(ext, supported_exts)
-            self.assertEqual(get_default_file_extension(mime_type), ext)
-            self.assertIsInstance(
-                get_parser_class_for_mime_type(mime_type)(logging_group=None),
-                TikaDocumentParser,
-            )
-
-    def test_no_parser_for_mime(self):
-        self.assertIsNone(get_parser_class_for_mime_type("text/sdgsdf"))
-
-    def test_default_extension(self):
-        # Test no parser declared still returns a an extension
-        self.assertEqual(get_default_file_extension("application/zip"), ".zip")
+    def test_default_extension(self) -> None:
+        # Test no parser declared still returns an extension
+        assert get_default_file_extension("application/zip") == ".zip"
 
         # Test invalid mimetype returns no extension
-        self.assertEqual(get_default_file_extension("aasdasd/dgfgf"), "")
+        assert get_default_file_extension("aasdasd/dgfgf") == ""
 
-    def test_file_extension_support(self):
-        self.assertTrue(is_file_ext_supported(".pdf"))
-        self.assertFalse(is_file_ext_supported(".hsdfh"))
-        self.assertFalse(is_file_ext_supported(""))
+    def test_file_extension_support(self) -> None:
+        assert is_file_ext_supported(".pdf")
+        assert not is_file_ext_supported(".hsdfh")
+        assert not is_file_ext_supported("")

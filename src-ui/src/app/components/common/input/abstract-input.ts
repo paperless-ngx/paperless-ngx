@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Directive,
   ElementRef,
   EventEmitter,
@@ -6,12 +7,15 @@ import {
   OnInit,
   Output,
   ViewChild,
+  inject,
 } from '@angular/core'
 import { ControlValueAccessor } from '@angular/forms'
 import { v4 as uuidv4 } from 'uuid'
 
 @Directive()
 export class AbstractInputComponent<T> implements OnInit, ControlValueAccessor {
+  protected readonly changeDetector = inject(ChangeDetectorRef)
+
   @ViewChild('inputField')
   inputField: ElementRef
 
@@ -23,6 +27,7 @@ export class AbstractInputComponent<T> implements OnInit, ControlValueAccessor {
 
   writeValue(newValue: any): void {
     this.value = newValue
+    this.changeDetector.markForCheck()
   }
   registerOnChange(fn: any): void {
     this.onChange = fn
@@ -32,6 +37,7 @@ export class AbstractInputComponent<T> implements OnInit, ControlValueAccessor {
   }
   setDisabledState?(isDisabled: boolean): void {
     this.disabled = isDisabled
+    this.changeDetector.markForCheck()
   }
 
   focus() {

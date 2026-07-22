@@ -1,5 +1,12 @@
 import { Clipboard, ClipboardModule } from '@angular/cdk/clipboard'
-import { Component, OnDestroy, OnInit, inject } from '@angular/core'
+import {
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core'
 import {
   NgbActiveModal,
   NgbModalModule,
@@ -8,14 +15,16 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, takeUntil } from 'rxjs'
-import { PaperlessTaskName } from 'src/app/data/paperless-task'
+import { PaperlessTaskType } from 'src/app/data/paperless-task'
 import {
   SystemStatus,
   SystemStatusItemStatus,
 } from 'src/app/data/system-status'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { FileSizePipe } from 'src/app/pipes/file-size.pipe'
 import { PermissionsService } from 'src/app/services/permissions.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { SystemStatusService } from 'src/app/services/system-status.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -44,42 +53,44 @@ export class SystemStatusDialogComponent implements OnInit, OnDestroy {
   private toastService = inject(ToastService)
   private permissionsService = inject(PermissionsService)
   private websocketStatusService = inject(WebsocketStatusService)
+  private settingsService = inject(SettingsService)
 
   public SystemStatusItemStatus = SystemStatusItemStatus
-  public PaperlessTaskName = PaperlessTaskName
-  public status: SystemStatus
+  public PaperlessTaskType = PaperlessTaskType
+  @Input() status = signal<SystemStatus>(undefined)
   public frontendVersion: string = environment.version
-  public versionMismatch: boolean = false
-
-  public copied: boolean = false
-
-  private runningTasks: Set<PaperlessTaskName> = new Set()
+  readonly versionMismatch = signal(false)
+  readonly copied = signal(false)
+  readonly runningTasks = signal<Set<PaperlessTaskType>>(new Set())
   private unsubscribeNotifier: Subject<any> = new Subject()
 
   get currentUserIsSuperUser(): boolean {
     return this.permissionsService.isSuperUser()
   }
 
+  get aiEnabled(): boolean {
+    return this.settingsService.get(SETTINGS_KEYS.AI_ENABLED)
+  }
+
   public ngOnInit() {
-    this.versionMismatch =
+    const status = this.status()
+    this.versionMismatch.set(
       environment.production &&
-      this.status.pngx_version &&
-      this.frontendVersion &&
-      this.status.pngx_version !== this.frontendVersion
-    if (this.versionMismatch) {
-      this.status.pngx_version = `${this.status.pngx_version} (frontend: ${this.frontendVersion})`
+        status.pngx_version &&
+        this.frontendVersion &&
+        status.pngx_version !== this.frontendVersion
+    )
+    if (this.versionMismatch()) {
+      this.status.set({
+        ...status,
+        pngx_version: `${status.pngx_version} (frontend: ${this.frontendVersion})`,
+      })
     }
-    this.status.websocket_connected = this.websocketStatusService.isConnected()
-      ? SystemStatusItemStatus.OK
-      : SystemStatusItemStatus.ERROR
+    this.updateWebsocketStatus(this.websocketStatusService.isConnected())
     this.websocketStatusService
       .onConnectionStatus()
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((connected) => {
-        this.status.websocket_connected = connected
-          ? SystemStatusItemStatus.OK
-          : SystemStatusItemStatus.ERROR
-      })
+      .subscribe((connected) => this.updateWebsocketStatus(connected))
   }
 
   public close() {
@@ -87,10 +98,10 @@ export class SystemStatusDialogComponent implements OnInit, OnDestroy {
   }
 
   public copy() {
-    this.clipboard.copy(JSON.stringify(this.status, null, 4))
-    this.copied = true
+    this.clipboard.copy(JSON.stringify(this.status(), null, 4))
+    this.copied.set(true)
     setTimeout(() => {
-      this.copied = false
+      this.copied.set(false)
     }, 3000)
   }
 
@@ -100,30 +111,52 @@ export class SystemStatusDialogComponent implements OnInit, OnDestroy {
     return now.getTime() - date.getTime() > hours * 60 * 60 * 1000
   }
 
-  public isRunning(taskName: PaperlessTaskName): boolean {
-    return this.runningTasks.has(taskName)
+  public isRunning(taskName: PaperlessTaskType): boolean {
+    return this.runningTasks().has(taskName)
   }
 
-  public runTask(taskName: PaperlessTaskName) {
-    this.runningTasks.add(taskName)
+  public runTask(taskName: PaperlessTaskType) {
+    this.setTaskRunning(taskName, true)
     this.toastService.showInfo(`Task ${taskName} started`)
     this.tasksService.run(taskName).subscribe({
       next: () => {
-        this.runningTasks.delete(taskName)
+        this.setTaskRunning(taskName, false)
         this.systemStatusService.get().subscribe({
-          next: (status) => {
-            Object.assign(this.status, status)
+          next: (statusUpdate) => {
+            this.status.set({
+              ...this.status(),
+              ...statusUpdate,
+            })
           },
         })
       },
       error: (err) => {
-        this.runningTasks.delete(taskName)
+        this.setTaskRunning(taskName, false)
         this.toastService.showError(
           `Failed to start task ${taskName}, see the logs for more details`,
           err
         )
       },
     })
+  }
+
+  private updateWebsocketStatus(connected: boolean): void {
+    this.status.set({
+      ...this.status(),
+      websocket_connected: connected
+        ? SystemStatusItemStatus.OK
+        : SystemStatusItemStatus.ERROR,
+    })
+  }
+
+  private setTaskRunning(taskName: PaperlessTaskType, running: boolean): void {
+    const runningTasks = new Set(this.runningTasks())
+    if (running) {
+      runningTasks.add(taskName)
+    } else {
+      runningTasks.delete(taskName)
+    }
+    this.runningTasks.set(runningTasks)
   }
 
   ngOnDestroy(): void {

@@ -1,0 +1,136 @@
+from datetime import timedelta
+from types import SimpleNamespace
+from typing import TYPE_CHECKING
+from typing import cast
+from unittest import mock
+
+from django.db import connection
+from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
+from django.utils import timezone
+
+from documents.conditionals import metadata_etag
+from documents.conditionals import preview_etag
+from documents.conditionals import thumbnail_etag
+from documents.conditionals import thumbnail_last_modified
+from documents.models import Document
+from documents.tests.utils import DirectoriesMixin
+from documents.versioning import resolve_effective_document_by_pk
+
+if TYPE_CHECKING:
+    from rest_framework.request import Request
+
+
+class TestConditionals(DirectoriesMixin, TestCase):
+    def test_metadata_etag_uses_latest_version_for_root_request(self) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="root-checksum",
+            archive_checksum="root-archive",
+            mime_type="application/pdf",
+        )
+        latest = Document.objects.create(
+            title="v1",
+            checksum="version-checksum",
+            archive_checksum="version-archive",
+            mime_type="application/pdf",
+            root_document=root,
+        )
+        request = cast("Request", SimpleNamespace(query_params={}))
+
+        self.assertEqual(
+            metadata_etag(request, root.id),
+            f"{latest.checksum}:{latest.modified.isoformat()}",
+        )
+        # preview_etag/thumbnail_etag resolve the same (pk, request) and should
+        # reuse metadata_etag's cached resolution instead of re-querying.
+        with CaptureQueriesContext(connection) as ctx:
+            self.assertEqual(preview_etag(request, root.id), latest.archive_checksum)
+            self.assertEqual(thumbnail_etag(request, root.id), latest.checksum)
+        self.assertEqual(len(ctx.captured_queries), 0)
+
+    def test_metadata_etag_changes_when_document_modified_changes(self) -> None:
+        doc = Document.objects.create(
+            title="doc",
+            checksum="same-checksum",
+            mime_type="application/pdf",
+        )
+        # Each call simulates a separate incoming HTTP request, so it gets its
+        # own request object -- the per-request resolution cache must not leak
+        # a stale result across genuinely different requests.
+        original_etag = metadata_etag(
+            cast("Request", SimpleNamespace(query_params={})),
+            doc.id,
+        )
+        new_modified = timezone.now() + timedelta(seconds=5)
+        Document.objects.filter(id=doc.id).update(modified=new_modified)
+
+        second_request = cast("Request", SimpleNamespace(query_params={}))
+        self.assertNotEqual(metadata_etag(second_request, doc.id), original_etag)
+        self.assertEqual(
+            metadata_etag(second_request, doc.id),
+            f"{doc.checksum}:{new_modified.isoformat()}",
+        )
+
+    def test_resolve_effective_doc_returns_none_for_invalid_or_unrelated_version(
+        self,
+    ) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+        )
+        other_root = Document.objects.create(
+            title="other",
+            checksum="other",
+            mime_type="application/pdf",
+        )
+        other_version = Document.objects.create(
+            title="other-v1",
+            checksum="other-v1",
+            mime_type="application/pdf",
+            root_document=other_root,
+        )
+
+        invalid_request = cast(
+            "Request",
+            SimpleNamespace(query_params={"version": "not-a-number"}),
+        )
+        unrelated_request = cast(
+            "Request",
+            SimpleNamespace(query_params={"version": str(other_version.id)}),
+        )
+
+        self.assertIsNone(
+            resolve_effective_document_by_pk(root.id, invalid_request).document,
+        )
+        self.assertIsNone(
+            resolve_effective_document_by_pk(root.id, unrelated_request).document,
+        )
+
+    def test_thumbnail_last_modified_uses_effective_document_for_cache_key(
+        self,
+    ) -> None:
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+        )
+        latest = Document.objects.create(
+            title="v2",
+            checksum="v2",
+            mime_type="application/pdf",
+            root_document=root,
+        )
+        latest.thumbnail_path.parent.mkdir(parents=True, exist_ok=True)
+        latest.thumbnail_path.write_bytes(b"thumb")
+
+        request = cast("Request", SimpleNamespace(query_params={}))
+        with mock.patch(
+            "documents.conditionals.get_thumbnail_modified_key",
+            return_value="thumb-modified-key",
+        ) as get_thumb_key:
+            result = thumbnail_last_modified(request, root.id)
+
+        self.assertIsNotNone(result)
+        get_thumb_key.assert_called_once_with(latest.id)

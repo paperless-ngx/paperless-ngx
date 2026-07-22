@@ -39,7 +39,7 @@ class MailMessageDecryptor(MailMessagePreprocessor, LoggingMixin):
 
     NAME = "MailMessageDecryptor"
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.renew_logging_group()
         self._gpg = GPG(gnupghome=settings.EMAIL_GNUPG_HOME)

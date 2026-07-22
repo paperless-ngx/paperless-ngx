@@ -1,5 +1,5 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
-import { Component, OnDestroy, inject } from '@angular/core'
+import { Component, OnDestroy, inject, signal } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -23,7 +23,7 @@ import {
 } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Document } from 'src/app/data/document'
-import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
+import { FILTER_SIMPLE_TITLE } from 'src/app/data/filter-rule-type'
 import { DEFAULT_MATCHING_ALGORITHM } from 'src/app/data/matching-model'
 import { StoragePath } from 'src/app/data/storage-path'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
@@ -65,13 +65,13 @@ export class StoragePathEditDialogComponent
   public documentsInput$ = new Subject<string>()
   public foundDocuments$: Observable<Document[]>
   private testDocument: Document
-  public testResult: string
-  public testFailed: boolean = false
-  public loading = false
-  public testLoading = false
+  readonly testResult = signal<string>(undefined)
+  readonly testFailed = signal(false)
+  readonly testLoading = signal(false)
 
   constructor() {
     super()
+    this.loading.set(false)
     this.service = inject(StoragePathService)
     this.userService = inject(UserService)
     this.settingsService = inject(SettingsService)
@@ -99,22 +99,22 @@ export class StoragePathEditDialogComponent
 
   public testPath(document: Document) {
     if (!document) {
-      this.testResult = null
+      this.testResult.set(null)
       return
     }
     this.testDocument = document
-    this.testLoading = true
+    this.testLoading.set(true)
     ;(this.service as StoragePathService)
       .testPath(this.objectForm.get('path').value, document.id)
       .subscribe((result) => {
         if (result?.length) {
-          this.testResult = result
-          this.testFailed = false
+          this.testResult.set(result)
+          this.testFailed.set(false)
         } else {
-          this.testResult = null
-          this.testFailed = true
+          this.testResult.set(null)
+          this.testFailed.set(true)
         }
-        this.testLoading = false
+        this.testLoading.set(false)
       })
   }
 
@@ -138,7 +138,7 @@ export class StoragePathEditDialogComponent
       this.documentsInput$.pipe(
         distinctUntilChanged(),
         takeUntil(this.unsubscribeNotifier),
-        tap(() => (this.loading = true)),
+        tap(() => this.loading.set(true)),
         switchMap((title) =>
           this.documentsService
             .listFiltered(
@@ -146,13 +146,13 @@ export class StoragePathEditDialogComponent
               null,
               'created',
               true,
-              [{ rule_type: FILTER_TITLE, value: title }],
+              [{ rule_type: FILTER_SIMPLE_TITLE, value: title }],
               { truncate_content: true }
             )
             .pipe(
               map((result) => result.results),
               catchError(() => of([])), // empty on error
-              tap(() => (this.loading = false))
+              tap(() => this.loading.set(false))
             )
         )
       )

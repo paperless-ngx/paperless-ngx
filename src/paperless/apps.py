@@ -10,7 +10,7 @@ class PaperlessConfig(AppConfig):
 
     verbose_name = _("Paperless")
 
-    def ready(self):
+    def ready(self) -> None:
         from django.contrib.auth.signals import user_login_failed
 
         user_login_failed.connect(handle_failed_login)

@@ -2,7 +2,7 @@
   <div content tourAnchor="tour.upload-widget">
     <form class="justify-content-center d-flex flex-column align-items-center">
       <button type="button" class="btn btn-outline-dark bg-light shadow-sm w-100 h-100 pt-3 pb-3" (click)="fileUpload.click()">
-        <i-bs class="text-primary" name="plus-circle"></i-bs>&nbsp;
+        <i-bs class="text-primary me-1" name="plus-circle"></i-bs>
         <span class="text-primary" i18n>Upload documents</span>
         <div class="text-muted smaller fst-italic" i18n>or drop files anywhere</div>
       </button>
@@ -54,10 +54,10 @@
       @if (isFinished(status)) {
         <div>
           @if (status.documentId) {
-            <button class="btn btn-sm btn-outline-primary btn-open" routerLink="/documents/{{status.documentId}}" (click)="dismiss(status)">
+            <a class="btn btn-sm btn-outline-primary btn-open" [routerLink]="['/documents', status.documentId]" (click)="dismiss(status)">
               <small i18n>Open document</small>
               <i-bs name="arrow-right-short"></i-bs>
-            </button>
+            </a>
           }
         </div>
       }

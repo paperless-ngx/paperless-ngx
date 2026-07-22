@@ -23,10 +23,10 @@ export class ConfirmDialogComponent extends LoadingComponentWithPermissions {
   title = $localize`Confirmation`
 
   @Input()
-  messageBold
+  messageBold: string
 
   @Input()
-  message
+  message: string
 
   @Input()
   btnClass = 'btn-primary'
@@ -38,7 +38,7 @@ export class ConfirmDialogComponent extends LoadingComponentWithPermissions {
   alternativeBtnClass = 'btn-secondary'
 
   @Input()
-  alternativeBtnCaption
+  alternativeBtnCaption: string
 
   @Input()
   cancelBtnClass = 'btn-outline-secondary'

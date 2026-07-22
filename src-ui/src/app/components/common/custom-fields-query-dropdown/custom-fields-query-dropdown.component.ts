@@ -6,6 +6,7 @@ import {
   Input,
   Output,
   QueryList,
+  signal,
   ViewChild,
   ViewChildren,
 } from '@angular/core'
@@ -36,6 +37,7 @@ import {
   CustomFieldQueryExpression,
 } from 'src/app/utils/custom-field-query-element'
 import { pngxPopperOptions } from 'src/app/utils/popper-options'
+import { matchesSearchText } from 'src/app/utils/text-search'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 import { DocumentLinkComponent } from '../input/document-link/document-link.component'
@@ -277,9 +279,17 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
   @Output()
   selectionModelChange = new EventEmitter<CustomFieldQueriesModel>()
 
-  customFields: CustomField[] = []
+  readonly customFields = signal<CustomField[]>([])
 
   public readonly today: string = new Date().toLocaleDateString('en-CA')
+
+  public customFieldSearchFn = (term: string, field: CustomField): boolean =>
+    matchesSearchText(field?.name, term)
+
+  public selectOptionSearchFn = (
+    term: string,
+    option: { id: string; label: string }
+  ): boolean => matchesSearchText(option?.label, term)
 
   constructor() {
     super()
@@ -316,12 +326,12 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
       .listAll()
       .pipe(first(), takeUntil(this.unsubscribeNotifier))
       .subscribe((result) => {
-        this.customFields = result.results
+        this.customFields.set(result.results)
       })
   }
 
   public getCustomFieldByID(id: number): CustomField {
-    return this.customFields.find((field) => field.id === id)
+    return this.customFields().find((field) => field.id === id)
   }
 
   public addAtom(expression: CustomFieldQueryExpression) {
@@ -344,7 +354,7 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
   getOperatorsForField(
     fieldID: number
   ): Array<{ value: string; label: string }> {
-    const field = this.customFields.find((field) => field.id === fieldID)
+    const field = this.customFields().find((field) => field.id === fieldID)
     const groups: CustomFieldQueryOperatorGroups[] = field
       ? CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE[field.data_type]
       : [CustomFieldQueryOperatorGroups.Basic]
@@ -360,7 +370,7 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
   getSelectOptionsForField(
     fieldID: number
   ): Array<{ label: string; id: string }> {
-    const field = this.customFields.find((field) => field.id === fieldID)
+    const field = this.customFields().find((field) => field.id === fieldID)
     if (field) {
       return field.extra_data['select_options']
     }

@@ -2,6 +2,26 @@
   overflow-wrap: anywhere;
 }
 
+.fade.show {
+  animation: pngx-entry-fade 160ms ease-out;
+}
+
+@keyframes pngx-entry-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade.show {
+    animation: none;
+  }
+}
+
 .doc-img-container {
   position: relative;
 }
@@ -65,7 +85,9 @@
   }
 }
 
-span ::ng-deep .match {
+.card-text ::ng-deep .match,
+.card-text ::ng-deep b {
+  font-weight: normal;
   color: black;
   background-color: rgb(255, 211, 66);
 }

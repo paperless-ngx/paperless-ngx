@@ -5,6 +5,7 @@ import {
   inject,
   Input,
   Output,
+  signal,
 } from '@angular/core'
 import {
   FormsModule,
@@ -63,11 +64,11 @@ export class CustomFieldsValuesComponent extends AbstractInputComponent<Object> 
 
     super()
     customFieldsService.listAll().subscribe((items) => {
-      this.fields = items.results
+      this.fields.set(items.results)
     })
   }
 
-  private fields: CustomField[]
+  private readonly fields = signal<CustomField[]>([])
 
   private _selectedFields: number[]
 
@@ -90,6 +91,6 @@ export class CustomFieldsValuesComponent extends AbstractInputComponent<Object> 
   public removeSelectedField: EventEmitter<number> = new EventEmitter<number>()
 
   public getCustomField(id: number): CustomField {
-    return this.fields.find((field) => field.id === id)
+    return this.fields().find((field) => field.id === id)
   }
 }

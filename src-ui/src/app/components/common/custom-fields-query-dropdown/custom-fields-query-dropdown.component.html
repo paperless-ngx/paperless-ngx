@@ -1,8 +1,7 @@
 @if (useDropdown) {
   <div class="btn-group w-100" role="group" ngbDropdown #dropdown="ngbDropdown" (openChange)="onOpenChange($event)" [popperOptions]="popperOptions">
     <button class="btn btn-sm btn-outline-primary" id="dropdown_toggle" ngbDropdownToggle [disabled]="disabled">
-      <i-bs name="{{icon}}"></i-bs>
-      <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
+      <i-bs name="{{icon}}"></i-bs><div class="d-none d-sm-inline ms-1">{{title}}</div>
       @if (isActive) {
         <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge>
       }
@@ -64,6 +63,7 @@
       [(ngModel)]="atom.value"
       [disabled]="disabled"
       [virtualScroll]="getSelectOptionsForField(atom.field)?.length > 100"
+      [searchFn]="selectOptionSearchFn"
       (mousedown)="$event.stopImmediatePropagation()"
     ></ng-select>
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.DocumentLink) {
@@ -75,13 +75,14 @@
 
 <ng-template #queryAtom let-atom="atom">
   <div class="input-group input-group-sm">
-    <ng-select
+    <ng-select #fieldSelects
       class="paperless-input-select"
-      [items]="customFields"
+      [items]="customFields()"
       [(ngModel)]="atom.field"
       [disabled]="disabled"
       bindLabel="name"
       bindValue="id"
+      [searchFn]="customFieldSearchFn"
       (mousedown)="$event.stopImmediatePropagation()"
     ></ng-select>
     <select class="w-25 form-select" [(ngModel)]="atom.operator" [disabled]="disabled">
@@ -126,6 +127,7 @@
           [(ngModel)]="atom.value"
           [disabled]="disabled"
           [multiple]="true"
+          [searchFn]="selectOptionSearchFn"
           (mousedown)="$event.stopImmediatePropagation()"
         ></ng-select>
       }

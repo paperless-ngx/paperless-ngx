@@ -4,7 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { NgbAccordionButton, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { of, throwError } from 'rxjs'
-import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
+import { FILTER_SIMPLE_TITLE } from 'src/app/data/filter-rule-type'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -30,20 +30,20 @@ describe('StoragePathEditDialogComponent', () => {
     documentService = TestBed.inject(DocumentService)
     fixture = TestBed.createComponent(StoragePathEditDialogComponent)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = { id: 99, username: 'user99' }
+    settingsService.currentUser.set({ id: 99, username: 'user99' })
     component = fixture.componentInstance
 
     fixture.detectChanges()
   })
 
   it('should support create and edit modes', () => {
-    component.dialogMode = EditDialogMode.CREATE
+    component.dialogMode.set(EditDialogMode.CREATE)
     const createTitleSpy = jest.spyOn(component, 'getCreateTitle')
     const editTitleSpy = jest.spyOn(component, 'getEditTitle')
     fixture.detectChanges()
     expect(createTitleSpy).toHaveBeenCalled()
     expect(editTitleSpy).not.toHaveBeenCalled()
-    component.dialogMode = EditDialogMode.EDIT
+    component.dialogMode.set(EditDialogMode.EDIT)
     fixture.detectChanges()
     expect(editTitleSpy).toHaveBeenCalled()
   })
@@ -58,17 +58,17 @@ describe('StoragePathEditDialogComponent', () => {
     fixture.detectChanges()
     component.testPath({ id: 1 })
     expect(testSpy).toHaveBeenCalledWith('test/{{title}}', 1)
-    expect(component.testResult).toBe('test/abc123')
-    expect(component.testFailed).toBeFalsy()
+    expect(component.testResult()).toBe('test/abc123')
+    expect(component.testFailed()).toBeFalsy()
 
     // test failed
     testSpy.mockReturnValueOnce(of(''))
     component.testPath({ id: 1 })
-    expect(component.testResult).toBeNull()
-    expect(component.testFailed).toBeTruthy()
+    expect(component.testResult()).toBeNull()
+    expect(component.testFailed()).toBeTruthy()
 
     component.testPath(null)
-    expect(component.testResult).toBeNull()
+    expect(component.testResult()).toBeNull()
   })
 
   it('should compare two documents by id', () => {
@@ -105,7 +105,7 @@ describe('StoragePathEditDialogComponent', () => {
       null,
       'created',
       true,
-      [{ rule_type: FILTER_TITLE, value: 'bar' }],
+      [{ rule_type: FILTER_SIMPLE_TITLE, value: 'bar' }],
       { truncate_content: true }
     )
     listSpy.mockReturnValueOnce(

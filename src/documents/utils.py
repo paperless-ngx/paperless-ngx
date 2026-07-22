@@ -1,12 +1,26 @@
+import hashlib
 import logging
 import shutil
+from collections.abc import Callable
+from collections.abc import Iterable
 from os import utime
 from pathlib import Path
 from subprocess import CompletedProcess
 from subprocess import run
+from typing import TypeVar
 
 from django.conf import settings
 from PIL import Image
+
+_T = TypeVar("_T")
+
+# A function that wraps an iterable — typically used to inject a progress bar.
+IterWrapper = Callable[[Iterable[_T]], Iterable[_T]]
+
+
+def identity(iterable: Iterable[_T]) -> Iterable[_T]:
+    """Return the iterable unchanged; the no-op default for IterWrapper."""
+    return iterable
 
 
 def _coerce_to_path(
@@ -128,3 +142,28 @@ def get_boolean(boolstr: str) -> bool:
     Return a boolean value from a string representation.
     """
     return bool(boolstr.lower() in ("yes", "y", "1", "t", "true"))
+
+
+def compute_checksum(path: Path, chunk_size: int = 65536) -> str:
+    """
+    Compute the SHA-256 checksum of a file.
+
+    Reads the file in chunks to avoid loading the entire file into memory.
+
+    Args:
+        path (Path): Path to the file to hash.
+        chunk_size (int, optional): Number of bytes to read per chunk.
+            Defaults to 65536.
+
+    Returns:
+        str: Hexadecimal SHA-256 digest of the file contents.
+
+    Raises:
+        FileNotFoundError: If the file does not exist.
+        OSError: If the file cannot be read.
+    """
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        while chunk := f.read(chunk_size):
+            h.update(chunk)
+    return h.hexdigest()

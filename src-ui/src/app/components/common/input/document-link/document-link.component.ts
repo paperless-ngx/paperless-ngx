@@ -6,6 +6,7 @@ import {
   Input,
   OnDestroy,
   OnInit,
+  signal,
 } from '@angular/core'
 import {
   FormsModule,
@@ -28,7 +29,7 @@ import {
   tap,
 } from 'rxjs'
 import { Document } from 'src/app/data/document'
-import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
+import { FILTER_SIMPLE_TITLE } from 'src/app/data/filter-rule-type'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { AbstractInputComponent } from '../abstract-input'
@@ -63,7 +64,7 @@ export class DocumentLinkComponent
 
   documentsInput$ = new Subject<string>()
   foundDocuments$: Observable<Document[]>
-  loading = false
+  readonly loading = signal(false)
   selectedDocuments: Document[] = []
 
   private unsubscribeNotifier: Subject<any> = new Subject()
@@ -93,12 +94,12 @@ export class DocumentLinkComponent
       this.selectedDocuments = []
       super.writeValue([])
     } else {
-      this.loading = true
+      this.loading.set(true)
       this.documentsService
         .getFew(documentIDs, { fields: 'id,title' })
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe((documentResults) => {
-          this.loading = false
+          this.loading.set(false)
           this.selectedDocuments = documentIDs.map(
             (id) => documentResults.results.find((d) => d.id === id) ?? {}
           )
@@ -113,7 +114,7 @@ export class DocumentLinkComponent
       this.documentsInput$.pipe(
         distinctUntilChanged(),
         takeUntil(this.unsubscribeNotifier),
-        tap(() => (this.loading = true)),
+        tap(() => this.loading.set(true)),
         switchMap((title) =>
           this.documentsService
             .listFiltered(
@@ -121,7 +122,7 @@ export class DocumentLinkComponent
               null,
               'created',
               true,
-              [{ rule_type: FILTER_TITLE, value: title }],
+              [{ rule_type: FILTER_SIMPLE_TITLE, value: title }],
               { truncate_content: true }
             )
             .pipe(
@@ -133,7 +134,7 @@ export class DocumentLinkComponent
                 )
               ),
               catchError(() => of([])), // empty on error
-              tap(() => (this.loading = false))
+              tap(() => this.loading.set(false))
             )
         )
       )

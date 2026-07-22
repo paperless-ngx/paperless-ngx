@@ -4,13 +4,13 @@
 
 set -eu
 
-for command in decrypt_documents \
-	document_archiver \
+for command in document_archiver \
 	document_exporter \
 	document_importer \
 	mail_fetcher \
 	document_create_classifier \
 	document_index \
+	document_llmindex \
 	document_renamer \
 	document_retagger \
 	document_thumbnails \

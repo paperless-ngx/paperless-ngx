@@ -29,6 +29,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { FileComponent } from '../../common/input/file/file.component'
 import { NumberComponent } from '../../common/input/number/number.component'
+import { PasswordComponent } from '../../common/input/password/password.component'
 import { SelectComponent } from '../../common/input/select/select.component'
 import { SwitchComponent } from '../../common/input/switch/switch.component'
 import { TextComponent } from '../../common/input/text/text.component'
@@ -46,6 +47,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     TextComponent,
     NumberComponent,
     FileComponent,
+    PasswordComponent,
     AsyncPipe,
     NgbNavModule,
     FormsModule,
@@ -95,11 +97,11 @@ export class ConfigComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (config) => {
-          this.loading = false
+          this.loading.set(false)
           this.initialize(config)
         },
         error: (e) => {
-          this.loading = false
+          this.loading.set(false)
           this.toastService.showError($localize`Error retrieving config`, e)
         },
       })
@@ -160,20 +162,20 @@ export class ConfigComponent
   }
 
   public saveConfig() {
-    this.loading = true
+    this.loading.set(true)
     this.configService
       .saveConfig(this.configForm.value as PaperlessConfig)
       .pipe(takeUntil(this.unsubscribeNotifier), first())
       .subscribe({
         next: (config) => {
-          this.loading = false
+          this.loading.set(false)
           this.initialize(config)
           this.store.next(config)
           this.settingsService.initializeSettings().subscribe()
           this.toastService.showInfo($localize`Configuration updated`)
         },
         error: (e) => {
-          this.loading = false
+          this.loading.set(false)
           this.toastService.showError(
             $localize`An error occurred updating configuration`,
             e
@@ -187,20 +189,20 @@ export class ConfigComponent
   }
 
   public uploadFile(file: File, key: string) {
-    this.loading = true
+    this.loading.set(true)
     this.configService
       .uploadFile(file, this.configForm.value['id'], key)
       .pipe(takeUntil(this.unsubscribeNotifier), first())
       .subscribe({
         next: (config) => {
-          this.loading = false
+          this.loading.set(false)
           this.initialize(config)
           this.store.next(config)
           this.settingsService.initializeSettings().subscribe()
           this.toastService.showInfo($localize`File successfully updated`)
         },
         error: (e) => {
-          this.loading = false
+          this.loading.set(false)
           this.toastService.showError(
             $localize`An error occurred uploading file`,
             e

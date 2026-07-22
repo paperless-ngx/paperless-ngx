@@ -8,7 +8,7 @@
 {% block form_top_content %}
 		{% if not FIRST_INSTALL %}
 			<p>
-					{% blocktrans %}Already have an account? <a href="{{ login_url }}">Sign in</a>{% endblocktrans %}
+					{% translate "Already have an account?" %} <a href="{{ login_url }}">{% translate "Sign in" %}</a>
 			</p>
 		{% endif %}
 {% endblock form_top_content %}
@@ -16,7 +16,7 @@
 {% block form_content %}
 		{% if FIRST_INSTALL %}
 			<p>
-				{% blocktrans %}Note: This is the first user account for this installation and will be granted superuser privileges.{% endblocktrans %}
+				{% translate "Note: This is the first user account for this installation and will be granted superuser privileges." %}
 			</p>
 		{% endif %}
     {% translate "Username" as i18n_username %}
@@ -24,20 +24,20 @@
     {% translate "Password" as i18n_password1 %}
     {% translate "Password (again)" as i18n_password2 %}
     <div class="form-floating form-stacked-top">
-        <input type="text" name="username" id="inputUsername" placeholder="{{ i18n_username }}" class="form-control" autocorrect="off" autocapitalize="none" required autofocus>
-        <label for="inputUsername">{{ i18n_username }}</label>
+        <input type="text" name="username" id="inputUsername" placeholder="{{ i18n_username|force_escape }}" class="form-control" autocorrect="off" autocapitalize="none" required autofocus>
+        <label for="inputUsername">{{ i18n_username|force_escape }}</label>
     </div>
     <div class="form-floating form-stacked-middle">
-        <input type="email" name="email" id="inputEmail" placeholder="{{ i18n_email }}" class="form-control">
-        <label for="inputEmail">{{ i18n_email }}</label>
+        <input type="email" name="email" id="inputEmail" placeholder="{{ i18n_email|force_escape }}" class="form-control">
+        <label for="inputEmail">{{ i18n_email|force_escape }}</label>
     </div>
     <div class="form-floating form-stacked-middle">
-        <input type="password" name="password1" id="inputPassword1" placeholder="{{ i18n_password1 }}" class="form-control" required>
-        <label for="inputPassword1">{{ i18n_password1 }}</label>
+        <input type="password" name="password1" id="inputPassword1" placeholder="{{ i18n_password1|force_escape }}" class="form-control" required>
+        <label for="inputPassword1">{{ i18n_password1|force_escape }}</label>
     </div>
     <div class="form-floating form-stacked-bottom">
-        <input type="password" name="password2" id="inputPassword2" placeholder="{{ i18n_password2 }}" class="form-control" required>
-        <label for="inputPassword2">{{ i18n_password2 }}</label>
+        <input type="password" name="password2" id="inputPassword2" placeholder="{{ i18n_password2|force_escape }}" class="form-control" required>
+        <label for="inputPassword2">{{ i18n_password2|force_escape }}</label>
     </div>
     <div class="d-grid mt-3">
         <button class="btn btn-lg btn-primary" type="submit">{% translate "Sign up" %}</button>

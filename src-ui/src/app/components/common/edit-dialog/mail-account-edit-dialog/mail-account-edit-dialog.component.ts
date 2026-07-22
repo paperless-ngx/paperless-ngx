@@ -1,4 +1,4 @@
-import { Component, ViewChild, inject } from '@angular/core'
+import { Component, ViewChild, inject, signal } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -38,7 +38,7 @@ const IMAP_SECURITY_OPTIONS = [
 })
 export class MailAccountEditDialogComponent extends EditDialogComponent<MailAccount> {
   testActive: boolean = false
-  testResult: string
+  readonly testResult = signal<string>(undefined)
   alertTimeout
 
   @ViewChild('testResultAlert', { static: false }) testResultAlert: NgbAlert
@@ -77,7 +77,7 @@ export class MailAccountEditDialogComponent extends EditDialogComponent<MailAcco
 
   test() {
     this.testActive = true
-    this.testResult = null
+    this.testResult.set(null)
     clearTimeout(this.alertTimeout)
     const mailService = this.service as MailAccountService
     const newObject = Object.assign(
@@ -87,19 +87,19 @@ export class MailAccountEditDialogComponent extends EditDialogComponent<MailAcco
     mailService.test(newObject).subscribe({
       next: (result: { success: boolean }) => {
         this.testActive = false
-        this.testResult = result.success ? 'success' : 'danger'
+        this.testResult.set(result.success ? 'success' : 'danger')
         this.alertTimeout = setTimeout(() => this.testResultAlert.close(), 5000)
       },
       error: (e) => {
         this.testActive = false
-        this.testResult = 'danger'
+        this.testResult.set('danger')
         this.alertTimeout = setTimeout(() => this.testResultAlert.close(), 5000)
       },
     })
   }
 
   get testResultMessage() {
-    return this.testResult === 'success'
+    return this.testResult() === 'success'
       ? $localize`Successfully connected to the mail server`
       : $localize`Unable to connect to the mail server`
   }

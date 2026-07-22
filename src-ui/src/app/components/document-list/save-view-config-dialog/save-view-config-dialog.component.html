@@ -1,23 +1,24 @@
 <form [formGroup]="saveViewConfigForm" (ngSubmit)="save()">
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title" i18n>Save current view</h4>
-    <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
+    <button type="button" [disabled]="!closeEnabled()" class="btn-close" aria-label="Close" (click)="cancel()">
     </button>
   </div>
   <div class="modal-body">
-    <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
+    <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error()?.name" autocomplete="off"></pngx-input-text>
     <pngx-input-check i18n-title title="Show in sidebar" formControlName="showInSideBar"></pngx-input-check>
     <pngx-input-check i18n-title title="Show on dashboard" formControlName="showOnDashboard"></pngx-input-check>
-    @if (error?.filter_rules) {
+    <pngx-permissions-form accordion="true" formControlName="permissions_form"></pngx-permissions-form>
+    @if (error()?.filter_rules) {
       <div class="alert alert-danger" role="alert">
         <h6 class="alert-heading" i18n>Filter rules error occurred while saving this view</h6>
         <ng-container i18n>The error returned was</ng-container>:<br/>
-        {{ error.filter_rules }}
+        {{ error().filter_rules }}
       </div>
     }
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="!buttonsEnabled">Cancel</button>
-    <button type="submit" class="btn btn-primary" i18n [disabled]="!buttonsEnabled">Save</button>
+    <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="!buttonsEnabled()">Cancel</button>
+    <button type="submit" class="btn btn-primary" i18n [disabled]="!buttonsEnabled()">Save</button>
   </div>
 </form>

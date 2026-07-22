@@ -1,23 +1,21 @@
 import {
   HttpErrorResponse,
   HttpEvent,
-  HttpHandler,
-  HttpInterceptor,
+  HttpHandlerFn,
+  HttpInterceptorFn,
   HttpRequest,
 } from '@angular/common/http'
-import { Injectable } from '@angular/core'
 import { catchError, Observable, throwError } from 'rxjs'
 import { locationReload } from '../utils/navigation'
 
-@Injectable()
-export class AuthExpiryInterceptor implements HttpInterceptor {
-  private lastReloadAttempt = Number.NEGATIVE_INFINITY
+export const createAuthExpiryInterceptor = (): HttpInterceptorFn => {
+  let lastReloadAttempt = Number.NEGATIVE_INFINITY
 
-  intercept(
+  return (
     request: HttpRequest<unknown>,
-    next: HttpHandler
-  ): Observable<HttpEvent<unknown>> {
-    return next.handle(request).pipe(
+    next: HttpHandlerFn
+  ): Observable<HttpEvent<unknown>> =>
+    next(request).pipe(
       catchError((error: unknown) => {
         if (
           error instanceof HttpErrorResponse &&
@@ -25,8 +23,8 @@ export class AuthExpiryInterceptor implements HttpInterceptor {
           request.url.includes('/api/')
         ) {
           const now = Date.now()
-          if (now - this.lastReloadAttempt >= 2000) {
-            this.lastReloadAttempt = now
+          if (now - lastReloadAttempt >= 2000) {
+            lastReloadAttempt = now
             locationReload()
           }
         }
@@ -34,5 +32,6 @@ export class AuthExpiryInterceptor implements HttpInterceptor {
         return throwError(() => error)
       })
     )
-  }
 }
+
+export const withAuthExpiryInterceptor = createAuthExpiryInterceptor()

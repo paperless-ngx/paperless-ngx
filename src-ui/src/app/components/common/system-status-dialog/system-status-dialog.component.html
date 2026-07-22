@@ -3,7 +3,7 @@
   <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
 </div>
 <div class="modal-body">
-  @if (!status) {
+  @if (!status()) {
     <div class="w-100 h-100 d-flex align-items-center justify-content-center">
       <div>
         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
@@ -21,25 +21,25 @@
             <dl class="card-text">
               <dt i18n>Paperless-ngx Version</dt>
               <dd>
-                {{status.pngx_version}}
-                @if (versionMismatch) {
+                {{status().pngx_version}}
+                @if (versionMismatch()) {
                     <button class="btn btn-sm d-inline align-items-center btn-dark text-uppercase small" [ngbPopover]="versionPopover" triggers="click mouseenter:mouseleave">
                       <i-bs name="exclamation-triangle-fill" class="text-danger lh-1"></i-bs>
                     </button>
                 }
                 <ng-template #versionPopover>
                   Frontend version: {{frontendVersion}}<br>
-                  Backend version: {{status.pngx_version}}
+                  Backend version: {{status().pngx_version}}
                 </ng-template>
               </dd>
               <dt i18n>Install Type</dt>
-              <dd>{{status.install_type}}</dd>
+              <dd>{{status().install_type}}</dd>
               <dt i18n>Server OS</dt>
-              <dd>{{status.server_os}}</dd>
+              <dd>{{status().server_os}}</dd>
               <dt i18n>Media Storage</dt>
               <dd>
-                <ngb-progressbar style="height: 4px;" class="mt-2 mb-1" type="primary" [max]="status.storage.total" [value]="status.storage.total - status.storage.available"></ngb-progressbar>
-                <span class="small">{{status.storage.available | fileSize}} <ng-container i18n>available</ng-container> ({{status.storage.total | fileSize}} <ng-container i18n>total</ng-container>)</span>
+                <ngb-progressbar style="height: 4px;" class="mt-2 mb-1" type="primary" [max]="status().storage.total" [value]="status().storage.total - status().storage.available"></ngb-progressbar>
+                <span class="small">{{status().storage.available | fileSize}} <ng-container i18n>available</ng-container> ({{status().storage.total | fileSize}} <ng-container i18n>total</ng-container>)</span>
               </dd>
             </dl>
           </div>
@@ -54,39 +54,39 @@
           <div class="card-body">
             <dl class="card-text">
               <dt i18n>Type</dt>
-              <dd>{{status.database.type}}</dd>
+              <dd>{{status().database.type}}</dd>
               <dt i18n>Status</dt>
               <dd>
                 <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="databaseStatus" triggers="click mouseenter:mouseleave">
-                  {{status.database.status}}
-                  @if (status.database.status === 'OK') {
+                  {{status().database.status}}
+                  @if (status().database.status === 'OK') {
                     <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
                   } @else {
                     <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
                   }
                 </button>
                 <ng-template #databaseStatus>
-                  @if (status.database.status === 'OK') {
-                    {{status.database.url}}
+                  @if (status().database.status === 'OK') {
+                    {{status().database.url}}
                   } @else {
-                    {{status.database.url}}: {{status.database.error}}
+                    {{status().database.url}}: {{status().database.error}}
                   }
                 </ng-template>
               </dd>
               <dt i18n>Migration Status</dt>
               <dd>
                 <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="migrationStatus" triggers="click mouseenter:mouseleave">
-                  @if (status.database.migration_status.unapplied_migrations.length === 0) {
+                  @if (status().database.migration_status.unapplied_migrations.length === 0) {
                     <ng-container i18n>Up to date</ng-container><i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
                   } @else {
-                    <ng-container>{{status.database.migration_status.unapplied_migrations.length}} Pending</ng-container><i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></i-bs>
+                    <ng-container>{{status().database.migration_status.unapplied_migrations.length}} Pending</ng-container><i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></i-bs>
                   }
                   <ng-template #migrationStatus>
-                    <h6><ng-container i18n>Latest Migration</ng-container>:</h6> <span class="font-monospace small">{{status.database.migration_status.latest_migration}}</span>
-                    @if (status.database.migration_status.unapplied_migrations.length > 0) {
+                    <h6><ng-container i18n>Latest Migration</ng-container>:</h6> <span class="font-monospace small">{{status().database.migration_status.latest_migration}}</span>
+                    @if (status().database.migration_status.unapplied_migrations.length > 0) {
                       <h6 class="mt-3"><ng-container i18n>Pending Migrations</ng-container>:</h6>
                       <ul>
-                        @for (migration of status.database.migration_status.unapplied_migrations; track migration) {
+                        @for (migration of status().database.migration_status.unapplied_migrations; track migration) {
                           <li class="font-monospace small">{{migration}}</li>
                         }
                       </ul>
@@ -109,38 +109,65 @@
               <dt i18n>Redis Status</dt>
               <dd>
                 <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="redisStatus" triggers="click mouseenter:mouseleave">
-                  {{status.tasks.redis_status}}
-                  @if (status.tasks.redis_status === 'OK') {
+                  {{status().tasks.redis_status}}
+                  @if (status().tasks.redis_status === 'OK') {
                     <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
                   } @else {
                     <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
                   }
                 </button>
                 <ng-template #redisStatus>
-                  @if (status.tasks.redis_status === 'OK') {
-                    {{status.tasks.redis_url}}
+                  @if (status().tasks.redis_status === 'OK') {
+                    {{status().tasks.redis_url}}
                   } @else {
-                    {{status.tasks.redis_url}}: {{status.tasks.redis_error}}
+                    {{status().tasks.redis_url}}: {{status().tasks.redis_error}}
                   }
                 </ng-template>
               </dd>
               <dt i18n>Celery Status</dt>
               <dd>
                 <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="celeryStatus" triggers="click mouseenter:mouseleave">
-                  {{status.tasks.celery_status}}
-                  @if (status.tasks.celery_status === 'OK') {
+                  {{status().tasks.celery_status}}
+                  @if (status().tasks.celery_status === 'OK') {
                     <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
                   } @else {
-                    <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
+                    <i-bs name="exclamation-triangle-fill" class="ms-2 lh-1"
+                    [class.text-danger]="status().tasks.celery_status === SystemStatusItemStatus.ERROR"
+                    [class.text-warning]="status().tasks.celery_status === SystemStatusItemStatus.WARNING"></i-bs>
                   }
                 </button>
                 <ng-template #celeryStatus>
-                  @if (status.tasks.celery_status === 'OK') {
-                    {{status.tasks.celery_url}}
+                  @if (status().tasks.celery_status === 'OK') {
+                    {{status().tasks.celery_url}}
                   } @else {
-                    {{status.tasks.celery_error}}
+                    {{status().tasks.celery_error}}
                   }
                 </ng-template>
+              </dd>
+              <dt i18n>Recent Task Activity <span class="small text-muted fw-light">({{status().tasks.summary.days}} days)</span></dt>
+              <dd class="mb-0">
+                @if (status().tasks.summary.total_count > 0) {
+                  <ul class="list-group border-light mt-2">
+                    <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                      <span class="small"><ng-container i18n>Total</ng-container>:</span>
+                      <span class="badge bg-light rounded-pill">{{status().tasks.summary.total_count}}</span>
+                    </li>
+                    <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                      <span class="small"><ng-container i18n>Successful</ng-container>:</span>
+                      <span class="badge bg-primary rounded-pill">{{status().tasks.summary.success_count}}</span>
+                    </li>
+                    <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                      <span class="small"><ng-container i18n>Failed</ng-container>:</span>
+                      <span class="badge bg-danger rounded-pill">{{status().tasks.summary.failure_count}}</span>
+                    </li>
+                    <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                      <span class="small"><ng-container i18n>Pending</ng-container>:</span>
+                      <span class="badge bg-warning rounded-pill">{{status().tasks.summary.pending_count}}</span>
+                    </li>
+                  </ul>
+                } @else {
+                  <span class="small text-muted" i18n>No recent tasks</span>
+                }
               </dd>
             </dl>
           </div>
@@ -157,107 +184,93 @@
               <dt i18n>Search Index</dt>
               <dd class="d-flex align-items-center">
                 <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="indexStatus" triggers="click mouseenter:mouseleave">
-                  {{status.tasks.index_status}}
-                  @if (status.tasks.index_status === 'OK') {
-                    @if (isStale(status.tasks.index_last_modified)) {
-                      <i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></i-bs>
-                    } @else {
-                      <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
-                    }
+                  {{status().tasks.index_status}}
+                  @if (status().tasks.index_status === 'OK') {
+                    <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
                   } @else {
                     <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
                   }
                 </button>
-                @if (currentUserIsSuperUser) {
-                  @if (isRunning(PaperlessTaskName.IndexOptimize)) {
-                    <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
-                  } @else {
-                    <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskName.IndexOptimize)">
-                      <i-bs name="play-fill"></i-bs>&nbsp;
-                      <ng-container i18n>Run Task</ng-container>
-                    </button>
-                  }
-                }
               </dd>
               <ng-template #indexStatus>
-                @if (status.tasks.index_status === 'OK') {
-                  <h6><ng-container i18n>Last Updated</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.index_last_modified | customDate:'medium'}}</span>
+                @if (status().tasks.index_status === 'OK') {
+                  <h6><ng-container i18n>Last Updated</ng-container>:</h6> <span class="font-monospace small">{{status().tasks.index_last_modified | customDate:'medium'}}</span>
                 } @else {
-                  <h6><ng-container i18n>Error</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.index_error}}</span>
+                  <h6><ng-container i18n>Error</ng-container>:</h6> <span class="font-monospace small">{{status().tasks.index_error}}</span>
                 }
               </ng-template>
               <dt i18n>Classifier</dt>
               <dd class="d-flex align-items-center">
                 <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="classifierStatus" triggers="click mouseenter:mouseleave">
-                  {{status.tasks.classifier_status}}
-                  @if (status.tasks.classifier_status === 'OK') {
-                    @if (isStale(status.tasks.classifier_last_trained)) {
+                  {{status().tasks.classifier_status}}
+                  @if (status().tasks.classifier_status === 'OK') {
+                    @if (isStale(status().tasks.classifier_last_trained)) {
                       <i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></i-bs>
                     } @else {
                       <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
                     }
                   } @else {
                     <i-bs name="exclamation-triangle-fill" class="ms-2 lh-1"
-                    [class.text-danger]="status.tasks.classifier_status === SystemStatusItemStatus.ERROR"
-                    [class.text-warning]="status.tasks.classifier_status === SystemStatusItemStatus.WARNING"></i-bs>
+                    [class.text-danger]="status().tasks.classifier_status === SystemStatusItemStatus.ERROR"
+                    [class.text-warning]="status().tasks.classifier_status === SystemStatusItemStatus.WARNING"></i-bs>
                   }
                 </button>
                 @if (currentUserIsSuperUser) {
-                  @if (isRunning(PaperlessTaskName.TrainClassifier)) {
+                  @if (isRunning(PaperlessTaskType.TrainClassifier)) {
                     <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
                   } @else {
-                    <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskName.TrainClassifier)">
-                      <i-bs name="play-fill"></i-bs>&nbsp;
+                    <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskType.TrainClassifier)">
+                      <i-bs name="play-fill" class="me-1"></i-bs>
                       <ng-container i18n>Run Task</ng-container>
                     </button>
                   }
                 }
               </dd>
               <ng-template #classifierStatus>
-                @if (status.tasks.classifier_status === 'OK') {
-                  <h6><ng-container i18n>Last Trained</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.classifier_last_trained | customDate:'medium'}}</span>
+                @if (status().tasks.classifier_status === 'OK') {
+                  <h6><ng-container i18n>Last Trained</ng-container>:</h6> <span class="font-monospace small">{{status().tasks.classifier_last_trained | customDate:'medium'}}</span>
                 } @else {
-                  <h6><ng-container i18n>Error</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.classifier_error}}</span>
+                  <h6><ng-container i18n>Error</ng-container>:</h6> <span class="font-monospace small">{{status().tasks.classifier_error}}</span>
                 }
               </ng-template>
               <dt i18n>Sanity Checker</dt>
               <dd class="d-flex align-items-center">
                 <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="sanityCheckerStatus" triggers="click mouseenter:mouseleave">
-                  {{status.tasks.sanity_check_status}}
-                  @if (status.tasks.sanity_check_status === 'OK') {
-                    @if (isStale(status.tasks.sanity_check_last_run)) {
+                  {{status().tasks.sanity_check_status}}
+                  @if (status().tasks.sanity_check_status === 'OK') {
+                    @if (isStale(status().tasks.sanity_check_last_run)) {
                       <i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></i-bs>
                     } @else {
                       <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
                     }
                   } @else {
                     <i-bs name="exclamation-triangle-fill" class="ms-2 lh-1"
-                    [class.text-danger]="status.tasks.sanity_check_status === SystemStatusItemStatus.ERROR"
-                    [class.text-warning]="status.tasks.sanity_check_status === SystemStatusItemStatus.WARNING"></i-bs>
+                    [class.text-danger]="status().tasks.sanity_check_status === SystemStatusItemStatus.ERROR"
+                    [class.text-warning]="status().tasks.sanity_check_status === SystemStatusItemStatus.WARNING"></i-bs>
                   }
                 </button>
                 @if (currentUserIsSuperUser) {
-                  @if (isRunning(PaperlessTaskName.SanityCheck)) {
+                  @if (isRunning(PaperlessTaskType.SanityCheck)) {
                     <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
                   } @else {
-                    <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskName.SanityCheck)">
-                      <i-bs name="play-fill"></i-bs>&nbsp;
+                    <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskType.SanityCheck)">
+                      <i-bs name="play-fill" class="me-1"></i-bs>
                       <ng-container i18n>Run Task</ng-container>
                     </button>
                   }
                 }
               </dd>
               <ng-template #sanityCheckerStatus>
-                @if (status.tasks.sanity_check_status === 'OK') {
-                  <h6><ng-container i18n>Last Run</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.sanity_check_last_run | customDate:'medium'}}</span>
+                @if (status().tasks.sanity_check_status === 'OK') {
+                  <h6><ng-container i18n>Last Run</ng-container>:</h6> <span class="font-monospace small">{{status().tasks.sanity_check_last_run | customDate:'medium'}}</span>
                 } @else {
-                  <h6><ng-container i18n>Error</ng-container>:</h6> <span class="font-monospace small">{{status.tasks.sanity_check_error}}</span>
+                  <h6><ng-container i18n>Error</ng-container>:</h6> <span class="font-monospace small">{{status().tasks.sanity_check_error}}</span>
                 }
               </ng-template>
               <dt i18n>WebSocket Connection</dt>
               <dd>
                 <span class="btn btn-sm pe-none align-items-center btn-dark text-uppercase small">
-                  @if (status.websocket_connected === 'OK') {
+                  @if (status().websocket_connected === 'OK') {
                     <ng-container i18n>OK</ng-container>
                     <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
                   } @else {
@@ -266,6 +279,43 @@
                   }
                 </span>
               </dd>
+              @if (aiEnabled) {
+                <dt i18n>AI Index</dt>
+                <dd class="d-flex align-items-center">
+                  <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="llmIndexStatus" triggers="click mouseenter:mouseleave">
+                    {{status().tasks.llmindex_status}}
+                    @if (status().tasks.llmindex_status === 'OK') {
+                      @if (isStale(status().tasks.llmindex_last_modified)) {
+                        <i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></i-bs>
+                      } @else {
+                        <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
+                      }
+                    } @else {
+                      <i-bs name="exclamation-triangle-fill" class="ms-2 lh-1"
+                      [class.text-danger]="status().tasks.llmindex_status === SystemStatusItemStatus.ERROR"
+                      [class.text-warning]="status().tasks.llmindex_status === SystemStatusItemStatus.WARNING"
+                      [class.text-muted]="status().tasks.llmindex_status === SystemStatusItemStatus.DISABLED"></i-bs>
+                    }
+                  </button>
+                  @if (currentUserIsSuperUser) {
+                    @if (isRunning(PaperlessTaskType.LlmIndex)) {
+                      <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
+                    } @else {
+                      <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskType.LlmIndex)">
+                        <i-bs name="play-fill" class="me-1"></i-bs>
+                        <ng-container i18n>Run Task</ng-container>
+                      </button>
+                    }
+                  }
+                </dd>
+                <ng-template #llmIndexStatus>
+                  @if (status().tasks.llmindex_status === 'OK') {
+                    <h6><ng-container i18n>Last Run</ng-container>:</h6> <span class="font-monospace small">{{status().tasks.llmindex_last_modified | customDate:'medium'}}</span>
+                  } @else {
+                    <h6><ng-container i18n>Error</ng-container>:</h6> <span class="font-monospace small">{{status().tasks.llmindex_error}}</span>
+                  }
+                </ng-template>
+              }
             </dl>
           </div>
         </div>
@@ -275,11 +325,11 @@
 </div>
 <div class="modal-footer">
   <button class="btn btn-sm d-flex align-items-center btn-dark btn btn-sm d-flex align-items-center btn-dark btn-outline-secondary" (click)="copy()">
-    @if (!copied) {
-      <i-bs name="clipboard-fill"></i-bs>&nbsp;
+    @if (!copied()) {
+      <i-bs name="clipboard-fill" class="me-1"></i-bs>
     }
-    @if (copied) {
-      <i-bs name="clipboard-check-fill"></i-bs>&nbsp;
+    @if (copied()) {
+      <i-bs name="clipboard-check-fill" class="me-1"></i-bs>
     }
     <ng-container i18n>Copy</ng-container>
   </button>

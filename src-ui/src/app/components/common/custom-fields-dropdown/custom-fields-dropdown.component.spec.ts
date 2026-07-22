@@ -1,11 +1,6 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import {
@@ -74,7 +69,7 @@ describe('CustomFieldsDropdownComponent', () => {
       })
     )
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = { id: 1, username: 'test' }
+    settingsService.currentUser.set({ id: 1, username: 'test' })
     fixture = TestBed.createComponent(CustomFieldsDropdownComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
@@ -100,8 +95,8 @@ describe('CustomFieldsDropdownComponent', () => {
   it('should support update unused fields', () => {
     component.existingFields = [{ field: fields[0].id } as any]
     component['updateUnusedFields']()
-    expect(component['unusedFields'].length).toEqual(1)
-    expect(component['unusedFields'][0].name).toEqual('Field 2')
+    expect(component['unusedFields']().length).toEqual(1)
+    expect(component['unusedFields']()[0].name).toEqual('Field 2')
   })
 
   it('should support getting data type label', () => {
@@ -110,7 +105,8 @@ describe('CustomFieldsDropdownComponent', () => {
     )
   })
 
-  it('should support creating field, show error if necessary, then add', fakeAsync(() => {
+  it('should support creating field, show error if necessary, then add', () => {
+    jest.useFakeTimers()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
@@ -134,11 +130,12 @@ describe('CustomFieldsDropdownComponent', () => {
 
     // succeed
     editDialog.succeeded.emit(fields[0])
-    tick(100)
+    jest.advanceTimersByTime(100)
     expect(toastInfoSpy).toHaveBeenCalled()
     expect(getFieldsSpy).toHaveBeenCalled()
     expect(addFieldSpy).toHaveBeenCalled()
-  }))
+    jest.useRealTimers()
+  })
 
   it('should support creating field with name', () => {
     let modal: NgbModalRef
@@ -150,12 +147,13 @@ describe('CustomFieldsDropdownComponent', () => {
     expect(editDialog.object.name).toEqual('Foo bar')
   })
 
-  it('should support arrow keyboard navigation', fakeAsync(() => {
+  it('should support arrow keyboard navigation', () => {
+    jest.useFakeTimers()
     fixture.nativeElement
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
     fixture.detectChanges()
-    tick(100)
+    jest.advanceTimersByTime(100)
     const filterInputEl: HTMLInputElement =
       component.listFilterTextInput.nativeElement
     expect(document.activeElement).toEqual(filterInputEl)
@@ -193,14 +191,16 @@ describe('CustomFieldsDropdownComponent', () => {
       new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
     )
     expect(document.activeElement).toEqual(itemButtons[0])
-  }))
+    jest.useRealTimers()
+  })
 
-  it('should support arrow keyboard navigation after tab keyboard navigation', fakeAsync(() => {
+  it('should support arrow keyboard navigation after tab keyboard navigation', () => {
+    jest.useFakeTimers()
     fixture.nativeElement
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
     fixture.detectChanges()
-    tick(100)
+    jest.advanceTimersByTime(100)
     const filterInputEl: HTMLInputElement =
       component.listFilterTextInput.nativeElement
     expect(document.activeElement).toEqual(filterInputEl)
@@ -229,9 +229,10 @@ describe('CustomFieldsDropdownComponent', () => {
       new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
     )
     expect(document.activeElement).toEqual(itemButtons[1])
-  }))
+    jest.useRealTimers()
+  })
 
-  it('should support enter keyboard navigation', fakeAsync(() => {
+  it('should support enter keyboard navigation', () => {
     jest.spyOn(component, 'canCreateFields', 'get').mockReturnValue(true)
     const addFieldSpy = jest.spyOn(component, 'addField')
     const createFieldSpy = jest.spyOn(component, 'createField')
@@ -250,5 +251,5 @@ describe('CustomFieldsDropdownComponent', () => {
     component.listFilterEnter()
     expect(createFieldSpy).not.toHaveBeenCalled()
     expect(addFieldSpy).not.toHaveBeenCalled()
-  }))
+  })
 })

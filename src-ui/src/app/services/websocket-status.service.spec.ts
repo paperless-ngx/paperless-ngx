@@ -45,11 +45,11 @@ describe('ConsumerStatusService', () => {
 
     httpTestingController = TestBed.inject(HttpTestingController)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = {
+    settingsService.currentUser.set({
       id: 1,
       username: 'testuser',
       is_superuser: false,
-    }
+    })
     websocketStatusService = TestBed.inject(WebsocketStatusService)
     documentService = TestBed.inject(DocumentService)
   })
@@ -356,12 +356,12 @@ describe('ConsumerStatusService', () => {
   })
 
   it('should notify user if user can view or is in group', () => {
-    settingsService.currentUser = {
+    settingsService.currentUser.set({
       id: 1,
       username: 'testuser',
       is_superuser: false,
       groups: [1],
-    }
+    })
     websocketStatusService.connect()
     server.send({
       type: WebsocketStatusType.STATUS_UPDATE,
@@ -415,5 +415,43 @@ describe('ConsumerStatusService', () => {
 
     websocketStatusService.disconnect()
     expect(deleted).toBeTruthy()
+  })
+
+  it('should trigger updated subject on document updated', () => {
+    let updated = false
+    websocketStatusService.onDocumentUpdated().subscribe((data) => {
+      updated = true
+      expect(data.document_id).toEqual(12)
+    })
+
+    websocketStatusService.connect()
+    server.send({
+      type: WebsocketStatusType.DOCUMENT_UPDATED,
+      data: {
+        document_id: 12,
+        modified: '2026-02-17T00:00:00Z',
+        owner_id: 1,
+      },
+    })
+
+    websocketStatusService.disconnect()
+    expect(updated).toBeTruthy()
+  })
+
+  it('should ignore document updated events the user cannot view', () => {
+    let updated = false
+    websocketStatusService.onDocumentUpdated().subscribe(() => {
+      updated = true
+    })
+
+    websocketStatusService.handleDocumentUpdated({
+      document_id: 12,
+      modified: '2026-02-17T00:00:00Z',
+      owner_id: 2,
+      users_can_view: [],
+      groups_can_view: [],
+    })
+
+    expect(updated).toBeFalsy()
   })
 })

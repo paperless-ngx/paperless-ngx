@@ -4,7 +4,8 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
 import { NgTemplateOutlet } from '@angular/common'
-import { Component, OnInit, inject } from '@angular/core'
+import { Component, OnInit, computed, inject, signal } from '@angular/core'
+import { toSignal } from '@angular/core/rxjs-interop'
 import {
   AbstractControl,
   FormArray,
@@ -15,7 +16,7 @@ import {
 } from '@angular/forms'
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { Subscription, first, takeUntil } from 'rxjs'
+import { Subscription, map, takeUntil } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentType } from 'src/app/data/document-type'
@@ -139,16 +140,27 @@ export const WORKFLOW_ACTION_OPTIONS = [
     id: WorkflowActionType.Webhook,
     name: $localize`Webhook`,
   },
+  {
+    id: WorkflowActionType.PasswordRemoval,
+    name: $localize`Password removal`,
+  },
+  {
+    id: WorkflowActionType.MoveToTrash,
+    name: $localize`Move to trash`,
+  },
 ]
 
 export enum TriggerFilterType {
   TagsAny = 'tags_any',
   TagsAll = 'tags_all',
   TagsNone = 'tags_none',
+  CorrespondentAny = 'correspondent_any',
   CorrespondentIs = 'correspondent_is',
   CorrespondentNot = 'correspondent_not',
+  DocumentTypeAny = 'document_type_any',
   DocumentTypeIs = 'document_type_is',
   DocumentTypeNot = 'document_type_not',
+  StoragePathAny = 'storage_path_any',
   StoragePathIs = 'storage_path_is',
   StoragePathNot = 'storage_path_not',
   CustomFieldQuery = 'custom_field_query',
@@ -172,8 +184,11 @@ type TriggerFilterAggregate = {
   filter_has_tags: number[]
   filter_has_all_tags: number[]
   filter_has_not_tags: number[]
+  filter_has_any_correspondents: number[]
   filter_has_not_correspondents: number[]
+  filter_has_any_document_types: number[]
   filter_has_not_document_types: number[]
+  filter_has_any_storage_paths: number[]
   filter_has_not_storage_paths: number[]
   filter_has_correspondent: number | null
   filter_has_document_type: number | null
@@ -220,6 +235,14 @@ const TRIGGER_FILTER_DEFINITIONS: TriggerFilterDefinition[] = [
     allowMultipleValues: true,
   },
   {
+    id: TriggerFilterType.CorrespondentAny,
+    name: $localize`Has any of these correspondents`,
+    inputType: 'select',
+    allowMultipleEntries: false,
+    allowMultipleValues: true,
+    selectItems: 'correspondents',
+  },
+  {
     id: TriggerFilterType.CorrespondentIs,
     name: $localize`Has correspondent`,
     inputType: 'select',
@@ -244,6 +267,14 @@ const TRIGGER_FILTER_DEFINITIONS: TriggerFilterDefinition[] = [
     selectItems: 'documentTypes',
   },
   {
+    id: TriggerFilterType.DocumentTypeAny,
+    name: $localize`Has any of these document types`,
+    inputType: 'select',
+    allowMultipleEntries: false,
+    allowMultipleValues: true,
+    selectItems: 'documentTypes',
+  },
+  {
     id: TriggerFilterType.DocumentTypeNot,
     name: $localize`Does not have document types`,
     inputType: 'select',
@@ -257,6 +288,14 @@ const TRIGGER_FILTER_DEFINITIONS: TriggerFilterDefinition[] = [
     inputType: 'select',
     allowMultipleEntries: false,
     allowMultipleValues: false,
+    selectItems: 'storagePaths',
+  },
+  {
+    id: TriggerFilterType.StoragePathAny,
+    name: $localize`Has any of these storage paths`,
+    inputType: 'select',
+    allowMultipleEntries: false,
+    allowMultipleValues: true,
     selectItems: 'storagePaths',
   },
   {
@@ -306,6 +345,15 @@ const FILTER_HANDLERS: Record<TriggerFilterType, FilterHandler> = {
     extract: (trigger) => trigger.filter_has_not_tags,
     hasValue: (value) => Array.isArray(value) && value.length > 0,
   },
+  [TriggerFilterType.CorrespondentAny]: {
+    apply: (aggregate, values) => {
+      aggregate.filter_has_any_correspondents = Array.isArray(values)
+        ? [...values]
+        : [values]
+    },
+    extract: (trigger) => trigger.filter_has_any_correspondents,
+    hasValue: (value) => Array.isArray(value) && value.length > 0,
+  },
   [TriggerFilterType.CorrespondentIs]: {
     apply: (aggregate, values) => {
       aggregate.filter_has_correspondent = Array.isArray(values)
@@ -333,6 +381,15 @@ const FILTER_HANDLERS: Record<TriggerFilterType, FilterHandler> = {
     extract: (trigger) => trigger.filter_has_document_type,
     hasValue: (value) => value !== null && value !== undefined,
   },
+  [TriggerFilterType.DocumentTypeAny]: {
+    apply: (aggregate, values) => {
+      aggregate.filter_has_any_document_types = Array.isArray(values)
+        ? [...values]
+        : [values]
+    },
+    extract: (trigger) => trigger.filter_has_any_document_types,
+    hasValue: (value) => Array.isArray(value) && value.length > 0,
+  },
   [TriggerFilterType.DocumentTypeNot]: {
     apply: (aggregate, values) => {
       aggregate.filter_has_not_document_types = Array.isArray(values)
@@ -350,6 +407,15 @@ const FILTER_HANDLERS: Record<TriggerFilterType, FilterHandler> = {
     },
     extract: (trigger) => trigger.filter_has_storage_path,
     hasValue: (value) => value !== null && value !== undefined,
+  },
+  [TriggerFilterType.StoragePathAny]: {
+    apply: (aggregate, values) => {
+      aggregate.filter_has_any_storage_paths = Array.isArray(values)
+        ? [...values]
+        : [values]
+    },
+    extract: (trigger) => trigger.filter_has_any_storage_paths,
+    hasValue: (value) => Array.isArray(value) && value.length > 0,
   },
   [TriggerFilterType.StoragePathNot]: {
     apply: (aggregate, values) => {
@@ -405,23 +471,40 @@ export class WorkflowEditDialogComponent
   public TriggerFilterType = TriggerFilterType
   public filterDefinitions = TRIGGER_FILTER_DEFINITIONS
 
-  private correspondentService: CorrespondentService
-  private documentTypeService: DocumentTypeService
-  private storagePathService: StoragePathService
-  private mailRuleService: MailRuleService
-  private customFieldsService: CustomFieldsService
+  private readonly correspondentService = inject(CorrespondentService)
+  private readonly documentTypeService = inject(DocumentTypeService)
+  private readonly storagePathService = inject(StoragePathService)
+  private readonly mailRuleService = inject(MailRuleService)
+  private readonly customFieldsService = inject(CustomFieldsService)
 
-  templates: Workflow[]
-  correspondents: Correspondent[]
-  documentTypes: DocumentType[]
-  storagePaths: StoragePath[]
-  mailRules: MailRule[]
-  customFields: CustomField[]
-  dateCustomFields: CustomField[]
+  readonly templates = signal<Workflow[]>(undefined)
+  readonly correspondents = toSignal(
+    this.correspondentService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as Correspondent[] }
+  )
+  readonly documentTypes = toSignal(
+    this.documentTypeService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as DocumentType[] }
+  )
+  readonly storagePaths = toSignal(
+    this.storagePathService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as StoragePath[] }
+  )
+  readonly mailRules = toSignal(
+    this.mailRuleService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as MailRule[] }
+  )
+  readonly customFields = toSignal(
+    this.customFieldsService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as CustomField[] }
+  )
+  readonly dateCustomFields = computed(() =>
+    this.customFields()?.filter((f) => f.data_type === CustomFieldDataType.Date)
+  )
 
   expandedItem: number = null
 
-  private allowedActionTypes = []
+  readonly allowedActionTypes = signal([])
 
   private readonly triggerFilterOptionsMap = new WeakMap<
     FormArray,
@@ -431,43 +514,8 @@ export class WorkflowEditDialogComponent
   constructor() {
     super()
     this.service = inject(WorkflowService)
-    this.correspondentService = inject(CorrespondentService)
-    this.documentTypeService = inject(DocumentTypeService)
-    this.storagePathService = inject(StoragePathService)
-    this.mailRuleService = inject(MailRuleService)
     this.userService = inject(UserService)
     this.settingsService = inject(SettingsService)
-    this.customFieldsService = inject(CustomFieldsService)
-
-    this.correspondentService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.correspondents = result.results))
-
-    this.documentTypeService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.documentTypes = result.results))
-
-    this.storagePathService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.storagePaths = result.results))
-
-    this.mailRuleService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.mailRules = result.results))
-
-    this.customFieldsService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => {
-        this.customFields = result.results
-        this.dateCustomFields = this.customFields?.filter(
-          (f) => f.data_type === CustomFieldDataType.Date
-        )
-      })
   }
 
   getCreateTitle() {
@@ -500,11 +548,13 @@ export class WorkflowEditDialogComponent
       this.checkRemovalActionFields.bind(this)
     )
     this.checkRemovalActionFields(this.objectForm.value)
-    this.allowedActionTypes = this.settingsService.get(
-      SETTINGS_KEYS.EMAIL_ENABLED
+    this.allowedActionTypes.set(
+      this.settingsService.get(SETTINGS_KEYS.EMAIL_ENABLED)
+        ? WORKFLOW_ACTION_OPTIONS
+        : WORKFLOW_ACTION_OPTIONS.filter(
+            (a) => a.id !== WorkflowActionType.Email
+          )
     )
-      ? WORKFLOW_ACTION_OPTIONS
-      : WORKFLOW_ACTION_OPTIONS.filter((a) => a.id !== WorkflowActionType.Email)
   }
 
   private checkRemovalActionFields(formWorkflow: Workflow) {
@@ -642,8 +692,11 @@ export class WorkflowEditDialogComponent
             filter_has_tags: [],
             filter_has_all_tags: [],
             filter_has_not_tags: [],
+            filter_has_any_correspondents: [],
             filter_has_not_correspondents: [],
+            filter_has_any_document_types: [],
             filter_has_not_document_types: [],
+            filter_has_any_storage_paths: [],
             filter_has_not_storage_paths: [],
             filter_has_correspondent: null,
             filter_has_document_type: null,
@@ -670,10 +723,16 @@ export class WorkflowEditDialogComponent
           trigger.filter_has_tags = aggregate.filter_has_tags
           trigger.filter_has_all_tags = aggregate.filter_has_all_tags
           trigger.filter_has_not_tags = aggregate.filter_has_not_tags
+          trigger.filter_has_any_correspondents =
+            aggregate.filter_has_any_correspondents
           trigger.filter_has_not_correspondents =
             aggregate.filter_has_not_correspondents
+          trigger.filter_has_any_document_types =
+            aggregate.filter_has_any_document_types
           trigger.filter_has_not_document_types =
             aggregate.filter_has_not_document_types
+          trigger.filter_has_any_storage_paths =
+            aggregate.filter_has_any_storage_paths
           trigger.filter_has_not_storage_paths =
             aggregate.filter_has_not_storage_paths
           trigger.filter_has_correspondent =
@@ -856,8 +915,11 @@ export class WorkflowEditDialogComponent
       case TriggerFilterType.TagsAny:
       case TriggerFilterType.TagsAll:
       case TriggerFilterType.TagsNone:
+      case TriggerFilterType.CorrespondentAny:
       case TriggerFilterType.CorrespondentNot:
+      case TriggerFilterType.DocumentTypeAny:
       case TriggerFilterType.DocumentTypeNot:
+      case TriggerFilterType.StoragePathAny:
       case TriggerFilterType.StoragePathNot:
         return true
       default:
@@ -871,17 +933,17 @@ export class WorkflowEditDialogComponent
 
   getFilterSelectItems(type: TriggerFilterType) {
     const definition = this.getFilterDefinition(type)
-    if (!definition || definition.inputType !== 'select') {
+    if (definition?.inputType !== 'select') {
       return []
     }
 
     switch (definition.selectItems) {
       case 'correspondents':
-        return this.correspondents
+        return this.correspondents()
       case 'documentTypes':
-        return this.documentTypes
+        return this.documentTypes()
       case 'storagePaths':
-        return this.storagePaths
+        return this.storagePaths()
       default:
         return []
     }
@@ -1133,9 +1195,23 @@ export class WorkflowEditDialogComponent
           headers: new FormControl(action.webhook?.headers),
           include_document: new FormControl(!!action.webhook?.include_document),
         }),
+        passwords: new FormControl(
+          this.formatPasswords(action.passwords ?? [])
+        ),
       }),
       { emitEvent }
     )
+  }
+
+  private formatPasswords(passwords: string[] = []): string {
+    return passwords.join('\n')
+  }
+
+  private parsePasswords(value: string = ''): string[] {
+    return value
+      .split(/[\n,]+/)
+      .map((entry) => entry.trim())
+      .filter((entry) => entry.length > 0)
   }
 
   private updateAllTriggerActionFields(emitEvent: boolean = false) {
@@ -1179,8 +1255,11 @@ export class WorkflowEditDialogComponent
       filter_has_tags: [],
       filter_has_all_tags: [],
       filter_has_not_tags: [],
+      filter_has_any_correspondents: [],
       filter_has_not_correspondents: [],
+      filter_has_any_document_types: [],
       filter_has_not_document_types: [],
+      filter_has_any_storage_paths: [],
       filter_has_not_storage_paths: [],
       filter_custom_field_query: null,
       filter_has_correspondent: null,
@@ -1200,7 +1279,8 @@ export class WorkflowEditDialogComponent
   }
 
   get actionTypeOptions() {
-    return this.allowedActionTypes
+    this.settingsService.trackChanges()
+    return this.allowedActionTypes()
   }
 
   getActionTypeOptionName(type: WorkflowActionType): string {
@@ -1259,6 +1339,7 @@ export class WorkflowEditDialogComponent
         headers: null,
         include_document: false,
       },
+      passwords: [],
     }
     this.object.actions.push(action)
     this.createActionField(action)
@@ -1295,6 +1376,7 @@ export class WorkflowEditDialogComponent
         if (action.type !== WorkflowActionType.Email) {
           action.email = null
         }
+        action.passwords = this.parsePasswords(action.passwords as any)
       })
     super.save()
   }

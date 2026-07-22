@@ -12,6 +12,7 @@ import { of, throwError } from 'rxjs'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { PngxPdfViewerComponent } from '../pdf-viewer/pdf-viewer.component'
 import { PreviewPopupComponent } from './preview-popup.component'
 
 const doc = {
@@ -78,7 +79,7 @@ describe('PreviewPopupComponent', () => {
     component.popover.open()
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('object'))).toBeNull()
-    expect(fixture.debugElement.query(By.css('pdf-viewer'))).not.toBeNull()
+    expect(fixture.debugElement.query(By.css('pngx-pdf-viewer'))).not.toBeNull()
   })
 
   it('should show lock icon on password error', () => {
@@ -86,7 +87,7 @@ describe('PreviewPopupComponent', () => {
     component.popover.open()
     component.onError({ name: 'PasswordException' })
     fixture.detectChanges()
-    expect(component.requiresPassword).toBeTruthy()
+    expect(component.requiresPassword()).toBeTruthy()
     expect(fixture.debugElement.query(By.css('i-bs'))).not.toBeNull()
   })
 
@@ -120,16 +121,18 @@ describe('PreviewPopupComponent', () => {
     )
     component.init()
     expect(httpSpy).toHaveBeenCalled()
-    expect(component.error).toBeTruthy()
+    expect(component.error()).toBeTruthy()
     httpSpy.mockReturnValueOnce(of('Preview text'))
     component.init()
-    expect(component.previewText).toEqual('Preview text')
+    expect(component.previewText()).toEqual('Preview text')
   })
 
   it('should show preview on mouseover after delay to preload content', () => {
     component.mouseEnterPreview()
     expect(component.popover.isOpen()).toBeTruthy()
+    expect(component.popoverClass()).toContain('opacity-0')
     jest.advanceTimersByTime(600)
+    expect(component.popoverClass()).not.toContain('opacity-0')
     component.close()
     jest.advanceTimersByTime(600)
   })
@@ -159,23 +162,15 @@ describe('PreviewPopupComponent', () => {
     expect(component.popover.isOpen()).toBeFalsy()
   })
 
-  it('should dispatch find event on viewer loaded if searchQuery set', () => {
+  it('should pass searchQuery to viewer', () => {
     documentService.searchQuery = 'test'
     settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, false)
     component.popover.open()
-    jest.advanceTimersByTime(1000)
     fixture.detectChanges()
-    // normally setup by pdf-viewer
-    jest.replaceProperty(component.pdfViewer, 'eventBus', {
-      dispatch: jest.fn(),
-    } as any)
-    const dispatchSpy = jest.spyOn(component.pdfViewer.eventBus, 'dispatch')
-    component.onPageRendered()
-    expect(dispatchSpy).toHaveBeenCalledWith('find', {
-      query: 'test',
-      caseSensitive: false,
-      highlightAll: true,
-      phraseSearch: true,
-    })
+    const viewer = fixture.debugElement.query(
+      By.directive(PngxPdfViewerComponent)
+    )
+    expect(viewer).not.toBeNull()
+    expect(viewer.componentInstance.searchQuery).toBe('test')
   })
 })

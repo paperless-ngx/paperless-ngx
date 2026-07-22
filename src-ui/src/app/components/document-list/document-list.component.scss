@@ -56,10 +56,17 @@ $paperless-card-breakpoints: (
 
 .sticky-top {
   z-index: 990; // below main navbar
-  top: calc(7rem - 2px); // height of navbar (mobile)
+  top: calc(7rem - 2px); // height of navbar + search row (mobile)
+  transition: top 0.2s ease;
 
   @media (min-width: 580px) {
     top: 3.5rem; // height of navbar
+  }
+}
+
+@media (max-width: 579.98px) {
+  :host-context(main.mobile-search-hidden) .sticky-top {
+    top: calc(3.5rem - 2px); // height of navbar only when search is hidden
   }
 }
 

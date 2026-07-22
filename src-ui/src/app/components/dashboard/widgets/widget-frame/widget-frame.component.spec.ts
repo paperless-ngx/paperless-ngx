@@ -45,21 +45,19 @@ describe('WidgetFrameComponent', () => {
   })
 
   it('should show title', () => {
-    component.title = 'Foo'
+    fixture.componentRef.setInput('title', 'Foo')
     fixture.detectChanges()
     expect(fixture.debugElement.nativeElement.textContent).toContain('Foo')
   })
 
   it('should show loading indicator', () => {
     expect(fixture.debugElement.query(By.css('.spinner-border'))).toBeNull()
-    component.loading = true
+    fixture.componentRef.setInput('loading', true)
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('.spinner-border'))).not.toBeNull()
   })
 
   it('should show', () => {
-    expect(component.show).toBeFalsy()
-    jest.advanceTimersByTime(100)
-    expect(component.show).toBeTruthy()
+    expect(component.show()).toBeTruthy()
   })
 })

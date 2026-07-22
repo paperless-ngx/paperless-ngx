@@ -1,19 +1,18 @@
-import { HttpErrorResponse, HttpRequest } from '@angular/common/http'
-import { TestBed } from '@angular/core/testing'
+import {
+  HttpErrorResponse,
+  HttpHandlerFn,
+  HttpRequest,
+} from '@angular/common/http'
 import { throwError } from 'rxjs'
 import * as navUtils from '../utils/navigation'
-import { AuthExpiryInterceptor } from './auth-expiry.interceptor'
+import { createAuthExpiryInterceptor } from './auth-expiry.interceptor'
 
-describe('AuthExpiryInterceptor', () => {
-  let interceptor: AuthExpiryInterceptor
+describe('withAuthExpiryInterceptor', () => {
+  let interceptor: ReturnType<typeof createAuthExpiryInterceptor>
   let dateNowSpy: jest.SpiedFunction<typeof Date.now>
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [AuthExpiryInterceptor],
-    })
-
-    interceptor = TestBed.inject(AuthExpiryInterceptor)
+    interceptor = createAuthExpiryInterceptor()
     dateNowSpy = jest.spyOn(Date, 'now').mockReturnValue(1000)
   })
 
@@ -26,20 +25,12 @@ describe('AuthExpiryInterceptor', () => {
       .spyOn(navUtils, 'locationReload')
       .mockImplementation(() => {})
 
-    interceptor
-      .intercept(new HttpRequest('GET', '/api/documents/'), {
-        handle: (_request) =>
-          throwError(
-            () =>
-              new HttpErrorResponse({
-                status: 401,
-                url: '/api/documents/',
-              })
-          ),
-      })
-      .subscribe({
-        error: () => undefined,
-      })
+    interceptor(
+      new HttpRequest('GET', '/api/documents/'),
+      failingHandler('/api/documents/', 401)
+    ).subscribe({
+      error: () => undefined,
+    })
 
     expect(reloadSpy).toHaveBeenCalledTimes(1)
   })
@@ -49,20 +40,12 @@ describe('AuthExpiryInterceptor', () => {
       .spyOn(navUtils, 'locationReload')
       .mockImplementation(() => {})
 
-    interceptor
-      .intercept(new HttpRequest('GET', '/api/documents/'), {
-        handle: (_request) =>
-          throwError(
-            () =>
-              new HttpErrorResponse({
-                status: 500,
-                url: '/api/documents/',
-              })
-          ),
-      })
-      .subscribe({
-        error: () => undefined,
-      })
+    interceptor(
+      new HttpRequest('GET', '/api/documents/'),
+      failingHandler('/api/documents/', 500)
+    ).subscribe({
+      error: () => undefined,
+    })
 
     expect(reloadSpy).not.toHaveBeenCalled()
   })
@@ -72,20 +55,12 @@ describe('AuthExpiryInterceptor', () => {
       .spyOn(navUtils, 'locationReload')
       .mockImplementation(() => {})
 
-    interceptor
-      .intercept(new HttpRequest('GET', '/accounts/profile/'), {
-        handle: (_request) =>
-          throwError(
-            () =>
-              new HttpErrorResponse({
-                status: 401,
-                url: '/accounts/profile/',
-              })
-          ),
-      })
-      .subscribe({
-        error: () => undefined,
-      })
+    interceptor(
+      new HttpRequest('GET', '/accounts/profile/'),
+      failingHandler('/accounts/profile/', 401)
+    ).subscribe({
+      error: () => undefined,
+    })
 
     expect(reloadSpy).not.toHaveBeenCalled()
   })
@@ -96,21 +71,12 @@ describe('AuthExpiryInterceptor', () => {
       .mockImplementation(() => {})
 
     const request = new HttpRequest('GET', '/api/documents/')
-    const handler = {
-      handle: (_request) =>
-        throwError(
-          () =>
-            new HttpErrorResponse({
-              status: 401,
-              url: '/api/documents/',
-            })
-        ),
-    }
+    const handler = failingHandler('/api/documents/', 401)
 
-    interceptor.intercept(request, handler).subscribe({
+    interceptor(request, handler).subscribe({
       error: () => undefined,
     })
-    interceptor.intercept(request, handler).subscribe({
+    interceptor(request, handler).subscribe({
       error: () => undefined,
     })
 
@@ -128,27 +94,29 @@ describe('AuthExpiryInterceptor', () => {
       .mockReturnValueOnce(3501)
 
     const request = new HttpRequest('GET', '/api/documents/')
-    const handler = {
-      handle: (_request) =>
-        throwError(
-          () =>
-            new HttpErrorResponse({
-              status: 401,
-              url: '/api/documents/',
-            })
-        ),
-    }
+    const handler = failingHandler('/api/documents/', 401)
 
-    interceptor.intercept(request, handler).subscribe({
+    interceptor(request, handler).subscribe({
       error: () => undefined,
     })
-    interceptor.intercept(request, handler).subscribe({
+    interceptor(request, handler).subscribe({
       error: () => undefined,
     })
-    interceptor.intercept(request, handler).subscribe({
+    interceptor(request, handler).subscribe({
       error: () => undefined,
     })
 
     expect(reloadSpy).toHaveBeenCalledTimes(2)
   })
 })
+
+function failingHandler(url: string, status: number): HttpHandlerFn {
+  return (_request) =>
+    throwError(
+      () =>
+        new HttpErrorResponse({
+          status,
+          url,
+        })
+    )
+}

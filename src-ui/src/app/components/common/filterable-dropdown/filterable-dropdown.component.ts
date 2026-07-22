@@ -1,3 +1,7 @@
+import {
+  CdkVirtualScrollViewport,
+  ScrollingModule,
+} from '@angular/cdk/scrolling'
 import { NgClass } from '@angular/common'
 import {
   Component,
@@ -8,6 +12,7 @@ import {
   Output,
   ViewChild,
   inject,
+  signal,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
@@ -16,9 +21,9 @@ import { Subject, filter, takeUntil } from 'rxjs'
 import { NEGATIVE_NULL_FILTER_VALUE } from 'src/app/data/filter-rule-type'
 import { MatchingModel } from 'src/app/data/matching-model'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
+import { SelectionDataItem } from 'src/app/data/results'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { HotKeyService } from 'src/app/services/hot-key.service'
-import { SelectionDataItem } from 'src/app/services/rest/document.service'
 import { pngxPopperOptions } from 'src/app/utils/popper-options'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
@@ -656,24 +661,32 @@ export class FilterableDropdownSelectionModel {
   imports: [
     ClearableBadgeComponent,
     ToggleableDropdownButtonComponent,
-    FilterPipe,
     FormsModule,
     ReactiveFormsModule,
     NgxBootstrapIconsModule,
     NgbDropdownModule,
     NgClass,
+    ScrollingModule,
   ],
 })
 export class FilterableDropdownComponent
   extends LoadingComponentWithPermissions
   implements OnInit
 {
+  public readonly FILTERABLE_BUTTON_HEIGHT_PX = 42
+
   private filterPipe = inject(FilterPipe)
   private hotkeyService = inject(HotKeyService)
 
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
   @ViewChild('dropdown') dropdown: NgbDropdown
-  @ViewChild('buttonItems') buttonItems: ElementRef
+  @ViewChild('buttonsViewport') buttonsViewport: CdkVirtualScrollViewport
+
+  private get renderedButtons(): Array<HTMLButtonElement> {
+    return Array.from(
+      this.buttonsViewport.elementRef.nativeElement.querySelectorAll('button')
+    )
+  }
 
   public popperOptions = pngxPopperOptions
 
@@ -783,14 +796,27 @@ export class FilterableDropdownComponent
     return this.title ? this.title.replace(/\s/g, '_').toLowerCase() : null
   }
 
-  modelIsDirty: boolean = false
+  readonly modelIsDirty = signal(false)
 
   private keyboardIndex: number
+
+  public get filteredItems(): MatchingModel[] {
+    return this.filterPipe
+      .transform(this.items, this.filterText, 'name')
+      .filter((item) => this.allowSelectNone || Boolean(item.id))
+  }
+
+  public get scrollViewportHeight(): number {
+    return Math.min(
+      this.filteredItems.length * this.FILTERABLE_BUTTON_HEIGHT_PX,
+      400
+    )
+  }
 
   constructor() {
     super()
     this.selectionModelChange.subscribe((updatedModel) => {
-      this.modelIsDirty = updatedModel.isDirty()
+      this.modelIsDirty.set(updatedModel.isDirty())
     })
   }
 
@@ -811,6 +837,10 @@ export class FilterableDropdownComponent
     }
   }
 
+  public trackByItem(index: number, item: MatchingModel) {
+    return item?.id ?? index
+  }
+
   applyClicked() {
     if (this.selectionModel.isDirty()) {
       this.dropdown.close()
@@ -829,10 +859,11 @@ export class FilterableDropdownComponent
     if (open) {
       setTimeout(() => {
         this.listFilterTextInput?.nativeElement.focus()
+        this.buttonsViewport?.checkViewportSize()
       }, 0)
       if (this.editing) {
         this.selectionModel.reset()
-        this.modelIsDirty = false
+        this.modelIsDirty.set(false)
       }
       this.selectionModel.singleSelect =
         this.editing && !this.selectionModel.manyToOne
@@ -851,7 +882,7 @@ export class FilterableDropdownComponent
   }
 
   listFilterEnter(): void {
-    let filtered = this.filterPipe.transform(this.items, this.filterText)
+    const filtered = this.filteredItems
     if (filtered.length == 1) {
       this.selectionModel.toggle(filtered[0].id)
       setTimeout(() => {
@@ -896,12 +927,14 @@ export class FilterableDropdownComponent
             event.preventDefault()
           }
         } else if (event.target instanceof HTMLButtonElement) {
+          this.syncKeyboardIndexFromButton(event.target)
           this.focusNextButtonItem()
           event.preventDefault()
         }
         break
       case 'ArrowUp':
         if (event.target instanceof HTMLButtonElement) {
+          this.syncKeyboardIndexFromButton(event.target)
           if (this.keyboardIndex === 0) {
             this.listFilterTextInput.nativeElement.focus()
           } else {
@@ -938,15 +971,18 @@ export class FilterableDropdownComponent
     if (setFocus) this.setButtonItemFocus()
   }
 
-  setButtonItemFocus() {
-    this.buttonItems.nativeElement.children[
-      this.keyboardIndex
-    ]?.children[0].focus()
+  private syncKeyboardIndexFromButton(button: HTMLButtonElement) {
+    // because of virtual scrolling, re-calculate the index
+    const idx = this.renderedButtons.indexOf(button)
+    if (idx >= 0) {
+      this.keyboardIndex = this.buttonsViewport.getRenderedRange().start + idx
+    }
   }
 
-  setButtonItemIndex(index: number) {
-    // just track the index in case user uses arrows
-    this.keyboardIndex = index
+  setButtonItemFocus() {
+    const offset =
+      this.keyboardIndex - this.buttonsViewport.getRenderedRange().start
+    this.renderedButtons[offset]?.focus()
   }
 
   hideCount(item: ObjectWithPermissions) {

@@ -9,33 +9,49 @@
         <label class="form-label" for="metadataDocumentID" i18n>Documents:</label>
         <ul class="list-group"
             cdkDropList
+            [cdkDropListData]="documentIDs()"
             (cdkDropListDropped)="onDrop($event)">
-            @for (documentID of documentIDs; track documentID) {
-                <li class="list-group-item" cdkDrag>
+            @for (documentID of documentIDs(); track documentID) {
+              @let document = getDocument(documentID);
+              @if (document) {
+                <li class="list-group-item d-flex align-items-center" cdkDrag>
                     <i-bs name="grip-vertical" class="me-2"></i-bs>
-                    {{getDocument(documentID)?.title}}
+                    <div class="d-flex flex-column">
+                        <div>
+                          @if (document.correspondent) {
+                            <b>{{document.correspondent | correspondentName | async}}: </b>
+                          }{{document.title}}
+                        </div>
+                        <small class="text-muted">
+                          {{document.created | customDate:'mediumDate'}}
+                          @if (document.page_count) {
+                            | {document.page_count, plural, =1 {One page} other {{{document.page_count}} pages}}
+                          }
+                        </small>
+                    </div>
                 </li>
+              }
             }
         </ul>
         </div>
     <div class="form-group mt-4">
         <label class="form-label" for="metadataDocumentID" i18n>Use metadata from:</label>
-        <select class="form-select" [(ngModel)]="metadataDocumentID">
+        <select class="form-select" [ngModel]="metadataDocumentID()" (ngModelChange)="metadataDocumentID.set($event)">
             <option [ngValue]="-1" i18n>Regenerate all metadata</option>
-            @for (document of documents; track document.id) {
+            @for (document of documents(); track document.id) {
               <option [ngValue]="document.id">{{document.title}}</option>
             }
         </select>
     </div>
     <div class="form-check form-switch mt-4">
-      <input class="form-check-input" type="checkbox" role="switch" id="archiveFallbackSwitch" [(ngModel)]="archiveFallback">
+      <input class="form-check-input" type="checkbox" role="switch" id="archiveFallbackSwitch" [ngModel]="archiveFallback()" (ngModelChange)="archiveFallback.set($event)">
       <label class="form-check-label" for="archiveFallbackSwitch" i18n>Try to include archive version in merge for non-PDF files</label>
     </div>
     <div class="form-check form-switch mt-2">
-      <input class="form-check-input" type="checkbox" role="switch" id="deleteOriginalsSwitch" [(ngModel)]="deleteOriginals" [disabled]="!userOwnsAllDocuments">
+      <input class="form-check-input" type="checkbox" role="switch" id="deleteOriginalsSwitch" [ngModel]="deleteOriginals()" (ngModelChange)="deleteOriginals.set($event)" [disabled]="!userOwnsAllDocuments">
       <label class="form-check-label" for="deleteOriginalsSwitch" i18n>Delete original documents after successful merge</label>
     </div>
-    @if (!archiveFallback) {
+    @if (!archiveFallback()) {
       <p class="small text-muted fst-italic mt-4" i18n>Note that only PDFs will be included.</p>
     }
 </div>

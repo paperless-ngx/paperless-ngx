@@ -7,6 +7,7 @@ import {
   LOCALE_ID,
   Renderer2,
   RendererFactory2,
+  signal,
 } from '@angular/core'
 import { Meta } from '@angular/platform-browser'
 import { CookieService } from 'ngx-cookie-service'
@@ -135,6 +136,12 @@ const LANGUAGE_OPTIONS = [
     name: $localize`Hungarian`,
     englishName: 'Hungarian',
     dateInputFormat: 'yyyy.mm.dd',
+  },
+  {
+    code: 'id-id',
+    name: $localize`Indonesian`,
+    englishName: 'Indonesian',
+    dateInputFormat: 'dd-mm-yyyy',
   },
   {
     code: 'it-it',
@@ -270,6 +277,8 @@ const ISO_LANGUAGE_OPTION: LanguageOption = {
   dateInputFormat: 'yyyy-mm-dd',
 }
 
+const UNSAFE_OBJECT_KEYS = new Set(['__proto__', 'prototype', 'constructor'])
+
 @Injectable({
   providedIn: 'root',
 })
@@ -285,8 +294,9 @@ export class SettingsService {
 
   protected baseUrl: string = environment.apiBaseUrl + 'ui_settings/'
 
-  private settings: Object = {}
-  currentUser: User
+  private settings: Record<string, any> = {}
+  private readonly settingsVersion = signal(0)
+  readonly currentUser = signal<User>(undefined)
 
   public settingsSaved: EventEmitter<any> = new EventEmitter()
 
@@ -295,23 +305,39 @@ export class SettingsService {
     return this._renderer
   }
 
-  public dashboardIsEmpty: boolean = false
+  readonly dashboardIsEmpty = signal(false)
+  readonly globalDropzoneEnabled = signal(true)
+  readonly globalDropzoneActive = signal(false)
+  readonly organizingSidebarSavedViews = signal(false)
 
-  public globalDropzoneEnabled: boolean = true
-  public globalDropzoneActive: boolean = false
-  public organizingSidebarSavedViews: boolean = false
-
-  private _allDisplayFields: Array<{ id: DisplayField; name: string }> =
+  readonly allDisplayFields = signal<Array<{ id: DisplayField; name: string }>>(
     DEFAULT_DISPLAY_FIELDS
-  public get allDisplayFields(): Array<{ id: DisplayField; name: string }> {
-    return this._allDisplayFields
-  }
+  )
   public displayFieldsInit: EventEmitter<boolean> = new EventEmitter()
 
   constructor() {
     const rendererFactory = inject(RendererFactory2)
 
     this._renderer = rendererFactory.createRenderer(null, null)
+  }
+
+  private isSafeObjectKey(key: string): boolean {
+    return !UNSAFE_OBJECT_KEYS.has(key)
+  }
+
+  public trackChanges(): void {
+    this.settingsVersion()
+  }
+
+  private assignSafeSettings(source: Record<string, any>) {
+    if (!source || typeof source !== 'object' || Array.isArray(source)) {
+      return
+    }
+
+    for (const key of Object.keys(source)) {
+      if (!this.isSafeObjectKey(key)) continue
+      this.settings[key] = source[key]
+    }
   }
 
   // this is called by the app initializer in app.module
@@ -332,7 +358,7 @@ export class SettingsService {
         })
       }),
       tap((uisettings) => {
-        Object.assign(this.settings, uisettings.settings)
+        this.assignSafeSettings(uisettings.settings)
         if (this.get(SETTINGS_KEYS.APP_TITLE)?.length) {
           environment.appTitle = this.get(SETTINGS_KEYS.APP_TITLE)
         }
@@ -340,10 +366,10 @@ export class SettingsService {
         // to update lang cookie
         if (this.settings['language']?.length)
           this.setLanguage(this.settings['language'])
-        this.currentUser = uisettings.user
+        this.currentUser.set(uisettings.user)
         this.permissionsService.initialize(
           uisettings.permissions,
-          this.currentUser
+          this.currentUser()
         )
 
         this.initializeDisplayFields()
@@ -352,44 +378,39 @@ export class SettingsService {
   }
 
   public initializeDisplayFields() {
-    this._allDisplayFields = DEFAULT_DISPLAY_FIELDS
+    const displayFields = DEFAULT_DISPLAY_FIELDS?.map((field) => {
+      if (
+        field.id === DisplayField.NOTES &&
+        !this.get(SETTINGS_KEYS.NOTES_ENABLED)
+      ) {
+        return null
+      }
 
-    this._allDisplayFields = this._allDisplayFields
-      ?.map((field) => {
-        if (
-          field.id === DisplayField.NOTES &&
-          !this.get(SETTINGS_KEYS.NOTES_ENABLED)
-        ) {
-          return null
-        }
+      if (
+        [
+          DisplayField.TITLE,
+          DisplayField.CREATED,
+          DisplayField.ADDED,
+          DisplayField.ASN,
+          DisplayField.PAGE_COUNT,
+          DisplayField.SHARED,
+        ].includes(field.id)
+      ) {
+        return field
+      }
 
-        if (
-          [
-            DisplayField.TITLE,
-            DisplayField.CREATED,
-            DisplayField.ADDED,
-            DisplayField.ASN,
-            DisplayField.PAGE_COUNT,
-            DisplayField.SHARED,
-          ].includes(field.id)
-        ) {
-          return field
-        }
+      let type: PermissionType = Object.values(PermissionType).find((t) =>
+        t.includes(field.id)
+      )
+      if (field.id === DisplayField.OWNER) {
+        type = PermissionType.User
+      }
+      return this.permissionsService.currentUserCan(PermissionAction.View, type)
+        ? field
+        : null
+    }).filter(Boolean)
 
-        let type: PermissionType = Object.values(PermissionType).find((t) =>
-          t.includes(field.id)
-        )
-        if (field.id === DisplayField.OWNER) {
-          type = PermissionType.User
-        }
-        return this.permissionsService.currentUserCan(
-          PermissionAction.View,
-          type
-        )
-          ? field
-          : null
-      })
-      .filter((f) => f)
+    this.allDisplayFields.set(displayFields)
 
     if (
       this.permissionsService.currentUserCan(
@@ -398,13 +419,15 @@ export class SettingsService {
       )
     ) {
       this.customFieldsService.listAll().subscribe((r) => {
-        this._allDisplayFields = this._allDisplayFields.concat(
-          r.results.map((field) => {
-            return {
-              id: `${DisplayField.CUSTOM_FIELD}${field.id}` as any,
-              name: field.name,
-            }
-          })
+        this.allDisplayFields.set(
+          displayFields.concat(
+            r.results.map((field) => {
+              return {
+                id: `${DisplayField.CUSTOM_FIELD}${field.id}` as any,
+                name: field.name,
+              }
+            })
+          )
         )
         this.displayFieldsInit.emit(true)
       })
@@ -415,8 +438,8 @@ export class SettingsService {
 
   get displayName(): string {
     return (
-      this.currentUser.first_name ??
-      this.currentUser.username ??
+      this.currentUser()?.first_name ??
+      this.currentUser()?.username ??
       ''
     ).trim()
   }
@@ -527,7 +550,11 @@ export class SettingsService {
     let settingObj = this.settings
     keys.forEach((keyPart, index) => {
       keyPart = keyPart.replace(/-/g, '_')
-      if (!settingObj.hasOwnProperty(keyPart)) return
+      if (
+        !this.isSafeObjectKey(keyPart) ||
+        !Object.prototype.hasOwnProperty.call(settingObj, keyPart)
+      )
+        return
       if (index == keys.length - 1) value = settingObj[keyPart]
       else settingObj = settingObj[keyPart]
     })
@@ -545,7 +572,7 @@ export class SettingsService {
 
     // special case to fallback
     if (key === SETTINGS_KEYS.DEFAULT_PERMS_OWNER && value === undefined) {
-      return this.currentUser.id
+      return this.currentUser()?.id
     }
 
     if (value !== undefined) {
@@ -573,10 +600,13 @@ export class SettingsService {
     const keys = key.replace('general-settings:', '').split(':')
     keys.forEach((keyPart, index) => {
       keyPart = keyPart.replace(/-/g, '_')
-      if (!settingObj.hasOwnProperty(keyPart)) settingObj[keyPart] = {}
+      if (!this.isSafeObjectKey(keyPart)) return
+      if (!Object.prototype.hasOwnProperty.call(settingObj, keyPart))
+        settingObj[keyPart] = {}
       if (index == keys.length - 1) settingObj[keyPart] = value
       else settingObj = settingObj[keyPart]
     })
+    this.settingsVersion.update((version) => version + 1)
   }
 
   private settingIsSet(key: string): boolean {
@@ -596,7 +626,10 @@ export class SettingsService {
 
   maybeMigrateSettings() {
     if (
-      !this.settings.hasOwnProperty('documentListSize') &&
+      !Object.prototype.hasOwnProperty.call(
+        this.settings,
+        'documentListSize'
+      ) &&
       localStorage.getItem(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
     ) {
       // lets migrate
@@ -604,8 +637,7 @@ export class SettingsService {
       const errorMessage = $localize`Unable to migrate settings to the database, please try saving manually.`
 
       try {
-        for (const setting in SETTINGS_KEYS) {
-          const key = SETTINGS_KEYS[setting]
+        for (const key of Object.values(SETTINGS_KEYS)) {
           const value = localStorage.getItem(key)
           this.set(key, value)
         }
@@ -657,7 +689,7 @@ export class SettingsService {
   }
 
   offerTour(): boolean {
-    return this.dashboardIsEmpty && !this.get(SETTINGS_KEYS.TOUR_COMPLETE)
+    return this.dashboardIsEmpty() && !this.get(SETTINGS_KEYS.TOUR_COMPLETE)
   }
 
   completeTour() {
@@ -690,6 +722,19 @@ export class SettingsService {
   updateSidebarViewsSort(sidebarViews: SavedView[]): Observable<any> {
     this.set(SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER, [
       ...new Set(sidebarViews.map((v) => v.id)),
+    ])
+    return this.storeSettings()
+  }
+
+  updateSavedViewsVisibility(
+    dashboardVisibleViewIds: number[],
+    sidebarVisibleViewIds: number[]
+  ): Observable<any> {
+    this.set(SETTINGS_KEYS.DASHBOARD_VIEWS_VISIBLE_IDS, [
+      ...new Set(dashboardVisibleViewIds),
+    ])
+    this.set(SETTINGS_KEYS.SIDEBAR_VIEWS_VISIBLE_IDS, [
+      ...new Set(sidebarVisibleViewIds),
     ])
     return this.storeSettings()
   }

@@ -28,3 +28,4 @@
 ./resources
 # Other stuff
 **/*.drawio.png
+.mypy_baseline

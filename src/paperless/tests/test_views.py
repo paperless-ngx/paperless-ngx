@@ -1,25 +1,31 @@
-import tempfile
 from pathlib import Path
 
-from django.conf import settings
+from django.test import Client
+from pytest_django.fixtures import SettingsWrapper
 
 
-def test_favicon_view(client):
-    with tempfile.TemporaryDirectory() as tmpdir:
-        static_dir = Path(tmpdir)
-        favicon_path = static_dir / "paperless" / "img" / "favicon.ico"
-        favicon_path.parent.mkdir(parents=True, exist_ok=True)
-        favicon_path.write_bytes(b"FAKE ICON DATA")
+def test_favicon_view(
+    client: Client,
+    tmp_path: Path,
+    settings: SettingsWrapper,
+) -> None:
+    favicon_path = tmp_path / "paperless" / "img" / "favicon.ico"
+    favicon_path.parent.mkdir(parents=True)
+    favicon_path.write_bytes(b"FAKE ICON DATA")
 
-        settings.STATIC_ROOT = static_dir
+    settings.STATIC_ROOT = tmp_path
 
-        response = client.get("/favicon.ico")
-        assert response.status_code == 200
-        assert response["Content-Type"] == "image/x-icon"
-        assert b"".join(response.streaming_content) == b"FAKE ICON DATA"
+    response = client.get("/favicon.ico")
+    assert response.status_code == 200
+    assert response["Content-Type"] == "image/x-icon"
+    assert b"".join(response.streaming_content) == b"FAKE ICON DATA"
 
 
-def test_favicon_view_missing_file(client):
-    settings.STATIC_ROOT = Path(tempfile.mkdtemp())
+def test_favicon_view_missing_file(
+    client: Client,
+    tmp_path: Path,
+    settings: SettingsWrapper,
+) -> None:
+    settings.STATIC_ROOT = tmp_path
     response = client.get("/favicon.ico")
     assert response.status_code == 404

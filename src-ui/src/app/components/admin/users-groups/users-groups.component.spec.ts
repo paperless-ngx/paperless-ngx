@@ -1,12 +1,7 @@
 import { DatePipe } from '@angular/common'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
@@ -57,7 +52,7 @@ describe('UsersAndGroupsComponent', () => {
     }).compileComponents()
     fixture = TestBed.createComponent(UsersAndGroupsComponent)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = users[0]
+    settingsService.currentUser.set(users[0])
     userService = TestBed.inject(UserService)
     modalService = TestBed.inject(NgbModal)
     toastService = TestBed.inject(ToastService)
@@ -109,7 +104,7 @@ describe('UsersAndGroupsComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     editDialog.failed.emit()
     expect(toastErrorSpy).toHaveBeenCalled()
-    settingsService.currentUser = users[1] // simulate logged in as different user
+    settingsService.currentUser.set(users[1]) // simulate logged in as different user
     editDialog.succeeded.emit(users[0])
     expect(toastInfoSpy).toHaveBeenCalledWith(
       `Saved user "${users[0].username}".`
@@ -138,7 +133,8 @@ describe('UsersAndGroupsComponent', () => {
     expect(toastInfoSpy).toHaveBeenCalledWith('Deleted user "user1"')
   })
 
-  it('should logout current user if password changed, after delay', fakeAsync(() => {
+  it('should logout current user if password changed, after delay', () => {
+    jest.useFakeTimers()
     completeSetup()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
@@ -148,14 +144,15 @@ describe('UsersAndGroupsComponent', () => {
       .mockImplementation(() => {})
     const editDialog = modal.componentInstance as UserEditDialogComponent
     editDialog.passwordIsSet = true
-    settingsService.currentUser = users[0] // simulate logged in as same user
+    settingsService.currentUser.set(users[0]) // simulate logged in as same user
     editDialog.succeeded.emit(users[0])
     fixture.detectChanges()
-    tick(2600)
+    jest.advanceTimersByTime(2600)
     expect(navSpy).toHaveBeenCalledWith(
       `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
     )
-  }))
+    jest.useRealTimers()
+  })
 
   it('should support edit / create group, show error if needed', () => {
     completeSetup()

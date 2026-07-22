@@ -4,27 +4,27 @@
 
 Check for the following issues:
 
--   Ensure that the directory you're putting your documents in is the
-    folder paperless is watching. With docker, this setting is performed
-    in the `docker-compose.yml` file. Without Docker, look at the
-    `CONSUMPTION_DIR` setting. Don't adjust this setting if you're
-    using docker.
+- Ensure that the directory you're putting your documents in is the
+  folder paperless is watching. With docker, this setting is performed
+  in the `docker-compose.yml` file. Without Docker, look at the
+  `CONSUMPTION_DIR` setting. Don't adjust this setting if you're
+  using docker.
 
--   Ensure that redis is up and running. Paperless does its task
-    processing asynchronously, and for documents to arrive at the task
-    processor, it needs redis to run.
+- Ensure that the broker is up and running. Paperless does its task
+  processing asynchronously, and for documents to arrive at the task
+  processor, it needs the broker to run.
 
--   Ensure that the task processor is running. Docker does this
-    automatically. Manually invoke the task processor by executing
+- Ensure that the task processor is running. Docker does this
+  automatically. Manually invoke the task processor by executing
 
-    ```shell-session
-    celery --app paperless worker
-    ```
+  ```shell-session
+  celery --app paperless worker
+  ```
 
--   Look at the output of paperless and inspect it for any errors.
+- Look at the output of paperless and inspect it for any errors.
 
--   Go to the admin interface, and check if there are failed tasks. If
-    so, the tasks will contain an error message.
+- Go to the admin interface, and check if there are failed tasks. If
+  so, the tasks will contain an error message.
 
 ## Consumer warns `OCR for XX failed`
 
@@ -46,9 +46,9 @@ run:
 If you notice that the consumer will only pickup files in the
 consumption directory at startup, but won't find any other files added
 later, you will need to enable filesystem polling with the configuration
-option [`PAPERLESS_CONSUMER_POLLING`](configuration.md#PAPERLESS_CONSUMER_POLLING).
+option [`PAPERLESS_CONSUMER_POLLING_INTERVAL`](configuration.md#PAPERLESS_CONSUMER_POLLING_INTERVAL).
 
-This will disable listening to filesystem changes with inotify and
+This will disable automatic listening for filesystem changes and
 paperless will manually check the consumption directory for changes
 instead.
 
@@ -78,12 +78,12 @@ Ensure that `chown` is possible on these directories.
 This indicates that the Auto matching algorithm found no documents to
 learn from. This may have two reasons:
 
--   You don't use the Auto matching algorithm: The error can be safely
-    ignored in this case.
--   You are using the Auto matching algorithm: The classifier explicitly
-    excludes documents with Inbox tags. Verify that there are documents
-    in your archive without inbox tags. The algorithm will only learn
-    from documents not in your inbox.
+- You don't use the Auto matching algorithm: The error can be safely
+  ignored in this case.
+- You are using the Auto matching algorithm: The classifier explicitly
+  excludes documents with Inbox tags. Verify that there are documents
+  in your archive without inbox tags. The algorithm will only learn
+  from documents not in your inbox.
 
 ## UserWarning in sklearn on every single document
 
@@ -127,10 +127,10 @@ change in the `docker-compose.yml` file:
 # The gotenberg chromium route is used to convert .eml files. We do not
 # want to allow external content like tracking pixels or even javascript.
 command:
-    - 'gotenberg'
-    - '--chromium-disable-javascript=true'
-    - '--chromium-allow-list=file:///tmp/.*'
-    - '--api-timeout=60s'
+  - 'gotenberg'
+  - '--chromium-disable-javascript=true'
+  - '--chromium-allow-list=file:///tmp/.*'
+  - '--api-timeout=60s'
 ```
 
 ## Permission denied errors in the consumption directory
@@ -148,37 +148,6 @@ operating system, if these are different from `1000`. See [Docker setup](setup.m
 
 Also ensure that you are able to read and write to the consumption
 directory on the host.
-
-## OSError: \[Errno 19\] No such device when consuming files
-
-If you experience errors such as:
-
-```shell-session
-File "/usr/local/lib/python3.7/site-packages/whoosh/codec/base.py", line 570, in open_compound_file
-return CompoundStorage(dbfile, use_mmap=storage.supports_mmap)
-File "/usr/local/lib/python3.7/site-packages/whoosh/filedb/compound.py", line 75, in __init__
-self._source = mmap.mmap(fileno, 0, access=mmap.ACCESS_READ)
-OSError: [Errno 19] No such device
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-File "/usr/local/lib/python3.7/site-packages/django_q/cluster.py", line 436, in worker
-res = f(*task["args"], **task["kwargs"])
-File "/usr/src/paperless/src/documents/tasks.py", line 73, in consume_file
-override_tag_ids=override_tag_ids)
-File "/usr/src/paperless/src/documents/consumer.py", line 271, in try_consume_file
-raise ConsumerError(e)
-```
-
-Paperless uses a search index to provide better and faster full text
-searching. This search index is stored inside the `data` folder. The
-search index uses memory-mapped files (mmap). The above error indicates
-that paperless was unable to create and open these files.
-
-This happens when you're trying to store the data directory on certain
-file systems (mostly network shares) that don't support memory-mapped
-files.
 
 ## Web-UI stuck at "Loading\..."
 
@@ -234,47 +203,9 @@ FileNotFoundError: [Errno 2] No such file or directory: '/tmp/ocrmypdf.io.yhk3zb
 
 This probably indicates paperless tried to consume the same file twice.
 This can happen for a number of reasons, depending on how documents are
-placed into the consume folder. If paperless is using inotify (the
-default) to check for documents, try adjusting the
-[inotify configuration](configuration.md#inotify). If polling is enabled, try adjusting the
-[polling configuration](configuration.md#polling).
-
-## Consumer fails waiting for file to remain unmodified.
-
-You might find messages like these in your log files:
-
-```
-[ERROR] [paperless.management.consumer] Timeout while waiting on file /usr/src/paperless/src/../consume/SCN_0001.pdf to remain unmodified.
-```
-
-This indicates paperless timed out while waiting for the file to be
-completely written to the consume folder. Adjusting
-[polling configuration](configuration.md#polling) values should resolve the issue.
-
-!!! note
-
-    The user will need to manually move the file out of the consume folder
-    and back in, for the initial failing file to be consumed.
-
-## Consumer fails reporting "OS reports file as busy still".
-
-You might find messages like these in your log files:
-
-```
-[WARNING] [paperless.management.consumer] Not consuming file /usr/src/paperless/src/../consume/SCN_0001.pdf: OS reports file as busy still
-```
-
-This indicates paperless was unable to open the file, as the OS reported
-the file as still being in use. To prevent a crash, paperless did not
-try to consume the file. If paperless is using inotify (the default) to
-check for documents, try adjusting the
-[inotify configuration](configuration.md#inotify). If polling is enabled, try adjusting the
-[polling configuration](configuration.md#polling).
-
-!!! note
-
-    The user will need to manually move the file out of the consume folder
-    and back in, for the initial failing file to be consumed.
+placed into the consume folder, such as how a scanner may modify a file multiple times as it scans.
+Try adjusting the
+[file stability delay](configuration.md#PAPERLESS_CONSUMER_STABILITY_DELAY) to a larger value.
 
 ## Log reports "Creating PaperlessTask failed".
 

@@ -3,89 +3,47 @@ from __future__ import annotations
 import logging
 import mimetypes
 import os
-import re
 import shutil
 import subprocess
 import tempfile
-from functools import lru_cache
 from pathlib import Path
-from re import Match
 from typing import TYPE_CHECKING
 
 from django.conf import settings
-from django.utils import timezone
 
 from documents.loggers import LoggingMixin
-from documents.signals import document_consumer_declaration
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
-from paperless.config import OcrConfig
-from paperless.utils import ocr_to_dateparser_languages
+from paperless.parsers.registry import get_parser_registry
 
 if TYPE_CHECKING:
     import datetime
-    from collections.abc import Iterator
-
-# This regular expression will try to find dates in the document at
-# hand and will match the following formats:
-# - XX.YY.ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-# - XX/YY/ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-# - XX-YY-ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-# - ZZZZ.XX.YY with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-# - ZZZZ/XX/YY with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-# - ZZZZ-XX-YY with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-# - XX. MONTH ZZZZ with XX being 1 or 2 and ZZZZ being 2 or 4 digits
-# - MONTH ZZZZ, with ZZZZ being 4 digits
-# - MONTH XX, ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits
-# - XX MON ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits. MONTH is 3 letters
-# - XXPP MONTH ZZZZ with XX being 1 or 2 and PP being 2 letters and ZZZZ being 4 digits
-
-# TODO: isn't there a date parsing library for this?
-
-DATE_REGEX = re.compile(
-    r"(\b|(?!=([_-])))(\d{1,2})[\.\/-](\d{1,2})[\.\/-](\d{4}|\d{2})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))(\d{4}|\d{2})[\.\/-](\d{1,2})[\.\/-](\d{1,2})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))(\d{1,2}[\. ]+[a-zéûäëčžúřěáíóńźçŞğü]{3,9} \d{4}|[a-zéûäëčžúřěáíóńźçŞğü]{3,9} \d{1,2}, \d{4})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))([^\W\d_]{3,9} \d{1,2}, (\d{4}))(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))([^\W\d_]{3,9} \d{4})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))(\d{1,2}[^ 0-9]{2}[\. ]+[^ ]{3,9}[ \.\/-]\d{4})(\b|(?=([_-])))|"
-    r"(\b|(?!=([_-])))(\b\d{1,2}[ \.\/-][a-zéûäëčžúřěáíóńźçŞğü]{3}[ \.\/-]\d{4})(\b|(?=([_-])))",
-    re.IGNORECASE,
-)
-
 
 logger = logging.getLogger("paperless.parsing")
 
 
-@lru_cache(maxsize=8)
 def is_mime_type_supported(mime_type: str) -> bool:
     """
     Returns True if the mime type is supported, False otherwise
     """
-    return get_parser_class_for_mime_type(mime_type) is not None
+    return get_parser_registry().get_parser_for_file(mime_type, "") is not None
 
 
-@lru_cache(maxsize=8)
 def get_default_file_extension(mime_type: str) -> str:
     """
     Returns the default file extension for a mimetype, or
     an empty string if it could not be determined
     """
-    for response in document_consumer_declaration.send(None):
-        parser_declaration = response[1]
-        supported_mime_types = parser_declaration["mime_types"]
-
-        if mime_type in supported_mime_types:
-            return supported_mime_types[mime_type]
+    parser_class = get_parser_registry().get_parser_for_file(mime_type, "")
+    if parser_class is not None:
+        supported = parser_class.supported_mime_types()
+        if mime_type in supported:
+            return supported[mime_type]
 
     ext = mimetypes.guess_extension(mime_type)
-    if ext:
-        return ext
-    else:
-        return ""
+    return ext if ext else ""
 
 
-@lru_cache(maxsize=8)
 def is_file_ext_supported(ext: str) -> bool:
     """
     Returns True if the file extension is supported, False otherwise
@@ -99,42 +57,15 @@ def is_file_ext_supported(ext: str) -> bool:
 
 def get_supported_file_extensions() -> set[str]:
     extensions = set()
-    for response in document_consumer_declaration.send(None):
-        parser_declaration = response[1]
-        supported_mime_types = parser_declaration["mime_types"]
-
-        for mime_type in supported_mime_types:
+    for parser_class in get_parser_registry().all_parsers():
+        for mime_type, ext in parser_class.supported_mime_types().items():
             extensions.update(mimetypes.guess_all_extensions(mime_type))
             # Python's stdlib might be behind, so also add what the parser
             # says is the default extension
             # This makes image/webp supported on Python < 3.11
-            extensions.add(supported_mime_types[mime_type])
+            extensions.add(ext)
 
     return extensions
-
-
-def get_parser_class_for_mime_type(mime_type: str) -> type[DocumentParser] | None:
-    """
-    Returns the best parser (by weight) for the given mimetype or
-    None if no parser exists
-    """
-
-    options = []
-
-    for response in document_consumer_declaration.send(None):
-        parser_declaration = response[1]
-        supported_mime_types = parser_declaration["mime_types"]
-
-        if mime_type in supported_mime_types:
-            options.append(parser_declaration)
-
-    if not options:
-        return None
-
-    best_parser = sorted(options, key=lambda _: _["weight"], reverse=True)[0]
-
-    # Return the parser with the highest weight.
-    return best_parser["parser"]
 
 
 def run_convert(
@@ -155,7 +86,15 @@ def run_convert(
 ) -> None:
     environment = os.environ.copy()
     if settings.CONVERT_MEMORY_LIMIT:
+        # MAGICK_MEMORY_LIMIT sets the maximum amount of RAM the pixel cache can use.
+        # MAGICK_MAP_LIMIT sets the maximum amount of memory-mapped I/O allowed.
+        #
+        # For large-format documents  ImageMagick will hit the RAM limit and
+        # immediately try to "map" the remaining data. If MAGICK_MAP_LIMIT isn't
+        # also set, the process may trigger an OOM kill because the default
+        # system/policy map limit is often too restrictive for these massive bitmaps.
         environment["MAGICK_MEMORY_LIMIT"] = settings.CONVERT_MEMORY_LIMIT
+        environment["MAGICK_MAP_LIMIT"] = settings.CONVERT_MEMORY_LIMIT
     if settings.CONVERT_TMPDIR:
         environment["MAGICK_TMPDIR"] = settings.CONVERT_TMPDIR
 
@@ -259,75 +198,6 @@ def make_thumbnail_from_pdf(in_path: Path, temp_dir: Path, logging_group=None) -
     return out_path
 
 
-def parse_date(filename, text) -> datetime.datetime | None:
-    return next(parse_date_generator(filename, text), None)
-
-
-def parse_date_generator(filename, text) -> Iterator[datetime.datetime]:
-    """
-    Returns the date of the document.
-    """
-
-    def __parser(ds: str, date_order: str) -> datetime.datetime:
-        """
-        Call dateparser.parse with a particular date ordering
-        """
-        import dateparser
-
-        ocr_config = OcrConfig()
-        languages = settings.DATE_PARSER_LANGUAGES or ocr_to_dateparser_languages(
-            ocr_config.language,
-        )
-
-        return dateparser.parse(
-            ds,
-            settings={
-                "DATE_ORDER": date_order,
-                "PREFER_DAY_OF_MONTH": "first",
-                "RETURN_AS_TIMEZONE_AWARE": True,
-                "TIMEZONE": settings.TIME_ZONE,
-            },
-            locales=languages,
-        )
-
-    def __filter(date: datetime.datetime) -> datetime.datetime | None:
-        if (
-            date is not None
-            and date.year > 1900
-            and date <= timezone.now()
-            and date.date() not in settings.IGNORE_DATES
-        ):
-            return date
-        return None
-
-    def __process_match(
-        match: Match[str],
-        date_order: str,
-    ) -> datetime.datetime | None:
-        date_string = match.group(0)
-
-        try:
-            date = __parser(date_string, date_order)
-        except Exception:
-            # Skip all matches that do not parse to a proper date
-            date = None
-
-        return __filter(date)
-
-    def __process_content(content: str, date_order: str) -> Iterator[datetime.datetime]:
-        for m in re.finditer(DATE_REGEX, content):
-            date = __process_match(m, date_order)
-            if date is not None:
-                yield date
-
-    # if filename date parsing is enabled, search there first:
-    if settings.FILENAME_DATE_ORDER:
-        yield from __process_content(filename, settings.FILENAME_DATE_ORDER)
-
-    # Iterate through all regex matches in text and try to parse the date
-    yield from __process_content(text, settings.DATE_ORDER)
-
-
 class ParseError(Exception):
     pass
 
@@ -340,7 +210,7 @@ class DocumentParser(LoggingMixin):
 
     logging_name = "paperless.parsing"
 
-    def __init__(self, logging_group, progress_callback=None):
+    def __init__(self, logging_group, progress_callback=None) -> None:
         super().__init__()
         self.renew_logging_group()
         self.logging_group = logging_group
@@ -355,7 +225,7 @@ class DocumentParser(LoggingMixin):
         self.date: datetime.datetime | None = None
         self.progress_callback = progress_callback
 
-    def progress(self, current_progress, max_progress):
+    def progress(self, current_progress, max_progress) -> None:
         if self.progress_callback:
             self.progress_callback(current_progress, max_progress)
 
@@ -380,7 +250,7 @@ class DocumentParser(LoggingMixin):
     def extract_metadata(self, document_path, mime_type):
         return []
 
-    def get_page_count(self, document_path, mime_type):
+    def get_page_count(self, document_path, mime_type) -> None:
         return None
 
     def parse(self, document_path, mime_type, file_name=None):
@@ -401,6 +271,6 @@ class DocumentParser(LoggingMixin):
     def get_date(self) -> datetime.datetime | None:
         return self.date
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         self.log.debug(f"Deleting directory {self.tempdir}")
         shutil.rmtree(self.tempdir)

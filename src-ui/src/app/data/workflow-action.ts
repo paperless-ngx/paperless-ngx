@@ -5,6 +5,8 @@ export enum WorkflowActionType {
   Removal = 2,
   Email = 3,
   Webhook = 4,
+  PasswordRemoval = 5,
+  MoveToTrash = 6,
 }
 
 export interface WorkflowActionEmail extends ObjectWithId {
@@ -97,4 +99,6 @@ export interface WorkflowAction extends ObjectWithId {
   email?: WorkflowActionEmail
 
   webhook?: WorkflowActionWebhook
+
+  passwords?: string[]
 }

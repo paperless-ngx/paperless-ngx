@@ -1,9 +1,9 @@
 <form [formGroup]="form" (ngSubmit)="save()" autocomplete="off">
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title" i8n>{
-      documents.length,
+      documentCount,
       plural,
-      =1 {Set custom fields for 1 document} other {Set custom fields for {{documents.length}} documents}
+      =1 {Set custom fields for 1 document} other {Set custom fields for {{documentCount}} documents}
       }</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="cancel()">
     </button>

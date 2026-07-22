@@ -1,5 +1,12 @@
 import { NgClass } from '@angular/common'
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  inject,
+  signal,
+} from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent } from '@ng-select/ng-select'
@@ -75,7 +82,7 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
   @Output()
   ownerFilterSet = new EventEmitter<PermissionsSelectionModel>()
 
-  users: User[]
+  readonly users = signal<User[]>([])
 
   hideUnowned: boolean
 
@@ -102,7 +109,7 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
         .listAll()
         .pipe(first())
         .subscribe({
-          next: (result) => (this.users = result.results),
+          next: (result) => this.users.set(result.results),
         })
     }
   }
@@ -117,12 +124,12 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
     if (this.selectionModel.ownerFilter === OwnerFilterType.SELF) {
       this.selectionModel.includeUsers = []
       this.selectionModel.excludeUsers = []
-      this.selectionModel.userID = this.settingsService.currentUser.id
+      this.selectionModel.userID = this.settingsService.currentUser().id
       this.selectionModel.hideUnowned = false
     } else if (this.selectionModel.ownerFilter === OwnerFilterType.NOT_SELF) {
       this.selectionModel.userID = null
       this.selectionModel.includeUsers = []
-      this.selectionModel.excludeUsers = [this.settingsService.currentUser.id]
+      this.selectionModel.excludeUsers = [this.settingsService.currentUser().id]
       this.selectionModel.hideUnowned = false
     } else if (this.selectionModel.ownerFilter === OwnerFilterType.NONE) {
       this.selectionModel.userID = null
@@ -132,7 +139,7 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
     } else if (
       this.selectionModel.ownerFilter === OwnerFilterType.SHARED_BY_ME
     ) {
-      this.selectionModel.userID = this.settingsService.currentUser.id
+      this.selectionModel.userID = this.settingsService.currentUser()?.id
       this.selectionModel.includeUsers = []
       this.selectionModel.excludeUsers = []
       this.selectionModel.hideUnowned = false

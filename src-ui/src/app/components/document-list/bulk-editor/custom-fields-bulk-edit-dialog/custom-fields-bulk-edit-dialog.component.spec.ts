@@ -42,13 +42,27 @@ describe('CustomFieldsBulkEditDialogComponent', () => {
     expect(component.form.contains('2')).toBeTruthy()
   })
 
+  it('should render the document count for a filtered selection', () => {
+    component.selection = {
+      all: true,
+      filters: { title__icontains: 'invoice' },
+    }
+    component.selectionCount = 42
+    fixture.detectChanges()
+
+    expect(component.documents).toEqual([])
+    expect(
+      fixture.nativeElement.querySelector('.modal-title').textContent
+    ).toContain('Set custom fields for 42 documents')
+  })
+
   it('should emit succeeded event and close modal on successful save', () => {
     const editSpy = jest
       .spyOn(documentService, 'bulkEdit')
       .mockReturnValue(of('Success'))
     const successSpy = jest.spyOn(component.succeeded, 'emit')
 
-    component.documents = [1, 2]
+    component.selection = [1, 2]
     component.fieldsToAddIds = [1]
     component.form.controls['1'].setValue('Value 1')
     component.save()
@@ -63,7 +77,7 @@ describe('CustomFieldsBulkEditDialogComponent', () => {
       .mockReturnValue(throwError(new Error('Error')))
     const failSpy = jest.spyOn(component.failed, 'emit')
 
-    component.documents = [1, 2]
+    component.selection = [1, 2]
     component.fieldsToAddIds = [1]
     component.form.controls['1'].setValue('Value 1')
     component.save()

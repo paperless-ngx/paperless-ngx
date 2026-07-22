@@ -5,6 +5,7 @@ import {
   OnDestroy,
   OnInit,
   QueryList,
+  signal,
   ViewChild,
   ViewChildren,
 } from '@angular/core'
@@ -21,7 +22,7 @@ import {
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { TourNgBootstrapModule } from 'ngx-ui-tour-ng-bootstrap'
+import { TourNgBootstrap } from 'ngx-ui-tour-ng-bootstrap'
 import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
 import {
   DEFAULT_DISPLAY_FIELDS,
@@ -47,7 +48,10 @@ import { UsernamePipe } from 'src/app/pipes/username.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { HotKeyService } from 'src/app/services/hot-key.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
-import { PermissionsService } from 'src/app/services/permissions.service'
+import {
+  PermissionAction,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -99,7 +103,7 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
     NgbPaginationModule,
     NgClass,
     RouterModule,
-    TourNgBootstrapModule,
+    TourNgBootstrap,
   ],
 })
 export class DocumentListComponent
@@ -146,14 +150,20 @@ export class DocumentListComponent
     )
   }
 
-  unmodifiedFilterRules: FilterRule[] = []
+  readonly unmodifiedFilterRules = signal<FilterRule[]>([])
   private unmodifiedSavedView: SavedView
+  private activeSavedView: SavedView | null = null
 
   private unsubscribeNotifier: Subject<any> = new Subject()
 
   get savedViewIsModified(): boolean {
-    if (!this.list.activeSavedViewId || !this.unmodifiedSavedView) return false
-    else {
+    if (
+      !this.list.activeSavedViewId ||
+      !this.unmodifiedSavedView ||
+      !this.activeSavedViewCanChange
+    ) {
+      return false
+    } else {
       return (
         this.unmodifiedSavedView.sort_field !== this.list.sortField ||
         this.unmodifiedSavedView.sort_reverse !== this.list.sortReverse ||
@@ -178,6 +188,16 @@ export class DocumentListComponent
         )
       )
     }
+  }
+
+  get activeSavedViewCanChange(): boolean {
+    if (!this.activeSavedView) {
+      return false
+    }
+    return this.permissionService.currentUserHasObjectPermissions(
+      PermissionAction.Change,
+      this.activeSavedView
+    )
   }
 
   get isFiltered() {
@@ -212,8 +232,16 @@ export class DocumentListComponent
     this.list.setSort(event.column, event.reverse)
   }
 
+  onFilterRulesChange(filterRules: FilterRule[]) {
+    this.list.setFilterRules(filterRules)
+  }
+
+  onFilterRulesReset(filterRules: FilterRule[]) {
+    this.list.setFilterRules(filterRules, true)
+  }
+
   get isBulkEditing(): boolean {
-    return this.list.selected.size > 0
+    return this.list.hasSelection
   }
 
   toggleDisplayField(field: DisplayField) {
@@ -228,7 +256,7 @@ export class DocumentListComponent
   }
 
   public getDisplayCustomFieldTitle(field: string) {
-    return this.settingsService.allDisplayFields.find((f) => f.id === field)
+    return this.settingsService.allDisplayFields().find((f) => f.id === field)
       ?.name
   }
 
@@ -256,11 +284,13 @@ export class DocumentListComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(({ view }) => {
         if (!view) {
+          this.activeSavedView = null
           this.router.navigate(['404'], {
             replaceUrl: true,
           })
           return
         }
+        this.activeSavedView = view
         this.unmodifiedSavedView = view
         this.list.activateSavedViewWithQueryParams(
           view,
@@ -270,7 +300,7 @@ export class DocumentListComponent
           this.savedViewService.setDocumentCount(view, this.list.collectionSize)
         })
         this.updateDisplayCustomFields()
-        this.unmodifiedFilterRules = view.filter_rules
+        this.unmodifiedFilterRules.set(view.filter_rules)
       })
 
     this.route.queryParamMap
@@ -284,9 +314,10 @@ export class DocumentListComponent
           // loading a saved view on /documents
           this.loadViewConfig(parseInt(queryParams.get('view')))
         } else {
+          this.activeSavedView = null
           this.list.activateSavedView(null)
           this.list.loadFromQueryParams(queryParams)
-          this.unmodifiedFilterRules = []
+          this.unmodifiedFilterRules.set([])
         }
       })
 
@@ -297,10 +328,10 @@ export class DocumentListComponent
       })
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        if (this.list.selected.size > 0) {
+        if (this.list.hasSelection) {
           this.list.selectNone()
         } else if (this.isFiltered) {
-          this.filterEditor.resetSelected()
+          this.resetFilters()
         }
       })
 
@@ -326,7 +357,7 @@ export class DocumentListComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         if (this.list.documents.length > 0) {
-          if (this.list.selected.size > 0) {
+          if (this.list.hasSelection) {
             this.openDocumentDetail(Array.from(this.list.selected)[0])
           } else {
             this.openDocumentDetail(this.list.documents[0])
@@ -366,7 +397,7 @@ export class DocumentListComponent
   }
 
   saveViewConfig() {
-    if (this.list.activeSavedViewId != null) {
+    if (this.list.activeSavedViewId != null && this.activeSavedViewCanChange) {
       let savedView: SavedView = {
         id: this.list.activeSavedViewId,
         filter_rules: this.list.filterRules,
@@ -380,11 +411,12 @@ export class DocumentListComponent
         .pipe(first())
         .subscribe({
           next: (view) => {
+            this.activeSavedView = view
             this.unmodifiedSavedView = view
             this.toastService.showInfo(
               $localize`View "${this.list.activeSavedViewTitle}" saved successfully.`
             )
-            this.unmodifiedFilterRules = this.list.filterRules
+            this.unmodifiedFilterRules.set(this.list.filterRules)
           },
           error: (err) => {
             this.toastService.showError(
@@ -401,6 +433,11 @@ export class DocumentListComponent
       .getCached(viewID)
       .pipe(first())
       .subscribe((view) => {
+        if (!view) {
+          this.activeSavedView = null
+          return
+        }
+        this.activeSavedView = view
         this.unmodifiedSavedView = view
         this.list.activateSavedView(view)
         this.list.reload(() => {
@@ -413,40 +450,88 @@ export class DocumentListComponent
     let modal = this.modalService.open(SaveViewConfigDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.defaultName = this.filterEditor.generateFilterName()
+    modal.componentInstance.setDefaultName(
+      this.filterEditor.generateFilterName()
+    )
     modal.componentInstance.saveClicked.pipe(first()).subscribe((formValue) => {
-      modal.componentInstance.buttonsEnabled = false
+      modal.componentInstance.buttonsEnabled.set(false)
       let savedView: SavedView = {
         name: formValue.name,
-        show_on_dashboard: formValue.showOnDashboard,
-        show_in_sidebar: formValue.showInSideBar,
         filter_rules: this.list.filterRules,
         sort_reverse: this.list.sortReverse,
         sort_field: this.list.sortField,
         display_mode: this.list.displayMode,
         display_fields: this.activeDisplayFields,
       }
+      const permissions = formValue.permissions_form
+      if (permissions) {
+        if (permissions.owner !== null && permissions.owner !== undefined) {
+          savedView.owner = permissions.owner
+        }
+        if (permissions.set_permissions) {
+          savedView['set_permissions'] = permissions.set_permissions
+        }
+      }
 
       this.savedViewService
         .create(savedView)
         .pipe(first())
         .subscribe({
-          next: () => {
-            modal.close()
-            this.toastService.showInfo(
-              $localize`View "${savedView.name}" created successfully.`
+          next: (createdView) => {
+            this.saveCreatedViewVisibility(
+              createdView,
+              formValue.showOnDashboard,
+              formValue.showInSideBar
             )
+              .pipe(first())
+              .subscribe({
+                next: () => {
+                  modal.close()
+                  this.toastService.showInfo(
+                    $localize`View "${savedView.name}" created successfully.`
+                  )
+                },
+                error: (error) => {
+                  modal.close()
+                  this.toastService.showError(
+                    $localize`View "${savedView.name}" created successfully, but could not update visibility settings.`,
+                    error
+                  )
+                },
+              })
           },
           error: (httpError) => {
             let error = httpError.error
             if (error.filter_rules) {
               error.filter_rules = error.filter_rules.map((r) => r.value)
             }
-            modal.componentInstance.error = error
-            modal.componentInstance.buttonsEnabled = true
+            modal.componentInstance.error.set(error)
+            modal.componentInstance.buttonsEnabled.set(true)
           },
         })
     })
+  }
+
+  private saveCreatedViewVisibility(
+    createdView: SavedView,
+    showOnDashboard: boolean,
+    showInSideBar: boolean
+  ) {
+    const dashboardViewIds = this.savedViewService.dashboardViews.map(
+      (v) => v.id
+    )
+    const sidebarViewIds = this.savedViewService.sidebarViews.map((v) => v.id)
+    if (showOnDashboard) {
+      dashboardViewIds.push(createdView.id)
+    }
+    if (showInSideBar) {
+      sidebarViewIds.push(createdView.id)
+    }
+
+    return this.settingsService.updateSavedViewsVisibility(
+      dashboardViewIds,
+      sidebarViewIds
+    )
   }
 
   openDocumentDetail(document: Document | number) {
@@ -488,6 +573,7 @@ export class DocumentListComponent
   }
 
   get notesEnabled(): boolean {
+    this.settingsService.trackChanges()
     return this.settingsService.get(SETTINGS_KEYS.NOTES_ENABLED)
   }
 

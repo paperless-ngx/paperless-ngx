@@ -2,10 +2,34 @@
   font-size: 90%;
 }
 
+.fade.show {
+  animation: pngx-entry-fade 160ms ease-out;
+}
+
+@keyframes pngx-entry-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade.show {
+    animation: none;
+  }
+}
+
+.doc-img-container {
+  position: relative;
+  height: 180px;
+}
+
 .doc-img {
   object-fit: cover;
   object-position: top left;
-  height: 180px;
 }
 
 .document-card-check {

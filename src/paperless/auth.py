@@ -14,7 +14,7 @@ logger = logging.getLogger("paperless.auth")
 
 
 class AutoLoginMiddleware(MiddlewareMixin):
-    def process_request(self, request: HttpRequest):
+    def process_request(self, request: HttpRequest) -> None:
         # Dont use auto-login with token request
         if request.path.startswith("/api/token/") and request.method == "POST":
             return None

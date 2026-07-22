@@ -13,7 +13,9 @@ If you want to implement something big:
 
 ## Python
 
-Paperless supports python 3.10 - 3.12 at this time. We format Python code with [ruff](https://docs.astral.sh/ruff/formatter/).
+Paperless-ngx currently supports Python 3.11, 3.12, 3.13, and 3.14. As a policy, we aim to support at least the three most recent Python versions, and drop support for versions as they reach end-of-life. Older versions may be supported if dependencies permit, but this is not guaranteed.
+
+We format Python code with [ruff](https://docs.astral.sh/ruff/formatter/).
 
 ## Branches
 

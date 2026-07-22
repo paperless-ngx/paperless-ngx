@@ -15,12 +15,13 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import SampleDirMixin
+from documents.tests.utils import read_streaming_response
 
 
 class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
     ENDPOINT = "/api/documents/bulk_download/"
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
@@ -56,7 +57,7 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
         shutil.copy(self.SAMPLE_DIR / "simple.jpg", self.doc3.source_path)
         shutil.copy(self.SAMPLE_DIR / "test_with_bom.pdf", self.doc3.archive_path)
 
-    def test_download_originals(self):
+    def test_download_originals(self) -> None:
         response = self.client.post(
             self.ENDPOINT,
             json.dumps(
@@ -68,7 +69,7 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response["Content-Type"], "application/zip")
 
-        with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
+        with zipfile.ZipFile(io.BytesIO(read_streaming_response(response))) as zipf:
             self.assertEqual(len(zipf.filelist), 2)
             self.assertIn("2021-01-01 document A.pdf", zipf.namelist())
             self.assertIn("2020-03-21 document B.jpg", zipf.namelist())
@@ -79,7 +80,7 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
             with self.doc3.source_file as f:
                 self.assertEqual(f.read(), zipf.read("2020-03-21 document B.jpg"))
 
-    def test_download_default(self):
+    def test_download_default(self) -> None:
         response = self.client.post(
             self.ENDPOINT,
             json.dumps({"documents": [self.doc2.id, self.doc3.id]}),
@@ -89,7 +90,7 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response["Content-Type"], "application/zip")
 
-        with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
+        with zipfile.ZipFile(io.BytesIO(read_streaming_response(response))) as zipf:
             self.assertEqual(len(zipf.filelist), 2)
             self.assertIn("2021-01-01 document A.pdf", zipf.namelist())
             self.assertIn("2020-03-21 document B.pdf", zipf.namelist())
@@ -100,7 +101,7 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
             with self.doc3.archive_file as f:
                 self.assertEqual(f.read(), zipf.read("2020-03-21 document B.pdf"))
 
-    def test_download_both(self):
+    def test_download_both(self) -> None:
         response = self.client.post(
             self.ENDPOINT,
             json.dumps({"documents": [self.doc2.id, self.doc3.id], "content": "both"}),
@@ -110,7 +111,7 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response["Content-Type"], "application/zip")
 
-        with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
+        with zipfile.ZipFile(io.BytesIO(read_streaming_response(response))) as zipf:
             self.assertEqual(len(zipf.filelist), 3)
             self.assertIn("originals/2021-01-01 document A.pdf", zipf.namelist())
             self.assertIn("archive/2020-03-21 document B.pdf", zipf.namelist())
@@ -134,7 +135,7 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
                     zipf.read("originals/2020-03-21 document B.jpg"),
                 )
 
-    def test_filename_clashes(self):
+    def test_filename_clashes(self) -> None:
         response = self.client.post(
             self.ENDPOINT,
             json.dumps({"documents": [self.doc2.id, self.doc2b.id]}),
@@ -144,7 +145,7 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response["Content-Type"], "application/zip")
 
-        with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
+        with zipfile.ZipFile(io.BytesIO(read_streaming_response(response))) as zipf:
             self.assertEqual(len(zipf.filelist), 2)
 
             self.assertIn("2021-01-01 document A.pdf", zipf.namelist())
@@ -156,17 +157,18 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
             with self.doc2b.source_file as f:
                 self.assertEqual(f.read(), zipf.read("2021-01-01 document A_01.pdf"))
 
-    def test_compression(self):
-        self.client.post(
+    def test_compression(self) -> None:
+        response = self.client.post(
             self.ENDPOINT,
             json.dumps(
                 {"documents": [self.doc2.id, self.doc2b.id], "compression": "lzma"},
             ),
             content_type="application/json",
         )
+        response.close()
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
-    def test_formatted_download_originals(self):
+    def test_formatted_download_originals(self) -> None:
         """
         GIVEN:
             - Defined file naming format
@@ -203,7 +205,7 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response["Content-Type"], "application/zip")
 
-        with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
+        with zipfile.ZipFile(io.BytesIO(read_streaming_response(response))) as zipf:
             self.assertEqual(len(zipf.filelist), 2)
             self.assertIn("a space name/Title 2 - Doc 3.jpg", zipf.namelist())
             self.assertIn("test/This is Doc 2.pdf", zipf.namelist())
@@ -218,7 +220,7 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
                 )
 
     @override_settings(FILENAME_FORMAT="somewhere/{title}")
-    def test_formatted_download_archive(self):
+    def test_formatted_download_archive(self) -> None:
         """
         GIVEN:
             - Defined file naming format
@@ -249,7 +251,7 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response["Content-Type"], "application/zip")
 
-        with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
+        with zipfile.ZipFile(io.BytesIO(read_streaming_response(response))) as zipf:
             self.assertEqual(len(zipf.filelist), 2)
             self.assertIn("somewhere/This is Doc 2.pdf", zipf.namelist())
             self.assertIn("somewhere/Title 2 - Doc 3.pdf", zipf.namelist())
@@ -261,7 +263,7 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
                 self.assertEqual(f.read(), zipf.read("somewhere/Title 2 - Doc 3.pdf"))
 
     @override_settings(FILENAME_FORMAT="{document_type}/{title}")
-    def test_formatted_download_both(self):
+    def test_formatted_download_both(self) -> None:
         """
         GIVEN:
             - Defined file naming format
@@ -298,7 +300,7 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response["Content-Type"], "application/zip")
 
-        with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
+        with zipfile.ZipFile(io.BytesIO(read_streaming_response(response))) as zipf:
             self.assertEqual(len(zipf.filelist), 3)
             self.assertIn("originals/bill/This is Doc 2.pdf", zipf.namelist())
             self.assertIn("archive/statement/Title 2 - Doc 3.pdf", zipf.namelist())
@@ -322,7 +324,7 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
                     zipf.read("originals/statement/Title 2 - Doc 3.jpg"),
                 )
 
-    def test_download_insufficient_permissions(self):
+    def test_download_insufficient_permissions(self) -> None:
         user = User.objects.create_user(username="temp_user")
         self.client.force_authenticate(user=user)
 

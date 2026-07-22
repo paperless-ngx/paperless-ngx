@@ -1,5 +1,5 @@
 import re
-import shutil
+import warnings
 from pathlib import Path
 from unittest import mock
 
@@ -31,14 +31,14 @@ def dummy_preprocess(content: str, **kwargs):
 
 
 class TestClassifier(DirectoriesMixin, TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.classifier = DocumentClassifier()
         self.classifier.preprocess_content = mock.MagicMock(
             side_effect=dummy_preprocess,
         )
 
-    def generate_test_data(self):
+    def generate_test_data(self) -> None:
         self.c1 = Correspondent.objects.create(
             name="c1",
             matching_algorithm=Correspondent.MATCH_AUTO,
@@ -119,7 +119,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.doc2.tags.add(self.t3)
         self.doc_inbox.tags.add(self.t2)
 
-    def generate_train_and_save(self):
+    def generate_train_and_save(self) -> None:
         """
         Generates the training data, trains and saves the updated pickle
         file. This ensures the test is using the same scikit learn version
@@ -129,7 +129,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.classifier.train()
         self.classifier.save()
 
-    def test_no_training_data(self):
+    def test_no_training_data(self) -> None:
         """
         GIVEN:
             - No documents exist to train
@@ -141,7 +141,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         with self.assertRaisesMessage(ValueError, "No training data available."):
             self.classifier.train()
 
-    def test_no_non_inbox_tags(self):
+    def test_no_non_inbox_tags(self) -> None:
         """
         GIVEN:
             - No documents without an inbox tag exist
@@ -168,7 +168,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         with self.assertRaisesMessage(ValueError, "No training data available."):
             self.classifier.train()
 
-    def testEmpty(self):
+    def testEmpty(self) -> None:
         """
         GIVEN:
             - A document exists
@@ -189,7 +189,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertIsNone(self.classifier.predict_document_type(""))
         self.assertIsNone(self.classifier.predict_correspondent(""))
 
-    def testTrain(self):
+    def testTrain(self) -> None:
         """
         GIVEN:
             - Test data
@@ -211,7 +211,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
             [self.t1.pk, self.t3.pk],
         )
 
-    def testPredict(self):
+    def testPredict(self) -> None:
         """
         GIVEN:
             - Classifier trained against test data
@@ -265,7 +265,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
             self.assertEqual(mock_preprocess_content.call_count, 2)
             self.assertEqual(mock_transform.call_count, 2)
 
-    def test_no_retrain_if_no_change(self):
+    def test_no_retrain_if_no_change(self) -> None:
         """
         GIVEN:
             - Classifier trained with current data
@@ -280,7 +280,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertTrue(self.classifier.train())
         self.assertFalse(self.classifier.train())
 
-    def test_retrain_if_change(self):
+    def test_retrain_if_change(self) -> None:
         """
         GIVEN:
             - Classifier trained with current data
@@ -300,7 +300,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
 
         self.assertTrue(self.classifier.train())
 
-    def test_retrain_if_auto_match_set_changed(self):
+    def test_retrain_if_auto_match_set_changed(self) -> None:
         """
         GIVEN:
             - Classifier trained with current data
@@ -322,7 +322,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
 
         self.assertTrue(self.classifier.train())
 
-    def testVersionIncreased(self):
+    def testVersionIncreased(self) -> None:
         """
         GIVEN:
             - Existing classifier model saved at a version
@@ -348,7 +348,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
             # assure that we can load the classifier after saving it.
             classifier2.load()
 
-    def testSaveClassifier(self):
+    def testSaveClassifier(self) -> None:
         self.generate_train_and_save()
 
         new_classifier = DocumentClassifier()
@@ -357,7 +357,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
 
         self.assertFalse(new_classifier.train())
 
-    def test_load_and_classify(self):
+    def test_load_and_classify(self) -> None:
         self.generate_train_and_save()
 
         new_classifier = DocumentClassifier()
@@ -366,8 +366,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
 
         self.assertCountEqual(new_classifier.predict_tags(self.doc2.content), [45, 12])
 
-    @mock.patch("documents.classifier.pickle.load")
-    def test_load_corrupt_file(self, patched_pickle_load: mock.MagicMock):
+    def test_load_corrupt_file(self) -> None:
         """
         GIVEN:
             - Corrupted classifier pickle file
@@ -378,38 +377,118 @@ class TestClassifier(DirectoriesMixin, TestCase):
         """
         self.generate_train_and_save()
 
-        # First load is the schema version,allow it
-        patched_pickle_load.side_effect = [DocumentClassifier.FORMAT_VERSION, OSError()]
+        # Write garbage data (valid HMAC length but invalid content)
+        Path(settings.MODEL_FILE).write_bytes(b"\x00" * 64)
 
         with self.assertRaises(ClassifierModelCorruptError):
             self.classifier.load()
-            patched_pickle_load.assert_called()
-
-        patched_pickle_load.reset_mock()
-        patched_pickle_load.side_effect = [
-            DocumentClassifier.FORMAT_VERSION,
-            ClassifierModelCorruptError(),
-        ]
 
         self.assertIsNone(load_classifier())
-        patched_pickle_load.assert_called()
 
-    def test_load_new_scikit_learn_version(self):
+    def test_load_corrupt_pickle_valid_hmac(self) -> None:
         """
         GIVEN:
-            - classifier pickle file created with a different scikit-learn version
+            - A classifier file with valid HMAC but unparsable pickle data
         WHEN:
             - An attempt is made to load the classifier
         THEN:
-            - The classifier reports the warning was captured and processed
+            - The ClassifierModelCorruptError is raised
         """
-        # TODO: This wasn't testing the warning anymore, as the schema changed
-        # but as it was implemented, it would require installing an old version
-        # rebuilding the file and committing that.  Not developer friendly
-        # Need to rethink how to pass the load through to a file with a single
-        # old model?
+        garbage_data = b"this is not valid pickle data"
+        signature = DocumentClassifier._compute_hmac(garbage_data)
+        Path(settings.MODEL_FILE).write_bytes(signature + garbage_data)
 
-    def test_one_correspondent_predict(self):
+        with self.assertRaises(ClassifierModelCorruptError):
+            self.classifier.load()
+
+    def test_load_tampered_file(self) -> None:
+        """
+        GIVEN:
+            - A classifier model file whose data has been modified
+        WHEN:
+            - An attempt is made to load the classifier
+        THEN:
+            - The ClassifierModelCorruptError is raised due to HMAC mismatch
+        """
+        self.generate_train_and_save()
+
+        raw = Path(settings.MODEL_FILE).read_bytes()
+        # Flip a byte in the data portion (after the 32-byte HMAC)
+        tampered = raw[:32] + bytes([raw[32] ^ 0xFF]) + raw[33:]
+        Path(settings.MODEL_FILE).write_bytes(tampered)
+
+        with self.assertRaises(ClassifierModelCorruptError):
+            self.classifier.load()
+
+    def test_load_wrong_secret_key(self) -> None:
+        """
+        GIVEN:
+            - A classifier model file signed with a different SECRET_KEY
+        WHEN:
+            - An attempt is made to load the classifier
+        THEN:
+            - The ClassifierModelCorruptError is raised due to HMAC mismatch
+        """
+        self.generate_train_and_save()
+
+        with override_settings(SECRET_KEY="different-secret-key"):
+            with self.assertRaises(ClassifierModelCorruptError):
+                self.classifier.load()
+
+    def test_load_truncated_file(self) -> None:
+        """
+        GIVEN:
+            - A classifier model file that is too short to contain an HMAC
+        WHEN:
+            - An attempt is made to load the classifier
+        THEN:
+            - The ClassifierModelCorruptError is raised
+        """
+        Path(settings.MODEL_FILE).write_bytes(b"\x00" * 16)
+
+        with self.assertRaises(ClassifierModelCorruptError):
+            self.classifier.load()
+
+    def test_load_new_scikit_learn_version(self) -> None:
+        """
+        GIVEN:
+            - classifier pickle file triggers an InconsistentVersionWarning
+        WHEN:
+            - An attempt is made to load the classifier
+        THEN:
+            - IncompatibleClassifierVersionError is raised
+        """
+        from sklearn.exceptions import InconsistentVersionWarning
+
+        self.generate_train_and_save()
+
+        fake_warning = warnings.WarningMessage(
+            message=InconsistentVersionWarning(
+                estimator_name="MLPClassifier",
+                current_sklearn_version="1.0",
+                original_sklearn_version="0.9",
+            ),
+            category=InconsistentVersionWarning,
+            filename="",
+            lineno=0,
+        )
+
+        real_catch_warnings = warnings.catch_warnings
+
+        class PatchedCatchWarnings(real_catch_warnings):
+            def __enter__(self):
+                w = super().__enter__()
+                w.append(fake_warning)
+                return w
+
+        with mock.patch(
+            "documents.classifier.warnings.catch_warnings",
+            PatchedCatchWarnings,
+        ):
+            with self.assertRaises(IncompatibleClassifierVersionError):
+                self.classifier.load()
+
+    def test_one_correspondent_predict(self) -> None:
         c1 = Correspondent.objects.create(
             name="c1",
             matching_algorithm=Correspondent.MATCH_AUTO,
@@ -424,7 +503,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.classifier.train()
         self.assertEqual(self.classifier.predict_correspondent(doc1.content), c1.pk)
 
-    def test_one_correspondent_predict_manydocs(self):
+    def test_one_correspondent_predict_manydocs(self) -> None:
         c1 = Correspondent.objects.create(
             name="c1",
             matching_algorithm=Correspondent.MATCH_AUTO,
@@ -445,7 +524,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertEqual(self.classifier.predict_correspondent(doc1.content), c1.pk)
         self.assertIsNone(self.classifier.predict_correspondent(doc2.content))
 
-    def test_one_type_predict(self):
+    def test_one_type_predict(self) -> None:
         dt = DocumentType.objects.create(
             name="dt",
             matching_algorithm=DocumentType.MATCH_AUTO,
@@ -461,7 +540,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.classifier.train()
         self.assertEqual(self.classifier.predict_document_type(doc1.content), dt.pk)
 
-    def test_one_type_predict_manydocs(self):
+    def test_one_type_predict_manydocs(self) -> None:
         dt = DocumentType.objects.create(
             name="dt",
             matching_algorithm=DocumentType.MATCH_AUTO,
@@ -484,7 +563,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertEqual(self.classifier.predict_document_type(doc1.content), dt.pk)
         self.assertIsNone(self.classifier.predict_document_type(doc2.content))
 
-    def test_one_path_predict(self):
+    def test_one_path_predict(self) -> None:
         sp = StoragePath.objects.create(
             name="sp",
             matching_algorithm=StoragePath.MATCH_AUTO,
@@ -500,7 +579,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.classifier.train()
         self.assertEqual(self.classifier.predict_storage_path(doc1.content), sp.pk)
 
-    def test_one_path_predict_manydocs(self):
+    def test_one_path_predict_manydocs(self) -> None:
         sp = StoragePath.objects.create(
             name="sp",
             matching_algorithm=StoragePath.MATCH_AUTO,
@@ -523,7 +602,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertEqual(self.classifier.predict_storage_path(doc1.content), sp.pk)
         self.assertIsNone(self.classifier.predict_storage_path(doc2.content))
 
-    def test_one_tag_predict(self):
+    def test_one_tag_predict(self) -> None:
         t1 = Tag.objects.create(name="t1", matching_algorithm=Tag.MATCH_AUTO, pk=12)
 
         doc1 = Document.objects.create(
@@ -536,7 +615,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.classifier.train()
         self.assertListEqual(self.classifier.predict_tags(doc1.content), [t1.pk])
 
-    def test_one_tag_predict_unassigned(self):
+    def test_one_tag_predict_unassigned(self) -> None:
         Tag.objects.create(name="t1", matching_algorithm=Tag.MATCH_AUTO, pk=12)
 
         doc1 = Document.objects.create(
@@ -548,7 +627,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.classifier.train()
         self.assertListEqual(self.classifier.predict_tags(doc1.content), [])
 
-    def test_two_tags_predict_singledoc(self):
+    def test_two_tags_predict_singledoc(self) -> None:
         t1 = Tag.objects.create(name="t1", matching_algorithm=Tag.MATCH_AUTO, pk=12)
         t2 = Tag.objects.create(name="t2", matching_algorithm=Tag.MATCH_AUTO, pk=121)
 
@@ -563,7 +642,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.classifier.train()
         self.assertListEqual(self.classifier.predict_tags(doc4.content), [t1.pk, t2.pk])
 
-    def test_two_tags_predict(self):
+    def test_two_tags_predict(self) -> None:
         t1 = Tag.objects.create(name="t1", matching_algorithm=Tag.MATCH_AUTO, pk=12)
         t2 = Tag.objects.create(name="t2", matching_algorithm=Tag.MATCH_AUTO, pk=121)
 
@@ -599,7 +678,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertListEqual(self.classifier.predict_tags(doc3.content), [])
         self.assertListEqual(self.classifier.predict_tags(doc4.content), [t1.pk, t2.pk])
 
-    def test_one_tag_predict_multi(self):
+    def test_one_tag_predict_multi(self) -> None:
         t1 = Tag.objects.create(name="t1", matching_algorithm=Tag.MATCH_AUTO, pk=12)
 
         doc1 = Document.objects.create(
@@ -619,7 +698,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertListEqual(self.classifier.predict_tags(doc1.content), [t1.pk])
         self.assertListEqual(self.classifier.predict_tags(doc2.content), [t1.pk])
 
-    def test_one_tag_predict_multi_2(self):
+    def test_one_tag_predict_multi_2(self) -> None:
         t1 = Tag.objects.create(name="t1", matching_algorithm=Tag.MATCH_AUTO, pk=12)
 
         doc1 = Document.objects.create(
@@ -638,12 +717,12 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertListEqual(self.classifier.predict_tags(doc1.content), [t1.pk])
         self.assertListEqual(self.classifier.predict_tags(doc2.content), [])
 
-    def test_load_classifier_not_exists(self):
+    def test_load_classifier_not_exists(self) -> None:
         self.assertFalse(Path(settings.MODEL_FILE).exists())
         self.assertIsNone(load_classifier())
 
     @mock.patch("documents.classifier.DocumentClassifier.load")
-    def test_load_classifier(self, load):
+    def test_load_classifier(self, load) -> None:
         Path(settings.MODEL_FILE).touch()
         self.assertIsNotNone(load_classifier())
         load.assert_called_once()
@@ -659,7 +738,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
     @pytest.mark.skip(
         reason="Disabled caching due to high memory usage - need to investigate.",
     )
-    def test_load_classifier_cached(self):
+    def test_load_classifier_cached(self) -> None:
         classifier = load_classifier()
         self.assertIsNotNone(classifier)
 
@@ -668,7 +747,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
             load.assert_not_called()
 
     @mock.patch("documents.classifier.DocumentClassifier.load")
-    def test_load_classifier_incompatible_version(self, load):
+    def test_load_classifier_incompatible_version(self, load) -> None:
         Path(settings.MODEL_FILE).touch()
         self.assertTrue(Path(settings.MODEL_FILE).exists())
 
@@ -677,7 +756,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertFalse(Path(settings.MODEL_FILE).exists())
 
     @mock.patch("documents.classifier.DocumentClassifier.load")
-    def test_load_classifier_os_error(self, load):
+    def test_load_classifier_os_error(self, load) -> None:
         Path(settings.MODEL_FILE).touch()
         self.assertTrue(Path(settings.MODEL_FILE).exists())
 
@@ -685,19 +764,8 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertIsNone(load_classifier())
         self.assertTrue(Path(settings.MODEL_FILE).exists())
 
-    def test_load_old_classifier_version(self):
-        shutil.copy(
-            Path(__file__).parent / "data" / "v1.17.4.model.pickle",
-            self.dirs.scratch_dir,
-        )
-        with override_settings(
-            MODEL_FILE=self.dirs.scratch_dir / "v1.17.4.model.pickle",
-        ):
-            classifier = load_classifier()
-            self.assertIsNone(classifier)
-
     @mock.patch("documents.classifier.DocumentClassifier.load")
-    def test_load_classifier_raise_exception(self, mock_load):
+    def test_load_classifier_raise_exception(self, mock_load) -> None:
         Path(settings.MODEL_FILE).touch()
         mock_load.side_effect = IncompatibleClassifierVersionError("Dummy Error")
         with self.assertRaises(IncompatibleClassifierVersionError):
@@ -719,7 +787,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
             load_classifier(raise_exception=True)
 
 
-def test_preprocess_content():
+def test_preprocess_content() -> None:
     """
     GIVEN:
         - Advanced text processing is enabled (default)
@@ -739,7 +807,7 @@ def test_preprocess_content():
     assert result == expected_preprocess_content
 
 
-def test_preprocess_content_nltk_disabled():
+def test_preprocess_content_nltk_disabled() -> None:
     """
     GIVEN:
         - Advanced text processing is disabled
@@ -760,7 +828,7 @@ def test_preprocess_content_nltk_disabled():
     assert result == expected_preprocess_content
 
 
-def test_preprocess_content_nltk_load_fail(mocker):
+def test_preprocess_content_nltk_load_fail(mocker) -> None:
     """
     GIVEN:
         - NLTK stop words fail to load

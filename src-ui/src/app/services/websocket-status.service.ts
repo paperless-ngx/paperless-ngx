@@ -1,7 +1,8 @@
-import { Injectable, inject } from '@angular/core'
+import { Injectable, inject, signal } from '@angular/core'
 import { Subject } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { User } from '../data/user'
+import { WebsocketDocumentUpdatedMessage } from '../data/websocket-document-updated-message'
 import { WebsocketDocumentsDeletedMessage } from '../data/websocket-documents-deleted-message'
 import { WebsocketProgressMessage } from '../data/websocket-progress-message'
 import { SettingsService } from './settings.service'
@@ -9,6 +10,7 @@ import { SettingsService } from './settings.service'
 export enum WebsocketStatusType {
   STATUS_UPDATE = 'status_update',
   DOCUMENTS_DELETED = 'documents_deleted',
+  DOCUMENT_UPDATED = 'document_updated',
 }
 
 // see ProgressStatusOptions in src/documents/plugins/helpers.py
@@ -89,32 +91,42 @@ export class FileStatus {
   }
 }
 
+export enum UploadState {
+  Idle = 'idle',
+  Uploading = 'uploading',
+  Processing = 'processing',
+  Failed = 'failed',
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class WebsocketStatusService {
-  private settingsService = inject(SettingsService)
+  private readonly settingsService = inject(SettingsService)
 
   private statusWebSocket: WebSocket
 
-  private consumerStatus: FileStatus[] = []
+  private readonly consumerStatus = signal<FileStatus[]>([])
 
-  private documentDetectedSubject = new Subject<FileStatus>()
-  private documentConsumptionFinishedSubject = new Subject<FileStatus>()
-  private documentConsumptionFailedSubject = new Subject<FileStatus>()
-  private documentDeletedSubject = new Subject<boolean>()
-  private connectionStatusSubject = new Subject<boolean>()
+  private readonly documentDetectedSubject = new Subject<FileStatus>()
+  private readonly documentConsumptionFinishedSubject =
+    new Subject<FileStatus>()
+  private readonly documentConsumptionFailedSubject = new Subject<FileStatus>()
+  private readonly documentDeletedSubject = new Subject<boolean>()
+  private readonly documentUpdatedSubject =
+    new Subject<WebsocketDocumentUpdatedMessage>()
+  private readonly connectionStatusSubject = new Subject<boolean>()
 
   private get(taskId: string, filename?: string) {
     let status =
-      this.consumerStatus.find((e) => e.taskId == taskId) ||
-      this.consumerStatus.find(
+      this.consumerStatus().find((e) => e.taskId == taskId) ||
+      this.consumerStatus().find(
         (e) => e.filename == filename && e.taskId == null
       )
     let created = false
     if (!status) {
       status = new FileStatus()
-      this.consumerStatus.push(status)
+      this.consumerStatus.update((statuses) => [...statuses, status])
       created = true
     }
     status.taskId = taskId
@@ -125,24 +137,30 @@ export class WebsocketStatusService {
   newFileUpload(filename: string): FileStatus {
     let status = new FileStatus()
     status.filename = filename
-    this.consumerStatus.push(status)
+    this.consumerStatus.update((statuses) => [...statuses, status])
     return status
+  }
+
+  statusChanged() {
+    this.consumerStatus.update((statuses) => [...statuses])
   }
 
   getConsumerStatus(phase?: FileStatusPhase) {
     if (phase != null) {
-      return this.consumerStatus.filter((s) => s.phase == phase)
+      return this.consumerStatus().filter((s) => s.phase == phase)
     } else {
-      return this.consumerStatus
+      return this.consumerStatus()
     }
   }
 
   getConsumerStatusNotCompleted() {
-    return this.consumerStatus.filter((s) => s.phase < FileStatusPhase.SUCCESS)
+    return this.consumerStatus().filter(
+      (s) => s.phase < FileStatusPhase.SUCCESS
+    )
   }
 
   getConsumerStatusCompleted() {
-    return this.consumerStatus.filter(
+    return this.consumerStatus().filter(
       (s) =>
         s.phase == FileStatusPhase.FAILED || s.phase == FileStatusPhase.SUCCESS
     )
@@ -169,12 +187,21 @@ export class WebsocketStatusService {
         data: messageData,
       }: {
         type: WebsocketStatusType
-        data: WebsocketProgressMessage | WebsocketDocumentsDeletedMessage
+        data:
+          | WebsocketProgressMessage
+          | WebsocketDocumentsDeletedMessage
+          | WebsocketDocumentUpdatedMessage
       } = JSON.parse(ev.data)
 
       switch (type) {
         case WebsocketStatusType.DOCUMENTS_DELETED:
           this.documentDeletedSubject.next(true)
+          break
+
+        case WebsocketStatusType.DOCUMENT_UPDATED:
+          this.handleDocumentUpdated(
+            messageData as WebsocketDocumentUpdatedMessage
+          )
           break
 
         case WebsocketStatusType.STATUS_UPDATE:
@@ -184,9 +211,13 @@ export class WebsocketStatusService {
     }
   }
 
-  private canViewMessage(messageData: WebsocketProgressMessage): boolean {
+  private canViewMessage(messageData: {
+    owner_id?: number
+    users_can_view?: number[]
+    groups_can_view?: number[]
+  }): boolean {
     // see paperless.consumers.StatusConsumer._can_view
-    const user: User = this.settingsService.currentUser
+    const user: User = this.settingsService.currentUser()
     return (
       !messageData.owner_id ||
       user.is_superuser ||
@@ -225,6 +256,7 @@ export class WebsocketStatusService {
     if (messageData.status in FileStatusPhase) {
       status.phase = FileStatusPhase[messageData.status]
     }
+    this.statusChanged()
 
     switch (status.phase) {
       case FileStatusPhase.STARTED:
@@ -244,9 +276,19 @@ export class WebsocketStatusService {
     }
   }
 
+  handleDocumentUpdated(messageData: WebsocketDocumentUpdatedMessage) {
+    // fallback if backend didn't restrict message
+    if (!this.canViewMessage(messageData)) {
+      return
+    }
+
+    this.documentUpdatedSubject.next(messageData)
+  }
+
   fail(status: FileStatus, message: string) {
     status.message = message
     status.phase = FileStatusPhase.FAILED
+    this.statusChanged()
     this.documentConsumptionFailedSubject.next(status)
   }
 
@@ -260,24 +302,28 @@ export class WebsocketStatusService {
   dismiss(status: FileStatus) {
     let index
     if (status.taskId != null) {
-      index = this.consumerStatus.findIndex((s) => s.taskId == status.taskId)
+      index = this.consumerStatus().findIndex((s) => s.taskId == status.taskId)
     } else {
-      index = this.consumerStatus.findIndex(
+      index = this.consumerStatus().findIndex(
         (s) => s.filename == status.filename
       )
     }
 
     if (index > -1) {
-      this.consumerStatus.splice(index, 1)
+      this.consumerStatus.update((statuses) =>
+        statuses.filter((_, statusIndex) => statusIndex !== index)
+      )
     }
   }
 
   dismissCompleted() {
-    this.consumerStatus = this.consumerStatus.filter(
-      (status) =>
-        ![FileStatusPhase.SUCCESS, FileStatusPhase.FAILED].includes(
-          status.phase
-        )
+    this.consumerStatus.update((statuses) =>
+      statuses.filter(
+        (status) =>
+          ![FileStatusPhase.SUCCESS, FileStatusPhase.FAILED].includes(
+            status.phase
+          )
+      )
     )
   }
 
@@ -295,6 +341,10 @@ export class WebsocketStatusService {
 
   onDocumentDeleted() {
     return this.documentDeletedSubject
+  }
+
+  onDocumentUpdated() {
+    return this.documentUpdatedSubject
   }
 
   onConnectionStatus() {

@@ -4,12 +4,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import { RouterModule } from '@angular/router'
@@ -21,6 +16,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { provideUiTour } from 'ngx-ui-tour-ng-bootstrap'
 import { of, throwError } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
@@ -66,6 +62,8 @@ import {
   FILTER_OWNER_DOES_NOT_INCLUDE,
   FILTER_OWNER_ISNULL,
   FILTER_SHARED_BY_USER,
+  FILTER_SIMPLE_TEXT,
+  FILTER_SIMPLE_TITLE,
   FILTER_STORAGE_PATH,
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
@@ -186,8 +184,13 @@ describe('FilterEditorComponent', () => {
   let httpTestingController: HttpTestingController
   let searchService: SearchService
 
-  beforeEach(fakeAsync(() => {
-    TestBed.configureTestingModule({
+  const tick = (ms: number = 0) => {
+    jest.advanceTimersByTime(ms)
+    fixture.detectChanges()
+  }
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       imports: [
         RouterModule,
         NgbDropdownModule,
@@ -251,12 +254,13 @@ describe('FilterEditorComponent', () => {
         SettingsService,
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
+        provideUiTour(),
       ],
     }).compileComponents()
 
     documentService = TestBed.inject(DocumentService)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = users[0]
+    settingsService.currentUser.set(users[0])
     permissionsService = TestBed.inject(PermissionsService)
     searchService = TestBed.inject(SearchService)
     jest
@@ -271,8 +275,13 @@ describe('FilterEditorComponent', () => {
     component = fixture.componentInstance
     component.filterRules = []
     fixture.detectChanges()
-    tick()
-  }))
+    await fixture.whenStable()
+    jest.useFakeTimers()
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
 
   it('should not attempt to retrieve objects if user does not have permissions', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReset()
@@ -294,7 +303,7 @@ describe('FilterEditorComponent', () => {
 
   // SET filterRules
 
-  it('should ingest text filter rules for doc title', fakeAsync(() => {
+  it('should ingest text filter rules for doc title', () => {
     expect(component.textFilter).toEqual(null)
     component.filterRules = [
       {
@@ -304,21 +313,33 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.textFilter).toEqual('foo')
     expect(component.textFilterTarget).toEqual('title') // TEXT_FILTER_TARGET_TITLE
-  }))
+  })
 
-  it('should ingest text filter rules for doc title + content', fakeAsync(() => {
+  it('should ingest text filter rules for doc title + content', () => {
     expect(component.textFilter).toEqual(null)
     component.filterRules = [
       {
-        rule_type: FILTER_TITLE_CONTENT,
+        rule_type: FILTER_SIMPLE_TEXT,
         value: 'foo',
       },
     ]
     expect(component.textFilter).toEqual('foo')
     expect(component.textFilterTarget).toEqual('title-content') // TEXT_FILTER_TARGET_TITLE_CONTENT
-  }))
+  })
 
-  it('should ingest text filter rules for doc asn', fakeAsync(() => {
+  it('should ingest legacy text filter rules for doc title + content', () => {
+    expect(component.textFilter).toBeNull()
+    component.filterRules = [
+      {
+        rule_type: FILTER_TITLE_CONTENT,
+        value: 'legacy foo',
+      },
+    ]
+    expect(component.textFilter).toEqual('legacy foo')
+    expect(component.textFilterTarget).toEqual('title-content') // TEXT_FILTER_TARGET_TITLE_CONTENT
+  })
+
+  it('should ingest text filter rules for doc asn', () => {
     expect(component.textFilter).toEqual(null)
     component.filterRules = [
       {
@@ -328,9 +349,9 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.textFilter).toEqual('foo')
     expect(component.textFilterTarget).toEqual('asn') // TEXT_FILTER_TARGET_ASN
-  }))
+  })
 
-  it('should ingest text filter rules for custom fields', fakeAsync(() => {
+  it('should ingest text filter rules for custom fields', () => {
     expect(component.textFilter).toEqual(null)
     component.filterRules = [
       {
@@ -340,9 +361,9 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.textFilter).toEqual('foo')
     expect(component.textFilterTarget).toEqual('custom-fields') // TEXT_FILTER_TARGET_CUSTOM_FIELDS
-  }))
+  })
 
-  it('should ingest text filter rules for doc asn is null', fakeAsync(() => {
+  it('should ingest text filter rules for doc asn is null', () => {
     expect(component.textFilterTarget).toEqual('title-content')
     expect(component.textFilterModifier).toEqual('equals') // TEXT_FILTER_MODIFIER_EQUALS
     component.filterRules = [
@@ -353,9 +374,9 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.textFilterTarget).toEqual('asn') // TEXT_FILTER_TARGET_ASN
     expect(component.textFilterModifier).toEqual('is null') // TEXT_FILTER_MODIFIER_NULL
-  }))
+  })
 
-  it('should ingest text filter rules for doc asn is not null', fakeAsync(() => {
+  it('should ingest text filter rules for doc asn is not null', () => {
     expect(component.textFilterTarget).toEqual('title-content')
     expect(component.textFilterModifier).toEqual('equals') // TEXT_FILTER_MODIFIER_EQUALS
     component.filterRules = [
@@ -366,9 +387,9 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.textFilterTarget).toEqual('asn') // TEXT_FILTER_TARGET_ASN
     expect(component.textFilterModifier).toEqual('not null') // TEXT_FILTER_MODIFIER_NOTNULL
-  }))
+  })
 
-  it('should ingest text filter rules for doc asn greater than', fakeAsync(() => {
+  it('should ingest text filter rules for doc asn greater than', () => {
     expect(component.textFilterTarget).toEqual('title-content')
     expect(component.textFilterModifier).toEqual('equals') // TEXT_FILTER_MODIFIER_EQUALS
     component.filterRules = [
@@ -379,9 +400,9 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.textFilterTarget).toEqual('asn') // TEXT_FILTER_TARGET_ASN
     expect(component.textFilterModifier).toEqual('greater') // TEXT_FILTER_MODIFIER_GT
-  }))
+  })
 
-  it('should ingest text filter rules for doc asn less than', fakeAsync(() => {
+  it('should ingest text filter rules for doc asn less than', () => {
     expect(component.textFilterTarget).toEqual('title-content')
     expect(component.textFilterModifier).toEqual('equals') // TEXT_FILTER_MODIFIER_EQUALS
     component.filterRules = [
@@ -392,9 +413,9 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.textFilterTarget).toEqual('asn') // TEXT_FILTER_TARGET_ASN
     expect(component.textFilterModifier).toEqual('less') // TEXT_FILTER_MODIFIER_LT
-  }))
+  })
 
-  it('should ingest text filter rules for mime type', fakeAsync(() => {
+  it('should ingest text filter rules for mime type', () => {
     expect(component.textFilter).toEqual(null)
     component.filterRules = [
       {
@@ -404,9 +425,9 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.textFilter).toEqual('pdf')
     expect(component.textFilterTarget).toEqual('mime-type') // TEXT_FILTER_TARGET_MIME_TYPE
-  }))
+  })
 
-  it('should ingest text filter rules for fulltext query', fakeAsync(() => {
+  it('should ingest text filter rules for fulltext query', () => {
     expect(component.textFilter).toEqual(null)
     component.filterRules = [
       {
@@ -416,9 +437,9 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.textFilter).toEqual('foo,bar')
     expect(component.textFilterTarget).toEqual('fulltext-query') // TEXT_FILTER_TARGET_FULLTEXT_QUERY
-  }))
+  })
 
-  it('should ingest text filter rules for fulltext query that include date created', fakeAsync(() => {
+  it('should ingest text filter rules for fulltext query that include date created', () => {
     expect(component.dateCreatedRelativeDate).toBeNull()
     component.filterRules = [
       {
@@ -428,9 +449,9 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.dateCreatedRelativeDate).toEqual(1) // RELATIVE_DATE_QUERYSTRINGS['-1 week to now']
     expect(component.textFilter).toBeNull()
-  }))
+  })
 
-  it('should ingest text filter rules for fulltext query that include date added', fakeAsync(() => {
+  it('should ingest text filter rules for fulltext query that include date added', () => {
     expect(component.dateAddedRelativeDate).toBeNull()
     component.filterRules = [
       {
@@ -440,9 +461,9 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.dateAddedRelativeDate).toEqual(1) // RELATIVE_DATE_QUERYSTRINGS['-1 week to now']
     expect(component.textFilter).toBeNull()
-  }))
+  })
 
-  it('should ingest text filter content with relative dates that are not in quick list', fakeAsync(() => {
+  it('should ingest text filter content with relative dates that are not in quick list', () => {
     expect(component.dateAddedRelativeDate).toBeNull()
     component.filterRules = [
       {
@@ -462,9 +483,9 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.dateCreatedRelativeDate).toBeNull()
     expect(component.textFilter).toEqual('created:[-2 week to now]')
-  }))
+  })
 
-  it('should ingest text filter rules for more like', fakeAsync(() => {
+  it('should ingest text filter rules for more like', () => {
     const moreLikeSpy = jest.spyOn(documentService, 'get')
     moreLikeSpy.mockReturnValue(of({ id: 1, title: 'Foo Bar' }))
     expect(component.textFilter).toEqual(null)
@@ -484,9 +505,9 @@ describe('FilterEditorComponent', () => {
         value: '1',
       },
     ])
-  }))
+  })
 
-  it('should ingest filter rules for date created after and adjust date by 1 day', fakeAsync(() => {
+  it('should ingest filter rules for date created after and adjust date by 1 day', () => {
     expect(component.dateCreatedFrom).toBeNull()
     component.filterRules = [
       {
@@ -495,9 +516,9 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.dateCreatedFrom).toEqual('2023-05-15')
-  }))
+  })
 
-  it('should ingest filter rules for date created from', fakeAsync(() => {
+  it('should ingest filter rules for date created from', () => {
     expect(component.dateCreatedFrom).toBeNull()
     component.filterRules = [
       {
@@ -506,9 +527,9 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.dateCreatedFrom).toEqual('2023-05-14')
-  }))
+  })
 
-  it('should ingest filter rules for date created before and adjust date by 1 day', fakeAsync(() => {
+  it('should ingest filter rules for date created before and adjust date by 1 day', () => {
     expect(component.dateCreatedTo).toBeNull()
     component.filterRules = [
       {
@@ -517,9 +538,9 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.dateCreatedTo).toEqual('2023-05-13')
-  }))
+  })
 
-  it('should ingest filter rules for date created to', fakeAsync(() => {
+  it('should ingest filter rules for date created to', () => {
     expect(component.dateCreatedTo).toBeNull()
     component.filterRules = [
       {
@@ -528,9 +549,9 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.dateCreatedTo).toEqual('2023-05-14')
-  }))
+  })
 
-  it('should ingest filter rules for date added after and adjust date by 1 day', fakeAsync(() => {
+  it('should ingest filter rules for date added after and adjust date by 1 day', () => {
     expect(component.dateAddedFrom).toBeNull()
     component.filterRules = [
       {
@@ -539,9 +560,9 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.dateAddedFrom).toEqual('2023-05-15')
-  }))
+  })
 
-  it('should ingest filter rules for date added from', fakeAsync(() => {
+  it('should ingest filter rules for date added from', () => {
     expect(component.dateAddedFrom).toBeNull()
     component.filterRules = [
       {
@@ -550,9 +571,9 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.dateAddedFrom).toEqual('2023-05-14')
-  }))
+  })
 
-  it('should ingest filter rules for date added before and adjust date by 1 day', fakeAsync(() => {
+  it('should ingest filter rules for date added before and adjust date by 1 day', () => {
     expect(component.dateAddedTo).toBeNull()
     component.filterRules = [
       {
@@ -561,9 +582,9 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.dateAddedTo).toEqual('2023-05-13')
-  }))
+  })
 
-  it('should ingest filter rules for date added to', fakeAsync(() => {
+  it('should ingest filter rules for date added to', () => {
     expect(component.dateAddedTo).toBeNull()
     component.filterRules = [
       {
@@ -572,9 +593,9 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.dateAddedTo).toEqual('2023-05-14')
-  }))
+  })
 
-  it('should ingest filter rules for has all tags', fakeAsync(() => {
+  it('should ingest filter rules for has all tags', () => {
     expect(component.tagSelectionModel.getSelectedItems()).toHaveLength(0)
     component.filterRules = [
       {
@@ -598,9 +619,9 @@ describe('FilterEditorComponent', () => {
       },
     ]
     component.toggleTag(2) // coverage
-  }))
+  })
 
-  it('should ingest filter rules for has any tags', fakeAsync(() => {
+  it('should ingest filter rules for has any tags', () => {
     expect(component.tagSelectionModel.getSelectedItems()).toHaveLength(0)
     component.filterRules = [
       {
@@ -623,9 +644,9 @@ describe('FilterEditorComponent', () => {
         value: null,
       },
     ]
-  }))
+  })
 
-  it('should ingest filter rules for has any tag', fakeAsync(() => {
+  it('should ingest filter rules for has any tag', () => {
     expect(component.tagSelectionModel.getSelectedItems()).toHaveLength(0)
     component.filterRules = [
       {
@@ -635,9 +656,9 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.tagSelectionModel.getSelectedItems()).toHaveLength(1)
     expect(component.tagSelectionModel.get(null)).toBeTruthy()
-  }))
+  })
 
-  it('should ingest filter rules for exclude tag(s)', fakeAsync(() => {
+  it('should ingest filter rules for exclude tag(s)', () => {
     expect(component.tagSelectionModel.getExcludedItems()).toHaveLength(0)
     component.filterRules = [
       {
@@ -660,9 +681,9 @@ describe('FilterEditorComponent', () => {
         value: null,
       },
     ]
-  }))
+  })
 
-  it('should ingest filter rules for has correspondent', fakeAsync(() => {
+  it('should ingest filter rules for has correspondent', () => {
     expect(
       component.correspondentSelectionModel.getSelectedItems()
     ).toHaveLength(0)
@@ -692,9 +713,9 @@ describe('FilterEditorComponent', () => {
     expect(component.correspondentSelectionModel.getExcludedItems()).toEqual([
       { id: NEGATIVE_NULL_FILTER_VALUE, name: 'Not assigned' },
     ])
-  }))
+  })
 
-  it('should ingest filter rules for has any of correspondents', fakeAsync(() => {
+  it('should ingest filter rules for has any of correspondents', () => {
     expect(
       component.correspondentSelectionModel.getSelectedItems()
     ).toHaveLength(0)
@@ -724,9 +745,9 @@ describe('FilterEditorComponent', () => {
         value: null,
       },
     ]
-  }))
+  })
 
-  it('should ingest filter rules for does not have any of correspondents', fakeAsync(() => {
+  it('should ingest filter rules for does not have any of correspondents', () => {
     expect(
       component.correspondentSelectionModel.getExcludedItems()
     ).toHaveLength(0)
@@ -753,9 +774,9 @@ describe('FilterEditorComponent', () => {
         value: null,
       },
     ]
-  }))
+  })
 
-  it('should ingest filter rules for has document type', fakeAsync(() => {
+  it('should ingest filter rules for has document type', () => {
     expect(
       component.documentTypeSelectionModel.getSelectedItems()
     ).toHaveLength(0)
@@ -785,9 +806,9 @@ describe('FilterEditorComponent', () => {
     expect(component.documentTypeSelectionModel.getExcludedItems()).toEqual([
       { id: NEGATIVE_NULL_FILTER_VALUE, name: 'Not assigned' },
     ])
-  }))
+  })
 
-  it('should ingest filter rules for has any of document types', fakeAsync(() => {
+  it('should ingest filter rules for has any of document types', () => {
     expect(
       component.documentTypeSelectionModel.getSelectedItems()
     ).toHaveLength(0)
@@ -814,9 +835,9 @@ describe('FilterEditorComponent', () => {
         value: null,
       },
     ]
-  }))
+  })
 
-  it('should ingest filter rules for does not have any of document types', fakeAsync(() => {
+  it('should ingest filter rules for does not have any of document types', () => {
     expect(
       component.documentTypeSelectionModel.getExcludedItems()
     ).toHaveLength(0)
@@ -843,9 +864,9 @@ describe('FilterEditorComponent', () => {
         value: null,
       },
     ]
-  }))
+  })
 
-  it('should ingest filter rules for has storage path', fakeAsync(() => {
+  it('should ingest filter rules for has storage path', () => {
     expect(component.storagePathSelectionModel.getSelectedItems()).toHaveLength(
       0
     )
@@ -875,9 +896,9 @@ describe('FilterEditorComponent', () => {
     expect(component.storagePathSelectionModel.getExcludedItems()).toEqual([
       { id: NEGATIVE_NULL_FILTER_VALUE, name: 'Not assigned' },
     ])
-  }))
+  })
 
-  it('should ingest filter rules for has any of storage paths', fakeAsync(() => {
+  it('should ingest filter rules for has any of storage paths', () => {
     expect(component.storagePathSelectionModel.getSelectedItems()).toHaveLength(
       0
     )
@@ -907,9 +928,9 @@ describe('FilterEditorComponent', () => {
         value: null,
       },
     ]
-  }))
+  })
 
-  it('should ingest filter rules for does not have any of storage paths', fakeAsync(() => {
+  it('should ingest filter rules for does not have any of storage paths', () => {
     expect(component.storagePathSelectionModel.getExcludedItems()).toHaveLength(
       0
     )
@@ -936,9 +957,9 @@ describe('FilterEditorComponent', () => {
         value: null,
       },
     ]
-  }))
+  })
 
-  it('should ingest filter rules for custom fields all', fakeAsync(() => {
+  it('should ingest filter rules for custom fields all', () => {
     expect(component.customFieldQueriesModel.isEmpty()).toBeTruthy()
     component.filterRules = [
       {
@@ -956,9 +977,9 @@ describe('FilterEditorComponent', () => {
           .value[0] as CustomFieldQueryAtom
       ).serialize()
     ).toEqual(['42', CustomFieldQueryOperator.Exists, 'true'])
-  }))
+  })
 
-  it('should ingest filter rules for has any custom fields', fakeAsync(() => {
+  it('should ingest filter rules for has any custom fields', () => {
     expect(component.customFieldQueriesModel.isEmpty()).toBeTruthy()
     component.filterRules = [
       {
@@ -976,9 +997,9 @@ describe('FilterEditorComponent', () => {
           .value[0] as CustomFieldQueryAtom
       ).serialize()
     ).toEqual(['42', CustomFieldQueryOperator.Exists, 'true'])
-  }))
+  })
 
-  it('should ingest filter rules for custom field queries', fakeAsync(() => {
+  it('should ingest filter rules for custom field queries', () => {
     expect(component.customFieldQueriesModel.isEmpty()).toBeTruthy()
     component.filterRules = [
       {
@@ -1011,9 +1032,9 @@ describe('FilterEditorComponent', () => {
           .value[0] as CustomFieldQueryAtom
       ).serialize()
     ).toEqual([42, CustomFieldQueryOperator.Exists, 'true'])
-  }))
+  })
 
-  it('should ingest filter rules for owner', fakeAsync(() => {
+  it('should ingest filter rules for owner', () => {
     expect(component.permissionsSelectionModel.ownerFilter).toEqual(
       OwnerFilterType.NONE
     )
@@ -1028,9 +1049,9 @@ describe('FilterEditorComponent', () => {
     )
     expect(component.permissionsSelectionModel.hideUnowned).toBeFalsy()
     expect(component.permissionsSelectionModel.userID).toEqual(100)
-  }))
+  })
 
-  it('should ingest filter rules for owner is others', fakeAsync(() => {
+  it('should ingest filter rules for owner is others', () => {
     expect(component.permissionsSelectionModel.ownerFilter).toEqual(
       OwnerFilterType.NONE
     )
@@ -1044,9 +1065,9 @@ describe('FilterEditorComponent', () => {
       OwnerFilterType.OTHERS
     )
     expect(component.permissionsSelectionModel.includeUsers).toContain(50)
-  }))
+  })
 
-  it('should ingest filter rules for owner does not include others', fakeAsync(() => {
+  it('should ingest filter rules for owner does not include others', () => {
     expect(component.permissionsSelectionModel.ownerFilter).toEqual(
       OwnerFilterType.NONE
     )
@@ -1060,9 +1081,9 @@ describe('FilterEditorComponent', () => {
       OwnerFilterType.NOT_SELF
     )
     expect(component.permissionsSelectionModel.excludeUsers).toContain(50)
-  }))
+  })
 
-  it('should ingest filter rules for owner is null', fakeAsync(() => {
+  it('should ingest filter rules for owner is null', () => {
     expect(component.permissionsSelectionModel.ownerFilter).toEqual(
       OwnerFilterType.NONE
     )
@@ -1076,9 +1097,9 @@ describe('FilterEditorComponent', () => {
       OwnerFilterType.UNOWNED
     )
     expect(component.permissionsSelectionModel.hideUnowned).toBeFalsy()
-  }))
+  })
 
-  it('should ingest filter rules for owner is not null', fakeAsync(() => {
+  it('should ingest filter rules for owner is not null', () => {
     component.filterRules = [
       {
         rule_type: FILTER_OWNER_ISNULL,
@@ -1093,9 +1114,9 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.permissionsSelectionModel.hideUnowned).toBeTruthy()
-  }))
+  })
 
-  it('should ingest filter rules for shared by me', fakeAsync(() => {
+  it('should ingest filter rules for shared by me', () => {
     component.filterRules = [
       {
         rule_type: FILTER_SHARED_BY_USER,
@@ -1103,11 +1124,11 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.permissionsSelectionModel.userID).toEqual(2)
-  }))
+  })
 
   // GET filterRules
 
-  it('should convert user input to correct filter rules on text field search title + content', fakeAsync(() => {
+  it('should convert user input to correct filter rules on text field search title + content', () => {
     component.textFilterInput.nativeElement.value = 'foo'
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     fixture.detectChanges()
@@ -1115,13 +1136,13 @@ describe('FilterEditorComponent', () => {
     expect(component.textFilter).toEqual('foo')
     expect(component.filterRules).toEqual([
       {
-        rule_type: FILTER_TITLE_CONTENT,
+        rule_type: FILTER_SIMPLE_TEXT,
         value: 'foo',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on text field search title only', fakeAsync(() => {
+  it('should convert user input to correct filter rules on text field search title only', () => {
     component.textFilterInput.nativeElement.value = 'foo'
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.query(
@@ -1134,13 +1155,13 @@ describe('FilterEditorComponent', () => {
     expect(component.textFilterTarget).toEqual('title')
     expect(component.filterRules).toEqual([
       {
-        rule_type: FILTER_TITLE,
+        rule_type: FILTER_SIMPLE_TITLE,
         value: 'foo',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on text field search equals asn', fakeAsync(() => {
+  it('should convert user input to correct filter rules on text field search equals asn', () => {
     component.textFilterInput.nativeElement.value = '1234'
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
@@ -1158,9 +1179,9 @@ describe('FilterEditorComponent', () => {
         value: '1234',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on text field search greater than asn', fakeAsync(() => {
+  it('should convert user input to correct filter rules on text field search greater than asn', () => {
     component.textFilterInput.nativeElement.value = '123'
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
@@ -1182,9 +1203,9 @@ describe('FilterEditorComponent', () => {
         value: '123',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on text field search less than asn', fakeAsync(() => {
+  it('should convert user input to correct filter rules on text field search less than asn', () => {
     component.textFilterInput.nativeElement.value = '999'
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
@@ -1206,9 +1227,9 @@ describe('FilterEditorComponent', () => {
         value: '999',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on asn is null', fakeAsync(() => {
+  it('should convert user input to correct filter rules on asn is null', () => {
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
     )[2]
@@ -1226,9 +1247,9 @@ describe('FilterEditorComponent', () => {
         value: 'true',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on asn is not null', fakeAsync(() => {
+  it('should convert user input to correct filter rules on asn is not null', () => {
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
     )[2]
@@ -1246,32 +1267,14 @@ describe('FilterEditorComponent', () => {
         value: 'false',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on custom fields query', fakeAsync(() => {
-    component.textFilterInput.nativeElement.value = 'foo'
-    component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
-    const textFieldTargetDropdown = fixture.debugElement.queryAll(
-      By.directive(NgbDropdownItem)
-    )[3]
-    textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_CUSTOM_FIELDS
-    fixture.detectChanges()
-    tick(400)
-    expect(component.textFilterTarget).toEqual('custom-fields')
-    expect(component.filterRules).toEqual([
-      {
-        rule_type: FILTER_CUSTOM_FIELDS_TEXT,
-        value: 'foo',
-      },
-    ])
-  }))
-
-  it('should convert user input to correct filter rules on mime type', fakeAsync(() => {
+  it('should convert user input to correct filter rules on mime type', () => {
     component.textFilterInput.nativeElement.value = 'pdf'
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
-    )[4]
+    )[3]
     textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_MIME_TYPE
     fixture.detectChanges()
     tick(400)
@@ -1282,15 +1285,15 @@ describe('FilterEditorComponent', () => {
         value: 'pdf',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on full text query', fakeAsync(() => {
+  it('should convert user input to correct filter rules on full text query', () => {
     component.textFilterInput.nativeElement.value = 'foo'
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
-    )[5]
-    textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_ASN
+    )[4]
+    textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_FULLTEXT_QUERY
     fixture.detectChanges()
     tick(400)
     expect(component.textFilterTarget).toEqual('fulltext-query')
@@ -1300,13 +1303,14 @@ describe('FilterEditorComponent', () => {
         value: 'foo',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on tag select not assigned', fakeAsync(() => {
+  it('should convert user input to correct filter rules on tag select not assigned', () => {
     const tagsFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[0]
-    tagsFilterableDropdown.triggerEventHandler('opened')
+    tagsFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const tagButton = tagsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
@@ -1318,13 +1322,14 @@ describe('FilterEditorComponent', () => {
         value: 'false',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on tag selections', fakeAsync(() => {
+  it('should convert user input to correct filter rules on tag selections', () => {
     const tagsFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[0] // Tags dropdown
-    tagsFilterableDropdown.triggerEventHandler('opened')
+    tagsFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const tagButtons = tagsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
@@ -1369,13 +1374,14 @@ describe('FilterEditorComponent', () => {
         value: tags[1].id.toString(),
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on correspondent selections', fakeAsync(() => {
+  it('should convert user input to correct filter rules on correspondent selections', () => {
     const correspondentsFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[1] // Corresp dropdown
-    correspondentsFilterableDropdown.triggerEventHandler('opened')
+    correspondentsFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const correspondentButtons = correspondentsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
@@ -1408,13 +1414,14 @@ describe('FilterEditorComponent', () => {
         value: correspondents[1].id.toString(),
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on correspondent select not assigned', fakeAsync(() => {
+  it('should convert user input to correct filter rules on correspondent select not assigned', () => {
     const correspondentsFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[1]
-    correspondentsFilterableDropdown.triggerEventHandler('opened')
+    correspondentsFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const notAssignedButton = correspondentsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
@@ -1439,13 +1446,14 @@ describe('FilterEditorComponent', () => {
         value: NEGATIVE_NULL_FILTER_VALUE.toString(),
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on document type selections', fakeAsync(() => {
+  it('should convert user input to correct filter rules on document type selections', () => {
     const documentTypesFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[2] // DocType dropdown
-    documentTypesFilterableDropdown.triggerEventHandler('opened')
+    documentTypesFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const documentTypeButtons = documentTypesFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
@@ -1478,13 +1486,14 @@ describe('FilterEditorComponent', () => {
         value: document_types[1].id.toString(),
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on doc type select not assigned', fakeAsync(() => {
+  it('should convert user input to correct filter rules on doc type select not assigned', () => {
     const docTypesFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[2]
-    docTypesFilterableDropdown.triggerEventHandler('opened')
+    docTypesFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const notAssignedButton = docTypesFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
@@ -1509,13 +1518,14 @@ describe('FilterEditorComponent', () => {
         value: NEGATIVE_NULL_FILTER_VALUE.toString(),
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on storage path selections', fakeAsync(() => {
+  it('should convert user input to correct filter rules on storage path selections', () => {
     const storagePathFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[3] // StoragePath dropdown
-    storagePathFilterableDropdown.triggerEventHandler('opened')
+    storagePathFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const storagePathButtons = storagePathFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )
@@ -1548,13 +1558,14 @@ describe('FilterEditorComponent', () => {
         value: storage_paths[1].id.toString(),
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on storage path select not assigned', fakeAsync(() => {
+  it('should convert user input to correct filter rules on storage path select not assigned', () => {
     const storagePathsFilterableDropdown = fixture.debugElement.queryAll(
       By.directive(FilterableDropdownComponent)
     )[3]
-    storagePathsFilterableDropdown.triggerEventHandler('opened')
+    storagePathsFilterableDropdown.componentInstance.dropdownOpenChange(true)
+    fixture.detectChanges()
     const notAssignedButton = storagePathsFilterableDropdown.queryAll(
       By.directive(ToggleableDropdownButtonComponent)
     )[0]
@@ -1579,9 +1590,9 @@ describe('FilterEditorComponent', () => {
         value: NEGATIVE_NULL_FILTER_VALUE.toString(),
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on custom field selections', fakeAsync(() => {
+  it('should convert user input to correct filter rules on custom field selections', () => {
     const customFieldsQueryDropdown = fixture.debugElement.queryAll(
       By.directive(CustomFieldsQueryDropdownComponent)
     )[0]
@@ -1611,9 +1622,9 @@ describe('FilterEditorComponent', () => {
         ]),
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on date created from', fakeAsync(() => {
+  it('should convert user input to correct filter rules on date created from', () => {
     const dateCreatedDropdown = fixture.debugElement.queryAll(
       By.directive(DatesDropdownComponent)
     )[0]
@@ -1631,9 +1642,9 @@ describe('FilterEditorComponent', () => {
         value: '2023-05-14',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on date created to', fakeAsync(() => {
+  it('should convert user input to correct filter rules on date created to', () => {
     const dateCreatedDropdown = fixture.debugElement.queryAll(
       By.directive(DatesDropdownComponent)
     )[0]
@@ -1651,9 +1662,9 @@ describe('FilterEditorComponent', () => {
         value: '2023-05-14',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on date created with relative date', fakeAsync(() => {
+  it('should convert user input to correct filter rules on date created with relative date', () => {
     const dateCreatedDropdown = fixture.debugElement.queryAll(
       By.directive(DatesDropdownComponent)
     )[0]
@@ -1667,9 +1678,9 @@ describe('FilterEditorComponent', () => {
         value: 'created:[-1 week to now]',
       },
     ])
-  }))
+  })
 
-  it('should carry over text filtering on date created with relative date', fakeAsync(() => {
+  it('should carry over text filtering on date created with relative date', () => {
     component.textFilter = 'foo'
     const dateCreatedDropdown = fixture.debugElement.queryAll(
       By.directive(DatesDropdownComponent)
@@ -1684,14 +1695,58 @@ describe('FilterEditorComponent', () => {
         value: 'foo,created:[-1 week to now]',
       },
     ])
-  }))
+  })
 
-  it('should leave relative dates not in quick list intact', fakeAsync(() => {
+  it('should convert legacy title filters into full text query when adding a created relative date', () => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_TITLE,
+        value: 'foo',
+      },
+    ]
+    const dateCreatedDropdown = fixture.debugElement.queryAll(
+      By.directive(DatesDropdownComponent)
+    )[0]
+    component.dateCreatedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    dateCreatedDropdown.triggerEventHandler('datesSet')
+    fixture.detectChanges()
+    tick(400)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'foo,created:[-1 week to now]',
+      },
+    ])
+  })
+
+  it('should convert simple title filters into full text query when adding a created relative date', () => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_SIMPLE_TITLE,
+        value: 'foo',
+      },
+    ]
+    const dateCreatedDropdown = fixture.debugElement.queryAll(
+      By.directive(DatesDropdownComponent)
+    )[0]
+    component.dateCreatedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    dateCreatedDropdown.triggerEventHandler('datesSet')
+    fixture.detectChanges()
+    tick(400)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'foo,created:[-1 week to now]',
+      },
+    ])
+  })
+
+  it('should leave relative dates not in quick list intact', () => {
     component.textFilterInput.nativeElement.value = 'created:[-2 week to now]'
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
     const textFieldTargetDropdown = fixture.debugElement.queryAll(
       By.directive(NgbDropdownItem)
-    )[5]
+    )[4]
     textFieldTargetDropdown.triggerEventHandler('click')
     fixture.detectChanges()
     tick(400)
@@ -1712,9 +1767,9 @@ describe('FilterEditorComponent', () => {
         value: 'added:[-2 month to now]',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on date added after', fakeAsync(() => {
+  it('should convert user input to correct filter rules on date added after', () => {
     const datesDropdown = fixture.debugElement.query(
       By.directive(DatesDropdownComponent)
     )
@@ -1732,9 +1787,9 @@ describe('FilterEditorComponent', () => {
         value: '2023-05-14',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on date added before', fakeAsync(() => {
+  it('should convert user input to correct filter rules on date added before', () => {
     const datesDropdown = fixture.debugElement.query(
       By.directive(DatesDropdownComponent)
     )
@@ -1752,9 +1807,9 @@ describe('FilterEditorComponent', () => {
         value: '2023-05-14',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter rules on date added with relative date', fakeAsync(() => {
+  it('should convert user input to correct filter rules on date added with relative date', () => {
     const datesDropdown = fixture.debugElement.query(
       By.directive(DatesDropdownComponent)
     )
@@ -1768,9 +1823,9 @@ describe('FilterEditorComponent', () => {
         value: 'added:[-1 week to now]',
       },
     ])
-  }))
+  })
 
-  it('should carry over text filtering on date added with relative date', fakeAsync(() => {
+  it('should carry over text filtering on date added with relative date', () => {
     component.textFilter = 'foo'
     const datesDropdown = fixture.debugElement.query(
       By.directive(DatesDropdownComponent)
@@ -1785,9 +1840,9 @@ describe('FilterEditorComponent', () => {
         value: 'foo,added:[-1 week to now]',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter on permissions select my docs', fakeAsync(() => {
+  it('should convert user input to correct filter on permissions select my docs', () => {
     const permissionsDropdown = fixture.debugElement.query(
       By.directive(PermissionsFilterDropdownComponent)
     )
@@ -1801,24 +1856,9 @@ describe('FilterEditorComponent', () => {
         value: '1',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter on permissions select shared with me', fakeAsync(() => {
-    const permissionsDropdown = fixture.debugElement.query(
-      By.directive(PermissionsFilterDropdownComponent)
-    )
-    const sharedWithMe = permissionsDropdown.queryAll(By.css('button'))[3]
-    sharedWithMe.triggerEventHandler('click')
-    fixture.detectChanges()
-    expect(component.filterRules).toEqual([
-      {
-        rule_type: FILTER_OWNER_DOES_NOT_INCLUDE,
-        value: '1',
-      },
-    ])
-  }))
-
-  it('should convert user input to correct filter on permissions select shared with me', fakeAsync(() => {
+  it('should convert user input to correct filter on permissions select shared with me', () => {
     const permissionsDropdown = fixture.debugElement.query(
       By.directive(PermissionsFilterDropdownComponent)
     )
@@ -1839,9 +1879,9 @@ describe('FilterEditorComponent', () => {
         value: '1,2',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter on permissions select shared by me', fakeAsync(() => {
+  it('should convert user input to correct filter on permissions select shared by me', () => {
     const permissionsDropdown = fixture.debugElement.query(
       By.directive(PermissionsFilterDropdownComponent)
     )
@@ -1854,9 +1894,9 @@ describe('FilterEditorComponent', () => {
         value: '1',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter on permissions select unowned', fakeAsync(() => {
+  it('should convert user input to correct filter on permissions select unowned', () => {
     const permissionsDropdown = fixture.debugElement.query(
       By.directive(PermissionsFilterDropdownComponent)
     )
@@ -1869,9 +1909,9 @@ describe('FilterEditorComponent', () => {
         value: 'true',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter on permissions select others', fakeAsync(() => {
+  it('should convert user input to correct filter on permissions select others', () => {
     const permissionsDropdown = fixture.debugElement.query(
       By.directive(PermissionsFilterDropdownComponent)
     )
@@ -1890,9 +1930,9 @@ describe('FilterEditorComponent', () => {
         value: '3',
       },
     ])
-  }))
+  })
 
-  it('should convert user input to correct filter on permissions hide unowned', fakeAsync(() => {
+  it('should convert user input to correct filter on permissions hide unowned', () => {
     const permissionsDropdown = fixture.debugElement.query(
       By.directive(PermissionsFilterDropdownComponent)
     )
@@ -1910,7 +1950,7 @@ describe('FilterEditorComponent', () => {
         value: 'false',
       },
     ])
-  }))
+  })
 
   // The rest
 
@@ -2021,11 +2061,29 @@ describe('FilterEditorComponent', () => {
 
     component.filterRules = [
       {
-        rule_type: FILTER_TITLE,
+        rule_type: FILTER_SIMPLE_TITLE,
         value: 'foo',
       },
     ]
     expect(component.generateFilterName()).toEqual('Title: foo')
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_TITLE_CONTENT,
+        value: 'legacy foo',
+      },
+    ]
+    expect(component.generateFilterName()).toEqual(
+      'Title & content: legacy foo'
+    )
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_SIMPLE_TEXT,
+        value: 'foo',
+      },
+    ]
+    expect(component.generateFilterName()).toEqual('Title & content: foo')
 
     component.filterRules = [
       {
@@ -2097,6 +2155,22 @@ describe('FilterEditorComponent', () => {
     expect(component.filterRules).toEqual(rules)
   })
 
+  it('should emit reset filter rules when resetting', () => {
+    const rules = [{ rule_type: FILTER_HAS_TAGS_ANY, value: '2' }]
+    component.unmodifiedFilterRules = rules
+    component.filterRules = [
+      { rule_type: FILTER_DOES_NOT_HAVE_TAG, value: '2' },
+    ]
+
+    const resetFilterRulesSpy = jest.spyOn(component.resetFilterRules, 'next')
+    const filterRulesChangeSpy = jest.spyOn(component.filterRulesChange, 'next')
+
+    component.resetSelected()
+
+    expect(resetFilterRulesSpy).toHaveBeenCalledWith(rules)
+    expect(filterRulesChangeSpy).not.toHaveBeenCalled()
+  })
+
   it('should support resetting text field', () => {
     component.textFilter = 'foo'
     component.resetTextField()
@@ -2130,7 +2204,37 @@ describe('FilterEditorComponent', () => {
     })
   })
 
-  it('should call autocomplete endpoint on input', fakeAsync(() => {
+  it('should hide deprecated custom fields target from default text filter targets', () => {
+    expect(component.textFilterTargets).not.toContainEqual({
+      id: 'custom-fields',
+      name: $localize`Custom fields (Deprecated)`,
+    })
+  })
+
+  it('should keep deprecated custom fields target available for legacy filters', () => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_CUSTOM_FIELDS_TEXT,
+        value: 'foo',
+      },
+    ]
+    fixture.detectChanges()
+    tick()
+
+    expect(component.textFilterTarget).toEqual('custom-fields')
+    expect(component.textFilterTargets).toContainEqual({
+      id: 'custom-fields',
+      name: $localize`Custom fields (Deprecated)`,
+    })
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_CUSTOM_FIELDS_TEXT,
+        value: 'foo',
+      },
+    ])
+  })
+
+  it('should call autocomplete endpoint on input', () => {
     component.textFilterTarget = 'fulltext-query' // TEXT_FILTER_TARGET_FULLTEXT_QUERY
     const autocompleteSpy = jest.spyOn(searchService, 'autocomplete')
     component.searchAutoComplete(of('hello')).subscribe()
@@ -2140,9 +2244,9 @@ describe('FilterEditorComponent', () => {
     component.searchAutoComplete(of('hello world 1')).subscribe()
     tick(250)
     expect(autocompleteSpy).toHaveBeenCalled()
-  }))
+  })
 
-  it('should handle autocomplete backend failure gracefully', fakeAsync(() => {
+  it('should handle autocomplete backend failure gracefully', () => {
     component.textFilterTarget = 'fulltext-query' // TEXT_FILTER_TARGET_FULLTEXT_QUERY
     const serviceAutocompleteSpy = jest.spyOn(searchService, 'autocomplete')
     serviceAutocompleteSpy.mockReturnValue(
@@ -2156,7 +2260,7 @@ describe('FilterEditorComponent', () => {
     tick(250)
     expect(serviceAutocompleteSpy).toHaveBeenCalled()
     expect(result).toEqual([])
-  }))
+  })
 
   it('should support choosing a autocomplete item', () => {
     expect(component.textFilter).toBeNull()

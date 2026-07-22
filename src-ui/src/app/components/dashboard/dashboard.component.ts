@@ -5,10 +5,10 @@ import {
   DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
-import { Component, inject } from '@angular/core'
+import { Component, inject, signal } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { TourNgBootstrapModule, TourService } from 'ngx-ui-tour-ng-bootstrap'
+import { TourNgBootstrap, TourService } from 'ngx-ui-tour-ng-bootstrap'
 import { SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
@@ -36,7 +36,7 @@ import { WelcomeWidgetComponent } from './widgets/welcome-widget/welcome-widget.
     WelcomeWidgetComponent,
     IfPermissionsDirective,
     DragDropModule,
-    TourNgBootstrapModule,
+    TourNgBootstrap,
     NgxBootstrapIconsModule,
     RouterModule,
   ],
@@ -47,12 +47,12 @@ export class DashboardComponent extends ComponentWithPermissions {
   private tourService = inject(TourService)
   private toastService = inject(ToastService)
 
-  public dashboardViews: SavedView[] = []
+  readonly dashboardViews = signal<SavedView[]>([])
   constructor() {
     super()
 
     this.savedViewService.listAll().subscribe(() => {
-      this.dashboardViews = this.savedViewService.dashboardViews
+      this.dashboardViews.set(this.savedViewService.dashboardViews)
     })
   }
 
@@ -73,22 +73,20 @@ export class DashboardComponent extends ComponentWithPermissions {
   }
 
   onDragStart(event: CdkDragStart) {
-    this.settingsService.globalDropzoneEnabled = false
+    this.settingsService.globalDropzoneEnabled.set(false)
   }
 
   onDragEnd(event: CdkDragEnd) {
-    this.settingsService.globalDropzoneEnabled = true
+    this.settingsService.globalDropzoneEnabled.set(true)
   }
 
   onDrop(event: CdkDragDrop<SavedView[]>) {
-    moveItemInArray(
-      this.dashboardViews,
-      event.previousIndex,
-      event.currentIndex
-    )
+    const dashboardViews = [...this.dashboardViews()]
+    moveItemInArray(dashboardViews, event.previousIndex, event.currentIndex)
+    this.dashboardViews.set(dashboardViews)
 
     this.settingsService
-      .updateDashboardViewsSort(this.dashboardViews)
+      .updateDashboardViewsSort(this.dashboardViews())
       .subscribe({
         next: () => {
           this.toastService.showInfo($localize`Dashboard updated`)

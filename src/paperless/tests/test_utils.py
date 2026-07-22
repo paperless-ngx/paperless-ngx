@@ -9,35 +9,50 @@ from paperless.utils import ocr_to_dateparser_languages
 @pytest.mark.parametrize(
     ("ocr_language", "expected"),
     [
-        # One language
-        ("eng", ["en"]),
-        # Multiple languages
-        ("fra+ita+lao", ["fr", "it", "lo"]),
-        # Languages that don't have a two-letter equivalent
-        ("fil", ["fil"]),
-        # Languages with a script part supported by dateparser
-        ("aze_cyrl+srp_latn", ["az-Cyrl", "sr-Latn"]),
-        # Languages with a script part not supported by dateparser
-        # In this case, default to the language without script
-        ("deu_frak", ["de"]),
-        # Traditional and simplified chinese don't have the same name in dateparser,
-        # so they're converted to the general chinese language
-        ("chi_tra+chi_sim", ["zh"]),
-        # If a language is not supported by dateparser, fallback to the supported ones
-        ("eng+unsupported_language+por", ["en", "pt"]),
-        # If no language is supported, fallback to default
-        ("unsupported1+unsupported2", []),
-        # Duplicate languages, should not duplicate in result
-        ("eng+eng", ["en"]),
-        # Language with script, but script is not mapped
-        ("ita_unknownscript", ["it"]),
+        pytest.param("eng", ["en"], id="single-language"),
+        pytest.param("fra+ita+lao", ["fr", "it", "lo"], id="multiple-languages"),
+        pytest.param("fil", ["fil"], id="no-two-letter-equivalent"),
+        pytest.param(
+            "aze_cyrl+srp_latn",
+            ["az-Cyrl", "sr-Latn"],
+            id="script-supported-by-dateparser",
+        ),
+        pytest.param(
+            "deu_frak",
+            ["de"],
+            id="script-not-supported-falls-back-to-language",
+        ),
+        pytest.param(
+            "chi_tra+chi_sim",
+            ["zh"],
+            id="chinese-variants-collapse-to-general",
+        ),
+        pytest.param(
+            "eng+unsupported_language+por",
+            ["en", "pt"],
+            id="unsupported-language-skipped",
+        ),
+        pytest.param(
+            "unsupported1+unsupported2",
+            [],
+            id="all-unsupported-returns-empty",
+        ),
+        pytest.param("eng+eng", ["en"], id="duplicates-deduplicated"),
+        pytest.param(
+            "ita_unknownscript",
+            ["it"],
+            id="unknown-script-falls-back-to-language",
+        ),
     ],
 )
-def test_ocr_to_dateparser_languages(ocr_language, expected):
+def test_ocr_to_dateparser_languages(ocr_language: str, expected: list[str]) -> None:
     assert sorted(ocr_to_dateparser_languages(ocr_language)) == sorted(expected)
 
 
-def test_ocr_to_dateparser_languages_exception(monkeypatch, caplog):
+def test_ocr_to_dateparser_languages_exception(
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
     # Patch LocaleDataLoader.get_locale_map to raise an exception
     class DummyLoader:
         def get_locale_map(self, locales=None):

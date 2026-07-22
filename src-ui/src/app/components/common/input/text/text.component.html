@@ -6,7 +6,7 @@
       }
       @if (removable) {
         <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
-          <i-bs name="x"></i-bs>&nbsp;<ng-container i18n>Remove</ng-container>
+          <i-bs name="x" class="me-1"></i-bs><ng-container i18n>Remove</ng-container>
           </button>
         }
       </div>
@@ -14,6 +14,12 @@
         <input #inputField type="text" class="form-control" [class.is-invalid]="error" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [disabled]="disabled" [autocomplete]="autocomplete" [placeholder]="placeholder">
         @if (hint) {
           <small class="form-text text-muted" [innerHTML]="hint"></small>
+        }
+        @if (getSuggestion()?.length > 0) {
+          <small>
+            <span i18n>Suggestion:</span>&nbsp;
+            <a (click)="applySuggestion(s)" [routerLink]="[]">{{getSuggestion()}}</a>&nbsp;
+          </small>
         }
         <div class="invalid-feedback position-absolute top-100">
           {{error}}

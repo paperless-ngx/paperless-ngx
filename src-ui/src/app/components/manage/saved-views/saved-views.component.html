@@ -7,7 +7,7 @@
 </pngx-page-header>
 <form [formGroup]="savedViewsForm" (ngSubmit)="save()">
   <ul class="list-group mb-3" formGroupName="savedViews">
-    @for (view of savedViews; track view) {
+    @for (view of savedViews(); track view) {
       <li class="list-group-item py-3">
       <div [formGroupName]="view.id">
         <div class="row">
@@ -25,15 +25,23 @@
             </div>
           </div>
           <div class="col-auto">
-            <label class="form-label" for="name_{{view.id}}" i18n>Actions</label>
-            <pngx-confirm-button
-              label="Delete"
-              i18n-label
-              (confirm)="deleteSavedView(view)"
-              *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.SavedView }"
-              buttonClasses="btn-sm btn-outline-danger form-control"
-              iconName="trash">
-            </pngx-confirm-button>
+            @if (canDeleteSavedView(view)) {
+              <label class="form-label" for="name_{{view.id}}" i18n>Actions</label>
+              <button
+                class="btn btn-sm btn-outline-secondary form-control mb-2"
+                type="button"
+                (click)="editPermissions(view)"
+                *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.SavedView }"
+                i18n><i-bs class="me-1" name="person-fill-lock"></i-bs>Permissions</button>
+              <pngx-confirm-button
+                label="Delete"
+                i18n-label
+                (confirm)="deleteSavedView(view)"
+                *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.SavedView }"
+                buttonClasses="btn-sm btn-outline-danger form-control"
+                iconName="trash">
+              </pngx-confirm-button>
+            }
           </div>
         </div>
         <div class="row">
@@ -57,13 +65,13 @@
       </li>
     }
 
-    @if (savedViews && savedViews.length === 0) {
+    @if (savedViews() && savedViews().length === 0) {
       <li class="list-group-item">
         <div i18n>No saved views defined.</div>
       </li>
     }
 
-    @if (loading) {
+    @if (loading()) {
       <li class="list-group-item">
         <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
         <div class="visually-hidden" i18n>Loading...</div>

@@ -6,18 +6,23 @@ on:
   push:
     paths: ['src/locale/**', 'src-ui/messages.xlf', 'src-ui/src/locale/**']
     branches: [dev]
+permissions:
+  contents: write
+  pull-requests: write
 jobs:
   synchronize-with-crowdin:
     name: Crowdin Sync
     if: github.repository_owner == 'paperless-ngx'
     runs-on: ubuntu-24.04
+    environment: translation-sync
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           token: ${{ secrets.PNGX_BOT_PAT }}
+          persist-credentials: false
       - name: crowdin action
-        uses: crowdin/github-action@v2
+        uses: crowdin/github-action@52aa776766211d83d975df51f3b9c53c2f8ba35f # v2.16.3
         with:
           upload_translations: false
           download_translations: true

@@ -39,3 +39,6 @@ max_line_length = off
 
 [Dockerfile*]
 indent_style = space
+
+[*.toml]
+indent_style = space

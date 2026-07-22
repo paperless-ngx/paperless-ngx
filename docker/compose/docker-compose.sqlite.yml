@@ -23,7 +23,7 @@
 # documentation.
 services:
   broker:
-    image: docker.io/library/redis:8
+    image: docker.io/valkey/valkey:9-alpine
     restart: unless-stopped
     volumes:
       - redisdata:/data
@@ -42,6 +42,7 @@ services:
     env_file: docker-compose.env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBENGINE: sqlite
 volumes:
   data:
   media:

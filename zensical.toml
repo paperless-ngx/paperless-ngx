@@ -18,7 +18,10 @@ nav = [
   "setup.md",
   "usage.md",
   "configuration.md",
-  "administration.md",
+  { Administration = [
+    "administration.md",
+    { "v3 Migration Guide" = "migration-v3.md" },
+  ] },
   "advanced_usage.md",
   "api.md",
   "development.md",
@@ -33,7 +36,7 @@ extra_css = ["assets/extra.css"]
 
 [project.theme]
 
-logo = "assets/logo.svg"
+logo = "assets/logo_leaf_white.svg"
 favicon = "assets/favicon.png"
 
 language = "en"

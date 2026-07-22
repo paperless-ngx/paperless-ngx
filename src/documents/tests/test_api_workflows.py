@@ -78,7 +78,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.workflow.actions.add(self.action)
         self.workflow.save()
 
-    def test_api_get_workflow(self):
+    def test_api_get_workflow(self) -> None:
         """
         GIVEN:
             - API request to get all workflows
@@ -99,7 +99,41 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             self.action.assign_correspondent.pk,
         )
 
-    def test_api_create_workflow(self):
+    def test_api_get_workflow_actions_ordered(self) -> None:
+        """
+        GIVEN:
+            - A workflow with two actions added in reverse order (order=1 before order=0)
+        WHEN:
+            - API is called to get workflows
+        THEN:
+            - Actions are returned sorted by order ascending
+        """
+        # Created before action_first so its pk is lower — ensures pk order
+        # disagrees with the order field, catching regressions if order_by is removed.
+        action_second = WorkflowAction.objects.create(
+            assign_title="Second action",
+            order=1,
+        )
+        action_first = WorkflowAction.objects.create(
+            assign_title="First action",
+            order=0,
+        )
+        self.workflow.actions.add(action_second)
+        self.workflow.actions.add(action_first)
+
+        response = self.client.get(self.ENDPOINT, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        resp_actions = response.data["results"][0]["actions"]
+        action_ids = [a["id"] for a in resp_actions]
+        self.assertIn(action_first.id, action_ids)
+        self.assertIn(action_second.id, action_ids)
+        self.assertLess(
+            action_ids.index(action_first.id),
+            action_ids.index(action_second.id),
+        )
+
+    def test_api_create_workflow(self) -> None:
         """
         GIVEN:
             - API request to create a workflow, trigger and action separately
@@ -160,7 +194,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Workflow.objects.count(), 2)
 
-    def test_api_create_workflow_nested(self):
+    def test_api_create_workflow_nested(self) -> None:
         """
         GIVEN:
             - API request to create a workflow with nested trigger and action
@@ -186,8 +220,11 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                             "filter_has_tags": [self.t1.id],
                             "filter_has_all_tags": [self.t2.id],
                             "filter_has_not_tags": [self.t3.id],
+                            "filter_has_any_correspondents": [self.c.id],
                             "filter_has_not_correspondents": [self.c2.id],
+                            "filter_has_any_document_types": [self.dt.id],
                             "filter_has_not_document_types": [self.dt2.id],
+                            "filter_has_any_storage_paths": [self.sp.id],
                             "filter_has_not_storage_paths": [self.sp2.id],
                             "filter_custom_field_query": json.dumps(
                                 [
@@ -236,6 +273,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(Workflow.objects.count(), 2)
         workflow = Workflow.objects.get(name="Workflow 2")
         trigger = workflow.triggers.first()
+        assert trigger is not None
         self.assertSetEqual(
             set(trigger.filter_has_tags.values_list("id", flat=True)),
             {self.t1.id},
@@ -249,12 +287,24 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             {self.t3.id},
         )
         self.assertSetEqual(
+            set(trigger.filter_has_any_correspondents.values_list("id", flat=True)),
+            {self.c.id},
+        )
+        self.assertSetEqual(
             set(trigger.filter_has_not_correspondents.values_list("id", flat=True)),
             {self.c2.id},
         )
         self.assertSetEqual(
+            set(trigger.filter_has_any_document_types.values_list("id", flat=True)),
+            {self.dt.id},
+        )
+        self.assertSetEqual(
             set(trigger.filter_has_not_document_types.values_list("id", flat=True)),
             {self.dt2.id},
+        )
+        self.assertSetEqual(
+            set(trigger.filter_has_any_storage_paths.values_list("id", flat=True)),
+            {self.sp.id},
         )
         self.assertSetEqual(
             set(trigger.filter_has_not_storage_paths.values_list("id", flat=True)),
@@ -265,7 +315,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             json.dumps(["AND", [[self.cf1.id, "exact", "value"]]]),
         )
 
-    def test_api_create_invalid_workflow_trigger(self):
+    def test_api_create_invalid_workflow_trigger(self) -> None:
         """
         GIVEN:
             - API request to create a workflow trigger
@@ -301,7 +351,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
 
         self.assertEqual(WorkflowTrigger.objects.count(), 1)
 
-    def test_api_create_invalid_assign_title(self):
+    def test_api_create_invalid_assign_title(self) -> None:
         """
         GIVEN:
             - API request to create a workflow
@@ -340,7 +390,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
 
         self.assertEqual(Workflow.objects.count(), 1)
 
-    def test_api_create_workflow_trigger_action_empty_fields(self):
+    def test_api_create_workflow_trigger_action_empty_fields(self) -> None:
         """
         GIVEN:
             - API request to create a workflow trigger and action
@@ -397,7 +447,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(trigger2.filter_path, "*/test/*")
         self.assertIsNone(trigger2.filter_filename)
 
-    def test_api_update_workflow_nested_triggers_actions(self):
+    def test_api_update_workflow_nested_triggers_actions(self) -> None:
         """
         GIVEN:
             - Existing workflow with trigger and action
@@ -419,8 +469,11 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                             "filter_has_tags": [self.t1.id],
                             "filter_has_all_tags": [self.t2.id],
                             "filter_has_not_tags": [self.t3.id],
+                            "filter_has_any_correspondents": [self.c.id],
                             "filter_has_not_correspondents": [self.c2.id],
+                            "filter_has_any_document_types": [self.dt.id],
                             "filter_has_not_document_types": [self.dt2.id],
+                            "filter_has_any_storage_paths": [self.sp.id],
                             "filter_has_not_storage_paths": [self.sp2.id],
                             "filter_custom_field_query": json.dumps(
                                 ["AND", [[self.cf1.id, "exact", "value"]]],
@@ -441,34 +494,26 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         workflow = Workflow.objects.get(id=response.data["id"])
         self.assertEqual(workflow.name, "Workflow Updated")
-        self.assertEqual(workflow.triggers.first().filter_has_tags.first(), self.t1)
+        trigger = workflow.triggers.first()
+        assert trigger is not None
+        action = workflow.actions.first()
+        assert action is not None
+        self.assertEqual(trigger.filter_has_tags.first(), self.t1)
+        self.assertEqual(trigger.filter_has_all_tags.first(), self.t2)
+        self.assertEqual(trigger.filter_has_not_tags.first(), self.t3)
+        self.assertEqual(trigger.filter_has_any_correspondents.first(), self.c)
+        self.assertEqual(trigger.filter_has_not_correspondents.first(), self.c2)
+        self.assertEqual(trigger.filter_has_any_document_types.first(), self.dt)
+        self.assertEqual(trigger.filter_has_not_document_types.first(), self.dt2)
+        self.assertEqual(trigger.filter_has_any_storage_paths.first(), self.sp)
+        self.assertEqual(trigger.filter_has_not_storage_paths.first(), self.sp2)
         self.assertEqual(
-            workflow.triggers.first().filter_has_all_tags.first(),
-            self.t2,
-        )
-        self.assertEqual(
-            workflow.triggers.first().filter_has_not_tags.first(),
-            self.t3,
-        )
-        self.assertEqual(
-            workflow.triggers.first().filter_has_not_correspondents.first(),
-            self.c2,
-        )
-        self.assertEqual(
-            workflow.triggers.first().filter_has_not_document_types.first(),
-            self.dt2,
-        )
-        self.assertEqual(
-            workflow.triggers.first().filter_has_not_storage_paths.first(),
-            self.sp2,
-        )
-        self.assertEqual(
-            workflow.triggers.first().filter_custom_field_query,
+            trigger.filter_custom_field_query,
             json.dumps(["AND", [[self.cf1.id, "exact", "value"]]]),
         )
-        self.assertEqual(workflow.actions.first().assign_title, "Action New Title")
+        self.assertEqual(action.assign_title, "Action New Title")
 
-    def test_api_update_workflow_no_trigger_actions(self):
+    def test_api_update_workflow_no_trigger_actions(self) -> None:
         """
         GIVEN:
             - Existing workflow
@@ -512,7 +557,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(workflow.triggers.count(), 1)
         self.assertEqual(workflow.actions.count(), 0)
 
-    def test_api_auto_remove_orphaned_triggers_actions(self):
+    def test_api_auto_remove_orphaned_triggers_actions(self) -> None:
         """
         GIVEN:
             - Existing trigger and action
@@ -548,11 +593,15 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         workflow = Workflow.objects.get(id=response.data["id"])
         self.assertEqual(WorkflowTrigger.objects.all().count(), 1)
-        self.assertNotEqual(workflow.triggers.first().id, self.trigger.id)
+        new_trigger = workflow.triggers.first()
+        assert new_trigger is not None
+        self.assertNotEqual(new_trigger.id, self.trigger.id)
         self.assertEqual(WorkflowAction.objects.all().count(), 1)
-        self.assertNotEqual(workflow.actions.first().id, self.action.id)
+        new_action = workflow.actions.first()
+        assert new_action is not None
+        self.assertNotEqual(new_action.id, self.action.id)
 
-    def test_email_action_validation(self):
+    def test_email_action_validation(self) -> None:
         """
         GIVEN:
             - API request to create a workflow with an email action
@@ -645,7 +694,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_webhook_action_validation(self):
+    def test_webhook_action_validation(self) -> None:
         """
         GIVEN:
             - API request to create a workflow with a notification action
@@ -707,7 +756,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_webhook_action_url_validation(self):
+    def test_webhook_action_url_validation(self) -> None:
         """
         GIVEN:
             - API request to create a workflow with a notification action
@@ -749,7 +798,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             )
             self.assertEqual(response.status_code, expected_resp_code)
 
-    def test_patch_trigger_cannot_change_id(self):
+    def test_patch_trigger_cannot_change_id(self) -> None:
         """
         GIVEN:
             - An existing workflow trigger
@@ -808,3 +857,268 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.action.refresh_from_db()
         self.assertEqual(self.action.assign_title, "Patched Title")
+
+    def test_password_action_passwords_field(self) -> None:
+        """
+        GIVEN:
+            - Nothing
+        WHEN:
+            - A workflow password removal action is created with passwords set
+        THEN:
+            - The passwords field is correctly stored and retrieved
+        """
+        passwords = ["password1", "password2", "password3"]
+        response = self.client.post(
+            "/api/workflow_actions/",
+            json.dumps(
+                {
+                    "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+                    "passwords": passwords,
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["passwords"], passwords)
+
+    def test_password_action_invalid_passwords_field(self) -> None:
+        """
+        GIVEN:
+            - Nothing
+        WHEN:
+            - A workflow password removal action is created with invalid passwords field
+        THEN:
+            - The required validation error is raised
+        """
+        for payload in [
+            {"type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL},
+            {
+                "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+                "passwords": "",
+            },
+            {
+                "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+                "passwords": [],
+            },
+            {
+                "type": WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+                "passwords": ["", "password2"],
+            },
+        ]:
+            response = self.client.post(
+                "/api/workflow_actions/",
+                json.dumps(payload),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            self.assertIn(
+                "Passwords are required",
+                str(response.data["non_field_errors"][0]),
+            )
+
+    def test_trash_action_validation(self) -> None:
+        """
+        GIVEN:
+            - API request to create a workflow with a trash action
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 2",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 3",
+                    "order": 2,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_trash_action_as_last_action_valid(self) -> None:
+        """
+        GIVEN:
+            - API request to create a workflow with multiple actions
+            - Move to trash action is the last action
+        WHEN:
+            - API is called
+        THEN:
+            - Workflow is created successfully
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow with Move to Trash Last",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "Assigned Title",
+                        },
+                        {
+                            "type": WorkflowAction.WorkflowActionType.REMOVAL,
+                            "remove_all_tags": True,
+                        },
+                        {
+                            "type": WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_update_workflow_add_trash_at_end_valid(self) -> None:
+        """
+        GIVEN:
+            - Existing workflow without trash action
+        WHEN:
+            - PATCH to add trash action at end
+        THEN:
+            - HTTP 200 success
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow to Add Move to Trash",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "First Action",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        workflow_id = response.data["id"]
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{workflow_id}/",
+            json.dumps(
+                {
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "First Action",
+                        },
+                        {
+                            "type": WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_update_workflow_remove_trash_action_valid(self) -> None:
+        """
+        GIVEN:
+            - Existing workflow with trash action
+        WHEN:
+            - PATCH to remove trash action
+        THEN:
+            - HTTP 200 success
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow to Remove move to trash",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "sources": [DocumentSource.ApiUpload],
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "First Action",
+                        },
+                        {
+                            "type": WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        workflow_id = response.data["id"]
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{workflow_id}/",
+            json.dumps(
+                {
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                            "assign_title": "Only Action",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

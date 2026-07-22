@@ -1,4 +1,4 @@
-import { Component, HostListener, inject } from '@angular/core'
+import { Component, HostListener, inject, signal } from '@angular/core'
 import {
   PermissionAction,
   PermissionsService,
@@ -21,12 +21,12 @@ export class FileDropComponent {
   private permissionsService = inject(PermissionsService)
 
   private fileLeaveTimeoutID: any
-  fileIsOver: boolean = false
-  hidden: boolean = true
+  fileIsOver = signal<boolean>(false)
+  hidden = signal<boolean>(true)
 
   public get dragDropEnabled(): boolean {
     return (
-      this.settings.globalDropzoneEnabled &&
+      this.settings.globalDropzoneEnabled() &&
       this.permissionsService.currentUserCan(
         PermissionAction.Add,
         PermissionType.Document
@@ -39,12 +39,12 @@ export class FileDropComponent {
       return
     event.preventDefault()
     event.stopImmediatePropagation()
-    this.settings.globalDropzoneActive = true
+    this.settings.globalDropzoneActive.set(true)
     // allows transition
     setTimeout(() => {
-      this.fileIsOver = true
+      this.fileIsOver.set(true)
     }, 1)
-    this.hidden = false
+    this.hidden.set(false)
     // stop fileLeave timeout
     clearTimeout(this.fileLeaveTimeoutID)
   }
@@ -56,15 +56,15 @@ export class FileDropComponent {
     if (!this.dragDropEnabled) return
     event?.preventDefault()
     event?.stopImmediatePropagation()
-    this.settings.globalDropzoneActive = false
+    this.settings.globalDropzoneActive.set(false)
 
     const ms = immediate ? 0 : 500
 
     this.fileLeaveTimeoutID = setTimeout(() => {
-      this.fileIsOver = false
+      this.fileIsOver.set(false)
       // await transition completed
       setTimeout(() => {
-        this.hidden = true
+        this.hidden.set(true)
       }, 150)
     }, ms)
   }
@@ -150,12 +150,11 @@ export class FileDropComponent {
     this.onDragLeave(event, true)
   }
 
-  @HostListener('window:blur', ['$event']) public onWindowBlur() {
+  @HostListener('window:blur') public onWindowBlur() {
     if (this.fileIsOver) this.onDragLeave(null)
   }
 
-  @HostListener('document:visibilitychange', ['$event'])
-  public onVisibilityChange() {
+  @HostListener('document:visibilitychange') public onVisibilityChange() {
     if (document.hidden && this.fileIsOver) this.onDragLeave(null)
   }
 }

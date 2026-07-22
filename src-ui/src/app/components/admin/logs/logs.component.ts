@@ -7,6 +7,7 @@ import {
   OnInit,
   ViewChild,
   inject,
+  signal,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
@@ -34,17 +35,17 @@ export class LogsComponent
   private logService = inject(LogService)
   private changedetectorRef = inject(ChangeDetectorRef)
 
-  public logs: Array<{ message: string; level: number }> = []
+  readonly logs = signal<Array<{ message: string; level: number }>>([])
 
-  public logFiles: string[] = []
+  readonly logFiles = signal<string[]>([])
 
-  public activeLog: string
+  readonly activeLog = signal<string>(undefined)
 
-  public autoRefreshEnabled: boolean = true
+  readonly autoRefreshEnabled = signal<boolean>(true)
 
-  public limit: number = 5000
+  readonly limit = signal<number>(5000)
 
-  public showJumpToBottom = false
+  readonly showJumpToBottom = signal<boolean>(false)
 
   private readonly limitChange$ = new Subject<number>()
 
@@ -59,15 +60,15 @@ export class LogsComponent
       .list()
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((result) => {
-        this.logFiles = result
-        this.loading = false
-        if (this.logFiles.length > 0) {
-          this.activeLog = this.logFiles[0]
+        this.logFiles.set(result)
+        this.loading.set(false)
+        if (this.logFiles().length > 0) {
+          this.activeLog.set(this.logFiles()[0])
           this.reloadLogs()
         }
         timer(5000, 5000)
           .pipe(
-            filter(() => this.autoRefreshEnabled),
+            filter(() => this.autoRefreshEnabled()),
             takeUntil(this.unsubscribeNotifier)
           )
           .subscribe(() => {
@@ -85,36 +86,34 @@ export class LogsComponent
   }
 
   reloadLogs() {
-    this.loading = true
+    this.loading.set(true)
     const shouldStickToBottom = this.isNearBottom()
     this.logService
-      .get(this.activeLog, this.limit)
+      .get(this.activeLog(), this.limit())
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
-          this.loading = false
+          this.loading.set(false)
           const parsed = this.parseLogsWithLevel(result)
           const hasChanges =
-            parsed.length !== this.logs.length ||
+            parsed.length !== this.logs().length ||
             parsed.some((log, idx) => {
-              const current = this.logs[idx]
+              const current = this.logs()[idx]
               return (
-                !current ||
-                current.message !== log.message ||
-                current.level !== log.level
+                current?.message !== log.message || current?.level !== log.level
               )
             })
           if (hasChanges) {
-            this.logs = parsed
+            this.logs.set(parsed)
             if (shouldStickToBottom) {
               this.scrollToBottom()
             }
-            this.showJumpToBottom = !shouldStickToBottom
+            this.showJumpToBottom.set(!shouldStickToBottom)
           }
         },
         error: () => {
-          this.logs = []
-          this.loading = false
+          this.logs.set([])
+          this.loading.set(false)
         },
       })
   }
@@ -149,7 +148,7 @@ export class LogsComponent
     }
     this.changedetectorRef.detectChanges()
     viewport.scrollTop = viewport.scrollHeight
-    this.showJumpToBottom = false
+    this.showJumpToBottom.set(false)
   }
 
   private isNearBottom(): boolean {
@@ -162,6 +161,6 @@ export class LogsComponent
   }
 
   onScroll(): void {
-    this.showJumpToBottom = !this.isNearBottom()
+    this.showJumpToBottom.set(!this.isNearBottom())
   }
 }

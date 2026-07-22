@@ -1,11 +1,7 @@
+import { ScrollingModule } from '@angular/cdk/scrolling'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { NEGATIVE_NULL_FILTER_VALUE } from 'src/app/data/filter-rule-type'
 import {
@@ -51,6 +47,7 @@ const negativeNullItem = {
 }
 
 let selectionModel: FilterableDropdownSelectionModel
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () => {
   let component: FilterableDropdownComponent
@@ -64,7 +61,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
-      imports: [NgxBootstrapIconsModule.pick(allIcons)],
+      imports: [NgxBootstrapIconsModule.pick(allIcons), ScrollingModule],
     }).compileComponents()
 
     hotkeyService = TestBed.inject(HotKeyService)
@@ -224,7 +221,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       .dispatchEvent(new MouseEvent('click')) // open
     selectionModel.toggle(items[0].id)
     fixture.detectChanges()
-    expect(component.modelIsDirty).toBeTruthy()
+    expect(component.modelIsDirty()).toBeTruthy()
     let applyResult: ChangedItems
     const closeSpy = jest.spyOn(component.dropdown, 'close')
     component.apply.subscribe((result) => (applyResult = result))
@@ -247,41 +244,66 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       .dispatchEvent(new MouseEvent('click')) // open
     selectionModel.toggle(items[0].id)
     fixture.detectChanges()
-    expect(component.modelIsDirty).toBeTruthy()
+    expect(component.modelIsDirty()).toBeTruthy()
     let applyResult: ChangedItems
     component.apply.subscribe((result) => (applyResult = result))
     component.dropdown.close()
     expect(applyResult).toEqual({ itemsToAdd: [items[0]], itemsToRemove: [] })
   })
 
-  it('should focus text filter on open, support filtering, clear on close', fakeAsync(() => {
+  it('should focus text filter on open, support filtering, clear on close', async () => {
     component.selectionModel.items = items
     component.icon = 'tag-fill'
     fixture.nativeElement
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
     fixture.detectChanges()
-    tick(100)
+    await wait(100)
+    fixture.detectChanges()
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
     expect(document.activeElement).toEqual(
       component.listFilterTextInput.nativeElement
     )
-    expect(
-      Array.from(
-        (fixture.nativeElement as HTMLDivElement).querySelectorAll('button')
-      ).filter((b) => b.textContent.includes('Tag'))
-    ).toHaveLength(2)
+    expect(component.buttonsViewport.getRenderedRange().end).toEqual(
+      items.length
+    ) // all selectable items shown
+
     component.filterText = 'Tag2'
     fixture.detectChanges()
-    expect(
-      Array.from(
-        (fixture.nativeElement as HTMLDivElement).querySelectorAll('button')
-      ).filter((b) => b.textContent.includes('Tag'))
-    ).toHaveLength(1)
+    component.buttonsViewport.checkViewportSize()
+    fixture.detectChanges()
+    expect(component.scrollViewportHeight).toEqual(
+      component.FILTERABLE_BUTTON_HEIGHT_PX
+    ) // filtered
     component.dropdown.close()
     expect(component.filterText).toHaveLength(0)
-  }))
+  })
 
-  it('should toggle & close on enter inside filter field if 1 item remains', fakeAsync(() => {
+  it('should omit disallowed null items from the virtual scroll viewport', async () => {
+    component.selectionModel.items = items
+    component.icon = 'tag-fill'
+    fixture.nativeElement
+      .querySelector('button')
+      .dispatchEvent(new MouseEvent('click')) // open
+    fixture.detectChanges()
+    await wait(100)
+    fixture.detectChanges()
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
+
+    expect(component.filteredItems).toEqual(items)
+    expect(component.scrollViewportHeight).toEqual(
+      items.length * component.FILTERABLE_BUTTON_HEIGHT_PX
+    )
+    expect(
+      component.buttonsViewport.elementRef.nativeElement.querySelectorAll(
+        '.cdk-virtual-scroll-content-wrapper > div'
+      )
+    ).toHaveLength(items.length)
+  })
+
+  it('should toggle & close on enter inside filter field if 1 item remains', async () => {
     component.selectionModel.items = items
     component.icon = 'tag-fill'
     expect(component.selectionModel.getSelectedItems()).toEqual([])
@@ -289,7 +311,10 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
     fixture.detectChanges()
-    tick(100)
+    await wait(100)
+    fixture.detectChanges()
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
     component.filterText = 'Tag2'
     fixture.detectChanges()
     const closeSpy = jest.spyOn(component.dropdown, 'close')
@@ -297,11 +322,11 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       new KeyboardEvent('keyup', { key: 'Enter' })
     )
     expect(component.selectionModel.getSelectedItems()).toEqual([items[1]])
-    tick(300)
+    await wait(300)
     expect(closeSpy).toHaveBeenCalled()
-  }))
+  })
 
-  it('should apply & close on enter inside filter field if 1 item remains if editing', fakeAsync(() => {
+  it('should apply & close on enter inside filter field if 1 item remains if editing', async () => {
     component.selectionModel.items = items
     component.icon = 'tag-fill'
     component.editing = true
@@ -312,25 +337,33 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
     fixture.detectChanges()
-    tick(100)
+    await wait(100)
+    fixture.detectChanges()
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
     component.filterText = 'Tag2'
     fixture.detectChanges()
     component.listFilterTextInput.nativeElement.dispatchEvent(
       new KeyboardEvent('keyup', { key: 'Enter' })
     )
     expect(component.selectionModel.getSelectedItems()).toEqual([items[1]])
-    tick(300)
+    await wait(300)
     expect(applyResult).toEqual({ itemsToAdd: [items[1]], itemsToRemove: [] })
-  }))
+  })
 
-  it('should support arrow keyboard navigation', fakeAsync(() => {
+  it('should support arrow keyboard navigation', async () => {
     component.selectionModel.items = items
     component.icon = 'tag-fill'
     fixture.nativeElement
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
     fixture.detectChanges()
-    tick(100)
+    await wait(100)
+    fixture.detectChanges()
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
     const filterInputEl: HTMLInputElement =
       component.listFilterTextInput.nativeElement
     expect(document.activeElement).toEqual(filterInputEl)
@@ -366,16 +399,21 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
     )
     expect(document.activeElement).toEqual(itemButtons[0])
-  }))
+  })
 
-  it('should support arrow keyboard navigation after tab keyboard navigation', fakeAsync(() => {
+  it('should support arrow keyboard navigation after tab keyboard navigation', async () => {
     component.selectionModel.items = items
     component.icon = 'tag-fill'
     fixture.nativeElement
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
     fixture.detectChanges()
-    tick(100)
+    await wait(100)
+    fixture.detectChanges()
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
     const filterInputEl: HTMLInputElement =
       component.listFilterTextInput.nativeElement
     expect(document.activeElement).toEqual(filterInputEl)
@@ -402,16 +440,21 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
     )
     expect(document.activeElement).toEqual(itemButtons[1])
-  }))
+  })
 
-  it('should support arrow keyboard navigation after click', fakeAsync(() => {
+  it('should support arrow keyboard navigation after click', async () => {
     component.selectionModel.items = items
     component.icon = 'tag-fill'
     fixture.nativeElement
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
     fixture.detectChanges()
-    tick(100)
+    await wait(100)
+    fixture.detectChanges()
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
     const filterInputEl: HTMLInputElement =
       component.listFilterTextInput.nativeElement
     expect(document.activeElement).toEqual(filterInputEl)
@@ -427,9 +470,9 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
     )
     expect(document.activeElement).toEqual(itemButtons[1])
-  }))
+  })
 
-  it('should toggle logical operator', fakeAsync(() => {
+  it('should toggle logical operator', async () => {
     component.selectionModel.items = items
     component.icon = 'tag-fill'
     component.selectionModel.manyToOne = true
@@ -445,7 +488,10 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
     fixture.detectChanges()
-    tick(100)
+    await wait(100)
+    fixture.detectChanges()
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
 
     expect(component.modifierToggleEnabled).toBeTruthy()
     const operatorButtons: HTMLInputElement[] = Array.from(
@@ -456,9 +502,9 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     fixture.detectChanges()
     expect(selectionModel.logicalOperator).toEqual(LogicalOperator.Or)
     expect(changedResult.logicalOperator).toEqual(LogicalOperator.Or)
-  }))
+  })
 
-  it('should toggle intersection include / exclude', fakeAsync(() => {
+  it('should toggle intersection include / exclude', async () => {
     component.selectionModel.items = items
     component.icon = 'tag-fill'
     selectionModel.set(items[0].id, ToggleableItemState.Selected)
@@ -473,7 +519,10 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
     fixture.detectChanges()
-    tick(100)
+    await wait(100)
+    fixture.detectChanges()
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
 
     expect(component.modifierToggleEnabled).toBeTruthy()
     const intersectionButtons: HTMLInputElement[] = Array.from(
@@ -486,7 +535,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     expect(changedResult.intersection).toEqual(Intersection.Exclude)
     expect(changedResult.getSelectedItems()).toEqual([])
     expect(changedResult.getExcludedItems()).toEqual(items)
-  }))
+  })
 
   it('should update null item selection on toggleIntersection', () => {
     component.selectionModel.items = items
@@ -819,7 +868,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     expect(getRootDocCount(rootWithoutCounts.id)).toEqual(0)
   })
 
-  it('should set support create, keep open model and call createRef method', fakeAsync(() => {
+  it('should set support create, keep open model and call createRef method', async () => {
     component.selectionModel.items = items
     component.icon = 'tag-fill'
     component.selectionModel = selectionModel
@@ -827,7 +876,10 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
     fixture.detectChanges()
-    tick(100)
+    await wait(100)
+    fixture.detectChanges()
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
 
     component.filterText = 'Test Filter Text'
     component.createRef = jest.fn()
@@ -837,9 +889,9 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     const openSpy = jest.spyOn(component.dropdown, 'open')
     component.dropdownOpenChange(false)
     expect(openSpy).toHaveBeenCalled() // should keep open
-  }))
+  })
 
-  it('should call create on enter inside filter field if 0 items remain while editing', fakeAsync(() => {
+  it('should call create on enter inside filter field if 0 items remain while editing', async () => {
     component.selectionModel.items = items
     component.icon = 'tag-fill'
     component.editing = true
@@ -849,12 +901,15 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     fixture.nativeElement
       .querySelector('button')
       .dispatchEvent(new MouseEvent('click')) // open
-    tick(100)
+    await wait(100)
+    fixture.detectChanges()
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
     component.filterText = 'FooBar'
     component.listFilterEnter()
     expect(component.selectionModel.getSelectedItems()).toEqual([])
     expect(createSpy).toHaveBeenCalled()
-  }))
+  })
 
   it('should exclude item and trigger change event', () => {
     const id = 1

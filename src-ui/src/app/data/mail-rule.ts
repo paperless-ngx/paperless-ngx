@@ -84,4 +84,6 @@ export interface MailRule extends ObjectWithPermissions {
   assign_correspondent?: number // PaperlessCorrespondent.id
 
   assign_owner_from_rule: boolean
+
+  stop_processing: boolean
 }

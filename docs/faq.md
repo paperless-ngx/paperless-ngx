@@ -44,33 +44,42 @@ system. On Linux, chances are high that this location is
 You can always drag those files out of that folder to use them
 elsewhere. Here are a couple notes about that.
 
--   Paperless-ngx never modifies your original documents. It keeps
-    checksums of all documents and uses a scheduled sanity checker to
-    check that they remain the same.
--   By default, paperless uses the internal ID of each document as its
-    filename. This might not be very convenient for export. However, you
-    can adjust the way files are stored in paperless by
-    [configuring the filename format](advanced_usage.md#file-name-handling).
--   [The exporter](administration.md#exporter) is
-    another easy way to get your files out of paperless with reasonable
-    file names.
+- Paperless-ngx never modifies your original documents. It keeps
+  checksums of all documents and uses a scheduled sanity checker to
+  check that they remain the same.
+- By default, paperless uses the internal ID of each document as its
+  filename. This might not be very convenient for export. However, you
+  can adjust the way files are stored in paperless by
+  [configuring the filename format](advanced_usage.md#file-name-handling).
+- [The exporter](administration.md#exporter) is
+  another easy way to get your files out of paperless with reasonable
+  file names.
 
 ## _What file types does paperless-ngx support?_
 
 **A:** Currently, the following files are supported:
 
--   PDF documents, PNG images, JPEG images, TIFF images, GIF images and
-    WebP images are processed with OCR and converted into PDF documents.
--   Plain text documents are supported as well and are added verbatim to
-    paperless.
--   With the optional Tika integration enabled (see [Tika configuration](https://docs.paperless-ngx.com/configuration#tika)),
-    Paperless also supports various Office documents (.docx, .doc, odt,
-    .ppt, .pptx, .odp, .xls, .xlsx, .ods).
+- PDF documents, PNG images, JPEG images, TIFF images, GIF images and
+  WebP images are processed with OCR and converted into PDF documents.
+- Plain text documents are supported as well and are added verbatim to
+  paperless.
+- With the optional Tika integration enabled (see [Tika configuration](https://docs.paperless-ngx.com/configuration#tika)),
+  Paperless also supports various Office documents (.docx, .doc, odt,
+  .ppt, .pptx, .odp, .xls, .xlsx, .ods).
 
 Paperless-ngx determines the type of a file by inspecting its content
 rather than its file extensions. However, files processed via the
 consumption directory will be rejected if they have a file extension that
-not supported by any of the available parsers.
+is not supported by any of the available parsers.
+
+## _Are duplicate documents rejected?_
+
+**A:** Not by default. As of v3, a file whose contents match an existing document is still
+consumed, and the duplicate is flagged in the UI — open the document and check the
+**Duplicates** tab to review documents that share the same content. If you prefer the old
+behavior of rejecting duplicates during consumption, set
+[`PAPERLESS_CONSUMER_DELETE_DUPLICATES`](configuration.md#PAPERLESS_CONSUMER_DELETE_DUPLICATES)
+to `true`.
 
 ## _Will paperless-ngx run on Raspberry Pi?_
 
@@ -118,10 +127,24 @@ able to run paperless, you're a bit on your own. If you can't run the
 docker image, the documentation has instructions for bare metal
 installs.
 
-## _What about the Redis licensing change and using one of the open source forks_?
+## _Does Paperless-ngx use AI, and is my data private?_
 
-Currently (October 2024), forks of Redis such as Valkey or Redirect are not officially supported by our upstream
-libraries, so using one of these to replace Redis is not officially supported.
+**A:** Paperless-ngx includes optional AI features — LLM-based suggestions, document chat,
+and similar-document retrieval — that are **disabled by default**. They only run when you
+enable them and configure an LLM backend. The built-in tag/correspondent suggestions use a
+local, non-LLM machine-learning model and do not send your data anywhere. If you enable the
+LLM features, document content is sent to whichever backend you configure — this can be a
+fully local backend (e.g. Ollama) or a remote provider. See
+[AI features](advanced_usage.md#ai-features) for details.
 
-However, they do claim to be compatible with the Redis protocol and will likely work, but we will
-not be updating from using Redis as the broker officially just yet.
+## _Which message broker should I use_?
+
+Paperless-ngx talks to a Redis-compatible message broker, so any broker that
+implements the Redis protocol will work. The bundled Docker Compose files
+default to [Valkey](https://valkey.io/), the open-source fork created after
+Redis' licensing change, but Redis itself and other wire-compatible brokers
+(such as Microsoft's Garnet) are equally fine.
+
+Existing installs can switch broker implementations in place: point
+[`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS) at the new instance and
+reuse the same data volume.

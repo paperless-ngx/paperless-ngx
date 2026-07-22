@@ -1,0 +1,29 @@
+rules:
+  template-injection:
+    ignore:
+      # github.event_name is a GitHub-internal constant (push/pull_request/etc.),
+      # not attacker-controllable.
+      - ci-docker.yml:74
+      - ci-docs.yml:33
+      # github.event.repository.default_branch refers to the target repo's setting,
+      # which only admins can change; not influenced by fork PR authors.
+      - ci-docs.yml:45
+      # steps.setup-python.outputs.python-version is always a semver string (e.g. "3.12.0")
+      # produced by actions/setup-python from a hardcoded env var input.
+      - ci-docs.yml:88
+      - ci-docs.yml:92
+      # needs.*.result is always one of: success/failure/cancelled/skipped.
+      - ci-docs.yml:131
+      - ci-docs.yml:132
+      # needs.changes.outputs.* is always "true" or "false".
+      - ci-docs.yml:126
+      # steps.build.outputs.digest is always a SHA256 digest (sha256:[a-f0-9]{64}).
+      - ci-docker.yml:152
+  dangerous-triggers:
+    ignore:
+      # Both workflows use pull_request_target solely to label/comment on fork PRs
+      # (requires write-back access unavailable to pull_request). Neither workflow
+      # checks out PR code or executes anything from the fork — only reads PR
+      # metadata via context/API. Permissions are scoped to pull-requests: write.
+      - pr-bot.yml:2
+      - project-actions.yml:2

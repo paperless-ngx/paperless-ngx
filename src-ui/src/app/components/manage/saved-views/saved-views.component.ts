@@ -1,16 +1,23 @@
 import { AsyncPipe } from '@angular/common'
-import { Component, OnDestroy, OnInit, inject } from '@angular/core'
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core'
 import {
   FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { dirtyCheck } from '@ngneat/dirty-check-forms'
-import { BehaviorSubject, Observable, takeUntil } from 'rxjs'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BehaviorSubject, Observable, of, switchMap, takeUntil } from 'rxjs'
+import { PermissionsDialogComponent } from 'src/app/components/common/permissions-dialog/permissions-dialog.component'
 import { DisplayMode } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import {
+  PermissionAction,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -34,19 +41,22 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     FormsModule,
     ReactiveFormsModule,
     AsyncPipe,
+    NgxBootstrapIconsModule,
   ],
 })
 export class SavedViewsComponent
   extends LoadingComponentWithPermissions
   implements OnInit, OnDestroy
 {
-  private savedViewService = inject(SavedViewService)
-  private settings = inject(SettingsService)
-  private toastService = inject(ToastService)
+  private readonly savedViewService = inject(SavedViewService)
+  private readonly permissionsService = inject(PermissionsService)
+  private readonly settings = inject(SettingsService)
+  private readonly toastService = inject(ToastService)
+  private readonly modalService = inject(NgbModal)
 
   DisplayMode = DisplayMode
 
-  public savedViews: SavedView[]
+  readonly savedViews = signal<SavedView[]>(undefined)
   private savedViewsGroup = new FormGroup({})
   public savedViewsForm: FormGroup = new FormGroup({
     savedViews: this.savedViewsGroup,
@@ -56,36 +66,42 @@ export class SavedViewsComponent
   public isDirty$: Observable<boolean>
 
   get displayFields() {
-    return this.settings.allDisplayFields
+    return this.settings.allDisplayFields()
   }
 
   constructor() {
     super()
-    this.settings.organizingSidebarSavedViews = true
+    this.settings.organizingSidebarSavedViews.set(true)
   }
 
   ngOnInit(): void {
-    this.loading = true
-    this.savedViewService.listAll().subscribe((r) => {
-      this.savedViews = r.results
-      this.initialize()
-    })
+    this.reloadViews()
+  }
+
+  private reloadViews(): void {
+    this.loading.set(true)
+    this.savedViewService
+      .list(null, null, null, false, { full_perms: true })
+      .subscribe((r) => {
+        this.savedViews.set(r.results)
+        this.initialize()
+      })
   }
 
   ngOnDestroy(): void {
-    this.settings.organizingSidebarSavedViews = false
+    this.settings.organizingSidebarSavedViews.set(false)
     super.ngOnDestroy()
   }
 
   private initialize() {
-    this.loading = false
+    this.loading.set(false)
     this.emptyGroup(this.savedViewsGroup)
 
     let storeData = {
       savedViews: {},
     }
 
-    for (let view of this.savedViews) {
+    for (let view of this.savedViews()) {
       storeData.savedViews[view.id.toString()] = {
         id: view.id,
         name: view.name,
@@ -95,16 +111,20 @@ export class SavedViewsComponent
         display_mode: view.display_mode,
         display_fields: view.display_fields,
       }
+      const canEdit = this.canEditSavedView(view)
       this.savedViewsGroup.addControl(
         view.id.toString(),
         new FormGroup({
-          id: new FormControl(null),
-          name: new FormControl(null),
-          show_on_dashboard: new FormControl(null),
-          show_in_sidebar: new FormControl(null),
-          page_size: new FormControl(null),
-          display_mode: new FormControl(null),
-          display_fields: new FormControl([]),
+          id: new FormControl({ value: null, disabled: !canEdit }),
+          name: new FormControl({ value: null, disabled: !canEdit }),
+          show_on_dashboard: new FormControl({
+            value: null,
+            disabled: false,
+          }),
+          show_in_sidebar: new FormControl({ value: null, disabled: false }),
+          page_size: new FormControl({ value: null, disabled: !canEdit }),
+          display_mode: new FormControl({ value: null, disabled: !canEdit }),
+          display_fields: new FormControl({ value: [], disabled: !canEdit }),
         })
       )
     }
@@ -128,15 +148,14 @@ export class SavedViewsComponent
   public deleteSavedView(savedView: SavedView) {
     this.savedViewService.delete(savedView).subscribe(() => {
       this.savedViewsGroup.removeControl(savedView.id.toString())
-      this.savedViews.splice(this.savedViews.indexOf(savedView), 1)
+      this.savedViews.update((savedViews) =>
+        savedViews.filter((view) => view !== savedView)
+      )
       this.toastService.showInfo(
         $localize`Saved view "${savedView.name}" deleted.`
       )
       this.savedViewService.clearCache()
-      this.savedViewService.listAll().subscribe((r) => {
-        this.savedViews = r.results
-        this.initialize()
-      })
+      this.reloadViews()
     })
   }
 
@@ -145,26 +164,122 @@ export class SavedViewsComponent
   }
 
   public save() {
-    // only patch views that have actually changed
+    // Save only changed views, then save the visibility changes into user settings.
+    const groups = Object.values(this.savedViewsGroup.controls) as FormGroup[]
+    const visibilityChanged = groups.some(
+      (group) =>
+        group.get('show_on_dashboard')?.dirty ||
+        group.get('show_in_sidebar')?.dirty
+    )
+
     const changed: SavedView[] = []
-    Object.values(this.savedViewsGroup.controls)
-      .filter((g: FormGroup) => !g.pristine)
-      .forEach((group: FormGroup) => {
-        changed.push(group.value)
-      })
+    const dashboardVisibleIds: number[] = []
+    const sidebarVisibleIds: number[] = []
+
+    groups.forEach((group) => {
+      const value = group.getRawValue()
+      if (value.show_on_dashboard) {
+        dashboardVisibleIds.push(value.id)
+      }
+      if (value.show_in_sidebar) {
+        sidebarVisibleIds.push(value.id)
+      }
+      // Would be fine to send, but no longer stored on the model
+      delete value.show_on_dashboard
+      delete value.show_in_sidebar
+
+      if (!group.get('name')?.enabled) {
+        // Quick check for user doesn't have permissions, then bail
+        return
+      }
+
+      const modelFieldsChanged =
+        group.get('name')?.dirty ||
+        group.get('page_size')?.dirty ||
+        group.get('display_mode')?.dirty ||
+        group.get('display_fields')?.dirty
+
+      if (!modelFieldsChanged) {
+        return
+      }
+
+      changed.push(value)
+    })
+
+    if (!changed.length && !visibilityChanged) {
+      return
+    }
+
+    let saveOperation = of([])
     if (changed.length) {
-      this.savedViewService.patchMany(changed).subscribe({
+      saveOperation = saveOperation.pipe(
+        switchMap(() => this.savedViewService.patchMany(changed))
+      )
+    }
+    if (visibilityChanged) {
+      saveOperation = saveOperation.pipe(
+        switchMap(() =>
+          this.settings.updateSavedViewsVisibility(
+            dashboardVisibleIds,
+            sidebarVisibleIds
+          )
+        )
+      )
+    }
+
+    saveOperation.subscribe({
+      next: () => {
+        this.toastService.showInfo($localize`Views saved successfully.`)
+        this.savedViewService.clearCache()
+        this.reloadViews()
+      },
+      error: (error) => {
+        this.toastService.showError($localize`Error while saving views.`, error)
+      },
+    })
+  }
+
+  public canEditSavedView(view: SavedView): boolean {
+    return this.permissionsService.currentUserHasObjectPermissions(
+      PermissionAction.Change,
+      view
+    )
+  }
+
+  public canDeleteSavedView(view: SavedView): boolean {
+    return this.permissionsService.currentUserOwnsObject(view)
+  }
+
+  public editPermissions(savedView: SavedView): void {
+    const modal = this.modalService.open(PermissionsDialogComponent, {
+      backdrop: 'static',
+    })
+    const dialog = modal.componentInstance as PermissionsDialogComponent
+    dialog.object = savedView
+    dialog.note.set(
+      $localize`Note: Sharing saved views does not share the underlying documents.`
+    )
+
+    modal.componentInstance.confirmClicked.subscribe(({ permissions }) => {
+      modal.componentInstance.buttonsEnabled.set(false)
+      const view = {
+        id: savedView.id,
+        owner: permissions.owner,
+      }
+      view['set_permissions'] = permissions.set_permissions
+      this.savedViewService.patch(view as SavedView).subscribe({
         next: () => {
-          this.toastService.showInfo($localize`Views saved successfully.`)
-          this.store.next(this.savedViewsForm.value)
+          this.toastService.showInfo($localize`Permissions updated`)
+          modal.close()
+          this.reloadViews()
         },
         error: (error) => {
           this.toastService.showError(
-            $localize`Error while saving views.`,
+            $localize`Error updating permissions`,
             error
           )
         },
       })
-    }
+    })
   }
 }

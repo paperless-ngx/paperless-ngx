@@ -16,16 +16,11 @@ jest.mock('src/environments/environment', () => ({
 import { Clipboard } from '@angular/cdk/clipboard'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject, of, throwError } from 'rxjs'
-import { PaperlessTaskName } from 'src/app/data/paperless-task'
+import { PaperlessTaskType } from 'src/app/data/paperless-task'
 import {
   InstallType,
   SystemStatus,
@@ -68,6 +63,16 @@ const status: SystemStatus = {
     sanity_check_status: SystemStatusItemStatus.OK,
     sanity_check_last_run: new Date().toISOString(),
     sanity_check_error: null,
+    llmindex_status: SystemStatusItemStatus.OK,
+    llmindex_last_modified: new Date().toISOString(),
+    llmindex_error: null,
+    summary: {
+      days: 30,
+      total_count: 12,
+      pending_count: 1,
+      success_count: 10,
+      failure_count: 1,
+    },
   },
 }
 
@@ -96,7 +101,7 @@ describe('SystemStatusDialogComponent', () => {
 
     fixture = TestBed.createComponent(SystemStatusDialogComponent)
     component = fixture.componentInstance
-    component.status = status
+    component.status.set({ ...status })
     clipboard = TestBed.inject(Clipboard)
     tasksService = TestBed.inject(TasksService)
     systemStatusService = TestBed.inject(SystemStatusService)
@@ -116,16 +121,18 @@ describe('SystemStatusDialogComponent', () => {
     expect(closeSpy).toHaveBeenCalled()
   })
 
-  it('should copy the system status to clipboard', fakeAsync(() => {
+  it('should copy the system status to clipboard', () => {
+    jest.useFakeTimers()
     jest.spyOn(clipboard, 'copy')
     component.copy()
     expect(clipboard.copy).toHaveBeenCalledWith(
-      JSON.stringify(component.status, null, 4)
+      JSON.stringify(component.status(), null, 4)
     )
-    expect(component.copied).toBeTruthy()
-    tick(3000)
-    expect(component.copied).toBeFalsy()
-  }))
+    expect(component.copied()).toBeTruthy()
+    jest.advanceTimersByTime(3000)
+    expect(component.copied()).toBeFalsy()
+    jest.useRealTimers()
+  })
 
   it('should calculate if date is stale', () => {
     const date = new Date()
@@ -135,9 +142,9 @@ describe('SystemStatusDialogComponent', () => {
   })
 
   it('should check if task is running', () => {
-    component.runTask(PaperlessTaskName.IndexOptimize)
-    expect(component.isRunning(PaperlessTaskName.IndexOptimize)).toBeTruthy()
-    expect(component.isRunning(PaperlessTaskName.SanityCheck)).toBeFalsy()
+    component.runTask(PaperlessTaskType.SanityCheck)
+    expect(component.isRunning(PaperlessTaskType.SanityCheck)).toBeTruthy()
+    expect(component.isRunning(PaperlessTaskType.TrainClassifier)).toBeFalsy()
   })
 
   it('should support running tasks, refresh status and show toasts', () => {
@@ -148,47 +155,50 @@ describe('SystemStatusDialogComponent', () => {
 
     // fail first
     runSpy.mockReturnValue(throwError(() => new Error('error')))
-    component.runTask(PaperlessTaskName.IndexOptimize)
-    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskName.IndexOptimize)
+    component.runTask(PaperlessTaskType.SanityCheck)
+    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskType.SanityCheck)
     expect(toastErrorSpy).toHaveBeenCalledWith(
-      `Failed to start task ${PaperlessTaskName.IndexOptimize}, see the logs for more details`,
+      `Failed to start task ${PaperlessTaskType.SanityCheck}, see the logs for more details`,
       expect.any(Error)
     )
 
     // succeed
     runSpy.mockReturnValue(of({}))
     getStatusSpy.mockReturnValue(of(status))
-    component.runTask(PaperlessTaskName.IndexOptimize)
-    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskName.IndexOptimize)
+    component.runTask(PaperlessTaskType.SanityCheck)
+    expect(runSpy).toHaveBeenCalledWith(PaperlessTaskType.SanityCheck)
 
     expect(getStatusSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith(
-      `Task ${PaperlessTaskName.IndexOptimize} started`
+      `Task ${PaperlessTaskType.SanityCheck} started`
     )
   })
 
   it('shoduld handle version mismatch', () => {
     component.frontendVersion = '2.4.2'
     component.ngOnInit()
-    expect(component.versionMismatch).toBeTruthy()
-    expect(component.status.pngx_version).toContain('(frontend: 2.4.2)')
+    expect(component.versionMismatch()).toBeTruthy()
+    expect(component.status().pngx_version).toContain('(frontend: 2.4.2)')
     component.frontendVersion = '2.4.3'
-    component.status.pngx_version = '2.4.3'
+    component.status.update((status) => ({
+      ...status,
+      pngx_version: '2.4.3',
+    }))
     component.ngOnInit()
-    expect(component.versionMismatch).toBeFalsy()
+    expect(component.versionMismatch()).toBeFalsy()
   })
 
   it('should update websocket connection status', () => {
     websocketSubject.next(true)
-    expect(component.status.websocket_connected).toEqual(
+    expect(component.status().websocket_connected).toEqual(
       SystemStatusItemStatus.OK
     )
     websocketSubject.next(false)
-    expect(component.status.websocket_connected).toEqual(
+    expect(component.status().websocket_connected).toEqual(
       SystemStatusItemStatus.ERROR
     )
     websocketSubject.next(true)
-    expect(component.status.websocket_connected).toEqual(
+    expect(component.status().websocket_connected).toEqual(
       SystemStatusItemStatus.OK
     )
   })

@@ -1,10 +1,14 @@
 import { Clipboard } from '@angular/cdk/clipboard'
-import { Component, Input, OnInit, inject } from '@angular/core'
+import { Component, OnInit, effect, inject, input, signal } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first } from 'rxjs'
-import { FileVersion, ShareLink } from 'src/app/data/share-link'
+import {
+  FileVersion,
+  SHARE_LINK_EXPIRATION_OPTIONS,
+  ShareLink,
+} from 'src/app/data/share-link'
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
@@ -21,62 +25,42 @@ export class ShareLinksDialogComponent implements OnInit {
   private toastService = inject(ToastService)
   private clipboard = inject(Clipboard)
 
-  EXPIRATION_OPTIONS = [
-    { label: $localize`1 day`, value: 1 },
-    { label: $localize`7 days`, value: 7 },
-    { label: $localize`30 days`, value: 30 },
-    { label: $localize`Never`, value: null },
-  ]
+  readonly expirationOptions = SHARE_LINK_EXPIRATION_OPTIONS
 
-  @Input()
-  title = $localize`Share Links`
-
-  _documentId: number
-
-  @Input()
-  set documentId(id: number) {
-    if (id !== undefined) {
-      this._documentId = id
-      this.refresh()
-    }
-  }
-
-  private _hasArchiveVersion: boolean = true
-
-  @Input()
-  set hasArchiveVersion(value: boolean) {
-    this._hasArchiveVersion = value
-    this.useArchiveVersion = value
-  }
-
-  get hasArchiveVersion(): boolean {
-    return this._hasArchiveVersion
-  }
-
-  shareLinks: ShareLink[]
-
-  loading: boolean = false
-
-  copied: number
+  readonly title = input($localize`Share Links`)
+  readonly documentId = signal<number>(undefined)
+  readonly hasArchiveVersion = signal(true)
+  readonly shareLinks = signal<ShareLink[]>(undefined)
+  readonly loading = signal(false)
+  readonly copied = signal<number>(undefined)
 
   expirationDays: number = 7
-
   useArchiveVersion: boolean = true
 
+  constructor() {
+    effect(() => {
+      const id = this.documentId()
+      if (id !== undefined) this.refresh()
+    })
+    effect(() => {
+      this.useArchiveVersion = this.hasArchiveVersion()
+    })
+  }
+
   ngOnInit(): void {
-    if (this._documentId !== undefined) this.refresh()
+    if (this.documentId() !== undefined) this.refresh()
   }
 
   refresh() {
-    if (this._documentId === undefined) return
-    this.loading = true
+    if (this.documentId() === undefined) return
+    this.loading.set(true)
     this.shareLinkService
-      .getLinksForDocument(this._documentId)
+      .getLinksForDocument(this.documentId())
       .pipe(first())
       .subscribe({
         next: (results) => {
-          this.loading = false
-          this.shareLinks = results
+          this.loading.set(false)
+          this.shareLinks.set(results)
         },
         error: (e) => {
           this.toastService.showError(
@@ -105,9 +89,9 @@ export class ShareLinksDialogComponent implements OnInit {
   copy(link: ShareLink) {
     const success = this.clipboard.copy(this.getShareUrl(link))
     if (success) {
-      this.copied = link.id
+      this.copied.set(link.id)
       setTimeout(() => {
-        this.copied = null
+        this.copied.set(null)
       }, 3000)
     }
   }
@@ -139,23 +123,23 @@ export class ShareLinksDialogComponent implements OnInit {
       expiration = new Date()
       expiration.setDate(expiration.getDate() + this.expirationDays)
     }
-    this.loading = true
+    this.loading.set(true)
     this.shareLinkService
       .createLinkForDocument(
-        this._documentId,
+        this.documentId(),
         this.useArchiveVersion ? FileVersion.Archive : FileVersion.Original,
         expiration
       )
       .subscribe({
         next: (result) => {
-          this.loading = false
+          this.loading.set(false)
           setTimeout(() => {
             this.copy(result)
           }, 10)
           this.refresh()
         },
         error: (e) => {
-          this.loading = false
+          this.loading.set(false)
           this.toastService.showError($localize`Error creating link`, 10000, e)
         },
       })
