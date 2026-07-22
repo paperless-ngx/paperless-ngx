@@ -3,9 +3,9 @@
     <div class="border-bottom doc-img-container rounded-top" (click)="this.toggleSelected.emit($event)" (dblclick)="dblClickDocument.emit(this)">
        @if (document()) {
         @if (priority()) {
-          <img class="card-img doc-img" [class.inverted]="getIsThumbInverted()" [ngSrc]="getThumbUrl()" fill priority>
+          <img class="card-img doc-img" [class.inverted]="getIsThumbInverted()" [ngSrc]="getThumbUrl()" fill priority alt="{{ document().title | documentTitle }} thumbnail" i18n-alt>
         } @else {
-          <img class="card-img doc-img" [class.inverted]="getIsThumbInverted()" [ngSrc]="getThumbUrl()" fill>
+          <img class="card-img doc-img" [class.inverted]="getIsThumbInverted()" [ngSrc]="getThumbUrl()" fill alt="{{ document().title | documentTitle }} thumbnail" i18n-alt>
         }
 
         <div class="border-end border-bottom bg-light py-1 px-2 document-card-check">
