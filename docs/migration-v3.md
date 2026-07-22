@@ -192,7 +192,7 @@ searchable PDF and stores it as the archive copy. `ARCHIVE_FILE_GENERATION=never
 has no effect for documents handled by the remote parser — the archive is produced
 unconditionally by the remote engine.
 
-# Search Index (Whoosh -> Tantivy)
+## Search Index (Whoosh -> Tantivy)
 
 The full-text search backend has been replaced with [Tantivy](https://github.com/quickwit-oss/tantivy).
 The index format is incompatible with Whoosh, so **the search index is automatically rebuilt from
