@@ -431,14 +431,12 @@ class BulkPermissionMixin:
         This avoid fetching permissions object by object in database.
         """
         context = super().get_serializer_context()
-        try:
-            full_perms = get_boolean(
-                str(self.request.query_params.get("full_perms", "false")),
-            )
-        except ValueError:
-            full_perms = False
 
-        if not full_perms:
+        if getattr(self, "action", None) != "list":
+            # Batching only pays off across a page of objects; for single-object
+            # actions (retrieve, update, ...) the per-object fallback in
+            # get_user_can_change()/_get_perms() is cheap and avoids scanning
+            # the whole queryset here.
             return context
 
         # Check which objects are being paginated
@@ -943,6 +941,7 @@ class EmailDocumentDetailSchema(EmailSerializer):
     ),
 )
 class DocumentViewSet(
+    BulkPermissionMixin,
     PassUserMixin,
     RetrieveModelMixin,
     UpdateModelMixin,
