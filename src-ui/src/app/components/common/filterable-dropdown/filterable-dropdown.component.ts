@@ -661,7 +661,6 @@ export class FilterableDropdownSelectionModel {
   imports: [
     ClearableBadgeComponent,
     ToggleableDropdownButtonComponent,
-    FilterPipe,
     FormsModule,
     ReactiveFormsModule,
     NgxBootstrapIconsModule,
