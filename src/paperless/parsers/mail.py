@@ -58,6 +58,12 @@ _SUPPORTED_MIME_TYPES: dict[str, str] = {
     "message/rfc822": ".eml",
 }
 
+# Bleach's email-address linkifier uses a superlinear regular expression. Keep
+# email linkification for ordinary headers and short messages, but never run it
+# over an unbounded attacker-controlled field. URL linkification remains enabled
+# for longer text.
+_MAX_EMAIL_LINKIFY_LENGTH = 2048
+
 
 class MailDocumentParser:
     """Parse .eml email files for Paperless-ngx.
@@ -627,7 +633,10 @@ class MailDocumentParser:
                 text = str(text)
             text = escape(text)
             text = clean(text)
-            text = linkify(text, parse_email=True)
+            text = linkify(
+                text,
+                parse_email="@" in text and len(text) <= _MAX_EMAIL_LINKIFY_LENGTH,
+            )
             text = text.replace("\n", "<br>")
             return text
 
