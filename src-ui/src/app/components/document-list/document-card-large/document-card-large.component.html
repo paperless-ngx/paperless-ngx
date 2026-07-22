@@ -2,7 +2,11 @@
   <div class="row g-0">
     <div class="col-md-2 doc-img-container rounded-start" (click)="this.toggleSelected.emit($event)" (dblclick)="dblClickDocument.emit()">
        @if (document()) {
-        <img [ngSrc]="getThumbUrl()" fill [priority]="priority()" class="card-img doc-img border-end rounded-start" [class.inverted]="getIsThumbInverted()">
+        @if (priority()) {
+          <img [ngSrc]="getThumbUrl()" fill priority class="card-img doc-img border-end rounded-start" [class.inverted]="getIsThumbInverted()">
+        } @else {
+          <img [ngSrc]="getThumbUrl()" fill class="card-img doc-img border-end rounded-start" [class.inverted]="getIsThumbInverted()">
+        }
 
         <div class="border-end border-bottom bg-light document-card-check">
           <div class="form-check">

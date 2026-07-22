@@ -68,10 +68,7 @@ describe('DocumentCardSmallComponent', () => {
   })
 
   it('should prioritize the thumbnail when requested', () => {
-    fixture.destroy()
-    fixture = TestBed.createComponent(DocumentCardSmallComponent)
     fixture.componentRef.setInput('priority', true)
-    fixture.componentRef.setInput('document', Object.assign({}, doc))
     fixture.detectChanges()
     const thumbnail: HTMLImageElement =
       fixture.nativeElement.querySelector('img.doc-img')
