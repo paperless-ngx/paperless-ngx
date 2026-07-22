@@ -1041,6 +1041,14 @@ export class BulkEditorComponent
     return this.settings.get(SETTINGS_KEYS.EMAIL_ENABLED)
   }
 
+  public get canSendSelection(): boolean {
+    return (
+      this.list.hasSelection &&
+      (!this.list.allSelected ||
+        this.list.selectedCount === this.list.selected.size)
+    )
+  }
+
   createShareLinkBundle() {
     const modal = this.modalService.open(ShareLinkBundleDialogComponent, {
       backdrop: 'static',
