@@ -1020,6 +1020,7 @@ export class BulkEditorComponent
     )
 
     dialog.selection = this.getSelectionQuery()
+    dialog.selectionCount = this.getSelectionSize()
     dialog.succeeded.subscribe((result) => {
       this.toastService.showInfo($localize`Custom fields updated.`)
       this.list.reload()
