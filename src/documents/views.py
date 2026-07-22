@@ -482,41 +482,45 @@ class BulkPermissionMixin:
 class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
     """Mixin to add document count to queryset, permissions-aware if needed"""
 
-    # Default is simple relation path, override for through-table/count specialization.
+    # Direct FK/M2M relation name from this model to Document, used for the
+    # cheap Count(filter=...) path (Correspondent, DocumentType, StoragePath).
+    document_count_related_name: str = "documents"
+
+    # Set both of these instead, for models that only reach Document through
+    # an M2M/through-model table (Tag, CustomField). A plain Count(filter=...)
+    # over such a relation is fine for a direct FK, but forces a much more
+    # expensive plan once an M2M bridge table is involved -- see
+    # annotate_document_count_for_related_queryset() for why.
     document_count_through: type[Model] | None = None
     document_count_source_field: str | None = None
-
-    def _get_document_count_source_field(self) -> str:
-        if self.document_count_source_field is None:
-            msg = (
-                "document_count_source_field must be set when "
-                "document_count_through is configured"
-            )
-            raise ValueError(msg)
-        return self.document_count_source_field
 
     def get_document_count_filter(self):
         request = getattr(self, "request", None)
         user = getattr(request, "user", None) if request else None
-        return get_document_count_filter_for_user(user)
+        return get_document_count_filter_for_user(
+            user,
+            related_name=self.document_count_related_name,
+        )
 
     def get_queryset(self):
         base_qs = super().get_queryset()
 
-        # Use optimized through-table counting when configured.
         if self.document_count_through:
             user = getattr(getattr(self, "request", None), "user", None)
             return annotate_document_count_for_related_queryset(
                 base_qs,
                 through_model=self.document_count_through,
-                related_object_field=self._get_document_count_source_field(),
+                related_object_field=self.document_count_source_field,
                 user=user,
             )
 
-        # Fallback: simple Count on relation with permission filter.
         filter = self.get_document_count_filter()
         return base_qs.annotate(
-            document_count=Count("documents", filter=filter),
+            document_count=Count(
+                self.document_count_related_name,
+                filter=filter,
+                distinct=True,
+            ),
         )
 
 
@@ -609,7 +613,7 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Tag]):
                         pk__in=descendant_pks | {t.pk for t in all_tags},
                     ).select_related("owner"),
                     through_model=self.document_count_through,
-                    related_object_field=self._get_document_count_source_field(),
+                    related_object_field=self.document_count_source_field,
                     user=user,
                 ).order_by(*ordering),
             )
