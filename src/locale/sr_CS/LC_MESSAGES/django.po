@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-22 15:44+0000\n"
-"PO-Revision-Date: 2026-07-22 15:48\n"
+"POT-Creation-Date: 2026-07-23 19:21+0000\n"
+"PO-Revision-Date: 2026-07-23 19:23\n"
 "Last-Translator: \n"
 "Language-Team: Serbian (Latin)\n"
 "Language: sr_CS\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumenta"
 
-#: documents/filters.py:464
+#: documents/filters.py:470
 msgid "Value must be valid JSON."
 msgstr "Vrednost mora da bude važeći JSON."
 
-#: documents/filters.py:483
+#: documents/filters.py:489
 msgid "Invalid custom field query expression"
 msgstr "Nevažeći izraz upita prilagođen polja"
 
-#: documents/filters.py:493
+#: documents/filters.py:499
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Nevažeća lista izraza. Ne sme biti prazna."
 
-#: documents/filters.py:514
+#: documents/filters.py:520
 msgid "Invalid logical operator {op!r}"
 msgstr "Nevažeći logični operator {op!r}"
 
-#: documents/filters.py:528
+#: documents/filters.py:534
 msgid "Maximum number of query conditions exceeded."
 msgstr "Premašen je maksimalni broj uslova u upitu."
 
-#: documents/filters.py:592
+#: documents/filters.py:598
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} nije validno prilagođeno polje."
 
-#: documents/filters.py:629
+#: documents/filters.py:635
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} ne podržava izraz u upitu {expr!r}."
 
-#: documents/filters.py:744 documents/models.py:136
+#: documents/filters.py:750 documents/models.py:136
 msgid "Maximum nesting depth exceeded."
 msgstr "Premašena je maksimalna dubina grananja."
 
-#: documents/filters.py:1061
+#: documents/filters.py:1067
 msgid "Custom field not found"
 msgstr "Nije pronađeno prilagođeno polje"
 
@@ -1338,48 +1338,48 @@ msgstr "pokretanje radnog toka"
 msgid "workflow runs"
 msgstr "pokretanje tokova rada"
 
-#: documents/serialisers.py:503 documents/serialisers.py:855
-#: documents/serialisers.py:2744 documents/views.py:297 documents/views.py:2500
+#: documents/serialisers.py:522 documents/serialisers.py:874
+#: documents/serialisers.py:2763 documents/views.py:298 documents/views.py:2541
 #: paperless_mail/serialisers.py:155
 msgid "Insufficient permissions."
 msgstr "Nedovoljne dozvole."
 
-#: documents/serialisers.py:691
+#: documents/serialisers.py:710
 msgid "Invalid color."
 msgstr "Nevažeća boja."
 
-#: documents/serialisers.py:2216
+#: documents/serialisers.py:2235
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Vrsta datoteke %(type)s nije podržana"
 
-#: documents/serialisers.py:2260
+#: documents/serialisers.py:2279
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "ID prilagođenog polja mora biti ceo broj: %(id)s"
 
-#: documents/serialisers.py:2267
+#: documents/serialisers.py:2286
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Prilagođeno polje sa ID-em %(id)s ne postoji"
 
-#: documents/serialisers.py:2284 documents/serialisers.py:2294
+#: documents/serialisers.py:2303 documents/serialisers.py:2313
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Prilagođena polja moraju biti lista celih brojeva ili objekat koji mapira identifikatore na vrednosti."
 
-#: documents/serialisers.py:2289
+#: documents/serialisers.py:2308
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Neka prilagođena polja ne postoje ili su navedena dva puta."
 
-#: documents/serialisers.py:2436
+#: documents/serialisers.py:2455
 msgid "Invalid variable detected."
 msgstr "Otkrivena je nevažeća promenljiva."
 
-#: documents/serialisers.py:2800
+#: documents/serialisers.py:2819
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Duplirani identifikatori dokumenata nisu dozvoljeni."
 
-#: documents/serialisers.py:2830 documents/views.py:4459
+#: documents/serialisers.py:2849 documents/views.py:4500
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Dokumenti nisu pronađeni: %(ids)s"
@@ -1635,36 +1635,36 @@ msgstr "Šema URI-ja '{parts.scheme}' nije dozvoljena. Dozvoljene šeme {', '.jo
 msgid "Unable to parse URI {value}"
 msgstr "Nije moguće analizirati URI {value}"
 
-#: documents/views.py:290 documents/views.py:2497
+#: documents/views.py:291 documents/views.py:2538
 msgid "Invalid more_like_id"
 msgstr "Nevažeći more_like_id"
 
-#: documents/views.py:1524
+#: documents/views.py:1556
 msgid "Invalid AI configuration."
 msgstr "Nevažeća konfiguracija veštačke inteligencije."
 
-#: documents/views.py:1533
+#: documents/views.py:1565
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:2322 documents/views.py:2643
+#: documents/views.py:2363 documents/views.py:2684
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Navedite samo jedno od sledećeg: text, title_search, query ili more_like_id."
 
-#: documents/views.py:4471
+#: documents/views.py:4512
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Nedovoljne dozvole za deljenje dokumenta %(id)s."
 
-#: documents/views.py:4517
+#: documents/views.py:4558
 msgid "Bundle is already being processed."
 msgstr "Paket se već obrađuje."
 
-#: documents/views.py:4578
+#: documents/views.py:4619
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Paket linkova za deljenje se još uvek priprema. Molimo pokušajte ponovo kasnije."
 
-#: documents/views.py:4588
+#: documents/views.py:4629
 msgid "The share link bundle is unavailable."
 msgstr "Paket linkova za deljenje nije dostupan."
 
