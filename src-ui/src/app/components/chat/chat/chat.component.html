@@ -9,7 +9,7 @@
         @for (message of messages(); track message) {
           <div class="message d-flex flex-row small" [class.justify-content-end]="message.role === 'user'">
             <div class="p-2 m-2" [class.bg-body]="message.role === 'user'">
-              <span>
+              <span class="text-break">
                 {{ message.content }}
                 @if (message.isStreaming) { <span class="blinking-cursor">|</span> }
               </span>
