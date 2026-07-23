@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             field=models.PositiveSmallIntegerField(
                 null=True,
                 validators=[django.core.validators.MinValueValidator(1)],
-                verbose_name="Sets the LLM request timeout in seconds",
+                verbose_name="Sets the LLM timeout in seconds",
             ),
         ),
     ]
