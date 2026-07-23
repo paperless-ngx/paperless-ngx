@@ -1058,6 +1058,26 @@ class TestExportImport(
 
         self.assertEqual(Document.objects.all().count(), 4)
 
+    def test_zip_with_compare_flags_raises(self) -> None:
+        """
+        GIVEN:
+            - A request to export to a zip file
+        WHEN:
+            - --compare-checksums or --compare-json is also passed
+        THEN:
+            - A CommandError is raised (the flags are no-ops in zip mode)
+        """
+        for flag in ("--compare-checksums", "--compare-json"):
+            with self.subTest(flag=flag):
+                with self.assertRaises(CommandError):
+                    call_command(
+                        "document_exporter",
+                        self.target,
+                        "--zip",
+                        flag,
+                        skip_checks=True,
+                    )
+
 
 @pytest.mark.management
 class TestCryptExportImport(
