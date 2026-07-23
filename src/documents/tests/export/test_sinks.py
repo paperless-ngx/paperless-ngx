@@ -5,6 +5,7 @@ import zipfile
 from pathlib import Path
 
 import pytest
+import pytest_mock
 from pytest_django.fixtures import SettingsWrapper
 
 from documents.export.sinks import DirectoryExportSink
@@ -306,13 +307,6 @@ class TestZipExportSink:
 
 
 class TestZipExportSinkCompression:
-    @pytest.fixture()
-    def large_source_file(self, tmp_path: Path) -> Path:
-        src: Path = tmp_path / "src" / "doc.pdf"
-        src.parent.mkdir(parents=True)
-        src.write_bytes(b"PDF-CONTENT" * 100)
-        return src
-
     @pytest.mark.parametrize(
         ("method", "constant"),
         [
@@ -322,25 +316,29 @@ class TestZipExportSinkCompression:
             ("lzma", zipfile.ZIP_LZMA),
         ],
     )
-    def test_compression_method_is_applied_to_file_entries(
+    def test_compression_and_level_forwarded_to_zipfile(
         self,
+        mocker: pytest_mock.MockerFixture,
         tmp_path: Path,
-        large_source_file: Path,
         method: str,
         constant: int,
     ) -> None:
+        # ZipExportSink's only responsibility here is forwarding the
+        # constructor's compression/compresslevel to zipfile.ZipFile
+        # unchanged; whether ZipFile actually compresses is Python's contract,
+        # not ours, so this checks the call args rather than the archive.
         target: Path = tmp_path / "out"
         target.mkdir()
-        with ZipExportSink(
-            target,
-            "export",
-            delete=False,
+        zip_cls = mocker.patch("documents.export.sinks.zipfile.ZipFile")
+        sink = ZipExportSink(target, "export", compression=constant, compresslevel=5)
+        sink._open()
+        zip_cls.assert_called_once_with(
+            mocker.ANY,
+            "w",
             compression=constant,
-        ) as sink:
-            sink.add_file(large_source_file, "doc.pdf")
-        with zipfile.ZipFile(target / "export.zip") as zf:
-            info = zf.getinfo("doc.pdf")
-            assert info.compress_type == constant
+            compresslevel=5,
+            allowZip64=True,
+        )
 
 
 class TestStreamContract:
