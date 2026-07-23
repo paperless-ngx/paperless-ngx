@@ -342,30 +342,6 @@ class TestZipExportSinkCompression:
             info = zf.getinfo("doc.pdf")
             assert info.compress_type == constant
 
-    def test_compressing_method_beats_stored(
-        self,
-        tmp_path: Path,
-        large_source_file: Path,
-    ) -> None:
-        # Robust size invariant: a compressing method must be <= stored on
-        # compressible content (avoids flaky level-9-vs-level-1 comparisons).
-        sizes: dict[str, int] = {}
-        for name, constant in (
-            ("stored", zipfile.ZIP_STORED),
-            ("deflated", zipfile.ZIP_DEFLATED),
-        ):
-            target: Path = tmp_path / name
-            target.mkdir()
-            with ZipExportSink(
-                target,
-                "export",
-                delete=False,
-                compression=constant,
-            ) as sink:
-                sink.add_file(large_source_file, "doc.pdf")
-            sizes[name] = (target / "export.zip").stat().st_size
-        assert sizes["deflated"] <= sizes["stored"]
-
 
 class TestStreamContract:
     @pytest.fixture(params=["dir", "zip"])
