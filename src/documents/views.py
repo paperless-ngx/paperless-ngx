@@ -1063,9 +1063,16 @@ class DocumentViewSet(
             .values("count"),
             output_field=IntegerField(),
         )
+        # No .distinct() here: nothing in this base queryset can produce
+        # duplicate document rows (select_related below is all FK-to-PK;
+        # permission filtering is a boolean id__in predicate, not a join).
+        # M2M-based filters that *do* introduce a join (e.g. tags__id__in)
+        # already call .distinct() themselves where they need it -- see
+        # ObjectFilter.filter(). A blanket .distinct() here forces the
+        # database to fully sort and dedupe every visible document before
+        # it can apply LIMIT, which is disastrous at scale.
         return (
             Document.objects.filter(root_document__isnull=True)
-            .distinct()
             .order_by("-created", "-id")
             .annotate(effective_content=Coalesce(latest_version_content, F("content")))
             .annotate(num_notes=Coalesce(note_count, 0))
