@@ -164,17 +164,25 @@ class DirectoryExportSink(ExportSink):
             target.parent.mkdir(parents=True, exist_ok=True)
             copy_file_with_basic_stats(source, target)
 
+    @staticmethod
+    def _content_unchanged(target: Path, new_bytes: bytes) -> bool:
+        """True if ``target`` already holds byte-identical content (BLAKE2b)."""
+        return (
+            hashlib.blake2b(target.read_bytes()).hexdigest()
+            == hashlib.blake2b(new_bytes).hexdigest()
+        )
+
     def add_json(self, content: list | dict, arcname: str) -> None:
         target = (self._target / arcname).resolve()
         json_str = _dumps(content)
         perform_write = True
         if target in self._snapshot:
             self._snapshot.discard(target)
-            if self._compare_json:
-                target_checksum = hashlib.blake2b(target.read_bytes()).hexdigest()
-                src_checksum = hashlib.blake2b(json_str.encode("utf-8")).hexdigest()
-                if src_checksum == target_checksum:
-                    perform_write = False
+            if self._compare_json and self._content_unchanged(
+                target,
+                json_str.encode("utf-8"),
+            ):
+                perform_write = False
         if perform_write:
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(json_str, encoding="utf-8")
@@ -203,12 +211,12 @@ class DirectoryExportSink(ExportSink):
     def _commit_streamed_file(self, target: Path, tmp: Path) -> None:
         if target in self._snapshot:
             self._snapshot.discard(target)
-            if self._compare_json:
-                existing = hashlib.blake2b(target.read_bytes()).hexdigest()
-                new = hashlib.blake2b(tmp.read_bytes()).hexdigest()
-                if existing == new:
-                    tmp.unlink()
-                    return
+            if self._compare_json and self._content_unchanged(
+                target,
+                tmp.read_bytes(),
+            ):
+                tmp.unlink()
+                return
         tmp.rename(target)
 
     def _finalize(self) -> None:
@@ -251,12 +259,12 @@ class ZipExportSink(ExportSink):
         )
 
     def _ensure_dirs(self, arcname: str) -> None:
-        parts = PurePosixPath(arcname).parts[:-1]
-        for i in range(len(parts)):
-            dir_arc = "/".join(parts[: i + 1]) + "/"
+        assert self._zip is not None
+        dir_arc = ""
+        for part in PurePosixPath(arcname).parts[:-1]:
+            dir_arc += f"{part}/"
             if dir_arc not in self._dirs:
                 self._dirs.add(dir_arc)
-                assert self._zip is not None
                 self._zip.mkdir(dir_arc)
 
     def add_file(
