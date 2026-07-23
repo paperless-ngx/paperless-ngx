@@ -305,6 +305,68 @@ class TestZipExportSink:
         assert not (target / "export.zip").exists()
 
 
+class TestZipExportSinkCompression:
+    @pytest.fixture()
+    def large_source_file(self, tmp_path: Path) -> Path:
+        src: Path = tmp_path / "src" / "doc.pdf"
+        src.parent.mkdir(parents=True)
+        src.write_bytes(b"PDF-CONTENT" * 100)
+        return src
+
+    @pytest.mark.parametrize(
+        ("method", "constant"),
+        [
+            ("stored", zipfile.ZIP_STORED),
+            ("deflated", zipfile.ZIP_DEFLATED),
+            ("bzip2", zipfile.ZIP_BZIP2),
+            ("lzma", zipfile.ZIP_LZMA),
+        ],
+    )
+    def test_compression_method_is_applied_to_file_entries(
+        self,
+        tmp_path: Path,
+        large_source_file: Path,
+        method: str,
+        constant: int,
+    ) -> None:
+        target: Path = tmp_path / "out"
+        target.mkdir()
+        with ZipExportSink(
+            target,
+            "export",
+            delete=False,
+            compression=constant,
+        ) as sink:
+            sink.add_file(large_source_file, "doc.pdf")
+        with zipfile.ZipFile(target / "export.zip") as zf:
+            info = zf.getinfo("doc.pdf")
+            assert info.compress_type == constant
+
+    def test_compressing_method_beats_stored(
+        self,
+        tmp_path: Path,
+        large_source_file: Path,
+    ) -> None:
+        # Robust size invariant: a compressing method must be <= stored on
+        # compressible content (avoids flaky level-9-vs-level-1 comparisons).
+        sizes: dict[str, int] = {}
+        for name, constant in (
+            ("stored", zipfile.ZIP_STORED),
+            ("deflated", zipfile.ZIP_DEFLATED),
+        ):
+            target: Path = tmp_path / name
+            target.mkdir()
+            with ZipExportSink(
+                target,
+                "export",
+                delete=False,
+                compression=constant,
+            ) as sink:
+                sink.add_file(large_source_file, "doc.pdf")
+            sizes[name] = (target / "export.zip").stat().st_size
+        assert sizes["deflated"] <= sizes["stored"]
+
+
 class TestStreamContract:
     @pytest.fixture(params=["dir", "zip"])
     def sink(self, request: pytest.FixtureRequest, tmp_path: Path) -> ExportSink:
