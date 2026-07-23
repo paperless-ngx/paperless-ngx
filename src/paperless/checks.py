@@ -293,7 +293,7 @@ def check_deprecated_db_settings(
                     f"{var_name} is no longer supported and will be removed in v3.2. "
                     f"Set the equivalent option via PAPERLESS_DB_OPTIONS instead. "
                     f'Example: PAPERLESS_DB_OPTIONS=\'{{"{db_option_key}": "<value>"}}\'. '
-                    "See https://docs.paperless-ngx.com/migration/ for the full reference."
+                    "See https://docs.paperless-ngx.com/migration-v3/ for the full reference."
                 ),
                 id="paperless.W001",
             ),
