@@ -320,7 +320,7 @@ class ZipExportSink(ExportSink):
         self._zip = None
         if self._delete:
             self._wipe_destination()
-        self._tmp_path.rename(self._zip_path)
+        self._tmp_path.replace(self._zip_path)
 
     def _wipe_destination(self) -> None:
         skip = {self._zip_path.resolve(), self._tmp_path.resolve()}
