@@ -568,6 +568,30 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertNotIn("user_can_change", results[0])
         self.assertNotIn("is_shared_by_requester", results[0])
 
+    def test_superuser_user_can_change_without_explicit_grant(self) -> None:
+        """
+        A superuser has implicit change access to every document, even one
+        owned by someone else with no explicit guardian grant -- mirrors
+        guardian's own ObjectPermissionChecker.has_perm() superuser shortcut.
+        """
+        superuser = User.objects.create_superuser(username="admin")
+        other_user = User.objects.create_user(username="user2")
+        Document.objects.create(
+            title="Test",
+            content="content",
+            checksum="1",
+            owner=other_user,
+        )
+
+        self.client.force_authenticate(superuser)
+
+        response = self.client.get("/api/documents/", format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.json()["results"]
+        self.assertEqual(len(results), 1)
+        self.assertTrue(results[0]["user_can_change"])
+
     @mock.patch("allauth.mfa.adapter.DefaultMFAAdapter.is_mfa_enabled")
     def test_basic_auth_mfa_enabled(self, mock_is_mfa_enabled) -> None:
         """
