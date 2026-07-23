@@ -132,11 +132,8 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
   ]
 
   @ViewChild('activeOutlet', { read: NgComponentOutlet })
-  set activeOutlet(outlet: NgComponentOutlet | undefined) {
-    this.activeComponent.set(outlet?.componentInstance ?? null)
-  }
+  activeOutlet: NgComponentOutlet
 
-  readonly activeComponent = signal<unknown>(null)
   readonly activeNavID = signal<number>(null)
 
   get visibleSections(): DocumentAttributesSection[] {
@@ -161,14 +158,14 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
       this.activeSection?.kind !== DocumentAttributesSectionKind.ManagementList
     )
       return null
-    const instance = this.activeComponent()
+    const instance = this.activeOutlet?.componentInstance
     return instance instanceof ManagementListComponent ? instance : null
   }
 
   get activeCustomFields(): CustomFieldsComponent | null {
     if (this.activeSection?.kind !== DocumentAttributesSectionKind.CustomFields)
       return null
-    const instance = this.activeComponent()
+    const instance = this.activeOutlet?.componentInstance
     return instance instanceof CustomFieldsComponent ? instance : null
   }
 
