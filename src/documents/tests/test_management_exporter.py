@@ -1143,6 +1143,47 @@ class TestExportImport(
                 skip_checks=True,
             )
 
+    def test_zip_compression_level_rejected_for_lzma(self) -> None:
+        """
+        GIVEN:
+            - A request to export to a zip file with --zip-compression lzma
+        WHEN:
+            - --zip-compression-level is also passed
+        THEN:
+            - A CommandError is raised (lzma ignores level entirely)
+        """
+        with self.assertRaises(CommandError):
+            call_command(
+                "document_exporter",
+                self.target,
+                "--zip",
+                "--zip-compression",
+                "lzma",
+                "--zip-compression-level",
+                "5",
+                skip_checks=True,
+            )
+
+    def test_zstd_unavailable_raises_friendly_error(self) -> None:
+        """
+        GIVEN:
+            - A Python runtime without zstd support (< 3.14)
+        WHEN:
+            - --zip-compression zstd is requested
+        THEN:
+            - A CommandError naming the Python version requirement is raised
+        """
+        with self.assertRaises(CommandError) as e:
+            call_command(
+                "document_exporter",
+                self.target,
+                "--zip",
+                "--zip-compression",
+                "zstd",
+                skip_checks=True,
+            )
+        self.assertIn("3.14", str(e.exception))
+
     def test_zip_compression_flag_resolves_to_sink_constant(self) -> None:
         """
         GIVEN:

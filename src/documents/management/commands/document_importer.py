@@ -468,11 +468,14 @@ class Command(CryptMixin, PaperlessCommand):
                         if not compress_type_readable(info.compress_type)
                     }
                     if unsupported:
-                        names = ", ".join(sorted(unreadable_method_names(unsupported)))
-                        raise CommandError(
+                        names = sorted(unreadable_method_names(unsupported))
+                        message = (
                             f"This archive uses compression this Python cannot "
-                            f"read ({names}). zstd archives require Python 3.14+.",
+                            f"read ({', '.join(names)})."
                         )
+                        if "zstd" in names:
+                            message += " zstd archives require Python 3.14+."
+                        raise CommandError(message)
                     zf.extractall(tmp_dir)
                 self.source = Path(tmp_dir)
             self._run_import()
