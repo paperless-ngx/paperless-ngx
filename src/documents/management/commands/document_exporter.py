@@ -30,6 +30,7 @@ if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
 
 from documents.export.sinks import DirectoryExportSink
+from documents.export.sinks import ExportSink
 from documents.export.sinks import StreamingManifestWriter
 from documents.export.sinks import ZipExportSink
 from documents.file_handling import generate_filename
@@ -245,7 +246,7 @@ class Command(CryptMixin, PaperlessCommand):
         if not os.access(self.target, os.W_OK):
             raise CommandError("That path doesn't appear to be writable")
 
-        sink: DirectoryExportSink | ZipExportSink
+        sink: ExportSink
         if self.zip_export:
             sink = ZipExportSink(
                 self.target,
@@ -264,7 +265,7 @@ class Command(CryptMixin, PaperlessCommand):
         with FileLock(settings.MEDIA_LOCK), sink:
             self.dump(sink)
 
-    def dump(self, sink: DirectoryExportSink | ZipExportSink) -> None:
+    def dump(self, sink: ExportSink) -> None:
         # 1. Create manifest, containing all correspondents, types, tags, storage
         #    paths, note, documents and ui_settings
         _excluded_usernames = ["consumer", "AnonymousUser"]
@@ -487,7 +488,7 @@ class Command(CryptMixin, PaperlessCommand):
     def copy_document_files(
         self,
         document: Document,
-        sink: DirectoryExportSink | ZipExportSink,
+        sink: ExportSink,
         original_arc: str,
         thumbnail_arc: str | None,
         archive_arc: str | None,
@@ -536,7 +537,7 @@ class Command(CryptMixin, PaperlessCommand):
     def copy_share_link_bundle_file(
         self,
         bundle: ShareLinkBundle,
-        sink: DirectoryExportSink | ZipExportSink,
+        sink: ExportSink,
         bundle_arc: str,
     ) -> None:
         """
@@ -562,7 +563,7 @@ class Command(CryptMixin, PaperlessCommand):
 
     def _write_split_manifest(
         self,
-        sink: DirectoryExportSink | ZipExportSink,
+        sink: ExportSink,
         document_dict: dict,
         document: Document,
         base_name: Path,
