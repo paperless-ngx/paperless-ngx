@@ -94,7 +94,7 @@ def _unpack(blob: bytes) -> list[float]:
 
 
 def _build_where(filters: MetadataFilters | None) -> tuple[str, list[str]]:
-    """Translate the EQ / IN filters we use into a parameterized SQL clause
+    """Translate the EQ / IN / NE filters we use into a parameterized SQL clause
     on vec0 metadata columns. Returns ("", []) when there is nothing to filter.
     """
     if filters is None or not filters.filters:
@@ -119,7 +119,10 @@ def _build_where(filters: MetadataFilters | None) -> tuple[str, list[str]]:
         elif f.operator == FilterOperator.EQ:
             clauses.append(f"{f.key} = ?")
             params.append(str(f.value))
-        else:  # pragma: no cover - we only ever build EQ/IN filters
+        elif f.operator == FilterOperator.NE:
+            clauses.append(f"{f.key} != ?")
+            params.append(str(f.value))
+        else:  # pragma: no cover - we only ever build EQ/IN/NE filters
             raise NotImplementedError(f"Unsupported filter operator: {f.operator}")
     if not clauses:
         # Filters were requested but none could be translated. Fail closed
