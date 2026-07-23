@@ -299,6 +299,8 @@ optional arguments:
 -sm, --split-manifest
 -z,  --zip
 -zn, --zip-name
+--zip-compression
+--zip-compression-level
 --data-only
 --no-progress-bar
 --passphrase
@@ -360,6 +362,19 @@ document type, etc)
 If `-z` or `--zip` is provided, the export will be a zip file
 in the target directory, named according to the current local date or the
 value set in `-zn` or `--zip-name`.
+
+The compression method for the zip can be set with `--zip-compression`
+(`stored`, `deflated` (default), `bzip2`, `lzma`, or `zstd`) and tuned with
+`--zip-compression-level` (deflated: 0–9, bzip2: 1–9, zstd: -22–22; ignored
+for `stored` and `lzma`). Both options require `--zip`.
+
+!!! warning
+
+    `zstd` compression requires Python 3.14 or newer on **both** the machine
+    creating the export and any machine importing it. An archive compressed with
+    `zstd` (or `lzma`/`bzip2` where those modules are unavailable) cannot be
+    imported on a runtime that lacks the codec; the importer will refuse it with
+    a clear error. The default `deflated` is universally readable.
 
 If `--data-only` is provided, only the database will be exported. This option is intended
 to facilitate database upgrades without needing to clean documents and thumbnails from the media directory.

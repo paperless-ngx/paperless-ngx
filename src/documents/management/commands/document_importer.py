@@ -32,6 +32,8 @@ from django.db.models.signals import post_save
 from filelock import FileLock
 from guardian.shortcuts import clear_ct_cache
 
+from documents.export.compression import compress_type_readable
+from documents.export.compression import unreadable_method_names
 from documents.file_handling import create_source_path_directory
 from documents.management.commands.base import PaperlessCommand
 from documents.management.commands.mixins import CryptMixin
@@ -460,6 +462,20 @@ class Command(CryptMixin, PaperlessCommand):
         with tempfile.TemporaryDirectory() as tmp_dir:
             if is_zipfile(self.source):
                 with ZipFile(self.source) as zf:
+                    unsupported = {
+                        info.compress_type
+                        for info in zf.infolist()
+                        if not compress_type_readable(info.compress_type)
+                    }
+                    if unsupported:
+                        names = sorted(unreadable_method_names(unsupported))
+                        message = (
+                            f"This archive uses compression this Python cannot "
+                            f"read ({', '.join(names)})."
+                        )
+                        if "zstd" in names:
+                            message += " zstd archives require Python 3.14+."
+                        raise CommandError(message)
                     zf.extractall(tmp_dir)
                 self.source = Path(tmp_dir)
             self._run_import()
