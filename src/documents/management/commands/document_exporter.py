@@ -1,8 +1,4 @@
-import hashlib
-import json
 import os
-import shutil
-import tempfile
 from itertools import islice
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -19,7 +15,6 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import serializers
 from django.core.management.base import CommandError
-from django.core.serializers.json import DjangoJSONEncoder
 from django.db import transaction
 from django.utils import timezone
 from filelock import FileLock
@@ -34,7 +29,9 @@ if TYPE_CHECKING:
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
 
-from documents.file_handling import delete_empty_directories
+from documents.export.sinks import DirectoryExportSink
+from documents.export.sinks import StreamingManifestWriter
+from documents.export.sinks import ZipExportSink
 from documents.file_handling import generate_filename
 from documents.management.commands.base import PaperlessCommand
 from documents.management.commands.mixins import CryptMixin
@@ -60,8 +57,6 @@ from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_SHARE_LINK_BUNDLE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
-from documents.utils import compute_checksum
-from documents.utils import copy_file_with_basic_stats
 from paperless import version
 from paperless.models import ApplicationConfiguration
 from paperless_mail.models import MailAccount
@@ -82,87 +77,6 @@ def serialize_queryset_batched(
     iterator = queryset.iterator(chunk_size=batch_size)
     while chunk := list(islice(iterator, batch_size)):
         yield serializers.serialize("python", chunk)
-
-
-class StreamingManifestWriter:
-    """Incrementally writes a JSON array to a file, one record at a time.
-
-    Writes to <target>.tmp first; on close(), optionally BLAKE2b-compares
-    with the existing file (--compare-json) and renames or discards accordingly.
-    On exception, discard() deletes the tmp file and leaves the original intact.
-    """
-
-    def __init__(
-        self,
-        path: Path,
-        *,
-        compare_json: bool = False,
-        files_in_export_dir: "set[Path] | None" = None,
-    ) -> None:
-        self._path = path.resolve()
-        self._tmp_path = self._path.with_suffix(self._path.suffix + ".tmp")
-        self._compare_json = compare_json
-        self._files_in_export_dir: set[Path] = (
-            files_in_export_dir if files_in_export_dir is not None else set()
-        )
-        self._file = None
-        self._first = True
-
-    def open(self) -> None:
-        self._path.parent.mkdir(parents=True, exist_ok=True)
-        self._file = self._tmp_path.open("w", encoding="utf-8")
-        self._file.write("[")
-        self._first = True
-
-    def write_record(self, record: dict) -> None:
-        if not self._first:
-            self._file.write(",\n")
-        else:
-            self._first = False
-        self._file.write(
-            json.dumps(record, cls=DjangoJSONEncoder, indent=2, ensure_ascii=False),
-        )
-
-    def write_batch(self, records: list[dict]) -> None:
-        for record in records:
-            self.write_record(record)
-
-    def close(self) -> None:
-        if self._file is None:
-            return
-        self._file.write("\n]")
-        self._file.close()
-        self._file = None
-        self._finalize()
-
-    def discard(self) -> None:
-        if self._file is not None:
-            self._file.close()
-            self._file = None
-        if self._tmp_path.exists():
-            self._tmp_path.unlink()
-
-    def _finalize(self) -> None:
-        """Compare with existing file (if --compare-json) then rename or discard tmp."""
-        if self._path in self._files_in_export_dir:
-            self._files_in_export_dir.remove(self._path)
-            if self._compare_json:
-                existing_hash = hashlib.blake2b(self._path.read_bytes()).hexdigest()
-                new_hash = hashlib.blake2b(self._tmp_path.read_bytes()).hexdigest()
-                if existing_hash == new_hash:
-                    self._tmp_path.unlink()
-                    return
-        self._tmp_path.rename(self._path)
-
-    def __enter__(self) -> "StreamingManifestWriter":
-        self.open()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
-        if exc_type is not None:
-            self.discard()
-        else:
-            self.close()
 
 
 class Command(CryptMixin, PaperlessCommand):
@@ -314,20 +228,13 @@ class Command(CryptMixin, PaperlessCommand):
         self.passphrase: str | None = options.get("passphrase")
         self.batch_size: int = options["batch_size"]
 
-        self.files_in_export_dir: set[Path] = set()
         self.exported_files: set[str] = set()
 
-        # If zipping, save the original target for later and
-        # get a temporary directory for the target instead
-        temp_dir = None
-        self.original_target = self.target
-        if self.zip_export:
-            settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
-            temp_dir = tempfile.TemporaryDirectory(
-                dir=settings.SCRATCH_DIR,
-                prefix="paperless-export",
+        if self.zip_export and (self.compare_checksums or self.compare_json):
+            raise CommandError(
+                "--compare-checksums and --compare-json have no effect when "
+                "used with --zip",
             )
-            self.target = Path(temp_dir.name).resolve()
 
         if not self.target.exists():
             raise CommandError("That path doesn't exist")
@@ -338,33 +245,28 @@ class Command(CryptMixin, PaperlessCommand):
         if not os.access(self.target, os.W_OK):
             raise CommandError("That path doesn't appear to be writable")
 
-        try:
-            # Prevent any ongoing changes in the documents
-            with FileLock(settings.MEDIA_LOCK):
-                self.dump()
+        sink: DirectoryExportSink | ZipExportSink
+        if self.zip_export:
+            sink = ZipExportSink(
+                self.target,
+                options["zip_name"],
+                delete=self.delete,
+            )
+        else:
+            sink = DirectoryExportSink(
+                self.target,
+                compare_checksums=self.compare_checksums,
+                compare_json=self.compare_json,
+                delete=self.delete,
+            )
 
-                # We've written everything to the temporary directory in this case,
-                # now make an archive in the original target, with all files stored
-                if self.zip_export and temp_dir is not None:
-                    shutil.make_archive(
-                        self.original_target / options["zip_name"],
-                        format="zip",
-                        root_dir=temp_dir.name,
-                    )
+        # Prevent any ongoing changes in the documents while exporting
+        with FileLock(settings.MEDIA_LOCK), sink:
+            self.dump(sink)
 
-        finally:
-            # Always cleanup the temporary directory, if one was created
-            if self.zip_export and temp_dir is not None:
-                temp_dir.cleanup()
-
-    def dump(self) -> None:
-        # 1. Take a snapshot of what files exist in the current export folder
-        for x in self.target.glob("**/*"):
-            if x.is_file():
-                self.files_in_export_dir.add(x.resolve())
-
-        # 2. Create manifest, containing all correspondents, types, tags, storage paths
-        # note, documents and ui_settings
+    def dump(self, sink: DirectoryExportSink | ZipExportSink) -> None:
+        # 1. Create manifest, containing all correspondents, types, tags, storage
+        #    paths, note, documents and ui_settings
         _excluded_usernames = ["consumer", "AnonymousUser"]
         manifest_key_to_object_query: dict[str, QuerySet[Any]] = {
             "correspondents": Correspondent.objects.all(),
@@ -427,13 +329,9 @@ class Command(CryptMixin, PaperlessCommand):
 
         document_manifest: list[dict] = []
         share_link_bundle_manifest: list[dict] = []
-        manifest_path = (self.target / "manifest.json").resolve()
 
-        with StreamingManifestWriter(
-            manifest_path,
-            compare_json=self.compare_json,
-            files_in_export_dir=self.files_in_export_dir,
-        ) as writer:
+        with sink.stream("manifest.json") as handle:
+            writer = StreamingManifestWriter(handle)
             with transaction.atomic():
                 for key, qs in manifest_key_to_object_query.items():
                     if key == "documents":
@@ -479,84 +377,55 @@ class Command(CryptMixin, PaperlessCommand):
                 )
             }
 
-            # 3. Export files from each document
-            for index, document_dict in enumerate(
-                self.track(
-                    document_manifest,
-                    description="Exporting documents...",
-                    total=len(document_manifest),
-                ),
+            # 2. Export files from each document
+            for document_dict in self.track(
+                document_manifest,
+                description="Exporting documents...",
+                total=len(document_manifest),
             ):
                 document = document_map[document_dict["pk"]]
 
-                # 3.1. generate a unique filename
+                # generate a unique filename, then the arcnames for its files
                 base_name = self.generate_base_name(document)
-
-                # 3.2. write filenames into manifest
-                original_target, thumbnail_target, archive_target = (
+                original_arc, thumbnail_arc, archive_arc = (
                     self.generate_document_targets(document, base_name, document_dict)
                 )
 
-                # 3.3. write files to target folder
                 if not self.data_only:
                     self.copy_document_files(
                         document,
-                        original_target,
-                        thumbnail_target,
-                        archive_target,
+                        sink,
+                        original_arc,
+                        thumbnail_arc,
+                        archive_arc,
                     )
 
                 if self.split_manifest:
-                    self._write_split_manifest(document_dict, document, base_name)
+                    self._write_split_manifest(sink, document_dict, document, base_name)
                 else:
                     writer.write_record(document_dict)
 
             for bundle_dict in share_link_bundle_manifest:
                 bundle = share_link_bundle_map[bundle_dict["pk"]]
-
-                bundle_target = self.generate_share_link_bundle_target(
+                bundle_arc = self.generate_share_link_bundle_target(
                     bundle,
                     bundle_dict,
                 )
-
-                if not self.data_only and bundle_target is not None:
-                    self.copy_share_link_bundle_file(bundle, bundle_target)
-
+                if not self.data_only and bundle_arc is not None:
+                    self.copy_share_link_bundle_file(bundle, sink, bundle_arc)
                 writer.write_record(bundle_dict)
 
-        # 4.2 write version information to target folder
-        extra_metadata_path = (self.target / "metadata.json").resolve()
+            writer.close()
+
+        # 3. Write version (and crypto params) to metadata.json
+        # Django stores most crypto values in the field itself; we store
+        # them once here for the whole export
         metadata: dict[str, str | int | dict[str, str | int]] = {
             "version": version.__full_version_str__,
         }
-
-        # 4.2.1 If needed, write the crypto values into the metadata
-        # Django stores most of these in the field itself, we store them once here
         if self.passphrase:
             metadata.update(self.get_crypt_params())
-
-        self.check_and_write_json(
-            metadata,
-            extra_metadata_path,
-        )
-
-        if self.delete:
-            # 5. Remove files which we did not explicitly export in this run
-            if not self.zip_export:
-                for f in self.files_in_export_dir:
-                    f.unlink()
-
-                    delete_empty_directories(
-                        f.parent,
-                        self.target,
-                    )
-            else:
-                # 5. Remove anything in the original location (before moving the zip)
-                for item in self.original_target.glob("*"):
-                    if item.is_dir():
-                        shutil.rmtree(item)
-                    else:
-                        item.unlink()
+        sink.add_json(metadata, "metadata.json")
 
     def generate_base_name(self, document: Document) -> Path:
         """
@@ -584,73 +453,69 @@ class Command(CryptMixin, PaperlessCommand):
         document: Document,
         base_name: Path,
         document_dict: dict,
-    ) -> tuple[Path, Path | None, Path | None]:
+    ) -> tuple[str, str | None, str | None]:
         """
-        Generates the targets for a given document, including the original file, archive file and thumbnail (depending on settings).
+        Generates the relative POSIX arcnames for a document's original, thumbnail
+        and archive files (depending on settings), and records them in the manifest.
         """
         original_name = base_name
         if self.use_folder_prefix:
             original_name = Path("originals") / original_name
-        original_target = (self.target / original_name).resolve()
-        document_dict[EXPORTER_FILE_NAME] = str(original_name)
+        original_arc = original_name.as_posix()
+        document_dict[EXPORTER_FILE_NAME] = original_arc
 
         if not self.no_thumbnail:
             thumbnail_name = base_name.parent / (base_name.stem + "-thumbnail.webp")
             if self.use_folder_prefix:
                 thumbnail_name = Path("thumbnails") / thumbnail_name
-            thumbnail_target = (self.target / thumbnail_name).resolve()
-            document_dict[EXPORTER_THUMBNAIL_NAME] = str(thumbnail_name)
+            thumbnail_arc = thumbnail_name.as_posix()
+            document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_arc
         else:
-            thumbnail_target = None
+            thumbnail_arc = None
 
         if not self.no_archive and document.has_archive_version:
             archive_name = base_name.parent / (base_name.stem + "-archive.pdf")
             if self.use_folder_prefix:
                 archive_name = Path("archive") / archive_name
-            archive_target = (self.target / archive_name).resolve()
-            document_dict[EXPORTER_ARCHIVE_NAME] = str(archive_name)
+            archive_arc = archive_name.as_posix()
+            document_dict[EXPORTER_ARCHIVE_NAME] = archive_arc
         else:
-            archive_target = None
+            archive_arc = None
 
-        return original_target, thumbnail_target, archive_target
+        return original_arc, thumbnail_arc, archive_arc
 
     def copy_document_files(
         self,
         document: Document,
-        original_target: Path,
-        thumbnail_target: Path | None,
-        archive_target: Path | None,
+        sink: DirectoryExportSink | ZipExportSink,
+        original_arc: str,
+        thumbnail_arc: str | None,
+        archive_arc: str | None,
     ) -> None:
         """
-        Copies files from the document storage location to the specified target location.
-
-        If the document is encrypted, the files are decrypted before copying them to the target location.
+        Hands the document's files to the sink (original, thumbnail, archive).
         """
-        self.check_and_copy(
-            document.source_path,
-            document.checksum,
-            original_target,
-        )
+        sink.add_file(document.source_path, original_arc, checksum=document.checksum)
 
-        if thumbnail_target:
-            self.check_and_copy(document.thumbnail_path, None, thumbnail_target)
+        if thumbnail_arc:
+            sink.add_file(document.thumbnail_path, thumbnail_arc)
 
-        if archive_target:
+        if archive_arc:
             if TYPE_CHECKING:
                 assert isinstance(document.archive_path, Path)
-            self.check_and_copy(
+            sink.add_file(
                 document.archive_path,
-                document.archive_checksum,
-                archive_target,
+                archive_arc,
+                checksum=document.archive_checksum,
             )
 
     def generate_share_link_bundle_target(
         self,
         bundle: ShareLinkBundle,
         bundle_dict: dict,
-    ) -> Path | None:
+    ) -> str | None:
         """
-        Generates the export target for a share link bundle file, when present.
+        Generates the relative POSIX arcname for a share link bundle file, if any.
         """
         if not bundle.file_path:
             return None
@@ -666,25 +531,22 @@ class Command(CryptMixin, PaperlessCommand):
         bundle_dict["fields"]["file_path"] = portable_bundle_path.as_posix()
         bundle_dict[EXPORTER_SHARE_LINK_BUNDLE_NAME] = export_bundle_path.as_posix()
 
-        return (self.target / export_bundle_path).resolve()
+        return export_bundle_path.as_posix()
 
     def copy_share_link_bundle_file(
         self,
         bundle: ShareLinkBundle,
-        bundle_target: Path,
+        sink: DirectoryExportSink | ZipExportSink,
+        bundle_arc: str,
     ) -> None:
         """
-        Copies a share link bundle ZIP into the export directory.
+        Hands a share link bundle ZIP to the sink.
         """
         bundle_source_path = bundle.absolute_file_path
         if bundle_source_path is None:
             raise FileNotFoundError(f"Share link bundle {bundle.pk} has no file path")
 
-        self.check_and_copy(
-            bundle_source_path,
-            None,
-            bundle_target,
-        )
+        sink.add_file(bundle_source_path, bundle_arc)
 
     def _encrypt_record_inline(self, record: dict) -> None:
         """Encrypt sensitive fields in a single record, if passphrase is set."""
@@ -700,6 +562,7 @@ class Command(CryptMixin, PaperlessCommand):
 
     def _write_split_manifest(
         self,
+        sink: DirectoryExportSink | ZipExportSink,
         document_dict: dict,
         document: Document,
         base_name: Path,
@@ -721,81 +584,4 @@ class Command(CryptMixin, PaperlessCommand):
         manifest_name = base_name.with_name(f"{base_name.stem}-manifest.json")
         if self.use_folder_prefix:
             manifest_name = Path("json") / manifest_name
-        manifest_name = (self.target / manifest_name).resolve()
-        manifest_name.parent.mkdir(parents=True, exist_ok=True)
-        self.check_and_write_json(content, manifest_name)
-
-    def check_and_write_json(
-        self,
-        content: list[dict] | dict,
-        target: Path,
-    ) -> None:
-        """
-        Writes the source content to the target json file.
-        If --compare-json arg was used, don't write to target file if
-        the file exists and checksum is identical to content checksum.
-        This preserves the file timestamps when no changes are made.
-        """
-
-        target = target.resolve()
-        perform_write = True
-        if target in self.files_in_export_dir:
-            self.files_in_export_dir.remove(target)
-            if self.compare_json:
-                target_checksum = hashlib.blake2b(target.read_bytes()).hexdigest()
-                src_str = json.dumps(
-                    content,
-                    cls=DjangoJSONEncoder,
-                    indent=2,
-                    ensure_ascii=False,
-                )
-                src_checksum = hashlib.blake2b(src_str.encode("utf-8")).hexdigest()
-                if src_checksum == target_checksum:
-                    perform_write = False
-
-        if perform_write:
-            target.write_text(
-                json.dumps(
-                    content,
-                    cls=DjangoJSONEncoder,
-                    indent=2,
-                    ensure_ascii=False,
-                ),
-                encoding="utf-8",
-            )
-
-    def check_and_copy(
-        self,
-        source: Path,
-        source_checksum: str | None,
-        target: Path,
-    ) -> None:
-        """
-        Copies the source to the target, if target doesn't exist or the target doesn't seem to match
-        the source attributes
-        """
-
-        target = target.resolve()
-        if target in self.files_in_export_dir:
-            self.files_in_export_dir.remove(target)
-
-        perform_copy = False
-
-        if target.exists():
-            source_stat = source.stat()
-            target_stat = target.stat()
-            if self.compare_checksums and source_checksum:
-                target_checksum = compute_checksum(target)
-                perform_copy = target_checksum != source_checksum
-            elif (
-                source_stat.st_mtime != target_stat.st_mtime
-                or source_stat.st_size != target_stat.st_size
-            ):
-                perform_copy = True
-        else:
-            # Copy if it does not exist
-            perform_copy = True
-
-        if perform_copy:
-            target.parent.mkdir(parents=True, exist_ok=True)
-            copy_file_with_basic_stats(source, target)
+        sink.add_json(content, manifest_name.as_posix())
