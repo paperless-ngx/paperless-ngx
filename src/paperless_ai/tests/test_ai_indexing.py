@@ -772,3 +772,33 @@ class TestQuerySimilarDocuments:
         results = indexing.query_similar_documents(a, document_ids=[b.id])
 
         assert all(doc.id == b.id for doc in results)
+
+    def test_query_similar_documents_excludes_self(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+    ) -> None:
+        a = DocumentFactory.create(content="alpha shared content here")
+        b = DocumentFactory.create(content="beta shared content here")
+        for doc in (a, b):
+            indexing.llm_index_add_or_update_document(doc)
+
+        results = indexing.query_similar_documents(a, top_k=5)
+
+        assert [doc.id for doc in results] == [b.id]
+
+    def test_query_similar_documents_excludes_self_with_multiple_chunks(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+    ) -> None:
+        # Document `a` is split into many chunks, so it could otherwise
+        # occupy several of the top-k slots with its own content.
+        a = DocumentFactory.create(content="word " * 4000)
+        b = DocumentFactory.create(content="beta shared content here")
+        for doc in (a, b):
+            indexing.llm_index_add_or_update_document(doc)
+
+        results = indexing.query_similar_documents(a, top_k=3)
+
+        assert [doc.id for doc in results] == [b.id]

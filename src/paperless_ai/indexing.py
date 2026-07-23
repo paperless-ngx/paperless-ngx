@@ -297,6 +297,23 @@ def _document_id_filters(doc_ids):
     )
 
 
+def _exclude_document_id_filter(document_id: int | str):
+    """Return a MetadataFilters NE filter excluding ``document_id``."""
+    from llama_index.core.vector_stores.types import FilterOperator
+    from llama_index.core.vector_stores.types import MetadataFilter
+    from llama_index.core.vector_stores.types import MetadataFilters
+
+    return MetadataFilters(
+        filters=[
+            MetadataFilter(
+                key="document_id",
+                operator=FilterOperator.NE,
+                value=str(document_id),
+            ),
+        ],
+    )
+
+
 def update_llm_index(
     *,
     iter_wrapper: IterWrapper[Document] = identity,
@@ -481,10 +498,18 @@ def query_similar_documents(
     config = AIConfig()
 
     from llama_index.core.retrievers import VectorIndexRetriever
+    from llama_index.core.vector_stores.types import FilterCondition
+    from llama_index.core.vector_stores.types import MetadataFilters
+
+    filter_parts = []
+    if allowed_document_ids is not None:
+        filter_parts.extend(_document_id_filters(allowed_document_ids).filters)
+    if document.pk is not None:
+        filter_parts.extend(_exclude_document_id_filter(document.pk).filters)
 
     filters = (
-        _document_id_filters(allowed_document_ids)
-        if allowed_document_ids is not None
+        MetadataFilters(filters=filter_parts, condition=FilterCondition.AND)
+        if filter_parts
         else None
     )
 
