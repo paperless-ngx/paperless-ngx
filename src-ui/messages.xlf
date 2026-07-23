@@ -1393,8 +1393,8 @@
           <context context-type="linenumber">302</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="6544153565064275581" datatype="html">
-        <source> Settings apply to this user account for objects (Tags, Mail Rules, etc. but not documents) created via the web UI. </source>
+      <trans-unit id="1267490156259885391" datatype="html">
+        <source> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI. These settings do not apply to documents. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">306,308</context>
