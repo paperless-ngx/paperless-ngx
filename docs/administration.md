@@ -365,7 +365,7 @@ value set in `-zn` or `--zip-name`.
 
 The compression method for the zip can be set with `--zip-compression`
 (`stored`, `deflated` (default), `bzip2`, `lzma`, or `zstd`) and tuned with
-`--zip-compression-level` (deflated: 0–9, bzip2: 1–9, zstd: -131072–22; ignored
+`--zip-compression-level` (deflated: 0–9, bzip2: 1–9, zstd: -22–22; ignored
 for `stored` and `lzma`). Both options require `--zip`.
 
 !!! warning

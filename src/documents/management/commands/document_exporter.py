@@ -214,7 +214,7 @@ class Command(CryptMixin, PaperlessCommand):
             default=None,
             help=(
                 "Compression level for the export zip (requires --zip). "
-                "deflated: 0-9, bzip2: 1-9, zstd: -131072..22; ignored for "
+                "deflated: 0-9, bzip2: 1-9, zstd: -22..22; ignored for "
                 "stored/lzma."
             ),
         )

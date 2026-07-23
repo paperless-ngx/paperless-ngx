@@ -78,6 +78,8 @@ class TestLevelError:
             ("deflated", 9),
             ("bzip2", 1),
             ("bzip2", 9),
+            ("zstd", -22),
+            ("zstd", 22),
             ("deflated", None),
             ("stored", None),
         ],
@@ -100,6 +102,8 @@ class TestLevelError:
             ("deflated", -1),
             ("bzip2", 0),
             ("bzip2", 10),
+            ("zstd", -23),
+            ("zstd", 23),
         ],
     )
     def test_out_of_range_levels_return_message(

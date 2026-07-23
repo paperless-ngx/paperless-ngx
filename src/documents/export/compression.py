@@ -28,12 +28,19 @@ if ZSTD is not None:
 
 # Inclusive (min, max) level bounds per method; None => level not applicable.
 # Verified on CPython 3.14.3.
+#
+# zstd's raw library bounds are (-131072, 22)
+# (compression.zstd.CompressionParameter.compression_level.bounds()) — the
+# minimum is an internal implementation constant (-ZSTD_TARGETLENGTH_MAX),
+# not a meaningful distinct "level"; deeper negative values than -22 buy
+# nothing over -22 in practice. We expose the conventional zstd CLI range
+# instead of the raw library bounds.
 LEVEL_BOUNDS: dict[str, tuple[int, int] | None] = {
     "stored": None,
     "deflated": (0, 9),
     "bzip2": (1, 9),
     "lzma": None,
-    "zstd": (-131072, 22),
+    "zstd": (-22, 22),
 }
 
 # zipfile compress_type id -> method name. 93 = current zstd id, 20 = legacy
