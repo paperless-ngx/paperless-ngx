@@ -77,6 +77,18 @@ def _in_filter(document_ids: list[str]):
     )
 
 
+def _ne_filter(document_id: str):
+    return MetadataFilters(
+        filters=[
+            MetadataFilter(
+                key="document_id",
+                operator=FilterOperator.NE,
+                value=document_id,
+            ),
+        ],
+    )
+
+
 class TestCrud:
     def test_add_then_query_returns_node(self, store) -> None:
         node = make_node("n1", "1")
@@ -172,6 +184,19 @@ class TestCrud:
 
 
 class TestBuildWhere:
+    def test_ne_filter_translates_to_not_equal_clause(self) -> None:
+        where, params = _build_where(_ne_filter("1"))
+        assert where == "(document_id != ?)"
+        assert params == ["1"]
+
+    def test_query_with_ne_filter_excludes_matching_document(self, store) -> None:
+        store.add([make_node("a1", "1"), make_node("b1", "2")])
+        assert sorted(
+            _query(store, [0.0] * DIM, top_k=5, filters=_ne_filter("1")).ids,
+        ) == [
+            "b1",
+        ]
+
     def test_fails_closed_when_no_filter_is_translatable(self) -> None:
         # A nested MetadataFilters is not a MetadataFilter, so it is skipped.
         # With no translatable clauses, the function must fail closed rather

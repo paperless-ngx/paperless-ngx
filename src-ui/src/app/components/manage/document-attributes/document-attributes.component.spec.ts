@@ -18,6 +18,7 @@ import {
   DocumentAttributesComponent,
   DocumentAttributesSectionKind,
 } from './document-attributes.component'
+import { ManagementListComponent } from './management-list/management-list.component'
 
 @Component({
   selector: 'pngx-dummy-section',
@@ -170,10 +171,32 @@ describe('DocumentAttributesComponent', () => {
     expect(component.activeManagementList).toBeNull()
 
     component.activeNavID.set(1)
+    const managementList = Object.create(ManagementListComponent.prototype)
+    component.activeOutlet = {
+      componentInstance: managementList,
+    } as any
     expect(component.activeSection.kind).toBe(
       DocumentAttributesSectionKind.ManagementList
     )
-    expect(component.activeManagementList).toBeDefined()
+    expect(component.activeManagementList).toBe(managementList)
+  })
+
+  it('should use the current component instance when the outlet is reused', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    component.activeNavID.set(1)
+    const firstManagementList = Object.create(ManagementListComponent.prototype)
+    const secondManagementList = Object.create(
+      ManagementListComponent.prototype
+    )
+    component.activeOutlet = {
+      componentInstance: firstManagementList,
+    } as any
+
+    expect(component.activeManagementList).toBe(firstManagementList)
+
+    component.activeOutlet.componentInstance = secondManagementList
+
+    expect(component.activeManagementList).toBe(secondManagementList)
   })
 
   it('should return activeCustomFields correctly', () => {

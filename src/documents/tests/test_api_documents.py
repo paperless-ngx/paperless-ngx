@@ -883,6 +883,62 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results), 3)
 
+    def test_is_in_inbox_filter_no_duplicates_with_multiple_inbox_tags(self) -> None:
+        """
+        GIVEN:
+            - A document tagged with two different inbox tags
+        WHEN:
+            - The document list is filtered by is_in_inbox=true
+        THEN:
+            - The document appears exactly once, not once per matching tag
+        """
+        doc = Document.objects.create(title="doc", checksum="c1")
+        inbox_1 = Tag.objects.create(name="inbox1", is_inbox_tag=True)
+        inbox_2 = Tag.objects.create(name="inbox2", is_inbox_tag=True)
+        doc.tags.add(inbox_1, inbox_2)
+
+        response = self.client.get("/api/documents/?is_in_inbox=true")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc.id)
+
+    def test_custom_fields_icontains_filter_no_duplicates(self) -> None:
+        """
+        GIVEN:
+            - A document with two custom field instances that both match the
+              same custom_fields__icontains search term
+        WHEN:
+            - The document list is filtered by custom_fields__icontains
+        THEN:
+            - The document appears exactly once, not once per matching field
+        """
+        doc = Document.objects.create(title="doc", checksum="c1")
+        field_1 = CustomField.objects.create(
+            name="apple",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        field_2 = CustomField.objects.create(
+            name="apricot",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=field_1,
+            value_text="something",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=field_2,
+            value_text="something else",
+        )
+
+        response = self.client.get("/api/documents/?custom_fields__icontains=ap")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc.id)
+
     def test_custom_field_select_filter(self) -> None:
         """
         GIVEN:
@@ -1290,6 +1346,63 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(selected_tag["document_count"], 1)
         self.assertEqual(selected_type["document_count"], 1)
         self.assertEqual(selected_storage_path["document_count"], 1)
+
+    def test_selection_data_document_counts_per_tag(self) -> None:
+        """
+        GIVEN:
+            - Multiple tags with different numbers of matching documents
+              within the filtered set, including one with no matches
+        WHEN:
+            - Requesting the document list with include_selection_data=true
+        THEN:
+            - Each tag's document_count reflects only documents in the
+              filtered set, not the instance-wide count
+        """
+        tag_a = Tag.objects.create(name="a")
+        tag_b = Tag.objects.create(name="b")
+        tag_unused = Tag.objects.create(name="unused")
+        custom_field = CustomField.objects.create(
+            name="cf1",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+
+        doc1 = Document.objects.create(checksum="1", correspondent=None)
+        doc1.tags.add(tag_a)
+        doc2 = Document.objects.create(checksum="2")
+        doc2.tags.add(tag_a, tag_b)
+        doc3 = Document.objects.create(checksum="3")
+        doc3.tags.add(tag_b)
+        CustomFieldInstance.objects.create(
+            document=doc1,
+            field=custom_field,
+            value_text="x",
+        )
+
+        # Excluded from the filtered set entirely.
+        excluded = Document.objects.create(checksum="4")
+        excluded.tags.add(tag_a, tag_b, tag_unused)
+
+        response = self.client.get(
+            f"/api/documents/?id__in={doc1.id},{doc2.id},{doc3.id}"
+            "&include_selection_data=true",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        selection_data = response.data["selection_data"]
+
+        counts_by_tag = {
+            item["id"]: item["document_count"]
+            for item in selection_data["selected_tags"]
+        }
+        self.assertEqual(counts_by_tag[tag_a.id], 2)
+        self.assertEqual(counts_by_tag[tag_b.id], 2)
+        self.assertEqual(counts_by_tag[tag_unused.id], 0)
+
+        counts_by_field = {
+            item["id"]: item["document_count"]
+            for item in selection_data["selected_custom_fields"]
+        }
+        self.assertEqual(counts_by_field[custom_field.id], 1)
 
     def test_statistics(self) -> None:
         doc1 = Document.objects.create(

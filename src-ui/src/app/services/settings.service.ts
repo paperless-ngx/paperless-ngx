@@ -17,7 +17,7 @@ import {
   estimateBrightnessForColor,
   hexToHsl,
 } from 'src/app/utils/color'
-import { environment } from 'src/environments/environment'
+import { DEFAULT_APP_TITLE, environment } from 'src/environments/environment'
 import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
 import { SavedView } from '../data/saved-view'
 import {
@@ -359,9 +359,8 @@ export class SettingsService {
       }),
       tap((uisettings) => {
         this.assignSafeSettings(uisettings.settings)
-        if (this.get(SETTINGS_KEYS.APP_TITLE)?.length) {
-          environment.appTitle = this.get(SETTINGS_KEYS.APP_TITLE)
-        }
+        environment.appTitle =
+          this.get(SETTINGS_KEYS.APP_TITLE) || DEFAULT_APP_TITLE
         this.maybeMigrateSettings()
         // to update lang cookie
         if (this.settings['language']?.length)

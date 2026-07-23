@@ -4,14 +4,14 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
-from django.db.models import OuterRef
 from django.db.models import Q
 from django.db.models import QuerySet
-from django.db.models import Subquery
+from django.db.models import Value
+from django.db.models import When
 from django.db.models.functions import Cast
-from django.db.models.functions import Coalesce
 from guardian.core import ObjectPermissionChecker
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
@@ -204,20 +204,95 @@ def _permitted_document_ids(user):
     ).values_list("id", flat=True)
 
 
-def get_document_count_filter_for_user(user):
+def get_document_count_filter_for_user(user, related_name: str = "documents"):
     """
     Return the Q object used to filter document counts for the given user.
 
     The filter is expressed as an ``id__in`` against a small subquery of permitted
     document IDs to keep the generated SQL simple and avoid large OR clauses.
+
+    ``related_name`` is the ORM path from the annotated model to Document (e.g.
+    ``"documents"`` for Tag's direct M2M, or ``"fields__document"`` for CustomField,
+    which only reaches Document via the CustomFieldInstance through-model).
     """
 
     if getattr(user, "is_superuser", False):
         # Superuser: no permission filtering needed
-        return Q(documents__deleted_at__isnull=True)
+        return Q(**{f"{related_name}__deleted_at__isnull": True})
 
     permitted_ids = _permitted_document_ids(user)
-    return Q(documents__id__in=permitted_ids)
+    return Q(**{f"{related_name}__id__in": permitted_ids})
+
+
+def annotate_document_count_by_ids(
+    queryset: QuerySet[Any],
+    through_model: Any,
+    related_object_field: str,
+    document_ids: Any,
+    target_field: str = "document_id",
+) -> QuerySet[Any]:
+    """
+    Annotate a queryset with a document count for a relation to Document that
+    goes through an M2M/through-model table (e.g. Tag via
+    ``Document.tags.through``, or CustomField via ``CustomFieldInstance``),
+    for an explicit, already-resolved set of document ids.
+
+    Counts are computed via a single, independent GROUP BY over the relation
+    table -- with the id filter expressed as a plain ``WHERE`` rather than an
+    aggregate ``FILTER`` -- then injected via ``Case``/``When``. This
+    deliberately avoids two slower alternatives found while building this:
+
+    - A per-outer-row correlated subquery (one execution per row of the
+      annotated queryset): fine at a handful of rows, catastrophic once the
+      queryset has hundreds/thousands of rows.
+    - ``Count(..., filter=Q(id__in=document_ids), distinct=True)`` applied
+      directly to the M2M relation: Postgres can fail to plan the ``id__in``
+      check as a semi-join and instead re-checks subquery membership once per
+      row of the (much larger) M2M join -- worse than the correlated subquery.
+
+    Aggregation is restricted to rows whose ``related_object_field`` is one of
+    ``queryset``'s pks, so passing a subset (e.g. a handful of tag descendants)
+    doesn't pay the cost of counting for every row matching ``document_ids``.
+
+    Args:
+        queryset: base queryset to annotate (must contain pk)
+        through_model: model representing the relation (e.g., Document.tags.through
+                       or CustomFieldInstance)
+        related_object_field: field on the relation pointing back to queryset pk
+        document_ids: the document ids to count against -- a concrete list/set,
+                       or a simple (already resolved) queryset of ids. Callers
+                       that need this filtered by a complex condition (e.g. a
+                       permission check) should resolve it to a concrete list
+                       first if the same ids will be reused across multiple
+                       calls, rather than passing the complex queryset itself
+                       into each -- see ``_get_selection_data_for_queryset``.
+        target_field: field on the relation pointing to Document id
+    """
+
+    counts = (
+        through_model.objects.filter(
+            **{
+                f"{related_object_field}__in": queryset.values("pk"),
+                f"{target_field}__in": document_ids,
+            },
+        )
+        .values(related_object_field)
+        .annotate(c=Count(target_field, distinct=True))
+    )
+    counts_by_pk = {row[related_object_field]: row["c"] for row in counts}
+
+    if not counts_by_pk:
+        return queryset.annotate(
+            document_count=Value(0, output_field=IntegerField()),
+        )
+
+    return queryset.annotate(
+        document_count=Case(
+            *(When(pk=pk, then=Value(count)) for pk, count in counts_by_pk.items()),
+            default=Value(0),
+            output_field=IntegerField(),
+        ),
+    )
 
 
 def annotate_document_count_for_related_queryset(
@@ -228,31 +303,17 @@ def annotate_document_count_for_related_queryset(
     user: User | None = None,
 ) -> QuerySet[Any]:
     """
-    Annotate a queryset with permissions-aware document counts using a subquery
-    against a relation table.
-
-    Args:
-        queryset: base queryset to annotate (must contain pk)
-        through_model: model representing the relation (e.g., Document.tags.through
-                       or CustomFieldInstance)
-        source_field: field on the relation pointing back to queryset pk
-        target_field: field on the relation pointing to Document id
-        user: the user for whom to filter permitted document ids
+    Same as ``annotate_document_count_by_ids``, but resolves the document ids
+    from the given user's view permissions rather than taking them directly.
     """
 
-    permitted_ids = _permitted_document_ids(user)
-    counts = (
-        through_model.objects.filter(
-            **{
-                related_object_field: OuterRef("pk"),
-                f"{target_field}__in": permitted_ids,
-            },
-        )
-        .values(related_object_field)
-        .annotate(c=Count(target_field))
-        .values("c")
+    return annotate_document_count_by_ids(
+        queryset,
+        through_model=through_model,
+        related_object_field=related_object_field,
+        document_ids=_permitted_document_ids(user),
+        target_field=target_field,
     )
-    return queryset.annotate(document_count=Coalesce(Subquery(counts[:1]), 0))
 
 
 def get_objects_for_user_owner_aware(

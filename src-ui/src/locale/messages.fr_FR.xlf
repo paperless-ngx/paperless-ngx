@@ -432,7 +432,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">171</context>
         </context-group>
-        <target state="translated">Le tableau de bord peut être utilisé pour afficher les vues enregistrées, comme une boîte de réception. Les vues se trouvent dans Paramètres &gt; Vues enregistrées une fois que vous en avez créées.</target>
+        <target state="translated">Le tableau de bord peut être utilisé pour afficher les vues enregistrées, comme une boîte de réception. Les vues se trouvent dans Paramètres &gt; Vues enregistrées une fois que vous en avez créé.</target>
       </trans-unit>
       <trans-unit id="9075755296812854717" datatype="html" approved="yes">
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
@@ -1264,7 +1264,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">185</context>
         </context-group>
-        <target state="translated">Afficher le nombre de documents dans la barre latérale vues enregistrées</target>
+        <target state="translated">Afficher le nombre de documents dans les vues enregistrées dans la barre latérale</target>
       </trans-unit>
       <trans-unit id="8939587804990976924" datatype="html" approved="yes">
         <source>Items per page</source>
@@ -1522,13 +1522,13 @@
         </context-group>
         <target state="final">Droits d'accès par défaut</target>
       </trans-unit>
-      <trans-unit id="6544153565064275581" datatype="html">
-        <source> Settings apply to this user account for objects (Tags, Mail Rules, etc. but not documents) created via the web UI. </source>
+      <trans-unit id="1267490156259885391" datatype="html">
+        <source> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI. These settings do not apply to documents. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">306,308</context>
         </context-group>
-        <target state="translated"> Les paramètres s’appliquent à ce compte utilisateur pour les objets (étiquettes, règles de courriel, etc. à l’exception des documents) créés via l’interface web. </target>
+        <target state="needs-translation"> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI. These settings do not apply to documents. </target>
       </trans-unit>
       <trans-unit id="4292903881380648974" datatype="html" approved="yes">
         <source>Default Owner</source>
@@ -2484,7 +2484,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="needs-translation">Consume File</target>
+        <target state="translated">Fichier à consommer</target>
       </trans-unit>
       <trans-unit id="5622386857946132209" datatype="html">
         <source>Train Classifier</source>
@@ -2492,7 +2492,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">70</context>
         </context-group>
-        <target state="needs-translation">Train Classifier</target>
+        <target state="translated">Entrainer le classificateur</target>
       </trans-unit>
       <trans-unit id="776309955507105337" datatype="html">
         <source>Sanity Check</source>
@@ -2520,7 +2520,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">LLM Index</target>
+        <target state="translated">Index LLM</target>
       </trans-unit>
       <trans-unit id="6402092370576716734" datatype="html">
         <source>Empty Trash</source>
@@ -2528,7 +2528,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="translated">Vider la poubelle</target>
+        <target state="translated">Vider la corbeille</target>
       </trans-unit>
       <trans-unit id="4173754487295857311" datatype="html">
         <source>Check Workflows</source>
@@ -2536,7 +2536,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">84</context>
         </context-group>
-        <target state="needs-translation">Check Workflows</target>
+        <target state="translated">Processus de contrôle</target>
       </trans-unit>
       <trans-unit id="2065831805515896240" datatype="html">
         <source>Bulk Update</source>
@@ -2560,7 +2560,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">Build Share Link</target>
+        <target state="translated">Créer un lien de partage</target>
       </trans-unit>
       <trans-unit id="6581973658756561124" datatype="html">
         <source>Bulk Delete</source>
@@ -2696,7 +2696,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">348</context>
         </context-group>
-        <target state="needs-translation">Confirm Dismiss All</target>
+        <target state="translated">Confirmer « Tout ignorer »</target>
       </trans-unit>
       <trans-unit id="4157200209636243740" datatype="html">
         <source>Dismiss all <x id="PH" equiv-text="this.totalTasks()"/> tasks?</source>
@@ -2704,7 +2704,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">349</context>
         </context-group>
-        <target state="needs-translation">Dismiss all <x id="PH" equiv-text="this.totalTasks()"/> tasks?</target>
+        <target state="translated">Ignorer toutes (<x id="PH" equiv-text="this.totalTasks()"/>) les tâches ?</target>
       </trans-unit>
       <trans-unit id="8149502458056418229" datatype="html">
         <source>Success. New document id <x id="PH" equiv-text="documentId"/> created</source>
@@ -2724,7 +2724,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">452</context>
         </context-group>
-        <target state="needs-translation">Duplicate of document #<x id="PH" equiv-text="duplicateOf"/></target>
+        <target state="translated">Doublon du document #<x id="PH" equiv-text="duplicateOf"/></target>
       </trans-unit>
       <trans-unit id="3418677553313974490" datatype="html" approved="yes">
         <source>Trash</source>
@@ -2772,7 +2772,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/processed-mail-dialog/processed-mail-dialog.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="translated">Effacer le(s) sélectionné(s)</target>
+        <target state="translated">Supprimer la sélection</target>
       </trans-unit>
       <trans-unit id="8597030111956627342" datatype="html" approved="yes">
         <source>Empty trash</source>
@@ -2984,7 +2984,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="translated">Cette opération effacera définitivement ce document.</target>
+        <target state="translated">Cette opération supprimera définitivement ce document.</target>
       </trans-unit>
       <trans-unit id="5641451190833696892" datatype="html" approved="yes">
         <source>This operation cannot be undone.</source>
@@ -3048,7 +3048,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">111</context>
         </context-group>
-        <target state="translated">Cette action effacera définitivement les documents sélectionnés.</target>
+        <target state="translated">Cette action supprimera définitivement les documents sélectionnés.</target>
       </trans-unit>
       <trans-unit id="6804051092296228130" datatype="html">
         <source>This operation will permanently delete all documents in the trash.</source>
@@ -3056,7 +3056,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">112</context>
         </context-group>
-        <target state="translated">Cette opération effacera définitivement tous les documents de la corbeille.</target>
+        <target state="translated">Cette opération supprimera définitivement tous les documents de la corbeille.</target>
       </trans-unit>
       <trans-unit id="6996183233986182894" datatype="html">
         <source>Document(s) deleted</source>
@@ -3064,7 +3064,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.ts</context>
           <context context-type="linenumber">123</context>
         </context-group>
-        <target state="translated">Document(s) effacé(s)</target>
+        <target state="translated">Document(s) supprimé(s)</target>
       </trans-unit>
       <trans-unit id="6962724852893361467" datatype="html">
         <source>Error deleting document(s)</source>
@@ -3957,6 +3957,22 @@
           <context context-type="linenumber">85</context>
         </context-group>
         <target state="final">Réinitialiser</target>
+      </trans-unit>
+      <trans-unit id="2807800733729323332" datatype="html" approved="yes">
+        <source>Yes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/confirm-button/confirm-button.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
+          <context context-type="linenumber">102</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">386</context>
+        </context-group>
+        <target state="final">Oui</target>
       </trans-unit>
       <trans-unit id="7515883357904500238" datatype="html" approved="yes">
         <source>Are you sure?</source>
@@ -5764,7 +5780,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">158</context>
         </context-group>
-        <target state="translated">Déclenche pour les documents qui correspondent à <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>tous<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/>les filtres spécifiés ci-dessous.</target>
+        <target state="translated">Déclenche pour les documents qui correspondent à <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>tous<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> les filtres spécifiés ci-dessous.</target>
       </trans-unit>
       <trans-unit id="7467799586957602479" datatype="html">
         <source>Filter filename</source>
@@ -6084,7 +6100,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">418</context>
         </context-group>
-        <target state="translated">URL du Webhook</target>
+        <target state="translated">URL du webhook</target>
       </trans-unit>
       <trans-unit id="7491983459027245019" datatype="html">
         <source>Use parameters for webhook body</source>
@@ -6116,7 +6132,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">426</context>
         </context-group>
-        <target state="translated">Corps du Webhook</target>
+        <target state="translated">Corps du webhook</target>
       </trans-unit>
       <trans-unit id="3829826512656746316" datatype="html">
         <source>Webhook headers</source>
@@ -6124,7 +6140,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">428</context>
         </context-group>
-        <target state="translated">En-têtes Webhook</target>
+        <target state="translated">En-têtes du webhook</target>
       </trans-unit>
       <trans-unit id="2114525789021600887" datatype="html">
         <source>Include document</source>
@@ -6140,7 +6156,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">436,438</context>
         </context-group>
-        <target state="translated"> Un mot de passe par ligne. Le workflow va les essayer dans l'ordre jusqu'à ce que l'un d'entre eux réussisse. </target>
+        <target state="translated"> Un mot de passe par ligne. Le workflow les essaiera dans l'ordre jusqu'à ce qu'un réussisse. </target>
       </trans-unit>
       <trans-unit id="3853121441237751087" datatype="html">
         <source>Passwords</source>
@@ -7598,7 +7614,7 @@
           <context context-type="sourcefile">src/app/components/common/share-link-bundle-manage-dialog/share-link-bundle-manage-dialog.component.html</context>
           <context context-type="linenumber">62</context>
         </context-group>
-        <target state="needs-translation">View error details</target>
+        <target state="translated">Afficher les détails de l'erreur</target>
       </trans-unit>
       <trans-unit id="2057574872309338088" datatype="html">
         <source>Copy share link</source>
@@ -8200,18 +8216,6 @@
         </context-group>
         <target state="translated">Filtrer par propriétaire</target>
       </trans-unit>
-      <trans-unit id="2807800733729323332" datatype="html" approved="yes">
-        <source>Yes</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
-          <context context-type="linenumber">102</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">386</context>
-        </context-group>
-        <target state="final">Oui</target>
-      </trans-unit>
       <trans-unit id="3542042671420335679" datatype="html" approved="yes">
         <source>No</source>
         <context-group purpose="location">
@@ -8656,7 +8660,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">318</context>
         </context-group>
-        <target state="needs-translation">Original SHA256 checksum</target>
+        <target state="translated">Somme de contrôle SHA256 de l'original</target>
       </trans-unit>
       <trans-unit id="5888243105821763422" datatype="html" approved="yes">
         <source>Original file size</source>
@@ -8680,7 +8684,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">331</context>
         </context-group>
-        <target state="needs-translation">Archive SHA256 checksum</target>
+        <target state="translated">Somme de contrôle SHA256 de l'archive</target>
       </trans-unit>
       <trans-unit id="6033581412811562084" datatype="html" approved="yes">
         <source>Archive file size</source>
@@ -8736,7 +8740,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">407</context>
         </context-group>
-        <target state="translated">Documents en double détectés:</target>
+        <target state="translated">Documents en double détectés :</target>
       </trans-unit>
       <trans-unit id="14058600336670816" datatype="html">
         <source>In trash</source>
@@ -8932,7 +8936,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1271</context>
         </context-group>
-        <target state="needs-translation">Error saving document "<x id="PH" equiv-text="this.document().title"/>"</target>
+        <target state="translated">Erreur lors de la sauvegarde du document "<x id="PH" equiv-text="this.document().title"/>"</target>
       </trans-unit>
       <trans-unit id="448882439049417053" datatype="html" approved="yes">
         <source>Error saving document</source>
@@ -9228,7 +9232,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.ts</context>
           <context context-type="linenumber">224</context>
         </context-group>
-        <target state="needs-translation">Missing task ID.</target>
+        <target state="translated">ID de tâche manquant.</target>
       </trans-unit>
       <trans-unit id="205445381296663832" datatype="html">
         <source>Upload failed.</source>
@@ -9248,7 +9252,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.ts</context>
           <context context-type="linenumber">274</context>
         </context-group>
-        <target state="needs-translation">Error uploading new version</target>
+        <target state="translated">Erreur lors du téléversement de la nouvelle version</target>
       </trans-unit>
       <trans-unit id="6299008920007331381" datatype="html" approved="yes">
         <source>Edit:</source>
@@ -10275,7 +10279,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">212</context>
         </context-group>
-        <target state="needs-translation">Custom fields (Deprecated)</target>
+        <target state="translated">Champs personnalisés (Obsolète)</target>
       </trans-unit>
       <trans-unit id="2649431021108393503" datatype="html" approved="yes">
         <source>More like</source>
@@ -10411,7 +10415,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">332</context>
         </context-group>
-        <target state="needs-translation">Title &amp; content: <x id="PH" equiv-text="rule.value"/></target>
+        <target state="translated">Titre &amp; contenu : <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
       <trans-unit id="1872523635812236432" datatype="html" approved="yes">
         <source>ASN: <x id="PH" equiv-text="rule.value"/></source>
@@ -10935,7 +10939,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
           <context context-type="linenumber">453</context>
         </context-group>
-        <target state="translated">Cette action effacera définitivement les <x id="PH" equiv-text="this.typeNamePlural"/> documents sélectionnés.</target>
+        <target state="translated">Cette action supprimera définitivement les <x id="PH" equiv-text="this.typeNamePlural"/> documents sélectionnés.</target>
       </trans-unit>
       <trans-unit id="5897787932098828336" datatype="html">
         <source>Objects deleted successfully</source>
@@ -12180,7 +12184,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">365</context>
         </context-group>
-        <target state="needs-translation">LLM Request Timeout</target>
+        <target state="translated">Délai d'attente des requêtes LLM</target>
       </trans-unit>
       <trans-unit id="483994032066441287" datatype="html">
         <source>Timeout in seconds for LLM requests.</source>
@@ -12188,7 +12192,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">369</context>
         </context-group>
-        <target state="needs-translation">Timeout in seconds for LLM requests.</target>
+        <target state="translated">Délai d'attente en secondes pour les requêtes LLM.</target>
       </trans-unit>
       <trans-unit id="9155387182259025015" datatype="html">
         <source>Processing</source>
@@ -12770,7 +12774,7 @@
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">636</context>
+          <context context-type="linenumber">635</context>
         </context-group>
         <target state="final">La migration des paramètres vers la base de données a été effectuée avec succès !</target>
       </trans-unit>
@@ -12778,7 +12782,7 @@
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">637</context>
+          <context context-type="linenumber">636</context>
         </context-group>
         <target state="final">Impossible de migrer les paramètres vers la base de données, veuillez essayer d’enregistrer manuellement.</target>
       </trans-unit>
@@ -12786,7 +12790,7 @@
         <source>You can restart the tour from the settings page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">709</context>
+          <context context-type="linenumber">708</context>
         </context-group>
         <target state="final">Vous pouvez recommencer la visite depuis les paramètres.</target>
       </trans-unit>
