@@ -6,6 +6,8 @@ from datetime import timedelta
 from io import StringIO
 from pathlib import Path
 from unittest import mock
+from zipfile import ZIP_DEFLATED
+from zipfile import ZIP_LZMA
 from zipfile import ZipFile
 
 import pytest
@@ -1077,6 +1079,87 @@ class TestExportImport(
                         flag,
                         skip_checks=True,
                     )
+
+    def test_compression_flags_require_zip(self) -> None:
+        for args in (
+            ["--zip-compression", "lzma"],
+            ["--zip-compression-level", "5"],
+        ):
+            with self.assertRaises(CommandError):
+                call_command(
+                    "document_exporter",
+                    self.target,
+                    *args,
+                    skip_checks=True,
+                )
+
+    def test_zip_compression_level_out_of_range_raises(self) -> None:
+        with self.assertRaises(CommandError):
+            call_command(
+                "document_exporter",
+                self.target,
+                "--zip",
+                "--zip-compression",
+                "deflated",
+                "--zip-compression-level",
+                "99",
+                skip_checks=True,
+            )
+
+    def test_zip_compression_level_rejected_for_stored(self) -> None:
+        with self.assertRaises(CommandError):
+            call_command(
+                "document_exporter",
+                self.target,
+                "--zip",
+                "--zip-compression",
+                "stored",
+                "--zip-compression-level",
+                "5",
+                skip_checks=True,
+            )
+
+    def test_zip_lzma_compression_round_trips(self) -> None:
+        shutil.rmtree(Path(self.dirs.media_dir) / "documents")
+        shutil.copytree(
+            Path(__file__).parent / "samples" / "documents",
+            Path(self.dirs.media_dir) / "documents",
+        )
+        call_command(
+            "document_exporter",
+            self.target,
+            "--zip",
+            "--zip-compression",
+            "lzma",
+            skip_checks=True,
+        )
+        expected = str(
+            self.target / f"export-{timezone.localdate().isoformat()}.zip",
+        )
+        self.assertIsFile(expected)
+        with ZipFile(expected) as zip_file:
+            info = zip_file.getinfo("manifest.json")
+            # manifest.json carries the chosen method; deflated is the default
+            self.assertEqual(info.compress_type, ZIP_LZMA)
+
+    def test_default_zip_uses_deflate(self) -> None:
+        shutil.rmtree(Path(self.dirs.media_dir) / "documents")
+        shutil.copytree(
+            Path(__file__).parent / "samples" / "documents",
+            Path(self.dirs.media_dir) / "documents",
+        )
+        call_command(
+            "document_exporter",
+            self.target,
+            "--zip",
+            skip_checks=True,
+        )
+        expected = str(
+            self.target / f"export-{timezone.localdate().isoformat()}.zip",
+        )
+        with ZipFile(expected) as zip_file:
+            info = zip_file.getinfo("manifest.json")
+            self.assertEqual(info.compress_type, ZIP_DEFLATED)
 
 
 @pytest.mark.management

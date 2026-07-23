@@ -29,6 +29,11 @@ if TYPE_CHECKING:
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
 
+from documents.export.compression import COMPRESSION_CHOICES
+from documents.export.compression import COMPRESSION_METHODS
+from documents.export.compression import ZSTD
+from documents.export.compression import compression_available
+from documents.export.compression import level_error
 from documents.export.sinks import DirectoryExportSink
 from documents.export.sinks import ExportSink
 from documents.export.sinks import StreamingManifestWriter
@@ -193,6 +198,28 @@ class Command(CryptMixin, PaperlessCommand):
         )
 
         parser.add_argument(
+            "--zip-compression",
+            choices=COMPRESSION_CHOICES,
+            default=None,
+            help=(
+                "Compression method for the export zip (requires --zip). "
+                "Default: deflated. 'zstd' requires Python 3.14+ on both the "
+                "exporting and importing machine."
+            ),
+        )
+
+        parser.add_argument(
+            "--zip-compression-level",
+            type=int,
+            default=None,
+            help=(
+                "Compression level for the export zip (requires --zip). "
+                "deflated: 0-9, bzip2: 1-9, zstd: -131072..22; ignored for "
+                "stored/lzma."
+            ),
+        )
+
+        parser.add_argument(
             "--data-only",
             default=False,
             action="store_true",
@@ -247,12 +274,39 @@ class Command(CryptMixin, PaperlessCommand):
         if not os.access(self.target, os.W_OK):
             raise CommandError("That path doesn't appear to be writable")
 
+        zip_compression: str | None = options["zip_compression"]
+        zip_compression_level: int | None = options["zip_compression_level"]
+
+        if not self.zip_export and (
+            zip_compression is not None or zip_compression_level is not None
+        ):
+            raise CommandError(
+                "--zip-compression and --zip-compression-level require --zip",
+            )
+
+        compression_method = zip_compression or "deflated"
+        if self.zip_export:
+            if not compression_available(compression_method):
+                if compression_method == "zstd" and ZSTD is None:
+                    raise CommandError(
+                        "zstd compression requires Python 3.14 or newer",
+                    )
+                raise CommandError(
+                    f"Compression method '{compression_method}' is not "
+                    f"available on this Python runtime",
+                )
+            level_msg = level_error(compression_method, zip_compression_level)
+            if level_msg is not None:
+                raise CommandError(level_msg)
+
         sink: ExportSink
         if self.zip_export:
             sink = ZipExportSink(
                 self.target,
                 options["zip_name"],
                 delete=self.delete,
+                compression=COMPRESSION_METHODS[compression_method],
+                compresslevel=zip_compression_level,
             )
         else:
             sink = DirectoryExportSink(
