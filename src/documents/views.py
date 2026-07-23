@@ -999,7 +999,10 @@ class DocumentViewSet(
         # calls forces the database to re-evaluate that whole thing 5 times, and
         # -- for FK relations especially -- can defeat semi-join planning
         # entirely at scale. A concrete id list is cheap to reuse.
-        document_ids = list(queryset.values_list("pk", flat=True))
+        # order_by() drops the default/user ordering -- irrelevant for a plain
+        # id list, but left in place it forces a sort over the full filtered
+        # set before the ids can even be collected.
+        document_ids = list(queryset.order_by().values_list("pk", flat=True))
 
         correspondents = Correspondent.objects.annotate(
             document_count=Count(
