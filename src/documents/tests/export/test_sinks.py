@@ -323,10 +323,17 @@ class TestZipExportSinkCompression:
         method: str,
         constant: int,
     ) -> None:
-        # ZipExportSink's only responsibility here is forwarding the
-        # constructor's compression/compresslevel to zipfile.ZipFile
-        # unchanged; whether ZipFile actually compresses is Python's contract,
-        # not ours, so this checks the call args rather than the archive.
+        """
+        GIVEN:
+            - A ZipExportSink constructed with a compression method and level
+        WHEN:
+            - The sink is opened
+        THEN:
+            - zipfile.ZipFile is constructed with those values forwarded
+              unchanged (whether ZipFile actually compresses is Python's own
+              contract, not ours, so this checks the call args, not a real
+              archive)
+        """
         target: Path = tmp_path / "out"
         target.mkdir()
         zip_cls = mocker.patch("documents.export.sinks.zipfile.ZipFile")
