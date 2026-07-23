@@ -1522,13 +1522,13 @@
         </context-group>
         <target state="translated">הרשאות ברירת מחדל</target>
       </trans-unit>
-      <trans-unit id="6544153565064275581" datatype="html">
-        <source> Settings apply to this user account for objects (Tags, Mail Rules, etc. but not documents) created via the web UI. </source>
+      <trans-unit id="1267490156259885391" datatype="html">
+        <source> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI. These settings do not apply to documents. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">306,308</context>
         </context-group>
-        <target state="translated"> ההגדרות חלות על חשבון משתמש זה עבור אובייקטים (תגים, כללי דואר וכו'. אבל לא מסמכים) שנוצרו באמצעות ממשק המשתמש באינטרנט. </target>
+        <target state="needs-translation"> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI. These settings do not apply to documents. </target>
       </trans-unit>
       <trans-unit id="4292903881380648974" datatype="html">
         <source>Default Owner</source>
@@ -3957,6 +3957,22 @@
           <context context-type="linenumber">85</context>
         </context-group>
         <target state="translated">ניקוי</target>
+      </trans-unit>
+      <trans-unit id="2807800733729323332" datatype="html">
+        <source>Yes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/confirm-button/confirm-button.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
+          <context context-type="linenumber">102</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">386</context>
+        </context-group>
+        <target state="translated">כן</target>
       </trans-unit>
       <trans-unit id="7515883357904500238" datatype="html">
         <source>Are you sure?</source>
@@ -8199,18 +8215,6 @@
           <context context-type="linenumber">92</context>
         </context-group>
         <target state="translated">סינון לפי בעלים</target>
-      </trans-unit>
-      <trans-unit id="2807800733729323332" datatype="html">
-        <source>Yes</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
-          <context context-type="linenumber">102</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">386</context>
-        </context-group>
-        <target state="translated">כן</target>
       </trans-unit>
       <trans-unit id="3542042671420335679" datatype="html">
         <source>No</source>
@@ -12770,7 +12774,7 @@
         <source>Successfully completed one-time migratration of settings to the database!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">636</context>
+          <context context-type="linenumber">635</context>
         </context-group>
         <target state="translated">הושלמה בהצלחה העברה חד פעמית של הגדרות למסד הנתונים!</target>
       </trans-unit>
@@ -12778,7 +12782,7 @@
         <source>Unable to migrate settings to the database, please try saving manually.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">637</context>
+          <context context-type="linenumber">636</context>
         </context-group>
         <target state="translated">לא ניתן לבצע העברה של הגדרות למסד הנתונים, נסה לשמור באופן ידני.</target>
       </trans-unit>
@@ -12786,7 +12790,7 @@
         <source>You can restart the tour from the settings page.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">709</context>
+          <context context-type="linenumber">708</context>
         </context-group>
         <target state="needs-translation">You can restart the tour from the settings page.</target>
       </trans-unit>
