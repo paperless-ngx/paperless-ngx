@@ -1119,47 +1119,47 @@ class TestExportImport(
                 skip_checks=True,
             )
 
-    def test_zip_lzma_compression_round_trips(self) -> None:
-        shutil.rmtree(Path(self.dirs.media_dir) / "documents")
-        shutil.copytree(
-            Path(__file__).parent / "samples" / "documents",
-            Path(self.dirs.media_dir) / "documents",
+    def test_zip_compression_flag_resolves_to_sink_constant(self) -> None:
+        # Whether zipfile actually compresses with the chosen method is
+        # Python's contract (and ZipExportSink's own tests already cover the
+        # forwarding). What this command owns is resolving the CLI string to
+        # the right constant, so assert that resolution directly.
+        with mock.patch(
+            "documents.management.commands.document_exporter.ZipExportSink",
+        ) as sink_cls:
+            call_command(
+                "document_exporter",
+                self.target,
+                "--zip",
+                "--zip-compression",
+                "lzma",
+                skip_checks=True,
+            )
+        sink_cls.assert_called_once_with(
+            mock.ANY,
+            mock.ANY,
+            delete=False,
+            compression=ZIP_LZMA,
+            compresslevel=None,
         )
-        call_command(
-            "document_exporter",
-            self.target,
-            "--zip",
-            "--zip-compression",
-            "lzma",
-            skip_checks=True,
-        )
-        expected = str(
-            self.target / f"export-{timezone.localdate().isoformat()}.zip",
-        )
-        self.assertIsFile(expected)
-        with ZipFile(expected) as zip_file:
-            info = zip_file.getinfo("manifest.json")
-            # manifest.json carries the chosen method; deflated is the default
-            self.assertEqual(info.compress_type, ZIP_LZMA)
 
-    def test_default_zip_uses_deflate(self) -> None:
-        shutil.rmtree(Path(self.dirs.media_dir) / "documents")
-        shutil.copytree(
-            Path(__file__).parent / "samples" / "documents",
-            Path(self.dirs.media_dir) / "documents",
+    def test_default_zip_compression_resolves_to_deflate(self) -> None:
+        with mock.patch(
+            "documents.management.commands.document_exporter.ZipExportSink",
+        ) as sink_cls:
+            call_command(
+                "document_exporter",
+                self.target,
+                "--zip",
+                skip_checks=True,
+            )
+        sink_cls.assert_called_once_with(
+            mock.ANY,
+            mock.ANY,
+            delete=False,
+            compression=ZIP_DEFLATED,
+            compresslevel=None,
         )
-        call_command(
-            "document_exporter",
-            self.target,
-            "--zip",
-            skip_checks=True,
-        )
-        expected = str(
-            self.target / f"export-{timezone.localdate().isoformat()}.zip",
-        )
-        with ZipFile(expected) as zip_file:
-            info = zip_file.getinfo("manifest.json")
-            self.assertEqual(info.compress_type, ZIP_DEFLATED)
 
 
 @pytest.mark.management
