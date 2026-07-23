@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-23 14:24+0000\n"
+"POT-Creation-Date: 2026-07-23 19:21+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1352,7 +1352,7 @@ msgid "workflow runs"
 msgstr ""
 
 #: documents/serialisers.py:522 documents/serialisers.py:874
-#: documents/serialisers.py:2763 documents/views.py:297 documents/views.py:2528
+#: documents/serialisers.py:2763 documents/views.py:298 documents/views.py:2541
 #: paperless_mail/serialisers.py:155
 msgid "Insufficient permissions."
 msgstr ""
@@ -1393,7 +1393,7 @@ msgstr ""
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2849 documents/views.py:4487
+#: documents/serialisers.py:2849 documents/views.py:4500
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1661,36 +1661,36 @@ msgstr ""
 msgid "Unable to parse URI {value}"
 msgstr ""
 
-#: documents/views.py:290 documents/views.py:2525
+#: documents/views.py:291 documents/views.py:2538
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:1543
+#: documents/views.py:1556
 msgid "Invalid AI configuration."
 msgstr ""
 
-#: documents/views.py:1552
+#: documents/views.py:1565
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:2350 documents/views.py:2671
+#: documents/views.py:2363 documents/views.py:2684
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:4499
+#: documents/views.py:4512
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr ""
 
-#: documents/views.py:4545
+#: documents/views.py:4558
 msgid "Bundle is already being processed."
 msgstr ""
 
-#: documents/views.py:4606
+#: documents/views.py:4619
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr ""
 
-#: documents/views.py:4616
+#: documents/views.py:4629
 msgid "The share link bundle is unavailable."
 msgstr ""
 
