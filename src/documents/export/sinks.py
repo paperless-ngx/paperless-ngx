@@ -86,8 +86,7 @@ class ExportSink(AbstractContextManager, abc.ABC):
     def add_json(self, content: list | dict, arcname: str) -> None: ...
 
     @abc.abstractmethod
-    def stream(self, arcname: str):  # -> contextmanager yielding TextIO
-        ...
+    def stream(self, arcname: str) -> AbstractContextManager[TextIO]: ...
 
     def _open(self) -> None:
         """Hook called on context entry. Override as needed."""
