@@ -408,7 +408,7 @@ def assert_eventually_equals(
     deadline = time.time() + timeout
     while time.time() < deadline:
         if getter_fn() == expected_value:
-            return None
+            return
         time.sleep(interval)
     actual = getter_fn()
     raise AssertionError(f"Expected {expected_value}, but got {actual}")
@@ -1519,7 +1519,7 @@ class TestMail(
             if message.from_ == "amazon@amazon.de":
                 raise ValueError("Does not compute.")
             else:
-                return None
+                return
 
         m.side_effect = get_correspondent_fake
 

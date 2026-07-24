@@ -12,6 +12,7 @@ from pathlib import Path
 from types import TracebackType
 from typing import Any
 from typing import Literal
+from typing import Self
 
 import sqlite_vec
 from llama_index.core.bridge.pydantic import PrivateAttr
@@ -199,7 +200,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         """Close the underlying SQLite connection (idempotent)."""
         self._conn.close()
 
-    def __enter__(self) -> "PaperlessSqliteVecVectorStore":
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(

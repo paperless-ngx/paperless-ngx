@@ -729,7 +729,7 @@ class CustomFieldQueryParser:
         )
 
         # Check if any of the requested IDs are missing.
-        missing_ids = set(value) - set(link.document_id for link in links)
+        missing_ids = set(value) - {link.document_id for link in links}
         if missing_ids:
             # The result should be an empty set in this case.
             return Q(id__in=[])

@@ -21,5 +21,6 @@ class TestLazyAiImports:
             capture_output=True,
             text=True,
             cwd=_SRC_DIR,
+            check=False,
         )
         assert result.returncode == 0, result.stdout + result.stderr

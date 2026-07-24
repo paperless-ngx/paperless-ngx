@@ -67,7 +67,7 @@ class DateParserPluginBase(ABC):
 
         Subclasses can override this to release resources.
         """
-        return None
+        return
 
     def _parse_string(
         self,

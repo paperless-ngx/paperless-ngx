@@ -161,7 +161,7 @@ class TestEmailFileParsing:
         """
         mock_message = mocker.Mock(
             from_values="mail@someserver.de",
-            date=datetime.datetime(2022, 10, 12, 21, 40, 43),
+            date=datetime.datetime(2022, 10, 12, 21, 40, 43),  # noqa: DTZ001
         )
         mocker.patch(
             "paperless.parsers.mail.MailMessage.from_bytes",
@@ -171,7 +171,7 @@ class TestEmailFileParsing:
         parsed_msg = mail_parser.parse_file_to_message(simple_txt_email_file)
 
         assert timezone.is_aware(parsed_msg.date)
-        assert parsed_msg.date.replace(tzinfo=None) == datetime.datetime(
+        assert parsed_msg.date.replace(tzinfo=None) == datetime.datetime(  # noqa: DTZ001
             2022,
             10,
             12,

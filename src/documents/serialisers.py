@@ -432,7 +432,7 @@ class OwnedObjectSerializer(
             return set()
 
         ctype = ContentType.objects.get_for_model(first_obj)
-        object_pks = list(obj.pk for obj in objects)
+        object_pks = [obj.pk for obj in objects]
         pk_type = type(first_obj.pk)
 
         def get_pks_for_permission_type(model):

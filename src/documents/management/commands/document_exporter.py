@@ -7,6 +7,7 @@ from itertools import islice
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import Self
 
 from allauth.mfa.models import Authenticator
 from allauth.socialaccount.models import SocialAccount
@@ -154,7 +155,7 @@ class StreamingManifestWriter:
                     return
         self._tmp_path.rename(self._path)
 
-    def __enter__(self) -> "StreamingManifestWriter":
+    def __enter__(self) -> Self:
         self.open()
         return self
 

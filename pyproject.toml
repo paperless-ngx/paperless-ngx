@@ -105,7 +105,7 @@ docs = [
 ]
 lint = [
   "prek~=0.3.10",
-  "ruff~=0.15.20",
+  "ruff~=0.16.0",
 ]
 testing = [
   "daphne",
@@ -213,11 +213,15 @@ extend-select = [
   "W",    # https://docs.astral.sh/ruff/rules/#pycodestyle-e-w
 ]
 ignore = [
+  "BLE001",  # blind except: too invasive to fix wholesale on ruff 0.16's default bump; revisit incrementally
   "DJ001",
   "G004",    # f-strings in logging: accepted style in this codebase
   "PLC0415",
   "RUF012",
   "SIM105",
+  "TRY002",  # create-your-own-exception: too invasive to fix wholesale on ruff 0.16's default bump; revisit incrementally
+  "TRY201",  # verbose-raise: too invasive to fix wholesale on ruff 0.16's default bump; revisit incrementally
+  "TRY401",  # redundant exception in logging.exception: too invasive to fix wholesale on ruff 0.16's default bump; revisit incrementally
 ]
 # Migrations
 per-file-ignores."*/migrations/*.py" = [

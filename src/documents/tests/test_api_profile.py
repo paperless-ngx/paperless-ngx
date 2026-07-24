@@ -18,8 +18,8 @@ class MockOpenIDProvider:
 
     def get_brands(self):
         default_servers = [
-            dict(id="yahoo", name="Yahoo", openid_url="http://me.yahoo.com"),
-            dict(id="hyves", name="Hyves", openid_url="http://hyves.nl"),
+            {"id": "yahoo", "name": "Yahoo", "openid_url": "http://me.yahoo.com"},
+            {"id": "hyves", "name": "Hyves", "openid_url": "http://hyves.nl"},
         ]
         return default_servers
 

@@ -1424,7 +1424,7 @@ class DocumentViewSet(
         try:
             lang = detect(doc.content)
         except Exception:
-            pass
+            logger.debug("Unable to detect language for document %s", doc.pk)
         meta["lang"] = lang
 
         return Response(meta)
@@ -4029,7 +4029,7 @@ class UiSettingsView(GenericAPIView[Any]):
             user_resp["last_name"] = user.last_name
 
         # strip <app_label>.
-        roles = map(lambda perm: re.sub(r"^\w+.", "", perm), user.get_all_permissions())
+        roles = (re.sub(r"^\w+.", "", perm) for perm in user.get_all_permissions())
         return Response(
             {
                 "user": user_resp,

@@ -21,20 +21,22 @@ def uri_validator(value: str, allowed_schemes: set[str] | None = None) -> None:
         parts = urlparse(value)
         if not parts.scheme:
             raise ValidationError(
-                _(f"Unable to parse URI {value}, missing scheme"),
+                _("Unable to parse URI %(value)s, missing scheme") % {"value": value},
                 params={"value": value},
             )
         elif not parts.netloc and not parts.path:
             raise ValidationError(
-                _(f"Unable to parse URI {value}, missing net location or path"),
+                _("Unable to parse URI %(value)s, missing net location or path")
+                % {"value": value},
                 params={"value": value},
             )
 
         if allowed_schemes and parts.scheme not in allowed_schemes:
             raise ValidationError(
                 _(
-                    f"URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}",
-                ),
+                    "URI scheme '%(scheme)s' is not allowed. Allowed schemes: %(schemes)s",
+                )
+                % {"scheme": parts.scheme, "schemes": ", ".join(allowed_schemes)},
                 params={"value": value, "scheme": parts.scheme},
             )
 
@@ -42,7 +44,7 @@ def uri_validator(value: str, allowed_schemes: set[str] | None = None) -> None:
         raise
     except Exception as e:
         raise ValidationError(
-            _(f"Unable to parse URI {value}"),
+            _("Unable to parse URI %(value)s") % {"value": value},
             params={"value": value},
         ) from e
 

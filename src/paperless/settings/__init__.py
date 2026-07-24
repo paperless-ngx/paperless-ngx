@@ -294,7 +294,7 @@ if _CHANNELS_BACKEND.startswith("channels_redis."):
 ###############################################################################
 
 EMAIL_HOST: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST", "localhost")
-EMAIL_PORT: Final[int] = int(os.getenv("PAPERLESS_EMAIL_PORT", 25))
+EMAIL_PORT: Final[int] = get_int_from_env("PAPERLESS_EMAIL_PORT", 25)
 EMAIL_HOST_USER: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL: Final[str] = os.getenv("PAPERLESS_EMAIL_FROM", EMAIL_HOST_USER)
@@ -375,8 +375,9 @@ ACCOUNT_SESSION_REMEMBER = get_bool_from_env(
     "True",
 )
 SESSION_EXPIRE_AT_BROWSER_CLOSE = not ACCOUNT_SESSION_REMEMBER
-SESSION_COOKIE_AGE = int(
-    os.getenv("PAPERLESS_SESSION_COOKIE_AGE", 60 * 60 * 24 * 7 * 3),
+SESSION_COOKIE_AGE = get_int_from_env(
+    "PAPERLESS_SESSION_COOKIE_AGE",
+    60 * 60 * 24 * 7 * 3,
 )
 # https://docs.djangoproject.com/en/5.1/ref/settings/#std-setting-SESSION_ENGINE
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
@@ -389,7 +390,6 @@ if AUTO_LOGIN_USERNAME:
 
 
 def _parse_remote_user_settings() -> str:
-    global MIDDLEWARE, AUTHENTICATION_BACKENDS, REST_FRAMEWORK
     enable = get_bool_from_env("PAPERLESS_ENABLE_HTTP_REMOTE_USER")
     enable_api = get_bool_from_env("PAPERLESS_ENABLE_HTTP_REMOTE_USER_API")
     if enable or enable_api:
@@ -448,7 +448,6 @@ if ALLOWED_HOSTS != ["*"]:
 
 
 def _parse_paperless_url():
-    global CSRF_TRUSTED_ORIGINS, CORS_ALLOWED_ORIGINS, ALLOWED_HOSTS
     url = os.getenv("PAPERLESS_URL")
     if url:
         CSRF_TRUSTED_ORIGINS.append(url)
@@ -597,8 +596,8 @@ USE_TZ = True
 
 LOGGING_DIR.mkdir(parents=True, exist_ok=True)
 
-LOGROTATE_MAX_SIZE = os.getenv("PAPERLESS_LOGROTATE_MAX_SIZE", 1024 * 1024)
-LOGROTATE_MAX_BACKUPS = os.getenv("PAPERLESS_LOGROTATE_MAX_BACKUPS", 20)
+LOGROTATE_MAX_SIZE = get_int_from_env("PAPERLESS_LOGROTATE_MAX_SIZE", 1024 * 1024)
+LOGROTATE_MAX_BACKUPS = get_int_from_env("PAPERLESS_LOGROTATE_MAX_BACKUPS", 20)
 
 LOGGING = {
     "version": 1,
@@ -794,9 +793,12 @@ IGNORABLE_FILES: Final[list[str]] = [
     "Thumbs.db",
 ]
 
-CONSUMER_POLLING_INTERVAL = float(os.getenv("PAPERLESS_CONSUMER_POLLING_INTERVAL", 0))
+CONSUMER_POLLING_INTERVAL = get_float_from_env(
+    "PAPERLESS_CONSUMER_POLLING_INTERVAL",
+    0,
+)
 
-CONSUMER_STABILITY_DELAY = float(os.getenv("PAPERLESS_CONSUMER_STABILITY_DELAY", 5))
+CONSUMER_STABILITY_DELAY = get_float_from_env("PAPERLESS_CONSUMER_STABILITY_DELAY", 5)
 
 CONSUMER_DELETE_DUPLICATES = get_bool_from_env("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
 
