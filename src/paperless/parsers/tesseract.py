@@ -3,7 +3,6 @@ from __future__ import annotations
 import importlib.resources
 import logging
 import os
-import re
 import shutil
 import tempfile
 from pathlib import Path
@@ -25,9 +24,9 @@ from paperless.config import OcrConfig
 from paperless.models import CleanChoices
 from paperless.models import ModeChoices
 from paperless.models import OutputTypeChoices
-from paperless.parsers.utils import PDF_TEXT_MIN_LENGTH
 from paperless.parsers.utils import extract_pdf_text
-from paperless.parsers.utils import is_tagged_pdf
+from paperless.parsers.utils import pdf_has_digital_text
+from paperless.parsers.utils import post_process_text
 from paperless.parsers.utils import read_file_handle_unicode_errors
 from paperless.version import __full_version_str__
 
@@ -510,10 +509,10 @@ class RasterisedDocumentParser:
 
         if mime_type == "application/pdf":
             text_original = self.extract_text(None, document_path)
-            has_text = text_original is not None and len(text_original) > 0
-            original_has_text = has_text and (
-                is_tagged_pdf(document_path, log=self.log)
-                or len(text_original) > PDF_TEXT_MIN_LENGTH
+            original_has_text = pdf_has_digital_text(
+                document_path,
+                text_original,
+                log=self.log,
             )
         else:
             text_original = None
@@ -658,17 +657,3 @@ class RasterisedDocumentParser:
                     f"No text was found in {document_path}, the content will be empty.",
                 )
                 self.text = ""
-
-
-def post_process_text(text: str | None) -> str | None:
-    if not text:
-        return None
-
-    collapsed_spaces = re.sub(r"([^\S\r\n]+)", " ", text)
-    no_leading_whitespace = re.sub(r"([\n\r]+)([^\S\n\r]+)", "\\1", collapsed_spaces)
-    no_trailing_whitespace = re.sub(r"([^\S\n\r]+)$", "", no_leading_whitespace)
-
-    # TODO: this needs a rework
-    # replace \0 prevents issues with saving to postgres.
-    # text may contain \0 when this character is present in PDF files.
-    return no_trailing_whitespace.strip().replace("\0", " ")

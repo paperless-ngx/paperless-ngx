@@ -21,7 +21,7 @@ from documents.parsers import run_convert
 from paperless.models import ModeChoices
 from paperless.parsers import ParserProtocol
 from paperless.parsers.tesseract import RasterisedDocumentParser
-from paperless.parsers.tesseract import post_process_text
+from paperless.parsers.utils import post_process_text
 
 if TYPE_CHECKING:
     from pathlib import Path
