@@ -272,11 +272,6 @@ class MailDocumentParser:
         logger.debug("Building formatted text from email")
         self._text = build_formatted_text(mail)
 
-        if is_naive(mail.date):
-            self._date = make_aware(mail.date)
-        else:
-            self._date = mail.date
-
         logger.debug("Creating a PDF from the email")
         if self._mailrule_id:
             rule = MailRule.objects.get(pk=self._mailrule_id)
@@ -501,6 +496,9 @@ class MailDocumentParser:
             raise ParseError(
                 f"Could not parse {filepath}: {err}",
             ) from err
+
+        if is_naive(parsed.date):
+            parsed.date = make_aware(parsed.date)
 
         return parsed
 
