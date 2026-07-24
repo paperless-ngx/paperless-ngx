@@ -3,7 +3,9 @@ Built-in remote-OCR document parser.
 
 Handles documents by sending them to a configured remote OCR engine
 (currently Azure AI Vision / Document Intelligence) and retrieving both
-the extracted text and a searchable PDF with an embedded text layer.
+the extracted text and a searchable PDF with an embedded text layer. For
+born-digital PDFs that need no archive copy, the remote call is skipped
+entirely in favor of locally-extracted text (see ``RemoteDocumentParser.parse``).
 
 When no engine is configured, ``score()`` returns ``None`` so the parser
 is effectively invisible to the registry — the tesseract parser handles
@@ -22,6 +24,8 @@ from typing import Self
 from django.conf import settings
 
 from documents.parsers import ParseError
+from paperless.parsers.utils import extract_pdf_text
+from paperless.parsers.utils import post_process_text
 from paperless.version import __full_version_str__
 
 if TYPE_CHECKING:
@@ -70,8 +74,11 @@ class RemoteDocumentParser:
     """Parse documents via a remote OCR API (currently Azure AI Vision).
 
     This parser sends documents to a remote engine that returns both
-    extracted text and a searchable PDF with an embedded text layer.
-    It does not depend on Tesseract or ocrmypdf.
+    extracted text and a searchable PDF with an embedded text layer,
+    except when ``parse()`` is called with ``produce_archive=False`` for
+    a PDF, in which case the remote call is skipped and only locally
+    extracted text is returned (no archive). It does not depend on
+    Tesseract or ocrmypdf.
 
     Class attributes
     ----------------
@@ -160,8 +167,11 @@ class RemoteDocumentParser:
         Returns
         -------
         bool
-            Always True — the remote engine always returns a PDF with an
-            embedded text layer that serves as the archive copy.
+            Always True — the remote engine is capable of returning a PDF
+            with an embedded text layer to serve as the archive copy.
+            Whether it actually does so for a given document depends on
+            ``produce_archive`` passed to :meth:`parse` (see there for when
+            the remote engine call, and thus archive generation, is skipped).
         """
         return True
 
@@ -218,6 +228,12 @@ class RemoteDocumentParser:
     ) -> None:
         """Send the document to the remote engine and store results.
 
+        When *produce_archive* is False for a PDF, the caller (via
+        ``documents.consumer.should_produce_archive``) has already determined
+        that the document is born-digital and needs no archive — skip the
+        remote engine entirely rather than re-OCRing it and creating a
+        duplicate text layer.
+
         Parameters
         ----------
         document_path:
@@ -225,8 +241,8 @@ class RemoteDocumentParser:
         mime_type:
             Detected MIME type of the document.
         produce_archive:
-            Ignored — the remote engine always returns a searchable PDF,
-            which is stored as the archive copy regardless of this flag.
+            Whether an archive copy is wanted. For PDFs, False skips the
+            remote engine and uses locally-extracted text instead.
         """
         config = RemoteEngineConfig(
             engine=settings.REMOTE_OCR_ENGINE,
@@ -239,6 +255,16 @@ class RemoteDocumentParser:
                 "No valid remote parser engine is configured, content will be empty.",
             )
             self._text = ""
+            return
+
+        if not produce_archive and mime_type == "application/pdf":
+            logger.debug(
+                "Remote OCR: skipped — no archive requested, "
+                "using locally-extracted text",
+            )
+            self._text = (
+                post_process_text(extract_pdf_text(document_path, log=logger)) or ""
+            )
             return
 
         if config.engine == "azureai":
