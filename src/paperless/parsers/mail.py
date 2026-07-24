@@ -272,6 +272,8 @@ class MailDocumentParser:
         logger.debug("Building formatted text from email")
         self._text = build_formatted_text(mail)
 
+        self._date = mail.date
+
         logger.debug("Creating a PDF from the email")
         if self._mailrule_id:
             rule = MailRule.objects.get(pk=self._mailrule_id)
