@@ -844,6 +844,23 @@ class TestFieldHandling:
             f"Expected 1, got {len(ids)}. Note content should be searchable via notes.note: prefix."
         )
 
+    def test_notes_without_user_are_indexed(self, backend: TantivyBackend) -> None:
+        """Notes whose user was deleted (SET_NULL) must not break indexing."""
+        doc = Document.objects.create(
+            title="Doc with orphaned note",
+            content="test",
+            checksum="NT2",
+            pk=81,
+        )
+        Note.objects.create(document=doc, note="Orphaned note", user=None)
+
+        backend.add_or_update(doc)
+
+        ids = backend.search_ids("notes.note:orphaned", user=None)
+        assert len(ids) == 1, (
+            f"Expected 1, got {len(ids)}. Notes without a user should still be indexed."
+        )
+
 
 class TestHighlightHits:
     """Test highlight_hits returns proper HTML strings, not raw Snippet objects."""

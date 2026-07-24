@@ -475,7 +475,13 @@ class TantivyBackend:
         note_texts: list[str] = []
         for note in document.notes.all():
             num_notes += 1
-            doc.add_json("notes", {"note": note.note, "user": note.user.username})
+            doc.add_json(
+                "notes",
+                {
+                    "note": note.note,
+                    "user": note.user.username if note.user else None,
+                },
+            )
             note_texts.append(note.note)
         if note_texts:
             doc.add_text("notes_text", " ".join(note_texts))
