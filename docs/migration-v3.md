@@ -327,6 +327,64 @@ behind a reverse proxy may need to set
 [`PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER`](configuration.md#PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER),
 or both, to avoid `403 Forbidden` errors on login.
 
+## Minimum CPU Requirements (NumPy Baseline)
+
+Starting with NumPy 2.4.0, official `manylinux` x86_64 wheels are compiled with a minimum
+CPU baseline of `x86-64-v2`, which requires SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, and
+CMPXCHG16B. This is a [deliberate upstream change](https://github.com/numpy/numpy/issues/27851)
+citing that these instructions have been present in over 99.7% of CPUs since 2008
+([Intel](<https://en.wikipedia.org/wiki/Nehalem_(microprocessor)#Overview>)) or 2011
+([AMD](<https://en.wikipedia.org/wiki/Bulldozer_(microarchitecture)>)).
+
+NumPy is a dependency of the document classifier (via scikit-learn), so any CPU that
+predates SSE4.2 support will crash with `SIGILL` (illegal instruction) when the classifier
+is loaded or trained, regardless of whether AI features are enabled.
+
+This differs from NumPy's optional SIMD dispatch (e.g. AVX2, AVX512), which is detected and
+selected safely at runtime — the `x86-64-v2` requirement above is a hard floor baked into the
+wheel, with no runtime fallback.
+
+### Affected hardware
+
+CPUs older than roughly 2008 (Intel) or 2011 (AMD) that lack SSE4.2 support. This is more
+likely to affect low-power or embedded hardware — e.g. early Atom, Celeron, or pre-Bulldozer
+AMD chips — than typical desktop or server hardware from the last decade.
+
+Check for SSE4.2 support with:
+
+```bash
+grep -o -m1 sse4_2 /proc/cpuinfo
+```
+
+If this prints nothing, your CPU is affected.
+
+### Symptoms
+
+The Celery worker (and potentially the web server) repeatedly crashes and restarts with a
+`SIGILL` error, typically visible in `dmesg`/`journalctl` as a `trap invalid opcode` inside
+`_multiarray_umath...so`. Because the classifier is trained on a periodic schedule
+(hourly, by default), affected instances see intermittent, hard-to-reproduce document
+consumption failures whenever that scheduled task runs and takes down the worker process
+mid-task.
+
+### Action Required (for affected hardware only)
+
+There is no way to make the classifier itself work on such CPUs — it requires an unofficial
+NumPy build with `cpu-baseline=none`, which is not something we can ship. The practical
+path forward is to stop the classifier from ever loading or training, which avoids
+importing NumPy at all:
+
+```bash
+PAPERLESS_TRAIN_TASK_CRON=disable
+```
+
+This disables the periodic classifier training task (see
+[`PAPERLESS_TRAIN_TASK_CRON`](configuration.md#PAPERLESS_TRAIN_TASK_CRON)). Automatic
+matching based on the classifier (suggested correspondents, document types, tags, and
+storage paths from trained rules) will no longer be available, but rule-based matching is
+unaffected, and document consumption itself will no longer be at risk of crashing the
+worker.
+
 ## Database Migrations
 
 Some integer fields have been changed to smaller types to reduce database size. If you have any `MailRule` records with a `maximum_age` greater than 32767, they will be clamped to 32767 during the migration to avoid errors during migration.
