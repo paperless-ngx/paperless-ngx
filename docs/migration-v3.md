@@ -133,7 +133,7 @@ PAPERLESS_DB_OPTIONS="sslmode=require,sslrootcert=/certs/ca.pem,pool.max_size=10
 
 ## OCR and Archive File Generation Settings
 
-The settings that control OCR behaviour and archive file generation have been redesigned. The old settings that coupled these two concerns together are **removed** — old values are not silently honoured; a startup warning is logged if any removed variable is still set in your environment.
+The settings that control OCR behaviour and archive file generation have been redesigned. The old settings that coupled these two concerns together are **removed** - old values are not silently honoured; a startup warning is logged if any removed variable is still set in your environment.
 
 ### Removed settings
 
@@ -166,7 +166,7 @@ Remove any `PAPERLESS_OCR_SKIP_ARCHIVE_FILE` variable from your environment. If 
 # v2: skip OCR when text present, always archive
 PAPERLESS_OCR_MODE=skip
 # v3: equivalent (auto is the new default)
-# No change needed — auto is the default
+# No change needed - auto is the default
 
 # v2: skip OCR when text present, skip archive too
 PAPERLESS_OCR_MODE=skip_noarchive
@@ -189,7 +189,7 @@ PAPERLESS_ARCHIVE_FILE_GENERATION=auto
 
 If you use the **remote OCR parser** (Azure AI), note that it always produces a
 searchable PDF and stores it as the archive copy. `ARCHIVE_FILE_GENERATION=never`
-has no effect for documents handled by the remote parser — the archive is produced
+has no effect for documents handled by the remote parser - the archive is produced
 unconditionally by the remote engine.
 
 ## Search Index (Whoosh -> Tantivy)
@@ -333,7 +333,7 @@ Starting with NumPy 2.4.0, official `manylinux` x86_64 wheels are compiled with 
 CPU baseline of `x86-64-v2`, which requires SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, and
 CMPXCHG16B. This is a [deliberate upstream change](https://github.com/numpy/numpy/issues/27851)
 citing that these instructions have been present in over 99.7% of CPUs since 2008
-([Intel](<https://en.wikipedia.org/wiki/Nehalem_(microprocessor)#Overview>)) or 2011
+([Intel](<https://en.wikipedia.org/wiki/Nehalem_(microarchitecture)>)) or 2011
 ([AMD](<https://en.wikipedia.org/wiki/Bulldozer_(microarchitecture)>)).
 
 NumPy is a dependency of the document classifier (via scikit-learn), so any CPU that
@@ -341,14 +341,14 @@ predates SSE4.2 support will crash with `SIGILL` (illegal instruction) when the 
 is loaded or trained, regardless of whether AI features are enabled.
 
 This differs from NumPy's optional SIMD dispatch (e.g. AVX2, AVX512), which is detected and
-selected safely at runtime — the `x86-64-v2` requirement above is a hard floor baked into the
+selected safely at runtime - the `x86-64-v2` requirement above is a hard floor baked into the
 wheel, with no runtime fallback.
 
 ### Affected hardware
 
 CPUs older than roughly 2008 (Intel) or 2011 (AMD) that lack SSE4.2 support. This is more
-likely to affect low-power or embedded hardware — e.g. early Atom, Celeron, or pre-Bulldozer
-AMD chips — than typical desktop or server hardware from the last decade.
+likely to affect low-power or embedded hardware - e.g. early Atom, Celeron, or pre-Bulldozer
+AMD chips - than typical desktop or server hardware from the last decade.
 
 Check for SSE4.2 support with:
 
@@ -369,7 +369,7 @@ mid-task.
 
 ### Action Required (for affected hardware only)
 
-There is no way to make the classifier itself work on such CPUs — it requires an unofficial
+There is no way to make the classifier itself work on such CPUs - it requires an unofficial
 NumPy build with `cpu-baseline=none`, which is not something we can ship. The practical
 path forward is to stop the classifier from ever loading or training, which avoids
 importing NumPy at all:
