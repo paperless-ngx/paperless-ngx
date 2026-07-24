@@ -134,7 +134,17 @@ class BogusMailBox(AbstractContextManager):
         if username != self.USERNAME or access_token != self.ACCESS_TOKEN:
             raise MailboxLoginError("BAD", "OK")
 
-    def fetch(self, criteria, mark_seen, charset="", *, bulk=True):
+    def fetch(
+        self,
+        criteria="ALL",
+        charset="",
+        *,
+        mark_seen=True,
+        bulk=True,
+        uid_list=None,
+    ):
+        if uid_list is not None:
+            return [m for m in self.messages if m.uid in uid_list]
         return self._filter_messages(criteria)
 
     def uids(self, criteria, charset="") -> list[str]:
@@ -416,7 +426,7 @@ def assert_eventually_equals(
     deadline = time.time() + timeout
     while time.time() < deadline:
         if getter_fn() == expected_value:
-            return None
+            return
         time.sleep(interval)
     actual = getter_fn()
     raise AssertionError(f"Expected {expected_value}, but got {actual}")
@@ -443,7 +453,8 @@ class TestMail(
         WHEN:
             - The mail account is processed
         THEN:
-            - The body fetch is issued in multiple batches
+            - The body fetch is issued once, with all UIDs and the configured batch size
+              handed to imap_tools so it can bulk-fetch in batches server-side
             - Every message is still processed (none dropped at a batch boundary)
         """
         account = MailAccount.objects.create(
@@ -476,8 +487,11 @@ class TestMail(
         ) as fetch_spy:
             self.mail_account_handler.handle_mail_account(account)
 
-        # ceil(12 / 5) == 3 batches
-        self.assertEqual(fetch_spy.call_count, 3)
+        # A single fetch() call hands the full UID list and batch size to imap_tools,
+        # which does its own bulk-fetching in batches of MAIL_FETCH_BATCH_SIZE.
+        fetch_spy.assert_called_once()
+        self.assertEqual(fetch_spy.call_args.kwargs["bulk"], 5)
+        self.assertEqual(len(fetch_spy.call_args.kwargs["uid_list"]), message_count)
         self.assertEqual(
             ProcessedMail.objects.filter(rule=rule).count(),
             message_count,
@@ -1673,7 +1687,7 @@ class TestMail(
             if message.from_ == "amazon@amazon.de":
                 raise ValueError("Does not compute.")
             else:
-                return None
+                return
 
         m.side_effect = get_correspondent_fake
 

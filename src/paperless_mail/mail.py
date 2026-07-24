@@ -712,25 +712,16 @@ class MailAccountHandler(LoggingMixin):
             return 0
 
         sorted_new_uids = sorted(new_uids, key=int)
-        message_batches = []
-        # ikvk/imap_tools#268 requests a direct UID-list fetch that would let us drop this manual batching loop
-        for batch_start in range(0, len(sorted_new_uids), MAIL_FETCH_BATCH_SIZE):
-            batch = sorted_new_uids[batch_start : batch_start + MAIL_FETCH_BATCH_SIZE]
-            try:
-                message_batches.append(
-                    M.fetch(
-                        criteria=AND(uid=batch),
-                        mark_seen=False,
-                        charset=rule.account.character_set,
-                        bulk=True,
-                    ),
-                )
-            except Exception as err:
-                raise MailError(
-                    f"Rule {rule}: Error while fetching folder {rule.folder}",
-                ) from err
-
-        messages = itertools.chain(*message_batches)
+        try:
+            messages = M.fetch(
+                uid_list=sorted_new_uids,
+                mark_seen=False,
+                bulk=MAIL_FETCH_BATCH_SIZE,
+            )
+        except Exception as err:
+            raise MailError(
+                f"Rule {rule}: Error while fetching folder {rule.folder}",
+            ) from err
 
         mails_processed = 0
         total_processed_files = 0
