@@ -948,10 +948,11 @@ for display in the web interface.
 
     !!! note
 
-        The **remote OCR parser** (Azure AI) always produces a searchable
-        PDF and stores it as the archive copy, regardless of this setting.
-        `ARCHIVE_FILE_GENERATION=never` has no effect when the remote
-        parser handles a document.
+        The **remote OCR parser** (Azure AI) also honors this setting: when
+        no archive is requested (`never`, or `auto` with a born-digital PDF),
+        the remote engine is skipped entirely and locally-extracted text is
+        used instead, avoiding an unnecessary API call and a duplicate text
+        layer.
 
 #### [`PAPERLESS_OCR_CLEAN=<mode>`](#PAPERLESS_OCR_CLEAN) {#PAPERLESS_OCR_CLEAN}
 
