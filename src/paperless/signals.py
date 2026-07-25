@@ -1,17 +1,14 @@
 import logging
 
 from django.conf import settings
-from python_ipware import IpWare
+
+from paperless.utils import describe_client_suffix
 
 logger = logging.getLogger("paperless.auth")
 
 
 # https://docs.djangoproject.com/en/4.1/ref/contrib/auth/#django.contrib.auth.signals.user_login_failed
 def handle_failed_login(sender, credentials, request, **kwargs):
-    ipware = IpWare(proxy_list=settings.TRUSTED_PROXIES)
-    client_ip, _ = ipware.get_client_ip(
-        meta=request.META,
-    )
     username = credentials.get("username")
     log_output = (
         "No authentication provided"
@@ -19,15 +16,20 @@ def handle_failed_login(sender, credentials, request, **kwargs):
         else f"Login failed for user `{username}`"
     )
 
-    if client_ip is None:
-        log_output += ". Unable to determine IP address."
-    else:
-        if client_ip.is_global:
-            # We got the client's IP address
-            log_output += f" from IP `{client_ip}`."
-        else:
-            # The client's IP address is private
-            log_output += f" from private IP `{client_ip}`."
+    log_output += describe_client_suffix(request)
+
+    logger.info(log_output)
+
+
+# https://docs.djangoproject.com/en/4.1/ref/contrib/auth/#django.contrib.auth.signals.user_logged_in
+def handle_successful_login(sender, request, user, **kwargs):
+    if settings.AUTO_LOGIN_USERNAME:
+        # Auto-login re-authenticates the fixed user on every request, so
+        # this isn't a meaningful login event worth logging.
+        return
+
+    log_output = f"Login successful for user `{user.get_username()}`"
+    log_output += describe_client_suffix(request)
 
     logger.info(log_output)
 

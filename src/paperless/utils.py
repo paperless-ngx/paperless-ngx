@@ -1,8 +1,40 @@
 import logging
 
 from dateparser.languages.loader import LocaleDataLoader
+from django.conf import settings
+from django.http import HttpRequest
+from python_ipware import IpWare
 
 logger = logging.getLogger("paperless.utils")
+
+
+def get_client_ip(request: HttpRequest):
+    """
+    Resolve the client's IP address, respecting X-Forwarded-For only from
+    proxies listed in PAPERLESS_TRUSTED_PROXIES.
+    """
+    ipware = IpWare(proxy_list=settings.TRUSTED_PROXIES)
+    client_ip, _ = ipware.get_client_ip(meta=request.META)
+    return client_ip
+
+
+def get_user_agent(request: HttpRequest) -> str:
+    return request.META.get("HTTP_USER_AGENT") or "unknown"
+
+
+def describe_client_suffix(request: HttpRequest) -> str:
+    """
+    Build a `<ip clause>. User-Agent: \\`<agent>\\`.` suffix for log messages,
+    e.g. " from IP address `1.2.3.4`. User-Agent: `curl/8.0`."
+    """
+    client_ip = get_client_ip(request)
+    if client_ip is None:
+        ip_clause = ". Unable to determine IP address."
+    else:
+        ip_clause = f" from IP address `{client_ip}`."
+
+    return f"{ip_clause} User-Agent: `{get_user_agent(request)}`."
+
 
 OCR_TO_DATEPARSER_LANGUAGES = {
     """

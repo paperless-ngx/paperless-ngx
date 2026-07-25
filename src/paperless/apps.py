@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from paperless.signals import handle_failed_login
 from paperless.signals import handle_social_account_updated
+from paperless.signals import handle_successful_login
 
 
 class PaperlessConfig(AppConfig):
@@ -11,9 +12,11 @@ class PaperlessConfig(AppConfig):
     verbose_name = _("Paperless")
 
     def ready(self) -> None:
+        from django.contrib.auth.signals import user_logged_in
         from django.contrib.auth.signals import user_login_failed
 
         user_login_failed.connect(handle_failed_login)
+        user_logged_in.connect(handle_successful_login)
 
         from allauth.socialaccount.signals import social_account_updated
 

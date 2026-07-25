@@ -1,3 +1,4 @@
+import logging
 from unittest.mock import Mock
 
 from django.contrib.auth.models import Group
@@ -9,6 +10,7 @@ from django.test import override_settings
 from documents.models import UiSettings
 from paperless.signals import handle_failed_login
 from paperless.signals import handle_social_account_updated
+from paperless.signals import handle_successful_login
 
 
 class TestFailedLoginLogging(TestCase):
@@ -35,7 +37,7 @@ class TestFailedLoginLogging(TestCase):
             self.assertEqual(
                 logs.output,
                 [
-                    "INFO:paperless.auth:No authentication provided. Unable to determine IP address.",
+                    "INFO:paperless.auth:No authentication provided. Unable to determine IP address. User-Agent: `unknown`.",
                 ],
             )
 
@@ -56,7 +58,7 @@ class TestFailedLoginLogging(TestCase):
             self.assertEqual(
                 logs.output,
                 [
-                    "INFO:paperless.auth:Login failed for user `john lennon`. Unable to determine IP address.",
+                    "INFO:paperless.auth:Login failed for user `john lennon`. Unable to determine IP address. User-Agent: `unknown`.",
                 ],
             )
 
@@ -72,6 +74,7 @@ class TestFailedLoginLogging(TestCase):
         request = HttpRequest()
         request.META = {
             "HTTP_X_FORWARDED_FOR": "177.139.233.139",
+            "HTTP_USER_AGENT": "Mozilla/5.0",
         }
         with self.assertLogs("paperless.auth") as logs:
             handle_failed_login(None, self.creds, request)
@@ -79,7 +82,7 @@ class TestFailedLoginLogging(TestCase):
             self.assertEqual(
                 logs.output,
                 [
-                    "INFO:paperless.auth:Login failed for user `john lennon` from IP `177.139.233.139`.",
+                    "INFO:paperless.auth:Login failed for user `john lennon` from IP address `177.139.233.139`. User-Agent: `Mozilla/5.0`.",
                 ],
             )
 
@@ -91,7 +94,6 @@ class TestFailedLoginLogging(TestCase):
             - Request provided to signal handler
         THEN:
             - Expected IP is logged
-            - IP is noted to be a private IP
         """
         request = HttpRequest()
         request.META = {
@@ -103,9 +105,101 @@ class TestFailedLoginLogging(TestCase):
             self.assertEqual(
                 logs.output,
                 [
-                    "INFO:paperless.auth:Login failed for user `john lennon` from private IP `10.0.0.1`.",
+                    "INFO:paperless.auth:Login failed for user `john lennon` from IP address `10.0.0.1`. User-Agent: `unknown`.",
                 ],
             )
+
+
+class TestSuccessfulLoginLogging(TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.user = User.objects.create_user(username="john lennon")
+
+    def test_public_ip(self) -> None:
+        """
+        GIVEN:
+            - Request with publicly routeable IP and a user-agent
+        WHEN:
+            - Request provided to signal handler after a successful login
+        THEN:
+            - Username, IP and user-agent are logged
+        """
+        request = HttpRequest()
+        request.META = {
+            "HTTP_X_FORWARDED_FOR": "177.139.233.139",
+            "HTTP_USER_AGENT": "Mozilla/5.0",
+        }
+        with self.assertLogs("paperless.auth") as logs:
+            handle_successful_login(None, request, self.user)
+
+            self.assertEqual(
+                logs.output,
+                [
+                    "INFO:paperless.auth:Login successful for user `john lennon` from IP address `177.139.233.139`. User-Agent: `Mozilla/5.0`.",
+                ],
+            )
+
+    def test_private_ip(self) -> None:
+        """
+        GIVEN:
+            - Request with a private range IP
+        WHEN:
+            - Request provided to signal handler after a successful login
+        THEN:
+            - IP is logged
+        """
+        request = HttpRequest()
+        request.META = {
+            "HTTP_X_FORWARDED_FOR": "10.0.0.1",
+        }
+        with self.assertLogs("paperless.auth") as logs:
+            handle_successful_login(None, request, self.user)
+
+            self.assertEqual(
+                logs.output,
+                [
+                    "INFO:paperless.auth:Login successful for user `john lennon` from IP address `10.0.0.1`. User-Agent: `unknown`.",
+                ],
+            )
+
+    def test_no_ip(self) -> None:
+        """
+        GIVEN:
+            - Request with no determinable IP
+        WHEN:
+            - Request provided to signal handler after a successful login
+        THEN:
+            - Unable to determine IP is logged
+        """
+        request = HttpRequest()
+        request.META = {}
+        with self.assertLogs("paperless.auth") as logs:
+            handle_successful_login(None, request, self.user)
+
+            self.assertEqual(
+                logs.output,
+                [
+                    "INFO:paperless.auth:Login successful for user `john lennon`. Unable to determine IP address. User-Agent: `unknown`.",
+                ],
+            )
+
+    @override_settings(AUTO_LOGIN_USERNAME="john lennon")
+    def test_auto_login_not_logged(self) -> None:
+        """
+        GIVEN:
+            - Auto-login is configured, so every request re-authenticates
+              a fixed user
+        WHEN:
+            - Request provided to signal handler after a successful login
+        THEN:
+            - Nothing is logged, since this isn't a meaningful login event
+        """
+        request = HttpRequest()
+        request.META = {}
+        logger = logging.getLogger("paperless.auth")
+        with self.assertNoLogs(logger, level="INFO"):
+            handle_successful_login(None, request, self.user)
 
 
 class TestSyncSocialLoginGroups(TestCase):

@@ -158,9 +158,21 @@ class TestViews(DirectoriesMixin, TestCase):
         self.client.logout()
 
         # Valid
-        response = self.client.get(f"/share/{sl1.slug}")
+        with self.assertLogs("paperless.api", level="INFO") as logs:
+            response = self.client.get(
+                f"/share/{sl1.slug}",
+                HTTP_X_FORWARDED_FOR="177.139.233.139",
+                HTTP_USER_AGENT="test-agent",
+            )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(read_streaming_response(response), content)
+        self.assertEqual(
+            logs.output,
+            [
+                f"INFO:paperless.api:Share link for document {doc.pk} accessed "
+                "from IP address `177.139.233.139`. User-Agent: `test-agent`.",
+            ],
+        )
 
         # Invalid
         response = self.client.get("/share/123notaslug", follow=True)
@@ -176,6 +188,115 @@ class TestViews(DirectoriesMixin, TestCase):
         response.render()
         self.assertEqual(response.request["PATH_INFO"], "/accounts/login/")
         self.assertContains(response, b"Share link has expired")
+
+    def test_share_link_create_delete_logging(self) -> None:
+        """
+        GIVEN:
+            - A user with permission to manage share links
+        WHEN:
+            - The user creates a share link
+            - The user deletes the share link
+        THEN:
+            - Both events are logged with the user, document and IP
+        """
+        doc = Document.objects.create(
+            title="none",
+            filename="none.pdf",
+            mime_type="application/pdf",
+        )
+
+        sharelink_permissions = Permission.objects.filter(
+            codename__contains="sharelink",
+        )
+        self.user.user_permissions.add(*sharelink_permissions)
+        self.user.save()
+
+        self.client.force_login(self.user)
+
+        expiration = timezone.now() + timedelta(days=7)
+        with self.assertLogs("paperless.api", level="INFO") as logs:
+            response = self.client.post(
+                "/api/share_links/",
+                {
+                    "document": doc.pk,
+                    "file_version": "original",
+                    "expiration": expiration.isoformat(),
+                },
+                HTTP_X_FORWARDED_FOR="177.139.233.139",
+                HTTP_USER_AGENT="test-agent",
+            )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        share_link = ShareLink.objects.get(document=doc)
+        self.assertEqual(
+            logs.output,
+            [
+                f"INFO:paperless.api:Share link created for document {doc.pk} "
+                f"by user `testuser` (duration: 7 days, link ending in "
+                f"`...{share_link.slug[-8:]}`) from IP address "
+                f"`177.139.233.139`. User-Agent: `test-agent`.",
+            ],
+        )
+
+        with self.assertLogs("paperless.api", level="INFO") as logs:
+            response = self.client.delete(
+                f"/api/share_links/{share_link.pk}/",
+                HTTP_X_FORWARDED_FOR="177.139.233.139",
+                HTTP_USER_AGENT="test-agent",
+            )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(
+            logs.output,
+            [
+                f"INFO:paperless.api:Share link for document {doc.pk} deleted "
+                f"by user `testuser` (link ending in `...{share_link.slug[-8:]}`) "
+                f"from IP address `177.139.233.139`. User-Agent: `test-agent`.",
+            ],
+        )
+
+    def test_share_link_create_logging_no_expiration(self) -> None:
+        """
+        GIVEN:
+            - A user with permission to manage share links
+        WHEN:
+            - The user creates a share link with no expiration
+        THEN:
+            - The creation is logged with "no expiration" as the duration
+        """
+        doc = Document.objects.create(
+            title="none",
+            filename="none2.pdf",
+            mime_type="application/pdf",
+        )
+
+        sharelink_permissions = Permission.objects.filter(
+            codename__contains="sharelink",
+        )
+        self.user.user_permissions.add(*sharelink_permissions)
+        self.user.save()
+
+        self.client.force_login(self.user)
+
+        with self.assertLogs("paperless.api", level="INFO") as logs:
+            response = self.client.post(
+                "/api/share_links/",
+                {
+                    "document": doc.pk,
+                    "file_version": "original",
+                },
+                HTTP_X_FORWARDED_FOR="177.139.233.139",
+                HTTP_USER_AGENT="test-agent",
+            )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        share_link = ShareLink.objects.get(document=doc)
+        self.assertEqual(
+            logs.output,
+            [
+                f"INFO:paperless.api:Share link created for document {doc.pk} "
+                f"by user `testuser` (duration: no expiration, link ending in "
+                f"`...{share_link.slug[-8:]}`) from IP address "
+                f"`177.139.233.139`. User-Agent: `test-agent`.",
+            ],
+        )
 
     def test_share_link_archive_falls_back_to_original(self) -> None:
         """

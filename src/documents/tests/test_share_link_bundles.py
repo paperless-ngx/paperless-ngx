@@ -137,13 +137,21 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         bundle.documents.set([self.document])
 
         self.client.logout()
-        response = self.client.get(f"/share/{bundle.slug}/")
+        with self.assertLogs("paperless.api", level="INFO") as logs:
+            response = self.client.get(f"/share/{bundle.slug}/")
         content = b"".join(response.streaming_content)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response["Content-Type"], "application/zip")
         self.assertEqual(content, b"binary-zip-content")
         self.assertIn("attachment;", response["Content-Disposition"])
+        self.assertEqual(
+            logs.output,
+            [
+                f"INFO:paperless.api:Share link bundle {bundle.pk} downloaded "
+                "from IP address `127.0.0.1`. User-Agent: `unknown`.",
+            ],
+        )
 
     def test_download_pending_bundle_returns_202(self) -> None:
         bundle = ShareLinkBundle.objects.create(
@@ -167,9 +175,41 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         bundle.documents.set([self.document])
 
         self.client.logout()
-        response = self.client.get(f"/share/{bundle.slug}/")
+        with self.assertLogs("paperless.api", level="INFO") as logs:
+            response = self.client.get(f"/share/{bundle.slug}/")
 
         self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
+        self.assertEqual(
+            logs.output,
+            [
+                f"INFO:paperless.api:Share link bundle {bundle.pk} access failed, "
+                "bundle unavailable from IP address `127.0.0.1`. "
+                "User-Agent: `unknown`.",
+            ],
+        )
+
+    def test_download_expired_bundle_redirects(self) -> None:
+        bundle = ShareLinkBundle.objects.create(
+            slug="expiredbundle",
+            file_version=ShareLink.FileVersion.ARCHIVE,
+            status=ShareLinkBundle.Status.READY,
+            expiration=timezone.now() - timedelta(hours=1),
+        )
+        bundle.documents.set([self.document])
+
+        self.client.logout()
+        with self.assertLogs("paperless.api", level="INFO") as logs:
+            response = self.client.get(f"/share/{bundle.slug}/")
+
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertIn("sharelink_expired=1", response["Location"])
+        self.assertEqual(
+            logs.output,
+            [
+                f"INFO:paperless.api:Expired share link bundle {bundle.pk} "
+                "accessed from IP address `127.0.0.1`. User-Agent: `unknown`.",
+            ],
+        )
 
     def test_expired_share_link_redirects(self) -> None:
         share_link = ShareLink.objects.create(
@@ -180,17 +220,35 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         )
 
         self.client.logout()
-        response = self.client.get(f"/share/{share_link.slug}/")
+        with self.assertLogs("paperless.api", level="INFO") as logs:
+            response = self.client.get(f"/share/{share_link.slug}/")
 
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertIn("sharelink_expired=1", response["Location"])
+        self.assertEqual(
+            logs.output,
+            [
+                f"INFO:paperless.api:Expired share link for document "
+                f"{self.document.pk} accessed from IP address `127.0.0.1`. "
+                "User-Agent: `unknown`.",
+            ],
+        )
 
     def test_unknown_share_link_redirects(self) -> None:
         self.client.logout()
-        response = self.client.get("/share/unknownsharelink/")
+        with self.assertLogs("paperless.api", level="INFO") as logs:
+            response = self.client.get("/share/unknownsharelink/")
 
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertIn("sharelink_notfound=1", response["Location"])
+        self.assertEqual(
+            logs.output,
+            [
+                "INFO:paperless.api:Share link access attempted with unknown "
+                "slug `unknownsharelink` from IP address `127.0.0.1`. "
+                "User-Agent: `unknown`.",
+            ],
+        )
 
 
 class ShareLinkBundleTaskTests(DirectoriesMixin, APITestCase):

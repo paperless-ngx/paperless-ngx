@@ -239,6 +239,7 @@ from paperless.models import ApplicationConfiguration
 from paperless.parsers.registry import get_parser_registry
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import UserSerializer
+from paperless.utils import describe_client_suffix
 from paperless.views import StandardPagination
 from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.chat import stream_chat_with_documents
@@ -4446,6 +4447,36 @@ class ShareLinkViewSet(
     filterset_class = ShareLinkFilterSet
     ordering_fields = ("created", "expiration", "document")
 
+    def perform_create(self, serializer):
+        instance = serializer.save()
+
+        if instance.expiration is None:
+            duration = "no expiration"
+        else:
+            days = round(
+                (instance.expiration - instance.created).total_seconds() / 86400,
+            )
+            duration = "1 day" if days == 1 else f"{days} days"
+
+        log_output = (
+            f"Share link created for document {instance.document_id} "
+            f"by user `{self.request.user}` (duration: {duration}, "
+            f"link ending in `...{instance.slug[-8:]}`)"
+        )
+        log_output += describe_client_suffix(self.request)
+        logger.info(log_output)
+
+    def perform_destroy(self, instance):
+        document_id = instance.document_id
+        slug_suffix = instance.slug[-8:]
+        log_output = (
+            f"Share link for document {document_id} deleted "
+            f"by user `{self.request.user}` (link ending in `...{slug_suffix}`)"
+        )
+        log_output += describe_client_suffix(self.request)
+        instance.delete()
+        logger.info(log_output)
+
 
 @extend_schema_view(
     rebuild=extend_schema(
@@ -4589,13 +4620,23 @@ class SharedLinkView(View):
     permission_classes = []
 
     def get(self, request, slug):
+        client_suffix = describe_client_suffix(request)
+
         share_link = ShareLink.objects.filter(slug=slug).first()
         if share_link is not None:
             if (
                 share_link.expiration is not None
                 and share_link.expiration < timezone.now()
             ):
+                logger.info(
+                    f"Expired share link for document {share_link.document_id} "
+                    f"accessed{client_suffix}",
+                )
                 return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
+            logger.info(
+                f"Share link for document {share_link.document_id} "
+                f"accessed{client_suffix}",
+            )
             return serve_file(
                 doc=share_link.document,
                 use_archive=share_link.file_version == ShareLink.FileVersion.ARCHIVE
@@ -4605,9 +4646,15 @@ class SharedLinkView(View):
 
         bundle = ShareLinkBundle.objects.filter(slug=slug).first()
         if bundle is None:
+            logger.info(
+                f"Share link access attempted with unknown slug `{slug}`{client_suffix}",
+            )
             return HttpResponseRedirect("/accounts/login/?sharelink_notfound=1")
 
         if bundle.expiration is not None and bundle.expiration < timezone.now():
+            logger.info(
+                f"Expired share link bundle {bundle.pk} accessed{client_suffix}",
+            )
             return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
 
         if bundle.status in {
@@ -4624,12 +4671,18 @@ class SharedLinkView(View):
         file_path = bundle.absolute_file_path
 
         if bundle.status == ShareLinkBundle.Status.FAILED or file_path is None:
+            logger.info(
+                f"Share link bundle {bundle.pk} access failed, bundle "
+                f"unavailable{client_suffix}",
+            )
             return HttpResponse(
                 _(
                     "The share link bundle is unavailable.",
                 ),
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
+
+        logger.info(f"Share link bundle {bundle.pk} downloaded{client_suffix}")
 
         response = FileResponse(file_path.open("rb"), content_type="application/zip")
         short_slug = bundle.slug[:12]
