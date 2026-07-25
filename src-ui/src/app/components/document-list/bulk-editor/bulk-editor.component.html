@@ -103,13 +103,13 @@
         class="btn btn-sm btn-outline-primary"
         id="dropdownSend"
         ngbDropdownToggle
-        [disabled]="disabled || !list.hasSelection || list.allSelected"
+        [disabled]="disabled || !canSendSelection"
       >
         <i-bs name="send"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Send</ng-container>
         </div>
       </button>
       <div ngbDropdownMenu aria-labelledby="dropdownSend" class="shadow">
-        <button ngbDropdownItem (click)="createShareLinkBundle()" [disabled]="list.allSelected">
+        <button ngbDropdownItem (click)="createShareLinkBundle()" [disabled]="!canSendSelection">
           <i-bs name="link" class="me-1"></i-bs><ng-container i18n>Create a share link bundle</ng-container>
         </button>
         <button ngbDropdownItem (click)="manageShareLinkBundles()">
@@ -117,7 +117,7 @@
         </button>
         <div class="dropdown-divider"></div>
         @if (emailEnabled) {
-          <button ngbDropdownItem (click)="emailSelected()" [disabled]="list.allSelected">
+          <button ngbDropdownItem (click)="emailSelected()" [disabled]="!canSendSelection">
             <i-bs name="envelope" class="me-1"></i-bs><ng-container i18n>Email</ng-container>
           </button>
         }

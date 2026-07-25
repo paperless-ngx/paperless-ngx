@@ -208,6 +208,50 @@ describe('BulkEditorComponent', () => {
     expect(component.tagSelectionModel.selectionSize()).toEqual(1)
   })
 
+  it('should allow sending an all-filtered selection that fits on the current page', () => {
+    jest
+      .spyOn(documentListViewService, 'hasSelection', 'get')
+      .mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'allSelected', 'get')
+      .mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'selectedCount', 'get')
+      .mockReturnValue(5)
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([1, 2, 3, 4, 5]))
+
+    fixture.detectChanges()
+
+    expect(component.canSendSelection).toBe(true)
+    expect(
+      fixture.debugElement.query(By.css('#dropdownSend')).nativeElement.disabled
+    ).toBe(false)
+  })
+
+  it('should prevent sending an all-filtered selection spanning multiple pages', () => {
+    jest
+      .spyOn(documentListViewService, 'hasSelection', 'get')
+      .mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'allSelected', 'get')
+      .mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'selectedCount', 'get')
+      .mockReturnValue(6)
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([1, 2, 3, 4, 5]))
+
+    fixture.detectChanges()
+
+    expect(component.canSendSelection).toBe(false)
+    expect(
+      fixture.debugElement.query(By.css('#dropdownSend')).nativeElement.disabled
+    ).toBe(true)
+  })
+
   it('should apply selection data to correspondents menu', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     fixture.detectChanges()
@@ -1597,6 +1641,7 @@ describe('BulkEditorComponent', () => {
     expect(modal.componentInstance.customFields.length).toEqual(2)
     expect(modal.componentInstance.fieldsToAddIds).toEqual([1, 2])
     expect(modal.componentInstance.selection).toEqual({ documents: [3, 4] })
+    expect(modal.componentInstance.selectionCount).toEqual(2)
     expect(modal.componentInstance.documents).toEqual([3, 4])
 
     modal.componentInstance.failed.emit()

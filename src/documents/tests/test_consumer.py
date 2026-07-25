@@ -767,6 +767,8 @@ class TestConsumer(
         root_doc.archive_serial_number = 42
         root_doc.save()
 
+        original_modified = timezone.now() - datetime.timedelta(days=1)
+        Document.objects.filter(pk=root_doc.pk).update(modified=original_modified)
         actor = User.objects.create_user(
             username="actor",
             email="actor@example.com",
@@ -818,6 +820,8 @@ class TestConsumer(
         self.assertIsNone(version.archive_serial_number)
         self.assertEqual(version.original_filename, version_file.name)
         self.assertTrue(bool(version.content))
+        root_doc.refresh_from_db()
+        self.assertGreater(root_doc.modified, original_modified)
 
     @override_settings(AUDIT_LOG_ENABLED=True)
     @mock.patch("documents.consumer.load_classifier")

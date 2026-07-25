@@ -11,6 +11,10 @@ def clamp_mailrule_maximum_age(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
+    # The data update must commit before PostgreSQL rewrites the table, otherwise
+    # pending foreign-key trigger events can block the subsequent ALTER TABLE.
+    atomic = False
+
     dependencies = [
         ("paperless_mail", "0001_squashed"),
     ]

@@ -133,7 +133,7 @@ PAPERLESS_DB_OPTIONS="sslmode=require,sslrootcert=/certs/ca.pem,pool.max_size=10
 
 ## OCR and Archive File Generation Settings
 
-The settings that control OCR behaviour and archive file generation have been redesigned. The old settings that coupled these two concerns together are **removed** — old values are not silently honoured; a startup warning is logged if any removed variable is still set in your environment.
+The settings that control OCR behaviour and archive file generation have been redesigned. The old settings that coupled these two concerns together are **removed** - old values are not silently honoured; a startup warning is logged if any removed variable is still set in your environment.
 
 ### Removed settings
 
@@ -166,7 +166,7 @@ Remove any `PAPERLESS_OCR_SKIP_ARCHIVE_FILE` variable from your environment. If 
 # v2: skip OCR when text present, always archive
 PAPERLESS_OCR_MODE=skip
 # v3: equivalent (auto is the new default)
-# No change needed — auto is the default
+# No change needed - auto is the default
 
 # v2: skip OCR when text present, skip archive too
 PAPERLESS_OCR_MODE=skip_noarchive
@@ -189,10 +189,10 @@ PAPERLESS_ARCHIVE_FILE_GENERATION=auto
 
 If you use the **remote OCR parser** (Azure AI), note that it always produces a
 searchable PDF and stores it as the archive copy. `ARCHIVE_FILE_GENERATION=never`
-has no effect for documents handled by the remote parser — the archive is produced
+has no effect for documents handled by the remote parser - the archive is produced
 unconditionally by the remote engine.
 
-# Search Index (Whoosh -> Tantivy)
+## Search Index (Whoosh -> Tantivy)
 
 The full-text search backend has been replaced with [Tantivy](https://github.com/quickwit-oss/tantivy).
 The index format is incompatible with Whoosh, so **the search index is automatically rebuilt from
@@ -324,8 +324,69 @@ option since v1.8.0.
 Allauth changed how it determines the client IP address for login rate limiting. Users running
 behind a reverse proxy may need to set
 [`PAPERLESS_TRUSTED_PROXIES`](configuration.md#PAPERLESS_TRUSTED_PROXIES),
+[`PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT`](configuration.md#PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT),
 [`PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER`](configuration.md#PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER),
-or both, to avoid `403 Forbidden` errors on login.
+or a combination of these settings to avoid `403 Forbidden` errors on login.
+The proxy count is the number of proxy hops in `X-Forwarded-For`, which may
+differ from the number of configured proxy IP addresses.
+
+## Minimum CPU Requirements (NumPy Baseline)
+
+Starting with NumPy 2.4.0, official `manylinux` x86_64 wheels are compiled with a minimum
+CPU baseline of `x86-64-v2`, which requires SSE3, SSSE3, SSE4.1, SSE4.2, POPCNT, and
+CMPXCHG16B. This is a [deliberate upstream change](https://github.com/numpy/numpy/issues/27851)
+citing that these instructions have been present in over 99.7% of CPUs since 2008
+([Intel](<https://en.wikipedia.org/wiki/Nehalem_(microarchitecture)>)) or 2011
+([AMD](<https://en.wikipedia.org/wiki/Bulldozer_(microarchitecture)>)).
+
+NumPy is a dependency of the document classifier (via scikit-learn), so any CPU that
+predates SSE4.2 support will crash with `SIGILL` (illegal instruction) when the classifier
+is loaded or trained, regardless of whether AI features are enabled.
+
+This differs from NumPy's optional SIMD dispatch (e.g. AVX2, AVX512), which is detected and
+selected safely at runtime - the `x86-64-v2` requirement above is a hard floor baked into the
+wheel, with no runtime fallback.
+
+### Affected hardware
+
+CPUs older than roughly 2008 (Intel) or 2011 (AMD) that lack SSE4.2 support. This is more
+likely to affect low-power or embedded hardware - e.g. early Atom, Celeron, or pre-Bulldozer
+AMD chips - than typical desktop or server hardware from the last decade.
+
+Check for SSE4.2 support with:
+
+```bash
+grep -o -m1 sse4_2 /proc/cpuinfo
+```
+
+If this prints nothing, your CPU is affected.
+
+### Symptoms
+
+The Celery worker (and potentially the web server) repeatedly crashes and restarts with a
+`SIGILL` error, typically visible in `dmesg`/`journalctl` as a `trap invalid opcode` inside
+`_multiarray_umath...so`. Because the classifier is trained on a periodic schedule
+(hourly, by default), affected instances see intermittent, hard-to-reproduce document
+consumption failures whenever that scheduled task runs and takes down the worker process
+mid-task.
+
+### Action Required (for affected hardware only)
+
+There is no way to make the classifier itself work on such CPUs - it requires an unofficial
+NumPy build with `cpu-baseline=none`, which is not something we can ship. The practical
+path forward is to stop the classifier from ever loading or training, which avoids
+importing NumPy at all:
+
+```bash
+PAPERLESS_TRAIN_TASK_CRON=disable
+```
+
+This disables the periodic classifier training task (see
+[`PAPERLESS_TRAIN_TASK_CRON`](configuration.md#PAPERLESS_TRAIN_TASK_CRON)). Automatic
+matching based on the classifier (suggested correspondents, document types, tags, and
+storage paths from trained rules) will no longer be available, but rule-based matching is
+unaffected, and document consumption itself will no longer be at risk of crashing the
+worker.
 
 ## Database Migrations
 

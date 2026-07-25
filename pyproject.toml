@@ -1,6 +1,6 @@
 [project]
 name = "paperless-ngx"
-version = "3.0.0"
+version = "3.0.2"
 description = "A community-supported supercharged document management system: scan, index and archive all your physical documents"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -75,7 +75,7 @@ dependencies = [
   "sqlite-vec==0.1.9",
   "tantivy~=0.26.0",
   "tika-client~=0.11.0",
-  "torch~=2.12.0",
+  "torch~=2.13.0",
   "watchfiles>=1.1.1",
   "whitenoise~=6.11",
   "zxing-cpp~=3.0.0",

@@ -88,6 +88,21 @@ describe('DocumentCardLargeComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('8 pages')
   })
 
+  it('should lazy load the thumbnail', () => {
+    const thumbnail: HTMLImageElement =
+      fixture.nativeElement.querySelector('img.doc-img')
+    expect(thumbnail.getAttribute('loading')).toEqual('lazy')
+  })
+
+  it('should prioritize the thumbnail when requested', () => {
+    fixture.componentRef.setInput('priority', true)
+    fixture.detectChanges()
+    const thumbnail: HTMLImageElement =
+      fixture.nativeElement.querySelector('img.doc-img')
+    expect(thumbnail.getAttribute('loading')).toEqual('eager')
+    expect(thumbnail.getAttribute('fetchpriority')).toEqual('high')
+  })
+
   it('should trim content', () => {
     expect(component.contentTrimmed).toHaveLength(503) // includes ...
   })

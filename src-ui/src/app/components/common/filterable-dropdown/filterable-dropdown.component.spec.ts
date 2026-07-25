@@ -265,7 +265,9 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     expect(document.activeElement).toEqual(
       component.listFilterTextInput.nativeElement
     )
-    expect(component.buttonsViewport.getRenderedRange().end).toEqual(3) // all items shown
+    expect(component.buttonsViewport.getRenderedRange().end).toEqual(
+      items.length
+    ) // all selectable items shown
 
     component.filterText = 'Tag2'
     fixture.detectChanges()
@@ -276,6 +278,29 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     ) // filtered
     component.dropdown.close()
     expect(component.filterText).toHaveLength(0)
+  })
+
+  it('should omit disallowed null items from the virtual scroll viewport', async () => {
+    component.selectionModel.items = items
+    component.icon = 'tag-fill'
+    fixture.nativeElement
+      .querySelector('button')
+      .dispatchEvent(new MouseEvent('click')) // open
+    fixture.detectChanges()
+    await wait(100)
+    fixture.detectChanges()
+    component.buttonsViewport?.checkViewportSize()
+    fixture.detectChanges()
+
+    expect(component.filteredItems).toEqual(items)
+    expect(component.scrollViewportHeight).toEqual(
+      items.length * component.FILTERABLE_BUTTON_HEIGHT_PX
+    )
+    expect(
+      component.buttonsViewport.elementRef.nativeElement.querySelectorAll(
+        '.cdk-virtual-scroll-content-wrapper > div'
+      )
+    ).toHaveLength(items.length)
   })
 
   it('should toggle & close on enter inside filter field if 1 item remains', async () => {

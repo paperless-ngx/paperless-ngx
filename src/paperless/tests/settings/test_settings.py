@@ -3,7 +3,9 @@ from unittest import TestCase
 from unittest import mock
 
 import pytest
+from django.core.exceptions import ImproperlyConfigured
 
+from paperless.settings import _get_allauth_trusted_proxy_count
 from paperless.settings import _get_search_language_setting
 from paperless.settings import _parse_paperless_url
 from paperless.settings import default_threads_per_worker
@@ -33,6 +35,31 @@ class TestThreadCalculation(TestCase):
                 self.assertGreaterEqual(default_threads, 1)
 
                 self.assertLessEqual(default_workers * default_threads, i)
+
+
+def test_allauth_trusted_proxy_count_defaults_to_trusted_proxies(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT", raising=False)
+
+    assert _get_allauth_trusted_proxy_count(["proxy-v4", "proxy-v6"]) == 2
+
+
+def test_allauth_trusted_proxy_count_can_be_overridden(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT", "1")
+
+    assert _get_allauth_trusted_proxy_count(["proxy-v4", "proxy-v6"]) == 1
+
+
+def test_allauth_trusted_proxy_count_rejects_negative_values(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT", "-1")
+
+    with pytest.raises(ImproperlyConfigured, match="must be zero or greater"):
+        _get_allauth_trusted_proxy_count([])
 
 
 @pytest.mark.parametrize(

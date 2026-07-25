@@ -1020,6 +1020,7 @@ export class BulkEditorComponent
     )
 
     dialog.selection = this.getSelectionQuery()
+    dialog.selectionCount = this.getSelectionSize()
     dialog.succeeded.subscribe((result) => {
       this.toastService.showInfo($localize`Custom fields updated.`)
       this.list.reload()
@@ -1038,6 +1039,14 @@ export class BulkEditorComponent
 
   public get emailEnabled(): boolean {
     return this.settings.get(SETTINGS_KEYS.EMAIL_ENABLED)
+  }
+
+  public get canSendSelection(): boolean {
+    return (
+      this.list.hasSelection &&
+      (!this.list.allSelected ||
+        this.list.selectedCount === this.list.selected.size)
+    )
   }
 
   createShareLinkBundle() {

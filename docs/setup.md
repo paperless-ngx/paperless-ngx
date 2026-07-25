@@ -157,8 +157,8 @@ Do not combine this with `USERMAP_UID` or `USERMAP_GID`, which are intended for 
 Some file systems, such as NFS network shares, don't support file system
 notifications with `inotify`. When the consumption directory is on such a
 file system, Paperless-ngx will not pick up new files with the default
-configuration. Use [`PAPERLESS_CONSUMER_POLLING`](configuration.md#PAPERLESS_CONSUMER_POLLING)
-to enable polling and disable inotify. See [here](configuration.md#polling).
+configuration. Set [`PAPERLESS_CONSUMER_POLLING_INTERVAL`](configuration.md#PAPERLESS_CONSUMER_POLLING_INTERVAL)
+to a positive number to enable polling and disable native filesystem notifications.
 
 ## Bare Metal Install {#bare_metal}
 

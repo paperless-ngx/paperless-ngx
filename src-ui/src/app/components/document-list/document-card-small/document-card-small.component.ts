@@ -1,4 +1,4 @@
-import { AsyncPipe } from '@angular/common'
+import { AsyncPipe, NgOptimizedImage } from '@angular/common'
 import {
   AfterViewInit,
   Component,
@@ -46,6 +46,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     TagComponent,
     CustomFieldDisplayComponent,
     AsyncPipe,
+    NgOptimizedImage,
     UsernamePipe,
     CorrespondentNamePipe,
     DocumentTypeNamePipe,
@@ -65,6 +66,7 @@ export class DocumentCardSmallComponent
   private documentService = inject(DocumentService)
   settingsService = inject(SettingsService)
   readonly selected = input(false)
+  readonly priority = input(false)
   readonly document = input<Document>(undefined)
   readonly displayFields = input<string[]>(
     DEFAULT_DISPLAY_FIELDS.map((f) => f.id)
