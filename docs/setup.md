@@ -262,6 +262,14 @@ to a positive number to enable polling and disable native filesystem notificatio
     and copy the contents to the home directory of the user you created
     earlier (`/opt/paperless`).
 
+    !!! note
+
+        If you are updating an existing bare-metal installation rather than
+        installing for the first time, see the
+        [bare metal update instructions](administration.md#bare-metal-updating)
+        instead -- extracting a new release on top of an old one can leave
+        behind stale files from the previous version.
+
     Optional: If you cloned the Git repository, you will need to
     compile the frontend yourself. See [here](development.md#front-end-development)
     and use the `build` step, not `serve`.
