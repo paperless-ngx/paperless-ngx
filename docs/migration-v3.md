@@ -324,8 +324,11 @@ option since v1.8.0.
 Allauth changed how it determines the client IP address for login rate limiting. Users running
 behind a reverse proxy may need to set
 [`PAPERLESS_TRUSTED_PROXIES`](configuration.md#PAPERLESS_TRUSTED_PROXIES),
+[`PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT`](configuration.md#PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT),
 [`PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER`](configuration.md#PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER),
-or both, to avoid `403 Forbidden` errors on login.
+or a combination of these settings to avoid `403 Forbidden` errors on login.
+The proxy count is the number of proxy hops in `X-Forwarded-For`, which may
+differ from the number of configured proxy IP addresses.
 
 ## Minimum CPU Requirements (NumPy Baseline)
 
