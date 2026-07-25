@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-23 19:21+0000\n"
-"PO-Revision-Date: 2026-07-23 19:23\n"
+"POT-Creation-Date: 2026-07-25 07:12+0000\n"
+"PO-Revision-Date: 2026-07-25 07:14\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -558,11 +558,11 @@ msgstr "mimetype is"
 
 #: documents/models.py:632
 msgid "simple title search"
-msgstr ""
+msgstr "eenvoudige titel zoeken"
 
 #: documents/models.py:633
 msgid "simple text search"
-msgstr ""
+msgstr "eenvoudige tekst zoeken"
 
 #: documents/models.py:643
 msgid "rule type"
@@ -586,19 +586,19 @@ msgstr "In behandeling"
 
 #: documents/models.py:680 documents/models.py:757
 msgid "Started"
-msgstr ""
+msgstr "Gestart"
 
 #: documents/models.py:681
 msgid "Success"
-msgstr ""
+msgstr "Geslaagd"
 
 #: documents/models.py:682
 msgid "Failure"
-msgstr ""
+msgstr "Mislukt"
 
 #: documents/models.py:683
 msgid "Revoked"
-msgstr ""
+msgstr "Ingetrokken"
 
 #: documents/models.py:686
 msgid "Consume File"
@@ -606,15 +606,15 @@ msgstr "Gebruik bestand"
 
 #: documents/models.py:687
 msgid "Train Classifier"
-msgstr ""
+msgstr "Train Classifier"
 
 #: documents/models.py:688
 msgid "Sanity Check"
-msgstr ""
+msgstr "Gezondheidscheck"
 
 #: documents/models.py:689
 msgid "Index Optimize"
-msgstr ""
+msgstr "Index Optimaliseren"
 
 #: documents/models.py:690 documents/models.py:1282
 msgid "Mail Fetch"
@@ -622,23 +622,23 @@ msgstr "E-mails ophalen"
 
 #: documents/models.py:691
 msgid "LLM Index"
-msgstr ""
+msgstr "LLM Index"
 
 #: documents/models.py:692
 msgid "Empty Trash"
-msgstr ""
+msgstr "Prullenbak legen"
 
 #: documents/models.py:693
 msgid "Check Workflows"
-msgstr ""
+msgstr "Controleer Workflows"
 
 #: documents/models.py:694
 msgid "Bulk Update"
-msgstr ""
+msgstr "Bulk bijwerken"
 
 #: documents/models.py:695
 msgid "Reprocess Document"
-msgstr ""
+msgstr "Document opnieuw verwerken"
 
 #: documents/models.py:696
 msgid "Build Share Link"
@@ -646,7 +646,7 @@ msgstr "Bouw Deel Link"
 
 #: documents/models.py:697
 msgid "Bulk Delete"
-msgstr ""
+msgstr "Bulk verwijderen"
 
 #: documents/models.py:706 documents/models.py:1277
 msgid "Scheduled"
@@ -658,23 +658,23 @@ msgstr "Web interface"
 
 #: documents/models.py:708
 msgid "API Upload"
-msgstr ""
+msgstr "API Upload"
 
 #: documents/models.py:709
 msgid "Folder Consume"
-msgstr ""
+msgstr "Map inlezen"
 
 #: documents/models.py:710
 msgid "Email Consume"
-msgstr ""
+msgstr "Email Inlezen"
 
 #: documents/models.py:711
 msgid "System"
-msgstr ""
+msgstr "Systeem"
 
 #: documents/models.py:712
 msgid "Manual"
-msgstr ""
+msgstr "Handmatig"
 
 #: documents/models.py:718
 msgid "Task ID"
@@ -682,7 +682,7 @@ msgstr "Taak ID"
 
 #: documents/models.py:719
 msgid "Celery task ID"
-msgstr ""
+msgstr "Celery taak ID"
 
 #: documents/models.py:725
 msgid "Task Type"
@@ -690,35 +690,35 @@ msgstr "Taak type"
 
 #: documents/models.py:726
 msgid "The kind of work being performed"
-msgstr ""
+msgstr "Het soort werk dat wordt uitgevoerd"
 
 #: documents/models.py:733
 msgid "Trigger Source"
-msgstr ""
+msgstr "Trigger bron"
 
 #: documents/models.py:734
 msgid "What initiated this task"
-msgstr ""
+msgstr "Wat begon deze taak"
 
 #: documents/models.py:743
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #: documents/models.py:763
 msgid "Completed"
-msgstr ""
+msgstr "Voltooid"
 
 #: documents/models.py:771
 msgid "Duration (seconds)"
-msgstr ""
+msgstr "Duur (seconden)"
 
 #: documents/models.py:772
 msgid "Elapsed time from start to completion"
-msgstr ""
+msgstr "Verstreken tijd van begin tot voltooiing"
 
 #: documents/models.py:778
 msgid "Wait Time (seconds)"
-msgstr ""
+msgstr "Wachttijd (seconden)"
 
 #: documents/models.py:779
 msgid "Time from task creation to worker pickup"
@@ -1920,151 +1920,151 @@ msgstr ""
 msgid "paperless application settings"
 msgstr "paperless applicatie instellingen"
 
-#: paperless/settings/__init__.py:545
+#: paperless/settings/__init__.py:556
 msgid "English (US)"
 msgstr "Engels (US)"
 
-#: paperless/settings/__init__.py:546
+#: paperless/settings/__init__.py:557
 msgid "Arabic"
 msgstr "Arabisch"
 
-#: paperless/settings/__init__.py:547
+#: paperless/settings/__init__.py:558
 msgid "Afrikaans"
 msgstr "Afrikaans"
 
-#: paperless/settings/__init__.py:548
+#: paperless/settings/__init__.py:559
 msgid "Belarusian"
 msgstr "Wit-Russisch"
 
-#: paperless/settings/__init__.py:549
+#: paperless/settings/__init__.py:560
 msgid "Bulgarian"
 msgstr "Bulgaars"
 
-#: paperless/settings/__init__.py:550
+#: paperless/settings/__init__.py:561
 msgid "Catalan"
 msgstr "Catalaans"
 
-#: paperless/settings/__init__.py:551
+#: paperless/settings/__init__.py:562
 msgid "Czech"
 msgstr "Tsjechisch"
 
-#: paperless/settings/__init__.py:552
+#: paperless/settings/__init__.py:563
 msgid "Danish"
 msgstr "Deens"
 
-#: paperless/settings/__init__.py:553
+#: paperless/settings/__init__.py:564
 msgid "German"
 msgstr "Duits"
 
-#: paperless/settings/__init__.py:554
+#: paperless/settings/__init__.py:565
 msgid "Greek"
 msgstr "Grieks"
 
-#: paperless/settings/__init__.py:555
+#: paperless/settings/__init__.py:566
 msgid "English (GB)"
 msgstr "Engels (Brits)"
 
-#: paperless/settings/__init__.py:556
+#: paperless/settings/__init__.py:567
 msgid "Spanish"
 msgstr "Spaans"
 
-#: paperless/settings/__init__.py:557
+#: paperless/settings/__init__.py:568
 msgid "Persian"
 msgstr "Perzisch"
 
-#: paperless/settings/__init__.py:558
+#: paperless/settings/__init__.py:569
 msgid "Finnish"
 msgstr "Fins"
 
-#: paperless/settings/__init__.py:559
+#: paperless/settings/__init__.py:570
 msgid "French"
 msgstr "Frans"
 
-#: paperless/settings/__init__.py:560
+#: paperless/settings/__init__.py:571
 msgid "Hungarian"
 msgstr "Hongaars"
 
-#: paperless/settings/__init__.py:561
+#: paperless/settings/__init__.py:572
 msgid "Indonesian"
 msgstr ""
 
-#: paperless/settings/__init__.py:562
+#: paperless/settings/__init__.py:573
 msgid "Italian"
 msgstr "Italiaans"
 
-#: paperless/settings/__init__.py:563
+#: paperless/settings/__init__.py:574
 msgid "Japanese"
 msgstr "Japans"
 
-#: paperless/settings/__init__.py:564
+#: paperless/settings/__init__.py:575
 msgid "Korean"
 msgstr "Koreaans"
 
-#: paperless/settings/__init__.py:565
+#: paperless/settings/__init__.py:576
 msgid "Luxembourgish"
 msgstr "Luxemburgs"
 
-#: paperless/settings/__init__.py:566
+#: paperless/settings/__init__.py:577
 msgid "Norwegian"
 msgstr "Noors"
 
-#: paperless/settings/__init__.py:567
+#: paperless/settings/__init__.py:578
 msgid "Dutch"
 msgstr "Nederlands"
 
-#: paperless/settings/__init__.py:568
+#: paperless/settings/__init__.py:579
 msgid "Polish"
 msgstr "Pools"
 
-#: paperless/settings/__init__.py:569
+#: paperless/settings/__init__.py:580
 msgid "Portuguese (Brazil)"
 msgstr "Portugees (Brazilië)"
 
-#: paperless/settings/__init__.py:570
+#: paperless/settings/__init__.py:581
 msgid "Portuguese"
 msgstr "Portugees"
 
-#: paperless/settings/__init__.py:571
+#: paperless/settings/__init__.py:582
 msgid "Romanian"
 msgstr "Roemeens"
 
-#: paperless/settings/__init__.py:572
+#: paperless/settings/__init__.py:583
 msgid "Russian"
 msgstr "Russisch"
 
-#: paperless/settings/__init__.py:573
+#: paperless/settings/__init__.py:584
 msgid "Slovak"
 msgstr "Slowaaks"
 
-#: paperless/settings/__init__.py:574
+#: paperless/settings/__init__.py:585
 msgid "Slovenian"
 msgstr "Sloveens"
 
-#: paperless/settings/__init__.py:575
+#: paperless/settings/__init__.py:586
 msgid "Serbian"
 msgstr "Servisch"
 
-#: paperless/settings/__init__.py:576
+#: paperless/settings/__init__.py:587
 msgid "Swedish"
 msgstr "Zweeds"
 
-#: paperless/settings/__init__.py:577
+#: paperless/settings/__init__.py:588
 msgid "Turkish"
 msgstr "Turks"
 
-#: paperless/settings/__init__.py:578
+#: paperless/settings/__init__.py:589
 msgid "Ukrainian"
 msgstr "Oekraïens"
 
-#: paperless/settings/__init__.py:579
+#: paperless/settings/__init__.py:590
 msgid "Vietnamese"
 msgstr "Vietnamees"
 
-#: paperless/settings/__init__.py:580
+#: paperless/settings/__init__.py:591
 msgid "Chinese Simplified"
 msgstr "Chinees (vereenvoudigd)"
 
-#: paperless/settings/__init__.py:581
+#: paperless/settings/__init__.py:592
 msgid "Chinese Traditional"
 msgstr ""
 

@@ -1528,7 +1528,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">306,308</context>
         </context-group>
-        <target state="needs-translation"> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI. These settings do not apply to documents. </target>
+        <target state="translated"> Die Einstellungen gelten für dieses Benutzerkonto in Bezug auf Objekte (Tags, E-Mail-Regeln usw.), die über die Weboberfläche erstellt wurden. Diese Einstellungen gelten nicht für Dokumente. </target>
       </trans-unit>
       <trans-unit id="4292903881380648974" datatype="html" approved="yes">
         <source>Default Owner</source>

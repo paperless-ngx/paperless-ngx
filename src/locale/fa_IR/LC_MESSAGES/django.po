@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-23 19:21+0000\n"
-"PO-Revision-Date: 2026-07-23 19:23\n"
+"POT-Creation-Date: 2026-07-25 07:12+0000\n"
+"PO-Revision-Date: 2026-07-25 07:14\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -1919,151 +1919,151 @@ msgstr ""
 msgid "paperless application settings"
 msgstr "تنظیمات برنامه بدون کاغذ"
 
-#: paperless/settings/__init__.py:545
+#: paperless/settings/__init__.py:556
 msgid "English (US)"
 msgstr "انگلیسی (ایالات متحده)"
 
-#: paperless/settings/__init__.py:546
+#: paperless/settings/__init__.py:557
 msgid "Arabic"
 msgstr "عربی"
 
-#: paperless/settings/__init__.py:547
+#: paperless/settings/__init__.py:558
 msgid "Afrikaans"
 msgstr "افریکان"
 
-#: paperless/settings/__init__.py:548
+#: paperless/settings/__init__.py:559
 msgid "Belarusian"
 msgstr "وابسته به بلروس"
 
-#: paperless/settings/__init__.py:549
+#: paperless/settings/__init__.py:560
 msgid "Bulgarian"
 msgstr "وابسته به بلغاری"
 
-#: paperless/settings/__init__.py:550
+#: paperless/settings/__init__.py:561
 msgid "Catalan"
 msgstr "کاتالان"
 
-#: paperless/settings/__init__.py:551
+#: paperless/settings/__init__.py:562
 msgid "Czech"
 msgstr "وابسته به چک"
 
-#: paperless/settings/__init__.py:552
+#: paperless/settings/__init__.py:563
 msgid "Danish"
 msgstr "وابسته به دانمارکی"
 
-#: paperless/settings/__init__.py:553
+#: paperless/settings/__init__.py:564
 msgid "German"
 msgstr "آلمانی"
 
-#: paperless/settings/__init__.py:554
+#: paperless/settings/__init__.py:565
 msgid "Greek"
 msgstr "یونانی"
 
-#: paperless/settings/__init__.py:555
+#: paperless/settings/__init__.py:566
 msgid "English (GB)"
 msgstr "انگلیسی (GB)"
 
-#: paperless/settings/__init__.py:556
+#: paperless/settings/__init__.py:567
 msgid "Spanish"
 msgstr "اسپانیایی"
 
-#: paperless/settings/__init__.py:557
+#: paperless/settings/__init__.py:568
 msgid "Persian"
 msgstr "فارسی"
 
-#: paperless/settings/__init__.py:558
+#: paperless/settings/__init__.py:569
 msgid "Finnish"
 msgstr "فنلاندی"
 
-#: paperless/settings/__init__.py:559
+#: paperless/settings/__init__.py:570
 msgid "French"
 msgstr "فرانسوی"
 
-#: paperless/settings/__init__.py:560
+#: paperless/settings/__init__.py:571
 msgid "Hungarian"
 msgstr "مجارستانی"
 
-#: paperless/settings/__init__.py:561
+#: paperless/settings/__init__.py:572
 msgid "Indonesian"
 msgstr ""
 
-#: paperless/settings/__init__.py:562
+#: paperless/settings/__init__.py:573
 msgid "Italian"
 msgstr "ایتالیایی"
 
-#: paperless/settings/__init__.py:563
+#: paperless/settings/__init__.py:574
 msgid "Japanese"
 msgstr "وابسته به ژاپنی"
 
-#: paperless/settings/__init__.py:564
+#: paperless/settings/__init__.py:575
 msgid "Korean"
 msgstr "کره ای"
 
-#: paperless/settings/__init__.py:565
+#: paperless/settings/__init__.py:576
 msgid "Luxembourgish"
 msgstr "وابسته به لوکس"
 
-#: paperless/settings/__init__.py:566
+#: paperless/settings/__init__.py:577
 msgid "Norwegian"
 msgstr "نروژی"
 
-#: paperless/settings/__init__.py:567
+#: paperless/settings/__init__.py:578
 msgid "Dutch"
 msgstr "هلندی"
 
-#: paperless/settings/__init__.py:568
+#: paperless/settings/__init__.py:579
 msgid "Polish"
 msgstr "صیقل دادن"
 
-#: paperless/settings/__init__.py:569
+#: paperless/settings/__init__.py:580
 msgid "Portuguese (Brazil)"
 msgstr "پرتغالی (برزیل)"
 
-#: paperless/settings/__init__.py:570
+#: paperless/settings/__init__.py:581
 msgid "Portuguese"
 msgstr "وابسته به پرتغالی"
 
-#: paperless/settings/__init__.py:571
+#: paperless/settings/__init__.py:582
 msgid "Romanian"
 msgstr "وابسته به رومانی"
 
-#: paperless/settings/__init__.py:572
+#: paperless/settings/__init__.py:583
 msgid "Russian"
 msgstr "روسی"
 
-#: paperless/settings/__init__.py:573
+#: paperless/settings/__init__.py:584
 msgid "Slovak"
 msgstr "لگن"
 
-#: paperless/settings/__init__.py:574
+#: paperless/settings/__init__.py:585
 msgid "Slovenian"
 msgstr "وابسته به اسلوونی"
 
-#: paperless/settings/__init__.py:575
+#: paperless/settings/__init__.py:586
 msgid "Serbian"
 msgstr "صرب"
 
-#: paperless/settings/__init__.py:576
+#: paperless/settings/__init__.py:587
 msgid "Swedish"
 msgstr "سوئدی"
 
-#: paperless/settings/__init__.py:577
+#: paperless/settings/__init__.py:588
 msgid "Turkish"
 msgstr "ترکی"
 
-#: paperless/settings/__init__.py:578
+#: paperless/settings/__init__.py:589
 msgid "Ukrainian"
 msgstr "وابسته به اوکراینی"
 
-#: paperless/settings/__init__.py:579
+#: paperless/settings/__init__.py:590
 msgid "Vietnamese"
 msgstr ""
 
-#: paperless/settings/__init__.py:580
+#: paperless/settings/__init__.py:591
 msgid "Chinese Simplified"
 msgstr "چینی ساده شد"
 
-#: paperless/settings/__init__.py:581
+#: paperless/settings/__init__.py:592
 msgid "Chinese Traditional"
 msgstr "چینی سنتی"
 

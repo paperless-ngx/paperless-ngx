@@ -828,7 +828,7 @@
           <context context-type="sourcefile">src/app/components/admin/logs/logs.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="translated">řádky</target>
+        <target state="translated">řádků</target>
       </trans-unit>
       <trans-unit id="8838884664569764142" datatype="html">
         <source>Auto refresh</source>
@@ -1352,7 +1352,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">248</context>
         </context-group>
-        <target state="needs-translation">Built-in fields to show:</target>
+        <target state="translated">Vestavěná pole k zobrazení:</target>
       </trans-unit>
       <trans-unit id="3467966318201103991" datatype="html">
         <source>Uncheck fields to hide them on the document details page.</source>
@@ -1360,7 +1360,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">260</context>
         </context-group>
-        <target state="needs-translation">Uncheck fields to hide them on the document details page.</target>
+        <target state="translated">Zrušte zaškrtnutí polí pro jejich skrytí na stránce s podrobnostmi o dokumentu.</target>
       </trans-unit>
       <trans-unit id="8508424367627989968" datatype="html" approved="yes">
         <source>Bulk editing</source>
@@ -1400,7 +1400,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1787</context>
         </context-group>
-        <target state="translated">PDF editor</target>
+        <target state="translated">Editor PDF</target>
       </trans-unit>
       <trans-unit id="1577733187050997705" datatype="html">
         <source>Default editing mode</source>
@@ -1964,7 +1964,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">298</context>
         </context-group>
-        <target state="needs-translation">Tasks</target>
+        <target state="translated">Úlohy</target>
       </trans-unit>
       <trans-unit id="8492095365580052820" datatype="html">
         <source>Tasks shows detailed information about document consumption and system tasks.</source>
@@ -1972,7 +1972,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Tasks shows detailed information about document consumption and system tasks.</target>
+        <target state="translated">Úlohy zobrazují podrobné informace o zpracování dokumentů a systémových úlohách.</target>
       </trans-unit>
       <trans-unit id="103921551219467537" datatype="html">
         <source>Clear selection</source>
@@ -1996,7 +1996,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Dismiss all</target>
+        <target state="translated">Zahodit vše</target>
       </trans-unit>
       <trans-unit id="1616102757855967475" datatype="html" approved="yes">
         <source>All</source>
@@ -2056,7 +2056,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">215</context>
         </context-group>
-        <target state="needs-translation">All types</target>
+        <target state="translated">Všechny typy</target>
       </trans-unit>
       <trans-unit id="131016739441837046" datatype="html">
         <source>All sources</source>
@@ -2068,7 +2068,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">227</context>
         </context-group>
-        <target state="needs-translation">All sources</target>
+        <target state="translated">Všechny zdroje</target>
       </trans-unit>
       <trans-unit id="3570013039254960445" datatype="html">
         <source>Search tasks</source>
@@ -2100,7 +2100,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {1 task} other {<x id="INTERPOLATION"/> tasks}}</target>
+        <target state="translated">{VAR_PLURAL, plural, few {<x id="INTERPOLATION"/> úlohy} many {<x id="INTERPOLATION"/> úloh}=1 {1 úloha} other {<x id="INTERPOLATION"/> úloh}}</target>
       </trans-unit>
       <trans-unit id="8953033926734869941" datatype="html" approved="yes">
         <source>Name</source>
@@ -2444,7 +2444,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">289</context>
         </context-group>
-        <target state="needs-translation">No tasks match the current filters.</target>
+        <target state="translated">Zvoleným filtrům neodpovídají žádné úlohy.</target>
       </trans-unit>
       <trans-unit id="2525230676386818985" datatype="html">
         <source>Result</source>
@@ -2460,7 +2460,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="needs-translation">Needs attention</target>
+        <target state="translated">Vyžaduje pozornost</target>
       </trans-unit>
       <trans-unit id="3307214558906712688" datatype="html">
         <source>In progress</source>
@@ -2468,7 +2468,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="needs-translation">In progress</target>
+        <target state="translated">Probíhá</target>
       </trans-unit>
       <trans-unit id="1371178633976505412" datatype="html">
         <source>Recently completed</source>
@@ -2476,7 +2476,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">57</context>
         </context-group>
-        <target state="needs-translation">Recently completed</target>
+        <target state="translated">Nedávno dokončené</target>
       </trans-unit>
       <trans-unit id="2936452645673957909" datatype="html">
         <source>Consume File</source>
@@ -2484,7 +2484,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="needs-translation">Consume File</target>
+        <target state="translated">Zpracování souboru</target>
       </trans-unit>
       <trans-unit id="5622386857946132209" datatype="html">
         <source>Train Classifier</source>
@@ -2492,7 +2492,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">70</context>
         </context-group>
-        <target state="needs-translation">Train Classifier</target>
+        <target state="translated">Trénování klasifikátoru</target>
       </trans-unit>
       <trans-unit id="776309955507105337" datatype="html">
         <source>Sanity Check</source>
@@ -2500,7 +2500,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="needs-translation">Sanity Check</target>
+        <target state="translated">Kontrola zdraví</target>
       </trans-unit>
       <trans-unit id="7502272564743467653" datatype="html">
         <source>Mail Fetch</source>
@@ -2520,7 +2520,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">LLM Index</target>
+        <target state="translated">Index LLM</target>
       </trans-unit>
       <trans-unit id="6402092370576716734" datatype="html">
         <source>Empty Trash</source>
@@ -2528,7 +2528,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="needs-translation">Empty Trash</target>
+        <target state="translated">Vyprázdnění koše</target>
       </trans-unit>
       <trans-unit id="4173754487295857311" datatype="html">
         <source>Check Workflows</source>
@@ -2536,7 +2536,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">84</context>
         </context-group>
-        <target state="needs-translation">Check Workflows</target>
+        <target state="translated">Kontrola postupů</target>
       </trans-unit>
       <trans-unit id="2065831805515896240" datatype="html">
         <source>Bulk Update</source>
@@ -2544,7 +2544,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">88</context>
         </context-group>
-        <target state="needs-translation">Bulk Update</target>
+        <target state="translated">Hromadná aktualizace</target>
       </trans-unit>
       <trans-unit id="5062348912423871240" datatype="html">
         <source>Reprocess Document</source>
@@ -2552,7 +2552,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="needs-translation">Reprocess Document</target>
+        <target state="translated">Opětovné zpracování dokumentu</target>
       </trans-unit>
       <trans-unit id="6903696804811148799" datatype="html">
         <source>Build Share Link</source>
@@ -2560,7 +2560,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">Build Share Link</target>
+        <target state="translated">Sestavení odkazu ke sdílení</target>
       </trans-unit>
       <trans-unit id="6581973658756561124" datatype="html">
         <source>Bulk Delete</source>
@@ -2568,7 +2568,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">100</context>
         </context-group>
-        <target state="needs-translation">Bulk Delete</target>
+        <target state="translated">Hromadné smazání</target>
       </trans-unit>
       <trans-unit id="9172233176401579786" datatype="html">
         <source>Scheduled</source>
@@ -2612,7 +2612,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">119</context>
         </context-group>
-        <target state="needs-translation">Folder Consume</target>
+        <target state="translated">Zpracování složky</target>
       </trans-unit>
       <trans-unit id="1456901843819961615" datatype="html">
         <source>Email Consume</source>
@@ -2620,7 +2620,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">123</context>
         </context-group>
-        <target state="needs-translation">Email Consume</target>
+        <target state="translated">Zpracování e-mailu</target>
       </trans-unit>
       <trans-unit id="29832309535656200" datatype="html">
         <source>System</source>
@@ -2628,7 +2628,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">125</context>
         </context-group>
-        <target state="needs-translation">System</target>
+        <target state="translated">Systém</target>
       </trans-unit>
       <trans-unit id="2233560223291461480" datatype="html">
         <source>Manual</source>
@@ -2636,7 +2636,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="needs-translation">Manual</target>
+        <target state="translated">Ruční</target>
       </trans-unit>
       <trans-unit id="5404910960991552159" datatype="html">
         <source>Dismiss selected</source>
@@ -2652,7 +2652,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">240</context>
         </context-group>
-        <target state="needs-translation">Dismiss visible</target>
+        <target state="translated">Zahodit viditelné</target>
       </trans-unit>
       <trans-unit id="3169751690815214293" datatype="html">
         <source>Confirm Dismiss</source>
@@ -2696,7 +2696,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">348</context>
         </context-group>
-        <target state="needs-translation">Confirm Dismiss All</target>
+        <target state="translated">Potvrdit zahození všech</target>
       </trans-unit>
       <trans-unit id="4157200209636243740" datatype="html">
         <source>Dismiss all <x id="PH" equiv-text="this.totalTasks()"/> tasks?</source>
@@ -2704,7 +2704,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">349</context>
         </context-group>
-        <target state="needs-translation">Dismiss all <x id="PH" equiv-text="this.totalTasks()"/> tasks?</target>
+        <target state="translated">Zahodit všech <x id="PH" equiv-text="this.totalTasks()"/> úloh?</target>
       </trans-unit>
       <trans-unit id="8149502458056418229" datatype="html">
         <source>Success. New document id <x id="PH" equiv-text="documentId"/> created</source>
@@ -2712,7 +2712,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">408</context>
         </context-group>
-        <target state="needs-translation">Success. New document id <x id="PH" equiv-text="documentId"/> created</target>
+        <target state="translated">Úspěch. Vytvořen nový dokument s ID <x id="PH" equiv-text="documentId"/></target>
       </trans-unit>
       <trans-unit id="8760066891202884337" datatype="html">
         <source>Duplicate of document #<x id="PH" equiv-text="duplicateOf"/></source>
@@ -3540,7 +3540,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">183</context>
         </context-group>
-        <target state="needs-translation">Attributes</target>
+        <target state="translated">Atributy</target>
       </trans-unit>
       <trans-unit id="7437910965833684826" datatype="html" approved="yes">
         <source>Correspondents</source>
@@ -3572,7 +3572,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-attributes/document-attributes.component.ts</context>
           <context context-type="linenumber">105</context>
         </context-group>
-        <target state="needs-translation">Document types</target>
+        <target state="translated">Typy dokumentů</target>
       </trans-unit>
       <trans-unit id="8835528846812581148" datatype="html">
         <source>Storage paths</source>
@@ -3584,7 +3584,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-attributes/document-attributes.component.ts</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="needs-translation">Storage paths</target>
+        <target state="translated">Cesty úložiště</target>
       </trans-unit>
       <trans-unit id="9149498548977462220" datatype="html">
         <source>Custom fields</source>
@@ -5540,7 +5540,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Access system status, logs, Django backend</target>
+        <target state="translated">Přístup ke stavu systému, protokolům, backendu Django</target>
       </trans-unit>
       <trans-unit id="1808271538028523977" datatype="html">
         <source>Superuser</source>
@@ -5556,7 +5556,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/user-edit-dialog/user-edit-dialog.component.html</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Grants all permissions and can view all objects</target>
+        <target state="translated">Uděluje všechna oprávnění a může zobrazovat všechny objekty</target>
       </trans-unit>
       <trans-unit id="8900662509426586619" datatype="html">
         <source>Two-factor Authentication</source>
@@ -6344,7 +6344,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">271</context>
         </context-group>
-        <target state="needs-translation">Has any of these document types</target>
+        <target state="translated">Má kterýkoli z následujících typů dokumentů</target>
       </trans-unit>
       <trans-unit id="1507843981661822403" datatype="html">
         <source>Does not have document types</source>
@@ -7546,7 +7546,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">116</context>
         </context-group>
-        <target state="needs-translation">Manage share link bundles</target>
+        <target state="translated">Spravovat balíčky sdílení odkazů</target>
       </trans-unit>
       <trans-unit id="1070687661569746428" datatype="html">
         <source>Create share link bundle</source>
@@ -7554,7 +7554,7 @@
           <context context-type="sourcefile">src/app/components/common/share-link-bundle-dialog/share-link-bundle-dialog.component.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">Create share link bundle</target>
+        <target state="translated">Vytvořit balíček sdílení odkazů</target>
       </trans-unit>
       <trans-unit id="2362798555008696742" datatype="html">
         <source>Create link</source>
@@ -7590,7 +7590,7 @@
           <context context-type="sourcefile">src/app/components/common/share-link-bundle-manage-dialog/share-link-bundle-manage-dialog.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Status updates every few seconds while bundles are being prepared.</target>
+        <target state="translated">Aktualizace stavu každých pár sekund během přípravy balíčků.</target>
       </trans-unit>
       <trans-unit id="5194711788228004418" datatype="html">
         <source>No share link bundles currently exist.</source>
@@ -7598,7 +7598,7 @@
           <context context-type="sourcefile">src/app/components/common/share-link-bundle-manage-dialog/share-link-bundle-manage-dialog.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">No share link bundles currently exist.</target>
+        <target state="translated">V současné době neexistují žádné balíčky.</target>
       </trans-unit>
       <trans-unit id="2841249062294860035" datatype="html">
         <source>Built:</source>
@@ -7650,7 +7650,7 @@
           <context context-type="sourcefile">src/app/components/common/share-link-bundle-manage-dialog/share-link-bundle-manage-dialog.component.ts</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Share link bundles</target>
+        <target state="translated">Balíčky sdílení odkazů</target>
       </trans-unit>
       <trans-unit id="1541995860059283227" datatype="html">
         <source>Failed to load share link bundles.</source>
@@ -7658,7 +7658,7 @@
           <context context-type="sourcefile">src/app/components/common/share-link-bundle-manage-dialog/share-link-bundle-manage-dialog.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="needs-translation">Failed to load share link bundles.</target>
+        <target state="translated">Nepodařilo se načíst balíčky sdílení odkazů.</target>
       </trans-unit>
       <trans-unit id="5417797597565486403" datatype="html">
         <source>Error retrieving share link bundles.</source>
@@ -7942,7 +7942,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">147</context>
         </context-group>
-        <target state="needs-translation">Recent Task Activity <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;small text-muted fw-light&quot;&gt;"/>(<x id="INTERPOLATION" equiv-text="{{status().tasks.summary.days}}"/> days)<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated">Nedávná aktivita úloh <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;small text-muted fw-light&quot;&gt;"/>(<x id="INTERPOLATION" equiv-text="{{status().tasks.summary.days}}"/> days)<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="3448462145758383019" datatype="html">
         <source>Total</source>
@@ -7950,7 +7950,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">152</context>
         </context-group>
-        <target state="needs-translation">Total</target>
+        <target state="translated">Celkem</target>
       </trans-unit>
       <trans-unit id="3521084103654700903" datatype="html">
         <source>Successful</source>
@@ -7958,7 +7958,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">156</context>
         </context-group>
-        <target state="needs-translation">Successful</target>
+        <target state="translated">Úspěšných</target>
       </trans-unit>
       <trans-unit id="7256395947475975935" datatype="html">
         <source>Failed</source>
@@ -7970,7 +7970,7 @@
           <context context-type="sourcefile">src/app/data/share-link-bundle.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">Failed</target>
+        <target state="translated">Selhané</target>
       </trans-unit>
       <trans-unit id="4416413576346763682" datatype="html">
         <source>Pending</source>
@@ -7982,7 +7982,7 @@
           <context context-type="sourcefile">src/app/data/share-link-bundle.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Pending</target>
+        <target state="translated">Čekající</target>
       </trans-unit>
       <trans-unit id="2000433102211963975" datatype="html">
         <source>No recent tasks</source>
@@ -7990,7 +7990,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">169</context>
         </context-group>
-        <target state="needs-translation">No recent tasks</target>
+        <target state="translated">Žádné nedávné úlohy</target>
       </trans-unit>
       <trans-unit id="2041675390931385838" datatype="html">
         <source>Health</source>
@@ -8090,7 +8090,7 @@
           <context context-type="sourcefile">src/app/components/common/system-status-dialog/system-status-dialog.component.html</context>
           <context context-type="linenumber">283</context>
         </context-group>
-        <target state="needs-translation">AI Index</target>
+        <target state="translated">Index AI</target>
       </trans-unit>
       <trans-unit id="6732151329960766506" datatype="html">
         <source>Copy Raw Error</source>
@@ -8660,7 +8660,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">318</context>
         </context-group>
-        <target state="needs-translation">Original SHA256 checksum</target>
+        <target state="translated">Původní kontrolní součet SHA256</target>
       </trans-unit>
       <trans-unit id="5888243105821763422" datatype="html" approved="yes">
         <source>Original file size</source>
@@ -8684,7 +8684,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">331</context>
         </context-group>
-        <target state="needs-translation">Archive SHA256 checksum</target>
+        <target state="translated">Archivní kontrolní součet SHA256</target>
       </trans-unit>
       <trans-unit id="6033581412811562084" datatype="html" approved="yes">
         <source>Archive file size</source>
@@ -8716,7 +8716,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">368,371</context>
         </context-group>
-        <target state="needs-translation">Notes <x id="START_BLOCK_IF" equiv-text="@if (document()?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></target>
+        <target state="translated">Poznámky <x id="START_BLOCK_IF" equiv-text="@if (document()?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></target>
       </trans-unit>
       <trans-unit id="186236568870281953" datatype="html">
         <source>History</source>
@@ -9116,7 +9116,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Versions</target>
+        <target state="translated">Verze</target>
       </trans-unit>
       <trans-unit id="4077520913910941990" datatype="html">
         <source>Label</source>
@@ -9124,7 +9124,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">Label</target>
+        <target state="translated">Označení</target>
       </trans-unit>
       <trans-unit id="3915966149686975421" datatype="html">
         <source>Optional</source>
@@ -9132,7 +9132,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Optional</target>
+        <target state="translated">Volitelné</target>
       </trans-unit>
       <trans-unit id="787787001194154763" datatype="html">
         <source>Add new version</source>
@@ -9140,7 +9140,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Add new version</target>
+        <target state="translated">Přidat novou verzi</target>
       </trans-unit>
       <trans-unit id="3119565892291077820" datatype="html">
         <source>Uploading version...</source>
@@ -9164,7 +9164,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.html</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">Version upload failed.</target>
+        <target state="translated">Nepodařilo se nahrát verzi.</target>
       </trans-unit>
       <trans-unit id="6328986243040954523" datatype="html">
         <source>Version label</source>
@@ -9176,7 +9176,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.html</context>
           <context context-type="linenumber">85</context>
         </context-group>
-        <target state="needs-translation">Version label</target>
+        <target state="translated">Označení verze</target>
       </trans-unit>
       <trans-unit id="2724055831234181057" datatype="html">
         <source>Version</source>
@@ -9184,7 +9184,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.html</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">Version</target>
+        <target state="translated">Verze</target>
       </trans-unit>
       <trans-unit id="2491751767883178298" datatype="html">
         <source>Delete this version?</source>
@@ -9216,7 +9216,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.ts</context>
           <context context-type="linenumber">189</context>
         </context-group>
-        <target state="needs-translation">Error updating version label</target>
+        <target state="translated">Chyba při aktualizaci označení verze</target>
       </trans-unit>
       <trans-unit id="3567158019134759286" datatype="html">
         <source>Uploading new version. Processing will happen in the background.</source>
@@ -9244,7 +9244,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.ts</context>
           <context context-type="linenumber">271</context>
         </context-group>
-        <target state="needs-translation">Upload failed.</target>
+        <target state="translated">Nahrání selhalo.</target>
       </trans-unit>
       <trans-unit id="8350861980330256599" datatype="html">
         <source>Error uploading new version</source>
@@ -9348,7 +9348,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="needs-translation">Create a share link bundle</target>
+        <target state="translated">Vytvořit balíček sdílení odkazů</target>
       </trans-unit>
       <trans-unit id="1015374532025907183" datatype="html">
         <source>Include:</source>
@@ -9755,7 +9755,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">95,96</context>
         </context-group>
-        <target state="needs-translation">Created: <x id="INTERPOLATION" equiv-text="{{ document().created | customDate }}"/></target>
+        <target state="translated">Vytvořeno: <x id="INTERPOLATION" equiv-text="{{ document().created | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="2030261243264601523" datatype="html">
         <source>Added: <x id="INTERPOLATION" equiv-text="{{ document().added | customDate }}"/></source>
@@ -9771,7 +9771,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">96,97</context>
         </context-group>
-        <target state="needs-translation">Added: <x id="INTERPOLATION" equiv-text="{{ document().added | customDate }}"/></target>
+        <target state="translated">Přidáno: <x id="INTERPOLATION" equiv-text="{{ document().added | customDate }}"/></target>
       </trans-unit>
       <trans-unit id="4235671847487610290" datatype="html">
         <source>Modified: <x id="INTERPOLATION" equiv-text="{{ document().modified | customDate }}"/></source>
@@ -10247,7 +10247,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
           <context context-type="linenumber">497</context>
         </context-group>
-        <target state="needs-translation">View "<x id="PH" equiv-text="savedView.name"/>" created successfully, but could not update visibility settings.</target>
+        <target state="translated">Pohled „<x id="PH" equiv-text="savedView.name"/>“ úspěšně vytvořen, nepodařilo se ale aktualizovat nastavení viditelnosti.</target>
       </trans-unit>
       <trans-unit id="739880801667335279" datatype="html">
         <source>Dates</source>
@@ -11367,7 +11367,7 @@
           <context context-type="sourcefile">src/app/components/manage/saved-views/saved-views.component.html</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation"><x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="bs class=&quot;me-1&quot; name=&quot;person-fill-lock&quot;&gt;"/><x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="Permissions&lt;"/>Permissions</target>
+        <target state="translated"><x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="bs class=&quot;me-1&quot; name=&quot;person-fill-lock&quot;&gt;"/><x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="Oprávnění&lt;"/>Oprávnění</target>
       </trans-unit>
       <trans-unit id="6338800642797811873" datatype="html">
         <source>Documents page size</source>
@@ -11415,7 +11415,7 @@
           <context context-type="sourcefile">src/app/components/manage/saved-views/saved-views.component.html</context>
           <context context-type="linenumber">62</context>
         </context-group>
-        <target state="needs-translation">Note: ordering is not preserved</target>
+        <target state="translated">Upozornění: pořadí nebude zachováno</target>
       </trans-unit>
       <trans-unit id="7877440816920439876" datatype="html" approved="yes">
         <source>No saved views defined.</source>
@@ -11864,7 +11864,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">AI Settings</target>
+        <target state="translated">Nastavení AI</target>
       </trans-unit>
       <trans-unit id="1313137480169642057" datatype="html">
         <source>Output Type</source>
@@ -11896,7 +11896,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">120</context>
         </context-group>
-        <target state="needs-translation">Archive File Generation</target>
+        <target state="translated">Generování archivních souborů</target>
       </trans-unit>
       <trans-unit id="1115402553541327390" datatype="html">
         <source>Image DPI</source>
@@ -12072,7 +12072,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">277</context>
         </context-group>
-        <target state="needs-translation">Split on Tag Barcodes</target>
+        <target state="translated">Rozdělení podle čárových kódů štítků</target>
       </trans-unit>
       <trans-unit id="7011909364081812031" datatype="html">
         <source>AI Enabled</source>
@@ -12080,7 +12080,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">284</context>
         </context-group>
-        <target state="needs-translation">AI Enabled</target>
+        <target state="translated">AI povoleno</target>
       </trans-unit>
       <trans-unit id="8028880048909383956" datatype="html">
         <source>Consider privacy implications when enabling AI features, especially if using a remote model.</source>
@@ -12088,7 +12088,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">288</context>
         </context-group>
-        <target state="needs-translation">Consider privacy implications when enabling AI features, especially if using a remote model.</target>
+        <target state="translated">Při aktivaci funkcí umělé inteligence zvažte dopady na ochranu osobních údajů, zejména pokud používáte vzdálený model.</target>
       </trans-unit>
       <trans-unit id="8131374115579345652" datatype="html">
         <source>LLM Embedding Backend</source>
@@ -12096,7 +12096,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">292</context>
         </context-group>
-        <target state="needs-translation">LLM Embedding Backend</target>
+        <target state="translated">Backend pro vkládání LLM</target>
       </trans-unit>
       <trans-unit id="6647708571891295756" datatype="html">
         <source>LLM Embedding Model</source>
@@ -12104,7 +12104,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">300</context>
         </context-group>
-        <target state="needs-translation">LLM Embedding Model</target>
+        <target state="translated">Model vkládání LLM</target>
       </trans-unit>
       <trans-unit id="3554114880473286122" datatype="html">
         <source>LLM Embedding Endpoint</source>
@@ -12112,7 +12112,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">307</context>
         </context-group>
-        <target state="needs-translation">LLM Embedding Endpoint</target>
+        <target state="translated">Koncový bod vkládání LLM</target>
       </trans-unit>
       <trans-unit id="1044242175651289991" datatype="html">
         <source>LLM Embedding Chunk Size</source>
@@ -12120,7 +12120,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">314</context>
         </context-group>
-        <target state="needs-translation">LLM Embedding Chunk Size</target>
+        <target state="translated">Velikost bloku vkládání LLM</target>
       </trans-unit>
       <trans-unit id="7218245223139363113" datatype="html">
         <source>LLM Context Size</source>
@@ -12128,7 +12128,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">321</context>
         </context-group>
-        <target state="needs-translation">LLM Context Size</target>
+        <target state="translated">Velikost kontextu LLM</target>
       </trans-unit>
       <trans-unit id="4234495692726214397" datatype="html">
         <source>LLM Backend</source>
@@ -12136,7 +12136,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">328</context>
         </context-group>
-        <target state="needs-translation">LLM Backend</target>
+        <target state="translated">Backend LLM</target>
       </trans-unit>
       <trans-unit id="7935234833834000002" datatype="html">
         <source>LLM Model</source>
@@ -12144,7 +12144,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">336</context>
         </context-group>
-        <target state="needs-translation">LLM Model</target>
+        <target state="translated">Model LLM</target>
       </trans-unit>
       <trans-unit id="1980550530387803165" datatype="html">
         <source>LLM API Key</source>
@@ -12152,7 +12152,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">343</context>
         </context-group>
-        <target state="needs-translation">LLM API Key</target>
+        <target state="translated">Klíč API LLM</target>
       </trans-unit>
       <trans-unit id="6126617860376156501" datatype="html">
         <source>LLM Endpoint</source>
@@ -12160,7 +12160,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">350</context>
         </context-group>
-        <target state="needs-translation">LLM Endpoint</target>
+        <target state="translated">Koncový bod LLM</target>
       </trans-unit>
       <trans-unit id="6572826277249350975" datatype="html">
         <source>LLM Output Language</source>
@@ -12168,7 +12168,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">357</context>
         </context-group>
-        <target state="needs-translation">LLM Output Language</target>
+        <target state="translated">Výstupní jazyk LLM</target>
       </trans-unit>
       <trans-unit id="3284403507172415792" datatype="html">
         <source>Language to use for generated AI suggestions. When unset, AI suggestions use the user&apos;s display language if explicitly set.</source>
@@ -12176,7 +12176,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">361</context>
         </context-group>
-        <target state="needs-translation">Language to use for generated AI suggestions. When unset, AI suggestions use the user's display language if explicitly set.</target>
+        <target state="translated">Jazyk, který se má použít pro návrhy generované AI. Pokud není nastaveno, návrhy AI použijí jazyk zobrazení uživatele, je-li explicitně nastaven.</target>
       </trans-unit>
       <trans-unit id="4493921125434706859" datatype="html">
         <source>LLM Request Timeout</source>
@@ -12184,7 +12184,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">365</context>
         </context-group>
-        <target state="needs-translation">LLM Request Timeout</target>
+        <target state="translated">Čawsový limit žádosti LLM</target>
       </trans-unit>
       <trans-unit id="483994032066441287" datatype="html">
         <source>Timeout in seconds for LLM requests.</source>
@@ -12192,7 +12192,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">369</context>
         </context-group>
-        <target state="needs-translation">Timeout in seconds for LLM requests.</target>
+        <target state="translated">Časový limit v sekundách pro žádosti LLM.</target>
       </trans-unit>
       <trans-unit id="9155387182259025015" datatype="html">
         <source>Processing</source>
