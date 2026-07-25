@@ -460,11 +460,22 @@ def _parse_paperless_url():
 
 PAPERLESS_URL = _parse_paperless_url()
 
+
+def _get_allauth_trusted_proxy_count(trusted_proxies: list[str]) -> int:
+    count = get_int_from_env(
+        "PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT",
+        len(trusted_proxies),
+    )
+    if count < 0:
+        raise ImproperlyConfigured(
+            "PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT must be zero or greater",
+        )
+    return count
+
+
 # For use with trusted proxies
 TRUSTED_PROXIES = get_list_from_env("PAPERLESS_TRUSTED_PROXIES")
-# Derive allauth's proxy count from the same list so X-Forwarded-For is trusted
-# correctly when users have configured PAPERLESS_TRUSTED_PROXIES.
-ALLAUTH_TRUSTED_PROXY_COUNT = len(TRUSTED_PROXIES)
+ALLAUTH_TRUSTED_PROXY_COUNT = _get_allauth_trusted_proxy_count(TRUSTED_PROXIES)
 ALLAUTH_TRUSTED_CLIENT_IP_HEADER = os.getenv(
     "PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER",
 )

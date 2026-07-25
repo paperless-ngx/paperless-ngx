@@ -522,22 +522,36 @@ do CORS calls. Set this to your public domain name.
 fail2ban with log entries for failed authorization attempts. Value should be
 IP address(es).
 
-    This setting also controls allauth's
-    [`ALLAUTH_TRUSTED_PROXY_COUNT`](https://docs.allauth.org/en/latest/account/configuration.html),
-    which is set to the number of proxies listed here. Without this,
-    allauth cannot determine the client IP address for rate limiting when
-    running behind a reverse proxy, resulting in a `403 Forbidden` on login.
+    By default, this setting also controls allauth's trusted proxy count,
+    which is set to the number of proxies listed here. Override that default
+    with [`PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT`](#PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT)
+    when the list length does not match the number of proxy hops.
 
     Defaults to empty string.
+
+#### [`PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT=<integer>`](#PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT) {#PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT}
+
+: Sets allauth's
+[`ALLAUTH_TRUSTED_PROXY_COUNT`](https://docs.allauth.org/en/latest/common/rate_limits.html#configuration).
+This is the number of trusted proxy **hops** represented in each
+`X-Forwarded-For` header, not the number of IP addresses through which those
+proxies may be reached. For example, a single dual-stack proxy is one hop even
+when its IPv4 and IPv6 addresses are both listed in
+[`PAPERLESS_TRUSTED_PROXIES`](#PAPERLESS_TRUSTED_PROXIES).
+
+    Only trust `X-Forwarded-For` when untrusted clients cannot connect directly
+    to Paperless-ngx.
+
+    Defaults to the number of entries in `PAPERLESS_TRUSTED_PROXIES`.
 
 #### [`PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER=<header-name>`](#PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER) {#PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER}
 
 : Sets allauth's
-[`ALLAUTH_TRUSTED_CLIENT_IP_HEADER`](https://docs.allauth.org/en/latest/account/configuration.html).
+[`ALLAUTH_TRUSTED_CLIENT_IP_HEADER`](https://docs.allauth.org/en/latest/common/rate_limits.html#configuration).
 Use this when your reverse proxy sets a dedicated header for the real
 client IP instead of `X-Forwarded-For`, for example `X-Real-IP` (nginx)
 or `CF-Connecting-IP` (Cloudflare). When set, this takes precedence over
-[`PAPERLESS_TRUSTED_PROXIES`](#PAPERLESS_TRUSTED_PROXIES).
+`PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT`.
 
     Defaults to none.
 
