@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-23 19:21+0000\n"
-"PO-Revision-Date: 2026-07-23 19:23\n"
+"POT-Creation-Date: 2026-07-25 07:12+0000\n"
+"PO-Revision-Date: 2026-07-25 07:14\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -1914,157 +1914,157 @@ msgstr "Estableix l'idioma de sortida de LLM"
 
 #: paperless/models.py:370
 msgid "Sets the LLM timeout in seconds"
-msgstr ""
+msgstr "Estableix temps d'espera en segons"
 
 #: paperless/models.py:376
 msgid "paperless application settings"
 msgstr "configuració de l'aplicació paperless"
 
-#: paperless/settings/__init__.py:545
+#: paperless/settings/__init__.py:556
 msgid "English (US)"
 msgstr "Anglès (US)"
 
-#: paperless/settings/__init__.py:546
+#: paperless/settings/__init__.py:557
 msgid "Arabic"
 msgstr "Àrab"
 
-#: paperless/settings/__init__.py:547
+#: paperless/settings/__init__.py:558
 msgid "Afrikaans"
 msgstr "Africà"
 
-#: paperless/settings/__init__.py:548
+#: paperless/settings/__init__.py:559
 msgid "Belarusian"
 msgstr "Bielorús"
 
-#: paperless/settings/__init__.py:549
+#: paperless/settings/__init__.py:560
 msgid "Bulgarian"
 msgstr "Búlgar"
 
-#: paperless/settings/__init__.py:550
+#: paperless/settings/__init__.py:561
 msgid "Catalan"
 msgstr "Català"
 
-#: paperless/settings/__init__.py:551
+#: paperless/settings/__init__.py:562
 msgid "Czech"
 msgstr "Txec"
 
-#: paperless/settings/__init__.py:552
+#: paperless/settings/__init__.py:563
 msgid "Danish"
 msgstr "Danès"
 
-#: paperless/settings/__init__.py:553
+#: paperless/settings/__init__.py:564
 msgid "German"
 msgstr "Alemany"
 
-#: paperless/settings/__init__.py:554
+#: paperless/settings/__init__.py:565
 msgid "Greek"
 msgstr "Grec"
 
-#: paperless/settings/__init__.py:555
+#: paperless/settings/__init__.py:566
 msgid "English (GB)"
 msgstr "Anglès (GB)"
 
-#: paperless/settings/__init__.py:556
+#: paperless/settings/__init__.py:567
 msgid "Spanish"
 msgstr "Espanyol"
 
-#: paperless/settings/__init__.py:557
+#: paperless/settings/__init__.py:568
 msgid "Persian"
 msgstr "Persa"
 
-#: paperless/settings/__init__.py:558
+#: paperless/settings/__init__.py:569
 msgid "Finnish"
 msgstr "Finès"
 
-#: paperless/settings/__init__.py:559
+#: paperless/settings/__init__.py:570
 msgid "French"
 msgstr "Francès"
 
-#: paperless/settings/__init__.py:560
+#: paperless/settings/__init__.py:571
 msgid "Hungarian"
 msgstr "Hongarès"
 
-#: paperless/settings/__init__.py:561
+#: paperless/settings/__init__.py:572
 msgid "Indonesian"
 msgstr "Indonesi"
 
-#: paperless/settings/__init__.py:562
+#: paperless/settings/__init__.py:573
 msgid "Italian"
 msgstr "Italià"
 
-#: paperless/settings/__init__.py:563
+#: paperless/settings/__init__.py:574
 msgid "Japanese"
 msgstr "Japonès"
 
-#: paperless/settings/__init__.py:564
+#: paperless/settings/__init__.py:575
 msgid "Korean"
 msgstr "Coreà"
 
-#: paperless/settings/__init__.py:565
+#: paperless/settings/__init__.py:576
 msgid "Luxembourgish"
 msgstr "Luxemburguès"
 
-#: paperless/settings/__init__.py:566
+#: paperless/settings/__init__.py:577
 msgid "Norwegian"
 msgstr "Noruec"
 
-#: paperless/settings/__init__.py:567
+#: paperless/settings/__init__.py:578
 msgid "Dutch"
 msgstr "Holandès"
 
-#: paperless/settings/__init__.py:568
+#: paperless/settings/__init__.py:579
 msgid "Polish"
 msgstr "Polonès"
 
-#: paperless/settings/__init__.py:569
+#: paperless/settings/__init__.py:580
 msgid "Portuguese (Brazil)"
 msgstr "Portuguès (Brasil)"
 
-#: paperless/settings/__init__.py:570
+#: paperless/settings/__init__.py:581
 msgid "Portuguese"
 msgstr "Portuguès"
 
-#: paperless/settings/__init__.py:571
+#: paperless/settings/__init__.py:582
 msgid "Romanian"
 msgstr "Romanès"
 
-#: paperless/settings/__init__.py:572
+#: paperless/settings/__init__.py:583
 msgid "Russian"
 msgstr "Rus"
 
-#: paperless/settings/__init__.py:573
+#: paperless/settings/__init__.py:584
 msgid "Slovak"
 msgstr "Eslovac"
 
-#: paperless/settings/__init__.py:574
+#: paperless/settings/__init__.py:585
 msgid "Slovenian"
 msgstr "Eslovè"
 
-#: paperless/settings/__init__.py:575
+#: paperless/settings/__init__.py:586
 msgid "Serbian"
 msgstr "Serbi"
 
-#: paperless/settings/__init__.py:576
+#: paperless/settings/__init__.py:587
 msgid "Swedish"
 msgstr "Suec"
 
-#: paperless/settings/__init__.py:577
+#: paperless/settings/__init__.py:588
 msgid "Turkish"
 msgstr "Turc"
 
-#: paperless/settings/__init__.py:578
+#: paperless/settings/__init__.py:589
 msgid "Ukrainian"
 msgstr "Ucranià"
 
-#: paperless/settings/__init__.py:579
+#: paperless/settings/__init__.py:590
 msgid "Vietnamese"
 msgstr "Vietnamita"
 
-#: paperless/settings/__init__.py:580
+#: paperless/settings/__init__.py:591
 msgid "Chinese Simplified"
 msgstr "Xinès Simplificat"
 
-#: paperless/settings/__init__.py:581
+#: paperless/settings/__init__.py:592
 msgid "Chinese Traditional"
 msgstr "Xinès tradicional"
 
@@ -2386,7 +2386,7 @@ msgstr "uid"
 
 #: paperless_mail/models.py:342
 msgid "uid validity"
-msgstr ""
+msgstr "validació uid"
 
 #: paperless_mail/models.py:350
 msgid "subject"
