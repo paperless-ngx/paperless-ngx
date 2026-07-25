@@ -8,7 +8,7 @@ export const environment = {
   apiVersion: '10', // match src/paperless/settings.py
   appTitle: DEFAULT_APP_TITLE,
   tag: 'prod',
-  version: '3.0.2',
+  version: '3.0.3',
   webSocketHost: window.location.host,
   webSocketProtocol: window.location.protocol == 'https:' ? 'wss:' : 'ws:',
   webSocketBaseUrl: base_url.pathname + 'ws/',
