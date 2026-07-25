@@ -141,8 +141,8 @@ class MailRule(document_models.ModelWithOwner):
         FROM_CUSTOM = 4, _("Use correspondent selected below")
 
     class CreatedSource(models.IntegerChoices):
-        FROM_NOTHING = 1, _("Do not assign a created date from the rule")
-        FROM_MESSAGE_DATE = 2, _("Use the email's Date header")
+        FROM_NOTHING = 1, _("Document (extracted date or import time)")
+        FROM_MESSAGE_DATE = 2, _("Email's Date header")
 
     name = models.CharField(_("name"), max_length=256)
 
@@ -314,7 +314,7 @@ class MailRule(document_models.ModelWithOwner):
     )
 
     assign_created_from = models.PositiveSmallIntegerField(
-        _("assign created from"),
+        _("Created date source"),
         choices=CreatedSource.choices,
         default=CreatedSource.FROM_NOTHING,
     )

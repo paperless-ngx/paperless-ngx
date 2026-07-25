@@ -19,11 +19,11 @@ class Migration(migrations.Migration):
             name="assign_created_from",
             field=models.PositiveSmallIntegerField(
                 choices=[
-                    (1, "Do not assign a created date from the rule"),
-                    (2, "Use the email's Date header"),
+                    (1, "Document (extracted date or import time)"),
+                    (2, "Email's Date header"),
                 ],
                 default=1,
-                verbose_name="assign created from",
+                verbose_name="Created date source",
             ),
         ),
         migrations.AddField(

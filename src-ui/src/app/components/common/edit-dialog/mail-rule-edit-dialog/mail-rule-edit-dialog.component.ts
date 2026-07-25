@@ -145,11 +145,11 @@ const METADATA_CORRESPONDENT_OPTIONS = [
 const METADATA_CREATED_OPTIONS = [
   {
     id: MailMetadataCreatedOption.FromNothing,
-    name: $localize`Do not assign a created date from the rule`,
+    name: $localize`Document (extracted date or import time)`,
   },
   {
     id: MailMetadataCreatedOption.FromMessageDate,
-    name: $localize`Use the email's Date header`,
+    name: $localize`Email's Date header`,
   },
 ]
 

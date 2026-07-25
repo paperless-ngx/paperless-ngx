@@ -70,7 +70,7 @@
         @if (showCorrespondentField) {
           <pngx-input-select [horizontal]="true" i18n-title title="Assign correspondent" [items]="correspondents()" [allowNull]="true" formControlName="assign_correspondent"></pngx-input-select>
         }
-        <pngx-input-select [horizontal]="true" i18n-title title="Assign created date from" [items]="metadataCreatedOptions" formControlName="assign_created_from"></pngx-input-select>
+        <pngx-input-select [horizontal]="true" i18n-title title="Created date source" [items]="metadataCreatedOptions" formControlName="assign_created_from"></pngx-input-select>
       </div>
     </div>
     <hr class="mt-0"/>
