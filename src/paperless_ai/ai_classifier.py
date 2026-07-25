@@ -38,7 +38,9 @@ def build_prompt_without_rag(
     You are a document classification assistant.
 
     Analyze the following document and extract the following information:
-    - A short descriptive title
+    - A short descriptive title. The title must describe the document itself;
+      do not include the correspondent, sender, issuer, or organization name
+      unless it is part of the document's official title.
     - Tags that reflect the content
     - Names of people or organizations mentioned
     - The type or category of the document
