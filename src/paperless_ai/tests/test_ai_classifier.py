@@ -216,7 +216,10 @@ def test_prompt_with_without_rag(mock_document):
         prompt = build_prompt_without_rag(mock_document, config)
         assert "Additional context from similar documents" not in prompt
         assert "for generated" not in prompt
-        assert "do not include the correspondent, sender, issuer, or organization name" in prompt
+        assert (
+            "do not include the correspondent, sender, issuer, or organization name"
+            in prompt
+        )
         assert "unless it is part of the document's official title" in prompt
 
         prompt = build_prompt_with_rag(mock_document, config)
