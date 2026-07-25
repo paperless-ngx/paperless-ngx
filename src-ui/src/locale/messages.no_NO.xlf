@@ -1528,7 +1528,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">306,308</context>
         </context-group>
-        <target state="needs-translation"> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI. These settings do not apply to documents. </target>
+        <target state="translated"> Innstillinger gjelder denne brukerkontoen for objekter (Etiketter, postregler, etc.) som er opprettet via web-grensesnittet. Disse innstillingene gjelder ikke for dokumenter. </target>
       </trans-unit>
       <trans-unit id="4292903881380648974" datatype="html">
         <source>Default Owner</source>
@@ -2076,7 +2076,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">Search tasks</target>
+        <target state="translated">Søk oppgaver</target>
       </trans-unit>
       <trans-unit id="6849725902312323996" datatype="html">
         <source>Reset filters</source>
@@ -2620,7 +2620,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">123</context>
         </context-group>
-        <target state="translated">E-postforbruk</target>
+        <target state="translated">E-post-import</target>
       </trans-unit>
       <trans-unit id="29832309535656200" datatype="html">
         <source>System</source>
@@ -4924,7 +4924,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="translated">Paperløst vil bare behandle e-poster som passer til <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>hele<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> av kriteriene som er angitt nedenfor.</target>
+        <target state="translated">Paperless vil bare behandle e-poster som passer til <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>hele<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> av kriteriene som er angitt nedenfor.</target>
       </trans-unit>
       <trans-unit id="7046259383943324039" datatype="html">
         <source>Folder</source>
@@ -6810,7 +6810,7 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="translated">Filtrer dokumenter med disse Etikettene</target>
+        <target state="translated">Filtrer dokumenter med disse etikettene</target>
       </trans-unit>
       <trans-unit id="1400555558847223243" datatype="html">
         <source>Suggestion:</source>
@@ -7478,7 +7478,7 @@
           <context context-type="sourcefile">src/app/components/common/share-link-bundle-dialog/share-link-bundle-dialog.component.html</context>
           <context context-type="linenumber">68</context>
         </context-group>
-        <target state="needs-translation">Share link</target>
+        <target state="translated">Del kobling</target>
       </trans-unit>
       <trans-unit id="2618101617221155143" datatype="html">
         <source>Copy link</source>
@@ -8416,7 +8416,7 @@
           <context context-type="sourcefile">src/app/components/document-asn/document-asn.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn()}}"/></target>
+        <target state="translated">Søker etter dokument med asn<x id="INTERPOLATION" equiv-text="{{asn()}}"/></target>
       </trans-unit>
       <trans-unit id="1407560924967345762" datatype="html">
         <source>Page</source>
@@ -9720,7 +9720,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="document().title | documentTitle }}"/> thumbnail</target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="document().title | documentTitle }}"/> miniatyr</target>
       </trans-unit>
       <trans-unit id="2784168796433474565" datatype="html">
         <source>Filter by tag</source>
@@ -10008,7 +10008,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">135</context>
         </context-group>
-        <target state="translated">{VAR_PLURAL, plural, one {}=1 {1 dokument} other {E-post <x id="INTERPOLATION"/> dokumenter}}</target>
+        <target state="translated">{VAR_PLURAL, plural, one {}=1 {1 dokument} other {<x id="INTERPOLATION"/> dokumenter}}</target>
       </trans-unit>
       <trans-unit id="2243770355958919528" datatype="html">
         <source>(filtered)</source>
@@ -11328,7 +11328,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/processed-mail-dialog/processed-mail-dialog.component.html</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Select all processed email messages</target>
+        <target state="translated">Velg alle behandlede e-postmeldinger</target>
       </trans-unit>
       <trans-unit id="8691920320483720007" datatype="html">
         <source>Received</source>

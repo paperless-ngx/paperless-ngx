@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-25 07:12+0000\n"
-"PO-Revision-Date: 2026-07-25 07:14\n"
+"PO-Revision-Date: 2026-07-25 23:30\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -2386,7 +2386,7 @@ msgstr "uid (NO)"
 
 #: paperless_mail/models.py:342
 msgid "uid validity"
-msgstr ""
+msgstr "uid gyldighet"
 
 #: paperless_mail/models.py:350
 msgid "subject"
