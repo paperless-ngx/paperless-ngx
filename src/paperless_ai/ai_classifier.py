@@ -40,7 +40,9 @@ def build_prompt_without_rag(
     Analyze the following document and extract the following information:
     - A short descriptive title
     - Tags that reflect the content
-    - Names of people or organizations mentioned
+    - The organization or person that issued or sent this document.
+      Not the recipient: if the document is addressed to someone, that
+      person is not the answer.
     - The type or category of the document
     - Suggested folder paths for storing the document
     - Up to 3 relevant dates in YYYY-MM-DD format

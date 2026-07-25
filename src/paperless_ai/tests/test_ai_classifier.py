@@ -235,6 +235,22 @@ def test_prompt_with_without_rag(mock_document):
         assert "Do not translate correspondents or dates" in prompt
 
 
+@pytest.mark.django_db
+@override_settings(
+    LLM_EMBEDDING_BACKEND="huggingface",
+    LLM_BACKEND="ollama",
+    LLM_MODEL="some_model",
+)
+def test_prompt_asks_for_sender_not_mentioned_names(mock_document):
+    """The correspondent is the issuer, so the prompt must not ask for every
+    name that appears in the document - the recipient appears in most of them.
+    """
+    prompt = build_prompt_without_rag(mock_document, AIConfig())
+
+    assert "issued or sent this document" in prompt
+    assert "Not the recipient" in prompt
+
+
 def test_get_language_name_falls_back_to_language_code():
     assert get_language_name("zz-zz") == "zz-zz"
 
