@@ -1,5 +1,64 @@
 # Changelog
 
+## paperless-ngx 3.0.2
+
+### Bug Fixes
+
+- Fix: fix broken migration in 3.0.1 [@shamoon](https://github.com/shamoon) ([#13242](https://github.com/paperless-ngx/paperless-ngx/pull/13242))
+
+### All App Changes
+
+- Fix: fix broken migration in 3.0.1 [@shamoon](https://github.com/shamoon) ([#13242](https://github.com/paperless-ngx/paperless-ngx/pull/13242))
+
+## paperless-ngx 3.0.1
+
+### Bug Fixes
+
+- Fix: selection\_data re-derives the filtered document set 5 times over [@stumpylog](https://github.com/stumpylog) ([#13229](https://github.com/paperless-ngx/paperless-ngx/pull/13229))
+- Fix: exclude source document from its own RAG similarity results [@stumpylog](https://github.com/stumpylog) ([#13233](https://github.com/paperless-ngx/paperless-ngx/pull/13233))
+- Fix: split mailrule maximum\_age clamp into its own migration [@stumpylog](https://github.com/stumpylog) ([#13231](https://github.com/paperless-ngx/paperless-ngx/pull/13231))
+- Chore: mark yes in confirm button for translation [@shamoon](https://github.com/shamoon) ([#13225](https://github.com/paperless-ngx/paperless-ngx/pull/13225))
+- Fix: correct URL for W001 check [@shamoon](https://github.com/shamoon) ([#13220](https://github.com/paperless-ngx/paperless-ngx/pull/13220))
+- Fix: ensure create dialog uses correct attribute type [@shamoon](https://github.com/shamoon) ([#13221](https://github.com/paperless-ngx/paperless-ngx/pull/13221))
+- Fix: correct database engine from postgres to postgresql [@OberstVonGatow](https://github.com/OberstVonGatow) ([#13213](https://github.com/paperless-ngx/paperless-ngx/pull/13213))
+- Fix: remove unnecessary .distinct() dominating document list queries [@stumpylog](https://github.com/stumpylog) ([#13205](https://github.com/paperless-ngx/paperless-ngx/pull/13205))
+- Fix: also wrap non-breaking words in chat messages, handle whitespace [@shamoon](https://github.com/shamoon) ([#13211](https://github.com/paperless-ngx/paperless-ngx/pull/13211))
+- Fix: tag/custom-field document\_count scales badly with tag count [@stumpylog](https://github.com/stumpylog) ([#13203](https://github.com/paperless-ngx/paperless-ngx/pull/13203))
+- Fix: batch document user\_can\_change checks to avoid per-row N+1 [@stumpylog](https://github.com/stumpylog) ([#13204](https://github.com/paperless-ngx/paperless-ngx/pull/13204))
+- Fix: fix app title restoration [@shamoon](https://github.com/shamoon) ([#13208](https://github.com/paperless-ngx/paperless-ngx/pull/13208))
+- Fix: handle long wrapping titles in AI chat document list [@shamoon](https://github.com/shamoon) ([#13206](https://github.com/paperless-ngx/paperless-ngx/pull/13206))
+
+### Dependencies
+
+- Chore(deps-dev): Bump postcss from 8.5.6 to 8.5.22 in /src/paperless\_mail/templates in the npm\_and\_yarn group across 1 directory @[dependabot[bot]](https://github.com/apps/dependabot) ([#13236](https://github.com/paperless-ngx/paperless-ngx/pull/13236))
+- Chore(deps): Bump pyasn1 from 0.6.3 to 0.6.4 in the uv group across 1 directory @[dependabot[bot]](https://github.com/apps/dependabot) ([#13237](https://github.com/paperless-ngx/paperless-ngx/pull/13237))
+- Chore(deps): Bump the uv group across 1 directory with 8 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#13189](https://github.com/paperless-ngx/paperless-ngx/pull/13189))
+
+### All App Changes
+
+<details>
+<summary>17 changes</summary>
+
+- Chore(deps-dev): Bump postcss from 8.5.6 to 8.5.22 in /src/paperless\_mail/templates in the npm\_and\_yarn group across 1 directory @[dependabot[bot]](https://github.com/apps/dependabot) ([#13236](https://github.com/paperless-ngx/paperless-ngx/pull/13236))
+- Fix: selection\_data re-derives the filtered document set 5 times over [@stumpylog](https://github.com/stumpylog) ([#13229](https://github.com/paperless-ngx/paperless-ngx/pull/13229))
+- Chore: reword "Settings > Default permissions" description for clarity [@NotaInutilis](https://github.com/NotaInutilis) ([#13232](https://github.com/paperless-ngx/paperless-ngx/pull/13232))
+- Chore(deps): Bump pyasn1 from 0.6.3 to 0.6.4 in the uv group across 1 directory @[dependabot[bot]](https://github.com/apps/dependabot) ([#13237](https://github.com/paperless-ngx/paperless-ngx/pull/13237))
+- Chore(deps): Bump the uv group across 1 directory with 8 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#13189](https://github.com/paperless-ngx/paperless-ngx/pull/13189))
+- Fix: exclude source document from its own RAG similarity results [@stumpylog](https://github.com/stumpylog) ([#13233](https://github.com/paperless-ngx/paperless-ngx/pull/13233))
+- Fix: split mailrule maximum\_age clamp into its own migration [@stumpylog](https://github.com/stumpylog) ([#13231](https://github.com/paperless-ngx/paperless-ngx/pull/13231))
+- Chore: mark yes in confirm button for translation [@shamoon](https://github.com/shamoon) ([#13225](https://github.com/paperless-ngx/paperless-ngx/pull/13225))
+- Fix: correct URL for W001 check [@shamoon](https://github.com/shamoon) ([#13220](https://github.com/paperless-ngx/paperless-ngx/pull/13220))
+- Fix: ensure create dialog uses correct attribute type [@shamoon](https://github.com/shamoon) ([#13221](https://github.com/paperless-ngx/paperless-ngx/pull/13221))
+- Fix: correct database engine from postgres to postgresql [@OberstVonGatow](https://github.com/OberstVonGatow) ([#13213](https://github.com/paperless-ngx/paperless-ngx/pull/13213))
+- Fix: remove unnecessary .distinct() dominating document list queries [@stumpylog](https://github.com/stumpylog) ([#13205](https://github.com/paperless-ngx/paperless-ngx/pull/13205))
+- Fix: also wrap non-breaking words in chat messages, handle whitespace [@shamoon](https://github.com/shamoon) ([#13211](https://github.com/paperless-ngx/paperless-ngx/pull/13211))
+- Fix: tag/custom-field document\_count scales badly with tag count [@stumpylog](https://github.com/stumpylog) ([#13203](https://github.com/paperless-ngx/paperless-ngx/pull/13203))
+- Fix: batch document user\_can\_change checks to avoid per-row N+1 [@stumpylog](https://github.com/stumpylog) ([#13204](https://github.com/paperless-ngx/paperless-ngx/pull/13204))
+- Fix: fix app title restoration [@shamoon](https://github.com/shamoon) ([#13208](https://github.com/paperless-ngx/paperless-ngx/pull/13208))
+- Fix: handle long wrapping titles in AI chat document list [@shamoon](https://github.com/shamoon) ([#13206](https://github.com/paperless-ngx/paperless-ngx/pull/13206))
+
+</details>
+
 ## paperless-ngx 3.0.0
 
 ### Breaking Changes
