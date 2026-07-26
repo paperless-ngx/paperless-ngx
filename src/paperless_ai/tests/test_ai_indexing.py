@@ -8,7 +8,9 @@ from django.test import override_settings
 from django.utils import timezone
 from llama_index.core.schema import MetadataMode
 
+from documents.models import Correspondent
 from documents.models import Document
+from documents.models import DocumentType
 from documents.models import PaperlessTask
 from documents.signals import document_consumption_finished
 from documents.signals import document_updated
@@ -93,6 +95,38 @@ def test_build_document_node_structured_fields_in_metadata(
         assert "created" in node.metadata
         assert "added" in node.metadata
         assert "modified" in node.metadata
+
+
+@pytest.mark.django_db
+def test_build_document_node_survives_concurrently_deleted_correspondent(
+    real_document: Document,
+) -> None:
+    """Regression test for #13314.
+
+    If a document's correspondent (or document type) is deleted after the
+    in-memory Document instance was loaded but before build_document_node
+    resolves the relation, accessing the FK must not raise -- it should
+    behave like an unset FK and produce None in the metadata instead of
+    aborting the whole indexing pass.
+    """
+    correspondent = Correspondent.objects.create(name="Stale Correspondent")
+    document_type = DocumentType.objects.create(name="Stale Type")
+    real_document.correspondent = correspondent
+    real_document.document_type = document_type
+    real_document.save()
+
+    # Re-fetch to get an instance whose correspondent/document_type relations
+    # are unresolved (not yet cached), mirroring a task that loaded the
+    # document before the concurrent deletion below.
+    stale_document = Document.objects.get(pk=real_document.pk)
+
+    correspondent.delete()
+    document_type.delete()
+
+    nodes = indexing.build_document_node(stale_document)
+    assert len(nodes) > 0
+    assert nodes[0].metadata["correspondent"] is None
+    assert nodes[0].metadata["document_type"] is None
 
 
 @pytest.mark.django_db

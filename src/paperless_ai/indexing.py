@@ -5,6 +5,7 @@ from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from filelock import FileLock
 from filelock import ReadWriteLock
@@ -167,6 +168,19 @@ def write_store(embed_model_name: str | None = None):
         yield store
 
 
+def _safe_related_name(document: Document, field: str) -> str | None:
+    """
+    Returns the ``name`` of a related object (correspondent, document_type,
+    storage_path), or None if the FK is unset or points at a row that has
+    since been deleted (e.g. concurrently with this call).
+    """
+    try:
+        related = getattr(document, field)
+    except ObjectDoesNotExist:
+        return None
+    return related.name if related else None
+
+
 def build_document_node(
     document: Document,
     *,
@@ -180,14 +194,10 @@ def build_document_node(
         "document_id": str(document.id),
         "title": document.title,
         "tags": [t.name for t in document.tags.all()],
-        "correspondent": document.correspondent.name
-        if document.correspondent
-        else None,
-        "document_type": document.document_type.name
-        if document.document_type
-        else None,
+        "correspondent": _safe_related_name(document, "correspondent"),
+        "document_type": _safe_related_name(document, "document_type"),
         "filename": document.filename,
-        "storage_path": document.storage_path.name if document.storage_path else None,
+        "storage_path": _safe_related_name(document, "storage_path"),
         "archive_serial_number": document.archive_serial_number,
         "created": document.created.isoformat() if document.created else None,
         "added": document.added.isoformat() if document.added else None,
