@@ -283,6 +283,22 @@ describe('PngxPdfViewerComponent', () => {
     expect(mockViewer.currentPageNumber).toBe(1)
   })
 
+  it('reloads when the source revision changes', () => {
+    const resetSpy = jest.spyOn(component as any, 'resetViewerState')
+    const loadSpy = jest
+      .spyOn(component as any, 'loadDocument')
+      .mockImplementation(() => {})
+    component.src = 'test.pdf'
+    component.sourceRevision = 1
+
+    component.ngOnChanges({
+      sourceRevision: new SimpleChange(0, 1, false),
+    })
+
+    expect(resetSpy).toHaveBeenCalled()
+    expect(loadSpy).toHaveBeenCalled()
+  })
+
   it('applies viewer state after view init when already loaded', () => {
     const applySpy = jest.spyOn(component as any, 'applyViewerState')
     ;(component as any).hasLoaded = true
