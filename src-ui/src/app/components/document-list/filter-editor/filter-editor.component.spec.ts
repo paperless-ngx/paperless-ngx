@@ -2180,17 +2180,17 @@ describe('FilterEditorComponent', () => {
   it('should support Enter / Esc key on text field', () => {
     component.textFilterInput.nativeElement.value = 'foo'
     component.textFilterInput.nativeElement.dispatchEvent(
-      new KeyboardEvent('keyup', { key: 'Enter' })
+      new KeyboardEvent('keydown', { key: 'Enter' })
     )
     expect(component.textFilter).toEqual('foo')
     component.textFilterInput.nativeElement.value = 'foo bar'
     component.textFilterInput.nativeElement.dispatchEvent(
-      new KeyboardEvent('keyup', { key: 'Escape' })
+      new KeyboardEvent('keydown', { key: 'Escape' })
     )
     expect(component.textFilter).toEqual('')
     const blurSpy = jest.spyOn(component.textFilterInput.nativeElement, 'blur')
     component.textFilterInput.nativeElement.dispatchEvent(
-      new KeyboardEvent('keyup', { key: 'Escape' })
+      new KeyboardEvent('keydown', { key: 'Escape' })
     )
     expect(blurSpy).toHaveBeenCalled()
   })
