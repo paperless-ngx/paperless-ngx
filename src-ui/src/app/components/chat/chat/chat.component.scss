@@ -5,6 +5,7 @@
 .chat-messages {
   max-height: 350px;
   overflow-y: auto;
+  white-space: pre-wrap;
 }
 
 .chat-references {

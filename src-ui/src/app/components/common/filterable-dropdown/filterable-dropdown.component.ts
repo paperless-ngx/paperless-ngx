@@ -12,6 +12,7 @@ import {
   Output,
   ViewChild,
   inject,
+  signal,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
@@ -660,7 +661,6 @@ export class FilterableDropdownSelectionModel {
   imports: [
     ClearableBadgeComponent,
     ToggleableDropdownButtonComponent,
-    FilterPipe,
     FormsModule,
     ReactiveFormsModule,
     NgxBootstrapIconsModule,
@@ -796,22 +796,27 @@ export class FilterableDropdownComponent
     return this.title ? this.title.replace(/\s/g, '_').toLowerCase() : null
   }
 
-  modelIsDirty: boolean = false
+  readonly modelIsDirty = signal(false)
 
   private keyboardIndex: number
 
+  public get filteredItems(): MatchingModel[] {
+    return this.filterPipe
+      .transform(this.items, this.filterText, 'name')
+      .filter((item) => this.allowSelectNone || Boolean(item.id))
+  }
+
   public get scrollViewportHeight(): number {
-    const filteredLength = this.filterPipe.transform(
-      this.items,
-      this.filterText
-    ).length
-    return Math.min(filteredLength * this.FILTERABLE_BUTTON_HEIGHT_PX, 400)
+    return Math.min(
+      this.filteredItems.length * this.FILTERABLE_BUTTON_HEIGHT_PX,
+      400
+    )
   }
 
   constructor() {
     super()
     this.selectionModelChange.subscribe((updatedModel) => {
-      this.modelIsDirty = updatedModel.isDirty()
+      this.modelIsDirty.set(updatedModel.isDirty())
     })
   }
 
@@ -858,7 +863,7 @@ export class FilterableDropdownComponent
       }, 0)
       if (this.editing) {
         this.selectionModel.reset()
-        this.modelIsDirty = false
+        this.modelIsDirty.set(false)
       }
       this.selectionModel.singleSelect =
         this.editing && !this.selectionModel.manyToOne
@@ -877,7 +882,7 @@ export class FilterableDropdownComponent
   }
 
   listFilterEnter(): void {
-    let filtered = this.filterPipe.transform(this.items, this.filterText)
+    const filtered = this.filteredItems
     if (filtered.length == 1) {
       this.selectionModel.toggle(filtered[0].id)
       setTimeout(() => {

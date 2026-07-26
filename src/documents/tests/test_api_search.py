@@ -832,6 +832,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         """
         u1 = User.objects.create_user("user1")
         u2 = User.objects.create_user("user2")
+        u1.user_permissions.add(Permission.objects.get(codename="view_document"))
 
         self.client.force_authenticate(user=u1)
 
@@ -877,6 +878,30 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         response = self.client.get("/api/search/autocomplete/?term=app")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, ["applebaum", "apples", "appletini"])
+
+    def test_search_autocomplete_group_revocation_is_immediate(self) -> None:
+        user = User.objects.create_user("group-user")
+        owner = User.objects.create_user("document-owner")
+        group = Group.objects.create(name="temporary-viewers")
+        user.user_permissions.add(Permission.objects.get(codename="view_document"))
+        user.groups.add(group)
+
+        document = Document.objects.create(
+            title="private",
+            content="canarysecretautocomplete",
+            checksum="group-revocation",
+            owner=owner,
+        )
+        assign_perm("view_document", group, document)
+        get_backend().add_or_update(document)
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get("/api/search/autocomplete/?term=canarysecret")
+        self.assertEqual(response.data, ["canarysecretautocomplete"])
+
+        user.groups.remove(group)
+        response = self.client.get("/api/search/autocomplete/?term=canarysecret")
+        self.assertEqual(response.data, [])
 
     def test_search_autocomplete_field_name_match(self) -> None:
         """

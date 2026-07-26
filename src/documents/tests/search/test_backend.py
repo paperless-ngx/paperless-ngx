@@ -1,5 +1,7 @@
 import pytest
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from guardian.shortcuts import assign_perm
 from pytest_mock import MockerFixture
 
 from documents.models import CustomField
@@ -15,6 +17,7 @@ from documents.tests.factories import CorrespondentFactory
 from documents.tests.factories import DocumentFactory
 from documents.tests.factories import DocumentTypeFactory
 from documents.tests.factories import TagFactory
+from documents.tests.factories import UserFactory
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
 
@@ -260,6 +263,36 @@ class TestSearch:
             len(backend.search_ids("sswo gu", user=None, search_mode=SearchMode.TITLE))
             == 1
         )
+
+    @pytest.mark.parametrize(
+        ("search_mode", "query"),
+        [
+            pytest.param(SearchMode.TITLE, "12345", id="title_search"),
+            pytest.param(SearchMode.TEXT, "12345", id="text_search"),
+            pytest.param(SearchMode.QUERY, None, id="query_title_exact"),
+        ],
+    )
+    def test_search_modes_match_model_limit_title_tokens(
+        self,
+        backend: TantivyBackend,
+        search_mode: SearchMode,
+        query: str | None,
+    ) -> None:
+        """Search must keep filename-like title tokens up to the model limit."""
+        long_title = "1234567890" * 12 + "12345678"
+        doc = Document.objects.create(
+            title=long_title,
+            content="ordinary content",
+            checksum="TXT12",
+            pk=18,
+        )
+        backend.add_or_update(doc)
+
+        assert backend.search_ids(
+            query or f"title:{long_title}",
+            user=None,
+            search_mode=search_mode,
+        ) == [doc.pk]
 
     @pytest.mark.parametrize(
         ("mode", "title", "content", "hits", "misses"),
@@ -531,17 +564,47 @@ class TestRebuild:
     """Test index rebuilding functionality."""
 
     def test_with_iter_wrapper_called(self, backend: TantivyBackend) -> None:
-        """Index rebuild must pass documents through iter_wrapper for progress tracking."""
+        """Index rebuild must pass (document, viewer_ids) pairs through iter_wrapper."""
         seen = []
 
-        def wrapper(docs):
-            for doc in docs:
+        def wrapper(pairs):
+            for doc, viewer_ids in pairs:
                 seen.append(doc.pk)
-                yield doc
+                yield doc, viewer_ids
 
         Document.objects.create(title="Tracked", content="x", checksum="TW1", pk=30)
         backend.rebuild(Document.objects.all(), iter_wrapper=wrapper)
         assert 30 in seen
+
+    def test_includes_group_granted_viewers(self, backend: TantivyBackend) -> None:
+        """Rebuild must index viewer ids for group-only grants, not just direct ones.
+
+        The batched viewer-id lookup used during rebuild() must mirror
+        get_users_with_perms(with_group_users=True), which is the default
+        used by the non-batched per-document indexing path. Without it, a
+        user who can only see a document via group membership would lose
+        search access to it after any full reindex.
+        """
+        owner = UserFactory()
+        group_member = UserFactory()
+        group = Group.objects.create(name="viewers")
+        group_member.groups.add(group)
+
+        doc = DocumentFactory(
+            title="Group shared doc",
+            content="group secret keyword",
+            owner=owner,
+        )
+        assign_perm("view_document", group, doc)
+
+        backend.rebuild(Document.objects.all())
+
+        ids = backend.search_ids(
+            "group secret",
+            user=group_member,
+            search_mode=SearchMode.QUERY,
+        )
+        assert ids == [doc.pk]
 
 
 class TestAutocomplete:
@@ -779,6 +842,23 @@ class TestFieldHandling:
         ids = backend.search_ids("notes.note:important", user=None)
         assert len(ids) == 1, (
             f"Expected 1, got {len(ids)}. Note content should be searchable via notes.note: prefix."
+        )
+
+    def test_notes_without_user_are_indexed(self, backend: TantivyBackend) -> None:
+        """Notes whose user was deleted (SET_NULL) must not break indexing."""
+        doc = Document.objects.create(
+            title="Doc with orphaned note",
+            content="test",
+            checksum="NT2",
+            pk=81,
+        )
+        Note.objects.create(document=doc, note="Orphaned note", user=None)
+
+        backend.add_or_update(doc)
+
+        ids = backend.search_ids("notes.note:orphaned", user=None)
+        assert len(ids) == 1, (
+            f"Expected 1, got {len(ids)}. Notes without a user should still be indexed."
         )
 
 

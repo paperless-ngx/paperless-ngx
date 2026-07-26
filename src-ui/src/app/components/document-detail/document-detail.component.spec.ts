@@ -510,7 +510,7 @@ describe('DocumentDetailComponent', () => {
     const deleteButtons = fixture.debugElement.queryAll(
       By.css('pngx-confirm-button')
     )
-    expect(deleteButtons.length).toEqual(1)
+    expect(deleteButtons).toHaveLength(1)
   })
 
   it('should fall back to details tab when duplicates tab is active but no duplicates', () => {
@@ -1602,6 +1602,7 @@ describe('DocumentDetailComponent', () => {
     expect(openDoc.__changedFields).toEqual([])
     expect(setDirtySpy).toHaveBeenCalledWith(openDoc, false)
     expect(saveSpy).toHaveBeenCalled()
+    expect(component.previewRevision()).toBe(1)
   })
 
   it('should ignore incoming update for a different document id', () => {

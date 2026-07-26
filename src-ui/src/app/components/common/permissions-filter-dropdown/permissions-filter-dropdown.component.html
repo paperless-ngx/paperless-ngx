@@ -68,7 +68,7 @@
             [(ngModel)]="selectionModel.includeUsers"
             [disabled]="disabled"
             [clearable]="false"
-            [items]="users"
+            [items]="users()"
             bindLabel="username"
             multiple="true"
             bindValue="id"

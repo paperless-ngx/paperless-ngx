@@ -933,7 +933,7 @@ export class WorkflowEditDialogComponent
 
   getFilterSelectItems(type: TriggerFilterType) {
     const definition = this.getFilterDefinition(type)
-    if (!definition || definition.inputType !== 'select') {
+    if (definition?.inputType !== 'select') {
       return []
     }
 

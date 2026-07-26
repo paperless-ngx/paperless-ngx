@@ -315,7 +315,7 @@
                     <td>{{metadata()?.original_filename}}</td>
                   </tr>
                   <tr>
-                    <td i18n>Original MD5 checksum</td>
+                    <td i18n>Original SHA256 checksum</td>
                     <td>{{metadata()?.original_checksum}}</td>
                   </tr>
                   <tr>
@@ -328,7 +328,7 @@
                   </tr>
                   @if (metadata()?.has_archive_version) {
                     <tr>
-                      <td i18n>Archive MD5 checksum</td>
+                      <td i18n>Archive SHA256 checksum</td>
                       <td>{{metadata()?.archive_checksum}}</td>
                     </tr>
                   }
@@ -472,6 +472,7 @@
           <div class="preview-sticky pdf-viewer-container">
             <pngx-pdf-viewer
               [src]="pdfSource()"
+              [sourceRevision]="previewRevision()"
               [password]="pdfPassword()"
               [renderMode]="PdfRenderMode.All"
               [page]="previewCurrentPage()" (pageChange)="previewCurrentPage.set($event)"
@@ -482,9 +483,7 @@
             </pngx-pdf-viewer>
           </div>
         } @else {
-          <object [data]="previewUrl() | safeUrl" class="preview-sticky" width="100%">
-            <span>Preview is unavailable.</span>
-          </object>
+          <object [data]="previewUrl() | safeUrl" class="preview-sticky" width="100%"></object>
         }
       }
       @case (ContentRenderType.Text) {
@@ -505,9 +504,7 @@
         }
       }
       @case (ContentRenderType.Other) {
-        <object [data]="previewUrl() | safeUrl" class="preview-sticky" width="100%">
-          <span>Preview is unavailable.</span>
-        </object>
+        <object [data]="previewUrl() | safeUrl" class="preview-sticky" width="100%"></object>
       }
     }
     @if (requiresPassword) {

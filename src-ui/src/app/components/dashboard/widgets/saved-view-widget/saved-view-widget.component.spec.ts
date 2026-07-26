@@ -1,6 +1,10 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { DatePipe } from '@angular/common'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import {
+  HttpErrorResponse,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
@@ -8,7 +12,7 @@ import { Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { Subject, of } from 'rxjs'
+import { Subject, of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import { CustomFieldDisplayComponent } from 'src/app/components/common/custom-field-display/custom-field-display.component'
 import { PreviewPopupComponent } from 'src/app/components/common/preview-popup/preview-popup.component'
@@ -228,6 +232,27 @@ describe('SavedViewWidgetComponent', () => {
     )
     fixture.detectChanges()
     expect(component.documents()).toEqual(documentResults)
+  })
+
+  it('should show an error if documents fail to load', () => {
+    jest.spyOn(documentService, 'listFiltered').mockReturnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            error: { added__date__lte: ['Enter a valid date.'] },
+            status: 400,
+          })
+      )
+    )
+
+    component.reload()
+    fixture.detectChanges()
+
+    expect(component.loading()).toBe(false)
+    expect(component.error()).toEqual('Added: Enter a valid date.')
+    expect(fixture.debugElement.nativeElement.textContent).toContain(
+      'Error while loading documents: Added: Enter a valid date.'
+    )
   })
 
   it('should reload on document consumption finished', () => {

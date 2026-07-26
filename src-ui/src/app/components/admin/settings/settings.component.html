@@ -37,7 +37,7 @@
 
 <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
 
-  <ul ngbNav #nav="ngbNav" (navChange)="onNavChange($event)" [(activeId)]="activeNavID" class="nav-tabs">
+  <ul ngbNav #nav="ngbNav" (navChange)="onNavChange($event)" [activeId]="activeNavID()" (activeIdChange)="activeNavID.set($event)" class="nav-tabs">
     <li [ngbNavItem]="SettingsNavIDs.General">
       <a ngbNavLink i18n>General</a>
       <ng-template ngbNavContent>
@@ -150,10 +150,10 @@
 
             <div class="row mb-3">
               <div class="col-md-3 col-form-label pt-0">
-                <span i18n>Full search links to</span>
+                <label for="searchLink" i18n>Full search links to</label>
               </div>
               <div class="col mb-3">
-                <select class="form-select" formControlName="searchLink">
+                <select id="searchLink" class="form-select" formControlName="searchLink">
                   <option [ngValue]="GlobalSearchType.TITLE_CONTENT" i18n>Title and content search</option>
                   <option [ngValue]="GlobalSearchType.ADVANCED" i18n>Advanced search</option>
                 </select>
@@ -199,10 +199,10 @@
             <h5 i18n>Documents</h5>
             <div class="row mb-3">
               <div class="col-md-3 col-form-label pt-0">
-                <span i18n>Items per page</span>
+                <label for="documentListItemPerPage" i18n>Items per page</label>
               </div>
               <div class="col">
-                <select class="form-select" formControlName="documentListItemPerPage">
+                <select id="documentListItemPerPage" class="form-select" formControlName="documentListItemPerPage">
                   <option [ngValue]="10">10</option>
                   <option [ngValue]="25">25</option>
                   <option [ngValue]="50">50</option>
@@ -274,10 +274,10 @@
             <h5 class="mt-3" i18n>PDF Editor</h5>
             <div class="row">
               <div class="col-md-3 col-form-label pt-0">
-                <span i18n>Default editing mode</span>
+                <label for="pdfEditorDefaultEditMode" i18n>Default editing mode</label>
               </div>
               <div class="col">
-                <select class="form-select" formControlName="pdfEditorDefaultEditMode">
+                <select id="pdfEditorDefaultEditMode" class="form-select" formControlName="pdfEditorDefaultEditMode">
                   <option [ngValue]="PdfEditorEditMode.Create" i18n>Create new document(s)</option>
                   <option [ngValue]="PdfEditorEditMode.Update" i18n>Add document version</option>
                 </select>
@@ -304,7 +304,7 @@
         <div class="row mb-3">
           <div class="col">
             <p i18n>
-              Settings apply to this user account for objects (Tags, Mail Rules, etc. but not documents) created via the web UI.
+              Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI. These settings do not apply to documents.
             </p>
           </div>
         </div>

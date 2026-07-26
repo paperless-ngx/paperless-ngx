@@ -280,23 +280,58 @@ main {
   }
 }
 
-@media screen and (min-width: 376px) and (max-width: 768px) {
+@media screen and (max-width: 575.98px) {
+  .navbar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-areas:
+      "toggler brand actions"
+      "search search search";
+  }
+
   .navbar-toggler {
-    // compensate for 2 buttons on the right
-    margin-right: 45px;
+    grid-area: toggler;
+    text-align: left;
+  }
+
+  .navbar-brand {
+    grid-area: brand;
+    min-width: 0;
+    max-width: 100%;
+    justify-self: center;
+    overflow: hidden;
+
+    > div,
+    .custom-title {
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
+    }
+
+    .title,
+    .byline {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .search-container {
+    grid-area: search;
+    width: 100%;
+  }
+
+  .navbar > ul {
+    grid-area: actions;
+    justify-self: end;
+    flex-wrap: nowrap;
   }
 }
 
 @media screen and (min-width: 768px) {
   .navbar-brand.slim {
     max-width: 50px;
-  }
-}
-
-@media screen and (max-width: 345px) {
-  .custom-title {
-    max-width: 110px;
-    overflow: hidden;
   }
 }
 

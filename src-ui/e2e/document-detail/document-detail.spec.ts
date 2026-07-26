@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type WebSocketRoute } from '@playwright/test'
 import path from 'node:path'
 
 const REQUESTS_HAR = path.join(__dirname, 'requests/api-document-detail.har')
@@ -94,4 +94,61 @@ test('should support quick filters', async ({ page }) => {
     .getByRole('button', { name: 'Filter documents with these Tags' })
     .click()
   await expect(page).toHaveURL(/tags__id__all=4&sort=created&reverse=1&page=1/)
+})
+
+test('should finish reloading the preview after a remote document update', async ({
+  page,
+}) => {
+  let resolveStatusSocket: (socket: WebSocketRoute) => void
+  const statusSocketReady = new Promise<WebSocketRoute>((resolve) => {
+    resolveStatusSocket = resolve
+  })
+  await page.routeWebSocket(/\/ws\/status\/$/, (socket) => {
+    resolveStatusSocket(socket)
+  })
+  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
+  let previewRequestCount = 0
+  page.on('request', (request) => {
+    if (request.url().includes('/api/documents/175/preview/')) {
+      previewRequestCount++
+    }
+  })
+  await page.goto('/documents/175/details')
+
+  await page.locator('pngx-document-detail').waitFor()
+  await expect(page.getByTitle('Storage path', { exact: true })).toHaveText(
+    /\w+/
+  )
+  const previewWasLoaded = await page.evaluate(() => {
+    const detail = document.querySelector('pngx-document-detail')
+    const component = (window as any).ng.getComponent(detail)
+    component.pdfPreviewLoaded({ numPages: 1 })
+    return component.previewLoaded()
+  })
+  expect(previewWasLoaded).toBe(true)
+  const previewRequestsBeforeReload = previewRequestCount
+
+  const statusSocket = await statusSocketReady
+  const documentReloaded = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/documents/175/?full_perms=true') &&
+      response.request().method() === 'GET'
+  )
+  statusSocket.send(
+    JSON.stringify({
+      type: 'document_updated',
+      data: {
+        document_id: 175,
+        modified: '2026-07-26T20:00:00Z',
+      },
+    })
+  )
+  await documentReloaded
+
+  await expect(
+    page.getByText('Document reloaded with latest changes.').first()
+  ).toBeVisible()
+  await expect
+    .poll(() => previewRequestCount)
+    .toBeGreaterThan(previewRequestsBeforeReload + 1)
 })

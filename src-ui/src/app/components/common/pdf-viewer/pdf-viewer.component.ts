@@ -43,6 +43,7 @@ export class PngxPdfViewerComponent
   private readonly document = inject<Document>(DOCUMENT)
 
   @Input() src!: string
+  @Input() sourceRevision = 0
   @Input() password?: string
   @Input() page?: number
   @Output() pageChange = new EventEmitter<number>()
@@ -93,7 +94,7 @@ export class PngxPdfViewerComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['src'] || changes['password']) {
+    if (changes['src'] || changes['sourceRevision'] || changes['password']) {
       this.resetViewerState()
       if (this.src) {
         this.loadDocument()
@@ -174,10 +175,12 @@ export class PngxPdfViewerComponent
       'assets/js/pdf.worker.min.mjs',
       this.document.baseURI
     ).toString()
-    let initOptions = {
+    const initOptions = {
       url: this.src,
       password: this.password,
       withCredentials: true,
+      wasmUrl: new URL('assets/wasm/', this.document.baseURI).toString(),
+      iccUrl: new URL('assets/iccs/', this.document.baseURI).toString(),
     }
     this.loadingTask = getDocument(initOptions)
     try {
@@ -254,7 +257,9 @@ export class PngxPdfViewerComponent
         Math.max(Math.trunc(this.page), 1),
         this.pdfViewer.pagesCount
       )
-      this.pdfViewer.currentPageNumber = nextPage
+      if (nextPage !== this.pdfViewer.currentPageNumber) {
+        this.pdfViewer.currentPageNumber = nextPage
+      }
     }
     if (this.page === this.lastViewerPage) {
       this.lastViewerPage = undefined

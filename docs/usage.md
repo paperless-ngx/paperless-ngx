@@ -458,8 +458,8 @@ For related metadata such as tags, correspondents, document types, and storage p
 ### Password reset
 
 In order to enable the password reset feature you will need to setup an SMTP backend, see
-[`PAPERLESS_EMAIL_HOST`](configuration.md#PAPERLESS_EMAIL_HOST). If your installation does not have
-[`PAPERLESS_URL`](configuration.md#PAPERLESS_URL) set, the reset link included in emails will use the server host.
+[`PAPERLESS_EMAIL_HOST`](configuration.md#PAPERLESS_EMAIL_HOST). You should also set
+[`PAPERLESS_URL`](configuration.md#PAPERLESS_URL) and / or its corresponding configuration settings.
 
 ### Two-factor authentication
 
@@ -833,10 +833,10 @@ contract you signed 8 years ago).
 
 When you search paperless for a document, it tries to match this query
 against your documents. Paperless will look for matching documents by
-inspecting their content, title, correspondent, type, tags, notes, and
-custom field values. Paperless returns a scored list of results, so that
-documents matching your query better will appear further up in the search
-results.
+inspecting their content, title, correspondent, type, and tags. Paperless
+returns a scored list of results, so that documents matching your query
+better will appear further up in the search results. Notes and custom field
+values can be searched using the advanced search syntax described below.
 
 By default, paperless returns only documents which contain all words
 typed in the search bar. A few things to know about how matching works:
@@ -891,9 +891,9 @@ Supported date keywords: `today`, `yesterday`, `previous week`,
 
 #### Searching custom fields
 
-Custom field values are included in the full-text index, so a plain search
-already matches documents whose custom field values contain your search terms.
-To narrow by field name or value specifically:
+Custom field names and values are included in the full-text index, but they
+are not searched by a plain, unqualified query. Use the advanced search syntax
+to search by field name or value:
 
 ```
 custom_fields.value:policy
@@ -921,8 +921,9 @@ custom_fields.name:"Contract Number" custom_fields.value:1312
 
 #### Searching notes
 
-Notes content is included in full-text search automatically. To search
-by note author or content specifically:
+Notes are included in the full-text index, but they are not searched by a
+plain, unqualified query. Use the advanced search syntax to search by note
+author or content:
 
 ```
 notes.user:alice

@@ -205,7 +205,7 @@ describe('DocumentVersionDropdownComponent', () => {
       { id: 3, is_root: true, checksum: 'aaaa' },
       { id: 10, is_root: false, checksum: 'bbbb', version_label: 'Updated' },
     ])
-    expect(component.savingVersionLabelId).toBeNull()
+    expect(component.savingVersionLabelId()).toBeNull()
   })
 
   it('saveVersionLabel should show error toast on failure', () => {
@@ -218,7 +218,7 @@ describe('DocumentVersionDropdownComponent', () => {
       'Error updating version label',
       error
     )
-    expect(component.savingVersionLabelId).toBeNull()
+    expect(component.savingVersionLabelId()).toBeNull()
   })
 
   it('onVersionFileSelected should upload and update versions after websocket success', () => {
@@ -252,11 +252,11 @@ describe('DocumentVersionDropdownComponent', () => {
     expect(versionsEmitSpy).toHaveBeenCalledWith(versions)
     expect(selectedEmitSpy).toHaveBeenCalledWith(20)
     expect(component.newVersionLabel).toEqual('')
-    expect(component.versionUploadState).toEqual(UploadState.Idle)
-    expect(component.versionUploadError).toBeNull()
+    expect(component.versionUploadState()).toEqual(UploadState.Idle)
+    expect(component.versionUploadError()).toBeNull()
   })
 
-  it('onVersionFileSelected should set failed state after websocket failure', () => {
+  it('onVersionFileSelected should render failed state after websocket failure', async () => {
     const file = new File(['test'], 'new-version.pdf', {
       type: 'application/pdf',
     })
@@ -266,9 +266,11 @@ describe('DocumentVersionDropdownComponent', () => {
 
     component.onVersionFileSelected({ target: input } as Event)
     failed$.next({ taskId: 'task-1', message: 'processing failed' })
+    await fixture.whenStable()
 
-    expect(component.versionUploadState).toEqual(UploadState.Failed)
-    expect(component.versionUploadError).toEqual('processing failed')
+    expect(component.versionUploadState()).toEqual(UploadState.Failed)
+    expect(component.versionUploadError()).toEqual('processing failed')
+    expect(fixture.nativeElement.textContent).toContain('processing failed')
     expect(documentService.getVersions).not.toHaveBeenCalled()
   })
 
@@ -282,8 +284,8 @@ describe('DocumentVersionDropdownComponent', () => {
 
     component.onVersionFileSelected({ target: input } as Event)
 
-    expect(component.versionUploadState).toEqual(UploadState.Failed)
-    expect(component.versionUploadError).toEqual('Missing task ID.')
+    expect(component.versionUploadState()).toEqual(UploadState.Failed)
+    expect(component.versionUploadError()).toEqual('Missing task ID.')
     expect(documentService.getVersions).not.toHaveBeenCalled()
   })
 
@@ -298,8 +300,8 @@ describe('DocumentVersionDropdownComponent', () => {
 
     component.onVersionFileSelected({ target: input } as Event)
 
-    expect(component.versionUploadState).toEqual(UploadState.Failed)
-    expect(component.versionUploadError).toEqual('upload failed')
+    expect(component.versionUploadState()).toEqual(UploadState.Failed)
+    expect(component.versionUploadError()).toEqual('upload failed')
     expect(toastService.showError).toHaveBeenCalledWith(
       'Error uploading new version',
       error
@@ -307,8 +309,8 @@ describe('DocumentVersionDropdownComponent', () => {
   })
 
   it('ngOnChanges should clear upload status on document switch', () => {
-    component.versionUploadState = UploadState.Failed
-    component.versionUploadError = 'something failed'
+    component.versionUploadState.set(UploadState.Failed)
+    component.versionUploadError.set('something failed')
     component.editingVersionId = 10
     component.versionLabelDraft = 'draft'
 
@@ -316,8 +318,8 @@ describe('DocumentVersionDropdownComponent', () => {
       documentId: new SimpleChange(3, 4, false),
     })
 
-    expect(component.versionUploadState).toEqual(UploadState.Idle)
-    expect(component.versionUploadError).toBeNull()
+    expect(component.versionUploadState()).toEqual(UploadState.Idle)
+    expect(component.versionUploadError()).toBeNull()
     expect(component.editingVersionId).toBeNull()
     expect(component.versionLabelDraft).toEqual('')
   })

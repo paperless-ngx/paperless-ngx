@@ -54,11 +54,15 @@ class _AttachmentDef:
 
 class BogusFolderManager:
     current_folder = "INBOX"
+    uidvalidity = "1"
 
     def set(self, new_folder) -> None:
         if new_folder not in ["INBOX", "spam"]:
             raise MailboxFolderSelectError(None, "uhm")
         self.current_folder = new_folder
+
+    def status(self, folder, options):
+        return {"UIDVALIDITY": self.uidvalidity}
 
 
 class BogusClient:
@@ -943,6 +947,223 @@ class TestMail(
         self.mailMocker.apply_mail_actions()
 
         self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 1)
+
+    def test_handle_mail_account_skips_mail_already_processed_in_same_uidvalidity(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A ProcessedMail row recorded under the mailbox's current UIDVALIDITY
+        WHEN:
+            - A mail with the same UID is fetched from the same UIDVALIDITY epoch
+        THEN:
+            - The mail is skipped as a duplicate.
+        """
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        rule = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.DELETE,
+        )
+
+        message = self.mailMocker.messageBuilder.create_message()
+        self.mailMocker.bogus_mailbox.messages = [message]
+        self.mailMocker.bogus_mailbox.updateClient()
+
+        self.mailMocker.bogus_mailbox.folder.uidvalidity = "SAME"
+        ProcessedMail.objects.create(
+            rule=rule,
+            folder=rule.folder,
+            uid=message.uid,
+            uid_validity="SAME",
+            subject="Previously processed mail",
+            status="SUCCESS",
+            received=timezone.make_aware(timezone.datetime(2023, 1, 1, 12, 0, 0)),
+        )
+
+        self.mail_account_handler.handle_mail_account(account)
+
+        self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 0)
+
+    def test_handle_mail_account_processes_mail_after_uidvalidity_change(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A ProcessedMail row recorded under a previous UIDVALIDITY epoch
+        WHEN:
+            - A mail with the same UID is fetched after UIDVALIDITY has changed
+        THEN:
+            - The mail is processed, not skipped as a duplicate.
+        """
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        rule = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.DELETE,
+        )
+
+        message = self.mailMocker.messageBuilder.create_message()
+        self.mailMocker.bogus_mailbox.messages = [message]
+        self.mailMocker.bogus_mailbox.updateClient()
+
+        self.mailMocker.bogus_mailbox.folder.uidvalidity = "NEW"
+        ProcessedMail.objects.create(
+            rule=rule,
+            folder=rule.folder,
+            uid=message.uid,
+            uid_validity="OLD",
+            subject="Previously processed mail",
+            status="SUCCESS",
+            received=timezone.make_aware(timezone.datetime(2023, 1, 1, 12, 0, 0)),
+        )
+
+        self.mail_account_handler.handle_mail_account(account)
+
+        self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 1)
+
+    def test_handle_mail_account_skips_mail_processed_before_uidvalidity_tracking(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A ProcessedMail row recorded before UIDVALIDITY tracking existed
+              (uid_validity is NULL)
+        WHEN:
+            - A mail with the same UID is fetched
+        THEN:
+            - The mail is skipped as a duplicate, to avoid re-ingesting all
+              previously processed mail after upgrading.
+        """
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        rule = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.DELETE,
+        )
+
+        message = self.mailMocker.messageBuilder.create_message()
+        self.mailMocker.bogus_mailbox.messages = [message]
+        self.mailMocker.bogus_mailbox.updateClient()
+
+        ProcessedMail.objects.create(
+            rule=rule,
+            folder=rule.folder,
+            uid=message.uid,
+            uid_validity=None,
+            subject="Previously processed mail",
+            status="SUCCESS",
+            received=timezone.make_aware(timezone.datetime(2023, 1, 1, 12, 0, 0)),
+        )
+
+        self.mail_account_handler.handle_mail_account(account)
+
+        self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 0)
+
+    def test_handle_mail_account_processes_mail_when_uidvalidity_unavailable(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - The mail server fails to report a UIDVALIDITY for the folder
+        WHEN:
+            - A mail account is processed
+        THEN:
+            - The failure is logged and the rule still processes the mail,
+              instead of the whole rule being disabled.
+        """
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.DELETE,
+        )
+
+        message = self.mailMocker.messageBuilder.create_message()
+        self.mailMocker.bogus_mailbox.messages = [message]
+        self.mailMocker.bogus_mailbox.updateClient()
+
+        self.mailMocker.bogus_mailbox.folder.status = mock.MagicMock(
+            side_effect=errors.MailboxFolderStatusError(("NO", [b"unsupported"]), "OK"),
+        )
+
+        with self.assertLogs("paperless_mail", level="WARNING") as cm:
+            self.mail_account_handler.handle_mail_account(account)
+
+        self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 1)
+        self.assertEqual(len(cm.output), 1)
+        self.assertIn(
+            "Server does not support retrieving UIDVALIDITY",
+            cm.output[0],
+        )
+
+    def test_handle_mail_account_skips_mail_when_uidvalidity_unavailable_but_prior_record_exists(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A ProcessedMail row recorded with a real uid_validity value
+            - The mail server fails to report UIDVALIDITY (MailboxFolderStatusError),
+              so _get_uid_validity returns None
+        WHEN:
+            - A mail with the same UID is fetched
+        THEN:
+            - The mail is skipped as already-processed rather than re-ingested,
+              falling back to (rule, uid, folder) matching.
+        """
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        rule = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.DELETE,
+        )
+
+        message = self.mailMocker.messageBuilder.create_message()
+        self.mailMocker.bogus_mailbox.messages = [message]
+        self.mailMocker.bogus_mailbox.updateClient()
+
+        ProcessedMail.objects.create(
+            rule=rule,
+            folder=rule.folder,
+            uid=message.uid,
+            uid_validity="REAL_VALIDITY",
+            subject="Previously processed mail",
+            status="SUCCESS",
+            received=timezone.make_aware(timezone.datetime(2023, 1, 1, 12, 0, 0)),
+        )
+
+        self.mailMocker.bogus_mailbox.folder.status = mock.MagicMock(
+            side_effect=errors.MailboxFolderStatusError(("NO", [b"unsupported"]), "OK"),
+        )
+
+        self.mail_account_handler.handle_mail_account(account)
+
+        self.assertEqual(self.mailMocker._queue_consumption_tasks_mock.call_count, 0)
 
     @pytest.mark.flaky(reruns=4)
     def test_handle_mail_account_flag(self) -> None:

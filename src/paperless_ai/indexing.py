@@ -5,6 +5,7 @@ from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from filelock import FileLock
 from filelock import ReadWriteLock
@@ -167,6 +168,19 @@ def write_store(embed_model_name: str | None = None):
         yield store
 
 
+def _safe_related_name(document: Document, field: str) -> str | None:
+    """
+    Returns the ``name`` of a related object (correspondent, document_type,
+    storage_path), or None if the FK is unset or points at a row that has
+    since been deleted (e.g. concurrently with this call).
+    """
+    try:
+        related = getattr(document, field)
+    except ObjectDoesNotExist:
+        return None
+    return related.name if related else None
+
+
 def build_document_node(
     document: Document,
     *,
@@ -180,14 +194,10 @@ def build_document_node(
         "document_id": str(document.id),
         "title": document.title,
         "tags": [t.name for t in document.tags.all()],
-        "correspondent": document.correspondent.name
-        if document.correspondent
-        else None,
-        "document_type": document.document_type.name
-        if document.document_type
-        else None,
+        "correspondent": _safe_related_name(document, "correspondent"),
+        "document_type": _safe_related_name(document, "document_type"),
         "filename": document.filename,
-        "storage_path": document.storage_path.name if document.storage_path else None,
+        "storage_path": _safe_related_name(document, "storage_path"),
         "archive_serial_number": document.archive_serial_number,
         "created": document.created.isoformat() if document.created else None,
         "added": document.added.isoformat() if document.added else None,
@@ -292,6 +302,23 @@ def _document_id_filters(doc_ids):
                 key="document_id",
                 operator=FilterOperator.IN,
                 value=sorted(doc_ids),
+            ),
+        ],
+    )
+
+
+def _exclude_document_id_filter(document_id: int | str):
+    """Return a MetadataFilters NE filter excluding ``document_id``."""
+    from llama_index.core.vector_stores.types import FilterOperator
+    from llama_index.core.vector_stores.types import MetadataFilter
+    from llama_index.core.vector_stores.types import MetadataFilters
+
+    return MetadataFilters(
+        filters=[
+            MetadataFilter(
+                key="document_id",
+                operator=FilterOperator.NE,
+                value=str(document_id),
             ),
         ],
     )
@@ -481,10 +508,18 @@ def query_similar_documents(
     config = AIConfig()
 
     from llama_index.core.retrievers import VectorIndexRetriever
+    from llama_index.core.vector_stores.types import FilterCondition
+    from llama_index.core.vector_stores.types import MetadataFilters
+
+    filter_parts = []
+    if allowed_document_ids is not None:
+        filter_parts.extend(_document_id_filters(allowed_document_ids).filters)
+    if document.pk is not None:
+        filter_parts.extend(_exclude_document_id_filter(document.pk).filters)
 
     filters = (
-        _document_id_filters(allowed_document_ids)
-        if allowed_document_ids is not None
+        MetadataFilters(filters=filter_parts, condition=FilterCondition.AND)
+        if filter_parts
         else None
     )
 

@@ -8,6 +8,7 @@ import {
   ViewChild,
   ViewChildren,
   inject,
+  signal,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
@@ -65,11 +66,11 @@ export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissio
   @ViewChildren('button') buttons: QueryList<ElementRef>
 
   private customFields: CustomField[] = []
-  private unusedFields: CustomField[] = []
+  private readonly unusedFields = signal<CustomField[]>([])
   private keyboardIndex: number
 
   public get filteredFields(): CustomField[] {
-    return this.unusedFields.filter(
+    return this.unusedFields().filter(
       (f) => !this.filterText || matchesSearchText(f.name, this.filterText)
     )
   }
@@ -99,8 +100,10 @@ export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissio
   }
 
   private updateUnusedFields() {
-    this.unusedFields = this.customFields.filter(
-      (f) => !this.existingFields?.find((e) => e.field === f.id)
+    this.unusedFields.set(
+      this.customFields.filter(
+        (f) => !this.existingFields?.find((e) => e.field === f.id)
+      )
     )
   }
 

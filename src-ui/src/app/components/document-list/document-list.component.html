@@ -115,7 +115,7 @@
 </pngx-page-header>
 
 <div class="row sticky-top py-3 mt-n2 mt-md-n3 bg-body">
-  <pngx-filter-editor [hidden]="isBulkEditing" [disabled]="isBulkEditing" [filterRules]="list.filterRules" (filterRulesChange)="onFilterRulesChange($event)" (resetFilterRules)="onFilterRulesReset($event)" [unmodifiedFilterRules]="unmodifiedFilterRules" [selectionData]="list.selectionData" #filterEditor></pngx-filter-editor>
+  <pngx-filter-editor [hidden]="isBulkEditing" [disabled]="isBulkEditing" [filterRules]="list.filterRules" (filterRulesChange)="onFilterRulesChange($event)" (resetFilterRules)="onFilterRulesReset($event)" [unmodifiedFilterRules]="unmodifiedFilterRules()" [selectionData]="list.selectionData" #filterEditor></pngx-filter-editor>
   <pngx-bulk-editor [hidden]="!isBulkEditing" [disabled]="!isBulkEditing"></pngx-bulk-editor>
 </div>
 
@@ -164,9 +164,10 @@
   } @else {
     @if (list.displayMode === DisplayMode.LARGE_CARDS) {
       <div>
-        @for (d of list.documents; track d.id) {
+        @for (d of list.documents; track d.id; let i = $index) {
           <pngx-document-card-large
             [selected]="list.isSelected(d)"
+            [priority]="i < 2"
             (toggleSelected)="toggleSelected(d, $event)"
             (dblClickDocument)="openDocumentDetail(d)"
             [document]="d"
@@ -398,9 +399,10 @@
     }
     @if (list.displayMode === DisplayMode.SMALL_CARDS) {
       <div class="row row-cols-paperless-cards">
-        @for (d of list.documents; track d.id) {
+        @for (d of list.documents; track d.id; let i = $index) {
           <pngx-document-card-small class="p-0"
             [selected]="list.isSelected(d)"
+            [priority]="i < 6"
             (toggleSelected)="toggleSelected(d, $event)"
             (dblClickDocument)="openDocumentDetail(d)"
             [document]="d"

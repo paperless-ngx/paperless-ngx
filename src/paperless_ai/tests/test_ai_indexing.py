@@ -8,7 +8,9 @@ from django.test import override_settings
 from django.utils import timezone
 from llama_index.core.schema import MetadataMode
 
+from documents.models import Correspondent
 from documents.models import Document
+from documents.models import DocumentType
 from documents.models import PaperlessTask
 from documents.signals import document_consumption_finished
 from documents.signals import document_updated
@@ -93,6 +95,38 @@ def test_build_document_node_structured_fields_in_metadata(
         assert "created" in node.metadata
         assert "added" in node.metadata
         assert "modified" in node.metadata
+
+
+@pytest.mark.django_db
+def test_build_document_node_survives_concurrently_deleted_correspondent(
+    real_document: Document,
+) -> None:
+    """Regression test for #13314.
+
+    If a document's correspondent (or document type) is deleted after the
+    in-memory Document instance was loaded but before build_document_node
+    resolves the relation, accessing the FK must not raise -- it should
+    behave like an unset FK and produce None in the metadata instead of
+    aborting the whole indexing pass.
+    """
+    correspondent = Correspondent.objects.create(name="Stale Correspondent")
+    document_type = DocumentType.objects.create(name="Stale Type")
+    real_document.correspondent = correspondent
+    real_document.document_type = document_type
+    real_document.save()
+
+    # Re-fetch to get an instance whose correspondent/document_type relations
+    # are unresolved (not yet cached), mirroring a task that loaded the
+    # document before the concurrent deletion below.
+    stale_document = Document.objects.get(pk=real_document.pk)
+
+    correspondent.delete()
+    document_type.delete()
+
+    nodes = indexing.build_document_node(stale_document)
+    assert len(nodes) > 0
+    assert nodes[0].metadata["correspondent"] is None
+    assert nodes[0].metadata["document_type"] is None
 
 
 @pytest.mark.django_db
@@ -772,3 +806,33 @@ class TestQuerySimilarDocuments:
         results = indexing.query_similar_documents(a, document_ids=[b.id])
 
         assert all(doc.id == b.id for doc in results)
+
+    def test_query_similar_documents_excludes_self(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+    ) -> None:
+        a = DocumentFactory.create(content="alpha shared content here")
+        b = DocumentFactory.create(content="beta shared content here")
+        for doc in (a, b):
+            indexing.llm_index_add_or_update_document(doc)
+
+        results = indexing.query_similar_documents(a, top_k=5)
+
+        assert [doc.id for doc in results] == [b.id]
+
+    def test_query_similar_documents_excludes_self_with_multiple_chunks(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+    ) -> None:
+        # Document `a` is split into many chunks, so it could otherwise
+        # occupy several of the top-k slots with its own content.
+        a = DocumentFactory.create(content="word " * 4000)
+        b = DocumentFactory.create(content="beta shared content here")
+        for doc in (a, b):
+            indexing.llm_index_add_or_update_document(doc)
+
+        results = indexing.query_similar_documents(a, top_k=3)
+
+        assert [doc.id for doc in results] == [b.id]

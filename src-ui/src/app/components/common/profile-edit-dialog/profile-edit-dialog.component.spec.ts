@@ -10,7 +10,7 @@ import {
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { of, throwError } from 'rxjs'
+import { NEVER, of, Subject, throwError } from 'rxjs'
 import { ProfileService } from 'src/app/services/profile.service'
 import { ToastService } from 'src/app/services/toast.service'
 import * as navUtils from 'src/app/utils/navigation'
@@ -60,6 +60,10 @@ describe('ProfileEditDialogComponent', () => {
       providers: [NgbActiveModal, provideHttpClient(withInterceptorsFromDi())],
     })
     profileService = TestBed.inject(ProfileService)
+    jest.spyOn(profileService, 'get').mockReturnValue(NEVER)
+    jest
+      .spyOn(profileService, 'getSocialAccountProviders')
+      .mockReturnValue(of([]))
     toastService = TestBed.inject(ToastService)
     clipboard = TestBed.inject(Clipboard)
     fixture = TestBed.createComponent(ProfileEditDialogComponent)
@@ -155,7 +159,7 @@ describe('ProfileEditDialogComponent', () => {
       'getSocialAccountProviders'
     )
     getProvidersSpy.mockReturnValue(of(socialAccountProviders))
-    component.hasUsablePassword = true
+    component.hasUsablePassword.set(true)
     component.ngOnInit()
     component.form.get('password').patchValue('new*pass')
     component.onPasswordKeyUp({
@@ -268,6 +272,27 @@ describe('ProfileEditDialogComponent', () => {
     expect(getProvidersSpy).toHaveBeenCalled()
   })
 
+  it('should render social account providers after an async update', async () => {
+    const providers$ = new Subject<typeof socialAccountProviders>()
+    jest.spyOn(profileService, 'get').mockReturnValue(of(profile))
+    jest
+      .spyOn(profileService, 'getSocialAccountProviders')
+      .mockReturnValue(providers$)
+
+    component.ngOnInit()
+    await fixture.whenStable()
+    expect(
+      fixture.nativeElement.querySelector('a[href="https://example.com"]')
+    ).toBeNull()
+
+    providers$.next(socialAccountProviders)
+    await fixture.whenStable()
+
+    expect(
+      fixture.nativeElement.querySelector('a[href="https://example.com"]')
+    ).not.toBeNull()
+  })
+
   it('should remove disconnected social account from component, show error if needed', () => {
     const disconnectSpy = jest.spyOn(profileService, 'disconnectSocialAccount')
     const getSpy = jest.spyOn(profileService, 'get')
@@ -276,7 +301,7 @@ describe('ProfileEditDialogComponent', () => {
 
     const errorSpy = jest.spyOn(toastService, 'showError')
 
-    expect(component.socialAccounts).toContainEqual(socialAccount)
+    expect(component.socialAccounts()).toContainEqual(socialAccount)
 
     // fail first
     disconnectSpy.mockReturnValueOnce(
@@ -289,7 +314,7 @@ describe('ProfileEditDialogComponent', () => {
     disconnectSpy.mockReturnValue(of(socialAccount.id))
     component.disconnectSocialAccount(socialAccount.id)
     expect(disconnectSpy).toHaveBeenCalled()
-    expect(component.socialAccounts).not.toContainEqual(socialAccount)
+    expect(component.socialAccounts()).not.toContainEqual(socialAccount)
   })
 
   it('should get totp settings', () => {
@@ -310,7 +335,7 @@ describe('ProfileEditDialogComponent', () => {
     getSpy.mockReturnValue(of(settings))
     component.gettotpSettings()
     expect(getSpy).toHaveBeenCalled()
-    expect(component.totpSettings).toEqual(settings)
+    expect(component.totpSettings()).toEqual(settings)
   })
 
   it('should activate totp', () => {
@@ -319,15 +344,15 @@ describe('ProfileEditDialogComponent', () => {
     const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     const error = new Error('failed to activate totp')
     activateSpy.mockReturnValueOnce(throwError(() => error))
-    component.totpSettings = {
+    component.totpSettings.set({
       url: 'http://localhost/',
       qr_svg: 'svg',
       secret: 'secret',
-    }
+    })
     component.form.get('totp_code').patchValue('123456')
     component.activateTotp()
     expect(activateSpy).toHaveBeenCalledWith(
-      component.totpSettings.secret,
+      component.totpSettings().secret,
       component.form.get('totp_code').value
     )
     expect(toastErrorSpy).toHaveBeenCalled()
@@ -341,8 +366,8 @@ describe('ProfileEditDialogComponent', () => {
     )
     component.activateTotp()
     expect(toastInfoSpy).toHaveBeenCalled()
-    expect(component.isTotpEnabled).toBeTruthy()
-    expect(component.recoveryCodes).toEqual(['1', '2', '3'])
+    expect(component.isTotpEnabled()).toBeTruthy()
+    expect(component.recoveryCodes()).toEqual(['1', '2', '3'])
   })
 
   it('should deactivate totp', () => {
@@ -362,13 +387,13 @@ describe('ProfileEditDialogComponent', () => {
     deactivateSpy.mockReturnValueOnce(of(true))
     component.deactivateTotp()
     expect(toastInfoSpy).toHaveBeenCalled()
-    expect(component.isTotpEnabled).toBeFalsy()
+    expect(component.isTotpEnabled()).toBeFalsy()
   })
 
   it('should copy recovery codes', () => {
     jest.useFakeTimers()
     const copySpy = jest.spyOn(clipboard, 'copy')
-    component.recoveryCodes = ['1', '2', '3']
+    component.recoveryCodes.set(['1', '2', '3'])
     component.copyRecoveryCodes()
     expect(copySpy).toHaveBeenCalledWith('1\n2\n3')
     jest.advanceTimersByTime(3000)

@@ -49,8 +49,7 @@ describe('PngxPdfViewerComponent', () => {
       new URL('assets/js/pdf.worker.min.mjs', document.baseURI).toString()
     )
     const isVisible = (component as any).findController.onIsPageVisible as
-      | (() => boolean)
-      | undefined
+      (() => boolean) | undefined
     expect(isVisible?.()).toBe(true)
     expect(loadSpy).toHaveBeenCalledWith(
       expect.objectContaining({ numPages: 1 })
@@ -61,6 +60,7 @@ describe('PngxPdfViewerComponent', () => {
 
   it('resolves the worker source relative to the document base URI', async () => {
     setBaseHref('/paperless/')
+    const getDocumentSpy = jest.spyOn(pdfjs, 'getDocument')
 
     await initComponent()
 
@@ -70,6 +70,13 @@ describe('PngxPdfViewerComponent', () => {
     expect(pdfjs.GlobalWorkerOptions.workerSrc).toContain(
       '/paperless/assets/js/pdf.worker.min.mjs'
     )
+    expect(getDocumentSpy).toHaveBeenCalledWith({
+      url: 'test.pdf',
+      password: undefined,
+      withCredentials: true,
+      wasmUrl: expect.stringContaining('/paperless/assets/wasm/'),
+      iccUrl: expect.stringContaining('/paperless/assets/iccs/'),
+    })
   })
 
   it('initializes single-page viewer and disables text layer', async () => {
@@ -129,6 +136,18 @@ describe('PngxPdfViewerComponent', () => {
     ;(component as any).applyViewerState()
     expect((component as any).lastViewerPage).toBeUndefined()
     expect(applyScaleSpy).toHaveBeenCalled()
+  })
+
+  it('does not reset the viewer when it is already on the requested page', async () => {
+    await initComponent()
+
+    const viewer = (component as any).pdfViewer as PDFViewer
+    const currentPageSpy = jest.spyOn(viewer, 'currentPageNumber', 'set')
+    component.page = viewer.currentPageNumber
+
+    ;(component as any).applyViewerState()
+
+    expect(currentPageSpy).not.toHaveBeenCalled()
   })
 
   it('dispatches find when search query changes after render', async () => {
@@ -262,6 +281,22 @@ describe('PngxPdfViewerComponent', () => {
 
     expect(mockViewer.setDocument).toHaveBeenCalledWith(null)
     expect(mockViewer.currentPageNumber).toBe(1)
+  })
+
+  it('reloads when the source revision changes', () => {
+    const resetSpy = jest.spyOn(component as any, 'resetViewerState')
+    const loadSpy = jest
+      .spyOn(component as any, 'loadDocument')
+      .mockImplementation(() => {})
+    component.src = 'test.pdf'
+    component.sourceRevision = 1
+
+    component.ngOnChanges({
+      sourceRevision: new SimpleChange(0, 1, false),
+    })
+
+    expect(resetSpy).toHaveBeenCalled()
+    expect(loadSpy).toHaveBeenCalled()
   })
 
   it('applies viewer state after view init when already loaded', () => {

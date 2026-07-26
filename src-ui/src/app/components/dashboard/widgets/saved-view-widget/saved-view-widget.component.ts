@@ -125,6 +125,8 @@ export class SavedViewWidgetComponent
 
   readonly count = signal<number>(null)
 
+  readonly error = signal<string | null>(null)
+
   placeholderRows: number[] = []
 
   ngOnInit(): void {
@@ -180,6 +182,7 @@ export class SavedViewWidgetComponent
 
   reload() {
     this.loading.set(this.documents().length == 0)
+    this.error.set(null)
     this.show.set(true)
     this.documentService
       .listFiltered(
@@ -191,12 +194,40 @@ export class SavedViewWidgetComponent
         { truncate_content: true }
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((result) => {
-        this.documents.set(result.results)
-        this.count.set(result.count)
-        this.savedViewService.setDocumentCount(this.savedView, result.count)
-        this.loading.set(false)
-        this.show.set(true)
+      .subscribe({
+        next: (result) => {
+          this.documents.set(result.results)
+          this.count.set(result.count)
+          this.savedViewService.setDocumentCount(this.savedView, result.count)
+          this.loading.set(false)
+          this.show.set(true)
+        },
+        error: (error) => {
+          this.documents.set([])
+          this.count.set(null)
+          let errorMessage
+          if (
+            typeof error.error === 'object' &&
+            Object.keys(error.error).length > 0
+          ) {
+            errorMessage = Object.keys(error.error)
+              .map((fieldName) => {
+                const fieldNameBase = fieldName.split('__')[0]
+                const fieldError: Array<string> = error.error[fieldName]
+                return `${
+                  this.documentService.sortFields.find(
+                    (f) => f.field?.split('__')[0] == fieldNameBase
+                  )?.name ?? fieldNameBase
+                }: ${fieldError[0]}`
+              })
+              .join(', ')
+          } else {
+            errorMessage = error.error
+          }
+          this.error.set(errorMessage)
+          this.loading.set(false)
+          this.show.set(true)
+        },
       })
   }
 

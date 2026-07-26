@@ -77,7 +77,7 @@
   <div class="input-group input-group-sm">
     <ng-select #fieldSelects
       class="paperless-input-select"
-      [items]="customFields"
+      [items]="customFields()"
       [(ngModel)]="atom.field"
       [disabled]="disabled"
       bindLabel="name"

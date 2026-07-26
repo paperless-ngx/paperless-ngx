@@ -26,11 +26,11 @@ import { UserService } from 'src/app/services/rest/user.service'
   ],
 })
 export class DocumentHistoryComponent implements OnInit {
-  private documentService = inject(DocumentService)
-  private correspondentService = inject(CorrespondentService)
-  private storagePathService = inject(StoragePathService)
-  private documentTypeService = inject(DocumentTypeService)
-  private userService = inject(UserService)
+  private readonly documentService = inject(DocumentService)
+  private readonly correspondentService = inject(CorrespondentService)
+  private readonly storagePathService = inject(StoragePathService)
+  private readonly documentTypeService = inject(DocumentTypeService)
+  private readonly userService = inject(UserService)
 
   public AuditLogAction = AuditLogAction
 
@@ -70,7 +70,7 @@ export class DocumentHistoryComponent implements OnInit {
       return cached
     }
 
-    const idInt = parseInt(id, 10)
+    const idInt = Number.parseInt(id, 10)
     const fallback$ = of(id)
 
     let result$: Observable<string>

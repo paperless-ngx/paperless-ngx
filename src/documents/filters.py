@@ -161,7 +161,9 @@ class ObjectFilter(Filter):
 class InboxFilter(Filter):
     def filter(self, qs, value):
         if value == "true":
-            return qs.filter(tags__is_inbox_tag=True)
+            # A document can have more than one tag flagged as an inbox tag
+            # (nothing enforces uniqueness), so this join can multiply rows.
+            return qs.filter(tags__is_inbox_tag=True).distinct()
         elif value == "false":
             return qs.exclude(tags__is_inbox_tag=True)
         else:
@@ -268,6 +270,10 @@ class CustomFieldsFilter(Filter):
                     for _, option in enumerate(options):
                         if option.get("label").lower().find(value.lower()) != -1:
                             option_ids.extend([option.get("id")])
+            # A document with multiple custom field instances can match more
+            # than one of these OR-ed branches (or the same branch via
+            # different fields), each via its own join to custom_fields --
+            # dedupe explicitly rather than relying on the caller to.
             return (
                 qs.filter(custom_fields__field__name__icontains=value)
                 | qs.filter(custom_fields__value_text__icontains=value)
@@ -280,7 +286,7 @@ class CustomFieldsFilter(Filter):
                 | qs.filter(custom_fields__value_document_ids__icontains=value)
                 | qs.filter(custom_fields__value_select__in=option_ids)
                 | qs.filter(custom_fields__value_long_text__icontains=value)
-            )
+            ).distinct()
         else:
             return qs
 
@@ -771,7 +777,14 @@ class CustomFieldQueryFilter(Filter):
         )
         q, annotations = parser.parse(value)
 
-        return qs.annotate(**annotations).filter(q)
+        # The Count(...) annotations above require a GROUP BY/HAVING to evaluate.
+        # Applying them directly to `qs` mixes that HAVING with `qs`'s existing
+        # joins (e.g. repeated tag joins from tags__id__all, the object-permission
+        # OR-filter), which some backends (e.g. MariaDB) fail to plan correctly,
+        # raising "Unknown column ... in 'HAVING'". Evaluating the annotation on
+        # an isolated queryset keeps the GROUP BY/HAVING self-contained.
+        matching_ids = Document.objects.annotate(**annotations).filter(q).values("pk")
+        return qs.filter(pk__in=matching_ids)
 
 
 class DocumentFilterSet(FilterSet):
@@ -1017,6 +1030,8 @@ class ObjectOwnedOrGrantedPermissionsFilter(ObjectPermissionsFilter):
     """
 
     def filter_queryset(self, request, queryset, view):
+        if request.user.is_superuser:
+            return queryset
         objects_with_perms = super().filter_queryset(request, queryset, view)
         objects_owned = queryset.filter(owner=request.user)
         objects_unowned = queryset.filter(owner__isnull=True)

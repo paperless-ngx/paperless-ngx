@@ -1420,6 +1420,30 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_called_once()
 
     @mock.patch("documents.views.bulk_edit.merge")
+    def test_merge_and_delete_requires_change_permission(self, m) -> None:
+        self.setup_mock(m, "merge")
+        user = User.objects.create_user(username="no-change")
+        user.user_permissions.add(
+            Permission.objects.get(codename="add_document"),
+            Permission.objects.get(codename="delete_document"),
+        )
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(
+            "/api/documents/merge/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id, self.doc3.id],
+                    "delete_originals": True,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        m.assert_not_called()
+
+    @mock.patch("documents.views.bulk_edit.merge")
     def test_merge_invalid_parameters(self, m) -> None:
         self.setup_mock(m, "merge")
         response = self.client.post(
@@ -1667,6 +1691,74 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
+
+    @mock.patch("documents.views.bulk_edit.edit_pdf")
+    def test_edit_pdf_update_requires_change_permission(self, m) -> None:
+        self.setup_mock(m, "edit_pdf")
+        user = User.objects.create_user(username="no-change")
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(
+            "/api/documents/edit_pdf/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "operations": [{"page": 1}],
+                    "update_document": True,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        m.assert_not_called()
+
+    @mock.patch("documents.views.bulk_edit.remove_password")
+    @mock.patch("documents.views.bulk_edit.edit_pdf")
+    def test_delete_original_requires_delete_permission(
+        self,
+        edit_pdf_mock,
+        remove_password_mock,
+    ) -> None:
+        self.setup_mock(edit_pdf_mock, "edit_pdf")
+        self.setup_mock(remove_password_mock, "remove_password")
+        user = User.objects.create_user(username="no-delete")
+        user.user_permissions.add(
+            Permission.objects.get(codename="add_document"),
+            Permission.objects.get(codename="change_document"),
+        )
+        self.client.force_authenticate(user=user)
+
+        cases = [
+            (
+                "/api/documents/edit_pdf/",
+                {
+                    "documents": [self.doc2.id],
+                    "operations": [{"page": 1}],
+                    "delete_original": True,
+                },
+                edit_pdf_mock,
+            ),
+            (
+                "/api/documents/remove_password/",
+                {
+                    "documents": [self.doc2.id],
+                    "password": "secret",
+                    "delete_original": True,
+                },
+                remove_password_mock,
+            ),
+        ]
+        for endpoint, payload, operation_mock in cases:
+            with self.subTest(endpoint=endpoint):
+                response = self.client.post(
+                    endpoint,
+                    json.dumps(payload),
+                    content_type="application/json",
+                )
+
+                self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                operation_mock.assert_not_called()
 
     @mock.patch("documents.views.bulk_edit.remove_password")
     def test_remove_password(self, m) -> None:

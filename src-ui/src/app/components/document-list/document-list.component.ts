@@ -5,6 +5,7 @@ import {
   OnDestroy,
   OnInit,
   QueryList,
+  signal,
   ViewChild,
   ViewChildren,
 } from '@angular/core'
@@ -149,7 +150,7 @@ export class DocumentListComponent
     )
   }
 
-  unmodifiedFilterRules: FilterRule[] = []
+  readonly unmodifiedFilterRules = signal<FilterRule[]>([])
   private unmodifiedSavedView: SavedView
   private activeSavedView: SavedView | null = null
 
@@ -299,7 +300,7 @@ export class DocumentListComponent
           this.savedViewService.setDocumentCount(view, this.list.collectionSize)
         })
         this.updateDisplayCustomFields()
-        this.unmodifiedFilterRules = view.filter_rules
+        this.unmodifiedFilterRules.set(view.filter_rules)
       })
 
     this.route.queryParamMap
@@ -316,7 +317,7 @@ export class DocumentListComponent
           this.activeSavedView = null
           this.list.activateSavedView(null)
           this.list.loadFromQueryParams(queryParams)
-          this.unmodifiedFilterRules = []
+          this.unmodifiedFilterRules.set([])
         }
       })
 
@@ -415,7 +416,7 @@ export class DocumentListComponent
             this.toastService.showInfo(
               $localize`View "${this.list.activeSavedViewTitle}" saved successfully.`
             )
-            this.unmodifiedFilterRules = this.list.filterRules
+            this.unmodifiedFilterRules.set(this.list.filterRules)
           },
           error: (err) => {
             this.toastService.showError(

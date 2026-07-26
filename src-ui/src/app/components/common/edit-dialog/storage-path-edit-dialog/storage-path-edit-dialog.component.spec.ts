@@ -58,17 +58,17 @@ describe('StoragePathEditDialogComponent', () => {
     fixture.detectChanges()
     component.testPath({ id: 1 })
     expect(testSpy).toHaveBeenCalledWith('test/{{title}}', 1)
-    expect(component.testResult).toBe('test/abc123')
-    expect(component.testFailed).toBeFalsy()
+    expect(component.testResult()).toBe('test/abc123')
+    expect(component.testFailed()).toBeFalsy()
 
     // test failed
     testSpy.mockReturnValueOnce(of(''))
     component.testPath({ id: 1 })
-    expect(component.testResult).toBeNull()
-    expect(component.testFailed).toBeTruthy()
+    expect(component.testResult()).toBeNull()
+    expect(component.testFailed()).toBeTruthy()
 
     component.testPath(null)
-    expect(component.testResult).toBeNull()
+    expect(component.testResult()).toBeNull()
   })
 
   it('should compare two documents by id', () => {

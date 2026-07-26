@@ -142,7 +142,7 @@ a [superuser](usage.md#superusers) account.
 
     It is not possible to run the container rootless if additional languages are specified via `PAPERLESS_OCR_LANGUAGES`.
 
-If you want to run Paperless as a rootless container, set `user:` in `docker-compose.yml` to the UID and GID of your host user (use `id -u` and `id -g` to find these values). The container process starts directly as that user with no internal privilege remapping:
+If you want to run Paperless as a rootless container, set `user:` in `docker-compose.yml` to the UID and GID of your host user (use `id -u` and `id -g` to find these values). The container process starts directly as that user with no internal privilege remapping. Any UID and GID is supported:
 
 ```yaml
 webserver:
@@ -157,8 +157,8 @@ Do not combine this with `USERMAP_UID` or `USERMAP_GID`, which are intended for 
 Some file systems, such as NFS network shares, don't support file system
 notifications with `inotify`. When the consumption directory is on such a
 file system, Paperless-ngx will not pick up new files with the default
-configuration. Use [`PAPERLESS_CONSUMER_POLLING`](configuration.md#PAPERLESS_CONSUMER_POLLING)
-to enable polling and disable inotify. See [here](configuration.md#polling).
+configuration. Set [`PAPERLESS_CONSUMER_POLLING_INTERVAL`](configuration.md#PAPERLESS_CONSUMER_POLLING_INTERVAL)
+to a positive number to enable polling and disable native filesystem notifications.
 
 ## Bare Metal Install {#bare_metal}
 
@@ -261,6 +261,14 @@ to enable polling and disable inotify. See [here](configuration.md#polling).
 
     and copy the contents to the home directory of the user you created
     earlier (`/opt/paperless`).
+
+    !!! note
+
+        If you are updating an existing bare-metal installation rather than
+        installing for the first time, see the
+        [bare metal update instructions](administration.md#bare-metal-updating)
+        instead -- extracting a new release on top of an old one can leave
+        behind stale files from the previous version.
 
     Optional: If you cloned the Git repository, you will need to
     compile the frontend yourself. See [here](development.md#front-end-development)

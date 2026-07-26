@@ -20,6 +20,7 @@ from documents.search._translate import SearchQueryError
 from documents.search._translate import translate_query
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from datetime import tzinfo
 
     from django.contrib.auth.base_user import AbstractBaseUser
@@ -38,6 +39,17 @@ _CJK_RE: Final = regex.compile(r"[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]+")
 def _has_cjk(text: str) -> bool:
     """Return True if text contains any CJK characters."""
     return bool(_CJK_RE.search(text))
+
+
+def extract_cjk_text(text: str) -> str:
+    """Join the CJK runs in ``text`` for indexing into bigram (char-ngram) fields.
+
+    Mirrors the query side (``_build_cjk_query``): only CJK runs are ever searched
+    against the bigram fields, so only CJK runs are worth indexing there. Latin
+    text fed to a character-bigram field is never matched and only bloats the
+    index and slows indexing/merge. Returns "" when there is no CJK text.
+    """
+    return " ".join(_CJK_RE.findall(text))
 
 
 def _build_cjk_query(
@@ -103,6 +115,7 @@ def normalize_query(query: str) -> str:
 def build_permission_filter(
     schema: tantivy.Schema,
     user: AbstractBaseUser,
+    viewer_group_ids: Iterable[int] = (),
 ) -> tantivy.Query:
     """
     Build a query filter for user document permissions.
@@ -112,10 +125,12 @@ def build_permission_filter(
     - Public documents (no owner) are visible to all users
     - Private documents are visible to their owner
     - Documents explicitly shared with the user are visible
+    - Documents shared with one of the user's current groups are visible
 
     Args:
         schema: Tantivy schema for field validation
         user: User to check permissions for
+        viewer_group_ids: Current group memberships for the user
 
     Returns:
         Tantivy query that filters results to visible documents
@@ -129,7 +144,13 @@ def build_permission_filter(
     )
     owned = tantivy.Query.term_query(schema, "owner_id", user.pk)
     shared = tantivy.Query.term_query(schema, "viewer_id", user.pk)
-    return tantivy.Query.disjunction_max_query([no_owner, owned, shared])
+    group_shared = [
+        tantivy.Query.term_query(schema, "viewer_group_id", group_id)
+        for group_id in viewer_group_ids
+    ]
+    return tantivy.Query.disjunction_max_query(
+        [no_owner, owned, shared, *group_shared],
+    )
 
 
 DEFAULT_SEARCH_FIELDS = [

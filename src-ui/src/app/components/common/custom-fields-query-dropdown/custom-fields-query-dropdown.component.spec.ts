@@ -79,7 +79,7 @@ describe('CustomFieldsQueryDropdownComponent', () => {
   })
 
   it('should initialize custom fields on creation', () => {
-    expect(component.customFields).toEqual(customFields)
+    expect(component.customFields()).toEqual(customFields)
   })
 
   it('should add an expression when opened if queries are empty', () => {
@@ -101,7 +101,7 @@ describe('CustomFieldsQueryDropdownComponent', () => {
       data_type: CustomFieldDataType.String,
       extra_data: {},
     }
-    component.customFields = [field]
+    component.customFields.set([field])
     const operators = component.getOperatorsForField(1)
     expect(operators.length).toEqual(
       [
@@ -138,7 +138,7 @@ describe('CustomFieldsQueryDropdownComponent', () => {
         ],
       },
     }
-    component.customFields = [field]
+    component.customFields.set([field])
     const options = component.getSelectOptionsForField(1)
     expect(options).toEqual([
       { label: 'Option 1', id: 'abc-123' },

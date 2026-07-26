@@ -392,15 +392,34 @@ class OwnedObjectSerializer(
         }
 
     def get_user_can_change(self, obj) -> bool:
-        checker = ObjectPermissionChecker(self.user) if self.user is not None else None
-        return (
-            obj.owner is None
-            or obj.owner == self.user
-            or (
-                self.user is not None
-                and checker.has_perm(f"change_{obj.__class__.__name__.lower()}", obj)
+        if obj.owner is None or obj.owner == self.user:
+            return True
+        if self.user is None:
+            return False
+        if self.user.is_active and self.user.is_superuser:
+            # Mirrors guardian's own ObjectPermissionChecker.has_perm() shortcut --
+            # superusers aren't necessarily granted explicit object permissions,
+            # so the batched context below would otherwise incorrectly say no.
+            return True
+
+        # Prefer the page-level batch computed by BulkPermissionMixin
+        # (get_serializer_context) over a fresh per-object guardian check,
+        # which would otherwise query the permission tables once per row.
+        users_change_perms = self.context.get("users_change_perms")
+        groups_change_perms = self.context.get("groups_change_perms")
+        if users_change_perms is not None and groups_change_perms is not None:
+            if self.user.pk in users_change_perms.get(obj.pk, []):
+                return True
+            user_group_ids = getattr(self, "_user_group_ids", None)
+            if user_group_ids is None:
+                user_group_ids = set(self.user.groups.values_list("id", flat=True))
+                self._user_group_ids = user_group_ids
+            return bool(
+                user_group_ids.intersection(groups_change_perms.get(obj.pk, [])),
             )
-        )
+
+        checker = ObjectPermissionChecker(self.user)
+        return checker.has_perm(f"change_{obj.__class__.__name__.lower()}", obj)
 
     @staticmethod
     def get_shared_object_pks(objects: Iterable):

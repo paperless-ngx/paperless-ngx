@@ -1264,7 +1264,17 @@ def task_failure_handler(
             "error_message": str(exception) if exception else "Unknown error",
         }
         if traceback:
-            tb_str = "".join(_tb.format_tb(traceback))
+            # billiard/celery pass a pre-formatted string instead of a real
+            # traceback object when the worker process itself died (e.g.
+            # WorkerLostError from a SIGILL) since there's no live traceback
+            # to walk in that case.
+            tb_str = (
+                traceback
+                if isinstance(traceback, str)
+                else "".join(
+                    _tb.format_tb(traceback),
+                )
+            )
             result_data["traceback"] = tb_str[:5000]
 
         now = timezone.now()

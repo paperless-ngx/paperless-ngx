@@ -24,7 +24,11 @@ def apply_assignment_to_document(
     action: WorkflowAction, annotated with 'has_assign_*' boolean fields
     """
     if action.has_assign_tags:
-        document.add_nested_tags(action.assign_tags.all())
+        # Apply to a freshly-fetched instance rather than the shared `document`.
+        # Document.tags.add() fires an m2m_changed signal that ultimately calls
+        # instance.refresh_from_db(), which would discard any other unsaved
+        # assignment fields (e.g. storage_path) already staged on `document`.
+        Document.objects.get(pk=document.pk).add_nested_tags(action.assign_tags.all())
 
     if action.assign_correspondent:
         document.correspondent = action.assign_correspondent

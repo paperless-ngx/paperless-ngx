@@ -26,6 +26,7 @@ jobs:
           check-name: 'Merge and Push Manifest'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 60
+          checks-discovery-timeout: 1800
   build-release:
     name: Build Release
     needs: wait-for-docker
@@ -85,7 +86,7 @@ jobs:
       # ---- Prepare Release ----
       - name: Generate requirements file
         run: |
-          uv export --quiet --no-dev --all-extras --format requirements-txt --output-file requirements.txt
+          uv export --quiet --no-dev --all-extras --emit-index-url --format requirements-txt --output-file requirements.txt
       - name: Compile messages
         env:
           PAPERLESS_SECRET_KEY: "ci-release-not-a-real-secret"
