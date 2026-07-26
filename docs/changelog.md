@@ -2,11 +2,6 @@
 
 ## paperless-ngx 3.0.3
 
-### Features / Enhancements
-
-- Docs: warn bare-metal users about stale files when upgrading [@stumpylog](https://github.com/stumpylog) ([#13296](https://github.com/paperless-ngx/paperless-ngx/pull/13296))
-- Documentation: Add the NumPy CPU baseline increase to the migration guide [@stumpylog](https://github.com/stumpylog) ([#13269](https://github.com/paperless-ngx/paperless-ngx/pull/13269))
-
 ### Bug Fixes
 
 - Fixhancement: PAPERLESS\_ALLAUTH\_TRUSTED\_PROXY\_COUNT [@shamoon](https://github.com/shamoon) ([#13281](https://github.com/paperless-ngx/paperless-ngx/pull/13281))
