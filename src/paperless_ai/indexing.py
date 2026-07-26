@@ -389,6 +389,8 @@ def update_llm_index(
         else:
             scoped_documents = (
                 Document.objects.filter(id__in=document_ids)
+                .select_related("correspondent", "document_type", "storage_path")
+                .prefetch_related("tags")
                 if document_ids is not None
                 else documents
             )
