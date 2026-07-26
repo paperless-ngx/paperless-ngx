@@ -331,6 +331,7 @@ def bulk_update_documents(document_ids) -> None:
     if ai_config.llm_index_enabled:
         update_llm_index(
             rebuild=False,
+            document_ids=document_ids,
         )
 
 

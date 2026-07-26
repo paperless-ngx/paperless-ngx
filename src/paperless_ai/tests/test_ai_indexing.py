@@ -286,6 +286,22 @@ def test_update_llm_index_partial_update(
         assert store.table_exists(), (
             "Expected the vector store table to exist after incremental update"
         )
+        before = store.get_modified_times()
+
+    # A further edit, scoped via document_ids to just doc3 -- doc2 must be
+    # left exactly as it was, proving document_ids restricts the scan
+    # instead of falling back to the whole library.
+    doc3.modified = timezone.now()
+    doc3.save()
+
+    result = indexing.update_llm_index(rebuild=False, document_ids=[doc3.pk])
+    assert result == "LLM index updated successfully."
+
+    with indexing.get_vector_store() as store:
+        after = store.get_modified_times()
+
+    assert after[str(doc3.pk)] == doc3.modified.isoformat()
+    assert after[str(doc2.pk)] == before[str(doc2.pk)]
 
 
 @pytest.mark.django_db
