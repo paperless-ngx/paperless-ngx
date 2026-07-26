@@ -1,5 +1,44 @@
 # Changelog
 
+## paperless-ngx 3.0.3
+
+### Features / Enhancements
+
+- Docs: warn bare-metal users about stale files when upgrading [@stumpylog](https://github.com/stumpylog) ([#13296](https://github.com/paperless-ngx/paperless-ngx/pull/13296))
+- Documentation: Add the NumPy CPU baseline increase to the migration guide [@stumpylog](https://github.com/stumpylog) ([#13269](https://github.com/paperless-ngx/paperless-ngx/pull/13269))
+
+### Bug Fixes
+
+- Fixhancement: PAPERLESS\_ALLAUTH\_TRUSTED\_PROXY\_COUNT [@shamoon](https://github.com/shamoon) ([#13281](https://github.com/paperless-ngx/paperless-ngx/pull/13281))
+- Fix: preserve document fields during Gotenberg conversion to PDF [@stumpylog](https://github.com/stumpylog) ([#13271](https://github.com/paperless-ngx/paperless-ngx/pull/13271))
+- Fix: Makes the email date aware as soon as possible during parsing [@stumpylog](https://github.com/stumpylog) ([#13266](https://github.com/paperless-ngx/paperless-ngx/pull/13266))
+- Fix: Handle a plain string as Celery sometimes provides for the traceback [@stumpylog](https://github.com/stumpylog) ([#13267](https://github.com/paperless-ngx/paperless-ngx/pull/13267))
+- Fix: Emit the torch index into the requirements.txt for people still using it [@stumpylog](https://github.com/stumpylog) ([#13265](https://github.com/paperless-ngx/paperless-ngx/pull/13265))
+- Fix: handle notes without a user when building the search index [@matthiasmast](https://github.com/matthiasmast) ([#13260](https://github.com/paperless-ngx/paperless-ngx/pull/13260))
+
+### Documentation
+
+- Docs: warn bare-metal users about stale files when upgrading [@stumpylog](https://github.com/stumpylog) ([#13296](https://github.com/paperless-ngx/paperless-ngx/pull/13296))
+- Documentation: Add the NumPy CPU baseline increase to the migration guide [@stumpylog](https://github.com/stumpylog) ([#13269](https://github.com/paperless-ngx/paperless-ngx/pull/13269))
+
+### Maintenance
+
+- Fix: Emit the torch index into the requirements.txt for people still using it [@stumpylog](https://github.com/stumpylog) ([#13265](https://github.com/paperless-ngx/paperless-ngx/pull/13265))
+
+### All App Changes
+
+<details>
+<summary>6 changes</summary>
+
+- Fixhancement: PAPERLESS\_ALLAUTH\_TRUSTED\_PROXY\_COUNT [@shamoon](https://github.com/shamoon) ([#13281](https://github.com/paperless-ngx/paperless-ngx/pull/13281))
+- Tweak: adjust top navbar wrapping when AI chat button visible [@shamoon](https://github.com/shamoon) ([#13280](https://github.com/paperless-ngx/paperless-ngx/pull/13280))
+- Fix: preserve document fields during Gotenberg conversion to PDF [@stumpylog](https://github.com/stumpylog) ([#13271](https://github.com/paperless-ngx/paperless-ngx/pull/13271))
+- Fix: Makes the email date aware as soon as possible during parsing [@stumpylog](https://github.com/stumpylog) ([#13266](https://github.com/paperless-ngx/paperless-ngx/pull/13266))
+- Fix: Handle a plain string as Celery sometimes provides for the traceback [@stumpylog](https://github.com/stumpylog) ([#13267](https://github.com/paperless-ngx/paperless-ngx/pull/13267))
+- Fix: handle notes without a user when building the search index [@matthiasmast](https://github.com/matthiasmast) ([#13260](https://github.com/paperless-ngx/paperless-ngx/pull/13260))
+
+</details>
+
 ## paperless-ngx 3.0.2
 
 ### Bug Fixes
