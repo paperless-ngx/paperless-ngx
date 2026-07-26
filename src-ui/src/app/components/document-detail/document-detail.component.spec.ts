@@ -1602,6 +1602,7 @@ describe('DocumentDetailComponent', () => {
     expect(openDoc.__changedFields).toEqual([])
     expect(setDirtySpy).toHaveBeenCalledWith(openDoc, false)
     expect(saveSpy).toHaveBeenCalled()
+    expect(component.previewRevision()).toBe(1)
   })
 
   it('should ignore incoming update for a different document id', () => {

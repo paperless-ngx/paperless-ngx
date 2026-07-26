@@ -43,6 +43,7 @@ export class PngxPdfViewerComponent
   private readonly document = inject<Document>(DOCUMENT)
 
   @Input() src!: string
+  @Input() sourceRevision = 0
   @Input() password?: string
   @Input() page?: number
   @Output() pageChange = new EventEmitter<number>()
@@ -93,7 +94,7 @@ export class PngxPdfViewerComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['src'] || changes['password']) {
+    if (changes['src'] || changes['sourceRevision'] || changes['password']) {
       this.resetViewerState()
       if (this.src) {
         this.loadDocument()
