@@ -69,5 +69,5 @@
     "typescript": "^6.0.3",
     "webpack": "^5.107.2"
   },
-  "packageManager": "pnpm@10.26.0"
+  "packageManager": "pnpm@11.15.1"
 }
