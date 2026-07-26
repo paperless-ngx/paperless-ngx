@@ -67,6 +67,13 @@ class AIClient:
                 context_window=self.settings.llm_context_size,
                 request_timeout=self.settings.llm_request_timeout,
                 system_prompt=LLM_SYSTEM_PROMPT,
+                # Also set thinking at the instance level. run_llm_query() passes
+                # think=False per call, but llama-index resolves it as
+                # `kwargs.pop("think", None) or self.thinking`, so a per-call False
+                # is discarded and `think` is dropped from the request entirely
+                # (run-llama/llama_index#22467). Setting it here makes the flag
+                # survive that fallback; it stays correct once #22468 lands.
+                thinking=False,
                 client=Client(
                     host=endpoint,
                     timeout=self.settings.llm_request_timeout,

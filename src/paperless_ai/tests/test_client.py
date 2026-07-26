@@ -49,6 +49,7 @@ def test_get_llm_ollama(mock_ai_config, mock_ollama_llm):
         context_window=8192,
         request_timeout=120,
         system_prompt=LLM_SYSTEM_PROMPT,
+        thinking=False,
         client=ANY,
         async_client=ANY,
     )
@@ -122,6 +123,44 @@ def test_run_llm_query_ollama_uses_structured_json(mock_ai_config, mock_ollama_l
         format=ANY,
         think=False,
     )
+
+
+def test_run_llm_query_ollama_sends_think_false_to_ollama(mock_ai_config):
+    """
+    Regression test for thinking not actually being disabled.
+
+    The per-call think=False in run_llm_query() is not enough on its own:
+    llama-index resolves it as `kwargs.pop("think", None) or self.thinking`,
+    so a False is discarded and `think` never reaches Ollama. This asserts on
+    the real request instead of on our own call, so it fails if the flag is
+    dropped anywhere between us and the Ollama client.
+    """
+    mock_ai_config.llm_backend = "ollama"
+    mock_ai_config.llm_model = "test_model"
+    mock_ai_config.llm_endpoint = "http://test-url"
+
+    with patch("ollama.Client") as mock_client_cls:
+        mock_client = mock_client_cls.return_value
+        mock_client.chat.return_value = {
+            "message": {
+                "role": "assistant",
+                "content": json.dumps(
+                    {
+                        "title": "Test Title",
+                        "tags": [],
+                        "correspondents": [],
+                        "document_types": [],
+                        "storage_paths": [],
+                        "dates": [],
+                    },
+                ),
+            },
+        }
+
+        client = AIClient()
+        client.run_llm_query("test_prompt")
+
+    assert mock_client.chat.call_args.kwargs["think"] is False
 
 
 def test_run_llm_query_openai_uses_tools(mock_ai_config, mock_openai_llm):
