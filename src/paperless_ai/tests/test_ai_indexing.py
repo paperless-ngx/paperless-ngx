@@ -197,6 +197,8 @@ def test_update_llm_index(
         mock_queryset = MagicMock()
         mock_queryset.exists.return_value = True
         mock_queryset.__iter__.return_value = iter([real_document])
+        mock_queryset.select_related.return_value = mock_queryset
+        mock_queryset.prefetch_related.return_value = mock_queryset
         mock_all.return_value = mock_queryset
         build_document_node.return_value = []
         indexing.update_llm_index(rebuild=True)
@@ -216,6 +218,8 @@ def test_update_llm_index_rebuilds_on_model_name_change(
         mock_queryset = MagicMock()
         mock_queryset.exists.return_value = True
         mock_queryset.__iter__.return_value = iter([real_document])
+        mock_queryset.select_related.return_value = mock_queryset
+        mock_queryset.prefetch_related.return_value = mock_queryset
         mock_all.return_value = mock_queryset
         with patch(
             "paperless_ai.indexing.get_configured_model_name",
@@ -228,6 +232,8 @@ def test_update_llm_index_rebuilds_on_model_name_change(
         mock_queryset = MagicMock()
         mock_queryset.exists.return_value = True
         mock_queryset.__iter__.return_value = iter([real_document])
+        mock_queryset.select_related.return_value = mock_queryset
+        mock_queryset.prefetch_related.return_value = mock_queryset
         mock_all.return_value = mock_queryset
         with patch(
             "paperless_ai.indexing.get_configured_model_name",
@@ -258,6 +264,8 @@ def test_update_llm_index_partial_update(
         mock_queryset = MagicMock()
         mock_queryset.exists.return_value = True
         mock_queryset.__iter__.return_value = iter([real_document, doc2])
+        mock_queryset.select_related.return_value = mock_queryset
+        mock_queryset.prefetch_related.return_value = mock_queryset
         mock_all.return_value = mock_queryset
 
         indexing.update_llm_index(rebuild=True)

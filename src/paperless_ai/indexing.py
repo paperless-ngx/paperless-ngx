@@ -381,7 +381,12 @@ def update_llm_index(
         if rebuild or not store.table_exists():
             logger.info("Rebuilding LLM index.")
             store.drop_table()
-            for document in iter_wrapper(documents):
+            rebuild_documents = documents.select_related(
+                "correspondent",
+                "document_type",
+                "storage_path",
+            ).prefetch_related("tags")
+            for document in iter_wrapper(rebuild_documents):
                 nodes = build_document_node(document, chunk_size=chunk_size)
                 _embed_nodes(nodes, embed_model)
                 store.add(nodes)
