@@ -353,7 +353,11 @@ def update_llm_index(
                 "LLM index migration requires re-embedding; forcing rebuild.",
             )
             rebuild = True
-    documents = Document.objects.all()
+    documents = Document.objects.select_related(
+        "correspondent",
+        "document_type",
+        "storage_path",
+    ).prefetch_related("tags")
     no_documents = not documents.exists()
 
     # Fast exit before touching config: nothing to index and no existing index.
@@ -381,21 +385,14 @@ def update_llm_index(
         if rebuild or not store.table_exists():
             logger.info("Rebuilding LLM index.")
             store.drop_table()
-            rebuild_documents = documents.select_related(
-                "correspondent",
-                "document_type",
-                "storage_path",
-            ).prefetch_related("tags")
-            for document in iter_wrapper(rebuild_documents):
+            for document in iter_wrapper(documents):
                 nodes = build_document_node(document, chunk_size=chunk_size)
                 _embed_nodes(nodes, embed_model)
                 store.add(nodes)
             msg = "LLM index rebuilt successfully."
         else:
             scoped_documents = (
-                Document.objects.filter(id__in=document_ids)
-                .select_related("correspondent", "document_type", "storage_path")
-                .prefetch_related("tags")
+                documents.filter(id__in=document_ids)
                 if document_ids is not None
                 else documents
             )
