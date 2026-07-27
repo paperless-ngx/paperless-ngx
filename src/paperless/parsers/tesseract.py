@@ -510,8 +510,10 @@ class RasterisedDocumentParser:
 
         if mime_type == "application/pdf":
             text_original = self.extract_text(None, document_path)
-            original_has_text = is_tagged_pdf(document_path, log=self.log) or (
-                text_original is not None and len(text_original) > PDF_TEXT_MIN_LENGTH
+            has_text = text_original is not None and len(text_original) > 0
+            original_has_text = has_text and (
+                is_tagged_pdf(document_path, log=self.log)
+                or len(text_original) > PDF_TEXT_MIN_LENGTH
             )
         else:
             text_original = None

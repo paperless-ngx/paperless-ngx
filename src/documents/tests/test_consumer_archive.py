@@ -166,24 +166,28 @@ class TestShouldProduceArchive:
         mocker: MockerFixture,
         settings,
     ) -> None:
-        """Tagged PDFs (e.g. Word exports) are treated as born-digital regardless of text length."""
+        """Tagged PDFs (e.g. Word exports) with real text are treated as born-digital, even below PDF_TEXT_MIN_LENGTH."""
         settings.ARCHIVE_FILE_GENERATION = "auto"
         mocker.patch("documents.consumer.is_tagged_pdf", return_value=True)
+        mocker.patch("documents.consumer.extract_pdf_text", return_value="tiny")
         parser = _parser_instance(can_produce=True, requires_rendition=False)
         assert (
             should_produce_archive(parser, "application/pdf", Path("/tmp/doc.pdf"))
             is False
         )
 
-    def test_tagged_pdf_does_not_call_pdftotext(
+    def test_tagged_pdf_without_text_produces_archive(
         self,
         mocker: MockerFixture,
         settings,
     ) -> None:
-        """When a PDF is tagged, pdftotext is not invoked (fast path)."""
+        """A tagged PDF with no actual extractable text (e.g. some scanner firmware) is not
+        trusted as born-digital — the tag alone must not bypass OCR."""
         settings.ARCHIVE_FILE_GENERATION = "auto"
         mocker.patch("documents.consumer.is_tagged_pdf", return_value=True)
-        mock_extract = mocker.patch("documents.consumer.extract_pdf_text")
+        mocker.patch("documents.consumer.extract_pdf_text", return_value=None)
         parser = _parser_instance(can_produce=True, requires_rendition=False)
-        should_produce_archive(parser, "application/pdf", Path("/tmp/doc.pdf"))
-        mock_extract.assert_not_called()
+        assert (
+            should_produce_archive(parser, "application/pdf", Path("/tmp/doc.pdf"))
+            is True
+        )
