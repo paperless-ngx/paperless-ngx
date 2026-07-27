@@ -663,7 +663,7 @@ def _get_llm_output_language(ai_config: AIConfig, request) -> str | None:
             dict,
         )
     ):
-        output_language = request.user.ui_settings.settings.get("language") or None
+        output_language = request.user.ui_settings.settings.get("language")
     return output_language
 
 
