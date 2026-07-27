@@ -357,7 +357,7 @@ def update_llm_index(
         "correspondent",
         "document_type",
         "storage_path",
-    ).prefetch_related("tags")
+    ).prefetch_related("tags", "notes", "custom_fields__field")
     no_documents = not documents.exists()
 
     # Fast exit before touching config: nothing to index and no existing index.
