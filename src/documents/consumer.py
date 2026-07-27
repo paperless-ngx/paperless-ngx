@@ -160,13 +160,14 @@ def should_produce_archive(
         _log.debug("Archive: yes — image document, ARCHIVE_FILE_GENERATION=auto")
         return True
     if mime_type == "application/pdf":
-        if is_tagged_pdf(document_path):
+        text = extract_pdf_text(document_path)
+        has_text = text is not None and len(text) > 0
+        if has_text and is_tagged_pdf(document_path):
             _log.debug(
                 "Archive: no — born-digital PDF (structure tags detected),"
                 " ARCHIVE_FILE_GENERATION=auto",
             )
             return False
-        text = extract_pdf_text(document_path)
         if text is None or len(text) <= PDF_TEXT_MIN_LENGTH:
             _log.debug(
                 "Archive: yes — scanned PDF (text_length=%d ≤ %d),"

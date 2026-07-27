@@ -906,6 +906,34 @@ class TestSkipArchive:
         assert tesseract_parser.archive_path is None
         assert tesseract_parser.get_text()
 
+    def test_tagged_pdf_without_text_does_not_skip_ocr(
+        self,
+        mocker: MockerFixture,
+        tesseract_parser: RasterisedDocumentParser,
+        tesseract_samples_dir: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A PDF that reports itself as tagged (/MarkInfo /Marked true) but
+              has no actual extractable text (some scanner firmware produces
+              this — see GitHub issue #13349)
+            - Mode: auto, produce_archive=False
+        WHEN:
+            - Document is parsed
+        THEN:
+            - The tag alone is not trusted as "has text"; OCRmyPDF still runs
+        """
+        tesseract_parser.settings.mode = ModeChoices.AUTO
+        mocker.patch("paperless.parsers.tesseract.is_tagged_pdf", return_value=True)
+        mocker.patch.object(tesseract_parser, "extract_text", return_value=None)
+        mock_ocr = mocker.patch("ocrmypdf.ocr")
+        tesseract_parser.parse(
+            tesseract_samples_dir / "multi-page-images.pdf",
+            "application/pdf",
+            produce_archive=False,
+        )
+        mock_ocr.assert_called()
+
     def test_tagged_pdf_produces_pdfa_archive_without_ocr(
         self,
         tesseract_parser: RasterisedDocumentParser,
