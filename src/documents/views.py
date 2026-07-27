@@ -133,6 +133,7 @@ from documents.file_handling import format_filename
 from documents.filters import CorrespondentFilterSet
 from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
+from documents.filters import DocumentPermissionsFilter
 from documents.filters import DocumentsOrderingFilter
 from documents.filters import DocumentTypeFilterSet
 from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
@@ -986,7 +987,7 @@ class DocumentViewSet(
         DjangoFilterBackend,
         SearchFilter,
         DocumentsOrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        DocumentPermissionsFilter,
     )
     filterset_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "effective_content")
