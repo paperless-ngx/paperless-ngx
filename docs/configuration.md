@@ -2135,7 +2135,7 @@ used with the OpenAI-compatible backend to target a custom provider or local gat
 
     Defaults to None.
 
-### [`PAPERLESS_AI_LLM_OUTPUT_LANGUAGE=<str>`](#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE) {#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE}
+#### [`PAPERLESS_AI_LLM_OUTPUT_LANGUAGE=<str>`](#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE) {#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE}
 
 : The language to use for AI suggestions (results may vary by LLM model). If not supplied, defaults to the user's UI language setting or None.
 
