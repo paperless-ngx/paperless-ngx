@@ -328,8 +328,16 @@ def update_llm_index(
     *,
     iter_wrapper: IterWrapper[Document] = identity,
     rebuild=False,
+    document_ids: Iterable[int] | None = None,
 ) -> str:
-    """Rebuild or incrementally update the LLM index."""
+    """Rebuild or incrementally update the LLM index.
+
+    ``document_ids``, when given, scopes an incremental update to just those
+    documents instead of scanning the whole library -- callers that already
+    know which documents changed (e.g. a bulk edit) should pass this to avoid
+    an O(library size) scan per call. Ignored whenever a rebuild actually
+    happens, since a rebuild always covers the whole library regardless.
+    """
     with write_store() as store:
         try:
             with _exclude_readers():
@@ -345,7 +353,11 @@ def update_llm_index(
                 "LLM index migration requires re-embedding; forcing rebuild.",
             )
             rebuild = True
-    documents = Document.objects.all()
+    documents = Document.objects.select_related(
+        "correspondent",
+        "document_type",
+        "storage_path",
+    ).prefetch_related("tags")
     no_documents = not documents.exists()
 
     # Fast exit before touching config: nothing to index and no existing index.
@@ -379,9 +391,14 @@ def update_llm_index(
                 store.add(nodes)
             msg = "LLM index rebuilt successfully."
         else:
+            scoped_documents = (
+                documents.filter(id__in=document_ids)
+                if document_ids is not None
+                else documents
+            )
             existing = store.get_modified_times()
             changed = 0
-            for document in iter_wrapper(documents):
+            for document in iter_wrapper(scoped_documents):
                 doc_id = str(document.id)
                 if existing.get(doc_id) == document.modified.isoformat():
                     continue

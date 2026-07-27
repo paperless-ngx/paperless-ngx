@@ -12,6 +12,7 @@ from paperless_ai import chat
 from paperless_ai import indexing
 from paperless_ai.chat import CHAT_ERROR_MESSAGE
 from paperless_ai.chat import CHAT_METADATA_DELIMITER
+from paperless_ai.chat import _build_chat_prompt
 from paperless_ai.chat import stream_chat_with_documents
 
 
@@ -57,6 +58,26 @@ def assert_chat_output(
     assert json.loads(trailer.removeprefix(CHAT_METADATA_DELIMITER)) == {
         "references": expected_references,
     }
+
+
+@pytest.mark.parametrize(
+    ("output_language", "expected_language_line"),
+    [
+        (None, ""),
+        ("de-de", "Respond in de-de.\n"),
+    ],
+)
+def test_build_chat_prompt(
+    output_language,
+    expected_language_line,
+) -> None:
+    prompt = _build_chat_prompt(output_language)
+
+    assert "{output_language_line}" not in prompt
+    assert (
+        prompt.split("Do not use prior knowledge.\n", maxsplit=1)[1]
+        == f"{expected_language_line}Query: {{query_str}}\nAnswer:"
+    )
 
 
 @pytest.mark.django_db
