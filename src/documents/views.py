@@ -653,6 +653,20 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Tag]):
             update_document_parent_tags(tag, new_parent)
 
 
+def _get_llm_output_language(ai_config: AIConfig, request) -> str | None:
+    output_language = ai_config.llm_output_language
+    if (
+        not output_language
+        and hasattr(request.user, "ui_settings")
+        and isinstance(
+            request.user.ui_settings.settings,
+            dict,
+        )
+    ):
+        output_language = request.user.ui_settings.settings.get("language")
+    return output_language
+
+
 @extend_schema_view(**generate_object_with_permissions_schema(DocumentTypeSerializer))
 class DocumentTypeViewSet(
     PermissionsAwareDocumentCountMixin,
@@ -1514,16 +1528,7 @@ class DocumentViewSet(
         if not ai_config.ai_enabled:
             return HttpResponseBadRequest("AI is required for this feature")
 
-        output_language = ai_config.llm_output_language
-        if (
-            not output_language
-            and hasattr(request.user, "ui_settings")
-            and isinstance(
-                request.user.ui_settings.settings,
-                dict,
-            )
-        ):
-            output_language = request.user.ui_settings.settings.get("language") or None
+        output_language = _get_llm_output_language(ai_config=ai_config, request=request)
         llm_cache_backend = (
             f"{ai_config.llm_backend}:{output_language}"
             if output_language
@@ -2265,8 +2270,14 @@ class ChatStreamingView(GenericAPIView[Any]):
                 Document,
             )
 
+        output_language = _get_llm_output_language(ai_config=ai_config, request=request)
+
         response = StreamingHttpResponse(
-            stream_chat_with_documents(query_str=question, documents=documents),
+            stream_chat_with_documents(
+                query_str=question,
+                documents=documents,
+                output_language=output_language,
+            ),
             content_type="text/event-stream",
         )
         return response

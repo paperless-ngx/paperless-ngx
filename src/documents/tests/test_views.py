@@ -625,6 +625,37 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "text/event-stream")
+        mock_stream_chat.assert_called_once_with(
+            query_str="question",
+            documents=[self.document],
+            output_language=None,
+        )
+
+    @patch("documents.views.stream_chat_with_documents")
+    @patch("documents.views.get_objects_for_user_owner_aware")
+    @override_settings(AI_ENABLED=True)
+    def test_post_uses_user_display_language(
+        self,
+        mock_get_objects,
+        mock_stream_chat,
+    ) -> None:
+        UiSettings.objects.create(user=self.user, settings={"language": "de-de"})
+        self.grant_view_document_permission()
+        mock_get_objects.return_value = [self.document]
+        mock_stream_chat.return_value = iter([b"data"])
+
+        response = self.client.post(
+            self.ENDPOINT,
+            data='{"q": "question"}',
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        mock_stream_chat.assert_called_once_with(
+            query_str="question",
+            documents=[self.document],
+            output_language="de-de",
+        )
 
     @patch("documents.views.stream_chat_with_documents")
     @override_settings(AI_ENABLED=True)
