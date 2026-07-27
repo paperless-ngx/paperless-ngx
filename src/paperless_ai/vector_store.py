@@ -105,6 +105,42 @@ def _unpack(blob: bytes) -> list[float]:
     return list(struct.unpack(f"{len(blob) // 4}f", blob))
 
 
+def _copy_rows(src_conn: sqlite3.Connection, dst_conn: sqlite3.Connection) -> int:
+    """Copy every live vec0 row from ``src_conn`` into ``dst_conn``, recording
+    each one in ``dst_conn``'s document_chunks side table. Returns the number
+    of rows copied. The caller owns ``dst_conn``'s transaction.
+
+    Rows are streamed from the source cursor in batches instead of being
+    materialized all at once, so a large index does not cause an OOM during a
+    routine compaction or migration.
+    """
+    src_cursor = src_conn.execute(
+        "SELECT id, document_id, modified, node_content, embedding FROM "
+        + DEFAULT_TABLE_NAME,
+    )
+    copied = 0
+    while batch := src_cursor.fetchmany(COMPACT_BATCH_SIZE):
+        dst_conn.executemany(
+            _INSERT,
+            [
+                (
+                    r["id"],
+                    r["document_id"],
+                    r["modified"],
+                    r["node_content"],
+                    bytes(r["embedding"]),
+                )
+                for r in batch
+            ],
+        )
+        dst_conn.executemany(
+            _INSERT_CHUNK_INDEX,
+            [(r["id"], r["document_id"]) for r in batch],
+        )
+        copied += len(batch)
+    return copied
+
+
 def _build_where(filters: MetadataFilters | None) -> tuple[str, list[str]]:
     """Translate the EQ / IN / NE filters we use into a parameterized SQL clause
     on vec0 metadata columns. Returns ("", []) when there is nothing to filter.
@@ -247,12 +283,16 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         else:
             self._conn.execute("COMMIT")
 
-    def _meta_get(self, key: str) -> str | None:
-        row = self._conn.execute(
+    @staticmethod
+    def _meta_get_on(conn: sqlite3.Connection, key: str) -> str | None:
+        row = conn.execute(
             "SELECT value FROM index_meta WHERE key = ?",
             (key,),
         ).fetchone()
         return row["value"] if row else None
+
+    def _meta_get(self, key: str) -> str | None:
+        return self._meta_get_on(self._conn, key)
 
     @staticmethod
     def _meta_set_on(conn: sqlite3.Connection, key: str, value: str) -> None:
@@ -355,7 +395,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         side table, kept in lockstep with every insert into the vec0 table."""
         self._conn.executemany(
             _INSERT_CHUNK_INDEX,
-            [(row[0], row[1]) for row in rows],
+            [(chunk_id, document_id) for chunk_id, document_id, *_ in rows],
         )
 
     def _delete_chunks_by_document_id(self, document_id: str) -> None:
@@ -368,21 +408,18 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         indexed lookup) and deleting each by its `id` primary key instead
         turns that scan into a handful of O(1) point deletes.
         """
-        chunk_ids = [
-            row[0]
-            for row in self._conn.execute(
-                "SELECT chunk_id FROM document_chunks WHERE document_id = ?",
-                (str(document_id),),
-            )
-        ]
-        for chunk_id in chunk_ids:
-            self._conn.execute(
-                "DELETE FROM " + DEFAULT_TABLE_NAME + " WHERE id = ?",
-                (chunk_id,),
-            )
+        doc_id = str(document_id)
+        chunk_rows = self._conn.execute(
+            "SELECT chunk_id FROM document_chunks WHERE document_id = ?",
+            (doc_id,),
+        ).fetchall()
+        self._conn.executemany(
+            "DELETE FROM " + DEFAULT_TABLE_NAME + " WHERE id = ?",
+            [(row["chunk_id"],) for row in chunk_rows],
+        )
         self._conn.execute(
             "DELETE FROM document_chunks WHERE document_id = ?",
-            (str(document_id),),
+            (doc_id,),
         )
 
     def _increment_total_inserts(self, count: int) -> None:
@@ -558,32 +595,8 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
                 value = self._meta_get(key)
                 if value is not None:
                     self._meta_set_on(new_conn, key, value)
-            src_cursor = self._conn.execute(
-                "SELECT id, document_id, modified, node_content, embedding "
-                "FROM " + DEFAULT_TABLE_NAME,
-            )
             new_conn.execute("BEGIN IMMEDIATE")
-            # Stream rows from the source cursor in batches instead of
-            # materializing the whole table in memory, so a large index does
-            # not cause an OOM during routine maintenance compactions.
-            while batch := src_cursor.fetchmany(COMPACT_BATCH_SIZE):
-                new_conn.executemany(
-                    _INSERT,
-                    [
-                        (
-                            r["id"],
-                            r["document_id"],
-                            r["modified"],
-                            r["node_content"],
-                            bytes(r["embedding"]),
-                        )
-                        for r in batch
-                    ],
-                )
-                new_conn.executemany(
-                    _INSERT_CHUNK_INDEX,
-                    [(r["id"], r["document_id"]) for r in batch],
-                )
+            _copy_rows(self._conn, new_conn)
             # Reset the cumulative counter: after compact, total_inserts == live.
             self._meta_set_on(new_conn, "total_inserts", str(live))
             new_conn.execute("COMMIT")
@@ -682,46 +695,18 @@ def _migrate_v1_to_v2_add_document_chunks(
     full table scan on the document_id metadata column. Every row written
     before this migration predates that table, so without backfilling,
     deleting a pre-migration document would find zero chunk ids and leave its
-    vec0 rows permanently orphaned. This copies all live rows into the new
-    file -- the same approach compact() uses -- indexing each as it goes.
+    vec0 rows permanently orphaned. Backfilling is a plain row copy into the
+    new-schema file (``_copy_rows``, the same helper compact() uses), which
+    records every copied row in document_chunks as it goes.
     """
     PaperlessSqliteVecVectorStore._create_vec_table(dst_conn, dim)
     PaperlessSqliteVecVectorStore._meta_set_on(dst_conn, "dim", str(dim))
-    embed_model_row = src_conn.execute(
-        "SELECT value FROM index_meta WHERE key = 'embed_model'",
-    ).fetchone()
-    if embed_model_row is not None:
-        PaperlessSqliteVecVectorStore._meta_set_on(
-            dst_conn,
-            "embed_model",
-            embed_model_row["value"],
-        )
+    embed_model = PaperlessSqliteVecVectorStore._meta_get_on(src_conn, "embed_model")
+    if embed_model is not None:
+        PaperlessSqliteVecVectorStore._meta_set_on(dst_conn, "embed_model", embed_model)
 
-    src_cursor = src_conn.execute(
-        "SELECT id, document_id, modified, node_content, embedding FROM "
-        + DEFAULT_TABLE_NAME,
-    )
     dst_conn.execute("BEGIN IMMEDIATE")
-    live = 0
-    while batch := src_cursor.fetchmany(COMPACT_BATCH_SIZE):
-        dst_conn.executemany(
-            _INSERT,
-            [
-                (
-                    r["id"],
-                    r["document_id"],
-                    r["modified"],
-                    r["node_content"],
-                    bytes(r["embedding"]),
-                )
-                for r in batch
-            ],
-        )
-        dst_conn.executemany(
-            _INSERT_CHUNK_INDEX,
-            [(r["id"], r["document_id"]) for r in batch],
-        )
-        live += len(batch)
+    live = _copy_rows(src_conn, dst_conn)
     # This migration only ever copies live rows (like compact()), so the
     # cumulative counter resets to match -- the new file has no bloat yet.
     PaperlessSqliteVecVectorStore._meta_set_on(dst_conn, "total_inserts", str(live))
