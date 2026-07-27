@@ -31,10 +31,20 @@ logger = logging.getLogger("paperless_ai.vector_store")
 DB_FILENAME = "llmindex.db"
 DEFAULT_TABLE_NAME = "documents"
 
+_INSERT = (
+    "INSERT INTO "
+    + DEFAULT_TABLE_NAME
+    + " (id, document_id, modified, node_content, embedding) VALUES (?, ?, ?, ?, ?)"
+)
+
+_INSERT_CHUNK_INDEX = (
+    "INSERT INTO document_chunks (chunk_id, document_id) VALUES (?, ?)"
+)
+
 # Current schema version. Written to index_meta at table creation and bumped
 # whenever a Migration is added to MIGRATIONS. check_and_run_migrations() uses
 # this to decide which migrations to run on an existing store.
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 # compact(): rebuild when the cumulative rowid count exceeds this multiple of
 # the live row count. DELETEs on vec0 tables never reclaim space (upstream
@@ -80,8 +90,10 @@ class Migration:
     )
 
 
-# Registry of all schema migrations in order. Empty at v1 -- this is the
-# baseline. Add entries here (and bump SCHEMA_VERSION) when the schema changes.
+# Registry of all schema migrations in order. Populated after the class body
+# below, since v1 -> v2's apply() needs PaperlessSqliteVecVectorStore's own
+# static methods. Add entries here (and bump SCHEMA_VERSION) when the schema
+# changes.
 MIGRATIONS: list[Migration] = []
 
 
@@ -189,6 +201,18 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         conn.execute(
             "CREATE TABLE IF NOT EXISTS index_meta (key TEXT PRIMARY KEY, value TEXT)",
         )
+        # vec0 metadata columns only get an efficient lookup path inside a KNN
+        # (MATCH) query; a plain `WHERE document_id = ?` is a full table scan
+        # regardless of index size. This plain, indexed table is how delete()/
+        # upsert_document() find a document's chunk ids without that scan.
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS document_chunks "
+            "(chunk_id TEXT PRIMARY KEY, document_id TEXT NOT NULL)",
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_document_chunks_document_id "
+            "ON document_chunks (document_id)",
+        )
         return conn
 
     @property
@@ -259,6 +283,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
     def drop_table(self) -> None:
         self._conn.execute("DROP TABLE IF EXISTS " + DEFAULT_TABLE_NAME)
         self._conn.execute("DELETE FROM index_meta")
+        self._conn.execute("DELETE FROM document_chunks")
 
     def stored_model_name(self) -> str | None:
         """Return the embedding model name recorded at table creation, or None."""
@@ -325,11 +350,40 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             _pack(node.get_embedding()),
         )
 
-    _INSERT = (
-        "INSERT INTO "
-        + DEFAULT_TABLE_NAME
-        + " (id, document_id, modified, node_content, embedding) VALUES (?, ?, ?, ?, ?)"
-    )
+    def _index_chunks(self, rows: list[tuple[str, str, str, str, bytes]]) -> None:
+        """Record each row's (chunk_id, document_id) in the document_chunks
+        side table, kept in lockstep with every insert into the vec0 table."""
+        self._conn.executemany(
+            _INSERT_CHUNK_INDEX,
+            [(row[0], row[1]) for row in rows],
+        )
+
+    def _delete_chunks_by_document_id(self, document_id: str) -> None:
+        """Delete all of a document's chunks via point-deletes on `id`.
+
+        vec0 has no efficient lookup on the document_id metadata column
+        outside a KNN query (see _open_connection), so a plain
+        `DELETE ... WHERE document_id = ?` is a full table scan regardless of
+        index size. Looking the chunk ids up in document_chunks first (a real
+        indexed lookup) and deleting each by its `id` primary key instead
+        turns that scan into a handful of O(1) point deletes.
+        """
+        chunk_ids = [
+            row[0]
+            for row in self._conn.execute(
+                "SELECT chunk_id FROM document_chunks WHERE document_id = ?",
+                (str(document_id),),
+            )
+        ]
+        for chunk_id in chunk_ids:
+            self._conn.execute(
+                "DELETE FROM " + DEFAULT_TABLE_NAME + " WHERE id = ?",
+                (chunk_id,),
+            )
+        self._conn.execute(
+            "DELETE FROM document_chunks WHERE document_id = ?",
+            (str(document_id),),
+        )
 
     def _increment_total_inserts(self, count: int) -> None:
         """Increment the cumulative insert counter stored in index_meta.
@@ -348,7 +402,8 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         rows = [self._row(node) for node in nodes]
         with self._transaction():
             self._ensure_table(len(nodes[0].get_embedding()))
-            self._conn.executemany(self._INSERT, rows)
+            self._conn.executemany(_INSERT, rows)
+            self._index_chunks(rows)
             self._increment_total_inserts(len(rows))
         return [node.node_id for node in nodes]
 
@@ -365,22 +420,17 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             if nodes:
                 self._ensure_table(len(nodes[0].get_embedding()))
             if self.table_exists():
-                self._conn.execute(
-                    "DELETE FROM " + DEFAULT_TABLE_NAME + " WHERE document_id = ?",
-                    (str(document_id),),
-                )
+                self._delete_chunks_by_document_id(document_id)
             if rows:
-                self._conn.executemany(self._INSERT, rows)
+                self._conn.executemany(_INSERT, rows)
+                self._index_chunks(rows)
                 self._increment_total_inserts(len(rows))
         return [node.node_id for node in nodes]
 
     def delete(self, ref_doc_id: str, **delete_kwargs: Any) -> None:
         if self.table_exists():
             with self._transaction():
-                self._conn.execute(
-                    "DELETE FROM " + DEFAULT_TABLE_NAME + " WHERE document_id = ?",
-                    (str(ref_doc_id),),
-                )
+                self._delete_chunks_by_document_id(ref_doc_id)
 
     def _rows_to_nodes(self, rows: list[sqlite3.Row]) -> list[BaseNode]:
         nodes: list[BaseNode] = []
@@ -518,7 +568,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             # not cause an OOM during routine maintenance compactions.
             while batch := src_cursor.fetchmany(COMPACT_BATCH_SIZE):
                 new_conn.executemany(
-                    self._INSERT,
+                    _INSERT,
                     [
                         (
                             r["id"],
@@ -529,6 +579,10 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
                         )
                         for r in batch
                     ],
+                )
+                new_conn.executemany(
+                    _INSERT_CHUNK_INDEX,
+                    [(r["id"], r["document_id"]) for r in batch],
                 )
             # Reset the cumulative counter: after compact, total_inserts == live.
             self._meta_set_on(new_conn, "total_inserts", str(live))
@@ -614,3 +668,72 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             raise
         new_conn.close()
         self._swap_in_compact(compact_path, db_path)
+
+
+def _migrate_v1_to_v2_add_document_chunks(
+    src_conn: sqlite3.Connection,
+    dst_conn: sqlite3.Connection,
+    dim: int,
+) -> None:
+    """v1 -> v2: backfill the document_chunks side table.
+
+    document_chunks (see PaperlessSqliteVecVectorStore._open_connection) lets
+    delete()/upsert_document() find a document's chunk ids without a vec0
+    full table scan on the document_id metadata column. Every row written
+    before this migration predates that table, so without backfilling,
+    deleting a pre-migration document would find zero chunk ids and leave its
+    vec0 rows permanently orphaned. This copies all live rows into the new
+    file -- the same approach compact() uses -- indexing each as it goes.
+    """
+    PaperlessSqliteVecVectorStore._create_vec_table(dst_conn, dim)
+    PaperlessSqliteVecVectorStore._meta_set_on(dst_conn, "dim", str(dim))
+    embed_model_row = src_conn.execute(
+        "SELECT value FROM index_meta WHERE key = 'embed_model'",
+    ).fetchone()
+    if embed_model_row is not None:
+        PaperlessSqliteVecVectorStore._meta_set_on(
+            dst_conn,
+            "embed_model",
+            embed_model_row["value"],
+        )
+
+    src_cursor = src_conn.execute(
+        "SELECT id, document_id, modified, node_content, embedding FROM "
+        + DEFAULT_TABLE_NAME,
+    )
+    dst_conn.execute("BEGIN IMMEDIATE")
+    live = 0
+    while batch := src_cursor.fetchmany(COMPACT_BATCH_SIZE):
+        dst_conn.executemany(
+            _INSERT,
+            [
+                (
+                    r["id"],
+                    r["document_id"],
+                    r["modified"],
+                    r["node_content"],
+                    bytes(r["embedding"]),
+                )
+                for r in batch
+            ],
+        )
+        dst_conn.executemany(
+            _INSERT_CHUNK_INDEX,
+            [(r["id"], r["document_id"]) for r in batch],
+        )
+        live += len(batch)
+    # This migration only ever copies live rows (like compact()), so the
+    # cumulative counter resets to match -- the new file has no bloat yet.
+    PaperlessSqliteVecVectorStore._meta_set_on(dst_conn, "total_inserts", str(live))
+    dst_conn.execute("COMMIT")
+
+
+MIGRATIONS.append(
+    Migration(
+        from_version=1,
+        to_version=2,
+        kind="structural",
+        description="add document_chunks side table for O(1) per-document deletes",
+        apply=_migrate_v1_to_v2_add_document_chunks,
+    ),
+)

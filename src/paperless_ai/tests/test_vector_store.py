@@ -262,6 +262,41 @@ class TestUpsert:
             assert ids == ["a3"]
 
 
+class TestDocumentChunksIndex:
+    """document_chunks lets delete()/upsert_document() find a document's chunk
+    ids without a vec0 full table scan on document_id -- see
+    PaperlessSqliteVecVectorStore._delete_chunks_by_document_id."""
+
+    def _chunk_index_rows(self, store) -> list[tuple[str, str]]:
+        rows = store.client.execute(
+            "SELECT chunk_id, document_id FROM document_chunks ORDER BY chunk_id",
+        ).fetchall()
+        return [(r["chunk_id"], r["document_id"]) for r in rows]
+
+    def test_add_populates_document_chunks(self, store) -> None:
+        store.add([make_node("a1", "1"), make_node("a2", "1"), make_node("b1", "2")])
+        assert self._chunk_index_rows(store) == [
+            ("a1", "1"),
+            ("a2", "1"),
+            ("b1", "2"),
+        ]
+
+    def test_delete_clears_document_chunks(self, store) -> None:
+        store.add([make_node("a1", "1"), make_node("a2", "1"), make_node("b1", "2")])
+        store.delete("1")
+        assert self._chunk_index_rows(store) == [("b1", "2")]
+
+    def test_upsert_replaces_document_chunks(self, store) -> None:
+        store.add([make_node("a1", "1"), make_node("b1", "2")])
+        store.upsert_document("1", [make_node("a2", "1")])
+        assert self._chunk_index_rows(store) == [("a2", "1"), ("b1", "2")]
+
+    def test_drop_table_clears_document_chunks(self, store) -> None:
+        store.add([make_node("a1", "1")])
+        store.drop_table()
+        assert self._chunk_index_rows(store) == []
+
+
 class TestMetadataCoercion:
     def test_none_metadata_values_become_empty_strings(self, store) -> None:
         node = make_node("a1", "1")
@@ -381,6 +416,22 @@ class TestCompact:
         store.compact()
         store.compact(force=True)
 
+    def test_compact_preserves_document_chunks(self, store) -> None:
+        """document_chunks must survive the file-swap rebuild, or delete()
+        would silently stop finding chunk ids for anything indexed before a
+        compaction ran."""
+        store.add([make_node("a1", "1"), make_node("b1", "2")])
+        self._churn(store, 5)
+        store.compact(force=True)
+
+        rows = store.client.execute(
+            "SELECT chunk_id, document_id FROM document_chunks WHERE document_id = '2'",
+        ).fetchall()
+        assert [(r["chunk_id"], r["document_id"]) for r in rows] == [("b1", "2")]
+
+        store.delete("2")
+        assert "b1" not in _query(store, [0.0] * DIM, top_k=10).ids
+
     def test_failed_compact_removes_temp_wal_and_shm(
         self,
         store,
@@ -469,18 +520,22 @@ class TestMigrations:
 
     def test_reembed_migration_returns_true(self, store, tmp_path: Path) -> None:
         store.add([make_node("a1", "1")])
+        # store was just created at the real (current) SCHEMA_VERSION, so the
+        # simulated pending migration must target one version past that --
+        # not a hardcoded 1 -> 2, which would collide with the real
+        # document_chunks migration already registered in MIGRATIONS.
+        from paperless_ai import vector_store as vs_mod
+
+        original = vs_mod.SCHEMA_VERSION
         migration = Migration(
-            from_version=1,
-            to_version=2,
+            from_version=original,
+            to_version=original + 1,
             kind="re-embed",
             description="test re-embed",
         )
         MIGRATIONS.append(migration)
         try:
-            from paperless_ai import vector_store as vs_mod
-
-            original = vs_mod.SCHEMA_VERSION
-            vs_mod.SCHEMA_VERSION = 2
+            vs_mod.SCHEMA_VERSION = original + 1
             result = store.check_and_run_migrations()
         finally:
             MIGRATIONS.remove(migration)
@@ -537,26 +592,26 @@ class TestMigrations:
             )
             dst.execute("COMMIT")
 
+        from paperless_ai import vector_store as vs_mod
+
+        original = vs_mod.SCHEMA_VERSION
         migration = Migration(
-            from_version=1,
-            to_version=2,
+            from_version=original,
+            to_version=original + 1,
             kind="structural",
             description="test structural",
             apply=apply,
         )
         MIGRATIONS.append(migration)
         try:
-            from paperless_ai import vector_store as vs_mod
-
-            original = vs_mod.SCHEMA_VERSION
-            vs_mod.SCHEMA_VERSION = 2
+            vs_mod.SCHEMA_VERSION = original + 1
             result = store.check_and_run_migrations()
         finally:
             MIGRATIONS.remove(migration)
             vs_mod.SCHEMA_VERSION = original
 
         assert result is False
-        assert self._schema_version(store) == 2
+        assert self._schema_version(store) == original + 1
         ids = {n.node_id for n in store.get_nodes()}
         assert ids == {"a1", "b1"}
 
@@ -565,6 +620,38 @@ class TestMigrations:
         assert self._schema_version(store) == SCHEMA_VERSION
         store.compact(force=True)
         assert self._schema_version(store) == SCHEMA_VERSION
+
+    def test_v1_to_v2_migration_backfills_document_chunks(self, store) -> None:
+        """The real v1 -> v2 migration (registered in MIGRATIONS) must
+        backfill document_chunks for rows written before it existed, or
+        delete()/upsert_document() would find zero chunk ids for them and
+        leave their vec0 rows orphaned forever."""
+        store.add([make_node("a1", "1"), make_node("a2", "1"), make_node("b1", "2")])
+        # Simulate a pre-migration (schema v1) store: rows exist in the vec0
+        # table, but document_chunks (added by the v1 -> v2 migration) has no
+        # entries for them, mirroring a real on-disk index created before
+        # this migration existed.
+        store.client.execute("DELETE FROM document_chunks")
+        store.client.execute(
+            "UPDATE index_meta SET value = '1' WHERE key = 'schema_version'",
+        )
+
+        assert store.check_and_run_migrations() is False  # structural, not re-embed
+        assert self._schema_version(store) == SCHEMA_VERSION
+
+        rows = store.client.execute(
+            "SELECT chunk_id, document_id FROM document_chunks ORDER BY chunk_id",
+        ).fetchall()
+        assert [(r["chunk_id"], r["document_id"]) for r in rows] == [
+            ("a1", "1"),
+            ("a2", "1"),
+            ("b1", "2"),
+        ]
+
+        # And delete() now actually removes rows for a document that
+        # predates the migration, instead of silently no-op'ing.
+        store.delete("1")
+        assert sorted(_query(store, [0.0] * DIM, top_k=10).ids) == ["b1"]
 
     def test_stop_at_reembed_boundary(self, store) -> None:
         # Registry: structural v2, re-embed v3, structural v4.
