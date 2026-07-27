@@ -8,6 +8,7 @@ import {
   ViewChild,
 } from '@angular/core'
 import { NgbPopover, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
+import { Options } from '@popperjs/core'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first, Subject, takeUntil } from 'rxjs'
 import { Document } from 'src/app/data/document'
@@ -73,6 +74,11 @@ export class PreviewPopupComponent implements OnDestroy {
   readonly mouseOnPreview = signal(false)
 
   readonly popoverClass = signal('shadow popover-preview')
+
+  readonly popperOptions = (options: Partial<Options>): Partial<Options> => ({
+    ...options,
+    strategy: 'fixed',
+  })
 
   get renderAsObject(): boolean {
     return (this.isPdf && this.useNativePdfViewer) || !this.isPdf
