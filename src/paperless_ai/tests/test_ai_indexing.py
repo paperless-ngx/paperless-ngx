@@ -4,13 +4,18 @@ from unittest.mock import patch
 
 import pytest
 import pytest_mock
+from django.db import connection
 from django.test import override_settings
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 from llama_index.core.schema import MetadataMode
 
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import Note
 from documents.models import PaperlessTask
 from documents.signals import document_consumption_finished
 from documents.signals import document_updated
@@ -296,14 +301,44 @@ def test_update_llm_index_partial_update(
         )
         before = store.get_modified_times()
 
-    # A further edit, scoped via document_ids to just doc3 -- doc2 must be
+    # new doc, also touched by the scoped update below
+    doc4 = DocumentFactory.create(title="Test Document 4", added=timezone.now())
+
+    # A further edit, scoped via document_ids to doc3 + doc4 -- doc2 must be
     # left exactly as it was, proving document_ids restricts the scan
     # instead of falling back to the whole library.
     doc3.modified = timezone.now()
     doc3.save()
+    doc4.modified = timezone.now()
+    doc4.save()
 
-    result = indexing.update_llm_index(rebuild=False, document_ids=[doc3.pk])
+    # Give both scoped documents a note and a custom field: build_llm_index_text
+    # reads both per document, so without the notes/custom_fields__field
+    # prefetch on scoped_documents, each additional document adds 3 more
+    # queries (N+1 regression) instead of the query count staying flat.
+    custom_field = CustomField.objects.create(
+        name="Priority",
+        data_type=CustomField.FieldDataType.STRING,
+    )
+    for doc in (doc3, doc4):
+        Note.objects.create(document=doc, note=f"a note on {doc.title}")
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=custom_field,
+            value_text="high",
+        )
+
+    with CaptureQueriesContext(connection) as ctx:
+        result = indexing.update_llm_index(
+            rebuild=False,
+            document_ids=[doc3.pk, doc4.pk],
+        )
     assert result == "LLM index updated successfully."
+    # Notes/custom fields are prefetched in one batch query each (plus one
+    # more for custom_fields__field), not re-queried per document -- an N+1
+    # regression here would scale with document count instead of staying flat
+    # (7 with the prefetch vs. 10 without it, for these 2 documents).
+    assert len(ctx.captured_queries) <= 8
 
     with indexing.get_vector_store() as store:
         after = store.get_modified_times()
