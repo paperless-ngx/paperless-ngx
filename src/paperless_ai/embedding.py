@@ -7,7 +7,6 @@ if TYPE_CHECKING:
     from llama_index.core.base.embeddings.base import BaseEmbedding
 
 from documents.models import Document
-from documents.models import Note
 from paperless.config import AIConfig
 from paperless.models import LLMEmbeddingBackend
 from paperless.network import PinnedHostAsyncHTTPTransport
@@ -126,7 +125,7 @@ def build_llm_index_text(doc: Document) -> str:
     # prepend. Notes and Custom Fields stay in the body: Notes can be long free
     # text, Custom Fields are dynamic in count and best kept in the embedding.
     lines = [
-        f"Notes: {','.join([str(c.note) for c in Note.objects.filter(document=doc)])}",
+        f"Notes: {','.join([str(c.note) for c in doc.notes.all()])}",
     ]
 
     for instance in doc.custom_fields.all():
