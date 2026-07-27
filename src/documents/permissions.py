@@ -163,7 +163,7 @@ def set_permissions_for_object(
                         )
 
 
-def _permitted_document_ids(user):
+def permitted_document_ids(user):
     """
     Return a queryset of document IDs the user may view, limited to non-deleted
     documents. This intentionally avoids ``get_objects_for_user`` to keep the
@@ -220,7 +220,7 @@ def get_document_count_filter_for_user(user, related_name: str = "documents"):
         # Superuser: no permission filtering needed
         return Q(**{f"{related_name}__deleted_at__isnull": True})
 
-    permitted_ids = _permitted_document_ids(user)
+    permitted_ids = permitted_document_ids(user)
     return Q(**{f"{related_name}__id__in": permitted_ids})
 
 
@@ -311,7 +311,7 @@ def annotate_document_count_for_related_queryset(
         queryset,
         through_model=through_model,
         related_object_field=related_object_field,
-        document_ids=_permitted_document_ids(user),
+        document_ids=permitted_document_ids(user),
         target_field=target_field,
     )
 

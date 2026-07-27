@@ -14,6 +14,7 @@ from unittest import mock
 import celery
 from dateutil import parser
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.core import mail
@@ -47,6 +48,8 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.signals.handlers import run_workflows
+from documents.tests.factories import DocumentFactory
+from documents.tests.factories import TagFactory
 from documents.tests.utils import ConsumeTaskMixin
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import read_streaming_response
@@ -1211,6 +1214,91 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             [results[0]["id"]],
             [u1_doc1.id],
         )
+
+    def test_document_owned_and_group_shared_not_duplicated_when_filtering_by_tags(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A document owned by a user and also shared with a group the user belongs to
+        WHEN:
+            - The user filters documents by more than one tag (tags__id__all)
+        THEN:
+            - The document is returned exactly once, not once per permission path
+            (regression test for https://github.com/paperless-ngx/paperless-ngx/issues/13331)
+        """
+        user = User.objects.create_user("user1")
+        user.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        group = Group.objects.create(name="group1")
+        user.groups.add(group)
+
+        tag1 = TagFactory()
+        tag2 = TagFactory()
+        doc = DocumentFactory(title="shared", owner=user)
+        doc.tags.add(tag1, tag2)
+        assign_perm("view_document", group, doc)
+
+        self.client.force_authenticate(user=user)
+        response = self.client.get(
+            f"/api/documents/?tags__id__all={tag1.id},{tag2.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], doc.id)
+
+    def test_document_permission_filter_excludes_unrelated_documents(self) -> None:
+        """
+        GIVEN:
+            - A document owned by one user, with no permission granted to another user
+        WHEN:
+            - The unrelated user requests the document list
+        THEN:
+            - The document does not appear in their results
+        """
+        owner = User.objects.create_user("owner1")
+        stranger = User.objects.create_user("stranger1")
+        stranger.user_permissions.add(
+            *Permission.objects.filter(codename="view_document"),
+        )
+
+        DocumentFactory(title="private", owner=owner)
+
+        self.client.force_authenticate(user=stranger)
+        response = self.client.get("/api/documents/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 0)
+
+    def test_document_permission_filter_only_visible_to_group_members(self) -> None:
+        """
+        GIVEN:
+            - A document shared with a group via object permissions
+        WHEN:
+            - A group member and a non-member both request the document list
+        THEN:
+            - Only the group member sees the document
+        """
+        owner = User.objects.create_user("owner2")
+        member = User.objects.create_user("member1")
+        non_member = User.objects.create_user("nonmember1")
+        for u in (member, non_member):
+            u.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+
+        group = Group.objects.create(name="group2")
+        member.groups.add(group)
+
+        doc = DocumentFactory(title="shared2", owner=owner)
+        assign_perm("view_document", group, doc)
+
+        self.client.force_authenticate(user=member)
+        response = self.client.get("/api/documents/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], doc.id)
+
+        self.client.force_authenticate(user=non_member)
+        response = self.client.get("/api/documents/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 0)
 
     def test_pagination_results(self) -> None:
         """
