@@ -242,6 +242,61 @@ class ConsumerPluginMixin:
         self.log.error(log_message or message, exc_info=exc_info)
         raise ConsumerError(f"{self.filename}: {log_message or message}") from exception
 
+    def _check_duplicate(self, checksum: str) -> None:
+        """
+        Check the given checksum against existing documents. If any match,
+        a warning is logged. If CONSUMER_DELETE_DUPLICATES is also enabled,
+        the input file is deleted and consumption is rejected via
+        ConsumeFileDuplicateError.
+        """
+        existing_doc = Document.global_objects.filter(
+            Q(checksum=checksum) | Q(archive_checksum=checksum),
+        )
+        if existing_doc.exists():
+            existing_doc = existing_doc.order_by("-created")
+            duplicates_in_trash = existing_doc.filter(deleted_at__isnull=False)
+            log_msg = (
+                f"Consuming duplicate {self.filename}: "
+                f"{existing_doc.count()} existing document(s) share the same content."
+            )
+
+            if duplicates_in_trash.exists():
+                log_msg += " Note: at least one existing document is in the trash."
+
+            self.log.warning(log_msg)
+
+            if settings.CONSUMER_DELETE_DUPLICATES:
+                duplicate = existing_doc.first()
+                duplicate_label = (
+                    duplicate.title
+                    or duplicate.original_filename
+                    or (Path(duplicate.filename).name if duplicate.filename else None)
+                    or str(duplicate.pk)
+                )
+
+                Path(self.input_doc.original_file).unlink()
+
+                failure_msg = (
+                    f"Not consuming {self.filename}: "
+                    f"It is a duplicate of {duplicate_label} (#{duplicate.pk})"
+                )
+                status_msg = ConsumerStatusShortMessage.DOCUMENT_ALREADY_EXISTS
+
+                if duplicates_in_trash.exists():
+                    status_msg = (
+                        ConsumerStatusShortMessage.DOCUMENT_ALREADY_EXISTS_IN_TRASH
+                    )
+                    failure_msg += " Note: existing document is in the trash."
+
+                self._send_progress(100, 100, ProgressStatusOptions.FAILED, status_msg)
+                self.log.error(failure_msg)
+                in_trash = duplicates_in_trash.exists()
+                raise ConsumeFileDuplicateError(
+                    f"{self.filename}: {failure_msg}",
+                    duplicate.pk,
+                    in_trash=in_trash,
+                )
+
 
 class ConsumerPlugin(
     AlwaysRunPluginMixin,
@@ -314,6 +369,8 @@ class ConsumerPlugin(
         working_file_path = str(self.working_copy)
         original_file_path = str(self.input_doc.original_file)
 
+        checksum_before = compute_checksum(self.working_copy)
+
         script_env = os.environ.copy()
         script_env["DOCUMENT_SOURCE_PATH"] = original_file_path
         script_env["DOCUMENT_WORKING_PATH"] = working_file_path
@@ -335,6 +392,20 @@ class ConsumerPlugin(
                 exc_info=True,
                 exception=e,
             )
+
+        # The script may have replaced the file with new content (e.g. an
+        # external OCR service). The stored checksum will be computed from the
+        # modified file, so the preflight check against the unmodified input
+        # cannot catch duplicates of it. Re-check with the checksum the
+        # document would actually be stored under.
+        if self.working_copy.is_file():
+            checksum_after = compute_checksum(self.working_copy)
+            if checksum_after != checksum_before:
+                self.log.debug(
+                    "Pre-consume script modified the working file, "
+                    "re-checking for duplicates",
+                )
+                self._check_duplicate(checksum_after)
 
     def run_post_consume_script(self, document: Document) -> None:
         """
@@ -986,54 +1057,7 @@ class ConsumerPreflightPlugin(
         """
         Using the SHA256 of the file, check this exact file doesn't already exist
         """
-        checksum = compute_checksum(Path(self.input_doc.original_file))
-        existing_doc = Document.global_objects.filter(
-            Q(checksum=checksum) | Q(archive_checksum=checksum),
-        )
-        if existing_doc.exists():
-            existing_doc = existing_doc.order_by("-created")
-            duplicates_in_trash = existing_doc.filter(deleted_at__isnull=False)
-            log_msg = (
-                f"Consuming duplicate {self.filename}: "
-                f"{existing_doc.count()} existing document(s) share the same content."
-            )
-
-            if duplicates_in_trash.exists():
-                log_msg += " Note: at least one existing document is in the trash."
-
-            self.log.warning(log_msg)
-
-            if settings.CONSUMER_DELETE_DUPLICATES:
-                duplicate = existing_doc.first()
-                duplicate_label = (
-                    duplicate.title
-                    or duplicate.original_filename
-                    or (Path(duplicate.filename).name if duplicate.filename else None)
-                    or str(duplicate.pk)
-                )
-
-                Path(self.input_doc.original_file).unlink()
-
-                failure_msg = (
-                    f"Not consuming {self.filename}: "
-                    f"It is a duplicate of {duplicate_label} (#{duplicate.pk})"
-                )
-                status_msg = ConsumerStatusShortMessage.DOCUMENT_ALREADY_EXISTS
-
-                if duplicates_in_trash.exists():
-                    status_msg = (
-                        ConsumerStatusShortMessage.DOCUMENT_ALREADY_EXISTS_IN_TRASH
-                    )
-                    failure_msg += " Note: existing document is in the trash."
-
-                self._send_progress(100, 100, ProgressStatusOptions.FAILED, status_msg)
-                self.log.error(failure_msg)
-                in_trash = duplicates_in_trash.exists()
-                raise ConsumeFileDuplicateError(
-                    f"{self.filename}: {failure_msg}",
-                    duplicate.pk,
-                    in_trash=in_trash,
-                )
+        self._check_duplicate(compute_checksum(Path(self.input_doc.original_file)))
 
     def pre_check_directories(self) -> None:
         """

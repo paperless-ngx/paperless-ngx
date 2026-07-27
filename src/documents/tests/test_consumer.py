@@ -1,7 +1,9 @@
 import datetime
+import hashlib
 import shutil
 import stat
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
@@ -1433,6 +1435,100 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                         ConsumerError,
                         c.run,
                     )
+
+    @contextmanager
+    def get_modifying_script(self):
+        """
+        A pre-consume script which deterministically replaces the working
+        file, as e.g. an external OCR service would.
+        """
+        with tempfile.NamedTemporaryFile(mode="w") as script:
+            with script.file as outfile:
+                outfile.write("#!/usr/bin/env bash\n")
+                outfile.write('printf "modified content" > "$DOCUMENT_WORKING_PATH"\n')
+
+            st = Path(script.name).stat()
+            Path(script.name).chmod(st.st_mode | stat.S_IEXEC)
+
+            with override_settings(PRE_CONSUME_SCRIPT=script.name):
+                yield hashlib.sha256(b"modified content").hexdigest()
+
+    @override_settings(CONSUMER_DELETE_DUPLICATES=True)
+    def test_script_modified_file_duplicate_rejected(self) -> None:
+        """
+        GIVEN:
+            - A pre-consume script which replaces the file content
+            - An existing document whose checksum matches the modified content
+        WHEN:
+            - The file is consumed
+        THEN:
+            - The file passes the preflight check (its unmodified checksum is
+              unknown), but is rejected after the script has modified it
+        """
+        with self.get_modifying_script() as modified_checksum:
+            existing = Document.objects.create(
+                title="Existing document",
+                content="",
+                checksum=modified_checksum,
+                mime_type="application/pdf",
+            )
+
+            with self.get_consumer(self.test_file) as c:
+                self.assertRaisesMessage(
+                    ConsumerError,
+                    f"It is a duplicate of {existing.title} (#{existing.pk})",
+                    c.run,
+                )
+
+            self.assertFalse(self.test_file.is_file())
+            self.assertEqual(Document.objects.count(), 1)
+
+    def test_script_modified_file_duplicate_warns(self) -> None:
+        """
+        GIVEN:
+            - A pre-consume script which replaces the file content
+            - An existing document whose checksum matches the modified content
+        WHEN:
+            - The pre-consume script is run without CONSUMER_DELETE_DUPLICATES
+        THEN:
+            - A duplicate warning is logged, consumption is not rejected
+        """
+        with self.get_modifying_script() as modified_checksum:
+            Document.objects.create(
+                title="Existing document",
+                content="",
+                checksum=modified_checksum,
+                mime_type="application/pdf",
+            )
+
+            with self.get_consumer(self.test_file) as c:
+                c.working_copy = self.dirs.scratch_dir / "working.pdf"
+                shutil.copy(self.test_file, c.working_copy)
+
+                with self.assertLogs("paperless.consumer", level="WARNING") as cm:
+                    c.run_pre_consume_script()
+
+                self.assertTrue(
+                    any("share the same content" in line for line in cm.output),
+                )
+
+    def test_script_modified_file_no_duplicate(self) -> None:
+        """
+        GIVEN:
+            - A pre-consume script which replaces the file content
+            - No existing document matches the modified content
+        WHEN:
+            - The pre-consume script is run
+        THEN:
+            - No duplicate warning is logged
+        """
+        with self.get_modifying_script():
+            with self.get_consumer(self.test_file) as c:
+                c.working_copy = self.dirs.scratch_dir / "working.pdf"
+                shutil.copy(self.test_file, c.working_copy)
+
+                with self.assertNoLogs("paperless.consumer", level="WARNING"):
+                    c.run_pre_consume_script()
 
 
 class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
