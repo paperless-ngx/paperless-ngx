@@ -401,6 +401,10 @@ class TestAIIndex(DirectoriesMixin, TestCase):
                 "documents.tasks.update_llm_index",
             ) as update_llm_index,
         ):
-            tasks.bulk_update_documents([doc.pk for doc in docs])
+            doc_ids = [doc.pk for doc in docs]
+            tasks.bulk_update_documents(doc_ids)
             self.assertEqual(update_document_in_llm_index.apply_async.call_count, 0)
-            update_llm_index.assert_called_once()
+            update_llm_index.assert_called_once_with(
+                rebuild=False,
+                document_ids=doc_ids,
+            )
