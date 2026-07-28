@@ -173,6 +173,14 @@ class TestCrud:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - An empty vector store
+        WHEN:
+            - A single node is added and then queried with its own embedding
+        THEN:
+            - The node id, metadata, and a cosine similarity of 1.0 are returned
+        """
         node = make_node("n1", "1")
         assert store.add([node]) == ["n1"]
         result = _query(store, node.embedding, top_k=1)
@@ -185,10 +193,26 @@ class TestCrud:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A vector store with no table created yet
+        WHEN:
+            - A query is issued
+        THEN:
+            - Empty ids, nodes, and similarities are returned without raising
+        """
         result = _query(store, [0.0] * DIM)
         assert result.ids == [] and result.nodes == [] and result.similarities == []
 
     def test_add_empty_list_is_noop(self, store: PaperlessSqliteVecVectorStore) -> None:
+        """
+        GIVEN:
+            - A vector store with no table created yet
+        WHEN:
+            - add() is called with an empty list of nodes
+        THEN:
+            - No ids are returned and the table is not created
+        """
         assert store.add([]) == []
         assert not store.table_exists()
 
@@ -196,6 +220,14 @@ class TestCrud:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with two chunks for document 1 and one chunk for document 2
+        WHEN:
+            - delete() is called for document 1
+        THEN:
+            - Only document 2's chunk remains queryable
+        """
         store.add([make_node("a1", "1"), make_node("a2", "1"), make_node("b1", "2")])
         store.delete("1")
         result = _query(store, [0.0] * DIM, top_k=10)
@@ -205,6 +237,14 @@ class TestCrud:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with one chunk each for documents 1, 2, and 3
+        WHEN:
+            - A query is issued with an IN filter on documents 2 and 3
+        THEN:
+            - Only chunks belonging to documents 2 and 3 are returned
+        """
         store.add(
             [
                 make_node("a1", "1", seed=0.0),
@@ -219,6 +259,17 @@ class TestCrud:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with 12 chunks spread across 4 documents
+        WHEN:
+            - A query is issued with top_k=3 and an IN filter covering all 4
+              documents
+        THEN:
+            - Exactly 3 results are returned, ranked by similarity (global
+              top-k even under an IN filter, since document_id is a metadata
+              column, not a partition key)
+        """
         # k semantics: global top-k even with IN filters (document_id is a
         # metadata column, not a partition key -- see design doc).
         store.add(
@@ -237,6 +288,17 @@ class TestCrud:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store that starts with no table, then has chunks for
+              documents 1 and 2 added
+        WHEN:
+            - get_nodes() is called before the table exists, filtered to
+              document 1, and filtered to a document id that doesn't exist
+        THEN:
+            - Each call returns the expected embedding-bearing nodes or an
+              empty list, without raising
+        """
         assert store.get_nodes(filters=_in_filter(["1"])) == []  # no table yet
         store.add([make_node("a1", "1"), make_node("b1", "2")])
         nodes = store.get_nodes(filters=_in_filter(["1"]))
@@ -248,6 +310,14 @@ class TestCrud:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with one chunk each for documents 1, 2, and 3
+        WHEN:
+            - A query is issued with an EQ filter on document 2
+        THEN:
+            - Only document 2's chunk is returned
+        """
         store.add(
             [
                 make_node("a1", "1", seed=0.0),
@@ -267,6 +337,14 @@ class TestCrud:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A vector store
+        WHEN:
+            - get_nodes() is called with node_ids (an unsupported lookup mode)
+        THEN:
+            - NotImplementedError is raised
+        """
         with pytest.raises(NotImplementedError):
             store.get_nodes(node_ids=["x"])
 
@@ -275,6 +353,15 @@ class TestCrud:
         store: PaperlessSqliteVecVectorStore,
         tmp_path: Path,
     ) -> None:
+        """
+        GIVEN:
+            - A store with one chunk already written to disk
+        WHEN:
+            - A new PaperlessSqliteVecVectorStore instance is opened against
+              the same directory
+        THEN:
+            - The new instance sees the existing table, dimension, and node
+        """
         store.add([make_node("a1", "1")])
         with PaperlessSqliteVecVectorStore(uri=str(tmp_path)) as reopened:
             assert reopened.table_exists()
@@ -282,6 +369,15 @@ class TestCrud:
             assert _query(reopened, [0.0] * DIM, top_k=1).ids == ["a1"]
 
     def test_table_exists_and_drop(self, store: PaperlessSqliteVecVectorStore) -> None:
+        """
+        GIVEN:
+            - A fresh store with no table
+        WHEN:
+            - A node is added, then drop_table() is called
+        THEN:
+            - table_exists() and vector_dim() reflect the table's creation and
+              subsequent removal
+        """
         assert not store.table_exists()
         store.add([make_node("a1", "1")])
         assert store.table_exists()
@@ -292,6 +388,14 @@ class TestCrud:
 
 class TestBuildWhere:
     def test_ne_filter_translates_to_not_equal_clause(self) -> None:
+        """
+        GIVEN:
+            - A NE MetadataFilter on document_id
+        WHEN:
+            - _build_where() translates it to SQL
+        THEN:
+            - A parameterized "!=" clause is produced
+        """
         where, params = _build_where(_ne_filter("1"))
         assert where == "(document_id != ?)"
         assert params == ["1"]
@@ -300,6 +404,14 @@ class TestBuildWhere:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with one chunk each for documents 1 and 2
+        WHEN:
+            - A query is issued with a NE filter on document 1
+        THEN:
+            - Only document 2's chunk is returned
+        """
         store.add([make_node("a1", "1"), make_node("b1", "2")])
         assert sorted(
             _query(store, [0.0] * DIM, top_k=5, filters=_ne_filter("1")).ids,
@@ -328,6 +440,16 @@ class TestBuildWhere:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with one chunk each for documents 1 and 2
+        WHEN:
+            - A query and a get_nodes() call are issued with a filter whose
+              only clause is an untranslatable nested MetadataFilters
+        THEN:
+            - Neither call raises, and both fail closed by returning no rows
+              (rather than emitting invalid or unfiltered SQL)
+        """
         store.add([make_node("a1", "1"), make_node("b1", "2")])
         nested = MetadataFilters(
             filters=[
@@ -349,6 +471,16 @@ class TestUpsert:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with two chunks for document 1 and one for document 2
+        WHEN:
+            - upsert_document() replaces document 1's chunks with a single new
+              chunk
+        THEN:
+            - Querying returns only the new chunk for document 1 and the
+              untouched chunk for document 2; the stale chunks are gone
+        """
         store.add(
             [make_node("d1c1", "1"), make_node("d1c2", "1"), make_node("d2c1", "2")],
         )
@@ -360,6 +492,14 @@ class TestUpsert:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with no table yet
+        WHEN:
+            - upsert_document() is called for a document with one node
+        THEN:
+            - The table is created and the node is queryable
+        """
         store.upsert_document("1", [make_node("a1", "1")])
         assert _query(store, [0.0] * DIM, top_k=1).ids == ["a1"]
 
@@ -367,6 +507,16 @@ class TestUpsert:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with one chunk each for documents 1 and 2
+        WHEN:
+            - upsert_document() is called for document 1 with an empty node
+              list
+        THEN:
+            - Document 1's chunk is removed and only document 2's remains
+              queryable
+        """
         store.add([make_node("a1", "1"), make_node("b1", "2")])
         store.upsert_document("1", [])
         assert _query(store, [0.0] * DIM, top_k=10).ids == ["b1"]
@@ -376,7 +526,18 @@ class TestUpsert:
         store: PaperlessSqliteVecVectorStore,
         tmp_path: Path,
     ) -> None:
-        """A second connection must never observe document 1 half-replaced."""
+        """A second connection must never observe document 1 half-replaced.
+
+        GIVEN:
+            - A store with two chunks for document 1, and a second reader
+              connection open against the same database
+        WHEN:
+            - upsert_document() replaces document 1's chunks on the writer
+              connection
+        THEN:
+            - The reader connection only ever observes the fully-replaced
+              state, never a partial mix of old and new chunks
+        """
         store.add([make_node("a1", "1"), make_node("a2", "1")])
         with PaperlessSqliteVecVectorStore(uri=str(tmp_path)) as reader:
             store.upsert_document("1", [make_node("a3", "1")])
@@ -393,6 +554,15 @@ class TestDocumentChunksIndex:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - An empty store
+        WHEN:
+            - add() writes chunks for documents 1 and 2
+        THEN:
+            - document_chunks records a (chunk_id, document_id) row for every
+              chunk written
+        """
         store.add([make_node("a1", "1"), make_node("a2", "1"), make_node("b1", "2")])
         assert _chunk_index_rows(store) == [
             ("a1", "1"),
@@ -404,6 +574,15 @@ class TestDocumentChunksIndex:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with two chunks for document 1 and one for document 2
+        WHEN:
+            - delete() removes document 1
+        THEN:
+            - document_chunks no longer has rows for document 1, but retains
+              document 2's row
+        """
         store.add([make_node("a1", "1"), make_node("a2", "1"), make_node("b1", "2")])
         store.delete("1")
         assert _chunk_index_rows(store) == [("b1", "2")]
@@ -412,6 +591,15 @@ class TestDocumentChunksIndex:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with one chunk each for documents 1 and 2
+        WHEN:
+            - upsert_document() replaces document 1's chunk with a new one
+        THEN:
+            - document_chunks reflects only the new chunk for document 1,
+              alongside the untouched row for document 2
+        """
         store.add([make_node("a1", "1"), make_node("b1", "2")])
         store.upsert_document("1", [make_node("a2", "1")])
         assert _chunk_index_rows(store) == [("a2", "1"), ("b1", "2")]
@@ -420,9 +608,53 @@ class TestDocumentChunksIndex:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with one chunk indexed
+        WHEN:
+            - drop_table() is called
+        THEN:
+            - document_chunks is emptied along with the vec0 table
+        """
         store.add([make_node("a1", "1")])
         store.drop_table()
         assert _chunk_index_rows(store) == []
+
+    def test_delete_never_indexed_document_is_noop(
+        self,
+        store: PaperlessSqliteVecVectorStore,
+    ) -> None:
+        """
+        GIVEN:
+            - A store with chunks for documents 1 and 2, but none for a
+              document id that was never indexed
+        WHEN:
+            - delete() is called for that never-indexed document id
+        THEN:
+            - document_chunks is unchanged; no error is raised and no other
+              document's rows are touched
+        """
+        store.add([make_node("a1", "1"), make_node("b1", "2")])
+        store.delete("never-indexed")
+        assert _chunk_index_rows(store) == [("a1", "1"), ("b1", "2")]
+
+    def test_upsert_empty_nodes_clears_document_chunks(
+        self,
+        store: PaperlessSqliteVecVectorStore,
+    ) -> None:
+        """
+        GIVEN:
+            - A store with one chunk each for documents 1 and 2
+        WHEN:
+            - upsert_document() is called for document 1 with an empty node
+              list
+        THEN:
+            - document_chunks no longer has rows for document 1, but retains
+              document 2's row
+        """
+        store.add([make_node("a1", "1"), make_node("b1", "2")])
+        store.upsert_document("1", [])
+        assert _chunk_index_rows(store) == [("b1", "2")]
 
 
 class TestMetadataCoercion:
@@ -430,6 +662,15 @@ class TestMetadataCoercion:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A node whose "modified" metadata value is None
+        WHEN:
+            - The node is added
+        THEN:
+            - No error is raised (vec0 rejects NULL metadata) and the stored
+              modified time is an empty string
+        """
         node = make_node("a1", "1")
         node.metadata["modified"] = None
         store.add([node])  # must not raise (vec0 rejects NULL metadata)
@@ -438,6 +679,15 @@ class TestMetadataCoercion:
 
 class TestModelNameTracking:
     def test_stored_model_name_none_without_table(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A store configured with an embed_model_name but no table
+              created yet
+        WHEN:
+            - stored_model_name() is called
+        THEN:
+            - None is returned, since nothing has been persisted
+        """
         with PaperlessSqliteVecVectorStore(
             uri=str(tmp_path),
             embed_model_name="model-a",
@@ -445,6 +695,16 @@ class TestModelNameTracking:
             assert store.stored_model_name() is None
 
     def test_model_name_stored_after_add_and_persists(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A store configured with an embed_model_name
+        WHEN:
+            - A node is added, and the store is later reopened against the
+              same directory without specifying a model name
+        THEN:
+            - stored_model_name() returns the original model name in both
+              cases
+        """
         with PaperlessSqliteVecVectorStore(
             uri=str(tmp_path),
             embed_model_name="model-a",
@@ -455,6 +715,17 @@ class TestModelNameTracking:
             assert reopened.stored_model_name() == "model-a"
 
     def test_config_mismatch_semantics(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A store configured with embed_model_name "model-a"
+        WHEN:
+            - config_mismatch() is checked before the table exists, then
+              after adding a node, against both the matching and a different
+              model name
+        THEN:
+            - No mismatch is reported before the table exists or against the
+              matching name; a mismatch is reported against the different name
+        """
         with PaperlessSqliteVecVectorStore(
             uri=str(tmp_path),
             embed_model_name="model-a",
@@ -468,6 +739,17 @@ class TestModelNameTracking:
         self,
         tmp_path: Path,
     ) -> None:
+        """
+        GIVEN:
+            - A store created without an embed_model_name (as if the table
+              predates model-name tracking)
+        WHEN:
+            - config_mismatch() is checked against a model name after adding
+              a node
+        THEN:
+            - No mismatch is reported, since there is no recorded model name
+              to compare against
+        """
         with PaperlessSqliteVecVectorStore(uri=str(tmp_path)) as store:  # no model name
             store.add([make_node("a1", "1")])
             assert not store.config_mismatch("model-a")
@@ -478,12 +760,30 @@ class TestGetModifiedTimes:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - An empty store
+        WHEN:
+            - get_modified_times() is called
+        THEN:
+            - An empty dict is returned
+        """
         assert store.get_modified_times() == {}
 
     def test_returns_one_entry_per_document(
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with two chunks for document 1 (same modified time) and
+              one chunk for document 2 (a different modified time)
+        WHEN:
+            - get_modified_times() is called
+        THEN:
+            - One entry per document id is returned, each with its modified
+              time
+        """
         store.add(
             [
                 make_node("a1", "1", modified="2026-01-01T00:00:00"),
@@ -521,6 +821,14 @@ class TestCompact:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with a single chunk, far below the compaction threshold
+        WHEN:
+            - compact() is called
+        THEN:
+            - The store is left usable and the chunk remains queryable
+        """
         store.add([make_node("a1", "1")])
         store.compact()
         assert _query(store, [0.0] * DIM, top_k=1).ids == ["a1"]
@@ -529,6 +837,17 @@ class TestCompact:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with chunks for two documents, one of which has been
+              churned through several upsert generations
+        WHEN:
+            - compact(force=True) rebuilds the index
+        THEN:
+            - Every live node and its metadata survive unchanged, the bloat
+              ratio drops back to 1.0, and the store remains usable for
+              further writes and queries afterward
+        """
         store.add([make_node("a1", "1"), make_node("b1", "2", seed=3.0)])
         self._churn(store, 5)
         before = {
@@ -552,6 +871,16 @@ class TestCompact:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store churned through enough upsert generations that its
+              bloat ratio exceeds the auto-compact threshold
+        WHEN:
+            - compact() is called without force=True
+        THEN:
+            - The store compacts automatically, dropping the bloat ratio back
+              to 1.0
+        """
         store.add([make_node(f"s{j}", "1", seed=float(j)) for j in range(20)])
         self._churn(store, 5)
         assert self._bloat_ratio(store) > 2
@@ -562,6 +891,14 @@ class TestCompact:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with no table created yet
+        WHEN:
+            - compact() and compact(force=True) are both called
+        THEN:
+            - Neither call raises
+        """
         store.compact()
         store.compact(force=True)
 
@@ -571,12 +908,30 @@ class TestCompact:
     ) -> None:
         """document_chunks must survive the file-swap rebuild, or delete()
         would silently stop finding chunk ids for anything indexed before a
-        compaction ran."""
+        compaction ran.
+
+        GIVEN:
+            - A store with an untouched chunk for document 2 and a chunk for
+              document 1 that has been churned through 5 upsert generations
+        WHEN:
+            - compact(force=True) rebuilds the index
+        THEN:
+            - document_chunks still has document 2's row, and document 1's
+              rows match only its final upsert generation (no stale ids from
+              earlier generations); delete() still works afterward
+        """
         store.add([make_node("a1", "1"), make_node("b1", "2")])
         self._churn(store, 5)
         store.compact(force=True)
 
         assert _chunk_index_rows(store, "2") == [("b1", "2")]
+
+        # document "1" was upserted 5x before compaction (gen0..gen4); only
+        # its final generation's chunk ids should remain in document_chunks,
+        # not stale ids from earlier upsert generations.
+        assert _chunk_index_rows(store, "1") == sorted(
+            (f"gen4-{j}", "1") for j in range(20)
+        )
 
         store.delete("2")
         assert "b1" not in _query(store, [0.0] * DIM, top_k=10).ids
@@ -592,6 +947,17 @@ class TestCompact:
         Normally the sole connection's close() checkpoints the temp WAL away,
         but a concurrent reader keeps -wal/-shm alive, so the cleanup must
         unlink them explicitly (as the structural-migration path does).
+
+        GIVEN:
+            - A store with one chunk, and a rebuild step patched to raise
+              after opening an extra connection to the temp compact file
+              (keeping its -wal/-shm alive past the raising connection's
+              close())
+        WHEN:
+            - compact(force=True) is called
+        THEN:
+            - RuntimeError propagates, and no .compact/.compact-wal/.compact-shm
+              files remain in the index directory
         """
         store.add([make_node("a1", "1")])
         compact_path = str(tmp_path / DB_FILENAME) + ".compact"
@@ -627,6 +993,16 @@ class TestCompact:
 
         A tiny batch size forces several fetchmany()/executemany() cycles so a
         regression in the streaming loop (dropped tail, off-by-one) surfaces.
+
+        GIVEN:
+            - A store with 10 chunks and a COMPACT_BATCH_SIZE small enough
+              that the rebuild must stream several fetchmany()/executemany()
+              batches
+        WHEN:
+            - compact(force=True) is called
+        THEN:
+            - Every row survives the rebuild and the bloat ratio settles at
+              1.0
         """
         monkeypatch.setattr("paperless_ai.vector_store.COMPACT_BATCH_SIZE", 3)
         store.add([make_node(f"n{i}", "1", seed=float(i)) for i in range(10)])
@@ -642,10 +1018,26 @@ class TestDbFile:
         store: PaperlessSqliteVecVectorStore,
         tmp_path: Path,
     ) -> None:
+        """
+        GIVEN:
+            - A fresh store directory
+        WHEN:
+            - A node is added
+        THEN:
+            - The expected single db file exists in the index directory
+        """
         store.add([make_node("a1", "1")])
         assert (tmp_path / DB_FILENAME).exists()
 
     def test_wal_mode_enabled(self, store: PaperlessSqliteVecVectorStore) -> None:
+        """
+        GIVEN:
+            - A freshly opened store
+        WHEN:
+            - The connection's journal_mode pragma is checked
+        THEN:
+            - WAL mode is enabled
+        """
         assert (
             store.client.execute("PRAGMA journal_mode").fetchone()[0].lower() == "wal"
         )
@@ -664,6 +1056,15 @@ class TestMigrations:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with no table yet
+        WHEN:
+            - A node is added, creating the table
+        THEN:
+            - The store's schema_version is recorded as the current
+              SCHEMA_VERSION
+        """
         store.add([make_node("a1", "1")])
         assert self._schema_version(store) == SCHEMA_VERSION
 
@@ -671,12 +1072,28 @@ class TestMigrations:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store with no table yet
+        WHEN:
+            - check_and_run_migrations() is called
+        THEN:
+            - False is returned (nothing to migrate)
+        """
         assert store.check_and_run_migrations() is False
 
     def test_check_migrations_current_version_returns_false(
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store already at the current SCHEMA_VERSION
+        WHEN:
+            - check_and_run_migrations() is called
+        THEN:
+            - False is returned (no pending migration)
+        """
         store.add([make_node("a1", "1")])
         assert store.check_and_run_migrations() is False
 
@@ -684,6 +1101,16 @@ class TestMigrations:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store at the current SCHEMA_VERSION with a pending re-embed
+              migration registered one version ahead
+        WHEN:
+            - check_and_run_migrations() is called
+        THEN:
+            - True is returned, signaling the caller must force a full
+              rebuild
+        """
         store.add([make_node("a1", "1")])
         # store was just created at the real (current) SCHEMA_VERSION, so the
         # simulated pending migration must target one version past that --
@@ -702,6 +1129,16 @@ class TestMigrations:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store at the current SCHEMA_VERSION with two chunks, and a
+              pending structural migration registered one version ahead
+        WHEN:
+            - check_and_run_migrations() is called
+        THEN:
+            - False is returned (no rebuild needed by the caller), the
+              schema_version advances, and every row survives the migration
+        """
         store.add([make_node("a1", "1"), make_node("b1", "2")])
         migration = Migration(
             from_version=SCHEMA_VERSION,
@@ -721,6 +1158,14 @@ class TestMigrations:
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store at the current SCHEMA_VERSION with one chunk
+        WHEN:
+            - compact(force=True) rebuilds the index
+        THEN:
+            - schema_version is unchanged after the rebuild
+        """
         store.add([make_node("a1", "1")])
         assert self._schema_version(store) == SCHEMA_VERSION
         store.compact(force=True)
@@ -733,7 +1178,23 @@ class TestMigrations:
         """The real v1 -> v2 migration (registered in MIGRATIONS) must
         backfill document_chunks for rows written before it existed, or
         delete()/upsert_document() would find zero chunk ids for them and
-        leave their vec0 rows orphaned forever."""
+        leave their vec0 rows orphaned forever.
+
+        GIVEN:
+            - A store simulating a pre-migration (schema v1) index: rows
+              exist in the vec0 table, but document_chunks is empty and
+              schema_version is forced back to 1
+        WHEN:
+            - check_and_run_migrations() is called, then delete() removes one
+              of the pre-migration documents, then
+              check_and_run_migrations() is called again
+        THEN:
+            - The first call backfills document_chunks for every
+              pre-migration row and advances schema_version to current;
+              delete() correctly removes the pre-migration document's rows
+              instead of silently no-op'ing; the second call is a no-op that
+              leaves schema_version unchanged
+        """
         store.add([make_node("a1", "1"), make_node("a2", "1"), make_node("b1", "2")])
         # Simulate a pre-migration (schema v1) store: rows exist in the vec0
         # table, but document_chunks (added by the v1 -> v2 migration) has no
@@ -758,10 +1219,62 @@ class TestMigrations:
         store.delete("1")
         assert sorted(_query(store, [0.0] * DIM, top_k=10).ids) == ["b1"]
 
+        # Running the check again post-migration must be a no-op: the store
+        # is already at SCHEMA_VERSION, so this just hits the
+        # current-version early return, not the migration logic a second
+        # time.
+        assert store.check_and_run_migrations() is False
+        assert self._schema_version(store) == SCHEMA_VERSION
+
+    def test_v1_to_v2_migration_preserves_embed_model_name(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """embed_model tracking (see TestModelNameTracking) predates the v1 ->
+        v2 migration and must survive it, or a migrated store would silently
+        stop detecting embedding-model config changes.
+
+        GIVEN:
+            - A store configured with an embed_model_name, simulated as a
+              pre-migration (schema v1) index with document_chunks emptied
+              and schema_version forced back to 1
+        WHEN:
+            - check_and_run_migrations() runs the v1 -> v2 migration
+        THEN:
+            - schema_version advances to current and stored_model_name()
+              still returns the original embed_model_name
+        """
+        with PaperlessSqliteVecVectorStore(
+            uri=str(tmp_path),
+            embed_model_name="model-a",
+        ) as store:
+            store.add([make_node("a1", "1")])
+            store.client.execute("DELETE FROM document_chunks")
+            store.client.execute(
+                "UPDATE index_meta SET value = '1' WHERE key = 'schema_version'",
+            )
+
+            assert store.check_and_run_migrations() is False
+            assert self._schema_version(store) == SCHEMA_VERSION
+            assert store.stored_model_name() == "model-a"
+
     def test_stop_at_reembed_boundary(
         self,
         store: PaperlessSqliteVecVectorStore,
     ) -> None:
+        """
+        GIVEN:
+            - A store at the current SCHEMA_VERSION N with three pending
+              migrations registered: structural N+1, re-embed N+2, structural
+              N+3
+        WHEN:
+            - check_and_run_migrations() is called
+        THEN:
+            - True is returned (re-embed needed), only the N+1 structural
+              migration actually runs, and schema_version stops at N+1 --
+              the N+3 migration must not run before the caller has forced a
+              rebuild for the re-embed boundary
+        """
         # Registry, relative to the store's current (real) SCHEMA_VERSION N:
         # structural N+1, re-embed N+2, structural N+3. Only N+1 should apply;
         # the re-embed boundary must stop execution before N+3 runs, and the
