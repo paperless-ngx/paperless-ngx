@@ -173,9 +173,7 @@ def permitted_document_ids(user, *, include_deleted: bool = False):
     """
 
     manager = Document.global_objects if include_deleted else Document.objects
-    base_docs = (
-        manager.all() if include_deleted else manager.filter(deleted_at__isnull=True)
-    )
+    base_docs = manager.all()
     base_docs = base_docs.only("id", "owner")
 
     if user is None or not getattr(user, "is_authenticated", False):
