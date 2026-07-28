@@ -214,27 +214,27 @@ class TestTranslateScalar:
             (
                 "created",
                 "2020",
-                "created:[2020-01-01T00:00:00Z TO 2021-01-01T00:00:00Z]",
+                "created:[2020-01-01T00:00:00Z TO 2021-01-01T00:00:00Z}",
             ),
             (
                 "created",
                 "202003",
-                "created:[2020-03-01T00:00:00Z TO 2020-04-01T00:00:00Z]",
+                "created:[2020-03-01T00:00:00Z TO 2020-04-01T00:00:00Z}",
             ),
             (
                 "created",
                 "20200115",
-                "created:[2020-01-15T00:00:00Z TO 2020-01-16T00:00:00Z]",
+                "created:[2020-01-15T00:00:00Z TO 2020-01-16T00:00:00Z}",
             ),
             (
                 "created",
                 "2020-01-15",
-                "created:[2020-01-15T00:00:00Z TO 2020-01-16T00:00:00Z]",
+                "created:[2020-01-15T00:00:00Z TO 2020-01-16T00:00:00Z}",
             ),
             (
                 "created",
                 "2020-03",
-                "created:[2020-03-01T00:00:00Z TO 2020-04-01T00:00:00Z]",
+                "created:[2020-03-01T00:00:00Z TO 2020-04-01T00:00:00Z}",
             ),
         ],
     )
@@ -248,9 +248,9 @@ class TestTranslateScalar:
         assert exc_info.value.value == "202023"
 
     def test_keyword_delegates(self) -> None:
-        # keyword path produces a range; just assert it is a created range
+        # keyword path produces a half-open range; just assert it is a created range
         out = translate_scalar("created", "today", UTC)
-        assert out.startswith("created:[") and out.endswith("]")
+        assert out.startswith("created:[") and out.endswith("}")
 
     def test_14digit_compact_datetime(self) -> None:
         out = translate_scalar("created", "20240115120000", UTC)
@@ -279,21 +279,21 @@ class TestTranslateRange:
     @pytest.mark.parametrize(
         ("lo", "hi", "expected"),
         [
-            ("2005", "2009", "created:[2005-01-01T00:00:00Z TO 2010-01-01T00:00:00Z]"),
+            ("2005", "2009", "created:[2005-01-01T00:00:00Z TO 2010-01-01T00:00:00Z}"),
             (
                 "202001",
                 "202006",
-                "created:[2020-01-01T00:00:00Z TO 2020-07-01T00:00:00Z]",
+                "created:[2020-01-01T00:00:00Z TO 2020-07-01T00:00:00Z}",
             ),
             (
                 "20200101",
                 "20201231",
-                "created:[2020-01-01T00:00:00Z TO 2021-01-01T00:00:00Z]",
+                "created:[2020-01-01T00:00:00Z TO 2021-01-01T00:00:00Z}",
             ),
             (
                 "2020-01-01",
                 "2020-12-31",
-                "created:[2020-01-01T00:00:00Z TO 2021-01-01T00:00:00Z]",
+                "created:[2020-01-01T00:00:00Z TO 2021-01-01T00:00:00Z}",
             ),
         ],
     )
@@ -302,7 +302,7 @@ class TestTranslateRange:
 
     def test_reversed_swaps(self):
         assert translate_range("created", "2009", "2005", UTC) == (
-            "created:[2005-01-01T00:00:00Z TO 2010-01-01T00:00:00Z]"
+            "created:[2005-01-01T00:00:00Z TO 2010-01-01T00:00:00Z}"
         )
 
     def test_open_upper(self):
@@ -311,7 +311,7 @@ class TestTranslateRange:
 
     def test_open_lower(self):
         out = translate_range("created", "", "2020", UTC)
-        assert out == f"created:[{OPEN_LO} TO 2021-01-01T00:00:00Z]"
+        assert out == f"created:[{OPEN_LO} TO 2021-01-01T00:00:00Z}}"
 
     def test_invalid_bound_raises(self):
         with pytest.raises(InvalidDateQuery) as exc_info:
@@ -334,16 +334,16 @@ class TestTranslateQuery:
         [
             (
                 "created:2020",
-                "created:[2020-01-01T00:00:00Z TO 2021-01-01T00:00:00Z]",
+                "created:[2020-01-01T00:00:00Z TO 2021-01-01T00:00:00Z}",
             ),
             ("tag:foo,bar", "tag:foo AND tag:bar"),
             # 'type' is a user-facing alias rewritten to 'document_type' (the real schema field)
             ("tag:foo,type:bar", "tag:foo AND document_type:bar"),
             (
                 "created:[2020 TO 2021],added:[2022 TO 2023]",
-                "created:[2020-01-01T00:00:00Z TO 2022-01-01T00:00:00Z]"
+                "created:[2020-01-01T00:00:00Z TO 2022-01-01T00:00:00Z}"
                 " AND "
-                "added:[2022-01-01T00:00:00Z TO 2024-01-01T00:00:00Z]",
+                "added:[2022-01-01T00:00:00Z TO 2024-01-01T00:00:00Z}",
             ),
             # correspondent is not multi-value: comma stays literal inside the value
             ("correspondent:foo,bar", "correspondent:foo,bar"),
@@ -506,7 +506,7 @@ class TestOperatorNormalization:
     def test_date_range_preserved(self) -> None:
         out = translate_query("created:[2020 TO 2021]", UTC)
         # Must not corrupt the ISO range
-        assert out == "created:[2020-01-01T00:00:00Z TO 2022-01-01T00:00:00Z]"
+        assert out == "created:[2020-01-01T00:00:00Z TO 2022-01-01T00:00:00Z}"
 
     def test_date_scalar_with_or(self) -> None:
         out = translate_query("created:2020 OR foo", UTC)
@@ -581,42 +581,42 @@ class TestKeywordDateResolution:
         [
             pytest.param(
                 "today",
-                "created:[2026-03-28T00:00:00Z TO 2026-03-29T00:00:00Z]",
+                "created:[2026-03-28T00:00:00Z TO 2026-03-29T00:00:00Z}",
                 id="today",
             ),
             pytest.param(
                 "yesterday",
-                "created:[2026-03-27T00:00:00Z TO 2026-03-28T00:00:00Z]",
+                "created:[2026-03-27T00:00:00Z TO 2026-03-28T00:00:00Z}",
                 id="yesterday",
             ),
             pytest.param(
                 "previous week",
-                "created:[2026-03-16T00:00:00Z TO 2026-03-23T00:00:00Z]",
+                "created:[2026-03-16T00:00:00Z TO 2026-03-23T00:00:00Z}",
                 id="previous-week",
             ),
             pytest.param(
                 "this month",
-                "created:[2026-03-01T00:00:00Z TO 2026-04-01T00:00:00Z]",
+                "created:[2026-03-01T00:00:00Z TO 2026-04-01T00:00:00Z}",
                 id="this-month",
             ),
             pytest.param(
                 "previous month",
-                "created:[2026-02-01T00:00:00Z TO 2026-03-01T00:00:00Z]",
+                "created:[2026-02-01T00:00:00Z TO 2026-03-01T00:00:00Z}",
                 id="previous-month",
             ),
             pytest.param(
                 "this year",
-                "created:[2026-01-01T00:00:00Z TO 2027-01-01T00:00:00Z]",
+                "created:[2026-01-01T00:00:00Z TO 2027-01-01T00:00:00Z}",
                 id="this-year",
             ),
             pytest.param(
                 "previous year",
-                "created:[2025-01-01T00:00:00Z TO 2026-01-01T00:00:00Z]",
+                "created:[2025-01-01T00:00:00Z TO 2026-01-01T00:00:00Z}",
                 id="previous-year",
             ),
             pytest.param(
                 "previous quarter",
-                "created:[2025-10-01T00:00:00Z TO 2026-01-01T00:00:00Z]",
+                "created:[2025-10-01T00:00:00Z TO 2026-01-01T00:00:00Z}",
                 id="previous-quarter",
             ),
         ],
@@ -637,42 +637,42 @@ class TestKeywordDateResolution:
         [
             pytest.param(
                 "today",
-                "added:[2026-03-27T15:00:00Z TO 2026-03-28T15:00:00Z]",
+                "added:[2026-03-27T15:00:00Z TO 2026-03-28T15:00:00Z}",
                 id="today",
             ),
             pytest.param(
                 "yesterday",
-                "added:[2026-03-26T15:00:00Z TO 2026-03-27T15:00:00Z]",
+                "added:[2026-03-26T15:00:00Z TO 2026-03-27T15:00:00Z}",
                 id="yesterday",
             ),
             pytest.param(
                 "previous week",
-                "added:[2026-03-15T15:00:00Z TO 2026-03-22T15:00:00Z]",
+                "added:[2026-03-15T15:00:00Z TO 2026-03-22T15:00:00Z}",
                 id="previous-week",
             ),
             pytest.param(
                 "this month",
-                "added:[2026-02-28T15:00:00Z TO 2026-03-31T15:00:00Z]",
+                "added:[2026-02-28T15:00:00Z TO 2026-03-31T15:00:00Z}",
                 id="this-month",
             ),
             pytest.param(
                 "previous month",
-                "added:[2026-01-31T15:00:00Z TO 2026-02-28T15:00:00Z]",
+                "added:[2026-01-31T15:00:00Z TO 2026-02-28T15:00:00Z}",
                 id="previous-month",
             ),
             pytest.param(
                 "this year",
-                "added:[2025-12-31T15:00:00Z TO 2026-12-31T15:00:00Z]",
+                "added:[2025-12-31T15:00:00Z TO 2026-12-31T15:00:00Z}",
                 id="this-year",
             ),
             pytest.param(
                 "previous year",
-                "added:[2024-12-31T15:00:00Z TO 2025-12-31T15:00:00Z]",
+                "added:[2024-12-31T15:00:00Z TO 2025-12-31T15:00:00Z}",
                 id="previous-year",
             ),
             pytest.param(
                 "previous quarter",
-                "added:[2025-09-30T15:00:00Z TO 2025-12-31T15:00:00Z]",
+                "added:[2025-09-30T15:00:00Z TO 2025-12-31T15:00:00Z}",
                 id="previous-quarter",
             ),
         ],
@@ -719,7 +719,7 @@ class TestISODatetimeBounds:
     def test_translate_query_text_before_comma_separated_date_clause(self) -> None:
         result = translate_query("schäfersee,created:previous year", UTC)
         assert result == (
-            "schäfersee AND created:[2025-01-01T00:00:00Z TO 2026-01-01T00:00:00Z]"
+            "schäfersee AND created:[2025-01-01T00:00:00Z TO 2026-01-01T00:00:00Z}"
         )
 
     def test_invalid_iso_datetime_raises(self) -> None:
