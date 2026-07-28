@@ -36,7 +36,16 @@
           (focus)="clearLastSearchTerm()"
           (clear)="clearLastSearchTerm()"
           (blur)="onBlur()">
+          <ng-template ng-label-tmp let-item="item">
+            @if (iconField && item[iconField]) {
+              <i-bs class="me-2" [name]="item[iconField]"></i-bs>
+            }
+            <span [title]="item[bindLabel]">{{item[bindLabel]}}</span>
+          </ng-template>
           <ng-template ng-option-tmp let-item="item">
+              @if (iconField && item[iconField]) {
+                <i-bs class="me-2" [name]="item[iconField]"></i-bs>
+              }
               <span [title]="item[bindLabel]">{{item[bindLabel]}}</span>
           </ng-template>
         </ng-select>
