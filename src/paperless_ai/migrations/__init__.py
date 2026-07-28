@@ -2,20 +2,20 @@
 
 Each migration lives in its own module here, named ``mNNNN_description.py``
 (e.g. ``m0001_add_document_chunks.py`` -- a leading digit isn't a valid
-Python identifier, hence the ``m`` prefix, unlike Django's own
-``NNNN_description.py`` migrations, which get away with it because Django's
-migration loader uses ``importlib.import_module()`` with a dynamic string
-path instead of a static import statement), and registers itself into
+Python identifier, hence the ``m`` prefix, unlike Django's own numbered
+migrations, which load via a dynamic ``importlib.import_module()`` call
+rather than a static import statement), and registers itself into
 ``MIGRATIONS`` at import time. ``vector_store.py`` imports those modules at
 the bottom of the file, purely for that registration side effect, after
-``PaperlessSqliteVecVectorStore`` and ``_copy_rows`` are fully defined --
-migrations need both to implement ``apply()``.
+``PaperlessSqliteVecVectorStore`` is fully defined -- migrations need it to
+implement ``apply()`` (see ``Migration`` below).
 
-Add a new migration by adding a new ``mNNNN_description.py`` module here that
-imports ``PaperlessSqliteVecVectorStore``/``_copy_rows`` from
-``paperless_ai.vector_store``, defines its ``apply()``, and appends a
-``Migration`` to ``MIGRATIONS``; then import that module at the bottom of
-``vector_store.py`` and bump ``SCHEMA_VERSION``.
+To add a new migration: add a new ``mNNNN_description.py`` module here that
+imports ``PaperlessSqliteVecVectorStore`` from ``paperless_ai.vector_store``,
+defines its ``apply()`` (most likely just a call to
+``PaperlessSqliteVecVectorStore._rebuild_into()``, see ``Migration`` below),
+and appends a ``Migration`` to ``MIGRATIONS``; then import that module at the
+bottom of ``vector_store.py`` and bump ``SCHEMA_VERSION`` there.
 """
 
 import sqlite3
@@ -30,11 +30,12 @@ class Migration:
     """A schema migration for the sqlite-vec vector store.
 
     kind="structural": rows are copied into a new-schema file with no
-    re-embedding needed.  Supply ``apply(src_conn, dst_conn, dim)`` which
-    must create the vec0 table in ``dst_conn``, copy all rows from
-    ``src_conn``, and write ``dim`` / ``embed_model`` / ``total_inserts`` to
-    ``dst_conn``'s ``index_meta``.  ``schema_version`` is written by the
-    migration runner after ``apply`` returns.
+    re-embedding needed.  Supply ``apply(src_conn, dst_conn, dim)``, which
+    must create the vec0 table in ``dst_conn`` and copy ``src_conn``'s rows
+    and index_meta into it -- usually just a call to
+    ``PaperlessSqliteVecVectorStore._rebuild_into(src_conn, dst_conn, dim)``.
+    ``schema_version`` is written by the migration runner after ``apply``
+    returns, not by ``apply`` itself.
 
     kind="re-embed": the new schema requires fresh embeddings.
     ``check_and_run_migrations()`` returns True when it encounters one of

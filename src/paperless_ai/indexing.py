@@ -144,6 +144,24 @@ def _exclude_readers():
         lock.close()
 
 
+def _with_exclusive_access(operation: str, fn):
+    """Run ``fn()`` with exclusive index access (see ``_exclude_readers()``),
+    for compaction/migration file swaps that must not run while readers are
+    active. Returns ``fn()``'s result, or None (after logging) if active
+    readers do not drain within ``LLM_INDEX_COMPACTION_LOCK_TIMEOUT`` --
+    callers skip the operation this run; it retries next time.
+    """
+    try:
+        with _exclude_readers():
+            return fn()
+    except Timeout:
+        logger.info(
+            "Skipping LLM index %s: index readers are active; will retry next run.",
+            operation,
+        )
+        return None
+
+
 @contextmanager
 def write_store(embed_model_name: str | None = None):
     """Acquire the write lock and yield the vector store.
@@ -325,34 +343,18 @@ def _exclude_document_id_filter(document_id: int | str):
 
 
 def _check_and_run_migrations(store: "PaperlessSqliteVecVectorStore") -> bool:
-    """Run any pending structural migrations before a write. Returns True
-    when a pending re-embed migration was encountered, signaling the
-    caller must force a full rebuild.
-
-    check_and_run_migrations() never re-embeds anything itself: it only
-    applies cheap, local structural migrations, and for a re-embed
-    migration returns True as a pure signal with no side effects. Actual
-    re-embedding only happens in update_llm_index()'s explicit rebuild
-    path below, so it is safe to call this before any write -- including
-    delete()/upsert_document() -- without risking an unwanted (and
-    possibly costly, if the embedding backend is metered) re-embed.
-
-    has_pending_migration() gates the exclusive-access check: in the
-    common case (already at SCHEMA_VERSION) this returns immediately
-    without ever contending with readers or a concurrent compaction --
-    normal writes must not be gated by that lock.
+    """Run any pending structural migrations, returning True if a pending
+    re-embed migration needs the caller to force a rebuild -- never
+    triggered automatically here. Safe to call before any write, including
+    delete()/upsert_document(): has_pending_migration() (see its docstring)
+    keeps this a no-op, with no exclusive access taken, once the store is
+    current.
     """
     if not store.has_pending_migration():
         return False
-    try:
-        with _exclude_readers():
-            return store.check_and_run_migrations()
-    except Timeout:
-        logger.info(
-            "Skipping LLM index migration check: index readers are active; "
-            "will retry next run.",
-        )
-        return False
+    return bool(
+        _with_exclusive_access("migration check", store.check_and_run_migrations),
+    )
 
 
 def update_llm_index(
@@ -447,14 +449,7 @@ def update_llm_index(
                 else "No changes detected in LLM index."
             )
 
-        try:
-            with _exclude_readers():
-                store.compact()
-        except Timeout:
-            logger.info(
-                "Skipping LLM index compaction: index readers are active; "
-                "will retry next run.",
-            )
+        _with_exclusive_access("compaction", store.compact)
     return msg
 
 
@@ -501,14 +496,7 @@ def llm_index_migrate() -> None:
 def llm_index_compact() -> None:
     """Compact the index immediately, rebuilding the table to reclaim space."""
     with write_store() as store:
-        try:
-            with _exclude_readers():
-                store.compact(force=True)
-        except Timeout:
-            logger.info(
-                "Skipping LLM index compaction: index readers are active; "
-                "will retry next run.",
-            )
+        _with_exclusive_access("compaction", lambda: store.compact(force=True))
 
 
 def llm_index_remove_document(document: Document):

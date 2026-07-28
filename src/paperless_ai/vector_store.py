@@ -40,9 +40,8 @@ _INSERT_CHUNK_INDEX = (
     "INSERT INTO document_chunks (chunk_id, document_id) VALUES (?, ?)"
 )
 
-# Current schema version. Written to index_meta at table creation and bumped
-# whenever a Migration is added to MIGRATIONS. check_and_run_migrations() uses
-# this to decide which migrations to run on an existing store.
+# Current schema version. Bump when adding a migration -- see
+# paperless_ai/migrations/__init__.py for the full procedure.
 SCHEMA_VERSION = 2
 
 # compact(): rebuild when the cumulative rowid count exceeds this multiple of
@@ -522,6 +521,67 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
                 result[doc_id] = str(row["modified"] or "")
         return result
 
+    @property
+    def _db_path(self) -> str:
+        return str(Path(self._uri) / DB_FILENAME)
+
+    @contextmanager
+    def _rebuild_file(self) -> Iterator[sqlite3.Connection]:
+        """Open a fresh temp database file for a file-swap rebuild (compact
+        or structural migration), yielding its connection for the caller to
+        populate.
+
+        On success, swaps the temp file in as the live database (closing
+        this store's current connection first -- see _swap_in_compact()).
+        On any exception, discards the temp file, including its -wal/-shm,
+        instead, and this store's own connection is left untouched.
+        """
+        compact_path = self._db_path + ".compact"
+        new_conn = self._open_connection(compact_path)
+        try:
+            yield new_conn
+        except BaseException:
+            new_conn.close()
+            for suffix in ["", "-wal", "-shm"]:
+                Path(compact_path + suffix).unlink(missing_ok=True)
+            raise
+        else:
+            new_conn.close()
+            self._swap_in_compact(compact_path, self._db_path)
+
+    @staticmethod
+    def _rebuild_into(
+        src_conn: sqlite3.Connection,
+        dst_conn: sqlite3.Connection,
+        dim: int,
+        meta_keys: tuple[str, ...] = ("dim", "embed_model", "schema_version"),
+    ) -> int:
+        """Create the vec0 table in ``dst_conn``, copy ``meta_keys`` from
+        ``src_conn``'s index_meta, and stream every live row across
+        (populating document_chunks as it goes -- see _copy_rows()).
+        Returns the number of rows copied.
+
+        Used by both compact() (default meta_keys: the schema is unchanged)
+        and structural migrations (meta_keys minus "schema_version", which
+        the migration sets to its own target version instead of preserving
+        the source's).
+        """
+        PaperlessSqliteVecVectorStore._create_vec_table(dst_conn, dim)
+        for key in meta_keys:
+            value = PaperlessSqliteVecVectorStore._meta_get_on(src_conn, key)
+            if value is not None:
+                PaperlessSqliteVecVectorStore._meta_set_on(dst_conn, key, value)
+        dst_conn.execute("BEGIN IMMEDIATE")
+        copied = _copy_rows(src_conn, dst_conn)
+        # Reset the cumulative counter: after a rebuild, total_inserts == live.
+        PaperlessSqliteVecVectorStore._meta_set_on(
+            dst_conn,
+            "total_inserts",
+            str(copied),
+        )
+        dst_conn.execute("COMMIT")
+        return copied
+
     def compact(self, *, force: bool = False) -> None:
         """Rebuild the database file to reclaim space left behind by DELETEs.
 
@@ -554,30 +614,8 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             live,
             total,
         )
-        db_path = str(Path(self._uri) / DB_FILENAME)
-        compact_path = db_path + ".compact"
-
-        # Copy all live rows into a fresh database file.
-        new_conn = self._open_connection(compact_path)
-        try:
-            self._create_vec_table(new_conn, dim)
-            self._meta_set_on(new_conn, "dim", str(dim))
-            for key in ("embed_model", "schema_version"):
-                value = self._meta_get(key)
-                if value is not None:
-                    self._meta_set_on(new_conn, key, value)
-            new_conn.execute("BEGIN IMMEDIATE")
-            _copy_rows(self._conn, new_conn)
-            # Reset the cumulative counter: after compact, total_inserts == live.
-            self._meta_set_on(new_conn, "total_inserts", str(live))
-            new_conn.execute("COMMIT")
-        except BaseException:
-            new_conn.close()
-            for p in [compact_path, compact_path + "-wal", compact_path + "-shm"]:
-                Path(p).unlink(missing_ok=True)
-            raise
-        new_conn.close()
-        self._swap_in_compact(compact_path, db_path)
+        with self._rebuild_file() as new_conn:
+            self._rebuild_into(self._conn, new_conn, dim)
 
     def _swap_in_compact(self, compact_path: str, db_path: str) -> None:
         """Atomically replace the live database with the compacted copy."""
@@ -588,6 +626,17 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
                 stale.unlink()
         Path(compact_path).replace(db_path)
         self._conn = self._open_connection(db_path)
+
+    def _stored_schema_version(self) -> int | None:
+        """The schema_version recorded in index_meta, or None if no table
+        exists. A missing key (a store predating version tracking) is
+        treated as SCHEMA_VERSION -- i.e. already current -- since no
+        migration in MIGRATIONS targets a version before tracking began.
+        """
+        if not self.table_exists():
+            return None
+        raw = self._meta_get("schema_version")
+        return int(raw) if raw is not None else SCHEMA_VERSION
 
     def has_pending_migration(self) -> bool:
         """Cheaply check whether a migration is pending, with no exclusive
@@ -600,11 +649,8 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         case -- already at SCHEMA_VERSION -- never contends with readers
         or a concurrent compaction.
         """
-        if not self.table_exists():
-            return False
-        raw = self._meta_get("schema_version")
-        current = int(raw) if raw is not None else SCHEMA_VERSION
-        return current < SCHEMA_VERSION
+        current = self._stored_schema_version()
+        return current is not None and current < SCHEMA_VERSION
 
     def check_and_run_migrations(self) -> bool:
         """Apply any pending schema migrations to the store.
@@ -619,12 +665,8 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         that exclusion in the common case).  No-op when the table does not
         exist or is already at SCHEMA_VERSION.
         """
-        if not self.table_exists():
-            return False
-
-        raw = self._meta_get("schema_version")
-        current = int(raw) if raw is not None else SCHEMA_VERSION
-        if current >= SCHEMA_VERSION:
+        current = self._stored_schema_version()
+        if current is None or current >= SCHEMA_VERSION:
             return False
 
         pending = sorted(
@@ -658,24 +700,12 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         dim = self.vector_dim()
         if dim is None:  # pragma: no cover
             raise RuntimeError("Cannot migrate: no stored vector dimension")
-        db_path = str(Path(self._uri) / DB_FILENAME)
-        compact_path = db_path + ".compact"
-        new_conn = self._open_connection(compact_path)
-        try:
+        with self._rebuild_file() as new_conn:
             migration.apply(self._conn, new_conn, dim)
             self._meta_set_on(new_conn, "schema_version", str(migration.to_version))
-        except BaseException:  # pragma: no cover
-            new_conn.close()
-            for p in [compact_path, compact_path + "-wal", compact_path + "-shm"]:
-                Path(p).unlink(missing_ok=True)
-            raise
-        new_conn.close()
-        self._swap_in_compact(compact_path, db_path)
 
 
-# Import migration modules for their registration side effect (each appends
-# itself to MIGRATIONS on import). Must be at the bottom of this file: those
-# modules import PaperlessSqliteVecVectorStore and _copy_rows from here, which
-# must already be fully defined by the time they run. Add a new migration
-# module's import here (and bump SCHEMA_VERSION) when the schema changes.
+# Registers m0001 into MIGRATIONS; must be at the bottom (needs
+# PaperlessSqliteVecVectorStore fully defined) -- see
+# paperless_ai/migrations/__init__.py for the full procedure.
 from paperless_ai.migrations import m0001_add_document_chunks  # noqa: E402, F401

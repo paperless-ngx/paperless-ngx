@@ -212,16 +212,15 @@ following:
     This is a no-op if the index is already up to date, so it is safe to
     run on every upgrade.
 
-5.  If the LLM index is enabled, apply any pending LLM index schema
-    migrations.
+5.  Apply any pending LLM index schema migrations.
 
     ```shell-session
     cd src
     python3 manage.py document_llmindex migrate
     ```
 
-    This is a no-op if the index is already up to date (or the LLM index
-    is disabled), so it is safe to run on every upgrade.
+    This is a no-op if the index is already up to date, or if the LLM index
+    is disabled, so it is safe to run on every upgrade.
 
 ### Database Upgrades
 
@@ -557,12 +556,12 @@ Specify `compact` to reclaim space and optimize the on-disk vector store.
 
 Specify `migrate` to apply any pending index schema migrations without a full reindex.
 This is a no-op if the index is already up to date, so it is safe to run on every
-startup or upgrade; it is what the container's startup sequence and the
-[bare-metal upgrade steps](#bare-metal-updating) run automatically. If a pending
-migration would require re-embedding every document, `migrate` only logs a warning and
-leaves the index as-is -- re-embedding can be slow and, for a metered embedding backend,
-cost money, so it is never triggered automatically. Run `rebuild` yourself when you are
-ready.
+startup or upgrade; the container's startup sequence runs it automatically, and the
+[bare-metal upgrade steps](#bare-metal-updating) include it as a manual step. If a
+pending migration would require re-embedding every document, `migrate` only logs a
+warning and leaves the index as-is -- re-embedding can be slow and, for a metered
+embedding backend, cost money, so it is never triggered automatically. Run `rebuild`
+yourself when you are ready.
 
 !!! note
 

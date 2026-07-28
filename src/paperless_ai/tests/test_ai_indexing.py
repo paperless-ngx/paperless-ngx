@@ -37,6 +37,23 @@ def real_document(db: None) -> Document:
     )
 
 
+@pytest.fixture
+def mock_store(mocker: pytest_mock.MockerFixture) -> MagicMock:
+    """The MagicMock store yielded by every ``with write_store() as store:``
+    block, for tests that only care what indexing.py does with the store,
+    not what the store itself does.
+    """
+    store = mocker.MagicMock()
+    mocker.patch(
+        "paperless_ai.indexing.write_store",
+        return_value=mocker.MagicMock(
+            __enter__=mocker.MagicMock(return_value=store),
+            __exit__=mocker.MagicMock(return_value=False),
+        ),
+    )
+    return store
+
+
 @pytest.mark.django_db
 def test_build_document_node(real_document: Document) -> None:
     nodes = indexing.build_document_node(real_document)
@@ -762,18 +779,9 @@ class TestLlmIndexAddOrUpdateDocumentEmptyContent:
 @pytest.mark.django_db
 def test_llm_index_compact_uses_force(
     temp_llm_index_dir: Path,
-    mocker: pytest_mock.MockerFixture,
+    mock_store: MagicMock,
 ) -> None:
     """compact must use force=True to rebuild the table and reclaim space immediately."""
-    mock_store = mocker.MagicMock()
-    mocker.patch(
-        "paperless_ai.indexing.write_store",
-        return_value=mocker.MagicMock(
-            __enter__=mocker.MagicMock(return_value=mock_store),
-            __exit__=mocker.MagicMock(return_value=False),
-        ),
-    )
-
     indexing.llm_index_compact()
 
     mock_store.compact.assert_called_once_with(force=True)
@@ -812,6 +820,7 @@ class TestLlmIndexMigrate:
         self,
         temp_llm_index_dir: Path,
         mocker: pytest_mock.MockerFixture,
+        mock_store: MagicMock,
         caplog: pytest.LogCaptureFixture,
     ) -> None:
         """
@@ -826,16 +835,8 @@ class TestLlmIndexMigrate:
         mock_config = mocker.MagicMock()
         mock_config.llm_index_enabled = True
         mocker.patch("paperless_ai.indexing.AIConfig", return_value=mock_config)
-        mock_store = mocker.MagicMock()
         mock_store.has_pending_migration.return_value = True
         mock_store.check_and_run_migrations.return_value = False
-        mocker.patch(
-            "paperless_ai.indexing.write_store",
-            return_value=mocker.MagicMock(
-                __enter__=mocker.MagicMock(return_value=mock_store),
-                __exit__=mocker.MagicMock(return_value=False),
-            ),
-        )
 
         with caplog.at_level("WARNING"):
             indexing.llm_index_migrate()
@@ -847,6 +848,7 @@ class TestLlmIndexMigrate:
         self,
         temp_llm_index_dir: Path,
         mocker: pytest_mock.MockerFixture,
+        mock_store: MagicMock,
         caplog: pytest.LogCaptureFixture,
     ) -> None:
         """
@@ -864,16 +866,8 @@ class TestLlmIndexMigrate:
         mock_config = mocker.MagicMock()
         mock_config.llm_index_enabled = True
         mocker.patch("paperless_ai.indexing.AIConfig", return_value=mock_config)
-        mock_store = mocker.MagicMock()
         mock_store.has_pending_migration.return_value = True
         mock_store.check_and_run_migrations.return_value = True
-        mocker.patch(
-            "paperless_ai.indexing.write_store",
-            return_value=mocker.MagicMock(
-                __enter__=mocker.MagicMock(return_value=mock_store),
-                __exit__=mocker.MagicMock(return_value=False),
-            ),
-        )
 
         with caplog.at_level("WARNING"):
             indexing.llm_index_migrate()
@@ -895,16 +889,9 @@ class TestLlmIndexLocking:
         self,
         temp_llm_index_dir: Path,
         mock_embed_model: FakeEmbedding,
+        mock_store: MagicMock,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
-        mock_store = MagicMock()
-        mocker.patch(
-            "paperless_ai.indexing.write_store",
-            return_value=mocker.MagicMock(
-                __enter__=mocker.MagicMock(return_value=mock_store),
-                __exit__=mocker.MagicMock(return_value=False),
-            ),
-        )
         mock_node = MagicMock()
         mock_node.get_content.return_value = "fake node text"
         mocker.patch(
@@ -923,6 +910,7 @@ class TestLlmIndexLocking:
         self,
         temp_llm_index_dir: Path,
         mock_embed_model: FakeEmbedding,
+        mock_store: MagicMock,
         mocker: pytest_mock.MockerFixture,
         *,
         has_pending: bool,
@@ -939,15 +927,7 @@ class TestLlmIndexLocking:
               that check_and_run_migrations() requires
             - upsert_document() is called either way
         """
-        mock_store = MagicMock()
         mock_store.has_pending_migration.return_value = has_pending
-        mocker.patch(
-            "paperless_ai.indexing.write_store",
-            return_value=mocker.MagicMock(
-                __enter__=mocker.MagicMock(return_value=mock_store),
-                __exit__=mocker.MagicMock(return_value=False),
-            ),
-        )
         mock_node = MagicMock()
         mock_node.get_content.return_value = "fake node text"
         mocker.patch(
@@ -964,17 +944,8 @@ class TestLlmIndexLocking:
     def test_remove_document_uses_write_store(
         self,
         temp_llm_index_dir: Path,
-        mocker: pytest_mock.MockerFixture,
+        mock_store: MagicMock,
     ) -> None:
-        mock_store = MagicMock()
-        mocker.patch(
-            "paperless_ai.indexing.write_store",
-            return_value=mocker.MagicMock(
-                __enter__=mocker.MagicMock(return_value=mock_store),
-                __exit__=mocker.MagicMock(return_value=False),
-            ),
-        )
-
         doc = MagicMock(spec=Document)
         doc.id = 1
         indexing.llm_index_remove_document(doc)
@@ -985,7 +956,7 @@ class TestLlmIndexLocking:
     def test_remove_document_runs_migration_check_only_when_pending(
         self,
         temp_llm_index_dir: Path,
-        mocker: pytest_mock.MockerFixture,
+        mock_store: MagicMock,
         *,
         has_pending: bool,
     ) -> None:
@@ -1002,15 +973,7 @@ class TestLlmIndexLocking:
               test_normal_write_is_not_gated_by_the_compaction_lock)
             - delete() is called either way
         """
-        mock_store = MagicMock()
         mock_store.has_pending_migration.return_value = has_pending
-        mocker.patch(
-            "paperless_ai.indexing.write_store",
-            return_value=mocker.MagicMock(
-                __enter__=mocker.MagicMock(return_value=mock_store),
-                __exit__=mocker.MagicMock(return_value=False),
-            ),
-        )
 
         doc = DocumentFactory.build(id=1)
         indexing.llm_index_remove_document(doc)
@@ -1022,16 +985,9 @@ class TestLlmIndexLocking:
         self,
         temp_llm_index_dir: Path,
         mock_embed_model: FakeEmbedding,
+        mock_store: MagicMock,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
-        mock_store = MagicMock()
-        mocker.patch(
-            "paperless_ai.indexing.write_store",
-            return_value=mocker.MagicMock(
-                __enter__=mocker.MagicMock(return_value=mock_store),
-                __exit__=mocker.MagicMock(return_value=False),
-            ),
-        )
         mock_qs = MagicMock()
         mock_qs.exists.return_value = True
         mock_qs.__iter__ = MagicMock(return_value=iter([]))

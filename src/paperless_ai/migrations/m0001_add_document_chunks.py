@@ -3,7 +3,6 @@ import sqlite3
 from paperless_ai.migrations import MIGRATIONS
 from paperless_ai.migrations import Migration
 from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
-from paperless_ai.vector_store import _copy_rows
 
 
 def _migrate_v1_to_v2_add_document_chunks(
@@ -18,22 +17,17 @@ def _migrate_v1_to_v2_add_document_chunks(
     full table scan on the document_id metadata column. Every row written
     before this migration predates that table, so without backfilling,
     deleting a pre-migration document would find zero chunk ids and leave its
-    vec0 rows permanently orphaned. Backfilling is a plain row copy into the
-    new-schema file (``_copy_rows``, the same helper compact() uses), which
-    records every copied row in document_chunks as it goes.
+    vec0 rows permanently orphaned. Backfilling is just the same rebuild
+    compact() uses (_rebuild_into), minus "schema_version" -- the caller
+    (_run_structural_migration) sets that to this migration's target version
+    instead of preserving the source's.
     """
-    PaperlessSqliteVecVectorStore._create_vec_table(dst_conn, dim)
-    PaperlessSqliteVecVectorStore._meta_set_on(dst_conn, "dim", str(dim))
-    embed_model = PaperlessSqliteVecVectorStore._meta_get_on(src_conn, "embed_model")
-    if embed_model is not None:
-        PaperlessSqliteVecVectorStore._meta_set_on(dst_conn, "embed_model", embed_model)
-
-    dst_conn.execute("BEGIN IMMEDIATE")
-    live = _copy_rows(src_conn, dst_conn)
-    # This migration only ever copies live rows (like compact()), so the
-    # cumulative counter resets to match -- the new file has no bloat yet.
-    PaperlessSqliteVecVectorStore._meta_set_on(dst_conn, "total_inserts", str(live))
-    dst_conn.execute("COMMIT")
+    PaperlessSqliteVecVectorStore._rebuild_into(
+        src_conn,
+        dst_conn,
+        dim,
+        meta_keys=("dim", "embed_model"),
+    )
 
 
 MIGRATIONS.append(
