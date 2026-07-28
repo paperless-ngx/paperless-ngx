@@ -12,6 +12,7 @@ from guardian.shortcuts import assign_perm
 from rest_framework.test import APIClient
 
 from documents.permissions import permitted_document_ids
+from documents.serialisers import _get_viewable_duplicates
 from documents.tests.factories import DocumentFactory
 
 
@@ -199,3 +200,21 @@ class TestAiChatAllDocumentsPermissionBoundary:
         visible_ids = {doc.pk for doc in kwargs["documents"]}
         assert shared.pk in visible_ids
         assert not_shared.pk not in visible_ids
+
+
+@pytest.mark.django_db
+class TestDuplicateDocumentsPermissionBoundary:
+    def test_get_viewable_duplicates_includes_soft_deleted_but_respects_perms(self):
+        owner = User.objects.create_user(username="owner")
+        stranger = User.objects.create_user(username="mallory")
+        original = DocumentFactory(owner=owner, checksum="dupe-checksum")
+        dup_visible = DocumentFactory(owner=owner, checksum="dupe-checksum")
+        dup_hidden = DocumentFactory(owner=owner, checksum="dupe-checksum")
+        dup_hidden.delete()  # soft delete, should still be found (include_deleted=True)
+        assign_perm("view_document", stranger, dup_visible)
+
+        result_owner = _get_viewable_duplicates(original, owner)
+        assert {d.pk for d in result_owner} == {dup_visible.pk, dup_hidden.pk}
+
+        result_stranger = _get_viewable_duplicates(original, stranger)
+        assert {d.pk for d in result_stranger} == {dup_visible.pk}
