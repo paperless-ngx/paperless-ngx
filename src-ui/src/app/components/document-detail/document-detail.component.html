@@ -113,8 +113,8 @@
 
     <form [formGroup]='documentForm' (ngSubmit)="save()">
 
-      <div class="btn-toolbar mb-1 border-bottom">
-        <div class="btn-group pb-3">
+      <div class="btn-toolbar justify-content-end mb-1 pb-3 gap-2 row-gap-2 border-bottom">
+        <div class="btn-group me-auto">
           <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Close" (click)="close()">
             <i-bs width="1.2em" height="1.2em" name="x"></i-bs>
           </button>
@@ -127,32 +127,36 @@
         </div>
 
         <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-          <div class="btn-group pb-3 ms-auto">
-            <pngx-suggestions-dropdown *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }"
-              [disabled]="!userCanEdit || suggestionsLoading()"
-              [loading]="suggestionsLoading()"
-              [suggestions]="suggestions()"
-              [aiEnabled]="aiEnabled"
-              (getSuggestions)="getSuggestions()"
-              (addTag)="createTag($event)"
-              (addDocumentType)="createDocumentType($event)"
-              (addCorrespondent)="createCorrespondent($event)">
-            </pngx-suggestions-dropdown>
+          <div class="d-flex gap-2">
+            <div class="btn-group">
+              <pngx-suggestions-dropdown *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }"
+                [disabled]="!userCanEdit || suggestionsLoading()"
+                [loading]="suggestionsLoading()"
+                [suggestions]="suggestions()"
+                [aiEnabled]="aiEnabled"
+                (getSuggestions)="getSuggestions()"
+                (addTag)="createTag($event)"
+                (addDocumentType)="createDocumentType($event)"
+                (addCorrespondent)="createCorrespondent($event)">
+              </pngx-suggestions-dropdown>
+            </div>
+
+            <div class="btn-group">
+              <pngx-custom-fields-dropdown
+                *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
+                [documentId]="documentId()"
+                [disabled]="!userCanEdit"
+                [existingFields]="document()?.custom_fields"
+                (created)="refreshCustomFields()"
+                (added)="addField($event)">
+              </pngx-custom-fields-dropdown>
+            </div>
           </div>
 
-          <div class="btn-group pb-3 ms-2">
-            <pngx-custom-fields-dropdown
-              *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
-              [documentId]="documentId()"
-              [disabled]="!userCanEdit"
-              [existingFields]="document()?.custom_fields"
-              (created)="refreshCustomFields()"
-              (added)="addField($event)">
-            </pngx-custom-fields-dropdown>
+          <div class="ps-3">
+            <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
           </div>
         </ng-container>
-
-        <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
       </div>
 
       <ul ngbNav #nav="ngbNav" class="nav-underline flex-nowrap flex-md-wrap overflow-auto" (navChange)="onNavChange($event)" [activeId]="activeNavID()" (activeIdChange)="activeNavID.set($event)">
@@ -276,7 +280,7 @@
               }
             </div>
 
-            <div class="d-flex border-top pt-3">
+            <div class="d-flex justify-content-end border-top pt-3">
               <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
             </div>
           </ng-template>
@@ -440,7 +444,7 @@
 </div>
 
 <ng-template #saveButtons>
-  <div class="btn-group pb-3 ms-4">
+  <div class="btn-group">
     <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
       <button type="submit" class="order-3 btn btn-sm btn-primary" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Save</button>
       @if (hasNext()) {
