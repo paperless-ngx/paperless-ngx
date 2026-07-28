@@ -2911,14 +2911,14 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
 
         response = self.client.patch(
             f"/api/saved_views/{v1.id}/",
-            {"sort_reverse": True, "icon": SavedView.Icon.ARCHIVE},
+            {"sort_reverse": True, "icon": SavedView.Icon.RECEIPT},
             format="json",
         )
 
         v1 = SavedView.objects.get(id=v1.id)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(v1.sort_reverse)
-        self.assertEqual(v1.icon, SavedView.Icon.ARCHIVE)
+        self.assertEqual(v1.icon, SavedView.Icon.RECEIPT)
         self.assertEqual(v1.filter_rules.count(), 1)
 
         view["filter_rules"] = [{"rule_type": 12, "value": "secret"}]
