@@ -284,3 +284,27 @@ class TestPermittedDocumentIdsArbitraryPermission:
             expected_visible=[],
             expected_hidden=[doc.pk],
         )
+
+
+@pytest.mark.django_db
+class TestEmailDocumentPermissionBoundary:
+    def test_email_action_rejects_document_without_view_permission(
+        self,
+        rest_api_client,
+    ):
+        owner = User.objects.create_user(username="owner")
+        requester = User.objects.create_user(username="requester")
+        rest_api_client.force_authenticate(user=requester)
+        hidden = DocumentFactory(owner=owner)
+
+        response = rest_api_client.post(
+            "/api/documents/email/",
+            {
+                "documents": [hidden.pk],
+                "addresses": "someone@example.com",
+                "subject": "test",
+                "message": "test",
+            },
+            format="json",
+        )
+        assert response.status_code == 403

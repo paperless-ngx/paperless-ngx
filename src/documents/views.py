@@ -1930,12 +1930,9 @@ class DocumentViewSet(
         use_archive_version = validated_data.get("use_archive_version", True)
 
         documents = Document.objects.select_related("owner").filter(pk__in=document_ids)
-        for document in documents:
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "view_document",
-                document,
-            ):
+        if request.user is not None:
+            permitted_ids = set(permitted_document_ids(request.user))
+            if not all(document.pk in permitted_ids for document in documents):
                 return HttpResponseForbidden("Insufficient permissions")
 
         try:
@@ -4509,8 +4506,9 @@ class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
             )
 
         documents = list(documents_qs)
+        permitted_ids = set(permitted_document_ids(request.user))
         for document in documents:
-            if not has_perms_owner_aware(request.user, "view_document", document):
+            if document.pk not in permitted_ids:
                 raise ValidationError(
                     {
                         "document_ids": _(
