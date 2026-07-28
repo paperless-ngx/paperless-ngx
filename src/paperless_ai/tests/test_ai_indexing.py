@@ -186,6 +186,57 @@ def test_truncate_embedding_query_returns_single_chunk() -> None:
     assert "word199" not in result
 
 
+class TestStreamedDocuments:
+    """_StreamedDocuments streams via .iterator() instead of materializing
+    the whole queryset (plus its content and prefetch caches) in memory at
+    once, while still supporting len() so a progress bar wrapped around it
+    shows a real total.
+    """
+
+    def test_len_uses_queryset_count(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A mock queryset
+        WHEN:
+            - len() is called on a _StreamedDocuments wrapping it
+        THEN:
+            - The queryset's count() is used, not a materializing len()
+        """
+        mock_queryset = mocker.MagicMock()
+        mock_queryset.count.return_value = 42
+
+        assert len(indexing._StreamedDocuments(mock_queryset)) == 42
+        mock_queryset.count.assert_called_once_with()
+
+    def test_iter_streams_via_queryset_iterator(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A mock queryset whose .iterator() yields documents
+        WHEN:
+            - A _StreamedDocuments wrapping it is iterated
+        THEN:
+            - .iterator() is called with the streaming chunk size (not
+              plain iteration, which would materialize prefetches for the
+              whole queryset instead of one batch at a time), and its
+              results are yielded through unchanged
+        """
+        mock_queryset = mocker.MagicMock()
+        mock_queryset.iterator.return_value = iter(["doc-1", "doc-2"])
+
+        result = list(indexing._StreamedDocuments(mock_queryset))
+
+        assert result == ["doc-1", "doc-2"]
+        mock_queryset.iterator.assert_called_once_with(
+            chunk_size=indexing._INDEX_STREAM_CHUNK_SIZE,
+        )
+
+
 @pytest.mark.django_db
 def test_update_llm_index(
     temp_llm_index_dir: Path,
