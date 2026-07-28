@@ -2786,8 +2786,9 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         )
 
         # check global and object permissions for all documents
+        permitted_change_ids = set(permitted_document_ids(user, perm="change_document"))
         has_perms = user.has_perm("documents.change_document") and all(
-            has_perms_owner_aware(user, "change_document", doc) for doc in document_objs
+            doc.pk in permitted_change_ids for doc in document_objs
         )
 
         # check ownership for methods that change original document

@@ -308,3 +308,37 @@ class TestEmailDocumentPermissionBoundary:
             format="json",
         )
         assert response.status_code == 403
+
+
+@pytest.mark.django_db
+class TestBulkEditChangePermissionBoundary:
+    def test_bulk_edit_rejects_document_without_change_permission(
+        self,
+        rest_api_client,
+    ):
+        owner = User.objects.create_user(username="owner")
+        requester = User.objects.create_user(username="requester")
+        # grant the global change_document permission so the object-level
+        # check (not the global has_perm check) is what's under test
+        requester.user_permissions.add(
+            Permission.objects.get(codename="change_document"),
+        )
+        rest_api_client.force_authenticate(user=requester)
+        assign_perm(
+            "view_document",
+            requester,
+            DocumentFactory(owner=owner),
+        )  # unrelated grant
+        target = DocumentFactory(owner=owner)
+        assign_perm("view_document", requester, target)  # view only, NOT change
+
+        response = rest_api_client.post(
+            "/api/documents/bulk_edit/",
+            {
+                "documents": [target.pk],
+                "method": "modify_tags",
+                "parameters": {"add_tags": [], "remove_tags": []},
+            },
+            format="json",
+        )
+        assert response.status_code == 403
