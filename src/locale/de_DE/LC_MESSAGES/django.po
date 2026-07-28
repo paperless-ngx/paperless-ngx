@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-25 07:12+0000\n"
-"PO-Revision-Date: 2026-07-25 07:14\n"
+"POT-Creation-Date: 2026-07-27 19:34+0000\n"
+"PO-Revision-Date: 2026-07-27 19:35\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumente"
 
-#: documents/filters.py:470
+#: documents/filters.py:472
 msgid "Value must be valid JSON."
 msgstr "Wert muss gültiges JSON sein."
 
-#: documents/filters.py:489
+#: documents/filters.py:491
 msgid "Invalid custom field query expression"
 msgstr "Ungültiger Zusatzfeld-Abfrageausdruck"
 
-#: documents/filters.py:499
+#: documents/filters.py:501
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Ungültige Ausdrucksliste. Darf nicht leer sein."
 
-#: documents/filters.py:520
+#: documents/filters.py:522
 msgid "Invalid logical operator {op!r}"
 msgstr "Ungültiger logischer Operator {op!r}"
 
-#: documents/filters.py:534
+#: documents/filters.py:536
 msgid "Maximum number of query conditions exceeded."
 msgstr "Maximale Anzahl an Abfragebedingungen überschritten."
 
-#: documents/filters.py:598
+#: documents/filters.py:600
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} ist kein gültiges Zusatzfeld."
 
-#: documents/filters.py:635
+#: documents/filters.py:637
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} unterstützt den Abfrageausdruck {expr!r} nicht."
 
-#: documents/filters.py:750 documents/models.py:136
+#: documents/filters.py:752 documents/models.py:136
 msgid "Maximum nesting depth exceeded."
 msgstr "Maximale Verschachtelungstiefe überschritten."
 
-#: documents/filters.py:1067
+#: documents/filters.py:1094
 msgid "Custom field not found"
 msgstr "Zusatzfeld nicht gefunden"
 
@@ -1339,7 +1339,7 @@ msgid "workflow runs"
 msgstr "Arbeitsablauf wird ausgeführt"
 
 #: documents/serialisers.py:522 documents/serialisers.py:874
-#: documents/serialisers.py:2763 documents/views.py:298 documents/views.py:2541
+#: documents/serialisers.py:2763 documents/views.py:299 documents/views.py:2553
 #: paperless_mail/serialisers.py:155
 msgid "Insufficient permissions."
 msgstr "Unzureichende Berechtigungen."
@@ -1379,7 +1379,7 @@ msgstr "Ungültige Variable erkannt."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Doppelte Dokumentbezeichner sind nicht erlaubt."
 
-#: documents/serialisers.py:2849 documents/views.py:4500
+#: documents/serialisers.py:2849 documents/views.py:4512
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Dokumente nicht gefunden: %(ids)s"
@@ -1635,36 +1635,36 @@ msgstr "URI-Schema „{parts.scheme}“ ist nicht erlaubt. Erlaubte Schemata: {'
 msgid "Unable to parse URI {value}"
 msgstr "URI {value} kann nicht gelesen werden"
 
-#: documents/views.py:291 documents/views.py:2538
+#: documents/views.py:292 documents/views.py:2550
 msgid "Invalid more_like_id"
 msgstr "Ungültige more_like_id"
 
-#: documents/views.py:1556
+#: documents/views.py:1562
 msgid "Invalid AI configuration."
 msgstr "Ungültige KI-Konfiguration."
 
-#: documents/views.py:1565
+#: documents/views.py:1571
 msgid "AI backend request timed out."
 msgstr "Zeitüberschreitung bei der KI-Backendanfrage."
 
-#: documents/views.py:2363 documents/views.py:2684
+#: documents/views.py:2375 documents/views.py:2696
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Geben Sie nur einen von text, title_search, query, oder more_like_id an."
 
-#: documents/views.py:4512
+#: documents/views.py:4524
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Unzureichende Berechtigungen, um Dokument %(id)s zu teilen."
 
-#: documents/views.py:4558
+#: documents/views.py:4570
 msgid "Bundle is already being processed."
 msgstr "Paket wird bereits verarbeitet."
 
-#: documents/views.py:4619
+#: documents/views.py:4631
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Das Freigabelink-Paket wird noch vorbereitet. Bitte versuchen Sie es später erneut."
 
-#: documents/views.py:4629
+#: documents/views.py:4641
 msgid "The share link bundle is unavailable."
 msgstr "Das Freigabelink-Paket ist nicht verfügbar."
 
