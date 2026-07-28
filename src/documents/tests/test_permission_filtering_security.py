@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from http import HTTPStatus
 from unittest.mock import patch
 
 import pytest
@@ -342,3 +343,39 @@ class TestBulkEditChangePermissionBoundary:
             format="json",
         )
         assert response.status_code == 403
+
+
+@pytest.mark.django_db
+class TestBulkDownloadPermissionChecksRootDocument:
+    def test_permission_checked_on_root_not_on_version(
+        self,
+        rest_api_client,
+        paperless_dirs,
+        _media_settings,
+    ):
+        owner = User.objects.create_user(username="owner")
+        requester = User.objects.create_user(username="requester")
+        rest_api_client.force_authenticate(user=requester)
+        root = DocumentFactory(owner=owner)
+        # a version of root that the requester has NOT been individually granted
+        version = DocumentFactory(owner=owner, root_document=root, version_index=1)
+        version.source_path.write_bytes(b"%PDF-1.4 test")
+        assign_perm("view_document", requester, root)  # granted on ROOT only
+
+        response = rest_api_client.post(
+            "/api/documents/bulk_download/",
+            {"documents": [version.pk]},
+            format="json",
+        )
+        assert (
+            response.status_code == HTTPStatus.OK
+        )  # visible because root is permitted
+
+        stranger = User.objects.create_user(username="mallory")
+        rest_api_client.force_authenticate(user=stranger)
+        response = rest_api_client.post(
+            "/api/documents/bulk_download/",
+            {"documents": [version.pk]},
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.FORBIDDEN

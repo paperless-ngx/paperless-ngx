@@ -3841,9 +3841,10 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
         content = serializer.validated_data.get("content")
         follow_filename_format = serializer.validated_data.get("follow_formatting")
 
+        permitted_ids = set(permitted_document_ids(request.user))
         for document in documents:
             root_doc = get_root_document(document)
-            if not has_perms_owner_aware(request.user, "view_document", root_doc):
+            if root_doc.pk not in permitted_ids:
                 return HttpResponseForbidden("Insufficient permissions")
             versioned_documents.append(
                 get_latest_version_for_root(
