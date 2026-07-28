@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-25 07:12+0000\n"
-"PO-Revision-Date: 2026-07-25 07:14\n"
+"POT-Creation-Date: 2026-07-27 19:34+0000\n"
+"PO-Revision-Date: 2026-07-27 19:35\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "文档"
 
-#: documents/filters.py:470
+#: documents/filters.py:472
 msgid "Value must be valid JSON."
 msgstr "值必须是有效的 JSON 格式。"
 
-#: documents/filters.py:489
+#: documents/filters.py:491
 msgid "Invalid custom field query expression"
 msgstr "无效的自定义字段查询表达式"
 
-#: documents/filters.py:499
+#: documents/filters.py:501
 msgid "Invalid expression list. Must be nonempty."
 msgstr "无效的表达式列表。必须不为空。"
 
-#: documents/filters.py:520
+#: documents/filters.py:522
 msgid "Invalid logical operator {op!r}"
 msgstr "无效的逻辑运算符 {op!r}"
 
-#: documents/filters.py:534
+#: documents/filters.py:536
 msgid "Maximum number of query conditions exceeded."
 msgstr "超出查询条件的最大数量。"
 
-#: documents/filters.py:598
+#: documents/filters.py:600
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} 不是一个有效的自定义字段。"
 
-#: documents/filters.py:635
+#: documents/filters.py:637
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} 不支持查询表达式 {expr!r}。"
 
-#: documents/filters.py:750 documents/models.py:136
+#: documents/filters.py:752 documents/models.py:136
 msgid "Maximum nesting depth exceeded."
 msgstr "超出最大嵌套深度。"
 
-#: documents/filters.py:1067
+#: documents/filters.py:1094
 msgid "Custom field not found"
 msgstr "Custom field not found"
 
@@ -1339,7 +1339,7 @@ msgid "workflow runs"
 msgstr "工作流运行"
 
 #: documents/serialisers.py:522 documents/serialisers.py:874
-#: documents/serialisers.py:2763 documents/views.py:298 documents/views.py:2541
+#: documents/serialisers.py:2763 documents/views.py:299 documents/views.py:2553
 #: paperless_mail/serialisers.py:155
 msgid "Insufficient permissions."
 msgstr "权限不足。"
@@ -1379,7 +1379,7 @@ msgstr "检测到无效变量。"
 msgid "Duplicate document identifiers are not allowed."
 msgstr "不允许重复文档标识符。"
 
-#: documents/serialisers.py:2849 documents/views.py:4500
+#: documents/serialisers.py:2849 documents/views.py:4512
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "未找到文档：%(ids)s"
@@ -1635,36 +1635,36 @@ msgstr "URI 格式 '{parts.scheme}' 不支持。支持的格式有：{', '.join(
 msgid "Unable to parse URI {value}"
 msgstr "无法解析 URI {value}"
 
-#: documents/views.py:291 documents/views.py:2538
+#: documents/views.py:292 documents/views.py:2550
 msgid "Invalid more_like_id"
 msgstr "无效的more_like_id"
 
-#: documents/views.py:1556
+#: documents/views.py:1562
 msgid "Invalid AI configuration."
 msgstr "无效的 AI 配置。"
 
-#: documents/views.py:1565
+#: documents/views.py:1571
 msgid "AI backend request timed out."
 msgstr "AI 后端请求超时。"
 
-#: documents/views.py:2363 documents/views.py:2684
+#: documents/views.py:2375 documents/views.py:2696
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "只能指定 text、title_search、query 或 more_like_id 中的一项。"
 
-#: documents/views.py:4512
+#: documents/views.py:4524
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "权限不足以分享文件：%(id)s。"
 
-#: documents/views.py:4558
+#: documents/views.py:4570
 msgid "Bundle is already being processed."
 msgstr "捆绑包已在处理中。"
 
-#: documents/views.py:4619
+#: documents/views.py:4631
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "分享链接包仍在准备中，请稍后再试。"
 
-#: documents/views.py:4629
+#: documents/views.py:4641
 msgid "The share link bundle is unavailable."
 msgstr "分享链接包不可用。"
 

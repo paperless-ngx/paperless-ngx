@@ -1398,7 +1398,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1787</context>
+          <context context-type="linenumber">1791</context>
         </context-group>
         <target state="translated">Editor de PDF</target>
       </trans-unit>
@@ -2358,7 +2358,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">653</context>
+          <context context-type="linenumber">657</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.html</context>
@@ -3338,11 +3338,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1405</context>
+          <context context-type="linenumber">1409</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1788</context>
+          <context context-type="linenumber">1792</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -4002,7 +4002,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1358</context>
+          <context context-type="linenumber">1362</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -4126,7 +4126,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1841</context>
+          <context context-type="linenumber">1845</context>
         </context-group>
         <target state="translated">Remover a proteção por senha</target>
       </trans-unit>
@@ -4138,7 +4138,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1842</context>
+          <context context-type="linenumber">1846</context>
         </context-group>
         <target state="translated">Crie uma cópia sem proteção ou substitua o arquivo existente.</target>
       </trans-unit>
@@ -4150,7 +4150,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1843</context>
+          <context context-type="linenumber">1847</context>
         </context-group>
         <target state="translated">Iniciar</target>
       </trans-unit>
@@ -6274,7 +6274,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1362</context>
+          <context context-type="linenumber">1366</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7073,7 +7073,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error loading preview</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/preview-popup/preview-popup.component.html</context>
-          <context context-type="linenumber">10</context>
+          <context context-type="linenumber">11</context>
         </context-group>
         <target state="translated">Erro ao carregar pré-visualização</target>
       </trans-unit>
@@ -7081,7 +7081,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Open preview</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/preview-popup/preview-popup.component.ts</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="linenumber">62</context>
         </context-group>
         <target state="translated">Abrir pré-visualização</target>
       </trans-unit>
@@ -8787,7 +8787,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Enter Password</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">512</context>
+          <context context-type="linenumber">513</context>
         </context-group>
         <target state="translated">Digite a senha</target>
       </trans-unit>
@@ -8795,7 +8795,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error retrieving metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">423</context>
+          <context context-type="linenumber">424</context>
         </context-group>
         <target state="translated">Erro ao recuperar metadados</target>
       </trans-unit>
@@ -8803,11 +8803,11 @@ Erro ao enviar documentos por e-mail</target>
         <source>An error occurred loading content: <x id="PH" equiv-text="err.message ?? err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">525,527</context>
+          <context context-type="linenumber">526,528</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">982,984</context>
+          <context context-type="linenumber">986,988</context>
         </context-group>
         <target state="translated">Ocorreu um erro ao carregar o conteúdo: <x id="PH" equiv-text="err.message ?? err.toString()"/></target>
       </trans-unit>
@@ -8815,7 +8815,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Document was updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">648</context>
+          <context context-type="linenumber">652</context>
         </context-group>
         <target state="needs-translation">Document was updated</target>
       </trans-unit>
@@ -8823,7 +8823,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Document was updated at <x id="PH" equiv-text="formattedModified"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">649</context>
+          <context context-type="linenumber">653</context>
         </context-group>
         <target state="needs-translation">Document was updated at <x id="PH" equiv-text="formattedModified"/>.</target>
       </trans-unit>
@@ -8831,7 +8831,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Reload to discard your local unsaved edits and load the latest remote version.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">650</context>
+          <context context-type="linenumber">654</context>
         </context-group>
         <target state="needs-translation">Reload to discard your local unsaved edits and load the latest remote version.</target>
       </trans-unit>
@@ -8839,7 +8839,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Reload</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">652</context>
+          <context context-type="linenumber">656</context>
         </context-group>
         <target state="needs-translation">Reload</target>
       </trans-unit>
@@ -8847,7 +8847,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Document reloaded with latest changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">708</context>
+          <context context-type="linenumber">712</context>
         </context-group>
         <target state="needs-translation">Document reloaded with latest changes.</target>
       </trans-unit>
@@ -8855,7 +8855,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Document reloaded.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">719</context>
+          <context context-type="linenumber">723</context>
         </context-group>
         <target state="needs-translation">Document reloaded.</target>
       </trans-unit>
@@ -8863,7 +8863,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Next document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">821</context>
+          <context context-type="linenumber">825</context>
         </context-group>
         <target state="translated">Próximo documento</target>
       </trans-unit>
@@ -8871,7 +8871,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Previous document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">831</context>
+          <context context-type="linenumber">835</context>
         </context-group>
         <target state="translated">Documento anterior</target>
       </trans-unit>
@@ -8879,7 +8879,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Close document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">839</context>
+          <context context-type="linenumber">843</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
@@ -8891,7 +8891,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Save document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">846</context>
+          <context context-type="linenumber">850</context>
         </context-group>
         <target state="translated">Salvar documento</target>
       </trans-unit>
@@ -8899,7 +8899,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Save and close / next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">855</context>
+          <context context-type="linenumber">859</context>
         </context-group>
         <target state="translated">Salvar e fechar / próximo</target>
       </trans-unit>
@@ -8907,7 +8907,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error retrieving version content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">965</context>
+          <context context-type="linenumber">969</context>
         </context-group>
         <target state="needs-translation">Error retrieving version content</target>
       </trans-unit>
@@ -8915,7 +8915,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error retrieving suggestions.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1026</context>
+          <context context-type="linenumber">1030</context>
         </context-group>
         <target state="needs-review-translation" state-qualifier="leveraged-tm">Erro ao recuperar sugestões.</target>
       </trans-unit>
@@ -8923,11 +8923,11 @@ Erro ao enviar documentos por e-mail</target>
         <source>Document &quot;<x id="PH" equiv-text="newValues.title"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1238</context>
+          <context context-type="linenumber">1242</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1265</context>
+          <context context-type="linenumber">1269</context>
         </context-group>
         <target state="translated">Documento "<x id="PH" equiv-text="newValues.title"/>" salvo com sucesso.</target>
       </trans-unit>
@@ -8935,7 +8935,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error saving document &quot;<x id="PH" equiv-text="this.document().title"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1271</context>
+          <context context-type="linenumber">1275</context>
         </context-group>
         <target state="needs-translation">Error saving document "<x id="PH" equiv-text="this.document().title"/>"</target>
       </trans-unit>
@@ -8943,7 +8943,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1326</context>
+          <context context-type="linenumber">1330</context>
         </context-group>
         <target state="translated">Erro ao salvar documento</target>
       </trans-unit>
@@ -8951,7 +8951,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Do you really want to move the document &quot;<x id="PH" equiv-text="this.document().title"/>&quot; to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1359</context>
+          <context context-type="linenumber">1363</context>
         </context-group>
         <target state="needs-translation">Do you really want to move the document "<x id="PH" equiv-text="this.document().title"/>" to the trash?</target>
       </trans-unit>
@@ -8959,7 +8959,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Documents can be restored prior to permanent deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1360</context>
+          <context context-type="linenumber">1364</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -8971,7 +8971,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error deleting document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1381</context>
+          <context context-type="linenumber">1385</context>
         </context-group>
         <target state="translated">Erro ao apagar documento</target>
       </trans-unit>
@@ -8979,7 +8979,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Reprocess confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1401</context>
+          <context context-type="linenumber">1405</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -8991,7 +8991,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will permanently recreate the archive file for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1402</context>
+          <context context-type="linenumber">1406</context>
         </context-group>
         <target state="translated">Essa operação irá recriar permanentemente o arquivo para este documento.</target>
       </trans-unit>
@@ -8999,7 +8999,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>The archive file will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1403</context>
+          <context context-type="linenumber">1407</context>
         </context-group>
         <target state="translated">Os arquivos serão re-gerados com as configurações atuais.</target>
       </trans-unit>
@@ -9007,7 +9007,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Reprocess operation for &quot;<x id="PH" equiv-text="this.document().title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1413</context>
+          <context context-type="linenumber">1417</context>
         </context-group>
         <target state="needs-translation">Reprocess operation for "<x id="PH" equiv-text="this.document().title"/>" will begin in the background.</target>
       </trans-unit>
@@ -9015,7 +9015,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1424</context>
+          <context context-type="linenumber">1428</context>
         </context-group>
         <target state="translated">Erro ao executar a operação de divisão</target>
       </trans-unit>
@@ -9023,7 +9023,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error downloading document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1487</context>
+          <context context-type="linenumber">1491</context>
         </context-group>
         <target state="translated">Erro ao baixar o documento</target>
       </trans-unit>
@@ -9031,7 +9031,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Page Fit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1565</context>
+          <context context-type="linenumber">1569</context>
         </context-group>
         <target state="translated">Ajustar à Página</target>
       </trans-unit>
@@ -9039,7 +9039,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>PDF edit operation for &quot;<x id="PH" equiv-text="this.document().title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1808</context>
+          <context context-type="linenumber">1812</context>
         </context-group>
         <target state="needs-translation">PDF edit operation for "<x id="PH" equiv-text="this.document().title"/>" will begin in the background.</target>
       </trans-unit>
@@ -9047,7 +9047,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error executing PDF edit operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1820</context>
+          <context context-type="linenumber">1824</context>
         </context-group>
         <target state="translated">Erro ao executar a operação de divisão</target>
       </trans-unit>
@@ -9055,7 +9055,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Please enter the current password before attempting to remove it.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1831</context>
+          <context context-type="linenumber">1835</context>
         </context-group>
         <target state="translated">Digite a senha atual antes de tentar removê-la.</target>
       </trans-unit>
@@ -9063,7 +9063,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Password removal operation for &quot;<x id="PH" equiv-text="this.document().title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1865</context>
+          <context context-type="linenumber">1869</context>
         </context-group>
         <target state="needs-translation">Password removal operation for "<x id="PH" equiv-text="this.document().title"/>" will begin in the background.</target>
       </trans-unit>
@@ -9071,7 +9071,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error executing password removal operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1879</context>
+          <context context-type="linenumber">1883</context>
         </context-group>
         <target state="translated">Erro ao executar operação de remoção de senha</target>
       </trans-unit>
@@ -9079,7 +9079,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Print failed.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1925</context>
+          <context context-type="linenumber">1929</context>
         </context-group>
         <target state="translated">Impressão falhou.</target>
       </trans-unit>
@@ -9087,7 +9087,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error loading document for printing.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1938</context>
+          <context context-type="linenumber">1942</context>
         </context-group>
         <target state="translated">Erro ao carregar o documento para impressão.</target>
       </trans-unit>
@@ -9095,11 +9095,11 @@ Erro ao enviar documentos por e-mail</target>
         <source>An error occurred loading tiff: <x id="PH" equiv-text="err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2008</context>
+          <context context-type="linenumber">2012</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2014</context>
+          <context context-type="linenumber">2018</context>
         </context-group>
         <target state="translated">Ocorreu um erro ao carregar tiff: <x id="PH" equiv-text="err.toString()"/></target>
       </trans-unit>

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-25 07:12+0000\n"
-"PO-Revision-Date: 2026-07-25 07:14\n"
+"POT-Creation-Date: 2026-07-27 19:34+0000\n"
+"PO-Revision-Date: 2026-07-27 19:35\n"
 "Last-Translator: \n"
 "Language-Team: Lithuanian\n"
 "Language: lt_LT\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumentai"
 
-#: documents/filters.py:470
+#: documents/filters.py:472
 msgid "Value must be valid JSON."
 msgstr "Reikšmė turi būti galiojantis JSON."
 
-#: documents/filters.py:489
+#: documents/filters.py:491
 msgid "Invalid custom field query expression"
 msgstr "Neteisinga pasirinktinio lauko užklausos išraiška"
 
-#: documents/filters.py:499
+#: documents/filters.py:501
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Neteisingas išraiškos sąrašas. Jis turi būti netuščias."
 
-#: documents/filters.py:520
+#: documents/filters.py:522
 msgid "Invalid logical operator {op!r}"
 msgstr "Neteisingas loginis operatorius {op!r}"
 
-#: documents/filters.py:534
+#: documents/filters.py:536
 msgid "Maximum number of query conditions exceeded."
 msgstr "Viršytas maksimalus užklausos sąlygų skaičius."
 
-#: documents/filters.py:598
+#: documents/filters.py:600
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} nėra galiojantis pasirinktas laukas."
 
-#: documents/filters.py:635
+#: documents/filters.py:637
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} nepalaiko užklausos išraiškos {expr!r}."
 
-#: documents/filters.py:750 documents/models.py:136
+#: documents/filters.py:752 documents/models.py:136
 msgid "Maximum nesting depth exceeded."
 msgstr "Viršytas maksimalus įdėjimo gylis."
 
-#: documents/filters.py:1067
+#: documents/filters.py:1094
 msgid "Custom field not found"
 msgstr "Pasirinktinis laukas nerastas"
 
@@ -1339,7 +1339,7 @@ msgid "workflow runs"
 msgstr ""
 
 #: documents/serialisers.py:522 documents/serialisers.py:874
-#: documents/serialisers.py:2763 documents/views.py:298 documents/views.py:2541
+#: documents/serialisers.py:2763 documents/views.py:299 documents/views.py:2553
 #: paperless_mail/serialisers.py:155
 msgid "Insufficient permissions."
 msgstr ""
@@ -1379,7 +1379,7 @@ msgstr ""
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2849 documents/views.py:4500
+#: documents/serialisers.py:2849 documents/views.py:4512
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1634,36 +1634,36 @@ msgstr "URI schema '{parts.scheme}' nėra leistina. Galimos schemos: {', '.join(
 msgid "Unable to parse URI {value}"
 msgstr "Nepavyko apdoroti URI {value}"
 
-#: documents/views.py:291 documents/views.py:2538
+#: documents/views.py:292 documents/views.py:2550
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:1556
+#: documents/views.py:1562
 msgid "Invalid AI configuration."
 msgstr ""
 
-#: documents/views.py:1565
+#: documents/views.py:1571
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:2363 documents/views.py:2684
+#: documents/views.py:2375 documents/views.py:2696
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:4512
+#: documents/views.py:4524
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Nepakanka leidimų bendrinti dokumentą %(id)s."
 
-#: documents/views.py:4558
+#: documents/views.py:4570
 msgid "Bundle is already being processed."
 msgstr "Rinkinys jau apdorojamas."
 
-#: documents/views.py:4619
+#: documents/views.py:4631
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Bendrinimo nuorodų rinkinys vis dar ruošiamas. Bandykite dar kartą vėliau."
 
-#: documents/views.py:4629
+#: documents/views.py:4641
 msgid "The share link bundle is unavailable."
 msgstr "Dalinimos nuorodų rinkinys yra nepasiekiamas."
 
