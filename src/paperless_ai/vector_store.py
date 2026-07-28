@@ -241,9 +241,15 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         # (MATCH) query; a plain `WHERE document_id = ?` is a full table scan
         # regardless of index size. This plain, indexed table is how delete()/
         # upsert_document() find a document's chunk ids without that scan.
+        # document_id is INTEGER here (unlike vec0's own TEXT metadata
+        # column): this is a normal SQLite table, so standard type affinity
+        # correctly coerces the TEXT document ids written/looked-up
+        # elsewhere in this module -- it does not share vec0's own
+        # metadata-column comparison code, which silently mismatches
+        # non-TEXT bound values instead of coercing them.
         conn.execute(
             "CREATE TABLE IF NOT EXISTS document_chunks "
-            "(chunk_id TEXT PRIMARY KEY, document_id TEXT NOT NULL)",
+            "(chunk_id TEXT PRIMARY KEY, document_id INTEGER NOT NULL)",
         )
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_document_chunks_document_id "

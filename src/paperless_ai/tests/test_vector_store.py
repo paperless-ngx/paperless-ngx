@@ -103,7 +103,7 @@ def _chunk_index_rows(
         sql += " WHERE document_id = ?"
         params.append(document_id)
     rows = store.client.execute(sql + " ORDER BY chunk_id", params).fetchall()
-    return [(r["chunk_id"], r["document_id"]) for r in rows]
+    return [(r["chunk_id"], str(r["document_id"])) for r in rows]
 
 
 @contextmanager
