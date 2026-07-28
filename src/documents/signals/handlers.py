@@ -1134,6 +1134,11 @@ def before_task_publish_handler(
         return
 
     try:
+        # Close stale connections without disrupting a transaction publishing a task
+        for connection in connections.all(initialized_only=True):
+            if not connection.in_atomic_block:
+                connection.close_if_unusable_or_obsolete()
+
         _, task_kwargs, _ = body
         task_id = headers["id"]
 
