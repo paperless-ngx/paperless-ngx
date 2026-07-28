@@ -2905,18 +2905,20 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
 
         v1 = SavedView.objects.get(name="test")
         self.assertEqual(v1.sort_field, "created2")
+        self.assertEqual(v1.icon, SavedView.Icon.FUNNEL)
         self.assertEqual(v1.filter_rules.count(), 1)
         self.assertEqual(v1.owner, self.user)
 
         response = self.client.patch(
             f"/api/saved_views/{v1.id}/",
-            {"sort_reverse": True},
+            {"sort_reverse": True, "icon": SavedView.Icon.ARCHIVE},
             format="json",
         )
 
         v1 = SavedView.objects.get(id=v1.id)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(v1.sort_reverse)
+        self.assertEqual(v1.icon, SavedView.Icon.ARCHIVE)
         self.assertEqual(v1.filter_rules.count(), 1)
 
         view["filter_rules"] = [{"rule_type": 12, "value": "secret"}]
@@ -2935,6 +2937,13 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
 
         v1 = SavedView.objects.get(id=v1.id)
         self.assertEqual(v1.filter_rules.count(), 0)
+
+        response = self.client.patch(
+            f"/api/saved_views/{v1.id}/",
+            {"icon": "not-an-icon"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_saved_view_display_options(self) -> None:
         """

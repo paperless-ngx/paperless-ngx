@@ -519,6 +519,42 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
 
 
 class SavedView(ModelWithOwner):
+    class Icon(models.TextChoices):
+        ARCHIVE = ("archive", _("Archive"))
+        BELL = ("bell", _("Bell"))
+        BOXES = ("boxes", _("Boxes"))
+        CALENDAR = ("calendar", _("Calendar"))
+        CARD_CHECKLIST = ("card-checklist", _("Checklist"))
+        CHAT_LEFT_TEXT = ("chat-left-text", _("Chat"))
+        CHECK_CIRCLE = ("check-circle", _("Check"))
+        CLIPBOARD = ("clipboard", _("Clipboard"))
+        CLOCK_HISTORY = ("clock-history", _("Clock"))
+        DOWNLOAD = ("download", _("Download"))
+        ENVELOPE = ("envelope", _("Envelope"))
+        EXCLAMATION_TRIANGLE = ("exclamation-triangle", _("Warning"))
+        FILE_EARMARK = ("file-earmark", _("File"))
+        FILE_EARMARK_CHECK = ("file-earmark-check", _("Checked file"))
+        FILE_EARMARK_LOCK = ("file-earmark-lock", _("Locked file"))
+        FILE_TEXT = ("file-text", _("Text file"))
+        FILES = ("files", _("Files"))
+        FOLDER = ("folder", _("Folder"))
+        FUNNEL = ("funnel", _("Filter"))
+        GEAR = ("gear", _("Gear"))
+        HASH = ("hash", _("Hash"))
+        HOUSE = ("house", _("House"))
+        JOURNALS = ("journals", _("Journals"))
+        LIST_TASK = ("list-task", _("Task list"))
+        PEOPLE = ("people", _("People"))
+        PERSON = ("person", _("Person"))
+        PRINTER = ("printer", _("Printer"))
+        SEARCH = ("search", _("Search"))
+        SEND = ("send", _("Send"))
+        STACK = ("stack", _("Stack"))
+        STARS = ("stars", _("Stars"))
+        TAG = ("tag", _("Tag"))
+        TAGS = ("tags", _("Tags"))
+        UPC_SCAN = ("upc-scan", _("Barcode"))
+
     class DisplayMode(models.TextChoices):
         TABLE = ("table", _("Table"))
         SMALL_CARDS = ("smallCards", _("Small Cards"))
@@ -540,6 +576,13 @@ class SavedView(ModelWithOwner):
         CUSTOM_FIELD = ("custom_field_%d", ("Custom Field"))
 
     name = models.CharField(_("name"), max_length=128)
+
+    icon = models.CharField(
+        _("icon"),
+        max_length=64,
+        choices=Icon.choices,
+        default=Icon.FUNNEL,
+    )
 
     sort_field = models.CharField(
         _("sort field"),
