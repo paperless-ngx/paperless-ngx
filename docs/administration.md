@@ -104,8 +104,7 @@ $ docker compose down
     docker compose up
     ```
 
-Running `docker compose up` will also apply any new database migrations,
-and, if the LLM index is enabled, any pending LLM index schema migrations.
+Running `docker compose up` will also apply any new database migrations.
 If you see everything working, press CTRL+C once to gracefully stop
 paperless. Then you can start paperless-ngx with `-d` to have it run in
 the background.

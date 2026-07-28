@@ -2,16 +2,12 @@ import json
 import logging
 import sqlite3
 import struct
-from collections.abc import Callable
 from collections.abc import Iterator
 from collections.abc import Sequence
 from contextlib import contextmanager
-from dataclasses import dataclass
-from dataclasses import field
 from pathlib import Path
 from types import TracebackType
 from typing import Any
-from typing import Literal
 
 import sqlite_vec
 from llama_index.core.bridge.pydantic import PrivateAttr
@@ -25,6 +21,9 @@ from llama_index.core.vector_stores.types import VectorStoreQuery
 from llama_index.core.vector_stores.types import VectorStoreQueryResult
 from llama_index.core.vector_stores.utils import metadata_dict_to_node
 from llama_index.core.vector_stores.utils import node_to_metadata_dict
+
+from paperless_ai.migrations import MIGRATIONS
+from paperless_ai.migrations import Migration
 
 logger = logging.getLogger("paperless_ai.vector_store")
 
@@ -61,40 +60,6 @@ COMPACT_BATCH_SIZE = 500
 # keys we construct ourselves, but allowlisting keeps SQL identifiers safe by
 # construction.
 _FILTER_COLUMNS = frozenset({"document_id", "modified"})
-
-
-@dataclass
-class Migration:
-    """A schema migration for the sqlite-vec vector store.
-
-    kind="structural": rows are copied into a new-schema file with no
-    re-embedding needed.  Supply ``apply(src_conn, dst_conn, dim)`` which
-    must create the vec0 table in ``dst_conn``, copy all rows from
-    ``src_conn``, and write ``dim`` / ``embed_model`` / ``total_inserts`` to
-    ``dst_conn``'s ``index_meta``.  ``schema_version`` is written by the
-    migration runner after ``apply`` returns.
-
-    kind="re-embed": the new schema requires fresh embeddings.
-    ``check_and_run_migrations()`` returns True when it encounters one of
-    these so the caller can force a full rebuild (which recreates the table
-    at the current SCHEMA_VERSION).
-    """
-
-    from_version: int
-    to_version: int
-    kind: Literal["structural", "re-embed"]
-    description: str
-    apply: Callable[[sqlite3.Connection, sqlite3.Connection, int], None] | None = field(
-        default=None,
-        repr=False,
-    )
-
-
-# Registry of all schema migrations in order. Populated after the class body
-# below, since v1 -> v2's apply() needs PaperlessSqliteVecVectorStore's own
-# static methods. Add entries here (and bump SCHEMA_VERSION) when the schema
-# changes.
-MIGRATIONS: list[Migration] = []
 
 
 def _pack(embedding: Sequence[float]) -> bytes:
@@ -708,42 +673,9 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         self._swap_in_compact(compact_path, db_path)
 
 
-def _migrate_v1_to_v2_add_document_chunks(
-    src_conn: sqlite3.Connection,
-    dst_conn: sqlite3.Connection,
-    dim: int,
-) -> None:
-    """v1 -> v2: backfill the document_chunks side table.
-
-    document_chunks (see PaperlessSqliteVecVectorStore._open_connection) lets
-    delete()/upsert_document() find a document's chunk ids without a vec0
-    full table scan on the document_id metadata column. Every row written
-    before this migration predates that table, so without backfilling,
-    deleting a pre-migration document would find zero chunk ids and leave its
-    vec0 rows permanently orphaned. Backfilling is a plain row copy into the
-    new-schema file (``_copy_rows``, the same helper compact() uses), which
-    records every copied row in document_chunks as it goes.
-    """
-    PaperlessSqliteVecVectorStore._create_vec_table(dst_conn, dim)
-    PaperlessSqliteVecVectorStore._meta_set_on(dst_conn, "dim", str(dim))
-    embed_model = PaperlessSqliteVecVectorStore._meta_get_on(src_conn, "embed_model")
-    if embed_model is not None:
-        PaperlessSqliteVecVectorStore._meta_set_on(dst_conn, "embed_model", embed_model)
-
-    dst_conn.execute("BEGIN IMMEDIATE")
-    live = _copy_rows(src_conn, dst_conn)
-    # This migration only ever copies live rows (like compact()), so the
-    # cumulative counter resets to match -- the new file has no bloat yet.
-    PaperlessSqliteVecVectorStore._meta_set_on(dst_conn, "total_inserts", str(live))
-    dst_conn.execute("COMMIT")
-
-
-MIGRATIONS.append(
-    Migration(
-        from_version=1,
-        to_version=2,
-        kind="structural",
-        description="add document_chunks side table for O(1) per-document deletes",
-        apply=_migrate_v1_to_v2_add_document_chunks,
-    ),
-)
+# Import migration modules for their registration side effect (each appends
+# itself to MIGRATIONS on import). Must be at the bottom of this file: those
+# modules import PaperlessSqliteVecVectorStore and _copy_rows from here, which
+# must already be fully defined by the time they run. Add a new migration
+# module's import here (and bump SCHEMA_VERSION) when the schema changes.
+from paperless_ai.migrations import m0001_add_document_chunks  # noqa: E402, F401

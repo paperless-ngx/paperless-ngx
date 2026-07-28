@@ -12,11 +12,11 @@ from llama_index.core.vector_stores.types import MetadataFilters
 from llama_index.core.vector_stores.types import VectorStoreQuery
 
 from paperless_ai import vector_store as vs_mod
+from paperless_ai.migrations import MIGRATIONS
+from paperless_ai.migrations import Migration
 from paperless_ai.vector_store import DB_FILENAME
 from paperless_ai.vector_store import DEFAULT_TABLE_NAME
-from paperless_ai.vector_store import MIGRATIONS
 from paperless_ai.vector_store import SCHEMA_VERSION
-from paperless_ai.vector_store import Migration
 from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
 from paperless_ai.vector_store import _build_where
 
