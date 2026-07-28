@@ -125,3 +125,29 @@ class TestPermittedDocumentIdsSecurity:
             expected_visible=[unowned.pk],
             expected_hidden=[owned.pk],
         )
+
+
+@pytest.mark.django_db
+class TestPermittedDocumentIdsIncludeDeleted:
+    def test_include_deleted_true_reveals_soft_deleted_owned_document(self):
+        owner = User.objects.create_user(username="owner")
+        doc = DocumentFactory(owner=owner)
+        doc.delete()
+
+        assert_visible_document_ids(
+            permitted_document_ids(owner, include_deleted=True),
+            expected_visible=[doc.pk],
+            expected_hidden=[],
+        )
+
+    def test_include_deleted_true_still_respects_permission_boundary(self):
+        owner = User.objects.create_user(username="owner")
+        stranger = User.objects.create_user(username="mallory")
+        doc = DocumentFactory(owner=owner)
+        doc.delete()
+
+        assert_visible_document_ids(
+            permitted_document_ids(stranger, include_deleted=True),
+            expected_visible=[],
+            expected_hidden=[doc.pk],
+        )
