@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
 _COMPACT = "documents.management.commands.document_llmindex.llm_index_compact"
+_MIGRATE = "documents.management.commands.document_llmindex.llm_index_migrate"
 _INDEX = "documents.management.commands.document_llmindex.llmindex_index"
 
 
@@ -16,6 +17,11 @@ class TestDocumentLlmindexCommand:
         mock_compact = mocker.patch(_COMPACT)
         call_command("document_llmindex", "compact")
         mock_compact.assert_called_once_with()
+
+    def test_migrate_calls_llm_index_migrate(self, mocker: MockerFixture) -> None:
+        mock_migrate = mocker.patch(_MIGRATE)
+        call_command("document_llmindex", "migrate")
+        mock_migrate.assert_called_once_with()
 
     def test_rebuild_calls_llmindex_index_with_rebuild_true(
         self,

@@ -723,6 +723,110 @@ def test_llm_index_compact_uses_force(
 
 
 @pytest.mark.django_db
+class TestLlmIndexMigrate:
+    """llm_index_migrate() is the cheap, startup-safe migration check -- see
+    the init-llmindex-migrate container step and the bare-metal upgrade docs.
+    """
+
+    def test_skips_when_llm_index_disabled(
+        self,
+        temp_llm_index_dir: Path,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - The LLM index is disabled
+        WHEN:
+            - llm_index_migrate() is called
+        THEN:
+            - The store is never opened (no stray db file for users who
+              never enabled AI features)
+        """
+        mock_config = mocker.MagicMock()
+        mock_config.llm_index_enabled = False
+        mocker.patch("paperless_ai.indexing.AIConfig", return_value=mock_config)
+        mock_write_store = mocker.patch("paperless_ai.indexing.write_store")
+
+        indexing.llm_index_migrate()
+
+        mock_write_store.assert_not_called()
+
+    def test_runs_pending_structural_migration(
+        self,
+        temp_llm_index_dir: Path,
+        mocker: pytest_mock.MockerFixture,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - The LLM index is enabled and a structural migration is pending
+        WHEN:
+            - llm_index_migrate() is called
+        THEN:
+            - check_and_run_migrations() runs, and no re-embed warning is
+              logged (the pending migration was structural, not re-embed)
+        """
+        mock_config = mocker.MagicMock()
+        mock_config.llm_index_enabled = True
+        mocker.patch("paperless_ai.indexing.AIConfig", return_value=mock_config)
+        mock_store = mocker.MagicMock()
+        mock_store.has_pending_migration.return_value = True
+        mock_store.check_and_run_migrations.return_value = False
+        mocker.patch(
+            "paperless_ai.indexing.write_store",
+            return_value=mocker.MagicMock(
+                __enter__=mocker.MagicMock(return_value=mock_store),
+                __exit__=mocker.MagicMock(return_value=False),
+            ),
+        )
+
+        with caplog.at_level("WARNING"):
+            indexing.llm_index_migrate()
+
+        mock_store.check_and_run_migrations.assert_called_once()
+        assert "re-embedding" not in caplog.text
+
+    def test_warns_without_rebuilding_when_reembed_pending(
+        self,
+        temp_llm_index_dir: Path,
+        mocker: pytest_mock.MockerFixture,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - The LLM index is enabled and a pending migration requires
+              re-embedding
+        WHEN:
+            - llm_index_migrate() is called
+        THEN:
+            - A warning is logged telling the admin to rebuild manually, but
+              no rebuild is triggered automatically -- re-embedding can be
+              slow and, for a metered embedding backend, cost money, so it
+              must be a deliberate user action, never an automatic one
+        """
+        mock_config = mocker.MagicMock()
+        mock_config.llm_index_enabled = True
+        mocker.patch("paperless_ai.indexing.AIConfig", return_value=mock_config)
+        mock_store = mocker.MagicMock()
+        mock_store.has_pending_migration.return_value = True
+        mock_store.check_and_run_migrations.return_value = True
+        mocker.patch(
+            "paperless_ai.indexing.write_store",
+            return_value=mocker.MagicMock(
+                __enter__=mocker.MagicMock(return_value=mock_store),
+                __exit__=mocker.MagicMock(return_value=False),
+            ),
+        )
+
+        with caplog.at_level("WARNING"):
+            indexing.llm_index_migrate()
+
+        assert "re-embedding" in caplog.text
+        mock_store.drop_table.assert_not_called()
+        mock_store.add.assert_not_called()
+
+
+@pytest.mark.django_db
 class TestLlmIndexLocking:
     """Index mutation functions must go through write_store(), which holds the lock.
 

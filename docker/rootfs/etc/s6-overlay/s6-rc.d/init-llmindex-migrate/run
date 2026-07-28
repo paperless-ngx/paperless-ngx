@@ -1,0 +1,12 @@
+#!/command/with-contenv /usr/bin/bash
+# shellcheck shell=bash
+
+declare -r log_prefix="[init-llmindex-migrate]"
+
+echo "${log_prefix} Checking LLM index schema..."
+cd "${PAPERLESS_SRC_DIR}"
+if [[ -n "${USER_IS_NON_ROOT}" ]]; then
+	python3 manage.py document_llmindex migrate
+else
+	s6-setuidgid paperless python3 manage.py document_llmindex migrate
+fi

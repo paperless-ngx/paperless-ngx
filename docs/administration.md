@@ -104,7 +104,8 @@ $ docker compose down
     docker compose up
     ```
 
-Running `docker compose up` will also apply any new database migrations.
+Running `docker compose up` will also apply any new database migrations,
+and, if the LLM index is enabled, any pending LLM index schema migrations.
 If you see everything working, press CTRL+C once to gracefully stop
 paperless. Then you can start paperless-ngx with `-d` to have it run in
 the background.
@@ -211,6 +212,17 @@ following:
 
     This is a no-op if the index is already up to date, so it is safe to
     run on every upgrade.
+
+5.  If the LLM index is enabled, apply any pending LLM index schema
+    migrations.
+
+    ```shell-session
+    cd src
+    python3 manage.py document_llmindex migrate
+    ```
+
+    This is a no-op if the index is already up to date (or the LLM index
+    is disabled), so it is safe to run on every upgrade.
 
 ### Database Upgrades
 
@@ -532,7 +544,7 @@ index is updated automatically on the schedule set by
 can manage it manually:
 
 ```
-document_llmindex {rebuild,update,compact}
+document_llmindex {rebuild,update,compact,migrate}
 ```
 
 Specify `rebuild` to build the index from scratch from all documents in the database. Use
@@ -543,6 +555,15 @@ Specify `update` to incrementally index new and changed documents. This is what 
 scheduled task runs.
 
 Specify `compact` to reclaim space and optimize the on-disk vector store.
+
+Specify `migrate` to apply any pending index schema migrations without a full reindex.
+This is a no-op if the index is already up to date, so it is safe to run on every
+startup or upgrade; it is what the container's startup sequence and the
+[bare-metal upgrade steps](#bare-metal-updating) run automatically. If a pending
+migration would require re-embedding every document, `migrate` only logs a warning and
+leaves the index as-is -- re-embedding can be slow and, for a metered embedding backend,
+cost money, so it is never triggered automatically. Run `rebuild` yourself when you are
+ready.
 
 !!! note
 

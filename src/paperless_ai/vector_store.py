@@ -671,7 +671,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             if migration.kind == "re-embed":
                 logger.warning(
                     "LLM index schema v%d -> v%d requires re-embedding (%s); "
-                    "forcing full rebuild.",
+                    "the caller must force a rebuild.",
                     migration.from_version,
                     migration.to_version,
                     migration.description,

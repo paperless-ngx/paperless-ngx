@@ -461,6 +461,31 @@ def llm_index_add_or_update_document(document: Document):
         store.upsert_document(str(document.id), new_nodes)
 
 
+def llm_index_migrate() -> None:
+    """Apply any pending LLM index schema migrations, with no reindex.
+
+    Intended to run unconditionally on every startup (see the
+    init-llmindex-migrate container step and the bare-metal upgrade docs):
+    has_pending_migration() short-circuits to a metadata-only read once the
+    store is current, so a healthy install pays almost nothing here. Only
+    ever applies structural migrations -- a pending re-embed migration is
+    left for the explicit, deliberate rebuild path (``document_llmindex
+    update``/``rebuild``) to resolve, since re-embedding can be slow and,
+    for a metered embedding backend, cost money.
+    """
+    if not AIConfig().llm_index_enabled:
+        return
+    with write_store() as store:
+        needs_reembed = _check_and_run_migrations(store)
+    if needs_reembed:
+        logger.warning(
+            "LLM index requires re-embedding, which this automatic migration "
+            "check will not do on its own -- it can be slow and, for a "
+            "metered embedding backend, cost money. Run "
+            "'document_llmindex rebuild' manually when ready.",
+        )
+
+
 def llm_index_compact() -> None:
     """Compact the index immediately, rebuilding the table to reclaim space."""
     with write_store() as store:
