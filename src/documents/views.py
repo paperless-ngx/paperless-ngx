@@ -177,6 +177,7 @@ from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_global_statistics_permission
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import has_system_status_permission
+from documents.permissions import permitted_document_ids
 from documents.permissions import set_permissions_for_object
 from documents.plugins.date_parsing import get_date_parser
 from documents.schema import generate_object_with_permissions_schema
@@ -2270,10 +2271,8 @@ class ChatStreamingView(GenericAPIView[Any]):
 
             documents = [document]
         else:
-            documents = get_objects_for_user_owner_aware(
-                request.user,
-                "view_document",
-                Document,
+            documents = Document.objects.filter(
+                id__in=permitted_document_ids(request.user),
             )
 
         output_language = _get_llm_output_language(ai_config=ai_config, request=request)
@@ -2741,10 +2740,8 @@ class DocumentSelectionMixin:
             for key, value in filters.items()
             if key not in _TANTIVY_SEARCH_PARAM_NAMES
         }
-        permitted_documents = get_objects_for_user_owner_aware(
-            user,
-            permission_codename,
-            Document,
+        permitted_documents = Document.objects.filter(
+            id__in=permitted_document_ids(user),
         )
         # orm-filtered docs
         filtered_documents = DocumentFilterSet(
@@ -3352,10 +3349,8 @@ class SelectionDataView(GenericAPIView[Any]):
         serializer.is_valid(raise_exception=True)
 
         ids = serializer.validated_data.get("documents")
-        permitted_documents = get_objects_for_user_owner_aware(
-            request.user,
-            "documents.view_document",
-            Document,
+        permitted_documents = Document.objects.filter(
+            id__in=permitted_document_ids(request.user),
         )
         if permitted_documents.filter(pk__in=ids).count() != len(ids):
             return HttpResponseForbidden("Insufficient permissions")
@@ -3527,10 +3522,8 @@ class GlobalSearchView(PassUserMixin):
         OBJECT_LIMIT = 3
         docs = []
         if request.user.has_perm("documents.view_document"):
-            all_docs = get_objects_for_user_owner_aware(
-                request.user,
-                "view_document",
-                Document,
+            all_docs = Document.objects.filter(
+                id__in=permitted_document_ids(request.user),
             )
             if db_only:
                 docs = all_docs.filter(title__icontains=query)[:OBJECT_LIMIT]
@@ -3734,11 +3727,7 @@ class StatisticsView(GenericAPIView[Any]):
         documents = (
             Document.objects.all()
             if can_view_global_stats
-            else get_objects_for_user_owner_aware(
-                user,
-                "documents.view_document",
-                Document,
-            )
+            else Document.objects.filter(id__in=permitted_document_ids(user))
         ).filter(root_document__isnull=True)
         tags = (
             Tag.objects.all()

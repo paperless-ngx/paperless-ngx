@@ -648,11 +648,11 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         self.assertIn(b"AI is required for this feature", response.content)
 
     @patch("documents.views.stream_chat_with_documents")
-    @patch("documents.views.get_objects_for_user_owner_aware")
+    @patch("documents.views.permitted_document_ids")
     @override_settings(AI_ENABLED=True)
-    def test_post_no_document_id(self, mock_get_objects, mock_stream_chat) -> None:
+    def test_post_no_document_id(self, mock_permitted_ids, mock_stream_chat) -> None:
         self.grant_view_document_permission()
-        mock_get_objects.return_value = [self.document]
+        mock_permitted_ids.return_value = [self.document.pk]
         mock_stream_chat.return_value = iter([b"data"])
         response = self.client.post(
             self.ENDPOINT,
@@ -661,23 +661,23 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "text/event-stream")
-        mock_stream_chat.assert_called_once_with(
-            query_str="question",
-            documents=[self.document],
-            output_language=None,
-        )
+        mock_stream_chat.assert_called_once()
+        call_kwargs = mock_stream_chat.call_args.kwargs
+        self.assertEqual(call_kwargs["query_str"], "question")
+        self.assertEqual(list(call_kwargs["documents"]), [self.document])
+        self.assertIsNone(call_kwargs["output_language"])
 
     @patch("documents.views.stream_chat_with_documents")
-    @patch("documents.views.get_objects_for_user_owner_aware")
+    @patch("documents.views.permitted_document_ids")
     @override_settings(AI_ENABLED=True)
     def test_post_uses_user_display_language(
         self,
-        mock_get_objects,
+        mock_permitted_ids,
         mock_stream_chat,
     ) -> None:
         UiSettings.objects.create(user=self.user, settings={"language": "de-de"})
         self.grant_view_document_permission()
-        mock_get_objects.return_value = [self.document]
+        mock_permitted_ids.return_value = [self.document.pk]
         mock_stream_chat.return_value = iter([b"data"])
 
         response = self.client.post(
@@ -687,11 +687,11 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        mock_stream_chat.assert_called_once_with(
-            query_str="question",
-            documents=[self.document],
-            output_language="de-de",
-        )
+        mock_stream_chat.assert_called_once()
+        call_kwargs = mock_stream_chat.call_args.kwargs
+        self.assertEqual(call_kwargs["query_str"], "question")
+        self.assertEqual(list(call_kwargs["documents"]), [self.document])
+        self.assertEqual(call_kwargs["output_language"], "de-de")
 
     @patch("documents.views.stream_chat_with_documents")
     @override_settings(AI_ENABLED=True)
