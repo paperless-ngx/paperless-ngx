@@ -57,9 +57,7 @@ from paperless.models import ArchiveFileGenerationChoices
 from paperless.parsers import ParserContext
 from paperless.parsers import ParserProtocol
 from paperless.parsers.registry import get_parser_registry
-from paperless.parsers.utils import PDF_TEXT_MIN_LENGTH
-from paperless.parsers.utils import extract_pdf_text
-from paperless.parsers.utils import is_tagged_pdf
+from paperless.parsers.utils import pdf_born_digital_text
 
 LOGGING_NAME: Final[str] = "paperless.consumer"
 
@@ -160,29 +158,20 @@ def should_produce_archive(
         _log.debug("Archive: yes — image document, ARCHIVE_FILE_GENERATION=auto")
         return True
     if mime_type == "application/pdf":
-        text = extract_pdf_text(document_path)
-        has_text = text is not None and len(text) > 0
-        if has_text and is_tagged_pdf(document_path):
+        text, born_digital = pdf_born_digital_text(document_path, log=_log)
+        if born_digital:
             _log.debug(
-                "Archive: no — born-digital PDF (structure tags detected),"
-                " ARCHIVE_FILE_GENERATION=auto",
-            )
-            return False
-        if text is None or len(text) <= PDF_TEXT_MIN_LENGTH:
-            _log.debug(
-                "Archive: yes — scanned PDF (text_length=%d ≤ %d),"
+                "Archive: no - born-digital PDF (text_length=%d),"
                 " ARCHIVE_FILE_GENERATION=auto",
                 len(text) if text else 0,
-                PDF_TEXT_MIN_LENGTH,
             )
-            return True
+            return False
         _log.debug(
-            "Archive: no — born-digital PDF (text_length=%d > %d),"
+            "Archive: yes - scanned/textless PDF (text_length=%d),"
             " ARCHIVE_FILE_GENERATION=auto",
-            len(text),
-            PDF_TEXT_MIN_LENGTH,
+            len(text) if text else 0,
         )
-        return False
+        return True
     _log.debug(
         "Archive: no — MIME type %r not eligible for auto archive generation",
         mime_type,
