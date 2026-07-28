@@ -2269,4 +2269,34 @@ describe('FilterEditorComponent', () => {
     component.itemSelected({ item: 'world', preventDefault: () => true })
     expect(component.textFilter).toEqual('hello world ')
   })
+
+  it('should choose the active autocomplete item with Enter', () => {
+    component.textFilterTarget = 'fulltext-query'
+    jest
+      .spyOn(searchService, 'autocomplete')
+      .mockReturnValue(of(['hello', 'help']))
+
+    const input = component.textFilterInput.nativeElement as HTMLInputElement
+    input.value = 'he'
+    input.dispatchEvent(new Event('input'))
+    tick(250)
+
+    input.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'ArrowDown',
+        bubbles: true,
+        cancelable: true,
+      })
+    )
+    input.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'Enter',
+        bubbles: true,
+        cancelable: true,
+      })
+    )
+    fixture.detectChanges()
+
+    expect(component.textFilter).toEqual('help ')
+  })
 })

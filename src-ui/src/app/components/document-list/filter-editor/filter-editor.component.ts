@@ -1314,6 +1314,10 @@ export class FilterEditorComponent
 
   textFilterKeydown(event: KeyboardEvent) {
     if (event.key == 'Enter') {
+      if (event.defaultPrevented) {
+        // NgbTypeahead calls preventDefault, so use that to detect if the Enter key was for the dropdown
+        return
+      }
       const filterString = (
         this.textFilterInput.nativeElement as HTMLInputElement
       ).value
