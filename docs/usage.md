@@ -89,7 +89,7 @@ You can view the document, edit its metadata, assign tags, correspondents,
 document types, and custom fields. You can also view the document history,
 download the document or share it via a share link.
 
-### Document File Versions {#document-file-versions}
+### Document File Versions
 
 Think of versions as **file history** for a document.
 
