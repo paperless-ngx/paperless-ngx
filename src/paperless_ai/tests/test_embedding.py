@@ -167,10 +167,15 @@ def test_build_llm_index_text(mock_document):
 
         assert "Title: Test Title" in result
         assert "Filename: test_file.pdf" in result
-        assert "Created: 2023-01-01" in result
+        assert "Created: 2023-01-01" not in result
+        assert "Added: 2023-01-02" not in result
+        assert "Modified: 2023-01-03" not in result
         assert "Tags: Tag1, Tag2" in result
         assert "Document Type: Invoice" in result
         assert "Correspondent: Test Correspondent" in result
-        assert "Notes: Note1,Note2" in result
+        assert "Storage Path:" not in result
+        assert "Archive Serial Number:" not in result
+        assert "Notes: Note1,Note2" not in result
         assert "Content:\n\nThis is the document content." in result
-        assert "Custom Field - Field1: Value1\nCustom Field - Field2: Value2" in result
+        assert "Custom Field - Field1: Value1" not in result
+        assert "Custom Field - Field2: Value2" not in result

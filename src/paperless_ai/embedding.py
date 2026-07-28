@@ -9,7 +9,6 @@ if TYPE_CHECKING:
     from llama_index.core.base.embeddings.base import BaseEmbedding
 
 from documents.models import Document
-from documents.models import Note
 from paperless.config import AIConfig
 from paperless.models import LLMEmbeddingBackend
 from paperless.network import validate_outbound_http_url
@@ -80,22 +79,18 @@ def get_embedding_dim() -> int:
 
 
 def build_llm_index_text(doc: Document) -> str:
+    """Build the minimal text representation used for embedding/indexing.
+
+    Only include fields that are useful for retrieval and avoid notes, custom
+    fields, archive serial numbers, and other potentially sensitive metadata.
+    """
     lines = [
         f"Title: {doc.title}",
         f"Filename: {doc.filename}",
-        f"Created: {doc.created}",
-        f"Added: {doc.added}",
-        f"Modified: {doc.modified}",
         f"Tags: {', '.join(tag.name for tag in doc.tags.all())}",
         f"Document Type: {doc.document_type.name if doc.document_type else ''}",
         f"Correspondent: {doc.correspondent.name if doc.correspondent else ''}",
-        f"Storage Path: {doc.storage_path.name if doc.storage_path else ''}",
-        f"Archive Serial Number: {doc.archive_serial_number or ''}",
-        f"Notes: {','.join([str(c.note) for c in Note.objects.filter(document=doc)])}",
     ]
-
-    for instance in doc.custom_fields.all():
-        lines.append(f"Custom Field - {instance.field.name}: {instance}")
 
     lines.append("\nContent:\n")
     lines.append(doc.content or "")
