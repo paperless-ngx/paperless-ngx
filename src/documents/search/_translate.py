@@ -566,6 +566,17 @@ def translate_range(field: str, lo: str, hi: str, tz: tzinfo) -> str:
         lo_pair, hi_pair = hi_pair, lo_pair
 
     lo_iso = _fmt(lo_pair[0]) if lo_pair is not None else OPEN_LO
-    hi_iso = _fmt(hi_pair[1]) if hi_pair is not None else OPEN_HI
 
-    return f"{field}:[{lo_iso} TO {hi_iso}]"
+    # A bound resolves to (floor, ceil) where floor == ceil for an exact instant
+    # (a full ISO datetime, "now", or a "+/-N unit" offset) and floor != ceil for
+    # a coarser period token (year/month/day precision). Only the latter needs a
+    # half-open close: its ceil is the start of the *next* period and must be
+    # excluded, or that instant (e.g. the 1st of next month) wrongly matches.
+    if hi_pair is not None:
+        hi_iso = _fmt(hi_pair[1])
+        hi_close = "]" if hi_pair[0] == hi_pair[1] else "}"
+    else:
+        hi_iso = OPEN_HI
+        hi_close = "]"
+
+    return f"{field}:[{lo_iso} TO {hi_iso}{hi_close}"
