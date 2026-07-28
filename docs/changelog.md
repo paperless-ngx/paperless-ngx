@@ -1,5 +1,51 @@
 # Changelog
 
+## paperless-ngx 3.0.4
+
+### Bug Fixes
+
+- Fix: prevent pdfjs highlight scrolling from affecting the entire page [@shamoon](https://github.com/shamoon) ([#13355](https://github.com/paperless-ngx/paperless-ngx/pull/13355))
+- Fix: don't skip OCR/archive for tagged PDFs with no actual text [@stumpylog](https://github.com/stumpylog) ([#13351](https://github.com/paperless-ngx/paperless-ngx/pull/13351))
+- Performance: more efficient diacritic normalization in dropdown filtering [@shamoon](https://github.com/shamoon) ([#13347](https://github.com/paperless-ngx/paperless-ngx/pull/13347))
+- Fix: dedupe permission-visible documents when combined with multi-tag filters [@stumpylog](https://github.com/stumpylog) ([#13345](https://github.com/paperless-ngx/paperless-ngx/pull/13345))
+- Fixhancement: pass LLM output language to chat if specified [@shamoon](https://github.com/shamoon) ([#13340](https://github.com/paperless-ngx/paperless-ngx/pull/13340))
+- Fix: ensure preview reload on live changes [@shamoon](https://github.com/shamoon) ([#13321](https://github.com/paperless-ngx/paperless-ngx/pull/13321))
+- Fix: clamp all out out-of-range possible fields [@stumpylog](https://github.com/stumpylog) ([#13316](https://github.com/paperless-ngx/paperless-ngx/pull/13316))
+- Fix: add docstring to DocumentClassifierSchema for cleaner LLM tool description [@stumpylog](https://github.com/stumpylog) ([#13315](https://github.com/paperless-ngx/paperless-ngx/pull/13315))
+- Fix: guard build\_document\_node against stale FK on deleted correspondent/doc type [@stumpylog](https://github.com/stumpylog) ([#13318](https://github.com/paperless-ngx/paperless-ngx/pull/13318))
+- Fix: prevent search filter loss when closing document with Escape key [@shamoon](https://github.com/shamoon) ([#13317](https://github.com/paperless-ngx/paperless-ngx/pull/13317))
+- Fix: fix frontend permissions display for stats/system perms [@shamoon](https://github.com/shamoon) ([#13305](https://github.com/paperless-ngx/paperless-ngx/pull/13305))
+
+### Documentation
+
+- Documentation: fix PAPERLESS\_AI\_LLM\_OUTPUT\_LANGUAGE heading level [@SuperSandro2000](https://github.com/SuperSandro2000) ([#13341](https://github.com/paperless-ngx/paperless-ngx/pull/13341))
+
+### Dependencies
+
+- Chore: resolve npm provenance issues with chokidar and semver [@shamoon](https://github.com/shamoon) ([#13323](https://github.com/paperless-ngx/paperless-ngx/pull/13323))
+
+### All App Changes
+
+<details>
+<summary>14 changes</summary>
+
+- Fix: prevent pdfjs highlight scrolling from affecting the entire page [@shamoon](https://github.com/shamoon) ([#13355](https://github.com/paperless-ngx/paperless-ngx/pull/13355))
+- Fix: don't skip OCR/archive for tagged PDFs with no actual text [@stumpylog](https://github.com/stumpylog) ([#13351](https://github.com/paperless-ngx/paperless-ngx/pull/13351))
+- Performance: more efficient diacritic normalization in dropdown filtering [@shamoon](https://github.com/shamoon) ([#13347](https://github.com/paperless-ngx/paperless-ngx/pull/13347))
+- Performance: prefetch notes and custom fields for LLM index text building [@stumpylog](https://github.com/stumpylog) ([#13350](https://github.com/paperless-ngx/paperless-ngx/pull/13350))
+- Fix: dedupe permission-visible documents when combined with multi-tag filters [@stumpylog](https://github.com/stumpylog) ([#13345](https://github.com/paperless-ngx/paperless-ngx/pull/13345))
+- Performance: Scope llm index updates to actually modified documents [@stumpylog](https://github.com/stumpylog) ([#13322](https://github.com/paperless-ngx/paperless-ngx/pull/13322))
+- Fixhancement: pass LLM output language to chat if specified [@shamoon](https://github.com/shamoon) ([#13340](https://github.com/paperless-ngx/paperless-ngx/pull/13340))
+- Chore: resolve npm provenance issues with chokidar and semver [@shamoon](https://github.com/shamoon) ([#13323](https://github.com/paperless-ngx/paperless-ngx/pull/13323))
+- Fix: ensure preview reload on live changes [@shamoon](https://github.com/shamoon) ([#13321](https://github.com/paperless-ngx/paperless-ngx/pull/13321))
+- Fix: clamp all out out-of-range possible fields [@stumpylog](https://github.com/stumpylog) ([#13316](https://github.com/paperless-ngx/paperless-ngx/pull/13316))
+- Fix: add docstring to DocumentClassifierSchema for cleaner LLM tool description [@stumpylog](https://github.com/stumpylog) ([#13315](https://github.com/paperless-ngx/paperless-ngx/pull/13315))
+- Fix: guard build\_document\_node against stale FK on deleted correspondent/doc type [@stumpylog](https://github.com/stumpylog) ([#13318](https://github.com/paperless-ngx/paperless-ngx/pull/13318))
+- Fix: prevent search filter loss when closing document with Escape key [@shamoon](https://github.com/shamoon) ([#13317](https://github.com/paperless-ngx/paperless-ngx/pull/13317))
+- Fix: fix frontend permissions display for stats/system perms [@shamoon](https://github.com/shamoon) ([#13305](https://github.com/paperless-ngx/paperless-ngx/pull/13305))
+
+</details>
+
 ## paperless-ngx 3.0.3
 
 ### Bug Fixes
