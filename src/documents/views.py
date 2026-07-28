@@ -5314,9 +5314,15 @@ class TrashView(ListModelMixin, PassUserMixin):
             if doc_ids is not None
             else self.filter_queryset(self.get_queryset()).all()
         )
-        for doc in docs:
-            if not has_perms_owner_aware(request.user, "delete_document", doc):
-                return HttpResponseForbidden("Insufficient permissions")
+        permitted_ids = set(
+            permitted_document_ids(
+                request.user,
+                perm="delete_document",
+                include_deleted=True,
+            ),
+        )
+        if not all(doc.pk in permitted_ids for doc in docs):
+            return HttpResponseForbidden("Insufficient permissions")
         action = serializer.validated_data.get("action")
         if action == "restore":
             for doc in Document.deleted_objects.filter(id__in=doc_ids).all():

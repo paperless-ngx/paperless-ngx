@@ -379,3 +379,42 @@ class TestBulkDownloadPermissionChecksRootDocument:
             format="json",
         )
         assert response.status_code == HTTPStatus.FORBIDDEN
+
+
+@pytest.mark.django_db
+class TestTrashRestorePermissionBoundary:
+    def test_restore_rejects_document_without_delete_permission(
+        self,
+        rest_api_client,
+    ):
+        owner = User.objects.create_user(username="owner")
+        requester = User.objects.create_user(username="requester")
+        rest_api_client.force_authenticate(user=requester)
+        doc = DocumentFactory(owner=owner)
+        assign_perm("view_document", requester, doc)  # view only, NOT delete
+        doc.delete()
+
+        response = rest_api_client.post(
+            "/api/trash/",
+            {"documents": [doc.pk], "action": "restore"},
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.FORBIDDEN
+
+    def test_restore_allows_document_with_explicit_delete_permission(
+        self,
+        rest_api_client,
+    ):
+        owner = User.objects.create_user(username="owner")
+        requester = User.objects.create_user(username="requester")
+        rest_api_client.force_authenticate(user=requester)
+        doc = DocumentFactory(owner=owner)
+        assign_perm("delete_document", requester, doc)
+        doc.delete()
+
+        response = rest_api_client.post(
+            "/api/trash/",
+            {"documents": [doc.pk], "action": "restore"},
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.OK
