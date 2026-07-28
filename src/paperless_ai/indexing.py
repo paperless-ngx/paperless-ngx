@@ -324,6 +324,37 @@ def _exclude_document_id_filter(document_id: int | str):
     )
 
 
+def _check_and_run_migrations(store: "PaperlessSqliteVecVectorStore") -> bool:
+    """Run any pending structural migrations before a write. Returns True
+    when a pending re-embed migration was encountered, signaling the
+    caller must force a full rebuild.
+
+    check_and_run_migrations() never re-embeds anything itself: it only
+    applies cheap, local structural migrations, and for a re-embed
+    migration returns True as a pure signal with no side effects. Actual
+    re-embedding only happens in update_llm_index()'s explicit rebuild
+    path below, so it is safe to call this before any write -- including
+    delete()/upsert_document() -- without risking an unwanted (and
+    possibly costly, if the embedding backend is metered) re-embed.
+
+    has_pending_migration() gates the exclusive-access check: in the
+    common case (already at SCHEMA_VERSION) this returns immediately
+    without ever contending with readers or a concurrent compaction --
+    normal writes must not be gated by that lock.
+    """
+    if not store.has_pending_migration():
+        return False
+    try:
+        with _exclude_readers():
+            return store.check_and_run_migrations()
+    except Timeout:
+        logger.info(
+            "Skipping LLM index migration check: index readers are active; "
+            "will retry next run.",
+        )
+        return False
+
+
 def update_llm_index(
     *,
     iter_wrapper: IterWrapper[Document] = identity,
@@ -339,15 +370,7 @@ def update_llm_index(
     happens, since a rebuild always covers the whole library regardless.
     """
     with write_store() as store:
-        try:
-            with _exclude_readers():
-                needs_reembed = store.check_and_run_migrations()
-        except Timeout:
-            logger.info(
-                "Skipping LLM index migration check: index readers are active; "
-                "will retry next run.",
-            )
-            needs_reembed = False
+        needs_reembed = _check_and_run_migrations(store)
         if needs_reembed:
             logger.warning(
                 "LLM index migration requires re-embedding; forcing rebuild.",
@@ -434,6 +457,7 @@ def llm_index_add_or_update_document(document: Document):
         _embed_nodes(new_nodes, get_embedding_model(config))
 
     with write_store(embed_model_name=get_configured_model_name(config)) as store:
+        _check_and_run_migrations(store)
         store.upsert_document(str(document.id), new_nodes)
 
 
@@ -453,6 +477,7 @@ def llm_index_compact() -> None:
 def llm_index_remove_document(document: Document):
     """Remove a document's chunks from the LLM index."""
     with write_store() as store:
+        _check_and_run_migrations(store)
         store.delete(str(document.id))
 
 

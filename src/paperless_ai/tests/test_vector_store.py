@@ -1097,6 +1097,58 @@ class TestMigrations:
         store.add([make_node("a1", "1")])
         assert store.check_and_run_migrations() is False
 
+    def test_has_pending_migration_no_table_returns_false(
+        self,
+        store: PaperlessSqliteVecVectorStore,
+    ) -> None:
+        """
+        GIVEN:
+            - A store with no table yet
+        WHEN:
+            - has_pending_migration() is called
+        THEN:
+            - False is returned
+        """
+        assert store.has_pending_migration() is False
+
+    def test_has_pending_migration_current_version_returns_false(
+        self,
+        store: PaperlessSqliteVecVectorStore,
+    ) -> None:
+        """
+        GIVEN:
+            - A store already at the current SCHEMA_VERSION
+        WHEN:
+            - has_pending_migration() is called
+        THEN:
+            - False is returned, without running any migration or requiring
+              exclusive access (unlike check_and_run_migrations(), this is a
+              plain metadata read -- see PaperlessSqliteVecVectorStore.has_pending_migration)
+        """
+        store.add([make_node("a1", "1")])
+        assert store.has_pending_migration() is False
+
+    def test_has_pending_migration_true_when_behind(
+        self,
+        store: PaperlessSqliteVecVectorStore,
+    ) -> None:
+        """
+        GIVEN:
+            - A store whose schema_version has been forced behind
+              SCHEMA_VERSION, simulating a store awaiting migration
+        WHEN:
+            - has_pending_migration() is called
+        THEN:
+            - True is returned, and the store is left untouched (no
+              migration actually runs)
+        """
+        store.add([make_node("a1", "1")])
+        store.client.execute(
+            "UPDATE index_meta SET value = '1' WHERE key = 'schema_version'",
+        )
+        assert store.has_pending_migration() is True
+        assert self._schema_version(store) == 1
+
     def test_reembed_migration_returns_true(
         self,
         store: PaperlessSqliteVecVectorStore,

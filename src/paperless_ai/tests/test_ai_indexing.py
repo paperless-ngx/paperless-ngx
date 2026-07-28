@@ -757,6 +757,49 @@ class TestLlmIndexLocking:
 
         mock_store.upsert_document.assert_called_once()
 
+    @pytest.mark.parametrize("has_pending", [True, False])
+    def test_add_or_update_document_runs_migration_check_only_when_pending(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+        mocker: pytest_mock.MockerFixture,
+        *,
+        has_pending: bool,
+    ) -> None:
+        """
+        GIVEN:
+            - A document to add/update, and a store reporting whether a
+              migration is pending
+        WHEN:
+            - llm_index_add_or_update_document() is called
+        THEN:
+            - check_and_run_migrations() runs only when has_pending_migration()
+              is True, so a normal upsert never pays for the exclusive access
+              that check_and_run_migrations() requires
+            - upsert_document() is called either way
+        """
+        mock_store = MagicMock()
+        mock_store.has_pending_migration.return_value = has_pending
+        mocker.patch(
+            "paperless_ai.indexing.write_store",
+            return_value=mocker.MagicMock(
+                __enter__=mocker.MagicMock(return_value=mock_store),
+                __exit__=mocker.MagicMock(return_value=False),
+            ),
+        )
+        mock_node = MagicMock()
+        mock_node.get_content.return_value = "fake node text"
+        mocker.patch(
+            "paperless_ai.indexing.build_document_node",
+            return_value=[mock_node],
+        )
+
+        doc = DocumentFactory.build(id=1)
+        indexing.llm_index_add_or_update_document(doc)
+
+        assert mock_store.check_and_run_migrations.called is has_pending
+        mock_store.upsert_document.assert_called_once()
+
     def test_remove_document_uses_write_store(
         self,
         temp_llm_index_dir: Path,
@@ -775,6 +818,43 @@ class TestLlmIndexLocking:
         doc.id = 1
         indexing.llm_index_remove_document(doc)
 
+        mock_store.delete.assert_called_once_with("1")
+
+    @pytest.mark.parametrize("has_pending", [True, False])
+    def test_remove_document_runs_migration_check_only_when_pending(
+        self,
+        temp_llm_index_dir: Path,
+        mocker: pytest_mock.MockerFixture,
+        *,
+        has_pending: bool,
+    ) -> None:
+        """
+        GIVEN:
+            - A document to remove, and a store reporting whether a
+              migration is pending
+        WHEN:
+            - llm_index_remove_document() is called
+        THEN:
+            - check_and_run_migrations() runs only when has_pending_migration()
+              is True, so a normal delete never pays for the exclusive access
+              that check_and_run_migrations() requires (see
+              test_normal_write_is_not_gated_by_the_compaction_lock)
+            - delete() is called either way
+        """
+        mock_store = MagicMock()
+        mock_store.has_pending_migration.return_value = has_pending
+        mocker.patch(
+            "paperless_ai.indexing.write_store",
+            return_value=mocker.MagicMock(
+                __enter__=mocker.MagicMock(return_value=mock_store),
+                __exit__=mocker.MagicMock(return_value=False),
+            ),
+        )
+
+        doc = DocumentFactory.build(id=1)
+        indexing.llm_index_remove_document(doc)
+
+        assert mock_store.check_and_run_migrations.called is has_pending
         mock_store.delete.assert_called_once_with("1")
 
     def test_update_llm_index_rebuild_uses_write_store(

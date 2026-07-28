@@ -624,6 +624,23 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         Path(compact_path).replace(db_path)
         self._conn = self._open_connection(db_path)
 
+    def has_pending_migration(self) -> bool:
+        """Cheaply check whether a migration is pending, with no exclusive
+        access needed -- just a metadata read under the connection callers
+        already hold via the write FileLock.
+
+        Callers should only pay for check_and_run_migrations()'s exclusive
+        access (a structural migration's file swap must not run while
+        readers are active) when this returns True, so that the common
+        case -- already at SCHEMA_VERSION -- never contends with readers
+        or a concurrent compaction.
+        """
+        if not self.table_exists():
+            return False
+        raw = self._meta_get("schema_version")
+        current = int(raw) if raw is not None else SCHEMA_VERSION
+        return current < SCHEMA_VERSION
+
     def check_and_run_migrations(self) -> bool:
         """Apply any pending schema migrations to the store.
 
@@ -632,8 +649,10 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         this method returns True when one is encountered so the caller can
         force a full rebuild (which recreates the table at SCHEMA_VERSION).
 
-        Must be called under the write FileLock.  No-op when the table does
-        not exist or is already at SCHEMA_VERSION.
+        Must be called under the write FileLock, with readers excluded (see
+        has_pending_migration() for a cheap pre-check that avoids paying for
+        that exclusion in the common case).  No-op when the table does not
+        exist or is already at SCHEMA_VERSION.
         """
         if not self.table_exists():
             return False
