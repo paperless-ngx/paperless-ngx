@@ -249,6 +249,7 @@ export class DocumentDetailComponent
   titleSubject: Subject<string> = new Subject()
   readonly previewUrl = signal<string>(undefined)
   readonly pdfSource = signal<string>(undefined)
+  readonly previewRevision = signal(0)
   readonly pdfPassword = signal<string>(undefined)
   readonly thumbUrl = signal<string>(undefined)
   readonly previewText = signal<string>(undefined)
@@ -609,6 +610,9 @@ export class DocumentDetailComponent
               .subscribe()
           }
           this.updateComponent(useDoc)
+          if (forceRemote) {
+            this.previewRevision.update((revision) => revision + 1)
+          }
           this.titleSubject
             .pipe(
               debounceTime(1000),

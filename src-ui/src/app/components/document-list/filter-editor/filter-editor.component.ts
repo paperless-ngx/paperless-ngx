@@ -1312,7 +1312,7 @@ export class FilterEditorComponent
     }
   }
 
-  textFilterKeyup(event: KeyboardEvent) {
+  textFilterKeydown(event: KeyboardEvent) {
     if (event.key == 'Enter') {
       const filterString = (
         this.textFilterInput.nativeElement as HTMLInputElement

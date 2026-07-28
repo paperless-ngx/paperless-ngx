@@ -4,11 +4,18 @@ from unittest.mock import patch
 
 import pytest
 import pytest_mock
+from django.db import connection
 from django.test import override_settings
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 from llama_index.core.schema import MetadataMode
 
+from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.models import DocumentType
+from documents.models import Note
 from documents.models import PaperlessTask
 from documents.signals import document_consumption_finished
 from documents.signals import document_updated
@@ -96,6 +103,38 @@ def test_build_document_node_structured_fields_in_metadata(
 
 
 @pytest.mark.django_db
+def test_build_document_node_survives_concurrently_deleted_correspondent(
+    real_document: Document,
+) -> None:
+    """Regression test for #13314.
+
+    If a document's correspondent (or document type) is deleted after the
+    in-memory Document instance was loaded but before build_document_node
+    resolves the relation, accessing the FK must not raise -- it should
+    behave like an unset FK and produce None in the metadata instead of
+    aborting the whole indexing pass.
+    """
+    correspondent = Correspondent.objects.create(name="Stale Correspondent")
+    document_type = DocumentType.objects.create(name="Stale Type")
+    real_document.correspondent = correspondent
+    real_document.document_type = document_type
+    real_document.save()
+
+    # Re-fetch to get an instance whose correspondent/document_type relations
+    # are unresolved (not yet cached), mirroring a task that loaded the
+    # document before the concurrent deletion below.
+    stale_document = Document.objects.get(pk=real_document.pk)
+
+    correspondent.delete()
+    document_type.delete()
+
+    nodes = indexing.build_document_node(stale_document)
+    assert len(nodes) > 0
+    assert nodes[0].metadata["correspondent"] is None
+    assert nodes[0].metadata["document_type"] is None
+
+
+@pytest.mark.django_db
 def test_build_document_node_excludes_document_id_from_llm_context(
     real_document: Document,
 ) -> None:
@@ -163,6 +202,8 @@ def test_update_llm_index(
         mock_queryset = MagicMock()
         mock_queryset.exists.return_value = True
         mock_queryset.__iter__.return_value = iter([real_document])
+        mock_queryset.select_related.return_value = mock_queryset
+        mock_queryset.prefetch_related.return_value = mock_queryset
         mock_all.return_value = mock_queryset
         build_document_node.return_value = []
         indexing.update_llm_index(rebuild=True)
@@ -182,6 +223,8 @@ def test_update_llm_index_rebuilds_on_model_name_change(
         mock_queryset = MagicMock()
         mock_queryset.exists.return_value = True
         mock_queryset.__iter__.return_value = iter([real_document])
+        mock_queryset.select_related.return_value = mock_queryset
+        mock_queryset.prefetch_related.return_value = mock_queryset
         mock_all.return_value = mock_queryset
         with patch(
             "paperless_ai.indexing.get_configured_model_name",
@@ -194,6 +237,8 @@ def test_update_llm_index_rebuilds_on_model_name_change(
         mock_queryset = MagicMock()
         mock_queryset.exists.return_value = True
         mock_queryset.__iter__.return_value = iter([real_document])
+        mock_queryset.select_related.return_value = mock_queryset
+        mock_queryset.prefetch_related.return_value = mock_queryset
         mock_all.return_value = mock_queryset
         with patch(
             "paperless_ai.indexing.get_configured_model_name",
@@ -224,6 +269,8 @@ def test_update_llm_index_partial_update(
         mock_queryset = MagicMock()
         mock_queryset.exists.return_value = True
         mock_queryset.__iter__.return_value = iter([real_document, doc2])
+        mock_queryset.select_related.return_value = mock_queryset
+        mock_queryset.prefetch_related.return_value = mock_queryset
         mock_all.return_value = mock_queryset
 
         indexing.update_llm_index(rebuild=True)
@@ -252,6 +299,52 @@ def test_update_llm_index_partial_update(
         assert store.table_exists(), (
             "Expected the vector store table to exist after incremental update"
         )
+        before = store.get_modified_times()
+
+    # new doc, also touched by the scoped update below
+    doc4 = DocumentFactory.create(title="Test Document 4", added=timezone.now())
+
+    # A further edit, scoped via document_ids to doc3 + doc4 -- doc2 must be
+    # left exactly as it was, proving document_ids restricts the scan
+    # instead of falling back to the whole library.
+    doc3.modified = timezone.now()
+    doc3.save()
+    doc4.modified = timezone.now()
+    doc4.save()
+
+    # Give both scoped documents a note and a custom field: build_llm_index_text
+    # reads both per document, so without the notes/custom_fields__field
+    # prefetch on scoped_documents, each additional document adds 3 more
+    # queries (N+1 regression) instead of the query count staying flat.
+    custom_field = CustomField.objects.create(
+        name="Priority",
+        data_type=CustomField.FieldDataType.STRING,
+    )
+    for doc in (doc3, doc4):
+        Note.objects.create(document=doc, note=f"a note on {doc.title}")
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=custom_field,
+            value_text="high",
+        )
+
+    with CaptureQueriesContext(connection) as ctx:
+        result = indexing.update_llm_index(
+            rebuild=False,
+            document_ids=[doc3.pk, doc4.pk],
+        )
+    assert result == "LLM index updated successfully."
+    # Notes/custom fields are prefetched in one batch query each (plus one
+    # more for custom_fields__field), not re-queried per document -- an N+1
+    # regression here would scale with document count instead of staying flat
+    # (7 with the prefetch vs. 10 without it, for these 2 documents).
+    assert len(ctx.captured_queries) <= 8
+
+    with indexing.get_vector_store() as store:
+        after = store.get_modified_times()
+
+    assert after[str(doc3.pk)] == doc3.modified.isoformat()
+    assert after[str(doc2.pk)] == before[str(doc2.pk)]
 
 
 @pytest.mark.django_db

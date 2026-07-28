@@ -932,8 +932,8 @@ for display in the web interface.
     | Document type              | `never` | `auto` (default)           | `always` |
     | -------------------------- | ------- | -------------------------- | -------- |
     | Scanned image (TIFF, JPEG) | No      | **Yes**                    | Yes      |
-    | Image-based PDF            | No      | **Yes** (short/no text, untagged) | Yes |
-    | Born-digital PDF           | No      | No (tagged or has embedded text)  | Yes |
+    | Image-based PDF            | No      | **Yes** (no embedded text) | Yes |
+    | Born-digital PDF           | No      | No (has embedded text, optionally confirmed by tag) | Yes |
     | Plain text, email, HTML    | No      | No                         | No       |
     | DOCX / ODT (via Tika)      | Yes\*   | Yes\*                      | Yes\*    |
 
@@ -2135,7 +2135,7 @@ used with the OpenAI-compatible backend to target a custom provider or local gat
 
     Defaults to None.
 
-### [`PAPERLESS_AI_LLM_OUTPUT_LANGUAGE=<str>`](#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE) {#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE}
+#### [`PAPERLESS_AI_LLM_OUTPUT_LANGUAGE=<str>`](#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE) {#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE}
 
 : The language to use for AI suggestions (results may vary by LLM model). If not supplied, defaults to the user's UI language setting or None.
 

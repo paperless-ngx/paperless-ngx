@@ -54,6 +54,7 @@ def mock_document():
     cf2.field.name = "Field2"
     cf2.value = "Value2"
     doc.custom_fields.all = MagicMock(return_value=[cf1, cf2])
+    doc.notes.all = MagicMock(return_value=[])
 
     return doc
 
@@ -219,28 +220,26 @@ def test_get_configured_model_name_explicit_overrides_default(mock_ai_config):
 
 
 def test_build_llm_index_text(mock_document):
-    with patch("documents.models.Note.objects.filter") as mock_notes_filter:
-        mock_notes_filter.return_value = [
-            MagicMock(note="Note1"),
-            MagicMock(note="Note2"),
-        ]
+    mock_document.notes.all = MagicMock(
+        return_value=[MagicMock(note="Note1"), MagicMock(note="Note2")],
+    )
 
-        result = build_llm_index_text(mock_document)
+    result = build_llm_index_text(mock_document)
 
-        # Structured fields live in node.metadata for LLM context -- not body text
-        assert "Title: Test Title" not in result
-        assert "Created: 2023-01-01" not in result
-        assert "Tags: Tag1, Tag2" not in result
-        assert "Document Type: Invoice" not in result
-        assert "Correspondent: Test Correspondent" not in result
-        assert "Filename:" not in result
-        assert "Storage Path:" not in result
-        assert "Archive Serial Number:" not in result
+    # Structured fields live in node.metadata for LLM context -- not body text
+    assert "Title: Test Title" not in result
+    assert "Created: 2023-01-01" not in result
+    assert "Tags: Tag1, Tag2" not in result
+    assert "Document Type: Invoice" not in result
+    assert "Correspondent: Test Correspondent" not in result
+    assert "Filename:" not in result
+    assert "Storage Path:" not in result
+    assert "Archive Serial Number:" not in result
 
-        # Fields without a metadata equivalent stay in body text
-        assert "Notes: Note1,Note2" in result
-        assert "Content:\n\nThis is the document content." in result
-        assert "Custom Field - Field1: Value1\nCustom Field - Field2: Value2" in result
+    # Fields without a metadata equivalent stay in body text
+    assert "Notes: Note1,Note2" in result
+    assert "Content:\n\nThis is the document content." in result
+    assert "Custom Field - Field1: Value1\nCustom Field - Field2: Value2" in result
 
 
 def test_build_llm_index_text_normalizes_ocr_punctuation_runs(mock_document):
@@ -250,8 +249,7 @@ def test_build_llm_index_text_normalizes_ocr_punctuation_runs(mock_document):
         "Keep short punctuation like INV-100 and ellipses..."
     )
 
-    with patch("documents.models.Note.objects.filter", return_value=[]):
-        result = build_llm_index_text(mock_document)
+    result = build_llm_index_text(mock_document)
 
     assert "Introduction 7" in result
     assert "Hardware Limitation 9" in result

@@ -5,6 +5,7 @@ from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from filelock import FileLock
 from filelock import ReadWriteLock
@@ -167,6 +168,19 @@ def write_store(embed_model_name: str | None = None):
         yield store
 
 
+def _safe_related_name(document: Document, field: str) -> str | None:
+    """
+    Returns the ``name`` of a related object (correspondent, document_type,
+    storage_path), or None if the FK is unset or points at a row that has
+    since been deleted (e.g. concurrently with this call).
+    """
+    try:
+        related = getattr(document, field)
+    except ObjectDoesNotExist:
+        return None
+    return related.name if related else None
+
+
 def build_document_node(
     document: Document,
     *,
@@ -180,14 +194,10 @@ def build_document_node(
         "document_id": str(document.id),
         "title": document.title,
         "tags": [t.name for t in document.tags.all()],
-        "correspondent": document.correspondent.name
-        if document.correspondent
-        else None,
-        "document_type": document.document_type.name
-        if document.document_type
-        else None,
+        "correspondent": _safe_related_name(document, "correspondent"),
+        "document_type": _safe_related_name(document, "document_type"),
         "filename": document.filename,
-        "storage_path": document.storage_path.name if document.storage_path else None,
+        "storage_path": _safe_related_name(document, "storage_path"),
         "archive_serial_number": document.archive_serial_number,
         "created": document.created.isoformat() if document.created else None,
         "added": document.added.isoformat() if document.added else None,
@@ -318,8 +328,16 @@ def update_llm_index(
     *,
     iter_wrapper: IterWrapper[Document] = identity,
     rebuild=False,
+    document_ids: Iterable[int] | None = None,
 ) -> str:
-    """Rebuild or incrementally update the LLM index."""
+    """Rebuild or incrementally update the LLM index.
+
+    ``document_ids``, when given, scopes an incremental update to just those
+    documents instead of scanning the whole library -- callers that already
+    know which documents changed (e.g. a bulk edit) should pass this to avoid
+    an O(library size) scan per call. Ignored whenever a rebuild actually
+    happens, since a rebuild always covers the whole library regardless.
+    """
     with write_store() as store:
         try:
             with _exclude_readers():
@@ -335,7 +353,11 @@ def update_llm_index(
                 "LLM index migration requires re-embedding; forcing rebuild.",
             )
             rebuild = True
-    documents = Document.objects.all()
+    documents = Document.objects.select_related(
+        "correspondent",
+        "document_type",
+        "storage_path",
+    ).prefetch_related("tags", "notes", "custom_fields__field")
     no_documents = not documents.exists()
 
     # Fast exit before touching config: nothing to index and no existing index.
@@ -369,9 +391,14 @@ def update_llm_index(
                 store.add(nodes)
             msg = "LLM index rebuilt successfully."
         else:
+            scoped_documents = (
+                documents.filter(id__in=document_ids)
+                if document_ids is not None
+                else documents
+            )
             existing = store.get_modified_times()
             changed = 0
-            for document in iter_wrapper(documents):
+            for document in iter_wrapper(scoped_documents):
                 doc_id = str(document.id)
                 if existing.get(doc_id) == document.modified.isoformat():
                     continue

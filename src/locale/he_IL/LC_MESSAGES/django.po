@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-25 07:12+0000\n"
-"PO-Revision-Date: 2026-07-25 07:14\n"
+"POT-Creation-Date: 2026-07-27 19:34+0000\n"
+"PO-Revision-Date: 2026-07-27 19:35\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "מסמכים"
 
-#: documents/filters.py:470
+#: documents/filters.py:472
 msgid "Value must be valid JSON."
 msgstr "ערך חייב להיות JSON תקין."
 
-#: documents/filters.py:489
+#: documents/filters.py:491
 msgid "Invalid custom field query expression"
 msgstr "ביטוי שאילתה לא חוקי של שדה מותאם אישית"
 
-#: documents/filters.py:499
+#: documents/filters.py:501
 msgid "Invalid expression list. Must be nonempty."
 msgstr "רשימת ביטויים לא חוקית. חייב לכלול ערך."
 
-#: documents/filters.py:520
+#: documents/filters.py:522
 msgid "Invalid logical operator {op!r}"
 msgstr "סימן פעולה לוגית לא חוקי {op!r}"
 
-#: documents/filters.py:534
+#: documents/filters.py:536
 msgid "Maximum number of query conditions exceeded."
 msgstr "חריגה ממספר תנאי השאילתה המרבי."
 
-#: documents/filters.py:598
+#: documents/filters.py:600
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} הוא לא שדה מותאם אישית חוקי."
 
-#: documents/filters.py:635
+#: documents/filters.py:637
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} לא תומך בביטוי שאילתה {expr!r}."
 
-#: documents/filters.py:750 documents/models.py:136
+#: documents/filters.py:752 documents/models.py:136
 msgid "Maximum nesting depth exceeded."
 msgstr "חריגה מעומק הקינון המרבי."
 
-#: documents/filters.py:1067
+#: documents/filters.py:1094
 msgid "Custom field not found"
 msgstr "שדה מותאם אישית לא נמצא"
 
@@ -1340,7 +1340,7 @@ msgid "workflow runs"
 msgstr "הרצות זרימת עבודה"
 
 #: documents/serialisers.py:522 documents/serialisers.py:874
-#: documents/serialisers.py:2763 documents/views.py:298 documents/views.py:2541
+#: documents/serialisers.py:2763 documents/views.py:299 documents/views.py:2553
 #: paperless_mail/serialisers.py:155
 msgid "Insufficient permissions."
 msgstr "הרשאות אינן מספיקות."
@@ -1380,7 +1380,7 @@ msgstr "משתנה לא חוקי זוהה."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "מזהי מסמכים כפולים אינם מורשים."
 
-#: documents/serialisers.py:2849 documents/views.py:4500
+#: documents/serialisers.py:2849 documents/views.py:4512
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "מסמכים לא נמצאו: %(ids)s"
@@ -1636,36 +1636,36 @@ msgstr "פרוטוקול ה-URI ‏'{parts.scheme}' אינו מורשה. הפר�
 msgid "Unable to parse URI {value}"
 msgstr "לא ניתן לפענח את ה URI ‏{value}"
 
-#: documents/views.py:291 documents/views.py:2538
+#: documents/views.py:292 documents/views.py:2550
 msgid "Invalid more_like_id"
 msgstr "מזהה more_like_id אינו תקין"
 
-#: documents/views.py:1556
+#: documents/views.py:1562
 msgid "Invalid AI configuration."
 msgstr "הגדרות בינה מלאכותית שגויות."
 
-#: documents/views.py:1565
+#: documents/views.py:1571
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:2363 documents/views.py:2684
+#: documents/views.py:2375 documents/views.py:2696
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "יש לציין רק אחד מהבאים: text‏, title_search‏, query או more_like_id."
 
-#: documents/views.py:4512
+#: documents/views.py:4524
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "הרשאות לא מספיקות לשיתוף מסמך %(id)s."
 
-#: documents/views.py:4558
+#: documents/views.py:4570
 msgid "Bundle is already being processed."
 msgstr "החבילה (Bundle) כבר נמצאת בתהליך עיבוד."
 
-#: documents/views.py:4619
+#: documents/views.py:4631
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "חבילת קישור השיתוף עדיין בהכנה. נא לנסות שוב מאוחר יותר."
 
-#: documents/views.py:4629
+#: documents/views.py:4641
 msgid "The share link bundle is unavailable."
 msgstr "חבילת קישור השיתוף אינה זמינה."
 
