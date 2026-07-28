@@ -32,7 +32,9 @@ AUCKLAND = ZoneInfo("Pacific/Auckland")  # UTC+13 in southern-hemisphere summer
 
 
 def _range(result: str, field: str) -> tuple[str, str]:
-    m = re.search(rf"{field}:\[(.+?) TO (.+?)\]", result)
+    # Half-open period ranges close with "}" (exclusive); exact-instant ranges
+    # (full ISO datetimes, "now", relative offsets) close with "]" (inclusive).
+    m = re.search(rf"{field}:\[(.+?) TO (.+?)[\]}}]", result)
     assert m, f"No range for {field!r} in: {result!r}"
     return m.group(1), m.group(2)
 
