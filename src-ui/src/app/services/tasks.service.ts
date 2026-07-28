@@ -63,10 +63,6 @@ export class TasksService {
       })
   }
 
-  public get completedTasks(): PaperlessTask[] {
-    return this.tasks().filter((t) => t.status === PaperlessTaskStatus.Success)
-  }
-
   public get needsAttentionTasks(): PaperlessTask[] {
     return this.tasks().filter((t) =>
       [PaperlessTaskStatus.Failure, PaperlessTaskStatus.Revoked].includes(

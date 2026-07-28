@@ -21,7 +21,7 @@
   </div>
 </pngx-page-header>
 
-@if (!tasksService.completedTasks && tasksService.loading) {
+@if (loading() && pagedTasks().length === 0) {
   <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
   <div class="visually-hidden" i18n>Loading...</div>
 }
