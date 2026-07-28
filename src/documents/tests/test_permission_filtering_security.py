@@ -217,3 +217,47 @@ class TestDuplicateDocumentsPermissionBoundary:
 
         result_stranger = _get_viewable_duplicates(original, stranger)
         assert {d.pk for d in result_stranger} == {dup_visible.pk}
+
+
+@pytest.mark.django_db
+class TestPermittedDocumentIdsArbitraryPermission:
+    def test_change_document_permission_is_distinct_from_view(self):
+        owner = User.objects.create_user(username="owner")
+        viewer_only = User.objects.create_user(username="viewer")
+        editor = User.objects.create_user(username="editor")
+        doc = DocumentFactory(owner=owner)
+        assign_perm("view_document", viewer_only, doc)
+        assign_perm("change_document", editor, doc)
+        assign_perm("view_document", editor, doc)
+
+        assert_visible_document_ids(
+            permitted_document_ids(editor, perm="change_document"),
+            expected_visible=[doc.pk],
+            expected_hidden=[],
+        )
+        assert_visible_document_ids(
+            permitted_document_ids(viewer_only, perm="change_document"),
+            expected_visible=[],
+            expected_hidden=[doc.pk],
+        )
+
+    def test_delete_permission_with_include_deleted_for_trash_restore(self):
+        owner = User.objects.create_user(username="owner")
+        stranger = User.objects.create_user(username="mallory")
+        doc = DocumentFactory(owner=owner)
+        doc.delete()
+
+        assert_visible_document_ids(
+            permitted_document_ids(owner, perm="delete_document", include_deleted=True),
+            expected_visible=[doc.pk],
+            expected_hidden=[],
+        )
+        assert_visible_document_ids(
+            permitted_document_ids(
+                stranger,
+                perm="delete_document",
+                include_deleted=True,
+            ),
+            expected_visible=[],
+            expected_hidden=[doc.pk],
+        )
