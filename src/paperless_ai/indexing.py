@@ -419,12 +419,24 @@ def update_llm_index(
                 if document_ids is not None
                 else documents
             )
-            existing = store.get_modified_times()
+            # When document_ids is given, the caller already knows exactly
+            # which documents to reindex (e.g. a bulk edit) -- trust it and
+            # skip the modified-time comparison entirely. Bulk edits (tags,
+            # correspondent, document type, storage path, custom fields)
+            # write via queryset.update()/M2M bulk operations, which bypass
+            # Document.modified's auto_now, so comparing against
+            # get_modified_times() here would silently skip reindexing
+            # documents whose embedded metadata just changed. The comparison
+            # is only meaningful for the unscoped, full-library scan, where
+            # it avoids re-embedding documents that have not changed.
+            existing = store.get_modified_times() if document_ids is None else None
             changed = 0
             for document in iter_wrapper(scoped_documents):
                 doc_id = str(document.id)
-                if existing.get(doc_id) == document.modified.isoformat():
-                    continue
+                if existing is not None:
+                    stored_modified = existing.get(doc_id)
+                    if stored_modified == document.modified.isoformat():
+                        continue
                 nodes = build_document_node(document, chunk_size=chunk_size)
                 _embed_nodes(nodes, embed_model)
                 store.upsert_document(doc_id, nodes)

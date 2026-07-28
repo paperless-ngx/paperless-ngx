@@ -21,6 +21,7 @@ from documents.signals import document_consumption_finished
 from documents.signals import document_updated
 from documents.tests.factories import DocumentFactory
 from documents.tests.factories import PaperlessTaskFactory
+from documents.tests.factories import TagFactory
 from paperless.models import ApplicationConfiguration
 from paperless_ai import indexing
 from paperless_ai.tests.conftest import FakeEmbedding
@@ -345,6 +346,62 @@ def test_update_llm_index_partial_update(
 
     assert after[str(doc3.pk)] == doc3.modified.isoformat()
     assert after[str(doc2.pk)] == before[str(doc2.pk)]
+
+
+class TestUpdateLlmIndexScopedDocumentIds:
+    """A document_ids-scoped update must trust the caller and reindex every scoped
+    document, never gating on Document.modified.
+
+    bulk_edit.py's add_tag/remove_tag/modify_tags/set_correspondent/set_document_type/
+    set_storage_path/modify_custom_fields all write via queryset.update() or direct
+    M2M/through-model bulk operations -- none of which call Document.save(), so
+    Document.modified's auto_now never fires. Comparing against
+    get_modified_times() for a document_ids-scoped call would therefore skip
+    reindexing documents whose embedded tags/correspondent/etc. just changed.
+    """
+
+    @pytest.mark.django_db
+    def test_scoped_update_reindexes_despite_unchanged_modified(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+    ) -> None:
+        """A document_ids-scoped update must pick up a tag added via the M2M
+        manager's bulk_create path, even though that leaves modified untouched.
+
+        Steps:
+        1. Build an initial index for a document with no tags.
+        2. Add a tag via a direct through-model bulk_create, mirroring
+           bulk_edit.add_tag -- this does not call Document.save().
+        3. Call update_llm_index(rebuild=False, document_ids=[doc.pk]).
+        4. Assert the stored node metadata now includes the new tag.
+        """
+        # Step 1
+        tag = TagFactory.create(name="Important")
+        doc = DocumentFactory.create(title="Test Document", added=timezone.now())
+        indexing.update_llm_index(rebuild=True)
+        modified_before = doc.modified
+
+        # Step 2: bulk-add the tag the way bulk_edit.add_tag does -- a direct
+        # through-model insert, no Document.save().
+        DocumentTagRelationship = Document.tags.through
+        DocumentTagRelationship.objects.bulk_create(
+            [DocumentTagRelationship(document_id=doc.pk, tag_id=tag.pk)],
+        )
+        doc.refresh_from_db()
+        assert doc.modified == modified_before, (
+            "Precondition failed: expected modified to be unchanged after a "
+            "through-model bulk tag add"
+        )
+
+        # Step 3
+        result = indexing.update_llm_index(rebuild=False, document_ids=[doc.pk])
+        assert result == "LLM index updated successfully."
+
+        # Step 4
+        with indexing.get_vector_store() as store:
+            nodes = store.get_nodes()
+        assert any(tag.name in node.metadata.get("tags", []) for node in nodes)
 
 
 @pytest.mark.django_db
