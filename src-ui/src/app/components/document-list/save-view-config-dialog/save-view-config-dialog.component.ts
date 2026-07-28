@@ -13,9 +13,14 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import {
+  DEFAULT_SAVED_VIEW_ICON,
+  SAVED_VIEW_ICONS,
+} from 'src/app/data/saved-view-icons'
 import { User } from 'src/app/data/user'
 import { CheckComponent } from '../../common/input/check/check.component'
 import { PermissionsFormComponent } from '../../common/input/permissions/permissions-form/permissions-form.component'
+import { SelectComponent } from '../../common/input/select/select.component'
 import { TextComponent } from '../../common/input/text/text.component'
 
 @Component({
@@ -24,6 +29,7 @@ import { TextComponent } from '../../common/input/text/text.component'
   styleUrls: ['./save-view-config-dialog.component.scss'],
   imports: [
     CheckComponent,
+    SelectComponent,
     TextComponent,
     PermissionsFormComponent,
     FormsModule,
@@ -41,6 +47,7 @@ export class SaveViewConfigDialogComponent implements OnInit {
   public saveClicked = new EventEmitter()
 
   users: User[]
+  readonly savedViewIcons = SAVED_VIEW_ICONS
 
   setDefaultName(value: string) {
     this.defaultName.set(value)
@@ -49,6 +56,7 @@ export class SaveViewConfigDialogComponent implements OnInit {
 
   saveViewConfigForm = new FormGroup({
     name: new FormControl(''),
+    icon: new FormControl(DEFAULT_SAVED_VIEW_ICON),
     showInSideBar: new FormControl(false),
     showOnDashboard: new FormControl(false),
     permissions_form: new FormControl(null),
@@ -65,6 +73,7 @@ export class SaveViewConfigDialogComponent implements OnInit {
     const formValue = this.saveViewConfigForm.value
     const saveViewConfig = {
       name: formValue.name,
+      icon: formValue.icon,
       showInSideBar: formValue.showInSideBar,
       showOnDashboard: formValue.showOnDashboard,
     }
