@@ -1530,10 +1530,20 @@ class DocumentViewSet(
             return HttpResponseBadRequest("AI is required for this feature")
 
         output_language = _get_llm_output_language(ai_config=ai_config, request=request)
-        llm_cache_backend = (
-            f"{ai_config.llm_backend}:{output_language}"
-            if output_language
-            else ai_config.llm_backend
+        # Include model and endpoint in the cache discriminator: suggestions
+        # cached for one model/endpoint must not be served after the operator
+        # switches either (A/B test, migration, proxy) — otherwise a stale
+        # result is returned with no indication. Empty parts (model/endpoint
+        # unset) are skipped, preserving the prior "backend[:language]" key.
+        llm_cache_backend = ":".join(
+            part
+            for part in (
+                ai_config.llm_backend,
+                ai_config.llm_model,
+                ai_config.llm_endpoint,
+                output_language,
+            )
+            if part
         )
 
         cached_llm_suggestions = get_llm_suggestion_cache(
