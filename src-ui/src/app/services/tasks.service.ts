@@ -63,10 +63,6 @@ export class TasksService {
       })
   }
 
-  public get total(): number {
-    return this.tasks().length
-  }
-
   public get completedTasks(): PaperlessTask[] {
     return this.tasks().filter((t) => t.status === PaperlessTaskStatus.Success)
   }

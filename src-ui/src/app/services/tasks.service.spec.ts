@@ -155,7 +155,6 @@ describe('TasksService', () => {
   })
 
   it('groups mixed task types by status when reloading', () => {
-    expect(tasksService.total).toEqual(0)
     const mockTasks = [
       {
         task_type: PaperlessTaskType.ConsumeFile,
