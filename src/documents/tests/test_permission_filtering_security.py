@@ -194,7 +194,7 @@ class TestAiChatAllDocumentsPermissionBoundary:
             format="json",
         )
 
-        assert response.status_code == 200
+        assert response.status_code == HTTPStatus.OK
         mock_stream_chat.assert_called_once()
         _, kwargs = mock_stream_chat.call_args
         visible_ids = {doc.pk for doc in kwargs["documents"]}
@@ -308,7 +308,7 @@ class TestEmailDocumentPermissionBoundary:
             },
             format="json",
         )
-        assert response.status_code == 403
+        assert response.status_code == HTTPStatus.FORBIDDEN
 
 
 @pytest.mark.django_db
@@ -342,7 +342,7 @@ class TestBulkEditChangePermissionBoundary:
             },
             format="json",
         )
-        assert response.status_code == 403
+        assert response.status_code == HTTPStatus.FORBIDDEN
 
 
 @pytest.mark.django_db
