@@ -65,6 +65,63 @@ def is_tagged_pdf(
         return False
 
 
+def pdf_has_digital_text(
+    path: Path,
+    text: str | None,
+    log: logging.Logger | None = None,
+) -> bool:
+    """Return True if a PDF already has a usable, born-digital text layer.
+
+    Combines the tagged-PDF check with an extracted-text length check.
+    Shared by the tesseract and remote OCR parsers to decide whether
+    OCR_MODE=auto/off should skip (re-)OCRing a document.
+
+    Parameters
+    ----------
+    path:
+        Absolute path to the PDF file.
+    text:
+        Text already extracted from the PDF (e.g. via ``extract_pdf_text``),
+        or ``None``.
+    log:
+        Logger for warnings.  Falls back to the module-level logger when omitted.
+
+    Returns
+    -------
+    bool
+        ``True`` when the document already contains a text layer.
+    """
+    return is_tagged_pdf(path, log=log) or (
+        text is not None and len(text) > PDF_TEXT_MIN_LENGTH
+    )
+
+
+def post_process_text(text: str | None) -> str | None:
+    """Normalise whitespace in extracted OCR/PDF text and strip NUL bytes.
+
+    Parameters
+    ----------
+    text:
+        Raw extracted text, or ``None``.
+
+    Returns
+    -------
+    str | None
+        Cleaned text, or ``None`` when *text* is falsy.
+    """
+    if not text:
+        return None
+
+    collapsed_spaces = re.sub(r"([^\S\r\n]+)", " ", text)
+    no_leading_whitespace = re.sub(r"([\n\r]+)([^\S\n\r]+)", "\\1", collapsed_spaces)
+    no_trailing_whitespace = re.sub(r"([^\S\n\r]+)$", "", no_leading_whitespace)
+
+    # TODO: this needs a rework
+    # replace \0 prevents issues with saving to postgres.
+    # text may contain \0 when this character is present in PDF files.
+    return no_trailing_whitespace.strip().replace("\0", " ")
+
+
 def extract_pdf_text(
     path: Path,
     log: logging.Logger | None = None,
