@@ -219,6 +219,24 @@ describe(`DocumentService`, () => {
     })
   })
 
+  it('should call appropriate api endpoint for bulk CSV export', () => {
+    const ids = [1, 2, 3]
+    const fields = ['title', 'created', 'filename']
+    const customFields = [5, 12]
+    subscription = service
+      .bulkExportCsv({ documents: ids }, fields, customFields)
+      .subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/bulk_export_csv/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toEqual({
+      documents: ids,
+      fields,
+      custom_fields: customFields,
+    })
+  })
+
   it('should call appropriate api endpoint for bulk edit', () => {
     const ids = [1, 2, 3]
     const method = 'modify_tags'

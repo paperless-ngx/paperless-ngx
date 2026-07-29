@@ -44,6 +44,7 @@ import { FilterableDropdownComponent } from '../../common/filterable-dropdown/fi
 import { ShareLinkBundleDialogComponent } from '../../common/share-link-bundle-dialog/share-link-bundle-dialog.component'
 import { ShareLinkBundleManageDialogComponent } from '../../common/share-link-bundle-manage-dialog/share-link-bundle-manage-dialog.component'
 import { BulkEditorComponent } from './bulk-editor.component'
+import { ExportCsvDialogComponent } from './export-csv-dialog/export-csv-dialog.component'
 
 const selectionData: SelectionData = {
   selected_tags: [
@@ -1299,6 +1300,47 @@ describe('BulkEditorComponent', () => {
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/bulk_download/`
     )
+  })
+
+  it('should open CSV export dialog for selected documents and handle success and failure', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 3 }, { id: 4 }])
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([3, 4]))
+    fixture.detectChanges()
+
+    const succeeded = new EventEmitter<Blob>()
+    const failed = new EventEmitter<any>()
+    const modalRef: Partial<NgbModalRef> = {
+      componentInstance: {
+        selection: null,
+        selectionCount: null,
+        succeeded,
+        failed,
+      },
+    }
+    const openSpy = jest
+      .spyOn(modalService, 'open')
+      .mockReturnValue(modalRef as NgbModalRef)
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+
+    component.exportCsvSelected()
+
+    expect(openSpy).toHaveBeenCalledWith(
+      ExportCsvDialogComponent,
+      expect.objectContaining({ backdrop: 'static', size: 'lg' })
+    )
+    expect(modalRef.componentInstance.selection).toEqual({
+      documents: [3, 4],
+    })
+    expect(modalRef.componentInstance.selectionCount).toEqual(2)
+
+    succeeded.emit(new Blob(['csv']))
+    failed.emit(new Error('export failed'))
+    expect(toastErrorSpy).toHaveBeenCalled()
   })
 
   it('should support bulk permissions update', () => {
