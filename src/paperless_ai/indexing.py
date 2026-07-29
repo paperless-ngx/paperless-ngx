@@ -399,12 +399,11 @@ def update_llm_index(
     config = AIConfig()
     model_name = get_configured_model_name(config)
 
-    if not rebuild and llm_index_exists():
+    if not rebuild:
         with read_store() as store:
-            config_mismatch = store.config_mismatch(model_name)
-        if config_mismatch:
-            logger.warning("Embedding model changed; forcing LLM index rebuild.")
-            rebuild = True
+            if store.table_exists() and store.config_mismatch(model_name):
+                logger.warning("Embedding model changed; forcing LLM index rebuild.")
+                rebuild = True
 
     if no_documents:
         logger.warning("No documents found to index.")

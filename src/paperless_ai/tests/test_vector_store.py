@@ -234,6 +234,31 @@ class TestCrud:
             == 0
         )
 
+    def test_upsert_document_checks_table_exists_once(
+        self,
+        store: PaperlessSqliteVecVectorStore,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - An existing store with one document already indexed
+        WHEN:
+            - upsert_document() replaces that document's chunks
+        THEN:
+            - table_exists() is queried at most once per call, not twice
+              (previously: once via _ensure_table(), once via the separate
+              `if self.table_exists():` delete-chunks guard)
+        """
+        store.add([make_node("a1", 1)])
+        # store is a pydantic model, whose __setattr__/__delattr__ reject
+        # arbitrary instance attributes ("object has no attribute
+        # 'table_exists'"), so mocker.spy(store, "table_exists") can't
+        # shadow the method on the instance. Spying on the class works
+        # (bound method lookup on the instance still resolves through it).
+        exists_spy = mocker.spy(PaperlessSqliteVecVectorStore, "table_exists")
+        store.upsert_document(1, [make_node("a2", 1)])
+        assert exists_spy.call_count == 1
+
 
 class TestBuildWhere:
     def test_ne_filter_translates_to_not_equal_clause(self) -> None:

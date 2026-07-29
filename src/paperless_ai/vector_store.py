@@ -306,8 +306,8 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         if self._embed_model_name:
             IndexMetaTable.set_embed_model(self._conn, self._embed_model_name)
 
-    def _ensure_table(self, dim: int) -> None:
-        if not self.table_exists():
+    def _ensure_table(self, dim: int, *, table_exists: bool) -> None:
+        if not table_exists:
             self._create_table(dim)
 
     def _row(self, node: BaseNode) -> _Row:
@@ -381,7 +381,10 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             return []
         rows = [self._row(node) for node in nodes]
         with self._transaction():
-            self._ensure_table(len(nodes[0].get_embedding()))
+            self._ensure_table(
+                len(nodes[0].get_embedding()),
+                table_exists=self.table_exists(),
+            )
             self._conn.executemany(_INSERT, _vec0_params(rows))
             self._index_chunks(rows)
             self._increment_total_inserts(len(rows))
@@ -402,9 +405,14 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         doc_id = int(document_id)
         rows = [self._row(node) for node in nodes]
         with self._transaction():
-            if nodes:
-                self._ensure_table(len(nodes[0].get_embedding()))
-            if self.table_exists():
+            table_exists = self.table_exists()
+            if nodes and not table_exists:
+                self._ensure_table(
+                    len(nodes[0].get_embedding()),
+                    table_exists=False,
+                )
+                table_exists = True
+            if table_exists:
                 self._delete_chunks_by_document_id(doc_id)
             if rows:
                 self._conn.executemany(_INSERT, _vec0_params(rows))
