@@ -2354,6 +2354,69 @@ class DocumentVersionLabelSerializer(serializers.Serializer[dict[str, str | None
         return normalized or None
 
 
+class BulkExportCsvSerializer(DocumentSelectionSerializer):
+    fields = serializers.ListField(
+        child=serializers.CharField(),
+        required=False,
+        default=list,
+        write_only=True,
+        label="Fields",
+    )
+
+    custom_fields = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=False,
+        default=list,
+        write_only=True,
+        label="Custom fields",
+    )
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        fields = attrs.get("fields", [])
+        custom_fields = attrs.get("custom_fields", [])
+
+        if not fields and not custom_fields:
+            raise serializers.ValidationError(
+                _("At least one field must be selected for export."),
+            )
+
+        from documents.bulk_export import STANDARD_FIELDS
+        from documents.bulk_export import build_export_field_list
+
+        invalid_fields = [field for field in fields if field not in STANDARD_FIELDS]
+        if invalid_fields:
+            raise serializers.ValidationError(
+                {
+                    "fields": _(
+                        "Invalid export fields: %(fields)s",
+                    )
+                    % {"fields": ", ".join(invalid_fields)},
+                },
+            )
+
+        if custom_fields:
+            existing_ids = set(
+                CustomField.objects.filter(id__in=custom_fields).values_list(
+                    "id",
+                    flat=True,
+                ),
+            )
+            missing_ids = sorted(set(custom_fields) - existing_ids)
+            if missing_ids:
+                raise serializers.ValidationError(
+                    {
+                        "custom_fields": _(
+                            "Some custom fields don't exist: %(ids)s",
+                        )
+                        % {"ids": ", ".join(str(field_id) for field_id in missing_ids)},
+                    },
+                )
+
+        attrs["export_fields"] = build_export_field_list(fields, custom_fields)
+        return attrs
+
+
 class BulkDownloadSerializer(DocumentSelectionSerializer):
     content = serializers.ChoiceField(
         choices=["archive", "originals", "both"],

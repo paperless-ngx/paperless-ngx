@@ -77,6 +77,41 @@ export const DEFAULT_DISPLAY_FIELDS = [
 
 export const DEFAULT_DASHBOARD_VIEW_PAGE_SIZE = 10
 
+export const EXPORT_DOCUMENT_FIELDS = [
+  { id: 'id', name: $localize`ID` },
+  { id: DisplayField.TITLE, name: $localize`Title` },
+  { id: DisplayField.CREATED, name: $localize`Created` },
+  { id: DisplayField.ADDED, name: $localize`Added` },
+  { id: 'modified', name: $localize`Modified` },
+  { id: DisplayField.TAGS, name: $localize`Tags` },
+  { id: DisplayField.CORRESPONDENT, name: $localize`Correspondent` },
+  { id: DisplayField.DOCUMENT_TYPE, name: $localize`Document type` },
+  { id: DisplayField.STORAGE_PATH, name: $localize`Storage path` },
+  { id: DisplayField.NOTES, name: $localize`Notes` },
+  { id: DisplayField.OWNER, name: $localize`Owner` },
+  { id: DisplayField.SHARED, name: $localize`Shared` },
+  { id: DisplayField.ASN, name: $localize`ASN` },
+  { id: DisplayField.PAGE_COUNT, name: $localize`Pages` },
+  { id: 'mime_type', name: $localize`MIME type` },
+  { id: 'filename', name: $localize`Filename` },
+  { id: 'archived_filename', name: $localize`Archived filename` },
+  { id: 'content', name: $localize`Content` },
+]
+
+export const DEFAULT_CSV_EXPORT_FIELDS = [
+  DisplayField.CREATED,
+  DisplayField.ADDED,
+  DisplayField.TITLE,
+  DisplayField.CORRESPONDENT,
+  DisplayField.TAGS,
+  DisplayField.DOCUMENT_TYPE,
+  'filename',
+]
+
+export const CSV_EXPORT_FIELDS_STORAGE_KEY = 'paperless_csv_export_fields'
+export const CSV_EXPORT_CUSTOM_FIELDS_STORAGE_KEY =
+  'paperless_csv_export_custom_fields'
+
 export const DEFAULT_DASHBOARD_DISPLAY_FIELDS = [
   DisplayField.CREATED,
   DisplayField.TITLE,

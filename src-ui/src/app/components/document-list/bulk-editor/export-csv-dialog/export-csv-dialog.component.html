@@ -1,0 +1,68 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-basic-title" i18n>Export CSV</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="cancel()"></button>
+</div>
+<div class="modal-body">
+  <p class="text-muted small" i18n>Select the document properties and custom fields to include in the CSV export.</p>
+  <div class="mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h6 class="mb-0" i18n>Document properties</h6>
+      <div class="btn-group btn-group-sm">
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="selectAllDocumentFields()" i18n>Select all</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="selectNoDocumentFields()" i18n>Select none</button>
+      </div>
+    </div>
+    <div class="row">
+      @for (field of documentFields; track field.id) {
+        <div class="col-sm-6 col-lg-4">
+          <div class="form-check">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              [id]="'export-field-' + field.id"
+              [checked]="selectedDocumentFields.has(field.id)"
+              (change)="toggleDocumentField(field.id)"
+            />
+            <label class="form-check-label" [for]="'export-field-' + field.id">{{ field.name }}</label>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  @if (customFields.length > 0) {
+    <div>
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="mb-0" i18n>Custom fields</h6>
+        <div class="btn-group btn-group-sm">
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="selectAllCustomFields()" i18n>Select all</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="selectNoCustomFields()" i18n>Select none</button>
+        </div>
+      </div>
+      <div class="row">
+        @for (field of customFields; track field.id) {
+          <div class="col-sm-6 col-lg-4">
+            <div class="form-check">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                [id]="'export-custom-field-' + field.id"
+                [checked]="selectedCustomFields.has(field.id)"
+                (change)="toggleCustomField(field.id)"
+              />
+              <label class="form-check-label" [for]="'export-custom-field-' + field.id">{{ field.name }}</label>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="exporting">Cancel</button>
+  <button type="button" class="btn btn-primary" (click)="export()" i18n [disabled]="exporting || !hasSelection">
+    @if (exporting) {
+      <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+    }
+    Export
+  </button>
+</div>

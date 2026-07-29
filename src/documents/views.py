@@ -109,6 +109,7 @@ from documents import bulk_edit
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
+from documents.bulk_export import export_documents_to_csv
 from documents.caching import get_llm_suggestion_cache
 from documents.caching import get_metadata_cache
 from documents.caching import get_suggestion_cache
@@ -185,6 +186,7 @@ from documents.serialisers import AcknowledgeTasksViewSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
+from documents.serialisers import BulkExportCsvSerializer
 from documents.serialisers import CorrespondentSerializer
 from documents.serialisers import CustomFieldSerializer
 from documents.serialisers import DeleteDocumentsSerializer
@@ -3895,6 +3897,68 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
             as_attachment=True,
             filename="documents.zip",
             content_type="application/zip",
+        )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="bulk_export_csv",
+        description="Export document metadata for selected documents as CSV.",
+        responses={
+            (HTTPStatus.OK, "text/csv"): OpenApiTypes.BINARY,
+            HTTPStatus.FORBIDDEN: None,
+        },
+    ),
+)
+class BulkExportCsvView(DocumentSelectionMixin, GenericAPIView[Any]):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = BulkExportCsvSerializer
+    parser_classes = (parsers.JSONParser,)
+
+    def post(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        ids = self._resolve_document_ids(
+            user=request.user,
+            validated_data=serializer.validated_data,
+        )
+        documents = (
+            Document.objects.filter(pk__in=ids)
+            .select_related(
+                "correspondent",
+                "document_type",
+                "storage_path",
+                "owner",
+            )
+            .prefetch_related(
+                "tags",
+                "custom_fields__field",
+            )
+            .annotate(notes_count=Count("notes"))
+        )
+        documents_by_id = {document.id: document for document in documents}
+
+        versioned_documents = []
+        for document_id in ids:
+            document = documents_by_id.get(document_id)
+            if document is None:
+                continue
+            root_doc = get_root_document(document)
+            if not has_perms_owner_aware(request.user, "view_document", root_doc):
+                return HttpResponseForbidden("Insufficient permissions")
+            versioned_documents.append(get_latest_version_for_root(root_doc))
+
+        csv_data = export_documents_to_csv(
+            versioned_documents,
+            serializer.validated_data["export_fields"],
+            user=request.user,
+        )
+
+        return HttpResponse(
+            csv_data,
+            content_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="documents.csv"'},
         )
 
 

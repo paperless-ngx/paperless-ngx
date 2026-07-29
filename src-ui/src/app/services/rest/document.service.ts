@@ -430,6 +430,22 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     )
   }
 
+  bulkExportCsv(
+    selection: DocumentSelectionQuery,
+    fields: string[],
+    customFields: number[] = []
+  ) {
+    return this.http.post(
+      this.getResourceUrl(null, 'bulk_export_csv'),
+      {
+        ...selection,
+        fields,
+        custom_fields: customFields,
+      },
+      { responseType: 'blob' }
+    )
+  }
+
   public set searchQuery(query: string) {
     this._searchQuery = query.trim()
   }
