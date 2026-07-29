@@ -212,12 +212,27 @@ class TestCrud:
         WHEN:
             - drop_table() is called
         THEN:
-            - get_modified_times() returns an empty dict (no stale rows
-              survive a full rebuild)
+            - document_meta and document_chunks are both cleared directly
+              (asserted against the tables themselves, not via
+              get_modified_times()/table_exists() -- those short-circuit on
+              the vec0 table being gone, which drop_table() does first, so
+              they would pass even if DocumentMetaTable.delete_all()/
+              DocumentChunksTable.delete_all() were never called)
         """
         store.add([make_node("a1", 1)])
         store.drop_table()
-        assert store.get_modified_times() == {}
+        assert (
+            store.client.execute(
+                "SELECT count(*) FROM document_meta",
+            ).fetchone()[0]
+            == 0
+        )
+        assert (
+            store.client.execute(
+                "SELECT count(*) FROM document_chunks",
+            ).fetchone()[0]
+            == 0
+        )
 
 
 class TestBuildWhere:
@@ -912,21 +927,34 @@ class TestV1ToV2Migration:
         from paperless_ai.tables import DocumentChunksTable
         from paperless_ai.tables import DocumentMetaTable
 
-        mocker.spy(DocumentChunksTable, "create")
-        mocker.spy(DocumentMetaTable, "create")
-        mocker.spy(
+        chunks_create_spy = mocker.spy(DocumentChunksTable, "create")
+        meta_create_spy = mocker.spy(DocumentMetaTable, "create")
+        vec_table_spy = mocker.spy(
             PaperlessSqliteVecVectorStore,
             "_create_vec_table",
         )
-        with PaperlessSqliteVecVectorStore(uri=str(db_dir)):
-            pass
-        # _open_connection() legitimately calls create() twice (once for the
-        # store's own live connection, once for the migration's temp rebuild
-        # file) -- what matters is m0001_v1_to_v2's apply() itself never
-        # calls these directly. Assert via call count parity: every create()
-        # call traces back to _open_connection, not the migration body, by
-        # checking the migration's own module never imports these symbols
-        # for direct invocation.
+        with PaperlessSqliteVecVectorStore(uri=str(db_dir)) as store:
+            store.check_and_run_migrations()
+        # _open_connection() legitimately calls create() three times across
+        # a structural migration: once for the store's own live connection
+        # (construction), once for the migration's temp rebuild file
+        # (_rebuild_file), and once more when _swap_in_compact() reopens the
+        # swapped-in file as self._conn. What matters is that
+        # m0001_v1_to_v2's apply() itself never calls these directly, which
+        # a source-text check alone can't prove (it can't tell "mentioned in
+        # a comment" from "actually called", and is trivially evadable by
+        # importing a symbol under an alias). Asserting the exact call count
+        # instead: exactly 3 calls to each create() (all from
+        # _open_connection, never a 4th from inside apply()), and zero calls
+        # to _create_vec_table (neither _open_connection nor apply() calls
+        # it -- apply() freezes its own literal CREATE VIRTUAL TABLE DDL
+        # instead).
+        assert chunks_create_spy.call_count == 3
+        assert meta_create_spy.call_count == 3
+        assert vec_table_spy.call_count == 0
+        # Cheap secondary signal, kept alongside the spy assertions above
+        # (not in place of them): the migration module's source should never
+        # even mention these "current schema" helpers by name.
         import inspect
 
         from paperless_ai.migrations import m0001_v1_to_v2
@@ -934,4 +962,4 @@ class TestV1ToV2Migration:
         source = inspect.getsource(m0001_v1_to_v2)
         assert "DocumentChunksTable.create" not in source
         assert "DocumentMetaTable.create" not in source
-        assert "_create_vec_table(" not in source or "DROP TABLE" in source
+        assert "_create_vec_table(" not in source
