@@ -452,7 +452,15 @@ def llm_index_add_or_update_document(document: Document):
         _embed_nodes(new_nodes, get_embedding_model(config))
 
     with write_store(embed_model_name=get_configured_model_name(config)) as store:
-        _check_and_run_migrations(store)
+        needs_reembed = _check_and_run_migrations(store)
+        if needs_reembed:
+            logger.warning(
+                "Skipping incremental LLM index update for document %s: the "
+                "index requires re-embedding first. Run 'document_llmindex "
+                "rebuild' to resolve.",
+                document.id,
+            )
+            return
         store.upsert_document(str(document.id), new_nodes)
 
 
@@ -490,7 +498,14 @@ def llm_index_compact() -> None:
 def llm_index_remove_document(document: Document):
     """Remove a document's chunks from the LLM index."""
     with write_store() as store:
-        _check_and_run_migrations(store)
+        if _check_and_run_migrations(store):
+            logger.warning(
+                "Skipping removal of document %s from the LLM index: the "
+                "index requires re-embedding first. Run 'document_llmindex "
+                "rebuild' to resolve.",
+                document.id,
+            )
+            return
         store.delete(str(document.id))
 
 

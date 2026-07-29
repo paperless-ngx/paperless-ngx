@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -737,6 +738,7 @@ class TestLlmIndexLocking:
         mocker: pytest_mock.MockerFixture,
     ) -> None:
         mock_store = MagicMock()
+        mock_store.has_pending_migration.return_value = False
         mocker.patch(
             "paperless_ai.indexing.write_store",
             return_value=mocker.MagicMock(
@@ -757,12 +759,45 @@ class TestLlmIndexLocking:
 
         mock_store.upsert_document.assert_called_once()
 
+    def test_add_or_update_document_skips_write_when_reembed_pending(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """A pending re-embed migration must block the incremental write,
+        not let it proceed against a schema that just changed underneath it.
+        """
+        mock_store = MagicMock()
+        mock_store.has_pending_migration.return_value = True
+        mock_store.check_and_run_migrations.return_value = True
+        mocker.patch(
+            "paperless_ai.indexing.write_store",
+            return_value=mocker.MagicMock(
+                __enter__=mocker.MagicMock(return_value=mock_store),
+                __exit__=mocker.MagicMock(return_value=False),
+            ),
+        )
+        mock_node = MagicMock()
+        mock_node.get_content.return_value = "fake node text"
+        mocker.patch(
+            "paperless_ai.indexing.build_document_node",
+            return_value=[mock_node],
+        )
+
+        doc = MagicMock(spec=Document)
+        doc.id = 1
+        indexing.llm_index_add_or_update_document(doc)
+
+        mock_store.upsert_document.assert_not_called()
+
     def test_remove_document_uses_write_store(
         self,
         temp_llm_index_dir: Path,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
         mock_store = MagicMock()
+        mock_store.has_pending_migration.return_value = False
         mocker.patch(
             "paperless_ai.indexing.write_store",
             return_value=mocker.MagicMock(
@@ -776,6 +811,31 @@ class TestLlmIndexLocking:
         indexing.llm_index_remove_document(doc)
 
         mock_store.delete.assert_called_once_with("1")
+
+    def test_remove_document_skips_write_when_reembed_pending(
+        self,
+        temp_llm_index_dir: Path,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """A pending re-embed migration must block the delete too, for the
+        same consistency reason as the incremental-update path.
+        """
+        mock_store = MagicMock()
+        mock_store.has_pending_migration.return_value = True
+        mock_store.check_and_run_migrations.return_value = True
+        mocker.patch(
+            "paperless_ai.indexing.write_store",
+            return_value=mocker.MagicMock(
+                __enter__=mocker.MagicMock(return_value=mock_store),
+                __exit__=mocker.MagicMock(return_value=False),
+            ),
+        )
+
+        doc = MagicMock(spec=Document)
+        doc.id = 1
+        indexing.llm_index_remove_document(doc)
+
+        mock_store.delete.assert_not_called()
 
     def test_update_llm_index_rebuild_uses_write_store(
         self,
@@ -889,6 +949,34 @@ class TestLlmIndexMigrate:
         write_store_cm.return_value.__enter__.return_value = store_mock
         indexing.llm_index_migrate()
         store_mock.has_pending_migration.assert_called_once()
+
+    def test_logs_warning_when_reembed_needed(
+        self,
+        mocker: pytest_mock.MockerFixture,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - AI/LLM index support is enabled
+            - A pending migration requires re-embedding
+        WHEN:
+            - llm_index_migrate() is called
+        THEN:
+            - A warning directs the operator to run a manual rebuild, since
+              this automatic check must never re-embed on its own
+        """
+        mocker.patch(
+            "paperless_ai.indexing.AIConfig",
+            return_value=mocker.Mock(llm_index_enabled=True),
+        )
+        store_mock = mocker.MagicMock()
+        store_mock.has_pending_migration.return_value = True
+        store_mock.check_and_run_migrations.return_value = True
+        write_store_cm = mocker.patch("paperless_ai.indexing.write_store")
+        write_store_cm.return_value.__enter__.return_value = store_mock
+        with caplog.at_level(logging.WARNING, logger="paperless_ai.indexing"):
+            indexing.llm_index_migrate()
+        assert "requires re-embedding" in caplog.text
 
 
 @pytest.mark.django_db
