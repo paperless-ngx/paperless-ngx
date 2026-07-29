@@ -147,9 +147,12 @@ class TestShouldProduceArchive:
         born_digital: bool,  # noqa: FBT001
         expected: bool,  # noqa: FBT001
     ) -> None:
-        """should_produce_archive() defers entirely to pdf_born_digital_text()
+        """Archive decision tracks pdf_born_digital_text()'s verdict exactly.
+
+        should_produce_archive() defers entirely to pdf_born_digital_text()
         for the has-real-text decision, so both callers of that predicate
-        (this function and RasterisedDocumentParser.parse()) always agree."""
+        (this function and RasterisedDocumentParser.parse()) always agree.
+        """
         settings.ARCHIVE_FILE_GENERATION = "auto"
         mocker.patch(
             "documents.consumer.pdf_born_digital_text",

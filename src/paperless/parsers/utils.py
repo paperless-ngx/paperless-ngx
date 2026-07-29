@@ -161,10 +161,9 @@ def is_born_digital_text(
         Whether the PDF counts as born-digital (has real text, and is either
         tagged or exceeds ``PDF_TEXT_MIN_LENGTH``).
     """
-    has_text = text is not None and len(text) > 0
-    return has_text and (
-        is_tagged_pdf(path, log=log) or len(text) > PDF_TEXT_MIN_LENGTH
-    )
+    if not text:
+        return False
+    return is_tagged_pdf(path, log=log) or len(text) > PDF_TEXT_MIN_LENGTH
 
 
 def pdf_born_digital_text(

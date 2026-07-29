@@ -675,21 +675,6 @@ def single_page_mixed_pdf_file(tesseract_samples_dir: Path) -> Path:
 
 
 @pytest.fixture(scope="session")
-def tagged_no_text_pdf_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a tagged PDF whose only "text" is pdftotext layout padding.
-
-    Reproduces GH #13387: ``/MarkInfo /Marked true`` is set, but the only
-    extractable content is a form-feed byte, not real text.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/tagged-but-no-text.pdf``.
-    """
-    return tesseract_samples_dir / "tagged-but-no-text.pdf"
-
-
-@pytest.fixture(scope="session")
 def with_form_pdf_file(tesseract_samples_dir: Path) -> Path:
     """Path to a PDF with form sample file.
 

@@ -109,54 +109,64 @@ class TestPdfBornDigitalText:
     on whether a PDF has real text, so both go through this one function.
     """
 
-    def test_tagged_pdf_with_real_text_is_born_digital(
+    @pytest.mark.parametrize(
+        ("extracted", "tagged", "expected_text", "expected_born_digital"),
+        [
+            pytest.param("tiny", True, "tiny", True, id="tagged-with-real-text"),
+            pytest.param("tiny", False, "tiny", False, id="untagged-below-min-length"),
+            pytest.param(
+                "x" * 51,
+                False,
+                "x" * 51,
+                True,
+                id="untagged-above-min-length",
+            ),
+            pytest.param(None, True, None, False, id="tagged-but-no-text"),
+        ],
+    )
+    def test_born_digital_decision(
         self,
         mocker: MockerFixture,
         tmp_path: Path,
+        extracted: str | None,
+        tagged: bool,  # noqa: FBT001
+        expected_text: str | None,
+        expected_born_digital: bool,  # noqa: FBT001
     ) -> None:
+        """
+        GIVEN:
+            - A PDF whose pdftotext output and /MarkInfo tag status vary
+        WHEN:
+            - pdf_born_digital_text() is called
+        THEN:
+            - The normalized text and born-digital verdict match; the tag
+              alone never counts as "has text"
+        """
         mocker.patch(
             "paperless.parsers.utils.extract_pdf_text",
-            return_value="tiny",
+            return_value=extracted,
         )
-        mocker.patch("paperless.parsers.utils.is_tagged_pdf", return_value=True)
+        mocker.patch("paperless.parsers.utils.is_tagged_pdf", return_value=tagged)
         text, born_digital = pdf_born_digital_text(tmp_path / "doc.pdf")
-        assert text == "tiny"
-        assert born_digital is True
+        assert text == expected_text
+        assert born_digital is expected_born_digital
 
-    def test_untagged_pdf_below_min_length_is_not_born_digital(
+    def test_tagged_but_textless_pdf_is_not_born_digital(
         self,
-        mocker: MockerFixture,
-        tmp_path: Path,
+        tagged_no_text_pdf_file: Path,
     ) -> None:
-        mocker.patch(
-            "paperless.parsers.utils.extract_pdf_text",
-            return_value="tiny",
-        )
-        mocker.patch("paperless.parsers.utils.is_tagged_pdf", return_value=False)
-        text, born_digital = pdf_born_digital_text(tmp_path / "doc.pdf")
-        assert text == "tiny"
-        assert born_digital is False
-
-    def test_untagged_pdf_above_min_length_is_born_digital(
-        self,
-        mocker: MockerFixture,
-        tmp_path: Path,
-    ) -> None:
-        mocker.patch(
-            "paperless.parsers.utils.extract_pdf_text",
-            return_value="x" * 51,
-        )
-        mocker.patch("paperless.parsers.utils.is_tagged_pdf", return_value=False)
-        _text, born_digital = pdf_born_digital_text(tmp_path / "doc.pdf")
-        assert born_digital is True
-
-    def test_no_text_is_not_born_digital(
-        self,
-        mocker: MockerFixture,
-        tmp_path: Path,
-    ) -> None:
-        mocker.patch("paperless.parsers.utils.extract_pdf_text", return_value=None)
-        mocker.patch("paperless.parsers.utils.is_tagged_pdf", return_value=True)
-        text, born_digital = pdf_born_digital_text(tmp_path / "doc.pdf")
+        """
+        GIVEN:
+            - A real PDF that is tagged (/MarkInfo /Marked true) but whose
+              only "text" is layout padding (a stray form-feed byte)
+        WHEN:
+            - pdf_born_digital_text() is called with no mocking
+        THEN:
+            - The normalized text is None and the PDF is not treated as
+              born-digital. The raw, unnormalized pdftotext output is
+              non-empty for this file, which is exactly what caused the
+              archive decision to disagree with the OCR decision in #13387.
+        """
+        text, born_digital = pdf_born_digital_text(tagged_no_text_pdf_file)
         assert text is None
         assert born_digital is False
