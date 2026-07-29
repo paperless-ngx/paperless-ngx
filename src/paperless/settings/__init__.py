@@ -150,6 +150,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "drf_spectacular_sidecar",
     "treenode",
+    "paperless_benchmark.apps.PaperlessBenchmarkConfig",
     *env_apps,
 ]
 
