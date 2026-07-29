@@ -25,7 +25,7 @@ from paperless.models import CleanChoices
 from paperless.models import ModeChoices
 from paperless.models import OutputTypeChoices
 from paperless.parsers.utils import extract_pdf_text
-from paperless.parsers.utils import pdf_born_digital_text
+from paperless.parsers.utils import is_born_digital_text
 from paperless.parsers.utils import post_process_text
 from paperless.parsers.utils import read_file_handle_unicode_errors
 from paperless.version import __full_version_str__
@@ -508,7 +508,9 @@ class RasterisedDocumentParser:
         from ocrmypdf.exceptions import PriorOcrFoundError
 
         if mime_type == "application/pdf":
-            text_original, original_has_text = pdf_born_digital_text(
+            text_original = self.extract_text(None, document_path)
+            original_has_text = is_born_digital_text(
+                text_original,
                 document_path,
                 log=self.log,
             )
