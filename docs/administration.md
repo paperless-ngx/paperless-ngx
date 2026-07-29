@@ -212,6 +212,16 @@ following:
     This is a no-op if the index is already up to date, so it is safe to
     run on every upgrade.
 
+5.  Migrate the LLM index if needed.
+
+    ```shell-session
+    cd src
+    python3 manage.py document_llmindex migrate
+    ```
+
+    This is a no-op if the index schema is already current, so it is safe
+    to run on every upgrade.
+
 ### Database Upgrades
 
 Paperless-ngx is compatible with Django-supported versions of PostgreSQL and MariaDB and it is generally
@@ -532,7 +542,7 @@ index is updated automatically on the schedule set by
 can manage it manually:
 
 ```
-document_llmindex {rebuild,update,compact}
+document_llmindex {rebuild,update,compact,migrate}
 ```
 
 Specify `rebuild` to build the index from scratch from all documents in the database. Use
