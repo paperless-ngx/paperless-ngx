@@ -1,6 +1,7 @@
 import csv
 import io
 import json
+from unittest import mock
 
 from django.contrib.auth.models import User
 from django.test import override_settings
@@ -8,6 +9,7 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from documents.bulk_export import STANDARD_FIELDS
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -16,6 +18,7 @@ from documents.models import DocumentType
 from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import SampleDirMixin
+from documents.views import BulkExportCsvView
 
 
 class TestBulkExportCsv(DirectoriesMixin, SampleDirMixin, APITestCase):
@@ -162,3 +165,92 @@ class TestBulkExportCsv(DirectoriesMixin, SampleDirMixin, APITestCase):
         self.assertEqual(len(rows), 3)
         titles = {row[0] for row in rows[1:]}
         self.assertEqual(titles, {"Invoice 1", "Invoice 2"})
+
+    def test_export_invalid_custom_field(self) -> None:
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "fields": ["title"],
+                    "custom_fields": [99999],
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_export_custom_fields_only(self) -> None:
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "fields": [],
+                    "custom_fields": [self.custom_field.id],
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        rows = self._read_csv(response)
+        self.assertEqual(rows[0], ["Reference"])
+        self.assertEqual(rows[1], ["REF-001"])
+
+    def test_export_all_standard_fields(self) -> None:
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "fields": sorted(STANDARD_FIELDS),
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        rows = self._read_csv(response)
+        self.assertEqual(len(rows[0]), len(STANDARD_FIELDS))
+        self.assertEqual(len(rows), 2)
+
+    def test_export_insufficient_permissions(self) -> None:
+        user = User.objects.create_user(username="temp_user")
+        self.client.force_authenticate(user=user)
+
+        self.doc2.owner = self.user
+        self.doc2.save()
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "fields": ["title"],
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.content, b"Insufficient permissions")
+
+    @mock.patch.object(BulkExportCsvView, "_resolve_document_ids")
+    def test_export_skips_missing_documents(
+        self,
+        resolve_document_ids,
+    ) -> None:
+        resolve_document_ids.return_value = [self.doc1.id, 99999]
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps({"documents": [self.doc1.id], "fields": ["title"]}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        rows = self._read_csv(response)
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[1][0], "Invoice 1")

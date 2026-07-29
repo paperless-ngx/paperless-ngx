@@ -43,8 +43,13 @@ import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog
 import { FilterableDropdownComponent } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ShareLinkBundleDialogComponent } from '../../common/share-link-bundle-dialog/share-link-bundle-dialog.component'
 import { ShareLinkBundleManageDialogComponent } from '../../common/share-link-bundle-manage-dialog/share-link-bundle-manage-dialog.component'
+import { saveAs } from 'file-saver'
 import { BulkEditorComponent } from './bulk-editor.component'
 import { ExportCsvDialogComponent } from './export-csv-dialog/export-csv-dialog.component'
+
+jest.mock('file-saver', () => ({
+  saveAs: jest.fn(),
+}))
 
 const selectionData: SelectionData = {
   selected_tags: [
@@ -1339,6 +1344,7 @@ describe('BulkEditorComponent', () => {
     expect(modalRef.componentInstance.selectionCount).toEqual(2)
 
     succeeded.emit(new Blob(['csv']))
+    expect(saveAs).toHaveBeenCalledWith(expect.any(Blob), 'documents.csv')
     failed.emit(new Error('export failed'))
     expect(toastErrorSpy).toHaveBeenCalled()
   })
