@@ -849,6 +849,48 @@ class TestVectorStoreIndexing:
             assert rows >= 1
 
 
+class TestLlmIndexMigrate:
+    def test_noop_when_ai_disabled(self, mocker: pytest_mock.MockerFixture) -> None:
+        """
+        GIVEN:
+            - AI/LLM index support is disabled in configuration
+        WHEN:
+            - llm_index_migrate() is called
+        THEN:
+            - No store is opened and no migration check runs
+        """
+        mocker.patch(
+            "paperless_ai.indexing.AIConfig",
+            return_value=mocker.Mock(llm_index_enabled=False),
+        )
+        write_store_mock = mocker.patch("paperless_ai.indexing.write_store")
+        indexing.llm_index_migrate()
+        write_store_mock.assert_not_called()
+
+    def test_runs_pending_migration_when_enabled(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - AI/LLM index support is enabled
+        WHEN:
+            - llm_index_migrate() is called
+        THEN:
+            - The store is opened for write and a migration check runs
+        """
+        mocker.patch(
+            "paperless_ai.indexing.AIConfig",
+            return_value=mocker.Mock(llm_index_enabled=True),
+        )
+        store_mock = mocker.MagicMock()
+        store_mock.has_pending_migration.return_value = False
+        write_store_cm = mocker.patch("paperless_ai.indexing.write_store")
+        write_store_cm.return_value.__enter__.return_value = store_mock
+        indexing.llm_index_migrate()
+        store_mock.has_pending_migration.assert_called_once()
+
+
 @pytest.mark.django_db
 class TestQuerySimilarDocuments:
     def test_query_similar_documents_respects_allowed_ids(
