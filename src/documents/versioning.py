@@ -8,6 +8,8 @@ from typing import Any
 from documents.models import Document
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from rest_framework.request import Request
 
 
@@ -53,6 +55,38 @@ def get_latest_version_for_root(
     manager = _document_manager(include_deleted=include_deleted)
     latest = manager.filter(root_document=root_doc).order_by("-id").first()
     return latest or root_doc
+
+
+def normalize_to_root_ids(
+    document_ids: Iterable[int],
+    *,
+    include_deleted: bool = False,
+) -> list[int]:
+    """
+    Map a mixed collection of root and version document ids onto the ids of their
+    root documents, in a single query.
+
+    The order of first appearance is preserved and duplicates are dropped, so a
+    selection containing both a root and one of its versions yields that root
+    exactly once. Ids that no longer exist are silently skipped.
+    """
+    ordered_ids = list(dict.fromkeys(document_ids))
+    if not ordered_ids:
+        return []
+
+    manager = _document_manager(include_deleted=include_deleted)
+    root_id_by_id = {
+        doc_id: root_id if root_id is not None else doc_id
+        for doc_id, root_id in manager.filter(id__in=ordered_ids).values_list(
+            "id",
+            "root_document_id",
+        )
+    }
+    return list(
+        dict.fromkeys(
+            root_id_by_id[doc_id] for doc_id in ordered_ids if doc_id in root_id_by_id
+        ),
+    )
 
 
 def resolve_requested_version_for_root(

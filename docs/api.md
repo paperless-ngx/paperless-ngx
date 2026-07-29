@@ -319,6 +319,46 @@ The following methods are supported:
 
 Beginning with version 10+, the API supports individual endpoints for document-editing operations (`merge`, `rotate`, `edit_pdf`, etc), thus their documentation can be found in the API spec / viewer. Legacy document-editing methods via `/api/documents/bulk_edit/` are still supported for compatibility, are deprecated and clients should migrate to the individual endpoints before they are removed in a future version.
 
+#### CSV metadata export
+
+`POST /api/documents/bulk_export_csv/` returns document metadata as a CSV attachment. Unlike
+the bulk-editing endpoints above it is executed synchronously, and it accepts the same document
+selection payload as `/api/documents/bulk_download/`:
+
+```jsonc
+{
+  "documents": [LIST_OF_DOCUMENT_IDS],
+  "all": false, // if true, `documents` is ignored and `filters` is applied instead
+  "filters": {}, // document list filter query parameters, e.g. { "tags__id__all": "1" }
+  "fields": [LIST_OF_FIELD_NAMES],
+  "custom_fields": [LIST_OF_CUSTOM_FIELD_IDS]
+}
+```
+
+At least one of `fields` or `custom_fields` must be non-empty. The supported `fields` values are
+`id`, `title`, `created`, `added`, `modified`, `tag`, `correspondent`, `documenttype`,
+`storagepath`, `note`, `owner`, `shared`, `asn`, `pagecount`, `mime_type`, `filename`,
+`archived_filename` and `content`. Column headers are translated into the requesting user's
+language and columns appear in the order they were requested, with custom fields last.
+
+Behavior worth noting:
+
+- **Root documents only.** Selected document versions are resolved to their root document, and
+  duplicates are collapsed, so every selected document produces exactly one row. Metadata columns
+  come from the root document, while the file columns (`content`, `mime_type`, `pagecount`,
+  `filename`, `archived_filename`) describe its latest version. `all: true` likewise only matches
+  root documents.
+- **Field permissions are enforced server-side.** Requesting `tag`, `correspondent`,
+  `documenttype`, `storagepath`, `note` or `owner` without the corresponding global view
+  permission returns `HTTP 400`. Custom fields require the custom field view permission;
+  unavailable and nonexistent custom field IDs return the same generic error so that IDs cannot
+  be enumerated. Users lacking view access to a selected document receive `HTTP 403`.
+- **Formulas are neutralized.** Any cell (including headers) that starts with `=`, `+`, `-`, `@`,
+  a tab or a carriage return is prefixed with a single quote, so that spreadsheet applications do
+  not evaluate values originating from document content or names.
+- **Export size is capped.** A single export covers at most 10,000 root documents; larger
+  selections return `HTTP 400`.
+
 ### Objects
 
 Bulk editing for objects (tags, document types etc.) currently supports set permissions or delete

@@ -70,6 +70,7 @@ import { ShareLinkBundleDialogComponent } from '../../common/share-link-bundle-d
 import { ShareLinkBundleManageDialogComponent } from '../../common/share-link-bundle-manage-dialog/share-link-bundle-manage-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { CustomFieldsBulkEditDialogComponent } from './custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component'
+import { ExportCsvDialogComponent } from './export-csv-dialog/export-csv-dialog.component'
 
 @Component({
   selector: 'pngx-bulk-editor',
@@ -902,10 +903,31 @@ export class BulkEditorComponent
         this.downloadForm.get('downloadUseFormatting').value
       )
       .pipe(first())
-      .subscribe((result: any) => {
-        saveAs(result, 'documents.zip')
-        this.awaitingDownload.set(false)
+      .subscribe({
+        next: (result: any) => {
+          saveAs(result, 'documents.zip')
+          this.awaitingDownload.set(false)
+        },
+        error: () => {
+          this.awaitingDownload.set(false)
+        },
       })
+  }
+
+  exportCsvSelected() {
+    const modal = this.modalService.open(ExportCsvDialogComponent, {
+      backdrop: 'static',
+      size: 'lg',
+    })
+    const dialog = modal.componentInstance as ExportCsvDialogComponent
+    dialog.selection = this.getSelectionQuery()
+    dialog.selectionCount = this.getSelectionSize()
+    dialog.succeeded.pipe(first()).subscribe((blob: Blob) => {
+      saveAs(blob, 'documents.csv')
+    })
+    dialog.failed.pipe(first()).subscribe((error) => {
+      this.toastService.showError($localize`Error exporting CSV`, error)
+    })
   }
 
   reprocessSelected() {

@@ -77,6 +77,7 @@ from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import extend_schema_serializer
 from drf_spectacular.utils import extend_schema_view
 from drf_spectacular.utils import inline_serializer
+from guardian.core import ObjectPermissionChecker
 from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from langdetect import detect
@@ -109,6 +110,10 @@ from documents import bulk_edit
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
+from documents.bulk_export import MAX_EXPORT_DOCUMENTS
+from documents.bulk_export import ExportDocument
+from documents.bulk_export import requires_latest_version
+from documents.bulk_export import write_documents_csv
 from documents.caching import get_llm_suggestion_cache
 from documents.caching import get_metadata_cache
 from documents.caching import get_suggestion_cache
@@ -185,6 +190,7 @@ from documents.serialisers import AcknowledgeTasksViewSerializer
 from documents.serialisers import BulkDownloadSerializer
 from documents.serialisers import BulkEditObjectsSerializer
 from documents.serialisers import BulkEditSerializer
+from documents.serialisers import BulkExportCsvSerializer
 from documents.serialisers import CorrespondentSerializer
 from documents.serialisers import CustomFieldSerializer
 from documents.serialisers import DeleteDocumentsSerializer
@@ -231,6 +237,7 @@ from documents.versioning import VersionResolutionError
 from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_request_version_param
 from documents.versioning import get_root_document
+from documents.versioning import normalize_to_root_ids
 from documents.versioning import resolve_requested_version_for_root
 from paperless import version
 from paperless.celery import app as celery_app
@@ -2724,6 +2731,8 @@ class DocumentSelectionMixin:
         user: User,
         validated_data: dict[str, Any],
         permission_codename: str = "view_document",
+        roots_only: bool = False,
+        max_results: int | None = None,
     ) -> list[int]:
         if not validated_data.get("all", False):
             # if all is not true, just pass through the provided document ids
@@ -2741,6 +2750,12 @@ class DocumentSelectionMixin:
             permission_codename,
             Document,
         )
+        if roots_only:
+            # The document list only ever shows root documents, so a "select
+            # all" must not additionally pick up every stored version.
+            permitted_documents = permitted_documents.filter(
+                root_document__isnull=True,
+            )
         # orm-filtered docs
         filtered_documents = DocumentFilterSet(
             data=orm_filters,
@@ -2753,7 +2768,12 @@ class DocumentSelectionMixin:
         )
         if search_filtered_ids is not None:
             filtered_documents = filtered_documents.filter(pk__in=search_filtered_ids)
-        return list(filtered_documents.values_list("pk", flat=True))
+        document_ids = filtered_documents.values_list("pk", flat=True)
+        if max_results is not None:
+            # Fetch one extra id so callers can reject an oversized selection
+            # without first materializing every matching document.
+            document_ids = document_ids[: max_results + 1]
+        return list(document_ids)
 
 
 class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
@@ -3896,6 +3916,177 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
             filename="documents.zip",
             content_type="application/zip",
         )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="bulk_export_csv",
+        description=(
+            "Export metadata for the selected documents as CSV. Selections are "
+            f"resolved to root documents and capped at {MAX_EXPORT_DOCUMENTS} of them."
+        ),
+        responses={
+            (HTTPStatus.OK, "text/csv"): OpenApiTypes.BINARY,
+            HTTPStatus.FORBIDDEN: None,
+        },
+    ),
+)
+class BulkExportCsvView(DocumentSelectionMixin, GenericAPIView[Any]):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = BulkExportCsvSerializer
+    parser_classes = (parsers.JSONParser,)
+
+    def post(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        fields = serializer.validated_data["export_fields"]
+        ids = self._resolve_document_ids(
+            user=request.user,
+            validated_data=serializer.validated_data,
+            roots_only=True,
+            max_results=MAX_EXPORT_DOCUMENTS,
+        )
+        # An explicit selection may contain versions, or both a root and one of
+        # its versions; either way the export must produce one row per document.
+        root_ids = normalize_to_root_ids(ids)
+
+        if len(root_ids) > MAX_EXPORT_DOCUMENTS:
+            raise ValidationError(
+                {
+                    "documents": _(
+                        "Only %(limit)s documents can be exported at once.",
+                    )
+                    % {"limit": MAX_EXPORT_DOCUMENTS},
+                },
+            )
+
+        entries = self._build_export_documents(request.user, root_ids, fields)
+        if entries is None:
+            return HttpResponseForbidden("Insufficient permissions")
+
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
+        fd, temp_name = tempfile.mkstemp(dir=settings.SCRATCH_DIR, suffix="-export-csv")
+        os.close(fd)
+        temp_path = Path(temp_name)
+
+        try:
+            with temp_path.open("w", encoding="utf-8", newline="") as csv_file:
+                write_documents_csv(csv_file, entries, fields, user=request.user)
+
+            f = temp_path.open("rb")
+            temp_path.unlink()
+        except Exception:
+            temp_path.unlink(missing_ok=True)
+            raise
+
+        return FileResponse(
+            f,
+            as_attachment=True,
+            filename="documents.csv",
+            content_type="text/csv",
+        )
+
+    def _build_export_documents(
+        self,
+        user: User,
+        root_ids: list[int],
+        fields: list[str],
+    ) -> list[ExportDocument] | None:
+        """
+        Load the roots to export along with the versions their file fields come
+        from, in the order they were selected.
+
+        Returns ``None`` if the user may not view one of the selected documents.
+        """
+        related_fields = ["owner"]
+        if "correspondent" in fields or "archived_filename" in fields:
+            related_fields.append("correspondent")
+        if "documenttype" in fields:
+            related_fields.append("document_type")
+        if "storagepath" in fields:
+            related_fields.append("storage_path")
+
+        roots = Document.objects.filter(pk__in=root_ids).select_related(*related_fields)
+        if "content" not in fields:
+            # OCR content can dwarf every other field. Avoid loading it when no
+            # output column will consume it.
+            roots = roots.defer("content")
+        if "tag" in fields:
+            roots = roots.prefetch_related("tags")
+        if any(field.startswith("custom_field_") for field in fields):
+            roots = roots.prefetch_related(
+                Prefetch(
+                    "custom_fields",
+                    queryset=CustomFieldInstance.objects.select_related("field"),
+                ),
+            )
+        if "note" in fields:
+            note_count = Subquery(
+                Note.objects.filter(document=OuterRef("pk"))
+                .order_by()
+                .values("document")
+                .annotate(count=Count("pk"))
+                .values("count"),
+                output_field=IntegerField(),
+            )
+            roots = roots.annotate(notes_count=Coalesce(note_count, 0))
+
+        # Only pay for resolving versions when a file field was actually asked
+        # for; everything else is answered by the root document alone.
+        needs_versions = requires_latest_version(fields)
+        if needs_versions:
+            roots = roots.annotate(
+                latest_version_pk=Subquery(
+                    Document.objects.filter(root_document=OuterRef("pk"))
+                    .order_by("-id")
+                    .values("pk")[:1],
+                ),
+            )
+        roots_by_id = {root.id: root for root in roots}
+
+        latest_by_pk: dict[int, Document] = {}
+        if needs_versions:
+            version_pks = [
+                latest_version_pk
+                for root in roots_by_id.values()
+                if (latest_version_pk := getattr(root, "latest_version_pk", None))
+                is not None
+            ]
+            if version_pks:
+                versions = Document.objects.filter(pk__in=version_pks)
+                if "archived_filename" in fields:
+                    versions = versions.select_related("correspondent")
+                if "content" not in fields:
+                    versions = versions.defer("content")
+                latest_by_pk = versions.in_bulk()
+
+        # One prefetched checker for the whole export, rather than one guardian
+        # round trip per row.
+        checker = ObjectPermissionChecker(user)
+        owned_by_others = [
+            root
+            for root in roots_by_id.values()
+            if root.owner_id is not None and root.owner_id != user.pk
+        ]
+        if owned_by_others:
+            # django-guardian accepts any iterable here at runtime, despite its
+            # type hint requiring a QuerySet.
+            checker.prefetch_perms(owned_by_others)  # type: ignore[arg-type]
+
+        entries = []
+        for root_id in root_ids:
+            root = roots_by_id.get(root_id)
+            if root is None:
+                continue
+            if not has_perms_owner_aware(user, "view_document", root, checker):
+                return None
+            file_doc = root
+            latest_version_pk = getattr(root, "latest_version_pk", None)
+            if needs_versions and latest_version_pk is not None:
+                file_doc = latest_by_pk.get(latest_version_pk, root)
+            entries.append(ExportDocument(root=root, file_doc=file_doc))
+        return entries
 
 
 @extend_schema_view(

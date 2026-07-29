@@ -15,7 +15,6 @@ import magic
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.validators import DecimalValidator
 from django.core.validators import EmailValidator
@@ -41,8 +40,6 @@ from drf_writable_nested.serializers import NestedUpdateMixin
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_objects_for_user
 from guardian.shortcuts import get_users_with_perms
-from guardian.utils import get_group_obj_perms_model
-from guardian.utils import get_user_obj_perms_model
 from rest_framework import fields
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
@@ -55,6 +52,10 @@ if settings.AUDIT_LOG_ENABLED:
 
 
 from documents import bulk_edit
+from documents.bulk_export import CUSTOM_FIELD_PERMISSION
+from documents.bulk_export import FIELD_PERMISSIONS
+from documents.bulk_export import STANDARD_FIELDS
+from documents.bulk_export import build_export_field_list
 from documents.data_models import DocumentSource
 from documents.filters import CustomFieldQueryParser
 from documents.models import Correspondent
@@ -81,6 +82,7 @@ from documents.parsers import is_mime_type_supported
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import get_objects_for_user_owner_aware
+from documents.permissions import get_shared_object_pks
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import set_permissions_for_object
 from documents.regex import validate_regex_pattern
@@ -426,32 +428,7 @@ class OwnedObjectSerializer(
         """
         Return the primary keys of the subset of objects that are shared.
         """
-        try:
-            first_obj = next(iter(objects))
-        except StopIteration:
-            return set()
-
-        ctype = ContentType.objects.get_for_model(first_obj)
-        object_pks = list(obj.pk for obj in objects)
-        pk_type = type(first_obj.pk)
-
-        def get_pks_for_permission_type(model):
-            return map(
-                pk_type,  # coerce the pk to be the same type of the provided objects
-                model.objects.filter(
-                    content_type=ctype,
-                    object_pk__in=object_pks,
-                )
-                .values_list("object_pk", flat=True)
-                .distinct(),
-            )
-
-        UserObjectPermission = get_user_obj_perms_model()
-        GroupObjectPermission = get_group_obj_perms_model()
-        user_permission_pks = get_pks_for_permission_type(UserObjectPermission)
-        group_permission_pks = get_pks_for_permission_type(GroupObjectPermission)
-
-        return set(user_permission_pks) | set(group_permission_pks)
+        return get_shared_object_pks(objects)
 
     def get_is_shared_by_requester(self, obj: Document) -> bool:
         # First check the context to see if `shared_object_pks` is set by the parent.
@@ -2352,6 +2329,127 @@ class DocumentVersionLabelSerializer(serializers.Serializer[dict[str, str | None
             return None
         normalized = value.strip()
         return normalized or None
+
+
+class BulkExportCsvSerializer(DocumentSelectionSerializer):
+    fields = serializers.ListField(  # type: ignore[assignment]
+        child=serializers.CharField(),
+        required=False,
+        default=list,
+        write_only=True,
+        label="Fields",
+    )
+
+    custom_fields = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=False,
+        default=list,
+        write_only=True,
+        label="Custom fields",
+    )
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        fields = attrs.get("fields", [])
+        custom_fields = attrs.get("custom_fields", [])
+
+        if not fields and not custom_fields:
+            raise serializers.ValidationError(
+                _("At least one field must be selected for export."),
+            )
+
+        invalid_fields = [field for field in fields if field not in STANDARD_FIELDS]
+        if invalid_fields:
+            raise serializers.ValidationError(
+                {
+                    "fields": _(
+                        "Invalid export fields: %(fields)s",
+                    )
+                    % {"fields": ", ".join(invalid_fields)},
+                },
+            )
+
+        if len(fields) != len(set(fields)):
+            raise serializers.ValidationError(
+                {"fields": _("Export fields must not contain duplicates.")},
+            )
+        if len(custom_fields) != len(set(custom_fields)):
+            raise serializers.ValidationError(
+                {
+                    "custom_fields": _(
+                        "Custom fields must not contain duplicates.",
+                    ),
+                },
+            )
+
+        user = getattr(self.context.get("request"), "user", None)
+        self._validate_field_permissions(fields, user)
+        self._validate_custom_fields(custom_fields, user)
+
+        attrs["export_fields"] = build_export_field_list(fields, custom_fields)
+        return attrs
+
+    def _validate_field_permissions(
+        self,
+        fields: list[str],
+        user: User | None,
+    ) -> None:
+        """
+        Reject fields exposing related models the user may not view. Without
+        this the UI's own gating could simply be skipped by calling the API
+        directly.
+        """
+        if user is None:
+            return
+        unauthorized = sorted(
+            {
+                field
+                for field in fields
+                if field in FIELD_PERMISSIONS
+                and not user.has_perm(FIELD_PERMISSIONS[field])
+            },
+        )
+        if unauthorized:
+            raise serializers.ValidationError(
+                {
+                    "fields": _(
+                        "Insufficient permissions to export these fields: %(fields)s",
+                    )
+                    % {"fields": ", ".join(unauthorized)},
+                },
+            )
+
+    def _validate_custom_fields(
+        self,
+        custom_fields: list[int],
+        user: User | None,
+    ) -> None:
+        """
+        Custom fields that are missing and custom fields the user may not view
+        deliberately produce the same error, so that the response cannot be used
+        to enumerate which custom field IDs exist.
+        """
+        if not custom_fields:
+            return
+
+        unavailable = user is not None and not user.has_perm(CUSTOM_FIELD_PERMISSION)
+        if not unavailable:
+            existing_ids = set(
+                CustomField.objects.filter(id__in=custom_fields).values_list(
+                    "id",
+                    flat=True,
+                ),
+            )
+            unavailable = bool(set(custom_fields) - existing_ids)
+
+        if unavailable:
+            raise serializers.ValidationError(
+                {
+                    "custom_fields": _(
+                        "One or more of the requested custom fields is unavailable.",
+                    ),
+                },
+            )
 
 
 class BulkDownloadSerializer(DocumentSelectionSerializer):

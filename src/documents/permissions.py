@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from typing import Any
 
 from django.contrib.auth.models import Group
@@ -19,10 +20,42 @@ from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_objects_for_user
 from guardian.shortcuts import get_users_with_perms
 from guardian.shortcuts import remove_perm
+from guardian.utils import get_group_obj_perms_model
+from guardian.utils import get_user_obj_perms_model
 from rest_framework.permissions import BasePermission
 from rest_framework.permissions import DjangoObjectPermissions
 
 from documents.models import Document
+
+
+def get_shared_object_pks(objects: Iterable[Any]) -> set[Any]:
+    """
+    Return the primary keys of the subset of objects that are shared.
+    """
+    objects = tuple(objects)
+    if not objects:
+        return set()
+
+    first_obj = objects[0]
+    ctype = ContentType.objects.get_for_model(first_obj)
+    object_pks = [obj.pk for obj in objects]
+    pk_type = type(first_obj.pk)
+
+    def get_pks_for_permission_type(model):
+        return map(
+            pk_type,  # coerce the pk to be the same type of the provided objects
+            model.objects.filter(
+                content_type=ctype,
+                object_pk__in=object_pks,
+            )
+            .values_list("object_pk", flat=True)
+            .distinct(),
+        )
+
+    user_permission_pks = get_pks_for_permission_type(get_user_obj_perms_model())
+    group_permission_pks = get_pks_for_permission_type(get_group_obj_perms_model())
+
+    return set(user_permission_pks) | set(group_permission_pks)
 
 
 class PaperlessObjectPermissions(DjangoObjectPermissions):
@@ -344,8 +377,21 @@ def get_objects_for_user_owner_aware(
     return objects_owned | objects_unowned | objects_with_perms
 
 
-def has_perms_owner_aware(user, perms, obj):
-    checker = ObjectPermissionChecker(user)
+def has_perms_owner_aware(
+    user: Any,
+    perms: str,
+    obj: Any,
+    checker: ObjectPermissionChecker | None = None,
+) -> bool:
+    """
+    Check object permissions, treating an unset or matching owner as permitted.
+
+    Callers checking many objects should build one ``ObjectPermissionChecker``,
+    prime it with ``prefetch_perms()`` and pass it in, so that guardian is
+    queried once rather than once per object.
+    """
+    if checker is None:
+        checker = ObjectPermissionChecker(user)
     return obj.owner is None or obj.owner == user or checker.has_perm(perms, obj)
 
 

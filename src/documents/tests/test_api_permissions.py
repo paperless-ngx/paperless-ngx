@@ -83,6 +83,10 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
             status.HTTP_401_UNAUTHORIZED,
         )
         self.assertEqual(
+            self.client.post("/api/documents/bulk_export_csv/").status_code,
+            status.HTTP_401_UNAUTHORIZED,
+        )
+        self.assertEqual(
             self.client.get("/api/documents/selection_data/").status_code,
             status.HTTP_401_UNAUTHORIZED,
         )

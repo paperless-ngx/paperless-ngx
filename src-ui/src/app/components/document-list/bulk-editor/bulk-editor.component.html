@@ -138,6 +138,10 @@
       <div ngbDropdown class="me-2 d-flex btn-group" role="group">
         <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle-split rounded-end" ngbDropdownToggle></button>
         <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
+          <button ngbDropdownItem (click)="exportCsvSelected()">
+            <i-bs name="file-text" class="me-1"></i-bs><ng-container i18n>Export CSV</ng-container>
+          </button>
+          <div class="dropdown-divider"></div>
           <form [formGroup]="downloadForm" class="px-3 py-1">
             <p class="mb-1" i18n>Include:</p>
             <div class="form-group ps-3 mb-2">

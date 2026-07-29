@@ -5,6 +5,8 @@ from drf_spectacular.generators import SchemaGenerator
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from documents.bulk_export import MAX_EXPORT_DOCUMENTS
+
 
 @pytest.fixture(scope="session")
 def api_schema():
@@ -307,3 +309,50 @@ class TestBulkDownloadSchema:
     def test_bulk_download_response_403(self, api_schema: SchemaGenerator) -> None:
         op = api_schema["paths"]["/api/documents/bulk_download/"]["post"]
         assert "403" in op["responses"]
+
+
+class TestBulkExportCsvSchema:
+    """bulk_export_csv_create: POST accepts BulkExportCsvSerializer, returns text/csv."""
+
+    PATH = "/api/documents/bulk_export_csv/"
+
+    def test_path_exists(self, api_schema: SchemaGenerator) -> None:
+        assert self.PATH in api_schema["paths"]
+
+    def test_operation_id(self, api_schema: SchemaGenerator) -> None:
+        op = api_schema["paths"][self.PATH]["post"]
+        assert op["operationId"] == "bulk_export_csv"
+
+    def test_request_references_serializer(self, api_schema: SchemaGenerator) -> None:
+        op = api_schema["paths"][self.PATH]["post"]
+        schema_ref = (
+            op["requestBody"]["content"]["application/json"]
+            .get("schema", {})
+            .get("$ref", "")
+        )
+        assert schema_ref.split("/")[-1] == "BulkExportCsvRequest"
+
+    def test_request_advertises_field_selection(
+        self,
+        api_schema: SchemaGenerator,
+    ) -> None:
+        props = api_schema["components"]["schemas"]["BulkExportCsvRequest"][
+            "properties"
+        ]
+        assert "fields" in props
+        assert "custom_fields" in props
+
+    def test_response_200_is_csv(self, api_schema: SchemaGenerator) -> None:
+        op = api_schema["paths"][self.PATH]["post"]
+        assert "text/csv" in op["responses"]["200"]["content"]
+
+    def test_response_403(self, api_schema: SchemaGenerator) -> None:
+        op = api_schema["paths"][self.PATH]["post"]
+        assert "403" in op["responses"]
+
+    def test_description_documents_the_export_limit(
+        self,
+        api_schema: SchemaGenerator,
+    ) -> None:
+        op = api_schema["paths"][self.PATH]["post"]
+        assert str(MAX_EXPORT_DOCUMENTS) in op["description"]
