@@ -26,13 +26,14 @@ class TestDocumentChunksTable:
         GIVEN:
             - A bare sqlite3 connection
         WHEN:
-            - create() is called twice
+            - create() is called, a row is inserted, then create() is called again
         THEN:
-            - No error is raised and the table exists
+            - No error is raised and the row survives uncorrupted
         """
         DocumentChunksTable.create(conn)
+        DocumentChunksTable.insert_many(conn, [ChunkRow("c1", 1)])
         DocumentChunksTable.create(conn)
-        assert DocumentChunksTable.count(conn) == 0
+        assert DocumentChunksTable.chunk_ids_for_document(conn, 1) == ["c1"]
 
     def test_insert_many_then_lookup_by_document_id(
         self,
@@ -228,48 +229,35 @@ class TestDocumentMetaTable:
 
 
 class TestIndexMetaTable:
-    def test_dim_roundtrip(self, conn: sqlite3.Connection) -> None:
+    @pytest.mark.parametrize(
+        ("setter_name", "getter_name", "value"),
+        [
+            ("set_dim", "get_dim", 384),
+            ("set_embed_model", "get_embed_model", "model-a"),
+            ("set_schema_version", "get_schema_version", 2),
+        ],
+    )
+    def test_typed_accessor_roundtrip(
+        self,
+        conn: sqlite3.Connection,
+        setter_name: str,
+        getter_name: str,
+        value: int | str,
+    ) -> None:
         """
         GIVEN:
             - An empty index_meta table
         WHEN:
-            - set_dim() is called then get_dim() is read back
+            - A typed accessor's setter is called then the getter is read back
         THEN:
-            - The same int value is returned
+            - The same value is returned, correctly typed (int or str)
         """
         IndexMetaTable.create(conn)
-        assert IndexMetaTable.get_dim(conn) is None
-        IndexMetaTable.set_dim(conn, 384)
-        assert IndexMetaTable.get_dim(conn) == 384
-
-    def test_embed_model_roundtrip(self, conn: sqlite3.Connection) -> None:
-        """
-        GIVEN:
-            - An empty index_meta table
-        WHEN:
-            - set_embed_model() is called then get_embed_model() is read back
-        THEN:
-            - The same string value is returned
-        """
-        IndexMetaTable.create(conn)
-        assert IndexMetaTable.get_embed_model(conn) is None
-        IndexMetaTable.set_embed_model(conn, "model-a")
-        assert IndexMetaTable.get_embed_model(conn) == "model-a"
-
-    def test_schema_version_roundtrip(self, conn: sqlite3.Connection) -> None:
-        """
-        GIVEN:
-            - An empty index_meta table
-        WHEN:
-            - set_schema_version() is called then get_schema_version() is
-              read back
-        THEN:
-            - The same int value is returned
-        """
-        IndexMetaTable.create(conn)
-        assert IndexMetaTable.get_schema_version(conn) is None
-        IndexMetaTable.set_schema_version(conn, 2)
-        assert IndexMetaTable.get_schema_version(conn) == 2
+        getter = getattr(IndexMetaTable, getter_name)
+        setter = getattr(IndexMetaTable, setter_name)
+        assert getter(conn) is None
+        setter(conn, value)
+        assert getter(conn) == value
 
     def test_total_inserts_starts_at_zero(self, conn: sqlite3.Connection) -> None:
         """

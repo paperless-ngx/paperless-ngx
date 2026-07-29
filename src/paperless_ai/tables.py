@@ -3,6 +3,14 @@ vec0 table. Each method takes the sqlite3.Connection to operate on
 explicitly, rather than owning one -- the store swaps connections during
 compact()/migration, and migrations always work across two connections
 (src_conn, dst_conn) at once.
+
+PRECONDITION: Callers must set conn.row_factory = sqlite3.Row before passing a
+connection to any of these gateways' read methods. The read methods across all
+three classes (DocumentChunksTable.chunk_ids_for_document, IndexMetaTable._get,
+DocumentMetaTable.all_modified_times, DocumentMetaTable.copy_all) use
+row["column_name"] dictionary-style indexing, which requires sqlite3.Row as the
+row factory -- without it, sqlite3.Row is not set, rows are returned as plain
+tuples, and tuple indices must be integers, raising TypeError.
 """
 
 import sqlite3
