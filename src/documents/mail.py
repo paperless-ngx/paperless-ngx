@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from email import message_from_bytes
 from pathlib import Path
@@ -36,6 +37,8 @@ def send_email(
 
     TODO: re-evaluate this pending https://code.djangoproject.com/ticket/35581 / https://github.com/django/django/pull/18966
     """
+    subject = re.sub(r"[ \t]*[\r\n]+[ \t]*", " ", subject)
+
     email = EmailMessage(
         subject=subject,
         body=body,
