@@ -1329,7 +1329,7 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
         with self.get_consumer(self.test_file) as c:
             c.run()
             # Verify no pre-consume script subprocess was invoked
-            # (run_subprocess may still be called by _extract_text_for_archive_check)
+            # (run_subprocess may still be called by pdf_born_digital_text via pdftotext)
             script_calls = [
                 call
                 for call in m.call_args_list
@@ -1354,7 +1354,7 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                     self.assertTrue(m.called)
 
                     # Find the call that invoked the pre-consume script
-                    # (run_subprocess may also be called by _extract_text_for_archive_check)
+                    # (run_subprocess may also be called by pdf_born_digital_text via pdftotext)
                     script_call = next(
                         call
                         for call in m.call_args_list
