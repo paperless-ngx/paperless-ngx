@@ -68,6 +68,11 @@
     ></ng-select>
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.DocumentLink) {
     <pngx-input-document-link [(ngModel)]="atom.value" class="w-25 form-select doc-link-select p-0" placeholder="Search docs..." i18n-placeholder [minimal]="true"></pngx-input-document-link>
+  } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Monetary) {
+    <input class="w-25 form-control rounded-end" type="text" inputmode="decimal"
+      [ngModel]="atom.value"
+      (ngModelChange)="setMonetaryValue(atom, $event)"
+      [disabled]="disabled">
   } @else {
     <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [disabled]="disabled">
   }

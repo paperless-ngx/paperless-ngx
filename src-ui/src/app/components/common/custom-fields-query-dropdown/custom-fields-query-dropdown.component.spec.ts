@@ -1,5 +1,6 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { LOCALE_ID } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
@@ -41,6 +42,12 @@ const customFields = [
       ],
     },
   },
+  {
+    id: 3,
+    name: 'Test Monetary Field',
+    data_type: CustomFieldDataType.Monetary,
+    extra_data: { default_currency: 'EUR' },
+  },
 ]
 
 describe('CustomFieldsQueryDropdownComponent', () => {
@@ -61,6 +68,7 @@ describe('CustomFieldsQueryDropdownComponent', () => {
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
+        { provide: LOCALE_ID, useValue: 'de' },
       ],
     }).compileComponents()
 
@@ -148,6 +156,22 @@ describe('CustomFieldsQueryDropdownComponent', () => {
     // Fallback to empty array if field is not found
     const options2 = component.getSelectOptionsForField(2)
     expect(options2).toEqual([])
+  })
+
+  it('should normalize localized monetary comparison values', () => {
+    const atom = new CustomFieldQueryAtom([3, 'exact', null])
+
+    component.setMonetaryComparisonValue(atom, '1.234,56')
+
+    expect(atom.value).toEqual('1234.56')
+  })
+
+  it('should preserve API-formatted monetary comparison values', () => {
+    const atom = new CustomFieldQueryAtom([3, 'exact', null])
+
+    component.setMonetaryComparisonValue(atom, '1234.56')
+
+    expect(atom.value).toEqual('1234.56')
   })
 
   it('should remove an element from the selection model', () => {
