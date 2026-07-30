@@ -47,10 +47,12 @@ SCHEMA_VERSION = 2
 # a rebuild copies the live rows into a fresh table.
 COMPACT_BLOAT_RATIO = 2.0
 
-# compact(): number of rows copied per executemany() when rebuilding the file.
-# Rows are streamed from the source cursor in batches of this size rather than
-# materialized all at once, keeping memory bounded regardless of index size.
-COMPACT_BATCH_SIZE = 500
+# Number of rows fetched/copied per batch whenever this module streams rows
+# instead of materializing them all at once, keeping memory bounded regardless
+# of index size -- used by compact()'s rebuild, m0001_v1_to_v2's migration
+# copy, and DocumentMetaTable.copy_all(). No longer compact()-specific, hence
+# the plain name.
+BATCH_SIZE = 500
 
 # Filterable vec0 metadata columns. _build_where() only ever receives filter
 # keys we construct ourselves, but allowlisting keeps SQL identifiers safe by
@@ -605,7 +607,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             + DEFAULT_TABLE_NAME,
         )
         copied = 0
-        while batch := src_cursor.fetchmany(COMPACT_BATCH_SIZE):
+        while batch := src_cursor.fetchmany(BATCH_SIZE):
             dst_conn.executemany(
                 _INSERT,
                 [
@@ -623,7 +625,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
                 (ChunkRow(r["id"], r["document_id"]) for r in batch),
             )
             copied += len(batch)
-        DocumentMetaTable.copy_all(src_conn, dst_conn, COMPACT_BATCH_SIZE)
+        DocumentMetaTable.copy_all(src_conn, dst_conn, BATCH_SIZE)
         # Reset the cumulative counter: after a rebuild, total_inserts == live.
         IndexMetaTable.reset_total_inserts(dst_conn, copied)
         dst_conn.execute("COMMIT")

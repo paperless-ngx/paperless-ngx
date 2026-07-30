@@ -508,7 +508,7 @@ class TestCompact:
         A tiny batch size forces several fetchmany()/executemany() cycles so a
         regression in the streaming loop (dropped tail, off-by-one) surfaces.
         """
-        monkeypatch.setattr("paperless_ai.vector_store.COMPACT_BATCH_SIZE", 3)
+        monkeypatch.setattr("paperless_ai.vector_store.BATCH_SIZE", 3)
         store.add([make_node(f"n{i}", 1, seed=float(i)) for i in range(10)])
         store.compact(force=True)
         ids = {n.node_id for n in store.get_nodes(filters=_in_filter([1]))}
