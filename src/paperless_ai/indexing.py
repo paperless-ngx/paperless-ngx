@@ -1,6 +1,5 @@
 import logging
 from collections.abc import Iterable
-from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import timedelta
 from typing import TYPE_CHECKING
@@ -15,6 +14,7 @@ from filelock import Timeout
 from documents.models import Document
 from documents.models import PaperlessTask
 from documents.utils import IterWrapper
+from documents.utils import QuerySetStream
 from documents.utils import identity
 from paperless.config import AIConfig
 from paperless_ai.db import db_connection_released
@@ -23,7 +23,6 @@ from paperless_ai.embedding import get_configured_model_name
 from paperless_ai.embedding import get_embedding_model
 
 if TYPE_CHECKING:
-    from django.db.models import QuerySet
     from llama_index.core.schema import BaseNode
 
     from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
@@ -35,33 +34,9 @@ RAG_NUM_OUTPUT = 512
 RAG_CHUNK_OVERLAP = 200
 
 # update_llm_index(): row count per .iterator() batch when streaming
-# documents for a rebuild/update, matching _DocumentViewerStream's chunk
-# size in documents/search/_backend.py.
+# documents for a rebuild/update via QuerySetStream, matching
+# _DocumentViewerStream's chunk size in documents/search/_backend.py.
 _INDEX_STREAM_CHUNK_SIZE = 1000
-
-
-class _StreamedDocuments:
-    """A thin QuerySet wrapper that streams via ``.iterator()`` instead of
-    materializing every row (plus its ``content`` and prefetch caches) into
-    memory at once, while still supporting ``len()`` so ``iter_wrapper``'s
-    progress bar shows a real total instead of falling back to indeterminate.
-    Same shape as ``documents/search/_backend.py``'s ``_DocumentViewerStream``,
-    just without that class's extra per-batch permission lookup -- nothing
-    here needs one.
-    """
-
-    def __init__(self, documents: "QuerySet[Document]") -> None:
-        self._documents = documents
-
-    def __len__(self) -> int:
-        return self._documents.count()
-
-    def __iter__(self) -> Iterator[Document]:
-        # iterator(chunk_size=...) streams from a server-side cursor instead
-        # of materializing the whole queryset in memory; since Django 4.1 it
-        # still honours prefetch_related, running the prefetches one batch
-        # at a time.
-        return iter(self._documents.iterator(chunk_size=_INDEX_STREAM_CHUNK_SIZE))
 
 
 def queue_llm_index_update_if_needed(*, rebuild: bool, reason: str) -> bool:
@@ -441,7 +416,9 @@ def update_llm_index(
         if rebuild or not store.table_exists():
             logger.info("Rebuilding LLM index.")
             store.drop_table()
-            for document in iter_wrapper(_StreamedDocuments(documents)):
+            for document in iter_wrapper(
+                QuerySetStream(documents, chunk_size=_INDEX_STREAM_CHUNK_SIZE),
+            ):
                 nodes = build_document_node(document, chunk_size=chunk_size)
                 _embed_nodes(nodes, embed_model)
                 store.add(nodes)
@@ -454,7 +431,9 @@ def update_llm_index(
             )
             existing = store.get_modified_times()
             changed = 0
-            for document in iter_wrapper(_StreamedDocuments(scoped_documents)):
+            for document in iter_wrapper(
+                QuerySetStream(scoped_documents, chunk_size=_INDEX_STREAM_CHUNK_SIZE),
+            ):
                 doc_id = str(document.id)
                 if existing.get(doc_id) == document.modified.isoformat():
                     continue
