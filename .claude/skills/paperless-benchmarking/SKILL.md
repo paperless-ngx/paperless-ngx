@@ -28,7 +28,7 @@ manage.py benchmark list-scenarios
   guardian permission grants) and `perf_admin` (superuser), plus a general
   user/group pool with realistic permission-row ratios.
 - **`run`** times the 3 built-in API endpoint benchmarks
-  (`/api/documents/`, `/api/documents/?page_size=50`, `/api/tags/`) for both
+  (`/api/documents/`, `/api/documents/?page_size=50`, `/api/tags/?page_size=100000`) for both
   `perf_target` and `perf_admin`, reporting min/median/max wall-clock and SQL
   query count. Requires `seed` to have already run — it reuses that data, it
   does not seed its own.
