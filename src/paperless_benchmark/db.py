@@ -30,17 +30,19 @@ def _reset_table_names() -> list[str]:
     ]
 
 
-def _delete_non_superusers() -> None:
+def _delete_all_users_and_groups() -> None:
     from django.contrib.auth import get_user_model
+    from django.contrib.auth.models import Group
 
-    get_user_model().objects.filter(is_superuser=False).delete()
+    get_user_model().objects.all().delete()
+    Group.objects.all().delete()
 
 
 def _reset_postgresql() -> None:
     tables = _reset_table_names()
     with connection.cursor() as cursor:
         cursor.execute(f"TRUNCATE TABLE {', '.join(tables)} RESTART IDENTITY CASCADE;")
-    _delete_non_superusers()
+    _delete_all_users_and_groups()
 
 
 def _reset_mariadb() -> None:
@@ -55,7 +57,7 @@ def _reset_mariadb() -> None:
                 cursor.execute(f"TRUNCATE TABLE {table};")
         finally:
             cursor.execute("SET FOREIGN_KEY_CHECKS = 1;")
-    _delete_non_superusers()
+    _delete_all_users_and_groups()
 
 
 def _reset_sqlite() -> None:
@@ -70,14 +72,14 @@ def _reset_sqlite() -> None:
     Correspondent.objects.all().delete()
     DocumentType.objects.all().delete()
     StoragePath.objects.all().delete()
-    _delete_non_superusers()
+    _delete_all_users_and_groups()
 
 
 def reset_benchmark_data() -> None:
     """
     Remove all previously-seeded benchmark data (documents, tags,
     correspondents, document types, storage paths, guardian permission
-    rows, and non-superuser users) so a fresh `benchmark seed` run starts
+    rows, users, and groups) so a fresh `benchmark seed` run starts
     from an empty slate. Dispatches per-backend because TRUNCATE syntax
     and cascade behavior differ across the 3 supported databases.
     """
