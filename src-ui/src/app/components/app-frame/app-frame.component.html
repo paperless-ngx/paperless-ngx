@@ -182,7 +182,7 @@
                     container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
                     <i-bs class="me-2" name="stack"></i-bs><span><ng-container i18n>Attributes</ng-container></span>
                   </a>
-                  @if (!slimSidebarEnabled) {
+                  @if (!slimSidebarEnabled && canSaveSettings) {
                     <button
                       type="button"
                       class="btn btn-link btn-sm text-muted p-0 me-3 attributes-expand-btn"
