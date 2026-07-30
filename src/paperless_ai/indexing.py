@@ -1,3 +1,4 @@
+import enum
 import logging
 from collections.abc import Iterable
 from contextlib import contextmanager
@@ -192,18 +193,49 @@ def write_store(embed_model_name: str | None = None):
         yield store
 
 
-def _check_and_run_migrations(store: "PaperlessSqliteVecVectorStore") -> bool:
-    """Run any pending structural migrations, returning True if a pending
-    re-embed migration needs the caller to force a rebuild -- never
-    triggered automatically here. Safe to call before any write, including
+class MigrationCheckResult(enum.Enum):
+    """Outcome of _check_and_run_migrations().
+
+    CURRENT: no migration was pending, or a pending structural migration
+    was applied successfully -- safe to write.
+
+    REEMBED_REQUIRED: a pending migration needs fresh embeddings, which is
+    never triggered automatically -- the caller must force a rebuild.
+
+    DEFERRED: a migration was pending but could not run because active
+    index readers did not drain within LLM_INDEX_COMPACTION_LOCK_TIMEOUT --
+    the store is still on its old schema. Callers must NOT proceed to
+    write: collapsing this into the same falsy value as CURRENT (as a
+    plain bool return once did) would let a write proceed against an
+    unmigrated schema.
+    """
+
+    CURRENT = "current"
+    REEMBED_REQUIRED = "reembed_required"
+    DEFERRED = "deferred"
+
+
+def _check_and_run_migrations(
+    store: "PaperlessSqliteVecVectorStore",
+) -> MigrationCheckResult:
+    """Run any pending structural migrations, reporting the outcome as a
+    tri-state result. Safe to call before any write, including
     delete()/upsert_document(): has_pending_migration() (see its docstring)
     keeps this a no-op, with no exclusive access taken, once the store is
     current.
     """
     if not store.has_pending_migration():
-        return False
-    return bool(
-        _with_exclusive_access("migration check", store.check_and_run_migrations),
+        return MigrationCheckResult.CURRENT
+    result = _with_exclusive_access(
+        "migration check",
+        store.check_and_run_migrations,
+    )
+    if result is None:
+        return MigrationCheckResult.DEFERRED
+    return (
+        MigrationCheckResult.REEMBED_REQUIRED
+        if result
+        else MigrationCheckResult.CURRENT
     )
 
 
@@ -378,12 +410,21 @@ def update_llm_index(
     happens, since a rebuild always covers the whole library regardless.
     """
     with write_store() as store:
-        needs_reembed = _check_and_run_migrations(store)
-        if needs_reembed:
+        migration_result = _check_and_run_migrations(store)
+        if migration_result is MigrationCheckResult.REEMBED_REQUIRED:
             logger.warning(
                 "LLM index migration requires re-embedding; forcing rebuild.",
             )
             rebuild = True
+        elif migration_result is MigrationCheckResult.DEFERRED:
+            logger.info(
+                "Skipping LLM index update: migration check deferred while "
+                "index readers are active; will retry next run.",
+            )
+            return (
+                "Skipping LLM index update: migration check deferred; "
+                "will retry next run."
+            )
     documents = Document.objects.select_related(
         "correspondent",
         "document_type",
@@ -461,12 +502,20 @@ def llm_index_add_or_update_document(document: Document):
         _embed_nodes(new_nodes, get_embedding_model(config))
 
     with write_store(embed_model_name=get_configured_model_name(config)) as store:
-        needs_reembed = _check_and_run_migrations(store)
-        if needs_reembed:
+        migration_result = _check_and_run_migrations(store)
+        if migration_result is MigrationCheckResult.REEMBED_REQUIRED:
             logger.warning(
                 "Skipping incremental LLM index update for document %s: the "
                 "index requires re-embedding first. Run 'document_llmindex "
                 "rebuild' to resolve.",
+                document.id,
+            )
+            return
+        if migration_result is MigrationCheckResult.DEFERRED:
+            logger.info(
+                "Skipping incremental LLM index update for document %s: "
+                "migration check deferred while index readers are active; "
+                "will retry on the next write.",
                 document.id,
             )
             return
@@ -488,13 +537,18 @@ def llm_index_migrate() -> None:
     if not AIConfig().llm_index_enabled:
         return
     with write_store() as store:
-        needs_reembed = _check_and_run_migrations(store)
-    if needs_reembed:
+        migration_result = _check_and_run_migrations(store)
+    if migration_result is MigrationCheckResult.REEMBED_REQUIRED:
         logger.warning(
             "LLM index requires re-embedding, which this automatic migration "
             "check will not do on its own -- it can be slow and, for a "
             "metered embedding backend, cost money. Run "
             "'document_llmindex rebuild' manually when ready.",
+        )
+    elif migration_result is MigrationCheckResult.DEFERRED:
+        logger.info(
+            "LLM index migration check deferred while index readers are "
+            "active; will retry next run.",
         )
 
 
@@ -507,11 +561,20 @@ def llm_index_compact() -> None:
 def llm_index_remove_document(document: Document):
     """Remove a document's chunks from the LLM index."""
     with write_store() as store:
-        if _check_and_run_migrations(store):
+        migration_result = _check_and_run_migrations(store)
+        if migration_result is MigrationCheckResult.REEMBED_REQUIRED:
             logger.warning(
                 "Skipping removal of document %s from the LLM index: the "
                 "index requires re-embedding first. Run 'document_llmindex "
                 "rebuild' to resolve.",
+                document.id,
+            )
+            return
+        if migration_result is MigrationCheckResult.DEFERRED:
+            logger.info(
+                "Skipping removal of document %s from the LLM index: "
+                "migration check deferred while index readers are active; "
+                "will retry on the next write.",
                 document.id,
             )
             return
