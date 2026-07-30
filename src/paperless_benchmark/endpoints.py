@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import User
+    from rest_framework.test import APIClient
 
 ENDPOINTS: tuple[tuple[str, str], ...] = (
     ("documents_default", "/api/documents/"),
@@ -26,7 +27,7 @@ class EndpointTiming:
     max_ms: float
 
 
-def _timed_requests(client, url: str, n: int) -> list[float]:
+def _timed_requests(client: APIClient, url: str, n: int) -> list[float]:
     times = []
     for _ in range(n):
         t0 = time.perf_counter()
@@ -40,7 +41,7 @@ def _timed_requests(client, url: str, n: int) -> list[float]:
     return times
 
 
-def _query_count(client, url: str) -> int:
+def _query_count(client: APIClient, url: str) -> int:
     from django.db import connection
     from django.test.utils import CaptureQueriesContext
 

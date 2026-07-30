@@ -36,6 +36,17 @@ class Command(BaseCommand):
             help="For `seed`: truncate existing benchmark data first.",
         )
         parser.add_argument(
+            "--yes-i-know-this-wipes-the-database",
+            action="store_true",
+            default=False,
+            help=(
+                "Required alongside --reset: confirms you understand `seed "
+                "--reset` deletes ALL users, ALL groups, and ALL documents/"
+                "tags/correspondents/document types/storage paths in this "
+                "database, not just benchmark-created ones."
+            ),
+        )
+        parser.add_argument(
             "--seed",
             type=int,
             default=42,
@@ -75,20 +86,32 @@ class Command(BaseCommand):
         from paperless_benchmark.seeding import seed_benchmark_dataset
 
         if options["reset"]:
+            if not options["yes_i_know_this_wipes_the_database"]:
+                raise CommandError(
+                    "--reset requires --yes-i-know-this-wipes-the-database. "
+                    "This deletes ALL users, ALL groups, and ALL documents, "
+                    "tags, correspondents, document types, and storage paths "
+                    "in this database -- not just benchmark-created ones. "
+                    "Only run this against a disposable benchmark database, "
+                    "never a real install. Re-run with "
+                    "--reset --yes-i-know-this-wipes-the-database to proceed.",
+                )
             self.stdout.write("Resetting existing benchmark data...")
             reset_benchmark_data()
 
         data = seed_benchmark_dataset(options["tier"], seed=options["seed"])
         self.stdout.write(
             self.style.SUCCESS(
-                f"Seeded tier={options['tier']!r}: {len(data.documents)} documents, "
+                f"Seeded tier={options['tier']!r}: {data.documents} documents, "
                 f"{len(data.users)} users, {len(data.groups)} groups.",
             ),
         )
 
     def _handle_run(self, options: dict[str, Any]) -> None:
         from django.contrib.auth import get_user_model
+        from django.db import connection
 
+        from documents.models import Document
         from paperless_benchmark.endpoints import run_endpoint_benchmarks
         from paperless_benchmark.results import append_history
 
@@ -100,6 +123,9 @@ class Command(BaseCommand):
             raise CommandError(
                 "No benchmark dataset found. Run `manage.py benchmark seed` first.",
             ) from e
+
+        db_vendor = connection.vendor
+        document_count = Document.objects.count()
 
         results = run_endpoint_benchmarks(
             perf_target=perf_target,
@@ -127,12 +153,16 @@ class Command(BaseCommand):
                     "min_ms": r.min_ms,
                     "median_ms": r.median_ms,
                     "max_ms": r.max_ms,
+                    "db_vendor": db_vendor,
+                    "document_count": document_count,
                 },
             )
 
     def _handle_profile(self, options: dict[str, Any]) -> None:
         from django.contrib.auth import get_user_model
+        from django.db import connection
 
+        from documents.models import Document
         from paperless_benchmark.db import capture_explain
         from paperless_benchmark.harness import run_profile
         from paperless_benchmark.results import append_history
@@ -162,9 +192,17 @@ class Command(BaseCommand):
             f"queries={profile.query_count}",
         )
 
-        if options["explain"] and scenario.queryset_for_explain is not None:
-            plan = capture_explain(scenario.queryset_for_explain(perf_target))
-            self.stdout.write(plan)
+        if options["explain"]:
+            if scenario.queryset_for_explain is not None:
+                plan = capture_explain(scenario.queryset_for_explain(perf_target))
+                self.stdout.write(plan)
+            else:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"--explain was requested but scenario {scenario.name!r} "
+                        "does not support it (no queryset_for_explain); skipping.",
+                    ),
+                )
 
         append_history(
             {
@@ -172,6 +210,8 @@ class Command(BaseCommand):
                 "scenario": scenario.name,
                 "best_seconds": profile.best_seconds,
                 "query_count": profile.query_count,
+                "db_vendor": connection.vendor,
+                "document_count": Document.objects.count(),
             },
         )
 

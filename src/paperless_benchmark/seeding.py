@@ -1,6 +1,7 @@
 # src/paperless_benchmark/seeding.py
 from __future__ import annotations
 
+import datetime
 import random
 import time
 from dataclasses import dataclass
@@ -10,12 +11,6 @@ from typing import Literal
 if TYPE_CHECKING:
     from django.contrib.auth.models import Group
     from django.contrib.auth.models import User
-
-    from documents.models import Correspondent
-    from documents.models import Document
-    from documents.models import DocumentType
-    from documents.models import StoragePath
-    from documents.models import Tag
 
 Tier = Literal["home", "medium", "large"]
 
@@ -102,18 +97,28 @@ def log(msg: str) -> None:
 
 @dataclass(frozen=True, slots=True)
 class SeededData:
+    """
+    Summary of a completed seed run. `documents`/`tags`/`correspondents`/
+    `document_types`/`storage_paths` are counts, not the seeded ORM
+    instances: at the `large` tier (360,000 documents) holding every
+    instance in memory simultaneously is a real risk for zero benefit, since
+    no caller consumes anything but the counts. `perf_target`/`perf_admin`/
+    `users`/`groups` stay as real objects -- at most ~26 users/12 groups even
+    at `large` tier, and small enough to be useful to a future caller.
+    """
+
     perf_target: User
     perf_admin: User
     users: tuple[User, ...]
     groups: tuple[Group, ...]
-    documents: tuple[Document, ...]
-    tags: tuple[Tag, ...]
-    correspondents: tuple[Correspondent, ...]
-    document_types: tuple[DocumentType, ...]
-    storage_paths: tuple[StoragePath, ...]
+    documents: int
+    tags: int
+    correspondents: int
+    document_types: int
+    storage_paths: int
 
 
-def _grant_model_level_permissions(user) -> None:
+def _grant_model_level_permissions(user: User) -> None:
     """
     Grant perf_target Django model-level view/add/change permissions on
     Document and Tag, on top of the per-object guardian grants seeding
@@ -140,7 +145,9 @@ def _grant_model_level_permissions(user) -> None:
         user.user_permissions.add(*perms)
 
 
-def _create_users_and_groups(counts: _TierCounts):
+def _create_users_and_groups(
+    counts: _TierCounts,
+) -> tuple[User, User, tuple[User, ...], tuple[Group, ...]]:
     from django.contrib.auth.models import Group
 
     from documents.tests.factories import UserFactory
@@ -192,7 +199,7 @@ def _create_lookup_tables(counts: _TierCounts):
     return tags, correspondents, document_types, storage_paths
 
 
-def _assign_owner(rng: random.Random, perf_target, other_users):
+def _assign_owner(rng: random.Random, perf_target: User, other_users: tuple[User, ...]):
     roll = rng.random()
     if roll < OWNED_BY_TARGET_FRACTION:
         return perf_target, "target"
@@ -207,9 +214,18 @@ def _seed_documents(
     tags,
     correspondents,
     document_types,
+    storage_paths,
     perf_target,
     other_users,
-):
+) -> tuple[int, list[int]]:
+    """
+    Bulk-create `counts.documents` documents in chunks. Returns the total
+    document count plus a lightweight list of pks for documents that ended
+    up with an owner (target or other) -- that's all
+    `_grant_general_permissions` needs to sample from, so full `Document`
+    instances aren't accumulated across chunks (a real memory concern at the
+    `large` tier's 360,000 documents).
+    """
     from django.contrib.auth.models import Permission
     from django.contrib.contenttypes.models import ContentType
     from guardian.models import UserObjectPermission
@@ -220,6 +236,7 @@ def _seed_documents(
     tag_ids = [t.pk for t in tags]
     correspondent_ids = [c.pk for c in correspondents]
     document_type_ids = [d.pk for d in document_types]
+    storage_path_ids = [s.pk for s in storage_paths]
 
     doc_content_type = ContentType.objects.get_for_model(Document)
     view_perm = Permission.objects.get(
@@ -232,7 +249,8 @@ def _seed_documents(
     )
     through_model = Document.tags.through
 
-    documents: list[Document] = []
+    document_count = 0
+    owned_document_pks: list[int] = []
     remaining = counts.documents
     while remaining > 0:
         chunk_n = min(CHUNK_SIZE, remaining)
@@ -254,6 +272,18 @@ def _seed_documents(
                     if document_type_ids and rng.random() < 0.6
                     else None
                 ),
+                storage_path_id=(
+                    rng.choice(storage_path_ids)
+                    if storage_path_ids and rng.random() < 0.8
+                    else None
+                ),
+                # Document.created is a plain DateField (default: today).
+                # Leaving it unset would give every seeded document the same
+                # date, collapsing Document's ("-created",) ordering index
+                # into a single-valued sort key -- spread it over a
+                # realistic multi-year window instead.
+                created=datetime.date.today()
+                - datetime.timedelta(days=rng.randint(0, 365 * 3)),
             )
             owner, bucket = _assign_owner(rng, perf_target, other_users)
             doc.owner_id = owner.pk if owner else None
@@ -272,6 +302,10 @@ def _seed_documents(
 
         perm_rows = []
         for doc, bucket in zip(created, owner_buckets, strict=True):
+            if bucket == "unowned":
+                continue
+            owned_document_pks.append(doc.pk)
+
             if bucket != "other":
                 continue
             if rng.random() >= SHARED_WITH_TARGET_FRACTION:
@@ -296,13 +330,18 @@ def _seed_documents(
         if perm_rows:
             UserObjectPermission.objects.bulk_create(perm_rows, batch_size=CHUNK_SIZE)
 
-        documents.extend(created)
-        log(f"  {len(documents)}/{counts.documents} documents seeded")
+        document_count += len(created)
+        log(f"  {document_count}/{counts.documents} documents seeded")
 
-    return tuple(documents)
+    return document_count, owned_document_pks
 
 
-def _grant_general_permissions(rng: random.Random, documents, users, groups) -> None:
+def _grant_general_permissions(
+    rng: random.Random,
+    owned_document_pks: list[int],
+    users,
+    groups,
+) -> None:
     """
     Layer realistic (issue #13276-derived) guardian permission-row ratios
     across owned documents for the general user/group pool, so `profile`
@@ -316,8 +355,7 @@ def _grant_general_permissions(rng: random.Random, documents, users, groups) -> 
 
     from documents.models import Document
 
-    owned_documents = [d for d in documents if d.owner_id is not None]
-    if not owned_documents or not users:
+    if not owned_document_pks or not users:
         return
 
     doc_content_type = ContentType.objects.get_for_model(Document)
@@ -326,16 +364,16 @@ def _grant_general_permissions(rng: random.Random, documents, users, groups) -> 
         content_type=doc_content_type,
     )
 
-    n_user_perms = round(len(owned_documents) * USER_PERM_ROWS_PER_DOC)
+    n_user_perms = round(len(owned_document_pks) * USER_PERM_ROWS_PER_DOC)
     n_group_perms = (
-        round(len(owned_documents) * GROUP_PERM_ROWS_PER_DOC) if groups else 0
+        round(len(owned_document_pks) * GROUP_PERM_ROWS_PER_DOC) if groups else 0
     )
 
     user_rows = [
         UserObjectPermission(
             permission=view_perm,
             content_type=doc_content_type,
-            object_pk=str(rng.choice(owned_documents).pk),
+            object_pk=str(rng.choice(owned_document_pks)),
             user=rng.choice(users),
         )
         for _ in range(n_user_perms)
@@ -351,7 +389,7 @@ def _grant_general_permissions(rng: random.Random, documents, users, groups) -> 
         GroupObjectPermission(
             permission=view_perm,
             content_type=doc_content_type,
-            object_pk=str(rng.choice(owned_documents).pk),
+            object_pk=str(rng.choice(owned_document_pks)),
             group=rng.choice(groups),
         )
         for _ in range(n_group_perms)
@@ -379,28 +417,29 @@ def seed_benchmark_dataset(tier: Tier, *, seed: int = 42) -> SeededData:
     log(f"Seeding tier={tier!r}")
     perf_target, perf_admin, other_users, groups = _create_users_and_groups(counts)
     tags, correspondents, document_types, storage_paths = _create_lookup_tables(counts)
-    documents = _seed_documents(
+    document_count, owned_document_pks = _seed_documents(
         rng,
         counts,
         tags,
         correspondents,
         document_types,
+        storage_paths,
         perf_target,
         other_users,
     )
     all_users = (perf_target, *other_users)
-    _grant_general_permissions(rng, documents, all_users, groups)
+    _grant_general_permissions(rng, owned_document_pks, all_users, groups)
 
-    log(f"Done. {len(documents)} documents seeded for tier={tier!r}.")
+    log(f"Done. {document_count} documents seeded for tier={tier!r}.")
 
     return SeededData(
         perf_target=perf_target,
         perf_admin=perf_admin,
         users=all_users,
         groups=groups,
-        documents=documents,
-        tags=tags,
-        correspondents=correspondents,
-        document_types=document_types,
-        storage_paths=storage_paths,
+        documents=document_count,
+        tags=len(tags),
+        correspondents=len(correspondents),
+        document_types=len(document_types),
+        storage_paths=len(storage_paths),
     )
