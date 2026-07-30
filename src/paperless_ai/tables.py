@@ -216,11 +216,14 @@ class IndexMetaTable:
 
     @staticmethod
     def increment_total_inserts(conn: sqlite3.Connection, count: int) -> None:
-        """Atomically add ``count`` to the stored counter in one statement
-        (INSERT .. ON CONFLICT DO UPDATE with arithmetic), instead of a
-        separate read-then-write -- called once per add()/upsert_document(),
-        so halving the statement count here is a real, if small, per-call
-        saving. index_meta.value has TEXT affinity, so the incremented
+        """Add ``count`` to the stored counter in one SQL statement (INSERT
+        .. ON CONFLICT DO UPDATE with arithmetic), instead of a separate
+        read-then-write -- called once per add()/upsert_document(), so
+        halving the statement count here is a real, if small, per-call
+        saving. This only avoids a read-then-write race within this single
+        statement; it does not make the counter safe against concurrent
+        writers in general (callers still rely on the write FileLock for
+        that). index_meta.value has TEXT affinity, so the incremented
         result is stored as its text representation -- get_total_inserts()
         already expects that (int(value)), so this is not a behavior
         change, only fewer statements.

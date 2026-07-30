@@ -1,8 +1,10 @@
+import inspect
 import sqlite3
 from collections.abc import Generator
 from pathlib import Path
 
 import pytest
+import sqlite_vec
 from llama_index.core.schema import TextNode
 from llama_index.core.vector_stores.types import FilterOperator
 from llama_index.core.vector_stores.types import MetadataFilter
@@ -12,6 +14,9 @@ from pytest_mock import MockerFixture
 
 from paperless_ai.migrations import MIGRATIONS
 from paperless_ai.migrations import Migration
+from paperless_ai.migrations import m0001_v1_to_v2
+from paperless_ai.tables import DocumentChunksTable
+from paperless_ai.tables import DocumentMetaTable
 from paperless_ai.vector_store import DB_FILENAME
 from paperless_ai.vector_store import DEFAULT_TABLE_NAME
 from paperless_ai.vector_store import SCHEMA_VERSION
@@ -534,6 +539,41 @@ class TestCompact:
         store.compact(force=True)
         assert store.get_modified_times() == before
 
+    def test_compact_on_unmigrated_store_is_noop(
+        self,
+        store: PaperlessSqliteVecVectorStore,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A store whose schema_version has been forced behind
+              SCHEMA_VERSION (has_pending_migration() is True)
+        WHEN:
+            - compact(force=True) is called directly, without the caller
+              having run check_and_run_migrations() first
+        THEN:
+            - compact() is a safe no-op: no file-swap rebuild is attempted
+              at all (asserted via a spy on _rebuild_into, since schema_version
+              alone is not a reliable signal -- a rebuild would otherwise
+              copy the stale schema_version across unchanged, making a
+              before/after equality check pass even when a rebuild *did*
+              happen). Rebuilding an unmigrated store would silently lose
+              document_meta and leave the swapped-in file claiming the old
+              schema_version -- see the class docstring rationale.
+        """
+        store.add([make_node("a1", 1)])
+        store.client.execute(
+            "UPDATE index_meta SET value = '0' WHERE key = 'schema_version'",
+        )
+        assert store.has_pending_migration() is True
+        rebuild_spy = mocker.spy(PaperlessSqliteVecVectorStore, "_rebuild_into")
+        store.compact(force=True)
+        rebuild_spy.assert_not_called()
+        row = store.client.execute(
+            "SELECT value FROM index_meta WHERE key = 'schema_version'",
+        ).fetchone()
+        assert int(row["value"]) == 0
+
 
 class TestDbFile:
     def test_single_db_file_in_index_dir(self, store, tmp_path: Path) -> None:
@@ -556,6 +596,16 @@ class TestMigrations:
     migration. Test migrations use version numbers starting at
     SCHEMA_VERSION (2) and above so they never collide with the real
     from_version=1/to_version=2 migration already registered in MIGRATIONS.
+
+    The fake structural migrations' apply() fixtures (see
+    test_structural_migration_copies_rows_and_updates_version and
+    test_stop_at_reembed_boundary below) only populate the rebuilt vec0
+    table itself -- they never insert into document_chunks/document_meta on
+    the destination connection. That's fine here: these tests exist to
+    verify the generic dispatch mechanism (version bookkeeping, structural-
+    vs-reembed branching), not full schema correctness of a rebuilt store;
+    the real migration's data completeness is covered separately by
+    TestV1ToV2Migration.
     """
 
     def _schema_version(self, store: PaperlessSqliteVecVectorStore) -> int | None:
@@ -815,8 +865,6 @@ class TestV1ToV2Migration:
         conn = sqlite3.connect(db_path)
         conn.row_factory = sqlite3.Row
         conn.enable_load_extension(True)  # noqa: FBT003
-        import sqlite_vec
-
         sqlite_vec.load(conn)
         conn.enable_load_extension(False)  # noqa: FBT003
         conn.execute("PRAGMA journal_mode=WAL")
@@ -913,8 +961,6 @@ class TestV1ToV2Migration:
         """
         db_dir = tmp_path
         self._build_v1_store(str(db_dir / DB_FILENAME), dim=16)
-        import sqlite_vec
-
         conn = sqlite3.connect(str(db_dir / DB_FILENAME))
         conn.enable_load_extension(True)  # noqa: FBT003
         sqlite_vec.load(conn)
@@ -949,9 +995,6 @@ class TestV1ToV2Migration:
         """
         db_dir = tmp_path
         self._build_v1_store(str(db_dir / DB_FILENAME), dim=16)
-        from paperless_ai.tables import DocumentChunksTable
-        from paperless_ai.tables import DocumentMetaTable
-
         chunks_create_spy = mocker.spy(DocumentChunksTable, "create")
         meta_create_spy = mocker.spy(DocumentMetaTable, "create")
         vec_table_spy = mocker.spy(
@@ -980,10 +1023,6 @@ class TestV1ToV2Migration:
         # Cheap secondary signal, kept alongside the spy assertions above
         # (not in place of them): the migration module's source should never
         # even mention these "current schema" helpers by name.
-        import inspect
-
-        from paperless_ai.migrations import m0001_v1_to_v2
-
         source = inspect.getsource(m0001_v1_to_v2)
         assert "DocumentChunksTable.create" not in source
         assert "DocumentMetaTable.create" not in source

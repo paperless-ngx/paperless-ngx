@@ -319,6 +319,14 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         document_id = node.ref_doc_id or node.metadata.get("document_id")
         return _Row(
             chunk_id=node.node_id,
+            # document_id is required -- int(None) raises TypeError and
+            # int("not-a-number") raises ValueError, both intentional:
+            # fail loudly on a malformed/missing document_id rather than
+            # silently indexing a chunk with no owning document. modified,
+            # below, still uses the str(x or "") sentinel pattern because a
+            # missing modified value is legitimate (vec0 no longer even
+            # stores it -- see document_meta), whereas document_id must
+            # always be present.
             document_id=int(document_id),
             modified=str(node.metadata.get("modified") or ""),
             node_content=json.dumps(meta),
@@ -545,6 +553,12 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         """
         if not self.table_exists():
             return
+        if self.has_pending_migration():
+            logger.warning(
+                "Skipping compact: store has a pending schema migration; "
+                "run check_and_run_migrations() first",
+            )
+            return
         live = DocumentChunksTable.count(self._conn)
         total = IndexMetaTable.get_total_inserts(self._conn) or live
         if not force and total <= max(live, 1) * COMPACT_BLOAT_RATIO:
@@ -566,13 +580,13 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         src_conn: sqlite3.Connection,
         dst_conn: sqlite3.Connection,
         dim: int,
-    ) -> int:
+    ) -> None:
         """Create the vec0 table in ``dst_conn``, copy dim/embed_model from
         ``src_conn``, and stream every live vec0 row, document_chunks row,
-        and document_meta row across. Returns the number of vec0 rows
-        copied. Used by compact() only -- m0001_v1_to_v2 freezes its own
-        copy loop instead of calling this, since this always reflects the
-        *current* schema (see the migration DDL-freezing rule in the spec).
+        and document_meta row across. Used by compact() only --
+        m0001_v1_to_v2 freezes its own copy loop instead of calling this,
+        since this always reflects the *current* schema (see the migration
+        DDL-freezing rule in the spec).
         """
         PaperlessSqliteVecVectorStore._create_vec_table(dst_conn, dim)
         dim_value = IndexMetaTable.get_dim(src_conn)
@@ -613,7 +627,6 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         # Reset the cumulative counter: after a rebuild, total_inserts == live.
         IndexMetaTable.reset_total_inserts(dst_conn, copied)
         dst_conn.execute("COMMIT")
-        return copied
 
     def _swap_in_compact(self, compact_path: str, db_path: str) -> None:
         """Atomically replace the live database with the compacted copy."""
