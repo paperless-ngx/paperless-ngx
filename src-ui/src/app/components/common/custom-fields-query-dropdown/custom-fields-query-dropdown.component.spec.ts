@@ -161,7 +161,7 @@ describe('CustomFieldsQueryDropdownComponent', () => {
   it('should normalize localized monetary comparison values', () => {
     const atom = new CustomFieldQueryAtom([3, 'exact', null])
 
-    component.setMonetaryComparisonValue(atom, '1.234,56')
+    component.setMonetaryValue(atom, '1.234,56')
 
     expect(atom.value).toEqual('1234.56')
   })
@@ -169,7 +169,7 @@ describe('CustomFieldsQueryDropdownComponent', () => {
   it('should preserve API-formatted monetary comparison values', () => {
     const atom = new CustomFieldQueryAtom([3, 'exact', null])
 
-    component.setMonetaryComparisonValue(atom, '1234.56')
+    component.setMonetaryValue(atom, '1234.56')
 
     expect(atom.value).toEqual('1234.56')
   })
