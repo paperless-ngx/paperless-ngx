@@ -8,17 +8,16 @@ from typing import Any
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    from django.contrib.auth.models import User
     from django.db.models import QuerySet
-
-    from paperless_benchmark.seeding import SeededData
 
 
 @dataclass(frozen=True, slots=True)
 class Scenario:
     name: str
     describe: str
-    run: Callable[[SeededData], Any]
-    queryset_for_explain: Callable[[SeededData], QuerySet] | None = None
+    run: Callable[[User], Any]
+    queryset_for_explain: Callable[[User], QuerySet] | None = None
 
 
 _SCENARIOS: dict[str, Scenario] = {}
@@ -44,11 +43,10 @@ def all_scenarios() -> tuple[Scenario, ...]:
     return tuple(_SCENARIOS.values())
 
 
-def _guardian_visibility_query_run(data: SeededData) -> list[int]:
+def _guardian_visibility_query_run(user: User) -> list[int]:
     from documents.models import Document
     from documents.permissions import get_objects_for_user_owner_aware
 
-    user = data.users[0]
     return list(
         get_objects_for_user_owner_aware(
             user,
@@ -58,11 +56,10 @@ def _guardian_visibility_query_run(data: SeededData) -> list[int]:
     )
 
 
-def _guardian_visibility_query_queryset(data: SeededData) -> QuerySet:
+def _guardian_visibility_query_queryset(user: User) -> QuerySet:
     from documents.models import Document
     from documents.permissions import get_objects_for_user_owner_aware
 
-    user = data.users[0]
     return get_objects_for_user_owner_aware(user, "documents.view_document", Document)
 
 
@@ -80,11 +77,10 @@ register(
 )
 
 
-def _permitted_document_ids_run(data: SeededData) -> list[int]:
+def _permitted_document_ids_run(user: User) -> list[int]:
     from documents.models import Document
     from documents.permissions import permitted_document_ids
 
-    user = data.users[0]
     return list(
         Document.objects.filter(id__in=permitted_document_ids(user)).values_list(
             "id",
@@ -93,11 +89,10 @@ def _permitted_document_ids_run(data: SeededData) -> list[int]:
     )
 
 
-def _permitted_document_ids_queryset(data: SeededData) -> QuerySet:
+def _permitted_document_ids_queryset(user: User) -> QuerySet:
     from documents.models import Document
     from documents.permissions import permitted_document_ids
 
-    user = data.users[0]
     return Document.objects.filter(id__in=permitted_document_ids(user))
 
 
