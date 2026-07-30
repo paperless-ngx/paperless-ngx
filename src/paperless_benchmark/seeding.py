@@ -113,12 +113,40 @@ class SeededData:
     storage_paths: tuple[StoragePath, ...]
 
 
+def _grant_model_level_permissions(user) -> None:
+    """
+    Grant perf_target Django model-level view/add/change permissions on
+    Document and Tag, on top of the per-object guardian grants seeding
+    creates elsewhere. DRF's PaperlessObjectPermissions checks model-level
+    permissions before guardian's object-level ones are ever consulted, so
+    without this perf_target gets a blanket 403 on /api/documents/ and
+    /api/tags/ regardless of which documents guardian says it can see.
+    """
+    from django.contrib.auth.models import Permission
+    from django.contrib.contenttypes.models import ContentType
+
+    from documents.models import Document
+    from documents.models import Tag
+
+    for model in (Document, Tag):
+        content_type = ContentType.objects.get_for_model(model)
+        codenames = [
+            f"{action}_{model._meta.model_name}" for action in ("view", "add", "change")
+        ]
+        perms = Permission.objects.filter(
+            content_type=content_type,
+            codename__in=codenames,
+        )
+        user.user_permissions.add(*perms)
+
+
 def _create_users_and_groups(counts: _TierCounts):
     from django.contrib.auth.models import Group
 
     from documents.tests.factories import UserFactory
 
     perf_target = UserFactory.create(username="perf_target")
+    _grant_model_level_permissions(perf_target)
     perf_admin = UserFactory.create(username="perf_admin", superuser=True)
     other_users = tuple(UserFactory.create_batch(counts.other_users))
     groups = tuple(
