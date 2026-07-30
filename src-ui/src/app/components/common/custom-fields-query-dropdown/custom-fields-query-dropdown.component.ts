@@ -1,9 +1,14 @@
-import { NgTemplateOutlet } from '@angular/common'
+import {
+  getLocaleNumberSymbol,
+  NgTemplateOutlet,
+  NumberSymbol,
+} from '@angular/common'
 import {
   Component,
   EventEmitter,
   inject,
   Input,
+  LOCALE_ID,
   Output,
   QueryList,
   signal,
@@ -212,6 +217,7 @@ export class CustomFieldQueriesModel {
 })
 export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPermissions {
   protected customFieldsService = inject(CustomFieldsService)
+  private readonly locale = inject(LOCALE_ID)
 
   public CustomFieldQueryComponentType = CustomFieldQueryElementType
   public CustomFieldQueryOperator = CustomFieldQueryOperator
@@ -375,5 +381,19 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
       return field.extra_data['select_options']
     }
     return []
+  }
+
+  setMonetaryValue(atom: CustomFieldQueryAtom, value: string) {
+    // Normalize the decimal symbol e.g. . vs , by locale
+    const decimalSymbol = getLocaleNumberSymbol(
+      this.locale,
+      NumberSymbol.Decimal
+    )
+    if (decimalSymbol !== '.' && value.includes(decimalSymbol)) {
+      const groupSymbol = getLocaleNumberSymbol(this.locale, NumberSymbol.Group)
+      value = value.split(groupSymbol).join('').split(decimalSymbol).join('.')
+    }
+
+    atom.value = value
   }
 }
