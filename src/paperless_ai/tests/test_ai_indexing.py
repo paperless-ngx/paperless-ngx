@@ -193,7 +193,7 @@ class TestStreamedDocuments:
     shows a real total.
     """
 
-    def test_len_uses_queryset_count(
+    def test_len_and_iter_delegate_to_streaming_queryset_methods(
         self,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
@@ -201,37 +201,25 @@ class TestStreamedDocuments:
         GIVEN:
             - A mock queryset
         WHEN:
-            - len() is called on a _StreamedDocuments wrapping it
+            - A _StreamedDocuments wrapping it is measured and iterated
         THEN:
-            - The queryset's count() is used, not a materializing len()
+            - len() uses count() (not a materializing len()), and iteration
+              uses .iterator(chunk_size=...) (not plain iteration, which
+              would materialize prefetches for the whole queryset at once)
         """
         mock_queryset = mocker.MagicMock()
         mock_queryset.count.return_value = 42
-
-        assert len(indexing._StreamedDocuments(mock_queryset)) == 42
-        mock_queryset.count.assert_called_once_with()
-
-    def test_iter_streams_via_queryset_iterator(
-        self,
-        mocker: pytest_mock.MockerFixture,
-    ) -> None:
-        """
-        GIVEN:
-            - A mock queryset whose .iterator() yields documents
-        WHEN:
-            - A _StreamedDocuments wrapping it is iterated
-        THEN:
-            - .iterator() is called with the streaming chunk size (not
-              plain iteration, which would materialize prefetches for the
-              whole queryset instead of one batch at a time), and its
-              results are yielded through unchanged
-        """
-        mock_queryset = mocker.MagicMock()
         mock_queryset.iterator.return_value = iter(["doc-1", "doc-2"])
+        streamed = indexing._StreamedDocuments(mock_queryset)
 
-        result = list(indexing._StreamedDocuments(mock_queryset))
-
-        assert result == ["doc-1", "doc-2"]
+        assert len(streamed) == 42
+        assert list(streamed) == ["doc-1", "doc-2"]
+        # count.call_count isn't asserted exactly: list()'s own size-hint
+        # optimization calls len(streamed) again internally, on top of the
+        # explicit len() call above -- both legitimately delegate to
+        # count(), so only the delegation itself (not the call count) is
+        # the thing being verified here.
+        mock_queryset.count.assert_called_with()
         mock_queryset.iterator.assert_called_once_with(
             chunk_size=indexing._INDEX_STREAM_CHUNK_SIZE,
         )
