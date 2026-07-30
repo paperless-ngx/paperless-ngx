@@ -966,6 +966,35 @@ class TestLlmIndexLocking:
 
         mock_store.drop_table.assert_called_once()
 
+    def test_update_llm_index_skips_when_migration_check_deferred(
+        self,
+        temp_llm_index_dir: Path,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """A migration check deferred by a reader-lock timeout must short-
+        circuit before the second write_store() block (document scanning,
+        add/upsert, compaction) ever runs -- that block would otherwise
+        write against a store still on its old schema.
+        """
+        mock_store = MagicMock()
+        mock_store.has_pending_migration.return_value = True
+        write_store_mock = mocker.patch(
+            "paperless_ai.indexing.write_store",
+            return_value=mocker.MagicMock(
+                __enter__=mocker.MagicMock(return_value=mock_store),
+                __exit__=mocker.MagicMock(return_value=False),
+            ),
+        )
+        mocker.patch(
+            "paperless_ai.indexing._exclude_readers",
+            side_effect=Timeout("test"),
+        )
+
+        result = indexing.update_llm_index(rebuild=False)
+
+        assert "deferred" in result
+        write_store_mock.assert_called_once()
+
 
 @pytest.mark.django_db
 @pytest.mark.django_db
