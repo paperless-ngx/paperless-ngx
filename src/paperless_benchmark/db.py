@@ -31,6 +31,14 @@ def _reset_table_names() -> list[str]:
 
 
 def _delete_all_users_and_groups() -> None:
+    # ASSUMPTION: this tool assumes a disposable benchmark database, never
+    # point it at a real install. This deletes EVERY user and group in the
+    # database (not just benchmark-created ones) -- there is no way to
+    # distinguish "real" users from seeded ones, so this is only safe against
+    # a database that exists solely to run this benchmarking tool. The
+    # `benchmark seed --reset` CLI path requires an explicit
+    # `--yes-i-know-this-wipes-the-database` flag before reaching here; do
+    # not remove that guard.
     from django.contrib.auth import get_user_model
     from django.contrib.auth.models import Group
 
@@ -95,17 +103,34 @@ def reset_benchmark_data() -> None:
 def capture_explain(queryset: QuerySet) -> str:
     """
     Return the query plan for `queryset` using the current backend's
-    explain facility. PostgreSQL and MariaDB both support EXPLAIN ANALYZE
-    (real execution stats). SQLite only supports EXPLAIN QUERY PLAN (the
-    chosen plan, not real timing/row counts) -- that output is clearly
-    labeled rather than silently looking equivalent to the other two
-    backends' output.
+    explain facility. PostgreSQL supports `EXPLAIN ANALYZE {sql}` (real
+    execution stats). MariaDB does NOT accept that syntax -- verified
+    against a real MariaDB 12.3 container: `EXPLAIN ANALYZE {sql}` raises a
+    1064 syntax error, while MariaDB's own `ANALYZE {sql}` form (no
+    `EXPLAIN` keyword) works and returns real per-row execution stats
+    (`r_rows`, `r_filtered`, etc. columns) -- this is MariaDB's
+    EXPLAIN-ANALYZE-equivalent, distinct from MySQL 8.0.18+'s
+    `EXPLAIN ANALYZE` syntax, which MariaDB does not implement. SQLite only
+    supports EXPLAIN QUERY PLAN (the chosen plan, not real timing/row
+    counts) -- that output is clearly labeled rather than silently looking
+    equivalent to the other two backends' output.
     """
     sql, params = queryset.query.sql_with_params()
     with connection.cursor() as cursor:
-        if connection.vendor in ("postgresql", "mysql"):
+        if connection.vendor == "postgresql":
             cursor.execute(f"EXPLAIN ANALYZE {sql}", params)
             return "\n".join(str(row[0]) for row in cursor.fetchall())
+        if connection.vendor == "mysql":
+            # MariaDB also reports vendor == "mysql" under Django's mysql
+            # backend. Unlike MySQL 8.0.18+, MariaDB has no `EXPLAIN
+            # ANALYZE` syntax -- its equivalent is `ANALYZE <statement>`.
+            cursor.execute(f"ANALYZE {sql}", params)
+            columns = [c[0] for c in cursor.description]
+            header = " | ".join(columns)
+            rows = "\n".join(
+                " | ".join(str(c) for c in row) for row in cursor.fetchall()
+            )
+            return f"{header}\n{rows}"
         cursor.execute(f"EXPLAIN QUERY PLAN {sql}", params)
         rows = "\n".join(" | ".join(str(c) for c in row) for row in cursor.fetchall())
         return f"(plan only -- no execution stats on SQLite)\n{rows}"
