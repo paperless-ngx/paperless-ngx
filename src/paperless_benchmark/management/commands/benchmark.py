@@ -27,7 +27,7 @@ class Command(BaseCommand):
             "--tier",
             choices=["home", "medium", "large"],
             default="medium",
-            help="Dataset scale tier for `seed` and `profile` (default: medium).",
+            help="Dataset scale tier for `seed` (default: medium).",
         )
         parser.add_argument(
             "--reset",
@@ -131,11 +131,12 @@ class Command(BaseCommand):
             )
 
     def _handle_profile(self, options: dict[str, Any]) -> None:
+        from django.contrib.auth import get_user_model
+
         from paperless_benchmark.db import capture_explain
         from paperless_benchmark.harness import run_profile
         from paperless_benchmark.results import append_history
         from paperless_benchmark.scenarios import get as get_scenario
-        from paperless_benchmark.seeding import seed_benchmark_dataset
 
         if not options["scenario"]:
             raise CommandError(
@@ -143,23 +144,32 @@ class Command(BaseCommand):
             )
 
         scenario = get_scenario(options["scenario"])
-        data = seed_benchmark_dataset(options["tier"], seed=options["seed"])
 
-        profile = run_profile(lambda: scenario.run(data), repeat=options["repeat"])
+        user_model = get_user_model()
+        try:
+            perf_target = user_model.objects.get(username="perf_target")
+        except user_model.DoesNotExist as e:
+            raise CommandError(
+                "No benchmark dataset found. Run `manage.py benchmark seed` first.",
+            ) from e
+
+        profile = run_profile(
+            lambda: scenario.run(perf_target),
+            repeat=options["repeat"],
+        )
         self.stdout.write(
             f"{scenario.name}: best={profile.best_seconds:.4f}s "
-            f"queries={profile.query_count} (tier={options['tier']})",
+            f"queries={profile.query_count}",
         )
 
         if options["explain"] and scenario.queryset_for_explain is not None:
-            plan = capture_explain(scenario.queryset_for_explain(data))
+            plan = capture_explain(scenario.queryset_for_explain(perf_target))
             self.stdout.write(plan)
 
         append_history(
             {
                 "mode": "profile",
                 "scenario": scenario.name,
-                "tier": options["tier"],
                 "best_seconds": profile.best_seconds,
                 "query_count": profile.query_count,
             },
