@@ -17,6 +17,7 @@ from paperless_ai.migrations import Migration
 from paperless_ai.migrations import m0001_v1_to_v2
 from paperless_ai.tables import DocumentChunksTable
 from paperless_ai.tables import DocumentMetaTable
+from paperless_ai.vector_store import _MAX_IN_VALUES
 from paperless_ai.vector_store import DB_FILENAME
 from paperless_ai.vector_store import DEFAULT_TABLE_NAME
 from paperless_ai.vector_store import SCHEMA_VERSION
@@ -296,8 +297,47 @@ class TestBuildWhere:
         assert where == "1 = 0"
         assert params == []
 
-    def test_query_with_untranslatable_filter_returns_no_rows(self, store) -> None:
-        store.add([make_node("a1", 1), make_node("b1", 2)])
+    def test_fails_closed_when_in_filter_exceeds_max_values(
+        self,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - An IN filter with more values than _MAX_IN_VALUES (SQLite's
+              own bound-parameter limit is 32766; this guard sits below
+              that with headroom for the query's other bound parameters)
+        WHEN:
+            - _build_where() translates it to SQL
+        THEN:
+            - It fails closed ("1 = 0", no params) instead of building an
+              IN clause SQLite would reject, and logs a warning -- this
+              filter scopes document access, so refusing to build it must
+              never widen the scope to "everything" by accident
+        """
+        oversized = _in_filter([str(i) for i in range(_MAX_IN_VALUES + 1)])
+
+        with caplog.at_level("WARNING"):
+            where, params = _build_where(oversized)
+
+        assert where == "(1 = 0)"
+        assert params == []
+        assert "document_id" in caplog.text
+
+    def test_query_with_untranslatable_filter_returns_no_rows(
+        self,
+        store: PaperlessSqliteVecVectorStore,
+    ) -> None:
+        """
+        GIVEN:
+            - A store with one chunk each for documents 1 and 2
+        WHEN:
+            - A query and a get_nodes() call are issued with a filter whose
+              only clause is an untranslatable nested MetadataFilters
+        THEN:
+            - Neither call raises, and both fail closed by returning no rows
+              (rather than emitting invalid or unfiltered SQL)
+        """
+        store.add([make_node("a1", "1"), make_node("b1", "2")])
         nested = MetadataFilters(
             filters=[
                 MetadataFilter(

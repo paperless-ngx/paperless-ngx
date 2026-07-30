@@ -75,6 +75,17 @@ class _Row(NamedTuple):
     embedding: bytes
 
 
+# _build_where(): the largest IN value list translated into bound SQL
+# parameters. SQLite's own hard limit (SQLITE_MAX_VARIABLE_NUMBER) is 32766
+# by default; this leaves headroom below that for the query's other bound
+# parameters (the embedding blob, k, and any NE clause) and for the limit
+# itself to move. An IN filter this large should not happen in practice --
+# callers are expected to pass None (no filter) rather than every id when
+# the filter would not actually narrow anything -- so this is a guard
+# against a future regression, not a normal code path.
+_MAX_IN_VALUES = 32700
+
+
 def _pack(embedding: Sequence[float]) -> bytes:
     return struct.pack(f"{len(embedding)}f", *embedding)
 
@@ -117,6 +128,21 @@ def _build_where(filters: MetadataFilters | None) -> tuple[str, list[int]]:
         if f.operator == FilterOperator.IN:
             values = [int(v) for v in f.value]  # type: ignore[union-attr]
             if not values:  # pragma: no cover
+                clauses.append("1 = 0")
+                continue
+            if len(values) > _MAX_IN_VALUES:
+                # Fail closed (see the empty-clauses case below) rather than
+                # let SQLite raise "too many SQL variables" past its own
+                # limit: this filter scopes document access, so an IN list
+                # too large to safely bind must match no rows, never widen
+                # the scope to "everything" by accident.
+                logger.warning(
+                    "Refusing to build an IN filter on %r with %d values "
+                    "(over the %d-value safety limit); returning no rows.",
+                    f.key,
+                    len(values),
+                    _MAX_IN_VALUES,
+                )
                 clauses.append("1 = 0")
                 continue
             placeholders = ",".join("?" for _ in values)
