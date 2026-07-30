@@ -12,21 +12,28 @@ use it instead of writing new one-off seed/timing scripts.
 ## Command reference
 
 ```
-manage.py benchmark seed --tier {home,medium,large} [--reset] [--seed N]
+manage.py benchmark seed --tier {home,medium,large} [--reset --yes-i-know-this-wipes-the-database] [--seed N]
 manage.py benchmark run --repeat 5 [--label baseline]
 manage.py benchmark profile <scenario_name> [--repeat 5] [--explain]
 manage.py benchmark list-scenarios
 ```
 
 - **`seed`** builds a realistic dataset at one of three scales: `home` (500
-  documents — fast, use this for iteration), `medium` (20,000), `large`
-  (360,000 — matches the scale reported in real large-install bug reports;
-  slow, only use it when a finding needs confirming at real scale). `--reset`
-  wipes any previously-seeded benchmark data first — always pass it unless you
-  specifically want to layer more data onto an existing seed. `seed` creates
-  two named users, `perf_target` (mixed owned/shared documents, realistic
-  guardian permission grants) and `perf_admin` (superuser), plus a general
-  user/group pool with realistic permission-row ratios.
+  documents — fast, use this for iteration), `medium` (20,000 — the default
+  when `--tier` is omitted; a multi-minute seed), `large` (360,000 — matches
+  the scale reported in real large-install bug reports; slow, only use it
+  when a finding needs confirming at real scale). `--reset` wipes any
+  previously-seeded benchmark data first — but it is destructive and
+  irreversible: it deletes **all** users, **all** groups, and **all**
+  documents/tags/correspondents/document types/storage paths in the target
+  database, not just benchmark-created rows. Only run it against a disposable
+  benchmark database, never a real install. Because of that, `--reset` also
+  requires passing `--yes-i-know-this-wipes-the-database` in the same
+  invocation, or the command raises an error and does nothing. Omit both
+  flags if you want to layer more data onto an existing seed instead. `seed`
+  creates two named users, `perf_target` (mixed owned/shared documents,
+  realistic guardian permission grants) and `perf_admin` (superuser), plus a
+  general user/group pool with realistic permission-row ratios.
 - **`run`** times the 3 built-in API endpoint benchmarks
   (`/api/documents/`, `/api/documents/?page_size=50`, `/api/tags/?page_size=100000`) for both
   `perf_target` and `perf_admin`, reporting min/median/max wall-clock and SQL
@@ -83,11 +90,21 @@ a feature branch that gets merged and closed:
 
 ## Reading query-plan output
 
-- **PostgreSQL/MariaDB** `EXPLAIN ANALYZE`: look for `Seq Scan` on a large
-  table (missing index), a large gap between `rows=N` (planner's estimate)
-  and the actual row count in parentheses (stale statistics or a bad
-  cardinality estimate), and nested-loop joins driven by an outer relation
-  with many rows (usually the N+1 pattern this tool exists to catch).
+- **PostgreSQL** `EXPLAIN ANALYZE`: look for `Seq Scan` on a large table
+  (missing index), a large gap between `rows=N` (planner's estimate) and the
+  actual row count in parentheses (stale statistics or a bad cardinality
+  estimate), and nested-loop joins driven by an outer relation with many
+  rows (usually the N+1 pattern this tool exists to catch).
+- **MariaDB**: verified against a real MariaDB 12.3 container that MariaDB
+  does NOT accept MySQL 8.0.18+'s `EXPLAIN ANALYZE` syntax (it's a 1064
+  syntax error) -- `capture_explain()` instead runs MariaDB's own
+  `ANALYZE <statement>` form (no `EXPLAIN` keyword), which returns a
+  tabular plan with real per-row execution columns: `rows` (estimate) vs.
+  `r_rows` (actual), and `filtered` vs. `r_filtered`. A large gap between
+  `rows` and `r_rows`, or `type: ALL` (full table scan) on a large table,
+  are the signals to look for -- the same underlying concerns as Postgres's
+  `Seq Scan`/estimate-vs-actual gap, just in MariaDB's column-based output
+  instead of Postgres's nested-tree text format.
 - **SQLite** `EXPLAIN QUERY PLAN`: no real timing/row-count data, only the
   chosen access path (`SCAN` vs `SEARCH`, which index if any). Useful for
   confirming an index is even being considered, not for judging real-world
@@ -97,6 +114,58 @@ a feature branch that gets merged and closed:
   keeps the same wall-clock time but drops query count from O(n) to O(1) is
   still a real, durable improvement — timing alone is noisy and
   environment-dependent, query count is not.
+
+## Cleaning up after an interrupted run
+
+If a `seed`/`run`/`profile` invocation gets killed mid-run (Ctrl-C, `kill -9`,
+a timed-out SSH session, etc.), check whether it left anything behind before
+trusting the next benchmark's numbers. This was verified for real: a
+`benchmark seed --tier large --reset ...` was started against both a fresh
+PostgreSQL 18 container and a fresh MariaDB 12.3 container and `kill -9`'d a
+few seconds into document seeding. In both cases, the database-side
+connection disappeared immediately -- no stuck backend, no lingering query,
+no held lock was observed in either backend once the killed process's PID
+was confirmed gone. That said, this was one interruption point (mid
+bulk-seed, between chunks); a run killed mid-query, or a driver/network
+hiccup that doesn't cleanly close the socket, could behave differently, so
+still check before trusting a number if any run in the session was
+interrupted:
+
+- **PostgreSQL**: look for leftover connections against the benchmark
+  database:
+
+  ```sql
+  SELECT pid, state, query, query_start
+  FROM pg_stat_activity
+  WHERE datname = current_database() AND pid <> pg_backend_pid();
+  ```
+
+  If a stuck backend shows up, clear it with:
+
+  ```sql
+  SELECT pg_terminate_backend(pid)
+  FROM pg_stat_activity
+  WHERE datname = current_database() AND pid <> pg_backend_pid();
+  ```
+
+- **MariaDB**: look for leftover connections/queries:
+
+  ```sql
+  SHOW FULL PROCESSLIST;
+  ```
+
+  If a stuck connection shows up (anything other than your current admin
+  session), clear it with:
+
+  ```sql
+  KILL <id>;
+  ```
+
+A stray connection left running concurrently with a subsequent benchmark run
+would add real, contaminating load (extra queries competing for the same
+rows, possibly held locks slowing the next run's timings) -- cheap to rule
+out, expensive to silently trust a number that was actually measured
+alongside a zombie connection.
 
 ## When to graduate a one-off finding into a permanent scenario
 

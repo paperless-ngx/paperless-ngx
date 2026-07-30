@@ -31,6 +31,9 @@ def run_profile(fn: Callable[[], T], *, repeat: int = 5) -> ProfileResult[T]:
     time across all repeats, since the first call(s) can be skewed by
     connection warm-up or cold caches.
     """
+    if repeat < 1:
+        raise ValueError("repeat must be >= 1")
+
     all_seconds: list[float] = []
     result: T | None = None
     query_count = 0
@@ -41,7 +44,10 @@ def run_profile(fn: Callable[[], T], *, repeat: int = 5) -> ProfileResult[T]:
             all_seconds.append(time.perf_counter() - start)
         if i == repeat - 1:
             query_count = len(ctx.captured_queries)
-    assert result is not None  # repeat >= 1 guarantees at least one assignment
+    # Purely a type-narrowing aid for the type checker: the `repeat < 1`
+    # guard above already turns the one case that could leave `result`
+    # unset into a clear ValueError, so this is unreachable in practice.
+    assert result is not None
     return ProfileResult(
         best_seconds=min(all_seconds),
         all_seconds=tuple(all_seconds),
