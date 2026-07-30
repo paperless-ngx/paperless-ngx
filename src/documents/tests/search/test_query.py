@@ -11,16 +11,15 @@ import pytest
 import tantivy
 import time_machine
 
-from documents.search._query import _date_only_range
-from documents.search._query import _datetime_range
+from documents.search._dates import _date_only_range
+from documents.search._dates import _datetime_range
 from documents.search._query import build_permission_filter
-from documents.search._query import normalize_query
 from documents.search._query import parse_simple_text_highlight_query
 from documents.search._query import parse_user_query
-from documents.search._query import rewrite_natural_date_keywords
 from documents.search._schema import build_schema
 from documents.search._tokenizer import register_tokenizers
 from documents.search._translate import InvalidDateQuery
+from documents.search._translate import translate_query
 
 if TYPE_CHECKING:
     from django.contrib.auth.base_user import AbstractBaseUser
@@ -59,7 +58,7 @@ class TestCreatedDateField:
     )
     @time_machine.travel(datetime(2026, 3, 28, 15, 30, tzinfo=UTC), tick=False)
     def test_today(self, tz: tzinfo, expected_lo: str, expected_hi: str) -> None:
-        lo, hi = _range(rewrite_natural_date_keywords("created:today", tz), "created")
+        lo, hi = _range(translate_query("created:today", tz), "created")
         assert lo == expected_lo
         assert hi == expected_hi
 
@@ -67,7 +66,7 @@ class TestCreatedDateField:
     def test_today_auckland_ahead_of_utc(self) -> None:
         # UTC 03:00 -> Auckland (UTC+13) = 16:00 same date; local date = 2026-03-28
         lo, _ = _range(
-            rewrite_natural_date_keywords("created:today", AUCKLAND),
+            translate_query("created:today", AUCKLAND),
             "created",
         )
         assert lo == "2026-03-28T00:00:00Z"
@@ -129,7 +128,7 @@ class TestCreatedDateField:
     ) -> None:
         # 2026-03-28 is Saturday; Mon-Sun week calculation built into expectations
         query = f"{field}:{keyword}"
-        lo, hi = _range(rewrite_natural_date_keywords(query, UTC), field)
+        lo, hi = _range(translate_query(query, UTC), field)
         assert lo == expected_lo
         assert hi == expected_hi
 
@@ -137,7 +136,7 @@ class TestCreatedDateField:
     def test_this_month_december_wraps_to_next_year(self) -> None:
         # December: next month must roll over to January 1 of next year
         lo, hi = _range(
-            rewrite_natural_date_keywords("created:this month", UTC),
+            translate_query("created:this month", UTC),
             "created",
         )
         assert lo == "2026-12-01T00:00:00Z"
@@ -147,7 +146,7 @@ class TestCreatedDateField:
     def test_last_month_january_wraps_to_previous_year(self) -> None:
         # January: last month must roll back to December 1 of previous year
         lo, hi = _range(
-            rewrite_natural_date_keywords("created:previous month", UTC),
+            translate_query("created:previous month", UTC),
             "created",
         )
         assert lo == "2025-12-01T00:00:00Z"
@@ -156,7 +155,7 @@ class TestCreatedDateField:
     @time_machine.travel(datetime(2026, 7, 15, 12, 0, tzinfo=UTC), tick=False)
     def test_previous_quarter(self) -> None:
         lo, hi = _range(
-            rewrite_natural_date_keywords('created:"previous quarter"', UTC),
+            translate_query('created:"previous quarter"', UTC),
             "created",
         )
         assert lo == "2026-04-01T00:00:00Z"
@@ -176,7 +175,7 @@ class TestDateTimeFields:
     @time_machine.travel(datetime(2026, 3, 28, 15, 30, tzinfo=UTC), tick=False)
     def test_added_today_eastern(self) -> None:
         # EDT = UTC-4; local midnight 2026-03-28 00:00 EDT = 2026-03-28 04:00 UTC
-        lo, hi = _range(rewrite_natural_date_keywords("added:today", EASTERN), "added")
+        lo, hi = _range(translate_query("added:today", EASTERN), "added")
         assert lo == "2026-03-28T04:00:00Z"
         assert hi == "2026-03-29T04:00:00Z"
 
@@ -184,14 +183,14 @@ class TestDateTimeFields:
     def test_added_today_auckland_midnight_crossing(self) -> None:
         # UTC 02:00 on 2026-03-29 -> Auckland (UTC+13) = 2026-03-29 15:00 local
         # Auckland midnight = UTC 2026-03-28 11:00
-        lo, hi = _range(rewrite_natural_date_keywords("added:today", AUCKLAND), "added")
+        lo, hi = _range(translate_query("added:today", AUCKLAND), "added")
         assert lo == "2026-03-28T11:00:00Z"
         assert hi == "2026-03-29T11:00:00Z"
 
     @time_machine.travel(datetime(2026, 3, 28, 15, 0, tzinfo=UTC), tick=False)
     def test_modified_today_utc(self) -> None:
         lo, hi = _range(
-            rewrite_natural_date_keywords("modified:today", UTC),
+            translate_query("modified:today", UTC),
             "modified",
         )
         assert lo == "2026-03-28T00:00:00Z"
@@ -246,14 +245,14 @@ class TestDateTimeFields:
         expected_hi: str,
     ) -> None:
         # 2026-03-28 is Saturday; weekday()==5 so Monday=2026-03-23
-        lo, hi = _range(rewrite_natural_date_keywords(f"added:{keyword}", UTC), "added")
+        lo, hi = _range(translate_query(f"added:{keyword}", UTC), "added")
         assert lo == expected_lo
         assert hi == expected_hi
 
     @time_machine.travel(datetime(2026, 12, 15, 12, 0, tzinfo=UTC), tick=False)
     def test_this_month_december_wraps_to_next_year(self) -> None:
         # December: next month wraps to January of next year
-        lo, hi = _range(rewrite_natural_date_keywords("added:this month", UTC), "added")
+        lo, hi = _range(translate_query("added:this month", UTC), "added")
         assert lo == "2026-12-01T00:00:00Z"
         assert hi == "2027-01-01T00:00:00Z"
 
@@ -261,7 +260,7 @@ class TestDateTimeFields:
     def test_last_month_january_wraps_to_previous_year(self) -> None:
         # January: last month wraps back to December of previous year
         lo, hi = _range(
-            rewrite_natural_date_keywords("added:previous month", UTC),
+            translate_query("added:previous month", UTC),
             "added",
         )
         assert lo == "2025-12-01T00:00:00Z"
@@ -297,7 +296,7 @@ class TestDateTimeFields:
         expected_lo: str,
         expected_hi: str,
     ) -> None:
-        lo, hi = _range(rewrite_natural_date_keywords(query, UTC), "added")
+        lo, hi = _range(translate_query(query, UTC), "added")
         assert lo == expected_lo
         assert hi == expected_hi
 
@@ -311,20 +310,20 @@ class TestWhooshQueryRewriting:
 
     @time_machine.travel(datetime(2026, 3, 28, 15, 0, tzinfo=UTC), tick=False)
     def test_compact_date_shim_rewrites_to_iso(self) -> None:
-        result = rewrite_natural_date_keywords("created:20240115120000", UTC)
+        result = translate_query("created:20240115120000", UTC)
         assert "2024-01-15" in result
         assert "20240115120000" not in result
 
     @time_machine.travel(datetime(2026, 3, 28, 15, 0, tzinfo=UTC), tick=False)
     def test_relative_range_shim_removes_now(self) -> None:
-        result = rewrite_natural_date_keywords("added:[now-7d TO now]", UTC)
+        result = translate_query("added:[now-7d TO now]", UTC)
         assert "now" not in result
         assert "2026-03-" in result
 
     @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
     def test_bracket_minus_7_days(self) -> None:
         lo, hi = _range(
-            rewrite_natural_date_keywords("added:[-7 days to now]", UTC),
+            translate_query("added:[-7 days to now]", UTC),
             "added",
         )
         assert lo == "2026-03-21T12:00:00Z"
@@ -333,7 +332,7 @@ class TestWhooshQueryRewriting:
     @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
     def test_bracket_minus_1_week(self) -> None:
         lo, hi = _range(
-            rewrite_natural_date_keywords("added:[-1 week to now]", UTC),
+            translate_query("added:[-1 week to now]", UTC),
             "added",
         )
         assert lo == "2026-03-21T12:00:00Z"
@@ -343,7 +342,7 @@ class TestWhooshQueryRewriting:
     def test_bracket_minus_1_month_uses_relativedelta(self) -> None:
         # relativedelta(months=1) from 2026-03-28 = 2026-02-28 (not 29)
         lo, hi = _range(
-            rewrite_natural_date_keywords("created:[-1 month to now]", UTC),
+            translate_query("created:[-1 month to now]", UTC),
             "created",
         )
         assert lo == "2026-02-28T12:00:00Z"
@@ -352,7 +351,7 @@ class TestWhooshQueryRewriting:
     @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
     def test_bracket_minus_1_year(self) -> None:
         lo, hi = _range(
-            rewrite_natural_date_keywords("modified:[-1 year to now]", UTC),
+            translate_query("modified:[-1 year to now]", UTC),
             "modified",
         )
         assert lo == "2025-03-28T12:00:00Z"
@@ -361,7 +360,7 @@ class TestWhooshQueryRewriting:
     @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
     def test_bracket_plural_unit_hours(self) -> None:
         lo, hi = _range(
-            rewrite_natural_date_keywords("added:[-3 hours to now]", UTC),
+            translate_query("added:[-3 hours to now]", UTC),
             "added",
         )
         assert lo == "2026-03-28T09:00:00Z"
@@ -369,7 +368,7 @@ class TestWhooshQueryRewriting:
 
     @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
     def test_bracket_case_insensitive(self) -> None:
-        result = rewrite_natural_date_keywords("added:[-1 WEEK TO NOW]", UTC)
+        result = translate_query("added:[-1 WEEK TO NOW]", UTC)
         assert "now" not in result.lower()
         lo, hi = _range(result, "added")
         assert lo == "2026-03-21T12:00:00Z"
@@ -379,7 +378,7 @@ class TestWhooshQueryRewriting:
     def test_relative_range_swaps_bounds_when_lo_exceeds_hi(self) -> None:
         # [now+1h TO now-1h] has lo > hi before substitution; they must be swapped
         lo, hi = _range(
-            rewrite_natural_date_keywords("added:[now+1h TO now-1h]", UTC),
+            translate_query("added:[now+1h TO now-1h]", UTC),
             "added",
         )
         assert lo == "2026-03-28T11:00:00Z"
@@ -387,14 +386,14 @@ class TestWhooshQueryRewriting:
 
     def test_8digit_created_date_field_always_uses_utc_midnight(self) -> None:
         # created is a DateField: boundaries are always UTC midnight, no TZ offset
-        result = rewrite_natural_date_keywords("created:20231201", EASTERN)
+        result = translate_query("created:20231201", EASTERN)
         lo, hi = _range(result, "created")
         assert lo == "2023-12-01T00:00:00Z"
         assert hi == "2023-12-02T00:00:00Z"
 
     def test_8digit_added_datetime_field_converts_local_midnight_to_utc(self) -> None:
         # added is DateTimeField: midnight Dec 1 Eastern (EST = UTC-5) = 05:00 UTC
-        result = rewrite_natural_date_keywords("added:20231201", EASTERN)
+        result = translate_query("added:20231201", EASTERN)
         lo, hi = _range(result, "added")
         assert lo == "2023-12-01T05:00:00Z"
         assert hi == "2023-12-02T05:00:00Z"
@@ -402,7 +401,7 @@ class TestWhooshQueryRewriting:
     def test_8digit_modified_datetime_field_converts_local_midnight_to_utc(
         self,
     ) -> None:
-        result = rewrite_natural_date_keywords("modified:20231201", EASTERN)
+        result = translate_query("modified:20231201", EASTERN)
         lo, hi = _range(result, "modified")
         assert lo == "2023-12-01T05:00:00Z"
         assert hi == "2023-12-02T05:00:00Z"
@@ -412,7 +411,7 @@ class TestWhooshQueryRewriting:
         # (e.g. month=13) so the API can surface a 400 telling the user the date
         # is malformed instead of silently returning zero results.
         with pytest.raises(InvalidDateQuery) as exc_info:
-            rewrite_natural_date_keywords("added:20231340", UTC)
+            translate_query("added:20231340", UTC)
         assert exc_info.value.field == "added"
         assert exc_info.value.value == "20231340"
 
@@ -579,7 +578,7 @@ class TestYearRangeRewriting:
         expected_lo: str,
         expected_hi: str,
     ) -> None:
-        result = rewrite_natural_date_keywords(query, UTC)
+        result = translate_query(query, UTC)
         lo, hi = _range(result, field)
         assert lo == expected_lo
         assert hi == expected_hi
@@ -587,14 +586,14 @@ class TestYearRangeRewriting:
     def test_reversed_year_range_is_swapped(self) -> None:
         # A reversed range must not yield lo > hi, which Tantivy treats as an
         # empty range (silently zero results). The bounds are swapped instead.
-        result = rewrite_natural_date_keywords("created:[2025 TO 2020]", UTC)
+        result = translate_query("created:[2025 TO 2020]", UTC)
         lo, hi = _range(result, "created")
         assert lo == "2020-01-01T00:00:00Z"
         assert hi == "2026-01-01T00:00:00Z"
 
     def test_year_range_in_complex_boolean_query(self) -> None:
         query = "tag:steuer AND (title:2020 OR (NOT title:2019 AND NOT title:2018 AND created:[2020 TO 2020]))"
-        result = rewrite_natural_date_keywords(query, UTC)
+        result = translate_query(query, UTC)
         lo, hi = _range(result, "created")
         assert lo == "2020-01-01T00:00:00Z"
         assert hi == "2021-01-01T00:00:00Z"
@@ -604,7 +603,7 @@ class TestYearRangeRewriting:
 
     def test_already_iso_date_range_passes_through_unchanged(self) -> None:
         original = "created:[2020-01-01T00:00:00Z TO 2021-01-01T00:00:00Z]"
-        assert rewrite_natural_date_keywords(original, UTC) == original
+        assert translate_query(original, UTC) == original
 
     def test_8digit_in_brackets_not_matched_as_year_range(self) -> None:
         # [YYYYMMDD TO YYYYMMDD]: the translation layer converts 8-digit bounds to
@@ -613,7 +612,7 @@ class TestYearRangeRewriting:
         # This is the correct and accepted behavior: old compact form becomes a
         # proper Tantivy-parseable ISO range.
         original = "created:[20200101 TO 20201231]"
-        result = rewrite_natural_date_keywords(original, UTC)
+        result = translate_query(original, UTC)
         lo, hi = _range(result, "created")
         assert lo == "2020-01-01T00:00:00Z"
         assert hi == "2021-01-01T00:00:00Z"
@@ -636,7 +635,7 @@ class TestNonDateFieldsNotRewritten:
         ],
     )
     def test_8digit_on_integer_field_passes_through_unchanged(self, query: str) -> None:
-        assert rewrite_natural_date_keywords(query, EASTERN) == query
+        assert translate_query(query, EASTERN) == query
 
     @pytest.mark.parametrize(
         "query",
@@ -650,12 +649,12 @@ class TestNonDateFieldsNotRewritten:
         self,
         query: str,
     ) -> None:
-        assert rewrite_natural_date_keywords(query, UTC) == query
+        assert translate_query(query, UTC) == query
 
     def test_unknown_field_keyword_passes_through_unchanged(self) -> None:
         # foobar is not a date field: 'foobar:today' must not become a date range,
         # which Tantivy would otherwise reject as an unknown/typed field.
-        assert rewrite_natural_date_keywords("foobar:today", UTC) == "foobar:today"
+        assert translate_query("foobar:today", UTC) == "foobar:today"
 
 
 class TestPassthrough:
@@ -663,37 +662,39 @@ class TestPassthrough:
 
     def test_bare_keyword_no_field_prefix_unchanged(self) -> None:
         # Bare 'today' with no field: prefix passes through unchanged
-        result = rewrite_natural_date_keywords("bank statement today", UTC)
+        result = translate_query("bank statement today", UTC)
         assert "today" in result
 
     def test_unrelated_query_unchanged(self) -> None:
-        assert rewrite_natural_date_keywords("title:invoice", UTC) == "title:invoice"
+        assert translate_query("title:invoice", UTC) == "title:invoice"
 
 
 class TestNormalizeQuery:
-    """normalize_query expands comma-separated values and collapses whitespace."""
+    """translate_query expands comma-separated values and collapses whitespace."""
 
     def test_normalize_expands_comma_separated_tags(self) -> None:
-        assert normalize_query("tag:foo,bar") == "tag:foo AND tag:bar"
+        assert translate_query("tag:foo,bar", UTC) == "tag:foo AND tag:bar"
 
     def test_normalize_comma_between_range_expressions(self) -> None:
         # Comma-separated field range expressions (Whoosh v2 syntax) must be
         # converted to AND so Tantivy does not receive an invalid comma.
         q = "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z],added:[2026-05-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
-        assert normalize_query(q) == (
+        assert translate_query(q, UTC) == (
             "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
             " AND "
             "added:[2026-05-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
         )
 
     def test_normalize_expands_three_values(self) -> None:
-        assert normalize_query("tag:foo,bar,baz") == "tag:foo AND tag:bar AND tag:baz"
+        assert (
+            translate_query("tag:foo,bar,baz", UTC) == "tag:foo AND tag:bar AND tag:baz"
+        )
 
     def test_normalize_collapses_whitespace(self) -> None:
-        assert normalize_query("bank   statement") == "bank statement"
+        assert translate_query("bank   statement", UTC) == "bank statement"
 
     def test_normalize_no_commas_unchanged(self) -> None:
-        assert normalize_query("bank statement") == "bank statement"
+        assert translate_query("bank statement", UTC) == "bank statement"
 
     @pytest.mark.parametrize(
         ("raw", "expected"),
@@ -736,7 +737,7 @@ class TestNormalizeQuery:
         ],
     )
     def test_normalize_strips_dangling_operators(self, raw: str, expected: str) -> None:
-        assert normalize_query(raw) == expected
+        assert translate_query(raw, UTC) == expected
 
     @pytest.mark.parametrize(
         "query",
@@ -748,7 +749,7 @@ class TestNormalizeQuery:
         ],
     )
     def test_normalize_preserves_valid_operators(self, query: str) -> None:
-        assert normalize_query(query) == query
+        assert translate_query(query, UTC) == query
 
 
 class TestParseSimpleTextHighlightQuery:
