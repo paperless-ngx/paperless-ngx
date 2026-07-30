@@ -217,7 +217,7 @@ export class CustomFieldQueriesModel {
 })
 export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPermissions {
   protected customFieldsService = inject(CustomFieldsService)
-  private locale = inject(LOCALE_ID)
+  private readonly locale = inject(LOCALE_ID)
 
   public CustomFieldQueryComponentType = CustomFieldQueryElementType
   public CustomFieldQueryOperator = CustomFieldQueryOperator
