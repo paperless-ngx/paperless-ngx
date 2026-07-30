@@ -1362,7 +1362,271 @@ git commit -m "chore(benchmark): remove superseded root benchmark scripts"
 
 ---
 
+### Task 10: Fix reset and permission quirks
+
+**Files:**
+
+- Modify: `src/paperless_benchmark/db.py` (`_delete_non_superusers` → `_delete_all_users_and_groups`)
+- Modify: `src/paperless_benchmark/seeding.py` (`_create_users_and_groups`)
+
+**Interfaces:**
+
+- Consumes: nothing new.
+- Produces: `reset_benchmark_data()` now fully reverses a `seed`, including `perf_admin` and all benchmark groups. `seed_benchmark_dataset(...)` now leaves `perf_target` able to hit `/api/documents/` and `/api/tags/` without a manual permission grant.
+
+**Background:** Tasks 6, 8, and 9's real verification runs all independently hit the same two rough edges: (1) `reset_benchmark_data()`'s `_delete_non_superusers()` only deletes non-superuser users, so the `perf_admin` superuser (and `benchmark_group_*` groups) survive a `--reset` and collide on re-seed with a `UNIQUE constraint failed` error; (2) `perf_target` only gets per-object guardian permissions during seeding, but DRF's `PaperlessObjectPermissions` class checks Django's _model-level_ `view`/`add`/`change` permission before guardian's object-level checks are ever consulted, so `perf_target` gets a blanket `403` on list endpoints regardless of which documents it can actually see. This tool only ever runs against a disposable benchmark database (never a real production install — see the module docstrings from the original standalone scripts this was ported from), so a full wipe on reset is safe and intentional here.
+
+- [ ] **Step 1: Fix `reset_benchmark_data()` to fully clear users and groups**
+
+In `src/paperless_benchmark/db.py`, replace:
+
+```python
+def _delete_non_superusers() -> None:
+    from django.contrib.auth import get_user_model
+
+    get_user_model().objects.filter(is_superuser=False).delete()
+```
+
+with:
+
+```python
+def _delete_all_users_and_groups() -> None:
+    from django.contrib.auth import get_user_model
+    from django.contrib.auth.models import Group
+
+    get_user_model().objects.all().delete()
+    Group.objects.all().delete()
+```
+
+Then update all three call sites (`_reset_postgresql`, `_reset_mariadb`, `_reset_sqlite`) to call `_delete_all_users_and_groups()` instead of `_delete_non_superusers()`.
+
+- [ ] **Step 2: Grant `perf_target` model-level permissions during seeding**
+
+In `src/paperless_benchmark/seeding.py`, add a new helper and call it right after creating `perf_target` inside `_create_users_and_groups`:
+
+```python
+def _grant_model_level_permissions(user) -> None:
+    """
+    Grant perf_target Django model-level view/add/change permissions on
+    Document and Tag, on top of the per-object guardian grants seeding
+    creates elsewhere. DRF's PaperlessObjectPermissions checks model-level
+    permissions before guardian's object-level ones are ever consulted, so
+    without this perf_target gets a blanket 403 on /api/documents/ and
+    /api/tags/ regardless of which documents guardian says it can see.
+    """
+    from django.contrib.auth.models import Permission
+    from django.contrib.contenttypes.models import ContentType
+
+    from documents.models import Document
+    from documents.models import Tag
+
+    for model in (Document, Tag):
+        content_type = ContentType.objects.get_for_model(model)
+        codenames = [
+            f"{action}_{model._meta.model_name}"
+            for action in ("view", "add", "change")
+        ]
+        perms = Permission.objects.filter(
+            content_type=content_type,
+            codename__in=codenames,
+        )
+        user.user_permissions.add(*perms)
+```
+
+Update `_create_users_and_groups` so it calls this right after creating `perf_target`:
+
+```python
+def _create_users_and_groups(counts: _TierCounts):
+    from django.contrib.auth.models import Group
+
+    from documents.tests.factories import UserFactory
+
+    perf_target = UserFactory.create(username="perf_target")
+    _grant_model_level_permissions(perf_target)
+    perf_admin = UserFactory.create(username="perf_admin", superuser=True)
+    other_users = tuple(UserFactory.create_batch(counts.other_users))
+    groups = tuple(
+        Group.objects.create(name=f"benchmark_group_{i}")
+        for i in range(counts.groups)
+    )
+    log(
+        f"Created users: 1 target, 1 superuser, {len(other_users)} other, "
+        f"{len(groups)} groups.",
+    )
+    return perf_target, perf_admin, other_users, groups
+```
+
+- [ ] **Step 3: Verify the full chain works with no manual workarounds**
+
+Run (against the local/VM dev DB, resetting first to include any stale `perf_admin`/groups from earlier manual testing):
+
+```
+cd src && python manage.py benchmark seed --tier home --reset
+python manage.py benchmark run --repeat 1 --label quirk-fix-check
+python manage.py benchmark profile guardian_visibility_query --repeat 1
+python manage.py benchmark seed --tier home --reset
+```
+
+Expected: every command succeeds with no traceback and no manual `manage.py shell` permission-granting or DB-file-deletion step — in particular, `run`'s `documents_default`/`documents_page50`/`tags_all` rows for the `target` user must show `200`-driven real query counts (not a 403), and the second `seed --reset` must succeed cleanly (proving `perf_admin` and groups were actually cleared by the first reset).
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add src/paperless_benchmark/db.py src/paperless_benchmark/seeding.py
+git commit -m "fix(benchmark): fully clear users/groups on reset, grant perf_target model perms"
+```
+
+---
+
+### Task 11: `paperless-benchmarking` skill
+
+**Files:**
+
+- Create: `.claude/skills/paperless-benchmarking/SKILL.md`
+
+**Interfaces:** none — documentation only.
+
+**Background:** This is a project skill (committed on `tools/benchmark-management-commands`, travels with the branch) that teaches an agent how to use the `manage.py benchmark` tool, the branch/merge-back workflow for performance investigations, and how to judge when a one-off profiling scenario is worth turning into a permanent registered scenario. This branch is intended to stay merged-up-to-date with `dev`; new performance investigations fork a fresh branch _from this branch_ (not from `dev`), do their investigation there, and PR only newly-useful scenarios back into `tools/benchmark-management-commands` — the investigation branch itself never merges into `dev`/production.
+
+- [ ] **Step 1: Write the skill file**
+
+```markdown
+---
+name: paperless-benchmarking
+description: Use when profiling paperless-ngx performance, running `manage.py benchmark`, investigating a slow query or endpoint, or deciding whether a profiling finding should become a permanent registered scenario. Covers command reference, the fork/merge-back branch workflow for perf investigations, and how to read query-plan output.
+---
+
+# Paperless-ngx Benchmarking
+
+This repo has a built-in benchmarking/profiling tool: `manage.py benchmark`, in
+the `paperless_benchmark` Django app. It replaces ad hoc standalone scripts —
+use it instead of writing new one-off seed/timing scripts.
+
+## Command reference
+```
+
+manage.py benchmark seed --tier {home,medium,large} [--reset] [--seed N]
+manage.py benchmark run --repeat 5 [--label baseline]
+manage.py benchmark profile <scenario_name> [--repeat 5] [--explain]
+manage.py benchmark list-scenarios
+
+```
+
+- **`seed`** builds a realistic dataset at one of three scales: `home` (500
+  documents — fast, use this for iteration), `medium` (20,000), `large`
+  (360,000 — matches the scale reported in real large-install bug reports;
+  slow, only use it when a finding needs confirming at real scale). `--reset`
+  wipes any previously-seeded benchmark data first — always pass it unless you
+  specifically want to layer more data onto an existing seed. `seed` creates
+  two named users, `perf_target` (mixed owned/shared documents, realistic
+  guardian permission grants) and `perf_admin` (superuser), plus a general
+  user/group pool with realistic permission-row ratios.
+- **`run`** times the 3 built-in API endpoint benchmarks
+  (`/api/documents/`, `/api/documents/?page_size=50`, `/api/tags/`) for both
+  `perf_target` and `perf_admin`, reporting min/median/max wall-clock and SQL
+  query count. Requires `seed` to have already run — it reuses that data, it
+  does not seed its own.
+- **`profile`** times one named scenario from the registry (see
+  `list-scenarios`) via best-of-N repeat timing and SQL query count, against
+  `perf_target`. `--explain` additionally captures and prints the query plan:
+  real `EXPLAIN ANALYZE` execution stats on PostgreSQL/MariaDB, or
+  `EXPLAIN QUERY PLAN` (plan only, no real timing/row counts — clearly labeled
+  as such) on SQLite. Like `run`, `profile` requires `seed` to have already
+  run — it does not seed its own data either.
+- Every `run`/`profile` invocation appends a JSON line to
+  `benchmark_results/history.jsonl` at the repo root (local-only, gitignored —
+  never commit this file). Use it to compare a `before`/`after` pair across
+  two invocations without hand-copying numbers.
+- Full chain example: `seed --reset` once, then `run` and `profile` as many
+  times as you want against that same seeded data — no need to reseed between
+  them.
+
+## Adding a new scenario
+
+A "scenario" is a named, registered query/operation that `profile` can time
+and explain. To add one, edit `src/paperless_benchmark/scenarios.py`: write a
+`_<name>_run(user)` function (returns whatever `run_profile` should time) and
+optionally a `_<name>_queryset(user)` function (returns the `QuerySet` for
+`--explain` to analyze), then `register(Scenario(name=..., describe=...,
+run=..., queryset_for_explain=...))` at module level. Both functions receive
+the already-seeded `perf_target` user — they should not seed their own data.
+
+## Branch workflow
+
+`tools/benchmark-management-commands` is a **long-lived tooling branch**, not
+a feature branch that gets merged and closed:
+
+1. It is periodically brought up to date with `dev` (merge `dev` into it) so
+   the tooling doesn't drift from the schema/codebase it profiles. Do this
+   before starting a new investigation if it's been a while since the last
+   sync.
+2. **Every performance investigation forks its own branch from
+   `tools/benchmark-management-commands`** (not from `dev`). Do the
+   investigation there: write throwaway profiling code, try fixes, capture
+   before/after numbers.
+3. **That investigation branch never merges into `dev` or production.** Its
+   only job is to produce evidence and, optionally, a reusable scenario.
+4. If the investigation turns up a scenario worth keeping permanently (see
+   "When to graduate a scenario" below), open a PR that adds **just that
+   scenario** back into `tools/benchmark-management-commands` — not the rest
+   of the investigation branch's throwaway code.
+5. Any actual production fix the investigation motivates (e.g. an ORM query
+   change) goes into its own normal feature branch off `dev`, following the
+   project's regular contribution process — profiling evidence informs that
+   PR's description, but the profiling code itself does not travel with it.
+
+## Reading query-plan output
+
+- **PostgreSQL/MariaDB** `EXPLAIN ANALYZE`: look for `Seq Scan` on a large
+  table (missing index), a large gap between `rows=N` (planner's estimate)
+  and the actual row count in parentheses (stale statistics or a bad
+  cardinality estimate), and nested-loop joins driven by an outer relation
+  with many rows (usually the N+1 pattern this tool exists to catch).
+- **SQLite** `EXPLAIN QUERY PLAN`: no real timing/row-count data, only the
+  chosen access path (`SCAN` vs `SEARCH`, which index if any). Useful for
+  confirming an index is even being considered, not for judging real-world
+  cost — corroborate any SQLite finding against Postgres/MariaDB before
+  trusting it, since planner behavior differs meaningfully between them.
+- Compare query **count**, not just timing, between before/after: a fix that
+  keeps the same wall-clock time but drops query count from O(n) to O(1) is
+  still a real, durable improvement — timing alone is noisy and
+  environment-dependent, query count is not.
+
+## When to graduate a one-off finding into a permanent scenario
+
+Register a scenario (rather than leaving it as throwaway code on the
+investigation branch) when **both** are true:
+- The query pattern is one this codebase is likely to regress on again (e.g.
+  it involves a permission-check join, a bulk operation, or anything else
+  with an easy-to-reintroduce N+1) — not a one-time fluke specific to this
+  investigation.
+- Re-running it later, against a fresh seed, would still produce a
+  meaningful signal (it doesn't depend on investigation-specific throwaway
+  data or a fix that's already permanently landed and can't regress the same
+  way).
+
+If a finding doesn't meet both bars, keep it as disposable code on the
+investigation branch and let the branch's evidence (captured in the PR
+description of whatever production fix it motivates) be the permanent
+record instead.
+```
+
+- [ ] **Step 2: Verify the skill file is well-formed**
+
+Run: `python -c "import re, pathlib; text = pathlib.Path('.claude/skills/paperless-benchmarking/SKILL.md').read_text(); m = re.match(r'^---\n(.*?)\n---\n', text, re.DOTALL); assert m, 'no frontmatter found'; assert 'name: paperless-benchmarking' in m.group(1); assert 'description:' in m.group(1); print('frontmatter OK')"`
+Expected: prints `frontmatter OK`, no traceback.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add .claude/skills/paperless-benchmarking/SKILL.md
+git commit -m "docs(benchmark): add paperless-benchmarking skill"
+```
+
+---
+
 ## Post-plan notes
 
 - `tools/profiling` (the source branch this work was ported from) is left untouched — not merged, not deleted.
 - Large-tier (`--tier large`, 360k documents) and MariaDB/PostgreSQL-specific verification are not exercised by the steps above (which use the fast, local `home` tier against whatever DB backend the dev environment defaults to — typically SQLite). Before relying on this tooling for a real perf investigation, run at least one `--tier large` seed against Postgres and MariaDB using the project's VM test setup (see `CLAUDE.md`'s "Running tests" section for the SSH/worktree pattern) to confirm `_reset_mariadb`'s `TRUNCATE`/`FOREIGN_KEY_CHECKS` sequencing and the `EXPLAIN ANALYZE` dispatch behave as expected outside SQLite.
+- Task 9 found the two root scripts (`run_benchmarks.py`, `seed_benchmark_data.py`) never existed in the `tools/benchmark-management-commands` worktree — they were untracked files only in the unrelated original checkout this branch's worktree was created alongside. No further action needed; there is nothing left to delete.
