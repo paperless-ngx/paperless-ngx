@@ -175,6 +175,24 @@ def _exclude_readers():
         lock.close()
 
 
+def _with_exclusive_access(operation: str, fn):
+    """Run ``fn()`` with exclusive index access (see ``_exclude_readers()``),
+    for compaction/migration file swaps that must not run while readers are
+    active. Returns ``fn()``'s result, or None (after logging) if active
+    readers do not drain within ``LLM_INDEX_COMPACTION_LOCK_TIMEOUT`` --
+    callers skip the operation this run; it retries next time.
+    """
+    try:
+        with _exclude_readers():
+            return fn()
+    except Timeout:
+        logger.info(
+            "Skipping LLM index %s: index readers are active; will retry next run.",
+            operation,
+        )
+        return None
+
+
 @contextmanager
 def write_store(embed_model_name: str | None = None):
     """Acquire the write lock and yield the vector store.
@@ -197,6 +215,21 @@ def write_store(embed_model_name: str | None = None):
         ) as store,
     ):
         yield store
+
+
+def _check_and_run_migrations(store: "PaperlessSqliteVecVectorStore") -> bool:
+    """Run any pending structural migrations, returning True if a pending
+    re-embed migration needs the caller to force a rebuild -- never
+    triggered automatically here. Safe to call before any write, including
+    delete()/upsert_document(): has_pending_migration() (see its docstring)
+    keeps this a no-op, with no exclusive access taken, once the store is
+    current.
+    """
+    if not store.has_pending_migration():
+        return False
+    return bool(
+        _with_exclusive_access("migration check", store.check_and_run_migrations),
+    )
 
 
 def _safe_related_name(document: Document, field: str) -> str | None:
@@ -370,15 +403,7 @@ def update_llm_index(
     happens, since a rebuild always covers the whole library regardless.
     """
     with write_store() as store:
-        try:
-            with _exclude_readers():
-                needs_reembed = store.check_and_run_migrations()
-        except Timeout:
-            logger.info(
-                "Skipping LLM index migration check: index readers are active; "
-                "will retry next run.",
-            )
-            needs_reembed = False
+        needs_reembed = _check_and_run_migrations(store)
         if needs_reembed:
             logger.warning(
                 "LLM index migration requires re-embedding; forcing rebuild.",
@@ -443,14 +468,7 @@ def update_llm_index(
                 else "No changes detected in LLM index."
             )
 
-        try:
-            with _exclude_readers():
-                store.compact()
-        except Timeout:
-            logger.info(
-                "Skipping LLM index compaction: index readers are active; "
-                "will retry next run.",
-            )
+        _with_exclusive_access("compaction", store.compact)
     return msg
 
 
@@ -465,25 +483,60 @@ def llm_index_add_or_update_document(document: Document):
         _embed_nodes(new_nodes, get_embedding_model(config))
 
     with write_store(embed_model_name=get_configured_model_name(config)) as store:
+        needs_reembed = _check_and_run_migrations(store)
+        if needs_reembed:
+            logger.warning(
+                "Skipping incremental LLM index update for document %s: the "
+                "index requires re-embedding first. Run 'document_llmindex "
+                "rebuild' to resolve.",
+                document.id,
+            )
+            return
         store.upsert_document(str(document.id), new_nodes)
+
+
+def llm_index_migrate() -> None:
+    """Apply any pending LLM index schema migrations, with no reindex.
+
+    Intended to run unconditionally on every startup (see the
+    init-llmindex-migrate container step and the bare-metal upgrade docs):
+    has_pending_migration() short-circuits to a metadata-only read once the
+    store is current, so a healthy install pays almost nothing here. Only
+    ever applies structural migrations -- a pending re-embed migration is
+    left for the explicit, deliberate rebuild path (``document_llmindex
+    update``/``rebuild``) to resolve, since re-embedding can be slow and,
+    for a metered embedding backend, cost money.
+    """
+    if not AIConfig().llm_index_enabled:
+        return
+    with write_store() as store:
+        needs_reembed = _check_and_run_migrations(store)
+    if needs_reembed:
+        logger.warning(
+            "LLM index requires re-embedding, which this automatic migration "
+            "check will not do on its own -- it can be slow and, for a "
+            "metered embedding backend, cost money. Run "
+            "'document_llmindex rebuild' manually when ready.",
+        )
 
 
 def llm_index_compact() -> None:
     """Compact the index immediately, rebuilding the table to reclaim space."""
     with write_store() as store:
-        try:
-            with _exclude_readers():
-                store.compact(force=True)
-        except Timeout:
-            logger.info(
-                "Skipping LLM index compaction: index readers are active; "
-                "will retry next run.",
-            )
+        _with_exclusive_access("compaction", lambda: store.compact(force=True))
 
 
 def llm_index_remove_document(document: Document):
     """Remove a document's chunks from the LLM index."""
     with write_store() as store:
+        if _check_and_run_migrations(store):
+            logger.warning(
+                "Skipping removal of document %s from the LLM index: the "
+                "index requires re-embedding first. Run 'document_llmindex "
+                "rebuild' to resolve.",
+                document.id,
+            )
+            return
         store.delete(str(document.id))
 
 

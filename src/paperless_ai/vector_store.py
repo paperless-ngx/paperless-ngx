@@ -2,16 +2,12 @@ import json
 import logging
 import sqlite3
 import struct
-from collections.abc import Callable
 from collections.abc import Iterator
 from collections.abc import Sequence
 from contextlib import contextmanager
-from dataclasses import dataclass
-from dataclasses import field
 from pathlib import Path
 from types import TracebackType
 from typing import Any
-from typing import Literal
 
 import sqlite_vec
 from llama_index.core.bridge.pydantic import PrivateAttr
@@ -25,6 +21,9 @@ from llama_index.core.vector_stores.types import VectorStoreQuery
 from llama_index.core.vector_stores.types import VectorStoreQueryResult
 from llama_index.core.vector_stores.utils import metadata_dict_to_node
 from llama_index.core.vector_stores.utils import node_to_metadata_dict
+
+from paperless_ai.migrations import MIGRATIONS
+from paperless_ai.migrations import Migration
 
 logger = logging.getLogger("paperless_ai.vector_store")
 
@@ -51,38 +50,6 @@ COMPACT_BATCH_SIZE = 500
 # keys we construct ourselves, but allowlisting keeps SQL identifiers safe by
 # construction.
 _FILTER_COLUMNS = frozenset({"document_id", "modified"})
-
-
-@dataclass
-class Migration:
-    """A schema migration for the sqlite-vec vector store.
-
-    kind="structural": rows are copied into a new-schema file with no
-    re-embedding needed.  Supply ``apply(src_conn, dst_conn, dim)`` which
-    must create the vec0 table in ``dst_conn``, copy all rows from
-    ``src_conn``, and write ``dim`` / ``embed_model`` / ``total_inserts`` to
-    ``dst_conn``'s ``index_meta``.  ``schema_version`` is written by the
-    migration runner after ``apply`` returns.
-
-    kind="re-embed": the new schema requires fresh embeddings.
-    ``check_and_run_migrations()`` returns True when it encounters one of
-    these so the caller can force a full rebuild (which recreates the table
-    at the current SCHEMA_VERSION).
-    """
-
-    from_version: int
-    to_version: int
-    kind: Literal["structural", "re-embed"]
-    description: str
-    apply: Callable[[sqlite3.Connection, sqlite3.Connection, int], None] | None = field(
-        default=None,
-        repr=False,
-    )
-
-
-# Registry of all schema migrations in order. Empty at v1 -- this is the
-# baseline. Add entries here (and bump SCHEMA_VERSION) when the schema changes.
-MIGRATIONS: list[Migration] = []
 
 
 def _pack(embedding: Sequence[float]) -> bytes:
@@ -551,6 +518,31 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         Path(compact_path).replace(db_path)
         self._conn = self._open_connection(db_path)
 
+    def _stored_schema_version(self) -> int | None:
+        """The schema_version recorded in index_meta, or None if no table
+        exists. A missing key (a store predating version tracking) is
+        treated as SCHEMA_VERSION -- i.e. already current -- since no
+        migration in MIGRATIONS targets a version before tracking began.
+        """
+        if not self.table_exists():
+            return None
+        raw = self._meta_get("schema_version")
+        return int(raw) if raw is not None else SCHEMA_VERSION
+
+    def has_pending_migration(self) -> bool:
+        """Cheaply check whether a migration is pending, with no exclusive
+        access needed -- just a metadata read under the connection callers
+        already hold via the write FileLock.
+
+        Callers should only pay for check_and_run_migrations()'s exclusive
+        access (a structural migration's file swap must not run while
+        readers are active) when this returns True, so that the common
+        case -- already at SCHEMA_VERSION -- never contends with readers
+        or a concurrent compaction.
+        """
+        current = self._stored_schema_version()
+        return current is not None and current < SCHEMA_VERSION
+
     def check_and_run_migrations(self) -> bool:
         """Apply any pending schema migrations to the store.
 
@@ -559,15 +551,13 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         this method returns True when one is encountered so the caller can
         force a full rebuild (which recreates the table at SCHEMA_VERSION).
 
-        Must be called under the write FileLock.  No-op when the table does
-        not exist or is already at SCHEMA_VERSION.
+        Must be called under the write FileLock, with readers excluded (see
+        has_pending_migration() for a cheap pre-check that avoids paying for
+        that exclusion in the common case).  No-op when the table does not
+        exist or is already at SCHEMA_VERSION.
         """
-        if not self.table_exists():
-            return False
-
-        raw = self._meta_get("schema_version")
-        current = int(raw) if raw is not None else SCHEMA_VERSION
-        if current >= SCHEMA_VERSION:
+        current = self._stored_schema_version()
+        if current is None or current >= SCHEMA_VERSION:
             return False
 
         pending = sorted(
@@ -579,7 +569,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             if migration.kind == "re-embed":
                 logger.warning(
                     "LLM index schema v%d -> v%d requires re-embedding (%s); "
-                    "forcing full rebuild.",
+                    "the caller must force a rebuild.",
                     migration.from_version,
                     migration.to_version,
                     migration.description,
