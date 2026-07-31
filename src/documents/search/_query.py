@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from datetime import UTC
 from typing import TYPE_CHECKING
 from typing import Final
 
@@ -9,12 +8,6 @@ import regex
 import tantivy
 from django.conf import settings
 
-from documents.search._dates import (
-    _date_only_range,  # noqa: F401 — re-exported for test imports
-)
-from documents.search._dates import (
-    _datetime_range,  # noqa: F401 — re-exported for test imports
-)
 from documents.search._tokenizer import simple_search_tokens
 from documents.search._translate import SearchQueryError
 from documents.search._translate import translate_query
@@ -74,42 +67,6 @@ def _build_cjk_query(
         return index.parse_query(cjk_text, fields)
     except Exception:
         return None
-
-
-def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
-    """
-    Rewrite natural date syntax to ISO 8601 format for Tantivy compatibility.
-
-    Delegates to ``translate_query`` which handles all date forms, comma
-    expansion, field aliasing, relative ranges, and operator normalization.
-
-    Args:
-        query: Raw user query string
-        tz: Timezone for converting local date boundaries to UTC
-
-    Returns:
-        Query with date syntax rewritten to ISO 8601 ranges
-
-    Note:
-        Bare keywords without field prefixes pass through unchanged.
-    """
-    return translate_query(query, tz)
-
-
-def normalize_query(query: str) -> str:
-    """
-    Normalize query syntax for better search behavior.
-
-    Delegates to ``translate_query`` which handles comma expansion, whitespace
-    collapsing, operator normalization, and field aliasing.
-
-    Args:
-        query: Query string after date rewriting
-
-    Returns:
-        Normalized query string ready for Tantivy parsing
-    """
-    return translate_query(query, UTC)
 
 
 def build_permission_filter(
