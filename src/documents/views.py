@@ -1929,7 +1929,7 @@ class DocumentViewSet(
         message = validated_data.get("message")
         use_archive_version = validated_data.get("use_archive_version", True)
 
-        documents = Document.objects.select_related("owner").filter(pk__in=document_ids)
+        documents = Document.objects.filter(pk__in=document_ids)
         if request.user is not None:
             permitted_ids = set(permitted_document_ids(request.user))
             if not all(document.pk in permitted_ids for document in documents):
