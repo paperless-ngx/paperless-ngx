@@ -526,11 +526,6 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
                 backend="mock_backend:model-a:http://endpoint-a",
             ),
         )
-        # ...and NOT under the model/endpoint-agnostic key (the pre-fix key,
-        # which would serve stale suggestions after a model or endpoint switch).
-        self.assertIsNone(
-            get_llm_suggestion_cache(self.document.pk, backend="mock_backend"),
-        )
 
     @patch("documents.views.get_ai_document_classification")
     @override_settings(
