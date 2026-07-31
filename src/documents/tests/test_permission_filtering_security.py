@@ -313,10 +313,15 @@ class TestEmailDocumentPermissionBoundary:
 
 @pytest.mark.django_db
 class TestBulkEditChangePermissionBoundary:
-    def test_bulk_edit_rejects_document_without_change_permission(
+    def test_bulk_edit_rejects_mixed_batch_when_any_document_lacks_change_permission(
         self,
         rest_api_client,
     ):
+        # A bulk-edit request containing both a document the requester CAN
+        # change and one they CANNOT should be rejected as a whole: the
+        # permitted document must not be partially applied just because it
+        # was bundled with a forbidden one, proving the endpoint checks
+        # every document in the batch rather than only the first/last.
         owner = User.objects.create_user(username="owner")
         requester = User.objects.create_user(username="requester")
         # grant the global change_document permission so the object-level
@@ -325,18 +330,16 @@ class TestBulkEditChangePermissionBoundary:
             Permission.objects.get(codename="change_document"),
         )
         rest_api_client.force_authenticate(user=requester)
-        assign_perm(
-            "view_document",
-            requester,
-            DocumentFactory(owner=owner),
-        )  # unrelated grant
+        changeable = DocumentFactory(owner=owner)
+        assign_perm("view_document", requester, changeable)
+        assign_perm("change_document", requester, changeable)  # fully permitted
         target = DocumentFactory(owner=owner)
         assign_perm("view_document", requester, target)  # view only, NOT change
 
         response = rest_api_client.post(
             "/api/documents/bulk_edit/",
             {
-                "documents": [target.pk],
+                "documents": [changeable.pk, target.pk],
                 "method": "modify_tags",
                 "parameters": {"add_tags": [], "remove_tags": []},
             },
