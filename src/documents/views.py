@@ -2727,7 +2727,6 @@ class DocumentSelectionMixin:
         *,
         user: User,
         validated_data: dict[str, Any],
-        permission_codename: str = "view_document",
     ) -> list[int]:
         if not validated_data.get("all", False):
             # if all is not true, just pass through the provided document ids
