@@ -374,14 +374,24 @@ class TestBulkDownloadPermissionChecksRootDocument:
             response.status_code == HTTPStatus.OK
         )  # visible because root is permitted
 
-        stranger = User.objects.create_user(username="mallory")
-        rest_api_client.force_authenticate(user=stranger)
+        # Granted on the VERSION itself, but NOT on the root. If the endpoint
+        # ever regressed to checking "root OR version" instead of root-only,
+        # this grant would incorrectly unlock access. This is the case that
+        # actually discriminates correct (root-only) enforcement from a
+        # root-or-version bug; a user with no grant at all (the old
+        # `stranger` case) can't tell the two apart, since they're denied
+        # either way.
+        version_only_grantee = User.objects.create_user(username="version_only_grantee")
+        assign_perm("view_document", version_only_grantee, version)
+        rest_api_client.force_authenticate(user=version_only_grantee)
         response = rest_api_client.post(
             "/api/documents/bulk_download/",
             {"documents": [version.pk]},
             format="json",
         )
-        assert response.status_code == HTTPStatus.FORBIDDEN
+        assert (
+            response.status_code == HTTPStatus.FORBIDDEN
+        )  # version-only grant must not substitute for root permission
 
 
 @pytest.mark.django_db
