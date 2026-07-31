@@ -18,6 +18,7 @@ import {
   DocumentAttributesComponent,
   DocumentAttributesSectionKind,
 } from './document-attributes.component'
+import { CustomFieldsComponent } from './custom-fields/custom-fields.component'
 import { ManagementListComponent } from './management-list/management-list.component'
 
 @Component({
@@ -207,6 +208,29 @@ describe('DocumentAttributesComponent', () => {
     expect(component.activeSection.kind).toBe(
       DocumentAttributesSectionKind.CustomFields
     )
-    expect(component.activeCustomFields).toBeDefined()
+    const customFields = Object.create(CustomFieldsComponent.prototype)
+    customFields.editField = jest.fn()
+    component.activeOutlet = {
+      componentInstance: customFields,
+    } as any
+    expect(component.activeCustomFields).toBe(customFields)
+
+    component.addCustomField()
+    expect(customFields.editField).toHaveBeenCalled()
+  })
+
+  it('should show the add field button before the custom fields instance is available', async () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+
+    fixture.detectChanges()
+    component.activeNavID.set(2)
+    await fixture.whenStable()
+
+    expect(component.activeCustomFields).toBeNull()
+    expect(
+      fixture.nativeElement.querySelector(
+        'pngx-page-header .btn-outline-primary'
+      )?.textContent
+    ).toContain('Add Field')
   })
 })

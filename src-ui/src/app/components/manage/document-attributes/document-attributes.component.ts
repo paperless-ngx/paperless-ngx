@@ -163,10 +163,15 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
   }
 
   get activeCustomFields(): CustomFieldsComponent | null {
-    if (this.activeSection?.kind !== DocumentAttributesSectionKind.CustomFields)
-      return null
+    if (!this.customFieldsActive) return null
     const instance = this.activeOutlet?.componentInstance
     return instance instanceof CustomFieldsComponent ? instance : null
+  }
+
+  get customFieldsActive(): boolean {
+    return (
+      this.activeSection?.kind === DocumentAttributesSectionKind.CustomFields
+    )
   }
 
   get activeTabLabel(): string {
@@ -222,6 +227,10 @@ export class DocumentAttributesComponent implements OnInit, OnDestroy {
       return
     }
     this.router.navigate(['attributes', nextSection])
+  }
+
+  addCustomField(): void {
+    this.activeCustomFields?.editField(null)
   }
 
   private getDefaultNavID(): DocumentAttributesNavIDs | null {
