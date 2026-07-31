@@ -1829,18 +1829,27 @@ class BulkEditSerializer(
                 f"Some custom fields in {name} don't exist or were specified twice.",
             )
 
-        if isinstance(custom_fields, dict):
-            custom_field_map = CustomField.objects.in_bulk(ids)
-            for raw_field_id, value in custom_fields.items():
-                field = custom_field_map.get(int(raw_field_id))
-                if (
-                    field is not None
-                    and field.data_type == CustomField.FieldDataType.DOCUMENTLINK
-                    and value is not None
-                ):
-                    if not isinstance(value, list):
-                        raise serializers.ValidationError("Value must be a list")
-                    validate_documentlink_targets(self.user, value)
+    def _validate_custom_field_values(self, custom_fields, name):
+        if not isinstance(custom_fields, dict):
+            return custom_fields
+
+        validated = {}
+        errors = {}
+        for raw_field_id, value in custom_fields.items():
+            field_id = int(raw_field_id)
+            validator = CustomFieldInstanceSerializer(
+                data={"field": field_id, "value": value},
+                context=self.context,
+            )
+            if validator.is_valid():
+                validated[field_id] = validator.validated_data["value"]
+            else:
+                errors[str(field_id)] = validator.errors
+
+        if errors:
+            raise serializers.ValidationError({name: errors})
+
+        return validated
 
     def validate_method(self, method):
         if method == "set_correspondent":
@@ -1941,6 +1950,10 @@ class BulkEditSerializer(
     def _validate_parameters_modify_custom_fields(self, parameters) -> None:
         if "add_custom_fields" in parameters:
             self._validate_custom_field_id_list_or_dict(
+                parameters["add_custom_fields"],
+                "add_custom_fields",
+            )
+            parameters["add_custom_fields"] = self._validate_custom_field_values(
                 parameters["add_custom_fields"],
                 "add_custom_fields",
             )
