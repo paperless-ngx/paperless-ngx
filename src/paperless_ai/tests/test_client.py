@@ -9,6 +9,7 @@ import pytest
 from llama_index.core.llms.llm import ToolSelection
 
 from paperless_ai.client import LLM_SYSTEM_PROMPT
+from paperless_ai.client import THINKING_DISABLED_KWARGS
 from paperless_ai.client import AIClient
 from paperless_ai.exceptions import LLMTimeoutError
 
@@ -71,6 +72,7 @@ def test_get_llm_openai(mock_ai_config, mock_openai_llm):
         is_chat_model=True,
         is_function_calling_model=True,
         system_prompt=LLM_SYSTEM_PROMPT,
+        additional_kwargs=THINKING_DISABLED_KWARGS,
         http_client=ANY,
         async_http_client=ANY,
     )
@@ -153,6 +155,126 @@ def test_run_llm_query_openai_uses_tools(mock_ai_config, mock_openai_llm):
 
     assert result["title"] == "Test Title"
     mock_llm_instance.chat_with_tools.assert_called_once()
+
+
+def _tool_selection() -> ToolSelection:
+    return ToolSelection(
+        tool_id="call_test",
+        tool_name="DocumentClassifierSchema",
+        tool_kwargs={
+            "title": "Test Title",
+            "tags": ["test", "document"],
+            "correspondents": ["John Doe"],
+            "document_types": ["report"],
+            "storage_paths": ["Reports"],
+            "dates": ["2023-01-01"],
+        },
+    )
+
+
+def _configure_openai(mock_ai_config) -> None:
+    mock_ai_config.llm_backend = "openai-like"
+    mock_ai_config.llm_model = "test_model"
+    mock_ai_config.llm_api_key = "test_api_key"
+    mock_ai_config.llm_endpoint = "http://test-url"
+
+
+def _bad_request(message: str) -> openai.BadRequestError:
+    request = httpx.Request("POST", "http://test-url/v1/chat/completions")
+    response = httpx.Response(
+        400,
+        request=request,
+        json={"error": {"message": message}},
+    )
+    return openai.BadRequestError(message, response=response, body=None)
+
+
+def test_run_llm_query_openai_retries_without_thinking_kwargs(
+    mock_ai_config,
+    mock_openai_llm,
+):
+    """A provider that rejects the thinking argument still gets an answer."""
+    _configure_openai(mock_ai_config)
+
+    mock_llm_instance = mock_openai_llm.return_value
+    mock_llm_instance.additional_kwargs = dict(THINKING_DISABLED_KWARGS)
+    mock_llm_instance.chat_with_tools.side_effect = [
+        _bad_request("unrecognized request argument supplied: chat_template_kwargs"),
+        MagicMock(),
+    ]
+    mock_llm_instance.get_tool_calls_from_response.return_value = [_tool_selection()]
+
+    client = AIClient()
+    result = client.run_llm_query("test_prompt")
+
+    assert result["title"] == "Test Title"
+    assert mock_llm_instance.chat_with_tools.call_count == 2
+    assert "extra_body" not in mock_llm_instance.additional_kwargs
+
+
+def test_run_llm_query_openai_does_not_retry_unrelated_bad_request(
+    mock_ai_config,
+    mock_openai_llm,
+):
+    _configure_openai(mock_ai_config)
+
+    mock_llm_instance = mock_openai_llm.return_value
+    mock_llm_instance.additional_kwargs = dict(THINKING_DISABLED_KWARGS)
+    mock_llm_instance.chat_with_tools.side_effect = _bad_request("model not found")
+
+    client = AIClient()
+
+    with pytest.raises(openai.BadRequestError):
+        client.run_llm_query("test_prompt")
+
+    assert mock_llm_instance.chat_with_tools.call_count == 1
+
+
+def test_run_llm_query_openai_reports_reasoning_only_response(
+    mock_ai_config,
+    mock_openai_llm,
+):
+    """A thinking model that answers in the reasoning channel gets a real hint."""
+    _configure_openai(mock_ai_config)
+
+    response = MagicMock()
+    response.message.content = ""
+    response.message.additional_kwargs = {"reasoning_content": "Let me think..."}
+
+    mock_llm_instance = mock_openai_llm.return_value
+    mock_llm_instance.additional_kwargs = dict(THINKING_DISABLED_KWARGS)
+    mock_llm_instance.chat_with_tools.return_value = response
+    mock_llm_instance.get_tool_calls_from_response.side_effect = ValueError(
+        "Expected at least one tool call, but got 0 tool calls.",
+    )
+
+    client = AIClient()
+
+    with pytest.raises(ValueError, match="thinking is still active"):
+        client.run_llm_query("test_prompt")
+
+
+def test_run_llm_query_openai_keeps_original_error_without_reasoning(
+    mock_ai_config,
+    mock_openai_llm,
+):
+    _configure_openai(mock_ai_config)
+
+    response = MagicMock()
+    response.message.content = "some answer"
+    response.message.additional_kwargs = {}
+
+    mock_llm_instance = mock_openai_llm.return_value
+    mock_llm_instance.additional_kwargs = dict(THINKING_DISABLED_KWARGS)
+    mock_llm_instance.chat_with_tools.return_value = response
+    mock_llm_instance.get_tool_calls_from_response.side_effect = ValueError(
+        "Expected at least one tool call, but got 0 tool calls.",
+    )
+
+    client = AIClient()
+
+    with pytest.raises(ValueError, match=r"^Expected at least one tool call"):
+        client.run_llm_query("test_prompt")
 
 
 def test_run_llm_query_openai_timeout_raises_local_error(

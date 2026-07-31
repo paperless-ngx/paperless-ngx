@@ -2121,6 +2121,17 @@ backend and "llama3.1" for Ollama.
 
     Defaults to None.
 
+    !!! note
+
+        Reasoning models such as the Qwen3, GLM and DeepSeek-R1 families think before they answer,
+        and self-hosted inference servers usually enable that by default. Paperless-ngx asks both
+        backends to turn thinking off, because it only slows down the structured requests it makes
+        and some models answer inside the reasoning channel instead of returning a tool call.
+
+        If your provider ignores that request, suggestions may fail with "Expected at least one
+        tool call, but got 0 tool calls". Either serve the model with thinking disabled or pick a
+        model that emits tool calls while thinking.
+
 #### [`PAPERLESS_AI_LLM_API_KEY=<str>`](#PAPERLESS_AI_LLM_API_KEY) {#PAPERLESS_AI_LLM_API_KEY}
 
 : The API key to use for the AI backend. This is typically required for the OpenAI-compatible
