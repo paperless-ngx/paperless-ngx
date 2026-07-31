@@ -244,7 +244,9 @@ class TestPermittedDocumentIdsArbitraryPermission:
     def test_delete_permission_with_include_deleted_for_trash_restore(self):
         owner = User.objects.create_user(username="owner")
         stranger = User.objects.create_user(username="mallory")
+        view_only = User.objects.create_user(username="viewer")
         doc = DocumentFactory(owner=owner)
+        assign_perm("view_document", view_only, doc)
         doc.delete()
 
         assert_visible_document_ids(
@@ -255,6 +257,15 @@ class TestPermittedDocumentIdsArbitraryPermission:
         assert_visible_document_ids(
             permitted_document_ids(
                 stranger,
+                perm="delete_document",
+                include_deleted=True,
+            ),
+            expected_visible=[],
+            expected_hidden=[doc.pk],
+        )
+        assert_visible_document_ids(
+            permitted_document_ids(
+                view_only,
                 perm="delete_document",
                 include_deleted=True,
             ),
