@@ -75,7 +75,7 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
                 {
                     "documents": [self.doc1.pk, self.doc2.pk],
                     "addresses": "hello@paperless-ngx.com,test@example.com",
-                    "subject": "Bulk email test",
+                    "subject": "Bulk email\n test",
                     "message": "Here are your documents",
                 },
             ),
