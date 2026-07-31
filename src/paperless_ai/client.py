@@ -146,7 +146,14 @@ class AIClient:
                 error_on_no_tool_call=True,
             )
         logger.debug("LLM query result: %s", tool_calls)
-        parsed = DocumentClassifierSchema(**tool_calls[0].tool_kwargs)
+
+        tool_kwargs = dict(tool_calls[0].tool_kwargs)
+
+        tool_kwargs.setdefault("document_types", [])
+        tool_kwargs.setdefault("storage_paths", [])
+        tool_kwargs.setdefault("dates", [])
+
+        parsed = DocumentClassifierSchema(**tool_kwargs)
         return parsed.model_dump()
 
     @contextmanager
