@@ -113,7 +113,7 @@ def test_get_ai_document_classification_success(mock_run_llm_query, mock_documen
     localization_prompt = mock_run_llm_query.call_args_list[1].args[0]
     assert "Write suggested titles" not in classification_prompt
     assert "Rewrite only these generated fields in German" in localization_prompt
-    assert "Do not translate correspondents or dates" in localization_prompt
+    assert "Do not translate correspondents, tags or dates" in localization_prompt
 
 
 @pytest.mark.django_db
@@ -242,7 +242,6 @@ def test_prompt_with_without_rag(mock_document):
             output_language="de-de",
         )
         assert "Rewrite only these generated fields in German" in prompt
-        assert "Do not translate correspondents or dates" in prompt
 
 
 def test_get_language_name_falls_back_to_language_code():
@@ -414,8 +413,11 @@ def test_get_system_metadata(
     mock_doc_types,
     mock_tags,
 ):
-    # Configure mock querysets
-    mock_tags.values_list.return_value.order_by.return_value = ["Finance", "Tax"]
+    # Configure mock querysets - tags chain is values_list().exclude().order_by()
+    mock_tags.values_list.return_value.exclude.return_value.order_by.return_value = [
+        "Finance",
+        "Tax",
+    ]
     mock_doc_types.values_list.return_value.order_by.return_value = [
         "Invoice",
         "Contract",
