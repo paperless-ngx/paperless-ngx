@@ -7,7 +7,7 @@ from paperless_ai.tables import DocumentChunksTable
 from paperless_ai.tables import DocumentMetaRow
 from paperless_ai.tables import DocumentMetaTable
 from paperless_ai.tables import IndexMetaTable
-from paperless_ai.vector_store import COMPACT_BATCH_SIZE
+from paperless_ai.vector_store import BATCH_SIZE
 from paperless_ai.vector_store import DEFAULT_TABLE_NAME
 
 # v1's vec0 shape has never changed since it first shipped and is the ONLY
@@ -75,7 +75,7 @@ def _migrate_v1_to_v2(
     dst_conn.execute("BEGIN IMMEDIATE")
     src_cursor = src_conn.execute(_V1_SELECT)
     live = 0
-    while batch := src_cursor.fetchmany(COMPACT_BATCH_SIZE):
+    while batch := src_cursor.fetchmany(BATCH_SIZE):
         vec0_rows = []
         chunk_rows = []
         meta_by_document: dict[int, str] = {}

@@ -131,7 +131,7 @@ class DocumentMetaTable:
         connections (compact()/migrations) -- an unbounded fetchall here
         would defeat the same OOM-avoidance the vec0 row copy already relies
         on. batch_size has no default: forces the call site to think about
-        it (pass COMPACT_BATCH_SIZE)."""
+        it (pass BATCH_SIZE)."""
         cursor = src_conn.execute(
             "SELECT document_id, modified FROM document_meta",
         )

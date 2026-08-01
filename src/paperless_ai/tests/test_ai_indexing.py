@@ -9,6 +9,7 @@ from django.db import connection
 from django.test import override_settings
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
+from filelock import Timeout
 from llama_index.core.schema import MetadataMode
 
 from documents.models import Correspondent
@@ -830,6 +831,44 @@ class TestLlmIndexLocking:
 
         mock_store.upsert_document.assert_not_called()
 
+    def test_add_or_update_document_skips_write_when_migration_check_deferred(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """A migration check that times out waiting for readers to drain
+        must be treated the same as a pending migration -- proceeding to
+        write would target a store still on its old schema. Regression
+        test for the tri-state fix: a bare bool collapsed this outcome
+        into the same falsy value as "already current".
+        """
+        mock_store = MagicMock()
+        mock_store.has_pending_migration.return_value = True
+        mocker.patch(
+            "paperless_ai.indexing.write_store",
+            return_value=mocker.MagicMock(
+                __enter__=mocker.MagicMock(return_value=mock_store),
+                __exit__=mocker.MagicMock(return_value=False),
+            ),
+        )
+        mocker.patch(
+            "paperless_ai.indexing._exclude_readers",
+            side_effect=Timeout("test"),
+        )
+        mock_node = MagicMock()
+        mock_node.get_content.return_value = "fake node text"
+        mocker.patch(
+            "paperless_ai.indexing.build_document_node",
+            return_value=[mock_node],
+        )
+
+        doc = MagicMock(spec=Document)
+        doc.id = 1
+        indexing.llm_index_add_or_update_document(doc)
+
+        mock_store.upsert_document.assert_not_called()
+
     def test_remove_document_uses_write_store(
         self,
         temp_llm_index_dir: Path,
@@ -876,6 +915,34 @@ class TestLlmIndexLocking:
 
         mock_store.delete.assert_not_called()
 
+    def test_remove_document_skips_write_when_migration_check_deferred(
+        self,
+        temp_llm_index_dir: Path,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """A migration check deferred by a reader-lock timeout must block
+        the delete too, for the same reason as the incremental-update path.
+        """
+        mock_store = MagicMock()
+        mock_store.has_pending_migration.return_value = True
+        mocker.patch(
+            "paperless_ai.indexing.write_store",
+            return_value=mocker.MagicMock(
+                __enter__=mocker.MagicMock(return_value=mock_store),
+                __exit__=mocker.MagicMock(return_value=False),
+            ),
+        )
+        mocker.patch(
+            "paperless_ai.indexing._exclude_readers",
+            side_effect=Timeout("test"),
+        )
+
+        doc = MagicMock(spec=Document)
+        doc.id = 1
+        indexing.llm_index_remove_document(doc)
+
+        mock_store.delete.assert_not_called()
+
     def test_update_llm_index_rebuild_uses_write_store(
         self,
         temp_llm_index_dir: Path,
@@ -898,6 +965,35 @@ class TestLlmIndexLocking:
         indexing.update_llm_index(rebuild=True)
 
         mock_store.drop_table.assert_called_once()
+
+    def test_update_llm_index_skips_when_migration_check_deferred(
+        self,
+        temp_llm_index_dir: Path,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """A migration check deferred by a reader-lock timeout must short-
+        circuit before the second write_store() block (document scanning,
+        add/upsert, compaction) ever runs -- that block would otherwise
+        write against a store still on its old schema.
+        """
+        mock_store = MagicMock()
+        mock_store.has_pending_migration.return_value = True
+        write_store_mock = mocker.patch(
+            "paperless_ai.indexing.write_store",
+            return_value=mocker.MagicMock(
+                __enter__=mocker.MagicMock(return_value=mock_store),
+                __exit__=mocker.MagicMock(return_value=False),
+            ),
+        )
+        mocker.patch(
+            "paperless_ai.indexing._exclude_readers",
+            side_effect=Timeout("test"),
+        )
+
+        result = indexing.update_llm_index(rebuild=False)
+
+        assert "deferred" in result
+        write_store_mock.assert_called_once()
 
 
 @pytest.mark.django_db
@@ -1016,6 +1112,37 @@ class TestLlmIndexMigrate:
         with caplog.at_level(logging.WARNING, logger="paperless_ai.indexing"):
             indexing.llm_index_migrate()
         assert "requires re-embedding" in caplog.text
+
+    def test_logs_info_when_migration_check_deferred(
+        self,
+        mocker: pytest_mock.MockerFixture,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - AI/LLM index support is enabled
+            - A pending migration cannot run because readers are active
+        WHEN:
+            - llm_index_migrate() is called
+        THEN:
+            - An info line notes the deferral, not the re-embed warning
+        """
+        mocker.patch(
+            "paperless_ai.indexing.AIConfig",
+            return_value=mocker.Mock(llm_index_enabled=True),
+        )
+        store_mock = mocker.MagicMock()
+        store_mock.has_pending_migration.return_value = True
+        write_store_cm = mocker.patch("paperless_ai.indexing.write_store")
+        write_store_cm.return_value.__enter__.return_value = store_mock
+        mocker.patch(
+            "paperless_ai.indexing._exclude_readers",
+            side_effect=Timeout("test"),
+        )
+        with caplog.at_level(logging.INFO, logger="paperless_ai.indexing"):
+            indexing.llm_index_migrate()
+        assert "deferred" in caplog.text
+        assert "requires re-embedding" not in caplog.text
 
 
 @pytest.mark.django_db
