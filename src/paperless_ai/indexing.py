@@ -372,7 +372,7 @@ def _document_id_filters(doc_ids):
             MetadataFilter(
                 key="document_id",
                 operator=FilterOperator.IN,
-                value=sorted(doc_ids),
+                value=list(doc_ids),
             ),
         ],
     )
