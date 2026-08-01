@@ -7,6 +7,8 @@ from django.test import override_settings
 
 from documents.models import Document
 from paperless.config import AIConfig
+from paperless_ai.ai_classifier import _extract_document_metadata
+from paperless_ai.ai_classifier import _get_system_metadata
 from paperless_ai.ai_classifier import build_localization_prompt
 from paperless_ai.ai_classifier import build_prompt_with_rag
 from paperless_ai.ai_classifier import build_prompt_without_rag
@@ -29,11 +31,14 @@ def mock_document():
     tag2 = MagicMock()
     tag2.name = "Tag2"
     doc.tags.all = MagicMock(return_value=[tag1, tag2])
+    doc.tags.exists = MagicMock(return_value=True)
 
     doc.document_type = MagicMock()
     doc.document_type.name = "Invoice"
     doc.correspondent = MagicMock()
     doc.correspondent.name = "Test Correspondent"
+    doc.storage_path = MagicMock()
+    doc.storage_path.name = "/archive/invoices"
     doc.archive_serial_number = "12345"
     doc.content = "This is the document content."
 
@@ -211,7 +216,12 @@ def test_prompt_with_without_rag(mock_document):
     with patch(
         "paperless_ai.ai_classifier.get_context_for_document",
         return_value="Context from similar documents",
-    ):
+    ), patch("paperless_ai.ai_classifier._get_system_metadata", return_value={
+        "tags": ["Tag1"],
+        "document_types": ["Invoice"],
+        "correspondents": ["Test"],
+        "storage_paths": ["/path"],
+    }):
         config = AIConfig()
         prompt = build_prompt_without_rag(mock_document, config)
         assert "Additional context from similar documents" not in prompt
@@ -278,3 +288,149 @@ def test_get_context_for_document_no_similar_docs(mock_document):
     with patch("paperless_ai.ai_classifier.query_similar_documents", return_value=[]):
         result = get_context_for_document(mock_document)
         assert result == ""
+
+
+def test_extract_document_metadata(mock_document):
+    result = _extract_document_metadata(mock_document)
+
+    assert result["tags"] == ["Tag1", "Tag2"]
+    assert result["document_type"] == "Invoice"
+    assert result["correspondent"] == "Test Correspondent"
+    assert result["storage_path"] == "/archive/invoices"
+
+
+def test_extract_document_metadata_with_empty_values():
+    doc = MagicMock(spec=Document)
+    doc.tags.exists = MagicMock(return_value=False)
+    doc.tags.all = MagicMock(return_value=[])
+    doc.document_type = None
+    doc.correspondent = None
+    doc.storage_path = None
+
+    result = _extract_document_metadata(doc)
+
+    assert result["tags"] == []
+    assert result["document_type"] is None
+    assert result["correspondent"] is None
+    assert result["storage_path"] is None
+
+
+@pytest.mark.django_db
+@patch("paperless_ai.ai_classifier._get_system_metadata")
+def test_prompt_without_rag_includes_existing_metadata(
+    mock_system_metadata,
+    mock_document,
+):
+    mock_system_metadata.return_value = {
+        "tags": ["Tag1", "Tag2", "Tax"],
+        "document_types": ["Invoice", "Contract"],
+        "correspondents": ["Test Correspondent", "Acme Corp"],
+        "storage_paths": ["/archive/invoices", "/archive/contracts"],
+    }
+    config = AIConfig()
+    prompt = build_prompt_without_rag(mock_document, config)
+
+    assert "Existing Metadata:" in prompt
+    assert "Tags: Tag1, Tag2" in prompt
+    assert "Document Type: Invoice" in prompt
+    assert "Correspondent: Test Correspondent" in prompt
+    assert "Storage Path: /archive/invoices" in prompt
+    assert "Use the existing metadata as hints" in prompt
+    # System-wide metadata
+    assert "Available Tags in System:" in prompt
+    assert "Tag1, Tag2, Tax" in prompt
+    assert "Available Document Types in System:" in prompt
+    assert "Invoice, Contract" in prompt
+    assert "Available Correspondents in System:" in prompt
+    assert "Test Correspondent, Acme Corp" in prompt
+    assert "Available Storage Paths in System:" in prompt
+    assert "/archive/invoices, /archive/contracts" in prompt
+
+
+@pytest.mark.django_db
+@patch("paperless_ai.ai_classifier._get_system_metadata")
+def test_prompt_without_rag_handles_missing_metadata(mock_system_metadata):
+    mock_system_metadata.return_value = {
+        "tags": ["Finance"],
+        "document_types": ["Memo"],
+        "correspondents": [],
+        "storage_paths": [],
+    }
+    doc = MagicMock(spec=Document)
+    doc.filename = "test.pdf"
+    doc.content = "Some content."
+    doc.tags.exists = MagicMock(return_value=False)
+    doc.tags.all = MagicMock(return_value=[])
+    doc.document_type = None
+    doc.correspondent = None
+    doc.storage_path = None
+
+    config = AIConfig()
+    prompt = build_prompt_without_rag(doc, config)
+
+    assert "Existing Metadata:" in prompt
+    assert "Tags: Not set" in prompt
+    assert "Document Type: Not set" in prompt
+    assert "Correspondent: Not set" in prompt
+    assert "Storage Path: Not set" in prompt
+    assert "Available Tags in System:" in prompt
+    assert "Finance" in prompt
+
+
+@pytest.mark.django_db
+@patch("paperless_ai.ai_classifier._get_system_metadata")
+@patch("paperless_ai.ai_classifier.get_context_for_document")
+def test_prompt_with_rag_includes_existing_metadata(
+    mock_get_context,
+    mock_system_metadata,
+    mock_document,
+):
+    mock_get_context.return_value = "Similar document context."
+    mock_system_metadata.return_value = {
+        "tags": ["Tag1", "Tag2"],
+        "document_types": ["Invoice"],
+        "correspondents": ["Test Correspondent"],
+        "storage_paths": ["/archive/invoices"],
+    }
+
+    config = AIConfig()
+    prompt = build_prompt_with_rag(mock_document, config)
+
+    # RAG prompt should include both existing metadata and additional context
+    assert "Existing Metadata:" in prompt
+    assert "Tags: Tag1, Tag2" in prompt
+    assert "Document Type: Invoice" in prompt
+    assert "Available Tags in System:" in prompt
+    assert "Additional context from similar documents" in prompt
+
+
+@patch("paperless_ai.ai_classifier.Tag.objects")
+@patch("paperless_ai.ai_classifier.DocumentType.objects")
+@patch("paperless_ai.ai_classifier.Correspondent.objects")
+@patch("paperless_ai.ai_classifier.StoragePath.objects")
+def test_get_system_metadata(
+    mock_storage_paths,
+    mock_correspondents,
+    mock_doc_types,
+    mock_tags,
+):
+    # Configure mock querysets
+    mock_tags.values_list.return_value.order_by.return_value = ["Finance", "Tax"]
+    mock_doc_types.values_list.return_value.order_by.return_value = [
+        "Invoice",
+        "Contract",
+    ]
+    mock_correspondents.values_list.return_value.order_by.return_value = [
+        "Acme Corp",
+        "Test Corp",
+    ]
+    mock_storage_paths.values_list.return_value.order_by.return_value = [
+        "/archive/finance",
+    ]
+
+    result = _get_system_metadata()
+
+    assert result["tags"] == ["Finance", "Tax"]
+    assert result["document_types"] == ["Invoice", "Contract"]
+    assert result["correspondents"] == ["Acme Corp", "Test Corp"]
+    assert result["storage_paths"] == ["/archive/finance"]
