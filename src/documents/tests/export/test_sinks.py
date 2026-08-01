@@ -5,6 +5,7 @@ import zipfile
 from pathlib import Path
 
 import pytest
+from pytest_django.fixtures import SettingsWrapper
 
 from documents.export.sinks import DirectoryExportSink
 from documents.export.sinks import ExportSink
@@ -235,6 +236,43 @@ class TestZipExportSink:
                 raise RuntimeError("boom")
         assert not (target / "export.zip").exists()
         assert not (target / "export.zip.tmp").exists()
+
+    def test_exception_inside_stream_cleans_up_manifest_tmp(
+        self,
+        tmp_path: Path,
+        source_file: Path,
+        settings: SettingsWrapper,
+    ) -> None:
+        scratch_dir = tmp_path / "scratch"
+        settings.SCRATCH_DIR = scratch_dir
+        target: Path = tmp_path / "out"
+        target.mkdir()
+        with pytest.raises(RuntimeError):
+            with ZipExportSink(target, "export", delete=False) as sink:
+                sink.add_file(source_file, "doc.pdf")
+                with sink.stream("manifest.json") as handle:
+                    handle.write("[")
+                    raise RuntimeError("boom")
+        assert list(scratch_dir.glob("export-manifest-*")) == []
+        assert not (target / "export.zip").exists()
+        assert not (target / "export.zip.tmp").exists()
+
+    def test_abort_after_manifest_written_cleans_up_pending_tmp(
+        self,
+        tmp_path: Path,
+        settings: SettingsWrapper,
+    ) -> None:
+        scratch_dir = tmp_path / "scratch"
+        settings.SCRATCH_DIR = scratch_dir
+        target: Path = tmp_path / "out"
+        target.mkdir()
+        with pytest.raises(RuntimeError):
+            with ZipExportSink(target, "export", delete=False) as sink:
+                with sink.stream("manifest.json") as handle:
+                    handle.write("[]")
+                raise RuntimeError("boom")
+        assert list(scratch_dir.glob("export-manifest-*")) == []
+        assert not (target / "export.zip").exists()
 
     def test_delete_wipes_destination_on_success(
         self,

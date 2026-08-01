@@ -390,7 +390,11 @@ class Command(CryptMixin, PaperlessCommand):
                 description="Exporting documents...",
                 total=len(document_manifest),
             ):
-                if document.pk != document_dict["pk"]:
+                # Both document_manifest and documents_stream come from the same
+                # Document.global_objects.order_by("id") query, taken while
+                # MEDIA_LOCK is held, so this should be unreachable -- it guards
+                # against silent data corruption if that invariant ever breaks.
+                if document.pk != document_dict["pk"]:  # pragma: no cover
                     raise CommandError(
                         "Document export ordering mismatch: expected "
                         f"pk={document_dict['pk']}, got pk={document.pk}. "
