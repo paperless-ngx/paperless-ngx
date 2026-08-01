@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-27 19:34+0000\n"
-"PO-Revision-Date: 2026-07-27 19:35\n"
+"POT-Creation-Date: 2026-07-31 16:14+0000\n"
+"PO-Revision-Date: 2026-07-31 16:15\n"
 "Last-Translator: \n"
 "Language-Team: Albanian\n"
 "Language: sq_AL\n"
@@ -1339,7 +1339,7 @@ msgid "workflow runs"
 msgstr "[SQ] workflow runs"
 
 #: documents/serialisers.py:522 documents/serialisers.py:874
-#: documents/serialisers.py:2763 documents/views.py:299 documents/views.py:2553
+#: documents/serialisers.py:2776 documents/views.py:299 documents/views.py:2558
 #: paperless_mail/serialisers.py:155
 msgid "Insufficient permissions."
 msgstr "[SQ] Insufficient permissions."
@@ -1348,38 +1348,38 @@ msgstr "[SQ] Insufficient permissions."
 msgid "Invalid color."
 msgstr "Invalid color."
 
-#: documents/serialisers.py:2235
+#: documents/serialisers.py:2248
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "[SQ] File type %(type)s not supported"
 
-#: documents/serialisers.py:2279
+#: documents/serialisers.py:2292
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "Custom field id must be an integer: %(id)s"
 
-#: documents/serialisers.py:2286
+#: documents/serialisers.py:2299
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Custom field with id %(id)s does not exist"
 
-#: documents/serialisers.py:2303 documents/serialisers.py:2313
+#: documents/serialisers.py:2316 documents/serialisers.py:2326
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Custom fields must be a list of integers or an object mapping ids to values."
 
-#: documents/serialisers.py:2308
+#: documents/serialisers.py:2321
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "[SQ] Some custom fields don't exist or were specified twice."
 
-#: documents/serialisers.py:2455
+#: documents/serialisers.py:2468
 msgid "Invalid variable detected."
 msgstr "Invalid variable detected."
 
-#: documents/serialisers.py:2819
+#: documents/serialisers.py:2832
 msgid "Duplicate document identifiers are not allowed."
 msgstr "[SQ] Duplicate document identifiers are not allowed."
 
-#: documents/serialisers.py:2849 documents/views.py:4512
+#: documents/serialisers.py:2862 documents/views.py:4517
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Documents not found: %(ids)s"
@@ -1635,36 +1635,36 @@ msgstr "[SQ] URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.
 msgid "Unable to parse URI {value}"
 msgstr "[SQ] Unable to parse URI {value}"
 
-#: documents/views.py:292 documents/views.py:2550
+#: documents/views.py:292 documents/views.py:2555
 msgid "Invalid more_like_id"
 msgstr "Invalid more_like_id"
 
-#: documents/views.py:1562
+#: documents/views.py:1567
 msgid "Invalid AI configuration."
 msgstr "Invalid AI configuration."
 
-#: documents/views.py:1571
+#: documents/views.py:1576
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:2375 documents/views.py:2696
+#: documents/views.py:2380 documents/views.py:2701
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Specify only one of text, title_search, query, or more_like_id."
 
-#: documents/views.py:4524
+#: documents/views.py:4529
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "[SQ] Insufficient permissions to share document %(id)s."
 
-#: documents/views.py:4570
+#: documents/views.py:4575
 msgid "Bundle is already being processed."
 msgstr "[SQ] Bundle is already being processed."
 
-#: documents/views.py:4631
+#: documents/views.py:4636
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "[SQ] The share link bundle is still being prepared. Please try again later."
 
-#: documents/views.py:4641
+#: documents/views.py:4646
 msgid "The share link bundle is unavailable."
 msgstr "[SQ] The share link bundle is unavailable."
 

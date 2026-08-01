@@ -718,7 +718,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">445</context>
+          <context context-type="linenumber">449</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component.html</context>
@@ -902,7 +902,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">464</context>
+          <context context-type="linenumber">468</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -1482,7 +1482,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">390</context>
+          <context context-type="linenumber">394</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1742,7 +1742,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">165</context>
+          <context context-type="linenumber">169</context>
         </context-group>
         <target state="final">Numéro de série d'archivage (NSA)</target>
       </trans-unit>
@@ -1754,7 +1754,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">170</context>
+          <context context-type="linenumber">174</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1786,7 +1786,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">174</context>
+          <context context-type="linenumber">178</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1818,7 +1818,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">178</context>
+          <context context-type="linenumber">182</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -2010,7 +2010,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">159</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
@@ -4310,11 +4310,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">96</context>
+          <context context-type="linenumber">101</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">107</context>
         </context-group>
         <target state="translated">Vrai</target>
       </trans-unit>
@@ -4326,11 +4326,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">97</context>
+          <context context-type="linenumber">102</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">108</context>
         </context-group>
         <target state="translated">Faux</target>
       </trans-unit>
@@ -4342,7 +4342,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">119</context>
+          <context context-type="linenumber">124</context>
         </context-group>
         <target state="translated">Rechercher un document...</target>
       </trans-unit>
@@ -4350,7 +4350,7 @@
         <source>Any</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">152</context>
+          <context context-type="linenumber">157</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
@@ -4362,7 +4362,7 @@
         <source>Not</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">157</context>
+          <context context-type="linenumber">162</context>
         </context-group>
         <target state="translated">Non</target>
       </trans-unit>
@@ -4370,7 +4370,7 @@
         <source>Add query</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">176</context>
+          <context context-type="linenumber">181</context>
         </context-group>
         <target state="translated">Ajouter une requête</target>
       </trans-unit>
@@ -4378,7 +4378,7 @@
         <source>Add expression</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">179</context>
+          <context context-type="linenumber">184</context>
         </context-group>
         <target state="translated">Ajouter une expression</target>
       </trans-unit>
@@ -4706,7 +4706,7 @@
         <source>Create new item</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
-          <context context-type="linenumber">119</context>
+          <context context-type="linenumber">123</context>
         </context-group>
         <target state="final">Créer un nouvel élément</target>
       </trans-unit>
@@ -4714,7 +4714,7 @@
         <source>Edit item</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
-          <context context-type="linenumber">123</context>
+          <context context-type="linenumber">127</context>
         </context-group>
         <target state="final">Modifier l'élément</target>
       </trans-unit>
@@ -5362,7 +5362,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">356</context>
+          <context context-type="linenumber">360</context>
         </context-group>
         <target state="translated">Prévisualisation</target>
       </trans-unit>
@@ -8554,7 +8554,7 @@
         <source>Details</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">160</context>
+          <context context-type="linenumber">164</context>
         </context-group>
         <target state="final">Détails</target>
       </trans-unit>
@@ -8562,7 +8562,7 @@
         <source>Title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">163</context>
+          <context context-type="linenumber">167</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -8586,7 +8586,7 @@
         <source>Date created</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">167</context>
+          <context context-type="linenumber">171</context>
         </context-group>
         <target state="final">Date de création</target>
       </trans-unit>
@@ -8594,7 +8594,7 @@
         <source>Default</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">179</context>
+          <context context-type="linenumber">183</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/saved-views/saved-views.component.html</context>
@@ -8606,7 +8606,7 @@
         <source>Content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">286</context>
+          <context context-type="linenumber">290</context>
         </context-group>
         <target state="final">Contenu</target>
       </trans-unit>
@@ -8614,7 +8614,7 @@
         <source>Metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">295</context>
+          <context context-type="linenumber">299</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/metadata-collapse/metadata-collapse.component.ts</context>
@@ -8626,7 +8626,7 @@
         <source>Date modified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">302</context>
+          <context context-type="linenumber">306</context>
         </context-group>
         <target state="final">Date de modification</target>
       </trans-unit>
@@ -8634,7 +8634,7 @@
         <source>Date added</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">306</context>
+          <context context-type="linenumber">310</context>
         </context-group>
         <target state="final">Date d'ajout</target>
       </trans-unit>
@@ -8642,7 +8642,7 @@
         <source>Media filename</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">310</context>
+          <context context-type="linenumber">314</context>
         </context-group>
         <target state="final">Nom de fichier du média</target>
       </trans-unit>
@@ -8650,7 +8650,7 @@
         <source>Original filename</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">314</context>
+          <context context-type="linenumber">318</context>
         </context-group>
         <target state="final">Nom du fichier d'origine</target>
       </trans-unit>
@@ -8658,7 +8658,7 @@
         <source>Original SHA256 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">318</context>
+          <context context-type="linenumber">322</context>
         </context-group>
         <target state="translated">Somme de contrôle SHA256 de l'original</target>
       </trans-unit>
@@ -8666,7 +8666,7 @@
         <source>Original file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">322</context>
+          <context context-type="linenumber">326</context>
         </context-group>
         <target state="final">Taille du fichier original</target>
       </trans-unit>
@@ -8674,7 +8674,7 @@
         <source>Original mime type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">326</context>
+          <context context-type="linenumber">330</context>
         </context-group>
         <target state="final">Type MIME de l'original</target>
       </trans-unit>
@@ -8682,7 +8682,7 @@
         <source>Archive SHA256 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">331</context>
+          <context context-type="linenumber">335</context>
         </context-group>
         <target state="translated">Somme de contrôle SHA256 de l'archive</target>
       </trans-unit>
@@ -8690,7 +8690,7 @@
         <source>Archive file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">337</context>
+          <context context-type="linenumber">341</context>
         </context-group>
         <target state="final">Taille du fichier archivé</target>
       </trans-unit>
@@ -8698,7 +8698,7 @@
         <source>Original document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">346</context>
+          <context context-type="linenumber">350</context>
         </context-group>
         <target state="final">Métadonnées du document original</target>
       </trans-unit>
@@ -8706,7 +8706,7 @@
         <source>Archived document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">349</context>
+          <context context-type="linenumber">353</context>
         </context-group>
         <target state="final">Métadonnées du document archivé</target>
       </trans-unit>
@@ -8714,7 +8714,7 @@
         <source>Notes <x id="START_BLOCK_IF" equiv-text="@if (document()?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">368,371</context>
+          <context context-type="linenumber">372,375</context>
         </context-group>
         <target state="needs-translation">Notes <x id="START_BLOCK_IF" equiv-text="@if (document()?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></target>
       </trans-unit>
@@ -8722,7 +8722,7 @@
         <source>History</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">379</context>
+          <context context-type="linenumber">383</context>
         </context-group>
         <target state="translated">Historique</target>
       </trans-unit>
@@ -8730,7 +8730,7 @@
         <source> Duplicates <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="cate_documents.length }}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">401,405</context>
+          <context context-type="linenumber">405,409</context>
         </context-group>
         <target state="needs-translation"> Duplicates <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="cate_documents.length }}"/><x id="CLOSE_TAG_SPAN" ctype="x-span"/></target>
       </trans-unit>
@@ -8738,7 +8738,7 @@
         <source>Duplicate documents detected:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">407</context>
+          <context context-type="linenumber">411</context>
         </context-group>
         <target state="translated">Documents en double détectés :</target>
       </trans-unit>
@@ -8746,7 +8746,7 @@
         <source>In trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">418</context>
+          <context context-type="linenumber">422</context>
         </context-group>
         <target state="translated">Dans la corbeille</target>
       </trans-unit>
@@ -8754,7 +8754,7 @@
         <source>Save &amp; next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">447</context>
+          <context context-type="linenumber">451</context>
         </context-group>
         <target state="final">Enregistrer &amp; suivant</target>
       </trans-unit>
@@ -8762,7 +8762,7 @@
         <source>Save &amp; close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">449</context>
+          <context context-type="linenumber">453</context>
         </context-group>
         <target state="final">Enregister &amp; fermer</target>
       </trans-unit>
@@ -8770,7 +8770,7 @@
         <source>Discard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">451</context>
+          <context context-type="linenumber">455</context>
         </context-group>
         <target state="final">Abandonner</target>
       </trans-unit>
@@ -8778,7 +8778,7 @@
         <source>Document loading...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">459</context>
+          <context context-type="linenumber">463</context>
         </context-group>
         <target state="translated">Chargement du document…</target>
       </trans-unit>
@@ -8786,7 +8786,7 @@
         <source>Enter Password</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">513</context>
+          <context context-type="linenumber">517</context>
         </context-group>
         <target state="translated">Saisir le mot de passe</target>
       </trans-unit>

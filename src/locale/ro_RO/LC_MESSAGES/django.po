@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-27 19:34+0000\n"
-"PO-Revision-Date: 2026-07-27 19:35\n"
+"POT-Creation-Date: 2026-07-31 16:14+0000\n"
+"PO-Revision-Date: 2026-07-31 16:15\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -626,7 +626,7 @@ msgstr ""
 
 #: documents/models.py:692
 msgid "Empty Trash"
-msgstr ""
+msgstr "Golire gunoi"
 
 #: documents/models.py:693
 msgid "Check Workflows"
@@ -1339,7 +1339,7 @@ msgid "workflow runs"
 msgstr "rulări flux de lucru"
 
 #: documents/serialisers.py:522 documents/serialisers.py:874
-#: documents/serialisers.py:2763 documents/views.py:299 documents/views.py:2553
+#: documents/serialisers.py:2776 documents/views.py:299 documents/views.py:2558
 #: paperless_mail/serialisers.py:155
 msgid "Insufficient permissions."
 msgstr ""
@@ -1348,38 +1348,38 @@ msgstr ""
 msgid "Invalid color."
 msgstr "Culoare invalidă."
 
-#: documents/serialisers.py:2235
+#: documents/serialisers.py:2248
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Tip de fișier %(type)s nesuportat"
 
-#: documents/serialisers.py:2279
+#: documents/serialisers.py:2292
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "Id-ul câmpului personalizat trebuie să fie un număr întreg: %(id)s"
 
-#: documents/serialisers.py:2286
+#: documents/serialisers.py:2299
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Câmp personalizat cu id %(id)s nu există"
 
-#: documents/serialisers.py:2303 documents/serialisers.py:2313
+#: documents/serialisers.py:2316 documents/serialisers.py:2326
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Câmpurile personalizate trebuie să fie o listă de numere întregi sau un obiect mapping ids la valori."
 
-#: documents/serialisers.py:2308
+#: documents/serialisers.py:2321
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Unele câmpuri personalizate nu există sau au fost specificate de două ori."
 
-#: documents/serialisers.py:2455
+#: documents/serialisers.py:2468
 msgid "Invalid variable detected."
 msgstr "Variabilă nevalidă detectată."
 
-#: documents/serialisers.py:2819
+#: documents/serialisers.py:2832
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2849 documents/views.py:4512
+#: documents/serialisers.py:2862 documents/views.py:4517
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1635,36 +1635,36 @@ msgstr "Schema URI '{parts.scheme}' nu este permisă. Schemele permise: {', '.jo
 msgid "Unable to parse URI {value}"
 msgstr "Nu se poate analiza URI {value}"
 
-#: documents/views.py:292 documents/views.py:2550
+#: documents/views.py:292 documents/views.py:2555
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:1562
+#: documents/views.py:1567
 msgid "Invalid AI configuration."
 msgstr ""
 
-#: documents/views.py:1571
+#: documents/views.py:1576
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:2375 documents/views.py:2696
+#: documents/views.py:2380 documents/views.py:2701
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:4524
+#: documents/views.py:4529
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr ""
 
-#: documents/views.py:4570
+#: documents/views.py:4575
 msgid "Bundle is already being processed."
 msgstr ""
 
-#: documents/views.py:4631
+#: documents/views.py:4636
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr ""
 
-#: documents/views.py:4641
+#: documents/views.py:4646
 msgid "The share link bundle is unavailable."
 msgstr ""
 
