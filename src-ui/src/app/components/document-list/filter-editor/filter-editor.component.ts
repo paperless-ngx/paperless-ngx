@@ -52,6 +52,7 @@ import {
   FILTER_CREATED_TO,
   FILTER_CUSTOM_FIELDS_QUERY,
   FILTER_CUSTOM_FIELDS_TEXT,
+  FILTER_DOCUMENT_ID,
   FILTER_DOCUMENT_TYPE,
   FILTER_DOES_NOT_HAVE_CORRESPONDENT,
   FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
@@ -128,6 +129,7 @@ const TEXT_FILTER_TARGET_FULLTEXT_QUERY = 'fulltext-query'
 const TEXT_FILTER_TARGET_FULLTEXT_MORELIKE = 'fulltext-morelike'
 const TEXT_FILTER_TARGET_CUSTOM_FIELDS = 'custom-fields'
 const TEXT_FILTER_TARGET_MIME_TYPE = 'mime-type'
+const TEXT_FILTER_TARGET_DOCUMENT_ID = 'document-id'
 
 const TEXT_FILTER_MODIFIER_EQUALS = 'equals'
 const TEXT_FILTER_MODIFIER_NULL = 'is null'
@@ -204,6 +206,7 @@ const DEFAULT_TEXT_FILTER_TARGET_OPTIONS = [
     id: TEXT_FILTER_TARGET_FULLTEXT_QUERY,
     name: $localize`Advanced search`,
   },
+  { id: TEXT_FILTER_TARGET_DOCUMENT_ID, name: $localize`Document ID` },
 ]
 
 const DEPRECATED_CUSTOM_FIELDS_TEXT_FILTER_TARGET_OPTION = {
@@ -464,6 +467,10 @@ export class FilterEditorComponent
         case FILTER_ASN:
           this._textFilter = rule.value
           this.textFilterTarget = TEXT_FILTER_TARGET_ASN
+          break
+        case FILTER_DOCUMENT_ID:
+          this._textFilter = rule.value
+          this.textFilterTarget = TEXT_FILTER_TARGET_DOCUMENT_ID
           break
         case FILTER_CUSTOM_FIELDS_TEXT:
           this._textFilter = rule.value
@@ -817,6 +824,15 @@ export class FilterEditorComponent
           value: this._textFilter,
         })
       }
+    }
+    if (
+      /^[1-9]\d*$/.test(this._textFilter) &&
+      this.textFilterTarget == TEXT_FILTER_TARGET_DOCUMENT_ID
+    ) {
+      filterRules.push({
+        rule_type: FILTER_DOCUMENT_ID,
+        value: this._textFilter,
+      })
     }
     if (
       this._textFilter &&
@@ -1245,7 +1261,12 @@ export class FilterEditorComponent
         takeUntil(this.unsubscribeNotifier),
         debounceTime(400),
         distinctUntilChanged(),
-        filter((query) => !query.length || query.length > 2)
+        filter(
+          (query) =>
+            !query.length ||
+            this.textFilterTarget == TEXT_FILTER_TARGET_DOCUMENT_ID ||
+            query.length > 2
+        )
       )
       .subscribe((text) =>
         this.updateTextFilter(

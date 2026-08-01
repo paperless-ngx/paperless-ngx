@@ -41,6 +41,7 @@ import {
   FILTER_CREATED_TO,
   FILTER_CUSTOM_FIELDS_QUERY,
   FILTER_CUSTOM_FIELDS_TEXT,
+  FILTER_DOCUMENT_ID,
   FILTER_DOCUMENT_TYPE,
   FILTER_DOES_NOT_HAVE_CORRESPONDENT,
   FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
@@ -349,6 +350,17 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.textFilter).toEqual('foo')
     expect(component.textFilterTarget).toEqual('asn') // TEXT_FILTER_TARGET_ASN
+  })
+
+  it('should ingest a document ID filter rule', () => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_DOCUMENT_ID,
+        value: '1234',
+      },
+    ]
+    expect(component.textFilter).toEqual('1234')
+    expect(component.textFilterTarget).toEqual('document-id')
   })
 
   it('should ingest text filter rules for custom fields', () => {
@@ -1179,6 +1191,35 @@ describe('FilterEditorComponent', () => {
         value: '1234',
       },
     ])
+  })
+
+  it('should convert user input to a document ID filter rule', () => {
+    component.textFilterInput.nativeElement.value = '7'
+    component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
+    const targetIndex = component.textFilterTargets.findIndex(
+      (target) => target.id === 'document-id'
+    )
+    const textFieldTargetDropdown = fixture.debugElement.queryAll(
+      By.directive(NgbDropdownItem)
+    )[targetIndex]
+    textFieldTargetDropdown.triggerEventHandler('click')
+    fixture.detectChanges()
+    tick(400)
+    expect(component.textFilterTarget).toEqual('document-id')
+    expect(component.textFilter).toEqual('7')
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_DOCUMENT_ID,
+        value: '7',
+      },
+    ])
+  })
+
+  it('should not create a document ID rule from invalid input', () => {
+    component.changeTextFilterTarget('document-id')
+    component.textFilter = 'abc'
+    tick(400)
+    expect(component.filterRules).toEqual([])
   })
 
   it('should convert user input to correct filter rules on text field search greater than asn', () => {

@@ -4,6 +4,7 @@ import { FilterRule } from '../data/filter-rule'
 import {
   FILTER_CORRESPONDENT,
   FILTER_CUSTOM_FIELDS_QUERY,
+  FILTER_DOCUMENT_ID,
   FILTER_HAS_ANY_TAG,
   FILTER_HAS_CUSTOM_FIELDS_ALL,
   FILTER_HAS_CUSTOM_FIELDS_ANY,
@@ -171,6 +172,12 @@ describe('QueryParams Utils', () => {
   })
 
   it('should convert filter rules to query params', () => {
+    expect(
+      queryParamsFromFilterRules([
+        { rule_type: FILTER_DOCUMENT_ID, value: '1234' },
+      ])
+    ).toEqual({ id: '1234' })
+
     let rules = filterRulesFromQueryParams(
       convertToParamMap({
         text: 'bank statement',
@@ -180,6 +187,14 @@ describe('QueryParams Utils', () => {
       {
         rule_type: FILTER_SIMPLE_TEXT,
         value: 'bank statement',
+      },
+    ])
+
+    rules = filterRulesFromQueryParams(convertToParamMap({ id: '1234' }))
+    expect(rules).toEqual([
+      {
+        rule_type: FILTER_DOCUMENT_ID,
+        value: '1234',
       },
     ])
 

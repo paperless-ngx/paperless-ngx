@@ -49,6 +49,7 @@ export const FILTER_MODIFIED_AFTER = 16
 export const FILTER_TITLE_CONTENT = 19 // Deprecated in favor of Tantivy-backed `text` filtervar. Keep for now for existing saved views
 export const FILTER_SIMPLE_TITLE = 48
 export const FILTER_SIMPLE_TEXT = 49
+export const FILTER_DOCUMENT_ID = 50
 export const FILTER_FULLTEXT_QUERY = 20
 export const FILTER_FULLTEXT_MORELIKE = 21
 
@@ -72,6 +73,12 @@ export const SIMPLE_TEXT_PARAMETER = 'text'
 export const SIMPLE_TITLE_PARAMETER = 'title_search'
 
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
+  {
+    id: FILTER_DOCUMENT_ID,
+    filtervar: 'id',
+    datatype: 'number',
+    multi: false,
+  },
   {
     id: FILTER_TITLE,
     filtervar: 'title__icontains',
