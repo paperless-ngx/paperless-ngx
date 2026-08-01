@@ -9,11 +9,11 @@ from llama_index.core.vector_stores.types import MetadataFilter
 from llama_index.core.vector_stores.types import MetadataFilters
 from llama_index.core.vector_stores.types import VectorStoreQuery
 
+from paperless_ai.migrations import MIGRATIONS
+from paperless_ai.migrations import Migration
 from paperless_ai.vector_store import DB_FILENAME
 from paperless_ai.vector_store import DEFAULT_TABLE_NAME
-from paperless_ai.vector_store import MIGRATIONS
 from paperless_ai.vector_store import SCHEMA_VERSION
-from paperless_ai.vector_store import Migration
 from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
 from paperless_ai.vector_store import _build_where
 
@@ -646,3 +646,50 @@ class TestMigrations:
 
         assert result is True
         assert self._schema_version(store) == 2
+
+    def test_has_pending_migration_false_when_no_table(
+        self,
+        store: PaperlessSqliteVecVectorStore,
+    ) -> None:
+        """
+        GIVEN:
+            - A vector store with no table created yet
+        WHEN:
+            - has_pending_migration() is checked
+        THEN:
+            - False is returned (nothing to migrate before anything exists)
+        """
+        assert store.has_pending_migration() is False
+
+    def test_has_pending_migration_false_at_current_version(
+        self,
+        store: PaperlessSqliteVecVectorStore,
+    ) -> None:
+        """
+        GIVEN:
+            - A store at the current SCHEMA_VERSION
+        WHEN:
+            - has_pending_migration() is checked
+        THEN:
+            - False is returned
+        """
+        store.add([make_node("a1", "1")])
+        assert store.has_pending_migration() is False
+
+    def test_has_pending_migration_true_when_behind(
+        self,
+        store: PaperlessSqliteVecVectorStore,
+    ) -> None:
+        """
+        GIVEN:
+            - A store whose schema_version has been forced behind SCHEMA_VERSION
+        WHEN:
+            - has_pending_migration() is checked
+        THEN:
+            - True is returned
+        """
+        store.add([make_node("a1", "1")])
+        store.client.execute(
+            "UPDATE index_meta SET value = '0' WHERE key = 'schema_version'",
+        )
+        assert store.has_pending_migration() is True
