@@ -254,6 +254,45 @@ def test_update_llm_index_rebuilds_on_model_name_change(
 
 
 @pytest.mark.django_db
+def test_update_llm_index_merges_exists_and_config_mismatch_reads(
+    temp_llm_index_dir: Path,
+    real_document: Document,
+    mock_embed_model: FakeEmbedding,
+) -> None:
+    # Build an initial index so the second call's table_exists()/
+    # config_mismatch() checks have something real to check against.
+    with patch("documents.models.Document.objects.all") as mock_all:
+        mock_queryset = MagicMock()
+        mock_queryset.exists.return_value = True
+        mock_queryset.__iter__.return_value = iter([real_document])
+        mock_queryset.select_related.return_value = mock_queryset
+        mock_queryset.prefetch_related.return_value = mock_queryset
+        mock_all.return_value = mock_queryset
+        indexing.update_llm_index(rebuild=True)
+
+    with patch("documents.models.Document.objects.all") as mock_all:
+        mock_queryset = MagicMock()
+        mock_queryset.exists.return_value = True
+        mock_queryset.__iter__.return_value = iter([real_document])
+        mock_queryset.select_related.return_value = mock_queryset
+        mock_queryset.prefetch_related.return_value = mock_queryset
+        mock_all.return_value = mock_queryset
+        with patch(
+            "paperless_ai.indexing.read_store",
+            wraps=indexing.read_store,
+        ) as read_store_spy:
+            indexing.update_llm_index(rebuild=False)
+
+    # Documents exist, so the fast-exit check's `no_documents and ...`
+    # short-circuits before ever calling llm_index_exists() -- the only
+    # read_store() call left in this path is the merged table_exists()/
+    # config_mismatch() check. Before this task's fix, that merged check
+    # was two separate read_store() calls (one inside llm_index_exists(),
+    # one for config_mismatch() right after) -- so this asserts 1, not 2.
+    assert read_store_spy.call_count == 1
+
+
+@pytest.mark.django_db
 def test_update_llm_index_partial_update(
     temp_llm_index_dir: Path,
     real_document: Document,

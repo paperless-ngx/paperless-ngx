@@ -2,6 +2,7 @@ import sqlite3
 from collections.abc import Generator
 
 import pytest
+from pytest_mock import MockerFixture
 
 from paperless_ai.tables import ChunkRow
 from paperless_ai.tables import DocumentChunksTable
@@ -287,6 +288,39 @@ class TestIndexMetaTable:
         IndexMetaTable.increment_total_inserts(conn, 5)
         IndexMetaTable.increment_total_inserts(conn, 3)
         assert IndexMetaTable.get_total_inserts(conn) == 8
+
+    def test_increment_total_inserts_is_a_single_statement(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - An empty index_meta table
+        WHEN:
+            - increment_total_inserts() is called
+        THEN:
+            - Exactly one conn.execute() call is made (a single INSERT ...
+              ON CONFLICT DO UPDATE, not a separate read then write)
+        """
+
+        # sqlite3.Connection is an immutable C extension type with no
+        # instance __dict__, so mocker.spy(conn, "execute") can't shadow
+        # "execute" on a plain connection ("attribute 'execute' is
+        # read-only"). A trivial Python subclass gets a normal instance
+        # __dict__, making the instance spyable while still being a real,
+        # usable sqlite3.Connection.
+        class _SpyableConnection(sqlite3.Connection):
+            pass
+
+        conn = sqlite3.connect(":memory:", factory=_SpyableConnection)
+        try:
+            conn.row_factory = sqlite3.Row
+            IndexMetaTable.create(conn)
+            execute_spy = mocker.spy(conn, "execute")
+            IndexMetaTable.increment_total_inserts(conn, 5)
+            assert execute_spy.call_count == 1
+        finally:
+            conn.close()
 
     def test_reset_total_inserts_sets_absolute_value(
         self,
