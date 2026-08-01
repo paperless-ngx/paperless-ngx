@@ -57,7 +57,7 @@ dependencies = [
   "llama-index-llms-ollama>=0.9.1",
   "llama-index-llms-openai-like>=0.7.1",
   "nltk~=3.10.0",
-  "ocrmypdf~=17.4.2",
+  "ocrmypdf~=17.8.1",
   "openai>=2.32",
   "pathvalidate~=3.3.1",
   "pdf2image~=1.17.0",
@@ -78,7 +78,7 @@ dependencies = [
   "torch~=2.13.0",
   "watchfiles>=1.1.1",
   "whitenoise~=6.11",
-  "zxing-cpp~=3.0.0",
+  "zxing-cpp~=3.1.0",
 ]
 [project.optional-dependencies]
 mariadb = [
