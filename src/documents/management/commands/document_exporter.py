@@ -58,6 +58,7 @@ from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_SHARE_LINK_BUNDLE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
+from documents.utils import QuerySetStream
 from paperless import version
 from paperless.models import ApplicationConfiguration
 from paperless_mail.models import MailAccount
@@ -368,9 +369,6 @@ class Command(CryptMixin, PaperlessCommand):
                                 self._encrypt_record_inline(record)
                             writer.write_batch(batch)
 
-            document_map: dict[int, Document] = {
-                d.pk: d for d in Document.global_objects.order_by("id")
-            }
             share_link_bundle_map: dict[int, ShareLinkBundle] = {
                 b.pk: b
                 for b in ShareLinkBundle.objects.order_by("id").prefetch_related(
@@ -379,12 +377,25 @@ class Command(CryptMixin, PaperlessCommand):
             }
 
             # 2. Export files from each document
-            for document_dict in self.track(
-                document_manifest,
+            # document_manifest and this stream are both ordered by id from the
+            # same underlying rows, so zip them in lockstep instead of building
+            # a dict of every Document instance up front (QuerySetStream keeps
+            # only one batch of documents resident at a time).
+            documents_stream = QuerySetStream(
+                Document.global_objects.order_by("id"),
+                chunk_size=self.batch_size,
+            )
+            for document_dict, document in self.track(
+                zip(document_manifest, documents_stream, strict=True),
                 description="Exporting documents...",
                 total=len(document_manifest),
             ):
-                document = document_map[document_dict["pk"]]
+                if document.pk != document_dict["pk"]:
+                    raise CommandError(
+                        "Document export ordering mismatch: expected "
+                        f"pk={document_dict['pk']}, got pk={document.pk}. "
+                        "Documents may have changed during export.",
+                    )
 
                 # generate a unique filename, then the arcnames for its files
                 base_name = self.generate_base_name(document)
