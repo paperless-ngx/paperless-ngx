@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Directive,
   EventEmitter,
   Input,
@@ -45,6 +46,7 @@ export abstract class EditDialogComponent<
   protected userService = inject(UserService)
   protected settingsService = inject(SettingsService)
   protected permissionsService = inject(PermissionsService)
+  protected changeDetector = inject(ChangeDetectorRef)
 
   dialogMode = model(EditDialogMode.CREATE)
 
@@ -108,10 +110,12 @@ export abstract class EditDialogComponent<
     // wait to enable close button so it doesn't steal focus from input since its the first clickable element in the DOM
     setTimeout(() => {
       this.closeEnabled = true
+      this.changeDetector.markForCheck()
     })
 
     this.userService.listAll().subscribe((r) => {
       this.users = r.results
+      this.changeDetector.markForCheck()
     })
   }
 
@@ -191,6 +195,7 @@ export abstract class EditDialogComponent<
         this.error = error.error
         this.networkActive = false
         this.failed.next(error)
+        this.changeDetector.markForCheck()
       },
     })
   }
