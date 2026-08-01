@@ -56,6 +56,32 @@ def send_publish(
 
 @pytest.mark.django_db
 class TestBeforeTaskPublishHandler:
+    @mock.patch("documents.signals.handlers.connections.all")
+    def test_closes_old_connections_outside_atomic_blocks(
+        self,
+        connections_all,
+    ) -> None:
+        connection = mock.Mock(in_atomic_block=False)
+        connections_all.return_value = [connection]
+
+        task_id = send_publish("documents.tasks.train_classifier", (), {})
+
+        connection.close_if_unusable_or_obsolete.assert_called_once_with()
+        assert PaperlessTask.objects.filter(task_id=task_id).exists()
+
+    @mock.patch("documents.signals.handlers.connections.all")
+    def test_keeps_connections_open_inside_atomic_blocks(
+        self,
+        connections_all,
+    ) -> None:
+        connection = mock.Mock(in_atomic_block=True)
+        connections_all.return_value = [connection]
+
+        task_id = send_publish("documents.tasks.train_classifier", (), {})
+
+        connection.close_if_unusable_or_obsolete.assert_not_called()
+        assert PaperlessTask.objects.filter(task_id=task_id).exists()
+
     def test_creates_task_for_consume_file(
         self,
         consume_input_doc,

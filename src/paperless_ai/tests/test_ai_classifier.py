@@ -3,6 +3,8 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
+import pytest_mock
+from django.contrib.auth.models import User
 from django.test import override_settings
 
 from documents.models import Document
@@ -278,3 +280,104 @@ def test_get_context_for_document_no_similar_docs(mock_document):
     with patch("paperless_ai.ai_classifier.query_similar_documents", return_value=[]):
         result = get_context_for_document(mock_document)
         assert result == ""
+
+
+class TestGetContextForDocumentVisibility:
+    """get_context_for_document must not materialize every visible document
+    id for a user who can already see the whole library: a superuser (like
+    no user at all) gets document_ids=None (no restriction) straight
+    through to query_similar_documents(), instead of a full-library IN
+    filter that is wasteful at best and, past ~32,763 documents, a hard
+    sqlite3.OperationalError at worst (SQLite's bound-parameter limit).
+    """
+
+    def test_skips_permission_lookup_for_superuser(
+        self,
+        mock_document: MagicMock,
+        mock_similar_documents: list[MagicMock],
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A superuser
+        WHEN:
+            - get_context_for_document() is called
+        THEN:
+            - get_objects_for_user_owner_aware() is never called, and
+              query_similar_documents() is called with document_ids=None
+        """
+        mock_query = mocker.patch(
+            "paperless_ai.ai_classifier.query_similar_documents",
+            return_value=mock_similar_documents,
+        )
+        mock_get_objects = mocker.patch(
+            "paperless_ai.ai_classifier.get_objects_for_user_owner_aware",
+        )
+        user = mocker.MagicMock(spec=User)
+        user.is_superuser = True
+
+        get_context_for_document(mock_document, user, max_docs=2)
+
+        mock_get_objects.assert_not_called()
+        assert mock_query.call_args.kwargs["document_ids"] is None
+
+    def test_skips_permission_lookup_when_no_user(
+        self,
+        mock_document: MagicMock,
+        mock_similar_documents: list[MagicMock],
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - No user (user=None)
+        WHEN:
+            - get_context_for_document() is called
+        THEN:
+            - get_objects_for_user_owner_aware() is never called, and
+              query_similar_documents() is called with document_ids=None
+        """
+        mock_query = mocker.patch(
+            "paperless_ai.ai_classifier.query_similar_documents",
+            return_value=mock_similar_documents,
+        )
+        mock_get_objects = mocker.patch(
+            "paperless_ai.ai_classifier.get_objects_for_user_owner_aware",
+        )
+
+        get_context_for_document(mock_document, None, max_docs=2)
+
+        mock_get_objects.assert_not_called()
+        assert mock_query.call_args.kwargs["document_ids"] is None
+
+    def test_restricts_to_visible_documents_for_non_superuser(
+        self,
+        mock_document: MagicMock,
+        mock_similar_documents: list[MagicMock],
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A non-superuser with a specific set of visible documents
+        WHEN:
+            - get_context_for_document() is called
+        THEN:
+            - query_similar_documents() is called with exactly that user's
+              visible document ids, unchanged from before this optimization
+        """
+        mock_query = mocker.patch(
+            "paperless_ai.ai_classifier.query_similar_documents",
+            return_value=mock_similar_documents,
+        )
+        mock_queryset = mocker.MagicMock()
+        mock_queryset.values_list.return_value = [1, 2, 3]
+        mock_get_objects = mocker.patch(
+            "paperless_ai.ai_classifier.get_objects_for_user_owner_aware",
+            return_value=mock_queryset,
+        )
+        user = mocker.MagicMock(spec=User)
+        user.is_superuser = False
+
+        get_context_for_document(mock_document, user, max_docs=2)
+
+        mock_get_objects.assert_called_once_with(user, "view_document", Document)
+        assert mock_query.call_args.kwargs["document_ids"] == [1, 2, 3]

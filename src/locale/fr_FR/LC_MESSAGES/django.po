@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-27 19:34+0000\n"
-"PO-Revision-Date: 2026-07-27 19:35\n"
+"POT-Creation-Date: 2026-07-31 16:14+0000\n"
+"PO-Revision-Date: 2026-07-31 16:15\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -1339,7 +1339,7 @@ msgid "workflow runs"
 msgstr "le flux de travail s'exécute"
 
 #: documents/serialisers.py:522 documents/serialisers.py:874
-#: documents/serialisers.py:2763 documents/views.py:299 documents/views.py:2553
+#: documents/serialisers.py:2776 documents/views.py:299 documents/views.py:2558
 #: paperless_mail/serialisers.py:155
 msgid "Insufficient permissions."
 msgstr "Droits insuffisants."
@@ -1348,38 +1348,38 @@ msgstr "Droits insuffisants."
 msgid "Invalid color."
 msgstr "Couleur incorrecte."
 
-#: documents/serialisers.py:2235
+#: documents/serialisers.py:2248
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Type de fichier %(type)s non pris en charge"
 
-#: documents/serialisers.py:2279
+#: documents/serialisers.py:2292
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "L'id du champ personnalisé doit être un entier : %(id)s"
 
-#: documents/serialisers.py:2286
+#: documents/serialisers.py:2299
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Le champ personnalisé avec l'id %(id)s n'existe pas"
 
-#: documents/serialisers.py:2303 documents/serialisers.py:2313
+#: documents/serialisers.py:2316 documents/serialisers.py:2326
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Les champs personnalisés doivent être une liste d'entiers ou un mappage d'identifiants à des valeurs."
 
-#: documents/serialisers.py:2308
+#: documents/serialisers.py:2321
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Certains champs personnalisés n'existent pas ou ont été spécifiés deux fois."
 
-#: documents/serialisers.py:2455
+#: documents/serialisers.py:2468
 msgid "Invalid variable detected."
 msgstr "Variable invalide détectée."
 
-#: documents/serialisers.py:2819
+#: documents/serialisers.py:2832
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Les identificateurs de document en double ne sont pas autorisés."
 
-#: documents/serialisers.py:2849 documents/views.py:4512
+#: documents/serialisers.py:2862 documents/views.py:4517
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Documents introuvables : %(ids)s"
@@ -1634,36 +1634,36 @@ msgstr "Le schéma d'URI « {parts.scheme} » n'est pas autorisé. Schémas aut
 msgid "Unable to parse URI {value}"
 msgstr "Impossible d'analyser l'URI {value}"
 
-#: documents/views.py:292 documents/views.py:2550
+#: documents/views.py:292 documents/views.py:2555
 msgid "Invalid more_like_id"
 msgstr "More_like_id invalide"
 
-#: documents/views.py:1562
+#: documents/views.py:1567
 msgid "Invalid AI configuration."
 msgstr "Configuration IA invalide."
 
-#: documents/views.py:1571
+#: documents/views.py:1576
 msgid "AI backend request timed out."
 msgstr "La requête d'arrière-plan IA a expiré."
 
-#: documents/views.py:2375 documents/views.py:2696
+#: documents/views.py:2380 documents/views.py:2701
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Spécifiez seulement un texte, titre, recherche ou more_like_id."
 
-#: documents/views.py:4524
+#: documents/views.py:4529
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Droits d'accès insuffisant pour partager %(id)s document."
 
-#: documents/views.py:4570
+#: documents/views.py:4575
 msgid "Bundle is already being processed."
 msgstr "Le paquet est déjà en cours de traitement."
 
-#: documents/views.py:4631
+#: documents/views.py:4636
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Le lot de liens de partage est en cours de préparation. Veuillez réessayer plus tard."
 
-#: documents/views.py:4641
+#: documents/views.py:4646
 msgid "The share link bundle is unavailable."
 msgstr "Le lot de liens de partage n'est pas disponible."
 

@@ -116,7 +116,10 @@ export class PngxPdfViewerComponent
       changes['zoomScale'] ||
       changes['rotation']
     ) {
-      this.applyViewerState()
+      // Prevent loop with page / scale application see https://github.com/paperless-ngx/paperless-ngx/issues/13404
+      this.applyViewerState(
+        !!(changes['zoom'] || changes['zoomScale'] || changes['rotation'])
+      )
     }
 
     if (changes['searchQuery']) {
@@ -240,7 +243,7 @@ export class PngxPdfViewerComponent
     }
   }
 
-  private applyViewerState(): void {
+  private applyViewerState(applyScale = true): void {
     if (!this.pdfViewer) {
       return
     }
@@ -264,7 +267,7 @@ export class PngxPdfViewerComponent
     if (this.page === this.lastViewerPage) {
       this.lastViewerPage = undefined
     }
-    if (hasPages) {
+    if (hasPages && applyScale) {
       this.applyScale()
     }
     this.dispatchFindIfReady()

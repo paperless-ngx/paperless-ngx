@@ -43,8 +43,16 @@ def _fmt(dt: datetime) -> str:
 
 
 def _iso_range(lo: datetime, hi: datetime) -> str:
-    """Format a [lo TO hi] range string in ISO 8601 for Tantivy query syntax."""
-    return f"[{_fmt(lo)} TO {_fmt(hi)}]"
+    """
+    Format a half-open ``[lo TO hi)`` range in ISO 8601 for Tantivy query syntax.
+
+    ``hi`` is always the exclusive ceiling of a computed period (the start of
+    the *next* day/week/month/quarter/year), so the closing bracket must be
+    the Tantivy exclusive-range brace ``}`` rather than ``]`` — otherwise the
+    first instant of the following period (e.g. the 1st of next month) is
+    incorrectly included in the match.
+    """
+    return f"[{_fmt(lo)} TO {_fmt(hi)}}}"
 
 
 def _quarter_start(d: date) -> date:

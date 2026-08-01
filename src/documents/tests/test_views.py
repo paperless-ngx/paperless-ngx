@@ -494,6 +494,42 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
     @patch("documents.views.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
+        LLM_BACKEND="mock_backend",
+        LLM_MODEL="model-a",
+        LLM_ENDPOINT="http://endpoint-a",
+    )
+    def test_ai_suggestions_cache_key_includes_model_and_endpoint(
+        self,
+        mock_get_ai_classification,
+    ) -> None:
+        """Cached suggestions are keyed by model and endpoint, so switching
+        either yields a cache miss instead of a stale hit."""
+        mock_get_ai_classification.return_value = {
+            "title": "Answer A",
+            "tags": [],
+            "correspondents": [],
+            "document_types": [],
+            "storage_paths": [],
+            "dates": [],
+        }
+
+        self.client.force_login(user=self.user)
+        response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Cached under a key that carries model + endpoint...
+        self.assertIsNotNone(
+            get_llm_suggestion_cache(
+                self.document.pk,
+                backend="mock_backend:model-a:http://endpoint-a",
+            ),
+        )
+
+    @patch("documents.views.get_ai_document_classification")
+    @override_settings(
+        AI_ENABLED=True,
         LLM_BACKEND="openai-like",
     )
     def test_ai_suggestions_with_invalid_ai_configuration(

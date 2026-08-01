@@ -1,7 +1,15 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable, inject, signal } from '@angular/core'
-import { Observable, Subject } from 'rxjs'
-import { first, map, takeUntil, tap } from 'rxjs/operators'
+import { EMPTY, Observable, Subject } from 'rxjs'
+import {
+  catchError,
+  finalize,
+  first,
+  map,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs/operators'
 import {
   PaperlessTask,
   PaperlessTaskStatus,
@@ -23,44 +31,40 @@ export class TasksService {
 
   public loading: boolean = false
 
-  private readonly fileTasks = signal<PaperlessTask[]>([])
+  private readonly tasks = signal<PaperlessTask[]>([])
+  private readonly reloadNotifier = new Subject<void>()
 
   private unsubscribeNotifer: Subject<any> = new Subject()
 
-  public get total(): number {
-    return this.fileTasks().length
-  }
-
-  public get allFileTasks(): PaperlessTask[] {
-    return this.fileTasks().slice(0)
-  }
-
-  public get queuedFileTasks(): PaperlessTask[] {
-    return this.fileTasks().filter(
-      (t) => t.status === PaperlessTaskStatus.Pending
-    )
-  }
-
-  public get startedFileTasks(): PaperlessTask[] {
-    return this.fileTasks().filter(
-      (t) => t.status === PaperlessTaskStatus.Started
-    )
-  }
-
-  public get completedFileTasks(): PaperlessTask[] {
-    return this.fileTasks().filter(
-      (t) => t.status === PaperlessTaskStatus.Success
-    )
-  }
-
-  public get failedFileTasks(): PaperlessTask[] {
-    return this.fileTasks().filter(
-      (t) => t.status === PaperlessTaskStatus.Failure
-    )
+  constructor() {
+    this.reloadNotifier
+      .pipe(
+        switchMap(() => {
+          this.loading = true
+          return this.http
+            .get<Results<PaperlessTask>>(`${this.baseUrl}${this.endpoint}/`, {
+              params: {
+                acknowledged: 'false',
+                page_size: this.defaultReloadPageSize,
+              },
+            })
+            .pipe(
+              map((response) => response.results),
+              takeUntil(this.unsubscribeNotifer),
+              catchError(() => EMPTY),
+              finalize(() => {
+                this.loading = false
+              })
+            )
+        })
+      )
+      .subscribe((tasks) => {
+        this.tasks.set(tasks)
+      })
   }
 
   public get needsAttentionTasks(): PaperlessTask[] {
-    return this.fileTasks().filter((t) =>
+    return this.tasks().filter((t) =>
       [PaperlessTaskStatus.Failure, PaperlessTaskStatus.Revoked].includes(
         t.status
       )
@@ -68,22 +72,7 @@ export class TasksService {
   }
 
   public reload() {
-    if (this.loading) return
-    this.loading = true
-
-    this.http
-      .get<Results<PaperlessTask>>(`${this.baseUrl}${this.endpoint}/`, {
-        params: {
-          acknowledged: 'false',
-          page_size: this.defaultReloadPageSize,
-        },
-      })
-      .pipe(map((r) => r.results))
-      .pipe(takeUntil(this.unsubscribeNotifer), first())
-      .subscribe((r) => {
-        this.fileTasks.set(r)
-        this.loading = false
-      })
+    this.reloadNotifier.next()
   }
 
   public list(

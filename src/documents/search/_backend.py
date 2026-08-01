@@ -39,6 +39,7 @@ from documents.search._tokenizer import ascii_fold
 from documents.search._tokenizer import autocomplete_tokens
 from documents.search._tokenizer import register_tokenizers
 from documents.utils import IterWrapper
+from documents.utils import QuerySetStream
 from documents.utils import identity
 
 if TYPE_CHECKING:
@@ -1035,14 +1036,15 @@ _EMPTY_VIEWER_GRANT: Final[ViewerGrant] = ViewerGrant(
 )
 
 
-class _DocumentViewerStream:
+class _DocumentViewerStream(QuerySetStream["Document"]):
     """Yield document permission data while batch-loading grants.
 
     Viewer permissions are fetched in batches (see
     ``_bulk_get_viewer_permissions``), but documents are yielded individually so a
     progress bar wrapped around this stream advances per document rather than
-    jumping a whole chunk at a time. ``__len__`` lets the progress helper still
-    discover the total (it inspects ``QuerySet``/``Sized``).
+    jumping a whole chunk at a time. ``__len__`` (inherited from
+    ``QuerySetStream``) lets the progress helper still discover the total (it
+    inspects ``QuerySet``/``Sized``).
 
     The viewer and group ids travel with each document in the yielded pair
     rather than through a separate mutable attribute, so the pairing survives
@@ -1051,18 +1053,11 @@ class _DocumentViewerStream:
     generator in lock-step.
     """
 
-    def __init__(self, documents: QuerySet[Document], *, chunk_size: int) -> None:
-        self._documents = documents
-        self._chunk_size = chunk_size
-
-    def __len__(self) -> int:
-        return self._documents.count()
-
     def __iter__(self) -> Iterator[tuple[Document, ViewerGrant]]:
         # iterator(chunk_size=…) streams from a server-side cursor instead of
         # materialising the whole queryset in memory; since Django 4.1 it still
         # honours prefetch_related, running the prefetches one batch at a time.
-        documents = self._documents.iterator(chunk_size=self._chunk_size)
+        documents = self._queryset.iterator(chunk_size=self._chunk_size)
         for chunk in chunked(documents, self._chunk_size):
             grants_by_pk = _bulk_get_viewer_permissions([doc.pk for doc in chunk])
             for doc in chunk:

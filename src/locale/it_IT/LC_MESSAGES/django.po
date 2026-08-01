@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-27 19:34+0000\n"
-"PO-Revision-Date: 2026-07-27 19:35\n"
+"POT-Creation-Date: 2026-07-31 16:14+0000\n"
+"PO-Revision-Date: 2026-07-31 16:15\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -1339,7 +1339,7 @@ msgid "workflow runs"
 msgstr "esecuzioni del flusso di lavoro"
 
 #: documents/serialisers.py:522 documents/serialisers.py:874
-#: documents/serialisers.py:2763 documents/views.py:299 documents/views.py:2553
+#: documents/serialisers.py:2776 documents/views.py:299 documents/views.py:2558
 #: paperless_mail/serialisers.py:155
 msgid "Insufficient permissions."
 msgstr "Autorizzazioni insufficienti."
@@ -1348,38 +1348,38 @@ msgstr "Autorizzazioni insufficienti."
 msgid "Invalid color."
 msgstr "Colore non valido."
 
-#: documents/serialisers.py:2235
+#: documents/serialisers.py:2248
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Il tipo di file %(type)s non è supportato"
 
-#: documents/serialisers.py:2279
+#: documents/serialisers.py:2292
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "L'ID del campo personalizzato deve essere un numero intero: %(id)s"
 
-#: documents/serialisers.py:2286
+#: documents/serialisers.py:2299
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Il campo personalizzato con ID %(id)s non esiste"
 
-#: documents/serialisers.py:2303 documents/serialisers.py:2313
+#: documents/serialisers.py:2316 documents/serialisers.py:2326
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "I campi personalizzati devono essere un elenco di numeri interi o un oggetto che mappa gli ID ai valori."
 
-#: documents/serialisers.py:2308
+#: documents/serialisers.py:2321
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Alcuni campi personalizzati non esistono o sono stati specificati due volte."
 
-#: documents/serialisers.py:2455
+#: documents/serialisers.py:2468
 msgid "Invalid variable detected."
 msgstr "Variabile non valida rilevata."
 
-#: documents/serialisers.py:2819
+#: documents/serialisers.py:2832
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Non sono consentiti identificatori di documenti duplicati."
 
-#: documents/serialisers.py:2849 documents/views.py:4512
+#: documents/serialisers.py:2862 documents/views.py:4517
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Documenti non trovati: %(ids)s"
@@ -1635,36 +1635,36 @@ msgstr "Lo schema URI '{parts.scheme}' non è consentito. Schemi consentiti: {',
 msgid "Unable to parse URI {value}"
 msgstr "Impossibile analizzare l'URI {value}"
 
-#: documents/views.py:292 documents/views.py:2550
+#: documents/views.py:292 documents/views.py:2555
 msgid "Invalid more_like_id"
 msgstr "more_like_id non valido"
 
-#: documents/views.py:1562
+#: documents/views.py:1567
 msgid "Invalid AI configuration."
 msgstr "Configurazione AI non valida."
 
-#: documents/views.py:1571
+#: documents/views.py:1576
 msgid "AI backend request timed out."
 msgstr "Richiesta di backend AI scaduta."
 
-#: documents/views.py:2375 documents/views.py:2696
+#: documents/views.py:2380 documents/views.py:2701
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Specificare solo uno tra text, title_search, query o more_like_id."
 
-#: documents/views.py:4524
+#: documents/views.py:4529
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Autorizzazioni insufficienti per condividere il documento %(id)s."
 
-#: documents/views.py:4570
+#: documents/views.py:4575
 msgid "Bundle is already being processed."
 msgstr "Il pacchetto è già in fase di elaborazione."
 
-#: documents/views.py:4631
+#: documents/views.py:4636
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Il pacchetto di link di condivisione è ancora in fase di preparazione. Riprova più tardi."
 
-#: documents/views.py:4641
+#: documents/views.py:4646
 msgid "The share link bundle is unavailable."
 msgstr "Il pacchetto di link di condivisione non è disponibile."
 
