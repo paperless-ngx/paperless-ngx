@@ -489,6 +489,66 @@ class TestRelativeRanges:
 
 
 @pytest.mark.search
+class TestWhooshUnitAbbreviations:
+    """
+    Whoosh's PlusMinus date grammar accepted abbreviated unit spellings
+    (e.g. "yrs", "mos", "wks", "hrs", "mins", "secs"); saved views/searches
+    created under the old Whoosh backend can contain those tokens (see
+    https://github.com/paperless-ngx/paperless-ngx/issues/13482), so the
+    Tantivy translator must still accept them.
+    """
+
+    @time_machine.travel(_FROZEN_NOW, tick=False)
+    def test_minus_999_yrs(self) -> None:
+        assert translate_query("created:[-999yrs to now]", UTC) == (
+            "created:[1027-03-28T12:00:00Z TO 2026-03-28T12:00:00Z]"
+        )
+
+    @pytest.mark.parametrize(
+        ("token", "expected_lo"),
+        [
+            ("-1y", "2025-03-28T12:00:00Z"),
+            ("-1yr", "2025-03-28T12:00:00Z"),
+            ("-3mos", "2025-12-28T12:00:00Z"),
+            ("-3mo", "2025-12-28T12:00:00Z"),
+            ("-2wks", "2026-03-14T12:00:00Z"),
+            ("-2wk", "2026-03-14T12:00:00Z"),
+            ("-5dys", "2026-03-23T12:00:00Z"),
+            ("-5dy", "2026-03-23T12:00:00Z"),
+            ("-1hrs", "2026-03-28T11:00:00Z"),
+            ("-1hr", "2026-03-28T11:00:00Z"),
+            ("-10mins", "2026-03-28T11:50:00Z"),
+            ("-10min", "2026-03-28T11:50:00Z"),
+            ("-30secs", "2026-03-28T11:59:30Z"),
+            ("-30sec", "2026-03-28T11:59:30Z"),
+        ],
+    )
+    @time_machine.travel(_FROZEN_NOW, tick=False)
+    def test_abbreviated_units(self, token: str, expected_lo: str) -> None:
+        assert translate_query(f"added:[{token} to now]", UTC) == (
+            f"added:[{expected_lo} TO 2026-03-28T12:00:00Z]"
+        )
+
+    @pytest.mark.parametrize(
+        "raw",
+        [
+            "created:[-999yrs to now]",
+            "added:[-1y to now]",
+            "created:[-3mos to now]",
+            "added:[-2wks to now]",
+            "added:[-5dys to now]",
+            "added:[-1hrs to now]",
+            "added:[-10mins to now]",
+            "added:[-30secs to now]",
+        ],
+    )
+    @time_machine.travel(_FROZEN_NOW, tick=False)
+    def test_parse_acceptance(self, index: tantivy.Index, raw: str) -> None:
+        translated = translate_query(raw, UTC)
+        index.parse_query(translated, DEFAULT_SEARCH_FIELDS, field_boosts=_FIELD_BOOSTS)
+
+
+@pytest.mark.search
 class TestOperatorNormalization:
     """Post-render operator normalization in translate_query."""
 

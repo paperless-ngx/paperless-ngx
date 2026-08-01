@@ -391,13 +391,39 @@ _NOW_COMPACT_RE = regex.compile(
     regex.IGNORECASE,
 )
 
-# Matches "±N <unit>" Whoosh-style offsets (e.g. -7 days, -1 week, +3 hours)
-# Unit is singular or plural; sign prefix is mandatory.
+# Matches "±N <unit>" Whoosh-style offsets (e.g. -7 days, -1 week, +3 hours).
+# Whoosh's own date parser (qparser.dateparse.PlusMinus) additionally accepted
+# abbreviated unit spellings (e.g. "yrs", "yr", "y", "mos", "wks", "hrs", "mins",
+# "secs"); saved views/searches created under the old Whoosh backend can still
+# contain those tokens (e.g. "-999yrs"), so they are accepted here too and
+# normalized to a canonical unit via _UNIT_ALIASES below.
 _NOW_SPACED_RE = regex.compile(
     r"^(?P<sign>[+-])(?P<n>\d+)\s*"
-    r"(?P<unit>second|minute|hour|day|week|month|year)s?$",
+    r"(?P<unit>years|year|yrs|yr|ys|y"
+    r"|months|month|mons|mon|mos|mo"
+    r"|weeks|week|wks|wk|ws|w"
+    r"|days|day|dys|dy|ds|d"
+    r"|hours|hour|hrs|hr|hs|h"
+    r"|minutes|minute|mins|min|ms|m"
+    r"|seconds|second|secs|sec|s)$",
     regex.IGNORECASE,
 )
+
+# Maps every accepted unit spelling (including Whoosh-era abbreviations) to the
+# canonical unit name used as a key into the delta map in _resolve_relative_bound.
+_UNIT_ALIASES: dict[str, str] = {
+    alias: canonical
+    for canonical, aliases in {
+        "year": ("years", "year", "yrs", "yr", "ys", "y"),
+        "month": ("months", "month", "mons", "mon", "mos", "mo"),
+        "week": ("weeks", "week", "wks", "wk", "ws", "w"),
+        "day": ("days", "day", "dys", "dy", "ds", "d"),
+        "hour": ("hours", "hour", "hrs", "hr", "hs", "h"),
+        "minute": ("minutes", "minute", "mins", "min", "ms", "m"),
+        "second": ("seconds", "second", "secs", "sec", "s"),
+    }.items()
+    for alias in aliases
+}
 
 
 def _resolve_relative_bound(token: str) -> datetime | None:
@@ -407,7 +433,9 @@ def _resolve_relative_bound(token: str) -> datetime | None:
     Supported forms:
       - ``now``            -> current UTC instant
       - ``now+/-<n>d/h/m`` -> now +/- timedelta (d=days, h=hours, m=minutes)
-      - ``±N <unit>``     -> now +/- delta; month/year use relativedelta
+      - ``±N <unit>``     -> now +/- delta; month/year use relativedelta;
+                              unit also accepts Whoosh-era abbreviations
+                              (e.g. "yrs", "mos", "wks", "hrs", "mins", "secs")
     """
     stripped = token.strip()
     low = stripped.lower()
@@ -435,7 +463,7 @@ def _resolve_relative_bound(token: str) -> datetime | None:
     if m:
         sign = 1 if m.group("sign") == "+" else -1
         n = int(m.group("n"))
-        unit = m.group("unit").lower()
+        unit = _UNIT_ALIASES[m.group("unit").lower()]
         delta_map: dict[str, timedelta | relativedelta] = {
             "second": timedelta(seconds=n),
             "minute": timedelta(minutes=n),
