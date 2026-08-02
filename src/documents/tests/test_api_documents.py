@@ -472,6 +472,31 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertIn("my_document.pdf", response["Content-Disposition"])
         response.close()
 
+    @override_settings(FILENAME_FORMAT="")
+    def test_download_filename_normalization_does_not_inject_parameters(
+        self,
+    ) -> None:
+        doc = Document.objects.create(
+            title="file.doc\uff02; x=\uff02\uff3c",
+            created=date(2020, 1, 2),
+            filename="source.pdf",
+            mime_type="application/pdf",
+        )
+        Path(doc.source_path).write_bytes(b"This is a test")
+
+        response = self.client.get(
+            f"/api/documents/{doc.pk}/download/?original=true",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response["Content-Disposition"],
+            "attachment; "
+            'filename="2020-01-02 file.doc_; x=__.pdf"; '
+            "filename*=utf-8''2020-01-02%20file.doc%EF%BC%82%3B%20x%3D%EF%BC%82%EF%BC%BC.pdf",
+        )
+        response.close()
+
     def test_document_actions_not_existing_file(self) -> None:
         doc = Document.objects.create(
             title="none",
