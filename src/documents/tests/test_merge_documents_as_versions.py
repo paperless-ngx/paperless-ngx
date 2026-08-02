@@ -1,6 +1,11 @@
+import json
 from unittest import mock
 
+from django.contrib.auth.models import Permission
+from django.contrib.auth.models import User
 from django.test import TestCase
+from rest_framework import status
+from rest_framework.test import APITestCase
 
 from documents.bulk_edit import merge_as_versions
 from documents.models import Document
@@ -215,3 +220,87 @@ class TestMergeDocumentsAsVersions(TestCase):
         get_backend_mock.assert_not_called()
         bulk_update_mock.assert_not_called()
         status_manager_mock.assert_not_called()
+
+
+class TestMergeDocumentsAsVersionsAPI(APITestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(username="user")
+        self.user.user_permissions.add(
+            Permission.objects.get(codename="change_document"),
+        )
+        self.doc1 = Document.objects.create(
+            checksum="A",
+            title="A",
+            owner=self.user,
+        )
+        self.doc2 = Document.objects.create(
+            checksum="B",
+            title="B",
+            owner=self.user,
+        )
+        self.client.force_authenticate(user=self.user)
+
+    @mock.patch("documents.views.bulk_edit.merge_as_versions")
+    def test_merges_documents_as_versions(self, merge_mock) -> None:
+        merge_mock.return_value = "OK"
+        merge_mock.__name__ = "merge_as_versions"
+
+        response = self.client.post(
+            "/api/documents/merge_as_versions/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id, self.doc2.id],
+                    "root_document_id": self.doc2.id,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {"result": "OK"})
+        merge_mock.assert_called_once_with(
+            [self.doc1.id, self.doc2.id],
+            root_document_id=self.doc2.id,
+        )
+
+    @mock.patch("documents.views.bulk_edit.merge_as_versions")
+    def test_requires_change_permission(self, merge_mock) -> None:
+        merge_mock.__name__ = "merge_as_versions"
+        user = User.objects.create_user(username="no-change")
+        self.doc1.owner = user
+        self.doc1.save()
+        self.doc2.owner = user
+        self.doc2.save()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(
+            "/api/documents/merge_as_versions/",
+            {
+                "documents": [self.doc1.id, self.doc2.id],
+                "root_document_id": self.doc1.id,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        merge_mock.assert_not_called()
+
+    @mock.patch("documents.views.bulk_edit.merge_as_versions")
+    def test_rejects_unselected_root(self, merge_mock) -> None:
+        doc3 = Document.objects.create(
+            checksum="C",
+            title="C",
+            owner=self.user,
+        )
+
+        response = self.client.post(
+            "/api/documents/merge_as_versions/",
+            {
+                "documents": [self.doc1.id, self.doc2.id],
+                "root_document_id": doc3.id,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        merge_mock.assert_not_called()
