@@ -139,31 +139,38 @@ def _simple_query_tokens(raw_query: str) -> list[str]:
     return simple_search_tokens(raw_query)
 
 
-def _build_simple_field_query(
+def _build_simple_token_query(
     index: tantivy.Index,
-    field: str,
-    tokens: list[str],
+    fields: list[str],
+    token: str,
+    *,
+    allow_infix: bool,
 ) -> tantivy.Query:
-    patterns = []
-    for idx, token in enumerate(tokens):
-        escaped = regex.escape(token)
-        # For multi-token substring search, only the first token can begin mid-word.
-        # Later tokens follow a whitespace boundary in the original query, so anchor
-        # them to the start of the next indexed token to reduce false positives like
-        # matching "Z-Berichte 16" for the query "Z-Berichte 6".
-        if idx == 0:
-            patterns.append(f".*{escaped}.*")
-        else:
-            patterns.append(f"{escaped}.*")
-    if len(patterns) == 1:
-        query = tantivy.Query.regex_query(index.schema, field, patterns[0])
-    else:
-        query = tantivy.Query.regex_phrase_query(index.schema, field, patterns)
+    escaped = regex.escape(token)
+    # The simple analyzer keeps punctuation inside whitespace-delimited terms.
+    # Later query tokens may therefore begin either at the indexed term boundary
+    # or after punctuation within a term (for example, ``medical-history``).
+    # Do not allow an arbitrary infix for later tokens: a query ending in ``6``
+    # must not match the middle of ``16``.
+    pattern = (
+        f".*{escaped}.*"
+        if allow_infix
+        else (
+            f"({escaped}.*|"
+            rf".*[\x20-\x2f\x3a-\x40\x5b-\x60\x7b-\x7e]{escaped}.*)"
+        )
+    )
+    field_queries: list[tuple[tantivy.Occur, tantivy.Query]] = []
+    for field in fields:
+        query = tantivy.Query.regex_query(index.schema, field, pattern)
+        boost = _SIMPLE_FIELD_BOOSTS.get(field, 1.0)
+        if boost > 1.0:
+            query = tantivy.Query.boost_query(query, boost)
+        field_queries.append((tantivy.Occur.Should, query))
 
-    boost = _SIMPLE_FIELD_BOOSTS.get(field, 1.0)
-    if boost > 1.0:
-        return tantivy.Query.boost_query(query, boost)
-    return query
+    if len(field_queries) == 1:
+        return field_queries[0][1]
+    return tantivy.Query.boolean_query(field_queries)
 
 
 def parse_user_query(
@@ -265,10 +272,27 @@ def parse_simple_query(
 
     clauses: list[tuple[tantivy.Occur, tantivy.Query]] = []
     if tokens:
-        clauses = [
-            (tantivy.Occur.Should, _build_simple_field_query(index, field, tokens))
-            for field in fields
+        # Match every query token, regardless of its position in the document.
+        # Each token may occur in any of the requested fields, so text mode also
+        # finds documents whose matches are split between title and content.
+        token_queries = [
+            (
+                tantivy.Occur.Must,
+                _build_simple_token_query(
+                    index,
+                    fields,
+                    token,
+                    allow_infix=idx == 0,
+                ),
+            )
+            for idx, token in enumerate(tokens)
         ]
+        simple_query = (
+            token_queries[0][1]
+            if len(token_queries) == 1
+            else tantivy.Query.boolean_query(token_queries)
+        )
+        clauses.append((tantivy.Occur.Should, simple_query))
 
     if cjk_fields and _has_cjk(raw_query):
         cjk_q = _build_cjk_query(index, raw_query, cjk_fields)
