@@ -168,6 +168,50 @@ class TestSearch:
             == 1
         )
 
+    def test_text_mode_matches_all_terms_without_requiring_adjacency(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """Simple text mode should match all terms in any order or field."""
+        doc = Document.objects.create(
+            title="complete-medical-history",
+            content="Samsung Odyssey curved monitor",
+            checksum="TXT13",
+            pk=19,
+        )
+        backend.add_or_update(doc)
+
+        for query in [
+            "complete history",
+            "history complete",
+            "Samsung curved",
+            "curved Samsung",
+        ]:
+            assert backend.search_ids(
+                query,
+                user=None,
+                search_mode=SearchMode.TEXT,
+            ) == [doc.pk], query
+
+    def test_text_mode_matches_terms_across_title_and_content(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """Each simple-search term may match either title or content."""
+        doc = Document.objects.create(
+            title="Complete record",
+            content="Patient history",
+            checksum="TXT14",
+            pk=20,
+        )
+        backend.add_or_update(doc)
+
+        assert backend.search_ids(
+            "complete history",
+            user=None,
+            search_mode=SearchMode.TEXT,
+        ) == [doc.pk]
+
     def test_text_mode_does_not_match_on_partial_term_overlap(
         self,
         backend: TantivyBackend,
