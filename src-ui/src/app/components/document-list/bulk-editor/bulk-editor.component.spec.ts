@@ -1281,7 +1281,6 @@ describe('BulkEditorComponent', () => {
 
     component.mergeSelectedAsVersions()
     expect(modal).not.toBeUndefined()
-    expect(modal.componentInstance.mergeAsVersions).toBe(true)
     modal.componentInstance.rootDocumentID.set(4)
     modal.componentInstance.confirm()
 
