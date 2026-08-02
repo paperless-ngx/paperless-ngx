@@ -620,3 +620,42 @@ class TestMatchingRespectsObjectPermissions:
         matched_ids = {sp.pk for sp in matched}
         assert visible_storage_path.pk in matched_ids
         assert hidden_storage_path.pk not in matched_ids
+
+
+@pytest.mark.django_db
+class TestBulkEditObjectsApplyToAllPermissionBoundary:
+    def test_apply_to_all_tags_excludes_unpermitted_tag(self, rest_api_client):
+        owner = User.objects.create_user(username="tags_owner")
+        requester = User.objects.create_user(username="tags_requester")
+        # grant the global change_tag permission so the object-level
+        # filtering (not the global has_perm check) is what's under test
+        requester.user_permissions.add(
+            Permission.objects.get(codename="change_tag"),
+        )
+        rest_api_client.force_authenticate(user=requester)
+        visible = TagFactory(owner=owner)
+        hidden = TagFactory(owner=owner)
+        assign_perm("view_tag", requester, visible)
+        assign_perm("change_tag", requester, visible)
+
+        response = rest_api_client.post(
+            "/api/bulk_edit_objects/",
+            {
+                "object_type": "tags",
+                "operation": "set_permissions",
+                "all": True,
+                "filters": {},
+                "owner": requester.pk,
+            },
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.OK
+
+        # The apply_to_all dispatch must resolve permitted objects up front:
+        # the visible tag (object-level change_tag granted) gets its owner
+        # reassigned, while the hidden tag (no object-level grant) is
+        # excluded entirely and keeps its original owner.
+        visible.refresh_from_db()
+        hidden.refresh_from_db()
+        assert visible.owner == requester
+        assert hidden.owner == owner

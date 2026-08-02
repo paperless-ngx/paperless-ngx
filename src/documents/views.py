@@ -178,6 +178,7 @@ from documents.permissions import has_global_statistics_permission
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import has_system_status_permission
 from documents.permissions import permitted_document_ids
+from documents.permissions import permitted_object_ids
 from documents.permissions import set_permissions_for_object
 from documents.plugins.date_parsing import get_date_parser
 from documents.schema import generate_object_with_permissions_schema
@@ -4764,10 +4765,8 @@ class BulkEditObjectsView(PassUserMixin):
                 "document_types": DocumentTypeFilterSet,
                 "storage_paths": StoragePathFilterSet,
             }[object_type]
-            user_permitted_objects = get_objects_for_user_owner_aware(
-                user,
-                perm_codename,
-                object_class,
+            user_permitted_objects = object_class.objects.filter(
+                id__in=permitted_object_ids(user, object_class, perm_codename),
             )
             objs = filterset_class(
                 data=filters,
@@ -4792,8 +4791,9 @@ class BulkEditObjectsView(PassUserMixin):
 
         if not user.is_superuser:
             perm = f"documents.{perm_codename}"
+            permitted_ids = set(permitted_object_ids(user, object_class, perm_codename))
             has_perms = user.has_perm(perm) and all(
-                has_perms_owner_aware(user, perm_codename, obj) for obj in objs
+                obj.pk in permitted_ids for obj in objs
             )
 
             if not has_perms:
