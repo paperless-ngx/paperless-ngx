@@ -1002,6 +1002,34 @@ export class BulkEditorComponent
       })
   }
 
+  mergeSelectedAsVersions() {
+    let modal = this.modalService.open(MergeConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    const mergeDialog = modal.componentInstance as MergeConfirmDialogComponent
+    const documentIDs = Array.from(this.list.selected)
+    mergeDialog.title = $localize`Merge as versions`
+    mergeDialog.message = $localize`The selected documents will become versions of the root document.`
+    mergeDialog.btnCaption = $localize`Proceed`
+    mergeDialog.mergeAsVersions = true
+    mergeDialog.documentIDs.set(documentIDs)
+    mergeDialog.rootDocumentID.set(documentIDs[0])
+    mergeDialog.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        mergeDialog.buttonsEnabled = false
+        this.executeDocumentAction(
+          modal,
+          this.documentService.mergeDocumentsAsVersions(
+            mergeDialog.documentIDs(),
+            mergeDialog.rootDocumentID()
+          ),
+          { deleteOriginals: true }
+        )
+        this.toastService.showInfo($localize`Documents merged as versions.`)
+      })
+  }
+
   public setCustomFieldValues(changedCustomFields: ChangedItems) {
     const modal = this.modalService.open(CustomFieldsBulkEditDialogComponent, {
       backdrop: 'static',
