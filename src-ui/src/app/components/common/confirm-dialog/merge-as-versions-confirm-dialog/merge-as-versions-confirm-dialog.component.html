@@ -1,0 +1,52 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="cancel()"></button>
+</div>
+<div class="modal-body">
+  <p>{{message}}</p>
+  <div class="form-group">
+    <label class="form-label" i18n>Versions:</label>
+    <ul class="list-group"
+        cdkDropList
+        [cdkDropListData]="draggableDocumentIDs()"
+        (cdkDropListDropped)="onDrop($event)">
+      @for (documentID of draggableDocumentIDs(); track documentID) {
+        @let document = getDocument(documentID);
+        @if (document) {
+          <li class="list-group-item d-flex align-items-center" cdkDrag>
+            <i-bs name="grip-vertical" class="me-2"></i-bs>
+            <div class="d-flex flex-column">
+              <div>
+                @if (document.correspondent) {
+                  <b>{{document.correspondent | correspondentName | async}}: </b>
+                }{{document.title}}
+              </div>
+              <small class="text-muted">
+                {{document.created | customDate:'mediumDate'}}
+                @if (document.page_count) {
+                  | {document.page_count, plural, =1 {One page} other {{{document.page_count}} pages}}
+                }
+              </small>
+            </div>
+          </li>
+        }
+      }
+    </ul>
+  </div>
+  <div class="form-group mt-4">
+    <label class="form-label" for="rootDocumentID" i18n>Root document:</label>
+    <select id="rootDocumentID" class="form-select" [ngModel]="rootDocumentID()" (ngModelChange)="rootDocumentID.set($event)">
+      @for (document of documents(); track document.id) {
+        <option [ngValue]="document.id">{{document.title}}</option>
+      }
+    </select>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">
+    <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
+  </button>
+  <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled">
+    {{btnCaption}}
+  </button>
+</div>
