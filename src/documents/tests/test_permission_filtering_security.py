@@ -12,6 +12,7 @@ from django.test import override_settings
 from guardian.shortcuts import assign_perm
 from rest_framework.test import APIClient
 
+from documents.matching import match_tags
 from documents.models import Correspondent
 from documents.models import DocumentType
 from documents.models import StoragePath
@@ -529,3 +530,27 @@ class TestPermittedObjectIdsGenericModels:
             expected_visible=[obj.pk],
             expected_hidden=[],
         )
+
+
+@pytest.mark.django_db
+class TestMatchingRespectsObjectPermissions:
+    def test_match_tags_only_considers_tags_visible_to_user(self):
+        owner = User.objects.create_user(username="tag_owner")
+        classifying_user = User.objects.create_user(username="classifier_user")
+        visible_tag = TagFactory(
+            owner=owner,
+            match="invoice",
+            matching_algorithm=Tag.MATCH_LITERAL,
+        )
+        hidden_tag = TagFactory(
+            owner=owner,
+            match="invoice",
+            matching_algorithm=Tag.MATCH_LITERAL,
+        )
+        assign_perm("view_tag", classifying_user, visible_tag)
+        doc = DocumentFactory(owner=classifying_user, content="an invoice document")
+
+        matched = match_tags(doc, classifier=None, user=classifying_user)
+        matched_ids = {t.pk for t in matched}
+        assert visible_tag.pk in matched_ids
+        assert hidden_tag.pk not in matched_ids
