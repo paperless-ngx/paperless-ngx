@@ -4,7 +4,7 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
 import { AsyncPipe } from '@angular/common'
-import { Component, OnInit, inject, signal } from '@angular/core'
+import { Component, Input, OnInit, inject, signal } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { takeUntil } from 'rxjs'
@@ -41,6 +41,10 @@ export class MergeConfirmDialogComponent
   readonly deleteOriginals = signal(false)
   readonly documents = signal<Document[]>([])
   readonly metadataDocumentID = signal(-1)
+  readonly rootDocumentID = signal(-1)
+
+  @Input()
+  mergeAsVersions = false
 
   constructor() {
     super()
