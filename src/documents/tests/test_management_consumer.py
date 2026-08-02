@@ -880,6 +880,41 @@ class TestCommandWatch:
         ]
         assert call_args.original_file.name == "valid.pdf"
 
+    def test_ignores_event_for_already_queued_file(
+        self,
+        consumption_dir: Path,
+        sample_pdf: Path,
+        mock_consume_file_delay: MagicMock,
+        start_consumer: Callable[..., ConsumerThread],
+    ) -> None:
+        """
+        A stray filesystem event (NAS metadata touch, AV scan, etc.) on a
+        file that has already been queued and is awaiting consumption must
+        not cause it to be queued a second time (GH #13511). The task is
+        mocked, so the file is never removed from disk, mirroring a
+        long-running OCR job still holding it.
+        """
+        thread = start_consumer()
+
+        target = consumption_dir / "document.pdf"
+        shutil.copy(sample_pdf, target)
+
+        wait_for_mock_call(mock_consume_file_delay.apply_async, timeout_s=2.0)
+
+        if thread.exception:
+            raise thread.exception
+
+        assert mock_consume_file_delay.apply_async.call_count == 1
+
+        # Simulate a stray event on the still-present, already-queued file.
+        target.touch()
+        sleep(0.5)
+
+        if thread.exception:
+            raise thread.exception
+
+        assert mock_consume_file_delay.apply_async.call_count == 1
+
     @pytest.mark.django_db
     @pytest.mark.usefixtures("mock_supported_extensions")
     def test_stop_flag_stops_consumer(
