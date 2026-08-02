@@ -316,6 +316,19 @@ describe(`DocumentService`, () => {
     })
   })
 
+  it('should call appropriate api endpoint for merging documents as versions', () => {
+    const ids = [1, 2, 3]
+    subscription = service.mergeDocumentsAsVersions(ids, 2).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/merge_as_versions/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toEqual({
+      documents: ids,
+      root_document_id: 2,
+    })
+  })
+
   it('should call appropriate api endpoint for edit pdf', () => {
     const ids = [1]
     const args = { operations: [{ page: 1, rotate: 90, doc: 0 }] }
