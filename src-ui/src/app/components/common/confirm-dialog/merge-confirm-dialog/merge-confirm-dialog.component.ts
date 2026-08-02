@@ -4,7 +4,14 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
 import { AsyncPipe } from '@angular/common'
-import { Component, Input, OnInit, inject, signal } from '@angular/core'
+import {
+  Component,
+  Input,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { takeUntil } from 'rxjs'
@@ -42,6 +49,11 @@ export class MergeConfirmDialogComponent
   readonly documents = signal<Document[]>([])
   readonly metadataDocumentID = signal(-1)
   readonly rootDocumentID = signal(-1)
+  readonly draggableDocumentIDs = computed(() =>
+    this.documentIDs().filter(
+      (documentID) => documentID !== this.rootDocumentID()
+    )
+  )
 
   @Input()
   mergeAsVersions = false
@@ -60,9 +72,21 @@ export class MergeConfirmDialogComponent
   }
 
   onDrop(event: CdkDragDrop<number[]>) {
-    const documentIDs = this.documentIDs().concat()
-    moveItemInArray(documentIDs, event.previousIndex, event.currentIndex)
-    this.documentIDs.set(documentIDs)
+    const draggableDocumentIDs = this.draggableDocumentIDs().concat()
+    moveItemInArray(
+      draggableDocumentIDs,
+      event.previousIndex,
+      event.currentIndex
+    )
+
+    let draggableIndex = 0
+    this.documentIDs.update((documentIDs) =>
+      documentIDs.map((documentID) =>
+        documentID === this.rootDocumentID()
+          ? documentID
+          : draggableDocumentIDs[draggableIndex++]
+      )
+    )
   }
 
   getDocument(documentID: number): Document {
