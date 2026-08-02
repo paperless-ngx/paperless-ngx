@@ -66,6 +66,20 @@ describe('MergeConfirmDialogComponent', () => {
     expect(component.documentIDs()).toEqual([1, 3, 2])
   })
 
+  it('should move draggable documents while keeping the root fixed', () => {
+    component.documentIDs.set([1, 2, 3])
+    component.rootDocumentID.set(1)
+    const event = {
+      previousIndex: 1,
+      currentIndex: 0,
+    }
+
+    component.onDrop(event as any)
+
+    expect(component.documentIDs()).toEqual([1, 3, 2])
+    expect(component.draggableDocumentIDs()).toEqual([3, 2])
+  })
+
   it('should get document by ID', () => {
     const documents = [
       { id: 1, name: 'Document 1' },
