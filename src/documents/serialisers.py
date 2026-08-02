@@ -1677,6 +1677,22 @@ class MergeDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin
     from_webui = serializers.BooleanField(required=False, default=False)
 
 
+class MergeDocumentsAsVersionsSerializer(DocumentListSerializer):
+    root_document_id = serializers.IntegerField(required=True)
+
+    def validate(self, attrs):
+        documents = attrs["documents"]
+        if len(documents) < 2:
+            raise serializers.ValidationError(
+                "At least two documents are required.",
+            )
+        if attrs["root_document_id"] not in documents:
+            raise serializers.ValidationError(
+                "root_document_id must be one of the selected documents.",
+            )
+        return attrs
+
+
 class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
     operations = serializers.ListField(required=True)
     delete_original = serializers.BooleanField(required=False, default=False)
