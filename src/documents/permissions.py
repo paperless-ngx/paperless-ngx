@@ -7,6 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
+from django.db.models import Model
 from django.db.models import Q
 from django.db.models import QuerySet
 from django.db.models import Value
@@ -164,12 +165,12 @@ def set_permissions_for_object(
 
 
 def permitted_object_ids(
-    user,
-    model,
+    user: User | None,
+    model: type[Model],
     perm: str,
     *,
     include_deleted: bool = False,
-):
+) -> QuerySet[int]:
     """
     Generic version of ``permitted_document_ids`` for any model with an
     ``owner`` field and guardian object-level permissions. ``include_deleted``
@@ -228,11 +229,11 @@ def permitted_object_ids(
 
 
 def permitted_document_ids(
-    user,
+    user: User | None,
     *,
     perm: str = "view_document",
     include_deleted: bool = False,
-):
+) -> QuerySet[int]:
     """
     Document-specific convenience wrapper around ``permitted_object_ids``.
     Return a queryset of document IDs the user has ``perm`` on (default
