@@ -725,9 +725,13 @@ class CustomFieldQueryParser:
             )
 
         # First we look up reverse links from the requested documents.
+        # Scoped to this specific field (not just any document link field) and
+        # excluding unset instances, which have a null value_document_ids and
+        # are equivalent to having no reverse link at all.
         links = CustomFieldInstance.objects.filter(
             document_id__in=value,
-            field__data_type=CustomField.FieldDataType.DOCUMENTLINK,
+            field=custom_field,
+            value_document_ids__isnull=False,
         )
 
         # Check if any of the requested IDs are missing.
