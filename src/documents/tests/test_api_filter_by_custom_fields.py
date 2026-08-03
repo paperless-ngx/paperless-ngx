@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 
 from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
@@ -604,6 +605,56 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
                 and set(document["documentlink_field"]) >= {self.documents[6].id}
             ),
             match_nothing_ok=True,
+        )
+
+    def test_document_link_contains_unset_reverse_link(self) -> None:
+        # Another edge case: the document in the value list has the same
+        # document link field attached, but it was never given a value
+        # (value_document_ids is None). This must be treated the same as
+        # having no reverse link at all, not raise a TypeError.
+        unset_document = self.documents[6]
+        CustomFieldInstance.objects.create(
+            document=unset_document,
+            field=self.custom_fields["documentlink_field"],
+            value_document_ids=None,
+        )
+        self._assert_query_match_predicate(
+            ["documentlink_field", "contains", [unset_document.id]],
+            lambda document: (
+                "documentlink_field" in document
+                and document["documentlink_field"] is not None
+                and set(document["documentlink_field"]) >= {unset_document.id}
+            ),
+            match_nothing_ok=True,
+        )
+
+    def test_document_link_contains_ignores_unrelated_document_link_field(
+        self,
+    ) -> None:
+        # A document referenced in the value list may have a *different*
+        # Document Link custom field attached with no value set. This must
+        # not be pulled into the reverse-link lookup for the field being
+        # queried, and must not crash.
+        unrelated_field = CustomField.objects.create(
+            name="unrelated_documentlink_field",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+        # self.documents[0] is reciprocally linked from self.documents[35]
+        # (documentlink_field=[documents[0].id, documents[1].id, documents[2].id]).
+        target_document = self.documents[0]
+        CustomFieldInstance.objects.create(
+            document=target_document,
+            field=unrelated_field,
+            value_document_ids=None,
+        )
+
+        self._assert_query_match_predicate(
+            ["documentlink_field", "contains", [target_document.id]],
+            lambda document: (
+                "documentlink_field" in document
+                and document["documentlink_field"] is not None
+                and set(document["documentlink_field"]) >= {target_document.id}
+            ),
         )
 
     # ==========================================================#
