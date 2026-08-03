@@ -92,6 +92,11 @@ class TestPermittedDocumentIdsSecurity:
         owner = User.objects.create_user(username="owner")
         doc = DocumentFactory(owner=owner)
         doc.delete()  # soft delete
+        doc.refresh_from_db()
+        assert doc.deleted_at is not None, (
+            "document should be soft-deleted, not hard-deleted, for this "
+            "test to actually validate the deleted_at filtering behavior"
+        )
 
         assert_visible_document_ids(
             permitted_document_ids(owner),
