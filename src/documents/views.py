@@ -1930,10 +1930,13 @@ class DocumentViewSet(
         use_archive_version = validated_data.get("use_archive_version", True)
 
         documents = Document.objects.filter(pk__in=document_ids)
-        if request.user is not None:
-            permitted_ids = set(permitted_document_ids(request.user))
-            if not all(document.pk in permitted_ids for document in documents):
-                return HttpResponseForbidden("Insufficient permissions")
+        if (
+            request.user is not None
+            and documents.exclude(
+                pk__in=permitted_document_ids(request.user),
+            ).exists()
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
 
         try:
             attachments: list[EmailAttachment] = []
@@ -2786,9 +2789,13 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         )
 
         # check global and object permissions for all documents
-        permitted_change_ids = set(permitted_document_ids(user, perm="change_document"))
-        has_perms = user.has_perm("documents.change_document") and all(
-            doc.pk in permitted_change_ids for doc in document_objs
+        has_perms = (
+            user.has_perm(
+                "documents.change_document",
+            )
+            and not document_objs.exclude(
+                pk__in=permitted_document_ids(user, perm="change_document"),
+            ).exists()
         )
 
         # check ownership for methods that change original document
@@ -5314,14 +5321,13 @@ class TrashView(ListModelMixin, PassUserMixin):
             if doc_ids is not None
             else self.filter_queryset(self.get_queryset()).all()
         )
-        permitted_ids = set(
-            permitted_document_ids(
+        if docs.exclude(
+            pk__in=permitted_document_ids(
                 request.user,
                 perm="delete_document",
                 include_deleted=True,
             ),
-        )
-        if not all(doc.pk in permitted_ids for doc in docs):
+        ).exists():
             return HttpResponseForbidden("Insufficient permissions")
         action = serializer.validated_data.get("action")
         if action == "restore":
