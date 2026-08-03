@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-31 16:14+0000\n"
+"POT-Creation-Date: 2026-08-03 13:34+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -49,11 +49,11 @@ msgstr ""
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr ""
 
-#: documents/filters.py:752 documents/models.py:136
+#: documents/filters.py:756 documents/models.py:136
 msgid "Maximum nesting depth exceeded."
 msgstr ""
 
-#: documents/filters.py:1094
+#: documents/filters.py:1098
 msgid "Custom field not found"
 msgstr ""
 

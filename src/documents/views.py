@@ -4708,6 +4708,8 @@ def serve_file(
             "ignore",
         )
         .decode("ascii")
+        .replace("\\", "_")
+        .replace('"', "_")
     )
     filename_encoded = quote(filename)
     content_disposition = (
