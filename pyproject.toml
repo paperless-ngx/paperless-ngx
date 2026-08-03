@@ -101,7 +101,7 @@ dev = [
   { include-group = "testing" },
 ]
 docs = [
-  "zensical>=0.0.47",
+  "zensical>=0.0.51",
 ]
 lint = [
   "prek~=0.3.10",
