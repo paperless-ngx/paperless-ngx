@@ -99,6 +99,7 @@ Think of versions as **file history** for a document.
 - By default, search and document content use the latest version.
 - In document detail, selecting a version switches the preview, file metadata and content (and download etc buttons) to that version.
 - Deleting a non-root version keeps metadata and falls back to the latest remaining version.
+- From the document list, select two or more documents and choose **Merge as versions** to combine them under one entry. Select the root document whose metadata and permissions should be retained; the other selected documents become file versions. The root may already have versions, but documents being added as versions must not have version histories of their own.
 
 ### Management Lists
 
