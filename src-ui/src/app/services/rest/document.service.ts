@@ -374,10 +374,15 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     })
   }
 
-  mergeDocumentsAsVersions(ids: number[], rootDocumentId: number) {
+  mergeDocumentsAsVersions(
+    ids: number[],
+    rootDocumentId: number,
+    versionLabel?: string
+  ) {
     return this.http.post(this.getResourceUrl(null, 'merge_as_versions'), {
       documents: ids,
       root_document_id: rootDocumentId,
+      ...(versionLabel ? { version_label: versionLabel } : {}),
     })
   }
 

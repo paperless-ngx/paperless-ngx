@@ -617,6 +617,7 @@ def merge_as_versions(
     doc_ids: list[int],
     *,
     root_document_id: int,
+    version_label: str | None = None,
 ) -> Literal["OK"]:
     with transaction.atomic():
         documents = list(
@@ -632,6 +633,10 @@ def merge_as_versions(
             raise ValueError("Only top-level documents can be merged as versions.")
 
         source_ids = sorted(doc_id for doc_id in doc_ids if doc_id != root_document_id)
+        if version_label is not None and len(source_ids) != 1:
+            raise ValueError(
+                "A version label can only be set when merging one source document.",
+            )
         if Document.objects.filter(root_document_id__in=source_ids).exists():
             raise ValueError(
                 "Documents with existing versions cannot be merged into another document.",
@@ -650,14 +655,16 @@ def merge_as_versions(
             next_version_index += 1
             source_document.root_document = root_document
             source_document.version_index = next_version_index
+            update_fields = [
+                "root_document",
+                "version_index",
+                "archive_serial_number",
+            ]
+            if version_label is not None:
+                source_document.version_label = version_label
+                update_fields.append("version_label")
             source_document.archive_serial_number = None
-            source_document.save(
-                update_fields=[
-                    "root_document",
-                    "version_index",
-                    "archive_serial_number",
-                ],
-            )
+            source_document.save(update_fields=update_fields)
 
         root_document.modified = timezone.now()
         root_document.save(update_fields=["modified"])
