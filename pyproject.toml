@@ -105,7 +105,7 @@ docs = [
 ]
 lint = [
   "prek~=0.3.10",
-  "ruff~=0.15.20",
+  "ruff~=0.16.1",
 ]
 testing = [
   "daphne",
@@ -183,6 +183,7 @@ output-format = "grouped"
 line-ending = "lf"
 [tool.ruff.lint]
 # https://docs.astral.sh/ruff/rules/
+select = [ "E4", "E7", "E9", "F" ]
 extend-select = [
   "COM",  # https://docs.astral.sh/ruff/rules/#flake8-commas-com
   "DJ",   # https://docs.astral.sh/ruff/rules/#flake8-django-dj
