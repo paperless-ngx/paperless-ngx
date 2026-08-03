@@ -148,10 +148,10 @@ def _build_simple_token_query(
 ) -> tantivy.Query:
     escaped = regex.escape(token)
     # The simple analyzer keeps punctuation inside whitespace-delimited terms.
-    # Later query tokens may therefore begin either at the indexed term boundary
-    # or after punctuation within a term (for example, ``medical-history``).
-    # Do not allow an arbitrary infix for later tokens: a query ending in ``6``
-    # must not match the middle of ``16``.
+    # Boundary-constrained query tokens may therefore begin either at the indexed
+    # term boundary or after punctuation within a term (for example,
+    # ``medical-history``). This avoids matching a numeric token such as ``6``
+    # in the middle of ``16``.
     pattern = (
         f".*{escaped}.*"
         if allow_infix
@@ -282,10 +282,14 @@ def parse_simple_query(
                     index,
                     fields,
                     token,
-                    allow_infix=idx == 0,
+                    # Preserve historical infix matching for single-token
+                    # searches. In multi-token searches, constrain numeric
+                    # tokens to boundaries to avoid partial-number overlap.
+                    # This depends on token content, not query order.
+                    allow_infix=len(tokens) == 1 or not token.isdecimal(),
                 ),
             )
-            for idx, token in enumerate(tokens)
+            for token in tokens
         ]
         simple_query = (
             token_queries[0][1]

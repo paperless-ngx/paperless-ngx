@@ -163,10 +163,11 @@ class TestSearch:
         assert (
             len(backend.search_ids("sswo", user=None, search_mode=SearchMode.TEXT)) == 1
         )
-        assert (
-            len(backend.search_ids("sswo re", user=None, search_mode=SearchMode.TEXT))
-            == 1
-        )
+        for query in ["sswo re", "re sswo"]:
+            assert (
+                len(backend.search_ids(query, user=None, search_mode=SearchMode.TEXT))
+                == 1
+            ), query
 
     def test_text_mode_matches_all_terms_without_requiring_adjacency(
         self,
@@ -230,11 +231,11 @@ class TestSearch:
             == 0
         )
 
-    def test_text_mode_anchors_later_query_tokens_to_token_starts(
+    def test_text_mode_anchors_numeric_tokens_regardless_of_query_order(
         self,
         backend: TantivyBackend,
     ) -> None:
-        """Multi-token simple search should not match later tokens in the middle of a word."""
+        """Numeric tokens must not match in the middle of a larger number."""
         exact_doc = Document.objects.create(
             title="Z-Berichte 6",
             content="monthly report",
@@ -257,13 +258,14 @@ class TestSearch:
         backend.add_or_update(prefix_doc)
         backend.add_or_update(false_positive)
 
-        result_ids = set(
-            backend.search_ids("Z-Berichte 6", user=None, search_mode=SearchMode.TEXT),
-        )
+        for query in ["Z-Berichte 6", "6 Z-Berichte"]:
+            result_ids = set(
+                backend.search_ids(query, user=None, search_mode=SearchMode.TEXT),
+            )
 
-        assert exact_doc.id in result_ids
-        assert prefix_doc.id in result_ids
-        assert false_positive.id not in result_ids
+            assert exact_doc.id in result_ids, query
+            assert prefix_doc.id in result_ids, query
+            assert false_positive.id not in result_ids, query
 
     def test_text_mode_ignores_queries_without_searchable_tokens(
         self,
