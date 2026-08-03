@@ -166,8 +166,7 @@ class TestAiChatAllDocumentsPermissionBoundary:
     (ChatStreamingView.post, no document_id) to the same owner/permission
     boundary enforced by permitted_document_ids(). This call site was
     migrated from get_objects_for_user_owner_aware() to
-    permitted_document_ids() in Task 5; this test must stay green across
-    that swap.
+    permitted_document_ids(); this test must stay green across that swap.
     """
 
     ENDPOINT = "/api/documents/chat/"
