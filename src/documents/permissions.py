@@ -183,15 +183,7 @@ def permitted_object_ids(
     manager = (
         model.global_objects if include_deleted and has_soft_delete else model.objects
     )
-    if has_soft_delete:
-        base_qs = (
-            manager.all()
-            if include_deleted
-            else manager.filter(deleted_at__isnull=True)
-        )
-    else:
-        base_qs = manager.all()
-    base_qs = base_qs.only("id", "owner")
+    base_qs = manager.all().only("id", "owner")
 
     if user is None or not getattr(user, "is_authenticated", False):
         return base_qs.filter(owner__isnull=True).values_list("id", flat=True)
