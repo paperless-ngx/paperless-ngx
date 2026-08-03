@@ -135,7 +135,7 @@ class TestMergeDocumentsAsVersions(TestCase):
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
     @mock.patch("documents.search.get_backend")
-    def test_merges_documents_in_selection_order(
+    def test_merges_documents_in_creation_order(
         self,
         get_backend_mock,
         bulk_update_mock,
@@ -170,9 +170,9 @@ class TestMergeDocumentsAsVersions(TestCase):
         source2.refresh_from_db()
         root.refresh_from_db()
         self.assertEqual(source2.root_document_id, root.id)
-        self.assertEqual(source2.version_index, 4)
+        self.assertEqual(source2.version_index, 5)
         self.assertEqual(source1.root_document_id, root.id)
-        self.assertEqual(source1.version_index, 5)
+        self.assertEqual(source1.version_index, 4)
         self.assertIsNone(source1.archive_serial_number)
         self.assertIsNone(source2.archive_serial_number)
         self.assertGreater(root.modified, original_modified)
@@ -181,14 +181,14 @@ class TestMergeDocumentsAsVersions(TestCase):
         batch = get_backend_mock.return_value.batch_update.return_value.__enter__.return_value
         self.assertEqual(
             [call.args[0] for call in batch.remove.call_args_list],
-            [source2.id, source1.id],
+            [source1.id, source2.id],
         )
         bulk_update_mock.assert_called_once_with(
             kwargs={"document_ids": [root.id]},
             headers={"trigger_source": "system"},
         )
         status_manager_mock.return_value.send_documents_deleted.assert_called_once_with(
-            [source2.id, source1.id],
+            [source1.id, source2.id],
         )
 
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
@@ -227,6 +227,7 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
         self.user = User.objects.create_user(username="user")
         self.user.user_permissions.add(
             Permission.objects.get(codename="change_document"),
+            Permission.objects.get(codename="view_document"),
         )
         self.doc1 = Document.objects.create(
             checksum="A",
@@ -304,3 +305,44 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         merge_mock.assert_not_called()
+
+    @mock.patch("documents.bulk_edit.DocumentsStatusManager")
+    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
+    @mock.patch("documents.search.get_backend")
+    def test_merges_and_returns_documents_as_versions(
+        self,
+        get_backend_mock,
+        bulk_update_mock,
+        status_manager_mock,
+    ) -> None:
+        response = self.client.post(
+            "/api/documents/merge_as_versions/",
+            {
+                "documents": [self.doc1.id, self.doc2.id],
+                "root_document_id": self.doc2.id,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.doc1.refresh_from_db()
+        self.assertEqual(self.doc1.root_document_id, self.doc2.id)
+
+        detail_response = self.client.get(
+            f"/api/documents/{self.doc2.id}/?fields=id,versions",
+        )
+        self.assertEqual(detail_response.status_code, status.HTTP_200_OK)
+        versions = detail_response.data["versions"]
+        self.assertEqual(
+            {version["id"] for version in versions},
+            {self.doc1.id, self.doc2.id},
+        )
+        self.assertEqual(
+            [version["id"] for version in versions if version["is_root"]],
+            [self.doc2.id],
+        )
+        get_backend_mock.assert_called_once()
+        bulk_update_mock.assert_called_once()
+        status_manager_mock.return_value.send_documents_deleted.assert_called_once_with(
+            [self.doc1.id],
+        )
