@@ -1679,12 +1679,28 @@ class MergeDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin
 
 class MergeDocumentsAsVersionsSerializer(DocumentListSerializer):
     root_document_id = serializers.IntegerField(required=True)
+    version_label = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        max_length=64,
+    )
+
+    def validate_version_label(self, value):
+        if value is None:
+            return None
+        normalized = value.strip()
+        return normalized or None
 
     def validate(self, attrs):
         documents = attrs["documents"]
         if len(documents) < 2:
             raise serializers.ValidationError(
                 "At least two documents are required.",
+            )
+        if "version_label" in attrs and len(documents) != 2:
+            raise serializers.ValidationError(
+                "version_label can only be used when merging one source document.",
             )
         if attrs["root_document_id"] not in documents:
             raise serializers.ValidationError(

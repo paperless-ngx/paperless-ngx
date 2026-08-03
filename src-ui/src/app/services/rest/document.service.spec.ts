@@ -329,6 +329,21 @@ describe(`DocumentService`, () => {
     })
   })
 
+  it('should include an optional label when merging one document as a version', () => {
+    const ids = [1, 2]
+    subscription = service
+      .mergeDocumentsAsVersions(ids, 2, 'Imported')
+      .subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/merge_as_versions/`
+    )
+    expect(req.request.body).toEqual({
+      documents: ids,
+      root_document_id: 2,
+      version_label: 'Imported',
+    })
+  })
+
   it('should call appropriate api endpoint for edit pdf', () => {
     const ids = [1]
     const args = { operations: [{ page: 1, rotate: 90, doc: 0 }] }

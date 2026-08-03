@@ -49,6 +49,33 @@ class TestMergeDocumentsAsVersionsSerializer(TestCase):
             "At least two documents are required.",
         )
 
+    def test_accepts_version_label_for_one_source_document(self) -> None:
+        serializer = MergeDocumentsAsVersionsSerializer(
+            data={
+                "documents": [self.doc1.id, self.doc2.id],
+                "root_document_id": self.doc1.id,
+                "version_label": "  Imported  ",
+            },
+        )
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(serializer.validated_data["version_label"], "Imported")
+
+    def test_rejects_version_label_for_multiple_source_documents(self) -> None:
+        serializer = MergeDocumentsAsVersionsSerializer(
+            data={
+                "documents": [self.doc1.id, self.doc2.id, self.doc3.id],
+                "root_document_id": self.doc1.id,
+                "version_label": "Imported",
+            },
+        )
+
+        self.assertFalse(serializer.is_valid())
+        self.assertEqual(
+            serializer.errors["non_field_errors"][0],
+            "version_label can only be used when merging one source document.",
+        )
+
     def test_requires_root_document_to_be_selected(self) -> None:
         serializer = MergeDocumentsAsVersionsSerializer(
             data={
@@ -194,6 +221,27 @@ class TestMergeDocumentsAsVersions(TestCase):
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
     @mock.patch("documents.search.get_backend")
+    def test_sets_version_label_for_one_source_document(
+        self,
+        _get_backend_mock,
+        _bulk_update_mock,
+        _status_manager_mock,
+    ) -> None:
+        root = Document.objects.create(checksum="A", title="Root")
+        source = Document.objects.create(checksum="B", title="Source")
+
+        merge_as_versions(
+            [root.id, source.id],
+            root_document_id=root.id,
+            version_label="Imported",
+        )
+
+        source.refresh_from_db()
+        self.assertEqual(source.version_label, "Imported")
+
+    @mock.patch("documents.bulk_edit.DocumentsStatusManager")
+    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
+    @mock.patch("documents.search.get_backend")
     def test_rejects_source_document_with_versions(
         self,
         get_backend_mock,
@@ -252,6 +300,7 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
                 {
                     "documents": [self.doc1.id, self.doc2.id],
                     "root_document_id": self.doc2.id,
+                    "version_label": "Imported",
                 },
             ),
             content_type="application/json",
@@ -262,6 +311,7 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
         merge_mock.assert_called_once_with(
             [self.doc1.id, self.doc2.id],
             root_document_id=self.doc2.id,
+            version_label="Imported",
         )
 
     @mock.patch("documents.views.bulk_edit.merge_as_versions")
@@ -320,6 +370,7 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
             {
                 "documents": [self.doc1.id, self.doc2.id],
                 "root_document_id": self.doc2.id,
+                "version_label": "Imported",
             },
             format="json",
         )
@@ -327,6 +378,7 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.doc1.refresh_from_db()
         self.assertEqual(self.doc1.root_document_id, self.doc2.id)
+        self.assertEqual(self.doc1.version_label, "Imported")
 
         detail_response = self.client.get(
             f"/api/documents/{self.doc2.id}/?fields=id,versions",
