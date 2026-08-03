@@ -241,6 +241,18 @@ class TestPermittedDocumentIdsArbitraryPermission:
             expected_hidden=[doc.pk],
         )
 
+    def test_qualified_permission_string_is_normalized_to_codename(self):
+        owner = User.objects.create_user(username="owner")
+        editor = User.objects.create_user(username="editor")
+        doc = DocumentFactory(owner=owner)
+        assign_perm("change_document", editor, doc)
+
+        assert_visible_document_ids(
+            permitted_document_ids(editor, perm="documents.change_document"),
+            expected_visible=[doc.pk],
+            expected_hidden=[],
+        )
+
     def test_delete_permission_with_include_deleted_for_trash_restore(self):
         owner = User.objects.create_user(username="owner")
         stranger = User.objects.create_user(username="mallory")

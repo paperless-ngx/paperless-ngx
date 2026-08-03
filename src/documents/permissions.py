@@ -188,6 +188,12 @@ def permitted_document_ids(
     if getattr(user, "is_superuser", False):
         return base_docs.values_list("id", flat=True)
 
+    # Guardian's UserObjectPermission/GroupObjectPermission always store a bare
+    # codename, but has_perm()-style callers commonly pass the qualified
+    # "app_label.codename" form. content_type already disambiguates the
+    # codename, so just drop any prefix rather than silently under-permitting.
+    perm = perm.rsplit(".", 1)[-1]
+
     document_ct = ContentType.objects.get_for_model(Document)
     perm_filter = {
         "permission__codename": perm,
