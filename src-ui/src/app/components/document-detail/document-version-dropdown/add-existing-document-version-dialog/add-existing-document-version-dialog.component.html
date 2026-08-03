@@ -1,0 +1,18 @@
+<div class="modal-header">
+  <h4 class="modal-title" i18n>Add existing document as version</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="cancel()"></button>
+</div>
+<div class="modal-body">
+  <pngx-input-document-link
+    [(ngModel)]="selectedDocumentIDs"
+    [parentDocumentID]="rootDocumentID"
+    [minimal]="true"
+    placeholder="Search for a document"
+    i18n-placeholder
+  ></pngx-input-document-link>
+  <div class="form-text mt-2" i18n>Select one document to add as a version.</div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="cancel()" [disabled]="!buttonsEnabled" i18n>Cancel</button>
+  <button type="button" class="btn btn-primary" (click)="confirm()" [disabled]="!buttonsEnabled || selectedDocumentIDs.length !== 1" i18n>Add version</button>
+</div>
