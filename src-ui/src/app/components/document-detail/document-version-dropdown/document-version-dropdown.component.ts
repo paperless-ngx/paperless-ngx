@@ -11,7 +11,7 @@ import {
   SimpleChanges,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { merge, of, Subject } from 'rxjs'
 import {
@@ -33,6 +33,7 @@ import {
   WebsocketStatusService,
 } from 'src/app/services/websocket-status.service'
 import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
+import { AddExistingDocumentVersionDialogComponent } from './add-existing-document-version-dialog/add-existing-document-version-dialog.component'
 
 @Component({
   selector: 'pngx-document-version-dropdown',
@@ -69,6 +70,7 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
   private readonly documentsService = inject(DocumentService)
   private readonly toastService = inject(ToastService)
   private readonly websocketStatusService = inject(WebsocketStatusService)
+  private readonly modalService = inject(NgbModal)
   private readonly destroy$ = new Subject<void>()
   private readonly documentChange$ = new Subject<void>()
 
@@ -275,6 +277,56 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
             error
           )
         },
+      })
+  }
+
+  addExistingDocumentAsVersion(): void {
+    const modal = this.modalService.open(
+      AddExistingDocumentVersionDialogComponent,
+      { backdrop: 'static' }
+    )
+    const dialog =
+      modal.componentInstance as AddExistingDocumentVersionDialogComponent
+    dialog.rootDocumentID = this.documentId
+    dialog.confirmClicked
+      .pipe(takeUntil(this.destroy$), takeUntil(this.documentChange$))
+      .subscribe((existingDocumentID) => {
+        dialog.buttonsEnabled = false
+        const versionLabel = this.newVersionLabel?.trim()
+        this.documentsService
+          .mergeDocumentsAsVersions(
+            [this.documentId, existingDocumentID],
+            this.documentId,
+            versionLabel
+          )
+          .pipe(
+            switchMap(() => this.documentsService.getVersions(this.documentId)),
+            first(),
+            finalize(() => (dialog.buttonsEnabled = true)),
+            takeUntil(this.destroy$),
+            takeUntil(this.documentChange$)
+          )
+          .subscribe({
+            next: (document) => {
+              if (document?.versions) {
+                this.versionsUpdated.emit(document.versions)
+                this.versionSelected.emit(
+                  Math.max(...document.versions.map((version) => version.id))
+                )
+              }
+              this.newVersionLabel = ''
+              modal.close()
+              this.toastService.showInfo(
+                $localize`Existing document added as a version.`
+              )
+            },
+            error: (error) => {
+              this.toastService.showError(
+                $localize`Error adding existing document as a version`,
+                error
+              )
+            },
+          })
       })
   }
 

@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common'
 import { SimpleChange } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject, of, throwError } from 'rxjs'
 import { DocumentVersionInfo } from 'src/app/data/document'
@@ -19,12 +20,17 @@ describe('DocumentVersionDropdownComponent', () => {
   let documentService: jest.Mocked<
     Pick<
       DocumentService,
-      'deleteVersion' | 'getVersions' | 'uploadVersion' | 'updateVersionLabel'
+      | 'deleteVersion'
+      | 'getVersions'
+      | 'mergeDocumentsAsVersions'
+      | 'uploadVersion'
+      | 'updateVersionLabel'
     >
   >
   let toastService: jest.Mocked<Pick<ToastService, 'showError' | 'showInfo'>>
   let finished$: Subject<{ taskId: string }>
   let failed$: Subject<{ taskId: string; message?: string }>
+  let modalService: jest.Mocked<Pick<NgbModal, 'open'>>
 
   beforeEach(async () => {
     finished$ = new Subject<{ taskId: string }>()
@@ -32,9 +38,11 @@ describe('DocumentVersionDropdownComponent', () => {
     documentService = {
       deleteVersion: jest.fn(),
       getVersions: jest.fn(),
+      mergeDocumentsAsVersions: jest.fn(),
       uploadVersion: jest.fn(),
       updateVersionLabel: jest.fn(),
     }
+    modalService = { open: jest.fn() }
     toastService = {
       showError: jest.fn(),
       showInfo: jest.fn(),
@@ -60,6 +68,10 @@ describe('DocumentVersionDropdownComponent', () => {
         {
           provide: ToastService,
           useValue: toastService,
+        },
+        {
+          provide: NgbModal,
+          useValue: modalService,
         },
         {
           provide: WebsocketStatusService,
@@ -322,5 +334,44 @@ describe('DocumentVersionDropdownComponent', () => {
     expect(component.versionUploadError()).toBeNull()
     expect(component.editingVersionId).toBeNull()
     expect(component.versionLabelDraft).toEqual('')
+  })
+
+  it('addExistingDocumentAsVersion should merge with a label and refresh versions', () => {
+    const confirmClicked = new Subject<number>()
+    const modal = {
+      componentInstance: {
+        rootDocumentID: null,
+        buttonsEnabled: true,
+        confirmClicked,
+      },
+      close: jest.fn(),
+    }
+    modalService.open.mockReturnValue(modal as any)
+    documentService.mergeDocumentsAsVersions.mockReturnValue(of({} as any))
+    const versions: DocumentVersionInfo[] = [
+      { id: 3, is_root: true, checksum: 'aaaa' },
+      { id: 20, is_root: false, checksum: 'cccc' },
+    ]
+    documentService.getVersions.mockReturnValue(of({ id: 3, versions } as any))
+    component.newVersionLabel = '  Imported  '
+    const versionsEmitSpy = jest.spyOn(component.versionsUpdated, 'emit')
+    const selectedEmitSpy = jest.spyOn(component.versionSelected, 'emit')
+
+    component.addExistingDocumentAsVersion()
+    expect(modal.componentInstance.rootDocumentID).toEqual(3)
+    confirmClicked.next(20)
+
+    expect(documentService.mergeDocumentsAsVersions).toHaveBeenCalledWith(
+      [3, 20],
+      3,
+      'Imported'
+    )
+    expect(documentService.updateVersionLabel).not.toHaveBeenCalled()
+    expect(documentService.getVersions).toHaveBeenCalledWith(3)
+    expect(versionsEmitSpy).toHaveBeenCalledWith(versions)
+    expect(selectedEmitSpy).toHaveBeenCalledWith(20)
+    expect(component.newVersionLabel).toEqual('')
+    expect(modal.close).toHaveBeenCalled()
+    expect(toastService.showInfo).toHaveBeenCalled()
   })
 })
