@@ -221,6 +221,7 @@ export class PngxPdfViewerComponent
       linkService: this.linkService,
       findController: this.findController,
       textLayerMode,
+      enableSelectionRendering: false,
       removePageBorders: true,
     }
 
