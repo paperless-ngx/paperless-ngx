@@ -300,7 +300,7 @@ def consumable_document_matches_workflow(
     ]:
         reason = (
             f"Document source {document.source.name} not in"
-            f" {[DocumentSource(int(x)).name for x in trigger.sources]}",
+            f" {[DocumentSource(int(x)).name for x in trigger.sources]}"
         )
         trigger_matched = False
 
@@ -310,8 +310,7 @@ def consumable_document_matches_workflow(
         and document.mailrule_id != trigger.filter_mailrule.pk
     ):
         reason = (
-            f"Document mail rule {document.mailrule_id}"
-            f" != {trigger.filter_mailrule.pk}",
+            f"Document mail rule {document.mailrule_id} != {trigger.filter_mailrule.pk}"
         )
         trigger_matched = False
 
@@ -326,7 +325,7 @@ def consumable_document_matches_workflow(
     ):
         reason = (
             f"Document filename {document.original_file.name} does not match"
-            f" {trigger.filter_filename.lower()}",
+            f" {trigger.filter_filename.lower()}"
         )
         trigger_matched = False
 
@@ -349,7 +348,7 @@ def consumable_document_matches_workflow(
     ):
         reason = (
             f"Document path {document.original_file}"
-            f" does not match {trigger.filter_path}",
+            f" does not match {trigger.filter_path}"
         )
         trigger_matched = False
 
