@@ -6,15 +6,11 @@
   <p>{{message}}</p>
   <div class="form-group">
     <label class="form-label" i18n>Versions:</label>
-    <ul class="list-group"
-        cdkDropList
-        [cdkDropListData]="draggableDocumentIDs()"
-        (cdkDropListDropped)="onDrop($event)">
-      @for (documentID of draggableDocumentIDs(); track documentID) {
+    <ul class="list-group">
+      @for (documentID of versionDocumentIDs(); track documentID) {
         @let document = getDocument(documentID);
         @if (document) {
-          <li class="list-group-item d-flex align-items-center" cdkDrag>
-            <i-bs name="grip-vertical" class="me-2"></i-bs>
+          <li class="list-group-item d-flex align-items-center">
             <div class="d-flex flex-column">
               <div>
                 @if (document.correspondent) {

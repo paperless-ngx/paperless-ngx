@@ -631,7 +631,7 @@ def merge_as_versions(
         if any(document.root_document_id is not None for document in documents):
             raise ValueError("Only top-level documents can be merged as versions.")
 
-        source_ids = [doc_id for doc_id in doc_ids if doc_id != root_document_id]
+        source_ids = sorted(doc_id for doc_id in doc_ids if doc_id != root_document_id)
         if Document.objects.filter(root_document_id__in=source_ids).exists():
             raise ValueError(
                 "Documents with existing versions cannot be merged into another document.",
