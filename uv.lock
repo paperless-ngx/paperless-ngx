@@ -867,7 +867,7 @@ name = "deprecation"
 version = "2.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "packaging" },
+    { name = "packaging", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/5a/d3/8ae2869247df154b64c1884d7346d412fed0c49df84db635aab2d1c40e62/deprecation-2.1.0.tar.gz", hash = "sha256:72b3bde64e5d778694b0cf68178aed03d15e15477116add3fb773e581f9518ff", size = 173788, upload-time = "2020-04-20T14:23:38.738Z" }
 wheels = [
@@ -2824,9 +2824,10 @@ wheels = [
 
 [[package]]
 name = "ocrmypdf"
-version = "17.8.1"
+version = "17.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "deprecation", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "fpdf2", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "img2pdf", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "packaging", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
@@ -2838,12 +2839,11 @@ dependencies = [
     { name = "pydantic", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "pypdfium2", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "rich", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
-    { name = "typing-extensions", marker = "(python_full_version < '3.13' and sys_platform == 'darwin') or (python_full_version < '3.13' and sys_platform == 'linux')" },
     { name = "uharfbuzz", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f7/2e/7d429156859602ffc9929ffb014eb11da931e653a21c64d5cabfc30c3ccd/ocrmypdf-17.8.1.tar.gz", hash = "sha256:6f72e4da5fd7805e5d677c0fc55ad380c70e1c7ad33dd9ce2402575194803e08", size = 7451173, upload-time = "2026-07-16T20:55:09.412Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/15/ac/30171791db306c7b1c705957a0b9bed9df443b9465533dfc1945a654805b/ocrmypdf-17.7.1.tar.gz", hash = "sha256:d61184b84e3001ebe7c5acb265041bd8591f924b8616bbefc746a5bdafab3eca", size = 7438611, upload-time = "2026-06-27T08:50:06.824Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/95/29/ce4e14fbb63ea7a1d5749ac97ccafe60e915d50ad3c4a06fddd782e952d2/ocrmypdf-17.8.1-py3-none-any.whl", hash = "sha256:df236ea84b6c5d9d1979fd410ca786b67da428a9e6cb0b26654e3039ac129704", size = 514050, upload-time = "2026-07-16T20:55:07.497Z" },
+    { url = "https://files.pythonhosted.org/packages/03/9e/88bed373c0449dc3bd8772744788f89e6c9c4e6034f03703304b9d9c2d4c/ocrmypdf-17.7.1-py3-none-any.whl", hash = "sha256:3e69d11cc98f5019af61bc457b106365d67c791ec4f358e4f8e938f99d654492", size = 506631, upload-time = "2026-06-27T08:50:05.031Z" },
 ]
 
 [[package]]
@@ -3084,7 +3084,7 @@ requires-dist = [
     { name = "llama-index-llms-openai-like", specifier = ">=0.7.1" },
     { name = "mysqlclient", marker = "extra == 'mariadb'", specifier = "~=2.2.7" },
     { name = "nltk", specifier = "~=3.10.0" },
-    { name = "ocrmypdf", specifier = "~=17.8.1" },
+    { name = "ocrmypdf", specifier = "~=17.7.0" },
     { name = "openai", specifier = ">=2.48.0" },
     { name = "pathvalidate", specifier = "~=3.3.1" },
     { name = "pdf2image", specifier = "~=1.17.0" },
