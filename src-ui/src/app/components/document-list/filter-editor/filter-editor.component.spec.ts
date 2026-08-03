@@ -1842,6 +1842,46 @@ describe('FilterEditorComponent', () => {
     ])
   })
 
+  it('should not duplicate carried-over text filter when setting both created and added relative dates', () => {
+    component.textFilter = 'foo'
+    const datesDropdown = fixture.debugElement.query(
+      By.directive(DatesDropdownComponent)
+    )
+    component.dateCreatedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    component.dateAddedRelativeDate = RelativeDate.WITHIN_1_MONTH
+    datesDropdown.triggerEventHandler('datesSet')
+    fixture.detectChanges()
+    tick(400)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'foo,created:[-1 week to now],added:[-1 month to now]',
+      },
+    ])
+  })
+
+  it('should replace stale relative date clauses instead of duplicating them when re-editing', () => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'foo,created:[-1 week to now],added:[-1 month to now]',
+      },
+    ]
+    const datesDropdown = fixture.debugElement.query(
+      By.directive(DatesDropdownComponent)
+    )
+    component.dateCreatedRelativeDate = RelativeDate.WITHIN_3_MONTHS
+    datesDropdown.triggerEventHandler('datesSet')
+    fixture.detectChanges()
+    tick(400)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'foo,created:[-3 month to now],added:[-1 month to now]',
+      },
+    ])
+  })
+
   it('should convert user input to correct filter on permissions select my docs', () => {
     const permissionsDropdown = fixture.debugElement.query(
       By.directive(PermissionsFilterDropdownComponent)

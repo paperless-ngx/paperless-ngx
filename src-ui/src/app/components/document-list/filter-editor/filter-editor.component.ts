@@ -1016,7 +1016,6 @@ export class FilterEditorComponent
       this.dateAddedRelativeDate !== null ||
       this.dateCreatedRelativeDate !== null
     ) {
-      let queryArgs: Array<string> = []
       let existingRule = filterRules.find(
         (fr) => fr.rule_type == FILTER_FULLTEXT_QUERY
       )
@@ -1038,7 +1037,17 @@ export class FilterEditorComponent
         existingRule.rule_type = FILTER_FULLTEXT_QUERY
       }
 
-      let existingRuleArgs = existingRule?.value.split(',')
+      // Start from the existing terms with any stale created:/added: clauses
+      // stripped out, then append the currently active relative date clauses.
+      let queryArgs: Array<string> = existingRule
+        ? existingRule.value
+            .split(',')
+            .filter(
+              (arg) =>
+                !arg.match(RELATIVE_DATE_QUERY_REGEXP_CREATED) &&
+                !arg.match(RELATIVE_DATE_QUERY_REGEXP_ADDED)
+            )
+        : []
       if (this.dateCreatedRelativeDate !== null) {
         const rd = RELATIVE_DATE_QUERYSTRINGS.find(
           (qS) => qS.relativeDate == this.dateCreatedRelativeDate
@@ -1046,11 +1055,6 @@ export class FilterEditorComponent
         queryArgs.push(
           `created:${rd.isRange ? `[${rd.dateQuery}]` : `"${rd.dateQuery}"`}`
         )
-        if (existingRule) {
-          queryArgs = existingRuleArgs
-            .filter((arg) => !arg.match(RELATIVE_DATE_QUERY_REGEXP_CREATED))
-            .concat(queryArgs)
-        }
       }
       if (this.dateAddedRelativeDate !== null) {
         const rd = RELATIVE_DATE_QUERYSTRINGS.find(
@@ -1059,11 +1063,6 @@ export class FilterEditorComponent
         queryArgs.push(
           `added:${rd.isRange ? `[${rd.dateQuery}]` : `"${rd.dateQuery}"`}`
         )
-        if (existingRule) {
-          queryArgs = existingRuleArgs
-            .filter((arg) => !arg.match(RELATIVE_DATE_QUERY_REGEXP_ADDED))
-            .concat(queryArgs)
-        }
       }
 
       if (existingRule) {
