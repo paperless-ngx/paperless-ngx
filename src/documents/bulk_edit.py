@@ -31,6 +31,7 @@ from documents.permissions import set_permissions_for_object
 from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
+from documents.tasks import remove_document_from_index
 from documents.tasks import update_document_content_maybe_archive_file
 from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_root_document
@@ -669,12 +670,8 @@ def merge_as_versions(
         root_document.modified = timezone.now()
         root_document.save(update_fields=["modified"])
 
-    # We need to remove these explicitly from search
-    from documents.search import get_backend
-
-    with get_backend().batch_update() as batch:
-        for source_id in source_ids:
-            batch.remove(source_id)
+    for source_id in source_ids:
+        remove_document_from_index.apply_async(args=[source_id])
 
     bulk_update_documents.apply_async(
         kwargs={"document_ids": [root_document_id]},

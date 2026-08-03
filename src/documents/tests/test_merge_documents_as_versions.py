@@ -161,10 +161,10 @@ class TestMergeDocumentsAsVersionsSerializer(TestCase):
 class TestMergeDocumentsAsVersions(TestCase):
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
-    @mock.patch("documents.search.get_backend")
+    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
     def test_merges_documents_in_creation_order(
         self,
-        get_backend_mock,
+        remove_from_index_mock,
         bulk_update_mock,
         status_manager_mock,
     ) -> None:
@@ -205,10 +205,9 @@ class TestMergeDocumentsAsVersions(TestCase):
         self.assertGreater(root.modified, original_modified)
         self.assertEqual(existing_version.root_document_id, root.id)
 
-        batch = get_backend_mock.return_value.batch_update.return_value.__enter__.return_value
         self.assertEqual(
-            [call.args[0] for call in batch.remove.call_args_list],
-            [source1.id, source2.id],
+            [call.kwargs["args"] for call in remove_from_index_mock.call_args_list],
+            [[source1.id], [source2.id]],
         )
         bulk_update_mock.assert_called_once_with(
             kwargs={"document_ids": [root.id]},
@@ -220,10 +219,10 @@ class TestMergeDocumentsAsVersions(TestCase):
 
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
-    @mock.patch("documents.search.get_backend")
+    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
     def test_sets_version_label_for_one_source_document(
         self,
-        _get_backend_mock,
+        _remove_from_index_mock,
         _bulk_update_mock,
         _status_manager_mock,
     ) -> None:
@@ -241,10 +240,10 @@ class TestMergeDocumentsAsVersions(TestCase):
 
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
-    @mock.patch("documents.search.get_backend")
+    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
     def test_rejects_source_document_with_versions(
         self,
-        get_backend_mock,
+        remove_from_index_mock,
         bulk_update_mock,
         status_manager_mock,
     ) -> None:
@@ -265,7 +264,7 @@ class TestMergeDocumentsAsVersions(TestCase):
 
         source.refresh_from_db()
         self.assertIsNone(source.root_document_id)
-        get_backend_mock.assert_not_called()
+        remove_from_index_mock.assert_not_called()
         bulk_update_mock.assert_not_called()
         status_manager_mock.assert_not_called()
 
@@ -358,10 +357,10 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
 
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
-    @mock.patch("documents.search.get_backend")
+    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
     def test_merges_and_returns_documents_as_versions(
         self,
-        get_backend_mock,
+        remove_from_index_mock,
         bulk_update_mock,
         status_manager_mock,
     ) -> None:
@@ -393,8 +392,11 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
             [version["id"] for version in versions if version["is_root"]],
             [self.doc2.id],
         )
-        get_backend_mock.assert_called_once()
-        bulk_update_mock.assert_called_once()
+        remove_from_index_mock.assert_called_once_with(args=[self.doc1.id])
+        bulk_update_mock.assert_called_once_with(
+            kwargs={"document_ids": [self.doc2.id]},
+            headers={"trigger_source": "system"},
+        )
         status_manager_mock.return_value.send_documents_deleted.assert_called_once_with(
             [self.doc1.id],
         )
