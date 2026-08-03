@@ -75,6 +75,12 @@ APPLE_MAIL_TAG_COLORS = {
 
 MAIL_FETCH_BATCH_SIZE = 500
 
+# SQLite's default SQLITE_MAX_VARIABLE_NUMBER has been 32766 since 3.32.0
+# (2020), but older/custom builds and other backends may allow fewer, so
+# stay comfortably under that ceiling for `uid__in` queries against
+# ProcessedMail.
+PROCESSED_UID_QUERY_BATCH_SIZE = 10_000
+
 
 class MailError(Exception):
     pass
@@ -691,17 +697,21 @@ class MailAccountHandler(LoggingMixin):
                 f"Rule {rule}: Error while searching folder {rule.folder}",
             ) from err
 
-        processed_uids_qs = ProcessedMail.objects.filter(
-            rule=rule,
-            folder=rule.folder,
-            uid__in=all_uids,
-        )
-        if self._current_uid_validity is not None:
-            processed_uids_qs = processed_uids_qs.filter(
-                Q(uid_validity=self._current_uid_validity)
-                | Q(uid_validity__isnull=True),
+        all_uids_list = list(all_uids)
+        processed_uids: set[str] = set()
+        for i in range(0, len(all_uids_list), PROCESSED_UID_QUERY_BATCH_SIZE):
+            uid_chunk = all_uids_list[i : i + PROCESSED_UID_QUERY_BATCH_SIZE]
+            processed_uids_qs = ProcessedMail.objects.filter(
+                rule=rule,
+                folder=rule.folder,
+                uid__in=uid_chunk,
             )
-        processed_uids = set(processed_uids_qs.values_list("uid", flat=True))
+            if self._current_uid_validity is not None:
+                processed_uids_qs = processed_uids_qs.filter(
+                    Q(uid_validity=self._current_uid_validity)
+                    | Q(uid_validity__isnull=True),
+                )
+            processed_uids.update(processed_uids_qs.values_list("uid", flat=True))
 
         new_uids = all_uids - processed_uids
 
