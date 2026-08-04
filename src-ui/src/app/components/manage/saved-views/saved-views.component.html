@@ -14,16 +14,18 @@
           <div class="col">
             <pngx-input-text title="Name" formControlName="name"></pngx-input-text>
           </div>
-          <div class="col">
-            <div class="form-check form-switch mt-3">
-              <input type="checkbox" class="form-check-input" id="show_on_dashboard_{{view.id}}" formControlName="show_on_dashboard">
-              <label class="form-check-label" for="show_on_dashboard_{{view.id}}" i18n>Show on dashboard</label>
+          @if (canSaveSettings) {
+            <div class="col">
+              <div class="form-check form-switch mt-3">
+                <input type="checkbox" class="form-check-input" id="show_on_dashboard_{{view.id}}" formControlName="show_on_dashboard">
+                <label class="form-check-label" for="show_on_dashboard_{{view.id}}" i18n>Show on dashboard</label>
+              </div>
+              <div class="form-check form-switch">
+                <input type="checkbox" class="form-check-input" id="show_in_sidebar_{{view.id}}" formControlName="show_in_sidebar">
+                <label class="form-check-label" for="show_in_sidebar_{{view.id}}" i18n>Show in sidebar</label>
+              </div>
             </div>
-            <div class="form-check form-switch">
-              <input type="checkbox" class="form-check-input" id="show_in_sidebar_{{view.id}}" formControlName="show_in_sidebar">
-              <label class="form-check-label" for="show_in_sidebar_{{view.id}}" i18n>Show in sidebar</label>
-            </div>
-          </div>
+          }
           <div class="col-auto">
             @if (canDeleteSavedView(view)) {
               <label class="form-label" for="name_{{view.id}}" i18n>Actions</label>

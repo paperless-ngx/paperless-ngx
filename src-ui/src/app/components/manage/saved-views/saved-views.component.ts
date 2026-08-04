@@ -17,6 +17,7 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import {
   PermissionAction,
   PermissionsService,
+  PermissionType,
 } from 'src/app/services/permissions.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -71,7 +72,9 @@ export class SavedViewsComponent
 
   constructor() {
     super()
-    this.settings.organizingSidebarSavedViews.set(true)
+    if (this.canSaveSettings) {
+      this.settings.organizingSidebarSavedViews.set(true)
+    }
   }
 
   ngOnInit(): void {
@@ -89,7 +92,9 @@ export class SavedViewsComponent
   }
 
   ngOnDestroy(): void {
-    this.settings.organizingSidebarSavedViews.set(false)
+    if (this.canSaveSettings) {
+      this.settings.organizingSidebarSavedViews.set(false)
+    }
     super.ngOnDestroy()
   }
 
@@ -216,7 +221,7 @@ export class SavedViewsComponent
         switchMap(() => this.savedViewService.patchMany(changed))
       )
     }
-    if (visibilityChanged) {
+    if (visibilityChanged && this.canSaveSettings) {
       saveOperation = saveOperation.pipe(
         switchMap(() =>
           this.settings.updateSavedViewsVisibility(
@@ -248,6 +253,19 @@ export class SavedViewsComponent
 
   public canDeleteSavedView(view: SavedView): boolean {
     return this.permissionsService.currentUserOwnsObject(view)
+  }
+
+  public get canSaveSettings(): boolean {
+    return (
+      this.permissionsService.currentUserCan(
+        PermissionAction.Change,
+        PermissionType.UISettings
+      ) &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.Add,
+        PermissionType.UISettings
+      )
+    )
   }
 
   public editPermissions(savedView: SavedView): void {
