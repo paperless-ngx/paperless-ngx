@@ -1949,7 +1949,7 @@ export class DocumentDetailComponent
   }
 
   private cleanupPrintDocument() {
-    if (this.printIframe) document.body.removeChild(this.printIframe)
+    if (this.printIframe) this.printIframe.remove()
     this.printIframe = null
     if (this.printBlobUrl) {
       URL.revokeObjectURL(this.printBlobUrl)
