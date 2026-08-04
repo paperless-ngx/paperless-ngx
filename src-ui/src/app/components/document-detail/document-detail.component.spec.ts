@@ -2191,9 +2191,6 @@ describe('DocumentDetailComponent', () => {
     const appendChildSpy = jest
       .spyOn(document.body, 'appendChild')
       .mockImplementation((node: Node) => node)
-    const removeChildSpy = jest
-      .spyOn(document.body, 'removeChild')
-      .mockImplementation((node: Node) => node)
     const createObjectURLSpy = jest
       .spyOn(URL, 'createObjectURL')
       .mockReturnValue('blob:mock-url')
@@ -2212,6 +2209,7 @@ describe('DocumentDetailComponent', () => {
       src: '',
       onload: null,
       contentWindow: mockContentWindow,
+      remove: jest.fn(),
     }
 
     const createElementSpy = jest
@@ -2255,12 +2253,11 @@ describe('DocumentDetailComponent', () => {
       mockContentWindow.onafterprint(new Event('afterprint'))
     }
 
-    expect(removeChildSpy).toHaveBeenCalledWith(mockIframe)
+    expect(mockIframe.remove).toHaveBeenCalled()
     expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
 
     createElementSpy.mockRestore()
     appendChildSpy.mockRestore()
-    removeChildSpy.mockRestore()
     createObjectURLSpy.mockRestore()
     revokeObjectURLSpy.mockRestore()
   })
@@ -2307,9 +2304,6 @@ describe('DocumentDetailComponent', () => {
       const appendChildSpy = jest
         .spyOn(document.body, 'appendChild')
         .mockImplementation((node: Node) => node)
-      const removeChildSpy = jest
-        .spyOn(document.body, 'removeChild')
-        .mockImplementation((node: Node) => node)
       const createObjectURLSpy = jest
         .spyOn(URL, 'createObjectURL')
         .mockReturnValue('blob:mock-url')
@@ -2332,6 +2326,7 @@ describe('DocumentDetailComponent', () => {
         src: '',
         onload: null,
         contentWindow: mockContentWindow,
+        remove: jest.fn(),
       }
 
       const createElementSpy = jest
@@ -2354,15 +2349,21 @@ describe('DocumentDetailComponent', () => {
 
       if (expectToast) {
         expect(toastSpy).toHaveBeenCalled()
+        expect(mockIframe.remove).toHaveBeenCalled()
+        expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
       } else {
         expect(toastSpy).not.toHaveBeenCalled()
+        expect(mockIframe.remove).not.toHaveBeenCalled()
+        expect(revokeObjectURLSpy).not.toHaveBeenCalled()
+
+        component.ngOnDestroy()
+
+        expect(mockIframe.remove).toHaveBeenCalled()
+        expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
       }
-      expect(removeChildSpy).toHaveBeenCalledWith(mockIframe)
-      expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
 
       createElementSpy.mockRestore()
       appendChildSpy.mockRestore()
-      removeChildSpy.mockRestore()
       createObjectURLSpy.mockRestore()
       revokeObjectURLSpy.mockRestore()
     })
