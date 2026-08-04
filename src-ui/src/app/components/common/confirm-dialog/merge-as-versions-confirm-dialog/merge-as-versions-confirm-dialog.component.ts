@@ -17,7 +17,7 @@ export class MergeAsVersionsConfirmDialogComponent
   extends ConfirmDialogComponent
   implements OnInit
 {
-  private documentService = inject(DocumentService)
+  private readonly documentService = inject(DocumentService)
 
   readonly documentIDs = signal<number[]>([])
   readonly documents = signal<Document[]>([])

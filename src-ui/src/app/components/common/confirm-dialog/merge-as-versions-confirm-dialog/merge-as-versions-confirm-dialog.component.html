@@ -5,7 +5,7 @@
 <div class="modal-body">
   <p>{{message}}</p>
   <div class="form-group">
-    <label class="form-label" i18n>Versions:</label>
+    <span class="form-label d-inline-block" i18n>Versions:</span>
     <ul class="list-group">
       @for (documentID of versionDocumentIDs(); track documentID) {
         @let document = getDocument(documentID);
