@@ -21,7 +21,7 @@ from documents.parsers import run_convert
 from paperless.models import ModeChoices
 from paperless.parsers import ParserProtocol
 from paperless.parsers.tesseract import RasterisedDocumentParser
-from paperless.parsers.tesseract import post_process_text
+from paperless.parsers.utils import is_tagged_pdf
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -149,36 +149,6 @@ class TestRasterisedDocumentParserLifecycle:
                 tempdir = parser.tempdir
                 raise RuntimeError("boom")
         assert tempdir is not None and not tempdir.exists()
-
-
-# ---------------------------------------------------------------------------
-# post_process_text
-# ---------------------------------------------------------------------------
-
-
-class TestPostProcessText:
-    @pytest.mark.parametrize(
-        ("source", "expected"),
-        [
-            pytest.param(
-                "simple     string",
-                "simple string",
-                id="collapse-spaces",
-            ),
-            pytest.param(
-                "simple    newline\n   testing string",
-                "simple newline\ntesting string",
-                id="preserve-newline",
-            ),
-            pytest.param(
-                "utf-8   строка с пробелами в конце  ",  # noqa: RUF001
-                "utf-8 строка с пробелами в конце",  # noqa: RUF001
-                id="utf8-trailing-spaces",
-            ),
-        ],
-    )
-    def test_post_process_text(self, source: str, expected: str) -> None:
-        assert post_process_text(source) == expected
 
 
 # ---------------------------------------------------------------------------
@@ -905,6 +875,34 @@ class TestSkipArchive:
         mock_ocr.assert_not_called()
         assert tesseract_parser.archive_path is None
         assert tesseract_parser.get_text()
+
+    def test_tagged_pdf_without_text_does_not_skip_ocr(
+        self,
+        mocker: MockerFixture,
+        tesseract_parser: RasterisedDocumentParser,
+        tagged_no_text_pdf_file: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A real PDF that reports itself as tagged (/MarkInfo /Marked
+              true) but whose only pdftotext output is layout padding (a
+              lone form-feed byte), not real text (see GitHub issue #13387,
+              originally reported against #13349's tagged-PDF handling)
+            - Mode: auto, produce_archive=False
+        WHEN:
+            - Document is parsed
+        THEN:
+            - The tag alone is not trusted as "has text"; OCRmyPDF still runs
+        """
+        assert is_tagged_pdf(tagged_no_text_pdf_file) is True
+        tesseract_parser.settings.mode = ModeChoices.AUTO
+        mock_ocr = mocker.patch("ocrmypdf.ocr")
+        tesseract_parser.parse(
+            tagged_no_text_pdf_file,
+            "application/pdf",
+            produce_archive=False,
+        )
+        mock_ocr.assert_called()
 
     def test_tagged_pdf_produces_pdfa_archive_without_ocr(
         self,

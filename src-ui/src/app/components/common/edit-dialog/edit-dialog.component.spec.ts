@@ -32,6 +32,8 @@ import { EditDialogComponent, EditDialogMode } from './edit-dialog.component'
   template: `
     <div>
       <h4 class="modal-title" id="modal-basic-title">{{ getTitle() }}</h4>
+      <span class="error">{{ error?.name }}</span>
+      <button [disabled]="networkActive" (click)="save()">Save</button>
     </div>
   `,
   imports: [FormsModule, ReactiveFormsModule],
@@ -275,5 +277,23 @@ describe('EditDialogComponent', () => {
     expect(closeSpy).not.toHaveBeenCalled()
     expect(failedSpy).toHaveBeenCalled()
     expect(component.error).toEqual('error')
+  })
+
+  it('should update the view after a failed save', async () => {
+    const button: HTMLButtonElement =
+      fixture.nativeElement.querySelector('button')
+    button.click()
+    await fixture.whenStable()
+    expect(button.disabled).toBe(true)
+
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}tags/`)
+      .flush({ name: ['Name is required.'] }, { status: 400, statusText: '' })
+    await fixture.whenStable()
+
+    expect(button.disabled).toBe(false)
+    expect(fixture.nativeElement.querySelector('.error').textContent).toContain(
+      'Name is required.'
+    )
   })
 })

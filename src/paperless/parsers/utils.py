@@ -111,6 +111,88 @@ def extract_pdf_text(
         return None
 
 
+def post_process_text(text: str | None) -> str | None:
+    """Normalize extracted PDF/OCR text: collapse whitespace, strip padding.
+
+    Returns ``None`` for ``None`` or whitespace-only input, so callers can
+    treat "no text" and "only layout padding" the same way.
+    """
+    if not text:
+        return None
+
+    collapsed_spaces = re.sub(r"([^\S\r\n]+)", " ", text)
+    no_leading_whitespace = re.sub(r"([\n\r]+)([^\S\n\r]+)", "\\1", collapsed_spaces)
+    no_trailing_whitespace = re.sub(r"([^\S\n\r]+)$", "", no_leading_whitespace)
+
+    # replace \0 prevents issues with saving to postgres.
+    # text may contain \0 when this character is present in PDF files.
+    result = no_trailing_whitespace.strip().replace("\0", " ")
+    return result or None
+
+
+def is_born_digital_text(
+    text: str | None,
+    path: Path,
+    log: logging.Logger | None = None,
+) -> bool:
+    """Decide whether already-extracted, normalized PDF text counts as born-digital.
+
+    This is the single source of truth for "does this PDF already have real
+    text", used both to decide whether to produce an archive file and to
+    decide whether OCR can be skipped. Both decisions must agree, or a
+    tagged-but-textless PDF can end up with no archive AND a forced OCR pass
+    (see GH #13387): raw ``pdftotext -layout`` output can be non-empty
+    (whitespace/form-feed padding) even when there is no real content, so
+    *text* must already be normalized via :func:`post_process_text`, not the
+    raw extraction.
+
+    Parameters
+    ----------
+    text:
+        The normalized extracted text (or ``None``) to evaluate.
+    path:
+        Absolute path to the PDF file, used for the tagged-PDF check.
+    log:
+        Logger for warnings.  Falls back to the module-level logger when omitted.
+
+    Returns
+    -------
+    bool
+        Whether the PDF counts as born-digital (has real text, and is either
+        tagged or exceeds ``PDF_TEXT_MIN_LENGTH``).
+    """
+    if not text:
+        return False
+    return is_tagged_pdf(path, log=log) or len(text) > PDF_TEXT_MIN_LENGTH
+
+
+def pdf_born_digital_text(
+    path: Path,
+    log: logging.Logger | None = None,
+) -> tuple[str | None, bool]:
+    """Extract a PDF's text and decide whether it should be treated as born-digital.
+
+    Convenience wrapper around :func:`is_born_digital_text` for callers that
+    don't already have the PDF's text extracted (e.g. the archive-generation
+    decision, which runs before any parser has touched the file).
+
+    Parameters
+    ----------
+    path:
+        Absolute path to the PDF file.
+    log:
+        Logger for warnings.  Falls back to the module-level logger when omitted.
+
+    Returns
+    -------
+    tuple[str | None, bool]
+        The normalized extracted text (or ``None``), and whether the PDF
+        counts as born-digital.
+    """
+    text = post_process_text(extract_pdf_text(path, log=log))
+    return text, is_born_digital_text(text, path, log=log)
+
+
 def read_file_handle_unicode_errors(
     filepath: Path,
     log: logging.Logger | None = None,

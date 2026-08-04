@@ -90,6 +90,7 @@ describe('PngxPdfViewerComponent', () => {
     }
     expect(viewer).toBeInstanceOf(PDFSinglePageViewer)
     expect(viewer.options.textLayerMode).toBe(0)
+    expect(viewer.options.enableSelectionRendering).toBe(false)
   })
 
   it('applies zoom, rotation, and page changes', async () => {
@@ -129,13 +130,25 @@ describe('PngxPdfViewerComponent', () => {
     ;(component as any).applyScale()
     expect(viewer.currentScaleValue).toBe(PdfZoomScale.PageFit)
     expect(viewer.currentScale).toBe(2)
+  })
 
+  it('does not reapply scale for page-only changes', async () => {
+    await initComponent()
+
+    const pdf = (component as any).pdf as { numPages: number }
+    pdf.numPages = 3
+    const viewer = (component as any).pdfViewer as PDFViewer
+    viewer.setDocument(pdf)
     const applyScaleSpy = jest.spyOn(component as any, 'applyScale')
     component.page = 2
-    ;(component as any).lastViewerPage = 2
-    ;(component as any).applyViewerState()
+
+    component.ngOnChanges({
+      page: new SimpleChange(1, 2, false),
+    })
+
+    expect(viewer.currentPageNumber).toBe(2)
     expect((component as any).lastViewerPage).toBeUndefined()
-    expect(applyScaleSpy).toHaveBeenCalled()
+    expect(applyScaleSpy).not.toHaveBeenCalled()
   })
 
   it('does not reset the viewer when it is already on the requested page', async () => {

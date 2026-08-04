@@ -28,9 +28,20 @@ CHAT_PROMPT_TMPL = (
     "---------------------\n"
     "Using only the context above, answer the query. "
     "Do not use prior knowledge.\n"
+    "{output_language_line}"
     "Query: {query_str}\n"
     "Answer:"
 )
+
+
+def _build_chat_prompt(output_language: str | None) -> str:
+    output_language_line = (
+        f"Respond in {output_language}.\n" if output_language is not None else ""
+    )
+    return CHAT_PROMPT_TMPL.replace(
+        "{output_language_line}",
+        output_language_line,
+    )
 
 
 def _build_document_reference(
@@ -79,15 +90,27 @@ def _format_chat_metadata_trailer(references: list[dict[str, int | str]]) -> str
     )
 
 
-def stream_chat_with_documents(query_str: str, documents: list[Document]):
+def stream_chat_with_documents(
+    query_str: str,
+    documents: list[Document],
+    output_language: str | None = None,
+):
     try:
-        yield from _stream_chat_with_documents(query_str, documents)
+        yield from _stream_chat_with_documents(
+            query_str,
+            documents,
+            output_language=output_language,
+        )
     except Exception as e:
         logger.exception("Failed to stream document chat response: %s", e)
         yield CHAT_ERROR_MESSAGE
 
 
-def _stream_chat_with_documents(query_str: str, documents: list[Document]):
+def _stream_chat_with_documents(
+    query_str: str,
+    documents: list[Document],
+    output_language: str | None = None,
+):
     if not documents:
         yield CHAT_NO_CONTENT_MESSAGE
         return
@@ -125,7 +148,7 @@ def _stream_chat_with_documents(query_str: str, documents: list[Document]):
 
         references = _get_document_references(documents, top_nodes)
 
-        prompt_template = PromptTemplate(template=CHAT_PROMPT_TMPL)
+        prompt_template = PromptTemplate(template=_build_chat_prompt(output_language))
         response_synthesizer = get_response_synthesizer(
             llm=client.llm,
             prompt_helper=get_rag_prompt_helper(

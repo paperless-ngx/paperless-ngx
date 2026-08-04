@@ -67,6 +67,10 @@ describe('PreviewPopupComponent', () => {
     expect(component.useNativePdfViewer).toBeTruthy()
   })
 
+  it('should use fixed positioning for the preview popover', () => {
+    expect(component.popperOptions({}).strategy).toEqual('fixed')
+  })
+
   it('should render object if native PDF viewer enabled', () => {
     settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, true)
     component.popover.open()

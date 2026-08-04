@@ -104,7 +104,7 @@
             </h6>
             <ul class="nav flex-column mb-2" cdkDropList (cdkDropListDropped)="onDrop($event)">
               @for (view of savedViewService.sidebarViews; track view.id) {
-                <li class="nav-item w-100 app-link" cdkDrag [cdkDragDisabled]="!settingsService.organizingSidebarSavedViews()"
+                <li class="nav-item w-100 app-link" cdkDrag [cdkDragDisabled]="!settingsService.organizingSidebarSavedViews() || !canSaveSettings"
                   cdkDragPreviewContainer="parent" cdkDragPreviewClass="navItemDrag" (cdkDragStarted)="onDragStart($event)"
                   (cdkDragEnded)="onDragEnd($event)">
                   <a class="nav-link" routerLink="view/{{view.id}}"
@@ -120,7 +120,7 @@
                       <span class="badge bg-info text-dark position-absolute top-0 end-0 d-none d-md-block">{{ savedViewService.getDocumentCount(view) }}</span>
                     }
                   </a>
-                  @if (settingsService.organizingSidebarSavedViews()) {
+                  @if (settingsService.organizingSidebarSavedViews() && canSaveSettings) {
                     <div class="position-absolute end-0 top-0 px-3 py-2" [class.me-n3]="slimSidebarEnabled" cdkDragHandle>
                       <i-bs name="grip-vertical"></i-bs>
                     </div>
@@ -182,7 +182,7 @@
                     container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
                     <i-bs class="me-2" name="stack"></i-bs><span><ng-container i18n>Attributes</ng-container></span>
                   </a>
-                  @if (!slimSidebarEnabled) {
+                  @if (!slimSidebarEnabled && canSaveSettings) {
                     <button
                       type="button"
                       class="btn btn-link btn-sm text-muted p-0 me-3 attributes-expand-btn"

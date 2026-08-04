@@ -96,19 +96,26 @@ def get_context_for_document(
     user: User | None = None,
     max_docs: int = 5,
 ) -> str:
-    visible_documents = (
-        get_objects_for_user_owner_aware(
-            user,
-            "view_document",
-            Document,
-        )
-        if user
-        else None
-    )
+    # None means "no restriction" to query_similar_documents. A superuser
+    # (like no user at all) can see every document, so skip materializing
+    # every visible pk into a Python list and passing it through as a SQL
+    # IN filter: for a large library that is a wasted quadratic scan in the
+    # vector store at best, and past ~32,763 documents a hard
+    # sqlite3.OperationalError (SQLite's bound-parameter limit) at worst.
+    # get_objects_for_user_owner_aware() would return every Document for a
+    # superuser anyway (guardian's own with_superuser shortcut), so this
+    # changes nothing about which documents are considered -- only how we
+    # get there.
     visible_document_ids = (
-        list(visible_documents.values_list("pk", flat=True))
-        if visible_documents is not None
-        else None
+        None
+        if user is None or user.is_superuser
+        else list(
+            get_objects_for_user_owner_aware(
+                user,
+                "view_document",
+                Document,
+            ).values_list("pk", flat=True),
+        )
     )
     similar_docs = query_similar_documents(
         document=doc,

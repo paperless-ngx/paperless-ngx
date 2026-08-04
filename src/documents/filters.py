@@ -37,6 +37,7 @@ from drf_spectacular.utils import extend_schema_field
 from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from rest_framework import serializers
+from rest_framework.filters import BaseFilterBackend
 from rest_framework.filters import OrderingFilter
 from rest_framework_guardian.filters import ObjectPermissionsFilter
 
@@ -50,6 +51,7 @@ from documents.models import ShareLink
 from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.permissions import permitted_document_ids
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -723,9 +725,13 @@ class CustomFieldQueryParser:
             )
 
         # First we look up reverse links from the requested documents.
+        # Scoped to this specific field (not just any document link field) and
+        # excluding unset instances, which have a null value_document_ids and
+        # are equivalent to having no reverse link at all.
         links = CustomFieldInstance.objects.filter(
             document_id__in=value,
-            field__data_type=CustomField.FieldDataType.DOCUMENTLINK,
+            field=custom_field,
+            value_document_ids__isnull=False,
         )
 
         # Check if any of the requested IDs are missing.
@@ -1036,6 +1042,31 @@ class ObjectOwnedOrGrantedPermissionsFilter(ObjectPermissionsFilter):
         objects_owned = queryset.filter(owner=request.user)
         objects_unowned = queryset.filter(owner__isnull=True)
         return objects_with_perms | objects_owned | objects_unowned
+
+
+class DocumentPermissionsFilter(BaseFilterBackend):
+    """
+    A filter backend limiting Document results to those the requesting user
+    owns, are unowned, or has explicit (user- or group-level) view
+    permission on.
+
+    Unlike ``ObjectOwnedOrGrantedPermissionsFilter``, this does not build an
+    ``objects_with_perms | objects_owned | objects_unowned`` union of
+    querysets derived from the same base queryset. When that base queryset
+    already carries independent joins on a multi-valued relation (e.g. two
+    separate joins from ``tags__id__all`` filtering on two tags), each
+    OR-ed branch can end up pairing those joins' aliases differently,
+    letting more than one row out of the join's cross product satisfy the
+    combined WHERE -- returning the same document more than once. Filtering
+    via a single ``id__in`` against ``permitted_document_ids`` (a plain
+    subquery, not a join) sidesteps that entirely and is also cheaper than
+    guardian's join-based permission check.
+    """
+
+    def filter_queryset(self, request, queryset, view):
+        if request.user.is_superuser:
+            return queryset
+        return queryset.filter(id__in=permitted_document_ids(request.user))
 
 
 class ObjectOwnedPermissionsFilter(ObjectPermissionsFilter):

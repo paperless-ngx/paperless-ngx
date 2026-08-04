@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-25 07:12+0000\n"
-"PO-Revision-Date: 2026-07-25 07:14\n"
+"POT-Creation-Date: 2026-07-31 16:14+0000\n"
+"PO-Revision-Date: 2026-07-31 16:15\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumen"
 
-#: documents/filters.py:470
+#: documents/filters.py:472
 msgid "Value must be valid JSON."
 msgstr "Nilai harus berupa JSON yang valid."
 
-#: documents/filters.py:489
+#: documents/filters.py:491
 msgid "Invalid custom field query expression"
 msgstr "Ekspresi pencarian bidang khusus tidak valid"
 
-#: documents/filters.py:499
+#: documents/filters.py:501
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Daftar ekspresi tidak valid. Tidak boleh kosong."
 
-#: documents/filters.py:520
+#: documents/filters.py:522
 msgid "Invalid logical operator {op!r}"
 msgstr "Operator logika {op!r} tidak valid"
 
-#: documents/filters.py:534
+#: documents/filters.py:536
 msgid "Maximum number of query conditions exceeded."
 msgstr "Jumlah maksimal kondisi pencarian terlampaui."
 
-#: documents/filters.py:598
+#: documents/filters.py:600
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} bukan bidang khusus yang valid."
 
-#: documents/filters.py:635
+#: documents/filters.py:637
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} tidak mendukung ekspresi pencarian expr {expr!r}."
 
-#: documents/filters.py:750 documents/models.py:136
+#: documents/filters.py:752 documents/models.py:136
 msgid "Maximum nesting depth exceeded."
 msgstr "Kedalaman susunan maksimal terlampaui."
 
-#: documents/filters.py:1067
+#: documents/filters.py:1094
 msgid "Custom field not found"
 msgstr "Bidang khusus tidak ditemukan"
 
@@ -590,11 +590,11 @@ msgstr ""
 
 #: documents/models.py:681
 msgid "Success"
-msgstr ""
+msgstr "Sukses"
 
 #: documents/models.py:682
 msgid "Failure"
-msgstr ""
+msgstr "Gagal"
 
 #: documents/models.py:683
 msgid "Revoked"
@@ -626,7 +626,7 @@ msgstr ""
 
 #: documents/models.py:692
 msgid "Empty Trash"
-msgstr ""
+msgstr "Kosongkan Sampah"
 
 #: documents/models.py:693
 msgid "Check Workflows"
@@ -1339,7 +1339,7 @@ msgid "workflow runs"
 msgstr "daftar jalankan alur kerja"
 
 #: documents/serialisers.py:522 documents/serialisers.py:874
-#: documents/serialisers.py:2763 documents/views.py:298 documents/views.py:2541
+#: documents/serialisers.py:2776 documents/views.py:299 documents/views.py:2558
 #: paperless_mail/serialisers.py:155
 msgid "Insufficient permissions."
 msgstr "Izin tidak mencukupi"
@@ -1348,38 +1348,38 @@ msgstr "Izin tidak mencukupi"
 msgid "Invalid color."
 msgstr "Warna tidak sesuai."
 
-#: documents/serialisers.py:2235
+#: documents/serialisers.py:2248
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Jenis berkas %(type)s tidak didukung"
 
-#: documents/serialisers.py:2279
+#: documents/serialisers.py:2292
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "Id kolom kustom harus berupa bilangan bulat: %(id)s"
 
-#: documents/serialisers.py:2286
+#: documents/serialisers.py:2299
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Kolom kustom dengan id %(id)s tidak ada"
 
-#: documents/serialisers.py:2303 documents/serialisers.py:2313
+#: documents/serialisers.py:2316 documents/serialisers.py:2326
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Kolom kustom harus berupa daftar bilangan bulat atau objek yang memetakan id ke nilai."
 
-#: documents/serialisers.py:2308
+#: documents/serialisers.py:2321
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Beberapa kolom kustom tidak ada atau ditentukan dua kali."
 
-#: documents/serialisers.py:2455
+#: documents/serialisers.py:2468
 msgid "Invalid variable detected."
 msgstr "Variabel ilegal terdeteksi."
 
-#: documents/serialisers.py:2819
+#: documents/serialisers.py:2832
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Penggunaan pengenal dokumen ganda tidak diperbolehkan."
 
-#: documents/serialisers.py:2849 documents/views.py:4500
+#: documents/serialisers.py:2862 documents/views.py:4517
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Dokumen tidak ditemukan: %(ids)s"
@@ -1635,36 +1635,36 @@ msgstr "Skema URI '{parts.scheme}' tidak diizinkan. Skema yang diizinkan: {', '.
 msgid "Unable to parse URI {value}"
 msgstr "Gagal membaca URI {value}"
 
-#: documents/views.py:291 documents/views.py:2538
+#: documents/views.py:292 documents/views.py:2555
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:1556
+#: documents/views.py:1567
 msgid "Invalid AI configuration."
 msgstr ""
 
-#: documents/views.py:1565
+#: documents/views.py:1576
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:2363 documents/views.py:2684
+#: documents/views.py:2380 documents/views.py:2701
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:4512
+#: documents/views.py:4529
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Izin tidak mencukupi untuk berbagi dokumen %(id)s"
 
-#: documents/views.py:4558
+#: documents/views.py:4575
 msgid "Bundle is already being processed."
 msgstr "Paket sedang diproses."
 
-#: documents/views.py:4619
+#: documents/views.py:4636
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Bundel tautan berbagi masih dalam proses persiapan. Silakan coba lagi nanti."
 
-#: documents/views.py:4629
+#: documents/views.py:4646
 msgid "The share link bundle is unavailable."
 msgstr "Bundel tautan berbagi tidak tersedia."
 

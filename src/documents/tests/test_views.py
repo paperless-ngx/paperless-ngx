@@ -494,6 +494,42 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
     @patch("documents.views.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
+        LLM_BACKEND="mock_backend",
+        LLM_MODEL="model-a",
+        LLM_ENDPOINT="http://endpoint-a",
+    )
+    def test_ai_suggestions_cache_key_includes_model_and_endpoint(
+        self,
+        mock_get_ai_classification,
+    ) -> None:
+        """Cached suggestions are keyed by model and endpoint, so switching
+        either yields a cache miss instead of a stale hit."""
+        mock_get_ai_classification.return_value = {
+            "title": "Answer A",
+            "tags": [],
+            "correspondents": [],
+            "document_types": [],
+            "storage_paths": [],
+            "dates": [],
+        }
+
+        self.client.force_login(user=self.user)
+        response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Cached under a key that carries model + endpoint...
+        self.assertIsNotNone(
+            get_llm_suggestion_cache(
+                self.document.pk,
+                backend="mock_backend:model-a:http://endpoint-a",
+            ),
+        )
+
+    @patch("documents.views.get_ai_document_classification")
+    @override_settings(
+        AI_ENABLED=True,
         LLM_BACKEND="openai-like",
     )
     def test_ai_suggestions_with_invalid_ai_configuration(
@@ -625,6 +661,37 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "text/event-stream")
+        mock_stream_chat.assert_called_once_with(
+            query_str="question",
+            documents=[self.document],
+            output_language=None,
+        )
+
+    @patch("documents.views.stream_chat_with_documents")
+    @patch("documents.views.get_objects_for_user_owner_aware")
+    @override_settings(AI_ENABLED=True)
+    def test_post_uses_user_display_language(
+        self,
+        mock_get_objects,
+        mock_stream_chat,
+    ) -> None:
+        UiSettings.objects.create(user=self.user, settings={"language": "de-de"})
+        self.grant_view_document_permission()
+        mock_get_objects.return_value = [self.document]
+        mock_stream_chat.return_value = iter([b"data"])
+
+        response = self.client.post(
+            self.ENDPOINT,
+            data='{"q": "question"}',
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        mock_stream_chat.assert_called_once_with(
+            query_str="question",
+            documents=[self.document],
+            output_language="de-de",
+        )
 
     @patch("documents.views.stream_chat_with_documents")
     @override_settings(AI_ENABLED=True)

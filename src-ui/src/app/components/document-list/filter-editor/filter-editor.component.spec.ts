@@ -1697,6 +1697,24 @@ describe('FilterEditorComponent', () => {
     ])
   })
 
+  it('should carry over text filtering once with created and added relative dates', () => {
+    component.textFilter = 'foo'
+    const datesDropdown = fixture.debugElement.query(
+      By.directive(DatesDropdownComponent)
+    )
+    component.dateCreatedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    component.dateAddedRelativeDate = RelativeDate.WITHIN_1_MONTH
+    datesDropdown.triggerEventHandler('datesSet')
+    fixture.detectChanges()
+    tick(400)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'foo,created:[-1 week to now],added:[-1 month to now]',
+      },
+    ])
+  })
+
   it('should convert legacy title filters into full text query when adding a created relative date', () => {
     component.filterRules = [
       {
@@ -2268,5 +2286,35 @@ describe('FilterEditorComponent', () => {
     expect(component.textFilter).toEqual('hello ')
     component.itemSelected({ item: 'world', preventDefault: () => true })
     expect(component.textFilter).toEqual('hello world ')
+  })
+
+  it('should choose the active autocomplete item with Enter', () => {
+    component.textFilterTarget = 'fulltext-query'
+    jest
+      .spyOn(searchService, 'autocomplete')
+      .mockReturnValue(of(['hello', 'help']))
+
+    const input = component.textFilterInput.nativeElement as HTMLInputElement
+    input.value = 'he'
+    input.dispatchEvent(new Event('input'))
+    tick(250)
+
+    input.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'ArrowDown',
+        bubbles: true,
+        cancelable: true,
+      })
+    )
+    input.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'Enter',
+        bubbles: true,
+        cancelable: true,
+      })
+    )
+    fixture.detectChanges()
+
+    expect(component.textFilter).toEqual('help ')
   })
 })

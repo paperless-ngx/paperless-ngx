@@ -343,8 +343,32 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_called_once()
         args, kwargs = m.call_args
         self.assertListEqual(args[0], [self.doc1.id, self.doc3.id])
-        self.assertEqual(kwargs["add_custom_fields"], {str(self.cf1.id): "foo"})
+        self.assertEqual(kwargs["add_custom_fields"], {self.cf1.id: "foo"})
         self.assertEqual(kwargs["remove_custom_fields"], [self.cf2.id])
+
+    @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
+    def test_api_modify_custom_fields_rejects_invalid_value(self, m) -> None:
+        self.setup_mock(m, "modify_custom_fields")
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "modify_custom_fields",
+                    "parameters": {
+                        "add_custom_fields": {self.cf1.id: "x" * 129},
+                        "remove_custom_fields": [],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("add_custom_fields", response.data)
+        self.assertIn(str(self.cf1.id), response.data["add_custom_fields"])
+        m.assert_not_called()
 
     @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
     def test_api_modify_custom_fields_invalid_params(self, m) -> None:

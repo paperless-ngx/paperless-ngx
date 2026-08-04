@@ -932,8 +932,8 @@ for display in the web interface.
     | Document type              | `never` | `auto` (default)           | `always` |
     | -------------------------- | ------- | -------------------------- | -------- |
     | Scanned image (TIFF, JPEG) | No      | **Yes**                    | Yes      |
-    | Image-based PDF            | No      | **Yes** (short/no text, untagged) | Yes |
-    | Born-digital PDF           | No      | No (tagged or has embedded text)  | Yes |
+    | Image-based PDF            | No      | **Yes** (no embedded text) | Yes |
+    | Born-digital PDF           | No      | No (has embedded text, optionally confirmed by tag) | Yes |
     | Plain text, email, HTML    | No      | No                         | No       |
     | DOCX / ODT (via Tika)      | Yes\*   | Yes\*                      | Yes\*    |
 
@@ -1360,12 +1360,15 @@ don't exist yet.
 #### [`PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>`](#PAPERLESS_CONSUMER_IGNORE_PATTERNS) {#PAPERLESS_CONSUMER_IGNORE_PATTERNS}
 
 : Additional regex patterns for files to ignore in the consumption directory. Patterns are matched against filenames only (not full paths)
-using Python's `re.match()`, which anchors at the start of the filename.
+using Python's `re.search()`. Use `^` to anchor a pattern to the start of the filename and `$` to anchor it to the end.
 
     See the [watchfiles documentation](https://watchfiles.helpmanual.io/api/filters/#watchfiles.BaseFilter.ignore_entity_patterns)
 
     This setting is for additional patterns beyond the built-in defaults. Common system files and directories are already ignored automatically.
     The patterns will be compiled via Python's standard `re` module.
+
+    These are regular expressions, not glob patterns. For example, the glob pattern `._*` does not mean "starts with `._`" when used as a
+    regular expression; it matches nearly any non-empty filename. Use `^\._.*` for that behavior instead.
 
     Example custom patterns:
 
@@ -1381,7 +1384,11 @@ using Python's `re.match()`, which anchors at the start of the filename.
 
     Defaults to `[]` (empty list, uses only built-in defaults).
 
-    The default ignores are `[.DS_Store, .DS_STORE, ._*, desktop.ini, Thumbs.db]` and cannot be overridden.
+    The built-in file patterns are equivalent to the following regular expressions and cannot be overridden:
+
+    ```json
+    ["^\\.DS_Store$", "^\\.DS_STORE$", "^\\._.*", "^desktop\\.ini$", "^Thumbs\\.db$"]
+    ```
 
 #### [`PAPERLESS_CONSUMER_IGNORE_DIRS=<json>`](#PAPERLESS_CONSUMER_IGNORE_DIRS) {#PAPERLESS_CONSUMER_IGNORE_DIRS}
 
@@ -2135,7 +2142,7 @@ used with the OpenAI-compatible backend to target a custom provider or local gat
 
     Defaults to None.
 
-### [`PAPERLESS_AI_LLM_OUTPUT_LANGUAGE=<str>`](#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE) {#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE}
+#### [`PAPERLESS_AI_LLM_OUTPUT_LANGUAGE=<str>`](#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE) {#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE}
 
 : The language to use for AI suggestions (results may vary by LLM model). If not supplied, defaults to the user's UI language setting or None.
 

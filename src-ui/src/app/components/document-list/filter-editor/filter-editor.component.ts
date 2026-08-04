@@ -1016,7 +1016,6 @@ export class FilterEditorComponent
       this.dateAddedRelativeDate !== null ||
       this.dateCreatedRelativeDate !== null
     ) {
-      let queryArgs: Array<string> = []
       let existingRule = filterRules.find(
         (fr) => fr.rule_type == FILTER_FULLTEXT_QUERY
       )
@@ -1038,32 +1037,28 @@ export class FilterEditorComponent
         existingRule.rule_type = FILTER_FULLTEXT_QUERY
       }
 
-      let existingRuleArgs = existingRule?.value.split(',')
+      let queryArgs = existingRule?.value.split(',') ?? []
       if (this.dateCreatedRelativeDate !== null) {
         const rd = RELATIVE_DATE_QUERYSTRINGS.find(
           (qS) => qS.relativeDate == this.dateCreatedRelativeDate
         )
+        queryArgs = queryArgs.filter(
+          (arg) => !arg.match(RELATIVE_DATE_QUERY_REGEXP_CREATED)
+        )
         queryArgs.push(
           `created:${rd.isRange ? `[${rd.dateQuery}]` : `"${rd.dateQuery}"`}`
         )
-        if (existingRule) {
-          queryArgs = existingRuleArgs
-            .filter((arg) => !arg.match(RELATIVE_DATE_QUERY_REGEXP_CREATED))
-            .concat(queryArgs)
-        }
       }
       if (this.dateAddedRelativeDate !== null) {
         const rd = RELATIVE_DATE_QUERYSTRINGS.find(
           (qS) => qS.relativeDate == this.dateAddedRelativeDate
         )
+        queryArgs = queryArgs.filter(
+          (arg) => !arg.match(RELATIVE_DATE_QUERY_REGEXP_ADDED)
+        )
         queryArgs.push(
           `added:${rd.isRange ? `[${rd.dateQuery}]` : `"${rd.dateQuery}"`}`
         )
-        if (existingRule) {
-          queryArgs = existingRuleArgs
-            .filter((arg) => !arg.match(RELATIVE_DATE_QUERY_REGEXP_ADDED))
-            .concat(queryArgs)
-        }
       }
 
       if (existingRule) {
@@ -1314,6 +1309,10 @@ export class FilterEditorComponent
 
   textFilterKeydown(event: KeyboardEvent) {
     if (event.key == 'Enter') {
+      if (event.defaultPrevented) {
+        // NgbTypeahead calls preventDefault, so use that to detect if the Enter key was for the dropdown
+        return
+      }
       const filterString = (
         this.textFilterInput.nativeElement as HTMLInputElement
       ).value

@@ -720,6 +720,48 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(results[0]["id"], 3)
         self.assertEqual(results[0]["title"], "bank statement 3")
 
+    def test_search_added_previous_month_excludes_next_period_start(self) -> None:
+        """
+        GIVEN:
+            - One document added at the last instant of last month
+            - One document added exactly at the first instant of this month
+        WHEN:
+            - Query for documents added in the previous month
+        THEN:
+            - Only the document from last month is returned; the document dated
+              exactly at the start of this month (the exclusive upper bound of
+              the range) is not
+        """
+        d1 = DocumentFactory.create(
+            title="end of last month",
+            content="last instant of last month",
+            checksum="A",
+            pk=1,
+            added=timezone.make_aware(datetime.datetime(2024, 1, 31, 23, 59, 59)),
+        )
+        d2 = DocumentFactory.create(
+            title="start of this month",
+            content="first instant of this month",
+            checksum="B",
+            pk=2,
+            added=timezone.make_aware(datetime.datetime(2024, 2, 1, 0, 0, 0)),
+        )
+
+        backend = get_backend()
+        backend.add_or_update(d1)
+        backend.add_or_update(d2)
+
+        with time_machine.travel(
+            timezone.make_aware(datetime.datetime(2024, 2, 15, 12, 0, 0)),
+            tick=False,
+        ):
+            response = self.client.get("/api/documents/?query=added:previous month")
+        results = response.data["results"]
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], 1)
+        self.assertEqual(results[0]["title"], "end of last month")
+
     def test_search_added_invalid_date(self) -> None:
         """
         GIVEN:
