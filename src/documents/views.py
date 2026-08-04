@@ -1929,14 +1929,14 @@ class DocumentViewSet(
         message = validated_data.get("message")
         use_archive_version = validated_data.get("use_archive_version", True)
 
-        documents = Document.objects.select_related("owner").filter(pk__in=document_ids)
-        for document in documents:
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "view_document",
-                document,
-            ):
-                return HttpResponseForbidden("Insufficient permissions")
+        documents = Document.objects.filter(pk__in=document_ids)
+        if (
+            request.user is not None
+            and documents.exclude(
+                pk__in=permitted_document_ids(request.user),
+            ).exists()
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
 
         try:
             attachments: list[EmailAttachment] = []
@@ -2789,8 +2789,13 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         )
 
         # check global and object permissions for all documents
-        has_perms = user.has_perm("documents.change_document") and all(
-            has_perms_owner_aware(user, "change_document", doc) for doc in document_objs
+        has_perms = (
+            user.has_perm(
+                "documents.change_document",
+            )
+            and not document_objs.exclude(
+                pk__in=permitted_document_ids(user, perm="change_document"),
+            ).exists()
         )
 
         # check ownership for methods that change original document
@@ -3843,9 +3848,10 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
         content = serializer.validated_data.get("content")
         follow_filename_format = serializer.validated_data.get("follow_formatting")
 
+        permitted_ids = set(permitted_document_ids(request.user))
         for document in documents:
             root_doc = get_root_document(document)
-            if not has_perms_owner_aware(request.user, "view_document", root_doc):
+            if root_doc.pk not in permitted_ids:
                 return HttpResponseForbidden("Insufficient permissions")
             versioned_documents.append(
                 get_latest_version_for_root(
@@ -4509,8 +4515,9 @@ class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
             )
 
         documents = list(documents_qs)
+        permitted_ids = set(permitted_document_ids(request.user))
         for document in documents:
-            if not has_perms_owner_aware(request.user, "view_document", document):
+            if document.pk not in permitted_ids:
                 raise ValidationError(
                     {
                         "document_ids": _(
@@ -5314,9 +5321,14 @@ class TrashView(ListModelMixin, PassUserMixin):
             if doc_ids is not None
             else self.filter_queryset(self.get_queryset()).all()
         )
-        for doc in docs:
-            if not has_perms_owner_aware(request.user, "delete_document", doc):
-                return HttpResponseForbidden("Insufficient permissions")
+        if docs.exclude(
+            pk__in=permitted_document_ids(
+                request.user,
+                perm="delete_document",
+                include_deleted=True,
+            ),
+        ).exists():
+            return HttpResponseForbidden("Insufficient permissions")
         action = serializer.validated_data.get("action")
         if action == "restore":
             for doc in Document.deleted_objects.filter(id__in=doc_ids).all():

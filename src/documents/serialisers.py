@@ -864,10 +864,10 @@ def validate_documentlink_targets(user, doc_ids):
     if user is None:
         return
 
-    target_documents = Document.objects.filter(id__in=doc_ids).select_related("owner")
-    if not all(
-        has_perms_owner_aware(user, "change_document", document)
-        for document in target_documents
+    if (
+        Document.objects.filter(id__in=doc_ids)
+        .exclude(id__in=permitted_document_ids(user, perm="change_document"))
+        .exists()
     ):
         raise PermissionDenied(
             _("Insufficient permissions."),

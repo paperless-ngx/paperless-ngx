@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from http import HTTPStatus
 from unittest.mock import patch
 
 import pytest
@@ -193,7 +194,7 @@ class TestAiChatAllDocumentsPermissionBoundary:
             format="json",
         )
 
-        assert response.status_code == 200
+        assert response.status_code == HTTPStatus.OK
         mock_stream_chat.assert_called_once()
         _, kwargs = mock_stream_chat.call_args
         visible_ids = {doc.pk for doc in kwargs["documents"]}
@@ -284,3 +285,149 @@ class TestPermittedDocumentIdsArbitraryPermission:
             expected_visible=[],
             expected_hidden=[doc.pk],
         )
+
+
+@pytest.mark.django_db
+class TestEmailDocumentPermissionBoundary:
+    def test_email_action_rejects_document_without_view_permission(
+        self,
+        rest_api_client,
+    ):
+        owner = User.objects.create_user(username="owner")
+        requester = User.objects.create_user(username="requester")
+        rest_api_client.force_authenticate(user=requester)
+        hidden = DocumentFactory(owner=owner)
+
+        response = rest_api_client.post(
+            "/api/documents/email/",
+            {
+                "documents": [hidden.pk],
+                "addresses": "someone@example.com",
+                "subject": "test",
+                "message": "test",
+            },
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.FORBIDDEN
+
+
+@pytest.mark.django_db
+class TestBulkEditChangePermissionBoundary:
+    def test_bulk_edit_rejects_mixed_batch_when_any_document_lacks_change_permission(
+        self,
+        rest_api_client,
+    ):
+        # A bulk-edit request containing both a document the requester CAN
+        # change and one they CANNOT should be rejected as a whole: the
+        # permitted document must not be partially applied just because it
+        # was bundled with a forbidden one, proving the endpoint checks
+        # every document in the batch rather than only the first/last.
+        owner = User.objects.create_user(username="owner")
+        requester = User.objects.create_user(username="requester")
+        # grant the global change_document permission so the object-level
+        # check (not the global has_perm check) is what's under test
+        requester.user_permissions.add(
+            Permission.objects.get(codename="change_document"),
+        )
+        rest_api_client.force_authenticate(user=requester)
+        changeable = DocumentFactory(owner=owner)
+        assign_perm("view_document", requester, changeable)
+        assign_perm("change_document", requester, changeable)  # fully permitted
+        target = DocumentFactory(owner=owner)
+        assign_perm("view_document", requester, target)  # view only, NOT change
+
+        response = rest_api_client.post(
+            "/api/documents/bulk_edit/",
+            {
+                "documents": [changeable.pk, target.pk],
+                "method": "modify_tags",
+                "parameters": {"add_tags": [], "remove_tags": []},
+            },
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.FORBIDDEN
+
+
+@pytest.mark.django_db
+class TestBulkDownloadPermissionChecksRootDocument:
+    def test_permission_checked_on_root_not_on_version(
+        self,
+        rest_api_client,
+        paperless_dirs,
+        _media_settings,
+    ):
+        owner = User.objects.create_user(username="owner")
+        requester = User.objects.create_user(username="requester")
+        rest_api_client.force_authenticate(user=requester)
+        root = DocumentFactory(owner=owner)
+        # a version of root that the requester has NOT been individually granted
+        version = DocumentFactory(owner=owner, root_document=root, version_index=1)
+        version.source_path.write_bytes(b"%PDF-1.4 test")
+        assign_perm("view_document", requester, root)  # granted on ROOT only
+
+        response = rest_api_client.post(
+            "/api/documents/bulk_download/",
+            {"documents": [version.pk]},
+            format="json",
+        )
+        assert (
+            response.status_code == HTTPStatus.OK
+        )  # visible because root is permitted
+
+        # Granted on the VERSION itself, but NOT on the root. If the endpoint
+        # ever regressed to checking "root OR version" instead of root-only,
+        # this grant would incorrectly unlock access. This is the case that
+        # actually discriminates correct (root-only) enforcement from a
+        # root-or-version bug; a user with no grant at all (the old
+        # `stranger` case) can't tell the two apart, since they're denied
+        # either way.
+        version_only_grantee = User.objects.create_user(username="version_only_grantee")
+        assign_perm("view_document", version_only_grantee, version)
+        rest_api_client.force_authenticate(user=version_only_grantee)
+        response = rest_api_client.post(
+            "/api/documents/bulk_download/",
+            {"documents": [version.pk]},
+            format="json",
+        )
+        assert (
+            response.status_code == HTTPStatus.FORBIDDEN
+        )  # version-only grant must not substitute for root permission
+
+
+@pytest.mark.django_db
+class TestTrashRestorePermissionBoundary:
+    def test_restore_rejects_document_without_delete_permission(
+        self,
+        rest_api_client,
+    ):
+        owner = User.objects.create_user(username="owner")
+        requester = User.objects.create_user(username="requester")
+        rest_api_client.force_authenticate(user=requester)
+        doc = DocumentFactory(owner=owner)
+        assign_perm("view_document", requester, doc)  # view only, NOT delete
+        doc.delete()
+
+        response = rest_api_client.post(
+            "/api/trash/",
+            {"documents": [doc.pk], "action": "restore"},
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.FORBIDDEN
+
+    def test_restore_allows_document_with_explicit_delete_permission(
+        self,
+        rest_api_client,
+    ):
+        owner = User.objects.create_user(username="owner")
+        requester = User.objects.create_user(username="requester")
+        rest_api_client.force_authenticate(user=requester)
+        doc = DocumentFactory(owner=owner)
+        assign_perm("delete_document", requester, doc)
+        doc.delete()
+
+        response = rest_api_client.post(
+            "/api/trash/",
+            {"documents": [doc.pk], "action": "restore"},
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.OK
