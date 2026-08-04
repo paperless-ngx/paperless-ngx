@@ -1,12 +1,18 @@
 from __future__ import annotations
 
+from unittest.mock import patch
+
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.test import override_settings
 from guardian.shortcuts import assign_perm
+from rest_framework.test import APIClient
 
 from documents.permissions import permitted_document_ids
+from documents.serialisers import _get_viewable_duplicates
 from documents.tests.factories import DocumentFactory
 
 
@@ -151,3 +157,63 @@ class TestPermittedDocumentIdsIncludeDeleted:
             expected_visible=[],
             expected_hidden=[doc.pk],
         )
+
+
+@pytest.mark.django_db
+class TestAiChatAllDocumentsPermissionBoundary:
+    """
+    Regression test pinning the "ask across all documents" AI chat behavior
+    (ChatStreamingView.post, no document_id) to the same owner/permission
+    boundary enforced by permitted_document_ids(). This call site was
+    migrated from get_objects_for_user_owner_aware() to
+    permitted_document_ids(); this test must stay green across that swap.
+    """
+
+    ENDPOINT = "/api/documents/chat/"
+
+    @override_settings(AI_ENABLED=True)
+    @patch("documents.views.stream_chat_with_documents")
+    def test_chat_all_documents_excludes_unshared_document(self, mock_stream_chat):
+        mock_stream_chat.return_value = iter([b"data"])
+
+        owner = User.objects.create_user(username="owner")
+        asker = User.objects.create_user(username="asker")
+        asker.user_permissions.add(
+            *Permission.objects.filter(codename="view_document"),
+        )
+        shared = DocumentFactory(owner=owner)
+        not_shared = DocumentFactory(owner=owner)
+        assign_perm("view_document", asker, shared)
+
+        client = APIClient()
+        client.force_authenticate(user=asker)
+        response = client.post(
+            self.ENDPOINT,
+            data={"q": "question"},
+            format="json",
+        )
+
+        assert response.status_code == 200
+        mock_stream_chat.assert_called_once()
+        _, kwargs = mock_stream_chat.call_args
+        visible_ids = {doc.pk for doc in kwargs["documents"]}
+        assert shared.pk in visible_ids
+        assert not_shared.pk not in visible_ids
+
+
+@pytest.mark.django_db
+class TestDuplicateDocumentsPermissionBoundary:
+    def test_get_viewable_duplicates_includes_soft_deleted_but_respects_perms(self):
+        owner = User.objects.create_user(username="owner")
+        stranger = User.objects.create_user(username="mallory")
+        original = DocumentFactory(owner=owner, checksum="dupe-checksum")
+        dup_visible = DocumentFactory(owner=owner, checksum="dupe-checksum")
+        dup_hidden = DocumentFactory(owner=owner, checksum="dupe-checksum")
+        dup_hidden.delete()  # soft delete, should still be found (include_deleted=True)
+        assign_perm("view_document", stranger, dup_visible)
+
+        result_owner = _get_viewable_duplicates(original, owner)
+        assert {d.pk for d in result_owner} == {dup_visible.pk, dup_hidden.pk}
+
+        result_stranger = _get_viewable_duplicates(original, stranger)
+        assert {d.pk for d in result_stranger} == {dup_visible.pk}
