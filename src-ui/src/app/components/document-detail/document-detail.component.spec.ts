@@ -2354,11 +2354,18 @@ describe('DocumentDetailComponent', () => {
 
       if (expectToast) {
         expect(toastSpy).toHaveBeenCalled()
+        expect(removeChildSpy).toHaveBeenCalledWith(mockIframe)
+        expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
       } else {
         expect(toastSpy).not.toHaveBeenCalled()
+        expect(removeChildSpy).not.toHaveBeenCalled()
+        expect(revokeObjectURLSpy).not.toHaveBeenCalled()
+
+        component.ngOnDestroy()
+
+        expect(removeChildSpy).toHaveBeenCalledWith(mockIframe)
+        expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
       }
-      expect(removeChildSpy).toHaveBeenCalledWith(mockIframe)
-      expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
 
       createElementSpy.mockRestore()
       appendChildSpy.mockRestore()
