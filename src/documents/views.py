@@ -5348,15 +5348,26 @@ def serve_logo(request: HttpRequest, filename: str | None = None) -> FileRespons
     config = ApplicationConfiguration.objects.first()
     app_logo = config.app_logo
 
-    if not app_logo:
-        raise Http404("No logo configured")
+    if app_logo:
+        path = Path(app_logo.path)
+        logo_name = app_logo.name
+    else:
+        if not settings.APP_LOGO:
+            raise Http404("No logo configured")
 
-    path = app_logo.path
+        logo_root = (Path(settings.MEDIA_ROOT) / "logo").resolve()
+        path = (Path(settings.MEDIA_ROOT) / settings.APP_LOGO.lstrip("/")).resolve()
+        if not path.is_relative_to(logo_root) or not path.is_file():
+            raise Http404("Configured logo not found")
+
+        logo_name = path.name
+
     content_type = magic.from_file(path, mime=True) or "application/octet-stream"
+    logo_file = app_logo.open("rb") if app_logo else path.open("rb")
 
     return FileResponse(
-        app_logo.open("rb"),
+        logo_file,
         content_type=content_type,
-        filename=app_logo.name,
+        filename=logo_name,
         as_attachment=True,
     )

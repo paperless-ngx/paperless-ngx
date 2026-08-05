@@ -1069,6 +1069,30 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(len(kwargs["set_permissions"]["view"]["users"]), 2)
 
     @mock.patch("documents.serialisers.bulk_edit.set_permissions")
+    def test_set_permissions_requires_set_permissions_parameter(self, m) -> None:
+        self.setup_mock(m, "set_permissions")
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "set_permissions",
+                    "parameters": {
+                        "owner": self.user.id,
+                        "merge": True,
+                        "permissions": {"view": {"users": [self.user.id]}},
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"set_permissions not specified", response.content)
+        m.assert_not_called()
+
+    @mock.patch("documents.serialisers.bulk_edit.set_permissions")
     def test_set_permissions_merge(self, m) -> None:
         self.setup_mock(m, "set_permissions")
         user1 = User.objects.create(username="user1")
