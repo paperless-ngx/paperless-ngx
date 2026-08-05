@@ -1057,33 +1057,52 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         THEN:
             - The similar documents are returned from the API request
         """
-        # Distinct created/added dates: documents created at the same instant
-        # share a timestamp term, and more_like_this (which cannot be scoped to
-        # content fields) would then match on it, surfacing unrelated documents.
-        d1 = DocumentFactory(
-            title="invoice",
-            content="the thing i bought at a shop and paid with bank account",
-            created=datetime.date(2018, 1, 1),
-            added=timezone.make_aware(datetime.datetime(2018, 1, 1)),
-        )
-        d2 = DocumentFactory(
-            title="bank statement 1",
-            content="things i paid for in august",
-            created=datetime.date(2019, 3, 4),
-            added=timezone.make_aware(datetime.datetime(2019, 3, 4)),
-        )
-        d3 = DocumentFactory(
-            title="bank statement 3",
-            content="things i paid for in september",
-            created=datetime.date(2020, 7, 9),
-            added=timezone.make_aware(datetime.datetime(2020, 7, 9)),
-        )
-        d4 = DocumentFactory(
-            title="Quarterly Report",
-            content="quarterly revenue profit margin earnings growth",
-            created=datetime.date(2021, 11, 30),
-            added=timezone.make_aware(datetime.datetime(2021, 11, 30)),
-        )
+        # Distinct created/added/modified dates: documents sharing a timestamp
+        # term (down to the second) would be matched on it by more_like_this
+        # (which cannot be scoped to content fields), surfacing unrelated
+        # documents. `modified` is auto_now, so it can't be set via factory
+        # kwargs like created/added - freeze time per document instead so all
+        # three date fields land on distinct seconds.
+        with time_machine.travel(
+            timezone.make_aware(datetime.datetime(2018, 1, 1)),
+            tick=False,
+        ):
+            d1 = DocumentFactory(
+                title="invoice",
+                content="the thing i bought at a shop and paid with bank account",
+                created=datetime.date(2018, 1, 1),
+                added=timezone.make_aware(datetime.datetime(2018, 1, 1)),
+            )
+        with time_machine.travel(
+            timezone.make_aware(datetime.datetime(2019, 3, 4)),
+            tick=False,
+        ):
+            d2 = DocumentFactory(
+                title="bank statement 1",
+                content="things i paid for in august",
+                created=datetime.date(2019, 3, 4),
+                added=timezone.make_aware(datetime.datetime(2019, 3, 4)),
+            )
+        with time_machine.travel(
+            timezone.make_aware(datetime.datetime(2020, 7, 9)),
+            tick=False,
+        ):
+            d3 = DocumentFactory(
+                title="bank statement 3",
+                content="things i paid for in september",
+                created=datetime.date(2020, 7, 9),
+                added=timezone.make_aware(datetime.datetime(2020, 7, 9)),
+            )
+        with time_machine.travel(
+            timezone.make_aware(datetime.datetime(2021, 11, 30)),
+            tick=False,
+        ):
+            d4 = DocumentFactory(
+                title="Quarterly Report",
+                content="quarterly revenue profit margin earnings growth",
+                created=datetime.date(2021, 11, 30),
+                added=timezone.make_aware(datetime.datetime(2021, 11, 30)),
+            )
         backend = get_backend()
         backend.add_or_update(d1)
         backend.add_or_update(d2)
