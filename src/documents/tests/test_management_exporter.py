@@ -1172,8 +1172,24 @@ class TestExportImport(
             - --zip-compression zstd is requested
         THEN:
             - A CommandError naming the Python version requirement is raised
+
+        zstd availability is mocked rather than relying on the actual
+        runtime: on a Python 3.14+ CI leg, ZSTD is not None, so without the
+        mock this check is skipped and the command falls through into the
+        real export, which fails on missing document files instead of
+        raising the expected CommandError.
         """
-        with self.assertRaises(CommandError) as e:
+        with (
+            mock.patch(
+                "documents.management.commands.document_exporter.ZSTD",
+                None,
+            ),
+            mock.patch(
+                "documents.management.commands.document_exporter.compression_available",
+                return_value=False,
+            ),
+            self.assertRaises(CommandError) as e,
+        ):
             call_command(
                 "document_exporter",
                 self.target,
