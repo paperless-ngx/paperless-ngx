@@ -1207,9 +1207,8 @@ export class WorkflowEditDialogComponent
     return passwords.join('\n')
   }
 
-  private parsePasswords(value: string = ''): string[] {
-    return value
-      .split(/[\n,]+/)
+  private parsePasswords(value: string | string[] = ''): string[] {
+    return (Array.isArray(value) ? value : value.split(/[\n,]+/))
       .map((entry) => entry.trim())
       .filter((entry) => entry.length > 0)
   }

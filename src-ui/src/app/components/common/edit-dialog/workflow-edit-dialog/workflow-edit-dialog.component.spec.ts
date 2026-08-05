@@ -1019,4 +1019,28 @@ describe('WorkflowEditDialogComponent', () => {
       'pass3',
     ])
   })
+
+  it('should parse passwords again when retrying a failed save', () => {
+    component.object = {
+      name: 'Workflow with blank Passwords',
+      id: 1,
+      order: null,
+      enabled: true,
+      triggers: [],
+      actions: [
+        {
+          id: 1,
+          type: WorkflowActionType.PasswordRemoval,
+          passwords: [],
+        },
+      ],
+    }
+    component.ngOnInit()
+
+    component.save()
+    component.objectForm.get('order').setValue(1)
+
+    expect(() => component.save()).not.toThrow()
+    expect(component.objectForm.get('actions').value[0].passwords).toEqual([])
+  })
 })
