@@ -222,6 +222,10 @@ class DirectoryExportSink(ExportSink):
     def _finalize(self) -> None:
         if self._delete:
             for f in self._snapshot:
+                if not f.is_relative_to(self._target):  # pragma: no cover
+                    # Defense in depth: a symlink inside the export dir can
+                    # resolve outside of it; never delete outside the target.
+                    continue
                 f.unlink()
                 delete_empty_directories(f.parent, self._target)
 
