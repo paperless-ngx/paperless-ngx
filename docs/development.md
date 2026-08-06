@@ -889,7 +889,7 @@ To get started:
 
 3. In case your host operating system is Windows:
    - The Source Control view in Visual Studio Code might show: "The detected Git repository is potentially unsafe as the folder is owned by someone other than the current user." Use "Manage Unsafe Repositories" to fix this.
-   - Git might have detecteded modifications for all files, because Windows is using CRLF line endings. Run `git checkout .` in the containers terminal to fix this issue.
+   - Git might have detected modifications for all files, because Windows is using CRLF line endings. Run `git checkout .` in the containers terminal to fix this issue.
 
 4. Initialize the project by running the task **Project Setup: Run all Init Tasks**. This
    will initialize the database tables and create a superuser. Then you can compile the front end
