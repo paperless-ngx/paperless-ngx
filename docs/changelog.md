@@ -209,7 +209,7 @@
 - [BREAKING] Chore: Drop support for Python 3.10 [@stumpylog](https://github.com/stumpylog) ([#12234](https://github.com/paperless-ngx/paperless-ngx/pull/12234))
 - [BREAKING] Chore: Refactor advanced database settings to allow more user configuration [@stumpylog](https://github.com/stumpylog) ([#12165](https://github.com/paperless-ngx/paperless-ngx/pull/12165))
 - [BREAKING] Remove API v1 compatibility [@stumpylog](https://github.com/stumpylog) ([#12166](https://github.com/paperless-ngx/paperless-ngx/pull/12166))
-- [BREAKING] Remove pybzar as a barcode reader [@stumpylog](https://github.com/stumpylog) ([#12065](https://github.com/paperless-ngx/paperless-ngx/pull/12065))
+- [BREAKING] Remove pyzbar as a barcode reader [@stumpylog](https://github.com/stumpylog) ([#12065](https://github.com/paperless-ngx/paperless-ngx/pull/12065))
 - [BREAKING] Remove support for document and thumbnail encryption [@stumpylog](https://github.com/stumpylog) ([#11850](https://github.com/paperless-ngx/paperless-ngx/pull/11850))
 - [BREAKING] Feature: Simplify and improve the consumer [@stumpylog](https://github.com/stumpylog) ([#11753](https://github.com/paperless-ngx/paperless-ngx/pull/11753))
 
@@ -895,7 +895,7 @@
 - Fix: correct user dropdown button icon styling [@shamoon](https://github.com/shamoon) ([#12092](https://github.com/paperless-ngx/paperless-ngx/pull/12092))
 - Enhancement: consolidate management lists into document attributes section [@shamoon](https://github.com/shamoon) ([#12045](https://github.com/paperless-ngx/paperless-ngx/pull/12045))
 - Enhancement: option to stop processing further mail rules [@shamoon](https://github.com/shamoon) ([#12053](https://github.com/paperless-ngx/paperless-ngx/pull/12053))
-- [BREAKING] Remove pybzar as a barcode reader [@stumpylog](https://github.com/stumpylog) ([#12065](https://github.com/paperless-ngx/paperless-ngx/pull/12065))
+- [BREAKING] Remove pyzbar as a barcode reader [@stumpylog](https://github.com/stumpylog) ([#12065](https://github.com/paperless-ngx/paperless-ngx/pull/12065))
 - Chore(deps): Bump pillow from 12.1.0 to 12.1.1 @[dependabot[bot]](https://github.com/apps/dependabot) ([#12064](https://github.com/paperless-ngx/paperless-ngx/pull/12064))
 - Chore(deps): Bump cryptography from 46.0.3 to 46.0.5 @[dependabot[bot]](https://github.com/apps/dependabot) ([#12060](https://github.com/paperless-ngx/paperless-ngx/pull/12060))
 - Chore: Optimizes the integer fields for choice types [@stumpylog](https://github.com/stumpylog) ([#12057](https://github.com/paperless-ngx/paperless-ngx/pull/12057))
