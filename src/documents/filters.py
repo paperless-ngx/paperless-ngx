@@ -39,7 +39,6 @@ from guardian.utils import get_user_obj_perms_model
 from rest_framework import serializers
 from rest_framework.filters import BaseFilterBackend
 from rest_framework.filters import OrderingFilter
-from rest_framework_guardian.filters import ObjectPermissionsFilter
 
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -51,7 +50,7 @@ from documents.models import ShareLink
 from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.permissions import permitted_document_ids
+from documents.permissions import permitted_object_ids
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -1028,59 +1027,56 @@ class PaperlessTaskFilterSet(FilterSet):
         return queryset.exclude(status__in=PaperlessTask.COMPLETE_STATUSES)
 
 
-class ObjectOwnedOrGrantedPermissionsFilter(ObjectPermissionsFilter):
+class PermittedObjectsFilter(BaseFilterBackend):
     """
-    A filter backend that limits results to those where the requesting user
-    has read object level permissions, owns the objects, or objects without
-    an owner (for backwards compat)
+    Filters a queryset down to objects the requesting user owns, are
+    unowned, or (when ``include_granted`` is True) has an explicit
+    user/group guardian permission on. Backed by ``permitted_object_ids``
+    -- a single ``id__in`` subquery, not a join -- so it can't produce
+    duplicate rows even when the base queryset already carries independent
+    joins (e.g. multi-value ``tags__id__all`` filtering), and stays
+    index-friendly at scale instead of falling back to guardian's
+    varchar-cast join.
+
+    Set ``include_granted = False`` on a subclass for endpoints that
+    intentionally only show owned/unowned objects regardless of explicit
+    shares (e.g. ``TrashView``).
     """
+
+    include_granted: bool = True
+    perm_codename: str | None = None
 
     def filter_queryset(self, request, queryset, view):
         if request.user.is_superuser:
             return queryset
-        objects_with_perms = super().filter_queryset(request, queryset, view)
-        objects_owned = queryset.filter(owner=request.user)
-        objects_unowned = queryset.filter(owner__isnull=True)
-        return objects_with_perms | objects_owned | objects_unowned
+        model = queryset.model
+        if not self.include_granted:
+            return queryset.filter(Q(owner=request.user) | Q(owner__isnull=True))
+        perm = self.perm_codename or f"view_{model._meta.model_name}"
+        return queryset.filter(
+            id__in=permitted_object_ids(request.user, model, perm),
+        )
 
 
-class DocumentPermissionsFilter(BaseFilterBackend):
+# Deprecated aliases for backwards compatibility
+class ObjectOwnedOrGrantedPermissionsFilter(PermittedObjectsFilter):
     """
-    A filter backend limiting Document results to those the requesting user
-    owns, are unowned, or has explicit (user- or group-level) view
-    permission on.
-
-    Unlike ``ObjectOwnedOrGrantedPermissionsFilter``, this does not build an
-    ``objects_with_perms | objects_owned | objects_unowned`` union of
-    querysets derived from the same base queryset. When that base queryset
-    already carries independent joins on a multi-valued relation (e.g. two
-    separate joins from ``tags__id__all`` filtering on two tags), each
-    OR-ed branch can end up pairing those joins' aliases differently,
-    letting more than one row out of the join's cross product satisfy the
-    combined WHERE -- returning the same document more than once. Filtering
-    via a single ``id__in`` against ``permitted_document_ids`` (a plain
-    subquery, not a join) sidesteps that entirely and is also cheaper than
-    guardian's join-based permission check.
+    Deprecated: Use PermittedObjectsFilter instead.
     """
 
-    def filter_queryset(self, request, queryset, view):
-        if request.user.is_superuser:
-            return queryset
-        return queryset.filter(id__in=permitted_document_ids(request.user))
 
-
-class ObjectOwnedPermissionsFilter(ObjectPermissionsFilter):
+class DocumentPermissionsFilter(PermittedObjectsFilter):
     """
-    A filter backend that limits results to those where the requesting user
-    owns the objects or objects without an owner (for backwards compat)
+    Deprecated: Use PermittedObjectsFilter instead.
     """
 
-    def filter_queryset(self, request, queryset, view):
-        if request.user.is_superuser:
-            return queryset
-        objects_owned = queryset.filter(owner=request.user)
-        objects_unowned = queryset.filter(owner__isnull=True)
-        return objects_owned | objects_unowned
+
+class ObjectOwnedPermissionsFilter(PermittedObjectsFilter):
+    """
+    Deprecated: Use PermittedObjectsFilter instead.
+    """
+
+    include_granted = False
 
 
 class DocumentsOrderingFilter(OrderingFilter):
