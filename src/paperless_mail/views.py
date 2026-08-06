@@ -23,7 +23,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
-from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
+from documents.filters import PermittedObjectsFilter
 from documents.models import PaperlessTask
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import has_perms_owner_aware
@@ -75,7 +75,7 @@ class MailAccountViewSet(PassUserMixin, ModelViewSet[MailAccount]):
     serializer_class = MailAccountSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
-    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
+    filter_backends = (PermittedObjectsFilter,)
 
     def get_permissions(self):
         if self.action == "test":
@@ -197,7 +197,7 @@ class ProcessedMailViewSet(PassUserMixin, ReadOnlyModelViewSet[ProcessedMail]):
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = ProcessedMailFilterSet
 
@@ -225,7 +225,7 @@ class MailRuleViewSet(PassUserMixin, ModelViewSet[MailRule]):
     serializer_class = MailRuleSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
-    filter_backends = (ObjectOwnedOrGrantedPermissionsFilter,)
+    filter_backends = (PermittedObjectsFilter,)
 
 
 @extend_schema_view(

@@ -1058,27 +1058,6 @@ class PermittedObjectsFilter(BaseFilterBackend):
         )
 
 
-# Deprecated aliases for backwards compatibility
-class ObjectOwnedOrGrantedPermissionsFilter(PermittedObjectsFilter):
-    """
-    Deprecated: Use PermittedObjectsFilter instead.
-    """
-
-
-class DocumentPermissionsFilter(PermittedObjectsFilter):
-    """
-    Deprecated: Use PermittedObjectsFilter instead.
-    """
-
-
-class ObjectOwnedPermissionsFilter(PermittedObjectsFilter):
-    """
-    Deprecated: Use PermittedObjectsFilter instead.
-    """
-
-    include_granted = False
-
-
 class DocumentsOrderingFilter(OrderingFilter):
     field_name = "ordering"
     prefix = "custom_field_"

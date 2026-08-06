@@ -133,12 +133,10 @@ from documents.file_handling import format_filename
 from documents.filters import CorrespondentFilterSet
 from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
-from documents.filters import DocumentPermissionsFilter
 from documents.filters import DocumentsOrderingFilter
 from documents.filters import DocumentTypeFilterSet
-from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
-from documents.filters import ObjectOwnedPermissionsFilter
 from documents.filters import PaperlessTaskFilterSet
+from documents.filters import PermittedObjectsFilter
 from documents.filters import ShareLinkBundleFilterSet
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
@@ -551,7 +549,7 @@ class CorrespondentViewSet(
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = CorrespondentFilterSet
     ordering_fields = (
@@ -592,7 +590,7 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Tag]):
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = TagFilterSet
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
@@ -684,7 +682,7 @@ class DocumentTypeViewSet(
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = DocumentTypeFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
@@ -988,7 +986,7 @@ class DocumentViewSet(
         DjangoFilterBackend,
         SearchFilter,
         DocumentsOrderingFilter,
-        DocumentPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "effective_content")
@@ -2674,7 +2672,7 @@ class SavedViewViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[SavedVie
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     filter_backends = (
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     ordering_fields = ("name",)
 
@@ -3921,7 +3919,7 @@ class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Storag
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = StoragePathFilterSet
     ordering_fields = ("name", "path", "matching_algorithm", "match", "document_count")
@@ -4452,7 +4450,7 @@ class ShareLinkViewSet(
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = ShareLinkFilterSet
     ordering_fields = ("created", "expiration", "document")
@@ -4482,7 +4480,7 @@ class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = ShareLinkBundleFilterSet
     ordering_fields = ("created", "expiration", "status")
@@ -5294,7 +5292,11 @@ class SystemStatusView(PassUserMixin):
 class TrashView(ListModelMixin, PassUserMixin):
     permission_classes = (IsAuthenticated,)
     serializer_class = TrashSerializer
-    filter_backends = (ObjectOwnedPermissionsFilter,)
+
+    class _TrashPermittedObjectsFilter(PermittedObjectsFilter):
+        include_granted = False
+
+    filter_backends = (_TrashPermittedObjectsFilter,)
     pagination_class = StandardPagination
 
     model = Document
