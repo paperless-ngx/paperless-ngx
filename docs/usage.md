@@ -146,7 +146,7 @@ following operations on your documents:
     mail and will never overwrite that document (except when using certain
     document actions, which make that clear). Archived versions are
     stored alongside the original versions. Any files found in the
-    consumption directory will stored inside the Paperless-ngx file
+    consumption directory will be stored inside the Paperless-ngx file
     structure and will not be retained in the consumption directory.
 
 ### The consumption directory
