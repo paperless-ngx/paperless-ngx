@@ -1969,6 +1969,8 @@ class BulkEditSerializer(
         return ownerUser
 
     def _validate_parameters_set_permissions(self, parameters) -> None:
+        if "set_permissions" not in parameters:
+            raise serializers.ValidationError("set_permissions not specified")
         parameters["set_permissions"] = self.validate_set_permissions(
             parameters["set_permissions"],
         )
