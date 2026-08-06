@@ -1959,7 +1959,9 @@ export class DocumentDetailComponent
 
   public openShareLinks() {
     const modal = this.modalService.open(ShareLinksDialogComponent)
-    modal.componentInstance.documentId.set(this.document().id)
+    modal.componentInstance.documentId.set(
+      this.selectedVersionId() ?? this.document().id
+    )
     modal.componentInstance.hasArchiveVersion.set(
       this.metadata()?.has_archive_version ??
         !!this.document()?.archived_file_name

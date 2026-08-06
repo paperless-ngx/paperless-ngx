@@ -2161,8 +2161,14 @@ describe('DocumentDetailComponent', () => {
   it('should support open share links and email modals', () => {
     const modalSpy = jest.spyOn(modalService, 'open')
     initNormally()
+    component.selectedVersionId.set(10)
     component.openShareLinks()
     expect(modalSpy).toHaveBeenCalled()
+    expect(
+      (
+        modalSpy.mock.results[0].value as NgbModalRef
+      ).componentInstance.documentId()
+    ).toBe(10)
     component.openEmailDocument()
     expect(modalSpy).toHaveBeenCalled()
   })
