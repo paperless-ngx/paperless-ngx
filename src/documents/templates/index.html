@@ -70,8 +70,7 @@
 			]
 		</script>
 	</pngx-root>
-	<script src="{% static runtime_js %}" defer></script>
-	<script src="{% static polyfills_js %}" defer></script>
-	<script src="{% static main_js %}" defer></script>
+	<script src="{% static polyfills_js %}" type="module"></script>
+	<script src="{% static main_js %}" type="module"></script>
 </body>
 </html>
