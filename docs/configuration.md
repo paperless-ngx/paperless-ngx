@@ -776,6 +776,18 @@ system. See the corresponding
 
     Defaults to "groups"
 
+#### [`PAPERLESS_SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP=<str>`](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP) {#PAPERLESS_SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP}
+
+: Allows you to define a group name that, if present in the third-party authentication system's groups claim, will grant the user superuser (admin) and staff status in Paperless-ngx. If the group is not present in the claim, superuser status will be revoked upon next login.
+
+    Defaults to None
+
+#### [`PAPERLESS_SOCIAL_ACCOUNT_SYNC_STAFF_GROUP=<str>`](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_STAFF_GROUP) {#PAPERLESS_SOCIAL_ACCOUNT_SYNC_STAFF_GROUP}
+
+: Allows you to define a group name that, if present in the third-party authentication system's groups claim, will grant the user staff status in Paperless-ngx. If the group is not present in the claim and the user is not a superuser, staff status will be revoked upon next login.
+
+    Defaults to None
+
 #### [`PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS=<comma-separated-list>`](#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS) {#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS}
 
 : A list of group names that users who signup via social accounts will be added to upon signup. Groups listed here must already exist.

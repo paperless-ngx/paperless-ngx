@@ -61,3 +61,62 @@ def handle_social_account_updated(sender, request, sociallogin, **kwargs):
             f"Syncing groups for user `{sociallogin.user}`: {social_account_groups}",
         )
         sociallogin.user.groups.set(groups, clear=True)
+
+    user_modified = False
+    if (
+        settings.SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP
+        and social_account_groups is not None
+    ):
+        is_superuser = (
+            settings.SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP in social_account_groups
+        )
+        # Safeguards to prevent accidental administrator lockout:
+        if not is_superuser and sociallogin.user.is_superuser:
+            # 1. Do not demote if the user has a local password (local override)
+            if sociallogin.user.has_usable_password():
+                is_superuser = True
+            else:
+                # 2. Do not demote if this is the only active superuser in the database
+                from django.contrib.auth.models import User
+
+                other_superusers_exist = (
+                    User.objects.filter(is_superuser=True, is_active=True)
+                    .exclude(pk=sociallogin.user.pk)
+                    .exists()
+                )
+                if not other_superusers_exist:
+                    is_superuser = True
+
+        if sociallogin.user.is_superuser != is_superuser:
+            sociallogin.user.is_superuser = is_superuser
+            user_modified = True
+
+    if settings.SOCIAL_ACCOUNT_SYNC_STAFF_GROUP and social_account_groups is not None:
+        is_staff = (
+            settings.SOCIAL_ACCOUNT_SYNC_STAFF_GROUP in social_account_groups
+        ) or sociallogin.user.is_superuser
+        # Do not demote staff if the user has a local password (local override)
+        if (
+            not is_staff
+            and sociallogin.user.is_staff
+            and sociallogin.user.has_usable_password()
+        ):
+            is_staff = True
+
+        if sociallogin.user.is_staff != is_staff:
+            sociallogin.user.is_staff = is_staff
+            user_modified = True
+    elif (
+        settings.SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP
+        and social_account_groups is not None
+    ):
+        is_staff = sociallogin.user.is_superuser or sociallogin.user.is_staff
+        if sociallogin.user.is_staff != is_staff:
+            sociallogin.user.is_staff = is_staff
+            user_modified = True
+
+    if user_modified:
+        logger.debug(
+            f"Syncing roles for user `{sociallogin.user}`: superuser={sociallogin.user.is_superuser}, staff={sociallogin.user.is_staff}",
+        )
+        sociallogin.user.save(update_fields=["is_superuser", "is_staff"])
