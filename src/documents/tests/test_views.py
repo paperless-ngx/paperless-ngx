@@ -79,10 +79,6 @@ class TestViews(DirectoriesMixin, TestCase):
                 f"frontend/{language_actual}/styles.css",
             )
             self.assertEqual(
-                response.context_data["runtime_js"],
-                f"frontend/{language_actual}/runtime.js",
-            )
-            self.assertEqual(
                 response.context_data["polyfills_js"],
                 f"frontend/{language_actual}/polyfills.js",
             )

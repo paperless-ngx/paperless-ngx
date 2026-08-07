@@ -348,7 +348,6 @@ class IndexView(TemplateView):
         context["username"] = self.request.user.username
         context["full_name"] = self.request.user.get_full_name()
         context["styles_css"] = f"frontend/{self.get_frontend_language()}/styles.css"
-        context["runtime_js"] = f"frontend/{self.get_frontend_language()}/runtime.js"
         context["polyfills_js"] = (
             f"frontend/{self.get_frontend_language()}/polyfills.js"
         )
