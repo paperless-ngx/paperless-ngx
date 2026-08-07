@@ -15,6 +15,7 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
   NgbDropdownModule,
+  NgbTypeahead,
   NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -350,6 +351,9 @@ export class FilterEditorComponent
 
   @ViewChild('textFilterInput')
   textFilterInput: ElementRef
+
+  @ViewChild(NgbTypeahead)
+  searchTypeahead: NgbTypeahead
 
   readonly customFields = signal<CustomField[]>([])
 
@@ -1150,6 +1154,7 @@ export class FilterEditorComponent
   }
 
   set textFilter(value) {
+    this._textFilter = value // set immediately to prevent loss of keystrokes
     this.textFilterDebounce.next(value)
   }
 
@@ -1242,9 +1247,9 @@ export class FilterEditorComponent
         distinctUntilChanged(),
         filter((query) => !query.length || query.length > 2)
       )
-      .subscribe((text) =>
+      .subscribe(() =>
         this.updateTextFilter(
-          text,
+          this._textFilter, // use the current value, not the debounced (possibly stale) one
           this.textFilterTarget !== TEXT_FILTER_TARGET_FULLTEXT_QUERY
         )
       )
@@ -1320,6 +1325,11 @@ export class FilterEditorComponent
         this.updateTextFilter(filterString)
       }
     } else if (event.key === 'Escape') {
+      if (this.searchTypeahead?.isPopupOpen()) {
+        // only dismiss the suggestions, so longer query can use Enter
+        this.searchTypeahead.dismissPopup()
+        return
+      }
       if (this._textFilter?.length) {
         this.resetTextField()
       } else {

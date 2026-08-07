@@ -2213,6 +2213,20 @@ describe('FilterEditorComponent', () => {
     expect(blurSpy).toHaveBeenCalled()
   })
 
+  it('should only dismiss open autocomplete suggestions on Escape, keeping the query', () => {
+    component.textFilter = 'foo bar'
+    component.textFilterInput.nativeElement.value = 'foo bar'
+    jest.spyOn(component.searchTypeahead, 'isPopupOpen').mockReturnValue(true)
+    const dismissSpy = jest
+      .spyOn(component.searchTypeahead, 'dismissPopup')
+      .mockImplementation(() => {})
+    component.textFilterInput.nativeElement.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape' })
+    )
+    expect(dismissSpy).toHaveBeenCalled()
+    expect(component.textFilter).toEqual('foo bar')
+  })
+
   it('should adjust text filter targets if more like search', () => {
     const TEXT_FILTER_TARGET_FULLTEXT_MORELIKE = 'fulltext-morelike' // private const
     component.textFilterTarget = TEXT_FILTER_TARGET_FULLTEXT_MORELIKE
