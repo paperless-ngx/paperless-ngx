@@ -39,7 +39,6 @@ from drf_spectacular.utils import extend_schema_field
 from drf_spectacular.utils import extend_schema_serializer
 from drf_writable_nested.serializers import NestedUpdateMixin
 from guardian.core import ObjectPermissionChecker
-from guardian.shortcuts import get_objects_for_user
 from guardian.shortcuts import get_users_with_perms
 from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
@@ -80,8 +79,8 @@ from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_groups_with_only_permission
-from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
+from documents.permissions import permitted_document_ids
 from documents.permissions import set_permissions_for_object
 from documents.regex import validate_regex_pattern
 from documents.templating.filepath import validate_filepath_template_and_render
@@ -865,10 +864,10 @@ def validate_documentlink_targets(user, doc_ids):
     if user is None:
         return
 
-    target_documents = Document.objects.filter(id__in=doc_ids).select_related("owner")
-    if not all(
-        has_perms_owner_aware(user, "change_document", document)
-        for document in target_documents
+    if (
+        Document.objects.filter(id__in=doc_ids)
+        .exclude(id__in=permitted_document_ids(user, perm="change_document"))
+        .exists()
     ):
         raise PermissionDenied(
             _("Insufficient permissions."),
@@ -1011,13 +1010,8 @@ def _get_viewable_duplicates(
     ).exclude(pk=document.pk)
     duplicates = duplicates.filter(root_document__isnull=True)
     duplicates = duplicates.order_by("-created")
-    allowed = get_objects_for_user_owner_aware(
-        user,
-        "documents.view_document",
-        Document,
-        include_deleted=True,
-    )
-    return duplicates.filter(id__in=allowed)
+    allowed_ids = permitted_document_ids(user, include_deleted=True)
+    return duplicates.filter(id__in=allowed_ids)
 
 
 class DuplicateDocumentSummarySerializer(serializers.Serializer[dict[str, Any]]):
@@ -1975,6 +1969,8 @@ class BulkEditSerializer(
         return ownerUser
 
     def _validate_parameters_set_permissions(self, parameters) -> None:
+        if "set_permissions" not in parameters:
+            raise serializers.ValidationError("set_permissions not specified")
         parameters["set_permissions"] = self.validate_set_permissions(
             parameters["set_permissions"],
         )
@@ -2672,13 +2668,8 @@ class TaskSerializerV9(serializers.ModelSerializer[PaperlessTask]):
         user = request.user
         qs = Document.global_objects.filter(pk=dup_of)
         if not user.is_staff:
-            with_perms = get_objects_for_user(
-                user,
-                "documents.view_document",
-                qs,
-                accept_global_perms=False,
-            )
-            qs = with_perms | qs.filter(owner=user) | qs.filter(owner__isnull=True)
+            allowed_ids = permitted_document_ids(user, include_deleted=True)
+            qs = qs.filter(pk__in=allowed_ids)
         return list(qs.values("id", "title", "deleted_at"))
 
 
@@ -3528,8 +3519,6 @@ class StoragePathTestSerializer(SerializerWithPerms):
             document_field = self.fields.get("document")
             if not isinstance(document_field, serializers.PrimaryKeyRelatedField):
                 return
-            document_field.queryset = get_objects_for_user_owner_aware(
-                user,
-                "documents.view_document",
-                Document,
+            document_field.queryset = Document.objects.filter(
+                id__in=permitted_document_ids(user),
             )

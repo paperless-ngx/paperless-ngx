@@ -177,6 +177,7 @@ from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_global_statistics_permission
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import has_system_status_permission
+from documents.permissions import permitted_document_ids
 from documents.permissions import set_permissions_for_object
 from documents.plugins.date_parsing import get_date_parser
 from documents.schema import generate_object_with_permissions_schema
@@ -1928,14 +1929,14 @@ class DocumentViewSet(
         message = validated_data.get("message")
         use_archive_version = validated_data.get("use_archive_version", True)
 
-        documents = Document.objects.select_related("owner").filter(pk__in=document_ids)
-        for document in documents:
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "view_document",
-                document,
-            ):
-                return HttpResponseForbidden("Insufficient permissions")
+        documents = Document.objects.filter(pk__in=document_ids)
+        if (
+            request.user is not None
+            and documents.exclude(
+                pk__in=permitted_document_ids(request.user),
+            ).exists()
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
 
         try:
             attachments: list[EmailAttachment] = []
@@ -2270,10 +2271,8 @@ class ChatStreamingView(GenericAPIView[Any]):
 
             documents = [document]
         else:
-            documents = get_objects_for_user_owner_aware(
-                request.user,
-                "view_document",
-                Document,
+            documents = Document.objects.filter(
+                id__in=permitted_document_ids(request.user),
             )
 
         output_language = _get_llm_output_language(ai_config=ai_config, request=request)
@@ -2728,7 +2727,6 @@ class DocumentSelectionMixin:
         *,
         user: User,
         validated_data: dict[str, Any],
-        permission_codename: str = "view_document",
     ) -> list[int]:
         if not validated_data.get("all", False):
             # if all is not true, just pass through the provided document ids
@@ -2741,10 +2739,8 @@ class DocumentSelectionMixin:
             for key, value in filters.items()
             if key not in _TANTIVY_SEARCH_PARAM_NAMES
         }
-        permitted_documents = get_objects_for_user_owner_aware(
-            user,
-            permission_codename,
-            Document,
+        permitted_documents = Document.objects.filter(
+            id__in=permitted_document_ids(user),
         )
         # orm-filtered docs
         filtered_documents = DocumentFilterSet(
@@ -2793,8 +2789,13 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         )
 
         # check global and object permissions for all documents
-        has_perms = user.has_perm("documents.change_document") and all(
-            has_perms_owner_aware(user, "change_document", doc) for doc in document_objs
+        has_perms = (
+            user.has_perm(
+                "documents.change_document",
+            )
+            and not document_objs.exclude(
+                pk__in=permitted_document_ids(user, perm="change_document"),
+            ).exists()
         )
 
         # check ownership for methods that change original document
@@ -3352,10 +3353,8 @@ class SelectionDataView(GenericAPIView[Any]):
         serializer.is_valid(raise_exception=True)
 
         ids = serializer.validated_data.get("documents")
-        permitted_documents = get_objects_for_user_owner_aware(
-            request.user,
-            "documents.view_document",
-            Document,
+        permitted_documents = Document.objects.filter(
+            id__in=permitted_document_ids(request.user),
         )
         if permitted_documents.filter(pk__in=ids).count() != len(ids):
             return HttpResponseForbidden("Insufficient permissions")
@@ -3527,10 +3526,8 @@ class GlobalSearchView(PassUserMixin):
         OBJECT_LIMIT = 3
         docs = []
         if request.user.has_perm("documents.view_document"):
-            all_docs = get_objects_for_user_owner_aware(
-                request.user,
-                "view_document",
-                Document,
+            all_docs = Document.objects.filter(
+                id__in=permitted_document_ids(request.user),
             )
             if db_only:
                 docs = all_docs.filter(title__icontains=query)[:OBJECT_LIMIT]
@@ -3734,11 +3731,7 @@ class StatisticsView(GenericAPIView[Any]):
         documents = (
             Document.objects.all()
             if can_view_global_stats
-            else get_objects_for_user_owner_aware(
-                user,
-                "documents.view_document",
-                Document,
-            )
+            else Document.objects.filter(id__in=permitted_document_ids(user))
         ).filter(root_document__isnull=True)
         tags = (
             Tag.objects.all()
@@ -3855,9 +3848,10 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
         content = serializer.validated_data.get("content")
         follow_filename_format = serializer.validated_data.get("follow_formatting")
 
+        permitted_ids = set(permitted_document_ids(request.user))
         for document in documents:
             root_doc = get_root_document(document)
-            if not has_perms_owner_aware(request.user, "view_document", root_doc):
+            if root_doc.pk not in permitted_ids:
                 return HttpResponseForbidden("Insufficient permissions")
             versioned_documents.append(
                 get_latest_version_for_root(
@@ -4521,8 +4515,9 @@ class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
             )
 
         documents = list(documents_qs)
+        permitted_ids = set(permitted_document_ids(request.user))
         for document in documents:
-            if not has_perms_owner_aware(request.user, "view_document", document):
+            if document.pk not in permitted_ids:
                 raise ValidationError(
                     {
                         "document_ids": _(
@@ -5326,9 +5321,14 @@ class TrashView(ListModelMixin, PassUserMixin):
             if doc_ids is not None
             else self.filter_queryset(self.get_queryset()).all()
         )
-        for doc in docs:
-            if not has_perms_owner_aware(request.user, "delete_document", doc):
-                return HttpResponseForbidden("Insufficient permissions")
+        if docs.exclude(
+            pk__in=permitted_document_ids(
+                request.user,
+                perm="delete_document",
+                include_deleted=True,
+            ),
+        ).exists():
+            return HttpResponseForbidden("Insufficient permissions")
         action = serializer.validated_data.get("action")
         if action == "restore":
             for doc in Document.deleted_objects.filter(id__in=doc_ids).all():
@@ -5348,15 +5348,26 @@ def serve_logo(request: HttpRequest, filename: str | None = None) -> FileRespons
     config = ApplicationConfiguration.objects.first()
     app_logo = config.app_logo
 
-    if not app_logo:
-        raise Http404("No logo configured")
+    if app_logo:
+        path = Path(app_logo.path)
+        logo_name = app_logo.name
+    else:
+        if not settings.APP_LOGO:
+            raise Http404("No logo configured")
 
-    path = app_logo.path
+        logo_root = (Path(settings.MEDIA_ROOT) / "logo").resolve()
+        path = (Path(settings.MEDIA_ROOT) / settings.APP_LOGO.lstrip("/")).resolve()
+        if not path.is_relative_to(logo_root) or not path.is_file():
+            raise Http404("Configured logo not found")
+
+        logo_name = path.name
+
     content_type = magic.from_file(path, mime=True) or "application/octet-stream"
+    logo_file = app_logo.open("rb") if app_logo else path.open("rb")
 
     return FileResponse(
-        app_logo.open("rb"),
+        logo_file,
         content_type=content_type,
-        filename=app_logo.name,
+        filename=logo_name,
         as_attachment=True,
     )

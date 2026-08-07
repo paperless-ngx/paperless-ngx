@@ -60,7 +60,7 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("document_ids", response.data)
 
-    @mock.patch("documents.views.has_perms_owner_aware", return_value=False)
+    @mock.patch("documents.views.permitted_document_ids", return_value=set())
     def test_create_bundle_rejects_insufficient_permissions(self, perms_mock) -> None:
         payload = {
             "document_ids": [self.document.pk],

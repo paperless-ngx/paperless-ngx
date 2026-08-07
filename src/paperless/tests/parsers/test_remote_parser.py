@@ -20,6 +20,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from documents.parsers import ParseError
 from paperless.parsers import ParserContext
 from paperless.parsers import ParserProtocol
 from paperless.parsers.remote import RemoteDocumentParser
@@ -342,15 +343,14 @@ class TestRemoteParserParse:
 
 
 class TestRemoteParserParseError:
-    def test_parse_returns_empty_on_azure_error(
+    def test_parse_raises_parse_error_on_azure_error(
         self,
         remote_parser: RemoteDocumentParser,
         simple_digital_pdf_file: Path,
         failing_azure_client: Mock,
     ) -> None:
-        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
-
-        assert remote_parser.get_text() == ""
+        with pytest.raises(ParseError, match="Azure AI Vision parsing failed"):
+            remote_parser.parse(simple_digital_pdf_file, "application/pdf")
 
     def test_parse_closes_client_on_error(
         self,
@@ -358,7 +358,8 @@ class TestRemoteParserParseError:
         simple_digital_pdf_file: Path,
         failing_azure_client: Mock,
     ) -> None:
-        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
+        with pytest.raises(ParseError):
+            remote_parser.parse(simple_digital_pdf_file, "application/pdf")
 
         failing_azure_client.close.assert_called_once()
 
@@ -371,7 +372,8 @@ class TestRemoteParserParseError:
     ) -> None:
         mock_log = mocker.patch("paperless.parsers.remote.logger")
 
-        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
+        with pytest.raises(ParseError):
+            remote_parser.parse(simple_digital_pdf_file, "application/pdf")
 
         mock_log.exception.assert_called_once()
         assert "Azure AI Vision parsing failed" in mock_log.exception.call_args[0][0]

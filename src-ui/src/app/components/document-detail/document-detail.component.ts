@@ -289,6 +289,8 @@ export class DocumentDetailComponent
   private incomingUpdateModal: NgbModalRef
   private pendingIncomingUpdate: IncomingDocumentUpdate
   private lastLocalSaveModified: string | null = null
+  private printIframe: HTMLIFrameElement | null = null
+  private printBlobUrl: string | null = null
 
   requiresPassword: boolean = false
   password: string
@@ -868,6 +870,7 @@ export class DocumentDetailComponent
   }
 
   ngOnDestroy(): void {
+    this.cleanupPrintDocument()
     this.unsubscribeNotifier.next(this)
     this.unsubscribeNotifier.complete()
   }
@@ -1889,6 +1892,7 @@ export class DocumentDetailComponent
   }
 
   printDocument() {
+    this.cleanupPrintDocument()
     const selectedVersionId = this.getSelectedNonLatestVersionId()
     const printUrl = this.documentsService.getDownloadUrl(
       this.document().id,
@@ -1902,6 +1906,8 @@ export class DocumentDetailComponent
         next: (blob) => {
           const blobUrl = URL.createObjectURL(blob)
           const iframe = document.createElement('iframe')
+          this.printIframe = iframe
+          this.printBlobUrl = blobUrl
           iframe.style.position = 'fixed'
           iframe.style.right = '0'
           iframe.style.bottom = '0'
@@ -1917,22 +1923,19 @@ export class DocumentDetailComponent
                 iframe.contentWindow.focus()
                 iframe.contentWindow.print()
                 iframe.contentWindow.onafterprint = () => {
-                  document.body.removeChild(iframe)
-                  URL.revokeObjectURL(blobUrl)
+                  this.cleanupPrintDocument()
                 }
               } catch (err) {
                 // FF throws cross-origin error on onafterprint
                 const isCrossOriginAfterPrintError =
                   err instanceof DOMException &&
                   err.message.includes('onafterprint')
+                // FF throws here while print preview is still reading the iframe
+                // so keep it alive until the next print or teardown
                 if (!isCrossOriginAfterPrintError) {
                   this.toastService.showError($localize`Print failed.`, err)
+                  timer(100).subscribe(() => this.cleanupPrintDocument())
                 }
-                timer(100).subscribe(() => {
-                  // delay to avoid FF print failure
-                  document.body.removeChild(iframe)
-                  URL.revokeObjectURL(blobUrl)
-                })
               }
             })
           }
@@ -1945,9 +1948,20 @@ export class DocumentDetailComponent
       })
   }
 
+  private cleanupPrintDocument() {
+    if (this.printIframe) this.printIframe.remove()
+    this.printIframe = null
+    if (this.printBlobUrl) {
+      URL.revokeObjectURL(this.printBlobUrl)
+      this.printBlobUrl = null
+    }
+  }
+
   public openShareLinks() {
     const modal = this.modalService.open(ShareLinksDialogComponent)
-    modal.componentInstance.documentId.set(this.document().id)
+    modal.componentInstance.documentId.set(
+      this.selectedVersionId() ?? this.document().id
+    )
     modal.componentInstance.hasArchiveVersion.set(
       this.metadata()?.has_archive_version ??
         !!this.document()?.archived_file_name

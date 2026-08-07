@@ -163,14 +163,23 @@ def set_permissions_for_object(
                         )
 
 
-def permitted_document_ids(user):
+def permitted_document_ids(
+    user,
+    *,
+    perm: str = "view_document",
+    include_deleted: bool = False,
+):
     """
-    Return a queryset of document IDs the user may view, limited to non-deleted
-    documents. This intentionally avoids ``get_objects_for_user`` to keep the
-    subquery small and index-friendly.
+    Return a queryset of document IDs the user has ``perm`` on (default
+    ``"view_document"``). By default limited to non-deleted documents; pass
+    ``include_deleted=True`` for callers that need to check permission on
+    soft-deleted documents (e.g. trash restore). This intentionally avoids
+    ``get_objects_for_user`` to keep the subquery small and index-friendly.
     """
 
-    base_docs = Document.objects.filter(deleted_at__isnull=True).only("id", "owner")
+    manager = Document.global_objects if include_deleted else Document.objects
+    base_docs = manager.all()
+    base_docs = base_docs.only("id", "owner")
 
     if user is None or not getattr(user, "is_authenticated", False):
         # Just Anonymous user e.g. for drf-spectacular
@@ -179,9 +188,15 @@ def permitted_document_ids(user):
     if getattr(user, "is_superuser", False):
         return base_docs.values_list("id", flat=True)
 
+    # Guardian's UserObjectPermission/GroupObjectPermission always store a bare
+    # codename, but has_perm()-style callers commonly pass the qualified
+    # "app_label.codename" form. content_type already disambiguates the
+    # codename, so just drop any prefix rather than silently under-permitting.
+    perm = perm.rsplit(".", 1)[-1]
+
     document_ct = ContentType.objects.get_for_model(Document)
     perm_filter = {
-        "permission__codename": "view_document",
+        "permission__codename": perm,
         "permission__content_type": document_ct,
     }
 

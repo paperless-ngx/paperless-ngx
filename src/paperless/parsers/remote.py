@@ -21,6 +21,7 @@ from typing import Self
 
 from django.conf import settings
 
+from documents.parsers import ParseError
 from paperless.version import __full_version_str__
 
 if TYPE_CHECKING:
@@ -366,8 +367,7 @@ class RemoteDocumentParser:
         """Send ``file`` to Azure AI Document Intelligence and return text.
 
         Downloads the searchable PDF output from Azure and stores it at
-        ``self._archive_path``.  Returns the extracted text content, or
-        ``None`` on failure (the error is logged).
+        ``self._archive_path``.
 
         Parameters
         ----------
@@ -379,7 +379,14 @@ class RemoteDocumentParser:
         Returns
         -------
         str | None
-            Extracted text, or None if the Azure call failed.
+            Extracted text.
+
+        Raises
+        ------
+        ParseError
+            If the Azure call fails for any reason. The error is logged
+            and re-raised so consumption fails loudly instead of silently
+            producing a document with no content.
         """
         if TYPE_CHECKING:
             # Callers must have already validated config via engine_is_valid():
@@ -426,8 +433,7 @@ class RemoteDocumentParser:
 
         except Exception as e:
             logger.exception("Azure AI Vision parsing failed: %s", e)
+            raise ParseError(f"Azure AI Vision parsing failed: {e}") from e
 
         finally:
             client.close()
-
-        return None
