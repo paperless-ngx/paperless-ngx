@@ -88,7 +88,7 @@
       @if (depth > 0) {
         <div class="indicator"></div>
       }
-      <button class="btn btn-link ms-0 ps-0 text-start" (click)="userCanEdit(object) ? openEditDialog(object) : null; $event.stopPropagation()">{{ object.name }}</button>
+      <button class="btn btn-link ms-0 ps-0 text-start" style="user-select: text;" (click)="userCanEdit(object) ? openEditDialog(object) : null; $event.stopPropagation()">{{ object.name }}</button>
     </td>
     <td class="d-none d-sm-table-cell">{{ getMatching(object) }}</td>
     <td>{{ getDocumentCount(object) }}</td>
