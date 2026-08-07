@@ -426,7 +426,7 @@ class TestExportImport(
         st_mtime_1 = (self.target / "manifest.json").stat().st_mtime
 
         with mock.patch(
-            "documents.management.commands.document_exporter.copy_file_with_basic_stats",
+            "documents.export.sinks.copy_file_with_basic_stats",
         ) as m:
             self._do_export()
             m.assert_not_called()
@@ -437,7 +437,7 @@ class TestExportImport(
         Path(self.d1.source_path).touch()
 
         with mock.patch(
-            "documents.management.commands.document_exporter.copy_file_with_basic_stats",
+            "documents.export.sinks.copy_file_with_basic_stats",
         ) as m:
             self._do_export()
             self.assertEqual(m.call_count, 1)
@@ -464,7 +464,7 @@ class TestExportImport(
         self.assertIsFile(self.target / "manifest.json")
 
         with mock.patch(
-            "documents.management.commands.document_exporter.copy_file_with_basic_stats",
+            "documents.export.sinks.copy_file_with_basic_stats",
         ) as m:
             self._do_export()
             m.assert_not_called()
@@ -475,7 +475,7 @@ class TestExportImport(
         self.d2.save()
 
         with mock.patch(
-            "documents.management.commands.document_exporter.copy_file_with_basic_stats",
+            "documents.export.sinks.copy_file_with_basic_stats",
         ) as m:
             self._do_export(compare_checksums=True)
             self.assertEqual(m.call_count, 1)
@@ -1057,6 +1057,26 @@ class TestExportImport(
         )
 
         self.assertEqual(Document.objects.all().count(), 4)
+
+    def test_zip_with_compare_flags_raises(self) -> None:
+        """
+        GIVEN:
+            - A request to export to a zip file
+        WHEN:
+            - --compare-checksums or --compare-json is also passed
+        THEN:
+            - A CommandError is raised (the flags are no-ops in zip mode)
+        """
+        for flag in ("--compare-checksums", "--compare-json"):
+            with self.subTest(flag=flag):
+                with self.assertRaises(CommandError):
+                    call_command(
+                        "document_exporter",
+                        self.target,
+                        "--zip",
+                        flag,
+                        skip_checks=True,
+                    )
 
 
 @pytest.mark.management
