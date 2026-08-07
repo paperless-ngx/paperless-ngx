@@ -363,10 +363,9 @@ def get_objects_for_user_owner_aware(
     Legacy slow path (guardian-backed, O(n) style permission resolution).
     The Stage 4 unification migrated most call sites onto
     ``PermittedObjectsFilter``/``permitted_object_ids()``, but this function
-    is kept because production callers still remain, e.g.
-    ``documents/views.py`` (several call sites), ``documents/signals/handlers.py``,
-    ``paperless_ai/matching.py``, and ``paperless_ai/ai_classifier.py``.
-    Do not remove until those call sites are migrated in a future task.
+    is kept because production callers still remain. Several callers remain
+    across ``documents/``, ``paperless_mail/``, and ``paperless_ai/`` --
+    grep for this function name before removing it.
     """
     manager = (
         Model.global_objects
@@ -391,9 +390,9 @@ def has_perms_owner_aware(user, perms, obj):
 
     Stage 4's ``PermittedObjectsFilter``/``permitted_object_ids()`` covers
     queryset-level filtering, but this single-object check still has many
-    production callers, notably ``documents/views.py`` and
-    ``documents/serialisers.py``. Kept only for those remaining callers;
-    do not remove until they are migrated in a future task.
+    production callers. Several callers remain across ``documents/``,
+    ``paperless_mail/``, and ``paperless_ai/`` -- grep for this function
+    name before removing it.
     """
     checker = ObjectPermissionChecker(user)
     return obj.owner is None or obj.owner == user or checker.has_perm(perms, obj)

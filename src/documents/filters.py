@@ -1049,9 +1049,9 @@ class PermittedObjectsFilter(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         if request.user.is_superuser:
             return queryset
-        model = queryset.model
         if not self.include_granted:
             return queryset.filter(Q(owner=request.user) | Q(owner__isnull=True))
+        model = queryset.model
         perm = self.perm_codename or f"view_{model._meta.model_name}"
         return queryset.filter(
             id__in=permitted_object_ids(request.user, model, perm),

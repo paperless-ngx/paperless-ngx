@@ -38,7 +38,6 @@ dependencies = [
   "django-soft-delete~=1.0.18",
   "django-treenode>=0.24",
   "djangorestframework~=3.16",
-  "djangorestframework-guardian~=0.4.0",
   "drf-spectacular~=0.30",
   "drf-spectacular-sidecar~=2026.7.1",
   "drf-writable-nested~=0.7.1",
