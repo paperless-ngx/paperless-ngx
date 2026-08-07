@@ -1150,6 +1150,7 @@ export class FilterEditorComponent
   }
 
   set textFilter(value) {
+    this._textFilter = value // set immediately to prevent loss of keystrokes
     this.textFilterDebounce.next(value)
   }
 
@@ -1242,9 +1243,9 @@ export class FilterEditorComponent
         distinctUntilChanged(),
         filter((query) => !query.length || query.length > 2)
       )
-      .subscribe((text) =>
+      .subscribe(() =>
         this.updateTextFilter(
-          text,
+          this._textFilter, // use the current value, not the debounced (possibly stale) one
           this.textFilterTarget !== TEXT_FILTER_TARGET_FULLTEXT_QUERY
         )
       )
