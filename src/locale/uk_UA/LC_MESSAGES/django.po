@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-31 16:14+0000\n"
-"PO-Revision-Date: 2026-07-31 16:15\n"
+"POT-Creation-Date: 2026-08-08 14:28+0000\n"
+"PO-Revision-Date: 2026-08-08 14:29\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Документи"
 
-#: documents/filters.py:472
+#: documents/filters.py:471
 msgid "Value must be valid JSON."
 msgstr "Значення має бути коректним JSON."
 
-#: documents/filters.py:491
+#: documents/filters.py:490
 msgid "Invalid custom field query expression"
 msgstr "Хибний вираз запиту користувацького поля"
 
-#: documents/filters.py:501
+#: documents/filters.py:500
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Недопустимий список виразів. Має бути непустим."
 
-#: documents/filters.py:522
+#: documents/filters.py:521
 msgid "Invalid logical operator {op!r}"
 msgstr "Неприпустимий логічний оператор {op!r}"
 
-#: documents/filters.py:536
+#: documents/filters.py:535
 msgid "Maximum number of query conditions exceeded."
 msgstr "Перевищено максимальну кількість умов запиту."
 
-#: documents/filters.py:600
+#: documents/filters.py:599
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} не є дійсним користувацьким полем."
 
-#: documents/filters.py:637
+#: documents/filters.py:636
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} не підтримує вираз {expr!r}."
 
-#: documents/filters.py:752 documents/models.py:136
+#: documents/filters.py:755 documents/models.py:136
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "Перевищена максимальна глибина вкладення."
 
-#: documents/filters.py:1094
+#: documents/filters.py:1073
 msgid "Custom field not found"
 msgstr "Не знайдено користувацьке поле"
 
@@ -249,7 +249,7 @@ msgstr "Позиція цього документа у вашому фізич�
 
 #: documents/models.py:319
 msgid "root document for this version"
-msgstr ""
+msgstr "кореневий документ для цієї версії"
 
 #: documents/models.py:323
 msgid "version index"
@@ -261,7 +261,7 @@ msgstr ""
 
 #: documents/models.py:331
 msgid "version label"
-msgstr ""
+msgstr "мітка версії"
 
 #: documents/models.py:335
 msgid "Optional short label for a document version."
@@ -546,11 +546,11 @@ msgstr "створено з"
 
 #: documents/models.py:629
 msgid "added to"
-msgstr ""
+msgstr "додано до"
 
 #: documents/models.py:630
 msgid "added from"
-msgstr ""
+msgstr "додано з"
 
 #: documents/models.py:631
 msgid "mime type is"
@@ -718,7 +718,7 @@ msgstr ""
 
 #: documents/models.py:778
 msgid "Wait Time (seconds)"
-msgstr ""
+msgstr "Час очікування (сек)"
 
 #: documents/models.py:779
 msgid "Time from task creation to worker pickup"
@@ -726,7 +726,7 @@ msgstr ""
 
 #: documents/models.py:786
 msgid "Input Data"
-msgstr ""
+msgstr "Вхідні дані"
 
 #: documents/models.py:787
 msgid "Structured input parameters for the task"
@@ -746,11 +746,11 @@ msgstr "Підтверджено"
 
 #: documents/models.py:805
 msgid "Task"
-msgstr ""
+msgstr "Задача"
 
 #: documents/models.py:806
 msgid "Tasks"
-msgstr ""
+msgstr "Задачі"
 
 #: documents/models.py:836
 msgid "Note for the document"
@@ -794,11 +794,11 @@ msgstr "поділитися посиланнями"
 
 #: documents/models.py:935
 msgid "Processing"
-msgstr ""
+msgstr "Обробка"
 
 #: documents/models.py:936
 msgid "Ready"
-msgstr ""
+msgstr "Готово"
 
 #: documents/models.py:937
 msgid "Failed"
@@ -1338,48 +1338,48 @@ msgstr ""
 msgid "workflow runs"
 msgstr ""
 
-#: documents/serialisers.py:522 documents/serialisers.py:874
-#: documents/serialisers.py:2776 documents/views.py:299 documents/views.py:2558
+#: documents/serialisers.py:521 documents/serialisers.py:873
+#: documents/serialisers.py:2767 documents/views.py:299 documents/views.py:2555
 #: paperless_mail/serialisers.py:155
 msgid "Insufficient permissions."
 msgstr ""
 
-#: documents/serialisers.py:710
+#: documents/serialisers.py:709
 msgid "Invalid color."
 msgstr "Неправильний колір."
 
-#: documents/serialisers.py:2248
+#: documents/serialisers.py:2244
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Тип файлу %(type)s не підтримується"
 
-#: documents/serialisers.py:2292
+#: documents/serialisers.py:2288
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:2299
+#: documents/serialisers.py:2295
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:2316 documents/serialisers.py:2326
+#: documents/serialisers.py:2312 documents/serialisers.py:2322
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:2321
+#: documents/serialisers.py:2317
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:2468
+#: documents/serialisers.py:2464
 msgid "Invalid variable detected."
 msgstr "Виявлено неправильну змінну."
 
-#: documents/serialisers.py:2832
+#: documents/serialisers.py:2823
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2862 documents/views.py:4517
+#: documents/serialisers.py:2853 documents/views.py:4509
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1635,36 +1635,36 @@ msgstr ""
 msgid "Unable to parse URI {value}"
 msgstr ""
 
-#: documents/views.py:292 documents/views.py:2555
+#: documents/views.py:292 documents/views.py:2552
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:1567
+#: documents/views.py:1566
 msgid "Invalid AI configuration."
 msgstr ""
 
-#: documents/views.py:1576
+#: documents/views.py:1575
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:2380 documents/views.py:2701
+#: documents/views.py:2377 documents/views.py:2698
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:4529
+#: documents/views.py:4522
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr ""
 
-#: documents/views.py:4575
+#: documents/views.py:4568
 msgid "Bundle is already being processed."
 msgstr ""
 
-#: documents/views.py:4636
+#: documents/views.py:4629
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr ""
 
-#: documents/views.py:4646
+#: documents/views.py:4639
 msgid "The share link bundle is unavailable."
 msgstr ""
 
