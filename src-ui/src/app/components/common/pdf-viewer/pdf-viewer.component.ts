@@ -13,6 +13,7 @@ import {
   ViewChild,
 } from '@angular/core'
 import {
+  AnnotationMode,
   getDocument,
   GlobalWorkerOptions,
   PDFDocumentLoadingTask,
@@ -221,6 +222,7 @@ export class PngxPdfViewerComponent
       linkService: this.linkService,
       findController: this.findController,
       textLayerMode,
+      annotationMode: AnnotationMode.ENABLE,
       enableSelectionRendering: false,
       removePageBorders: true,
     }
