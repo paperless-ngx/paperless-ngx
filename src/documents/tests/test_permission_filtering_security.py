@@ -12,9 +12,18 @@ from django.test import override_settings
 from guardian.shortcuts import assign_perm
 from rest_framework.test import APIClient
 
+from documents.models import Correspondent
+from documents.models import DocumentType
+from documents.models import StoragePath
+from documents.models import Tag
 from documents.permissions import permitted_document_ids
+from documents.permissions import permitted_object_ids
 from documents.serialisers import _get_viewable_duplicates
+from documents.tests.factories import CorrespondentFactory
 from documents.tests.factories import DocumentFactory
+from documents.tests.factories import DocumentTypeFactory
+from documents.tests.factories import StoragePathFactory
+from documents.tests.factories import TagFactory
 
 
 def assert_visible_document_ids(actual_ids, *, expected_visible, expected_hidden):
@@ -431,3 +440,92 @@ class TestTrashRestorePermissionBoundary:
             format="json",
         )
         assert response.status_code == HTTPStatus.OK
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("model", "factory", "perm"),
+    [
+        (Tag, TagFactory, "view_tag"),
+        (Correspondent, CorrespondentFactory, "view_correspondent"),
+        (DocumentType, DocumentTypeFactory, "view_documenttype"),
+        (StoragePath, StoragePathFactory, "view_storagepath"),
+    ],
+)
+class TestPermittedObjectIdsGenericModels:
+    def test_owner_sees_own_object(self, model, factory, perm):
+        owner = User.objects.create_user(username=f"owner_{model.__name__}")
+        stranger = User.objects.create_user(username=f"stranger_{model.__name__}")
+        owned = factory(owner=owner)
+        strangers = factory(owner=stranger)
+
+        assert_visible_document_ids(
+            permitted_object_ids(owner, model, perm),
+            expected_visible=[owned.pk],
+            expected_hidden=[strangers.pk],
+        )
+
+    def test_unowned_object_visible_to_everyone(self, model, factory, perm):
+        user = User.objects.create_user(username=f"user_{model.__name__}")
+        unowned = factory(owner=None)
+
+        assert_visible_document_ids(
+            permitted_object_ids(user, model, perm),
+            expected_visible=[unowned.pk],
+            expected_hidden=[],
+        )
+
+    def test_explicit_permission_grants_visibility(self, model, factory, perm):
+        owner = User.objects.create_user(username=f"owner2_{model.__name__}")
+        grantee = User.objects.create_user(username=f"grantee_{model.__name__}")
+        stranger = User.objects.create_user(username=f"stranger2_{model.__name__}")
+        shared = factory(owner=owner)
+        not_shared = factory(owner=owner)
+        assign_perm(perm, grantee, shared)
+
+        assert_visible_document_ids(
+            permitted_object_ids(grantee, model, perm),
+            expected_visible=[shared.pk],
+            expected_hidden=[not_shared.pk],
+        )
+        assert_visible_document_ids(
+            permitted_object_ids(stranger, model, perm),
+            expected_visible=[],
+            expected_hidden=[shared.pk, not_shared.pk],
+        )
+
+    def test_group_permission_grants_visibility_to_members_only(
+        self,
+        model,
+        factory,
+        perm,
+    ):
+        owner = User.objects.create_user(username=f"owner3_{model.__name__}")
+        member = User.objects.create_user(username=f"member_{model.__name__}")
+        non_member = User.objects.create_user(username=f"nonmember_{model.__name__}")
+        group = Group.objects.create(name=f"group_{model.__name__}")
+        member.groups.add(group)
+        shared = factory(owner=owner)
+        assign_perm(perm, group, shared)
+
+        assert_visible_document_ids(
+            permitted_object_ids(member, model, perm),
+            expected_visible=[shared.pk],
+            expected_hidden=[],
+        )
+        assert_visible_document_ids(
+            permitted_object_ids(non_member, model, perm),
+            expected_visible=[],
+            expected_hidden=[shared.pk],
+        )
+
+    def test_superuser_sees_everything(self, model, factory, perm):
+        superuser = User.objects.create_superuser(username=f"root_{model.__name__}")
+        owner = User.objects.create_user(username=f"owner4_{model.__name__}")
+        obj = factory(owner=owner)
+
+        assert_visible_document_ids(
+            permitted_object_ids(superuser, model, perm),
+            expected_visible=[obj.pk],
+            expected_hidden=[],
+        )
