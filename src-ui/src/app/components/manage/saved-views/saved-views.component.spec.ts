@@ -25,8 +25,20 @@ import { PageHeaderComponent } from '../../common/page-header/page-header.compon
 import { SavedViewsComponent } from './saved-views.component'
 
 const savedViews = [
-  { id: 1, name: 'view1', show_in_sidebar: true, show_on_dashboard: true },
-  { id: 2, name: 'view2', show_in_sidebar: false, show_on_dashboard: false },
+  {
+    id: 1,
+    name: 'view1',
+    icon: 'archive',
+    show_in_sidebar: true,
+    show_on_dashboard: true,
+  },
+  {
+    id: 2,
+    name: 'view2',
+    icon: 'funnel',
+    show_in_sidebar: false,
+    show_on_dashboard: false,
+  },
 ]
 
 describe('SavedViewsComponent', () => {
@@ -155,6 +167,24 @@ describe('SavedViewsComponent', () => {
     })
     expect(patchBody.show_on_dashboard).toBeUndefined()
     expect(patchBody.show_in_sidebar).toBeUndefined()
+  })
+
+  it('should persist a changed icon', () => {
+    const patchSpy = jest.spyOn(savedViewService, 'patchMany')
+    const view = savedViews[0]
+    const iconControl = component.savedViewsForm
+      .get('savedViews')
+      .get(view.id.toString())
+      .get('icon')
+
+    iconControl.setValue('bell')
+    iconControl.markAsDirty()
+    component.save()
+
+    expect(patchSpy.mock.calls[0][0][0]).toMatchObject({
+      id: view.id,
+      icon: 'bell',
+    })
   })
 
   it('should persist visibility changes to user settings', () => {

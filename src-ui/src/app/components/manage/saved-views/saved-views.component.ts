@@ -13,6 +13,10 @@ import { BehaviorSubject, Observable, of, switchMap, takeUntil } from 'rxjs'
 import { PermissionsDialogComponent } from 'src/app/components/common/permissions-dialog/permissions-dialog.component'
 import { DisplayMode } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
+import {
+  DEFAULT_SAVED_VIEW_ICON,
+  SAVED_VIEW_ICONS,
+} from 'src/app/data/saved-view-icons'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import {
   PermissionAction,
@@ -25,6 +29,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
 import { DragDropSelectComponent } from '../../common/input/drag-drop-select/drag-drop-select.component'
 import { NumberComponent } from '../../common/input/number/number.component'
+import { SelectComponent } from '../../common/input/select/select.component'
 import { TextComponent } from '../../common/input/text/text.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
@@ -36,6 +41,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     PageHeaderComponent,
     ConfirmButtonComponent,
     NumberComponent,
+    SelectComponent,
     TextComponent,
     IfPermissionsDirective,
     DragDropSelectComponent,
@@ -56,6 +62,7 @@ export class SavedViewsComponent
   private readonly modalService = inject(NgbModal)
 
   DisplayMode = DisplayMode
+  readonly savedViewIcons = SAVED_VIEW_ICONS
 
   readonly savedViews = signal<SavedView[]>(undefined)
   private savedViewsGroup = new FormGroup({})
@@ -110,6 +117,7 @@ export class SavedViewsComponent
       storeData.savedViews[view.id.toString()] = {
         id: view.id,
         name: view.name,
+        icon: view.icon ?? DEFAULT_SAVED_VIEW_ICON,
         show_on_dashboard: view.show_on_dashboard,
         show_in_sidebar: view.show_in_sidebar,
         page_size: view.page_size,
@@ -122,6 +130,7 @@ export class SavedViewsComponent
         new FormGroup({
           id: new FormControl({ value: null, disabled: !canEdit }),
           name: new FormControl({ value: null, disabled: !canEdit }),
+          icon: new FormControl({ value: null, disabled: !canEdit }),
           show_on_dashboard: new FormControl({
             value: null,
             disabled: false,
@@ -200,6 +209,7 @@ export class SavedViewsComponent
 
       const modelFieldsChanged =
         group.get('name')?.dirty ||
+        group.get('icon')?.dirty ||
         group.get('page_size')?.dirty ||
         group.get('display_mode')?.dirty ||
         group.get('display_fields')?.dirty
