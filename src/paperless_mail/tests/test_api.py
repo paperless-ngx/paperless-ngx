@@ -4,9 +4,11 @@ from unittest import mock
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from guardian.shortcuts import assign_perm
+from rest_framework import serializers as drf_serializers
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from documents.models import CustomField
 from documents.tests.factories import CorrespondentFactory
 from documents.tests.factories import DocumentTypeFactory
 from documents.tests.factories import TagFactory
@@ -14,6 +16,7 @@ from documents.tests.utils import DirectoriesMixin
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
+from paperless_mail.serialisers import MailRuleSerializer
 from paperless_mail.tests.factories import MailAccountFactory
 from paperless_mail.tests.factories import MailRuleFactory
 from paperless_mail.tests.factories import ProcessedMailFactory
@@ -320,6 +323,22 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         """
 
         account1 = MailAccountFactory()
+        subject_field = CustomField.objects.create(
+            name="subject_cf",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        sender_field = CustomField.objects.create(
+            name="sender_cf",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        recipient_field = CustomField.objects.create(
+            name="recipient_cf",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        date_field = CustomField.objects.create(
+            name="date_cf",
+            data_type=CustomField.FieldDataType.DATE,
+        )
         rule1 = MailRuleFactory(
             name="Rule1",
             account=account1,
@@ -328,6 +347,11 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             filter_subject="subject",
             filter_body="body",
             filter_attachment_filename_include="file.pdf",
+            assign_created_from=MailRule.CreatedSource.FROM_MESSAGE_DATE,
+            assign_subject_to=subject_field,
+            assign_sender_to=sender_field,
+            assign_recipient_to=recipient_field,
+            assign_message_date_to=date_field,
         )
 
         response = self.client.get(self.ENDPOINT)
@@ -356,6 +380,23 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(returned_rule1["order"], rule1.order)
         self.assertEqual(returned_rule1["attachment_type"], rule1.attachment_type)
+
+        self.assertIsInstance(returned_rule1["assign_created_from"], int)
+        self.assertEqual(
+            returned_rule1["assign_created_from"],
+            MailRule.CreatedSource.FROM_MESSAGE_DATE,
+        )
+        self.assertEqual(returned_rule1["assign_subject_to"], subject_field.pk)
+        self.assertEqual(returned_rule1["assign_sender_to"], sender_field.pk)
+        self.assertEqual(returned_rule1["assign_recipient_to"], recipient_field.pk)
+        self.assertEqual(returned_rule1["assign_message_date_to"], date_field.pk)
+        for fk in (
+            "assign_subject_to",
+            "assign_sender_to",
+            "assign_recipient_to",
+            "assign_message_date_to",
+        ):
+            self.assertIsInstance(returned_rule1[fk], int)
 
     def test_create_mail_rule(self) -> None:
         """
@@ -492,6 +533,216 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         returned_rule1 = MailRule.objects.get(pk=rule1.pk)
         self.assertEqual(returned_rule1.name, "Updated Name 1")
         self.assertEqual(returned_rule1.action, MailRule.MailAction.DELETE)
+
+    def test_update_mail_rule_rejects_data_type_mismatched_email_metadata_fk(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - The four assign_*_to FKs each accept exactly one data_type
+        WHEN:
+            - A PATCH request tries to set each FK to a CustomField of the
+              *wrong* data_type
+        THEN:
+            - The API rejects every mismatch with a per-field error
+        """
+        string_field = CustomField.objects.create(
+            name="Some string",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        date_field = CustomField.objects.create(
+            name="Some date",
+            data_type=CustomField.FieldDataType.DATE,
+        )
+
+        # Seed the rule with valid FKs so a "silent no-op then null" bug can't
+        # masquerade as a rejection: the pre-existing FK id must survive the
+        # rejected PATCH.
+        seed_string_field = CustomField.objects.create(
+            name="Seed string",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        seed_date_field = CustomField.objects.create(
+            name="Seed date",
+            data_type=CustomField.FieldDataType.DATE,
+        )
+        seed_fks = {
+            "assign_subject_to": seed_string_field,
+            "assign_sender_to": seed_string_field,
+            "assign_recipient_to": seed_string_field,
+            "assign_message_date_to": seed_date_field,
+        }
+
+        # (rule field name, wrong-type CustomField) pairs.
+        mismatches = [
+            ("assign_subject_to", date_field),
+            ("assign_sender_to", date_field),
+            ("assign_recipient_to", date_field),
+            ("assign_message_date_to", string_field),
+        ]
+
+        for field_name, wrong_field in mismatches:
+            with self.subTest(field=field_name):
+                account = MailAccountFactory()
+                rule = MailRuleFactory(
+                    account=account,
+                    **{field_name: seed_fks[field_name]},
+                )
+                response = self.client.patch(
+                    f"{self.ENDPOINT}{rule.pk}/",
+                    data={field_name: wrong_field.pk},
+                )
+                self.assertEqual(
+                    response.status_code,
+                    status.HTTP_400_BAD_REQUEST,
+                    response.content,
+                )
+                self.assertIn(field_name, response.json())
+                rule.refresh_from_db()
+                self.assertEqual(
+                    getattr(rule, f"{field_name}_id"),
+                    seed_fks[field_name].pk,
+                )
+
+    def test_update_mail_rule_accepts_matching_email_metadata_fk(self) -> None:
+        """
+        GIVEN:
+            - A STRING-typed CustomField
+        WHEN:
+            - A PATCH request sets assign_subject_to to that field
+        THEN:
+            - The API accepts the request and the FK is persisted
+        """
+        account = MailAccountFactory()
+        rule = MailRuleFactory(account=account)
+        string_field = CustomField.objects.create(
+            name="Some subject",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{rule.pk}/",
+            data={"assign_subject_to": string_field.pk},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        rule.refresh_from_db()
+        self.assertEqual(rule.assign_subject_to_id, string_field.pk)
+
+    def test_update_mail_rule_clears_email_metadata_fk_with_null(self) -> None:
+        """
+        GIVEN:
+            - A MailRule with assign_subject_to pointing at a CustomField
+        WHEN:
+            - A PATCH request sets assign_subject_to to null
+        THEN:
+            - The API accepts the request and the FK is cleared
+        """
+        account = MailAccountFactory()
+        string_field = CustomField.objects.create(
+            name="Some subject",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        rule = MailRuleFactory(account=account, assign_subject_to=string_field)
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{rule.pk}/",
+            data={"assign_subject_to": None},
+            content_type="application/json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+            response.content,
+        )
+        rule.refresh_from_db()
+        self.assertIsNone(rule.assign_subject_to_id)
+
+    def test_create_mail_rule_rejects_data_type_mismatched_email_metadata_fk(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A DATE-typed CustomField
+        WHEN:
+            - A POST create sets assign_subject_to (STRING-only) to that DATE
+              field
+        THEN:
+            - The API rejects with a per-field error and no rule is created
+        """
+        account = MailAccountFactory()
+        date_field = CustomField.objects.create(
+            name="Some date",
+            data_type=CustomField.FieldDataType.DATE,
+        )
+
+        existing_count = MailRule.objects.count()
+        response = self.client.post(
+            self.ENDPOINT,
+            data={
+                "name": "created via api",
+                "account": account.pk,
+                "folder": "INBOX",
+                "action": MailRule.MailAction.MARK_READ,
+                "assign_subject_to": date_field.pk,
+            },
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST,
+            response.content,
+        )
+        self.assertIn("assign_subject_to", response.json())
+        self.assertEqual(MailRule.objects.count(), existing_count)
+
+    def test_mail_rule_serializer_validate_accumulates_data_type_errors(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - CustomFields resolved directly into serializer attrs, bypassing
+              the field-level ``limit_choices_to`` queryset filter that
+              normally rejects wrong-type FKs before ``validate`` runs
+        WHEN:
+            - Multiple mail-metadata FKs point at CustomFields of the wrong
+              data_type (a STRING-only FK with a DATE field and a DATE-only
+              FK with a STRING field)
+        THEN:
+            - ``MailRuleSerializer.validate`` raises a ValidationError with
+              one per-field entry, and each entry renders both the expected
+              and the got FieldDataType labels
+        """
+        string_field = CustomField.objects.create(
+            name="Str",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        date_field = CustomField.objects.create(
+            name="Dt",
+            data_type=CustomField.FieldDataType.DATE,
+        )
+        attrs = {
+            # STRING-typed FK receiving a DATE field
+            "assign_subject_to": date_field,
+            # DATE-typed FK receiving a STRING field
+            "assign_message_date_to": string_field,
+        }
+
+        with self.assertRaises(drf_serializers.ValidationError) as ctx:
+            MailRuleSerializer().validate(attrs)
+
+        detail = ctx.exception.detail
+        self.assertIn("assign_subject_to", detail)
+        self.assertIn("assign_message_date_to", detail)
+        string_label = str(CustomField.FieldDataType.STRING.label)
+        date_label = str(CustomField.FieldDataType.DATE.label)
+        subject_msg = str(detail["assign_subject_to"])
+        message_date_msg = str(detail["assign_message_date_to"])
+        self.assertIn(string_label, subject_msg)
+        self.assertIn(date_label, subject_msg)
+        self.assertIn(date_label, message_date_msg)
+        self.assertIn(string_label, message_date_msg)
 
     def test_create_mail_rule_scopes_accounts(self) -> None:
         other_user = User.objects.create_user(username="mail-owner")

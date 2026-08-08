@@ -50,6 +50,7 @@ class MailRuleAdmin(GuardedModelAdmin):
         "action": admin.VERTICAL,
         "assign_title_from": admin.VERTICAL,
         "assign_correspondent_from": admin.VERTICAL,
+        "assign_created_from": admin.VERTICAL,
     }
 
     fieldsets = (
@@ -100,6 +101,11 @@ class MailRuleAdmin(GuardedModelAdmin):
                     "assign_document_type",
                     "assign_correspondent_from",
                     "assign_correspondent",
+                    "assign_created_from",
+                    "assign_subject_to",
+                    "assign_sender_to",
+                    "assign_recipient_to",
+                    "assign_message_date_to",
                 ),
             },
         ),
@@ -117,7 +123,14 @@ class MailRuleAdmin(GuardedModelAdmin):
 
     ordering = ["order"]
 
-    raw_id_fields = ("assign_correspondent", "assign_document_type")
+    raw_id_fields = (
+        "assign_correspondent",
+        "assign_document_type",
+        "assign_subject_to",
+        "assign_sender_to",
+        "assign_recipient_to",
+        "assign_message_date_to",
+    )
 
     filter_horizontal = ("assign_tags",)
 

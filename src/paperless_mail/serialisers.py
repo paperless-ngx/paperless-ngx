@@ -2,6 +2,7 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 
+from documents.models import CustomField
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.serialisers import CorrespondentField
@@ -86,6 +87,14 @@ class MailRuleSerializer(OwnedObjectSerializer):
     assign_document_type = DocumentTypeField(allow_null=True, required=False)
     order = serializers.IntegerField(required=False)
 
+    # Each mail-metadata FK holds exactly one CustomField.data_type.
+    EMAIL_METADATA_FIELD_DATA_TYPES = {
+        "assign_subject_to": CustomField.FieldDataType.STRING,
+        "assign_sender_to": CustomField.FieldDataType.STRING,
+        "assign_recipient_to": CustomField.FieldDataType.STRING,
+        "assign_message_date_to": CustomField.FieldDataType.DATE,
+    }
+
     class Meta:
         model = MailRule
         fields = [
@@ -118,6 +127,11 @@ class MailRuleSerializer(OwnedObjectSerializer):
             "permissions",
             "set_permissions",
             "stop_processing",
+            "assign_created_from",
+            "assign_subject_to",
+            "assign_sender_to",
+            "assign_recipient_to",
+            "assign_message_date_to",
         ]
 
     def update(self, instance, validated_data):
@@ -140,6 +154,23 @@ class MailRuleSerializer(OwnedObjectSerializer):
             and not action_parameter
         ):
             raise serializers.ValidationError("An action parameter is required.")
+
+        errors = {}
+        for field_name, expected in self.EMAIL_METADATA_FIELD_DATA_TYPES.items():
+            custom_field = attrs.get(field_name)
+            if custom_field is None:
+                continue
+            if custom_field.data_type != expected:
+                errors[field_name] = _(
+                    "CustomField must be of type %(expected)s (got %(got)s).",
+                ) % {
+                    "expected": str(CustomField.FieldDataType(expected).label),
+                    "got": str(
+                        CustomField.FieldDataType(custom_field.data_type).label,
+                    ),
+                }
+        if errors:
+            raise serializers.ValidationError(errors)
 
         return attrs
 
