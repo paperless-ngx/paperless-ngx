@@ -359,6 +359,13 @@ def get_objects_for_user_owner_aware(
     """
     Returns objects the user owns, are unowned, or has explicit perms.
     When include_deleted is True, soft-deleted items are also included.
+
+    Legacy slow path (guardian-backed, O(n) style permission resolution).
+    Most queryset-filtering call sites have migrated onto
+    ``PermittedObjectsFilter``/``permitted_object_ids()``, but this function
+    is kept because production callers still remain. Several callers remain
+    across ``documents/``, ``paperless_mail/``, and ``paperless_ai/`` --
+    grep for this function name before removing it.
     """
     manager = (
         Model.global_objects
@@ -378,6 +385,15 @@ def get_objects_for_user_owner_aware(
 
 
 def has_perms_owner_aware(user, perms, obj):
+    """
+    Legacy slow path (guardian-backed) single-object permission check.
+
+    The queryset-filtering side of this migrated onto
+    ``PermittedObjectsFilter``/``permitted_object_ids()``, but this
+    single-object check still has many production callers. Several callers
+    remain across ``documents/``, ``paperless_mail/``, and ``paperless_ai/``
+    -- grep for this function name before removing it.
+    """
     checker = ObjectPermissionChecker(user)
     return obj.owner is None or obj.owner == user or checker.has_perm(perms, obj)
 

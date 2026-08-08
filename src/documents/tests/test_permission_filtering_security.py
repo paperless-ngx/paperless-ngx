@@ -447,6 +447,33 @@ class TestTrashRestorePermissionBoundary:
 
 
 @pytest.mark.django_db
+class TestTrashViewExcludesExplicitlyGrantedDocuments:
+    """
+    Regression test pinning TrashView's use of
+    ``_TrashPermittedObjectsFilter`` (``include_granted = False``). If that
+    flag were ever flipped to the default ``True``, or the subclass removed
+    in favor of the base ``PermittedObjectsFilter``, a trashed document
+    would leak into ``/api/trash/`` results for any user holding an
+    explicit guardian grant on it, even though they are neither the owner
+    nor a superuser.
+    """
+
+    def test_explicit_grant_does_not_leak_trashed_document(self, rest_api_client):
+        owner = User.objects.create_user(username="trash_owner")
+        grantee = User.objects.create_user(username="trash_grantee")
+        doc = DocumentFactory(owner=owner)
+        doc.delete()  # soft delete
+        assign_perm("view_document", grantee, doc)
+
+        rest_api_client.force_authenticate(user=grantee)
+        response = rest_api_client.get("/api/trash/")
+
+        assert response.status_code == HTTPStatus.OK
+        result_ids = {result["id"] for result in response.data["results"]}
+        assert doc.pk not in result_ids
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     ("model", "factory", "perm"),
     [
