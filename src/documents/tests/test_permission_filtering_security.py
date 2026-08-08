@@ -620,3 +620,117 @@ class TestMatchingRespectsObjectPermissions:
         matched_ids = {sp.pk for sp in matched}
         assert visible_storage_path.pk in matched_ids
         assert hidden_storage_path.pk not in matched_ids
+
+
+@pytest.mark.django_db
+class TestBulkEditObjectsApplyToAllPermissionBoundary:
+    def test_apply_to_all_tags_excludes_unpermitted_tag(self, rest_api_client):
+        owner = User.objects.create_user(username="tags_owner")
+        requester = User.objects.create_user(username="tags_requester")
+        # grant the global change_tag permission so the object-level
+        # filtering (not the global has_perm check) is what's under test
+        requester.user_permissions.add(
+            Permission.objects.get(codename="change_tag"),
+        )
+        rest_api_client.force_authenticate(user=requester)
+        visible = TagFactory(owner=owner)
+        hidden = TagFactory(owner=owner)
+        assign_perm("view_tag", requester, visible)
+        assign_perm("change_tag", requester, visible)
+
+        response = rest_api_client.post(
+            "/api/bulk_edit_objects/",
+            {
+                "object_type": "tags",
+                "operation": "set_permissions",
+                "all": True,
+                "filters": {},
+                "owner": requester.pk,
+            },
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.OK
+
+        # The apply_to_all dispatch must resolve permitted objects up front:
+        # the visible tag (object-level change_tag granted) gets its owner
+        # reassigned, while the hidden tag (no object-level grant) is
+        # excluded entirely and keeps its original owner.
+        visible.refresh_from_db()
+        hidden.refresh_from_db()
+        assert visible.owner == requester
+        assert hidden.owner == owner
+
+
+@pytest.mark.django_db
+class TestBulkEditObjectsTagDescendantPartialPermission:
+    def test_apply_to_all_descendant_expansion_respects_per_object_permissions(
+        self,
+        rest_api_client,
+    ):
+        """
+        GIVEN:
+            - A tag hierarchy (parent -> permitted_child, unpermitted_child)
+            - A non-superuser requester with object-level change_tag granted
+              on the parent and on only ONE of the two children
+        WHEN:
+            - bulk_edit_objects is called with all=True and a filter that
+              matches only the root (parent) tag, engaging the
+              tag-descendant-expansion logic in BulkEditObjectsView.post
+        THEN:
+            - The descendant expansion only pulls in descendants the
+              requester actually has permission on: the permitted child's
+              owner is reassigned alongside the parent's, while the
+              unpermitted child keeps its original owner. This pins that the
+              expansion checks per-object permissions (editable_ids), not
+              merely "is a descendant of a filter match".
+
+        NOTE: this uses ``set_permissions`` (owner reassignment) rather than
+        ``delete`` as the operation, because Tag.tn_parent (django-treenode)
+        cascades deletes to descendants at the database/ORM level regardless
+        of which tags the view resolved into ``objs`` -- a delete-based test
+        would pass/fail based on FK cascade behavior, not on whether the
+        descendant-expansion logic itself respected per-object permissions.
+        """
+        owner = User.objects.create_user(username="tag_hierarchy_owner")
+        requester = User.objects.create_user(username="tag_hierarchy_requester")
+        # global change_tag permission so the has_perm() gate passes and the
+        # object-level permitted_object_ids filtering is what's under test
+        requester.user_permissions.add(
+            Permission.objects.get(codename="change_tag"),
+        )
+        rest_api_client.force_authenticate(user=requester)
+
+        parent = TagFactory(owner=owner, name="parent-tag")
+        permitted_child = TagFactory(
+            owner=owner,
+            name="permitted-child-tag",
+            tn_parent=parent,
+        )
+        unpermitted_child = TagFactory(
+            owner=owner,
+            name="unpermitted-child-tag",
+            tn_parent=parent,
+        )
+        assign_perm("change_tag", requester, parent)
+        assign_perm("change_tag", requester, permitted_child)
+        # unpermitted_child is intentionally NOT granted change_tag
+
+        response = rest_api_client.post(
+            "/api/bulk_edit_objects/",
+            {
+                "object_type": "tags",
+                "operation": "set_permissions",
+                "all": True,
+                "filters": {"is_root": True},
+                "owner": requester.pk,
+            },
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.OK
+
+        parent.refresh_from_db()
+        permitted_child.refresh_from_db()
+        unpermitted_child.refresh_from_db()
+        assert parent.owner == requester
+        assert permitted_child.owner == requester
+        assert unpermitted_child.owner == owner
