@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-31 16:14+0000\n"
-"PO-Revision-Date: 2026-07-31 16:15\n"
+"POT-Creation-Date: 2026-08-08 14:28+0000\n"
+"PO-Revision-Date: 2026-08-08 14:29\n"
 "Last-Translator: \n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Documents "
 
-#: documents/filters.py:472
+#: documents/filters.py:471
 msgid "Value must be valid JSON."
 msgstr "Valor ha de ser un JSON valid."
 
-#: documents/filters.py:491
+#: documents/filters.py:490
 msgid "Invalid custom field query expression"
 msgstr "Expressió de camp de consulta invàlid"
 
-#: documents/filters.py:501
+#: documents/filters.py:500
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Expressió de llista invàlida. No ha d'estar buida."
 
-#: documents/filters.py:522
+#: documents/filters.py:521
 msgid "Invalid logical operator {op!r}"
 msgstr "Invàlid operand lògic {op!r}"
 
-#: documents/filters.py:536
+#: documents/filters.py:535
 msgid "Maximum number of query conditions exceeded."
 msgstr "Condicions de consulta excedits."
 
-#: documents/filters.py:600
+#: documents/filters.py:599
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} no és un camp personalitzat vàlid."
 
-#: documents/filters.py:637
+#: documents/filters.py:636
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} no suporta expressió de consulta {expr!r}."
 
-#: documents/filters.py:752 documents/models.py:136
+#: documents/filters.py:755 documents/models.py:136
 msgid "Maximum nesting depth exceeded."
 msgstr "Màxima profunditat anidada excedida."
 
-#: documents/filters.py:1094
+#: documents/filters.py:1073
 msgid "Custom field not found"
 msgstr "Camp personalitzat no trobat"
 
@@ -1338,48 +1338,48 @@ msgstr "data del flux"
 msgid "workflow runs"
 msgstr "flux corrents"
 
-#: documents/serialisers.py:522 documents/serialisers.py:874
-#: documents/serialisers.py:2776 documents/views.py:299 documents/views.py:2558
+#: documents/serialisers.py:521 documents/serialisers.py:873
+#: documents/serialisers.py:2767 documents/views.py:299 documents/views.py:2555
 #: paperless_mail/serialisers.py:155
 msgid "Insufficient permissions."
 msgstr "Permisos insuficients."
 
-#: documents/serialisers.py:710
+#: documents/serialisers.py:709
 msgid "Invalid color."
 msgstr "Color Invàlid."
 
-#: documents/serialisers.py:2248
+#: documents/serialisers.py:2244
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Tipus arxiu %(type)s no suportat"
 
-#: documents/serialisers.py:2292
+#: documents/serialisers.py:2288
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "ID de camp personalizat ha de ser enter: %(id)s"
 
-#: documents/serialisers.py:2299
+#: documents/serialisers.py:2295
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Camp personalitzat amb ID %(id)s no existeix"
 
-#: documents/serialisers.py:2316 documents/serialisers.py:2326
+#: documents/serialisers.py:2312 documents/serialisers.py:2322
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Camps personalitzats han de ser una llista d'enters o un objecte que mapegi els identificadors amb els valors."
 
-#: documents/serialisers.py:2321
+#: documents/serialisers.py:2317
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Alguns camps personalitzats no existeixen o s'han especificat dues vegades."
 
-#: documents/serialisers.py:2468
+#: documents/serialisers.py:2464
 msgid "Invalid variable detected."
 msgstr "Variable detectada invàlida."
 
-#: documents/serialisers.py:2832
+#: documents/serialisers.py:2823
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Duplicat d'identificadors de documents no permès."
 
-#: documents/serialisers.py:2862 documents/views.py:4517
+#: documents/serialisers.py:2853 documents/views.py:4509
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Documents no trobats: %(ids)s"
@@ -1635,36 +1635,36 @@ msgstr "L'esquema d'URI '{parts.scheme}' no està permès. Esquemes permesos: {'
 msgid "Unable to parse URI {value}"
 msgstr "No s'ha pogut analitzar l'URI {value}"
 
-#: documents/views.py:292 documents/views.py:2555
+#: documents/views.py:292 documents/views.py:2552
 msgid "Invalid more_like_id"
 msgstr "Invalid more_like_id"
 
-#: documents/views.py:1567
+#: documents/views.py:1566
 msgid "Invalid AI configuration."
 msgstr "Configuració AI invàlida."
 
-#: documents/views.py:1576
+#: documents/views.py:1575
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:2380 documents/views.py:2701
+#: documents/views.py:2377 documents/views.py:2698
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Especifica només un dels següents valors: text, title_search, query o more_like_id."
 
-#: documents/views.py:4529
+#: documents/views.py:4522
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Permisos insuficients per compartir document %(id)s."
 
-#: documents/views.py:4575
+#: documents/views.py:4568
 msgid "Bundle is already being processed."
 msgstr "Paquet ja s'està processant."
 
-#: documents/views.py:4636
+#: documents/views.py:4629
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "El paquet de link encarà s'està preparant. Prova de nou més tard."
 
-#: documents/views.py:4646
+#: documents/views.py:4639
 msgid "The share link bundle is unavailable."
 msgstr "El paquet d'enllaç no està disponible."
 

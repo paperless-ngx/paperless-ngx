@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-31 16:14+0000\n"
-"PO-Revision-Date: 2026-07-31 16:15\n"
+"POT-Creation-Date: 2026-08-08 14:28+0000\n"
+"PO-Revision-Date: 2026-08-08 14:29\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Tài liệu"
 
-#: documents/filters.py:472
+#: documents/filters.py:471
 msgid "Value must be valid JSON."
 msgstr "."
 
-#: documents/filters.py:491
+#: documents/filters.py:490
 msgid "Invalid custom field query expression"
 msgstr "Biểu thức truy vấn trường tùy chỉnh không hợp lệ"
 
-#: documents/filters.py:501
+#: documents/filters.py:500
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Danh sách biểu thức không hợp lệ. Phải không rỗng."
 
-#: documents/filters.py:522
+#: documents/filters.py:521
 msgid "Invalid logical operator {op!r}"
 msgstr "Toán tử lô-gic không hợp lệ  {op!r}"
 
-#: documents/filters.py:536
+#: documents/filters.py:535
 msgid "Maximum number of query conditions exceeded."
 msgstr "Đã vượt quá số điều kiện truy vấn tối đa."
 
-#: documents/filters.py:600
+#: documents/filters.py:599
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} không phải là trường tùy chỉnh hợp lệ."
 
-#: documents/filters.py:637
+#: documents/filters.py:636
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} không hỗ trợ expr truy vấn{expr!r}."
 
-#: documents/filters.py:752 documents/models.py:136
+#: documents/filters.py:755 documents/models.py:136
 msgid "Maximum nesting depth exceeded."
 msgstr "Đã vượt quá độ sâu lồng nhau tối đa."
 
-#: documents/filters.py:1094
+#: documents/filters.py:1073
 msgid "Custom field not found"
 msgstr "Không tìm thấy trường tùy chỉnh"
 
@@ -1338,48 +1338,48 @@ msgstr "lần chạy quy trình"
 msgid "workflow runs"
 msgstr "các lần chạy quy trình"
 
-#: documents/serialisers.py:522 documents/serialisers.py:874
-#: documents/serialisers.py:2776 documents/views.py:299 documents/views.py:2558
+#: documents/serialisers.py:521 documents/serialisers.py:873
+#: documents/serialisers.py:2767 documents/views.py:299 documents/views.py:2555
 #: paperless_mail/serialisers.py:155
 msgid "Insufficient permissions."
 msgstr "Không có đủ quyền."
 
-#: documents/serialisers.py:710
+#: documents/serialisers.py:709
 msgid "Invalid color."
 msgstr "Màu không hợp lệ."
 
-#: documents/serialisers.py:2248
+#: documents/serialisers.py:2244
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Loại tập tin %(type)s không được hỗ trợ"
 
-#: documents/serialisers.py:2292
+#: documents/serialisers.py:2288
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "ID trường tùy chỉnh phải là số nguyên: %(id)s"
 
-#: documents/serialisers.py:2299
+#: documents/serialisers.py:2295
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Trường tùy chỉnh với ID %(id)s không tồn tại"
 
-#: documents/serialisers.py:2316 documents/serialisers.py:2326
+#: documents/serialisers.py:2312 documents/serialisers.py:2322
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Trường tùy chỉnh phải là danh sách số nguyên hoặc đối tượng ánh xạ ID sang giá trị."
 
-#: documents/serialisers.py:2321
+#: documents/serialisers.py:2317
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Một số trường tùy chỉnh không tồn tại hoặc được chỉ định hai lần."
 
-#: documents/serialisers.py:2468
+#: documents/serialisers.py:2464
 msgid "Invalid variable detected."
 msgstr "Đã phát hiện biến số không hợp lệ."
 
-#: documents/serialisers.py:2832
+#: documents/serialisers.py:2823
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Không cho phép các định danh tài liệu trùng lặp"
 
-#: documents/serialisers.py:2862 documents/views.py:4517
+#: documents/serialisers.py:2853 documents/views.py:4509
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Không tìm thấy tài liệu: %(ids)s"
@@ -1635,36 +1635,36 @@ msgstr "Giao thức URI '{parts.scheme}' không được phép. Các giao thức
 msgid "Unable to parse URI {value}"
 msgstr "Không thể phân tích URI {value}"
 
-#: documents/views.py:292 documents/views.py:2555
+#: documents/views.py:292 documents/views.py:2552
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:1567
+#: documents/views.py:1566
 msgid "Invalid AI configuration."
 msgstr ""
 
-#: documents/views.py:1576
+#: documents/views.py:1575
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:2380 documents/views.py:2701
+#: documents/views.py:2377 documents/views.py:2698
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:4529
+#: documents/views.py:4522
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Không đủ quyền để chia sẻ tài liệu %(id)s"
 
-#: documents/views.py:4575
+#: documents/views.py:4568
 msgid "Bundle is already being processed."
 msgstr "Gói đang được xử lý"
 
-#: documents/views.py:4636
+#: documents/views.py:4629
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Liên kết chia sẻ gói vẫn đang được chuẩn bị. Vui lòng thử lại sau."
 
-#: documents/views.py:4646
+#: documents/views.py:4639
 msgid "The share link bundle is unavailable."
 msgstr "Không tồn tại liên kết chia sẻ gói"
 
