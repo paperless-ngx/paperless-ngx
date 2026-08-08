@@ -195,6 +195,7 @@ from documents.serialisers import DocumentVersionLabelSerializer
 from documents.serialisers import DocumentVersionSerializer
 from documents.serialisers import EditPdfDocumentsSerializer
 from documents.serialisers import EmailSerializer
+from documents.serialisers import MergeDocumentsAsVersionsSerializer
 from documents.serialisers import MergeDocumentsSerializer
 from documents.serialisers import NotesSerializer
 from documents.serialisers import PostDocumentSerializer
@@ -2807,6 +2808,7 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
                     bulk_edit.rotate,
                     bulk_edit.delete_pages,
                     bulk_edit.edit_pdf,
+                    bulk_edit.merge_as_versions,
                     bulk_edit.remove_password,
                 ]
             )
@@ -3090,6 +3092,33 @@ class MergeDocumentsView(DocumentOperationPermissionMixin):
             method=bulk_edit.merge,
             validated_data=serializer.validated_data,
             operation_label="document merge",
+        )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="documents_merge_as_versions",
+        description="Merge selected documents as versions of a chosen root document",
+        responses={
+            200: inline_serializer(
+                name="MergeDocumentsAsVersionsResult",
+                fields={
+                    "result": serializers.CharField(),
+                },
+            ),
+        },
+    ),
+)
+class MergeDocumentsAsVersionsView(DocumentOperationPermissionMixin):
+    serializer_class = MergeDocumentsAsVersionsSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return self._execute_document_action(
+            method=bulk_edit.merge_as_versions,
+            validated_data=serializer.validated_data,
+            operation_label="document merge as versions",
         )
 
 

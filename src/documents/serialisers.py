@@ -1675,6 +1675,52 @@ class MergeDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin
     from_webui = serializers.BooleanField(required=False, default=False)
 
 
+class MergeDocumentsAsVersionsSerializer(DocumentListSerializer):
+    root_document_id = serializers.IntegerField(required=True)
+    version_label = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        max_length=64,
+    )
+
+    def validate_version_label(self, value):
+        if value is None:
+            return None
+        normalized = value.strip()
+        return normalized or None
+
+    def validate(self, attrs):
+        documents = attrs["documents"]
+        if len(documents) < 2:
+            raise serializers.ValidationError(
+                "At least two documents are required.",
+            )
+        if "version_label" in attrs and len(documents) != 2:
+            raise serializers.ValidationError(
+                "version_label can only be used when merging one source document.",
+            )
+        if attrs["root_document_id"] not in documents:
+            raise serializers.ValidationError(
+                "root_document_id must be one of the selected documents.",
+            )
+
+        selected_documents = Document.objects.filter(id__in=documents)
+        if selected_documents.filter(root_document__isnull=False).exists():
+            raise serializers.ValidationError(
+                "Only top-level documents can be merged as versions.",
+            )
+
+        source_document_ids = set(documents) - {attrs["root_document_id"]}
+        if Document.objects.filter(
+            root_document_id__in=source_document_ids,
+        ).exists():
+            raise serializers.ValidationError(
+                "Documents with existing versions cannot be merged into another document.",
+            )
+        return attrs
+
+
 class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
     operations = serializers.ListField(required=True)
     delete_original = serializers.BooleanField(required=False, default=False)

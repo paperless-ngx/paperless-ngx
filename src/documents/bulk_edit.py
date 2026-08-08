@@ -12,6 +12,7 @@ from celery import group
 from celery import shared_task
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Max
 from django.db.models import Q
 from django.utils import timezone
 
@@ -30,6 +31,7 @@ from documents.permissions import set_permissions_for_object
 from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
+from documents.tasks import remove_document_from_index
 from documents.tasks import update_document_content_maybe_archive_file
 from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_root_document
@@ -608,6 +610,77 @@ def merge(
             raise
     else:
         consume_task.apply_async()
+
+    return "OK"
+
+
+def merge_as_versions(
+    doc_ids: list[int],
+    *,
+    root_document_id: int,
+    version_label: str | None = None,
+) -> Literal["OK"]:
+    with transaction.atomic():
+        documents = list(
+            Document.objects.select_for_update().filter(id__in=doc_ids),
+        )
+        documents_by_id = {document.id: document for document in documents}
+
+        if len(documents) != len(doc_ids):
+            raise ValueError("Some documents do not exist or were specified twice.")
+        if root_document_id not in documents_by_id:
+            raise ValueError("The root document must be selected.")
+        if any(document.root_document_id is not None for document in documents):
+            raise ValueError("Only top-level documents can be merged as versions.")
+
+        source_ids = sorted(doc_id for doc_id in doc_ids if doc_id != root_document_id)
+        if version_label is not None and len(source_ids) != 1:
+            raise ValueError(
+                "A version label can only be set when merging one source document.",
+            )
+        if Document.objects.filter(root_document_id__in=source_ids).exists():
+            raise ValueError(
+                "Documents with existing versions cannot be merged into another document.",
+            )
+
+        root_document = documents_by_id[root_document_id]
+        next_version_index = (
+            Document.global_objects.filter(
+                root_document_id=root_document_id,
+            ).aggregate(max_index=Max("version_index"))["max_index"]
+            or 0
+        )
+
+        for source_id in source_ids:
+            source_document = documents_by_id[source_id]
+            next_version_index += 1
+            source_document.root_document = root_document
+            source_document.version_index = next_version_index
+            update_fields = [
+                "root_document",
+                "version_index",
+                "archive_serial_number",
+            ]
+            if version_label is not None:
+                source_document.version_label = version_label
+                update_fields.append("version_label")
+            source_document.archive_serial_number = None
+            source_document.save(update_fields=update_fields)
+
+        root_document.modified = timezone.now()
+        root_document.save(update_fields=["modified"])
+
+    for source_id in source_ids:
+        remove_document_from_index.apply_async(args=[source_id])
+
+    bulk_update_documents.apply_async(
+        kwargs={"document_ids": [root_document_id]},
+        headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
+    )
+
+    # And as far as the frontend is concerned, they're deleted
+    status_mgr = DocumentsStatusManager()
+    status_mgr.send_documents_deleted(source_ids)
 
     return "OK"
 
