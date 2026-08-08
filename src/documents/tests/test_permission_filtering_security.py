@@ -12,6 +12,10 @@ from django.test import override_settings
 from guardian.shortcuts import assign_perm
 from rest_framework.test import APIClient
 
+from documents.matching import match_correspondents
+from documents.matching import match_document_types
+from documents.matching import match_storage_paths
+from documents.matching import match_tags
 from documents.models import Correspondent
 from documents.models import DocumentType
 from documents.models import StoragePath
@@ -529,3 +533,90 @@ class TestPermittedObjectIdsGenericModels:
             expected_visible=[obj.pk],
             expected_hidden=[],
         )
+
+
+@pytest.mark.django_db
+class TestMatchingRespectsObjectPermissions:
+    def test_match_tags_only_considers_tags_visible_to_user(self):
+        owner = User.objects.create_user(username="tag_owner")
+        classifying_user = User.objects.create_user(username="classifier_user")
+        visible_tag = TagFactory(
+            owner=owner,
+            match="invoice",
+            matching_algorithm=Tag.MATCH_LITERAL,
+        )
+        hidden_tag = TagFactory(
+            owner=owner,
+            match="invoice",
+            matching_algorithm=Tag.MATCH_LITERAL,
+        )
+        assign_perm("view_tag", classifying_user, visible_tag)
+        doc = DocumentFactory(owner=classifying_user, content="an invoice document")
+
+        matched = match_tags(doc, classifier=None, user=classifying_user)
+        matched_ids = {t.pk for t in matched}
+        assert visible_tag.pk in matched_ids
+        assert hidden_tag.pk not in matched_ids
+
+    def test_match_correspondents_only_considers_correspondents_visible_to_user(self):
+        owner = User.objects.create_user(username="correspondent_owner")
+        classifying_user = User.objects.create_user(username="classifier_user2")
+        visible_correspondent = CorrespondentFactory(
+            owner=owner,
+            match="invoice",
+            matching_algorithm=Correspondent.MATCH_LITERAL,
+        )
+        hidden_correspondent = CorrespondentFactory(
+            owner=owner,
+            match="invoice",
+            matching_algorithm=Correspondent.MATCH_LITERAL,
+        )
+        assign_perm("view_correspondent", classifying_user, visible_correspondent)
+        doc = DocumentFactory(owner=classifying_user, content="an invoice document")
+
+        matched = match_correspondents(doc, classifier=None, user=classifying_user)
+        matched_ids = {c.pk for c in matched}
+        assert visible_correspondent.pk in matched_ids
+        assert hidden_correspondent.pk not in matched_ids
+
+    def test_match_document_types_only_considers_document_types_visible_to_user(self):
+        owner = User.objects.create_user(username="document_type_owner")
+        classifying_user = User.objects.create_user(username="classifier_user3")
+        visible_document_type = DocumentTypeFactory(
+            owner=owner,
+            match="invoice",
+            matching_algorithm=DocumentType.MATCH_LITERAL,
+        )
+        hidden_document_type = DocumentTypeFactory(
+            owner=owner,
+            match="invoice",
+            matching_algorithm=DocumentType.MATCH_LITERAL,
+        )
+        assign_perm("view_documenttype", classifying_user, visible_document_type)
+        doc = DocumentFactory(owner=classifying_user, content="an invoice document")
+
+        matched = match_document_types(doc, classifier=None, user=classifying_user)
+        matched_ids = {dt.pk for dt in matched}
+        assert visible_document_type.pk in matched_ids
+        assert hidden_document_type.pk not in matched_ids
+
+    def test_match_storage_paths_only_considers_storage_paths_visible_to_user(self):
+        owner = User.objects.create_user(username="storage_path_owner")
+        classifying_user = User.objects.create_user(username="classifier_user4")
+        visible_storage_path = StoragePathFactory(
+            owner=owner,
+            match="invoice",
+            matching_algorithm=StoragePath.MATCH_LITERAL,
+        )
+        hidden_storage_path = StoragePathFactory(
+            owner=owner,
+            match="invoice",
+            matching_algorithm=StoragePath.MATCH_LITERAL,
+        )
+        assign_perm("view_storagepath", classifying_user, visible_storage_path)
+        doc = DocumentFactory(owner=classifying_user, content="an invoice document")
+
+        matched = match_storage_paths(doc, classifier=None, user=classifying_user)
+        matched_ids = {sp.pk for sp in matched}
+        assert visible_storage_path.pk in matched_ids
+        assert hidden_storage_path.pk not in matched_ids
