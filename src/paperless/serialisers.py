@@ -217,6 +217,7 @@ class ApplicationConfigurationSerializer(
     llm_api_key = ObfuscatedPasswordField(
         required=False,
         allow_null=True,
+        max_length=1024,
     )
 
     def run_validation(self, data):
