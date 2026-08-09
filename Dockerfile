@@ -173,6 +173,10 @@ RUN set -eux \
         && rm --force --verbose *.deb \
     && rm --recursive --force --verbose /var/lib/apt/lists/*
 
+# Ensure interactive shells (docker exec bash) see resolved *_FILE secrets,
+# mirroring what with-contenv already does for s6 services.
+RUN echo '. /etc/profile.d/contenv.sh' >> /etc/bash.bashrc
+
 WORKDIR /usr/src/paperless/src/
 
 # Python dependencies
