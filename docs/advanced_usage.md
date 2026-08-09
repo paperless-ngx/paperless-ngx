@@ -150,6 +150,19 @@ Enable it by setting
 (`huggingface` for fully-local embeddings, or `ollama` / `openai-like`). The index is only
 built when AI is enabled **and** an embedding backend is set.
 
+!!! tip
+
+    The default Huggingface model (`all-MiniLM-L6-v2`) is trained mainly on
+    English text. If your archive is largely non-English, a multilingual
+    embedding model usually retrieves noticeably better. Set
+    [`PAPERLESS_AI_LLM_EMBEDDING_MODEL`](configuration.md#PAPERLESS_AI_LLM_EMBEDDING_MODEL)
+    to a multilingual model such as `intfloat/multilingual-e5-small`,
+    `intfloat/multilingual-e5-base`, or `BAAI/bge-m3`. Larger models tend to
+    retrieve better but use more RAM per query and take longer to build the
+    index, so prefer the smallest model that covers your languages. Changing
+    the model requires rebuilding the LLM index (see
+    [Managing the LLM index](administration.md#llm-index)).
+
 The index is updated automatically on a schedule controlled by
 [`PAPERLESS_LLM_INDEX_TASK_CRON`](configuration.md#PAPERLESS_LLM_INDEX_TASK_CRON) (daily by
 default), and can be rebuilt or compacted manually — see
