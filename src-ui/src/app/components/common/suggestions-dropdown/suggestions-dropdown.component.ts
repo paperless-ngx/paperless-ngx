@@ -61,4 +61,21 @@ export class SuggestionsDropdownComponent {
         this.suggestions()?.suggested_document_types?.length || 0
     )
   }
+
+  get noSuggestions(): boolean {
+    const suggestions = this.suggestions()
+    return (
+      suggestions != null &&
+      !suggestions.title &&
+      !suggestions.tags?.length &&
+      !suggestions.suggested_tags?.length &&
+      !suggestions.correspondents?.length &&
+      !suggestions.suggested_correspondents?.length &&
+      !suggestions.document_types?.length &&
+      !suggestions.suggested_document_types?.length &&
+      !suggestions.storage_paths?.length &&
+      !suggestions.suggested_storage_paths?.length &&
+      !suggestions.dates?.length
+    )
+  }
 }
