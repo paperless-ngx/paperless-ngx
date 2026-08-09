@@ -129,6 +129,10 @@ At a minimum you need to enable AI and choose an LLM backend:
   and/or [`PAPERLESS_AI_LLM_ENDPOINT`](configuration.md#PAPERLESS_AI_LLM_ENDPOINT). Ollama
   requires `PAPERLESS_AI_LLM_ENDPOINT` pointing at your Ollama server.
 
+See the community-maintained wiki page on
+[choosing AI models](https://github.com/paperless-ngx/paperless-ngx/wiki/AI-Model-Recommendations)
+for suggested generation and embedding models.
+
 ### AI-assisted suggestions
 
 With AI enabled, Paperless-ngx can suggest a title, tags, correspondent, document type,
@@ -808,7 +812,8 @@ Third-party parser plugins extend Paperless-ngx to support additional file
 formats. A plugin is a Python package that advertises itself under the
 `paperless_ngx.parsers` entry point group. Refer to the
 [developer documentation](development.md#making-custom-parsers) for how to
-create one.
+create one, or see the wiki for a community-maintained list of
+[parser plugins](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects#parser-plugins).
 
 !!! warning "Third-party plugins are not officially supported"
 
