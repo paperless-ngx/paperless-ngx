@@ -757,3 +757,30 @@ class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_bulk_delete_processed_mails_rejects_mixed_batch_atomically(self) -> None:
+        """
+        GIVEN:
+            - A permitted processed mail and one the user may not delete
+        WHEN:
+            - API call bulk deletes both in a single request
+        THEN:
+            - The request is rejected and neither mail is deleted
+        """
+        user2 = User.objects.create_user(username="temp_admin2")
+        rule = MailRuleFactory()
+        # Created first so it sorts ahead of the forbidden mail, i.e. the
+        # permission check has to cover the whole batch before deleting rather
+        # than rejecting only once it reaches the forbidden one.
+        pm_owned = ProcessedMailFactory(rule=rule, owner=self.user)
+        pm_forbidden = ProcessedMailFactory(rule=rule, owner=user2)
+
+        response = self.client.post(
+            f"{self.ENDPOINT}bulk_delete/",
+            data={"mail_ids": [pm_owned.id, pm_forbidden.id]},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(ProcessedMail.objects.filter(id=pm_owned.id).exists())
+        self.assertTrue(ProcessedMail.objects.filter(id=pm_forbidden.id).exists())
