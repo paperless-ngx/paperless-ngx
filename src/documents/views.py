@@ -2267,7 +2267,7 @@ class ChatStreamingView(GenericAPIView[Any]):
             if not has_perms_owner_aware(request.user, "view_document", document):
                 return HttpResponseForbidden("Insufficient permissions")
 
-            documents = [document]
+            documents = Document.objects.filter(pk=document.pk)
         else:
             documents = Document.objects.filter(
                 id__in=permitted_document_ids(request.user),
