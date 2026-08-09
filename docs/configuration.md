@@ -522,6 +522,15 @@ do CORS calls. Set this to your public domain name.
 fail2ban with log entries for failed authorization attempts. Value should be
 IP address(es).
 
+    Use the IP address as Paperless-ngx actually sees it, which is not always
+    the proxy's LAN address: when the reverse proxy runs on the same Docker
+    host, its requests usually reach the Paperless-ngx container from the
+    Docker bridge gateway (a hairpin/SNAT address such as `172.x.0.1`), not
+    from the host IP, so the host IP will never match. To find the value the
+    container actually sees, check the source address of an incoming proxied
+    request from inside the container (for example in the webserver access
+    log).
+
     By default, this setting also controls allauth's trusted proxy count,
     which is set to the number of proxies listed here. Override that default
     with [`PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT`](#PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT)
