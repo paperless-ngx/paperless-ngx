@@ -1047,6 +1047,12 @@ class PermittedObjectsFilter(BaseFilterBackend):
     perm_codename: str | None = None
 
     def filter_queryset(self, request, queryset, view):
+        # Before the superuser and owner-only paths, neither of which consults
+        # permitted_object_ids. Scoped to authenticated users so anonymous
+        # access (AnonymousUser.is_active is False) keeps its existing
+        # unowned-only behaviour.
+        if request.user.is_authenticated and not request.user.is_active:
+            return queryset.none()
         if request.user.is_superuser:
             return queryset
         if not self.include_granted:

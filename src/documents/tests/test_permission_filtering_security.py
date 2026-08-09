@@ -496,6 +496,28 @@ class TestPermittedObjectIdsGenericModels:
             expected_hidden=[strangers.pk],
         )
 
+    @pytest.mark.parametrize("is_superuser", [False, True])
+    def test_inactive_user_sees_nothing(self, model, factory, perm, is_superuser):
+        suffix = f"{model.__name__}_{is_superuser}"
+        user = User.objects.create_user(
+            username=f"inactive_{suffix}",
+            is_active=False,
+            is_superuser=is_superuser,
+        )
+        other = User.objects.create_user(username=f"other_{suffix}")
+        granted = factory(owner=other)
+        assign_perm(perm, user, granted)
+
+        assert_visible_document_ids(
+            permitted_object_ids(user, model, perm),
+            expected_visible=[],
+            expected_hidden=[
+                factory(owner=None).pk,
+                factory(owner=user).pk,
+                granted.pk,
+            ],
+        )
+
     def test_unowned_object_visible_to_everyone(self, model, factory, perm):
         user = User.objects.create_user(username=f"user_{model.__name__}")
         unowned = factory(owner=None)
