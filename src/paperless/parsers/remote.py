@@ -102,12 +102,17 @@ class RemoteDocumentParser:
         Maintainer name.
     url : str
         Issue tracker / source URL.
+    uses_remote_service : bool
+        Content is sent to a remote service, True so that the registry
+        can skip this parser if remote processing was not requested.
     """
 
     name: str = "Paperless-ngx Remote OCR Parser"
     version: str = __full_version_str__
     author: str = "Paperless-ngx Contributors"
     url: str = "https://github.com/paperless-ngx/paperless-ngx"
+
+    uses_remote_service: bool = True
 
     # ------------------------------------------------------------------
     # Class methods

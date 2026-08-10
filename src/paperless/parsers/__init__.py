@@ -134,6 +134,11 @@ class ParserProtocol(Protocol):
         Author or organisation name.
     url : str
         URL for documentation, source code, or issue tracker.
+
+    Parsers that send document content to a remote service should additionally
+    set ``uses_remote_service = True`` so the registry can exclude them when
+    remote processing has not been requested for a document. The attribute is
+    optional so a parser that omits it is treated as fully local.
     """
 
     # ------------------------------------------------------------------
@@ -144,6 +149,10 @@ class ParserProtocol(Protocol):
     version: str
     author: str
     url: str
+
+    # NOTE: uses_remote_service is not declared here, the registry reads it
+    # with getattr(cls, ..., False) for backwards-compatibility with existing
+    # parsers
 
     # ------------------------------------------------------------------
     # Class methods
