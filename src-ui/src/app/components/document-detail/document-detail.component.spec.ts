@@ -963,10 +963,22 @@ describe('DocumentDetailComponent', () => {
     component.reprocess()
     const modalCloseSpy = jest.spyOn(openModal, 'close')
     openModal.componentInstance.confirmClicked.next()
-    expect(reprocessSpy).toHaveBeenCalledWith({ documents: [doc.id] })
+    expect(reprocessSpy).toHaveBeenCalledWith({ documents: [doc.id] }, false)
     expect(modalSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalled()
     expect(modalCloseSpy).toHaveBeenCalled()
+  })
+
+  it('should pass remote OCR choice when reprocessing', () => {
+    initNormally()
+    const reprocessSpy = jest.spyOn(documentService, 'reprocessDocuments')
+    reprocessSpy.mockReturnValue(of(true))
+    let openModal: NgbModalRef
+    modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
+    component.reprocess()
+    openModal.componentInstance.remoteOcr = true
+    openModal.componentInstance.confirmClicked.next()
+    expect(reprocessSpy).toHaveBeenCalledWith({ documents: [doc.id] }, true)
   })
 
   it('should show error if redo ocr call fails', () => {

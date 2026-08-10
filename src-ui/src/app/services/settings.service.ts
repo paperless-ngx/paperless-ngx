@@ -19,6 +19,7 @@ import {
 } from 'src/app/utils/color'
 import { DEFAULT_APP_TITLE, environment } from 'src/environments/environment'
 import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
+import { RemoteOCRModeConfig } from '../data/paperless-config'
 import { SavedView } from '../data/saved-view'
 import {
   PAPERLESS_GREEN_HEX,
@@ -685,6 +686,17 @@ export class SettingsService {
 
   get updateCheckingIsSet(): boolean {
     return this.settingIsSet(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED)
+  }
+
+  /**
+   * Offering remote OCR as a  choice only makes sense when an engine
+   * is configured but is not already handling every document.
+   */
+  get remoteOCRIsSelectable(): boolean {
+    return (
+      this.get(SETTINGS_KEYS.REMOTE_OCR_CONFIGURED) &&
+      this.get(SETTINGS_KEYS.REMOTE_OCR_MODE) !== RemoteOCRModeConfig.ALWAYS
+    )
   }
 
   offerTour(): boolean {
