@@ -1096,6 +1096,10 @@ settings can be supplied as environment variables or via **Application Configura
 Additionally, when using a commercial service with this feature, consider both potential costs as well as any associated file size
 or page limitations (e.g. with a free tier).
 
+By default, every document of a supported file type is sent to the remote engine. To use it more selectively, set the
+[remote OCR mode](configuration.md#PAPERLESS_REMOTE_OCR_MODE) to `workflow_only`. Documents are then processed locally
+unless a workflow explicitly enables remote OCR for them, so you can limit the remote engine to particular documents.
+
 ## Architecture
 
 Paperless-ngx consists of the following components:

@@ -2066,6 +2066,18 @@ password. All of these options come from their similarly-named [Django settings]
 
     Defaults to None.
 
+#### [`PAPERLESS_REMOTE_OCR_MODE=<str>`](#PAPERLESS_REMOTE_OCR_MODE) {#PAPERLESS_REMOTE_OCR_MODE}
+
+: Which documents are sent to the remote OCR engine.
+
+    - `always`: every document of a supported file type is sent to the remote
+      engine, bypassing the local OCR engine.
+    - `workflow_only`: documents are processed locally unless a workflow
+      explicitly enables remote OCR for them, letting you use the remote engine
+      selectively.
+
+    Defaults to "always".
+
 ## AI {#ai}
 
 #### [`PAPERLESS_AI_ENABLED=<bool>`](#PAPERLESS_AI_ENABLED) {#PAPERLESS_AI_ENABLED}
