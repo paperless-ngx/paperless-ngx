@@ -47,6 +47,22 @@ def get_language_name(language_code: str) -> str:
     return language_code
 
 
+def get_llm_output_language(ai_config: AIConfig, user: User | None) -> str | None:
+    """
+    Language to localize LLM output into: the configured language, falling back
+    to the user's own UI language when unset.
+    """
+    output_language = ai_config.llm_output_language
+    if (
+        not output_language
+        and user is not None
+        and hasattr(user, "ui_settings")
+        and isinstance(user.ui_settings.settings, dict)
+    ):
+        output_language = user.ui_settings.settings.get("language")
+    return output_language
+
+
 def build_prompt_without_rag(
     document: Document,
     config: AIConfig,
