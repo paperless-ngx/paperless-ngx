@@ -508,8 +508,6 @@ export class WorkflowEditDialogComponent
 
   expandedItem: number = null
 
-  readonly allowedActionTypes = signal([])
-
   private readonly triggerFilterOptionsMap = new WeakMap<
     FormArray,
     TriggerFilterOption[]
@@ -548,15 +546,13 @@ export class WorkflowEditDialogComponent
   ngOnInit(): void {
     super.ngOnInit()
     this.updateAllTriggerActionFields()
-    this.objectForm.valueChanges.subscribe((formWorkflow) => {
-      this.checkRemovalActionFields(formWorkflow)
-      this.updateAllowedActionTypes(formWorkflow)
-    })
+    this.objectForm.valueChanges.subscribe(
+      this.checkRemovalActionFields.bind(this)
+    )
     this.checkRemovalActionFields(this.objectForm.value)
-    this.updateAllowedActionTypes(this.objectForm.value)
   }
 
-  private updateAllowedActionTypes(formWorkflow: Workflow) {
+  private getAllowedActionTypes() {
     let allowed = WORKFLOW_ACTION_OPTIONS
 
     if (!this.settingsService.get(SETTINGS_KEYS.EMAIL_ENABLED)) {
@@ -565,6 +561,7 @@ export class WorkflowEditDialogComponent
 
     // Remote OCR is decided before the document is parsed, so it is only
     // offered for workflows that run at consumption.
+    const formWorkflow: Workflow = this.objectForm?.value
     const remoteOcrUsable =
       this.settingsService.get(SETTINGS_KEYS.REMOTE_OCR_CONFIGURED) &&
       (formWorkflow?.triggers?.some(
@@ -577,7 +574,7 @@ export class WorkflowEditDialogComponent
       allowed = allowed.filter((a) => a.id !== WorkflowActionType.RemoteOcr)
     }
 
-    this.allowedActionTypes.set(allowed)
+    return allowed
   }
 
   private checkRemovalActionFields(formWorkflow: Workflow) {
@@ -1302,7 +1299,8 @@ export class WorkflowEditDialogComponent
 
   get actionTypeOptions() {
     this.settingsService.trackChanges()
-    return this.allowedActionTypes()
+    // Computed on read rather than cached
+    return this.getAllowedActionTypes()
   }
 
   getActionTypeOptionName(type: WorkflowActionType): string {

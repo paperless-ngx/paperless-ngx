@@ -281,6 +281,32 @@ describe('WorkflowEditDialogComponent', () => {
     )
   })
 
+  it('should offer remote OCR on a trigger added to a new workflow', () => {
+    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+    component.ngOnInit()
+
+    // Nothing for the action to apply to yet
+    expect(component.actionTypeOptions.map((a) => a.id)).not.toContain(
+      WorkflowActionType.RemoteOcr
+    )
+
+    // addTrigger creates the form field with emitEvent false, so the options
+    // have to be computed on read rather than cached from valueChanges
+    component.addTrigger()
+    expect(component.actionTypeOptions.map((a) => a.id)).toContain(
+      WorkflowActionType.RemoteOcr
+    )
+
+    // Switching that trigger to a type that runs after parsing removes it
+    component.triggerFields
+      .at(0)
+      .get('type')
+      .setValue(WorkflowTriggerType.DocumentAdded)
+    expect(component.actionTypeOptions.map((a) => a.id)).not.toContain(
+      WorkflowActionType.RemoteOcr
+    )
+  })
+
   it('should keep remote OCR listed when an action already uses it', () => {
     jest.spyOn(settingsService, 'get').mockReturnValue(true)
 
