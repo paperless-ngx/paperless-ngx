@@ -462,6 +462,45 @@
           </div>
         </div>
       }
+      @case (WorkflowActionType.ApplyAiSuggestions) {
+        <div class="row">
+          <div class="col">
+            <p class="text-muted small" i18n>The document will be sent to the configured AI service for suggestions. Consider costs and privacy.</p>
+            <pngx-input-select
+              i18n-title
+              title="Apply suggestions for"
+              [items]="aiSuggestionFieldOptions"
+              [multiple]="true"
+              formControlName="ai_suggestion_fields"
+              [error]="error?.actions?.[i]?.ai_suggestion_fields"
+              hint="Suggestions for fields that are not selected are discarded."
+              i18n-hint
+            ></pngx-input-select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <pngx-input-switch
+              [horizontal]="true"
+              i18n-title
+              title="Create missing items"
+              formControlName="ai_create_missing"
+              hint="Create suggested tags, correspondents and document types that do not exist yet."
+              i18n-hint
+            ></pngx-input-switch>
+          </div>
+          <div class="col-md-6">
+            <pngx-input-switch
+              [horizontal]="true"
+              i18n-title
+              title="Overwrite existing values"
+              formControlName="ai_overwrite_existing"
+              hint="Apply suggestions even if the document already has a value. Tags are always added, never replaced."
+              i18n-hint
+            ></pngx-input-switch>
+          </div>
+        </div>
+      }
     }
   </div>
 </ng-template>
