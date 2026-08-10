@@ -213,6 +213,17 @@ class RemoteOCRConfig(BaseConfig):
             settings.REMOTE_OCR_MODE,
         )
 
+    @property
+    def remote_ocr_by_default(self) -> bool:
+        """
+        Whether every supported document goes to the remote engine.
+
+        When False the remote engine is used only for documents that
+        explicitly asked for it, i.e. a workflow matched during consumption or
+        the user ticked the box when reprocessing.
+        """
+        return self.remote_ocr_mode == RemoteOCRMode.ALWAYS
+
 
 @dataclasses.dataclass
 class AIConfig(BaseConfig):

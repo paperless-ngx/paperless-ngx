@@ -287,6 +287,45 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
         self.assertNotEqual(Document.objects.get(pk=doc.pk).content, "test")
 
 
+class TestUpdateContentRemoteOCR(DirectoriesMixin, TestCase):
+    """
+    Consumption workflows do not run on reprocess, so the remote parser is
+    used only in 'always' mode or when the caller explicitly asks for it.
+    """
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        patcher = mock.patch("documents.tasks.get_parser_registry")
+        self.mock_registry = patcher.start()
+        self.mock_registry.return_value.get_parser_for_file.return_value = None
+        self.addCleanup(patcher.stop)
+
+        self.doc = Document.objects.create(
+            title="test",
+            content="my document",
+            checksum="wow",
+            mime_type="application/pdf",
+        )
+
+    def _allow_remote(self, **kwargs) -> bool:
+        tasks.update_document_content_maybe_archive_file(self.doc.pk, **kwargs)
+        _, call_kwargs = self.mock_registry.return_value.get_parser_for_file.call_args
+        return call_kwargs["allow_remote"]
+
+    @override_settings(REMOTE_OCR_MODE="always")
+    def test_always_mode_allows_remote(self) -> None:
+        self.assertTrue(self._allow_remote())
+
+    @override_settings(REMOTE_OCR_MODE="workflow_only")
+    def test_workflow_only_mode_denies_remote_by_default(self) -> None:
+        self.assertFalse(self._allow_remote())
+
+    @override_settings(REMOTE_OCR_MODE="workflow_only")
+    def test_workflow_only_mode_allows_remote_when_requested(self) -> None:
+        self.assertTrue(self._allow_remote(remote_ocr=True))
+
+
 class TestAIIndex(DirectoriesMixin, TestCase):
     @override_settings(
         AI_ENABLED=True,
