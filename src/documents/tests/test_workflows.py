@@ -5409,3 +5409,82 @@ class TestDateWorkflowLocalization(
             document = Document.objects.first()
             assert document is not None
             assert document.title == expected_title
+
+
+class TestRemoteOCRWorkflowAction(DirectoriesMixin, SampleDirMixin, APITestCase):
+    def _make_workflow(self, trigger_type) -> None:
+        trigger = WorkflowTrigger.objects.create(type=trigger_type)
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.REMOTE_OCR,
+        )
+        w = Workflow.objects.create(name="Remote OCR", order=0)
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+    def test_consumption_trigger_requests_remote_ocr(self) -> None:
+        """
+        GIVEN:
+            - A consumption workflow with a remote OCR action
+        WHEN:
+            - A matching document is consumed
+        THEN:
+            - The overrides ask for remote OCR, which is what the consumer
+              reads when choosing a parser
+        """
+        self._make_workflow(WorkflowTrigger.WorkflowTriggerType.CONSUMPTION)
+
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
+        overrides = DocumentMetadataOverrides()
+
+        run_workflows(
+            WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            ConsumableDocument(
+                source=DocumentSource.ConsumeFolder,
+                original_file=test_file,
+            ),
+            overrides=overrides,
+        )
+
+        self.assertTrue(overrides.remote_ocr)
+
+    def test_other_trigger_types_are_ignored(self) -> None:
+        """
+        GIVEN:
+            - A workflow with a remote OCR action that also has a
+              non-consumption trigger, which is a valid combination
+        WHEN:
+            - The non-consumption trigger fires
+        THEN:
+            - The action is skipped, since the document has already been
+              parsed by this point
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+        )
+        updated_trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.REMOTE_OCR,
+        )
+        w = Workflow.objects.create(name="Remote OCR", order=0)
+        w.triggers.add(trigger, updated_trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            original_filename="sample.pdf",
+        )
+
+        with self.assertLogs("paperless.handlers", level="DEBUG") as cm:
+            run_workflows(
+                WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+                doc,
+            )
+
+        self.assertIn("only applies to consumption triggers", "".join(cm.output))

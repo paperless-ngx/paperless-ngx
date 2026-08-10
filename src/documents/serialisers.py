@@ -3312,6 +3312,26 @@ class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
             "actions",
         ]
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+
+        triggers = attrs.get("triggers") or []
+        actions = attrs.get("actions") or []
+
+        # Remote OCR can only work with consumption triggers
+        if any(
+            action.get("type") == WorkflowAction.WorkflowActionType.REMOTE_OCR
+            for action in actions
+        ) and not any(
+            trigger.get("type") == WorkflowTrigger.WorkflowTriggerType.CONSUMPTION
+            for trigger in triggers
+        ):
+            raise serializers.ValidationError(
+                "Remote OCR actions require a consumption started trigger",
+            )
+
+        return attrs
+
     def update_triggers_and_actions(
         self,
         instance: Workflow,
