@@ -148,6 +148,10 @@ export const WORKFLOW_ACTION_OPTIONS = [
     id: WorkflowActionType.MoveToTrash,
     name: $localize`Move to trash`,
   },
+  {
+    id: WorkflowActionType.RemoteOcr,
+    name: $localize`Remote OCR`,
+  },
 ]
 
 export enum TriggerFilterType {
@@ -544,17 +548,36 @@ export class WorkflowEditDialogComponent
   ngOnInit(): void {
     super.ngOnInit()
     this.updateAllTriggerActionFields()
-    this.objectForm.valueChanges.subscribe(
-      this.checkRemovalActionFields.bind(this)
-    )
+    this.objectForm.valueChanges.subscribe((formWorkflow) => {
+      this.checkRemovalActionFields(formWorkflow)
+      this.updateAllowedActionTypes(formWorkflow)
+    })
     this.checkRemovalActionFields(this.objectForm.value)
-    this.allowedActionTypes.set(
-      this.settingsService.get(SETTINGS_KEYS.EMAIL_ENABLED)
-        ? WORKFLOW_ACTION_OPTIONS
-        : WORKFLOW_ACTION_OPTIONS.filter(
-            (a) => a.id !== WorkflowActionType.Email
-          )
-    )
+    this.updateAllowedActionTypes(this.objectForm.value)
+  }
+
+  private updateAllowedActionTypes(formWorkflow: Workflow) {
+    let allowed = WORKFLOW_ACTION_OPTIONS
+
+    if (!this.settingsService.get(SETTINGS_KEYS.EMAIL_ENABLED)) {
+      allowed = allowed.filter((a) => a.id !== WorkflowActionType.Email)
+    }
+
+    // Remote OCR is decided before the document is parsed, so it is only
+    // offered for workflows that run at consumption.
+    const remoteOcrUsable =
+      this.settingsService.get(SETTINGS_KEYS.REMOTE_OCR_CONFIGURED) &&
+      (formWorkflow?.triggers?.some(
+        (trigger) => trigger.type === WorkflowTriggerType.Consumption
+      ) ||
+        formWorkflow?.actions?.some(
+          (action) => action.type === WorkflowActionType.RemoteOcr
+        ))
+    if (!remoteOcrUsable) {
+      allowed = allowed.filter((a) => a.id !== WorkflowActionType.RemoteOcr)
+    }
+
+    this.allowedActionTypes.set(allowed)
   }
 
   private checkRemovalActionFields(formWorkflow: Workflow) {
