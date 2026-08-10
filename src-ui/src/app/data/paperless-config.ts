@@ -54,6 +54,10 @@ export const ConfigCategory = {
   AI: $localize`AI Settings`,
 }
 
+export const ConfigSection = {
+  RemoteOCR: $localize`Remote OCR`,
+}
+
 export const LLMEmbeddingBackendConfig = {
   OPENAI_LIKE: 'openai-like',
   HUGGINGFACE: 'huggingface',
@@ -65,6 +69,10 @@ export const LLMBackendConfig = {
   OLLAMA: 'ollama',
 }
 
+export const RemoteOCREngineConfig = {
+  AZURE_AI: 'azureai',
+}
+
 export interface ConfigOption {
   key: string
   title: string
@@ -72,6 +80,7 @@ export interface ConfigOption {
   choices?: Array<{ id: string; name: string }>
   config_key?: string
   category: string
+  section?: string
   note?: string
 }
 
@@ -180,6 +189,33 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     type: ConfigOptionType.JSON,
     config_key: 'PAPERLESS_OCR_USER_ARGS',
     category: ConfigCategory.OCR,
+  },
+  {
+    key: 'remote_ocr_engine',
+    title: $localize`Remote OCR Engine`,
+    type: ConfigOptionType.Select,
+    choices: mapToItems(RemoteOCREngineConfig),
+    config_key: 'PAPERLESS_REMOTE_OCR_ENGINE',
+    category: ConfigCategory.OCR,
+    section: ConfigSection.RemoteOCR,
+    note: $localize`Enabling remote OCR sends documents to a third-party service for processing. Consider the privacy implications as well as potential costs before enabling.`,
+  },
+  {
+    key: 'remote_ocr_api_key',
+    title: $localize`Remote OCR API Key`,
+    type: ConfigOptionType.Password,
+    config_key: 'PAPERLESS_REMOTE_OCR_API_KEY',
+    category: ConfigCategory.OCR,
+    section: ConfigSection.RemoteOCR,
+  },
+  {
+    key: 'remote_ocr_endpoint',
+    title: $localize`Remote OCR Endpoint`,
+    type: ConfigOptionType.String,
+    config_key: 'PAPERLESS_REMOTE_OCR_ENDPOINT',
+    category: ConfigCategory.OCR,
+    section: ConfigSection.RemoteOCR,
+    note: $localize`Required when using the Azure AI engine.`,
   },
   {
     key: 'app_logo',
@@ -398,6 +434,9 @@ export interface PaperlessConfig extends ObjectWithId {
   barcode_enable_tag: boolean
   barcode_tag_mapping: object
   barcode_tag_split: boolean
+  remote_ocr_engine: string
+  remote_ocr_api_key: string
+  remote_ocr_endpoint: string
   ai_enabled: boolean
   llm_embedding_backend: string
   llm_embedding_model: string
