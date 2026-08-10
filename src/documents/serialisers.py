@@ -3235,6 +3235,9 @@ class WorkflowActionSerializer(serializers.ModelSerializer[WorkflowAction]):
             "email",
             "webhook",
             "passwords",
+            "ai_suggestion_fields",
+            "ai_create_missing",
+            "ai_overwrite_existing",
         ]
 
     def validate(self, attrs):
@@ -3292,6 +3295,23 @@ class WorkflowActionSerializer(serializers.ModelSerializer[WorkflowAction]):
                     "Passwords are required for password removal actions",
                 )
 
+        if (
+            "type" in attrs
+            and attrs["type"] == WorkflowAction.WorkflowActionType.APPLY_AI_SUGGESTIONS
+        ):
+            fields = attrs.get("ai_suggestion_fields")
+            valid_fields = set(WorkflowAction.AISuggestionField.values)
+            if (
+                fields is None
+                or not isinstance(fields, list)
+                or len(fields) == 0
+                or any(field not in valid_fields for field in fields)
+            ):
+                raise serializers.ValidationError(
+                    "At least one valid field is required for apply AI "
+                    f"suggestions actions, options are: {sorted(valid_fields)}",
+                )
+
         return attrs
 
 
@@ -3320,10 +3340,20 @@ class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
                 action.get("type") == WorkflowAction.WorkflowActionType.REMOTE_OCR
                 for action in attrs["actions"]
             )
+            has_ai_suggestions_action = any(
+                action.get("type")
+                == WorkflowAction.WorkflowActionType.APPLY_AI_SUGGESTIONS
+                for action in attrs["actions"]
+            )
         else:
             has_remote_ocr_action = self.instance is not None and (
                 self.instance.actions.filter(
                     type=WorkflowAction.WorkflowActionType.REMOTE_OCR,
+                ).exists()
+            )
+            has_ai_suggestions_action = self.instance is not None and (
+                self.instance.actions.filter(
+                    type=WorkflowAction.WorkflowActionType.APPLY_AI_SUGGESTIONS,
                 ).exists()
             )
 
@@ -3332,9 +3362,18 @@ class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
                 trigger.get("type") == WorkflowTrigger.WorkflowTriggerType.CONSUMPTION
                 for trigger in attrs["triggers"]
             )
+            has_non_consumption_trigger = any(
+                trigger.get("type") != WorkflowTrigger.WorkflowTriggerType.CONSUMPTION
+                for trigger in attrs["triggers"]
+            )
         else:
             has_consumption_trigger = self.instance is not None and (
                 self.instance.triggers.filter(
+                    type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                ).exists()
+            )
+            has_non_consumption_trigger = self.instance is not None and (
+                self.instance.triggers.exclude(
                     type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
                 ).exists()
             )
@@ -3343,6 +3382,14 @@ class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
         if has_remote_ocr_action and not has_consumption_trigger:
             raise serializers.ValidationError(
                 "Remote OCR actions require a consumption started trigger",
+            )
+
+        # Suggestions are made from the document content, which does not exist
+        # until after consumption has finished
+        if has_ai_suggestions_action and not has_non_consumption_trigger:
+            raise serializers.ValidationError(
+                "Apply AI suggestions actions require a trigger other than "
+                "consumption started",
             )
 
         return attrs
