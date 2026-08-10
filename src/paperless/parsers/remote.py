@@ -61,6 +61,18 @@ class RemoteEngineConfig:
         self.api_key = api_key
         self.endpoint = endpoint
 
+    @classmethod
+    def from_app_config(cls) -> Self:
+        """Build the config from the app config, falling back to the env."""
+        from paperless.config import RemoteOCRConfig
+
+        app_config = RemoteOCRConfig()
+        return cls(
+            engine=app_config.remote_ocr_engine,
+            api_key=app_config.remote_ocr_api_key,
+            endpoint=app_config.remote_ocr_endpoint,
+        )
+
     def engine_is_valid(self) -> bool:
         """Return True when the engine is known and fully configured."""
         return (
@@ -145,11 +157,7 @@ class RemoteDocumentParser:
             20 when the remote engine is configured and the MIME type is
             supported, otherwise None.
         """
-        config = RemoteEngineConfig(
-            engine=settings.REMOTE_OCR_ENGINE,
-            api_key=settings.REMOTE_OCR_API_KEY,
-            endpoint=settings.REMOTE_OCR_ENDPOINT,
-        )
+        config = RemoteEngineConfig.from_app_config()
         if not config.engine_is_valid():
             return None
         if mime_type not in _SUPPORTED_MIME_TYPES:
@@ -244,11 +252,7 @@ class RemoteDocumentParser:
             Whether an archive copy is wanted. For PDFs, False skips the
             remote engine and uses locally-extracted text instead.
         """
-        config = RemoteEngineConfig(
-            engine=settings.REMOTE_OCR_ENGINE,
-            api_key=settings.REMOTE_OCR_API_KEY,
-            endpoint=settings.REMOTE_OCR_ENDPOINT,
-        )
+        config = RemoteEngineConfig.from_app_config()
 
         if not config.engine_is_valid():
             logger.warning(

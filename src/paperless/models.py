@@ -74,6 +74,14 @@ class ColorConvertChoices(models.TextChoices):
     CMYK = ("CMYK", _("CMYK"))
 
 
+class RemoteOCREngine(models.TextChoices):
+    """
+    Matches to PAPERLESS_REMOTE_OCR_ENGINE
+    """
+
+    AZURE_AI = ("azureai", _("Azure AI Document Intelligence"))
+
+
 class LLMEmbeddingBackend(models.TextChoices):
     OPENAI_LIKE = ("openai-like", _("OpenAI-compatible"))
     HUGGINGFACE = ("huggingface", _("Huggingface"))
@@ -284,6 +292,35 @@ class ApplicationConfiguration(AbstractSingletonModel):
     barcode_tag_split = models.BooleanField(
         verbose_name=_("Enables splitting on tag barcodes"),
         null=True,
+    )
+
+    """
+    Settings for the remote OCR parser
+    """
+
+    # PAPERLESS_REMOTE_OCR_ENGINE
+    remote_ocr_engine = models.CharField(
+        verbose_name=_("Sets the remote OCR engine"),
+        blank=True,
+        null=True,
+        max_length=32,
+        choices=RemoteOCREngine.choices,
+    )
+
+    # PAPERLESS_REMOTE_OCR_API_KEY
+    remote_ocr_api_key = models.CharField(
+        verbose_name=_("Sets the remote OCR API key"),
+        blank=True,
+        null=True,
+        max_length=1024,
+    )
+
+    # PAPERLESS_REMOTE_OCR_ENDPOINT
+    remote_ocr_endpoint = models.CharField(
+        verbose_name=_("Sets the remote OCR endpoint"),
+        blank=True,
+        null=True,
+        max_length=256,
     )
 
     """
