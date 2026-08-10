@@ -1100,6 +1100,8 @@ By default, every document of a supported file type is sent to the remote engine
 [remote OCR mode](configuration.md#PAPERLESS_REMOTE_OCR_MODE) to `workflow_only`. Documents are then processed locally
 unless a workflow explicitly enables remote OCR for them, so you can limit the remote engine to particular documents.
 
+Setting the mode to `workflow_only` also allows the **Reprocess** actions to selectively use remote OCR for individual documents.
+
 ## Architecture
 
 Paperless-ngx consists of the following components:
