@@ -54,11 +54,15 @@ class PaperlessObjectPermissions(DjangoObjectPermissions):
 
 class PaperlessAdminPermissions(BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_staff
+        return request.user.is_active and request.user.is_staff
 
 
 def has_global_statistics_permission(user: User | None) -> bool:
-    if user is None or not getattr(user, "is_authenticated", False):
+    if (
+        user is None
+        or not getattr(user, "is_active", False)
+        or not getattr(user, "is_authenticated", False)
+    ):
         return False
 
     return getattr(user, "is_superuser", False) or user.has_perm(
@@ -67,7 +71,11 @@ def has_global_statistics_permission(user: User | None) -> bool:
 
 
 def has_system_status_permission(user: User | None) -> bool:
-    if user is None or not getattr(user, "is_authenticated", False):
+    if (
+        user is None
+        or not getattr(user, "is_active", False)
+        or not getattr(user, "is_authenticated", False)
+    ):
         return False
 
     return (
@@ -187,6 +195,13 @@ def permitted_object_ids(
 
     if user is None or not getattr(user, "is_authenticated", False):
         return base_qs.filter(owner__isnull=True).values_list("id", flat=True)
+
+    # Deactivated users get nothing, deactivated superusers included, so this
+    # has to come before the superuser shortcut. guardian's
+    # ObjectPermissionChecker denies inactive users, but get_objects_for_user
+    # (the pattern this replaces) does not, so it would not be inherited.
+    if not getattr(user, "is_active", False):
+        return base_qs.none().values_list("id", flat=True)
 
     if getattr(user, "is_superuser", False):
         return base_qs.values_list("id", flat=True)
