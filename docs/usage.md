@@ -576,7 +576,9 @@ The following workflow action types are available:
 - Tags, correspondent, document type and storage path
 - Document owner
 - View and / or edit permissions to users or groups
-- Custom fields. Note that no value for the field will be set
+- Custom fields, optionally with a value. If no value is set, the field is only added to the
+  document and any value it may already have is left untouched. If a value is set, it will
+  overwrite an existing value of that field on the document.
 
 ##### Removal {#workflow-action-removal}
 
