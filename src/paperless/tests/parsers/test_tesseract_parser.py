@@ -22,7 +22,6 @@ from paperless.models import ModeChoices
 from paperless.parsers import ParserProtocol
 from paperless.parsers.tesseract import RasterisedDocumentParser
 from paperless.parsers.utils import is_tagged_pdf
-from paperless.parsers.utils import post_process_text
 
 if TYPE_CHECKING:
     from pathlib import Path
