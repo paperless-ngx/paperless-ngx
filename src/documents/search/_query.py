@@ -132,6 +132,20 @@ _FIELD_BOOSTS = {"title": 2.0}
 _SIMPLE_FIELD_BOOSTS = {"simple_title": 2.0}
 
 
+# Double-quote characters (plus their typographic variants) are search syntax,
+# not content. The simple-search analyzer tokenizes on \S+, so it keeps a quote
+# glued to the adjacent word ('"digital'), and no indexed token can match that.
+# Single quotes are deliberately not included: apostrophes occur inside real
+# words ("don't", "O'Brien") and are indexed as part of the token, so stripping
+# them here would break matching rather than fix it.
+_QUOTE_CHARS: Final[str] = '["“”„″]'
+
+
+def _strip_quote_syntax(raw_query: str) -> str:
+    # Replaced with a space rather than removed, so 'foo"bar' stays two tokens.
+    return regex.sub(_QUOTE_CHARS, " ", raw_query, timeout=_REGEX_TIMEOUT)
+
+
 def _simple_query_tokens(raw_query: str) -> list[str]:
     # Tokenize and fold via the same analyzer used to index simple_title /
     # simple_content, so query terms fold identically to the indexed terms
@@ -263,12 +277,14 @@ def parse_simple_query(
     Parse a plain-text query using Tantivy over a restricted field set.
 
     Query string is escaped and normalized to be treated as "simple" text query.
+    Quote characters are stripped: simple search has no phrase concept, so they
+    are meaningless syntax here, and leaving them in makes the query unmatchable.
     When cjk_fields is provided and the query contains CJK characters, an
     additional Should clause searches those bigram-tokenized fields, which match
     CJK substrings the simple analyzer can't (long whitespace-free runs are
     dropped by remove_long).
     """
-    tokens = _simple_query_tokens(raw_query)
+    tokens = _simple_query_tokens(_strip_quote_syntax(raw_query))
 
     clauses: list[tuple[tantivy.Occur, tantivy.Query]] = []
     if tokens:
@@ -322,8 +338,9 @@ def parse_simple_text_highlight_query(
 
     # Strip Tantivy operator chars before tokenizing: this is a plain-text
     # highlight query, not a structured boolean query, so +/- are separators.
+    # Quotes go too, so highlighting stays consistent with what actually matched.
     tokens = _simple_query_tokens(
-        regex.sub(r"[-+]", " ", raw_query, timeout=_REGEX_TIMEOUT),
+        regex.sub(r"[-+]", " ", _strip_quote_syntax(raw_query), timeout=_REGEX_TIMEOUT),
     )
     if not tokens:
         return tantivy.Query.empty_query()

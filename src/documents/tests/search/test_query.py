@@ -13,7 +13,11 @@ import time_machine
 
 from documents.search._dates import _date_only_range
 from documents.search._dates import _datetime_range
+from documents.search._query import SIMPLE_SEARCH_FIELDS
+from documents.search._query import _simple_query_tokens
+from documents.search._query import _strip_quote_syntax
 from documents.search._query import build_permission_filter
+from documents.search._query import parse_simple_query
 from documents.search._query import parse_simple_text_highlight_query
 from documents.search._query import parse_user_query
 from documents.search._schema import build_schema
@@ -793,6 +797,73 @@ class TestParseSimpleTextHighlightQuery:
     ) -> None:
         result = parse_simple_text_highlight_query(query_index, "- +")
         assert isinstance(result, tantivy.Query)
+
+
+class TestSimpleQuoteHandling:
+    """
+    Simple search has no phrase concept, so quote characters are syntax rather
+    than content. The simple analyzer tokenizes on \\S+, so an unstripped quote
+    stays glued to the adjacent word ('"digital') and can never match an indexed
+    token - making any quoted query return zero results.
+    """
+
+    @pytest.fixture
+    def query_index(self) -> tantivy.Index:
+        schema = build_schema()
+        idx = tantivy.Index(schema, path=None)
+        register_tokenizers(idx, "")
+        return idx
+
+    @pytest.mark.parametrize(
+        ("raw_query", "expected"),
+        [
+            pytest.param('"digital ocean"', ["digital", "ocean"], id="wrapped"),
+            pytest.param('"digital" "ocean"', ["digital", "ocean"], id="each_wrapped"),
+            pytest.param('digital "ocean', ["digital", "ocean"], id="unbalanced"),
+            pytest.param("“digital ocean”", ["digital", "ocean"], id="curly_quotes"),
+            pytest.param('foo"bar', ["foo", "bar"], id="infix_quote_splits"),
+        ],
+    )
+    def test_quotes_are_stripped_before_tokenizing(
+        self,
+        raw_query: str,
+        expected: list[str],
+    ) -> None:
+        assert _simple_query_tokens(_strip_quote_syntax(raw_query)) == expected
+
+    def test_apostrophes_are_preserved(self) -> None:
+        # Apostrophes are indexed as part of the token, so stripping them here
+        # would break matching rather than fix it.
+        assert _simple_query_tokens(_strip_quote_syntax("o'brien don't")) == [
+            "o'brien",
+            "don't",
+        ]
+
+    def test_quoted_and_unquoted_produce_equivalent_tokens(self) -> None:
+        quoted = _simple_query_tokens(_strip_quote_syntax('"tax document"'))
+        unquoted = _simple_query_tokens(_strip_quote_syntax("tax document"))
+        assert quoted == unquoted
+
+    def test_quote_only_query_yields_no_tokens(self) -> None:
+        assert _simple_query_tokens(_strip_quote_syntax('" ""  "')) == []
+
+    def test_parse_simple_query_accepts_quoted_input(
+        self,
+        query_index: tantivy.Index,
+    ) -> None:
+        assert isinstance(
+            parse_simple_query(query_index, '"tax document"', SIMPLE_SEARCH_FIELDS),
+            tantivy.Query,
+        )
+
+    def test_highlight_query_also_strips_quotes(
+        self,
+        query_index: tantivy.Index,
+    ) -> None:
+        assert isinstance(
+            parse_simple_text_highlight_query(query_index, '"tax document"'),
+            tantivy.Query,
+        )
 
 
 class TestPermissionFilter:
