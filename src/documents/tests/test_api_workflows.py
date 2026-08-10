@@ -422,6 +422,11 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             json.dumps(
                 {
                     "assign_title": "",
+                    "assign_custom_fields": [self.cf1.id, self.cf2.id],
+                    "assign_custom_fields_values": {
+                        str(self.cf1.id): "",
+                        str(self.cf2.id): 0,
+                    },
                 },
             ),
             content_type="application/json",
@@ -429,6 +434,10 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         action = WorkflowAction.objects.get(id=response.data["id"])
         self.assertIsNone(action.assign_title)
+        self.assertEqual(
+            action.assign_custom_fields_values,
+            {str(self.cf1.id): None, str(self.cf2.id): 0},
+        )
 
         response = self.client.post(
             self.ENDPOINT_TRIGGERS,

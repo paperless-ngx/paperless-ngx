@@ -77,7 +77,7 @@ export class CustomFieldsValuesComponent extends AbstractInputComponent<Object> 
     this._selectedFields = newFields
     // map the selected fields to an object with field_id as key and value as value
     this.value = newFields.reduce((acc, fieldId) => {
-      acc[fieldId] = this.value?.[fieldId] || null
+      acc[fieldId] = this.value?.[fieldId] ?? null
       return acc
     }, {})
     this.onChange(this.value)

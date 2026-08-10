@@ -2000,6 +2000,55 @@ class TestWorkflows(
                 r"Doc added in \w{3,}",
             )  # Match any 3-letter month name
 
+    def test_document_updated_workflow_existing_custom_field_empty_value(self) -> None:
+        """
+        GIVEN:
+            - Existing workflow with UPDATED trigger and action that assigns a custom field
+              with an empty value
+        WHEN:
+            - Document is updated that already contains the field with a value
+        THEN:
+            - The existing value is left untouched, see GH #13627
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+            filter_has_document_type=self.dt,
+        )
+        action = WorkflowAction.objects.create()
+        action.assign_custom_fields.add(self.cf1)
+        action.assign_custom_fields_values = {self.cf1.pk: ""}
+        action.save()
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=self.cf1,
+            value_text="existing value",
+        )
+
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+
+        self.client.patch(
+            f"/api/documents/{doc.id}/",
+            {"document_type": self.dt.id},
+            format="json",
+        )
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.custom_fields.get(field=self.cf1).value, "existing value")
+
     def test_document_updated_workflow_existing_custom_field(self) -> None:
         """
         GIVEN:
