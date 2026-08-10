@@ -11,7 +11,7 @@ from documents.models import Correspondent
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.permissions import get_objects_for_user_owner_aware
+from documents.permissions import permitted_object_ids
 from documents.permissions import restrict_queryset_to_visible
 
 MATCH_THRESHOLD = 0.8
@@ -63,30 +63,40 @@ def resolve_storage_path_ids(ids: list[int], user: User | None) -> list[StorageP
 
 def _match_by_name(
     names: list[str],
-    user: User,
+    user: User | None,
     model: type[ModelT],
     perm: str,
 ) -> list[ModelT]:
-    queryset = get_objects_for_user_owner_aware(user, [perm], model)
+    # A workflow may have no user. In that case permitted_object_ids limits
+    # matching to unowned objects, avoiding another user's private taxonomy.
+    queryset = model.objects.filter(
+        pk__in=permitted_object_ids(user, model, perm),
+    )
     return _match_names_to_queryset(names, queryset)
 
 
-def match_tags_by_name(names: list[str], user: User) -> list[Tag]:
+def match_tags_by_name(names: list[str], user: User | None) -> list[Tag]:
     return _match_by_name(names, user, Tag, "view_tag")
 
 
 def match_correspondents_by_name(
     names: list[str],
-    user: User,
+    user: User | None,
 ) -> list[Correspondent]:
     return _match_by_name(names, user, Correspondent, "view_correspondent")
 
 
-def match_document_types_by_name(names: list[str], user: User) -> list[DocumentType]:
+def match_document_types_by_name(
+    names: list[str],
+    user: User | None,
+) -> list[DocumentType]:
     return _match_by_name(names, user, DocumentType, "view_documenttype")
 
 
-def match_storage_paths_by_name(names: list[str], user: User) -> list[StoragePath]:
+def match_storage_paths_by_name(
+    names: list[str],
+    user: User | None,
+) -> list[StoragePath]:
     return _match_by_name(names, user, StoragePath, "view_storagepath")
 
 

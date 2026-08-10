@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from unittest.mock import patch
 
 import pytest
 import pytest_mock
@@ -45,33 +44,25 @@ class TestAIMatching(TestCase):
         self.storage_path1 = StoragePath.objects.create(name="Test Storage Path 1")
         self.storage_path2 = StoragePath.objects.create(name="Test Storage Path 2")
 
-    @patch("paperless_ai.matching.get_objects_for_user_owner_aware")
-    def test_match_tags_by_name(self, mock_get_objects) -> None:
-        mock_get_objects.return_value = Tag.objects.all()
+    def test_match_tags_by_name(self) -> None:
         names = ["Test Tag 1", "Nonexistent Tag"]
         result = match_tags_by_name(names, user=None)
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].name, "Test Tag 1")
 
-    @patch("paperless_ai.matching.get_objects_for_user_owner_aware")
-    def test_match_correspondents_by_name(self, mock_get_objects) -> None:
-        mock_get_objects.return_value = Correspondent.objects.all()
+    def test_match_correspondents_by_name(self) -> None:
         names = ["Test Correspondent 1", "Nonexistent Correspondent"]
         result = match_correspondents_by_name(names, user=None)
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].name, "Test Correspondent 1")
 
-    @patch("paperless_ai.matching.get_objects_for_user_owner_aware")
-    def test_match_document_types_by_name(self, mock_get_objects) -> None:
-        mock_get_objects.return_value = DocumentType.objects.all()
+    def test_match_document_types_by_name(self) -> None:
         names = ["Test Document Type 1", "Nonexistent Document Type"]
         result = match_document_types_by_name(names, user=None)
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].name, "Test Document Type 1")
 
-    @patch("paperless_ai.matching.get_objects_for_user_owner_aware")
-    def test_match_storage_paths_by_name(self, mock_get_objects) -> None:
-        mock_get_objects.return_value = StoragePath.objects.all()
+    def test_match_storage_paths_by_name(self) -> None:
         names = ["Test Storage Path 1", "Nonexistent Storage Path"]
         result = match_storage_paths_by_name(names, user=None)
         self.assertEqual(len(result), 1)
@@ -83,16 +74,12 @@ class TestAIMatching(TestCase):
         unmatched_names = extract_unmatched_names(llm_names, matched_objects)
         self.assertEqual(unmatched_names, ["Nonexistent Tag"])
 
-    @patch("paperless_ai.matching.get_objects_for_user_owner_aware")
-    def test_match_tags_by_name_with_empty_names(self, mock_get_objects) -> None:
-        mock_get_objects.return_value = Tag.objects.all()
+    def test_match_tags_by_name_with_empty_names(self) -> None:
         names = [None, "", "   "]
         result = match_tags_by_name(names, user=None)
         self.assertEqual(result, [])
 
-    @patch("paperless_ai.matching.get_objects_for_user_owner_aware")
-    def test_match_tags_with_fuzzy_matching(self, mock_get_objects) -> None:
-        mock_get_objects.return_value = Tag.objects.all()
+    def test_match_tags_with_fuzzy_matching(self) -> None:
         names = ["Test Taag 1", "Teest Tag 2"]
         result = match_tags_by_name(names, user=None)
         self.assertEqual(len(result), 2)
