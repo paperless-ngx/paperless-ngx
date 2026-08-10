@@ -337,6 +337,23 @@ def check_deprecated_v2_ocr_env_vars(
     return warnings
 
 
+@register()
+def check_remote_ocr_mode(app_configs: Any, **kwargs: Any) -> list[Error]:
+    # Import here because checks.py runs before the app registry is ready
+    from paperless.models import RemoteOCRMode
+
+    valid_modes = {mode.value for mode in RemoteOCRMode}
+    if settings.REMOTE_OCR_MODE not in valid_modes:
+        return [
+            Error(
+                f"PAPERLESS_REMOTE_OCR_MODE is set to {settings.REMOTE_OCR_MODE!r}, "
+                f"expected one of {sorted(valid_modes)}.",
+            ),
+        ]
+
+    return []
+
+
 def get_tesseract_langs():
     proc = subprocess.run(
         [shutil.which("tesseract"), "--list-langs"],
