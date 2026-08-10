@@ -984,6 +984,23 @@ def run_workflows(
                             "triggers, ignoring",
                             extra={"group": logging_group},
                         )
+                elif (
+                    action.type
+                    == WorkflowAction.WorkflowActionType.APPLY_AI_SUGGESTIONS
+                ):
+                    if use_overrides:
+                        # The document has not been parsed yet, so there is no
+                        # content for the LLM to make suggestions from
+                        logger.debug(
+                            "Apply AI suggestions action does not apply to "
+                            "consumption triggers, ignoring",
+                            extra={"group": logging_group},
+                        )
+                    else:
+                        # Queued rather than run sync
+                        from documents.tasks import apply_ai_suggestions
+
+                        apply_ai_suggestions.delay(action.pk, document.pk)
 
             if not use_overrides:
                 # limit title to 128 characters

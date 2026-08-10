@@ -715,6 +715,38 @@ def llmindex_index(
 
 
 @shared_task
+def apply_ai_suggestions(action_id: int, document_id: int) -> None:
+    """
+    Deferred "apply AI suggestions" workflow action.
+    """
+    from documents.models import WorkflowAction
+    from documents.workflows.ai import apply_ai_suggestions_to_document
+
+    try:
+        action = WorkflowAction.objects.get(pk=action_id)
+        document = Document.objects.select_related("owner").get(pk=document_id)
+    except (WorkflowAction.DoesNotExist, Document.DoesNotExist):
+        logger.warning(
+            "Workflow action %s or document %s no longer exists, "
+            "not applying AI suggestions",
+            action_id,
+            document_id,
+        )
+        return
+
+    if not apply_ai_suggestions_to_document(action, document):
+        return
+
+    # No document_updated signal to avoid loop
+    clear_document_caches(document.pk)
+    index_document.delay(document.pk)
+
+    ai_config = AIConfig()
+    if ai_config.llm_index_enabled:
+        update_document_in_llm_index.apply_async(kwargs={"document": document})
+
+
+@shared_task
 def update_document_in_llm_index(document) -> None:
     llm_index_add_or_update_document(document)
 
