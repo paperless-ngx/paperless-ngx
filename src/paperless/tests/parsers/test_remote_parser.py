@@ -21,6 +21,7 @@ from unittest.mock import Mock
 import pytest
 
 from documents.parsers import ParseError
+from paperless.models import ApplicationConfiguration
 from paperless.parsers import ParserContext
 from paperless.parsers import ParserProtocol
 from paperless.parsers.remote import RemoteDocumentParser
@@ -31,6 +32,10 @@ if TYPE_CHECKING:
 
     from pytest_django.fixtures import SettingsWrapper
     from pytest_mock import MockerFixture
+
+
+# Remote ocr config from ApplicationConfiguration needs DB access
+pytestmark = pytest.mark.django_db
 
 
 # ---------------------------------------------------------------------------
@@ -226,6 +231,18 @@ class TestRemoteParserScore:
         """Remote parser (20) outranks the tesseract default (10) when configured."""
         score = RemoteDocumentParser.score("application/pdf", "doc.pdf")
         assert score is not None and score > 10
+
+    @pytest.mark.usefixtures("no_engine_settings")
+    def test_score_uses_app_config_when_env_unset(self) -> None:
+        """The app config alone is enough to activate the parser."""
+        config = ApplicationConfiguration.objects.first()
+        assert config is not None
+        config.remote_ocr_engine = "azureai"
+        config.remote_ocr_api_key = "app-config-key"
+        config.remote_ocr_endpoint = "https://config.cognitiveservices.azure.com"
+        config.save()
+
+        assert RemoteDocumentParser.score("application/pdf", "doc.pdf") == 20
 
 
 # ---------------------------------------------------------------------------
