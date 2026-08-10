@@ -1795,7 +1795,7 @@ class DeleteDocumentsSerializer(DocumentSelectionSerializer):
 
 
 class ReprocessDocumentsSerializer(DocumentSelectionSerializer):
-    pass
+    remote_ocr = serializers.BooleanField(required=False, default=False)
 
 
 class BulkEditSerializer(
@@ -2137,6 +2137,13 @@ class BulkEditSerializer(
                         f"Page {op['page']} is out of bounds for document with {doc.page_count} pages.",
                     )
 
+    def _validate_parameters_reprocess(self, parameters) -> None:
+        if "remote_ocr" in parameters:
+            if not isinstance(parameters["remote_ocr"], bool):
+                raise serializers.ValidationError("remote_ocr must be a boolean")
+        else:
+            parameters["remote_ocr"] = False
+
     def validate_parameters_remove_password(self, parameters):
         if "password" not in parameters:
             raise serializers.ValidationError("password not specified")
@@ -2201,6 +2208,8 @@ class BulkEditSerializer(
             self._validate_parameters_edit_pdf(parameters, attrs["documents"][0])
         elif method == bulk_edit.remove_password:
             self.validate_parameters_remove_password(parameters)
+        elif method == bulk_edit.reprocess:
+            self._validate_parameters_reprocess(parameters)
 
         return attrs
 

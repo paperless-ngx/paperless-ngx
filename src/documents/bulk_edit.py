@@ -399,10 +399,16 @@ def delete(doc_ids: list[int]) -> Literal["OK"]:
     return "OK"
 
 
-def reprocess(doc_ids: list[int]) -> Literal["OK"]:
+def reprocess(doc_ids: list[int], *, remote_ocr: bool = False) -> Literal["OK"]:
+    """
+    Re-run parsing for the given documents.
+
+    Consumption workflows do not run here, so ``remote_ocr`` is how the user
+    asks for the remote engine when it is not configured to handle everything.
+    """
     for document_id in doc_ids:
         update_document_content_maybe_archive_file.apply_async(
-            kwargs={"document_id": document_id},
+            kwargs={"document_id": document_id, "remote_ocr": remote_ocr},
             headers={"trigger_source": PaperlessTask.TriggerSource.MANUAL},
         )
 
