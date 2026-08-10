@@ -31,6 +31,7 @@ from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_filename
 from documents.file_handling import generate_unique_filename
 from documents.signals.handlers import run_workflows
+from documents.workflows.ai import apply_ai_suggestions_to_document
 from documents.workflows.webhooks import send_webhook
 
 if TYPE_CHECKING:
@@ -5488,3 +5489,390 @@ class TestRemoteOCRWorkflowAction(DirectoriesMixin, SampleDirMixin, APITestCase)
             )
 
         self.assertIn("only applies to consumption triggers", "".join(cm.output))
+
+
+SUGGESTIONS = {
+    "title": "Suggested Title",
+    "tags": ["Existing Tag", "Suggested Tag"],
+    "correspondents": ["Existing Correspondent", "Suggested Correspondent"],
+    "document_types": ["Suggested Document Type"],
+    "storage_paths": ["Suggested Storage Path"],
+    "dates": ["2024-03-05"],
+}
+
+ALL_SUGGESTION_FIELDS = [
+    WorkflowAction.AISuggestionField.TITLE,
+    WorkflowAction.AISuggestionField.TAGS,
+    WorkflowAction.AISuggestionField.CORRESPONDENT,
+    WorkflowAction.AISuggestionField.DOCUMENT_TYPE,
+    WorkflowAction.AISuggestionField.STORAGE_PATH,
+    WorkflowAction.AISuggestionField.CREATED,
+]
+
+
+@override_settings(AI_ENABLED=True)
+class TestApplyAISuggestionsWorkflowAction(
+    DirectoriesMixin,
+    SampleDirMixin,
+    APITestCase,
+):
+    def setUp(self) -> None:
+        super().setUp()
+        self.user = User.objects.create(username="ai-user")
+        self.doc = Document.objects.create(
+            title="original.pdf",
+            content="the document content",
+            checksum="ai-suggestions-checksum",
+            mime_type="application/pdf",
+            created=datetime.date(2020, 1, 1),
+            owner=self.user,
+        )
+
+    def make_action(self, **kwargs) -> WorkflowAction:
+        return WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.APPLY_AI_SUGGESTIONS,
+            ai_suggestion_fields=kwargs.pop(
+                "ai_suggestion_fields",
+                ALL_SUGGESTION_FIELDS,
+            ),
+            **kwargs,
+        )
+
+    def make_workflow(self, action: WorkflowAction, trigger_type) -> Workflow:
+        trigger = WorkflowTrigger.objects.create(type=trigger_type)
+        w = Workflow.objects.create(name="Apply AI suggestions", order=0)
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+        return w
+
+    def apply(self, action: WorkflowAction) -> list[str]:
+        with mock.patch(
+            "documents.workflows.ai.get_ai_document_classification",
+            return_value=SUGGESTIONS,
+        ):
+            changed = apply_ai_suggestions_to_document(action, self.doc)
+        self.doc.refresh_from_db()
+        return changed
+
+    def test_document_added_trigger_queues_task(self) -> None:
+        """
+        GIVEN:
+            - A document added workflow with an apply AI suggestions action
+        WHEN:
+            - A matching document is added
+        THEN:
+            - The work is queued rather than run inline, so a slow LLM query
+              cannot stall the rest of the workflow run
+        """
+        action = self.make_action()
+        self.make_workflow(action, WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED)
+
+        with mock.patch("documents.tasks.apply_ai_suggestions.delay") as delay:
+            run_workflows(
+                WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+                self.doc,
+            )
+
+        delay.assert_called_once_with(action.pk, self.doc.pk)
+
+    def test_consumption_trigger_is_ignored(self) -> None:
+        """
+        GIVEN:
+            - A workflow with an apply AI suggestions action and a consumption
+              trigger alongside a valid one
+        WHEN:
+            - The consumption trigger fires
+        THEN:
+            - The action is skipped, since the document has not been parsed
+              yet and so has no content to make suggestions from
+        """
+        action = self.make_action()
+        w = self.make_workflow(
+            action,
+            WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        w.triggers.add(
+            WorkflowTrigger.objects.create(
+                type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            ),
+        )
+
+        test_file = shutil.copy(
+            self.SAMPLE_DIR / "simple.pdf",
+            self.dirs.scratch_dir / "simple.pdf",
+        )
+
+        with (
+            mock.patch("documents.tasks.apply_ai_suggestions.delay") as delay,
+            self.assertLogs("paperless.handlers", level="DEBUG") as cm,
+        ):
+            run_workflows(
+                WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                ),
+                overrides=DocumentMetadataOverrides(),
+            )
+
+        delay.assert_not_called()
+        self.assertIn("does not apply to consumption triggers", "".join(cm.output))
+
+    def test_no_selected_fields_does_nothing(self) -> None:
+        """
+        GIVEN:
+            - An action with no suggestion fields selected
+        WHEN:
+            - The action is applied
+        THEN:
+            - Nothing is changed and it is logged
+        """
+        action = self.make_action(ai_suggestion_fields=[])
+
+        with self.assertLogs("paperless.workflows.ai", level="WARNING") as cm:
+            changed = self.apply(action)
+
+        self.assertEqual(changed, [])
+        self.assertIn("no AI suggestion fields selected", "".join(cm.output))
+
+    @override_settings(AI_ENABLED=False)
+    def test_ai_disabled_does_nothing(self) -> None:
+        """
+        GIVEN:
+            - An action on an install where AI has since been disabled
+        WHEN:
+            - The action is applied
+        THEN:
+            - Nothing is changed and it is logged
+        """
+        action = self.make_action()
+
+        with self.assertLogs("paperless.workflows.ai", level="ERROR") as cm:
+            changed = self.apply(action)
+
+        self.assertEqual(changed, [])
+        self.assertIn("AI is not enabled", "".join(cm.output))
+
+    def test_llm_failure_leaves_document_untouched(self) -> None:
+        """
+        GIVEN:
+            - An LLM backend that errors out
+        WHEN:
+            - The action is applied
+        THEN:
+            - The failure is logged and the document is left alone, rather
+              than the error taking down the whole task
+        """
+        action = self.make_action()
+
+        with (
+            mock.patch(
+                "documents.workflows.ai.get_ai_document_classification",
+                side_effect=ValueError("nope"),
+            ),
+            self.assertLogs("paperless.workflows.ai", level="ERROR") as cm,
+        ):
+            changed = apply_ai_suggestions_to_document(action, self.doc)
+
+        self.assertEqual(changed, [])
+        self.doc.refresh_from_db()
+        self.assertEqual(self.doc.title, "original.pdf")
+        self.assertIn("Error getting AI suggestions", "".join(cm.output))
+
+    def test_only_matching_objects_are_applied(self) -> None:
+        """
+        GIVEN:
+            - An action without create missing, and only some of the suggested
+              objects existing
+        WHEN:
+            - The action is applied
+        THEN:
+            - Only the existing objects are assigned, unmatched suggestions are
+              dropped rather than creating anything
+        """
+        tag = Tag.objects.create(name="Existing Tag", owner=self.user)
+        correspondent = Correspondent.objects.create(
+            name="Existing Correspondent",
+            owner=self.user,
+        )
+        action = self.make_action(ai_overwrite_existing=True)
+
+        changed = self.apply(action)
+
+        self.assertEqual(self.doc.correspondent, correspondent)
+        self.assertEqual(list(self.doc.tags.all()), [tag])
+        # Nothing matched for these and create missing is off
+        self.assertIsNone(self.doc.document_type)
+        self.assertIsNone(self.doc.storage_path)
+        self.assertNotIn("document_type", changed)
+        self.assertEqual(Tag.objects.count(), 1)
+        self.assertEqual(Correspondent.objects.count(), 1)
+
+    def test_create_missing_creates_objects_owned_by_document_owner(self) -> None:
+        """
+        GIVEN:
+            - An action with create missing enabled
+        WHEN:
+            - The action is applied and suggestions match nothing
+        THEN:
+            - Tags, correspondents and document types are created, owned by the
+              document owner so they stay private to them
+            - Storage paths are never created, since a path template cannot be
+              inferred from a name
+        """
+        action = self.make_action(
+            ai_create_missing=True,
+            ai_overwrite_existing=True,
+        )
+
+        changed = self.apply(action)
+
+        self.assertEqual(
+            sorted(t.name for t in self.doc.tags.all()),
+            ["Existing Tag", "Suggested Tag"],
+        )
+        self.assertEqual(self.doc.correspondent.name, "Existing Correspondent")
+        self.assertEqual(self.doc.correspondent.owner, self.user)
+        self.assertEqual(self.doc.document_type.name, "Suggested Document Type")
+        self.assertEqual(self.doc.document_type.owner, self.user)
+
+        self.assertIsNone(self.doc.storage_path)
+        self.assertFalse(StoragePath.objects.exists())
+        self.assertNotIn("storage_path", changed)
+
+    def test_overwrite_disabled_keeps_existing_values(self) -> None:
+        """
+        GIVEN:
+            - An action without overwrite existing
+            - A document that already has a title, created date and
+              correspondent
+        WHEN:
+            - The action is applied
+        THEN:
+            - The existing values are kept, only the empty document type is
+              filled in
+        """
+        existing = Correspondent.objects.create(name="Mine", owner=self.user)
+        self.doc.correspondent = existing
+        self.doc.save()
+        action = self.make_action(ai_create_missing=True)
+
+        changed = self.apply(action)
+
+        self.assertEqual(self.doc.title, "original.pdf")
+        self.assertEqual(self.doc.created, datetime.date(2020, 1, 1))
+        self.assertEqual(self.doc.correspondent, existing)
+        self.assertEqual(self.doc.document_type.name, "Suggested Document Type")
+        self.assertNotIn("title", changed)
+        self.assertNotIn("correspondent", changed)
+
+    def test_overwrite_enabled_replaces_existing_values(self) -> None:
+        """
+        GIVEN:
+            - An action with overwrite existing
+            - A document that already has a title and created date
+        WHEN:
+            - The action is applied
+        THEN:
+            - The suggested values replace them
+        """
+        action = self.make_action(
+            ai_create_missing=True,
+            ai_overwrite_existing=True,
+        )
+
+        changed = self.apply(action)
+
+        self.assertEqual(self.doc.title, "Suggested Title")
+        self.assertEqual(self.doc.created, datetime.date(2024, 3, 5))
+        self.assertIn("title", changed)
+        self.assertIn("created", changed)
+
+    def test_tags_are_added_not_replaced(self) -> None:
+        """
+        GIVEN:
+            - A document that already has a tag unrelated to the suggestions
+        WHEN:
+            - The action is applied with overwrite existing enabled
+        THEN:
+            - The existing tag is kept, since suggested tags are always
+              additive regardless of the overwrite setting
+        """
+        kept = Tag.objects.create(name="Do Not Remove", owner=self.user)
+        self.doc.tags.add(kept)
+        Tag.objects.create(name="Existing Tag", owner=self.user)
+        action = self.make_action(ai_overwrite_existing=True)
+
+        self.apply(action)
+
+        self.assertEqual(
+            sorted(t.name for t in self.doc.tags.all()),
+            ["Do Not Remove", "Existing Tag"],
+        )
+
+    def test_unselected_fields_are_untouched(self) -> None:
+        """
+        GIVEN:
+            - An action that only selects the title
+        WHEN:
+            - The action is applied
+        THEN:
+            - Only the title changes, even though the LLM suggested everything
+        """
+        action = self.make_action(
+            ai_suggestion_fields=[WorkflowAction.AISuggestionField.TITLE],
+            ai_create_missing=True,
+            ai_overwrite_existing=True,
+        )
+
+        changed = self.apply(action)
+
+        self.assertEqual(changed, ["title"])
+        self.assertEqual(self.doc.title, "Suggested Title")
+        self.assertEqual(self.doc.tags.count(), 0)
+        self.assertIsNone(self.doc.correspondent)
+        self.assertEqual(self.doc.created, datetime.date(2020, 1, 1))
+
+    def test_another_users_private_objects_are_not_matched(self) -> None:
+        """
+        GIVEN:
+            - A suggested tag name that exists, but is owned by someone else
+        WHEN:
+            - The action is applied
+        THEN:
+            - It is not assigned, because the document owner cannot see it
+        """
+        other = User.objects.create(username="someone-else")
+        Tag.objects.create(name="Existing Tag", owner=other)
+        action = self.make_action(
+            ai_suggestion_fields=[WorkflowAction.AISuggestionField.TAGS],
+        )
+
+        self.apply(action)
+
+        self.assertEqual(self.doc.tags.count(), 0)
+
+    def test_unparsable_dates_are_skipped(self) -> None:
+        """
+        GIVEN:
+            - Suggested dates that are not all valid
+        WHEN:
+            - The action is applied
+        THEN:
+            - The first usable date is applied and the rest ignored
+        """
+        action = self.make_action(
+            ai_suggestion_fields=[WorkflowAction.AISuggestionField.CREATED],
+            ai_overwrite_existing=True,
+        )
+
+        with mock.patch(
+            "documents.workflows.ai.get_ai_document_classification",
+            return_value={**SUGGESTIONS, "dates": ["not a date", "2019-07-04"]},
+        ):
+            changed = apply_ai_suggestions_to_document(action, self.doc)
+
+        self.doc.refresh_from_db()
+        self.assertEqual(changed, ["created"])
+        self.assertEqual(self.doc.created, datetime.date(2019, 7, 4))

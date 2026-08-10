@@ -641,6 +641,145 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(self.workflow.triggers.get(), self.trigger)
 
+    def _post_ai_suggestions_workflow(self, *, trigger_types, action: dict):
+        def trigger(trigger_type):
+            # consumption triggers require a filter of their own
+            if trigger_type == WorkflowTrigger.WorkflowTriggerType.CONSUMPTION:
+                return {"type": trigger_type, "filter_filename": "*.pdf"}
+            return {"type": trigger_type}
+
+        return self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Apply AI suggestions",
+                    "order": 1,
+                    "triggers": [trigger(t) for t in trigger_types],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.APPLY_AI_SUGGESTIONS,
+                            **action,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+
+    def test_api_create_apply_ai_suggestions_action(self) -> None:
+        """
+        GIVEN:
+            - API request to create a workflow with an apply AI suggestions
+              action and a valid set of fields
+        WHEN:
+            - API is called
+        THEN:
+            - The workflow is created with the chosen options
+        """
+        response = self._post_ai_suggestions_workflow(
+            trigger_types=[WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED],
+            action={
+                "ai_suggestion_fields": ["title", "tags", "correspondent"],
+                "ai_create_missing": True,
+                "ai_overwrite_existing": True,
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        action = Workflow.objects.get(name="Apply AI suggestions").actions.first()
+        self.assertEqual(
+            action.ai_suggestion_fields,
+            ["title", "tags", "correspondent"],
+        )
+        self.assertTrue(action.ai_create_missing)
+        self.assertTrue(action.ai_overwrite_existing)
+
+    def test_api_create_apply_ai_suggestions_action_requires_fields(self) -> None:
+        """
+        GIVEN:
+            - API request to create an apply AI suggestions action with no
+              fields selected, which could never do anything
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+            - No objects are created
+        """
+        existing_count = Workflow.objects.count()
+
+        response = self._post_ai_suggestions_workflow(
+            trigger_types=[WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED],
+            action={"ai_suggestion_fields": []},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Workflow.objects.count(), existing_count)
+
+    def test_api_create_apply_ai_suggestions_action_rejects_unknown_field(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - API request to create an apply AI suggestions action naming a
+              field that does not exist
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+        """
+        response = self._post_ai_suggestions_workflow(
+            trigger_types=[WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED],
+            action={"ai_suggestion_fields": ["title", "not_a_field"]},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_api_create_apply_ai_suggestions_action_rejects_consumption_only(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - API request to create an apply AI suggestions action whose only
+              trigger is consumption started, so there is no document content
+              to make suggestions from yet
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+            - No objects are created
+        """
+        existing_count = Workflow.objects.count()
+
+        response = self._post_ai_suggestions_workflow(
+            trigger_types=[WorkflowTrigger.WorkflowTriggerType.CONSUMPTION],
+            action={"ai_suggestion_fields": ["title"]},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Workflow.objects.count(), existing_count)
+
+    def test_api_create_apply_ai_suggestions_action_allows_extra_consumption_trigger(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - API request to create an apply AI suggestions action with a
+              consumption trigger alongside a usable one
+        WHEN:
+            - API is called
+        THEN:
+            - The workflow is created, the action applies to the other trigger
+        """
+        response = self._post_ai_suggestions_workflow(
+            trigger_types=[
+                WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            ],
+            action={"ai_suggestion_fields": ["title"]},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
     def test_api_create_workflow_trigger_action_empty_fields(self) -> None:
         """
         GIVEN:
