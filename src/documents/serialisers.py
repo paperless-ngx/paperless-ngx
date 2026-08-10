@@ -3213,6 +3213,13 @@ class WorkflowActionSerializer(serializers.ModelSerializer[WorkflowAction]):
                         {"assign_title": f'Invalid f-string detected: "{e.args[0]}"'},
                     )
 
+        if attrs.get("assign_custom_fields_values"):
+            # Empty strings treated as None to avoid unexpected behavior
+            attrs["assign_custom_fields_values"] = {
+                field_id: (None if value == "" else value)
+                for field_id, value in attrs["assign_custom_fields_values"].items()
+            }
+
         if (
             "type" in attrs
             and attrs["type"] == WorkflowAction.WorkflowActionType.EMAIL
