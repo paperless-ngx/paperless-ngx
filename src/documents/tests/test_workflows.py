@@ -33,6 +33,7 @@ from documents.file_handling import generate_unique_filename
 from documents.signals.handlers import run_workflows
 from documents.workflows.ai import apply_ai_suggestions_to_document
 from documents.workflows.webhooks import send_webhook
+from paperless_ai.exceptions import LLMTimeoutError
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -5574,7 +5575,7 @@ class TestApplyAISuggestionsWorkflowAction(
                 self.doc,
             )
 
-        delay.assert_called_once_with(action.pk, self.doc.pk)
+        delay.assert_called_once_with(action_id=action.pk, document_id=self.doc.pk)
 
     def test_consumption_trigger_is_ignored(self) -> None:
         """
@@ -5654,15 +5655,15 @@ class TestApplyAISuggestionsWorkflowAction(
         self.assertEqual(changed, [])
         self.assertIn("AI is not enabled", "".join(cm.output))
 
-    def test_llm_failure_leaves_document_untouched(self) -> None:
+    def test_invalid_configuration_leaves_document_untouched(self) -> None:
         """
         GIVEN:
-            - An LLM backend that errors out
+            - An AI backend that is misconfigured
         WHEN:
             - The action is applied
         THEN:
-            - The failure is logged and the document is left alone, rather
-              than the error taking down the whole task
+            - The failure is logged and the document is left alone. It is not
+              re-raised, because retrying will not fix a bad configuration
         """
         action = self.make_action()
 
@@ -5678,7 +5679,31 @@ class TestApplyAISuggestionsWorkflowAction(
         self.assertEqual(changed, [])
         self.doc.refresh_from_db()
         self.assertEqual(self.doc.title, "original.pdf")
-        self.assertIn("Error getting AI suggestions", "".join(cm.output))
+        self.assertIn("Invalid AI configuration", "".join(cm.output))
+
+    def test_transient_llm_failure_is_raised_for_retry(self) -> None:
+        """
+        GIVEN:
+            - An LLM backend that times out, or rate limits the request
+        WHEN:
+            - The action is applied
+        THEN:
+            - The error propagates so the queued task can back off and retry,
+              rather than silently dropping this document's suggestions
+        """
+        action = self.make_action()
+
+        with (
+            mock.patch(
+                "documents.workflows.ai.get_ai_document_classification",
+                side_effect=LLMTimeoutError(),
+            ),
+            self.assertRaises(LLMTimeoutError),
+        ):
+            apply_ai_suggestions_to_document(action, self.doc)
+
+        self.doc.refresh_from_db()
+        self.assertEqual(self.doc.title, "original.pdf")
 
     def test_only_matching_objects_are_applied(self) -> None:
         """

@@ -140,9 +140,12 @@ def apply_ai_suggestions_to_document(
             owner,
             get_llm_output_language(ai_config, owner),
         )
-    except Exception:
+    except ValueError:
+        # A bad AI config will not fix itself, so swallow it rather than
+        # letting the caller retry. Timeouts, rate limits, network errors etc
+        # propagate so the queued task can back off and try again.
         logger.exception(
-            "Error getting AI suggestions for document %s",
+            "Invalid AI configuration, cannot get suggestions for document %s",
             document.pk,
             extra={"group": logging_group},
         )

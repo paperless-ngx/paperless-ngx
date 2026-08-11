@@ -714,8 +714,15 @@ def llmindex_index(
     )
 
 
-@shared_task
-def apply_ai_suggestions(action_id: int, document_id: int) -> None:
+@shared_task(
+    bind=True,
+    autoretry_for=(Exception,),
+    max_retries=3,
+    retry_backoff=60,
+    retry_backoff_max=600,
+    retry_jitter=True,
+)
+def apply_ai_suggestions(self, action_id: int, document_id: int) -> None:
     """
     Deferred "apply AI suggestions" workflow action.
     """
