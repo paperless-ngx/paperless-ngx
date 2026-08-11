@@ -1000,7 +1000,12 @@ def run_workflows(
                         # Queued rather than run sync
                         from documents.tasks import apply_ai_suggestions
 
-                        apply_ai_suggestions.delay(action.pk, document.pk)
+                        # kwargs so the PaperlessTask record can note the
+                        # document, see _extract_input_data
+                        apply_ai_suggestions.delay(
+                            action_id=action.pk,
+                            document_id=document.pk,
+                        )
 
             if not use_overrides:
                 # limit title to 128 characters
@@ -1056,6 +1061,7 @@ TRACKED_TASKS: dict[str, PaperlessTask.TaskType] = {
     "documents.tasks.update_document_content_maybe_archive_file": PaperlessTask.TaskType.REPROCESS_DOCUMENT,
     "documents.tasks.build_share_link_bundle": PaperlessTask.TaskType.BUILD_SHARE_LINK,
     "documents.bulk_edit.delete": PaperlessTask.TaskType.BULK_DELETE,
+    "documents.tasks.apply_ai_suggestions": PaperlessTask.TaskType.APPLY_AI_SUGGESTIONS,
 }
 
 _CELERY_STATE_TO_STATUS: dict[str, PaperlessTask.Status] = {
@@ -1107,6 +1113,12 @@ def _extract_input_data(
         account_ids = task_kwargs.get("account_ids")
         if account_ids is not None:
             return {"account_ids": account_ids}
+        return {}
+
+    if task_type == PaperlessTask.TaskType.APPLY_AI_SUGGESTIONS:
+        document_id = task_kwargs.get("document_id")
+        if document_id is not None:
+            return {"document_id": document_id}
         return {}
 
     return {}

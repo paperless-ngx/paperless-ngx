@@ -766,6 +766,7 @@ class PaperlessTask(ModelWithOwner):
         REPROCESS_DOCUMENT = "reprocess_document", _("Reprocess Document")
         BUILD_SHARE_LINK = "build_share_link", _("Build Share Link")
         BULK_DELETE = "bulk_delete", _("Bulk Delete")
+        APPLY_AI_SUGGESTIONS = "apply_ai_suggestions", _("Apply AI Suggestions")
 
     COMPLETE_STATUSES = (
         Status.SUCCESS,
