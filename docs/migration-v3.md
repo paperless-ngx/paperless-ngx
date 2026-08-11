@@ -187,10 +187,11 @@ PAPERLESS_ARCHIVE_FILE_GENERATION=auto
 
 ### Remote OCR parser
 
-If you use the **remote OCR parser** (Azure AI), note that it always produces a
-searchable PDF and stores it as the archive copy. `ARCHIVE_FILE_GENERATION=never`
-has no effect for documents handled by the remote parser - the archive is produced
-unconditionally by the remote engine.
+If you use the **remote OCR parser** (Azure AI), `ARCHIVE_FILE_GENERATION` is
+honored the same way as for the local engine: when no archive is requested
+(`never`, or `auto` with a born-digital PDF), the remote engine is skipped
+entirely and locally-extracted text is used instead, avoiding an unnecessary
+API call and a duplicate text layer.
 
 ## Search Index (Whoosh -> Tantivy)
 
