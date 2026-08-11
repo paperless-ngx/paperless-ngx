@@ -7,7 +7,7 @@
 </pngx-page-header>
 <form [formGroup]="savedViewsForm" (ngSubmit)="save()">
   <ul class="list-group mb-3" formGroupName="savedViews">
-    @for (view of savedViews(); track view) {
+    @for (view of pagedSavedViews(); track view) {
       <li class="list-group-item py-3">
       <div [formGroupName]="view.id">
         <div class="row">
@@ -81,6 +81,11 @@
     }
   </ul>
 
-  <button type="button" (click)="reset()" class="btn btn-outline-secondary mb-2" [disabled]="(isDirty$ | async) === false" i18n>Cancel</button>
-  <button type="submit" class="btn btn-primary ms-2 mb-2" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
+  <div class="d-flex align-items-center mb-3">
+    <button type="button" (click)="reset()" class="btn btn-outline-secondary mb-2" [disabled]="(isDirty$ | async) === false" i18n>Cancel</button>
+    <button type="submit" class="btn btn-primary ms-2 mb-2" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
+    @if (savedViews()?.length > pageSize) {
+      <ngb-pagination class="ms-auto" [pageSize]="pageSize" [collectionSize]="savedViews().length" [page]="page()" [maxSize]="5" (pageChange)="page.set($event)" size="sm" aria-label="Pagination"></ngb-pagination>
+    }
+  </div>
 </form>

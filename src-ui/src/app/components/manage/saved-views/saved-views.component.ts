@@ -1,12 +1,19 @@
 import { AsyncPipe } from '@angular/common'
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core'
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core'
 import {
   FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModal, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
 import { dirtyCheck } from '@ngneat/dirty-check-forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { BehaviorSubject, Observable, of, switchMap, takeUntil } from 'rxjs'
@@ -42,6 +49,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     FormsModule,
     ReactiveFormsModule,
     AsyncPipe,
+    NgbPaginationModule,
     NgxBootstrapIconsModule,
   ],
 })
@@ -58,6 +66,14 @@ export class SavedViewsComponent
   DisplayMode = DisplayMode
 
   readonly savedViews = signal<SavedView[]>(undefined)
+  readonly page = signal(1)
+  public readonly pageSize = 25
+  // All views are loaded at init, so paging is only for display
+  readonly pagedSavedViews = computed(() => {
+    const start = (this.page() - 1) * this.pageSize
+    return this.savedViews()?.slice(start, start + this.pageSize)
+  })
+
   private savedViewsGroup = new FormGroup({})
   public savedViewsForm: FormGroup = new FormGroup({
     savedViews: this.savedViewsGroup,
@@ -84,9 +100,11 @@ export class SavedViewsComponent
   private reloadViews(): void {
     this.loading.set(true)
     this.savedViewService
-      .list(null, null, null, false, { full_perms: true })
+      .list(1, 100000, null, false, { full_perms: true })
       .subscribe((r) => {
         this.savedViews.set(r.results)
+        const pageCount = Math.ceil(r.results.length / this.pageSize)
+        this.page.update((page) => Math.min(page, Math.max(1, pageCount)))
         this.initialize()
       })
   }
