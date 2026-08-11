@@ -2,6 +2,8 @@ import json
 import logging
 import sys
 
+from django.db.models import QuerySet
+
 from documents.models import Document
 from paperless.config import AIConfig
 from paperless_ai.client import AIClient
@@ -82,10 +84,21 @@ def _build_document_reference(
 
 
 def _get_document_references(
-    documents: list[Document],
+    documents: QuerySet[Document],
     top_nodes: list,
 ) -> list[dict[str, int | str]]:
-    allowed_documents = {doc.pk: doc for doc in documents}
+    candidate_ids: set[int] = set()
+    for node in top_nodes:
+        try:
+            candidate_ids.add(int(node.metadata["document_id"]))
+        except (KeyError, TypeError, ValueError):  # pragma: no cover
+            continue
+
+    if not candidate_ids:
+        return []
+
+    allowed_documents = {doc.pk: doc for doc in documents.filter(pk__in=candidate_ids)}
+
     references: list[dict[str, int | str]] = []
     seen_document_ids: set[int] = set()
 
@@ -119,7 +132,7 @@ def _format_chat_metadata_trailer(references: list[dict[str, int | str]]) -> str
 
 def stream_chat_with_documents(
     query_str: str,
-    documents: list[Document],
+    documents: QuerySet[Document],
     output_language: str | None = None,
 ):
     try:
@@ -135,10 +148,10 @@ def stream_chat_with_documents(
 
 def _stream_chat_with_documents(
     query_str: str,
-    documents: list[Document],
+    documents: QuerySet[Document],
     output_language: str | None = None,
 ):
-    if not documents:
+    if not documents.exists():
         yield CHAT_NO_CONTENT_MESSAGE
         return
 
@@ -148,7 +161,9 @@ def _stream_chat_with_documents(
     from llama_index.core.retrievers import VectorIndexRetriever
 
     config = AIConfig()
-    filters = _document_id_filters(str(doc.pk) for doc in documents)
+    filters = _document_id_filters(
+        str(pk) for pk in documents.values_list("pk", flat=True)
+    )
 
     # Hold the shared read lock for the whole operation: the query engine
     # retrieves from the vector store again during synthesis, so the connection
