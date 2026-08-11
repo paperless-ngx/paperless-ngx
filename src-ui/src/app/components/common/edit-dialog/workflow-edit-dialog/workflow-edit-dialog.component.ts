@@ -552,6 +552,8 @@ export class WorkflowEditDialogComponent
     this.checkRemovalActionFields(this.objectForm.value)
   }
 
+  private allowedActionTypes: typeof WORKFLOW_ACTION_OPTIONS = null
+
   private getAllowedActionTypes() {
     let allowed = WORKFLOW_ACTION_OPTIONS
 
@@ -574,6 +576,13 @@ export class WorkflowEditDialogComponent
       allowed = allowed.filter((a) => a.id !== WorkflowActionType.RemoteOcr)
     }
 
+    if (
+      this.allowedActionTypes?.length === allowed.length &&
+      this.allowedActionTypes.every((a, i) => a.id === allowed[i].id)
+    ) {
+      return this.allowedActionTypes
+    }
+    this.allowedActionTypes = allowed
     return allowed
   }
 
