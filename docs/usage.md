@@ -692,8 +692,9 @@ than as part of the workflow run itself. The document is updated once the sugges
 !!! warning
 
     Every matching document results in a query to the AI service, which may incur costs and have privacy
-    implications. Be careful when adding this action to a workflow with a **Scheduled** trigger or a
-    broad filter that could run over a large quantity of documents.
+    implications. Queries can be slow, so a workflow matching a large number of documents can occupy the
+    task queue, and delay consumption of new documents, etc. Consider narrowing the trigger filters,
+    running in small batches and / or increasing workers.
 
 #### Workflow placeholders
 
