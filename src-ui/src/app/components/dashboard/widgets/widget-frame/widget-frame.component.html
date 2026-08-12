@@ -8,7 +8,12 @@
               <i-bs name="grip-vertical"></i-bs>
             </div>
           }
-          <h6 class="card-title mb-0">{{title()}}</h6>
+          <h6 class="card-title mb-0">
+            @if (titleIcon()) {
+              <i-bs class="me-2" [name]="titleIcon()"></i-bs>
+            }
+            {{title()}}
+          </h6>
           <ng-content select="[title-badge]"></ng-content>
           @if (badge() !== null && badge() !== undefined) {
             <span class="badge bg-info text-dark ms-2">{{badge()}}</span>
