@@ -458,8 +458,8 @@ For related metadata such as tags, correspondents, document types, and storage p
 ### Password reset
 
 In order to enable the password reset feature you will need to setup an SMTP backend, see
-[`PAPERLESS_EMAIL_HOST`](configuration.md#PAPERLESS_EMAIL_HOST). If your installation does not have
-[`PAPERLESS_URL`](configuration.md#PAPERLESS_URL) set, the reset link included in emails will use the server host.
+[`PAPERLESS_EMAIL_HOST`](configuration.md#PAPERLESS_EMAIL_HOST). You should also set
+[`PAPERLESS_URL`](configuration.md#PAPERLESS_URL) and / or its corresponding configuration settings.
 
 ### Two-factor authentication
 
@@ -576,7 +576,9 @@ The following workflow action types are available:
 - Tags, correspondent, document type and storage path
 - Document owner
 - View and / or edit permissions to users or groups
-- Custom fields. Note that no value for the field will be set
+- Custom fields, optionally with a value. If no value is set, the field is only added to the
+  document and any value it may already have is left untouched. If a value is set, it will
+  overwrite an existing value of that field on the document.
 
 ##### Removal {#workflow-action-removal}
 
@@ -619,6 +621,34 @@ no other workflow will be executed on the document.
 
 If a "Move to Trash" action is executed in a consume pipeline, the consumption
 will be aborted and the file will be deleted.
+
+##### Password Removal {#workflow-action-password-removal}
+
+"Password Removal" actions attempt to remove password protection from encrypted PDF documents. You can specify:
+
+- One or more passwords to try, separated by commas or new lines
+- Each password is tried in order until one successfully unlocks the document
+
+Password removal never modifies a file in place. Instead, once a working password is found, the
+decrypted content is consumed as a new [document version](#document-file-versions), leaving the
+original (still encrypted) version in the document's version history.
+
+**Consumption Started**: because this trigger fires before the document exists yet, the password
+removal itself is deferred until after the initial consumption of the encrypted file has completed.
+OCR engines cannot process an encrypted PDF, so this first version is typically stored with no
+extracted text (unless the file already contained extractable text outside of OCR). Immediately
+afterwards, the password is removed and the decrypted file is automatically re-consumed as a second,
+new version of the same document, this time with normal OCR/text extraction applied. In other words,
+a password-protected file added with this trigger will briefly exist as an un-OCR'd version before
+the properly processed version is created.
+
+**Document Added**, **Document Updated**, **Scheduled**: these triggers run against a document that
+already exists, so password removal happens immediately: the decrypted content is queued for
+consumption as a new version right away. Note that if the document's initial consumption also
+happened while it was still encrypted, that original version will likewise be missing OCR text.
+
+**Current limitation**: Passwords are stored as a simple list without descriptions. To handle
+multiple PDF types with different passwords, create separate workflows for each use case.
 
 #### Workflow placeholders
 
@@ -833,10 +863,10 @@ contract you signed 8 years ago).
 
 When you search paperless for a document, it tries to match this query
 against your documents. Paperless will look for matching documents by
-inspecting their content, title, correspondent, type, tags, notes, and
-custom field values. Paperless returns a scored list of results, so that
-documents matching your query better will appear further up in the search
-results.
+inspecting their content, title, correspondent, type, and tags. Paperless
+returns a scored list of results, so that documents matching your query
+better will appear further up in the search results. Notes and custom field
+values can be searched using the advanced search syntax described below.
 
 By default, paperless returns only documents which contain all words
 typed in the search bar. A few things to know about how matching works:
@@ -891,9 +921,9 @@ Supported date keywords: `today`, `yesterday`, `previous week`,
 
 #### Searching custom fields
 
-Custom field values are included in the full-text index, so a plain search
-already matches documents whose custom field values contain your search terms.
-To narrow by field name or value specifically:
+Custom field names and values are included in the full-text index, but they
+are not searched by a plain, unqualified query. Use the advanced search syntax
+to search by field name or value:
 
 ```
 custom_fields.value:policy
@@ -921,8 +951,9 @@ custom_fields.name:"Contract Number" custom_fields.value:1312
 
 #### Searching notes
 
-Notes content is included in full-text search automatically. To search
-by note author or content specifically:
+Notes are included in the full-text index, but they are not searched by a
+plain, unqualified query. Use the advanced search syntax to search by note
+author or content:
 
 ```
 notes.user:alice

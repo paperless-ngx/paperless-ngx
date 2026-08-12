@@ -56,6 +56,14 @@ export class ProfileEditDialogComponent
   readonly showEmailConfirm = signal(false)
   readonly copied = signal(false)
   readonly codesCopied = signal(false)
+  readonly hasUsablePassword = signal(false)
+  readonly isTotpEnabled = signal(false)
+  readonly totpSettings = signal<TotpSettings>(undefined)
+  readonly totpSettingsLoading = signal(false)
+  readonly totpLoading = signal(false)
+  readonly recoveryCodes = signal<string[]>(undefined)
+  readonly socialAccounts = signal<SocialAccount[]>([])
+  readonly socialAccountProviders = signal<SocialAccountProvider[]>([])
 
   public form = new FormGroup({
     email: new FormControl(''),
@@ -72,25 +80,15 @@ export class ProfileEditDialogComponent
   private newPassword: string
   private passwordConfirm: string
 
-  public hasUsablePassword: boolean = false
-
   private currentEmail: string
   private newEmail: string
   private emailConfirm: string
 
-  public isTotpEnabled: boolean = false
-  public totpSettings: TotpSettings
-  public totpSettingsLoading: boolean = false
-  public totpLoading: boolean = false
-  public recoveryCodes: string[]
-  public socialAccounts: SocialAccount[] = []
-  public socialAccountProviders: SocialAccountProvider[] = []
-
   get qrSvgDataUrl(): string | null {
-    if (!this.totpSettings?.qr_svg) {
+    if (!this.totpSettings()?.qr_svg) {
       return null
     }
-    return `data:image/svg+xml;utf8,${encodeURIComponent(this.totpSettings.qr_svg)}`
+    return `data:image/svg+xml;utf8,${encodeURIComponent(this.totpSettings().qr_svg)}`
   }
 
   ngOnInit(): void {
@@ -107,20 +105,20 @@ export class ProfileEditDialogComponent
           this.onEmailChange()
         })
         this.currentPassword = profile.password
-        this.hasUsablePassword = profile.has_usable_password
+        this.hasUsablePassword.set(profile.has_usable_password)
         this.form.get('password').valueChanges.subscribe((newPassword) => {
           this.newPassword = newPassword
           this.onPasswordChange()
         })
-        this.socialAccounts = profile.social_accounts
-        this.isTotpEnabled = profile.is_mfa_enabled
+        this.socialAccounts.set(profile.social_accounts ?? [])
+        this.isTotpEnabled.set(profile.is_mfa_enabled)
       })
 
     this.profileService
       .getSocialAccountProviders()
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((providers) => {
-        this.socialAccountProviders = providers
+        this.socialAccountProviders.set(providers ?? [])
       })
   }
 
@@ -259,7 +257,9 @@ export class ProfileEditDialogComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (id: number) => {
-          this.socialAccounts = this.socialAccounts.filter((a) => a.id != id)
+          this.socialAccounts.update((accounts) =>
+            accounts.filter((account) => account.id != id)
+          )
         },
         error: (error) => {
           this.toastService.showError(
@@ -271,36 +271,39 @@ export class ProfileEditDialogComponent
   }
 
   public gettotpSettings(): void {
-    this.totpSettingsLoading = true
+    this.totpSettingsLoading.set(true)
     this.profileService
       .getTotpSettings()
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (totpSettings) => {
-          this.totpSettingsLoading = false
-          this.totpSettings = totpSettings
+          this.totpSettingsLoading.set(false)
+          this.totpSettings.set(totpSettings)
         },
         error: (error) => {
           this.toastService.showError(
             $localize`Error fetching TOTP settings`,
             error
           )
-          this.totpSettingsLoading = false
+          this.totpSettingsLoading.set(false)
         },
       })
   }
 
   public activateTotp(): void {
-    this.totpLoading = true
+    this.totpLoading.set(true)
     this.form.get('totp_code').disable()
     this.profileService
-      .activateTotp(this.totpSettings.secret, this.form.get('totp_code').value)
+      .activateTotp(
+        this.totpSettings().secret,
+        this.form.get('totp_code').value
+      )
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (activationResponse) => {
-          this.totpLoading = false
-          this.isTotpEnabled = activationResponse.success
-          this.recoveryCodes = activationResponse.recovery_codes
+          this.totpLoading.set(false)
+          this.isTotpEnabled.set(activationResponse.success)
+          this.recoveryCodes.set(activationResponse.recovery_codes)
           this.form.get('totp_code').enable()
           if (activationResponse.success) {
             this.toastService.showInfo($localize`TOTP activated successfully`)
@@ -309,7 +312,7 @@ export class ProfileEditDialogComponent
           }
         },
         error: (error) => {
-          this.totpLoading = false
+          this.totpLoading.set(false)
           this.form.get('totp_code').enable()
           this.toastService.showError($localize`Error activating TOTP`, error)
         },
@@ -317,15 +320,15 @@ export class ProfileEditDialogComponent
   }
 
   public deactivateTotp(): void {
-    this.totpLoading = true
+    this.totpLoading.set(true)
     this.profileService
       .deactivateTotp()
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (success) => {
-          this.totpLoading = false
-          this.isTotpEnabled = !success
-          this.recoveryCodes = null
+          this.totpLoading.set(false)
+          this.isTotpEnabled.set(!success)
+          this.recoveryCodes.set(null)
           if (success) {
             this.toastService.showInfo($localize`TOTP deactivated successfully`)
           } else {
@@ -333,14 +336,14 @@ export class ProfileEditDialogComponent
           }
         },
         error: (error) => {
-          this.totpLoading = false
+          this.totpLoading.set(false)
           this.toastService.showError($localize`Error deactivating TOTP`, error)
         },
       })
   }
 
   public copyRecoveryCodes(): void {
-    this.clipboard.copy(this.recoveryCodes.join('\n'))
+    this.clipboard.copy(this.recoveryCodes().join('\n'))
     this.codesCopied.set(true)
     setTimeout(() => {
       this.codesCopied.set(false)

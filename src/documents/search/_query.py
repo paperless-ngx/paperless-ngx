@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from datetime import UTC
 from typing import TYPE_CHECKING
 from typing import Final
 
@@ -9,17 +8,12 @@ import regex
 import tantivy
 from django.conf import settings
 
-from documents.search._dates import (
-    _date_only_range,  # noqa: F401 — re-exported for test imports
-)
-from documents.search._dates import (
-    _datetime_range,  # noqa: F401 — re-exported for test imports
-)
 from documents.search._tokenizer import simple_search_tokens
 from documents.search._translate import SearchQueryError
 from documents.search._translate import translate_query
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from datetime import tzinfo
 
     from django.contrib.auth.base_user import AbstractBaseUser
@@ -38,6 +32,17 @@ _CJK_RE: Final = regex.compile(r"[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]+")
 def _has_cjk(text: str) -> bool:
     """Return True if text contains any CJK characters."""
     return bool(_CJK_RE.search(text))
+
+
+def extract_cjk_text(text: str) -> str:
+    """Join the CJK runs in ``text`` for indexing into bigram (char-ngram) fields.
+
+    Mirrors the query side (``_build_cjk_query``): only CJK runs are ever searched
+    against the bigram fields, so only CJK runs are worth indexing there. Latin
+    text fed to a character-bigram field is never matched and only bloats the
+    index and slows indexing/merge. Returns "" when there is no CJK text.
+    """
+    return " ".join(_CJK_RE.findall(text))
 
 
 def _build_cjk_query(
@@ -64,45 +69,10 @@ def _build_cjk_query(
         return None
 
 
-def rewrite_natural_date_keywords(query: str, tz: tzinfo) -> str:
-    """
-    Rewrite natural date syntax to ISO 8601 format for Tantivy compatibility.
-
-    Delegates to ``translate_query`` which handles all date forms, comma
-    expansion, field aliasing, relative ranges, and operator normalization.
-
-    Args:
-        query: Raw user query string
-        tz: Timezone for converting local date boundaries to UTC
-
-    Returns:
-        Query with date syntax rewritten to ISO 8601 ranges
-
-    Note:
-        Bare keywords without field prefixes pass through unchanged.
-    """
-    return translate_query(query, tz)
-
-
-def normalize_query(query: str) -> str:
-    """
-    Normalize query syntax for better search behavior.
-
-    Delegates to ``translate_query`` which handles comma expansion, whitespace
-    collapsing, operator normalization, and field aliasing.
-
-    Args:
-        query: Query string after date rewriting
-
-    Returns:
-        Normalized query string ready for Tantivy parsing
-    """
-    return translate_query(query, UTC)
-
-
 def build_permission_filter(
     schema: tantivy.Schema,
     user: AbstractBaseUser,
+    viewer_group_ids: Iterable[int] = (),
 ) -> tantivy.Query:
     """
     Build a query filter for user document permissions.
@@ -112,10 +82,12 @@ def build_permission_filter(
     - Public documents (no owner) are visible to all users
     - Private documents are visible to their owner
     - Documents explicitly shared with the user are visible
+    - Documents shared with one of the user's current groups are visible
 
     Args:
         schema: Tantivy schema for field validation
         user: User to check permissions for
+        viewer_group_ids: Current group memberships for the user
 
     Returns:
         Tantivy query that filters results to visible documents
@@ -129,7 +101,13 @@ def build_permission_filter(
     )
     owned = tantivy.Query.term_query(schema, "owner_id", user.pk)
     shared = tantivy.Query.term_query(schema, "viewer_id", user.pk)
-    return tantivy.Query.disjunction_max_query([no_owner, owned, shared])
+    group_shared = [
+        tantivy.Query.term_query(schema, "viewer_group_id", group_id)
+        for group_id in viewer_group_ids
+    ]
+    return tantivy.Query.disjunction_max_query(
+        [no_owner, owned, shared, *group_shared],
+    )
 
 
 DEFAULT_SEARCH_FIELDS = [
@@ -161,31 +139,38 @@ def _simple_query_tokens(raw_query: str) -> list[str]:
     return simple_search_tokens(raw_query)
 
 
-def _build_simple_field_query(
+def _build_simple_token_query(
     index: tantivy.Index,
-    field: str,
-    tokens: list[str],
+    fields: list[str],
+    token: str,
+    *,
+    allow_infix: bool,
 ) -> tantivy.Query:
-    patterns = []
-    for idx, token in enumerate(tokens):
-        escaped = regex.escape(token)
-        # For multi-token substring search, only the first token can begin mid-word.
-        # Later tokens follow a whitespace boundary in the original query, so anchor
-        # them to the start of the next indexed token to reduce false positives like
-        # matching "Z-Berichte 16" for the query "Z-Berichte 6".
-        if idx == 0:
-            patterns.append(f".*{escaped}.*")
-        else:
-            patterns.append(f"{escaped}.*")
-    if len(patterns) == 1:
-        query = tantivy.Query.regex_query(index.schema, field, patterns[0])
-    else:
-        query = tantivy.Query.regex_phrase_query(index.schema, field, patterns)
+    escaped = regex.escape(token)
+    # The simple analyzer keeps punctuation inside whitespace-delimited terms.
+    # Boundary-constrained query tokens may therefore begin either at the indexed
+    # term boundary or after punctuation within a term (for example,
+    # ``medical-history``). This avoids matching a numeric token such as ``6``
+    # in the middle of ``16``.
+    pattern = (
+        f".*{escaped}.*"
+        if allow_infix
+        else (
+            f"({escaped}.*|"
+            rf".*[\x20-\x2f\x3a-\x40\x5b-\x60\x7b-\x7e]{escaped}.*)"
+        )
+    )
+    field_queries: list[tuple[tantivy.Occur, tantivy.Query]] = []
+    for field in fields:
+        query = tantivy.Query.regex_query(index.schema, field, pattern)
+        boost = _SIMPLE_FIELD_BOOSTS.get(field, 1.0)
+        if boost > 1.0:
+            query = tantivy.Query.boost_query(query, boost)
+        field_queries.append((tantivy.Occur.Should, query))
 
-    boost = _SIMPLE_FIELD_BOOSTS.get(field, 1.0)
-    if boost > 1.0:
-        return tantivy.Query.boost_query(query, boost)
-    return query
+    if len(field_queries) == 1:
+        return field_queries[0][1]
+    return tantivy.Query.boolean_query(field_queries)
 
 
 def parse_user_query(
@@ -287,10 +272,31 @@ def parse_simple_query(
 
     clauses: list[tuple[tantivy.Occur, tantivy.Query]] = []
     if tokens:
-        clauses = [
-            (tantivy.Occur.Should, _build_simple_field_query(index, field, tokens))
-            for field in fields
+        # Match every query token, regardless of its position in the document.
+        # Each token may occur in any of the requested fields, so text mode also
+        # finds documents whose matches are split between title and content.
+        token_queries = [
+            (
+                tantivy.Occur.Must,
+                _build_simple_token_query(
+                    index,
+                    fields,
+                    token,
+                    # Preserve historical infix matching for single-token
+                    # searches. In multi-token searches, constrain numeric
+                    # tokens to boundaries to avoid partial-number overlap.
+                    # This depends on token content, not query order.
+                    allow_infix=len(tokens) == 1 or not token.isdecimal(),
+                ),
+            )
+            for token in tokens
         ]
+        simple_query = (
+            token_queries[0][1]
+            if len(token_queries) == 1
+            else tantivy.Query.boolean_query(token_queries)
+        )
+        clauses.append((tantivy.Occur.Should, simple_query))
 
     if cjk_fields and _has_cjk(raw_query):
         cjk_q = _build_cjk_query(index, raw_query, cjk_fields)

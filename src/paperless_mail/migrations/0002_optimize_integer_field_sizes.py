@@ -10,7 +10,29 @@ def clamp_mailrule_maximum_age(apps, schema_editor):
     MailRule.objects.filter(maximum_age__gt=32767).update(maximum_age=32767)
 
 
+def clamp_mailrule_order(apps, schema_editor):
+    # The order field of MailRule is only used for relative sorting
+    # (account.rules.order_by("order")), so out-of-range values must be
+    # renumbered by rank rather than clamped to a single value, which
+    # would collapse distinct rules to the same order.
+    MailRule = apps.get_model("paperless_mail", "MailRule")
+    if (
+        MailRule.objects.filter(order__gt=32767).exists()
+        or MailRule.objects.filter(
+            order__lt=-32768,
+        ).exists()
+    ):  # pragma: no cover
+        for index, rule_id in enumerate(
+            MailRule.objects.order_by("order", "pk").values_list("pk", flat=True),
+        ):
+            MailRule.objects.filter(pk=rule_id).update(order=index)
+
+
 class Migration(migrations.Migration):
+    # The data update must commit before PostgreSQL rewrites the table, otherwise
+    # pending foreign-key trigger events can block the subsequent ALTER TABLE.
+    atomic = False
+
     dependencies = [
         ("paperless_mail", "0001_squashed"),
     ]
@@ -130,6 +152,10 @@ class Migration(migrations.Migration):
                 help_text="Specified in days.",
                 verbose_name="maximum age",
             ),
+        ),
+        migrations.RunPython(
+            clamp_mailrule_order,
+            migrations.RunPython.noop,
         ),
         migrations.AlterField(
             model_name="mailrule",

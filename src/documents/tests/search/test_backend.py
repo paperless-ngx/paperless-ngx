@@ -1,5 +1,7 @@
 import pytest
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from guardian.shortcuts import assign_perm
 from pytest_mock import MockerFixture
 
 from documents.models import CustomField
@@ -15,6 +17,7 @@ from documents.tests.factories import CorrespondentFactory
 from documents.tests.factories import DocumentFactory
 from documents.tests.factories import DocumentTypeFactory
 from documents.tests.factories import TagFactory
+from documents.tests.factories import UserFactory
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
 
@@ -160,10 +163,55 @@ class TestSearch:
         assert (
             len(backend.search_ids("sswo", user=None, search_mode=SearchMode.TEXT)) == 1
         )
-        assert (
-            len(backend.search_ids("sswo re", user=None, search_mode=SearchMode.TEXT))
-            == 1
+        for query in ["sswo re", "re sswo"]:
+            assert (
+                len(backend.search_ids(query, user=None, search_mode=SearchMode.TEXT))
+                == 1
+            ), query
+
+    def test_text_mode_matches_all_terms_without_requiring_adjacency(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """Simple text mode should match all terms in any order or field."""
+        doc = Document.objects.create(
+            title="complete-medical-history",
+            content="Samsung Odyssey curved monitor",
+            checksum="TXT13",
+            pk=19,
         )
+        backend.add_or_update(doc)
+
+        for query in [
+            "complete history",
+            "history complete",
+            "Samsung curved",
+            "curved Samsung",
+        ]:
+            assert backend.search_ids(
+                query,
+                user=None,
+                search_mode=SearchMode.TEXT,
+            ) == [doc.pk], query
+
+    def test_text_mode_matches_terms_across_title_and_content(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """Each simple-search term may match either title or content."""
+        doc = Document.objects.create(
+            title="Complete record",
+            content="Patient history",
+            checksum="TXT14",
+            pk=20,
+        )
+        backend.add_or_update(doc)
+
+        assert backend.search_ids(
+            "complete history",
+            user=None,
+            search_mode=SearchMode.TEXT,
+        ) == [doc.pk]
 
     def test_text_mode_does_not_match_on_partial_term_overlap(
         self,
@@ -183,11 +231,11 @@ class TestSearch:
             == 0
         )
 
-    def test_text_mode_anchors_later_query_tokens_to_token_starts(
+    def test_text_mode_anchors_numeric_tokens_regardless_of_query_order(
         self,
         backend: TantivyBackend,
     ) -> None:
-        """Multi-token simple search should not match later tokens in the middle of a word."""
+        """Numeric tokens must not match in the middle of a larger number."""
         exact_doc = Document.objects.create(
             title="Z-Berichte 6",
             content="monthly report",
@@ -210,13 +258,14 @@ class TestSearch:
         backend.add_or_update(prefix_doc)
         backend.add_or_update(false_positive)
 
-        result_ids = set(
-            backend.search_ids("Z-Berichte 6", user=None, search_mode=SearchMode.TEXT),
-        )
+        for query in ["Z-Berichte 6", "6 Z-Berichte"]:
+            result_ids = set(
+                backend.search_ids(query, user=None, search_mode=SearchMode.TEXT),
+            )
 
-        assert exact_doc.id in result_ids
-        assert prefix_doc.id in result_ids
-        assert false_positive.id not in result_ids
+            assert exact_doc.id in result_ids, query
+            assert prefix_doc.id in result_ids, query
+            assert false_positive.id not in result_ids, query
 
     def test_text_mode_ignores_queries_without_searchable_tokens(
         self,
@@ -561,17 +610,47 @@ class TestRebuild:
     """Test index rebuilding functionality."""
 
     def test_with_iter_wrapper_called(self, backend: TantivyBackend) -> None:
-        """Index rebuild must pass documents through iter_wrapper for progress tracking."""
+        """Index rebuild must pass (document, viewer_ids) pairs through iter_wrapper."""
         seen = []
 
-        def wrapper(docs):
-            for doc in docs:
+        def wrapper(pairs):
+            for doc, viewer_ids in pairs:
                 seen.append(doc.pk)
-                yield doc
+                yield doc, viewer_ids
 
         Document.objects.create(title="Tracked", content="x", checksum="TW1", pk=30)
         backend.rebuild(Document.objects.all(), iter_wrapper=wrapper)
         assert 30 in seen
+
+    def test_includes_group_granted_viewers(self, backend: TantivyBackend) -> None:
+        """Rebuild must index viewer ids for group-only grants, not just direct ones.
+
+        The batched viewer-id lookup used during rebuild() must mirror
+        get_users_with_perms(with_group_users=True), which is the default
+        used by the non-batched per-document indexing path. Without it, a
+        user who can only see a document via group membership would lose
+        search access to it after any full reindex.
+        """
+        owner = UserFactory()
+        group_member = UserFactory()
+        group = Group.objects.create(name="viewers")
+        group_member.groups.add(group)
+
+        doc = DocumentFactory(
+            title="Group shared doc",
+            content="group secret keyword",
+            owner=owner,
+        )
+        assign_perm("view_document", group, doc)
+
+        backend.rebuild(Document.objects.all())
+
+        ids = backend.search_ids(
+            "group secret",
+            user=group_member,
+            search_mode=SearchMode.QUERY,
+        )
+        assert ids == [doc.pk]
 
 
 class TestAutocomplete:
@@ -809,6 +888,23 @@ class TestFieldHandling:
         ids = backend.search_ids("notes.note:important", user=None)
         assert len(ids) == 1, (
             f"Expected 1, got {len(ids)}. Note content should be searchable via notes.note: prefix."
+        )
+
+    def test_notes_without_user_are_indexed(self, backend: TantivyBackend) -> None:
+        """Notes whose user was deleted (SET_NULL) must not break indexing."""
+        doc = Document.objects.create(
+            title="Doc with orphaned note",
+            content="test",
+            checksum="NT2",
+            pk=81,
+        )
+        Note.objects.create(document=doc, note="Orphaned note", user=None)
+
+        backend.add_or_update(doc)
+
+        ids = backend.search_ids("notes.note:orphaned", user=None)
+        assert len(ids) == 1, (
+            f"Expected 1, got {len(ids)}. Notes without a user should still be indexed."
         )
 
 

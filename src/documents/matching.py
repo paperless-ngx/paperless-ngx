@@ -19,7 +19,7 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowTrigger
-from documents.permissions import get_objects_for_user_owner_aware
+from documents.permissions import permitted_object_ids
 from documents.regex import safe_regex_search
 
 if TYPE_CHECKING:
@@ -55,10 +55,8 @@ def match_correspondents(document: Document, classifier: DocumentClassifier, use
         user = document.owner
 
     if user is not None:
-        correspondents = get_objects_for_user_owner_aware(
-            user,
-            "documents.view_correspondent",
-            Correspondent,
+        correspondents = Correspondent.objects.filter(
+            id__in=permitted_object_ids(user, Correspondent, "view_correspondent"),
         )
     else:
         correspondents = Correspondent.objects.all()
@@ -86,10 +84,8 @@ def match_document_types(document: Document, classifier: DocumentClassifier, use
         user = document.owner
 
     if user is not None:
-        document_types = get_objects_for_user_owner_aware(
-            user,
-            "documents.view_documenttype",
-            DocumentType,
+        document_types = DocumentType.objects.filter(
+            id__in=permitted_object_ids(user, DocumentType, "view_documenttype"),
         )
     else:
         document_types = DocumentType.objects.all()
@@ -116,7 +112,9 @@ def match_tags(document: Document, classifier: DocumentClassifier, user=None):
         user = document.owner
 
     if user is not None:
-        tags = get_objects_for_user_owner_aware(user, "documents.view_tag", Tag)
+        tags = Tag.objects.filter(
+            id__in=permitted_object_ids(user, Tag, "view_tag"),
+        )
     else:
         tags = Tag.objects.all()
 
@@ -145,10 +143,8 @@ def match_storage_paths(document: Document, classifier: DocumentClassifier, user
         user = document.owner
 
     if user is not None:
-        storage_paths = get_objects_for_user_owner_aware(
-            user,
-            "documents.view_storagepath",
-            StoragePath,
+        storage_paths = StoragePath.objects.filter(
+            id__in=permitted_object_ids(user, StoragePath, "view_storagepath"),
         )
     else:
         storage_paths = StoragePath.objects.all()
@@ -300,7 +296,7 @@ def consumable_document_matches_workflow(
     ]:
         reason = (
             f"Document source {document.source.name} not in"
-            f" {[DocumentSource(int(x)).name for x in trigger.sources]}",
+            f" {[DocumentSource(int(x)).name for x in trigger.sources]}"
         )
         trigger_matched = False
 
@@ -310,8 +306,7 @@ def consumable_document_matches_workflow(
         and document.mailrule_id != trigger.filter_mailrule.pk
     ):
         reason = (
-            f"Document mail rule {document.mailrule_id}"
-            f" != {trigger.filter_mailrule.pk}",
+            f"Document mail rule {document.mailrule_id} != {trigger.filter_mailrule.pk}"
         )
         trigger_matched = False
 
@@ -326,7 +321,7 @@ def consumable_document_matches_workflow(
     ):
         reason = (
             f"Document filename {document.original_file.name} does not match"
-            f" {trigger.filter_filename.lower()}",
+            f" {trigger.filter_filename.lower()}"
         )
         trigger_matched = False
 
@@ -349,7 +344,7 @@ def consumable_document_matches_workflow(
     ):
         reason = (
             f"Document path {document.original_file}"
-            f" does not match {trigger.filter_path}",
+            f" does not match {trigger.filter_path}"
         )
         trigger_matched = False
 

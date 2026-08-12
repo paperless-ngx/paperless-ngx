@@ -1,15 +1,17 @@
-import { normalizeSync } from 'normalize-diacritics'
+import { diacritics } from 'normalize-diacritics/diacritics'
 
 export type SearchTextValue =
-  | string
-  | number
-  | boolean
-  | bigint
-  | null
-  | undefined
+  string | number | boolean | bigint | null | undefined
 
 export function normalizeSearchText(value: SearchTextValue): string {
-  return normalizeSync(String(value ?? '')).toLocaleLowerCase()
+  const normalized = diacritics.reduce(
+    (text, replacement) => {
+      return text.replace(replacement.diacritics, replacement.letter)
+    },
+    String(value ?? '')
+  )
+
+  return normalized.toLocaleLowerCase()
 }
 
 export function matchesSearchText(

@@ -151,6 +151,23 @@ the background.
 
 ### Bare Metal Route {#bare-metal-updating}
 
+!!! warning
+
+    Extracting a new release archive on top of an existing installation
+    (e.g. `tar -xf paperless-ngx-vX.Y.Z.tar.xz -C /opt/paperless`) only adds
+    and overwrites files -- it does not remove files that were deleted in
+    the new release. Leftover files from an old version, such as
+    superseded database migrations, can remain on disk and cause errors
+    like `NodeNotFoundError` during `manage.py migrate`.
+
+    Before unpacking a new release over an existing bare-metal
+    installation, remove the previous source tree first (everything
+    except your `media`, `data`, and `consume` directories and your
+    `paperless.conf`/`.env`), or unpack into a fresh directory and move
+    your persistent data and configuration over. Installations updated via
+    `git pull` on a clean checkout are not affected, since Git removes
+    files that no longer exist upstream.
+
 After grabbing the new release and unpacking the contents, do the
 following:
 
@@ -194,6 +211,16 @@ following:
 
     This is a no-op if the index is already up to date, so it is safe to
     run on every upgrade.
+
+5.  Migrate the LLM index if needed.
+
+    ```shell-session
+    cd src
+    python3 manage.py document_llmindex migrate
+    ```
+
+    This is a no-op if the index schema is already current, so it is safe
+    to run on every upgrade.
 
 ### Database Upgrades
 
@@ -515,7 +542,7 @@ index is updated automatically on the schedule set by
 can manage it manually:
 
 ```
-document_llmindex {rebuild,update,compact}
+document_llmindex {rebuild,update,compact,migrate}
 ```
 
 Specify `rebuild` to build the index from scratch from all documents in the database. Use

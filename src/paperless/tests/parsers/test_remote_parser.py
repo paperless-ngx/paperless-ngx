@@ -20,6 +20,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from documents.parsers import ParseError
 from paperless.parsers import ParserContext
 from paperless.parsers import ParserProtocol
 from paperless.parsers.remote import RemoteDocumentParser
@@ -337,20 +338,130 @@ class TestRemoteParserParse:
 
 
 # ---------------------------------------------------------------------------
+# parse() — produce_archive=False skips the remote engine (PDFs only)
+# ---------------------------------------------------------------------------
+
+
+class TestRemoteParserSkipsWhenNoArchiveWanted:
+    """When the caller has already decided no archive is needed for a PDF
+    (documents.consumer.should_produce_archive), the remote engine call is
+    skipped entirely in favor of locally-extracted text.
+    """
+
+    def test_pdf_skips_azure_when_no_archive_requested(
+        self,
+        remote_parser: RemoteDocumentParser,
+        simple_digital_pdf_file: Path,
+        azure_client: Mock,
+    ) -> None:
+        """
+        GIVEN: produce_archive=False for a PDF
+        WHEN:  parse() is called
+        THEN:  Azure is never invoked, no archive is produced, and text
+               comes from local pdftotext extraction
+        """
+        remote_parser.parse(
+            simple_digital_pdf_file,
+            "application/pdf",
+            produce_archive=False,
+        )
+
+        azure_client.begin_analyze_document.assert_not_called()
+        assert remote_parser.get_archive_path() is None
+        assert remote_parser.get_text() != ""
+
+    def test_pdf_no_archive_requested_text_matches_local_extraction(
+        self,
+        remote_parser: RemoteDocumentParser,
+        simple_digital_pdf_file: Path,
+        azure_client: Mock,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN: produce_archive=False for a PDF
+        WHEN:  parse() is called
+        THEN:  the returned text is exactly the locally-extracted text,
+               not anything from the (unused) Azure mock
+        """
+        mocker.patch(
+            "paperless.parsers.remote.extract_pdf_text",
+            return_value="Local digital text.",
+        )
+
+        remote_parser.parse(
+            simple_digital_pdf_file,
+            "application/pdf",
+            produce_archive=False,
+        )
+
+        assert remote_parser.get_text() == "Local digital text."
+
+    def test_pdf_no_archive_requested_closes_no_client(
+        self,
+        remote_parser: RemoteDocumentParser,
+        simple_digital_pdf_file: Path,
+        azure_client: Mock,
+    ) -> None:
+        remote_parser.parse(
+            simple_digital_pdf_file,
+            "application/pdf",
+            produce_archive=False,
+        )
+
+        azure_client.close.assert_not_called()
+
+    def test_non_pdf_still_calls_azure_when_no_archive_requested(
+        self,
+        remote_parser: RemoteDocumentParser,
+        simple_digital_pdf_file: Path,
+        azure_client: Mock,
+    ) -> None:
+        """
+        Images have no local-text fallback, so produce_archive=False does
+        not skip the remote engine for non-PDF MIME types.
+        """
+        remote_parser.parse(
+            simple_digital_pdf_file,
+            "image/png",
+            produce_archive=False,
+        )
+
+        azure_client.begin_analyze_document.assert_called_once()
+        assert remote_parser.get_text() == _DEFAULT_TEXT
+
+    @pytest.mark.usefixtures("no_engine_settings")
+    def test_unconfigured_engine_takes_precedence_over_skip(
+        self,
+        remote_parser: RemoteDocumentParser,
+        simple_digital_pdf_file: Path,
+    ) -> None:
+        """An unconfigured engine still short-circuits before the
+        produce_archive check, returning empty text as before.
+        """
+        remote_parser.parse(
+            simple_digital_pdf_file,
+            "application/pdf",
+            produce_archive=False,
+        )
+
+        assert remote_parser.get_text() == ""
+        assert remote_parser.get_archive_path() is None
+
+
+# ---------------------------------------------------------------------------
 # parse() — Azure failure path
 # ---------------------------------------------------------------------------
 
 
 class TestRemoteParserParseError:
-    def test_parse_returns_empty_on_azure_error(
+    def test_parse_raises_parse_error_on_azure_error(
         self,
         remote_parser: RemoteDocumentParser,
         simple_digital_pdf_file: Path,
         failing_azure_client: Mock,
     ) -> None:
-        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
-
-        assert remote_parser.get_text() == ""
+        with pytest.raises(ParseError, match="Azure AI Vision parsing failed"):
+            remote_parser.parse(simple_digital_pdf_file, "application/pdf")
 
     def test_parse_closes_client_on_error(
         self,
@@ -358,7 +469,8 @@ class TestRemoteParserParseError:
         simple_digital_pdf_file: Path,
         failing_azure_client: Mock,
     ) -> None:
-        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
+        with pytest.raises(ParseError):
+            remote_parser.parse(simple_digital_pdf_file, "application/pdf")
 
         failing_azure_client.close.assert_called_once()
 
@@ -371,7 +483,8 @@ class TestRemoteParserParseError:
     ) -> None:
         mock_log = mocker.patch("paperless.parsers.remote.logger")
 
-        remote_parser.parse(simple_digital_pdf_file, "application/pdf")
+        with pytest.raises(ParseError):
+            remote_parser.parse(simple_digital_pdf_file, "application/pdf")
 
         mock_log.exception.assert_called_once()
         assert "Azure AI Vision parsing failed" in mock_log.exception.call_args[0][0]

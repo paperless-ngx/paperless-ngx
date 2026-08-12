@@ -401,7 +401,7 @@ describe('WorkflowEditDialogComponent', () => {
     component.addFilter(triggerGroup as FormGroup)
 
     const filters = component.getFiltersFormArray(triggerGroup as FormGroup)
-    expect(filters.length).toBe(3)
+    expect(filters).toHaveLength(3)
 
     filters.at(0).get('values').setValue([1])
     filters.at(1).get('values').setValue([2, 3])
@@ -672,7 +672,7 @@ describe('WorkflowEditDialogComponent', () => {
     } as any
 
     const filters = component['buildFiltersFormArray'](trigger)
-    expect(filters.length).toBe(0)
+    expect(filters).toHaveLength(0)
 
     component.filterDefinitions = originalDefinitions
   })
@@ -739,7 +739,7 @@ describe('WorkflowEditDialogComponent', () => {
     component.ngOnInit()
     const triggerGroup = component.triggerFields.at(0) as FormGroup
     const filters = component.getFiltersFormArray(triggerGroup)
-    expect(filters.length).toBe(13)
+    expect(filters).toHaveLength(13)
     const customFieldFilter = filters.at(12) as FormGroup
     expect(customFieldFilter.get('type').value).toBe(
       TriggerFilterType.CustomFieldQuery
@@ -969,12 +969,12 @@ describe('WorkflowEditDialogComponent', () => {
     component.addFilter(triggerGroup)
 
     component.removeFilter(triggerGroup, 0)
-    expect(component.getFiltersFormArray(triggerGroup).length).toBe(0)
+    expect(component.getFiltersFormArray(triggerGroup)).toHaveLength(0)
 
     component.addFilter(triggerGroup)
     const filterArrayAfterAdd = component.getFiltersFormArray(triggerGroup)
     filterArrayAfterAdd.at(0).get('type').setValue(TriggerFilterType.TagsAll)
-    expect(component.getFiltersFormArray(triggerGroup).length).toBe(1)
+    expect(component.getFiltersFormArray(triggerGroup)).toHaveLength(1)
   })
 
   it('should remove selected custom field from the form group', () => {
@@ -1018,5 +1018,29 @@ describe('WorkflowEditDialogComponent', () => {
       'pass2',
       'pass3',
     ])
+  })
+
+  it('should parse passwords again when retrying a failed save', () => {
+    component.object = {
+      name: 'Workflow with blank Passwords',
+      id: 1,
+      order: null,
+      enabled: true,
+      triggers: [],
+      actions: [
+        {
+          id: 1,
+          type: WorkflowActionType.PasswordRemoval,
+          passwords: [],
+        },
+      ],
+    }
+    component.ngOnInit()
+
+    component.save()
+    component.objectForm.get('order').setValue(1)
+
+    expect(() => component.save()).not.toThrow()
+    expect(component.objectForm.get('actions').value[0].passwords).toEqual([])
   })
 })

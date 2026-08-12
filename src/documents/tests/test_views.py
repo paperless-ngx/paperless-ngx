@@ -79,10 +79,6 @@ class TestViews(DirectoriesMixin, TestCase):
                 f"frontend/{language_actual}/styles.css",
             )
             self.assertEqual(
-                response.context_data["runtime_js"],
-                f"frontend/{language_actual}/runtime.js",
-            )
-            self.assertEqual(
                 response.context_data["polyfills_js"],
                 f"frontend/{language_actual}/polyfills.js",
             )
@@ -176,6 +172,49 @@ class TestViews(DirectoriesMixin, TestCase):
         response.render()
         self.assertEqual(response.request["PATH_INFO"], "/accounts/login/")
         self.assertContains(response, b"Share link has expired")
+
+    def test_share_link_archive_falls_back_to_original(self) -> None:
+        """
+        GIVEN:
+            - A document without an archive version
+            - A share link using the default archive file version
+        WHEN:
+            - An unauthenticated request for the share link is made
+        THEN:
+            - The original document is returned
+        """
+        _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
+        content = b"This document has no archive"
+
+        with Path(filename).open("wb") as f:
+            f.write(content)
+
+        doc = Document.objects.create(
+            title="no archive",
+            filename=Path(filename).name,
+            mime_type="text/plain",
+        )
+
+        sharelink_permissions = Permission.objects.filter(
+            codename__contains="sharelink",
+        )
+        self.user.user_permissions.add(*sharelink_permissions)
+        self.client.force_login(self.user)
+
+        create_response = self.client.post(
+            "/api/share_links/",
+            {"document": doc.pk},
+        )
+        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
+        share_link = ShareLink.objects.get(document=doc)
+        self.assertEqual(share_link.file_version, ShareLink.FileVersion.ARCHIVE)
+
+        self.client.logout()
+
+        response = self.client.get(f"/share/{share_link.slug}")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(read_streaming_response(response), content)
 
     def test_list_with_full_permissions(self) -> None:
         """
@@ -451,6 +490,42 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
     @patch("documents.views.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
+        LLM_BACKEND="mock_backend",
+        LLM_MODEL="model-a",
+        LLM_ENDPOINT="http://endpoint-a",
+    )
+    def test_ai_suggestions_cache_key_includes_model_and_endpoint(
+        self,
+        mock_get_ai_classification,
+    ) -> None:
+        """Cached suggestions are keyed by model and endpoint, so switching
+        either yields a cache miss instead of a stale hit."""
+        mock_get_ai_classification.return_value = {
+            "title": "Answer A",
+            "tags": [],
+            "correspondents": [],
+            "document_types": [],
+            "storage_paths": [],
+            "dates": [],
+        }
+
+        self.client.force_login(user=self.user)
+        response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Cached under a key that carries model + endpoint...
+        self.assertIsNotNone(
+            get_llm_suggestion_cache(
+                self.document.pk,
+                backend="mock_backend:model-a:http://endpoint-a",
+            ),
+        )
+
+    @patch("documents.views.get_ai_document_classification")
+    @override_settings(
+        AI_ENABLED=True,
         LLM_BACKEND="openai-like",
     )
     def test_ai_suggestions_with_invalid_ai_configuration(
@@ -569,11 +644,11 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         self.assertIn(b"AI is required for this feature", response.content)
 
     @patch("documents.views.stream_chat_with_documents")
-    @patch("documents.views.get_objects_for_user_owner_aware")
+    @patch("documents.views.permitted_document_ids")
     @override_settings(AI_ENABLED=True)
-    def test_post_no_document_id(self, mock_get_objects, mock_stream_chat) -> None:
+    def test_post_no_document_id(self, mock_permitted_ids, mock_stream_chat) -> None:
         self.grant_view_document_permission()
-        mock_get_objects.return_value = [self.document]
+        mock_permitted_ids.return_value = [self.document.pk]
         mock_stream_chat.return_value = iter([b"data"])
         response = self.client.post(
             self.ENDPOINT,
@@ -582,6 +657,37 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "text/event-stream")
+        mock_stream_chat.assert_called_once()
+        call_kwargs = mock_stream_chat.call_args.kwargs
+        self.assertEqual(call_kwargs["query_str"], "question")
+        self.assertEqual(list(call_kwargs["documents"]), [self.document])
+        self.assertIsNone(call_kwargs["output_language"])
+
+    @patch("documents.views.stream_chat_with_documents")
+    @patch("documents.views.permitted_document_ids")
+    @override_settings(AI_ENABLED=True)
+    def test_post_uses_user_display_language(
+        self,
+        mock_permitted_ids,
+        mock_stream_chat,
+    ) -> None:
+        UiSettings.objects.create(user=self.user, settings={"language": "de-de"})
+        self.grant_view_document_permission()
+        mock_permitted_ids.return_value = [self.document.pk]
+        mock_stream_chat.return_value = iter([b"data"])
+
+        response = self.client.post(
+            self.ENDPOINT,
+            data='{"q": "question"}',
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        mock_stream_chat.assert_called_once()
+        call_kwargs = mock_stream_chat.call_args.kwargs
+        self.assertEqual(call_kwargs["query_str"], "question")
+        self.assertEqual(list(call_kwargs["documents"]), [self.document])
+        self.assertEqual(call_kwargs["output_language"], "de-de")
 
     @patch("documents.views.stream_chat_with_documents")
     @override_settings(AI_ENABLED=True)

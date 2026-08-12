@@ -386,10 +386,19 @@ class Command(CryptMixin, PaperlessCommand):
                 raise DeserializationError(
                     f"{model.__name__} has no updatable fields; PK-only models are not supported by the importer",
                 )
+            # MySQL/MariaDB support upserts via ON DUPLICATE KEY UPDATE but,
+            # unlike PostgreSQL/SQLite, cannot target a specific unique field
+            # for the conflict -- passing unique_fields there raises
+            # NotSupportedError.
+            unique_fields = (
+                [model._meta.pk.attname]
+                if connection.features.supports_update_conflicts_with_target
+                else None
+            )
             model.objects.bulk_create(  # type: ignore[attr-defined]
                 instances,
                 update_conflicts=True,
-                unique_fields=[model._meta.pk.attname],
+                unique_fields=unique_fields,
                 update_fields=update_fields,
             )
             loaded_models.add(model)

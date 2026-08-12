@@ -22,10 +22,14 @@
   }
 }
 
+.doc-img-container {
+  position: relative;
+  height: 180px;
+}
+
 .doc-img {
   object-fit: cover;
   object-position: top left;
-  height: 180px;
 }
 
 .document-card-check {

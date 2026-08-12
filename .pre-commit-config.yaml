@@ -29,7 +29,7 @@ repos:
       - id: check-case-conflict
       - id: detect-private-key
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.2
+    rev: v2.4.3
     hooks:
       - id: codespell
         additional_dependencies: [tomli]
@@ -38,7 +38,7 @@ repos:
           - json
   # See https://github.com/prettier/prettier/issues/15742 for the fork reason
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: 'v3.8.4'
+    rev: 'v3.9.6'
     hooks:
       - id: prettier
         types_or:
@@ -46,16 +46,16 @@ repos:
           - ts
           - markdown
         additional_dependencies:
-          - prettier@3.8.3
+          - prettier@3.9.6
           - 'prettier-plugin-organize-imports@4.3.0'
   # Python hooks
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.17
+    rev: v0.16.1
     hooks:
       - id: ruff-check
       - id: ruff-format
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: "v2.24.1"
+    rev: "v2.26.0"
     hooks:
       - id: pyproject-fmt
         additional_dependencies: [tomli]

@@ -1134,6 +1134,11 @@ def before_task_publish_handler(
         return
 
     try:
+        # Close stale connections without disrupting a transaction publishing a task
+        for connection in connections.all(initialized_only=True):
+            if not connection.in_atomic_block:
+                connection.close_if_unusable_or_obsolete()
+
         _, task_kwargs, _ = body
         task_id = headers["id"]
 
@@ -1264,7 +1269,17 @@ def task_failure_handler(
             "error_message": str(exception) if exception else "Unknown error",
         }
         if traceback:
-            tb_str = "".join(_tb.format_tb(traceback))
+            # billiard/celery pass a pre-formatted string instead of a real
+            # traceback object when the worker process itself died (e.g.
+            # WorkerLostError from a SIGILL) since there's no live traceback
+            # to walk in that case.
+            tb_str = (
+                traceback
+                if isinstance(traceback, str)
+                else "".join(
+                    _tb.format_tb(traceback),
+                )
+            )
             result_data["traceback"] = tb_str[:5000]
 
         now = timezone.now()

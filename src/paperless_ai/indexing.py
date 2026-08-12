@@ -1,3 +1,4 @@
+import enum
 import logging
 from collections.abc import Iterable
 from contextlib import contextmanager
@@ -5,6 +6,7 @@ from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from filelock import FileLock
 from filelock import ReadWriteLock
@@ -13,6 +15,7 @@ from filelock import Timeout
 from documents.models import Document
 from documents.models import PaperlessTask
 from documents.utils import IterWrapper
+from documents.utils import QuerySetStream
 from documents.utils import identity
 from paperless.config import AIConfig
 from paperless_ai.db import db_connection_released
@@ -30,6 +33,11 @@ logger = logging.getLogger("paperless_ai.indexing")
 
 RAG_NUM_OUTPUT = 512
 RAG_CHUNK_OVERLAP = 200
+
+# update_llm_index(): row count per .iterator() batch when streaming
+# documents for a rebuild/update via QuerySetStream, matching
+# _DocumentViewerStream's chunk size in documents/search/_backend.py.
+_INDEX_STREAM_CHUNK_SIZE = 1000
 
 
 def queue_llm_index_update_if_needed(*, rebuild: bool, reason: str) -> bool:
@@ -143,6 +151,24 @@ def _exclude_readers():
         lock.close()
 
 
+def _with_exclusive_access(operation: str, fn):
+    """Run ``fn()`` with exclusive index access (see ``_exclude_readers()``),
+    for compaction/migration file swaps that must not run while readers are
+    active. Returns ``fn()``'s result, or None (after logging) if active
+    readers do not drain within ``LLM_INDEX_COMPACTION_LOCK_TIMEOUT`` --
+    callers skip the operation this run; it retries next time.
+    """
+    try:
+        with _exclude_readers():
+            return fn()
+    except Timeout:
+        logger.info(
+            "Skipping LLM index %s: index readers are active; will retry next run.",
+            operation,
+        )
+        return None
+
+
 @contextmanager
 def write_store(embed_model_name: str | None = None):
     """Acquire the write lock and yield the vector store.
@@ -167,6 +193,65 @@ def write_store(embed_model_name: str | None = None):
         yield store
 
 
+class MigrationCheckResult(enum.Enum):
+    """Outcome of _check_and_run_migrations().
+
+    CURRENT: no migration was pending, or a pending structural migration
+    was applied successfully -- safe to write.
+
+    REEMBED_REQUIRED: a pending migration needs fresh embeddings, which is
+    never triggered automatically -- the caller must force a rebuild.
+
+    DEFERRED: a migration was pending but could not run because active
+    index readers did not drain within LLM_INDEX_COMPACTION_LOCK_TIMEOUT --
+    the store is still on its old schema. Callers must NOT proceed to
+    write: collapsing this into the same falsy value as CURRENT (as a
+    plain bool return once did) would let a write proceed against an
+    unmigrated schema.
+    """
+
+    CURRENT = "current"
+    REEMBED_REQUIRED = "reembed_required"
+    DEFERRED = "deferred"
+
+
+def _check_and_run_migrations(
+    store: "PaperlessSqliteVecVectorStore",
+) -> MigrationCheckResult:
+    """Run any pending structural migrations, reporting the outcome as a
+    tri-state result. Safe to call before any write, including
+    delete()/upsert_document(): has_pending_migration() (see its docstring)
+    keeps this a no-op, with no exclusive access taken, once the store is
+    current.
+    """
+    if not store.has_pending_migration():
+        return MigrationCheckResult.CURRENT
+    result = _with_exclusive_access(
+        "migration check",
+        store.check_and_run_migrations,
+    )
+    if result is None:
+        return MigrationCheckResult.DEFERRED
+    return (
+        MigrationCheckResult.REEMBED_REQUIRED
+        if result
+        else MigrationCheckResult.CURRENT
+    )
+
+
+def _safe_related_name(document: Document, field: str) -> str | None:
+    """
+    Returns the ``name`` of a related object (correspondent, document_type,
+    storage_path), or None if the FK is unset or points at a row that has
+    since been deleted (e.g. concurrently with this call).
+    """
+    try:
+        related = getattr(document, field)
+    except ObjectDoesNotExist:
+        return None
+    return related.name if related else None
+
+
 def build_document_node(
     document: Document,
     *,
@@ -180,14 +265,10 @@ def build_document_node(
         "document_id": str(document.id),
         "title": document.title,
         "tags": [t.name for t in document.tags.all()],
-        "correspondent": document.correspondent.name
-        if document.correspondent
-        else None,
-        "document_type": document.document_type.name
-        if document.document_type
-        else None,
+        "correspondent": _safe_related_name(document, "correspondent"),
+        "document_type": _safe_related_name(document, "document_type"),
         "filename": document.filename,
-        "storage_path": document.storage_path.name if document.storage_path else None,
+        "storage_path": _safe_related_name(document, "storage_path"),
         "archive_serial_number": document.archive_serial_number,
         "created": document.created.isoformat() if document.created else None,
         "added": document.added.isoformat() if document.added else None,
@@ -291,7 +372,24 @@ def _document_id_filters(doc_ids):
             MetadataFilter(
                 key="document_id",
                 operator=FilterOperator.IN,
-                value=sorted(doc_ids),
+                value=list(doc_ids),
+            ),
+        ],
+    )
+
+
+def _exclude_document_id_filter(document_id: int | str):
+    """Return a MetadataFilters NE filter excluding ``document_id``."""
+    from llama_index.core.vector_stores.types import FilterOperator
+    from llama_index.core.vector_stores.types import MetadataFilter
+    from llama_index.core.vector_stores.types import MetadataFilters
+
+    return MetadataFilters(
+        filters=[
+            MetadataFilter(
+                key="document_id",
+                operator=FilterOperator.NE,
+                value=str(document_id),
             ),
         ],
     )
@@ -301,24 +399,37 @@ def update_llm_index(
     *,
     iter_wrapper: IterWrapper[Document] = identity,
     rebuild=False,
+    document_ids: Iterable[int] | None = None,
 ) -> str:
-    """Rebuild or incrementally update the LLM index."""
+    """Rebuild or incrementally update the LLM index.
+
+    ``document_ids``, when given, scopes an incremental update to just those
+    documents instead of scanning the whole library -- callers that already
+    know which documents changed (e.g. a bulk edit) should pass this to avoid
+    an O(library size) scan per call. Ignored whenever a rebuild actually
+    happens, since a rebuild always covers the whole library regardless.
+    """
     with write_store() as store:
-        try:
-            with _exclude_readers():
-                needs_reembed = store.check_and_run_migrations()
-        except Timeout:
-            logger.info(
-                "Skipping LLM index migration check: index readers are active; "
-                "will retry next run.",
-            )
-            needs_reembed = False
-        if needs_reembed:
+        migration_result = _check_and_run_migrations(store)
+        if migration_result is MigrationCheckResult.REEMBED_REQUIRED:
             logger.warning(
                 "LLM index migration requires re-embedding; forcing rebuild.",
             )
             rebuild = True
-    documents = Document.objects.all()
+        elif migration_result is MigrationCheckResult.DEFERRED:
+            logger.info(
+                "Skipping LLM index update: migration check deferred while "
+                "index readers are active; will retry next run.",
+            )
+            return (
+                "Skipping LLM index update: migration check deferred; "
+                "will retry next run."
+            )
+    documents = Document.objects.select_related(
+        "correspondent",
+        "document_type",
+        "storage_path",
+    ).prefetch_related("tags", "notes", "custom_fields__field")
     no_documents = not documents.exists()
 
     # Fast exit before touching config: nothing to index and no existing index.
@@ -329,12 +440,11 @@ def update_llm_index(
     config = AIConfig()
     model_name = get_configured_model_name(config)
 
-    if not rebuild and llm_index_exists():
+    if not rebuild:
         with read_store() as store:
-            config_mismatch = store.config_mismatch(model_name)
-        if config_mismatch:
-            logger.warning("Embedding model changed; forcing LLM index rebuild.")
-            rebuild = True
+            if store.table_exists() and store.config_mismatch(model_name):
+                logger.warning("Embedding model changed; forcing LLM index rebuild.")
+                rebuild = True
 
     if no_documents:
         logger.warning("No documents found to index.")
@@ -346,15 +456,24 @@ def update_llm_index(
         if rebuild or not store.table_exists():
             logger.info("Rebuilding LLM index.")
             store.drop_table()
-            for document in iter_wrapper(documents):
+            for document in iter_wrapper(
+                QuerySetStream(documents, chunk_size=_INDEX_STREAM_CHUNK_SIZE),
+            ):
                 nodes = build_document_node(document, chunk_size=chunk_size)
                 _embed_nodes(nodes, embed_model)
                 store.add(nodes)
             msg = "LLM index rebuilt successfully."
         else:
+            scoped_documents = (
+                documents.filter(id__in=document_ids)
+                if document_ids is not None
+                else documents
+            )
             existing = store.get_modified_times()
             changed = 0
-            for document in iter_wrapper(documents):
+            for document in iter_wrapper(
+                QuerySetStream(scoped_documents, chunk_size=_INDEX_STREAM_CHUNK_SIZE),
+            ):
                 doc_id = str(document.id)
                 if existing.get(doc_id) == document.modified.isoformat():
                     continue
@@ -368,14 +487,7 @@ def update_llm_index(
                 else "No changes detected in LLM index."
             )
 
-        try:
-            with _exclude_readers():
-                store.compact()
-        except Timeout:
-            logger.info(
-                "Skipping LLM index compaction: index readers are active; "
-                "will retry next run.",
-            )
+        _with_exclusive_access("compaction", store.compact)
     return msg
 
 
@@ -390,25 +502,82 @@ def llm_index_add_or_update_document(document: Document):
         _embed_nodes(new_nodes, get_embedding_model(config))
 
     with write_store(embed_model_name=get_configured_model_name(config)) as store:
+        migration_result = _check_and_run_migrations(store)
+        if migration_result is MigrationCheckResult.REEMBED_REQUIRED:
+            logger.warning(
+                "Skipping incremental LLM index update for document %s: the "
+                "index requires re-embedding first. Run 'document_llmindex "
+                "rebuild' to resolve.",
+                document.id,
+            )
+            return
+        if migration_result is MigrationCheckResult.DEFERRED:
+            logger.info(
+                "Skipping incremental LLM index update for document %s: "
+                "migration check deferred while index readers are active; "
+                "will retry on the next write.",
+                document.id,
+            )
+            return
         store.upsert_document(str(document.id), new_nodes)
+
+
+def llm_index_migrate() -> None:
+    """Apply any pending LLM index schema migrations, with no reindex.
+
+    Intended to run unconditionally on every startup (see the
+    init-llmindex-migrate container step and the bare-metal upgrade docs):
+    has_pending_migration() short-circuits to a metadata-only read once the
+    store is current, so a healthy install pays almost nothing here. Only
+    ever applies structural migrations -- a pending re-embed migration is
+    left for the explicit, deliberate rebuild path (``document_llmindex
+    update``/``rebuild``) to resolve, since re-embedding can be slow and,
+    for a metered embedding backend, cost money.
+    """
+    if not AIConfig().llm_index_enabled:
+        return
+    with write_store() as store:
+        migration_result = _check_and_run_migrations(store)
+    if migration_result is MigrationCheckResult.REEMBED_REQUIRED:
+        logger.warning(
+            "LLM index requires re-embedding, which this automatic migration "
+            "check will not do on its own -- it can be slow and, for a "
+            "metered embedding backend, cost money. Run "
+            "'document_llmindex rebuild' manually when ready.",
+        )
+    elif migration_result is MigrationCheckResult.DEFERRED:
+        logger.info(
+            "LLM index migration check deferred while index readers are "
+            "active; will retry next run.",
+        )
 
 
 def llm_index_compact() -> None:
     """Compact the index immediately, rebuilding the table to reclaim space."""
     with write_store() as store:
-        try:
-            with _exclude_readers():
-                store.compact(force=True)
-        except Timeout:
-            logger.info(
-                "Skipping LLM index compaction: index readers are active; "
-                "will retry next run.",
-            )
+        _with_exclusive_access("compaction", lambda: store.compact(force=True))
 
 
 def llm_index_remove_document(document: Document):
     """Remove a document's chunks from the LLM index."""
     with write_store() as store:
+        migration_result = _check_and_run_migrations(store)
+        if migration_result is MigrationCheckResult.REEMBED_REQUIRED:
+            logger.warning(
+                "Skipping removal of document %s from the LLM index: the "
+                "index requires re-embedding first. Run 'document_llmindex "
+                "rebuild' to resolve.",
+                document.id,
+            )
+            return
+        if migration_result is MigrationCheckResult.DEFERRED:
+            logger.info(
+                "Skipping removal of document %s from the LLM index: "
+                "migration check deferred while index readers are active; "
+                "will retry on the next write.",
+                document.id,
+            )
+            return
         store.delete(str(document.id))
 
 
@@ -481,10 +650,18 @@ def query_similar_documents(
     config = AIConfig()
 
     from llama_index.core.retrievers import VectorIndexRetriever
+    from llama_index.core.vector_stores.types import FilterCondition
+    from llama_index.core.vector_stores.types import MetadataFilters
+
+    filter_parts = []
+    if allowed_document_ids is not None:
+        filter_parts.extend(_document_id_filters(allowed_document_ids).filters)
+    if document.pk is not None:
+        filter_parts.extend(_exclude_document_id_filter(document.pk).filters)
 
     filters = (
-        _document_id_filters(allowed_document_ids)
-        if allowed_document_ids is not None
+        MetadataFilters(filters=filter_parts, condition=FilterCondition.AND)
+        if filter_parts
         else None
     )
 

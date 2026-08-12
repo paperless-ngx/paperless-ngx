@@ -767,6 +767,8 @@ class TestConsumer(
         root_doc.archive_serial_number = 42
         root_doc.save()
 
+        original_modified = timezone.now() - datetime.timedelta(days=1)
+        Document.objects.filter(pk=root_doc.pk).update(modified=original_modified)
         actor = User.objects.create_user(
             username="actor",
             email="actor@example.com",
@@ -818,6 +820,8 @@ class TestConsumer(
         self.assertIsNone(version.archive_serial_number)
         self.assertEqual(version.original_filename, version_file.name)
         self.assertTrue(bool(version.content))
+        root_doc.refresh_from_db()
+        self.assertGreater(root_doc.modified, original_modified)
 
     @override_settings(AUDIT_LOG_ENABLED=True)
     @mock.patch("documents.consumer.load_classifier")
@@ -1325,7 +1329,7 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
         with self.get_consumer(self.test_file) as c:
             c.run()
             # Verify no pre-consume script subprocess was invoked
-            # (run_subprocess may still be called by _extract_text_for_archive_check)
+            # (run_subprocess may still be called by pdf_born_digital_text via pdftotext)
             script_calls = [
                 call
                 for call in m.call_args_list
@@ -1350,7 +1354,7 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                     self.assertTrue(m.called)
 
                     # Find the call that invoked the pre-consume script
-                    # (run_subprocess may also be called by _extract_text_for_archive_check)
+                    # (run_subprocess may also be called by pdf_born_digital_text via pdftotext)
                     script_call = next(
                         call
                         for call in m.call_args_list

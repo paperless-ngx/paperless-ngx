@@ -6,17 +6,17 @@
   <div ngbDropdownMenu class="dropdown-menu-end shadow p-3" aria-labelledby="chatDropdown">
     <div class="chat-container bg-light p-2">
       <div class="chat-messages font-monospace small">
-        @for (message of messages; track message) {
+        @for (message of messages(); track message) {
           <div class="message d-flex flex-row small" [class.justify-content-end]="message.role === 'user'">
             <div class="p-2 m-2" [class.bg-body]="message.role === 'user'">
-              <span>
+              <span class="text-break">
                 {{ message.content }}
                 @if (message.isStreaming) { <span class="blinking-cursor">|</span> }
               </span>
               @if (message.role === 'assistant' && message.references?.length) {
                 <div class="chat-references list-group mt-3">
                   @for (reference of message.references; track reference.id) {
-                    <a class="list-group-item list-group-item-action text-primary" [routerLink]="['/documents', reference.id]">
+                    <a class="list-group-item list-group-item-action d-flex text-primary text-break" [routerLink]="['/documents', reference.id]">
                       <i-bs width="0.9em" height="0.9em" name="file-text" class="me-1"></i-bs><span>{{ reference.title }}</span>
                     </a>
                   }
@@ -29,16 +29,19 @@
       </div>
 
       <form class="chat-input">
+        <label class="visually-hidden" for="chatInput" i18n>Message</label>
         <div class="input-group">
           <input
             #chatInput
+            id="chatInput"
             class="form-control form-control-sm" name="chatInput" type="text"
             [placeholder]="placeholder"
-            [disabled]="loading"
-            [(ngModel)]="input"
+            [disabled]="loading()"
+            [ngModel]="input()"
+            (ngModelChange)="input.set($event)"
             (keydown)="searchInputKeyDown($event)"
             />
-          <button class="btn btn-sm btn-secondary" type="button" (click)="sendMessage()" [disabled]="loading">Send</button>
+          <button class="btn btn-sm btn-secondary" type="button" (click)="sendMessage()" [disabled]="loading()">Send</button>
         </div>
       </form>
     </div>

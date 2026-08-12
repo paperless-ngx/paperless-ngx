@@ -26,7 +26,7 @@
             <th scope="col" style="width: 40px;">
               <div class="form-check m-0 ms-2 me-n2">
                 <input type="checkbox" class="form-check-input" id="all-objects" [ngModel]="toggleAllEnabled()" (ngModelChange)="toggleAllEnabled.set($event)" [disabled]="processedMails().length === 0" (click)="toggleAll($event); $event.stopPropagation();">
-                <label class="form-check-label" for="all-objects"></label>
+                <label class="form-check-label" for="all-objects"><span class="visually-hidden" i18n>Select all processed email messages</span></label>
               </div>
             </th>
             <th scope="col" i18n>Subject</th>

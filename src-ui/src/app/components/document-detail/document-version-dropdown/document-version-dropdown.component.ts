@@ -7,6 +7,7 @@ import {
   OnChanges,
   OnDestroy,
   Output,
+  signal,
   SimpleChanges,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
@@ -59,9 +60,9 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
   @Output() versionsUpdated = new EventEmitter<DocumentVersionInfo[]>()
 
   newVersionLabel: string = ''
-  versionUploadState: UploadState = UploadState.Idle
-  versionUploadError: string | null = null
-  savingVersionLabelId: number | null = null
+  readonly versionUploadState = signal(UploadState.Idle)
+  readonly versionUploadError = signal<string | null>(null)
+  readonly savingVersionLabelId = signal<number | null>(null)
   editingVersionId: number | null = null
   versionLabelDraft: string = ''
 
@@ -101,7 +102,7 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
   beginEditingVersion(version: DocumentVersionInfo, event?: Event): void {
     event?.preventDefault()
     event?.stopPropagation()
-    if (!this.canEditLabels || this.savingVersionLabelId !== null) return
+    if (!this.canEditLabels || this.savingVersionLabelId() !== null) return
     this.editingVersionId = version.id
     this.versionLabelDraft = version.version_label ?? ''
   }
@@ -116,7 +117,7 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
   submitEditedVersionLabel(version: DocumentVersionInfo, event?: Event): void {
     event?.preventDefault()
     event?.stopPropagation()
-    if (this.savingVersionLabelId !== null) return
+    if (this.savingVersionLabelId() !== null) return
     const nextLabel = this.versionLabelDraft?.trim() || null
     const currentLabel = version.version_label?.trim() || null
     if (nextLabel === currentLabel) {
@@ -158,15 +159,15 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
   }
 
   saveVersionLabel(versionId: number, versionLabel: string | null): void {
-    if (this.savingVersionLabelId !== null) return
-    this.savingVersionLabelId = versionId
+    if (this.savingVersionLabelId() !== null) return
+    this.savingVersionLabelId.set(versionId)
     this.documentsService
       .updateVersionLabel(this.documentId, versionId, versionLabel)
       .pipe(
         first(),
         finalize(() => {
-          if (this.savingVersionLabelId === versionId) {
-            this.savingVersionLabelId = null
+          if (this.savingVersionLabelId() === versionId) {
+            this.savingVersionLabelId.set(null)
           }
         }),
         takeUntil(this.destroy$)
@@ -199,8 +200,8 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
     const file = input.files[0]
     input.value = ''
     const label = this.newVersionLabel?.trim()
-    this.versionUploadState = UploadState.Uploading
-    this.versionUploadError = null
+    this.versionUploadState.set(UploadState.Uploading)
+    this.versionUploadError.set(null)
     this.documentsService
       .uploadVersion(uploadDocumentId, file, label)
       .pipe(
@@ -210,7 +211,7 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
             $localize`Uploading new version. Processing will happen in the background.`
           )
           this.newVersionLabel = ''
-          this.versionUploadState = UploadState.Processing
+          this.versionUploadState.set(UploadState.Processing)
         }),
         map((taskId) =>
           typeof taskId === 'string'
@@ -219,8 +220,8 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
         ),
         switchMap((taskId) => {
           if (!taskId) {
-            this.versionUploadState = UploadState.Failed
-            this.versionUploadError = $localize`Missing task ID.`
+            this.versionUploadState.set(UploadState.Failed)
+            this.versionUploadError.set($localize`Missing task ID.`)
             return of(null)
           }
           return merge(
@@ -240,9 +241,10 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
         switchMap((result) => {
           if (result?.state !== 'success') {
             if (result?.state === 'failed') {
-              this.versionUploadState = UploadState.Failed
-              this.versionUploadError =
+              this.versionUploadState.set(UploadState.Failed)
+              this.versionUploadError.set(
                 result.message || $localize`Upload failed.`
+              )
             }
             return of(null)
           }
@@ -264,8 +266,10 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
         },
         error: (error) => {
           if (uploadDocumentId !== this.documentId) return
-          this.versionUploadState = UploadState.Failed
-          this.versionUploadError = error?.message || $localize`Upload failed.`
+          this.versionUploadState.set(UploadState.Failed)
+          this.versionUploadError.set(
+            error?.message || $localize`Upload failed.`
+          )
           this.toastService.showError(
             $localize`Error uploading new version`,
             error
@@ -275,7 +279,7 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
   }
 
   clearVersionUploadStatus(): void {
-    this.versionUploadState = UploadState.Idle
-    this.versionUploadError = null
+    this.versionUploadState.set(UploadState.Idle)
+    this.versionUploadError.set(null)
   }
 }

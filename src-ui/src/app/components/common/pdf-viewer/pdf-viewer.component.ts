@@ -13,6 +13,7 @@ import {
   ViewChild,
 } from '@angular/core'
 import {
+  AnnotationMode,
   getDocument,
   GlobalWorkerOptions,
   PDFDocumentLoadingTask,
@@ -43,6 +44,7 @@ export class PngxPdfViewerComponent
   private readonly document = inject<Document>(DOCUMENT)
 
   @Input() src!: string
+  @Input() sourceRevision = 0
   @Input() password?: string
   @Input() page?: number
   @Output() pageChange = new EventEmitter<number>()
@@ -93,7 +95,7 @@ export class PngxPdfViewerComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['src'] || changes['password']) {
+    if (changes['src'] || changes['sourceRevision'] || changes['password']) {
       this.resetViewerState()
       if (this.src) {
         this.loadDocument()
@@ -115,7 +117,10 @@ export class PngxPdfViewerComponent
       changes['zoomScale'] ||
       changes['rotation']
     ) {
-      this.applyViewerState()
+      // Prevent loop with page / scale application see https://github.com/paperless-ngx/paperless-ngx/issues/13404
+      this.applyViewerState(
+        !!(changes['zoom'] || changes['zoomScale'] || changes['rotation'])
+      )
     }
 
     if (changes['searchQuery']) {
@@ -217,6 +222,8 @@ export class PngxPdfViewerComponent
       linkService: this.linkService,
       findController: this.findController,
       textLayerMode,
+      annotationMode: AnnotationMode.ENABLE,
+      enableSelectionRendering: false,
       removePageBorders: true,
     }
 
@@ -239,7 +246,7 @@ export class PngxPdfViewerComponent
     }
   }
 
-  private applyViewerState(): void {
+  private applyViewerState(applyScale = true): void {
     if (!this.pdfViewer) {
       return
     }
@@ -256,12 +263,14 @@ export class PngxPdfViewerComponent
         Math.max(Math.trunc(this.page), 1),
         this.pdfViewer.pagesCount
       )
-      this.pdfViewer.currentPageNumber = nextPage
+      if (nextPage !== this.pdfViewer.currentPageNumber) {
+        this.pdfViewer.currentPageNumber = nextPage
+      }
     }
     if (this.page === this.lastViewerPage) {
       this.lastViewerPage = undefined
     }
-    if (hasPages) {
+    if (hasPages && applyScale) {
       this.applyScale()
     }
     this.dispatchFindIfReady()

@@ -2000,6 +2000,55 @@ class TestWorkflows(
                 r"Doc added in \w{3,}",
             )  # Match any 3-letter month name
 
+    def test_document_updated_workflow_existing_custom_field_empty_value(self) -> None:
+        """
+        GIVEN:
+            - Existing workflow with UPDATED trigger and action that assigns a custom field
+              with an empty value
+        WHEN:
+            - Document is updated that already contains the field with a value
+        THEN:
+            - The existing value is left untouched, see GH #13627
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+            filter_has_document_type=self.dt,
+        )
+        action = WorkflowAction.objects.create()
+        action.assign_custom_fields.add(self.cf1)
+        action.assign_custom_fields_values = {self.cf1.pk: ""}
+        action.save()
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=self.cf1,
+            value_text="existing value",
+        )
+
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+
+        self.client.patch(
+            f"/api/documents/{doc.id}/",
+            {"document_type": self.dt.id},
+            format="json",
+        )
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.custom_fields.get(field=self.cf1).value, "existing value")
+
     def test_document_updated_workflow_existing_custom_field(self) -> None:
         """
         GIVEN:
@@ -2936,6 +2985,69 @@ class TestWorkflows(
         doc.refresh_from_db()
         self.assertEqual(doc.title, "workflow renamed")
         self.assertFalse(doc.tags.filter(pk=self.t1.pk).exists())
+        self.assertTrue(doc.tags.filter(pk=self.t2.pk).exists())
+
+    def test_document_updated_workflow_assignment_storage_path_persists_with_tag_assignment(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A document updated workflow filtered on a tag
+            - One assignment action assigns a storage path, a second (later-ordered)
+              assignment action adds a tag
+        WHEN:
+            - The document is updated and the workflow is triggered
+        THEN:
+            - Both the tag and the storage path are persisted
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        trigger.filter_has_tags.add(self.t1)
+        assign_storage_path = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            assign_storage_path=self.sp,
+            order=0,
+        )
+        assign_tag = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            order=1,
+        )
+        assign_tag.assign_tags.add(self.t2)
+        assign_tag.save()
+
+        workflow = Workflow.objects.create(
+            name="Workflow assign storage path then tag",
+            order=0,
+        )
+        workflow.triggers.add(trigger)
+        workflow.actions.add(assign_storage_path, assign_tag)
+        workflow.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            mime_type="application/pdf",
+            checksum="assign-tag-and-storage-path",
+            original_filename="sample.pdf",
+        )
+        generated = generate_unique_filename(doc)
+        destination = (settings.ORIGINALS_DIR / generated).resolve()
+        create_source_path_directory(destination)
+        shutil.copy(self.SAMPLE_DIR / "simple.pdf", destination)
+        Document.objects.filter(pk=doc.pk).update(filename=generated.as_posix())
+        doc.refresh_from_db()
+        doc.tags.set([self.t1])
+
+        superuser = User.objects.create_superuser("superuser")
+        self.client.force_authenticate(user=superuser)
+        self.client.patch(
+            f"/api/documents/{doc.id}/",
+            {"title": "user update to trigger workflow"},
+            format="json",
+        )
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.storage_path, self.sp)
         self.assertTrue(doc.tags.filter(pk=self.t2.pk).exists())
 
     def test_removal_action_document_updated_removeall(self) -> None:

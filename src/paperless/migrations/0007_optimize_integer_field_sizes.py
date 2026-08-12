@@ -5,12 +5,30 @@ from django.db import migrations
 from django.db import models
 
 
+def clamp_applicationconfiguration_integer_fields(apps, schema_editor):
+    # Clamp barcode_dpi, barcode_max_pages, image_dpi and pages because of
+    # PositiveIntegerField --> PositiveSmallIntegerField
+    ApplicationConfiguration = apps.get_model("paperless", "ApplicationConfiguration")
+    ApplicationConfiguration.objects.filter(barcode_dpi__gt=32767).update(
+        barcode_dpi=32767,
+    )
+    ApplicationConfiguration.objects.filter(barcode_max_pages__gt=32767).update(
+        barcode_max_pages=32767,
+    )
+    ApplicationConfiguration.objects.filter(image_dpi__gt=32767).update(image_dpi=32767)
+    ApplicationConfiguration.objects.filter(pages__gt=32767).update(pages=32767)
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ("paperless", "0006_applicationconfiguration_barcode_tag_split"),
     ]
 
     operations = [
+        migrations.RunPython(
+            clamp_applicationconfiguration_integer_fields,
+            migrations.RunPython.noop,
+        ),
         migrations.AlterField(
             model_name="applicationconfiguration",
             name="barcode_dpi",

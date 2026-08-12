@@ -522,22 +522,36 @@ do CORS calls. Set this to your public domain name.
 fail2ban with log entries for failed authorization attempts. Value should be
 IP address(es).
 
-    This setting also controls allauth's
-    [`ALLAUTH_TRUSTED_PROXY_COUNT`](https://docs.allauth.org/en/latest/account/configuration.html),
-    which is set to the number of proxies listed here. Without this,
-    allauth cannot determine the client IP address for rate limiting when
-    running behind a reverse proxy, resulting in a `403 Forbidden` on login.
+    By default, this setting also controls allauth's trusted proxy count,
+    which is set to the number of proxies listed here. Override that default
+    with [`PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT`](#PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT)
+    when the list length does not match the number of proxy hops.
 
     Defaults to empty string.
+
+#### [`PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT=<integer>`](#PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT) {#PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT}
+
+: Sets allauth's
+[`ALLAUTH_TRUSTED_PROXY_COUNT`](https://docs.allauth.org/en/latest/common/rate_limits.html#configuration).
+This is the number of trusted proxy **hops** represented in each
+`X-Forwarded-For` header, not the number of IP addresses through which those
+proxies may be reached. For example, a single dual-stack proxy is one hop even
+when its IPv4 and IPv6 addresses are both listed in
+[`PAPERLESS_TRUSTED_PROXIES`](#PAPERLESS_TRUSTED_PROXIES).
+
+    Only trust `X-Forwarded-For` when untrusted clients cannot connect directly
+    to Paperless-ngx.
+
+    Defaults to the number of entries in `PAPERLESS_TRUSTED_PROXIES`.
 
 #### [`PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER=<header-name>`](#PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER) {#PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER}
 
 : Sets allauth's
-[`ALLAUTH_TRUSTED_CLIENT_IP_HEADER`](https://docs.allauth.org/en/latest/account/configuration.html).
+[`ALLAUTH_TRUSTED_CLIENT_IP_HEADER`](https://docs.allauth.org/en/latest/common/rate_limits.html#configuration).
 Use this when your reverse proxy sets a dedicated header for the real
 client IP instead of `X-Forwarded-For`, for example `X-Real-IP` (nginx)
 or `CF-Connecting-IP` (Cloudflare). When set, this takes precedence over
-[`PAPERLESS_TRUSTED_PROXIES`](#PAPERLESS_TRUSTED_PROXIES).
+`PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT`.
 
     Defaults to none.
 
@@ -918,8 +932,8 @@ for display in the web interface.
     | Document type              | `never` | `auto` (default)           | `always` |
     | -------------------------- | ------- | -------------------------- | -------- |
     | Scanned image (TIFF, JPEG) | No      | **Yes**                    | Yes      |
-    | Image-based PDF            | No      | **Yes** (short/no text, untagged) | Yes |
-    | Born-digital PDF           | No      | No (tagged or has embedded text)  | Yes |
+    | Image-based PDF            | No      | **Yes** (no embedded text) | Yes |
+    | Born-digital PDF           | No      | No (has embedded text, optionally confirmed by tag) | Yes |
     | Plain text, email, HTML    | No      | No                         | No       |
     | DOCX / ODT (via Tika)      | Yes\*   | Yes\*                      | Yes\*    |
 
@@ -934,10 +948,11 @@ for display in the web interface.
 
     !!! note
 
-        The **remote OCR parser** (Azure AI) always produces a searchable
-        PDF and stores it as the archive copy, regardless of this setting.
-        `ARCHIVE_FILE_GENERATION=never` has no effect when the remote
-        parser handles a document.
+        The **remote OCR parser** (Azure AI) also honors this setting: when
+        no archive is requested (`never`, or `auto` with a born-digital PDF),
+        the remote engine is skipped entirely and locally-extracted text is
+        used instead, avoiding an unnecessary API call and a duplicate text
+        layer.
 
 #### [`PAPERLESS_OCR_CLEAN=<mode>`](#PAPERLESS_OCR_CLEAN) {#PAPERLESS_OCR_CLEAN}
 
@@ -1159,19 +1174,21 @@ still perform some basic text pre-processing before matching.
 
 #### [`PAPERLESS_DATE_PARSER_LANGUAGES=<lang>`](#PAPERLESS_DATE_PARSER_LANGUAGES) {#PAPERLESS_DATE_PARSER_LANGUAGES}
 
-Specifies which language Paperless should use when parsing dates from documents.
+: Specifies which language Paperless should use when parsing dates from documents.
 
-    This should be a language code supported by the dateparser library,
-    for example: "en", or a combination such as "en+de".
-    Locales are also supported (e.g., "en-AU").
-    Multiple languages can be combined using "+", for example: "en+de" or "en-AU+de".
-    For valid values, refer to the list of supported languages and locales in the [dateparser documentation](https://dateparser.readthedocs.io/en/latest/supported_locales.html).
+: This should be a language code supported by the dateparser library,
+for example: "en", or a combination such as "en+de".
+Locales are also supported (e.g., "en-AU").
+Multiple languages can be combined using "+", for example: "en+de" or "en-AU+de".
+For valid values, refer to the list of supported languages and locales in the [dateparser documentation](https://dateparser.readthedocs.io/en/latest/supported_locales.html).
 
-    Set this to match the languages in which most of your documents are written.
+: Set this to match the languages in which most of your documents are written.
+
     If not set, Paperless will attempt to infer the language(s) from the OCR configuration (`PAPERLESS_OCR_LANGUAGE`).
 
-!!! note
-This format differs from the `PAPERLESS_OCR_LANGUAGE` setting, which uses ISO 639-2 codes (3 letters, e.g., "eng+deu" for Tesseract OCR).
+    !!! note
+
+        This format differs from the `PAPERLESS_OCR_LANGUAGE` setting, which uses ISO 639-2 codes (3 letters, e.g., "eng+deu" for Tesseract OCR).
 
 #### [`PAPERLESS_EMAIL_TASK_CRON=<cron expression>`](#PAPERLESS_EMAIL_TASK_CRON) {#PAPERLESS_EMAIL_TASK_CRON}
 
@@ -1344,12 +1361,15 @@ don't exist yet.
 #### [`PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>`](#PAPERLESS_CONSUMER_IGNORE_PATTERNS) {#PAPERLESS_CONSUMER_IGNORE_PATTERNS}
 
 : Additional regex patterns for files to ignore in the consumption directory. Patterns are matched against filenames only (not full paths)
-using Python's `re.match()`, which anchors at the start of the filename.
+using Python's `re.search()`. Use `^` to anchor a pattern to the start of the filename and `$` to anchor it to the end.
 
     See the [watchfiles documentation](https://watchfiles.helpmanual.io/api/filters/#watchfiles.BaseFilter.ignore_entity_patterns)
 
     This setting is for additional patterns beyond the built-in defaults. Common system files and directories are already ignored automatically.
     The patterns will be compiled via Python's standard `re` module.
+
+    These are regular expressions, not glob patterns. For example, the glob pattern `._*` does not mean "starts with `._`" when used as a
+    regular expression; it matches nearly any non-empty filename. Use `^\._.*` for that behavior instead.
 
     Example custom patterns:
 
@@ -1365,7 +1385,11 @@ using Python's `re.match()`, which anchors at the start of the filename.
 
     Defaults to `[]` (empty list, uses only built-in defaults).
 
-    The default ignores are `[.DS_Store, .DS_STORE, ._*, desktop.ini, Thumbs.db]` and cannot be overridden.
+    The built-in file patterns are equivalent to the following regular expressions and cannot be overridden:
+
+    ```json
+    ["^\\.DS_Store$", "^\\.DS_STORE$", "^\\._.*", "^desktop\\.ini$", "^Thumbs\\.db$"]
+    ```
 
 #### [`PAPERLESS_CONSUMER_IGNORE_DIRS=<json>`](#PAPERLESS_CONSUMER_IGNORE_DIRS) {#PAPERLESS_CONSUMER_IGNORE_DIRS}
 
@@ -2119,7 +2143,7 @@ used with the OpenAI-compatible backend to target a custom provider or local gat
 
     Defaults to None.
 
-### [`PAPERLESS_AI_LLM_OUTPUT_LANGUAGE=<str>`](#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE) {#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE}
+#### [`PAPERLESS_AI_LLM_OUTPUT_LANGUAGE=<str>`](#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE) {#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE}
 
 : The language to use for AI suggestions (results may vary by LLM model). If not supplied, defaults to the user's UI language setting or None.
 

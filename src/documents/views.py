@@ -135,9 +135,8 @@ from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
 from documents.filters import DocumentsOrderingFilter
 from documents.filters import DocumentTypeFilterSet
-from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
-from documents.filters import ObjectOwnedPermissionsFilter
 from documents.filters import PaperlessTaskFilterSet
+from documents.filters import PermittedObjectsFilter
 from documents.filters import ShareLinkBundleFilterSet
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
@@ -169,12 +168,15 @@ from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessNotePermissions
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import ViewDocumentsPermissions
+from documents.permissions import annotate_document_count_by_ids
 from documents.permissions import annotate_document_count_for_related_queryset
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_global_statistics_permission
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import has_system_status_permission
+from documents.permissions import permitted_document_ids
+from documents.permissions import permitted_object_ids
 from documents.permissions import set_permissions_for_object
 from documents.plugins.date_parsing import get_date_parser
 from documents.schema import generate_object_with_permissions_schema
@@ -345,7 +347,6 @@ class IndexView(TemplateView):
         context["username"] = self.request.user.username
         context["full_name"] = self.request.user.get_full_name()
         context["styles_css"] = f"frontend/{self.get_frontend_language()}/styles.css"
-        context["runtime_js"] = f"frontend/{self.get_frontend_language()}/runtime.js"
         context["polyfills_js"] = (
             f"frontend/{self.get_frontend_language()}/polyfills.js"
         )
@@ -431,14 +432,12 @@ class BulkPermissionMixin:
         This avoid fetching permissions object by object in database.
         """
         context = super().get_serializer_context()
-        try:
-            full_perms = get_boolean(
-                str(self.request.query_params.get("full_perms", "false")),
-            )
-        except ValueError:
-            full_perms = False
 
-        if not full_perms:
+        if getattr(self, "action", None) != "list":
+            # Batching only pays off across a page of objects; for single-object
+            # actions (retrieve, update, ...) the per-object fallback in
+            # get_user_can_change()/_get_perms() is cheap and avoids scanning
+            # the whole queryset here.
             return context
 
         # Check which objects are being paginated
@@ -484,7 +483,15 @@ class BulkPermissionMixin:
 class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
     """Mixin to add document count to queryset, permissions-aware if needed"""
 
-    # Default is simple relation path, override for through-table/count specialization.
+    # Direct FK/M2M relation name from this model to Document, used for the
+    # cheap Count(filter=...) path (Correspondent, DocumentType, StoragePath).
+    document_count_related_name: str = "documents"
+
+    # Set both of these instead, for models that only reach Document through
+    # an M2M/through-model table (Tag, CustomField). A plain Count(filter=...)
+    # over such a relation is fine for a direct FK, but forces a much more
+    # expensive plan once an M2M bridge table is involved -- see
+    # annotate_document_count_for_related_queryset() for why.
     document_count_through: type[Model] | None = None
     document_count_source_field: str | None = None
 
@@ -500,12 +507,14 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
     def get_document_count_filter(self):
         request = getattr(self, "request", None)
         user = getattr(request, "user", None) if request else None
-        return get_document_count_filter_for_user(user)
+        return get_document_count_filter_for_user(
+            user,
+            related_name=self.document_count_related_name,
+        )
 
     def get_queryset(self):
         base_qs = super().get_queryset()
 
-        # Use optimized through-table counting when configured.
         if self.document_count_through:
             user = getattr(getattr(self, "request", None), "user", None)
             return annotate_document_count_for_related_queryset(
@@ -515,10 +524,13 @@ class PermissionsAwareDocumentCountMixin(BulkPermissionMixin, PassUserMixin):
                 user=user,
             )
 
-        # Fallback: simple Count on relation with permission filter.
         filter = self.get_document_count_filter()
         return base_qs.annotate(
-            document_count=Count("documents", filter=filter),
+            document_count=Count(
+                self.document_count_related_name,
+                filter=filter,
+                distinct=True,
+            ),
         )
 
 
@@ -537,7 +549,7 @@ class CorrespondentViewSet(
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = CorrespondentFilterSet
     ordering_fields = (
@@ -578,7 +590,7 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Tag]):
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = TagFilterSet
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
@@ -641,6 +653,20 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Tag]):
             update_document_parent_tags(tag, new_parent)
 
 
+def _get_llm_output_language(ai_config: AIConfig, request) -> str | None:
+    output_language = ai_config.llm_output_language
+    if (
+        not output_language
+        and hasattr(request.user, "ui_settings")
+        and isinstance(
+            request.user.ui_settings.settings,
+            dict,
+        )
+    ):
+        output_language = request.user.ui_settings.settings.get("language")
+    return output_language
+
+
 @extend_schema_view(**generate_object_with_permissions_schema(DocumentTypeSerializer))
 class DocumentTypeViewSet(
     PermissionsAwareDocumentCountMixin,
@@ -656,7 +682,7 @@ class DocumentTypeViewSet(
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = DocumentTypeFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
@@ -943,6 +969,7 @@ class EmailDocumentDetailSchema(EmailSerializer):
     ),
 )
 class DocumentViewSet(
+    BulkPermissionMixin,
     PassUserMixin,
     RetrieveModelMixin,
     UpdateModelMixin,
@@ -959,7 +986,7 @@ class DocumentViewSet(
         DjangoFilterBackend,
         SearchFilter,
         DocumentsOrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "effective_content")
@@ -980,42 +1007,54 @@ class DocumentViewSet(
     )
 
     def _get_selection_data_for_queryset(self, queryset):
+        # Resolve once instead of once per model below. `queryset` can carry an
+        # arbitrarily expensive WHERE clause (user filters plus the permission
+        # filter); re-embedding it as a subquery inside 5 separate Count(...)
+        # calls forces the database to re-evaluate that whole thing 5 times, and
+        # -- for FK relations especially -- can defeat semi-join planning
+        # entirely at scale. A concrete id list is cheap to reuse.
+        # order_by() drops the default/user ordering -- irrelevant for a plain
+        # id list, but left in place it forces a sort over the full filtered
+        # set before the ids can even be collected.
+        document_ids = list(queryset.order_by().values_list("pk", flat=True))
+
         correspondents = Correspondent.objects.annotate(
             document_count=Count(
                 "documents",
-                filter=Q(documents__in=queryset),
-                distinct=True,
-            ),
-        )
-        tags = Tag.objects.annotate(
-            document_count=Count(
-                "documents",
-                filter=Q(documents__in=queryset),
+                filter=Q(documents__id__in=document_ids),
                 distinct=True,
             ),
         )
         document_types = DocumentType.objects.annotate(
             document_count=Count(
                 "documents",
-                filter=Q(documents__in=queryset),
+                filter=Q(documents__id__in=document_ids),
                 distinct=True,
             ),
         )
         storage_paths = StoragePath.objects.annotate(
             document_count=Count(
                 "documents",
-                filter=Q(documents__in=queryset),
+                filter=Q(documents__id__in=document_ids),
                 distinct=True,
             ),
         )
-        custom_fields = CustomField.objects.annotate(
-            document_count=Count(
-                "fields__document",
-                filter=Q(fields__document__in=queryset),
-                distinct=True,
-            ),
+        # Tag and CustomField reach Document through an M2M/through-model table;
+        # a plain Count(filter=...) there is a much more expensive plan than the
+        # FK relations above once the bridge table is large -- see
+        # annotate_document_count_by_ids() for why.
+        tags = annotate_document_count_by_ids(
+            Tag.objects.all(),
+            through_model=Document.tags.through,
+            related_object_field="tag_id",
+            document_ids=document_ids,
         )
-
+        custom_fields = annotate_document_count_by_ids(
+            CustomField.objects.all(),
+            through_model=CustomFieldInstance,
+            related_object_field="field_id",
+            document_ids=document_ids,
+        )
         return {
             "selected_correspondents": [
                 {"id": t.id, "document_count": t.document_count} for t in correspondents
@@ -1040,12 +1079,30 @@ class DocumentViewSet(
             .order_by("-id")
             .values("content")[:1],
         )
+        # A correlated subquery avoids the LEFT JOIN + Count() this used to
+        # be, which forced a GROUP BY aggregate over every matching document
+        # before the query could even be sorted or limited.
+        note_count = Subquery(
+            Note.objects.filter(document=OuterRef("pk"))
+            .order_by()
+            .values("document")
+            .annotate(count=Count("pk"))
+            .values("count"),
+            output_field=IntegerField(),
+        )
+        # No .distinct() here: nothing in this base queryset can produce
+        # duplicate document rows (select_related below is all FK-to-PK;
+        # permission filtering is a boolean id__in predicate, not a join).
+        # M2M-based filters that *do* introduce a join (e.g. tags__id__in)
+        # already call .distinct() themselves where they need it -- see
+        # ObjectFilter.filter(). A blanket .distinct() here forces the
+        # database to fully sort and dedupe every visible document before
+        # it can apply LIMIT, which is disastrous at scale.
         return (
             Document.objects.filter(root_document__isnull=True)
-            .distinct()
             .order_by("-created", "-id")
             .annotate(effective_content=Coalesce(latest_version_content, F("content")))
-            .annotate(num_notes=Count("notes"))
+            .annotate(num_notes=Coalesce(note_count, 0))
             .select_related("correspondent", "storage_path", "document_type", "owner")
             .prefetch_related(
                 Prefetch(
@@ -1471,20 +1528,16 @@ class DocumentViewSet(
         if not ai_config.ai_enabled:
             return HttpResponseBadRequest("AI is required for this feature")
 
-        output_language = ai_config.llm_output_language
-        if (
-            not output_language
-            and hasattr(request.user, "ui_settings")
-            and isinstance(
-                request.user.ui_settings.settings,
-                dict,
+        output_language = _get_llm_output_language(ai_config=ai_config, request=request)
+        llm_cache_backend = ":".join(
+            part
+            for part in (
+                ai_config.llm_backend,
+                ai_config.llm_model,
+                ai_config.llm_endpoint,
+                output_language,
             )
-        ):
-            output_language = request.user.ui_settings.settings.get("language") or None
-        llm_cache_backend = (
-            f"{ai_config.llm_backend}:{output_language}"
-            if output_language
-            else ai_config.llm_backend
+            if part
         )
 
         cached_llm_suggestions = get_llm_suggestion_cache(
@@ -1874,14 +1927,14 @@ class DocumentViewSet(
         message = validated_data.get("message")
         use_archive_version = validated_data.get("use_archive_version", True)
 
-        documents = Document.objects.select_related("owner").filter(pk__in=document_ids)
-        for document in documents:
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "view_document",
-                document,
-            ):
-                return HttpResponseForbidden("Insufficient permissions")
+        documents = Document.objects.filter(pk__in=document_ids)
+        if (
+            request.user is not None
+            and documents.exclude(
+                pk__in=permitted_document_ids(request.user),
+            ).exists()
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
 
         try:
             attachments: list[EmailAttachment] = []
@@ -1936,10 +1989,13 @@ class DocumentViewSet(
                 "root_document",
             ).get(pk=pk)
             root_doc = get_root_document(request_doc)
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "change_document",
-                root_doc,
+            if request.user is not None and (
+                not request.user.has_perm("documents.change_document")
+                or not has_perms_owner_aware(
+                    request.user,
+                    "change_document",
+                    root_doc,
+                )
             ):
                 return HttpResponseForbidden("Insufficient permissions")
         except Document.DoesNotExist:
@@ -2057,6 +2113,8 @@ class DocumentViewSet(
         _backend.remove(version_doc.pk)
         version_doc_id = version_doc.id
         version_doc.delete()
+        root_doc.modified = timezone.now()
+        Document.objects.filter(pk=root_doc.pk).update(modified=root_doc.modified)
         _backend.add_or_update(root_doc)
         if settings.AUDIT_LOG_ENABLED:
             actor = (
@@ -2136,6 +2194,8 @@ class DocumentViewSet(
         old_label = version_doc.version_label
         version_doc.version_label = serializer.validated_data["version_label"]
         version_doc.save(update_fields=["version_label"])
+        root_doc.modified = timezone.now()
+        Document.objects.filter(pk=root_doc.pk).update(modified=root_doc.modified)
 
         if settings.AUDIT_LOG_ENABLED and old_label != version_doc.version_label:
             actor = (
@@ -2207,16 +2267,20 @@ class ChatStreamingView(GenericAPIView[Any]):
             if not has_perms_owner_aware(request.user, "view_document", document):
                 return HttpResponseForbidden("Insufficient permissions")
 
-            documents = [document]
+            documents = Document.objects.filter(pk=document.pk)
         else:
-            documents = get_objects_for_user_owner_aware(
-                request.user,
-                "view_document",
-                Document,
+            documents = Document.objects.filter(
+                id__in=permitted_document_ids(request.user),
             )
 
+        output_language = _get_llm_output_language(ai_config=ai_config, request=request)
+
         response = StreamingHttpResponse(
-            stream_chat_with_documents(query_str=question, documents=documents),
+            stream_chat_with_documents(
+                query_str=question,
+                documents=documents,
+                output_language=output_language,
+            ),
             content_type="text/event-stream",
         )
         return response
@@ -2272,6 +2336,15 @@ class UnifiedSearchViewSet(DocumentViewSet):
         if self._is_search_request():
             return SearchResultSerializer
         return DocumentSerializer
+
+    def get_serializer_context(self):
+        if self._is_search_request():
+            # BulkPermissionMixin.get_serializer_context() (inherited via
+            # DocumentViewSet) assumes it's batching permissions for a page of
+            # real Document instances. Tantivy search results are SearchHit/
+            # dict-like objects instead, so skip straight past it here.
+            return super(BulkPermissionMixin, self).get_serializer_context()
+        return super().get_serializer_context()
 
     def _get_active_search_params(self, request: Request | None = None) -> list[str]:
         request = request or self.request
@@ -2599,7 +2672,7 @@ class SavedViewViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[SavedVie
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     filter_backends = (
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     ordering_fields = ("name",)
 
@@ -2652,7 +2725,6 @@ class DocumentSelectionMixin:
         *,
         user: User,
         validated_data: dict[str, Any],
-        permission_codename: str = "view_document",
     ) -> list[int]:
         if not validated_data.get("all", False):
             # if all is not true, just pass through the provided document ids
@@ -2665,10 +2737,8 @@ class DocumentSelectionMixin:
             for key, value in filters.items()
             if key not in _TANTIVY_SEARCH_PARAM_NAMES
         }
-        permitted_documents = get_objects_for_user_owner_aware(
-            user,
-            permission_codename,
-            Document,
+        permitted_documents = Document.objects.filter(
+            id__in=permitted_document_ids(user),
         )
         # orm-filtered docs
         filtered_documents = DocumentFilterSet(
@@ -2717,8 +2787,13 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         )
 
         # check global and object permissions for all documents
-        has_perms = user.has_perm("documents.change_document") and all(
-            has_perms_owner_aware(user, "change_document", doc) for doc in document_objs
+        has_perms = (
+            user.has_perm(
+                "documents.change_document",
+            )
+            and not document_objs.exclude(
+                pk__in=permitted_document_ids(user, perm="change_document"),
+            ).exists()
         )
 
         # check ownership for methods that change original document
@@ -2741,7 +2816,7 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
             )
             or (method == bulk_edit.edit_pdf and parameters.get("update_document"))
         ):
-            has_perms = user_is_owner_of_all_documents
+            has_perms = has_perms and user_is_owner_of_all_documents
 
         # check global add permissions for methods that create documents
         if (
@@ -2765,6 +2840,11 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
                 or (
                     method in [bulk_edit.merge, bulk_edit.split]
                     and parameters.get("delete_originals")
+                )
+                or (
+                    method in [bulk_edit.edit_pdf, bulk_edit.remove_password]
+                    and parameters.get("delete_original")
+                    and not parameters.get("update_document")
                 )
             )
             and not user.has_perm("documents.delete_document")
@@ -3271,10 +3351,8 @@ class SelectionDataView(GenericAPIView[Any]):
         serializer.is_valid(raise_exception=True)
 
         ids = serializer.validated_data.get("documents")
-        permitted_documents = get_objects_for_user_owner_aware(
-            request.user,
-            "documents.view_document",
-            Document,
+        permitted_documents = Document.objects.filter(
+            id__in=permitted_document_ids(request.user),
         )
         if permitted_documents.filter(pk__in=ids).count() != len(ids):
             return HttpResponseForbidden("Insufficient permissions")
@@ -3366,7 +3444,7 @@ class SelectionDataView(GenericAPIView[Any]):
     ),
 )
 class SearchAutoCompleteView(GenericAPIView[Any]):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, ViewDocumentsPermissions)
 
     def get(self, request, format=None):
         user = self.request.user if hasattr(self.request, "user") else None
@@ -3446,10 +3524,8 @@ class GlobalSearchView(PassUserMixin):
         OBJECT_LIMIT = 3
         docs = []
         if request.user.has_perm("documents.view_document"):
-            all_docs = get_objects_for_user_owner_aware(
-                request.user,
-                "view_document",
-                Document,
+            all_docs = Document.objects.filter(
+                id__in=permitted_document_ids(request.user),
             )
             if db_only:
                 docs = all_docs.filter(title__icontains=query)[:OBJECT_LIMIT]
@@ -3653,11 +3729,7 @@ class StatisticsView(GenericAPIView[Any]):
         documents = (
             Document.objects.all()
             if can_view_global_stats
-            else get_objects_for_user_owner_aware(
-                user,
-                "documents.view_document",
-                Document,
-            )
+            else Document.objects.filter(id__in=permitted_document_ids(user))
         ).filter(root_document__isnull=True)
         tags = (
             Tag.objects.all()
@@ -3774,9 +3846,10 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
         content = serializer.validated_data.get("content")
         follow_filename_format = serializer.validated_data.get("follow_formatting")
 
+        permitted_ids = set(permitted_document_ids(request.user))
         for document in documents:
             root_doc = get_root_document(document)
-            if not has_perms_owner_aware(request.user, "view_document", root_doc):
+            if root_doc.pk not in permitted_ids:
                 return HttpResponseForbidden("Insufficient permissions")
             versioned_documents.append(
                 get_latest_version_for_root(
@@ -3846,7 +3919,7 @@ class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Storag
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = StoragePathFilterSet
     ordering_fields = ("name", "path", "matching_algorithm", "match", "document_count")
@@ -4377,7 +4450,7 @@ class ShareLinkViewSet(
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = ShareLinkFilterSet
     ordering_fields = ("created", "expiration", "document")
@@ -4407,7 +4480,7 @@ class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = ShareLinkBundleFilterSet
     ordering_fields = ("created", "expiration", "status")
@@ -4440,8 +4513,9 @@ class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
             )
 
         documents = list(documents_qs)
+        permitted_ids = set(permitted_document_ids(request.user))
         for document in documents:
-            if not has_perms_owner_aware(request.user, "view_document", document):
+            if document.pk not in permitted_ids:
                 raise ValidationError(
                     {
                         "document_ids": _(
@@ -4534,7 +4608,8 @@ class SharedLinkView(View):
                 return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
             return serve_file(
                 doc=share_link.document,
-                use_archive=share_link.file_version == "archive",
+                use_archive=share_link.file_version == ShareLink.FileVersion.ARCHIVE
+                and share_link.document.has_archive_version,
                 disposition="inline",
             )
 
@@ -4626,6 +4701,8 @@ def serve_file(
             "ignore",
         )
         .decode("ascii")
+        .replace("\\", "_")
+        .replace('"', "_")
     )
     filename_encoded = quote(filename)
     content_disposition = (
@@ -4686,10 +4763,8 @@ class BulkEditObjectsView(PassUserMixin):
                 "document_types": DocumentTypeFilterSet,
                 "storage_paths": StoragePathFilterSet,
             }[object_type]
-            user_permitted_objects = get_objects_for_user_owner_aware(
-                user,
-                perm_codename,
-                object_class,
+            user_permitted_objects = object_class.objects.filter(
+                id__in=permitted_object_ids(user, object_class, perm_codename),
             )
             objs = filterset_class(
                 data=filters,
@@ -4714,8 +4789,11 @@ class BulkEditObjectsView(PassUserMixin):
 
         if not user.is_superuser:
             perm = f"documents.{perm_codename}"
-            has_perms = user.has_perm(perm) and all(
-                has_perms_owner_aware(user, perm_codename, obj) for obj in objs
+            has_perms = (
+                user.has_perm(perm)
+                and not objs.exclude(
+                    pk__in=permitted_object_ids(user, object_class, perm_codename),
+                ).exists()
             )
 
             if not has_perms:
@@ -5216,7 +5294,11 @@ class SystemStatusView(PassUserMixin):
 class TrashView(ListModelMixin, PassUserMixin):
     permission_classes = (IsAuthenticated,)
     serializer_class = TrashSerializer
-    filter_backends = (ObjectOwnedPermissionsFilter,)
+
+    class _TrashPermittedObjectsFilter(PermittedObjectsFilter):
+        include_granted = False
+
+    filter_backends = (_TrashPermittedObjectsFilter,)
     pagination_class = StandardPagination
 
     model = Document
@@ -5242,9 +5324,14 @@ class TrashView(ListModelMixin, PassUserMixin):
             if doc_ids is not None
             else self.filter_queryset(self.get_queryset()).all()
         )
-        for doc in docs:
-            if not has_perms_owner_aware(request.user, "delete_document", doc):
-                return HttpResponseForbidden("Insufficient permissions")
+        if docs.exclude(
+            pk__in=permitted_document_ids(
+                request.user,
+                perm="delete_document",
+                include_deleted=True,
+            ),
+        ).exists():
+            return HttpResponseForbidden("Insufficient permissions")
         action = serializer.validated_data.get("action")
         if action == "restore":
             for doc in Document.deleted_objects.filter(id__in=doc_ids).all():
@@ -5264,15 +5351,26 @@ def serve_logo(request: HttpRequest, filename: str | None = None) -> FileRespons
     config = ApplicationConfiguration.objects.first()
     app_logo = config.app_logo
 
-    if not app_logo:
-        raise Http404("No logo configured")
+    if app_logo:
+        path = Path(app_logo.path)
+        logo_name = app_logo.name
+    else:
+        if not settings.APP_LOGO:
+            raise Http404("No logo configured")
 
-    path = app_logo.path
+        logo_root = (Path(settings.MEDIA_ROOT) / "logo").resolve()
+        path = (Path(settings.MEDIA_ROOT) / settings.APP_LOGO.lstrip("/")).resolve()
+        if not path.is_relative_to(logo_root) or not path.is_file():
+            raise Http404("Configured logo not found")
+
+        logo_name = path.name
+
     content_type = magic.from_file(path, mime=True) or "application/octet-stream"
+    logo_file = app_logo.open("rb") if app_logo else path.open("rb")
 
     return FileResponse(
-        app_logo.open("rb"),
+        logo_file,
         content_type=content_type,
-        filename=app_logo.name,
+        filename=logo_name,
         as_attachment=True,
     )

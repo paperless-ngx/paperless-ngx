@@ -95,8 +95,8 @@ describe('CustomFieldsDropdownComponent', () => {
   it('should support update unused fields', () => {
     component.existingFields = [{ field: fields[0].id } as any]
     component['updateUnusedFields']()
-    expect(component['unusedFields'].length).toEqual(1)
-    expect(component['unusedFields'][0].name).toEqual('Field 2')
+    expect(component['unusedFields']().length).toEqual(1)
+    expect(component['unusedFields']()[0].name).toEqual('Field 2')
   })
 
   it('should support getting data type label', () => {

@@ -2,16 +2,13 @@ import json
 import logging
 import sqlite3
 import struct
-from collections.abc import Callable
 from collections.abc import Iterator
 from collections.abc import Sequence
 from contextlib import contextmanager
-from dataclasses import dataclass
-from dataclasses import field
 from pathlib import Path
 from types import TracebackType
 from typing import Any
-from typing import Literal
+from typing import NamedTuple
 
 import sqlite_vec
 from llama_index.core.bridge.pydantic import PrivateAttr
@@ -26,6 +23,14 @@ from llama_index.core.vector_stores.types import VectorStoreQueryResult
 from llama_index.core.vector_stores.utils import metadata_dict_to_node
 from llama_index.core.vector_stores.utils import node_to_metadata_dict
 
+from paperless_ai.migrations import MIGRATIONS
+from paperless_ai.migrations import Migration
+from paperless_ai.tables import ChunkRow
+from paperless_ai.tables import DocumentChunksTable
+from paperless_ai.tables import DocumentMetaRow
+from paperless_ai.tables import DocumentMetaTable
+from paperless_ai.tables import IndexMetaTable
+
 logger = logging.getLogger("paperless_ai.vector_store")
 
 DB_FILENAME = "llmindex.db"
@@ -34,7 +39,7 @@ DEFAULT_TABLE_NAME = "documents"
 # Current schema version. Written to index_meta at table creation and bumped
 # whenever a Migration is added to MIGRATIONS. check_and_run_migrations() uses
 # this to decide which migrations to run on an existing store.
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 # compact(): rebuild when the cumulative rowid count exceeds this multiple of
 # the live row count. DELETEs on vec0 tables never reclaim space (upstream
@@ -42,47 +47,43 @@ SCHEMA_VERSION = 1
 # a rebuild copies the live rows into a fresh table.
 COMPACT_BLOAT_RATIO = 2.0
 
-# compact(): number of rows copied per executemany() when rebuilding the file.
-# Rows are streamed from the source cursor in batches of this size rather than
-# materialized all at once, keeping memory bounded regardless of index size.
-COMPACT_BATCH_SIZE = 500
+# Number of rows fetched/copied per batch whenever this module streams rows
+# instead of materializing them all at once, keeping memory bounded regardless
+# of index size -- used by compact()'s rebuild, m0001_v1_to_v2's migration
+# copy, and DocumentMetaTable.copy_all(). No longer compact()-specific, hence
+# the plain name.
+BATCH_SIZE = 500
 
 # Filterable vec0 metadata columns. _build_where() only ever receives filter
 # keys we construct ourselves, but allowlisting keeps SQL identifiers safe by
-# construction.
-_FILTER_COLUMNS = frozenset({"document_id", "modified"})
+# construction. "modified" is not here: it is never filtered on, and as of
+# schema v2 it isn't even a vec0 column anymore (see document_meta).
+_FILTER_COLUMNS = frozenset({"document_id"})
 
 
-@dataclass
-class Migration:
-    """A schema migration for the sqlite-vec vector store.
-
-    kind="structural": rows are copied into a new-schema file with no
-    re-embedding needed.  Supply ``apply(src_conn, dst_conn, dim)`` which
-    must create the vec0 table in ``dst_conn``, copy all rows from
-    ``src_conn``, and write ``dim`` / ``embed_model`` / ``total_inserts`` to
-    ``dst_conn``'s ``index_meta``.  ``schema_version`` is written by the
-    migration runner after ``apply`` returns.
-
-    kind="re-embed": the new schema requires fresh embeddings.
-    ``check_and_run_migrations()`` returns True when it encounters one of
-    these so the caller can force a full rebuild (which recreates the table
-    at the current SCHEMA_VERSION).
+class _Row(NamedTuple):
+    """One node, ready to write. ``modified`` is not a vec0 column (see
+    document_meta) -- it rides along here because every row-producing call
+    site needs both the vec0 insert values and the document_meta upsert
+    value from the same node.
     """
 
-    from_version: int
-    to_version: int
-    kind: Literal["structural", "re-embed"]
-    description: str
-    apply: Callable[[sqlite3.Connection, sqlite3.Connection, int], None] | None = field(
-        default=None,
-        repr=False,
-    )
+    chunk_id: str
+    document_id: int
+    modified: str
+    node_content: str
+    embedding: bytes
 
 
-# Registry of all schema migrations in order. Empty at v1 -- this is the
-# baseline. Add entries here (and bump SCHEMA_VERSION) when the schema changes.
-MIGRATIONS: list[Migration] = []
+# _build_where(): the largest IN value list translated into bound SQL
+# parameters. SQLite's own hard limit (SQLITE_MAX_VARIABLE_NUMBER) is 32766
+# by default; this leaves headroom below that for the query's other bound
+# parameters (the embedding blob, k, and any NE clause) and for the limit
+# itself to move. An IN filter this large should not happen in practice --
+# callers are expected to pass None (no filter) rather than every id when
+# the filter would not actually narrow anything -- so this is a guard
+# against a future regression, not a normal code path.
+_MAX_IN_VALUES = 32700
 
 
 def _pack(embedding: Sequence[float]) -> bytes:
@@ -93,14 +94,30 @@ def _unpack(blob: bytes) -> list[float]:
     return list(struct.unpack(f"{len(blob) // 4}f", blob))
 
 
-def _build_where(filters: MetadataFilters | None) -> tuple[str, list[str]]:
-    """Translate the EQ / IN filters we use into a parameterized SQL clause
-    on vec0 metadata columns. Returns ("", []) when there is nothing to filter.
+_INSERT = (
+    "INSERT INTO "
+    + DEFAULT_TABLE_NAME
+    + " (id, document_id, node_content, embedding) VALUES (?, ?, ?, ?)"
+)
+
+
+def _vec0_params(rows: list[_Row]) -> list[tuple[str, int, str, bytes]]:
+    """``rows``, minus the ``modified`` field vec0 no longer stores."""
+    return [(r.chunk_id, r.document_id, r.node_content, r.embedding) for r in rows]
+
+
+def _build_where(filters: MetadataFilters | None) -> tuple[str, list[int]]:
+    """Translate the EQ / IN / NE filters we use into a parameterized SQL
+    clause on vec0 metadata columns. Returns ("", []) when there is nothing
+    to filter. document_id is vec0's only filterable column and is INTEGER;
+    every value is coerced via int() here so callers (which today still pass
+    strings in places, e.g. indexing.py's MetadataFilter construction) don't
+    have to be individually correct -- vec0 doesn't coerce types itself.
     """
     if filters is None or not filters.filters:
         return "", []
     clauses: list[str] = []
-    params: list[str] = []
+    params: list[int] = []
     for f in filters.filters:
         # filters.filters is Union[MetadataFilter, ExactMatchFilter, MetadataFilters];
         # we only build MetadataFilter entries, so skip anything else at runtime.
@@ -109,8 +126,23 @@ def _build_where(filters: MetadataFilters | None) -> tuple[str, list[str]]:
         if f.key not in _FILTER_COLUMNS:  # pragma: no cover - we build the keys
             raise NotImplementedError(f"Unsupported filter column: {f.key}")
         if f.operator == FilterOperator.IN:
-            values = [str(v) for v in f.value]  # type: ignore[union-attr]  # value is list when operator is IN
+            values = [int(v) for v in f.value]  # type: ignore[union-attr]
             if not values:  # pragma: no cover
+                clauses.append("1 = 0")
+                continue
+            if len(values) > _MAX_IN_VALUES:
+                # Fail closed (see the empty-clauses case below) rather than
+                # let SQLite raise "too many SQL variables" past its own
+                # limit: this filter scopes document access, so an IN list
+                # too large to safely bind must match no rows, never widen
+                # the scope to "everything" by accident.
+                logger.warning(
+                    "Refusing to build an IN filter on %r with %d values "
+                    "(over the %d-value safety limit); returning no rows.",
+                    f.key,
+                    len(values),
+                    _MAX_IN_VALUES,
+                )
                 clauses.append("1 = 0")
                 continue
             placeholders = ",".join("?" for _ in values)
@@ -118,8 +150,11 @@ def _build_where(filters: MetadataFilters | None) -> tuple[str, list[str]]:
             params.extend(values)
         elif f.operator == FilterOperator.EQ:
             clauses.append(f"{f.key} = ?")
-            params.append(str(f.value))
-        else:  # pragma: no cover - we only ever build EQ/IN filters
+            params.append(int(f.value))
+        elif f.operator == FilterOperator.NE:
+            clauses.append(f"{f.key} != ?")
+            params.append(int(f.value))
+        else:  # pragma: no cover - we only ever build EQ/IN/NE filters
             raise NotImplementedError(f"Unsupported filter operator: {f.operator}")
     if not clauses:
         # Filters were requested but none could be translated. Fail closed
@@ -183,9 +218,21 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         conn.enable_load_extension(False)  # noqa: FBT003
         conn.execute("PRAGMA journal_mode=WAL")
         conn.execute("PRAGMA synchronous=NORMAL")
-        conn.execute(
-            "CREATE TABLE IF NOT EXISTS index_meta (key TEXT PRIMARY KEY, value TEXT)",
-        )
+        IndexMetaTable.create(conn)
+        # vec0 metadata columns only get an efficient lookup path inside a
+        # KNN (MATCH) query; a plain `WHERE document_id = ?` is a full table
+        # scan regardless of index size. This plain, indexed table is how
+        # delete()/upsert_document() find a document's chunk ids without
+        # that scan.
+        DocumentChunksTable.create(conn)
+        # modified used to be a vec0 metadata column, but vec0 only inlines
+        # TEXT metadata up to 12 bytes -- an ISO timestamp is always longer,
+        # so every read recompiled and stepped a fresh SQL statement per row.
+        # It was never filtered on inside a KNN query either, so it never
+        # needed to be a vec0 column at all. One row per document here (not
+        # per chunk, like document_chunks), since every chunk of a document
+        # shares the same modified value -- see get_modified_times().
+        DocumentMetaTable.create(conn)
         return conn
 
     @property
@@ -220,24 +267,6 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         else:
             self._conn.execute("COMMIT")
 
-    def _meta_get(self, key: str) -> str | None:
-        row = self._conn.execute(
-            "SELECT value FROM index_meta WHERE key = ?",
-            (key,),
-        ).fetchone()
-        return row["value"] if row else None
-
-    @staticmethod
-    def _meta_set_on(conn: sqlite3.Connection, key: str, value: str) -> None:
-        conn.execute(
-            "INSERT INTO index_meta (key, value) VALUES (?, ?) "
-            "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
-            (key, value),
-        )
-
-    def _meta_set(self, key: str, value: str) -> None:
-        self._meta_set_on(self._conn, key, value)
-
     def table_exists(self) -> bool:
         return (
             self._conn.execute(
@@ -250,18 +279,19 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
     def vector_dim(self) -> int | None:
         if not self.table_exists():
             return None
-        value = self._meta_get("dim")
-        return int(value) if value else None
+        return IndexMetaTable.get_dim(self._conn)
 
     def drop_table(self) -> None:
         self._conn.execute("DROP TABLE IF EXISTS " + DEFAULT_TABLE_NAME)
         self._conn.execute("DELETE FROM index_meta")
+        DocumentChunksTable.delete_all(self._conn)
+        DocumentMetaTable.delete_all(self._conn)
 
     def stored_model_name(self) -> str | None:
         """Return the embedding model name recorded at table creation, or None."""
         if not self.table_exists():
             return None
-        return self._meta_get("embed_model")
+        return IndexMetaTable.get_embed_model(self._conn)
 
     def config_mismatch(self, model_name: str) -> bool:
         """True when the stored model name differs from ``model_name``.
@@ -279,14 +309,17 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         # document_id is deliberately a metadata column, NOT a partition key:
         # partition keys change KNN `k` to per-partition semantics under IN
         # filters (asg017/sqlite-vec#142); metadata columns give a correct
-        # global top-k.
+        # global top-k. INTEGER (not TEXT, as in schema v1): EQ/NE/IN
+        # comparisons become a native i64 array compare instead of per-row
+        # strncmp against a 16-byte text view, and this drops the unused
+        # metadatatext shadow table TEXT columns carry. modified is not a
+        # column here at all as of v2 -- see document_meta.
         conn.execute(  # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
             "CREATE VIRTUAL TABLE "
             + DEFAULT_TABLE_NAME
             + " USING vec0("
             + "id TEXT PRIMARY KEY,"
-            + " document_id TEXT,"
-            + " modified TEXT,"
+            + " document_id INTEGER,"
             + " +node_content TEXT,"
             + " embedding float["
             + str(int(dim))
@@ -296,37 +329,78 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
 
     def _create_table(self, dim: int) -> None:
         self._create_vec_table(self._conn, dim)
-        self._meta_set("dim", str(dim))
-        self._meta_set("schema_version", str(SCHEMA_VERSION))
+        IndexMetaTable.set_dim(self._conn, dim)
+        IndexMetaTable.set_schema_version(self._conn, SCHEMA_VERSION)
         if self._embed_model_name:
-            self._meta_set("embed_model", self._embed_model_name)
+            IndexMetaTable.set_embed_model(self._conn, self._embed_model_name)
 
-    def _ensure_table(self, dim: int) -> None:
-        if not self.table_exists():
+    def _ensure_table(self, dim: int, *, table_exists: bool) -> None:
+        if not table_exists:
             self._create_table(dim)
 
-    def _row(self, node: BaseNode) -> tuple[str, str, str, str, bytes]:
+    def _row(self, node: BaseNode) -> _Row:
         meta = node_to_metadata_dict(
             node,
             remove_text=False,
             flat_metadata=self.flat_metadata,
         )
-        # vec0 metadata columns reject NULL (asg017/sqlite-vec#141): coerce
-        # every value to a string, with "" as the absent sentinel.
         document_id = node.ref_doc_id or node.metadata.get("document_id")
-        return (
-            node.node_id,
-            str(document_id or ""),
-            str(node.metadata.get("modified") or ""),
-            json.dumps(meta),
-            _pack(node.get_embedding()),
+        return _Row(
+            chunk_id=node.node_id,
+            # document_id is required -- int(None) raises TypeError and
+            # int("not-a-number") raises ValueError, both intentional:
+            # fail loudly on a malformed/missing document_id rather than
+            # silently indexing a chunk with no owning document. modified,
+            # below, still uses the str(x or "") sentinel pattern because a
+            # missing modified value is legitimate (vec0 no longer even
+            # stores it -- see document_meta), whereas document_id must
+            # always be present.
+            document_id=int(document_id),
+            modified=str(node.metadata.get("modified") or ""),
+            node_content=json.dumps(meta),
+            embedding=_pack(node.get_embedding()),
         )
 
-    _INSERT = (
-        "INSERT INTO "
-        + DEFAULT_TABLE_NAME
-        + " (id, document_id, modified, node_content, embedding) VALUES (?, ?, ?, ?, ?)"
-    )
+    def _index_chunks(self, rows: list[_Row]) -> None:
+        """Record each row's (chunk_id, document_id) in document_chunks, and
+        each row's (document_id, modified) in document_meta -- deduped
+        within the batch, since every chunk of a document shares the same
+        modified value -- kept in lockstep with every insert into the vec0
+        table.
+        """
+        DocumentChunksTable.insert_many(
+            self._conn,
+            (ChunkRow(r.chunk_id, r.document_id) for r in rows),
+        )
+        modified_by_document = {r.document_id: r.modified for r in rows}
+        DocumentMetaTable.upsert_many(
+            self._conn,
+            (
+                DocumentMetaRow(doc_id, mod)
+                for doc_id, mod in modified_by_document.items()
+            ),
+        )
+
+    def _delete_chunks_by_document_id(self, document_id: int) -> None:
+        """Delete all of a document's chunks via point-deletes on `id`.
+
+        vec0 has no efficient lookup on the document_id metadata column
+        outside a KNN query, so a plain `DELETE ... WHERE document_id = ?`
+        is a full table scan regardless of index size. Looking the chunk
+        ids up in document_chunks first (a real indexed lookup) and
+        deleting each by its `id` primary key instead turns that scan into
+        a handful of O(1) point deletes.
+        """
+        chunk_ids = DocumentChunksTable.chunk_ids_for_document(
+            self._conn,
+            document_id,
+        )
+        self._conn.executemany(
+            "DELETE FROM " + DEFAULT_TABLE_NAME + " WHERE id = ?",
+            [(chunk_id,) for chunk_id in chunk_ids],
+        )
+        DocumentChunksTable.delete_for_document(self._conn, document_id)
+        DocumentMetaTable.delete_for_document(self._conn, document_id)
 
     def _increment_total_inserts(self, count: int) -> None:
         """Increment the cumulative insert counter stored in index_meta.
@@ -336,48 +410,56 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         live_rows exceeds COMPACT_BLOAT_RATIO the table has accumulated
         enough deleted-but-not-freed rows to warrant a rebuild.
         """
-        current = int(self._meta_get("total_inserts") or "0")
-        self._meta_set("total_inserts", str(current + count))
+        IndexMetaTable.increment_total_inserts(self._conn, count)
 
     def add(self, nodes: Sequence[BaseNode], **add_kwargs: Any) -> list[str]:
         if not nodes:
             return []
         rows = [self._row(node) for node in nodes]
         with self._transaction():
-            self._ensure_table(len(nodes[0].get_embedding()))
-            self._conn.executemany(self._INSERT, rows)
+            self._ensure_table(
+                len(nodes[0].get_embedding()),
+                table_exists=self.table_exists(),
+            )
+            self._conn.executemany(_INSERT, _vec0_params(rows))
+            self._index_chunks(rows)
             self._increment_total_inserts(len(rows))
         return [node.node_id for node in nodes]
 
-    def upsert_document(self, document_id: str, nodes: list[BaseNode]) -> list[str]:
+    def upsert_document(
+        self,
+        document_id: int | str,
+        nodes: list[BaseNode],
+    ) -> list[str]:
         """Atomically replace all stored chunks of ``document_id`` with ``nodes``.
 
         One transaction deletes the document's existing rows and inserts the
-        new set (vec0's INSERT OR REPLACE is broken upstream, #259, so
-        delete+insert it is). WAL readers in other processes see either the
-        old or the new chunk set, never a partial state.
+        new set (vec0's INSERT OR REPLACE is broken upstream, so delete+insert
+        it is). WAL readers in other processes see either the old or the new
+        chunk set, never a partial state.
         """
+        doc_id = int(document_id)
         rows = [self._row(node) for node in nodes]
         with self._transaction():
-            if nodes:
-                self._ensure_table(len(nodes[0].get_embedding()))
-            if self.table_exists():
-                self._conn.execute(
-                    "DELETE FROM " + DEFAULT_TABLE_NAME + " WHERE document_id = ?",
-                    (str(document_id),),
+            table_exists = self.table_exists()
+            if nodes and not table_exists:
+                self._ensure_table(
+                    len(nodes[0].get_embedding()),
+                    table_exists=False,
                 )
+                table_exists = True
+            if table_exists:
+                self._delete_chunks_by_document_id(doc_id)
             if rows:
-                self._conn.executemany(self._INSERT, rows)
+                self._conn.executemany(_INSERT, _vec0_params(rows))
+                self._index_chunks(rows)
                 self._increment_total_inserts(len(rows))
         return [node.node_id for node in nodes]
 
-    def delete(self, ref_doc_id: str, **delete_kwargs: Any) -> None:
+    def delete(self, ref_doc_id: int | str, **delete_kwargs: Any) -> None:
         if self.table_exists():
             with self._transaction():
-                self._conn.execute(
-                    "DELETE FROM " + DEFAULT_TABLE_NAME + " WHERE document_id = ?",
-                    (str(ref_doc_id),),
-                )
+                self._delete_chunks_by_document_id(int(ref_doc_id))
 
     def _rows_to_nodes(self, rows: list[sqlite3.Row]) -> list[BaseNode]:
         nodes: list[BaseNode] = []
@@ -447,41 +529,66 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
     def get_modified_times(self) -> dict[str, str]:
         """Return {document_id: stored_modified_isoformat} for all indexed documents.
 
-        All chunks of a document share the same ``modified`` value, so the
-        first row seen per document is sufficient.
+        document_meta already has exactly one row per document (not per
+        chunk, unlike the vec0 table), so no dedup is needed here.
         """
         if not self.table_exists():
             return {}
-        result: dict[str, str] = {}
-        for row in self._conn.execute(
-            "SELECT document_id, modified FROM " + DEFAULT_TABLE_NAME,
-        ):
-            doc_id = str(row["document_id"])
-            if doc_id not in result:
-                result[doc_id] = str(row["modified"] or "")
-        return result
+        return DocumentMetaTable.all_modified_times(self._conn)
+
+    @property
+    def _db_path(self) -> str:
+        return str(Path(self._uri) / DB_FILENAME)
+
+    @contextmanager
+    def _rebuild_file(self) -> Iterator[sqlite3.Connection]:
+        """Open a fresh temp database file for a file-swap rebuild (compact
+        or structural migration), yielding its connection for the caller to
+        populate.
+
+        On success, swaps the temp file in as the live database (closing
+        this store's current connection first -- see _swap_in_compact()).
+        On any exception, discards the temp file, including its -wal/-shm,
+        instead, and this store's own connection is left untouched.
+        """
+        compact_path = self._db_path + ".compact"
+        new_conn = self._open_connection(compact_path)
+        try:
+            yield new_conn
+        except BaseException:
+            new_conn.close()
+            for suffix in ["", "-wal", "-shm"]:
+                Path(compact_path + suffix).unlink(missing_ok=True)
+            raise
+        else:
+            new_conn.close()
+            self._swap_in_compact(compact_path, self._db_path)
 
     def compact(self, *, force: bool = False) -> None:
         """Rebuild the database file to reclaim space left behind by DELETEs.
 
         vec0 DELETE only invalidates rows; the vector data stays in the file
-        forever (asg017/sqlite-vec#54), and per-document re-indexing is a
-        delete+insert. The cumulative insert counter in ``index_meta`` tracks
-        total rows ever written; when that exceeds ``COMPACT_BLOAT_RATIO`` x
-        the live row count (or when forced), live rows are copied into a fresh
-        database file and swapped in via ``os.replace``.
+        forever, and per-document re-indexing is a delete+insert. The
+        cumulative insert counter in ``index_meta`` tracks total rows ever
+        written; when that exceeds ``COMPACT_BLOAT_RATIO`` x the live row
+        count (or when forced), live rows are copied into a fresh database
+        file and swapped in via ``os.replace``.
 
         Note: ``ALTER TABLE ... RENAME TO`` on vec0 virtual tables does NOT
-        rename the shadow tables (sqlite-vec upstream limitation), so
-        an in-place rename-based rebuild is not safe.  The file-swap approach
-        is the maintainer-endorsed workaround (asg017/sqlite-vec#205).
+        rename the shadow tables (sqlite-vec upstream limitation), so an
+        in-place rename-based rebuild is not safe. The file-swap approach is
+        the maintainer-endorsed workaround.
         """
         if not self.table_exists():
             return
-        live = self._conn.execute(
-            "SELECT count(*) FROM " + DEFAULT_TABLE_NAME,
-        ).fetchone()[0]
-        total = int(self._meta_get("total_inserts") or str(live))
+        if self.has_pending_migration():
+            logger.warning(
+                "Skipping compact: store has a pending schema migration; "
+                "run check_and_run_migrations() first",
+            )
+            return
+        live = DocumentChunksTable.count(self._conn)
+        total = IndexMetaTable.get_total_inserts(self._conn) or live
         if not force and total <= max(live, 1) * COMPACT_BLOAT_RATIO:
             return
         dim = self.vector_dim()
@@ -493,50 +600,61 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             live,
             total,
         )
-        db_path = str(Path(self._uri) / DB_FILENAME)
-        compact_path = db_path + ".compact"
+        with self._rebuild_file() as new_conn:
+            self._rebuild_into(self._conn, new_conn, dim)
 
-        # Copy all live rows into a fresh database file.
-        new_conn = self._open_connection(compact_path)
-        try:
-            self._create_vec_table(new_conn, dim)
-            self._meta_set_on(new_conn, "dim", str(dim))
-            for key in ("embed_model", "schema_version"):
-                value = self._meta_get(key)
-                if value is not None:
-                    self._meta_set_on(new_conn, key, value)
-            src_cursor = self._conn.execute(
-                "SELECT id, document_id, modified, node_content, embedding "
-                "FROM " + DEFAULT_TABLE_NAME,
+    @staticmethod
+    def _rebuild_into(
+        src_conn: sqlite3.Connection,
+        dst_conn: sqlite3.Connection,
+        dim: int,
+    ) -> None:
+        """Create the vec0 table in ``dst_conn``, copy dim/embed_model from
+        ``src_conn``, and stream every live vec0 row, document_chunks row,
+        and document_meta row across. Used by compact() only --
+        m0001_v1_to_v2 freezes its own copy loop instead of calling this,
+        since this always reflects the *current* schema (see the migration
+        DDL-freezing rule in the spec).
+        """
+        PaperlessSqliteVecVectorStore._create_vec_table(dst_conn, dim)
+        dim_value = IndexMetaTable.get_dim(src_conn)
+        if dim_value is not None:
+            IndexMetaTable.set_dim(dst_conn, dim_value)
+        embed_model = IndexMetaTable.get_embed_model(src_conn)
+        if embed_model is not None:
+            IndexMetaTable.set_embed_model(dst_conn, embed_model)
+        schema_version = IndexMetaTable.get_schema_version(src_conn)
+        if schema_version is not None:
+            IndexMetaTable.set_schema_version(dst_conn, schema_version)
+
+        dst_conn.execute("BEGIN IMMEDIATE")
+        src_cursor = src_conn.execute(
+            "SELECT id, document_id, node_content, embedding FROM "
+            + DEFAULT_TABLE_NAME,
+        )
+        copied = 0
+        while batch := src_cursor.fetchmany(BATCH_SIZE):
+            dst_conn.executemany(
+                _INSERT,
+                [
+                    (
+                        r["id"],
+                        r["document_id"],
+                        r["node_content"],
+                        bytes(r["embedding"]),
+                    )
+                    for r in batch
+                ],
             )
-            new_conn.execute("BEGIN IMMEDIATE")
-            # Stream rows from the source cursor in batches instead of
-            # materializing the whole table in memory, so a large index does
-            # not cause an OOM during routine maintenance compactions.
-            while batch := src_cursor.fetchmany(COMPACT_BATCH_SIZE):
-                new_conn.executemany(
-                    self._INSERT,
-                    [
-                        (
-                            r["id"],
-                            r["document_id"],
-                            r["modified"],
-                            r["node_content"],
-                            bytes(r["embedding"]),
-                        )
-                        for r in batch
-                    ],
-                )
-            # Reset the cumulative counter: after compact, total_inserts == live.
-            self._meta_set_on(new_conn, "total_inserts", str(live))
-            new_conn.execute("COMMIT")
-        except BaseException:
-            new_conn.close()
-            for p in [compact_path, compact_path + "-wal", compact_path + "-shm"]:
-                Path(p).unlink(missing_ok=True)
-            raise
-        new_conn.close()
-        self._swap_in_compact(compact_path, db_path)
+            DocumentChunksTable.insert_many(
+                dst_conn,
+                (ChunkRow(r["id"], r["document_id"]) for r in batch),
+            )
+            copied += len(batch)
+        DocumentMetaTable.copy_all(src_conn, dst_conn, BATCH_SIZE)
+        # Reset the cumulative counter: after a rebuild, total_inserts == live.
+        IndexMetaTable.reset_total_inserts(dst_conn, copied)
+        dst_conn.execute("COMMIT")
 
     def _swap_in_compact(self, compact_path: str, db_path: str) -> None:
         """Atomically replace the live database with the compacted copy."""
@@ -548,6 +666,31 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         Path(compact_path).replace(db_path)
         self._conn = self._open_connection(db_path)
 
+    def _stored_schema_version(self) -> int | None:
+        """The schema_version recorded in index_meta, or None if no table
+        exists. A missing key (a store predating version tracking) is
+        treated as SCHEMA_VERSION -- i.e. already current -- since no
+        migration in MIGRATIONS targets a version before tracking began.
+        """
+        if not self.table_exists():
+            return None
+        raw_version = IndexMetaTable.get_schema_version(self._conn)
+        return raw_version if raw_version is not None else SCHEMA_VERSION
+
+    def has_pending_migration(self) -> bool:
+        """Cheaply check whether a migration is pending, with no exclusive
+        access needed -- just a metadata read under the connection callers
+        already hold via the write FileLock.
+
+        Callers should only pay for check_and_run_migrations()'s exclusive
+        access (a structural migration's file swap must not run while
+        readers are active) when this returns True, so that the common
+        case -- already at SCHEMA_VERSION -- never contends with readers
+        or a concurrent compaction.
+        """
+        current = self._stored_schema_version()
+        return current is not None and current < SCHEMA_VERSION
+
     def check_and_run_migrations(self) -> bool:
         """Apply any pending schema migrations to the store.
 
@@ -556,15 +699,13 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         this method returns True when one is encountered so the caller can
         force a full rebuild (which recreates the table at SCHEMA_VERSION).
 
-        Must be called under the write FileLock.  No-op when the table does
-        not exist or is already at SCHEMA_VERSION.
+        Must be called under the write FileLock, with readers excluded (see
+        has_pending_migration() for a cheap pre-check that avoids paying for
+        that exclusion in the common case).  No-op when the table does not
+        exist or is already at SCHEMA_VERSION.
         """
-        if not self.table_exists():
-            return False
-
-        raw = self._meta_get("schema_version")
-        current = int(raw) if raw is not None else SCHEMA_VERSION
-        if current >= SCHEMA_VERSION:
+        current = self._stored_schema_version()
+        if current is None or current >= SCHEMA_VERSION:
             return False
 
         pending = sorted(
@@ -576,7 +717,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             if migration.kind == "re-embed":
                 logger.warning(
                     "LLM index schema v%d -> v%d requires re-embedding (%s); "
-                    "forcing full rebuild.",
+                    "the caller must force a rebuild.",
                     migration.from_version,
                     migration.to_version,
                     migration.description,
@@ -598,16 +739,12 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         dim = self.vector_dim()
         if dim is None:  # pragma: no cover
             raise RuntimeError("Cannot migrate: no stored vector dimension")
-        db_path = str(Path(self._uri) / DB_FILENAME)
-        compact_path = db_path + ".compact"
-        new_conn = self._open_connection(compact_path)
-        try:
+        with self._rebuild_file() as new_conn:
             migration.apply(self._conn, new_conn, dim)
-            self._meta_set_on(new_conn, "schema_version", str(migration.to_version))
-        except BaseException:  # pragma: no cover
-            new_conn.close()
-            for p in [compact_path, compact_path + "-wal", compact_path + "-shm"]:
-                Path(p).unlink(missing_ok=True)
-            raise
-        new_conn.close()
-        self._swap_in_compact(compact_path, db_path)
+            IndexMetaTable.set_schema_version(new_conn, migration.to_version)
+
+
+# Registers m0001_v1_to_v2 into MIGRATIONS; must be at the bottom (needs
+# PaperlessSqliteVecVectorStore fully defined) -- see
+# paperless_ai/migrations/__init__.py for the full procedure.
+from paperless_ai.migrations import m0001_v1_to_v2  # noqa: E402, F401

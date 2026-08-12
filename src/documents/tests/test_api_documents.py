@@ -14,6 +14,7 @@ from unittest import mock
 import celery
 from dateutil import parser
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.core import mail
@@ -47,6 +48,8 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.signals.handlers import run_workflows
+from documents.tests.factories import DocumentFactory
+from documents.tests.factories import TagFactory
 from documents.tests.utils import ConsumeTaskMixin
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import read_streaming_response
@@ -469,6 +472,31 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertIn("my_document.pdf", response["Content-Disposition"])
         response.close()
 
+    @override_settings(FILENAME_FORMAT="")
+    def test_download_filename_normalization_does_not_inject_parameters(
+        self,
+    ) -> None:
+        doc = Document.objects.create(
+            title="file.doc\uff02; x=\uff02\uff3c",
+            created=date(2020, 1, 2),
+            filename="source.pdf",
+            mime_type="application/pdf",
+        )
+        Path(doc.source_path).write_bytes(b"This is a test")
+
+        response = self.client.get(
+            f"/api/documents/{doc.pk}/download/?original=true",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response["Content-Disposition"],
+            "attachment; "
+            'filename="2020-01-02 file.doc_; x=__.pdf"; '
+            "filename*=utf-8''2020-01-02%20file.doc%EF%BC%82%3B%20x%3D%EF%BC%82%EF%BC%BC.pdf",
+        )
+        response.close()
+
     def test_document_actions_not_existing_file(self) -> None:
         doc = Document.objects.create(
             title="none",
@@ -883,6 +911,62 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(len(results), 3)
 
+    def test_is_in_inbox_filter_no_duplicates_with_multiple_inbox_tags(self) -> None:
+        """
+        GIVEN:
+            - A document tagged with two different inbox tags
+        WHEN:
+            - The document list is filtered by is_in_inbox=true
+        THEN:
+            - The document appears exactly once, not once per matching tag
+        """
+        doc = Document.objects.create(title="doc", checksum="c1")
+        inbox_1 = Tag.objects.create(name="inbox1", is_inbox_tag=True)
+        inbox_2 = Tag.objects.create(name="inbox2", is_inbox_tag=True)
+        doc.tags.add(inbox_1, inbox_2)
+
+        response = self.client.get("/api/documents/?is_in_inbox=true")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc.id)
+
+    def test_custom_fields_icontains_filter_no_duplicates(self) -> None:
+        """
+        GIVEN:
+            - A document with two custom field instances that both match the
+              same custom_fields__icontains search term
+        WHEN:
+            - The document list is filtered by custom_fields__icontains
+        THEN:
+            - The document appears exactly once, not once per matching field
+        """
+        doc = Document.objects.create(title="doc", checksum="c1")
+        field_1 = CustomField.objects.create(
+            name="apple",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        field_2 = CustomField.objects.create(
+            name="apricot",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=field_1,
+            value_text="something",
+        )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=field_2,
+            value_text="something else",
+        )
+
+        response = self.client.get("/api/documents/?custom_fields__icontains=ap")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], doc.id)
+
     def test_custom_field_select_filter(self) -> None:
         """
         GIVEN:
@@ -1156,6 +1240,91 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             [u1_doc1.id],
         )
 
+    def test_document_owned_and_group_shared_not_duplicated_when_filtering_by_tags(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A document owned by a user and also shared with a group the user belongs to
+        WHEN:
+            - The user filters documents by more than one tag (tags__id__all)
+        THEN:
+            - The document is returned exactly once, not once per permission path
+            (regression test for https://github.com/paperless-ngx/paperless-ngx/issues/13331)
+        """
+        user = User.objects.create_user("user1")
+        user.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        group = Group.objects.create(name="group1")
+        user.groups.add(group)
+
+        tag1 = TagFactory()
+        tag2 = TagFactory()
+        doc = DocumentFactory(title="shared", owner=user)
+        doc.tags.add(tag1, tag2)
+        assign_perm("view_document", group, doc)
+
+        self.client.force_authenticate(user=user)
+        response = self.client.get(
+            f"/api/documents/?tags__id__all={tag1.id},{tag2.id}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], doc.id)
+
+    def test_document_permission_filter_excludes_unrelated_documents(self) -> None:
+        """
+        GIVEN:
+            - A document owned by one user, with no permission granted to another user
+        WHEN:
+            - The unrelated user requests the document list
+        THEN:
+            - The document does not appear in their results
+        """
+        owner = User.objects.create_user("owner1")
+        stranger = User.objects.create_user("stranger1")
+        stranger.user_permissions.add(
+            *Permission.objects.filter(codename="view_document"),
+        )
+
+        DocumentFactory(title="private", owner=owner)
+
+        self.client.force_authenticate(user=stranger)
+        response = self.client.get("/api/documents/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 0)
+
+    def test_document_permission_filter_only_visible_to_group_members(self) -> None:
+        """
+        GIVEN:
+            - A document shared with a group via object permissions
+        WHEN:
+            - A group member and a non-member both request the document list
+        THEN:
+            - Only the group member sees the document
+        """
+        owner = User.objects.create_user("owner2")
+        member = User.objects.create_user("member1")
+        non_member = User.objects.create_user("nonmember1")
+        for u in (member, non_member):
+            u.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+
+        group = Group.objects.create(name="group2")
+        member.groups.add(group)
+
+        doc = DocumentFactory(title="shared2", owner=owner)
+        assign_perm("view_document", group, doc)
+
+        self.client.force_authenticate(user=member)
+        response = self.client.get("/api/documents/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], doc.id)
+
+        self.client.force_authenticate(user=non_member)
+        response = self.client.get("/api/documents/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 0)
+
     def test_pagination_results(self) -> None:
         """
         GIVEN:
@@ -1290,6 +1459,63 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(selected_tag["document_count"], 1)
         self.assertEqual(selected_type["document_count"], 1)
         self.assertEqual(selected_storage_path["document_count"], 1)
+
+    def test_selection_data_document_counts_per_tag(self) -> None:
+        """
+        GIVEN:
+            - Multiple tags with different numbers of matching documents
+              within the filtered set, including one with no matches
+        WHEN:
+            - Requesting the document list with include_selection_data=true
+        THEN:
+            - Each tag's document_count reflects only documents in the
+              filtered set, not the instance-wide count
+        """
+        tag_a = Tag.objects.create(name="a")
+        tag_b = Tag.objects.create(name="b")
+        tag_unused = Tag.objects.create(name="unused")
+        custom_field = CustomField.objects.create(
+            name="cf1",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+
+        doc1 = Document.objects.create(checksum="1", correspondent=None)
+        doc1.tags.add(tag_a)
+        doc2 = Document.objects.create(checksum="2")
+        doc2.tags.add(tag_a, tag_b)
+        doc3 = Document.objects.create(checksum="3")
+        doc3.tags.add(tag_b)
+        CustomFieldInstance.objects.create(
+            document=doc1,
+            field=custom_field,
+            value_text="x",
+        )
+
+        # Excluded from the filtered set entirely.
+        excluded = Document.objects.create(checksum="4")
+        excluded.tags.add(tag_a, tag_b, tag_unused)
+
+        response = self.client.get(
+            f"/api/documents/?id__in={doc1.id},{doc2.id},{doc3.id}"
+            "&include_selection_data=true",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        selection_data = response.data["selection_data"]
+
+        counts_by_tag = {
+            item["id"]: item["document_count"]
+            for item in selection_data["selected_tags"]
+        }
+        self.assertEqual(counts_by_tag[tag_a.id], 2)
+        self.assertEqual(counts_by_tag[tag_b.id], 2)
+        self.assertEqual(counts_by_tag[tag_unused.id], 0)
+
+        counts_by_field = {
+            item["id"]: item["document_count"]
+            for item in selection_data["selected_custom_fields"]
+        }
+        self.assertEqual(counts_by_field[custom_field.id], 1)
 
     def test_statistics(self) -> None:
         doc1 = Document.objects.create(

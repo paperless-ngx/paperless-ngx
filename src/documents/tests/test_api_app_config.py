@@ -12,6 +12,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import read_streaming_response
 from paperless.models import ApplicationConfiguration
 from paperless.models import ColorConvertChoices
 
@@ -193,6 +194,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         response = self.client.get("/logo/simple.jpg")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("image/jpeg", response["Content-Type"])
+        response.close()
 
         config = ApplicationConfiguration.objects.first()
         assert config is not None
@@ -211,6 +213,46 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
             },
         )
         self.assertFalse(Path(old_logo.path).exists())
+
+    @override_settings(APP_LOGO="/logo/simple.jpg")
+    def test_serve_app_logo_from_environment_setting(self) -> None:
+        """
+        GIVEN:
+            - No uploaded app logo
+            - PAPERLESS_APP_LOGO points to a file in the media logo directory
+        WHEN:
+            - The configured logo URL is requested
+        THEN:
+            - The environment-configured logo is served
+        """
+        logo = self.dirs.media_dir / "logo" / "simple.jpg"
+        logo.parent.mkdir()
+        expected_content = (
+            Path(__file__).parent / "samples" / "simple.jpg"
+        ).read_bytes()
+        logo.write_bytes(expected_content)
+
+        response = self.client.get("/logo/simple.jpg")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("image/jpeg", response["Content-Type"])
+        self.assertEqual(read_streaming_response(response), expected_content)
+
+    @override_settings(APP_LOGO="/logo/../outside-logo.jpg")
+    def test_environment_app_logo_must_be_inside_logo_directory(self) -> None:
+        """
+        GIVEN:
+            - PAPERLESS_APP_LOGO resolves outside the media logo directory
+        WHEN:
+            - The configured logo URL is requested
+        THEN:
+            - The file is not served
+        """
+        (self.dirs.media_dir / "outside-logo.jpg").write_bytes(b"not a logo")
+
+        response = self.client.get("/logo/outside-logo.jpg")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_api_strips_exif_data_from_uploaded_logo(self) -> None:
         """

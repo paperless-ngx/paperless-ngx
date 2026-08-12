@@ -39,7 +39,6 @@ from drf_spectacular.utils import extend_schema_field
 from drf_spectacular.utils import extend_schema_serializer
 from drf_writable_nested.serializers import NestedUpdateMixin
 from guardian.core import ObjectPermissionChecker
-from guardian.shortcuts import get_objects_for_user
 from guardian.shortcuts import get_users_with_perms
 from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
@@ -80,8 +79,8 @@ from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_groups_with_only_permission
-from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
+from documents.permissions import permitted_document_ids
 from documents.permissions import set_permissions_for_object
 from documents.regex import validate_regex_pattern
 from documents.templating.filepath import validate_filepath_template_and_render
@@ -392,15 +391,34 @@ class OwnedObjectSerializer(
         }
 
     def get_user_can_change(self, obj) -> bool:
-        checker = ObjectPermissionChecker(self.user) if self.user is not None else None
-        return (
-            obj.owner is None
-            or obj.owner == self.user
-            or (
-                self.user is not None
-                and checker.has_perm(f"change_{obj.__class__.__name__.lower()}", obj)
+        if obj.owner is None or obj.owner == self.user:
+            return True
+        if self.user is None:
+            return False
+        if self.user.is_active and self.user.is_superuser:
+            # Mirrors guardian's own ObjectPermissionChecker.has_perm() shortcut --
+            # superusers aren't necessarily granted explicit object permissions,
+            # so the batched context below would otherwise incorrectly say no.
+            return True
+
+        # Prefer the page-level batch computed by BulkPermissionMixin
+        # (get_serializer_context) over a fresh per-object guardian check,
+        # which would otherwise query the permission tables once per row.
+        users_change_perms = self.context.get("users_change_perms")
+        groups_change_perms = self.context.get("groups_change_perms")
+        if users_change_perms is not None and groups_change_perms is not None:
+            if self.user.pk in users_change_perms.get(obj.pk, []):
+                return True
+            user_group_ids = getattr(self, "_user_group_ids", None)
+            if user_group_ids is None:
+                user_group_ids = set(self.user.groups.values_list("id", flat=True))
+                self._user_group_ids = user_group_ids
+            return bool(
+                user_group_ids.intersection(groups_change_perms.get(obj.pk, [])),
             )
-        )
+
+        checker = ObjectPermissionChecker(self.user)
+        return checker.has_perm(f"change_{obj.__class__.__name__.lower()}", obj)
 
     @staticmethod
     def get_shared_object_pks(objects: Iterable):
@@ -846,10 +864,10 @@ def validate_documentlink_targets(user, doc_ids):
     if user is None:
         return
 
-    target_documents = Document.objects.filter(id__in=doc_ids).select_related("owner")
-    if not all(
-        has_perms_owner_aware(user, "change_document", document)
-        for document in target_documents
+    if (
+        Document.objects.filter(id__in=doc_ids)
+        .exclude(id__in=permitted_document_ids(user, perm="change_document"))
+        .exists()
     ):
         raise PermissionDenied(
             _("Insufficient permissions."),
@@ -992,13 +1010,8 @@ def _get_viewable_duplicates(
     ).exclude(pk=document.pk)
     duplicates = duplicates.filter(root_document__isnull=True)
     duplicates = duplicates.order_by("-created")
-    allowed = get_objects_for_user_owner_aware(
-        user,
-        "documents.view_document",
-        Document,
-        include_deleted=True,
-    )
-    return duplicates.filter(id__in=allowed)
+    allowed_ids = permitted_document_ids(user, include_deleted=True)
+    return duplicates.filter(id__in=allowed_ids)
 
 
 class DuplicateDocumentSummarySerializer(serializers.Serializer[dict[str, Any]]):
@@ -1810,18 +1823,27 @@ class BulkEditSerializer(
                 f"Some custom fields in {name} don't exist or were specified twice.",
             )
 
-        if isinstance(custom_fields, dict):
-            custom_field_map = CustomField.objects.in_bulk(ids)
-            for raw_field_id, value in custom_fields.items():
-                field = custom_field_map.get(int(raw_field_id))
-                if (
-                    field is not None
-                    and field.data_type == CustomField.FieldDataType.DOCUMENTLINK
-                    and value is not None
-                ):
-                    if not isinstance(value, list):
-                        raise serializers.ValidationError("Value must be a list")
-                    validate_documentlink_targets(self.user, value)
+    def _validate_custom_field_values(self, custom_fields, name):
+        if not isinstance(custom_fields, dict):
+            return custom_fields
+
+        validated = {}
+        errors = {}
+        for raw_field_id, value in custom_fields.items():
+            field_id = int(raw_field_id)
+            validator = CustomFieldInstanceSerializer(
+                data={"field": field_id, "value": value},
+                context=self.context,
+            )
+            if validator.is_valid():
+                validated[field_id] = validator.validated_data["value"]
+            else:
+                errors[str(field_id)] = validator.errors
+
+        if errors:
+            raise serializers.ValidationError({name: errors})
+
+        return validated
 
     def validate_method(self, method):
         if method == "set_correspondent":
@@ -1925,6 +1947,10 @@ class BulkEditSerializer(
                 parameters["add_custom_fields"],
                 "add_custom_fields",
             )
+            parameters["add_custom_fields"] = self._validate_custom_field_values(
+                parameters["add_custom_fields"],
+                "add_custom_fields",
+            )
         else:
             raise serializers.ValidationError("add_custom_fields not specified")
 
@@ -1943,6 +1969,8 @@ class BulkEditSerializer(
         return ownerUser
 
     def _validate_parameters_set_permissions(self, parameters) -> None:
+        if "set_permissions" not in parameters:
+            raise serializers.ValidationError("set_permissions not specified")
         parameters["set_permissions"] = self.validate_set_permissions(
             parameters["set_permissions"],
         )
@@ -2640,13 +2668,8 @@ class TaskSerializerV9(serializers.ModelSerializer[PaperlessTask]):
         user = request.user
         qs = Document.global_objects.filter(pk=dup_of)
         if not user.is_staff:
-            with_perms = get_objects_for_user(
-                user,
-                "documents.view_document",
-                qs,
-                accept_global_perms=False,
-            )
-            qs = with_perms | qs.filter(owner=user) | qs.filter(owner__isnull=True)
+            allowed_ids = permitted_document_ids(user, include_deleted=True)
+            qs = qs.filter(pk__in=allowed_ids)
         return list(qs.values("id", "title", "deleted_at"))
 
 
@@ -3190,6 +3213,13 @@ class WorkflowActionSerializer(serializers.ModelSerializer[WorkflowAction]):
                         {"assign_title": f'Invalid f-string detected: "{e.args[0]}"'},
                     )
 
+        if attrs.get("assign_custom_fields_values"):
+            # Empty strings treated as None to avoid unexpected behavior
+            attrs["assign_custom_fields_values"] = {
+                field_id: (None if value == "" else value)
+                for field_id, value in attrs["assign_custom_fields_values"].items()
+            }
+
         if (
             "type" in attrs
             and attrs["type"] == WorkflowAction.WorkflowActionType.EMAIL
@@ -3496,8 +3526,6 @@ class StoragePathTestSerializer(SerializerWithPerms):
             document_field = self.fields.get("document")
             if not isinstance(document_field, serializers.PrimaryKeyRelatedField):
                 return
-            document_field.queryset = get_objects_for_user_owner_aware(
-                user,
-                "documents.view_document",
-                Document,
+            document_field.queryset = Document.objects.filter(
+                id__in=permitted_document_ids(user),
             )

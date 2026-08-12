@@ -108,6 +108,18 @@ describe('PermissionsService', () => {
       actionKey: 'View', // PermissionAction.View
       typeKey: 'Document', // PermissionType.Document
     })
+    expect(
+      permissionsService.getPermissionKeys('view_global_statistics')
+    ).toEqual({
+      actionKey: 'View', // PermissionAction.View
+      typeKey: 'GlobalStatistics', // PermissionType.GlobalStatistics
+    })
+    expect(
+      permissionsService.getPermissionKeys('view_system_monitoring')
+    ).toEqual({
+      actionKey: 'View', // PermissionAction.View
+      typeKey: 'SystemMonitoring', // PermissionType.SystemMonitoring
+    })
   })
 
   it('correctly checks explicit global permissions', () => {

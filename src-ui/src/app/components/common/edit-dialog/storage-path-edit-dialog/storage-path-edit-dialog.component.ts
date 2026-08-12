@@ -1,5 +1,5 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common'
-import { Component, OnDestroy, inject } from '@angular/core'
+import { Component, OnDestroy, inject, signal } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -65,9 +65,9 @@ export class StoragePathEditDialogComponent
   public documentsInput$ = new Subject<string>()
   public foundDocuments$: Observable<Document[]>
   private testDocument: Document
-  public testResult: string
-  public testFailed: boolean = false
-  public testLoading = false
+  readonly testResult = signal<string>(undefined)
+  readonly testFailed = signal(false)
+  readonly testLoading = signal(false)
 
   constructor() {
     super()
@@ -99,22 +99,22 @@ export class StoragePathEditDialogComponent
 
   public testPath(document: Document) {
     if (!document) {
-      this.testResult = null
+      this.testResult.set(null)
       return
     }
     this.testDocument = document
-    this.testLoading = true
+    this.testLoading.set(true)
     ;(this.service as StoragePathService)
       .testPath(this.objectForm.get('path').value, document.id)
       .subscribe((result) => {
         if (result?.length) {
-          this.testResult = result
-          this.testFailed = false
+          this.testResult.set(result)
+          this.testFailed.set(false)
         } else {
-          this.testResult = null
-          this.testFailed = true
+          this.testResult.set(null)
+          this.testFailed.set(true)
         }
-        this.testLoading = false
+        this.testLoading.set(false)
       })
   }
 

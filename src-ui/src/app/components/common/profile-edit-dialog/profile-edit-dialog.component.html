@@ -57,15 +57,15 @@
           </div>
       </div>
       <div class="col-12 col-md-6">
-        @if (socialAccounts?.length > 0) {
+        @if (socialAccounts().length > 0) {
           <div class="mb-3">
             <p i18n>Connected social accounts</p>
             <ul class="list-group">
-              @for (account of socialAccounts; track account.id) {
+              @for (account of socialAccounts(); track account.id) {
                 <li class="list-group-item"
                   ngbPopover="Set a password before disconnecting social account."
                   i18n-ngbPopover
-                  [disablePopover]="hasUsablePassword"
+                  [disablePopover]="hasUsablePassword()"
                   triggers="mouseenter:mouseleave">
                   {{account.name}} ({{account.provider}})
                   <pngx-confirm-button
@@ -75,7 +75,7 @@
                     i18n-title
                     buttonClasses="btn-outline-danger btn-sm ms-2 align-baseline"
                     iconName="trash"
-                    [disabled]="!hasUsablePassword"
+                    [disabled]="!hasUsablePassword()"
                     (confirm)="disconnectSocialAccount(account.id)">
                   </pngx-confirm-button>
                 </li>
@@ -84,11 +84,11 @@
             <div class="form-text text-muted text-end fst-italic" i18n>Warning: disconnecting social accounts cannot be undone</div>
           </div>
         }
-        @if (socialAccountProviders?.length > 0) {
+        @if (socialAccountProviders().length > 0) {
           <div class="mb-3">
             <p i18n>Connect new social account</p>
             <div class="list-group">
-              @for (provider of socialAccountProviders; track provider.name) {
+              @for (provider of socialAccountProviders(); track provider.name) {
                 <a class="list-group-item list-group-item-action text-primary d-flex align-items-center" href="{{ provider.login_url }}" rel="noopener noreferrer">
                   {{provider.name}}<i-bs class="pb-1 ms-2" name="box-arrow-up-right"></i-bs>
                 </a>
@@ -96,7 +96,7 @@
             </div>
           </div>
         }
-        @if (!isTotpEnabled) {
+        @if (!isTotpEnabled()) {
           <div ngbAccordion>
             <div ngbAccordionItem>
               <h2 ngbAccordionHeader>
@@ -105,10 +105,10 @@
               <div ngbAccordionCollapse>
                 <div ngbAccordionBody>
                   <ng-template>
-                    @if (totpSettingsLoading) {
+                    @if (totpSettingsLoading()) {
                       <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
                       <div class="visually-hidden" i18n>Loading...</div>
-                    } @else if (totpSettings) {
+                    } @else if (totpSettings()) {
                       <figure class="figure">
                         @if (qrSvgDataUrl) {
                           <img class="bg-white d-inline-block" [src]="qrSvgDataUrl" alt="Authenticator QR code">
@@ -116,14 +116,14 @@
                         <figcaption class="figure-caption text-end mt-2" i18n>Scan the QR code with your authenticator app and then enter the code below</figcaption>
                       </figure>
                       <p>
-                        <ng-container i18n>Authenticator secret</ng-container>: <code>{{totpSettings.secret}}</code>.
+                        <ng-container i18n>Authenticator secret</ng-container>: <code>{{totpSettings().secret}}</code>.
                         <ng-container i18n>You can store this secret and use it to reinstall your authenticator app at a later time.</ng-container>
                       </p>
                       <div class="input-group mb-3">
                         <input type="text" class="form-control" formControlName="totp_code" placeholder="Code" i18n-placeholder>
-                        <button type="button" class="btn btn-primary ml-auto" (click)="activateTotp()" [disabled]="totpLoading">
+                        <button type="button" class="btn btn-primary ml-auto" (click)="activateTotp()" [disabled]="totpLoading()">
                           <ng-container i18n>Enable</ng-container>
-                          @if (totpLoading) {
+                          @if (totpLoading()) {
                             <div class="spinner-border spinner-border-sm fw-normal ms-2" role="status"></div>
                             <div class="visually-hidden" i18n>Loading...</div>
                           }
@@ -137,18 +137,18 @@
           </div>
         } @else {
           <label class="d-block mb-2" i18n>Two-factor Authentication</label>
-          @if (recoveryCodes) {
+          @if (recoveryCodes()) {
             <div class="alert alert-warning" role="alert">
               <i-bs name="exclamation-triangle" class="me-1"></i-bs><ng-container i18n>Recovery codes will not be shown again, make sure to save them.</ng-container>
             </div>
             <div class="d-flex flex-row align-items-start mb-3">
               <ul class="list-group w-50">
-                  @for (code of recoveryCodes; track code; let i = $index) {
+                  @for (code of recoveryCodes(); track code; let i = $index) {
                     @if (i % 2 === 0) {
                       <li class="list-group-item d-flex justify-content-around align-items-center">
                         <code>{{code}}</code>
-                        @if (recoveryCodes[i + 1]) {
-                          <code>{{recoveryCodes[i + 1]}}</code>
+                        @if (recoveryCodes()[i + 1]) {
+                          <code>{{recoveryCodes()[i + 1]}}</code>
                         }
                       </li>
                     }
@@ -171,7 +171,7 @@
             i18n-title
             buttonClasses="btn-outline-danger btn-sm"
             iconName="trash"
-            [disabled]="totpLoading"
+            [disabled]="totpLoading()"
             (confirm)="deactivateTotp()">
           </pngx-confirm-button>
         }

@@ -5,8 +5,9 @@
   i18n-info>
   <div class="input-group input-group-sm align-items-center">
     <div class="input-group input-group-sm me-3">
-      <span class="input-group-text text-muted" i18n>Show</span>
+      <label class="input-group-text text-muted" for="logLineLimit" i18n>Show</label>
       <input
+        id="logLineLimit"
         class="form-control"
         type="number"
         min="100"
@@ -17,7 +18,7 @@
       <span class="input-group-text text-muted" i18n>lines</span>
     </div>
     <div class="form-check form-switch mt-1">
-      <input class="form-check-input" type="checkbox" role="switch" [ngModel]="autoRefreshEnabled()" (ngModelChange)="autoRefreshEnabled.set($event)">
+      <input id="autoRefreshSwitch" class="form-check-input" type="checkbox" role="switch" [ngModel]="autoRefreshEnabled()" (ngModelChange)="autoRefreshEnabled.set($event)">
       <label class="form-check-label" for="autoRefreshSwitch" i18n>Auto refresh</label>
     </div>
   </div>
