@@ -9,6 +9,7 @@ import { CheckComponent } from '../../common/input/check/check.component'
 import { PermissionsFormComponent } from '../../common/input/permissions/permissions-form/permissions-form.component'
 import { PermissionsGroupComponent } from '../../common/input/permissions/permissions-group/permissions-group.component'
 import { PermissionsUserComponent } from '../../common/input/permissions/permissions-user/permissions-user.component'
+import { SelectComponent } from '../../common/input/select/select.component'
 import { TextComponent } from '../../common/input/text/text.component'
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog.component'
 
@@ -40,6 +41,7 @@ describe('SaveViewConfigDialogComponent', () => {
         ReactiveFormsModule,
         SaveViewConfigDialogComponent,
         TextComponent,
+        SelectComponent,
         CheckComponent,
         PermissionsFormComponent,
         PermissionsUserComponent,
@@ -63,6 +65,7 @@ describe('SaveViewConfigDialogComponent', () => {
     expect(component.defaultName()).toEqual(name)
     expect(result).toEqual({
       name,
+      icon: 'funnel',
       showInSideBar: false,
       showOnDashboard: false,
     })
@@ -94,6 +97,7 @@ describe('SaveViewConfigDialogComponent', () => {
     component.save()
     expect(result).toEqual({
       name,
+      icon: 'funnel',
       showInSideBar: true,
       showOnDashboard: true,
     })
@@ -113,6 +117,7 @@ describe('SaveViewConfigDialogComponent', () => {
     component.save()
     expect(result).toEqual({
       name: '',
+      icon: 'funnel',
       showInSideBar: false,
       showOnDashboard: false,
       permissions_form: permissions,

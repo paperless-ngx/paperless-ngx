@@ -97,7 +97,9 @@
     <div class="dropdown-menu shadow dropdown-menu-right" ngbDropdownMenu>
       @if (!list.activeSavedViewId) {
         @for (view of savedViewService.allViews; track view) {
-          <button ngbDropdownItem (click)="loadViewConfig(view.id)">{{view.name}}</button>
+          <button ngbDropdownItem (click)="loadViewConfig(view.id)">
+            <i-bs class="me-2" [name]="view.icon || 'funnel'"></i-bs>{{view.name}}
+          </button>
         }
         @if (savedViewService.allViews.length > 0) {
           <div class="dropdown-divider"></div>

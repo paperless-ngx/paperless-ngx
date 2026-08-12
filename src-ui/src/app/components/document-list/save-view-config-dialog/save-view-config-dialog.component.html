@@ -6,6 +6,14 @@
   </div>
   <div class="modal-body">
     <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error()?.name" autocomplete="off"></pngx-input-text>
+    <pngx-input-select
+      i18n-title
+      title="Icon"
+      formControlName="icon"
+      [items]="savedViewIcons"
+      iconField="icon"
+      [error]="error()?.icon">
+    </pngx-input-select>
     <pngx-input-check i18n-title title="Show in sidebar" formControlName="showInSideBar"></pngx-input-check>
     <pngx-input-check i18n-title title="Show on dashboard" formControlName="showOnDashboard"></pngx-input-check>
     <pngx-permissions-form accordion="true" formControlName="permissions_form"></pngx-permissions-form>
