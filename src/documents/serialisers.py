@@ -85,6 +85,7 @@ from documents.permissions import set_permissions_for_object
 from documents.regex import validate_regex_pattern
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.templating.utils import convert_format_str_to_template_format
+from documents.templating.workflows import validate_workflow_template
 from documents.validators import uri_validator
 from documents.validators import url_validator
 
@@ -3184,33 +3185,10 @@ class WorkflowActionSerializer(serializers.ModelSerializer[WorkflowAction]):
                 attrs["assign_title"] = None
             else:
                 try:
-                    # test against all placeholders, see consumer.py `parse_doc_title_w_placeholders`
-                    attrs["assign_title"].format(
-                        correspondent="",
-                        document_type="",
-                        added="",
-                        added_year="",
-                        added_year_short="",
-                        added_month="",
-                        added_month_name="",
-                        added_month_name_short="",
-                        added_day="",
-                        added_time="",
-                        owner_username="",
-                        original_filename="",
-                        filename="",
-                        created="",
-                        created_year="",
-                        created_year_short="",
-                        created_month="",
-                        created_month_name="",
-                        created_month_name_short="",
-                        created_day="",
-                        created_time="",
-                    )
+                    validate_workflow_template(attrs["assign_title"])
                 except (ValueError, KeyError) as e:
                     raise serializers.ValidationError(
-                        {"assign_title": f'Invalid f-string detected: "{e.args[0]}"'},
+                        {"assign_title": f"{e.args[0]}"},
                     )
 
         if attrs.get("assign_custom_fields_values"):
