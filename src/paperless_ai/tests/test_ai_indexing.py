@@ -735,8 +735,71 @@ class TestLlmIndexAddOrUpdateDocumentEmptyContent:
         )
         mock_load = mocker.patch("paperless_ai.indexing.load_or_build_index")
 
-        doc = MagicMock(spec=Document)
-        doc.id = 42
+        doc = DocumentFactory.create()
+        # Must not raise
+        indexing.llm_index_add_or_update_document(doc)
+
+        mock_load.assert_not_called()
+
+
+@pytest.mark.django_db
+class TestLlmIndexAddOrUpdateDocumentPrefetch:
+    """llm_index_add_or_update_document must prefetch the relations
+    build_document_node()/build_llm_index_text() touch, not re-query per
+    tag/note/custom field.
+    """
+
+    def test_query_count_does_not_scale_with_custom_field_count(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+    ) -> None:
+        """
+        GIVEN a document with several custom fields, a note, and a tag
+        WHEN it is incrementally indexed via llm_index_add_or_update_document
+        THEN the query count stays flat instead of growing with the number
+             of custom fields -- a regression here would add one query per
+             custom field instance (instance.field.name unprefetched), see
+             build_llm_index_text().
+        """
+        doc = DocumentFactory.create()
+        Note.objects.create(document=doc, note="a note")
+        for i in range(5):
+            field = CustomField.objects.create(
+                name=f"Field {i}",
+                data_type=CustomField.FieldDataType.STRING,
+            )
+            CustomFieldInstance.objects.create(
+                document=doc,
+                field=field,
+                value_text="value",
+            )
+
+        with CaptureQueriesContext(connection) as ctx:
+            indexing.llm_index_add_or_update_document(doc)
+
+        # Flat regardless of custom field count -- an unprefetched
+        # custom_fields__field would add one query per instance (5 here) on
+        # top of this budget.
+        assert len(ctx.captured_queries) <= 10
+
+    def test_skips_write_when_document_no_longer_exists(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN a document that has been deleted since the caller looked it up
+             (e.g. a race between a signal firing and its async task running)
+        WHEN llm_index_add_or_update_document is called with that stale instance
+        THEN it skips the write instead of raising Document.DoesNotExist
+        """
+        doc = DocumentFactory.create()
+        doc_id = doc.pk
+        Document.objects.filter(pk=doc_id).delete()
+        mock_load = mocker.patch("paperless_ai.indexing.load_or_build_index")
+
         # Must not raise
         indexing.llm_index_add_or_update_document(doc)
 
@@ -793,8 +856,7 @@ class TestLlmIndexLocking:
             return_value=[mock_node],
         )
 
-        doc = MagicMock(spec=Document)
-        doc.id = 1
+        doc = DocumentFactory.create()
         indexing.llm_index_add_or_update_document(doc)
 
         mock_store.upsert_document.assert_called_once()
@@ -825,8 +887,7 @@ class TestLlmIndexLocking:
             return_value=[mock_node],
         )
 
-        doc = MagicMock(spec=Document)
-        doc.id = 1
+        doc = DocumentFactory.create()
         indexing.llm_index_add_or_update_document(doc)
 
         mock_store.upsert_document.assert_not_called()
@@ -863,8 +924,7 @@ class TestLlmIndexLocking:
             return_value=[mock_node],
         )
 
-        doc = MagicMock(spec=Document)
-        doc.id = 1
+        doc = DocumentFactory.create()
         indexing.llm_index_add_or_update_document(doc)
 
         mock_store.upsert_document.assert_not_called()

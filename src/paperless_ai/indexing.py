@@ -24,6 +24,7 @@ from paperless_ai.embedding import get_configured_model_name
 from paperless_ai.embedding import get_embedding_model
 
 if TYPE_CHECKING:
+    from django.db.models import QuerySet
     from llama_index.core.schema import BaseNode
 
     from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
@@ -252,6 +253,20 @@ def _safe_related_name(document: Document, field: str) -> str | None:
     return related.name if related else None
 
 
+def _document_index_queryset() -> "QuerySet[Document]":
+    """Document queryset with every relation build_document_node() /
+    build_llm_index_text() touches -- correspondent, document_type,
+    storage_path, tags, notes, custom_fields__field -- pre-loaded, so
+    indexing one document costs a fixed handful of queries regardless of
+    its tag or custom field count, instead of one query per related object.
+    """
+    return Document.objects.select_related(
+        "correspondent",
+        "document_type",
+        "storage_path",
+    ).prefetch_related("tags", "notes", "custom_fields__field")
+
+
 def build_document_node(
     document: Document,
     *,
@@ -425,11 +440,7 @@ def update_llm_index(
                 "Skipping LLM index update: migration check deferred; "
                 "will retry next run."
             )
-    documents = Document.objects.select_related(
-        "correspondent",
-        "document_type",
-        "storage_path",
-    ).prefetch_related("tags", "notes", "custom_fields__field")
+    documents = _document_index_queryset()
     no_documents = not documents.exists()
 
     # Fast exit before touching config: nothing to index and no existing index.
@@ -494,6 +505,21 @@ def update_llm_index(
 def llm_index_add_or_update_document(document: Document):
     """Add or atomically replace a document's chunks in the index."""
     config = AIConfig()
+    document_id = document.id
+    # Re-fetch with the same select_related/prefetch_related shape as the
+    # bulk path (update_llm_index()) uses: the caller's ``document`` instance
+    # (e.g. straight off a signal) has none of that loaded, and
+    # build_document_node()/build_llm_index_text() touch
+    # correspondent/document_type/storage_path/tags/notes/custom_fields__field
+    # -- without prefetching, that's one query per related object, including
+    # one per custom field instance.
+    document = _document_index_queryset().filter(pk=document_id).first()
+    if document is None:
+        logger.info(
+            "Skipping LLM index update for document %s: it no longer exists.",
+            document_id,
+        )
+        return
     new_nodes = build_document_node(
         document,
         chunk_size=config.llm_embedding_chunk_size,
