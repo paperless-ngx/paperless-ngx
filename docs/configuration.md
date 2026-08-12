@@ -1951,6 +1951,15 @@ specified as "chi-tra".
 
     Defaults to none, which does not install any additional languages.
 
+    `PAPERLESS_OCR_LANGUAGES` installs Debian Tesseract language packages by
+    package name. It cannot install an arbitrary `.traineddata` file, such as
+    a locally trained or contributed domain model. For custom language data,
+    build a derived Paperless image that copies the file into the image's
+    Tesseract `tessdata` directory, verify it with `tesseract --list-langs`,
+    and set `PAPERLESS_OCR_LANGUAGE` to the model's language code. Do not use
+    `PAPERLESS_OCR_LANGUAGES` for that custom code unless a matching Debian
+    package exists.
+
     !!! warning
 
          This option must not be used in rootless containers.
