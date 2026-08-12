@@ -699,6 +699,7 @@ document_fuzzy_match [--ratio] [--processes N]
 | --ratio     | No       | 85.0                | a number between 0 and 100, setting how similar a document must be for it to be reported. Higher numbers mean more similarity. |
 | --processes | No       | 1/4 of system cores | Number of processes to use for matching. Setting 1 disables multiple processes                                                 |
 | --delete    | No       | False               | If provided, one document of a matched pair above the ratio will be deleted.                                                   |
+| --url       | No       | blank               | If an instance URL is provided, the output table will show URLs to each documents instead of the document ID and name.         |
 
 !!! warning
 
