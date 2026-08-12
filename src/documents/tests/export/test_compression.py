@@ -154,16 +154,14 @@ class TestCompressTypeReadable:
     def test_zstd_compress_type_readability_tracks_runtime(self) -> None:
         """
         GIVEN:
-            - The current (93) and legacy (20) zstd compress_type ids
+            - The zstd compress_type id (93, ZIP_ZSTANDARD)
         WHEN:
             - Checked with compress_type_readable() on this runtime
         THEN:
             - Readability matches whether Python is 3.14+
         """
-        # 93 = ZIP_ZSTANDARD; 20 = legacy zstd method id (read-only)
         expected: bool = sys.version_info >= (3, 14)
         assert compression.compress_type_readable(93) == expected
-        assert compression.compress_type_readable(20) == expected
 
     def test_unknown_compress_type_is_unreadable(self) -> None:
         """

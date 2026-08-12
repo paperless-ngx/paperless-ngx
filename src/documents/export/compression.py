@@ -43,15 +43,13 @@ LEVEL_BOUNDS: dict[str, tuple[int, int] | None] = {
     "zstd": (-22, 22),
 }
 
-# zipfile compress_type id -> method name. 93 = current zstd id, 20 = legacy
-# zstd id that zipfile can still read.
+# zipfile compress_type id -> method name.
 _COMPRESS_TYPE_TO_METHOD: dict[int, str] = {
     zipfile.ZIP_STORED: "stored",
     zipfile.ZIP_DEFLATED: "deflated",
     zipfile.ZIP_BZIP2: "bzip2",
     zipfile.ZIP_LZMA: "lzma",
     93: "zstd",
-    20: "zstd",
 }
 
 
