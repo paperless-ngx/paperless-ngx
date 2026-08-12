@@ -554,6 +554,42 @@ class TestCommandImport(
                 )
         self.assertIn("compression", str(e.exception))
 
+    def test_import_rejects_unreadable_zstd_with_version_hint(self) -> None:
+        """
+        GIVEN:
+            - A zip archive with an entry compressed with zstd
+        WHEN:
+            - Import is attempted on a Python runtime that can't read zstd
+        THEN:
+            - The CommandError names the 3.14+ requirement, not just the
+              generic "can't read" message
+        """
+        import zipfile
+        from unittest import mock
+
+        archive = Path(self.dirs.scratch_dir) / "export.zip"
+        with zipfile.ZipFile(archive, "w") as zf:
+            zf.writestr("manifest.json", "[]")
+
+        with (
+            mock.patch(
+                "documents.management.commands.document_importer.compress_type_readable",
+                return_value=False,
+            ),
+            mock.patch(
+                "documents.management.commands.document_importer.unreadable_method_names",
+                return_value={"zstd"},
+            ),
+        ):
+            with self.assertRaises(CommandError) as e:
+                call_command(
+                    "document_importer",
+                    str(archive),
+                    "--no-progress-bar",
+                    skip_checks=True,
+                )
+        self.assertIn("3.14", str(e.exception))
+
 
 @pytest.mark.management
 @pytest.mark.django_db

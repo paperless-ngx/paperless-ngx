@@ -1182,6 +1182,35 @@ class TestExportImport(
             )
         self.assertIn("3.14", str(e.exception))
 
+    def test_non_zstd_unavailable_raises_generic_error(self) -> None:
+        """
+        GIVEN:
+            - A Python runtime missing the module backing a non-zstd method
+              (e.g. bz2/lzma not compiled in on a minimal build)
+        WHEN:
+            - That method is requested via --zip-compression
+        THEN:
+            - A CommandError is raised naming the method, not the
+              zstd-specific "requires 3.14" message
+        """
+        with (
+            mock.patch(
+                "documents.management.commands.document_exporter.compression_available",
+                return_value=False,
+            ),
+            self.assertRaises(CommandError) as e,
+        ):
+            call_command(
+                "document_exporter",
+                self.target,
+                "--zip",
+                "--zip-compression",
+                "bzip2",
+                skip_checks=True,
+            )
+        self.assertIn("bzip2", str(e.exception))
+        self.assertNotIn("3.14", str(e.exception))
+
     def test_zip_compression_flag_resolves_to_sink_constant(self) -> None:
         """
         GIVEN:

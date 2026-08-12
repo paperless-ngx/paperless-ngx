@@ -2,6 +2,7 @@ import sys
 import zipfile
 
 import pytest
+import pytest_mock
 
 from documents.export import compression
 
@@ -68,6 +69,25 @@ class TestCompressionMethods:
         """
         expected: bool = sys.version_info >= (3, 14)
         assert compression.compression_available("zstd") == expected
+
+    def test_unimportable_module_reports_unavailable(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A compression method whose backing module fails to import
+              (e.g. a minimal Python build without bz2/lzma compiled in)
+        WHEN:
+            - Checked with compression_available()
+        THEN:
+            - False is returned rather than the ImportError propagating
+        """
+        mocker.patch(
+            "documents.export.compression.importlib.import_module",
+            side_effect=ImportError,
+        )
+        assert not compression.compression_available("bzip2")
 
 
 class TestLevelError:

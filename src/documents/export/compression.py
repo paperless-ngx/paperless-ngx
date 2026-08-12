@@ -64,7 +64,7 @@ def compression_available(method: str) -> bool:
         return _module_importable("lzma")
     if method == "zstd":
         return ZSTD is not None and _module_importable("compression.zstd")
-    return False
+    return False  # pragma: no cover -- method is always one of COMPRESSION_CHOICES
 
 
 def _module_importable(name: str) -> bool:
