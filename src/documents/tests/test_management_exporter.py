@@ -1089,11 +1089,12 @@ class TestExportImport(
         THEN:
             - A CommandError is raised (the flags are meaningless without --zip)
         """
-        for args in (
-            ["--zip-compression", "lzma"],
-            ["--zip-compression-level", "5"],
-        ):
-            with self.assertRaises(CommandError):
+        cases = {
+            "zip-compression": ["--zip-compression", "lzma"],
+            "zip-compression-level": ["--zip-compression-level", "5"],
+        }
+        for case_id, args in cases.items():
+            with self.subTest(case_id), self.assertRaises(CommandError):
                 call_command(
                     "document_exporter",
                     self.target,
@@ -1122,47 +1123,28 @@ class TestExportImport(
                 skip_checks=True,
             )
 
-    def test_zip_compression_level_rejected_for_stored(self) -> None:
+    def test_zip_compression_level_rejected_for_levelless_method(self) -> None:
         """
         GIVEN:
-            - A request to export to a zip file with --zip-compression stored
+            - A request to export to a zip file with a compression method
+              that ignores level entirely (stored, lzma)
         WHEN:
             - --zip-compression-level is also passed
         THEN:
-            - A CommandError is raised (stored ignores level entirely)
+            - A CommandError is raised
         """
-        with self.assertRaises(CommandError):
-            call_command(
-                "document_exporter",
-                self.target,
-                "--zip",
-                "--zip-compression",
-                "stored",
-                "--zip-compression-level",
-                "5",
-                skip_checks=True,
-            )
-
-    def test_zip_compression_level_rejected_for_lzma(self) -> None:
-        """
-        GIVEN:
-            - A request to export to a zip file with --zip-compression lzma
-        WHEN:
-            - --zip-compression-level is also passed
-        THEN:
-            - A CommandError is raised (lzma ignores level entirely)
-        """
-        with self.assertRaises(CommandError):
-            call_command(
-                "document_exporter",
-                self.target,
-                "--zip",
-                "--zip-compression",
-                "lzma",
-                "--zip-compression-level",
-                "5",
-                skip_checks=True,
-            )
+        for method in ("stored", "lzma"):
+            with self.subTest(method), self.assertRaises(CommandError):
+                call_command(
+                    "document_exporter",
+                    self.target,
+                    "--zip",
+                    "--zip-compression",
+                    method,
+                    "--zip-compression-level",
+                    "5",
+                    skip_checks=True,
+                )
 
     def test_zstd_unavailable_raises_friendly_error(self) -> None:
         """
