@@ -1396,3 +1396,18 @@ def delete_document_from_llm_index(
         from documents.tasks import remove_document_from_llm_index
 
         remove_document_from_llm_index.apply_async(kwargs={"document": instance})
+
+
+@receiver(models.signals.post_save, sender=Document)
+def warm_ai_after_consume(sender, instance, created=False, **kwargs):
+    """
+    Trigger async AI suggestion warm-up after document is saved.
+    Only fires when document was just created (consumed) and AI is enabled.
+    """
+    if not created:
+        return
+    ai_config = AIConfig()
+    if not ai_config.ai_enabled:
+        return
+    from documents.tasks import warm_ai_suggestions_after_consume
+    warm_ai_suggestions_after_consume.apply_async(args=[instance.pk])

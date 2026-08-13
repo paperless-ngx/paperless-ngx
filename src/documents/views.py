@@ -1546,7 +1546,10 @@ class DocumentViewSet(
         )
 
         if cached_llm_suggestions:
-            refresh_suggestions_cache(doc.pk)
+            refresh_suggestions_cache(
+                doc.pk,
+                timeout=getattr(settings, "PAPERLESS_AI_CACHE_TTL", 3600),
+            )
             return Response(cached_llm_suggestions.suggestions)
 
         try:

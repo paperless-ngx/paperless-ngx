@@ -826,3 +826,48 @@ def cleanup_expired_share_link_bundles() -> None:
             )
     if count:
         logger.info("Deleted %s expired share link bundle(s)", count)
+
+
+@shared_task
+def warm_ai_suggestions_after_consume(document_id: int) -> None:
+    """
+    Async warm AI suggestion cache after successful document consumption.
+    """
+    try:
+        from paperless.config import AIConfig
+        ai_config = AIConfig()
+        if not ai_config.ai_enabled:
+            return
+        doc = Document.objects.get(pk=document_id)
+        from paperless_ai.client import LLMTimeoutError
+        from documents.views import get_ai_document_classification, match_tags_by_name
+        output_language = doc.get_ai_output_language() if hasattr(doc, "get_ai_output_language") else "en"
+        llm_cache_backend = ":".join(
+            part
+            for part in (
+                ai_config.llm_backend,
+                ai_config.llm_model,
+                ai_config.llm_endpoint,
+                output_language,
+            )
+            if part
+        )
+        from documents.caching import get_llm_suggestion_cache, set_llm_suggestions_cache
+        cached = get_llm_suggestion_cache(doc.pk, backend=llm_cache_backend)
+        if not cached:
+            llm_suggestions = get_ai_document_classification(
+                doc,
+                doc.owner,
+                output_language,
+            )
+            resp_data = {
+                "title": llm_suggestions.get("title"),
+                "tags": llm_suggestions.get("tags", []),
+                "correspondents": llm_suggestions.get("correspondents", []),
+                "document_types": llm_suggestions.get("document_types", []),
+                "storage_paths": llm_suggestions.get("storage_paths", []),
+                "dates": llm_suggestions.get("dates", []),
+            }
+            set_llm_suggestions_cache(doc.pk, resp_data, backend=llm_cache_backend)
+    except Exception:
+        logger.exception("warm_ai_suggestions_after_consume failed for document %s", document_id)

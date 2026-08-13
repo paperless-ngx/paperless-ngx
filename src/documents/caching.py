@@ -187,8 +187,10 @@ def set_suggestions_cache(
 def refresh_suggestions_cache(
     document_id: int,
     *,
-    timeout: int = CACHE_50_MINUTES,
+    timeout: int | None = None,
 ) -> None:
+    if timeout is None:
+        timeout = getattr(settings, "PAPERLESS_AI_CACHE_TTL", CACHE_50_MINUTES)
     """
     Refreshes the expiration of the suggestions for the given document ID
     to the given timeout
@@ -215,8 +217,10 @@ def set_llm_suggestions_cache(
     suggestions: dict,
     *,
     backend: str,
-    timeout: int = CACHE_50_MINUTES,
+    timeout: int | None = None,
 ) -> None:
+    if timeout is None:
+        timeout = getattr(settings, "PAPERLESS_AI_CACHE_TTL", CACHE_50_MINUTES)
     """
     Cache LLM-generated suggestions using a backend-specific identifier
     (e.g. 'openai-like:gpt-4').
