@@ -2897,6 +2897,9 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
             has_perms
             and (
                 method == bulk_edit.delete
+                # Sources stop being documents of their own, and removing one
+                # again afterwards needs delete_document
+                or method == bulk_edit.merge_as_versions
                 or (
                     method in [bulk_edit.merge, bulk_edit.split]
                     and parameters.get("delete_originals")

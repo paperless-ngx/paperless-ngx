@@ -405,6 +405,7 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
         self.user.user_permissions.add(
             Permission.objects.get(codename="change_document"),
             Permission.objects.get(codename="view_document"),
+            Permission.objects.get(codename="delete_document"),
         )
         self.doc1 = Document.objects.create(
             checksum="A",
@@ -452,6 +453,32 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
         self.doc1.save()
         self.doc2.owner = user
         self.doc2.save()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(
+            "/api/documents/merge_as_versions/",
+            {
+                "documents": [self.doc1.id, self.doc2.id],
+                "root_document_id": self.doc1.id,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        merge_mock.assert_not_called()
+
+    @mock.patch("documents.views.bulk_edit.merge_as_versions")
+    def test_requires_delete_permission(self, merge_mock) -> None:
+        merge_mock.__name__ = "merge_as_versions"
+        # Owns them and may change them, but may not make them stop being documents
+        user = User.objects.create_user(username="no-delete")
+        user.user_permissions.add(
+            Permission.objects.get(codename="change_document"),
+            Permission.objects.get(codename="view_document"),
+        )
+        for doc in (self.doc1, self.doc2):
+            doc.owner = user
+            doc.save()
         self.client.force_authenticate(user=user)
 
         response = self.client.post(

@@ -95,7 +95,7 @@
           <button ngbDropdownItem (click)="mergeSelected()" [disabled]="!userCanAdd || list.allSelected || list.selectedCount < 2">
             <i-bs name="journals" class="me-1"></i-bs><ng-container i18n>Merge</ng-container>
           </button>
-          <button ngbDropdownItem (click)="mergeSelectedAsVersions()" [disabled]="!userOwnsAll || !userCanEditAll || list.allSelected || list.selectedCount < 2">
+          <button ngbDropdownItem (click)="mergeSelectedAsVersions()" [disabled]="!userOwnsAll || !userCanEditAll || !userCanDelete || list.allSelected || list.selectedCount < 2">
             <i-bs name="journal-bookmark-fill" class="me-1"></i-bs><ng-container i18n>Merge as versions</ng-container>
           </button>
         </div>

@@ -172,6 +172,13 @@ export class BulkEditorComponent
     )
   }
 
+  get userCanDelete(): boolean {
+    return this.permissionService.currentUserCan(
+      PermissionAction.Delete,
+      PermissionType.Document
+    )
+  }
+
   ngOnInit() {
     if (
       this.permissionService.currentUserCan(
