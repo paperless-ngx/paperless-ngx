@@ -243,11 +243,21 @@ class ZipExportSink(ExportSink):
     added as an entry at finalize (a zip entry cannot be interleaved with others).
     """
 
-    def __init__(self, target: Path, zip_name: str, *, delete: bool = False) -> None:
+    def __init__(
+        self,
+        target: Path,
+        zip_name: str,
+        *,
+        delete: bool = False,
+        compression: int = zipfile.ZIP_DEFLATED,
+        compresslevel: int | None = None,
+    ) -> None:
         self._target = target.resolve()
         self._zip_path = (self._target / zip_name).with_suffix(".zip")
         self._tmp_path = self._zip_path.with_name(self._zip_path.name + ".tmp")
         self._delete = delete
+        self._compression = compression
+        self._compresslevel = compresslevel
         self._zip: zipfile.ZipFile | None = None
         self._dirs: set[str] = set()
         self._pending_manifest: tuple[Path, str] | None = None
@@ -258,7 +268,8 @@ class ZipExportSink(ExportSink):
         self._zip = zipfile.ZipFile(
             self._tmp_path,
             "w",
-            compression=zipfile.ZIP_DEFLATED,
+            compression=self._compression,
+            compresslevel=self._compresslevel,
             allowZip64=True,
         )
 

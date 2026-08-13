@@ -34,10 +34,10 @@
           <p class="mb-0 small"><b>{{messageBold}}</b></p>
         }
     </div>
-    <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">
+    <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled()">
         <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
     </button>
-    <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled || degrees === 0">
+    <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled() || degrees === 0">
       {{btnCaption}}
       @if (!confirmButtonEnabled) {
           <ngb-progressbar style="height: 1px;" type="dark" [max]="secondsTotal" [value]="seconds"></ngb-progressbar>

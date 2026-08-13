@@ -5,6 +5,7 @@ import zipfile
 from pathlib import Path
 
 import pytest
+import pytest_mock
 from pytest_django.fixtures import SettingsWrapper
 
 from documents.export.sinks import DirectoryExportSink
@@ -303,6 +304,48 @@ class TestZipExportSink:
                 raise RuntimeError("boom")
         assert (target / "preexisting.txt").exists()
         assert not (target / "export.zip").exists()
+
+
+class TestZipExportSinkCompression:
+    @pytest.mark.parametrize(
+        ("method", "constant"),
+        [
+            ("stored", zipfile.ZIP_STORED),
+            ("deflated", zipfile.ZIP_DEFLATED),
+            ("bzip2", zipfile.ZIP_BZIP2),
+            ("lzma", zipfile.ZIP_LZMA),
+        ],
+    )
+    def test_compression_and_level_forwarded_to_zipfile(
+        self,
+        mocker: pytest_mock.MockerFixture,
+        tmp_path: Path,
+        method: str,
+        constant: int,
+    ) -> None:
+        """
+        GIVEN:
+            - A ZipExportSink constructed with a compression method and level
+        WHEN:
+            - The sink is opened
+        THEN:
+            - zipfile.ZipFile is constructed with those values forwarded
+              unchanged (whether ZipFile actually compresses is Python's own
+              contract, not ours, so this checks the call args, not a real
+              archive)
+        """
+        target: Path = tmp_path / "out"
+        target.mkdir()
+        zip_cls = mocker.patch("documents.export.sinks.zipfile.ZipFile")
+        sink = ZipExportSink(target, "export", compression=constant, compresslevel=5)
+        sink._open()
+        zip_cls.assert_called_once_with(
+            mocker.ANY,
+            "w",
+            compression=constant,
+            compresslevel=5,
+            allowZip64=True,
+        )
 
 
 class TestStreamContract:

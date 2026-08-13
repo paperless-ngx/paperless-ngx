@@ -576,7 +576,7 @@ describe('TasksComponent', () => {
 
     expect(dismissSpy).toHaveBeenCalledWith(new Set([tasks[0].id, tasks[1].id]))
     expect(toastSpy).toHaveBeenCalledWith('Error dismissing tasks', error)
-    expect(modal.componentInstance.buttonsEnabled).toBe(true)
+    expect(modal.componentInstance.buttonsEnabled()).toBe(true)
     expect(component.selectedTasks.size).toBe(0)
   })
 
@@ -642,7 +642,7 @@ describe('TasksComponent', () => {
 
     expect(dismissSpy).toHaveBeenCalled()
     expect(toastSpy).toHaveBeenCalledWith('Error dismissing tasks', error)
-    expect(modal.componentInstance.buttonsEnabled).toBe(true)
+    expect(modal.componentInstance.buttonsEnabled()).toBe(true)
   })
 
   it('should dismiss the currently visible scoped and filtered tasks', () => {

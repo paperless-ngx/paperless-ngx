@@ -1384,6 +1384,7 @@ class SavedViewSerializer(OwnedObjectSerializer):
         fields = [
             "id",
             "name",
+            "icon",
             "sort_field",
             "sort_reverse",
             "filter_rules",

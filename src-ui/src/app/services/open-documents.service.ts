@@ -142,7 +142,7 @@ export class OpenDocumentsService {
       modal.componentInstance.btnClass = 'btn-warning'
       modal.componentInstance.btnCaption = $localize`Close document`
       modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
-        modal.componentInstance.buttonsEnabled = false
+        modal.componentInstance.buttonsEnabled.set(false)
         modal.close()
         this.openDocuments.splice(index, 1)
         this.dirtyDocuments.delete(doc.id)
@@ -165,7 +165,7 @@ export class OpenDocumentsService {
       modal.componentInstance.btnClass = 'btn-warning'
       modal.componentInstance.btnCaption = $localize`Close documents`
       modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
-        modal.componentInstance.buttonsEnabled = false
+        modal.componentInstance.buttonsEnabled.set(false)
         modal.close()
         this.openDocuments.splice(0, this.openDocuments.length)
         this.dirtyDocuments.clear()

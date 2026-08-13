@@ -11,11 +11,20 @@
       <li class="list-group-item py-3">
       <div [formGroupName]="view.id">
         <div class="row">
-          <div class="col">
+          <div class="col-md">
             <pngx-input-text title="Name" formControlName="name"></pngx-input-text>
           </div>
+          <div class="col-md">
+            <pngx-input-select
+            i18n-title
+            title="Icon"
+            formControlName="icon"
+            [items]="savedViewIcons"
+            iconField="icon">
+            </pngx-input-select>
+          </div>
           @if (canSaveSettings) {
-            <div class="col">
+            <div class="col-md">
               <div class="form-check form-switch mt-3">
                 <input type="checkbox" class="form-check-input" id="show_on_dashboard_{{view.id}}" formControlName="show_on_dashboard">
                 <label class="form-check-label" for="show_on_dashboard_{{view.id}}" i18n>Show on dashboard</label>

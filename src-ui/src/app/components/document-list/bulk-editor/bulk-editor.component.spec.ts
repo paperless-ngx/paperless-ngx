@@ -1683,7 +1683,7 @@ describe('BulkEditorComponent', () => {
           expiration_days: 7,
         },
         loading: signal(false),
-        buttonsEnabled: true,
+        buttonsEnabled: signal(true),
         copied: signal(false),
       },
     }
@@ -1715,7 +1715,7 @@ describe('BulkEditorComponent', () => {
       expiration_days: 7,
     })
     expect(dialogInstance.loading()).toBe(false)
-    expect(dialogInstance.buttonsEnabled).toBe(false)
+    expect(dialogInstance.buttonsEnabled()).toBe(false)
     expect(dialogInstance.createdBundle).toEqual({ id: 42 })
     expect(typeof dialogInstance.onOpenManage).toBe('function')
     expect(toastInfoSpy).toHaveBeenCalledWith(
@@ -1755,7 +1755,7 @@ describe('BulkEditorComponent', () => {
           expiration_days: null,
         },
         loading: signal(false),
-        buttonsEnabled: true,
+        buttonsEnabled: signal(true),
       },
     }
 
@@ -1777,7 +1777,7 @@ describe('BulkEditorComponent', () => {
       expect.any(Error)
     )
     expect(dialogInstance.loading()).toBe(false)
-    expect(dialogInstance.buttonsEnabled).toBe(true)
+    expect(dialogInstance.buttonsEnabled()).toBe(true)
     openSpy.mockRestore()
   })
 

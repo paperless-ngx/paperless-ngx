@@ -100,7 +100,7 @@
       </div>
     }
     <div class="form-group ms-md-auto">
-      <button type="button" class="btn me-2" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">{{ cancelBtnCaption }}</button>
+      <button type="button" class="btn me-2" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled()">{{ cancelBtnCaption }}</button>
       <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="pages.length === 0">{{ btnCaption }}</button>
     </div>
   </div>

@@ -1564,7 +1564,7 @@ describe('DocumentDetailComponent', () => {
     dialog.confirmClicked.next()
     await openModal.result
 
-    expect(dialog.buttonsEnabled).toBe(false)
+    expect(dialog.buttonsEnabled()).toBe(false)
     expect(reloadSpy).toHaveBeenCalled()
     expect((component as any).incomingUpdateModal).toBeNull()
   })
@@ -1789,7 +1789,7 @@ describe('DocumentDetailComponent', () => {
 
     expect(errorSpy).toHaveBeenCalled()
     expect(component.networkActive()).toBe(false)
-    expect(dialog.buttonsEnabled).toBe(true)
+    expect(dialog.buttonsEnabled()).toBe(true)
   })
 
   it('should refresh the document when removing password in update mode', () => {

@@ -16,6 +16,8 @@ export class WidgetFrameComponent implements AfterViewInit {
 
   title = input<string>()
 
+  titleIcon = input<string>()
+
   draggable = input<any>()
 
   cardless = input(false)

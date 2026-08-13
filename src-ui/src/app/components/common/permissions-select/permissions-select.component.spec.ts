@@ -17,6 +17,10 @@ const permissions = [
   'view_document',
   'change_document',
   'delete_document',
+  'add_sharelinkbundle',
+  'view_sharelinkbundle',
+  'change_sharelinkbundle',
+  'delete_sharelinkbundle',
   'change_tag',
   'view_documenttype',
 ]
@@ -75,6 +79,7 @@ describe('PermissionsSelectComponent', () => {
     component.ngOnInit()
     component.writeValue(permissions)
     expect(component.typesWithAllActions).toContain('Document')
+    expect(component.typesWithAllActions).toContain('ShareLinkBundle')
   })
 
   it('should update checkboxes on permissions set', () => {
@@ -85,6 +90,10 @@ describe('PermissionsSelectComponent', () => {
     expect(input1.nativeElement.checked).toBeTruthy()
     const input2 = fixture.debugElement.query(By.css('input#Tag_Change'))
     expect(input2.nativeElement.checked).toBeTruthy()
+    const bundleInput = fixture.debugElement.query(
+      By.css('input#ShareLinkBundle_Add')
+    )
+    expect(bundleInput.nativeElement.checked).toBeTruthy()
   })
 
   it('disable checkboxes when permissions are inherited', () => {
