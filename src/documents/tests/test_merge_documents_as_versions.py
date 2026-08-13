@@ -184,10 +184,10 @@ class TestMergeDocumentsAsVersionsSerializer(TestCase):
 class TestMergeDocumentsAsVersions(TestCase):
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
-    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
+    @mock.patch("documents.search.get_backend")
     def test_merges_documents_in_selection_order(
         self,
-        remove_from_index_mock,
+        get_backend_mock,
         bulk_update_mock,
         status_manager_mock,
     ) -> None:
@@ -231,9 +231,10 @@ class TestMergeDocumentsAsVersions(TestCase):
         self.assertGreater(root.modified, original_modified)
         self.assertEqual(existing_version.root_document_id, root.id)
 
+        batch = get_backend_mock.return_value.batch_update.return_value.__enter__.return_value
         self.assertEqual(
-            [call.kwargs["args"] for call in remove_from_index_mock.call_args_list],
-            [[source2.id], [source1.id]],
+            [call.args[0] for call in batch.remove.call_args_list],
+            [source2.id, source1.id],
         )
         bulk_update_mock.assert_called_once_with(
             kwargs={"document_ids": [root.id]},
@@ -245,7 +246,7 @@ class TestMergeDocumentsAsVersions(TestCase):
 
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
-    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
+    @mock.patch("documents.search.get_backend")
     def test_root_keeps_its_own_archive_serial_number(self, *_mocks) -> None:
         root = Document.objects.create(
             checksum="A",
@@ -270,7 +271,7 @@ class TestMergeDocumentsAsVersions(TestCase):
 
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
-    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
+    @mock.patch("documents.search.get_backend")
     def test_root_without_asn_takes_the_source_archive_serial_number(
         self,
         *_mocks,
@@ -291,7 +292,7 @@ class TestMergeDocumentsAsVersions(TestCase):
 
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
-    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
+    @mock.patch("documents.search.get_backend")
     def test_writes_audit_log_entry(self, *_mocks) -> None:
         user = User.objects.create_user(username="merger")
         root = Document.objects.create(checksum="A", title="Root")
@@ -312,10 +313,10 @@ class TestMergeDocumentsAsVersions(TestCase):
 
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
-    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
+    @mock.patch("documents.search.get_backend")
     def test_sets_version_label_for_one_source_document(
         self,
-        _remove_from_index_mock,
+        _get_backend_mock,
         _bulk_update_mock,
         _status_manager_mock,
     ) -> None:
@@ -333,10 +334,10 @@ class TestMergeDocumentsAsVersions(TestCase):
 
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
-    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
+    @mock.patch("documents.search.get_backend")
     def test_rejects_source_document_with_versions(
         self,
-        remove_from_index_mock,
+        get_backend_mock,
         bulk_update_mock,
         status_manager_mock,
     ) -> None:
@@ -357,16 +358,16 @@ class TestMergeDocumentsAsVersions(TestCase):
 
         source.refresh_from_db()
         self.assertIsNone(source.root_document_id)
-        remove_from_index_mock.assert_not_called()
+        get_backend_mock.assert_not_called()
         bulk_update_mock.assert_not_called()
         status_manager_mock.assert_not_called()
 
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
-    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
+    @mock.patch("documents.search.get_backend")
     def test_rejects_source_document_with_trashed_versions(
         self,
-        remove_from_index_mock,
+        get_backend_mock,
         bulk_update_mock,
         status_manager_mock,
     ) -> None:
@@ -393,7 +394,7 @@ class TestMergeDocumentsAsVersions(TestCase):
             Document.global_objects.get(pk=version.pk).root_document_id,
             source.id,
         )
-        remove_from_index_mock.assert_not_called()
+        get_backend_mock.assert_not_called()
         bulk_update_mock.assert_not_called()
         status_manager_mock.assert_not_called()
 
@@ -487,10 +488,10 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
 
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
-    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
+    @mock.patch("documents.search.get_backend")
     def test_merges_and_returns_documents_as_versions(
         self,
-        remove_from_index_mock,
+        get_backend_mock,
         bulk_update_mock,
         status_manager_mock,
     ) -> None:
@@ -522,7 +523,8 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
             [version["id"] for version in versions if version["is_root"]],
             [self.doc2.id],
         )
-        remove_from_index_mock.assert_called_once_with(args=[self.doc1.id])
+        batch = get_backend_mock.return_value.batch_update.return_value.__enter__.return_value
+        batch.remove.assert_called_once_with(self.doc1.id)
         bulk_update_mock.assert_called_once_with(
             kwargs={"document_ids": [self.doc2.id]},
             headers={"trigger_source": "system"},
@@ -533,7 +535,7 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
 
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
-    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
+    @mock.patch("documents.search.get_backend")
     def test_chosen_order_survives_to_the_versions_list(self, *_mocks) -> None:
         doc3 = Document.objects.create(checksum="C", title="C", owner=self.user)
         # Deliberately not in id order, as dragging the dialog rows produces

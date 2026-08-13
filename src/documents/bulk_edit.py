@@ -712,8 +712,21 @@ def merge_as_versions(
                 },
             )
 
-    for source_id in source_ids:
-        remove_document_from_index.apply_async(args=[source_id])
+    # One batch rather than a task each
+    from documents.search import SearchIndexLockError
+    from documents.search import get_backend
+
+    try:
+        with get_backend().batch_update() as batch:
+            for source_id in source_ids:
+                batch.remove(source_id)
+    except SearchIndexLockError:
+        logger.error(
+            f"Search index lock exhausted removing {source_ids}, "
+            f"scheduling deferred index removal",
+        )
+        for source_id in source_ids:
+            remove_document_from_index.apply_async(args=[source_id], countdown=60)
 
     bulk_update_documents.apply_async(
         kwargs={"document_ids": [root_document_id]},
