@@ -5,7 +5,15 @@
 <div class="modal-body">
   <p>{{message}}</p>
   <div class="form-group">
-    <span class="form-label d-inline-block" i18n>Versions:</span>
+    <label class="form-label" for="rootDocumentID" i18n>Root document:</label>
+    <select id="rootDocumentID" class="form-select" [ngModel]="rootDocumentID()" (ngModelChange)="rootDocumentID.set($event)">
+      @for (document of documents(); track document.id) {
+        <option [ngValue]="document.id">{{document.title}}</option>
+      }
+    </select>
+  </div>
+  <div class="form-group mt-4">
+    <span class="form-label d-inline-block" i18n>Versions (oldest first):</span>
     <ul class="list-group"
         cdkDropList
         [cdkDropListData]="versionDocumentIDs()"
@@ -28,19 +36,16 @@
                 }
               </small>
             </div>
+            @if ($last) {
+              <span class="badge bg-primary ms-auto" i18n>Current version</span>
+            }
           </li>
         }
       }
     </ul>
-    <div class="form-text" i18n>Drag to reorder. The last document becomes the current version.</div>
-  </div>
-  <div class="form-group mt-4">
-    <label class="form-label" for="rootDocumentID" i18n>Root document:</label>
-    <select id="rootDocumentID" class="form-select" [ngModel]="rootDocumentID()" (ngModelChange)="rootDocumentID.set($event)">
-      @for (document of documents(); track document.id) {
-        <option [ngValue]="document.id">{{document.title}}</option>
-      }
-    </select>
+    @if (versionDocumentIDs().length > 1) {
+      <div class="form-text" i18n>Drag to reorder.</div>
+    }
   </div>
 </div>
 <div class="modal-footer">
