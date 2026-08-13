@@ -234,9 +234,10 @@ describe('DocumentVersionDropdownComponent', () => {
   })
 
   it('onVersionFileSelected should upload and update versions after websocket success', () => {
+    // Newest first, as the API returns them
     const versions: DocumentVersionInfo[] = [
-      { id: 3, is_root: true, checksum: 'aaaa' },
       { id: 20, is_root: false, checksum: 'cccc' },
+      { id: 3, is_root: true, checksum: 'aaaa' },
     ]
     const file = new File(['test'], 'new-version.pdf', {
       type: 'application/pdf',
@@ -348,9 +349,11 @@ describe('DocumentVersionDropdownComponent', () => {
     }
     modalService.open.mockReturnValue(modal as any)
     documentService.mergeDocumentsAsVersions.mockReturnValue(of({} as any))
+    // Newest first, as the API returns them. The merged document has a lower id
+    // than the root, which is the whole point of merging an existing document.
     const versions: DocumentVersionInfo[] = [
+      { id: 2, is_root: false, checksum: 'cccc' },
       { id: 3, is_root: true, checksum: 'aaaa' },
-      { id: 20, is_root: false, checksum: 'cccc' },
     ]
     documentService.getVersions.mockReturnValue(of({ id: 3, versions } as any))
     component.newVersionLabel = '  Imported  '
@@ -359,17 +362,17 @@ describe('DocumentVersionDropdownComponent', () => {
 
     component.addExistingDocumentAsVersion()
     expect(modal.componentInstance.rootDocumentID).toEqual(3)
-    confirmClicked.next(20)
+    confirmClicked.next(2)
 
     expect(documentService.mergeDocumentsAsVersions).toHaveBeenCalledWith(
-      [3, 20],
+      [3, 2],
       3,
       'Imported'
     )
     expect(documentService.updateVersionLabel).not.toHaveBeenCalled()
     expect(documentService.getVersions).toHaveBeenCalledWith(3)
     expect(versionsEmitSpy).toHaveBeenCalledWith(versions)
-    expect(selectedEmitSpy).toHaveBeenCalledWith(20)
+    expect(selectedEmitSpy).toHaveBeenCalledWith(2)
     expect(component.newVersionLabel).toEqual('')
     expect(modal.close).toHaveBeenCalled()
     expect(toastService.showInfo).toHaveBeenCalled()

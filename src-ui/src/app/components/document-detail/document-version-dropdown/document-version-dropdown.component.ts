@@ -258,11 +258,10 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
       .subscribe({
         next: (doc) => {
           if (uploadDocumentId !== this.documentId) return
-          if (doc?.versions) {
+          if (doc?.versions?.length) {
             this.versionsUpdated.emit(doc.versions)
-            this.versionSelected.emit(
-              Math.max(...doc.versions.map((version) => version.id))
-            )
+            // The API returns versions newest first
+            this.versionSelected.emit(doc.versions[0].id)
             this.clearVersionUploadStatus()
           }
         },
@@ -308,11 +307,10 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
           )
           .subscribe({
             next: (document) => {
-              if (document?.versions) {
+              if (document?.versions?.length) {
                 this.versionsUpdated.emit(document.versions)
-                this.versionSelected.emit(
-                  Math.max(...document.versions.map((version) => version.id))
-                )
+                // The API returns versions newest first
+                this.versionSelected.emit(document.versions[0].id)
               }
               this.newVersionLabel = ''
               modal.close()
