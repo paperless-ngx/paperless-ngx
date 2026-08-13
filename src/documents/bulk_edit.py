@@ -667,7 +667,7 @@ def merge_as_versions(
         for source_id in source_ids:
             next_version_index += 1
             updates = {
-                "root_document": root_document,
+                "root_document_id": root_document.pk,
                 "version_index": next_version_index,
                 "archive_serial_number": None,
             }
