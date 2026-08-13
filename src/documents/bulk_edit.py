@@ -638,7 +638,7 @@ def merge_as_versions(
             raise ValueError(
                 "A version label can only be set when merging one source document.",
             )
-        if Document.objects.filter(root_document_id__in=source_ids).exists():
+        if Document.global_objects.filter(root_document_id__in=source_ids).exists():
             raise ValueError(
                 "Documents with existing versions cannot be merged into another document.",
             )

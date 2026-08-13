@@ -141,6 +141,27 @@ class TestMergeDocumentsAsVersionsSerializer(TestCase):
             "Documents with existing versions cannot be merged into another document.",
         )
 
+    def test_rejects_source_document_with_trashed_versions(self) -> None:
+        version = Document.objects.create(
+            checksum="D",
+            title="D",
+            root_document=self.doc1,
+            version_index=1,
+        )
+        version.delete()  # trashed, but still points at doc1
+        serializer = MergeDocumentsAsVersionsSerializer(
+            data={
+                "documents": [self.doc1.id, self.doc2.id],
+                "root_document_id": self.doc2.id,
+            },
+        )
+
+        self.assertFalse(serializer.is_valid())
+        self.assertEqual(
+            serializer.errors["non_field_errors"][0],
+            "Documents with existing versions cannot be merged into another document.",
+        )
+
     def test_allows_root_document_with_versions(self) -> None:
         Document.objects.create(
             checksum="D",
@@ -264,6 +285,42 @@ class TestMergeDocumentsAsVersions(TestCase):
 
         source.refresh_from_db()
         self.assertIsNone(source.root_document_id)
+        remove_from_index_mock.assert_not_called()
+        bulk_update_mock.assert_not_called()
+        status_manager_mock.assert_not_called()
+
+    @mock.patch("documents.bulk_edit.DocumentsStatusManager")
+    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
+    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
+    def test_rejects_source_document_with_trashed_versions(
+        self,
+        remove_from_index_mock,
+        bulk_update_mock,
+        status_manager_mock,
+    ) -> None:
+        source = Document.objects.create(checksum="A", title="Source")
+        version = Document.objects.create(
+            checksum="B",
+            title="Source version",
+            root_document=source,
+            version_index=1,
+        )
+        version.delete()  # trashed, but still points at source
+        root = Document.objects.create(checksum="C", title="Root")
+
+        with self.assertRaisesRegex(ValueError, "existing versions"):
+            merge_as_versions(
+                [source.id, root.id],
+                root_document_id=root.id,
+            )
+
+        source.refresh_from_db()
+        self.assertIsNone(source.root_document_id)
+        # Restoring the version must not produce a version of a version
+        self.assertEqual(
+            Document.global_objects.get(pk=version.pk).root_document_id,
+            source.id,
+        )
         remove_from_index_mock.assert_not_called()
         bulk_update_mock.assert_not_called()
         status_manager_mock.assert_not_called()

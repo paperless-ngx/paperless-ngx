@@ -1717,7 +1717,7 @@ class MergeDocumentsAsVersionsSerializer(DocumentListSerializer):
             )
 
         source_document_ids = set(documents) - {attrs["root_document_id"]}
-        if Document.objects.filter(
+        if Document.global_objects.filter(
             root_document_id__in=source_document_ids,
         ).exists():
             raise serializers.ValidationError(
