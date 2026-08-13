@@ -1,20 +1,22 @@
-import json
+from types import SimpleNamespace
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
 import pytest_mock
-from django.contrib.auth.models import User
 from django.test import override_settings
 
 from documents.models import Document
+from documents.tests.factories import DocumentFactory
+from documents.tests.factories import TagFactory
+from documents.tests.factories import UserFactory
 from paperless.config import AIConfig
 from paperless_ai.ai_classifier import build_localization_prompt
 from paperless_ai.ai_classifier import build_prompt_with_rag
 from paperless_ai.ai_classifier import build_prompt_without_rag
 from paperless_ai.ai_classifier import get_ai_document_classification
-from paperless_ai.ai_classifier import get_context_for_document
 from paperless_ai.ai_classifier import get_language_name
+from paperless_ai.ai_classifier import get_taxonomy_context
 
 
 @pytest.fixture
@@ -36,6 +38,7 @@ def mock_document():
     doc.document_type.name = "Invoice"
     doc.correspondent = MagicMock()
     doc.correspondent.name = "Test Correspondent"
+    doc.storage_path = None  # get_assigned_metadata reads this directly
     doc.archive_serial_number = "12345"
     doc.content = "This is the document content."
 
@@ -52,48 +55,41 @@ def mock_document():
     return doc
 
 
-@pytest.fixture
-def mock_similar_documents():
-    doc1 = MagicMock()
-    doc1.content = "Content of document 1"
-    doc1.title = "Title 1"
-    doc1.filename = "file1.txt"
-
-    doc2 = MagicMock()
-    doc2.content = "Content of document 2"
-    doc2.title = None
-    doc2.filename = "file2.txt"
-
-    doc3 = MagicMock()
-    doc3.content = None
-    doc3.title = None
-    doc3.filename = None
-
-    return [doc1, doc2, doc3]
+NESTED_SUGGESTIONS = {
+    "title": "Test Title",
+    "tags": {"existing_ids": [], "new_names": ["test", "document"]},
+    "correspondents": {"existing_ids": [], "new_names": ["John Doe"]},
+    "document_types": {"existing_ids": [], "new_names": ["report"]},
+    "storage_paths": {"existing_ids": [], "new_names": ["Reports"]},
+    "dates": ["2023-01-01"],
+}
 
 
 @pytest.mark.django_db
 @patch("paperless_ai.client.AIClient.run_llm_query")
-@override_settings(
-    LLM_BACKEND="ollama",
-    LLM_MODEL="some_model",
-)
+@override_settings(LLM_BACKEND="ollama", LLM_MODEL="some_model")
 def test_get_ai_document_classification_success(mock_run_llm_query, mock_document):
+    """
+    GIVEN:
+        - An LLM backend configured without RAG
+        - A classification call followed by a localization call
+    WHEN:
+        - get_ai_document_classification() is called with an output_language
+    THEN:
+        - The localized title/new_names are used
+        - Correspondents are never localized, so the original suggestion survives
+        - Dates are never localized
+        - The classification prompt has no taxonomy title instruction and the
+          localization prompt asks to rewrite only new_names/title
+    """
     mock_run_llm_query.side_effect = [
-        {
-            "title": "Test Title",
-            "tags": ["test", "document"],
-            "correspondents": ["John Doe"],
-            "document_types": ["report"],
-            "storage_paths": ["Reports"],
-            "dates": ["2023-01-01"],
-        },
+        NESTED_SUGGESTIONS,
         {
             "title": "Testtitel",
-            "tags": ["Test", "Document"],
-            "correspondents": ["Jane Doe"],
-            "document_types": ["Bericht"],
-            "storage_paths": ["Berichte"],
+            "tags": {"existing_ids": [], "new_names": ["Test", "Document"]},
+            "correspondents": {"existing_ids": [], "new_names": ["Jane Doe"]},
+            "document_types": {"existing_ids": [], "new_names": ["Bericht"]},
+            "storage_paths": {"existing_ids": [], "new_names": ["Berichte"]},
             "dates": ["2024-01-01"],
         },
     ]
@@ -101,43 +97,43 @@ def test_get_ai_document_classification_success(mock_run_llm_query, mock_documen
     result = get_ai_document_classification(mock_document, output_language="de-de")
 
     assert result["title"] == "Testtitel"
-    assert result["tags"] == ["Test", "Document"]
-    assert result["correspondents"] == ["John Doe"]
-    assert result["document_types"] == ["Bericht"]
-    assert result["storage_paths"] == ["Berichte"]
+    assert result["tags"]["new_names"] == ["Test", "Document"]
+    # Correspondents are never localized - the merge step doesn't touch them,
+    # so the original (English) suggestion survives, same as before this change.
+    assert result["correspondents"]["new_names"] == ["John Doe"]
+    assert result["document_types"]["new_names"] == ["Bericht"]
+    assert result["storage_paths"]["new_names"] == ["Berichte"]
     assert result["dates"] == ["2023-01-01"]
     classification_prompt = mock_run_llm_query.call_args_list[0].args[0]
     localization_prompt = mock_run_llm_query.call_args_list[1].args[0]
     assert "Write suggested titles" not in classification_prompt
-    assert "Rewrite only these generated fields in German" in localization_prompt
+    assert "Rewrite only the" in localization_prompt
     assert "Do not translate correspondents or dates" in localization_prompt
 
 
 @pytest.mark.django_db
 @patch("paperless_ai.client.AIClient.run_llm_query")
-@override_settings(
-    LLM_BACKEND="ollama",
-    LLM_MODEL="some_model",
-)
+@override_settings(LLM_BACKEND="ollama", LLM_MODEL="some_model")
 def test_get_ai_document_classification_keeps_originals_when_localization_empty(
     mock_run_llm_query,
     mock_document,
 ):
+    """
+    GIVEN:
+        - A localization response whose fields are all empty
+    WHEN:
+        - get_ai_document_classification() is called with an output_language
+    THEN:
+        - The original (pre-localization) suggestions are kept for every field
+    """
     mock_run_llm_query.side_effect = [
-        {
-            "title": "Test Title",
-            "tags": ["test", "document"],
-            "correspondents": ["John Doe"],
-            "document_types": ["report"],
-            "storage_paths": ["Reports"],
-            "dates": ["2023-01-01"],
-        },
+        NESTED_SUGGESTIONS,
         {
             "title": "",
-            "tags": [],
-            "correspondents": [],
-            "document_types": [],
-            "storage_paths": [],
+            "tags": {"existing_ids": [], "new_names": []},
+            "correspondents": {"existing_ids": [], "new_names": []},
+            "document_types": {"existing_ids": [], "new_names": []},
+            "storage_paths": {"existing_ids": [], "new_names": []},
             "dates": [],
         },
     ]
@@ -145,19 +141,26 @@ def test_get_ai_document_classification_keeps_originals_when_localization_empty(
     result = get_ai_document_classification(mock_document, output_language="de-de")
 
     assert result["title"] == "Test Title"
-    assert result["tags"] == ["test", "document"]
-    assert result["correspondents"] == ["John Doe"]
-    assert result["document_types"] == ["report"]
-    assert result["storage_paths"] == ["Reports"]
+    assert result["tags"]["new_names"] == ["test", "document"]
+    assert result["correspondents"]["new_names"] == ["John Doe"]
+    assert result["document_types"]["new_names"] == ["report"]
+    assert result["storage_paths"]["new_names"] == ["Reports"]
     assert result["dates"] == ["2023-01-01"]
 
 
 @pytest.mark.django_db
 @patch("paperless_ai.client.AIClient.run_llm_query")
 def test_get_ai_document_classification_failure(mock_run_llm_query, mock_document):
+    """
+    GIVEN:
+        - The LLM client raises an exception
+    WHEN:
+        - get_ai_document_classification() is called
+    THEN:
+        - The exception propagates rather than being swallowed
+    """
     mock_run_llm_query.side_effect = Exception("LLM query failed")
 
-    # assert raises an exception
     with pytest.raises(Exception):
         get_ai_document_classification(mock_document)
 
@@ -165,6 +168,7 @@ def test_get_ai_document_classification_failure(mock_run_llm_query, mock_documen
 @pytest.mark.django_db
 @patch("paperless_ai.client.AIClient.run_llm_query")
 @patch("paperless_ai.ai_classifier.build_prompt_with_rag")
+@patch("paperless_ai.ai_classifier.retrieve_similar_nodes")
 @override_settings(
     LLM_EMBEDDING_BACKEND="huggingface",
     LLM_EMBEDDING_MODEL="some_model",
@@ -172,12 +176,22 @@ def test_get_ai_document_classification_failure(mock_run_llm_query, mock_documen
     LLM_MODEL="some_model",
 )
 def test_use_rag_if_configured(
+    mock_retrieve,
     mock_build_prompt_with_rag,
     mock_run_llm_query,
     mock_document,
 ):
+    """
+    GIVEN:
+        - An LLM embedding backend is configured
+    WHEN:
+        - get_ai_document_classification() is called
+    THEN:
+        - The RAG-augmented prompt builder is used
+    """
+    mock_retrieve.return_value = []
     mock_build_prompt_with_rag.return_value = "Prompt with RAG"
-    mock_run_llm_query.return_value.text = json.dumps({})
+    mock_run_llm_query.return_value = NESTED_SUGGESTIONS
     get_ai_document_classification(mock_document)
     mock_build_prompt_with_rag.assert_called_once()
 
@@ -185,20 +199,25 @@ def test_use_rag_if_configured(
 @pytest.mark.django_db
 @patch("paperless_ai.client.AIClient.run_llm_query")
 @patch("paperless_ai.ai_classifier.build_prompt_without_rag")
-@patch("paperless.config.AIConfig")
-@override_settings(
-    LLM_BACKEND="ollama",
-    LLM_MODEL="some_model",
-)
+@patch("paperless_ai.ai_classifier.AIConfig")
+@override_settings(LLM_BACKEND="ollama", LLM_MODEL="some_model")
 def test_use_without_rag_if_not_configured(
     mock_ai_config,
     mock_build_prompt_without_rag,
     mock_run_llm_query,
     mock_document,
 ):
-    mock_ai_config.llm_embedding_backend = None
+    """
+    GIVEN:
+        - No LLM embedding backend is configured
+    WHEN:
+        - get_ai_document_classification() is called
+    THEN:
+        - The non-RAG prompt builder is used
+    """
+    mock_ai_config.return_value.llm_embedding_backend = None
     mock_build_prompt_without_rag.return_value = "Prompt without RAG"
-    mock_run_llm_query.return_value.text = json.dumps({})
+    mock_run_llm_query.return_value = NESTED_SUGGESTIONS
     get_ai_document_classification(mock_document)
     mock_build_prompt_without_rag.assert_called_once()
 
@@ -210,45 +229,64 @@ def test_use_without_rag_if_not_configured(
     LLM_MODEL="some_model",
 )
 def test_prompt_with_without_rag(mock_document):
-    with patch(
-        "paperless_ai.ai_classifier.get_context_for_document",
-        return_value="Context from similar documents",
-    ):
-        config = AIConfig()
-        prompt = build_prompt_without_rag(mock_document, config)
-        assert "Additional context from similar documents" not in prompt
-        assert "for generated" not in prompt
+    """
+    GIVEN:
+        - A document and an AIConfig
+    WHEN:
+        - build_prompt_without_rag(), build_prompt_with_rag(), and
+          build_localization_prompt() are called
+    THEN:
+        - build_prompt_without_rag() has no similar-documents section
+        - build_prompt_with_rag() includes the similar-documents context
+        - build_localization_prompt() asks to rewrite only new_names/title and
+          not to translate correspondents or dates
+    """
+    config = AIConfig()
+    prompt = build_prompt_without_rag(mock_document, config)
+    assert "Additional context from similar documents" not in prompt
+    assert "for generated" not in prompt
 
-        prompt = build_prompt_with_rag(mock_document, config)
-        assert "Additional context from similar documents" in prompt
+    prompt = build_prompt_with_rag(
+        mock_document,
+        config,
+        context="Context from similar documents",
+    )
+    assert "Additional context from similar documents" in prompt
+    assert "Context from similar documents" in prompt
 
-        prompt = build_localization_prompt(
-            {
-                "title": "Test Title",
-                "tags": ["test", "document"],
-                "correspondents": ["John Doe"],
-                "document_types": ["report"],
-                "storage_paths": ["Reports"],
-                "dates": ["2023-01-01"],
-            },
-            output_language="de-de",
-        )
-        assert "Rewrite only these generated fields in German" in prompt
-        assert "Do not translate correspondents or dates" in prompt
+    prompt = build_localization_prompt(NESTED_SUGGESTIONS, output_language="de-de")
+    assert "Rewrite only the" in prompt
+    assert "Do not translate correspondents or dates" in prompt
 
 
 def test_get_language_name_falls_back_to_language_code():
+    """
+    GIVEN:
+        - A language code not present in settings.LANGUAGES
+    WHEN:
+        - get_language_name() is called
+    THEN:
+        - The original language code is returned unchanged
+    """
     assert get_language_name("zz-zz") == "zz-zz"
 
 
 def test_build_localization_prompt_preserves_unicode_characters():
+    """
+    GIVEN:
+        - Suggestions containing non-ASCII characters
+    WHEN:
+        - build_localization_prompt() is called
+    THEN:
+        - The unicode characters are preserved as-is rather than escaped
+    """
     prompt = build_localization_prompt(
         {
             "title": "Gebührenbescheid",
-            "tags": [],
-            "correspondents": [],
-            "document_types": [],
-            "storage_paths": [],
+            "tags": {"existing_ids": [], "new_names": []},
+            "correspondents": {"existing_ids": [], "new_names": []},
+            "document_types": {"existing_ids": [], "new_names": []},
+            "storage_paths": {"existing_ids": [], "new_names": []},
             "dates": [],
         },
         output_language="de-de",
@@ -258,115 +296,157 @@ def test_build_localization_prompt_preserves_unicode_characters():
     assert "\\u00fc" not in prompt
 
 
-@patch("paperless_ai.ai_classifier.query_similar_documents")
-def test_get_context_for_document(
-    mock_query_similar_documents,
-    mock_document,
-    mock_similar_documents,
-):
-    mock_query_similar_documents.return_value = mock_similar_documents
-
-    result = get_context_for_document(mock_document, max_docs=2)
-
-    expected_result = (
-        "TITLE: Title 1\nContent of document 1\n\n"
-        "TITLE: file2.txt\nContent of document 2"
+@pytest.mark.django_db
+def test_get_taxonomy_context_assembles_rag_text_and_candidates():
+    """
+    GIVEN:
+        - A neighbour document with a tag, retrieved via retrieve_similar_nodes
+    WHEN:
+        - get_taxonomy_context() is called
+    THEN:
+        - The neighbour's tag appears in the taxonomy candidates
+        - The neighbour's title/content appear in the RAG text context
+        - The document's own (empty) assigned metadata is returned
+    """
+    tag = TagFactory.create(name="Bloodwork")
+    neighbour = DocumentFactory.create(
+        content="Content of neighbour document",
+        title="Neighbour Title",
     )
-    assert result == expected_result
-    mock_query_similar_documents.assert_called_once()
+    neighbour.tags.add(tag)
+    document = DocumentFactory.create(content="Some content")
+    fake_node = SimpleNamespace(
+        metadata={"document_id": str(neighbour.pk)},
+        score=0.8,
+    )
+
+    with patch(
+        "paperless_ai.ai_classifier.retrieve_similar_nodes",
+        return_value=[fake_node],
+    ):
+        candidates, assigned, context = get_taxonomy_context(document, user=None)
+
+    assert candidates["tags"][0]["name"] == "Bloodwork"
+    assert "TITLE: Neighbour Title" in context
+    assert "Content of neighbour document" in context
+    assert assigned == {
+        "tags": [],
+        "document_type": None,
+        "correspondent": None,
+        "storage_path": None,
+    }
 
 
-def test_get_context_for_document_no_similar_docs(mock_document):
-    with patch("paperless_ai.ai_classifier.query_similar_documents", return_value=[]):
-        result = get_context_for_document(mock_document)
-        assert result == ""
+@pytest.mark.django_db
+def test_get_taxonomy_context_no_similar_docs():
+    """
+    GIVEN:
+        - No similar documents are retrieved
+    WHEN:
+        - get_taxonomy_context() is called
+    THEN:
+        - An empty RAG context and empty taxonomy candidates are returned
+    """
+    document = DocumentFactory.create(content="Some content")
+
+    with patch("paperless_ai.ai_classifier.retrieve_similar_nodes", return_value=[]):
+        candidates, _assigned, context = get_taxonomy_context(document, user=None)
+
+    assert context == ""
+    assert candidates == {
+        "tags": [],
+        "document_types": [],
+        "correspondents": [],
+        "storage_paths": [],
+    }
 
 
-class TestGetContextForDocumentVisibility:
-    """get_context_for_document must not materialize every visible document
-    id for a user who can already see the whole library: a superuser (like
-    no user at all) gets document_ids=None (no restriction) straight
-    through to query_similar_documents(), instead of a full-library IN
-    filter that is wasteful at best and, past ~32,763 documents, a hard
-    sqlite3.OperationalError at worst (SQLite's bound-parameter limit).
+class TestGetTaxonomyContextVisibility:
+    """get_taxonomy_context must not materialize every visible document id
+    for a user who can already see the whole library: a superuser (like no
+    user at all) gets document_ids=None (no restriction) straight through to
+    retrieve_similar_nodes(), instead of a full-library IN filter that is
+    wasteful at best and, past ~32,763 documents, a hard
+    sqlite3.OperationalError at worst (SQLite's bound-parameter limit). Ports
+    the coverage that used to live on get_context_for_document before this
+    refactor folded it into get_taxonomy_context.
     """
 
+    @pytest.mark.django_db
     def test_skips_permission_lookup_for_superuser(
         self,
-        mock_document: MagicMock,
-        mock_similar_documents: list[MagicMock],
         mocker: pytest_mock.MockerFixture,
     ) -> None:
         """
         GIVEN:
             - A superuser
         WHEN:
-            - get_context_for_document() is called
+            - get_taxonomy_context() is called
         THEN:
-            - get_objects_for_user_owner_aware() is never called, and
-              query_similar_documents() is called with document_ids=None
+            - Permission lookup is skipped and no document_ids restriction is
+              passed to retrieve_similar_nodes()
         """
-        mock_query = mocker.patch(
-            "paperless_ai.ai_classifier.query_similar_documents",
-            return_value=mock_similar_documents,
+        document = DocumentFactory.create(content="Some content")
+        mock_retrieve = mocker.patch(
+            "paperless_ai.ai_classifier.retrieve_similar_nodes",
+            return_value=[],
         )
         mock_get_objects = mocker.patch(
             "paperless_ai.ai_classifier.get_objects_for_user_owner_aware",
         )
-        user = mocker.MagicMock(spec=User)
-        user.is_superuser = True
+        user = UserFactory.create(is_superuser=True)
 
-        get_context_for_document(mock_document, user, max_docs=2)
+        get_taxonomy_context(document, user)
 
         mock_get_objects.assert_not_called()
-        assert mock_query.call_args.kwargs["document_ids"] is None
+        assert mock_retrieve.call_args.kwargs["document_ids"] is None
 
+    @pytest.mark.django_db
     def test_skips_permission_lookup_when_no_user(
         self,
-        mock_document: MagicMock,
-        mock_similar_documents: list[MagicMock],
         mocker: pytest_mock.MockerFixture,
     ) -> None:
         """
         GIVEN:
-            - No user (user=None)
+            - No user is supplied
         WHEN:
-            - get_context_for_document() is called
+            - get_taxonomy_context() is called
         THEN:
-            - get_objects_for_user_owner_aware() is never called, and
-              query_similar_documents() is called with document_ids=None
+            - Permission lookup is skipped and no document_ids restriction is
+              passed to retrieve_similar_nodes()
         """
-        mock_query = mocker.patch(
-            "paperless_ai.ai_classifier.query_similar_documents",
-            return_value=mock_similar_documents,
+        document = DocumentFactory.create(content="Some content")
+        mock_retrieve = mocker.patch(
+            "paperless_ai.ai_classifier.retrieve_similar_nodes",
+            return_value=[],
         )
         mock_get_objects = mocker.patch(
             "paperless_ai.ai_classifier.get_objects_for_user_owner_aware",
         )
 
-        get_context_for_document(mock_document, None, max_docs=2)
+        get_taxonomy_context(document, None)
 
         mock_get_objects.assert_not_called()
-        assert mock_query.call_args.kwargs["document_ids"] is None
+        assert mock_retrieve.call_args.kwargs["document_ids"] is None
 
+    @pytest.mark.django_db
     def test_restricts_to_visible_documents_for_non_superuser(
         self,
-        mock_document: MagicMock,
-        mock_similar_documents: list[MagicMock],
         mocker: pytest_mock.MockerFixture,
     ) -> None:
         """
         GIVEN:
-            - A non-superuser with a specific set of visible documents
+            - A non-superuser
         WHEN:
-            - get_context_for_document() is called
+            - get_taxonomy_context() is called
         THEN:
-            - query_similar_documents() is called with exactly that user's
-              visible document ids, unchanged from before this optimization
+            - The user's visible document ids are looked up and passed to
+              retrieve_similar_nodes() as a restriction
         """
-        mock_query = mocker.patch(
-            "paperless_ai.ai_classifier.query_similar_documents",
-            return_value=mock_similar_documents,
+        document = DocumentFactory.create(content="Some content")
+        mock_retrieve = mocker.patch(
+            "paperless_ai.ai_classifier.retrieve_similar_nodes",
+            return_value=[],
         )
         mock_queryset = mocker.MagicMock()
         mock_queryset.values_list.return_value = [1, 2, 3]
@@ -374,10 +454,198 @@ class TestGetContextForDocumentVisibility:
             "paperless_ai.ai_classifier.get_objects_for_user_owner_aware",
             return_value=mock_queryset,
         )
-        user = mocker.MagicMock(spec=User)
-        user.is_superuser = False
+        user = UserFactory.create(is_superuser=False)
 
-        get_context_for_document(mock_document, user, max_docs=2)
+        get_taxonomy_context(document, user)
 
         mock_get_objects.assert_called_once_with(user, "view_document", Document)
-        assert mock_query.call_args.kwargs["document_ids"] == [1, 2, 3]
+        assert mock_retrieve.call_args.kwargs["document_ids"] == [1, 2, 3]
+
+
+@pytest.mark.django_db
+@patch("paperless_ai.ai_classifier.retrieve_similar_nodes")
+def test_get_taxonomy_context_retrieval_failure_degrades_to_no_hints(mock_retrieve):
+    """
+    GIVEN:
+        - retrieve_similar_nodes() raises an exception (e.g. vector store outage)
+    WHEN:
+        - get_taxonomy_context() is called
+    THEN:
+        - Empty taxonomy candidates and an empty RAG context are returned
+          instead of propagating the exception
+    """
+    document = DocumentFactory.create(content="Some content")
+    mock_retrieve.side_effect = RuntimeError("vector store unavailable")
+
+    candidates, _assigned, rag_context = get_taxonomy_context(document, user=None)
+
+    assert candidates == {
+        "tags": [],
+        "document_types": [],
+        "correspondents": [],
+        "storage_paths": [],
+    }
+    assert rag_context == ""
+
+
+@pytest.mark.django_db
+@patch("paperless_ai.ai_classifier.build_taxonomy_candidates")
+@patch("paperless_ai.ai_classifier.retrieve_similar_nodes")
+def test_get_taxonomy_context_candidate_building_failure_degrades_to_no_hints(
+    mock_retrieve,
+    mock_build_candidates,
+):
+    """
+    GIVEN:
+        - retrieve_similar_nodes() succeeds but build_taxonomy_candidates()
+          raises (e.g. a DB or permission-backend failure)
+    WHEN:
+        - get_taxonomy_context() is called
+    THEN:
+        - Empty taxonomy candidates and an empty RAG context are returned
+          instead of propagating the exception - the error boundary covers
+          everything derived from the retrieval, not just the retrieval call
+          itself
+    """
+    document = DocumentFactory.create(content="Some content")
+    mock_retrieve.return_value = []
+    mock_build_candidates.side_effect = RuntimeError("permission backend unavailable")
+
+    candidates, _assigned, rag_context = get_taxonomy_context(document, user=None)
+
+    assert candidates == {
+        "tags": [],
+        "document_types": [],
+        "correspondents": [],
+        "storage_paths": [],
+    }
+    assert rag_context == ""
+
+
+@pytest.mark.django_db
+def test_build_prompt_without_rag_includes_taxonomy_block():
+    """
+    GIVEN:
+        - Non-empty taxonomy candidates
+    WHEN:
+        - build_prompt_without_rag() is called with candidates and assigned metadata
+    THEN:
+        - The candidate's id and the existing_ids instruction appear in the prompt
+    """
+    document = DocumentFactory.create(content="Some content")
+    config = AIConfig()
+    candidates = {
+        "tags": [{"id": 12, "name": "Bloodwork", "weight": 1.0}],
+        "document_types": [],
+        "correspondents": [],
+        "storage_paths": [],
+    }
+    assigned = {
+        "tags": [],
+        "document_type": None,
+        "correspondent": None,
+        "storage_path": None,
+    }
+
+    prompt = build_prompt_without_rag(
+        document,
+        config,
+        candidates=candidates,
+        assigned=assigned,
+    )
+
+    assert '"id": 12' in prompt
+    assert "existing_ids" in prompt
+
+
+@pytest.mark.django_db
+def test_build_prompt_without_rag_identical_when_no_hints():
+    """
+    GIVEN:
+        - Empty taxonomy candidates and empty assigned metadata
+    WHEN:
+        - build_prompt_without_rag() is called with those empty values, and
+          separately with no candidates/assigned at all
+    THEN:
+        - Both prompts are identical
+        - Neither mentions existing_ids or the "Available ..." candidate block:
+          without any candidates in the prompt, that instruction would only
+          invite the model to invent a plausible id that resolves to a real but
+          unrelated object
+    """
+    document = DocumentFactory.create(content="Some content")
+    config = AIConfig()
+    empty_candidates = {
+        "tags": [],
+        "document_types": [],
+        "correspondents": [],
+        "storage_paths": [],
+    }
+    empty_assigned = {
+        "tags": [],
+        "document_type": None,
+        "correspondent": None,
+        "storage_path": None,
+    }
+
+    with_empty_hints = build_prompt_without_rag(
+        document,
+        config,
+        candidates=empty_candidates,
+        assigned=empty_assigned,
+    )
+    with_no_hints = build_prompt_without_rag(document, config)
+
+    assert with_empty_hints == with_no_hints
+    assert "existing_ids" not in with_no_hints
+    assert "Available " not in with_no_hints
+
+
+@pytest.mark.django_db
+@patch("paperless_ai.ai_classifier.AIClient")
+@patch("paperless_ai.ai_classifier.retrieve_similar_nodes")
+def test_get_ai_document_classification_localizes_only_new_names(
+    mock_retrieve,
+    mock_client_cls,
+):
+    """
+    GIVEN:
+        - A classification response with a resolved existing tag id
+        - A localization response that echoes back a different existing_ids value
+    WHEN:
+        - get_ai_document_classification() is called with an output_language
+    THEN:
+        - The localized new_names are used
+        - The ORIGINAL existing_ids are kept, never the localized response's
+          existing_ids - localization must never corrupt an exact taxonomy match
+    """
+    document = DocumentFactory.create(content="Some content")
+    mock_retrieve.return_value = []
+    mock_client = mock_client_cls.return_value
+    mock_client.run_llm_query.side_effect = [
+        {
+            "title": "Invoice",
+            "tags": {"existing_ids": [12], "new_names": ["Contractor Work"]},
+            "correspondents": {"existing_ids": [], "new_names": []},
+            "document_types": {"existing_ids": [], "new_names": []},
+            "storage_paths": {"existing_ids": [], "new_names": []},
+            "dates": [],
+        },
+        {
+            # The model's own localized-response existing_ids (999) must be
+            # discarded - the merge always keeps the ORIGINAL resolved id.
+            "title": "Rechnung",
+            "tags": {"existing_ids": [999], "new_names": ["Auftragsarbeit"]},
+            "correspondents": {"existing_ids": [], "new_names": []},
+            "document_types": {"existing_ids": [], "new_names": []},
+            "storage_paths": {"existing_ids": [], "new_names": []},
+            "dates": [],
+        },
+    ]
+
+    result = get_ai_document_classification(document, output_language="de-de")
+
+    localization_prompt = mock_client.run_llm_query.call_args_list[1].args[0]
+    assert "Contractor Work" in localization_prompt
+    assert result["tags"]["existing_ids"] == [12]  # untouched by localization
+    assert result["tags"]["new_names"] == ["Auftragsarbeit"]

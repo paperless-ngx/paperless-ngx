@@ -235,6 +235,37 @@ def permitted_object_ids(
     ).values_list("id", flat=True)
 
 
+def visible_object_ids_or_none(
+    user: User | None,
+    model: type[Model],
+    perm: str,
+) -> set[int] | None:
+    """
+    Return the set of object IDs of ``model`` that ``user`` may see with
+    ``perm``, or ``None`` meaning "no restriction at all".
+
+    ``None`` is returned only for an absent user or an *active* superuser.
+    ``permitted_object_ids(None, ...)`` itself means the much narrower "only
+    unowned rows", which is NOT the same thing as "no user filtering
+    requested", so that case has to be special-cased before ever calling it.
+
+    Every other case is delegated to ``permitted_object_ids`` rather than
+    re-deciding here, so its ordering is inherited instead of duplicated: a
+    deactivated superuser must NOT be handed "no restriction", it gets an
+    empty set (nothing visible), and an unauthenticated user still gets the
+    unowned rows.
+    """
+    if user is None:
+        return None
+    if (
+        getattr(user, "is_authenticated", False)
+        and getattr(user, "is_active", False)
+        and getattr(user, "is_superuser", False)
+    ):
+        return None
+    return set(permitted_object_ids(user, model, perm))
+
+
 def permitted_document_ids(
     user: User | None,
     *,

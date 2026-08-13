@@ -25,6 +25,7 @@ from paperless_ai.embedding import get_embedding_model
 
 if TYPE_CHECKING:
     from llama_index.core.schema import BaseNode
+    from llama_index.core.schema import NodeWithScore
 
     from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
 
@@ -85,11 +86,11 @@ def get_vector_store() -> "PaperlessSqliteVecVectorStore":
 # Two locks guard the index; they answer different questions and are NOT
 # interchangeable:
 #
-# * settings.LLM_INDEX_LOCK (FileLock, exclusive) -- serializes WRITERS against
+# * settings.LLM_INDEX_LOCK (FileLock, exclusive) - serializes WRITERS against
 #   each other, so only one rebuild/upsert/delete/compaction runs at a time.
 #   Taken by write_store(). Readers never take it, so it never blocks reads.
 #
-# * settings.LLM_INDEX_RWLOCK (ReadWriteLock) -- coordinates readers against the
+# * settings.LLM_INDEX_RWLOCK (ReadWriteLock) - coordinates readers against the
 #   compaction/migration file swap. read_store() takes it SHARED (readers run
 #   concurrently); _exclude_readers() takes it EXCLUSIVE, only for the swap, so
 #   the database file is never replaced while a reader connection is open (that
@@ -197,10 +198,10 @@ class MigrationCheckResult(enum.Enum):
     """Outcome of _check_and_run_migrations().
 
     CURRENT: no migration was pending, or a pending structural migration
-    was applied successfully -- safe to write.
+    was applied successfully - safe to write.
 
     REEMBED_REQUIRED: a pending migration needs fresh embeddings, which is
-    never triggered automatically -- the caller must force a rebuild.
+    never triggered automatically - the caller must force a rebuild.
 
     DEFERRED: a migration was pending but could not run because active
     index readers did not drain within LLM_INDEX_COMPACTION_LOCK_TIMEOUT --
@@ -404,7 +405,7 @@ def update_llm_index(
     """Rebuild or incrementally update the LLM index.
 
     ``document_ids``, when given, scopes an incremental update to just those
-    documents instead of scanning the whole library -- callers that already
+    documents instead of scanning the whole library - callers that already
     know which documents changed (e.g. a bulk edit) should pass this to avoid
     an O(library size) scan per call. Ignored whenever a rebuild actually
     happens, since a rebuild always covers the whole library regardless.
@@ -529,7 +530,7 @@ def llm_index_migrate() -> None:
     init-llmindex-migrate container step and the bare-metal upgrade docs):
     has_pending_migration() short-circuits to a metadata-only read once the
     store is current, so a healthy install pays almost nothing here. Only
-    ever applies structural migrations -- a pending re-embed migration is
+    ever applies structural migrations - a pending re-embed migration is
     left for the explicit, deliberate rebuild path (``document_llmindex
     update``/``rebuild``) to resolve, since re-embedding can be slow and,
     for a metered embedding backend, cost money.
@@ -541,7 +542,7 @@ def llm_index_migrate() -> None:
     if migration_result is MigrationCheckResult.REEMBED_REQUIRED:
         logger.warning(
             "LLM index requires re-embedding, which this automatic migration "
-            "check will not do on its own -- it can be slow and, for a "
+            "check will not do on its own - it can be slow and, for a "
             "metered embedding backend, cost money. Run "
             "'document_llmindex rebuild' manually when ready.",
         )
@@ -630,12 +631,16 @@ def normalize_document_ids(document_ids: Iterable[int | str] | None) -> set[str]
     return {str(document_id) for document_id in document_ids}
 
 
-def query_similar_documents(
+def retrieve_similar_nodes(
     document: Document,
     top_k: int = 5,
     document_ids: Iterable[int | str] | None = None,
-) -> list[Document]:
-    """Return up to ``top_k`` Documents most similar to ``document``."""
+) -> list["NodeWithScore"]:
+    """Run the vector-store retrieval once and return the raw scored nodes,
+    permission-filtered by document_ids and with the source document excluded.
+    Callers derive both RAG text context and taxonomy candidates from this
+    single retrieval instead of querying the vector store twice per request.
+    """
     allowed_document_ids = normalize_document_ids(document_ids)
     if allowed_document_ids is not None and not allowed_document_ids:
         return []
@@ -684,20 +689,31 @@ def query_similar_documents(
         with db_connection_released():
             results = retriever.retrieve(query_text)
 
-    retrieved_document_ids: list[int] = []
+    if allowed_document_ids is None:
+        return results
+
+    filtered = []
     for node in results:
         document_id = node.metadata.get("document_id")
         if document_id is None:
             continue
-        normalized = str(document_id)
-        if allowed_document_ids is not None and normalized not in allowed_document_ids:
+        if str(document_id) not in allowed_document_ids:
+            continue
+        filtered.append(node)
+    return filtered
+
+
+def _node_document_ids(nodes: list["NodeWithScore"]) -> list[int]:
+    document_ids: list[int] = []
+    for node in nodes:
+        document_id = node.metadata.get("document_id")
+        if document_id is None:
             continue
         try:
-            retrieved_document_ids.append(int(normalized))
+            document_ids.append(int(document_id))
         except ValueError:  # pragma: no cover
             logger.warning(
                 "Skipping LLM index result with invalid document_id %r.",
                 document_id,
             )
-
-    return list(Document.objects.filter(pk__in=retrieved_document_ids))
+    return document_ids

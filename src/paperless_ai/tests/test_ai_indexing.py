@@ -112,7 +112,7 @@ def test_build_document_node_survives_concurrently_deleted_correspondent(
 
     If a document's correspondent (or document type) is deleted after the
     in-memory Document instance was loaded but before build_document_node
-    resolves the relation, accessing the FK must not raise -- it should
+    resolves the relation, accessing the FK must not raise - it should
     behave like an unset FK and produce None in the metadata instead of
     aborting the whole indexing pass.
     """
@@ -250,7 +250,7 @@ def test_update_llm_index_rebuilds_on_model_name_change(
 
     with indexing.get_vector_store() as store:
         # Schema metadata only updates when the table is dropped and recreated, never
-        # on incremental writes -- so "model-b" here proves a full rebuild happened.
+        # on incremental writes - so "model-b" here proves a full rebuild happened.
         assert store.stored_model_name() == "model-b"
 
 
@@ -285,11 +285,11 @@ def test_update_llm_index_merges_exists_and_config_mismatch_reads(
             indexing.update_llm_index(rebuild=False)
 
     # Documents exist, so the fast-exit check's `no_documents and ...`
-    # short-circuits before ever calling llm_index_exists() -- the only
+    # short-circuits before ever calling llm_index_exists() - the only
     # read_store() call left in this path is the merged table_exists()/
     # config_mismatch() check. Before this task's fix, that merged check
     # was two separate read_store() calls (one inside llm_index_exists(),
-    # one for config_mismatch() right after) -- so this asserts 1, not 2.
+    # one for config_mismatch() right after) - so this asserts 1, not 2.
     assert read_store_spy.call_count == 1
 
 
@@ -345,7 +345,7 @@ def test_update_llm_index_partial_update(
     # new doc, also touched by the scoped update below
     doc4 = DocumentFactory.create(title="Test Document 4", added=timezone.now())
 
-    # A further edit, scoped via document_ids to doc3 + doc4 -- doc2 must be
+    # A further edit, scoped via document_ids to doc3 + doc4 - doc2 must be
     # left exactly as it was, proving document_ids restricts the scan
     # instead of falling back to the whole library.
     doc3.modified = timezone.now()
@@ -376,7 +376,7 @@ def test_update_llm_index_partial_update(
         )
     assert result == "LLM index updated successfully."
     # Notes/custom fields are prefetched in one batch query each (plus one
-    # more for custom_fields__field), not re-queried per document -- an N+1
+    # more for custom_fields__field), not re-queried per document - an N+1
     # regression here would scale with document count instead of staying flat
     # (7 with the prefetch vs. 10 without it, for these 2 documents).
     assert len(ctx.captured_queries) <= 8
@@ -419,7 +419,7 @@ def test_query_after_remove_does_not_raise_key_error(
 
     indexing.llm_index_remove_document(real_document)
 
-    result = indexing.query_similar_documents(query_doc, top_k=5)
+    result = indexing.retrieve_similar_nodes(query_doc, top_k=5)
     assert isinstance(result, list)
 
 
@@ -492,57 +492,10 @@ def test_queue_llm_index_update_if_needed_enqueues_when_idle_or_skips_recent() -
 
 @override_settings(
     LLM_EMBEDDING_BACKEND="huggingface",
-    LLM_BACKEND="ollama",
-)
-def test_query_similar_documents(
-    temp_llm_index_dir: Path,
-    real_document: Document,
-) -> None:
-    with (
-        patch("paperless_ai.indexing.load_or_build_index") as mock_load_or_build_index,
-        patch(
-            "paperless_ai.indexing.llm_index_exists",
-        ) as mock_vector_store_exists,
-        patch("llama_index.core.retrievers.VectorIndexRetriever") as mock_retriever_cls,
-        patch("paperless_ai.indexing.Document.objects.filter") as mock_filter,
-    ):
-        mock_vector_store_exists.return_value = True
-
-        mock_index = MagicMock()
-        mock_load_or_build_index.return_value = mock_index
-
-        mock_retriever = MagicMock()
-        mock_retriever_cls.return_value = mock_retriever
-
-        mock_node1 = MagicMock()
-        mock_node1.metadata = {"document_id": 1}
-
-        mock_node2 = MagicMock()
-        mock_node2.metadata = {"document_id": 2}
-
-        mock_retriever.retrieve.return_value = [mock_node1, mock_node2]
-
-        mock_filtered_docs = [MagicMock(pk=1), MagicMock(pk=2)]
-        mock_filter.return_value = mock_filtered_docs
-
-        result = indexing.query_similar_documents(real_document, top_k=3)
-
-        mock_load_or_build_index.assert_called_once()
-        mock_retriever_cls.assert_called_once()
-        mock_retriever.retrieve.assert_called_once_with(
-            "Test Document\nThis is some test content.",
-        )
-        mock_filter.assert_called_once_with(pk__in=[1, 2])
-
-        assert result == mock_filtered_docs
-
-
-@override_settings(
-    LLM_EMBEDDING_BACKEND="huggingface",
     LLM_EMBEDDING_CHUNK_SIZE=32,
     LLM_BACKEND="ollama",
 )
-def test_query_similar_documents_truncates_query_to_embedding_chunk_size(
+def test_retrieve_similar_nodes_truncates_query_to_embedding_chunk_size(
     temp_llm_index_dir: Path,
     real_document: Document,
 ) -> None:
@@ -553,7 +506,6 @@ def test_query_similar_documents_truncates_query_to_embedding_chunk_size(
             "paperless_ai.indexing.llm_index_exists",
         ) as mock_vector_store_exists,
         patch("llama_index.core.retrievers.VectorIndexRetriever") as mock_retriever_cls,
-        patch("paperless_ai.indexing.Document.objects.filter") as mock_filter,
         patch("paperless_ai.indexing.truncate_content") as mock_truncate_content,
     ):
         mock_vector_store_exists.return_value = True
@@ -563,65 +515,13 @@ def test_query_similar_documents_truncates_query_to_embedding_chunk_size(
         mock_retriever = MagicMock()
         mock_retriever.retrieve.return_value = []
         mock_retriever_cls.return_value = mock_retriever
-        mock_filter.return_value = []
 
-        indexing.query_similar_documents(real_document, top_k=3)
+        indexing.retrieve_similar_nodes(real_document, top_k=3)
 
         mock_truncate_content.assert_not_called()
         query_text = mock_retriever.retrieve.call_args.args[0]
         assert query_text
         assert "word199" not in query_text
-
-
-@pytest.mark.django_db
-def test_query_similar_documents_triggers_update_when_index_missing(
-    temp_llm_index_dir: Path,
-    real_document: Document,
-) -> None:
-    with (
-        patch(
-            "paperless_ai.indexing.llm_index_exists",
-            return_value=False,
-        ),
-        patch(
-            "paperless_ai.indexing.queue_llm_index_update_if_needed",
-        ) as mock_queue,
-        patch("paperless_ai.indexing.load_or_build_index") as mock_load,
-    ):
-        result = indexing.query_similar_documents(
-            real_document,
-            top_k=2,
-        )
-
-    mock_queue.assert_called_once_with(
-        rebuild=False,
-        reason="LLM index not found for similarity query.",
-    )
-    mock_load.assert_not_called()
-    assert result == []
-
-
-@pytest.mark.django_db
-def test_query_similar_documents_empty_allow_list_fails_closed(
-    real_document: Document,
-) -> None:
-    with (
-        patch(
-            "paperless_ai.indexing.llm_index_exists",
-            return_value=True,
-        ) as mock_vector_store_exists,
-        patch("paperless_ai.indexing.load_or_build_index") as mock_load_or_build_index,
-        patch("llama_index.core.retrievers.VectorIndexRetriever") as mock_retriever_cls,
-    ):
-        result = indexing.query_similar_documents(
-            real_document,
-            document_ids=[],
-        )
-
-    assert result == []
-    mock_vector_store_exists.assert_not_called()
-    mock_load_or_build_index.assert_not_called()
-    mock_retriever_cls.assert_not_called()
 
 
 class TestUpdateLlmIndexEmptyDocumentSet:
@@ -838,7 +738,7 @@ class TestLlmIndexLocking:
         mocker: pytest_mock.MockerFixture,
     ) -> None:
         """A migration check that times out waiting for readers to drain
-        must be treated the same as a pending migration -- proceeding to
+        must be treated the same as a pending migration - proceeding to
         write would target a store still on its old schema. Regression
         test for the tri-state fix: a bare bool collapsed this outcome
         into the same falsy value as "already current".
@@ -973,7 +873,7 @@ class TestLlmIndexLocking:
     ) -> None:
         """A migration check deferred by a reader-lock timeout must short-
         circuit before the second write_store() block (document scanning,
-        add/upsert, compaction) ever runs -- that block would otherwise
+        add/upsert, compaction) ever runs - that block would otherwise
         write against a store still on its old schema.
         """
         mock_store = MagicMock()
@@ -1146,48 +1046,153 @@ class TestLlmIndexMigrate:
 
 
 @pytest.mark.django_db
-class TestQuerySimilarDocuments:
-    def test_query_similar_documents_respects_allowed_ids(
+def test_retrieve_similar_nodes_returns_raw_nodes_from_retriever(
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """
+    GIVEN:
+        - A source document and a mocked retriever returning one node
+    WHEN:
+        - retrieve_similar_nodes() is called with no document_ids filter
+    THEN:
+        - The retriever's raw result is returned unchanged
+
+    Source-document self-exclusion is a real vector-store MetadataFilters
+    behavior this mocked retriever bypasses entirely - see
+    TestRetrieveSimilarNodesAgainstRealIndex.test_excludes_self for that
+    coverage against a real index.
+    """
+    source = DocumentFactory.create()
+    other = DocumentFactory.create()
+    fake_node = mocker.MagicMock()
+    fake_node.metadata = {"document_id": str(other.pk)}
+    mocker.patch("paperless_ai.indexing.llm_index_exists", return_value=True)
+    mock_retriever_cls = mocker.patch(
+        "llama_index.core.retrievers.VectorIndexRetriever",
+    )
+    mock_retriever_cls.return_value.retrieve.return_value = [fake_node]
+    mocker.patch("paperless_ai.indexing.load_or_build_index")
+    mocker.patch("paperless_ai.indexing.read_store")
+
+    nodes = indexing.retrieve_similar_nodes(source, top_k=5)
+
+    assert nodes == [fake_node]
+
+
+@pytest.mark.django_db
+def test_retrieve_similar_nodes_returns_empty_when_index_missing(
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """
+    GIVEN:
+        - No LLM index exists yet
+    WHEN:
+        - retrieve_similar_nodes() is called
+    THEN:
+        - An empty list is returned and an index build is queued
+    """
+    source = DocumentFactory.create()
+    mocker.patch("paperless_ai.indexing.llm_index_exists", return_value=False)
+    mocker.patch("paperless_ai.indexing.queue_llm_index_update_if_needed")
+
+    nodes = indexing.retrieve_similar_nodes(source)
+
+    assert nodes == []
+
+
+@pytest.mark.django_db
+def test_retrieve_similar_nodes_empty_document_ids_short_circuits(
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """
+    GIVEN:
+        - An empty document_ids allow-list
+    WHEN:
+        - retrieve_similar_nodes() is called
+    THEN:
+        - An empty list is returned without checking whether an index exists
+    """
+    source = DocumentFactory.create()
+    spy = mocker.patch("paperless_ai.indexing.llm_index_exists")
+
+    nodes = indexing.retrieve_similar_nodes(source, document_ids=[])
+
+    assert nodes == []
+    spy.assert_not_called()
+
+
+@pytest.mark.django_db
+class TestRetrieveSimilarNodesAgainstRealIndex:
+    """End-to-end allow-list and self-exclusion coverage against a real
+    on-disk index (the mocked-retriever tests above cannot see the metadata
+    filters actually being applied by the vector store)."""
+
+    def test_respects_allowed_ids(
         self,
         temp_llm_index_dir: Path,
         mock_embed_model: FakeEmbedding,
     ) -> None:
+        """
+        GIVEN:
+            - Three indexed documents and an allow-list naming only one of them
+        WHEN:
+            - retrieve_similar_nodes() is called with that allow-list
+        THEN:
+            - Only nodes for the allowed document are returned
+        """
         a = DocumentFactory.create(content="alpha shared content here")
         b = DocumentFactory.create(content="beta shared content here")
         c = DocumentFactory.create(content="gamma shared content here")
         for doc in (a, b, c):
             indexing.llm_index_add_or_update_document(doc)
 
-        results = indexing.query_similar_documents(a, document_ids=[b.id])
+        nodes = indexing.retrieve_similar_nodes(a, document_ids=[b.id])
 
-        assert all(doc.id == b.id for doc in results)
+        assert all(
+            document_id == b.id for document_id in indexing._node_document_ids(nodes)
+        )
 
-    def test_query_similar_documents_excludes_self(
+    def test_excludes_self(
         self,
         temp_llm_index_dir: Path,
         mock_embed_model: FakeEmbedding,
     ) -> None:
+        """
+        GIVEN:
+            - The source document and one other document are both indexed
+        WHEN:
+            - retrieve_similar_nodes() is called for the source document
+        THEN:
+            - The source document's own nodes are excluded from the results
+        """
         a = DocumentFactory.create(content="alpha shared content here")
         b = DocumentFactory.create(content="beta shared content here")
         for doc in (a, b):
             indexing.llm_index_add_or_update_document(doc)
 
-        results = indexing.query_similar_documents(a, top_k=5)
+        nodes = indexing.retrieve_similar_nodes(a, top_k=5)
 
-        assert [doc.id for doc in results] == [b.id]
+        assert set(indexing._node_document_ids(nodes)) == {b.id}
 
-    def test_query_similar_documents_excludes_self_with_multiple_chunks(
+    def test_excludes_self_with_multiple_chunks(
         self,
         temp_llm_index_dir: Path,
         mock_embed_model: FakeEmbedding,
     ) -> None:
-        # Document `a` is split into many chunks, so it could otherwise
-        # occupy several of the top-k slots with its own content.
+        """
+        GIVEN:
+            - A source document long enough to be split into many chunks, so
+              it could otherwise occupy several of the top-k slots itself
+        WHEN:
+            - retrieve_similar_nodes() is called for the source document
+        THEN:
+            - Every one of its own chunks is excluded from the results
+        """
         a = DocumentFactory.create(content="word " * 4000)
         b = DocumentFactory.create(content="beta shared content here")
         for doc in (a, b):
             indexing.llm_index_add_or_update_document(doc)
 
-        results = indexing.query_similar_documents(a, top_k=3)
+        nodes = indexing.retrieve_similar_nodes(a, top_k=3)
 
-        assert [doc.id for doc in results] == [b.id]
+        assert set(indexing._node_document_ids(nodes)) == {b.id}

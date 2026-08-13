@@ -105,10 +105,10 @@ def test_run_llm_query_ollama_uses_structured_json(mock_ai_config, mock_ollama_l
     mock_llm_instance.chat.return_value.message.content = json.dumps(
         {
             "title": "Test Title",
-            "tags": ["test", "document"],
-            "correspondents": ["John Doe"],
-            "document_types": ["report"],
-            "storage_paths": ["Reports"],
+            "tags": {"existing_ids": [1], "new_names": ["document"]},
+            "correspondents": {"existing_ids": [], "new_names": ["John Doe"]},
+            "document_types": {"existing_ids": [], "new_names": ["report"]},
+            "storage_paths": {"existing_ids": [], "new_names": ["Reports"]},
             "dates": ["2023-01-01"],
         },
     )
@@ -117,6 +117,7 @@ def test_run_llm_query_ollama_uses_structured_json(mock_ai_config, mock_ollama_l
     result = client.run_llm_query("test_prompt")
 
     assert result["title"] == "Test Title"
+    assert result["tags"] == {"existing_ids": [1], "new_names": ["document"]}
     mock_llm_instance.chat.assert_called_once_with(
         [ANY],
         format=ANY,
@@ -137,10 +138,10 @@ def test_run_llm_query_openai_uses_tools(mock_ai_config, mock_openai_llm):
         tool_name="DocumentClassifierSchema",
         tool_kwargs={
             "title": "Test Title",
-            "tags": ["test", "document"],
-            "correspondents": ["John Doe"],
-            "document_types": ["report"],
-            "storage_paths": ["Reports"],
+            "tags": {"existing_ids": [1], "new_names": ["document"]},
+            "correspondents": {"existing_ids": [], "new_names": ["John Doe"]},
+            "document_types": {"existing_ids": [], "new_names": ["report"]},
+            "storage_paths": {"existing_ids": [], "new_names": ["Reports"]},
             "dates": ["2023-01-01"],
         },
     )
@@ -152,6 +153,7 @@ def test_run_llm_query_openai_uses_tools(mock_ai_config, mock_openai_llm):
     result = client.run_llm_query("test_prompt")
 
     assert result["title"] == "Test Title"
+    assert result["tags"] == {"existing_ids": [1], "new_names": ["document"]}
     mock_llm_instance.chat_with_tools.assert_called_once()
 
 
