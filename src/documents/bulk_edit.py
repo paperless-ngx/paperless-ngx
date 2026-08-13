@@ -41,6 +41,9 @@ if TYPE_CHECKING:
 
     from django.contrib.auth.models import User
 
+if settings.AUDIT_LOG_ENABLED:
+    from auditlog.models import LogEntry
+
 logger: logging.Logger = logging.getLogger("paperless.bulk_edit")
 
 SourceMode = Literal["latest_version", "explicit_selection"]
@@ -619,6 +622,7 @@ def merge_as_versions(
     *,
     root_document_id: int,
     version_label: str | None = None,
+    user: User | None = None,
 ) -> Literal["OK"]:
     with transaction.atomic():
         documents = list(
@@ -659,29 +663,24 @@ def merge_as_versions(
         ]
 
         for source_id in source_ids:
-            source_document = documents_by_id[source_id]
             next_version_index += 1
-            source_document.root_document = root_document
-            source_document.version_index = next_version_index
-            source_document.archive_serial_number = None
-            update_fields = [
-                "root_document",
-                "version_index",
-                "archive_serial_number",
-            ]
+            updates = {
+                "root_document": root_document,
+                "version_index": next_version_index,
+                "archive_serial_number": None,
+            }
             if version_label is not None:
-                source_document.version_label = version_label
-                update_fields.append("version_label")
-            source_document.save(update_fields=update_fields)
+                updates["version_label"] = version_label
+            # update() and not save to avoid post_save now
+            Document.objects.filter(pk=source_id).update(**updates)
 
-        root_update_fields = ["modified"]
+        root_updates = {"modified": timezone.now()}
         if source_asns and root_document.archive_serial_number is None:
             # If a version had one, hand the ASN over, the same as merge() does
-            root_document.archive_serial_number = source_asns.pop(0)
-            root_update_fields.append("archive_serial_number")
+            root_updates["archive_serial_number"] = source_asns.pop(0)
             logger.info(
                 f"Document {root_document.id} took archive serial number "
-                f"{root_document.archive_serial_number} from a document merged into it",
+                f"{root_updates['archive_serial_number']} from a document merged into it",
             )
         if source_asns:
             logger.warning(
@@ -689,8 +688,20 @@ def merge_as_versions(
                 f"those documents as versions of document {root_document.id}",
             )
 
-        root_document.modified = timezone.now()
-        root_document.save(update_fields=root_update_fields)
+        Document.objects.filter(pk=root_document.pk).update(**root_updates)
+
+        if settings.AUDIT_LOG_ENABLED:
+            # update() doesn't fire auditlog signals, so manual
+            LogEntry.objects.log_create(
+                instance=root_document,
+                changes={"Merged As Versions": ["None", source_ids]},
+                action=LogEntry.Action.UPDATE,
+                actor=user,
+                additional_data={
+                    "reason": "Merged as versions",
+                    "version_ids": source_ids,
+                },
+            )
 
     for source_id in source_ids:
         remove_document_from_index.apply_async(args=[source_id])

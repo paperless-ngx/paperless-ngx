@@ -1,8 +1,10 @@
 import json
 from unittest import mock
 
+from auditlog.models import LogEntry
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -289,6 +291,27 @@ class TestMergeDocumentsAsVersions(TestCase):
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
     @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
+    def test_writes_audit_log_entry(self, *_mocks) -> None:
+        user = User.objects.create_user(username="merger")
+        root = Document.objects.create(checksum="A", title="Root")
+        source = Document.objects.create(checksum="B", title="Source")
+        LogEntry.objects.all().delete()
+
+        merge_as_versions([root.id, source.id], root_document_id=root.id, user=user)
+
+        entry = LogEntry.objects.filter(
+            content_type=ContentType.objects.get_for_model(Document),
+            object_id=root.id,
+        ).first()
+        self.assertIsNotNone(entry)
+        self.assertEqual(entry.actor, user)
+        self.assertEqual(entry.action, LogEntry.Action.UPDATE)
+        self.assertEqual(entry.changes, {"Merged As Versions": ["None", [source.id]]})
+        self.assertEqual(entry.additional_data["version_ids"], [source.id])
+
+    @mock.patch("documents.bulk_edit.DocumentsStatusManager")
+    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
+    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
     def test_sets_version_label_for_one_source_document(
         self,
         _remove_from_index_mock,
@@ -416,6 +439,7 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
             [self.doc1.id, self.doc2.id],
             root_document_id=self.doc2.id,
             version_label="Imported",
+            user=self.user,
         )
 
     @mock.patch("documents.views.bulk_edit.merge_as_versions")

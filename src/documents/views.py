@@ -2820,8 +2820,12 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         "delete_pages",
         "edit_pdf",
         "remove_password",
+        "merge_as_versions",
     }
-    METHOD_NAMES_REQUIRING_TRIGGER_SOURCE = METHOD_NAMES_REQUIRING_USER
+    # merge_as_versions doesn't queue any consume tasks
+    METHOD_NAMES_REQUIRING_TRIGGER_SOURCE = METHOD_NAMES_REQUIRING_USER - {
+        "merge_as_versions",
+    }
 
     def _has_document_permissions(
         self,
