@@ -6,7 +6,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0022_add_perf_indexes"),
+        ("documents", "0023_savedview_icon"),
     ]
 
     operations = [
