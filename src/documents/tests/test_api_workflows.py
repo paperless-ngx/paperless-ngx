@@ -582,6 +582,65 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    def test_api_partial_update_adds_remote_ocr_action(self) -> None:
+        """
+        GIVEN:
+            - An existing workflow with a consumption started trigger
+        WHEN:
+            - A partial update adds a remote OCR action without resubmitting triggers
+        THEN:
+            - The existing trigger is considered and the update succeeds
+        """
+        response = self.client.patch(
+            f"{self.ENDPOINT}{self.workflow.id}/",
+            json.dumps(
+                {
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.REMOTE_OCR,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            self.workflow.actions.get().type,
+            WorkflowAction.WorkflowActionType.REMOTE_OCR,
+        )
+
+    def test_api_partial_update_cannot_remove_remote_ocr_trigger(self) -> None:
+        """
+        GIVEN:
+            - An existing workflow with a remote OCR action
+            - An existing consumption started trigger
+        WHEN:
+            - A partial update replaces the trigger without resubmitting actions
+        THEN:
+            - The existing action is considered and the update is rejected
+        """
+        self.action.type = WorkflowAction.WorkflowActionType.REMOTE_OCR
+        self.action.save()
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{self.workflow.id}/",
+            json.dumps(
+                {
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(self.workflow.triggers.get(), self.trigger)
+
     def test_api_create_workflow_trigger_action_empty_fields(self) -> None:
         """
         GIVEN:
