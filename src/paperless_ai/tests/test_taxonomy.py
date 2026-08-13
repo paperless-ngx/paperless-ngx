@@ -273,15 +273,91 @@ class TestBuildTaxonomyCandidates:
         THEN:
             - Only 5 correspondents are returned
         """
-        nodes = []
-        for i in range(7):
-            correspondent = CorrespondentFactory.create(name=f"Corr{i}")
-            document = DocumentFactory.create(correspondent=correspondent)
-            nodes.append(make_node(document.pk, 0.5))
+        correspondents = CorrespondentFactory.create_batch(7)
+        nodes = [
+            make_node(DocumentFactory.create(correspondent=c).pk, 0.5)
+            for c in correspondents
+        ]
 
         result = build_taxonomy_candidates(nodes, user=None)
 
         assert len(result["correspondents"]) == 5
+
+    def test_document_type_candidate_is_surfaced(self) -> None:
+        """
+        GIVEN:
+            - A neighbour document with a document_type assigned
+        WHEN:
+            - build_taxonomy_candidates() is called
+        THEN:
+            - The document_type is returned as a candidate
+        """
+        document_type = DocumentTypeFactory.create(name="Invoice")
+        document = DocumentFactory.create(document_type=document_type)
+        nodes = [make_node(document.pk, 0.5)]
+
+        result = build_taxonomy_candidates(nodes, user=None)
+
+        assert len(result["document_types"]) == 1
+        assert result["document_types"][0]["id"] == document_type.pk
+        assert result["document_types"][0]["name"] == "Invoice"
+
+    def test_document_type_candidates_capped_at_five(self) -> None:
+        """
+        GIVEN:
+            - 7 documents with different document_types
+        WHEN:
+            - build_taxonomy_candidates() is called
+        THEN:
+            - Only 5 document_types are returned
+        """
+        document_types = DocumentTypeFactory.create_batch(7)
+        nodes = [
+            make_node(DocumentFactory.create(document_type=dt).pk, 0.5)
+            for dt in document_types
+        ]
+
+        result = build_taxonomy_candidates(nodes, user=None)
+
+        assert len(result["document_types"]) == 5
+
+    def test_storage_path_candidate_is_surfaced(self) -> None:
+        """
+        GIVEN:
+            - A neighbour document with a storage_path assigned
+        WHEN:
+            - build_taxonomy_candidates() is called
+        THEN:
+            - The storage_path is returned as a candidate
+        """
+        storage_path = StoragePathFactory.create(name="Invoices")
+        document = DocumentFactory.create(storage_path=storage_path)
+        nodes = [make_node(document.pk, 0.5)]
+
+        result = build_taxonomy_candidates(nodes, user=None)
+
+        assert len(result["storage_paths"]) == 1
+        assert result["storage_paths"][0]["id"] == storage_path.pk
+        assert result["storage_paths"][0]["name"] == "Invoices"
+
+    def test_storage_path_candidates_capped_at_five(self) -> None:
+        """
+        GIVEN:
+            - 7 documents with different storage_paths
+        WHEN:
+            - build_taxonomy_candidates() is called
+        THEN:
+            - Only 5 storage_paths are returned
+        """
+        storage_paths = StoragePathFactory.create_batch(7)
+        nodes = [
+            make_node(DocumentFactory.create(storage_path=sp).pk, 0.5)
+            for sp in storage_paths
+        ]
+
+        result = build_taxonomy_candidates(nodes, user=None)
+
+        assert len(result["storage_paths"]) == 5
 
     def test_permission_filters_independent_of_neighbour_document_visibility(
         self,

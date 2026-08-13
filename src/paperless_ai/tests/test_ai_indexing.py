@@ -1080,6 +1080,46 @@ def test_retrieve_similar_nodes_returns_raw_nodes_from_retriever(
 
 
 @pytest.mark.django_db
+def test_retrieve_similar_nodes_drops_result_outside_allow_list(
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """
+    GIVEN:
+        - An allow-list naming only one document
+        - A mocked retriever that returns a node for a DIFFERENT document
+          (as if the vec0-level MetadataFilters had failed to apply)
+    WHEN:
+        - retrieve_similar_nodes() is called with that allow-list
+    THEN:
+        - The out-of-allow-list node is dropped by this function's own
+          Python-level re-check, independent of whatever filtering the
+          vector store itself applied - this is the defense-in-depth layer
+          for a permission boundary, so it must work standalone.
+    """
+    source = DocumentFactory.create()
+    allowed = DocumentFactory.create()
+    not_allowed = DocumentFactory.create()
+    allowed_node = mocker.MagicMock()
+    allowed_node.metadata = {"document_id": str(allowed.pk)}
+    disallowed_node = mocker.MagicMock()
+    disallowed_node.metadata = {"document_id": str(not_allowed.pk)}
+    mocker.patch("paperless_ai.indexing.llm_index_exists", return_value=True)
+    mock_retriever_cls = mocker.patch(
+        "llama_index.core.retrievers.VectorIndexRetriever",
+    )
+    mock_retriever_cls.return_value.retrieve.return_value = [
+        allowed_node,
+        disallowed_node,
+    ]
+    mocker.patch("paperless_ai.indexing.load_or_build_index")
+    mocker.patch("paperless_ai.indexing.read_store")
+
+    nodes = indexing.retrieve_similar_nodes(source, document_ids=[allowed.pk])
+
+    assert nodes == [allowed_node]
+
+
+@pytest.mark.django_db
 def test_retrieve_similar_nodes_returns_empty_when_index_missing(
     mocker: pytest_mock.MockerFixture,
 ) -> None:
