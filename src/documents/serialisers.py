@@ -1701,7 +1701,7 @@ class MergeDocumentsAsVersionsSerializer(DocumentListSerializer):
             raise serializers.ValidationError(
                 "At least two documents are required.",
             )
-        if "version_label" in attrs and len(documents) != 2:
+        if attrs.get("version_label") is not None and len(documents) != 2:
             raise serializers.ValidationError(
                 "version_label can only be used when merging one source document.",
             )
