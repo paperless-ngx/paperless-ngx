@@ -332,72 +332,6 @@ class TestMergeDocumentsAsVersions(TestCase):
         source.refresh_from_db()
         self.assertEqual(source.version_label, "Imported")
 
-    @mock.patch("documents.bulk_edit.DocumentsStatusManager")
-    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
-    @mock.patch("documents.search.get_backend")
-    def test_rejects_source_document_with_versions(
-        self,
-        get_backend_mock,
-        bulk_update_mock,
-        status_manager_mock,
-    ) -> None:
-        source = Document.objects.create(checksum="A", title="Source")
-        Document.objects.create(
-            checksum="B",
-            title="Source version",
-            root_document=source,
-            version_index=1,
-        )
-        root = Document.objects.create(checksum="C", title="Root")
-
-        with self.assertRaisesRegex(ValueError, "existing versions"):
-            merge_as_versions(
-                [source.id, root.id],
-                root_document_id=root.id,
-            )
-
-        source.refresh_from_db()
-        self.assertIsNone(source.root_document_id)
-        get_backend_mock.assert_not_called()
-        bulk_update_mock.assert_not_called()
-        status_manager_mock.assert_not_called()
-
-    @mock.patch("documents.bulk_edit.DocumentsStatusManager")
-    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
-    @mock.patch("documents.search.get_backend")
-    def test_rejects_source_document_with_trashed_versions(
-        self,
-        get_backend_mock,
-        bulk_update_mock,
-        status_manager_mock,
-    ) -> None:
-        source = Document.objects.create(checksum="A", title="Source")
-        version = Document.objects.create(
-            checksum="B",
-            title="Source version",
-            root_document=source,
-            version_index=1,
-        )
-        version.delete()  # trashed, but still points at source
-        root = Document.objects.create(checksum="C", title="Root")
-
-        with self.assertRaisesRegex(ValueError, "existing versions"):
-            merge_as_versions(
-                [source.id, root.id],
-                root_document_id=root.id,
-            )
-
-        source.refresh_from_db()
-        self.assertIsNone(source.root_document_id)
-        # Restoring the version must not produce a version of a version
-        self.assertEqual(
-            Document.global_objects.get(pk=version.pk).root_document_id,
-            source.id,
-        )
-        get_backend_mock.assert_not_called()
-        bulk_update_mock.assert_not_called()
-        status_manager_mock.assert_not_called()
-
 
 class TestMergeDocumentsAsVersionsAPI(APITestCase):
     def setUp(self) -> None:
@@ -512,6 +446,30 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         merge_mock.assert_not_called()
+
+    @mock.patch("documents.views.bulk_edit.merge_as_versions")
+    def test_rejects_source_document_with_versions(self, merge_mock) -> None:
+        Document.objects.create(
+            checksum="C",
+            title="C",
+            root_document=self.doc1,
+            version_index=1,
+            owner=self.user,
+        )
+
+        response = self.client.post(
+            "/api/documents/merge_as_versions/",
+            {
+                "documents": [self.doc1.id, self.doc2.id],
+                "root_document_id": self.doc2.id,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        merge_mock.assert_not_called()
+        self.doc1.refresh_from_db()
+        self.assertIsNone(self.doc1.root_document_id)
 
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")

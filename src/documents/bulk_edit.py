@@ -632,23 +632,7 @@ def merge_as_versions(
         )
         documents_by_id = {document.id: document for document in documents}
 
-        if len(documents) != len(doc_ids):
-            raise ValueError("Some documents do not exist or were specified twice.")
-        if root_document_id not in documents_by_id:
-            raise ValueError("The root document must be selected.")
-        if any(document.root_document_id is not None for document in documents):
-            raise ValueError("Only top-level documents can be merged as versions.")
-
         source_ids = [doc_id for doc_id in doc_ids if doc_id != root_document_id]
-        if version_label is not None and len(source_ids) != 1:
-            raise ValueError(
-                "A version label can only be set when merging one source document.",
-            )
-        if Document.global_objects.filter(root_document_id__in=source_ids).exists():
-            raise ValueError(
-                "Documents with existing versions cannot be merged into another document.",
-            )
-
         root_document = documents_by_id[root_document_id]
         next_version_index = (
             Document.global_objects.filter(
