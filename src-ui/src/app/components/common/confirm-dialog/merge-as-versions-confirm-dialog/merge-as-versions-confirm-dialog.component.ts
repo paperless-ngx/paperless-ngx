@@ -1,6 +1,12 @@
+import {
+  CdkDragDrop,
+  DragDropModule,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop'
 import { AsyncPipe } from '@angular/common'
 import { Component, OnInit, computed, inject, signal } from '@angular/core'
 import { FormsModule } from '@angular/forms'
+import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { takeUntil } from 'rxjs'
 import { Document } from 'src/app/data/document'
 import { CorrespondentNamePipe } from 'src/app/pipes/correspondent-name.pipe'
@@ -11,7 +17,15 @@ import { ConfirmDialogComponent } from '../confirm-dialog.component'
 @Component({
   selector: 'pngx-merge-as-versions-confirm-dialog',
   templateUrl: './merge-as-versions-confirm-dialog.component.html',
-  imports: [AsyncPipe, CorrespondentNamePipe, CustomDatePipe, FormsModule],
+  styleUrl: './merge-as-versions-confirm-dialog.component.scss',
+  imports: [
+    AsyncPipe,
+    CorrespondentNamePipe,
+    CustomDatePipe,
+    DragDropModule,
+    FormsModule,
+    NgxBootstrapIconsModule,
+  ],
 })
 export class MergeAsVersionsConfirmDialogComponent
   extends ConfirmDialogComponent
@@ -33,6 +47,21 @@ export class MergeAsVersionsConfirmDialogComponent
       .getFew(this.documentIDs())
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((response) => this.documents.set(response.results))
+  }
+
+  onDrop(event: CdkDragDrop<number[]>) {
+    const versionDocumentIDs = this.versionDocumentIDs().concat()
+    moveItemInArray(versionDocumentIDs, event.previousIndex, event.currentIndex)
+
+    // The root keeps its place in the list, only the versions move around it
+    let versionIndex = 0
+    this.documentIDs.update((documentIDs) =>
+      documentIDs.map((documentID) =>
+        documentID === this.rootDocumentID()
+          ? documentID
+          : versionDocumentIDs[versionIndex++]
+      )
+    )
   }
 
   getDocument(documentID: number): Document {

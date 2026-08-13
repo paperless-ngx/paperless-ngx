@@ -637,7 +637,7 @@ def merge_as_versions(
         if any(document.root_document_id is not None for document in documents):
             raise ValueError("Only top-level documents can be merged as versions.")
 
-        source_ids = sorted(doc_id for doc_id in doc_ids if doc_id != root_document_id)
+        source_ids = [doc_id for doc_id in doc_ids if doc_id != root_document_id]
         if version_label is not None and len(source_ids) != 1:
             raise ValueError(
                 "A version label can only be set when merging one source document.",

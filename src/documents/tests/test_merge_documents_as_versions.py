@@ -185,7 +185,7 @@ class TestMergeDocumentsAsVersions(TestCase):
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
     @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
-    def test_merges_documents_in_creation_order(
+    def test_merges_documents_in_selection_order(
         self,
         remove_from_index_mock,
         bulk_update_mock,
@@ -219,27 +219,28 @@ class TestMergeDocumentsAsVersions(TestCase):
         source1.refresh_from_db()
         source2.refresh_from_db()
         root.refresh_from_db()
+        # source2 was selected first, so it becomes the older of the two versions
         self.assertEqual(source2.root_document_id, root.id)
-        self.assertEqual(source2.version_index, 5)
+        self.assertEqual(source2.version_index, 4)
         self.assertEqual(source1.root_document_id, root.id)
-        self.assertEqual(source1.version_index, 4)
+        self.assertEqual(source1.version_index, 5)
         self.assertIsNone(source1.archive_serial_number)
         self.assertIsNone(source2.archive_serial_number)
         # The root had no ASN of its own, so it takes the first one
-        self.assertEqual(root.archive_serial_number, 1)
+        self.assertEqual(root.archive_serial_number, 2)
         self.assertGreater(root.modified, original_modified)
         self.assertEqual(existing_version.root_document_id, root.id)
 
         self.assertEqual(
             [call.kwargs["args"] for call in remove_from_index_mock.call_args_list],
-            [[source1.id], [source2.id]],
+            [[source2.id], [source1.id]],
         )
         bulk_update_mock.assert_called_once_with(
             kwargs={"document_ids": [root.id]},
             headers={"trigger_source": "system"},
         )
         status_manager_mock.return_value.send_documents_deleted.assert_called_once_with(
-            [source1.id, source2.id],
+            [source2.id, source1.id],
         )
 
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
@@ -528,4 +529,31 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
         )
         status_manager_mock.return_value.send_documents_deleted.assert_called_once_with(
             [self.doc1.id],
+        )
+
+    @mock.patch("documents.bulk_edit.DocumentsStatusManager")
+    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
+    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
+    def test_chosen_order_survives_to_the_versions_list(self, *_mocks) -> None:
+        doc3 = Document.objects.create(checksum="C", title="C", owner=self.user)
+        # Deliberately not in id order, as dragging the dialog rows produces
+        ordered = [doc3.id, self.doc1.id]
+
+        response = self.client.post(
+            "/api/documents/merge_as_versions/",
+            {
+                "documents": [*ordered, self.doc2.id],
+                "root_document_id": self.doc2.id,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        detail_response = self.client.get(
+            f"/api/documents/{self.doc2.id}/?fields=id,versions",
+        )
+        # Newest first, so the reverse of the order they were merged in
+        self.assertEqual(
+            [version["id"] for version in detail_response.data["versions"]],
+            [self.doc1.id, doc3.id, self.doc2.id],
         )

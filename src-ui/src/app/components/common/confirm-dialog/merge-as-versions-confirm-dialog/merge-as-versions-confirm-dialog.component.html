@@ -6,11 +6,15 @@
   <p>{{message}}</p>
   <div class="form-group">
     <span class="form-label d-inline-block" i18n>Versions:</span>
-    <ul class="list-group">
+    <ul class="list-group"
+        cdkDropList
+        [cdkDropListData]="versionDocumentIDs()"
+        (cdkDropListDropped)="onDrop($event)">
       @for (documentID of versionDocumentIDs(); track documentID) {
         @let document = getDocument(documentID);
         @if (document) {
-          <li class="list-group-item d-flex align-items-center">
+          <li class="list-group-item d-flex align-items-center" cdkDrag>
+            <i-bs name="grip-vertical" class="me-2"></i-bs>
             <div class="d-flex flex-column">
               <div>
                 @if (document.correspondent) {
@@ -28,6 +32,7 @@
         }
       }
     </ul>
+    <div class="form-text" i18n>Drag to reorder. The last document becomes the current version.</div>
   </div>
   <div class="form-group mt-4">
     <label class="form-label" for="rootDocumentID" i18n>Root document:</label>
