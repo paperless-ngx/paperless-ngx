@@ -64,7 +64,7 @@ export class MergeAsVersionsConfirmDialogComponent
     )
   }
 
-  getDocument(documentID: number): Document {
+  getDocument(documentID: number): Document | undefined {
     return this.documents().find((document) => document.id === documentID)
   }
 }
