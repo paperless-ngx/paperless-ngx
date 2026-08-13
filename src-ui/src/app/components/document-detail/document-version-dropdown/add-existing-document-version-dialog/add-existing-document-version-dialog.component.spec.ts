@@ -53,4 +53,21 @@ describe('AddExistingDocumentVersionDialogComponent', () => {
 
     expect(activeModal.dismiss).toHaveBeenCalled()
   })
+
+  it('should re-render the buttons when they are toggled from outside', async () => {
+    const cancelButton: HTMLButtonElement = fixture.nativeElement.querySelector(
+      '.modal-footer button'
+    )
+    expect(cancelButton.disabled).toBeFalsy()
+
+    // No detectChanges: the dropdown toggling this from a request callback is
+    // all that happens, and nothing else schedules a render for the modal
+    component.buttonsEnabled.set(false)
+    await fixture.whenStable()
+    expect(cancelButton.disabled).toBeTruthy()
+
+    component.buttonsEnabled.set(true)
+    await fixture.whenStable()
+    expect(cancelButton.disabled).toBeFalsy()
+  })
 })

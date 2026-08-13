@@ -290,7 +290,7 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
     dialog.confirmClicked
       .pipe(takeUntil(this.destroy$), takeUntil(this.documentChange$))
       .subscribe((existingDocumentID) => {
-        dialog.buttonsEnabled = false
+        dialog.buttonsEnabled.set(false)
         const versionLabel = this.newVersionLabel?.trim()
         this.documentsService
           .mergeDocumentsAsVersions(
@@ -301,7 +301,7 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
           .pipe(
             switchMap(() => this.documentsService.getVersions(this.documentId)),
             first(),
-            finalize(() => (dialog.buttonsEnabled = true)),
+            finalize(() => dialog.buttonsEnabled.set(true)),
             takeUntil(this.destroy$),
             takeUntil(this.documentChange$)
           )

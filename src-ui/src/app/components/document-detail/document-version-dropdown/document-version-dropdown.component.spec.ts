@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common'
-import { SimpleChange } from '@angular/core'
+import { SimpleChange, signal } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
@@ -342,7 +342,7 @@ describe('DocumentVersionDropdownComponent', () => {
     const modal = {
       componentInstance: {
         rootDocumentID: null,
-        buttonsEnabled: true,
+        buttonsEnabled: signal(true),
         confirmClicked,
       },
       close: jest.fn(),

@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  inject,
+  signal,
+} from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { DocumentLinkComponent } from 'src/app/components/common/input/document-link/document-link.component'
@@ -15,7 +22,7 @@ export class AddExistingDocumentVersionDialogComponent {
   @Output() confirmClicked = new EventEmitter<number>()
 
   selectedDocumentIDs: number[] = []
-  buttonsEnabled = true
+  readonly buttonsEnabled = signal(true)
 
   confirm(): void {
     if (this.selectedDocumentIDs.length !== 1) return

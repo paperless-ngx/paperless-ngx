@@ -1017,7 +1017,6 @@ export class BulkEditorComponent
     mergeDialog.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        mergeDialog.buttonsEnabled = false
         this.executeDocumentAction(
           modal,
           this.documentService.mergeDocumentsAsVersions(

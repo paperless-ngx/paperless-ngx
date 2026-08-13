@@ -49,10 +49,10 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">
+  <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled()">
     <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
   </button>
-  <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled">
+  <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled()">
     {{btnCaption}}
   </button>
 </div>
