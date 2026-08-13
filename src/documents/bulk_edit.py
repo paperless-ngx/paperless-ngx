@@ -626,7 +626,9 @@ def merge_as_versions(
 ) -> Literal["OK"]:
     with transaction.atomic():
         documents = list(
-            Document.objects.select_for_update().filter(id__in=doc_ids),
+            Document.objects.select_for_update()
+            .filter(id__in=doc_ids)
+            .defer("content"),
         )
         documents_by_id = {document.id: document for document in documents}
 
