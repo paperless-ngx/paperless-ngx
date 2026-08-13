@@ -88,6 +88,7 @@ from documents.templating.utils import convert_format_str_to_template_format
 from documents.templating.workflows import validate_workflow_template
 from documents.validators import uri_validator
 from documents.validators import url_validator
+from documents.versioning import sort_versions_newest_first
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -1116,8 +1117,12 @@ class DocumentSerializer(
                 "added",
                 "checksum",
                 "version_label",
+                "root_document_id",
+                "version_index",
             )
             versions = [*versions_qs, root_doc]
+
+        versions = sort_versions_newest_first(versions)
 
         def build_info(doc: Document) -> _DocumentVersionInfo:
             return {
@@ -1128,9 +1133,7 @@ class DocumentSerializer(
                 "is_root": doc.id == root_doc.id,
             }
 
-        info = [build_info(doc) for doc in versions]
-        info.sort(key=lambda item: item["id"], reverse=True)
-        return info
+        return [build_info(doc) for doc in versions]
 
     def get_original_file_name(self, obj) -> str | None:
         return obj.original_filename
