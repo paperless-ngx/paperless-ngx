@@ -664,17 +664,24 @@ def merge_as_versions(
             if documents_by_id[source_id].archive_serial_number is not None
         ]
 
+        updated_fields = ["root_document", "version_index", "archive_serial_number"]
+        if version_label is not None:
+            updated_fields.append("version_label")
+
         for source_id in source_ids:
             next_version_index += 1
-            updates = {
-                "root_document_id": root_document.pk,
-                "version_index": next_version_index,
-                "archive_serial_number": None,
-            }
+            source_document = documents_by_id[source_id]
+            source_document.root_document_id = root_document.pk
+            source_document.version_index = next_version_index
+            source_document.archive_serial_number = None
             if version_label is not None:
-                updates["version_label"] = version_label
-            # update() and not save to avoid post_save now
-            Document.objects.filter(pk=source_id).update(**updates)
+                source_document.version_label = version_label
+
+        # bulk_update and not save() to avoid post_save now
+        Document.objects.bulk_update(
+            [documents_by_id[source_id] for source_id in source_ids],
+            updated_fields,
+        )
 
         root_updates = {"modified": timezone.now()}
         if source_asns and root_document.archive_serial_number is None:
