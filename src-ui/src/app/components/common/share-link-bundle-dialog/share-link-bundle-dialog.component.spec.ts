@@ -69,7 +69,7 @@ describe('ShareLinkBundleDialogComponent', () => {
       file_version: FileVersion.Original,
       expiration_days: 3,
     })
-    expect(component.buttonsEnabled).toBe(false)
+    expect(component.buttonsEnabled()).toBe(false)
     expect(confirmSpy).toHaveBeenCalled()
 
     component.form.setValue({

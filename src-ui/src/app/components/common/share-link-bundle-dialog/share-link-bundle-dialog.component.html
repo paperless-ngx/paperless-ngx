@@ -119,7 +119,7 @@
         type="button"
         class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2 text-nowrap"
         (click)="submit()"
-        [disabled]="loading() || !buttonsEnabled">
+        [disabled]="loading() || !buttonsEnabled()">
         @if (loading()) {
           <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
         }

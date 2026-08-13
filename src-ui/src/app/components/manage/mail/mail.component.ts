@@ -196,7 +196,7 @@ export class MailComponent
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked.subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
+      modal.componentInstance.buttonsEnabled.set(false)
       this.mailAccountService.delete(account).subscribe({
         next: () => {
           modal.close()
@@ -298,7 +298,7 @@ export class MailComponent
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked.subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
+      modal.componentInstance.buttonsEnabled.set(false)
       this.mailRuleService.delete(rule).subscribe({
         next: () => {
           modal.close()

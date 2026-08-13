@@ -105,7 +105,7 @@ export class CustomFieldsComponent
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked.subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
+      modal.componentInstance.buttonsEnabled.set(false)
       this.customFieldsService.delete(field).subscribe({
         next: () => {
           modal.close()
