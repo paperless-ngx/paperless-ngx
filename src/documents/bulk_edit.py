@@ -651,11 +651,19 @@ def merge_as_versions(
             or 0
         )
 
+        # A version gives up its ASN
+        source_asns = [
+            documents_by_id[source_id].archive_serial_number
+            for source_id in source_ids
+            if documents_by_id[source_id].archive_serial_number is not None
+        ]
+
         for source_id in source_ids:
             source_document = documents_by_id[source_id]
             next_version_index += 1
             source_document.root_document = root_document
             source_document.version_index = next_version_index
+            source_document.archive_serial_number = None
             update_fields = [
                 "root_document",
                 "version_index",
@@ -664,11 +672,25 @@ def merge_as_versions(
             if version_label is not None:
                 source_document.version_label = version_label
                 update_fields.append("version_label")
-            source_document.archive_serial_number = None
             source_document.save(update_fields=update_fields)
 
+        root_update_fields = ["modified"]
+        if source_asns and root_document.archive_serial_number is None:
+            # If a version had one, hand the ASN over, the same as merge() does
+            root_document.archive_serial_number = source_asns.pop(0)
+            root_update_fields.append("archive_serial_number")
+            logger.info(
+                f"Document {root_document.id} took archive serial number "
+                f"{root_document.archive_serial_number} from a document merged into it",
+            )
+        if source_asns:
+            logger.warning(
+                f"Archive serial number(s) {source_asns} were removed by merging "
+                f"those documents as versions of document {root_document.id}",
+            )
+
         root_document.modified = timezone.now()
-        root_document.save(update_fields=["modified"])
+        root_document.save(update_fields=root_update_fields)
 
     for source_id in source_ids:
         remove_document_from_index.apply_async(args=[source_id])

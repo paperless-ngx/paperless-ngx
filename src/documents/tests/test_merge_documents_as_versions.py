@@ -223,6 +223,8 @@ class TestMergeDocumentsAsVersions(TestCase):
         self.assertEqual(source1.version_index, 4)
         self.assertIsNone(source1.archive_serial_number)
         self.assertIsNone(source2.archive_serial_number)
+        # The root had no ASN of its own, so it takes the first one
+        self.assertEqual(root.archive_serial_number, 1)
         self.assertGreater(root.modified, original_modified)
         self.assertEqual(existing_version.root_document_id, root.id)
 
@@ -237,6 +239,52 @@ class TestMergeDocumentsAsVersions(TestCase):
         status_manager_mock.return_value.send_documents_deleted.assert_called_once_with(
             [source1.id, source2.id],
         )
+
+    @mock.patch("documents.bulk_edit.DocumentsStatusManager")
+    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
+    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
+    def test_root_keeps_its_own_archive_serial_number(self, *_mocks) -> None:
+        root = Document.objects.create(
+            checksum="A",
+            title="Root",
+            archive_serial_number=1,
+        )
+        source = Document.objects.create(
+            checksum="B",
+            title="Source",
+            archive_serial_number=2,
+        )
+
+        with self.assertLogs("paperless.bulk_edit", level="WARNING") as logs:
+            merge_as_versions([root.id, source.id], root_document_id=root.id)
+
+        root.refresh_from_db()
+        source.refresh_from_db()
+        self.assertEqual(root.archive_serial_number, 1)
+        self.assertIsNone(source.archive_serial_number)
+        # Dropping an ASN is not silent
+        self.assertIn("[2]", logs.output[0])
+
+    @mock.patch("documents.bulk_edit.DocumentsStatusManager")
+    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
+    @mock.patch("documents.bulk_edit.remove_document_from_index.apply_async")
+    def test_root_without_asn_takes_the_source_archive_serial_number(
+        self,
+        *_mocks,
+    ) -> None:
+        root = Document.objects.create(checksum="A", title="Root")
+        source = Document.objects.create(
+            checksum="B",
+            title="Source",
+            archive_serial_number=7,
+        )
+
+        merge_as_versions([root.id, source.id], root_document_id=root.id)
+
+        root.refresh_from_db()
+        source.refresh_from_db()
+        self.assertEqual(root.archive_serial_number, 7)
+        self.assertIsNone(source.archive_serial_number)
 
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
