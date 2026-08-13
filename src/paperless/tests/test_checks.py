@@ -647,6 +647,7 @@ class TestRemoteOCRModeCheck:
         assert len(msgs) == 1
         assert "PAPERLESS_REMOTE_OCR_MODE is set to 'sometimes'" in msgs[0].msg
 
+
 class TestTesseractChecks:
     def test_default_language(self) -> None:
         check_default_language_available(None)
