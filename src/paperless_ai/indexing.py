@@ -695,7 +695,10 @@ def retrieve_similar_nodes(
     filtered = []
     for node in results:
         document_id = node.metadata.get("document_id")
-        if document_id is None:
+        if document_id is None:  # pragma: no cover
+            # Every node the indexing pipeline builds always sets
+            # document_id; this guards a malformed/partial vec0 row that
+            # shouldn't occur given the current schema.
             continue
         if str(document_id) not in allowed_document_ids:
             continue
@@ -707,7 +710,8 @@ def _node_document_ids(nodes: list["NodeWithScore"]) -> list[int]:
     document_ids: list[int] = []
     for node in nodes:
         document_id = node.metadata.get("document_id")
-        if document_id is None:
+        if document_id is None:  # pragma: no cover
+            # See the matching guard in retrieve_similar_nodes() above.
             continue
         try:
             document_ids.append(int(document_id))

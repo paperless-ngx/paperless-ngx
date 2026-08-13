@@ -108,7 +108,10 @@ def _node_document_weights(nodes: list["NodeWithScore"]) -> dict[int, float]:
     weights: dict[int, float] = defaultdict(float)
     for node in nodes:
         document_id = node.metadata.get("document_id")
-        if document_id is None:
+        if document_id is None:  # pragma: no cover
+            # Every node the indexing pipeline builds always sets
+            # document_id; this guards a malformed/partial vec0 row that
+            # shouldn't occur given the current schema.
             continue
         try:
             weights[int(document_id)] += float(node.score or 0.0)
