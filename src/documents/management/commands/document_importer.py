@@ -470,7 +470,7 @@ class Command(CryptMixin, PaperlessCommand):
                     if unsupported:
                         names = sorted(unreadable_method_names(unsupported))
                         message = (
-                            f"This archive uses compression this Python cannot "
+                            f"This archive uses compression this Python version cannot "
                             f"read ({', '.join(names)})."
                         )
                         if "zstd" in names:
