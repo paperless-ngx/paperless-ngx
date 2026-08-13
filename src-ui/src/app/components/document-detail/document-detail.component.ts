@@ -659,7 +659,7 @@ export class DocumentDetailComponent
     modal.componentInstance.cancelBtnCaption = $localize`Dismiss`
 
     modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
+      modal.componentInstance.buttonsEnabled.set(false)
       modal.close()
       this.reloadRemoteVersion()
     })
@@ -1374,7 +1374,7 @@ export class DocumentDetailComponent
     modal.componentInstance.confirmClicked
       .pipe(
         switchMap(() => {
-          modal.componentInstance.buttonsEnabled = false
+          modal.componentInstance.buttonsEnabled.set(false)
           return this.documentsService.delete(this.document())
         })
       )
@@ -1386,7 +1386,7 @@ export class DocumentDetailComponent
         },
         error: (error) => {
           this.toastService.showError($localize`Error deleting document`, error)
-          modal.componentInstance.buttonsEnabled = true
+          modal.componentInstance.buttonsEnabled.set(true)
           this.subscribeModalDelete(modal)
         },
       })
@@ -1411,7 +1411,7 @@ export class DocumentDetailComponent
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked.subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
+      modal.componentInstance.buttonsEnabled.set(false)
       this.documentsService
         .reprocessDocuments({ documents: [this.document().id] })
         .subscribe({
@@ -1425,7 +1425,7 @@ export class DocumentDetailComponent
           },
           error: (error) => {
             if (modal) {
-              modal.componentInstance.buttonsEnabled = true
+              modal.componentInstance.buttonsEnabled.set(true)
             }
             this.toastService.showError(
               $localize`Error executing operation`,
@@ -1798,7 +1798,7 @@ export class DocumentDetailComponent
     modal.componentInstance.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        modal.componentInstance.buttonsEnabled = false
+        modal.componentInstance.buttonsEnabled.set(false)
         this.documentsService
           .editPdfDocuments([sourceDocumentId], {
             operations: modal.componentInstance.getOperations(),
@@ -1821,7 +1821,7 @@ export class DocumentDetailComponent
             },
             error: (error) => {
               if (modal) {
-                modal.componentInstance.buttonsEnabled = true
+                modal.componentInstance.buttonsEnabled.set(true)
               }
               this.toastService.showError(
                 $localize`Error executing PDF edit operation`,
@@ -1855,7 +1855,7 @@ export class DocumentDetailComponent
         const sourceDocumentId = this.selectedVersionId() ?? this.document().id
         const dialog =
           modal.componentInstance as PasswordRemovalConfirmDialogComponent
-        dialog.buttonsEnabled = false
+        dialog.buttonsEnabled.set(false)
         this.networkActive.set(true)
         this.documentsService
           .removePasswordDocuments([sourceDocumentId], {
@@ -1880,7 +1880,7 @@ export class DocumentDetailComponent
               }
             },
             error: (error) => {
-              dialog.buttonsEnabled = true
+              dialog.buttonsEnabled.set(true)
               this.networkActive.set(false)
               this.toastService.showError(
                 $localize`Error executing password removal operation`,

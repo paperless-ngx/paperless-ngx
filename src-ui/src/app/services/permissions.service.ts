@@ -26,6 +26,7 @@ export enum PermissionType {
   User = '%s_user',
   Group = '%s_group',
   ShareLink = '%s_sharelink',
+  ShareLinkBundle = '%s_sharelinkbundle',
   CustomField = '%s_customfield',
   Workflow = '%s_workflow',
   ProcessedMail = '%s_processedmail',
