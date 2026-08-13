@@ -351,11 +351,45 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
 
         self.assertEqual(WorkflowTrigger.objects.count(), 1)
 
-    def test_api_create_invalid_assign_title(self) -> None:
+    def test_api_create_complex_assign_title(self) -> None:
         """
         GIVEN:
             - API request to create a workflow
-            - Invalid f-string for assign_title
+            - Template using Jinja flow control statements
+        WHEN:
+            - API is called
+        THEN:
+            - Workflow is created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 2",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "assign_title": '{# this is a comment #}foo{% if created_year < 2000 %}bar{% endif %}{{ "{:04d}".format(42) }}',
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.assertEqual(Workflow.objects.count(), 2)
+
+    def test_api_create_invalid_assign_title_syntax_error(self) -> None:
+        """
+        GIVEN:
+            - API request to create a workflow
+            - Invalid template for assign_title
         WHEN:
             - API is called
         THEN:
@@ -366,7 +400,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             self.ENDPOINT,
             json.dumps(
                 {
-                    "name": "Workflow 1",
+                    "name": "Workflow 2",
                     "order": 1,
                     "triggers": [
                         {
@@ -375,7 +409,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     ],
                     "actions": [
                         {
-                            "assign_title": "{created_year]",
+                            "assign_title": "{{created_year}",
                         },
                     ],
                 },
@@ -384,7 +418,89 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            "Invalid f-string detected",
+            "Template syntax error",
+            response.data["actions"][0]["assign_title"][0],
+        )
+
+        self.assertEqual(Workflow.objects.count(), 1)
+
+    def test_api_create_invalid_assign_title_assertion_error(self) -> None:
+        """
+        GIVEN:
+            - API request to create a workflow
+            - Template using unknown filters for assign_title
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+            - No objects are created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 2",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "assign_title": "{{ created_year | foo }}",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            "Template assertion error",
+            response.data["actions"][0]["assign_title"][0],
+        )
+
+        self.assertEqual(Workflow.objects.count(), 1)
+
+    def test_api_create_invalid_assign_title_unknown_placeholder(self) -> None:
+        """
+        GIVEN:
+            - API request to create a workflow
+            - Template with unknown placeholders for assign_title
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+            - No objects are created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 2",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "assign_title": "{{creation_year}}",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            "Template references unknown placeholders",
+            response.data["actions"][0]["assign_title"][0],
+        )
+        self.assertIn(
+            "creation_year",
             response.data["actions"][0]["assign_title"][0],
         )
 
