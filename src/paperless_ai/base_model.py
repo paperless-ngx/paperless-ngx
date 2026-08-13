@@ -39,7 +39,7 @@ class TaxonomyChoiceDict(TypedDict):
 
 
 class ClassificationSuggestions(TypedDict):
-    """Plain-dict counterpart of DocumentClassifierSchema.model_dump() --
+    """Plain-dict counterpart of DocumentClassifierSchema.model_dump() -
     the shape threaded through parse_ai_response, build_localization_prompt,
     get_ai_document_classification, and the ai_suggestions view."""
 

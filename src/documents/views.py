@@ -1554,34 +1554,48 @@ class DocumentViewSet(
         )
 
         if cached_llm_suggestions:
+            # Only the raw model choices are cached, never resolved object
+            # ids. resolve_choice() below still runs permission filtering
+            # freshly for this requester on every request, cache hit or not,
+            # so a resolved id cached for one user's visibility can never be
+            # handed unfiltered to a second, less-privileged requester of
+            # the same (backend-keyed, not user-keyed) cache entry.
             refresh_suggestions_cache(doc.pk)
-            return Response(cached_llm_suggestions.suggestions)
-
-        try:
-            llm_suggestions = get_ai_document_classification(
-                doc,
-                request.user,
-                output_language,
-            )
-        except ValueError as exc:
-            logger.exception(
-                "Invalid AI configuration while generating suggestions for "
-                "document %s: %s",
+            llm_suggestions = cached_llm_suggestions.suggestions
+        else:
+            try:
+                llm_suggestions = get_ai_document_classification(
+                    doc,
+                    request.user,
+                    output_language,
+                )
+            except ValueError as exc:
+                logger.exception(
+                    "Invalid AI configuration while generating suggestions for "
+                    "document %s: %s",
+                    doc.pk,
+                    exc,
+                    exc_info=True,
+                )
+                raise ValidationError(
+                    {"ai": [_("Invalid AI configuration.")]},
+                ) from exc
+            except LLMTimeoutError as exc:
+                logger.exception(
+                    "AI backend timed out while generating suggestions for "
+                    "document %s: %s",
+                    doc.pk,
+                    exc,
+                    exc_info=True,
+                )
+                return Response(
+                    {"ai": [_("AI backend request timed out.")]},
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                )
+            set_llm_suggestions_cache(
                 doc.pk,
-                exc,
-                exc_info=True,
-            )
-            raise ValidationError({"ai": [_("Invalid AI configuration.")]}) from exc
-        except LLMTimeoutError as exc:
-            logger.exception(
-                "AI backend timed out while generating suggestions for document %s: %s",
-                doc.pk,
-                exc,
-                exc_info=True,
-            )
-            return Response(
-                {"ai": [_("AI backend request timed out.")]},
-                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                llm_suggestions,
+                backend=llm_cache_backend,
             )
 
         tags_choice: TaxonomyChoiceDict = llm_suggestions["tags"]
@@ -1595,11 +1609,24 @@ class DocumentViewSet(
             match_names: Callable[[list[str], User], list],
         ) -> list:
             """The ids the model picked from the candidates it was shown, plus
-            name matches for the values it proposed as new."""
-            return resolve_ids(choice["existing_ids"], request.user) + match_names(
+            name matches for the values it proposed as new. The schema allows
+            the same object to satisfy both an existing_id and a new_name in
+            one valid response, so results are deduplicated by pk (keeping
+            first-seen order) rather than trusting the two lookups to be
+            disjoint.
+            """
+            matched = resolve_ids(choice["existing_ids"], request.user) + match_names(
                 choice["new_names"],
                 request.user,
             )
+            seen_ids: set[int] = set()
+            deduped = []
+            for obj in matched:
+                if obj.pk in seen_ids:
+                    continue
+                seen_ids.add(obj.pk)
+                deduped.append(obj)
+            return deduped
 
         matched_tags = resolve_choice(
             tags_choice,
@@ -1646,8 +1673,6 @@ class DocumentViewSet(
             ),
             "dates": llm_suggestions["dates"],
         }
-
-        set_llm_suggestions_cache(doc.pk, resp_data, backend=llm_cache_backend)
 
         return Response(resp_data)
 

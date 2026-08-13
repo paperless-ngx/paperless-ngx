@@ -24,13 +24,13 @@ class TestGetAssignedMetadata:
         GIVEN:
             - A document with no tags/type/correspondent/storage_path assigned
         WHEN:
-            - get_assigned_metadata() is called
+            - get_assigned_metadata() is called with no user (unrestricted)
         THEN:
             - All fields report as empty/None
         """
         document = DocumentFactory.create()
 
-        result = get_assigned_metadata(document)
+        result = get_assigned_metadata(document, user=None)
 
         assert result == {
             "tags": [],
@@ -44,7 +44,7 @@ class TestGetAssignedMetadata:
         GIVEN:
             - A document with tags, document_type, correspondent, and storage_path assigned
         WHEN:
-            - get_assigned_metadata() is called
+            - get_assigned_metadata() is called with no user (unrestricted)
         THEN:
             - All assigned fields are reported with their name values
         """
@@ -59,12 +59,77 @@ class TestGetAssignedMetadata:
         )
         document.tags.add(tag)
 
-        result = get_assigned_metadata(document)
+        result = get_assigned_metadata(document, user=None)
 
         assert result["tags"] == ["Bloodwork"]
         assert result["document_type"] == "Lab Report"
         assert result["correspondent"] == "City Hospital"
         assert result["storage_path"] == "Medical"
+
+    def test_assigned_tag_invisible_to_user_is_omitted(self) -> None:
+        """
+        GIVEN:
+            - A document with a tag owned by a different user
+            - A non-superuser requester with no visibility into that tag
+        WHEN:
+            - get_assigned_metadata() is called for the requester
+        THEN:
+            - The invisible tag's name is not surfaced - a document being
+              visible to a user does not imply every object assigned to it
+              is (per-object permissions can differ)
+        """
+        tag_owner = UserFactory.create()
+        tag = TagFactory.create(name="Restricted", owner=tag_owner)
+        document = DocumentFactory.create()
+        document.tags.add(tag)
+        requester = UserFactory.create()
+
+        result = get_assigned_metadata(document, user=requester)
+
+        assert result["tags"] == []
+
+    def test_assigned_correspondent_invisible_to_user_is_omitted(self) -> None:
+        """
+        GIVEN:
+            - A document whose correspondent is owned by a different user
+            - A non-superuser requester with no visibility into that
+              correspondent
+        WHEN:
+            - get_assigned_metadata() is called for the requester
+        THEN:
+            - The correspondent is reported as unset, not its actual name
+        """
+        correspondent_owner = UserFactory.create()
+        correspondent = CorrespondentFactory.create(
+            name="Restricted Correspondent",
+            owner=correspondent_owner,
+        )
+        document = DocumentFactory.create(correspondent=correspondent)
+        requester = UserFactory.create()
+
+        result = get_assigned_metadata(document, user=requester)
+
+        assert result["correspondent"] is None
+
+    def test_assigned_metadata_visible_to_superuser(self) -> None:
+        """
+        GIVEN:
+            - A document with a tag owned by a different user
+            - A superuser requester
+        WHEN:
+            - get_assigned_metadata() is called for the superuser
+        THEN:
+            - The tag's name is surfaced - superusers see everything
+        """
+        tag_owner = UserFactory.create()
+        tag = TagFactory.create(name="Owned By Someone Else", owner=tag_owner)
+        document = DocumentFactory.create()
+        document.tags.add(tag)
+        superuser = UserFactory.create(is_superuser=True)
+
+        result = get_assigned_metadata(document, user=superuser)
+
+        assert result["tags"] == ["Owned By Someone Else"]
 
 
 def make_node(document_id: int, score: float) -> SimpleNamespace:
@@ -125,7 +190,7 @@ class TestBuildTaxonomyCandidates:
         THEN:
             - The candidate uses the current tag name, not the indexed name
         """
-        # The node's own metadata name (if any) must never be trusted --
+        # The node's own metadata name (if any) must never be trusted -
         # only the document_id is used to re-derive the current name.
         tag = TagFactory.create(name="Old Name")
         document = DocumentFactory.create()

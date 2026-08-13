@@ -1,4 +1,5 @@
 from typing import Any
+from typing import TypeVar
 
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
@@ -235,35 +236,56 @@ def permitted_object_ids(
     ).values_list("id", flat=True)
 
 
-def visible_object_ids_or_none(
-    user: User | None,
-    model: type[Model],
-    perm: str,
-) -> set[int] | None:
-    """
-    Return the set of object IDs of ``model`` that ``user`` may see with
-    ``perm``, or ``None`` meaning "no restriction at all".
+ModelT = TypeVar("ModelT", bound=Model)
 
-    ``None`` is returned only for an absent user or an *active* superuser.
+
+def user_is_unrestricted(user: User | None) -> bool:
+    """
+    True when ``user`` means "no restriction at all" (an absent user, or an
+    *active* superuser) without needing a database check to know it.
+
     ``permitted_object_ids(None, ...)`` itself means the much narrower "only
     unowned rows", which is NOT the same thing as "no user filtering
-    requested", so that case has to be special-cased before ever calling it.
+    requested", so callers must special-case this before ever calling it.
+    A deactivated superuser is deliberately NOT unrestricted here, matching
+    permitted_object_ids's own is_active-before-is_superuser ordering.
 
-    Every other case is delegated to ``permitted_object_ids`` rather than
-    re-deciding here, so its ordering is inherited instead of duplicated: a
-    deactivated superuser must NOT be handed "no restriction", it gets an
-    empty set (nothing visible), and an unauthenticated user still gets the
-    unowned rows.
+    Callers that can avoid a database round trip entirely when this is true
+    (e.g. checking a single already-loaded object's visibility rather than
+    filtering a queryset) should do so via this function directly, rather
+    than through restrict_queryset_to_visible() below.
     """
     if user is None:
-        return None
-    if (
+        return True
+    return (
         getattr(user, "is_authenticated", False)
         and getattr(user, "is_active", False)
         and getattr(user, "is_superuser", False)
-    ):
-        return None
-    return set(permitted_object_ids(user, model, perm))
+    )
+
+
+def restrict_queryset_to_visible(
+    queryset: QuerySet[ModelT],
+    user: User | None,
+    perm: str,
+) -> QuerySet[ModelT]:
+    """
+    Restrict ``queryset`` to the rows ``user`` may see with ``perm``.
+
+    Delegates the visibility check to the database as a
+    ``WHERE id IN (subquery)`` rather than materializing the full
+    permitted-id set into a Python collection first: a caller that only
+    needs to check a small handful of rows (a resolved-id list, a few
+    RAG-neighbour candidate ids) never pays for scanning or holding the
+    installation's entire taxonomy in memory to do it.
+
+    Returns ``queryset`` unchanged for user_is_unrestricted(user); every
+    other case is delegated to ``permitted_object_ids`` rather than
+    re-deciding the ordering here.
+    """
+    if user_is_unrestricted(user):
+        return queryset
+    return queryset.filter(pk__in=permitted_object_ids(user, queryset.model, perm))
 
 
 def permitted_document_ids(

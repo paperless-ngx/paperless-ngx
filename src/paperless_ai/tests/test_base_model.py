@@ -50,7 +50,7 @@ def test_document_classifier_schema_json_schema_is_self_contained():
     client.py hands this generated schema straight to the LLM backend as
     the response-format constraint (Ollama's format=json_schema, and the
     OpenAI-like tool-calling path). What that backend actually needs is a
-    self-contained schema it can resolve without a document loader --
+    self-contained schema it can resolve without a document loader -
     unlike a bare "$ref present" check, this asserts the referenced
     definition genuinely carries the two fields the rest of the pipeline
     (parse_ai_response, matching.py's resolve_*_ids) relies on.

@@ -12,7 +12,8 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.permissions import visible_object_ids_or_none
+from documents.permissions import restrict_queryset_to_visible
+from documents.permissions import user_is_unrestricted
 
 if TYPE_CHECKING:
     from llama_index.core.schema import NodeWithScore
@@ -53,17 +54,50 @@ def empty_taxonomy_candidates() -> TaxonomyCandidates:
     )
 
 
-def get_assigned_metadata(document: Document) -> AssignedMetadata:
+def _visible_name(
+    obj: Model | None,
+    user: User | None,
+    perm: str,
+) -> str | None:
+    """``obj``'s name if ``user`` may see it under ``perm``, else None - a
+    document being visible to a user does not imply every object assigned to
+    it is (per-object guardian permissions can differ), so each assigned
+    relation is checked individually rather than trusted because it's
+    already sitting on a document this user can open.
+
+    Checks user_is_unrestricted() before ever touching type(obj).objects, so
+    the common "no restriction" case (no user, or an active superuser) never
+    needs obj to be backed by a real queryable row.
+    """
+    if obj is None:
+        return None
+    if user_is_unrestricted(user):
+        return obj.name
+    visible = restrict_queryset_to_visible(
+        type(obj).objects.filter(pk=obj.pk),
+        user,
+        perm,
+    )
+    return obj.name if visible.exists() else None
+
+
+def get_assigned_metadata(document: Document, user: User | None) -> AssignedMetadata:
     """The document's own current taxonomy. Authoritative context, not a
     candidate list - the model is never asked to add, remove, or replace
     these values, only to use them when helpful for the title and for
     fields that are still empty.
+
+    Permission-filtered the same way build_taxonomy_candidates() is: a
+    document a user may change/view does not imply every tag/type/
+    correspondent/storage_path assigned to it is visible to that same user,
+    so names the user cannot see are never surfaced into the prompt.
     """
+    visible_tags = restrict_queryset_to_visible(document.tags.all(), user, "view_tag")
     return AssignedMetadata(
-        tags=sorted(tag.name for tag in document.tags.all()),
-        document_type=document.document_type.name if document.document_type else None,
-        correspondent=document.correspondent.name if document.correspondent else None,
-        storage_path=document.storage_path.name if document.storage_path else None,
+        tags=sorted(tag.name for tag in visible_tags),
+        document_type=_visible_name(document.document_type, user, "view_documenttype"),
+        correspondent=_visible_name(document.correspondent, user, "view_correspondent"),
+        storage_path=_visible_name(document.storage_path, user, "view_storagepath"),
     )
 
 
@@ -91,17 +125,21 @@ def _visible_ranked_candidates(
     limit: int,
 ) -> list[TaxonomyCandidate]:
     """Drop anything ``user`` may not see, resolve the survivors' names, and
-    return them ranked by descending weight and capped at ``limit``."""
-    visible_ids = visible_object_ids_or_none(user, model, perm)
-    if visible_ids is not None:
-        weighted_ids = {
-            object_id: weight
-            for object_id, weight in weighted_ids.items()
-            if object_id in visible_ids
-        }
-    id_to_name = dict(
-        model.objects.filter(pk__in=weighted_ids).values_list("id", "name"),
+    return them ranked by descending weight and capped at ``limit``.
+
+    The visibility check restricts the query to just this small
+    weighted_ids set rather than materializing every id `user` may see
+    installation-wide - resolving names and checking visibility is one
+    query either way, so this never pays for scanning the whole taxonomy.
+    """
+    if not weighted_ids:
+        return []
+    visible_queryset = restrict_queryset_to_visible(
+        model.objects.filter(pk__in=weighted_ids),
+        user,
+        perm,
     )
+    id_to_name = dict(visible_queryset.values_list("id", "name"))
     candidates = [
         TaxonomyCandidate(id=object_id, name=id_to_name[object_id], weight=weight)
         for object_id, weight in weighted_ids.items()

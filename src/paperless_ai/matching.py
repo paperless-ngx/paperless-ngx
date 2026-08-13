@@ -12,7 +12,7 @@ from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import get_objects_for_user_owner_aware
-from documents.permissions import visible_object_ids_or_none
+from documents.permissions import restrict_queryset_to_visible
 
 MATCH_THRESHOLD = 0.8
 
@@ -34,10 +34,11 @@ def _resolve_visible_ids(
     """
     if not ids:
         return []
-    visible_ids = visible_object_ids_or_none(user, model, perm)
-    queryset = model.objects.filter(pk__in=ids)
-    if visible_ids is not None:
-        queryset = queryset.filter(pk__in=visible_ids)
+    queryset = restrict_queryset_to_visible(
+        model.objects.filter(pk__in=ids),
+        user,
+        perm,
+    )
     return list(queryset)
 
 

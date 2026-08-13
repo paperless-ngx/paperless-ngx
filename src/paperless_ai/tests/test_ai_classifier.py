@@ -11,12 +11,18 @@ from documents.tests.factories import DocumentFactory
 from documents.tests.factories import TagFactory
 from documents.tests.factories import UserFactory
 from paperless.config import AIConfig
+from paperless_ai.ai_classifier import _restrict_to_shown_candidates
 from paperless_ai.ai_classifier import build_localization_prompt
 from paperless_ai.ai_classifier import build_prompt_with_rag
 from paperless_ai.ai_classifier import build_prompt_without_rag
 from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.ai_classifier import get_language_name
 from paperless_ai.ai_classifier import get_taxonomy_context
+from paperless_ai.base_model import ClassificationSuggestions
+from paperless_ai.base_model import TaxonomyChoiceDict
+from paperless_ai.taxonomy import TaxonomyCandidate
+from paperless_ai.taxonomy import TaxonomyCandidates
+from paperless_ai.taxonomy import empty_taxonomy_candidates
 
 
 @pytest.fixture
@@ -603,14 +609,22 @@ def test_build_prompt_without_rag_identical_when_no_hints():
 
 @pytest.mark.django_db
 @patch("paperless_ai.ai_classifier.AIClient")
+@patch("paperless_ai.ai_classifier.build_taxonomy_candidates")
 @patch("paperless_ai.ai_classifier.retrieve_similar_nodes")
+@override_settings(
+    LLM_EMBEDDING_BACKEND="huggingface",
+    LLM_BACKEND="ollama",
+    LLM_MODEL="some_model",
+)
 def test_get_ai_document_classification_localizes_only_new_names(
     mock_retrieve,
+    mock_build_candidates,
     mock_client_cls,
 ):
     """
     GIVEN:
-        - A classification response with a resolved existing tag id
+        - A classification response with a resolved existing tag id that
+          was actually offered as a candidate
         - A localization response that echoes back a different existing_ids value
     WHEN:
         - get_ai_document_classification() is called with an output_language
@@ -621,6 +635,12 @@ def test_get_ai_document_classification_localizes_only_new_names(
     """
     document = DocumentFactory.create(content="Some content")
     mock_retrieve.return_value = []
+    mock_build_candidates.return_value = TaxonomyCandidates(
+        tags=[TaxonomyCandidate(id=12, name="Contractor", weight=1.0)],
+        document_types=[],
+        correspondents=[],
+        storage_paths=[],
+    )
     mock_client = mock_client_cls.return_value
     mock_client.run_llm_query.side_effect = [
         {
@@ -649,3 +669,86 @@ def test_get_ai_document_classification_localizes_only_new_names(
     assert "Contractor Work" in localization_prompt
     assert result["tags"]["existing_ids"] == [12]  # untouched by localization
     assert result["tags"]["new_names"] == ["Auftragsarbeit"]
+
+
+class TestRestrictToShownCandidates:
+    def test_hallucinated_id_not_among_candidates_is_dropped(self) -> None:
+        """
+        GIVEN:
+            - A tag candidate shown to the model with id=12
+            - A model response with existing_ids=[12, 999] for tags, where
+              999 was never offered as a candidate
+        WHEN:
+            - _restrict_to_shown_candidates() is called
+        THEN:
+            - Only the id that was actually shown survives; the hallucinated
+              id is dropped rather than being trusted to resolve to whatever
+              real, visible, unrelated object it happens to match
+        """
+        suggestions = ClassificationSuggestions(
+            title="T",
+            tags=TaxonomyChoiceDict(existing_ids=[12, 999], new_names=[]),
+            correspondents=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
+            document_types=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
+            storage_paths=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
+            dates=[],
+        )
+        candidates = TaxonomyCandidates(
+            tags=[TaxonomyCandidate(id=12, name="Contractor", weight=1.0)],
+            document_types=[],
+            correspondents=[],
+            storage_paths=[],
+        )
+
+        result = _restrict_to_shown_candidates(suggestions, candidates)
+
+        assert result["tags"]["existing_ids"] == [12]
+
+    def test_no_candidates_shown_drops_every_existing_id(self) -> None:
+        """
+        GIVEN:
+            - No candidates were shown in any category
+            - A model response with existing_ids populated anyway
+        WHEN:
+            - _restrict_to_shown_candidates() is called
+        THEN:
+            - Every existing_id is dropped across all four categories - an
+              id can only be trusted if the prompt actually offered it
+        """
+        suggestions = ClassificationSuggestions(
+            title="T",
+            tags=TaxonomyChoiceDict(existing_ids=[1], new_names=[]),
+            correspondents=TaxonomyChoiceDict(existing_ids=[2], new_names=[]),
+            document_types=TaxonomyChoiceDict(existing_ids=[3], new_names=[]),
+            storage_paths=TaxonomyChoiceDict(existing_ids=[4], new_names=[]),
+            dates=[],
+        )
+
+        result = _restrict_to_shown_candidates(suggestions, empty_taxonomy_candidates())
+
+        assert result["tags"]["existing_ids"] == []
+        assert result["correspondents"]["existing_ids"] == []
+        assert result["document_types"]["existing_ids"] == []
+        assert result["storage_paths"]["existing_ids"] == []
+
+    def test_new_names_are_never_touched(self) -> None:
+        """
+        GIVEN:
+            - A model response with new_names populated
+        WHEN:
+            - _restrict_to_shown_candidates() is called
+        THEN:
+            - new_names passes through unchanged regardless of candidates
+        """
+        suggestions = ClassificationSuggestions(
+            title="T",
+            tags=TaxonomyChoiceDict(existing_ids=[], new_names=["Brand New Tag"]),
+            correspondents=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
+            document_types=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
+            storage_paths=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
+            dates=[],
+        )
+
+        result = _restrict_to_shown_candidates(suggestions, empty_taxonomy_candidates())
+
+        assert result["tags"]["new_names"] == ["Brand New Tag"]

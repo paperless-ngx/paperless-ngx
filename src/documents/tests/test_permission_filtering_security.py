@@ -22,7 +22,7 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import permitted_document_ids
 from documents.permissions import permitted_object_ids
-from documents.permissions import visible_object_ids_or_none
+from documents.permissions import restrict_queryset_to_visible
 from documents.serialisers import _get_viewable_duplicates
 from documents.tests.factories import CorrespondentFactory
 from documents.tests.factories import DocumentFactory
@@ -737,7 +737,7 @@ class TestBulkEditObjectsTagDescendantPartialPermission:
         NOTE: this uses ``set_permissions`` (owner reassignment) rather than
         ``delete`` as the operation, because Tag.tn_parent (django-treenode)
         cascades deletes to descendants at the database/ORM level regardless
-        of which tags the view resolved into ``objs`` -- a delete-based test
+        of which tags the view resolved into ``objs`` - a delete-based test
         would pass/fail based on FK cascade behavior, not on whether the
         descendant-expansion logic itself respected per-object permissions.
         """
@@ -787,46 +787,58 @@ class TestBulkEditObjectsTagDescendantPartialPermission:
 
 
 @pytest.mark.django_db
-class TestVisibleObjectIdsOrNone:
-    """``None`` from visible_object_ids_or_none() means "no restriction at
-    all", so the cases that may return it have to be kept narrow."""
+class TestRestrictQuerysetToVisible:
+    """restrict_queryset_to_visible() returns its queryset argument
+    unchanged only for "no restriction at all", so the cases that may do
+    that have to be kept narrow."""
 
     def test_no_user_means_no_restriction(self) -> None:
         """
         GIVEN:
             - No user at all (a system-triggered call)
         WHEN:
-            - visible_object_ids_or_none() is called
+            - restrict_queryset_to_visible() is called
         THEN:
-            - None is returned, i.e. no filtering, rather than
+            - The queryset is returned unfiltered, rather than
               permitted_object_ids(None, ...)'s narrower "unowned rows only"
         """
         owner = User.objects.create_user(username="vis_none_owner")
-        TagFactory(owner=owner)
+        tag = TagFactory(owner=owner)
 
-        assert visible_object_ids_or_none(None, Tag, "view_tag") is None
+        visible = restrict_queryset_to_visible(Tag.objects.all(), None, "view_tag")
+
+        assert tag.pk in visible.values_list("pk", flat=True)
 
     def test_active_superuser_means_no_restriction(self) -> None:
         """
         GIVEN:
             - An active superuser
         WHEN:
-            - visible_object_ids_or_none() is called
+            - restrict_queryset_to_visible() is called
         THEN:
-            - None is returned, skipping the permission lookup entirely
+            - The queryset is returned unfiltered, skipping the permission
+              lookup entirely
         """
         superuser = User.objects.create_superuser(username="vis_active_super")
+        owner = User.objects.create_user(username="vis_active_super_owner")
+        tag = TagFactory(owner=owner)
 
-        assert visible_object_ids_or_none(superuser, Tag, "view_tag") is None
+        visible = restrict_queryset_to_visible(
+            Tag.objects.all(),
+            superuser,
+            "view_tag",
+        )
+
+        assert tag.pk in visible.values_list("pk", flat=True)
 
     def test_inactive_superuser_is_denied_not_unrestricted(self) -> None:
         """
         GIVEN:
             - A deactivated superuser
         WHEN:
-            - visible_object_ids_or_none() is called
+            - restrict_queryset_to_visible() is called
         THEN:
-            - An empty set (nothing visible) is returned, never None --
+            - No rows are visible, never the whole unrestricted queryset -
               deactivation has to win over the superuser shortcut, matching
               permitted_object_ids's own ordering
         """
@@ -838,23 +850,31 @@ class TestVisibleObjectIdsOrNone:
         TagFactory(owner=None)
         TagFactory(owner=user)
 
-        assert visible_object_ids_or_none(user, Tag, "view_tag") == set()
+        visible = restrict_queryset_to_visible(Tag.objects.all(), user, "view_tag")
+
+        assert not visible.exists()
 
     def test_regular_user_gets_permitted_ids(self) -> None:
         """
         GIVEN:
             - An ordinary active user and a tag owned by someone else
         WHEN:
-            - visible_object_ids_or_none() is called
+            - restrict_queryset_to_visible() is called
         THEN:
-            - Only the ids permitted_object_ids() reports are returned
+            - Only the rows permitted_object_ids() reports are visible
         """
         user = User.objects.create_user(username="vis_regular")
         other = User.objects.create_user(username="vis_regular_other")
         own = TagFactory(owner=user)
         hidden = TagFactory(owner=other)
 
-        visible = visible_object_ids_or_none(user, Tag, "view_tag")
+        visible_ids = set(
+            restrict_queryset_to_visible(
+                Tag.objects.all(),
+                user,
+                "view_tag",
+            ).values_list("pk", flat=True),
+        )
 
-        assert own.pk in visible
-        assert hidden.pk not in visible
+        assert own.pk in visible_ids
+        assert hidden.pk not in visible_ids

@@ -159,7 +159,7 @@ def get_taxonomy_context(
     propagating the exception - a vector-store outage should not block
     classification, only its RAG-assisted enrichment.
     """
-    assigned = get_assigned_metadata(document)
+    assigned = get_assigned_metadata(document, user)
     try:
         visible_document_ids = (
             None
@@ -220,6 +220,49 @@ def parse_ai_response(raw: dict) -> ClassificationSuggestions:
     )
 
 
+def _restrict_to_shown_candidates(
+    suggestions: ClassificationSuggestions,
+    candidates: TaxonomyCandidates,
+) -> ClassificationSuggestions:
+    """Drop any existing_id the model returned that was never actually
+    offered as a candidate in the prompt. The response schema permits any
+    integer, so a hallucinated id could otherwise silently resolve to a
+    real, visible, but completely unrelated object - this keeps
+    "reused an existing value" a fact about what the model was actually
+    shown, not just about what integer it happened to emit. When no
+    candidates were shown in a category at all (or the field was omitted
+    from the response), every existing_id in that category is dropped;
+    new_names is never touched here.
+    """
+
+    def _restrict(choice: TaxonomyChoiceDict, shown: set[int]) -> TaxonomyChoiceDict:
+        return TaxonomyChoiceDict(
+            existing_ids=[i for i in choice["existing_ids"] if i in shown],
+            new_names=choice["new_names"],
+        )
+
+    return ClassificationSuggestions(
+        title=suggestions["title"],
+        tags=_restrict(
+            suggestions["tags"],
+            {c["id"] for c in candidates["tags"]},
+        ),
+        correspondents=_restrict(
+            suggestions["correspondents"],
+            {c["id"] for c in candidates["correspondents"]},
+        ),
+        document_types=_restrict(
+            suggestions["document_types"],
+            {c["id"] for c in candidates["document_types"]},
+        ),
+        storage_paths=_restrict(
+            suggestions["storage_paths"],
+            {c["id"] for c in candidates["storage_paths"]},
+        ),
+        dates=suggestions["dates"],
+    )
+
+
 def get_ai_document_classification(
     document: Document,
     user: User | None = None,
@@ -237,11 +280,12 @@ def get_ai_document_classification(
             context=context,
         )
     else:
+        candidates = empty_taxonomy_candidates()
         prompt = build_prompt_without_rag(
             document,
             ai_config,
-            candidates=empty_taxonomy_candidates(),
-            assigned=get_assigned_metadata(document),
+            candidates=candidates,
+            assigned=get_assigned_metadata(document, user),
         )
 
     client = AIClient()
@@ -249,7 +293,10 @@ def get_ai_document_classification(
     # is not pinned for the call's duration; see paperless_ai.db and #12976.
     with db_connection_released():
         result = client.run_llm_query(prompt)
-        suggestions = parse_ai_response(result)
+        suggestions = _restrict_to_shown_candidates(
+            parse_ai_response(result),
+            candidates,
+        )
         if output_language:
             localized = client.run_llm_query(
                 build_localization_prompt(suggestions, output_language),
@@ -257,7 +304,7 @@ def get_ai_document_classification(
             localized_suggestions = parse_ai_response(localized)
 
             def _localized_choice(field: str) -> TaxonomyChoiceDict:
-                # existing_ids always come from the ORIGINAL suggestions --
+                # existing_ids always come from the ORIGINAL suggestions -
                 # never from localized_suggestions, whatever the model echoed
                 # back there. This is the concrete fix for the bug this
                 # feature exists to close: localization must never be able to
