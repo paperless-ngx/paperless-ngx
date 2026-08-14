@@ -23,6 +23,17 @@ from paperless_ai.taxonomy import get_assigned_metadata
 
 logger = logging.getLogger("paperless_ai.rag_classifier")
 
+# Neighbours retrieved for taxonomy-candidate weighting, decoupled from
+# get_taxonomy_context's max_docs (which caps how many of those same
+# neighbours get their text spliced into the RAG context block). A wider
+# pool of weighted neighbours gives build_taxonomy_candidates() more signal
+# for which tags/correspondents/etc. actually cluster around this document,
+# while the ranked candidate lists it returns stay capped by
+# taxonomy.MAX_TAG_CANDIDATES / MAX_SINGLE_VALUE_CANDIDATES regardless of
+# how many neighbours went in - so raising this does not by itself grow the
+# prompt.
+TAXONOMY_CANDIDATE_TOP_K = 15
+
 # Hand-wrapped to sit at the prompt's own indentation once spliced in below.
 EXISTING_IDS_INSTRUCTION = (
     "For tags, correspondents, document types, and storage paths: if a "
@@ -172,7 +183,11 @@ def get_taxonomy_context(
                 ).values_list("pk", flat=True),
             )
         )
-        nodes = retrieve_similar_nodes(document, document_ids=visible_document_ids)
+        nodes = retrieve_similar_nodes(
+            document,
+            top_k=TAXONOMY_CANDIDATE_TOP_K,
+            document_ids=visible_document_ids,
+        )
 
         candidates = build_taxonomy_candidates(nodes, user)
 
