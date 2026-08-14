@@ -223,7 +223,27 @@ class WriteBatch:
                     )
                     time.sleep(sleep_s)
 
-        self._raw_writer = self._backend._index.writer()
+            # Open a fresh Index (and thus a fresh Tantivy ManagedDirectory)
+            # for the write, rather than reusing the process-local cached
+            # index. ManagedDirectory loads its GC bookkeeping (.managed.json)
+            # once, at construction, and never re-reads it; paperless runs
+            # several long-lived processes (Granian workers, Celery workers)
+            # that take turns writing under the file lock above. A cached,
+            # long-lived writer index would carry a stale managed-files view
+            # and, on commit, overwrite .managed.json with that stale view -
+            # permanently losing track of segment files other processes
+            # registered in the meantime, so they can never be garbage
+            # collected. Reopening fresh here always picks up the current
+            # on-disk state. The long-lived self._backend._index is used for
+            # reads only and is reloaded (not reopened) after commit below.
+            write_index = tantivy.Index(
+                build_schema(),
+                path=str(self._backend._path),
+            )
+            register_tokenizers(write_index, settings.SEARCH_LANGUAGE)
+            self._raw_writer = write_index.writer()
+        else:
+            self._raw_writer = self._backend._index.writer()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):

@@ -1,3 +1,6 @@
+import json
+from pathlib import Path
+
 import pytest
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -20,6 +23,17 @@ from documents.tests.factories import TagFactory
 from documents.tests.factories import UserFactory
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
+
+# Extensions of actual Tantivy segment data files, as opposed to its own
+# bookkeeping files (meta.json, .managed.json, lock files).
+_SEGMENT_FILE_EXTENSIONS = (
+    ".fast",
+    ".fieldnorm",
+    ".idx",
+    ".pos",
+    ".store",
+    ".term",
+)
 
 
 class TestWriteBatch:
@@ -1014,3 +1028,63 @@ class TestHighlightHits:
         hits = backend.highlight_hits("quick", [doc.pk])
 
         assert len(hits) == 0
+
+
+class TestIndexDirectoryGarbageCollection:
+    """Regression tests for Tantivy segment files leaking on disk when
+    multiple long-lived worker processes (Granian/Celery) take turns writing
+    to the same on-disk index (issue #13679)."""
+
+    def test_no_permanently_orphaned_segment_files_across_worker_processes(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Simulate two long-lived worker processes, each with its own
+        process-local ``TantivyBackend``/``Index`` opened once at process
+        start, alternating turns as the writer -- exactly how paperless runs
+        in production (several Granian + Celery worker processes).
+
+        Every segment file physically present on disk must still be tracked
+        in Tantivy's ``.managed.json`` bookkeeping; otherwise it can never be
+        garbage collected by anyone again and the index directory grows
+        without bound.
+        """
+        index_dir = tmp_path / "index"
+        index_dir.mkdir()
+
+        worker_a = TantivyBackend(path=index_dir)
+        worker_a.open()
+        worker_b = TantivyBackend(path=index_dir)
+        worker_b.open()
+        workers = [worker_a, worker_b]
+
+        docs = [
+            DocumentFactory.create(checksum=f"GC{i}", title=f"gc doc {i}")
+            for i in range(5)
+        ]
+
+        try:
+            # Alternate writers across many commits, repeatedly upserting the
+            # same documents so segments accumulate and get superseded,
+            # forcing the delete+add upsert pattern and eventual merges.
+            for i in range(30):
+                worker = workers[i % len(workers)]
+                doc = docs[i % len(docs)]
+                worker.add_or_update(doc)
+        finally:
+            worker_a.close()
+            worker_b.close()
+
+        managed_path = index_dir / ".managed.json"
+        managed = set(json.loads(managed_path.read_text()))
+        on_disk = {
+            p.name
+            for p in index_dir.iterdir()
+            if p.is_file() and p.suffix in _SEGMENT_FILE_EXTENSIONS
+        }
+        orphans = on_disk - managed
+
+        assert not orphans, (
+            "Segment files present on disk but absent from Tantivy's "
+            f".managed.json bookkeeping (permanently un-collectible): {orphans}"
+        )
