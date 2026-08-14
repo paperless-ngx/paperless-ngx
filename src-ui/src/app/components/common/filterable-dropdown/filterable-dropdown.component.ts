@@ -774,6 +774,9 @@ export class FilterableDropdownComponent
   @Input()
   extraButtonTitle: string
 
+  @Input()
+  showExtraButtonIfEmpty: boolean = false
+
   creating: boolean = false
 
   @Output()
@@ -892,7 +895,11 @@ export class FilterableDropdownComponent
           this.dropdown.close()
         }
       }, 200)
-    } else if (filtered.length == 0 && this.createRef) {
+    } else if (
+      filtered.length == 0 &&
+      this.createRef &&
+      this.filterText?.length > 0
+    ) {
       this.createClicked()
     }
   }
