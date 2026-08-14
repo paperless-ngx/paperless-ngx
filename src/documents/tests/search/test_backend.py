@@ -45,6 +45,47 @@ class TestWriteBatch:
         ids = backend.search_ids("should survive", user=None)
         assert len(ids) == 1
 
+    def test_garbage_collect_called_after_successful_commit(
+        self,
+        backend: TantivyBackend,
+        mocker: MockerFixture,
+    ) -> None:
+        """garbage_collect_files() must be called after every successful commit.
+
+        Without it, segment files that are no longer referenced by the index
+        accumulate on disk indefinitely — the index can grow by one full
+        active-index generation per write batch even though the live data is
+        tiny.  See issue #13679.
+        """
+        doc = Document.objects.create(
+            title="GC Test Doc",
+            content="segment accumulation regression",
+            checksum="GC1",
+            pk=101,
+        )
+
+        mock_writer = mocker.MagicMock()
+        mocker.patch.object(
+            WriteBatch,
+            "_writer",
+            new_callable=mocker.PropertyMock,
+            return_value=mock_writer,
+        )
+
+        with backend.batch_update() as batch:
+            batch.add_or_update(doc)
+
+        mock_writer.commit.assert_called_once()
+        mock_writer.wait_merging_threads.assert_called_once()
+        mock_writer.garbage_collect_files.assert_called_once()
+        # garbage_collect_files must be called AFTER wait_merging_threads
+        call_order = [
+            c[0]
+            for c in mock_writer.method_calls
+            if c[0] in ("wait_merging_threads", "garbage_collect_files")
+        ]
+        assert call_order == ["wait_merging_threads", "garbage_collect_files"]
+
     def test_writer_released_when_commit_fails(
         self,
         backend: TantivyBackend,

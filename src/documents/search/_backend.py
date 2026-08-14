@@ -234,6 +234,12 @@ class WriteBatch:
                 # the file lock so the next writer doesn't race against an
                 # in-progress merge on the same index files.
                 self._writer.wait_merging_threads()
+                # Remove segment files that are no longer referenced by the
+                # index after the commit and any background merges.  Without
+                # this call, old segments accumulate indefinitely on disk —
+                # the index can grow by one full active-index generation per
+                # write batch even though the live index is tiny.
+                self._writer.garbage_collect_files()
                 self._backend._index.reload()
         finally:
             # Always release the writer (and Tantivy's internal writer lock),
@@ -1016,6 +1022,8 @@ class TantivyBackend:
             # Wait for background merge threads to finish so all segments are
             # fully merged and persisted before the index is considered rebuilt.
             writer.wait_merging_threads()
+            # Remove any unreferenced segment files left after the rebuild.
+            writer.garbage_collect_files()
             new_index.reload()
         except BaseException:  # pragma: no cover
             # Restore old index on failure so the backend remains usable
