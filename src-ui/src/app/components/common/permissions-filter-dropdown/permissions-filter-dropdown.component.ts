@@ -119,7 +119,7 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
 
     const usernames = excludedUsers
       .map((id) => this.getUsername(id))
-      .filter((username) => username)
+      .filter(Boolean)
     if (usernames.length === excludedUsers.length && usernames.length > 0) {
       return $localize`Not owned by ${usernames.join(', ')}`
     }
