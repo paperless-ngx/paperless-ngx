@@ -172,6 +172,16 @@ def get_taxonomy_context(
     """
     assigned = get_assigned_metadata(document, user)
     try:
+        # None means "no restriction" to retrieve_similar_nodes. A superuser
+        # (like no user at all) can see every document, so skip materializing
+        # every visible pk into a Python list and passing it through as an IN
+        # filter: for a large library that is a wasted quadratic scan in the
+        # vector store at best, and past ~32,763 documents a hard
+        # sqlite3.OperationalError (SQLite's bound-parameter limit) at worst.
+        # get_objects_for_user_owner_aware() would return every Document for a
+        # superuser anyway (guardian's own with_superuser shortcut), so this
+        # changes nothing about which documents are considered -- only how we
+        # get there.
         visible_document_ids = (
             None
             if user is None or user.is_superuser
