@@ -1,0 +1,25 @@
+.document-flipbook-page {
+  height: 100vh;
+  min-height: 100vh;
+  position: relative;
+}
+
+.document-flipbook-message,
+.document-flipbook-password {
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.document-flipbook-message {
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  padding: 1rem 1.25rem;
+}
+
+.document-flipbook-password {
+  width: min(24rem, calc(100% - 2rem));
+}

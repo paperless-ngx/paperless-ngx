@@ -117,6 +117,7 @@ import { TextComponent } from '../common/input/text/text.component'
 import { TextAreaComponent } from '../common/input/textarea/textarea.component'
 import { UrlComponent } from '../common/input/url/url.component'
 import { PageHeaderComponent } from '../common/page-header/page-header.component'
+import { PdfFlipbookViewerComponent } from '../common/pdf-flipbook-viewer/pdf-flipbook-viewer.component'
 import { PdfEditorEditMode } from '../common/pdf-editor/pdf-editor-edit-mode'
 import { PDFEditorComponent } from '../common/pdf-editor/pdf-editor.component'
 import { PngxPdfViewerComponent } from '../common/pdf-viewer/pdf-viewer.component'
@@ -194,6 +195,7 @@ interface IncomingDocumentUpdate {
     TextAreaComponent,
     RouterModule,
     PngxPdfViewerComponent,
+    PdfFlipbookViewerComponent,
     DocumentVersionDropdownComponent,
   ],
 })
@@ -333,6 +335,14 @@ export class DocumentDetailComponent
   get useNativePdfViewer(): boolean {
     this.settings.trackChanges()
     return this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
+  }
+
+  get usePdfFlipbookViewer(): boolean {
+    this.settings.trackChanges()
+    return (
+      !this.useNativePdfViewer &&
+      this.settings.get(SETTINGS_KEYS.PDF_FLIPBOOK_VIEWER)
+    )
   }
 
   get isMobile(): boolean {

@@ -1,0 +1,139 @@
+:host {
+  background: #2f2d2f;
+  display: block;
+  height: 100%;
+  min-height: 420px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.flipbook-container {
+  background: #2f2d2f;
+  height: 100%;
+  min-height: inherit;
+  overflow: hidden;
+  width: 100%;
+}
+
+.flipbook-status {
+  align-items: center;
+  color: #fff;
+  display: flex;
+  font-size: .875rem;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+}
+
+.flipbook-status-error {
+  background: rgba(0, 0, 0, .72);
+  border-radius: var(--bs-border-radius);
+  padding: .75rem 1rem;
+}
+
+.flipbook-toolbar {
+  align-items: center;
+  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, .4);
+  border-radius: var(--bs-border-radius);
+  bottom: .75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25rem;
+  justify-content: center;
+  left: 50%;
+  max-width: calc(100% - 1rem);
+  padding: .375rem;
+  position: absolute;
+  transform: translateX(-50%);
+  z-index: 30;
+
+  .btn {
+    align-items: center;
+    display: inline-flex;
+    height: 2rem;
+    justify-content: center;
+    padding: 0;
+    width: 2rem;
+  }
+
+  .dropdown-toggle::after {
+    display: none;
+  }
+
+  .dropdown-item {
+    align-items: center;
+    display: flex;
+  }
+}
+
+.flipbook-page-control {
+  align-items: center;
+  color: var(--bs-light);
+  display: inline-flex;
+  font-size: .875rem;
+  height: 2rem;
+}
+
+.flipbook-page-input {
+  align-items: center;
+  display: inline-flex;
+  gap: .2rem;
+  justify-content: center;
+  padding-left: .375rem;
+  padding-right: .375rem;
+  width: 5rem;
+
+  input {
+    appearance: textfield;
+    background: transparent;
+    border: 0;
+    color: inherit;
+    min-width: 0;
+    outline: 0;
+    padding: 0;
+    text-align: right;
+    width: 1.5rem;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      appearance: none;
+      margin: 0;
+    }
+  }
+
+  span {
+    white-space: nowrap;
+  }
+
+  &:focus-within {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 .25rem rgba(var(--bs-primary-rgb), .25);
+  }
+}
+
+:host ::ng-deep {
+  .df-container {
+    height: 100% !important;
+    min-height: inherit;
+  }
+
+  .df-ui-wrapper,
+  .df-ui-btn {
+    display: none !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  :host {
+    min-height: calc(100vh - 170px);
+  }
+
+  .flipbook-toolbar {
+    bottom: .5rem;
+  }
+
+}

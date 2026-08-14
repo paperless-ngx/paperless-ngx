@@ -175,16 +175,17 @@ export class PngxPdfViewerComponent
     this.lastFindQuery = ''
     this.loadingTask?.destroy()
 
+    const baseUri = this.documentBaseUri()
     GlobalWorkerOptions.workerSrc = new URL(
       'assets/js/pdf.worker.min.mjs',
-      this.document.baseURI
+      baseUri
     ).toString()
     const initOptions = {
       url: this.src,
       password: this.password,
       withCredentials: true,
-      wasmUrl: new URL('assets/wasm/', this.document.baseURI).toString(),
-      iccUrl: new URL('assets/iccs/', this.document.baseURI).toString(),
+      wasmUrl: new URL('assets/wasm/', baseUri).toString(),
+      iccUrl: new URL('assets/iccs/', baseUri).toString(),
     }
     this.loadingTask = getDocument(initOptions)
     try {
@@ -305,5 +306,9 @@ export class PngxPdfViewerComponent
       highlightAll: query?.length > 0,
       phraseSearch: true,
     })
+  }
+
+  private documentBaseUri(): string {
+    return (this.document as Document & { baseURI: string }).baseURI
   }
 }

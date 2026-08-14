@@ -36,6 +36,7 @@ repos:
         exclude_types:
           - pofile
           - json
+        exclude: '^src-ui/src/app/components/common/pdf-flipbook-viewer/lib/'
   # See https://github.com/prettier/prettier/issues/15742 for the fork reason
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: 'v3.9.6'

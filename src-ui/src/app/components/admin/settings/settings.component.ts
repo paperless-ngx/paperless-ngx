@@ -102,6 +102,12 @@ const documentDetailFieldOptions = [
   { id: DocumentDetailFieldID.Tags, label: $localize`Tags` },
 ]
 
+export enum PdfFlipbookPageMode {
+  Auto = 'auto',
+  Single = 'single',
+  Double = 'double',
+}
+
 @Component({
   selector: 'pngx-settings',
   templateUrl: './settings.component.html',
@@ -164,6 +170,10 @@ export class SettingsComponent
     defaultPermsEditUsers: new FormControl(null),
     defaultPermsEditGroups: new FormControl(null),
     useNativePdfViewer: new FormControl(null),
+    pdfFlipbookViewer: new FormControl(null),
+    pdfFlipbookBottomPanel: new FormControl(null),
+    pdfFlipbookPageMode: new FormControl(null),
+    pdfFlipbookTurnDuration: new FormControl(null),
     pdfViewerDefaultZoom: new FormControl(null),
     pdfEditorDefaultEditMode: new FormControl(null),
     documentEditingRemoveInboxTags: new FormControl(null),
@@ -200,6 +210,8 @@ export class SettingsComponent
   public readonly PdfZoomScale = PdfZoomScale
 
   public readonly PdfEditorEditMode = PdfEditorEditMode
+
+  public readonly PdfFlipbookPageMode = PdfFlipbookPageMode
 
   public readonly documentDetailFieldOptions = documentDetailFieldOptions
 
@@ -317,6 +329,16 @@ export class SettingsComponent
       themeColor: this.settings.get(SETTINGS_KEYS.THEME_COLOR),
       useNativePdfViewer: this.settings.get(
         SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER
+      ),
+      pdfFlipbookViewer: this.settings.get(SETTINGS_KEYS.PDF_FLIPBOOK_VIEWER),
+      pdfFlipbookBottomPanel: this.settings.get(
+        SETTINGS_KEYS.PDF_FLIPBOOK_BOTTOM_PANEL
+      ),
+      pdfFlipbookPageMode: this.settings.get(
+        SETTINGS_KEYS.PDF_FLIPBOOK_PAGE_MODE
+      ),
+      pdfFlipbookTurnDuration: this.settings.get(
+        SETTINGS_KEYS.PDF_FLIPBOOK_TURN_DURATION
       ),
       pdfViewerDefaultZoom: this.settings.get(
         SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING
@@ -488,6 +510,22 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER,
       this.settingsForm.value.useNativePdfViewer
+    )
+    this.settings.set(
+      SETTINGS_KEYS.PDF_FLIPBOOK_VIEWER,
+      this.settingsForm.value.pdfFlipbookViewer
+    )
+    this.settings.set(
+      SETTINGS_KEYS.PDF_FLIPBOOK_BOTTOM_PANEL,
+      this.settingsForm.value.pdfFlipbookBottomPanel
+    )
+    this.settings.set(
+      SETTINGS_KEYS.PDF_FLIPBOOK_PAGE_MODE,
+      this.settingsForm.value.pdfFlipbookPageMode
+    )
+    this.settings.set(
+      SETTINGS_KEYS.PDF_FLIPBOOK_TURN_DURATION,
+      this.settingsForm.value.pdfFlipbookTurnDuration
     )
     this.settings.set(
       SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING,

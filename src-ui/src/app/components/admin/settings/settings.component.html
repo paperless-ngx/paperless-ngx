@@ -290,6 +290,46 @@
                 <pngx-input-check i18n-title title="Enable notes" formControlName="notesEnabled"></pngx-input-check>
               </div>
             </div>
+
+            <h5 class="mt-3" i18n>PDF Flipbook</h5>
+            <div class="row">
+              <div class="col">
+                <pngx-input-check i18n-title title="Enable pdf flipbook viewer" formControlName="pdfFlipbookViewer"></pngx-input-check>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col">
+                <pngx-input-check i18n-title title="Show Flipbook bottom panel" formControlName="pdfFlipbookBottomPanel"></pngx-input-check>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-3 col-form-label pt-0">
+                <label for="pdfFlipbookPageMode" i18n>Page layout</label>
+              </div>
+              <div class="col">
+                <select id="pdfFlipbookPageMode" class="form-select" formControlName="pdfFlipbookPageMode">
+                  <option [ngValue]="PdfFlipbookPageMode.Auto" i18n>Automatic</option>
+                  <option [ngValue]="PdfFlipbookPageMode.Single" i18n>Single page</option>
+                  <option [ngValue]="PdfFlipbookPageMode.Double" i18n>Two page book</option>
+                </select>
+                <p class="small text-muted mt-1" i18n>Automatic uses one page on phones and a two-page book on larger screens.</p>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-3 col-form-label pt-0">
+                <label for="pdfFlipbookTurnDuration" i18n>Page turn speed</label>
+              </div>
+              <div class="col">
+                <select id="pdfFlipbookTurnDuration" class="form-select" formControlName="pdfFlipbookTurnDuration">
+                  <option [ngValue]="500" i18n>Fast</option>
+                  <option [ngValue]="800" i18n>Normal</option>
+                  <option [ngValue]="1200" i18n>Slow</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
       </ng-template>

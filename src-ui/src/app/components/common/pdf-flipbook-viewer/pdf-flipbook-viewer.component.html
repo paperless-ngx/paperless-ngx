@@ -1,0 +1,125 @@
+<div #container class="flipbook-container"></div>
+
+@if (showToolbar() && ready() && !error()) {
+  <div
+    class="flipbook-toolbar"
+    role="toolbar"
+    aria-label="PDF flipbook controls"
+    i18n-aria-label
+  >
+    <button
+      type="button"
+      class="btn btn-sm btn-primary"
+      title="First page"
+      i18n-title
+      (click)="firstPage()"
+    >
+      <i-bs name="chevron-double-left"></i-bs>
+    </button>
+    <button
+      type="button"
+      class="btn btn-sm btn-primary"
+      title="Previous page"
+      i18n-title
+      (click)="previousPage()"
+    >
+      <i-bs name="chevron-left"></i-bs>
+    </button>
+    <div class="flipbook-page-control">
+      <div class="flipbook-page-input form-control form-control-sm">
+        <input
+          #pageInput
+          type="number"
+          min="1"
+          [max]="pageCount()"
+          [value]="activePageNumber()"
+          title="Page number"
+          i18n-title
+          (change)="goToPage(pageInput.valueAsNumber)"
+          (keyup.enter)="goToPage(pageInput.valueAsNumber)"
+        />
+        <span>/ {{ pageCount() }}</span>
+      </div>
+    </div>
+    <button
+      type="button"
+      class="btn btn-sm btn-primary"
+      title="Next page"
+      i18n-title
+      (click)="nextPage()"
+    >
+      <i-bs name="chevron-right"></i-bs>
+    </button>
+    <button
+      type="button"
+      class="btn btn-sm btn-primary"
+      title="Last page"
+      i18n-title
+      (click)="lastPage()"
+    >
+      <i-bs name="chevron-double-right"></i-bs>
+    </button>
+    <div ngbDropdown placement="top-end" class="btn-group">
+      <button
+        type="button"
+        class="btn btn-sm btn-primary"
+        id="flipbookMoreMenu"
+        title="More"
+        i18n-title
+        ngbDropdownToggle
+      >
+        <i-bs name="three-dots"></i-bs>
+      </button>
+      <div
+        ngbDropdownMenu
+        class="dropdown-menu-dark shadow"
+        aria-labelledby="flipbookMoreMenu"
+      >
+        <button type="button" ngbDropdownItem (click)="zoomOut()">
+          <i-bs name="zoom-out" class="me-2"></i-bs><ng-container i18n
+            >Zoom out</ng-container
+          >
+        </button>
+        <button type="button" ngbDropdownItem (click)="zoomIn()">
+          <i-bs name="zoom-in" class="me-2"></i-bs><ng-container i18n
+            >Zoom in</ng-container
+          >
+        </button>
+        <button type="button" ngbDropdownItem (click)="togglePageMode()">
+          <i-bs name="book" class="me-2"></i-bs><ng-container i18n
+            >Toggle page layout</ng-container
+          >
+        </button>
+        <button type="button" ngbDropdownItem (click)="toggleFullscreen()">
+          <i-bs name="fullscreen" class="me-2"></i-bs><ng-container i18n
+            >Full screen</ng-container
+          >
+        </button>
+        <div class="dropdown-divider"></div>
+        <button type="button" ngbDropdownItem (click)="download()">
+          <i-bs name="download" class="me-2"></i-bs><ng-container i18n
+            >Download</ng-container
+          >
+        </button>
+        <button type="button" ngbDropdownItem (click)="print()">
+          <i-bs name="printer" class="me-2"></i-bs><ng-container i18n
+            >Print</ng-container
+          >
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (loading()) {
+  <div class="flipbook-status">
+    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+    <ng-container i18n>Loading...</ng-container>
+  </div>
+}
+
+@if (error()) {
+  <div class="flipbook-status flipbook-status-error" i18n>
+    Unable to load PDF flipbook.
+  </div>
+}

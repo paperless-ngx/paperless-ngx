@@ -1,0 +1,881 @@
+.df-container {
+    min-height: 320px;
+    background: no-repeat 70%;
+    background-size: cover;
+    width: 100%;
+    position: relative;
+    image-rendering: auto;
+    direction: ltr
+}
+
+.df-container div {
+    box-sizing: border-box !important
+}
+
+.df-container.df-transparent:not(.df-fullscreen) {
+    background: transparent !important
+}
+
+.df-container.df-custom-fullscreen.df-fullscreen {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    z-index: 999999
+}
+
+.df-3dcanvas {
+    position: absolute;
+    z-index: 1;
+    right: 0;
+    top: 0
+}
+
+.df-rtl .df-3dcanvas {
+    right: auto;
+    right: initial;
+    left: 0
+}
+
+.df-container a {
+    outline: 0;
+    text-decoration: none;
+    box-shadow: none
+}
+
+.df-container.df-zoom-enabled canvas.df-3dcanvas,
+.df-container.df-zoom-enabled .df-book-stage {
+    cursor: move;
+    cursor: -webkit-grab
+}
+
+.df-book-stage {
+    position: absolute;
+    overflow: hidden;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    filter: blur(0);
+    -webkit-filter: blur(0);
+    padding: 30px 50px 70px
+}
+
+.df-container.df-xs .df-book-stage {
+    padding-left: 20px;
+    padding-right: 20px
+}
+
+.df-book-stage.df-zoom-enabled {
+    cursor: move
+}
+
+.df-page-front:before,
+.df-page-back:before {
+    content: " "
+}
+
+.df-book-page .df-page-front:before {
+    background-image: -webkit-linear-gradient(right, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.2) 10%, rgba(0, 0, 0, 0.15) 25%, rgba(0, 0, 0, 0) 70%);
+    background-image: -moz-linear-gradient(right, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.2) 10%, rgba(0, 0, 0, 0.15) 25%, rgba(0, 0, 0, 0) 70%);
+    background-image: -ms-linear-gradient(right, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.2) 10%, rgba(0, 0, 0, 0.15) 25%, rgba(0, 0, 0, 0) 70%)
+}
+
+.df-book-page .df-page-back:before {
+    background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.15) 15%, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.0));
+    background-image: -moz-linear-gradient(left, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.15) 15%, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.0));
+    background-image: -ms-linear-gradient(left, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.15) 15%, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.0))
+}
+
+.df-book-wrapper,
+.df-page-wrapper,
+.df-book-page,
+.df-page-content,
+.df-page-front:before,
+.df-page-wrapper:after,
+.df-page-back:before,
+.df-page-content:after,
+.df-page-effects,
+.df-page-effects:before,
+.df-page-effects {
+    position: absolute;
+    height: 100%;
+    display: block;
+    top: 0
+}
+
+.df-page-content,
+.df-book-page {
+    width: 100%
+}
+
+.df-book-wrapper {
+    position: relative;
+    margin: 0 auto;
+    transition: .3s left;
+    -webkit-transition: .3s left;
+    left: 0
+}
+
+.df-zoom-enabled .df-book-wrapper {
+    transition: none;
+    -webkit-transition: none
+}
+
+.df-book-wrapper.close-right {
+    left: 25%
+}
+
+.df-book-wrapper.close-left {
+    left: -25%
+}
+
+.df-book-shadow {
+    position: absolute;
+    z-index: -1;
+    height: 100%;
+    -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    -ms-box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3)
+}
+
+.df-page-wrapper {
+    overflow: hidden
+}
+
+.df-hard-page .df-page-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+    overflow: visible;
+    transform-style: preserve-3d;
+    -webkit-transform-origin: 0 50% 0;
+    -moz-transform-origin: 0 50% 0;
+    -ms-transform-origin: 0 50% 0;
+    transform-origin: 0 50% 0
+}
+
+.df-book-page.df-flipping,
+.df-book-page.df-folding {
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.0)
+}
+
+.df-book-page.df-left-side {
+    left: 0;
+    -webkit-transform-origin: right;
+    -moz-transform-origin: right;
+    -ms-transform-origin: right;
+    transform-origin: right
+}
+
+.df-book-page.df-right-side {
+    left: 50%;
+    -webkit-transform-origin: left;
+    -moz-transform-origin: left;
+    -ms-transform-origin: left;
+    transform-origin: left
+}
+
+.df-book-page.df-right-side+.df-page-wrapper.df-right-side {
+    z-index: -1
+}
+
+.df-book-page .df-page-front,
+.df-book-page .df-page-back {
+    width: 100%;
+    background-size: 100.5% 100%;
+    background-size: 100% 100%;
+    height: 100%;
+    background-color: white;
+    position: absolute;
+    box-sizing: border-box
+}
+
+.df-page-back>canvas,
+.df-page-front>canvas {
+    width: 100%;
+    position: relative;
+    z-index: -1
+}
+
+.df-book-page.df-flipping.df-left-side:before {
+    background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1));
+    background-image: -moz-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1));
+    width: 10px;
+    left: -10px
+}
+
+.df-book-page {
+    width: 50%
+}
+
+.df-book-page.df-flipping,
+.df-book-page.df-folding {
+    z-index: 200 !important
+}
+
+.df-page-content {
+    background-size: 100.25% !important;
+    background-repeat: no-repeat !important;
+    transition-property: transform;
+    -webkit-transition-property: -webkit-transform;
+    width: 100%;
+    overflow: hidden
+}
+
+.df-book-page.df-left-side .df-page-front {
+    z-index: 2
+}
+
+.df-book-page.df-left-side .df-page-back {
+    z-index: 1
+}
+
+.df-book-page.df-left-side.df-folding:not(.df-hard-page) .df-page-back {
+    z-index: 3
+}
+
+.df-book-page.df-right-side .df-page-front {
+    top: 0;
+    left: 0;
+    z-index: 0
+}
+
+.df-book-page,
+.df-page-front,
+.df-page-back,
+.df-page-fold-inner-shadow,
+.df-page-fold-outer-shadow,
+.df-page-wrapper {
+    position: absolute;
+    -webkit-transform-origin: 0 0;
+    -moz-transform-origin: 0 0;
+    -ms-transform-origin: 0 0;
+    transform-origin: 0 0
+}
+
+.df-page-front,
+.df-page-back {
+    overflow: hidden
+}
+
+.df-page-fold-outer-shadow {
+    z-index: -1;
+    width: 100%;
+    height: 100%
+}
+
+.df-page-fold-inner-shadow {
+    position: absolute;
+    z-index: 5;
+    display: none
+}
+
+.df-book-page.df-folding .df-page-fold-inner-shadow {
+    display: block
+}
+
+.df-book-page.df-right-side .df-page-back {
+    left: 0;
+    z-index: 1
+}
+
+.df-book-page.df-right-side.df-folding .df-page-front {
+    z-index: 2
+}
+
+.df-page-wrapper.df-right-side .df-page-back {
+    left: 100%;
+    z-index: 1;
+    overflow: hidden
+}
+
+.df-hard-page .df-page-front,
+.df-hard-page .df-page-back {
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    -ms-backface-visibility: hidden;
+    backface-visibility: hidden
+}
+
+.df-hard-page.df-right-side .df-page-front {
+    -webkit-transform-origin: right 50%;
+    -moz-transform-origin: right 50%;
+    -ms-transform-origin: right 50%;
+    transform-origin: right 50%;
+    z-index: 3 !important
+}
+
+.df-hard-page.df-left-side .df-page-front {
+    -webkit-transform-origin: right 50%;
+    -moz-transform-origin: right 50%;
+    -ms-transform-origin: right 50%;
+    transform-origin: right 50%
+}
+
+.df-hard-page.df-right-side .df-page-back {
+    -webkit-transform-origin: left 50%;
+    -moz-transform-origin: left 50%;
+    -ms-transform-origin: left 50%;
+    transform-origin: left 50%;
+    z-index: 3
+}
+
+.df-hard-page.df-left-side .df-page-back {
+    -webkit-transform-origin: left 50%;
+    -moz-transform-origin: left 50%;
+    -ms-transform-origin: left 50%;
+    transform-origin: left 50%
+}
+
+.df-page-front:before,
+.df-page-back:before {
+    width: 20%;
+    z-index: 5;
+    pointer-events: none
+}
+
+.df-page-front:before {
+    right: 0
+}
+
+.df-page-wrapper.df-right-side.df-flipping {
+    z-index: 4
+}
+
+.df-ui {
+    height: 60px;
+    padding: 20px 16px 0
+}
+
+.df-ui-wrapper,
+.df-ui-btn {
+    color: #fff;
+    vertical-align: top;
+    backdrop-filter: blur(10px);
+    box-sizing: border-box;
+    text-align: center
+}
+
+.df-ui-wrapper {
+    background-color: #0f0f0f60;
+    backdrop-filter: blur(10px);
+    position: absolute
+}
+
+.df-ui-btn {
+    position: relative;
+    width: 35px;
+    right: 0;
+    height: 40px;
+    font-size: 17px;
+    cursor: pointer;
+    z-index: 2;
+    display: inline-block;
+    padding: 12px 5px;
+    line-height: 1
+}
+
+.df-floating .df-ui-controls>.df-ui-btn:first-child {
+    border-radius: 5px 0 0 5px
+}
+
+.df-floating .df-ui-controls>.df-ui-btn:last-child {
+    border-radius: 0 5px 5px 0
+}
+
+.df-ui-btn:before {
+    box-sizing: border-box
+}
+
+.df-ui-btn:hover {
+    text-shadow:
+        -.5px -.5px 1px rgba(255, 255, 255, 0.5),
+        .5px -.5px 1px rgba(255, 255, 255, 0.5),
+        -.5px .5px 1px rgba(255, 255, 255, 0.5),
+        .5px .5px 1px rgba(255, 255, 255, 0.5);
+}
+
+.df-ui-btn.disabled,
+.df-ui-btn.disabled:hover {
+    color: #ffffff50;
+    text-shadow: none;
+}
+
+.df-ui-page {
+    padding: 8px 5px 2px;
+    font-size: 12px;
+    width: auto;
+    width: 50px;
+    margin: 0;
+    border-radius: 0;
+    background-color: rgba(0, 0, 0, 0.03)
+}
+
+.df-ui-page input {
+    width: 100%;
+    background-color: transparent;
+    height: 25px;
+    margin: 0;
+    padding: 0 !important;
+    border: 1px solid #8f8f8f;
+    text-align: center;
+    vertical-align: top;
+    color: inherit;
+    font-size: 14px;
+    top: 0;
+    box-sizing: border-box;
+    z-index: -1;
+    display: inline-block;
+    opacity: 1
+}
+
+.df-ui-page input:focus {
+    z-index: 2;
+    opacity: 1;
+    color: inherit
+}
+
+.df-ui-page input:focus+label {
+    opacity: 0;
+    display: none
+}
+
+.df-ui-page label {
+    position: absolute;
+    height: 30px;
+    width: 100%;
+    display: block;
+    top: 0;
+    padding-top: 14px;
+    line-height: 1.1em;
+    color: #999;
+    font-size: 13px;
+    font-weight: normal;
+    left: 0;
+    cursor: pointer;
+    background-color: transparent;
+    z-index: 1;
+    box-sizing: border-box
+}
+
+.df-ui-fullscreen {
+    bottom: 0
+}
+
+.df-ui-zoom {
+    top: 24px;
+    height: 60px;
+    right: 24px;
+    width: 30px;
+    display: none;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px
+}
+
+.df-ui-controls {
+    bottom: 0;
+    width: 100%;
+    height: 40px;
+    padding: 0;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    z-index: 4;
+    display: block
+}
+
+.df-floating .df-ui-controls {
+    bottom: 10px;
+    width: auto;
+    width: initial;
+    -webkit-transform: translateX(-50%);
+    -moz-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
+    left: 50%;
+    margin: 0 auto;
+    display: table;
+    display: flex;
+    border-radius: 5px
+}
+
+.df-floating.df-controls-hide .df-ui-controls {
+    display: none
+}
+
+.df-ui-wrapper.df-ui-controls .df-ui-btn {
+    float: none
+}
+
+.df-ui-size {
+    bottom: 24px;
+    height: 60px;
+    right: 24px
+}
+
+.df-ui-zoom:before,
+.df-ui-size:before {
+    height: 0;
+    border-bottom: 1px solid;
+    content: " ";
+    right: 5px;
+    opacity: .3;
+    display: block;
+    position: absolute;
+    top: 30px;
+    left: 5px;
+    z-index: 2
+}
+
+.df-ui-zoomin {
+    top: 0
+}
+
+.df-ui-zoomout {
+    bottom: 0
+}
+
+.df-ui-next {
+    right: 0;
+    border-radius: 0
+}
+
+.df-container.df-floating>.df-ui-next {
+    right: 8px
+}
+
+.df-container.df-floating>.df-ui-prev {
+    left: 2px
+}
+
+.df-container>.df-ui-next,
+.df-container>.df-ui-prev {
+    margin-top: -5px;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    top: 50%;
+    position: absolute;
+    background-color: #0f0f0f60;
+    backdrop-filter: blur(10px);
+    font-size: 36px;
+    color: #fff;
+    text-align: center;
+    height: auto;
+    height: initial;
+    width: auto;
+    width: initial
+}
+
+.df-container>.df-ui-next:hover,
+.df-container>.df-ui-prev:hover {
+}
+
+.df-container.df-floating>.df-ui-next,
+.df-container.df-floating>.df-ui-prev {
+    border-radius: 5px;
+    width: 40px;
+}
+
+.df-ui-prev {
+    left: 0;
+    right: auto;
+    border-radius: 0
+}
+
+.df-ui-alt {
+    position: relative !important;
+    right: auto;
+    right: initial;
+    left: auto;
+    left: initial;
+    box-shadow: none !important
+}
+
+.df-ui-alt.df-ui-next {
+    border-right: 1px solid #ddd
+}
+
+.df-ui-btn.df-active {
+    color: #fff;
+    text-shadow:
+        -.5px -.5px 1px rgba(255, 255, 255, 0.5),
+        .5px -.5px 1px rgba(255, 255, 255, 0.5),
+        -.5px .5px 1px rgba(255, 255, 255, 0.5),
+        .5px .5px 1px rgba(255, 255, 255, 0.5);
+}
+
+.df-ui-zoomin,
+.df-ui-zoomout,
+.df-ui-fullscreen,
+.df-ui-more {
+    float: right
+}
+
+.df-ui-more .more-container {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    margin-bottom: 8px !important;
+    right: 10px;
+    background-color: #0f0f0f60;
+    backdrop-filter: blur(10px);
+    z-index: 20;
+    border-radius: 5px;
+}
+
+.more-container:before {
+    content: " ";
+    position: absolute;
+    border: 7px solid transparent;
+    border-top-color: #fff;
+    height: 0;
+    width: 0;
+    bottom: -14px;
+    right: 13px;
+    margin-right: -8px;
+    pointer-events: none
+}
+
+.more-container .df-ui-btn {
+    width: auto;
+    width: initial;
+    width: 170px;
+    text-align: left;
+    padding: 8px 10px;
+    height: 36px;
+    text-shadow: none;
+    border-radius: 0
+}
+
+.more-container .df-ui-btn:hover {
+    text-shadow:
+        -.5px -.5px 1px rgba(255, 255, 255, 0.5),
+        .5px -.5px 1px rgba(255, 255, 255, 0.5),
+        -.5px .5px 1px rgba(255, 255, 255, 0.5),
+        .5px .5px 1px rgba(255, 255, 255, 0.5);
+}
+
+.more-container>.df-ui-btn:first-child {
+    border-radius: 5px;
+    border-top: 0
+}
+
+.more-container>.df-ui-btn:last-child {
+    border-radius: 0 0 5px 5px
+}
+
+.more-container .df-ui-btn:before {
+    position: absolute;
+    top: 11px;
+    font-size: 14px
+}
+
+.df-ui-btn span {
+    display: none
+}
+
+.more-container .df-ui-btn span {
+    font-size: 12px;
+    padding-left: 20px;
+    vertical-align: middle;
+    display: inline-block
+}
+
+.df-ui-more.df-active .more-container {
+    display: block
+}
+
+.df-container section {
+    padding: 0
+}
+
+.annotationLayer section,
+.annotationDiv section,
+.customLinkAnnotation,
+.linkAnnotation,
+.highlightAnnotation,
+.popupAnnotation {
+    position: absolute;
+    z-index: 5;
+    cursor: pointer;
+    pointer-events: all
+}
+
+.annotationDiv .popupWrapper {
+    position: absolute;
+    width: 20em
+}
+
+.annotationDiv .popup {
+    position: absolute;
+    z-index: 200;
+    max-width: 20em;
+    background-color: #ff9;
+    box-shadow: 0 2px 5px #333;
+    border-radius: 2px;
+    padding: .6em;
+    margin-left: 5px;
+    cursor: pointer;
+    word-wrap: break-word
+}
+
+.annotationDiv .popup h1 {
+    font-size: 1em;
+    border-bottom: 1px solid rgb(97, 97, 97);
+    padding-bottom: .2em
+}
+
+.annotationDiv .popup p {
+    padding-top: .2em
+}
+
+.annotationDiv .highlightAnnotation,
+.annotationDiv .underlineAnnotation,
+.annotationDiv .squigglyAnnotation,
+.annotationDiv .strikeoutAnnotation,
+.annotationDiv .fileAttachmentAnnotation {
+    cursor: pointer
+}
+
+.annotationDiv .textAnnotation img {
+    position: absolute;
+    cursor: pointer
+}
+
+section.linkAnnotation a,
+.annotationDiv .buttonWidgetAnnotation.pushButton>a {
+    display: block;
+    height: 100%
+}
+
+section.linkAnnotation a,
+a.linkAnnotation,
+a.customLinkAnnotation {
+    background-color: transparent;
+    background-color: #ff0;
+    opacity: .1
+}
+
+section.linkAnnotation a:hover,
+a.linkAnnotation:hover,
+.highlightAnnotation:hover,
+a.customLinkAnnotation:hover {
+    opacity: .4;
+    border-color: transparent;
+    background-color: #577b99
+}
+
+.annotationDiv {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    overflow: hidden
+}
+
+section.linkAnnotation a .annotationLayer>a {
+    display: block;
+    position: absolute;
+    height: 100%;
+    cursor: pointer;
+    box-sizing: border-box
+}
+
+.df-container.df-xs .df-ui-controls .df-ui-btn.df-ui-page {
+    display: none !important
+}
+
+.df-page-wrapper {
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0)
+}
+
+.df-container ::-webkit-scrollbar {
+    width: 8px
+}
+
+.df-container ::-webkit-scrollbar-button {
+    height: 8px
+}
+
+.df-container ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border: 0 none #fff;
+    border-radius: 100px
+}
+
+.df-container ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5)
+}
+
+.df-container ::-webkit-scrollbar-thumb:active {
+    background: rgba(0, 0, 0, 0.5)
+}
+
+.df-container ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.20);
+    border: 0 none #fff;
+    border-radius: 100px
+}
+
+.df-container ::-webkit-scrollbar-track:hover {
+    background: rgba(0, 0, 0, 0.2)
+}
+
+.df-container ::-webkit-scrollbar-track:active {
+    background: rgba(0, 0, 0, 0.15)
+}
+
+.df-container ::-webkit-scrollbar-corner {
+    background: transparent
+}
+
+.df-skipTransition {
+    -webkit-transition: none !important;
+    -moz-transition: none !important;
+    -ms-transition: none !important;
+    transition: none !important
+}
+
+.df-container.df-fullscreen {
+    height: 100% !important;
+    max-height: 100% !important;
+    width: 100% !important;
+    max-width: 100% !important
+}
+
+.df-container.df-double-internal .df-page-front {
+    background-position: left;
+    background-size: cover
+}
+
+.df-container.df-double-internal .df-page-back {
+    background-position: right;
+    background-size: cover
+}
+
+.df-rtl .more-container .df-ui-btn {
+    text-align: right;
+    direction: rtl
+}
+
+.df-rtl .more-container .df-ui-btn:before {
+    right: 10px
+}
+
+.df-rtl .more-container .df-ui-btn span {
+    padding: 0 20px 0 0
+}

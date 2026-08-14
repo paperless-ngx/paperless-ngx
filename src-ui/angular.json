@@ -76,6 +76,11 @@
               "src/assets",
               "src/manifest.webmanifest",
               {
+                "glob": "**/*",
+                "input": "src/app/components/common/pdf-flipbook-viewer/lib/",
+                "output": "/assets/flipbook/lib/"
+              },
+              {
                 "glob": "{pdf.worker.min.mjs,pdf.min.mjs}",
                 "input": "node_modules/pdfjs-dist/legacy/build/",
                 "output": "/assets/js/"

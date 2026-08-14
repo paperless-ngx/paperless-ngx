@@ -1,0 +1,32 @@
+<div class="document-flipbook-page">
+  @if (error()) {
+    <div class="document-flipbook-message">
+      <p class="mb-0" i18n>Error loading preview</p>
+    </div>
+  } @else {
+    <pngx-pdf-flipbook-viewer
+      [src]="previewUrl()"
+      [password]="pdfPassword()"
+      [page]="currentPage()"
+      (pageChange)="currentPage.set($event)"
+      (loadError)="onError($event)"
+      (afterLoadComplete)="onLoaded($event)"
+    />
+  }
+
+  @if (requiresPassword()) {
+    <div class="document-flipbook-password">
+      <form>
+        <input
+          autocomplete=""
+          autofocus="true"
+          class="form-control"
+          i18n-placeholder
+          placeholder="Enter Password"
+          type="password"
+          (keyup)="onPasswordKeyUp($event)"
+        />
+      </form>
+    </div>
+  }
+</div>

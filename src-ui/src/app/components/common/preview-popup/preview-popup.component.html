@@ -1,4 +1,4 @@
-<a [href]="link ?? previewUrl" class="{{linkClasses}}" [target]="linkTarget" [title]="linkTitle"
+<a [href]="link ?? previewLink" class="{{linkClasses}}" [target]="link ? linkTarget : previewLinkTarget" [title]="linkTitle"
   [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle" container="body"
   autoClose="true" [popoverClass]="popoverClass()" [popperOptions]="popperOptions"
   (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">

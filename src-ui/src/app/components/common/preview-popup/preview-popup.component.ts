@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import {
   Component,
+  DOCUMENT,
   inject,
   Input,
   OnDestroy,
@@ -34,6 +35,7 @@ import { PdfRenderMode } from '../pdf-viewer/pdf-viewer.types'
 })
 export class PreviewPopupComponent implements OnDestroy {
   PdfRenderMode = PdfRenderMode
+  private domDocument = inject<Document>(DOCUMENT)
   private settingsService = inject(SettingsService)
   public readonly documentService = inject(DocumentService)
   private http = inject(HttpClient)
@@ -88,8 +90,30 @@ export class PreviewPopupComponent implements OnDestroy {
     return this.documentService.getPreviewUrl(this.document.id)
   }
 
+  get previewLink(): string {
+    if (this.usePdfFlipbookViewer) {
+      return new URL(
+        `documents/${this.document.id}/flipbook`,
+        this.domDocumentBaseUri()
+      ).toString()
+    }
+    return this.previewUrl
+  }
+
+  get previewLinkTarget(): string {
+    return this.linkTarget
+  }
+
   get useNativePdfViewer(): boolean {
     return this.settingsService.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
+  }
+
+  get usePdfFlipbookViewer(): boolean {
+    return (
+      this.isPdf &&
+      !this.useNativePdfViewer &&
+      this.settingsService.get(SETTINGS_KEYS.PDF_FLIPBOOK_VIEWER)
+    )
   }
 
   get isPdf(): boolean {
@@ -157,5 +181,9 @@ export class PreviewPopupComponent implements OnDestroy {
       },
       immediate ? 0 : 300
     )
+  }
+
+  private domDocumentBaseUri(): string {
+    return (this.domDocument as Document & { baseURI: string }).baseURI
   }
 }
