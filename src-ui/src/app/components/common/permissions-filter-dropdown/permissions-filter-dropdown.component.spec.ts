@@ -108,6 +108,27 @@ describe('PermissionsFilterDropdownComponent', () => {
     expect(component.sharedByFilterLabel).toEqual('Shared by user1')
   })
 
+  it('should describe concrete filters when usernames are unavailable', () => {
+    component.selectionModel.ownerFilter = OwnerFilterType.SELF
+    component.selectionModel.userID = 99
+    expect(component.ownerFilterLabel).toEqual('Owned by another user')
+
+    component.selectionModel.ownerFilter = OwnerFilterType.NOT_SELF
+    component.selectionModel.excludeUsers = [99]
+    expect(component.ownerExclusionFilterLabel).toEqual(
+      'Not owned by another user'
+    )
+
+    component.selectionModel.excludeUsers = [98, 99]
+    expect(component.ownerExclusionFilterLabel).toEqual(
+      'Not owned by selected users'
+    )
+
+    component.selectionModel.ownerFilter = OwnerFilterType.SHARED_BY_ME
+    component.selectionModel.userID = 99
+    expect(component.sharedByFilterLabel).toEqual('Shared by another user')
+  })
+
   it('should retain relative labels for filters bound to the current user', () => {
     component.selectionModel.userID = currentUserID
     expect(component.ownerFilterLabel).toEqual('My documents')
