@@ -49,7 +49,7 @@
         </cdk-virtual-scroll-viewport>
       }
       @if (editing) {
-        @if (filteredItems.length === 0 && createRef !== undefined) {
+        @if (filteredItems.length === 0 && createRef !== undefined && filterText?.length > 0) {
           <button class="list-group-item list-group-item-action bg-light" (click)="createClicked()" [disabled]="disabled">
             <small class="ms-2"><ng-container i18n>Create</ng-container> "{{filterText}}"</small>
             <i-bs width="1.5em" height="1em" name="plus"></i-bs>
@@ -62,7 +62,7 @@
           </button>
         }
       }
-      @if (extraButtonTitle) {
+      @if (extraButtonTitle && (showExtraButtonIfEmpty || filteredItems?.length > 0)) {
         <button class="list-group-item list-group-item-action bg-light d-flex align-items-center" (click)="extraButtonClicked($event)" [disabled]="disabled">
           <small class="ms-2 fw-bold">{{extraButtonTitle}}</small>
           <i-bs width="1.5em" height="1em" name="arrow-right"></i-bs>

@@ -911,6 +911,25 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     expect(createSpy).toHaveBeenCalled()
   })
 
+  it('should only show create when a non-empty filter has no matches', () => {
+    component.selectionModel.items = []
+    component.icon = 'tag-fill'
+    component.editing = true
+    component.createRef = jest.fn()
+
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).not.toContain('Create')
+    component.listFilterEnter()
+    expect(component.createRef).not.toHaveBeenCalled()
+
+    const filterInput: HTMLInputElement =
+      fixture.nativeElement.querySelector('input[type="text"]')
+    filterInput.value = 'FooBar'
+    filterInput.dispatchEvent(new Event('input'))
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).toContain('Create "FooBar"')
+  })
+
   it('should exclude item and trigger change event', () => {
     const id = 1
     const state = ToggleableItemState.Selected
@@ -969,5 +988,19 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     component.extraButtonClicked()
     expect(extraButtonClicked).toBeTruthy()
     expect(applied).toBeFalsy()
+  })
+
+  it('should only show the extra button for an empty result when enabled', () => {
+    component.selectionModel.items = items
+    component.icon = 'tag-fill'
+    component.extraButtonTitle = 'Extra'
+    component.filterText = 'FooBar'
+
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).not.toContain('Extra')
+
+    fixture.componentRef.setInput('showExtraButtonIfEmpty', true)
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).toContain('Extra')
   })
 })
