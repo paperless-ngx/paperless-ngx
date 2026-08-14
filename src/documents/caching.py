@@ -41,7 +41,16 @@ class SuggestionCacheData:
 CLASSIFIER_VERSION_KEY: Final[str] = "classifier_version"
 CLASSIFIER_HASH_KEY: Final[str] = "classifier_hash"
 CLASSIFIER_MODIFIED_KEY: Final[str] = "classifier_modified"
-LLM_CACHE_CLASSIFIER_VERSION: Final[int] = 1000  # Marker distinguishing LLM suggestions
+# Marker distinguishing LLM suggestions from classifier-generated ones (whose
+# FORMAT_VERSION lives in a much lower range - see DocumentClassifier). Bump
+# this whenever the *shape* of the cached `suggestions` dict changes, so a
+# cache entry written by a previous release can never be read back by code
+# that expects a different shape:
+#   1000 - initial LLM suggestions cache (flat lists of resolved object ids
+#          per taxonomy field)
+#   1001 - suggestions reshaped to {"existing_ids": [...], "new_names":
+#          [...]} per taxonomy field (#13676)
+LLM_CACHE_CLASSIFIER_VERSION: Final[int] = 1001
 
 CACHE_1_MINUTE: Final[int] = 60
 CACHE_5_MINUTES: Final[int] = 5 * CACHE_1_MINUTE
@@ -204,7 +213,11 @@ def get_llm_suggestion_cache(
     doc_key = get_suggestion_cache_key(document_id)
     data: SuggestionCacheData = cache.get(doc_key)
 
-    if data and data.classifier_hash == backend:
+    if (
+        data
+        and data.classifier_version == LLM_CACHE_CLASSIFIER_VERSION
+        and data.classifier_hash == backend
+    ):
         return data
 
     return None

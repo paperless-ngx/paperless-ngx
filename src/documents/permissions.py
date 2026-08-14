@@ -1,4 +1,5 @@
 from typing import Any
+from typing import TypeVar
 
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
@@ -233,6 +234,58 @@ def permitted_object_ids(
     return base_qs.filter(
         Q(owner=user) | Q(owner__isnull=True) | Q(id__in=permitted_ids),
     ).values_list("id", flat=True)
+
+
+ModelT = TypeVar("ModelT", bound=Model)
+
+
+def user_is_unrestricted(user: User | None) -> bool:
+    """
+    True when ``user`` means "no restriction at all" (an absent user, or an
+    *active* superuser) without needing a database check to know it.
+
+    ``permitted_object_ids(None, ...)`` itself means the much narrower "only
+    unowned rows", which is NOT the same thing as "no user filtering
+    requested", so callers must special-case this before ever calling it.
+    A deactivated superuser is deliberately NOT unrestricted here, matching
+    permitted_object_ids's own is_active-before-is_superuser ordering.
+
+    Callers that can avoid a database round trip entirely when this is true
+    (e.g. checking a single already-loaded object's visibility rather than
+    filtering a queryset) should do so via this function directly, rather
+    than through restrict_queryset_to_visible() below.
+    """
+    if user is None:
+        return True
+    return (
+        getattr(user, "is_authenticated", False)
+        and getattr(user, "is_active", False)
+        and getattr(user, "is_superuser", False)
+    )
+
+
+def restrict_queryset_to_visible(
+    queryset: QuerySet[ModelT],
+    user: User | None,
+    perm: str,
+) -> QuerySet[ModelT]:
+    """
+    Restrict ``queryset`` to the rows ``user`` may see with ``perm``.
+
+    Delegates the visibility check to the database as a
+    ``WHERE id IN (subquery)`` rather than materializing the full
+    permitted-id set into a Python collection first: a caller that only
+    needs to check a small handful of rows (a resolved-id list, a few
+    RAG-neighbour candidate ids) never pays for scanning or holding the
+    installation's entire taxonomy in memory to do it.
+
+    Returns ``queryset`` unchanged for user_is_unrestricted(user); every
+    other case is delegated to ``permitted_object_ids`` rather than
+    re-deciding the ordering here.
+    """
+    if user_is_unrestricted(user):
+        return queryset
+    return queryset.filter(pk__in=permitted_object_ids(user, queryset.model, perm))
 
 
 def permitted_document_ids(

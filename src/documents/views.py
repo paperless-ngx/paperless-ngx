@@ -7,6 +7,7 @@ import tempfile
 import zipfile
 from collections import defaultdict
 from collections import deque
+from collections.abc import Callable
 from datetime import datetime
 from datetime import timedelta
 from http import HTTPStatus
@@ -249,6 +250,10 @@ from paperless_ai.matching import match_correspondents_by_name
 from paperless_ai.matching import match_document_types_by_name
 from paperless_ai.matching import match_storage_paths_by_name
 from paperless_ai.matching import match_tags_by_name
+from paperless_ai.matching import resolve_correspondent_ids
+from paperless_ai.matching import resolve_document_type_ids
+from paperless_ai.matching import resolve_storage_path_ids
+from paperless_ai.matching import resolve_tag_ids
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.oauth import PaperlessMailOAuth2Manager
@@ -257,6 +262,9 @@ from paperless_mail.serialisers import MailRuleSerializer
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
+
+if TYPE_CHECKING:
+    from paperless_ai.base_model import TaxonomyChoiceDict
 
 
 logger = logging.getLogger("paperless.api")
@@ -1546,79 +1554,125 @@ class DocumentViewSet(
         )
 
         if cached_llm_suggestions:
+            # Only the raw model choices are cached, never resolved object
+            # ids. resolve_choice() below still runs permission filtering
+            # freshly for this requester on every request, cache hit or not,
+            # so a resolved id cached for one user's visibility can never be
+            # handed unfiltered to a second, less-privileged requester of
+            # the same (backend-keyed, not user-keyed) cache entry.
             refresh_suggestions_cache(doc.pk)
-            return Response(cached_llm_suggestions.suggestions)
+            llm_suggestions = cached_llm_suggestions.suggestions
+        else:
+            try:
+                llm_suggestions = get_ai_document_classification(
+                    doc,
+                    request.user,
+                    output_language,
+                )
+            except ValueError as exc:
+                logger.exception(
+                    "Invalid AI configuration while generating suggestions for "
+                    "document %s: %s",
+                    doc.pk,
+                    exc,
+                    exc_info=True,
+                )
+                raise ValidationError(
+                    {"ai": [_("Invalid AI configuration.")]},
+                ) from exc
+            except LLMTimeoutError as exc:
+                logger.exception(
+                    "AI backend timed out while generating suggestions for "
+                    "document %s: %s",
+                    doc.pk,
+                    exc,
+                    exc_info=True,
+                )
+                return Response(
+                    {"ai": [_("AI backend request timed out.")]},
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                )
+            set_llm_suggestions_cache(
+                doc.pk,
+                llm_suggestions,
+                backend=llm_cache_backend,
+            )
 
-        try:
-            llm_suggestions = get_ai_document_classification(
-                doc,
+        tags_choice: TaxonomyChoiceDict = llm_suggestions["tags"]
+        correspondents_choice: TaxonomyChoiceDict = llm_suggestions["correspondents"]
+        document_types_choice: TaxonomyChoiceDict = llm_suggestions["document_types"]
+        storage_paths_choice: TaxonomyChoiceDict = llm_suggestions["storage_paths"]
+
+        def resolve_choice(
+            choice: "TaxonomyChoiceDict",
+            resolve_ids: Callable[[list[int], User], list],
+            match_names: Callable[[list[str], User], list],
+        ) -> list:
+            """The ids the model picked from the candidates it was shown, plus
+            name matches for the values it proposed as new. The schema allows
+            the same object to satisfy both an existing_id and a new_name in
+            one valid response, so results are deduplicated by pk (keeping
+            first-seen order) rather than trusting the two lookups to be
+            disjoint.
+            """
+            matched = resolve_ids(choice["existing_ids"], request.user) + match_names(
+                choice["new_names"],
                 request.user,
-                output_language,
             )
-        except ValueError as exc:
-            logger.exception(
-                "Invalid AI configuration while generating suggestions for "
-                "document %s: %s",
-                doc.pk,
-                exc,
-                exc_info=True,
-            )
-            raise ValidationError({"ai": [_("Invalid AI configuration.")]}) from exc
-        except LLMTimeoutError as exc:
-            logger.exception(
-                "AI backend timed out while generating suggestions for document %s: %s",
-                doc.pk,
-                exc,
-                exc_info=True,
-            )
-            return Response(
-                {"ai": [_("AI backend request timed out.")]},
-                status=status.HTTP_503_SERVICE_UNAVAILABLE,
-            )
+            seen_ids: set[int] = set()
+            deduped = []
+            for obj in matched:
+                if obj.pk in seen_ids:
+                    continue
+                seen_ids.add(obj.pk)
+                deduped.append(obj)
+            return deduped
 
-        matched_tags = match_tags_by_name(
-            llm_suggestions.get("tags", []),
-            request.user,
+        matched_tags = resolve_choice(
+            tags_choice,
+            resolve_tag_ids,
+            match_tags_by_name,
         )
-        matched_correspondents = match_correspondents_by_name(
-            llm_suggestions.get("correspondents", []),
-            request.user,
+        matched_correspondents = resolve_choice(
+            correspondents_choice,
+            resolve_correspondent_ids,
+            match_correspondents_by_name,
         )
-        matched_types = match_document_types_by_name(
-            llm_suggestions.get("document_types", []),
-            request.user,
+        matched_types = resolve_choice(
+            document_types_choice,
+            resolve_document_type_ids,
+            match_document_types_by_name,
         )
-        matched_paths = match_storage_paths_by_name(
-            llm_suggestions.get("storage_paths", []),
-            request.user,
+        matched_paths = resolve_choice(
+            storage_paths_choice,
+            resolve_storage_path_ids,
+            match_storage_paths_by_name,
         )
 
         resp_data = {
-            "title": llm_suggestions.get("title"),
+            "title": llm_suggestions["title"],
             "tags": [t.id for t in matched_tags],
             "suggested_tags": extract_unmatched_names(
-                llm_suggestions.get("tags", []),
+                tags_choice["new_names"],
                 matched_tags,
             ),
             "correspondents": [c.id for c in matched_correspondents],
             "suggested_correspondents": extract_unmatched_names(
-                llm_suggestions.get("correspondents", []),
+                correspondents_choice["new_names"],
                 matched_correspondents,
             ),
             "document_types": [d.id for d in matched_types],
             "suggested_document_types": extract_unmatched_names(
-                llm_suggestions.get("document_types", []),
+                document_types_choice["new_names"],
                 matched_types,
             ),
             "storage_paths": [s.id for s in matched_paths],
             "suggested_storage_paths": extract_unmatched_names(
-                llm_suggestions.get("storage_paths", []),
+                storage_paths_choice["new_names"],
                 matched_paths,
             ),
-            "dates": llm_suggestions.get("dates", []),
+            "dates": llm_suggestions["dates"],
         }
-
-        set_llm_suggestions_cache(doc.pk, resp_data, backend=llm_cache_backend)
 
         return Response(resp_data)
 
