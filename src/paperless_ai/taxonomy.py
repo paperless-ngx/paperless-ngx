@@ -6,6 +6,7 @@ from typing import TypedDict
 
 from django.contrib.auth.models import User
 from django.db.models import Model
+from django.db.models import Prefetch
 
 from documents.models import Correspondent
 from documents.models import Document
@@ -176,7 +177,9 @@ def build_taxonomy_candidates(
     # full related row just to reach an id already sitting on `neighbour`.
     neighbours = Document.objects.filter(
         pk__in=document_weights.keys(),
-    ).prefetch_related("tags")
+    ).prefetch_related(
+        Prefetch("tags", queryset=Tag.objects.filter(is_inbox_tag=False)),
+    )
 
     tag_weights: dict[int, float] = defaultdict(float)
     document_type_weights: dict[int, float] = defaultdict(float)
