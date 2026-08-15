@@ -6,16 +6,5 @@
         &.show {
             margin-left: -245px !important;
         }
-
-        .list-group {
-            max-height: min(50dvh, 20rem);
-            overflow-y: auto;
-        }
-
-        .list-group-item:first-child {
-            position: sticky;
-            top: 0;
-            z-index: 1;
-        }
     }
 }
