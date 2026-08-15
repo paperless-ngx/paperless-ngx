@@ -776,6 +776,16 @@ canvas.hiddenCanvasElement {
 
 .document-card {
   overflow: hidden;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+  &:hover:not(.card-selected) {
+    border-color: var(--pngx-card-hover-border);
+    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
+  }
+
+  .document-card-check {
+    border-color: var(--pngx-card-hover-border) !important;
+  }
 
   .card-footer i-bs svg {
     vertical-align: middle;
