@@ -64,6 +64,13 @@ $paperless-card-breakpoints: (
   }
 }
 
+// Popper may place a dropdown above its toggle when the virtual keyboard
+// reduces the available viewport. Raise the toolbar while a menu is open so
+// the menu isn't obscured by the fixed navbar.
+:host ::ng-deep .sticky-top:has(.dropdown-menu.show) {
+  z-index: 1040;
+}
+
 @media (max-width: 579.98px) {
   :host-context(main.mobile-search-hidden) .sticky-top {
     top: calc(3.5rem - 2px); // height of navbar only when search is hidden
