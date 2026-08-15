@@ -9,6 +9,5 @@ export function pngxPopperOptions(config: Partial<Options>): Partial<Options> {
       padding: 10,
     }
   }
-
   return config
 }
