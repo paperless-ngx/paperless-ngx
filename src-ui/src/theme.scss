@@ -66,6 +66,17 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   color: var(--pngx-primary-text-contrast);
 }
 
+.dropdown-menu > .list-group-flush:only-child {
+  > .list-group-item:first-child {
+    border-top-left-radius: var(--bs-dropdown-border-radius);
+    border-top-right-radius: var(--bs-dropdown-border-radius);
+  }
+  > .list-group-item:last-child {
+    border-bottom-left-radius: var(--bs-dropdown-border-radius);
+    border-bottom-right-radius: var(--bs-dropdown-border-radius);
+  }
+}
+
 // Dark mode
 @mixin paperless-green-dark-mode {
   --pngx-primary-lightness: 31%;
