@@ -65,8 +65,8 @@ $paperless-card-breakpoints: (
 }
 
 // Popper may place a dropdown above its toggle when the virtual keyboard
-// reduces the available viewport. Raise the toolbar while a menu is open so
-// the menu isn't obscured by the fixed navbar.
+// reduces the available viewport, increase the z-index so navbar doesn't
+// obscure it. See github.com/paperless-ngx/paperless-ngx/pull/13694
 :host ::ng-deep .sticky-top:has(.dropdown-menu.show) {
   z-index: 1040;
 }
