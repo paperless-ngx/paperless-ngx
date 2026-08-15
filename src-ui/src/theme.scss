@@ -251,13 +251,6 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   }
 
   table {
-    .des,
-    .asc {
-      &::after {
-        filter: invert(0.8); /* arrow is a black inline png bkgd image (!) so use filter */
-      }
-    }
-
     &.table-hover > tbody > tr:hover > * {
       background-color: var(--bs-light);
       color: var(--pngx-body-color-accent);
