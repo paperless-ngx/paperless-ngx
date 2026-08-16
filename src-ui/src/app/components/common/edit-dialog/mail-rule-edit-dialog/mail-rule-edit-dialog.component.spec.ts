@@ -2,9 +2,11 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { By } from '@angular/platform-browser'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of } from 'rxjs'
+import { CustomFieldDataType } from 'src/app/data/custom-field'
 import {
   MailAction,
   MailMetadataCorrespondentOption,
@@ -12,6 +14,7 @@ import {
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -68,6 +71,36 @@ describe('MailRuleEditDialogComponent', () => {
             listAll: () => of([]),
           },
         },
+        {
+          provide: CustomFieldsService,
+          useValue: {
+            listAll: () =>
+              of({
+                results: [
+                  {
+                    id: 1,
+                    name: 'Subject Field',
+                    data_type: CustomFieldDataType.String,
+                  },
+                  {
+                    id: 2,
+                    name: 'Date Field',
+                    data_type: CustomFieldDataType.Date,
+                  },
+                  {
+                    id: 3,
+                    name: 'Integer Field',
+                    data_type: CustomFieldDataType.Integer,
+                  },
+                  {
+                    id: 4,
+                    name: 'Monetary Field',
+                    data_type: CustomFieldDataType.Monetary,
+                  },
+                ],
+              }),
+          },
+        },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
@@ -112,5 +145,37 @@ describe('MailRuleEditDialogComponent', () => {
     component.objectForm = null
     expect(component.showCorrespondentField).toBeFalsy()
     expect(component.showActionParamField).toBeFalsy()
+  })
+
+  it('should filter CustomField options by data_type for the mail metadata FK selects', () => {
+    const stringIds = component.stringCustomFieldOptions().map((f) => f.id)
+    const dateIds = component.dateCustomFieldOptions().map((f) => f.id)
+    expect(stringIds).toEqual([1])
+    expect(dateIds).toEqual([2])
+  })
+
+  it('should route each mail metadata select to the correctly filtered CustomField list', () => {
+    fixture.detectChanges()
+    const debugEls = fixture.debugElement.queryAll(By.css('pngx-input-select'))
+    const bindingsByFormControl = Object.fromEntries(
+      debugEls
+        .map((el) => [
+          el.attributes['formControlName'],
+          el.componentInstance.items,
+        ])
+        .filter(([name]) => name)
+    )
+    expect(bindingsByFormControl['assign_subject_to']).toEqual(
+      component.stringCustomFieldOptions()
+    )
+    expect(bindingsByFormControl['assign_sender_to']).toEqual(
+      component.stringCustomFieldOptions()
+    )
+    expect(bindingsByFormControl['assign_recipient_to']).toEqual(
+      component.stringCustomFieldOptions()
+    )
+    expect(bindingsByFormControl['assign_message_date_to']).toEqual(
+      component.dateCustomFieldOptions()
+    )
   })
 })

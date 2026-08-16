@@ -1,4 +1,5 @@
 import dataclasses
+import datetime
 import email.contentmanager
 import time
 import uuid
@@ -27,11 +28,14 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import MatchingModel
 from documents.tests.factories import CorrespondentFactory
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from paperless_mail import tasks
+from paperless_mail.mail import MAIL_METADATA_STRING_TRUNCATE
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.mail import MailError
 from paperless_mail.mail import TagMailAction
@@ -1965,6 +1969,509 @@ class TestMail(
             len(self.mailMocker.bogus_mailbox.fetch("UNSEEN", mark_seen=False)),
             2,
         )  # still 2
+
+    # Attributes on the imap_tools MailMessage that tests are allowed to override
+    # after construction. Kept small so typos in msg_kwargs surface as KeyError
+    # instead of silently creating dead attributes.
+    _MSG_OVERRIDABLE_ATTRS = frozenset(
+        {"date", "date_str", "from_values", "to_values"},
+    )
+
+    def _make_rule_and_message(self, marker, rule_kwargs=None, msg_kwargs=None):
+        """
+        Isolated MailAccount + MailRule filtered on a unique-subject marker.
+        `msg_kwargs` are passed to `create_message` for keys it accepts and
+        applied via `setattr` for the whitelisted overrides only.
+        """
+        assert " " not in marker, (
+            "BogusMailBox.fetch splits the criteria on whitespace, so markers "
+            "with spaces will silently match nothing or everything."
+        )
+        account = MailAccount.objects.create(
+            name=f"acc-{marker}",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        rule = MailRule.objects.create(
+            name=f"rule-{marker}",
+            account=account,
+            action=MailRule.MailAction.DELETE,
+            filter_subject=marker,
+            **(rule_kwargs or {}),
+        )
+        create_kwargs = {
+            "subject": f"{marker} test",
+            "from_": "Vendor Inc <billing@vendor.example>",
+            "to": ["me@example.com"],
+        }
+        create_message_params = {"subject", "from_", "to", "attachments", "body"}
+        post_setattrs = {}
+        for k, v in (msg_kwargs or {}).items():
+            if k in create_message_params:
+                create_kwargs[k] = v
+            elif k in self._MSG_OVERRIDABLE_ATTRS:
+                post_setattrs[k] = v
+            else:
+                raise KeyError(
+                    f"Unknown msg_kwarg {k!r}; add to _MSG_OVERRIDABLE_ATTRS "
+                    "if this is a real MailMessage attribute the test needs to "
+                    "override.",
+                )
+        message = self.mailMocker.messageBuilder.create_message(**create_kwargs)
+        for k, v in post_setattrs.items():
+            setattr(message, k, v)
+        self.mailMocker.bogus_mailbox.messages.append(message)
+        return account, rule, message
+
+    def _overrides_for(self, account):
+        self.mail_account_handler.handle_mail_account(account)
+        mock_ = self.mailMocker._queue_consumption_tasks_mock
+        self.assertEqual(
+            mock_.call_count,
+            1,
+            "expected exactly one message to be consumed",
+        )
+        consume_tasks = mock_.call_args.kwargs["consume_tasks"]
+        self.assertEqual(len(consume_tasks), 1)
+        return consume_tasks[0].kwargs["overrides"]
+
+    def test_email_metadata_writes_nothing_when_no_fk_set(self) -> None:
+        """
+        GIVEN:
+            - A mail rule with none of the assign_*_to FKs pointing at a
+              CustomField (the default)
+        WHEN:
+            - A matching message is consumed
+        THEN:
+            - overrides.custom_fields is empty (no email metadata writes)
+        """
+        account, _, _ = self._make_rule_and_message("no-fk-marker")
+        overrides = self._overrides_for(account)
+        self.assertFalse(overrides.custom_fields)
+
+    def test_email_metadata_writes_only_configured_fks(self) -> None:
+        """
+        GIVEN:
+            - A mail rule that has assign_subject_to and assign_sender_to
+              pointed at CustomFields, but leaves assign_recipient_to and
+              assign_message_date_to null
+        WHEN:
+            - A matching message is consumed
+        THEN:
+            - overrides.custom_fields contains only the two configured fields;
+              recipient and date entries are absent
+        """
+
+        subject_field = CustomField.objects.create(
+            name="my subject field",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        sender_field = CustomField.objects.create(
+            name="my sender field",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        account, _, _ = self._make_rule_and_message(
+            "partial-fk-marker",
+            rule_kwargs={
+                "assign_subject_to": subject_field,
+                "assign_sender_to": sender_field,
+            },
+        )
+
+        overrides = self._overrides_for(account)
+
+        self.assertEqual(
+            set(overrides.custom_fields.keys()),
+            {subject_field.id, sender_field.id},
+        )
+        self.assertEqual(
+            overrides.custom_fields[subject_field.id],
+            "partial-fk-marker test",
+        )
+        self.assertEqual(
+            overrides.custom_fields[sender_field.id],
+            "Vendor Inc <billing@vendor.example>",
+        )
+
+    def test_email_metadata_sender_falls_back_to_bare_address(self) -> None:
+        """
+        GIVEN:
+            - A message whose From: header carries no display name
+        WHEN:
+            - The rule's sender FK is set and a matching message is consumed
+        THEN:
+            - The written value is the raw address, not 'None <addr>' or empty
+        """
+
+        sender_field = CustomField.objects.create(
+            name="Sender",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        account, _, _ = self._make_rule_and_message(
+            "bare-addr-marker",
+            rule_kwargs={"assign_sender_to": sender_field},
+            msg_kwargs={"from_": "bare@example.com"},
+        )
+        overrides = self._overrides_for(account)
+        self.assertEqual(overrides.custom_fields[sender_field.id], "bare@example.com")
+
+    def test_email_metadata_skips_sender_when_from_values_is_none(self) -> None:
+        """
+        GIVEN:
+            - A message with from_values set to None (no parsable From header)
+        WHEN:
+            - The rule's sender FK is set and a matching message is consumed
+        THEN:
+            - The sender FK entry is absent from overrides.custom_fields
+        """
+        sender_field = CustomField.objects.create(
+            name="Sender",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        account, _, _ = self._make_rule_and_message(
+            "none-from-values-marker",
+            rule_kwargs={"assign_sender_to": sender_field},
+            msg_kwargs={"from_values": None},
+        )
+        overrides = self._overrides_for(account)
+        self.assertNotIn(sender_field.id, overrides.custom_fields)
+
+    def test_email_metadata_skips_recipient_when_to_values_is_empty(self) -> None:
+        """
+        GIVEN:
+            - A message with to_values set to an empty tuple
+        WHEN:
+            - The rule's recipient FK is set and a matching message is consumed
+        THEN:
+            - The recipient FK entry is absent from overrides.custom_fields
+        """
+        recipient_field = CustomField.objects.create(
+            name="Recip",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        account, _, _ = self._make_rule_and_message(
+            "empty-to-values-marker",
+            rule_kwargs={"assign_recipient_to": recipient_field},
+            msg_kwargs={"to_values": ()},
+        )
+        overrides = self._overrides_for(account)
+        self.assertNotIn(recipient_field.id, overrides.custom_fields)
+
+    def test_email_metadata_omits_absent_date_header(self) -> None:
+        """
+        GIVEN:
+            - A message with no Date: header (imap_tools substitutes the
+              1900-01-01 sentinel; date_str is empty)
+        WHEN:
+            - The rule's date FK is set and the message is consumed
+        THEN:
+            - The date field is not written: the code must not silently ship
+              the 1900-01-01 sentinel to the CustomField
+        """
+        date_field = CustomField.objects.create(
+            name="Msg Date",
+            data_type=CustomField.FieldDataType.DATE,
+        )
+        account, _, message = self._make_rule_and_message(
+            "no-date-marker",
+            rule_kwargs={"assign_message_date_to": date_field},
+        )
+        # MessageBuilder does not set a Date: header, so this is the real
+        # production shape. Pin it explicitly so the test won't silently drift
+        # if MessageBuilder ever starts adding a default header.
+        self.assertEqual(message.date_str, "")
+        self.assertEqual(message.date, datetime.datetime(1900, 1, 1))
+
+        overrides = self._overrides_for(account)
+        self.assertNotIn(date_field.id, overrides.custom_fields)
+
+    def test_email_metadata_omits_unparsable_date_header(self) -> None:
+        """
+        GIVEN:
+            - A message whose Date: header is present but not parseable
+              (imap_tools substitutes the 1900-01-01 sentinel in that case)
+        WHEN:
+            - The rule's date FK is set and the message is consumed
+        THEN:
+            - The date field is not written, matching the absent-header path;
+              spam and broken MUAs must not silently ship 1900-01-01
+        """
+        date_field = CustomField.objects.create(
+            name="Msg Date",
+            data_type=CustomField.FieldDataType.DATE,
+        )
+        account, _, _ = self._make_rule_and_message(
+            "bad-date-marker",
+            rule_kwargs={"assign_message_date_to": date_field},
+            msg_kwargs={
+                "date_str": "not a real date",
+                "date": datetime.datetime(1900, 1, 1),
+            },
+        )
+
+        overrides = self._overrides_for(account)
+        self.assertNotIn(date_field.id, overrides.custom_fields)
+
+    def test_email_metadata_writes_message_date_from_header(self) -> None:
+        """
+        GIVEN:
+            - A message whose date_str/date carry a parsed Date-header value
+              (constructed directly to keep this a unit test of the write path)
+        WHEN:
+            - The rule's date FK is set and the message is consumed
+        THEN:
+            - overrides.custom_fields carries the parsed calendar date
+              (datetime.date), not a datetime
+        """
+        date_field = CustomField.objects.create(
+            name="Msg Date",
+            data_type=CustomField.FieldDataType.DATE,
+        )
+        account, _, message = self._make_rule_and_message(
+            "written-date-marker",
+            rule_kwargs={"assign_message_date_to": date_field},
+        )
+        message.date_str = "Tue, 03 Jun 2025 09:47:00 +0000"
+        message.date = datetime.datetime(2025, 6, 3, 9, 47, tzinfo=datetime.UTC)
+
+        overrides = self._overrides_for(account)
+        written = overrides.custom_fields[date_field.id]
+        self.assertEqual(written, datetime.date(2025, 6, 3))
+        self.assertNotIsInstance(written, datetime.datetime)
+
+    def test_email_metadata_writes_message_date_in_senders_offset(self) -> None:
+        """
+        GIVEN:
+            - A message dated at 23:30 in a -0800 offset: the same instant is
+              the following calendar day in UTC
+        WHEN:
+            - The rule's date FK is set and the message is consumed
+        THEN:
+            - The written date is the sender-local calendar date, not the UTC
+              date; the code must not silently normalize to server TZ
+        """
+        date_field = CustomField.objects.create(
+            name="Msg Date",
+            data_type=CustomField.FieldDataType.DATE,
+        )
+        account, _, message = self._make_rule_and_message(
+            "sender-tz-marker",
+            rule_kwargs={"assign_message_date_to": date_field},
+        )
+        offset = datetime.timezone(datetime.timedelta(hours=-8))
+        message.date_str = "Tue, 03 Jun 2025 23:30:00 -0800"
+        message.date = datetime.datetime(2025, 6, 3, 23, 30, tzinfo=offset)
+
+        overrides = self._overrides_for(account)
+        self.assertEqual(
+            overrides.custom_fields[date_field.id],
+            datetime.date(2025, 6, 3),
+        )
+
+    def test_email_metadata_joins_multiple_recipients(self) -> None:
+        """
+        GIVEN:
+            - A message with multiple To: addresses, each with display names
+        WHEN:
+            - The rule's recipient FK is set and the message is consumed
+        THEN:
+            - The written value is the ", "-joined full form of every address,
+              in the order the To: header lists them
+        """
+        recipient_field = CustomField.objects.create(
+            name="Recip",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        account, _, _ = self._make_rule_and_message(
+            "multi-recipient-marker",
+            rule_kwargs={"assign_recipient_to": recipient_field},
+            msg_kwargs={
+                "to": ["Alice <alice@example.com>", "Bob <bob@example.com>"],
+            },
+        )
+        overrides = self._overrides_for(account)
+        self.assertEqual(
+            overrides.custom_fields[recipient_field.id],
+            "Alice <alice@example.com>, Bob <bob@example.com>",
+        )
+
+    def test_email_metadata_sender_uses_display_name_composite(self) -> None:
+        """
+        GIVEN:
+            - A message From: header with a display name
+        WHEN:
+            - The rule's sender FK is set and the message is consumed
+        THEN:
+            - The written value is 'Name <addr>', preserving the display name
+        """
+        sender_field = CustomField.objects.create(
+            name="Sender",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        account, _, _ = self._make_rule_and_message(
+            "named-sender-marker",
+            rule_kwargs={"assign_sender_to": sender_field},
+            msg_kwargs={"from_": "Alice Example <alice@example.com>"},
+        )
+        overrides = self._overrides_for(account)
+        self.assertEqual(
+            overrides.custom_fields[sender_field.id],
+            "Alice Example <alice@example.com>",
+        )
+
+    def test_email_metadata_skips_field_after_custom_field_deleted(self) -> None:
+        """
+        GIVEN:
+            - A rule pointed at a CustomField that is then deleted
+        WHEN:
+            - A matching message is consumed
+        THEN:
+            - SET_NULL fires, rule.assign_subject_to_id is falsy, and the
+              write path skips the entry rather than raising or writing
+              against a stale id
+        """
+        field = CustomField.objects.create(
+            name="Doomed",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        account, rule, _ = self._make_rule_and_message(
+            "deleted-fk-marker",
+            rule_kwargs={"assign_subject_to": field},
+        )
+        field.delete()
+        rule.refresh_from_db()
+        self.assertIsNone(rule.assign_subject_to_id)
+
+        overrides = self._overrides_for(account)
+        self.assertFalse(overrides.custom_fields)
+
+    def test_email_metadata_subject_is_truncated(self) -> None:
+        """
+        GIVEN:
+            - A message subject longer than the internal truncation cap
+        WHEN:
+            - The rule's subject FK is set and the message is consumed
+        THEN:
+            - The written value is the head of the subject up to the cap, and
+              fits within the CustomFieldInstance.value_text column
+        """
+        subject_field = CustomField.objects.create(
+            name="Subj",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        long_marker = "trunc-marker"
+        long_subject = long_marker + " " + ("x" * 300)
+        account, _, _ = self._make_rule_and_message(
+            long_marker,
+            rule_kwargs={"assign_subject_to": subject_field},
+            msg_kwargs={"subject": long_subject},
+        )
+        overrides = self._overrides_for(account)
+        written = overrides.custom_fields[subject_field.id]
+        self.assertEqual(written, long_subject[:MAIL_METADATA_STRING_TRUNCATE])
+        column_limit = CustomFieldInstance._meta.get_field("value_text").max_length
+        self.assertLessEqual(len(written), column_limit)
+
+    def test_process_attachments_default_leaves_created_alone(self) -> None:
+        """
+        GIVEN:
+            - A rule with the default assign_created_from=FROM_NOTHING
+        WHEN:
+            - A matching message is consumed
+        THEN:
+            - overrides.created is None (consumer's normal created-date logic
+              runs unchanged)
+        """
+        account, _, _ = self._make_rule_and_message("default-created-marker")
+        overrides = self._overrides_for(account)
+        self.assertIsNone(overrides.created)
+
+    def test_process_attachments_created_uses_message_date_when_opted_in(self) -> None:
+        """
+        GIVEN:
+            - A rule with assign_created_from=FROM_MESSAGE_DATE
+            - A message whose date_str/date carry a parsed Date-header value
+        WHEN:
+            - A matching message is consumed
+        THEN:
+            - overrides.created is a datetime.date (matching the
+              DocumentMetadataOverrides.created annotation) taken from the
+              Date header
+        """
+        account, _, message = self._make_rule_and_message(
+            "opt-in-created-marker",
+            rule_kwargs={
+                "assign_created_from": MailRule.CreatedSource.FROM_MESSAGE_DATE,
+            },
+        )
+        message.date_str = "Tue, 03 Jun 2025 09:47:00 +0000"
+        message.date = datetime.datetime(
+            2025,
+            6,
+            3,
+            9,
+            47,
+            tzinfo=datetime.UTC,
+        )
+
+        overrides = self._overrides_for(account)
+        self.assertEqual(overrides.created, datetime.date(2025, 6, 3))
+        self.assertNotIsInstance(overrides.created, datetime.datetime)
+
+    def test_process_attachments_created_left_alone_when_date_header_absent(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A rule with assign_created_from=FROM_MESSAGE_DATE
+            - A message with no Date: header (imap_tools sentinel case)
+        WHEN:
+            - A matching message is consumed
+        THEN:
+            - overrides.created is None so the consumer keeps its default
+              behavior; the 1900-01-01 sentinel is never written
+        """
+        account, _, message = self._make_rule_and_message(
+            "opt-in-no-date-marker",
+            rule_kwargs={
+                "assign_created_from": MailRule.CreatedSource.FROM_MESSAGE_DATE,
+            },
+        )
+        self.assertEqual(message.date_str, "")
+        overrides = self._overrides_for(account)
+        self.assertIsNone(overrides.created)
+
+    def test_email_metadata_also_applies_on_eml_consumption_scope(self) -> None:
+        """
+        GIVEN:
+            - A rule with consumption_scope=EML_ONLY and assign_subject_to set
+        WHEN:
+            - A matching message is processed (the .eml body itself is consumed
+              via _process_eml rather than _process_attachments)
+        THEN:
+            - overrides.custom_fields still carries the subject value, so the
+              two consume paths behave the same
+        """
+
+        subject_field = CustomField.objects.create(
+            name="EmlSubject",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        account, _, _ = self._make_rule_and_message(
+            "eml-scope-marker",
+            rule_kwargs={
+                "assign_subject_to": subject_field,
+                "consumption_scope": MailRule.ConsumptionScope.EML_ONLY,
+            },
+            msg_kwargs={"attachments": 0},
+        )
+
+        overrides = self._overrides_for(account)
+        self.assertEqual(
+            overrides.custom_fields[subject_field.id],
+            "eml-scope-marker test",
+        )
 
 
 class TestPostConsumeAction(TestCase):

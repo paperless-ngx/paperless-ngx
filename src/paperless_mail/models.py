@@ -140,6 +140,10 @@ class MailRule(document_models.ModelWithOwner):
         FROM_NAME = 3, _("Use name (or mail address if not available)")
         FROM_CUSTOM = 4, _("Use correspondent selected below")
 
+    class CreatedSource(models.IntegerChoices):
+        FROM_NOTHING = 1, _("Document (extracted date or import time)")
+        FROM_MESSAGE_DATE = 2, _("Email's Date header")
+
     name = models.CharField(_("name"), max_length=256)
 
     order = models.SmallIntegerField(_("order"), default=0)
@@ -307,6 +311,58 @@ class MailRule(document_models.ModelWithOwner):
         help_text=_(
             "If True, no further rules will be processed after this one if any document is queued.",
         ),
+    )
+
+    assign_created_from = models.PositiveSmallIntegerField(
+        _("Created date source"),
+        choices=CreatedSource.choices,
+        default=CreatedSource.FROM_NOTHING,
+    )
+
+    assign_subject_to = models.ForeignKey(
+        document_models.CustomField,
+        related_name="+",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        limit_choices_to={
+            "data_type": document_models.CustomField.FieldDataType.STRING,
+        },
+        verbose_name=_("assign email subject to custom field"),
+    )
+
+    assign_sender_to = models.ForeignKey(
+        document_models.CustomField,
+        related_name="+",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        limit_choices_to={
+            "data_type": document_models.CustomField.FieldDataType.STRING,
+        },
+        verbose_name=_("assign email sender to custom field"),
+    )
+
+    assign_recipient_to = models.ForeignKey(
+        document_models.CustomField,
+        related_name="+",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        limit_choices_to={
+            "data_type": document_models.CustomField.FieldDataType.STRING,
+        },
+        verbose_name=_("assign email recipient to custom field"),
+    )
+
+    assign_message_date_to = models.ForeignKey(
+        document_models.CustomField,
+        related_name="+",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        limit_choices_to={"data_type": document_models.CustomField.FieldDataType.DATE},
+        verbose_name=_("assign email message date to custom field"),
     )
 
     def __str__(self):
