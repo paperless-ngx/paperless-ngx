@@ -762,6 +762,7 @@ export class BulkEditorComponent
         this.tagSelectionModel.items = flattenTags(tags.results)
         this.tagSelectionModel.toggle(newTag.id)
       })
+    return modal
   }
 
   createCorrespondent(name: string) {
@@ -785,6 +786,7 @@ export class BulkEditorComponent
         this.correspondentSelectionModel.items = correspondents.results
         this.correspondentSelectionModel.toggle(newCorrespondent.id)
       })
+    return modal
   }
 
   createDocumentType(name: string) {
@@ -806,6 +808,7 @@ export class BulkEditorComponent
         this.documentTypeSelectionModel.items = documentTypes.results
         this.documentTypeSelectionModel.toggle(newDocumentType.id)
       })
+    return modal
   }
 
   createStoragePath(name: string) {
@@ -827,6 +830,7 @@ export class BulkEditorComponent
         this.storagePathsSelectionModel.items = storagePaths.results
         this.storagePathsSelectionModel.toggle(newStoragePath.id)
       })
+    return modal
   }
 
   createCustomField(name: string) {
@@ -848,6 +852,7 @@ export class BulkEditorComponent
         this.customFieldsSelectionModel.items = customFields.results
         this.customFieldsSelectionModel.toggle(newCustomField.id)
       })
+    return modal
   }
 
   applyDelete() {

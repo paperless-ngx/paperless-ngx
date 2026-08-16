@@ -15,9 +15,13 @@ import {
   signal,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
+import {
+  NgbDropdown,
+  NgbDropdownModule,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { Subject, filter, takeUntil } from 'rxjs'
+import { Subject, filter, first, merge, takeUntil } from 'rxjs'
 import { NEGATIVE_NULL_FILTER_VALUE } from 'src/app/data/filter-rule-type'
 import { MatchingModel } from 'src/app/data/matching-model'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
@@ -759,7 +763,7 @@ export class FilterableDropdownComponent
   disabled = false
 
   @Input()
-  createRef: (name) => void
+  createRef: (name: string) => NgbModalRef
 
   @Input()
   set documentCounts(counts: SelectionDataItem[]) {
@@ -777,7 +781,7 @@ export class FilterableDropdownComponent
   @Input()
   showExtraButtonIfEmpty: boolean = false
 
-  creating: boolean = false
+  readonly creating = signal(false)
 
   @Output()
   apply = new EventEmitter<ChangedItems>()
@@ -854,12 +858,18 @@ export class FilterableDropdownComponent
   }
 
   createClicked() {
-    this.creating = true
-    this.createRef(this.filterText)
+    this.creating.set(true)
+    const modal = this.createRef(this.filterText)
+    merge(modal.closed, modal.dismissed)
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => this.creating.set(false))
   }
 
   dropdownOpenChange(open: boolean): void {
     if (open) {
+      // Dont let a create modal close this
+      if (this.creating()) return
+
       setTimeout(() => {
         this.listFilterTextInput?.nativeElement.focus()
         this.buttonsViewport?.checkViewportSize()
@@ -872,9 +882,8 @@ export class FilterableDropdownComponent
         this.editing && !this.selectionModel.manyToOne
       this.opened.next(this)
     } else {
-      if (this.creating) {
+      if (this.creating()) {
         this.dropdown?.open()
-        this.creating = false
       } else {
         this.filterText = ''
         if (this.applyOnClose && this.selectionModel.isDirty()) {
