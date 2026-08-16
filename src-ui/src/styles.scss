@@ -127,6 +127,28 @@ table .btn-link {
   background-color: var(--bs-body-bg);
 }
 
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-weight: 600;
+  letter-spacing: -0.021em;
+}
+
+pngx-page-header h3 {
+  font-size: 1.5rem;
+}
+
+table,
+.badge,
+.card-info,
+.pagination {
+  font-variant-numeric: tabular-nums;
+}
+
 .bg-primary {
   background-color: var(--bs-primary) !important;
   color: var(--pngx-primary-text-contrast);
