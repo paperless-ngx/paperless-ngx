@@ -19,6 +19,11 @@
     height: 0.8em;
   }
 
+  .sidebar-heading,
+  .text-uppercase {
+    letter-spacing: 0.06em;
+  }
+
   .view-name {
     max-width: calc(100% - 50px)
   }
