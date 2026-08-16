@@ -127,6 +127,28 @@ table .btn-link {
   background-color: var(--bs-body-bg);
 }
 
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-weight: 600;
+  letter-spacing: -0.021em;
+}
+
+pngx-page-header h3 {
+  font-size: 1.5rem;
+}
+
+table,
+.badge,
+.card-info,
+.pagination {
+  font-variant-numeric: tabular-nums;
+}
+
 .bg-primary {
   background-color: var(--bs-primary) !important;
   color: var(--pngx-primary-text-contrast);
@@ -213,7 +235,8 @@ table .btn-link {
 }
 
 .form-switch .form-check-input:focus {
-  background-image: escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#bbb'/></svg>"));
+  // neutral knob in place of bootstrap's blue, which clashes with the theme colour
+  --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23bbb'/%3e%3c/svg%3e");
 }
 
 .nav-item a:focus-visible {
@@ -269,33 +292,44 @@ a.btn-link:focus-visible,
   box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
 }
 
-.asc {
-  background-color: #f8f9fa!important;
+// Sortable table headers
+th[pngxSortable] {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  &::after {
+    content: '';
+    display: inline-block;
+    vertical-align: -0.15em;
+    width: 0.8rem;
+    height: 0.8rem;
+    margin-left: 0.25rem;
+    // chevron, matched to the bootstrap-icons set used elsewhere in the app
+    mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") no-repeat center / 0.8rem;
+    background-color: currentColor;
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+  }
+
+  // hint that an unsorted column can be sorted
+  &:hover::after {
+    opacity: 0.35;
+  }
 }
 
-.asc:after {
-  content: '';
-  transform: rotate(180deg);
-  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAmxJREFUeAHtmksrRVEUx72fH8CIGQNJkpGUUmakDEiZSJRIZsRQmCkTJRmZmJgQE0kpX0D5DJKJgff7v+ru2u3O3vvc67TOvsdatdrnnP1Y///v7HvvubdbUiIhBISAEBACQkAICAEhIAQ4CXSh2DnyDfmCPEG2Iv9F9MPlM/LHyAecdyMzHYNwR3fdNK/OH9HXl1UCozD24TCvILxizEDWIEzA0FcM8woCgRrJCoS5PIwrANQSMAJX1LEI9bqpQo4JYNFFKRSvIgsxHDVnqZgIkPnNBM0rIGtYk9YOOsqgbgepRCfdbmFtqhFkVEDVPjJp0+Z6e6hRHhqBKgg6ZDCvYBygVmUoEGoh5JTRvIJwhJo1aUOoh4CLPMyvxxi7EWOMgnCGsXXI1GIXlZUYX7ucU+kbR8NW8lh3O7cue0Pk32MKndfUxQFAwxdirk3fHappAnc0oqDPzDfGTBrCfHP04dM4oTV8cxr0SVzH9FF07xD3ib6xCDE+M+aUcVygtWzzbtGX2rPBrEUYfecfQkaFzYi6HjVnGBdtL7epqAlc1+jRdAap74RrnPc4BCijttY2tRcdN0g17w7HqZrXhdJTYAuS3hd8z+vKgK3V1zWPae0mZDMykadBn1hTQBLnZNwVrJpSe/NwEeDsEwCctEOsJTsgxLvCqUl2ACftEGvJDgjxrnBqkh3ASTvEWrIDQrwrnJpkB3DSDrGW7IAQ7wqnJtkBnLRztejXXVu4+mxz/nQ9jR1w5VB86ejLTFcnnDwhzV+F6T+CHZlx6THSjn76eyyBIOPHyDakhBAQAkJACAgBISAEhIAQYCLwC8JxpAmsEGt6AAAAAElFTkSuQmCC") no-repeat;
-  height: 1rem;
-  width: 1rem;
-  display: block;
-  background-size: 1rem;
-  float: right;
-}
-
+.asc,
 .des {
-  background-color: #f8f9fa!important;
+  color: var(--bs-primary);
+  --bs-table-color-state: var(--bs-primary); // bootstrap sets cell color at higher specificity
+
+  &::after {
+    opacity: 1 !important;
+  }
 }
 
-.des:after {
-  content: '';
-  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAmxJREFUeAHtmksrRVEUx72fH8CIGQNJkpGUUmakDEiZSJRIZsRQmCkTJRmZmJgQE0kpX0D5DJKJgff7v+ru2u3O3vvc67TOvsdatdrnnP1Y///v7HvvubdbUiIhBISAEBACQkAICAEhIAQ4CXSh2DnyDfmCPEG2Iv9F9MPlM/LHyAecdyMzHYNwR3fdNK/OH9HXl1UCozD24TCvILxizEDWIEzA0FcM8woCgRrJCoS5PIwrANQSMAJX1LEI9bqpQo4JYNFFKRSvIgsxHDVnqZgIkPnNBM0rIGtYk9YOOsqgbgepRCfdbmFtqhFkVEDVPjJp0+Z6e6hRHhqBKgg6ZDCvYBygVmUoEGoh5JTRvIJwhJo1aUOoh4CLPMyvxxi7EWOMgnCGsXXI1GIXlZUYX7ucU+kbR8NW8lh3O7cue0Pk32MKndfUxQFAwxdirk3fHappAnc0oqDPzDfGTBrCfHP04dM4oTV8cxr0SVzH9FF07xD3ib6xCDE+M+aUcVygtWzzbtGX2rPBrEUYfecfQkaFzYi6HjVnGBdtL7epqAlc1+jRdAap74RrnPc4BCijttY2tRcdN0g17w7HqZrXhdJTYAuS3hd8z+vKgK3V1zWPae0mZDMykadBn1hTQBLnZNwVrJpSe/NwEeDsEwCctEOsJTsgxLvCqUl2ACftEGvJDgjxrnBqkh3ASTvEWrIDQrwrnJpkB3DSDrGW7IAQ7wqnJtkBnLRztejXXVu4+mxz/nQ9jR1w5VB86ejLTFcnnDwhzV+F6T+CHZlx6THSjn76eyyBIOPHyDakhBAQAkJACAgBISAEhIAQYCLwC8JxpAmsEGt6AAAAAElFTkSuQmCC") no-repeat;
-  height: 1rem;
-  width: 1rem;
-  display: block;
-  background-size: 1rem;
-  float: right;
+.asc::after {
+  transform: rotate(180deg);
 }
 
 .paperless-input-select {
@@ -564,10 +598,6 @@ ul.pagination {
 table.table {
   --bs-table-color: var(--bs-body-color);
   --bs-table-bg: var(--bs-light-rgb);
-
-  .des,.asc {
-    background-color: var(--bs-body-bg) !important;
-  }
 }
 
 .close {
@@ -776,6 +806,16 @@ canvas.hiddenCanvasElement {
 
 .document-card {
   overflow: hidden;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+  &:hover:not(.card-selected) {
+    border-color: var(--pngx-card-hover-border);
+    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
+  }
+
+  .document-card-check {
+    border-color: var(--pngx-card-hover-border) !important;
+  }
 
   .card-footer i-bs svg {
     vertical-align: middle;
