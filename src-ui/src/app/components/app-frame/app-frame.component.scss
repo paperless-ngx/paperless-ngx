@@ -81,7 +81,7 @@ main {
 
 .sidebar li.nav-item span,
 .sidebar .sidebar-heading span {
-  transition: all .1s ease;
+  transition: opacity .1s ease;
 }
 
 @media(min-width: 768px) {
@@ -181,6 +181,8 @@ main {
 .sidebar .nav-link {
   font-weight: 500;
   white-space: nowrap;
+  border-left: 2px solid transparent;
+  transition: color .15s ease-in-out;
 
   &:hover, &.active, &:focus {
     color: var(--bs-primary);
@@ -193,12 +195,24 @@ main {
 
   &.active {
     font-weight: bold;
+    border-left-color: var(--bs-primary);
   }
 
   i-bs {
     position: relative;
     top: -1px;
   }
+}
+
+// sub-page gets marker only
+.nav-item:has(.attributes-submenu.show .nav-link.active) > .attributes-row > .nav-link.active {
+  border-left-color: transparent;
+}
+
+// bring sub-menu markers back out to L edge
+.attributes-submenu .nav-link {
+  margin-left: -0.5rem;
+  padding-left: calc(var(--bs-nav-link-padding-x) + 0.5rem);
 }
 
 .attributes-row .attributes-expand-btn {
