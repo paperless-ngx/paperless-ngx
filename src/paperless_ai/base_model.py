@@ -24,9 +24,11 @@ def _truncate_to_field_limit(value: Any, field: FieldInfo) -> Any:
         (m.max_length for m in field.metadata if hasattr(m, "max_length")),
         None,
     )
-    if limit is None or not isinstance(value, (list, str)):
-        return value
-    return value[:limit]
+    return (
+        value
+        if (limit is None or not isinstance(value, (list, str)))
+        else value[:limit]
+    )
 
 
 class TaxonomyChoice(BaseModel):
