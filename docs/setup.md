@@ -416,22 +416,15 @@ to a positive number to enable polling and disable native filesystem notificatio
         You may need to change the path in the files. Example:
         `ExecStart=/opt/paperless/.local/bin/celery --app paperless worker --loglevel INFO`
 
-12. Configure ImageMagick to allow processing of PDF documents. Most
-    distributions have this disabled by default, since PDF documents can
-    contain malware. If you don't do this, Paperless-ngx will fall back to
-    Ghostscript for certain steps such as thumbnail generation.
+12. Configure ImageMagick to allow processing of PDF documents and disable
+    formats that Paperless-ngx does not use. Most distributions disable PDF
+    processing by default, since PDF documents can contain malware. If you
+    don't enable it, Paperless-ngx will fall back to Ghostscript for certain
+    steps such as thumbnail generation.
 
-    Edit `/etc/ImageMagick-6/policy.xml` and adjust
-
-    ```
-    <policy domain="coder" rights="none" pattern="PDF" />
-    ```
-
-    to
-
-    ```
-    <policy domain="coder" rights="read|write" pattern="PDF" />
-    ```
+    Configure the active ImageMagick policy file (commonly
+    `/etc/ImageMagick-6/policy.xml` or `/etc/ImageMagick-7/policy.xml`) and
+    adjust similar to [the docker policy file](https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/refs/heads/main/docker/rootfs/etc/ImageMagick-6/paperless-policy.xml). You should also include restrictions as noted there.
 
 **Optional: Install the [jbig2enc](https://ocrmypdf.readthedocs.io/en/latest/jbig2.html) encoder.**
 This will reduce the size of generated PDF documents. You'll most likely need to compile this yourself, because this
