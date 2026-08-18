@@ -389,7 +389,7 @@ git commit -m "Add HybridRetriever: lexical fallback for archive AI chat retriev
 
 **Files:**
 
-- Modify: `src/paperless_ai/chat.py:95-112`
+- Modify: `src/paperless_ai/chat.py:149-177`
 - Modify: `src/paperless_ai/tests/test_chat.py`
 
 **Interfaces:**
@@ -436,7 +436,7 @@ Expected: FAIL — `HybridRetriever` is never constructed yet (`chat.py` still b
 
 - [ ] **Step 3: Wire `HybridRetriever` into `_stream_chat_with_documents`**
 
-In `src/paperless_ai/chat.py`, inside `_stream_chat_with_documents` (currently lines 95-112), add the `HybridRetriever` import alongside the other lazy llama-index imports and replace the retriever construction:
+In `src/paperless_ai/chat.py`, inside `_stream_chat_with_documents` (currently lines 149-177), add the `HybridRetriever` import alongside the other lazy llama-index imports and replace the retriever construction:
 
 ```python
     from llama_index.core.prompts import PromptTemplate

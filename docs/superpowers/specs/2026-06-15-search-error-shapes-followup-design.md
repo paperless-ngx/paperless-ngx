@@ -6,7 +6,7 @@
 `docs/superpowers/done/specs/2026-06-14-search-query-translation-design.md`.
 **Builds on:** the `SearchQueryError(ValueError)` base in
 `documents/search/_translate.py` and the single `except SearchQueryError` handler
-in `UnifiedSearchViewSet.list` (`documents/views.py:2477`), which re-raises as DRF
+in `UnifiedSearchViewSet.list` (`documents/views.py:2612`), which re-raises as DRF
 `ValidationError({"query": [msg]})`. Any new subclass surfaces through that one
 handler automatically, so this work is purely additive.
 
@@ -15,7 +15,7 @@ handler automatically, so this work is purely additive.
 Every advanced-search failure other than the now-handled invalid date lands in
 the view's generic `except Exception` and returns
 `HttpResponseBadRequest("Error listing search results, check logs for more
-detail.")` (`views.py:2479-2482`). `index.parse_query(...)` runs _outside_ the
+detail.")` (`views.py:2617-2621`). `index.parse_query(...)` runs _outside_ the
 `translate_query` try/except in `parse_user_query` (`_query.py:220-235`), so
 anything Tantivy rejects bypasses `SearchQueryError` entirely and gets the
 unhelpful generic 400. Some Tantivy errors also leak Rust internals (e.g.

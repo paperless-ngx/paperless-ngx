@@ -24,7 +24,7 @@ hard-to-fix bugs (see the revert/refix history around password removal: #12803,
    `DOCUMENT_ADDED` workflow fires from `run_workflows_added`, which runs while
    the consumer is still inside its transaction — _before_ the consumed file is
    copied to `document.source_path` (`document_consumption_finished` is sent at
-   `consumer.py:658`; the file copy happens after, at `consumer.py:670+`). The
+   `consumer.py:654`; the file copy happens after, at `consumer.py:666+`). The
    staged path is therefore threaded through as `original_file` /
    `caller_supplied_original_file` parameters. Actions that read the file
    (password removal, email attachments) depend on this plumbing being correct.
