@@ -4,7 +4,7 @@ on:
     branches:
       - dev
 env:
-  DEFAULT_UV_VERSION: "0.11.x"
+  DEFAULT_UV_VERSION: "0.12.x"
 jobs:
   generate-translate-strings:
     name: Generate Translation Strings
