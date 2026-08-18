@@ -74,36 +74,30 @@ def handle_social_account_updated(sender, request, sociallogin, **kwargs):
         )
         sociallogin.user.groups.set(groups, clear=True)
 
-    user_modified = False
-    if (
-        settings.SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP
-        and social_account_groups is not None
-    ):
+    modified_fields = []
+    if settings.SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP:
         is_superuser = (
             settings.SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP in social_account_groups
         )
         if sociallogin.user.is_superuser != is_superuser:
             sociallogin.user.is_superuser = is_superuser
-            user_modified = True
+            modified_fields.append("is_superuser")
 
-    if settings.SOCIAL_ACCOUNT_SYNC_STAFF_GROUP and social_account_groups is not None:
+    if settings.SOCIAL_ACCOUNT_SYNC_STAFF_GROUP:
         is_staff = (
             settings.SOCIAL_ACCOUNT_SYNC_STAFF_GROUP in social_account_groups
         ) or sociallogin.user.is_superuser
         if sociallogin.user.is_staff != is_staff:
             sociallogin.user.is_staff = is_staff
-            user_modified = True
-    elif (
-        settings.SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP
-        and social_account_groups is not None
-    ):
+            modified_fields.append("is_staff")
+    elif settings.SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP:
         is_staff = sociallogin.user.is_superuser or sociallogin.user.is_staff
         if sociallogin.user.is_staff != is_staff:
             sociallogin.user.is_staff = is_staff
-            user_modified = True
+            modified_fields.append("is_staff")
 
-    if user_modified:
+    if modified_fields:
         logger.debug(
             f"Syncing roles for user `{sociallogin.user}`: superuser={sociallogin.user.is_superuser}, staff={sociallogin.user.is_staff}",
         )
-        sociallogin.user.save(update_fields=["is_superuser", "is_staff"])
+        sociallogin.user.save(update_fields=modified_fields)
