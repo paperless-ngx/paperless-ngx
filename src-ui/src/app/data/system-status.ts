@@ -47,6 +47,9 @@ export interface SystemStatus {
     llmindex_status: SystemStatusItemStatus
     llmindex_last_modified: string // ISO date string
     llmindex_error: string
+    export_status: SystemStatusItemStatus
+    export_last_failure: string // ISO date string
+    export_error: string
     summary: {
       days: number
       total_count: number

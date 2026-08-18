@@ -12,6 +12,7 @@ import { DocumentAsnComponent } from './components/document-asn/document-asn.com
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component'
 import { DocumentListComponent } from './components/document-list/document-list.component'
 import { DocumentAttributesComponent } from './components/manage/document-attributes/document-attributes.component'
+import { ExportTargetsComponent } from './components/manage/export-targets/export-targets.component'
 import { MailComponent } from './components/manage/mail/mail.component'
 import { SavedViewsComponent } from './components/manage/saved-views/saved-views.component'
 import { WorkflowsComponent } from './components/manage/workflows/workflows.component'
@@ -284,6 +285,18 @@ export const routes: Routes = [
             type: PermissionType.MailAccount,
           },
           componentName: 'MailComponent',
+        },
+      },
+      {
+        path: 'exporttargets',
+        component: ExportTargetsComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.ExportTarget,
+          },
+          componentName: 'ExportTargetsComponent',
         },
       },
       {

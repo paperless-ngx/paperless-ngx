@@ -316,6 +316,27 @@
                   }
                 </ng-template>
               }
+              @if (status().tasks.export_status && status().tasks.export_status !== SystemStatusItemStatus.DISABLED) {
+                <dt i18n>Exports</dt>
+                <dd class="d-flex align-items-center">
+                  <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="exportStatus" triggers="click mouseenter:mouseleave">
+                    {{status().tasks.export_status}}
+                    @if (status().tasks.export_status === 'OK') {
+                      <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
+                    } @else {
+                      <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
+                    }
+                  </button>
+                </dd>
+                <ng-template #exportStatus>
+                  @if (status().tasks.export_status === 'OK') {
+                    <span i18n>No export has failed in the last {{status().tasks.summary.days}} days.</span>
+                  } @else {
+                    <h6><ng-container i18n>Last Failure</ng-container>:</h6> <span class="font-monospace small">{{status().tasks.export_last_failure | customDate:'medium'}}</span>
+                    <h6><ng-container i18n>Error</ng-container>:</h6> <span class="font-monospace small">{{status().tasks.export_error}}</span>
+                  }
+                </ng-template>
+              }
             </dl>
           </div>
         </div>

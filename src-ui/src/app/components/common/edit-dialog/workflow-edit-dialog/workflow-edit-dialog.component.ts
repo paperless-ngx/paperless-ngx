@@ -20,6 +20,7 @@ import { Subscription, map, takeUntil } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentType } from 'src/app/data/document-type'
+import { ExportTarget } from 'src/app/data/export-target'
 import { MailRule } from 'src/app/data/mail-rule'
 import {
   MATCHING_ALGORITHMS,
@@ -30,6 +31,8 @@ import { StoragePath } from 'src/app/data/storage-path'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { Workflow } from 'src/app/data/workflow'
 import {
+  EXPORT_CONFLICT_POLICY_OPTIONS,
+  ExportConflictPolicy,
   WorkflowAction,
   WorkflowActionType,
 } from 'src/app/data/workflow-action'
@@ -42,6 +45,7 @@ import {
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
+import { ExportTargetService } from 'src/app/services/rest/export-target.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { UserService } from 'src/app/services/rest/user.service'
@@ -147,6 +151,10 @@ export const WORKFLOW_ACTION_OPTIONS = [
   {
     id: WorkflowActionType.MoveToTrash,
     name: $localize`Move to trash`,
+  },
+  {
+    id: WorkflowActionType.Export,
+    name: $localize`Export`,
   },
 ]
 
@@ -476,6 +484,7 @@ export class WorkflowEditDialogComponent
   private readonly storagePathService = inject(StoragePathService)
   private readonly mailRuleService = inject(MailRuleService)
   private readonly customFieldsService = inject(CustomFieldsService)
+  private readonly exportTargetService = inject(ExportTargetService)
 
   readonly templates = signal<Workflow[]>(undefined)
   readonly correspondents = toSignal(
@@ -497,6 +506,10 @@ export class WorkflowEditDialogComponent
   readonly customFields = toSignal(
     this.customFieldsService.listAll().pipe(map((result) => result.results)),
     { initialValue: undefined as CustomField[] }
+  )
+  readonly exportTargets = toSignal(
+    this.exportTargetService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as ExportTarget[] }
   )
   readonly dateCustomFields = computed(() =>
     this.customFields()?.filter((f) => f.data_type === CustomFieldDataType.Date)
@@ -1195,6 +1208,21 @@ export class WorkflowEditDialogComponent
           headers: new FormControl(action.webhook?.headers),
           include_document: new FormControl(!!action.webhook?.include_document),
         }),
+        export: new FormGroup({
+          id: new FormControl(action.export?.id),
+          target: new FormControl(action.export?.target),
+          include_original: new FormControl(
+            action.export?.include_original ?? true
+          ),
+          include_archive: new FormControl(!!action.export?.include_archive),
+          write_metadata_sidecar: new FormControl(
+            action.export?.write_metadata_sidecar ?? true
+          ),
+          path: new FormControl(action.export?.path ?? ''),
+          on_conflict: new FormControl(
+            action.export?.on_conflict ?? ExportConflictPolicy.Overwrite
+          ),
+        }),
         passwords: new FormControl(
           this.formatPasswords(action.passwords ?? [])
         ),
@@ -1235,6 +1263,10 @@ export class WorkflowEditDialogComponent
 
   get scheduleDateFieldOptions() {
     return SCHEDULE_DATE_FIELD_OPTIONS
+  }
+
+  get exportConflictPolicyOptions() {
+    return EXPORT_CONFLICT_POLICY_OPTIONS
   }
 
   getTriggerTypeOptionName(type: WorkflowTriggerType): string {
@@ -1279,11 +1311,24 @@ export class WorkflowEditDialogComponent
 
   get actionTypeOptions() {
     this.settingsService.trackChanges()
-    return this.allowedActionTypes()
+    // Export actions cannot run for consumption triggers: the document has
+    // no stored file or id yet. The serializer rejects the combination, so
+    // remove the option here as well.
+    const hasConsumptionTrigger = (
+      this.objectForm.get('triggers') as FormArray
+    ).controls.some(
+      (control) =>
+        control.get('type')?.value === WorkflowTriggerType.Consumption
+    )
+    return hasConsumptionTrigger
+      ? this.allowedActionTypes().filter(
+          (option) => option.id !== WorkflowActionType.Export
+        )
+      : this.allowedActionTypes()
   }
 
   getActionTypeOptionName(type: WorkflowActionType): string {
-    return this.actionTypeOptions.find((t) => t.id === type)?.name ?? ''
+    return WORKFLOW_ACTION_OPTIONS.find((t) => t.id === type)?.name ?? ''
   }
 
   addAction() {
@@ -1338,6 +1383,15 @@ export class WorkflowEditDialogComponent
         headers: null,
         include_document: false,
       },
+      export: {
+        id: null,
+        target: null,
+        include_original: true,
+        include_archive: false,
+        write_metadata_sidecar: true,
+        path: '',
+        on_conflict: ExportConflictPolicy.Overwrite,
+      },
       passwords: [],
     }
     this.object.actions.push(action)
@@ -1374,6 +1428,9 @@ export class WorkflowEditDialogComponent
         }
         if (action.type !== WorkflowActionType.Email) {
           action.email = null
+        }
+        if (action.type !== WorkflowActionType.Export) {
+          action.export = null
         }
         action.passwords = this.parsePasswords(action.passwords as any)
       })

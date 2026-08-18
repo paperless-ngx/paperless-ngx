@@ -24,6 +24,7 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { PermissionsService } from 'src/app/services/permissions.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
@@ -655,6 +656,145 @@ describe('TasksComponent', () => {
     component.dismissTasks()
 
     expect(dismissSpy).toHaveBeenCalledWith(new Set([461]))
+  })
+
+  const failedExportTask: PaperlessTask = {
+    id: 500,
+    task_id: '5f81a5b1-9f81-442c-b2c8-7e4ae53657f2',
+    input_data: { record_id: 2, document_id: 12, target: 'S3' },
+    date_created: new Date('2026-08-18T11:54:16Z'),
+    date_done: new Date('2026-08-18T11:55:27Z'),
+    task_type: PaperlessTaskType.ExportDocument,
+    task_type_display: 'Export Document',
+    trigger_source: PaperlessTaskTriggerSource.System,
+    trigger_source_display: 'System',
+    status: PaperlessTaskStatus.Failure,
+    status_display: 'Failure',
+    result_data: { error_message: 'Could not connect to the endpoint URL' },
+    acknowledged: false,
+    related_document_ids: [12],
+  }
+
+  it('should offer retry only for failed export tasks with record info', () => {
+    expect(component.canRetryExport(failedExportTask)).toBeTruthy()
+    // failed consume task
+    expect(component.canRetryExport(tasks[0])).toBeFalsy()
+    // export task that did not fail
+    expect(
+      component.canRetryExport({
+        ...failedExportTask,
+        status: PaperlessTaskStatus.Success,
+      })
+    ).toBeFalsy()
+    // export task published without record info
+    expect(
+      component.canRetryExport({ ...failedExportTask, input_data: {} })
+    ).toBeFalsy()
+  })
+
+  it('should retry a failed export and dismiss its task', () => {
+    const documentService = TestBed.inject(DocumentService)
+    const retrySpy = jest
+      .spyOn(documentService, 'retryExport')
+      .mockReturnValue(of({} as any))
+    const dismissSpy = jest
+      .spyOn(tasksService, 'dismissTasks')
+      .mockReturnValue(of({}))
+    const reloadPageSpy = jest
+      .spyOn(component as any, 'reloadPage')
+      .mockImplementation(() => undefined)
+    const toastSpy = jest.spyOn(toastService, 'showInfo')
+
+    component.retryExport(failedExportTask)
+
+    expect(retrySpy).toHaveBeenCalledWith(12, 2)
+    expect(toastSpy).toHaveBeenCalled()
+    expect(dismissSpy).toHaveBeenCalledWith(new Set([500]))
+    expect(reloadPageSpy).toHaveBeenCalledWith(false)
+    expect(component.retryingTaskId).toBeNull()
+  })
+
+  it('should retry all selected retryable export tasks and dismiss them', () => {
+    const secondExportTask: PaperlessTask = {
+      ...failedExportTask,
+      id: 501,
+      task_id: '6f81a5b1-9f81-442c-b2c8-7e4ae53657f3',
+      input_data: { record_id: 3, document_id: 13, target: 'S3' },
+    }
+    jest
+      .spyOn(component, 'retryableSelectedTasks', 'get')
+      .mockReturnValue([failedExportTask, secondExportTask])
+    const documentService = TestBed.inject(DocumentService)
+    const retrySpy = jest
+      .spyOn(documentService, 'retryExport')
+      .mockReturnValue(of({} as any))
+    const dismissSpy = jest
+      .spyOn(tasksService, 'dismissTasks')
+      .mockReturnValue(of({}))
+    const reloadPageSpy = jest
+      .spyOn(component as any, 'reloadPage')
+      .mockImplementation(() => undefined)
+    const toastSpy = jest.spyOn(toastService, 'showInfo')
+
+    component.retrySelectedExports()
+
+    expect(retrySpy).toHaveBeenCalledTimes(2)
+    expect(retrySpy).toHaveBeenCalledWith(12, 2)
+    expect(retrySpy).toHaveBeenCalledWith(13, 3)
+    expect(toastSpy).toHaveBeenCalled()
+    expect(dismissSpy).toHaveBeenCalledWith(new Set([500, 501]))
+    expect(reloadPageSpy).toHaveBeenCalledWith(false)
+    expect(component.selectedTasks.size).toBe(0)
+    expect(component.retryingSelected).toBeFalsy()
+  })
+
+  it('should report selected exports that could not be retried', () => {
+    const secondExportTask: PaperlessTask = {
+      ...failedExportTask,
+      id: 501,
+      task_id: '6f81a5b1-9f81-442c-b2c8-7e4ae53657f3',
+      input_data: { record_id: 3, document_id: 13, target: 'S3' },
+    }
+    jest
+      .spyOn(component, 'retryableSelectedTasks', 'get')
+      .mockReturnValue([failedExportTask, secondExportTask])
+    const documentService = TestBed.inject(DocumentService)
+    jest
+      .spyOn(documentService, 'retryExport')
+      .mockImplementation((documentId) =>
+        documentId === 12
+          ? of({} as any)
+          : throwError(() => new Error('target disabled'))
+      )
+    const dismissSpy = jest
+      .spyOn(tasksService, 'dismissTasks')
+      .mockReturnValue(of({}))
+    jest
+      .spyOn(component as any, 'reloadPage')
+      .mockImplementation(() => undefined)
+    const errorSpy = jest.spyOn(toastService, 'showError')
+
+    component.retrySelectedExports()
+
+    // only the successful retry is dismissed; the failure is reported
+    expect(dismissSpy).toHaveBeenCalledWith(new Set([500]))
+    expect(errorSpy).toHaveBeenCalled()
+  })
+
+  it('should show an error when retrying an export fails', () => {
+    const documentService = TestBed.inject(DocumentService)
+    const error = new Error('retry failed')
+    jest
+      .spyOn(documentService, 'retryExport')
+      .mockReturnValue(throwError(() => error))
+    const dismissSpy = jest.spyOn(tasksService, 'dismissTasks')
+    const toastSpy = jest.spyOn(toastService, 'showError')
+
+    component.retryExport(failedExportTask)
+
+    expect(toastSpy).toHaveBeenCalledWith('Error retrying export', error)
+    expect(dismissSpy).not.toHaveBeenCalled()
+    expect(component.retryingTaskId).toBeNull()
   })
 
   it('should support toggling a full section', () => {

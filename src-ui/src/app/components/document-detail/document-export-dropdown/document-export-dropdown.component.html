@@ -1,0 +1,93 @@
+<div class="btn-group" ngbDropdown autoClose="outside" (openChange)="onOpenChange($event)">
+  <button class="btn btn-sm btn-outline-secondary dropdown-toggle" ngbDropdownToggle>
+    <i-bs name="box-arrow-up"></i-bs>
+    <span class="d-none d-lg-inline ps-1" i18n>Exports</span>
+    @if (records().length > 0) {
+      <span class="badge bg-secondary ms-1">{{records().length}}</span>
+    }
+  </button>
+  <div class="dropdown-menu shadow export-dropdown-menu" ngbDropdownMenu>
+    @if (canExportNow) {
+      <div class="px-3 py-2">
+        <div class="small text-muted mb-1" i18n>Export now</div>
+        @if (targets().length > 0) {
+          @for (target of targets(); track target.id) {
+            <button
+              class="btn btn-sm btn-outline-secondary me-1 mb-1"
+              [disabled]="exporting()"
+              (click)="exportNow(target)"
+            >
+              <i-bs name="box-arrow-up" class="me-1"></i-bs>{{target.name}}
+            </button>
+          }
+        } @else {
+          <div class="small text-muted fst-italic" i18n>No export targets available.</div>
+        }
+      </div>
+    }
+    <div class="d-flex align-items-center border-top px-3 py-2">
+      <div class="small text-muted" i18n>Export history</div>
+      <button class="btn btn-sm btn-link ms-auto p-0" (click)="loadRecords()" [disabled]="loading()">
+        <i-bs name="arrow-clockwise"></i-bs>
+        <span class="visually-hidden" i18n>Refresh</span>
+      </button>
+    </div>
+    @if (loading()) {
+      <div class="px-3 py-2 small text-muted">
+        <output class="spinner-border spinner-border-sm me-2" aria-hidden="true"></output>
+        <span i18n>Loading...</span>
+      </div>
+    }
+    @for (record of records(); track record.id) {
+      <div class="dropdown-item-text border-top px-3 py-2 export-record">
+        <div class="d-flex align-items-center">
+          @switch (record.status) {
+            @case (ExportRecordStatus.Complete) {
+              <i-bs name="check-circle-fill" class="text-success me-2"></i-bs>
+            }
+            @case (ExportRecordStatus.Failed) {
+              <i-bs name="exclamation-triangle-fill" class="text-danger me-2"></i-bs>
+            }
+            @default {
+              <i-bs name="clock-history" class="text-muted me-2"></i-bs>
+            }
+          }
+          <span class="fw-bold">{{record.target_name}}</span>
+          <span class="text-muted small ms-auto ps-3">{{record.created_at | customDate:'short'}}</span>
+        </div>
+        @if (record.object_key) {
+          <div class="d-flex align-items-center mt-1">
+            <code class="small text-truncate object-key">{{record.object_key}}</code>
+            <button class="btn btn-sm btn-link p-0 ms-2" (click)="copyObjectKey(record)">
+              @if (copiedRecordId() === record.id) {
+                <i-bs name="clipboard-check-fill" class="text-primary"></i-bs>
+              } @else {
+                <i-bs name="clipboard-fill"></i-bs>
+              }
+              <span class="visually-hidden" i18n>Copy object key</span>
+            </button>
+          </div>
+        }
+        @if (record.status === ExportRecordStatus.Failed) {
+          <div class="d-flex align-items-center mt-1">
+            @if (record.last_error?.error) {
+              <span class="small text-danger">{{record.last_error.error}}</span>
+            }
+            @if (canExportNow) {
+              <button
+                class="btn btn-sm btn-link p-0 ms-auto text-nowrap"
+                [disabled]="retryingRecordId() === record.id"
+                (click)="retry(record)"
+              >
+                <i-bs name="arrow-clockwise" class="me-1"></i-bs><ng-container i18n>Retry</ng-container>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+    @if (!loading() && records().length === 0) {
+      <div class="px-3 py-2 small text-muted fst-italic" i18n>This document has not been exported.</div>
+    }
+  </div>
+</div>

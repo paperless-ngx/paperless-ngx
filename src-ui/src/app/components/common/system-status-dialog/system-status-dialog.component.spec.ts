@@ -66,6 +66,9 @@ const status: SystemStatus = {
     llmindex_status: SystemStatusItemStatus.OK,
     llmindex_last_modified: new Date().toISOString(),
     llmindex_error: null,
+    export_status: SystemStatusItemStatus.DISABLED,
+    export_last_failure: null,
+    export_error: null,
     summary: {
       days: 30,
       total_count: 12,
@@ -186,6 +189,23 @@ describe('SystemStatusDialogComponent', () => {
     }))
     component.ngOnInit()
     expect(component.versionMismatch()).toBeFalsy()
+  })
+
+  it('should only show export status once export targets exist', () => {
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).not.toContain('Exports')
+
+    component.status.set({
+      ...status,
+      tasks: {
+        ...status.tasks,
+        export_status: SystemStatusItemStatus.ERROR,
+        export_last_failure: new Date().toISOString(),
+        export_error: 'AccessDenied',
+      },
+    })
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).toContain('Exports')
   })
 
   it('should update websocket connection status', () => {

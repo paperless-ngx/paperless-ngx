@@ -11,6 +11,7 @@ import {
 } from 'src/app/data/document'
 import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
+import { ExportRecord } from 'src/app/data/export-record'
 import { FilterRule } from 'src/app/data/filter-rule'
 import { Results, SelectionData } from 'src/app/data/results'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
@@ -278,6 +279,26 @@ export class DocumentService extends AbstractPaperlessService<Document> {
   getRootId(documentId: number) {
     return this.http.get<{ root_id: number }>(
       this.getResourceUrl(documentId, 'root')
+    )
+  }
+
+  getExports(documentId: number): Observable<ExportRecord[]> {
+    return this.http.get<ExportRecord[]>(
+      this.getResourceUrl(documentId, 'exports')
+    )
+  }
+
+  exportNow(documentId: number, targetId: number): Observable<ExportRecord> {
+    return this.http.post<ExportRecord>(
+      this.getResourceUrl(documentId, 'exports'),
+      { target: targetId }
+    )
+  }
+
+  retryExport(documentId: number, recordId: number): Observable<ExportRecord> {
+    return this.http.post<ExportRecord>(
+      this.getResourceUrl(documentId, `exports/${recordId}/retry`),
+      {}
     )
   }
 

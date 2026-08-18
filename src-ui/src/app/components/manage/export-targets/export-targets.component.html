@@ -1,0 +1,83 @@
+<pngx-page-header
+  title="Export Targets"
+  i18n-title
+  info="Manage destinations that workflow export actions deliver documents to."
+  i18n-info
+  infoLink="usage/#export-targets"
+  >
+</pngx-page-header>
+
+<ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.ExportTarget }">
+  <h4>
+    <ng-container i18n>Export targets</ng-container>
+    <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="editTarget()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ExportTarget }">
+      <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Add Target</ng-container>
+    </button>
+  </h4>
+  <ul class="list-group">
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col" i18n>Name</div>
+        <div class="col" i18n>Type</div>
+        <div class="col d-none d-sm-block" i18n>Destination</div>
+        <div class="col" i18n>Actions</div>
+      </div>
+    </li>
+
+    @if (loading()) {
+      <li class="list-group-item">
+        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+        <ng-container i18n>Loading...</ng-container>
+      </li>
+    }
+
+    @for (target of exportTargets(); track target) {
+      <li class="list-group-item">
+        <div class="row fade" [class.show]="show()">
+          <div class="col d-flex align-items-center">
+            <button class="btn btn-link p-0 text-start" type="button" (click)="editTarget(target)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.ExportTarget) || !userCanEdit(target)">
+              {{target.name}}
+              @if (!target.enabled) {
+                <span class="badge bg-secondary ms-2" i18n>Paused</span>
+              }
+            </button>
+          </div>
+          <div class="col d-flex align-items-center">
+            <i-bs [name]="kindIcon(target)" class="me-2"></i-bs>{{kindName(target)}}
+          </div>
+          <div class="col d-flex align-items-center d-none d-sm-block text-truncate">{{destination(target)}}</div>
+          <div class="col">
+            <div class="btn-group d-block d-sm-none">
+              <div ngbDropdown container="body" class="d-inline-block">
+                <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()" ngbDropdownToggle>
+                  <i-bs name="three-dots-vertical"></i-bs>
+                </button>
+                <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
+                  <button (click)="editTarget(target)" [disabled]="!userCanEdit(target)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.ExportTarget }" ngbDropdownItem i18n>Edit</button>
+                  <button (click)="editPermissions(target)" *pngxIfOwner="target" ngbDropdownItem i18n>Permissions</button>
+                  <button (click)="deleteTarget(target)" [disabled]="!userIsOwner(target)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.ExportTarget }" ngbDropdownItem i18n>Delete</button>
+                </div>
+              </div>
+            </div>
+            <div class="btn-toolbar d-none d-sm-flex gap-2" role="toolbar">
+              <div class="btn-group">
+                <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.ExportTarget }" [disabled]="!userCanEdit(target)" class="btn btn-sm btn-outline-secondary" type="button" (click)="editTarget(target)">
+                  <i-bs width="1em" height="1em" name="pencil" class="me-1"></i-bs><ng-container i18n>Edit</ng-container>
+                </button>
+                <button *pngxIfOwner="target" class="btn btn-sm btn-outline-secondary" type="button" (click)="editPermissions(target)">
+                  <i-bs width="1em" height="1em" name="person-lock" class="me-1"></i-bs><ng-container i18n>Permissions</ng-container>
+                </button>
+                <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.ExportTarget }" [disabled]="!userIsOwner(target)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteTarget(target)">
+                  <i-bs width="1em" height="1em" name="trash" class="me-1"></i-bs><ng-container i18n>Delete</ng-container>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+    }
+    @if (!loading() && exportTargets().length === 0) {
+      <li class="list-group-item" i18n>No export targets defined.</li>
+    }
+  </ul>
+</ng-container>

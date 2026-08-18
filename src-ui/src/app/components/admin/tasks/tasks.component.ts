@@ -11,10 +11,14 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import {
+  catchError,
   debounceTime,
   distinctUntilChanged,
   filter,
   first,
+  forkJoin,
+  map,
+  of,
   Subject,
   takeUntil,
   timer,
@@ -27,6 +31,12 @@ import {
 } from 'src/app/data/paperless-task'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import {
+  PermissionAction,
+  PermissionType,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
@@ -99,6 +109,10 @@ const TASK_TYPE_OPTIONS: Array<{
     value: PaperlessTaskType.BulkDelete,
     label: $localize`Bulk Delete`,
   },
+  {
+    value: PaperlessTaskType.ExportDocument,
+    label: $localize`Export Document`,
+  },
 ]
 
 const TRIGGER_SOURCE_OPTIONS: Array<{
@@ -154,6 +168,8 @@ export class TasksComponent
   private modalService = inject(NgbModal)
   private readonly router = inject(Router)
   private readonly toastService = inject(ToastService)
+  private readonly documentService = inject(DocumentService)
+  private readonly permissionsService = inject(PermissionsService)
 
   readonly TaskSection = TaskSection
   readonly sections = [
@@ -299,6 +315,114 @@ export class TasksComponent
 
   dismissTask(task: PaperlessTask) {
     this.dismissTasks(task)
+  }
+
+  public retryingTaskId: number | null = null
+
+  canRetryExport(task: PaperlessTask): boolean {
+    // Mirrors the API's retry endpoint: the task must be a failed export
+    // whose record and document are known, and the user needs the same
+    // permissions as for exporting on demand.
+    return (
+      task.task_type === PaperlessTaskType.ExportDocument &&
+      task.status === PaperlessTaskStatus.Failure &&
+      !!task.input_data?.record_id &&
+      !!task.input_data?.document_id &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.Add,
+        PermissionType.ExportRecord
+      ) &&
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.ExportTarget
+      )
+    )
+  }
+
+  retryExport(task: PaperlessTask) {
+    this.retryingTaskId = task.id
+    this.documentService
+      .retryExport(task.input_data.document_id, task.input_data.record_id)
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: () => {
+          this.retryingTaskId = null
+          this.toastService.showInfo($localize`Export queued again`)
+          // The failure is superseded by the re-queued delivery, whose new
+          // task will surface here if it fails again — dismiss the old one.
+          this.tasksService.dismissTasks(new Set([task.id])).subscribe({
+            next: () => {
+              this.reloadPage(false)
+            },
+            error: () => {
+              this.reloadPage(false)
+            },
+          })
+        },
+        error: (e) => {
+          this.retryingTaskId = null
+          this.toastService.showError($localize`Error retrying export`, e)
+        },
+      })
+  }
+
+  get retryableSelectedTasks(): PaperlessTask[] {
+    return this.visibleTasks.filter(
+      (t) => this.selectedTasks.has(t.id) && this.canRetryExport(t)
+    )
+  }
+
+  public retryingSelected: boolean = false
+
+  retrySelectedExports() {
+    const tasksToRetry = this.retryableSelectedTasks
+    if (tasksToRetry.length === 0) {
+      return
+    }
+    this.retryingSelected = true
+    forkJoin(
+      tasksToRetry.map((task) =>
+        this.documentService
+          .retryExport(task.input_data.document_id, task.input_data.record_id)
+          .pipe(
+            map(() => task),
+            catchError(() => of(null))
+          )
+      )
+    )
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe((results) => {
+        this.retryingSelected = false
+        const succeeded = results.filter((task) => task !== null)
+        const failedCount = results.length - succeeded.length
+        if (succeeded.length > 0) {
+          this.toastService.showInfo(
+            succeeded.length === 1
+              ? $localize`Export queued again`
+              : $localize`${succeeded.length} exports queued again`
+          )
+          // Each re-queued delivery publishes a fresh task; the superseded
+          // failures are dismissed so needs-attention tracks the new attempts.
+          this.tasksService
+            .dismissTasks(new Set(succeeded.map((task) => task.id)))
+            .subscribe({
+              next: () => {
+                this.reloadPage(false)
+              },
+              error: () => {
+                this.reloadPage(false)
+              },
+            })
+        }
+        if (failedCount > 0) {
+          this.toastService.showError(
+            failedCount === 1
+              ? $localize`1 export could not be retried`
+              : $localize`${failedCount} exports could not be retried`
+          )
+        }
+        this.clearSelection()
+      })
   }
 
   dismissTasks(task: PaperlessTask = undefined) {

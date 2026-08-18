@@ -764,6 +764,7 @@ class PaperlessTask(ModelWithOwner):
         REPROCESS_DOCUMENT = "reprocess_document", _("Reprocess Document")
         BUILD_SHARE_LINK = "build_share_link", _("Build Share Link")
         BULK_DELETE = "bulk_delete", _("Bulk Delete")
+        EXPORT_DOCUMENT = "export_document", _("Export Document")
 
     COMPLETE_STATUSES = (
         Status.SUCCESS,
@@ -889,12 +890,15 @@ class PaperlessTask(ModelWithOwner):
 
     @property
     def related_document_ids(self) -> list[int]:  # pragma: no cover
-        if not self.result_data:
-            return []
-        if doc_id := self.result_data.get("document_id"):
+        if self.result_data:
+            if doc_id := self.result_data.get("document_id"):
+                return [doc_id]
+            if dup_id := self.result_data.get("duplicate_of"):
+                return [dup_id]
+        # Export tasks know their document up front; a failed export should
+        # still link to the document it could not deliver.
+        if self.input_data and (doc_id := self.input_data.get("document_id")):
             return [doc_id]
-        if dup_id := self.result_data.get("duplicate_of"):
-            return [dup_id]
         return []
 
 
@@ -1642,6 +1646,154 @@ class WorkflowActionWebhook(models.Model):
         return f"Workflow Webhook Action {self.pk}"
 
 
+class ExportTarget(ModelWithOwner):
+    """
+    A destination outside paperless that documents can be delivered to:
+    an S3 bucket, an SFTP host or a local directory. Export is pure push —
+    paperless never deletes from a target.
+    """
+
+    class Kind(models.TextChoices):
+        S3 = "s3", _("S3")
+        SFTP = "sftp", _("SFTP")
+        LOCAL = "local", _("Local")
+
+    name = models.CharField(_("name"), max_length=128, unique=True)
+
+    kind = models.CharField(
+        _("kind"),
+        max_length=16,
+        choices=Kind.choices,
+    )
+
+    config = models.JSONField(
+        _("configuration"),
+        default=dict,
+        blank=True,
+        help_text=_(
+            "Non-secret destination settings. S3: bucket, prefix, endpoint, "
+            "region, storage class. SFTP: host, port, path, host key. "
+            "Local: path.",
+        ),
+    )
+
+    access_key = models.CharField(
+        _("access key"),
+        max_length=256,
+        blank=True,
+        null=True,
+        help_text=_("S3 access key or SFTP username."),
+    )
+
+    secret_key = models.TextField(
+        _("secret key"),
+        blank=True,
+        null=True,
+        help_text=_("S3 secret key, or SFTP password or key passphrase."),
+    )
+
+    private_key = models.TextField(
+        _("private key"),
+        blank=True,
+        null=True,
+        help_text=_("SFTP private key for key authentication."),
+    )
+
+    passphrase = models.TextField(
+        _("passphrase"),
+        blank=True,
+        null=True,
+        help_text=_(
+            "Reserved for client-side encryption of exports. "
+            "Not used yet: exports are currently written unencrypted.",
+        ),
+    )
+
+    retention_days = models.PositiveIntegerField(
+        _("retention days"),
+        blank=True,
+        null=True,
+        help_text=_(
+            "S3 only: sets an Object Lock RetainUntilDate this many days "
+            "in the future on every delivered object. The lock mode is "
+            "configured on the bucket, not here.",
+        ),
+    )
+
+    enabled = models.BooleanField(_("enabled"), default=True)
+
+    class Meta:
+        ordering = ("name",)
+        verbose_name = _("export target")
+        verbose_name_plural = _("export targets")
+
+    def __str__(self):
+        return self.name
+
+
+class WorkflowActionExport(models.Model):
+    class ConflictPolicy(models.TextChoices):
+        OVERWRITE = "overwrite", _("Overwrite existing")
+        SKIP = "skip", _("Skip if exists")
+        SUFFIX = "suffix", _("Keep both (add suffix)")
+
+    # PROTECT, not CASCADE: cascading would delete the settings but leave the
+    # WorkflowAction itself behind as an export action with nothing to export.
+    target = models.ForeignKey(
+        ExportTarget,
+        on_delete=models.PROTECT,
+        related_name="workflow_actions",
+        verbose_name=_("export target"),
+    )
+
+    include_original = models.BooleanField(
+        default=True,
+        verbose_name=_("include original file"),
+    )
+
+    include_archive = models.BooleanField(
+        default=False,
+        verbose_name=_("include archive file"),
+    )
+
+    write_metadata_sidecar = models.BooleanField(
+        default=True,
+        verbose_name=_("write metadata sidecar"),
+        help_text=_(
+            "Write a .metadata.json file with the document's metadata "
+            "next to the exported file.",
+        ),
+    )
+
+    path = models.CharField(
+        max_length=1024,
+        blank=True,
+        default="",
+        verbose_name=_("path"),
+        help_text=_(
+            "Optional path and filename for exported files, overriding the "
+            "document's filename. Works like a storage path, e.g. "
+            "{{ created_year }}/{{ title }}; the file extension is appended "
+            "automatically. If empty, files are named exactly as in the "
+            "media directory.",
+        ),
+    )
+
+    on_conflict = models.CharField(
+        max_length=16,
+        choices=ConflictPolicy.choices,
+        default=ConflictPolicy.OVERWRITE,
+        verbose_name=_("if file exists at destination"),
+        help_text=_(
+            "What to do when the destination already has an object under "
+            "the same name.",
+        ),
+    )
+
+    def __str__(self):
+        return f"Workflow Export Action {self.pk}"
+
+
 class WorkflowAction(models.Model):
     class WorkflowActionType(models.IntegerChoices):
         ASSIGNMENT = (
@@ -1667,6 +1819,10 @@ class WorkflowAction(models.Model):
         MOVE_TO_TRASH = (
             6,
             _("Move to trash"),
+        )
+        EXPORT = (
+            7,
+            _("Export"),
         )
 
     type = models.PositiveSmallIntegerField(
@@ -1897,6 +2053,15 @@ class WorkflowAction(models.Model):
         verbose_name=_("webhook"),
     )
 
+    export = models.ForeignKey(
+        WorkflowActionExport,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="action",
+        verbose_name=_("export"),
+    )
+
     passwords = models.JSONField(
         _("passwords"),
         null=True,
@@ -1973,3 +2138,112 @@ class WorkflowRun(SoftDeleteModel):
 
     def __str__(self) -> str:
         return f"WorkflowRun of {self.workflow} at {self.run_at} on {self.document}"
+
+
+class ExportRecord(models.Model):
+    """
+    The receipt for one delivery of one document to an export target.
+
+    Records must outlive their documents: the question that gets asked is
+    always about the document that is no longer there, so ``document`` is
+    SET_NULL and the primary key is denormalised into ``document_pk``.
+    """
+
+    class Status(models.TextChoices):
+        PENDING = "pending", _("Pending")
+        COMPLETE = "complete", _("Complete")
+        FAILED = "failed", _("Failed")
+
+    target = models.ForeignKey(
+        ExportTarget,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="records",
+        verbose_name=_("export target"),
+    )
+
+    action = models.ForeignKey(
+        WorkflowActionExport,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="records",
+        verbose_name=_("workflow action"),
+    )
+
+    document = models.ForeignKey(
+        Document,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="export_records",
+        verbose_name=_("document"),
+    )
+
+    document_pk = models.IntegerField(
+        _("document id"),
+        db_index=True,
+    )
+
+    status = models.CharField(
+        _("status"),
+        max_length=16,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+
+    object_key = models.TextField(
+        _("object key"),
+        blank=True,
+        help_text=_("The key or path actually written at the destination."),
+    )
+
+    checksum = models.CharField(
+        _("checksum"),
+        max_length=64,
+        blank=True,
+        help_text=_("SHA-256 of the delivered file."),
+    )
+
+    size_bytes = models.BigIntegerField(
+        _("size in bytes"),
+        null=True,
+        blank=True,
+    )
+
+    created_at = models.DateTimeField(
+        _("created at"),
+        default=timezone.now,
+        db_index=True,
+    )
+
+    finished_at = models.DateTimeField(
+        _("finished at"),
+        null=True,
+        blank=True,
+    )
+
+    last_error = models.JSONField(
+        _("last error"),
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name = _("export record")
+        verbose_name_plural = _("export records")
+
+    def __str__(self) -> str:
+        return (
+            f"ExportRecord {self.pk} of document {self.document_pk} "
+            f"to {self.target} ({self.status})"
+        )
+
+
+if settings.AUDIT_LOG_ENABLED:
+    auditlog.register(
+        ExportTarget,
+        exclude_fields=["secret_key", "private_key", "passphrase"],
+    )

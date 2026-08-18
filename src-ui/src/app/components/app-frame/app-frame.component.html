@@ -252,6 +252,13 @@
                 <i-bs class="me-2" name="envelope"></i-bs><span><ng-container i18n>Mail</ng-container></span>
               </a>
             </li>
+            <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.ExportTarget }">
+              <a class="nav-link" routerLink="exporttargets" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Export Targets"
+                i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body"
+                triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                <i-bs class="me-2" name="box-arrow-up"></i-bs><span><ng-container i18n>Export Targets</ng-container></span>
+              </a>
+            </li>
             <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
               <a class="nav-link" routerLink="trash" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Trash"
                 i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body"

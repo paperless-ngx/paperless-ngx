@@ -29,6 +29,8 @@ export enum PermissionType {
   ShareLinkBundle = '%s_sharelinkbundle',
   CustomField = '%s_customfield',
   Workflow = '%s_workflow',
+  ExportTarget = '%s_exporttarget',
+  ExportRecord = '%s_exportrecord',
   ProcessedMail = '%s_processedmail',
   GlobalStatistics = '%s_global_statistics',
   SystemMonitoring = '%s_system_monitoring',

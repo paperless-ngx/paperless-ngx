@@ -12,6 +12,7 @@ export enum PaperlessTaskType {
   ReprocessDocument = 'reprocess_document',
   BuildShareLink = 'build_share_link',
   BulkDelete = 'bulk_delete',
+  ExportDocument = 'export_document',
 }
 
 export enum PaperlessTaskTriggerSource {

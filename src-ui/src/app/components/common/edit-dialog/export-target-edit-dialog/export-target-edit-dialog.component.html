@@ -1,0 +1,95 @@
+<form [formGroup]="objectForm" (ngSubmit)="save()" autocomplete="off">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
+    @if (object?.id) {
+      <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{object.id}}</span>
+    }
+    <button type="button" [disabled]="!closeEnabled" class="btn-close" aria-label="Close" (click)="cancel()">
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col">
+        <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
+        <pngx-input-select i18n-title title="Type" [items]="kindOptions" formControlName="kind" [error]="error?.kind"></pngx-input-select>
+        <pngx-input-check i18n-title title="Enabled" i18n-hint hint="Paused targets keep their history but no new documents are delivered." formControlName="enabled"></pngx-input-check>
+      </div>
+    </div>
+    <div formGroupName="config">
+      @switch (kind) {
+        @case (ExportTargetKind.S3) {
+          <div class="row">
+            <div class="col">
+              <pngx-input-text i18n-title title="Bucket" formControlName="bucket" [error]="error?.config"></pngx-input-text>
+              <pngx-input-text i18n-title title="Prefix" i18n-hint hint="Optional key prefix for delivered objects." formControlName="prefix"></pngx-input-text>
+              <pngx-input-text i18n-title title="Endpoint" i18n-hint hint="Optional custom endpoint URL, e.g. for DigitalOcean." formControlName="endpoint"></pngx-input-text>
+            </div>
+            <div class="col">
+              <pngx-input-text i18n-title title="Region" formControlName="region"></pngx-input-text>
+              <pngx-input-select i18n-title title="Storage class" [items]="storageClassOptions" [allowNull]="true" formControlName="storage_class"></pngx-input-select>
+            </div>
+          </div>
+        }
+        @case (ExportTargetKind.SFTP) {
+          <div class="row">
+            <div class="col">
+              <pngx-input-text i18n-title title="Host" formControlName="host" [error]="error?.config"></pngx-input-text>
+              <pngx-input-number i18n-title title="Port" i18n-hint hint="Defaults to 22." [showAdd]="false" formControlName="port"></pngx-input-number>
+            </div>
+            <div class="col">
+              <pngx-input-text i18n-title title="Path" i18n-hint hint="Base directory on the server." formControlName="path"></pngx-input-text>
+            </div>
+          </div>
+        }
+        @case (ExportTargetKind.Local) {
+          <div class="row">
+            <div class="col">
+              <pngx-input-text i18n-title title="Path" i18n-hint hint="Directory on the server running Paperless-ngx." formControlName="path" [error]="error?.config"></pngx-input-text>
+            </div>
+          </div>
+        }
+      }
+    </div>
+    @switch (kind) {
+      @case (ExportTargetKind.S3) {
+        <div class="row">
+          <div class="col">
+            <pngx-input-text i18n-title title="Access key" formControlName="access_key" [error]="error?.access_key"></pngx-input-text>
+            <pngx-input-password i18n-title title="Secret key" formControlName="secret_key" [error]="error?.secret_key"></pngx-input-password>
+          </div>
+          <div class="col">
+            <pngx-input-number i18n-title title="Retention days" i18n-hint hint="Optional: sets an Object Lock retain-until date on delivered objects. Requires Object Lock on the bucket; the lock mode is bucket configuration." [showAdd]="false" formControlName="retention_days" [error]="error?.retention_days"></pngx-input-number>
+          </div>
+        </div>
+        <p class="small text-muted mb-0" i18n>Exports are written unencrypted. Use the bucket's server-side encryption and bucket policy for protection at rest.</p>
+      }
+      @case (ExportTargetKind.SFTP) {
+        <div class="row">
+          <div class="col">
+            <pngx-input-text i18n-title title="Username" formControlName="access_key" [error]="error?.access_key"></pngx-input-text>
+            <pngx-input-password i18n-title title="Password or key passphrase" formControlName="secret_key" [error]="error?.secret_key"></pngx-input-password>
+          </div>
+          <div class="col">
+            <pngx-input-textarea i18n-title title="Private key" i18n-hint hint="Optional: private key for key authentication. The host key is pinned on first successful connection." formControlName="private_key" [error]="error?.private_key" rows="4"></pngx-input-textarea>
+          </div>
+        </div>
+      }
+    }
+  </div>
+  <div class="modal-footer">
+    <div class="m-0 me-2">
+      @if (testResult()) {
+        <ngb-alert #testResultAlert [type]="testResult()" class="mb-0 py-2" (closed)="testResult.set(null)">{{testMessage()}}</ngb-alert>
+      }
+    </div>
+    <button type="button" class="btn btn-outline-primary" (click)="test()" [disabled]="networkActive || testActive">
+      @if (testActive) {
+        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+        <span class="visually-hidden mr-1" i18n>Loading...</span>
+      }
+      <ng-container i18n>Test connection</ng-container>
+    </button>
+    <button type="button" class="btn btn-outline-secondary" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
+    <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
+  </div>
+</form>

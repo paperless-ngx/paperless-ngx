@@ -61,6 +61,8 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import ExportRecord
+from documents.models import ExportTarget
 from documents.models import MatchingModel
 from documents.models import Note
 from documents.models import PaperlessTask
@@ -74,6 +76,7 @@ from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowActionEmail
+from documents.models import WorkflowActionExport
 from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
@@ -88,6 +91,7 @@ from documents.templating.utils import convert_format_str_to_template_format
 from documents.templating.workflows import validate_workflow_template
 from documents.validators import uri_validator
 from documents.validators import url_validator
+from paperless.network import validate_outbound_http_url
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -252,6 +256,18 @@ class SetPermissionsMixin:
 
     def _set_permissions(self, permissions, object) -> None:
         set_permissions_for_object(permissions, object)
+
+
+class ObfuscatedPasswordField(serializers.CharField):
+    """
+    Sends *** string instead of password in the clear
+    """
+
+    def to_representation(self, value) -> str:
+        return "*" * max(10, len(value))
+
+    def to_internal_value(self, data):
+        return data
 
 
 class SerializerWithPerms(serializers.Serializer[dict[str, Any]]):
@@ -3131,6 +3147,41 @@ class WorkflowActionWebhookSerializer(
         ]
 
 
+class WorkflowActionExportSerializer(
+    serializers.ModelSerializer[WorkflowActionExport],
+):
+    id = serializers.IntegerField(allow_null=True, required=False)
+
+    class Meta:
+        model = WorkflowActionExport
+        fields = [
+            "id",
+            "target",
+            "include_original",
+            "include_archive",
+            "write_metadata_sidecar",
+            "path",
+            "on_conflict",
+        ]
+
+    def validate_path(self, path: str):
+        if not path:
+            return ""
+        converted = convert_format_str_to_template_format(path)
+        if validate_filepath_template_and_render(converted) is None:
+            raise serializers.ValidationError(_("Invalid variable detected."))
+        return converted
+
+    def validate(self, attrs):
+        include_original = attrs.get("include_original", True)
+        include_archive = attrs.get("include_archive", False)
+        if not include_original and not include_archive:
+            raise serializers.ValidationError(
+                "At least one of the original or archive file must be included",
+            )
+        return attrs
+
+
 class WorkflowActionSerializer(serializers.ModelSerializer[WorkflowAction]):
     id = serializers.IntegerField(required=False, allow_null=True)
     assign_correspondent = CorrespondentField(allow_null=True, required=False)
@@ -3139,6 +3190,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer[WorkflowAction]):
     assign_storage_path = StoragePathField(allow_null=True, required=False)
     email = WorkflowActionEmailSerializer(allow_null=True, required=False)
     webhook = WorkflowActionWebhookSerializer(allow_null=True, required=False)
+    export = WorkflowActionExportSerializer(allow_null=True, required=False)
 
     class Meta:
         model = WorkflowAction
@@ -3176,6 +3228,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer[WorkflowAction]):
             "remove_change_groups",
             "email",
             "webhook",
+            "export",
             "passwords",
         ]
 
@@ -3219,6 +3272,15 @@ class WorkflowActionSerializer(serializers.ModelSerializer[WorkflowAction]):
 
         if (
             "type" in attrs
+            and attrs["type"] == WorkflowAction.WorkflowActionType.EXPORT
+            and not attrs.get("export")
+        ):
+            raise serializers.ValidationError(
+                "Export data is required for export actions",
+            )
+
+        if (
+            "type" in attrs
             and attrs["type"] == WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL
         ):
             passwords = attrs.get("passwords")
@@ -3253,6 +3315,34 @@ class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
             "triggers",
             "actions",
         ]
+
+    def validate(self, attrs):
+        # Export actions need a stored document with a primary key, which a
+        # consumption trigger cannot provide.
+        triggers = attrs.get("triggers")
+        actions = attrs.get("actions")
+        trigger_types = (
+            [trigger.get("type") for trigger in triggers]
+            if triggers is not None
+            else [trigger.type for trigger in self.instance.triggers.all()]
+            if self.instance
+            else []
+        )
+        action_types = (
+            [action.get("type") for action in actions]
+            if actions is not None
+            else [action.type for action in self.instance.actions.all()]
+            if self.instance
+            else []
+        )
+        if (
+            WorkflowTrigger.WorkflowTriggerType.CONSUMPTION in trigger_types
+            and WorkflowAction.WorkflowActionType.EXPORT in action_types
+        ):
+            raise serializers.ValidationError(
+                "Export actions do not support consumption triggers",
+            )
+        return attrs
 
     def update_triggers_and_actions(
         self,
@@ -3352,6 +3442,7 @@ class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
 
                 email_data = action.pop("email", None)
                 webhook_data = action.pop("webhook", None)
+                export_data = action.pop("export", None)
 
                 action_instance, _ = WorkflowAction.objects.update_or_create(
                     id=action.get("id"),
@@ -3376,6 +3467,20 @@ class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
                         defaults=serializer.validated_data,
                     )
                     action_instance.webhook = webhook
+                    action_instance.save()
+
+                if export_data is not None:
+                    # The action serializer already resolved the target to an
+                    # instance; hand its pk back for re-validation
+                    if isinstance(export_data.get("target"), ExportTarget):
+                        export_data["target"] = export_data["target"].pk
+                    serializer = WorkflowActionExportSerializer(data=export_data)
+                    serializer.is_valid(raise_exception=True)
+                    export, _ = WorkflowActionExport.objects.update_or_create(
+                        id=export_data.get("id"),
+                        defaults=serializer.validated_data,
+                    )
+                    action_instance.export = export
                     action_instance.save()
 
                 if assign_tags is not None:
@@ -3434,6 +3539,9 @@ class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
 
         WorkflowActionEmail.objects.filter(action=None).delete()
         WorkflowActionWebhook.objects.filter(action=None).delete()
+        # Only the per-action export settings are pruned here; export targets
+        # are standalone, user-managed objects.
+        WorkflowActionExport.objects.filter(action=None).delete()
 
     def create(self, validated_data) -> Workflow:
         if "triggers" in validated_data:
@@ -3458,6 +3566,130 @@ class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
         self.prune_triggers_and_actions()
 
         return instance
+
+
+class ExportTargetSerializer(OwnedObjectSerializer):
+    secret_key = ObfuscatedPasswordField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+    )
+    private_key = ObfuscatedPasswordField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+    )
+    passphrase = ObfuscatedPasswordField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+    )
+
+    class Meta:
+        model = ExportTarget
+        fields = [
+            "id",
+            "name",
+            "kind",
+            "config",
+            "access_key",
+            "secret_key",
+            "private_key",
+            "passphrase",
+            "retention_days",
+            "enabled",
+            "owner",
+            "user_can_change",
+            "permissions",
+            "set_permissions",
+        ]
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        kind = attrs.get("kind", getattr(self.instance, "kind", None))
+        config = attrs.get("config")
+        if config is None:
+            config = getattr(self.instance, "config", None) or {}
+
+        if kind == ExportTarget.Kind.S3:
+            if not config.get("bucket"):
+                raise serializers.ValidationError(
+                    {"config": "S3 targets require a bucket."},
+                )
+            endpoint = config.get("endpoint")
+            if endpoint:
+                try:
+                    validate_outbound_http_url(endpoint, allow_internal=True)
+                except ValueError as e:
+                    raise serializers.ValidationError(
+                        {"config": f"Invalid endpoint: {e.args[0]}"},
+                    ) from e
+        elif kind == ExportTarget.Kind.SFTP:
+            if not config.get("host"):
+                raise serializers.ValidationError(
+                    {"config": "SFTP targets require a host."},
+                )
+            port = config.get("port")
+            if port is not None and (
+                not isinstance(port, int) or not (0 < port < 65536)
+            ):
+                raise serializers.ValidationError(
+                    {"config": "Invalid SFTP port."},
+                )
+        elif kind == ExportTarget.Kind.LOCAL:
+            if not config.get("path"):
+                raise serializers.ValidationError(
+                    {"config": "Local targets require a path."},
+                )
+
+        retention_days = attrs.get(
+            "retention_days",
+            getattr(self.instance, "retention_days", None),
+        )
+        if retention_days and kind != ExportTarget.Kind.S3:
+            raise serializers.ValidationError(
+                {"retention_days": "Retention is only supported on S3 targets."},
+            )
+        return attrs
+
+    def update(self, instance, validated_data):
+        # An all-* secret means "unchanged"
+        for field in ("secret_key", "private_key", "passphrase"):
+            value = validated_data.get(field)
+            if (
+                field in validated_data
+                and value
+                and len(str(value).replace("*", "")) == 0
+            ):
+                validated_data.pop(field)
+        return super().update(instance, validated_data)
+
+
+class ExportRecordSerializer(serializers.ModelSerializer[ExportRecord]):
+    target_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ExportRecord
+        fields = [
+            "id",
+            "target",
+            "target_name",
+            "action",
+            "document",
+            "document_pk",
+            "status",
+            "object_key",
+            "checksum",
+            "size_bytes",
+            "created_at",
+            "finished_at",
+            "last_error",
+        ]
+        read_only_fields = fields
+
+    @extend_schema_field(serializers.CharField(allow_null=True))
+    def get_target_name(self, obj) -> str | None:
+        return obj.target.name if obj.target else None
 
 
 class TrashSerializer(SerializerWithPerms):

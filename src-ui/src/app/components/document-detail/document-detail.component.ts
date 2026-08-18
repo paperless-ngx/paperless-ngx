@@ -131,6 +131,7 @@ import { SuggestionsDropdownComponent } from '../common/suggestions-dropdown/sug
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { DocumentHistoryComponent } from './document-history/document-history.component'
+import { DocumentExportDropdownComponent } from './document-export-dropdown/document-export-dropdown.component'
 import { DocumentVersionDropdownComponent } from './document-version-dropdown/document-version-dropdown.component'
 import { MetadataCollapseComponent } from './metadata-collapse/metadata-collapse.component'
 
@@ -195,6 +196,7 @@ interface IncomingDocumentUpdate {
     RouterModule,
     PngxPdfViewerComponent,
     DocumentVersionDropdownComponent,
+    DocumentExportDropdownComponent,
   ],
 })
 export class DocumentDetailComponent

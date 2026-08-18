@@ -455,6 +455,24 @@
           </div>
         </div>
       }
+      @case (WorkflowActionType.Export) {
+        <div class="row" [formGroup]="formGroup.get('export')">
+          <input type="hidden" formControlName="id" />
+          <div class="col">
+            <pngx-input-select i18n-title title="Export target" [items]="exportTargets()" formControlName="target" [error]="error?.actions?.[i]?.export"></pngx-input-select>
+            <pngx-input-text i18n-title title="Path" formControlName="path" i18n-hint hint="Optional path and filename for exported files, overriding the document's filename. Works like a storage path with the same placeholders; the file extension is appended automatically. If empty, files are named exactly as in the media directory. See <a target='_blank' href='https://docs.paperless-ngx.com/advanced_usage/#file-name-handling'>documentation</a>." [error]="error?.actions?.[i]?.export?.path"></pngx-input-text>
+            <pngx-input-select i18n-title title="If file exists at destination" [items]="exportConflictPolicyOptions" [allowNull]="false" formControlName="on_conflict" [error]="error?.actions?.[i]?.export?.on_conflict"></pngx-input-select>
+            <div class="d-flex">
+              <pngx-input-switch i18n-title title="Include original file" formControlName="include_original" [horizontal]="true"></pngx-input-switch>
+              <pngx-input-switch i18n-title title="Include archive file" formControlName="include_archive" [horizontal]="true" class="ms-5"></pngx-input-switch>
+            </div>
+            <div class="d-flex">
+              <pngx-input-switch i18n-title title="Write metadata sidecar" i18n-hint hint="Write a .metadata.json file next to the exported file." formControlName="write_metadata_sidecar" [horizontal]="true"></pngx-input-switch>
+            </div>
+            <p class="text-muted small mt-2" i18n>A copy of the document and its metadata will be delivered to the selected target. Paperless never deletes from the target.</p>
+          </div>
+        </div>
+      }
     }
   </div>
 </ng-template>

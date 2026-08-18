@@ -6,23 +6,14 @@ from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
 from documents.serialisers import CorrespondentField
 from documents.serialisers import DocumentTypeField
+
+# Kept importable from here for backwards compatibility
+from documents.serialisers import ObfuscatedPasswordField
 from documents.serialisers import OwnedObjectSerializer
 from documents.serialisers import TagsField
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
-
-
-class ObfuscatedPasswordField(serializers.CharField):
-    """
-    Sends *** string instead of password in the clear
-    """
-
-    def to_representation(self, value) -> str:
-        return "*" * max(10, len(value))
-
-    def to_internal_value(self, data):
-        return data
 
 
 class MailAccountSerializer(OwnedObjectSerializer):

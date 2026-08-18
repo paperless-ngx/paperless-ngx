@@ -42,6 +42,7 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import ExportRecord
 from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import StoragePath
@@ -57,6 +58,7 @@ from documents.templating.utils import convert_format_str_to_template_format
 from documents.utils import compute_checksum
 from documents.workflows.actions import build_workflow_action_context
 from documents.workflows.actions import execute_email_action
+from documents.workflows.actions import execute_export_action
 from documents.workflows.actions import execute_move_to_trash_action
 from documents.workflows.actions import execute_password_removal_action
 from documents.workflows.actions import execute_webhook_action
@@ -969,6 +971,12 @@ def run_workflows(
                             original_file if caller_supplied_original_file else None
                         ),
                     )
+                elif action.type == WorkflowAction.WorkflowActionType.EXPORT:
+                    execute_export_action(
+                        action,
+                        document,
+                        logging_group,
+                    )
                 elif action.type == WorkflowAction.WorkflowActionType.MOVE_TO_TRASH:
                     has_move_to_trash_action = True
 
@@ -1026,6 +1034,7 @@ TRACKED_TASKS: dict[str, PaperlessTask.TaskType] = {
     "documents.tasks.update_document_content_maybe_archive_file": PaperlessTask.TaskType.REPROCESS_DOCUMENT,
     "documents.tasks.build_share_link_bundle": PaperlessTask.TaskType.BUILD_SHARE_LINK,
     "documents.bulk_edit.delete": PaperlessTask.TaskType.BULK_DELETE,
+    "documents.workflows.exports.export_document": PaperlessTask.TaskType.EXPORT_DOCUMENT,
 }
 
 _CELERY_STATE_TO_STATUS: dict[str, PaperlessTask.Status] = {
@@ -1078,6 +1087,20 @@ def _extract_input_data(
         if account_ids is not None:
             return {"account_ids": account_ids}
         return {}
+
+    if task_type == PaperlessTask.TaskType.EXPORT_DOCUMENT:
+        record_id = task_kwargs.get("record_id")
+        if record_id is None:
+            return {}
+        data = {"record_id": record_id}
+        record = (
+            ExportRecord.objects.filter(pk=record_id).select_related("target").first()
+        )
+        if record is not None:
+            data["document_id"] = record.document_pk
+            if record.target is not None:
+                data["target"] = record.target.name
+        return data
 
     return {}
 
@@ -1141,6 +1164,11 @@ def before_task_publish_handler(
 
         _, task_kwargs, _ = body
         task_id = headers["id"]
+
+        # A task retry (e.g. export_document backoff) republishes the message
+        # under the same task id; the record from the first publish stands.
+        if PaperlessTask.objects.filter(task_id=task_id).exists():
+            return
 
         input_data = _extract_input_data(task_type, task_kwargs)
         trigger_source = _determine_trigger_source(headers)

@@ -7,6 +7,7 @@ export enum WorkflowActionType {
   Webhook = 4,
   PasswordRemoval = 5,
   MoveToTrash = 6,
+  Export = 7,
 }
 
 export interface WorkflowActionEmail extends ObjectWithId {
@@ -33,6 +34,41 @@ export interface WorkflowActionWebhook extends ObjectWithId {
   headers?: object
 
   include_document?: boolean
+}
+
+export enum ExportConflictPolicy {
+  Overwrite = 'overwrite',
+  Skip = 'skip',
+  Suffix = 'suffix',
+}
+
+export const EXPORT_CONFLICT_POLICY_OPTIONS = [
+  {
+    id: ExportConflictPolicy.Overwrite,
+    name: $localize`Overwrite existing`,
+  },
+  {
+    id: ExportConflictPolicy.Skip,
+    name: $localize`Skip if exists`,
+  },
+  {
+    id: ExportConflictPolicy.Suffix,
+    name: $localize`Keep both (add suffix)`,
+  },
+]
+
+export interface WorkflowActionExport extends ObjectWithId {
+  target?: number // ExportTarget.id
+
+  include_original?: boolean
+
+  include_archive?: boolean
+
+  write_metadata_sidecar?: boolean
+
+  path?: string
+
+  on_conflict?: ExportConflictPolicy
 }
 
 export interface WorkflowAction extends ObjectWithId {
@@ -99,6 +135,8 @@ export interface WorkflowAction extends ObjectWithId {
   email?: WorkflowActionEmail
 
   webhook?: WorkflowActionWebhook
+
+  export?: WorkflowActionExport
 
   passwords?: string[]
 }

@@ -4,6 +4,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import transaction
 from django.utils import timezone
 
 from documents.data_models import ConsumableDocument
@@ -13,11 +14,14 @@ from documents.mail import send_email
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import ExportRecord
+from documents.models import PaperlessTask
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.plugins.base import StopConsumeTaskError
 from documents.signals import document_consumption_finished
 from documents.templating.workflows import parse_w_workflow_placeholders
+from documents.workflows.exports import export_document
 from documents.workflows.webhooks import send_webhook
 
 logger = logging.getLogger("paperless.workflows.actions")
@@ -270,6 +274,63 @@ def execute_webhook_action(
             f"Error occurred sending webhook: {e}",
             extra={"group": logging_group},
         )
+
+
+def execute_export_action(
+    action: WorkflowAction,
+    document: Document | ConsumableDocument,
+    logging_group,
+) -> None:
+    """
+    Create an ExportRecord and queue delivery of the document to the
+    action's export target.
+    """
+    if isinstance(document, ConsumableDocument):
+        # Not reachable through supported triggers: export actions are
+        # rejected for consumption triggers at the serializer level, and a
+        # document being consumed has no primary key or stored file yet.
+        logger.warning(
+            "Export actions are not supported for consumption triggers",
+            extra={"group": logging_group},
+        )
+        return
+
+    export = action.export
+    if export is None:
+        logger.error(
+            f"Workflow export action {action.pk} has no export settings",
+            extra={"group": logging_group},
+        )
+        return
+
+    target = export.target
+    if not target.enabled:
+        logger.info(
+            f"Export target {target} is disabled, skipping export of "
+            f"document {document.pk}",
+            extra={"group": logging_group},
+        )
+        return
+
+    record = ExportRecord.objects.create(
+        target=target,
+        action=export,
+        document=document,
+        document_pk=document.pk,
+    )
+    # on_commit, not a bare dispatch: a worker that picks the task up before
+    # the record's transaction commits would find nothing to deliver and drop
+    # the export silently. Outside a transaction this runs immediately.
+    transaction.on_commit(
+        lambda: export_document.apply_async(
+            kwargs={"record_id": record.pk},
+            headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
+        ),
+    )
+    logger.debug(
+        f"Export of document {document.pk} to {target} queued",
+        extra={"group": logging_group},
+    )
 
 
 def execute_password_removal_action(

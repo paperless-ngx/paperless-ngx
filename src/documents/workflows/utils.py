@@ -28,6 +28,8 @@ def get_workflows_for_trigger(
             "assign_owner",
             "email",
             "webhook",
+            "export",
+            "export__target",
         )
         .prefetch_related(
             "assign_tags",

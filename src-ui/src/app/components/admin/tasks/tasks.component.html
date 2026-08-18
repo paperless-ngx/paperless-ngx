@@ -8,6 +8,10 @@
     <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedTasks.size === 0">
       <i-bs name="x" class="me-1"></i-bs><ng-container i18n>Clear selection</ng-container>
     </button>
+    <button class="btn btn-sm btn-outline-primary me-2" (click)="retrySelectedExports()" [hidden]="retryableSelectedTasks.length === 0" [disabled]="retryingSelected">
+      <i-bs name="arrow-clockwise" class="me-1"></i-bs><ng-container i18n>Retry selected</ng-container>
+      <span class="badge bg-primary ms-1">{{retryableSelectedTasks.length}}</span>
+    </button>
     <button class="btn btn-sm btn-outline-primary me-2" (click)="dismissTasks()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="visibleTasks.length === 0">
       <i-bs name="check2-all" class="me-1"></i-bs>{{dismissButtonText}}
     </button>
@@ -213,7 +217,12 @@
               </button>
             </td>
             <td class="actions-col">
-              <div class="btn-group" role="group">
+              <div class="d-inline-flex flex-wrap gap-1" role="group">
+                @if (canRetryExport(task)) {
+                  <button class="btn btn-sm btn-outline-primary" [disabled]="retryingTaskId === task.id" (click)="retryExport(task); $event.stopPropagation();">
+                    <i-bs name="arrow-clockwise" class="me-1"></i-bs><ng-container i18n>Retry</ng-container>
+                  </button>
+                }
                 <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }">
                   <i-bs name="check" class="me-1"></i-bs><ng-container i18n>Dismiss</ng-container>
                 </button>

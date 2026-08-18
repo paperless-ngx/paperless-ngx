@@ -31,6 +31,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
 from django.db import connections
+from django.db import transaction
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.models import Avg
@@ -130,6 +131,8 @@ from documents.conditionals import thumbnail_last_modified
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
+from documents.export.delivery import probe_target
+from documents.export.sinks import ExportSinkError
 from documents.file_handling import format_filename
 from documents.filters import CorrespondentFilterSet
 from documents.filters import CustomFieldFilterSet
@@ -153,6 +156,8 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import ExportRecord
+from documents.models import ExportTarget
 from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
@@ -196,6 +201,8 @@ from documents.serialisers import DocumentVersionLabelSerializer
 from documents.serialisers import DocumentVersionSerializer
 from documents.serialisers import EditPdfDocumentsSerializer
 from documents.serialisers import EmailSerializer
+from documents.serialisers import ExportRecordSerializer
+from documents.serialisers import ExportTargetSerializer
 from documents.serialisers import MergeDocumentsSerializer
 from documents.serialisers import NotesSerializer
 from documents.serialisers import PostDocumentSerializer
@@ -233,6 +240,7 @@ from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_request_version_param
 from documents.versioning import get_root_document
 from documents.versioning import resolve_requested_version_for_root
+from documents.workflows.exports import export_document
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import AIConfig
@@ -1857,6 +1865,146 @@ class DocumentViewSet(
                 "error": "error",
             },
         )
+
+    @action(
+        methods=["get", "post"],
+        detail=True,
+        pagination_class=None,
+        filter_backends=[],
+    )
+    def exports(self, request, pk=None):
+        """
+        List the export records of a document, or deliver it to a target now.
+        """
+        currentUser = request.user
+        if not currentUser.has_perm("documents.view_exportrecord"):
+            return HttpResponseForbidden("Insufficient permissions to view exports")
+        try:
+            doc = Document.objects.select_related("owner").get(pk=pk)
+            if currentUser is not None and not has_perms_owner_aware(
+                currentUser,
+                "view_document",
+                doc,
+            ):
+                return HttpResponseForbidden(
+                    "Insufficient permissions to view exports",
+                )
+        except Document.DoesNotExist:
+            raise Http404
+
+        if request.method == "POST":
+            if not currentUser.has_perm("documents.add_exportrecord"):
+                return HttpResponseForbidden(
+                    "Insufficient permissions to export this document",
+                )
+            target_id = request.data.get("target")
+            if target_id is None:
+                raise ValidationError({"target": "This field is required."})
+            try:
+                target = ExportTarget.objects.get(pk=target_id)
+            except (TypeError, ValueError, ExportTarget.DoesNotExist):
+                raise ValidationError({"target": "Invalid export target."})
+            if currentUser is not None and not has_perms_owner_aware(
+                currentUser,
+                "view_exporttarget",
+                target,
+            ):
+                return HttpResponseForbidden(
+                    "Insufficient permissions to use this export target",
+                )
+            if not target.enabled:
+                raise ValidationError({"target": "Export target is disabled."})
+            # A manual export has no workflow action; delivery falls back to
+            # the default options (original file plus metadata sidecar).
+            record = ExportRecord.objects.create(
+                target=target,
+                document=doc,
+                document_pk=doc.pk,
+            )
+            transaction.on_commit(
+                lambda: export_document.apply_async(
+                    kwargs={"record_id": record.pk},
+                ),
+            )
+            return Response(ExportRecordSerializer(record).data)
+
+        records = ExportRecord.objects.filter(document_pk=doc.pk).select_related(
+            "target",
+        )
+        return Response(ExportRecordSerializer(records, many=True).data)
+
+    @action(
+        methods=["post"],
+        detail=True,
+        url_path="exports/(?P<record_id>[0-9]+)/retry",
+        pagination_class=None,
+        filter_backends=[],
+    )
+    def export_retry(self, request, pk=None, record_id=None):
+        """
+        Reset a failed export record to pending and queue its delivery again.
+
+        The typical use is a target whose credentials went stale: once the
+        target is fixed, the failed records can be re-driven without creating
+        new ones.
+        """
+        currentUser = request.user
+        # Retrying is dispatching a delivery, the same capability as
+        # exporting on demand — hence add_exportrecord, not change.
+        if not currentUser.has_perm("documents.add_exportrecord"):
+            return HttpResponseForbidden(
+                "Insufficient permissions to retry exports",
+            )
+        try:
+            doc = Document.objects.select_related("owner").get(pk=pk)
+            if currentUser is not None and not has_perms_owner_aware(
+                currentUser,
+                "view_document",
+                doc,
+            ):
+                return HttpResponseForbidden(
+                    "Insufficient permissions to retry exports",
+                )
+        except Document.DoesNotExist:
+            raise Http404
+
+        record = (
+            ExportRecord.objects.filter(pk=record_id, document_pk=doc.pk)
+            .select_related("target")
+            .first()
+        )
+        if record is None:
+            raise Http404
+        if record.status != ExportRecord.Status.FAILED:
+            raise ValidationError(
+                {"status": "Only failed exports can be retried."},
+            )
+        target = record.target
+        if target is None:
+            raise ValidationError(
+                {"target": "The export target no longer exists."},
+            )
+        if currentUser is not None and not has_perms_owner_aware(
+            currentUser,
+            "view_exporttarget",
+            target,
+        ):
+            return HttpResponseForbidden(
+                "Insufficient permissions to use this export target",
+            )
+        if not target.enabled:
+            raise ValidationError({"target": "Export target is disabled."})
+
+        record.status = ExportRecord.Status.PENDING
+        record.last_error = None
+        record.finished_at = None
+        record.save(update_fields=["status", "last_error", "finished_at"])
+        transaction.on_commit(
+            lambda: export_document.apply_async(
+                kwargs={"record_id": record.pk},
+            ),
+        )
+        return Response(ExportRecordSerializer(record).data)
 
     @action(methods=["get"], detail=True, filter_backends=[])
     def share_links(self, request, pk=None):
@@ -4988,6 +5136,191 @@ class WorkflowViewSet(ModelViewSet[Workflow]):
     )
 
 
+@extend_schema_view(
+    test=extend_schema(
+        operation_id="export_target_test",
+        request=ExportTargetSerializer,
+        description="Test the connection to an export target",
+        responses={
+            200: inline_serializer(
+                name="ExportTargetTestResponse",
+                fields={"success": serializers.BooleanField()},
+            ),
+            400: OpenApiTypes.STR,
+        },
+    ),
+)
+class ExportTargetViewSet(PassUserMixin, ModelViewSet[ExportTarget]):
+    model = ExportTarget
+
+    queryset = ExportTarget.objects.select_related("owner").order_by(Lower("name"))
+    serializer_class = ExportTargetSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (PermittedObjectsFilter,)
+
+    # The settings that decide whether the destination can be reached. Editing
+    # anything else — a name, an owner, permissions, the enabled flag — must
+    # not depend on the destination being up at that moment.
+    CONNECTION_FIELDS = (
+        "kind",
+        "config",
+        "access_key",
+        "secret_key",
+        "private_key",
+        "passphrase",
+        "retention_days",
+    )
+    SECRET_FIELDS = ("secret_key", "private_key", "passphrase")
+
+    def get_permissions(self):
+        if self.action == "test":
+            # Test action does not require object level permissions
+            self.permission_classes = (IsAuthenticated,)
+        return super().get_permissions()
+
+    @staticmethod
+    def _is_obfuscated(value) -> bool:
+        """True for the all-``*`` placeholder the API sends back for a secret."""
+        return bool(value) and not str(value).replace("*", "")
+
+    def _changes_connection(self, serializer) -> bool:
+        instance = serializer.instance
+        if instance is None:
+            return True
+        for field in self.CONNECTION_FIELDS:
+            if field not in serializer.validated_data:
+                continue
+            value = serializer.validated_data[field]
+            if field in self.SECRET_FIELDS and self._is_obfuscated(value):
+                # Unchanged secret, echoed back from a previous read.
+                continue
+            if value != getattr(instance, field):
+                return True
+        return False
+
+    def _connection_candidate(self, serializer) -> ExportTarget:
+        """An unsaved target carrying the connection settings to be probed."""
+        instance = serializer.instance
+        candidate = ExportTarget(
+            **{
+                field: serializer.validated_data.get(
+                    field,
+                    getattr(instance, field, None),
+                )
+                for field in self.CONNECTION_FIELDS
+            },
+        )
+        for field in self.SECRET_FIELDS:
+            if self._is_obfuscated(getattr(candidate, field)):
+                setattr(candidate, field, getattr(instance, field, None))
+        return candidate
+
+    def _probe_and_save(self, serializer) -> None:
+        """
+        Save a target only once it has proved it can be written to.
+
+        The probe runs before the write, so a destination that cannot be
+        reached leaves the stored target untouched rather than needing a
+        rollback, and no transaction is held open across the network call.
+        """
+        if not self._changes_connection(serializer):
+            serializer.save()
+            return
+        candidate = self._connection_candidate(serializer)
+        try:
+            probe_target(candidate)
+        except ExportSinkError as e:
+            raise ValidationError({"non_field_errors": [str(e)]}) from e
+        # Probing an SFTP host pins its key on the first successful connection.
+        serializer.save(config=candidate.config)
+
+    def perform_create(self, serializer) -> None:
+        self._probe_and_save(serializer)
+
+    def perform_update(self, serializer) -> None:
+        self._probe_and_save(serializer)
+
+    def perform_destroy(self, instance) -> None:
+        # WorkflowActionExport.target is PROTECTed: deleting the target would
+        # otherwise leave export actions behind with nothing to export.
+        workflows = (
+            Workflow.objects.filter(actions__export__target=instance)
+            .distinct()
+            .values_list("name", flat=True)
+        )
+        if workflows:
+            raise ValidationError(
+                {
+                    "non_field_errors": [
+                        "This export target is still used by the workflow(s): "
+                        + ", ".join(workflows)
+                        + ". Remove the export actions first.",
+                    ],
+                },
+            )
+        super().perform_destroy(instance)
+
+    @action(methods=["post"], detail=False)
+    def test(self, request):
+        logger = logging.getLogger("paperless.export")
+        request.data["name"] = timezone.now().isoformat()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        existing_target = None
+        target_id = request.data.get("id")
+
+        # testing a new target requires add permission
+        if target_id is None and not request.user.has_perms(
+            ["documents.add_exporttarget"],
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        # testing an existing target requires change permission on that target
+        if target_id is not None:
+            try:
+                existing_target = ExportTarget.objects.get(pk=target_id)
+            except (TypeError, ValueError, ExportTarget.DoesNotExist):
+                return HttpResponseForbidden("Insufficient permissions")
+
+            if not has_perms_owner_aware(
+                request.user,
+                "change_exporttarget",
+                existing_target,
+            ):
+                return HttpResponseForbidden("Insufficient permissions")
+
+        data = {
+            key: value
+            for key, value in serializer.validated_data.items()
+            if key
+            in (
+                "kind",
+                "config",
+                "access_key",
+                "secret_key",
+                "private_key",
+                "passphrase",
+                "retention_days",
+                "enabled",
+            )
+        }
+        # target exists, use the stored secrets instead of ***
+        if existing_target is not None:
+            for field in ("secret_key", "private_key", "passphrase"):
+                value = data.get(field)
+                if value and len(str(value).replace("*", "")) == 0:
+                    data[field] = getattr(existing_target, field)
+
+        target = ExportTarget(**data)
+        try:
+            probe_target(target)
+        except ExportSinkError as e:
+            logger.error("Export target connectivity test failed: %s", e)
+            return HttpResponseBadRequest(str(e))
+        return Response({"success": True})
+
+
 class CustomFieldViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[CustomField]):
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
 
@@ -5276,6 +5609,33 @@ class SystemStatusView(PassUserMixin):
                 last_llmindex_update.date_done if last_llmindex_update else None
             )
 
+        if not ExportTarget.objects.exists():
+            export_status = "DISABLED"
+            export_error = None
+            export_last_failure = None
+        else:
+            last_failed_export = (
+                ExportRecord.objects.filter(
+                    status=ExportRecord.Status.FAILED,
+                    created_at__gte=timezone.now()
+                    - timedelta(days=self.TASK_SUMMARY_DAYS),
+                )
+                .order_by("-created_at")
+                .select_related("target")
+                .first()
+            )
+            export_status = "OK"
+            export_error = None
+            export_last_failure = None
+            if last_failed_export is not None:
+                export_status = "ERROR"
+                export_error = (
+                    last_failed_export.last_error.get("error")
+                    if last_failed_export.last_error
+                    else None
+                )
+                export_last_failure = last_failed_export.created_at
+
         summary_cutoff = timezone.now() - timedelta(days=self.TASK_SUMMARY_DAYS)
         task_summary_agg = PaperlessTask.objects.filter(
             date_created__gte=summary_cutoff,
@@ -5339,6 +5699,9 @@ class SystemStatusView(PassUserMixin):
                     "llmindex_status": llmindex_status,
                     "llmindex_last_modified": llmindex_last_modified,
                     "llmindex_error": llmindex_error,
+                    "export_status": export_status,
+                    "export_last_failure": export_last_failure,
+                    "export_error": export_error,
                     "summary": task_summary,
                 },
             },

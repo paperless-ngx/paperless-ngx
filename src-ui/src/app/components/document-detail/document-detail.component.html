@@ -34,6 +34,11 @@
     (versionsUpdated)="onVersionsUpdated($event)"
   />
 
+  <pngx-document-export-dropdown
+    *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.ExportRecord }"
+    [documentId]="documentId()"
+  />
+
   <div class="btn-group">
     <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading()">
       @if (downloading()) {

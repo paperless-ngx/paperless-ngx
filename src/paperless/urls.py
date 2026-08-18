@@ -24,6 +24,7 @@ from documents.views import CustomFieldViewSet
 from documents.views import DeleteDocumentsView
 from documents.views import DocumentTypeViewSet
 from documents.views import EditPdfDocumentsView
+from documents.views import ExportTargetViewSet
 from documents.views import GlobalSearchView
 from documents.views import IndexView
 from documents.views import LogViewSet
@@ -86,6 +87,7 @@ api_router.register(r"workflow_triggers", WorkflowTriggerViewSet)
 api_router.register(r"workflow_actions", WorkflowActionViewSet)
 api_router.register(r"workflows", WorkflowViewSet)
 api_router.register(r"custom_fields", CustomFieldViewSet)
+api_router.register(r"export_targets", ExportTargetViewSet)
 api_router.register(r"config", ApplicationConfigurationViewSet)
 api_router.register(r"processed_mail", ProcessedMailViewSet)
 

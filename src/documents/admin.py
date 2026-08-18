@@ -8,6 +8,8 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import ExportRecord
+from documents.models import ExportTarget
 from documents.models import Note
 from documents.models import PaperlessTask
 from documents.models import SavedView
@@ -234,6 +236,79 @@ class CustomFieldInstancesAdmin(GuardedModelAdmin):
         )
 
 
+class ExportTargetAdmin(GuardedModelAdmin):
+    list_display = ("name", "kind", "enabled", "owner")
+    list_filter = ("kind", "enabled", "owner")
+    search_fields = ("name",)
+    # Credentials are deliberately not part of the admin form: the admin
+    # bypasses the save-time connection probe, and rendering a stored secret
+    # into an HTML form is a wider exposure than the API, which only ever
+    # returns an obfuscated placeholder. Manage them on the Export Targets
+    # page instead.
+    exclude = ("access_key", "secret_key", "private_key", "passphrase")
+    readonly_fields = ("credentials",)
+
+    @admin.display(description="credentials")
+    def credentials(self, obj) -> str:  # pragma: no cover
+        stored = [
+            name
+            for name, value in (
+                ("access key", obj.access_key),
+                ("secret key", obj.secret_key),
+                ("private key", obj.private_key),
+                ("passphrase", obj.passphrase),
+            )
+            if value
+        ]
+        return ", ".join(stored) if stored else "none stored"
+
+    def get_queryset(self, request):  # pragma: no cover
+        return super().get_queryset(request).select_related("owner")
+
+
+class ExportRecordAdmin(admin.ModelAdmin):
+    """
+    Export records are audit evidence of what was pushed where, so they are
+    read-only here: they are written by the delivery task and must outlive
+    both their document and their target.
+    """
+
+    list_display = (
+        "created_at",
+        "document_pk",
+        "target",
+        "status",
+        "object_key",
+        "finished_at",
+    )
+    list_filter = ("status", "created_at", "target")
+    list_display_links = ("created_at",)
+    search_fields = ("object_key", "checksum", "document_pk")
+    raw_id_fields = ("document",)
+    readonly_fields = (
+        "target",
+        "action",
+        "document",
+        "document_pk",
+        "status",
+        "object_key",
+        "checksum",
+        "size_bytes",
+        "created_at",
+        "finished_at",
+        "last_error",
+    )
+
+    def has_add_permission(self, request) -> bool:  # pragma: no cover
+        return False
+
+    def has_change_permission(self, request, obj=None) -> bool:  # pragma: no cover
+        return False
+
+    def get_queryset(self, request):  # pragma: no cover
+        return super().get_queryset(request).select_related("target", "document")
+
+
 admin.site.register(Correspondent, CorrespondentAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(DocumentType, DocumentTypeAdmin)
@@ -246,6 +321,8 @@ admin.site.register(ShareLink, ShareLinksAdmin)
 admin.site.register(ShareLinkBundle, ShareLinkBundleAdmin)
 admin.site.register(CustomField, CustomFieldsAdmin)
 admin.site.register(CustomFieldInstance, CustomFieldInstancesAdmin)
+admin.site.register(ExportTarget, ExportTargetAdmin)
+admin.site.register(ExportRecord, ExportRecordAdmin)
 
 if settings.AUDIT_LOG_ENABLED:
 
