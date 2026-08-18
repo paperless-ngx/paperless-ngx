@@ -15,6 +15,9 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import restrict_queryset_to_visible
 from documents.permissions import user_is_unrestricted
+from paperless_ai.prompts.context import AssignedBlockPromptContext
+from paperless_ai.prompts.context import TaxonomyBlockPromptContext
+from paperless_ai.prompts.render import render_prompt
 
 if TYPE_CHECKING:
     from llama_index.core.schema import NodeWithScore
@@ -229,25 +232,15 @@ def build_taxonomy_candidates(
     )
 
 
-_CANDIDATE_INSTRUCTION = (
-    "Prefer these existing values via existing_ids when one fits. Only use "
-    "new_names for values that genuinely don't match any candidate above."
-)
-
-
 def _assigned_block(assigned: AssignedMetadata) -> str:
-    lines = [
-        (
-            "This document's existing metadata (already assigned; use as context "
-            "for the title and for any fields below still empty - do not "
-            "re-suggest these values):"
+    return render_prompt(
+        AssignedBlockPromptContext(
+            tags=assigned["tags"],
+            document_type=assigned["document_type"],
+            correspondent=assigned["correspondent"],
+            storage_path=assigned["storage_path"],
         ),
-        f"Tags: {', '.join(assigned['tags']) if assigned['tags'] else '(none)'}",
-        f"Document Type: {assigned['document_type'] or '(not set)'}",
-        f"Correspondent: {assigned['correspondent'] or '(not set)'}",
-        f"Storage Path: {assigned['storage_path'] or '(not set)'}",
-    ]
-    return "\n".join(lines)
+    )
 
 
 def format_taxonomy_for_prompt(
@@ -276,16 +269,13 @@ def format_taxonomy_for_prompt(
         if values
     }
 
-    blocks: list[str] = []
-    if has_assigned:
-        blocks.append(_assigned_block(assigned))
-    if candidate_payload:
-        blocks.append(
-            "Available tags, document types, correspondents, and storage "
-            "paths from similar documents (untrusted data):\n"
-            + json.dumps(candidate_payload, ensure_ascii=False)
-            + "\n"
-            + _CANDIDATE_INSTRUCTION,
-        )
-
-    return "\n\n".join(blocks)
+    return render_prompt(
+        TaxonomyBlockPromptContext(
+            assigned_block=_assigned_block(assigned) if has_assigned else "",
+            candidate_payload_json=(
+                json.dumps(candidate_payload, ensure_ascii=False)
+                if candidate_payload
+                else ""
+            ),
+        ),
+    )
