@@ -16,7 +16,7 @@
 - `page_count:>5`, `asn:<10`, `page_count:>=5`, `asn:[1 TO 10]`, `tag_id:1,2,3` parse OK (comparison operators produce correct `RangeQuery`).
 - `asn:[1 TO]` / `asn:[TO 10]` are a **Syntax Error** (open numeric ranges unsupported; only open _date_ ranges work via sentinels).
 - `scan()` only tokenizes fields in `KNOWN_FIELDS`; unknown `foobar:hello` stays a `Passthrough` and only fails at `parse_query` -> detected by the backstop, not proactively.
-- `difflib.get_close_matches("corespondent", pool)` -> `["correspondent"]`; `has_tags`/`http`/`12` -> `[]` (bare message).
+- `difflib.get_close_matches("correspondent", pool)` -> `["correspondent"]`; `has_tags`/`http`/`12` -> `[]` (bare message).
 - `tantivy.Schema` exposes no field-name list, so the drift guard is parse-based.
 
 ## File Structure
@@ -74,7 +74,7 @@ class TestErrorClasses:
         assert str(err) == "Unknown search field 'has_tags'."
 
     def test_unknown_field_message_with_suggestion(self):
-        err = UnknownFieldError("corespondent", suggestion="correspondent")
+        err = UnknownFieldError("correspondent", suggestion="correspondent")
         assert err.suggestion == "correspondent"
         assert str(err) == (
             "Unknown search field 'corespondent'. Did you mean 'correspondent'?"
@@ -350,9 +350,9 @@ from documents.search._translate import map_tantivy_error
 class TestMapTantivyError:
     def test_unknown_field_maps_with_suggestion(self):
         exc = ValueError("Field does not exist: 'corespondent'")
-        mapped = map_tantivy_error(exc, "corespondent:foo")
+        mapped = map_tantivy_error(exc, "correspondent:foo")
         assert isinstance(mapped, UnknownFieldError)
-        assert mapped.field == "corespondent"
+        assert mapped.field == "correspondent"
         assert mapped.suggestion == "correspondent"
 
     def test_unknown_field_maps_without_suggestion(self):
@@ -481,7 +481,7 @@ git commit -m "feat(search): map tantivy parse errors to user-safe messages"
 
 **Files:**
 
-- Modify: `src/documents/search/_query.py` (import `map_tantivy_error`; add `_parse_query_friendly`; use it at lines 231-235 and 253-259)
+- Modify: `src/documents/search/_query.py` (import `map_tantivy_error`; add `_parse_query_friendly`; use it at lines 216-220 and 238-244)
 - Test: `src/documents/tests/search/test_error_shapes.py`
 
 - [ ] **Step 1: Write the failing test**
@@ -506,7 +506,7 @@ class TestBackstopViaParseUserQuery:
 
     def test_unknown_field_suggestion(self, index: tantivy.Index):
         with pytest.raises(UnknownFieldError) as exc_info:
-            parse_user_query(index, "corespondent:bob", UTC)
+            parse_user_query(index, "correspondent:bob", UTC)
         assert exc_info.value.suggestion == "correspondent"
 
     def test_legacy_backend_field_is_unknown(self, index: tantivy.Index):
@@ -555,13 +555,13 @@ Expected: FAIL — unknown-field/syntax cases currently raise the bare Tantivy `
 
 - [ ] **Step 3: Write minimal implementation**
 
-In `src/documents/search/_query.py`, add the import alongside the existing translate imports (after line 20):
+In `src/documents/search/_query.py`, add the import alongside the existing translate imports (after line 13):
 
 ```python
 from documents.search._translate import map_tantivy_error
 ```
 
-Add a module-level helper (place it just above `parse_user_query`, before line 191):
+Add a module-level helper (place it just above `parse_user_query`, before line 176):
 
 ```python
 def _parse_query_friendly(
@@ -584,7 +584,7 @@ def _parse_query_friendly(
         raise
 ```
 
-In `parse_user_query`, replace the exact-query parse (lines 231-235):
+In `parse_user_query`, replace the exact-query parse (lines 216-220):
 
 ```python
     exact = _parse_query_friendly(
@@ -596,7 +596,7 @@ In `parse_user_query`, replace the exact-query parse (lines 231-235):
     )
 ```
 
-and the fuzzy parse (lines 253-259):
+and the fuzzy parse (lines 238-244):
 
 ```python
         fuzzy = _parse_query_friendly(
@@ -610,7 +610,7 @@ and the fuzzy parse (lines 253-259):
         )
 ```
 
-(`SearchQueryError` is already imported in `_query.py` at line 19.)
+(`SearchQueryError` is already imported in `_query.py` at line 12.)
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -712,7 +712,7 @@ Expected: PASS. (These assert current truth; they guard against future drift. If
 
 - [ ] **Step 4: Write the failing view-level test**
 
-In `src/documents/tests/test_api_search.py`, locate `test_search_added_invalid_date` (around line 723) and add this test directly after it, inside the same `TestDocumentSearchApi` class (mirrors that test's structure):
+In `src/documents/tests/test_api_search.py`, locate `test_search_added_invalid_date` (around line 765) and add this test directly after it, inside the same `TestDocumentSearchApi` class (mirrors that test's structure):
 
 ```python
     def test_search_unknown_field_returns_400(self) -> None:

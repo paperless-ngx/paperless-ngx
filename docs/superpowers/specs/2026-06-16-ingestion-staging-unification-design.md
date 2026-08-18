@@ -11,11 +11,11 @@ Every document that enters paperless converges on one operation: build a
 and dispatch the `consume_file` Celery task with a `trigger_source` header. That
 operation is hand-rolled at **five** sites today, plus a sixth internal one:
 
-- consume-folder watcher — `document_consumer.py:342`
-- API upload + Web UI — `views.py:3181` (one endpoint, two `DocumentSource` values)
-- document-version upload — `views.py:1964`
-- mail attachment — `mail.py:899`
-- mail `.eml` whole-message — `mail.py:987`
+- consume-folder watcher — `document_consumer.py:346`
+- API upload + Web UI — `views.py:3327` (one endpoint, two `DocumentSource` values)
+- document-version upload — `views.py:2086`
+- mail attachment — `mail.py:993`
+- mail `.eml` whole-message — `mail.py:1084`
 - barcode split children (internal re-enqueue) — `barcodes.py:190`/`227`
 
 The duplication causes three concrete problems:
@@ -29,10 +29,10 @@ The duplication causes three concrete problems:
 2. **A scratch leak from split staging/cleanup ownership.** Staged sources create
    scratch input under `SCRATCH_DIR` that nothing ever fully removes:
    `ConsumerPlugin` unlinks only the input **file**, and only on the success path
-   (`consumer.py:742`). The exact leak shape varies by site — mail attachments and
+   (`consumer.py:738`). The exact leak shape varies by site — mail attachments and
    API/version use `mkdtemp` + a file inside, so the **directory** is orphaned
    (empty after success, dir-with-file on failure); the mail `.eml` path uses
-   `mkstemp` (`mail.py:~955`), so it leaks a **file** directly in `SCRATCH_DIR` on
+   `mkstemp` (`mail.py:~1034`), so it leaks a **file** directly in `SCRATCH_DIR` on
    failure. Either way there is no owner that removes the staged input on every
    terminal path.
 
@@ -46,7 +46,7 @@ The duplication causes three concrete problems:
 Separately, the consumption task already has **two** working temp directories that
 duplicate each other: `consume_file` opens one `TemporaryDirectory` and passes it
 to every plugin (`tasks.py:220`), but `ConsumerPlugin` ignores that and opens its
-_own_ second `TemporaryDirectory` (`consumer.py:417`).
+_own_ second `TemporaryDirectory` (`consumer.py:408`).
 
 ## Goal
 
@@ -194,7 +194,7 @@ with a derived work_root:
 
 The per-task working directory passed to plugins becomes a **subfolder of
 work_root**, and `ConsumerPlugin` uses that handed-in directory for its working
-copy instead of opening its own second `TemporaryDirectory` (`consumer.py:417`).
+copy instead of opening its own second `TemporaryDirectory` (`consumer.py:408`).
 One tree per document; one cleanup.
 
 ### Barcode split children (`barcodes.py`)
@@ -216,7 +216,7 @@ independently cleanable when the parent stops.
 Mail is the one source that does **not** dispatch per file: `_handle_message`
 collects N attachment signatures (and optionally the `.eml` signature), then
 `queue_consumption_tasks` wraps them in a single `chord(...).delay()` _after_ the
-loop (`mail.py:919`). A per-file `release()` is therefore wrong — if `release()`
+loop (`mail.py:1014`). A per-file `release()` is therefore wrong — if `release()`
 ran per attachment and the later chord dispatch threw, every staged file would be
 orphaned, reopening the leak. **The ownership boundary is the whole message:**
 
@@ -237,7 +237,7 @@ def _handle_message(...):
 `queue_consumption_tasks` itself is unchanged. `build_consume_signature` **must
 pass `input_doc`/`overrides` as keyword args** (`consume_file.s(input_doc=...,
 overrides=...)`) so the resulting `Signature.kwargs` keeps the shape mail tests
-assert on (`test_mail.py:365-366`).
+assert on (`test_mail.py:389-390`).
 
 ### Call-site refactor (the external sites)
 
@@ -298,7 +298,7 @@ consume_file task (async, later)
   extend to it; (b) the plan must verify the move-precedes-stop ordering, since it
   is load-bearing for the cleanup rule.
 - **`ConsumerPlugin`'s own cleanup becomes partly redundant.** On success it
-  unlinks `original_file` and `working_copy` (`consumer.py:742/744`), both of
+  unlinks `original_file` and `working_copy` (`consumer.py:738/740`), both of
   which now live inside work_root that the task `finally` `rmtree`s. The redundant
   unlinks are harmless but the plan should remove them for clarity, while keeping
   the qpdf `--replace-input` recovery (`unmodified_original`, `consumer.py:452+`)

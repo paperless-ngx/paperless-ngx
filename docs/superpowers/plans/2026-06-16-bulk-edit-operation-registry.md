@@ -95,7 +95,7 @@ class TestBulkEditPermissionMatrix:
 Notes:
 
 - Mock the underlying `bulk_edit.<fn>` (patch `documents.views.bulk_edit.<fn>`) so the operations don't actually run — this test is purely about the permission gate returning 200 vs 403.
-- A superuser short-circuits to allowed (`views.py:2697`); include one superuser row to pin that.
+- A superuser short-circuits to allowed (`views.py:2833`); include one superuser row to pin that.
 - This is verbose by design; the matrix is the security contract. Prefer one parametrized test over hand-written methods.
 - **Cover the six moved single-action endpoints too (REQUIRED — C2).** `/api/documents/rotate/`, `/merge/`, `/delete/`, `/reprocess/`, `/edit_pdf/`, `/remove_password/` run the **same** `_has_document_permissions` gate via `_execute_document_action`, and that path is rewritten in Task 3 (C1). Add a parallel parametrized test that POSTs to each (their request bodies are the dedicated serializers' fields — e.g. `{"documents": [...], "degrees": 90}` for rotate — **not** a `method`+`parameters` envelope). The existing `test_api_bulk_edit.py` already covers these endpoints' permission gates (`test_rotate_insufficient_permissions:1320`, `test_merge_and_delete_insufficient_permissions:1381`, `test_edit_pdf_insufficient_permissions:1635`, `test_remove_password_insufficient_permissions:1719`), so this is hardening rather than the sole net — but make the moved-endpoint matrix explicit here so the `_execute_document_action` rewrite is guarded by a parametrized characterization, not scattered one-offs.
 - **`edit_pdf` test docs need a `page_count` (M3).** `clean_parameters` for `edit_pdf` bounds-checks `op["page"]` against `Document.page_count` (`serialisers.py:2052-2059`); this test mocks execution but **not** validation, so an `edit_pdf` row with `page: 1` needs its target doc created with `page_count >= 1`, else it fails with a 400 (out-of-bounds) instead of the expected 200/403.
@@ -103,7 +103,7 @@ Notes:
 - [ ] **Step 2: Run it against CURRENT code — it must PASS**
 
 Run: `bash /c/Users/tholmes/Documents/Coding/paperless/vmtest.sh "src/documents/tests/test_bulk_operations.py -v"`
-Expected: PASS. If any row is red, the spec matrix is misread — reconcile against `views.py:2713-2760` before writing any production code.
+Expected: PASS. If any row is red, the spec matrix is misread — reconcile against `views.py:2843-2906` before writing any production code.
 
 - [ ] **Step 3: Commit**
 

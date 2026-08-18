@@ -133,7 +133,7 @@ Individual failures are logged and counted but do not abort the run. Bidirection
 | `src/documents/signals/handlers.py`                      | `shutil.move()` → `storage.move()`; remove `create_source_path_directory` / `delete_empty_directories` callsites |
 | `src/documents/tasks.py`                                 | Same as signals                                                                                                  |
 | `src/documents/file_handling.py`                         | `exists()` checks and directory references use storage API                                                       |
-| `src/documents/views/`                                   | File-serving views use `storage.open()` within context; wrap for `FileResponse` lifecycle                        |
+| `src/documents/views.py`                                 | File-serving views use `storage.open()` within context; wrap for `FileResponse` lifecycle                        |
 | `src/documents/management/commands/document_importer.py` | Replace `Path.glob()` and direct copies with storage API                                                         |
 | `src/documents/management/commands/document_exporter.py` | Replace direct file copies and `FileLock`-guarded writes with storage API                                        |
 
