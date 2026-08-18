@@ -626,8 +626,10 @@ def merge_as_versions(
 ) -> Literal["OK"]:
     with transaction.atomic():
         documents = list(
+            # Ordered by pk so concurrent merges take the row locks in the same order
             Document.objects.select_for_update()
             .filter(id__in=doc_ids)
+            .order_by("id")
             .defer("content"),
         )
         documents_by_id = {document.id: document for document in documents}
