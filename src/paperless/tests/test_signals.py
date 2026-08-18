@@ -163,6 +163,47 @@ class TestSyncSocialLoginGroups(TestCase):
         )
         self.assertEqual(list(user.groups.all()), [])
 
+    @override_settings(
+        SOCIAL_ACCOUNT_SYNC_GROUPS=True,
+        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP="admin-group",
+        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP="staff-group",
+    )
+    def test_no_sync_for_inactive_user(self) -> None:
+        """
+        GIVEN:
+            - Enabled group, superuser, and staff syncing
+            - A deactivated user with a matching social login
+        WHEN:
+            - The social login is updated via signal
+        THEN:
+            - Groups and roles are left untouched, since the login itself
+              would be rejected for a deactivated user anyway
+        """
+        Group.objects.create(name="admin-group")
+        user = User.objects.create_user(
+            username="inactive_user",
+            is_active=False,
+            is_superuser=False,
+            is_staff=False,
+        )
+        sociallogin = Mock(
+            user=user,
+            account=Mock(
+                extra_data={
+                    "groups": ["admin-group", "staff-group"],
+                },
+            ),
+        )
+        handle_social_account_updated(
+            sender=None,
+            request=HttpRequest(),
+            sociallogin=sociallogin,
+        )
+        user.refresh_from_db()
+        self.assertEqual(list(user.groups.all()), [])
+        self.assertFalse(user.is_superuser)
+        self.assertFalse(user.is_staff)
+
     @override_settings(SOCIAL_ACCOUNT_SYNC_GROUPS=True)
     def test_no_groups(self) -> None:
         """

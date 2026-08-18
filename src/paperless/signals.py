@@ -38,6 +38,18 @@ def handle_social_account_updated(sender, request, sociallogin, **kwargs):
     """
     from django.contrib.auth.models import Group
 
+    if not sociallogin.user.is_active:
+        # allauth looks up and updates the social account, firing this
+        # signal, before checking if the user is allowed to actually log
+        # in. Syncing groups/roles here would arm a deactivated account
+        # with permissions it never exercised, which would silently take
+        # effect if the account is later reactivated for an unrelated
+        # reason.
+        logger.debug(
+            f"Skipping social account sync for inactive user `{sociallogin.user}`",
+        )
+        return
+
     extra_data = sociallogin.account.extra_data or {}
     social_account_groups = extra_data.get(
         settings.SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM,
