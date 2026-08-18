@@ -70,23 +70,6 @@ def handle_social_account_updated(sender, request, sociallogin, **kwargs):
         is_superuser = (
             settings.SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP in social_account_groups
         )
-        # Safeguards to prevent accidental administrator lockout:
-        if not is_superuser and sociallogin.user.is_superuser:
-            # 1. Do not demote if the user has a local password (local override)
-            if sociallogin.user.has_usable_password():
-                is_superuser = True
-            else:
-                # 2. Do not demote if this is the only active superuser in the database
-                from django.contrib.auth.models import User
-
-                other_superusers_exist = (
-                    User.objects.filter(is_superuser=True, is_active=True)
-                    .exclude(pk=sociallogin.user.pk)
-                    .exists()
-                )
-                if not other_superusers_exist:
-                    is_superuser = True
-
         if sociallogin.user.is_superuser != is_superuser:
             sociallogin.user.is_superuser = is_superuser
             user_modified = True
@@ -95,14 +78,6 @@ def handle_social_account_updated(sender, request, sociallogin, **kwargs):
         is_staff = (
             settings.SOCIAL_ACCOUNT_SYNC_STAFF_GROUP in social_account_groups
         ) or sociallogin.user.is_superuser
-        # Do not demote staff if the user has a local password (local override)
-        if (
-            not is_staff
-            and sociallogin.user.is_staff
-            and sociallogin.user.has_usable_password()
-        ):
-            is_staff = True
-
         if sociallogin.user.is_staff != is_staff:
             sociallogin.user.is_staff = is_staff
             user_modified = True

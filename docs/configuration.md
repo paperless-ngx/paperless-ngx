@@ -780,11 +780,17 @@ system. See the corresponding
 
 : Allows you to define a group name that, if present in the third-party authentication system's groups claim, will grant the user superuser (admin) and staff status in Paperless-ngx. If the group is not present in the claim, superuser status will be revoked upon next login.
 
+    !!! warning
+        This is a direct reflection of the claim on every login, including the connecting user's own, with no exemption for the last remaining admin. If the group is missing or misconfigured on the identity provider side, the logged-in user will immediately lose their own superuser access. Fix the group membership or claim mapping on the identity provider to restore it. If the identity provider itself is unreachable or misconfigured and you are locked out, you can recover admin access locally with `manage.py createsuperuser`.
+
     Defaults to None
 
 #### [`PAPERLESS_SOCIAL_ACCOUNT_SYNC_STAFF_GROUP=<str>`](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_STAFF_GROUP) {#PAPERLESS_SOCIAL_ACCOUNT_SYNC_STAFF_GROUP}
 
 : Allows you to define a group name that, if present in the third-party authentication system's groups claim, will grant the user staff status in Paperless-ngx. If the group is not present in the claim and the user is not a superuser, staff status will be revoked upon next login.
+
+    !!! warning
+        As with [`PAPERLESS_SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP`](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP), this is applied on every login with no safeguards, including for the connecting user themselves.
 
     Defaults to None
 
