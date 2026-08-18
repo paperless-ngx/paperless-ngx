@@ -19,7 +19,7 @@ class TestRenderPrompt:
         WHEN:
             - render_prompt() is called
         THEN:
-            - The rendered text contains the labelled header and each value
+            - The rendered text contains the labeled header and each value
         """
         context = AssignedBlockPromptContext(
             tags=["Bloodwork", "Urgent"],

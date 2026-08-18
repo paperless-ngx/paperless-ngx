@@ -23,7 +23,7 @@ class PromptContext:
 
 
 # Every render here goes through Environment.get_template() and
-# .render(**dataclasses.asdict(context)). This is a variable substitution,
+# .render(**dataclasses.asdict(context)). This is variable substitution,
 # never a template-source compile. If you're about to call from_string()/Template()
 # on anything derived from user input, stop: that needs a sandboxed
 # environment (see documents/templating/environment.py), not this one.
