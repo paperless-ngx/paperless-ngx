@@ -10,8 +10,10 @@ from auditlog.context import disable_auditlog
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import DatabaseError
+from django.db import connection
 from django.test import TestCase
 from django.test import override_settings
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 
 from documents.file_handling import create_source_path_directory
@@ -32,6 +34,36 @@ from documents.tests.utils import FileSystemAssertsMixin
 
 
 class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
+    @override_settings(FILENAME_FORMAT="{title}")
+    def test_generate_unique_filename_renders_template_once(self) -> None:
+        document = Document.objects.create(
+            title="collision",
+            mime_type="application/pdf",
+        )
+        Document.objects.filter(pk=document.pk).update(filename="collision_03.pdf")
+        document.refresh_from_db()
+
+        for filename in (
+            "collision.pdf",
+            "collision_01.pdf",
+            "collision_02.pdf",
+            "collision_03.pdf",
+        ):
+            (settings.ORIGINALS_DIR / filename).touch()
+
+        with CaptureQueriesContext(connection) as queries:
+            generated = generate_unique_filename(document)
+
+        relation_queries = [
+            query["sql"]
+            for query in queries.captured_queries
+            if "documents_tag" in query["sql"]
+            or "documents_customfieldinstance" in query["sql"]
+        ]
+
+        self.assertEqual(generated, Path("collision_03.pdf"))
+        self.assertEqual(len(relation_queries), 2)
+
     @override_settings(FILENAME_FORMAT="")
     def test_generate_source_filename(self) -> None:
         document = Document()
