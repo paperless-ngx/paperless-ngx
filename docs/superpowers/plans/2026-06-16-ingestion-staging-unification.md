@@ -519,7 +519,7 @@ git commit -m "Feature: consume_file owns and cleans the staged work_root"
 
 **Files:**
 
-- Modify: `src/documents/management/commands/document_consumer.py:340-353`
+- Modify: `src/documents/management/commands/document_consumer.py:344-357`
 - Test: `src/documents/tests/test_management_consumer.py:99-103`
 
 - [ ] **Step 1: Repoint the consumer test fixture**
@@ -548,7 +548,7 @@ Expected: FAIL — the folder site still calls `consume_file.apply_async`, not t
 
 - [ ] **Step 3: Migrate the folder enqueue site**
 
-In `src/documents/management/commands/document_consumer.py`, add `from documents import ingest` at the top, and replace the enqueue block (lines ~340-353):
+In `src/documents/management/commands/document_consumer.py`, add `from documents import ingest` at the top, and replace the enqueue block (lines ~344-357):
 
 ```python
     # Queue for consumption
@@ -594,7 +594,7 @@ rewrite and the site migration land together.
 **Files:**
 
 - Modify: `src/documents/tests/utils.py:242-274`
-- Modify: `src/documents/views.py:3149-3192` (PostDocumentView) and `:1917-1976` (update_version)
+- Modify: `src/documents/views.py:3275-3338` (PostDocumentView) and `:2036-2098` (update_version)
 - Modify: `src/documents/tests/test_api_document_versions.py` (patch target)
 
 - [ ] **Step 1: Rewrite `ConsumeTaskMixin` to patch the seam**
@@ -643,7 +643,7 @@ Expected: FAIL — `PostDocumentView` still calls `consume_file.apply_async`, so
 - [ ] **Step 3: Migrate `PostDocumentView.post`**
 
 In `src/documents/views.py`, ensure `from documents import ingest` is imported,
-then replace the staging + dispatch (lines ~3149-3192) with a `stage_document`
+then replace the staging + dispatch (lines ~3275-3338) with a `stage_document`
 block:
 
 ```python
@@ -687,7 +687,7 @@ The old `SCRATCH_DIR.mkdir` + `mkdtemp` + `write_bytes` + the explicit
 
 - [ ] **Step 4: Migrate `update_version`**
 
-In `src/documents/views.py` `update_version` (lines ~1917-1976), replace its
+In `src/documents/views.py` `update_version` (lines ~2036-2098), replace its
 `mkdtemp`/`write`/`consume_file.apply_async` with the same pattern, preserving its
 specific fields (`root_document_id`, `version_label`, `actor_id`):
 
@@ -732,7 +732,7 @@ git commit -m "Refactor: route API/WebUI/version ingest through the staging seam
 
 **Files:**
 
-- Modify: `src/paperless_mail/mail.py` (`_handle_message` ~716-760, `_process_attachments` ~861-908, `_process_eml` ~952-1006)
+- Modify: `src/paperless_mail/mail.py` (`_handle_message` ~790-835, `_process_attachments` ~893-1024, `_process_eml` ~1026-1097)
 - Test: `src/paperless_mail/tests/test_mail.py`, `test_mail_nfc.py` (verify, likely no change)
 
 - [ ] **Step 1: Wrap the message's staging in an `ExitStack`**
@@ -774,7 +774,7 @@ work_root for the message.)
 
 - [ ] **Step 2: Stage each attachment via the stack**
 
-Replace the attachment staging (`mail.py:861-908`) inside `_process_attachments`:
+Replace the attachment staging (`mail.py:893-1024`) inside `_process_attachments`:
 
 ```python
                 staged = staging_stack.enter_context(
@@ -804,7 +804,7 @@ Replace the attachment staging (`mail.py:861-908`) inside `_process_attachments`
 
 The old `SCRATCH_DIR.mkdir` + `mkdtemp` + `write_bytes` + `consume_file.s(...).set(...)`
 are gone; `stage_document` handles the temp dir and `build_consume_signature` the
-header. Do the analogous replacement in `_process_eml` (`mail.py:952-1006`),
+header. Do the analogous replacement in `_process_eml` (`mail.py:1026-1097`),
 staging the `.eml` bytes and building the signature the same way.
 
 - [ ] **Step 3: Run the mail suites**
@@ -885,14 +885,14 @@ folder source needs it (its loose file in `CONSUMPTION_DIR` is removed on succes
 
 **Files:**
 
-- Modify: `src/documents/consumer.py:417-422`
+- Modify: `src/documents/consumer.py:408-414`
 - Test: `src/documents/tests/test_consumer.py`
 
 - [ ] **Step 1: Use the handed-in working dir instead of a second `TemporaryDirectory`**
 
 `ConsumerPlugin` already receives the task's working dir as `self.base_tmp_dir`
 (the `tmp_dir` arg from `tasks.py:227-233`). Replace its own
-`tempfile.TemporaryDirectory(...)` (`consumer.py:417`) with a subfolder of that
+`tempfile.TemporaryDirectory(...)` (`consumer.py:408`) with a subfolder of that
 handed-in dir:
 
 ```python

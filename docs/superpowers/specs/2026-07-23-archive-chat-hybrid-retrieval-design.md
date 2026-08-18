@@ -11,7 +11,7 @@ The archive-wide AI chat (`ChatStreamingView` with no `document_id`, backed by
 purely via dense-vector similarity search: `VectorIndexRetriever` embeds the
 user's question and does cosine-similarity nearest-neighbor search over chunk
 embeddings, with a hardcoded `similarity_top_k` of 5 (`CHAT_RETRIEVER_TOP_K`,
-`chat.py:20`) and no similarity cutoff.
+`chat.py:22`) and no similarity cutoff.
 
 Dense embeddings are known to perform poorly on exact keyword, rare/foreign
 word, and numeric-string matching (e.g. a compound German word like
@@ -60,9 +60,9 @@ already computed for vector search wherever possible.
    caller's permitted document IDs.
 2. Call `documents.search.get_backend().search_ids(query_str, user=user,
 search_mode=SearchMode.TEXT, limit=CHAT_LEXICAL_TOP_K)` — the same idiom
-   already used in `views.py:3522` — to get lexical document-ID matches.
+   already used in `views.py:3588` — to get lexical document-ID matches.
    `user` is `None` for superusers and `request.user` otherwise, matching the
-   existing permission pattern (`views.py:3521`). Intersect the returned IDs
+   existing permission pattern (`views.py:3587`). Intersect the returned IDs
    with the caller-provided `documents` set so results never exceed what the
    caller already permission-scoped (this is what makes the retriever safe
    to use for both the archive-wide and single-document cases).
@@ -72,7 +72,7 @@ search_mode=SearchMode.TEXT, limit=CHAT_LEXICAL_TOP_K)` — the same idiom
    and a metadata filter restricted to that one document ID, reusing the
    same query embedding. This is deliberate: `PaperlessSqliteVecVectorStore
 .query()` runs a single global `vec0` KNN search over the WHERE-filtered
-   rows (`vector_store.py:409-434`) — it does not partition top-k per
+   rows (`vector_store.py:491-527`) — it does not partition top-k per
    document — so a single batched call across N lexical-hit documents with
    `top_k=N` could return several chunks from one document and none from
    another. Per-document calls are the only way to guarantee each lexical
@@ -122,7 +122,7 @@ search_mode=SearchMode.TEXT, limit=CHAT_LEXICAL_TOP_K)` — the same idiom
   internally exactly as today and used as step 1 of the hybrid flow.
 - **Changed:** `stream_chat_with_documents()` / `_stream_chat_with_documents()`
   gain a `user` parameter, threaded from `ChatStreamingView.post`
-  (`views.py:2268`) using the same `None`-for-superuser convention already
+  (`views.py:2303`) using the same `None`-for-superuser convention already
   used elsewhere in `views.py`.
 
 ### Scope: applies to both chat modes
@@ -140,7 +140,7 @@ that vector similarity alone might miss.
   reason, the lexical step should degrade gracefully to vector-only results
   (log and continue) rather than failing the whole chat response — chat
   already wraps everything in a try/except at the `stream_chat_with_documents`
-  level (`chat.py:82-87`), but the lexical addition should not, by itself,
+  level (`chat.py:138-146`), but the lexical addition should not, by itself,
   turn a previously-working vector-only answer into an error.
 
 ### Testing

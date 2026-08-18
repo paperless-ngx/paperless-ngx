@@ -131,7 +131,9 @@ Both postdate the `0.26.0` wheel.
 - Tantivy side (does a translated string parse?): build a real index via
   `documents.search._schema.build_schema` + `register_tokenizers`, then
   `index.parse_query(translate_query(q, tz), DEFAULT_SEARCH_FIELDS, field_boosts=…)`.
-- Whoosh side (what did v2 do?): the old `get_schema()` + `MultifieldParser([...]) +
-DateParserPlugin(...)` still exists on `main` (`src/documents/index.py`); run a query
-  through it to get the ground-truth `Query`.
+- Whoosh side (what did v2 do?): `src/documents/index.py` (the old `get_schema()` +
+  `MultifieldParser([...]) + DateParserPlugin(...)`) was deleted from `main` in
+  `aed9abe48` (#12471, 2026-04-02); check it out at `git show aed9abe48^:src/documents/index.py`
+  (or `git checkout aed9abe48^ -- src/documents/index.py`) and run a query through it
+  to get the ground-truth `Query`.
 - A fuller empirical gap matrix lives in `SEARCH_TANTIVY_WHOOSH_COMPAT.md`.
