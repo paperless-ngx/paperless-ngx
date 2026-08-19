@@ -395,7 +395,7 @@ class DocumentClassifier:
                 self.tags_binarizer = MultiLabelBinarizer()
                 labels_tags_vectorized = self.tags_binarizer.fit_transform(labels_tags)
 
-            self.tags_classifier = MLPClassifier(tol=0.01)
+            self.tags_classifier = MLPClassifier(tol=0.01, random_state=0)
             self.tags_classifier.fit(data_vectorized, labels_tags_vectorized)
         else:
             self.tags_classifier = None
@@ -406,7 +406,7 @@ class DocumentClassifier:
             notify(
                 f"Training correspondent classifier ({num_correspondents} correspondent(s))...",
             )
-            self.correspondent_classifier = MLPClassifier(tol=0.01)
+            self.correspondent_classifier = MLPClassifier(tol=0.01, random_state=0)
             self.correspondent_classifier.fit(
                 data_vectorized,
                 labels_correspondent,
@@ -423,7 +423,7 @@ class DocumentClassifier:
             notify(
                 f"Training document type classifier ({num_document_types} type(s))...",
             )
-            self.document_type_classifier = MLPClassifier(tol=0.01)
+            self.document_type_classifier = MLPClassifier(tol=0.01, random_state=0)
             self.document_type_classifier.fit(
                 data_vectorized,
                 labels_document_type,
@@ -440,7 +440,7 @@ class DocumentClassifier:
                 "Training storage paths classifier...",
             )
             notify(f"Training storage path classifier ({num_storage_paths} path(s))...")
-            self.storage_path_classifier = MLPClassifier(tol=0.01)
+            self.storage_path_classifier = MLPClassifier(tol=0.01, random_state=0)
             self.storage_path_classifier.fit(
                 data_vectorized,
                 labels_storage_path,

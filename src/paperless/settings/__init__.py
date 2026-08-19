@@ -99,9 +99,9 @@ MODEL_FILE = get_path_from_env(
 
 # Minimum confidence (0.0-1.0) for the ML classifier to assign a correspondent,
 # document type, or storage path. 0.0 disables the threshold.
-CLASSIFIER_MATCH_THRESHOLD: Final[float] = __get_float(
+CLASSIFIER_MATCH_THRESHOLD: Final[float] = get_float_from_env(
     "PAPERLESS_CLASSIFIER_MATCH_THRESHOLD",
-    0.0,
+    0.6,
 )
 LLM_INDEX_DIR = DATA_DIR / "llm_index"
 LLM_INDEX_LOCK = LLM_INDEX_DIR / "index.lock"
