@@ -168,7 +168,7 @@ class TestParseHostingSettings:
 def make_expected_schedule(
     overrides: dict[str, dict[str, Any]] | None = None,
     disabled: set[str] | None = None,
-    email_minute: str = "3,13,23,33,43,53",
+    email_minute: str = "6,16,26,36,46,56",
 ) -> dict[str, Any]:
     """
     Build the expected schedule with optional overrides and disabled tasks.
@@ -310,8 +310,11 @@ class TestParseBeatSchedule:
         expected: dict[str, Any],
         mocker: MockerFixture,
     ) -> None:
-        mocker.patch.dict(os.environ, env, clear=False)
-        mocker.patch("paperless.settings.custom.random.randrange", return_value=3)
+        mocker.patch.dict(
+            os.environ,
+            {"PAPERLESS_SECRET_KEY": "test-secret", **env},
+            clear=False,
+        )
         schedule = parse_beat_schedule()
         assert schedule == expected
 

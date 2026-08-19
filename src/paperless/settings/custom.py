@@ -1,7 +1,7 @@
 import datetime
 import logging
 import os
-import random
+from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
@@ -178,7 +178,8 @@ def parse_beat_schedule() -> dict:
             and task["env_key"] not in os.environ
         ):
             # Spread default polling across the ten-minute interval.
-            offset = random.randrange(10)
+            secret = os.environ["PAPERLESS_SECRET_KEY"].encode()
+            offset = int.from_bytes(sha256(secret).digest()) % 10
             minutes = ",".join(str(minute) for minute in range(offset, 60, 10))
             value = f"{minutes} * * * *"
         # I find https://crontab.guru/ super helpful
