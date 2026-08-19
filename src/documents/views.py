@@ -196,6 +196,7 @@ from documents.serialisers import DocumentVersionLabelSerializer
 from documents.serialisers import DocumentVersionSerializer
 from documents.serialisers import EditPdfDocumentsSerializer
 from documents.serialisers import EmailSerializer
+from documents.serialisers import MergeDocumentsAsVersionsSerializer
 from documents.serialisers import MergeDocumentsSerializer
 from documents.serialisers import NotesSerializer
 from documents.serialisers import PostDocumentSerializer
@@ -233,6 +234,7 @@ from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_request_version_param
 from documents.versioning import get_root_document
 from documents.versioning import resolve_requested_version_for_root
+from documents.versioning import versions_newest_first
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import AIConfig
@@ -1083,9 +1085,9 @@ class DocumentViewSet(
 
     def get_queryset(self):
         latest_version_content = Subquery(
-            Document.objects.filter(root_document=OuterRef("pk"))
-            .order_by("-id")
-            .values("content")[:1],
+            versions_newest_first(
+                Document.objects.filter(root_document=OuterRef("pk")),
+            ).values("content")[:1],
         )
         # A correlated subquery avoids the LEFT JOIN + Count() this used to
         # be, which forced a GROUP BY aggregate over every matching document
@@ -1121,6 +1123,7 @@ class DocumentViewSet(
                         "checksum",
                         "version_label",
                         "root_document_id",
+                        "version_index",
                     ),
                 ),
                 "tags",
@@ -2187,11 +2190,9 @@ class DocumentViewSet(
                 },
             )
 
-        current = (
-            Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc))
-            .order_by("-id")
-            .first()
-        )
+        current = versions_newest_first(
+            Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc)),
+        ).first()
 
         document_updated.send(
             sender=self.__class__,
@@ -2819,8 +2820,12 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         "delete_pages",
         "edit_pdf",
         "remove_password",
+        "merge_as_versions",
     }
-    METHOD_NAMES_REQUIRING_TRIGGER_SOURCE = METHOD_NAMES_REQUIRING_USER
+    # merge_as_versions doesn't queue any consume tasks
+    METHOD_NAMES_REQUIRING_TRIGGER_SOURCE = METHOD_NAMES_REQUIRING_USER - {
+        "merge_as_versions",
+    }
 
     def _has_document_permissions(
         self,
@@ -2861,6 +2866,7 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
                     bulk_edit.rotate,
                     bulk_edit.delete_pages,
                     bulk_edit.edit_pdf,
+                    bulk_edit.merge_as_versions,
                     bulk_edit.remove_password,
                 ]
             )
@@ -2891,6 +2897,9 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
             has_perms
             and (
                 method == bulk_edit.delete
+                # Sources stop being documents of their own, and removing one
+                # again afterwards needs delete_document
+                or method == bulk_edit.merge_as_versions
                 or (
                     method in [bulk_edit.merge, bulk_edit.split]
                     and parameters.get("delete_originals")
@@ -3144,6 +3153,33 @@ class MergeDocumentsView(DocumentOperationPermissionMixin):
             method=bulk_edit.merge,
             validated_data=serializer.validated_data,
             operation_label="document merge",
+        )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="documents_merge_as_versions",
+        description="Merge selected documents as versions of a chosen root document",
+        responses={
+            200: inline_serializer(
+                name="MergeDocumentsAsVersionsResult",
+                fields={
+                    "result": serializers.CharField(),
+                },
+            ),
+        },
+    ),
+)
+class MergeDocumentsAsVersionsView(DocumentOperationPermissionMixin):
+    serializer_class = MergeDocumentsAsVersionsSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return self._execute_document_action(
+            method=bulk_edit.merge_as_versions,
+            validated_data=serializer.validated_data,
+            operation_label="document merge as versions",
         )
 
 

@@ -50,6 +50,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { flattenTags } from 'src/app/utils/flatten-tags'
 import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
+import { MergeAsVersionsConfirmDialogComponent } from '../../common/confirm-dialog/merge-as-versions-confirm-dialog/merge-as-versions-confirm-dialog.component'
 import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
 import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
@@ -171,6 +172,13 @@ export class BulkEditorComponent
     )
   }
 
+  get userCanDelete(): boolean {
+    return this.permissionService.currentUserCan(
+      PermissionAction.Delete,
+      PermissionType.Document
+    )
+  }
+
   ngOnInit() {
     if (
       this.permissionService.currentUserCan(
@@ -287,14 +295,17 @@ export class BulkEditorComponent
   private executeDocumentAction(
     modal: NgbModalRef,
     request: Observable<any>,
-    options: { deleteOriginals?: boolean } = {}
+    options: { clearSelection?: boolean; successMessage?: string } = {}
   ) {
     if (modal) {
       modal.componentInstance.buttonsEnabled.set(false)
     }
     request.pipe(first()).subscribe({
       next: () => {
-        this.handleOperationSuccess(modal, options.deleteOriginals ?? false)
+        this.handleOperationSuccess(modal, options.clearSelection ?? false)
+        if (options.successMessage) {
+          this.toastService.showInfo(options.successMessage)
+        }
       },
       error: (error) => this.handleOperationError(modal, error),
     })
@@ -990,10 +1001,39 @@ export class BulkEditorComponent
         this.executeDocumentAction(
           modal,
           this.documentService.mergeDocuments(mergeDialog.documentIDs(), args),
-          { deleteOriginals: !!args.delete_originals }
+          { clearSelection: !!args.delete_originals }
         )
         this.toastService.showInfo(
           $localize`Merged document will be queued for consumption.`
+        )
+      })
+  }
+
+  mergeSelectedAsVersions() {
+    let modal = this.modalService.open(MergeAsVersionsConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    const mergeDialog =
+      modal.componentInstance as MergeAsVersionsConfirmDialogComponent
+    const documentIDs = Array.from(this.list.selected)
+    mergeDialog.title = $localize`Merge as versions`
+    mergeDialog.message = $localize`The selected documents will become versions of the root document.`
+    mergeDialog.btnCaption = $localize`Proceed`
+    mergeDialog.documentIDs.set(documentIDs)
+    mergeDialog.rootDocumentID.set(documentIDs[0])
+    mergeDialog.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        this.executeDocumentAction(
+          modal,
+          this.documentService.mergeDocumentsAsVersions(
+            mergeDialog.documentIDs(),
+            mergeDialog.rootDocumentID()
+          ),
+          {
+            clearSelection: true,
+            successMessage: $localize`Documents merged as versions.`,
+          }
         )
       })
   }

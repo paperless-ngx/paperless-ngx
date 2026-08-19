@@ -1248,6 +1248,89 @@ describe('BulkEditorComponent', () => {
     expect(documentListViewService.selected.size).toEqual(0)
   })
 
+  it('should support merging documents as versions', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 3 }, { id: 4 }])
+    jest.spyOn(documentService, 'getFew').mockReturnValue(
+      of({
+        all: [3, 4],
+        count: 2,
+        results: [
+          { id: 3, title: 'Document 3' },
+          { id: 4, title: 'Document 4' },
+        ],
+      })
+    )
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([3, 4]))
+    jest
+      .spyOn(permissionsService, 'currentUserHasObjectPermissions')
+      .mockReturnValue(true)
+    jest
+      .spyOn(permissionsService, 'currentUserOwnsObject')
+      .mockReturnValue(true)
+    const mergeAsVersionsSpy = jest
+      .spyOn(documentService, 'mergeDocumentsAsVersions')
+      .mockReturnValue(of(true))
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    fixture.detectChanges()
+
+    component.mergeSelectedAsVersions()
+    expect(modal).not.toBeUndefined()
+    modal.componentInstance.rootDocumentID.set(4)
+    modal.componentInstance.confirm()
+
+    expect(mergeAsVersionsSpy).toHaveBeenCalledWith([3, 4], 4)
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+    )
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
+    )
+    expect(documentListViewService.selected.size).toEqual(0)
+    expect(toastInfoSpy).toHaveBeenCalledWith('Documents merged as versions.')
+  })
+
+  it('should not report success when merging documents as versions fails', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 3 }, { id: 4 }])
+    jest.spyOn(documentService, 'getFew').mockReturnValue(
+      of({
+        all: [3, 4],
+        count: 2,
+        results: [
+          { id: 3, title: 'Document 3' },
+          { id: 4, title: 'Document 4' },
+        ],
+      })
+    )
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([3, 4]))
+    jest
+      .spyOn(documentService, 'mergeDocumentsAsVersions')
+      .mockReturnValue(throwError(() => new Error('failed')))
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    fixture.detectChanges()
+
+    component.mergeSelectedAsVersions()
+    modal.componentInstance.rootDocumentID.set(4)
+    modal.componentInstance.confirm()
+
+    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).not.toHaveBeenCalled()
+  })
+
   it('should support bulk download with archive, originals or both and file formatting', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest

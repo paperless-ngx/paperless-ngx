@@ -468,18 +468,18 @@ describe('DocumentDetailComponent', () => {
       ...doc,
       versions: [
         {
-          id: doc.id,
-          added: new Date('2024-01-01T00:00:00Z'),
-          version_label: 'Original',
-          checksum: 'aaaa',
-          is_root: true,
-        },
-        {
           id: 10,
           added: new Date('2024-01-02T00:00:00Z'),
           version_label: 'Edited',
           checksum: 'bbbb',
           is_root: false,
+        },
+        {
+          id: doc.id,
+          added: new Date('2024-01-01T00:00:00Z'),
+          version_label: 'Original',
+          checksum: 'aaaa',
+          is_root: true,
         },
       ],
     } as Document
@@ -1232,8 +1232,8 @@ describe('DocumentDetailComponent', () => {
 
     metadataSpy.mockClear()
     component.document().versions = [
-      { id: doc.id, is_root: true },
       { id: 10, is_root: false },
+      { id: doc.id, is_root: true },
     ] as any
     jest.spyOn(documentService, 'getPreviewUrl').mockReturnValue('preview-root')
     jest.spyOn(documentService, 'getThumbUrl').mockReturnValue('thumb-root')
@@ -1929,8 +1929,8 @@ describe('DocumentDetailComponent', () => {
     component.documentId.set(doc.id)
     component.document.set({ ...doc, versions: [] } as Document)
     const updatedVersions = [
-      { id: doc.id, is_root: true },
       { id: 10, is_root: false },
+      { id: doc.id, is_root: true },
     ] as any
     const openDoc = { ...doc, versions: [] } as Document
     jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(openDoc)
@@ -2046,8 +2046,8 @@ describe('DocumentDetailComponent', () => {
   it('should include version in download and print only for non-latest selected version', () => {
     initNormally()
     component.document().versions = [
-      { id: doc.id, is_root: true },
       { id: 10, is_root: false },
+      { id: doc.id, is_root: true },
     ] as any
 
     const getDownloadUrlSpy = jest

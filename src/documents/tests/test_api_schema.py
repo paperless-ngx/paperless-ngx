@@ -48,6 +48,7 @@ class TestApiSchema(APITestCase):
         self.assertIn("/api/documents/reprocess/", paths)
         self.assertIn("/api/documents/rotate/", paths)
         self.assertIn("/api/documents/merge/", paths)
+        self.assertIn("/api/documents/merge_as_versions/", paths)
         self.assertIn("/api/documents/edit_pdf/", paths)
         self.assertIn("/api/documents/remove_password/", paths)
 
