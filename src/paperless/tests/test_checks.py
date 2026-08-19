@@ -15,7 +15,6 @@ from paperless.checks import audit_log_check
 from paperless.checks import binaries_check
 from paperless.checks import check_default_language_available
 from paperless.checks import check_deprecated_db_settings
-from paperless.checks import check_remote_ocr_mode
 from paperless.checks import check_v3_minimum_upgrade_version
 from paperless.checks import debug_mode_check
 from paperless.checks import paths_check
@@ -629,23 +628,6 @@ class TestV3MinimumUpgradeVersionCheck:
         conn.introspection.table_names.side_effect = OperationalError("DB unavailable")
         mocker.patch.dict("paperless.checks.connections", {"default": conn})
         assert check_v3_minimum_upgrade_version(None) == []
-
-
-class TestRemoteOCRModeCheck:
-    def test_valid_mode(self, settings: SettingsWrapper) -> None:
-        settings.REMOTE_OCR_MODE = "workflow_only"
-
-        msgs = check_remote_ocr_mode(None)
-
-        assert len(msgs) == 0
-
-    def test_invalid_mode(self, settings: SettingsWrapper) -> None:
-        settings.REMOTE_OCR_MODE = "sometimes"
-
-        msgs = check_remote_ocr_mode(None)
-
-        assert len(msgs) == 1
-        assert "PAPERLESS_REMOTE_OCR_MODE is set to 'sometimes'" in msgs[0].msg
 
 
 class TestTesseractChecks:
