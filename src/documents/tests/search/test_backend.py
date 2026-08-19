@@ -1070,6 +1070,42 @@ class TestVersionIndexing:
         assert backend.search_ids("unprotected", user=None) == [root.pk]
 
 
+class TestEffectiveContentIndexing:
+    """
+    GIVEN:
+        - A root document with a newer version
+    WHEN:
+        - The root document is indexed
+    THEN:
+        - The newest version's content is indexed, never the root's own
+          outdated text
+    """
+
+    def test_root_is_indexed_with_latest_version_content(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        root = Document.objects.create(
+            title="Statement",
+            content="stale original text",
+            checksum="EFF1",
+            pk=95,
+        )
+        Document.objects.create(
+            title="Statement",
+            content="latest version text",
+            checksum="EFF2",
+            pk=96,
+            root_document=root,
+            version_index=1,
+        )
+
+        backend.add_or_update(root)
+
+        assert backend.search_ids("latest", user=None) == [root.pk]
+        assert backend.search_ids("stale", user=None) == []
+
+
 class TestIndexDirectoryGarbageCollection:
     """Regression tests for Tantivy segment files leaking on disk when
     multiple long-lived worker processes (Granian/Celery) take turns writing

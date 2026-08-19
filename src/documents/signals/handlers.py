@@ -799,10 +799,7 @@ def add_to_index(sender, document, **kwargs) -> None:
     if document.root_document_id:
         document = document.root_document
 
-    get_backend().add_or_update(
-        document,
-        effective_content=document.get_effective_content(),
-    )
+    get_backend().add_or_update(document)
 
 
 def run_workflows_added(
