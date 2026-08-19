@@ -34,10 +34,6 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
 
-# Remote ocr config from ApplicationConfiguration needs DB access
-pytestmark = pytest.mark.django_db
-
-
 # ---------------------------------------------------------------------------
 # Module-local fixtures
 # ---------------------------------------------------------------------------
@@ -203,21 +199,21 @@ class TestRemoteParserScore:
 
     def test_score_returns_none_when_api_key_missing(
         self,
-        settings: SettingsWrapper,
+        no_engine_settings: SettingsWrapper,
     ) -> None:
-        settings.REMOTE_OCR_ENGINE = "azureai"
-        settings.REMOTE_OCR_API_KEY = None
-        settings.REMOTE_OCR_ENDPOINT = "https://test.cognitiveservices.azure.com"
+        no_engine_settings.REMOTE_OCR_ENGINE = "azureai"
+        no_engine_settings.REMOTE_OCR_ENDPOINT = (
+            "https://test.cognitiveservices.azure.com"
+        )
         result = RemoteDocumentParser.score("application/pdf", "doc.pdf")
         assert result is None
 
     def test_score_returns_none_when_endpoint_missing(
         self,
-        settings: SettingsWrapper,
+        no_engine_settings: SettingsWrapper,
     ) -> None:
-        settings.REMOTE_OCR_ENGINE = "azureai"
-        settings.REMOTE_OCR_API_KEY = "key"
-        settings.REMOTE_OCR_ENDPOINT = None
+        no_engine_settings.REMOTE_OCR_ENGINE = "azureai"
+        no_engine_settings.REMOTE_OCR_API_KEY = "key"
         result = RemoteDocumentParser.score("application/pdf", "doc.pdf")
         assert result is None
 
@@ -232,9 +228,15 @@ class TestRemoteParserScore:
         score = RemoteDocumentParser.score("application/pdf", "doc.pdf")
         assert score is not None and score > 10
 
-    @pytest.mark.usefixtures("no_engine_settings")
-    def test_score_uses_app_config_when_env_unset(self) -> None:
+    @pytest.mark.django_db
+    def test_score_uses_app_config_when_env_unset(
+        self,
+        settings: SettingsWrapper,
+    ) -> None:
         """The app config alone is enough to activate the parser."""
+        settings.REMOTE_OCR_ENGINE = None
+        settings.REMOTE_OCR_API_KEY = None
+        settings.REMOTE_OCR_ENDPOINT = None
         config = ApplicationConfiguration.objects.first()
         assert config is not None
         config.remote_ocr_engine = "azureai"
