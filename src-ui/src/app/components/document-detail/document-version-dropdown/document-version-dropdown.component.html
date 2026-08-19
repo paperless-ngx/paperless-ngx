@@ -141,6 +141,7 @@
               i18n-confirmMessage
               [disabled]="!userIsOwner || !userCanEdit"
               (confirm)="deleteVersion(version.id)"
+              *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }"
             >
               <span class="visually-hidden" i18n>Delete version</span>
             </pngx-confirm-button>
