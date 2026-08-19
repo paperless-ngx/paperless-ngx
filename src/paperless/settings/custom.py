@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os
+import random
 from pathlib import Path
 from typing import Any
 
@@ -172,6 +173,14 @@ def parse_beat_schedule() -> dict:
         # Don't add disabled tasks to the schedule
         if value == "disable":
             continue
+        if (
+            task["env_key"] == "PAPERLESS_EMAIL_TASK_CRON"
+            and task["env_key"] not in os.environ
+        ):
+            # Spread default polling across the ten-minute interval.
+            offset = random.randrange(10)
+            minutes = ",".join(str(minute) for minute in range(offset, 60, 10))
+            value = f"{minutes} * * * *"
         # I find https://crontab.guru/ super helpful
         # crontab(5) format
         #   - five time-and-date fields

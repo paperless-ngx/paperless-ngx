@@ -1215,7 +1215,7 @@ should be a valid crontab(5) expression describing when to run.
 
 : If set to the string "disable", no emails will be fetched automatically.
 
-    Defaults to `*/10 * * * *` or every ten minutes.
+    Defaults to every ten minutes, with a random minute offset selected at startup.
 
 #### [`PAPERLESS_TRAIN_TASK_CRON=<cron expression>`](#PAPERLESS_TRAIN_TASK_CRON) {#PAPERLESS_TRAIN_TASK_CRON}
 
