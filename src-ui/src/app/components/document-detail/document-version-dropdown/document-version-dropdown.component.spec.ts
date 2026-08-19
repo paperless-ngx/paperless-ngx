@@ -1,10 +1,16 @@
 import { DatePipe } from '@angular/common'
 import { SimpleChange, signal } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { By } from '@angular/platform-browser'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject, of, throwError } from 'rxjs'
 import { DocumentVersionInfo } from 'src/app/data/document'
+import {
+  PermissionAction,
+  PermissionsService,
+  PermissionType,
+} from 'src/app/services/permissions.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -31,6 +37,9 @@ describe('DocumentVersionDropdownComponent', () => {
   let finished$: Subject<{ taskId: string }>
   let failed$: Subject<{ taskId: string; message?: string }>
   let modalService: jest.Mocked<Pick<NgbModal, 'open'>>
+  let permissionsService: jest.Mocked<
+    Pick<PermissionsService, 'currentUserCan'>
+  >
 
   beforeEach(async () => {
     finished$ = new Subject<{ taskId: string }>()
@@ -46,6 +55,9 @@ describe('DocumentVersionDropdownComponent', () => {
     toastService = {
       showError: jest.fn(),
       showInfo: jest.fn(),
+    }
+    permissionsService = {
+      currentUserCan: jest.fn().mockReturnValue(true),
     }
 
     await TestBed.configureTestingModule({
@@ -72,6 +84,10 @@ describe('DocumentVersionDropdownComponent', () => {
         {
           provide: NgbModal,
           useValue: modalService,
+        },
+        {
+          provide: PermissionsService,
+          useValue: permissionsService,
         },
         {
           provide: WebsocketStatusService,
@@ -141,6 +157,31 @@ describe('DocumentVersionDropdownComponent', () => {
       'Error deleting version',
       error
     )
+  })
+
+  it('should not show version delete buttons without document delete permission', () => {
+    fixture.destroy()
+    permissionsService.currentUserCan.mockReturnValue(false)
+    fixture = TestBed.createComponent(DocumentVersionDropdownComponent)
+    component = fixture.componentInstance
+    component.documentId = 3
+    component.selectedVersionId = 3
+    component.userIsOwner = true
+    component.userCanEdit = true
+    component.versions = [
+      { id: 3, is_root: true, checksum: 'aaaa' },
+      { id: 10, is_root: false, checksum: 'bbbb' },
+    ]
+
+    fixture.detectChanges()
+
+    expect(permissionsService.currentUserCan).toHaveBeenCalledWith(
+      PermissionAction.Delete,
+      PermissionType.Document
+    )
+    expect(
+      fixture.debugElement.queryAll(By.css('pngx-confirm-button'))
+    ).toHaveLength(0)
   })
 
   it('beginEditingVersion should set active row and draft label', () => {
