@@ -889,13 +889,9 @@ export class DocumentDetailComponent
 
   updateComponent(doc: Document) {
     this.document.set(doc)
-    // Default selected version is the newest version
+    // Default selected version is the newest version, which the API returns first
     const versions = doc.versions ?? []
-    this.selectedVersionId.set(
-      versions.length
-        ? Math.max(...versions.map((version) => version.id))
-        : doc.id
-    )
+    this.selectedVersionId.set(versions.length ? versions[0].id : doc.id)
     this.previewLoaded.set(false)
     this.requiresPassword = false
     this.updateFormForCustomFields()
@@ -1441,7 +1437,8 @@ export class DocumentDetailComponent
     if (!versions.length || !this.selectedVersionId()) {
       return null
     }
-    const latestVersionId = Math.max(...versions.map((version) => version.id))
+    // The API returns versions newest first
+    const latestVersionId = versions[0].id
     return this.selectedVersionId() === latestVersionId
       ? null
       : this.selectedVersionId()
