@@ -88,6 +88,7 @@ from documents.templating.utils import convert_format_str_to_template_format
 from documents.templating.workflows import validate_workflow_template
 from documents.validators import uri_validator
 from documents.validators import url_validator
+from documents.versioning import sort_versions_newest_first
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -1116,8 +1117,12 @@ class DocumentSerializer(
                 "added",
                 "checksum",
                 "version_label",
+                "root_document_id",
+                "version_index",
             )
             versions = [*versions_qs, root_doc]
+
+        versions = sort_versions_newest_first(versions)
 
         def build_info(doc: Document) -> _DocumentVersionInfo:
             return {
@@ -1128,9 +1133,7 @@ class DocumentSerializer(
                 "is_root": doc.id == root_doc.id,
             }
 
-        info = [build_info(doc) for doc in versions]
-        info.sort(key=lambda item: item["id"], reverse=True)
-        return info
+        return [build_info(doc) for doc in versions]
 
     def get_original_file_name(self, obj) -> str | None:
         return obj.original_filename
@@ -1675,6 +1678,52 @@ class MergeDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin
         default=bulk_edit.SourceModeChoices.LATEST_VERSION,
     )
     from_webui = serializers.BooleanField(required=False, default=False)
+
+
+class MergeDocumentsAsVersionsSerializer(DocumentListSerializer):
+    root_document_id = serializers.IntegerField(required=True)
+    version_label = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        max_length=64,
+    )
+
+    def validate_version_label(self, value):
+        if value is None:
+            return None
+        normalized = value.strip()
+        return normalized or None
+
+    def validate(self, attrs):
+        documents = attrs["documents"]
+        if len(documents) < 2:
+            raise serializers.ValidationError(
+                "At least two documents are required.",
+            )
+        if attrs.get("version_label") is not None and len(documents) != 2:
+            raise serializers.ValidationError(
+                "version_label can only be used when merging one source document.",
+            )
+        if attrs["root_document_id"] not in documents:
+            raise serializers.ValidationError(
+                "root_document_id must be one of the selected documents.",
+            )
+
+        selected_documents = Document.objects.filter(id__in=documents)
+        if selected_documents.filter(root_document__isnull=False).exists():
+            raise serializers.ValidationError(
+                "Only top-level documents can be merged as versions.",
+            )
+
+        source_document_ids = set(documents) - {attrs["root_document_id"]}
+        if Document.global_objects.filter(
+            root_document_id__in=source_document_ids,
+        ).exists():
+            raise serializers.ValidationError(
+                "Documents with existing versions cannot be merged into another document.",
+            )
+        return attrs
 
 
 class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):

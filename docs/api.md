@@ -227,6 +227,7 @@ Version-aware endpoints:
 - `PATCH /api/documents/{id}/`: content updates target the selected version (`?version={version_id}`) or latest version by default; non-content metadata updates target the root document.
 - `GET /api/documents/{id}/download/`, `GET /api/documents/{id}/preview/`, `GET /api/documents/{id}/thumb/`, `GET /api/documents/{id}/metadata/`: accept `?version={version_id}`.
 - `POST /api/documents/{id}/update_version/`: uploads a new version using multipart form field `document` and optional `version_label`.
+- `POST /api/documents/merge_as_versions/`: merges existing top-level documents as versions of a selected root. The JSON body must contain `documents` (at least two document IDs) and `root_document_id` (one of those IDs). When merging one source document, an optional `version_label` may be provided.
 - `PATCH /api/documents/{id}/versions/{version_id}/`: updates the `version_label` of a specific version.
 - `DELETE /api/documents/{root_id}/versions/{version_id}/`: deletes a non-root version.
 
