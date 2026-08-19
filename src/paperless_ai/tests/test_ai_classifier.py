@@ -608,6 +608,44 @@ def test_build_prompt_without_rag_identical_when_no_hints():
 
 
 @pytest.mark.django_db
+def test_build_prompt_without_rag_excludes_instruction_when_no_candidates():
+    """
+    GIVEN:
+        - Assigned metadata but empty taxonomy candidates
+    WHEN:
+        - build_prompt_without_rag() is called with candidates and assigned metadata
+    THEN:
+        - The assigned-metadata block appears (taxonomy_block is non-empty)
+        - The existing_ids instruction does NOT appear, since there are no
+          candidates for it to point at
+    """
+    document = DocumentFactory.create(content="Some content")
+    config = AIConfig()
+    empty_candidates = {
+        "tags": [],
+        "document_types": [],
+        "correspondents": [],
+        "storage_paths": [],
+    }
+    assigned = {
+        "tags": ["Bloodwork"],
+        "document_type": None,
+        "correspondent": None,
+        "storage_path": None,
+    }
+
+    prompt = build_prompt_without_rag(
+        document,
+        config,
+        candidates=empty_candidates,
+        assigned=assigned,
+    )
+
+    assert "already assigned" in prompt
+    assert "existing_ids" not in prompt
+
+
+@pytest.mark.django_db
 @patch("paperless_ai.ai_classifier.AIClient")
 @patch("paperless_ai.ai_classifier.build_taxonomy_candidates")
 @patch("paperless_ai.ai_classifier.retrieve_similar_nodes")

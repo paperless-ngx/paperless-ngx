@@ -195,32 +195,32 @@
                   }
                 </div>
                 <div
-                  class="attributes-submenu ms-2"
+                  class="attributes-submenu ms-3"
                   [ngbCollapse]="slimSidebarEnabled || attributesSectionsCollapsed"
                 >
                   <ul class="nav flex-column">
                     <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }">
-                      <a class="nav-link py-1" routerLink="attributes/tags" routerLinkActive="active" (click)="closeMenu()">
+                      <a class="nav-link" routerLink="attributes/tags" routerLinkActive="active" (click)="closeMenu()">
                         <i-bs class="me-2" name="tags"></i-bs><span><ng-container i18n>Tags</ng-container></span>
                       </a>
                     </li>
                     <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }">
-                      <a class="nav-link py-1" routerLink="attributes/correspondents" routerLinkActive="active" (click)="closeMenu()">
+                      <a class="nav-link" routerLink="attributes/correspondents" routerLinkActive="active" (click)="closeMenu()">
                         <i-bs class="me-2" name="person"></i-bs><span><ng-container i18n>Correspondents</ng-container></span>
                       </a>
                     </li>
                     <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }">
-                      <a class="nav-link py-1" routerLink="attributes/documenttypes" routerLinkActive="active" (click)="closeMenu()">
+                      <a class="nav-link" routerLink="attributes/documenttypes" routerLinkActive="active" (click)="closeMenu()">
                         <i-bs class="me-2" name="hash"></i-bs><span><ng-container i18n>Document types</ng-container></span>
                       </a>
                     </li>
                     <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }">
-                      <a class="nav-link py-1" routerLink="attributes/storagepaths" routerLinkActive="active" (click)="closeMenu()">
+                      <a class="nav-link" routerLink="attributes/storagepaths" routerLinkActive="active" (click)="closeMenu()">
                         <i-bs class="me-2" name="folder"></i-bs><span><ng-container i18n>Storage paths</ng-container></span>
                       </a>
                     </li>
                     <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }">
-                      <a class="nav-link py-1" routerLink="attributes/customfields" routerLinkActive="active" (click)="closeMenu()">
+                      <a class="nav-link" routerLink="attributes/customfields" routerLinkActive="active" (click)="closeMenu()">
                         <i-bs class="me-2" name="ui-radios"></i-bs><span><ng-container i18n>Custom fields</ng-container></span>
                       </a>
                     </li>

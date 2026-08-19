@@ -607,6 +607,55 @@ table.table {
   color: var(--bs-body-color);
 }
 
+// Tighten horizontal spacing in modals on small viewports
+@media (max-width: 575.98px) {
+  .modal {
+    --bs-modal-margin: 0.25rem;
+    --bs-modal-header-padding-x: 0.5rem;
+    --bs-modal-header-padding: var(--bs-modal-header-padding-y) var(--bs-modal-header-padding-x);
+
+    .modal-body {
+      padding-inline: 0.5rem;
+    }
+
+    .modal-footer {
+      padding-inline: 0.25rem;
+    }
+
+    .accordion {
+      --bs-accordion-btn-padding-x: 0.75rem;
+      --bs-accordion-body-padding-x: 0.5rem;
+    }
+
+    .card {
+      --bs-card-spacer-x: 0.5rem;
+    }
+
+    .list-group {
+      --bs-list-group-item-padding-x: 0.5rem;
+    }
+  }
+}
+
+// Wider-width modals on small viewports when the content is wide (e.g. landscape)
+@media (min-width: 576px) and (max-height: 700px) {
+  .modal {
+    --bs-modal-margin: 0.5rem;
+  }
+
+  .modal-dialog {
+    max-width: min(var(--bs-modal-width), calc(100% - 1rem));
+  }
+
+  .modal-lg {
+    --bs-modal-width: 800px;
+  }
+
+  .modal-xl {
+    --bs-modal-width: 1140px;
+  }
+}
+
 .toast {
   --bs-toast-max-width: var(--pngx-toast-max-width);
 }

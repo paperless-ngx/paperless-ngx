@@ -216,8 +216,8 @@ main {
 
 // bring sub-menu markers back out to L edge
 .attributes-submenu .nav-link {
-  margin-left: -0.5rem;
-  padding-left: calc(var(--bs-nav-link-padding-x) + 0.5rem);
+  margin-left: -1rem;
+  padding-left: calc(var(--bs-nav-link-padding-x) + 1rem);
 }
 
 .attributes-row .attributes-expand-btn {

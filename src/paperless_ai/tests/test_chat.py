@@ -104,6 +104,26 @@ def test_build_refine_prompt(
     assert prompt.endswith(f"{expected_language_line}Refined Answer:")
 
 
+@pytest.mark.parametrize(
+    "build_prompt",
+    [_build_chat_prompt, _build_refine_prompt],
+)
+def test_build_prompt_escapes_braces_in_output_language(
+    build_prompt,
+) -> None:
+    """
+    GIVEN an output_language containing literal curly braces
+    WHEN the chat/refine prompt is built
+    THEN the braces are doubled, so a later str.format() call (done by
+         llama_index's PromptTemplate, not tested here) will collapse
+         them back to the literal text instead of misinterpreting them
+         as format fields
+    """
+    prompt = build_prompt("wei{rd}")
+
+    assert "wei{{rd}}" in prompt
+
+
 @pytest.mark.django_db
 def test_stream_chat_with_one_document_retrieval(
     patch_embed_nodes,
