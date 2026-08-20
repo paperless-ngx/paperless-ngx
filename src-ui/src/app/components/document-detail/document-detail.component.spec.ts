@@ -2171,6 +2171,11 @@ describe('DocumentDetailComponent', () => {
     ).toBe(10)
     component.openEmailDocument()
     expect(modalSpy).toHaveBeenCalled()
+    expect(
+      (
+        modalSpy.mock.results[1].value as NgbModalRef
+      ).componentInstance.documentIds()
+    ).toEqual([10])
   })
 
   it('should set previewText', () => {
