@@ -25,6 +25,7 @@ import {
   tap,
 } from 'rxjs/operators'
 import { DocumentVersionInfo } from 'src/app/data/document'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -33,6 +34,7 @@ import {
   WebsocketStatusService,
 } from 'src/app/services/websocket-status.service'
 import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { AddExistingDocumentVersionDialogComponent } from './add-existing-document-version-dialog/add-existing-document-version-dialog.component'
 
 @Component({
@@ -44,11 +46,15 @@ import { AddExistingDocumentVersionDialogComponent } from './add-existing-docume
     NgbDropdownModule,
     NgxBootstrapIconsModule,
     ConfirmButtonComponent,
+    IfPermissionsDirective,
     SlicePipe,
     CustomDatePipe,
   ],
 })
-export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
+export class DocumentVersionDropdownComponent
+  extends ComponentWithPermissions
+  implements OnChanges, OnDestroy
+{
   UploadState = UploadState
 
   @Input() documentId: number
