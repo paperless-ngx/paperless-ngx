@@ -3198,6 +3198,29 @@ class WorkflowActionSerializer(serializers.ModelSerializer[WorkflowAction]):
                 field_id: (None if value == "" else value)
                 for field_id, value in attrs["assign_custom_fields_values"].items()
             }
+            # Templates on string custom-field values are rendered at apply
+            # time; validate them here so bad templates surface at save.
+            string_field_ids = set(
+                CustomField.objects.filter(
+                    pk__in=[int(fid) for fid in attrs["assign_custom_fields_values"]],
+                    data_type=CustomField.FieldDataType.STRING,
+                ).values_list("pk", flat=True),
+            )
+            template_errors: dict[str, str] = {}
+            for field_id, value in attrs["assign_custom_fields_values"].items():
+                if (
+                    isinstance(value, str)
+                    and "{{" in value
+                    and int(field_id) in string_field_ids
+                ):
+                    try:
+                        validate_workflow_template(value)
+                    except (ValueError, KeyError) as e:
+                        template_errors[str(field_id)] = f"{e.args[0]}"
+            if template_errors:
+                raise serializers.ValidationError(
+                    {"assign_custom_fields_values": template_errors},
+                )
 
         if (
             "type" in attrs

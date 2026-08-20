@@ -1,16 +1,54 @@
 import logging
+import unicodedata
 
 from django.utils import timezone
 from guardian.shortcuts import remove_perm
 
 from documents.data_models import DocumentMetadataOverrides
+from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import WorkflowAction
 from documents.permissions import set_permissions_for_object
 from documents.templating.workflows import parse_w_workflow_placeholders
+from documents.templating.workflows import render_workflow_custom_field_string
 
 logger = logging.getLogger("paperless.workflows.mutations")
+
+
+def _render_string_cf_value(
+    field: CustomField,
+    raw_value,
+    mail_context: dict | None,
+    logging_group=None,
+):
+    """
+    If `field` is a STRING custom field and `raw_value` is a str carrying a
+    Jinja template ("{{" ), render it against the mail namespace, NFC-normalise
+    the result, and truncate to CustomFieldInstance.value_text.max_length.
+
+    Non-string types and plain (non-templated) strings pass through untouched.
+    On render failure a warning is logged and the raw value is returned so
+    consumption is not aborted by a bad template.
+    """
+    if field.data_type != CustomField.FieldDataType.STRING:
+        return raw_value
+    if not isinstance(raw_value, str) or "{{" not in raw_value:
+        return raw_value
+    try:
+        rendered = render_workflow_custom_field_string(raw_value, mail_context)
+    except Exception as e:
+        logger.warning(
+            f"Error rendering custom field '{field.name}' template "
+            f"'{raw_value}': {e}. Storing raw value instead.",
+            extra={"group": logging_group} if logging_group else {},
+        )
+        return raw_value
+    rendered = unicodedata.normalize("NFC", rendered)
+    max_length = CustomFieldInstance._meta.get_field("value_text").max_length
+    if max_length is not None and len(rendered) > max_length:
+        rendered = rendered[:max_length]
+    return rendered
 
 
 def apply_assignment_to_document(
@@ -94,10 +132,18 @@ def apply_assignment_to_document(
             value_field_name = CustomFieldInstance.get_value_field_name(
                 data_type=field.data_type,
             )
+            raw_value = action.assign_custom_fields_values.get(
+                str(field.pk),
+                None,
+            )
+            # DOCUMENT_ADDED/UPDATED triggers don't carry mail context; pass
+            # None so the render resolves `mail.*` to empty via defaults.
             args = {
-                value_field_name: action.assign_custom_fields_values.get(
-                    str(field.pk),
-                    None,
+                value_field_name: _render_string_cf_value(
+                    field,
+                    raw_value,
+                    mail_context=None,
+                    logging_group=logging_group,
                 ),
             }
             # for some reason update_or_create doesn't work here
@@ -187,15 +233,16 @@ def apply_assignment_to_overrides(
     if action.has_assign_custom_fields:
         if overrides.custom_fields is None:
             overrides.custom_fields = {}
-        overrides.custom_fields.update(
-            {
-                field.pk: action.assign_custom_fields_values.get(
-                    str(field.pk),
-                    None,
-                )
-                for field in action.assign_custom_fields.all()
-            },
-        )
+        for field in action.assign_custom_fields.all():
+            raw_value = action.assign_custom_fields_values.get(
+                str(field.pk),
+                None,
+            )
+            overrides.custom_fields[field.pk] = _render_string_cf_value(
+                field,
+                raw_value,
+                mail_context=overrides.mail_context,
+            )
 
 
 def apply_removal_to_document(

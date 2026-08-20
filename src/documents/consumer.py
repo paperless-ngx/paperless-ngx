@@ -78,7 +78,12 @@ class WorkflowTriggerPlugin(
             trigger_type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
             document=self.input_doc,
             logging_group=None,
-            overrides=DocumentMetadataOverrides(),
+            # Seed mail_context from the incoming metadata so the templating
+            # layer can expose the `mail` namespace when the doc originated
+            # from a mail rule.
+            overrides=DocumentMetadataOverrides(
+                mail_context=self.metadata.mail_context,
+            ),
         )
         if overrides:
             self.metadata.update(overrides)

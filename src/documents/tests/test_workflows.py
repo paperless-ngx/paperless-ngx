@@ -2093,6 +2093,181 @@ class TestWorkflows(
         doc.refresh_from_db()
         self.assertEqual(doc.custom_fields.get(field=self.cf1).value, "new value")
 
+    def test_document_added_workflow_string_cf_template_no_mail(self) -> None:
+        """
+        GIVEN:
+            - Existing workflow with DOCUMENT_ADDED trigger assigning a STRING
+              custom field whose value is a Jinja template referencing the
+              `mail` namespace
+        WHEN:
+            - Workflow runs for a non-mail document
+        THEN:
+            - The `mail.*` variables resolve to their empty defaults so the
+              rendered value is a well-formed string (not a crash)
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        action = WorkflowAction.objects.create()
+        action.assign_custom_fields.add(self.cf1)
+        action.assign_custom_fields_values = {
+            self.cf1.pk: "subject={{ mail.subject }}|sender={{ mail.sender }}",
+        }
+        action.save()
+        w = Workflow.objects.create(name="Workflow mail no-mail", order=0)
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+        run_workflows(
+            WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            doc,
+        )
+        doc.refresh_from_db()
+        self.assertEqual(
+            doc.custom_fields.get(field=self.cf1).value,
+            "subject=|sender=",
+        )
+
+    def test_consumption_workflow_string_cf_template_mail(self) -> None:
+        """
+        GIVEN:
+            - Existing workflow with CONSUMPTION trigger assigning a STRING
+              custom field via a Jinja template referencing `mail.subject`
+              plus a non-string CF with a literal value
+            - Consumption overrides carry a populated mail_context
+        WHEN:
+            - run_workflows builds the CONSUMPTION overrides
+        THEN:
+            - overrides.custom_fields holds the rendered subject string for
+              the STRING field, and the literal value for the INT field
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            sources=f"{DocumentSource.MailFetch}",
+            filter_mailrule=self.rule1,
+        )
+        action = WorkflowAction.objects.create()
+        action.assign_custom_fields.add(self.cf1)
+        action.assign_custom_fields.add(self.cf2)
+        action.assign_custom_fields_values = {
+            self.cf1.pk: "Re: {{ mail.subject }}",
+            self.cf2.pk: 7,
+        }
+        action.save()
+        w = Workflow.objects.create(name="Workflow mail cf", order=0)
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        overrides = DocumentMetadataOverrides(
+            mail_context={
+                "subject": "Invoice 42",
+                "sender": "Ann <ann@example.com>",
+                "recipients": ["me@example.com"],
+                "date": None,
+            },
+        )
+        input_doc = ConsumableDocument(
+            source=DocumentSource.MailFetch,
+            original_file=self.SAMPLE_DIR / "simple.pdf",
+            mailrule_id=self.rule1.pk,
+        )
+        result_overrides, _ = run_workflows(
+            trigger_type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            document=input_doc,
+            overrides=overrides,
+        )
+        self.assertEqual(
+            result_overrides.custom_fields[self.cf1.pk],
+            "Re: Invoice 42",
+        )
+        self.assertEqual(result_overrides.custom_fields[self.cf2.pk], 7)
+
+    def test_string_cf_bad_template_falls_back_to_raw(self) -> None:
+        """
+        GIVEN:
+            - Workflow with a malformed Jinja template on a STRING custom field
+        WHEN:
+            - Workflow builds CONSUMPTION overrides
+        THEN:
+            - The raw string is stored and no exception propagates
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            sources=f"{DocumentSource.MailFetch}",
+            filter_mailrule=self.rule1,
+        )
+        action = WorkflowAction.objects.create()
+        action.assign_custom_fields.add(self.cf1)
+        action.assign_custom_fields_values = {
+            self.cf1.pk: "{{ mail.subject",  # unterminated
+        }
+        action.save()
+        w = Workflow.objects.create(name="Workflow bad tpl", order=0)
+        w.triggers.add(trigger)
+        w.actions.add(action)
+        w.save()
+
+        overrides = DocumentMetadataOverrides(
+            mail_context={"subject": "x", "sender": "", "recipients": [], "date": None},
+        )
+        input_doc = ConsumableDocument(
+            source=DocumentSource.MailFetch,
+            original_file=self.SAMPLE_DIR / "simple.pdf",
+            mailrule_id=self.rule1.pk,
+        )
+        result_overrides, _ = run_workflows(
+            trigger_type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+            document=input_doc,
+            overrides=overrides,
+        )
+        self.assertEqual(
+            result_overrides.custom_fields[self.cf1.pk],
+            "{{ mail.subject",
+        )
+
+    def test_workflow_action_serializer_rejects_bad_cf_template(self) -> None:
+        """
+        GIVEN:
+            - Payload for a workflow action assigning a STRING custom field
+              with a syntactically invalid Jinja template
+        WHEN:
+            - The workflow API is called
+        THEN:
+            - The API returns a 400 with a per-field template error
+        """
+        superuser = User.objects.create_superuser("superuser2")
+        self.client.force_authenticate(user=superuser)
+        payload = {
+            "name": "Bad template workflow",
+            "order": 0,
+            "enabled": True,
+            "triggers": [
+                {
+                    "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                    "sources": [DocumentSource.MailFetch.value],
+                    "filter_mailrule": self.rule1.pk,
+                },
+            ],
+            "actions": [
+                {
+                    "type": WorkflowAction.WorkflowActionType.ASSIGNMENT,
+                    "assign_custom_fields": [self.cf1.pk],
+                    "assign_custom_fields_values": {
+                        str(self.cf1.pk): "{{ mail.subject",
+                    },
+                },
+            ],
+        }
+        response = self.client.post("/api/workflows/", payload, format="json")
+        self.assertEqual(response.status_code, 400)
+
     def test_document_updated_workflow_merge_permissions(self) -> None:
         """
         GIVEN:

@@ -691,6 +691,23 @@ The following placeholders are only available for "added" or "updated" triggers
 - `{{doc_url}}`: URL to the document in the web UI. Requires the `PAPERLESS_URL` setting to be set.
 - `{{doc_id}}`: Document ID
 
+##### Mail metadata placeholders
+
+When a document is consumed via a mail rule, the source email is exposed to templates:
+
+- `{{ mail.subject }}`: email subject
+- `{{ mail.sender }}`: sender address
+- `{{ mail.recipients }}`: list of recipient addresses (join with `|join(', ')`)
+- `{{ mail.date }}`: email date as a Python `date`, or `None` if unavailable
+
+These are only populated for the "Consumption Started" trigger on mail-sourced documents. In any
+other trigger phase, or for documents not consumed from mail, `mail.subject`, `mail.sender`, and
+`mail.recipients` render as empty (empty string and empty list) and `mail.date` is `None`. Templates
+that reference them still render without error.
+
+The Assignment action's custom-field values also accept Jinja templates for string-type fields,
+using the same placeholders. Rendered values are NFC-normalized and truncated to 128 characters.
+
 ##### Examples
 
 ```jinja2

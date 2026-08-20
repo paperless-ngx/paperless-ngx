@@ -34,6 +34,10 @@ class DocumentMetadataOverrides:
     skip_asn_if_exists: bool = False
     version_label: str | None = None
     actor_id: int | None = None
+    # Metadata about the originating mail message, populated by paperless_mail
+    # when a document is consumed via a mail rule. Consumed by the workflow
+    # templating layer to expose a `mail` namespace to Jinja templates.
+    mail_context: dict | None = None
 
     def update(self, other: "DocumentMetadataOverrides") -> "DocumentMetadataOverrides":
         """
@@ -95,6 +99,11 @@ class DocumentMetadataOverrides:
             self.custom_fields = other.custom_fields
         elif other.custom_fields is not None:
             self.custom_fields.update(other.custom_fields)
+
+        if self.mail_context is None:
+            self.mail_context = other.mail_context
+        elif other.mail_context is not None:
+            self.mail_context.update(other.mail_context)
 
         return self
 

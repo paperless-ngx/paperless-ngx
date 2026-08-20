@@ -508,6 +508,45 @@ class MailAccountHandler(LoggingMixin):
             self.log.error(f"Error while retrieving correspondent {name}: {e}")
             return None
 
+    @staticmethod
+    def _mail_context_from_message(message: MailMessage) -> dict:
+        """
+        Build the `mail` namespace exposed to workflow Jinja templates.
+
+        Keys:
+            subject:    str - message.subject or ""
+            sender:     str - full imap_tools address ("Name <addr>") or the
+                              raw From if from_values is unavailable
+            recipients: list[str] - full-form addresses from the To header
+            date:       datetime.date | None - sender-local calendar date of
+                              the Date header, or None if unparsable/absent
+        """
+        subject = message.subject or ""
+
+        from_values = getattr(message, "from_values", None)
+        if from_values is not None and getattr(from_values, "full", None):
+            sender = from_values.full
+        else:
+            sender = message.from_ or ""
+
+        to_values = getattr(message, "to_values", None) or ()
+        recipients = [addr.full for addr in to_values if getattr(addr, "full", None)]
+
+        msg_date = getattr(message, "date", None)
+        if isinstance(msg_date, datetime.datetime):
+            mail_date = msg_date.date()
+        elif isinstance(msg_date, date):
+            mail_date = msg_date
+        else:
+            mail_date = None
+
+        return {
+            "subject": subject,
+            "sender": sender,
+            "recipients": recipients,
+            "date": mail_date,
+        }
+
     def _get_title(
         self,
         message: MailMessage,
@@ -988,6 +1027,7 @@ class MailAccountHandler(LoggingMixin):
                         if (rule.assign_owner_from_rule and rule.owner)
                         else None
                     ),
+                    mail_context=self._mail_context_from_message(message),
                 )
 
                 consume_task = consume_file.s(
@@ -1079,6 +1119,7 @@ class MailAccountHandler(LoggingMixin):
             document_type_id=doc_type.id if doc_type else None,
             tag_ids=tag_ids,
             owner_id=rule.owner.id if rule.owner else None,
+            mail_context=self._mail_context_from_message(message),
         )
 
         consume_task = consume_file.s(

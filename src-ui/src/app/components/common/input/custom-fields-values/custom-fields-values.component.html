@@ -79,4 +79,7 @@
       </button>
     </div>
   }
+  @if (selectedFields?.length > 0) {
+    <small class="form-text text-muted"><span i18n>String fields support Jinja templates, including mail placeholders</span> <code>&#123;&#123; mail.subject &#125;&#125;</code>, <code>&#123;&#123; mail.sender &#125;&#125;</code>, <code>&#123;&#123; mail.recipients &#125;&#125;</code>, <code>&#123;&#123; mail.date &#125;&#125;</code> <span i18n>(populated only when consumed via a mail rule). See <a target="_blank" href="https://docs.paperless-ngx.com/usage/#workflows">documentation</a>.</span></small>
+  }
 </div>

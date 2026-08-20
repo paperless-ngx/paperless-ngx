@@ -24,6 +24,31 @@ _LogStrictUndefined = make_logging_undefined(logger, StrictUndefined)
 
 _template_environment.undefined = _LogStrictUndefined
 
+
+# The `mail` namespace exposed to templates when a document was consumed via
+# a mail rule. Non-mail triggers get this same shape with empty values so that
+# `{{ mail.subject }}` renders as an empty string rather than blowing up under
+# StrictUndefined.
+_EMPTY_MAIL_CONTEXT: dict = {
+    "subject": "",
+    "sender": "",
+    "recipients": [],
+    "date": None,
+}
+
+
+def _resolve_mail_context(mail_context: dict | None) -> dict:
+    """
+    Return a fully-populated mail namespace dict, filling any missing keys
+    from `_EMPTY_MAIL_CONTEXT` so template access never trips StrictUndefined.
+    """
+    if not mail_context:
+        return dict(_EMPTY_MAIL_CONTEXT)
+    resolved = dict(_EMPTY_MAIL_CONTEXT)
+    resolved.update(mail_context)
+    return resolved
+
+
 _template_environment.filters["datetime"] = format_datetime
 
 _template_environment.filters["slugify"] = django_slugify
@@ -56,7 +81,26 @@ _known_placeholder_names = {
     "doc_title",
     "doc_url",
     "doc_id",
+    "mail",
 }
+
+
+def render_workflow_custom_field_string(
+    text: str,
+    mail_context: dict | None = None,
+) -> str:
+    """
+    Render a string custom-field value that may contain a Jinja template.
+
+    Only the `mail` namespace is exposed for v1 (see WorkflowAction docstring).
+    Raises the underlying jinja2 exception on syntax or security errors so the
+    caller can decide how loudly to fail; unlike `parse_w_workflow_placeholders`
+    this always returns a string on success (never None) so the caller can
+    write the result directly to a value_text column.
+    """
+    formatting = {"mail": _resolve_mail_context(mail_context)}
+    template = _template_environment.from_string(text, template_class=Template)
+    return template.render(formatting)
 
 
 def validate_workflow_template(text: str) -> None:
@@ -86,6 +130,7 @@ def parse_w_workflow_placeholders(
     doc_title: str | None = None,
     doc_url: str | None = None,
     doc_id: int | None = None,
+    mail_context: dict | None = None,
 ) -> str:
     """
     Available title placeholders for Workflows depend on what has already been assigned,
@@ -127,6 +172,8 @@ def parse_w_workflow_placeholders(
         formatting.update({"doc_url": doc_url})
     if doc_id is not None:
         formatting.update({"doc_id": str(doc_id)})
+
+    formatting["mail"] = _resolve_mail_context(mail_context)
 
     logger.debug(f"Parsing Workflow Jinja template: {text}")
     try:
