@@ -1973,7 +1973,9 @@ export class DocumentDetailComponent
     const modal = this.modalService.open(EmailDocumentDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.documentIds.set([this.document().id])
+    modal.componentInstance.documentIds.set([
+      this.selectedVersionId() ?? this.document().id,
+    ])
     modal.componentInstance.hasArchiveVersion.set(
       this.metadata()?.has_archive_version ??
         !!this.document()?.archived_file_name
