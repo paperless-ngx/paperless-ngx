@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import asyncio
+import contextlib
 import json
 from typing import TYPE_CHECKING
 
@@ -14,8 +16,12 @@ if TYPE_CHECKING:
     from documents.plugins.helpers import PermissionsData
     from documents.plugins.helpers import StatusUpdatePayload
 
+HEARTBEAT_INTERVAL = 30
+
 
 class StatusConsumer(AsyncWebsocketConsumer):
+    heartbeat_task: asyncio.Task | None = None
+
     def _authenticated(self) -> bool:
         user: AbstractBaseUser | AnonymousUser | None = self.scope.get("user")
         return user is not None and user.is_authenticated
@@ -39,9 +45,27 @@ class StatusConsumer(AsyncWebsocketConsumer):
             return
         await self.channel_layer.group_add("status_updates", self.channel_name)
         await self.accept()
+        self._start_heartbeat()
 
     async def disconnect(self, code: int) -> None:
+        await self._stop_heartbeat()
         await self.channel_layer.group_discard("status_updates", self.channel_name)
+
+    def _start_heartbeat(self) -> None:
+        self.heartbeat_task = asyncio.create_task(self._heartbeat_loop())
+
+    async def _stop_heartbeat(self) -> None:
+        if self.heartbeat_task is not None:
+            self.heartbeat_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await self.heartbeat_task
+            self.heartbeat_task = None
+
+    async def _heartbeat_loop(self) -> None:
+        with contextlib.suppress(Exception):
+            while True:
+                await asyncio.sleep(HEARTBEAT_INTERVAL)
+                await self.send(json.dumps({"type": "heartbeat"}))
 
     async def status_update(self, event: StatusUpdatePayload) -> None:
         if not self._authenticated():

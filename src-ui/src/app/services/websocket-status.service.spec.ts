@@ -438,6 +438,21 @@ describe('ConsumerStatusService', () => {
     expect(updated).toBeTruthy()
   })
 
+  it('should ignore keep-alive heartbeat messages from the server', () => {
+    let updated = false
+    let deleted = false
+    websocketStatusService.onDocumentUpdated().subscribe(() => (updated = true))
+    websocketStatusService.onDocumentDeleted().subscribe(() => (deleted = true))
+
+    websocketStatusService.connect()
+    server.send({ type: WebsocketStatusType.HEARTBEAT })
+
+    expect(updated).toBeFalsy()
+    expect(deleted).toBeFalsy()
+    expect(websocketStatusService.getConsumerStatus()).toHaveLength(0)
+    websocketStatusService.disconnect()
+  })
+
   it('should ignore document updated events the user cannot view', () => {
     let updated = false
     websocketStatusService.onDocumentUpdated().subscribe(() => {
