@@ -156,7 +156,7 @@ The new settings are independent:
 
 ### Database configuration
 
-If you changed OCR settings via the admin UI (ApplicationConfiguration), the database values are **migrated automatically** during the upgrade. `mode` values (`skip` / `skip_noarchive`) are mapped to their new equivalents and `skip_archive_file` values are converted to the new `archive_file_generation` field. After upgrading, review the OCR settings in the admin UI to confirm the migrated values match your intent.
+If you changed OCR settings via the admin UI (ApplicationConfiguration), the database values are **migrated automatically** during the upgrade. `mode` values (`skip` / `skip_noarchive`) are mapped to their new equivalents and explicit `skip_archive_file` values are converted to the new `archive_file_generation` field. Users who relied on the old defaults must set `archive_file_generation` to `always` to preserve the v2 behaviour of always creating an archive. After upgrading, review the OCR settings in the admin UI to confirm the migrated values match your intent.
 
 ### Action Required
 
@@ -165,8 +165,9 @@ Remove any `PAPERLESS_OCR_SKIP_ARCHIVE_FILE` variable from your environment. If 
 ```bash
 # v2: skip OCR when text present, always archive
 PAPERLESS_OCR_MODE=skip
-# v3: equivalent (auto is the new default)
-# No change needed - auto is the default
+# v3: equivalent
+PAPERLESS_OCR_MODE=auto
+PAPERLESS_ARCHIVE_FILE_GENERATION=always
 
 # v2: skip OCR when text present, skip archive too
 PAPERLESS_OCR_MODE=skip_noarchive
