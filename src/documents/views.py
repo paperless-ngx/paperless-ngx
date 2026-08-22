@@ -4879,10 +4879,11 @@ class BulkEditObjectsView(PassUserMixin):
 
         if not user.is_superuser:
             perm = f"documents.{perm_codename}"
+            # Limited to the owner (or unowned), same as documents, see BulkEditView
             has_perms = (
                 user.has_perm(perm)
                 and not objs.exclude(
-                    pk__in=permitted_object_ids(user, object_class, perm_codename),
+                    Q(owner=user) | Q(owner__isnull=True),
                 ).exists()
             )
 
