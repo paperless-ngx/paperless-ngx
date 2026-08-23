@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import math
 import re
+from collections.abc import Iterable
 from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
@@ -876,8 +877,50 @@ def validate_documentlink_targets(user, doc_ids):
         )
 
 
+class _CachingCustomFieldPrimaryKeyField(serializers.PrimaryKeyRelatedField):
+    """
+    A document's custom_fields are validated as a list; the default
+    PrimaryKeyRelatedField issues one SELECT per item. CustomFieldInstanceListSerializer
+    below resolves all of an incoming list's field ids in a single query up
+    front and caches them here, keyed by id, so per-item validation is free
+    instead of re-querying. The cache lives on this field instance, which
+    DRF constructs fresh for each request -- no state persists between
+    requests.
+    """
+
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self._cache: dict[int, CustomField] = {}
+
+    def prefetch(self, ids: Iterable[int]) -> None:
+        missing = {i for i in ids if i not in self._cache}
+        if missing:
+            for obj in self.get_queryset().filter(pk__in=missing):
+                self._cache[obj.pk] = obj
+
+    def to_internal_value(self, data: int) -> CustomField:
+        if data in self._cache:
+            return self._cache[data]
+        obj: CustomField = super().to_internal_value(data)
+        self._cache[obj.pk] = obj
+        return obj
+
+
+class CustomFieldInstanceListSerializer(serializers.ListSerializer):
+    def to_internal_value(self, data: Any) -> list[Any]:
+        if isinstance(data, list):
+            field_ids = {
+                item["field"]
+                for item in data
+                if isinstance(item, dict) and "field" in item
+            }
+            if field_ids:
+                self.child.fields["field"].prefetch(field_ids)
+        return super().to_internal_value(data)
+
+
 class CustomFieldInstanceSerializer(serializers.ModelSerializer[CustomFieldInstance]):
-    field = serializers.PrimaryKeyRelatedField(queryset=CustomField.objects.all())
+    field = _CachingCustomFieldPrimaryKeyField(queryset=CustomField.objects.all())
     value = ReadWriteSerializerMethodField(allow_null=True)
 
     def create(self, validated_data):
@@ -978,6 +1021,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer[CustomFieldInsta
 
     class Meta:
         model = CustomFieldInstance
+        list_serializer_class = CustomFieldInstanceListSerializer
         fields = [
             "value",
             "field",
