@@ -16,6 +16,7 @@ from documents.search._backend import TantivyBackend
 from documents.search._backend import WriteBatch
 from documents.search._backend import get_backend
 from documents.search._backend import reset_backend
+from documents.signals.handlers import add_to_index
 from documents.tests.factories import CorrespondentFactory
 from documents.tests.factories import DocumentFactory
 from documents.tests.factories import DocumentTypeFactory
@@ -1028,6 +1029,81 @@ class TestHighlightHits:
         hits = backend.highlight_hits("quick", [doc.pk])
 
         assert len(hits) == 0
+
+
+class TestVersionIndexing:
+    """
+    GIVEN:
+        - A root document whose new version has just been consumed, e.g. by
+          the password removal workflow action
+    WHEN:
+        - The consumption finished signal is handled
+    THEN:
+        - The root document is indexed with the new version's content, since
+          versions are not searchable on their own
+    """
+
+    def test_consumed_version_updates_root_entry(
+        self,
+        backend: TantivyBackend,
+        mocker: MockerFixture,
+    ) -> None:
+        root = Document.objects.create(
+            title="Statement",
+            content="",
+            checksum="VER1",
+            pk=90,
+        )
+        backend.add_or_update(root)
+        version = Document.objects.create(
+            title="Statement",
+            content="unprotected statement text",
+            checksum="VER2",
+            pk=91,
+            root_document=root,
+            version_index=1,
+        )
+        mocker.patch("documents.search.get_backend", return_value=backend)
+
+        add_to_index(sender=None, document=version)
+
+        assert backend.search_ids("unprotected", user=None) == [root.pk]
+
+
+class TestEffectiveContentIndexing:
+    """
+    GIVEN:
+        - A root document with a newer version
+    WHEN:
+        - The root document is indexed
+    THEN:
+        - The newest version's content is indexed, never the root's own
+          outdated text
+    """
+
+    def test_root_is_indexed_with_latest_version_content(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        root = Document.objects.create(
+            title="Statement",
+            content="stale original text",
+            checksum="EFF1",
+            pk=95,
+        )
+        Document.objects.create(
+            title="Statement",
+            content="latest version text",
+            checksum="EFF2",
+            pk=96,
+            root_document=root,
+            version_index=1,
+        )
+
+        backend.add_or_update(root)
+
+        assert backend.search_ids("latest", user=None) == [root.pk]
+        assert backend.search_ids("stale", user=None) == []
 
 
 class TestIndexDirectoryGarbageCollection:

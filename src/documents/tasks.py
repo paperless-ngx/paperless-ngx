@@ -64,6 +64,7 @@ from documents.signals.handlers import send_websocket_document_updated
 from documents.utils import IterWrapper
 from documents.utils import compute_checksum
 from documents.utils import identity
+from documents.versioning import annotate_effective_content
 from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
 from paperless.logging import consume_task_id
@@ -114,10 +115,7 @@ def index_document(self, document_id: int) -> None:
         )
         return
     with get_backend().batch_update() as batch:
-        batch.add_or_update(
-            document,
-            effective_content=document.get_effective_content(),
-        )
+        batch.add_or_update(document)
 
 
 @shared_task(
@@ -312,7 +310,10 @@ def bulk_update_documents(document_ids) -> None:
     from documents.search import get_backend
 
     document_ids = list(document_ids)
-    documents = Document.objects.filter(id__in=document_ids)
+    # Annotated so indexing below doesn't query the versions of each document
+    documents = annotate_effective_content(
+        Document.objects.filter(id__in=document_ids),
+    )
 
     for doc in documents:
         clear_document_caches(doc.pk)
