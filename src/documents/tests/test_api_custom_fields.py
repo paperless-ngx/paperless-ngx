@@ -5,7 +5,9 @@ from unittest.mock import ANY
 
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.db import connection
 from django.test import override_settings
+from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -13,6 +15,8 @@ from rest_framework.test import APITestCase
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.serialisers import DocumentSerializer
+from documents.tests.factories import DocumentFactory
 from documents.tests.utils import DirectoriesMixin
 
 
@@ -529,6 +533,55 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
 
         doc.refresh_from_db()
         self.assertEqual(len(doc.custom_fields.all()), 10)
+
+    def test_document_serializer_custom_fields_validation_batches_field_lookup(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A document is being validated with several custom field values
+              at once (as happens on every PATCH/PUT/POST)
+        WHEN:
+            - The serializer is validated
+        THEN:
+            - The referenced CustomField objects are resolved with a single
+              query, not one query per custom field
+        """
+        doc = DocumentFactory(mime_type="application/pdf")
+        custom_fields = [
+            CustomField.objects.create(
+                name=f"Test Custom Field {i}",
+                data_type=CustomField.FieldDataType.STRING,
+            )
+            for i in range(5)
+        ]
+
+        serializer = DocumentSerializer(
+            doc,
+            data={
+                "custom_fields": [
+                    {"field": custom_field.id, "value": "test value"}
+                    for custom_field in custom_fields
+                ],
+            },
+            partial=True,
+        )
+
+        with CaptureQueriesContext(connection) as ctx:
+            self.assertTrue(serializer.is_valid(), serializer.errors)
+
+        custom_field_lookups = [
+            query
+            for query in ctx.captured_queries
+            if 'FROM "documents_customfield" WHERE "documents_customfield"."id"'
+            in query["sql"]
+        ]
+        self.assertEqual(
+            len(custom_field_lookups),
+            1,
+            "Expected a single batched query to resolve the custom fields, "
+            f"got {len(custom_field_lookups)}: {custom_field_lookups}",
+        )
 
     def test_change_custom_field_instance_value(self) -> None:
         """
