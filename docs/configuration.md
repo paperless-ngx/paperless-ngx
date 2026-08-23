@@ -316,6 +316,39 @@ Docker, this may be the `environment` key of the webserver or a
 containing the configuration parameters. Be sure to use the correct format
 and watch out for indentation if editing the YAML file.
 
+### Native document parsing {#native-parsing}
+
+Paperless can parse "Office" documents and text-based PDFs entirely in-process
+with the [anydoc](https://github.com/firecrawl/anydoc) and
+[pdf-inspector](https://github.com/firecrawl/pdf-inspector) Rust libraries,
+without requiring an external Tika server. This avoids running a JVM-based
+container and is considerably faster for most documents.
+
+When enabled, the native parser handles office documents (Word, Excel,
+PowerPoint, OpenDocument, RTF, EPUB) and also claims PDFs that contain native
+text, which are then parsed without OCR. Scanned or mixed PDFs continue to be
+handled by the OCR pipeline. Note that neither library exposes creation dates
+or office metadata, so dates are detected from filename and content as usual,
+and metadata extraction remains available for PDF files only.
+
+E-Mail (.eml) parsing still requires the Tika stack described above.
+
+#### [`PAPERLESS_ANYDOC_ENABLED=<bool>`](#PAPERLESS_ANYDOC_ENABLED) {#PAPERLESS_ANYDOC_ENABLED}
+
+: Enable (or disable) the native document parser.
+
+    Defaults to false.
+
+#### [`PAPERLESS_ANYDOC_GOTENBERG_ENDPOINT=<url>`](#PAPERLESS_ANYDOC_GOTENBERG_ENDPOINT) {#PAPERLESS_ANYDOC_GOTENBERG_ENDPOINT}
+
+: Set the endpoint URL of an optional Gotenberg server used to render office
+documents to PDF for the frontend preview.
+
+    Defaults to empty (no PDF preview; documents are ingested with their
+    extracted text only). When unset but `PAPERLESS_TIKA_GOTENBERG_ENDPOINT`
+    is provided, that value is inherited automatically. If the endpoint is
+    unreachable, ingestion continues without a preview.
+
 ### Email Parsing
 
 #### [`PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT=<int>`](#PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT) {#PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT}

@@ -88,6 +88,15 @@ PAPERLESS_SECRET_KEY=change-me
 #PAPERLESS_TIKA_ENDPOINT=http://localhost:9998
 #PAPERLESS_TIKA_GOTENBERG_ENDPOINT=http://localhost:3000
 
+# Native document parsing (anydoc + pdf-inspector)
+# Converts office documents and text-based PDFs to text in-process, without
+# the Tika container. The Gotenberg endpoint is optional: when set, office
+# documents also get a PDF rendition for frontend preview. Set it to an empty
+# value to disable PDF rendering entirely.
+
+#PAPERLESS_ANYDOC_ENABLED=false
+#PAPERLESS_ANYDOC_GOTENBERG_ENDPOINT=http://localhost:3000
+
 # Binaries
 
 #PAPERLESS_CONVERT_BINARY=/usr/bin/convert

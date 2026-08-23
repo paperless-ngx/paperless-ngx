@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 import pytest
 from django.test import override_settings
 
+from paperless.parsers.anydoc import AnydocDocumentParser
 from paperless.parsers.mail import MailDocumentParser
 from paperless.parsers.remote import RemoteDocumentParser
 from paperless.parsers.tesseract import RasterisedDocumentParser
@@ -227,6 +228,24 @@ def tika_parser() -> Generator[TikaDocumentParser, None, None]:
         A ready-to-use parser instance.
     """
     with TikaDocumentParser() as parser:
+        yield parser
+
+
+# ------------------------------------------------------------------
+# Anydoc parser instance
+# ------------------------------------------------------------------
+
+
+@pytest.fixture()
+def anydoc_parser() -> Generator[AnydocDocumentParser, None, None]:
+    """Yield an AnydocDocumentParser and clean up its temporary directory afterwards.
+
+    Yields
+    ------
+    AnydocDocumentParser
+        A ready-to-use parser instance.
+    """
+    with AnydocDocumentParser() as parser:
         yield parser
 
 

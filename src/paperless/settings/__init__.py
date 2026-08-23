@@ -1036,6 +1036,23 @@ TIKA_GOTENBERG_ENDPOINT = os.getenv(
 # Tika parser is now integrated into the main parser registry
 # No separate Django app needed
 
+# Native document parsing settings. When enabled, the AnydocDocumentParser
+# converts office documents and text-based PDFs to text locally via the
+# anydoc and pdf-inspector Rust libraries, avoiding the Tika container
+# entirely. The Gotenberg endpoint is optional: when configured, office
+# documents additionally get a PDF rendition for frontend preview. It
+# defaults to an empty value (rendering disabled) unless explicitly set;
+# deployments that already run Gotenberg can inherit
+# PAPERLESS_TIKA_GOTENBERG_ENDPOINT automatically.
+ANYDOC_ENABLED = get_bool_from_env("PAPERLESS_ANYDOC_ENABLED", "NO")
+ANYDOC_GOTENBERG_ENDPOINT = os.getenv(
+    "PAPERLESS_ANYDOC_GOTENBERG_ENDPOINT",
+    # Only inherit the Tika stack's Gotenberg endpoint when it was actually
+    # provided; otherwise rendering stays disabled so native parsing works
+    # fully container-less.
+    os.getenv("PAPERLESS_TIKA_GOTENBERG_ENDPOINT", ""),
+)
+
 AUDIT_LOG_ENABLED = get_bool_from_env("PAPERLESS_AUDIT_LOG_ENABLED", "true")
 if AUDIT_LOG_ENABLED:
     INSTALLED_APPS.append("auditlog")
