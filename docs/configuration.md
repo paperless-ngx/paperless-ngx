@@ -1215,7 +1215,7 @@ should be a valid crontab(5) expression describing when to run.
 
 : If set to the string "disable", no emails will be fetched automatically.
 
-    Defaults to `*/10 * * * *` or every ten minutes.
+    Defaults to every ten minutes, with an installation-specific minute offset.
 
 #### [`PAPERLESS_TRAIN_TASK_CRON=<cron expression>`](#PAPERLESS_TRAIN_TASK_CRON) {#PAPERLESS_TRAIN_TASK_CRON}
 
@@ -2088,6 +2088,8 @@ suggestions. This setting is required to be set to true in order to use the AI f
 models supported by the current embedding backend. If not supplied, defaults to
 "text-embedding-3-small" for the OpenAI-compatible backend,
 "sentence-transformers/all-MiniLM-L6-v2" for Huggingface, and "embeddinggemma" for Ollama.
+See [choosing AI models](https://github.com/paperless-ngx/paperless-ngx/wiki/AI-Model-Recommendations)
+for language and resource considerations.
 
     Defaults to None.
 
@@ -2144,6 +2146,8 @@ setting is required to be set to use the AI features.
 : The model to use for the AI backend, i.e. "gpt-3.5-turbo", "gpt-4" or any of the models supported
 by the current backend. If not supplied, defaults to "gpt-3.5-turbo" for the OpenAI-compatible
 backend and "llama3.1" for Ollama.
+See [choosing AI models](https://github.com/paperless-ngx/paperless-ngx/wiki/AI-Model-Recommendations)
+for local versus remote and model-size considerations.
 
     Defaults to None.
 

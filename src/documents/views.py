@@ -4778,6 +4778,9 @@ def serve_file(
         # Support browser previewing csv files by using text mime type
         if mime_type in {"application/csv", "text/csv"} and disposition == "inline":
             mime_type = "text/plain"
+        # Tell browsers to use UTF-8 for the text files we parse as UTF-8
+        if mime_type in {"text/plain", "text/csv", "application/csv"}:
+            mime_type = f"{mime_type}; charset=utf-8"
 
     response = FileResponse(file_handle, content_type=mime_type)
     # Firefox is not able to handle unicode characters in filename field
@@ -4879,10 +4882,11 @@ class BulkEditObjectsView(PassUserMixin):
 
         if not user.is_superuser:
             perm = f"documents.{perm_codename}"
+            # Limited to the owner (or unowned), same as documents, see BulkEditView
             has_perms = (
                 user.has_perm(perm)
                 and not objs.exclude(
-                    pk__in=permitted_object_ids(user, object_class, perm_codename),
+                    Q(owner=user) | Q(owner__isnull=True),
                 ).exists()
             )
 

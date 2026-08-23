@@ -677,16 +677,54 @@ class TestBulkEditObjectsApplyToAllPermissionBoundary:
     def test_apply_to_all_tags_excludes_unpermitted_tag(self, rest_api_client):
         owner = User.objects.create_user(username="tags_owner")
         requester = User.objects.create_user(username="tags_requester")
+        new_owner = User.objects.create_user(username="tags_new_owner")
         # grant the global change_tag permission so the object-level
         # filtering (not the global has_perm check) is what's under test
         requester.user_permissions.add(
             Permission.objects.get(codename="change_tag"),
         )
         rest_api_client.force_authenticate(user=requester)
-        visible = TagFactory(owner=owner)
+        visible = TagFactory(owner=requester)
         hidden = TagFactory(owner=owner)
-        assign_perm("view_tag", requester, visible)
-        assign_perm("change_tag", requester, visible)
+
+        response = rest_api_client.post(
+            "/api/bulk_edit_objects/",
+            {
+                "object_type": "tags",
+                "operation": "set_permissions",
+                "all": True,
+                "filters": {},
+                "owner": new_owner.pk,
+            },
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.OK
+
+        # The apply_to_all dispatch must resolve permitted objects up front:
+        # the requester's own tag gets its owner reassigned, while the tag
+        # owned by someone else is excluded entirely and keeps its owner.
+        visible.refresh_from_db()
+        hidden.refresh_from_db()
+        assert visible.owner == new_owner
+        assert hidden.owner == owner
+
+    def test_apply_to_all_tags_refuses_shared_but_unowned_tag(self, rest_api_client):
+        """
+        A tag owned by someone else but shared with the requester is inside the
+        permitted set, so it reaches the ownership gate and fails the whole
+        request rather than being silently skipped. Editing permissions is
+        limited to the owner, same as documents.
+        """
+        owner = User.objects.create_user(username="shared_tags_owner")
+        requester = User.objects.create_user(username="shared_tags_requester")
+        requester.user_permissions.add(
+            Permission.objects.get(codename="change_tag"),
+        )
+        rest_api_client.force_authenticate(user=requester)
+        owned = TagFactory(owner=requester)
+        shared = TagFactory(owner=owner)
+        assign_perm("view_tag", requester, shared)
+        assign_perm("change_tag", requester, shared)
 
         response = rest_api_client.post(
             "/api/bulk_edit_objects/",
@@ -699,16 +737,12 @@ class TestBulkEditObjectsApplyToAllPermissionBoundary:
             },
             format="json",
         )
-        assert response.status_code == HTTPStatus.OK
+        assert response.status_code == HTTPStatus.FORBIDDEN
 
-        # The apply_to_all dispatch must resolve permitted objects up front:
-        # the visible tag (object-level change_tag granted) gets its owner
-        # reassigned, while the hidden tag (no object-level grant) is
-        # excluded entirely and keeps its original owner.
-        visible.refresh_from_db()
-        hidden.refresh_from_db()
-        assert visible.owner == requester
-        assert hidden.owner == owner
+        owned.refresh_from_db()
+        shared.refresh_from_db()
+        assert shared.owner == owner
+        assert owned.owner == requester
 
 
 @pytest.mark.django_db
@@ -720,8 +754,8 @@ class TestBulkEditObjectsTagDescendantPartialPermission:
         """
         GIVEN:
             - A tag hierarchy (parent -> permitted_child, unpermitted_child)
-            - A non-superuser requester with object-level change_tag granted
-              on the parent and on only ONE of the two children
+            - A non-superuser requester who owns the parent and only ONE of
+              the two children
         WHEN:
             - bulk_edit_objects is called with all=True and a filter that
               matches only the root (parent) tag, engaging the
@@ -743,6 +777,7 @@ class TestBulkEditObjectsTagDescendantPartialPermission:
         """
         owner = User.objects.create_user(username="tag_hierarchy_owner")
         requester = User.objects.create_user(username="tag_hierarchy_requester")
+        new_owner = User.objects.create_user(username="tag_hierarchy_new_owner")
         # global change_tag permission so the has_perm() gate passes and the
         # object-level permitted_object_ids filtering is what's under test
         requester.user_permissions.add(
@@ -750,9 +785,9 @@ class TestBulkEditObjectsTagDescendantPartialPermission:
         )
         rest_api_client.force_authenticate(user=requester)
 
-        parent = TagFactory(owner=owner, name="parent-tag")
+        parent = TagFactory(owner=requester, name="parent-tag")
         permitted_child = TagFactory(
-            owner=owner,
+            owner=requester,
             name="permitted-child-tag",
             tn_parent=parent,
         )
@@ -761,9 +796,6 @@ class TestBulkEditObjectsTagDescendantPartialPermission:
             name="unpermitted-child-tag",
             tn_parent=parent,
         )
-        assign_perm("change_tag", requester, parent)
-        assign_perm("change_tag", requester, permitted_child)
-        # unpermitted_child is intentionally NOT granted change_tag
 
         response = rest_api_client.post(
             "/api/bulk_edit_objects/",
@@ -772,7 +804,7 @@ class TestBulkEditObjectsTagDescendantPartialPermission:
                 "operation": "set_permissions",
                 "all": True,
                 "filters": {"is_root": True},
-                "owner": requester.pk,
+                "owner": new_owner.pk,
             },
             format="json",
         )
@@ -781,8 +813,8 @@ class TestBulkEditObjectsTagDescendantPartialPermission:
         parent.refresh_from_db()
         permitted_child.refresh_from_db()
         unpermitted_child.refresh_from_db()
-        assert parent.owner == requester
-        assert permitted_child.owner == requester
+        assert parent.owner == new_owner
+        assert permitted_child.owner == new_owner
         assert unpermitted_child.owner == owner
 
 
