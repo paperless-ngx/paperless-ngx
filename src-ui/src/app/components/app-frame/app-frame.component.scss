@@ -458,7 +458,25 @@ main {
 
   .navbar-toggler {
     grid-area: toggler;
+    color: var(--pngx-primary-text-contrast);
     text-align: left;
+
+    .navbar-toggler-icon {
+      position: relative;
+      background-image: none;
+
+      &::before {
+        position: absolute;
+        top: calc(50% - 1px);
+        left: 0;
+        width: 100%;
+        height: 2px;
+        content: "";
+        background-color: currentColor;
+        border-radius: 1rem;
+        box-shadow: 0 -.4rem currentColor, 0 .4rem currentColor;
+      }
+    }
   }
 
   .navbar-brand {
