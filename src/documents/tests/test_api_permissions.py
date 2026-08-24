@@ -1360,6 +1360,145 @@ class TestBulkEditObjectPermissions(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(response.content, b"Insufficient permissions")
 
+    def test_bulk_edit_object_permissions_shared_object_not_owner(self) -> None:
+        """
+        GIVEN:
+            - Object owned by another user, shared with the logged in user with
+              change permissions
+        WHEN:
+            - bulk_edit_objects API endpoint is called with set_permissions operation
+        THEN:
+            - User is not able to take ownership or change permissions, consistent
+              with the single object API
+        """
+        self.t1.owner = self.user2
+        self.t1.save()
+        assign_perm("view_tag", self.user1, self.t1)
+        assign_perm("change_tag", self.user1, self.t1)
+        self.user1.user_permissions.add(
+            *Permission.objects.filter(
+                codename__in=["view_tag", "change_tag"],
+            ),
+        )
+        user1 = User.objects.get(pk=self.user1.pk)
+        self.client.force_authenticate(user=user1)
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id],
+                    "object_type": "tags",
+                    "operation": "set_permissions",
+                    "owner": user1.id,
+                    "permissions": {
+                        "view": {"users": [user1.id], "groups": []},
+                        "change": {"users": [user1.id], "groups": []},
+                    },
+                    "merge": False,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Tag.objects.get(pk=self.t1.id).owner, self.user2)
+
+        # the single object endpoint refuses the same request
+        response = self.client.patch(
+            f"/api/tags/{self.t1.id}/",
+            {"owner": user1.id},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Tag.objects.get(pk=self.t1.id).owner, self.user2)
+
+    def test_bulk_edit_object_permissions_all_with_shared_objects(self) -> None:
+        """
+        GIVEN:
+            - Objects owned by the logged in user, unowned objects and objects owned
+              by another user but shared with the logged in user
+        WHEN:
+            - bulk_edit_objects API endpoint is called with set_permissions operation
+              and all = True
+        THEN:
+            - The request is refused and no objects are changed
+        """
+        owned = Tag.objects.create(name="owned", owner=self.user1)
+        shared = Tag.objects.create(name="shared", owner=self.user2)
+        assign_perm("view_tag", self.user1, shared)
+        assign_perm("change_tag", self.user1, shared)
+        self.user1.user_permissions.add(
+            *Permission.objects.filter(
+                codename__in=["view_tag", "change_tag"],
+            ),
+        )
+        user1 = User.objects.get(pk=self.user1.pk)
+        self.client.force_authenticate(user=user1)
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "objects": [],
+                    "all": True,
+                    "object_type": "tags",
+                    "operation": "set_permissions",
+                    "permissions": {
+                        "view": {"users": [self.user3.id], "groups": []},
+                        "change": {"users": [self.user3.id], "groups": []},
+                    },
+                    "merge": False,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # nothing was changed, including the objects the user does own
+        self.assertNotIn(self.user3, get_users_with_perms(owned))
+        self.assertNotIn(self.user3, get_users_with_perms(self.t1))
+        self.assertNotIn(self.user3, get_users_with_perms(shared))
+        self.assertEqual(Tag.objects.get(pk=shared.pk).owner, self.user2)
+
+    def test_bulk_edit_object_delete_shared_object_not_owner(self) -> None:
+        """
+        GIVEN:
+            - Object owned by another user, shared with the logged in user with
+              change and delete permissions
+        WHEN:
+            - bulk_edit_objects API endpoint is called with delete operation
+        THEN:
+            - User is not able to delete the object, consistent with documents
+        """
+        self.t1.owner = self.user2
+        self.t1.save()
+        assign_perm("view_tag", self.user1, self.t1)
+        assign_perm("change_tag", self.user1, self.t1)
+        assign_perm("delete_tag", self.user1, self.t1)
+        self.user1.user_permissions.add(
+            *Permission.objects.filter(
+                codename__in=["view_tag", "change_tag", "delete_tag"],
+            ),
+        )
+        user1 = User.objects.get(pk=self.user1.pk)
+        self.client.force_authenticate(user=user1)
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id],
+                    "object_type": "tags",
+                    "operation": "delete",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(Tag.objects.filter(pk=self.t1.id).exists())
+
     def test_bulk_edit_object_permissions_validation(self) -> None:
         """
         GIVEN:

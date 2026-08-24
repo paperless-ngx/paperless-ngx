@@ -6,7 +6,10 @@ from typing import TYPE_CHECKING
 from typing import Any
 
 from django.db.models import F
+from django.db.models import OuterRef
 from django.db.models import QuerySet
+from django.db.models import Subquery
+from django.db.models.functions import Coalesce
 
 from documents.models import Document
 
@@ -20,6 +23,24 @@ def versions_newest_first(documents: QuerySet[Document]) -> QuerySet[Document]:
     because an existing document can be merged in as a version
     """
     return documents.order_by(F("version_index").desc(nulls_last=True), "-id")
+
+
+def annotate_effective_content(documents: QuerySet[Document]) -> QuerySet[Document]:
+    """
+    Annotates documents with the content of their newest version, falling back
+    to their own, so get_effective_content() can answer from the row rather
+    than querying for the versions of each document
+    """
+    return documents.annotate(
+        effective_content=Coalesce(
+            Subquery(
+                versions_newest_first(
+                    Document.objects.filter(root_document=OuterRef("pk")),
+                ).values("content")[:1],
+            ),
+            F("content"),
+        ),
+    )
 
 
 def sort_versions_newest_first(documents: list[Document]) -> list[Document]:

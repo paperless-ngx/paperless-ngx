@@ -89,7 +89,7 @@
         </div>
       </div>
       @if (filterText?.length) {
-        <button class="btn btn-link btn-sm px-2 position-absolute top-0 end-0 z-10" (click)="resetFilter()">
+        <button class="btn btn-link btn-sm px-2 position-absolute top-0 end-0 z-10" (click)="resetFilter()" aria-label="Clear search" i18n-aria-label>
           <i-bs width="1em" height="1em" name="x"></i-bs>
         </button>
       }
@@ -208,7 +208,7 @@
               </td>
             }
             <td class="d-lg-none">
-              <button class="btn btn-link" (click)="expandTask(task); $event.stopPropagation();">
+              <button class="btn btn-link" (click)="expandTask(task); $event.stopPropagation();" aria-label="View task details" i18n-aria-label>
                 <i-bs width="1.2em" height="1.2em" name="info-circle"></i-bs>
               </button>
             </td>

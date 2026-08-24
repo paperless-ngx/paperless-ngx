@@ -266,11 +266,7 @@ class WriteBatch:
             if self._lock is not None:
                 self._lock.release()
 
-    def add_or_update(
-        self,
-        document: Document,
-        effective_content: str | None = None,
-    ) -> None:
+    def add_or_update(self, document: Document) -> None:
         """
         Add or update a document in the batch.
 
@@ -280,11 +276,9 @@ class WriteBatch:
 
         Args:
             document: Django Document instance to index
-            effective_content: Override document.content for indexing (used when
-                re-indexing with newer OCR text from document versions)
         """
         self.remove(document.pk)
-        doc = self._backend._build_tantivy_doc(document, effective_content)
+        doc = self._backend._build_tantivy_doc(document)
         self._writer.add_document(doc)
 
     def remove(self, doc_id: int) -> None:
@@ -425,18 +419,17 @@ class TantivyBackend:
     def _build_tantivy_doc(
         self,
         document: Document,
-        effective_content: str | None = None,
         viewer_ids: list[int] | None = None,
         viewer_group_ids: list[int] | None = None,
     ) -> tantivy.Document:
         """Build a tantivy Document from a Django Document instance.
 
-        ``effective_content`` overrides ``document.content`` for indexing —
-        used when re-indexing a root document with a newer version's OCR text.
+        A root document is indexed with its effective content, i.e. the newest
+        version's OCR text, so it is never indexed with its own outdated text.
+        Annotate the queryset with ``annotate_effective_content`` when indexing
+        more than a couple of documents, to resolve that without a query each.
         """
-        content = (
-            effective_content if effective_content is not None else document.content
-        )
+        content = document.get_effective_content() or ""
 
         doc = tantivy.Document()
 
@@ -584,11 +577,7 @@ class TantivyBackend:
 
         return doc
 
-    def add_or_update(
-        self,
-        document: Document,
-        effective_content: str | None = None,
-    ) -> None:
+    def add_or_update(self, document: Document) -> None:
         """
         Add or update a single document with file locking.
 
@@ -601,12 +590,11 @@ class TantivyBackend:
 
         Args:
             document: Django Document instance to index
-            effective_content: Override document.content for indexing
         """
         self._ensure_open()
         try:
             with self.batch_update(lock_timeout=_LOCK_TIMEOUT_SECONDS) as batch:
-                batch.add_or_update(document, effective_content)
+                batch.add_or_update(document)
         except SearchIndexLockError:
             logger.error(
                 "Search index lock exhausted for document %d after %d attempts; "
@@ -1027,7 +1015,6 @@ class TantivyBackend:
             ):
                 doc = self._build_tantivy_doc(
                     document,
-                    document.get_effective_content(),
                     viewer_ids=viewer_ids,
                     viewer_group_ids=viewer_group_ids,
                 )

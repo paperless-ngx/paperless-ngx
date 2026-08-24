@@ -34,7 +34,7 @@
     }
     <pngx-toasts-dropdown></pngx-toasts-dropdown>
     <li ngbDropdown class="nav-item dropdown">
-      <button class="btn ps-1 border-0" id="userDropdown" ngbDropdownToggle>
+      <button class="btn ps-1 border-0" id="userDropdown" ngbDropdownToggle aria-label="User menu" i18n-aria-label>
         <i-bs width="1.3em" height="1.3em" name="person-circle"></i-bs>
         <span class="small ms-2 d-none d-sm-inline">
           {{this.settingsService.displayName}}
@@ -71,7 +71,7 @@
       [ngClass]="slimSidebarEnabled ? 'slim' : 'col-md-3 col-lg-2 col-xxxl-1'" [class.animating]="slimSidebarAnimating()"
       [ngbCollapse]="isMenuCollapsed()">
       @if (canSaveSettings) {
-        <button class="btn btn-sm btn-dark sidebar-slim-toggler" (click)="toggleSlimSidebar()">
+        <button class="btn btn-sm btn-dark sidebar-slim-toggler" (click)="toggleSlimSidebar()" [aria-label]="slimSidebarEnabled ? 'Expand sidebar' : 'Collapse sidebar'" i18n-aria-label>
           @if (slimSidebarEnabled) {
             <i-bs width="0.9em" height="0.9em" name="chevron-double-right"></i-bs>
           } @else {
@@ -363,7 +363,7 @@
                         </a>
                       }
                     } @else {
-                      <a  *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }" class="small text-decoration-none" routerLink="/settings" fragment="update-checking"
+                      <a  *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }" class="small text-decoration-none" routerLink="/settings" fragment="update-checking" aria-label="Configure update checking" i18n-aria-label
                         [ngbPopover]="updateCheckingNotEnabledPopContent" popoverClass="shadow" triggers="mouseenter"
                         container="body">
                         <i-bs width="1.2em" height="1.2em" name="info-circle"></i-bs>

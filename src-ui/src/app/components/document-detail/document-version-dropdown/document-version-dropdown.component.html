@@ -1,7 +1,10 @@
 <div class="btn-group" ngbDropdown autoClose="outside">
-  <button class="btn btn-sm btn-outline-secondary dropdown-toggle" ngbDropdownToggle>
+  <button class="btn btn-sm btn-outline-secondary dropdown-toggle" ngbDropdownToggle aria-label="Versions" i18n-aria-label>
     <i-bs name="file-earmark-diff"></i-bs>
     <span class="d-none d-lg-inline ps-1" i18n>Versions</span>
+    @if (versions.length > 1) {
+      <span class="badge text-bg-secondary ms-1">{{ versions.length }}</span>
+    }
   </button>
   <div class="dropdown-menu shadow" ngbDropdownMenu>
     <div class="px-3 py-2 mb-2">

@@ -497,6 +497,56 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         )
         response.close()
 
+    @override_settings(FILENAME_FORMAT="")
+    def test_serve_text_file_declares_utf8_charset(self) -> None:
+        """
+        GIVEN:
+            - A UTF-8 encoded text document
+        WHEN:
+            - The file is served for preview or download
+        THEN:
+            - The Content-Type declares the UTF-8 charset, so the browser does
+              not fall back to its locale default and mangle non-ASCII text
+        """
+        doc = Document.objects.create(
+            title="none",
+            filename="my_document.txt",
+            mime_type="text/plain",
+        )
+        Path(doc.source_path).write_bytes("für Grüße München".encode())
+
+        for endpoint in ("preview", "download"):
+            with self.subTest(endpoint=endpoint):
+                response = self.client.get(f"/api/documents/{doc.pk}/{endpoint}/")
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(response["Content-Type"], "text/plain; charset=utf-8")
+                self.assertEqual(
+                    read_streaming_response(response).decode("utf-8"),
+                    "für Grüße München",
+                )
+
+    @override_settings(FILENAME_FORMAT="")
+    def test_serve_pdf_file_has_no_charset(self) -> None:
+        """
+        GIVEN:
+            - A PDF document
+        WHEN:
+            - The file is served for preview
+        THEN:
+            - No charset is added to the binary content type
+        """
+        doc = Document.objects.create(
+            title="none",
+            filename="my_document.pdf",
+            mime_type="application/pdf",
+        )
+        Path(doc.source_path).write_bytes(b"This is a test")
+
+        response = self.client.get(f"/api/documents/{doc.pk}/preview/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response["Content-Type"], "application/pdf")
+        response.close()
+
     def test_document_actions_not_existing_file(self) -> None:
         doc = Document.objects.create(
             title="none",
