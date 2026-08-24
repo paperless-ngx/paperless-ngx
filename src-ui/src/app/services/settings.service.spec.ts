@@ -13,6 +13,7 @@ import { environment } from 'src/environments/environment'
 import { CustomFieldDataType } from '../data/custom-field'
 import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
 import { SavedView } from '../data/saved-view'
+import { RemoteOCRModeConfig } from '../data/paperless-config'
 import { SETTINGS_KEYS, UiSettings } from '../data/ui-settings'
 import { PermissionsService } from './permissions.service'
 import { CustomFieldsService } from './rest/custom-fields.service'
@@ -433,5 +434,27 @@ describe('SettingsService', () => {
           (f) => f.id === `${DisplayField.CUSTOM_FIELD}${customFields[0].id}`
         ).name
     ).toEqual(customFields[0].name)
+  })
+  it('should offer remote OCR only when configured and selective', () => {
+    settingsService.set(SETTINGS_KEYS.REMOTE_OCR_CONFIGURED, false)
+    settingsService.set(
+      SETTINGS_KEYS.REMOTE_OCR_MODE,
+      RemoteOCRModeConfig.WORKFLOW_ONLY
+    )
+    expect(settingsService.remoteOCRIsSelectable).toBeFalsy()
+
+    // configured, but already handling every document
+    settingsService.set(SETTINGS_KEYS.REMOTE_OCR_CONFIGURED, true)
+    settingsService.set(
+      SETTINGS_KEYS.REMOTE_OCR_MODE,
+      RemoteOCRModeConfig.ALWAYS
+    )
+    expect(settingsService.remoteOCRIsSelectable).toBeFalsy()
+
+    settingsService.set(
+      SETTINGS_KEYS.REMOTE_OCR_MODE,
+      RemoteOCRModeConfig.WORKFLOW_ONLY
+    )
+    expect(settingsService.remoteOCRIsSelectable).toBeTruthy()
   })
 })

@@ -52,6 +52,7 @@ import { flattenTags } from 'src/app/utils/flatten-tags'
 import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
 import { MergeAsVersionsConfirmDialogComponent } from '../../common/confirm-dialog/merge-as-versions-confirm-dialog/merge-as-versions-confirm-dialog.component'
 import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
+import { ReprocessConfirmDialogComponent } from '../../common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component'
 import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
@@ -916,7 +917,7 @@ export class BulkEditorComponent
   }
 
   reprocessSelected() {
-    let modal = this.modalService.open(ConfirmDialogComponent, {
+    let modal = this.modalService.open(ReprocessConfirmDialogComponent, {
       backdrop: 'static',
     })
     modal.componentInstance.title = $localize`Reprocess confirm`
@@ -930,7 +931,10 @@ export class BulkEditorComponent
         modal.componentInstance.buttonsEnabled.set(false)
         this.executeDocumentAction(
           modal,
-          this.documentService.reprocessDocuments(this.getSelectionQuery())
+          this.documentService.reprocessDocuments(
+            this.getSelectionQuery(),
+            modal.componentInstance.remoteOcr
+          )
         )
       })
   }

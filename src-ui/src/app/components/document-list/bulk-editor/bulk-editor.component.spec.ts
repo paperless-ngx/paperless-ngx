@@ -1122,6 +1122,7 @@ describe('BulkEditorComponent', () => {
     req.flush(true)
     expect(req.request.body).toEqual({
       documents: [3, 4],
+      remote_ocr: false,
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`

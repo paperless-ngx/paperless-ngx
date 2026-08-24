@@ -239,8 +239,10 @@ from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import AIConfig
 from paperless.config import GeneralConfig
+from paperless.config import RemoteOCRConfig
 from paperless.models import ApplicationConfiguration
 from paperless.parsers.registry import get_parser_registry
+from paperless.parsers.remote import RemoteEngineConfig
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
@@ -4099,6 +4101,11 @@ class UiSettingsView(GenericAPIView[Any]):
             ui_settings["app_logo"] = general_config.app_logo
 
         ui_settings["auditlog_enabled"] = settings.AUDIT_LOG_ENABLED
+
+        ui_settings["remote_ocr"] = {
+            "configured": RemoteEngineConfig.from_app_config().engine_is_valid(),
+            "mode": RemoteOCRConfig().remote_ocr_mode,
+        }
 
         if settings.GMAIL_OAUTH_ENABLED or settings.OUTLOOK_OAUTH_ENABLED:
             manager = PaperlessMailOAuth2Manager()

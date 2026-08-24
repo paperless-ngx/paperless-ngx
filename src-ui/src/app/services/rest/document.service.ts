@@ -349,9 +349,13 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     })
   }
 
-  reprocessDocuments(selection: DocumentSelectionQuery) {
+  reprocessDocuments(
+    selection: DocumentSelectionQuery,
+    remoteOcr: boolean = false
+  ) {
     return this.http.post(this.getResourceUrl(null, 'reprocess'), {
       ...selection,
+      remote_ocr: remoteOcr,
     })
   }
 
