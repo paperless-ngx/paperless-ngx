@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-24 21:18+0000\n"
+"POT-Creation-Date: 2026-08-24 21:43+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -89,7 +89,7 @@ msgstr ""
 msgid "Automatic"
 msgstr ""
 
-#: documents/models.py:65 documents/models.py:606 documents/models.py:1920
+#: documents/models.py:65 documents/models.py:606 documents/models.py:1924
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
 msgstr ""
@@ -272,7 +272,7 @@ msgid "Optional short label for a document version."
 msgstr ""
 
 #: documents/models.py:340 documents/models.py:922 documents/models.py:976
-#: documents/models.py:1963
+#: documents/models.py:1967
 msgid "document"
 msgstr ""
 
@@ -1385,198 +1385,202 @@ msgid "Move to trash"
 msgstr ""
 
 #: documents/models.py:1675
+msgid "Remote OCR"
+msgstr ""
+
+#: documents/models.py:1679
 msgid "Workflow Action Type"
 msgstr ""
 
-#: documents/models.py:1680 documents/models.py:1922
+#: documents/models.py:1684 documents/models.py:1926
 #: paperless_mail/models.py:145
 msgid "order"
 msgstr ""
 
-#: documents/models.py:1683
+#: documents/models.py:1687
 msgid "assign title"
 msgstr ""
 
-#: documents/models.py:1687
+#: documents/models.py:1691
 msgid "Assign a document title, must  be a Jinja2 template, see documentation."
 msgstr ""
 
-#: documents/models.py:1695 paperless_mail/models.py:274
+#: documents/models.py:1699 paperless_mail/models.py:274
 msgid "assign this tag"
 msgstr ""
 
-#: documents/models.py:1704 paperless_mail/models.py:282
+#: documents/models.py:1708 paperless_mail/models.py:282
 msgid "assign this document type"
 msgstr ""
 
-#: documents/models.py:1713 paperless_mail/models.py:296
+#: documents/models.py:1717 paperless_mail/models.py:296
 msgid "assign this correspondent"
 msgstr ""
 
-#: documents/models.py:1722
+#: documents/models.py:1726
 msgid "assign this storage path"
 msgstr ""
 
-#: documents/models.py:1731
+#: documents/models.py:1735
 msgid "assign this owner"
 msgstr ""
 
-#: documents/models.py:1738
+#: documents/models.py:1742
 msgid "grant view permissions to these users"
 msgstr ""
 
-#: documents/models.py:1745
+#: documents/models.py:1749
 msgid "grant view permissions to these groups"
 msgstr ""
 
-#: documents/models.py:1752
+#: documents/models.py:1756
 msgid "grant change permissions to these users"
 msgstr ""
 
-#: documents/models.py:1759
+#: documents/models.py:1763
 msgid "grant change permissions to these groups"
 msgstr ""
 
-#: documents/models.py:1766
+#: documents/models.py:1770
 msgid "assign these custom fields"
 msgstr ""
 
-#: documents/models.py:1770
+#: documents/models.py:1774
 msgid "custom field values"
 msgstr ""
 
-#: documents/models.py:1774
+#: documents/models.py:1778
 msgid "Optional values to assign to the custom fields."
 msgstr ""
 
-#: documents/models.py:1783
+#: documents/models.py:1787
 msgid "remove these tag(s)"
 msgstr ""
 
-#: documents/models.py:1788
+#: documents/models.py:1792
 msgid "remove all tags"
 msgstr ""
 
-#: documents/models.py:1795
+#: documents/models.py:1799
 msgid "remove these document type(s)"
 msgstr ""
 
-#: documents/models.py:1800
+#: documents/models.py:1804
 msgid "remove all document types"
 msgstr ""
 
-#: documents/models.py:1807
+#: documents/models.py:1811
 msgid "remove these correspondent(s)"
 msgstr ""
 
-#: documents/models.py:1812
+#: documents/models.py:1816
 msgid "remove all correspondents"
 msgstr ""
 
-#: documents/models.py:1819
+#: documents/models.py:1823
 msgid "remove these storage path(s)"
 msgstr ""
 
-#: documents/models.py:1824
+#: documents/models.py:1828
 msgid "remove all storage paths"
 msgstr ""
 
-#: documents/models.py:1831
+#: documents/models.py:1835
 msgid "remove these owner(s)"
 msgstr ""
 
-#: documents/models.py:1836
+#: documents/models.py:1840
 msgid "remove all owners"
 msgstr ""
 
-#: documents/models.py:1843
+#: documents/models.py:1847
 msgid "remove view permissions for these users"
 msgstr ""
 
-#: documents/models.py:1850
+#: documents/models.py:1854
 msgid "remove view permissions for these groups"
 msgstr ""
 
-#: documents/models.py:1857
+#: documents/models.py:1861
 msgid "remove change permissions for these users"
 msgstr ""
 
-#: documents/models.py:1864
+#: documents/models.py:1868
 msgid "remove change permissions for these groups"
 msgstr ""
 
-#: documents/models.py:1869
+#: documents/models.py:1873
 msgid "remove all permissions"
 msgstr ""
 
-#: documents/models.py:1876
+#: documents/models.py:1880
 msgid "remove these custom fields"
 msgstr ""
 
-#: documents/models.py:1881
+#: documents/models.py:1885
 msgid "remove all custom fields"
 msgstr ""
 
-#: documents/models.py:1890
+#: documents/models.py:1894
 msgid "email"
 msgstr ""
 
-#: documents/models.py:1899
+#: documents/models.py:1903
 msgid "webhook"
 msgstr ""
 
-#: documents/models.py:1903
+#: documents/models.py:1907
 msgid "passwords"
 msgstr ""
 
-#: documents/models.py:1907
+#: documents/models.py:1911
 msgid ""
 "Passwords to try when removing PDF protection. Separate with commas or new "
 "lines."
 msgstr ""
 
-#: documents/models.py:1912
+#: documents/models.py:1916
 msgid "workflow action"
 msgstr ""
 
-#: documents/models.py:1913
+#: documents/models.py:1917
 msgid "workflow actions"
 msgstr ""
 
-#: documents/models.py:1928
+#: documents/models.py:1932
 msgid "triggers"
 msgstr ""
 
-#: documents/models.py:1935
+#: documents/models.py:1939
 msgid "actions"
 msgstr ""
 
-#: documents/models.py:1938 paperless_mail/models.py:154
+#: documents/models.py:1942 paperless_mail/models.py:154
 msgid "enabled"
 msgstr ""
 
-#: documents/models.py:1949
+#: documents/models.py:1953
 msgid "workflow"
 msgstr ""
 
-#: documents/models.py:1953
+#: documents/models.py:1957
 msgid "workflow trigger type"
 msgstr ""
 
-#: documents/models.py:1967
+#: documents/models.py:1971
 msgid "date run"
 msgstr ""
 
-#: documents/models.py:1973
+#: documents/models.py:1977
 msgid "workflow run"
 msgstr ""
 
-#: documents/models.py:1974
+#: documents/models.py:1978
 msgid "workflow runs"
 msgstr ""
 
 #: documents/serialisers.py:523 documents/serialisers.py:875
-#: documents/serialisers.py:2818 documents/views.py:309 documents/views.py:2610
+#: documents/serialisers.py:2827 documents/views.py:311 documents/views.py:2612
 #: paperless_mail/serialisers.py:155
 msgid "Insufficient permissions."
 msgstr ""
@@ -1585,39 +1589,39 @@ msgstr ""
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:2295
+#: documents/serialisers.py:2304
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:2339
+#: documents/serialisers.py:2348
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:2346
+#: documents/serialisers.py:2355
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:2363 documents/serialisers.py:2373
+#: documents/serialisers.py:2372 documents/serialisers.py:2382
 msgid ""
 "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:2368
+#: documents/serialisers.py:2377
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:2515
+#: documents/serialisers.py:2524
 msgid "Invalid variable detected."
 msgstr ""
 
-#: documents/serialisers.py:2874
+#: documents/serialisers.py:2883
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2904 documents/views.py:4599
+#: documents/serialisers.py:2913 documents/views.py:4606
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1885,36 +1889,36 @@ msgstr ""
 msgid "Unable to parse URI {value}"
 msgstr ""
 
-#: documents/views.py:302 documents/views.py:2607
+#: documents/views.py:304 documents/views.py:2609
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:1584
+#: documents/views.py:1586
 msgid "Invalid AI configuration."
 msgstr ""
 
-#: documents/views.py:1595
+#: documents/views.py:1597
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:2432 documents/views.py:2753
+#: documents/views.py:2434 documents/views.py:2755
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:4612
+#: documents/views.py:4619
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr ""
 
-#: documents/views.py:4658
+#: documents/views.py:4665
 msgid "Bundle is already being processed."
 msgstr ""
 
-#: documents/views.py:4719
+#: documents/views.py:4726
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr ""
 
-#: documents/views.py:4729
+#: documents/views.py:4736
 msgid "The share link bundle is unavailable."
 msgstr ""
 
@@ -2002,187 +2006,199 @@ msgstr ""
 msgid "Azure AI Document Intelligence"
 msgstr ""
 
-#: paperless/models.py:86 paperless/models.py:96
+#: paperless/models.py:90
+msgid "All supported documents"
+msgstr ""
+
+#: paperless/models.py:91
+msgid "Only when a workflow enables it"
+msgstr ""
+
+#: paperless/models.py:95 paperless/models.py:105
 msgid "OpenAI-compatible"
 msgstr ""
 
-#: paperless/models.py:87
+#: paperless/models.py:96
 msgid "Huggingface"
 msgstr ""
 
-#: paperless/models.py:88 paperless/models.py:97
+#: paperless/models.py:97 paperless/models.py:106
 msgid "Ollama"
 msgstr ""
 
-#: paperless/models.py:106
+#: paperless/models.py:115
 msgid "Sets the output PDF type"
 msgstr ""
 
-#: paperless/models.py:118
+#: paperless/models.py:127
 msgid "Do OCR from page 1 to this value"
 msgstr ""
 
-#: paperless/models.py:124
+#: paperless/models.py:133
 msgid "Do OCR using these languages"
 msgstr ""
 
-#: paperless/models.py:131
+#: paperless/models.py:140
 msgid "Sets the OCR mode"
 msgstr ""
 
-#: paperless/models.py:139
+#: paperless/models.py:148
 msgid "Controls archive file generation"
 msgstr ""
 
-#: paperless/models.py:147
+#: paperless/models.py:156
 msgid "Sets image DPI fallback value"
 msgstr ""
 
-#: paperless/models.py:154
+#: paperless/models.py:163
 msgid "Controls the unpaper cleaning"
 msgstr ""
 
-#: paperless/models.py:161
+#: paperless/models.py:170
 msgid "Enables deskew"
 msgstr ""
 
-#: paperless/models.py:164
+#: paperless/models.py:173
 msgid "Enables page rotation"
 msgstr ""
 
-#: paperless/models.py:169
+#: paperless/models.py:178
 msgid "Sets the threshold for rotation of pages"
 msgstr ""
 
-#: paperless/models.py:175
+#: paperless/models.py:184
 msgid "Sets the maximum image size for decompression"
 msgstr ""
 
-#: paperless/models.py:181
+#: paperless/models.py:190
 msgid "Sets the Ghostscript color conversion strategy"
 msgstr ""
 
-#: paperless/models.py:189
+#: paperless/models.py:198
 msgid "Adds additional user arguments for OCRMyPDF"
 msgstr ""
 
-#: paperless/models.py:198
+#: paperless/models.py:207
 msgid "Application title"
 msgstr ""
 
-#: paperless/models.py:205
+#: paperless/models.py:214
 msgid "Application logo"
 msgstr ""
 
-#: paperless/models.py:220
+#: paperless/models.py:229
 msgid "Enables barcode scanning"
 msgstr ""
 
-#: paperless/models.py:226
+#: paperless/models.py:235
 msgid "Enables barcode TIFF support"
 msgstr ""
 
-#: paperless/models.py:232
+#: paperless/models.py:241
 msgid "Sets the barcode string"
 msgstr ""
 
-#: paperless/models.py:240
+#: paperless/models.py:249
 msgid "Retains split pages"
 msgstr ""
 
-#: paperless/models.py:246
+#: paperless/models.py:255
 msgid "Enables ASN barcode"
 msgstr ""
 
-#: paperless/models.py:252
+#: paperless/models.py:261
 msgid "Sets the ASN barcode prefix"
 msgstr ""
 
-#: paperless/models.py:260
+#: paperless/models.py:269
 msgid "Sets the barcode upscale factor"
 msgstr ""
 
-#: paperless/models.py:267
+#: paperless/models.py:276
 msgid "Sets the barcode DPI"
 msgstr ""
 
-#: paperless/models.py:274
+#: paperless/models.py:283
 msgid "Sets the maximum pages for barcode"
 msgstr ""
 
-#: paperless/models.py:281
+#: paperless/models.py:290
 msgid "Enables tag barcode"
 msgstr ""
 
-#: paperless/models.py:287
+#: paperless/models.py:296
 msgid "Sets the tag barcode mapping"
 msgstr ""
 
-#: paperless/models.py:293
+#: paperless/models.py:302
 msgid "Enables splitting on tag barcodes"
 msgstr ""
 
-#: paperless/models.py:303
+#: paperless/models.py:312
 msgid "Sets the remote OCR engine"
 msgstr ""
 
-#: paperless/models.py:312
+#: paperless/models.py:321
 msgid "Sets the remote OCR API key"
 msgstr ""
 
-#: paperless/models.py:320
+#: paperless/models.py:329
 msgid "Sets the remote OCR endpoint"
 msgstr ""
 
-#: paperless/models.py:331
+#: paperless/models.py:337
+msgid "Sets which documents are sent to the remote OCR engine"
+msgstr ""
+
+#: paperless/models.py:349
 msgid "Enables AI features"
 msgstr ""
 
-#: paperless/models.py:337
+#: paperless/models.py:355
 msgid "Sets the LLM embedding backend"
 msgstr ""
 
-#: paperless/models.py:345
+#: paperless/models.py:363
 msgid "Sets the LLM embedding model"
 msgstr ""
 
-#: paperless/models.py:352
+#: paperless/models.py:370
 msgid "Sets the LLM embedding endpoint, optional"
 msgstr ""
 
-#: paperless/models.py:359
+#: paperless/models.py:377
 msgid "Sets the LLM embedding chunk size"
 msgstr ""
 
-#: paperless/models.py:365
+#: paperless/models.py:383
 msgid "Sets the LLM context size"
 msgstr ""
 
-#: paperless/models.py:371
+#: paperless/models.py:389
 msgid "Sets the LLM backend"
 msgstr ""
 
-#: paperless/models.py:379
+#: paperless/models.py:397
 msgid "Sets the LLM model"
 msgstr ""
 
-#: paperless/models.py:386
+#: paperless/models.py:404
 msgid "Sets the LLM API key"
 msgstr ""
 
-#: paperless/models.py:393
+#: paperless/models.py:411
 msgid "Sets the LLM endpoint, optional"
 msgstr ""
 
-#: paperless/models.py:400
+#: paperless/models.py:418
 msgid "Sets the LLM output language"
 msgstr ""
 
-#: paperless/models.py:407
+#: paperless/models.py:425
 msgid "Sets the LLM timeout in seconds"
 msgstr ""
 
-#: paperless/models.py:413
+#: paperless/models.py:431
 msgid "paperless application settings"
 msgstr ""
 
