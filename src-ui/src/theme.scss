@@ -20,7 +20,7 @@
   --pngx-primary-darken-27: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 27%));
   --pngx-success-darken-10: hsl(152, 69%, 11%); // based on success #198754
   --pngx-bg-alt: #fff;
-  --pngx-bg-darker: var(--bs-gray-100);
+  --pngx-bg-darker: #f4f6f5;
   --pngx-bg-alt2: var(--bs-gray-200); // #e9ecef
   --pngx-bg-disabled: #f7f7f7;
   --pngx-card-hover-border: var(--bs-tertiary-color);
@@ -107,7 +107,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,%3csvg xmlns='h
   --bs-light-rgb: 28, 28, 31;
   --bs-info: var(--pngx-bg-alt);
   --bs-info-rgb: 36, 36, 39;
-  --bs-border-color: #47494f;
+  --bs-border-color: #34373d;
   --bs-tertiary-bg: var(--pngx-bg-darker);
   --bs-dark-border-subtle: var(--pngx-bg-darker);
   --bs-border-color-translucent: rgba(0, 0, 0, .175); // override bs

@@ -1,3 +1,19 @@
 .col-sidebar .row {
-    top: 3.5rem;
+  top: 4.75rem;
+}
+
+:host {
+  display: block;
+  max-width: 1560px;
+  margin: 0 auto;
+}
+
+.dashboard-grid {
+  padding-bottom: 2rem;
+}
+
+@media (min-width: 1200px) {
+  .dashboard-main {
+    padding-right: 1rem;
+  }
 }

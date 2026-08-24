@@ -2,6 +2,20 @@ i-bs {
     cursor: move;
 }
 
+.card {
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--bs-border-color) 68%, transparent);
+
+  .card-header {
+    padding: .9rem 1rem;
+    border-bottom-color: color-mix(in srgb, var(--bs-border-color) 55%, transparent);
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+}
+
 .fade.show {
   animation: pngx-entry-fade 160ms ease-out;
 }
