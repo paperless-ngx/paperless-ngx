@@ -333,8 +333,20 @@ main {
  */
 
 .navbar-brand {
-  font-size: 1rem;
+  font-size: 1.0625rem;
   min-height: 64px;
+  letter-spacing: -0.015em;
+
+  .brand-mark {
+    width: 1.65rem;
+    height: 1.65rem;
+    flex: 0 0 auto;
+  }
+
+  .default-title,
+  .title {
+    font-weight: 600;
+  }
 
   .flex-column {
     padding: 0.15rem 0;
