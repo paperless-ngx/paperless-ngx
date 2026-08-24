@@ -23,7 +23,7 @@
               <dd>
                 {{status().pngx_version}}
                 @if (versionMismatch()) {
-                    <button class="btn btn-sm d-inline align-items-center btn-dark text-uppercase small" [ngbPopover]="versionPopover" triggers="click mouseenter:mouseleave">
+                    <button class="btn btn-sm d-inline align-items-center btn-dark text-uppercase small" [ngbPopover]="versionPopover" triggers="click mouseenter:mouseleave" aria-label="View version mismatch details" i18n-aria-label>
                       <i-bs name="exclamation-triangle-fill" class="text-danger lh-1"></i-bs>
                     </button>
                 }

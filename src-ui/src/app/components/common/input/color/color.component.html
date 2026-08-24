@@ -4,7 +4,7 @@
   }
 
   <div class="input-group" [class.is-invalid]="error">
-    <button type="button" class="input-group-text" [style.background-color]="value" (click)="colorPicker.toggle()">&nbsp;&nbsp;&nbsp;</button>
+    <button type="button" class="input-group-text" [style.background-color]="value" (click)="colorPicker.toggle()" aria-label="Open color picker" i18n-aria-label>&nbsp;&nbsp;&nbsp;</button>
 
     <ng-template #popContent>
       <div style="min-width: 200px;" class="pb-3">
@@ -14,7 +14,7 @@
 
     <input #inputField class="form-control" [class.is-invalid]="error" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [autoClose]="'outside'" [ngbPopover]="popContent" #colorPicker="ngbPopover" placement="bottom" popoverClass="shadow">
 
-    <button class="btn btn-outline-secondary" type="button" (click)="randomize()">
+    <button class="btn btn-outline-secondary" type="button" (click)="randomize()" aria-label="Choose a random color" i18n-aria-label>
       <i-bs name="dice5"></i-bs>
     </button>
 

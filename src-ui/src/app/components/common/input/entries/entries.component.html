@@ -13,7 +13,7 @@
         <div class="input-group mb-3">
           <input type="text" class="form-control" [(ngModel)]="entry[0]" (change)="inputChange()" [disabled]="disabled" autocomplete="off">
           <input type="text" class="form-control" [(ngModel)]="entry[1]" (change)="inputChange()" [disabled]="disabled" autocomplete="off">
-          <button type="button" class="btn btn-outline-secondary" (click)="removeEntry(i)">
+          <button type="button" class="btn btn-outline-secondary" (click)="removeEntry(i)" aria-label="Remove entry" i18n-aria-label>
             <i-bs class="text-danger" name="trash"></i-bs>
           </button>
         </div>

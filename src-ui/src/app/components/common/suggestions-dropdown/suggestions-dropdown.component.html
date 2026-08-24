@@ -1,5 +1,5 @@
 <div class="btn-group">
-  <button type="button" class="btn btn-sm btn-outline-primary" (click)="clickSuggest()" [disabled]="disabled() || loading() || (suggestions() && !aiEnabled())">
+  <button type="button" class="btn btn-sm btn-outline-primary" (click)="clickSuggest()" [disabled]="disabled() || loading() || (suggestions() && !aiEnabled())" [aria-label]="noSuggestions ? 'No suggestions' : 'Suggest'" i18n-aria-label>
     @if (loading()) {
       <div class="spinner-border spinner-border-sm" role="status"></div>
     } @else if (noSuggestions) {
