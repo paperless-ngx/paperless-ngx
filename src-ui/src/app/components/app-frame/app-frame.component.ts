@@ -96,6 +96,7 @@ export class AppFrameComponent
   readonly isMenuCollapsed = signal(true)
   readonly slimSidebarAnimating = signal(false)
   readonly mobileSearchHidden = signal(false)
+  readonly isMobile = signal(this.isMobileViewport())
   private lastScrollY: number = 0
 
   constructor() {
@@ -115,6 +116,7 @@ export class AppFrameComponent
   }
 
   ngOnInit(): void {
+    this.isMobile.set(this.isMobileViewport())
     this.lastScrollY = window.scrollY
 
     if (this.settingsService.get(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED)) {
@@ -263,6 +265,10 @@ export class AppFrameComponent
     return this.settingsService.get(SETTINGS_KEYS.SLIM_SIDEBAR)
   }
 
+  get slimSidebarActive(): boolean {
+    return this.slimSidebarEnabled && !this.isMobile()
+  }
+
   set slimSidebarEnabled(enabled: boolean) {
     this.settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, enabled)
     this.settingsService
@@ -311,6 +317,7 @@ export class AppFrameComponent
 
   @HostListener('window:resize')
   onWindowResize(): void {
+    this.isMobile.set(this.isMobileViewport())
     if (!this.isMobileViewport()) {
       this.mobileSearchHidden.set(false)
     }

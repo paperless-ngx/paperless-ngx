@@ -270,6 +270,35 @@ describe('AppFrameComponent', () => {
     jest.useRealTimers()
   })
 
+  it('should not apply the slim sidebar on mobile viewports', () => {
+    settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, true)
+
+    Object.defineProperty(globalThis, 'innerWidth', { value: 1024 })
+    component.onWindowResize()
+    expect(component.slimSidebarActive).toBeTruthy()
+
+    Object.defineProperty(globalThis, 'innerWidth', { value: 767 })
+    component.onWindowResize()
+    fixture.detectChanges()
+    // the burger menu shows full labels, so the slim-only icon popovers
+    // (which overflow the viewport and shift the layout) must be disabled
+    expect(component.slimSidebarActive).toBeFalsy()
+    const dashboardLink: HTMLAnchorElement = Array.from(
+      (fixture.nativeElement as HTMLDivElement).querySelectorAll(
+        '#sidebarMenu a.nav-link'
+      )
+    ).find((el) =>
+      el.textContent.trim().startsWith('Dashboard')
+    ) as HTMLAnchorElement
+    expect(dashboardLink).not.toBeUndefined()
+    dashboardLink.dispatchEvent(new MouseEvent('mouseenter'))
+    fixture.detectChanges()
+    expect(globalThis.document.querySelector('ngb-popover-window')).toBeNull()
+
+    Object.defineProperty(globalThis, 'innerWidth', { value: 1024 })
+    component.onWindowResize()
+  })
+
   it('should show error on toggle slim sidebar if store settings fails', () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {})
     const toastSpy = jest.spyOn(toastService, 'showError')
