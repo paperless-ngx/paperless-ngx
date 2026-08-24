@@ -4,12 +4,12 @@ form {
   > i-bs[name="search"] {
     position: absolute;
     left: 0.6rem;
-    top: .35rem;
+    top: .25rem;
     color: rgba(255, 255, 255, 0.6);
 
     @media screen and (min-width: 768px) {
       // adjust for smaller font size on non-mobile
-      top: 0.25rem;
+      top: .15rem;
     }
   }
 
@@ -37,8 +37,9 @@ form {
   }
 
   .form-control {
-    color: rgba(255, 255, 255, 0.3);
-    background-color: rgba(0, 0, 0, 0.15);
+    min-height: 2.25rem;
+    color: rgba(255, 255, 255, 0.55);
+    background-color: rgba(0, 0, 0, 0.16);
     padding-left: 1.8rem;
     border-color: rgba(255, 255, 255, 0.2);
     transition: all .3s ease, padding-left 0s ease, background-color 0s ease; // Safari requires all
@@ -52,7 +53,7 @@ form {
     }
 
     &:focus-within {
-      background-color: rgba(0, 0, 0, 0.3);
+      background-color: rgba(0, 0, 0, 0.26);
       color: var(--bs-light);
       flex-grow: 1;
       padding-left: 0.5rem;

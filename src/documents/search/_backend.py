@@ -20,10 +20,7 @@ from typing import cast
 import filelock
 import tantivy
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 from django.utils.timezone import get_current_timezone
-from guardian.shortcuts import get_groups_with_perms
-from guardian.shortcuts import get_users_with_perms
 
 from documents.search._query import build_permission_filter
 from documents.search._query import extract_cjk_text
@@ -429,6 +426,9 @@ class TantivyBackend:
         Annotate the queryset with ``annotate_effective_content`` when indexing
         more than a couple of documents, to resolve that without a query each.
         """
+        from guardian.shortcuts import get_groups_with_perms
+        from guardian.shortcuts import get_users_with_perms
+
         content = document.get_effective_content() or ""
 
         doc = tantivy.Document()
@@ -1082,6 +1082,7 @@ def _bulk_get_viewer_permissions(
     """
     from collections import defaultdict
 
+    from django.contrib.contenttypes.models import ContentType
     from guardian.models import GroupObjectPermission
     from guardian.models import UserObjectPermission
 
