@@ -415,21 +415,21 @@ main {
   align-items: center;
   gap: .125rem;
   padding-right: .5rem;
+}
 
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 2.5rem;
-    min-height: 2.5rem;
-    padding: .45rem .55rem;
-    border-radius: .6rem;
-    transition: background-color .15s ease-in-out, opacity .15s ease-in-out;
+:host ::ng-deep .navbar-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  padding: .45rem .55rem;
+  border-radius: .6rem;
+  transition: background-color .15s ease-in-out, opacity .15s ease-in-out;
 
-    &:hover,
-    &:focus-visible {
-      background-color: rgba(0, 0, 0, .14);
-    }
+  &:hover,
+  &:focus-visible {
+    background-color: rgba(0, 0, 0, .14);
   }
 }
 
@@ -492,8 +492,13 @@ main {
     padding-right: .25rem;
   }
 
-  #userDropdown {
+  :host ::ng-deep .navbar-action {
     min-width: 2.25rem;
+    padding-right: .4rem;
+    padding-left: .4rem;
+  }
+
+  #userDropdown {
     padding-right: .35rem;
     padding-left: .45rem;
   }

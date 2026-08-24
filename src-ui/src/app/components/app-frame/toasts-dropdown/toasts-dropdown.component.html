@@ -1,9 +1,9 @@
 
-<li ngbDropdown class="nav-item mx-1 position-relative" (openChange)="onOpenChange($event)">
+<li ngbDropdown class="nav-item position-relative" (openChange)="onOpenChange($event)">
   @if (toasts().length) {
     <span class="notification-count badge rounded-pill z-3 pe-none bg-secondary position-absolute">{{ toasts().length }}</span>
   }
-  <button class="btn border-0" id="notificationsDropdown" ngbDropdownToggle aria-label="Notifications" i18n-aria-label>
+  <button class="btn navbar-action border-0" id="notificationsDropdown" ngbDropdownToggle aria-label="Notifications" i18n-aria-label>
     <i-bs width="1.3em" height="1.3em" name="bell"></i-bs>
   </button>
   <div ngbDropdownMenu class="dropdown-menu-end shadow p-3" aria-labelledby="notificationsDropdown">

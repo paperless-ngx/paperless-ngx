@@ -21,37 +21,11 @@
   line-height: 1;
 }
 
-.nav-item > .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 2.5rem;
-  min-height: 2.5rem;
-  padding: .45rem .55rem;
-  border-radius: .6rem;
-
-  &:hover,
-  &:focus-visible {
-    background-color: rgba(0, 0, 0, .14);
-  }
-}
-
 .dropdown-item {
   white-space: initial;
 }
 
 @media screen and (max-width: 400px) {
-  .nav-item {
-    margin-right: 0 !important;
-    margin-left: 0 !important;
-  }
-
-  .nav-item > .btn {
-    min-width: 2.25rem;
-    padding-right: .4rem;
-    padding-left: .4rem;
-  }
-
   :host ::ng-deep .dropdown-menu-end {
     right: -3rem;
   }
