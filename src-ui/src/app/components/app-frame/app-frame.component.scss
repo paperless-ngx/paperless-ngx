@@ -473,6 +473,14 @@ main {
     grid-area: actions;
     justify-self: end;
     flex-wrap: nowrap;
+    gap: 0;
+    padding-right: .25rem;
+  }
+
+  #userDropdown {
+    min-width: 2.25rem;
+    padding-right: .35rem;
+    padding-left: .45rem;
   }
 }
 
