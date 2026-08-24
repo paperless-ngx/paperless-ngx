@@ -73,6 +73,11 @@ export const RemoteOCREngineConfig = {
   AZURE_AI: 'azureai',
 }
 
+export const RemoteOCRModeConfig = {
+  ALWAYS: 'always',
+  WORKFLOW_ONLY: 'workflow_only',
+}
+
 export interface ConfigOption {
   key: string
   title: string
@@ -216,6 +221,16 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     category: ConfigCategory.OCR,
     section: ConfigSection.RemoteOCR,
     note: $localize`Required when using the Azure AI engine.`,
+  },
+  {
+    key: 'remote_ocr_mode',
+    title: $localize`Remote OCR Mode`,
+    type: ConfigOptionType.Select,
+    choices: mapToItems(RemoteOCRModeConfig),
+    config_key: 'PAPERLESS_REMOTE_OCR_MODE',
+    category: ConfigCategory.OCR,
+    section: ConfigSection.RemoteOCR,
+    note: $localize`Which documents are sent to the remote engine. Use 'workflow_only' to keep remote OCR off unless a workflow enables it for a document.`,
   },
   {
     key: 'app_logo',
@@ -437,6 +452,7 @@ export interface PaperlessConfig extends ObjectWithId {
   remote_ocr_engine: string
   remote_ocr_api_key: string
   remote_ocr_endpoint: string
+  remote_ocr_mode: string
   ai_enabled: boolean
   llm_embedding_backend: string
   llm_embedding_model: string

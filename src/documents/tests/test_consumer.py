@@ -1559,12 +1559,92 @@ class PostConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
                         consumer.run_post_consume_script(doc)
 
 
+class TestConsumerRemoteOCR(
+    DirectoriesMixin,
+    FileSystemAssertsMixin,
+    GetConsumerMixin,
+    TestCase,
+):
+    """
+    The consumer resolves the remote OCR mode and the per-document request from
+    workflows into the allow_remote flag it hands to the parser registry.
+    """
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        patcher = mock.patch("documents.consumer.get_parser_registry")
+        self.mock_registry = patcher.start()
+        self.mock_registry.return_value.get_parser_for_file.return_value = DummyParser
+        self.addCleanup(patcher.stop)
+
+    def _consume(self, *, overrides: DocumentMetadataOverrides | None = None) -> bool:
+        src = (
+            Path(__file__).parent
+            / "samples"
+            / "documents"
+            / "originals"
+            / "0000001.pdf"
+        )
+        dst = self.dirs.scratch_dir / "sample.pdf"
+        shutil.copy(src, dst)
+
+        with self.get_consumer(dst, overrides=overrides) as consumer:
+            consumer.run()
+
+        _, kwargs = self.mock_registry.return_value.get_parser_for_file.call_args
+        return kwargs["allow_remote"]
+
+    @override_settings(REMOTE_OCR_MODE="always")
+    def test_always_mode_allows_remote(self) -> None:
+        """
+        GIVEN: Remote OCR mode is 'always'.
+        WHEN:  A document is consumed without any workflow asking for it.
+        THEN:  The registry is allowed to pick the remote parser.
+        """
+        self.assertTrue(self._consume())
+
+    @override_settings(REMOTE_OCR_MODE="workflow_only")
+    def test_workflow_only_mode_denies_remote_by_default(self) -> None:
+        """
+        GIVEN: Remote OCR mode is 'workflow_only'.
+        WHEN:  A document is consumed and nothing asked for remote OCR.
+        THEN:  The remote parser is excluded.
+        """
+        self.assertFalse(self._consume())
+
+    @override_settings(REMOTE_OCR_MODE="workflow_only")
+    def test_workflow_only_mode_allows_remote_when_requested(self) -> None:
+        """
+        GIVEN: Remote OCR mode is 'workflow_only'.
+        WHEN:  A workflow set remote_ocr on the metadata overrides.
+        THEN:  The registry is allowed to pick the remote parser.
+        """
+        self.assertTrue(
+            self._consume(overrides=DocumentMetadataOverrides(remote_ocr=True)),
+        )
+
+
 class TestMetadataOverrides(TestCase):
     def test_update_skip_asn_if_exists(self) -> None:
         base = DocumentMetadataOverrides()
         incoming = DocumentMetadataOverrides(skip_asn_if_exists=True)
         base.update(incoming)
         self.assertTrue(base.skip_asn_if_exists)
+
+    def test_update_remote_ocr(self) -> None:
+        base = DocumentMetadataOverrides()
+        base.update(DocumentMetadataOverrides(remote_ocr=True))
+        self.assertTrue(base.remote_ocr)
+
+    def test_update_remote_ocr_is_not_unset(self) -> None:
+        """
+        A later workflow that says nothing must not undo an earlier one that
+        asked for remote OCR.
+        """
+        base = DocumentMetadataOverrides(remote_ocr=True)
+        base.update(DocumentMetadataOverrides())
+        self.assertTrue(base.remote_ocr)
 
     def test_update_actor_and_version_label(self) -> None:
         base = DocumentMetadataOverrides(

@@ -82,6 +82,15 @@ class RemoteOCREngine(models.TextChoices):
     AZURE_AI = ("azureai", _("Azure AI Document Intelligence"))
 
 
+class RemoteOCRMode(models.TextChoices):
+    """
+    Matches to PAPERLESS_REMOTE_OCR_MODE
+    """
+
+    ALWAYS = ("always", _("All supported documents"))
+    WORKFLOW_ONLY = ("workflow_only", _("Only when a workflow enables it"))
+
+
 class LLMEmbeddingBackend(models.TextChoices):
     OPENAI_LIKE = ("openai-like", _("OpenAI-compatible"))
     HUGGINGFACE = ("huggingface", _("Huggingface"))
@@ -321,6 +330,15 @@ class ApplicationConfiguration(AbstractSingletonModel):
         blank=True,
         null=True,
         max_length=256,
+    )
+
+    # PAPERLESS_REMOTE_OCR_MODE
+    remote_ocr_mode = models.CharField(
+        verbose_name=_("Sets which documents are sent to the remote OCR engine"),
+        blank=True,
+        null=True,
+        max_length=32,
+        choices=RemoteOCRMode.choices,
     )
 
     """

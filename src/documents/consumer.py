@@ -53,6 +53,7 @@ from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
 from paperless.config import OcrConfig
+from paperless.config import RemoteOCRConfig
 from paperless.models import ArchiveFileGenerationChoices
 from paperless.parsers import ParserContext
 from paperless.parsers import ParserProtocol
@@ -451,12 +452,19 @@ class ConsumerPlugin(
                 except Exception as e:
                     self.log.error(f"Error attempting to clean PDF: {e}")
 
+            # Workflows have already run at this point, so the metadata knows
+            # whether this document was singled out for remote OCR
+            allow_remote = (
+                self.metadata.remote_ocr or RemoteOCRConfig().remote_ocr_by_default
+            )
+
             # Based on the mime type, get the parser for that type
             parser_class: type[ParserProtocol] | None = (
                 get_parser_registry().get_parser_for_file(
                     mime_type,
                     self.filename,
                     self.working_copy,
+                    allow_remote=allow_remote,
                 )
             )
             if not parser_class:

@@ -9,6 +9,7 @@ from paperless.models import CleanChoices
 from paperless.models import ColorConvertChoices
 from paperless.models import ModeChoices
 from paperless.models import OutputTypeChoices
+from paperless.models import RemoteOCRMode
 
 
 @dataclasses.dataclass
@@ -194,6 +195,7 @@ class RemoteOCRConfig(BaseConfig):
     remote_ocr_engine: str | None = dataclasses.field(init=False)
     remote_ocr_api_key: str | None = dataclasses.field(init=False)
     remote_ocr_endpoint: str | None = dataclasses.field(init=False)
+    remote_ocr_mode: RemoteOCRMode = dataclasses.field(init=False)
 
     def __post_init__(self) -> None:
         app_config = self._get_config_instance()
@@ -207,6 +209,20 @@ class RemoteOCRConfig(BaseConfig):
         self.remote_ocr_endpoint = (
             app_config.remote_ocr_endpoint or settings.REMOTE_OCR_ENDPOINT
         )
+        self.remote_ocr_mode = app_config.remote_ocr_mode or RemoteOCRMode(
+            settings.REMOTE_OCR_MODE,
+        )
+
+    @property
+    def remote_ocr_by_default(self) -> bool:
+        """
+        Whether every supported document goes to the remote engine.
+
+        When False the remote engine is used only for documents that
+        explicitly asked for it, i.e. a workflow matched during consumption or
+        the user ticked the box when reprocessing.
+        """
+        return self.remote_ocr_mode == RemoteOCRMode.ALWAYS
 
 
 @dataclasses.dataclass

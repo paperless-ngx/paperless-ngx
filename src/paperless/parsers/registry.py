@@ -334,6 +334,8 @@ class ParserRegistry:
         mime_type: str,
         filename: str,
         path: Path | None = None,
+        *,
+        allow_remote: bool = True,
     ) -> type[ParserProtocol] | None:
         """Return the best parser class for the given file, or None.
 
@@ -359,6 +361,11 @@ class ParserRegistry:
         path:
             Optional filesystem path to the file. Forwarded to each
             parser's score method.
+        allow_remote:
+            When False, parsers that declare ``uses_remote_service = True``
+            are excluded from consideration, so a document is never sent to
+            a remote service. Parsers that do not declare the attribute
+            are treated as local and are always considered.
 
         Returns
         -------
@@ -372,6 +379,13 @@ class ParserRegistry:
         # external parser wins over a built-in (first-seen policy).
         for parser_class in (*self._external, *self._builtins):
             if mime_type not in parser_class.supported_mime_types():
+                continue
+
+            if not allow_remote and getattr(
+                parser_class,
+                "uses_remote_service",
+                False,
+            ):
                 continue
 
             score = parser_class.score(mime_type, filename, path)
