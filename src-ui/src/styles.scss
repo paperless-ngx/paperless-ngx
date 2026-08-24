@@ -1,7 +1,7 @@
 @use "sass:meta";
 // bs variables
 $grid-gutter-width: 1.5rem;
-$border-radius: .375rem;
+$border-radius: .425rem;
 $btn-border-width: var(--bs-border-width);
 
 $form-file-button-bg: var(--bs-body-bg);
@@ -68,15 +68,44 @@ body {
   --pngx-body-font-size: 0.875rem;
   font-size: var(--pngx-body-font-size);
   height: 100vh;
+  letter-spacing: -0.005em;
 }
 
 * {
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
+.card,
+.dropdown-menu,
+.modal-content,
+.popover {
+  --bs-card-border-color: color-mix(in srgb, var(--bs-border-color) 72%, transparent);
+  border-radius: .55rem;
+}
+
+.card {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 8px 24px rgba(0, 0, 0, .035);
+}
+
+.btn {
+  --bs-btn-border-radius: .425rem;
+  --bs-border-radius-sm: .425rem;
+  font-weight: 500;
+}
+
+.form-control,
+.form-select,
+.input-group-text {
+  border-radius: .425rem;
+}
+
+.pagination, .input-group {
+  --bs-border-radius-sm: .425rem;
+}
+
 @media(min-width: 768px) {
   .col-slim {
-    padding-left: calc(50px + $grid-gutter-width) !important;
+    padding-left: calc(56px + $grid-gutter-width) !important;
   }
 }
 
@@ -660,6 +689,10 @@ table.table {
   --bs-toast-max-width: var(--pngx-toast-max-width);
 }
 
+.alert {
+  --bs-border-radius: .425rem;
+}
+
 .alert-primary {
   --bs-alert-color: var(--bs-primary);
   --bs-alert-bg: var(--pngx-primary-faded);
@@ -791,6 +824,8 @@ code {
   --bs-accordion-bg: var(--bs-light);
   --bs-accordion-active-color: var(--bs-primary);
   --bs-accordion-active-bg: var(--pngx-bg-alt);
+  --bs-border-radius: .425rem;
+  --bs-accordion-inner-border-radius: calc(.425rem - 1px);
 }
 
 .accordion-button::after {

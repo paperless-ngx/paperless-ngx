@@ -33,7 +33,7 @@ test('should warn on unsaved changes', async ({ page }) => {
   await page.getByRole('button', { name: 'Close', exact: true }).click()
   await expect(page.getByRole('dialog')).toHaveText(/unsaved changes/)
   await page.getByRole('button', { name: 'Cancel' }).click()
-  await page.getByRole('link', { name: 'Close all' }).click()
+  await page.getByRole('button', { name: 'Close all' }).click()
   await expect(page.getByRole('dialog')).toHaveText(/unsaved changes/)
 })
 
