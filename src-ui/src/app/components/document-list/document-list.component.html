@@ -1,6 +1,6 @@
 <pngx-page-header [title]="getTitle()">
   <div ngbDropdown class="btn-group flex-fill d-sm-none">
-    <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle>
+    <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle aria-label="Select" i18n-aria-label>
       <i-bs name="text-indent-left"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Select</ng-container></div>
       @if (list.hasSelection) {
         <pngx-clearable-badge [selected]="list.hasSelection" [number]="list.selectedCount" (cleared)="list.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
@@ -31,7 +31,7 @@
     </div>
   </div>
   <div ngbDropdown class="btn-group flex-fill">
-    <button class="btn btn-sm btn-outline-primary" id="dropdownDisplayFields" ngbDropdownToggle>
+    <button class="btn btn-sm btn-outline-primary" id="dropdownDisplayFields" ngbDropdownToggle aria-label="Show" i18n-aria-label>
       <i-bs name="card-heading"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Show</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownDisplayFields" class="shadow">
@@ -61,7 +61,7 @@
   </div>
 
   <div ngbDropdown class="btn-group flex-fill">
-    <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle>
+    <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle aria-label="Sort" i18n-aria-label>
       <i-bs name="arrow-down-up"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Sort</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow dropdown-menu-right">
@@ -86,7 +86,7 @@
   </div>
 
   <div class="btn-group flex-fill" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }" ngbDropdown #viewsDropdown="ngbDropdown" role="group">
-    <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" tourAnchor="tour.documents-views" ngbDropdownToggle>
+    <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" tourAnchor="tour.documents-views" ngbDropdownToggle aria-label="Views" i18n-aria-label>
       <i-bs name="window-stack"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Views</ng-container></div>
       @if (savedViewIsModified) {
         <div class="position-absolute top-0 start-100 p-2 translate-middle badge bg-secondary border border-light rounded-circle">

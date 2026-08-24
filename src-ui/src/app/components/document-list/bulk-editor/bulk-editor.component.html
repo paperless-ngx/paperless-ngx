@@ -74,7 +74,7 @@
       </pngx-filterable-dropdown>
     }
     <div class="btn-group">
-      <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="setPermissions()" [disabled]="!userOwnsAll || !userCanEditAll">
+      <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="setPermissions()" [disabled]="!userOwnsAll || !userCanEditAll" aria-label="Permissions" i18n-aria-label>
         <i-bs name="person-fill-lock"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Permissions</ng-container></div>
       </button>
     </div>
@@ -82,7 +82,7 @@
   <div class="d-flex align-items-center gap-2 ms-auto">
     <div class="btn-toolbar">
       <div ngbDropdown>
-        <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" [disabled]="!userCanEdit && !userCanAdd" ngbDropdownToggle>
+        <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" [disabled]="!userCanEdit && !userCanAdd" ngbDropdownToggle aria-label="Actions" i18n-aria-label>
           <i-bs name="three-dots"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Actions</ng-container></div>
         </button>
         <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
@@ -107,6 +107,8 @@
         id="dropdownSend"
         ngbDropdownToggle
         [disabled]="disabled || !canSendSelection"
+        aria-label="Send"
+        i18n-aria-label
       >
         <i-bs name="send"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Send</ng-container>
         </div>
@@ -127,7 +129,7 @@
       </div>
     </div>
     <div class="btn-group btn-group-sm">
-      <button class="btn btn-sm btn-outline-primary" [disabled]="awaitingDownload()" (click)="downloadSelected()">
+      <button class="btn btn-sm btn-outline-primary" [disabled]="awaitingDownload()" (click)="downloadSelected()" aria-label="Download" i18n-aria-label>
         @if (!awaitingDownload()) {
           <i-bs name="arrow-down"></i-bs>
         }
