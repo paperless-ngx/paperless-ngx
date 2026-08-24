@@ -11,6 +11,7 @@ export enum WebsocketStatusType {
   STATUS_UPDATE = 'status_update',
   DOCUMENTS_DELETED = 'documents_deleted',
   DOCUMENT_UPDATED = 'document_updated',
+  HEARTBEAT = 'heartbeat',
 }
 
 // see ProgressStatusOptions in src/documents/plugins/helpers.py
@@ -206,6 +207,10 @@ export class WebsocketStatusService {
 
         case WebsocketStatusType.STATUS_UPDATE:
           this.handleProgressUpdate(messageData as WebsocketProgressMessage)
+          break
+
+        case WebsocketStatusType.HEARTBEAT:
+          // keep-alive from the server, see paperless.consumers.StatusConsumer
           break
       }
     }
