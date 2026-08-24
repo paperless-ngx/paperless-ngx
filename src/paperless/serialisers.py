@@ -219,6 +219,13 @@ class ApplicationConfigurationSerializer(
         allow_null=True,
         max_length=1024,
     )
+    remote_ocr_api_key = ObfuscatedPasswordField(
+        required=False,
+        allow_null=True,
+        max_length=1024,
+    )
+
+    OBFUSCATED_FIELDS = ("llm_api_key", "remote_ocr_api_key")
 
     def run_validation(self, data):
         # Empty strings treated as None to avoid unexpected behavior
@@ -230,11 +237,13 @@ class ApplicationConfigurationSerializer(
             data["language"] = None
         if "llm_output_language" in data and data["llm_output_language"] == "":
             data["llm_output_language"] = None
-        if "llm_api_key" in data and data["llm_api_key"] is not None:
-            if data["llm_api_key"] == "":
-                data["llm_api_key"] = None
-            elif len(data["llm_api_key"].replace("*", "")) == 0:
-                del data["llm_api_key"]
+        for field in self.OBFUSCATED_FIELDS:
+            if field in data and data[field] is not None:
+                if data[field] == "":
+                    data[field] = None
+                # Not a real value, don't overwrite the stored one
+                elif len(data[field].replace("*", "")) == 0:
+                    del data[field]
         return super().run_validation(data)
 
     def update(self, instance, validated_data):

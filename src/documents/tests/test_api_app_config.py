@@ -72,6 +72,9 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 "barcode_enable_tag": None,
                 "barcode_tag_mapping": None,
                 "barcode_tag_split": None,
+                "remote_ocr_engine": None,
+                "remote_ocr_api_key": None,
+                "remote_ocr_endpoint": None,
                 "ai_enabled": False,
                 "llm_embedding_backend": None,
                 "llm_embedding_model": None,
@@ -869,6 +872,49 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         config.refresh_from_db()
         self.assertEqual(config.llm_api_key, None)
+
+    def test_update_remote_ocr_api_key(self) -> None:
+        """
+        GIVEN:
+            - Existing config with remote_ocr_api_key specified
+        WHEN:
+            - API to update remote_ocr_api_key is called with all *s
+            - API to update remote_ocr_api_key is called with empty string
+        THEN:
+            - remote_ocr_api_key is unchanged
+            - remote_ocr_api_key is set to None
+        """
+        config = ApplicationConfiguration.objects.first()
+        assert config is not None
+        config.remote_ocr_api_key = "1234567890"
+        config.save()
+
+        # Test with all *
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            json.dumps(
+                {
+                    "remote_ocr_api_key": "*" * 32,
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        config.refresh_from_db()
+        self.assertEqual(config.remote_ocr_api_key, "1234567890")
+        # Test with empty string
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            json.dumps(
+                {
+                    "remote_ocr_api_key": "",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        config.refresh_from_db()
+        self.assertEqual(config.remote_ocr_api_key, None)
 
     def test_enable_ai_index_triggers_update(self) -> None:
         """

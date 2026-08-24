@@ -74,8 +74,20 @@ export class ConfigComponent
     return Object.values(ConfigCategory)
   }
 
-  getCategoryOptions(category: string): ConfigOption[] {
-    return PaperlessConfigOptions.filter((o) => o.category === category)
+  getCategorySections(category: string): string[] {
+    return [
+      ...new Set(
+        PaperlessConfigOptions.filter((o) => o.category === category).map(
+          (o) => o.section ?? null // null means no section
+        )
+      ),
+    ]
+  }
+
+  getCategoryOptions(category: string, section: string = null): ConfigOption[] {
+    return PaperlessConfigOptions.filter(
+      (o) => o.category === category && (o.section ?? null) === section
+    )
   }
 
   initialConfig: PaperlessConfig

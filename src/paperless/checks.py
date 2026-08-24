@@ -337,20 +337,6 @@ def check_deprecated_v2_ocr_env_vars(
     return warnings
 
 
-@register()
-def check_remote_parser_configured(app_configs: Any, **kwargs: Any) -> list[Error]:
-    if settings.REMOTE_OCR_ENGINE == "azureai" and not (
-        settings.REMOTE_OCR_ENDPOINT and settings.REMOTE_OCR_API_KEY
-    ):
-        return [
-            Error(
-                "Azure AI remote parser requires endpoint and API key to be configured.",
-            ),
-        ]
-
-    return []
-
-
 def get_tesseract_langs():
     proc = subprocess.run(
         [shutil.which("tesseract"), "--list-langs"],

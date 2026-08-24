@@ -21,6 +21,7 @@ from unittest.mock import Mock
 import pytest
 
 from documents.parsers import ParseError
+from paperless.models import ApplicationConfiguration
 from paperless.parsers import ParserContext
 from paperless.parsers import ParserProtocol
 from paperless.parsers.remote import RemoteDocumentParser
@@ -198,21 +199,21 @@ class TestRemoteParserScore:
 
     def test_score_returns_none_when_api_key_missing(
         self,
-        settings: SettingsWrapper,
+        no_engine_settings: SettingsWrapper,
     ) -> None:
-        settings.REMOTE_OCR_ENGINE = "azureai"
-        settings.REMOTE_OCR_API_KEY = None
-        settings.REMOTE_OCR_ENDPOINT = "https://test.cognitiveservices.azure.com"
+        no_engine_settings.REMOTE_OCR_ENGINE = "azureai"
+        no_engine_settings.REMOTE_OCR_ENDPOINT = (
+            "https://test.cognitiveservices.azure.com"
+        )
         result = RemoteDocumentParser.score("application/pdf", "doc.pdf")
         assert result is None
 
     def test_score_returns_none_when_endpoint_missing(
         self,
-        settings: SettingsWrapper,
+        no_engine_settings: SettingsWrapper,
     ) -> None:
-        settings.REMOTE_OCR_ENGINE = "azureai"
-        settings.REMOTE_OCR_API_KEY = "key"
-        settings.REMOTE_OCR_ENDPOINT = None
+        no_engine_settings.REMOTE_OCR_ENGINE = "azureai"
+        no_engine_settings.REMOTE_OCR_API_KEY = "key"
         result = RemoteDocumentParser.score("application/pdf", "doc.pdf")
         assert result is None
 
@@ -226,6 +227,24 @@ class TestRemoteParserScore:
         """Remote parser (20) outranks the tesseract default (10) when configured."""
         score = RemoteDocumentParser.score("application/pdf", "doc.pdf")
         assert score is not None and score > 10
+
+    @pytest.mark.django_db
+    def test_score_uses_app_config_when_env_unset(
+        self,
+        settings: SettingsWrapper,
+    ) -> None:
+        """The app config alone is enough to activate the parser."""
+        settings.REMOTE_OCR_ENGINE = None
+        settings.REMOTE_OCR_API_KEY = None
+        settings.REMOTE_OCR_ENDPOINT = None
+        config = ApplicationConfiguration.objects.first()
+        assert config is not None
+        config.remote_ocr_engine = "azureai"
+        config.remote_ocr_api_key = "app-config-key"
+        config.remote_ocr_endpoint = "https://config.cognitiveservices.azure.com"
+        config.save()
+
+        assert RemoteDocumentParser.score("application/pdf", "doc.pdf") == 20
 
 
 # ---------------------------------------------------------------------------
