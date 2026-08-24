@@ -305,33 +305,49 @@ def modify_custom_fields(
         else [(field, None) for field in add_custom_fields]
     )
 
-    custom_fields = CustomField.objects.filter(
-        id__in=[int(field) for field, _ in add_custom_fields],
-    ).distinct()
+    custom_fields_by_id: dict[int, CustomField] = {
+        cf.id: cf
+        for cf in CustomField.objects.filter(
+            id__in=[int(field) for field, _ in add_custom_fields],
+        )
+    }
+    # Deferred, not `.only()`: these objects get cached onto the FK
+    # descriptor of newly-created CustomFieldInstance rows below, and
+    # downstream post_save receivers (e.g. the filename-generation signal)
+    # touch other Document fields -- `.only("pk")` would just turn that into
+    # a deferred-field reload per document, trading one N+1 for another.
+    # `content` is the one field guaranteed to be both large (full OCR text)
+    # and unused by anything this function or its receivers touch.
+    docs_by_id: dict[int, Document] = {
+        doc.id: doc
+        for doc in Document.objects.filter(id__in=affected_docs).defer("content")
+    }
     for field_id, value in add_custom_fields:
+        custom_field = custom_fields_by_id[field_id]
+        value_field = CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+            custom_field.data_type
+        ]
         for doc_id in affected_docs:
-            defaults = {}
-            custom_field = custom_fields.get(id=field_id)
-            if custom_field:
-                value_field = CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
-                    custom_field.data_type
-                ]
-                defaults[value_field] = value
-                if (
-                    custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK
-                    and value
-                    and doc_id in value
-                ):
-                    # Prevent self-linking
-                    continue
+            defaults = {value_field: value}
+            if (
+                custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK
+                and value
+                and doc_id in value
+            ):
+                # Prevent self-linking
+                continue
+            # Pass the already-resolved objects, not bare ids: this caches
+            # them on the FK descriptor of any newly-created instance, so a
+            # later `.field`/`.document` access (e.g. auditlog's post_save
+            # receiver calling `str(instance)`, which touches `.field.name`)
+            # doesn't trigger its own per-instance re-fetch.
             CustomFieldInstance.objects.update_or_create(
-                document_id=doc_id,
-                field_id=field_id,
+                document=docs_by_id[doc_id],
+                field=custom_field,
                 defaults=defaults,
             )
             if custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
-                doc = Document.objects.get(id=doc_id)
-                reflect_doclinks(doc, custom_field, value)
+                reflect_doclinks(docs_by_id[doc_id], custom_field, value)
 
     # For doc link fields that are being removed, remove symmetrical links
     for doclink_being_removed_instance in CustomFieldInstance.objects.filter(
@@ -339,12 +355,10 @@ def modify_custom_fields(
         field__id__in=remove_custom_fields,
         field__data_type=CustomField.FieldDataType.DOCUMENTLINK,
         value_document_ids__isnull=False,
-    ):
+    ).select_related("field"):
         for target_doc_id in doclink_being_removed_instance.value:
             remove_doclink(
-                document=Document.objects.get(
-                    id=doclink_being_removed_instance.document.id,
-                ),
+                document=docs_by_id[doclink_being_removed_instance.document_id],
                 field=doclink_being_removed_instance.field,
                 target_doc_id=target_doc_id,
             )
