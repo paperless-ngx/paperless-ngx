@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from documents.plugins.helpers import StatusUpdatePayload
 
 HEARTBEAT_INTERVAL = 30
+HEARTBEAT_MESSAGE = json.dumps({"type": "heartbeat"})
 
 
 class StatusConsumer(AsyncWebsocketConsumer):
@@ -62,10 +63,9 @@ class StatusConsumer(AsyncWebsocketConsumer):
             self.heartbeat_task = None
 
     async def _heartbeat_loop(self) -> None:
-        with contextlib.suppress(Exception):
-            while True:
-                await asyncio.sleep(HEARTBEAT_INTERVAL)
-                await self.send(json.dumps({"type": "heartbeat"}))
+        while True:
+            await asyncio.sleep(HEARTBEAT_INTERVAL)
+            await self.send(HEARTBEAT_MESSAGE)
 
     async def status_update(self, event: StatusUpdatePayload) -> None:
         if not self._authenticated():
