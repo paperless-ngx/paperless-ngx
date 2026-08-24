@@ -15,7 +15,7 @@
         <span class="page-subtitle h6 mb-0 mt-1 fw-normal ms-md-3 text-truncate" style="line-height: 1.4">{{subTitle()}}</span>
       }
       @if (info()) {
-        <button class="btn btn-sm btn-link text-muted p-0 p-md-2" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true">
+        <button class="btn btn-sm btn-link text-muted p-0 ms-2 p-md-2 ms-md-0" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true">
           <i-bs name="question-circle"></i-bs>
         </button>
         <ng-template #infoPopover>
