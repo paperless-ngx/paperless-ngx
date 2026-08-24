@@ -209,6 +209,18 @@ main {
     background-color: color-mix(in srgb, var(--bs-primary) 13%, transparent);
   }
 
+  &.nav-link-action {
+    color: var(--bs-secondary-color);
+    font-weight: 400;
+    background-color: transparent;
+
+    &:hover,
+    &:focus {
+      color: var(--bs-primary);
+      background-color: transparent;
+    }
+  }
+
   i-bs {
     position: relative;
     top: -1px;

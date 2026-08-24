@@ -161,11 +161,12 @@
             }
             @if (openDocuments.length >= 1) {
               <li class="nav-item w-100 app-link">
-                <a class="nav-link app-link" [class.text-truncate]="!slimSidebarEnabled" [routerLink]="[]" (click)="closeAll()"
+                <button type="button" class="nav-link nav-link-action app-link w-100 text-start"
+                  [class.text-truncate]="!slimSidebarEnabled" (click)="closeAll()"
                   ngbPopover="Close all" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
                   container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
                   <i-bs class="me-2" name="x"></i-bs><span><ng-container i18n>Close all</ng-container></span>
-                </a>
+                </button>
               </li>
             }
           </ul>
