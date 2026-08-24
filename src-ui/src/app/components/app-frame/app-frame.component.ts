@@ -278,6 +278,10 @@ export class AppFrameComponent
       })
   }
 
+  get slimSidebarPopoversEnabled(): boolean {
+    return this.slimSidebarEnabled && !this.isMobileViewport()
+  }
+
   get attributesSectionsCollapsed(): boolean {
     this.settingsService.trackChanges()
     return this.settingsService
