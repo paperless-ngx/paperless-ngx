@@ -11,6 +11,16 @@
   display: none;
 }
 
+.notification-count {
+  top: -.2rem;
+  right: -.2rem;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: .18rem .32rem;
+  font-size: .68rem;
+  line-height: 1;
+}
+
 .nav-item > .btn {
   display: inline-flex;
   align-items: center;
