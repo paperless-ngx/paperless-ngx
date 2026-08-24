@@ -107,6 +107,25 @@ describe('PermissionsSelectComponent', () => {
     expect(component.form.get('Tag').get('Change').disabled).toBeTruthy()
   })
 
+  it('should update checkboxes when inherited permissions change', () => {
+    component.ngOnInit()
+    component.inheritedPermissions = ['documents.change_document']
+    component.writeValue(['delete_document'])
+    expect(component.form.get('Document').get('Change').value).toBeTruthy()
+    expect(component.form.get('Document').get('Change').disabled).toBeTruthy()
+
+    // swap for a group with a different permission, but the same number of them
+    component.inheritedPermissions = ['documents.view_document']
+
+    // the no-longer-inherited permission is unchecked, the explicit one is kept
+    expect(component.permissions).toEqual(['delete_document'])
+    expect(component.form.get('Document').get('Change').value).toBeFalsy()
+    expect(component.form.get('Document').get('Change').disabled).toBeFalsy()
+    expect(component.form.get('Document').get('Delete').value).toBeTruthy()
+    expect(component.form.get('Document').get('View').value).toBeTruthy()
+    expect(component.form.get('Document').get('View').disabled).toBeTruthy()
+  })
+
   it('should exclude history permissions if disabled', () => {
     settingsService.set(SETTINGS_KEYS.AUDITLOG_ENABLED, false)
     fixture = TestBed.createComponent(PermissionsSelectComponent)
