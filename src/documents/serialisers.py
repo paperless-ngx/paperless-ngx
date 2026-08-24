@@ -877,32 +877,60 @@ def validate_documentlink_targets(user, doc_ids):
         )
 
 
+# drf-writable-nested revalidates a document's custom_fields more than once
+# per request: once as the ordinary nested list, then again per-item while
+# matching existing vs. new CustomFieldInstance rows during save() -- and
+# that second pass builds a brand new serializer (and field) instance per
+# item (see its update_or_create_reverse_relations / _get_serializer_for_field),
+# so a cache on the field instance alone only helps the first pass. It does,
+# however, explicitly pass `context=self.context` to every one of those
+# fresh serializers -- the *same* dict object the outer DocumentSerializer
+# is using, not a copy. That context dict is already request-scoped (DRF
+# builds it fresh per request via get_serializer_context()), so stashing the
+# resolved CustomField objects there -- rather than in some new global/
+# thread-local cache -- lets every later pass reuse them for free while
+# staying entirely within DRF's existing, already-request-scoped machinery.
+_CUSTOM_FIELD_CONTEXT_CACHE_KEY = "_custom_field_lookup_cache"
+
+
 class _CachingCustomFieldPrimaryKeyField(serializers.PrimaryKeyRelatedField):
     """
-    A document's custom_fields are validated as a list; the default
-    PrimaryKeyRelatedField issues one SELECT per item. CustomFieldInstanceListSerializer
-    below resolves all of an incoming list's field ids in a single query up
-    front and caches them here, keyed by id, so per-item validation is free
-    instead of re-querying. The cache lives on this field instance, which
-    DRF constructs fresh for each request -- no state persists between
-    requests.
+    Resolves CustomField ids with as few queries as possible: a per-instance
+    cache for repeat lookups on this exact field instance, backed by a
+    shared cache on the serializer context (see _CUSTOM_FIELD_CONTEXT_CACHE_KEY
+    above) so later, separately-instantiated fields for the same request
+    reuse what was already resolved instead of re-querying.
     """
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self._cache: dict[int, CustomField] = {}
 
+    def _shared_cache(self) -> dict[int, CustomField]:
+        return self.context.setdefault(_CUSTOM_FIELD_CONTEXT_CACHE_KEY, {})
+
     def prefetch(self, ids: Iterable[int]) -> None:
-        missing = {i for i in ids if i not in self._cache}
+        shared_cache = self._shared_cache()
+        missing = {i for i in ids if i not in self._cache and i not in shared_cache}
         if missing:
             for obj in self.get_queryset().filter(pk__in=missing):
-                self._cache[obj.pk] = obj
+                shared_cache[obj.pk] = obj
+        for i in ids:
+            obj = shared_cache.get(i)
+            if obj is not None:
+                self._cache[i] = obj
 
     def to_internal_value(self, data: int) -> CustomField:
         if data in self._cache:
             return self._cache[data]
+        shared_cache = self._shared_cache()
+        if data in shared_cache:
+            obj = shared_cache[data]
+            self._cache[data] = obj
+            return obj
         obj: CustomField = super().to_internal_value(data)
         self._cache[obj.pk] = obj
+        shared_cache[obj.pk] = obj
         return obj
 
 

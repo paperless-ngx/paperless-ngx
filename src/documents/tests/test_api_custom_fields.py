@@ -15,6 +15,7 @@ from rest_framework.test import APITestCase
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.serialisers import CustomFieldInstanceSerializer
 from documents.serialisers import DocumentSerializer
 from documents.tests.factories import DocumentFactory
 from documents.tests.utils import DirectoriesMixin
@@ -581,6 +582,52 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             1,
             "Expected a single batched query to resolve the custom fields, "
             f"got {len(custom_field_lookups)}: {custom_field_lookups}",
+        )
+
+    def test_custom_field_lookup_reuses_shared_context_cache(self) -> None:
+        """
+        GIVEN:
+            - A CustomField has already been resolved once, by a serializer
+              sharing a given `context` dict
+        WHEN:
+            - A second, separately-instantiated CustomFieldInstanceSerializer
+              validates the same field id, sharing that same context
+              (this is what drf-writable-nested does: it rebuilds a fresh
+              serializer -- and fresh field instances -- per item while
+              matching existing vs. new instances during save())
+        THEN:
+            - No additional query is issued to resolve the CustomField
+        """
+        custom_field = CustomField.objects.create(
+            name="Test Custom Field",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+
+        context: dict = {}
+        first_pass = CustomFieldInstanceSerializer(
+            data={"field": custom_field.id, "value": "a"},
+            context=context,
+        )
+        self.assertTrue(first_pass.is_valid(), first_pass.errors)
+
+        second_pass = CustomFieldInstanceSerializer(
+            data={"field": custom_field.id, "value": "b"},
+            context=context,
+        )
+        with CaptureQueriesContext(connection) as ctx:
+            self.assertTrue(second_pass.is_valid(), second_pass.errors)
+
+        custom_field_lookups = [
+            query
+            for query in ctx.captured_queries
+            if 'FROM "documents_customfield" WHERE "documents_customfield"."id"'
+            in query["sql"]
+        ]
+        self.assertEqual(
+            len(custom_field_lookups),
+            0,
+            "Expected the second, separately-instantiated serializer to reuse "
+            f"the already-resolved CustomField, got: {custom_field_lookups}",
         )
 
     def test_change_custom_field_instance_value(self) -> None:
