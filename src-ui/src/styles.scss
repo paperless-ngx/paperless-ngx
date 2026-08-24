@@ -99,6 +99,10 @@ body {
   border-radius: .425rem;
 }
 
+.pagination, .input-group {
+  --bs-border-radius-sm: .425rem;
+}
+
 @media(min-width: 768px) {
   .col-slim {
     padding-left: calc(50px + $grid-gutter-width) !important;
