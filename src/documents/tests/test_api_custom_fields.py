@@ -630,6 +630,41 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             f"the already-resolved CustomField, got: {custom_field_lookups}",
         )
 
+    def test_custom_field_validation_rejects_malformed_field_value(self) -> None:
+        """
+        GIVEN:
+            - A document is being validated with a malformed custom_fields
+              entry whose "field" value is neither a valid CustomField id
+              nor a type DRF's own PrimaryKeyRelatedField can safely reject
+              on its own (unhashable, or a non-numeric scalar)
+        WHEN:
+            - The serializer is validated
+        THEN:
+            - A normal validation error is raised, not an unhandled
+              TypeError/ValueError escaping past DRF's validation layer
+        """
+        doc = DocumentFactory(mime_type="application/pdf")
+
+        bad_field_values = {
+            "unhashable-list": [],
+            "unhashable-dict": {},
+            "non-numeric-scalar": "abc",
+        }
+        for case_id, bad_field_value in bad_field_values.items():
+            with self.subTest(case_id):
+                serializer = DocumentSerializer(
+                    doc,
+                    data={
+                        "custom_fields": [
+                            {"field": bad_field_value, "value": "test value"},
+                        ],
+                    },
+                    partial=True,
+                )
+
+                self.assertFalse(serializer.is_valid())
+                self.assertIn("custom_fields", serializer.errors)
+
     def test_change_custom_field_instance_value(self) -> None:
         """
         GIVEN:

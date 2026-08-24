@@ -909,24 +909,48 @@ class _CachingCustomFieldPrimaryKeyField(serializers.PrimaryKeyRelatedField):
     def _shared_cache(self) -> dict[int, CustomField]:
         return self.context.setdefault(_CUSTOM_FIELD_CONTEXT_CACHE_KEY, {})
 
-    def prefetch(self, ids: Iterable[int]) -> None:
+    @staticmethod
+    def _normalize_pk(data: Any) -> int | None:
+        """
+        Returns `data` coerced to the int a valid CustomField pk would be,
+        or None if `data` isn't a plausible pk (wrong type, unhashable,
+        non-numeric, or a bool -- DRF itself rejects bools as pks since
+        `True == 1` would otherwise silently match). None tells callers to
+        leave `data` alone and let `super().to_internal_value()` report the
+        normal validation error instead of touching the cache/queryset with
+        it directly.
+        """
+        if isinstance(data, bool):
+            return None
+        try:
+            return int(data)
+        except (TypeError, ValueError):
+            return None
+
+    def prefetch(self, ids: Iterable[Any]) -> None:
         shared_cache = self._shared_cache()
-        missing = {i for i in ids if i not in self._cache and i not in shared_cache}
+        candidates = {pk for i in ids if (pk := self._normalize_pk(i)) is not None}
+        missing = {
+            i for i in candidates if i not in self._cache and i not in shared_cache
+        }
         if missing:
             for obj in self.get_queryset().filter(pk__in=missing):
                 shared_cache[obj.pk] = obj
-        for i in ids:
+        for i in candidates:
             obj = shared_cache.get(i)
             if obj is not None:
                 self._cache[i] = obj
 
-    def to_internal_value(self, data: int) -> CustomField:
-        if data in self._cache:
-            return self._cache[data]
+    def to_internal_value(self, data: Any) -> CustomField:
+        pk = self._normalize_pk(data)
+        if pk is None:
+            return super().to_internal_value(data)
+        if pk in self._cache:
+            return self._cache[pk]
         shared_cache = self._shared_cache()
-        if data in shared_cache:
-            obj = shared_cache[data]
-            self._cache[data] = obj
+        if pk in shared_cache:
+            obj = shared_cache[pk]
+            self._cache[pk] = obj
             return obj
         obj: CustomField = super().to_internal_value(data)
         self._cache[obj.pk] = obj
@@ -937,11 +961,15 @@ class _CachingCustomFieldPrimaryKeyField(serializers.PrimaryKeyRelatedField):
 class CustomFieldInstanceListSerializer(serializers.ListSerializer):
     def to_internal_value(self, data: Any) -> list[Any]:
         if isinstance(data, list):
-            field_ids = {
-                item["field"]
-                for item in data
-                if isinstance(item, dict) and "field" in item
-            }
+            field_ids = []
+            for item in data:
+                if not isinstance(item, dict) or "field" not in item:
+                    continue
+                try:
+                    hash(item["field"])
+                except TypeError:
+                    continue
+                field_ids.append(item["field"])
             if field_ids:
                 self.child.fields["field"].prefetch(field_ids)
         return super().to_internal_value(data)
