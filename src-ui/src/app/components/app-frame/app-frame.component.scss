@@ -337,6 +337,12 @@ main {
   min-height: 64px;
   letter-spacing: -0.015em;
 
+  ::ng-deep .navbar-official-logo {
+    @media screen and (max-width: 575.98px) {
+      max-height: 2rem;
+    }
+  }
+
   .brand-mark {
     width: 1.65rem;
     height: 1.65rem;
