@@ -685,6 +685,10 @@ table.table {
   --bs-toast-max-width: var(--pngx-toast-max-width);
 }
 
+.alert {
+  --bs-border-radius: .425rem;
+}
+
 .alert-primary {
   --bs-alert-color: var(--bs-primary);
   --bs-alert-bg: var(--pngx-primary-faded);
