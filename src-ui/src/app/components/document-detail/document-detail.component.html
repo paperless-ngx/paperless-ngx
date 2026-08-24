@@ -20,7 +20,7 @@
     </div>
   }
 
-  <button type="button" class="btn btn-sm btn-outline-danger me-md-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
+  <button type="button" class="btn btn-sm btn-outline-danger me-md-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }" aria-label="Delete" i18n-aria-label>
     <i-bs width="1.2em" height="1.2em" name="trash"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
   </button>
 
@@ -35,7 +35,7 @@
   />
 
   <div class="btn-group">
-    <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading()">
+    <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading()" aria-label="Download" i18n-aria-label>
       @if (downloading()) {
         <div class="spinner-border spinner-border-sm" role="status"></div>
       } @else {
@@ -45,7 +45,7 @@
     </button>
 
     <div class="btn-group" ngbDropdown role="group">
-      <button class="btn btn-sm btn-outline-primary dropdown-toggle" [disabled]="downloading()" ngbDropdownToggle></button>
+      <button class="btn btn-sm btn-outline-primary dropdown-toggle" [disabled]="downloading()" ngbDropdownToggle aria-label="Download options" i18n-aria-label></button>
       <div class="dropdown-menu shadow" ngbDropdownMenu>
         @if (metadata()?.has_archive_version) {
           <button ngbDropdownItem (click)="download(true)" [disabled]="downloading()" i18n>Download original</button>
@@ -62,7 +62,7 @@
   </div>
 
   <div class="ms-auto" ngbDropdown>
-    <button class="btn btn-sm btn-outline-primary" id="actionsDropdown" ngbDropdownToggle>
+    <button class="btn btn-sm btn-outline-primary" id="actionsDropdown" ngbDropdownToggle aria-label="Actions" i18n-aria-label>
       <i-bs name="three-dots"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Actions</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
@@ -91,7 +91,7 @@
   </div>
 
   <div class="ms-auto" ngbDropdown>
-    <button class="btn btn-sm btn-outline-primary" id="sendDropdown" ngbDropdownToggle>
+    <button class="btn btn-sm btn-outline-primary" id="sendDropdown" ngbDropdownToggle aria-label="Send" i18n-aria-label>
       <i-bs name="send"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Send</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
