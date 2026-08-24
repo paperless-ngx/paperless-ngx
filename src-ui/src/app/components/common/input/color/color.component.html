@@ -14,7 +14,7 @@
 
     <input #inputField class="form-control" [class.is-invalid]="error" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [autoClose]="'outside'" [ngbPopover]="popContent" #colorPicker="ngbPopover" placement="bottom" popoverClass="shadow">
 
-    <button class="btn btn-outline-secondary" type="button" (click)="randomize()">
+    <button class="btn btn-outline-secondary" type="button" (click)="randomize()" aria-label="Choose a random color" i18n-aria-label>
       <i-bs name="dice5"></i-bs>
     </button>
 

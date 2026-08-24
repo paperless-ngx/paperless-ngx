@@ -45,7 +45,7 @@
     </button>
 
     <div class="btn-group" ngbDropdown role="group">
-      <button class="btn btn-sm btn-outline-primary dropdown-toggle" [disabled]="downloading()" ngbDropdownToggle></button>
+      <button class="btn btn-sm btn-outline-primary dropdown-toggle" [disabled]="downloading()" ngbDropdownToggle aria-label="Download options" i18n-aria-label></button>
       <div class="dropdown-menu shadow" ngbDropdownMenu>
         @if (metadata()?.has_archive_version) {
           <button ngbDropdownItem (click)="download(true)" [disabled]="downloading()" i18n>Download original</button>

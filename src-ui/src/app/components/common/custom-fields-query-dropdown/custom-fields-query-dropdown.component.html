@@ -38,7 +38,7 @@
       ngbDatepicker
       #d="ngbDatepicker"
       [footerTemplate]="datePickerFooterTemplate" />
-    <button class="btn btn-sm btn-outline-secondary rounded-end" (click)="d.toggle()" type="button">
+    <button class="btn btn-sm btn-outline-secondary rounded-end" (click)="d.toggle()" type="button" aria-label="Open date picker" i18n-aria-label>
       <i-bs name="calendar-event"></i-bs>
     </button>
     <ng-template #datePickerFooterTemplate>
@@ -143,7 +143,7 @@
         <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [disabled]="disabled">
       }
     }
-    <button class="btn btn-link btn-sm text-danger pe-0" type="button" (click)="removeElement(atom)" [disabled]="disabled">
+    <button class="btn btn-link btn-sm text-danger pe-0" type="button" (click)="removeElement(atom)" [disabled]="disabled" aria-label="Remove query" i18n-aria-label>
       <i-bs name="x-circle"></i-bs>
     </button>
   </div>
@@ -185,7 +185,7 @@
         <i-bs name="braces"></i-bs>
       </button>
       @if (expression.depth > 0) {
-        <button type="button" class="btn btn-sm btn-outline-secondary text-danger" (click)="removeElement(expression)" [disabled]="disabled">
+        <button type="button" class="btn btn-sm btn-outline-secondary text-danger" (click)="removeElement(expression)" [disabled]="disabled" aria-label="Remove expression" i18n-aria-label>
           <i-bs name="x-circle"></i-bs>
         </button>
       }
