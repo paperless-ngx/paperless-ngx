@@ -121,13 +121,15 @@ export class PermissionsSelectComponent
 
   // sets every checkbox from inherited + own perms
   private applyCheckedState(): void {
-    const allPerms = this._inheritedPermissions.concat(this.permissions)
+    const allPerms = new Set(
+      this._inheritedPermissions.concat(this.permissions)
+    )
 
     this.allowedTypes.forEach((type) => {
       const typeGroup = this.form.get(type)
       for (const action of Object.keys(PermissionAction)) {
         typeGroup.get(action)?.patchValue(
-          allPerms.includes(
+          allPerms.has(
             this.permissionsService.getPermissionCode(
               PermissionAction[action],
               PermissionType[type]
