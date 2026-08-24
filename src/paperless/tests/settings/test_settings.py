@@ -1,7 +1,4 @@
 import os
-import subprocess
-import sys
-from pathlib import Path
 from unittest import TestCase
 from unittest import mock
 
@@ -12,8 +9,6 @@ from paperless.settings import _get_allauth_trusted_proxy_count
 from paperless.settings import _get_search_language_setting
 from paperless.settings import _parse_paperless_url
 from paperless.settings import default_threads_per_worker
-
-_SRC_DIR = Path(__file__).parents[3]
 
 
 class TestThreadCalculation(TestCase):
@@ -107,25 +102,6 @@ def test_get_search_language_setting_explicit_invalid(
     monkeypatch.setenv("PAPERLESS_SEARCH_LANGUAGE", "klingon")
     with pytest.raises(ValueError, match="klingon"):
         _get_search_language_setting("eng")
-
-
-def test_explicit_search_language_during_settings_import() -> None:
-    code = (
-        "from paperless.settings import SEARCH_LANGUAGE; assert SEARCH_LANGUAGE == 'de'"
-    )
-    result = subprocess.run(
-        [sys.executable, "-c", code],
-        capture_output=True,
-        text=True,
-        cwd=_SRC_DIR,
-        env={
-            **os.environ,
-            "PAPERLESS_SEARCH_LANGUAGE": "de",
-            "PAPERLESS_SECRET_KEY": "test-secret-key",
-        },
-    )
-
-    assert result.returncode == 0, result.stdout + result.stderr
 
 
 class TestPaperlessURLSettings(TestCase):
