@@ -103,11 +103,6 @@ body {
   --bs-border-radius-sm: .425rem;
 }
 
-.accordion {
-  --bs-border-radius: .425rem;
-  --bs-accordion-inner-border-radius: calc(.425rem - 1px);
-}
-
 @media(min-width: 768px) {
   .col-slim {
     padding-left: calc(56px + $grid-gutter-width) !important;
@@ -829,6 +824,8 @@ code {
   --bs-accordion-bg: var(--bs-light);
   --bs-accordion-active-color: var(--bs-primary);
   --bs-accordion-active-bg: var(--pngx-bg-alt);
+  --bs-border-radius: .425rem;
+  --bs-accordion-inner-border-radius: calc(.425rem - 1px);
 }
 
 .accordion-button::after {
