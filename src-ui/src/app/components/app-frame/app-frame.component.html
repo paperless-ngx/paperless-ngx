@@ -184,7 +184,7 @@
                     [routerLinkActiveOptions]="{ exact: !(slimSidebarEnabled || attributesSectionsCollapsed) }" (click)="closeMenu()"
                     ngbPopover="Attributes" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
                     container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                    <i-bs class="me-2" name="stack"></i-bs><span><ng-container i18n>Attributes</ng-container></span>
+                    <i-bs name="stack"></i-bs><span class="ms-2"><ng-container i18n>Attributes</ng-container></span>
                   </a>
                   @if (!slimSidebarEnabled && canSaveSettings) {
                     <button
