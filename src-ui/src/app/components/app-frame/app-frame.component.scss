@@ -97,7 +97,7 @@ main {
 
     li.nav-item span.badge {
       display: inline-block;
-      margin-right: 2px;
+      margin-right: -4px;
     }
   }
 
@@ -138,13 +138,6 @@ main {
     .text-truncate {
       text-overflow: unset !important;
       word-wrap: break-word !important;
-    }
-  }
-
-  .sidebar.slim {
-    li.nav-item span.badge {
-      display: inline-block;
-      margin-right: 2px;
     }
   }
 
