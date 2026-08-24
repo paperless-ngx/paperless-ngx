@@ -7,6 +7,15 @@ h3 {
     }
 }
 
+:host {
+  display: block;
+  margin-bottom: .35rem;
+}
+
+h3 > .h6 {
+  color: var(--bs-secondary-color);
+}
+
 @media (min-width: 1200px) {
     h3 {
         min-height: 2.8rem;

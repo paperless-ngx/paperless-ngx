@@ -45,6 +45,7 @@ import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ChatComponent } from '../chat/chat/chat.component'
+import { LogoComponent } from '../common/logo/logo.component'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
@@ -59,6 +60,7 @@ const SCROLL_THRESHOLD = 16
   styleUrls: ['./app-frame.component.scss'],
   imports: [
     GlobalSearchComponent,
+    LogoComponent,
     DocumentTitlePipe,
     IfPermissionsDirective,
     ToastsDropdownComponent,
@@ -190,9 +192,32 @@ export class AppFrameComponent
     return `${environment.appTitle} v${this.settingsService.get(SETTINGS_KEYS.VERSION)}${environment.tag === 'prod' ? '' : ` #${environment.tag}`}`
   }
 
+  get appTitle(): string {
+    this.settingsService.trackChanges()
+    return (
+      this.settingsService.get(SETTINGS_KEYS.APP_TITLE) || environment.appTitle
+    )
+  }
+
   get customAppTitle(): string {
     this.settingsService.trackChanges()
     return this.settingsService.get(SETTINGS_KEYS.APP_TITLE)
+  }
+
+  get hasCustomBranding(): boolean {
+    this.settingsService.trackChanges()
+    return !!(
+      this.settingsService.get(SETTINGS_KEYS.APP_TITLE)?.length ||
+      this.settingsService.get(SETTINGS_KEYS.APP_LOGO)?.length
+    )
+  }
+
+  get customAppLogo(): string {
+    this.settingsService.trackChanges()
+    const logo = this.settingsService.get(SETTINGS_KEYS.APP_LOGO)
+    return logo?.length
+      ? environment.apiBaseUrl.replace(/\/api\/$/, logo)
+      : null
   }
 
   get canSaveSettings(): boolean {

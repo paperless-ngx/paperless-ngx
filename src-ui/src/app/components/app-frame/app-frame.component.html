@@ -4,27 +4,34 @@
     (click)="closeMobileSearch(); toggleMenuCollapsed()">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <a class="navbar-brand d-flex align-items-center me-0 px-3 py-3 order-sm-0"
-    [ngClass]="{ 'slim': slimSidebarEnabled, 'col-auto col-md-3 col-lg-2 col-xxxl-1' : !slimSidebarEnabled, 'py-3' : !customAppTitle?.length || slimSidebarEnabled, 'py-2': customAppTitle?.length }"
+  <a class="navbar-brand d-flex align-items-center me-0 ps-md-3 py-0 order-sm-0"
+    [ngClass]="{ 'slim': slimSidebarEnabled, '' : !slimSidebarEnabled }"
     routerLink="/dashboard"
     tourAnchor="tour.intro">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="1.5em" height="1.5em" fill="currentColor">
-      <path d="M341,949.1c-6.9-20.3-20.7-61.2-21.9-61-199.6-88.9-182.5-229.8-134.3-347.5,30,137.2,268.8,148.9,146.2,336-.9,2.2,10,27.8,19.5,51.3,22.7-51.9,58.6-115.5,55.8-120.8C178,398.7,724.9,299,807.1,18.5c83,251.5,53.1,659.8-377.4,814.9-2,1.4-63.5,148.6-66.9,150.2-.2-2.1-33.2,2.9-30.1-8.7,1.6-7,4.8-16.2,8.2-25.6h0v-.2h.1ZM323.1,846.2c48.3-71.9-12.7-120.8-56.9-152.2,81.2,107.4,66.4,120.8,56.9,152.2h0Z"/>
-    </svg>
-    <div class="ms-2 ms-md-3 d-inline-block" [class.d-md-none]="slimSidebarEnabled">
-      @if (customAppTitle?.length) {
-        <div class="d-flex flex-column align-items-start custom-title">
-          <span class="title">{{customAppTitle}}</span>
-          <span class="byline text-uppercase font-monospace" i18n>by Paperless-ngx</span>
-        </div>
+    @if (!hasCustomBranding) {
+      <pngx-logo extra_classes="navbar-official-logo px-1" height="2.4rem"></pngx-logo>
+      <svg class="brand-mark brand-mark-slim d-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="1.5em" height="1.5em" fill="currentColor">
+        <path d="M341,949.1c-6.9-20.3-20.7-61.2-21.9-61-199.6-88.9-182.5-229.8-134.3-347.5,30,137.2,268.8,148.9,146.2,336-.9,2.2,10,27.8,19.5,51.3,22.7-51.9,58.6-115.5,55.8-120.8C178,398.7,724.9,299,807.1,18.5c83,251.5,53.1,659.8-377.4,814.9-2,1.4-63.5,148.6-66.9,150.2-.2-2.1-33.2,2.9-30.1-8.7,1.6-7,4.8-16.2,8.2-25.6h0v-.2h.1ZM323.1,846.2c48.3-71.9-12.7-120.8-56.9-152.2,81.2,107.4,66.4,120.8,56.9,152.2h0Z"/>
+      </svg>
+    } @else {
+      @if (customAppLogo) {
+        <img class="brand-logo" [src]="customAppLogo" alt="" />
       } @else {
-        Paperless-ngx
+        <svg class="brand-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="1.5em" height="1.5em" fill="currentColor">
+          <path d="M341,949.1c-6.9-20.3-20.7-61.2-21.9-61-199.6-88.9-182.5-229.8-134.3-347.5,30,137.2,268.8,148.9,146.2,336-.9,2.2,10,27.8,19.5,51.3,22.7-51.9,58.6-115.5,55.8-120.8C178,398.7,724.9,299,807.1,18.5c83,251.5,53.1,659.8-377.4,814.9-2,1.4-63.5,148.6-66.9,150.2-.2-2.1-33.2,2.9-30.1-8.7,1.6-7,4.8-16.2,8.2-25.6h0v-.2h.1ZM323.1,846.2c48.3-71.9-12.7-120.8-56.9-152.2,81.2,107.4,66.4,120.8,56.9,152.2h0Z"/>
+        </svg>
       }
-    </div>
+      <div class="brand-copy ms-2 text-truncate" [class.d-md-none]="slimSidebarEnabled">
+        <span class="brand-title text-truncate">{{ appTitle }}</span>
+        @if (customAppTitle) {
+          <span class="byline text-uppercase font-monospace" i18n>by Paperless-ngx</span>
+        }
+      </div>
+    }
   </a>
-  <div class="search-container flex-grow-1 py-2 pb-3 pb-sm-2 px-3 ps-md-4 me-sm-auto order-3 order-sm-1"
+  <div class="search-container flex-grow-1 py-2 pb-3 pb-sm-2 px-3 ps-md-3 me-sm-auto order-3 order-sm-1"
     [class.mobile-hidden]="mobileSearchHidden()">
-    <div class="col-12 col-md-7">
+    <div class="col-12 header-search">
       <pngx-global-search></pngx-global-search>
     </div>
   </div>
@@ -34,7 +41,7 @@
     }
     <pngx-toasts-dropdown></pngx-toasts-dropdown>
     <li ngbDropdown class="nav-item dropdown">
-      <button class="btn ps-1 border-0" id="userDropdown" ngbDropdownToggle aria-label="User menu" i18n-aria-label>
+      <button class="btn border-0" id="userDropdown" ngbDropdownToggle aria-label="User menu" i18n-aria-label>
         <i-bs width="1.3em" height="1.3em" name="person-circle"></i-bs>
         <span class="small ms-2 d-none d-sm-inline">
           {{this.settingsService.displayName}}
@@ -79,7 +86,7 @@
           }
         </button>
       }
-      <div class="sidebar-sticky pt-3 d-flex flex-column justify-space-around">
+      <div class="sidebar-sticky pt-3 pb-1 d-flex flex-column justify-space-around">
         <ul class="nav flex-column">
           <li class="nav-item app-link">
             <a class="nav-link" routerLink="dashboard" routerLinkActive="active" (click)="closeMenu()"
@@ -89,7 +96,9 @@
             </a>
           </li>
           <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
-            <a class="nav-link" routerLink="documents" routerLinkActive="active" (click)="closeMenu()"
+            <a class="nav-link" routerLink="documents" routerLinkActive="active"
+              [routerLinkActiveOptions]="{ paths: 'exact', queryParams: 'ignored', matrixParams: 'ignored', fragment: 'ignored' }"
+              (click)="closeMenu()"
               ngbPopover="Documents" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
               container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
               <i-bs class="me-2" name="files"></i-bs><span><ng-container i18n>Documents</ng-container></span>
@@ -159,11 +168,12 @@
             }
             @if (openDocuments.length >= 1) {
               <li class="nav-item w-100 app-link">
-                <a class="nav-link app-link" [class.text-truncate]="!slimSidebarEnabled" [routerLink]="[]" (click)="closeAll()"
+                <button type="button" class="nav-link nav-link-action app-link w-100 text-start"
+                  [class.text-truncate]="!slimSidebarEnabled" (click)="closeAll()"
                   ngbPopover="Close all" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
                   container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
                   <i-bs class="me-2" name="x"></i-bs><span><ng-container i18n>Close all</ng-container></span>
-                </a>
+                </button>
               </li>
             }
           </ul>
@@ -177,10 +187,11 @@
             @if (canManageAttributes) {
               <li class="nav-item app-link" tourAnchor="tour.tags">
                 <div class="d-flex align-items-center attributes-row">
-                  <a class="nav-link flex-fill" routerLink="attributes" routerLinkActive="active" (click)="closeMenu()"
+                  <a class="nav-link flex-fill" routerLink="attributes" routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: !(slimSidebarEnabled || attributesSectionsCollapsed) }" (click)="closeMenu()"
                     ngbPopover="Attributes" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
                     container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                    <i-bs class="me-2" name="stack"></i-bs><span><ng-container i18n>Attributes</ng-container></span>
+                    <i-bs name="stack"></i-bs><span class="ms-2"><ng-container i18n>Attributes</ng-container></span>
                   </a>
                   @if (!slimSidebarEnabled && canSaveSettings) {
                     <button

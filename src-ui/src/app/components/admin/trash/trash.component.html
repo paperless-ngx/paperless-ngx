@@ -18,9 +18,11 @@
     </button>
 </pngx-page-header>
 
-<div class="row mb-3">
-    <ngb-pagination class="col-auto" [pageSize]="25" [collectionSize]="totalDocuments()" [page]="page()" [maxSize]="5" (pageChange)="page.set($event); reload()" size="sm" aria-label="Pagination"></ngb-pagination>
-</div>
+@if (totalDocuments() > 25) {
+    <div class="row mb-3">
+        <ngb-pagination class="col-auto" [pageSize]="25" [collectionSize]="totalDocuments()" [page]="page()" [maxSize]="5" (pageChange)="page.set($event); reload()" size="sm" aria-label="Pagination"></ngb-pagination>
+    </div>
+}
 
 <div class="card border table-responsive mb-3">
     <table class="table table-striped align-middle shadow-sm mb-0">
