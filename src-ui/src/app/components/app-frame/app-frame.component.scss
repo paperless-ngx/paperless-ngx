@@ -25,7 +25,7 @@
   }
 
   .view-name {
-    max-width: calc(100% - 50px)
+    max-width: calc(100% - 55px)
   }
 
   .nav-group:not(:has(.app-link)) .sidebar-heading {
@@ -93,7 +93,7 @@ main {
 
 @media(min-width: 768px) {
   .sidebar.slim {
-    max-width: 50px;
+    max-width: 55px;
 
     li.nav-item span.badge {
       display: inline-block;
@@ -215,9 +215,29 @@ main {
   }
 }
 
-// sub-page gets marker only
-.nav-item:has(.attributes-submenu.show .nav-link.active) > .attributes-row > .nav-link.active {
-  border-left-color: transparent;
+.attributes-row {
+  border-radius: .55rem;
+  margin: .1rem 0;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out;
+
+  > .nav-link {
+    margin: 0;
+
+    &:hover,
+    &:focus,
+    &.active {
+      background-color: transparent;
+    }
+  }
+
+  &:hover,
+  &:has(> .nav-link:focus-visible) {
+    background-color: color-mix(in srgb, var(--bs-primary) 8%, transparent);
+  }
+
+  &:has(> .nav-link.active) {
+    background-color: color-mix(in srgb, var(--bs-primary) 13%, transparent);
+  }
 }
 
 // bring sub-menu markers back out to L edge
@@ -228,7 +248,18 @@ main {
 
 .attributes-row .attributes-expand-btn {
   opacity: 0.2;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-right: .35rem !important;
+  border-radius: 50%;
+  box-shadow: none !important;
   transition: opacity 0.15s ease-in-out;
+
+  &:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--bs-primary) 55%, transparent);
+    outline-offset: 1px;
+    opacity: 1;
+  }
 }
 
 .attributes-row:hover .attributes-expand-btn {
@@ -369,7 +400,7 @@ main {
 
 @media screen and (min-width: 768px) {
   .navbar-brand.slim {
-    max-width: 50px;
+    max-width: 55px;
   }
 }
 
