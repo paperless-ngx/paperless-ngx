@@ -343,18 +343,45 @@ main {
     flex: 0 0 auto;
   }
 
-  .default-title,
-  .title {
-    font-weight: 600;
+  .brand-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+    line-height: 1.1;
   }
 
-  .flex-column {
-    padding: 0.15rem 0;
+  .brand-title {
+    font-weight: 600;
+    max-width: 100%;
+    min-width: 0;
   }
 
   .byline {
-    font-size: 0.5rem;
-    letter-spacing: 0.1rem;
+    margin-top: .15rem;
+    font-size: .5rem;
+    font-weight: 500;
+    letter-spacing: .1rem;
+    opacity: .8;
+  }
+
+  .brand-logo {
+    width: auto;
+    height: 2.75rem;
+    max-width: 5rem;
+    flex: 0 0 auto;
+    object-fit: contain;
+  }
+
+}
+
+:host ::ng-deep .navbar-official-logo {
+  .leaf {
+    fill: color-mix(in srgb, var(--pngx-primary-text-contrast) 70%, var(--bs-primary)) !important;
+  }
+
+  .text {
+    fill: var(--pngx-primary-text-contrast) !important;
   }
 }
 
@@ -446,6 +473,19 @@ main {
 @media screen and (min-width: 768px) {
   .navbar-brand.slim {
     max-width: 55px;
+
+    .brand-logo {
+      width: 1.65rem;
+      max-width: 1.65rem;
+    }
+
+    .brand-mark-slim {
+      display: block !important;
+    }
+  }
+
+  :host ::ng-deep .navbar-brand.slim .navbar-official-logo {
+    display: none;
   }
 }
 
