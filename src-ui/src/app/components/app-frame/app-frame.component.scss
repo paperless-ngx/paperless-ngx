@@ -67,6 +67,23 @@
   main.mobile-search-hidden {
     padding-top: 56px;
   }
+
+  .navbar-toggler {
+    padding-left: calc(12px - (1.5em * 2.5 / 16));
+  }
+}
+
+.search-container {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+// Below sm the search gets its own full-width row, so line it up with main's content edge
+@media (max-width: 575.98px) {
+  .search-container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
 }
 
 main {
