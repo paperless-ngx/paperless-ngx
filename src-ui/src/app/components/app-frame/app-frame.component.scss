@@ -352,7 +352,34 @@ main {
 }
 
 .navbar > ul {
+  align-items: center;
+  gap: .125rem;
   padding-right: .5rem;
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    padding: .45rem .55rem;
+    border-radius: .6rem;
+    transition: background-color .15s ease-in-out, opacity .15s ease-in-out;
+
+    &:hover,
+    &:focus-visible {
+      background-color: rgba(0, 0, 0, .14);
+    }
+  }
+}
+
+#userDropdown {
+  padding-left: .75rem;
+}
+
+.header-search {
+  width: 100%;
+  max-width: 44rem;
 }
 
 @media screen and (max-width: 575.98px) {
@@ -412,7 +439,7 @@ main {
 
 :host ::ng-deep .dropdown.show .dropdown-toggle,
 :host ::ng-deep .dropdown-toggle:hover {
-  opacity: 0.7;
+  opacity: 1;
 }
 
 .dropdown-toggle::after {

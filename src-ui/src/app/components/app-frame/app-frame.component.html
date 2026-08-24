@@ -24,7 +24,7 @@
   </a>
   <div class="search-container flex-grow-1 py-2 pb-3 pb-sm-2 px-3 ps-md-4 me-sm-auto order-3 order-sm-1"
     [class.mobile-hidden]="mobileSearchHidden()">
-    <div class="col-12 col-md-7">
+    <div class="col-12 header-search">
       <pngx-global-search></pngx-global-search>
     </div>
   </div>
@@ -34,7 +34,7 @@
     }
     <pngx-toasts-dropdown></pngx-toasts-dropdown>
     <li ngbDropdown class="nav-item dropdown">
-      <button class="btn ps-1 border-0" id="userDropdown" ngbDropdownToggle aria-label="User menu" i18n-aria-label>
+      <button class="btn border-0" id="userDropdown" ngbDropdownToggle aria-label="User menu" i18n-aria-label>
         <i-bs width="1.3em" height="1.3em" name="person-circle"></i-bs>
         <span class="small ms-2 d-none d-sm-inline">
           {{this.settingsService.displayName}}
