@@ -455,6 +455,13 @@
           </div>
         </div>
       }
+      @case (WorkflowActionType.RemoteOcr) {
+        <div class="row">
+          <div class="col">
+            <p class="text-muted small" i18n>The document will be sent to the configured remote OCR service. May incur costs.</p>
+          </div>
+        </div>
+      }
     }
   </div>
 </ng-template>

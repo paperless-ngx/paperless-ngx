@@ -7,6 +7,7 @@ export enum WorkflowActionType {
   Webhook = 4,
   PasswordRemoval = 5,
   MoveToTrash = 6,
+  RemoteOcr = 7,
 }
 
 export interface WorkflowActionEmail extends ObjectWithId {

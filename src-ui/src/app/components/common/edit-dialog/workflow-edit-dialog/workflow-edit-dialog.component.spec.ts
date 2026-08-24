@@ -29,6 +29,7 @@ import {
   DocumentSource,
   WorkflowTriggerType,
 } from 'src/app/data/workflow-trigger'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
@@ -224,7 +225,12 @@ describe('WorkflowEditDialogComponent', () => {
     ).toEqual('Document Added')
     expect(component.getTriggerTypeOptionName(null)).toEqual('')
     expect(component.sourceOptions).toEqual(DOCUMENT_SOURCE_OPTIONS)
-    expect(component.actionTypeOptions).toEqual(WORKFLOW_ACTION_OPTIONS)
+    // Remote OCR is absent until the workflow has a consumption trigger
+    expect(component.actionTypeOptions).toEqual(
+      WORKFLOW_ACTION_OPTIONS.filter(
+        (a) => a.id !== WorkflowActionType.RemoteOcr
+      )
+    )
     expect(
       component.getActionTypeOptionName(WorkflowActionType.Assignment)
     ).toEqual('Assignment')
@@ -237,7 +243,104 @@ describe('WorkflowEditDialogComponent', () => {
     jest.spyOn(settingsService, 'get').mockReturnValue(false)
     component.ngOnInit()
     expect(component.actionTypeOptions).toEqual(
-      WORKFLOW_ACTION_OPTIONS.filter((a) => a.id !== WorkflowActionType.Email)
+      WORKFLOW_ACTION_OPTIONS.filter(
+        (a) =>
+          a.id !== WorkflowActionType.Email &&
+          a.id !== WorkflowActionType.RemoteOcr
+      )
+    )
+  })
+
+  it('should offer remote OCR only for consumption workflows', () => {
+    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+
+    // A consumption trigger makes the action reachable
+    component.object = {
+      name: 'Workflow 1',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.Consumption }],
+      actions: [],
+    } as Workflow
+    component.ngOnInit()
+    expect(component.actionTypeOptions.map((a) => a.id)).toContain(
+      WorkflowActionType.RemoteOcr
+    )
+
+    // Any other trigger type runs after the document has been parsed
+    component.object = {
+      name: 'Workflow 2',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.DocumentAdded }],
+      actions: [],
+    } as Workflow
+    component.ngOnInit()
+    expect(component.actionTypeOptions.map((a) => a.id)).not.toContain(
+      WorkflowActionType.RemoteOcr
+    )
+  })
+
+  it('should offer remote OCR on a trigger added to a new workflow', () => {
+    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+    component.ngOnInit()
+
+    // Nothing for the action to apply to yet
+    expect(component.actionTypeOptions.map((a) => a.id)).not.toContain(
+      WorkflowActionType.RemoteOcr
+    )
+
+    // addTrigger creates the form field with emitEvent false, so the options
+    // have to be computed on read rather than cached from valueChanges
+    component.addTrigger()
+    expect(component.actionTypeOptions.map((a) => a.id)).toContain(
+      WorkflowActionType.RemoteOcr
+    )
+
+    // Switching that trigger to a type that runs after parsing removes it
+    component.triggerFields
+      .at(0)
+      .get('type')
+      .setValue(WorkflowTriggerType.DocumentAdded)
+    expect(component.actionTypeOptions.map((a) => a.id)).not.toContain(
+      WorkflowActionType.RemoteOcr
+    )
+  })
+
+  it('should keep remote OCR listed when an action already uses it', () => {
+    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+
+    // Otherwise changing the trigger would silently blank the selection
+    component.object = {
+      name: 'Workflow 1',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.DocumentAdded }],
+      actions: [{ type: WorkflowActionType.RemoteOcr }],
+    } as Workflow
+    component.ngOnInit()
+
+    expect(component.actionTypeOptions.map((a) => a.id)).toContain(
+      WorkflowActionType.RemoteOcr
+    )
+  })
+
+  it('should not offer remote OCR when no engine is configured', () => {
+    jest
+      .spyOn(settingsService, 'get')
+      .mockImplementation((key) => key !== SETTINGS_KEYS.REMOTE_OCR_CONFIGURED)
+
+    component.object = {
+      name: 'Workflow 1',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.Consumption }],
+      actions: [],
+    } as Workflow
+    component.ngOnInit()
+
+    expect(component.actionTypeOptions.map((a) => a.id)).not.toContain(
+      WorkflowActionType.RemoteOcr
     )
   })
 

@@ -148,6 +148,10 @@ export const WORKFLOW_ACTION_OPTIONS = [
     id: WorkflowActionType.MoveToTrash,
     name: $localize`Move to trash`,
   },
+  {
+    id: WorkflowActionType.RemoteOcr,
+    name: $localize`Remote OCR`,
+  },
 ]
 
 export enum TriggerFilterType {
@@ -504,8 +508,6 @@ export class WorkflowEditDialogComponent
 
   expandedItem: number = null
 
-  readonly allowedActionTypes = signal([])
-
   private readonly triggerFilterOptionsMap = new WeakMap<
     FormArray,
     TriggerFilterOption[]
@@ -548,13 +550,40 @@ export class WorkflowEditDialogComponent
       this.checkRemovalActionFields.bind(this)
     )
     this.checkRemovalActionFields(this.objectForm.value)
-    this.allowedActionTypes.set(
-      this.settingsService.get(SETTINGS_KEYS.EMAIL_ENABLED)
-        ? WORKFLOW_ACTION_OPTIONS
-        : WORKFLOW_ACTION_OPTIONS.filter(
-            (a) => a.id !== WorkflowActionType.Email
-          )
-    )
+  }
+
+  private allowedActionTypes: typeof WORKFLOW_ACTION_OPTIONS = null
+
+  private getAllowedActionTypes() {
+    let allowed = WORKFLOW_ACTION_OPTIONS
+
+    if (!this.settingsService.get(SETTINGS_KEYS.EMAIL_ENABLED)) {
+      allowed = allowed.filter((a) => a.id !== WorkflowActionType.Email)
+    }
+
+    // Remote OCR is decided before the document is parsed, so it is only
+    // offered for workflows that run at consumption.
+    const formWorkflow: Workflow = this.objectForm?.value
+    const remoteOcrUsable =
+      this.settingsService.get(SETTINGS_KEYS.REMOTE_OCR_CONFIGURED) &&
+      (formWorkflow?.triggers?.some(
+        (trigger) => trigger.type === WorkflowTriggerType.Consumption
+      ) ||
+        formWorkflow?.actions?.some(
+          (action) => action.type === WorkflowActionType.RemoteOcr
+        ))
+    if (!remoteOcrUsable) {
+      allowed = allowed.filter((a) => a.id !== WorkflowActionType.RemoteOcr)
+    }
+
+    if (
+      this.allowedActionTypes?.length === allowed.length &&
+      this.allowedActionTypes.every((a, i) => a.id === allowed[i].id)
+    ) {
+      return this.allowedActionTypes
+    }
+    this.allowedActionTypes = allowed
+    return allowed
   }
 
   private checkRemovalActionFields(formWorkflow: Workflow) {
@@ -1279,7 +1308,8 @@ export class WorkflowEditDialogComponent
 
   get actionTypeOptions() {
     this.settingsService.trackChanges()
-    return this.allowedActionTypes()
+    // Computed on read rather than cached
+    return this.getAllowedActionTypes()
   }
 
   getActionTypeOptionName(type: WorkflowActionType): string {

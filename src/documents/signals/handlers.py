@@ -973,6 +973,17 @@ def run_workflows(
                     )
                 elif action.type == WorkflowAction.WorkflowActionType.MOVE_TO_TRASH:
                     has_move_to_trash_action = True
+                elif action.type == WorkflowAction.WorkflowActionType.REMOTE_OCR:
+                    if use_overrides and overrides:
+                        overrides.remote_ocr = True
+                    else:
+                        # If a workflow has a consumption trigger *and* another type,
+                        # the document has already been parsed by the time the other one fires
+                        logger.debug(
+                            "Remote OCR action only applies to consumption "
+                            "triggers, ignoring",
+                            extra={"group": logging_group},
+                        )
 
             if not use_overrides:
                 # limit title to 128 characters

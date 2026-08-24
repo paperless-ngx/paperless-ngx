@@ -506,6 +506,141 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
 
         self.assertEqual(Workflow.objects.count(), 1)
 
+    def test_api_create_remote_ocr_action_requires_consumption_trigger(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - API request to create a workflow with a remote OCR action
+            - No consumption started trigger, so the action could never run
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+            - No objects are created
+        """
+        existing_count = Workflow.objects.count()
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Remote OCR too late",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.REMOTE_OCR,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Workflow.objects.count(), existing_count)
+
+    def test_api_create_remote_ocr_action_with_consumption_trigger(self) -> None:
+        """
+        GIVEN:
+            - API request to create a workflow with a remote OCR action
+            - A consumption started trigger alongside another trigger type
+        WHEN:
+            - API is called
+        THEN:
+            - The workflow is created, the action applies to consumption only
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Remote OCR on consume",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "filter_filename": "*.pdf",
+                        },
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.REMOTE_OCR,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_api_partial_update_adds_remote_ocr_action(self) -> None:
+        """
+        GIVEN:
+            - An existing workflow with a consumption started trigger
+        WHEN:
+            - A partial update adds a remote OCR action without resubmitting triggers
+        THEN:
+            - The existing trigger is considered and the update succeeds
+        """
+        response = self.client.patch(
+            f"{self.ENDPOINT}{self.workflow.id}/",
+            json.dumps(
+                {
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.REMOTE_OCR,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            self.workflow.actions.get().type,
+            WorkflowAction.WorkflowActionType.REMOTE_OCR,
+        )
+
+    def test_api_partial_update_cannot_remove_remote_ocr_trigger(self) -> None:
+        """
+        GIVEN:
+            - An existing workflow with a remote OCR action
+            - An existing consumption started trigger
+        WHEN:
+            - A partial update replaces the trigger without resubmitting actions
+        THEN:
+            - The existing action is considered and the update is rejected
+        """
+        self.action.type = WorkflowAction.WorkflowActionType.REMOTE_OCR
+        self.action.save()
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{self.workflow.id}/",
+            json.dumps(
+                {
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(self.workflow.triggers.get(), self.trigger)
+
     def test_api_create_workflow_trigger_action_empty_fields(self) -> None:
         """
         GIVEN:

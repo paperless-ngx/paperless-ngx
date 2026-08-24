@@ -1670,6 +1670,10 @@ class WorkflowAction(models.Model):
             6,
             _("Move to trash"),
         )
+        REMOTE_OCR = (
+            7,
+            _("Remote OCR"),
+        )
 
     type = models.PositiveSmallIntegerField(
         _("Workflow Action Type"),

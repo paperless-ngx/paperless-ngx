@@ -473,6 +473,16 @@ class ConsumerPlugin(
                     f"Unsupported mime type {mime_type}",
                 )
 
+            if self.metadata.remote_ocr and not getattr(
+                parser_class,
+                "uses_remote_service",
+                False,
+            ):
+                self.log.warning(
+                    "Remote OCR was requested for this document but no remote "
+                    "parser is available for it, processing locally instead.",
+                )
+
             # Notify all listeners that we're going to do some work.
 
             document_consumption_started.send(
