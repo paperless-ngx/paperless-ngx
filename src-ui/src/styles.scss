@@ -103,6 +103,11 @@ body {
   --bs-border-radius-sm: .425rem;
 }
 
+.accordion {
+  --bs-border-radius: .425rem;
+  --bs-accordion-inner-border-radius: calc(.425rem - 1px);
+}
+
 @media(min-width: 768px) {
   .col-slim {
     padding-left: calc(50px + $grid-gutter-width) !important;
