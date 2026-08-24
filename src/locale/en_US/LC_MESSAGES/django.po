@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-19 18:18+0000\n"
+"POT-Creation-Date: 2026-08-24 21:18+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1998,175 +1998,191 @@ msgstr ""
 msgid "CMYK"
 msgstr ""
 
-#: paperless/models.py:78 paperless/models.py:88
+#: paperless/models.py:82
+msgid "Azure AI Document Intelligence"
+msgstr ""
+
+#: paperless/models.py:86 paperless/models.py:96
 msgid "OpenAI-compatible"
 msgstr ""
 
-#: paperless/models.py:79
+#: paperless/models.py:87
 msgid "Huggingface"
 msgstr ""
 
-#: paperless/models.py:80 paperless/models.py:89
+#: paperless/models.py:88 paperless/models.py:97
 msgid "Ollama"
 msgstr ""
 
-#: paperless/models.py:98
+#: paperless/models.py:106
 msgid "Sets the output PDF type"
 msgstr ""
 
-#: paperless/models.py:110
+#: paperless/models.py:118
 msgid "Do OCR from page 1 to this value"
 msgstr ""
 
-#: paperless/models.py:116
+#: paperless/models.py:124
 msgid "Do OCR using these languages"
 msgstr ""
 
-#: paperless/models.py:123
+#: paperless/models.py:131
 msgid "Sets the OCR mode"
 msgstr ""
 
-#: paperless/models.py:131
+#: paperless/models.py:139
 msgid "Controls archive file generation"
 msgstr ""
 
-#: paperless/models.py:139
+#: paperless/models.py:147
 msgid "Sets image DPI fallback value"
 msgstr ""
 
-#: paperless/models.py:146
+#: paperless/models.py:154
 msgid "Controls the unpaper cleaning"
 msgstr ""
 
-#: paperless/models.py:153
+#: paperless/models.py:161
 msgid "Enables deskew"
 msgstr ""
 
-#: paperless/models.py:156
+#: paperless/models.py:164
 msgid "Enables page rotation"
 msgstr ""
 
-#: paperless/models.py:161
+#: paperless/models.py:169
 msgid "Sets the threshold for rotation of pages"
 msgstr ""
 
-#: paperless/models.py:167
+#: paperless/models.py:175
 msgid "Sets the maximum image size for decompression"
 msgstr ""
 
-#: paperless/models.py:173
+#: paperless/models.py:181
 msgid "Sets the Ghostscript color conversion strategy"
 msgstr ""
 
-#: paperless/models.py:181
+#: paperless/models.py:189
 msgid "Adds additional user arguments for OCRMyPDF"
 msgstr ""
 
-#: paperless/models.py:190
+#: paperless/models.py:198
 msgid "Application title"
 msgstr ""
 
-#: paperless/models.py:197
+#: paperless/models.py:205
 msgid "Application logo"
 msgstr ""
 
-#: paperless/models.py:212
+#: paperless/models.py:220
 msgid "Enables barcode scanning"
 msgstr ""
 
-#: paperless/models.py:218
+#: paperless/models.py:226
 msgid "Enables barcode TIFF support"
 msgstr ""
 
-#: paperless/models.py:224
+#: paperless/models.py:232
 msgid "Sets the barcode string"
 msgstr ""
 
-#: paperless/models.py:232
+#: paperless/models.py:240
 msgid "Retains split pages"
 msgstr ""
 
-#: paperless/models.py:238
+#: paperless/models.py:246
 msgid "Enables ASN barcode"
 msgstr ""
 
-#: paperless/models.py:244
+#: paperless/models.py:252
 msgid "Sets the ASN barcode prefix"
 msgstr ""
 
-#: paperless/models.py:252
+#: paperless/models.py:260
 msgid "Sets the barcode upscale factor"
 msgstr ""
 
-#: paperless/models.py:259
+#: paperless/models.py:267
 msgid "Sets the barcode DPI"
 msgstr ""
 
-#: paperless/models.py:266
+#: paperless/models.py:274
 msgid "Sets the maximum pages for barcode"
 msgstr ""
 
-#: paperless/models.py:273
+#: paperless/models.py:281
 msgid "Enables tag barcode"
 msgstr ""
 
-#: paperless/models.py:279
+#: paperless/models.py:287
 msgid "Sets the tag barcode mapping"
 msgstr ""
 
-#: paperless/models.py:285
+#: paperless/models.py:293
 msgid "Enables splitting on tag barcodes"
 msgstr ""
 
-#: paperless/models.py:294
+#: paperless/models.py:303
+msgid "Sets the remote OCR engine"
+msgstr ""
+
+#: paperless/models.py:312
+msgid "Sets the remote OCR API key"
+msgstr ""
+
+#: paperless/models.py:320
+msgid "Sets the remote OCR endpoint"
+msgstr ""
+
+#: paperless/models.py:331
 msgid "Enables AI features"
 msgstr ""
 
-#: paperless/models.py:300
+#: paperless/models.py:337
 msgid "Sets the LLM embedding backend"
 msgstr ""
 
-#: paperless/models.py:308
+#: paperless/models.py:345
 msgid "Sets the LLM embedding model"
 msgstr ""
 
-#: paperless/models.py:315
+#: paperless/models.py:352
 msgid "Sets the LLM embedding endpoint, optional"
 msgstr ""
 
-#: paperless/models.py:322
+#: paperless/models.py:359
 msgid "Sets the LLM embedding chunk size"
 msgstr ""
 
-#: paperless/models.py:328
+#: paperless/models.py:365
 msgid "Sets the LLM context size"
 msgstr ""
 
-#: paperless/models.py:334
+#: paperless/models.py:371
 msgid "Sets the LLM backend"
 msgstr ""
 
-#: paperless/models.py:342
+#: paperless/models.py:379
 msgid "Sets the LLM model"
 msgstr ""
 
-#: paperless/models.py:349
+#: paperless/models.py:386
 msgid "Sets the LLM API key"
 msgstr ""
 
-#: paperless/models.py:356
+#: paperless/models.py:393
 msgid "Sets the LLM endpoint, optional"
 msgstr ""
 
-#: paperless/models.py:363
+#: paperless/models.py:400
 msgid "Sets the LLM output language"
 msgstr ""
 
-#: paperless/models.py:370
+#: paperless/models.py:407
 msgid "Sets the LLM timeout in seconds"
 msgstr ""
 
-#: paperless/models.py:376
+#: paperless/models.py:413
 msgid "paperless application settings"
 msgstr ""
 
