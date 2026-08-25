@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from functools import cache
 from typing import Final
 
 import tantivy
@@ -71,7 +72,7 @@ def register_tokenizers(index: tantivy.Index, language: str | None) -> None:
         use fast=True and Tantivy requires fast-field tokenizers to exist
         even for documents that omit those fields.
     """
-    index.register_tokenizer("paperless_text", _paperless_text(language))
+    index.register_tokenizer("paperless_text", paperless_text_analyzer(language))
     index.register_tokenizer("simple_analyzer", _simple_analyzer())
     index.register_tokenizer("bigram_analyzer", _bigram_analyzer())
     index.register_tokenizer("simple_search_analyzer", _simple_search_analyzer())
@@ -79,7 +80,7 @@ def register_tokenizers(index: tantivy.Index, language: str | None) -> None:
     index.register_fast_field_tokenizer("simple_analyzer", _simple_analyzer())
 
 
-def _paperless_text(language: str | None) -> tantivy.TextAnalyzer:
+def paperless_text_analyzer(language: str | None) -> tantivy.TextAnalyzer:
     """Main full-text tokenizer for content, title, etc: simple -> remove_long(129) -> lowercase -> ascii_fold [-> stemmer]"""
     builder = (
         tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.simple())
@@ -98,6 +99,54 @@ def _paperless_text(language: str | None) -> tantivy.TextAnalyzer:
                 ", ".join(sorted(SUPPORTED_LANGUAGES)),
             )
     return builder.build()
+
+
+@cache
+def _pattern_stemmer(language: str | None) -> tantivy.TextAnalyzer | None:
+    """The stemming tail of paperless_text_analyzer, over a whole literal run.
+
+    Same language gate and same Snowball stemmer paperless_text_analyzer
+    applies at index time, so query patterns follow SEARCH_LANGUAGE. Returns
+    None when that gate disables stemming; paperless_text_analyzer already
+    warns about an unsupported language, so this stays quiet.
+
+    The raw tokenizer keeps the run whole (a wildcard literal is a fragment,
+    not necessarily a word), and remove_long is kept so an over-long run is
+    treated the same way the index treats it.
+    """
+    if not language:
+        return None
+    tantivy_lang = _LANGUAGE_MAP.get(language.lower())
+    if tantivy_lang is None:
+        return None
+    return (
+        tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.raw())
+        .filter(tantivy.Filter.remove_long(_TOKEN_REMOVE_LONG_LIMIT))
+        .filter(tantivy.Filter.stemmer(tantivy_lang))
+        .build()
+    )
+
+
+def stem_pattern_text(text: str, language: str | None) -> str:
+    """Stem an already lowercased/ascii-folded run the way index terms are.
+
+    Returns text unchanged when stemming is disabled for language, and also
+    when the stem step does not yield exactly one token: remove_long drops a run
+    past the length limit, leaving no stem to substitute. Falling back to the
+    text as typed is the safe direction for a pattern prefix, since it can only
+    be as narrow as it was before stemming was considered.
+
+    The raw tokenizer emits one token whatever the input and the stemmer is
+    1-to-1, so only the zero-token case can fire today; the guard covers both
+    counts so a tokenizer change cannot turn this into an IndexError.
+    """
+    analyzer = _pattern_stemmer(language)
+    if analyzer is None:
+        return text
+    tokens = analyzer.analyze(text)
+    if len(tokens) != 1:
+        return text
+    return tokens[0]
 
 
 def _simple_analyzer() -> tantivy.TextAnalyzer:
