@@ -40,7 +40,6 @@ dependencies = [
   "djangorestframework~=3.16",
   "drf-spectacular~=0.30",
   "drf-spectacular-sidecar~=2026.7.1",
-  "drf-writable-nested~=0.7.1",
   "filelock~=3.32.0",
   "flower~=2.0.1",
   "gotenberg-client~=0.14.0",
