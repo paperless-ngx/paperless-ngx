@@ -373,6 +373,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         If the queryset already annotated ``effective_content``, that value is used.
         """
         # Here to avoid circular import
+        from documents.versioning import LATEST_VERSION_CONTENT_PREFETCH_ATTR
         from documents.versioning import sort_versions_newest_first
         from documents.versioning import versions_newest_first
 
@@ -381,6 +382,19 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
 
         if self.root_document_id is not None or self.pk is None:
             return self.content
+
+        latest_version_prefetch = getattr(
+            self,
+            LATEST_VERSION_CONTENT_PREFETCH_ATTR,
+            None,
+        )
+        if latest_version_prefetch is not None:
+            # Empty list means prefetch ran and found no versions — use own content.
+            return (
+                latest_version_prefetch[0].content
+                if latest_version_prefetch
+                else self.content
+            )
 
         prefetched_cache = getattr(self, "_prefetched_objects_cache", None)
         prefetched_versions = (

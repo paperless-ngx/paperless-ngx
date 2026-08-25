@@ -233,6 +233,7 @@ from documents.versioning import VersionResolutionError
 from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_request_version_param
 from documents.versioning import get_root_document
+from documents.versioning import latest_version_content_prefetch
 from documents.versioning import resolve_requested_version_for_root
 from documents.versioning import versions_newest_first
 from paperless import version
@@ -1094,9 +1095,16 @@ class DocumentViewSet(
         # self-join once real candidate counts get large. Everything on this
         # list is deprecated in favor of the Tantivy-backed search endpoint
         # (see filters.py's TitleContentFilter/EffectiveContentFilter docs),
-        # so keep paying that cost only when one is actually used.
+        # so keep paying that cost only when one is actually used. Checked as
+        # a stripped, non-blank value (not just key presence) to match how
+        # DRF's SearchFilter and TitleContentFilter/EffectiveContentFilter
+        # themselves no-op on a blank value -- otherwise an empty `?search=`
+        # or a saved view with a cleared text filter would still pay for the
+        # annotation despite applying no actual predicate.
         params = self.request.query_params
-        return any(param in params for param in self._CONTENT_FILTER_PARAMS)
+        return any(
+            params.get(param, "").strip() for param in self._CONTENT_FILTER_PARAMS
+        )
 
     def get_queryset(self):
         # A correlated subquery avoids the LEFT JOIN + Count() this used to
@@ -1133,9 +1141,9 @@ class DocumentViewSet(
                         "version_label",
                         "root_document_id",
                         "version_index",
-                        "content",
                     ),
                 ),
+                latest_version_content_prefetch(),
                 "tags",
                 Prefetch(
                     "custom_fields",
