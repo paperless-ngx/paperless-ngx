@@ -536,6 +536,7 @@ ul.pagination {
 }
 
 .nav-underline {
+  gap: calc(0.5 * var(--bs-nav-underline-gap)) var(--bs-nav-underline-gap);
   .nav-link {
     &.active, &:hover, &:focus {
       color: var(--bs-primary);
