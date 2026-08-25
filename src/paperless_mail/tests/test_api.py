@@ -253,6 +253,81 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["success"], True)
 
+    def test_mail_account_test_existing_no_global_perms(self) -> None:
+        """
+        GIVEN:
+            - Existing account without an owner
+            - User without any mail account permissions
+        WHEN:
+            - API call is made to test the account by id
+        THEN:
+            - API returns forbidden
+        """
+        account = MailAccountFactory(
+            username="admin",
+            password="secret",
+            imap_server="server.example.com",
+            imap_port=443,
+            owner=None,
+        )
+        user = User.objects.create_user(username="no_perms")
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "id": account.pk,
+                    "imap_server": "server.example.com",
+                    "imap_port": 443,
+                    "imap_security": MailAccount.ImapSecurity.SSL,
+                    "username": "admin",
+                    "password": "******",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.content.decode(), "Insufficient permissions")
+
+    def test_mail_account_test_existing_object_perms_only(self) -> None:
+        """
+        GIVEN:
+            - Existing account owned by another user
+            - User with an object level grant but no global change permission
+        WHEN:
+            - API call is made to test the account by id
+        THEN:
+            - API returns forbidden
+        """
+        owner = User.objects.create_user(username="account_owner")
+        account = MailAccountFactory(
+            username="admin",
+            password="secret",
+            imap_server="server.example.com",
+            imap_port=443,
+            owner=owner,
+        )
+        user = User.objects.create_user(username="object_perms_only")
+        assign_perm("change_mailaccount", user, account)
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "id": account.pk,
+                    "imap_server": "server.example.com",
+                    "imap_port": 443,
+                    "imap_security": MailAccount.ImapSecurity.SSL,
+                    "username": "admin",
+                    "password": "******",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_mail_account_test_existing_nonexistent_id_forbidden(self) -> None:
         response = self.client.post(
             f"{self.ENDPOINT}test/",
