@@ -1,5 +1,6 @@
 import datetime
 import json
+import re
 import shutil
 import tempfile
 import uuid
@@ -21,7 +22,9 @@ from django.core import mail
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import DataError
+from django.db import connection
 from django.test import override_settings
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from rest_framework import status
@@ -251,6 +254,82 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         doc.refresh_from_db()
         self.assertEqual(doc.created, date(2023, 6, 28))
+
+    def test_document_update_tags_batches_tag_lookup(self) -> None:
+        """
+        GIVEN:
+            - A document is being updated with several tags at once
+        WHEN:
+            - API PATCH request is made setting the document's tags
+        THEN:
+            - The referenced Tag objects are resolved with a single batched
+              query, not one query per tag
+        """
+        doc = Document.objects.create(
+            title="none",
+            checksum="123",
+            mime_type="application/pdf",
+        )
+        tags = [TagFactory() for _ in range(8)]
+
+        with CaptureQueriesContext(connection) as ctx:
+            response = self.client.patch(
+                f"/api/documents/{doc.pk}/",
+                {"tags": [t.id for t in tags]},
+                format="json",
+            )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Match `"documents_tag"."id" = <literal>` (a single-row WHERE lookup)
+        # but not the same substring appearing as a JOIN's ON condition
+        # (`"documents_tag"."id" = "documents_document_tags"."tag_id"`),
+        # which is a legitimate, unrelated response-serialization query.
+        single_tag_lookup_re = re.compile(r'"documents_tag"\."id" = \d')
+        single_tag_lookups = [
+            q for q in ctx.captured_queries if single_tag_lookup_re.search(q["sql"])
+        ]
+        self.assertEqual(
+            len(single_tag_lookups),
+            0,
+            "Expected tags to be resolved with a batched query, not "
+            f"per-tag lookups, got: {single_tag_lookups}",
+        )
+
+        doc.refresh_from_db()
+        self.assertCountEqual(
+            doc.tags.values_list("id", flat=True),
+            [t.id for t in tags],
+        )
+
+    def test_document_update_tags_rejects_out_of_range_id(self) -> None:
+        """
+        GIVEN:
+            - A document is being updated with a tag id too large for the
+              database's integer column
+        WHEN:
+            - API PATCH request is made setting the document's tags
+        THEN:
+            - A normal 400 validation error is returned, not an unhandled
+              OverflowError/DataError escaping as a 500
+
+        Django's IntegerFieldOverflow guard converts an out-of-range int
+        into a clean "no match" for exact/gt/gte/lt/lte lookups, but not for
+        `in` -- the batched tag resolution uses `pk__in=`, so this has to be
+        guarded explicitly rather than relying on Django to do it.
+        """
+        doc = Document.objects.create(
+            title="none",
+            checksum="123",
+            mime_type="application/pdf",
+        )
+
+        response = self.client.patch(
+            f"/api/documents/{doc.pk}/",
+            {"tags": [99999999999999999999999999999]},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_document_update_legacy_created_format(self) -> None:
         """
