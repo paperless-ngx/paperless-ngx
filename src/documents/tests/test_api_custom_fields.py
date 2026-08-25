@@ -1552,6 +1552,83 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         results = response.data["results"]
         self.assertEqual(results[0]["document_count"], 0)
 
+    def test_document_update_custom_fields_sync_query_count(self) -> None:
+        """
+        GIVEN:
+            - A document already has 3 custom field instances attached
+        WHEN:
+            - A PATCH request updates 2 of them, adds 1 new one, and omits
+              the 3rd (which should be deleted)
+        THEN:
+            - The number of queries used to create/update/delete the
+              CustomFieldInstance rows is bounded and does not scale with
+              drf-writable-nested's per-item serializer-rebuild + separate
+              soft-delete-then-hard-delete-after pattern (one query per
+              CustomFieldInstance write via update_or_create, plus exactly
+              one final hard-delete query -- not two delete passes)
+        """
+        doc = Document.objects.create(
+            title="WOW",
+            content="the content",
+            checksum="123-sync-count",
+            mime_type="application/pdf",
+        )
+        fields = [
+            CustomField.objects.create(
+                name=f"Sync Field {i}",
+                data_type=CustomField.FieldDataType.STRING,
+            )
+            for i in range(4)
+        ]
+        # Attach the first 3 up front; the 4th is added in the PATCH below,
+        # and the 3rd is omitted (so it should be deleted).
+        for field in fields[:3]:
+            CustomFieldInstance.objects.create(
+                document=doc,
+                field=field,
+                value_text="initial",
+            )
+        self.assertEqual(CustomFieldInstance.objects.count(), 3)
+
+        with CaptureQueriesContext(connection) as ctx:
+            resp = self.client.patch(
+                f"/api/documents/{doc.id}/",
+                data={
+                    "custom_fields": [
+                        {"field": fields[0].id, "value": "updated 0"},
+                        {"field": fields[1].id, "value": "updated 1"},
+                        {"field": fields[3].id, "value": "new 3"},
+                    ],
+                },
+                format="json",
+            )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        delete_queries = [
+            q
+            for q in ctx.captured_queries
+            if 'DELETE FROM "documents_customfieldinstance"' in q["sql"]
+            or (
+                'UPDATE "documents_customfieldinstance"' in q["sql"]
+                and '"deleted_at"' in q["sql"]
+                and '"deleted_at" = NULL' not in q["sql"]
+            )
+        ]
+        self.assertEqual(
+            len(delete_queries),
+            1,
+            "Expected exactly one delete/soft-delete-marking query for the "
+            f"omitted custom field, got {len(delete_queries)}: {delete_queries}",
+        )
+
+        self.assertEqual(CustomFieldInstance.objects.count(), 3)
+        doc.refresh_from_db()
+        values = {cfi.field_id: cfi.value for cfi in doc.custom_fields.all()}
+        self.assertEqual(values[fields[0].id], "updated 0")
+        self.assertEqual(values[fields[1].id], "updated 1")
+        self.assertEqual(values[fields[3].id], "new 3")
+        self.assertNotIn(fields[2].id, values)
+
     def test_patch_document_invalid_date_custom_field_returns_validation_error(
         self,
     ) -> None:
