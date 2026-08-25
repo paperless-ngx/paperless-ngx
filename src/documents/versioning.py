@@ -43,6 +43,21 @@ def annotate_effective_content(documents: QuerySet[Document]) -> QuerySet[Docume
     )
 
 
+def ensure_effective_content(documents: QuerySet[Document]) -> QuerySet[Document]:
+    """
+    Annotates effective_content unless the queryset already carries it.
+
+    Lets a filter depend on effective_content without having to assume its
+    caller annotated one -- annotating twice under the same alias is an error,
+    and silently matching on the root document's own content instead is worse,
+    because the same filter then selects different documents depending on which
+    queryset it was handed.
+    """
+    if "effective_content" in documents.query.annotations:
+        return documents
+    return annotate_effective_content(documents)
+
+
 def sort_versions_newest_first(documents: list[Document]) -> list[Document]:
     """
     Same sorting as versions_newest_first()
