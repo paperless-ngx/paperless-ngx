@@ -27,7 +27,7 @@ from documents.models import DocumentType
 from documents.models import PaperlessTask
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.permissions import set_permissions_for_object
+from documents.permissions import set_permissions_for_objects
 from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
@@ -430,10 +430,10 @@ def set_permissions(
     else:
         qs.update(owner=owner)
 
-    for doc in qs:
-        set_permissions_for_object(permissions=set_permissions, object=doc, merge=merge)
+    docs = list(qs)
+    set_permissions_for_objects(permissions=set_permissions, objects=docs, merge=merge)
 
-    affected_docs = list(qs.values_list("pk", flat=True))
+    affected_docs = [doc.pk for doc in docs]
 
     bulk_update_documents.apply_async(
         kwargs={"document_ids": affected_docs},
