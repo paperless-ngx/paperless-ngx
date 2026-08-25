@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import logging
 import math
 import re
@@ -956,19 +957,19 @@ def validate_documentlink_targets(user, doc_ids):
         )
 
 
-# drf-writable-nested revalidates a document's custom_fields more than once
-# per request: once as the ordinary nested list, then again per-item while
-# matching existing vs. new CustomFieldInstance rows during save() -- and
-# that second pass builds a brand new serializer (and field) instance per
-# item (see its update_or_create_reverse_relations / _get_serializer_for_field),
-# so a cache on the field instance alone only helps the first pass. It does,
-# however, explicitly pass `context=self.context` to every one of those
-# fresh serializers -- the *same* dict object the outer DocumentSerializer
-# is using, not a copy. That context dict is already request-scoped (DRF
-# builds it fresh per request via get_serializer_context()), so stashing the
-# resolved CustomField objects there -- rather than in some new global/
-# thread-local cache -- lets every later pass reuse them for free while
-# staying entirely within DRF's existing, already-request-scoped machinery.
+# A CustomField lookup cache scoped to a single field/serializer instance
+# only helps within that one instance's own validation pass. Several call
+# sites, though, build more than one CustomFieldInstanceSerializer (or its
+# CustomFieldInstanceListSerializer/field) for the same request and pass
+# each of them `context=self.context` -- the *same* dict object, not a
+# copy -- e.g. bulk-edit's _validate_custom_field_values() constructing a
+# fresh CustomFieldInstanceSerializer per submitted field. That context
+# dict is already request-scoped (DRF builds it fresh per request via
+# get_serializer_context()), so stashing the resolved CustomField objects
+# there -- rather than in some new global/thread-local cache -- lets every
+# one of those separately-instantiated serializers reuse them for free
+# while staying entirely within DRF's existing, already-request-scoped
+# machinery.
 _CUSTOM_FIELD_CONTEXT_CACHE_KEY = "_custom_field_lookup_cache"
 
 
@@ -1438,12 +1439,12 @@ class DocumentSerializer(
 
         custom_fields_data = validated_data.pop("custom_fields", None)
 
-        if settings.AUDIT_LOG_ENABLED:
-            with set_actor(self.user):
-                super().update(instance, validated_data)
-                if custom_fields_data is not None:
-                    self._sync_custom_fields(instance, custom_fields_data)
-        else:
+        actor_context = (
+            set_actor(self.user)
+            if settings.AUDIT_LOG_ENABLED
+            else contextlib.nullcontext()
+        )
+        with actor_context:
             super().update(instance, validated_data)
             if custom_fields_data is not None:
                 self._sync_custom_fields(instance, custom_fields_data)

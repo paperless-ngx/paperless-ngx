@@ -592,9 +592,10 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         WHEN:
             - A second, separately-instantiated CustomFieldInstanceSerializer
               validates the same field id, sharing that same context
-              (this is what drf-writable-nested does: it rebuilds a fresh
-              serializer -- and fresh field instances -- per item while
-              matching existing vs. new instances during save())
+              (this mirrors what real call sites do, e.g. bulk-edit's
+              validate_custom_fields()/_validate_custom_field_values()
+              constructing a fresh CustomFieldInstanceSerializer per
+              submitted field, all sharing the outer serializer's context)
         THEN:
             - No additional query is issued to resolve the CustomField
         """
@@ -1560,12 +1561,10 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             - A PATCH request updates 2 of them, adds 1 new one, and omits
               the 3rd (which should be deleted)
         THEN:
-            - The number of queries used to create/update/delete the
-              CustomFieldInstance rows is bounded and does not scale with
-              drf-writable-nested's per-item serializer-rebuild + separate
-              soft-delete-then-hard-delete-after pattern (one query per
-              CustomFieldInstance write via update_or_create, plus exactly
-              one final hard-delete query -- not two delete passes)
+            - The omitted custom field is removed via exactly one
+              delete-shaped query, not drf-writable-nested's old two-step
+              soft-delete-then-hard-delete-after pattern (two delete
+              passes)
         """
         doc = Document.objects.create(
             title="WOW",
