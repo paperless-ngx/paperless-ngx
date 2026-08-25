@@ -173,6 +173,182 @@ def set_permissions_for_object(
                         )
 
 
+def _resolve_permissions(codenames: set[str], ctype: ContentType) -> list[Permission]:
+    """
+    Resolves `codenames` to Permission rows, raising like the single-object
+    assign_perm() this bulk path replaces does (via a `.get()` internally)
+    if any codename doesn't exist -- e.g. a client-supplied action name that
+    was never validated (BulkEditObjectsSerializer._validate_permissions
+    calls validate_set_permissions() only for its side-effecting id checks
+    and discards the filtered dict it returns, so an unrecognized action key
+    reaches this function as-is). A plain `.filter()` with no existence
+    check would otherwise silently build zero rows and no-op instead of
+    reporting the bad input.
+    """
+    permission_objs = list(
+        Permission.objects.filter(content_type=ctype, codename__in=codenames),
+    )
+    missing = codenames - {p.codename for p in permission_objs}
+    if missing:
+        raise Permission.DoesNotExist(
+            f"Permission matching query does not exist for codename(s): "
+            f"{', '.join(sorted(missing))}",
+        )
+    return permission_objs
+
+
+# Target number of permission rows to build in Python before handing them to
+# bulk_create -- keeps peak memory bounded for a large "apply to all" call,
+# independent of bulk_create's own batch_size (which only caps the size of
+# each INSERT statement, not how many row objects exist in memory at once).
+_PERMISSION_ROW_CHUNK_SIZE = 5000
+
+
+def _apply_bulk_permission_entry(
+    *,
+    perm_model: type[UserObjectPermission] | type[GroupObjectPermission],
+    identity_model: type[User] | type[Group],
+    identity_field: str,
+    ids: list[int],
+    codename: str,
+    permission_objs: list[Permission],
+    ctype: ContentType,
+    object_pks: list[str],
+    merge: bool,
+) -> None:
+    # Only the ids are needed to build permission rows (via `<field>_id=`),
+    # so avoid fetching full User/Group rows for identities that may not
+    # even end up being granted anything new.
+    add_ids = set(
+        identity_model.objects.filter(id__in=ids).values_list("id", flat=True),
+    )
+
+    if not merge:
+        existing_ids = set(
+            perm_model.objects.filter(
+                content_type=ctype,
+                object_pk__in=object_pks,
+                permission__codename=codename,
+            ).values_list(f"{identity_field}_id", flat=True),
+        )
+        remove_ids = existing_ids - add_ids
+        if remove_ids:
+            perm_model.objects.filter(
+                content_type=ctype,
+                object_pk__in=object_pks,
+                permission__codename=codename,
+                **{f"{identity_field}_id__in": remove_ids},
+            ).delete()
+
+    if not add_ids:
+        return
+
+    rows_per_pk = len(permission_objs) * len(add_ids)
+    pks_per_chunk = max(1, _PERMISSION_ROW_CHUNK_SIZE // rows_per_pk)
+    for start in range(0, len(object_pks), pks_per_chunk):
+        pk_chunk = object_pks[start : start + pks_per_chunk]
+        rows = [
+            perm_model(
+                content_type=ctype,
+                object_pk=pk,
+                permission=permission_obj,
+                **{f"{identity_field}_id": identity_id},
+            )
+            for permission_obj in permission_objs
+            for pk in pk_chunk
+            for identity_id in add_ids
+        ]
+        # ignore_conflicts skips only rows that already exist as an exact
+        # (identity, permission, object) match -- the same de-dup the
+        # underlying (user|group, permission, object_pk) unique constraint
+        # already enforces for the single-object assign_perm() this
+        # replaces, so it doesn't change what counts as "already granted".
+        # batch_size caps how many rows go into a single INSERT so a huge
+        # chunk doesn't build one enormous statement.
+        perm_model.objects.bulk_create(rows, ignore_conflicts=True, batch_size=1000)
+
+
+def set_permissions_for_objects(
+    permissions: dict,
+    model: type[Model],
+    pks: QuerySet | list,
+    *,
+    merge: bool = False,
+) -> None:
+    """
+    Bulk equivalent of set_permissions_for_object: applies the same
+    permission changes to every object identified by `pks` at once.
+
+    Takes a model + pks (rather than model instances) deliberately -- the
+    permission rows built below only ever need `pk`, `content_type`, and
+    identity ids, so callers shouldn't have to fetch full rows (with every
+    other field) just to hand them to this function.
+
+    Deliberately does not use guardian's queryset/list-aware assign_perm:
+    passing a list as the object routes to bulk_assign_perm, which skips
+    creating a direct permission row for anyone who already has the
+    permission via ANY group membership (it checks
+    ObjectPermissionChecker.has_perm, which is group-inheritance-aware) --
+    unlike the single-object assign_perm this replaces, which always
+    ensures a direct row via get_or_create regardless of group-derived
+    access. Losing that guarantee would mean a later revocation of the
+    group's grant silently strips access an admin explicitly asked to be
+    direct. Bulk-creating rows straight against the permission models
+    instead (see _apply_bulk_permission_entry) preserves the original
+    always-create-a-direct-row semantics while still batching every object
+    and every identity into one query per action, rather than one query per
+    (object, user) pair.
+    """
+    object_pks = [str(pk) for pk in pks]
+    if not object_pks:
+        return
+
+    model_name = model.__name__.lower()
+    ctype = ContentType.objects.get_for_model(model)
+
+    for action, entry in permissions.items():
+        codename = f"{action}_{model_name}"
+        implied_codenames = {codename}
+        if action == "change":
+            # change gives view too
+            implied_codenames.add(f"view_{model_name}")
+
+        # Resolved once per action (not once per users/groups branch) and
+        # shared between both below -- also where an unrecognized action
+        # name (see _resolve_permissions) is caught.
+        permission_objs = (
+            _resolve_permissions(implied_codenames, ctype)
+            if "users" in entry or "groups" in entry
+            else []
+        )
+
+        if "users" in entry:
+            _apply_bulk_permission_entry(
+                perm_model=UserObjectPermission,
+                identity_model=User,
+                identity_field="user",
+                ids=entry["users"],
+                codename=codename,
+                permission_objs=permission_objs,
+                ctype=ctype,
+                object_pks=object_pks,
+                merge=merge,
+            )
+
+        if "groups" in entry:
+            _apply_bulk_permission_entry(
+                perm_model=GroupObjectPermission,
+                identity_model=Group,
+                identity_field="group",
+                ids=entry["groups"],
+                codename=codename,
+                permission_objs=permission_objs,
+                ctype=ctype,
+                object_pks=object_pks,
+                merge=merge,
+            )
+
+
 def permitted_object_ids(
     user: User | None,
     model: type[Model],

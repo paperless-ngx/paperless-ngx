@@ -5,8 +5,11 @@ from unittest import mock
 
 import pikepdf
 from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
@@ -19,6 +22,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.permissions import set_permissions_for_objects
 from documents.tests.utils import DirectoriesMixin
 
 
@@ -509,6 +513,132 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             self.doc1,
         )
         self.assertEqual(groups_with_perms.count(), 2)
+
+    @mock.patch("documents.tasks.bulk_update_documents.apply_async")
+    def test_set_permissions_query_count_independent_of_document_count(
+        self,
+        m,
+    ) -> None:
+        """
+        GIVEN:
+            - Many documents are being bulk-edited to set permissions at once
+        WHEN:
+            - set_permissions runs over a small batch vs. a much larger one
+        THEN:
+            - The number of queries issued is the same either way -- each
+              user/group is applied across all documents with one batched
+              call, not one call per (document, user) pair
+        """
+        permissions = {
+            "view": {
+                "users": [self.user1.id, self.user2.id],
+                "groups": [self.group2.id],
+            },
+            "change": {
+                "users": [self.user1.id],
+                "groups": [self.group2.id],
+            },
+        }
+
+        def run_with_n_documents(n: int) -> int:
+            docs = [
+                Document.objects.create(checksum=f"perm-{n}-{i}", title=f"perm-{n}-{i}")
+                for i in range(n)
+            ]
+            with CaptureQueriesContext(connection) as ctx:
+                bulk_edit.set_permissions(
+                    [doc.id for doc in docs],
+                    set_permissions=permissions,
+                    owner=self.owner,
+                    merge=False,
+                )
+            for doc in docs:
+                self.assertEqual(get_users_with_perms(doc).count(), 2)
+                self.assertEqual(get_groups_with_perms(doc).count(), 1)
+            return len(ctx.captured_queries)
+
+        small_batch_queries = run_with_n_documents(5)
+        large_batch_queries = run_with_n_documents(50)
+
+        self.assertEqual(
+            small_batch_queries,
+            large_batch_queries,
+            "Expected the same query count regardless of document count, got "
+            f"{small_batch_queries} queries for 5 documents vs. "
+            f"{large_batch_queries} for 50",
+        )
+
+    @mock.patch("documents.tasks.bulk_update_documents.apply_async")
+    def test_set_permissions_grants_direct_perm_even_if_already_granted_via_group(
+        self,
+        m,
+    ) -> None:
+        """
+        GIVEN:
+            - A user already has view access to a document via group
+              membership, with no direct grant of their own
+        WHEN:
+            - set_permissions explicitly grants that same user direct view
+              access via bulk_edit
+        THEN:
+            - A direct permission grant is created for the user, not skipped
+              because they already have equivalent access via the group
+
+        Regression test: guardian's queryset-aware assign_perm() (routed to
+        when the target is a list/queryset) skips creating a direct row for
+        anyone whose ObjectPermissionChecker.has_perm() already returns True
+        -- which includes group-derived access. The single-object assign_perm
+        this bulk path replaces has no such check; it always ensures a
+        direct row via get_or_create. Losing that guarantee would mean
+        revoking the group's grant later silently strips access that was
+        supposed to be explicit.
+        """
+        self.doc1.owner = self.user1
+        self.doc1.save()
+        self.user1.groups.add(self.group1)
+        assign_perm("view_document", self.group1, self.doc1)
+
+        bulk_edit.set_permissions(
+            [self.doc1.id],
+            set_permissions={
+                "view": {"users": [self.user1.id], "groups": []},
+            },
+            merge=True,
+        )
+
+        direct_users = get_users_with_perms(
+            self.doc1,
+            only_with_perms_in=["view_document"],
+            with_group_users=False,
+        )
+        self.assertIn(self.user1, direct_users)
+
+    def test_set_permissions_for_objects_raises_for_unknown_action(self) -> None:
+        """
+        GIVEN:
+            - An unrecognized permission action name with users to grant it
+              to
+        WHEN:
+            - set_permissions_for_objects is called
+        THEN:
+            - Permission.DoesNotExist is raised, not a silent no-op
+
+        Regression test: the endpoint that calls this
+        (BulkEditObjectPermissionsView) never actually validates action
+        names against the raw client-supplied permissions dict --
+        BulkEditObjectsSerializer._validate_permissions calls
+        validate_set_permissions() only for its side-effecting user/group id
+        checks and discards the filtered dict it returns -- so a bogus
+        action key reaches this function as-is. Resolving the Permission via
+        a bare `.filter()` (which returns empty instead of raising) would
+        silently drop the grant and report success.
+        """
+        with self.assertRaises(Permission.DoesNotExist):
+            set_permissions_for_objects(
+                {"not_a_real_action": {"users": [self.user1.id], "groups": []}},
+                Document,
+                [self.doc1.pk],
+            )
 
     @mock.patch("documents.models.Document.delete")
     def test_delete_documents_old_uuid_field(self, m) -> None:
