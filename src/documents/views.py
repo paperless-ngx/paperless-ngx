@@ -4912,7 +4912,8 @@ class BulkEditObjectsView(PassUserMixin):
                 if "permissions" in serializer.validated_data:
                     set_permissions_for_objects(
                         permissions=permissions,
-                        objects=qs,
+                        model=object_class,
+                        pks=qs.values_list("pk", flat=True),
                         merge=merge,
                     )
 

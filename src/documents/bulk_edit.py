@@ -424,10 +424,13 @@ def set_permissions(
     else:
         qs.update(owner=owner)
 
-    docs = list(qs)
-    set_permissions_for_objects(permissions=set_permissions, objects=docs, merge=merge)
-
-    affected_docs = [doc.pk for doc in docs]
+    affected_docs = list(qs.values_list("pk", flat=True))
+    set_permissions_for_objects(
+        permissions=set_permissions,
+        model=Document,
+        pks=affected_docs,
+        merge=merge,
+    )
 
     bulk_update_documents.apply_async(
         kwargs={"document_ids": affected_docs},
