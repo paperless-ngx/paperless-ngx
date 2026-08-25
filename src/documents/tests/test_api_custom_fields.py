@@ -5,7 +5,9 @@ from unittest.mock import ANY
 
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.db import connection
 from django.test import override_settings
+from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -13,6 +15,9 @@ from rest_framework.test import APITestCase
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.serialisers import CustomFieldInstanceSerializer
+from documents.serialisers import DocumentSerializer
+from documents.tests.factories import DocumentFactory
 from documents.tests.utils import DirectoriesMixin
 
 
@@ -529,6 +534,136 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
 
         doc.refresh_from_db()
         self.assertEqual(len(doc.custom_fields.all()), 10)
+
+    def test_document_serializer_custom_fields_validation_batches_field_lookup(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A document is being validated with several custom field values
+              at once (as happens on every PATCH/PUT/POST)
+        WHEN:
+            - The serializer is validated
+        THEN:
+            - The referenced CustomField objects are resolved with a single
+              query, not one query per custom field
+        """
+        doc = DocumentFactory(mime_type="application/pdf")
+        custom_fields = [
+            CustomField.objects.create(
+                name=f"Test Custom Field {i}",
+                data_type=CustomField.FieldDataType.STRING,
+            )
+            for i in range(5)
+        ]
+
+        serializer = DocumentSerializer(
+            doc,
+            data={
+                "custom_fields": [
+                    {"field": custom_field.id, "value": "test value"}
+                    for custom_field in custom_fields
+                ],
+            },
+            partial=True,
+        )
+
+        with CaptureQueriesContext(connection) as ctx:
+            self.assertTrue(serializer.is_valid(), serializer.errors)
+
+        custom_field_lookups = [
+            query
+            for query in ctx.captured_queries
+            if 'FROM "documents_customfield" WHERE "documents_customfield"."id"'
+            in query["sql"]
+        ]
+        self.assertEqual(
+            len(custom_field_lookups),
+            1,
+            "Expected a single batched query to resolve the custom fields, "
+            f"got {len(custom_field_lookups)}: {custom_field_lookups}",
+        )
+
+    def test_custom_field_lookup_reuses_shared_context_cache(self) -> None:
+        """
+        GIVEN:
+            - A CustomField has already been resolved once, by a serializer
+              sharing a given `context` dict
+        WHEN:
+            - A second, separately-instantiated CustomFieldInstanceSerializer
+              validates the same field id, sharing that same context
+              (this is what drf-writable-nested does: it rebuilds a fresh
+              serializer -- and fresh field instances -- per item while
+              matching existing vs. new instances during save())
+        THEN:
+            - No additional query is issued to resolve the CustomField
+        """
+        custom_field = CustomField.objects.create(
+            name="Test Custom Field",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+
+        context: dict = {}
+        first_pass = CustomFieldInstanceSerializer(
+            data={"field": custom_field.id, "value": "a"},
+            context=context,
+        )
+        self.assertTrue(first_pass.is_valid(), first_pass.errors)
+
+        second_pass = CustomFieldInstanceSerializer(
+            data={"field": custom_field.id, "value": "b"},
+            context=context,
+        )
+        with CaptureQueriesContext(connection) as ctx:
+            self.assertTrue(second_pass.is_valid(), second_pass.errors)
+
+        custom_field_lookups = [
+            query
+            for query in ctx.captured_queries
+            if 'FROM "documents_customfield" WHERE "documents_customfield"."id"'
+            in query["sql"]
+        ]
+        self.assertEqual(
+            len(custom_field_lookups),
+            0,
+            "Expected the second, separately-instantiated serializer to reuse "
+            f"the already-resolved CustomField, got: {custom_field_lookups}",
+        )
+
+    def test_custom_field_validation_rejects_malformed_field_value(self) -> None:
+        """
+        GIVEN:
+            - A document is being validated with a malformed custom_fields
+              entry whose "field" value is neither a valid CustomField id
+              nor a type DRF's own PrimaryKeyRelatedField can safely reject
+              on its own (unhashable, or a non-numeric scalar)
+        WHEN:
+            - The serializer is validated
+        THEN:
+            - A normal validation error is raised, not an unhandled
+              TypeError/ValueError escaping past DRF's validation layer
+        """
+        doc = DocumentFactory(mime_type="application/pdf")
+
+        bad_field_values = {
+            "unhashable-list": [],
+            "unhashable-dict": {},
+            "non-numeric-scalar": "abc",
+        }
+        for case_id, bad_field_value in bad_field_values.items():
+            with self.subTest(case_id):
+                serializer = DocumentSerializer(
+                    doc,
+                    data={
+                        "custom_fields": [
+                            {"field": bad_field_value, "value": "test value"},
+                        ],
+                    },
+                    partial=True,
+                )
+
+                self.assertFalse(serializer.is_valid())
+                self.assertIn("custom_fields", serializer.errors)
 
     def test_change_custom_field_instance_value(self) -> None:
         """
