@@ -641,7 +641,8 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         with self.assertRaises(Permission.DoesNotExist):
             set_permissions_for_objects(
                 {"not_a_real_action": {"users": [self.user1.id], "groups": []}},
-                [self.doc1],
+                Document,
+                [self.doc1.pk],
             )
 
     @mock.patch("documents.models.Document.delete")

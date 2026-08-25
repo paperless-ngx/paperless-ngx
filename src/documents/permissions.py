@@ -197,6 +197,13 @@ def _resolve_permissions(codenames: set[str], ctype: ContentType) -> list[Permis
     return permission_objs
 
 
+# Target number of permission rows to build in Python before handing them to
+# bulk_create -- keeps peak memory bounded for a large "apply to all" call,
+# independent of bulk_create's own batch_size (which only caps the size of
+# each INSERT statement, not how many row objects exist in memory at once).
+_PERMISSION_ROW_CHUNK_SIZE = 5000
+
+
 def _apply_bulk_permission_entry(
     *,
     perm_model: type[UserObjectPermission] | type[GroupObjectPermission],
@@ -209,10 +216,14 @@ def _apply_bulk_permission_entry(
     object_pks: list[str],
     merge: bool,
 ) -> None:
-    identities_to_add = list(identity_model.objects.filter(id__in=ids))
+    # Only the ids are needed to build permission rows (via `<field>_id=`),
+    # so avoid fetching full User/Group rows for identities that may not
+    # even end up being granted anything new.
+    add_ids = set(
+        identity_model.objects.filter(id__in=ids).values_list("id", flat=True),
+    )
 
     if not merge:
-        add_ids = {identity.id for identity in identities_to_add}
         existing_ids = set(
             perm_model.objects.filter(
                 content_type=ctype,
@@ -229,17 +240,23 @@ def _apply_bulk_permission_entry(
                 **{f"{identity_field}_id__in": remove_ids},
             ).delete()
 
-    if identities_to_add:
+    if not add_ids:
+        return
+
+    rows_per_pk = len(permission_objs) * len(add_ids)
+    pks_per_chunk = max(1, _PERMISSION_ROW_CHUNK_SIZE // rows_per_pk)
+    for start in range(0, len(object_pks), pks_per_chunk):
+        pk_chunk = object_pks[start : start + pks_per_chunk]
         rows = [
             perm_model(
                 content_type=ctype,
                 object_pk=pk,
                 permission=permission_obj,
-                **{identity_field: identity},
+                **{f"{identity_field}_id": identity_id},
             )
             for permission_obj in permission_objs
-            for pk in object_pks
-            for identity in identities_to_add
+            for pk in pk_chunk
+            for identity_id in add_ids
         ]
         # ignore_conflicts skips only rows that already exist as an exact
         # (identity, permission, object) match -- the same de-dup the
@@ -247,19 +264,25 @@ def _apply_bulk_permission_entry(
         # already enforces for the single-object assign_perm() this
         # replaces, so it doesn't change what counts as "already granted".
         # batch_size caps how many rows go into a single INSERT so a huge
-        # "apply to all" call doesn't build one enormous statement.
+        # chunk doesn't build one enormous statement.
         perm_model.objects.bulk_create(rows, ignore_conflicts=True, batch_size=1000)
 
 
 def set_permissions_for_objects(
     permissions: dict,
-    objects: QuerySet | list,
+    model: type[Model],
+    pks: QuerySet | list,
     *,
     merge: bool = False,
 ) -> None:
     """
     Bulk equivalent of set_permissions_for_object: applies the same
-    permission changes to every object in `objects` at once.
+    permission changes to every object identified by `pks` at once.
+
+    Takes a model + pks (rather than model instances) deliberately -- the
+    permission rows built below only ever need `pk`, `content_type`, and
+    identity ids, so callers shouldn't have to fetch full rows (with every
+    other field) just to hand them to this function.
 
     Deliberately does not use guardian's queryset/list-aware assign_perm:
     passing a list as the object routes to bulk_assign_perm, which skips
@@ -276,14 +299,12 @@ def set_permissions_for_objects(
     and every identity into one query per action, rather than one query per
     (object, user) pair.
     """
-    objects = list(objects)
-    if not objects:
+    object_pks = [str(pk) for pk in pks]
+    if not object_pks:
         return
 
-    model = objects[0].__class__
     model_name = model.__name__.lower()
     ctype = ContentType.objects.get_for_model(model)
-    object_pks = [str(obj.pk) for obj in objects]
 
     for action, entry in permissions.items():
         codename = f"{action}_{model_name}"
