@@ -795,6 +795,72 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         assert _cf_4 is not None
         self.assertEqual(_cf_4.value, date_value)
 
+    def test_delete_custom_field_instance_is_hard_deleted_not_soft_deleted(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A document has two custom field instances
+        WHEN:
+            - A PATCH request updates custom_fields to omit one of them
+        THEN:
+            - The omitted instance is immediately hard-deleted: it is gone
+              from both the default manager and the soft-deleted manager,
+              not left in a soft-deleted, not-yet-purged state
+        """
+        doc = Document.objects.create(
+            title="WOW",
+            content="the content",
+            checksum="123-hard-delete",
+            mime_type="application/pdf",
+        )
+        kept_field = CustomField.objects.create(
+            name="Kept Field",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        removed_field = CustomField.objects.create(
+            name="Removed Field",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+
+        resp = self.client.patch(
+            f"/api/documents/{doc.id}/",
+            data={
+                "custom_fields": [
+                    {"field": kept_field.id, "value": "keep me"},
+                    {"field": removed_field.id, "value": "remove me"},
+                ],
+            },
+            format="json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(CustomFieldInstance.objects.count(), 2)
+
+        resp = self.client.patch(
+            f"/api/documents/{doc.id}/",
+            data={
+                "custom_fields": [
+                    {"field": kept_field.id, "value": "keep me"},
+                ],
+            },
+            format="json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(CustomFieldInstance.objects.count(), 1)
+        self.assertEqual(
+            CustomFieldInstance.deleted_objects.filter(field=removed_field).count(),
+            0,
+            "Removed custom field instance should be hard-deleted, not left "
+            "soft-deleted",
+        )
+        self.assertEqual(
+            CustomFieldInstance.global_objects.filter(field=removed_field).count(),
+            0,
+            "Removed custom field instance should not exist at all, even in "
+            "the all-rows manager",
+        )
+
     def test_custom_field_validation(self) -> None:
         """
         GIVEN:
