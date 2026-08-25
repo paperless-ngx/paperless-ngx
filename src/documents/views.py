@@ -180,7 +180,7 @@ from documents.permissions import has_perms_owner_aware
 from documents.permissions import has_system_status_permission
 from documents.permissions import permitted_document_ids
 from documents.permissions import permitted_object_ids
-from documents.permissions import set_permissions_for_object
+from documents.permissions import set_permissions_for_objects
 from documents.permissions import user_is_unrestricted
 from documents.plugins.date_parsing import get_date_parser
 from documents.schema import generate_object_with_permissions_schema
@@ -5019,12 +5019,11 @@ class BulkEditObjectsView(PassUserMixin):
                     qs_owner_update.update(owner=owner)
 
                 if "permissions" in serializer.validated_data:
-                    for obj in qs:
-                        set_permissions_for_object(
-                            permissions=permissions,
-                            object=obj,
-                            merge=merge,
-                        )
+                    set_permissions_for_objects(
+                        permissions=permissions,
+                        objects=qs,
+                        merge=merge,
+                    )
 
             except Exception as e:
                 logger.warning(
