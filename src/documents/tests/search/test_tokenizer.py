@@ -7,8 +7,8 @@ import pytest
 import tantivy
 
 from documents.search._tokenizer import _bigram_analyzer
-from documents.search._tokenizer import _paperless_text
 from documents.search._tokenizer import _simple_search_analyzer
+from documents.search._tokenizer import paperless_text_analyzer
 from documents.search._tokenizer import register_tokenizers
 
 if TYPE_CHECKING:
@@ -25,7 +25,7 @@ class TestTokenizers:
         sb.add_text_field("content", stored=True, tokenizer_name="paperless_text")
         schema = sb.build()
         idx = tantivy.Index(schema, path=None)
-        idx.register_tokenizer("paperless_text", _paperless_text(""))
+        idx.register_tokenizer("paperless_text", paperless_text_analyzer(""))
         return idx
 
     @pytest.fixture

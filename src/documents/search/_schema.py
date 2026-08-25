@@ -1,14 +1,19 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import shutil
 from typing import TYPE_CHECKING
 from typing import Final
+from typing import NamedTuple
 from typing import cast
 
 import tantivy
 from django.conf import settings
+from whoosh_compat import FieldKind
+
+from documents.search._fields import PUBLIC_FIELDS
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -16,7 +21,201 @@ if TYPE_CHECKING:
 logger = logging.getLogger("paperless.search")
 
 # v1 - Initial tantivy schema format
-SCHEMA_VERSION: Final[int] = 1
+# v2 - build_schema() derived from PUBLIC_FIELDS, changing the field declaration
+#      order, and the write-only correspondent/document_type/storage_path/tag id
+#      columns dropped. tantivy compares schemas by ordered field list, so an
+#      index built by v1 rejects every write against the v2 schema.
+SCHEMA_VERSION: Final[int] = 2
+
+
+class FieldDescriptor(NamedTuple):
+    """One tantivy field, in declaration order.
+
+    The descriptor vocabulary is paperless', not tantivy-py's: it is both the
+    input to the SchemaBuilder and the input to schema_fingerprint(), so the
+    persisted fingerprint cannot move under a tantivy-py upgrade.
+    """
+
+    name: str
+    kind: str
+    stored: bool
+    indexed: bool
+    fast: bool
+    tokenizer: str | None
+
+
+def _public_field_descriptors() -> list[FieldDescriptor]:
+    """Descriptors for the query-visible fields declared in PUBLIC_FIELDS."""
+    descriptors: list[FieldDescriptor] = []
+    for field in PUBLIC_FIELDS:
+        if field.kind is FieldKind.TEXT:
+            descriptors.append(
+                FieldDescriptor(
+                    field.name,
+                    "text",
+                    stored=True,
+                    indexed=True,
+                    fast=False,
+                    tokenizer="paperless_text",
+                ),
+            )
+        elif field.kind is FieldKind.KEYWORD:
+            descriptors.append(
+                FieldDescriptor(
+                    field.name,
+                    "text",
+                    stored=True,
+                    indexed=True,
+                    fast=False,
+                    tokenizer="raw",
+                ),
+            )
+        elif field.kind is FieldKind.U64:
+            descriptors.append(
+                FieldDescriptor(
+                    field.name,
+                    "u64",
+                    stored=True,
+                    indexed=True,
+                    fast=field.fast,
+                    tokenizer=None,
+                ),
+            )
+        elif field.kind in (FieldKind.DATE, FieldKind.DATETIME):
+            descriptors.append(
+                FieldDescriptor(
+                    field.name,
+                    "date",
+                    stored=True,
+                    indexed=True,
+                    fast=field.fast,
+                    tokenizer=None,
+                ),
+            )
+        elif field.kind is FieldKind.JSON:
+            descriptors.append(
+                FieldDescriptor(
+                    field.name,
+                    "json",
+                    stored=True,
+                    indexed=True,
+                    fast=False,
+                    tokenizer="paperless_text",
+                ),
+            )
+            if field.name == "notes":
+                # Plain-text companion for snippet generation — tantivy's
+                # SnippetGenerator does not support JSON fields. Schema-only,
+                # no query-syntax meaning, not in PUBLIC_FIELDS.
+                descriptors.append(
+                    FieldDescriptor(
+                        "notes_text",
+                        "text",
+                        stored=True,
+                        indexed=True,
+                        fast=False,
+                        tokenizer="paperless_text",
+                    ),
+                )
+    return descriptors
+
+
+def field_descriptors() -> list[FieldDescriptor]:
+    """Every field of the document index, in the order tantivy declares them.
+
+    tantivy compares schemas by *ordered* field list, so the order here is
+    part of the on-disk contract: schema_fingerprint() hashes it and
+    needs_rebuild() acts on the result.
+    """
+    return [
+        FieldDescriptor(
+            "id",
+            "u64",
+            stored=True,
+            indexed=True,
+            fast=True,
+            tokenizer=None,
+        ),
+        *_public_field_descriptors(),
+        # Shadow sort fields - fast, not stored
+        *(
+            FieldDescriptor(
+                name,
+                "text",
+                stored=False,
+                indexed=True,
+                fast=True,
+                tokenizer="simple_analyzer",
+            )
+            for name in ("title_sort", "correspondent_sort", "type_sort")
+        ),
+        # CJK support - not stored, indexed only
+        *(
+            FieldDescriptor(
+                name,
+                "text",
+                stored=False,
+                indexed=True,
+                fast=False,
+                tokenizer="bigram_analyzer",
+            )
+            for name in (
+                "bigram_content",
+                "bigram_title",
+                "bigram_correspondent",
+                "bigram_document_type",
+                "bigram_tag",
+            )
+        ),
+        # Simple substring search support for title/content - not stored,
+        # indexed only
+        *(
+            FieldDescriptor(
+                name,
+                "text",
+                stored=False,
+                indexed=True,
+                fast=False,
+                tokenizer="simple_search_analyzer",
+            )
+            for name in ("simple_title", "simple_content")
+        ),
+        # Autocomplete prefix scan via terms_with_prefix, which walks the
+        # field's term dictionary - so the field must be indexed (term dict),
+        # not stored. The stored value is never read back, so storing it only
+        # wastes space.
+        FieldDescriptor(
+            "autocomplete_word",
+            "text",
+            stored=False,
+            indexed=True,
+            fast=False,
+            tokenizer="raw",
+        ),
+        # Permission filter columns, read by build_permission_filter.
+        *(
+            FieldDescriptor(
+                name,
+                "u64",
+                stored=False,
+                indexed=True,
+                fast=True,
+                tokenizer=None,
+            )
+            for name in ("owner_id", "viewer_id", "viewer_group_id")
+        ),
+    ]
+
+
+def schema_fingerprint() -> str:
+    """Hash of the field descriptors, stamped into .index_settings.json.
+
+    Changes whenever a field is added, removed, retyped, re-optioned or
+    reordered, so an index built from a different schema shape is detected
+    even when SCHEMA_VERSION was not bumped.
+    """
+    payload = json.dumps([list(descriptor) for descriptor in field_descriptors()])
+    return hashlib.blake2b(payload.encode()).hexdigest()
 
 
 def build_schema() -> tantivy.Schema:
@@ -32,85 +231,37 @@ def build_schema() -> tantivy.Schema:
     """
     sb = tantivy.SchemaBuilder()
 
-    sb.add_unsigned_field("id", stored=True, indexed=True, fast=True)
-    sb.add_text_field("checksum", stored=True, tokenizer_name="raw")
-
-    for field in (
-        "title",
-        "correspondent",
-        "document_type",
-        "storage_path",
-        "original_filename",
-        "content",
-    ):
-        sb.add_text_field(field, stored=True, tokenizer_name="paperless_text")
-
-    # Shadow sort fields - fast, not stored/indexed
-    for field in ("title_sort", "correspondent_sort", "type_sort"):
-        sb.add_text_field(
-            field,
-            stored=False,
-            tokenizer_name="simple_analyzer",
-            fast=True,
-        )
-
-    # CJK support - not stored, indexed only
-    sb.add_text_field("bigram_content", stored=False, tokenizer_name="bigram_analyzer")
-    sb.add_text_field("bigram_title", stored=False, tokenizer_name="bigram_analyzer")
-    sb.add_text_field(
-        "bigram_correspondent",
-        stored=False,
-        tokenizer_name="bigram_analyzer",
-    )
-    sb.add_text_field(
-        "bigram_document_type",
-        stored=False,
-        tokenizer_name="bigram_analyzer",
-    )
-    sb.add_text_field("bigram_tag", stored=False, tokenizer_name="bigram_analyzer")
-
-    # Simple substring search support for title/content - not stored, indexed only
-    sb.add_text_field(
-        "simple_title",
-        stored=False,
-        tokenizer_name="simple_search_analyzer",
-    )
-    sb.add_text_field(
-        "simple_content",
-        stored=False,
-        tokenizer_name="simple_search_analyzer",
-    )
-
-    # Autocomplete prefix scan via terms_with_prefix, which walks the field's
-    # term dictionary - so the field must be indexed (term dict), not stored.
-    # The stored value is never read back, so storing it only wastes space.
-    sb.add_text_field("autocomplete_word", stored=False, tokenizer_name="raw")
-
-    sb.add_text_field("tag", stored=True, tokenizer_name="paperless_text")
-
-    # JSON fields — structured queries: notes.user:alice, custom_fields.name:invoice
-    sb.add_json_field("notes", stored=True, tokenizer_name="paperless_text")
-    # Plain-text companion for notes — tantivy's SnippetGenerator does not support
-    # JSON fields, so highlights require a text field with the same content.
-    sb.add_text_field("notes_text", stored=True, tokenizer_name="paperless_text")
-    sb.add_json_field("custom_fields", stored=True, tokenizer_name="paperless_text")
-
-    for field in (
-        "correspondent_id",
-        "document_type_id",
-        "storage_path_id",
-        "tag_id",
-        "owner_id",
-        "viewer_id",
-        "viewer_group_id",
-    ):
-        sb.add_unsigned_field(field, stored=False, indexed=True, fast=True)
-
-    for field in ("created", "modified", "added"):
-        sb.add_date_field(field, stored=True, indexed=True, fast=True)
-
-    for field in ("asn", "page_count", "num_notes"):
-        sb.add_unsigned_field(field, stored=True, indexed=True, fast=True)
+    for descriptor in field_descriptors():
+        if descriptor.kind == "text":
+            sb.add_text_field(
+                descriptor.name,
+                stored=descriptor.stored,
+                fast=descriptor.fast,
+                tokenizer_name=cast("str", descriptor.tokenizer),
+            )
+        elif descriptor.kind == "json":
+            sb.add_json_field(
+                descriptor.name,
+                stored=descriptor.stored,
+                fast=descriptor.fast,
+                tokenizer_name=cast("str", descriptor.tokenizer),
+            )
+        elif descriptor.kind == "u64":
+            sb.add_unsigned_field(
+                descriptor.name,
+                stored=descriptor.stored,
+                indexed=descriptor.indexed,
+                fast=descriptor.fast,
+            )
+        elif descriptor.kind == "date":
+            sb.add_date_field(
+                descriptor.name,
+                stored=descriptor.stored,
+                indexed=descriptor.indexed,
+                fast=descriptor.fast,
+            )
+        else:
+            raise ValueError(f"Unknown schema field kind: {descriptor.kind}")
 
     return sb.build()
 
@@ -119,9 +270,9 @@ def needs_rebuild(index_dir: Path) -> bool:
     """
     Check if the search index needs rebuilding.
 
-    Reads .index_settings.json to compare the stored schema version and
-    search language against the current configuration. Returns True if the
-    file is missing, unparsable, or either value mismatches.
+    Reads .index_settings.json to compare the stored schema version, search
+    language and schema fingerprint against the current configuration. Returns
+    True if the file is missing, unparsable, or any value mismatches.
 
     Args:
         index_dir: Path to the search index directory
@@ -139,6 +290,9 @@ def needs_rebuild(index_dir: Path) -> bool:
             return True
         if "language" not in data or data["language"] != settings.SEARCH_LANGUAGE:
             logger.info("Search index language changed - rebuilding.")
+            return True
+        if data.get("schema_fingerprint") != schema_fingerprint():
+            logger.info("Search index schema fingerprint mismatch - rebuilding.")
             return True
     except ValueError:
         return True
@@ -170,6 +324,7 @@ def _write_sentinels(index_dir: Path) -> None:
             {
                 "schema_version": SCHEMA_VERSION,
                 "language": settings.SEARCH_LANGUAGE,
+                "schema_fingerprint": schema_fingerprint(),
             },
         ),
     )
