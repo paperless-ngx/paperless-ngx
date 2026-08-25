@@ -886,6 +886,19 @@ Matching documents with logical expressions:
 
 ```
 shopname AND (product1 OR product2)
+invoice NOT draft
+```
+
+`AND`, `OR` and `NOT` must be written in capitals, and parentheses group sub-expressions. Terms written next to each other with no operator between them are combined with `AND`.
+
+!!! warning
+
+    A leading `-` does **not** exclude a term. Separators are stripped during indexing, so `invoice -secret` searches for `invoice` and `secret`, which is the opposite of what you probably intended. Use `NOT` to exclude a term: `invoice NOT secret`.
+
+Matching an exact phrase, in order, by quoting it:
+
+```
+"quick brown fox"
 ```
 
 Matching specific tags, correspondents or types:
@@ -893,7 +906,11 @@ Matching specific tags, correspondents or types:
 ```
 type:invoice tag:unpaid
 correspondent:university certificate
+tag:bills,unpaid
 ```
+
+- `document_type` may be abbreviated to `type`, and `storage_path` to `path`.
+- A comma-separated list after `tag:` requires **all** of the listed tags, so `tag:bills,unpaid` matches only documents tagged both `bills` and `unpaid`.
 
 Matching dates:
 
@@ -903,13 +920,57 @@ added:yesterday
 modified:today
 ```
 
+Matching by archive metadata:
+
+```
+asn:100
+page_count:12
+num_notes:0
+checksum:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
+original_filename:invoice.pdf
+```
+
+- `asn` matches a document's Archive Serial Number.
+- `page_count` matches a document's page count.
+- `num_notes` matches how many notes a document has.
+- `checksum` matches the checksum of the original document file (not the archived/processed version). Unlike the text fields, this one is stored verbatim rather than tokenized, so only a complete, lowercase checksum matches. To search by the first few characters instead, use a wildcard: `checksum:9f86d081*`. Wildcard patterns on the text fields are also tried stemmed, to line up with the stemmed index, but `checksum` is indexed without stemming, so its patterns are not stemmed either: a wildcard prefix is matched literally, apart from being lowercased first. `checksum:9F86D081*` therefore does find the document, even though the plain uppercase term does not.
+- `original_filename` matches the filename of the document as originally consumed.
+
+`asn`, `page_count` and `num_notes` are numeric and also accept ranges, for example `asn:[50 to 150]`.
+
 Matching inexact words:
 
 ```
-produ*name
+invoice*
+title:Invoice*
 ```
 
+Wildcards are matched against the _stemmed_ terms stored in the index, not
+against the words as they appear in the document. Each literal part of a
+pattern is tried both as you typed it and in its stemmed form, so a trailing
+`*` matches a word and its inflections (`invoice*` finds "invoice", "invoices"
+and "invoiced") as well as longer words whose stored term still begins with
+what you typed (`copy*` finds "copyright" alongside "copy" and "copies").
+
+It is still not a plain prefix search over the original text. A trailing `*`
+matches a stored term when either the run you typed or its stemmed form is a
+prefix of that term, so a fragment that stops part-way between the two matches
+neither: `universities*` finds "university" and "universities", which are both
+stored as `univers`, while the shorter `universit*` finds nothing at all. For
+the same reason `happine*` does not find "happiness", which is stored as
+`happi`. And a pattern that requires letters after the wildcard which stemming
+has removed cannot match either: `productname` is stored as `productnam`, so
+`produ*name` finds nothing.
+
 Matching natural date keywords:
+
+The multi-word date keywords listed below work quoted or unquoted after a
+date field (`added:"previous month"` and `added:previous month` are
+equivalent); elsewhere in a query the same words are treated as ordinary
+search text. Other date expressions the parser accepts (relative offsets
+like `-1 week`, or specific dates like `12 december 2019`) must be quoted when
+they stand alone as a value; inside a range's brackets they work unquoted, as
+in `added:[-1 week to now]`.
 
 ```
 added:today
@@ -922,6 +983,30 @@ modified:"this year"
 Supported date keywords: `today`, `yesterday`, `previous week`,
 `this month`, `previous month`, `this year`, `previous year`,
 `previous quarter`.
+
+These other date forms also work after a date field:
+
+```
+added:tomorrow
+created:2005-03-04
+added:january
+modified:"next monday"
+added:"last monday"
+added:"2005-01-01T00:00:00Z"
+created:[2005-01-01 to 2005-01-31]
+added:[2005-06-15T09:00:00Z to 2005-06-15T17:00:00Z]
+```
+
+- `tomorrow`, like `today` and `yesterday`, covers that whole day.
+- An ISO date such as `2005-03-04` covers that whole day, and `2005-01` covers that whole month.
+- A month name such as `january` covers that whole month in the current year.
+- `next <weekday>` and `last <weekday>` each cover that whole day and must be quoted. A bare weekday name such as `monday` is not accepted.
+- A full timestamp such as `2005-01-01T00:00:00Z` matches that exact instant. Like the other expressions above, it has to be quoted when it stands on its own: `added:"2005-01-01T00:00:00Z"`. The unquoted spelling is rejected with an error rather than searched, because only part of it can be read as a date.
+- A range takes two of the above as its bounds, for example `created:[2005 to 2009]` or `added:[2005-01-01 to 2005-01-31]`. Bounds may carry a time of day. A bound is normally written without quotes; if you do quote one, use single quotes (`added:['-1 week' to now]`), because a double-quoted bound is rejected with an error.
+
+!!! warning
+
+    As a value on its own, `now`, `noon`, `midnight` and relative offsets such as `"-3 days"` or `"-1 week"` are accepted by the parser but resolve to a single instant rather than to a span of time, so they match only a document whose timestamp is exactly that instant, which in practice means no documents at all. Quoting does not change this. As a *range bound* they are the opposite of a trap and are what you want: `added:['-1 week' to now]` covers the whole of the last seven days. Spellings like `now-3days` and `"3 days ago"` are rejected outright wherever they appear.
 
 #### Searching custom fields
 
@@ -938,6 +1023,7 @@ custom_fields.name:Insurance custom_fields.value:policy
 - `custom_fields.value` matches against the value of any custom field.
 - `custom_fields.name` matches the name of the field (use quotes for multi-word names).
 - Combine both to find documents where a specific named field contains a specific value.
+- The bare `custom_fields:` prefix is shorthand for `custom_fields.value:`.
 
 Because separators are stripped during indexing, individual parts of formatted
 codes are searchable on their own. A value stored as `A-1312/99.50` produces the
@@ -965,9 +1051,9 @@ notes.note:reminder
 notes.user:alice notes.note:insurance
 ```
 
-All of these constructs can be combined as you see fit. If you want to
-learn more about the query language used by paperless, see the
-[Tantivy query language documentation](https://docs.rs/tantivy/latest/tantivy/query/struct.QueryParser.html).
+The bare `notes:` prefix is shorthand for `notes.note:`.
+
+All of these constructs can be combined as you see fit. What is described above is the whole of the query language paperless supports. It resembles other search query languages without being identical to any of them, so a construct that is not documented here is most likely treated as ordinary search text rather than as syntax, and an unrecognized field name is searched as text too.
 
 !!! note
 

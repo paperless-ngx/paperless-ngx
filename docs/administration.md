@@ -521,7 +521,8 @@ Pass `--recreate` to wipe the existing index before rebuilding. Use this when th
 index is corrupted or you want a fully clean rebuild.
 
 Pass `--if-needed` to skip the rebuild if the index is already up to date (schema
-version and search language match). Safe to run on every startup or upgrade.
+version, schema fingerprint and search language all match). Safe to run on every
+startup or upgrade.
 
 Specify `optimize` to optimize the index. This command is regularly invoked by the
 task scheduler.

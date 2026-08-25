@@ -115,3 +115,6 @@ celerybeat-schedule*
 
 # Git worktree local folder
 .worktrees
+
+# Agent workflow scratch (ledgers, briefs, review packages)
+.superpowers/
