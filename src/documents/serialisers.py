@@ -39,7 +39,6 @@ from django.utils.timezone import make_aware
 from django.utils.translation import gettext as _
 from drf_spectacular.utils import extend_schema_field
 from drf_spectacular.utils import extend_schema_serializer
-from drf_writable_nested.serializers import NestedUpdateMixin
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_users_with_perms
 from guardian.utils import get_group_obj_perms_model
@@ -1223,7 +1222,6 @@ class DocumentVersionInfoSerializer(serializers.Serializer[_DocumentVersionInfo]
 )
 class DocumentSerializer(
     OwnedObjectSerializer,
-    NestedUpdateMixin,
     DocumentUpdateFieldsModelSerializer,
 ):
     correspondent = CorrespondentField(allow_null=True)
@@ -1438,15 +1436,59 @@ class DocumentSerializer(
                     if tag not in inbox_tags_not_being_added
                 ]
 
+        custom_fields_data = validated_data.pop("custom_fields", None)
+
         if settings.AUDIT_LOG_ENABLED:
             with set_actor(self.user):
                 super().update(instance, validated_data)
+                if custom_fields_data is not None:
+                    self._sync_custom_fields(instance, custom_fields_data)
         else:
             super().update(instance, validated_data)
+            if custom_fields_data is not None:
+                self._sync_custom_fields(instance, custom_fields_data)
 
-        # hard delete custom field instances that were soft deleted
-        CustomFieldInstance.deleted_objects.filter(document=instance).delete()
         return instance
+
+    def _sync_custom_fields(
+        self,
+        instance: Document,
+        custom_fields_data: list[dict],
+    ) -> None:
+        """
+        Create/update a CustomFieldInstance for every (field, value) pair in
+        custom_fields_data, then hard-delete any of the document's existing
+        instances whose field wasn't included.
+
+        Replaces drf-writable-nested's generic
+        update_or_create_reverse_relations()/delete_reverse_relations_if_need():
+        that machinery always matched submitted items by an instance "id"
+        this client payload never sends, so its own pk-matching never did
+        anything for this field -- the real upsert semantics were always
+        CustomFieldInstanceSerializer.create()'s update_or_create() below.
+
+        On a partial (PATCH) update, DRF skips the "value" field's required
+        check on the first validation pass because it's absent entirely from
+        the payload item, not merely null. drf-writable-nested happened to
+        re-enforce that check itself, by re-validating each item against a
+        freshly built, non-partial child serializer before saving. Reproduce
+        that specific guarantee explicitly here, since CustomFieldInstance's
+        "value" is not optional.
+        """
+        for item in custom_fields_data:
+            if "value" not in item:
+                raise serializers.ValidationError(
+                    {"custom_fields": [{"value": ["This field is required."]}]},
+                )
+
+        kept_field_ids: set[int] = set()
+        serializer = CustomFieldInstanceSerializer()
+        for item in custom_fields_data:
+            kept_field_ids.add(item["field"].pk)
+            serializer.create({**item, "document": instance})
+        CustomFieldInstance.objects.filter(document=instance).exclude(
+            field_id__in=kept_field_ids,
+        ).hard_delete()
 
     def __init__(self, *args, **kwargs) -> None:
         self.truncate_content = kwargs.pop("truncate_content", False)
