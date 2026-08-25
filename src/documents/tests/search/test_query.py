@@ -1,448 +1,96 @@
 from __future__ import annotations
 
-import re
 from datetime import UTC
 from datetime import datetime
-from datetime import tzinfo
 from typing import TYPE_CHECKING
-from zoneinfo import ZoneInfo
 
 import pytest
 import tantivy
 import time_machine
 
-from documents.search._dates import _date_only_range
-from documents.search._dates import _datetime_range
-from documents.search._query import build_permission_filter
+from documents.search._backend import build_permission_filter
+from documents.search._errors import InvalidDateQuery
+from documents.search._errors import InvalidNumberQuery
+from documents.search._errors import MultipleSearchQueryErrors
+from documents.search._errors import SearchQueryError
 from documents.search._query import parse_simple_text_highlight_query
 from documents.search._query import parse_user_query
 from documents.search._schema import build_schema
 from documents.search._tokenizer import register_tokenizers
-from documents.search._translate import InvalidDateQuery
-from documents.search._translate import translate_query
 
 if TYPE_CHECKING:
     from django.contrib.auth.base_user import AbstractBaseUser
 
 pytestmark = pytest.mark.search
 
-EASTERN = ZoneInfo("America/New_York")  # UTC-5 / UTC-4 (DST)
-AUCKLAND = ZoneInfo("Pacific/Auckland")  # UTC+13 in southern-hemisphere summer
+
+@pytest.fixture(scope="module")
+def query_index() -> tantivy.Index:
+    """An in-memory, unstemmed index shared read-only across this module's
+    parse-only tests (none of them index documents)."""
+    schema = build_schema()
+    idx = tantivy.Index(schema, path=None)
+    register_tokenizers(idx, "")
+    return idx
 
 
-def _range(result: str, field: str) -> tuple[str, str]:
-    # Half-open period ranges close with "}" (exclusive); exact-instant ranges
-    # (full ISO datetimes, "now", relative offsets) close with "]" (inclusive).
-    m = re.search(rf"{field}:\[(.+?) TO (.+?)[\]}}]", result)
-    assert m, f"No range for {field!r} in: {result!r}"
-    return m.group(1), m.group(2)
+@pytest.fixture(scope="module")
+def populated_index() -> tantivy.Index:
+    """An index holding one document, so a query matching nothing is
+    distinguishable from one matching everything."""
+    idx = tantivy.Index(build_schema(), path=None)
+    register_tokenizers(idx, "")
+    writer = idx.writer()
+    doc = tantivy.Document()
+    doc.add_unsigned("id", 1)
+    doc.add_text("content", "needle in indexed content")
+    writer.add_document(doc)
+    writer.commit()
+    idx.reload()
+    return idx
 
 
-class TestCreatedDateField:
-    """
-    created is a Django DateField: indexed as midnight UTC of the local calendar
-    date. No offset arithmetic needed - the local calendar date is what matters.
-    """
-
-    @pytest.mark.parametrize(
-        ("tz", "expected_lo", "expected_hi"),
-        [
-            pytest.param(UTC, "2026-03-28T00:00:00Z", "2026-03-29T00:00:00Z", id="utc"),
-            pytest.param(
-                EASTERN,
-                "2026-03-28T00:00:00Z",
-                "2026-03-29T00:00:00Z",
-                id="eastern_same_calendar_date",
-            ),
-        ],
-    )
-    @time_machine.travel(datetime(2026, 3, 28, 15, 30, tzinfo=UTC), tick=False)
-    def test_today(self, tz: tzinfo, expected_lo: str, expected_hi: str) -> None:
-        lo, hi = _range(translate_query("created:today", tz), "created")
-        assert lo == expected_lo
-        assert hi == expected_hi
-
-    @time_machine.travel(datetime(2026, 3, 28, 3, 0, tzinfo=UTC), tick=False)
-    def test_today_auckland_ahead_of_utc(self) -> None:
-        # UTC 03:00 -> Auckland (UTC+13) = 16:00 same date; local date = 2026-03-28
-        lo, _ = _range(
-            translate_query("created:today", AUCKLAND),
-            "created",
-        )
-        assert lo == "2026-03-28T00:00:00Z"
-
-    @pytest.mark.parametrize(
-        ("field", "keyword", "expected_lo", "expected_hi"),
-        [
-            pytest.param(
-                "created",
-                "yesterday",
-                "2026-03-27T00:00:00Z",
-                "2026-03-28T00:00:00Z",
-                id="yesterday",
-            ),
-            pytest.param(
-                "created",
-                "previous week",
-                "2026-03-16T00:00:00Z",
-                "2026-03-23T00:00:00Z",
-                id="previous_week",
-            ),
-            pytest.param(
-                "created",
-                "this month",
-                "2026-03-01T00:00:00Z",
-                "2026-04-01T00:00:00Z",
-                id="this_month",
-            ),
-            pytest.param(
-                "created",
-                "previous month",
-                "2026-02-01T00:00:00Z",
-                "2026-03-01T00:00:00Z",
-                id="previous_month",
-            ),
-            pytest.param(
-                "created",
-                "this year",
-                "2026-01-01T00:00:00Z",
-                "2027-01-01T00:00:00Z",
-                id="this_year",
-            ),
-            pytest.param(
-                "created",
-                "previous year",
-                "2025-01-01T00:00:00Z",
-                "2026-01-01T00:00:00Z",
-                id="previous_year",
-            ),
-        ],
-    )
-    @time_machine.travel(datetime(2026, 3, 28, 15, 0, tzinfo=UTC), tick=False)
-    def test_date_keywords(
-        self,
-        field: str,
-        keyword: str,
-        expected_lo: str,
-        expected_hi: str,
-    ) -> None:
-        # 2026-03-28 is Saturday; Mon-Sun week calculation built into expectations
-        query = f"{field}:{keyword}"
-        lo, hi = _range(translate_query(query, UTC), field)
-        assert lo == expected_lo
-        assert hi == expected_hi
-
-    @time_machine.travel(datetime(2026, 12, 15, 12, 0, tzinfo=UTC), tick=False)
-    def test_this_month_december_wraps_to_next_year(self) -> None:
-        # December: next month must roll over to January 1 of next year
-        lo, hi = _range(
-            translate_query("created:this month", UTC),
-            "created",
-        )
-        assert lo == "2026-12-01T00:00:00Z"
-        assert hi == "2027-01-01T00:00:00Z"
-
-    @time_machine.travel(datetime(2026, 1, 15, 12, 0, tzinfo=UTC), tick=False)
-    def test_last_month_january_wraps_to_previous_year(self) -> None:
-        # January: last month must roll back to December 1 of previous year
-        lo, hi = _range(
-            translate_query("created:previous month", UTC),
-            "created",
-        )
-        assert lo == "2025-12-01T00:00:00Z"
-        assert hi == "2026-01-01T00:00:00Z"
-
-    @time_machine.travel(datetime(2026, 7, 15, 12, 0, tzinfo=UTC), tick=False)
-    def test_previous_quarter(self) -> None:
-        lo, hi = _range(
-            translate_query('created:"previous quarter"', UTC),
-            "created",
-        )
-        assert lo == "2026-04-01T00:00:00Z"
-        assert hi == "2026-07-01T00:00:00Z"
-
-    def test_unknown_keyword_raises(self) -> None:
-        with pytest.raises(ValueError, match="Unknown keyword"):
-            _date_only_range("bogus_keyword", UTC)
-
-
-class TestDateTimeFields:
-    """
-    added/modified store full UTC datetimes. Natural keywords must convert
-    the local day boundaries to UTC - timezone offset arithmetic IS required.
-    """
-
-    @time_machine.travel(datetime(2026, 3, 28, 15, 30, tzinfo=UTC), tick=False)
-    def test_added_today_eastern(self) -> None:
-        # EDT = UTC-4; local midnight 2026-03-28 00:00 EDT = 2026-03-28 04:00 UTC
-        lo, hi = _range(translate_query("added:today", EASTERN), "added")
-        assert lo == "2026-03-28T04:00:00Z"
-        assert hi == "2026-03-29T04:00:00Z"
-
-    @time_machine.travel(datetime(2026, 3, 29, 2, 0, tzinfo=UTC), tick=False)
-    def test_added_today_auckland_midnight_crossing(self) -> None:
-        # UTC 02:00 on 2026-03-29 -> Auckland (UTC+13) = 2026-03-29 15:00 local
-        # Auckland midnight = UTC 2026-03-28 11:00
-        lo, hi = _range(translate_query("added:today", AUCKLAND), "added")
-        assert lo == "2026-03-28T11:00:00Z"
-        assert hi == "2026-03-29T11:00:00Z"
-
-    @time_machine.travel(datetime(2026, 3, 28, 15, 0, tzinfo=UTC), tick=False)
-    def test_modified_today_utc(self) -> None:
-        lo, hi = _range(
-            translate_query("modified:today", UTC),
-            "modified",
-        )
-        assert lo == "2026-03-28T00:00:00Z"
-        assert hi == "2026-03-29T00:00:00Z"
-
-    @pytest.mark.parametrize(
-        ("keyword", "expected_lo", "expected_hi"),
-        [
-            pytest.param(
-                "yesterday",
-                "2026-03-27T00:00:00Z",
-                "2026-03-28T00:00:00Z",
-                id="yesterday",
-            ),
-            pytest.param(
-                "previous week",
-                "2026-03-16T00:00:00Z",
-                "2026-03-23T00:00:00Z",
-                id="previous_week",
-            ),
-            pytest.param(
-                "this month",
-                "2026-03-01T00:00:00Z",
-                "2026-04-01T00:00:00Z",
-                id="this_month",
-            ),
-            pytest.param(
-                "previous month",
-                "2026-02-01T00:00:00Z",
-                "2026-03-01T00:00:00Z",
-                id="previous_month",
-            ),
-            pytest.param(
-                "this year",
-                "2026-01-01T00:00:00Z",
-                "2027-01-01T00:00:00Z",
-                id="this_year",
-            ),
-            pytest.param(
-                "previous year",
-                "2025-01-01T00:00:00Z",
-                "2026-01-01T00:00:00Z",
-                id="previous_year",
-            ),
-        ],
-    )
-    @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
-    def test_datetime_keywords_utc(
-        self,
-        keyword: str,
-        expected_lo: str,
-        expected_hi: str,
-    ) -> None:
-        # 2026-03-28 is Saturday; weekday()==5 so Monday=2026-03-23
-        lo, hi = _range(translate_query(f"added:{keyword}", UTC), "added")
-        assert lo == expected_lo
-        assert hi == expected_hi
-
-    @time_machine.travel(datetime(2026, 12, 15, 12, 0, tzinfo=UTC), tick=False)
-    def test_this_month_december_wraps_to_next_year(self) -> None:
-        # December: next month wraps to January of next year
-        lo, hi = _range(translate_query("added:this month", UTC), "added")
-        assert lo == "2026-12-01T00:00:00Z"
-        assert hi == "2027-01-01T00:00:00Z"
-
-    @time_machine.travel(datetime(2026, 1, 15, 12, 0, tzinfo=UTC), tick=False)
-    def test_last_month_january_wraps_to_previous_year(self) -> None:
-        # January: last month wraps back to December of previous year
-        lo, hi = _range(
-            translate_query("added:previous month", UTC),
-            "added",
-        )
-        assert lo == "2025-12-01T00:00:00Z"
-        assert hi == "2026-01-01T00:00:00Z"
-
-    @pytest.mark.parametrize(
-        ("query", "expected_lo", "expected_hi"),
-        [
-            pytest.param(
-                'added:"previous quarter"',
-                "2026-04-01T00:00:00Z",
-                "2026-07-01T00:00:00Z",
-                id="quoted_previous_quarter",
-            ),
-            pytest.param(
-                "added:previous month",
-                "2026-06-01T00:00:00Z",
-                "2026-07-01T00:00:00Z",
-                id="bare_previous_month",
-            ),
-            pytest.param(
-                "added:this month",
-                "2026-07-01T00:00:00Z",
-                "2026-08-01T00:00:00Z",
-                id="bare_this_month",
-            ),
-        ],
-    )
-    @time_machine.travel(datetime(2026, 7, 15, 12, 0, tzinfo=UTC), tick=False)
-    def test_legacy_natural_language_aliases(
-        self,
-        query: str,
-        expected_lo: str,
-        expected_hi: str,
-    ) -> None:
-        lo, hi = _range(translate_query(query, UTC), "added")
-        assert lo == expected_lo
-        assert hi == expected_hi
-
-    def test_unknown_keyword_raises(self) -> None:
-        with pytest.raises(ValueError, match="Unknown keyword"):
-            _datetime_range("bogus_keyword", UTC)
-
-
-class TestWhooshQueryRewriting:
-    """All Whoosh query syntax variants must be rewritten to ISO 8601 before Tantivy parses them."""
-
-    @time_machine.travel(datetime(2026, 3, 28, 15, 0, tzinfo=UTC), tick=False)
-    def test_compact_date_shim_rewrites_to_iso(self) -> None:
-        result = translate_query("created:20240115120000", UTC)
-        assert "2024-01-15" in result
-        assert "20240115120000" not in result
-
-    @time_machine.travel(datetime(2026, 3, 28, 15, 0, tzinfo=UTC), tick=False)
-    def test_relative_range_shim_removes_now(self) -> None:
-        result = translate_query("added:[now-7d TO now]", UTC)
-        assert "now" not in result
-        assert "2026-03-" in result
-
-    @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
-    def test_bracket_minus_7_days(self) -> None:
-        lo, hi = _range(
-            translate_query("added:[-7 days to now]", UTC),
-            "added",
-        )
-        assert lo == "2026-03-21T12:00:00Z"
-        assert hi == "2026-03-28T12:00:00Z"
-
-    @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
-    def test_bracket_minus_1_week(self) -> None:
-        lo, hi = _range(
-            translate_query("added:[-1 week to now]", UTC),
-            "added",
-        )
-        assert lo == "2026-03-21T12:00:00Z"
-        assert hi == "2026-03-28T12:00:00Z"
-
-    @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
-    def test_bracket_minus_1_month_uses_relativedelta(self) -> None:
-        # relativedelta(months=1) from 2026-03-28 = 2026-02-28 (not 29)
-        lo, hi = _range(
-            translate_query("created:[-1 month to now]", UTC),
-            "created",
-        )
-        assert lo == "2026-02-28T12:00:00Z"
-        assert hi == "2026-03-28T12:00:00Z"
-
-    @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
-    def test_bracket_minus_1_year(self) -> None:
-        lo, hi = _range(
-            translate_query("modified:[-1 year to now]", UTC),
-            "modified",
-        )
-        assert lo == "2025-03-28T12:00:00Z"
-        assert hi == "2026-03-28T12:00:00Z"
-
-    @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
-    def test_bracket_plural_unit_hours(self) -> None:
-        lo, hi = _range(
-            translate_query("added:[-3 hours to now]", UTC),
-            "added",
-        )
-        assert lo == "2026-03-28T09:00:00Z"
-        assert hi == "2026-03-28T12:00:00Z"
-
-    @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
-    def test_bracket_case_insensitive(self) -> None:
-        result = translate_query("added:[-1 WEEK TO NOW]", UTC)
-        assert "now" not in result.lower()
-        lo, hi = _range(result, "added")
-        assert lo == "2026-03-21T12:00:00Z"
-        assert hi == "2026-03-28T12:00:00Z"
-
-    @time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False)
-    def test_relative_range_swaps_bounds_when_lo_exceeds_hi(self) -> None:
-        # [now+1h TO now-1h] has lo > hi before substitution; they must be swapped
-        lo, hi = _range(
-            translate_query("added:[now+1h TO now-1h]", UTC),
-            "added",
-        )
-        assert lo == "2026-03-28T11:00:00Z"
-        assert hi == "2026-03-28T13:00:00Z"
-
-    def test_8digit_created_date_field_always_uses_utc_midnight(self) -> None:
-        # created is a DateField: boundaries are always UTC midnight, no TZ offset
-        result = translate_query("created:20231201", EASTERN)
-        lo, hi = _range(result, "created")
-        assert lo == "2023-12-01T00:00:00Z"
-        assert hi == "2023-12-02T00:00:00Z"
-
-    def test_8digit_added_datetime_field_converts_local_midnight_to_utc(self) -> None:
-        # added is DateTimeField: midnight Dec 1 Eastern (EST = UTC-5) = 05:00 UTC
-        result = translate_query("added:20231201", EASTERN)
-        lo, hi = _range(result, "added")
-        assert lo == "2023-12-01T05:00:00Z"
-        assert hi == "2023-12-02T05:00:00Z"
-
-    def test_8digit_modified_datetime_field_converts_local_midnight_to_utc(
-        self,
-    ) -> None:
-        result = translate_query("modified:20231201", EASTERN)
-        lo, hi = _range(result, "modified")
-        assert lo == "2023-12-01T05:00:00Z"
-        assert hi == "2023-12-02T05:00:00Z"
-
-    def test_8digit_invalid_date_raises(self) -> None:
-        # The translation pipeline raises InvalidDateQuery for unparsable dates
-        # (e.g. month=13) so the API can surface a 400 telling the user the date
-        # is malformed instead of silently returning zero results.
-        with pytest.raises(InvalidDateQuery) as exc_info:
-            translate_query("added:20231340", UTC)
-        assert exc_info.value.field == "added"
-        assert exc_info.value.value == "20231340"
+def _highlight_hit_count(index: tantivy.Index, raw_query: str) -> int:
+    query = parse_simple_text_highlight_query(index, raw_query)
+    return index.searcher().search(query, limit=1).count
 
 
 class TestParseUserQuery:
     """parse_user_query runs the full preprocessing pipeline."""
 
-    @pytest.fixture
-    def query_index(self) -> tantivy.Index:
-        schema = build_schema()
-        idx = tantivy.Index(schema, path=None)
-        register_tokenizers(idx, "")
-        return idx
-
     def test_returns_tantivy_query(self, query_index: tantivy.Index) -> None:
         assert isinstance(parse_user_query(query_index, "invoice", UTC), tantivy.Query)
 
+    @pytest.mark.parametrize(
+        "raw_query",
+        [
+            pytest.param("invoice", id="plain_text"),
+            pytest.param("created:today", id="date_keyword"),
+            pytest.param("created:[2005 to 2009]", id="whoosh_date_range"),
+            pytest.param('added:"previous month"', id="quoted_date_phrase"),
+            pytest.param("title:202[0-1]*", id="bracket_class_wildcard"),
+        ],
+    )
     def test_fuzzy_mode_does_not_raise(
         self,
         query_index: tantivy.Index,
         settings,
+        raw_query: str,
     ) -> None:
+        # These are all valid whoosh grammar that tantivy's own query parser
+        # (used only by the fuzzy blend clause) cannot parse; the fuzzy
+        # clause must degrade gracefully instead of raising and failing the
+        # whole query. See _try_parse_fuzzy_query.
         settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 0.5
-        assert isinstance(parse_user_query(query_index, "invoice", UTC), tantivy.Query)
+        assert isinstance(parse_user_query(query_index, raw_query, UTC), tantivy.Query)
 
-    def test_date_rewriting_applied_before_tantivy_parse(
+    def test_date_keyword_resolves_without_raising(
         self,
         query_index: tantivy.Index,
     ) -> None:
-        # created:today must be rewritten to an ISO range before Tantivy parses it;
-        # if passed raw, Tantivy would reject "today" as an invalid date value
+        # whoosh-compat's DateParserPlugin resolves "today" against the AST
+        # directly (no string rewrite to an ISO range happens anywhere in
+        # this pipeline); the emitted tantivy query must still build cleanly.
         with time_machine.travel(datetime(2026, 3, 28, 12, 0, tzinfo=UTC), tick=False):
             q = parse_user_query(query_index, "created:today", UTC)
         assert isinstance(q, tantivy.Query)
@@ -466,301 +114,57 @@ class TestParseUserQuery:
     ) -> None:
         assert isinstance(parse_user_query(query_index, raw_query, UTC), tantivy.Query)
 
-    @pytest.mark.parametrize(
-        "raw_query",
-        [
-            # Partial date scalar (year only)
-            pytest.param("created:2020", id="created_year_scalar"),
-            # 8-digit compact date range in brackets
-            pytest.param(
-                "created:[20200101 TO 20201231]",
-                id="created_8digit_bracket_range",
-            ),
-            # Comma-separated field + date range (Whoosh v2 multi-clause syntax)
-            pytest.param(
-                "title:x,created:[2020 TO 2021]",
-                id="title_comma_created_range",
-            ),
-            # Field alias: type -> document_type
-            pytest.param("type:invoice", id="type_alias"),
-            # Multi-word date keyword
-            pytest.param("created:previous week", id="created_previous_week"),
-            # Full ISO datetime range
-            pytest.param(
-                "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z]",
-                id="created_iso_range",
-            ),
-            # Comma-separated ISO ranges (Whoosh v2 syntax)
-            pytest.param(
-                "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z],"
-                "added:[2026-05-01T00:00:00Z TO 2026-06-01T00:00:00Z]",
-                id="comma_iso_ranges",
-            ),
-        ],
-    )
-    def test_advanced_search_queries_do_not_raise(
-        self,
-        query_index: tantivy.Index,
-        raw_query: str,
-    ) -> None:
-        """
-        End-to-end: queries that the frontend sends must parse without raising.
-
-        This tests the full pipeline: translate_query -> tantivy parse_query.
-        Equivalent to asserting HTTP 200 (not 400) for each query form.
-        """
-        with time_machine.travel(datetime(2026, 6, 15, 12, 0, tzinfo=UTC), tick=False):
-            assert isinstance(
-                parse_user_query(query_index, raw_query, UTC),
-                tantivy.Query,
-            )
-
     def test_invalid_date_propagates_not_swallowed(
         self,
         query_index: tantivy.Index,
     ) -> None:
-        # parse_user_query falls back to the raw query on unexpected translation
-        # errors, but an InvalidDateQuery is intentional and must propagate so the
-        # view can return a 400 instead of silently parsing the raw (invalid) date.
+        # parse_user_query never falls back to the raw query string on a parse
+        # error — a bad date diagnostic from whoosh-compat always maps to an
+        # InvalidDateQuery and must propagate, so the view can return a 400
+        # instead of silently parsing the raw (invalid) date.
         with pytest.raises(InvalidDateQuery) as exc_info:
             parse_user_query(query_index, "created:202023", UTC)
         assert exc_info.value.field == "created"
         assert exc_info.value.value == "202023"
 
-
-class TestYearRangeRewriting:
-    """Whoosh-style year-only date ranges must be rewritten to ISO 8601."""
-
-    @pytest.mark.parametrize(
-        ("query", "field", "expected_lo", "expected_hi"),
-        [
-            pytest.param(
-                "created:[2020 TO 2020]",
-                "created",
-                "2020-01-01T00:00:00Z",
-                "2021-01-01T00:00:00Z",
-                id="single_year_created",
-            ),
-            pytest.param(
-                "created:[2018 TO 2021]",
-                "created",
-                "2018-01-01T00:00:00Z",
-                "2022-01-01T00:00:00Z",
-                id="multi_year_range_created",
-            ),
-            pytest.param(
-                "added:[2022 TO 2023]",
-                "added",
-                "2022-01-01T00:00:00Z",
-                "2024-01-01T00:00:00Z",
-                id="added_field",
-            ),
-            pytest.param(
-                "modified:[2021 TO 2021]",
-                "modified",
-                "2021-01-01T00:00:00Z",
-                "2022-01-01T00:00:00Z",
-                id="modified_field",
-            ),
-            pytest.param(
-                "created:[2020 to 2020]",
-                "created",
-                "2020-01-01T00:00:00Z",
-                "2021-01-01T00:00:00Z",
-                id="lowercase_to_keyword",
-            ),
-        ],
-    )
-    def test_year_range_rewritten(
+    def test_invalid_number_raises_invalid_number_query(
         self,
-        query: str,
-        field: str,
-        expected_lo: str,
-        expected_hi: str,
+        query_index: tantivy.Index,
     ) -> None:
-        result = translate_query(query, UTC)
-        lo, hi = _range(result, field)
-        assert lo == expected_lo
-        assert hi == expected_hi
+        with pytest.raises(InvalidNumberQuery) as exc_info:
+            parse_user_query(query_index, "asn:notanumber", UTC)
+        assert exc_info.value.field == "asn"
+        assert exc_info.value.value == "notanumber"
 
-    def test_reversed_year_range_is_swapped(self) -> None:
-        # A reversed range must not yield lo > hi, which Tantivy treats as an
-        # empty range (silently zero results). The bounds are swapped instead.
-        result = translate_query("created:[2025 TO 2020]", UTC)
-        lo, hi = _range(result, "created")
-        assert lo == "2020-01-01T00:00:00Z"
-        assert hi == "2026-01-01T00:00:00Z"
-
-    def test_year_range_in_complex_boolean_query(self) -> None:
-        query = "tag:steuer AND (title:2020 OR (NOT title:2019 AND NOT title:2018 AND created:[2020 TO 2020]))"
-        result = translate_query(query, UTC)
-        lo, hi = _range(result, "created")
-        assert lo == "2020-01-01T00:00:00Z"
-        assert hi == "2021-01-01T00:00:00Z"
-        assert "title:2020" in result
-        assert "title:2019" in result
-        assert "title:2018" in result
-
-    def test_already_iso_date_range_passes_through_unchanged(self) -> None:
-        original = "created:[2020-01-01T00:00:00Z TO 2021-01-01T00:00:00Z]"
-        assert translate_query(original, UTC) == original
-
-    def test_8digit_in_brackets_not_matched_as_year_range(self) -> None:
-        # [YYYYMMDD TO YYYYMMDD]: the translation layer converts 8-digit bounds to
-        # ISO day ranges. 20200101 -> 2020-01-01T00:00:00Z (lo of that day);
-        # 20201231 -> the ceil of Dec 31 = 2021-01-01T00:00:00Z (exclusive end).
-        # This is the correct and accepted behavior: old compact form becomes a
-        # proper Tantivy-parseable ISO range.
-        original = "created:[20200101 TO 20201231]"
-        result = translate_query(original, UTC)
-        lo, hi = _range(result, "created")
-        assert lo == "2020-01-01T00:00:00Z"
-        assert hi == "2021-01-01T00:00:00Z"
-
-
-class TestNonDateFieldsNotRewritten:
-    """Date rewriters must only fire on the date fields (created/modified/added).
-
-    Integer fields like asn/id/page_count and unknown fields would otherwise be
-    rewritten into date ranges and rejected by Tantivy as type mismatches.
-    """
-
-    @pytest.mark.parametrize(
-        "query",
-        [
-            pytest.param("asn:20240101", id="asn_8digit"),
-            pytest.param("id:20240101", id="id_8digit"),
-            pytest.param("page_count:12345678", id="page_count_8digit"),
-            pytest.param("num_notes:20231201", id="num_notes_8digit"),
-        ],
-    )
-    def test_8digit_on_integer_field_passes_through_unchanged(self, query: str) -> None:
-        assert translate_query(query, EASTERN) == query
-
-    @pytest.mark.parametrize(
-        "query",
-        [
-            pytest.param("asn:[2000 TO 2024]", id="asn_year_range"),
-            pytest.param("id:[2000 TO 2024]", id="id_year_range"),
-            pytest.param("page_count:[2000 TO 2024]", id="page_count_year_range"),
-        ],
-    )
-    def test_year_range_on_integer_field_passes_through_unchanged(
+    def test_multiple_bad_fields_raise_multiple_search_query_errors(
         self,
-        query: str,
+        query_index: tantivy.Index,
     ) -> None:
-        assert translate_query(query, UTC) == query
+        with pytest.raises(MultipleSearchQueryErrors) as exc_info:
+            parse_user_query(
+                query_index,
+                "created:notadate AND asn:notanumber",
+                UTC,
+            )
+        assert len(exc_info.value.errors) == 2
+        kinds = {type(e) for e in exc_info.value.errors}
+        assert kinds == {InvalidDateQuery, InvalidNumberQuery}
 
-    def test_unknown_field_keyword_passes_through_unchanged(self) -> None:
-        # foobar is not a date field: 'foobar:today' must not become a date range,
-        # which Tantivy would otherwise reject as an unknown/typed field.
-        assert translate_query("foobar:today", UTC) == "foobar:today"
-
-
-class TestPassthrough:
-    """Queries without field prefixes or unrelated content pass through unchanged."""
-
-    def test_bare_keyword_no_field_prefix_unchanged(self) -> None:
-        # Bare 'today' with no field: prefix passes through unchanged
-        result = translate_query("bank statement today", UTC)
-        assert "today" in result
-
-    def test_unrelated_query_unchanged(self) -> None:
-        assert translate_query("title:invoice", UTC) == "title:invoice"
-
-
-class TestNormalizeQuery:
-    """translate_query expands comma-separated values and collapses whitespace."""
-
-    def test_normalize_expands_comma_separated_tags(self) -> None:
-        assert translate_query("tag:foo,bar", UTC) == "tag:foo AND tag:bar"
-
-    def test_normalize_comma_between_range_expressions(self) -> None:
-        # Comma-separated field range expressions (Whoosh v2 syntax) must be
-        # converted to AND so Tantivy does not receive an invalid comma.
-        q = "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z],added:[2026-05-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
-        assert translate_query(q, UTC) == (
-            "created:[2026-01-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
-            " AND "
-            "added:[2026-05-01T00:00:00Z TO 2026-06-01T00:00:00Z]"
-        )
-
-    def test_normalize_expands_three_values(self) -> None:
-        assert (
-            translate_query("tag:foo,bar,baz", UTC) == "tag:foo AND tag:bar AND tag:baz"
-        )
-
-    def test_normalize_collapses_whitespace(self) -> None:
-        assert translate_query("bank   statement", UTC) == "bank statement"
-
-    def test_normalize_no_commas_unchanged(self) -> None:
-        assert translate_query("bank statement", UTC) == "bank statement"
-
-    @pytest.mark.parametrize(
-        ("raw", "expected"),
-        [
-            pytest.param(
-                "h52.1 - kurzsichtigkeit",
-                "h52.1 kurzsichtigkeit",
-                id="icd_code_dash_description",
-            ),
-            pytest.param(
-                "H52.1 - asd",
-                "H52.1 asd",
-                id="icd_code_uppercase_dash",
-            ),
-            pytest.param(
-                "h52.1 -",
-                "h52.1",
-                id="trailing_minus",
-            ),
-            pytest.param(
-                ". -",
-                ".",
-                id="dot_trailing_minus",
-            ),
-            pytest.param(
-                "h52. -",
-                "h52.",
-                id="partial_code_trailing_minus",
-            ),
-            pytest.param(
-                "foo - bar - baz",
-                "foo bar baz",
-                id="multiple_dashes",
-            ),
-            pytest.param(
-                "foo + bar",
-                "foo bar",
-                id="spaced_plus_operator",
-            ),
-        ],
-    )
-    def test_normalize_strips_dangling_operators(self, raw: str, expected: str) -> None:
-        assert translate_query(raw, UTC) == expected
-
-    @pytest.mark.parametrize(
-        "query",
-        [
-            pytest.param("term -other", id="adjacent_not_operator"),
-            pytest.param("-term", id="leading_not_operator"),
-            pytest.param("+term", id="leading_must_operator"),
-            pytest.param("foo -bar +baz", id="mixed_adjacent_operators"),
-        ],
-    )
-    def test_normalize_preserves_valid_operators(self, query: str) -> None:
-        assert translate_query(query, UTC) == query
+    def test_unregistered_id_field_folds_to_literal_text_not_error(
+        self,
+        query_index: tantivy.Index,
+    ) -> None:
+        # tag_id is intentionally excluded from the FieldRegistry — whoosh-compat
+        # parity leniency folds it into literal text, not a diagnostic/400.
+        # A result-level assertion that this fold actually matches nothing
+        # against real documents lives in
+        # test_acceptance.py::TestUnregisteredIdFieldFoldsToLiteralText.
+        q = parse_user_query(query_index, "tag_id:5", UTC)
+        assert isinstance(q, tantivy.Query)
 
 
 class TestParseSimpleTextHighlightQuery:
     """parse_simple_text_highlight_query must not raise on natural-language queries."""
-
-    @pytest.fixture
-    def query_index(self) -> tantivy.Index:
-        schema = build_schema()
-        idx = tantivy.Index(schema, path=None)
-        register_tokenizers(idx, "")
-        return idx
 
     @pytest.mark.parametrize(
         "raw_query",
@@ -783,16 +187,25 @@ class TestParseSimpleTextHighlightQuery:
             tantivy.Query,
         )
 
-    def test_empty_query_returns_empty_query(self, query_index: tantivy.Index) -> None:
-        result = parse_simple_text_highlight_query(query_index, "")
-        assert isinstance(result, tantivy.Query)
-
-    def test_all_operators_returns_empty_query(
+    def test_a_real_token_matches_the_corpus(
         self,
-        query_index: tantivy.Index,
+        populated_index: tantivy.Index,
     ) -> None:
-        result = parse_simple_text_highlight_query(query_index, "- +")
-        assert isinstance(result, tantivy.Query)
+        """Without this, an empty corpus would make the two assertions below
+        pass for a query that matches every document."""
+        assert _highlight_hit_count(populated_index, "needle") == 1
+
+    def test_empty_query_matches_no_document(
+        self,
+        populated_index: tantivy.Index,
+    ) -> None:
+        assert _highlight_hit_count(populated_index, "") == 0
+
+    def test_all_operators_query_matches_no_document(
+        self,
+        populated_index: tantivy.Index,
+    ) -> None:
+        assert _highlight_hit_count(populated_index, "- +") == 0
 
 
 class TestPermissionFilter:
@@ -884,3 +297,52 @@ class TestPermissionFilter:
         user = django_user_model(pk=20)
         perm = build_permission_filter(perm_index.schema, user)
         assert perm_index.searcher().search(perm, limit=10).count == 1  # only unowned
+
+
+class TestSearchQueryErrors:
+    def test_invalid_date_query_is_a_search_query_error(self) -> None:
+        err = InvalidDateQuery("created", "notadate")
+        assert isinstance(err, SearchQueryError)
+        assert err.field == "created"
+        assert err.value == "notadate"
+        assert "created" in str(err)
+        assert "notadate" in str(err)
+
+    def test_invalid_number_query_is_a_search_query_error(self) -> None:
+        err = InvalidNumberQuery("asn", "notanumber")
+        assert isinstance(err, SearchQueryError)
+        assert err.field == "asn"
+        assert err.value == "notanumber"
+        assert "asn" in str(err)
+        assert "notanumber" in str(err)
+
+    def test_multiple_search_query_errors_aggregates(self) -> None:
+        sub_errors = [
+            InvalidDateQuery("created", "notadate"),
+            InvalidNumberQuery("asn", "notanumber"),
+        ]
+        err = MultipleSearchQueryErrors(sub_errors)
+        assert isinstance(err, SearchQueryError)
+        assert err.errors == tuple(sub_errors)
+        assert "created" in str(err)
+        assert "asn" in str(err)
+
+
+class TestEmitErrorContract:
+    """A QueryError from emit() surfaces as a SearchQueryError (HTTP 400).
+
+    The Cause-based routing table itself is covered in test_error_routing.py.
+    """
+
+    def test_exists_requires_fast_gets_the_user_facing_rewrite(
+        self,
+        query_index: tantivy.Index,
+    ) -> None:
+        # whoosh-compat's own message advises a host-side fast=True config
+        # change the user can't act on, so this checks OUR wording, not
+        # whoosh-compat's (that's its own test suite's job now).
+        with pytest.raises(SearchQueryError) as exc_info:
+            parse_user_query(query_index, "notes.user:*", UTC)
+        assert str(exc_info.value) == (
+            "Existence searches (field:*) are not supported for field 'notes.user'."
+        )

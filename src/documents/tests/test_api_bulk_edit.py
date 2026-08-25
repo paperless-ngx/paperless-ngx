@@ -1976,3 +1976,22 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(LogEntry.objects.filter(object_pk=self.doc1.id).count(), 2)
+
+    def test_api_bulk_edit_with_bad_search_query_returns_400(self) -> None:
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "all": True,
+                    "filters": {"query": "added:notadate"},
+                    "method": "set_storage_path",
+                    "parameters": {"storage_path": self.sp1.id},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        # A user-fixable query error must surface as a 400 naming the bad
+        # value, exactly like the search list endpoint, never a 500.
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"notadate", response.content)

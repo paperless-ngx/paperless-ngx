@@ -16,6 +16,7 @@ from time import mktime
 from time import sleep
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import Final
 from typing import Literal
 from typing import NamedTuple
 from unicodedata import normalize
@@ -279,17 +280,40 @@ logger = logging.getLogger("paperless.api")
 _TANTIVY_INTERSECT_THRESHOLD = 5_000
 _TANTIVY_SEARCH_PARAM_NAMES = ("text", "title_search", "query", "more_like_id")
 
+# whoosh-compat's fieldname tagger (used only for SearchMode.QUERY, via the
+# whoosh grammar in parse_user_query) is O(n^2) in plain word characters:
+# measured at ~0.96s/10k chars, ~3.67s/20k, ~14.4s/40k against the real field
+# registry. Django's DATA_UPLOAD_MAX_MEMORY_SIZE default (2.5 MB) does not
+# bound this on the POST-body selection-filter path, so an unbounded query
+# is a single-request CPU exhaustion vector. 4096 chars caps the worst case
+# at roughly 0.16s (quadratic extrapolation from the measurements above),
+# far beyond any plausible hand-typed advanced query, while still being fast
+# enough to absorb inside a request handler. Applied to all three modes at
+# this shared choke point: TEXT and TITLE route through simple_search_tokens
+# instead and measure linear even at 20k chars, so the cap is hygiene for
+# them, not a fix, but a single limit here is simpler than one exemption.
+# Not exposed as a PAPERLESS_* setting: this is a hard security boundary,
+# not a tunable, and a raisable ceiling would let a misconfiguration
+# reintroduce the exact hazard this exists to close.
+_MAX_QUERY_LENGTH: Final[int] = 4096
+
 
 def _get_tantivy_query_and_mode(params):
+    from documents.search import QueryTooLongError
     from documents.search import SearchMode
 
     if "text" in params:
-        return str(params["text"]), SearchMode.TEXT
-    if "title_search" in params:
-        return str(params["title_search"]), SearchMode.TITLE
-    if "query" in params:
-        return str(params["query"]), SearchMode.QUERY
-    return None  # pragma: no cover
+        raw, mode = str(params["text"]), SearchMode.TEXT
+    elif "title_search" in params:
+        raw, mode = str(params["title_search"]), SearchMode.TITLE
+    elif "query" in params:
+        raw, mode = str(params["query"]), SearchMode.QUERY
+    else:
+        return None  # pragma: no cover
+
+    if len(raw) > _MAX_QUERY_LENGTH:
+        raise QueryTooLongError(len(raw), _MAX_QUERY_LENGTH)
+    return raw, mode
 
 
 def _get_more_like_id(query_params: dict[str, Any], user: User | None) -> int:
@@ -2421,6 +2445,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
         from documents.search import TantivyBackend
         from documents.search import TantivyRelevanceList
         from documents.search import get_backend
+        from documents.search import search_query_error_messages
 
         def parse_search_params() -> SearchParams:
             """Extract query string, search mode, and ordering from request."""
@@ -2611,15 +2636,10 @@ class UnifiedSearchViewSet(DocumentViewSet):
         except ValidationError:
             raise
         except SearchQueryError as e:
-            # User-fixable query error (e.g. an unparsable date): surface the
-            # specific message so the user can correct it, rather than a generic
-            # 400 or silently empty results.
-            raise ValidationError({"query": [str(e)]}) from e
-        except Exception as e:
-            logger.warning(f"An error occurred listing search results: {e!s}")
-            return HttpResponseBadRequest(
-                "Error listing search results, check logs for more detail.",
-            )
+            # User-fixable query error(s) (e.g. unparsable dates/numbers):
+            # surface every offending field's message, not just the first,
+            # so the user can fix them all in one round-trip.
+            raise ValidationError({"query": search_query_error_messages(e)}) from e
 
     @action(detail=False, methods=["GET"], name="Get Next ASN")
     def next_asn(self, request, *args, **kwargs):
@@ -2755,23 +2775,34 @@ class DocumentSelectionMixin:
                 },
             )
 
+        from documents.search import SearchQueryError
         from documents.search import get_backend
+        from documents.search import search_query_error_messages
 
         filter_name = search_filters[0]
         backend = get_backend()
         search_user = None if user.is_superuser else user
 
-        if filter_name == "more_like_id":
-            more_like_doc_id = _get_more_like_id(filters, user)
+        try:
+            if filter_name == "more_like_id":
+                more_like_doc_id = _get_more_like_id(filters, user)
 
-            search_ids = backend.more_like_this_ids(more_like_doc_id, user=search_user)
-        else:
-            query_str, search_mode = _get_tantivy_query_and_mode(filters)
-            search_ids = backend.search_ids(
-                query_str,
-                user=search_user,
-                search_mode=search_mode,
-            )
+                search_ids = backend.more_like_this_ids(
+                    more_like_doc_id,
+                    user=search_user,
+                )
+            else:
+                query_str, search_mode = _get_tantivy_query_and_mode(filters)
+                search_ids = backend.search_ids(
+                    query_str,
+                    user=search_user,
+                    search_mode=search_mode,
+                )
+        except SearchQueryError as e:
+            # Same user-fixable-query mapping as the search list endpoint:
+            # a bad date/number in a bulk selection filter is a 400 naming
+            # the value, never a 500.
+            raise ValidationError({"query": search_query_error_messages(e)}) from e
 
         return search_ids
 
@@ -3608,6 +3639,10 @@ class GlobalSearchView(PassUserMixin):
             return HttpResponseBadRequest("Query required")
         if len(query) < 3:
             return HttpResponseBadRequest("Query must be at least 3 characters")
+        if len(query) > _MAX_QUERY_LENGTH:
+            return HttpResponseBadRequest(
+                f"Query must be at most {_MAX_QUERY_LENGTH} characters",
+            )
 
         db_only = request.query_params.get("db_only", False)
 

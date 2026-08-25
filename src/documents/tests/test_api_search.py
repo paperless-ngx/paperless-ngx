@@ -756,6 +756,10 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             tick=False,
         ):
             response = self.client.get("/api/documents/?query=added:previous month")
+        assert response.status_code == 200, (
+            f"expected a successful search response, got {response.status_code}: "
+            f"{response.data!r}"
+        )
         results = response.data["results"]
 
         self.assertEqual(len(results), 1)
@@ -787,6 +791,26 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         # An unparsable date is reported as a malformed query, not silently empty.
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("invalid-date", str(response.data["query"]))
+
+    def test_search_multiple_bad_fields_returns_all_messages(self) -> None:
+        """
+        GIVEN:
+            - One document added
+        WHEN:
+            - Query with multiple bad fields (e.g. invalid date and invalid number)
+        THEN:
+            - 400 Bad Request with error messages for every bad field,
+              so the user can fix them all in one round-trip
+        """
+        response = self.client.get(
+            "/api/documents/",
+            {"query": "created:notadate AND asn:notanumber"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        messages = response.data["query"]
+        self.assertEqual(len(messages), 2)
+        self.assertTrue(any("created" in m for m in messages))
+        self.assertTrue(any("asn" in m for m in messages))
 
     @override_settings(
         TIME_ZONE="UTC",
@@ -830,6 +854,29 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
 
         results = response.data["results"]
         self.assertEqual({r["id"] for r in results}, {1, 2})
+
+    @mock.patch("documents.search._backend.parse_user_query")
+    def test_search_parser_bug_surfaces_as_500_not_400(self, m) -> None:
+        """
+        GIVEN:
+            - The query parser itself fails (a whoosh-compat bug, per
+              QueryParserError's own contract: not user-fixable input)
+        WHEN:
+            - Any search request runs
+        THEN:
+            - The error surfaces as a 500 monitoring can see, never a 400
+              blaming the user for a library defect
+        """
+        from whoosh_compat.errors import QueryParserError
+
+        m.side_effect = QueryParserError("synthetic parser bug")
+
+        self.client.raise_request_exception = False
+        response = self.client.get("/api/documents/?query=anything")
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
     @mock.patch("documents.search._backend.TantivyBackend.autocomplete")
     def test_search_autocomplete_limits(self, m) -> None:
@@ -2005,3 +2052,45 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         response = self.client.get("/api/search/?query=no")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def _assert_query_finds(self, doc: Document, query: str) -> None:
+        get_backend().add_or_update(doc)
+        response = self.client.get("/api/documents/", {"query": query})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        ids = [r["id"] for r in response.data["results"]]
+        self.assertIn(doc.id, ids)
+
+    def test_search_by_asn(self) -> None:
+        doc = Document.objects.create(
+            title="Has ASN",
+            content="content",
+            checksum="asn-checksum",
+            archive_serial_number=555,
+        )
+        self._assert_query_finds(doc, "asn:555")
+
+    def test_search_by_page_count(self) -> None:
+        doc = Document.objects.create(
+            title="Multi-page",
+            content="content",
+            checksum="page-count-checksum",
+            page_count=42,
+        )
+        self._assert_query_finds(doc, "page_count:42")
+
+    def test_search_by_original_filename(self) -> None:
+        doc = Document.objects.create(
+            title="Named file",
+            content="content",
+            checksum="filename-checksum",
+            original_filename="quarterly-report.pdf",
+        )
+        self._assert_query_finds(doc, "original_filename:quarterly-report.pdf")
+
+    def test_search_by_checksum(self) -> None:
+        doc = Document.objects.create(
+            title="Checksum doc",
+            content="content",
+            checksum="deadbeef1234",
+        )
+        self._assert_query_finds(doc, "checksum:deadbeef1234")

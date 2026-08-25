@@ -339,3 +339,21 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(response.content, b"Insufficient permissions")
+
+    def test_bad_search_query_returns_400(self) -> None:
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "all": True,
+                    "filters": {"query": "added:notadate"},
+                    "content": "originals",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        # A user-fixable query error must surface as a 400 naming the bad
+        # value, exactly like the search list endpoint, never a 500.
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"notadate", response.content)
