@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase as DjangoTestCase
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -21,6 +22,7 @@ from documents.filters import TitleContentFilter
 from documents.models import Document
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import read_streaming_response
+from documents.views import DocumentSelectionMixin
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -923,3 +925,36 @@ class TestVersionAwareFilters(TestCase):
 
         self.assertIs(result, queryset)
         queryset.filter.assert_not_called()
+
+
+class TestBulkSelectionExcludesVersions(DjangoTestCase):
+    def test_select_all_matching_does_not_select_version_documents(self) -> None:
+        """
+        "Select all matching" reconstructs the document list, which never
+        contains version documents as rows of their own.
+        """
+        user = User.objects.create_superuser(username="bulk_versions")
+        root = Document.objects.create(
+            title="shared-title root",
+            checksum="bulk-root",
+            mime_type="application/pdf",
+            content="root",
+        )
+        Document.objects.create(
+            title="shared-title version",
+            checksum="bulk-version",
+            mime_type="application/pdf",
+            root_document=root,
+            version_index=1,
+            content="version",
+        )
+
+        selected = DocumentSelectionMixin()._resolve_document_ids(
+            user=user,
+            validated_data={
+                "all": True,
+                "filters": {"title__icontains": "shared-title"},
+            },
+        )
+
+        self.assertEqual(selected, [root.id])

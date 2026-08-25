@@ -2794,8 +2794,11 @@ class DocumentSelectionMixin:
             for key, value in filters.items()
             if key not in _TANTIVY_SEARCH_PARAM_NAMES
         }
+        # Operations are addressed to roots, a caller that wants
+        # to act on a specific version passes its id explicitly instead
         permitted_documents = Document.objects.filter(
             id__in=permitted_document_ids(user),
+            root_document__isnull=True,
         )
         # orm-filtered docs
         filtered_documents = DocumentFilterSet(
