@@ -1072,12 +1072,33 @@ class DocumentViewSet(
             ],
         }
 
+    # Query params whose filtering needs effective_content evaluated in SQL
+    # against every candidate row -- see _needs_effective_content_annotation().
+    _CONTENT_FILTER_PARAMS = (
+        "search",  # DRF SearchFilter's search_fields includes effective_content
+        "title_content",
+        "content__istartswith",
+        "content__iendswith",
+        "content__icontains",
+        "content__iexact",
+    )
+
+    def _needs_effective_content_annotation(self) -> bool:
+        # effective_content is a per-row correlated subquery resolving each
+        # document's latest version. Cheap when evaluated only for the page
+        # that survives filtering/sorting/pagination (the common case, via
+        # the "versions" prefetch + Document.get_effective_content()'s
+        # fallback), but if anything filters *on* it, the database has to
+        # evaluate it for every candidate row before the LIMIT is reached --
+        # pathological on MariaDB specifically for the root_document_id
+        # self-join once real candidate counts get large. Everything on this
+        # list is deprecated in favor of the Tantivy-backed search endpoint
+        # (see filters.py's TitleContentFilter/EffectiveContentFilter docs),
+        # so keep paying that cost only when one is actually used.
+        params = self.request.query_params
+        return any(param in params for param in self._CONTENT_FILTER_PARAMS)
+
     def get_queryset(self):
-        latest_version_content = Subquery(
-            versions_newest_first(
-                Document.objects.filter(root_document=OuterRef("pk")),
-            ).values("content")[:1],
-        )
         # A correlated subquery avoids the LEFT JOIN + Count() this used to
         # be, which forced a GROUP BY aggregate over every matching document
         # before the query could even be sorted or limited.
@@ -1097,10 +1118,9 @@ class DocumentViewSet(
         # ObjectFilter.filter(). A blanket .distinct() here forces the
         # database to fully sort and dedupe every visible document before
         # it can apply LIMIT, which is disastrous at scale.
-        return (
+        queryset = (
             Document.objects.filter(root_document__isnull=True)
             .order_by("-created", "-id")
-            .annotate(effective_content=Coalesce(latest_version_content, F("content")))
             .annotate(num_notes=Coalesce(note_count, 0))
             .select_related("correspondent", "storage_path", "document_type", "owner")
             .prefetch_related(
@@ -1113,6 +1133,7 @@ class DocumentViewSet(
                         "version_label",
                         "root_document_id",
                         "version_index",
+                        "content",
                     ),
                 ),
                 "tags",
@@ -1124,6 +1145,16 @@ class DocumentViewSet(
                 Prefetch("notes", queryset=Note.objects.select_related("user")),
             )
         )
+        if self._needs_effective_content_annotation():
+            latest_version_content = Subquery(
+                versions_newest_first(
+                    Document.objects.filter(root_document=OuterRef("pk")),
+                ).values("content")[:1],
+            )
+            queryset = queryset.annotate(
+                effective_content=Coalesce(latest_version_content, F("content")),
+            )
+        return queryset
 
     def get_serializer(self, *args, **kwargs):
         fields_param = self.request.query_params.get("fields", None)

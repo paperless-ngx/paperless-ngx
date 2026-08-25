@@ -1146,8 +1146,13 @@ class DocumentSerializer(
 
     def to_representation(self, instance):
         doc = super().to_representation(instance)
-        if "content" in self.fields and hasattr(instance, "effective_content"):
-            doc["content"] = getattr(instance, "effective_content") or ""
+        if "content" in self.fields:
+            # get_effective_content() already falls back through the SQL
+            # annotation (when the queryset attached one), the prefetched
+            # "versions" cache, and finally a direct query -- so this stays
+            # correct whether or not DocumentViewSet.get_queryset() decided
+            # the annotation was needed for this request.
+            doc["content"] = instance.get_effective_content() or ""
         if self.truncate_content and "content" in self.fields:
             doc["content"] = doc.get("content")[0:550]
         return doc
