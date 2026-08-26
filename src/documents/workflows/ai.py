@@ -172,50 +172,44 @@ def apply_ai_suggestions_to_document(
             document.title = title[:128]
             updated_fields.append("title")
 
-    if should_set(AISuggestionField.CORRESPONDENT):
-        choice = suggestions["correspondents"]
-        names = choice["new_names"]
-        correspondent = resolve_object(
+    for field, model, choice, resolve_ids, match_names in (
+        (
+            AISuggestionField.CORRESPONDENT,
             Correspondent,
-            names,
-            resolve_correspondent_ids(choice["existing_ids"], owner)
-            + match_correspondents_by_name(names, owner),
-            create_missing=create_missing,
-            owner=owner,
-        )
-        if correspondent:
-            document.correspondent = correspondent
-            updated_fields.append("correspondent")
-
-    if should_set(AISuggestionField.DOCUMENT_TYPE):
-        choice = suggestions["document_types"]
-        names = choice["new_names"]
-        document_type = resolve_object(
+            suggestions["correspondents"],
+            resolve_correspondent_ids,
+            match_correspondents_by_name,
+        ),
+        (
+            AISuggestionField.DOCUMENT_TYPE,
             DocumentType,
-            names,
-            resolve_document_type_ids(choice["existing_ids"], owner)
-            + match_document_types_by_name(names, owner),
-            create_missing=create_missing,
-            owner=owner,
-        )
-        if document_type:
-            document.document_type = document_type
-            updated_fields.append("document_type")
-
-    if should_set(AISuggestionField.STORAGE_PATH):
-        choice = suggestions["storage_paths"]
-        names = choice["new_names"]
-        storage_path = resolve_object(
+            suggestions["document_types"],
+            resolve_document_type_ids,
+            match_document_types_by_name,
+        ),
+        (
+            AISuggestionField.STORAGE_PATH,
             StoragePath,
+            suggestions["storage_paths"],
+            resolve_storage_path_ids,
+            match_storage_paths_by_name,
+        ),
+    ):
+        if not should_set(field):
+            continue
+
+        names = choice["new_names"]
+        obj = resolve_object(
+            model,
             names,
-            resolve_storage_path_ids(choice["existing_ids"], owner)
-            + match_storage_paths_by_name(names, owner),
+            resolve_ids(choice["existing_ids"], owner) + match_names(names, owner),
             create_missing=create_missing,
             owner=owner,
         )
-        if storage_path:
-            document.storage_path = storage_path
-            updated_fields.append("storage_path")
+        if obj:
+            document_field = DIRECT_FIELDS[field]
+            setattr(document, document_field, obj)
+            updated_fields.append(document_field)
 
     if should_set(AISuggestionField.CREATED):
         created = resolve_date(suggestions["dates"])
