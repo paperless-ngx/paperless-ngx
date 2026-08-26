@@ -31,6 +31,11 @@ class TaxonomyCandidate(TypedDict):
     weight: float
 
 
+class SimilarDocument(TypedDict):
+    document_id: int
+    weight: float
+
+
 class TaxonomyCandidates(TypedDict):
     tags: list[TaxonomyCandidate]
     document_types: list[TaxonomyCandidate]
@@ -49,10 +54,10 @@ def empty_taxonomy_candidates() -> TaxonomyCandidates:
     )
 
 
-def _node_document_weights(nodes: list["NodeWithScore"]) -> dict[int, float]:
-    """document_id -> that node's similarity score, summed if a document_id
-    appears more than once across the retrieved nodes (e.g. multiple chunks
-    of the same source document)."""
+def _node_document_weights(nodes: list["NodeWithScore"]) -> list[SimilarDocument]:
+    """Sum each node's similarity score into its document_id (a document can
+    appear via multiple chunks/nodes) and return one SimilarDocument per
+    distinct document_id."""
     weights: dict[int, float] = defaultdict(float)
     for node in nodes:
         document_id = node.metadata.get("document_id")
@@ -65,7 +70,10 @@ def _node_document_weights(nodes: list["NodeWithScore"]) -> dict[int, float]:
             weights[int(document_id)] += float(node.score or 0.0)
         except (TypeError, ValueError):  # pragma: no cover
             continue
-    return weights
+    return [
+        SimilarDocument(document_id=document_id, weight=weight)
+        for document_id, weight in weights.items()
+    ]
 
 
 def _visible_ranked_candidates(
@@ -101,20 +109,25 @@ def _visible_ranked_candidates(
 
 
 def build_taxonomy_candidates(
-    nodes: list["NodeWithScore"],
+    similar_documents: list[SimilarDocument],
     user: User | None,
 ) -> TaxonomyCandidates:
-    """Resolve each neighbour node's document_id to a live Document, read its
-    *current* tags/type/correspondent/storage_path via the ORM (never the
-    possibly-stale names cached in vector-index node metadata), weight each
-    distinct taxonomy object by aggregate neighbour similarity, permission-filter
+    """Resolve each similar document's id to a live Document, read its
+    *current* tags/type/correspondent/storage_path via the ORM (never any
+    possibly-stale names an adapter's source might have cached), weight each
+    distinct taxonomy object by aggregate similarity weight, permission-filter
     against what ``user`` can see, and return each category ranked by weight
-    and capped.
+    and capped. ``similar_documents`` may come from either the vector-RAG
+    adapter or the full-text fallback adapter - both produce this same shape.
     """
-
-    document_weights = _node_document_weights(nodes)
-    if not document_weights:
+    if not similar_documents:
         return empty_taxonomy_candidates()
+
+    # Both adapters guarantee at most one SimilarDocument per document_id, so
+    # this never silently drops a duplicate's weight.
+    document_weights: dict[int, float] = {
+        s["document_id"]: s["weight"] for s in similar_documents
+    }
 
     # Only .tags.all() needs prefetching (a reverse M2M, one extra query for
     # the whole batch). document_type/correspondent/storage_path are read
