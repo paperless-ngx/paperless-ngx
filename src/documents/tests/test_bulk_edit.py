@@ -440,6 +440,110 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
                 [target.id],
             )
 
+    def test_modify_custom_fields_update_caches_document_and_field(self) -> None:
+        """
+        GIVEN:
+            - Several documents already have an instance of a custom field
+        WHEN:
+            - modify_custom_fields runs again for the same field, updating
+              the existing instances rather than creating new ones
+        THEN:
+            - No per-instance `.document`/`.field` reload query is issued
+              (e.g. by auditlog's post_save receiver touching them)
+        """
+        docs = [
+            Document.objects.create(checksum=f"update-{i}", title=f"update-{i}")
+            for i in range(6)
+        ]
+        field = CustomField.objects.create(
+            name="Update Field",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        bulk_edit.modify_custom_fields(
+            [doc.id for doc in docs],
+            add_custom_fields=[field.id],
+            remove_custom_fields=[],
+        )
+
+        with CaptureQueriesContext(connection) as ctx:
+            bulk_edit.modify_custom_fields(
+                [doc.id for doc in docs],
+                add_custom_fields={field.id: "updated value"},
+                remove_custom_fields=[],
+            )
+
+        single_row_reloads = [
+            q
+            for q in ctx.captured_queries
+            if ('FROM "documents_document"' in q["sql"] and '."id" = ' in q["sql"])
+            or ('FROM "documents_customfield"' in q["sql"] and '."id" = ' in q["sql"])
+        ]
+        self.assertEqual(
+            single_row_reloads,
+            [],
+            "Expected no per-instance document/field reload queries when "
+            f"updating existing custom field instances, got: {single_row_reloads}",
+        )
+
+        for doc in docs:
+            self.assertEqual(
+                doc.custom_fields.get(field=field).value,
+                "updated value",
+            )
+
+    def test_modify_custom_fields_removes_symmetrical_doclinks_batched(self) -> None:
+        """
+        GIVEN:
+            - Several source documents link to a shared target via a doc
+              link field
+        WHEN:
+            - The field is removed from all of them in one call
+        THEN:
+            - The symmetrical links are removed from the target
+            - The source documents come from one batched query, not one
+              lookup per source document (the target side, fetched inside
+              remove_doclink(), is untouched by this PR and out of scope)
+        """
+        target = Document.objects.create(checksum="rm-target", title="rm-target")
+        docs = [
+            Document.objects.create(checksum=f"rm-{i}", title=f"rm-{i}")
+            for i in range(6)
+        ]
+        field = CustomField.objects.create(
+            name="Related",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+        bulk_edit.modify_custom_fields(
+            [doc.id for doc in docs],
+            add_custom_fields={field.id: [target.id]},
+            remove_custom_fields=[],
+        )
+        self.assertEqual(
+            target.custom_fields.get(field=field).value,
+            [d.id for d in docs],
+        )
+
+        with CaptureQueriesContext(connection) as ctx:
+            bulk_edit.modify_custom_fields(
+                [doc.id for doc in docs],
+                add_custom_fields=[],
+                remove_custom_fields=[field.id],
+            )
+
+        source_doc_lookups = [
+            q
+            for q in ctx.captured_queries
+            if 'FROM "documents_document"' in q["sql"]
+            and any(f'."id" = {doc.id} ' in q["sql"] for doc in docs)
+        ]
+        self.assertEqual(
+            source_doc_lookups,
+            [],
+            "Expected source documents to come from a batched query, not "
+            f"per-document lookups, got: {source_doc_lookups}",
+        )
+        self.assertEqual(target.custom_fields.get(field=field).value, [])
+
     def test_modify_custom_fields_doclink_self_link(self) -> None:
         """
         GIVEN:

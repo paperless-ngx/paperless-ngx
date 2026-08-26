@@ -311,17 +311,19 @@ def modify_custom_fields(
             id__in=[int(field) for field, _ in add_custom_fields],
         )
     }
-    # Deferred, not `.only()`: these objects get cached onto the FK
-    # descriptor of newly-created CustomFieldInstance rows below, and
-    # downstream post_save receivers (e.g. the filename-generation signal)
-    # touch other Document fields -- `.only("pk")` would just turn that into
-    # a deferred-field reload per document, trading one N+1 for another.
-    # `content` is the one field guaranteed to be both large (full OCR text)
-    # and unused by anything this function or its receivers touch.
-    docs_by_id: dict[int, Document] = {
-        doc.id: doc
-        for doc in Document.objects.filter(id__in=affected_docs).defer("content")
-    }
+    # Deferred, not `.only()`: signal receivers touch other Document fields,
+    # and `.only("pk")` would just turn that into a per-document reload.
+    # `content` is the one field both large and unused here. Skipped
+    # entirely for a remove-only call -- the removal pass below resolves
+    # its own documents.
+    docs_by_id: dict[int, Document] = (
+        {
+            doc.id: doc
+            for doc in Document.objects.filter(id__in=affected_docs).defer("content")
+        }
+        if add_custom_fields
+        else {}
+    )
     for field_id, value in add_custom_fields:
         custom_field = custom_fields_by_id[field_id]
         value_field = CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
@@ -336,29 +338,41 @@ def modify_custom_fields(
             ):
                 # Prevent self-linking
                 continue
-            # Pass the already-resolved objects, not bare ids: this caches
-            # them on the FK descriptor of any newly-created instance, so a
-            # later `.field`/`.document` access (e.g. auditlog's post_save
-            # receiver calling `str(instance)`, which touches `.field.name`)
-            # doesn't trigger its own per-instance re-fetch.
-            CustomFieldInstance.objects.update_or_create(
-                document=docs_by_id[doc_id],
-                field=custom_field,
-                defaults=defaults,
-            )
+            # Not update_or_create(): it fetches an existing row via plain
+            # `.get()` before calling .save(), so a signal receiver touching
+            # `.field`/`.document` (e.g. auditlog) on that save re-fetches
+            # per instance regardless of what's passed in as lookup kwargs.
+            # Assigning the cached objects ourselves before .save() avoids
+            # that for both the create and update case.
+            try:
+                instance = CustomFieldInstance.objects.get(
+                    document=docs_by_id[doc_id],
+                    field=custom_field,
+                )
+            except CustomFieldInstance.DoesNotExist:
+                instance = CustomFieldInstance(
+                    document=docs_by_id[doc_id],
+                    field=custom_field,
+                )
+            instance.document = docs_by_id[doc_id]
+            instance.field = custom_field
+            for attr, val in defaults.items():
+                setattr(instance, attr, val)
+            instance.save()
             if custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
                 reflect_doclinks(docs_by_id[doc_id], custom_field, value)
 
-    # For doc link fields that are being removed, remove symmetrical links
+    # For doc link fields being removed, remove symmetrical links.
+    # select_related here avoids resolving every affected document up front.
     for doclink_being_removed_instance in CustomFieldInstance.objects.filter(
         document_id__in=affected_docs,
         field__id__in=remove_custom_fields,
         field__data_type=CustomField.FieldDataType.DOCUMENTLINK,
         value_document_ids__isnull=False,
-    ).select_related("field"):
+    ).select_related("field", "document"):
         for target_doc_id in doclink_being_removed_instance.value:
             remove_doclink(
-                document=docs_by_id[doclink_being_removed_instance.document_id],
+                document=doclink_being_removed_instance.document,
                 field=doclink_being_removed_instance.field,
                 target_doc_id=target_doc_id,
             )
