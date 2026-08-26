@@ -1205,10 +1205,13 @@ def remove_doclink(
     """
     Removes a 'symmetrical' link to `document` from the target document's existing custom field instance
     """
-    target_doc_field_instance = CustomFieldInstance.objects.filter(
-        document_id=target_doc_id,
-        field=field,
-    ).first()
+    # select_related: a signal receiver (auditlog) touches .document/.field
+    # on save() below -- without this, that's a per-call reload query.
+    target_doc_field_instance = (
+        CustomFieldInstance.objects.filter(document_id=target_doc_id, field=field)
+        .select_related("document", "field")
+        .first()
+    )
     if (
         target_doc_field_instance is not None
         and document.id in target_doc_field_instance.value

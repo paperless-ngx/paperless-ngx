@@ -500,9 +500,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             - The field is removed from all of them in one call
         THEN:
             - The symmetrical links are removed from the target
-            - The source documents come from one batched query, not one
-              lookup per source document (the target side, fetched inside
-              remove_doclink(), is untouched by this PR and out of scope)
+            - No per-document lookup query is issued, on either side
         """
         target = Document.objects.create(checksum="rm-target", title="rm-target")
         docs = [
@@ -530,17 +528,17 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
                 remove_custom_fields=[field.id],
             )
 
-        source_doc_lookups = [
+        single_document_lookups = [
             q
             for q in ctx.captured_queries
             if 'FROM "documents_document"' in q["sql"]
-            and any(f'."id" = {doc.id} ' in q["sql"] for doc in docs)
+            and '"documents_document"."id" = ' in q["sql"]
         ]
         self.assertEqual(
-            source_doc_lookups,
+            single_document_lookups,
             [],
-            "Expected source documents to come from a batched query, not "
-            f"per-document lookups, got: {source_doc_lookups}",
+            "Expected batched document resolution, not per-document lookups, "
+            f"got: {single_document_lookups}",
         )
         self.assertEqual(target.custom_fields.get(field=field).value, [])
 
