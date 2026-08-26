@@ -106,7 +106,9 @@ class MailAccountViewSet(PassUserMixin, ModelViewSet[MailAccount]):
             except (TypeError, ValueError, MailAccount.DoesNotExist):
                 return HttpResponseForbidden("Insufficient permissions")
 
-            if not has_perms_owner_aware(
+            if not request.user.has_perms(
+                ["paperless_mail.change_mailaccount"],
+            ) or not has_perms_owner_aware(
                 request.user,
                 "change_mailaccount",
                 existing_account,

@@ -2195,7 +2195,9 @@ class TestMailAccountTestView(APITestCase):
             password="testpassword",
         )
         self.user.user_permissions.add(
-            *Permission.objects.filter(codename__in=["add_mailaccount"]),
+            *Permission.objects.filter(
+                codename__in=["add_mailaccount", "change_mailaccount"],
+            ),
         )
         self.user.save()
         self.client.force_authenticate(user=self.user)
