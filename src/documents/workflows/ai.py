@@ -1,12 +1,14 @@
 import logging
 from datetime import date
 from datetime import datetime
+from typing import TypeVar
 
 from django.contrib.auth.models import User
 
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import MatchingModel
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import WorkflowAction
@@ -26,6 +28,7 @@ from paperless_ai.matching import resolve_tag_ids
 logger = logging.getLogger("paperless.workflows.ai")
 
 AISuggestionField = WorkflowAction.AISuggestionField
+ObjT = TypeVar("ObjT", bound=MatchingModel)
 
 # Tags use m2m relation instead
 DIRECT_FIELDS: dict[str, str] = {
@@ -51,13 +54,13 @@ def resolve_date(dates: list[str]) -> date | None:
 
 
 def resolve_object(
-    model,
+    model: type[ObjT],
     names: list[str],
-    matched: list,
+    matched: list[ObjT],
     *,
     create_missing: bool,
     owner: User | None,
-):
+) -> ObjT | None:
     """
     Single object from a suggestion list. The best match if there was one, else
     optionally a newly-created object. StoragePaths are excluded.
@@ -172,44 +175,50 @@ def apply_ai_suggestions_to_document(
             document.title = title[:128]
             updated_fields.append("title")
 
-    for field, model, choice, resolve_ids, match_names in (
-        (
-            AISuggestionField.CORRESPONDENT,
-            Correspondent,
-            suggestions["correspondents"],
-            resolve_correspondent_ids,
-            match_correspondents_by_name,
-        ),
-        (
-            AISuggestionField.DOCUMENT_TYPE,
-            DocumentType,
-            suggestions["document_types"],
-            resolve_document_type_ids,
-            match_document_types_by_name,
-        ),
-        (
-            AISuggestionField.STORAGE_PATH,
-            StoragePath,
-            suggestions["storage_paths"],
-            resolve_storage_path_ids,
-            match_storage_paths_by_name,
-        ),
-    ):
-        if not should_set(field):
-            continue
-
+    if should_set(AISuggestionField.CORRESPONDENT):
+        choice = suggestions["correspondents"]
         names = choice["new_names"]
-        obj = resolve_object(
-            model,
+        correspondent = resolve_object(
+            Correspondent,
             names,
-            resolve_ids(choice["existing_ids"], owner) + match_names(names, owner),
+            resolve_correspondent_ids(choice["existing_ids"], owner)
+            + match_correspondents_by_name(names, owner),
             create_missing=create_missing,
             owner=owner,
         )
-        if obj:
-            document_field = DIRECT_FIELDS[field]
-            setattr(document, document_field, obj)
-            updated_fields.append(document_field)
+        if correspondent:
+            document.correspondent = correspondent
+            updated_fields.append("correspondent")
+
+    if should_set(AISuggestionField.DOCUMENT_TYPE):
+        choice = suggestions["document_types"]
+        names = choice["new_names"]
+        document_type = resolve_object(
+            DocumentType,
+            names,
+            resolve_document_type_ids(choice["existing_ids"], owner)
+            + match_document_types_by_name(names, owner),
+            create_missing=create_missing,
+            owner=owner,
+        )
+        if document_type:
+            document.document_type = document_type
+            updated_fields.append("document_type")
+
+    if should_set(AISuggestionField.STORAGE_PATH):
+        choice = suggestions["storage_paths"]
+        names = choice["new_names"]
+        storage_path = resolve_object(
+            StoragePath,
+            names,
+            resolve_storage_path_ids(choice["existing_ids"], owner)
+            + match_storage_paths_by_name(names, owner),
+            create_missing=create_missing,
+            owner=owner,
+        )
+        if storage_path:
+            document.storage_path = storage_path
+            updated_fields.append("storage_path")
 
     if should_set(AISuggestionField.CREATED):
         created = resolve_date(suggestions["dates"])
