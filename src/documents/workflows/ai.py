@@ -223,10 +223,6 @@ def apply_ai_suggestions_to_document(
             document.created = created
             updated_fields.append("created")
 
-    if updated_fields:
-        # save fields and update modified
-        document.save(update_fields=[*updated_fields, "modified"])
-
     if AISuggestionField.TAGS in selected:
         choice = suggestions["tags"]
         names = choice["new_names"]
@@ -242,6 +238,13 @@ def apply_ai_suggestions_to_document(
             # does not really apply here
             document.add_nested_tags(tags)
             updated_fields.append("tags")
+
+    if updated_fields:
+        # save fields and update modified (excluding m2m tags from update_fields)
+        direct_updated_fields = [
+            field for field in updated_fields if field in DIRECT_FIELDS.values()
+        ]
+        document.save(update_fields=[*direct_updated_fields, "modified"])
 
     logger.info(
         "Applied AI suggestions %s to document %s",
