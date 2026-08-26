@@ -30,6 +30,7 @@ import { StoragePath } from 'src/app/data/storage-path'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { Workflow } from 'src/app/data/workflow'
 import {
+  AISuggestionField,
   WorkflowAction,
   WorkflowActionType,
 } from 'src/app/data/workflow-action'
@@ -151,6 +152,37 @@ export const WORKFLOW_ACTION_OPTIONS = [
   {
     id: WorkflowActionType.RemoteOcr,
     name: $localize`Remote OCR`,
+  },
+  {
+    id: WorkflowActionType.ApplyAiSuggestions,
+    name: $localize`Apply AI suggestions`,
+  },
+]
+
+export const AI_SUGGESTION_FIELD_OPTIONS = [
+  {
+    id: AISuggestionField.Title,
+    name: $localize`Title`,
+  },
+  {
+    id: AISuggestionField.Tags,
+    name: $localize`Tags`,
+  },
+  {
+    id: AISuggestionField.Correspondent,
+    name: $localize`Correspondent`,
+  },
+  {
+    id: AISuggestionField.DocumentType,
+    name: $localize`Document type`,
+  },
+  {
+    id: AISuggestionField.StoragePath,
+    name: $localize`Storage path`,
+  },
+  {
+    id: AISuggestionField.Created,
+    name: $localize`Created date`,
   },
 ]
 
@@ -574,6 +606,24 @@ export class WorkflowEditDialogComponent
         ))
     if (!remoteOcrUsable) {
       allowed = allowed.filter((a) => a.id !== WorkflowActionType.RemoteOcr)
+    }
+
+    // Only available after consumption. Unlike remote OCR this is hidden only
+    // once every trigger is consumption, so it stays offered on a workflow
+    // that has no triggers yet.
+    const aiSuggestionsUsable =
+      this.settingsService.get(SETTINGS_KEYS.AI_ENABLED) &&
+      (!formWorkflow?.triggers?.length ||
+        formWorkflow.triggers.some(
+          (trigger) => trigger.type !== WorkflowTriggerType.Consumption
+        ) ||
+        formWorkflow.actions?.some(
+          (action) => action.type === WorkflowActionType.ApplyAiSuggestions
+        ))
+    if (!aiSuggestionsUsable) {
+      allowed = allowed.filter(
+        (a) => a.id !== WorkflowActionType.ApplyAiSuggestions
+      )
     }
 
     if (
@@ -1227,6 +1277,11 @@ export class WorkflowEditDialogComponent
         passwords: new FormControl(
           this.formatPasswords(action.passwords ?? [])
         ),
+        ai_suggestion_fields: new FormControl(
+          action.ai_suggestion_fields ?? []
+        ),
+        ai_create_missing: new FormControl(!!action.ai_create_missing),
+        ai_overwrite_existing: new FormControl(!!action.ai_overwrite_existing),
       }),
       { emitEvent }
     )
@@ -1316,6 +1371,10 @@ export class WorkflowEditDialogComponent
     return this.actionTypeOptions.find((t) => t.id === type)?.name ?? ''
   }
 
+  get aiSuggestionFieldOptions() {
+    return AI_SUGGESTION_FIELD_OPTIONS
+  }
+
   addAction() {
     if (!this.object) {
       this.object = Object.assign({}, this.objectForm.value)
@@ -1369,6 +1428,9 @@ export class WorkflowEditDialogComponent
         include_document: false,
       },
       passwords: [],
+      ai_suggestion_fields: [],
+      ai_create_missing: false,
+      ai_overwrite_existing: false,
     }
     this.object.actions.push(action)
     this.createActionField(action)

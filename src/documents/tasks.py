@@ -71,6 +71,7 @@ from paperless.config import RemoteOCRConfig
 from paperless.logging import consume_task_id
 from paperless.parsers import ParserContext
 from paperless.parsers.registry import get_parser_registry
+from paperless_ai.exceptions import LLMTimeoutError
 from paperless_ai.indexing import llm_index_add_or_update_document
 from paperless_ai.indexing import llm_index_remove_document
 from paperless_ai.indexing import update_llm_index
@@ -712,6 +713,45 @@ def llmindex_index(
         iter_wrapper=iter_wrapper,
         rebuild=rebuild,
     )
+
+
+@shared_task(
+    bind=True,
+    autoretry_for=(LLMTimeoutError,),
+    max_retries=3,
+    retry_backoff=60,
+    retry_backoff_max=600,
+    retry_jitter=True,
+)
+def apply_ai_suggestions(self, action_id: int, document_id: int) -> None:
+    """
+    Deferred "apply AI suggestions" workflow action.
+    """
+    from documents.models import WorkflowAction
+    from documents.workflows.ai import apply_ai_suggestions_to_document
+
+    try:
+        action = WorkflowAction.objects.get(pk=action_id)
+        document = Document.objects.select_related("owner").get(pk=document_id)
+    except (WorkflowAction.DoesNotExist, Document.DoesNotExist):
+        logger.warning(
+            "Workflow action %s or document %s no longer exists, "
+            "not applying AI suggestions",
+            action_id,
+            document_id,
+        )
+        return
+
+    if not apply_ai_suggestions_to_document(action, document):
+        return
+
+    # No document_updated signal to avoid loop
+    clear_document_caches(document.pk)
+    index_document.delay(document.pk)
+
+    ai_config = AIConfig()
+    if ai_config.llm_index_enabled:
+        update_document_in_llm_index.apply_async(kwargs={"document": document})
 
 
 @shared_task

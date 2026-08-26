@@ -8,6 +8,17 @@ export enum WorkflowActionType {
   PasswordRemoval = 5,
   MoveToTrash = 6,
   RemoteOcr = 7,
+  ApplyAiSuggestions = 8,
+}
+
+// see src/documents/models.py AISuggestionField
+export enum AISuggestionField {
+  Title = 'title',
+  Tags = 'tags',
+  Correspondent = 'correspondent',
+  DocumentType = 'document_type',
+  StoragePath = 'storage_path',
+  Created = 'created',
 }
 
 export interface WorkflowActionEmail extends ObjectWithId {
@@ -102,4 +113,10 @@ export interface WorkflowAction extends ObjectWithId {
   webhook?: WorkflowActionWebhook
 
   passwords?: string[]
+
+  ai_suggestion_fields?: AISuggestionField[]
+
+  ai_create_missing?: boolean
+
+  ai_overwrite_existing?: boolean
 }

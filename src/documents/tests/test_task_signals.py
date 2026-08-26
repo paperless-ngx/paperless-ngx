@@ -386,6 +386,25 @@ class TestTaskFailureHandler:
 
 
 @pytest.mark.django_db
+class TestApplyAiSuggestionsTracking:
+    def test_records_the_document_it_is_for(self) -> None:
+        """
+        The action queues one task per document, so the tracked record notes
+        which document it is for -- otherwise a bulk run is an indistinguishable
+        wall of identical entries in the tasks list.
+        """
+        task_id = send_publish(
+            "documents.tasks.apply_ai_suggestions",
+            (),
+            {"action_id": 1, "document_id": 42},
+        )
+
+        task = PaperlessTask.objects.get(task_id=task_id)
+        assert task.task_type == PaperlessTask.TaskType.APPLY_AI_SUGGESTIONS
+        assert task.input_data == {"document_id": 42}
+
+
+@pytest.mark.django_db
 class TestTaskRevokedHandler:
     def test_marks_task_revoked(self, mocker: pytest_mock.MockerFixture) -> None:
         """task_revoked_handler moves a queued task to REVOKED and stamps date_done."""

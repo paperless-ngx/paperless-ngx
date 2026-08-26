@@ -22,6 +22,7 @@ import {
 } from 'src/app/data/matching-model'
 import { Workflow } from 'src/app/data/workflow'
 import {
+  AISuggestionField,
   WorkflowAction,
   WorkflowActionType,
 } from 'src/app/data/workflow-action'
@@ -49,6 +50,7 @@ import { TagsComponent } from '../../input/tags/tags.component'
 import { TextComponent } from '../../input/text/text.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import {
+  AI_SUGGESTION_FIELD_OPTIONS,
   DOCUMENT_SOURCE_OPTIONS,
   SCHEDULE_DATE_FIELD_OPTIONS,
   TriggerFilterType,
@@ -239,14 +241,15 @@ describe('WorkflowEditDialogComponent', () => {
       SCHEDULE_DATE_FIELD_OPTIONS
     )
 
-    // Email disabled
+    // Email, remote OCR and AI all disabled
     jest.spyOn(settingsService, 'get').mockReturnValue(false)
     component.ngOnInit()
     expect(component.actionTypeOptions).toEqual(
       WORKFLOW_ACTION_OPTIONS.filter(
         (a) =>
           a.id !== WorkflowActionType.Email &&
-          a.id !== WorkflowActionType.RemoteOcr
+          a.id !== WorkflowActionType.RemoteOcr &&
+          a.id !== WorkflowActionType.ApplyAiSuggestions
       )
     )
   })
@@ -342,6 +345,125 @@ describe('WorkflowEditDialogComponent', () => {
     expect(component.actionTypeOptions.map((a) => a.id)).not.toContain(
       WorkflowActionType.RemoteOcr
     )
+  })
+
+  it('should offer apply AI suggestions unless every trigger is consumption', () => {
+    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+
+    // Consumption runs before the document has been parsed, so there would be
+    // no content to make suggestions from
+    component.object = {
+      name: 'Workflow 1',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.Consumption }],
+      actions: [],
+    } as Workflow
+    component.ngOnInit()
+    expect(component.actionTypeOptions.map((a) => a.id)).not.toContain(
+      WorkflowActionType.ApplyAiSuggestions
+    )
+
+    // A second, usable trigger is enough
+    component.object = {
+      name: 'Workflow 2',
+      order: 0,
+      enabled: true,
+      triggers: [
+        { type: WorkflowTriggerType.Consumption },
+        { type: WorkflowTriggerType.DocumentAdded },
+      ],
+      actions: [],
+    } as Workflow
+    component.ngOnInit()
+    expect(component.actionTypeOptions.map((a) => a.id)).toContain(
+      WorkflowActionType.ApplyAiSuggestions
+    )
+  })
+
+  it('should keep apply AI suggestions listed when an action already uses it', () => {
+    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+
+    // Otherwise changing the trigger would silently blank the selection
+    component.object = {
+      name: 'Workflow 1',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.Consumption }],
+      actions: [{ type: WorkflowActionType.ApplyAiSuggestions }],
+    } as Workflow
+    component.ngOnInit()
+
+    expect(component.actionTypeOptions.map((a) => a.id)).toContain(
+      WorkflowActionType.ApplyAiSuggestions
+    )
+  })
+
+  it('should not offer apply AI suggestions when AI is disabled', () => {
+    jest
+      .spyOn(settingsService, 'get')
+      .mockImplementation((key) => key !== SETTINGS_KEYS.AI_ENABLED)
+
+    component.object = {
+      name: 'Workflow 1',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.DocumentAdded }],
+      actions: [],
+    } as Workflow
+    component.ngOnInit()
+
+    expect(component.actionTypeOptions.map((a) => a.id)).not.toContain(
+      WorkflowActionType.ApplyAiSuggestions
+    )
+  })
+
+  it('should create form fields for apply AI suggestions options', () => {
+    component.object = {
+      name: 'Workflow 1',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.DocumentAdded }],
+      actions: [
+        {
+          type: WorkflowActionType.ApplyAiSuggestions,
+          ai_suggestion_fields: [
+            AISuggestionField.Title,
+            AISuggestionField.Tags,
+          ],
+          ai_create_missing: true,
+          ai_overwrite_existing: true,
+        },
+      ],
+    } as Workflow
+    component.ngOnInit()
+
+    const action = component.actionFields.at(0)
+    expect(action.get('ai_suggestion_fields').value).toEqual([
+      AISuggestionField.Title,
+      AISuggestionField.Tags,
+    ])
+    expect(action.get('ai_create_missing').value).toBeTruthy()
+    expect(action.get('ai_overwrite_existing').value).toBeTruthy()
+    expect(component.aiSuggestionFieldOptions).toEqual(
+      AI_SUGGESTION_FIELD_OPTIONS
+    )
+  })
+
+  it('should default apply AI suggestions options on a new action', () => {
+    component.object = {
+      name: 'Workflow 1',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.DocumentAdded }],
+      actions: [],
+    } as Workflow
+    component.addAction()
+
+    const action = component.actionFields.at(component.actionFields.length - 1)
+    expect(action.get('ai_suggestion_fields').value).toEqual([])
+    expect(action.get('ai_create_missing').value).toBeFalsy()
+    expect(action.get('ai_overwrite_existing').value).toBeFalsy()
   })
 
   it('should support add and remove triggers and actions', () => {

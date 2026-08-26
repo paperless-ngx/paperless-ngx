@@ -766,6 +766,7 @@ class PaperlessTask(ModelWithOwner):
         REPROCESS_DOCUMENT = "reprocess_document", _("Reprocess Document")
         BUILD_SHARE_LINK = "build_share_link", _("Build Share Link")
         BULK_DELETE = "bulk_delete", _("Bulk Delete")
+        APPLY_AI_SUGGESTIONS = "apply_ai_suggestions", _("Apply AI Suggestions")
 
     COMPLETE_STATUSES = (
         Status.SUCCESS,
@@ -1674,6 +1675,18 @@ class WorkflowAction(models.Model):
             7,
             _("Remote OCR"),
         )
+        APPLY_AI_SUGGESTIONS = (
+            8,
+            _("Apply AI suggestions"),
+        )
+
+    class AISuggestionField(models.TextChoices):
+        TITLE = ("title", _("Title"))
+        TAGS = ("tags", _("Tags"))
+        CORRESPONDENT = ("correspondent", _("Correspondent"))
+        DOCUMENT_TYPE = ("document_type", _("Document type"))
+        STORAGE_PATH = ("storage_path", _("Storage path"))
+        CREATED = ("created", _("Created date"))
 
     type = models.PositiveSmallIntegerField(
         _("Workflow Action Type"),
@@ -1909,6 +1922,33 @@ class WorkflowAction(models.Model):
         blank=True,
         help_text=_(
             "Passwords to try when removing PDF protection. Separate with commas or new lines.",
+        ),
+    )
+
+    ai_suggestion_fields = models.JSONField(
+        _("AI suggestion fields"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "Which of the AI-suggested fields to apply to the document.",
+        ),
+    )
+
+    ai_create_missing = models.BooleanField(
+        _("create missing objects"),
+        default=False,
+        help_text=_(
+            "Create suggested tags, correspondents, document types and storage "
+            "paths that do not already exist instead of skipping them.",
+        ),
+    )
+
+    ai_overwrite_existing = models.BooleanField(
+        _("overwrite existing values"),
+        default=False,
+        help_text=_(
+            "Apply suggestions even if the document already has a value for that "
+            "field. Tags are always added to, never replaced.",
         ),
     )
 
