@@ -67,6 +67,10 @@ def handle_social_account_updated(sender, request, sociallogin, **kwargs):
             )
             or []
         )
+
+    if isinstance(social_account_groups, str):
+        social_account_groups = [social_account_groups]
+
     if settings.SOCIAL_ACCOUNT_SYNC_GROUPS and social_account_groups is not None:
         groups = Group.objects.filter(name__in=social_account_groups)
         logger.debug(
