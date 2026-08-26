@@ -229,7 +229,9 @@ def _apply_bulk_permission_entry(
                 content_type=ctype,
                 object_pk__in=object_pks,
                 permission__codename=codename,
-            ).values_list(f"{identity_field}_id", flat=True),
+            )
+            .values_list(f"{identity_field}_id", flat=True)
+            .distinct(),
         )
         remove_ids = existing_ids - add_ids
         if remove_ids:
