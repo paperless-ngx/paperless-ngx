@@ -1133,7 +1133,8 @@ class DocumentViewSet(
                     "custom_fields",
                     queryset=CustomFieldInstance.objects.select_related("field"),
                 ),
-                "notes",
+                # NotesSerializer nests the author, this avoids query per note
+                Prefetch("notes", queryset=Note.objects.select_related("user")),
             )
         )
 

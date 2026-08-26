@@ -45,6 +45,7 @@ import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ChatComponent } from '../chat/chat/chat.component'
+import { BrandMarkComponent } from '../common/logo/brand-mark/brand-mark.component'
 import { LogoComponent } from '../common/logo/logo.component'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
@@ -61,6 +62,7 @@ const SCROLL_THRESHOLD = 16
   imports: [
     GlobalSearchComponent,
     LogoComponent,
+    BrandMarkComponent,
     DocumentTitlePipe,
     IfPermissionsDirective,
     ToastsDropdownComponent,
