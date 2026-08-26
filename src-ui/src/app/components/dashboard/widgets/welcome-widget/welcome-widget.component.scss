@@ -1,7 +1,5 @@
-
 .welcome-widget {
-  border-color: color-mix(in srgb, var(--bs-primary) 30%, transparent);
-  background-image: linear-gradient(115deg, color-mix(in srgb, var(--bs-primary) 12%, transparent), transparent 60%);
+  border-color: color-mix(in srgb, var(--bs-primary) 50%, transparent);
 
   hr {
     border-top-color: color-mix(in srgb, var(--bs-primary) 25%, transparent);
@@ -10,4 +8,9 @@
 
 .welcome-copy {
   max-width: 68ch;
+}
+
+.welcome-watermark {
+  right: -6rem;
+  opacity: .07;
 }
