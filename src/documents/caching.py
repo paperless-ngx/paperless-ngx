@@ -2,20 +2,25 @@ from __future__ import annotations
 
 import logging
 import pickle
+import time
 from binascii import hexlify
 from collections import OrderedDict
 from dataclasses import dataclass
+from hashlib import sha256
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Final
+from uuid import uuid4
 
 from django.conf import settings
 from django.core.cache import cache
 from django.core.cache import caches
 
 from documents.models import Document
+from paperless_ai.ai_classifier import get_ai_document_classification
 
 if TYPE_CHECKING:
+    from django.contrib.auth.models import User
     from django.core.cache.backends.base import BaseCache
 
     from documents.classifier import DocumentClassifier
@@ -221,6 +226,56 @@ def get_llm_suggestion_cache(
         return data
 
     return None
+
+
+def retrieve_llm_suggestions(
+    document: Document,
+    user: User | None,
+    output_language: str | None,
+    backend: str,
+    *,
+    lock_timeout: int,
+) -> dict:
+    """Return cached LLM suggestions, generating them once across workers."""
+    lock_key = (
+        f"{get_suggestion_cache_key(document.pk)}_llm_lock_"
+        f"{sha256(backend.encode()).hexdigest()}"
+    )
+
+    while True:
+        cached = get_llm_suggestion_cache(document.pk, backend)
+        if cached is not None:
+            refresh_suggestions_cache(document.pk)
+            return cached.suggestions
+
+        lock_token = uuid4().hex
+        if cache.add(lock_key, lock_token, lock_timeout):
+            try:
+                # The cache may have been populated while acquiring the lock.
+                cached = get_llm_suggestion_cache(document.pk, backend)
+                if cached is not None:
+                    refresh_suggestions_cache(document.pk)
+                    return cached.suggestions
+
+                suggestions = get_ai_document_classification(
+                    document,
+                    user,
+                    output_language,
+                )
+                set_llm_suggestions_cache(
+                    document.pk,
+                    suggestions,
+                    backend=backend,
+                )
+                return suggestions
+            finally:
+                # Do not remove a replacement lock if this one expired while
+                # generation was still running.
+                if cache.get(lock_key) == lock_token:
+                    cache.delete(lock_key)
+
+        # Another worker is generating suggestions, poll to avoid another LLM request
+        time.sleep(0.1)
 
 
 def set_llm_suggestions_cache(

@@ -2486,7 +2486,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         response = self.client.get("/api/documents/34676/suggestions/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @mock.patch("documents.views.get_ai_document_classification")
+    @mock.patch("documents.caching.get_ai_document_classification")
     @override_settings(AI_ENABLED=True)
     def test_suggestions_still_uses_classifier_when_ai_enabled(
         self,
