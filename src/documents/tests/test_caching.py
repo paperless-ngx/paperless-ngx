@@ -3,8 +3,6 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Event
 from threading import Lock
 
-from django.core.cache import cache
-
 from documents.caching import StoredLRUCache
 from documents.caching import retrieve_llm_suggestions
 
@@ -52,7 +50,6 @@ def test_stored_lru_cache_key_ttl(mocker) -> None:
 
 
 def test_llm_suggestions_are_generated_once_for_concurrent_requests(mocker) -> None:
-    cache.clear()
     generation_started = Event()
     finish_generation = Event()
     waiter_started = Event()
@@ -75,7 +72,7 @@ def test_llm_suggestions_are_generated_once_for_concurrent_requests(mocker) -> N
         assert finish_generation.wait(timeout=2)
 
     mock_get_classification = mocker.patch(
-        "documents.caching.get_ai_document_classification",
+        "paperless_ai.ai_classifier.get_ai_document_classification",
         side_effect=generate,
     )
     mocker.patch("documents.caching.time.sleep", side_effect=wait_for_generation)
@@ -86,7 +83,7 @@ def test_llm_suggestions_are_generated_once_for_concurrent_requests(mocker) -> N
             document,
             user,
             None,
-            "ollama:model",
+            backend="ollama:model",
             lock_timeout=10,
         )
         assert generation_started.wait(timeout=2)
@@ -95,7 +92,7 @@ def test_llm_suggestions_are_generated_once_for_concurrent_requests(mocker) -> N
             document,
             user,
             None,
-            "ollama:model",
+            backend="ollama:model",
             lock_timeout=10,
         )
         assert waiter_started.wait(timeout=2)

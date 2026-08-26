@@ -17,7 +17,6 @@ from django.core.cache import cache
 from django.core.cache import caches
 
 from documents.models import Document
-from paperless_ai.ai_classifier import get_ai_document_classification
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import User
@@ -56,6 +55,9 @@ CLASSIFIER_MODIFIED_KEY: Final[str] = "classifier_modified"
 #   1001 - suggestions reshaped to {"existing_ids": [...], "new_names":
 #          [...]} per taxonomy field (#13676)
 LLM_CACHE_CLASSIFIER_VERSION: Final[int] = 1001
+
+# How often a request waiting on llm generation re-checks the  cache
+LLM_SUGGESTION_POLL_INTERVAL: Final[float] = 0.5
 
 CACHE_1_MINUTE: Final[int] = 60
 CACHE_5_MINUTES: Final[int] = 5 * CACHE_1_MINUTE
@@ -232,18 +234,21 @@ def retrieve_llm_suggestions(
     document: Document,
     user: User | None,
     output_language: str | None,
-    backend: str,
     *,
+    backend: str,
     lock_timeout: int,
 ) -> dict:
     """Return cached LLM suggestions, generating them once across workers."""
+    # Lazy import to avoid pulling in the whole AI stuff
+    from paperless_ai.ai_classifier import get_ai_document_classification
+
     lock_key = (
         f"{get_suggestion_cache_key(document.pk)}_llm_lock_"
         f"{sha256(backend.encode()).hexdigest()}"
     )
 
     while True:
-        cached = get_llm_suggestion_cache(document.pk, backend)
+        cached = get_llm_suggestion_cache(document.pk, backend=backend)
         if cached is not None:
             refresh_suggestions_cache(document.pk)
             return cached.suggestions
@@ -252,7 +257,7 @@ def retrieve_llm_suggestions(
         if cache.add(lock_key, lock_token, lock_timeout):
             try:
                 # The cache may have been populated while acquiring the lock.
-                cached = get_llm_suggestion_cache(document.pk, backend)
+                cached = get_llm_suggestion_cache(document.pk, backend=backend)
                 if cached is not None:
                     refresh_suggestions_cache(document.pk)
                     return cached.suggestions
@@ -275,7 +280,7 @@ def retrieve_llm_suggestions(
                     cache.delete(lock_key)
 
         # Another worker is generating suggestions, poll to avoid another LLM request
-        time.sleep(0.1)
+        time.sleep(LLM_SUGGESTION_POLL_INTERVAL)
 
 
 def set_llm_suggestions_cache(

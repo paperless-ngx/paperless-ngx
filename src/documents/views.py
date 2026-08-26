@@ -1560,10 +1560,10 @@ class DocumentViewSet(
         else:
             try:
                 llm_suggestions = retrieve_llm_suggestions(
-                    doc,
-                    request.user,
-                    output_language,
-                    llm_cache_backend,
+                    document=doc,
+                    user=request.user,
+                    output_language=output_language,
+                    backend=llm_cache_backend,
                     # Classification, localization + 30s
                     lock_timeout=(2 * ai_config.llm_request_timeout) + 30,
                 )
