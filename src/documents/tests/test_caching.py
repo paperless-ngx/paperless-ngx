@@ -1,4 +1,9 @@
+from concurrent.futures import ThreadPoolExecutor
+from threading import Event
+from threading import Lock
+
 from documents.caching import StoredLRUCache
+from documents.caching import retrieve_llm_suggestions
 from paperless.signed_pickle import HMAC_SIZE
 from paperless.signed_pickle import signed_pickle_dumps
 from paperless.signed_pickle import signed_pickle_loads
@@ -56,3 +61,59 @@ def test_stored_lru_cache_rejects_tampered_data(mocker) -> None:
     cache.load()
 
     assert cache.get("x") is None
+
+
+def test_llm_suggestions_are_generated_once_for_concurrent_requests(mocker) -> None:
+    generation_started = Event()
+    finish_generation = Event()
+    waiter_started = Event()
+    call_lock = Lock()
+    calls = 0
+    suggestions = {"title": "Generated once"}
+    document = mocker.Mock(pk=42)
+    user = mocker.Mock()
+
+    def generate(*args) -> dict:
+        nonlocal calls
+        with call_lock:
+            calls += 1
+        generation_started.set()
+        assert finish_generation.wait(timeout=2)
+        return suggestions
+
+    def wait_for_generation(_interval: float) -> None:
+        waiter_started.set()
+        assert finish_generation.wait(timeout=2)
+
+    mock_get_classification = mocker.patch(
+        "paperless_ai.ai_classifier.get_ai_document_classification",
+        side_effect=generate,
+    )
+    mocker.patch("documents.caching.time.sleep", side_effect=wait_for_generation)
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        first = executor.submit(
+            retrieve_llm_suggestions,
+            document,
+            user,
+            None,
+            backend="ollama:model",
+            lock_timeout=10,
+        )
+        assert generation_started.wait(timeout=2)
+        second = executor.submit(
+            retrieve_llm_suggestions,
+            document,
+            user,
+            None,
+            backend="ollama:model",
+            lock_timeout=10,
+        )
+        assert waiter_started.wait(timeout=2)
+        finish_generation.set()
+
+        assert first.result(timeout=2) == suggestions
+        assert second.result(timeout=2) == suggestions
+
+    assert calls == 1
+    mock_get_classification.assert_called_once_with(document, user, None)
