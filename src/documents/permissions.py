@@ -302,7 +302,7 @@ def set_permissions_for_objects(
     (object, user) pair.
     """
     object_pks = [str(pk) for pk in pks]
-    if not object_pks:
+    if not object_pks:  # pragma: no cover
         return
 
     model_name = model.__name__.lower()
