@@ -10,12 +10,12 @@
     tourAnchor="tour.intro">
     @if (!hasCustomBranding) {
       <pngx-logo extra_classes="navbar-official-logo px-1" height="2.4rem"></pngx-logo>
-      <svg pngx-brand-mark class="brand-mark brand-mark-slim d-none" width="1.5em" height="1.5em"></svg>
+      <pngx-brand-mark class="brand-mark brand-mark-slim d-none"></pngx-brand-mark>
     } @else {
       @if (customAppLogo) {
         <img class="brand-logo" [src]="customAppLogo" alt="" />
       } @else {
-        <svg pngx-brand-mark class="brand-mark" width="1.5em" height="1.5em"></svg>
+        <pngx-brand-mark class="brand-mark"></pngx-brand-mark>
       }
       <div class="brand-copy ms-2 text-truncate" [class.d-md-none]="slimSidebarEnabled">
         <span class="brand-title text-truncate">{{ appTitle }}</span>
