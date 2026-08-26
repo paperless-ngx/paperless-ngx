@@ -33,6 +33,7 @@ from documents.file_handling import generate_unique_filename
 from documents.signals.handlers import run_workflows
 from documents.workflows.ai import apply_ai_suggestions_to_document
 from documents.workflows.webhooks import send_webhook
+from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.exceptions import LLMTimeoutError
 
 if TYPE_CHECKING:
@@ -5492,12 +5493,24 @@ class TestRemoteOCRWorkflowAction(DirectoriesMixin, SampleDirMixin, APITestCase)
         self.assertIn("only applies to consumption triggers", "".join(cm.output))
 
 
-SUGGESTIONS = {
+SUGGESTIONS: ClassificationSuggestions = {
     "title": "Suggested Title",
-    "tags": ["Existing Tag", "Suggested Tag"],
-    "correspondents": ["Existing Correspondent", "Suggested Correspondent"],
-    "document_types": ["Suggested Document Type"],
-    "storage_paths": ["Suggested Storage Path"],
+    "tags": {
+        "existing_ids": [],
+        "new_names": ["Existing Tag", "Suggested Tag"],
+    },
+    "correspondents": {
+        "existing_ids": [],
+        "new_names": ["Existing Correspondent", "Suggested Correspondent"],
+    },
+    "document_types": {
+        "existing_ids": [],
+        "new_names": ["Suggested Document Type"],
+    },
+    "storage_paths": {
+        "existing_ids": [],
+        "new_names": ["Suggested Storage Path"],
+    },
     "dates": ["2024-03-05"],
 }
 
@@ -5547,10 +5560,14 @@ class TestApplyAISuggestionsWorkflowAction(
         w.save()
         return w
 
-    def apply(self, action: WorkflowAction) -> list[str]:
+    def apply(
+        self,
+        action: WorkflowAction,
+        suggestions: ClassificationSuggestions = SUGGESTIONS,
+    ) -> list[str]:
         with mock.patch(
             "documents.workflows.ai.get_ai_document_classification",
-            return_value=SUGGESTIONS,
+            return_value=suggestions,
         ):
             changed = apply_ai_suggestions_to_document(action, self.doc)
         self.doc.refresh_from_db()
@@ -5733,6 +5750,57 @@ class TestApplyAISuggestionsWorkflowAction(
         self.assertNotIn("document_type", changed)
         self.assertEqual(Tag.objects.count(), 1)
         self.assertEqual(Correspondent.objects.count(), 1)
+
+    def test_existing_id_suggestions_are_applied(self) -> None:
+        """
+        GIVEN:
+            - AI suggestions that select existing taxonomy candidates by ID
+        WHEN:
+            - The suggestions are applied
+        THEN:
+            - Each selected object is assigned to the document
+        """
+        tag = Tag.objects.create(name="Existing Tag", owner=self.user)
+        correspondent = Correspondent.objects.create(
+            name="Existing Correspondent",
+            owner=self.user,
+        )
+        document_type = DocumentType.objects.create(
+            name="Existing Document Type",
+            owner=self.user,
+        )
+        storage_path = StoragePath.objects.create(
+            name="Existing Storage Path",
+            path="{{ title }}",
+            owner=self.user,
+        )
+        action = self.make_action(ai_overwrite_existing=True)
+        suggestions: ClassificationSuggestions = {
+            **SUGGESTIONS,
+            "tags": {"existing_ids": [tag.pk], "new_names": []},
+            "correspondents": {
+                "existing_ids": [correspondent.pk],
+                "new_names": [],
+            },
+            "document_types": {
+                "existing_ids": [document_type.pk],
+                "new_names": [],
+            },
+            "storage_paths": {
+                "existing_ids": [storage_path.pk],
+                "new_names": [],
+            },
+        }
+
+        changed = self.apply(action, suggestions)
+
+        self.assertEqual(list(self.doc.tags.all()), [tag])
+        self.assertEqual(self.doc.correspondent, correspondent)
+        self.assertEqual(self.doc.document_type, document_type)
+        self.assertEqual(self.doc.storage_path, storage_path)
+        self.assertTrue(
+            {"tags", "correspondent", "document_type", "storage_path"} <= set(changed),
+        )
 
     def test_create_missing_creates_objects_owned_by_document_owner(self) -> None:
         """

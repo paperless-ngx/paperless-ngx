@@ -18,6 +18,10 @@ from paperless_ai.matching import match_correspondents_by_name
 from paperless_ai.matching import match_document_types_by_name
 from paperless_ai.matching import match_storage_paths_by_name
 from paperless_ai.matching import match_tags_by_name
+from paperless_ai.matching import resolve_correspondent_ids
+from paperless_ai.matching import resolve_document_type_ids
+from paperless_ai.matching import resolve_storage_path_ids
+from paperless_ai.matching import resolve_tag_ids
 
 logger = logging.getLogger("paperless.workflows.ai")
 
@@ -162,18 +166,20 @@ def apply_ai_suggestions_to_document(
         )
 
     if should_set(AISuggestionField.TITLE):
-        title = (suggestions.get("title") or "").strip()
+        title = suggestions["title"].strip()
         if title:
             # title is capped at 128 characters
             document.title = title[:128]
             updated_fields.append("title")
 
     if should_set(AISuggestionField.CORRESPONDENT):
-        names = suggestions.get("correspondents", [])
+        choice = suggestions["correspondents"]
+        names = choice["new_names"]
         correspondent = resolve_object(
             Correspondent,
             names,
-            match_correspondents_by_name(names, owner),
+            resolve_correspondent_ids(choice["existing_ids"], owner)
+            + match_correspondents_by_name(names, owner),
             create_missing=create_missing,
             owner=owner,
         )
@@ -182,11 +188,13 @@ def apply_ai_suggestions_to_document(
             updated_fields.append("correspondent")
 
     if should_set(AISuggestionField.DOCUMENT_TYPE):
-        names = suggestions.get("document_types", [])
+        choice = suggestions["document_types"]
+        names = choice["new_names"]
         document_type = resolve_object(
             DocumentType,
             names,
-            match_document_types_by_name(names, owner),
+            resolve_document_type_ids(choice["existing_ids"], owner)
+            + match_document_types_by_name(names, owner),
             create_missing=create_missing,
             owner=owner,
         )
@@ -195,11 +203,13 @@ def apply_ai_suggestions_to_document(
             updated_fields.append("document_type")
 
     if should_set(AISuggestionField.STORAGE_PATH):
-        names = suggestions.get("storage_paths", [])
+        choice = suggestions["storage_paths"]
+        names = choice["new_names"]
         storage_path = resolve_object(
             StoragePath,
             names,
-            match_storage_paths_by_name(names, owner),
+            resolve_storage_path_ids(choice["existing_ids"], owner)
+            + match_storage_paths_by_name(names, owner),
             create_missing=create_missing,
             owner=owner,
         )
@@ -208,7 +218,7 @@ def apply_ai_suggestions_to_document(
             updated_fields.append("storage_path")
 
     if should_set(AISuggestionField.CREATED):
-        created = resolve_date(suggestions.get("dates", []))
+        created = resolve_date(suggestions["dates"])
         if created:
             document.created = created
             updated_fields.append("created")
@@ -218,10 +228,12 @@ def apply_ai_suggestions_to_document(
         document.save(update_fields=[*updated_fields, "modified"])
 
     if AISuggestionField.TAGS in selected:
-        names = suggestions.get("tags", [])
+        choice = suggestions["tags"]
+        names = choice["new_names"]
         tags = resolve_tags(
             names,
-            match_tags_by_name(names, owner),
+            resolve_tag_ids(choice["existing_ids"], owner)
+            + match_tags_by_name(names, owner),
             create_missing=create_missing,
             owner=owner,
         )
