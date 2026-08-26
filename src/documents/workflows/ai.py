@@ -226,20 +226,20 @@ def apply_ai_suggestions_to_document(
             document.created = created
             updated_fields.append("created")
 
+    tags_to_add: list[Tag] = []
     if AISuggestionField.TAGS in selected:
         choice = suggestions["tags"]
         names = choice["new_names"]
-        tags = resolve_tags(
+        tags_to_add = resolve_tags(
             names,
             resolve_tag_ids(choice["existing_ids"], owner)
             + match_tags_by_name(names, owner),
             create_missing=create_missing,
             owner=owner,
         )
-        if tags:
+        if tags_to_add:
             # Suggested tags are always added, so overwrite_existing
             # does not really apply here
-            document.add_nested_tags(tags)
             updated_fields.append("tags")
 
     if updated_fields:
@@ -248,6 +248,10 @@ def apply_ai_suggestions_to_document(
             field for field in updated_fields if field in DIRECT_FIELDS.values()
         ]
         document.save(update_fields=[*direct_updated_fields, "modified"])
+
+    # Tags at the end so m2m_changed doesn't trigger db and overwrite other changes
+    if tags_to_add:
+        document.add_nested_tags(tags_to_add)
 
     logger.info(
         "Applied AI suggestions %s to document %s",

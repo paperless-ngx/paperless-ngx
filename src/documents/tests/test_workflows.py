@@ -5573,6 +5573,41 @@ class TestApplyAISuggestionsWorkflowAction(
         self.doc.refresh_from_db()
         return changed
 
+    def test_fields_persist_when_tags_are_applied_in_the_same_run(self) -> None:
+        """
+        GIVEN:
+            - A document that already has a filename, as any consumed document does
+            - Suggestions carrying both a document type and tags
+        WHEN:
+            - The suggestions are applied
+        THEN:
+            - The document type is still set after the tags are added
+
+        Adding tags fires m2m_changed, and update_filename_and_move_files
+        refreshes the document from the database. Assigning fields and then
+        adding tags before saving loses those assignments, and only for
+        documents with a filename, so it does not reproduce on a bare
+        Document.objects.create().
+        """
+        self.doc.filename = "originals/original.pdf"
+        self.doc.save(update_fields=["filename"])
+
+        action = self.make_action(ai_create_missing=True)
+        changed = self.apply(action)
+
+        self.assertIn("document_type", changed)
+        self.assertIn("tags", changed)
+        self.assertIsNotNone(
+            self.doc.document_type,
+            "document_type was reported as applied but did not persist",
+        )
+        self.assertEqual(self.doc.document_type.name, "Suggested Document Type")
+        self.assertEqual(self.doc.correspondent.name, "Existing Correspondent")
+        self.assertCountEqual(
+            [t.name for t in self.doc.tags.all()],
+            ["Existing Tag", "Suggested Tag"],
+        )
+
     def test_document_added_trigger_queues_task(self) -> None:
         """
         GIVEN:
