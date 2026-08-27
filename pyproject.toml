@@ -220,6 +220,7 @@ extend-select = [
   "COM",     # https://docs.astral.sh/ruff/rules/#flake8-commas-com
   "D419",    # https://docs.astral.sh/ruff/rules/#pydocstyle-d
   "DJ",      # https://docs.astral.sh/ruff/rules/#flake8-django-dj
+  "DTZ",     # https://docs.astral.sh/ruff/rules/#flake8-datetimez-dtz
   "EXE",     # https://docs.astral.sh/ruff/rules/#flake8-executable-exe
   "FA",      # https://docs.astral.sh/ruff/rules/#flake8-future-annotations-fa
   "FBT",     # https://docs.astral.sh/ruff/rules/#flake8-boolean-trap-fbt
@@ -304,6 +305,7 @@ per-file-ignores."*/migrations/*.py" = [
 ]
 # Testing
 per-file-ignores."*/tests/*.py" = [
+  "DTZ",
   "E501",
   "SIM117",
 ]

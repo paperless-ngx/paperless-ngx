@@ -47,7 +47,7 @@ def resolve_date(dates: list[str]) -> date | None:
     """
     for value in dates:
         try:
-            return datetime.strptime(value, "%Y-%m-%d").date()
+            return datetime.strptime(value, "%Y-%m-%d").date()  # noqa: DTZ007 - only the calendar date is used, time/tz is discarded
         except (TypeError, ValueError):
             logger.debug("Ignoring unparsable suggested date %s", value)
     return None

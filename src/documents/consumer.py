@@ -856,7 +856,7 @@ class ConsumerPlugin(
         else:
             stats = Path(self.input_doc.original_file).stat()
             create_date = timezone.make_aware(
-                datetime.datetime.fromtimestamp(stats.st_mtime),
+                datetime.datetime.fromtimestamp(stats.st_mtime),  # noqa: DTZ006 - make_aware() requires a naive datetime
             )
             self.log.debug(f"Creation date from st_mtime: {create_date}")
 

@@ -78,7 +78,9 @@ class CollatePlugin(NoCleanupPluginMixin, NoSetupPluginMixin, ConsumeTaskPlugin)
             stats = staging.stat()
             # if the file is older than the timeout, we don't consider
             # it valid
-            if (dt.datetime.now().timestamp() - stats.st_mtime) > TIMEOUT_SECONDS:
+            if (
+                dt.datetime.now(tz=dt.UTC).timestamp() - stats.st_mtime
+            ) > TIMEOUT_SECONDS:
                 logger.warning("Outdated double sided staging file exists, deleting it")
                 staging.unlink()
             else:
@@ -134,7 +136,7 @@ class CollatePlugin(NoCleanupPluginMixin, NoSetupPluginMixin, ConsumeTaskPlugin)
             shutil.move(pdf_file, staging)
             # update access to modification time so we know if the file
             # is outdated when another file gets uploaded
-            timestamp = dt.datetime.now().timestamp()
+            timestamp = dt.datetime.now(tz=dt.UTC).timestamp()
             os.utime(staging, (timestamp, timestamp))
             logger.info(
                 "Got scan with odd numbered pages of double-sided scan, moved it to %s",
