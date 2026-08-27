@@ -189,6 +189,23 @@ class TestWebSockets:
 
         await communicator.disconnect()
 
+    @pytest.mark.anyio
+    async def test_heartbeat(self, mocker: MockerFixture) -> None:
+        mocker.patch(
+            "paperless.consumers.StatusConsumer._authenticated",
+            return_value=True,
+        )
+        mocker.patch("paperless.consumers.HEARTBEAT_INTERVAL", 0.01)
+
+        communicator = WebsocketCommunicator(application, "/ws/status/")
+        connected, _ = await communicator.connect()
+        assert connected
+
+        assert await communicator.receive_json_from() == {"type": "heartbeat"}
+        assert await communicator.receive_json_from() == {"type": "heartbeat"}
+
+        await communicator.disconnect()
+
     def test_manager_send_progress(self, mocker: MockerFixture) -> None:
         mock_group_send = mocker.patch(
             "channels.layers.InMemoryChannelLayer.group_send",

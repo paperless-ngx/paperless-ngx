@@ -22,6 +22,7 @@ import {
 } from 'src/app/data/matching-model'
 import { Workflow } from 'src/app/data/workflow'
 import {
+  AISuggestionField,
   WorkflowAction,
   WorkflowActionType,
 } from 'src/app/data/workflow-action'
@@ -29,6 +30,7 @@ import {
   DocumentSource,
   WorkflowTriggerType,
 } from 'src/app/data/workflow-trigger'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
@@ -48,6 +50,7 @@ import { TagsComponent } from '../../input/tags/tags.component'
 import { TextComponent } from '../../input/text/text.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import {
+  AI_SUGGESTION_FIELD_OPTIONS,
   DOCUMENT_SOURCE_OPTIONS,
   SCHEDULE_DATE_FIELD_OPTIONS,
   TriggerFilterType,
@@ -224,7 +227,12 @@ describe('WorkflowEditDialogComponent', () => {
     ).toEqual('Document Added')
     expect(component.getTriggerTypeOptionName(null)).toEqual('')
     expect(component.sourceOptions).toEqual(DOCUMENT_SOURCE_OPTIONS)
-    expect(component.actionTypeOptions).toEqual(WORKFLOW_ACTION_OPTIONS)
+    // Remote OCR is absent until the workflow has a consumption trigger
+    expect(component.actionTypeOptions).toEqual(
+      WORKFLOW_ACTION_OPTIONS.filter(
+        (a) => a.id !== WorkflowActionType.RemoteOcr
+      )
+    )
     expect(
       component.getActionTypeOptionName(WorkflowActionType.Assignment)
     ).toEqual('Assignment')
@@ -233,12 +241,229 @@ describe('WorkflowEditDialogComponent', () => {
       SCHEDULE_DATE_FIELD_OPTIONS
     )
 
-    // Email disabled
+    // Email, remote OCR and AI all disabled
     jest.spyOn(settingsService, 'get').mockReturnValue(false)
     component.ngOnInit()
     expect(component.actionTypeOptions).toEqual(
-      WORKFLOW_ACTION_OPTIONS.filter((a) => a.id !== WorkflowActionType.Email)
+      WORKFLOW_ACTION_OPTIONS.filter(
+        (a) =>
+          a.id !== WorkflowActionType.Email &&
+          a.id !== WorkflowActionType.RemoteOcr &&
+          a.id !== WorkflowActionType.ApplyAiSuggestions
+      )
     )
+  })
+
+  it('should offer remote OCR only for consumption workflows', () => {
+    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+
+    // A consumption trigger makes the action reachable
+    component.object = {
+      name: 'Workflow 1',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.Consumption }],
+      actions: [],
+    } as Workflow
+    component.ngOnInit()
+    expect(component.actionTypeOptions.map((a) => a.id)).toContain(
+      WorkflowActionType.RemoteOcr
+    )
+
+    // Any other trigger type runs after the document has been parsed
+    component.object = {
+      name: 'Workflow 2',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.DocumentAdded }],
+      actions: [],
+    } as Workflow
+    component.ngOnInit()
+    expect(component.actionTypeOptions.map((a) => a.id)).not.toContain(
+      WorkflowActionType.RemoteOcr
+    )
+  })
+
+  it('should offer remote OCR on a trigger added to a new workflow', () => {
+    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+    component.ngOnInit()
+
+    // Nothing for the action to apply to yet
+    expect(component.actionTypeOptions.map((a) => a.id)).not.toContain(
+      WorkflowActionType.RemoteOcr
+    )
+
+    // addTrigger creates the form field with emitEvent false, so the options
+    // have to be computed on read rather than cached from valueChanges
+    component.addTrigger()
+    expect(component.actionTypeOptions.map((a) => a.id)).toContain(
+      WorkflowActionType.RemoteOcr
+    )
+
+    // Switching that trigger to a type that runs after parsing removes it
+    component.triggerFields
+      .at(0)
+      .get('type')
+      .setValue(WorkflowTriggerType.DocumentAdded)
+    expect(component.actionTypeOptions.map((a) => a.id)).not.toContain(
+      WorkflowActionType.RemoteOcr
+    )
+  })
+
+  it('should keep remote OCR listed when an action already uses it', () => {
+    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+
+    // Otherwise changing the trigger would silently blank the selection
+    component.object = {
+      name: 'Workflow 1',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.DocumentAdded }],
+      actions: [{ type: WorkflowActionType.RemoteOcr }],
+    } as Workflow
+    component.ngOnInit()
+
+    expect(component.actionTypeOptions.map((a) => a.id)).toContain(
+      WorkflowActionType.RemoteOcr
+    )
+  })
+
+  it('should not offer remote OCR when no engine is configured', () => {
+    jest
+      .spyOn(settingsService, 'get')
+      .mockImplementation((key) => key !== SETTINGS_KEYS.REMOTE_OCR_CONFIGURED)
+
+    component.object = {
+      name: 'Workflow 1',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.Consumption }],
+      actions: [],
+    } as Workflow
+    component.ngOnInit()
+
+    expect(component.actionTypeOptions.map((a) => a.id)).not.toContain(
+      WorkflowActionType.RemoteOcr
+    )
+  })
+
+  it('should offer apply AI suggestions unless every trigger is consumption', () => {
+    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+
+    // Consumption runs before the document has been parsed, so there would be
+    // no content to make suggestions from
+    component.object = {
+      name: 'Workflow 1',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.Consumption }],
+      actions: [],
+    } as Workflow
+    component.ngOnInit()
+    expect(component.actionTypeOptions.map((a) => a.id)).not.toContain(
+      WorkflowActionType.ApplyAiSuggestions
+    )
+
+    // A second, usable trigger is enough
+    component.object = {
+      name: 'Workflow 2',
+      order: 0,
+      enabled: true,
+      triggers: [
+        { type: WorkflowTriggerType.Consumption },
+        { type: WorkflowTriggerType.DocumentAdded },
+      ],
+      actions: [],
+    } as Workflow
+    component.ngOnInit()
+    expect(component.actionTypeOptions.map((a) => a.id)).toContain(
+      WorkflowActionType.ApplyAiSuggestions
+    )
+  })
+
+  it('should keep apply AI suggestions listed when an action already uses it', () => {
+    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+
+    // Otherwise changing the trigger would silently blank the selection
+    component.object = {
+      name: 'Workflow 1',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.Consumption }],
+      actions: [{ type: WorkflowActionType.ApplyAiSuggestions }],
+    } as Workflow
+    component.ngOnInit()
+
+    expect(component.actionTypeOptions.map((a) => a.id)).toContain(
+      WorkflowActionType.ApplyAiSuggestions
+    )
+  })
+
+  it('should not offer apply AI suggestions when AI is disabled', () => {
+    jest
+      .spyOn(settingsService, 'get')
+      .mockImplementation((key) => key !== SETTINGS_KEYS.AI_ENABLED)
+
+    component.object = {
+      name: 'Workflow 1',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.DocumentAdded }],
+      actions: [],
+    } as Workflow
+    component.ngOnInit()
+
+    expect(component.actionTypeOptions.map((a) => a.id)).not.toContain(
+      WorkflowActionType.ApplyAiSuggestions
+    )
+  })
+
+  it('should create form fields for apply AI suggestions options', () => {
+    component.object = {
+      name: 'Workflow 1',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.DocumentAdded }],
+      actions: [
+        {
+          type: WorkflowActionType.ApplyAiSuggestions,
+          ai_suggestion_fields: [
+            AISuggestionField.Title,
+            AISuggestionField.Tags,
+          ],
+          ai_create_missing: true,
+          ai_overwrite_existing: true,
+        },
+      ],
+    } as Workflow
+    component.ngOnInit()
+
+    const action = component.actionFields.at(0)
+    expect(action.get('ai_suggestion_fields').value).toEqual([
+      AISuggestionField.Title,
+      AISuggestionField.Tags,
+    ])
+    expect(action.get('ai_create_missing').value).toBeTruthy()
+    expect(action.get('ai_overwrite_existing').value).toBeTruthy()
+    expect(component.aiSuggestionFieldOptions).toEqual(
+      AI_SUGGESTION_FIELD_OPTIONS
+    )
+  })
+
+  it('should default apply AI suggestions options on a new action', () => {
+    component.object = {
+      name: 'Workflow 1',
+      order: 0,
+      enabled: true,
+      triggers: [{ type: WorkflowTriggerType.DocumentAdded }],
+      actions: [],
+    } as Workflow
+    component.addAction()
+
+    const action = component.actionFields.at(component.actionFields.length - 1)
+    expect(action.get('ai_suggestion_fields').value).toEqual([])
+    expect(action.get('ai_create_missing').value).toBeFalsy()
+    expect(action.get('ai_overwrite_existing').value).toBeFalsy()
   })
 
   it('should support add and remove triggers and actions', () => {
@@ -1018,5 +1243,29 @@ describe('WorkflowEditDialogComponent', () => {
       'pass2',
       'pass3',
     ])
+  })
+
+  it('should parse passwords again when retrying a failed save', () => {
+    component.object = {
+      name: 'Workflow with blank Passwords',
+      id: 1,
+      order: null,
+      enabled: true,
+      triggers: [],
+      actions: [
+        {
+          id: 1,
+          type: WorkflowActionType.PasswordRemoval,
+          passwords: [],
+        },
+      ],
+    }
+    component.ngOnInit()
+
+    component.save()
+    component.objectForm.get('order').setValue(1)
+
+    expect(() => component.save()).not.toThrow()
+    expect(component.objectForm.get('actions').value[0].passwords).toEqual([])
   })
 })

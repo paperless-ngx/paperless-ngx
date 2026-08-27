@@ -472,6 +472,81 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertIn("my_document.pdf", response["Content-Disposition"])
         response.close()
 
+    @override_settings(FILENAME_FORMAT="")
+    def test_download_filename_normalization_does_not_inject_parameters(
+        self,
+    ) -> None:
+        doc = Document.objects.create(
+            title="file.doc\uff02; x=\uff02\uff3c",
+            created=date(2020, 1, 2),
+            filename="source.pdf",
+            mime_type="application/pdf",
+        )
+        Path(doc.source_path).write_bytes(b"This is a test")
+
+        response = self.client.get(
+            f"/api/documents/{doc.pk}/download/?original=true",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response["Content-Disposition"],
+            "attachment; "
+            'filename="2020-01-02 file.doc_; x=__.pdf"; '
+            "filename*=utf-8''2020-01-02%20file.doc%EF%BC%82%3B%20x%3D%EF%BC%82%EF%BC%BC.pdf",
+        )
+        response.close()
+
+    @override_settings(FILENAME_FORMAT="")
+    def test_serve_text_file_declares_utf8_charset(self) -> None:
+        """
+        GIVEN:
+            - A UTF-8 encoded text document
+        WHEN:
+            - The file is served for preview or download
+        THEN:
+            - The Content-Type declares the UTF-8 charset, so the browser does
+              not fall back to its locale default and mangle non-ASCII text
+        """
+        doc = Document.objects.create(
+            title="none",
+            filename="my_document.txt",
+            mime_type="text/plain",
+        )
+        Path(doc.source_path).write_bytes("für Grüße München".encode())
+
+        for endpoint in ("preview", "download"):
+            with self.subTest(endpoint=endpoint):
+                response = self.client.get(f"/api/documents/{doc.pk}/{endpoint}/")
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(response["Content-Type"], "text/plain; charset=utf-8")
+                self.assertEqual(
+                    read_streaming_response(response).decode("utf-8"),
+                    "für Grüße München",
+                )
+
+    @override_settings(FILENAME_FORMAT="")
+    def test_serve_pdf_file_has_no_charset(self) -> None:
+        """
+        GIVEN:
+            - A PDF document
+        WHEN:
+            - The file is served for preview
+        THEN:
+            - No charset is added to the binary content type
+        """
+        doc = Document.objects.create(
+            title="none",
+            filename="my_document.pdf",
+            mime_type="application/pdf",
+        )
+        Path(doc.source_path).write_bytes(b"This is a test")
+
+        response = self.client.get(f"/api/documents/{doc.pk}/preview/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response["Content-Type"], "application/pdf")
+        response.close()
+
     def test_document_actions_not_existing_file(self) -> None:
         doc = Document.objects.create(
             title="none",
@@ -2880,18 +2955,20 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
 
         v1 = SavedView.objects.get(name="test")
         self.assertEqual(v1.sort_field, "created2")
+        self.assertEqual(v1.icon, SavedView.Icon.FUNNEL)
         self.assertEqual(v1.filter_rules.count(), 1)
         self.assertEqual(v1.owner, self.user)
 
         response = self.client.patch(
             f"/api/saved_views/{v1.id}/",
-            {"sort_reverse": True},
+            {"sort_reverse": True, "icon": SavedView.Icon.RECEIPT},
             format="json",
         )
 
         v1 = SavedView.objects.get(id=v1.id)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(v1.sort_reverse)
+        self.assertEqual(v1.icon, SavedView.Icon.RECEIPT)
         self.assertEqual(v1.filter_rules.count(), 1)
 
         view["filter_rules"] = [{"rule_type": 12, "value": "secret"}]
@@ -2910,6 +2987,13 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
 
         v1 = SavedView.objects.get(id=v1.id)
         self.assertEqual(v1.filter_rules.count(), 0)
+
+        response = self.client.patch(
+            f"/api/saved_views/{v1.id}/",
+            {"icon": "not-an-icon"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_saved_view_display_options(self) -> None:
         """

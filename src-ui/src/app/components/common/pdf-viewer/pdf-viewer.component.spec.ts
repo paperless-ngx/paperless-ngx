@@ -90,6 +90,7 @@ describe('PngxPdfViewerComponent', () => {
     }
     expect(viewer).toBeInstanceOf(PDFSinglePageViewer)
     expect(viewer.options.textLayerMode).toBe(0)
+    expect(viewer.options.enableSelectionRendering).toBe(false)
   })
 
   it('applies zoom, rotation, and page changes', async () => {

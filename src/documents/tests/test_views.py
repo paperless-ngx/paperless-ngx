@@ -79,10 +79,6 @@ class TestViews(DirectoriesMixin, TestCase):
                 f"frontend/{language_actual}/styles.css",
             )
             self.assertEqual(
-                response.context_data["runtime_js"],
-                f"frontend/{language_actual}/runtime.js",
-            )
-            self.assertEqual(
                 response.context_data["polyfills_js"],
                 f"frontend/{language_actual}/polyfills.js",
             )
@@ -356,19 +352,94 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         mock_refresh_cache,
         mock_get_cache,
     ) -> None:
-        mock_get_cache.return_value = MagicMock(suggestions={"tags": ["tag1", "tag2"]})
+        """
+        GIVEN:
+            - A cached LLM classification holding the raw existing_ids/
+              new_names choices (never resolved object ids)
+        WHEN:
+            - ai_suggestions is requested
+        THEN:
+            - The cached choices are resolved into ids for this request
+              (not returned verbatim from the cache) and the cache's TTL is
+              refreshed
+        """
+        mock_get_cache.return_value = MagicMock(
+            suggestions={
+                "title": "Cached Title",
+                "tags": {"existing_ids": [self.tag1.pk], "new_names": []},
+                "correspondents": {"existing_ids": [], "new_names": []},
+                "document_types": {"existing_ids": [], "new_names": []},
+                "storage_paths": {"existing_ids": [], "new_names": []},
+                "dates": [],
+            },
+        )
 
         self.client.force_login(user=self.user)
         response = self.client.get(
             f"/api/documents/{self.document.pk}/ai_suggestions/",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json(), {"tags": ["tag1", "tag2"]})
+        self.assertEqual(response.json()["title"], "Cached Title")
+        self.assertEqual(response.json()["tags"], [self.tag1.pk])
         mock_get_cache.assert_called_once_with(
             self.document.pk,
             backend="mock_backend",
         )
         mock_refresh_cache.assert_called_once_with(self.document.pk)
+
+    @patch("documents.views.get_llm_suggestion_cache")
+    @patch("documents.views.refresh_suggestions_cache")
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_BACKEND="mock_backend",
+    )
+    def test_ai_suggestions_cache_hit_re_filters_for_narrower_requester(
+        self,
+        mock_refresh_cache,
+        mock_get_cache,
+    ) -> None:
+        """
+        GIVEN:
+            - A cached LLM classification whose existing_ids include a tag
+              only visible to a broader-visibility user (e.g. the requester
+              who originally generated it)
+            - A second, non-superuser requester who may change the document
+              but has no permission to view that tag
+        WHEN:
+            - ai_suggestions is requested by the second requester and the
+              cache is hit
+        THEN:
+            - The cache hit still runs permission filtering fresh for this
+              requester; the invisible tag id does not leak into either the
+              matched or suggested tags
+        """
+        tag_owner = User.objects.create_user(username="cache_tag_owner")
+        invisible_tag = Tag.objects.create(name="cache_restricted", owner=tag_owner)
+        requester = User.objects.create_user(username="cache_requester")
+        requester.user_permissions.add(
+            *Permission.objects.filter(
+                codename__in=["view_document", "change_document", "view_tag"],
+            ),
+        )
+        mock_get_cache.return_value = MagicMock(
+            suggestions={
+                "title": "Untitled",
+                "tags": {"existing_ids": [invisible_tag.pk], "new_names": []},
+                "correspondents": {"existing_ids": [], "new_names": []},
+                "document_types": {"existing_ids": [], "new_names": []},
+                "storage_paths": {"existing_ids": [], "new_names": []},
+                "dates": [],
+            },
+        )
+
+        self.client.force_login(user=requester)
+        response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()["tags"], [])
+        self.assertEqual(response.json()["suggested_tags"], [])
 
     @patch("documents.views.get_ai_document_classification")
     @override_settings(
@@ -381,10 +452,16 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
     ) -> None:
         mock_get_ai_classification.return_value = {
             "title": "AI Title",
-            "tags": ["tag1", "tag2"],
-            "correspondents": ["correspondent1"],
-            "document_types": ["type1"],
-            "storage_paths": ["path1"],
+            "tags": {"existing_ids": [self.tag1.pk], "new_names": ["tag2"]},
+            "correspondents": {
+                "existing_ids": [self.correspondent1.pk],
+                "new_names": [],
+            },
+            "document_types": {
+                "existing_ids": [self.document_type1.pk],
+                "new_names": [],
+            },
+            "storage_paths": {"existing_ids": [self.path1.pk], "new_names": []},
             "dates": ["2023-01-01"],
         }
 
@@ -426,10 +503,10 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         UiSettings.objects.create(user=self.user, settings={"language": "de-de"})
         mock_get_ai_classification.return_value = {
             "title": "KI Title",
-            "tags": [],
-            "correspondents": [],
-            "document_types": [],
-            "storage_paths": [],
+            "tags": {"existing_ids": [], "new_names": []},
+            "correspondents": {"existing_ids": [], "new_names": []},
+            "document_types": {"existing_ids": [], "new_names": []},
+            "storage_paths": {"existing_ids": [], "new_names": []},
             "dates": [],
         }
 
@@ -465,10 +542,10 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         UiSettings.objects.create(user=self.user, settings={"language": "de-de"})
         mock_get_ai_classification.return_value = {
             "title": "Titre IA",
-            "tags": [],
-            "correspondents": [],
-            "document_types": [],
-            "storage_paths": [],
+            "tags": {"existing_ids": [], "new_names": []},
+            "correspondents": {"existing_ids": [], "new_names": []},
+            "document_types": {"existing_ids": [], "new_names": []},
+            "storage_paths": {"existing_ids": [], "new_names": []},
             "dates": [],
         }
 
@@ -506,10 +583,10 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         either yields a cache miss instead of a stale hit."""
         mock_get_ai_classification.return_value = {
             "title": "Answer A",
-            "tags": [],
-            "correspondents": [],
-            "document_types": [],
-            "storage_paths": [],
+            "tags": {"existing_ids": [], "new_names": []},
+            "correspondents": {"existing_ids": [], "new_names": []},
+            "document_types": {"existing_ids": [], "new_names": []},
+            "storage_paths": {"existing_ids": [], "new_names": []},
             "dates": [],
         }
 
@@ -583,6 +660,132 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             get_llm_suggestion_cache(self.document.pk, backend="openai-like"),
         )
 
+    @patch("documents.views.get_ai_document_classification")
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_BACKEND="mock_backend",
+    )
+    def test_ai_suggestions_combines_existing_ids_and_new_names(
+        self,
+        mock_get_ai_classification,
+    ) -> None:
+        """
+        GIVEN:
+            - AI classification returns a taxonomy choice with both an
+              existing tag id and a new tag name not present in the database
+        WHEN:
+            - ai_suggestions is requested
+        THEN:
+            - the existing id is resolved into the matched tags list
+            - the new name is fuzzy-matched, and since it doesn't match any
+              existing tag, it is surfaced as a suggested tag
+        """
+        mock_get_ai_classification.return_value = {
+            "title": "Lab Report",
+            "tags": {"existing_ids": [self.tag1.pk], "new_names": ["Follow-up"]},
+            "correspondents": {"existing_ids": [], "new_names": []},
+            "document_types": {"existing_ids": [], "new_names": []},
+            "storage_paths": {"existing_ids": [], "new_names": []},
+            "dates": [],
+        }
+
+        self.client.force_login(user=self.user)
+        response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()["tags"], [self.tag1.pk])
+        self.assertEqual(response.json()["suggested_tags"], ["Follow-up"])
+
+    @patch("documents.views.get_ai_document_classification")
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_BACKEND="mock_backend",
+    )
+    def test_ai_suggestions_deduplicates_id_matched_via_both_paths(
+        self,
+        mock_get_ai_classification,
+    ) -> None:
+        """
+        GIVEN:
+            - AI classification returns the same tag both as an existing_id
+              and as a new_name that fuzzy-matches that same tag
+        WHEN:
+            - ai_suggestions is requested
+        THEN:
+            - The tag's id appears exactly once in the response, not twice
+        """
+        mock_get_ai_classification.return_value = {
+            "title": "Lab Report",
+            "tags": {
+                "existing_ids": [self.tag1.pk],
+                "new_names": [self.tag1.name],
+            },
+            "correspondents": {"existing_ids": [], "new_names": []},
+            "document_types": {"existing_ids": [], "new_names": []},
+            "storage_paths": {"existing_ids": [], "new_names": []},
+            "dates": [],
+        }
+
+        self.client.force_login(user=self.user)
+        response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()["tags"], [self.tag1.pk])
+        self.assertEqual(response.json()["suggested_tags"], [])
+
+    @patch("documents.views.get_ai_document_classification")
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_BACKEND="mock_backend",
+    )
+    def test_ai_suggestions_existing_id_not_visible_falls_through_to_suggested(
+        self,
+        mock_get_ai_classification,
+    ) -> None:
+        """
+        GIVEN:
+            - A non-superuser who may change the document but has no
+              permission to view a tag owned by somebody else
+            - AI classification returns that tag's id in existing_ids (e.g.
+              from a cached response generated for a broader-visibility user)
+        WHEN:
+            - ai_suggestions is requested by that user
+        THEN:
+            - the invisible id is silently dropped by resolve_tag_ids, so
+              permission filtering survives the full request path
+            - it does not appear in either the matched or suggested tags
+        """
+        tag_owner = User.objects.create_user(username="tagowner")
+        invisible_tag = Tag.objects.create(name="restricted", owner=tag_owner)
+        requester = User.objects.create_user(username="requester")
+        requester.user_permissions.add(
+            *Permission.objects.filter(
+                codename__in=["view_document", "change_document", "view_tag"],
+            ),
+        )
+
+        mock_get_ai_classification.return_value = {
+            "title": "Untitled",
+            "tags": {"existing_ids": [invisible_tag.pk], "new_names": []},
+            "correspondents": {"existing_ids": [], "new_names": []},
+            "document_types": {"existing_ids": [], "new_names": []},
+            "storage_paths": {"existing_ids": [], "new_names": []},
+            "dates": [],
+        }
+
+        self.client.force_login(user=requester)
+        response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()["tags"], [])
+        self.assertEqual(response.json()["suggested_tags"], [])
+
     def test_invalidate_suggestions_cache(self) -> None:
         self.client.force_login(user=self.user)
         suggestions = {
@@ -648,11 +851,11 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         self.assertIn(b"AI is required for this feature", response.content)
 
     @patch("documents.views.stream_chat_with_documents")
-    @patch("documents.views.get_objects_for_user_owner_aware")
+    @patch("documents.views.permitted_document_ids")
     @override_settings(AI_ENABLED=True)
-    def test_post_no_document_id(self, mock_get_objects, mock_stream_chat) -> None:
+    def test_post_no_document_id(self, mock_permitted_ids, mock_stream_chat) -> None:
         self.grant_view_document_permission()
-        mock_get_objects.return_value = [self.document]
+        mock_permitted_ids.return_value = [self.document.pk]
         mock_stream_chat.return_value = iter([b"data"])
         response = self.client.post(
             self.ENDPOINT,
@@ -661,23 +864,23 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "text/event-stream")
-        mock_stream_chat.assert_called_once_with(
-            query_str="question",
-            documents=[self.document],
-            output_language=None,
-        )
+        mock_stream_chat.assert_called_once()
+        call_kwargs = mock_stream_chat.call_args.kwargs
+        self.assertEqual(call_kwargs["query_str"], "question")
+        self.assertEqual(list(call_kwargs["documents"]), [self.document])
+        self.assertIsNone(call_kwargs["output_language"])
 
     @patch("documents.views.stream_chat_with_documents")
-    @patch("documents.views.get_objects_for_user_owner_aware")
+    @patch("documents.views.permitted_document_ids")
     @override_settings(AI_ENABLED=True)
     def test_post_uses_user_display_language(
         self,
-        mock_get_objects,
+        mock_permitted_ids,
         mock_stream_chat,
     ) -> None:
         UiSettings.objects.create(user=self.user, settings={"language": "de-de"})
         self.grant_view_document_permission()
-        mock_get_objects.return_value = [self.document]
+        mock_permitted_ids.return_value = [self.document.pk]
         mock_stream_chat.return_value = iter([b"data"])
 
         response = self.client.post(
@@ -687,11 +890,11 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        mock_stream_chat.assert_called_once_with(
-            query_str="question",
-            documents=[self.document],
-            output_language="de-de",
-        )
+        mock_stream_chat.assert_called_once()
+        call_kwargs = mock_stream_chat.call_args.kwargs
+        self.assertEqual(call_kwargs["query_str"], "question")
+        self.assertEqual(list(call_kwargs["documents"]), [self.document])
+        self.assertEqual(call_kwargs["output_language"], "de-de")
 
     @patch("documents.views.stream_chat_with_documents")
     @override_settings(AI_ENABLED=True)

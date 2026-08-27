@@ -274,7 +274,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     activeModal.componentInstance.btnClass = 'btn-danger'
     activeModal.componentInstance.btnCaption = $localize`Delete`
     activeModal.componentInstance.confirmClicked.subscribe(() => {
-      activeModal.componentInstance.buttonsEnabled = false
+      activeModal.componentInstance.buttonsEnabled.set(false)
       this.service
         .delete(object)
         .pipe(takeUntil(this.unsubscribeNotifier))
@@ -284,7 +284,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
             this.reloadData()
           },
           error: (error) => {
-            activeModal.componentInstance.buttonsEnabled = true
+            activeModal.componentInstance.buttonsEnabled.set(true)
             this.toastService.showError(
               $localize`Error while deleting element`,
               error
@@ -455,7 +455,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked.subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
+      modal.componentInstance.buttonsEnabled.set(false)
       this.service
         .bulk_edit_objects(
           this.allSelectionActive ? [] : Array.from(this.selectedObjects),
@@ -472,7 +472,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
             this.reloadData()
           },
           error: (error) => {
-            modal.componentInstance.buttonsEnabled = true
+            modal.componentInstance.buttonsEnabled.set(true)
             this.toastService.showError(
               $localize`Error deleting objects`,
               error

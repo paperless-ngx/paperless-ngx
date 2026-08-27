@@ -168,6 +168,7 @@ class TestParseHostingSettings:
 def make_expected_schedule(
     overrides: dict[str, dict[str, Any]] | None = None,
     disabled: set[str] | None = None,
+    email_minute: str = "6,16,26,36,46,56",
 ) -> dict[str, Any]:
     """
     Build the expected schedule with optional overrides and disabled tasks.
@@ -185,7 +186,7 @@ def make_expected_schedule(
     schedule: dict[str, Any] = {
         "Check all e-mail accounts": {
             "task": "paperless_mail.tasks.process_mail_accounts",
-            "schedule": crontab(minute="*/10"),
+            "schedule": crontab(minute=email_minute),
             "options": {
                 "expires": mail_expire,
                 "headers": {"trigger_source": "scheduled"},
@@ -267,6 +268,11 @@ class TestParseBeatSchedule:
         [
             pytest.param({}, make_expected_schedule(), id="defaults"),
             pytest.param(
+                {"PAPERLESS_EMAIL_TASK_CRON": "*/10 * * * *"},
+                make_expected_schedule(email_minute="*/10"),
+                id="email-explicit-default",
+            ),
+            pytest.param(
                 {"PAPERLESS_EMAIL_TASK_CRON": "*/50 * * * mon"},
                 make_expected_schedule(
                     overrides={
@@ -304,7 +310,11 @@ class TestParseBeatSchedule:
         expected: dict[str, Any],
         mocker: MockerFixture,
     ) -> None:
-        mocker.patch.dict(os.environ, env, clear=False)
+        mocker.patch.dict(
+            os.environ,
+            {"PAPERLESS_SECRET_KEY": "test-secret", **env},
+            clear=False,
+        )
         schedule = parse_beat_schedule()
         assert schedule == expected
 

@@ -6,7 +6,7 @@
     infoLink="configuration">
 </pngx-page-header>
 
-<form [formGroup]="configForm" (ngSubmit)="saveConfig()" class="pb-4">
+<form [formGroup]="configForm" (ngSubmit)="saveConfig()" class="pb-4" autocomplete="off">
 
     <ul ngbNav #nav="ngbNav" class="nav-tabs">
         @for (category of optionCategories; track category) {
@@ -14,43 +14,48 @@
                 <a ngbNavLink>{{category}}</a>
                 <ng-template ngbNavContent>
                     <div class="p-3">
-                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
-                            @for (option of getCategoryOptions(category); track option.key) {
-                                <div class="col">
-                                    <div class="card bg-light">
-                                        <div class="card-body">
-                                            <div class="card-title d-flex align-items-center">
-                                                <h6 class="mb-0">
-                                                  {{option.title}}
-                                                </h6>
-                                                <a class="btn btn-sm btn-link" title="Read the documentation about this setting" i18n-title [href]="getDocsUrl(option.config_key)" target="_blank" referrerpolicy="no-referrer">
-                                                    <i-bs name="info-circle"></i-bs>
-                                                </a>
-                                                @if (isSet(option.key)) {
-                                                  <button type="button" class="btn btn-sm btn-link text-danger ms-auto pe-0" title="Reset" i18n-title (click)="resetOption(option.key)">
-                                                      <i-bs class="me-1" name="x"></i-bs><ng-container i18n>Reset</ng-container>
-                                                  </button>
+                        @for (section of getCategorySections(category); track section) {
+                            @if (section) {
+                                <h5 class="mt-4 mb-3">{{section}}</h5>
+                            }
+                            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
+                                @for (option of getCategoryOptions(category, section); track option.key) {
+                                    <div class="col">
+                                        <div class="card bg-light">
+                                            <div class="card-body">
+                                                <div class="card-title d-flex align-items-center">
+                                                    <h6 class="mb-0">
+                                                      {{option.title}}
+                                                    </h6>
+                                                    <a class="btn btn-sm btn-link" title="Read the documentation about this setting" i18n-title [href]="getDocsUrl(option.config_key)" target="_blank" referrerpolicy="no-referrer">
+                                                        <i-bs name="info-circle"></i-bs>
+                                                    </a>
+                                                    @if (isSet(option.key)) {
+                                                      <button type="button" class="btn btn-sm btn-link text-danger ms-auto pe-0" title="Reset" i18n-title (click)="resetOption(option.key)">
+                                                          <i-bs class="me-1" name="x"></i-bs><ng-container i18n>Reset</ng-container>
+                                                      </button>
+                                                    }
+                                                </div>
+                                                <div class="mb-n3">
+                                                    @switch (option.type) {
+                                                        @case (ConfigOptionType.Select) { <pngx-input-select [formControlName]="option.key" [error]="errors[option.key]" [items]="option.choices" [allowNull]="true"></pngx-input-select> }
+                                                        @case (ConfigOptionType.Number) { <pngx-input-number [formControlName]="option.key" [error]="errors[option.key]" [showAdd]="false"></pngx-input-number> }
+                                                        @case (ConfigOptionType.Boolean) { <pngx-input-switch [formControlName]="option.key" [error]="errors[option.key]" [showUnsetNote]="true" [horizontal]="true" title="Enable" i18n-title></pngx-input-switch> }
+                                                        @case (ConfigOptionType.String) { <pngx-input-text [formControlName]="option.key" [error]="errors[option.key]"></pngx-input-text> }
+                                                        @case (ConfigOptionType.JSON) { <pngx-input-text [formControlName]="option.key" [error]="errors[option.key]"></pngx-input-text> }
+                                                        @case (ConfigOptionType.File) { <pngx-input-file [formControlName]="option.key" (upload)="uploadFile($event, option.key)" [error]="errors[option.key]"></pngx-input-file> }
+                                                        @case (ConfigOptionType.Password) { <pngx-input-password [formControlName]="option.key" [error]="errors[option.key]" autocomplete="new-password"></pngx-input-password> }
+                                                    }
+                                                </div>
+                                                @if (option.note) {
+                                                    <div class="form-text fst-italic">{{option.note}}</div>
                                                 }
                                             </div>
-                                            <div class="mb-n3">
-                                                @switch (option.type) {
-                                                    @case (ConfigOptionType.Select) { <pngx-input-select [formControlName]="option.key" [error]="errors[option.key]" [items]="option.choices" [allowNull]="true"></pngx-input-select> }
-                                                    @case (ConfigOptionType.Number) { <pngx-input-number [formControlName]="option.key" [error]="errors[option.key]" [showAdd]="false"></pngx-input-number> }
-                                                    @case (ConfigOptionType.Boolean) { <pngx-input-switch [formControlName]="option.key" [error]="errors[option.key]" [showUnsetNote]="true" [horizontal]="true" title="Enable" i18n-title></pngx-input-switch> }
-                                                    @case (ConfigOptionType.String) { <pngx-input-text [formControlName]="option.key" [error]="errors[option.key]"></pngx-input-text> }
-                                                    @case (ConfigOptionType.JSON) { <pngx-input-text [formControlName]="option.key" [error]="errors[option.key]"></pngx-input-text> }
-                                                    @case (ConfigOptionType.File) { <pngx-input-file [formControlName]="option.key" (upload)="uploadFile($event, option.key)" [error]="errors[option.key]"></pngx-input-file> }
-                                                    @case (ConfigOptionType.Password) { <pngx-input-password [formControlName]="option.key" [error]="errors[option.key]"></pngx-input-password> }
-                                                }
-                                            </div>
-                                            @if (option.note) {
-                                                <div class="form-text fst-italic">{{option.note}}</div>
-                                            }
                                         </div>
                                     </div>
-                                </div>
-                            }
-                        </div>
+                                }
+                            </div>
+                        }
                     </div>
                 </ng-template>
             </li>

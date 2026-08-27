@@ -17,6 +17,10 @@ const permissions = [
   'view_document',
   'change_document',
   'delete_document',
+  'add_sharelinkbundle',
+  'view_sharelinkbundle',
+  'change_sharelinkbundle',
+  'delete_sharelinkbundle',
   'change_tag',
   'view_documenttype',
 ]
@@ -75,6 +79,7 @@ describe('PermissionsSelectComponent', () => {
     component.ngOnInit()
     component.writeValue(permissions)
     expect(component.typesWithAllActions).toContain('Document')
+    expect(component.typesWithAllActions).toContain('ShareLinkBundle')
   })
 
   it('should update checkboxes on permissions set', () => {
@@ -85,6 +90,10 @@ describe('PermissionsSelectComponent', () => {
     expect(input1.nativeElement.checked).toBeTruthy()
     const input2 = fixture.debugElement.query(By.css('input#Tag_Change'))
     expect(input2.nativeElement.checked).toBeTruthy()
+    const bundleInput = fixture.debugElement.query(
+      By.css('input#ShareLinkBundle_Add')
+    )
+    expect(bundleInput.nativeElement.checked).toBeTruthy()
   })
 
   it('disable checkboxes when permissions are inherited', () => {
@@ -96,6 +105,25 @@ describe('PermissionsSelectComponent', () => {
     expect(component.isInherited('Tag', 'Change')).toBeTruthy()
     expect(component.form.get('Document').get('Add').disabled).toBeFalsy()
     expect(component.form.get('Tag').get('Change').disabled).toBeTruthy()
+  })
+
+  it('should update checkboxes when inherited permissions change', () => {
+    component.ngOnInit()
+    component.inheritedPermissions = ['documents.change_document']
+    component.writeValue(['delete_document'])
+    expect(component.form.get('Document').get('Change').value).toBeTruthy()
+    expect(component.form.get('Document').get('Change').disabled).toBeTruthy()
+
+    // swap for a group with a different permission, but the same number of them
+    component.inheritedPermissions = ['documents.view_document']
+
+    // the no-longer-inherited permission is unchecked, the explicit one is kept
+    expect(component.permissions).toEqual(['delete_document'])
+    expect(component.form.get('Document').get('Change').value).toBeFalsy()
+    expect(component.form.get('Document').get('Change').disabled).toBeFalsy()
+    expect(component.form.get('Document').get('Delete').value).toBeTruthy()
+    expect(component.form.get('Document').get('View').value).toBeTruthy()
+    expect(component.form.get('Document').get('View').disabled).toBeTruthy()
   })
 
   it('should exclude history permissions if disabled', () => {

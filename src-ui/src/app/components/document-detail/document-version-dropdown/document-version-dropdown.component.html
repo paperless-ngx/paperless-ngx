@@ -1,7 +1,10 @@
 <div class="btn-group" ngbDropdown autoClose="outside">
-  <button class="btn btn-sm btn-outline-secondary dropdown-toggle" ngbDropdownToggle>
+  <button class="btn btn-sm btn-outline-secondary dropdown-toggle" ngbDropdownToggle aria-label="Versions" i18n-aria-label>
     <i-bs name="file-earmark-diff"></i-bs>
     <span class="d-none d-lg-inline ps-1" i18n>Versions</span>
+    @if (versions.length > 1) {
+      <span class="badge text-bg-secondary ms-1">{{ versions.length }}</span>
+    }
   </button>
   <div class="dropdown-menu shadow" ngbDropdownMenu>
     <div class="px-3 py-2 mb-2">
@@ -24,13 +27,26 @@
           class="visually-hidden"
           (change)="onVersionFileSelected($event)"
         />
-        <button
-          class="btn btn-sm btn-outline-secondary w-100"
-          (click)="versionFileInput.click()"
-          [disabled]="!userIsOwner || !userCanEdit"
-        >
-          <i-bs name="file-earmark-plus"></i-bs><span class="ps-1" i18n>Add new version</span>
-        </button>
+        <div class="btn-group btn-group-sm w-100">
+          <button
+            class="btn btn-sm btn-outline-secondary w-100"
+            (click)="versionFileInput.click()"
+            [disabled]="!userIsOwner || !userCanEdit"
+            title="Upload a new version"
+            i18n-title
+          >
+            <i-bs name="file-earmark-plus"></i-bs><span class="ps-1" i18n>Upload</span>
+          </button>
+          <button
+            class="btn btn-sm btn-outline-secondary w-100"
+            (click)="addExistingDocumentAsVersion()"
+            [disabled]="!userIsOwner || !userCanEdit"
+            title="Use an existing document"
+            i18n-title
+          >
+            <i-bs name="file-earmark"></i-bs><span class="ps-1" i18n>Existing</span>
+          </button>
+        </div>
       } @else {
         @switch (versionUploadState()) {
           @case (UploadState.Uploading) {
@@ -128,6 +144,7 @@
               i18n-confirmMessage
               [disabled]="!userIsOwner || !userCanEdit"
               (confirm)="deleteVersion(version.id)"
+              *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }"
             >
               <span class="visually-hidden" i18n>Delete version</span>
             </pngx-confirm-button>

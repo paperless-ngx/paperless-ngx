@@ -12,6 +12,7 @@ from celery import group
 from celery import shared_task
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Max
 from django.db.models import Q
 from django.utils import timezone
 
@@ -30,6 +31,7 @@ from documents.permissions import set_permissions_for_object
 from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
+from documents.tasks import remove_document_from_index
 from documents.tasks import update_document_content_maybe_archive_file
 from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_root_document
@@ -38,6 +40,9 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
 
     from django.contrib.auth.models import User
+
+if settings.AUDIT_LOG_ENABLED:
+    from auditlog.models import LogEntry
 
 logger: logging.Logger = logging.getLogger("paperless.bulk_edit")
 
@@ -394,10 +399,16 @@ def delete(doc_ids: list[int]) -> Literal["OK"]:
     return "OK"
 
 
-def reprocess(doc_ids: list[int]) -> Literal["OK"]:
+def reprocess(doc_ids: list[int], *, remote_ocr: bool = False) -> Literal["OK"]:
+    """
+    Re-run parsing for the given documents.
+
+    Consumption workflows do not run here, so ``remote_ocr`` is how the user
+    asks for the remote engine when it is not configured to handle everything.
+    """
     for document_id in doc_ids:
         update_document_content_maybe_archive_file.apply_async(
-            kwargs={"document_id": document_id},
+            kwargs={"document_id": document_id, "remote_ocr": remote_ocr},
             headers={"trigger_source": PaperlessTask.TriggerSource.MANUAL},
         )
 
@@ -608,6 +619,115 @@ def merge(
             raise
     else:
         consume_task.apply_async()
+
+    return "OK"
+
+
+def merge_as_versions(
+    doc_ids: list[int],
+    *,
+    root_document_id: int,
+    version_label: str | None = None,
+    user: User | None = None,
+) -> Literal["OK"]:
+    with transaction.atomic():
+        documents = list(
+            # Ordered by pk so concurrent merges take the row locks in the same order
+            Document.objects.select_for_update()
+            .filter(id__in=doc_ids)
+            .order_by("id")
+            .defer("content"),
+        )
+        documents_by_id = {document.id: document for document in documents}
+
+        source_ids = [doc_id for doc_id in doc_ids if doc_id != root_document_id]
+        root_document = documents_by_id[root_document_id]
+        next_version_index = (
+            Document.global_objects.filter(
+                root_document_id=root_document_id,
+            ).aggregate(max_index=Max("version_index"))["max_index"]
+            or 0
+        )
+
+        # A version gives up its ASN
+        source_asns = [
+            documents_by_id[source_id].archive_serial_number
+            for source_id in source_ids
+            if documents_by_id[source_id].archive_serial_number is not None
+        ]
+
+        updated_fields = ["root_document", "version_index", "archive_serial_number"]
+        if version_label is not None:
+            updated_fields.append("version_label")
+
+        for source_id in source_ids:
+            next_version_index += 1
+            source_document = documents_by_id[source_id]
+            source_document.root_document_id = root_document.pk
+            source_document.version_index = next_version_index
+            source_document.archive_serial_number = None
+            if version_label is not None:
+                source_document.version_label = version_label
+
+        # bulk_update and not save() to avoid post_save now
+        Document.objects.bulk_update(
+            [documents_by_id[source_id] for source_id in source_ids],
+            updated_fields,
+        )
+
+        root_updates = {"modified": timezone.now()}
+        if source_asns and root_document.archive_serial_number is None:
+            # If a version had one, hand the ASN over, the same as merge() does
+            root_updates["archive_serial_number"] = source_asns.pop(0)
+            logger.info(
+                f"Document {root_document.id} took archive serial number "
+                f"{root_updates['archive_serial_number']} from a document merged into it",
+            )
+        if source_asns:
+            logger.warning(
+                f"Archive serial number(s) {source_asns} were removed by merging "
+                f"those documents as versions of document {root_document.id}",
+            )
+
+        Document.objects.filter(pk=root_document.pk).update(**root_updates)
+
+        if settings.AUDIT_LOG_ENABLED:
+            # update() doesn't fire auditlog signals, so manual
+            LogEntry.objects.log_create(
+                instance=root_document,
+                changes={"Merged As Versions": ["None", source_ids]},
+                action=LogEntry.Action.UPDATE,
+                actor=user,
+                additional_data={
+                    "reason": "Merged as versions",
+                    "version_ids": source_ids,
+                },
+            )
+
+    # One batch rather than a task each
+    from documents.search import SearchIndexLockError
+    from documents.search import get_backend
+
+    try:
+        with get_backend().batch_update() as batch:
+            for source_id in source_ids:
+                batch.remove(source_id)
+    except SearchIndexLockError:
+        logger.error(
+            f"Search index lock exhausted removing {source_ids}, "
+            f"scheduling deferred index removal",
+        )
+        for source_id in source_ids:
+            remove_document_from_index.apply_async(args=[source_id], countdown=60)
+
+    bulk_update_documents.apply_async(
+        kwargs={"document_ids": [root_document_id]},
+        headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
+    )
+
+    # And as far as the frontend is concerned, they're deleted
+    status_mgr = DocumentsStatusManager()
+    status_mgr.send_documents_deleted(source_ids)
 
     return "OK"
 

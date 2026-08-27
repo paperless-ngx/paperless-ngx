@@ -782,6 +782,24 @@ system. See the corresponding
 
     Defaults to "groups"
 
+#### [`PAPERLESS_SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP=<str>`](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP) {#PAPERLESS_SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP}
+
+: Allows you to define a group name that, if present in the third-party authentication system's groups claim, will grant the user superuser (admin) and staff status in Paperless-ngx. If the group is not present in the claim, superuser status will be revoked upon next login.
+
+    !!! warning
+        This is a direct reflection of the claim on every login, including the connecting user, with no exemption for the last remaining admin. If the group is missing or misconfigured on the identity provider side, the logged-in user will immediately lose their own superuser access. Fix the group membership or claim mapping on the identity provider to restore it. If the identity provider itself is unreachable or misconfigured and you are locked out, you can recover admin access locally with `manage.py createsuperuser`.
+
+    Defaults to None
+
+#### [`PAPERLESS_SOCIAL_ACCOUNT_SYNC_STAFF_GROUP=<str>`](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_STAFF_GROUP) {#PAPERLESS_SOCIAL_ACCOUNT_SYNC_STAFF_GROUP}
+
+: Allows you to define a group name that, if present in the third-party authentication system's groups claim, will grant the user staff status in Paperless-ngx. If the group is not present in the claim and the user is not a superuser, staff status will be revoked upon next login.
+
+    !!! warning
+        As with [`PAPERLESS_SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP`](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP), this is applied on every login unconditionally, including for the connecting user themselves.
+
+    Defaults to None
+
 #### [`PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS=<comma-separated-list>`](#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS) {#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS}
 
 : A list of group names that users who signup via social accounts will be added to upon signup. Groups listed here must already exist.
@@ -954,10 +972,11 @@ for display in the web interface.
 
     !!! note
 
-        The **remote OCR parser** (Azure AI) always produces a searchable
-        PDF and stores it as the archive copy, regardless of this setting.
-        `ARCHIVE_FILE_GENERATION=never` has no effect when the remote
-        parser handles a document.
+        The **remote OCR parser** (Azure AI) also honors this setting: when
+        no archive is requested (`never`, or `auto` with a born-digital PDF),
+        the remote engine is skipped entirely and locally-extracted text is
+        used instead, avoiding an unnecessary API call and a duplicate text
+        layer.
 
 #### [`PAPERLESS_OCR_CLEAN=<mode>`](#PAPERLESS_OCR_CLEAN) {#PAPERLESS_OCR_CLEAN}
 
@@ -1206,7 +1225,7 @@ should be a valid crontab(5) expression describing when to run.
 
 : If set to the string "disable", no emails will be fetched automatically.
 
-    Defaults to `*/10 * * * *` or every ten minutes.
+    Defaults to every ten minutes, with an installation-specific minute offset.
 
 #### [`PAPERLESS_TRAIN_TASK_CRON=<cron expression>`](#PAPERLESS_TRAIN_TASK_CRON) {#PAPERLESS_TRAIN_TASK_CRON}
 
@@ -2056,6 +2075,18 @@ password. All of these options come from their similarly-named [Django settings]
 : The endpoint to use for the remote OCR engine. This is required for Azure AI.
 
     Defaults to None.
+
+#### [`PAPERLESS_REMOTE_OCR_MODE=<str>`](#PAPERLESS_REMOTE_OCR_MODE) {#PAPERLESS_REMOTE_OCR_MODE}
+
+: Which documents are sent to the remote OCR engine.
+
+    - `always`: every document of a supported file type is sent to the remote
+      engine, bypassing the local OCR engine.
+    - `workflow_only`: documents are processed locally unless a workflow
+      explicitly enables remote OCR for them, letting you use the remote engine
+      selectively.
+
+    Defaults to "always".
 
 ## AI {#ai}
 

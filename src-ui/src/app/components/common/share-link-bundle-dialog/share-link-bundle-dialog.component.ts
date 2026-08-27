@@ -78,7 +78,7 @@ export class ShareLinkBundleDialogComponent extends ConfirmDialogComponent {
         : FileVersion.Original,
       expiration_days: this.form.value.expirationDays,
     }
-    this.buttonsEnabled = false
+    this.buttonsEnabled.set(false)
     super.confirm()
   }
 

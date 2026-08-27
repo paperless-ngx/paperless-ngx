@@ -97,6 +97,7 @@ import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
 import { DocumentDetailFieldID } from '../admin/settings/settings.component'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
+import { ReprocessConfirmDialogComponent } from '../common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component'
 import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
@@ -289,6 +290,8 @@ export class DocumentDetailComponent
   private incomingUpdateModal: NgbModalRef
   private pendingIncomingUpdate: IncomingDocumentUpdate
   private lastLocalSaveModified: string | null = null
+  private printIframe: HTMLIFrameElement | null = null
+  private printBlobUrl: string | null = null
 
   requiresPassword: boolean = false
   password: string
@@ -657,7 +660,7 @@ export class DocumentDetailComponent
     modal.componentInstance.cancelBtnCaption = $localize`Dismiss`
 
     modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
+      modal.componentInstance.buttonsEnabled.set(false)
       modal.close()
       this.reloadRemoteVersion()
     })
@@ -868,6 +871,7 @@ export class DocumentDetailComponent
   }
 
   ngOnDestroy(): void {
+    this.cleanupPrintDocument()
     this.unsubscribeNotifier.next(this)
     this.unsubscribeNotifier.complete()
   }
@@ -886,13 +890,9 @@ export class DocumentDetailComponent
 
   updateComponent(doc: Document) {
     this.document.set(doc)
-    // Default selected version is the newest version
+    // Default selected version is the newest version, which the API returns first
     const versions = doc.versions ?? []
-    this.selectedVersionId.set(
-      versions.length
-        ? Math.max(...versions.map((version) => version.id))
-        : doc.id
-    )
+    this.selectedVersionId.set(versions.length ? versions[0].id : doc.id)
     this.previewLoaded.set(false)
     this.requiresPassword = false
     this.updateFormForCustomFields()
@@ -1371,7 +1371,7 @@ export class DocumentDetailComponent
     modal.componentInstance.confirmClicked
       .pipe(
         switchMap(() => {
-          modal.componentInstance.buttonsEnabled = false
+          modal.componentInstance.buttonsEnabled.set(false)
           return this.documentsService.delete(this.document())
         })
       )
@@ -1383,7 +1383,7 @@ export class DocumentDetailComponent
         },
         error: (error) => {
           this.toastService.showError($localize`Error deleting document`, error)
-          modal.componentInstance.buttonsEnabled = true
+          modal.componentInstance.buttonsEnabled.set(true)
           this.subscribeModalDelete(modal)
         },
       })
@@ -1399,7 +1399,7 @@ export class DocumentDetailComponent
   }
 
   reprocess() {
-    let modal = this.modalService.open(ConfirmDialogComponent, {
+    let modal = this.modalService.open(ReprocessConfirmDialogComponent, {
       backdrop: 'static',
     })
     modal.componentInstance.title = $localize`Reprocess confirm`
@@ -1408,9 +1408,12 @@ export class DocumentDetailComponent
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked.subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
+      modal.componentInstance.buttonsEnabled.set(false)
       this.documentsService
-        .reprocessDocuments({ documents: [this.document().id] })
+        .reprocessDocuments(
+          { documents: [this.document().id] },
+          modal.componentInstance.remoteOcr
+        )
         .subscribe({
           next: () => {
             this.toastService.showInfo(
@@ -1422,7 +1425,7 @@ export class DocumentDetailComponent
           },
           error: (error) => {
             if (modal) {
-              modal.componentInstance.buttonsEnabled = true
+              modal.componentInstance.buttonsEnabled.set(true)
             }
             this.toastService.showError(
               $localize`Error executing operation`,
@@ -1438,7 +1441,8 @@ export class DocumentDetailComponent
     if (!versions.length || !this.selectedVersionId()) {
       return null
     }
-    const latestVersionId = Math.max(...versions.map((version) => version.id))
+    // The API returns versions newest first
+    const latestVersionId = versions[0].id
     return this.selectedVersionId() === latestVersionId
       ? null
       : this.selectedVersionId()
@@ -1795,7 +1799,7 @@ export class DocumentDetailComponent
     modal.componentInstance.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        modal.componentInstance.buttonsEnabled = false
+        modal.componentInstance.buttonsEnabled.set(false)
         this.documentsService
           .editPdfDocuments([sourceDocumentId], {
             operations: modal.componentInstance.getOperations(),
@@ -1818,7 +1822,7 @@ export class DocumentDetailComponent
             },
             error: (error) => {
               if (modal) {
-                modal.componentInstance.buttonsEnabled = true
+                modal.componentInstance.buttonsEnabled.set(true)
               }
               this.toastService.showError(
                 $localize`Error executing PDF edit operation`,
@@ -1852,7 +1856,7 @@ export class DocumentDetailComponent
         const sourceDocumentId = this.selectedVersionId() ?? this.document().id
         const dialog =
           modal.componentInstance as PasswordRemovalConfirmDialogComponent
-        dialog.buttonsEnabled = false
+        dialog.buttonsEnabled.set(false)
         this.networkActive.set(true)
         this.documentsService
           .removePasswordDocuments([sourceDocumentId], {
@@ -1877,7 +1881,7 @@ export class DocumentDetailComponent
               }
             },
             error: (error) => {
-              dialog.buttonsEnabled = true
+              dialog.buttonsEnabled.set(true)
               this.networkActive.set(false)
               this.toastService.showError(
                 $localize`Error executing password removal operation`,
@@ -1889,6 +1893,7 @@ export class DocumentDetailComponent
   }
 
   printDocument() {
+    this.cleanupPrintDocument()
     const selectedVersionId = this.getSelectedNonLatestVersionId()
     const printUrl = this.documentsService.getDownloadUrl(
       this.document().id,
@@ -1902,6 +1907,8 @@ export class DocumentDetailComponent
         next: (blob) => {
           const blobUrl = URL.createObjectURL(blob)
           const iframe = document.createElement('iframe')
+          this.printIframe = iframe
+          this.printBlobUrl = blobUrl
           iframe.style.position = 'fixed'
           iframe.style.right = '0'
           iframe.style.bottom = '0'
@@ -1917,22 +1924,19 @@ export class DocumentDetailComponent
                 iframe.contentWindow.focus()
                 iframe.contentWindow.print()
                 iframe.contentWindow.onafterprint = () => {
-                  document.body.removeChild(iframe)
-                  URL.revokeObjectURL(blobUrl)
+                  this.cleanupPrintDocument()
                 }
               } catch (err) {
                 // FF throws cross-origin error on onafterprint
                 const isCrossOriginAfterPrintError =
                   err instanceof DOMException &&
                   err.message.includes('onafterprint')
+                // FF throws here while print preview is still reading the iframe
+                // so keep it alive until the next print or teardown
                 if (!isCrossOriginAfterPrintError) {
                   this.toastService.showError($localize`Print failed.`, err)
+                  timer(100).subscribe(() => this.cleanupPrintDocument())
                 }
-                timer(100).subscribe(() => {
-                  // delay to avoid FF print failure
-                  document.body.removeChild(iframe)
-                  URL.revokeObjectURL(blobUrl)
-                })
               }
             })
           }
@@ -1945,9 +1949,20 @@ export class DocumentDetailComponent
       })
   }
 
+  private cleanupPrintDocument() {
+    if (this.printIframe) this.printIframe.remove()
+    this.printIframe = null
+    if (this.printBlobUrl) {
+      URL.revokeObjectURL(this.printBlobUrl)
+      this.printBlobUrl = null
+    }
+  }
+
   public openShareLinks() {
     const modal = this.modalService.open(ShareLinksDialogComponent)
-    modal.componentInstance.documentId.set(this.document().id)
+    modal.componentInstance.documentId.set(
+      this.selectedVersionId() ?? this.document().id
+    )
     modal.componentInstance.hasArchiveVersion.set(
       this.metadata()?.has_archive_version ??
         !!this.document()?.archived_file_name
@@ -1962,7 +1977,9 @@ export class DocumentDetailComponent
     const modal = this.modalService.open(EmailDocumentDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.documentIds.set([this.document().id])
+    modal.componentInstance.documentIds.set([
+      this.selectedVersionId() ?? this.document().id,
+    ])
     modal.componentInstance.hasArchiveVersion.set(
       this.metadata()?.has_archive_version ??
         !!this.document()?.archived_file_name

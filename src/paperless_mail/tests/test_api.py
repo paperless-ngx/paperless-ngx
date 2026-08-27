@@ -253,6 +253,81 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["success"], True)
 
+    def test_mail_account_test_existing_no_global_perms(self) -> None:
+        """
+        GIVEN:
+            - Existing account without an owner
+            - User without any mail account permissions
+        WHEN:
+            - API call is made to test the account by id
+        THEN:
+            - API returns forbidden
+        """
+        account = MailAccountFactory(
+            username="admin",
+            password="secret",
+            imap_server="server.example.com",
+            imap_port=443,
+            owner=None,
+        )
+        user = User.objects.create_user(username="no_perms")
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "id": account.pk,
+                    "imap_server": "server.example.com",
+                    "imap_port": 443,
+                    "imap_security": MailAccount.ImapSecurity.SSL,
+                    "username": "admin",
+                    "password": "******",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.content.decode(), "Insufficient permissions")
+
+    def test_mail_account_test_existing_object_perms_only(self) -> None:
+        """
+        GIVEN:
+            - Existing account owned by another user
+            - User with an object level grant but no global change permission
+        WHEN:
+            - API call is made to test the account by id
+        THEN:
+            - API returns forbidden
+        """
+        owner = User.objects.create_user(username="account_owner")
+        account = MailAccountFactory(
+            username="admin",
+            password="secret",
+            imap_server="server.example.com",
+            imap_port=443,
+            owner=owner,
+        )
+        user = User.objects.create_user(username="object_perms_only")
+        assign_perm("change_mailaccount", user, account)
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "id": account.pk,
+                    "imap_server": "server.example.com",
+                    "imap_port": 443,
+                    "imap_security": MailAccount.ImapSecurity.SSL,
+                    "username": "admin",
+                    "password": "******",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_mail_account_test_existing_nonexistent_id_forbidden(self) -> None:
         response = self.client.post(
             f"{self.ENDPOINT}test/",
@@ -757,3 +832,30 @@ class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_bulk_delete_processed_mails_rejects_mixed_batch_atomically(self) -> None:
+        """
+        GIVEN:
+            - A permitted processed mail and one the user may not delete
+        WHEN:
+            - API call bulk deletes both in a single request
+        THEN:
+            - The request is rejected and neither mail is deleted
+        """
+        user2 = User.objects.create_user(username="temp_admin2")
+        rule = MailRuleFactory()
+        # Created first so it sorts ahead of the forbidden mail, i.e. the
+        # permission check has to cover the whole batch before deleting rather
+        # than rejecting only once it reaches the forbidden one.
+        pm_owned = ProcessedMailFactory(rule=rule, owner=self.user)
+        pm_forbidden = ProcessedMailFactory(rule=rule, owner=user2)
+
+        response = self.client.post(
+            f"{self.ENDPOINT}bulk_delete/",
+            data={"mail_ids": [pm_owned.id, pm_forbidden.id]},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(ProcessedMail.objects.filter(id=pm_owned.id).exists())
+        self.assertTrue(ProcessedMail.objects.filter(id=pm_forbidden.id).exists())

@@ -4,6 +4,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { signal } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { By } from '@angular/platform-browser'
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject, of, throwError } from 'rxjs'
@@ -25,8 +26,20 @@ import { PageHeaderComponent } from '../../common/page-header/page-header.compon
 import { SavedViewsComponent } from './saved-views.component'
 
 const savedViews = [
-  { id: 1, name: 'view1', show_in_sidebar: true, show_on_dashboard: true },
-  { id: 2, name: 'view2', show_in_sidebar: false, show_on_dashboard: false },
+  {
+    id: 1,
+    name: 'view1',
+    icon: 'archive',
+    show_in_sidebar: true,
+    show_on_dashboard: true,
+  },
+  {
+    id: 2,
+    name: 'view2',
+    icon: 'funnel',
+    show_in_sidebar: false,
+    show_on_dashboard: false,
+  },
 ]
 
 describe('SavedViewsComponent', () => {
@@ -157,6 +170,24 @@ describe('SavedViewsComponent', () => {
     expect(patchBody.show_in_sidebar).toBeUndefined()
   })
 
+  it('should persist a changed icon', () => {
+    const patchSpy = jest.spyOn(savedViewService, 'patchMany')
+    const view = savedViews[0]
+    const iconControl = component.savedViewsForm
+      .get('savedViews')
+      .get(view.id.toString())
+      .get('icon')
+
+    iconControl.setValue('bell')
+    iconControl.markAsDirty()
+    component.save()
+
+    expect(patchSpy.mock.calls[0][0][0]).toMatchObject({
+      id: view.id,
+      icon: 'bell',
+    })
+  })
+
   it('should persist visibility changes to user settings', () => {
     const patchSpy = jest.spyOn(savedViewService, 'patchMany')
     const updateVisibilitySpy = jest
@@ -220,6 +251,44 @@ describe('SavedViewsComponent', () => {
         .get(view.id.toString())
         .get('show_on_dashboard').value
     ).toEqual(view.show_on_dashboard)
+  })
+
+  it('should page saved views, clamp the page if views are removed', () => {
+    const manyViews = Array.from({ length: 30 }, (_, i) => ({
+      id: i + 1,
+      name: `view${i + 1}`,
+    })) as SavedView[]
+    const listSpy = jest.spyOn(savedViewService, 'list').mockReturnValue(
+      of({
+        all: manyViews.map((v) => v.id),
+        count: manyViews.length,
+        results: manyViews.concat([]),
+      })
+    )
+    component.ngOnInit()
+    fixture.detectChanges()
+    expect(listSpy).toHaveBeenCalledWith(1, 100000, null, false, {
+      full_perms: true,
+    })
+    expect(component.pagedSavedViews()).toHaveLength(25)
+    expect(fixture.debugElement.query(By.css('ngb-pagination'))).not.toBeNull()
+    // all views have controls, not just the current page
+    expect(
+      Object.keys(component.savedViewsForm.get('savedViews').value)
+    ).toHaveLength(30)
+
+    component.page.set(2)
+    expect(component.pagedSavedViews()).toHaveLength(5)
+
+    listSpy.mockReturnValue(
+      of({
+        all: manyViews.slice(0, 25).map((v) => v.id),
+        count: 25,
+        results: manyViews.slice(0, 25),
+      })
+    )
+    component.ngOnInit()
+    expect(component.page()).toEqual(1)
   })
 
   it('should support editing permissions', () => {

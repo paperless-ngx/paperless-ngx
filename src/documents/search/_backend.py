@@ -20,10 +20,7 @@ from typing import cast
 import filelock
 import tantivy
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 from django.utils.timezone import get_current_timezone
-from guardian.shortcuts import get_groups_with_perms
-from guardian.shortcuts import get_users_with_perms
 
 from documents.search._query import build_permission_filter
 from documents.search._query import extract_cjk_text
@@ -223,7 +220,27 @@ class WriteBatch:
                     )
                     time.sleep(sleep_s)
 
-        self._raw_writer = self._backend._index.writer()
+            # Open a fresh Index (and thus a fresh Tantivy ManagedDirectory)
+            # for the write, rather than reusing the process-local cached
+            # index. ManagedDirectory loads its GC bookkeeping (.managed.json)
+            # once, at construction, and never re-reads it; paperless runs
+            # several long-lived processes (Granian workers, Celery workers)
+            # that take turns writing under the file lock above. A cached,
+            # long-lived writer index would carry a stale managed-files view
+            # and, on commit, overwrite .managed.json with that stale view -
+            # permanently losing track of segment files other processes
+            # registered in the meantime, so they can never be garbage
+            # collected. Reopening fresh here always picks up the current
+            # on-disk state. The long-lived self._backend._index is used for
+            # reads only and is reloaded (not reopened) after commit below.
+            write_index = tantivy.Index(
+                build_schema(),
+                path=str(self._backend._path),
+            )
+            register_tokenizers(write_index, settings.SEARCH_LANGUAGE)
+            self._raw_writer = write_index.writer()
+        else:
+            self._raw_writer = self._backend._index.writer()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -246,11 +263,7 @@ class WriteBatch:
             if self._lock is not None:
                 self._lock.release()
 
-    def add_or_update(
-        self,
-        document: Document,
-        effective_content: str | None = None,
-    ) -> None:
+    def add_or_update(self, document: Document) -> None:
         """
         Add or update a document in the batch.
 
@@ -260,11 +273,9 @@ class WriteBatch:
 
         Args:
             document: Django Document instance to index
-            effective_content: Override document.content for indexing (used when
-                re-indexing with newer OCR text from document versions)
         """
         self.remove(document.pk)
-        doc = self._backend._build_tantivy_doc(document, effective_content)
+        doc = self._backend._build_tantivy_doc(document)
         self._writer.add_document(doc)
 
     def remove(self, doc_id: int) -> None:
@@ -405,18 +416,20 @@ class TantivyBackend:
     def _build_tantivy_doc(
         self,
         document: Document,
-        effective_content: str | None = None,
         viewer_ids: list[int] | None = None,
         viewer_group_ids: list[int] | None = None,
     ) -> tantivy.Document:
         """Build a tantivy Document from a Django Document instance.
 
-        ``effective_content`` overrides ``document.content`` for indexing —
-        used when re-indexing a root document with a newer version's OCR text.
+        A root document is indexed with its effective content, i.e. the newest
+        version's OCR text, so it is never indexed with its own outdated text.
+        Annotate the queryset with ``annotate_effective_content`` when indexing
+        more than a couple of documents, to resolve that without a query each.
         """
-        content = (
-            effective_content if effective_content is not None else document.content
-        )
+        from guardian.shortcuts import get_groups_with_perms
+        from guardian.shortcuts import get_users_with_perms
+
+        content = document.get_effective_content() or ""
 
         doc = tantivy.Document()
 
@@ -564,11 +577,7 @@ class TantivyBackend:
 
         return doc
 
-    def add_or_update(
-        self,
-        document: Document,
-        effective_content: str | None = None,
-    ) -> None:
+    def add_or_update(self, document: Document) -> None:
         """
         Add or update a single document with file locking.
 
@@ -581,12 +590,11 @@ class TantivyBackend:
 
         Args:
             document: Django Document instance to index
-            effective_content: Override document.content for indexing
         """
         self._ensure_open()
         try:
             with self.batch_update(lock_timeout=_LOCK_TIMEOUT_SECONDS) as batch:
-                batch.add_or_update(document, effective_content)
+                batch.add_or_update(document)
         except SearchIndexLockError:
             logger.error(
                 "Search index lock exhausted for document %d after %d attempts; "
@@ -1007,7 +1015,6 @@ class TantivyBackend:
             ):
                 doc = self._build_tantivy_doc(
                     document,
-                    document.get_effective_content(),
                     viewer_ids=viewer_ids,
                     viewer_group_ids=viewer_group_ids,
                 )
@@ -1075,6 +1082,7 @@ def _bulk_get_viewer_permissions(
     """
     from collections import defaultdict
 
+    from django.contrib.contenttypes.models import ContentType
     from guardian.models import GroupObjectPermission
     from guardian.models import UserObjectPermission
 

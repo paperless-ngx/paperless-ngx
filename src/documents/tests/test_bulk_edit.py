@@ -1782,3 +1782,56 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         self.assertIn("wrong password", str(exc.exception))
         self.assertIn("Error removing password from document", cm.output[0])
+
+
+class TestBulkEditReprocess(DirectoriesMixin, TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.doc = Document.objects.create(
+            title="test",
+            checksum="A",
+            mime_type="application/pdf",
+        )
+
+    @mock.patch("documents.bulk_edit.update_document_content_maybe_archive_file")
+    def test_reprocess_defaults_to_local(self, mock_task: mock.Mock) -> None:
+        """
+        GIVEN:
+            - A reprocess request that says nothing about remote OCR
+        WHEN:
+            - reprocess is called
+        THEN:
+            - The task is queued without asking for the remote engine
+        """
+        result = bulk_edit.reprocess([self.doc.id])
+
+        self.assertEqual(result, "OK")
+        mock_task.apply_async.assert_called_once()
+        _, kwargs = mock_task.apply_async.call_args
+        self.assertEqual(
+            kwargs["kwargs"],
+            {"document_id": self.doc.id, "remote_ocr": False},
+        )
+
+    @mock.patch("documents.bulk_edit.update_document_content_maybe_archive_file")
+    def test_reprocess_passes_remote_ocr(self, mock_task: mock.Mock) -> None:
+        """
+        GIVEN:
+            - A reprocess request that explicitly asks for remote OCR
+        WHEN:
+            - reprocess is called
+        THEN:
+            - The request is forwarded to the task for every document
+        """
+        other = Document.objects.create(
+            title="test2",
+            checksum="B",
+            mime_type="application/pdf",
+        )
+
+        bulk_edit.reprocess([self.doc.id, other.id], remote_ocr=True)
+
+        self.assertEqual(mock_task.apply_async.call_count, 2)
+        for call in mock_task.apply_async.call_args_list:
+            self.assertTrue(call.kwargs["kwargs"]["remote_ocr"])

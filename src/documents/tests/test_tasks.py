@@ -14,6 +14,7 @@ from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Tag
+from documents.models import WorkflowAction
 from documents.sanity_checker import SanityCheckFailedException
 from documents.sanity_checker import SanityCheckMessages
 from documents.tests.test_classifier import dummy_preprocess
@@ -287,6 +288,45 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
         self.assertNotEqual(Document.objects.get(pk=doc.pk).content, "test")
 
 
+class TestUpdateContentRemoteOCR(DirectoriesMixin, TestCase):
+    """
+    Consumption workflows do not run on reprocess, so the remote parser is
+    used only in 'always' mode or when the caller explicitly asks for it.
+    """
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        patcher = mock.patch("documents.tasks.get_parser_registry")
+        self.mock_registry = patcher.start()
+        self.mock_registry.return_value.get_parser_for_file.return_value = None
+        self.addCleanup(patcher.stop)
+
+        self.doc = Document.objects.create(
+            title="test",
+            content="my document",
+            checksum="wow",
+            mime_type="application/pdf",
+        )
+
+    def _allow_remote(self, **kwargs) -> bool:
+        tasks.update_document_content_maybe_archive_file(self.doc.pk, **kwargs)
+        _, call_kwargs = self.mock_registry.return_value.get_parser_for_file.call_args
+        return call_kwargs["allow_remote"]
+
+    @override_settings(REMOTE_OCR_MODE="always")
+    def test_always_mode_allows_remote(self) -> None:
+        self.assertTrue(self._allow_remote())
+
+    @override_settings(REMOTE_OCR_MODE="workflow_only")
+    def test_workflow_only_mode_denies_remote_by_default(self) -> None:
+        self.assertFalse(self._allow_remote())
+
+    @override_settings(REMOTE_OCR_MODE="workflow_only")
+    def test_workflow_only_mode_allows_remote_when_requested(self) -> None:
+        self.assertTrue(self._allow_remote(remote_ocr=True))
+
+
 class TestAIIndex(DirectoriesMixin, TestCase):
     @override_settings(
         AI_ENABLED=True,
@@ -408,3 +448,110 @@ class TestAIIndex(DirectoriesMixin, TestCase):
                 rebuild=False,
                 document_ids=doc_ids,
             )
+
+
+class TestApplyAISuggestionsTask(DirectoriesMixin, TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.doc = Document.objects.create(
+            title="doc",
+            content="content",
+            checksum="apply-ai-suggestions",
+        )
+        self.action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.APPLY_AI_SUGGESTIONS,
+            ai_suggestion_fields=[WorkflowAction.AISuggestionField.TITLE],
+        )
+
+    def test_reindexes_without_sending_document_updated(self) -> None:
+        """
+        GIVEN:
+            - An apply AI suggestions action that changes the document
+        WHEN:
+            - The task runs
+        THEN:
+            - The search index and caches are refreshed directly, deliberately
+              not via the document_updated signal: that re-runs updated
+              workflows, which for this action means queueing another LLM
+              query for a document it just changed, forever
+        """
+        with (
+            mock.patch(
+                "documents.workflows.ai.apply_ai_suggestions_to_document",
+                return_value=["title"],
+            ),
+            mock.patch("documents.tasks.index_document") as index_document,
+            mock.patch("documents.tasks.clear_document_caches") as clear_caches,
+            mock.patch("documents.tasks.document_updated") as document_updated,
+        ):
+            tasks.apply_ai_suggestions(self.action.pk, self.doc.pk)
+
+        index_document.delay.assert_called_once_with(self.doc.pk)
+        clear_caches.assert_called_once_with(self.doc.pk)
+        document_updated.send.assert_not_called()
+
+    def test_no_changes_skips_reindex(self) -> None:
+        """
+        GIVEN:
+            - An apply AI suggestions action that changes nothing
+        WHEN:
+            - The task runs
+        THEN:
+            - No reindexing work is queued
+        """
+        with (
+            mock.patch(
+                "documents.workflows.ai.apply_ai_suggestions_to_document",
+                return_value=[],
+            ),
+            mock.patch("documents.tasks.index_document") as index_document,
+        ):
+            tasks.apply_ai_suggestions(self.action.pk, self.doc.pk)
+
+        index_document.delay.assert_not_called()
+
+    @override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="huggingface")
+    def test_updates_llm_index_when_enabled(self) -> None:
+        """
+        GIVEN:
+            - An apply AI suggestions action that changes the document
+            - The LLM index is enabled
+        WHEN:
+            - The task runs
+        THEN:
+            - The document is updated in the LLM index too
+        """
+        with (
+            mock.patch(
+                "documents.workflows.ai.apply_ai_suggestions_to_document",
+                return_value=["title"],
+            ),
+            mock.patch("documents.tasks.index_document"),
+            mock.patch(
+                "documents.tasks.update_document_in_llm_index",
+            ) as update_in_llm_index,
+        ):
+            tasks.apply_ai_suggestions(self.action.pk, self.doc.pk)
+
+        update_in_llm_index.apply_async.assert_called_once()
+
+    def test_deleted_document_is_a_noop(self) -> None:
+        """
+        GIVEN:
+            - A document that was deleted between the workflow running and the
+              queued task starting
+        WHEN:
+            - The task runs
+        THEN:
+            - It logs and exits rather than raising
+        """
+        with (
+            mock.patch(
+                "documents.workflows.ai.apply_ai_suggestions_to_document",
+            ) as apply_suggestions,
+            self.assertLogs("paperless.tasks", level="WARNING") as cm,
+        ):
+            tasks.apply_ai_suggestions(self.action.pk, self.doc.pk + 1000)
+
+        apply_suggestions.assert_not_called()
+        self.assertIn("no longer exists", "".join(cm.output))

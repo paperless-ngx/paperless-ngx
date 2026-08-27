@@ -1,3 +1,6 @@
+import json
+from pathlib import Path
+
 import pytest
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -13,6 +16,7 @@ from documents.search._backend import TantivyBackend
 from documents.search._backend import WriteBatch
 from documents.search._backend import get_backend
 from documents.search._backend import reset_backend
+from documents.signals.handlers import add_to_index
 from documents.tests.factories import CorrespondentFactory
 from documents.tests.factories import DocumentFactory
 from documents.tests.factories import DocumentTypeFactory
@@ -20,6 +24,17 @@ from documents.tests.factories import TagFactory
 from documents.tests.factories import UserFactory
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
+
+# Extensions of actual Tantivy segment data files, as opposed to its own
+# bookkeeping files (meta.json, .managed.json, lock files).
+_SEGMENT_FILE_EXTENSIONS = (
+    ".fast",
+    ".fieldnorm",
+    ".idx",
+    ".pos",
+    ".store",
+    ".term",
+)
 
 
 class TestWriteBatch:
@@ -163,10 +178,55 @@ class TestSearch:
         assert (
             len(backend.search_ids("sswo", user=None, search_mode=SearchMode.TEXT)) == 1
         )
-        assert (
-            len(backend.search_ids("sswo re", user=None, search_mode=SearchMode.TEXT))
-            == 1
+        for query in ["sswo re", "re sswo"]:
+            assert (
+                len(backend.search_ids(query, user=None, search_mode=SearchMode.TEXT))
+                == 1
+            ), query
+
+    def test_text_mode_matches_all_terms_without_requiring_adjacency(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """Simple text mode should match all terms in any order or field."""
+        doc = Document.objects.create(
+            title="complete-medical-history",
+            content="Samsung Odyssey curved monitor",
+            checksum="TXT13",
+            pk=19,
         )
+        backend.add_or_update(doc)
+
+        for query in [
+            "complete history",
+            "history complete",
+            "Samsung curved",
+            "curved Samsung",
+        ]:
+            assert backend.search_ids(
+                query,
+                user=None,
+                search_mode=SearchMode.TEXT,
+            ) == [doc.pk], query
+
+    def test_text_mode_matches_terms_across_title_and_content(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """Each simple-search term may match either title or content."""
+        doc = Document.objects.create(
+            title="Complete record",
+            content="Patient history",
+            checksum="TXT14",
+            pk=20,
+        )
+        backend.add_or_update(doc)
+
+        assert backend.search_ids(
+            "complete history",
+            user=None,
+            search_mode=SearchMode.TEXT,
+        ) == [doc.pk]
 
     def test_text_mode_does_not_match_on_partial_term_overlap(
         self,
@@ -186,11 +246,11 @@ class TestSearch:
             == 0
         )
 
-    def test_text_mode_anchors_later_query_tokens_to_token_starts(
+    def test_text_mode_anchors_numeric_tokens_regardless_of_query_order(
         self,
         backend: TantivyBackend,
     ) -> None:
-        """Multi-token simple search should not match later tokens in the middle of a word."""
+        """Numeric tokens must not match in the middle of a larger number."""
         exact_doc = Document.objects.create(
             title="Z-Berichte 6",
             content="monthly report",
@@ -213,13 +273,14 @@ class TestSearch:
         backend.add_or_update(prefix_doc)
         backend.add_or_update(false_positive)
 
-        result_ids = set(
-            backend.search_ids("Z-Berichte 6", user=None, search_mode=SearchMode.TEXT),
-        )
+        for query in ["Z-Berichte 6", "6 Z-Berichte"]:
+            result_ids = set(
+                backend.search_ids(query, user=None, search_mode=SearchMode.TEXT),
+            )
 
-        assert exact_doc.id in result_ids
-        assert prefix_doc.id in result_ids
-        assert false_positive.id not in result_ids
+            assert exact_doc.id in result_ids, query
+            assert prefix_doc.id in result_ids, query
+            assert false_positive.id not in result_ids, query
 
     def test_text_mode_ignores_queries_without_searchable_tokens(
         self,
@@ -968,3 +1029,138 @@ class TestHighlightHits:
         hits = backend.highlight_hits("quick", [doc.pk])
 
         assert len(hits) == 0
+
+
+class TestVersionIndexing:
+    """
+    GIVEN:
+        - A root document whose new version has just been consumed, e.g. by
+          the password removal workflow action
+    WHEN:
+        - The consumption finished signal is handled
+    THEN:
+        - The root document is indexed with the new version's content, since
+          versions are not searchable on their own
+    """
+
+    def test_consumed_version_updates_root_entry(
+        self,
+        backend: TantivyBackend,
+        mocker: MockerFixture,
+    ) -> None:
+        root = Document.objects.create(
+            title="Statement",
+            content="",
+            checksum="VER1",
+            pk=90,
+        )
+        backend.add_or_update(root)
+        version = Document.objects.create(
+            title="Statement",
+            content="unprotected statement text",
+            checksum="VER2",
+            pk=91,
+            root_document=root,
+            version_index=1,
+        )
+        mocker.patch("documents.search.get_backend", return_value=backend)
+
+        add_to_index(sender=None, document=version)
+
+        assert backend.search_ids("unprotected", user=None) == [root.pk]
+
+
+class TestEffectiveContentIndexing:
+    """
+    GIVEN:
+        - A root document with a newer version
+    WHEN:
+        - The root document is indexed
+    THEN:
+        - The newest version's content is indexed, never the root's own
+          outdated text
+    """
+
+    def test_root_is_indexed_with_latest_version_content(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        root = Document.objects.create(
+            title="Statement",
+            content="stale original text",
+            checksum="EFF1",
+            pk=95,
+        )
+        Document.objects.create(
+            title="Statement",
+            content="latest version text",
+            checksum="EFF2",
+            pk=96,
+            root_document=root,
+            version_index=1,
+        )
+
+        backend.add_or_update(root)
+
+        assert backend.search_ids("latest", user=None) == [root.pk]
+        assert backend.search_ids("stale", user=None) == []
+
+
+class TestIndexDirectoryGarbageCollection:
+    """Regression tests for Tantivy segment files leaking on disk when
+    multiple long-lived worker processes (Granian/Celery) take turns writing
+    to the same on-disk index (issue #13679)."""
+
+    def test_no_permanently_orphaned_segment_files_across_worker_processes(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Simulate two long-lived worker processes, each with its own
+        process-local ``TantivyBackend``/``Index`` opened once at process
+        start, alternating turns as the writer -- exactly how paperless runs
+        in production (several Granian + Celery worker processes).
+
+        Every segment file physically present on disk must still be tracked
+        in Tantivy's ``.managed.json`` bookkeeping; otherwise it can never be
+        garbage collected by anyone again and the index directory grows
+        without bound.
+        """
+        index_dir = tmp_path / "index"
+        index_dir.mkdir()
+
+        worker_a = TantivyBackend(path=index_dir)
+        worker_a.open()
+        worker_b = TantivyBackend(path=index_dir)
+        worker_b.open()
+        workers = [worker_a, worker_b]
+
+        docs = [
+            DocumentFactory.create(checksum=f"GC{i}", title=f"gc doc {i}")
+            for i in range(5)
+        ]
+
+        try:
+            # Alternate writers across many commits, repeatedly upserting the
+            # same documents so segments accumulate and get superseded,
+            # forcing the delete+add upsert pattern and eventual merges.
+            for i in range(30):
+                worker = workers[i % len(workers)]
+                doc = docs[i % len(docs)]
+                worker.add_or_update(doc)
+        finally:
+            worker_a.close()
+            worker_b.close()
+
+        managed_path = index_dir / ".managed.json"
+        managed = set(json.loads(managed_path.read_text()))
+        on_disk = {
+            p.name
+            for p in index_dir.iterdir()
+            if p.is_file() and p.suffix in _SEGMENT_FILE_EXTENSIONS
+        }
+        orphans = on_disk - managed
+
+        assert not orphans, (
+            "Segment files present on disk but absent from Tantivy's "
+            f".managed.json bookkeeping (permanently un-collectible): {orphans}"
+        )

@@ -36,12 +36,26 @@
           (focus)="clearLastSearchTerm()"
           (clear)="clearLastSearchTerm()"
           (blur)="onBlur()">
+          <ng-template ng-label-tmp let-item="item" let-clear="clear">
+            @if (multiple && !disabled) {
+              <span class="ng-value-icon left" role="button" tabindex="0" (click)="clear(item)" (keydown.enter)="clear(item)" aria-label="Remove item" i18n-aria-label>×</span>
+            }
+            <span class="ng-value-label" [title]="item[bindLabel]">
+              @if (iconField && item[iconField]) {
+                <i-bs class="me-2" [name]="item[iconField]"></i-bs>
+              }
+              {{item[bindLabel]}}
+            </span>
+          </ng-template>
           <ng-template ng-option-tmp let-item="item">
+              @if (iconField && item[iconField]) {
+                <i-bs class="me-2" [name]="item[iconField]"></i-bs>
+              }
               <span [title]="item[bindLabel]">{{item[bindLabel]}}</span>
           </ng-template>
         </ng-select>
         @if (allowCreateNew && !hideAddButton) {
-          <button class="btn btn-outline-secondary" type="button" (click)="addItem()" [disabled]="disabled">
+          <button class="btn btn-outline-secondary" type="button" (click)="addItem()" [disabled]="disabled" aria-label="Create new item" i18n-aria-label>
             <i-bs width="1.2em" height="1.2em" name="plus"></i-bs>
           </button>
         }

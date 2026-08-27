@@ -2,3 +2,8 @@
 .d-block.d-sm-none .dropdown-toggle::after {
   display: none;
 }
+
+tbody tr:last-child td,
+table:not(:has(tbody tr)) thead th {
+  border-bottom: none;
+}

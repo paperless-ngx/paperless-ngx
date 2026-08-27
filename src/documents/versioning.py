@@ -5,10 +5,53 @@ from enum import StrEnum
 from typing import TYPE_CHECKING
 from typing import Any
 
+from django.db.models import F
+from django.db.models import OuterRef
+from django.db.models import QuerySet
+from django.db.models import Subquery
+from django.db.models.functions import Coalesce
+
 from documents.models import Document
 
 if TYPE_CHECKING:
     from rest_framework.request import Request
+
+
+def versions_newest_first(documents: QuerySet[Document]) -> QuerySet[Document]:
+    """
+    Sorts versions so the newest one comes first using version_index and not on id,
+    because an existing document can be merged in as a version
+    """
+    return documents.order_by(F("version_index").desc(nulls_last=True), "-id")
+
+
+def annotate_effective_content(documents: QuerySet[Document]) -> QuerySet[Document]:
+    """
+    Annotates documents with the content of their newest version, falling back
+    to their own, so get_effective_content() can answer from the row rather
+    than querying for the versions of each document
+    """
+    return documents.annotate(
+        effective_content=Coalesce(
+            Subquery(
+                versions_newest_first(
+                    Document.objects.filter(root_document=OuterRef("pk")),
+                ).values("content")[:1],
+            ),
+            F("content"),
+        ),
+    )
+
+
+def sort_versions_newest_first(documents: list[Document]) -> list[Document]:
+    """
+    Same sorting as versions_newest_first()
+    """
+    return sorted(
+        documents,
+        key=lambda doc: (doc.version_index or 0, doc.id),
+        reverse=True,
+    )
 
 
 class VersionResolutionError(StrEnum):
@@ -51,7 +94,7 @@ def get_latest_version_for_root(
     include_deleted: bool = False,
 ) -> Document:
     manager = _document_manager(include_deleted=include_deleted)
-    latest = manager.filter(root_document=root_doc).order_by("-id").first()
+    latest = versions_newest_first(manager.filter(root_document=root_doc)).first()
     return latest or root_doc
 
 

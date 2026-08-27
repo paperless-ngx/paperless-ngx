@@ -7,6 +7,7 @@ import tempfile
 import zipfile
 from collections import defaultdict
 from collections import deque
+from collections.abc import Callable
 from datetime import datetime
 from datetime import timedelta
 from http import HTTPStatus
@@ -133,12 +134,10 @@ from documents.file_handling import format_filename
 from documents.filters import CorrespondentFilterSet
 from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
-from documents.filters import DocumentPermissionsFilter
 from documents.filters import DocumentsOrderingFilter
 from documents.filters import DocumentTypeFilterSet
-from documents.filters import ObjectOwnedOrGrantedPermissionsFilter
-from documents.filters import ObjectOwnedPermissionsFilter
 from documents.filters import PaperlessTaskFilterSet
+from documents.filters import PermittedObjectsFilter
 from documents.filters import ShareLinkBundleFilterSet
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
@@ -177,6 +176,8 @@ from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_global_statistics_permission
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import has_system_status_permission
+from documents.permissions import permitted_document_ids
+from documents.permissions import permitted_object_ids
 from documents.permissions import set_permissions_for_object
 from documents.plugins.date_parsing import get_date_parser
 from documents.schema import generate_object_with_permissions_schema
@@ -195,6 +196,7 @@ from documents.serialisers import DocumentVersionLabelSerializer
 from documents.serialisers import DocumentVersionSerializer
 from documents.serialisers import EditPdfDocumentsSerializer
 from documents.serialisers import EmailSerializer
+from documents.serialisers import MergeDocumentsAsVersionsSerializer
 from documents.serialisers import MergeDocumentsSerializer
 from documents.serialisers import NotesSerializer
 from documents.serialisers import PostDocumentSerializer
@@ -232,16 +234,20 @@ from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_request_version_param
 from documents.versioning import get_root_document
 from documents.versioning import resolve_requested_version_for_root
+from documents.versioning import versions_newest_first
 from paperless import version
 from paperless.celery import app as celery_app
 from paperless.config import AIConfig
 from paperless.config import GeneralConfig
+from paperless.config import RemoteOCRConfig
 from paperless.models import ApplicationConfiguration
 from paperless.parsers.registry import get_parser_registry
+from paperless.parsers.remote import RemoteEngineConfig
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
 from paperless_ai.ai_classifier import get_ai_document_classification
+from paperless_ai.ai_classifier import get_llm_output_language
 from paperless_ai.chat import stream_chat_with_documents
 from paperless_ai.exceptions import LLMTimeoutError
 from paperless_ai.matching import extract_unmatched_names
@@ -249,6 +255,10 @@ from paperless_ai.matching import match_correspondents_by_name
 from paperless_ai.matching import match_document_types_by_name
 from paperless_ai.matching import match_storage_paths_by_name
 from paperless_ai.matching import match_tags_by_name
+from paperless_ai.matching import resolve_correspondent_ids
+from paperless_ai.matching import resolve_document_type_ids
+from paperless_ai.matching import resolve_storage_path_ids
+from paperless_ai.matching import resolve_tag_ids
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.oauth import PaperlessMailOAuth2Manager
@@ -257,6 +267,9 @@ from paperless_mail.serialisers import MailRuleSerializer
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
+
+if TYPE_CHECKING:
+    from paperless_ai.base_model import TaxonomyChoiceDict
 
 
 logger = logging.getLogger("paperless.api")
@@ -347,7 +360,6 @@ class IndexView(TemplateView):
         context["username"] = self.request.user.username
         context["full_name"] = self.request.user.get_full_name()
         context["styles_css"] = f"frontend/{self.get_frontend_language()}/styles.css"
-        context["runtime_js"] = f"frontend/{self.get_frontend_language()}/runtime.js"
         context["polyfills_js"] = (
             f"frontend/{self.get_frontend_language()}/polyfills.js"
         )
@@ -550,7 +562,7 @@ class CorrespondentViewSet(
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = CorrespondentFilterSet
     ordering_fields = (
@@ -591,7 +603,7 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Tag]):
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = TagFilterSet
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
@@ -654,20 +666,6 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Tag]):
             update_document_parent_tags(tag, new_parent)
 
 
-def _get_llm_output_language(ai_config: AIConfig, request) -> str | None:
-    output_language = ai_config.llm_output_language
-    if (
-        not output_language
-        and hasattr(request.user, "ui_settings")
-        and isinstance(
-            request.user.ui_settings.settings,
-            dict,
-        )
-    ):
-        output_language = request.user.ui_settings.settings.get("language")
-    return output_language
-
-
 @extend_schema_view(**generate_object_with_permissions_schema(DocumentTypeSerializer))
 class DocumentTypeViewSet(
     PermissionsAwareDocumentCountMixin,
@@ -683,7 +681,7 @@ class DocumentTypeViewSet(
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = DocumentTypeFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
@@ -987,7 +985,7 @@ class DocumentViewSet(
         DjangoFilterBackend,
         SearchFilter,
         DocumentsOrderingFilter,
-        DocumentPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "effective_content")
@@ -1076,9 +1074,9 @@ class DocumentViewSet(
 
     def get_queryset(self):
         latest_version_content = Subquery(
-            Document.objects.filter(root_document=OuterRef("pk"))
-            .order_by("-id")
-            .values("content")[:1],
+            versions_newest_first(
+                Document.objects.filter(root_document=OuterRef("pk")),
+            ).values("content")[:1],
         )
         # A correlated subquery avoids the LEFT JOIN + Count() this used to
         # be, which forced a GROUP BY aggregate over every matching document
@@ -1114,6 +1112,7 @@ class DocumentViewSet(
                         "checksum",
                         "version_label",
                         "root_document_id",
+                        "version_index",
                     ),
                 ),
                 "tags",
@@ -1121,7 +1120,8 @@ class DocumentViewSet(
                     "custom_fields",
                     queryset=CustomFieldInstance.objects.select_related("field"),
                 ),
-                "notes",
+                # NotesSerializer nests the author, this avoids query per note
+                Prefetch("notes", queryset=Note.objects.select_related("user")),
             )
         )
 
@@ -1529,7 +1529,10 @@ class DocumentViewSet(
         if not ai_config.ai_enabled:
             return HttpResponseBadRequest("AI is required for this feature")
 
-        output_language = _get_llm_output_language(ai_config=ai_config, request=request)
+        output_language = get_llm_output_language(
+            ai_config=ai_config,
+            user=request.user,
+        )
         llm_cache_backend = ":".join(
             part
             for part in (
@@ -1547,79 +1550,125 @@ class DocumentViewSet(
         )
 
         if cached_llm_suggestions:
+            # Only the raw model choices are cached, never resolved object
+            # ids. resolve_choice() below still runs permission filtering
+            # freshly for this requester on every request, cache hit or not,
+            # so a resolved id cached for one user's visibility can never be
+            # handed unfiltered to a second, less-privileged requester of
+            # the same (backend-keyed, not user-keyed) cache entry.
             refresh_suggestions_cache(doc.pk)
-            return Response(cached_llm_suggestions.suggestions)
+            llm_suggestions = cached_llm_suggestions.suggestions
+        else:
+            try:
+                llm_suggestions = get_ai_document_classification(
+                    doc,
+                    request.user,
+                    output_language,
+                )
+            except ValueError as exc:
+                logger.exception(
+                    "Invalid AI configuration while generating suggestions for "
+                    "document %s: %s",
+                    doc.pk,
+                    exc,
+                    exc_info=True,
+                )
+                raise ValidationError(
+                    {"ai": [_("Invalid AI configuration.")]},
+                ) from exc
+            except LLMTimeoutError as exc:
+                logger.exception(
+                    "AI backend timed out while generating suggestions for "
+                    "document %s: %s",
+                    doc.pk,
+                    exc,
+                    exc_info=True,
+                )
+                return Response(
+                    {"ai": [_("AI backend request timed out.")]},
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                )
+            set_llm_suggestions_cache(
+                doc.pk,
+                llm_suggestions,
+                backend=llm_cache_backend,
+            )
 
-        try:
-            llm_suggestions = get_ai_document_classification(
-                doc,
+        tags_choice: TaxonomyChoiceDict = llm_suggestions["tags"]
+        correspondents_choice: TaxonomyChoiceDict = llm_suggestions["correspondents"]
+        document_types_choice: TaxonomyChoiceDict = llm_suggestions["document_types"]
+        storage_paths_choice: TaxonomyChoiceDict = llm_suggestions["storage_paths"]
+
+        def resolve_choice(
+            choice: "TaxonomyChoiceDict",
+            resolve_ids: Callable[[list[int], User], list],
+            match_names: Callable[[list[str], User], list],
+        ) -> list:
+            """The ids the model picked from the candidates it was shown, plus
+            name matches for the values it proposed as new. The schema allows
+            the same object to satisfy both an existing_id and a new_name in
+            one valid response, so results are deduplicated by pk (keeping
+            first-seen order) rather than trusting the two lookups to be
+            disjoint.
+            """
+            matched = resolve_ids(choice["existing_ids"], request.user) + match_names(
+                choice["new_names"],
                 request.user,
-                output_language,
             )
-        except ValueError as exc:
-            logger.exception(
-                "Invalid AI configuration while generating suggestions for "
-                "document %s: %s",
-                doc.pk,
-                exc,
-                exc_info=True,
-            )
-            raise ValidationError({"ai": [_("Invalid AI configuration.")]}) from exc
-        except LLMTimeoutError as exc:
-            logger.exception(
-                "AI backend timed out while generating suggestions for document %s: %s",
-                doc.pk,
-                exc,
-                exc_info=True,
-            )
-            return Response(
-                {"ai": [_("AI backend request timed out.")]},
-                status=status.HTTP_503_SERVICE_UNAVAILABLE,
-            )
+            seen_ids: set[int] = set()
+            deduped = []
+            for obj in matched:
+                if obj.pk in seen_ids:
+                    continue
+                seen_ids.add(obj.pk)
+                deduped.append(obj)
+            return deduped
 
-        matched_tags = match_tags_by_name(
-            llm_suggestions.get("tags", []),
-            request.user,
+        matched_tags = resolve_choice(
+            tags_choice,
+            resolve_tag_ids,
+            match_tags_by_name,
         )
-        matched_correspondents = match_correspondents_by_name(
-            llm_suggestions.get("correspondents", []),
-            request.user,
+        matched_correspondents = resolve_choice(
+            correspondents_choice,
+            resolve_correspondent_ids,
+            match_correspondents_by_name,
         )
-        matched_types = match_document_types_by_name(
-            llm_suggestions.get("document_types", []),
-            request.user,
+        matched_types = resolve_choice(
+            document_types_choice,
+            resolve_document_type_ids,
+            match_document_types_by_name,
         )
-        matched_paths = match_storage_paths_by_name(
-            llm_suggestions.get("storage_paths", []),
-            request.user,
+        matched_paths = resolve_choice(
+            storage_paths_choice,
+            resolve_storage_path_ids,
+            match_storage_paths_by_name,
         )
 
         resp_data = {
-            "title": llm_suggestions.get("title"),
+            "title": llm_suggestions["title"],
             "tags": [t.id for t in matched_tags],
             "suggested_tags": extract_unmatched_names(
-                llm_suggestions.get("tags", []),
+                tags_choice["new_names"],
                 matched_tags,
             ),
             "correspondents": [c.id for c in matched_correspondents],
             "suggested_correspondents": extract_unmatched_names(
-                llm_suggestions.get("correspondents", []),
+                correspondents_choice["new_names"],
                 matched_correspondents,
             ),
             "document_types": [d.id for d in matched_types],
             "suggested_document_types": extract_unmatched_names(
-                llm_suggestions.get("document_types", []),
+                document_types_choice["new_names"],
                 matched_types,
             ),
             "storage_paths": [s.id for s in matched_paths],
             "suggested_storage_paths": extract_unmatched_names(
-                llm_suggestions.get("storage_paths", []),
+                storage_paths_choice["new_names"],
                 matched_paths,
             ),
-            "dates": llm_suggestions.get("dates", []),
+            "dates": llm_suggestions["dates"],
         }
-
-        set_llm_suggestions_cache(doc.pk, resp_data, backend=llm_cache_backend)
 
         return Response(resp_data)
 
@@ -1928,14 +1977,14 @@ class DocumentViewSet(
         message = validated_data.get("message")
         use_archive_version = validated_data.get("use_archive_version", True)
 
-        documents = Document.objects.select_related("owner").filter(pk__in=document_ids)
-        for document in documents:
-            if request.user is not None and not has_perms_owner_aware(
-                request.user,
-                "view_document",
-                document,
-            ):
-                return HttpResponseForbidden("Insufficient permissions")
+        documents = Document.objects.filter(pk__in=document_ids)
+        if (
+            request.user is not None
+            and documents.exclude(
+                pk__in=permitted_document_ids(request.user),
+            ).exists()
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
 
         try:
             attachments: list[EmailAttachment] = []
@@ -2134,11 +2183,9 @@ class DocumentViewSet(
                 },
             )
 
-        current = (
-            Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc))
-            .order_by("-id")
-            .first()
-        )
+        current = versions_newest_first(
+            Document.objects.filter(Q(id=root_doc.id) | Q(root_document=root_doc)),
+        ).first()
 
         document_updated.send(
             sender=self.__class__,
@@ -2268,15 +2315,16 @@ class ChatStreamingView(GenericAPIView[Any]):
             if not has_perms_owner_aware(request.user, "view_document", document):
                 return HttpResponseForbidden("Insufficient permissions")
 
-            documents = [document]
+            documents = Document.objects.filter(pk=document.pk)
         else:
-            documents = get_objects_for_user_owner_aware(
-                request.user,
-                "view_document",
-                Document,
+            documents = Document.objects.filter(
+                id__in=permitted_document_ids(request.user),
             )
 
-        output_language = _get_llm_output_language(ai_config=ai_config, request=request)
+        output_language = get_llm_output_language(
+            ai_config=ai_config,
+            user=request.user,
+        )
 
         response = StreamingHttpResponse(
             stream_chat_with_documents(
@@ -2675,7 +2723,7 @@ class SavedViewViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[SavedVie
     permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     filter_backends = (
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     ordering_fields = ("name",)
 
@@ -2728,7 +2776,6 @@ class DocumentSelectionMixin:
         *,
         user: User,
         validated_data: dict[str, Any],
-        permission_codename: str = "view_document",
     ) -> list[int]:
         if not validated_data.get("all", False):
             # if all is not true, just pass through the provided document ids
@@ -2741,10 +2788,11 @@ class DocumentSelectionMixin:
             for key, value in filters.items()
             if key not in _TANTIVY_SEARCH_PARAM_NAMES
         }
-        permitted_documents = get_objects_for_user_owner_aware(
-            user,
-            permission_codename,
-            Document,
+        # Operations are addressed to roots, a caller that wants
+        # to act on a specific version passes its id explicitly instead
+        permitted_documents = Document.objects.filter(
+            id__in=permitted_document_ids(user),
+            root_document__isnull=True,
         )
         # orm-filtered docs
         filtered_documents = DocumentFilterSet(
@@ -2771,8 +2819,12 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         "delete_pages",
         "edit_pdf",
         "remove_password",
+        "merge_as_versions",
     }
-    METHOD_NAMES_REQUIRING_TRIGGER_SOURCE = METHOD_NAMES_REQUIRING_USER
+    # merge_as_versions doesn't queue any consume tasks
+    METHOD_NAMES_REQUIRING_TRIGGER_SOURCE = METHOD_NAMES_REQUIRING_USER - {
+        "merge_as_versions",
+    }
 
     def _has_document_permissions(
         self,
@@ -2793,8 +2845,13 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         )
 
         # check global and object permissions for all documents
-        has_perms = user.has_perm("documents.change_document") and all(
-            has_perms_owner_aware(user, "change_document", doc) for doc in document_objs
+        has_perms = (
+            user.has_perm(
+                "documents.change_document",
+            )
+            and not document_objs.exclude(
+                pk__in=permitted_document_ids(user, perm="change_document"),
+            ).exists()
         )
 
         # check ownership for methods that change original document
@@ -2808,6 +2865,7 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
                     bulk_edit.rotate,
                     bulk_edit.delete_pages,
                     bulk_edit.edit_pdf,
+                    bulk_edit.merge_as_versions,
                     bulk_edit.remove_password,
                 ]
             )
@@ -2838,6 +2896,9 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
             has_perms
             and (
                 method == bulk_edit.delete
+                # Sources stop being documents of their own, and removing one
+                # again afterwards needs delete_document
+                or method == bulk_edit.merge_as_versions
                 or (
                     method in [bulk_edit.merge, bulk_edit.split]
                     and parameters.get("delete_originals")
@@ -3091,6 +3152,33 @@ class MergeDocumentsView(DocumentOperationPermissionMixin):
             method=bulk_edit.merge,
             validated_data=serializer.validated_data,
             operation_label="document merge",
+        )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="documents_merge_as_versions",
+        description="Merge selected documents as versions of a chosen root document",
+        responses={
+            200: inline_serializer(
+                name="MergeDocumentsAsVersionsResult",
+                fields={
+                    "result": serializers.CharField(),
+                },
+            ),
+        },
+    ),
+)
+class MergeDocumentsAsVersionsView(DocumentOperationPermissionMixin):
+    serializer_class = MergeDocumentsAsVersionsSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return self._execute_document_action(
+            method=bulk_edit.merge_as_versions,
+            validated_data=serializer.validated_data,
+            operation_label="document merge as versions",
         )
 
 
@@ -3352,10 +3440,8 @@ class SelectionDataView(GenericAPIView[Any]):
         serializer.is_valid(raise_exception=True)
 
         ids = serializer.validated_data.get("documents")
-        permitted_documents = get_objects_for_user_owner_aware(
-            request.user,
-            "documents.view_document",
-            Document,
+        permitted_documents = Document.objects.filter(
+            id__in=permitted_document_ids(request.user),
         )
         if permitted_documents.filter(pk__in=ids).count() != len(ids):
             return HttpResponseForbidden("Insufficient permissions")
@@ -3527,10 +3613,8 @@ class GlobalSearchView(PassUserMixin):
         OBJECT_LIMIT = 3
         docs = []
         if request.user.has_perm("documents.view_document"):
-            all_docs = get_objects_for_user_owner_aware(
-                request.user,
-                "view_document",
-                Document,
+            all_docs = Document.objects.filter(
+                id__in=permitted_document_ids(request.user),
             )
             if db_only:
                 docs = all_docs.filter(title__icontains=query)[:OBJECT_LIMIT]
@@ -3734,11 +3818,7 @@ class StatisticsView(GenericAPIView[Any]):
         documents = (
             Document.objects.all()
             if can_view_global_stats
-            else get_objects_for_user_owner_aware(
-                user,
-                "documents.view_document",
-                Document,
-            )
+            else Document.objects.filter(id__in=permitted_document_ids(user))
         ).filter(root_document__isnull=True)
         tags = (
             Tag.objects.all()
@@ -3855,9 +3935,10 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
         content = serializer.validated_data.get("content")
         follow_filename_format = serializer.validated_data.get("follow_formatting")
 
+        permitted_ids = set(permitted_document_ids(request.user))
         for document in documents:
             root_doc = get_root_document(document)
-            if not has_perms_owner_aware(request.user, "view_document", root_doc):
+            if root_doc.pk not in permitted_ids:
                 return HttpResponseForbidden("Insufficient permissions")
             versioned_documents.append(
                 get_latest_version_for_root(
@@ -3927,7 +4008,7 @@ class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Storag
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = StoragePathFilterSet
     ordering_fields = ("name", "path", "matching_algorithm", "match", "document_count")
@@ -4017,6 +4098,11 @@ class UiSettingsView(GenericAPIView[Any]):
             ui_settings["app_logo"] = general_config.app_logo
 
         ui_settings["auditlog_enabled"] = settings.AUDIT_LOG_ENABLED
+
+        ui_settings["remote_ocr"] = {
+            "configured": RemoteEngineConfig.from_app_config().engine_is_valid(),
+            "mode": RemoteOCRConfig().remote_ocr_mode,
+        }
 
         if settings.GMAIL_OAUTH_ENABLED or settings.OUTLOOK_OAUTH_ENABLED:
             manager = PaperlessMailOAuth2Manager()
@@ -4458,7 +4544,7 @@ class ShareLinkViewSet(
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = ShareLinkFilterSet
     ordering_fields = ("created", "expiration", "document")
@@ -4488,7 +4574,7 @@ class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = ShareLinkBundleFilterSet
     ordering_fields = ("created", "expiration", "status")
@@ -4521,8 +4607,9 @@ class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
             )
 
         documents = list(documents_qs)
+        permitted_ids = set(permitted_document_ids(request.user))
         for document in documents:
-            if not has_perms_owner_aware(request.user, "view_document", document):
+            if document.pk not in permitted_ids:
                 raise ValidationError(
                     {
                         "document_ids": _(
@@ -4695,6 +4782,9 @@ def serve_file(
         # Support browser previewing csv files by using text mime type
         if mime_type in {"application/csv", "text/csv"} and disposition == "inline":
             mime_type = "text/plain"
+        # Tell browsers to use UTF-8 for the text files we parse as UTF-8
+        if mime_type in {"text/plain", "text/csv", "application/csv"}:
+            mime_type = f"{mime_type}; charset=utf-8"
 
     response = FileResponse(file_handle, content_type=mime_type)
     # Firefox is not able to handle unicode characters in filename field
@@ -4708,6 +4798,8 @@ def serve_file(
             "ignore",
         )
         .decode("ascii")
+        .replace("\\", "_")
+        .replace('"', "_")
     )
     filename_encoded = quote(filename)
     content_disposition = (
@@ -4768,10 +4860,8 @@ class BulkEditObjectsView(PassUserMixin):
                 "document_types": DocumentTypeFilterSet,
                 "storage_paths": StoragePathFilterSet,
             }[object_type]
-            user_permitted_objects = get_objects_for_user_owner_aware(
-                user,
-                perm_codename,
-                object_class,
+            user_permitted_objects = object_class.objects.filter(
+                id__in=permitted_object_ids(user, object_class, perm_codename),
             )
             objs = filterset_class(
                 data=filters,
@@ -4796,8 +4886,12 @@ class BulkEditObjectsView(PassUserMixin):
 
         if not user.is_superuser:
             perm = f"documents.{perm_codename}"
-            has_perms = user.has_perm(perm) and all(
-                has_perms_owner_aware(user, perm_codename, obj) for obj in objs
+            # Limited to the owner (or unowned), same as documents, see BulkEditView
+            has_perms = (
+                user.has_perm(perm)
+                and not objs.exclude(
+                    Q(owner=user) | Q(owner__isnull=True),
+                ).exists()
             )
 
             if not has_perms:
@@ -5298,7 +5392,11 @@ class SystemStatusView(PassUserMixin):
 class TrashView(ListModelMixin, PassUserMixin):
     permission_classes = (IsAuthenticated,)
     serializer_class = TrashSerializer
-    filter_backends = (ObjectOwnedPermissionsFilter,)
+
+    class _TrashPermittedObjectsFilter(PermittedObjectsFilter):
+        include_granted = False
+
+    filter_backends = (_TrashPermittedObjectsFilter,)
     pagination_class = StandardPagination
 
     model = Document
@@ -5324,9 +5422,14 @@ class TrashView(ListModelMixin, PassUserMixin):
             if doc_ids is not None
             else self.filter_queryset(self.get_queryset()).all()
         )
-        for doc in docs:
-            if not has_perms_owner_aware(request.user, "delete_document", doc):
-                return HttpResponseForbidden("Insufficient permissions")
+        if docs.exclude(
+            pk__in=permitted_document_ids(
+                request.user,
+                perm="delete_document",
+                include_deleted=True,
+            ),
+        ).exists():
+            return HttpResponseForbidden("Insufficient permissions")
         action = serializer.validated_data.get("action")
         if action == "restore":
             for doc in Document.deleted_objects.filter(id__in=doc_ids).all():
@@ -5346,15 +5449,26 @@ def serve_logo(request: HttpRequest, filename: str | None = None) -> FileRespons
     config = ApplicationConfiguration.objects.first()
     app_logo = config.app_logo
 
-    if not app_logo:
-        raise Http404("No logo configured")
+    if app_logo:
+        path = Path(app_logo.path)
+        logo_name = app_logo.name
+    else:
+        if not settings.APP_LOGO:
+            raise Http404("No logo configured")
 
-    path = app_logo.path
+        logo_root = (Path(settings.MEDIA_ROOT) / "logo").resolve()
+        path = (Path(settings.MEDIA_ROOT) / settings.APP_LOGO.lstrip("/")).resolve()
+        if not path.is_relative_to(logo_root) or not path.is_file():
+            raise Http404("Configured logo not found")
+
+        logo_name = path.name
+
     content_type = magic.from_file(path, mime=True) or "application/octet-stream"
+    logo_file = app_logo.open("rb") if app_logo else path.open("rb")
 
     return FileResponse(
-        app_logo.open("rb"),
+        logo_file,
         content_type=content_type,
-        filename=app_logo.name,
+        filename=logo_name,
         as_attachment=True,
     )

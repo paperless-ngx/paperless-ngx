@@ -1,11 +1,17 @@
 <div class="btn-group">
-  <button type="button" class="btn btn-sm btn-outline-primary" (click)="clickSuggest()" [disabled]="disabled() || loading() || (suggestions() && !aiEnabled())">
+  <button type="button" class="btn btn-sm btn-outline-primary" (click)="clickSuggest()" [disabled]="disabled() || loading() || (suggestions() && !aiEnabled())" [aria-label]="noSuggestions ? 'No suggestions' : 'Suggest'" i18n-aria-label>
     @if (loading()) {
       <div class="spinner-border spinner-border-sm" role="status"></div>
+    } @else if (noSuggestions) {
+      <i-bs width="1.2em" height="1.2em" name="check-circle"></i-bs>
     } @else {
       <i-bs width="1.2em" height="1.2em" name="stars"></i-bs>
     }
-    <span class="d-none d-lg-inline ps-1" i18n>Suggest</span>
+    @if (noSuggestions) {
+      <span class="d-none d-lg-inline ps-1" i18n>No suggestions</span>
+    } @else {
+      <span class="d-none d-lg-inline ps-1" i18n>Suggest</span>
+    }
     @if (totalSuggestions > 0) {
       <span class="badge bg-primary ms-2">{{ totalSuggestions }}</span>
     }
@@ -19,7 +25,7 @@
 
       <div ngbDropdownMenu aria-labelledby="suggestionsDropdown" class="shadow suggestions-dropdown">
         <div class="list-group list-group-flush small pb-0">
-          @if (!suggestions()?.suggested_tags && !suggestions()?.suggested_document_types && !suggestions()?.suggested_correspondents) {
+          @if (totalSuggestions === 0) {
             <div class="list-group-item text-muted fst-italic">
               <small class="text-muted small fst-italic" i18n>No novel suggestions</small>
             </div>

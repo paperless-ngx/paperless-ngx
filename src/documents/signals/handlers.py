@@ -794,10 +794,12 @@ def cleanup_user_deletion(sender, instance: User | Group, **kwargs) -> None:
 def add_to_index(sender, document, **kwargs) -> None:
     from documents.search import get_backend
 
-    get_backend().add_or_update(
-        document,
-        effective_content=document.get_effective_content(),
-    )
+    # A newly consumed version is not searchable on its own, its content
+    # becomes the effective_content of the root document
+    if document.root_document_id:
+        document = document.root_document
+
+    get_backend().add_or_update(document)
 
 
 def run_workflows_added(
@@ -971,6 +973,39 @@ def run_workflows(
                     )
                 elif action.type == WorkflowAction.WorkflowActionType.MOVE_TO_TRASH:
                     has_move_to_trash_action = True
+                elif action.type == WorkflowAction.WorkflowActionType.REMOTE_OCR:
+                    if use_overrides and overrides:
+                        overrides.remote_ocr = True
+                    else:
+                        # If a workflow has a consumption trigger *and* another type,
+                        # the document has already been parsed by the time the other one fires
+                        logger.debug(
+                            "Remote OCR action only applies to consumption "
+                            "triggers, ignoring",
+                            extra={"group": logging_group},
+                        )
+                elif (
+                    action.type
+                    == WorkflowAction.WorkflowActionType.APPLY_AI_SUGGESTIONS
+                ):
+                    if use_overrides:
+                        # The document has not been parsed yet, so there is no
+                        # content for the LLM to make suggestions from
+                        logger.debug(
+                            "Apply AI suggestions action does not apply to "
+                            "consumption triggers, ignoring",
+                            extra={"group": logging_group},
+                        )
+                    else:
+                        # Queued rather than run sync
+                        from documents.tasks import apply_ai_suggestions
+
+                        # kwargs so the PaperlessTask record can note the
+                        # document, see _extract_input_data
+                        apply_ai_suggestions.delay(
+                            action_id=action.pk,
+                            document_id=document.pk,
+                        )
 
             if not use_overrides:
                 # limit title to 128 characters
@@ -1026,6 +1061,7 @@ TRACKED_TASKS: dict[str, PaperlessTask.TaskType] = {
     "documents.tasks.update_document_content_maybe_archive_file": PaperlessTask.TaskType.REPROCESS_DOCUMENT,
     "documents.tasks.build_share_link_bundle": PaperlessTask.TaskType.BUILD_SHARE_LINK,
     "documents.bulk_edit.delete": PaperlessTask.TaskType.BULK_DELETE,
+    "documents.tasks.apply_ai_suggestions": PaperlessTask.TaskType.APPLY_AI_SUGGESTIONS,
 }
 
 _CELERY_STATE_TO_STATUS: dict[str, PaperlessTask.Status] = {
@@ -1077,6 +1113,12 @@ def _extract_input_data(
         account_ids = task_kwargs.get("account_ids")
         if account_ids is not None:
             return {"account_ids": account_ids}
+        return {}
+
+    if task_type == PaperlessTask.TaskType.APPLY_AI_SUGGESTIONS:
+        document_id = task_kwargs.get("document_id")
+        if document_id is not None:
+            return {"document_id": document_id}
         return {}
 
     return {}

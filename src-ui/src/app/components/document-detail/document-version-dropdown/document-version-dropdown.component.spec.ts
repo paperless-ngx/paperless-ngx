@@ -1,9 +1,16 @@
 import { DatePipe } from '@angular/common'
-import { SimpleChange } from '@angular/core'
+import { SimpleChange, signal } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { By } from '@angular/platform-browser'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject, of, throwError } from 'rxjs'
 import { DocumentVersionInfo } from 'src/app/data/document'
+import {
+  PermissionAction,
+  PermissionsService,
+  PermissionType,
+} from 'src/app/services/permissions.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -19,12 +26,20 @@ describe('DocumentVersionDropdownComponent', () => {
   let documentService: jest.Mocked<
     Pick<
       DocumentService,
-      'deleteVersion' | 'getVersions' | 'uploadVersion' | 'updateVersionLabel'
+      | 'deleteVersion'
+      | 'getVersions'
+      | 'mergeDocumentsAsVersions'
+      | 'uploadVersion'
+      | 'updateVersionLabel'
     >
   >
   let toastService: jest.Mocked<Pick<ToastService, 'showError' | 'showInfo'>>
   let finished$: Subject<{ taskId: string }>
   let failed$: Subject<{ taskId: string; message?: string }>
+  let modalService: jest.Mocked<Pick<NgbModal, 'open'>>
+  let permissionsService: jest.Mocked<
+    Pick<PermissionsService, 'currentUserCan'>
+  >
 
   beforeEach(async () => {
     finished$ = new Subject<{ taskId: string }>()
@@ -32,12 +47,17 @@ describe('DocumentVersionDropdownComponent', () => {
     documentService = {
       deleteVersion: jest.fn(),
       getVersions: jest.fn(),
+      mergeDocumentsAsVersions: jest.fn(),
       uploadVersion: jest.fn(),
       updateVersionLabel: jest.fn(),
     }
+    modalService = { open: jest.fn() }
     toastService = {
       showError: jest.fn(),
       showInfo: jest.fn(),
+    }
+    permissionsService = {
+      currentUserCan: jest.fn().mockReturnValue(true),
     }
 
     await TestBed.configureTestingModule({
@@ -60,6 +80,14 @@ describe('DocumentVersionDropdownComponent', () => {
         {
           provide: ToastService,
           useValue: toastService,
+        },
+        {
+          provide: NgbModal,
+          useValue: modalService,
+        },
+        {
+          provide: PermissionsService,
+          useValue: permissionsService,
         },
         {
           provide: WebsocketStatusService,
@@ -129,6 +157,31 @@ describe('DocumentVersionDropdownComponent', () => {
       'Error deleting version',
       error
     )
+  })
+
+  it('should not show version delete buttons without document delete permission', () => {
+    fixture.destroy()
+    permissionsService.currentUserCan.mockReturnValue(false)
+    fixture = TestBed.createComponent(DocumentVersionDropdownComponent)
+    component = fixture.componentInstance
+    component.documentId = 3
+    component.selectedVersionId = 3
+    component.userIsOwner = true
+    component.userCanEdit = true
+    component.versions = [
+      { id: 3, is_root: true, checksum: 'aaaa' },
+      { id: 10, is_root: false, checksum: 'bbbb' },
+    ]
+
+    fixture.detectChanges()
+
+    expect(permissionsService.currentUserCan).toHaveBeenCalledWith(
+      PermissionAction.Delete,
+      PermissionType.Document
+    )
+    expect(
+      fixture.debugElement.queryAll(By.css('pngx-confirm-button'))
+    ).toHaveLength(0)
   })
 
   it('beginEditingVersion should set active row and draft label', () => {
@@ -222,9 +275,10 @@ describe('DocumentVersionDropdownComponent', () => {
   })
 
   it('onVersionFileSelected should upload and update versions after websocket success', () => {
+    // Newest first, as the API returns them
     const versions: DocumentVersionInfo[] = [
-      { id: 3, is_root: true, checksum: 'aaaa' },
       { id: 20, is_root: false, checksum: 'cccc' },
+      { id: 3, is_root: true, checksum: 'aaaa' },
     ]
     const file = new File(['test'], 'new-version.pdf', {
       type: 'application/pdf',
@@ -322,5 +376,46 @@ describe('DocumentVersionDropdownComponent', () => {
     expect(component.versionUploadError()).toBeNull()
     expect(component.editingVersionId).toBeNull()
     expect(component.versionLabelDraft).toEqual('')
+  })
+
+  it('addExistingDocumentAsVersion should merge with a label and refresh versions', () => {
+    const confirmClicked = new Subject<number>()
+    const modal = {
+      componentInstance: {
+        rootDocumentID: null,
+        buttonsEnabled: signal(true),
+        confirmClicked,
+      },
+      close: jest.fn(),
+    }
+    modalService.open.mockReturnValue(modal as any)
+    documentService.mergeDocumentsAsVersions.mockReturnValue(of({} as any))
+    // Newest first, as the API returns them. The merged document has a lower id
+    // than the root, which is the whole point of merging an existing document.
+    const versions: DocumentVersionInfo[] = [
+      { id: 2, is_root: false, checksum: 'cccc' },
+      { id: 3, is_root: true, checksum: 'aaaa' },
+    ]
+    documentService.getVersions.mockReturnValue(of({ id: 3, versions } as any))
+    component.newVersionLabel = '  Imported  '
+    const versionsEmitSpy = jest.spyOn(component.versionsUpdated, 'emit')
+    const selectedEmitSpy = jest.spyOn(component.versionSelected, 'emit')
+
+    component.addExistingDocumentAsVersion()
+    expect(modal.componentInstance.rootDocumentID).toEqual(3)
+    confirmClicked.next(2)
+
+    expect(documentService.mergeDocumentsAsVersions).toHaveBeenCalledWith(
+      [3, 2],
+      3,
+      'Imported'
+    )
+    expect(documentService.updateVersionLabel).not.toHaveBeenCalled()
+    expect(documentService.getVersions).toHaveBeenCalledWith(3)
+    expect(versionsEmitSpy).toHaveBeenCalledWith(versions)
+    expect(selectedEmitSpy).toHaveBeenCalledWith(2)
+    expect(component.newVersionLabel).toEqual('')
+    expect(modal.close).toHaveBeenCalled()
+    expect(toastService.showInfo).toHaveBeenCalled()
   })
 })

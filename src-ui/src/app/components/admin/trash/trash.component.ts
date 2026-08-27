@@ -82,7 +82,7 @@ export class TrashComponent
     modal.componentInstance.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        modal.componentInstance.buttonsEnabled = false
+        modal.componentInstance.buttonsEnabled.set(false)
         this.trashService.emptyTrash([document.id]).subscribe({
           next: () => {
             this.toastService.showInfo(

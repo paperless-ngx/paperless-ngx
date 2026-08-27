@@ -3,6 +3,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { NEVER, Subject } from 'rxjs'
 import { NEGATIVE_NULL_FILTER_VALUE } from 'src/app/data/filter-rule-type'
 import {
   DEFAULT_MATCHING_ALGORITHM,
@@ -48,6 +49,7 @@ const negativeNullItem = {
 
 let selectionModel: FilterableDropdownSelectionModel
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+const createModalRef = () => ({ closed: NEVER, dismissed: NEVER }) as any
 
 describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () => {
   let component: FilterableDropdownComponent
@@ -868,7 +870,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     expect(getRootDocCount(rootWithoutCounts.id)).toEqual(0)
   })
 
-  it('should set support create, keep open model and call createRef method', async () => {
+  it('should keep the dropdown open while the create modal is active', async () => {
     component.selectionModel.items = items
     component.icon = 'tag-fill'
     component.selectionModel = selectionModel
@@ -882,20 +884,44 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     fixture.detectChanges()
 
     component.filterText = 'Test Filter Text'
-    component.createRef = jest.fn()
+    const modalClosed = new Subject<void>()
+    component.createRef = jest.fn(
+      () =>
+        ({
+          closed: modalClosed,
+          dismissed: NEVER,
+        }) as any
+    )
     component.createClicked()
-    expect(component.creating).toBeTruthy()
+    expect(component.creating()).toBeTruthy()
     expect(component.createRef).toHaveBeenCalledWith('Test Filter Text')
+    fixture.detectChanges()
+    expect(component.dropdown.autoClose).toBeFalsy()
+
+    document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    document.body.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
+    await wait(10)
+    expect(component.dropdown.isOpen()).toBeTruthy()
+
+    // Also cover a close that was already scheduled before autoClose changed.
     const openSpy = jest.spyOn(component.dropdown, 'open')
     component.dropdownOpenChange(false)
     expect(openSpy).toHaveBeenCalled() // should keep open
+    component.dropdownOpenChange(false)
+    expect(openSpy).toHaveBeenCalledTimes(2) // modal interactions keep it open
+
+    modalClosed.next()
+    fixture.detectChanges()
+    expect(component.creating()).toBeFalsy()
+    expect(component.dropdown.autoClose).toBeTruthy()
+    expect(component.dropdown.isOpen()).toBeTruthy()
   })
 
   it('should call create on enter inside filter field if 0 items remain while editing', async () => {
     component.selectionModel.items = items
     component.icon = 'tag-fill'
     component.editing = true
-    component.createRef = jest.fn()
+    component.createRef = jest.fn(createModalRef)
     const createSpy = jest.spyOn(component, 'createClicked')
     expect(component.selectionModel.getSelectedItems()).toEqual([])
     fixture.nativeElement
@@ -909,6 +935,25 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     component.listFilterEnter()
     expect(component.selectionModel.getSelectedItems()).toEqual([])
     expect(createSpy).toHaveBeenCalled()
+  })
+
+  it('should only show create when a non-empty filter has no matches', () => {
+    component.selectionModel.items = []
+    component.icon = 'tag-fill'
+    component.editing = true
+    component.createRef = jest.fn(createModalRef)
+
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).not.toContain('Create')
+    component.listFilterEnter()
+    expect(component.createRef).not.toHaveBeenCalled()
+
+    const filterInput: HTMLInputElement =
+      fixture.nativeElement.querySelector('input[type="text"]')
+    filterInput.value = 'FooBar'
+    filterInput.dispatchEvent(new Event('input'))
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).toContain('Create "FooBar"')
   })
 
   it('should exclude item and trigger change event', () => {
@@ -969,5 +1014,19 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     component.extraButtonClicked()
     expect(extraButtonClicked).toBeTruthy()
     expect(applied).toBeFalsy()
+  })
+
+  it('should only show the extra button for an empty result when enabled', () => {
+    component.selectionModel.items = items
+    component.icon = 'tag-fill'
+    component.extraButtonTitle = 'Extra'
+    component.filterText = 'FooBar'
+
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).not.toContain('Extra')
+
+    fixture.componentRef.setInput('showExtraButtonIfEmpty', true)
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).toContain('Extra')
   })
 })

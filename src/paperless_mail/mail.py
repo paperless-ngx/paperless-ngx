@@ -73,6 +73,14 @@ APPLE_MAIL_TAG_COLORS = {
     "grey": ["$MailFlagBit1", "$MailFlagBit2"],
 }
 
+MAIL_FETCH_BATCH_SIZE = 500
+
+# SQLite's default SQLITE_MAX_VARIABLE_NUMBER has been 32766 since 3.32.0
+# (2020), but older/custom builds and other backends may allow fewer, so
+# stay comfortably under that ceiling for `uid__in` queries against
+# ProcessedMail.
+PROCESSED_UID_QUERY_BATCH_SIZE = 10_000
+
 
 class MailError(Exception):
     pass
@@ -681,11 +689,44 @@ class MailAccountHandler(LoggingMixin):
         )
 
         try:
+            all_uids = set(
+                M.uids(criteria=criterias, charset=rule.account.character_set),
+            )
+        except Exception as err:
+            raise MailError(
+                f"Rule {rule}: Error while searching folder {rule.folder}",
+            ) from err
+
+        all_uids_list = list(all_uids)
+        processed_uids: set[str] = set()
+        for i in range(0, len(all_uids_list), PROCESSED_UID_QUERY_BATCH_SIZE):
+            uid_chunk = all_uids_list[i : i + PROCESSED_UID_QUERY_BATCH_SIZE]
+            processed_uids_qs = ProcessedMail.objects.filter(
+                rule=rule,
+                folder=rule.folder,
+                uid__in=uid_chunk,
+            )
+            if self._current_uid_validity is not None:
+                processed_uids_qs = processed_uids_qs.filter(
+                    Q(uid_validity=self._current_uid_validity)
+                    | Q(uid_validity__isnull=True),
+                )
+            processed_uids.update(processed_uids_qs.values_list("uid", flat=True))
+
+        new_uids = all_uids - processed_uids
+
+        if not new_uids:
+            self.log.debug(
+                f"Rule {rule}: No new mail matching criteria {criterias}",
+            )
+            return 0
+
+        sorted_new_uids = sorted(new_uids, key=int)
+        try:
             messages = M.fetch(
-                criteria=criterias,
+                uid_list=sorted_new_uids,
                 mark_seen=False,
-                charset=rule.account.character_set,
-                bulk=True,
+                bulk=MAIL_FETCH_BATCH_SIZE,
             )
         except Exception as err:
             raise MailError(
@@ -757,6 +798,7 @@ class MailAccountHandler(LoggingMixin):
             not message.attachments
             and rule.consumption_scope == MailRule.ConsumptionScope.ATTACHMENTS_ONLY
         ):
+            self._record_processed_without_consumption(message, rule)
             return processed_elements
 
         self.log.debug(
@@ -791,6 +833,25 @@ class MailAccountHandler(LoggingMixin):
             )
 
         return processed_elements
+
+    def _record_processed_without_consumption(
+        self,
+        message: MailMessage,
+        rule: MailRule,
+    ) -> None:
+        ProcessedMail.objects.get_or_create(
+            rule=rule,
+            uid=message.uid,
+            folder=rule.folder,
+            uid_validity=self._current_uid_validity,
+            defaults={
+                "subject": message.subject,
+                "received": make_aware(message.date)
+                if is_naive(message.date)
+                else message.date,
+                "status": "PROCESSED_WO_CONSUMPTION",
+            },
+        )
 
     def filename_inclusion_matches(
         self,
@@ -958,23 +1019,7 @@ class MailAccountHandler(LoggingMixin):
             )
         else:
             # No files to consume, just mark as processed if it wasn't by .eml processing
-            if not ProcessedMail.objects.filter(
-                rule=rule,
-                uid=message.uid,
-                folder=rule.folder,
-                uid_validity=self._current_uid_validity,
-            ).exists():
-                ProcessedMail.objects.create(
-                    rule=rule,
-                    folder=rule.folder,
-                    uid=message.uid,
-                    uid_validity=self._current_uid_validity,
-                    subject=message.subject,
-                    received=make_aware(message.date)
-                    if is_naive(message.date)
-                    else message.date,
-                    status="PROCESSED_WO_CONSUMPTION",
-                )
+            self._record_processed_without_consumption(message, rule)
 
         return processed_attachments
 

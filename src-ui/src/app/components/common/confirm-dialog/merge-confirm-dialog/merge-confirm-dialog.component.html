@@ -36,7 +36,7 @@
         </div>
     <div class="form-group mt-4">
         <label class="form-label" for="metadataDocumentID" i18n>Use metadata from:</label>
-        <select class="form-select" [ngModel]="metadataDocumentID()" (ngModelChange)="metadataDocumentID.set($event)">
+        <select id="metadataDocumentID" class="form-select" [ngModel]="metadataDocumentID()" (ngModelChange)="metadataDocumentID.set($event)">
             <option [ngValue]="-1" i18n>Regenerate all metadata</option>
             @for (document of documents(); track document.id) {
               <option [ngValue]="document.id">{{document.title}}</option>
@@ -56,10 +56,10 @@
     }
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">
+    <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled()">
         <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
     </button>
-    <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled">
+    <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled()">
         {{btnCaption}}
     </button>
 </div>

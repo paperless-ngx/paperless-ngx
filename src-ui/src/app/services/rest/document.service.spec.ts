@@ -284,6 +284,21 @@ describe(`DocumentService`, () => {
     expect(req.request.method).toEqual('POST')
     expect(req.request.body).toEqual({
       documents: ids,
+      remote_ocr: false,
+    })
+  })
+
+  it('should request remote OCR when reprocessing with it enabled', () => {
+    const ids = [1, 2, 3]
+    subscription = service
+      .reprocessDocuments({ documents: ids }, true)
+      .subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/reprocess/`
+    )
+    expect(req.request.body).toEqual({
+      documents: ids,
+      remote_ocr: true,
     })
   })
 
@@ -313,6 +328,34 @@ describe(`DocumentService`, () => {
       documents: ids,
       metadata_document_id: 1,
       delete_originals: true,
+    })
+  })
+
+  it('should call appropriate api endpoint for merging documents as versions', () => {
+    const ids = [1, 2, 3]
+    subscription = service.mergeDocumentsAsVersions(ids, 2).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/merge_as_versions/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toEqual({
+      documents: ids,
+      root_document_id: 2,
+    })
+  })
+
+  it('should include an optional label when merging one document as a version', () => {
+    const ids = [1, 2]
+    subscription = service
+      .mergeDocumentsAsVersions(ids, 2, 'Imported')
+      .subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/merge_as_versions/`
+    )
+    expect(req.request.body).toEqual({
+      documents: ids,
+      root_document_id: 2,
+      version_label: 'Imported',
     })
   })
 

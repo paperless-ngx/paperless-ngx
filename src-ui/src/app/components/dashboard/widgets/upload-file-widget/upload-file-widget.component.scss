@@ -4,6 +4,16 @@
 
 .btn-outline-dark {
   --bs-btn-border-color: var(--bs-border-color-translucent);
+  border-style: dashed;
+  border-width: 1px;
+  min-height: 5.25rem;
+  background: color-mix(in srgb, var(--bs-primary) 4%, var(--bs-light)) !important;
+
+  &:hover,
+  &:focus {
+    border-color: var(--bs-primary);
+    background: color-mix(in srgb, var(--bs-primary) 9%, var(--bs-light)) !important;
+  }
 }
 
 .smaller {

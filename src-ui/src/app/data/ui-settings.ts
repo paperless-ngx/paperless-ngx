@@ -1,5 +1,6 @@
 import { PdfEditorEditMode } from '../components/common/pdf-editor/pdf-editor-edit-mode'
 import { PdfZoomScale } from '../components/common/pdf-viewer/pdf-viewer.types'
+import { RemoteOCRModeConfig } from './paperless-config'
 import { User } from './user'
 
 export interface UiSettings {
@@ -94,6 +95,8 @@ export const SETTINGS_KEYS = {
   OUTLOOK_OAUTH_URL: 'outlook_oauth_url',
   EMAIL_ENABLED: 'email_enabled',
   AI_ENABLED: 'ai_enabled',
+  REMOTE_OCR_CONFIGURED: 'remote_ocr:configured',
+  REMOTE_OCR_MODE: 'remote_ocr:mode',
 }
 
 export const SETTINGS: UiSetting[] = [
@@ -346,5 +349,15 @@ export const SETTINGS: UiSetting[] = [
     key: SETTINGS_KEYS.PDF_EDITOR_DEFAULT_EDIT_MODE,
     type: 'string',
     default: PdfEditorEditMode.Create,
+  },
+  {
+    key: SETTINGS_KEYS.REMOTE_OCR_CONFIGURED,
+    type: 'boolean',
+    default: false,
+  },
+  {
+    key: SETTINGS_KEYS.REMOTE_OCR_MODE,
+    type: 'string',
+    default: RemoteOCRModeConfig.ALWAYS,
   },
 ]

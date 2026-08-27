@@ -7,8 +7,8 @@
   bottom: 0;
   left: 0;
   z-index: 995; /* Behind the navbar */
-  padding: 50px 0 0; /* Height of navbar */
-  box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+  padding: 64px 0 0; /* Height of navbar */
+  border-right: 1px solid color-mix(in srgb, var(--bs-border-color) 65%, transparent);
   overflow-y: auto;
   --pngx-sidebar-width: 100%;
   max-width: var(--pngx-sidebar-width);
@@ -19,8 +19,13 @@
     height: 0.8em;
   }
 
+  .sidebar-heading,
+  .text-uppercase {
+    letter-spacing: 0.06em;
+  }
+
   .view-name {
-    max-width: calc(100% - 50px)
+    max-width: calc(100% - 55px)
   }
 
   .nav-group:not(:has(.app-link)) .sidebar-heading {
@@ -42,16 +47,17 @@
 }
 @media (max-width: 767.98px) {
   .sidebar {
-    top: 3.5rem;
+    top: 4rem;
   }
 
   .search-container {
     max-height: 4.5rem;
-    overflow: hidden;
+    overflow: visible;
     transition: max-height .2s ease, opacity .2s ease, padding-top .2s ease, padding-bottom .2s ease;
 
     &.mobile-hidden {
       max-height: 0;
+      overflow: hidden;
       opacity: 0;
       padding-top: 0 !important;
       padding-bottom: 0 !important;
@@ -61,16 +67,35 @@
   main.mobile-search-hidden {
     padding-top: 56px;
   }
+
+  .navbar-toggler {
+    padding-left: calc(12px - (1.5em * 2.5 / 16));
+  }
+}
+
+.search-container {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+// Below sm the search gets its own full-width row, so line it up with main's content edge
+@media (max-width: 575.98px) {
+  .search-container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
 }
 
 main {
   transition: all .2s ease;
-  padding-top: 110px;
+  padding-top: 118px;
+  background: var(--pngx-bg-darker);
+  min-height: 100vh;
 }
 
 @media (min-width: 768px) {
   main {
-    padding-top: 56px;
+    padding-top: 64px;
   }
 }
 
@@ -80,16 +105,16 @@ main {
 
 .sidebar li.nav-item span,
 .sidebar .sidebar-heading span {
-  transition: all .1s ease;
+  transition: opacity .1s ease;
 }
 
 @media(min-width: 768px) {
   .sidebar.slim {
-    max-width: 50px;
+    max-width: 55px;
 
     li.nav-item span.badge {
       display: inline-block;
-      margin-right: 2px;
+      margin-right: -4px;
     }
   }
 
@@ -133,26 +158,19 @@ main {
     }
   }
 
-  .sidebar.slim {
-    li.nav-item span.badge {
-      display: inline-block;
-      margin-right: 2px;
-    }
-  }
-
   .sidebar-slim-toggler {
     display: block;
     position: fixed;
     left: calc(var(--pngx-sidebar-width) - 12px);
-    top: 60px;
+    bottom: 16px;
     z-index: 996;
     --bs-btn-padding-x: 0.35rem;
     --bs-btn-padding-y: 0.125rem;
-    transition: all .2s ease;
+    transition: left .2s ease;
   }
 
   .sidebar.slim .sidebar-slim-toggler {
-    --pngx-sidebar-width: 50px !important;
+    --pngx-sidebar-width: 56px !important;
   }
 }
 
@@ -165,7 +183,7 @@ main {
   position: relative;
   top: 0;
   height: 100%;
-  padding-top: 0.5rem;
+  padding: .75rem .5rem 1rem;
   overflow-x: hidden;
   overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
   min-height: min-content;
@@ -180,9 +198,14 @@ main {
 .sidebar .nav-link {
   font-weight: 500;
   white-space: nowrap;
+  border-radius: .55rem;
+  margin: 1px 0;
+  padding: .55rem .7rem;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out;
 
-  &:hover, &.active, &:focus {
+  &:hover, &:focus {
     color: var(--bs-primary);
+    background-color: color-mix(in srgb, var(--bs-primary) 8%, transparent);
   }
 
   &:focus-visible {
@@ -191,7 +214,21 @@ main {
   }
 
   &.active {
-    font-weight: bold;
+    font-weight: 600;
+    color: var(--bs-primary);
+    background-color: color-mix(in srgb, var(--bs-primary) 13%, transparent);
+  }
+
+  &.nav-link-action {
+    color: var(--bs-secondary-color);
+    font-weight: 400;
+    background-color: transparent;
+
+    &:hover,
+    &:focus {
+      color: var(--bs-primary);
+      background-color: transparent;
+    }
   }
 
   i-bs {
@@ -200,9 +237,49 @@ main {
   }
 }
 
+.sidebar .nav-anchor, .sidebar .nav-label {
+  padding: .25rem .7rem;
+}
+
+.attributes-row {
+  border-radius: .55rem;
+  margin: .1rem 0;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out;
+
+  > .nav-link {
+    margin: 0;
+
+    &:hover,
+    &:focus,
+    &.active {
+      background-color: transparent;
+    }
+  }
+
+  &:hover,
+  &:has(> .nav-link:focus-visible) {
+    background-color: color-mix(in srgb, var(--bs-primary) 8%, transparent);
+  }
+
+  &:has(> .nav-link.active) {
+    background-color: color-mix(in srgb, var(--bs-primary) 13%, transparent);
+  }
+}
+
 .attributes-row .attributes-expand-btn {
   opacity: 0.2;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-right: .35rem !important;
+  border-radius: 50%;
+  box-shadow: none !important;
   transition: opacity 0.15s ease-in-out;
+
+  &:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--bs-primary) 55%, transparent);
+    outline-offset: 1px;
+    opacity: 1;
+  }
 }
 
 .attributes-row:hover .attributes-expand-btn {
@@ -210,8 +287,10 @@ main {
 }
 
 .sidebar-heading {
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
+  font-weight: 700;
+  opacity: .75;
 }
 
 .nav {
@@ -268,16 +347,130 @@ main {
  */
 
 .navbar-brand {
-  font-size: 1rem;
+  --pngx-navbar-brand-shadow-rgb: 0, 0, 0;
+  font-size: 1.0625rem;
+  min-height: 64px;
+  letter-spacing: -0.015em;
 
-  .flex-column {
-    padding: 0.15rem 0;
+  &:hover,
+  &:focus-visible {
+    ::ng-deep .navbar-official-logo,
+    .brand-mark,
+    .brand-logo {
+      filter: drop-shadow(0 2px 3px rgba(var(--pngx-navbar-brand-shadow-rgb), .5));
+    }
+  }
+
+  ::ng-deep .navbar-official-logo {
+    filter: drop-shadow(0 1px 2px rgba(var(--pngx-navbar-brand-shadow-rgb), .3));
+    transition: filter .15s ease-in-out;
+
+    @media screen and (max-width: 575.98px) {
+      max-height: 2rem;
+    }
+  }
+
+  .brand-mark {
+    width: 1.65rem;
+    height: 1.65rem;
+    flex: 0 0 auto;
+    transition: filter .15s ease-in-out;
+  }
+
+  .brand-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+    line-height: 1.1;
+    transition: transform .15s ease-in-out;
+  }
+
+  .brand-title {
+    font-weight: 600;
+    max-width: 100%;
+    min-width: 0;
   }
 
   .byline {
-    font-size: 0.5rem;
-    letter-spacing: 0.1rem;
+    margin-top: .15rem;
+    font-size: .5rem;
+    font-weight: 500;
+    letter-spacing: .1rem;
+    opacity: .8;
   }
+
+  .brand-logo {
+    width: auto;
+    height: 2.75rem;
+    max-width: 5rem;
+    flex: 0 0 auto;
+    object-fit: contain;
+    transition: filter .15s ease-in-out, transform .15s ease-in-out;
+  }
+
+}
+
+:host-context(.primary-light) .navbar-brand {
+  --pngx-navbar-brand-shadow-rgb: 255, 255, 255; // Light app color, use white shadow for dark text
+}
+
+:host ::ng-deep .navbar-official-logo {
+  .leaf {
+    fill: color-mix(in srgb, var(--pngx-primary-text-contrast) 85%, var(--bs-primary)) !important;
+  }
+
+  .text {
+    fill: var(--pngx-primary-text-contrast) !important;
+  }
+}
+
+.navbar {
+  min-height: 64px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .12), 0 4px 18px rgba(0, 0, 0, .08) !important;
+}
+
+.navbar > ul {
+  align-items: center;
+  gap: .125rem;
+  padding-right: .5rem;
+}
+
+// true center the search with equal flex widths
+@media (min-width: 768px) {
+  .navbar-brand,
+  .navbar > ul {
+    flex: 1 1 0;
+  }
+
+  .navbar > ul {
+    justify-content: flex-end;
+  }
+}
+
+:host ::ng-deep .navbar-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  padding: .45rem .55rem;
+  border-radius: .6rem;
+  transition: background-color .15s ease-in-out, opacity .15s ease-in-out;
+
+  &:hover,
+  &:focus-visible {
+    background-color: rgba(0, 0, 0, .14);
+  }
+}
+
+#userDropdown {
+  padding-left: .75rem;
+}
+
+.header-search {
+  width: 100%;
+  max-width: 55rem;
 }
 
 @media screen and (max-width: 575.98px) {
@@ -291,6 +484,7 @@ main {
 
   .navbar-toggler {
     grid-area: toggler;
+    color: var(--pngx-primary-text-contrast);
     text-align: left;
   }
 
@@ -326,18 +520,44 @@ main {
     grid-area: actions;
     justify-self: end;
     flex-wrap: nowrap;
+    gap: 0;
+    padding-right: .25rem;
+  }
+
+  :host ::ng-deep .navbar-action {
+    min-width: 2.25rem;
+    padding-right: .4rem;
+    padding-left: .4rem;
+  }
+
+  #userDropdown {
+    padding-right: .35rem;
+    padding-left: .45rem;
   }
 }
 
 @media screen and (min-width: 768px) {
   .navbar-brand.slim {
-    max-width: 50px;
+    max-width: 55px;
+
+    .brand-logo {
+      width: 1.65rem;
+      max-width: 1.65rem;
+    }
+
+    .brand-mark-slim {
+      display: block !important;
+    }
+  }
+
+  :host ::ng-deep .navbar-brand.slim .navbar-official-logo {
+    display: none;
   }
 }
 
 :host ::ng-deep .dropdown.show .dropdown-toggle,
 :host ::ng-deep .dropdown-toggle:hover {
-  opacity: 0.7;
+  opacity: 1;
 }
 
 .dropdown-toggle::after {

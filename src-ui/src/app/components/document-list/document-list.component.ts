@@ -457,6 +457,7 @@ export class DocumentListComponent
       modal.componentInstance.buttonsEnabled.set(false)
       let savedView: SavedView = {
         name: formValue.name,
+        icon: formValue.icon,
         filter_rules: this.list.filterRules,
         sort_reverse: this.list.sortReverse,
         sort_field: this.list.sortField,

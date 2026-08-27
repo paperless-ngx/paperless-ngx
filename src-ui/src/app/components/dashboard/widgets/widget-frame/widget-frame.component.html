@@ -1,5 +1,5 @@
 @if (!cardless()) {
-  <div class="card shadow-sm bg-light fade" [class.show]="show()" cdkDrag [cdkDragDisabled]="!draggable()" cdkDragPreviewContainer="parent">
+  <div class="card bg-light fade" [class.show]="show()" cdkDrag [cdkDragDisabled]="!draggable()" cdkDragPreviewContainer="parent">
     <div class="card-header">
       <div class="d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
@@ -8,7 +8,12 @@
               <i-bs name="grip-vertical"></i-bs>
             </div>
           }
-          <h6 class="card-title mb-0">{{title()}}</h6>
+          <h6 class="card-title mb-0">
+            @if (titleIcon()) {
+              <i-bs class="me-2" [name]="titleIcon()"></i-bs>
+            }
+            {{title()}}
+          </h6>
           <ng-content select="[title-badge]"></ng-content>
           @if (badge() !== null && badge() !== undefined) {
             <span class="badge bg-info text-dark ms-2">{{badge()}}</span>

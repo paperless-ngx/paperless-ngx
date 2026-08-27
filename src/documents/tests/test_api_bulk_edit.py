@@ -532,7 +532,29 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_called_once()
         args, kwargs = m.call_args
         self.assertEqual(args[0], [self.doc1.id])
-        self.assertEqual(len(kwargs), 0)
+        self.assertEqual(kwargs, {"remote_ocr": False})
+
+    @mock.patch("documents.views.bulk_edit.reprocess")
+    def test_reprocess_documents_endpoint_remote_ocr(self, m) -> None:
+        """
+        GIVEN:
+            - API data to reprocess a document with remote OCR requested
+        WHEN:
+            - API is called
+        THEN:
+            - reprocess is called with remote_ocr=True
+        """
+        self.setup_mock(m, "reprocess")
+        response = self.client.post(
+            "/api/documents/reprocess/",
+            json.dumps({"documents": [self.doc1.id], "remote_ocr": True}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertEqual(args[0], [self.doc1.id])
+        self.assertEqual(kwargs, {"remote_ocr": True})
 
     @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
     def test_api_set_storage_path(self, m) -> None:
@@ -1069,6 +1091,30 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(len(kwargs["set_permissions"]["view"]["users"]), 2)
 
     @mock.patch("documents.serialisers.bulk_edit.set_permissions")
+    def test_set_permissions_requires_set_permissions_parameter(self, m) -> None:
+        self.setup_mock(m, "set_permissions")
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "set_permissions",
+                    "parameters": {
+                        "owner": self.user.id,
+                        "merge": True,
+                        "permissions": {"view": {"users": [self.user.id]}},
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"set_permissions not specified", response.content)
+        m.assert_not_called()
+
+    @mock.patch("documents.serialisers.bulk_edit.set_permissions")
     def test_set_permissions_merge(self, m) -> None:
         self.setup_mock(m, "set_permissions")
         user1 = User.objects.create(username="user1")
@@ -1528,6 +1574,29 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
                                 for entry in logs.output
                             ),
                         )
+
+    def test_legacy_bulk_edit_reprocess_invalid_remote_ocr(self) -> None:
+        """
+        GIVEN:
+            - The deprecated bulk_edit endpoint with a non-boolean remote_ocr
+        WHEN:
+            - API is called
+        THEN:
+            - The request is rejected rather than passed through to the task
+        """
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "method": "reprocess",
+                    "parameters": {"remote_ocr": "yes please"},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     @mock.patch("documents.views.bulk_edit.edit_pdf")
     def test_edit_pdf(self, m) -> None:

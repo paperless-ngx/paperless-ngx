@@ -146,7 +146,7 @@ export class UsersAndGroupsComponent
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked.subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
+      modal.componentInstance.buttonsEnabled.set(false)
       this.usersService.delete(user).subscribe({
         next: () => {
           modal.close()
@@ -199,7 +199,7 @@ export class UsersAndGroupsComponent
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked.subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
+      modal.componentInstance.buttonsEnabled.set(false)
       this.groupsService.delete(group).subscribe({
         next: () => {
           modal.close()

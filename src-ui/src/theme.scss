@@ -20,9 +20,10 @@
   --pngx-primary-darken-27: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 27%));
   --pngx-success-darken-10: hsl(152, 69%, 11%); // based on success #198754
   --pngx-bg-alt: #fff;
-  --pngx-bg-darker: var(--bs-gray-100);
+  --pngx-bg-darker: #f4f6f5;
   --pngx-bg-alt2: var(--bs-gray-200); // #e9ecef
   --pngx-bg-disabled: #f7f7f7;
+  --pngx-card-hover-border: var(--bs-tertiary-color);
   --pngx-focus-alpha: 0.3;
   --pngx-toast-max-width: 340px;
   --bs-info: var(--pngx-bg-alt2);
@@ -36,20 +37,22 @@
 $text-color-light-bg: #212529;
 $text-color-dark-bg: #abb2bf;
 $text-color-dark-bg-accent: color.adjust($text-color-dark-bg, $lightness: 10%);
-// Taken from bootstrap
-$form-check-input-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$text-color-light-bg}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/></svg>");
-$form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='#{$text-color-light-bg}'/></svg>");
+// url-encoded $text-color-light-bg
+$text-color-light-bg-esc: "%23212529";
+// Taken from bootstrap, pre-encoded
+$form-check-input-checked-bg-image-dark: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='#{$text-color-light-bg-esc}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+$form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2' fill='#{$text-color-light-bg-esc}'/%3e%3c/svg%3e");
 
 .primary-light {
   --pngx-primary-text-contrast: #{$text-color-light-bg} !important;
 
   .form-check:not(.form-switch) {
     .form-check-input:checked[type=checkbox] {
-      background-image: escape-svg($form-check-input-checked-bg-image-dark);
+      --bs-form-check-bg-image: #{$form-check-input-checked-bg-image-dark};
     }
 
     .form-check-input:checked[type=radio] {
-      background-image: escape-svg($form-check-radio-checked-bg-image-dark);
+      --bs-form-check-bg-image: #{$form-check-radio-checked-bg-image-dark};
     }
   }
 
@@ -66,6 +69,17 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   color: var(--pngx-primary-text-contrast);
 }
 
+.dropdown-menu > .list-group-flush:only-child {
+  > .list-group-item:first-child {
+    border-top-left-radius: var(--bs-dropdown-border-radius);
+    border-top-right-radius: var(--bs-dropdown-border-radius);
+  }
+  > .list-group-item:last-child {
+    border-bottom-left-radius: var(--bs-dropdown-border-radius);
+    border-bottom-right-radius: var(--bs-dropdown-border-radius);
+  }
+}
+
 // Dark mode
 @mixin paperless-green-dark-mode {
   --pngx-primary-lightness: 31%;
@@ -77,8 +91,9 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   --pngx-body-color-accent: #{$text-color-dark-bg-accent};
   --pngx-bg-alt: #242529;
   --pngx-bg-alt2: #232323;
-  --pngx-bg-darker: #101216;
+  --pngx-bg-darker: #121315;
   --pngx-bg-disabled: var(--pngx-bg-alt);
+  --pngx-card-hover-border: var(--bs-border-color);
   --pngx-focus-alpha: 0.6;
   --pngx-primary-faded: var(--pngx-primary-darken-15);
   --pngx-primary-text-contrast: var(--bs-body-color);
@@ -92,7 +107,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   --bs-light-rgb: 28, 28, 31;
   --bs-info: var(--pngx-bg-alt);
   --bs-info-rgb: 36, 36, 39;
-  --bs-border-color: #47494f;
+  --bs-border-color: #34373d;
   --bs-tertiary-bg: var(--pngx-bg-darker);
   --bs-dark-border-subtle: var(--pngx-bg-darker);
   --bs-border-color-translucent: rgba(0, 0, 0, .175); // override bs
@@ -238,13 +253,6 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   }
 
   table {
-    .des,
-    .asc {
-      &::after {
-        filter: invert(0.8); /* arrow is a black inline png bkgd image (!) so use filter */
-      }
-    }
-
     &.table-hover > tbody > tr:hover > * {
       background-color: var(--bs-light);
       color: var(--pngx-body-color-accent);

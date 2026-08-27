@@ -11,7 +11,7 @@ import {
   SimpleChanges,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { merge, of, Subject } from 'rxjs'
 import {
@@ -25,6 +25,7 @@ import {
   tap,
 } from 'rxjs/operators'
 import { DocumentVersionInfo } from 'src/app/data/document'
+import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -33,6 +34,8 @@ import {
   WebsocketStatusService,
 } from 'src/app/services/websocket-status.service'
 import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-button.component'
+import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
+import { AddExistingDocumentVersionDialogComponent } from './add-existing-document-version-dialog/add-existing-document-version-dialog.component'
 
 @Component({
   selector: 'pngx-document-version-dropdown',
@@ -43,11 +46,15 @@ import { ConfirmButtonComponent } from '../../common/confirm-button/confirm-butt
     NgbDropdownModule,
     NgxBootstrapIconsModule,
     ConfirmButtonComponent,
+    IfPermissionsDirective,
     SlicePipe,
     CustomDatePipe,
   ],
 })
-export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
+export class DocumentVersionDropdownComponent
+  extends ComponentWithPermissions
+  implements OnChanges, OnDestroy
+{
   UploadState = UploadState
 
   @Input() documentId: number
@@ -69,6 +76,7 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
   private readonly documentsService = inject(DocumentService)
   private readonly toastService = inject(ToastService)
   private readonly websocketStatusService = inject(WebsocketStatusService)
+  private readonly modalService = inject(NgbModal)
   private readonly destroy$ = new Subject<void>()
   private readonly documentChange$ = new Subject<void>()
 
@@ -256,11 +264,10 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
       .subscribe({
         next: (doc) => {
           if (uploadDocumentId !== this.documentId) return
-          if (doc?.versions) {
+          if (doc?.versions?.length) {
             this.versionsUpdated.emit(doc.versions)
-            this.versionSelected.emit(
-              Math.max(...doc.versions.map((version) => version.id))
-            )
+            // The API returns versions newest first
+            this.versionSelected.emit(doc.versions[0].id)
             this.clearVersionUploadStatus()
           }
         },
@@ -275,6 +282,55 @@ export class DocumentVersionDropdownComponent implements OnChanges, OnDestroy {
             error
           )
         },
+      })
+  }
+
+  addExistingDocumentAsVersion(): void {
+    const modal = this.modalService.open(
+      AddExistingDocumentVersionDialogComponent,
+      { backdrop: 'static' }
+    )
+    const dialog =
+      modal.componentInstance as AddExistingDocumentVersionDialogComponent
+    dialog.rootDocumentID = this.documentId
+    dialog.confirmClicked
+      .pipe(takeUntil(this.destroy$), takeUntil(this.documentChange$))
+      .subscribe((existingDocumentID) => {
+        dialog.buttonsEnabled.set(false)
+        const versionLabel = this.newVersionLabel?.trim()
+        this.documentsService
+          .mergeDocumentsAsVersions(
+            [this.documentId, existingDocumentID],
+            this.documentId,
+            versionLabel
+          )
+          .pipe(
+            switchMap(() => this.documentsService.getVersions(this.documentId)),
+            first(),
+            finalize(() => dialog.buttonsEnabled.set(true)),
+            takeUntil(this.destroy$),
+            takeUntil(this.documentChange$)
+          )
+          .subscribe({
+            next: (document) => {
+              if (document?.versions?.length) {
+                this.versionsUpdated.emit(document.versions)
+                // The API returns versions newest first
+                this.versionSelected.emit(document.versions[0].id)
+              }
+              this.newVersionLabel = ''
+              modal.close()
+              this.toastService.showInfo(
+                $localize`Existing document added as a version.`
+              )
+            },
+            error: (error) => {
+              this.toastService.showError(
+                $localize`Error adding existing document as a version`,
+                error
+              )
+            },
+          })
       })
   }
 

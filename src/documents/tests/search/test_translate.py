@@ -341,9 +341,11 @@ class TestTranslateQuery:
             ("tag:foo,type:bar", "tag:foo AND document_type:bar"),
             (
                 "created:[2020 TO 2021],added:[2022 TO 2023]",
-                "created:[2020-01-01T00:00:00Z TO 2022-01-01T00:00:00Z}"
-                " AND "
-                "added:[2022-01-01T00:00:00Z TO 2024-01-01T00:00:00Z}",
+                (
+                    "created:[2020-01-01T00:00:00Z TO 2022-01-01T00:00:00Z}"
+                    " AND "
+                    "added:[2022-01-01T00:00:00Z TO 2024-01-01T00:00:00Z}"
+                ),
             ),
             # correspondent is not multi-value: comma stays literal inside the value
             ("correspondent:foo,bar", "correspondent:foo,bar"),

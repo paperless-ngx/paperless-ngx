@@ -6,7 +6,7 @@
 <div class="modal-body">
     <div class="row">
         <div class="col-2 d-flex justify-content-end">
-            <button class="btn btn-secondary mt-auto" (click)="rotate(false)">
+            <button class="btn btn-secondary mt-auto" (click)="rotate(false)" aria-label="Rotate counterclockwise" i18n-aria-label>
                 <i-bs name="arrow-counterclockwise"></i-bs>
             </button>
         </div>
@@ -16,7 +16,7 @@
             }
         </div>
         <div class="col-2 d-flex">
-            <button class="btn btn-secondary mt-auto" (click)="rotate()">
+            <button class="btn btn-secondary mt-auto" (click)="rotate()" aria-label="Rotate clockwise" i18n-aria-label>
                 <i-bs name="arrow-clockwise"></i-bs>
             </button>
         </div>
@@ -34,10 +34,10 @@
           <p class="mb-0 small"><b>{{messageBold}}</b></p>
         }
     </div>
-    <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">
+    <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled()">
         <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
     </button>
-    <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled || degrees === 0">
+    <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled() || degrees === 0">
       {{btnCaption}}
       @if (!confirmButtonEnabled) {
           <ngb-progressbar style="height: 1px;" type="dark" [max]="secondsTotal" [value]="seconds"></ngb-progressbar>

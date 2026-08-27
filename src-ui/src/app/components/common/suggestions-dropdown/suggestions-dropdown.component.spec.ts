@@ -30,6 +30,34 @@ describe('SuggestionsDropdownComponent', () => {
     expect(component.totalSuggestions).toBe(4)
   })
 
+  it('should show when a completed request returned no suggestions', () => {
+    fixture.componentRef.setInput('suggestions', {
+      correspondents: [],
+      tags: [],
+      document_types: [],
+      storage_paths: [],
+      dates: [],
+    })
+    fixture.detectChanges()
+
+    expect(component.noSuggestions).toBeTruthy()
+    expect(fixture.nativeElement.textContent).toContain('No suggestions')
+  })
+
+  it('should not show the empty state before a request or with suggestions', () => {
+    expect(component.noSuggestions).toBeFalsy()
+
+    fixture.componentRef.setInput('suggestions', {
+      correspondents: [],
+      tags: [42],
+      document_types: [],
+      storage_paths: [],
+      dates: [],
+    })
+
+    expect(component.noSuggestions).toBeFalsy()
+  })
+
   it('should emit getSuggestions when clickSuggest is called and suggestions are null', () => {
     jest.spyOn(component.getSuggestions, 'emit')
     fixture.componentRef.setInput('suggestions', null)
@@ -59,5 +87,6 @@ describe('SuggestionsDropdownComponent', () => {
     })
     component.clickSuggest()
     expect(component.dropdown.open).toBeTruthy()
+    expect(fixture.nativeElement.textContent).toContain('No novel suggestions')
   })
 })

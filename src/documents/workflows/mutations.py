@@ -105,7 +105,8 @@ def apply_assignment_to_document(
                 field=field,
                 document=document,
             ).first()
-            if instance and args[value_field_name] is not None:
+            # empty string is indistinguishable from no value in the UI
+            if instance and args[value_field_name] not in (None, ""):
                 setattr(instance, value_field_name, args[value_field_name])
                 instance.save()
             elif not instance:

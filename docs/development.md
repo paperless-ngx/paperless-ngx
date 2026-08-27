@@ -456,6 +456,20 @@ def score(
     return 10
 ```
 
+**Remote services**
+
+If your parser sends document content to a remote service, declare it:
+
+```python
+class MyCustomParser:
+    uses_remote_service = True
+```
+
+Paperless-ngx excludes such parsers when the document being consumed has not
+been marked for remote processing, so users can keep remote OCR off by default
+and enable it selectively with a workflow. Parsers that do not declare the
+attribute are treated as fully local and are always considered.
+
 **Archive and rendition flags**
 
 ```python

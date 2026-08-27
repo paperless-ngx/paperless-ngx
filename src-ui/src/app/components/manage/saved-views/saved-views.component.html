@@ -7,23 +7,34 @@
 </pngx-page-header>
 <form [formGroup]="savedViewsForm" (ngSubmit)="save()">
   <ul class="list-group mb-3" formGroupName="savedViews">
-    @for (view of savedViews(); track view) {
+    @for (view of pagedSavedViews(); track view) {
       <li class="list-group-item py-3">
       <div [formGroupName]="view.id">
         <div class="row">
-          <div class="col">
+          <div class="col-md">
             <pngx-input-text title="Name" formControlName="name"></pngx-input-text>
           </div>
-          <div class="col">
-            <div class="form-check form-switch mt-3">
-              <input type="checkbox" class="form-check-input" id="show_on_dashboard_{{view.id}}" formControlName="show_on_dashboard">
-              <label class="form-check-label" for="show_on_dashboard_{{view.id}}" i18n>Show on dashboard</label>
-            </div>
-            <div class="form-check form-switch">
-              <input type="checkbox" class="form-check-input" id="show_in_sidebar_{{view.id}}" formControlName="show_in_sidebar">
-              <label class="form-check-label" for="show_in_sidebar_{{view.id}}" i18n>Show in sidebar</label>
-            </div>
+          <div class="col-md">
+            <pngx-input-select
+            i18n-title
+            title="Icon"
+            formControlName="icon"
+            [items]="savedViewIcons"
+            iconField="icon">
+            </pngx-input-select>
           </div>
+          @if (canSaveSettings) {
+            <div class="col-md">
+              <div class="form-check form-switch mt-3">
+                <input type="checkbox" class="form-check-input" id="show_on_dashboard_{{view.id}}" formControlName="show_on_dashboard">
+                <label class="form-check-label" for="show_on_dashboard_{{view.id}}" i18n>Show on dashboard</label>
+              </div>
+              <div class="form-check form-switch">
+                <input type="checkbox" class="form-check-input" id="show_in_sidebar_{{view.id}}" formControlName="show_in_sidebar">
+                <label class="form-check-label" for="show_in_sidebar_{{view.id}}" i18n>Show in sidebar</label>
+              </div>
+            </div>
+          }
           <div class="col-auto">
             @if (canDeleteSavedView(view)) {
               <label class="form-label" for="name_{{view.id}}" i18n>Actions</label>
@@ -79,6 +90,11 @@
     }
   </ul>
 
-  <button type="button" (click)="reset()" class="btn btn-outline-secondary mb-2" [disabled]="(isDirty$ | async) === false" i18n>Cancel</button>
-  <button type="submit" class="btn btn-primary ms-2 mb-2" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
+  <div class="d-flex align-items-center mb-3">
+    <button type="button" (click)="reset()" class="btn btn-outline-secondary mb-2" [disabled]="(isDirty$ | async) === false" i18n>Cancel</button>
+    <button type="submit" class="btn btn-primary ms-2 mb-2" [disabled]="(isDirty$ | async) === false" i18n>Save</button>
+    @if (savedViews()?.length > pageSize) {
+      <ngb-pagination class="ms-auto" [pageSize]="pageSize" [collectionSize]="savedViews().length" [page]="page()" [maxSize]="5" (pageChange)="page.set($event)" size="sm" aria-label="Pagination"></ngb-pagination>
+    }
+  </div>
 </form>

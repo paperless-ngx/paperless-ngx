@@ -7,7 +7,7 @@
   >
   @if (activeManagementList) {
     <div ngbDropdown class="btn-group flex-fill d-sm-none">
-      <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle>
+      <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle aria-label="Select" i18n-aria-label>
         <i-bs name="text-indent-left"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Select</ng-container></div>
         @if (activeManagementList.hasSelection) {
           <pngx-clearable-badge [selected]="activeManagementList.hasSelection" [number]="activeManagementList.selectedCount" (cleared)="activeManagementList.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
@@ -69,7 +69,7 @@
   }
 </ul>
 
-<div class="my-3 shadow-sm">
+<div class="my-3">
   <ng-container
     [ngComponentOutlet]="activeSection?.component"
     #activeOutlet="ngComponentOutlet"

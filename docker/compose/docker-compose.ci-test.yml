@@ -24,7 +24,7 @@ services:
     network_mode: host
     restart: unless-stopped
   greenmail:
-    image: docker.io/greenmail/standalone:2.1.9
+    image: docker.io/greenmail/standalone:2.1.11
     hostname: greenmail
     container_name: greenmail
     environment:
@@ -35,7 +35,7 @@ services:
       - "3143:3143" # IMAP
     restart: unless-stopped
   nginx:
-    image: docker.io/nginx:1.31.2-alpine
+    image: docker.io/nginx:1.31.3-alpine
     hostname: nginx
     container_name: nginx
     ports:

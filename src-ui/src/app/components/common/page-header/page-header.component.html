@@ -1,6 +1,6 @@
-<div class="row pt-3 pb-3 pb-md-2 align-items-center">
+<div class="row pt-3 pb-2 align-items-center">
   <div class="col-md text-truncate">
-    <h3 class="d-flex align-items-center mb-1" style="line-height: 1.4">
+    <h3 class="d-flex align-items-center mb-2 mb-md-1" style="line-height: 1.4">
       <span class="text-truncate">{{title()}}</span>
       @if (id()) {
         <span class="badge bg-primary text-primary-text-contrast ms-3 small fs-normal cursor-pointer" (click)="copyID()">
@@ -12,10 +12,10 @@
         </span>
       }
       @if (subTitle()) {
-        <span class="h6 mb-0 mt-1 d-block d-md-inline fw-normal ms-md-3 text-truncate" style="line-height: 1.4">{{subTitle()}}</span>
+        <span class="page-subtitle h6 mb-0 mt-1 fw-normal ms-md-3 text-truncate" style="line-height: 1.4">{{subTitle()}}</span>
       }
       @if (info()) {
-        <button class="btn btn-sm btn-link text-muted p-0 p-md-2" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true">
+        <button class="btn btn-sm btn-link text-muted p-0 ms-2 p-md-2 ms-md-0" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true">
           <i-bs name="question-circle"></i-bs>
         </button>
         <ng-template #infoPopover>

@@ -50,7 +50,9 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { flattenTags } from 'src/app/utils/flatten-tags'
 import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
+import { MergeAsVersionsConfirmDialogComponent } from '../../common/confirm-dialog/merge-as-versions-confirm-dialog/merge-as-versions-confirm-dialog.component'
 import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
+import { ReprocessConfirmDialogComponent } from '../../common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component'
 import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
@@ -171,6 +173,13 @@ export class BulkEditorComponent
     )
   }
 
+  get userCanDelete(): boolean {
+    return this.permissionService.currentUserCan(
+      PermissionAction.Delete,
+      PermissionType.Document
+    )
+  }
+
   ngOnInit() {
     if (
       this.permissionService.currentUserCan(
@@ -273,7 +282,7 @@ export class BulkEditorComponent
     overrideSelection?: DocumentSelectionQuery
   ) {
     if (modal) {
-      this.setModalButtonsEnabled(modal, false)
+      modal.componentInstance.buttonsEnabled.set(false)
     }
     this.documentService
       .bulkEdit(overrideSelection ?? this.getSelectionQuery(), method, args)
@@ -287,14 +296,17 @@ export class BulkEditorComponent
   private executeDocumentAction(
     modal: NgbModalRef,
     request: Observable<any>,
-    options: { deleteOriginals?: boolean } = {}
+    options: { clearSelection?: boolean; successMessage?: string } = {}
   ) {
     if (modal) {
-      this.setModalButtonsEnabled(modal, false)
+      modal.componentInstance.buttonsEnabled.set(false)
     }
     request.pipe(first()).subscribe({
       next: () => {
-        this.handleOperationSuccess(modal, options.deleteOriginals ?? false)
+        this.handleOperationSuccess(modal, options.clearSelection ?? false)
+        if (options.successMessage) {
+          this.toastService.showInfo(options.successMessage)
+        }
       },
       error: (error) => this.handleOperationError(modal, error),
     })
@@ -320,21 +332,12 @@ export class BulkEditorComponent
 
   private handleOperationError(modal: NgbModalRef, error: any) {
     if (modal) {
-      this.setModalButtonsEnabled(modal, true)
+      modal.componentInstance.buttonsEnabled.set(true)
     }
     this.toastService.showError(
       $localize`Error executing bulk operation`,
       error
     )
-  }
-
-  private setModalButtonsEnabled(modal: NgbModalRef, enabled: boolean) {
-    const buttonsEnabled = modal.componentInstance.buttonsEnabled
-    if (typeof buttonsEnabled?.set === 'function') {
-      buttonsEnabled.set(enabled)
-    } else {
-      modal.componentInstance.buttonsEnabled = enabled
-    }
   }
 
   private applySelectionData(
@@ -771,6 +774,7 @@ export class BulkEditorComponent
         this.tagSelectionModel.items = flattenTags(tags.results)
         this.tagSelectionModel.toggle(newTag.id)
       })
+    return modal
   }
 
   createCorrespondent(name: string) {
@@ -794,6 +798,7 @@ export class BulkEditorComponent
         this.correspondentSelectionModel.items = correspondents.results
         this.correspondentSelectionModel.toggle(newCorrespondent.id)
       })
+    return modal
   }
 
   createDocumentType(name: string) {
@@ -815,6 +820,7 @@ export class BulkEditorComponent
         this.documentTypeSelectionModel.items = documentTypes.results
         this.documentTypeSelectionModel.toggle(newDocumentType.id)
       })
+    return modal
   }
 
   createStoragePath(name: string) {
@@ -836,6 +842,7 @@ export class BulkEditorComponent
         this.storagePathsSelectionModel.items = storagePaths.results
         this.storagePathsSelectionModel.toggle(newStoragePath.id)
       })
+    return modal
   }
 
   createCustomField(name: string) {
@@ -857,6 +864,7 @@ export class BulkEditorComponent
         this.customFieldsSelectionModel.items = customFields.results
         this.customFieldsSelectionModel.toggle(newCustomField.id)
       })
+    return modal
   }
 
   applyDelete() {
@@ -872,7 +880,7 @@ export class BulkEditorComponent
       modal.componentInstance.confirmClicked
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
-          modal.componentInstance.buttonsEnabled = false
+          modal.componentInstance.buttonsEnabled.set(false)
           this.executeDocumentAction(
             modal,
             this.documentService.deleteDocuments(this.getSelectionQuery())
@@ -909,7 +917,7 @@ export class BulkEditorComponent
   }
 
   reprocessSelected() {
-    let modal = this.modalService.open(ConfirmDialogComponent, {
+    let modal = this.modalService.open(ReprocessConfirmDialogComponent, {
       backdrop: 'static',
     })
     modal.componentInstance.title = $localize`Reprocess confirm`
@@ -920,10 +928,13 @@ export class BulkEditorComponent
     modal.componentInstance.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        modal.componentInstance.buttonsEnabled = false
+        modal.componentInstance.buttonsEnabled.set(false)
         this.executeDocumentAction(
           modal,
-          this.documentService.reprocessDocuments(this.getSelectionQuery())
+          this.documentService.reprocessDocuments(
+            this.getSelectionQuery(),
+            modal.componentInstance.remoteOcr
+          )
         )
       })
   }
@@ -957,7 +968,7 @@ export class BulkEditorComponent
     rotateDialog.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        rotateDialog.buttonsEnabled = false
+        rotateDialog.buttonsEnabled.set(false)
         this.executeDocumentAction(
           modal,
           this.documentService.rotateDocuments(
@@ -990,14 +1001,43 @@ export class BulkEditorComponent
         if (mergeDialog.archiveFallback()) {
           args.archive_fallback = true
         }
-        mergeDialog.buttonsEnabled = false
+        mergeDialog.buttonsEnabled.set(false)
         this.executeDocumentAction(
           modal,
           this.documentService.mergeDocuments(mergeDialog.documentIDs(), args),
-          { deleteOriginals: !!args.delete_originals }
+          { clearSelection: !!args.delete_originals }
         )
         this.toastService.showInfo(
           $localize`Merged document will be queued for consumption.`
+        )
+      })
+  }
+
+  mergeSelectedAsVersions() {
+    let modal = this.modalService.open(MergeAsVersionsConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    const mergeDialog =
+      modal.componentInstance as MergeAsVersionsConfirmDialogComponent
+    const documentIDs = Array.from(this.list.selected)
+    mergeDialog.title = $localize`Merge as versions`
+    mergeDialog.message = $localize`The selected documents will become versions of the root document.`
+    mergeDialog.btnCaption = $localize`Proceed`
+    mergeDialog.documentIDs.set(documentIDs)
+    mergeDialog.rootDocumentID.set(documentIDs[0])
+    mergeDialog.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        this.executeDocumentAction(
+          modal,
+          this.documentService.mergeDocumentsAsVersions(
+            mergeDialog.documentIDs(),
+            mergeDialog.rootDocumentID()
+          ),
+          {
+            clearSelection: true,
+            successMessage: $localize`Documents merged as versions.`,
+          }
         )
       })
   }
@@ -1063,14 +1103,14 @@ export class BulkEditorComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         dialog.loading.set(true)
-        dialog.buttonsEnabled = false
+        dialog.buttonsEnabled.set(false)
         this.shareLinkBundleService
           .createBundle(dialog.payload)
           .pipe(first())
           .subscribe({
             next: (result) => {
               dialog.loading.set(false)
-              dialog.buttonsEnabled = false
+              dialog.buttonsEnabled.set(false)
               dialog.createdBundle = result
               dialog.copied.set(false)
               dialog.payload = null
@@ -1084,7 +1124,7 @@ export class BulkEditorComponent
             },
             error: (error) => {
               dialog.loading.set(false)
-              dialog.buttonsEnabled = true
+              dialog.buttonsEnabled.set(true)
               this.toastService.showError(
                 $localize`Share link bundle creation is not available yet.`,
                 error

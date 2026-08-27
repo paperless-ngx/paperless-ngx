@@ -1697,6 +1697,24 @@ describe('FilterEditorComponent', () => {
     ])
   })
 
+  it('should carry over text filtering once with created and added relative dates', () => {
+    component.textFilter = 'foo'
+    const datesDropdown = fixture.debugElement.query(
+      By.directive(DatesDropdownComponent)
+    )
+    component.dateCreatedRelativeDate = RelativeDate.WITHIN_1_WEEK
+    component.dateAddedRelativeDate = RelativeDate.WITHIN_1_MONTH
+    datesDropdown.triggerEventHandler('datesSet')
+    fixture.detectChanges()
+    tick(400)
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'foo,created:[-1 week to now],added:[-1 month to now]',
+      },
+    ])
+  })
+
   it('should convert legacy title filters into full text query when adding a created relative date', () => {
     component.filterRules = [
       {
@@ -2193,6 +2211,20 @@ describe('FilterEditorComponent', () => {
       new KeyboardEvent('keydown', { key: 'Escape' })
     )
     expect(blurSpy).toHaveBeenCalled()
+  })
+
+  it('should only dismiss open autocomplete suggestions on Escape, keeping the query', () => {
+    component.textFilter = 'foo bar'
+    component.textFilterInput.nativeElement.value = 'foo bar'
+    jest.spyOn(component.searchTypeahead, 'isPopupOpen').mockReturnValue(true)
+    const dismissSpy = jest
+      .spyOn(component.searchTypeahead, 'dismissPopup')
+      .mockImplementation(() => {})
+    component.textFilterInput.nativeElement.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape' })
+    )
+    expect(dismissSpy).toHaveBeenCalled()
+    expect(component.textFilter).toEqual('foo bar')
   })
 
   it('should adjust text filter targets if more like search', () => {

@@ -99,6 +99,10 @@ Think of versions as **file history** for a document.
 - By default, search and document content use the latest version.
 - In document detail, selecting a version switches the preview, file metadata and content (and download etc buttons) to that version.
 - Deleting a non-root version keeps metadata and falls back to the latest remaining version.
+- From the document list, select two or more documents and choose **Merge as versions** to combine them under one entry. Select the root document whose metadata and permissions should be retained; the other selected documents become file versions. The root may already have versions, but documents being added as versions must not have version histories of their own.
+- From a document's **Versions** menu, choose **Existing** to search for another document and add it as a version of the current document.
+- Documents merged as versions give up their archive serial number. If the root has no ASN of its own it takes the first one, otherwise the ASNs are released and the removal is logged.
+- Merging as versions cannot be undone from the UI, and deleting the root document moves its versions to the trash as well.
 
 ### Management Lists
 
@@ -576,7 +580,9 @@ The following workflow action types are available:
 - Tags, correspondent, document type and storage path
 - Document owner
 - View and / or edit permissions to users or groups
-- Custom fields. Note that no value for the field will be set
+- Custom fields, optionally with a value. If no value is set, the field is only added to the
+  document and any value it may already have is left untouched. If a value is set, it will
+  overwrite an existing value of that field on the document.
 
 ##### Removal {#workflow-action-removal}
 
@@ -647,6 +653,48 @@ happened while it was still encrypted, that original version will likewise be mi
 
 **Current limitation**: Passwords are stored as a simple list without descriptions. To handle
 multiple PDF types with different passwords, create separate workflows for each use case.
+
+##### Remote OCR {#workflow-action-remote-ocr}
+
+"Remote OCR" actions send the document to the configured remote OCR engine instead of processing it
+locally. To use remote OCR selectively, set the [remote OCR mode](configuration.md#PAPERLESS_REMOTE_OCR_MODE)
+to `workflow_only` then add this action to a workflow that matches only the documents you
+want sent to the remote engine. See [Remote OCR](#remote-ocr) for the engine setup. The action only works with
+a **Consumption Started** trigger.
+
+The action takes no options, its presence is what enables remote OCR for a matching document.
+
+If the remote engine is not configured, or does not support the document's file type, the document is
+processed locally instead and a warning is written to the log.
+
+##### Apply AI Suggestions {#workflow-action-apply-ai-suggestions}
+
+"Apply AI Suggestions" actions ask the configured AI service for title and metadata suggestions,
+the same as the AI suggestions shown on the document detail page, except applied automatically and in bulk.
+It requires [AI features](configuration.md#ai) to be enabled. You can specify:
+
+- Which suggestions to apply: title, tags, correspondent, document type, storage path and / or created
+  date. Suggestions for fields you did not select are discarded.
+- Whether to create missing items. By default only tags, correspondents and document types that
+  already exist are assigned and any other suggestion is dropped. With this enabled, suggested items
+  that do not exist are created. Storage paths are never created.
+- Whether to overwrite existing values. By default a field is only filled in if it is currently empty.
+  Note that documents almost always already have a title and created date, so if you select those you
+  will usually want to enable this too. Tags are an exception: suggested tags are always added and
+  never replace the document's existing tags.
+
+The action works with every trigger **except Consumption Started**, because suggestions are made from
+the document's text, which does not exist until after the document has been processed.
+
+Because the query to the AI service is slow, the action is queued and runs in the background rather
+than as part of the workflow run itself. The document is updated once the suggestions come back.
+
+!!! warning
+
+    Every matching document results in a query to the AI service, which may incur costs and have privacy
+    implications. Queries can be slow, so a workflow matching a large number of documents can occupy the
+    task queue, and delay consumption of new documents, etc. Consider narrowing the trigger filters,
+    running in small batches and / or increasing workers.
 
 #### Workflow placeholders
 
@@ -1084,10 +1132,18 @@ Paperless-ngx supports performing OCR on documents using remote services. At the
 [Microsoft's Azure "Document Intelligence" service](https://azure.microsoft.com/en-us/products/ai-services/ai-document-intelligence).
 This is of course a paid service (with a free tier) which requires an Azure account and subscription. Azure AI is not affiliated with
 Paperless-ngx in any way. When enabled, Paperless-ngx will automatically send appropriate documents to Azure for OCR processing, bypassing
-the local OCR engine. See the [configuration](configuration.md#PAPERLESS_REMOTE_OCR_ENGINE) options for more details.
+the local OCR engine. See the [configuration](configuration.md#PAPERLESS_REMOTE_OCR_ENGINE) options for more details. These
+settings can be supplied as environment variables or via **Application Configuration**.
 
 Additionally, when using a commercial service with this feature, consider both potential costs as well as any associated file size
 or page limitations (e.g. with a free tier).
+
+By default, every document of a supported file type is sent to the remote engine. To use it more selectively, set the
+[remote OCR mode](configuration.md#PAPERLESS_REMOTE_OCR_MODE) to `workflow_only`. Documents are then processed locally
+unless a [remote OCR workflow action](#workflow-action-remote-ocr) enables it for them, so you can limit the remote
+engine to particular documents.
+
+Setting the mode to `workflow_only` also allows the **Reprocess** actions to selectively use remote OCR for individual documents.
 
 ## Architecture
 

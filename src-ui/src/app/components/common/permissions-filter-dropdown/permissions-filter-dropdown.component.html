@@ -1,5 +1,5 @@
 <div class="btn-group w-100" ngbDropdown role="group">
-  <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="isActive ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled">
+  <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="isActive ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled" [aria-label]="title">
     <i-bs name="person-fill-lock"></i-bs><div class="d-none d-sm-inline ms-1">{{title}}</div>
     <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
   </button>
@@ -22,7 +22,7 @@
           }
         </div>
         <div class="me-1">
-          <small i18n>My documents</small>
+          <small>{{ownerFilterLabel}}</small>
         </div>
       </button>
       <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.NOT_SELF)" [disabled]="disabled">
@@ -32,7 +32,7 @@
           }
         </div>
         <div class="me-1">
-          <small i18n>Shared with me</small>
+          <small>{{ownerExclusionFilterLabel}}</small>
         </div>
       </button>
       <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.SHARED_BY_ME)" [disabled]="disabled">
@@ -42,7 +42,7 @@
           }
         </div>
         <div class="me-1">
-          <small i18n>Shared by me</small>
+          <small>{{sharedByFilterLabel}}</small>
         </div>
       </button>
       <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.UNOWNED)" [disabled]="disabled">

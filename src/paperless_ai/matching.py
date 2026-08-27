@@ -1,54 +1,103 @@
 import difflib
 import logging
 import re
+from typing import TypeVar
 
 from django.contrib.auth.models import User
+from django.db.models import Model
+from django.db.models import QuerySet
 
 from documents.models import Correspondent
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.permissions import get_objects_for_user_owner_aware
+from documents.permissions import permitted_object_ids
+from documents.permissions import restrict_queryset_to_visible
 
 MATCH_THRESHOLD = 0.8
 
 logger = logging.getLogger("paperless_ai.matching")
 
+ModelT = TypeVar("ModelT", bound=Model)
 
-def match_tags_by_name(names: list[str], user: User) -> list[Tag]:
-    queryset = get_objects_for_user_owner_aware(
+
+def _resolve_visible_ids(
+    ids: list[int],
+    user: User | None,
+    model: type[ModelT],
+    perm: str,
+) -> list[ModelT]:
+    """Resolve model-returned IDs against what the user may currently see.
+    Invalid, deleted, or now-invisible IDs are silently dropped - the model's
+    belief that an ID exists and is visible may be stale by the time the
+    response comes back.
+    """
+    if not ids:
+        return []
+    queryset = restrict_queryset_to_visible(
+        model.objects.filter(pk__in=ids),
         user,
-        ["view_tag"],
-        Tag,
+        perm,
     )
-    return _match_names_to_queryset(names, queryset, "name")
+    return list(queryset)
 
 
-def match_correspondents_by_name(names: list[str], user: User) -> list[Correspondent]:
-    queryset = get_objects_for_user_owner_aware(
-        user,
-        ["view_correspondent"],
-        Correspondent,
+def resolve_tag_ids(ids: list[int], user: User | None) -> list[Tag]:
+    return _resolve_visible_ids(ids, user, Tag, "view_tag")
+
+
+def resolve_correspondent_ids(
+    ids: list[int],
+    user: User | None,
+) -> list[Correspondent]:
+    return _resolve_visible_ids(ids, user, Correspondent, "view_correspondent")
+
+
+def resolve_document_type_ids(ids: list[int], user: User | None) -> list[DocumentType]:
+    return _resolve_visible_ids(ids, user, DocumentType, "view_documenttype")
+
+
+def resolve_storage_path_ids(ids: list[int], user: User | None) -> list[StoragePath]:
+    return _resolve_visible_ids(ids, user, StoragePath, "view_storagepath")
+
+
+def _match_by_name(
+    names: list[str],
+    user: User | None,
+    model: type[ModelT],
+    perm: str,
+) -> list[ModelT]:
+    # A workflow may have no user. In that case permitted_object_ids limits
+    # matching to unowned objects, avoiding another user's private taxonomy.
+    queryset = model.objects.filter(
+        pk__in=permitted_object_ids(user, model, perm),
     )
-    return _match_names_to_queryset(names, queryset, "name")
+    return _match_names_to_queryset(names, queryset)
 
 
-def match_document_types_by_name(names: list[str], user: User) -> list[DocumentType]:
-    queryset = get_objects_for_user_owner_aware(
-        user,
-        ["view_documenttype"],
-        DocumentType,
-    )
-    return _match_names_to_queryset(names, queryset, "name")
+def match_tags_by_name(names: list[str], user: User | None) -> list[Tag]:
+    return _match_by_name(names, user, Tag, "view_tag")
 
 
-def match_storage_paths_by_name(names: list[str], user: User) -> list[StoragePath]:
-    queryset = get_objects_for_user_owner_aware(
-        user,
-        ["view_storagepath"],
-        StoragePath,
-    )
-    return _match_names_to_queryset(names, queryset, "name")
+def match_correspondents_by_name(
+    names: list[str],
+    user: User | None,
+) -> list[Correspondent]:
+    return _match_by_name(names, user, Correspondent, "view_correspondent")
+
+
+def match_document_types_by_name(
+    names: list[str],
+    user: User | None,
+) -> list[DocumentType]:
+    return _match_by_name(names, user, DocumentType, "view_documenttype")
+
+
+def match_storage_paths_by_name(
+    names: list[str],
+    user: User | None,
+) -> list[StoragePath]:
+    return _match_by_name(names, user, StoragePath, "view_storagepath")
 
 
 def _normalize(s: str) -> str:
@@ -58,8 +107,16 @@ def _normalize(s: str) -> str:
     return s
 
 
-def _match_names_to_queryset(names: list[str], queryset, attr: str):
-    results = []
+def _match_names_to_queryset(
+    names: list[str],
+    queryset: QuerySet[ModelT],
+    attr: str = "name",
+) -> list[ModelT]:
+    """Match each name to at most one object, exactly first and fuzzily as a
+    fallback. A matched object is removed from the pool so two names can never
+    resolve to the same object; names that match nothing are simply skipped.
+    """
+    results: list[ModelT] = []
     objects = list(queryset)
     object_names = [_normalize(getattr(obj, attr)) for obj in objects]
 
@@ -68,28 +125,21 @@ def _match_names_to_queryset(names: list[str], queryset, attr: str):
             continue
         target = _normalize(name)
 
-        # First try exact match
         if target in object_names:
             index = object_names.index(target)
-            matched = objects.pop(index)
-            object_names.pop(index)  # keep object list aligned after removal
-            results.append(matched)
-            continue
-
-        # Fuzzy match fallback
-        matches = difflib.get_close_matches(
-            target,
-            object_names,
-            n=1,
-            cutoff=MATCH_THRESHOLD,
-        )
-        if matches:
-            index = object_names.index(matches[0])
-            matched = objects.pop(index)
-            object_names.pop(index)
-            results.append(matched)
         else:
-            pass
+            matches = difflib.get_close_matches(
+                target,
+                object_names,
+                n=1,
+                cutoff=MATCH_THRESHOLD,
+            )
+            if not matches:
+                continue
+            index = object_names.index(matches[0])
+
+        object_names.pop(index)  # keep both lists aligned after removal
+        results.append(objects.pop(index))
     return results
 
 

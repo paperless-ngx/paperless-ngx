@@ -1277,6 +1277,8 @@ class TestParserFileTypes:
 # ---------------------------------------------------------------------------
 
 
+# Remote ocr config from ApplicationConfiguration needs DB access
+@pytest.mark.django_db
 class TestRasterisedDocumentParserRegistry:
     def test_registered_in_defaults(self) -> None:
         from paperless.parsers.registry import ParserRegistry
