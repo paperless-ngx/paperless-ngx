@@ -19,7 +19,11 @@ import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { PermissionsService } from 'src/app/services/permissions.service'
+import {
+  PermissionAction,
+  PermissionsService,
+  PermissionType,
+} from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
@@ -250,6 +254,54 @@ describe('BulkEditorComponent', () => {
     expect(
       fixture.debugElement.query(By.css('#dropdownSend')).nativeElement.disabled
     ).toBe(true)
+  })
+
+  it('should only show permitted share link bundle actions', () => {
+    permissionsService.initialize(
+      [
+        permissionsService.getPermissionCode(
+          PermissionAction.Add,
+          PermissionType.ShareLinkBundle
+        ),
+      ],
+      { is_superuser: false } as any
+    )
+    fixture.detectChanges()
+
+    expect(fixture.nativeElement.textContent).toContain(
+      'Create a share link bundle'
+    )
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'Manage share link bundles'
+    )
+
+    permissionsService.initialize(
+      [
+        permissionsService.getPermissionCode(
+          PermissionAction.View,
+          PermissionType.ShareLinkBundle
+        ),
+      ],
+      { is_superuser: false } as any
+    )
+    fixture.detectChanges()
+
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'Create a share link bundle'
+    )
+    expect(fixture.nativeElement.textContent).toContain(
+      'Manage share link bundles'
+    )
+
+    permissionsService.initialize([], { is_superuser: false } as any)
+    fixture.detectChanges()
+
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'Create a share link bundle'
+    )
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'Manage share link bundles'
+    )
   })
 
   it('should apply selection data to correspondents menu', () => {
