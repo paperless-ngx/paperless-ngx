@@ -232,6 +232,9 @@ extend-select = [
   "I",       # https://docs.astral.sh/ruff/rules/#isort-i
   "ICN",     # https://docs.astral.sh/ruff/rules/#flake8-import-conventions-icn
   "INP",     # https://docs.astral.sh/ruff/rules/#flake8-no-pep420-inp
+  "INT001",  # https://docs.astral.sh/ruff/rules/#flake8-gettext-int
+  "INT002",  # https://docs.astral.sh/ruff/rules/#flake8-gettext-int
+  "INT003",  # https://docs.astral.sh/ruff/rules/#flake8-gettext-int
   "ISC",     # https://docs.astral.sh/ruff/rules/#flake8-implicit-str-concat-isc
   "LOG001",  # https://docs.astral.sh/ruff/rules/#flake8-logging-log
   "LOG002",  # https://docs.astral.sh/ruff/rules/#flake8-logging-log
