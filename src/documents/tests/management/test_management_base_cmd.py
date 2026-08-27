@@ -57,13 +57,13 @@ class MultiprocessCommand(PaperlessCommand):
 
     def handle(self, *args, **options):
         items = list(range(5))
-        results = []
-        for result in self.process_parallel(
-            _double_value,
-            items,
-            description="Processing...",
-        ):
-            results.append(result)
+        results = list(
+            self.process_parallel(
+                _double_value,
+                items,
+                description="Processing...",
+            ),
+        )
         successes = sum(1 for r in results if r.success)
         self.stdout.write(f"Successes: {successes}")
 
