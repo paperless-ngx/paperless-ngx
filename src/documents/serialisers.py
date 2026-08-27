@@ -730,7 +730,7 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
                 self.instance.clean()
             except ValidationError as e:
                 logger.debug("Tag parent validation failed: %s", e)
-                raise e
+                raise
             finally:
                 self.instance.tn_parent = original_parent
         else:
@@ -740,7 +740,7 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
                 temp.clean()
             except ValidationError as e:
                 logger.debug("Tag parent validation failed: %s", e)
-                raise e
+                raise
 
         return super().validate(attrs)
 
@@ -1860,8 +1860,8 @@ class BulkEditSerializer(
         if isinstance(custom_fields, dict):
             try:
                 ids = [int(i[0]) for i in custom_fields.items()]
-            except Exception as e:
-                logger.exception(f"Error validating custom fields: {e}")
+            except Exception:
+                logger.exception("Error validating custom fields")
                 raise serializers.ValidationError(
                     f"{name} must be a list of integers or a dict of id:value pairs, see the log for details",
                 )

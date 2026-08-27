@@ -214,7 +214,7 @@ class BogusMailBox(AbstractContextManager):
             )
             self.messages = list(filter(lambda m: m.uid not in uid_list, self.messages))
         else:
-            raise Exception
+            raise Exception  # noqa: TRY002 - test double simulating a generic mailbox failure
 
 
 def fake_magic_from_buffer(buffer, *, mime=False):

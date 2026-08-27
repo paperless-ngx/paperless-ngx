@@ -138,9 +138,9 @@ def parse_w_workflow_placeholders(
 
         # We're good!
         return rendered_template
-    except UndefinedError as e:
+    except UndefinedError:
         # The undefined class logs this already for us
-        raise e
+        raise
     except TemplateSyntaxError as e:
         logger.warning(f"Template syntax error in title generation: {e}")
     except SecurityError as e:
@@ -150,5 +150,5 @@ def parse_w_workflow_placeholders(
         logger.warning(
             f"Invalid title format '{text}', workflow not applied: {e}",
         )
-        raise e
+        raise
     return None

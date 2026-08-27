@@ -507,8 +507,8 @@ def rotate(
             logger.info(
                 f"Queued new rotated version for document {pair.root_doc.id} by {degrees} degrees",
             )
-        except Exception as e:
-            logger.exception(f"Error rotating document {pair.root_doc.id}: {e}")
+        except Exception:
+            logger.exception(f"Error rotating document {pair.root_doc.id}")
 
     return "OK"
 
@@ -554,9 +554,9 @@ def merge(
             affected_docs.append(doc.id)
             if handoff_asn is None and doc.archive_serial_number is not None:
                 handoff_asn = doc.archive_serial_number
-        except Exception as e:
+        except Exception:
             logger.exception(
-                f"Error merging document {doc.id}, it will not be included in the merge: {e}",
+                f"Error merging document {doc.id}, it will not be included in the merge",
             )
     if len(affected_docs) == 0:
         logger.warning("No documents were merged")
@@ -805,8 +805,8 @@ def split(
             else:
                 group(consume_tasks).delay()
 
-    except Exception as e:
-        logger.exception(f"Error splitting document {doc.id}: {e}")
+    except Exception:
+        logger.exception(f"Error splitting document {doc.id}")
 
     return "OK"
 
@@ -858,8 +858,8 @@ def delete_pages(
         logger.info(
             f"Queued new version for document {pair.root_doc.id} after deleting pages {pages}",
         )
-    except Exception as e:
-        logger.exception(f"Error deleting pages from document {pair.root_doc.id}: {e}")
+    except Exception:
+        logger.exception(f"Error deleting pages from document {pair.root_doc.id}")
 
     return "OK"
 
@@ -986,7 +986,7 @@ def edit_pdf(
                 group(consume_tasks).delay()
 
     except Exception as e:
-        logger.exception(f"Error editing document {pair.root_doc.id}: {e}")
+        logger.exception(f"Error editing document {pair.root_doc.id}")
         raise ValueError(
             f"An error occurred while editing the document: {e}",
         ) from e
@@ -1097,7 +1097,7 @@ def remove_password(
 
         except Exception as e:
             logger.exception(
-                f"Error removing password from document {pair.root_doc.id}: {e}",
+                f"Error removing password from document {pair.root_doc.id}",
             )
             raise ValueError(
                 f"An error occurred while removing the password: {e}",

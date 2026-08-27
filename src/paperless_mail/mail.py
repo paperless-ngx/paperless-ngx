@@ -723,9 +723,9 @@ class MailAccountHandler(LoggingMixin):
                                 f"Rule {rule}: Stopping processing rules due to stop_processing flag",
                             )
                             break
-                    except Exception as e:
+                    except Exception:
                         self.log.exception(
-                            f"Rule {rule}: Error while processing rule: {e}",
+                            f"Rule {rule}: Error while processing rule",
                         )
         except MailError:
             raise
@@ -874,9 +874,9 @@ class MailAccountHandler(LoggingMixin):
 
                 total_processed_files += processed_files
                 mails_processed += 1
-            except Exception as e:
+            except Exception:
                 self.log.exception(
-                    f"Rule {rule}: Error while processing mail {message.uid}: {e}",
+                    f"Rule {rule}: Error while processing mail {message.uid}",
                 )
 
         self.log.debug(f"Rule {rule}: Processed {mails_processed} matching mail(s)")

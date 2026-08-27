@@ -1580,19 +1580,16 @@ class DocumentViewSet(
             except ValueError as exc:
                 logger.exception(
                     "Invalid AI configuration while generating suggestions for "
-                    "document %s: %s",
+                    "document %s",
                     doc.pk,
-                    exc,
                 )
                 raise ValidationError(
                     {"ai": [_("Invalid AI configuration.")]},
                 ) from exc
-            except LLMTimeoutError as exc:
+            except LLMTimeoutError:
                 logger.exception(
-                    "AI backend timed out while generating suggestions for "
-                    "document %s: %s",
+                    "AI backend timed out while generating suggestions for document %s",
                     doc.pk,
-                    exc,
                 )
                 return Response(
                     {"ai": [_("AI backend request timed out.")]},
@@ -5183,11 +5180,11 @@ class SystemStatusView(PassUserMixin):
                 f"{m.app}.{m.name}"
                 for m in MigrationRecorder.Migration.objects.all().order_by("id")
             ]
-        except Exception as e:  # pragma: no cover
+        except Exception:  # pragma: no cover
             applied_migrations = []
             db_status = "ERROR"
             logger.exception(
-                f"System status detected a possible problem while connecting to the database: {e}",
+                "System status detected a possible problem while connecting to the database",
             )
             db_error = "Error connecting to database, check logs for more detail."
 
@@ -5203,10 +5200,10 @@ class SystemStatusView(PassUserMixin):
             try:
                 client.ping()
                 redis_status = "OK"
-            except Exception as e:
+            except Exception:
                 redis_status = "ERROR"
                 logger.exception(
-                    f"System status detected a possible problem while connecting to redis: {e}",
+                    "System status detected a possible problem while connecting to redis",
                 )
                 redis_error = "Error connecting to redis, check logs for more detail."
 
@@ -5236,10 +5233,10 @@ class SystemStatusView(PassUserMixin):
                 else:
                     celery_active = "WARNING"
                     celery_error = "Celery worker responded unexpectedly."
-        except Exception as e:
+        except Exception:
             celery_active = "ERROR"
             logger.exception(
-                f"System status detected a possible problem while connecting to celery: {e}",
+                "System status detected a possible problem while connecting to celery",
             )
             celery_error = "Error connecting to celery, check logs for more detail."
 
@@ -5256,11 +5253,11 @@ class SystemStatusView(PassUserMixin):
             index_last_modified = (
                 make_aware(datetime.fromtimestamp(max(mtimes))) if mtimes else None
             )
-        except Exception as e:
+        except Exception:
             index_status = "ERROR"
             index_error = "Error opening index, check logs for more detail."
             logger.exception(
-                f"System status detected a possible problem while opening the index: {e}",
+                "System status detected a possible problem while opening the index",
             )
             index_last_modified = None
 

@@ -261,7 +261,7 @@ def consume_file(
                     )
 
                 except Exception as e:
-                    logger.exception(f"{plugin_name} failed: {e}")
+                    logger.exception(f"{plugin_name} failed")
                     status_mgr.send_progress(
                         ProgressStatusOptions.FAILED,
                         f"{e}",
@@ -495,8 +495,8 @@ def empty_trash(doc_ids=None) -> None:
                 content_type=ContentType.objects.get_for_model(Document),
                 object_id__in=deleted_document_ids,
             ).delete()
-    except Exception as e:  # pragma: no cover
-        logger.exception(f"Error while emptying trash: {e}")
+    except Exception:  # pragma: no cover
+        logger.exception("Error while emptying trash")
     finally:
         models.signals.post_delete.disconnect(
             cleanup_document_deletion,
@@ -832,9 +832,8 @@ def build_share_link_bundle(bundle_id: int) -> None:
         logger.info("Built share link bundle %s", bundle.pk)
     except Exception as exc:
         logger.exception(
-            "Failed to build share link bundle %s: %s",
+            "Failed to build share link bundle %s",
             bundle_id,
-            exc,
         )
         bundle.status = ShareLinkBundle.Status.FAILED
         bundle.last_error = {

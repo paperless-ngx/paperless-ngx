@@ -179,9 +179,9 @@ def execute_email_action(
             f"Sent {n_messages} notification email(s) to {action.email.to}",
             extra={"group": logging_group},
         )
-    except Exception as e:
+    except Exception:
         logger.exception(
-            f"Error occurred sending notification email: {e}",
+            "Error occurred sending notification email",
             extra={"group": logging_group},
         )
 
@@ -265,9 +265,9 @@ def execute_webhook_action(
             f"Webhook to {action.webhook.url} queued",
             extra={"group": logging_group},
         )
-    except Exception as e:
+    except Exception:
         logger.exception(
-            f"Error occurred sending webhook: {e}",
+            "Error occurred sending webhook",
             extra={"group": logging_group},
         )
 

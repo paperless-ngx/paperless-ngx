@@ -43,8 +43,8 @@ def _discover_parser_class() -> type[DateParserPluginBase]:
                 valid_plugins.append(ep)
             else:
                 logger.warning(f"Plugin {ep.name} does not subclass DateParser.")
-        except Exception as e:
-            logger.exception(f"Unable to load date parser plugin {ep.name}: {e}")
+        except Exception:
+            logger.exception(f"Unable to load date parser plugin {ep.name}")
 
     if not valid_plugins:
         return RegexDateParserPlugin

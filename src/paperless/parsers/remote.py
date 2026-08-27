@@ -505,7 +505,7 @@ class RemoteDocumentParser:
             return result.content
 
         except Exception as e:
-            logger.exception("Azure AI Vision parsing failed: %s", e)
+            logger.exception("Azure AI Vision parsing failed")
             raise ParseError(f"Azure AI Vision parsing failed: {e}") from e
 
         finally:

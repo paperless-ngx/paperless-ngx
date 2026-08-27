@@ -14,6 +14,7 @@ from imap_tools import MailMessage
 
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.models import MailRule
+from paperless_mail.preprocessor import MailDecryptionError
 from paperless_mail.preprocessor import MailMessageDecryptor
 from paperless_mail.tests.factories import MailAccountFactory
 from paperless_mail.tests.test_mail import TestMail
@@ -82,7 +83,9 @@ class MessageEncryptor:
             armor=True,
         )
         if not encrypted_data.ok:
-            raise Exception(f"Encryption failed: {encrypted_data.stderr}")
+            raise Exception(  # noqa: TRY002 - test fixture setup, not production code
+                f"Encryption failed: {encrypted_data.stderr}",
+            )
         encrypted_email_content = encrypted_data.data
 
         new_email = MIMEMultipart("encrypted", protocol="application/pgp-encrypted")
@@ -184,7 +187,11 @@ class TestMailMessageGpgDecryptor(TestMail):
                 EMAIL_GNUPG_HOME=empty_gpg_home,
             ):
                 message_decryptor = MailMessageDecryptor()
-                self.assertRaises(Exception, message_decryptor.run, encrypted_message)  # noqa: B017 - raises a bare Exception on decryption failure
+                self.assertRaises(
+                    MailDecryptionError,
+                    message_decryptor.run,
+                    encrypted_message,
+                )
         finally:
             # Clean up the temporary GPG home used only by this test
             try:

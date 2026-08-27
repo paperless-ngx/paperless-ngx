@@ -59,11 +59,10 @@ def safe_regex_match(pattern: str, text: str, *, flags: int = 0):
     try:
         validate_regex_pattern(pattern)
         compiled = regex.compile(pattern, flags=flags)
-    except (regex.error, ValueError) as exc:
+    except (regex.error, ValueError):
         logger.exception(
-            "Error while processing regular expression %s: %s",
+            "Error while processing regular expression %s",
             textwrap.shorten(pattern, width=80, placeholder="…"),
-            exc,
         )
         return None
 
@@ -86,11 +85,10 @@ def safe_regex_sub(pattern: str, repl: str, text: str, *, flags: int = 0) -> str
     try:
         validate_regex_pattern(pattern)
         compiled = regex.compile(pattern, flags=flags)
-    except (regex.error, ValueError) as exc:
+    except (regex.error, ValueError):
         logger.exception(
-            "Error while processing regular expression %s: %s",
+            "Error while processing regular expression %s",
             textwrap.shorten(pattern, width=80, placeholder="…"),
-            exc,
         )
         return None
 

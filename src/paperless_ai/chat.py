@@ -103,8 +103,8 @@ def stream_chat_with_documents(
             documents,
             output_language=output_language,
         )
-    except Exception as e:
-        logger.exception("Failed to stream document chat response: %s", e)
+    except Exception:
+        logger.exception("Failed to stream document chat response")
         yield CHAT_ERROR_MESSAGE
 
 

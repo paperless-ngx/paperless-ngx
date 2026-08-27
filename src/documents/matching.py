@@ -30,6 +30,10 @@ if TYPE_CHECKING:
 logger = logging.getLogger("paperless.matching")
 
 
+class UnsupportedWorkflowTriggerTypeError(Exception):
+    pass
+
+
 def log_reason(
     matching_model: MatchingModel | WorkflowTrigger,
     document: Document,
@@ -691,7 +695,9 @@ def document_matches_workflow(
                 )
             else:
                 # New trigger types need to be explicitly checked above
-                raise Exception(f"Trigger type {trigger_type} not yet supported")
+                raise UnsupportedWorkflowTriggerTypeError(
+                    f"Trigger type {trigger_type} not yet supported",
+                )
 
             if trigger_matched:
                 logger.info(f"Document matched {trigger} from {workflow}")

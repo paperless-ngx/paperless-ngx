@@ -44,6 +44,7 @@ from documents import tasks
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
+from documents.matching import UnsupportedWorkflowTriggerTypeError
 from documents.matching import document_matches_workflow
 from documents.matching import existing_document_matches_workflow
 from documents.matching import prefilter_documents_by_workflowtrigger
@@ -2851,7 +2852,13 @@ class TestWorkflows(
         doc = Document.objects.create(
             title="test",
         )
-        self.assertRaises(Exception, document_matches_workflow, doc, w, 99)  # noqa: B017 - raises a bare Exception for unsupported trigger types
+        self.assertRaises(
+            UnsupportedWorkflowTriggerTypeError,
+            document_matches_workflow,
+            doc,
+            w,
+            99,
+        )
 
     def test_removal_action_document_updated_workflow(self) -> None:
         """

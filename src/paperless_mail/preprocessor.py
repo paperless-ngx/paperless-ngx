@@ -11,6 +11,10 @@ from imap_tools import MailMessage
 from documents.loggers import LoggingMixin
 
 
+class MailDecryptionError(Exception):
+    pass
+
+
 class MailMessagePreprocessor(abc.ABC):
     """
     Defines the interface for preprocessors that alter messages before they are handled in MailAccountHandler
@@ -69,7 +73,7 @@ class MailMessageDecryptor(MailMessagePreprocessor, LoggingMixin):
                 f"Message decryption failed with status message "
                 f"{decrypted_raw_message.status}",
             )
-            raise Exception(
+            raise MailDecryptionError(
                 f"Decryption failed: {decrypted_raw_message.status}, {decrypted_raw_message.stderr}",
             )
         self.log.debug("Message decrypted successfully.")

@@ -70,6 +70,6 @@ def send_webhook(
         logger.error(
             f"Failed attempt sending webhook to {url}: {e}",
         )
-        raise e
+        raise
     finally:
         transport.close()

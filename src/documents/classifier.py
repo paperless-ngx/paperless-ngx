@@ -72,8 +72,8 @@ def load_classifier(*, raise_exception: bool = False) -> DocumentClassifier | No
         Path(settings.MODEL_FILE).unlink()
         classifier = None
         if raise_exception:
-            raise e
-    except ClassifierModelCorruptError as e:
+            raise
+    except ClassifierModelCorruptError:
         # there's something wrong with the model file.
         logger.exception(
             "Unrecoverable error while loading document "
@@ -82,17 +82,17 @@ def load_classifier(*, raise_exception: bool = False) -> DocumentClassifier | No
         Path(settings.MODEL_FILE).unlink()
         classifier = None
         if raise_exception:
-            raise e
-    except OSError as e:
+            raise
+    except OSError:
         logger.exception("IO error while loading document classification model")
         classifier = None
         if raise_exception:
-            raise e
-    except Exception as e:  # pragma: no cover
+            raise
+    except Exception:  # pragma: no cover
         logger.exception("Unknown error while loading document classification model")
         classifier = None
         if raise_exception:
-            raise e
+            raise
 
     return classifier
 

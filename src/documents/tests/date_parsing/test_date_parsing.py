@@ -296,7 +296,7 @@ class TestRegexDateParser:
 
             # simulate parse failure for malformed input
             if "99/99/9999" in date_string or "bad date" in date_string:
-                raise Exception("parse failed for malformed date")
+                raise Exception("parse failed for malformed date")  # noqa: TRY002 - simulates a generic parser failure
 
             return None
 

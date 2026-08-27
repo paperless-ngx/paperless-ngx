@@ -137,7 +137,7 @@ class FaultyParser(_BaseNewStyleParser):
 
 class FaultyGenericExceptionParser(_BaseNewStyleParser):
     def parse(self, document_path, mime_type, *, produce_archive: bool = True) -> None:
-        raise Exception("Generic exception.")
+        raise Exception("Generic exception.")  # noqa: TRY002 - deliberately not a ParseError
 
 
 def fake_magic_from_file(file, *, mime=False):  # NOSONAR
