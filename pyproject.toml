@@ -215,6 +215,19 @@ extend-select = [
   "PIE",     # https://docs.astral.sh/ruff/rules/#flake8-pie-pie
   "PLC",     # https://docs.astral.sh/ruff/rules/#pylint-pl
   "PLE",     # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLR0124", # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLR0133", # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLR0206", # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLR0402", # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLR1704", # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLR1708", # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLR1711", # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLR1716", # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLR1722", # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLR1730", # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLR1733", # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLR1736", # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLR2044", # https://docs.astral.sh/ruff/rules/#pylint-pl
   "PTH",     # https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
   "Q",       # https://docs.astral.sh/ruff/rules/#flake8-quotes-q
   "RSE",     # https://docs.astral.sh/ruff/rules/#flake8-raise-rse
