@@ -187,6 +187,35 @@ line-ending = "lf"
 select = [ "E4", "E7", "E9", "F" ]
 extend-select = [
   "ASYNC",   # https://docs.astral.sh/ruff/rules/#flake8-async-async
+  "B002",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B003",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B004",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B005",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B006",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B008",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B009",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B010",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B012",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B013",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B014",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B015",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B016",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B017",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B018",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B019",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B020",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B021",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B022",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B023",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B025",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B026",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B029",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B030",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B031",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B032",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B033",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B035",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B039",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
   "C4",      # https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
   "COM",     # https://docs.astral.sh/ruff/rules/#flake8-commas-com
   "D419",    # https://docs.astral.sh/ruff/rules/#pydocstyle-d

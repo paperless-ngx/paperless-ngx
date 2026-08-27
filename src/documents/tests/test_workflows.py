@@ -2851,7 +2851,7 @@ class TestWorkflows(
         doc = Document.objects.create(
             title="test",
         )
-        self.assertRaises(Exception, document_matches_workflow, doc, w, 99)
+        self.assertRaises(Exception, document_matches_workflow, doc, w, 99)  # noqa: B017 - raises a bare Exception for unsupported trigger types
 
     def test_removal_action_document_updated_workflow(self) -> None:
         """

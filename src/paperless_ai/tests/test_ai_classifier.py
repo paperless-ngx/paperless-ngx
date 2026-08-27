@@ -164,7 +164,7 @@ def test_get_ai_document_classification_failure(mock_run_llm_query, mock_documen
     """
     mock_run_llm_query.side_effect = Exception("LLM query failed")
 
-    with pytest.raises(Exception):
+    with pytest.raises(Exception):  # noqa: B017 - mock injects a bare Exception
         get_ai_document_classification(mock_document)
 
 

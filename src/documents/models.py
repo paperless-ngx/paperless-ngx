@@ -377,7 +377,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         from documents.versioning import versions_newest_first
 
         if hasattr(self, "effective_content"):
-            return getattr(self, "effective_content")
+            return self.effective_content
 
         if self.root_document_id is not None or self.pk is None:
             return self.content

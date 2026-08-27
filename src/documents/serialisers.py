@@ -1150,7 +1150,7 @@ class DocumentSerializer(
     def to_representation(self, instance):
         doc = super().to_representation(instance)
         if "content" in self.fields and hasattr(instance, "effective_content"):
-            doc["content"] = getattr(instance, "effective_content") or ""
+            doc["content"] = instance.effective_content or ""
         if self.truncate_content and "content" in self.fields:
             doc["content"] = doc.get("content")[0:550]
         return doc
@@ -2925,7 +2925,7 @@ class ShareLinkBundleSerializer(OwnedObjectSerializer):
         return share_link_bundle
 
     def get_document_count(self, obj: ShareLinkBundle) -> int:
-        return getattr(obj, "document_total") or obj.documents.count()
+        return obj.document_total or obj.documents.count()
 
 
 class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):

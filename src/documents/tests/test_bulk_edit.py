@@ -777,7 +777,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         sig.set.return_value.apply_async.side_effect = Exception("boom")
         mock_consume_file.return_value = sig
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(Exception):  # noqa: B017 - mock injects a bare Exception
             bulk_edit.merge(doc_ids, delete_originals=True)
 
         self.doc1.refresh_from_db()
@@ -1318,7 +1318,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         sig.apply_async.side_effect = Exception("boom")
         mock_chord.return_value = sig
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(Exception):  # noqa: B017 - mock injects a bare Exception
             bulk_edit.edit_pdf(doc_ids, operations, delete_original=True)
 
         self.doc2.refresh_from_db()
@@ -1430,7 +1430,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             {"page": 9999},  # invalid page, forces error during PDF load
         ]
         with self.assertLogs("paperless.bulk_edit", level="ERROR"):
-            with self.assertRaises(Exception):
+            with self.assertRaises(ValueError):
                 bulk_edit.edit_pdf(doc_ids, operations)
         mock_group.assert_not_called()
         mock_consume_file.assert_not_called()

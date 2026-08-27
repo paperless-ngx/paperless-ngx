@@ -184,7 +184,7 @@ class TestMailMessageGpgDecryptor(TestMail):
                 EMAIL_GNUPG_HOME=empty_gpg_home,
             ):
                 message_decryptor = MailMessageDecryptor()
-                self.assertRaises(Exception, message_decryptor.run, encrypted_message)
+                self.assertRaises(Exception, message_decryptor.run, encrypted_message)  # noqa: B017 - raises a bare Exception on decryption failure
         finally:
             # Clean up the temporary GPG home used only by this test
             try:

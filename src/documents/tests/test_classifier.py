@@ -806,7 +806,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
 
         Path(settings.MODEL_FILE).touch()
         mock_load.side_effect = Exception()
-        with self.assertRaises(Exception):
+        with self.assertRaises(Exception):  # noqa: B017 - mock injects a bare Exception
             load_classifier(raise_exception=True)
 
 
