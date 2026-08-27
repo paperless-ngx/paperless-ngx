@@ -197,7 +197,9 @@ extend-select = [
   "FLY",     # https://docs.astral.sh/ruff/rules/#flynt-fly
   "FURB",    # https://docs.astral.sh/ruff/rules/#refurb-furb
   "G010",    # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
+  "G101",    # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
   "G201",    # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
+  "G202",    # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
   "I",       # https://docs.astral.sh/ruff/rules/#isort-i
   "ICN",     # https://docs.astral.sh/ruff/rules/#flake8-import-conventions-icn
   "INP",     # https://docs.astral.sh/ruff/rules/#flake8-no-pep420-inp

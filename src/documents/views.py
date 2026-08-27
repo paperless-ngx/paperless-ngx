@@ -1583,7 +1583,6 @@ class DocumentViewSet(
                     "document %s: %s",
                     doc.pk,
                     exc,
-                    exc_info=True,
                 )
                 raise ValidationError(
                     {"ai": [_("Invalid AI configuration.")]},
@@ -1594,7 +1593,6 @@ class DocumentViewSet(
                     "document %s: %s",
                     doc.pk,
                     exc,
-                    exc_info=True,
                 )
                 return Response(
                     {"ai": [_("AI backend request timed out.")]},
