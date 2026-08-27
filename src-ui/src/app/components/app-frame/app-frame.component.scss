@@ -436,6 +436,18 @@ main {
   padding-right: .5rem;
 }
 
+// true center the search with equal flex widths
+@media (min-width: 768px) {
+  .navbar-brand,
+  .navbar > ul {
+    flex: 1 1 0;
+  }
+
+  .navbar > ul {
+    justify-content: flex-end;
+  }
+}
+
 :host ::ng-deep .navbar-action {
   display: inline-flex;
   align-items: center;
