@@ -228,6 +228,12 @@ extend-select = [
   "PLR1733", # https://docs.astral.sh/ruff/rules/#pylint-pl
   "PLR1736", # https://docs.astral.sh/ruff/rules/#pylint-pl
   "PLR2044", # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PT010",   # https://docs.astral.sh/ruff/rules/#flake8-pytest-style-pt
+  "PT014",   # https://docs.astral.sh/ruff/rules/#flake8-pytest-style-pt
+  "PT020",   # https://docs.astral.sh/ruff/rules/#flake8-pytest-style-pt
+  "PT025",   # https://docs.astral.sh/ruff/rules/#flake8-pytest-style-pt
+  "PT026",   # https://docs.astral.sh/ruff/rules/#flake8-pytest-style-pt
+  "PT031",   # https://docs.astral.sh/ruff/rules/#flake8-pytest-style-pt
   "PTH",     # https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
   "Q",       # https://docs.astral.sh/ruff/rules/#flake8-quotes-q
   "RSE",     # https://docs.astral.sh/ruff/rules/#flake8-raise-rse
