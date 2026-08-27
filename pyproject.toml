@@ -207,6 +207,7 @@ extend-select = [
   "LOG009",  # https://docs.astral.sh/ruff/rules/#flake8-logging-log
   "LOG014",  # https://docs.astral.sh/ruff/rules/#flake8-logging-log
   "LOG015",  # https://docs.astral.sh/ruff/rules/#flake8-logging-log
+  "N999",    # https://docs.astral.sh/ruff/rules/#pep8-naming-n
   "PERF101", # https://docs.astral.sh/ruff/rules/#perflint-perf
   "PERF102", # https://docs.astral.sh/ruff/rules/#perflint-perf
   "PERF402", # https://docs.astral.sh/ruff/rules/#perflint-perf
