@@ -217,9 +217,9 @@ def consume_file(
                 overrides.filename or input_doc.original_file.name,
                 self.request.id,
             ) as status_mgr,
-            TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir,
+            TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir_name,
         ):
-            tmp_dir = Path(tmp_dir)
+            tmp_dir = Path(tmp_dir_name)
             msg = None
             for plugin_class in plugins:
                 plugin_name = plugin_class.NAME

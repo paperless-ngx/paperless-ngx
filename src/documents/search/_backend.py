@@ -1142,7 +1142,7 @@ def get_backend() -> TantivyBackend:
     Returns:
         Thread-safe singleton TantivyBackend instance
     """
-    global _backend, _backend_path
+    global _backend, _backend_path  # noqa: PLW0603 - module-level singleton, no class to hold this state
 
     current_path: Path = settings.INDEX_DIR
 
@@ -1173,7 +1173,7 @@ def reset_backend() -> None:
     Forces creation of a new backend instance on the next get_backend() call.
     Used for test isolation and when switching between different index directories.
     """
-    global _backend, _backend_path
+    global _backend, _backend_path  # noqa: PLW0603 - module-level singleton, no class to hold this state
 
     with _backend_lock:
         if _backend is not None:

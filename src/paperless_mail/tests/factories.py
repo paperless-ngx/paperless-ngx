@@ -50,7 +50,7 @@ class ProcessedMailFactory(DjangoModelFactory[ProcessedMail]):
 
     rule = factory.SubFactory(MailRuleFactory)
     folder = "INBOX"
-    uid = factory.Sequence(lambda n: str(n))
+    uid = factory.Sequence(str)
     subject = factory.Faker("sentence", nb_words=4)
     received = factory.LazyFunction(timezone.now)
     processed = factory.LazyFunction(timezone.now)

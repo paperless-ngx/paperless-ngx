@@ -78,6 +78,10 @@ class PlaceholderString(str):
     def __ne__(self, other) -> bool:
         return not self.__eq__(other)
 
+    def __hash__(self) -> int:
+        # Equal to both "-none-" and "none", so hash to a single canonical value
+        return hash("-none-")
+
 
 NO_VALUE_PLACEHOLDER = PlaceholderString("-none-")
 

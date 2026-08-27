@@ -341,6 +341,7 @@ def get_tesseract_langs():
     proc = subprocess.run(
         [shutil.which("tesseract"), "--list-langs"],
         capture_output=True,
+        check=False,
     )
 
     # Decode bytes to string, split on newlines, trim out the header

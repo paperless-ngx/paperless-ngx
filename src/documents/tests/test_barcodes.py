@@ -205,12 +205,12 @@ class TestBarcode(
             - Barcode is detected on page 1 (zero indexed)
         """
 
-        for test_file in [
+        for test_filename in [
             "patch-code-t-middle-reverse.pdf",
             "patch-code-t-middle-distorted.pdf",
             "patch-code-t-middle-fuzzy.pdf",
         ]:
-            test_file = self.BARCODE_SAMPLE_DIR / test_file
+            test_file = self.BARCODE_SAMPLE_DIR / test_filename
 
             with self.get_reader(test_file) as reader:
                 reader.detect()

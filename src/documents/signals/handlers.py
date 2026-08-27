@@ -1102,10 +1102,11 @@ def _extract_input_data(
                 if v is None or k.startswith("_"):
                     continue
                 if isinstance(v, datetime.date):
-                    v = v.isoformat()
+                    override_dict[k] = v.isoformat()
                 elif isinstance(v, Path):
-                    v = str(v)
-                override_dict[k] = v
+                    override_dict[k] = str(v)
+                else:
+                    override_dict[k] = v
             if override_dict:
                 data["overrides"] = override_dict
         return data

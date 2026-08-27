@@ -84,7 +84,7 @@ def get_parser_registry() -> ParserRegistry:
     ParserRegistry
         The shared registry singleton.
     """
-    global _registry, _discovery_complete
+    global _registry, _discovery_complete  # noqa: PLW0603 - module-level singleton, no class to hold this state
 
     with _lock:
         if _registry is None:
@@ -113,7 +113,7 @@ def init_builtin_parsers() -> None:
     -------
     None
     """
-    global _registry
+    global _registry  # noqa: PLW0603 - module-level singleton, no class to hold this state
 
     with _lock:
         if _registry is None:
@@ -137,7 +137,7 @@ def reset_parser_registry() -> None:
     -------
     None
     """
-    global _registry, _discovery_complete
+    global _registry, _discovery_complete  # noqa: PLW0603 - module-level singleton, no class to hold this state
 
     _registry = None
     _discovery_complete = False

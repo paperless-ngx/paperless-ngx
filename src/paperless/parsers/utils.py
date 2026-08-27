@@ -306,8 +306,9 @@ def extract_pdf_metadata(
 
     for key, value in meta.items():
         if isinstance(value, list):
-            value = " ".join(str(e) for e in value)
-        value = str(value)
+            str_value = " ".join(str(e) for e in value)
+        else:
+            str_value = str(value)
 
         try:
             m = namespace_pattern.match(key)
@@ -329,7 +330,7 @@ def extract_pdf_metadata(
                     namespace=namespace,
                     prefix=meta.REVERSE_NS[namespace],
                     key=key_value,
-                    value=value,
+                    value=str_value,
                 ),
             )
         except Exception as e:

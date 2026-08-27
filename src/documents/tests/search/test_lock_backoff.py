@@ -66,7 +66,7 @@ class TestWriteBatchLockRetry:
         )
         mock_sleep = mocker.patch(
             "documents.search._backend.time.sleep",
-            side_effect=lambda s: sleep_values.append(s),
+            side_effect=sleep_values.append,
         )
 
         # Should not raise — 4th attempt succeeds
@@ -111,7 +111,7 @@ class TestWriteBatchLockRetry:
         sleep_values: list[float] = []
         mocker.patch(
             "documents.search._backend.time.sleep",
-            side_effect=lambda s: sleep_values.append(s),
+            side_effect=sleep_values.append,
         )
         for _ in range(50):
             sleep_values.clear()

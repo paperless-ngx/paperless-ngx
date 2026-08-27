@@ -631,23 +631,25 @@ class Command(BaseCommand):
                 ):
                     # Process each change
                     for change_type, path in changes:
-                        path = Path(path).resolve()
+                        resolved_path = Path(path).resolve()
                         if change_type == Change.deleted:
                             # Consumed (or otherwise removed); a later file
                             # reusing this name must not be skipped as
                             # already-queued.
-                            queued.discard(path)
-                        if not path.is_file():
+                            queued.discard(resolved_path)
+                        if not resolved_path.is_file():
                             continue
-                        if path in queued:
+                        if resolved_path in queued:
                             # Already queued and awaiting consumption; a stray
                             # event (NAS metadata touch, AV scan, etc.) while
                             # the file sits on disk mid-consumption must not
                             # cause it to be queued a second time (GH #13511).
-                            logger.debug(f"Ignoring event for queued file: {path}")
+                            logger.debug(
+                                f"Ignoring event for queued file: {resolved_path}",
+                            )
                             continue
-                        logger.debug(f"Event: {change_type.name} for {path}")
-                        tracker.track(path, change_type)
+                        logger.debug(f"Event: {change_type.name} for {resolved_path}")
+                        tracker.track(resolved_path, change_type)
 
                     # Check for stable files
                     for stable_path in tracker.get_stable_files():
