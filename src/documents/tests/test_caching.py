@@ -1,6 +1,7 @@
-import pickle
-
 from documents.caching import StoredLRUCache
+from paperless.signed_pickle import HMAC_SIZE
+from paperless.signed_pickle import signed_pickle_dumps
+from paperless.signed_pickle import signed_pickle_loads
 
 
 def test_lru_cache_entries() -> None:
@@ -42,4 +43,16 @@ def test_stored_lru_cache_key_ttl(mocker) -> None:
     key, data, timeout = mock_backend.set.call_args[0]
     assert key == "test_key"
     assert timeout == 321
-    assert pickle.loads(data) == {"x": "X", "y": "Y"}
+    assert signed_pickle_loads(data) == {"x": "X", "y": "Y"}
+
+
+def test_stored_lru_cache_rejects_tampered_data(mocker) -> None:
+    serialized_data = bytearray(signed_pickle_dumps({"x": "X"}))
+    serialized_data[HMAC_SIZE] ^= 0xFF
+    mock_backend = mocker.Mock()
+    mock_backend.get.return_value = bytes(serialized_data)
+    cache = StoredLRUCache("test_key", backend=mock_backend)
+
+    cache.load()
+
+    assert cache.get("x") is None

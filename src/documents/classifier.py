@@ -28,6 +28,9 @@ from documents.caching import CLASSIFIER_VERSION_KEY
 from documents.caching import StoredLRUCache
 from documents.models import Document
 from documents.models import MatchingModel
+from paperless.signed_pickle import SignedPickleError
+from paperless.signed_pickle import signed_pickle_dumps
+from paperless.signed_pickle import signed_pickle_loads
 
 logger = logging.getLogger("paperless.classifier")
 
@@ -527,10 +530,17 @@ class DocumentClassifier:
         serialized_result = read_cache.get(key)
         if serialized_result is None:
             result = self.data_vectorizer.transform([self.preprocess_content(content)])
-            read_cache.set(key, pickle.dumps(result), CACHE_5_MINUTES)
+            read_cache.set(key, signed_pickle_dumps(result), CACHE_5_MINUTES)
         else:
-            read_cache.touch(key, CACHE_5_MINUTES)
-            result = pickle.loads(serialized_result)
+            try:
+                result = signed_pickle_loads(serialized_result)
+            except SignedPickleError:
+                result = self.data_vectorizer.transform(
+                    [self.preprocess_content(content)],
+                )
+                read_cache.set(key, signed_pickle_dumps(result), CACHE_5_MINUTES)
+            else:
+                read_cache.touch(key, CACHE_5_MINUTES)
         return result
 
     def predict_correspondent(self, content: str) -> int | None:
