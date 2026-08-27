@@ -40,6 +40,10 @@ describe('PasswordComponent', () => {
     // expect(component.value).toEqual('foo')
   })
 
+  it('should not offer itself to browser autofill by default', () => {
+    expect(input.getAttribute('autocomplete')).toEqual('off')
+  })
+
   it('should support toggling field visibility', () => {
     expect(input.type).toEqual('password')
     component.showReveal = true
