@@ -189,6 +189,7 @@ extend-select = [
   "ASYNC",   # https://docs.astral.sh/ruff/rules/#flake8-async-async
   "C4",      # https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
   "COM",     # https://docs.astral.sh/ruff/rules/#flake8-commas-com
+  "D419",    # https://docs.astral.sh/ruff/rules/#pydocstyle-d
   "DJ",      # https://docs.astral.sh/ruff/rules/#flake8-django-dj
   "EXE",     # https://docs.astral.sh/ruff/rules/#flake8-executable-exe
   "FA",      # https://docs.astral.sh/ruff/rules/#flake8-future-annotations-fa
