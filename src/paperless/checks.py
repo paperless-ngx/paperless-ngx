@@ -241,7 +241,7 @@ def check_v3_minimum_upgrade_version(
         return []
 
     logger = logging.getLogger(__name__)
-    last_applied = sorted(applied)[-1] if applied else "(none)"
+    last_applied = max(applied) if applied else "(none)"
     logger.error(
         "V3 upgrade check failed: last applied documents migration is %r. "
         "Expected '1075_workflowaction_order' (v2.20.15). "

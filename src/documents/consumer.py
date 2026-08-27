@@ -217,7 +217,7 @@ class ConsumerPluginMixin:
             current_progress,
             max_progress,
             document_id=document_id,
-            owner_id=self.metadata.owner_id if self.metadata.owner_id else None,
+            owner_id=self.metadata.owner_id or None,
             users_can_view=(self.metadata.view_users or [])
             + (self.metadata.change_users or []),
             groups_can_view=(self.metadata.view_groups or [])
@@ -675,9 +675,7 @@ class ConsumerPlugin(
                             document=document,
                             logging_group=self.logging_group,
                             classifier=classifier,
-                            original_file=self.unmodified_original
-                            if self.unmodified_original
-                            else self.working_copy,
+                            original_file=self.unmodified_original or self.working_copy,
                         )
 
                         # After everything is in the database, copy the files into

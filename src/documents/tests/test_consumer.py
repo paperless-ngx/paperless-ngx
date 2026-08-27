@@ -1356,7 +1356,7 @@ class PreConsumeTestCase(DirectoriesMixin, GetConsumerMixin, TestCase):
             script_calls = [
                 call
                 for call in m.call_args_list
-                if call.args and call.args[0] and call.args[0][0] not in ("pdftotext",)
+                if call.args and call.args[0] and call.args[0][0] != "pdftotext"
             ]
             self.assertEqual(script_calls, [])
 

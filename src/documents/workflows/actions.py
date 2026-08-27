@@ -66,7 +66,7 @@ def build_workflow_action_context(
         else None
     )
 
-    filename = document.original_file if document.original_file else ""
+    filename = document.original_file or ""
     return {
         "title": overrides.title
         if overrides and overrides.title

@@ -192,6 +192,7 @@ extend-select = [
   "EXE",  # https://docs.astral.sh/ruff/rules/#flake8-executable-exe
   "FBT",  # https://docs.astral.sh/ruff/rules/#flake8-boolean-trap-fbt
   "FLY",  # https://docs.astral.sh/ruff/rules/#flynt-fly
+  "FURB", # https://docs.astral.sh/ruff/rules/#refurb-furb
   "G201", # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
   "I",    # https://docs.astral.sh/ruff/rules/#isort-i
   "ICN",  # https://docs.astral.sh/ruff/rules/#flake8-import-conventions-icn

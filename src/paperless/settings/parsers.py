@@ -111,7 +111,7 @@ def parse_dict_from_str(
             return False
 
     settings: dict[str, Any] = copy.deepcopy(defaults) if defaults else {}
-    _type_map = type_map if type_map else {}
+    _type_map = type_map or {}
 
     if not env_str:
         return settings

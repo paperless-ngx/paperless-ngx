@@ -78,7 +78,7 @@ class RemoteEngineConfig:
     def engine_is_valid(self) -> bool:
         """Return True when the engine is known and fully configured."""
         return (
-            self.engine in ("azureai",)
+            self.engine == "azureai"
             and self.api_key is not None
             and not (self.engine == "azureai" and self.endpoint is None)
         )
