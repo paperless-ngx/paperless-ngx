@@ -1449,7 +1449,7 @@ class DocumentViewSet(
         try:
             lang = detect(doc.content)
         except Exception:
-            pass
+            logger.debug("Unable to detect language for document %s", doc.pk)
         meta["lang"] = lang
 
         return Response(meta)

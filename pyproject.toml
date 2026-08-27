@@ -269,6 +269,9 @@ extend-select = [
   "Q",       # https://docs.astral.sh/ruff/rules/#flake8-quotes-q
   "RSE",     # https://docs.astral.sh/ruff/rules/#flake8-raise-rse
   "RUF",     # https://docs.astral.sh/ruff/rules/#ruff-specific-rules-ruf
+  "S102",    # https://docs.astral.sh/ruff/rules/#flake8-bandit-s
+  "S110",    # https://docs.astral.sh/ruff/rules/#flake8-bandit-s
+  "S112",    # https://docs.astral.sh/ruff/rules/#flake8-bandit-s
   "SIM",     # https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
   "T100",    # https://docs.astral.sh/ruff/rules/#flake8-debugger-t10
   "T20",     # https://docs.astral.sh/ruff/rules/#flake8-print-t20

@@ -637,7 +637,7 @@ def update_filename_and_move_files(
                 #  so this is not the end of the world.
                 # B: if moving the original file failed, nothing has changed
                 #  anyway.
-                pass
+                logger.exception("Error reverting document changes")
 
             # restore old values on the instance
             instance.filename = old_filename

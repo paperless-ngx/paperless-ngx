@@ -970,7 +970,7 @@ class ConsumerPlugin(
         try:
             copy_basic_file_stats(source, target)
         except Exception:  # pragma: no cover
-            pass
+            self.log.debug("Unable to copy file stats from %s to %s", source, target)
 
 
 class ConsumerPreflightPlugin(
