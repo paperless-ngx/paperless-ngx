@@ -240,7 +240,7 @@ def parse_user_query(
             DEFAULT_SEARCH_FIELDS,
             field_boosts=_FIELD_BOOSTS,
             # (prefix=True, distance=1, transposition_cost_one=True) — edit-distance fuzziness
-            fuzzy_fields={f: (True, 1, True) for f in DEFAULT_SEARCH_FIELDS},
+            fuzzy_fields=dict.fromkeys(DEFAULT_SEARCH_FIELDS, (True, 1, True)),
         )
         # 0.1 boost keeps fuzzy hits ranked below exact matches (intentional)
         clauses.append((tantivy.Occur.Should, tantivy.Query.boost_query(fuzzy, 0.1)))

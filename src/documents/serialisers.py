@@ -434,7 +434,7 @@ class OwnedObjectSerializer(
             return set()
 
         ctype = ContentType.objects.get_for_model(first_obj)
-        object_pks = list(obj.pk for obj in objects)
+        object_pks = [obj.pk for obj in objects]
         pk_type = type(first_obj.pk)
 
         def get_pks_for_permission_type(model):
@@ -2059,13 +2059,12 @@ class BulkEditSerializer(
             for doc in docs:
                 if "-" in doc:
                     pages.append(
-                        [
-                            x
-                            for x in range(
+                        list(
+                            range(
                                 int(doc.split("-")[0]),
                                 int(doc.split("-")[1]) + 1,
-                            )
-                        ],
+                            ),
+                        ),
                     )
                 else:
                     pages.append([int(doc)])

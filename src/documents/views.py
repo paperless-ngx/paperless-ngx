@@ -1487,13 +1487,12 @@ class DocumentViewSet(
             with get_date_parser() as date_parser:
                 gen = date_parser.parse(doc.filename, doc.content)
                 dates = sorted(
-                    {
-                        i
-                        for i in itertools.islice(
+                    set(
+                        itertools.islice(
                             gen,
                             settings.NUMBER_OF_SUGGESTED_DATES,
-                        )
-                    },
+                        ),
+                    ),
                 )
 
         resp_data = {
@@ -4148,7 +4147,7 @@ class UiSettingsView(GenericAPIView[Any]):
             user_resp["last_name"] = user.last_name
 
         # strip <app_label>.
-        roles = map(lambda perm: re.sub(r"^\w+.", "", perm), user.get_all_permissions())
+        roles = (re.sub(r"^\w+.", "", perm) for perm in user.get_all_permissions())
         return Response(
             {
                 "user": user_resp,

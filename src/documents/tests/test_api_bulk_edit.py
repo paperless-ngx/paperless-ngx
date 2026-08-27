@@ -1003,8 +1003,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             for correspondent in response.data[field]:
                 self.assertEqual(correspondent["document_count"], 0)
             self.assertCountEqual(
-                map(lambda c: c["id"], response.data[field]),
-                map(lambda c: c["id"], Entity.objects.values("id")),
+                (c["id"] for c in response.data[field]),
+                (c["id"] for c in Entity.objects.values("id")),
             )
 
     def test_api_selection_data(self) -> None:
