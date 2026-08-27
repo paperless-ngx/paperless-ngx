@@ -6,6 +6,17 @@ from urllib.parse import urlparse
 
 import httpx
 
+# Ranges ipaddress does not report as private, but which routinely front
+# internal infrastructure.
+_NON_PUBLIC_NETWORKS = (
+    # RFC 6598 shared address space: ISP CGNAT, and the default pod/service
+    # CIDR on several managed Kubernetes offerings.
+    ipaddress.ip_network("100.64.0.0/10"),
+    # RFC 6052 NAT64 well-known prefix: 64:ff9b::7f00:1 is 127.0.0.1 wherever
+    # a NAT64 gateway exists.
+    ipaddress.ip_network("64:ff9b::/96"),
+)
+
 
 def is_public_ip(ip: str | int) -> bool:
     try:
@@ -16,6 +27,7 @@ def is_public_ip(ip: str | int) -> bool:
             or obj.is_link_local
             or obj.is_multicast
             or obj.is_unspecified
+            or any(obj in network for network in _NON_PUBLIC_NETWORKS)
         )
     except ValueError:  # pragma: no cover
         return False
