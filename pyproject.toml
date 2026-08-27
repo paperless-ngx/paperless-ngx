@@ -245,6 +245,7 @@ extend-select = [
   "TID",     # https://docs.astral.sh/ruff/rules/#flake8-tidy-imports-tid
   "UP",      # https://docs.astral.sh/ruff/rules/#pyupgrade-up
   "W",       # https://docs.astral.sh/ruff/rules/#pycodestyle-e-w
+  "YTT",     # https://docs.astral.sh/ruff/rules/#flake8-2020-ytt
 ]
 ignore = [
   "DJ001",
