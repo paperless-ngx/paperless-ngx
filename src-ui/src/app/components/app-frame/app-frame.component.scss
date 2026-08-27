@@ -438,8 +438,9 @@ main {
 
 // true center the search with equal flex widths
 @media (min-width: 768px) {
-  .navbar-brand,
+  .navbar-brand-container,
   .navbar > ul {
+    display: flex; // so the brand link stays as wide as its contents
     flex: 1 1 0;
   }
 
@@ -488,6 +489,7 @@ main {
     text-align: left;
   }
 
+  .navbar-brand-container,
   .navbar-brand {
     grid-area: brand;
     min-width: 0;

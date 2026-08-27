@@ -4,27 +4,29 @@
     (click)="closeMobileSearch(); toggleMenuCollapsed()">
     <i-bs width="1.5em" height="1.5em" name="list"></i-bs>
   </button>
-  <a class="navbar-brand d-flex align-items-center me-0 ps-md-3 py-0 order-sm-0"
+  <div class="navbar-brand-container order-sm-0">
+    <a class="navbar-brand d-flex align-items-center me-0 ps-md-3 py-0"
     [ngClass]="{ 'slim': slimSidebarEnabled, '' : !slimSidebarEnabled }"
     routerLink="/dashboard"
     tourAnchor="tour.intro">
-    @if (!hasCustomBranding) {
-      <pngx-logo extra_classes="navbar-official-logo px-1" height="2.4rem"></pngx-logo>
-      <pngx-brand-mark class="brand-mark brand-mark-slim d-none"></pngx-brand-mark>
-    } @else {
-      @if (customAppLogo) {
-        <img class="brand-logo" [src]="customAppLogo" alt="" />
+      @if (!hasCustomBranding) {
+        <pngx-logo extra_classes="navbar-official-logo px-1" height="2.4rem"></pngx-logo>
+        <pngx-brand-mark class="brand-mark brand-mark-slim d-none"></pngx-brand-mark>
       } @else {
-        <pngx-brand-mark class="brand-mark"></pngx-brand-mark>
-      }
-      <div class="brand-copy ms-2 text-truncate" [class.d-md-none]="slimSidebarEnabled">
-        <span class="brand-title text-truncate">{{ appTitle }}</span>
-        @if (customAppTitle) {
-          <span class="byline text-uppercase font-monospace" i18n>by Paperless-ngx</span>
+        @if (customAppLogo) {
+          <img class="brand-logo" [src]="customAppLogo" alt="" />
+        } @else {
+          <pngx-brand-mark class="brand-mark"></pngx-brand-mark>
         }
-      </div>
-    }
-  </a>
+        <div class="brand-copy ms-2 text-truncate" [class.d-md-none]="slimSidebarEnabled">
+          <span class="brand-title text-truncate">{{ appTitle }}</span>
+          @if (customAppTitle) {
+            <span class="byline text-uppercase font-monospace" i18n>by Paperless-ngx</span>
+          }
+        </div>
+      }
+    </a>
+  </div>
   <div class="search-container flex-grow-1 py-2 pb-3 pb-sm-2 me-sm-auto order-3 order-sm-1"
     [class.mobile-hidden]="mobileSearchHidden()">
     <div class="col-12 header-search mx-auto">
