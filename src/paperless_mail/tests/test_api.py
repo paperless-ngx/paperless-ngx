@@ -26,7 +26,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         self.bogus_mailbox = BogusMailBox()
 
-        patcher = mock.patch("paperless_mail.mail.MailBox")
+        patcher = mock.patch("paperless_mail.mail.PinnedMailBox")
         m = patcher.start()
         m.return_value = self.bogus_mailbox
         self.addCleanup(patcher.stop)
