@@ -24,6 +24,12 @@ describe('TextComponent', () => {
     input = component.inputField.nativeElement
   })
 
+  it('should not offer itself to browser autofill by default', () => {
+    expect(
+      component.inputField.nativeElement.getAttribute('autocomplete')
+    ).toEqual('off')
+  })
+
   it('should support use of input field', () => {
     expect(component.value).toBeUndefined()
     input.value = 'foo'
