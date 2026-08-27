@@ -93,6 +93,36 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data["count"], 0)
         self.assertEqual(len(results), 0)
 
+    def test_search_after_restore_from_trash(self) -> None:
+        """
+        GIVEN:
+            - Indexed document that was moved to the trash
+        WHEN:
+            - The document is restored from the trash
+        THEN:
+            - The document is searchable again without a reindex
+        """
+        doc = Document.objects.create(
+            title="invoice",
+            content="the thing i bought at a shop and paid with bank account",
+            checksum="A",
+            pk=1,
+        )
+        get_backend().add_or_update(doc)
+
+        self.assertEqual(self.client.get("/api/documents/?query=shop").data["count"], 1)
+
+        self.client.delete(f"/api/documents/{doc.pk}/")
+        self.assertEqual(self.client.get("/api/documents/?query=shop").data["count"], 0)
+
+        response = self.client.post(
+            "/api/trash/",
+            {"action": "restore", "documents": [doc.pk]},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(self.client.get("/api/documents/?query=shop").data["count"], 1)
+
     def test_simple_text_search(self) -> None:
         tagged = Tag.objects.create(name="invoice")
         matching_doc = Document.objects.create(

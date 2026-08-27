@@ -5432,8 +5432,15 @@ class TrashView(ListModelMixin, PassUserMixin):
             return HttpResponseForbidden("Insufficient permissions")
         action = serializer.validated_data.get("action")
         if action == "restore":
-            for doc in Document.deleted_objects.filter(id__in=doc_ids).all():
+            restored = list(Document.deleted_objects.filter(id__in=doc_ids))
+            for doc in restored:
                 doc.restore(strict=False)
+            if restored:
+                from documents.search import get_backend
+
+                with get_backend().batch_update() as batch:
+                    for doc in restored:
+                        batch.add_or_update(doc)
         elif action == "empty":
             if doc_ids is None:
                 doc_ids = [doc.id for doc in docs]
