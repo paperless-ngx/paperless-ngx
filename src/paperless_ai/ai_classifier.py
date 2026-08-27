@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 
 from documents.models import Document
 from documents.permissions import permitted_object_ids
+from documents.permissions import restrict_queryset_to_visible
+from documents.permissions import user_is_unrestricted
 from paperless.config import AIConfig
 from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.base_model import TaxonomyChoiceDict
@@ -48,19 +50,32 @@ def _fulltext_similar_documents(
     similarity - cruder, but far better than no candidates at all.
     more_like_this_ids returns only a ranked ID list, no scores, so weight is
     synthesized from rank (descending from top_k) rather than claiming a
-    similarity magnitude that doesn't exist. A superuser is normalized to
-    ``None`` before calling, since the backend's permission filter has no
-    superuser short-circuit of its own.
+    similarity magnitude that doesn't exist. An unrestricted user (none, or an
+    active superuser - see user_is_unrestricted) is normalized to ``None``
+    before calling, since the backend's permission filter has no superuser
+    short-circuit of its own. Results are re-checked with
+    restrict_queryset_to_visible() since Tantivy's indexed permission fields
+    lag the DB via async reindexing.
     """
     from documents.search import get_backend
 
-    search_user = None if user is not None and user.is_superuser else user
+    unrestricted = user_is_unrestricted(user)
+    search_user = None if unrestricted else user
     backend = get_backend()
     similar_ids = backend.more_like_this_ids(
         document.pk,
         user=search_user,
         limit=top_k,
     )
+    if not unrestricted:
+        allowed_ids = set(
+            restrict_queryset_to_visible(
+                Document.objects.filter(pk__in=similar_ids),
+                user,
+                "view_document",
+            ).values_list("pk", flat=True),
+        )
+        similar_ids = [doc_id for doc_id in similar_ids if doc_id in allowed_ids]
     return [
         SimilarDocument(document_id=doc_id, weight=float(top_k - rank))
         for rank, doc_id in enumerate(similar_ids)
