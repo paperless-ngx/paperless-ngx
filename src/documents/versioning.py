@@ -9,7 +9,9 @@ from django.db.models import F
 from django.db.models import OuterRef
 from django.db.models import QuerySet
 from django.db.models import Subquery
+from django.db.models import Window
 from django.db.models.functions import Coalesce
+from django.db.models.functions import RowNumber
 
 from documents.models import Document
 
@@ -17,12 +19,59 @@ if TYPE_CHECKING:
     from rest_framework.request import Request
 
 
+# Ordering for "newest version first": version_index before id, because an
+# existing (low-id) document can be merged in as a newer version. Defined once
+# so the ORDER BY and the window function below sort identically.
+def _newest_version_ordering() -> list:
+    return [F("version_index").desc(nulls_last=True), F("id").desc()]
+
+
 def versions_newest_first(documents: QuerySet[Document]) -> QuerySet[Document]:
     """
     Sorts versions so the newest one comes first using version_index and not on id,
     because an existing document can be merged in as a version
     """
-    return documents.order_by(F("version_index").desc(nulls_last=True), "-id")
+    return documents.order_by(*_newest_version_ordering())
+
+
+def latest_version_content_subquery() -> Subquery:
+    """
+    Returns the content of a root document's newest version as a subquery
+    correlated on the root document's ``OuterRef("pk")``.
+
+    Written to avoid a MariaDB optimizer misstep: a directly correlated
+    subquery with ``ORDER BY version_index DESC, id DESC LIMIT 1`` tricks the
+    optimizer into a full primary-key backward scan per outer row (instead of
+    using the root_document_id index), which is >250x slower on large document
+    sets. Instead the primary keys of the newest version per root are computed
+    once, de-correlated, via a ROW_NUMBER() window and then matched with a
+    plain ``pk__in``. The result is identical to
+    ``versions_newest_first(...).values("content")[:1]``.
+    """
+    # De-correlated: exactly the newest version per root_document_id (rank == 1).
+    latest_version_pks = (
+        Document.objects.filter(root_document__isnull=False)
+        .annotate(
+            _version_rank=Window(
+                expression=RowNumber(),
+                partition_by=[F("root_document_id")],
+                order_by=_newest_version_ordering(),
+            ),
+        )
+        .filter(_version_rank=1)
+        .values("pk")
+    )
+    # Only correlated on the root document; pk__in stays un-correlated and is
+    # materialized once by the database. order_by() drops the model's
+    # Meta.ordering (-created), which would otherwise add a needless filesort.
+    return Subquery(
+        Document.objects.filter(
+            root_document_id=OuterRef("pk"),
+            pk__in=latest_version_pks,
+        )
+        .order_by()
+        .values("content")[:1],
+    )
 
 
 def annotate_effective_content(documents: QuerySet[Document]) -> QuerySet[Document]:
@@ -33,11 +82,7 @@ def annotate_effective_content(documents: QuerySet[Document]) -> QuerySet[Docume
     """
     return documents.annotate(
         effective_content=Coalesce(
-            Subquery(
-                versions_newest_first(
-                    Document.objects.filter(root_document=OuterRef("pk")),
-                ).values("content")[:1],
-            ),
+            latest_version_content_subquery(),
             F("content"),
         ),
     )

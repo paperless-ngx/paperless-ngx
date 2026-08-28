@@ -233,6 +233,7 @@ from documents.versioning import VersionResolutionError
 from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_request_version_param
 from documents.versioning import get_root_document
+from documents.versioning import latest_version_content_subquery
 from documents.versioning import resolve_requested_version_for_root
 from documents.versioning import versions_newest_first
 from paperless import version
@@ -1073,11 +1074,10 @@ class DocumentViewSet(
         }
 
     def get_queryset(self):
-        latest_version_content = Subquery(
-            versions_newest_first(
-                Document.objects.filter(root_document=OuterRef("pk")),
-            ).values("content")[:1],
-        )
+        # De-correlated subquery: see latest_version_content_subquery() for why
+        # a naive ORDER BY ... LIMIT 1 correlated subquery makes MariaDB's
+        # optimizer full-scan the primary key per row (>250x slower).
+        latest_version_content = latest_version_content_subquery()
         # A correlated subquery avoids the LEFT JOIN + Count() this used to
         # be, which forced a GROUP BY aggregate over every matching document
         # before the query could even be sorted or limited.
