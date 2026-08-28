@@ -76,7 +76,7 @@ def _public_field_descriptors() -> list[FieldDescriptor]:
                 ),
             )
             if field.name == "notes":
-                # Plain-text companion for snippet generation — tantivy's
+                # Plain-text companion for snippet generation: tantivy's
                 # SnippetGenerator does not support JSON fields. Schema-only,
                 # no query-syntax meaning, not in PUBLIC_FIELDS.
                 descriptors.append(

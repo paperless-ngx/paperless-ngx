@@ -64,7 +64,7 @@ def get_field_registry(language: str | None) -> FieldRegistry:
     """Build (or return the cached) FieldRegistry for the given search language.
 
     Cached keyed by language, rebuilt on the same trigger register_tokenizers()
-    uses (settings.SEARCH_LANGUAGE change) — a fresh call with a new language
+    uses (settings.SEARCH_LANGUAGE change). A fresh call with a new language
     builds and caches a new registry rather than mutating the old one.
     """
     if language in _registry_cache:

@@ -6,7 +6,7 @@ from whoosh_compat import SubpathSpec
 
 # Internal-only schema fields with no query-syntax meaning of their own
 # (sort shadow fields, bigram CJK fields, simple_title/simple_content,
-# autocomplete_word, notes_text) are NOT represented here — they are
+# autocomplete_word, notes_text) are NOT represented here, they are
 # declared in _schema.py's field_descriptors().
 #
 # analyzer/pattern_normalizer are deliberately left at FieldSpec's default
