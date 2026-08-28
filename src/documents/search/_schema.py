@@ -44,55 +44,27 @@ class FieldDescriptor(NamedTuple):
     tokenizer: str | None
 
 
+# (schema kind, tokenizer) for the FieldKind -> FieldDescriptor mapping that
+# doesn't need special-casing. JSON is handled separately below since it can
+# emit a second, synthetic descriptor.
+_KIND_TABLE: Final[dict[FieldKind, tuple[str, str | None]]] = {
+    FieldKind.TEXT: ("text", "paperless_text"),
+    FieldKind.KEYWORD: ("text", "raw"),
+    FieldKind.U64: ("u64", None),
+    FieldKind.DATE: ("date", None),
+    FieldKind.DATETIME: ("date", None),
+}
+# Kinds whose fast-field flag follows FieldSpec.fast rather than always False.
+_FAST_FROM_FIELD: Final[frozenset[FieldKind]] = frozenset(
+    {FieldKind.U64, FieldKind.DATE, FieldKind.DATETIME},
+)
+
+
 def _public_field_descriptors() -> list[FieldDescriptor]:
     """Descriptors for the query-visible fields declared in PUBLIC_FIELDS."""
     descriptors: list[FieldDescriptor] = []
     for field in PUBLIC_FIELDS:
-        if field.kind is FieldKind.TEXT:
-            descriptors.append(
-                FieldDescriptor(
-                    field.name,
-                    "text",
-                    stored=True,
-                    indexed=True,
-                    fast=False,
-                    tokenizer="paperless_text",
-                ),
-            )
-        elif field.kind is FieldKind.KEYWORD:
-            descriptors.append(
-                FieldDescriptor(
-                    field.name,
-                    "text",
-                    stored=True,
-                    indexed=True,
-                    fast=False,
-                    tokenizer="raw",
-                ),
-            )
-        elif field.kind is FieldKind.U64:
-            descriptors.append(
-                FieldDescriptor(
-                    field.name,
-                    "u64",
-                    stored=True,
-                    indexed=True,
-                    fast=field.fast,
-                    tokenizer=None,
-                ),
-            )
-        elif field.kind in (FieldKind.DATE, FieldKind.DATETIME):
-            descriptors.append(
-                FieldDescriptor(
-                    field.name,
-                    "date",
-                    stored=True,
-                    indexed=True,
-                    fast=field.fast,
-                    tokenizer=None,
-                ),
-            )
-        elif field.kind is FieldKind.JSON:
+        if field.kind is FieldKind.JSON:
             descriptors.append(
                 FieldDescriptor(
                     field.name,
@@ -117,6 +89,18 @@ def _public_field_descriptors() -> list[FieldDescriptor]:
                         tokenizer="paperless_text",
                     ),
                 )
+            continue
+        schema_kind, tokenizer = _KIND_TABLE[field.kind]
+        descriptors.append(
+            FieldDescriptor(
+                field.name,
+                schema_kind,
+                stored=True,
+                indexed=True,
+                fast=field.fast if field.kind in _FAST_FROM_FIELD else False,
+                tokenizer=tokenizer,
+            ),
+        )
     return descriptors
 
 
