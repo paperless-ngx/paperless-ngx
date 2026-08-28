@@ -2749,7 +2749,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">169</context>
+          <context context-type="linenumber">179</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.html</context>
@@ -3600,11 +3600,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">132</context>
+          <context context-type="linenumber">142</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">141</context>
+          <context context-type="linenumber">151</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
@@ -5350,7 +5350,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">126</context>
+          <context context-type="linenumber">136</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5342432350421167093" datatype="html">
@@ -6512,10 +6512,6 @@
           <context context-type="sourcefile">src/app/components/common/input/document-link/document-link.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/input/document-link/document-link.component.html</context>
-          <context context-type="linenumber">50</context>
-        </context-group>
       </trans-unit>
       <trans-unit id="1388712764439031120" datatype="html">
         <source>Open link</source>
@@ -6528,8 +6524,8 @@
           <context context-type="linenumber">14</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="6595008830732269870" datatype="html">
-        <source>Not found</source>
+      <trans-unit id="5643561794785412000" datatype="html">
+        <source>Unavailable</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/document-link/document-link.component.html</context>
           <context context-type="linenumber">51,52</context>
@@ -7384,7 +7380,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">121</context>
+          <context context-type="linenumber">124</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1070687661569746428" datatype="html">
@@ -8216,7 +8212,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">144</context>
+          <context context-type="linenumber">154</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8659635229098859487" datatype="html">
@@ -8234,7 +8230,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">160,161</context>
+          <context context-type="linenumber">170,171</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2696010339872056565" datatype="html">
@@ -9068,28 +9064,28 @@
         <source>Create a share link bundle</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">118</context>
+          <context context-type="linenumber">119</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1015374532025907183" datatype="html">
         <source>Include:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">147,148</context>
+          <context context-type="linenumber">157,158</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1537670659786159738" datatype="html">
         <source>Archived files</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">151,152</context>
+          <context context-type="linenumber">161,162</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2520291319362448498" datatype="html">
         <source>Original files</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">155,156</context>
+          <context context-type="linenumber">165,166</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1215215387232313677" datatype="html">
