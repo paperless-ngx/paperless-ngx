@@ -110,7 +110,8 @@ main {
 
 @media(min-width: 768px) {
   // hide scrollbars on browsers that take up layout width
-  .pngx-classic-scrollbars .sidebar.slim {
+  // :host-context since <html> is outside the component
+  :host-context(.pngx-classic-scrollbars) .sidebar.slim {
     scrollbar-width: none;
 
     &::-webkit-scrollbar {
