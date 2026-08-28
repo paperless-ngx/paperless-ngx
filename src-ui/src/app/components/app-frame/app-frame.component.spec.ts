@@ -543,6 +543,27 @@ describe('AppFrameComponent', () => {
     )
   })
 
+  it('should only flag scrollbars that take up layout width', () => {
+    const offsetWidth = jest.spyOn(HTMLElement.prototype, 'offsetWidth', 'get')
+    jest.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(100)
+
+    offsetWidth.mockReturnValue(115)
+    component['detectClassicScrollbars']()
+    expect(
+      window.document.documentElement.classList.contains(
+        'pngx-classic-scrollbars'
+      )
+    ).toBeTruthy()
+
+    offsetWidth.mockReturnValue(100)
+    component['detectClassicScrollbars']()
+    expect(
+      window.document.documentElement.classList.contains(
+        'pngx-classic-scrollbars'
+      )
+    ).toBeFalsy()
+  })
+
   it('should collapse attributes sections when enabling slim sidebar', () => {
     jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of(true))
     settingsService.set(SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED, [])
