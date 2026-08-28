@@ -440,7 +440,7 @@ def parse_user_query(
        (notes.note:/custom_fields.value:) directly in the registry, via
        each JSON field's SubpathSpec(default=True).
     2. Any diagnostics (bad dates/numbers) map to SearchQueryError subclasses
-       and raise — the view returns HTTP 400 with every offending field
+       and raise, the view returns HTTP 400 with every offending field
        listed, not just the first.
     3. emit() turns the AST into a tantivy.Query directly (no string
        round-trip). A QueryError is routed by its Diagnostic's Cause
@@ -450,7 +450,7 @@ def parse_user_query(
     4. Optional fuzzy blend (ADVANCED_FUZZY_SEARCH_THRESHOLD) builds a
        plain word string from the parsed AST's free-text tokens
        (whoosh_compat.free_text_tokens) and feeds THAT to
-       index.parse_query — never raw_query, whose whoosh grammar (date
+       index.parse_query, never raw_query, whose whoosh grammar (date
        keywords, bracket-class wildcards, etc.) tantivy's parser rejects,
        which used to silently knock the fuzzy clause out of any mixed
        query (see _try_parse_fuzzy_query).

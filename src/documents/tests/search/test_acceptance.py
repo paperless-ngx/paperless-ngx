@@ -1,6 +1,6 @@
 """Result-level acceptance corpus: real documents indexed via build_schema(),
 real queries run through parse_user_query(), matched-document-ID sets
-asserted — not intermediate ASTs or query strings. This is paperless-ngx's
+asserted, not intermediate ASTs or query strings. This is paperless-ngx's
 analogue of whoosh-compat's own tests/emitter/test_acceptance_e2e.py.
 
 Supersedes test_query.py's TestParseUserQuery result-level cases.
@@ -268,7 +268,7 @@ class TestFuzzyBlendSurvivesWhooshGrammar:
 
 class TestUnquotedDateKeywordPhrases:
     """The unquoted spelling (added:previous month) is honored natively by
-    whoosh-compat's own grammar for this closed phrase vocabulary — no
+    whoosh-compat's own grammar for this closed phrase vocabulary, no
     app-level rewrite is involved. Pins that the historically supported
     spelling keeps working now that paperless no longer pre-quotes it."""
 

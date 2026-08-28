@@ -3,7 +3,7 @@ _quote_date_keyword_phrases rewrite.
 
 That rewrite matched date-keyword phrases (e.g. "previous month" after a
 date field) anywhere in the raw query string, including inside an
-unrelated quoted string, and inserted quotes mid-phrase there too — its
+unrelated quoted string, and inserted quotes mid-phrase there too. Its
 own docstring gave ``title:"see added:previous month notes"`` as the
 example of what it corrupted. whoosh-compat's grammar accepts the same
 phrase vocabulary unquoted natively (see TestUnquotedDateKeywordPhrases

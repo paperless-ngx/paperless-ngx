@@ -119,7 +119,7 @@ class TestParseUserQuery:
         query_index: tantivy.Index,
     ) -> None:
         # parse_user_query never falls back to the raw query string on a parse
-        # error — a bad date diagnostic from whoosh-compat always maps to an
+        # error: a bad date diagnostic from whoosh-compat always maps to an
         # InvalidDateQuery and must propagate, so the view can return a 400
         # instead of silently parsing the raw (invalid) date.
         with pytest.raises(InvalidDateQuery) as exc_info:
@@ -154,7 +154,7 @@ class TestParseUserQuery:
         self,
         query_index: tantivy.Index,
     ) -> None:
-        # tag_id is intentionally excluded from the FieldRegistry — whoosh-compat
+        # tag_id is intentionally excluded from the FieldRegistry: whoosh-compat
         # parity leniency folds it into literal text, not a diagnostic/400.
         # A result-level assertion that this fold actually matches nothing
         # against real documents lives in

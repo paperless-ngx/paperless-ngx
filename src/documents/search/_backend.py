@@ -539,7 +539,7 @@ class TantivyBackend:
         if note_texts:
             doc.add_text("notes_text", " ".join(note_texts))
 
-        # Custom fields — JSON for structured queries (custom_fields.name:x,
+        # Custom fields: JSON for structured queries (custom_fields.name:x,
         # custom_fields.value:y). There is no companion text field here, unlike
         # notes: custom field values are reachable only through the JSON field.
         for cfi in document.custom_fields.all():
