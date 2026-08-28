@@ -34,6 +34,7 @@ import {
   debounceTime,
   distinctUntilChanged,
   filter,
+  finalize,
   first,
   map,
   switchMap,
@@ -1016,16 +1017,15 @@ export class DocumentDetailComponent
       .pipe(
         first(),
         takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
+        takeUntil(this.docChangeNotifier),
+        finalize(() => this.suggestionsLoading.set(false))
       )
       .subscribe({
         next: (result) => {
           this.suggestions.set(result)
-          this.suggestionsLoading.set(false)
         },
         error: (error) => {
           this.suggestions.set(null)
-          this.suggestionsLoading.set(false)
           this.toastService.showError(
             $localize`Error retrieving suggestions.`,
             error
