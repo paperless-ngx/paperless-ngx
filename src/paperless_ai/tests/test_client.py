@@ -9,6 +9,7 @@ import pytest
 from llama_index.core.llms.llm import ToolSelection
 
 from paperless_ai.client import LLM_SYSTEM_PROMPT
+from paperless_ai.client import PLACEHOLDER_API_KEY
 from paperless_ai.client import AIClient
 from paperless_ai.exceptions import LLMTimeoutError
 
@@ -75,6 +76,23 @@ def test_get_llm_openai(mock_ai_config, mock_openai_llm):
         async_http_client=ANY,
     )
     assert client.llm == mock_openai_llm.return_value
+
+
+@pytest.mark.parametrize("configured_key", [None, ""])
+def test_get_llm_openai_without_api_key_sends_placeholder(
+    mock_ai_config,
+    mock_openai_llm,
+    configured_key,
+):
+    """openai SDK rejects empty key, see #13831."""
+    mock_ai_config.llm_backend = "openai-like"
+    mock_ai_config.llm_model = "test_model"
+    mock_ai_config.llm_api_key = configured_key
+    mock_ai_config.llm_endpoint = "http://test-url"
+
+    AIClient()
+
+    assert mock_openai_llm.call_args.kwargs["api_key"] == PLACEHOLDER_API_KEY
 
 
 def test_get_llm_openai_blocks_internal_endpoint_when_disallowed(mock_ai_config):
