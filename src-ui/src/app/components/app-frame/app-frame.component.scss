@@ -109,6 +109,15 @@ main {
 }
 
 @media(min-width: 768px) {
+  // hide scrollbars on browsers that take up layout width
+  .pngx-classic-scrollbars .sidebar.slim {
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
   .sidebar.slim {
     max-width: 55px;
 
@@ -124,6 +133,19 @@ main {
     li.nav-item span,
     .sidebar-heading span {
       display: none;
+    }
+
+    .nav-link,
+    .nav-anchor {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+
+      i-bs {
+        margin-right: 0 !important;
+      }
     }
   }
 

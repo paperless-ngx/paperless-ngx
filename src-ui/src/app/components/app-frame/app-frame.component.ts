@@ -118,6 +118,7 @@ export class AppFrameComponent
 
   ngOnInit(): void {
     this.lastScrollY = window.scrollY
+    this.detectClassicScrollbars()
 
     if (this.settingsService.get(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED)) {
       this.checkForUpdates()
@@ -341,6 +342,22 @@ export class AppFrameComponent
     }
 
     this.lastScrollY = currentScrollY
+  }
+
+  /**
+   * Flag for browsers whose scrollbars take up layout width. Remove me
+   * some day, I hope.
+   */
+  private detectClassicScrollbars(): void {
+    const probe = document.createElement('div')
+    probe.style.cssText =
+      'position:absolute;top:-9999px;width:100px;height:100px;overflow:scroll'
+    document.body.appendChild(probe)
+    document.documentElement.classList.toggle(
+      'pngx-classic-scrollbars',
+      probe.offsetWidth > probe.clientWidth
+    )
+    probe.remove()
   }
 
   private isMobileViewport(): boolean {
