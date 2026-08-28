@@ -14,6 +14,7 @@ from paperless.network import PinnedHostHTTPTransport
 from paperless.network import create_pinned_async_httpx_client
 from paperless.network import create_pinned_httpx_client
 from paperless.network import validate_outbound_http_url
+from paperless_ai.client import PLACEHOLDER_API_KEY
 
 OCR_LEADER_REGEX = re.compile(r"[._\-\u00b7]{4,}")
 HORIZONTAL_WHITESPACE_REGEX = re.compile(r"[ \t\u00a0]+")
@@ -40,7 +41,7 @@ def get_embedding_model(config: AIConfig) -> "BaseEmbedding":
                 )
             return OpenAILikeEmbedding(
                 model_name=config.llm_embedding_model or "text-embedding-3-small",
-                api_key=config.llm_api_key,
+                api_key=config.llm_api_key or PLACEHOLDER_API_KEY,
                 api_base=endpoint,
                 timeout=config.llm_request_timeout,
                 http_client=http_client,

@@ -7,6 +7,7 @@ from django.conf import settings
 
 from documents.models import Document
 from paperless.models import LLMEmbeddingBackend
+from paperless_ai.client import PLACEHOLDER_API_KEY
 from paperless_ai.embedding import _normalize_llm_index_text
 from paperless_ai.embedding import build_llm_index_text
 from paperless_ai.embedding import get_configured_model_name
@@ -78,6 +79,25 @@ def test_get_embedding_model_openai(mock_ai_config):
             async_http_client=ANY,
         )
         assert model == MockOpenAIEmbedding.return_value
+
+
+@pytest.mark.parametrize("configured_key", [None, ""])
+def test_get_embedding_model_openai_without_api_key_sends_placeholder(
+    mock_ai_config,
+    configured_key,
+):
+    """Same required key handling as the LLM client, see #13831."""
+    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OPENAI_LIKE
+    mock_ai_config.return_value.llm_embedding_model = "text-embedding-3-small"
+    mock_ai_config.return_value.llm_api_key = configured_key
+    mock_ai_config.return_value.llm_endpoint = "http://test-url"
+
+    with patch(
+        "llama_index.embeddings.openai_like.OpenAILikeEmbedding",
+    ) as MockOpenAIEmbedding:
+        get_embedding_model(mock_ai_config.return_value)
+
+    assert MockOpenAIEmbedding.call_args.kwargs["api_key"] == PLACEHOLDER_API_KEY
 
 
 def test_get_embedding_model_openai_prefers_embedding_endpoint(mock_ai_config):
