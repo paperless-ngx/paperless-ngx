@@ -151,6 +151,23 @@ describe('DocumentLinkComponent', () => {
     expect(component.selectedDocuments).toEqual([])
   })
 
+  it('should preserve and neutrally label unavailable document IDs', async () => {
+    jest.spyOn(documentService, 'getFew').mockReturnValue(
+      of({
+        count: 0,
+        all: [],
+        results: [],
+      })
+    )
+
+    component.writeValue([99])
+    await fixture.whenStable()
+
+    expect(component.selectedDocuments).toEqual([{ id: 99 }])
+    expect(fixture.nativeElement.textContent).toContain('Unavailable')
+    expect(fixture.nativeElement.textContent).not.toContain('Not found')
+  })
+
   it('should support unselect', () => {
     const getSpy = jest.spyOn(documentService, 'getFew')
     getSpy.mockImplementation((ids) => {
@@ -165,6 +182,15 @@ describe('DocumentLinkComponent', () => {
     component.unselect({ id: 23 })
     fixture.detectChanges()
     expect(component.selectedDocuments).toEqual([documents[1]])
+  })
+
+  it('should not unselect documents when disabled', () => {
+    component.disabled = true
+    component.selectedDocuments = [documents[0]]
+
+    component.unselect(documents[0])
+
+    expect(component.selectedDocuments).toEqual([documents[0]])
   })
 
   it('should use correct compare, trackBy functions', () => {

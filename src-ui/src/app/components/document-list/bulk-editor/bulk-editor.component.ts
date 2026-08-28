@@ -101,7 +101,7 @@ export class BulkEditorComponent
   private toastService = inject(ToastService)
   private storagePathService = inject(StoragePathService)
   private customFieldService = inject(CustomFieldsService)
-  private permissionService = inject(PermissionsService)
+  public readonly permissionService = inject(PermissionsService)
   private savedViewService = inject(SavedViewService)
   private readonly shareLinkBundleService = inject(ShareLinkBundleService)
 
