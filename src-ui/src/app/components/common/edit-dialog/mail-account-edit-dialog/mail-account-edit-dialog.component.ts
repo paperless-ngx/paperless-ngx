@@ -94,6 +94,7 @@ export class MailAccountEditDialogComponent extends EditDialogComponent<MailAcco
         this.testActive = false
         this.testResult.set('danger')
         this.alertTimeout = setTimeout(() => this.testResultAlert.close(), 5000)
+        this.error = e.error
       },
     })
   }
