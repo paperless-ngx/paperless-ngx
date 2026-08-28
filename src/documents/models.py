@@ -341,6 +341,14 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         verbose_name_plural = _("documents")
         indexes = [
             models.Index(fields=["owner", "created"]),
+            # Covers the "newest version of a root" lookup (WHERE root_document
+            # + ORDER BY version_index DESC, id DESC LIMIT 1). Without the
+            # version_index column in the index, MariaDB's optimizer picks a
+            # full primary-key scan per row for that subquery (see #13778).
+            models.Index(
+                fields=["root_document", "version_index", "id"],
+                name="doc_root_version_id_idx",
+            ),
         ]
         constraints = [
             models.UniqueConstraint(
