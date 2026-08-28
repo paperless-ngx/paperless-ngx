@@ -108,6 +108,27 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_account1.imap_security, account1["imap_security"])
         self.assertEqual(returned_account1.character_set, account1["character_set"])
 
+    def test_create_mail_account_requires_imap_port(self) -> None:
+        account = {
+            "name": "Email1",
+            "username": "username1",
+            "password": "password1",
+            "imap_server": "server.example.com",
+            "imap_security": MailAccount.ImapSecurity.SSL,
+            "character_set": "UTF-8",
+        }
+
+        for imap_port in (None, "missing"):
+            with self.subTest(imap_port=imap_port):
+                data = account.copy()
+                if imap_port is None:
+                    data["imap_port"] = None
+
+                response = self.client.post(self.ENDPOINT, data=data, format="json")
+
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertIn("imap_port", response.data)
+
     def test_delete_mail_account(self) -> None:
         """
         GIVEN:

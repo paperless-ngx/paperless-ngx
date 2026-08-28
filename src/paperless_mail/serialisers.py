@@ -27,6 +27,7 @@ class ObfuscatedPasswordField(serializers.CharField):
 
 class MailAccountSerializer(OwnedObjectSerializer):
     password = ObfuscatedPasswordField()
+    imap_port = serializers.IntegerField(required=True, allow_null=False)
 
     class Meta:
         model = MailAccount
