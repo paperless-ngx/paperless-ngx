@@ -37,6 +37,7 @@ LLM_SYSTEM_PROMPT = (
 
 # openai-python rejects empty keys since 2.34.0, "fake" is the stand-in from
 # llama-index's own OpenAILike docs https://docs.llamaindex.ai/en/stable/api_reference/llms/openai_like/
+# TODO: remove pending resolution of https://github.com/openai/openai-python/issues/3224
 PLACEHOLDER_API_KEY: Final = "fake"
 
 
