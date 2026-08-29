@@ -68,6 +68,15 @@ class DocumentClassifierSchema(BaseModel):
     def _truncate(cls, value: Any, info: ValidationInfo) -> Any:
         return _truncate_to_field_limit(value, cls.model_fields[info.field_name])
 
+    @classmethod
+    def model_json_schema(cls, *args: Any, **kwargs: Any) -> dict[str, Any]:
+        """Inline TaxonomyChoice for backends that reject JSON Schema refs."""
+        schema = super().model_json_schema(*args, **kwargs)
+        taxonomy_choice = schema.pop("$defs")["TaxonomyChoice"]
+        for field in ("tags", "correspondents", "document_types", "storage_paths"):
+            schema["properties"][field] = taxonomy_choice
+        return schema
+
 
 class TaxonomyChoiceDict(TypedDict):
     """Plain-dict counterpart of TaxonomyChoice - what

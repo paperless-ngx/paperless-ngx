@@ -48,23 +48,22 @@ def test_document_classifier_schema_json_schema_is_self_contained():
     WHEN:
         - Its JSON schema is generated via model_json_schema()
     THEN:
-        - $defs includes a fully-resolvable TaxonomyChoice definition with
-          existing_ids/new_names properties
+        - No $defs section or taxonomy $ref survives in the schema
+        - Each taxonomy property carries existing_ids/new_names inline
 
-    client.py hands this generated schema straight to the LLM backend as
-    the response-format constraint (Ollama's format=json_schema, and the
-    OpenAI-like tool-calling path). What that backend actually needs is a
-    self-contained schema it can resolve without a document loader -
-    unlike a bare "$ref present" check, this asserts the referenced
-    definition genuinely carries the two fields the rest of the pipeline
-    (parse_ai_response, matching.py's resolve_*_ids) relies on.
+    Regression guard for #13831: Google's function-declaration schema rejects
+    the $ref Pydantic normally emits for the nested TaxonomyChoice model.
     """
     schema = DocumentClassifierSchema.model_json_schema()
 
-    defs = schema.get("$defs", {})
-    assert "TaxonomyChoice" in defs
-    taxonomy_choice_properties = defs["TaxonomyChoice"]["properties"]
-    assert set(taxonomy_choice_properties.keys()) == {"existing_ids", "new_names"}
+    assert "$defs" not in schema
+    for field in ("tags", "correspondents", "document_types", "storage_paths"):
+        field_schema = schema["properties"][field]
+        assert "$ref" not in field_schema
+        assert set(field_schema["properties"].keys()) == {
+            "existing_ids",
+            "new_names",
+        }
 
 
 def test_every_sequence_in_the_emitted_schema_is_bounded():
@@ -74,8 +73,8 @@ def test_every_sequence_in_the_emitted_schema_is_bounded():
     WHEN:
         - Its JSON schema is generated via model_json_schema()
     THEN:
-        - Every array property in the schema, including those on the
-          referenced TaxonomyChoice definition, carries a maxItems
+        - Every array property in the schema, including those on each
+          inlined TaxonomyChoice, carries a maxItems
     """
     schema = DocumentClassifierSchema.model_json_schema()
 
@@ -83,7 +82,11 @@ def test_every_sequence_in_the_emitted_schema_is_bounded():
         f"{owner}.{name}"
         for owner, definition in [
             ("DocumentClassifierSchema", schema),
-            *schema.get("$defs", {}).items(),
+            *(
+                (name, prop)
+                for name, prop in schema["properties"].items()
+                if prop.get("type") == "object"
+            ),
         ]
         for name, prop in definition.get("properties", {}).items()
         if prop.get("type") == "array" and "maxItems" not in prop
