@@ -113,6 +113,7 @@ from documents.bulk_download import OriginalsOnlyStrategy
 from documents.caching import get_llm_suggestion_cache
 from documents.caching import get_metadata_cache
 from documents.caching import get_suggestion_cache
+from documents.caching import refresh_llm_suggestions_cache
 from documents.caching import refresh_metadata_cache
 from documents.caching import refresh_suggestions_cache
 from documents.caching import set_llm_suggestions_cache
@@ -1540,6 +1541,7 @@ class DocumentViewSet(
                 ai_config.llm_model,
                 ai_config.llm_endpoint,
                 output_language,
+                f"user={request.user.pk}",
             )
             if part
         )
@@ -1555,8 +1557,11 @@ class DocumentViewSet(
             # freshly for this requester on every request, cache hit or not,
             # so a resolved id cached for one user's visibility can never be
             # handed unfiltered to a second, less-privileged requester of
-            # the same (backend-keyed, not user-keyed) cache entry.
-            refresh_suggestions_cache(doc.pk)
+            # the same (backend + user-keyed) cache entry.
+            refresh_llm_suggestions_cache(
+                doc.pk,
+                backend=llm_cache_backend,
+            )
             llm_suggestions = cached_llm_suggestions.suggestions
         else:
             try:
