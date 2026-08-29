@@ -32,6 +32,7 @@ from rest_framework import serializers
 from documents import matching
 from documents.caching import clear_document_caches
 from documents.caching import invalidate_llm_suggestions_cache
+from documents.caching import invalidate_suggestions_cache
 from documents.data_models import ConsumableDocument
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
@@ -740,9 +741,9 @@ def cleanup_custom_field_deletion(sender, instance: CustomField, **kwargs) -> No
 @receiver(models.signals.post_save, sender=Document)
 def update_llm_suggestions_cache(sender, instance, **kwargs):
     """
-    Invalidate the LLM suggestions cache when a document is saved.
+    Invalidate suggestions caches when a document is saved.
     """
-    # Invalidate the cache for the document
+    invalidate_suggestions_cache(instance.pk)
     invalidate_llm_suggestions_cache(instance.pk)
 
 

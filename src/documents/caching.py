@@ -210,6 +210,11 @@ def refresh_suggestions_cache(
     cache.touch(doc_key, timeout)
 
 
+def invalidate_suggestions_cache(document_id: int) -> None:
+    """Invalidate classifier-generated suggestions for a document."""
+    cache.delete(get_suggestion_cache_key(document_id))
+
+
 def _llm_generation_key(document_id: int) -> str:
     return f"{get_suggestion_cache_key(document_id)}_llm_generation"
 

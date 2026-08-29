@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.db import connection
 from django.test import TestCase
 from django.test import override_settings
@@ -18,6 +19,7 @@ from guardian.shortcuts import assign_perm
 from rest_framework import status
 
 from documents.caching import get_llm_suggestion_cache
+from documents.caching import get_suggestion_cache_key
 from documents.caching import set_llm_suggestions_cache
 from documents.models import Correspondent
 from documents.models import Document
@@ -861,8 +863,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         self.assertEqual(response.json()["tags"], [])
         self.assertEqual(response.json()["suggested_tags"], [])
 
-    def test_invalidate_suggestions_cache(self) -> None:
-        self.client.force_login(user=self.user)
+    def test_document_save_invalidates_all_suggestion_caches(self) -> None:
         suggestions = {
             "title": "AI Title",
             "tags": ["tag1", "tag2"],
@@ -871,6 +872,8 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             "storage_paths": ["path1"],
             "dates": ["2023-01-01"],
         }
+        standard_cache_key = get_suggestion_cache_key(self.document.pk)
+        cache.set(standard_cache_key, "classifier suggestions")
         set_llm_suggestions_cache(
             self.document.pk,
             suggestions,
@@ -888,11 +891,14 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             ).suggestions,
             suggestions,
         )
-        # post_save signal triggered
+        self.assertEqual(cache.get(standard_cache_key), "classifier suggestions")
+
         update_llm_suggestions_cache(
             sender=None,
             instance=self.document,
         )
+
+        self.assertIsNone(cache.get(standard_cache_key))
         self.assertIsNone(
             get_llm_suggestion_cache(
                 self.document.pk,
