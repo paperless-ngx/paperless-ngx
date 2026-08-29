@@ -1,3 +1,5 @@
+import json
+
 from paperless_ai.base_model import MAX_DATES
 from paperless_ai.base_model import MAX_EXISTING_IDS
 from paperless_ai.base_model import MAX_NEW_NAMES
@@ -48,7 +50,7 @@ def test_document_classifier_schema_json_schema_is_self_contained():
     WHEN:
         - Its JSON schema is generated via model_json_schema()
     THEN:
-        - No $defs section or taxonomy $ref survives in the schema
+        - No $defs section and no $ref at any depth survives in the schema
         - Each taxonomy property carries existing_ids/new_names inline
 
     Regression guard for #13831: Google's function-declaration schema rejects
@@ -57,6 +59,7 @@ def test_document_classifier_schema_json_schema_is_self_contained():
     schema = DocumentClassifierSchema.model_json_schema()
 
     assert "$defs" not in schema
+    assert "$ref" not in json.dumps(schema)
     for field in ("tags", "correspondents", "document_types", "storage_paths"):
         field_schema = schema["properties"][field]
         assert "$ref" not in field_schema
