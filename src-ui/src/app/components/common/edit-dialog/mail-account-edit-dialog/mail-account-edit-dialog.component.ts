@@ -1,4 +1,4 @@
-import { Component, ViewChild, inject, signal } from '@angular/core'
+import { Component, inject, OnInit, signal, ViewChild } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -6,8 +6,13 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgbAlert, NgbAlertModule } from '@ng-bootstrap/ng-bootstrap'
+import { pairwise, startWith, takeUntil } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
-import { IMAPSecurity, MailAccount } from 'src/app/data/mail-account'
+import {
+  IMAP_DEFAULT_PORTS,
+  IMAPSecurity,
+  MailAccount,
+} from 'src/app/data/mail-account'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -21,6 +26,8 @@ const IMAP_SECURITY_OPTIONS = [
   { id: IMAPSecurity.SSL, name: $localize`SSL` },
   { id: IMAPSecurity.STARTTLS, name: $localize`STARTTLS` },
 ]
+
+const DEFAULT_IMAP_SECURITY = IMAPSecurity.SSL
 
 @Component({
   selector: 'pngx-mail-account-edit-dialog',
@@ -36,7 +43,10 @@ const IMAP_SECURITY_OPTIONS = [
     NgbAlertModule,
   ],
 })
-export class MailAccountEditDialogComponent extends EditDialogComponent<MailAccount> {
+export class MailAccountEditDialogComponent
+  extends EditDialogComponent<MailAccount>
+  implements OnInit
+{
   testActive: boolean = false
   readonly testResult = signal<string>(undefined)
   alertTimeout
@@ -48,6 +58,33 @@ export class MailAccountEditDialogComponent extends EditDialogComponent<MailAcco
     this.service = inject(MailAccountService)
     this.userService = inject(UserService)
     this.settingsService = inject(SettingsService)
+  }
+
+  ngOnInit(): void {
+    // Subscribing *after* super.ngOnInit() is load-bearing: the base class
+    // patches a saved account into the form there, which emits on
+    // imap_security. Subscribing first would read that as a user edit and
+    // rewrite a stored port.
+    super.ngOnInit()
+
+    const security = this.objectForm.get('imap_security')
+    security.valueChanges
+      .pipe(
+        startWith(security.value),
+        pairwise(),
+        takeUntil(this.unsubscribeNotifier)
+      )
+      .subscribe(([previous, current]: [IMAPSecurity, IMAPSecurity]) => {
+        const portField = this.objectForm.get('imap_port')
+        const port = portField.value
+        const isUnset =
+          port === null || port === undefined || String(port).trim() === ''
+        // Follow the security setting only while the port is still whatever we
+        // last put there; once the user has customised it, it is theirs.
+        if (isUnset || Number(port) === IMAP_DEFAULT_PORTS[previous]) {
+          portField.setValue(IMAP_DEFAULT_PORTS[current])
+        }
+      })
   }
 
   getCreateTitle() {
@@ -62,8 +99,8 @@ export class MailAccountEditDialogComponent extends EditDialogComponent<MailAcco
     return new FormGroup({
       name: new FormControl(null),
       imap_server: new FormControl(null),
-      imap_port: new FormControl(null),
-      imap_security: new FormControl(IMAPSecurity.SSL),
+      imap_port: new FormControl(IMAP_DEFAULT_PORTS[DEFAULT_IMAP_SECURITY]),
+      imap_security: new FormControl(DEFAULT_IMAP_SECURITY),
       username: new FormControl(null),
       password: new FormControl(null),
       is_token: new FormControl(false),

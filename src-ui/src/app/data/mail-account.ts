@@ -6,6 +6,13 @@ export enum IMAPSecurity {
   STARTTLS = 3,
 }
 
+// Mirrors the imap_port help text on the MailAccount model.
+export const IMAP_DEFAULT_PORTS: Record<IMAPSecurity, number> = {
+  [IMAPSecurity.None]: 143,
+  [IMAPSecurity.SSL]: 993,
+  [IMAPSecurity.STARTTLS]: 143,
+}
+
 export enum MailAccountType {
   IMAP = 1,
   Gmail_OAuth = 2,
