@@ -70,10 +70,14 @@ def _node_document_weights(nodes: list["NodeWithScore"]) -> list[SimilarDocument
             weights[int(document_id)] += float(node.score or 0.0)
         except (TypeError, ValueError):  # pragma: no cover
             continue
-    return [
-        SimilarDocument(document_id=document_id, weight=weight)
-        for document_id, weight in weights.items()
-    ]
+    return sorted(
+        (
+            SimilarDocument(document_id=document_id, weight=weight)
+            for document_id, weight in weights.items()
+        ),
+        key=lambda similar: similar["weight"],
+        reverse=True,
+    )
 
 
 def _visible_ranked_candidates(

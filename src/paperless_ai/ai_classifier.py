@@ -192,18 +192,20 @@ def get_taxonomy_context(
     ai_config = AIConfig()
     try:
         if ai_config.llm_embedding_backend:
-            # None means "no restriction" to retrieve_similar_nodes. A superuser
-            # (like no user at all) can see every document, so skip materializing
-            # every visible pk into a Python list and passing it through as an IN
-            # filter: for a large library that is a wasted quadratic scan in the
-            # vector store at best, and past ~32,763 documents a hard
-            # sqlite3.OperationalError (SQLite's bound-parameter limit) at worst.
+            # None means "no restriction" to retrieve_similar_nodes. An
+            # unrestricted user (no user at all, or an active superuser -- see
+            # user_is_unrestricted) can see every document, so skip
+            # materializing every visible pk into a Python list and passing it
+            # through as an IN filter: for a large library that is a wasted
+            # quadratic scan in the vector store at best, and past ~32,763
+            # documents a hard sqlite3.OperationalError (SQLite's
+            # bound-parameter limit) at worst.
             # permitted_object_ids() has its own superuser shortcut that would
             # return every Document's id anyway, so this changes nothing about
             # which documents are considered -- only how we get there.
             visible_document_ids = (
                 None
-                if user is None or user.is_superuser
+                if user_is_unrestricted(user)
                 else list(permitted_object_ids(user, Document, "view_document"))
             )
             nodes = retrieve_similar_nodes(
