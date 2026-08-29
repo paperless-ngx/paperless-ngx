@@ -183,9 +183,14 @@ def get_taxonomy_context(
 
         candidates = build_taxonomy_candidates(nodes, user)
 
-        similar_docs = list(
-            Document.objects.filter(pk__in=_node_document_ids(nodes))[:max_docs],
-        )
+        # ``nodes`` are already ordered by descending vector similarity; don't lose it.
+        similar_document_ids = list(dict.fromkeys(_node_document_ids(nodes)))
+        similar_documents_by_id = Document.objects.in_bulk(similar_document_ids)
+        similar_docs = [
+            similar_documents_by_id[document_id]
+            for document_id in similar_document_ids
+            if document_id in similar_documents_by_id
+        ][:max_docs]
         context_blocks = []
         for similar in similar_docs:
             text = similar.content[:1000] or ""
