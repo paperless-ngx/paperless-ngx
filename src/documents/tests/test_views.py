@@ -342,7 +342,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         super().setUp()
 
     @patch("documents.views.get_llm_suggestion_cache")
-    @patch("documents.views.refresh_suggestions_cache")
+    @patch("documents.views.refresh_llm_suggestions_cache")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -383,12 +383,15 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         self.assertEqual(response.json()["tags"], [self.tag1.pk])
         mock_get_cache.assert_called_once_with(
             self.document.pk,
-            backend="mock_backend",
+            backend=f"mock_backend:user={self.user.pk}",
         )
-        mock_refresh_cache.assert_called_once_with(self.document.pk)
+        mock_refresh_cache.assert_called_once_with(
+            self.document.pk,
+            backend=f"mock_backend:user={self.user.pk}",
+        )
 
     @patch("documents.views.get_llm_suggestion_cache")
-    @patch("documents.views.refresh_suggestions_cache")
+    @patch("documents.views.refresh_llm_suggestions_cache")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -524,7 +527,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         self.assertEqual(
             get_llm_suggestion_cache(
                 self.document.pk,
-                backend="mock_backend:de-de",
+                backend=f"mock_backend:de-de:user={self.user.pk}",
             ).suggestions["title"],
             "KI Title",
         )
@@ -563,7 +566,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         self.assertEqual(
             get_llm_suggestion_cache(
                 self.document.pk,
-                backend="mock_backend:fr-fr",
+                backend=f"mock_backend:fr-fr:user={self.user.pk}",
             ).suggestions["title"],
             "Titre IA",
         )
@@ -600,7 +603,79 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         self.assertIsNotNone(
             get_llm_suggestion_cache(
                 self.document.pk,
-                backend="mock_backend:model-a:http://endpoint-a",
+                backend=(f"mock_backend:model-a:http://endpoint-a:user={self.user.pk}"),
+            ),
+        )
+
+    @patch("documents.views.get_ai_document_classification")
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_BACKEND="mock_backend",
+    )
+    def test_ai_suggestions_cache_variants_coexist_per_requesting_user(
+        self,
+        mock_get_ai_classification,
+    ) -> None:
+        """
+        GIVEN:
+            - One user has populated the document's LLM suggestion cache
+            - A second user requests suggestions for the same document and
+              backend
+        WHEN:
+            - The second request is made
+        THEN:
+            - The first user's prompt-derived result is not reused
+            - The classification runs with the second user's visibility
+              context without evicting the first user's result
+        """
+        second_user = User.objects.create_superuser(username="second_user")
+        empty_choices = {
+            "tags": {"existing_ids": [], "new_names": []},
+            "correspondents": {"existing_ids": [], "new_names": []},
+            "document_types": {"existing_ids": [], "new_names": []},
+            "storage_paths": {"existing_ids": [], "new_names": []},
+            "dates": [],
+        }
+        mock_get_ai_classification.side_effect = [
+            {"title": "First user's result", **empty_choices},
+            {"title": "Second user's result", **empty_choices},
+        ]
+
+        self.client.force_login(user=self.user)
+        first_response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
+        self.client.force_login(user=second_user)
+        second_response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
+        self.client.force_login(user=self.user)
+        first_cached_response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
+
+        self.assertEqual(first_response.json()["title"], "First user's result")
+        self.assertEqual(second_response.json()["title"], "Second user's result")
+        self.assertEqual(
+            first_cached_response.json()["title"],
+            "First user's result",
+        )
+        self.assertEqual(mock_get_ai_classification.call_count, 2)
+        mock_get_ai_classification.assert_called_with(
+            self.document,
+            second_user,
+            None,
+        )
+        self.assertIsNotNone(
+            get_llm_suggestion_cache(
+                self.document.pk,
+                backend=f"mock_backend:user={second_user.pk}",
+            ),
+        )
+        self.assertIsNotNone(
+            get_llm_suggestion_cache(
+                self.document.pk,
+                backend=f"mock_backend:user={self.user.pk}",
             ),
         )
 
@@ -801,6 +876,11 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             suggestions,
             backend="mock_backend",
         )
+        set_llm_suggestions_cache(
+            self.document.pk,
+            {**suggestions, "title": "Other Variant"},
+            backend="other_backend:user=2",
+        )
         self.assertEqual(
             get_llm_suggestion_cache(
                 self.document.pk,
@@ -817,6 +897,12 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             get_llm_suggestion_cache(
                 self.document.pk,
                 backend="mock_backend",
+            ),
+        )
+        self.assertIsNone(
+            get_llm_suggestion_cache(
+                self.document.pk,
+                backend="other_backend:user=2",
             ),
         )
 
