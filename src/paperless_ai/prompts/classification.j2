@@ -4,16 +4,19 @@ You are a document classification assistant.
 {{ taxonomy_block }}
 
 {% endif %}
-Analyze the following document and extract the following information:
-- A short descriptive title
-- Tags that reflect the content
-- Names of people or organizations mentioned
-- The type or category of the document
-- Suggested folder paths for storing the document
-- Up to 3 relevant dates in YYYY-MM-DD format
+Analyze the following document and fill in these fields:
+- title: a short descriptive title
+- tags: topic labels for what the document is about
+- correspondents: the person, institution or company the document is from, or was sent to
+- document_types: what kind of document it is, e.g. invoice, contract, letter
+- storage_paths: a folder-style filing location for the document
+- dates: up to 3 relevant dates in YYYY-MM-DD format
 {% if has_candidates %}
 
-For tags, correspondents, document types, and storage paths: if a candidate from the "Available ..." block above fits, put its id in existing_ids. Only put a value in new_names when nothing in the candidates fits.
+For tags, correspondents, document types, and storage paths: first decide whether there is a useful, well-supported suggestion. If an available candidate clearly represents that suggestion, put its id in existing_ids instead of duplicating it in new_names. If no candidate represents the suggestion, put its name in new_names. Do not choose a weak candidate merely because it exists.
+{% else %}
+
+No candidates are shown for this document, so leave every existing_ids list empty and put each suggestion's name in new_names.
 {% endif %}
 
 Filename:

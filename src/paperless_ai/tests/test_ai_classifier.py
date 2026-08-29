@@ -607,7 +607,8 @@ def test_build_prompt_without_rag_includes_taxonomy_block():
     WHEN:
         - build_prompt_without_rag() is called with candidates and assigned metadata
     THEN:
-        - The candidate's id and the existing_ids instruction appear in the prompt
+        - The candidate's id and the existing_ids/new_names instructions appear
+        - Candidates are presented as deduplication options, not requirements
     """
     document = DocumentFactory.create(content="Some content")
     config = AIConfig()
@@ -633,6 +634,9 @@ def test_build_prompt_without_rag_includes_taxonomy_block():
 
     assert '"id": 12' in prompt
     assert "existing_ids" in prompt
+    assert "new_names" in prompt
+    assert "not requirements" in prompt
+    assert "weak candidate" in prompt
 
 
 @pytest.mark.django_db
@@ -645,10 +649,9 @@ def test_build_prompt_without_rag_identical_when_no_hints():
           separately with no candidates/assigned at all
     THEN:
         - Both prompts are identical
-        - Neither mentions existing_ids or the "Available ..." candidate block:
-          without any candidates in the prompt, that instruction would only
-          invite the model to invent a plausible id that resolves to a real but
-          unrelated object
+        - Neither carries the "Available ..." candidate block or the
+          id-vs-name routing instruction
+        - Both still tell the model to leave existing_ids empty
     """
     document = DocumentFactory.create(content="Some content")
     config = AIConfig()
@@ -674,12 +677,13 @@ def test_build_prompt_without_rag_identical_when_no_hints():
     with_no_hints = build_prompt_without_rag(document, config)
 
     assert with_empty_hints == with_no_hints
-    assert "existing_ids" not in with_no_hints
     assert "Available " not in with_no_hints
+    assert "put its id in existing_ids" not in with_no_hints
+    assert "leave every existing_ids list empty" in with_no_hints
 
 
 @pytest.mark.django_db
-def test_build_prompt_without_rag_excludes_instruction_when_no_candidates():
+def test_build_prompt_without_rag_tells_model_to_skip_ids_when_no_candidates():
     """
     GIVEN:
         - Assigned metadata but empty taxonomy candidates
@@ -687,8 +691,11 @@ def test_build_prompt_without_rag_excludes_instruction_when_no_candidates():
         - build_prompt_without_rag() is called with candidates and assigned metadata
     THEN:
         - The assigned-metadata block appears (taxonomy_block is non-empty)
-        - The existing_ids instruction does NOT appear, since there are no
-          candidates for it to point at
+        - The prompt tells the model to leave existing_ids empty
+
+    Staying silent about existing_ids here is not enough: the response schema
+    advertises the field whatever the prompt says, and models fill it with
+    placeholder ids that resolve to real but unrelated objects (#13831).
     """
     document = DocumentFactory.create(content="Some content")
     config = AIConfig()
@@ -713,7 +720,8 @@ def test_build_prompt_without_rag_excludes_instruction_when_no_candidates():
     )
 
     assert "already assigned" in prompt
-    assert "existing_ids" not in prompt
+    assert "No candidates are shown" in prompt
+    assert "leave every existing_ids list empty" in prompt
 
 
 @pytest.mark.django_db

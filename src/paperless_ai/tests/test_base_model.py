@@ -1,3 +1,5 @@
+import json
+
 from paperless_ai.base_model import MAX_DATES
 from paperless_ai.base_model import MAX_EXISTING_IDS
 from paperless_ai.base_model import MAX_NEW_NAMES
@@ -48,23 +50,82 @@ def test_document_classifier_schema_json_schema_is_self_contained():
     WHEN:
         - Its JSON schema is generated via model_json_schema()
     THEN:
-        - $defs includes a fully-resolvable TaxonomyChoice definition with
-          existing_ids/new_names properties
+        - No $defs section and no $ref at any depth survives in the schema
+        - Each taxonomy property carries existing_ids/new_names inline
 
-    client.py hands this generated schema straight to the LLM backend as
-    the response-format constraint (Ollama's format=json_schema, and the
-    OpenAI-like tool-calling path). What that backend actually needs is a
-    self-contained schema it can resolve without a document loader -
-    unlike a bare "$ref present" check, this asserts the referenced
-    definition genuinely carries the two fields the rest of the pipeline
-    (parse_ai_response, matching.py's resolve_*_ids) relies on.
+    Regression guard: Google's function-declaration schema rejects the $ref
+    Pydantic normally emits for the nested TaxonomyChoice model.
     """
     schema = DocumentClassifierSchema.model_json_schema()
 
-    defs = schema.get("$defs", {})
-    assert "TaxonomyChoice" in defs
-    taxonomy_choice_properties = defs["TaxonomyChoice"]["properties"]
-    assert set(taxonomy_choice_properties.keys()) == {"existing_ids", "new_names"}
+    assert "$defs" not in schema
+    assert "$ref" not in json.dumps(schema)
+    for field in ("tags", "correspondents", "document_types", "storage_paths"):
+        field_schema = schema["properties"][field]
+        assert "$ref" not in field_schema
+        assert set(field_schema["properties"].keys()) == {
+            "existing_ids",
+            "new_names",
+        }
+
+
+def test_every_field_describes_itself_to_the_model():
+    """
+    GIVEN:
+        - The DocumentClassifierSchema pydantic model
+    WHEN:
+        - Its JSON schema is generated via model_json_schema()
+    THEN:
+        - Every property, and every property of each inlined TaxonomyChoice,
+          carries a non-empty description
+
+    In tool-calling mode the schema is most of what tells the model how to
+    fill these fields; on field names alone, small models can bin tags and
+    correspondents into storage_paths.
+    """
+    schema = DocumentClassifierSchema.model_json_schema()
+
+    undescribed = [
+        f"{owner}.{name}"
+        for owner, definition in [
+            ("DocumentClassifierSchema", schema),
+            *(
+                (name, prop)
+                for name, prop in schema["properties"].items()
+                if prop.get("type") == "object"
+            ),
+        ]
+        for name, prop in definition.get("properties", {}).items()
+        if not prop.get("description")
+    ]
+
+    assert undescribed == []
+
+
+def test_inlining_keeps_each_taxonomy_fields_own_description():
+    """
+    GIVEN:
+        - The DocumentClassifierSchema pydantic model
+    WHEN:
+        - Its JSON schema is generated via model_json_schema()
+    THEN:
+        - Each taxonomy field keeps its own description, not the shared one
+        - The inlined TaxonomyChoice properties survive underneath it
+
+    Pydantic emits a field's description as a sibling of its $ref, so
+    replacing the property outright collapses all four onto TaxonomyChoice's
+    docstring - which still passes a "has a description" check.
+    """
+    properties = DocumentClassifierSchema.model_json_schema()["properties"]
+
+    taxonomy_fields = ("tags", "correspondents", "document_types", "storage_paths")
+    descriptions = {
+        field: properties[field]["description"] for field in taxonomy_fields
+    }
+
+    assert len(set(descriptions.values())) == len(taxonomy_fields)
+    for field in taxonomy_fields:
+        assert properties[field]["properties"]["existing_ids"]["description"]
 
 
 def test_every_sequence_in_the_emitted_schema_is_bounded():
@@ -74,8 +135,8 @@ def test_every_sequence_in_the_emitted_schema_is_bounded():
     WHEN:
         - Its JSON schema is generated via model_json_schema()
     THEN:
-        - Every array property in the schema, including those on the
-          referenced TaxonomyChoice definition, carries a maxItems
+        - Every array property in the schema, including those on each
+          inlined TaxonomyChoice, carries a maxItems
     """
     schema = DocumentClassifierSchema.model_json_schema()
 
@@ -83,7 +144,11 @@ def test_every_sequence_in_the_emitted_schema_is_bounded():
         f"{owner}.{name}"
         for owner, definition in [
             ("DocumentClassifierSchema", schema),
-            *schema.get("$defs", {}).items(),
+            *(
+                (name, prop)
+                for name, prop in schema["properties"].items()
+                if prop.get("type") == "object"
+            ),
         ]
         for name, prop in definition.get("properties", {}).items()
         if prop.get("type") == "array" and "maxItems" not in prop
