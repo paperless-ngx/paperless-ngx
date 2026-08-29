@@ -53,8 +53,8 @@ def test_document_classifier_schema_json_schema_is_self_contained():
         - No $defs section and no $ref at any depth survives in the schema
         - Each taxonomy property carries existing_ids/new_names inline
 
-    Regression guard for #13831: Google's function-declaration schema rejects
-    the $ref Pydantic normally emits for the nested TaxonomyChoice model.
+    Regression guard: Google's function-declaration schema rejects the $ref
+    Pydantic normally emits for the nested TaxonomyChoice model.
     """
     schema = DocumentClassifierSchema.model_json_schema()
 
@@ -67,6 +67,65 @@ def test_document_classifier_schema_json_schema_is_self_contained():
             "existing_ids",
             "new_names",
         }
+
+
+def test_every_field_describes_itself_to_the_model():
+    """
+    GIVEN:
+        - The DocumentClassifierSchema pydantic model
+    WHEN:
+        - Its JSON schema is generated via model_json_schema()
+    THEN:
+        - Every property, and every property of each inlined TaxonomyChoice,
+          carries a non-empty description
+
+    In tool-calling mode the schema is most of what tells the model how to
+    fill these fields; on field names alone, small models can bin tags and
+    correspondents into storage_paths.
+    """
+    schema = DocumentClassifierSchema.model_json_schema()
+
+    undescribed = [
+        f"{owner}.{name}"
+        for owner, definition in [
+            ("DocumentClassifierSchema", schema),
+            *(
+                (name, prop)
+                for name, prop in schema["properties"].items()
+                if prop.get("type") == "object"
+            ),
+        ]
+        for name, prop in definition.get("properties", {}).items()
+        if not prop.get("description")
+    ]
+
+    assert undescribed == []
+
+
+def test_inlining_keeps_each_taxonomy_fields_own_description():
+    """
+    GIVEN:
+        - The DocumentClassifierSchema pydantic model
+    WHEN:
+        - Its JSON schema is generated via model_json_schema()
+    THEN:
+        - Each taxonomy field keeps its own description, not the shared one
+        - The inlined TaxonomyChoice properties survive underneath it
+
+    Pydantic emits a field's description as a sibling of its $ref, so
+    replacing the property outright collapses all four onto TaxonomyChoice's
+    docstring - which still passes a "has a description" check.
+    """
+    properties = DocumentClassifierSchema.model_json_schema()["properties"]
+
+    taxonomy_fields = ("tags", "correspondents", "document_types", "storage_paths")
+    descriptions = {
+        field: properties[field]["description"] for field in taxonomy_fields
+    }
+
+    assert len(set(descriptions.values())) == len(taxonomy_fields)
+    for field in taxonomy_fields:
+        assert properties[field]["properties"]["existing_ids"]["description"]
 
 
 def test_every_sequence_in_the_emitted_schema_is_bounded():
