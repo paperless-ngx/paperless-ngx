@@ -1,3 +1,4 @@
+import datetime
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -341,6 +342,76 @@ def test_get_taxonomy_context_assembles_rag_text_and_candidates():
         "correspondent": None,
         "storage_path": None,
     }
+
+
+@pytest.mark.django_db
+def test_get_taxonomy_context_preserves_similarity_order_and_distinct_documents():
+    """
+    GIVEN:
+        - Ranked nodes whose similarity order conflicts with Document's
+          newest-created-first default ordering
+        - Two chunks belonging to the most similar document
+        - A stale node whose document no longer exists
+    WHEN:
+        - get_taxonomy_context() builds a two-document RAG context
+    THEN:
+        - The two most similar distinct documents are used in ranked order
+        - The duplicate chunk does not consume a context slot
+        - The missing document does not consume a context slot
+    """
+    most_similar = DocumentFactory.create(
+        created=datetime.date(2020, 1, 1),
+        content="Most similar content",
+        title="Most Similar",
+    )
+    second_most_similar = DocumentFactory.create(
+        created=datetime.date(2021, 1, 1),
+        content="Second most similar content",
+        title="Second Most Similar",
+    )
+    newest_but_least_similar = DocumentFactory.create(
+        created=datetime.date(2026, 1, 1),
+        content="Least similar content",
+        title="Newest But Least Similar",
+    )
+    document = DocumentFactory.create(content="Some content")
+    fake_nodes = [
+        SimpleNamespace(
+            metadata={"document_id": str(most_similar.pk)},
+            score=0.9,
+        ),
+        SimpleNamespace(
+            metadata={"document_id": str(most_similar.pk)},
+            score=0.8,
+        ),
+        SimpleNamespace(
+            metadata={"document_id": "999999999"},
+            score=0.75,
+        ),
+        SimpleNamespace(
+            metadata={"document_id": str(second_most_similar.pk)},
+            score=0.7,
+        ),
+        SimpleNamespace(
+            metadata={"document_id": str(newest_but_least_similar.pk)},
+            score=0.6,
+        ),
+    ]
+
+    with patch(
+        "paperless_ai.ai_classifier.retrieve_similar_nodes",
+        return_value=fake_nodes,
+    ):
+        _candidates, _assigned, context = get_taxonomy_context(
+            document,
+            user=None,
+            max_docs=2,
+        )
+
+    assert context == (
+        "TITLE: Most Similar\nMost similar content\n\n"
+        "TITLE: Second Most Similar\nSecond most similar content"
+    )
 
 
 @pytest.mark.django_db
