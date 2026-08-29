@@ -41,17 +41,19 @@ class TaxonomyChoice(BaseModel):
         default_factory=list,
         max_length=MAX_EXISTING_IDS,
         description=(
-            "IDs of existing values for this field, taken from the candidate "
-            "list shown in the prompt. Only use IDs that appear in that list, "
-            "never invent one."
+            "IDs from the candidate list shown in the prompt that clearly "
+            "represent values you would suggest for this field. Never invent "
+            "an ID, select a weak match merely because it exists, or use an "
+            "ID when no candidates are shown."
         ),
     )
     new_names: list[str] = Field(
         default_factory=list,
         max_length=MAX_NEW_NAMES,
         description=(
-            "Names for values this field needs that no candidate in the "
-            "prompt covers. Leave empty when an existing candidate fits."
+            "Names for clearly supported values that no shown candidate "
+            "represents. When a candidate represents the same value, use its "
+            "ID instead so an existing value is not duplicated under a new name."
         ),
     )
 
