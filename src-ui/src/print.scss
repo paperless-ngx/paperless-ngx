@@ -12,9 +12,11 @@
     margin-right: 0 !important;
   }
 
-  main.col-lg-10 {
+  main {
     max-width: 100%;
     flex-basis: 100%;
+    width: 100% !important;
+    padding-left: 0 !important;
     display: block;
   }
 
