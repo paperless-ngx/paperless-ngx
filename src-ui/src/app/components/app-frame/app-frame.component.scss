@@ -254,6 +254,26 @@ main {
   }
 }
 
+.sidebar .nav-link:has(> .nav-link-label) {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+
+  > i-bs {
+    flex: 0 0 auto;
+  }
+
+  > .nav-link-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.sidebar:not(.slim):not(.animating) .nav-link > .nav-link-label {
+  overflow: hidden;
+}
+
 .sidebar .nav-anchor, .sidebar .nav-label {
   padding: .25rem .7rem;
 }
