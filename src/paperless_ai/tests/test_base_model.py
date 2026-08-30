@@ -43,6 +43,43 @@ def test_document_classifier_schema_declared_defaults():
     assert dumped["dates"] == []
 
 
+def test_flat_taxonomy_lists_are_normalized_for_legacy_model_responses():
+    """
+    GIVEN:
+        - A model response using the flat taxonomy lists accepted before 3.1
+        - Strings, integer candidate IDs, and a mixture of both
+    WHEN:
+        - DocumentClassifierSchema validates the response
+    THEN:
+        - Strings become new_names and integers become existing_ids
+
+    Some smaller models emit the old flat shape even when shown the nested
+    tool schema. Candidate IDs are still restricted to the IDs actually shown
+    to the model later in ai_classifier.py.
+    """
+    parsed = DocumentClassifierSchema(
+        title="Electricity Bill",
+        tags=["Utilities", "Electricity"],
+        correspondents=[12],
+        document_types=[34, "Utility Bill"],
+        storage_paths=["Finance/Utilities"],
+    )
+
+    assert parsed.tags == TaxonomyChoice(
+        existing_ids=[],
+        new_names=["Utilities", "Electricity"],
+    )
+    assert parsed.correspondents == TaxonomyChoice(existing_ids=[12], new_names=[])
+    assert parsed.document_types == TaxonomyChoice(
+        existing_ids=[34],
+        new_names=["Utility Bill"],
+    )
+    assert parsed.storage_paths == TaxonomyChoice(
+        existing_ids=[],
+        new_names=["Finance/Utilities"],
+    )
+
+
 def test_document_classifier_schema_json_schema_is_self_contained():
     """
     GIVEN:
