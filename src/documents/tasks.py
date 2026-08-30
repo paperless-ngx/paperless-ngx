@@ -312,7 +312,10 @@ def bulk_update_documents(document_ids) -> None:
     from documents.search import get_backend
 
     document_ids = list(document_ids)
-    # Annotated so indexing below doesn't query the versions of each document
+    # Annotated so the signal handlers below (e.g. matching) don't query the
+    # versions of each document. Indexing re-queries and re-annotates its own
+    # copy via add_or_update_ids() below, after these signals (and any
+    # workflow they trigger) have had a chance to mutate the documents.
     documents = annotate_effective_content(
         Document.objects.filter(id__in=document_ids),
     )
@@ -328,8 +331,7 @@ def bulk_update_documents(document_ids) -> None:
         post_save.send(Document, instance=doc, created=False)
 
     with get_backend().batch_update() as batch:
-        for doc in documents:
-            batch.add_or_update(doc)
+        batch.add_or_update_ids(document_ids)
 
     ai_config = AIConfig()
     if ai_config.llm_index_enabled:
