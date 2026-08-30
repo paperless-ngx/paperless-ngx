@@ -11,6 +11,7 @@
   border-right: 1px solid color-mix(in srgb, var(--bs-border-color) 65%, transparent);
   overflow-y: auto;
   --pngx-sidebar-width: 100%;
+  width: var(--pngx-sidebar-width);
   max-width: var(--pngx-sidebar-width);
   transition: all .2s ease;
 
@@ -32,17 +33,10 @@
     display: none !important;
   }
 
-  // These come from the col-* classes for non-slim sidebar, needed for animation
   @media (min-width: 768px) {
-    --pngx-sidebar-width: 25%;
-  }
-
-  @media (min-width: 992px) {
-    --pngx-sidebar-width: 16.66666667%;
-  }
-
-  @media (min-width: 2400px) {
-    --pngx-sidebar-width: 8.33333333%;
+    &.expanded {
+      --pngx-sidebar-width: var(--pngx-sidebar-expanded-width);
+    }
   }
 }
 @media (max-width: 767.98px) {
@@ -258,6 +252,26 @@ main {
     position: relative;
     top: -1px;
   }
+}
+
+.sidebar .nav-link:has(> .nav-link-label) {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+
+  > i-bs {
+    flex: 0 0 auto;
+  }
+
+  > .nav-link-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.sidebar:not(.slim):not(.animating) .nav-link > .nav-link-label {
+  overflow: hidden;
 }
 
 .sidebar .nav-anchor, .sidebar .nav-label {

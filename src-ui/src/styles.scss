@@ -52,20 +52,10 @@ $grid-breakpoints: (
   }
 }
 
-@media (min-width: 2400px) {
-  .col-xxxl-1 {
-    flex: 0 0 auto;
-    width: 8.33333333%;
-  }
-  .col-xxxl-11 {
-    flex: 0 0 auto;
-    width:91.66666667%
-  }
-}
-
 // Paperless-ngx styles
 body {
   --pngx-body-font-size: 0.875rem;
+  --pngx-sidebar-expanded-width: clamp(15rem, 16.66666667vw, 20rem);
   font-size: var(--pngx-body-font-size);
   height: 100vh;
   letter-spacing: -0.005em;
@@ -106,6 +96,15 @@ body {
 @media(min-width: 768px) {
   .col-slim {
     padding-left: calc(56px + $grid-gutter-width) !important;
+  }
+
+  .col-sidebar-expanded {
+    flex: 0 0 auto;
+    width: calc(100% - var(--pngx-sidebar-expanded-width));
+  }
+
+  .offset-sidebar-expanded {
+    margin-left: var(--pngx-sidebar-expanded-width);
   }
 }
 
