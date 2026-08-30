@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from pydantic import Field
 from pydantic import ValidationInfo
 from pydantic import field_validator
+from pydantic import model_validator
 from pydantic.fields import FieldInfo
 
 # taxonomy.py MAX_TAG_CANDIDATES = 10, prompt is "up to 3 relevant dates"
@@ -36,6 +37,27 @@ def _truncate_to_field_limit(value: Any, field: FieldInfo) -> Any:
 # should go here only.
 class TaxonomyChoice(BaseModel):
     """One field's suggestions: existing values to reuse, plus new ones to create."""
+
+    @model_validator(mode="before")
+    @classmethod
+    def _normalize_flat_list(cls, value: Any) -> Any:
+        """Accept the flat list shape used before 3.1 and still emitted by
+        some smaller models despite the nested tool schema. Strings are new
+        names and integers are candidate IDs; the latter remain subject to
+        the shown-candidate allowlist in ai_classifier.py.
+        """
+        if not isinstance(value, list):
+            return value
+        if not all(
+            isinstance(item, str)
+            or (isinstance(item, int) and not isinstance(item, bool))
+            for item in value
+        ):
+            return value
+        return {
+            "existing_ids": [item for item in value if isinstance(item, int)],
+            "new_names": [item for item in value if isinstance(item, str)],
+        }
 
     existing_ids: list[int] = Field(
         default_factory=list,
