@@ -606,10 +606,11 @@ def test_build_prompt_without_rag_includes_taxonomy_block():
     GIVEN:
         - Non-empty taxonomy candidates
     WHEN:
-        - build_prompt_without_rag() is called with candidates and assigned metadata
+        - build_prompt_without_rag() is called with candidates
     THEN:
-        - The candidate's id and the flat name/ID instructions appear
-        - Candidates are presented as deduplication options, not requirements
+        - The candidate and single-call reconciliation instructions appear
+        - Complete name suggestions remain mandatory
+        - Assigned metadata is not included
     """
     document = DocumentFactory.create(content="Some content")
     config = AIConfig()
@@ -619,40 +620,31 @@ def test_build_prompt_without_rag_includes_taxonomy_block():
         "correspondents": [],
         "storage_paths": [],
     }
-    assigned = {
-        "tags": [],
-        "document_type": None,
-        "correspondent": None,
-        "storage_path": None,
-    }
-
     prompt = build_prompt_without_rag(
         document,
         config,
         candidates=candidates,
-        assigned=assigned,
     )
 
     assert '"id": 12' in prompt
-    assert "tag_ids" in prompt
-    assert "correspondent_ids" in prompt
-    assert "not requirements" in prompt
-    assert "weak candidate" in prompt
+    assert "Always include every suggested name" in prompt
+    assert "matched_*" in prompt
+    assert "corresponding *_ids" in prompt
+    assert "Candidates must not create, replace, or suppress suggestions" in prompt
+    assert "already assigned" not in prompt
 
 
 @pytest.mark.django_db
-def test_build_prompt_without_rag_identical_when_no_hints():
+def test_build_prompt_without_rag_identical_when_no_candidates():
     """
     GIVEN:
-        - Empty taxonomy candidates and empty assigned metadata
+        - Empty taxonomy candidates
     WHEN:
         - build_prompt_without_rag() is called with those empty values, and
-          separately with no candidates/assigned at all
+          separately with no candidates at all
     THEN:
         - Both prompts are identical
-        - Neither carries the "Available ..." candidate block or the
-          id-vs-name routing instruction
-        - Both still tell the model to leave every ID field empty
+        - Neither carries candidate reconciliation instructions
     """
     document = DocumentFactory.create(content="Some content")
     config = AIConfig()
@@ -662,67 +654,37 @@ def test_build_prompt_without_rag_identical_when_no_hints():
         "correspondents": [],
         "storage_paths": [],
     }
-    empty_assigned = {
-        "tags": [],
-        "document_type": None,
-        "correspondent": None,
-        "storage_path": None,
-    }
-
     with_empty_hints = build_prompt_without_rag(
         document,
         config,
         candidates=empty_candidates,
-        assigned=empty_assigned,
     )
     with_no_hints = build_prompt_without_rag(document, config)
 
     assert with_empty_hints == with_no_hints
     assert "Available " not in with_no_hints
-    assert "put its id in the matching" not in with_no_hints
-    assert 'leave every field ending in "_ids" empty' in with_no_hints
+    assert "matched_*" not in with_no_hints
 
 
 @pytest.mark.django_db
-def test_build_prompt_without_rag_tells_model_to_skip_ids_when_no_candidates():
+def test_build_prompt_without_rag_never_includes_assigned_metadata():
     """
     GIVEN:
-        - Assigned metadata but empty taxonomy candidates
+        - A document with assigned taxonomy metadata
     WHEN:
-        - build_prompt_without_rag() is called with candidates and assigned metadata
+        - build_prompt_without_rag() is called
     THEN:
-        - The assigned-metadata block appears (taxonomy_block is non-empty)
-        - The prompt tells the model to leave every ID field empty
-
-    Staying silent about ID fields here is not enough: the response schema
-    advertises the field whatever the prompt says, and models fill it with
-    placeholder ids that resolve to real but unrelated objects (#13831).
+        - Assigned metadata is absent so it cannot anchor classification
     """
     document = DocumentFactory.create(content="Some content")
     config = AIConfig()
-    empty_candidates = {
-        "tags": [],
-        "document_types": [],
-        "correspondents": [],
-        "storage_paths": [],
-    }
-    assigned = {
-        "tags": ["Bloodwork"],
-        "document_type": None,
-        "correspondent": None,
-        "storage_path": None,
-    }
+    assigned_tag = TagFactory.create(name="Bloodwork")
+    document.tags.add(assigned_tag)
 
-    prompt = build_prompt_without_rag(
-        document,
-        config,
-        candidates=empty_candidates,
-        assigned=assigned,
-    )
+    prompt = build_prompt_without_rag(document, config)
 
-    assert "already assigned" in prompt
-    assert "No candidates are shown" in prompt
-    assert 'leave every field ending in "_ids" empty' in prompt
+    assert "Bloodwork" not in prompt
+    assert "already assigned" not in prompt
 
 
 @pytest.mark.django_db

@@ -48,75 +48,107 @@ class DocumentClassifierSchema(BaseModel):
         default_factory=list,
         max_length=MAX_NEW_NAMES,
         description=(
-            "Names of topic labels describing what this document is about, "
-            "e.g. 'Insurance', 'Car', 'Warranty'. When an available tag "
-            "represents the same label, use its ID in tag_ids instead."
+            "All topic labels you would suggest from the document itself, e.g. "
+            "'Insurance', 'Car', 'Warranty'. Always include every suggested "
+            "name here, even when it matches an available tag."
+        ),
+    )
+    matched_tags: list[str] = Field(
+        default_factory=list,
+        max_length=MAX_NEW_NAMES,
+        description=(
+            "Names copied exactly from tags that mean the same thing as an "
+            "available tag. Align each name by position with tag_ids."
         ),
     )
     tag_ids: list[int] = Field(
         default_factory=list,
         max_length=MAX_EXISTING_IDS,
         description=(
-            "IDs of available tags that clearly apply to this document. Only "
-            "use IDs shown in the prompt; never invent one or choose a weak match."
+            "Available tag IDs matching matched_tags, in the same order. "
+            "Only use IDs shown in the prompt."
         ),
     )
     correspondents: list[str] = Field(
         default_factory=list,
         max_length=MAX_NEW_NAMES,
         description=(
-            "Names of people, institutions or companies this document is from "
-            "or was sent to, not every party merely mentioned. When an "
-            "available correspondent is the same entity, use its ID in "
-            "correspondent_ids instead."
+            "All people, institutions or companies you would suggest as who "
+            "this document is from or was sent to, not every party merely "
+            "mentioned. Always include every suggested name here, even when it "
+            "matches an available correspondent."
+        ),
+    )
+    matched_correspondents: list[str] = Field(
+        default_factory=list,
+        max_length=MAX_NEW_NAMES,
+        description=(
+            "Names copied exactly from correspondents that identify the same "
+            "entity as an available correspondent. Align each name by position "
+            "with correspondent_ids."
         ),
     )
     correspondent_ids: list[int] = Field(
         default_factory=list,
         max_length=MAX_EXISTING_IDS,
         description=(
-            "IDs of available correspondents that clearly apply to this "
-            "document. Only use IDs shown in the prompt; never invent one or "
-            "choose a weak match."
+            "Available correspondent IDs matching matched_correspondents, in "
+            "the same order. Only use IDs shown in the prompt."
         ),
     )
     document_types: list[str] = Field(
         default_factory=list,
         max_length=MAX_NEW_NAMES,
         description=(
-            "Names describing what kind of document this is, e.g. 'Invoice', "
+            "All names describing what kind of document this is, e.g. 'Invoice', "
             "'Contract', 'Bank Statement', 'Letter'. Never use its subject or "
-            "sender as a document type. When an available document type is the "
-            "same kind, use its ID in document_type_ids instead."
+            "sender as a document type. Always include every suggested name "
+            "here, even when it matches an available document type."
+        ),
+    )
+    matched_document_types: list[str] = Field(
+        default_factory=list,
+        max_length=MAX_NEW_NAMES,
+        description=(
+            "Names copied exactly from document_types that mean the same thing "
+            "as an available document type. Align each name by position with "
+            "document_type_ids."
         ),
     )
     document_type_ids: list[int] = Field(
         default_factory=list,
         max_length=MAX_EXISTING_IDS,
         description=(
-            "IDs of available document types that clearly apply to this "
-            "document. Only use IDs shown in the prompt; never invent one or "
-            "choose a weak match."
+            "Available document type IDs matching matched_document_types, in "
+            "the same order. Only use IDs shown in the prompt."
         ),
     )
     storage_paths: list[str] = Field(
         default_factory=list,
         max_length=MAX_NEW_NAMES,
         description=(
-            "Names of folder-style filing locations, e.g. "
+            "All folder-style filing locations you would suggest, e.g. "
             "'Finance/Invoices'. Leave empty unless a filing location is "
             "clearly implied - never put tags, document types or "
-            "correspondents here. When an available storage path is the same "
-            "location, use its ID in storage_path_ids instead."
+            "correspondents here. Always include every suggested name here, "
+            "even when it matches an available storage path."
+        ),
+    )
+    matched_storage_paths: list[str] = Field(
+        default_factory=list,
+        max_length=MAX_NEW_NAMES,
+        description=(
+            "Names copied exactly from storage_paths that mean the same filing "
+            "location as an available storage path. Align each name by position "
+            "with storage_path_ids."
         ),
     )
     storage_path_ids: list[int] = Field(
         default_factory=list,
         max_length=MAX_EXISTING_IDS,
         description=(
-            "IDs of available storage paths that clearly apply to this "
-            "document. Only use IDs shown in the prompt; never invent one or "
-            "choose a weak match."
+            "Available storage path IDs matching matched_storage_paths, in the "
+            "same order. Only use IDs shown in the prompt."
         ),
     )
     dates: list[str] = Field(
@@ -132,12 +164,16 @@ class DocumentClassifierSchema(BaseModel):
     @field_validator(
         "title",
         "tags",
+        "matched_tags",
         "tag_ids",
         "correspondents",
+        "matched_correspondents",
         "correspondent_ids",
         "document_types",
+        "matched_document_types",
         "document_type_ids",
         "storage_paths",
+        "matched_storage_paths",
         "storage_path_ids",
         "dates",
         mode="before",
@@ -167,25 +203,64 @@ class ClassificationSuggestions(TypedDict):
 
 def model_to_classification_suggestions(
     model: DocumentClassifierSchema,
+    allowed_candidate_ids: dict[str, set[int]] | None = None,
 ) -> ClassificationSuggestions:
-    """Convert the flat, model-friendly response to the internal shape."""
+    """Validate optional candidate mappings and convert to the internal shape.
+
+    A mapping is accepted only when its name is copied from the model's own
+    complete suggestion list and its ID was actually shown for that category.
+    Invalid or unpaired mappings leave the original name untouched.
+    """
+    allowed_candidate_ids = allowed_candidate_ids or {}
+
+    def _choice(
+        names: list[str],
+        matched_names: list[str],
+        ids: list[int],
+        category: str,
+    ) -> TaxonomyChoiceDict:
+        remaining_names = list(names)
+        existing_ids: list[int] = []
+        allowed_ids = allowed_candidate_ids.get(category, set())
+        for name, object_id in zip(matched_names, ids, strict=False):
+            if (
+                name not in remaining_names
+                or object_id not in allowed_ids
+                or object_id in existing_ids
+            ):
+                continue
+            remaining_names.remove(name)
+            existing_ids.append(object_id)
+        return TaxonomyChoiceDict(
+            existing_ids=existing_ids,
+            new_names=remaining_names,
+        )
+
     return ClassificationSuggestions(
         title=model.title,
-        tags=TaxonomyChoiceDict(
-            existing_ids=model.tag_ids,
-            new_names=model.tags,
+        tags=_choice(
+            model.tags,
+            model.matched_tags,
+            model.tag_ids,
+            "tags",
         ),
-        correspondents=TaxonomyChoiceDict(
-            existing_ids=model.correspondent_ids,
-            new_names=model.correspondents,
+        correspondents=_choice(
+            model.correspondents,
+            model.matched_correspondents,
+            model.correspondent_ids,
+            "correspondents",
         ),
-        document_types=TaxonomyChoiceDict(
-            existing_ids=model.document_type_ids,
-            new_names=model.document_types,
+        document_types=_choice(
+            model.document_types,
+            model.matched_document_types,
+            model.document_type_ids,
+            "document_types",
         ),
-        storage_paths=TaxonomyChoiceDict(
-            existing_ids=model.storage_path_ids,
-            new_names=model.storage_paths,
+        storage_paths=_choice(
+            model.storage_paths,
+            model.matched_storage_paths,
+            model.storage_path_ids,
+            "storage_paths",
         ),
         dates=model.dates,
     )
@@ -198,12 +273,16 @@ def classification_suggestions_to_model(
     return DocumentClassifierSchema(
         title=suggestions["title"],
         tags=suggestions["tags"]["new_names"],
-        tag_ids=suggestions["tags"]["existing_ids"],
+        matched_tags=[],
+        tag_ids=[],
         correspondents=suggestions["correspondents"]["new_names"],
-        correspondent_ids=suggestions["correspondents"]["existing_ids"],
+        matched_correspondents=[],
+        correspondent_ids=[],
         document_types=suggestions["document_types"]["new_names"],
-        document_type_ids=suggestions["document_types"]["existing_ids"],
+        matched_document_types=[],
+        document_type_ids=[],
         storage_paths=suggestions["storage_paths"]["new_names"],
-        storage_path_ids=suggestions["storage_paths"]["existing_ids"],
+        matched_storage_paths=[],
+        storage_path_ids=[],
         dates=suggestions["dates"],
     )

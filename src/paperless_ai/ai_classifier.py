@@ -67,7 +67,6 @@ def build_prompt_without_rag(
     document: Document,
     config: AIConfig,
     candidates: TaxonomyCandidates | None = None,
-    assigned: AssignedMetadata | None = None,
 ) -> str:
     filename = document.filename or ""
     content = truncate_content(
@@ -77,9 +76,7 @@ def build_prompt_without_rag(
     )
 
     taxonomy_block = (
-        format_taxonomy_for_prompt(candidates, assigned)
-        if candidates is not None and assigned is not None
-        else ""
+        format_taxonomy_for_prompt(candidates) if candidates is not None else ""
     )
     has_candidates = candidates is not None and any(candidates.values())
 
@@ -97,14 +94,12 @@ def build_prompt_with_rag(
     document: Document,
     config: AIConfig,
     candidates: TaxonomyCandidates | None = None,
-    assigned: AssignedMetadata | None = None,
     context: str = "",
 ) -> str:
     base_prompt = build_prompt_without_rag(
         document,
         config,
         candidates=candidates,
-        assigned=assigned,
     )
     truncated_context = truncate_content(
         context,
@@ -277,28 +272,28 @@ def get_ai_document_classification(
     ai_config = AIConfig()
 
     if ai_config.llm_embedding_backend:
-        candidates, assigned, context = get_taxonomy_context(document, user)
+        candidates, _assigned, context = get_taxonomy_context(document, user)
         prompt = build_prompt_with_rag(
             document,
             ai_config,
             candidates=candidates,
-            assigned=assigned,
             context=context,
         )
     else:
         candidates = empty_taxonomy_candidates()
-        prompt = build_prompt_without_rag(
-            document,
-            ai_config,
-            candidates=candidates,
-            assigned=get_assigned_metadata(document, user),
-        )
+        prompt = build_prompt_without_rag(document, ai_config, candidates=candidates)
 
     client = AIClient()
     # Hand the pooled DB connection back while the (slow) LLM query runs so it
     # is not pinned for the call's duration; see paperless_ai.db and #12976.
     with db_connection_released():
-        result = client.run_llm_query(prompt)
+        result = client.run_llm_query(
+            prompt,
+            allowed_candidate_ids={
+                category: {candidate["id"] for candidate in values}
+                for category, values in candidates.items()
+            },
+        )
         suggestions = _restrict_to_shown_candidates(
             parse_ai_response(result),
             candidates,

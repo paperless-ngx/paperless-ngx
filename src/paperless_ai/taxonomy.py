@@ -245,7 +245,7 @@ def _assigned_block(assigned: AssignedMetadata) -> str:
 
 def format_taxonomy_for_prompt(
     candidates: TaxonomyCandidates,
-    assigned: AssignedMetadata,
+    assigned: AssignedMetadata | None = None,
 ) -> str:
     """Render assigned metadata and ranked candidates as labelled prompt
     blocks. Candidate names are untrusted, user-controlled data, so they are
@@ -255,7 +255,7 @@ def format_taxonomy_for_prompt(
     is nothing to say (no assigned metadata and no candidates), so callers can
     treat the result the same as no hints at all.
     """
-    has_assigned = any(
+    has_assigned = assigned is not None and any(
         [
             assigned["tags"],
             assigned["document_type"],
@@ -271,7 +271,11 @@ def format_taxonomy_for_prompt(
 
     return render_prompt(
         TaxonomyBlockPromptContext(
-            assigned_block=_assigned_block(assigned) if has_assigned else "",
+            assigned_block=(
+                _assigned_block(assigned)
+                if assigned is not None and has_assigned
+                else ""
+            ),
             candidate_payload_json=(
                 json.dumps(candidate_payload, ensure_ascii=False)
                 if candidate_payload

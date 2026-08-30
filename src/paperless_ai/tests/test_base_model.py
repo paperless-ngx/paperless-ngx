@@ -1,7 +1,6 @@
 import json
 
 from paperless_ai.base_model import MAX_DATES
-from paperless_ai.base_model import MAX_EXISTING_IDS
 from paperless_ai.base_model import MAX_NEW_NAMES
 from paperless_ai.base_model import MAX_TITLE_LENGTH
 from paperless_ai.base_model import ClassificationSuggestions
@@ -19,7 +18,7 @@ def test_document_classifier_schema_declared_defaults():
     WHEN:
         - The schema is dumped to a dict via model_dump()
     THEN:
-        - Every name and ID field, and dates, dump as empty lists
+        - Every optional name field, and dates, dump as empty lists
 
     The model may omit optional fields, so the schema must provide the complete
     empty shape expected by the conversion and matching pipeline.
@@ -31,54 +30,103 @@ def test_document_classifier_schema_declared_defaults():
     assert dumped == {
         "title": "Test Title",
         "tags": [],
+        "matched_tags": [],
         "tag_ids": [],
         "correspondents": [],
+        "matched_correspondents": [],
         "correspondent_ids": [],
         "document_types": [],
+        "matched_document_types": [],
         "document_type_ids": [],
         "storage_paths": [],
+        "matched_storage_paths": [],
         "storage_path_ids": [],
         "dates": [],
     }
 
 
-def test_flat_model_response_converts_to_internal_taxonomy_choices():
+def test_model_response_converts_names_to_internal_taxonomy_choices():
     """
     GIVEN:
-        - A flat model response with separate name and candidate-ID fields
+        - A model response containing taxonomy names
     WHEN:
         - It is converted to Paperless' internal suggestion representation
     THEN:
-        - Names and IDs are paired under their taxonomy category
+        - Names enter the internal taxonomy representation as new names
+        - Existing IDs remain empty for deterministic application-side matching
     """
     parsed = DocumentClassifierSchema(
         title="Electricity Bill",
         tags=["Utilities", "Electricity"],
-        tag_ids=[12],
         correspondents=["Power Company"],
-        correspondent_ids=[23],
         document_types=["Utility Bill"],
-        document_type_ids=[34],
         storage_paths=["Finance/Utilities"],
-        storage_path_ids=[45],
     )
     suggestions = model_to_classification_suggestions(parsed)
 
     assert suggestions["tags"] == {
-        "existing_ids": [12],
+        "existing_ids": [],
         "new_names": ["Utilities", "Electricity"],
     }
     assert suggestions["correspondents"] == {
-        "existing_ids": [23],
+        "existing_ids": [],
         "new_names": ["Power Company"],
     }
     assert suggestions["document_types"] == {
-        "existing_ids": [34],
+        "existing_ids": [],
         "new_names": ["Utility Bill"],
     }
     assert suggestions["storage_paths"] == {
-        "existing_ids": [45],
+        "existing_ids": [],
         "new_names": ["Finance/Utilities"],
+    }
+
+
+def test_valid_candidate_mappings_replace_only_the_matched_names():
+    parsed = DocumentClassifierSchema(
+        title="Electricity Bill",
+        tags=["Utilities", "Electricity"],
+        matched_tags=["Utilities"],
+        tag_ids=[12],
+        correspondents=["Power Company"],
+        matched_correspondents=["Power Company"],
+        correspondent_ids=[23],
+    )
+
+    suggestions = model_to_classification_suggestions(
+        parsed,
+        {
+            "tags": {12},
+            "correspondents": {23},
+        },
+    )
+
+    assert suggestions["tags"] == {
+        "existing_ids": [12],
+        "new_names": ["Electricity"],
+    }
+    assert suggestions["correspondents"] == {
+        "existing_ids": [23],
+        "new_names": [],
+    }
+
+
+def test_invalid_or_unpaired_candidate_mappings_do_not_remove_names():
+    parsed = DocumentClassifierSchema(
+        title="Electricity Bill",
+        tags=["Utilities", "Electricity", "Energy"],
+        matched_tags=["Invented", "Utilities", "Electricity"],
+        tag_ids=[12, 999],
+    )
+
+    suggestions = model_to_classification_suggestions(
+        parsed,
+        {"tags": {12}},
+    )
+
+    assert suggestions["tags"] == {
+        "existing_ids": [],
+        "new_names": ["Utilities", "Electricity", "Energy"],
     }
 
 
@@ -175,13 +223,11 @@ def test_over_long_response_is_truncated_rather_than_rejected():
     parsed = DocumentClassifierSchema(
         title="T" * (MAX_TITLE_LENGTH + 50),
         tags=["n"] * (MAX_NEW_NAMES + 20),
-        tag_ids=list(range(MAX_EXISTING_IDS + 20)),
         dates=[f"2016-{month:02d}-01" for month in range(1, 13)],
     )
 
     assert len(parsed.title) == MAX_TITLE_LENGTH
     assert len(parsed.dates) == MAX_DATES
-    assert len(parsed.tag_ids) == MAX_EXISTING_IDS
     assert len(parsed.tags) == MAX_NEW_NAMES
 
 
@@ -214,7 +260,7 @@ def test_model_conversion_matches_internal_typed_dict_keys():
         - The converted tags dict's keys exactly match TaxonomyChoiceDict's
           declared keys
     """
-    schema = DocumentClassifierSchema(title="T", tags=["Tag"], tag_ids=[1])
+    schema = DocumentClassifierSchema(title="T", tags=["Tag"])
     suggestions = model_to_classification_suggestions(schema)
 
     assert set(suggestions.keys()) == set(
@@ -225,7 +271,7 @@ def test_model_conversion_matches_internal_typed_dict_keys():
     )
 
 
-def test_internal_suggestions_round_trip_through_flat_model():
+def test_internal_suggestions_convert_to_names_only_model():
     suggestions = ClassificationSuggestions(
         title="Electricity Bill",
         tags=TaxonomyChoiceDict(existing_ids=[1], new_names=["Utilities"]),
@@ -246,4 +292,22 @@ def test_internal_suggestions_round_trip_through_flat_model():
 
     model = classification_suggestions_to_model(suggestions)
 
-    assert model_to_classification_suggestions(model) == suggestions
+    converted = model_to_classification_suggestions(model)
+
+    assert converted == ClassificationSuggestions(
+        title="Electricity Bill",
+        tags=TaxonomyChoiceDict(existing_ids=[], new_names=["Utilities"]),
+        correspondents=TaxonomyChoiceDict(
+            existing_ids=[],
+            new_names=["Power Company"],
+        ),
+        document_types=TaxonomyChoiceDict(
+            existing_ids=[],
+            new_names=["Utility Bill"],
+        ),
+        storage_paths=TaxonomyChoiceDict(
+            existing_ids=[],
+            new_names=["Finance/Utilities"],
+        ),
+        dates=["2026-08-30"],
+    )
