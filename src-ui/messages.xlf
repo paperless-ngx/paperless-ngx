@@ -1048,7 +1048,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.ts</context>
-          <context context-type="linenumber">124</context>
+          <context context-type="linenumber">130</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2818183879511244335" datatype="html">
@@ -3714,22 +3714,22 @@
         <source>Successfully updated object.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.ts</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">219</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.ts</context>
-          <context context-type="linenumber">251</context>
+          <context context-type="linenumber">257</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1801333259018423190" datatype="html">
         <source>Error occurred saving object.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.ts</context>
-          <context context-type="linenumber">216</context>
+          <context context-type="linenumber">222</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.ts</context>
-          <context context-type="linenumber">254</context>
+          <context context-type="linenumber">260</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8193912662253833654" datatype="html">
