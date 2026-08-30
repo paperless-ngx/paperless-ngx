@@ -264,6 +264,22 @@ def _restrict_to_shown_candidates(
     )
 
 
+def _candidate_id_allowlist(
+    candidates: TaxonomyCandidates,
+) -> dict[str, set[int]]:
+    """Candidate IDs grouped by category for validating model mappings."""
+    return {
+        "tags": {candidate["id"] for candidate in candidates["tags"]},
+        "document_types": {
+            candidate["id"] for candidate in candidates["document_types"]
+        },
+        "correspondents": {
+            candidate["id"] for candidate in candidates["correspondents"]
+        },
+        "storage_paths": {candidate["id"] for candidate in candidates["storage_paths"]},
+    }
+
+
 def get_ai_document_classification(
     document: Document,
     user: User | None = None,
@@ -289,10 +305,7 @@ def get_ai_document_classification(
     with db_connection_released():
         result = client.run_llm_query(
             prompt,
-            allowed_candidate_ids={
-                category: {candidate["id"] for candidate in values}
-                for category, values in candidates.items()
-            },
+            allowed_candidate_ids=_candidate_id_allowlist(candidates),
         )
         suggestions = _restrict_to_shown_candidates(
             parse_ai_response(result),
