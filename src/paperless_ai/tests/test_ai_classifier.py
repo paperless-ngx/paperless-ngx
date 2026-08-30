@@ -175,6 +175,7 @@ def test_get_ai_document_classification_failure(mock_run_llm_query, mock_documen
 @pytest.mark.django_db
 @patch("paperless_ai.client.AIClient.run_llm_query")
 @patch("paperless_ai.ai_classifier.build_prompt_with_rag")
+@patch("paperless_ai.ai_classifier.build_taxonomy_candidates")
 @patch("paperless_ai.ai_classifier.retrieve_similar_nodes")
 @override_settings(
     LLM_EMBEDDING_BACKEND="huggingface",
@@ -184,6 +185,7 @@ def test_get_ai_document_classification_failure(mock_run_llm_query, mock_documen
 )
 def test_use_rag_if_configured(
     mock_retrieve,
+    mock_build_candidates,
     mock_build_prompt_with_rag,
     mock_run_llm_query,
     mock_document,
@@ -195,12 +197,29 @@ def test_use_rag_if_configured(
         - get_ai_document_classification() is called
     THEN:
         - The RAG-augmented prompt builder is used
+        - Classification and candidate reconciliation happen in one LLM call
+        - Only candidate IDs from the permission-filtered candidate set are allowed
     """
     mock_retrieve.return_value = []
+    mock_build_candidates.return_value = TaxonomyCandidates(
+        tags=[TaxonomyCandidate(id=12, name="Contractor", weight=1.0)],
+        document_types=[],
+        correspondents=[],
+        storage_paths=[],
+    )
     mock_build_prompt_with_rag.return_value = "Prompt with RAG"
     mock_run_llm_query.return_value = NESTED_SUGGESTIONS
     get_ai_document_classification(mock_document)
     mock_build_prompt_with_rag.assert_called_once()
+    mock_run_llm_query.assert_called_once_with(
+        "Prompt with RAG",
+        allowed_candidate_ids={
+            "tags": {12},
+            "document_types": set(),
+            "correspondents": set(),
+            "storage_paths": set(),
+        },
+    )
 
 
 @pytest.mark.django_db
