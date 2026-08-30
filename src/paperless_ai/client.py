@@ -19,7 +19,9 @@ from paperless.network import PinnedHostHTTPTransport
 from paperless.network import create_pinned_async_httpx_client
 from paperless.network import create_pinned_httpx_client
 from paperless.network import validate_outbound_http_url
+from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.base_model import DocumentClassifierSchema
+from paperless_ai.base_model import model_to_classification_suggestions
 from paperless_ai.exceptions import LLMTimeoutError
 
 logger = logging.getLogger("paperless_ai.client")
@@ -115,7 +117,7 @@ class AIClient:
         else:
             raise ValueError(f"Unsupported LLM backend: {self.settings.llm_backend}")
 
-    def run_llm_query(self, prompt: str) -> str:
+    def run_llm_query(self, prompt: str) -> ClassificationSuggestions:
         logger.debug(
             "Running LLM query against %s with model %s",
             self.settings.llm_backend,
@@ -134,7 +136,7 @@ class AIClient:
                 )
             logger.debug("LLM query result: %s", result)
             parsed = DocumentClassifierSchema(**json.loads(result.message.content))
-            return parsed.model_dump()
+            return model_to_classification_suggestions(parsed)
 
         from llama_index.core.program.function_program import get_function_tool
 
@@ -153,7 +155,7 @@ class AIClient:
             )
         logger.debug("LLM query result: %s", tool_calls)
         parsed = DocumentClassifierSchema(**tool_calls[0].tool_kwargs)
-        return parsed.model_dump()
+        return model_to_classification_suggestions(parsed)
 
     @contextmanager
     def _normalize_timeouts(self) -> Iterator[None]:

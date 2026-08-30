@@ -123,10 +123,14 @@ def test_run_llm_query_ollama_uses_structured_json(mock_ai_config, mock_ollama_l
     mock_llm_instance.chat.return_value.message.content = json.dumps(
         {
             "title": "Test Title",
-            "tags": {"existing_ids": [1], "new_names": ["document"]},
-            "correspondents": {"existing_ids": [], "new_names": ["John Doe"]},
-            "document_types": {"existing_ids": [], "new_names": ["report"]},
-            "storage_paths": {"existing_ids": [], "new_names": ["Reports"]},
+            "tags": ["document"],
+            "tag_ids": [1],
+            "correspondents": ["John Doe"],
+            "correspondent_ids": [],
+            "document_types": ["report"],
+            "document_type_ids": [],
+            "storage_paths": ["Reports"],
+            "storage_path_ids": [],
             "dates": ["2023-01-01"],
         },
     )
@@ -156,10 +160,14 @@ def test_run_llm_query_openai_uses_tools(mock_ai_config, mock_openai_llm):
         tool_name="DocumentClassifierSchema",
         tool_kwargs={
             "title": "Test Title",
-            "tags": {"existing_ids": [1], "new_names": ["document"]},
-            "correspondents": {"existing_ids": [], "new_names": ["John Doe"]},
-            "document_types": {"existing_ids": [], "new_names": ["report"]},
-            "storage_paths": {"existing_ids": [], "new_names": ["Reports"]},
+            "tags": ["document"],
+            "tag_ids": [1],
+            "correspondents": ["John Doe"],
+            "correspondent_ids": [],
+            "document_types": ["report"],
+            "document_type_ids": [],
+            "storage_paths": ["Reports"],
+            "storage_path_ids": [],
             "dates": ["2023-01-01"],
         },
     )

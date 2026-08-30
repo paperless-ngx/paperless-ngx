@@ -1,4 +1,3 @@
-import json
 import logging
 
 from django.conf import settings
@@ -9,6 +8,7 @@ from documents.permissions import get_objects_for_user_owner_aware
 from paperless.config import AIConfig
 from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.base_model import TaxonomyChoiceDict
+from paperless_ai.base_model import classification_suggestions_to_model
 from paperless_ai.client import AIClient
 from paperless_ai.db import db_connection_released
 from paperless_ai.indexing import _node_document_ids
@@ -124,20 +124,16 @@ def build_localization_prompt(
     suggestions: ClassificationSuggestions,
     output_language: str,
 ) -> str:
-    """``suggestions`` is the full nested-shape result of parse_ai_response
-    (each taxonomy field a ``{"existing_ids": [...], "new_names": [...]}``
-    dict) - passed through as-is so the model receives and returns the exact
-    DocumentClassifierSchema shape run_llm_query() always parses against.
-    Only each field's new_names (never existing_ids, which are plain
-    resolved-object IDs, not text) and title get used from the response; see
-    get_ai_document_classification's merge step, which always keeps the
-    *original* existing_ids regardless of what the model echoes back here.
+    """Render internal suggestions in the same flat shape the model returns.
+    Only the name fields and title are used from the localized response; the
+    merge step always keeps the original ID fields.
     """
     language_name = get_language_name(output_language)
+    model_suggestions = classification_suggestions_to_model(suggestions)
     return render_prompt(
         LocalizationPromptContext(
             language_name=language_name,
-            suggestions_json=json.dumps(suggestions, ensure_ascii=False),
+            suggestions_json=model_suggestions.model_dump_json(),
         ),
     )
 
@@ -208,11 +204,9 @@ def get_taxonomy_context(
 
 
 def parse_ai_response(raw: dict) -> ClassificationSuggestions:
-    """``raw`` is AIClient.run_llm_query()'s return value - already a
-    DocumentClassifierSchema.model_dump(), so every key below is always
-    present with the right shape; this only exists to give the rest of the
-    module a named, typed boundary instead of passing the client's bare dict
-    straight through everywhere.
+    """``raw`` is AIClient.run_llm_query()'s validated internal-shape result.
+    This gives the rest of the module a named, typed boundary instead of
+    passing the client's bare dict straight through everywhere.
     """
 
     def _choice(value: dict | None) -> TaxonomyChoiceDict:
