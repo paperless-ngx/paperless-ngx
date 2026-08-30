@@ -25,7 +25,7 @@
 
       <div ngbDropdownMenu aria-labelledby="suggestionsDropdown" class="shadow suggestions-dropdown">
         <div class="list-group list-group-flush small pb-0">
-          @if (totalSuggestions === 0) {
+          @if (novelSuggestions === 0 && reusableSuggestions === 0) {
             <div class="list-group-item text-muted fst-italic">
               <small class="text-muted small fst-italic" i18n>No novel suggestions</small>
             </div>
@@ -47,6 +47,11 @@
             @for (correspondent of suggestions().suggested_correspondents; track correspondent) {
               <button type="button" class="list-group-item list-group-item-action bg-light" (click)="addCorrespondent.emit(correspondent)">{{ correspondent }}</button>
             }
+          }
+          @if (reusableSuggestions > 0) {
+            <div class="list-group-item text-muted fst-italic">
+              <small class="text-muted small fst-italic" i18n>{reusableSuggestions, plural, =1 {1 existing value suggested below} other {{{reusableSuggestions}} existing values suggested below}}</small>
+            </div>
           }
         </div>
       </div>
