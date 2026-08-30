@@ -14,8 +14,6 @@ from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import restrict_queryset_to_visible
-from documents.permissions import user_is_unrestricted
-from paperless_ai.prompts.context import AssignedBlockPromptContext
 from paperless_ai.prompts.context import TaxonomyBlockPromptContext
 from paperless_ai.prompts.render import render_prompt
 
@@ -40,13 +38,6 @@ class TaxonomyCandidates(TypedDict):
     storage_paths: list[TaxonomyCandidate]
 
 
-class AssignedMetadata(TypedDict):
-    tags: list[str]
-    document_type: str | None
-    correspondent: str | None
-    storage_path: str | None
-
-
 def empty_taxonomy_candidates() -> TaxonomyCandidates:
     """No candidates in any category - what callers use when retrieval was
     skipped or failed."""
@@ -55,53 +46,6 @@ def empty_taxonomy_candidates() -> TaxonomyCandidates:
         document_types=[],
         correspondents=[],
         storage_paths=[],
-    )
-
-
-def _visible_name(
-    obj: Model | None,
-    user: User | None,
-    perm: str,
-) -> str | None:
-    """``obj``'s name if ``user`` may see it under ``perm``, else None - a
-    document being visible to a user does not imply every object assigned to
-    it is (per-object guardian permissions can differ), so each assigned
-    relation is checked individually rather than trusted because it's
-    already sitting on a document this user can open.
-
-    Checks user_is_unrestricted() before ever touching type(obj).objects, so
-    the common "no restriction" case (no user, or an active superuser) never
-    needs obj to be backed by a real queryable row.
-    """
-    if obj is None:
-        return None
-    if user_is_unrestricted(user):
-        return obj.name
-    visible = restrict_queryset_to_visible(
-        type(obj).objects.filter(pk=obj.pk),
-        user,
-        perm,
-    )
-    return obj.name if visible.exists() else None
-
-
-def get_assigned_metadata(document: Document, user: User | None) -> AssignedMetadata:
-    """The document's own current taxonomy. Authoritative context, not a
-    candidate list - the model is never asked to add, remove, or replace
-    these values, only to use them when helpful for the title and for
-    fields that are still empty.
-
-    Permission-filtered the same way build_taxonomy_candidates() is: a
-    document a user may change/view does not imply every tag/type/
-    correspondent/storage_path assigned to it is visible to that same user,
-    so names the user cannot see are never surfaced into the prompt.
-    """
-    visible_tags = restrict_queryset_to_visible(document.tags.all(), user, "view_tag")
-    return AssignedMetadata(
-        tags=sorted(tag.name for tag in visible_tags),
-        document_type=_visible_name(document.document_type, user, "view_documenttype"),
-        correspondent=_visible_name(document.correspondent, user, "view_correspondent"),
-        storage_path=_visible_name(document.storage_path, user, "view_storagepath"),
     )
 
 
@@ -232,37 +176,17 @@ def build_taxonomy_candidates(
     )
 
 
-def _assigned_block(assigned: AssignedMetadata) -> str:
-    return render_prompt(
-        AssignedBlockPromptContext(
-            tags=assigned["tags"],
-            document_type=assigned["document_type"],
-            correspondent=assigned["correspondent"],
-            storage_path=assigned["storage_path"],
-        ),
-    )
-
-
 def format_taxonomy_for_prompt(
     candidates: TaxonomyCandidates,
-    assigned: AssignedMetadata | None = None,
 ) -> str:
-    """Render assigned metadata and ranked candidates as labelled prompt
-    blocks. Candidate names are untrusted, user-controlled data, so they are
+    """Render ranked candidates as a labelled prompt block.
+
+    Candidate names are untrusted, user-controlled data, so they are
     JSON-serialized (id/name only - weight is an internal ranking detail)
     rather than bullet-rendered, matching the untrusted-data handling already
     used for document content elsewhere in this module. Returns "" when there
-    is nothing to say (no assigned metadata and no candidates), so callers can
-    treat the result the same as no hints at all.
+    are no candidates, so callers can treat the result the same as no hints at all.
     """
-    has_assigned = assigned is not None and any(
-        [
-            assigned["tags"],
-            assigned["document_type"],
-            assigned["correspondent"],
-            assigned["storage_path"],
-        ],
-    )
     candidate_payload = {
         key: [{"id": c["id"], "name": c["name"]} for c in values]
         for key, values in candidates.items()
@@ -271,11 +195,6 @@ def format_taxonomy_for_prompt(
 
     return render_prompt(
         TaxonomyBlockPromptContext(
-            assigned_block=(
-                _assigned_block(assigned)
-                if assigned is not None and has_assigned
-                else ""
-            ),
             candidate_payload_json=(
                 json.dumps(candidate_payload, ensure_ascii=False)
                 if candidate_payload

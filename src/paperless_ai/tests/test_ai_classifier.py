@@ -12,18 +12,14 @@ from documents.tests.factories import DocumentFactory
 from documents.tests.factories import TagFactory
 from documents.tests.factories import UserFactory
 from paperless.config import AIConfig
-from paperless_ai.ai_classifier import _restrict_to_shown_candidates
 from paperless_ai.ai_classifier import build_localization_prompt
 from paperless_ai.ai_classifier import build_prompt_with_rag
 from paperless_ai.ai_classifier import build_prompt_without_rag
 from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.ai_classifier import get_language_name
 from paperless_ai.ai_classifier import get_taxonomy_context
-from paperless_ai.base_model import ClassificationSuggestions
-from paperless_ai.base_model import TaxonomyChoiceDict
 from paperless_ai.taxonomy import TaxonomyCandidate
 from paperless_ai.taxonomy import TaxonomyCandidates
-from paperless_ai.taxonomy import empty_taxonomy_candidates
 
 
 @pytest.fixture
@@ -45,7 +41,7 @@ def mock_document():
     doc.document_type.name = "Invoice"
     doc.correspondent = MagicMock()
     doc.correspondent.name = "Test Correspondent"
-    doc.storage_path = None  # get_assigned_metadata reads this directly
+    doc.storage_path = None
     doc.archive_serial_number = "12345"
     doc.content = "This is the document content."
 
@@ -333,7 +329,6 @@ def test_get_taxonomy_context_assembles_rag_text_and_candidates():
     THEN:
         - The neighbour's tag appears in the taxonomy candidates
         - The neighbour's title/content appear in the RAG text context
-        - The document's own (empty) assigned metadata is returned
     """
     tag = TagFactory.create(name="Bloodwork")
     neighbour = DocumentFactory.create(
@@ -351,17 +346,11 @@ def test_get_taxonomy_context_assembles_rag_text_and_candidates():
         "paperless_ai.ai_classifier.retrieve_similar_nodes",
         return_value=[fake_node],
     ):
-        candidates, assigned, context = get_taxonomy_context(document, user=None)
+        candidates, context = get_taxonomy_context(document, user=None)
 
     assert candidates["tags"][0]["name"] == "Bloodwork"
     assert "TITLE: Neighbour Title" in context
     assert "Content of neighbour document" in context
-    assert assigned == {
-        "tags": [],
-        "document_type": None,
-        "correspondent": None,
-        "storage_path": None,
-    }
 
 
 @pytest.mark.django_db
@@ -422,7 +411,7 @@ def test_get_taxonomy_context_preserves_similarity_order_and_distinct_documents(
         "paperless_ai.ai_classifier.retrieve_similar_nodes",
         return_value=fake_nodes,
     ):
-        _candidates, _assigned, context = get_taxonomy_context(
+        _candidates, context = get_taxonomy_context(
             document,
             user=None,
             max_docs=2,
@@ -447,7 +436,7 @@ def test_get_taxonomy_context_no_similar_docs():
     document = DocumentFactory.create(content="Some content")
 
     with patch("paperless_ai.ai_classifier.retrieve_similar_nodes", return_value=[]):
-        candidates, _assigned, context = get_taxonomy_context(document, user=None)
+        candidates, context = get_taxonomy_context(document, user=None)
 
     assert context == ""
     assert candidates == {
@@ -574,7 +563,7 @@ def test_get_taxonomy_context_retrieval_failure_degrades_to_no_hints(mock_retrie
     document = DocumentFactory.create(content="Some content")
     mock_retrieve.side_effect = RuntimeError("vector store unavailable")
 
-    candidates, _assigned, rag_context = get_taxonomy_context(document, user=None)
+    candidates, rag_context = get_taxonomy_context(document, user=None)
 
     assert candidates == {
         "tags": [],
@@ -608,7 +597,7 @@ def test_get_taxonomy_context_candidate_building_failure_degrades_to_no_hints(
     mock_retrieve.return_value = []
     mock_build_candidates.side_effect = RuntimeError("permission backend unavailable")
 
-    candidates, _assigned, rag_context = get_taxonomy_context(document, user=None)
+    candidates, rag_context = get_taxonomy_context(document, user=None)
 
     assert candidates == {
         "tags": [],
@@ -768,86 +757,3 @@ def test_get_ai_document_classification_localizes_only_new_names(
     assert "Contractor Work" in localization_prompt
     assert result["tags"]["existing_ids"] == [12]  # untouched by localization
     assert result["tags"]["new_names"] == ["Auftragsarbeit"]
-
-
-class TestRestrictToShownCandidates:
-    def test_hallucinated_id_not_among_candidates_is_dropped(self) -> None:
-        """
-        GIVEN:
-            - A tag candidate shown to the model with id=12
-            - A model response with existing_ids=[12, 999] for tags, where
-              999 was never offered as a candidate
-        WHEN:
-            - _restrict_to_shown_candidates() is called
-        THEN:
-            - Only the id that was actually shown survives; the hallucinated
-              id is dropped rather than being trusted to resolve to whatever
-              real, visible, unrelated object it happens to match
-        """
-        suggestions = ClassificationSuggestions(
-            title="T",
-            tags=TaxonomyChoiceDict(existing_ids=[12, 999], new_names=[]),
-            correspondents=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
-            document_types=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
-            storage_paths=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
-            dates=[],
-        )
-        candidates = TaxonomyCandidates(
-            tags=[TaxonomyCandidate(id=12, name="Contractor", weight=1.0)],
-            document_types=[],
-            correspondents=[],
-            storage_paths=[],
-        )
-
-        result = _restrict_to_shown_candidates(suggestions, candidates)
-
-        assert result["tags"]["existing_ids"] == [12]
-
-    def test_no_candidates_shown_drops_every_existing_id(self) -> None:
-        """
-        GIVEN:
-            - No candidates were shown in any category
-            - A model response with existing_ids populated anyway
-        WHEN:
-            - _restrict_to_shown_candidates() is called
-        THEN:
-            - Every existing_id is dropped across all four categories - an
-              id can only be trusted if the prompt actually offered it
-        """
-        suggestions = ClassificationSuggestions(
-            title="T",
-            tags=TaxonomyChoiceDict(existing_ids=[1], new_names=[]),
-            correspondents=TaxonomyChoiceDict(existing_ids=[2], new_names=[]),
-            document_types=TaxonomyChoiceDict(existing_ids=[3], new_names=[]),
-            storage_paths=TaxonomyChoiceDict(existing_ids=[4], new_names=[]),
-            dates=[],
-        )
-
-        result = _restrict_to_shown_candidates(suggestions, empty_taxonomy_candidates())
-
-        assert result["tags"]["existing_ids"] == []
-        assert result["correspondents"]["existing_ids"] == []
-        assert result["document_types"]["existing_ids"] == []
-        assert result["storage_paths"]["existing_ids"] == []
-
-    def test_new_names_are_never_touched(self) -> None:
-        """
-        GIVEN:
-            - A model response with new_names populated
-        WHEN:
-            - _restrict_to_shown_candidates() is called
-        THEN:
-            - new_names passes through unchanged regardless of candidates
-        """
-        suggestions = ClassificationSuggestions(
-            title="T",
-            tags=TaxonomyChoiceDict(existing_ids=[], new_names=["Brand New Tag"]),
-            correspondents=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
-            document_types=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
-            storage_paths=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
-            dates=[],
-        )
-
-        result = _restrict_to_shown_candidates(suggestions, empty_taxonomy_candidates())
-
-        assert result["tags"]["new_names"] == ["Brand New Tag"]

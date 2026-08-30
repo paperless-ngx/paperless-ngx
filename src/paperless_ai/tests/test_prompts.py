@@ -1,6 +1,5 @@
 import pytest
 
-from paperless_ai.prompts.context import AssignedBlockPromptContext
 from paperless_ai.prompts.context import ChatQaPromptContext
 from paperless_ai.prompts.context import ChatRefinePromptContext
 from paperless_ai.prompts.context import ClassificationPromptContext
@@ -12,64 +11,16 @@ from paperless_ai.prompts.render import render_prompt
 
 
 class TestRenderPrompt:
-    def test_renders_assigned_block_with_all_fields_set(self) -> None:
+    def test_renders_taxonomy_block_empty_when_candidates_empty(self) -> None:
         """
         GIVEN:
-            - An AssignedBlockPromptContext with every field populated
-        WHEN:
-            - render_prompt() is called
-        THEN:
-            - The rendered text contains the labeled header and each value
-        """
-        context = AssignedBlockPromptContext(
-            tags=["Bloodwork", "Urgent"],
-            document_type="Invoice",
-            correspondent="Acme Corp",
-            storage_path="/invoices",
-        )
-
-        result = render_prompt(context)
-
-        assert "already assigned" in result
-        assert "Tags: Bloodwork, Urgent" in result
-        assert "Document Type: Invoice" in result
-        assert "Correspondent: Acme Corp" in result
-        assert "Storage Path: /invoices" in result
-
-    def test_renders_assigned_block_defaults_for_empty_fields(self) -> None:
-        """
-        GIVEN:
-            - An AssignedBlockPromptContext with no values set
-        WHEN:
-            - render_prompt() is called
-        THEN:
-            - Each field falls back to its "(none)"/"(not set)" placeholder
-        """
-        context = AssignedBlockPromptContext(
-            tags=[],
-            document_type=None,
-            correspondent=None,
-            storage_path=None,
-        )
-
-        result = render_prompt(context)
-
-        assert "Tags: (none)" in result
-        assert "Document Type: (not set)" in result
-        assert "Correspondent: (not set)" in result
-        assert "Storage Path: (not set)" in result
-
-    def test_renders_taxonomy_block_empty_when_both_fields_empty(self) -> None:
-        """
-        GIVEN:
-            - A TaxonomyBlockPromptContext with both fields empty
+            - A TaxonomyBlockPromptContext with no candidate payload
         WHEN:
             - render_prompt() is called
         THEN:
             - The result is an empty string
         """
         context = TaxonomyBlockPromptContext(
-            assigned_block="",
             candidate_payload_json="",
         )
 
@@ -94,14 +45,7 @@ _MINIMAL_CONTEXTS = {
         suggestions_json="{}",
     ),
     PromptName.TAXONOMY_BLOCK: TaxonomyBlockPromptContext(
-        assigned_block="",
         candidate_payload_json="",
-    ),
-    PromptName.ASSIGNED_BLOCK: AssignedBlockPromptContext(
-        tags=[],
-        document_type=None,
-        correspondent=None,
-        storage_path=None,
     ),
     PromptName.CHAT_QA: ChatQaPromptContext(output_language=None),
     PromptName.CHAT_REFINE: ChatRefinePromptContext(output_language=None),
