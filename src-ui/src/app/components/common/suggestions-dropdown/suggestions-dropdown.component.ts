@@ -56,9 +56,9 @@ export class SuggestionsDropdownComponent {
 
   get totalSuggestions(): number {
     return (
-      this.suggestions()?.suggested_correspondents?.length +
-        this.suggestions()?.suggested_tags?.length +
-        this.suggestions()?.suggested_document_types?.length || 0
+      (this.suggestions()?.suggested_correspondents?.length ?? 0) +
+      (this.suggestions()?.suggested_tags?.length ?? 0) +
+      (this.suggestions()?.suggested_document_types?.length ?? 0)
     )
   }
 

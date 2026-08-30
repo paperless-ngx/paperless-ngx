@@ -21,13 +21,21 @@ describe('SuggestionsDropdownComponent', () => {
     fixture.detectChanges()
   })
 
-  it('should calculate totalSuggestions', () => {
+  it('should calculate totalSuggestions, excluding storage paths', () => {
     fixture.componentRef.setInput('suggestions', {
       suggested_correspondents: ['John Doe'],
       suggested_tags: ['Tag1', 'Tag2'],
       suggested_document_types: ['Type1'],
+      suggested_storage_paths: ['Finance/Invoices'],
     })
     expect(component.totalSuggestions).toBe(4)
+  })
+
+  it('should count suggestions when a category is absent from the response', () => {
+    fixture.componentRef.setInput('suggestions', {
+      suggested_tags: ['Tag1'],
+    })
+    expect(component.totalSuggestions).toBe(1)
   })
 
   it('should show when a completed request returned no suggestions', () => {
