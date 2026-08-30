@@ -13,10 +13,10 @@ Analyze the following document and fill in these fields:
 - dates: up to 3 relevant dates in YYYY-MM-DD format
 {% if has_candidates %}
 
-For tags, correspondents, document types, and storage paths: first decide whether there is a useful, well-supported suggestion. If an available candidate clearly represents that suggestion, put its id in existing_ids instead of duplicating it in new_names. If no candidate represents the suggestion, put its name in new_names. Do not choose a weak candidate merely because it exists.
+For tags, correspondents, document types, and storage paths: first decide whether there is a useful, well-supported suggestion. If an available candidate clearly represents that suggestion, put its id in the matching tag_ids, correspondent_ids, document_type_ids, or storage_path_ids field instead of repeating its name. If no candidate represents the suggestion, put its name in tags, correspondents, document_types, or storage_paths. Do not choose a weak candidate merely because it exists.
 {% else %}
 
-No candidates are shown for this document, so leave every existing_ids list empty and put each suggestion's name in new_names.
+No candidates are shown for this document, so leave every field ending in "_ids" empty and put suggestions in the corresponding name fields.
 {% endif %}
 
 Filename:

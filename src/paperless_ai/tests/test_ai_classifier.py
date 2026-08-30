@@ -245,7 +245,7 @@ def test_prompt_with_without_rag(mock_document):
     THEN:
         - build_prompt_without_rag() has no similar-documents section
         - build_prompt_with_rag() includes the similar-documents context
-        - build_localization_prompt() asks to rewrite only new_names/title and
+        - build_localization_prompt() asks to rewrite only names/title and
           not to translate correspondents or dates
     """
     config = AIConfig()
@@ -264,6 +264,7 @@ def test_prompt_with_without_rag(mock_document):
     prompt = build_localization_prompt(NESTED_SUGGESTIONS, output_language="de-de")
     assert "Rewrite only the" in prompt
     assert "Do not translate correspondents or dates" in prompt
+    assert '"tag_ids":[]' in prompt
 
 
 def test_get_language_name_falls_back_to_language_code():
@@ -607,7 +608,7 @@ def test_build_prompt_without_rag_includes_taxonomy_block():
     WHEN:
         - build_prompt_without_rag() is called with candidates and assigned metadata
     THEN:
-        - The candidate's id and the existing_ids/new_names instructions appear
+        - The candidate's id and the flat name/ID instructions appear
         - Candidates are presented as deduplication options, not requirements
     """
     document = DocumentFactory.create(content="Some content")
@@ -633,8 +634,8 @@ def test_build_prompt_without_rag_includes_taxonomy_block():
     )
 
     assert '"id": 12' in prompt
-    assert "existing_ids" in prompt
-    assert "new_names" in prompt
+    assert "tag_ids" in prompt
+    assert "correspondent_ids" in prompt
     assert "not requirements" in prompt
     assert "weak candidate" in prompt
 
@@ -651,7 +652,7 @@ def test_build_prompt_without_rag_identical_when_no_hints():
         - Both prompts are identical
         - Neither carries the "Available ..." candidate block or the
           id-vs-name routing instruction
-        - Both still tell the model to leave existing_ids empty
+        - Both still tell the model to leave every ID field empty
     """
     document = DocumentFactory.create(content="Some content")
     config = AIConfig()
@@ -678,8 +679,8 @@ def test_build_prompt_without_rag_identical_when_no_hints():
 
     assert with_empty_hints == with_no_hints
     assert "Available " not in with_no_hints
-    assert "put its id in existing_ids" not in with_no_hints
-    assert "leave every existing_ids list empty" in with_no_hints
+    assert "put its id in the matching" not in with_no_hints
+    assert 'leave every field ending in "_ids" empty' in with_no_hints
 
 
 @pytest.mark.django_db
@@ -691,9 +692,9 @@ def test_build_prompt_without_rag_tells_model_to_skip_ids_when_no_candidates():
         - build_prompt_without_rag() is called with candidates and assigned metadata
     THEN:
         - The assigned-metadata block appears (taxonomy_block is non-empty)
-        - The prompt tells the model to leave existing_ids empty
+        - The prompt tells the model to leave every ID field empty
 
-    Staying silent about existing_ids here is not enough: the response schema
+    Staying silent about ID fields here is not enough: the response schema
     advertises the field whatever the prompt says, and models fill it with
     placeholder ids that resolve to real but unrelated objects (#13831).
     """
@@ -721,7 +722,7 @@ def test_build_prompt_without_rag_tells_model_to_skip_ids_when_no_candidates():
 
     assert "already assigned" in prompt
     assert "No candidates are shown" in prompt
-    assert "leave every existing_ids list empty" in prompt
+    assert 'leave every field ending in "_ids" empty' in prompt
 
 
 @pytest.mark.django_db

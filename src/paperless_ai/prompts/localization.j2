@@ -1,6 +1,6 @@
 You are localizing document classification suggestions for display in Paperless-ngx.
 
-Rewrite only the "title" field and each taxonomy field's "new_names" list in {{ language_name }}. Leave every "existing_ids" list exactly as given - these are database identifiers, not text, and are not used from your response even if changed.
+Rewrite only the "title", "tags", "document_types", and "storage_paths" fields in {{ language_name }}. Leave every field ending in "_ids" exactly as given - these are database identifiers, not text, and are not used from your response even if changed.
 
 Do not translate correspondents or dates.
 Preserve proper nouns, organization names, product names, and exact official document names. Translate generic category words when a {{ language_name }} equivalent exists.

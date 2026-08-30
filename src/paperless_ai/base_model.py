@@ -6,7 +6,6 @@ from pydantic import BaseModel
 from pydantic import Field
 from pydantic import ValidationInfo
 from pydantic import field_validator
-from pydantic import model_validator
 from pydantic.fields import FieldInfo
 
 # taxonomy.py MAX_TAG_CANDIDATES = 10, prompt is "up to 3 relevant dates"
@@ -32,59 +31,9 @@ def _truncate_to_field_limit(value: Any, field: FieldInfo) -> Any:
     )
 
 
-# Docstrings and field descriptions on both models below are serialized into
-# the schema handed to the LLM, so write them for the model. Code comments
-# should go here only.
-class TaxonomyChoice(BaseModel):
-    """One field's suggestions: existing values to reuse, plus new ones to create."""
-
-    @model_validator(mode="before")
-    @classmethod
-    def _normalize_flat_list(cls, value: Any) -> Any:
-        """Accept the flat list shape used before 3.1 and still emitted by
-        some smaller models despite the nested tool schema. Strings are new
-        names and integers are candidate IDs; the latter remain subject to
-        the shown-candidate allowlist in ai_classifier.py.
-        """
-        if not isinstance(value, list):
-            return value
-        if not all(
-            isinstance(item, str)
-            or (isinstance(item, int) and not isinstance(item, bool))
-            for item in value
-        ):
-            return value
-        return {
-            "existing_ids": [item for item in value if isinstance(item, int)],
-            "new_names": [item for item in value if isinstance(item, str)],
-        }
-
-    existing_ids: list[int] = Field(
-        default_factory=list,
-        max_length=MAX_EXISTING_IDS,
-        description=(
-            "IDs from the candidate list shown in the prompt that clearly "
-            "represent values you would suggest for this field. Never invent "
-            "an ID, select a weak match merely because it exists, or use an "
-            "ID when no candidates are shown."
-        ),
-    )
-    new_names: list[str] = Field(
-        default_factory=list,
-        max_length=MAX_NEW_NAMES,
-        description=(
-            "Names for clearly supported values that no shown candidate "
-            "represents. When a candidate represents the same value, use its "
-            "ID instead so an existing value is not duplicated under a new name."
-        ),
-    )
-
-    @field_validator("existing_ids", "new_names", mode="before")
-    @classmethod
-    def _truncate(cls, value: Any, info: ValidationInfo) -> Any:
-        return _truncate_to_field_limit(value, cls.model_fields[info.field_name])
-
-
+# This model is serialized into the schema handed to the LLM, so its docstring
+# and field descriptions are instructions for the model. Keep implementation
+# details in code comments instead.
 class DocumentClassifierSchema(BaseModel):
     """Classification suggestions for a single document."""
 
@@ -95,36 +44,79 @@ class DocumentClassifierSchema(BaseModel):
             f"{MAX_TITLE_LENGTH} characters."
         ),
     )
-    tags: TaxonomyChoice = Field(
-        default_factory=TaxonomyChoice,
+    tags: list[str] = Field(
+        default_factory=list,
+        max_length=MAX_NEW_NAMES,
         description=(
-            "Topic labels describing what this document is about. A document "
-            "may have several, e.g. 'Insurance', 'Car', 'Warranty'."
+            "Names of topic labels describing what this document is about, "
+            "e.g. 'Insurance', 'Car', 'Warranty'. When an available tag "
+            "represents the same label, use its ID in tag_ids instead."
         ),
     )
-    correspondents: TaxonomyChoice = Field(
-        default_factory=TaxonomyChoice,
+    tag_ids: list[int] = Field(
+        default_factory=list,
+        max_length=MAX_EXISTING_IDS,
         description=(
-            "The person, institution or company this document originates "
-            "from, or was sent to. Not every party merely mentioned in the "
-            "text, and not the subject of the document."
+            "IDs of available tags that clearly apply to this document. Only "
+            "use IDs shown in the prompt; never invent one or choose a weak match."
         ),
     )
-    document_types: TaxonomyChoice = Field(
-        default_factory=TaxonomyChoice,
+    correspondents: list[str] = Field(
+        default_factory=list,
+        max_length=MAX_NEW_NAMES,
         description=(
-            "What kind of document this is, e.g. 'Invoice', 'Contract', "
-            "'Bank Statement', 'Letter'. Never its subject matter and never "
-            "who sent it."
+            "Names of people, institutions or companies this document is from "
+            "or was sent to, not every party merely mentioned. When an "
+            "available correspondent is the same entity, use its ID in "
+            "correspondent_ids instead."
         ),
     )
-    storage_paths: TaxonomyChoice = Field(
-        default_factory=TaxonomyChoice,
+    correspondent_ids: list[int] = Field(
+        default_factory=list,
+        max_length=MAX_EXISTING_IDS,
         description=(
-            "A folder-style filing location for this document, e.g. "
+            "IDs of available correspondents that clearly apply to this "
+            "document. Only use IDs shown in the prompt; never invent one or "
+            "choose a weak match."
+        ),
+    )
+    document_types: list[str] = Field(
+        default_factory=list,
+        max_length=MAX_NEW_NAMES,
+        description=(
+            "Names describing what kind of document this is, e.g. 'Invoice', "
+            "'Contract', 'Bank Statement', 'Letter'. Never use its subject or "
+            "sender as a document type. When an available document type is the "
+            "same kind, use its ID in document_type_ids instead."
+        ),
+    )
+    document_type_ids: list[int] = Field(
+        default_factory=list,
+        max_length=MAX_EXISTING_IDS,
+        description=(
+            "IDs of available document types that clearly apply to this "
+            "document. Only use IDs shown in the prompt; never invent one or "
+            "choose a weak match."
+        ),
+    )
+    storage_paths: list[str] = Field(
+        default_factory=list,
+        max_length=MAX_NEW_NAMES,
+        description=(
+            "Names of folder-style filing locations, e.g. "
             "'Finance/Invoices'. Leave empty unless a filing location is "
             "clearly implied - never put tags, document types or "
-            "correspondents here."
+            "correspondents here. When an available storage path is the same "
+            "location, use its ID in storage_path_ids instead."
+        ),
+    )
+    storage_path_ids: list[int] = Field(
+        default_factory=list,
+        max_length=MAX_EXISTING_IDS,
+        description=(
+            "IDs of available storage paths that clearly apply to this "
+            "document. Only use IDs shown in the prompt; never invent one or "
+            "choose a weak match."
         ),
     )
     dates: list[str] = Field(
@@ -137,41 +129,33 @@ class DocumentClassifierSchema(BaseModel):
         ),
     )
 
-    @field_validator("title", "dates", mode="before")
+    @field_validator(
+        "title",
+        "tags",
+        "tag_ids",
+        "correspondents",
+        "correspondent_ids",
+        "document_types",
+        "document_type_ids",
+        "storage_paths",
+        "storage_path_ids",
+        "dates",
+        mode="before",
+    )
     @classmethod
     def _truncate(cls, value: Any, info: ValidationInfo) -> Any:
         return _truncate_to_field_limit(value, cls.model_fields[info.field_name])
 
-    @classmethod
-    def model_json_schema(cls, *args: Any, **kwargs: Any) -> dict[str, Any]:
-        """Inline TaxonomyChoice for backends that reject JSON Schema refs."""
-        schema = super().model_json_schema(*args, **kwargs)
-        taxonomy_choice = schema.pop("$defs")["TaxonomyChoice"]
-        for field in ("tags", "correspondents", "document_types", "storage_paths"):
-            # Pydantic emits a field's description as a sibling of its $ref;
-            # those keys must survive and win over the shared definition.
-            siblings = {
-                key: value
-                for key, value in schema["properties"][field].items()
-                if key != "$ref"
-            }
-            schema["properties"][field] = taxonomy_choice | siblings
-        return schema
-
 
 class TaxonomyChoiceDict(TypedDict):
-    """Plain-dict counterpart of TaxonomyChoice - what
-    TaxonomyChoice.model_dump() actually produces, typed for callers that
-    work with the dumped dict rather than the pydantic instance."""
+    """Internal representation of names and existing IDs for one taxonomy."""
 
     existing_ids: list[int]
     new_names: list[str]
 
 
 class ClassificationSuggestions(TypedDict):
-    """Plain-dict counterpart of DocumentClassifierSchema.model_dump() -
-    the shape threaded through parse_ai_response, build_localization_prompt,
-    get_ai_document_classification, and the ai_suggestions view."""
+    """Internal shape used after the flat LLM response is validated."""
 
     title: str
     tags: TaxonomyChoiceDict
@@ -179,3 +163,47 @@ class ClassificationSuggestions(TypedDict):
     document_types: TaxonomyChoiceDict
     storage_paths: TaxonomyChoiceDict
     dates: list[str]
+
+
+def model_to_classification_suggestions(
+    model: DocumentClassifierSchema,
+) -> ClassificationSuggestions:
+    """Convert the flat, model-friendly response to the internal shape."""
+    return ClassificationSuggestions(
+        title=model.title,
+        tags=TaxonomyChoiceDict(
+            existing_ids=model.tag_ids,
+            new_names=model.tags,
+        ),
+        correspondents=TaxonomyChoiceDict(
+            existing_ids=model.correspondent_ids,
+            new_names=model.correspondents,
+        ),
+        document_types=TaxonomyChoiceDict(
+            existing_ids=model.document_type_ids,
+            new_names=model.document_types,
+        ),
+        storage_paths=TaxonomyChoiceDict(
+            existing_ids=model.storage_path_ids,
+            new_names=model.storage_paths,
+        ),
+        dates=model.dates,
+    )
+
+
+def classification_suggestions_to_model(
+    suggestions: ClassificationSuggestions,
+) -> DocumentClassifierSchema:
+    """Convert internal suggestions to the flat shape used for localization."""
+    return DocumentClassifierSchema(
+        title=suggestions["title"],
+        tags=suggestions["tags"]["new_names"],
+        tag_ids=suggestions["tags"]["existing_ids"],
+        correspondents=suggestions["correspondents"]["new_names"],
+        correspondent_ids=suggestions["correspondents"]["existing_ids"],
+        document_types=suggestions["document_types"]["new_names"],
+        document_type_ids=suggestions["document_types"]["existing_ids"],
+        storage_paths=suggestions["storage_paths"]["new_names"],
+        storage_path_ids=suggestions["storage_paths"]["existing_ids"],
+        dates=suggestions["dates"],
+    )

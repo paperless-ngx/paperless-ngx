@@ -6,8 +6,9 @@ from paperless_ai.base_model import MAX_NEW_NAMES
 from paperless_ai.base_model import MAX_TITLE_LENGTH
 from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.base_model import DocumentClassifierSchema
-from paperless_ai.base_model import TaxonomyChoice
 from paperless_ai.base_model import TaxonomyChoiceDict
+from paperless_ai.base_model import classification_suggestions_to_model
+from paperless_ai.base_model import model_to_classification_suggestions
 
 
 def test_document_classifier_schema_declared_defaults():
@@ -18,66 +19,67 @@ def test_document_classifier_schema_declared_defaults():
     WHEN:
         - The schema is dumped to a dict via model_dump()
     THEN:
-        - Every taxonomy field dumps as an empty existing_ids/new_names
-          dict, and dates dumps as an empty list
+        - Every name and ID field, and dates, dump as empty lists
 
-    This is the one project-owned fact worth pinning down here: which
-    defaults this schema declares for a partial LLM response (see
-    client.py's DocumentClassifierSchema(**json.loads(...)) call sites,
-    which construct from whatever subset of fields the backend actually
-    returned). It deliberately hardcodes the expected literal rather than
-    re-deriving it from TaxonomyChoice()/[] - pydantic's own
-    default_factory machinery is not this project's to re-test, and a
-    test that recomputes the expected value from the model under test
-    can't ever catch a wrong default.
+    The model may omit optional fields, so the schema must provide the complete
+    empty shape expected by the conversion and matching pipeline.
     """
     schema = DocumentClassifierSchema(title="Test Title")
 
     dumped = schema.model_dump()
 
-    empty_choice = {"existing_ids": [], "new_names": []}
-    assert dumped["tags"] == empty_choice
-    assert dumped["correspondents"] == empty_choice
-    assert dumped["document_types"] == empty_choice
-    assert dumped["storage_paths"] == empty_choice
-    assert dumped["dates"] == []
+    assert dumped == {
+        "title": "Test Title",
+        "tags": [],
+        "tag_ids": [],
+        "correspondents": [],
+        "correspondent_ids": [],
+        "document_types": [],
+        "document_type_ids": [],
+        "storage_paths": [],
+        "storage_path_ids": [],
+        "dates": [],
+    }
 
 
-def test_flat_taxonomy_lists_are_normalized_for_legacy_model_responses():
+def test_flat_model_response_converts_to_internal_taxonomy_choices():
     """
     GIVEN:
-        - A model response using the flat taxonomy lists accepted before 3.1
-        - Strings, integer candidate IDs, and a mixture of both
+        - A flat model response with separate name and candidate-ID fields
     WHEN:
-        - DocumentClassifierSchema validates the response
+        - It is converted to Paperless' internal suggestion representation
     THEN:
-        - Strings become new_names and integers become existing_ids
-
-    Some smaller models emit the old flat shape even when shown the nested
-    tool schema. Candidate IDs are still restricted to the IDs actually shown
-    to the model later in ai_classifier.py.
+        - Names and IDs are paired under their taxonomy category
     """
     parsed = DocumentClassifierSchema(
         title="Electricity Bill",
         tags=["Utilities", "Electricity"],
-        correspondents=[12],
-        document_types=[34, "Utility Bill"],
+        tag_ids=[12],
+        correspondents=["Power Company"],
+        correspondent_ids=[23],
+        document_types=["Utility Bill"],
+        document_type_ids=[34],
         storage_paths=["Finance/Utilities"],
+        storage_path_ids=[45],
     )
+    suggestions = model_to_classification_suggestions(parsed)
 
-    assert parsed.tags == TaxonomyChoice(
-        existing_ids=[],
-        new_names=["Utilities", "Electricity"],
-    )
-    assert parsed.correspondents == TaxonomyChoice(existing_ids=[12], new_names=[])
-    assert parsed.document_types == TaxonomyChoice(
-        existing_ids=[34],
-        new_names=["Utility Bill"],
-    )
-    assert parsed.storage_paths == TaxonomyChoice(
-        existing_ids=[],
-        new_names=["Finance/Utilities"],
-    )
+    assert suggestions["tags"] == {
+        "existing_ids": [12],
+        "new_names": ["Utilities", "Electricity"],
+    }
+    assert suggestions["correspondents"] == {
+        "existing_ids": [23],
+        "new_names": ["Power Company"],
+    }
+    assert suggestions["document_types"] == {
+        "existing_ids": [34],
+        "new_names": ["Utility Bill"],
+    }
+    assert suggestions["storage_paths"] == {
+        "existing_ids": [45],
+        "new_names": ["Finance/Utilities"],
+    }
 
 
 def test_document_classifier_schema_json_schema_is_self_contained():
@@ -87,23 +89,20 @@ def test_document_classifier_schema_json_schema_is_self_contained():
     WHEN:
         - Its JSON schema is generated via model_json_schema()
     THEN:
-        - No $defs section and no $ref at any depth survives in the schema
-        - Each taxonomy property carries existing_ids/new_names inline
+        - The schema contains no definitions, references, or nested objects
+        - Every response field is a scalar or flat array
 
-    Regression guard: Google's function-declaration schema rejects the $ref
-    Pydantic normally emits for the nested TaxonomyChoice model.
+    This keeps the function declaration compatible with backends that reject
+    JSON Schema references and with smaller models that struggle with nesting.
     """
     schema = DocumentClassifierSchema.model_json_schema()
 
     assert "$defs" not in schema
     assert "$ref" not in json.dumps(schema)
-    for field in ("tags", "correspondents", "document_types", "storage_paths"):
-        field_schema = schema["properties"][field]
-        assert "$ref" not in field_schema
-        assert set(field_schema["properties"].keys()) == {
-            "existing_ids",
-            "new_names",
-        }
+    assert all(
+        field_schema.get("type") != "object"
+        for field_schema in schema["properties"].values()
+    )
 
 
 def test_every_field_describes_itself_to_the_model():
@@ -113,8 +112,7 @@ def test_every_field_describes_itself_to_the_model():
     WHEN:
         - Its JSON schema is generated via model_json_schema()
     THEN:
-        - Every property, and every property of each inlined TaxonomyChoice,
-          carries a non-empty description
+        - Every property carries a non-empty description
 
     In tool-calling mode the schema is most of what tells the model how to
     fill these fields; on field names alone, small models can bin tags and
@@ -123,46 +121,12 @@ def test_every_field_describes_itself_to_the_model():
     schema = DocumentClassifierSchema.model_json_schema()
 
     undescribed = [
-        f"{owner}.{name}"
-        for owner, definition in [
-            ("DocumentClassifierSchema", schema),
-            *(
-                (name, prop)
-                for name, prop in schema["properties"].items()
-                if prop.get("type") == "object"
-            ),
-        ]
-        for name, prop in definition.get("properties", {}).items()
+        name
+        for name, prop in schema["properties"].items()
         if not prop.get("description")
     ]
 
     assert undescribed == []
-
-
-def test_inlining_keeps_each_taxonomy_fields_own_description():
-    """
-    GIVEN:
-        - The DocumentClassifierSchema pydantic model
-    WHEN:
-        - Its JSON schema is generated via model_json_schema()
-    THEN:
-        - Each taxonomy field keeps its own description, not the shared one
-        - The inlined TaxonomyChoice properties survive underneath it
-
-    Pydantic emits a field's description as a sibling of its $ref, so
-    replacing the property outright collapses all four onto TaxonomyChoice's
-    docstring - which still passes a "has a description" check.
-    """
-    properties = DocumentClassifierSchema.model_json_schema()["properties"]
-
-    taxonomy_fields = ("tags", "correspondents", "document_types", "storage_paths")
-    descriptions = {
-        field: properties[field]["description"] for field in taxonomy_fields
-    }
-
-    assert len(set(descriptions.values())) == len(taxonomy_fields)
-    for field in taxonomy_fields:
-        assert properties[field]["properties"]["existing_ids"]["description"]
 
 
 def test_every_sequence_in_the_emitted_schema_is_bounded():
@@ -172,22 +136,13 @@ def test_every_sequence_in_the_emitted_schema_is_bounded():
     WHEN:
         - Its JSON schema is generated via model_json_schema()
     THEN:
-        - Every array property in the schema, including those on each
-          inlined TaxonomyChoice, carries a maxItems
+        - Every array property in the schema carries a maxItems
     """
     schema = DocumentClassifierSchema.model_json_schema()
 
     unbounded = [
-        f"{owner}.{name}"
-        for owner, definition in [
-            ("DocumentClassifierSchema", schema),
-            *(
-                (name, prop)
-                for name, prop in schema["properties"].items()
-                if prop.get("type") == "object"
-            ),
-        ]
-        for name, prop in definition.get("properties", {}).items()
+        name
+        for name, prop in schema["properties"].items()
         if prop.get("type") == "array" and "maxItems" not in prop
     ]
 
@@ -219,17 +174,15 @@ def test_over_long_response_is_truncated_rather_than_rejected():
     """
     parsed = DocumentClassifierSchema(
         title="T" * (MAX_TITLE_LENGTH + 50),
-        tags=TaxonomyChoice(
-            existing_ids=list(range(MAX_EXISTING_IDS + 20)),
-            new_names=["n"] * (MAX_NEW_NAMES + 20),
-        ),
+        tags=["n"] * (MAX_NEW_NAMES + 20),
+        tag_ids=list(range(MAX_EXISTING_IDS + 20)),
         dates=[f"2016-{month:02d}-01" for month in range(1, 13)],
     )
 
     assert len(parsed.title) == MAX_TITLE_LENGTH
     assert len(parsed.dates) == MAX_DATES
-    assert len(parsed.tags.existing_ids) == MAX_EXISTING_IDS
-    assert len(parsed.tags.new_names) == MAX_NEW_NAMES
+    assert len(parsed.tag_ids) == MAX_EXISTING_IDS
+    assert len(parsed.tags) == MAX_NEW_NAMES
 
 
 def test_truncation_keeps_the_earliest_entries():
@@ -249,24 +202,48 @@ def test_truncation_keeps_the_earliest_entries():
     assert parsed.dates == ["2016-10-01", "2016-09-01", "2016-08-01"]
 
 
-def test_model_dump_matches_typed_dict_keys():
+def test_model_conversion_matches_internal_typed_dict_keys():
     """
     GIVEN:
         - A DocumentClassifierSchema instance
     WHEN:
-        - It is dumped to a dict via model_dump()
+        - It is converted to ClassificationSuggestions
     THEN:
-        - The dumped dict's keys exactly match ClassificationSuggestions'
+        - The converted dict's keys exactly match ClassificationSuggestions'
           declared keys
-        - The dumped tags dict's keys exactly match TaxonomyChoiceDict's
+        - The converted tags dict's keys exactly match TaxonomyChoiceDict's
           declared keys
     """
-    # TaxonomyChoiceDict/ClassificationSuggestions are the static-typing
-    # counterparts of TaxonomyChoice/DocumentClassifierSchema - this pins
-    # down that .model_dump()'s actual runtime keys are exactly what the
-    # TypedDicts declare, so the two don't silently drift apart.
-    schema = DocumentClassifierSchema(title="T", tags=TaxonomyChoice(existing_ids=[1]))
-    dumped = schema.model_dump()
+    schema = DocumentClassifierSchema(title="T", tags=["Tag"], tag_ids=[1])
+    suggestions = model_to_classification_suggestions(schema)
 
-    assert set(dumped.keys()) == set(ClassificationSuggestions.__annotations__.keys())
-    assert set(dumped["tags"].keys()) == set(TaxonomyChoiceDict.__annotations__.keys())
+    assert set(suggestions.keys()) == set(
+        ClassificationSuggestions.__annotations__.keys(),
+    )
+    assert set(suggestions["tags"].keys()) == set(
+        TaxonomyChoiceDict.__annotations__.keys(),
+    )
+
+
+def test_internal_suggestions_round_trip_through_flat_model():
+    suggestions = ClassificationSuggestions(
+        title="Electricity Bill",
+        tags=TaxonomyChoiceDict(existing_ids=[1], new_names=["Utilities"]),
+        correspondents=TaxonomyChoiceDict(
+            existing_ids=[2],
+            new_names=["Power Company"],
+        ),
+        document_types=TaxonomyChoiceDict(
+            existing_ids=[3],
+            new_names=["Utility Bill"],
+        ),
+        storage_paths=TaxonomyChoiceDict(
+            existing_ids=[4],
+            new_names=["Finance/Utilities"],
+        ),
+        dates=["2026-08-30"],
+    )
+
+    model = classification_suggestions_to_model(suggestions)
+
+    assert model_to_classification_suggestions(model) == suggestions
