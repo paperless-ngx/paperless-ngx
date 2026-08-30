@@ -213,10 +213,13 @@ def parse_user_query(
         logger.warning("Query translation failed; using raw query", exc_info=True)
         query_str = raw_query
 
+    # allow_regexes lets Tantivy accept the ``field:/pattern/`` literals emitted
+    # by translate_query for Whoosh wildcard values (see _translate.WILDCARD_FIELDS).
     exact = index.parse_query(
         query_str,
         DEFAULT_SEARCH_FIELDS,
         field_boosts=_FIELD_BOOSTS,
+        allow_regexes=True,
     )
 
     # The standard analyzer keeps a whitespace-free CJK run as a single token,
@@ -241,6 +244,7 @@ def parse_user_query(
             field_boosts=_FIELD_BOOSTS,
             # (prefix=True, distance=1, transposition_cost_one=True) — edit-distance fuzziness
             fuzzy_fields={f: (True, 1, True) for f in DEFAULT_SEARCH_FIELDS},
+            allow_regexes=True,
         )
         # 0.1 boost keeps fuzzy hits ranked below exact matches (intentional)
         clauses.append((tantivy.Occur.Should, tantivy.Query.boost_query(fuzzy, 0.1)))

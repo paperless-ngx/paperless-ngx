@@ -27,6 +27,7 @@ from documents.search._translate import scan
 from documents.search._translate import translate_query
 from documents.search._translate import translate_range
 from documents.search._translate import translate_scalar
+from documents.search._translate import wildcard_to_regex
 
 
 @pytest.mark.search
@@ -808,3 +809,158 @@ class TestISODatetimeBounds:
         )
         translated = translate_query(q, UTC)
         index.parse_query(translated, DEFAULT_SEARCH_FIELDS, field_boosts=_FIELD_BOOSTS)
+
+
+@pytest.mark.search
+class TestWildcardToRegex:
+    """Whoosh wildcard values become Tantivy regex literals (fnmatch semantics)."""
+
+    @pytest.mark.parametrize(
+        ("pattern", "expected"),
+        [
+            pytest.param("*2024", ".*2024", id="leading_star"),
+            pytest.param("steuer*", "steuer.*", id="trailing_star"),
+            pytest.param("*2024*", ".*2024.*", id="both_stars"),
+            pytest.param("ste?er", "ste.er", id="question_mark"),
+            pytest.param("*202[0-4]", ".*202[0-4]", id="char_class_range"),
+            pytest.param("re[ck]hnung*", "re[ck]hnung.*", id="char_class_set"),
+            pytest.param("[!0-9]*", "[^0-9].*", id="negated_class_bang"),
+            pytest.param("[^0-9]*", "[^0-9].*", id="negated_class_caret"),
+            pytest.param("[]]*", "[]].*", id="class_leading_close_bracket"),
+            pytest.param("*", ".*", id="bare_star"),
+        ],
+    )
+    def test_translates_metacharacters(self, pattern: str, expected: str) -> None:
+        assert wildcard_to_regex(pattern) == expected
+
+    @pytest.mark.parametrize(
+        ("pattern", "expected"),
+        [
+            pytest.param("a.b*", r"a\.b.*", id="dot"),
+            pytest.param("a+b*", r"a\+b.*", id="plus"),
+            pytest.param("a/b*", r"a\/b.*", id="slash_would_close_literal"),
+            pytest.param("a(b)*", r"a\(b\).*", id="parens"),
+            pytest.param("a|b*", r"a\|b.*", id="alternation"),
+            pytest.param("a$b*", r"a\$b.*", id="dollar"),
+            pytest.param("a-b*", r"a\-b.*", id="dash"),
+        ],
+    )
+    def test_escapes_regex_metacharacters_in_literals(
+        self,
+        pattern: str,
+        expected: str,
+    ) -> None:
+        assert wildcard_to_regex(pattern) == expected
+
+    @pytest.mark.parametrize(
+        "pattern",
+        [
+            pytest.param("2024", id="digits"),
+            pytest.param("rechnung", id="word"),
+            pytest.param("a.b", id="dot_only"),
+            pytest.param("", id="empty"),
+        ],
+    )
+    def test_returns_none_without_metacharacters(self, pattern: str) -> None:
+        # Plain terms must keep their term-query behaviour (stemming, scoring)
+        # rather than silently degrading into a regex scan.
+        assert wildcard_to_regex(pattern) is None
+
+    def test_unterminated_class_is_literal(self) -> None:
+        # fnmatch treats an unterminated '[' as a literal bracket. It still takes
+        # the regex path so the value never reaches Tantivy's parser, which would
+        # otherwise read '[' as the start of a range expression and raise.
+        assert wildcard_to_regex("foo[bar") == r"foo\[bar"
+
+
+@pytest.mark.search
+class TestWildcardTranslation:
+    """translate_query rewrites wildcard values on text fields only."""
+
+    @pytest.mark.parametrize(
+        ("query", "expected"),
+        [
+            pytest.param("title:*2024", "title:/.*2024/", id="title"),
+            pytest.param("content:foo*", "content:/foo.*/", id="content"),
+            pytest.param(
+                "correspondent:ac*",
+                "correspondent:/ac.*/",
+                id="correspondent",
+            ),
+            pytest.param("tag:steu*", "tag:/steu.*/", id="tag"),
+            pytest.param(
+                "original_filename:scan*",
+                "original_filename:/scan.*/",
+                id="original_filename",
+            ),
+        ],
+    )
+    def test_text_fields_are_rewritten(self, query: str, expected: str) -> None:
+        assert translate_query(query, UTC) == expected
+
+    @pytest.mark.parametrize(
+        ("query", "expected"),
+        [
+            pytest.param("type:inv*", "document_type:/inv.*/", id="type_alias"),
+            pytest.param("path:arch*", "storage_path:/arch.*/", id="path_alias"),
+        ],
+    )
+    def test_v2_field_aliases_resolve_before_rewriting(
+        self,
+        query: str,
+        expected: str,
+    ) -> None:
+        assert translate_query(query, UTC) == expected
+
+    @pytest.mark.parametrize(
+        "query",
+        [
+            # 'raw' tokenizer: folding the pattern would not match the stored term.
+            pytest.param("checksum:abc*", id="checksum_raw_tokenizer"),
+            # Numeric fields: a regex term does not match their encoding.
+            pytest.param("asn:12*", id="asn"),
+            pytest.param("page_count:1*", id="page_count"),
+            pytest.param("correspondent_id:3*", id="correspondent_id"),
+            # JSON fields are not addressable by a regex term query.
+            pytest.param("notes:foo*", id="notes_json"),
+            pytest.param("custom_fields:bar*", id="custom_fields_json"),
+        ],
+    )
+    def test_excluded_fields_pass_through_unchanged(self, query: str) -> None:
+        assert translate_query(query, UTC) == query
+
+    def test_quoted_phrase_is_not_rewritten(self) -> None:
+        # A wildcard is a literal character inside a Whoosh phrase.
+        assert translate_query('title:"exact *phrase"', UTC) == 'title:"exact *phrase"'
+
+    def test_plain_value_unchanged(self) -> None:
+        assert translate_query("title:2024", UTC) == "title:2024"
+
+    def test_date_range_bracket_is_not_treated_as_a_class(self) -> None:
+        # '[' after a date field opens a range, and must keep doing so.
+        result = translate_query("created:[2020 TO 2021]", UTC)
+        assert result.startswith("created:[2020-01-01T00:00:00Z TO ")
+        assert "/" not in result
+
+    def test_pattern_is_lowercased_and_ascii_folded(self) -> None:
+        # Regex terms bypass the analyzer, so the pattern must be folded the same
+        # way paperless_text folds indexed terms, or it can never match.
+        assert translate_query("title:M\u00fcll*", UTC) == "title:/mull.*/"
+        assert translate_query("title:GRO\u00df*", UTC) == "title:/gross.*/"
+
+    def test_multi_value_tag_list_rewrites_each_value(self) -> None:
+        assert (
+            translate_query("tag:steu*,valentin", UTC)
+            == "tag:/steu.*/ AND tag:valentin"
+        )
+
+    def test_reported_saved_view_query(self) -> None:
+        # The query from the v2 -> v3 regression report (issue #13568).
+        result = translate_query(
+            "tag:steuer AND tag:valentin AND (title:*2024 OR "
+            "(NOT title:*202[0-3] AND NOT title:*201[0-9] AND created:2024))",
+            UTC,
+        )
+        assert "title:/.*2024/" in result
+        assert "NOT title:/.*202[0-3]/" in result
+        assert "NOT title:/.*201[0-9]/" in result

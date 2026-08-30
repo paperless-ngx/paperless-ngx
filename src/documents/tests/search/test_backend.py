@@ -1164,3 +1164,127 @@ class TestIndexDirectoryGarbageCollection:
             "Segment files present on disk but absent from Tantivy's "
             f".managed.json bookkeeping (permanently un-collectible): {orphans}"
         )
+
+
+class TestWildcardSearch:
+    """Whoosh-style wildcard values must parse and match (issue #13568).
+
+    Under Whoosh these were ``fnmatch``-translated ``Wildcard`` queries. Tantivy's
+    parser has no wildcard support: ``*`` was silently dropped (turning a prefix
+    search into an exact term match) and ``[`` raised a syntax error, breaking
+    saved views carried over from v2.
+    """
+
+    @pytest.fixture
+    def wildcard_docs(self, backend: TantivyBackend) -> dict[str, int]:
+        """Index documents whose titles exercise prefix/suffix/class matching."""
+        titles = {
+            "steuer_2024": "Steuer 2024",
+            "steuer_2019": "Steuer 2019",
+            "rechnung_2021": "Rechnung 2021",
+            "beleg_2024": "Beleg 2024 extra",
+            "steuerbescheid": "Steuerbescheid 2015",
+            "mueller": "Müller Rechnung 2022",
+        }
+        ids: dict[str, int] = {}
+        for pk, (key, title) in enumerate(titles.items(), start=100):
+            doc = Document.objects.create(
+                title=title,
+                content=title,
+                checksum=f"WC{pk}",
+                pk=pk,
+            )
+            backend.add_or_update(doc)
+            ids[key] = pk
+        return ids
+
+    def test_trailing_star_matches_prefix(
+        self,
+        backend: TantivyBackend,
+        wildcard_docs: dict[str, int],
+    ) -> None:
+        # Previously '*' was dropped, so this matched only the exact term
+        # "steuer" and missed "steuerbescheid".
+        found = set(backend.search_ids("title:steuer*", user=None))
+        assert wildcard_docs["steuerbescheid"] in found
+        assert wildcard_docs["steuer_2024"] in found
+        assert wildcard_docs["rechnung_2021"] not in found
+
+    def test_leading_star_matches_suffix(
+        self,
+        backend: TantivyBackend,
+        wildcard_docs: dict[str, int],
+    ) -> None:
+        found = set(backend.search_ids("title:*bescheid", user=None))
+        assert found == {wildcard_docs["steuerbescheid"]}
+
+    def test_question_mark_matches_single_character(
+        self,
+        backend: TantivyBackend,
+        wildcard_docs: dict[str, int],
+    ) -> None:
+        found = set(backend.search_ids("title:ste?er", user=None))
+        assert wildcard_docs["steuer_2024"] in found
+        assert wildcard_docs["steuerbescheid"] not in found
+
+    def test_character_class_does_not_raise_and_matches(
+        self,
+        backend: TantivyBackend,
+        wildcard_docs: dict[str, int],
+    ) -> None:
+        # '[0-4]' previously made the whole query a Tantivy syntax error.
+        found = set(backend.search_ids("title:*202[0-2]", user=None))
+        assert found == {
+            wildcard_docs["rechnung_2021"],
+            wildcard_docs["mueller"],
+        }
+
+    def test_pattern_matches_ascii_folded_terms(
+        self,
+        backend: TantivyBackend,
+        wildcard_docs: dict[str, int],
+    ) -> None:
+        # Regex terms bypass the analyzer; the pattern is folded to match the
+        # indexed term ("muller"), so an umlaut in the query still hits.
+        found = set(backend.search_ids("title:Müll*", user=None))
+        assert found == {wildcard_docs["mueller"]}
+
+    def test_reported_saved_view_query_returns_expected_documents(
+        self,
+        backend: TantivyBackend,
+        wildcard_docs: dict[str, int],
+    ) -> None:
+        """The v2 saved-view query from the report now runs and filters correctly."""
+        found = set(
+            backend.search_ids(
+                "title:*2024 OR (NOT title:*202[0-3] AND NOT title:*201[0-9])",
+                user=None,
+            ),
+        )
+        # 2024 titles match the positive clause; 2021/2022/2019/2015 titles are
+        # excluded by the negated classes.
+        assert wildcard_docs["steuer_2024"] in found
+        assert wildcard_docs["beleg_2024"] in found
+        assert wildcard_docs["rechnung_2021"] not in found
+        assert wildcard_docs["steuer_2019"] not in found
+        assert wildcard_docs["steuerbescheid"] not in found
+
+    def test_plain_query_without_wildcards_is_unaffected(
+        self,
+        backend: TantivyBackend,
+        wildcard_docs: dict[str, int],
+    ) -> None:
+        found = set(backend.search_ids("title:rechnung", user=None))
+        assert found == {wildcard_docs["rechnung_2021"], wildcard_docs["mueller"]}
+
+    def test_highlight_hits_survives_a_wildcard_query(
+        self,
+        backend: TantivyBackend,
+        wildcard_docs: dict[str, int],
+    ) -> None:
+        """A rewritten regex term must not break snippet generation."""
+        doc_id = wildcard_docs["steuerbescheid"]
+        hits = backend.highlight_hits("title:steuer*", [doc_id])
+
+        assert len(hits) == 1
+        assert hits[0]["id"] == doc_id

@@ -5,6 +5,7 @@ from datetime import UTC
 from datetime import datetime
 from datetime import timedelta
 from typing import TYPE_CHECKING
+from typing import Final
 from typing import TypeAlias
 
 import regex
@@ -18,6 +19,7 @@ from documents.search._dates import _field_range_from_dates
 from documents.search._dates import _fmt
 from documents.search._dates import _precision_bounds
 from documents.search._dates import _utc_bounds_for_field
+from documents.search._tokenizer import ascii_fold
 
 # Compiled regex that matches any known multi-word (or single-word) date keyword
 # at the start of a match position, longest alternatives first so "previous week"
@@ -47,6 +49,26 @@ MULTI_VALUE_FIELDS = frozenset({"tag", "tag_id", "viewer_id"})
 
 # Date fields whose values/ranges get rewritten to RFC3339 Tantivy ranges.
 DATE_FIELDS = frozenset({"created", "modified", "added"})
+
+# Text fields (all tokenized with ``paperless_text``) whose values may carry
+# Whoosh wildcard patterns and can therefore be rewritten to a Tantivy regex
+# literal. Deliberately excludes:
+#   * date / numeric / ``*_id`` fields - a wildcard is meaningless there and the
+#     regex form would not match their non-text term encoding;
+#   * ``checksum`` - indexed with the ``raw`` tokenizer, so the case/ASCII
+#     folding applied below would not match the stored term;
+#   * ``notes`` / ``custom_fields`` - JSON fields, which regex terms don't address.
+WILDCARD_FIELDS = frozenset(
+    {
+        "title",
+        "content",
+        "correspondent",
+        "document_type",
+        "storage_path",
+        "original_filename",
+        "tag",
+    },
+)
 
 # Field aliases: Whoosh (v2) field names that were renamed in the Tantivy schema.
 # Preserved here so v2 queries using the old names continue to work without 400
@@ -514,6 +536,107 @@ def _bound_datetimes(
     return _utc_bounds_for_field(field, start, end, tz)
 
 
+# Characters that must be escaped to appear literally in a Rust ``regex`` crate
+# pattern. ``/`` is included because the rewritten value is emitted as a Tantivy
+# ``/.../`` regex literal, where an unescaped slash would close the literal early.
+_REGEX_SPECIAL: Final[frozenset[str]] = frozenset(".^$+(){}|\\/-[]?*")
+
+# Whoosh's ``Wildcard`` query translated its pattern with ``fnmatch.translate``,
+# so saved v2 queries can contain any fnmatch metacharacter: ``*``, ``?`` and
+# ``[seq]`` / ``[!seq]`` character classes. Tantivy's query parser understands
+# none of these - ``[`` in particular starts a range expression and makes the
+# whole query a syntax error - so such values are rewritten to a regex literal.
+_WILDCARD_META: Final[frozenset[str]] = frozenset("*?[")
+
+
+def _escape_literal(char: str) -> str:
+    """Escape a single character for literal use in a Rust regex pattern."""
+    return f"\\{char}" if char in _REGEX_SPECIAL else char
+
+
+def wildcard_to_regex(pattern: str) -> str | None:
+    """
+    Translate an fnmatch-style Whoosh wildcard into a Rust ``regex`` pattern.
+
+    Mirrors ``fnmatch.translate`` (what Whoosh's ``Wildcard`` query used), but
+    emits a bare fragment: Tantivy anchors regex term queries itself, and the
+    ``(?s:...)\\Z`` wrapper ``fnmatch`` produces uses ``\\Z``, which the Rust
+    ``regex`` crate does not accept.
+
+    Returns ``None`` when ``pattern`` holds no wildcard metacharacter, so plain
+    terms keep their existing term-query behaviour (and its stemming/scoring)
+    instead of silently becoming regex scans.
+    """
+    out: list[str] = []
+    i, length = 0, len(pattern)
+    saw_meta = False
+    while i < length:
+        char = pattern[i]
+        if char == "*":
+            out.append(".*")
+            saw_meta = True
+            i += 1
+        elif char == "?":
+            out.append(".")
+            saw_meta = True
+            i += 1
+        elif char == "[":
+            # fnmatch character class. Scan for the closing bracket, honouring
+            # the two positions where a literal is allowed inside the class:
+            # a leading negation (``!``/``^``) and a ``]`` immediately after it.
+            j = i + 1
+            if j < length and pattern[j] in "!^":
+                j += 1
+            if j < length and pattern[j] == "]":
+                j += 1
+            while j < length and pattern[j] != "]":
+                j += 1
+            saw_meta = True
+            if j >= length:
+                # Unterminated class: fnmatch treats the bracket as a literal.
+                # Still routed through the regex form so the value cannot reach
+                # Tantivy's parser and raise a syntax error.
+                out.append("\\[")
+                i += 1
+                continue
+            body = pattern[i + 1 : j]
+            if body[:1] in ("!", "^"):
+                body = f"^{body[1:]}"
+            # Inside a class only the backslash needs re-escaping; the rest is
+            # already valid Rust regex class syntax (ranges, literals, ``^``).
+            body = body.replace("\\", "\\\\")
+            out.append(f"[{body}]")
+            i = j + 1
+        else:
+            out.append(_escape_literal(char))
+            i += 1
+    return "".join(out) if saw_meta else None
+
+
+def _render_text_value(field: str, value: str) -> str:
+    """
+    Render one ``field:value`` clause, rewriting Whoosh wildcards to a regex.
+
+    Quoted phrases and values opening a group are passed through untouched: a
+    wildcard is literal inside a Whoosh phrase, and a ``(`` means the scanner
+    captured only the head of a grouped expression.
+    """
+    if (
+        field not in WILDCARD_FIELDS
+        or not value
+        or value[0] in "\"'("
+        or not (_WILDCARD_META & set(value))
+    ):
+        return f"{field}:{value}"
+    # Regex terms bypass the field analyzer, so fold the pattern exactly as
+    # ``paperless_text`` folds indexed terms (lowercase -> ascii_fold). Without
+    # this, ``title:Müll*`` would never match the indexed term ``muller``.
+    pattern = wildcard_to_regex(ascii_fold(value.lower()))
+    if pattern is None:  # pragma: no cover - guarded by the _WILDCARD_META check
+        return f"{field}:{value}"
+    return f"{field}:/{pattern}/"
+
+
 def _render(tok: Token, tz: tzinfo) -> str:
     """Render a single token back to a Tantivy query string fragment."""
     if isinstance(tok, Passthrough):
@@ -522,12 +645,12 @@ def _render(tok: Token, tz: tzinfo) -> str:
         return " AND "
     if isinstance(tok, FieldValueList):
         field = FIELD_ALIASES.get(tok.field, tok.field)
-        return " AND ".join(f"{field}:{v}" for v in tok.values)
+        return " AND ".join(_render_text_value(field, v) for v in tok.values)
     if isinstance(tok, FieldValue):
         field = FIELD_ALIASES.get(tok.field, tok.field)
         if field in DATE_FIELDS:
             return translate_scalar(field, tok.value, tz)
-        return f"{field}:{tok.value}"
+        return _render_text_value(field, tok.value)
     if isinstance(tok, FieldRange):
         field = FIELD_ALIASES.get(tok.field, tok.field)
         if field in DATE_FIELDS:

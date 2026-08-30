@@ -437,6 +437,44 @@ class TestParseUserQuery:
         settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 0.5
         assert isinstance(parse_user_query(query_index, "invoice", UTC), tantivy.Query)
 
+    @pytest.mark.parametrize(
+        "raw_query",
+        [
+            pytest.param("title:*2024", id="leading_star"),
+            pytest.param("title:steuer*", id="trailing_star"),
+            pytest.param("title:ste?er", id="question_mark"),
+            pytest.param("title:*202[0-4]", id="character_class"),
+            pytest.param("title:*[!0-9]", id="negated_character_class"),
+            pytest.param("content:foo[bar", id="unterminated_class"),
+            pytest.param(
+                "tag:steuer AND (title:*2024 OR (NOT title:*202[0-3] "
+                "AND NOT title:*201[0-9] AND created:2024))",
+                id="reported_saved_view",
+            ),
+        ],
+    )
+    def test_wildcard_queries_parse(
+        self,
+        query_index: tantivy.Index,
+        raw_query: str,
+    ) -> None:
+        # Tantivy's parser rejects '*' semantics and reads '[' as a range, so
+        # these are rewritten to regex literals and parsed with allow_regexes.
+        assert isinstance(parse_user_query(query_index, raw_query, UTC), tantivy.Query)
+
+    def test_wildcard_query_parses_in_fuzzy_mode(
+        self,
+        query_index: tantivy.Index,
+        settings,
+    ) -> None:
+        # The fuzzy companion query parses the same rewritten string and must
+        # therefore also accept regex literals.
+        settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 0.5
+        assert isinstance(
+            parse_user_query(query_index, "title:*202[0-4]", UTC),
+            tantivy.Query,
+        )
+
     def test_date_rewriting_applied_before_tantivy_parse(
         self,
         query_index: tantivy.Index,

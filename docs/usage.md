@@ -945,11 +945,19 @@ added:yesterday
 modified:today
 ```
 
-Matching inexact words:
+Matching inexact words with wildcards:
 
 ```
-produ*name
+title:produ*name
+correspondent:acme*
+title:*202[0-4]
 ```
+
+`*` matches any number of characters, `?` matches exactly one and `[...]`
+matches a single character from a set or range (`[!...]` negates the set).
+A wildcard pattern is matched against whole indexed words and must be used
+with a field prefix, one of `title`, `content`, `correspondent`,
+`document_type`, `storage_path`, `original_filename` or `tag`.
 
 Matching natural date keywords:
 
