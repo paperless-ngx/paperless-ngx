@@ -385,7 +385,7 @@ main {
   }
 
   ::ng-deep .navbar-official-logo {
-    will-change: filter; // Safari repaints the whole navbar on filter change without this
+    will-change: filter; // prevent resizing the filter region on hover and nudging the logo a pixel
     filter: drop-shadow(0 1px 2px rgba(var(--pngx-navbar-brand-shadow-rgb), .3));
     transition: filter .15s ease-in-out;
 
@@ -398,6 +398,8 @@ main {
     width: 1.65rem;
     height: 1.65rem;
     flex: 0 0 auto;
+    will-change: filter; // prevent resizing the filter region on hover and nudging the logo a pixel
+    filter: drop-shadow(0 2px 3px rgba(var(--pngx-navbar-brand-shadow-rgb), 0));
     transition: filter .15s ease-in-out;
   }
 
@@ -430,6 +432,8 @@ main {
     max-width: 5rem;
     flex: 0 0 auto;
     object-fit: contain;
+    will-change: filter; // prevent resizing the filter region on hover and nudging the logo a pixel
+    filter: drop-shadow(0 2px 3px rgba(var(--pngx-navbar-brand-shadow-rgb), 0));
     transition: filter .15s ease-in-out, transform .15s ease-in-out;
   }
 
