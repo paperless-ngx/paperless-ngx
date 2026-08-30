@@ -119,6 +119,12 @@ export class GlobalSearchComponent implements OnInit {
       })
   }
 
+  public onQueryChange(text: string) {
+    // set immediately so Enter / the full search button work without waiting for the debounce
+    this.query.set(text)
+    this.queryDebounce.next(text)
+  }
+
   public ngOnInit() {
     this.hotkeyService
       .addShortcut({ keys: '/', description: $localize`Global search` })
