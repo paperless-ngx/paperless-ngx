@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-26 16:49+0000\n"
-"PO-Revision-Date: 2026-08-26 17:04\n"
+"POT-Creation-Date: 2026-08-29 20:02+0000\n"
+"PO-Revision-Date: 2026-08-30 14:53\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -878,7 +878,7 @@ msgstr "Elimina in blocco"
 
 #: documents/models.py:769
 msgid "Apply AI Suggestions"
-msgstr ""
+msgstr "Applica Suggerimenti IA"
 
 #: documents/models.py:778 documents/models.py:1349
 msgid "Scheduled"
@@ -1379,23 +1379,23 @@ msgstr "Sposta nel cestino"
 
 #: documents/models.py:1676
 msgid "Remote OCR"
-msgstr ""
+msgstr "OCR Remoto"
 
 #: documents/models.py:1680
 msgid "Apply AI suggestions"
-msgstr ""
+msgstr "Applica suggerimenti IA"
 
 #: documents/models.py:1687
 msgid "Document type"
-msgstr ""
+msgstr "Tipo di documento"
 
 #: documents/models.py:1688
 msgid "Storage path"
-msgstr ""
+msgstr "Percorso di archiviazione"
 
 #: documents/models.py:1689
 msgid "Created date"
-msgstr ""
+msgstr "Data di creazione"
 
 #: documents/models.py:1692
 msgid "Workflow Action Type"
@@ -1548,27 +1548,27 @@ msgstr "Password da provare quando si rimuove la protezione PDF. Separare con vi
 
 #: documents/models.py:1929
 msgid "AI suggestion fields"
-msgstr ""
+msgstr "Campi di suggerimento IA"
 
 #: documents/models.py:1933
 msgid "Which of the AI-suggested fields to apply to the document."
-msgstr ""
+msgstr "Quale dei campi suggeriti dall'IA da applicare al documento."
 
 #: documents/models.py:1938
 msgid "create missing objects"
-msgstr ""
+msgstr "crea gli oggetti mancanti"
 
 #: documents/models.py:1941
 msgid "Create suggested tags, correspondents, document types and storage paths that do not already exist instead of skipping them."
-msgstr ""
+msgstr "Crea tag suggeriti, corrispondenti, tipi di documenti e percorsi di archiviazione che non esistono già invece di saltarli."
 
 #: documents/models.py:1947
 msgid "overwrite existing values"
-msgstr ""
+msgstr "sovrascrivi valori esistenti"
 
 #: documents/models.py:1950
 msgid "Apply suggestions even if the document already has a value for that field. Tags are always added to, never replaced."
-msgstr ""
+msgstr "Applica suggerimenti anche se il documento ha già un valore per quel campo. I tag sono sempre aggiunti, mai sostituiti."
 
 #: documents/models.py:1956
 msgid "workflow action"
@@ -1611,8 +1611,8 @@ msgid "workflow runs"
 msgstr "esecuzioni del flusso di lavoro"
 
 #: documents/serialisers.py:523 documents/serialisers.py:875
-#: documents/serialisers.py:2827 documents/views.py:312 documents/views.py:2606
-#: paperless_mail/serialisers.py:155
+#: documents/serialisers.py:2827 documents/views.py:313 documents/views.py:2611
+#: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "Autorizzazioni insufficienti."
 
@@ -1651,7 +1651,7 @@ msgstr "Variabile non valida rilevata."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Non sono consentiti identificatori di documenti duplicati."
 
-#: documents/serialisers.py:2913 documents/views.py:4603
+#: documents/serialisers.py:2913 documents/views.py:4608
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Documenti non trovati: %(ids)s"
@@ -1907,36 +1907,36 @@ msgstr "Lo schema URI '{parts.scheme}' non è consentito. Schemi consentiti: {',
 msgid "Unable to parse URI {value}"
 msgstr "Impossibile analizzare l'URI {value}"
 
-#: documents/views.py:305 documents/views.py:2603
+#: documents/views.py:306 documents/views.py:2608
 msgid "Invalid more_like_id"
 msgstr "more_like_id non valido"
 
-#: documents/views.py:1577
+#: documents/views.py:1582
 msgid "Invalid AI configuration."
 msgstr "Configurazione AI non valida."
 
-#: documents/views.py:1588
+#: documents/views.py:1593
 msgid "AI backend request timed out."
 msgstr "Richiesta di backend AI scaduta."
 
-#: documents/views.py:2428 documents/views.py:2749
+#: documents/views.py:2433 documents/views.py:2754
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Specificare solo uno tra text, title_search, query o more_like_id."
 
-#: documents/views.py:4616
+#: documents/views.py:4621
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Autorizzazioni insufficienti per condividere il documento %(id)s."
 
-#: documents/views.py:4662
+#: documents/views.py:4667
 msgid "Bundle is already being processed."
 msgstr "Il pacchetto è già in fase di elaborazione."
 
-#: documents/views.py:4723
+#: documents/views.py:4728
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Il pacchetto di link di condivisione è ancora in fase di preparazione. Riprova più tardi."
 
-#: documents/views.py:4733
+#: documents/views.py:4738
 msgid "The share link bundle is unavailable."
 msgstr "Il pacchetto di link di condivisione non è disponibile."
 
@@ -2022,15 +2022,15 @@ msgstr "CMYK"
 
 #: paperless/models.py:82
 msgid "Azure AI Document Intelligence"
-msgstr ""
+msgstr "Azure AI Document Intelligence"
 
 #: paperless/models.py:90
 msgid "All supported documents"
-msgstr ""
+msgstr "Tutti i documenti supportati"
 
 #: paperless/models.py:91
 msgid "Only when a workflow enables it"
-msgstr ""
+msgstr "Solo quando un flusso di lavoro lo abilita"
 
 #: paperless/models.py:95 paperless/models.py:105
 msgid "OpenAI-compatible"
@@ -2154,19 +2154,19 @@ msgstr "Abilita la suddivisione sui codici a barre dei tag"
 
 #: paperless/models.py:312
 msgid "Sets the remote OCR engine"
-msgstr ""
+msgstr "Imposta il motore OCR remoto"
 
 #: paperless/models.py:321
 msgid "Sets the remote OCR API key"
-msgstr ""
+msgstr "Imposta la chiave API OCR remota"
 
 #: paperless/models.py:329
 msgid "Sets the remote OCR endpoint"
-msgstr ""
+msgstr "Imposta l'endpoint OCR remoto"
 
 #: paperless/models.py:337
 msgid "Sets which documents are sent to the remote OCR engine"
-msgstr ""
+msgstr "Determina quali documenti vengono inviati al motore OCR remoto"
 
 #: paperless/models.py:349
 msgid "Enables AI features"

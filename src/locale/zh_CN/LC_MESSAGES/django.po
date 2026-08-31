@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-26 16:49+0000\n"
-"PO-Revision-Date: 2026-08-26 17:04\n"
+"POT-Creation-Date: 2026-08-29 20:02+0000\n"
+"PO-Revision-Date: 2026-08-31 05:12\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -282,7 +282,7 @@ msgstr "归档"
 
 #: documents/models.py:526
 msgid "Bank"
-msgstr ""
+msgstr "银行"
 
 #: documents/models.py:527
 msgid "Basket"
@@ -294,75 +294,75 @@ msgstr ""
 
 #: documents/models.py:529
 msgid "Bookmark"
-msgstr ""
+msgstr "书签"
 
 #: documents/models.py:530
 msgid "Boxes"
-msgstr ""
+msgstr "盒子"
 
 #: documents/models.py:531
 msgid "Briefcase"
-msgstr ""
+msgstr "公文包"
 
 #: documents/models.py:532
 msgid "Building"
-msgstr ""
+msgstr "建筑"
 
 #: documents/models.py:533
 msgid "Calculator"
-msgstr ""
+msgstr "计算器"
 
 #: documents/models.py:534
 msgid "Calendar"
-msgstr ""
+msgstr "日历"
 
 #: documents/models.py:535
 msgid "Camera"
-msgstr ""
+msgstr "相机"
 
 #: documents/models.py:536
 msgid "Checklist"
-msgstr ""
+msgstr "检查清单"
 
 #: documents/models.py:537
 msgid "Cash"
-msgstr ""
+msgstr "现金"
 
 #: documents/models.py:538
 msgid "Chat"
-msgstr ""
+msgstr "聊天"
 
 #: documents/models.py:539
 msgid "Check"
-msgstr ""
+msgstr "检查"
 
 #: documents/models.py:540
 msgid "Clipboard"
-msgstr ""
+msgstr "剪贴板"
 
 #: documents/models.py:541
 msgid "Clock"
-msgstr ""
+msgstr "时钟"
 
 #: documents/models.py:542
 msgid "Credit card"
-msgstr ""
+msgstr "信用卡"
 
 #: documents/models.py:543
 msgid "Download"
-msgstr ""
+msgstr "下载"
 
 #: documents/models.py:544
 msgid "Envelope"
-msgstr ""
+msgstr "信封"
 
 #: documents/models.py:545
 msgid "Warning"
-msgstr ""
+msgstr "警告"
 
 #: documents/models.py:546
 msgid "File"
-msgstr ""
+msgstr "文件"
 
 #: documents/models.py:547
 msgid "Checked file"
@@ -386,15 +386,15 @@ msgstr "表格"
 
 #: documents/models.py:555
 msgid "Text file"
-msgstr ""
+msgstr "文本文件"
 
 #: documents/models.py:556
 msgid "Files"
-msgstr ""
+msgstr "文件"
 
 #: documents/models.py:557
 msgid "Folder"
-msgstr ""
+msgstr "文件夹"
 
 #: documents/models.py:558 paperless_mail/admin.py:58
 msgid "Filter"
@@ -406,39 +406,39 @@ msgstr ""
 
 #: documents/models.py:560
 msgid "Globe"
-msgstr ""
+msgstr "地球"
 
 #: documents/models.py:561
 msgid "Hash"
-msgstr ""
+msgstr "哈希值"
 
 #: documents/models.py:562
 msgid "Heart"
-msgstr ""
+msgstr "心形"
 
 #: documents/models.py:563
 msgid "House"
-msgstr ""
+msgstr "房子"
 
 #: documents/models.py:564
 msgid "Inbox"
-msgstr ""
+msgstr "收件箱"
 
 #: documents/models.py:565
 msgid "Journals"
-msgstr ""
+msgstr "日记"
 
 #: documents/models.py:566
 msgid "Task list"
-msgstr ""
+msgstr "任务列表"
 
 #: documents/models.py:567
 msgid "Newspaper"
-msgstr ""
+msgstr "报纸"
 
 #: documents/models.py:568
 msgid "Attachment"
-msgstr ""
+msgstr "附件"
 
 #: documents/models.py:569
 msgid "People"
@@ -482,7 +482,7 @@ msgstr ""
 
 #: documents/models.py:579
 msgid "Tag"
-msgstr ""
+msgstr "标签"
 
 #: documents/models.py:580 documents/models.py:595 documents/models.py:1685
 msgid "Tags"
@@ -502,7 +502,7 @@ msgstr ""
 
 #: documents/models.py:584
 msgid "Wallet"
-msgstr ""
+msgstr "钱包"
 
 #: documents/models.py:587
 msgid "Table"
@@ -878,7 +878,7 @@ msgstr "批量删除"
 
 #: documents/models.py:769
 msgid "Apply AI Suggestions"
-msgstr ""
+msgstr "应用 AI 建议"
 
 #: documents/models.py:778 documents/models.py:1349
 msgid "Scheduled"
@@ -1299,7 +1299,7 @@ msgstr "邮件正文（内容），可以包含一些占位符，参见文档。
 
 #: documents/models.py:1582
 msgid "emails to"
-msgstr "发送邮件至"
+msgstr "发送邮件到"
 
 #: documents/models.py:1585
 msgid "The destination email addresses, comma separated."
@@ -1611,8 +1611,8 @@ msgid "workflow runs"
 msgstr "工作流运行"
 
 #: documents/serialisers.py:523 documents/serialisers.py:875
-#: documents/serialisers.py:2827 documents/views.py:312 documents/views.py:2606
-#: paperless_mail/serialisers.py:155
+#: documents/serialisers.py:2827 documents/views.py:313 documents/views.py:2611
+#: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "权限不足。"
 
@@ -1651,7 +1651,7 @@ msgstr "检测到无效变量。"
 msgid "Duplicate document identifiers are not allowed."
 msgstr "不允许重复文档标识符。"
 
-#: documents/serialisers.py:2913 documents/views.py:4603
+#: documents/serialisers.py:2913 documents/views.py:4608
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "未找到文档：%(ids)s"
@@ -1907,36 +1907,36 @@ msgstr "URI 格式 '{parts.scheme}' 不支持。支持的格式有：{', '.join(
 msgid "Unable to parse URI {value}"
 msgstr "无法解析 URI {value}"
 
-#: documents/views.py:305 documents/views.py:2603
+#: documents/views.py:306 documents/views.py:2608
 msgid "Invalid more_like_id"
 msgstr "无效的more_like_id"
 
-#: documents/views.py:1577
+#: documents/views.py:1582
 msgid "Invalid AI configuration."
 msgstr "无效的 AI 配置。"
 
-#: documents/views.py:1588
+#: documents/views.py:1593
 msgid "AI backend request timed out."
 msgstr "AI 后端请求超时。"
 
-#: documents/views.py:2428 documents/views.py:2749
+#: documents/views.py:2433 documents/views.py:2754
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "只能指定 text、title_search、query 或 more_like_id 中的一项。"
 
-#: documents/views.py:4616
+#: documents/views.py:4621
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "权限不足以分享文件：%(id)s。"
 
-#: documents/views.py:4662
+#: documents/views.py:4667
 msgid "Bundle is already being processed."
 msgstr "捆绑包已在处理中。"
 
-#: documents/views.py:4723
+#: documents/views.py:4728
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "分享链接包仍在准备中，请稍后再试。"
 
-#: documents/views.py:4733
+#: documents/views.py:4738
 msgid "The share link bundle is unavailable."
 msgstr "分享链接包不可用。"
 

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-26 16:49+0000\n"
-"PO-Revision-Date: 2026-08-26 17:04\n"
+"POT-Creation-Date: 2026-08-29 20:02+0000\n"
+"PO-Revision-Date: 2026-08-29 20:04\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -1611,8 +1611,8 @@ msgid "workflow runs"
 msgstr "workflow runs (NO)"
 
 #: documents/serialisers.py:523 documents/serialisers.py:875
-#: documents/serialisers.py:2827 documents/views.py:312 documents/views.py:2606
-#: paperless_mail/serialisers.py:155
+#: documents/serialisers.py:2827 documents/views.py:313 documents/views.py:2611
+#: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "Insufficient permissions. (NO)"
 
@@ -1651,7 +1651,7 @@ msgstr "Ugyldig variabel oppdaget."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Duplicate document identifiers are not allowed. (NO)"
 
-#: documents/serialisers.py:2913 documents/views.py:4603
+#: documents/serialisers.py:2913 documents/views.py:4608
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Documents not found: %(ids)s (NO)"
@@ -1907,36 +1907,36 @@ msgstr "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(
 msgid "Unable to parse URI {value}"
 msgstr "Unable to parse URI {value} (NO)"
 
-#: documents/views.py:305 documents/views.py:2603
+#: documents/views.py:306 documents/views.py:2608
 msgid "Invalid more_like_id"
 msgstr "Invalid more_like_id (NO)"
 
-#: documents/views.py:1577
+#: documents/views.py:1582
 msgid "Invalid AI configuration."
 msgstr "Invalid AI configuration. (NO)"
 
-#: documents/views.py:1588
+#: documents/views.py:1593
 msgid "AI backend request timed out."
 msgstr "Forespørselen til KI-tjenesten fikk tidsavbrudd."
 
-#: documents/views.py:2428 documents/views.py:2749
+#: documents/views.py:2433 documents/views.py:2754
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Specify only one of text, title_search, query, or more_like_id. (NO)"
 
-#: documents/views.py:4616
+#: documents/views.py:4621
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Insufficient permissions to share document %(id)s. (NO)"
 
-#: documents/views.py:4662
+#: documents/views.py:4667
 msgid "Bundle is already being processed."
 msgstr "Bundle is already being processed. (NO)"
 
-#: documents/views.py:4723
+#: documents/views.py:4728
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "The share link bundle is still being prepared. Please try again later. (NO)"
 
-#: documents/views.py:4733
+#: documents/views.py:4738
 msgid "The share link bundle is unavailable."
 msgstr "The share link bundle is unavailable. (NO)"
 
