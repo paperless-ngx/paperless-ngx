@@ -2,8 +2,10 @@ import pickle
 from concurrent.futures import ThreadPoolExecutor
 from threading import Event
 from threading import Lock
+from uuid import uuid4
 
 import pytest
+from django.core.cache.backends.locmem import LocMemCache
 
 from documents.caching import StoredLRUCache
 from documents.caching import retrieve_llm_suggestions
@@ -53,9 +55,14 @@ def test_stored_lru_cache_key_ttl(mocker) -> None:
 
 
 def test_llm_suggestions_are_generated_once_for_concurrent_requests(mocker) -> None:
+    mocker.patch(
+        "documents.caching.cache",
+        LocMemCache(uuid4().hex, {}),
+    )
     generation_started = Event()
     finish_generation = Event()
     waiter_started = Event()
+    release_waiter = Event()
     call_lock = Lock()
     calls = 0
     suggestions = {"title": "Generated once"}
@@ -72,7 +79,7 @@ def test_llm_suggestions_are_generated_once_for_concurrent_requests(mocker) -> N
 
     def wait_for_generation(_interval: float) -> None:
         waiter_started.set()
-        assert finish_generation.wait(timeout=2)
+        assert release_waiter.wait(timeout=2)
 
     mock_get_classification = mocker.patch(
         "paperless_ai.ai_classifier.get_ai_document_classification",
@@ -102,6 +109,7 @@ def test_llm_suggestions_are_generated_once_for_concurrent_requests(mocker) -> N
         finish_generation.set()
 
         assert first.result(timeout=2) == suggestions
+        release_waiter.set()
         assert second.result(timeout=2) == suggestions
 
     assert calls == 1
@@ -113,9 +121,14 @@ def test_llm_suggestions_waiter_does_not_rerun_a_failed_generation(mocker) -> No
     A request queued behind a generation that fails should give up, not take
     its turn at re-running a query that just failed.
     """
+    mocker.patch(
+        "documents.caching.cache",
+        LocMemCache(uuid4().hex, {}),
+    )
     generation_started = Event()
     fail_generation = Event()
     waiter_started = Event()
+    release_waiter = Event()
     call_lock = Lock()
     calls = 0
     document = mocker.Mock(pk=43)
@@ -131,7 +144,7 @@ def test_llm_suggestions_waiter_does_not_rerun_a_failed_generation(mocker) -> No
 
     def wait_for_generation(_interval: float) -> None:
         waiter_started.set()
-        assert fail_generation.wait(timeout=2)
+        assert release_waiter.wait(timeout=2)
 
     mocker.patch(
         "paperless_ai.ai_classifier.get_ai_document_classification",
@@ -162,6 +175,7 @@ def test_llm_suggestions_waiter_does_not_rerun_a_failed_generation(mocker) -> No
 
         with pytest.raises(ValueError, match="Unknown model"):
             first.result(timeout=2)
+        release_waiter.set()
         with pytest.raises(LLMTimeoutError):
             second.result(timeout=2)
 
