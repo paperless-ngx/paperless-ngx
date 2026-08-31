@@ -1,10 +1,12 @@
 import { expect, test } from '@playwright/test'
-import path from 'node:path'
 
-const REQUESTS_HAR = path.join(__dirname, 'requests/api-global-permissions.har')
+test.use({
+  extraHTTPHeaders: {
+    Authorization: `Basic ${Buffer.from('viewer:viewer').toString('base64')}`,
+  },
+})
 
 test('should not allow user to edit settings', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
   await page.goto('/dashboard')
   await expect(page.getByRole('link', { name: 'Settings' })).not.toBeAttached()
   await page.goto('/settings')
@@ -14,7 +16,6 @@ test('should not allow user to edit settings', async ({ page }) => {
 })
 
 test('should not allow user to view documents', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
   await page.goto('/dashboard')
   await expect(
     page.locator('nav').getByRole('link', { name: 'Documents' })
@@ -30,7 +31,6 @@ test('should not allow user to view documents', async ({ page }) => {
 })
 
 test('should not allow user to view correspondents', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
   await page.goto('/dashboard')
   await expect(
     page.getByRole('link', { name: 'Attributes' })
@@ -42,7 +42,6 @@ test('should not allow user to view correspondents', async ({ page }) => {
 })
 
 test('should not allow user to view tags', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
   await page.goto('/dashboard')
   await expect(
     page.getByRole('link', { name: 'Attributes' })
@@ -54,7 +53,6 @@ test('should not allow user to view tags', async ({ page }) => {
 })
 
 test('should not allow user to view document types', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
   await page.goto('/dashboard')
   await expect(
     page.getByRole('link', { name: 'Attributes' })
@@ -66,7 +64,6 @@ test('should not allow user to view document types', async ({ page }) => {
 })
 
 test('should not allow user to view storage paths', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
   await page.goto('/dashboard')
   await expect(
     page.getByRole('link', { name: 'Attributes' })
@@ -78,7 +75,6 @@ test('should not allow user to view storage paths', async ({ page }) => {
 })
 
 test('should not allow user to view logs', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
   await page.goto('/dashboard')
   await expect(page.getByRole('link', { name: 'Logs' })).not.toBeAttached()
   await page.goto('/logs')
@@ -88,7 +84,6 @@ test('should not allow user to view logs', async ({ page }) => {
 })
 
 test('should not allow user to view tasks', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
   await page.goto('/dashboard')
   await expect(page.getByRole('link', { name: 'Tasks' })).not.toBeAttached()
   await page.goto('/tasks')
