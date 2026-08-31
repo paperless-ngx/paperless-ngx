@@ -6,6 +6,10 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "e2e": "playwright test",
+    "e2e:backend": "uv run --project .. --no-sync python e2e/backend.py",
+    "e2e:ui": "playwright test --ui",
+    "start:e2e": "ng serve --configuration=e2e",
     "test": "ng test",
     "lint": "ng lint"
   },

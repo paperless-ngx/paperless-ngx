@@ -1,12 +1,25 @@
 import { expect, test } from '@playwright/test'
-import path from 'node:path'
 
-const REQUESTS_HAR = path.join(__dirname, 'requests/api-settings.har')
+test.beforeEach(async ({ page }) => {
+  await page.route('**/api/status/', (route) =>
+    route.fulfill({
+      json: {
+        database: { status: 'OK' },
+        tasks: {
+          redis_status: 'DISABLED',
+          celery_status: 'DISABLED',
+          index_status: 'OK',
+          classifier_status: 'OK',
+          sanity_check_status: 'OK',
+        },
+      },
+    })
+  )
+})
 
 test('should activate / deactivate save button when settings change', async ({
   page,
 }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
   await page.goto('/settings')
   await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled()
   await page.getByLabel('Use system setting').click()
@@ -15,7 +28,6 @@ test('should activate / deactivate save button when settings change', async ({
 })
 
 test('should warn on unsaved changes', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
   await page.goto('/settings')
   await page.getByLabel('Use system setting').click()
   await page.getByRole('link', { name: 'Dashboard' }).click()
@@ -27,7 +39,6 @@ test('should warn on unsaved changes', async ({ page }) => {
 })
 
 test('should apply appearance changes when set', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
   await page.goto('/settings')
   await expect(page.locator('html')).toHaveAttribute('data-bs-theme', /auto/)
   await page.getByLabel('Use system setting').click()

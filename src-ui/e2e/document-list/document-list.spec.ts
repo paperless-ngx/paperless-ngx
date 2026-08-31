@@ -1,19 +1,10 @@
 import { expect, test } from '@playwright/test'
-import path from 'node:path'
-
-const REQUESTS_HAR1 = path.join(__dirname, 'requests/api-document-list1.har')
-const REQUESTS_HAR2 = path.join(__dirname, 'requests/api-document-list2.har')
-const REQUESTS_HAR3 = path.join(__dirname, 'requests/api-document-list3.har')
-const REQUESTS_HAR4 = path.join(__dirname, 'requests/api-document-list4.har')
-const REQUESTS_HAR5 = path.join(__dirname, 'requests/api-document-list5.har')
-const REQUESTS_HAR6 = path.join(__dirname, 'requests/api-document-list6.har')
 
 test('basic filtering', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR1, { notFound: 'fallback' })
   await page.goto('/documents')
   await page.getByRole('button', { name: 'Tags' }).click()
   await page.getByRole('menuitem', { name: 'Inbox' }).click()
-  await expect(page).toHaveURL(/tags__id__all=9/)
+  await expect(page).toHaveURL(/tags__id__all=1/)
   await expect(page.locator('pngx-document-list')).toHaveText(/8 documents/)
   await page.getByRole('button', { name: 'Document type' }).click()
   await page.getByRole('menuitem', { name: /^Invoice Test/ }).click()
@@ -23,28 +14,27 @@ test('basic filtering', async ({ page }) => {
   await page.getByRole('button', { name: 'Correspondent' }).click()
   await page.getByRole('menuitem', { name: 'Test Correspondent 1' }).click()
   await page.getByRole('menuitem', { name: 'Correspondent 9' }).click()
-  await expect(page).toHaveURL(/correspondent__id__in=12,1/)
+  await expect(page).toHaveURL(/correspondent__id__in=(?:1,2|2,1)/)
   await expect(page.locator('pngx-document-list')).toHaveText(/7 documents/)
   await page
     .locator('pngx-filter-editor')
     .getByTitle('Correspondent')
     .getByText('Exclude')
     .click()
-  await expect(page).toHaveURL(/correspondent__id__none=12,1/)
+  await expect(page).toHaveURL(/correspondent__id__none=(?:1,2|2,1)/)
   await expect(page.locator('pngx-document-list')).toHaveText(/54 documents/)
   // clear button
   await page.getByRole('button', { name: '2 selected', exact: true }).click()
   await expect(page.locator('pngx-document-list')).toHaveText(/61 documents/)
   await page.getByRole('button', { name: 'Storage path' }).click()
   await page.getByRole('menuitem', { name: 'Testing 12' }).click()
-  await expect(page).toHaveURL(/storage_path__id__in=5/)
+  await expect(page).toHaveURL(/storage_path__id__in=1/)
   await expect(page.locator('pngx-document-list')).toHaveText(/8 documents/)
   await page.getByRole('button', { name: 'Reset filters' }).first().click()
   await expect(page.locator('pngx-document-list')).toHaveText(/61 documents/)
 })
 
 test('text filtering', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR2, { notFound: 'fallback' })
   await page.goto('/documents')
   await page.getByRole('main').getByRole('combobox').click()
   await page.getByRole('main').getByRole('combobox').fill('test')
@@ -57,7 +47,7 @@ test('text filtering', async ({ page }) => {
   await page.getByRole('button', { name: 'Title', exact: true }).click()
   await page.getByRole('button', { name: 'Advanced search' }).click()
   await expect(page).toHaveURL(/query=test/)
-  await expect(page.locator('pngx-document-list')).toHaveText(/26 documents/)
+  await expect(page.locator('pngx-document-list')).toHaveText(/32 documents/)
   await page.getByRole('button', { name: 'Advanced search' }).click()
   await page.getByRole('button', { name: 'ASN' }).click()
   await page.getByRole('main').getByRole('combobox').nth(1).fill('1123')
@@ -80,7 +70,6 @@ test('text filtering', async ({ page }) => {
 })
 
 test('date filtering', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR3, { notFound: 'fallback' })
   await page.goto('/documents')
   await page.getByRole('button', { name: 'Dates' }).click()
   await page.locator('.ng-arrow-wrapper').first().click()
@@ -94,15 +83,14 @@ test('date filtering', async ({ page }) => {
   await page.getByRole('option', { name: 'Within 3 months' }).click()
   await page.getByLabel('Dates selected').locator('button').first().click()
   await page.getByLabel('Dates selected').locator('button').first().click()
-  await page.getByRole('combobox', { name: 'Select month' }).selectOption('12')
-  await page.getByRole('combobox', { name: 'Select year' }).selectOption('2022')
-  await page.getByText('11', { exact: true }).click()
+  const createdFrom = page.getByRole('textbox', { name: 'mm/dd/yyyy' }).first()
+  await createdFrom.fill('12/11/2022')
+  await createdFrom.press('Enter')
   await page.getByRole('button', { name: 'Title & content' }).click()
-  await expect(page.locator('pngx-document-list')).toHaveText(/2 documents/)
+  await expect(page.locator('pngx-document-list')).toHaveText(/3 documents/)
 })
 
 test('sorting', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR4, { notFound: 'fallback' })
   await page.goto('/documents')
   await page.getByRole('button', { name: 'Sort' }).click()
   await page.getByRole('button', { name: 'ASN' }).click()
@@ -140,7 +128,6 @@ test('sorting', async ({ page }) => {
 })
 
 test('change views', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR5, { notFound: 'fallback' })
   await page.goto('/documents')
   await page.locator('.btn-group > label').first().click()
   await expect(page.locator('pngx-document-list table')).toBeVisible()
@@ -151,12 +138,18 @@ test('change views', async ({ page }) => {
 })
 
 test('bulk edit', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR6, { notFound: 'fallback' })
+  const uiSettingsLoaded = page.waitForResponse(
+    (response) => response.url().includes('/api/ui_settings/') && response.ok()
+  )
   await page.goto('/documents')
+  await uiSettingsLoaded
 
-  await page.locator('pngx-document-card-small').nth(0).click()
   await page
-    .locator('pngx-document-card-small')
+    .locator('pngx-document-card-small .doc-img-container')
+    .nth(0)
+    .click()
+  await page
+    .locator('pngx-document-card-small .doc-img-container')
     .nth(3)
     .click({
       modifiers: ['Shift'],
@@ -176,8 +169,14 @@ test('bulk edit', async ({ page }) => {
   )
   await page.getByRole('button', { name: 'None' }).click()
 
-  await page.locator('pngx-document-card-small').nth(1).click()
-  await page.locator('pngx-document-card-small').nth(2).click()
+  await page
+    .locator('pngx-document-card-small .doc-img-container')
+    .nth(1)
+    .click()
+  await page
+    .locator('pngx-document-card-small .doc-img-container')
+    .nth(2)
+    .click()
 
   await page.getByRole('button', { name: 'Tags' }).click()
   await page
@@ -185,15 +184,26 @@ test('bulk edit', async ({ page }) => {
     .fill('TagWithPartial')
   await page.getByRole('menuitem', { name: 'TagWithPartial' }).click()
 
-  await page.getByRole('button', { name: 'Apply' }).click()
-
   const bulkEditPromise = page.waitForRequest((request) => {
+    if (
+      !request.url().includes('/api/documents/bulk_edit/') ||
+      request.method() !== 'POST'
+    ) {
+      return false
+    }
     const postData = request.postDataJSON()
     let isValid = postData['method'] == 'modify_tags'
-    isValid = isValid && postData['parameters']['add_tags'].includes(5)
-    return request.url().toString().includes('bulk_edit') && isValid
+    isValid =
+      isValid &&
+      [
+        ...postData['parameters']['add_tags'],
+        ...postData['parameters']['remove_tags'],
+      ].includes(3)
+    return isValid
   })
 
+  await page.getByRole('button', { name: 'Apply' }).click()
+  await expect(page.getByRole('button', { name: 'Confirm' })).toBeVisible()
   await page.getByRole('button', { name: 'Confirm' }).click()
   await bulkEditPromise
 })
