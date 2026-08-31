@@ -57,11 +57,15 @@ def seed_database() -> None:
     from documents.models import Tag
     from documents.models import UiSettings
 
+    # Fixed credentials are safe within this disposable, localhost-only instance.
     admin = User.objects.create_superuser(
         username="playwright",
-        password="playwright",
+        password="playwright",  # NOSONAR
     )
-    User.objects.create_user(username="viewer", password="viewer")
+    User.objects.create_user(
+        username="viewer",
+        password="viewer",  # NOSONAR
+    )
 
     inbox = Tag.objects.create(name="Inbox", is_inbox_tag=True, owner=admin)
     quick_filter = Tag.objects.create(name="Another Sample Tag", owner=admin)

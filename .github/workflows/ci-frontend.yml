@@ -237,7 +237,8 @@ jobs:
       - name: Install backend dependencies
         env:
           PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}
-        run: uv sync --python "${PYTHON_VERSION}" --no-dev --frozen
+        # The frozen repository lockfile and its build hooks are trusted.
+        run: uv sync --python "${PYTHON_VERSION}" --no-dev --frozen # NOSONAR
       - name: Run Playwright E2E tests
         run: cd src-ui && pnpm exec playwright test
   frontend-build:
