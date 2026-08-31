@@ -103,6 +103,8 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,%3csvg xmlns='h
   --bs-danger-rgb: 183, 22, 49;
   --bs-body-bg: #161618;
   --bs-body-bg-rgb: 22, 22, 24;
+  --bs-secondary-bg: var(--pngx-bg-disabled);
+  --bs-secondary-bg-rgb: 36, 37, 41;
   --bs-light: #1c1c1f;
   --bs-light-rgb: 28, 28, 31;
   --bs-info: var(--pngx-bg-alt);
