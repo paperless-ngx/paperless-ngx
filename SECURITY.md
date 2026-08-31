@@ -59,10 +59,13 @@ The following are not generally considered vulnerabilities unless accompanied by
 - large uploads or resource usage that do not bypass documented limits or privileges
 - IDOR / access control claims regarding the ability to attach an un-viewable object to a document. This is expected behavior.
 - claims based solely on the presence of a library, framework feature or code pattern without a working exploit
-- reports that rely on admin-level access, workflow-editing privileges, shell access, or other high-trust roles unless they demonstrate an unintended privilege boundary bypass
+- pickle deserialization of internal data from trusted components such as the Redis-compatible broker or Paperless-ngx data directory
+- users with permission to edit users granting themselves additional privileges; this is expected behavior for that trusted permission
+- reports that rely on admin-level access, application-configuration access, workflow-editing privileges, shell access, or other high-trust roles unless they demonstrate an unintended privilege boundary bypass
 - optional webhook, mail, AI, OCR, or integration behavior described without a product-level vulnerability
 - missing limits or hardening settings presented without concrete impact
 - generic AI or static-analysis output that is not confirmed against the current codebase and a real deployment scenario
+- metadata names visible in a document's custom storage path, even when the user cannot access the underlying metadata object; this is expected behavior
 - the ability to attach objects that a user cannot access to a document by ID is an intentional design choice, and not considered a vulnerability
 
 ## Transparency

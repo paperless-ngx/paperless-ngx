@@ -272,6 +272,19 @@ describe('GlobalSearchComponent', () => {
     expect(advancedSearchSpy).toHaveBeenCalled()
   })
 
+  it('should set query immediately and run full search on enter without waiting for debounce', () => {
+    jest.useFakeTimers()
+    const searchSpy = jest.spyOn(searchService, 'globalSearch')
+    searchSpy.mockReturnValue(of({} as any))
+    const fullSearchSpy = jest.spyOn(component, 'runFullSearch')
+    component.onQueryChange('test')
+    expect(component.query()).toBe('test')
+    component.searchInputKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }))
+    expect(fullSearchSpy).toHaveBeenCalled()
+    expect(searchSpy).not.toHaveBeenCalled()
+    jest.useRealTimers()
+  })
+
   it('should search on query debounce', () => {
     jest.useFakeTimers()
     const query = 'test'

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-31 16:14+0000\n"
-"PO-Revision-Date: 2026-07-31 16:15\n"
+"POT-Creation-Date: 2026-08-29 20:02+0000\n"
+"PO-Revision-Date: 2026-08-29 20:04\n"
 "Last-Translator: \n"
 "Language-Team: Albanian\n"
 "Language: sq_AL\n"
@@ -21,199 +21,199 @@ msgstr ""
 msgid "Documents"
 msgstr "Documents"
 
-#: documents/filters.py:472
+#: documents/filters.py:471
 msgid "Value must be valid JSON."
-msgstr "Value must be valid JSON."
+msgstr "Vlera duhet të jetë JSON i vlefshëm."
 
-#: documents/filters.py:491
+#: documents/filters.py:490
 msgid "Invalid custom field query expression"
-msgstr "Invalid custom field query expression"
+msgstr "Shprehje e pavlefshme kërkimi për fushë të personalizuar"
 
-#: documents/filters.py:501
+#: documents/filters.py:500
 msgid "Invalid expression list. Must be nonempty."
-msgstr "Invalid expression list. Must be nonempty."
+msgstr "Listë shprehjesh e pavlefshme. Nuk duhet të jetë bosh."
 
-#: documents/filters.py:522
+#: documents/filters.py:521
 msgid "Invalid logical operator {op!r}"
 msgstr "Invalid logical operator {op!r}"
 
-#: documents/filters.py:536
+#: documents/filters.py:535
 msgid "Maximum number of query conditions exceeded."
-msgstr "[SQ] Maximum number of query conditions exceeded."
+msgstr "Është tejkaluar numri maksimal i kushteve të kërkimit."
 
-#: documents/filters.py:600
+#: documents/filters.py:599
 msgid "{name!r} is not a valid custom field."
-msgstr "[SQ] {name!r} is not a valid custom field."
+msgstr "{name!r} nuk është fushë e personalizuar e vlefshme."
 
-#: documents/filters.py:637
+#: documents/filters.py:636
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr "[SQ] {data_type} does not support query expr {expr!r}."
+msgstr "{data_type} nuk e mbështet shprehjen e kërkimit {expr!r}."
 
-#: documents/filters.py:752 documents/models.py:136
+#: documents/filters.py:755 documents/models.py:136
 msgid "Maximum nesting depth exceeded."
-msgstr "[SQ] Maximum nesting depth exceeded."
+msgstr "Është tejkaluar thellësia maksimale e ndërfutjes."
 
-#: documents/filters.py:1094
+#: documents/filters.py:1079
 msgid "Custom field not found"
-msgstr "Custom field not found"
+msgstr "Fusha e personalizuar nuk u gjet"
 
-#: documents/models.py:39 documents/models.py:920 documents/models.py:968
+#: documents/models.py:39 documents/models.py:992 documents/models.py:1040
 msgid "owner"
-msgstr "[SQ] owner"
+msgstr "pronari"
 
-#: documents/models.py:56 documents/models.py:1266
+#: documents/models.py:56 documents/models.py:1338
 msgid "None"
 msgstr "Asgjë"
 
-#: documents/models.py:57 documents/models.py:1267
+#: documents/models.py:57 documents/models.py:1339
 msgid "Any word"
-msgstr "[SQ] Any word"
+msgstr "Çdo fjalë"
 
-#: documents/models.py:58 documents/models.py:1268
+#: documents/models.py:58 documents/models.py:1340
 msgid "All words"
-msgstr "[SQ] All words"
+msgstr "Të gjitha fjalët"
 
-#: documents/models.py:59 documents/models.py:1269
+#: documents/models.py:59 documents/models.py:1341
 msgid "Exact match"
-msgstr "[SQ] Exact match"
+msgstr "Përputhje e saktë"
 
-#: documents/models.py:60 documents/models.py:1270
+#: documents/models.py:60 documents/models.py:1342
 msgid "Regular expression"
-msgstr "[SQ] Regular expression"
+msgstr "Shprehje e rregullt"
 
-#: documents/models.py:61 documents/models.py:1271
+#: documents/models.py:61 documents/models.py:1343
 msgid "Fuzzy word"
-msgstr "[SQ] Fuzzy word"
+msgstr "Fjalë e përafërt"
 
 #: documents/models.py:62
 msgid "Automatic"
-msgstr "[SQ] Automatic"
+msgstr "Automatike"
 
-#: documents/models.py:65 documents/models.py:542 documents/models.py:1849
+#: documents/models.py:65 documents/models.py:606 documents/models.py:1964
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
-msgstr "[SQ] name"
+msgstr "emri"
 
-#: documents/models.py:67 documents/models.py:1335
+#: documents/models.py:67 documents/models.py:1407
 msgid "match"
-msgstr "[SQ] match"
+msgstr "përputhje"
 
-#: documents/models.py:70 documents/models.py:1338
+#: documents/models.py:70 documents/models.py:1410
 msgid "matching algorithm"
-msgstr "[SQ] matching algorithm"
+msgstr "algoritmi i përputhjes"
 
-#: documents/models.py:75 documents/models.py:1343
+#: documents/models.py:75 documents/models.py:1415
 msgid "is insensitive"
-msgstr "[SQ] is insensitive"
+msgstr "është pa dallim shkronjash"
 
 #: documents/models.py:98 documents/models.py:166
 msgid "correspondent"
-msgstr "[SQ] correspondent"
+msgstr "korrespondenti"
 
 #: documents/models.py:99
 msgid "correspondents"
-msgstr "[SQ] correspondents"
+msgstr "korrespondentët"
 
 #: documents/models.py:103
 msgid "color"
-msgstr "[SQ] color"
+msgstr "ngjyra"
 
 #: documents/models.py:108
 msgid "is inbox tag"
-msgstr "[SQ] is inbox tag"
+msgstr "është etiketë e kutisë hyrëse"
 
 #: documents/models.py:111
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr "[SQ] Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
+msgstr "E shënon këtë etiketë si etiketë të kutisë hyrëse: të gjitha dokumentet e sapo-konsumuara do të etiketohen me etiketat e kutisë hyrëse."
 
 #: documents/models.py:117
 msgid "tag"
-msgstr "[SQ] tag"
+msgstr "etiketë"
 
 #: documents/models.py:118 documents/models.py:213
 msgid "tags"
-msgstr "[SQ] tags"
+msgstr "etiketat"
 
 #: documents/models.py:124
 msgid "Cannot set itself as parent."
-msgstr "[SQ] Cannot set itself as parent."
+msgstr "Nuk mund të caktohet vetja si prind."
 
 #: documents/models.py:126
 msgid "Cannot set parent to a descendant."
-msgstr "[SQ] Cannot set parent to a descendant."
+msgstr "Prindi nuk mund të caktohet te një pasardhës."
 
 #: documents/models.py:143 documents/models.py:186
 msgid "document type"
-msgstr "[SQ] document type"
+msgstr "lloji i dokumentit"
 
 #: documents/models.py:144
 msgid "document types"
-msgstr "[SQ] document types"
+msgstr "llojet e dokumenteve"
 
 #: documents/models.py:149
 msgid "path"
-msgstr "[SQ] path"
+msgstr "shtegu"
 
 #: documents/models.py:153 documents/models.py:175
 msgid "storage path"
-msgstr "[SQ] storage path"
+msgstr "shtegu i ruajtjes"
 
 #: documents/models.py:154
 msgid "storage paths"
-msgstr "[SQ] storage paths"
+msgstr "shtigjet e ruajtjes"
 
 #: documents/models.py:178
 msgid "title"
-msgstr "[SQ] title"
+msgstr "titulli"
 
-#: documents/models.py:190 documents/models.py:834
+#: documents/models.py:190 documents/models.py:906
 msgid "content"
-msgstr "[SQ] content"
+msgstr "përmbajtja"
 
 #: documents/models.py:193
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr "[SQ] The raw, text-only data of the document. This field is primarily used for searching."
+msgstr "Të dhënat e papërpunuara vetëm tekst të dokumentit. Kjo fushë përdoret kryesisht për kërkim."
 
 #: documents/models.py:207
 msgid "mime type"
-msgstr "[SQ] mime type"
+msgstr "lloji MIME"
 
 #: documents/models.py:217
 msgid "checksum"
-msgstr "[SQ] checksum"
+msgstr "shuma e kontrollit"
 
 #: documents/models.py:221
 msgid "The checksum of the original document."
-msgstr "[SQ] The checksum of the original document."
+msgstr "Shuma e kontrollit e dokumentit origjinal."
 
 #: documents/models.py:225
 msgid "archive checksum"
-msgstr "[SQ] archive checksum"
+msgstr "shuma e kontrollit e arkivit"
 
 #: documents/models.py:230
 msgid "The checksum of the archived document."
-msgstr "[SQ] The checksum of the archived document."
+msgstr "Shuma e kontrollit e dokumentit të arkivuar."
 
 #: documents/models.py:234
 msgid "page count"
-msgstr "[SQ] page count"
+msgstr "numri i faqeve"
 
 #: documents/models.py:241
 msgid "The number of pages of the document."
-msgstr "[SQ] The number of pages of the document."
+msgstr "Numri i faqeve të dokumentit."
 
-#: documents/models.py:246 documents/models.py:840 documents/models.py:878
-#: documents/models.py:940 documents/models.py:1068 documents/models.py:1127
+#: documents/models.py:246 documents/models.py:912 documents/models.py:950
+#: documents/models.py:1012 documents/models.py:1140 documents/models.py:1199
 msgid "created"
-msgstr "[SQ] created"
+msgstr "krijuar"
 
 #: documents/models.py:252
 msgid "modified"
-msgstr "[SQ] modified"
+msgstr "ndryshuar"
 
 #: documents/models.py:259
 msgid "added"
-msgstr "[SQ] added"
+msgstr "shtuar"
 
 #: documents/models.py:266
 msgid "filename"
@@ -221,1912 +221,2208 @@ msgstr "emri skedarit"
 
 #: documents/models.py:272
 msgid "Current filename in storage"
-msgstr "[SQ] Current filename in storage"
+msgstr "Emri aktual i skedarit në ruajtje"
 
 #: documents/models.py:276
 msgid "archive filename"
-msgstr "[SQ] archive filename"
+msgstr "emri i skedarit të arkivit"
 
 #: documents/models.py:282
 msgid "Current archive filename in storage"
-msgstr "[SQ] Current archive filename in storage"
+msgstr "Emri aktual i skedarit të arkivit në ruajtje"
 
 #: documents/models.py:286
 msgid "original filename"
-msgstr "[SQ] original filename"
+msgstr "emri origjinal i skedarit"
 
 #: documents/models.py:292
 msgid "The original name of the file when it was uploaded"
-msgstr "[SQ] The original name of the file when it was uploaded"
+msgstr "Emri origjinal i skedarit kur u ngarkua"
 
 #: documents/models.py:299
 msgid "archive serial number"
-msgstr "[SQ] archive serial number"
+msgstr "numri serial i arkivit"
 
 #: documents/models.py:309
 msgid "The position of this document in your physical document archive."
-msgstr "[SQ] The position of this document in your physical document archive."
+msgstr "Pozicioni i këtij dokumenti në arkivin tuaj fizik të dokumenteve."
 
 #: documents/models.py:319
 msgid "root document for this version"
-msgstr "[SQ] root document for this version"
+msgstr "dokumenti rrënjë për këtë version"
 
 #: documents/models.py:323
 msgid "version index"
-msgstr "[SQ] version index"
+msgstr "indeksi i versionit"
 
 #: documents/models.py:327
 msgid "Index of this version within the root document."
-msgstr "[SQ] Index of this version within the root document."
+msgstr "Indeksi i këtij versioni brenda dokumentit rrënjë."
 
 #: documents/models.py:331
 msgid "version label"
-msgstr "[SQ] version label"
+msgstr "etiketa e versionit"
 
 #: documents/models.py:335
 msgid "Optional short label for a document version."
-msgstr "Optional short label for a document version."
+msgstr "Etiketë e shkurtër opsionale për një version dokumenti."
 
-#: documents/models.py:340 documents/models.py:851 documents/models.py:905
-#: documents/models.py:1892
+#: documents/models.py:340 documents/models.py:923 documents/models.py:977
+#: documents/models.py:2007
 msgid "document"
-msgstr "[SQ] document"
+msgstr "dokumenti"
 
-#: documents/models.py:341 documents/models.py:1011
+#: documents/models.py:341 documents/models.py:1083
 msgid "documents"
-msgstr "[SQ] documents"
+msgstr "dokumentet"
 
-#: documents/models.py:523
-msgid "Table"
-msgstr "[SQ] Table"
+#: documents/models.py:525 documents/models.py:946
+msgid "Archive"
+msgstr "Arkiv"
 
-#: documents/models.py:524
-msgid "Small Cards"
-msgstr "[SQ] Small Cards"
+#: documents/models.py:526
+msgid "Bank"
+msgstr ""
 
-#: documents/models.py:525
-msgid "Large Cards"
-msgstr "[SQ] Large Cards"
+#: documents/models.py:527
+msgid "Basket"
+msgstr ""
 
 #: documents/models.py:528
-msgid "Title"
-msgstr "[SQ] Title"
+msgid "Bell"
+msgstr ""
 
-#: documents/models.py:529 documents/models.py:750 documents/models.py:1287
-msgid "Created"
-msgstr "Created"
+#: documents/models.py:529
+msgid "Bookmark"
+msgstr ""
 
-#: documents/models.py:530 documents/models.py:1286
-msgid "Added"
-msgstr "[SQ] Added"
+#: documents/models.py:530
+msgid "Boxes"
+msgstr ""
 
 #: documents/models.py:531
-msgid "Tags"
-msgstr "Tags"
+msgid "Briefcase"
+msgstr ""
 
 #: documents/models.py:532
-msgid "Correspondent"
-msgstr "[SQ] Correspondent"
+msgid "Building"
+msgstr ""
 
 #: documents/models.py:533
-msgid "Document Type"
-msgstr "Document Type"
+msgid "Calculator"
+msgstr ""
 
 #: documents/models.py:534
-msgid "Storage Path"
-msgstr "[SQ] Storage Path"
+msgid "Calendar"
+msgstr ""
 
 #: documents/models.py:535
-msgid "Note"
-msgstr "[SQ] Note"
+msgid "Camera"
+msgstr ""
 
 #: documents/models.py:536
-msgid "Owner"
-msgstr "[SQ] Owner"
+msgid "Checklist"
+msgstr ""
 
 #: documents/models.py:537
-msgid "Shared"
-msgstr "[SQ] Shared"
+msgid "Cash"
+msgstr ""
 
 #: documents/models.py:538
+msgid "Chat"
+msgstr ""
+
+#: documents/models.py:539
+msgid "Check"
+msgstr ""
+
+#: documents/models.py:540
+msgid "Clipboard"
+msgstr ""
+
+#: documents/models.py:541
+msgid "Clock"
+msgstr ""
+
+#: documents/models.py:542
+msgid "Credit card"
+msgstr ""
+
+#: documents/models.py:543
+msgid "Download"
+msgstr ""
+
+#: documents/models.py:544
+msgid "Envelope"
+msgstr ""
+
+#: documents/models.py:545
+msgid "Warning"
+msgstr ""
+
+#: documents/models.py:546
+msgid "File"
+msgstr ""
+
+#: documents/models.py:547
+msgid "Checked file"
+msgstr ""
+
+#: documents/models.py:548
+msgid "Locked file"
+msgstr ""
+
+#: documents/models.py:549
+msgid "Medical file"
+msgstr ""
+
+#: documents/models.py:550
+msgid "Person file"
+msgstr ""
+
+#: documents/models.py:553
+msgid "Spreadsheet"
+msgstr ""
+
+#: documents/models.py:555
+msgid "Text file"
+msgstr ""
+
+#: documents/models.py:556
+msgid "Files"
+msgstr ""
+
+#: documents/models.py:557
+msgid "Folder"
+msgstr ""
+
+#: documents/models.py:558 paperless_mail/admin.py:58
+msgid "Filter"
+msgstr "Filtër"
+
+#: documents/models.py:559
+msgid "Gear"
+msgstr ""
+
+#: documents/models.py:560
+msgid "Globe"
+msgstr ""
+
+#: documents/models.py:561
+msgid "Hash"
+msgstr ""
+
+#: documents/models.py:562
+msgid "Heart"
+msgstr ""
+
+#: documents/models.py:563
+msgid "House"
+msgstr ""
+
+#: documents/models.py:564
+msgid "Inbox"
+msgstr ""
+
+#: documents/models.py:565
+msgid "Journals"
+msgstr ""
+
+#: documents/models.py:566
+msgid "Task list"
+msgstr ""
+
+#: documents/models.py:567
+msgid "Newspaper"
+msgstr ""
+
+#: documents/models.py:568
+msgid "Attachment"
+msgstr ""
+
+#: documents/models.py:569
+msgid "People"
+msgstr ""
+
+#: documents/models.py:570
+msgid "Person"
+msgstr ""
+
+#: documents/models.py:571
+msgid "Printer"
+msgstr ""
+
+#: documents/models.py:572
+msgid "Receipt"
+msgstr ""
+
+#: documents/models.py:573
+msgid "Safe"
+msgstr ""
+
+#: documents/models.py:574
+msgid "Search"
+msgstr ""
+
+#: documents/models.py:575
+msgid "Send"
+msgstr ""
+
+#: documents/models.py:576
+msgid "Shop"
+msgstr ""
+
+#: documents/models.py:577
+msgid "Stack"
+msgstr ""
+
+#: documents/models.py:578
+msgid "Stars"
+msgstr ""
+
+#: documents/models.py:579
+msgid "Tag"
+msgstr ""
+
+#: documents/models.py:580 documents/models.py:595 documents/models.py:1685
+msgid "Tags"
+msgstr "Etiketat"
+
+#: documents/models.py:581
+msgid "Telephone"
+msgstr ""
+
+#: documents/models.py:582
+msgid "Truck"
+msgstr ""
+
+#: documents/models.py:583
+msgid "Barcode"
+msgstr ""
+
+#: documents/models.py:584
+msgid "Wallet"
+msgstr ""
+
+#: documents/models.py:587
+msgid "Table"
+msgstr "Tabelë"
+
+#: documents/models.py:588
+msgid "Small Cards"
+msgstr "Karta të vogla"
+
+#: documents/models.py:589
+msgid "Large Cards"
+msgstr "Karta të mëdha"
+
+#: documents/models.py:592 documents/models.py:1684
+msgid "Title"
+msgstr "Titulli"
+
+#: documents/models.py:593 documents/models.py:822 documents/models.py:1359
+msgid "Created"
+msgstr "Krijuar"
+
+#: documents/models.py:594 documents/models.py:1358
+msgid "Added"
+msgstr "Shtuar"
+
+#: documents/models.py:596 documents/models.py:1686
+msgid "Correspondent"
+msgstr "Korrespondenti"
+
+#: documents/models.py:597
+msgid "Document Type"
+msgstr "Lloji i dokumentit"
+
+#: documents/models.py:598
+msgid "Storage Path"
+msgstr "Shtegu i ruajtjes"
+
+#: documents/models.py:599
+msgid "Note"
+msgstr "Shënim"
+
+#: documents/models.py:600
+msgid "Owner"
+msgstr "Pronari"
+
+#: documents/models.py:601
+msgid "Shared"
+msgstr "I ndarë"
+
+#: documents/models.py:602
 msgid "ASN"
 msgstr "[SQ] ASN"
 
-#: documents/models.py:539
+#: documents/models.py:603
 msgid "Pages"
-msgstr "[SQ] Pages"
+msgstr "Faqet"
 
-#: documents/models.py:545
+#: documents/models.py:609
+msgid "icon"
+msgstr ""
+
+#: documents/models.py:616
 msgid "sort field"
-msgstr "[SQ] sort field"
+msgstr "fusha e renditjes"
 
-#: documents/models.py:550
+#: documents/models.py:621
 msgid "sort reverse"
-msgstr "[SQ] sort reverse"
+msgstr "renditje e kundërt"
 
-#: documents/models.py:553
+#: documents/models.py:624
 msgid "View page size"
-msgstr "[SQ] View page size"
+msgstr "Madhësia e faqes së pamjes"
 
-#: documents/models.py:561
+#: documents/models.py:632
 msgid "View display mode"
-msgstr "[SQ] View display mode"
+msgstr "Mënyra e shfaqjes së pamjes"
 
-#: documents/models.py:568
+#: documents/models.py:639
 msgid "Document display fields"
-msgstr "Document display fields"
+msgstr "Fushat e shfaqjes së dokumentit"
 
-#: documents/models.py:575 documents/models.py:640
+#: documents/models.py:646 documents/models.py:711
 msgid "saved view"
-msgstr "[SQ] saved view"
+msgstr "pamje e ruajtur"
 
-#: documents/models.py:576
+#: documents/models.py:647
 msgid "saved views"
-msgstr "[SQ] saved views"
+msgstr "pamje të ruajtura"
 
-#: documents/models.py:584
+#: documents/models.py:655
 msgid "title contains"
-msgstr "[SQ] title contains"
+msgstr "titulli përmban"
 
-#: documents/models.py:585
+#: documents/models.py:656
 msgid "content contains"
-msgstr "[SQ] content contains"
+msgstr "përmbajtja përmban"
 
-#: documents/models.py:586
+#: documents/models.py:657
 msgid "ASN is"
-msgstr "[SQ] ASN is"
+msgstr "ASN është"
 
-#: documents/models.py:587
+#: documents/models.py:658
 msgid "correspondent is"
-msgstr "[SQ] correspondent is"
+msgstr "korrespondenti është"
 
-#: documents/models.py:588
+#: documents/models.py:659
 msgid "document type is"
-msgstr "[SQ] document type is"
+msgstr "lloji i dokumentit është"
 
-#: documents/models.py:589
+#: documents/models.py:660
 msgid "is in inbox"
-msgstr "[SQ] is in inbox"
+msgstr "është në kutinë hyrëse"
 
-#: documents/models.py:590
+#: documents/models.py:661
 msgid "has tag"
-msgstr "[SQ] has tag"
+msgstr "ka etiketë"
 
-#: documents/models.py:591
+#: documents/models.py:662
 msgid "has any tag"
-msgstr "[SQ] has any tag"
+msgstr "ka ndonjë etiketë"
 
-#: documents/models.py:592
+#: documents/models.py:663
 msgid "created before"
-msgstr "[SQ] created before"
+msgstr "krijuar para"
 
-#: documents/models.py:593
+#: documents/models.py:664
 msgid "created after"
-msgstr "[SQ] created after"
+msgstr "krijuar pas"
 
-#: documents/models.py:594
+#: documents/models.py:665
 msgid "created year is"
-msgstr "[SQ] created year is"
+msgstr "viti i krijimit është"
 
-#: documents/models.py:595
+#: documents/models.py:666
 msgid "created month is"
-msgstr "[SQ] created month is"
+msgstr "muaji i krijimit është"
 
-#: documents/models.py:596
+#: documents/models.py:667
 msgid "created day is"
-msgstr "[SQ] created day is"
+msgstr "dita e krijimit është"
 
-#: documents/models.py:597
+#: documents/models.py:668
 msgid "added before"
 msgstr "më parë shtuar"
 
-#: documents/models.py:598
+#: documents/models.py:669
 msgid "added after"
-msgstr "[SQ] added after"
+msgstr "shtuar pas"
 
-#: documents/models.py:599
+#: documents/models.py:670
 msgid "modified before"
-msgstr "[SQ] modified before"
+msgstr "ndryshuar para"
 
-#: documents/models.py:600
+#: documents/models.py:671
 msgid "modified after"
-msgstr "[SQ] modified after"
+msgstr "ndryshuar pas"
 
-#: documents/models.py:601
+#: documents/models.py:672
 msgid "does not have tag"
-msgstr "[SQ] does not have tag"
+msgstr "nuk ka etiketë"
 
-#: documents/models.py:602
+#: documents/models.py:673
 msgid "does not have ASN"
-msgstr "[SQ] does not have ASN"
+msgstr "nuk ka ASN"
 
-#: documents/models.py:603
+#: documents/models.py:674
 msgid "title or content contains"
-msgstr "[SQ] title or content contains"
+msgstr "përmban titull ose përmbajtje"
 
-#: documents/models.py:604
+#: documents/models.py:675
 msgid "fulltext query"
-msgstr "[SQ] fulltext query"
+msgstr "kërkim në tekst të plotë"
 
-#: documents/models.py:605
+#: documents/models.py:676
 msgid "more like this"
-msgstr "[SQ] more like this"
+msgstr "më shumë si kjo"
 
-#: documents/models.py:606
+#: documents/models.py:677
 msgid "has tags in"
-msgstr "[SQ] has tags in"
+msgstr "ka etiketa në"
 
-#: documents/models.py:607
+#: documents/models.py:678
 msgid "ASN greater than"
-msgstr "[SQ] ASN greater than"
+msgstr "ASN më i madh se"
 
-#: documents/models.py:608
+#: documents/models.py:679
 msgid "ASN less than"
-msgstr "[SQ] ASN less than"
+msgstr "ASN më i vogël se"
 
-#: documents/models.py:609
+#: documents/models.py:680
 msgid "storage path is"
-msgstr "[SQ] storage path is"
-
-#: documents/models.py:610
-msgid "has correspondent in"
-msgstr "[SQ] has correspondent in"
-
-#: documents/models.py:611
-msgid "does not have correspondent in"
-msgstr "[SQ] does not have correspondent in"
-
-#: documents/models.py:612
-msgid "has document type in"
-msgstr "[SQ] has document type in"
-
-#: documents/models.py:613
-msgid "does not have document type in"
-msgstr "[SQ] does not have document type in"
-
-#: documents/models.py:614
-msgid "has storage path in"
-msgstr "[SQ] has storage path in"
-
-#: documents/models.py:615
-msgid "does not have storage path in"
-msgstr "[SQ] does not have storage path in"
-
-#: documents/models.py:616
-msgid "owner is"
-msgstr "[SQ] owner is"
-
-#: documents/models.py:617
-msgid "has owner in"
-msgstr "[SQ] has owner in"
-
-#: documents/models.py:618
-msgid "does not have owner"
-msgstr "[SQ] does not have owner"
-
-#: documents/models.py:619
-msgid "does not have owner in"
-msgstr "[SQ] does not have owner in"
-
-#: documents/models.py:620
-msgid "has custom field value"
-msgstr "[SQ] has custom field value"
-
-#: documents/models.py:621
-msgid "is shared by me"
-msgstr "[SQ] is shared by me"
-
-#: documents/models.py:622
-msgid "has custom fields"
-msgstr "[SQ] has custom fields"
-
-#: documents/models.py:623
-msgid "has custom field in"
-msgstr "[SQ] has custom field in"
-
-#: documents/models.py:624
-msgid "does not have custom field in"
-msgstr "[SQ] does not have custom field in"
-
-#: documents/models.py:625
-msgid "does not have custom field"
-msgstr "[SQ] does not have custom field"
-
-#: documents/models.py:626
-msgid "custom fields query"
-msgstr "[SQ] custom fields query"
-
-#: documents/models.py:627
-msgid "created to"
-msgstr "[SQ] created to"
-
-#: documents/models.py:628
-msgid "created from"
-msgstr "[SQ] created from"
-
-#: documents/models.py:629
-msgid "added to"
-msgstr "[SQ] added to"
-
-#: documents/models.py:630
-msgid "added from"
-msgstr "[SQ] added from"
-
-#: documents/models.py:631
-msgid "mime type is"
-msgstr "[SQ] mime type is"
-
-#: documents/models.py:632
-msgid "simple title search"
-msgstr "simple title search"
-
-#: documents/models.py:633
-msgid "simple text search"
-msgstr "simple text search"
-
-#: documents/models.py:643
-msgid "rule type"
-msgstr "[SQ] rule type"
-
-#: documents/models.py:645
-msgid "value"
-msgstr "[SQ] value"
-
-#: documents/models.py:648
-msgid "filter rule"
-msgstr "[SQ] filter rule"
-
-#: documents/models.py:649
-msgid "filter rules"
-msgstr "[SQ] filter rules"
-
-#: documents/models.py:679 documents/models.py:934
-msgid "Pending"
-msgstr "[SQ] Pending"
-
-#: documents/models.py:680 documents/models.py:757
-msgid "Started"
-msgstr "Started"
+msgstr "shtegu i ruajtjes është"
 
 #: documents/models.py:681
-msgid "Success"
-msgstr "Success"
+msgid "has correspondent in"
+msgstr "ka korrespondent në"
 
 #: documents/models.py:682
-msgid "Failure"
-msgstr "Failure"
+msgid "does not have correspondent in"
+msgstr "nuk ka korrespondent në"
 
 #: documents/models.py:683
-msgid "Revoked"
-msgstr "Revoked"
+msgid "has document type in"
+msgstr "ka lloj dokumenti në"
+
+#: documents/models.py:684
+msgid "does not have document type in"
+msgstr "nuk ka lloj dokumenti në"
+
+#: documents/models.py:685
+msgid "has storage path in"
+msgstr "ka shteg ruajtjeje në"
 
 #: documents/models.py:686
-msgid "Consume File"
-msgstr "[SQ] Consume File"
+msgid "does not have storage path in"
+msgstr "nuk ka rrugë ruajtjeje"
 
 #: documents/models.py:687
-msgid "Train Classifier"
-msgstr "[SQ] Train Classifier"
+msgid "owner is"
+msgstr "pronari është"
 
 #: documents/models.py:688
-msgid "Sanity Check"
-msgstr "Sanity Check"
+msgid "has owner in"
+msgstr "ka pronar në"
 
 #: documents/models.py:689
-msgid "Index Optimize"
-msgstr "[SQ] Index Optimize"
+msgid "does not have owner"
+msgstr "nuk ka pronar"
 
-#: documents/models.py:690 documents/models.py:1282
-msgid "Mail Fetch"
-msgstr "[SQ] Mail Fetch"
+#: documents/models.py:690
+msgid "does not have owner in"
+msgstr "nuk ka pronar në"
 
 #: documents/models.py:691
-msgid "LLM Index"
-msgstr "LLM Index"
+msgid "has custom field value"
+msgstr "ka vlerë fushe të personalizuar"
 
 #: documents/models.py:692
-msgid "Empty Trash"
-msgstr "Empty Trash"
+msgid "is shared by me"
+msgstr "është ndarë nga unë"
 
 #: documents/models.py:693
-msgid "Check Workflows"
-msgstr "Check Workflows"
+msgid "has custom fields"
+msgstr "ka fusha të personalizuara"
 
 #: documents/models.py:694
-msgid "Bulk Update"
-msgstr "Bulk Update"
+msgid "has custom field in"
+msgstr "ka fushë të personalizuar në"
 
 #: documents/models.py:695
-msgid "Reprocess Document"
-msgstr "Reprocess Document"
+msgid "does not have custom field in"
+msgstr "nuk ka fushë të personalizuar në"
 
 #: documents/models.py:696
-msgid "Build Share Link"
-msgstr "Build Share Link"
+msgid "does not have custom field"
+msgstr "nuk ka fushë të personalizuar"
 
 #: documents/models.py:697
-msgid "Bulk Delete"
-msgstr "Bulk Delete"
+msgid "custom fields query"
+msgstr "kërkim i fushave të personalizuara"
 
-#: documents/models.py:706 documents/models.py:1277
-msgid "Scheduled"
-msgstr "[SQ] Scheduled"
+#: documents/models.py:698
+msgid "created to"
+msgstr "krijuar deri më"
 
-#: documents/models.py:707 documents/models.py:1283
-msgid "Web UI"
-msgstr "[SQ] Web UI"
+#: documents/models.py:699
+msgid "created from"
+msgstr "krijuar nga"
 
-#: documents/models.py:708
-msgid "API Upload"
-msgstr "API Upload"
+#: documents/models.py:700
+msgid "added to"
+msgstr "shtuar deri më"
 
-#: documents/models.py:709
-msgid "Folder Consume"
-msgstr "Folder Consume"
+#: documents/models.py:701
+msgid "added from"
+msgstr "shtuar nga"
 
-#: documents/models.py:710
-msgid "Email Consume"
-msgstr "Email Consume"
+#: documents/models.py:702
+msgid "mime type is"
+msgstr "lloji MIME është"
 
-#: documents/models.py:711
-msgid "System"
-msgstr "System"
+#: documents/models.py:703
+msgid "simple title search"
+msgstr "kërkim i thjeshtë titulli"
 
-#: documents/models.py:712
-msgid "Manual"
-msgstr "Manual"
+#: documents/models.py:704
+msgid "simple text search"
+msgstr "kërkim i thjeshtë teksti"
 
-#: documents/models.py:718
-msgid "Task ID"
-msgstr "[SQ] Task ID"
+#: documents/models.py:714
+msgid "rule type"
+msgstr "lloji i rregullit"
+
+#: documents/models.py:716
+msgid "value"
+msgstr "vlera"
 
 #: documents/models.py:719
-msgid "Celery task ID"
-msgstr "Celery task ID"
+msgid "filter rule"
+msgstr "rregull filtri"
 
-#: documents/models.py:725
-msgid "Task Type"
-msgstr "[SQ] Task Type"
+#: documents/models.py:720
+msgid "filter rules"
+msgstr "rregulla filtri"
 
-#: documents/models.py:726
-msgid "The kind of work being performed"
-msgstr "The kind of work being performed"
+#: documents/models.py:750 documents/models.py:1006
+msgid "Pending"
+msgstr "Në pritje"
 
-#: documents/models.py:733
-msgid "Trigger Source"
-msgstr "Trigger Source"
+#: documents/models.py:751 documents/models.py:829
+msgid "Started"
+msgstr "Filluar"
 
-#: documents/models.py:734
-msgid "What initiated this task"
-msgstr "What initiated this task"
+#: documents/models.py:752
+msgid "Success"
+msgstr "Sukses"
 
-#: documents/models.py:743
-msgid "Status"
-msgstr "Status"
+#: documents/models.py:753
+msgid "Failure"
+msgstr "Dështim"
+
+#: documents/models.py:754
+msgid "Revoked"
+msgstr "Revokuar"
+
+#: documents/models.py:757
+msgid "Consume File"
+msgstr "Konsumo skedarin"
+
+#: documents/models.py:758
+msgid "Train Classifier"
+msgstr "Trajno klasifikuesin"
+
+#: documents/models.py:759
+msgid "Sanity Check"
+msgstr "Kontroll logjik"
+
+#: documents/models.py:760
+msgid "Index Optimize"
+msgstr "Optimizim indeksi"
+
+#: documents/models.py:761 documents/models.py:1354
+msgid "Mail Fetch"
+msgstr "Marrje email-i"
+
+#: documents/models.py:762
+msgid "LLM Index"
+msgstr "Indeks LLM"
 
 #: documents/models.py:763
-msgid "Completed"
-msgstr "Completed"
+msgid "Empty Trash"
+msgstr "Zbraz koshin"
 
-#: documents/models.py:771
-msgid "Duration (seconds)"
-msgstr "Duration (seconds)"
+#: documents/models.py:764
+msgid "Check Workflows"
+msgstr "Kontrollo rrjedhat e punës"
 
-#: documents/models.py:772
-msgid "Elapsed time from start to completion"
-msgstr "Elapsed time from start to completion"
+#: documents/models.py:765
+msgid "Bulk Update"
+msgstr "Përditësim në masë"
 
-#: documents/models.py:778
-msgid "Wait Time (seconds)"
-msgstr "Wait Time (seconds)"
+#: documents/models.py:766
+msgid "Reprocess Document"
+msgstr "Ripërpuno dokumentin"
 
-#: documents/models.py:779
-msgid "Time from task creation to worker pickup"
-msgstr "Time from task creation to worker pickup"
+#: documents/models.py:767
+msgid "Build Share Link"
+msgstr "Ndarja e krijimit të lidhjes"
 
-#: documents/models.py:786
-msgid "Input Data"
-msgstr "Input Data"
+#: documents/models.py:768
+msgid "Bulk Delete"
+msgstr "Fshirje në masë"
 
-#: documents/models.py:787
-msgid "Structured input parameters for the task"
-msgstr "Structured input parameters for the task"
+#: documents/models.py:769
+msgid "Apply AI Suggestions"
+msgstr ""
 
-#: documents/models.py:793
-msgid "Result Data"
-msgstr "[SQ] Result Data"
+#: documents/models.py:778 documents/models.py:1349
+msgid "Scheduled"
+msgstr "Planifikuar"
 
-#: documents/models.py:794
-msgid "Structured result data from task execution"
-msgstr "Structured result data from task execution"
+#: documents/models.py:779 documents/models.py:1355
+msgid "Web UI"
+msgstr "Ndërfaqja web"
 
-#: documents/models.py:800
-msgid "Acknowledged"
-msgstr "[SQ] Acknowledged"
+#: documents/models.py:780
+msgid "API Upload"
+msgstr "Ngarkim API"
+
+#: documents/models.py:781
+msgid "Folder Consume"
+msgstr "Konsum nga dosja"
+
+#: documents/models.py:782
+msgid "Email Consume"
+msgstr "Konsum nga email-i"
+
+#: documents/models.py:783
+msgid "System"
+msgstr "Sistemi"
+
+#: documents/models.py:784
+msgid "Manual"
+msgstr "Manuale"
+
+#: documents/models.py:790
+msgid "Task ID"
+msgstr "ID e detyrës"
+
+#: documents/models.py:791
+msgid "Celery task ID"
+msgstr "ID e detyrës Celery"
+
+#: documents/models.py:797
+msgid "Task Type"
+msgstr "Lloji i detyrës"
+
+#: documents/models.py:798
+msgid "The kind of work being performed"
+msgstr "Lloji i punës që po kryhet"
 
 #: documents/models.py:805
-msgid "Task"
-msgstr "Task"
+msgid "Trigger Source"
+msgstr "Burimi i nisjes"
 
 #: documents/models.py:806
+msgid "What initiated this task"
+msgstr "Çfarë e nisi këtë detyrë"
+
+#: documents/models.py:815
+msgid "Status"
+msgstr "Statusi"
+
+#: documents/models.py:835
+msgid "Completed"
+msgstr "Përfunduar"
+
+#: documents/models.py:843
+msgid "Duration (seconds)"
+msgstr "Kohëzgjatja (sekonda)"
+
+#: documents/models.py:844
+msgid "Elapsed time from start to completion"
+msgstr "Koha e kaluar nga fillimi deri në përfundim"
+
+#: documents/models.py:850
+msgid "Wait Time (seconds)"
+msgstr "Koha e pritjes (sekonda)"
+
+#: documents/models.py:851
+msgid "Time from task creation to worker pickup"
+msgstr "Koha nga krijimi i detyrës deri te marrja nga punëtori"
+
+#: documents/models.py:858
+msgid "Input Data"
+msgstr "Të dhënat hyrëse"
+
+#: documents/models.py:859
+msgid "Structured input parameters for the task"
+msgstr "Parametra hyrës të strukturuar për detyrën"
+
+#: documents/models.py:865
+msgid "Result Data"
+msgstr "Të dhënat e rezultatit"
+
+#: documents/models.py:866
+msgid "Structured result data from task execution"
+msgstr "Të dhëna të strukturuara të rezultatit nga ekzekutimi i detyrës"
+
+#: documents/models.py:872
+msgid "Acknowledged"
+msgstr "Pranuar"
+
+#: documents/models.py:877
+msgid "Task"
+msgstr "Detyrë"
+
+#: documents/models.py:878
 msgid "Tasks"
 msgstr "Detyrat"
 
-#: documents/models.py:836
+#: documents/models.py:908
 msgid "Note for the document"
-msgstr "[SQ] Note for the document"
+msgstr "Shënim për dokumentin"
 
-#: documents/models.py:860
+#: documents/models.py:932
 msgid "user"
-msgstr "[SQ] user"
+msgstr "përdoruesi"
 
-#: documents/models.py:865
+#: documents/models.py:937
 msgid "note"
-msgstr "[SQ] note"
+msgstr "shënim"
 
-#: documents/models.py:866
+#: documents/models.py:938
 msgid "notes"
-msgstr "[SQ] notes"
+msgstr "shënime"
 
-#: documents/models.py:874
-msgid "Archive"
-msgstr "[SQ] Archive"
-
-#: documents/models.py:875
+#: documents/models.py:947
 msgid "Original"
-msgstr "[SQ] Original"
+msgstr "Origjinal"
 
-#: documents/models.py:886 documents/models.py:948 paperless_mail/models.py:75
+#: documents/models.py:958 documents/models.py:1020 paperless_mail/models.py:75
 msgid "expiration"
-msgstr "[SQ] expiration"
+msgstr "skadimi"
 
-#: documents/models.py:893 documents/models.py:955
+#: documents/models.py:965 documents/models.py:1027
 msgid "slug"
 msgstr "[SQ] slug"
 
-#: documents/models.py:925
-msgid "share link"
-msgstr "[SQ] share link"
-
-#: documents/models.py:926
-msgid "share links"
-msgstr "[SQ] share links"
-
-#: documents/models.py:935
-msgid "Processing"
-msgstr "[SQ] Processing"
-
-#: documents/models.py:936
-msgid "Ready"
-msgstr "[SQ] Ready"
-
-#: documents/models.py:937
-msgid "Failed"
-msgstr "[SQ] Failed"
-
-#: documents/models.py:984
-msgid "size (bytes)"
-msgstr "[SQ] size (bytes)"
-
-#: documents/models.py:990
-msgid "last error"
-msgstr "[SQ] last error"
-
 #: documents/models.py:997
-msgid "file path"
-msgstr "[SQ] file path"
+msgid "share link"
+msgstr "lidhje ndarjeje"
 
-#: documents/models.py:1003
-msgid "built at"
-msgstr "[SQ] built at"
+#: documents/models.py:998
+msgid "share links"
+msgstr "lidhje ndarjeje"
 
-#: documents/models.py:1016
-msgid "share link bundle"
-msgstr "[SQ] share link bundle"
+#: documents/models.py:1007
+msgid "Processing"
+msgstr "Në përpunim"
 
-#: documents/models.py:1017
-msgid "share link bundles"
-msgstr "[SQ] share link bundles"
+#: documents/models.py:1008
+msgid "Ready"
+msgstr "Gati"
 
-#: documents/models.py:1020
-#, python-format
-msgid "Share link bundle %(slug)s"
-msgstr "[SQ] Share link bundle %(slug)s"
+#: documents/models.py:1009
+msgid "Failed"
+msgstr "Dështoi"
 
 #: documents/models.py:1056
-msgid "String"
-msgstr "[SQ] String"
+msgid "size (bytes)"
+msgstr "madhësia (bajt)"
 
-#: documents/models.py:1057
+#: documents/models.py:1062
+msgid "last error"
+msgstr "gabimi i fundit"
+
+#: documents/models.py:1069
+msgid "file path"
+msgstr "shtegu i skedarit"
+
+#: documents/models.py:1075
+msgid "built at"
+msgstr "ndërtuar më"
+
+#: documents/models.py:1088
+msgid "share link bundle"
+msgstr "paketë lidhjeje ndarjeje"
+
+#: documents/models.py:1089
+msgid "share link bundles"
+msgstr "paketa lidhjesh ndarjeje"
+
+#: documents/models.py:1092
+#, python-format
+msgid "Share link bundle %(slug)s"
+msgstr "Paketa e lidhjes së ndarjes %(slug)s"
+
+#: documents/models.py:1128
+msgid "String"
+msgstr "Varg"
+
+#: documents/models.py:1129
 msgid "URL"
 msgstr "[SQ] URL"
 
-#: documents/models.py:1058
+#: documents/models.py:1130
 msgid "Date"
-msgstr "[SQ] Date"
+msgstr "Datë"
 
-#: documents/models.py:1059
+#: documents/models.py:1131
 msgid "Boolean"
 msgstr "[SQ] Boolean"
 
-#: documents/models.py:1060
+#: documents/models.py:1132
 msgid "Integer"
-msgstr "[SQ] Integer"
+msgstr "Numër i plotë"
 
-#: documents/models.py:1061
+#: documents/models.py:1133
 msgid "Float"
-msgstr "[SQ] Float"
+msgstr "Numër dhjetor"
 
-#: documents/models.py:1062
+#: documents/models.py:1134
 msgid "Monetary"
-msgstr "[SQ] Monetary"
+msgstr "Monetar"
 
-#: documents/models.py:1063
+#: documents/models.py:1135
 msgid "Document Link"
-msgstr "Document Link"
+msgstr "Lidhje dokumenti"
 
-#: documents/models.py:1064
+#: documents/models.py:1136
 msgid "Select"
-msgstr "[SQ] Select"
+msgstr "Përzgjedhje"
 
-#: documents/models.py:1065
+#: documents/models.py:1137
 msgid "Long Text"
-msgstr "[SQ] Long Text"
+msgstr "Tekst i gjatë"
 
-#: documents/models.py:1077
+#: documents/models.py:1149
 msgid "data type"
-msgstr "[SQ] data type"
+msgstr "lloji i të dhënave"
 
-#: documents/models.py:1084
+#: documents/models.py:1156
 msgid "extra data"
-msgstr "[SQ] extra data"
+msgstr "të dhëna shtesë"
 
-#: documents/models.py:1088
+#: documents/models.py:1160
 msgid "Extra data for the custom field, such as select options"
-msgstr "[SQ] Extra data for the custom field, such as select options"
+msgstr "Të dhëna shtesë për fushën e personalizuar, si opsionet e përzgjedhjes"
 
-#: documents/models.py:1094
+#: documents/models.py:1166
 msgid "custom field"
-msgstr "[SQ] custom field"
+msgstr "fushë e personalizuar"
 
-#: documents/models.py:1095
+#: documents/models.py:1167
 msgid "custom fields"
-msgstr "[SQ] custom fields"
+msgstr "fusha të personalizuara"
 
-#: documents/models.py:1195
+#: documents/models.py:1267
 msgid "custom field instance"
-msgstr "[SQ] custom field instance"
+msgstr "instancë fushe të personalizuar"
 
-#: documents/models.py:1196
+#: documents/models.py:1268
 msgid "custom field instances"
-msgstr "[SQ] custom field instances"
+msgstr "instanca fushash të personalizuara"
 
-#: documents/models.py:1274
+#: documents/models.py:1346
 msgid "Consumption Started"
-msgstr "[SQ] Consumption Started"
+msgstr "Konsumi filloi"
 
-#: documents/models.py:1275
+#: documents/models.py:1347
 msgid "Document Added"
-msgstr "Document Added"
+msgstr "Dokumenti u shtua"
 
-#: documents/models.py:1276
+#: documents/models.py:1348
 msgid "Document Updated"
-msgstr "Document Updated"
+msgstr "Dokumenti u përditësua"
 
-#: documents/models.py:1280
+#: documents/models.py:1352
 msgid "Consume Folder"
-msgstr "Consume Folder"
+msgstr "Konsumo dosjen"
 
-#: documents/models.py:1281
+#: documents/models.py:1353
 msgid "Api Upload"
-msgstr "Api Upload"
+msgstr "Ngarkim API"
 
-#: documents/models.py:1288
+#: documents/models.py:1360
 msgid "Modified"
-msgstr "[SQ] Modified"
+msgstr "Ndryshuar"
 
-#: documents/models.py:1289
+#: documents/models.py:1361
 msgid "Custom Field"
 msgstr "Fusha e personalizuar"
 
-#: documents/models.py:1292
+#: documents/models.py:1364
 msgid "Workflow Trigger Type"
-msgstr "[SQ] Workflow Trigger Type"
+msgstr "Lloji i nisësit të rrjedhës së punës"
 
-#: documents/models.py:1304
+#: documents/models.py:1376
 msgid "filter path"
-msgstr "[SQ] filter path"
+msgstr "filtro shtegun"
 
-#: documents/models.py:1309
+#: documents/models.py:1381
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr "[SQ] Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
+msgstr "Konsumo vetëm dokumentet me shteg që përputhet me këtë, nëse është specifikuar. Lejohen shenja të përgjithshme si *. Pa dallim shkronjash."
 
-#: documents/models.py:1316
+#: documents/models.py:1388
 msgid "filter filename"
-msgstr "[SQ] filter filename"
+msgstr "filtro emrin e skedarit"
 
-#: documents/models.py:1321 paperless_mail/models.py:200
+#: documents/models.py:1393 paperless_mail/models.py:200
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr "[SQ] Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr "Konsumo vetëm dokumentet që përputhen plotësisht me këtë emër skedari, nëse është specifikuar. Lejohen shenja të përgjithshme si *.pdf ose *invoice*. Pa dallim shkronjash."
 
-#: documents/models.py:1332
+#: documents/models.py:1404
 msgid "filter documents from this mail rule"
-msgstr "[SQ] filter documents from this mail rule"
+msgstr "filtro dokumentet nga ky rregull email-i"
 
-#: documents/models.py:1348
+#: documents/models.py:1420
 msgid "has these tag(s)"
-msgstr "[SQ] has these tag(s)"
+msgstr "ka këto etiketë(a)"
 
-#: documents/models.py:1355
+#: documents/models.py:1427
 msgid "has all of these tag(s)"
 msgstr "i ka të gjitha këto tag(s)"
 
-#: documents/models.py:1362
+#: documents/models.py:1434
 msgid "does not have these tag(s)"
-msgstr "[SQ] does not have these tag(s)"
-
-#: documents/models.py:1370
-msgid "has this document type"
-msgstr "[SQ] has this document type"
-
-#: documents/models.py:1377
-msgid "has one of these document types"
-msgstr "[SQ] has one of these document types"
-
-#: documents/models.py:1384
-msgid "does not have these document type(s)"
-msgstr "[SQ] does not have these document type(s)"
-
-#: documents/models.py:1392
-msgid "has this correspondent"
-msgstr "[SQ] has this correspondent"
-
-#: documents/models.py:1399
-msgid "does not have these correspondent(s)"
-msgstr "[SQ] does not have these correspondent(s)"
-
-#: documents/models.py:1406
-msgid "has one of these correspondents"
-msgstr "[SQ] has one of these correspondents"
-
-#: documents/models.py:1414
-msgid "has this storage path"
-msgstr "[SQ] has this storage path"
-
-#: documents/models.py:1421
-msgid "has one of these storage paths"
-msgstr "[SQ] has one of these storage paths"
-
-#: documents/models.py:1428
-msgid "does not have these storage path(s)"
-msgstr "[SQ] does not have these storage path(s)"
-
-#: documents/models.py:1432
-msgid "filter custom field query"
-msgstr "[SQ] filter custom field query"
-
-#: documents/models.py:1435
-msgid "JSON-encoded custom field query expression."
-msgstr "[SQ] JSON-encoded custom field query expression."
-
-#: documents/models.py:1439
-msgid "schedule offset days"
-msgstr "[SQ] schedule offset days"
+msgstr "nuk ka këto etiketë(a)"
 
 #: documents/models.py:1442
-msgid "The number of days to offset the schedule trigger by."
-msgstr "[SQ] The number of days to offset the schedule trigger by."
+msgid "has this document type"
+msgstr "ka këtë lloj dokumenti"
 
-#: documents/models.py:1447
+#: documents/models.py:1449
+msgid "has one of these document types"
+msgstr "ka një nga këto lloje dokumentesh"
+
+#: documents/models.py:1456
+msgid "does not have these document type(s)"
+msgstr "nuk ka këto lloj(e) dokumentesh"
+
+#: documents/models.py:1464
+msgid "has this correspondent"
+msgstr "ka këtë korrespondent"
+
+#: documents/models.py:1471
+msgid "does not have these correspondent(s)"
+msgstr "nuk ka këta korrespondentë"
+
+#: documents/models.py:1478
+msgid "has one of these correspondents"
+msgstr "ka një nga këta korrespondentë"
+
+#: documents/models.py:1486
+msgid "has this storage path"
+msgstr "ka këtë shteg ruajtjeje"
+
+#: documents/models.py:1493
+msgid "has one of these storage paths"
+msgstr "ka një nga këto shtigje ruajtjeje"
+
+#: documents/models.py:1500
+msgid "does not have these storage path(s)"
+msgstr "nuk ka këto shtegje ruajtjeje"
+
+#: documents/models.py:1504
+msgid "filter custom field query"
+msgstr "filtro kërkimin e fushës së personalizuar"
+
+#: documents/models.py:1507
+msgid "JSON-encoded custom field query expression."
+msgstr "Shprehje kërkimi e fushës së personalizuar e koduar si JSON."
+
+#: documents/models.py:1511
+msgid "schedule offset days"
+msgstr "ditët e zhvendosjes së orarit"
+
+#: documents/models.py:1514
+msgid "The number of days to offset the schedule trigger by."
+msgstr "Numri i ditëve me të cilat zhvendoset nisësi i orarit."
+
+#: documents/models.py:1519
 msgid "schedule is recurring"
 msgstr "orari është i përsëritur"
 
-#: documents/models.py:1450
+#: documents/models.py:1522
 msgid "If the schedule should be recurring."
-msgstr "[SQ] If the schedule should be recurring."
+msgstr "Nëse orari duhet të përsëritet."
 
-#: documents/models.py:1455
+#: documents/models.py:1527
 msgid "schedule recurring delay in days"
-msgstr "[SQ] schedule recurring delay in days"
+msgstr "vonesa e përsëritjes së orarit në ditë"
 
-#: documents/models.py:1459
+#: documents/models.py:1531
 msgid "The number of days between recurring schedule triggers."
-msgstr "[SQ] The number of days between recurring schedule triggers."
+msgstr "Numri i ditëve midis nisjeve të përsëritura të orarit."
 
-#: documents/models.py:1464
+#: documents/models.py:1536
 msgid "schedule date field"
-msgstr "[SQ] schedule date field"
+msgstr "fusha e datës së orarit"
 
-#: documents/models.py:1469
+#: documents/models.py:1541
 msgid "The field to check for a schedule trigger."
-msgstr "[SQ] The field to check for a schedule trigger."
-
-#: documents/models.py:1478
-msgid "schedule date custom field"
-msgstr "[SQ] schedule date custom field"
-
-#: documents/models.py:1482
-msgid "workflow trigger"
-msgstr "[SQ] workflow trigger"
-
-#: documents/models.py:1483
-msgid "workflow triggers"
-msgstr "[SQ] workflow triggers"
-
-#: documents/models.py:1491
-msgid "email subject"
-msgstr "[SQ] email subject"
-
-#: documents/models.py:1495
-msgid "The subject of the email, can include some placeholders, see documentation."
-msgstr "[SQ] The subject of the email, can include some placeholders, see documentation."
-
-#: documents/models.py:1501
-msgid "email body"
-msgstr "[SQ] email body"
-
-#: documents/models.py:1504
-msgid "The body (message) of the email, can include some placeholders, see documentation."
-msgstr "[SQ] The body (message) of the email, can include some placeholders, see documentation."
-
-#: documents/models.py:1510
-msgid "emails to"
-msgstr "[SQ] emails to"
-
-#: documents/models.py:1513
-msgid "The destination email addresses, comma separated."
-msgstr "[SQ] The destination email addresses, comma separated."
-
-#: documents/models.py:1519
-msgid "include document in email"
-msgstr "[SQ] include document in email"
-
-#: documents/models.py:1530
-msgid "webhook url"
-msgstr "[SQ] webhook url"
-
-#: documents/models.py:1533
-msgid "The destination URL for the notification."
-msgstr "[SQ] The destination URL for the notification."
-
-#: documents/models.py:1538
-msgid "use parameters"
-msgstr "[SQ] use parameters"
-
-#: documents/models.py:1543
-msgid "send as JSON"
-msgstr "[SQ] send as JSON"
-
-#: documents/models.py:1547
-msgid "webhook parameters"
-msgstr "[SQ] webhook parameters"
+msgstr "Fusha që kontrollohet për një nisës orari."
 
 #: documents/models.py:1550
-msgid "The parameters to send with the webhook URL if body not used."
-msgstr "[SQ] The parameters to send with the webhook URL if body not used."
+msgid "schedule date custom field"
+msgstr "fushë e personalizuar date për orarin"
 
 #: documents/models.py:1554
+msgid "workflow trigger"
+msgstr "nisës rrjedhe pune"
+
+#: documents/models.py:1555
+msgid "workflow triggers"
+msgstr "nisës rrjedhash pune"
+
+#: documents/models.py:1563
+msgid "email subject"
+msgstr "subjekti i email-it"
+
+#: documents/models.py:1567
+msgid "The subject of the email, can include some placeholders, see documentation."
+msgstr "Subjekti i email-it, mund të përfshijë disa vendmbajtëse; shih dokumentacionin."
+
+#: documents/models.py:1573
+msgid "email body"
+msgstr "trupi i email-it"
+
+#: documents/models.py:1576
+msgid "The body (message) of the email, can include some placeholders, see documentation."
+msgstr "Trupi (mesazhi) i email-it, mund të përfshijë disa vendmbajtëse; shih dokumentacionin."
+
+#: documents/models.py:1582
+msgid "emails to"
+msgstr "email-et për"
+
+#: documents/models.py:1585
+msgid "The destination email addresses, comma separated."
+msgstr "Adresat email të destinacionit, të ndara me presje."
+
+#: documents/models.py:1591
+msgid "include document in email"
+msgstr "përfshi dokumentin në email"
+
+#: documents/models.py:1602
+msgid "webhook url"
+msgstr "URL e webhook-ut"
+
+#: documents/models.py:1605
+msgid "The destination URL for the notification."
+msgstr "URL-ja e destinacionit për njoftimin."
+
+#: documents/models.py:1610
+msgid "use parameters"
+msgstr "përdor parametrat"
+
+#: documents/models.py:1615
+msgid "send as JSON"
+msgstr "dërgo si JSON"
+
+#: documents/models.py:1619
+msgid "webhook parameters"
+msgstr "parametrat e webhook-ut"
+
+#: documents/models.py:1622
+msgid "The parameters to send with the webhook URL if body not used."
+msgstr "Parametrat që dërgohen me URL-në e webhook-ut nëse nuk përdoret trupi."
+
+#: documents/models.py:1626
 msgid "webhook body"
-msgstr "[SQ] webhook body"
+msgstr "trupi i webhook-ut"
 
-#: documents/models.py:1557
+#: documents/models.py:1629
 msgid "The body to send with the webhook URL if parameters not used."
-msgstr "[SQ] The body to send with the webhook URL if parameters not used."
+msgstr "Trupi që dërgohet me URL-në e webhook-ut nëse nuk përdoren parametrat."
 
-#: documents/models.py:1561
+#: documents/models.py:1633
 msgid "webhook headers"
-msgstr "[SQ] webhook headers"
+msgstr "kokat e webhook-ut"
 
-#: documents/models.py:1564
+#: documents/models.py:1636
 msgid "The headers to send with the webhook URL."
-msgstr "[SQ] The headers to send with the webhook URL."
+msgstr "Kokat që dërgohen me URL-në e webhook-ut."
 
-#: documents/models.py:1569
+#: documents/models.py:1641
 msgid "include document in webhook"
-msgstr "[SQ] include document in webhook"
+msgstr "përfshi dokumentin në webhook"
 
-#: documents/models.py:1580
+#: documents/models.py:1652
 msgid "Assignment"
-msgstr "[SQ] Assignment"
+msgstr "Caktim"
 
-#: documents/models.py:1584
+#: documents/models.py:1656
 msgid "Removal"
-msgstr "[SQ] Removal"
+msgstr "Heqje"
 
-#: documents/models.py:1588 documents/templates/account/password_reset.html:15
+#: documents/models.py:1660 documents/templates/account/password_reset.html:15
 msgid "Email"
 msgstr "[SQ] Email"
 
-#: documents/models.py:1592
+#: documents/models.py:1664
 msgid "Webhook"
-msgstr "[SQ] Webhook"
+msgstr "Webhook"
 
-#: documents/models.py:1596
+#: documents/models.py:1668
 msgid "Password removal"
-msgstr "Password removal"
+msgstr "Heqje fjalëkalimi"
 
-#: documents/models.py:1600
+#: documents/models.py:1672
 msgid "Move to trash"
-msgstr "[SQ] Move to trash"
+msgstr "Zhvendos në kosh"
 
-#: documents/models.py:1604
+#: documents/models.py:1676
+msgid "Remote OCR"
+msgstr ""
+
+#: documents/models.py:1680
+msgid "Apply AI suggestions"
+msgstr ""
+
+#: documents/models.py:1687
+msgid "Document type"
+msgstr ""
+
+#: documents/models.py:1688
+msgid "Storage path"
+msgstr ""
+
+#: documents/models.py:1689
+msgid "Created date"
+msgstr ""
+
+#: documents/models.py:1692
 msgid "Workflow Action Type"
-msgstr "[SQ] Workflow Action Type"
+msgstr "Lloji i veprimit të rrjedhës së punës"
 
-#: documents/models.py:1609 documents/models.py:1851
+#: documents/models.py:1697 documents/models.py:1966
 #: paperless_mail/models.py:145
 msgid "order"
-msgstr "[SQ] order"
+msgstr "renditja"
 
-#: documents/models.py:1612
+#: documents/models.py:1700
 msgid "assign title"
-msgstr "[SQ] assign title"
+msgstr "cakto titullin"
 
-#: documents/models.py:1616
+#: documents/models.py:1704
 msgid "Assign a document title, must  be a Jinja2 template, see documentation."
-msgstr "[SQ] Assign a document title, must  be a Jinja2 template, see documentation."
+msgstr "Cakto një titull dokumenti; duhet të jetë shabllon Jinja2, shih dokumentacionin."
 
-#: documents/models.py:1624 paperless_mail/models.py:274
+#: documents/models.py:1712 paperless_mail/models.py:274
 msgid "assign this tag"
-msgstr "[SQ] assign this tag"
+msgstr "cakto këtë etiketë"
 
-#: documents/models.py:1633 paperless_mail/models.py:282
+#: documents/models.py:1721 paperless_mail/models.py:282
 msgid "assign this document type"
-msgstr "[SQ] assign this document type"
+msgstr "cakto këtë lloj dokumenti"
 
-#: documents/models.py:1642 paperless_mail/models.py:296
+#: documents/models.py:1730 paperless_mail/models.py:296
 msgid "assign this correspondent"
-msgstr "[SQ] assign this correspondent"
+msgstr "cakto këtë korrespondent"
 
-#: documents/models.py:1651
+#: documents/models.py:1739
 msgid "assign this storage path"
-msgstr "[SQ] assign this storage path"
+msgstr "cakto këtë shteg ruajtjeje"
 
-#: documents/models.py:1660
+#: documents/models.py:1748
 msgid "assign this owner"
-msgstr "[SQ] assign this owner"
+msgstr "cakto këtë pronar"
 
-#: documents/models.py:1667
+#: documents/models.py:1755
 msgid "grant view permissions to these users"
-msgstr "[SQ] grant view permissions to these users"
+msgstr "jep leje shikimi këtyre përdoruesve"
 
-#: documents/models.py:1674
+#: documents/models.py:1762
 msgid "grant view permissions to these groups"
 msgstr "jepni leje shikimi këtyre grupeve"
 
-#: documents/models.py:1681
+#: documents/models.py:1769
 msgid "grant change permissions to these users"
-msgstr "[SQ] grant change permissions to these users"
+msgstr "jep leje ndryshimi këtyre përdoruesve"
 
-#: documents/models.py:1688
+#: documents/models.py:1776
 msgid "grant change permissions to these groups"
-msgstr "[SQ] grant change permissions to these groups"
+msgstr "jep leje ndryshimi këtyre grupeve"
 
-#: documents/models.py:1695
+#: documents/models.py:1783
 msgid "assign these custom fields"
-msgstr "[SQ] assign these custom fields"
+msgstr "cakto këto fusha të personalizuara"
 
-#: documents/models.py:1699
+#: documents/models.py:1787
 msgid "custom field values"
-msgstr "[SQ] custom field values"
+msgstr "vlerat e fushave të personalizuara"
 
-#: documents/models.py:1703
+#: documents/models.py:1791
 msgid "Optional values to assign to the custom fields."
-msgstr "Optional values to assign to the custom fields."
+msgstr "Vlera opsionale për t'u caktuar fushave të personalizuara."
 
-#: documents/models.py:1712
+#: documents/models.py:1800
 msgid "remove these tag(s)"
-msgstr "[SQ] remove these tag(s)"
-
-#: documents/models.py:1717
-msgid "remove all tags"
-msgstr "[SQ] remove all tags"
-
-#: documents/models.py:1724
-msgid "remove these document type(s)"
-msgstr "[SQ] remove these document type(s)"
-
-#: documents/models.py:1729
-msgid "remove all document types"
-msgstr "[SQ] remove all document types"
-
-#: documents/models.py:1736
-msgid "remove these correspondent(s)"
-msgstr "[SQ] remove these correspondent(s)"
-
-#: documents/models.py:1741
-msgid "remove all correspondents"
-msgstr "[SQ] remove all correspondents"
-
-#: documents/models.py:1748
-msgid "remove these storage path(s)"
-msgstr "[SQ] remove these storage path(s)"
-
-#: documents/models.py:1753
-msgid "remove all storage paths"
-msgstr "[SQ] remove all storage paths"
-
-#: documents/models.py:1760
-msgid "remove these owner(s)"
-msgstr "[SQ] remove these owner(s)"
-
-#: documents/models.py:1765
-msgid "remove all owners"
-msgstr "[SQ] remove all owners"
-
-#: documents/models.py:1772
-msgid "remove view permissions for these users"
-msgstr "[SQ] remove view permissions for these users"
-
-#: documents/models.py:1779
-msgid "remove view permissions for these groups"
-msgstr "[SQ] remove view permissions for these groups"
-
-#: documents/models.py:1786
-msgid "remove change permissions for these users"
-msgstr "[SQ] remove change permissions for these users"
-
-#: documents/models.py:1793
-msgid "remove change permissions for these groups"
-msgstr "[SQ] remove change permissions for these groups"
-
-#: documents/models.py:1798
-msgid "remove all permissions"
-msgstr "[SQ] remove all permissions"
+msgstr "hiq këto etiketë(a)"
 
 #: documents/models.py:1805
-msgid "remove these custom fields"
-msgstr "[SQ] remove these custom fields"
+msgid "remove all tags"
+msgstr "hiq të gjitha etiketat"
 
-#: documents/models.py:1810
-msgid "remove all custom fields"
-msgstr "[SQ] remove all custom fields"
+#: documents/models.py:1812
+msgid "remove these document type(s)"
+msgstr "hiq këto lloj(e) dokumentesh"
 
-#: documents/models.py:1819
-msgid "email"
-msgstr "[SQ] email"
+#: documents/models.py:1817
+msgid "remove all document types"
+msgstr "hiq të gjitha llojet e dokumenteve"
 
-#: documents/models.py:1828
-msgid "webhook"
-msgstr "[SQ] webhook"
+#: documents/models.py:1824
+msgid "remove these correspondent(s)"
+msgstr "hiq këta korrespondentë"
 
-#: documents/models.py:1832
-msgid "passwords"
-msgstr "[SQ] passwords"
+#: documents/models.py:1829
+msgid "remove all correspondents"
+msgstr "hiq të gjithë korrespondentët"
 
 #: documents/models.py:1836
-msgid "Passwords to try when removing PDF protection. Separate with commas or new lines."
-msgstr "Passwords to try when removing PDF protection. Separate with commas or new lines."
+msgid "remove these storage path(s)"
+msgstr "hiq këto shtigje ruajtjeje"
 
 #: documents/models.py:1841
+msgid "remove all storage paths"
+msgstr "hiq të gjitha shtigjet e ruajtjes"
+
+#: documents/models.py:1848
+msgid "remove these owner(s)"
+msgstr "hiq këta pronarë"
+
+#: documents/models.py:1853
+msgid "remove all owners"
+msgstr "hiq të gjithë pronarët"
+
+#: documents/models.py:1860
+msgid "remove view permissions for these users"
+msgstr "hiq lejet e shikimit për këta përdorues"
+
+#: documents/models.py:1867
+msgid "remove view permissions for these groups"
+msgstr "hiq lejet e shikimit për këto grupe"
+
+#: documents/models.py:1874
+msgid "remove change permissions for these users"
+msgstr "hiq lejet e ndryshimit për këta përdorues"
+
+#: documents/models.py:1881
+msgid "remove change permissions for these groups"
+msgstr "hiq lejet e ndryshimit për këto grupe"
+
+#: documents/models.py:1886
+msgid "remove all permissions"
+msgstr "hiq të gjitha lejet"
+
+#: documents/models.py:1893
+msgid "remove these custom fields"
+msgstr "hiq këto fusha të personalizuara"
+
+#: documents/models.py:1898
+msgid "remove all custom fields"
+msgstr "hiq të gjitha fushat e personalizuara"
+
+#: documents/models.py:1907
+msgid "email"
+msgstr "email"
+
+#: documents/models.py:1916
+msgid "webhook"
+msgstr "webhook"
+
+#: documents/models.py:1920
+msgid "passwords"
+msgstr "fjalëkalimet"
+
+#: documents/models.py:1924
+msgid "Passwords to try when removing PDF protection. Separate with commas or new lines."
+msgstr "Fjalëkalimet që provohen gjatë heqjes së mbrojtjes PDF. Ndaji me presje ose rreshta të rinj."
+
+#: documents/models.py:1929
+msgid "AI suggestion fields"
+msgstr ""
+
+#: documents/models.py:1933
+msgid "Which of the AI-suggested fields to apply to the document."
+msgstr ""
+
+#: documents/models.py:1938
+msgid "create missing objects"
+msgstr ""
+
+#: documents/models.py:1941
+msgid "Create suggested tags, correspondents, document types and storage paths that do not already exist instead of skipping them."
+msgstr ""
+
+#: documents/models.py:1947
+msgid "overwrite existing values"
+msgstr ""
+
+#: documents/models.py:1950
+msgid "Apply suggestions even if the document already has a value for that field. Tags are always added to, never replaced."
+msgstr ""
+
+#: documents/models.py:1956
 msgid "workflow action"
-msgstr "[SQ] workflow action"
+msgstr "veprim rrjedhe pune"
 
-#: documents/models.py:1842
+#: documents/models.py:1957
 msgid "workflow actions"
-msgstr "[SQ] workflow actions"
+msgstr "veprime rrjedhe pune"
 
-#: documents/models.py:1857
+#: documents/models.py:1972
 msgid "triggers"
-msgstr "[SQ] triggers"
+msgstr ""
 
-#: documents/models.py:1864
+#: documents/models.py:1979
 msgid "actions"
-msgstr "[SQ] actions"
+msgstr "veprimet"
 
-#: documents/models.py:1867 paperless_mail/models.py:154
+#: documents/models.py:1982 paperless_mail/models.py:154
 msgid "enabled"
-msgstr "[SQ] enabled"
+msgstr "aktivizuar"
 
-#: documents/models.py:1878
+#: documents/models.py:1993
 msgid "workflow"
-msgstr "[SQ] workflow"
+msgstr "rrjedhë pune"
 
-#: documents/models.py:1882
+#: documents/models.py:1997
 msgid "workflow trigger type"
-msgstr "[SQ] workflow trigger type"
+msgstr "lloji i nisësit të rrjedhës së punës"
 
-#: documents/models.py:1896
+#: documents/models.py:2011
 msgid "date run"
-msgstr "[SQ] date run"
+msgstr "data e ekzekutimit"
 
-#: documents/models.py:1902
+#: documents/models.py:2017
 msgid "workflow run"
-msgstr "[SQ] workflow run"
+msgstr "ekzekutim rrjedhe pune"
 
-#: documents/models.py:1903
+#: documents/models.py:2018
 msgid "workflow runs"
-msgstr "[SQ] workflow runs"
+msgstr "ekzekutime rrjedhash pune"
 
-#: documents/serialisers.py:522 documents/serialisers.py:874
-#: documents/serialisers.py:2776 documents/views.py:299 documents/views.py:2558
-#: paperless_mail/serialisers.py:155
+#: documents/serialisers.py:523 documents/serialisers.py:875
+#: documents/serialisers.py:2827 documents/views.py:313 documents/views.py:2611
+#: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
-msgstr "[SQ] Insufficient permissions."
+msgstr "Leje të pamjaftueshme."
 
-#: documents/serialisers.py:710
+#: documents/serialisers.py:711
 msgid "Invalid color."
-msgstr "Invalid color."
+msgstr "Ngjyrë e pavlefshme."
 
-#: documents/serialisers.py:2248
+#: documents/serialisers.py:2304
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr "[SQ] File type %(type)s not supported"
+msgstr "Lloji i skedarit %(type)s nuk mbështetet"
 
-#: documents/serialisers.py:2292
+#: documents/serialisers.py:2348
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
-msgstr "Custom field id must be an integer: %(id)s"
+msgstr "ID-ja e fushës së personalizuar duhet të jetë numër i plotë: %(id)s"
 
-#: documents/serialisers.py:2299
+#: documents/serialisers.py:2355
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
-msgstr "Custom field with id %(id)s does not exist"
+msgstr "Fusha e personalizuar me ID %(id)s nuk ekziston"
 
-#: documents/serialisers.py:2316 documents/serialisers.py:2326
+#: documents/serialisers.py:2372 documents/serialisers.py:2382
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
-msgstr "Custom fields must be a list of integers or an object mapping ids to values."
+msgstr ""
 
-#: documents/serialisers.py:2321
+#: documents/serialisers.py:2377
 msgid "Some custom fields don't exist or were specified twice."
-msgstr "[SQ] Some custom fields don't exist or were specified twice."
+msgstr "Disa fusha të personalizuara nuk ekzistojnë ose janë specifikuar dy herë."
 
-#: documents/serialisers.py:2468
+#: documents/serialisers.py:2524
 msgid "Invalid variable detected."
-msgstr "Invalid variable detected."
+msgstr "U zbulua variabël e pavlefshme."
 
-#: documents/serialisers.py:2832
+#: documents/serialisers.py:2883
 msgid "Duplicate document identifiers are not allowed."
-msgstr "[SQ] Duplicate document identifiers are not allowed."
+msgstr "Identifikuesit dublikatë të dokumenteve nuk lejohen."
 
-#: documents/serialisers.py:2862 documents/views.py:4517
+#: documents/serialisers.py:2913 documents/views.py:4608
 #, python-format
 msgid "Documents not found: %(ids)s"
-msgstr "Documents not found: %(ids)s"
+msgstr "Dokumentet nuk u gjetën: %(ids)s"
 
 #: documents/templates/account/account_inactive.html:5
 msgid "Paperless-ngx account inactive"
-msgstr "[SQ] Paperless-ngx account inactive"
+msgstr ""
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
-msgstr "[SQ] Account inactive."
+msgstr "Llogaria është joaktive."
 
 #: documents/templates/account/account_inactive.html:14
 msgid "This account is inactive."
-msgstr "[SQ] This account is inactive."
+msgstr "Kjo llogari është joaktive."
 
 #: documents/templates/account/account_inactive.html:16
 msgid "Return to login"
-msgstr "[SQ] Return to login"
+msgstr "Kthehu te hyrja"
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr "[SQ] Hello from %(site_name)s!"
+msgstr "Përshëndetje nga %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr "[SQ] Thank you for using %(site_name)s!\n"
+msgstr "Faleminderit që përdorni %(site_name)s!\n"
 "%(site_domain)s"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
-msgstr "[SQ] Paperless-ngx sign in"
+msgstr "Hyrje në Paperless-ngx"
 
 #: documents/templates/account/login.html:10
 msgid "Please sign in."
-msgstr "[SQ] Please sign in."
+msgstr "Ju lutemi hyni."
 
 #: documents/templates/account/login.html:12
 msgid "Don't have an account yet?"
-msgstr "Don't have an account yet?"
+msgstr "Nuk keni ende llogari?"
 
 #: documents/templates/account/login.html:12
 #: documents/templates/account/signup.html:43
 #: documents/templates/socialaccount/signup.html:29
 msgid "Sign up"
-msgstr "[SQ] Sign up"
+msgstr "Regjistrohu"
 
 #: documents/templates/account/login.html:25
 #: documents/templates/account/signup.html:22
 #: documents/templates/socialaccount/signup.html:15
 msgid "Username"
-msgstr "emri i përdoruesit"
+msgstr "Username"
 
 #: documents/templates/account/login.html:26
 #: documents/templates/account/signup.html:24
 msgid "Password"
-msgstr "fjalëkalimi"
+msgstr "Fjalëkalim"
 
 #: documents/templates/account/login.html:36
 #: documents/templates/account/signup.html:11
 #: documents/templates/mfa/authenticate.html:23
 msgid "Sign in"
-msgstr "[SQ] Sign in"
+msgstr "Hyr"
 
 #: documents/templates/account/login.html:40
 msgid "Forgot your password?"
-msgstr "[SQ] Forgot your password?"
+msgstr "Keni harruar fjalëkalimin?"
 
 #: documents/templates/account/login.html:51
 #: documents/templates/account/signup.html:57
 msgid "or sign in via"
-msgstr "[SQ] or sign in via"
+msgstr "ose hyr përmes"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
-msgstr "[SQ] Paperless-ngx reset password request"
+msgstr "Kërkesë për rivendosje fjalëkalimi në Paperless-ngx"
 
 #: documents/templates/account/password_reset.html:9
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr "[SQ] Enter your email address below, and we'll email instructions for setting a new one."
+msgstr "Shkruani adresën tuaj email më poshtë dhe do t'ju dërgojmë udhëzime për vendosjen e një të reje."
 
 #: documents/templates/account/password_reset.html:12
 msgid "An error occurred. Please try again."
-msgstr "[SQ] An error occurred. Please try again."
+msgstr "Ndodhi një gabim. Ju lutemi provoni përsëri."
 
 #: documents/templates/account/password_reset.html:21
 msgid "Send me instructions!"
-msgstr "[SQ] Send me instructions!"
+msgstr "Më dërgo udhëzimet!"
 
 #: documents/templates/account/password_reset_done.html:5
 msgid "Paperless-ngx reset password sent"
-msgstr "[SQ] Paperless-ngx reset password sent"
+msgstr "Rivendosja e fjalëkalimit në Paperless-ngx u dërgua"
 
 #: documents/templates/account/password_reset_done.html:9
 msgid "Check your inbox."
-msgstr "[SQ] Check your inbox."
+msgstr "Kontrolloni kutinë hyrëse."
 
 #: documents/templates/account/password_reset_done.html:13
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr "[SQ] We've emailed you instructions for setting your password. You should receive the email shortly!"
+msgstr "Ju kemi dërguar me email udhëzimet për vendosjen e fjalëkalimit. Email-in duhet ta merrni së shpejti!"
 
 #: documents/templates/account/password_reset_from_key.html:5
 msgid "Paperless-ngx reset password confirmation"
-msgstr "[SQ] Paperless-ngx reset password confirmation"
+msgstr "Konfirmimi i rivendosjes së fjalëkalimit në Paperless-ngx"
 
 #: documents/templates/account/password_reset_from_key.html:9
 msgid "Set a new password."
-msgstr "[SQ] Set a new password."
+msgstr "Vendosni një fjalëkalim të ri."
 
 #: documents/templates/account/password_reset_from_key.html:15
 msgid "request a new password reset"
-msgstr "[SQ] request a new password reset"
+msgstr "kërko një rivendosje të re fjalëkalimi"
 
 #: documents/templates/account/password_reset_from_key.html:17
 msgid "New Password"
-msgstr "New Password"
+msgstr "Fjalëkalim i ri"
 
 #: documents/templates/account/password_reset_from_key.html:18
 msgid "Confirm Password"
-msgstr "Confirm Password"
+msgstr "Konfirmo fjalëkalimin"
 
 #: documents/templates/account/password_reset_from_key.html:28
 msgid "Change my password"
-msgstr "[SQ] Change my password"
+msgstr "Ndrysho fjalëkalimin tim"
 
 #: documents/templates/account/password_reset_from_key_done.html:5
 msgid "Paperless-ngx reset password complete"
-msgstr "[SQ] Paperless-ngx reset password complete"
+msgstr ""
 
 #: documents/templates/account/password_reset_from_key_done.html:9
 msgid "Password reset complete."
-msgstr "Password reset complete."
+msgstr "Rivendosja e fjalëkalimit përfundoi."
 
 #: documents/templates/account/password_reset_from_key_done.html:14
 msgid "Your new password has been set. You can now"
-msgstr "Your new password has been set. You can now"
+msgstr "Fjalëkalimi juaj i ri është vendosur. Tani mund të"
 
 #: documents/templates/account/password_reset_from_key_done.html:14
 msgid "log in"
-msgstr "log in"
+msgstr "hyni"
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr "[SQ] Paperless-ngx sign up"
+msgstr "Regjistrim në Paperless-ngx"
 
 #: documents/templates/account/signup.html:11
 msgid "Already have an account?"
-msgstr "Already have an account?"
+msgstr "Keni tashmë një llogari?"
 
 #: documents/templates/account/signup.html:19
 msgid "Note: This is the first user account for this installation and will be granted superuser privileges."
-msgstr "[SQ] Note: This is the first user account for this installation and will be granted superuser privileges."
+msgstr "Shënim: Kjo është llogaria e parë e përdoruesit për këtë instalim dhe do t'i jepen privilegje superpërdoruesi."
 
 #: documents/templates/account/signup.html:23
 #: documents/templates/socialaccount/signup.html:16
 msgid "Email (optional)"
-msgstr "[SQ] Email (optional)"
+msgstr "Email (opsional)"
 
 #: documents/templates/account/signup.html:25
 msgid "Password (again)"
-msgstr "Password (again)"
+msgstr "Fjalëkalimi (përsëri)"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
-msgstr "[SQ] Paperless-ngx is loading..."
+msgstr "Paperless-ngx po ngarkohet..."
 
 #: documents/templates/index.html:62
 msgid "Still here?! Hmm, something might be wrong."
-msgstr "[SQ] Still here?! Hmm, something might be wrong."
+msgstr "Ende këtu?! Hmm, diçka mund të mos jetë në rregull."
 
 #: documents/templates/index.html:62
 msgid "Here's a link to the docs."
-msgstr "[SQ] Here's a link to the docs."
+msgstr "Ja një lidhje te dokumentacioni."
 
 #: documents/templates/mfa/authenticate.html:7
 msgid "Paperless-ngx Two-Factor Authentication"
-msgstr "[SQ] Paperless-ngx Two-Factor Authentication"
+msgstr "Autentikim me dy faktorë në Paperless-ngx"
 
 #: documents/templates/mfa/authenticate.html:12
 msgid "Your account is protected by two-factor authentication. Please enter an authenticator code:"
-msgstr "[SQ] Your account is protected by two-factor authentication. Please enter an authenticator code:"
+msgstr "Llogaria juaj mbrohet me autentikim me dy faktorë. Ju lutemi vendosni një kod autentikuesi:"
 
 #: documents/templates/mfa/authenticate.html:17
 msgid "Code"
-msgstr "[SQ] Code"
+msgstr "Kodi"
 
 #: documents/templates/mfa/authenticate.html:24
 msgid "Cancel"
-msgstr "anulo"
+msgstr "Anulo"
 
 #: documents/templates/paperless-ngx/base.html:58
 msgid "Share link was not found."
-msgstr "[SQ] Share link was not found."
+msgstr "Lidhja e ndarjes nuk u gjet."
 
 #: documents/templates/paperless-ngx/base.html:62
 msgid "Share link has expired."
-msgstr "[SQ] Share link has expired."
+msgstr "Lidhja e ndarjes ka skaduar."
 
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
-msgstr "[SQ] Paperless-ngx social account sign in"
+msgstr ""
 
 #: documents/templates/socialaccount/authentication_error.html:10
 msgid "An error occurred while attempting to login via your social network account. Back to the"
-msgstr "An error occurred while attempting to login via your social network account. Back to the"
+msgstr ""
 
 #: documents/templates/socialaccount/authentication_error.html:10
 msgid "login page"
-msgstr "login page"
+msgstr ""
 
 #: documents/templates/socialaccount/login.html:11
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
-msgstr "[SQ] You are about to connect a new third-party account from %(provider)s."
+msgstr ""
 
 #: documents/templates/socialaccount/login.html:15
 msgid "Continue"
-msgstr "[SQ] Continue"
+msgstr "Vazhdo"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
-msgstr "[SQ] Paperless-ngx social account sign up"
+msgstr "Paperless-ngx social llogari sign up"
 
 #: documents/templates/socialaccount/signup.html:11
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr "[SQ] You are about to use your %(provider_name)s account to login."
+msgstr "You are about to use your %(provider_name)s llogari to login."
 
 #: documents/templates/socialaccount/signup.html:13
 msgid "As a final step, please complete the following form:"
-msgstr "[SQ] As a final step, please complete the following form:"
+msgstr "Si hap i fundit, ju lutemi plotësoni formularin e mëposhtëm:"
 
 #: documents/validators.py:24
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing scheme"
-msgstr "[SQ] Unable to parse URI {value}, missing scheme"
+msgstr ""
 
 #: documents/validators.py:29
 #, python-brace-format
 msgid "Unable to parse URI {value}, missing net location or path"
-msgstr "[SQ] Unable to parse URI {value}, missing net location or path"
+msgstr ""
 
 #: documents/validators.py:36
 msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
-msgstr "[SQ] URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
+msgstr ""
 
 #: documents/validators.py:45
 #, python-brace-format
 msgid "Unable to parse URI {value}"
-msgstr "[SQ] Unable to parse URI {value}"
+msgstr ""
 
-#: documents/views.py:292 documents/views.py:2555
+#: documents/views.py:306 documents/views.py:2608
 msgid "Invalid more_like_id"
-msgstr "Invalid more_like_id"
+msgstr ""
 
-#: documents/views.py:1567
+#: documents/views.py:1582
 msgid "Invalid AI configuration."
-msgstr "Invalid AI configuration."
+msgstr "Konfigurim AI i pavlefshëm."
 
-#: documents/views.py:1576
+#: documents/views.py:1593
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:2380 documents/views.py:2701
+#: documents/views.py:2433 documents/views.py:2754
 msgid "Specify only one of text, title_search, query, or more_like_id."
-msgstr "Specify only one of text, title_search, query, or more_like_id."
+msgstr ""
 
-#: documents/views.py:4529
+#: documents/views.py:4621
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
-msgstr "[SQ] Insufficient permissions to share document %(id)s."
+msgstr "Leje të pamjaftueshme për të ndarë dokumentin %(id)s."
 
-#: documents/views.py:4575
+#: documents/views.py:4667
 msgid "Bundle is already being processed."
-msgstr "[SQ] Bundle is already being processed."
+msgstr "Paketa po përpunohet tashmë."
 
-#: documents/views.py:4636
+#: documents/views.py:4728
 msgid "The share link bundle is still being prepared. Please try again later."
-msgstr "[SQ] The share link bundle is still being prepared. Please try again later."
+msgstr "Paketa e lidhjes së ndarjes ende po përgatitet. Ju lutemi provoni përsëri më vonë."
 
-#: documents/views.py:4646
+#: documents/views.py:4738
 msgid "The share link bundle is unavailable."
-msgstr "[SQ] The share link bundle is unavailable."
+msgstr "Paketa e lidhjes së ndarjes nuk është e disponueshme."
 
 #: paperless/apps.py:11
 msgid "Paperless"
-msgstr "[SQ] Paperless"
+msgstr ""
 
 #: paperless/models.py:26
 msgid "pdf"
-msgstr "[SQ] pdf"
+msgstr ""
 
 #: paperless/models.py:27
 msgid "pdfa"
-msgstr "[SQ] pdfa"
+msgstr ""
 
 #: paperless/models.py:28
 msgid "pdfa-1"
-msgstr "[SQ] pdfa-1"
+msgstr ""
 
 #: paperless/models.py:29
 msgid "pdfa-2"
-msgstr "[SQ] pdfa-2"
+msgstr ""
 
 #: paperless/models.py:30
 msgid "pdfa-3"
-msgstr "[SQ] pdfa-3"
+msgstr "pdfa-3"
 
 #: paperless/models.py:39 paperless/models.py:50
 msgid "auto"
-msgstr "auto"
+msgstr "automatike"
 
 #: paperless/models.py:40
 msgid "force"
-msgstr "[SQ] force"
+msgstr "detyro"
 
 #: paperless/models.py:41
 msgid "redo"
-msgstr "[SQ] redo"
+msgstr "ribëj"
 
 #: paperless/models.py:42
 msgid "off"
-msgstr "off"
+msgstr "fikur"
 
 #: paperless/models.py:51
 msgid "always"
-msgstr "[SQ] always"
+msgstr "gjithmonë"
 
 #: paperless/models.py:52
 msgid "never"
-msgstr "[SQ] never"
+msgstr "kurrë"
 
 #: paperless/models.py:60
 msgid "clean"
-msgstr "[SQ] clean"
+msgstr ""
 
 #: paperless/models.py:61
 msgid "clean-final"
-msgstr "[SQ] clean-final"
+msgstr ""
 
 #: paperless/models.py:62
 msgid "none"
-msgstr "[SQ] none"
+msgstr "asnjë"
 
 #: paperless/models.py:70
 msgid "LeaveColorUnchanged"
-msgstr "[SQ] LeaveColorUnchanged"
+msgstr ""
 
 #: paperless/models.py:71
 msgid "RGB"
-msgstr "[SQ] RGB"
+msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
-msgstr "[SQ] UseDeviceIndependentColor"
+msgstr ""
 
 #: paperless/models.py:73
 msgid "Gray"
-msgstr "[SQ] Gray"
+msgstr "Gri"
 
 #: paperless/models.py:74
 msgid "CMYK"
-msgstr "[SQ] CMYK"
+msgstr "CMYK"
 
-#: paperless/models.py:78 paperless/models.py:88
+#: paperless/models.py:82
+msgid "Azure AI Document Intelligence"
+msgstr ""
+
+#: paperless/models.py:90
+msgid "All supported documents"
+msgstr ""
+
+#: paperless/models.py:91
+msgid "Only when a workflow enables it"
+msgstr ""
+
+#: paperless/models.py:95 paperless/models.py:105
 msgid "OpenAI-compatible"
-msgstr "OpenAI-compatible"
+msgstr ""
 
-#: paperless/models.py:79
+#: paperless/models.py:96
 msgid "Huggingface"
-msgstr "[SQ] Huggingface"
+msgstr ""
 
-#: paperless/models.py:80 paperless/models.py:89
+#: paperless/models.py:97 paperless/models.py:106
 msgid "Ollama"
-msgstr "[SQ] Ollama"
+msgstr ""
 
-#: paperless/models.py:98
+#: paperless/models.py:115
 msgid "Sets the output PDF type"
-msgstr "[SQ] Sets the output PDF type"
+msgstr ""
 
-#: paperless/models.py:110
+#: paperless/models.py:127
 msgid "Do OCR from page 1 to this value"
-msgstr "[SQ] Do OCR from page 1 to this value"
+msgstr "Kryen OCR nga faqja 1 deri te kjo vlerë"
 
-#: paperless/models.py:116
+#: paperless/models.py:133
 msgid "Do OCR using these languages"
-msgstr "[SQ] Do OCR using these languages"
+msgstr "Kryen OCR duke përdorur këto gjuhë"
 
-#: paperless/models.py:123
+#: paperless/models.py:140
 msgid "Sets the OCR mode"
-msgstr "[SQ] Sets the OCR mode"
+msgstr "Cakton mënyrën OCR"
 
-#: paperless/models.py:131
+#: paperless/models.py:148
 msgid "Controls archive file generation"
-msgstr "Controls archive file generation"
-
-#: paperless/models.py:139
-msgid "Sets image DPI fallback value"
-msgstr "[SQ] Sets image DPI fallback value"
-
-#: paperless/models.py:146
-msgid "Controls the unpaper cleaning"
-msgstr "[SQ] Controls the unpaper cleaning"
-
-#: paperless/models.py:153
-msgid "Enables deskew"
-msgstr "[SQ] Enables deskew"
+msgstr "Kontrollon gjenerimin e skedarit të arkivit"
 
 #: paperless/models.py:156
-msgid "Enables page rotation"
-msgstr "[SQ] Enables page rotation"
+msgid "Sets image DPI fallback value"
+msgstr "Cakton vlerën rezervë DPI të figurës"
 
-#: paperless/models.py:161
-msgid "Sets the threshold for rotation of pages"
-msgstr "[SQ] Sets the threshold for rotation of pages"
+#: paperless/models.py:163
+msgid "Controls the unpaper cleaning"
+msgstr "Kontrollon pastrimin me unpaper"
 
-#: paperless/models.py:167
-msgid "Sets the maximum image size for decompression"
-msgstr "[SQ] Sets the maximum image size for decompression"
+#: paperless/models.py:170
+msgid "Enables deskew"
+msgstr "Aktivizon drejtimin e shtrembërimit"
 
 #: paperless/models.py:173
-msgid "Sets the Ghostscript color conversion strategy"
-msgstr "[SQ] Sets the Ghostscript color conversion strategy"
+msgid "Enables page rotation"
+msgstr "Aktivizon rrotullimin e faqeve"
 
-#: paperless/models.py:181
-msgid "Adds additional user arguments for OCRMyPDF"
-msgstr "[SQ] Adds additional user arguments for OCRMyPDF"
+#: paperless/models.py:178
+msgid "Sets the threshold for rotation of pages"
+msgstr ""
+
+#: paperless/models.py:184
+msgid "Sets the maximum image size for decompression"
+msgstr "Cakton madhësinë maksimale të figurës për dekompresim"
 
 #: paperless/models.py:190
+msgid "Sets the Ghostscript color conversion strategy"
+msgstr ""
+
+#: paperless/models.py:198
+msgid "Adds additional user arguments for OCRMyPDF"
+msgstr ""
+
+#: paperless/models.py:207
 msgid "Application title"
-msgstr "[SQ] Application title"
+msgstr "Titulli i aplikacionit"
 
-#: paperless/models.py:197
+#: paperless/models.py:214
 msgid "Application logo"
-msgstr "[SQ] Application logo"
+msgstr "Logoja e aplikacionit"
 
-#: paperless/models.py:212
+#: paperless/models.py:229
 msgid "Enables barcode scanning"
-msgstr "[SQ] Enables barcode scanning"
+msgstr ""
 
-#: paperless/models.py:218
+#: paperless/models.py:235
 msgid "Enables barcode TIFF support"
-msgstr "[SQ] Enables barcode TIFF support"
+msgstr "Aktivizon mbështetjen TIFF për barkode"
 
-#: paperless/models.py:224
+#: paperless/models.py:241
 msgid "Sets the barcode string"
-msgstr "[SQ] Sets the barcode string"
+msgstr "Cakton vargun e barkodit"
 
-#: paperless/models.py:232
+#: paperless/models.py:249
 msgid "Retains split pages"
-msgstr "[SQ] Retains split pages"
+msgstr ""
 
-#: paperless/models.py:238
+#: paperless/models.py:255
 msgid "Enables ASN barcode"
-msgstr "[SQ] Enables ASN barcode"
+msgstr ""
 
-#: paperless/models.py:244
+#: paperless/models.py:261
 msgid "Sets the ASN barcode prefix"
-msgstr "[SQ] Sets the ASN barcode prefix"
+msgstr ""
 
-#: paperless/models.py:252
+#: paperless/models.py:269
 msgid "Sets the barcode upscale factor"
-msgstr "[SQ] Sets the barcode upscale factor"
+msgstr ""
 
-#: paperless/models.py:259
+#: paperless/models.py:276
 msgid "Sets the barcode DPI"
-msgstr "[SQ] Sets the barcode DPI"
+msgstr "Cakton DPI-në e barkodit"
 
-#: paperless/models.py:266
+#: paperless/models.py:283
 msgid "Sets the maximum pages for barcode"
-msgstr "[SQ] Sets the maximum pages for barcode"
+msgstr ""
 
-#: paperless/models.py:273
+#: paperless/models.py:290
 msgid "Enables tag barcode"
-msgstr "[SQ] Enables tag barcode"
+msgstr ""
 
-#: paperless/models.py:279
+#: paperless/models.py:296
 msgid "Sets the tag barcode mapping"
-msgstr "[SQ] Sets the tag barcode mapping"
+msgstr "Përcakton lidhjen midis etiketës dhe barkodit"
 
-#: paperless/models.py:285
+#: paperless/models.py:302
 msgid "Enables splitting on tag barcodes"
-msgstr "[SQ] Enables splitting on tag barcodes"
+msgstr "Mundëson ndarjen bazuar në barkodet e etiketave"
 
-#: paperless/models.py:294
-msgid "Enables AI features"
-msgstr "[SQ] Enables AI features"
-
-#: paperless/models.py:300
-msgid "Sets the LLM embedding backend"
-msgstr "[SQ] Sets the LLM embedding backend"
-
-#: paperless/models.py:308
-msgid "Sets the LLM embedding model"
-msgstr "[SQ] Sets the LLM embedding model"
-
-#: paperless/models.py:315
-msgid "Sets the LLM embedding endpoint, optional"
+#: paperless/models.py:312
+msgid "Sets the remote OCR engine"
 msgstr ""
 
-#: paperless/models.py:322
-msgid "Sets the LLM embedding chunk size"
+#: paperless/models.py:321
+msgid "Sets the remote OCR API key"
 msgstr ""
 
-#: paperless/models.py:328
-msgid "Sets the LLM context size"
+#: paperless/models.py:329
+msgid "Sets the remote OCR endpoint"
 msgstr ""
 
-#: paperless/models.py:334
-msgid "Sets the LLM backend"
-msgstr "[SQ] Sets the LLM backend"
-
-#: paperless/models.py:342
-msgid "Sets the LLM model"
-msgstr "[SQ] Sets the LLM model"
+#: paperless/models.py:337
+msgid "Sets which documents are sent to the remote OCR engine"
+msgstr ""
 
 #: paperless/models.py:349
-msgid "Sets the LLM API key"
-msgstr "[SQ] Sets the LLM API key"
+msgid "Enables AI features"
+msgstr "Aktivizon veçoritë AI"
 
-#: paperless/models.py:356
-msgid "Sets the LLM endpoint, optional"
-msgstr "[SQ] Sets the LLM endpoint, optional"
+#: paperless/models.py:355
+msgid "Sets the LLM embedding backend"
+msgstr ""
 
 #: paperless/models.py:363
-msgid "Sets the LLM output language"
+msgid "Sets the LLM embedding model"
 msgstr ""
 
 #: paperless/models.py:370
-msgid "Sets the LLM timeout in seconds"
+msgid "Sets the LLM embedding endpoint, optional"
 msgstr ""
 
-#: paperless/models.py:376
+#: paperless/models.py:377
+msgid "Sets the LLM embedding chunk size"
+msgstr ""
+
+#: paperless/models.py:383
+msgid "Sets the LLM context size"
+msgstr "Cakton madhësinë e kontekstit LLM"
+
+#: paperless/models.py:389
+msgid "Sets the LLM backend"
+msgstr ""
+
+#: paperless/models.py:397
+msgid "Sets the LLM model"
+msgstr "Cakton modelin LLM"
+
+#: paperless/models.py:404
+msgid "Sets the LLM API key"
+msgstr "Cakton çelësin API të LLM"
+
+#: paperless/models.py:411
+msgid "Sets the LLM endpoint, optional"
+msgstr ""
+
+#: paperless/models.py:418
+msgid "Sets the LLM output language"
+msgstr "Cakton gjuhën dalëse të LLM"
+
+#: paperless/models.py:425
+msgid "Sets the LLM timeout in seconds"
+msgstr "Cakton kohën limit të LLM në sekonda"
+
+#: paperless/models.py:431
 msgid "paperless application settings"
-msgstr "[SQ] paperless application settings"
-
-#: paperless/settings/__init__.py:556
-msgid "English (US)"
-msgstr "[SQ] English (US)"
-
-#: paperless/settings/__init__.py:557
-msgid "Arabic"
-msgstr "[SQ] Arabic"
-
-#: paperless/settings/__init__.py:558
-msgid "Afrikaans"
-msgstr "[SQ] Afrikaans"
-
-#: paperless/settings/__init__.py:559
-msgid "Belarusian"
-msgstr "[SQ] Belarusian"
-
-#: paperless/settings/__init__.py:560
-msgid "Bulgarian"
-msgstr "[SQ] Bulgarian"
-
-#: paperless/settings/__init__.py:561
-msgid "Catalan"
-msgstr "[SQ] Catalan"
+msgstr ""
 
 #: paperless/settings/__init__.py:562
-msgid "Czech"
-msgstr "[SQ] Czech"
+msgid "English (US)"
+msgstr "Anglisht (SHBA)"
 
 #: paperless/settings/__init__.py:563
-msgid "Danish"
-msgstr "[SQ] Danish"
+msgid "Arabic"
+msgstr "Arabisht"
 
 #: paperless/settings/__init__.py:564
-msgid "German"
-msgstr "[SQ] German"
+msgid "Afrikaans"
+msgstr ""
 
 #: paperless/settings/__init__.py:565
-msgid "Greek"
-msgstr "[SQ] Greek"
+msgid "Belarusian"
+msgstr "Bjellorusisht"
 
 #: paperless/settings/__init__.py:566
-msgid "English (GB)"
-msgstr "[SQ] English (GB)"
+msgid "Bulgarian"
+msgstr "Bullgarisht"
 
 #: paperless/settings/__init__.py:567
-msgid "Spanish"
-msgstr "[SQ] Spanish"
+msgid "Catalan"
+msgstr ""
 
 #: paperless/settings/__init__.py:568
-msgid "Persian"
-msgstr "[SQ] Persian"
+msgid "Czech"
+msgstr "Çekisht"
 
 #: paperless/settings/__init__.py:569
-msgid "Finnish"
-msgstr "[SQ] Finnish"
+msgid "Danish"
+msgstr "Danisht"
 
 #: paperless/settings/__init__.py:570
-msgid "French"
-msgstr "[SQ] French"
+msgid "German"
+msgstr "Gjermanisht"
 
 #: paperless/settings/__init__.py:571
-msgid "Hungarian"
-msgstr "[SQ] Hungarian"
+msgid "Greek"
+msgstr "Greqisht"
 
 #: paperless/settings/__init__.py:572
-msgid "Indonesian"
-msgstr "[SQ] Indonesian"
+msgid "English (GB)"
+msgstr "Anglisht (MB)"
 
 #: paperless/settings/__init__.py:573
-msgid "Italian"
-msgstr "[SQ] Italian"
+msgid "Spanish"
+msgstr "Spanjisht"
 
 #: paperless/settings/__init__.py:574
-msgid "Japanese"
-msgstr "[SQ] Japanese"
+msgid "Persian"
+msgstr "Persisht"
 
 #: paperless/settings/__init__.py:575
-msgid "Korean"
-msgstr "[SQ] Korean"
+msgid "Finnish"
+msgstr "Finlandisht"
 
 #: paperless/settings/__init__.py:576
-msgid "Luxembourgish"
-msgstr "[SQ] Luxembourgish"
+msgid "French"
+msgstr "Frëngjisht"
 
 #: paperless/settings/__init__.py:577
-msgid "Norwegian"
-msgstr "[SQ] Norwegian"
+msgid "Hungarian"
+msgstr "Hungarisht"
 
 #: paperless/settings/__init__.py:578
-msgid "Dutch"
-msgstr "[SQ] Dutch"
+msgid "Indonesian"
+msgstr ""
 
 #: paperless/settings/__init__.py:579
-msgid "Polish"
-msgstr "[SQ] Polish"
+msgid "Italian"
+msgstr "Italisht"
 
 #: paperless/settings/__init__.py:580
-msgid "Portuguese (Brazil)"
-msgstr "[SQ] Portuguese (Brazil)"
+msgid "Japanese"
+msgstr "Japonisht"
 
 #: paperless/settings/__init__.py:581
-msgid "Portuguese"
-msgstr "[SQ] Portuguese"
+msgid "Korean"
+msgstr "Koreane"
 
 #: paperless/settings/__init__.py:582
-msgid "Romanian"
-msgstr "[SQ] Romanian"
+msgid "Luxembourgish"
+msgstr "Luksemburgisht"
 
 #: paperless/settings/__init__.py:583
-msgid "Russian"
-msgstr "[SQ] Russian"
+msgid "Norwegian"
+msgstr "Norvegjeze"
 
 #: paperless/settings/__init__.py:584
-msgid "Slovak"
-msgstr "[SQ] Slovak"
+msgid "Dutch"
+msgstr "Holandisht"
 
 #: paperless/settings/__init__.py:585
-msgid "Slovenian"
-msgstr "[SQ] Slovenian"
+msgid "Polish"
+msgstr "Polonisht"
 
 #: paperless/settings/__init__.py:586
-msgid "Serbian"
-msgstr "[SQ] Serbian"
+msgid "Portuguese (Brazil)"
+msgstr "Portugeze (Brazili)"
 
 #: paperless/settings/__init__.py:587
-msgid "Swedish"
-msgstr "[SQ] Swedish"
+msgid "Portuguese"
+msgstr "Portugalisht"
 
 #: paperless/settings/__init__.py:588
-msgid "Turkish"
-msgstr "[SQ] Turkish"
+msgid "Romanian"
+msgstr "Rumanisht"
 
 #: paperless/settings/__init__.py:589
-msgid "Ukrainian"
-msgstr "[SQ] Ukrainian"
+msgid "Russian"
+msgstr "Rusisht"
 
 #: paperless/settings/__init__.py:590
-msgid "Vietnamese"
-msgstr "[SQ] Vietnamese"
+msgid "Slovak"
+msgstr "Sllovakisht"
 
 #: paperless/settings/__init__.py:591
-msgid "Chinese Simplified"
-msgstr "[SQ] Chinese Simplified"
+msgid "Slovenian"
+msgstr "Sllovenisht"
 
 #: paperless/settings/__init__.py:592
-msgid "Chinese Traditional"
-msgstr "[SQ] Chinese Traditional"
+msgid "Serbian"
+msgstr "Serbisht"
 
-#: paperless/urls.py:429
+#: paperless/settings/__init__.py:593
+msgid "Swedish"
+msgstr "Suedisht"
+
+#: paperless/settings/__init__.py:594
+msgid "Turkish"
+msgstr "Turqisht"
+
+#: paperless/settings/__init__.py:595
+msgid "Ukrainian"
+msgstr ""
+
+#: paperless/settings/__init__.py:596
+msgid "Vietnamese"
+msgstr "Vietnamisht"
+
+#: paperless/settings/__init__.py:597
+msgid "Chinese Simplified"
+msgstr "Kinezisht e thjeshtuar"
+
+#: paperless/settings/__init__.py:598
+msgid "Chinese Traditional"
+msgstr "Kinezisht tradicionale"
+
+#: paperless/urls.py:435
 msgid "Paperless-ngx administration"
-msgstr "[SQ] Paperless-ngx administration"
+msgstr "Paperless-ngx Administration"
 
 #: paperless_mail/admin.py:39
 msgid "Authentication"
-msgstr "[SQ] Authentication"
+msgstr "Authentikimi"
 
 #: paperless_mail/admin.py:42
 msgid "Advanced settings"
-msgstr "[SQ] Advanced settings"
-
-#: paperless_mail/admin.py:58
-msgid "Filter"
-msgstr "[SQ] Filter"
+msgstr "Cilësime të avancuara"
 
 #: paperless_mail/admin.py:61
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr "[SQ] Paperless will only process mails that match ALL of the filters given below."
+msgstr "Paperless do të përpunojë vetëm email-et që përputhen me TË GJITHË filtrat e dhënë më poshtë."
 
 #: paperless_mail/admin.py:78
 msgid "Actions"
-msgstr "[SQ] Actions"
+msgstr "Veprime"
 
 #: paperless_mail/admin.py:81
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr "[SQ] The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
+msgstr "The action applied to the email. This action is only performed when the email body or attachments were consumed from the email."
 
 #: paperless_mail/admin.py:89
 msgid "Metadata"
-msgstr "[SQ] Metadata"
+msgstr "Metadatat"
 
 #: paperless_mail/admin.py:92
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr "[SQ] Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
+msgstr "Assign metadata to dokumente consumed from this rregull automatically. If you do not assign etiketa, types or korrespondentë here, paperless will still process all matching rules that you have defined."
 
 #: paperless_mail/apps.py:8
 msgid "Paperless mail"
-msgstr "[SQ] Paperless mail"
+msgstr "Email i Paperless"
 
 #: paperless_mail/models.py:10
 msgid "mail account"
-msgstr "[SQ] mail account"
+msgstr "llogari email-i"
 
 #: paperless_mail/models.py:11
 msgid "mail accounts"
-msgstr "[SQ] mail accounts"
+msgstr "llogari email-i"
 
 #: paperless_mail/models.py:14
 msgid "No encryption"
-msgstr "[SQ] No encryption"
+msgstr "Pa enkriptim"
 
 #: paperless_mail/models.py:15
 msgid "Use SSL"
-msgstr "[SQ] Use SSL"
+msgstr "Përdor SSL"
 
 #: paperless_mail/models.py:16
 msgid "Use STARTTLS"
-msgstr "[SQ] Use STARTTLS"
+msgstr "Përdor STARTTLS"
 
 #: paperless_mail/models.py:19
 msgid "IMAP"
@@ -2142,19 +2438,19 @@ msgstr "[SQ] Outlook OAuth"
 
 #: paperless_mail/models.py:25
 msgid "IMAP server"
-msgstr "[SQ] IMAP server"
+msgstr "Serveri IMAP"
 
 #: paperless_mail/models.py:28
 msgid "IMAP port"
-msgstr "[SQ] IMAP port"
+msgstr "Porta IMAP"
 
 #: paperless_mail/models.py:32
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr "[SQ] This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
+msgstr "Zakonisht është 143 për lidhje të paenkriptuara dhe STARTTLS, dhe 993 për lidhje SSL."
 
 #: paperless_mail/models.py:38
 msgid "IMAP security"
-msgstr "[SQ] IMAP security"
+msgstr "Siguria IMAP"
 
 #: paperless_mail/models.py:43
 msgid "username"
@@ -2166,75 +2462,75 @@ msgstr "fjalëkalimi"
 
 #: paperless_mail/models.py:47
 msgid "Is token authentication"
-msgstr "[SQ] Is token authentication"
+msgstr "Është autentikim me token"
 
 #: paperless_mail/models.py:50
 msgid "character set"
-msgstr "[SQ] character set"
+msgstr "grup karakteresh"
 
 #: paperless_mail/models.py:54
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr "[SQ] The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
+msgstr "Grupi i karaktereve që përdoret gjatë komunikimit me serverin e email-it, si 'UTF-8' ose 'US-ASCII'."
 
 #: paperless_mail/models.py:60
 msgid "account type"
-msgstr "[SQ] account type"
+msgstr "lloji i llogarisë"
 
 #: paperless_mail/models.py:66
 msgid "refresh token"
-msgstr "[SQ] refresh token"
+msgstr "token rifreskimi"
 
 #: paperless_mail/models.py:70
 msgid "The refresh token to use for token authentication e.g. with oauth2."
-msgstr "[SQ] The refresh token to use for token authentication e.g. with oauth2."
+msgstr "Token-i i rifreskimit që përdoret për autentikim me token, p.sh. me oauth2."
 
 #: paperless_mail/models.py:79
 msgid "The expiration date of the refresh token. "
-msgstr "[SQ] The expiration date of the refresh token. "
+msgstr "Data e skadimit të token-it të rifreskimit. "
 
 #: paperless_mail/models.py:89
 msgid "mail rule"
-msgstr "[SQ] mail rule"
+msgstr "rregull email-i"
 
 #: paperless_mail/models.py:90
 msgid "mail rules"
-msgstr "[SQ] mail rules"
+msgstr "rregulla email-i"
 
 #: paperless_mail/models.py:104 paperless_mail/models.py:115
 msgid "Only process attachments."
-msgstr "[SQ] Only process attachments."
+msgstr "Përpuno vetëm bashkëngjitjet."
 
 #: paperless_mail/models.py:105
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr "[SQ] Process full Mail (with embedded attachments in file) as .eml"
+msgstr "Process full Email (with embedded attachments in skedar) as .eml"
 
 #: paperless_mail/models.py:109
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr "[SQ] Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
+msgstr ""
 
 #: paperless_mail/models.py:116
 msgid "Process all files, including 'inline' attachments."
-msgstr "[SQ] Process all files, including 'inline' attachments."
+msgstr "Process all skedarë, including 'inline' attachments."
 
 #: paperless_mail/models.py:119
 msgid "System default"
-msgstr "[SQ] System default"
+msgstr "Parazgjedhja e sistemit"
 
 #: paperless_mail/models.py:120
 msgid "Text, then HTML"
-msgstr "[SQ] Text, then HTML"
+msgstr "Tekst, pastaj HTML"
 
 #: paperless_mail/models.py:121
 msgid "HTML, then text"
-msgstr "[SQ] HTML, then text"
+msgstr "HTML, pastaj tekst"
 
 #: paperless_mail/models.py:122
 msgid "HTML only"
-msgstr "[SQ] HTML only"
+msgstr "Vetëm HTML"
 
 #: paperless_mail/models.py:123
 msgid "Text only"
-msgstr "[SQ] Text only"
+msgstr "Vetëm tekst"
 
 #: paperless_mail/models.py:126
 msgid "Delete"
@@ -2242,143 +2538,143 @@ msgstr "fshi"
 
 #: paperless_mail/models.py:127
 msgid "Move to specified folder"
-msgstr "[SQ] Move to specified folder"
+msgstr "Zhvendos në dosjen e specifikuar"
 
 #: paperless_mail/models.py:128
 msgid "Mark as read, don't process read mails"
-msgstr "[SQ] Mark as read, don't process read mails"
+msgstr ""
 
 #: paperless_mail/models.py:129
 msgid "Flag the mail, don't process flagged mails"
-msgstr "[SQ] Flag the mail, don't process flagged mails"
+msgstr "Flag the email, don't process flagged mails"
 
 #: paperless_mail/models.py:130
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr "Tag the mail with specified tag, don't process tagged mails"
+msgstr "Etiketë the email with specified etiketë, don't process tagged mails"
 
 #: paperless_mail/models.py:133
 msgid "Use subject as title"
-msgstr "[SQ] Use subject as title"
+msgstr "Përdor subjektin si titull"
 
 #: paperless_mail/models.py:134
 msgid "Use attachment filename as title"
-msgstr "[SQ] Use attachment filename as title"
+msgstr "Përdor emrin e skedarit të bashkëngjitjes si titull"
 
 #: paperless_mail/models.py:135
 msgid "Do not assign title from rule"
-msgstr "[SQ] Do not assign title from rule"
+msgstr "Mos cakto titull nga rregulli"
 
 #: paperless_mail/models.py:138
 msgid "Do not assign a correspondent"
-msgstr "[SQ] Do not assign a correspondent"
+msgstr "Mos cakto korrespondent"
 
 #: paperless_mail/models.py:139
 msgid "Use mail address"
-msgstr "[SQ] Use mail address"
+msgstr "Përdor adresën email"
 
 #: paperless_mail/models.py:140
 msgid "Use name (or mail address if not available)"
-msgstr "[SQ] Use name (or mail address if not available)"
+msgstr "Përdor emrin (ose adresën email nëse nuk ka emër)"
 
 #: paperless_mail/models.py:141
 msgid "Use correspondent selected below"
-msgstr "[SQ] Use correspondent selected below"
+msgstr "Përdor korrespondentin e zgjedhur më poshtë"
 
 #: paperless_mail/models.py:151
 msgid "account"
-msgstr "[SQ] account"
+msgstr "llogaria"
 
 #: paperless_mail/models.py:157 paperless_mail/models.py:326
 msgid "folder"
-msgstr "[SQ] folder"
+msgstr "dosja"
 
 #: paperless_mail/models.py:161
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr "[SQ] Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
+msgstr "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by email server."
 
 #: paperless_mail/models.py:167
 msgid "filter from"
-msgstr "[SQ] filter from"
+msgstr "filtro nga"
 
 #: paperless_mail/models.py:174
 msgid "filter to"
-msgstr "[SQ] filter to"
+msgstr "filtro te"
 
 #: paperless_mail/models.py:181
 msgid "filter subject"
-msgstr "[SQ] filter subject"
+msgstr "filtro subjektin"
 
 #: paperless_mail/models.py:188
 msgid "filter body"
-msgstr "[SQ] filter body"
+msgstr "filtro trupin"
 
 #: paperless_mail/models.py:195
 msgid "filter attachment filename inclusive"
-msgstr "[SQ] filter attachment filename inclusive"
+msgstr "filtër për përfshirjen sipas emrit të bashkëngjitjes"
 
 #: paperless_mail/models.py:207
 msgid "filter attachment filename exclusive"
-msgstr "[SQ] filter attachment filename exclusive"
+msgstr "filtër për përjashtimin sipas emrit të bashkëngjitjes"
 
 #: paperless_mail/models.py:212
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr "[SQ] Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr "Do not consume dokumente which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 
 #: paperless_mail/models.py:219
 msgid "maximum age"
-msgstr "[SQ] maximum age"
+msgstr "mosha maksimale"
 
 #: paperless_mail/models.py:221
 msgid "Specified in days."
-msgstr "[SQ] Specified in days."
+msgstr "Specifikuar në ditë."
 
 #: paperless_mail/models.py:225
 msgid "attachment type"
-msgstr "[SQ] attachment type"
+msgstr "lloji i bashkëngjitjes"
 
 #: paperless_mail/models.py:229
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
-msgstr "[SQ] Inline attachments include embedded images, so it's best to combine this option with a filename filter."
+msgstr "Bashkëngjitjet inline përfshijnë figura të futura në mesazh, prandaj është më mirë ta kombinoni këtë opsion me një filtër emri skedari."
 
 #: paperless_mail/models.py:235
 msgid "consumption scope"
-msgstr "[SQ] consumption scope"
+msgstr "fusha e konsumit"
 
 #: paperless_mail/models.py:241
 msgid "pdf layout"
-msgstr "[SQ] pdf layout"
+msgstr "faqosja PDF"
 
 #: paperless_mail/models.py:247
 msgid "action"
-msgstr "[SQ] action"
+msgstr "veprimi"
 
 #: paperless_mail/models.py:253
 msgid "action parameter"
-msgstr "[SQ] action parameter"
+msgstr "parametri i veprimit"
 
 #: paperless_mail/models.py:258
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr "[SQ] Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
+msgstr "Additional parameter for the action selected above, i.e., the target dosje of the move to dosje action. Subfolders must be separated by dots."
 
 #: paperless_mail/models.py:266
 msgid "assign title from"
-msgstr "[SQ] assign title from"
+msgstr "cakto titullin nga"
 
 #: paperless_mail/models.py:286
 msgid "assign correspondent from"
-msgstr "[SQ] assign correspondent from"
+msgstr "cakto korrespondentin nga"
 
 #: paperless_mail/models.py:300
 msgid "Assign the rule owner to documents"
-msgstr "[SQ] Assign the rule owner to documents"
+msgstr "Cakto pronarin e rregullit te dokumentet"
 
 #: paperless_mail/models.py:305
 msgid "Stop processing further rules"
-msgstr "[SQ] Stop processing further rules"
+msgstr "Ndalo përpunimin e rregullave të mëtejshme"
 
 #: paperless_mail/models.py:308
 msgid "If True, no further rules will be processed after this one if any document is queued."
-msgstr "[SQ] If True, no further rules will be processed after this one if any document is queued."
+msgstr "If True, no further rules will be processed after this one if any dokument is queued."
 
 #: paperless_mail/models.py:334
 msgid "uid"
@@ -2386,25 +2682,25 @@ msgstr "[SQ] uid"
 
 #: paperless_mail/models.py:342
 msgid "uid validity"
-msgstr ""
+msgstr "vlefshmëria uid"
 
 #: paperless_mail/models.py:350
 msgid "subject"
-msgstr "[SQ] subject"
+msgstr "subjekti"
 
 #: paperless_mail/models.py:358
 msgid "received"
-msgstr "[SQ] received"
+msgstr "marrë"
 
 #: paperless_mail/models.py:365
 msgid "processed"
-msgstr "[SQ] processed"
+msgstr "përpunuar"
 
 #: paperless_mail/models.py:371
 msgid "status"
-msgstr "[SQ] status"
+msgstr "statusi"
 
 #: paperless_mail/models.py:379
 msgid "error"
-msgstr "[SQ] error"
+msgstr "gabim"
 

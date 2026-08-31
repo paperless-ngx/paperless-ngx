@@ -9,6 +9,7 @@ import pytest
 from llama_index.core.llms.llm import ToolSelection
 
 from paperless_ai.client import LLM_SYSTEM_PROMPT
+from paperless_ai.client import PLACEHOLDER_API_KEY
 from paperless_ai.client import AIClient
 from paperless_ai.exceptions import LLMTimeoutError
 
@@ -77,6 +78,23 @@ def test_get_llm_openai(mock_ai_config, mock_openai_llm):
     assert client.llm == mock_openai_llm.return_value
 
 
+@pytest.mark.parametrize("configured_key", [None, ""])
+def test_get_llm_openai_without_api_key_sends_placeholder(
+    mock_ai_config,
+    mock_openai_llm,
+    configured_key,
+):
+    """openai SDK rejects empty key, see #13831."""
+    mock_ai_config.llm_backend = "openai-like"
+    mock_ai_config.llm_model = "test_model"
+    mock_ai_config.llm_api_key = configured_key
+    mock_ai_config.llm_endpoint = "http://test-url"
+
+    AIClient()
+
+    assert mock_openai_llm.call_args.kwargs["api_key"] == PLACEHOLDER_API_KEY
+
+
 def test_get_llm_openai_blocks_internal_endpoint_when_disallowed(mock_ai_config):
     mock_ai_config.llm_backend = "openai-like"
     mock_ai_config.llm_model = "test_model"
@@ -105,19 +123,24 @@ def test_run_llm_query_ollama_uses_structured_json(mock_ai_config, mock_ollama_l
     mock_llm_instance.chat.return_value.message.content = json.dumps(
         {
             "title": "Test Title",
-            "tags": {"existing_ids": [1], "new_names": ["document"]},
-            "correspondents": {"existing_ids": [], "new_names": ["John Doe"]},
-            "document_types": {"existing_ids": [], "new_names": ["report"]},
-            "storage_paths": {"existing_ids": [], "new_names": ["Reports"]},
+            "tags": ["document"],
+            "matched_tags": ["document"],
+            "tag_ids": [1],
+            "correspondents": ["John Doe"],
+            "document_types": ["report"],
+            "storage_paths": ["Reports"],
             "dates": ["2023-01-01"],
         },
     )
 
     client = AIClient()
-    result = client.run_llm_query("test_prompt")
+    result = client.run_llm_query(
+        "test_prompt",
+        allowed_candidate_ids={"tags": {1}},
+    )
 
     assert result["title"] == "Test Title"
-    assert result["tags"] == {"existing_ids": [1], "new_names": ["document"]}
+    assert result["tags"] == {"existing_ids": [1], "new_names": []}
     mock_llm_instance.chat.assert_called_once_with(
         [ANY],
         format=ANY,
@@ -138,10 +161,12 @@ def test_run_llm_query_openai_uses_tools(mock_ai_config, mock_openai_llm):
         tool_name="DocumentClassifierSchema",
         tool_kwargs={
             "title": "Test Title",
-            "tags": {"existing_ids": [1], "new_names": ["document"]},
-            "correspondents": {"existing_ids": [], "new_names": ["John Doe"]},
-            "document_types": {"existing_ids": [], "new_names": ["report"]},
-            "storage_paths": {"existing_ids": [], "new_names": ["Reports"]},
+            "tags": ["document"],
+            "matched_tags": ["document"],
+            "tag_ids": [1],
+            "correspondents": ["John Doe"],
+            "document_types": ["report"],
+            "storage_paths": ["Reports"],
             "dates": ["2023-01-01"],
         },
     )
@@ -150,10 +175,13 @@ def test_run_llm_query_openai_uses_tools(mock_ai_config, mock_openai_llm):
     mock_llm_instance.get_tool_calls_from_response.return_value = [tool_selection]
 
     client = AIClient()
-    result = client.run_llm_query("test_prompt")
+    result = client.run_llm_query(
+        "test_prompt",
+        allowed_candidate_ids={"tags": {1}},
+    )
 
     assert result["title"] == "Test Title"
-    assert result["tags"] == {"existing_ids": [1], "new_names": ["document"]}
+    assert result["tags"] == {"existing_ids": [1], "new_names": []}
     mock_llm_instance.chat_with_tools.assert_called_once()
 
 

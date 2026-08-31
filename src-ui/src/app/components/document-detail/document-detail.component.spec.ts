@@ -24,7 +24,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
-import { of, throwError } from 'rxjs'
+import { Subject, of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomFieldDataType } from 'src/app/data/custom-field'
@@ -1442,6 +1442,26 @@ describe('DocumentDetailComponent', () => {
       suggested_document_types: [],
       suggested_correspondents: [],
     })
+  })
+
+  it('should reset the suggestions loading state if the document changes mid-request', () => {
+    const getSetting = settingsService.get.bind(settingsService)
+    jest
+      .spyOn(settingsService, 'get')
+      .mockImplementation((key) =>
+        key === SETTINGS_KEYS.AI_ENABLED ? true : getSetting(key)
+      )
+    const pending = new Subject<any>()
+    jest
+      .spyOn(documentService, 'getAiSuggestions')
+      .mockReturnValue(pending.asObservable())
+    initNormally()
+    expect(component.suggestionsLoading()).toBeTruthy()
+
+    // the in-flight request is cancelled, e.g. by a websocket-driven reload
+    component.docChangeNotifier.next(component.documentId())
+
+    expect(component.suggestionsLoading()).toBeFalsy()
   })
 
   it('should show error if needed for get suggestions', () => {

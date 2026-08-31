@@ -11,6 +11,7 @@
   border-right: 1px solid color-mix(in srgb, var(--bs-border-color) 65%, transparent);
   overflow-y: auto;
   --pngx-sidebar-width: 100%;
+  width: var(--pngx-sidebar-width);
   max-width: var(--pngx-sidebar-width);
   transition: all .2s ease;
 
@@ -32,17 +33,10 @@
     display: none !important;
   }
 
-  // These come from the col-* classes for non-slim sidebar, needed for animation
   @media (min-width: 768px) {
-    --pngx-sidebar-width: 25%;
-  }
-
-  @media (min-width: 992px) {
-    --pngx-sidebar-width: 16.66666667%;
-  }
-
-  @media (min-width: 2400px) {
-    --pngx-sidebar-width: 8.33333333%;
+    &.expanded {
+      --pngx-sidebar-width: var(--pngx-sidebar-expanded-width);
+    }
   }
 }
 @media (max-width: 767.98px) {
@@ -109,6 +103,16 @@ main {
 }
 
 @media(min-width: 768px) {
+  // hide scrollbars on browsers that take up layout width
+  // :host-context since <html> is outside the component
+  :host-context(.pngx-classic-scrollbars) .sidebar.slim {
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
   .sidebar.slim {
     max-width: 55px;
 
@@ -124,6 +128,19 @@ main {
     li.nav-item span,
     .sidebar-heading span {
       display: none;
+    }
+
+    .nav-link,
+    .nav-anchor {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+
+      i-bs {
+        margin-right: 0 !important;
+      }
     }
   }
 
@@ -235,6 +252,26 @@ main {
     position: relative;
     top: -1px;
   }
+}
+
+.sidebar .nav-link:has(> .nav-link-label) {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+
+  > i-bs {
+    flex: 0 0 auto;
+  }
+
+  > .nav-link-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.sidebar:not(.slim):not(.animating) .nav-link > .nav-link-label {
+  overflow: hidden;
 }
 
 .sidebar .nav-anchor, .sidebar .nav-label {
@@ -362,6 +399,7 @@ main {
   }
 
   ::ng-deep .navbar-official-logo {
+    will-change: filter; // prevent resizing the filter region on hover and nudging the logo a pixel
     filter: drop-shadow(0 1px 2px rgba(var(--pngx-navbar-brand-shadow-rgb), .3));
     transition: filter .15s ease-in-out;
 
@@ -374,6 +412,8 @@ main {
     width: 1.65rem;
     height: 1.65rem;
     flex: 0 0 auto;
+    will-change: filter; // prevent resizing the filter region on hover and nudging the logo a pixel
+    filter: drop-shadow(0 2px 3px rgba(var(--pngx-navbar-brand-shadow-rgb), 0));
     transition: filter .15s ease-in-out;
   }
 
@@ -406,6 +446,8 @@ main {
     max-width: 5rem;
     flex: 0 0 auto;
     object-fit: contain;
+    will-change: filter; // prevent resizing the filter region on hover and nudging the logo a pixel
+    filter: drop-shadow(0 2px 3px rgba(var(--pngx-navbar-brand-shadow-rgb), 0));
     transition: filter .15s ease-in-out, transform .15s ease-in-out;
   }
 
@@ -434,6 +476,19 @@ main {
   align-items: center;
   gap: .125rem;
   padding-right: .5rem;
+}
+
+// true center the search with equal flex widths
+@media (min-width: 768px) {
+  .navbar-brand-container,
+  .navbar > ul {
+    display: flex; // so the brand link stays as wide as its contents
+    flex: 1 1 0;
+  }
+
+  .navbar > ul {
+    justify-content: flex-end;
+  }
 }
 
 :host ::ng-deep .navbar-action {
@@ -476,6 +531,7 @@ main {
     text-align: left;
   }
 
+  .navbar-brand-container,
   .navbar-brand {
     grid-area: brand;
     min-width: 0;

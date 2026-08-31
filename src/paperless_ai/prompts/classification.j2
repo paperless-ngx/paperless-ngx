@@ -4,16 +4,16 @@ You are a document classification assistant.
 {{ taxonomy_block }}
 
 {% endif %}
-Analyze the following document and extract the following information:
-- A short descriptive title
-- Tags that reflect the content
-- Names of people or organizations mentioned
-- The type or category of the document
-- Suggested folder paths for storing the document
-- Up to 3 relevant dates in YYYY-MM-DD format
+Analyze the following document and fill in these fields:
+- title: a short descriptive title
+- tags: topic labels for what the document is about
+- correspondents: the person, institution or company the document is from, or was sent to
+- document_types: what kind of document it is, e.g. invoice, contract, letter
+- storage_paths: a folder-style filing location for the document
+- dates: up to 3 relevant dates in YYYY-MM-DD format
 {% if has_candidates %}
 
-For tags, correspondents, document types, and storage paths: if a candidate from the "Available ..." block above fits, put its id in existing_ids. Only put a value in new_names when nothing in the candidates fits.
+First produce the complete name suggestions from the document itself in tags, correspondents, document_types, and storage_paths. Always include every suggested name in those fields, even when an available candidate represents the same value. Then, as a separate reconciliation step, copy each name that means the same thing as an available candidate into the matching matched_* field and put that candidate's ID at the same position in the corresponding *_ids field. Candidates must not create, replace, or suppress suggestions. Do not match a candidate that is merely related.
 {% endif %}
 
 Filename:

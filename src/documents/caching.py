@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import hashlib
 import logging
 import pickle
 import time
+import uuid
 from binascii import hexlify
 from collections import OrderedDict
 from dataclasses import dataclass
@@ -47,14 +49,16 @@ CLASSIFIER_HASH_KEY: Final[str] = "classifier_hash"
 CLASSIFIER_MODIFIED_KEY: Final[str] = "classifier_modified"
 # Marker distinguishing LLM suggestions from classifier-generated ones (whose
 # FORMAT_VERSION lives in a much lower range - see DocumentClassifier). Bump
-# this whenever the *shape* of the cached `suggestions` dict changes, so a
-# cache entry written by a previous release can never be read back by code
-# that expects a different shape:
+# this whenever cached suggestions must not be reused, including changes to
+# their shape or interpretation, so a previous release's result cannot leak
+# incompatible or obsolete behavior into the new one:
 #   1000 - initial LLM suggestions cache (flat lists of resolved object ids
 #          per taxonomy field)
 #   1001 - suggestions reshaped to {"existing_ids": [...], "new_names":
 #          [...]} per taxonomy field (#13676)
-LLM_CACHE_CLASSIFIER_VERSION: Final[int] = 1001
+#   1002 - names are always generated and optional candidate mappings are
+#          validated separately, so candidate-anchored 1001 results are stale
+LLM_CACHE_CLASSIFIER_VERSION: Final[int] = 1002
 
 # How often a request waiting on llm generation re-checks the cache
 LLM_SUGGESTION_POLL_INTERVAL: Final[float] = 0.5
@@ -62,6 +66,8 @@ LLM_SUGGESTION_POLL_INTERVAL: Final[float] = 0.5
 CACHE_1_MINUTE: Final[int] = 60
 CACHE_5_MINUTES: Final[int] = 5 * CACHE_1_MINUTE
 CACHE_50_MINUTES: Final[int] = 50 * CACHE_1_MINUTE
+# Deliberately longer than any entry it names
+LLM_CACHE_GENERATION_TIMEOUT: Final[int] = 2 * CACHE_50_MINUTES
 
 read_cache = caches["read-cache"]
 
@@ -213,12 +219,40 @@ def refresh_suggestions_cache(
     cache.touch(doc_key, timeout)
 
 
+def invalidate_suggestions_cache(document_id: int) -> None:
+    """Invalidate classifier-generated suggestions for a document."""
+    cache.delete(get_suggestion_cache_key(document_id))
+
+
+def _llm_generation_key(document_id: int) -> str:
+    return f"{get_suggestion_cache_key(document_id)}_llm_generation"
+
+
+def _llm_variant_key(document_id: int, backend: str) -> str:
+    """Cache key for one LLM configuration and permission scope.
+
+    ``backend`` identifies the variant - model, endpoint, output language and
+    requesting user.
+
+    Generating the token on first use lets invalidate_llm_suggestions_cache()
+    be no-op for documents that never had AI suggestions.
+    """
+    generation_key = _llm_generation_key(document_id)
+    generation = cache.get_or_set(
+        generation_key,
+        lambda: uuid.uuid4().hex,
+        timeout=LLM_CACHE_GENERATION_TIMEOUT,
+    )
+    cache.touch(generation_key, LLM_CACHE_GENERATION_TIMEOUT)
+    backend_hash = hashlib.sha256(backend.encode()).hexdigest()[:16]
+    return f"{get_suggestion_cache_key(document_id)}_llm_{generation}_{backend_hash}"
+
+
 def get_llm_suggestion_cache(
     document_id: int,
     backend: str,
 ) -> SuggestionCacheData | None:
-    doc_key = get_suggestion_cache_key(document_id)
-    data: SuggestionCacheData = cache.get(doc_key)
+    data: SuggestionCacheData = cache.get(_llm_variant_key(document_id, backend))
 
     if (
         data
@@ -303,9 +337,8 @@ def set_llm_suggestions_cache(
     Cache LLM-generated suggestions using a backend-specific identifier
     (e.g. 'openai-like:gpt-4').
     """
-    doc_key = get_suggestion_cache_key(document_id)
     cache.set(
-        doc_key,
+        _llm_variant_key(document_id, backend),
         SuggestionCacheData(
             classifier_version=LLM_CACHE_CLASSIFIER_VERSION,
             classifier_hash=backend,
@@ -315,17 +348,31 @@ def set_llm_suggestions_cache(
     )
 
 
+def refresh_llm_suggestions_cache(
+    document_id: int,
+    backend: str,
+    *,
+    timeout: int = CACHE_50_MINUTES,
+) -> None:
+    """
+    Refreshes the expiration of one cached LLM suggestion variant.
+    """
+    cache.touch(_llm_variant_key(document_id, backend), timeout)
+
+
 def invalidate_llm_suggestions_cache(
     document_id: int,
 ) -> None:
     """
-    Invalidate the LLM suggestions cache for a specific document and backend.
+    Invalidate every LLM suggestion variant for a document.
     """
-    doc_key = get_suggestion_cache_key(document_id)
-    data: SuggestionCacheData = cache.get(doc_key)
-
-    if data:
-        cache.delete(doc_key)
+    generation_key = _llm_generation_key(document_id)
+    if cache.get(generation_key) is not None:
+        cache.set(
+            generation_key,
+            uuid.uuid4().hex,
+            timeout=LLM_CACHE_GENERATION_TIMEOUT,
+        )
 
 
 def get_metadata_cache_key(document_id: int) -> str:
@@ -426,3 +473,4 @@ def clear_document_caches(document_id: int) -> None:
             get_thumbnail_modified_key(document_id),
         ],
     )
+    invalidate_llm_suggestions_cache(document_id)

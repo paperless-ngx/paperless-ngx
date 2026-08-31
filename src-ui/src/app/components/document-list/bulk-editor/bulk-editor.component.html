@@ -114,13 +114,23 @@
         </div>
       </button>
       <div ngbDropdownMenu aria-labelledby="dropdownSend" class="shadow">
-        <button ngbDropdownItem (click)="createShareLinkBundle()" [disabled]="!canSendSelection">
-          <i-bs name="link" class="me-1"></i-bs><ng-container i18n>Create a share link bundle</ng-container>
-        </button>
-        <button ngbDropdownItem (click)="manageShareLinkBundles()">
-          <i-bs name="list-ul" class="me-1"></i-bs><ng-container i18n>Manage share link bundles</ng-container>
-        </button>
-        <div class="dropdown-divider"></div>
+        @if (permissionService.currentUserCan(PermissionAction.Add, PermissionType.ShareLinkBundle)) {
+          <button ngbDropdownItem (click)="createShareLinkBundle()" [disabled]="!canSendSelection">
+            <i-bs name="link" class="me-1"></i-bs><ng-container i18n>Create a share link bundle</ng-container>
+          </button>
+        }
+        @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.ShareLinkBundle)) {
+          <button ngbDropdownItem (click)="manageShareLinkBundles()">
+            <i-bs name="list-ul" class="me-1"></i-bs><ng-container i18n>Manage share link bundles</ng-container>
+          </button>
+        }
+        @if (
+          emailEnabled &&
+          (permissionService.currentUserCan(PermissionAction.Add, PermissionType.ShareLinkBundle) ||
+            permissionService.currentUserCan(PermissionAction.View, PermissionType.ShareLinkBundle))
+        ) {
+          <div class="dropdown-divider"></div>
+        }
         @if (emailEnabled) {
           <button ngbDropdownItem (click)="emailSelected()" [disabled]="!canSendSelection">
             <i-bs name="envelope" class="me-1"></i-bs><ng-container i18n>Email</ng-container>

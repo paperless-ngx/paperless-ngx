@@ -296,6 +296,43 @@ class TestSyncSocialLoginGroups(TestCase):
         self.assertEqual(list(user.groups.all()), [group])
 
     @override_settings(
+        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP="admin",
+        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP="admin",
+    )
+    def test_sync_superuser_claim_no_substring_match(self) -> None:
+        """
+        GIVEN:
+            - Configured superuser group sync
+            - Provider emits the groups claim as a bare string, and the user's
+              only group merely *contains* the configured name
+        WHEN:
+            - Social login updated via signal
+        THEN:
+            - User is not promoted, since only an exact group match counts
+        """
+        user = User.objects.create_user(
+            username="testuser",
+            is_superuser=False,
+            is_staff=False,
+        )
+        sociallogin = Mock(
+            user=user,
+            account=Mock(
+                extra_data={
+                    "groups": "paperless-admins-readonly",
+                },
+            ),
+        )
+        handle_social_account_updated(
+            sender=None,
+            request=HttpRequest(),
+            sociallogin=sociallogin,
+        )
+        user.refresh_from_db()
+        self.assertFalse(user.is_superuser)
+        self.assertFalse(user.is_staff)
+
+    @override_settings(
         SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP="admin-group",
         SOCIAL_ACCOUNT_SYNC_STAFF_GROUP=None,
     )

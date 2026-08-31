@@ -8,6 +8,12 @@ common [OCR](#ocr) related settings and some frontend settings. If set, these wi
 preference over the settings via environment variables. If not set, the environment setting
 or applicable default will be utilized instead.
 
+!!! warning
+
+    Changing configuration from the UI requires the `AppConfig` permission, which applies
+    instance-wide and should be treated as an admin-level permission. See
+    [global permissions](usage.md#global-permissions).
+
 - If you run paperless on docker, `paperless.conf` is not used.
   Rather, configure paperless by copying necessary options to
   `docker-compose.env`.
@@ -1124,6 +1130,10 @@ they use underscores instead of dashes.
         above. There are many options that are incompatible with each other,
         so specifying invalid options may prevent paperless from consuming
         any documents.  Use with caution!
+
+        These arguments are passed directly to OCRmyPDF, so this setting should only
+        be changed by trusted users. This applies to the `AppConfig` permission as well,
+        which allows setting these arguments from the UI.
 
     Specify arguments as a JSON dictionary. Keep note of lower case
     booleans and double quoted parameter names and strings. Examples:

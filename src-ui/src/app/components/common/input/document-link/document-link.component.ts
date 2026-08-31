@@ -101,7 +101,7 @@ export class DocumentLinkComponent
         .subscribe((documentResults) => {
           this.loading.set(false)
           this.selectedDocuments = documentIDs.map(
-            (id) => documentResults.results.find((d) => d.id === id) ?? {}
+            (id) => documentResults.results.find((d) => d.id === id) ?? { id }
           )
           super.writeValue(documentIDs)
         })
@@ -142,6 +142,8 @@ export class DocumentLinkComponent
   }
 
   unselect(document: Document): void {
+    if (this.disabled) return
+
     this.selectedDocuments = this.selectedDocuments.filter(
       (d) => d && d.id !== document.id
     )

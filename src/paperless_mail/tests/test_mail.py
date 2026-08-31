@@ -36,6 +36,7 @@ from paperless_mail.mail import MailAccountHandler
 from paperless_mail.mail import MailError
 from paperless_mail.mail import TagMailAction
 from paperless_mail.mail import apply_mail_action
+from paperless_mail.mail import get_mailbox
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
@@ -341,7 +342,7 @@ class MailMocker(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         reset_bogus_mailbox(self.bogus_mailbox, self.messageBuilder)
 
-        patcher = mock.patch("paperless_mail.mail.MailBox")
+        patcher = mock.patch("paperless_mail.mail.PinnedMailBox")
         m = patcher.start()
         m.return_value = self.bogus_mailbox
         self.addCleanup(patcher.stop)
@@ -441,6 +442,7 @@ class TestMail(
     def setUp(self) -> None:
         self.mailMocker = MailMocker()
         self.mailMocker.setUp()
+        self.addCleanup(self.mailMocker.doCleanups)
         self.mail_account_handler = MailAccountHandler()
 
         super().setUp()
@@ -2190,6 +2192,7 @@ class TestMailAccountTestView(APITestCase):
     def setUp(self) -> None:
         self.mailMocker = MailMocker()
         self.mailMocker.setUp()
+        self.addCleanup(self.mailMocker.doCleanups)
         self.user = User.objects.create_user(
             username="testuser",
             password="testpassword",
@@ -2386,10 +2389,82 @@ class TestMailAccountTestView(APITestCase):
         self.assertEqual(response.content.decode(), "Insufficient permissions")
 
 
+class TestGetMailboxHostPinning(TestCase):
+    """
+    get_mailbox() must connect to the address it validated, so that a DNS answer
+    which changes between the check and the connection (DNS rebinding) cannot
+    redirect the connection to an internal host.
+    """
+
+    @override_settings(EMAIL_ALLOW_INTERNAL_HOSTS=False)
+    @mock.patch(
+        "paperless_mail.mail.resolve_hostname_ips",
+        return_value=["93.184.216.34"],
+    )
+    def test_connects_to_validated_ip(self, _mock_resolve) -> None:
+        with mock.patch(
+            "paperless_mail.mail.socket.create_connection",
+            side_effect=OSError("no connection in tests"),
+        ) as mock_connection:
+            with self.assertRaises(OSError):
+                get_mailbox(
+                    "mail.example.com",
+                    143,
+                    MailAccount.ImapSecurity.NONE,
+                )
+
+        # the hostname is never handed to the socket layer for a second lookup
+        mock_connection.assert_called_once_with(("93.184.216.34", 143))
+
+    @override_settings(EMAIL_ALLOW_INTERNAL_HOSTS=False)
+    @mock.patch(
+        "paperless_mail.mail.resolve_hostname_ips",
+        return_value=["93.184.216.34"],
+    )
+    def test_ssl_pins_ip_but_keeps_hostname_for_sni(self, _mock_resolve) -> None:
+        ssl_context = mock.MagicMock()
+        ssl_context.wrap_socket.return_value.makefile.side_effect = OSError(
+            "no connection in tests",
+        )
+
+        with (
+            mock.patch(
+                "paperless_mail.mail.ssl.create_default_context",
+                return_value=ssl_context,
+            ),
+            mock.patch(
+                "paperless_mail.mail.socket.create_connection",
+            ) as mock_connection,
+        ):
+            with self.assertRaises(OSError):
+                get_mailbox(
+                    "mail.example.com",
+                    993,
+                    MailAccount.ImapSecurity.SSL,
+                )
+
+        mock_connection.assert_called_once_with(("93.184.216.34", 993))
+        # certificate verification still happens against the hostname
+        ssl_context.wrap_socket.assert_called_once_with(
+            mock_connection.return_value,
+            server_hostname="mail.example.com",
+        )
+
+    @override_settings(EMAIL_ALLOW_INTERNAL_HOSTS=False)
+    @mock.patch(
+        "paperless_mail.mail.resolve_hostname_ips",
+        return_value=["93.184.216.34", "127.0.0.1"],
+    )
+    def test_blocks_when_any_resolved_address_is_internal(self, _mock_resolve) -> None:
+        with self.assertRaises(MailError):
+            get_mailbox("mail.example.com", 993, MailAccount.ImapSecurity.SSL)
+
+
 class TestMailAccountProcess(APITestCase):
     def setUp(self) -> None:
         self.mailMocker = MailMocker()
         self.mailMocker.setUp()
+        self.addCleanup(self.mailMocker.doCleanups)
         self.user = User.objects.create_superuser(
             username="testuser",
             password="testpassword",

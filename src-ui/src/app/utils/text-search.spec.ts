@@ -15,6 +15,35 @@ describe('text search utilities', () => {
     expect(matchesSearchText('taxes 2026', 'tax receipt')).toBeFalsy()
   })
 
+  it('does not let two terms match the same word', () => {
+    expect(matchesSearchText('Another Tag', 'another tag th')).toBeFalsy()
+    expect(matchesSearchText('Another Tag', 'another tag ag')).toBeFalsy()
+    expect(matchesSearchText('Another Tag', 'another tag e')).toBeFalsy()
+    expect(matchesSearchText('Another Tag', 'another tag')).toBeTruthy()
+    expect(matchesSearchText('Another Tag', 'tag another')).toBeTruthy()
+  })
+
+  it('matches a single term anywhere in the value', () => {
+    expect(matchesSearchText('Another Tag', 'anoth')).toBeTruthy()
+    expect(matchesSearchText('Another Tag', 'th')).toBeTruthy()
+  })
+
+  it('treats punctuation as a separator on both sides', () => {
+    expect(matchesSearchText('medical-history', 'medical history')).toBeTruthy()
+    expect(matchesSearchText('medical history', 'medical-history')).toBeTruthy()
+    expect(matchesSearchText('medical-history', 'medical dental')).toBeFalsy()
+  })
+
+  it('matches longer terms first so they cannot be starved', () => {
+    expect(matchesSearchText('tagger tag', 'tag tagger')).toBeTruthy()
+  })
+
+  it('handles a query with no usable terms', () => {
+    expect(matchesSearchText('Another Tag', '')).toBeTruthy()
+    // Still filters, so the dropdown can offer to create a tag named "---"
+    expect(matchesSearchText('Another Tag', '---')).toBeFalsy()
+  })
+
   it('matches a large set of tag names without blocking input', () => {
     const tagNames = Array.from(
       { length: 1280 },

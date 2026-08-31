@@ -4,27 +4,29 @@
     (click)="closeMobileSearch(); toggleMenuCollapsed()">
     <i-bs width="1.5em" height="1.5em" name="list"></i-bs>
   </button>
-  <a class="navbar-brand d-flex align-items-center me-0 ps-md-3 py-0 order-sm-0"
+  <div class="navbar-brand-container order-sm-0">
+    <a class="navbar-brand d-flex align-items-center me-0 ps-md-3 py-0"
     [ngClass]="{ 'slim': slimSidebarEnabled, '' : !slimSidebarEnabled }"
     routerLink="/dashboard"
     tourAnchor="tour.intro">
-    @if (!hasCustomBranding) {
-      <pngx-logo extra_classes="navbar-official-logo px-1" height="2.4rem"></pngx-logo>
-      <pngx-brand-mark class="brand-mark brand-mark-slim d-none"></pngx-brand-mark>
-    } @else {
-      @if (customAppLogo) {
-        <img class="brand-logo" [src]="customAppLogo" alt="" />
+      @if (!hasCustomBranding) {
+        <pngx-logo extra_classes="navbar-official-logo px-1" height="2.4rem"></pngx-logo>
+        <pngx-brand-mark class="brand-mark brand-mark-slim d-none"></pngx-brand-mark>
       } @else {
-        <pngx-brand-mark class="brand-mark"></pngx-brand-mark>
-      }
-      <div class="brand-copy ms-2 text-truncate" [class.d-md-none]="slimSidebarEnabled">
-        <span class="brand-title text-truncate">{{ appTitle }}</span>
-        @if (customAppTitle) {
-          <span class="byline text-uppercase font-monospace" i18n>by Paperless-ngx</span>
+        @if (customAppLogo) {
+          <img class="brand-logo" [src]="customAppLogo" alt="" />
+        } @else {
+          <pngx-brand-mark class="brand-mark"></pngx-brand-mark>
         }
-      </div>
-    }
-  </a>
+        <div class="brand-copy ms-2 text-truncate" [class.d-md-none]="slimSidebarEnabled">
+          <span class="brand-title text-truncate">{{ appTitle }}</span>
+          @if (customAppTitle) {
+            <span class="byline text-uppercase font-monospace" i18n>by Paperless-ngx</span>
+          }
+        </div>
+      }
+    </a>
+  </div>
   <div class="search-container flex-grow-1 py-2 pb-3 pb-sm-2 me-sm-auto order-3 order-sm-1"
     [class.mobile-hidden]="mobileSearchHidden()">
     <div class="col-12 header-search mx-auto">
@@ -37,7 +39,7 @@
     }
     <pngx-toasts-dropdown></pngx-toasts-dropdown>
     <li ngbDropdown class="nav-item dropdown">
-      <button class="btn navbar-action border-0" id="userDropdown" ngbDropdownToggle aria-label="User menu" i18n-aria-label>
+      <button class="btn navbar-action border-0 me-1 me-md-2" id="userDropdown" ngbDropdownToggle aria-label="User menu" i18n-aria-label>
         <i-bs width="1.3em" height="1.3em" name="person-circle"></i-bs>
         <span class="small ms-2 d-none d-sm-inline">
           {{this.settingsService.displayName}}
@@ -71,7 +73,7 @@
 <div class="container-fluid">
   <div class="row">
     <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse"
-      [ngClass]="slimSidebarEnabled ? 'slim' : 'col-md-3 col-lg-2 col-xxxl-1'" [class.animating]="slimSidebarAnimating()"
+      [ngClass]="slimSidebarEnabled ? 'slim' : 'expanded'" [class.animating]="slimSidebarAnimating()"
       [ngbCollapse]="isMenuCollapsed()">
       @if (canSaveSettings) {
         <button class="btn btn-sm btn-dark sidebar-slim-toggler" (click)="toggleSlimSidebar()" [aria-label]="slimSidebarEnabled ? 'Expand sidebar' : 'Collapse sidebar'" i18n-aria-label>
@@ -88,7 +90,7 @@
             <a class="nav-link" routerLink="dashboard" routerLinkActive="active" (click)="closeMenu()"
               ngbPopover="Dashboard" i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end"
               container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-              <i-bs class="me-2" name="house"></i-bs><span><ng-container i18n>Dashboard</ng-container></span>
+              <i-bs class="me-2" name="house"></i-bs><span class="nav-link-label"><ng-container i18n>Dashboard</ng-container></span>
             </a>
           </li>
           <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
@@ -97,7 +99,7 @@
               (click)="closeMenu()"
               ngbPopover="Documents" i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end"
               container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-              <i-bs class="me-2" name="files"></i-bs><span><ng-container i18n>Documents</ng-container></span>
+              <i-bs class="me-2" name="files"></i-bs><span class="nav-link-label"><ng-container i18n>Documents</ng-container></span>
             </a>
           </li>
         </ul>
@@ -168,7 +170,7 @@
                   [class.text-truncate]="!slimSidebarEnabled" (click)="closeAll()"
                   ngbPopover="Close all" i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end"
                   container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                  <i-bs class="me-2" name="x"></i-bs><span><ng-container i18n>Close all</ng-container></span>
+                  <i-bs class="me-2" name="x"></i-bs><span class="nav-link-label"><ng-container i18n>Close all</ng-container></span>
                 </button>
               </li>
             }
@@ -187,7 +189,7 @@
                     [routerLinkActiveOptions]="{ exact: !(slimSidebarEnabled || attributesSectionsCollapsed) }" (click)="closeMenu()"
                     ngbPopover="Attributes" i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end"
                     container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                    <i-bs name="stack"></i-bs><span class="ms-2"><ng-container i18n>Attributes</ng-container></span>
+                    <i-bs name="stack"></i-bs><span class="nav-link-label ms-2"><ng-container i18n>Attributes</ng-container></span>
                   </a>
                   @if (!slimSidebarEnabled && canSaveSettings) {
                     <button
@@ -208,27 +210,27 @@
                   <ul class="nav flex-column">
                     <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }">
                       <a class="nav-link" routerLink="attributes/tags" routerLinkActive="active" (click)="closeMenu()">
-                        <i-bs class="me-2" name="tags"></i-bs><span><ng-container i18n>Tags</ng-container></span>
+                        <i-bs class="me-2" name="tags"></i-bs><span class="nav-link-label"><ng-container i18n>Tags</ng-container></span>
                       </a>
                     </li>
                     <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }">
                       <a class="nav-link" routerLink="attributes/correspondents" routerLinkActive="active" (click)="closeMenu()">
-                        <i-bs class="me-2" name="person"></i-bs><span><ng-container i18n>Correspondents</ng-container></span>
+                        <i-bs class="me-2" name="person"></i-bs><span class="nav-link-label"><ng-container i18n>Correspondents</ng-container></span>
                       </a>
                     </li>
                     <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }">
                       <a class="nav-link" routerLink="attributes/documenttypes" routerLinkActive="active" (click)="closeMenu()">
-                        <i-bs class="me-2" name="hash"></i-bs><span><ng-container i18n>Document types</ng-container></span>
+                        <i-bs class="me-2" name="hash"></i-bs><span class="nav-link-label"><ng-container i18n>Document types</ng-container></span>
                       </a>
                     </li>
                     <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }">
                       <a class="nav-link" routerLink="attributes/storagepaths" routerLinkActive="active" (click)="closeMenu()">
-                        <i-bs class="me-2" name="folder"></i-bs><span><ng-container i18n>Storage paths</ng-container></span>
+                        <i-bs class="me-2" name="folder"></i-bs><span class="nav-link-label"><ng-container i18n>Storage paths</ng-container></span>
                       </a>
                     </li>
                     <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }">
                       <a class="nav-link" routerLink="attributes/customfields" routerLinkActive="active" (click)="closeMenu()">
-                        <i-bs class="me-2" name="ui-radios"></i-bs><span><ng-container i18n>Custom fields</ng-container></span>
+                        <i-bs class="me-2" name="ui-radios"></i-bs><span class="nav-link-label"><ng-container i18n>Custom fields</ng-container></span>
                       </a>
                     </li>
                   </ul>
@@ -239,7 +241,7 @@
               <a class="nav-link" routerLink="savedviews" routerLinkActive="active" (click)="closeMenu()"
                 ngbPopover="Saved Views" i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end"
                 container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-2" name="window-stack"></i-bs><span><ng-container i18n>Saved Views</ng-container></span>
+                <i-bs class="me-2" name="window-stack"></i-bs><span class="nav-link-label"><ng-container i18n>Saved Views</ng-container></span>
               </a>
             </li>
             <li class="nav-item app-link"
@@ -248,7 +250,7 @@
               <a class="nav-link" routerLink="workflows" routerLinkActive="active" (click)="closeMenu()"
                 ngbPopover="Workflows" i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end"
                 container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-2" name="boxes"></i-bs><span><ng-container i18n>Workflows</ng-container></span>
+                <i-bs class="me-2" name="boxes"></i-bs><span class="nav-link-label"><ng-container i18n>Workflows</ng-container></span>
               </a>
             </li>
             <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }"
@@ -256,14 +258,14 @@
               <a class="nav-link" routerLink="mail" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Mail"
                 i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end" container="body"
                 triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-2" name="envelope"></i-bs><span><ng-container i18n>Mail</ng-container></span>
+                <i-bs class="me-2" name="envelope"></i-bs><span class="nav-link-label"><ng-container i18n>Mail</ng-container></span>
               </a>
             </li>
             <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
               <a class="nav-link" routerLink="trash" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Trash"
                 i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end" container="body"
                 triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-2" name="trash"></i-bs><span><ng-container i18n>Trash</ng-container></span>
+                <i-bs class="me-2" name="trash"></i-bs><span class="nav-link-label"><ng-container i18n>Trash</ng-container></span>
               </a>
             </li>
           </ul>
@@ -279,21 +281,21 @@
               <a class="nav-link" routerLink="settings" routerLinkActive="active" (click)="closeMenu()"
                 ngbPopover="Settings" i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end"
                 container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-2" name="gear"></i-bs><span><ng-container i18n>Settings</ng-container></span>
+                <i-bs class="me-2" name="gear"></i-bs><span class="nav-link-label"><ng-container i18n>Settings</ng-container></span>
               </a>
             </li>
             <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.AppConfig }">
               <a class="nav-link" routerLink="config" routerLinkActive="active" (click)="closeMenu()"
                 ngbPopover="Configuration" i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end"
                 container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-2" name="sliders2-vertical"></i-bs><span><ng-container i18n>Configuration</ng-container></span>
+                <i-bs class="me-2" name="sliders2-vertical"></i-bs><span class="nav-link-label"><ng-container i18n>Configuration</ng-container></span>
               </a>
             </li>
             <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.User }">
               <a class="nav-link" routerLink="usersgroups" routerLinkActive="active" (click)="closeMenu()"
                 ngbPopover="Users & Groups" i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end"
                 container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-2" name="people"></i-bs><span><ng-container i18n>Users & Groups</ng-container></span>
+                <i-bs class="me-2" name="people"></i-bs><span class="nav-link-label"><ng-container i18n>Users & Groups</ng-container></span>
               </a>
             </li>
             <li class="nav-item app-link"
@@ -302,9 +304,10 @@
               <a class="nav-link" routerLink="tasks" routerLinkActive="active" (click)="closeMenu()"
                 ngbPopover="Tasks" i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end"
                 container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                <i-bs class="me-2" name="list-task"></i-bs><span><ng-container i18n>Tasks</ng-container>@if (tasksService.needsAttentionTasks.length > 0) {
-                  <span><span class="badge bg-danger ms-2 d-inline">{{tasksService.needsAttentionTasks.length}}</span></span>
-                }</span>
+                <i-bs class="me-2" name="list-task"></i-bs><span class="nav-link-label"><ng-container i18n>Tasks</ng-container></span>
+                @if (tasksService.needsAttentionTasks.length > 0 && !slimSidebarEnabled) {
+                  <span class="badge bg-danger ms-2 d-inline flex-shrink-0">{{tasksService.needsAttentionTasks.length}}</span>
+                }
                 @if (tasksService.needsAttentionTasks.length > 0 && slimSidebarEnabled) {
                   <span class="badge bg-danger position-absolute top-0 end-0 d-none d-md-block">{{tasksService.needsAttentionTasks.length}}</span>
                 }
@@ -315,7 +318,7 @@
                 <a class="nav-link" routerLink="logs" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Logs"
                   i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end" container="body"
                   triggers="mouseenter:mouseleave" popoverClass="popover-slim">
-                  <i-bs class="me-2" name="text-left"></i-bs><span><ng-container i18n>Logs</ng-container></span>
+                  <i-bs class="me-2" name="text-left"></i-bs><span class="nav-link-label"><ng-container i18n>Logs</ng-container></span>
                 </a>
               </li>
             }
@@ -386,7 +389,7 @@
     </nav>
 
     <main role="main" class="ms-sm-auto px-md-4" [class.mobile-search-hidden]="mobileSearchHidden()"
-      [ngClass]="slimSidebarEnabled ? 'col-slim' : 'col-md-9 col-lg-10 col-xxxl-11'">
+      [ngClass]="slimSidebarEnabled ? 'col-slim' : 'col-sidebar-expanded'">
       <router-outlet></router-outlet>
     </main>
   </div>
