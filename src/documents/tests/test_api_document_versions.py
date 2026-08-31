@@ -958,6 +958,7 @@ class TestVersionAwareFilters(DjangoTestCase):
         annotated = annotate_effective_content(
             Document.objects.filter(root_document__isnull=True),
         )
+        self.assertIs(annotate_effective_content(annotated), annotated)
 
         result = EffectiveContentFilter(lookup_expr="icontains").filter(
             annotated,

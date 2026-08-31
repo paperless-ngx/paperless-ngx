@@ -50,7 +50,7 @@ from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import permitted_object_ids
-from documents.versioning import ensure_effective_content
+from documents.versioning import annotate_effective_content
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -180,7 +180,7 @@ class TitleContentFilter(Filter):
             logger.warning(
                 "Deprecated document filter parameter 'title_content' used; use `text` instead.",
             )
-            return ensure_effective_content(qs).filter(
+            return annotate_effective_content(qs).filter(
                 Q(title__icontains=value) | Q(effective_content__icontains=value),
             )
         else:
@@ -193,7 +193,7 @@ class EffectiveContentFilter(Filter):
         value = value.strip() if isinstance(value, str) else value
         if not value:
             return qs
-        return ensure_effective_content(qs).filter(
+        return annotate_effective_content(qs).filter(
             **{f"effective_content__{self.lookup_expr}": value},
         )
 
