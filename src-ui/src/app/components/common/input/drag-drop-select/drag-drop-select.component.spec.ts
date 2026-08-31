@@ -98,4 +98,29 @@ describe('DragDropSelectComponent', () => {
       { id: '3', name: 'Item 3' },
     ])
   })
+
+  it('should disable drag and drop when the control is disabled', () => {
+    component.items = [
+      { id: '1', name: 'Item 1' },
+      { id: '2', name: 'Item 2' },
+    ]
+    component.writeValue(['1', '2'])
+    component.setDisabledState(true)
+    fixture.detectChanges()
+
+    expect(component.selectedList.disabled).toBe(true)
+    expect(component.unselectedList.disabled).toBe(true)
+
+    component.drop({
+      previousContainer: component.selectedList,
+      container: component.selectedList,
+      previousIndex: 0,
+      currentIndex: 1,
+    } as any)
+
+    expect(component.selectedItems).toEqual([
+      { id: '1', name: 'Item 1' },
+      { id: '2', name: 'Item 2' },
+    ])
+  })
 })
