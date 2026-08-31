@@ -753,6 +753,13 @@ class _BatchingTagsRelatedField(serializers.ManyRelatedField):
     falling back to the child relation's normal (query-per-item) validation
     for anything that isn't a plausible int pk, so bad input still gets the
     usual DRF validation error rather than being silently dropped.
+
+    This is a known upstream DRF limitation, not something paperless-specific:
+    https://github.com/encode/django-rest-framework/issues/9607, with a fix
+    (https://github.com/encode/django-rest-framework/pull/9984) open but
+    stalled as of 2026-08. If that lands, this class and the many_init()
+    override on TagsField below can be deleted in favor of plain
+    `PrimaryKeyRelatedField(many=True)`.
     """
 
     @staticmethod
