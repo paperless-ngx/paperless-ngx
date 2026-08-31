@@ -609,7 +609,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             ),
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
