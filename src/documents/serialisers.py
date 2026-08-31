@@ -744,15 +744,15 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         return super().validate(attrs)
 
 
-class _BatchingManyRelatedField(serializers.ManyRelatedField):
+class _BatchingTagsRelatedField(serializers.ManyRelatedField):
     """
     `ManyRelatedField.to_internal_value` resolves each id in the submitted
     list with its own `child_relation.to_internal_value()` call -- one query
-    per item on every PATCH/PUT that sets a `many=True` relation field.
-    Batch-resolve them instead, falling back to the child relation's normal
-    (query-per-item) validation for anything that isn't a plausible int pk,
-    so bad input still gets the usual DRF validation error rather than being
-    silently dropped.
+    per tag on every PATCH/PUT that sets `TagsField` (DocumentSerializer.tags,
+    WorkflowActionSerializer.assign_tags). Batch-resolve them instead,
+    falling back to the child relation's normal (query-per-item) validation
+    for anything that isn't a plausible int pk, so bad input still gets the
+    usual DRF validation error rather than being silently dropped.
     """
 
     @staticmethod
@@ -802,42 +802,30 @@ class _BatchingManyRelatedField(serializers.ManyRelatedField):
         return result
 
 
-class BatchResolvingPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
-    """
-    A PrimaryKeyRelatedField whose `many=True` form (a DRF ManyRelatedField)
-    resolves all submitted ids with one batched query instead of one query
-    per id. Subclasses only need to implement `get_queryset()` as usual --
-    only `TagsField` is used with `many=True` today, but this is the base
-    for all four so the fix isn't tag-specific: if a future PR puts
-    `many=True` on correspondent/document_type/storage_path, it inherits the
-    same batching instead of reintroducing this as a new bug to rediscover.
-    """
+class CorrespondentField(serializers.PrimaryKeyRelatedField[Correspondent]):
+    def get_queryset(self):
+        return Correspondent.objects.all()
 
+
+class TagsField(serializers.PrimaryKeyRelatedField[Tag]):
     @classmethod
     def many_init(cls, *args, **kwargs):
         list_kwargs = {"child_relation": cls(*args, **kwargs)}
         for key, value in kwargs.items():
             if key in relations.MANY_RELATION_KWARGS:
                 list_kwargs[key] = value
-        return _BatchingManyRelatedField(**list_kwargs)
+        return _BatchingTagsRelatedField(**list_kwargs)
 
-
-class CorrespondentField(BatchResolvingPrimaryKeyRelatedField[Correspondent]):
-    def get_queryset(self):
-        return Correspondent.objects.all()
-
-
-class TagsField(BatchResolvingPrimaryKeyRelatedField[Tag]):
     def get_queryset(self):
         return Tag.objects.all()
 
 
-class DocumentTypeField(BatchResolvingPrimaryKeyRelatedField[DocumentType]):
+class DocumentTypeField(serializers.PrimaryKeyRelatedField[DocumentType]):
     def get_queryset(self):
         return DocumentType.objects.all()
 
 
-class StoragePathField(BatchResolvingPrimaryKeyRelatedField[StoragePath]):
+class StoragePathField(serializers.PrimaryKeyRelatedField[StoragePath]):
     def get_queryset(self):
         return StoragePath.objects.all()
 
