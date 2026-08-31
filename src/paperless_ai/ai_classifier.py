@@ -18,12 +18,10 @@ from paperless_ai.prompts.context import ClassificationPromptContext
 from paperless_ai.prompts.context import LocalizationPromptContext
 from paperless_ai.prompts.context import RagContextPromptContext
 from paperless_ai.prompts.render import render_prompt
-from paperless_ai.taxonomy import AssignedMetadata
 from paperless_ai.taxonomy import TaxonomyCandidates
 from paperless_ai.taxonomy import build_taxonomy_candidates
 from paperless_ai.taxonomy import empty_taxonomy_candidates
 from paperless_ai.taxonomy import format_taxonomy_for_prompt
-from paperless_ai.taxonomy import get_assigned_metadata
 
 logger = logging.getLogger("paperless_ai.rag_classifier")
 
@@ -67,7 +65,6 @@ def build_prompt_without_rag(
     document: Document,
     config: AIConfig,
     candidates: TaxonomyCandidates | None = None,
-    assigned: AssignedMetadata | None = None,
 ) -> str:
     filename = document.filename or ""
     content = truncate_content(
@@ -77,9 +74,7 @@ def build_prompt_without_rag(
     )
 
     taxonomy_block = (
-        format_taxonomy_for_prompt(candidates, assigned)
-        if candidates is not None and assigned is not None
-        else ""
+        format_taxonomy_for_prompt(candidates) if candidates is not None else ""
     )
     has_candidates = candidates is not None and any(candidates.values())
 
@@ -97,14 +92,12 @@ def build_prompt_with_rag(
     document: Document,
     config: AIConfig,
     candidates: TaxonomyCandidates | None = None,
-    assigned: AssignedMetadata | None = None,
     context: str = "",
 ) -> str:
     base_prompt = build_prompt_without_rag(
         document,
         config,
         candidates=candidates,
-        assigned=assigned,
     )
     truncated_context = truncate_content(
         context,
@@ -142,13 +135,12 @@ def get_taxonomy_context(
     document: Document,
     user: User | None = None,
     max_docs: int = 5,
-) -> tuple[TaxonomyCandidates, AssignedMetadata, str]:
+) -> tuple[TaxonomyCandidates, str]:
     """One retrieval feeds both taxonomy candidates and RAG text context.
     On any retrieval failure, degrades to empty candidates/context rather than
     propagating the exception - a vector-store outage should not block
     classification, only its RAG-assisted enrichment.
     """
-    assigned = get_assigned_metadata(document, user)
     try:
         # None means "no restriction" to retrieve_similar_nodes. A superuser
         # (like no user at all) can see every document, so skip materializing
@@ -198,9 +190,9 @@ def get_taxonomy_context(
             "without taxonomy candidates or similar-document context.",
             document.pk,
         )
-        return empty_taxonomy_candidates(), assigned, ""
+        return empty_taxonomy_candidates(), ""
 
-    return candidates, assigned, "\n\n".join(context_blocks)
+    return candidates, "\n\n".join(context_blocks)
 
 
 def parse_ai_response(raw: dict) -> ClassificationSuggestions:
@@ -226,47 +218,20 @@ def parse_ai_response(raw: dict) -> ClassificationSuggestions:
     )
 
 
-def _restrict_to_shown_candidates(
-    suggestions: ClassificationSuggestions,
+def _candidate_id_allowlist(
     candidates: TaxonomyCandidates,
-) -> ClassificationSuggestions:
-    """Drop any existing_id the model returned that was never actually
-    offered as a candidate in the prompt. The response schema permits any
-    integer, so a hallucinated id could otherwise silently resolve to a
-    real, visible, but completely unrelated object - this keeps
-    "reused an existing value" a fact about what the model was actually
-    shown, not just about what integer it happened to emit. When no
-    candidates were shown in a category at all (or the field was omitted
-    from the response), every existing_id in that category is dropped;
-    new_names is never touched here.
-    """
-
-    def _restrict(choice: TaxonomyChoiceDict, shown: set[int]) -> TaxonomyChoiceDict:
-        return TaxonomyChoiceDict(
-            existing_ids=[i for i in choice["existing_ids"] if i in shown],
-            new_names=choice["new_names"],
-        )
-
-    return ClassificationSuggestions(
-        title=suggestions["title"],
-        tags=_restrict(
-            suggestions["tags"],
-            {c["id"] for c in candidates["tags"]},
-        ),
-        correspondents=_restrict(
-            suggestions["correspondents"],
-            {c["id"] for c in candidates["correspondents"]},
-        ),
-        document_types=_restrict(
-            suggestions["document_types"],
-            {c["id"] for c in candidates["document_types"]},
-        ),
-        storage_paths=_restrict(
-            suggestions["storage_paths"],
-            {c["id"] for c in candidates["storage_paths"]},
-        ),
-        dates=suggestions["dates"],
-    )
+) -> dict[str, set[int]]:
+    """Candidate IDs grouped by category for validating model mappings."""
+    return {
+        "tags": {candidate["id"] for candidate in candidates["tags"]},
+        "document_types": {
+            candidate["id"] for candidate in candidates["document_types"]
+        },
+        "correspondents": {
+            candidate["id"] for candidate in candidates["correspondents"]
+        },
+        "storage_paths": {candidate["id"] for candidate in candidates["storage_paths"]},
+    }
 
 
 def get_ai_document_classification(
@@ -277,32 +242,26 @@ def get_ai_document_classification(
     ai_config = AIConfig()
 
     if ai_config.llm_embedding_backend:
-        candidates, assigned, context = get_taxonomy_context(document, user)
+        candidates, context = get_taxonomy_context(document, user)
         prompt = build_prompt_with_rag(
             document,
             ai_config,
             candidates=candidates,
-            assigned=assigned,
             context=context,
         )
     else:
         candidates = empty_taxonomy_candidates()
-        prompt = build_prompt_without_rag(
-            document,
-            ai_config,
-            candidates=candidates,
-            assigned=get_assigned_metadata(document, user),
-        )
+        prompt = build_prompt_without_rag(document, ai_config, candidates=candidates)
 
     client = AIClient()
     # Hand the pooled DB connection back while the (slow) LLM query runs so it
     # is not pinned for the call's duration; see paperless_ai.db and #12976.
     with db_connection_released():
-        result = client.run_llm_query(prompt)
-        suggestions = _restrict_to_shown_candidates(
-            parse_ai_response(result),
-            candidates,
+        result = client.run_llm_query(
+            prompt,
+            allowed_candidate_ids=_candidate_id_allowlist(candidates),
         )
+        suggestions = parse_ai_response(result)
         if output_language:
             localized = client.run_llm_query(
                 build_localization_prompt(suggestions, output_language),

@@ -45,14 +45,16 @@ CLASSIFIER_HASH_KEY: Final[str] = "classifier_hash"
 CLASSIFIER_MODIFIED_KEY: Final[str] = "classifier_modified"
 # Marker distinguishing LLM suggestions from classifier-generated ones (whose
 # FORMAT_VERSION lives in a much lower range - see DocumentClassifier). Bump
-# this whenever the *shape* of the cached `suggestions` dict changes, so a
-# cache entry written by a previous release can never be read back by code
-# that expects a different shape:
+# this whenever cached suggestions must not be reused, including changes to
+# their shape or interpretation, so a previous release's result cannot leak
+# incompatible or obsolete behavior into the new one:
 #   1000 - initial LLM suggestions cache (flat lists of resolved object ids
 #          per taxonomy field)
 #   1001 - suggestions reshaped to {"existing_ids": [...], "new_names":
 #          [...]} per taxonomy field (#13676)
-LLM_CACHE_CLASSIFIER_VERSION: Final[int] = 1001
+#   1002 - names are always generated and optional candidate mappings are
+#          validated separately, so candidate-anchored 1001 results are stale
+LLM_CACHE_CLASSIFIER_VERSION: Final[int] = 1002
 
 CACHE_1_MINUTE: Final[int] = 60
 CACHE_5_MINUTES: Final[int] = 5 * CACHE_1_MINUTE

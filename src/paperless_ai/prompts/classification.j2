@@ -13,10 +13,7 @@ Analyze the following document and fill in these fields:
 - dates: up to 3 relevant dates in YYYY-MM-DD format
 {% if has_candidates %}
 
-For tags, correspondents, document types, and storage paths: first decide whether there is a useful, well-supported suggestion. If an available candidate clearly represents that suggestion, put its id in the matching tag_ids, correspondent_ids, document_type_ids, or storage_path_ids field instead of repeating its name. If no candidate represents the suggestion, put its name in tags, correspondents, document_types, or storage_paths. Do not choose a weak candidate merely because it exists.
-{% else %}
-
-No candidates are shown for this document, so leave every field ending in "_ids" empty and put suggestions in the corresponding name fields.
+First produce the complete name suggestions from the document itself in tags, correspondents, document_types, and storage_paths. Always include every suggested name in those fields, even when an available candidate represents the same value. Then, as a separate reconciliation step, copy each name that means the same thing as an available candidate into the matching matched_* field and put that candidate's ID at the same position in the corresponding *_ids field. Candidates must not create, replace, or suppress suggestions. Do not match a candidate that is merely related.
 {% endif %}
 
 Filename:

@@ -12,7 +12,6 @@ class PromptName(enum.Enum):
     CLASSIFICATION_RAG_CONTEXT = "classification_rag_context"
     LOCALIZATION = "localization"
     TAXONOMY_BLOCK = "taxonomy_block"
-    ASSIGNED_BLOCK = "assigned_block"
     CHAT_QA = "chat_qa"
     CHAT_REFINE = "chat_refine"
 

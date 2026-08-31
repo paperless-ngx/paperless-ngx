@@ -117,7 +117,12 @@ class AIClient:
         else:
             raise ValueError(f"Unsupported LLM backend: {self.settings.llm_backend}")
 
-    def run_llm_query(self, prompt: str) -> ClassificationSuggestions:
+    def run_llm_query(
+        self,
+        prompt: str,
+        *,
+        allowed_candidate_ids: dict[str, set[int]] | None = None,
+    ) -> ClassificationSuggestions:
         logger.debug(
             "Running LLM query against %s with model %s",
             self.settings.llm_backend,
@@ -136,7 +141,10 @@ class AIClient:
                 )
             logger.debug("LLM query result: %s", result)
             parsed = DocumentClassifierSchema(**json.loads(result.message.content))
-            return model_to_classification_suggestions(parsed)
+            return model_to_classification_suggestions(
+                parsed,
+                allowed_candidate_ids,
+            )
 
         from llama_index.core.program.function_program import get_function_tool
 
@@ -155,7 +163,10 @@ class AIClient:
             )
         logger.debug("LLM query result: %s", tool_calls)
         parsed = DocumentClassifierSchema(**tool_calls[0].tool_kwargs)
-        return model_to_classification_suggestions(parsed)
+        return model_to_classification_suggestions(
+            parsed,
+            allowed_candidate_ids,
+        )
 
     @contextmanager
     def _normalize_timeouts(self) -> Iterator[None]:
