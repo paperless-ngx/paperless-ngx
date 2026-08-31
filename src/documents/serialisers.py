@@ -895,18 +895,13 @@ _CUSTOM_FIELD_CONTEXT_CACHE_KEY = "_custom_field_lookup_cache"
 
 class _CachingCustomFieldPrimaryKeyField(serializers.PrimaryKeyRelatedField):
     """
-    Resolves CustomField ids with as few queries as possible: a per-instance
-    cache for repeat lookups on this exact field instance, backed by a
-    shared cache on the serializer context (see _CUSTOM_FIELD_CONTEXT_CACHE_KEY
-    above) so later, separately-instantiated fields for the same request
-    reuse what was already resolved instead of re-querying.
+    Resolves CustomField ids via a cache on the serializer context, so
+    later, separately-instantiated fields for the same request (drf-writable-
+    nested rebuilds one per item during save) reuse what was already
+    resolved instead of re-querying.
     """
 
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
-        self._cache: dict[int, CustomField] = {}
-
-    def _shared_cache(self) -> dict[int, CustomField]:
+    def _cache(self) -> dict[int, CustomField]:
         return self.context.setdefault(_CUSTOM_FIELD_CONTEXT_CACHE_KEY, {})
 
     @staticmethod
@@ -928,33 +923,22 @@ class _CachingCustomFieldPrimaryKeyField(serializers.PrimaryKeyRelatedField):
             return None
 
     def prefetch(self, ids: Iterable[Any]) -> None:
-        shared_cache = self._shared_cache()
+        cache = self._cache()
         candidates = {pk for i in ids if (pk := self._normalize_pk(i)) is not None}
-        missing = {
-            i for i in candidates if i not in self._cache and i not in shared_cache
-        }
+        missing = {i for i in candidates if i not in cache}
         if missing:
             for obj in self.get_queryset().filter(pk__in=missing):
-                shared_cache[obj.pk] = obj
-        for i in candidates:
-            obj = shared_cache.get(i)
-            if obj is not None:
-                self._cache[i] = obj
+                cache[obj.pk] = obj
 
     def to_internal_value(self, data: Any) -> CustomField:
         pk = self._normalize_pk(data)
         if pk is None:
             return super().to_internal_value(data)
-        if pk in self._cache:
-            return self._cache[pk]
-        shared_cache = self._shared_cache()
-        if pk in shared_cache:
-            obj = shared_cache[pk]
-            self._cache[pk] = obj
-            return obj
+        cache = self._cache()
+        if pk in cache:
+            return cache[pk]
         obj: CustomField = super().to_internal_value(data)
-        self._cache[obj.pk] = obj
-        shared_cache[obj.pk] = obj
+        cache[obj.pk] = obj
         return obj
 
 
