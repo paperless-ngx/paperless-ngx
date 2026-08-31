@@ -230,6 +230,10 @@ jobs:
           key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
       - name: Install dependencies
         run: cd src-ui && pnpm install --frozen-lockfile
+      - name: Install backend system dependencies
+        run: |
+          apt-get update
+          apt-get install --yes --quiet --no-install-recommends libmagic1
       - name: Install backend dependencies
         env:
           PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}
