@@ -11,6 +11,7 @@ from pydantic.fields import FieldInfo
 # taxonomy.py MAX_TAG_CANDIDATES = 10, prompt is "up to 3 relevant dates"
 MAX_EXISTING_IDS: Final = 10
 MAX_NEW_NAMES: Final = 8
+MAX_SINGLE_VALUE_NAMES: Final = 4
 MAX_DATES: Final = 3
 # Matches documents.models.Document.title's CharField(max_length=128).
 MAX_TITLE_LENGTH: Final = 128
@@ -71,17 +72,19 @@ class DocumentClassifierSchema(BaseModel):
     )
     correspondents: list[str] = Field(
         default_factory=list,
-        max_length=MAX_NEW_NAMES,
+        max_length=MAX_SINGLE_VALUE_NAMES,
         description=(
-            "All people, institutions or companies you would suggest as who "
-            "this document is from or was sent to, not every party merely "
-            "mentioned. Always include every suggested name here, even when it "
-            "matches an available correspondent."
+            "Who this document is from or was sent to, not every party merely "
+            "mentioned. A document has a single correspondent, so give at most "
+            f"{MAX_SINGLE_VALUE_NAMES}, best first, and prefer one name over "
+            "several names for the same organisation. Always include every "
+            "suggested name here, even when it matches an available "
+            "correspondent."
         ),
     )
     matched_correspondents: list[str] = Field(
         default_factory=list,
-        max_length=MAX_NEW_NAMES,
+        max_length=MAX_SINGLE_VALUE_NAMES,
         description=(
             "Names copied exactly from correspondents that identify the same "
             "entity as an available correspondent. Align each name by position "
@@ -90,7 +93,7 @@ class DocumentClassifierSchema(BaseModel):
     )
     correspondent_ids: list[int] = Field(
         default_factory=list,
-        max_length=MAX_EXISTING_IDS,
+        max_length=MAX_SINGLE_VALUE_NAMES,
         description=(
             "Available correspondent IDs matching matched_correspondents, in "
             "the same order. Only use IDs shown in the prompt."
@@ -98,17 +101,19 @@ class DocumentClassifierSchema(BaseModel):
     )
     document_types: list[str] = Field(
         default_factory=list,
-        max_length=MAX_NEW_NAMES,
+        max_length=MAX_SINGLE_VALUE_NAMES,
         description=(
-            "All names describing what kind of document this is, e.g. 'Invoice', "
-            "'Contract', 'Bank Statement', 'Letter'. Never use its subject or "
-            "sender as a document type. Always include every suggested name "
-            "here, even when it matches an available document type."
+            "What kind of document this is, e.g. 'Invoice', 'Contract', 'Bank "
+            "Statement', 'Letter'. Never use its subject or sender as a "
+            "document type. A document has a single type, so give at most "
+            f"{MAX_SINGLE_VALUE_NAMES}, best first. Always include every "
+            "suggested name here, even when it matches an available document "
+            "type."
         ),
     )
     matched_document_types: list[str] = Field(
         default_factory=list,
-        max_length=MAX_NEW_NAMES,
+        max_length=MAX_SINGLE_VALUE_NAMES,
         description=(
             "Names copied exactly from document_types that mean the same thing "
             "as an available document type. Align each name by position with "
@@ -117,7 +122,7 @@ class DocumentClassifierSchema(BaseModel):
     )
     document_type_ids: list[int] = Field(
         default_factory=list,
-        max_length=MAX_EXISTING_IDS,
+        max_length=MAX_SINGLE_VALUE_NAMES,
         description=(
             "Available document type IDs matching matched_document_types, in "
             "the same order. Only use IDs shown in the prompt."
@@ -125,18 +130,19 @@ class DocumentClassifierSchema(BaseModel):
     )
     storage_paths: list[str] = Field(
         default_factory=list,
-        max_length=MAX_NEW_NAMES,
+        max_length=MAX_SINGLE_VALUE_NAMES,
         description=(
-            "All folder-style filing locations you would suggest, e.g. "
-            "'Finance/Invoices'. Leave empty unless a filing location is "
-            "clearly implied - never put tags, document types or "
-            "correspondents here. Always include every suggested name here, "
-            "even when it matches an available storage path."
+            "Folder-style filing location, e.g. 'Finance/Invoices'. Leave "
+            "empty unless a filing location is clearly implied - never put "
+            "tags, document types or correspondents here. A document has a "
+            f"single storage path, so give at most {MAX_SINGLE_VALUE_NAMES}, "
+            "best first. Always include every suggested name here, even when "
+            "it matches an available storage path."
         ),
     )
     matched_storage_paths: list[str] = Field(
         default_factory=list,
-        max_length=MAX_NEW_NAMES,
+        max_length=MAX_SINGLE_VALUE_NAMES,
         description=(
             "Names copied exactly from storage_paths that mean the same filing "
             "location as an available storage path. Align each name by position "
@@ -145,7 +151,7 @@ class DocumentClassifierSchema(BaseModel):
     )
     storage_path_ids: list[int] = Field(
         default_factory=list,
-        max_length=MAX_EXISTING_IDS,
+        max_length=MAX_SINGLE_VALUE_NAMES,
         description=(
             "Available storage path IDs matching matched_storage_paths, in the "
             "same order. Only use IDs shown in the prompt."

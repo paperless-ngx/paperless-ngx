@@ -2,6 +2,7 @@ import json
 
 from paperless_ai.base_model import MAX_DATES
 from paperless_ai.base_model import MAX_NEW_NAMES
+from paperless_ai.base_model import MAX_SINGLE_VALUE_NAMES
 from paperless_ai.base_model import MAX_TITLE_LENGTH
 from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.base_model import DocumentClassifierSchema
@@ -195,6 +196,63 @@ def test_every_sequence_in_the_emitted_schema_is_bounded():
     ]
 
     assert unbounded == []
+
+
+def test_single_valued_categories_are_capped_below_tags():
+    r"""
+    GIVEN:
+        - The DocumentClassifierSchema pydantic model
+    WHEN:
+        - The emitted maxItems for each category is inspected
+    THEN:
+        - Correspondents, document types and storage paths are capped at
+          MAX_SINGLE_VALUE_NAMES, and their matched_*/\*_ids lists with them
+        - Tags keep the larger MAX_NEW_NAMES bound
+
+    A document has exactly one correspondent, document type and storage path.
+    Offering eight slots for each is how 3.0.5 came to suggest four separate
+    correspondents for a single document; tags are genuinely multi-valued and
+    keep their headroom.
+    """
+    properties = DocumentClassifierSchema.model_json_schema()["properties"]
+
+    for field in (
+        "correspondents",
+        "matched_correspondents",
+        "correspondent_ids",
+        "document_types",
+        "matched_document_types",
+        "document_type_ids",
+        "storage_paths",
+        "matched_storage_paths",
+        "storage_path_ids",
+    ):
+        assert properties[field]["maxItems"] == MAX_SINGLE_VALUE_NAMES, field
+
+    assert properties["tags"]["maxItems"] == MAX_NEW_NAMES
+    assert MAX_SINGLE_VALUE_NAMES < MAX_NEW_NAMES
+
+
+def test_over_long_single_valued_response_is_truncated():
+    """
+    GIVEN:
+        - A response naming four correspondents for one document, as 3.0.5
+          routinely produced
+    WHEN:
+        - The model is constructed and converted
+    THEN:
+        - Only the first MAX_SINGLE_VALUE_NAMES survive, with no error
+
+    The cap is a ceiling, not a quality filter - it keeps whichever names the
+    model emitted first, which is why the field description also asks for the
+    best ones first. Derived from the constant rather than hardcoded: the
+    exact bound is a tuning decision, the truncation is the contract.
+    """
+    names = [f"Correspondent {i}" for i in range(MAX_SINGLE_VALUE_NAMES + 2)]
+
+    parsed = DocumentClassifierSchema(title="T", correspondents=names)
+
+    assert parsed.correspondents == names[:MAX_SINGLE_VALUE_NAMES]
 
 
 def test_dates_bound_matches_what_the_prompt_asks_for():
