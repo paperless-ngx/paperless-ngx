@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-26 16:49+0000\n"
-"PO-Revision-Date: 2026-08-26 17:04\n"
+"POT-Creation-Date: 2026-08-29 20:02+0000\n"
+"PO-Revision-Date: 2026-08-31 05:12\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -878,7 +878,7 @@ msgstr "Množično brisanje"
 
 #: documents/models.py:769
 msgid "Apply AI Suggestions"
-msgstr ""
+msgstr "Uporabi predloge umetne inteligence"
 
 #: documents/models.py:778 documents/models.py:1349
 msgid "Scheduled"
@@ -1379,23 +1379,23 @@ msgstr "Premakni v koš"
 
 #: documents/models.py:1676
 msgid "Remote OCR"
-msgstr ""
+msgstr "Oddaljen OCR"
 
 #: documents/models.py:1680
 msgid "Apply AI suggestions"
-msgstr ""
+msgstr "Uporabite predloge umetne inteligence"
 
 #: documents/models.py:1687
 msgid "Document type"
-msgstr ""
+msgstr "Vrsta dokumenta"
 
 #: documents/models.py:1688
 msgid "Storage path"
-msgstr ""
+msgstr "Pot shranjevanja"
 
 #: documents/models.py:1689
 msgid "Created date"
-msgstr ""
+msgstr "Datum nastanka"
 
 #: documents/models.py:1692
 msgid "Workflow Action Type"
@@ -1548,27 +1548,27 @@ msgstr "Gesla, ki jih je treba poskusiti uporabiti pri odstranjevanju zaščite 
 
 #: documents/models.py:1929
 msgid "AI suggestion fields"
-msgstr ""
+msgstr "Polja za predloge umetne inteligence"
 
 #: documents/models.py:1933
 msgid "Which of the AI-suggested fields to apply to the document."
-msgstr ""
+msgstr "Katero od polj, ki jih predlaga umetna inteligenca, uporabiti za dokument."
 
 #: documents/models.py:1938
 msgid "create missing objects"
-msgstr ""
+msgstr "ustvari manjkajoče predmete"
 
 #: documents/models.py:1941
 msgid "Create suggested tags, correspondents, document types and storage paths that do not already exist instead of skipping them."
-msgstr ""
+msgstr "Ustvarite predlagane oznake, korespondence, vrste dokumentov in poti shranjevanja, ki še ne obstajajo, namesto da jih preskočite."
 
 #: documents/models.py:1947
 msgid "overwrite existing values"
-msgstr ""
+msgstr "prepiši obstoječe vrednosti"
 
 #: documents/models.py:1950
 msgid "Apply suggestions even if the document already has a value for that field. Tags are always added to, never replaced."
-msgstr ""
+msgstr "Uporabite predloge, tudi če dokument že ima vrednost za to polje. Oznake se vedno dodajo, nikoli ne nadomestijo."
 
 #: documents/models.py:1956
 msgid "workflow action"
@@ -1611,8 +1611,8 @@ msgid "workflow runs"
 msgstr "poteka dela"
 
 #: documents/serialisers.py:523 documents/serialisers.py:875
-#: documents/serialisers.py:2827 documents/views.py:312 documents/views.py:2606
-#: paperless_mail/serialisers.py:155
+#: documents/serialisers.py:2827 documents/views.py:313 documents/views.py:2611
+#: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "Nezadostna dovoljenja."
 
@@ -1651,7 +1651,7 @@ msgstr "Zaznani neveljavni znaki."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Podvojeni identifikatorji dokumentov niso dovoljeni."
 
-#: documents/serialisers.py:2913 documents/views.py:4603
+#: documents/serialisers.py:2913 documents/views.py:4608
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Dokumentov ni bilo mogoče najti: %(ids)s"
@@ -1907,36 +1907,36 @@ msgstr "Shema URI '{parts.scheme}' ni dovoljena. Dovoljene sheme: {', '.join(all
 msgid "Unable to parse URI {value}"
 msgstr "Ni mogoče razčleniti URI-ja {value}"
 
-#: documents/views.py:305 documents/views.py:2603
+#: documents/views.py:306 documents/views.py:2608
 msgid "Invalid more_like_id"
 msgstr "Neveljaven more_like_id"
 
-#: documents/views.py:1577
+#: documents/views.py:1582
 msgid "Invalid AI configuration."
 msgstr "Neveljavna konfiguracija umetne inteligence."
 
-#: documents/views.py:1588
+#: documents/views.py:1593
 msgid "AI backend request timed out."
 msgstr "Časovna omejitev zahteve za umetno inteligenco je potekla."
 
-#: documents/views.py:2428 documents/views.py:2749
+#: documents/views.py:2433 documents/views.py:2754
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Navedite samo eno od naslednjih vrednosti: text, title_search, query ali more_like_id."
 
-#: documents/views.py:4616
+#: documents/views.py:4621
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Nezadostna dovoljenja za skupno rabo dokumenta %(id)s."
 
-#: documents/views.py:4662
+#: documents/views.py:4667
 msgid "Bundle is already being processed."
 msgstr "Paket se že obdeluje."
 
-#: documents/views.py:4723
+#: documents/views.py:4728
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Paket povezav za deljenje je še vedno v pripravi. Poskusite znova pozneje."
 
-#: documents/views.py:4733
+#: documents/views.py:4738
 msgid "The share link bundle is unavailable."
 msgstr "Paket povezav za deljenje ni na voljo."
 
@@ -2022,15 +2022,15 @@ msgstr "CMYK"
 
 #: paperless/models.py:82
 msgid "Azure AI Document Intelligence"
-msgstr ""
+msgstr "Inteligenca dokumentov Azure AI"
 
 #: paperless/models.py:90
 msgid "All supported documents"
-msgstr ""
+msgstr "Vsi podprti dokumenti"
 
 #: paperless/models.py:91
 msgid "Only when a workflow enables it"
-msgstr ""
+msgstr "Samo ko to omogoča delovni tok"
 
 #: paperless/models.py:95 paperless/models.py:105
 msgid "OpenAI-compatible"
@@ -2154,19 +2154,19 @@ msgstr "Omogoča razdelitev na črtne kode oznak"
 
 #: paperless/models.py:312
 msgid "Sets the remote OCR engine"
-msgstr ""
+msgstr "Nastavi oddaljeni OCR mehanizem"
 
 #: paperless/models.py:321
 msgid "Sets the remote OCR API key"
-msgstr ""
+msgstr "Nastavi oddaljeni ključ API-ja za OCR"
 
 #: paperless/models.py:329
 msgid "Sets the remote OCR endpoint"
-msgstr ""
+msgstr "Nastavi oddaljeno končno točko OCR"
 
 #: paperless/models.py:337
 msgid "Sets which documents are sent to the remote OCR engine"
-msgstr ""
+msgstr "Določi, kateri dokumenti se pošljejo oddaljenemu mehanizmu OCR"
 
 #: paperless/models.py:349
 msgid "Enables AI features"

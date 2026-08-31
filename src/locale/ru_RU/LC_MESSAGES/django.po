@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-26 16:49+0000\n"
-"PO-Revision-Date: 2026-08-26 17:04\n"
+"POT-Creation-Date: 2026-08-29 20:02+0000\n"
+"PO-Revision-Date: 2026-08-31 05:12\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -878,7 +878,7 @@ msgstr "Массовое удаление"
 
 #: documents/models.py:769
 msgid "Apply AI Suggestions"
-msgstr ""
+msgstr "Применить советы ИИ"
 
 #: documents/models.py:778 documents/models.py:1349
 msgid "Scheduled"
@@ -1283,11 +1283,11 @@ msgstr "пусковые механизмы автоматизации"
 
 #: documents/models.py:1563
 msgid "email subject"
-msgstr "Тема письма"
+msgstr "тема письма"
 
 #: documents/models.py:1567
 msgid "The subject of the email, can include some placeholders, see documentation."
-msgstr "Тело (сообщение) письма, может включать некоторые плейсхолдеры, см. документацию."
+msgstr "Тема письма может включать некоторые плейсхолдеры, см. документацию."
 
 #: documents/models.py:1573
 msgid "email body"
@@ -1295,7 +1295,7 @@ msgstr "текст письма"
 
 #: documents/models.py:1576
 msgid "The body (message) of the email, can include some placeholders, see documentation."
-msgstr "Тело (сообщение) письма, может включать некоторые плейсхолдеры, см. документацию."
+msgstr "Текст письма может включать некоторые плейсхолдеры, см. документацию."
 
 #: documents/models.py:1582
 msgid "emails to"
@@ -1383,19 +1383,19 @@ msgstr "Удаленное распознавание (OCR)"
 
 #: documents/models.py:1680
 msgid "Apply AI suggestions"
-msgstr ""
+msgstr "Применить советы ИИ"
 
 #: documents/models.py:1687
 msgid "Document type"
-msgstr ""
+msgstr "Тип документа"
 
 #: documents/models.py:1688
 msgid "Storage path"
-msgstr ""
+msgstr "Путь к хранилищу"
 
 #: documents/models.py:1689
 msgid "Created date"
-msgstr ""
+msgstr "Дата создания"
 
 #: documents/models.py:1692
 msgid "Workflow Action Type"
@@ -1548,27 +1548,27 @@ msgstr "Пароли для удаления защиты PDF. Разделит�
 
 #: documents/models.py:1929
 msgid "AI suggestion fields"
-msgstr ""
+msgstr "Предложенные ИИ поля"
 
 #: documents/models.py:1933
 msgid "Which of the AI-suggested fields to apply to the document."
-msgstr ""
+msgstr "Какие из предлагаемых ИИ полей применить к документу."
 
 #: documents/models.py:1938
 msgid "create missing objects"
-msgstr ""
+msgstr "создать недостающие объекты"
 
 #: documents/models.py:1941
 msgid "Create suggested tags, correspondents, document types and storage paths that do not already exist instead of skipping them."
-msgstr ""
+msgstr "Создать предложенные теги, корреспондентов, типы документов и пути хранения, которые еще не существуют, вместо того чтобы пропускать их."
 
 #: documents/models.py:1947
 msgid "overwrite existing values"
-msgstr ""
+msgstr "перезаписать текущие значения"
 
 #: documents/models.py:1950
 msgid "Apply suggestions even if the document already has a value for that field. Tags are always added to, never replaced."
-msgstr ""
+msgstr "Применяйте предложения, даже если документ уже имеет значение для поля. Теги всегда добавляются, не заменяются."
 
 #: documents/models.py:1956
 msgid "workflow action"
@@ -1611,8 +1611,8 @@ msgid "workflow runs"
 msgstr "запуски рабочего процесса"
 
 #: documents/serialisers.py:523 documents/serialisers.py:875
-#: documents/serialisers.py:2827 documents/views.py:312 documents/views.py:2606
-#: paperless_mail/serialisers.py:155
+#: documents/serialisers.py:2827 documents/views.py:313 documents/views.py:2611
+#: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "Недостаточно прав."
 
@@ -1651,7 +1651,7 @@ msgstr "Обнаружена неверная переменная."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Повторяющиеся идентификаторы документа не допускаются."
 
-#: documents/serialisers.py:2913 documents/views.py:4603
+#: documents/serialisers.py:2913 documents/views.py:4608
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Документы не найдены: %(ids)s"
@@ -1907,36 +1907,36 @@ msgstr "Недопустимая схема URI '{parts.scheme}'. Разреше
 msgid "Unable to parse URI {value}"
 msgstr "Невозможно распознать URI {value}"
 
-#: documents/views.py:305 documents/views.py:2603
+#: documents/views.py:306 documents/views.py:2608
 msgid "Invalid more_like_id"
 msgstr "Недопустимый more_like_id"
 
-#: documents/views.py:1577
+#: documents/views.py:1582
 msgid "Invalid AI configuration."
 msgstr "Неверная конфигурация ИИ."
 
-#: documents/views.py:1588
+#: documents/views.py:1593
 msgid "AI backend request timed out."
 msgstr "Таймаут запроса ИИ."
 
-#: documents/views.py:2428 documents/views.py:2749
+#: documents/views.py:2433 documents/views.py:2754
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Укажите только одно: текст, title_search, query или more _like_id."
 
-#: documents/views.py:4616
+#: documents/views.py:4621
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Недостаточно прав для совместного доступа к документу %(id)s."
 
-#: documents/views.py:4662
+#: documents/views.py:4667
 msgid "Bundle is already being processed."
 msgstr "Пакет уже обрабатывается."
 
-#: documents/views.py:4723
+#: documents/views.py:4728
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Набор ссылок все еще готовится. Пожалуйста, повторите попытку позже."
 
-#: documents/views.py:4733
+#: documents/views.py:4738
 msgid "The share link bundle is unavailable."
 msgstr "Пакет общих ссылок недоступен."
 
@@ -2474,11 +2474,11 @@ msgstr "Кодировка, используемая при общении с п
 
 #: paperless_mail/models.py:60
 msgid "account type"
-msgstr "Тип учетной записи"
+msgstr "тип учетной записи"
 
 #: paperless_mail/models.py:66
 msgid "refresh token"
-msgstr "Refresh-токен"
+msgstr "refresh-токен"
 
 #: paperless_mail/models.py:70
 msgid "The refresh token to use for token authentication e.g. with oauth2."

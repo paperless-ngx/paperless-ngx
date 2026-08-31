@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-26 16:49+0000\n"
-"PO-Revision-Date: 2026-08-26 17:04\n"
+"POT-Creation-Date: 2026-08-29 20:02+0000\n"
+"PO-Revision-Date: 2026-08-29 20:04\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -1611,8 +1611,8 @@ msgid "workflow runs"
 msgstr "le flux de travail s'exécute"
 
 #: documents/serialisers.py:523 documents/serialisers.py:875
-#: documents/serialisers.py:2827 documents/views.py:312 documents/views.py:2606
-#: paperless_mail/serialisers.py:155
+#: documents/serialisers.py:2827 documents/views.py:313 documents/views.py:2611
+#: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "Droits insuffisants."
 
@@ -1651,7 +1651,7 @@ msgstr "Variable invalide détectée."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Les identificateurs de document en double ne sont pas autorisés."
 
-#: documents/serialisers.py:2913 documents/views.py:4603
+#: documents/serialisers.py:2913 documents/views.py:4608
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Documents introuvables : %(ids)s"
@@ -1906,36 +1906,36 @@ msgstr "Le schéma d'URI « {parts.scheme} » n'est pas autorisé. Schémas aut
 msgid "Unable to parse URI {value}"
 msgstr "Impossible d'analyser l'URI {value}"
 
-#: documents/views.py:305 documents/views.py:2603
+#: documents/views.py:306 documents/views.py:2608
 msgid "Invalid more_like_id"
 msgstr "More_like_id invalide"
 
-#: documents/views.py:1577
+#: documents/views.py:1582
 msgid "Invalid AI configuration."
 msgstr "Configuration IA invalide."
 
-#: documents/views.py:1588
+#: documents/views.py:1593
 msgid "AI backend request timed out."
 msgstr "La requête d'arrière-plan IA a expiré."
 
-#: documents/views.py:2428 documents/views.py:2749
+#: documents/views.py:2433 documents/views.py:2754
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Spécifiez seulement un texte, titre, recherche ou more_like_id."
 
-#: documents/views.py:4616
+#: documents/views.py:4621
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Droits d'accès insuffisant pour partager %(id)s document."
 
-#: documents/views.py:4662
+#: documents/views.py:4667
 msgid "Bundle is already being processed."
 msgstr "Le paquet est déjà en cours de traitement."
 
-#: documents/views.py:4723
+#: documents/views.py:4728
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Le lot de liens de partage est en cours de préparation. Veuillez réessayer plus tard."
 
-#: documents/views.py:4733
+#: documents/views.py:4738
 msgid "The share link bundle is unavailable."
 msgstr "Le lot de liens de partage n'est pas disponible."
 
