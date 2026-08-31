@@ -136,12 +136,14 @@ from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
 from documents.filters import DocumentsOrderingFilter
 from documents.filters import DocumentTypeFilterSet
+from documents.filters import EffectiveContentFilter
 from documents.filters import PaperlessTaskFilterSet
 from documents.filters import PermittedObjectsFilter
 from documents.filters import ShareLinkBundleFilterSet
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
+from documents.filters import TitleContentFilter
 from documents.mail import EmailAttachment
 from documents.mail import send_email
 from documents.matching import match_correspondents
@@ -1073,16 +1075,23 @@ class DocumentViewSet(
             ],
         }
 
-    # Query params whose filtering needs effective_content evaluated in SQL
-    # against every candidate row -- see _needs_effective_content_annotation().
-    _CONTENT_FILTER_PARAMS = (
-        "search",  # DRF SearchFilter's search_fields includes effective_content
-        "title_content",
-        "content__istartswith",
-        "content__iendswith",
-        "content__icontains",
-        "content__iexact",
-    )
+    @classmethod
+    def _content_filter_params(cls) -> tuple[str, ...]:
+        """
+        Query params whose filtering needs effective_content evaluated in
+        SQL against every candidate row -- see
+        _needs_effective_content_annotation(). Derived from DocumentFilterSet
+        and search_fields, rather than a hand-maintained list, so a new
+        content-filtering param automatically counts here too.
+        """
+        params = [
+            name
+            for name, f in DocumentFilterSet.declared_filters.items()
+            if isinstance(f, (TitleContentFilter, EffectiveContentFilter))
+        ]
+        if "effective_content" in cls.search_fields:
+            params.append(SearchFilter().search_param)
+        return tuple(params)
 
     def _needs_effective_content_annotation(self) -> bool:
         # effective_content is a per-row correlated subquery resolving each
@@ -1103,7 +1112,7 @@ class DocumentViewSet(
         # annotation despite applying no actual predicate.
         params = self.request.query_params
         return any(
-            params.get(param, "").strip() for param in self._CONTENT_FILTER_PARAMS
+            params.get(param, "").strip() for param in self._content_filter_params()
         )
 
     def get_queryset(self):
