@@ -1,5 +1,22 @@
 import { expect, test } from '@playwright/test'
 
+test.beforeEach(async ({ page }) => {
+  await page.route('**/api/status/', (route) =>
+    route.fulfill({
+      json: {
+        database: { status: 'OK' },
+        tasks: {
+          redis_status: 'DISABLED',
+          celery_status: 'DISABLED',
+          index_status: 'OK',
+          classifier_status: 'OK',
+          sanity_check_status: 'OK',
+        },
+      },
+    })
+  )
+})
+
 test('should activate / deactivate save button when settings change', async ({
   page,
 }) => {

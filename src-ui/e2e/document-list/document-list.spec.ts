@@ -138,7 +138,11 @@ test('change views', async ({ page }) => {
 })
 
 test('bulk edit', async ({ page }) => {
+  const uiSettingsLoaded = page.waitForResponse(
+    (response) => response.url().includes('/api/ui_settings/') && response.ok()
+  )
   await page.goto('/documents')
+  await uiSettingsLoaded
 
   await page
     .locator('pngx-document-card-small .doc-img-container')
@@ -180,15 +184,26 @@ test('bulk edit', async ({ page }) => {
     .fill('TagWithPartial')
   await page.getByRole('menuitem', { name: 'TagWithPartial' }).click()
 
-  await page.getByRole('button', { name: 'Apply' }).click()
-
   const bulkEditPromise = page.waitForRequest((request) => {
+    if (
+      !request.url().includes('/api/documents/bulk_edit/') ||
+      request.method() !== 'POST'
+    ) {
+      return false
+    }
     const postData = request.postDataJSON()
     let isValid = postData['method'] == 'modify_tags'
-    isValid = isValid && postData['parameters']['add_tags'].includes(3)
-    return request.url().toString().includes('bulk_edit') && isValid
+    isValid =
+      isValid &&
+      [
+        ...postData['parameters']['add_tags'],
+        ...postData['parameters']['remove_tags'],
+      ].includes(3)
+    return isValid
   })
 
+  await page.getByRole('button', { name: 'Apply' }).click()
+  await expect(page.getByRole('button', { name: 'Confirm' })).toBeVisible()
   await page.getByRole('button', { name: 'Confirm' }).click()
   await bulkEditPromise
 })
