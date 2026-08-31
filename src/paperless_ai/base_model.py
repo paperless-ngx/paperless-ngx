@@ -225,12 +225,13 @@ def model_to_classification_suggestions(
         ids: list[int],
         category: str,
     ) -> TaxonomyChoiceDict:
-        remaining_names = list(names)
+        remaining_names = [name for name in names if name.strip()]
         existing_ids: list[int] = []
         allowed_ids = allowed_candidate_ids.get(category, set())
         for name, object_id in zip(matched_names, ids, strict=False):
             if (
-                name not in remaining_names
+                not name.strip()
+                or name not in remaining_names
                 or object_id not in allowed_ids
                 or object_id in existing_ids
             ):

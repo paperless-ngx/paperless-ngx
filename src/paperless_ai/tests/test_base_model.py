@@ -131,6 +131,25 @@ def test_invalid_or_unpaired_candidate_mappings_do_not_remove_names():
     }
 
 
+def test_blank_names_cannot_authorize_candidate_mappings():
+    parsed = DocumentClassifierSchema(
+        title="Electricity Bill",
+        tags=["", "   ", "Utilities"],
+        matched_tags=["", "   "],
+        tag_ids=[12, 13],
+    )
+
+    suggestions = model_to_classification_suggestions(
+        parsed,
+        {"tags": {12, 13}},
+    )
+
+    assert suggestions["tags"] == {
+        "existing_ids": [],
+        "new_names": ["Utilities"],
+    }
+
+
 def test_document_classifier_schema_json_schema_is_self_contained():
     """
     GIVEN:
