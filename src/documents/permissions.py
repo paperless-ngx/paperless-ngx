@@ -197,13 +197,6 @@ def _resolve_permissions(codenames: set[str], ctype: ContentType) -> list[Permis
     return permission_objs
 
 
-# Target number of permission rows to build in Python before handing them to
-# bulk_create -- keeps peak memory bounded for a large "apply to all" call,
-# independent of bulk_create's own batch_size (which only caps the size of
-# each INSERT statement, not how many row objects exist in memory at once).
-_PERMISSION_ROW_CHUNK_SIZE = 5000
-
-
 def _apply_bulk_permission_entry(
     *,
     perm_model: type[UserObjectPermission] | type[GroupObjectPermission],
@@ -245,29 +238,24 @@ def _apply_bulk_permission_entry(
     if not add_ids:
         return
 
-    rows_per_pk = len(permission_objs) * len(add_ids)
-    pks_per_chunk = max(1, _PERMISSION_ROW_CHUNK_SIZE // rows_per_pk)
-    for start in range(0, len(object_pks), pks_per_chunk):
-        pk_chunk = object_pks[start : start + pks_per_chunk]
-        rows = [
-            perm_model(
-                content_type=ctype,
-                object_pk=pk,
-                permission=permission_obj,
-                **{f"{identity_field}_id": identity_id},
-            )
-            for permission_obj in permission_objs
-            for pk in pk_chunk
-            for identity_id in add_ids
-        ]
-        # ignore_conflicts skips only rows that already exist as an exact
-        # (identity, permission, object) match -- the same de-dup the
-        # underlying (user|group, permission, object_pk) unique constraint
-        # already enforces for the single-object assign_perm() this
-        # replaces, so it doesn't change what counts as "already granted".
-        # batch_size caps how many rows go into a single INSERT so a huge
-        # chunk doesn't build one enormous statement.
-        perm_model.objects.bulk_create(rows, ignore_conflicts=True, batch_size=1000)
+    rows = [
+        perm_model(
+            content_type=ctype,
+            object_pk=pk,
+            permission=permission_obj,
+            **{f"{identity_field}_id": identity_id},
+        )
+        for permission_obj in permission_objs
+        for pk in object_pks
+        for identity_id in add_ids
+    ]
+    # ignore_conflicts skips only rows that already exist as an exact
+    # (identity, permission, object) match -- the same de-dup the
+    # underlying (user|group, permission, object_pk) unique constraint
+    # already enforces for the single-object assign_perm() this replaces,
+    # so it doesn't change what counts as "already granted". batch_size
+    # caps how many rows go into a single INSERT statement.
+    perm_model.objects.bulk_create(rows, ignore_conflicts=True, batch_size=1000)
 
 
 def set_permissions_for_objects(
