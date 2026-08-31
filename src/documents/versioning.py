@@ -27,10 +27,13 @@ def versions_newest_first(documents: QuerySet[Document]) -> QuerySet[Document]:
 
 def annotate_effective_content(documents: QuerySet[Document]) -> QuerySet[Document]:
     """
-    Annotates documents with the content of their newest version, falling back
-    to their own, so get_effective_content() can answer from the row rather
-    than querying for the versions of each document
+    Annotates documents with the content of their newest version unless the
+    queryset already carries the annotation, falling back to their own, so
+    get_effective_content() can answer from the row rather than querying for
+    the versions of each document.
     """
+    if "effective_content" in documents.query.annotations:
+        return documents
     return documents.annotate(
         effective_content=Coalesce(
             Subquery(
@@ -41,21 +44,6 @@ def annotate_effective_content(documents: QuerySet[Document]) -> QuerySet[Docume
             F("content"),
         ),
     )
-
-
-def ensure_effective_content(documents: QuerySet[Document]) -> QuerySet[Document]:
-    """
-    Annotates effective_content unless the queryset already carries it.
-
-    Lets a filter depend on effective_content without having to assume its
-    caller annotated one -- annotating twice under the same alias is an error,
-    and silently matching on the root document's own content instead is worse,
-    because the same filter then selects different documents depending on which
-    queryset it was handed.
-    """
-    if "effective_content" in documents.query.annotations:
-        return documents
-    return annotate_effective_content(documents)
 
 
 def sort_versions_newest_first(documents: list[Document]) -> list[Document]:
