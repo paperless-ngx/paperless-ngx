@@ -1,3 +1,11 @@
 .badge {
     cursor: move;
 }
+
+.cdk-drop-list-disabled {
+    cursor: not-allowed !important;
+
+    * {
+      pointer-events: none !important;
+    }
+}
