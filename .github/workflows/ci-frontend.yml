@@ -185,22 +185,16 @@ jobs:
           flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/coverage/
   e2e-tests:
-    name: "E2E Tests (${{ matrix.shard-index }}/${{ matrix.shard-count }})"
+    name: E2E Tests
     needs: [changes, install-dependencies]
     if: needs.changes.outputs.frontend_changed == 'true'
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-    container: mcr.microsoft.com/playwright:v1.62.0-noble
+    container: mcr.microsoft.com/playwright:v1.62.1-noble
     env:
       PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: [24.x]
-        shard-index: [1, 2]
-        shard-count: [2]
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -216,6 +210,17 @@ jobs:
           node-version: 24.x
           cache: 'pnpm'
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: '0.12.x'
+          enable-cache: true
+          python-version: ${{ steps.setup-python.outputs.python-version }}
       - name: Cache frontend dependencies
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -225,8 +230,12 @@ jobs:
           key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
       - name: Install dependencies
         run: cd src-ui && pnpm install --frozen-lockfile
+      - name: Install backend dependencies
+        env:
+          PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}
+        run: uv sync --python "${PYTHON_VERSION}" --no-dev --frozen
       - name: Run Playwright E2E tests
-        run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
+        run: cd src-ui && pnpm exec playwright test
   frontend-build:
     name: Frontend Build
     needs: [changes, unit-tests, e2e-tests]

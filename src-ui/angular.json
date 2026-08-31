@@ -139,6 +139,17 @@
                 }
               ]
             },
+            "e2e": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.e2e.ts"
+                }
+              ],
+              "localize": [
+                "en-US"
+              ]
+            },
             "en-US": {
               "localize": [
                 "en-US"
@@ -155,6 +166,9 @@
           "configurations": {
             "production": {
               "buildTarget": "paperless-ui:build:production"
+            },
+            "e2e": {
+              "buildTarget": "paperless-ui:build:e2e"
             }
           }
         },

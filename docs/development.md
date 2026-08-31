@@ -224,13 +224,19 @@ respectively, can be run non-interactively with:
 
 ```bash
 pnpm ng test
-pnpm playwright test
+pnpm e2e
 ```
+
+The Playwright suite starts both the Angular development server and a disposable
+Paperless instance on port 8001. The instance uses SQLite, temporary data and
+media directories, and deterministic sample documents; it is removed when the
+test run finishes. This requires the back-end Python dependencies from the
+regular development setup to be installed with `uv sync`.
 
 Playwright also includes a UI which can be run with:
 
 ```bash
-pnpm playwright test --ui
+pnpm e2e:ui
 ```
 
 ### Building the frontend
