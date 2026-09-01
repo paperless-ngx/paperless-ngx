@@ -738,14 +738,16 @@ export class FilterEditorComponent
           this.permissionsSelectionModel.ownerFilter.set(OwnerFilterType.SELF)
           this.permissionsSelectionModel.hideUnowned.set(false)
           if (rule.value)
-            this.permissionsSelectionModel.userID.set(parseInt(rule.value, 10))
+            this.permissionsSelectionModel.userID.set(
+              Number.parseInt(rule.value, 10)
+            )
           break
         case FILTER_OWNER_ANY:
           this.permissionsSelectionModel.ownerFilter.set(OwnerFilterType.OTHERS)
           if (rule.value)
             this.permissionsSelectionModel.includeUsers.update((users) => [
               ...users,
-              parseInt(rule.value, 10),
+              Number.parseInt(rule.value, 10),
             ])
           break
         case FILTER_OWNER_DOES_NOT_INCLUDE:
@@ -755,7 +757,7 @@ export class FilterEditorComponent
           if (rule.value)
             this.permissionsSelectionModel.excludeUsers.update((users) => [
               ...users,
-              parseInt(rule.value, 10),
+              Number.parseInt(rule.value, 10),
             ])
           break
         case FILTER_SHARED_BY_USER:
@@ -763,7 +765,9 @@ export class FilterEditorComponent
             OwnerFilterType.SHARED_BY_ME
           )
           if (rule.value)
-            this.permissionsSelectionModel.userID.set(parseInt(rule.value, 10))
+            this.permissionsSelectionModel.userID.set(
+              Number.parseInt(rule.value, 10)
+            )
           break
         case FILTER_OWNER_ISNULL:
           if (rule.value === 'true' || rule.value === '1') {
