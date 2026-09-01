@@ -635,7 +635,9 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Tag]):
                 annotate_document_count_for_related_queryset(
                     Tag.objects.filter(
                         pk__in=descendant_pks | {t.pk for t in all_tags},
-                    ).select_related("owner"),
+                    )
+                    .filter(pk__in=permitted_object_ids(user, Tag, "view_tag"))
+                    .select_related("owner"),
                     through_model=self.document_count_through,
                     related_object_field=self._get_document_count_source_field(),
                     user=user,

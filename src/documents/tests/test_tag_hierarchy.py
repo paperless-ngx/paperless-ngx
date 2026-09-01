@@ -1,5 +1,6 @@
 from unittest import mock
 
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 
@@ -12,6 +13,36 @@ from documents.models import WorkflowTrigger
 from documents.serialisers import TagSerializer
 from documents.signals.handlers import run_workflows
 from documents.tests.utils import DirectoriesMixin
+
+
+class TestTagHierarchyPermissions(APITestCase):
+    def test_children_only_include_visible_tags(self) -> None:
+        owner = User.objects.create_user(username="owner")
+        requester = User.objects.create_user(username="requester")
+        requester.user_permissions.add(
+            Permission.objects.get(codename="view_tag"),
+        )
+        parent = Tag.objects.create(name="Visible parent", owner=requester)
+        hidden_child = Tag.objects.create(
+            name="Hidden child",
+            owner=owner,
+            tn_parent=parent,
+        )
+        self.client.force_authenticate(user=requester)
+
+        response = self.client.get("/api/tags/")
+
+        assert response.status_code == 200
+        parent_result = next(
+            tag for tag in response.data["results"] if tag["id"] == parent.pk
+        )
+        assert parent_result["children"] == []
+        assert hidden_child.pk not in response.data.get("all", [])
+
+        response = self.client.get(f"/api/tags/{parent.pk}/")
+
+        assert response.status_code == 200
+        assert response.data["children"] == []
 
 
 class TestTagHierarchy(DirectoriesMixin, APITestCase):
