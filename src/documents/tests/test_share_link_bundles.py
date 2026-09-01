@@ -192,6 +192,50 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertIn("sharelink_notfound=1", response["Location"])
 
+    def test_share_link_missing_file_redirects(self) -> None:
+        """
+        GIVEN:
+            - A share link whose document file is missing from disk
+        WHEN:
+            - The public share link is requested anonymously
+        THEN:
+            - The user is redirected to login instead of a 500 error
+        """
+        doc = DocumentFactory.create(filename="missing-original.pdf")
+        share_link = ShareLink.objects.create(
+            slug="missingfilelink",
+            document=doc,
+            file_version=ShareLink.FileVersion.ORIGINAL,
+        )
+
+        self.client.logout()
+        response = self.client.get(f"/share/{share_link.slug}/")
+
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertIn("sharelink_notfound=1", response["Location"])
+
+    def test_download_ready_bundle_missing_file_returns_503(self) -> None:
+        """
+        GIVEN:
+            - A READY bundle whose zip file is missing from disk
+        WHEN:
+            - The public share link is requested anonymously
+        THEN:
+            - A 503 is returned instead of a 500 error
+        """
+        bundle = ShareLinkBundle.objects.create(
+            slug="missingbundlefile",
+            file_version=ShareLink.FileVersion.ARCHIVE,
+            status=ShareLinkBundle.Status.READY,
+            file_path="bundles/gone.zip",
+        )
+        bundle.documents.set([self.document])
+
+        self.client.logout()
+        response = self.client.get(f"/share/{bundle.slug}/")
+
+        self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
+
 
 class ShareLinkBundleTaskTests(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:

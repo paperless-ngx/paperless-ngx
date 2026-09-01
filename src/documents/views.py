@@ -4707,12 +4707,15 @@ class SharedLinkView(View):
                 and share_link.expiration < timezone.now()
             ):
                 return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
-            return serve_file(
-                doc=share_link.document,
-                use_archive=share_link.file_version == ShareLink.FileVersion.ARCHIVE
-                and share_link.document.has_archive_version,
-                disposition="inline",
-            )
+            try:
+                return serve_file(
+                    doc=share_link.document,
+                    use_archive=share_link.file_version == ShareLink.FileVersion.ARCHIVE
+                    and share_link.document.has_archive_version,
+                    disposition="inline",
+                )
+            except FileNotFoundError:
+                return HttpResponseRedirect("/accounts/login/?sharelink_notfound=1")
 
         bundle = ShareLinkBundle.objects.filter(slug=slug).first()
         if bundle is None:
@@ -4734,7 +4737,11 @@ class SharedLinkView(View):
 
         file_path = bundle.absolute_file_path
 
-        if bundle.status == ShareLinkBundle.Status.FAILED or file_path is None:
+        if (
+            bundle.status == ShareLinkBundle.Status.FAILED
+            or file_path is None
+            or not file_path.exists()
+        ):
             return HttpResponse(
                 _(
                     "The share link bundle is unavailable.",
