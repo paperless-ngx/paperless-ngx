@@ -1,5 +1,6 @@
 import {
   getLocaleNumberSymbol,
+  NgClass,
   NgTemplateOutlet,
   NumberSymbol,
 } from '@angular/common'
@@ -48,25 +49,26 @@ import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.comp
 import { DocumentLinkComponent } from '../input/document-link/document-link.component'
 
 export class CustomFieldQueriesModel {
-  private _queries: CustomFieldQueryElement[] = []
+  private readonly _queries = signal<CustomFieldQueryElement[]>([])
   private rootSubscriptions: Subscription[] = []
 
   public readonly changed = new Subject<CustomFieldQueriesModel>()
 
   public get queries(): CustomFieldQueryElement[] {
-    return this._queries
+    return this._queries()
   }
 
   public set queries(value: CustomFieldQueryElement[]) {
     this.teardownRootSubscriptions()
-    this._queries = value ?? []
-    for (const element of this._queries) {
+    const queries = value ?? []
+    for (const element of queries) {
       this.rootSubscriptions.push(
         element.changed.subscribe(() => {
           this.changed.next(this)
         })
       )
     }
+    this._queries.set(queries)
   }
 
   public clear(fireEvent = true) {
@@ -209,6 +211,7 @@ export class CustomFieldQueriesModel {
     DocumentLinkComponent,
     ReactiveFormsModule,
     NgbDatepickerModule,
+    NgClass,
     NgTemplateOutlet,
     NgSelectModule,
     NgxBootstrapIconsModule,
