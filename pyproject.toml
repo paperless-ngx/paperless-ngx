@@ -226,11 +226,7 @@ extend-select = [
   "FBT",     # https://docs.astral.sh/ruff/rules/#flake8-boolean-trap-fbt
   "FLY",     # https://docs.astral.sh/ruff/rules/#flynt-fly
   "FURB",    # https://docs.astral.sh/ruff/rules/#refurb-furb
-  "G",
-  "G010",    # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
-  "G101",
-  "G201",
-  "G202",
+  "G",       # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
   "I",       # https://docs.astral.sh/ruff/rules/#isort-i
   "ICN",     # https://docs.astral.sh/ruff/rules/#flake8-import-conventions-icn
   "INP",     # https://docs.astral.sh/ruff/rules/#flake8-no-pep420-inp
@@ -297,6 +293,7 @@ ignore = [
   "PLC0415",
   "RUF012",
   "SIM105",
+  "G004",    # Logging statement uses f-string - good to do, but a large diff
 ]
 # Migrations
 per-file-ignores."*/migrations/*.py" = [

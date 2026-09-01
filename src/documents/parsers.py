@@ -110,7 +110,7 @@ def run_convert(
     args += ["-define", "pdf:use-cropbox=true"] if use_cropbox else []
     args += [str(input_file), str(output_file)]
 
-    logger.debug("Execute: " + " ".join(args), extra={"group": logging_group})
+    logger.debug("Execute: %s", " ".join(args), extra={"group": logging_group})
 
     try:
         run_subprocess(args, environment, logger)
