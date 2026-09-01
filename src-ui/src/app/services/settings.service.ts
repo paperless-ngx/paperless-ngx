@@ -329,10 +329,6 @@ export class SettingsService {
     return !UNSAFE_OBJECT_KEYS.has(key)
   }
 
-  public trackChanges(): void {
-    this.settingsVersion()
-  }
-
   private assignSafeSettings(source: Record<string, any>) {
     if (!source || typeof source !== 'object' || Array.isArray(source)) {
       return

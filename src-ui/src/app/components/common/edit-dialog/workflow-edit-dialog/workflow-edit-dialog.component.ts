@@ -537,6 +537,13 @@ export class WorkflowEditDialogComponent
   readonly dateCustomFields = computed(() =>
     this.customFields()?.filter((f) => f.data_type === CustomFieldDataType.Date)
   )
+  private readonly emailEnabledSetting =
+    this.settingsService.getSignal<boolean>(SETTINGS_KEYS.EMAIL_ENABLED)
+  private readonly remoteOcrConfiguredSetting =
+    this.settingsService.getSignal<boolean>(SETTINGS_KEYS.REMOTE_OCR_CONFIGURED)
+  private readonly aiEnabledSetting = this.settingsService.getSignal<boolean>(
+    SETTINGS_KEYS.AI_ENABLED
+  )
 
   expandedItem: number = null
 
@@ -589,7 +596,7 @@ export class WorkflowEditDialogComponent
   private getAllowedActionTypes() {
     let allowed = WORKFLOW_ACTION_OPTIONS
 
-    if (!this.settingsService.get(SETTINGS_KEYS.EMAIL_ENABLED)) {
+    if (!this.emailEnabledSetting()) {
       allowed = allowed.filter((a) => a.id !== WorkflowActionType.Email)
     }
 
@@ -597,7 +604,7 @@ export class WorkflowEditDialogComponent
     // offered for workflows that run at consumption.
     const formWorkflow: Workflow = this.objectForm?.value
     const remoteOcrUsable =
-      this.settingsService.get(SETTINGS_KEYS.REMOTE_OCR_CONFIGURED) &&
+      this.remoteOcrConfiguredSetting() &&
       (formWorkflow?.triggers?.some(
         (trigger) => trigger.type === WorkflowTriggerType.Consumption
       ) ||
@@ -612,7 +619,7 @@ export class WorkflowEditDialogComponent
     // once every trigger is consumption, so it stays offered on a workflow
     // that has no triggers yet.
     const aiSuggestionsUsable =
-      this.settingsService.get(SETTINGS_KEYS.AI_ENABLED) &&
+      this.aiEnabledSetting() &&
       (!formWorkflow?.triggers?.length ||
         formWorkflow.triggers.some(
           (trigger) => trigger.type !== WorkflowTriggerType.Consumption
@@ -1362,7 +1369,6 @@ export class WorkflowEditDialogComponent
   }
 
   get actionTypeOptions() {
-    this.settingsService.trackChanges()
     // Computed on read rather than cached
     return this.getAllowedActionTypes()
   }

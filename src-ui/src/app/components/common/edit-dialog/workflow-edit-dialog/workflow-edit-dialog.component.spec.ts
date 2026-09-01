@@ -196,6 +196,16 @@ describe('WorkflowEditDialogComponent', () => {
     fixture.detectChanges()
   })
 
+  function setActionSettings({
+    email = true,
+    remoteOcr = true,
+    ai = true,
+  } = {}) {
+    settingsService.set(SETTINGS_KEYS.EMAIL_ENABLED, email)
+    settingsService.set(SETTINGS_KEYS.REMOTE_OCR_CONFIGURED, remoteOcr)
+    settingsService.set(SETTINGS_KEYS.AI_ENABLED, ai)
+  }
+
   it('should support create and edit modes, support adding triggers and actions on new workflow', () => {
     component.dialogMode.set(EditDialogMode.CREATE)
     const createTitleSpy = jest.spyOn(component, 'getCreateTitle')
@@ -218,7 +228,7 @@ describe('WorkflowEditDialogComponent', () => {
   })
 
   it('should return source options, type options, type name, schedule date field options', () => {
-    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+    setActionSettings()
     component.ngOnInit()
     expect(component.sourceOptions).toEqual(DOCUMENT_SOURCE_OPTIONS)
     expect(component.triggerTypeOptions).toEqual(WORKFLOW_TYPE_OPTIONS)
@@ -242,7 +252,7 @@ describe('WorkflowEditDialogComponent', () => {
     )
 
     // Email, remote OCR and AI all disabled
-    jest.spyOn(settingsService, 'get').mockReturnValue(false)
+    setActionSettings({ email: false, remoteOcr: false, ai: false })
     component.ngOnInit()
     expect(component.actionTypeOptions).toEqual(
       WORKFLOW_ACTION_OPTIONS.filter(
@@ -255,7 +265,7 @@ describe('WorkflowEditDialogComponent', () => {
   })
 
   it('should offer remote OCR only for consumption workflows', () => {
-    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+    setActionSettings()
 
     // A consumption trigger makes the action reachable
     component.object = {
@@ -285,7 +295,7 @@ describe('WorkflowEditDialogComponent', () => {
   })
 
   it('should offer remote OCR on a trigger added to a new workflow', () => {
-    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+    setActionSettings()
     component.ngOnInit()
 
     // Nothing for the action to apply to yet
@@ -311,7 +321,7 @@ describe('WorkflowEditDialogComponent', () => {
   })
 
   it('should keep remote OCR listed when an action already uses it', () => {
-    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+    setActionSettings()
 
     // Otherwise changing the trigger would silently blank the selection
     component.object = {
@@ -329,9 +339,7 @@ describe('WorkflowEditDialogComponent', () => {
   })
 
   it('should not offer remote OCR when no engine is configured', () => {
-    jest
-      .spyOn(settingsService, 'get')
-      .mockImplementation((key) => key !== SETTINGS_KEYS.REMOTE_OCR_CONFIGURED)
+    setActionSettings({ remoteOcr: false })
 
     component.object = {
       name: 'Workflow 1',
@@ -348,7 +356,7 @@ describe('WorkflowEditDialogComponent', () => {
   })
 
   it('should offer apply AI suggestions unless every trigger is consumption', () => {
-    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+    setActionSettings()
 
     // Consumption runs before the document has been parsed, so there would be
     // no content to make suggestions from
@@ -382,7 +390,7 @@ describe('WorkflowEditDialogComponent', () => {
   })
 
   it('should keep apply AI suggestions listed when an action already uses it', () => {
-    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+    setActionSettings()
 
     // Otherwise changing the trigger would silently blank the selection
     component.object = {
@@ -400,9 +408,7 @@ describe('WorkflowEditDialogComponent', () => {
   })
 
   it('should not offer apply AI suggestions when AI is disabled', () => {
-    jest
-      .spyOn(settingsService, 'get')
-      .mockImplementation((key) => key !== SETTINGS_KEYS.AI_ENABLED)
+    setActionSettings({ ai: false })
 
     component.object = {
       name: 'Workflow 1',
