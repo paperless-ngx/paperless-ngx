@@ -577,13 +577,19 @@ class CorrespondentViewSet(
     def list(self, request, *args, **kwargs):
         if request.query_params.get("last_correspondence", None):
             self.queryset = self.queryset.annotate(
-                last_correspondence=Max("documents__created"),
+                last_correspondence=Max(
+                    "documents__created",
+                    filter=self.get_document_count_filter(),
+                ),
             )
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         self.queryset = self.queryset.annotate(
-            last_correspondence=Max("documents__created"),
+            last_correspondence=Max(
+                "documents__created",
+                filter=self.get_document_count_filter(),
+            ),
         )
         return super().retrieve(request, *args, **kwargs)
 
@@ -4573,6 +4579,10 @@ class ShareLinkViewSet(
 class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
     model = ShareLinkBundle
 
+    # Bundles are immutable once created; rebuild via the dedicated action
+    # rather than PUT/PATCH.
+    http_method_names = ["get", "post", "delete", "head", "options"]
+
     queryset = ShareLinkBundle.objects.all()
 
     serializer_class = ShareLinkBundleSerializer
@@ -4707,12 +4717,15 @@ class SharedLinkView(View):
                 and share_link.expiration < timezone.now()
             ):
                 return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
-            return serve_file(
-                doc=share_link.document,
-                use_archive=share_link.file_version == ShareLink.FileVersion.ARCHIVE
-                and share_link.document.has_archive_version,
-                disposition="inline",
-            )
+            try:
+                return serve_file(
+                    doc=share_link.document,
+                    use_archive=share_link.file_version == ShareLink.FileVersion.ARCHIVE
+                    and share_link.document.has_archive_version,
+                    disposition="inline",
+                )
+            except FileNotFoundError:
+                return HttpResponseRedirect("/accounts/login/?sharelink_notfound=1")
 
         bundle = ShareLinkBundle.objects.filter(slug=slug).first()
         if bundle is None:
@@ -4734,7 +4747,11 @@ class SharedLinkView(View):
 
         file_path = bundle.absolute_file_path
 
-        if bundle.status == ShareLinkBundle.Status.FAILED or file_path is None:
+        if (
+            bundle.status == ShareLinkBundle.Status.FAILED
+            or file_path is None
+            or not file_path.exists()
+        ):
             return HttpResponse(
                 _(
                     "The share link bundle is unavailable.",
