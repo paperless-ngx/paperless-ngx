@@ -254,7 +254,7 @@ extend-select = [
   "PLR1733",
   "PLR1736",
   "PLR2044",
-  "PLW",
+  "PLW",     # https://docs.astral.sh/ruff/rules/#warning-plw
   "PT010",   # https://docs.astral.sh/ruff/rules/#flake8-pytest-style-pt
   "PT014",
   "PT020",
