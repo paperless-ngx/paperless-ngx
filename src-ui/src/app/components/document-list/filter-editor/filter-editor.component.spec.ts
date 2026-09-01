@@ -621,6 +621,43 @@ describe('FilterEditorComponent', () => {
     component.toggleTag(2) // coverage
   })
 
+  it('should reflect ingested tag filter rules in the dropdown toggle', () => {
+    const dropdown = fixture.debugElement.query(
+      By.css('pngx-filterable-dropdown')
+    )
+    const toggle = dropdown.nativeElement.querySelector('#dropdown_tags')
+    expect(toggle.classList.contains('btn-primary')).toBeFalsy()
+    expect(
+      dropdown.nativeElement.querySelector('pngx-clearable-badge')
+    ).toBeNull()
+
+    // switching to a view with a tag filter
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_TAGS_ALL,
+        value: '2',
+      },
+    ]
+    fixture.detectChanges()
+    expect(toggle.classList.contains('btn-primary')).toBeTruthy()
+    expect(
+      dropdown.nativeElement.querySelector('pngx-clearable-badge')
+    ).not.toBeNull()
+
+    // and back to a view without one
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_CORRESPONDENT_ANY,
+        value: '12',
+      },
+    ]
+    fixture.detectChanges()
+    expect(toggle.classList.contains('btn-primary')).toBeFalsy()
+    expect(
+      dropdown.nativeElement.querySelector('pngx-clearable-badge')
+    ).toBeNull()
+  })
+
   it('should ingest filter rules for has any tags', () => {
     expect(component.tagSelectionModel.getSelectedItems()).toHaveLength(0)
     component.filterRules = [
