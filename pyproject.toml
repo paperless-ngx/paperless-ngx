@@ -295,25 +295,7 @@ per-file-ignores."*/migrations/*.py" = []
 # Testing
 per-file-ignores."*/tests/*.py" = [
   "DTZ",
-  "E501",
   "SIM117",
-]
-per-file-ignores.".github/scripts/*.py" = [
-  "E501",
-  "INP001",
-  "SIM117",
-]
-# Docker specific
-per-file-ignores."docker/rootfs/usr/local/bin/wait-for-redis.py" = [
-  "INP001",
-  "T201",
-]
-per-file-ignores."docker/wait-for-redis.py" = [
-  "INP001",
-  "T201",
-]
-per-file-ignores."src/documents/models.py" = [
-  "SIM115",
 ]
 isort.force-single-line = true
 
