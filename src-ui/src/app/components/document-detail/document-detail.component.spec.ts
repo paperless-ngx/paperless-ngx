@@ -1227,6 +1227,29 @@ describe('DocumentDetailComponent', () => {
     expect(fixture.debugElement.query(By.css('object'))).not.toBeNull()
   })
 
+  it('should reflect signal-backed document detail display settings', () => {
+    settingsService.set(SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL, false)
+    settingsService.set(SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS, [
+      component.DocumentDetailFieldID.Correspondent,
+    ])
+
+    expect(component.showThumbnailOverlay).toBeFalsy()
+    expect(
+      component.isFieldHidden(component.DocumentDetailFieldID.Correspondent)
+    ).toBeTruthy()
+    expect(
+      component.isFieldHidden(component.DocumentDetailFieldID.DocumentType)
+    ).toBeFalsy()
+
+    settingsService.set(SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL, true)
+    settingsService.set(SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS, [])
+
+    expect(component.showThumbnailOverlay).toBeTruthy()
+    expect(
+      component.isFieldHidden(component.DocumentDetailFieldID.Correspondent)
+    ).toBeFalsy()
+  })
+
   it('should attempt to retrieve metadata', () => {
     const metadataSpy = jest.spyOn(documentService, 'getMetadata')
     metadataSpy.mockReturnValue(of({ has_archive_version: true }))
