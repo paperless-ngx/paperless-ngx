@@ -193,6 +193,23 @@ describe('AppFrameComponent', () => {
     expect(savedViewSpy).toHaveBeenCalled()
   })
 
+  it('should update reinitialized signal-backed settings without manual change detection', async () => {
+    settingsService.initializeSettings().subscribe()
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush({
+        settings: { app_title: 'Reactive title' },
+        user: {},
+        permissions: [],
+      })
+
+    await fixture.whenStable()
+
+    expect(
+      fixture.nativeElement.querySelector('.brand-title').textContent
+    ).toBe('Reactive title')
+  })
+
   it('should check for update if enabled', () => {
     const updateCheckSpy = jest.spyOn(remoteVersionService, 'checkForUpdates')
     updateCheckSpy.mockImplementation(() => {
