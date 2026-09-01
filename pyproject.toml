@@ -241,7 +241,7 @@ extend-select = [
   "PIE",     # https://docs.astral.sh/ruff/rules/#flake8-pie-pie
   "PLC",     # https://docs.astral.sh/ruff/rules/#pylint-pl
   "PLE",
-  "PLR0124",
+  "PLR0124", # https://docs.astral.sh/ruff/rules/#refactor-plr
   "PLR0133",
   "PLR0206",
   "PLR0402",
