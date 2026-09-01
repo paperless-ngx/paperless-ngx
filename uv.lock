@@ -3053,7 +3053,7 @@ requires-dist = [
     { name = "httpx-oauth", specifier = "~=0.17" },
     { name = "ijson", specifier = ">=3.5.1" },
     { name = "imap-tools", specifier = "~=1.14.0" },
-    { name = "jinja2", specifier = "~=3.1.5" },
+    { name = "jinja2", specifier = "~=3.1.6" },
     { name = "langdetect", specifier = "~=1.0.9" },
     { name = "llama-index-core", specifier = ">=0.14.23" },
     { name = "llama-index-embeddings-huggingface", specifier = ">=0.6.1" },
