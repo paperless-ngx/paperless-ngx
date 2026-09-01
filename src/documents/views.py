@@ -577,13 +577,19 @@ class CorrespondentViewSet(
     def list(self, request, *args, **kwargs):
         if request.query_params.get("last_correspondence", None):
             self.queryset = self.queryset.annotate(
-                last_correspondence=Max("documents__created"),
+                last_correspondence=Max(
+                    "documents__created",
+                    filter=self.get_document_count_filter(),
+                ),
             )
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         self.queryset = self.queryset.annotate(
-            last_correspondence=Max("documents__created"),
+            last_correspondence=Max(
+                "documents__created",
+                filter=self.get_document_count_filter(),
+            ),
         )
         return super().retrieve(request, *args, **kwargs)
 

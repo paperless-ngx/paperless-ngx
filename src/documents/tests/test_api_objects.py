@@ -102,6 +102,7 @@ class TestApiObjects(DirectoriesMixin, APITestCase):
             - API is called
         THEN:
             - Last correspondence date is returned only if requested for list, and for detail
+            - The date is scoped to documents the requesting user may view
         """
 
         Document.objects.create(
@@ -144,6 +145,32 @@ class TestApiObjects(DirectoriesMixin, APITestCase):
             "2022-01-02",
             response.data["last_correspondence"],
         )
+
+        # A newer document owned by another user must not leak through the
+        # aggregate for a non-superuser who cannot view it
+        other = User.objects.create_user(username="other")
+        Document.objects.create(
+            mime_type="application/pdf",
+            correspondent=self.c1,
+            created=datetime.date(2023, 6, 1),
+            checksum="hidden",
+            owner=other,
+        )
+
+        user = User.objects.create_user(username="regular")
+        user.user_permissions.add(
+            Permission.objects.get(codename="view_correspondent"),
+        )
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get("/api/correspondents/?last_correspondence=true")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        result = next(r for r in response.data["results"] if r["id"] == self.c1.id)
+        self.assertIn("2022-01-02", result["last_correspondence"])
+
+        response = self.client.get(f"/api/correspondents/{self.c1.id}/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("2022-01-02", response.data["last_correspondence"])
 
     def test_paginated_objects_include_all_only_for_legacy_version(self) -> None:
         response_v10 = self.client.get("/api/correspondents/")
