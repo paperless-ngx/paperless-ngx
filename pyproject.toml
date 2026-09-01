@@ -240,7 +240,7 @@ extend-select = [
   "PGH005",  # https://docs.astral.sh/ruff/rules/#pygrep-hooks-pgh
   "PIE",     # https://docs.astral.sh/ruff/rules/#flake8-pie-pie
   "PLC",     # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PLE",
+  "PLE",     # https://docs.astral.sh/ruff/rules/#error-ple
   "PLR0124", # https://docs.astral.sh/ruff/rules/#refactor-plr
   "PLR0133",
   "PLR0206",
