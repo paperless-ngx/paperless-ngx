@@ -462,7 +462,11 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         """
         Returns a sanitized filename for the document, not including any paths.
         """
-        result = str(self)
+        # Root owns metadata for all versions
+        context_document = (
+            self.root_document if self.root_document_id is not None else self
+        )
+        result = str(context_document)
 
         if counter:
             result += f"_{counter:02}"
