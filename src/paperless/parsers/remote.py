@@ -32,6 +32,8 @@ if TYPE_CHECKING:
     import datetime
     from types import TracebackType
 
+    from azure.core.pipeline import PipelineRequest
+
     from paperless.parsers import MetadataEntry
     from paperless.parsers import ParserContext
 
@@ -438,17 +440,43 @@ class RemoteDocumentParser:
 
         from paperless.network import validate_outbound_http_url
 
+        allow_internal = settings.REMOTE_OCR_ALLOW_INTERNAL_ENDPOINTS
+
         try:
-            validate_outbound_http_url(
-                config.endpoint,
-                allow_internal=settings.REMOTE_OCR_ALLOW_INTERNAL_ENDPOINTS,
-            )
+            validate_outbound_http_url(config.endpoint, allow_internal=allow_internal)
         except ValueError as e:
             raise ParseError(f"Invalid remote OCR endpoint: {e}") from e
+
+        def _revalidate_request_host(request: PipelineRequest) -> None:
+            """Re-validates the destination host of every request sent.
+
+            The check above only covers the moment the client is built. A
+            single analysis involves several requests spread over the
+            polling loop below, and any one of them can be redirected.
+            Wiring this through ``raw_request_hook`` (Azure's built-in
+            CustomHookPolicy) rather than a custom policy means it runs
+            *after* RedirectPolicy in the pipeline, so it sees - and
+            re-checks - every actual outbound URL, including redirect
+            targets, not just the original request.
+            """
+            validate_outbound_http_url(
+                request.http_request.url,
+                allow_internal=allow_internal,
+            )
 
         client = DocumentIntelligenceClient(
             endpoint=config.endpoint,
             credential=AzureKeyCredential(config.api_key),
+            raw_request_hook=_revalidate_request_host,
+            # AzureKeyCredential is sent as Ocp-Apim-Subscription-Key, which
+            # Azure's default SensitiveHeaderCleanupPolicy does not strip on
+            # a cross-domain redirect (only Authorization and
+            # x-ms-authorization-auxiliary are, by default).
+            blocked_redirect_headers=[
+                "Authorization",
+                "x-ms-authorization-auxiliary",
+                "Ocp-Apim-Subscription-Key",
+            ],
         )
 
         try:
