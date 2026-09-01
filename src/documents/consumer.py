@@ -25,6 +25,7 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_filename
 from documents.file_handling import generate_unique_filename
+from documents.file_handling import validate_path_in_root
 from documents.loggers import LoggingMixin
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -695,6 +696,10 @@ class ConsumerPlugin(
                                     use_format=False,
                                 )
                             document.filename = generated_filename
+                            validate_path_in_root(
+                                document.source_path,
+                                settings.ORIGINALS_DIR,
+                            )
                             create_source_path_directory(document.source_path)
 
                             self._write(
@@ -727,6 +732,10 @@ class ConsumerPlugin(
                                         use_format=False,
                                     )
                                 document.archive_filename = generated_archive_filename
+                                validate_path_in_root(
+                                    document.archive_path,
+                                    settings.ARCHIVE_DIR,
+                                )
                                 create_source_path_directory(document.archive_path)
                                 self._write(
                                     archive_path,

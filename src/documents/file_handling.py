@@ -1,11 +1,32 @@
+import logging
 import os
 from pathlib import Path
 
 from django.conf import settings
 
 from documents.models import Document
+from documents.templating.filepath import is_safe_relative_path
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.templating.utils import convert_format_str_to_template_format
+
+logger = logging.getLogger("paperless.filehandling")
+
+
+class UnsafeFilePathError(Exception):
+    """
+    Raised when a path generated for a document would land outside of its root.
+    """
+
+
+def validate_path_in_root(path: Path, root: Path) -> None:
+    """
+    Ensures the given absolute path is contained within root, the
+    equivalent guard for the later move.
+    """
+    if not path.resolve().is_relative_to(root.resolve()):
+        msg = f"Refusing to write file outside of root {root}: {path}."
+        logger.warning(msg)
+        raise UnsafeFilePathError(msg)
 
 
 def create_source_path_directory(source_path: Path) -> None:
@@ -120,6 +141,14 @@ def format_filename(document: Document, template_str: str) -> str | None:
         "-none-",
         "none",
     )  # backward compatibility
+
+    # Validate again after remove none
+    if not is_safe_relative_path(rendered_filename):
+        logger.warning(
+            "Filename became unsafe after placeholder removal, "
+            "falling back to default naming",
+        )
+        return None
 
     return rendered_filename
 

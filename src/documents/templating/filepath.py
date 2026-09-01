@@ -340,7 +340,7 @@ def get_custom_fields_context(
     return field_data
 
 
-def _is_safe_relative_path(value: str) -> bool:
+def is_safe_relative_path(value: str) -> bool:
     if value == "":
         return True
 
@@ -398,7 +398,7 @@ def validate_filepath_template_and_render(
         )
         rendered_template = template.render(context)
 
-        if not _is_safe_relative_path(rendered_template):
+        if not is_safe_relative_path(rendered_template):
             logger.warning(
                 "Template rendered an unsafe path (absolute or containing traversal).",
             )

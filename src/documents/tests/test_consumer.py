@@ -1179,6 +1179,29 @@ class TestConsumer(
                 produce_archive=True,
             )
 
+    @mock.patch("documents.consumer.generate_unique_filename")
+    def test_consume_refuses_to_write_outside_originals_dir(
+        self,
+        m: mock.Mock,
+    ) -> None:
+        """
+        GIVEN:
+            - Filename generation produces a path outside of the originals directory
+        WHEN:
+            - The document is consumed
+        THEN:
+            - The consumption fails and no file is written outside of the root
+        """
+        m.return_value = Path("../../pwned.pdf")
+        escaped = (settings.ORIGINALS_DIR / ".." / ".." / "pwned.pdf").resolve()
+
+        with self.get_consumer(self.get_test_file()) as consumer:
+            with self.assertRaises(ConsumerError):
+                consumer.run()
+
+        self.assertIsNotFile(escaped)
+        self.assertEqual(Document.objects.count(), 0)
+
 
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
 class TestConsumerCreatedDate(DirectoriesMixin, GetConsumerMixin, TestCase):
