@@ -188,34 +188,34 @@ select = [ "E4", "E7", "E9", "F" ]
 extend-select = [
   "ASYNC",   # https://docs.astral.sh/ruff/rules/#flake8-async-async
   "B002",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B003",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B004",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B005",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B006",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B008",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B009",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B010",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B012",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B013",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B014",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B015",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B016",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B017",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B018",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B019",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B020",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B021",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B022",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B023",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B025",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B026",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B029",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B030",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B031",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B032",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B033",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B035",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-  "B039",    # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+  "B003",
+  "B004",
+  "B005",
+  "B006",
+  "B008",
+  "B009",
+  "B010",
+  "B012",
+  "B013",
+  "B014",
+  "B015",
+  "B016",
+  "B017",
+  "B018",
+  "B019",
+  "B020",
+  "B021",
+  "B022",
+  "B023",
+  "B025",
+  "B026",
+  "B029",
+  "B030",
+  "B031",
+  "B032",
+  "B033",
+  "B035",
+  "B039",
   "C4",      # https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
   "COM",     # https://docs.astral.sh/ruff/rules/#flake8-commas-com
   "D419",    # https://docs.astral.sh/ruff/rules/#pydocstyle-d
@@ -226,67 +226,68 @@ extend-select = [
   "FBT",     # https://docs.astral.sh/ruff/rules/#flake8-boolean-trap-fbt
   "FLY",     # https://docs.astral.sh/ruff/rules/#flynt-fly
   "FURB",    # https://docs.astral.sh/ruff/rules/#refurb-furb
+  "G",
   "G010",    # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
-  "G101",    # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
-  "G201",    # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
-  "G202",    # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
+  "G101",
+  "G201",
+  "G202",
   "I",       # https://docs.astral.sh/ruff/rules/#isort-i
   "ICN",     # https://docs.astral.sh/ruff/rules/#flake8-import-conventions-icn
   "INP",     # https://docs.astral.sh/ruff/rules/#flake8-no-pep420-inp
   "INT001",  # https://docs.astral.sh/ruff/rules/#flake8-gettext-int
-  "INT002",  # https://docs.astral.sh/ruff/rules/#flake8-gettext-int
-  "INT003",  # https://docs.astral.sh/ruff/rules/#flake8-gettext-int
+  "INT002",
+  "INT003",
   "ISC",     # https://docs.astral.sh/ruff/rules/#flake8-implicit-str-concat-isc
   "LOG001",  # https://docs.astral.sh/ruff/rules/#flake8-logging-log
-  "LOG002",  # https://docs.astral.sh/ruff/rules/#flake8-logging-log
-  "LOG009",  # https://docs.astral.sh/ruff/rules/#flake8-logging-log
-  "LOG014",  # https://docs.astral.sh/ruff/rules/#flake8-logging-log
-  "LOG015",  # https://docs.astral.sh/ruff/rules/#flake8-logging-log
+  "LOG002",
+  "LOG009",
+  "LOG014",
+  "LOG015",
   "N999",    # https://docs.astral.sh/ruff/rules/#pep8-naming-n
   "PERF101", # https://docs.astral.sh/ruff/rules/#perflint-perf
-  "PERF102", # https://docs.astral.sh/ruff/rules/#perflint-perf
-  "PERF402", # https://docs.astral.sh/ruff/rules/#perflint-perf
+  "PERF102",
+  "PERF402",
   "PGH005",  # https://docs.astral.sh/ruff/rules/#pygrep-hooks-pgh
   "PIE",     # https://docs.astral.sh/ruff/rules/#flake8-pie-pie
   "PLC",     # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PLE",     # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PLR0124", # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PLR0133", # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PLR0206", # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PLR0402", # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PLR1704", # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PLR1708", # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PLR1711", # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PLR1716", # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PLR1722", # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PLR1730", # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PLR1733", # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PLR1736", # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PLR2044", # https://docs.astral.sh/ruff/rules/#pylint-pl
-  "PLW",     # https://docs.astral.sh/ruff/rules/#pylint-pl
+  "PLE",
+  "PLR0124",
+  "PLR0133",
+  "PLR0206",
+  "PLR0402",
+  "PLR1704",
+  "PLR1708",
+  "PLR1711",
+  "PLR1716",
+  "PLR1722",
+  "PLR1730",
+  "PLR1733",
+  "PLR1736",
+  "PLR2044",
+  "PLW",
   "PT010",   # https://docs.astral.sh/ruff/rules/#flake8-pytest-style-pt
-  "PT014",   # https://docs.astral.sh/ruff/rules/#flake8-pytest-style-pt
-  "PT020",   # https://docs.astral.sh/ruff/rules/#flake8-pytest-style-pt
-  "PT025",   # https://docs.astral.sh/ruff/rules/#flake8-pytest-style-pt
-  "PT026",   # https://docs.astral.sh/ruff/rules/#flake8-pytest-style-pt
-  "PT031",   # https://docs.astral.sh/ruff/rules/#flake8-pytest-style-pt
+  "PT014",
+  "PT020",
+  "PT025",
+  "PT026",
+  "PT031",
   "PTH",     # https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
   "Q",       # https://docs.astral.sh/ruff/rules/#flake8-quotes-q
   "RSE",     # https://docs.astral.sh/ruff/rules/#flake8-raise-rse
   "RUF",     # https://docs.astral.sh/ruff/rules/#ruff-specific-rules-ruf
   "S102",    # https://docs.astral.sh/ruff/rules/#flake8-bandit-s
-  "S110",    # https://docs.astral.sh/ruff/rules/#flake8-bandit-s
-  "S112",    # https://docs.astral.sh/ruff/rules/#flake8-bandit-s
+  "S110",
+  "S112",
   "SIM",     # https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
   "T100",    # https://docs.astral.sh/ruff/rules/#flake8-debugger-t10
   "T20",     # https://docs.astral.sh/ruff/rules/#flake8-print-t20
   "TC",      # https://docs.astral.sh/ruff/rules/#flake8-type-checking-tc
   "TID",     # https://docs.astral.sh/ruff/rules/#flake8-tidy-imports-tid
   "TRY002",  # https://docs.astral.sh/ruff/rules/#tryceratops-try
-  "TRY004",  # https://docs.astral.sh/ruff/rules/#tryceratops-try
-  "TRY201",  # https://docs.astral.sh/ruff/rules/#tryceratops-try
-  "TRY203",  # https://docs.astral.sh/ruff/rules/#tryceratops-try
-  "TRY401",  # https://docs.astral.sh/ruff/rules/#tryceratops-try
+  "TRY004",
+  "TRY201",
+  "TRY203",
+  "TRY401",
   "UP",      # https://docs.astral.sh/ruff/rules/#pyupgrade-up
   "W",       # https://docs.astral.sh/ruff/rules/#pycodestyle-e-w
   "YTT",     # https://docs.astral.sh/ruff/rules/#flake8-2020-ytt
