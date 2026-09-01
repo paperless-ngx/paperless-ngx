@@ -2088,6 +2088,12 @@ password. All of these options come from their similarly-named [Django settings]
 
     Defaults to "always".
 
+#### [`PAPERLESS_REMOTE_OCR_ALLOW_INTERNAL_ENDPOINTS=<bool>`](#PAPERLESS_REMOTE_OCR_ALLOW_INTERNAL_ENDPOINTS) {#PAPERLESS_REMOTE_OCR_ALLOW_INTERNAL_ENDPOINTS}
+
+: If set to false, Paperless blocks remote OCR endpoint URLs that resolve to non-public addresses (e.g., localhost, etc).
+
+    Defaults to True.
+
 ## AI {#ai}
 
 #### [`PAPERLESS_AI_ENABLED=<bool>`](#PAPERLESS_AI_ENABLED) {#PAPERLESS_AI_ENABLED}

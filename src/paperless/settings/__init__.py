@@ -1208,6 +1208,10 @@ REMOTE_OCR_MODE = get_choice_from_env(
     {"always", "workflow_only"},
     default="always",
 )
+REMOTE_OCR_ALLOW_INTERNAL_ENDPOINTS = get_bool_from_env(
+    "PAPERLESS_REMOTE_OCR_ALLOW_INTERNAL_ENDPOINTS",
+    "true",
+)
 
 ################################################################################
 # AI Settings                                                                  #
