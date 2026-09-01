@@ -75,7 +75,7 @@ def recompute_checksums(apps, schema_editor):
         if updated_fields:
             batch.append(doc)
 
-        processed += 1
+        processed += 1  # noqa: SIM113
 
         if len(batch) >= _BATCH_SIZE:
             Document.objects.bulk_update(batch, ["checksum", "archive_checksum"])
