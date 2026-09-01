@@ -1,5 +1,26 @@
 # Changelog
 
+## paperless-ngx 3.1.2
+
+### Bug Fixes
+
+- Fix: fix dark mode select disabled color, ensure disabled cursor on display mode dropdown [@shamoon](https://github.com/shamoon) ([#13881](https://github.com/paperless-ngx/paperless-ngx/pull/13881))
+- Fix: add disable to the drag-drop list component [@shamoon](https://github.com/shamoon) ([#13880](https://github.com/paperless-ngx/paperless-ngx/pull/13880))
+
+### Documentation
+
+- Chore: update screenshots for v3+ [@shamoon](https://github.com/shamoon) ([#13883](https://github.com/paperless-ngx/paperless-ngx/pull/13883))
+
+### All App Changes
+
+<details>
+<summary>2 changes</summary>
+
+- Fix: fix dark mode select disabled color, ensure disabled cursor on display mode dropdown [@shamoon](https://github.com/shamoon) ([#13881](https://github.com/paperless-ngx/paperless-ngx/pull/13881))
+- Fix: add disable to the drag-drop list component [@shamoon](https://github.com/shamoon) ([#13880](https://github.com/paperless-ngx/paperless-ngx/pull/13880))
+
+</details>
+
 ## paperless-ngx 3.1.1
 
 ### Bug Fixes
