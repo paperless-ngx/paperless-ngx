@@ -81,6 +81,10 @@ export class GlobalSearchComponent implements OnInit {
   private hotkeyService = inject(HotKeyService)
   private settingsService = inject(SettingsService)
   private locationStrategy = inject(LocationStrategy)
+  private readonly searchFullTypeSetting =
+    this.settingsService.getSignal<GlobalSearchType>(
+      SETTINGS_KEYS.SEARCH_FULL_TYPE
+    )
 
   public DataType = DataType
   readonly query = signal<string>(null)
@@ -97,11 +101,7 @@ export class GlobalSearchComponent implements OnInit {
   @ViewChildren('secondaryButton') secondaryButtons: QueryList<ElementRef>
 
   get useAdvancedForFullSearch(): boolean {
-    this.settingsService.trackChanges()
-    return (
-      this.settingsService.get(SETTINGS_KEYS.SEARCH_FULL_TYPE) ===
-      GlobalSearchType.ADVANCED
-    )
+    return this.searchFullTypeSetting() === GlobalSearchType.ADVANCED
   }
 
   constructor() {

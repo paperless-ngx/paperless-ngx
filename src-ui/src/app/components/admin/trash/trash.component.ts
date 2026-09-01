@@ -41,6 +41,8 @@ export class TrashComponent
   private modalService = inject(NgbModal)
   private settingsService = inject(SettingsService)
   private router = inject(Router)
+  private readonly emptyTrashDelaySetting =
+    this.settingsService.getSignal<number>(SETTINGS_KEYS.EMPTY_TRASH_DELAY)
 
   readonly documentsInTrash = signal<Document[]>([])
   readonly selectedDocuments = signal<Set<number>>(new Set())
@@ -200,8 +202,7 @@ export class TrashComponent
   }
 
   getDaysRemaining(document: Document): number {
-    this.settingsService.trackChanges()
-    const delay = this.settingsService.get(SETTINGS_KEYS.EMPTY_TRASH_DELAY)
+    const delay = this.emptyTrashDelaySetting()
     const diff = new Date().getTime() - new Date(document.deleted_at).getTime()
     const days = Math.ceil(diff / (1000 * 3600 * 24))
     return delay - days
