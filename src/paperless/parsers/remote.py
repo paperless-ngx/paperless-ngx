@@ -436,6 +436,16 @@ class RemoteDocumentParser:
         from azure.ai.documentintelligence.models import DocumentContentFormat
         from azure.core.credentials import AzureKeyCredential
 
+        from paperless.network import validate_outbound_http_url
+
+        try:
+            validate_outbound_http_url(
+                config.endpoint,
+                allow_internal=settings.REMOTE_OCR_ALLOW_INTERNAL_ENDPOINTS,
+            )
+        except ValueError as e:
+            raise ParseError(f"Invalid remote OCR endpoint: {e}") from e
+
         client = DocumentIntelligenceClient(
             endpoint=config.endpoint,
             credential=AzureKeyCredential(config.api_key),
