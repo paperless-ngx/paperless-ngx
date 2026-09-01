@@ -1034,6 +1034,49 @@ describe('FilterEditorComponent', () => {
     ).toEqual([42, CustomFieldQueryOperator.Exists, 'true'])
   })
 
+  it('should reflect ingested custom field query rules in the dropdown toggle', () => {
+    const dropdown = fixture.debugElement.query(
+      By.css('pngx-custom-fields-query-dropdown')
+    )
+    expect(
+      dropdown.nativeElement.querySelector('pngx-clearable-badge')
+    ).toBeNull()
+
+    // switching to a view with a custom field query
+    component.filterRules = [
+      {
+        rule_type: FILTER_CUSTOM_FIELDS_QUERY,
+        value: '["OR",[[42,"exists","true"]]]',
+      },
+    ]
+    fixture.detectChanges()
+    expect(
+      dropdown.nativeElement.querySelector('pngx-clearable-badge')
+    ).not.toBeNull()
+    expect(
+      dropdown.nativeElement
+        .querySelector('#dropdown_toggle')
+        .classList.contains('btn-primary')
+    ).toBeTruthy()
+
+    // and back to a view without one
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_TAGS_ALL,
+        value: '19',
+      },
+    ]
+    fixture.detectChanges()
+    expect(
+      dropdown.nativeElement.querySelector('pngx-clearable-badge')
+    ).toBeNull()
+    expect(
+      dropdown.nativeElement
+        .querySelector('#dropdown_toggle')
+        .classList.contains('btn-primary')
+    ).toBeFalsy()
+  })
+
   it('should ingest filter rules for owner', () => {
     expect(component.permissionsSelectionModel.ownerFilter).toEqual(
       OwnerFilterType.NONE
