@@ -84,8 +84,6 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
 
   readonly users = signal<User[]>([])
 
-  hideUnowned: boolean
-
   get isActive(): boolean {
     return (
       this.selectionModel.ownerFilter() !== OwnerFilterType.NONE ||
