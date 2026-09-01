@@ -346,6 +346,11 @@ export class DocumentDetailComponent
     return this.settings.get(SETTINGS_KEYS.AI_ENABLED)
   }
 
+  get aiSuggestOnOpen(): boolean {
+    this.settings.trackChanges()
+    return this.settings.get(SETTINGS_KEYS.AI_SUGGEST_ON_OPEN)
+  }
+
   get archiveContentRenderType(): ContentRenderType {
     this.settings.trackChanges()
     const hasArchiveVersion =
@@ -899,6 +904,9 @@ export class DocumentDetailComponent
     this.updateFormForCustomFields()
     this.loadMetadataForSelectedVersion()
     if (
+      // AI suggestions can be requested on open or left to the Suggest control;
+      // classifier suggestions are always requested automatically
+      (!this.aiEnabled || this.aiSuggestOnOpen) &&
       this.permissionsService.currentUserHasObjectPermissions(
         PermissionAction.Change,
         doc

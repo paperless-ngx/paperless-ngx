@@ -4133,6 +4133,7 @@ class UiSettingsView(GenericAPIView[Any]):
         ai_config = AIConfig()
 
         ui_settings["ai_enabled"] = ai_config.ai_enabled
+        ui_settings["ai_suggest_on_open"] = ai_config.ai_suggest_on_open
 
         user_resp = {
             "id": user.id,

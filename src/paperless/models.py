@@ -427,6 +427,11 @@ class ApplicationConfiguration(AbstractSingletonModel):
         validators=[MinValueValidator(1)],
     )
 
+    ai_suggest_on_open = models.BooleanField(
+        verbose_name=_("Request AI suggestions when opening inbox documents"),
+        null=True,
+    )
+
     class Meta:
         verbose_name = _("paperless application settings")
         permissions = [

@@ -244,6 +244,7 @@ class AIConfig(BaseConfig):
     llm_endpoint: str = dataclasses.field(init=False)
     llm_output_language: str = dataclasses.field(init=False)
     llm_allow_internal_endpoints: bool = dataclasses.field(init=False)
+    ai_suggest_on_open: bool = dataclasses.field(init=False)
 
     def __post_init__(self) -> None:
         app_config = self._get_config_instance()
@@ -273,6 +274,11 @@ class AIConfig(BaseConfig):
             app_config.llm_output_language or settings.LLM_OUTPUT_LANGUAGE
         )
         self.llm_allow_internal_endpoints = settings.LLM_ALLOW_INTERNAL_ENDPOINTS
+        self.ai_suggest_on_open = (
+            app_config.ai_suggest_on_open
+            if app_config.ai_suggest_on_open is not None
+            else settings.AI_SUGGEST_ON_OPEN
+        )
 
     @property
     def llm_index_enabled(self) -> bool:

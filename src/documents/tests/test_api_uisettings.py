@@ -60,6 +60,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
                 },
                 "email_enabled": False,
                 "ai_enabled": False,
+                "ai_suggest_on_open": True,
                 "remote_ocr": {
                     "configured": False,
                     "mode": "always",

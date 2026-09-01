@@ -88,6 +88,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 "llm_endpoint": None,
                 "llm_output_language": None,
                 "llm_request_timeout": None,
+                "ai_suggest_on_open": None,
             },
         )
 

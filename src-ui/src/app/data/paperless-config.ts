@@ -419,6 +419,14 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     category: ConfigCategory.AI,
     note: $localize`Timeout in seconds for LLM requests.`,
   },
+  {
+    key: 'ai_suggest_on_open',
+    title: $localize`Suggest On Open`,
+    type: ConfigOptionType.Boolean,
+    config_key: 'PAPERLESS_AI_SUGGEST_ON_OPEN',
+    category: ConfigCategory.AI,
+    note: $localize`Request AI suggestions automatically when opening a document with an inbox tag. When disabled, AI suggestions are only requested via the Suggest button. Classifier-based suggestions are not affected.`,
+  },
 ]
 
 export interface PaperlessConfig extends ObjectWithId {
@@ -465,4 +473,5 @@ export interface PaperlessConfig extends ObjectWithId {
   llm_endpoint: string
   llm_output_language: string
   llm_request_timeout: number
+  ai_suggest_on_open: boolean
 }
