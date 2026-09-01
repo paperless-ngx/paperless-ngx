@@ -47,6 +47,8 @@ $grid-breakpoints: (
 );
 
 :root {
+  --bs-border-radius: #{$border-radius};
+
   @each $name, $value in $grid-breakpoints {
     --bs-breakpoint-#{$name}: #{$value};
   }
@@ -78,19 +80,12 @@ body {
 }
 
 .btn {
-  --bs-btn-border-radius: .425rem;
-  --bs-border-radius-sm: .425rem;
+  --bs-border-radius-sm: #{$border-radius};
   font-weight: 500;
 }
 
-.form-control,
-.form-select,
-.input-group-text {
-  border-radius: .425rem;
-}
-
 .pagination, .input-group {
-  --bs-border-radius-sm: .425rem;
+  --bs-border-radius-sm: #{$border-radius};
 }
 
 @media(min-width: 768px) {
@@ -689,10 +684,6 @@ table.table {
   --bs-toast-max-width: var(--pngx-toast-max-width);
 }
 
-.alert {
-  --bs-border-radius: .425rem;
-}
-
 .alert-primary {
   --bs-alert-color: var(--bs-primary);
   --bs-alert-bg: var(--pngx-primary-faded);
@@ -824,8 +815,6 @@ code {
   --bs-accordion-bg: var(--bs-light);
   --bs-accordion-active-color: var(--bs-primary);
   --bs-accordion-active-bg: var(--pngx-bg-alt);
-  --bs-border-radius: .425rem;
-  --bs-accordion-inner-border-radius: calc(.425rem - 1px);
 }
 
 .accordion-button::after {
