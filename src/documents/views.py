@@ -4579,6 +4579,10 @@ class ShareLinkViewSet(
 class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
     model = ShareLinkBundle
 
+    # Bundles are immutable once created; rebuild via the dedicated action
+    # rather than PUT/PATCH.
+    http_method_names = ["get", "post", "delete", "head", "options"]
+
     queryset = ShareLinkBundle.objects.all()
 
     serializer_class = ShareLinkBundleSerializer
