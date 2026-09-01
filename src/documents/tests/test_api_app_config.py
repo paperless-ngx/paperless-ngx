@@ -1114,3 +1114,28 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
             response.data["remote_ocr_endpoint"],
             "http://127.0.0.1:5000",
         )
+
+    @override_settings(REMOTE_OCR_ALLOW_INTERNAL_ENDPOINTS=False)
+    def test_update_remote_ocr_endpoint_empty_value_skips_validation(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - Internal remote OCR endpoints are disallowed
+        WHEN:
+            - The config is updated with an empty remote OCR endpoint
+        THEN:
+            - The request is accepted; clearing the field never needs
+              outbound URL validation
+        """
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            json.dumps(
+                {
+                    "remote_ocr_endpoint": "",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["remote_ocr_endpoint"], "")
