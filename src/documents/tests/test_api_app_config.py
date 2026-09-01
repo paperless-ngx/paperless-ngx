@@ -1063,3 +1063,54 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("non-public address", str(response.data).lower())
+
+    @override_settings(REMOTE_OCR_ALLOW_INTERNAL_ENDPOINTS=False)
+    def test_update_remote_ocr_endpoint_blocks_internal_endpoint_when_disallowed(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - Internal remote OCR endpoints are disallowed
+        WHEN:
+            - The config is updated with a remote OCR endpoint resolving internally
+        THEN:
+            - The request is rejected
+        """
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            json.dumps(
+                {
+                    "remote_ocr_endpoint": "http://127.0.0.1:5000",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("non-public address", str(response.data).lower())
+
+    @override_settings(REMOTE_OCR_ALLOW_INTERNAL_ENDPOINTS=True)
+    def test_update_remote_ocr_endpoint_allows_internal_endpoint_by_default(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - Internal remote OCR endpoints are allowed (the default)
+        WHEN:
+            - The config is updated with a remote OCR endpoint resolving internally
+        THEN:
+            - The request is accepted, preserving existing self-hosted deployments
+        """
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            json.dumps(
+                {
+                    "remote_ocr_endpoint": "http://127.0.0.1:5000",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data["remote_ocr_endpoint"],
+            "http://127.0.0.1:5000",
+        )
