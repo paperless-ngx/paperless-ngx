@@ -16,6 +16,9 @@ from django.core.cache import cache
 from django.core.cache import caches
 
 from documents.models import Document
+from paperless.signed_pickle import SignedPickleError
+from paperless.signed_pickle import signed_pickle_dumps
+from paperless.signed_pickle import signed_pickle_loads
 
 if TYPE_CHECKING:
     from django.core.cache.backends.base import BaseCache
@@ -118,9 +121,11 @@ class StoredLRUCache(LRUCache):
         serialized_data = self._backend.get(self._backend_key)
         try:
             self._data = (
-                pickle.loads(serialized_data) if serialized_data else OrderedDict()
+                signed_pickle_loads(serialized_data)
+                if serialized_data
+                else OrderedDict()
             )
-        except pickle.PickleError:
+        except (SignedPickleError, pickle.PickleError):
             logger.warning(
                 "Cache exists in backend but could not be read (possibly invalid format)",
             )
@@ -132,7 +137,7 @@ class StoredLRUCache(LRUCache):
         """
         self._backend.set(
             self._backend_key,
-            pickle.dumps(self._data),
+            signed_pickle_dumps(self._data),
             self.backend_ttl,
         )
 

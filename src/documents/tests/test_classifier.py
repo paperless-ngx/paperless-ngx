@@ -19,6 +19,8 @@ from documents.models import MatchingModel
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
+from paperless.signed_pickle import HMAC_SIZE
+from paperless.signed_pickle import signed_pickle_dumps
 
 
 def dummy_preprocess(content: str, **kwargs):
@@ -264,6 +266,27 @@ class TestClassifier(DirectoriesMixin, TestCase):
             # It should be called once per document (doc1 and doc2)
             self.assertEqual(mock_preprocess_content.call_count, 2)
             self.assertEqual(mock_transform.call_count, 2)
+
+    def test_vectorize_recomputes_tampered_cache_entry(self) -> None:
+        cached = bytearray(signed_pickle_dumps(["cached vector"]))
+        cached[HMAC_SIZE] ^= 0xFF
+        self.classifier.data_vectorizer = mock.Mock()
+        self.classifier.data_vectorizer.transform.return_value = ["fresh vector"]
+
+        with (
+            mock.patch(
+                "documents.classifier.read_cache.get",
+                return_value=bytes(cached),
+            ),
+            mock.patch("documents.classifier.read_cache.set") as cache_set,
+            mock.patch("documents.classifier.read_cache.touch") as cache_touch,
+        ):
+            result = self.classifier._vectorize("content")
+
+        self.assertEqual(result, ["fresh vector"])
+        self.classifier.data_vectorizer.transform.assert_called_once()
+        cache_set.assert_called_once()
+        cache_touch.assert_not_called()
 
     def test_no_retrain_if_no_change(self) -> None:
         """
