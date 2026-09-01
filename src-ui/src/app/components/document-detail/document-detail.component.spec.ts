@@ -1209,22 +1209,51 @@ describe('DocumentDetailComponent', () => {
     expect(fixture.debugElement.queryAll(By.css('textarea.rtl'))).not.toBeNull()
   })
 
-  it('should display built-in pdf viewer if not disabled', () => {
+  it('should display built-in pdf viewer if not disabled', async () => {
     initNormally()
-    component.document().archived_file_name = 'file.pdf'
+    component.document.update((document) => ({
+      ...document,
+      archived_file_name: 'file.pdf',
+    }))
     settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, false)
     expect(component.useNativePdfViewer).toBeFalsy()
-    fixture.detectChanges()
+    await fixture.whenStable()
     expect(fixture.debugElement.query(By.css('pngx-pdf-viewer'))).not.toBeNull()
   })
 
   it('should display native pdf viewer if enabled', () => {
     initNormally()
-    component.document().archived_file_name = 'file.pdf'
+    component.document.update((document) => ({
+      ...document,
+      archived_file_name: 'file.pdf',
+    }))
     settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, true)
     expect(component.useNativePdfViewer).toBeTruthy()
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('object'))).not.toBeNull()
+  })
+
+  it('should reflect signal-backed document detail display settings', () => {
+    settingsService.set(SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL, false)
+    settingsService.set(SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS, [
+      component.DocumentDetailFieldID.Correspondent,
+    ])
+
+    expect(component.showThumbnailOverlay).toBeFalsy()
+    expect(
+      component.isFieldHidden(component.DocumentDetailFieldID.Correspondent)
+    ).toBeTruthy()
+    expect(
+      component.isFieldHidden(component.DocumentDetailFieldID.DocumentType)
+    ).toBeFalsy()
+
+    settingsService.set(SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL, true)
+    settingsService.set(SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS, [])
+
+    expect(component.showThumbnailOverlay).toBeTruthy()
+    expect(
+      component.isFieldHidden(component.DocumentDetailFieldID.Correspondent)
+    ).toBeFalsy()
   })
 
   it('should attempt to retrieve metadata', () => {
@@ -1685,7 +1714,10 @@ describe('DocumentDetailComponent', () => {
 
   it('should change preview element by render type', () => {
     initNormally()
-    component.document().archived_file_name = 'file.pdf'
+    component.document.update((document) => ({
+      ...document,
+      archived_file_name: 'file.pdf',
+    }))
     fixture.detectChanges()
     expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.PDF
@@ -1694,8 +1726,11 @@ describe('DocumentDetailComponent', () => {
       fixture.debugElement.query(By.css('pdf-viewer-container'))
     ).not.toBeUndefined()
 
-    component.document().archived_file_name = undefined
-    component.document().mime_type = 'text/plain'
+    component.document.update((document) => ({
+      ...document,
+      archived_file_name: undefined,
+      mime_type: 'text/plain',
+    }))
     fixture.detectChanges()
     expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.Text
@@ -1704,7 +1739,10 @@ describe('DocumentDetailComponent', () => {
       fixture.debugElement.query(By.css('div.preview-sticky'))
     ).not.toBeUndefined()
 
-    component.document().mime_type = 'image/jpeg'
+    component.document.update((document) => ({
+      ...document,
+      mime_type: 'image/jpeg',
+    }))
     fixture.detectChanges()
     expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.Image
@@ -1712,9 +1750,12 @@ describe('DocumentDetailComponent', () => {
     expect(
       fixture.debugElement.query(By.css('.preview-sticky img'))
     ).not.toBeUndefined()
-    ;((component.document().mime_type =
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
-      fixture.detectChanges())
+    component.document.update((document) => ({
+      ...document,
+      mime_type:
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    }))
+    fixture.detectChanges()
     expect(component.archiveContentRenderType).toEqual(
       component.ContentRenderType.Other
     )

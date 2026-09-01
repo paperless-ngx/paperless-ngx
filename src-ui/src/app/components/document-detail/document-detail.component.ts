@@ -227,6 +227,19 @@ export class DocumentDetailComponent
   private deviceDetectorService = inject(DeviceDetectorService)
   private savedViewService = inject(SavedViewService)
   private readonly websocketStatusService = inject(WebsocketStatusService)
+  private readonly useNativePdfViewerSetting = this.settings.getSignal<boolean>(
+    SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER
+  )
+  private readonly aiEnabledSetting = this.settings.getSignal<boolean>(
+    SETTINGS_KEYS.AI_ENABLED
+  )
+  private readonly showThumbnailOverlaySetting =
+    this.settings.getSignal<boolean>(
+      SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL
+    )
+  private readonly hiddenFieldsSetting = this.settings.getSignal<
+    DocumentDetailFieldID[]
+  >(SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS)
 
   @ViewChild('inputTitle')
   titleInput: TextComponent
@@ -333,8 +346,7 @@ export class DocumentDetailComponent
   }
 
   get useNativePdfViewer(): boolean {
-    this.settings.trackChanges()
-    return this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
+    return this.useNativePdfViewerSetting()
   }
 
   get isMobile(): boolean {
@@ -342,12 +354,10 @@ export class DocumentDetailComponent
   }
 
   get aiEnabled(): boolean {
-    this.settings.trackChanges()
-    return this.settings.get(SETTINGS_KEYS.AI_ENABLED)
+    return this.aiEnabledSetting()
   }
 
   get archiveContentRenderType(): ContentRenderType {
-    this.settings.trackChanges()
     const hasArchiveVersion =
       this.metadata()?.has_archive_version ??
       !!this.document()?.archived_file_name
@@ -359,22 +369,17 @@ export class DocumentDetailComponent
   }
 
   get originalContentRenderType(): ContentRenderType {
-    this.settings.trackChanges()
     return this.getRenderType(
       this.metadata()?.original_mime_type || this.document()?.mime_type
     )
   }
 
   get showThumbnailOverlay(): boolean {
-    this.settings.trackChanges()
-    return this.settings.get(SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL)
+    return this.showThumbnailOverlaySetting()
   }
 
   isFieldHidden(fieldId: DocumentDetailFieldID): boolean {
-    this.settings.trackChanges()
-    return this.settings
-      .get(SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS)
-      .includes(fieldId)
+    return this.hiddenFieldsSetting().includes(fieldId)
   }
 
   private getRenderType(mimeType: string): ContentRenderType {
