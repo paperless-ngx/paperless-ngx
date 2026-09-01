@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-29 20:02+0000\n"
-"PO-Revision-Date: 2026-08-30 14:53\n"
+"POT-Creation-Date: 2026-09-01 14:47+0000\n"
+"PO-Revision-Date: 2026-09-01 14:48\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -1610,48 +1610,48 @@ msgstr "esecuzione del flusso di lavoro"
 msgid "workflow runs"
 msgstr "esecuzioni del flusso di lavoro"
 
-#: documents/serialisers.py:523 documents/serialisers.py:875
-#: documents/serialisers.py:2827 documents/views.py:313 documents/views.py:2611
+#: documents/serialisers.py:524 documents/serialisers.py:878
+#: documents/serialisers.py:2830 documents/views.py:313 documents/views.py:2613
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "Autorizzazioni insufficienti."
 
-#: documents/serialisers.py:711
+#: documents/serialisers.py:714
 msgid "Invalid color."
 msgstr "Colore non valido."
 
-#: documents/serialisers.py:2304
+#: documents/serialisers.py:2307
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Il tipo di file %(type)s non è supportato"
 
-#: documents/serialisers.py:2348
+#: documents/serialisers.py:2351
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "L'ID del campo personalizzato deve essere un numero intero: %(id)s"
 
-#: documents/serialisers.py:2355
+#: documents/serialisers.py:2358
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Il campo personalizzato con ID %(id)s non esiste"
 
-#: documents/serialisers.py:2372 documents/serialisers.py:2382
+#: documents/serialisers.py:2375 documents/serialisers.py:2385
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "I campi personalizzati devono essere un elenco di numeri interi o un oggetto che mappa gli ID ai valori."
 
-#: documents/serialisers.py:2377
+#: documents/serialisers.py:2380
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Alcuni campi personalizzati non esistono o sono stati specificati due volte."
 
-#: documents/serialisers.py:2524
+#: documents/serialisers.py:2527
 msgid "Invalid variable detected."
 msgstr "Variabile non valida rilevata."
 
-#: documents/serialisers.py:2883
+#: documents/serialisers.py:2886
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Non sono consentiti identificatori di documenti duplicati."
 
-#: documents/serialisers.py:2913 documents/views.py:4608
+#: documents/serialisers.py:2916 documents/views.py:4610
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Documenti non trovati: %(ids)s"
@@ -1907,36 +1907,36 @@ msgstr "Lo schema URI '{parts.scheme}' non è consentito. Schemi consentiti: {',
 msgid "Unable to parse URI {value}"
 msgstr "Impossibile analizzare l'URI {value}"
 
-#: documents/views.py:306 documents/views.py:2608
+#: documents/views.py:306 documents/views.py:2610
 msgid "Invalid more_like_id"
 msgstr "more_like_id non valido"
 
-#: documents/views.py:1582
+#: documents/views.py:1584
 msgid "Invalid AI configuration."
 msgstr "Configurazione AI non valida."
 
-#: documents/views.py:1593
+#: documents/views.py:1595
 msgid "AI backend request timed out."
 msgstr "Richiesta di backend AI scaduta."
 
-#: documents/views.py:2433 documents/views.py:2754
+#: documents/views.py:2435 documents/views.py:2756
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Specificare solo uno tra text, title_search, query o more_like_id."
 
-#: documents/views.py:4621
+#: documents/views.py:4623
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Autorizzazioni insufficienti per condividere il documento %(id)s."
 
-#: documents/views.py:4667
+#: documents/views.py:4669
 msgid "Bundle is already being processed."
 msgstr "Il pacchetto è già in fase di elaborazione."
 
-#: documents/views.py:4728
+#: documents/views.py:4730
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Il pacchetto di link di condivisione è ancora in fase di preparazione. Riprova più tardi."
 
-#: documents/views.py:4738
+#: documents/views.py:4740
 msgid "The share link bundle is unavailable."
 msgstr "Il pacchetto di link di condivisione non è disponibile."
 
