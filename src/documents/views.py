@@ -116,7 +116,7 @@ from documents.caching import get_suggestion_cache
 from documents.caching import refresh_llm_suggestions_cache
 from documents.caching import refresh_metadata_cache
 from documents.caching import refresh_suggestions_cache
-from documents.caching import set_llm_suggestions_cache
+from documents.caching import retrieve_llm_suggestions
 from documents.caching import set_metadata_cache
 from documents.caching import set_suggestions_cache
 from documents.classifier import load_classifier
@@ -247,7 +247,6 @@ from paperless.parsers.remote import RemoteEngineConfig
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
-from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.ai_classifier import get_llm_output_language
 from paperless_ai.chat import stream_chat_with_documents
 from paperless_ai.exceptions import LLMTimeoutError
@@ -1567,10 +1566,13 @@ class DocumentViewSet(
             llm_suggestions = cached_llm_suggestions.suggestions
         else:
             try:
-                llm_suggestions = get_ai_document_classification(
-                    doc,
-                    request.user,
-                    output_language,
+                llm_suggestions = retrieve_llm_suggestions(
+                    document=doc,
+                    user=request.user,
+                    output_language=output_language,
+                    backend=llm_cache_backend,
+                    # Classification, localization + 30s
+                    lock_timeout=(2 * ai_config.llm_request_timeout) + 30,
                 )
             except ValueError as exc:
                 logger.exception(
@@ -1595,11 +1597,6 @@ class DocumentViewSet(
                     {"ai": [_("AI backend request timed out.")]},
                     status=status.HTTP_503_SERVICE_UNAVAILABLE,
                 )
-            set_llm_suggestions_cache(
-                doc.pk,
-                llm_suggestions,
-                backend=llm_cache_backend,
-            )
 
         tags_choice: TaxonomyChoiceDict = llm_suggestions["tags"]
         correspondents_choice: TaxonomyChoiceDict = llm_suggestions["correspondents"]

@@ -3,13 +3,16 @@ from __future__ import annotations
 import hashlib
 import logging
 import pickle
+import time
 import uuid
 from binascii import hexlify
 from collections import OrderedDict
 from dataclasses import dataclass
+from hashlib import sha256
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Final
+from uuid import uuid4
 
 from django.conf import settings
 from django.core.cache import cache
@@ -18,6 +21,7 @@ from django.core.cache import caches
 from documents.models import Document
 
 if TYPE_CHECKING:
+    from django.contrib.auth.models import User
     from django.core.cache.backends.base import BaseCache
 
     from documents.classifier import DocumentClassifier
@@ -55,6 +59,9 @@ CLASSIFIER_MODIFIED_KEY: Final[str] = "classifier_modified"
 #   1002 - names are always generated and optional candidate mappings are
 #          validated separately, so candidate-anchored 1001 results are stale
 LLM_CACHE_CLASSIFIER_VERSION: Final[int] = 1002
+
+# How often a request waiting on llm generation re-checks the cache
+LLM_SUGGESTION_POLL_INTERVAL: Final[float] = 0.5
 
 CACHE_1_MINUTE: Final[int] = 60
 CACHE_5_MINUTES: Final[int] = 5 * CACHE_1_MINUTE
@@ -255,6 +262,68 @@ def get_llm_suggestion_cache(
         return data
 
     return None
+
+
+def retrieve_llm_suggestions(
+    document: Document,
+    user: User | None,
+    output_language: str | None,
+    *,
+    backend: str,
+    lock_timeout: int,
+) -> dict:
+    """Return cached LLM suggestions, generating them once across workers."""
+    # Lazy import to avoid pulling in the whole AI stuff
+    from paperless_ai.ai_classifier import get_ai_document_classification
+    from paperless_ai.exceptions import LLMTimeoutError
+
+    lock_key = (
+        f"{get_suggestion_cache_key(document.pk)}_llm_lock_"
+        f"{sha256(backend.encode()).hexdigest()}"
+    )
+    waited = False
+
+    while True:
+        cached = get_llm_suggestion_cache(document.pk, backend=backend)
+        if cached is not None:
+            refresh_suggestions_cache(document.pk)
+            return cached.suggestions
+
+        lock_token = uuid4().hex
+        if cache.add(lock_key, lock_token, lock_timeout):
+            if waited:
+                # The generation we were waiting on has ended without caching
+                # anything so it either failed or outlived its lock. Give up
+                # rather than re-running it
+                cache.delete(lock_key)
+                raise LLMTimeoutError
+
+            try:
+                # The cache may have been populated while acquiring the lock.
+                cached = get_llm_suggestion_cache(document.pk, backend=backend)
+                if cached is not None:
+                    refresh_suggestions_cache(document.pk)
+                    return cached.suggestions
+
+                suggestions = get_ai_document_classification(
+                    document,
+                    user,
+                    output_language,
+                )
+                set_llm_suggestions_cache(
+                    document.pk,
+                    suggestions,
+                    backend=backend,
+                )
+                return suggestions
+            finally:
+                # Don't remove lock if this one expired while generation was still running
+                if cache.get(lock_key) == lock_token:
+                    cache.delete(lock_key)
+
+        waited = True
+        # Another worker is generating suggestions, poll to avoid another LLM request
+        time.sleep(LLM_SUGGESTION_POLL_INTERVAL)
 
 
 def set_llm_suggestions_cache(

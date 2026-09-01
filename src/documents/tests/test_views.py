@@ -446,7 +446,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         self.assertEqual(response.json()["tags"], [])
         self.assertEqual(response.json()["suggested_tags"], [])
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -496,7 +496,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             None,
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -534,7 +534,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             "KI Title",
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -573,7 +573,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             "Titre IA",
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -609,7 +609,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             ),
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -681,7 +681,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             ),
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="openai-like",
@@ -710,7 +710,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             get_llm_suggestion_cache(self.document.pk, backend="openai-like"),
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="openai-like",
@@ -737,7 +737,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             get_llm_suggestion_cache(self.document.pk, backend="openai-like"),
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -775,7 +775,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         self.assertEqual(response.json()["tags"], [self.tag1.pk])
         self.assertEqual(response.json()["suggested_tags"], ["Follow-up"])
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -814,7 +814,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         self.assertEqual(response.json()["tags"], [self.tag1.pk])
         self.assertEqual(response.json()["suggested_tags"], [])
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
