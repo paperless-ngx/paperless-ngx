@@ -65,7 +65,7 @@ services:
       - "--chromium-disable-javascript=true"
       - "--chromium-allow-list=file:///tmp/.*"
   tika:
-    image: docker.io/apache/tika:3.3.1.0
+    image: docker.io/apache/tika:4.0.0-1
     restart: unless-stopped
 volumes:
   data:
