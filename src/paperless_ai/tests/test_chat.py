@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 import json
+from typing import TYPE_CHECKING
+from typing import Any
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
@@ -17,6 +21,11 @@ from paperless_ai.chat import CHAT_METADATA_DELIMITER
 from paperless_ai.chat import _build_chat_prompt
 from paperless_ai.chat import _build_refine_prompt
 from paperless_ai.chat import stream_chat_with_documents
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import pytest_mock
 
 
 @pytest.fixture(autouse=True)
@@ -312,6 +321,30 @@ def test_stream_chat_unexpected_failure_returns_generic_error(caplog) -> None:
 
 @pytest.mark.django_db
 class TestStreamChatRetrieval:
+    @pytest.fixture
+    def captured_filters(self, mocker: pytest_mock.MockerFixture) -> list[Any]:
+        """Stub out the AI client and the retriever, capturing the ``filters``
+        kwarg of every VectorIndexRetriever construction.
+
+        VectorIndexRetriever is imported inside _stream_chat_with_documents,
+        so it is patched at the llama_index source for the lazy import to
+        pick it up.
+        """
+        captured: list[Any] = []
+        retriever = mocker.MagicMock()
+        retriever.retrieve.return_value = []
+
+        def capture_retriever(*args, **kwargs) -> pytest_mock.MockType:
+            captured.append(kwargs.get("filters"))
+            return retriever
+
+        mocker.patch("paperless_ai.chat.AIClient")
+        mocker.patch(
+            "llama_index.core.retrievers.VectorIndexRetriever",
+            side_effect=capture_retriever,
+        )
+        return captured
+
     def test_no_nodes_yields_no_content_message(
         self,
         temp_llm_index_dir,
@@ -329,9 +362,9 @@ class TestStreamChatRetrieval:
 
     def test_chat_filter_contains_only_requested_document_ids(
         self,
-        temp_llm_index_dir,
-        mock_embed_model,
-        mocker,
+        temp_llm_index_dir: Path,
+        mock_embed_model: pytest_mock.MockType,
+        captured_filters: list[Any],
     ) -> None:
         """The MetadataFilter passed to the retriever must be scoped to the
         requested documents only — content from other indexed documents must
@@ -341,22 +374,6 @@ class TestStreamChatRetrieval:
         excluded = DocumentFactory.create(content="excluded document content")
         indexing.llm_index_add_or_update_document(included)
         indexing.llm_index_add_or_update_document(excluded)
-
-        # VectorIndexRetriever is imported inside _stream_chat_with_documents;
-        # patch it at the llama_index source so the lazy import picks it up.
-        captured_filters = []
-        mock_retriever = mocker.MagicMock()
-        mock_retriever.retrieve.return_value = []
-
-        def capture_retriever(*args, **kwargs):
-            captured_filters.append(kwargs.get("filters"))
-            return mock_retriever
-
-        mocker.patch("paperless_ai.chat.AIClient")
-        mocker.patch(
-            "llama_index.core.retrievers.VectorIndexRetriever",
-            side_effect=capture_retriever,
-        )
 
         list(
             chat.stream_chat_with_documents(
@@ -371,6 +388,37 @@ class TestStreamChatRetrieval:
         filter_values = filt.filters[0].value
         assert str(included.pk) in filter_values
         assert str(excluded.pk) not in filter_values
+
+    def test_unrestricted_chat_skips_document_id_filter(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: pytest_mock.MockType,
+        captured_filters: list[Any],
+    ) -> None:
+        """
+        GIVEN:
+            - A document indexed in the vector store
+        WHEN:
+            - stream_chat_with_documents is called with unrestricted=True
+        THEN:
+            - The retriever receives no document id filter (filters=None),
+              since an unrestricted caller can see every document and an id
+              filter here would only risk the vector store's IN-filter
+              safety limit on large installs, never narrow the search
+        """
+        included = DocumentFactory.create(content="included document content")
+        indexing.llm_index_add_or_update_document(included)
+
+        list(
+            chat.stream_chat_with_documents(
+                "question?",
+                Document.objects.filter(pk=included.pk),
+                unrestricted=True,
+            ),
+        )
+
+        assert captured_filters, "VectorIndexRetriever was never constructed"
+        assert captured_filters[0] is None
 
     @pytest.mark.django_db
     def test_get_document_references_only_queries_referenced_documents(
