@@ -34,9 +34,7 @@
   }
 
   @media (min-width: 768px) {
-    &.expanded {
-      --pngx-sidebar-width: var(--pngx-sidebar-expanded-width);
-    }
+    --pngx-sidebar-width: var(--pngx-sidebar-expanded-width);
   }
 }
 @media (max-width: 767.98px) {
@@ -113,6 +111,13 @@ main {
     }
   }
 
+  // only animate when the user toggles slim mode
+  .sidebar:not(.animating),
+  .sidebar:not(.animating) ~ main,
+  .sidebar:not(.animating) .sidebar-slim-toggler {
+    transition: none;
+  }
+
   .sidebar.slim {
     max-width: 55px;
 
@@ -123,8 +128,6 @@ main {
   }
 
   .sidebar.slim:not(.animating) {
-    transition: none;
-
     li.nav-item span,
     .sidebar-heading span {
       display: none;
@@ -142,10 +145,6 @@ main {
         margin-right: 0 !important;
       }
     }
-  }
-
-  .sidebar.slim:not(.animating) ~ main.col-slim {
-    transition: none;
   }
 
   .sidebar.animating {
@@ -194,6 +193,26 @@ main {
 ::ng-deep .popover-slim .popover-body {
   --bs-popover-body-padding-x: .5rem;
   --bs-popover-body-padding-y: .5rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sidebar-sticky > ul,
+  .sidebar-sticky > .nav-group {
+    animation: sidebar-nav-in .3s cubic-bezier(.22, .61, .36, 1) backwards;
+  }
+
+  @for $i from 2 through 5 {
+    .sidebar-sticky > :nth-child(#{$i}) {
+      animation-delay: #{($i - 1) * 0.04}s;
+    }
+  }
+}
+
+@keyframes sidebar-nav-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
 }
 
 .sidebar-sticky {
