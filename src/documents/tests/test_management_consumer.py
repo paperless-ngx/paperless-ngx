@@ -516,13 +516,7 @@ class TestConsumeFile:
         sample_pdf: Path,
         mock_consume_file_delay: MagicMock,
     ) -> None:
-        """
-        Test _consume_file reports failure when apply_async raises.
-
-        Callers rely on this return value to avoid marking the file as
-        queued when the broker publish itself failed (GH #13923) - a false
-        positive here would strand the file until the consumer restarts.
-        """
+        """Test _consume_file reports failure when apply_async raises."""
         target = consumption_dir / "document.pdf"
         shutil.copy(sample_pdf, target)
 
@@ -1299,31 +1293,29 @@ class TestCommandRetryAfterQueueFailure:
         start_consumer: Callable[..., ConsumerThread],
     ) -> None:
         """A publish failure from the watch loop is retried by the rescan."""
-        call_count = 0
+        apply_async = mock_consume_file_delay.apply_async
 
-        def flaky_apply_async(*args: object, **kwargs: object) -> None:
-            nonlocal call_count
-            call_count += 1
-            if call_count == 1:
+        def fail_first_call(*args: object, **kwargs: object) -> None:
+            if apply_async.call_count == 1:
                 raise Exception("broker down")
 
-        mock_consume_file_delay.apply_async.side_effect = flaky_apply_async
+        apply_async.side_effect = fail_first_call
 
         thread = start_consumer(stability_delay=0.1, rescan_interval=0.3)
 
         target = consumption_dir / "document.pdf"
         shutil.copy(sample_pdf, target)
 
-        start_time = monotonic()
-        while call_count < 2 and monotonic() - start_time < 5.0:
+        deadline = monotonic() + 5.0
+        while apply_async.call_count < 2 and monotonic() < deadline:
             sleep(0.1)
 
         if thread.exception:
             raise thread.exception
 
-        assert call_count >= 2, (
+        assert apply_async.call_count >= 2, (
             "Expected the failed publish to be retried by the rescan, "
-            f"but apply_async was only called {call_count} time(s)"
+            f"but apply_async was only called {apply_async.call_count} time(s)"
         )
 
 

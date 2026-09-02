@@ -325,8 +325,8 @@ def _consume_file(
 
     Returns:
         True if the file was successfully handed to Celery, False otherwise.
-        Callers must not treat the file as queued on failure, or it will be
-        stranded until the consumer process restarts.
+        Callers must not record the file as queued on failure, or the rescan
+        will never retry it.
     """
     # Verify file still exists and is accessible
     try:
@@ -361,8 +361,8 @@ def _consume_file(
     except Exception:
         logger.exception(f"Error while queuing document {filepath}")
         return False
-    else:
-        return True
+
+    return True
 
 
 class Command(BaseCommand):
@@ -659,18 +659,16 @@ class Command(BaseCommand):
 
                     # Check for stable files
                     for stable_path in tracker.get_stable_files():
+                        # Only remember files that were actually queued, so the
+                        # rescan does not re-queue them while the consume task
+                        # has yet to remove them from disk, but does retry a
+                        # failed publish instead of stranding it
                         if _consume_file(
                             filepath=stable_path,
                             consumption_dir=directory,
                             subdirs_as_tags=subdirs_as_tags,
                         ):
-                            # Remember it so the rescan does not re-queue it
-                            # while the consume task has yet to remove it
-                            # from disk
                             queued.add(stable_path)
-                        # else: leave it untracked and un-queued so the next
-                        # rescan retries the failed publish (GH #13923)
-                        # instead of stranding it until a restart.
 
                     # Exit watch loop to reconfigure timeout
                     break
