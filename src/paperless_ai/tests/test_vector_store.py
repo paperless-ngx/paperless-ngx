@@ -18,6 +18,7 @@ from paperless_ai.migrations import Migration
 from paperless_ai.migrations import m0001_v1_to_v2
 from paperless_ai.tables import DocumentChunksTable
 from paperless_ai.tables import DocumentMetaTable
+from paperless_ai.tables import PermittedIdsTable
 from paperless_ai.vector_store import _MAX_IN_VALUES
 from paperless_ai.vector_store import DB_FILENAME
 from paperless_ai.vector_store import DEFAULT_TABLE_NAME
@@ -280,8 +281,23 @@ class TestCrud:
 
 
 class TestBuildWhere:
-    def test_ne_filter_translates_to_not_equal_clause(self) -> None:
-        where, params = _build_where(_ne_filter(1))
+    @pytest.fixture
+    def conn(self) -> Generator[sqlite3.Connection, None, None]:
+        """A bare connection, sufficient for _build_where(): it only ever
+        touches the connection via PermittedIdsTable, which needs no vec0
+        extension loaded.
+        """
+        connection = sqlite3.connect(":memory:")
+        try:
+            yield connection
+        finally:
+            connection.close()
+
+    def test_ne_filter_translates_to_not_equal_clause(
+        self,
+        conn: sqlite3.Connection,
+    ) -> None:
+        where, params = _build_where(conn, _ne_filter(1))
         assert where == "(document_id != ?)"
         assert params == [1]
 
@@ -293,8 +309,11 @@ class TestBuildWhere:
             "b1",
         ]
 
-    def test_nin_filter_translates_to_not_in_clause(self) -> None:
-        where, params = _build_where(_nin_filter([1, 2]))
+    def test_nin_filter_translates_to_not_in_clause(
+        self,
+        conn: sqlite3.Connection,
+    ) -> None:
+        where, params = _build_where(conn, _nin_filter([1, 2]))
         assert where == "(document_id NOT IN (?,?))"
         assert params == [1, 2]
 
@@ -304,7 +323,10 @@ class TestBuildWhere:
             _query(store, [0.0] * DIM, top_k=5, filters=_nin_filter([1, 2])).ids,
         ) == ["c1"]
 
-    def test_empty_in_filter_excludes_everything(self) -> None:
+    def test_empty_in_filter_excludes_everything(
+        self,
+        conn: sqlite3.Connection,
+    ) -> None:
         """
         GIVEN:
             - An IN filter with an empty value list
@@ -314,11 +336,14 @@ class TestBuildWhere:
             - It excludes everything (the opposite of an empty NOT IN
               filter) -- an empty inclusion list must never widen results
         """
-        where, params = _build_where(_in_filter([]))
+        where, params = _build_where(conn, _in_filter([]))
         assert where == "(1 = 0)"
         assert params == []
 
-    def test_empty_nin_filter_excludes_nothing(self) -> None:
+    def test_empty_nin_filter_excludes_nothing(
+        self,
+        conn: sqlite3.Connection,
+    ) -> None:
         """
         GIVEN:
             - A NOT IN filter with an empty value list -- e.g. an
@@ -330,11 +355,14 @@ class TestBuildWhere:
               excludes everything) -- an empty exclusion list must never
               narrow results
         """
-        where, params = _build_where(_nin_filter([]))
+        where, params = _build_where(conn, _nin_filter([]))
         assert where == "(1 = 1)"
         assert params == []
 
-    def test_fails_closed_when_no_filter_is_translatable(self) -> None:
+    def test_fails_closed_when_no_filter_is_translatable(
+        self,
+        conn: sqlite3.Connection,
+    ) -> None:
         # A nested MetadataFilters is not a MetadataFilter, so it is skipped.
         # With no translatable clauses, the function must fail closed rather
         # than emit "()" (invalid SQL) and never widen document access.
@@ -347,42 +375,88 @@ class TestBuildWhere:
                 ),
             ],
         )
-        where, params = _build_where(MetadataFilters(filters=[nested]))
+        where, params = _build_where(conn, MetadataFilters(filters=[nested]))
         assert where == "1 = 0"
         assert params == []
 
     @pytest.mark.parametrize(
-        "build_filter",
-        [_in_filter, _nin_filter],
+        ("build_filter", "sql_op"),
+        [(_in_filter, "IN"), (_nin_filter, "NOT IN")],
         ids=["in", "nin"],
     )
-    def test_fails_closed_when_filter_exceeds_max_values(
+    def test_filter_over_max_values_uses_permitted_ids_table(
         self,
+        conn: sqlite3.Connection,
         build_filter: Callable[[list[str]], MetadataFilters],
-        caplog: pytest.LogCaptureFixture,
+        sql_op: str,
     ) -> None:
         """
         GIVEN:
             - An IN or NOT IN filter with more values than _MAX_IN_VALUES
-              (SQLite's own bound-parameter limit is 32766; this guard sits
-              below that with headroom for the query's other bound parameters)
+              (SQLite's own bound-parameter limit is 32766; this threshold
+              sits below that with headroom for the query's other bound
+              parameters)
         WHEN:
             - _build_where() translates it to SQL
         THEN:
-            - It fails closed ("1 = 0", no params) instead of building a
-              clause SQLite would reject, and logs a warning -- this filter
-              scopes document access, so refusing to build it must never
-              widen the scope to "everything" by accident. Failing open on
-              a NOT IN would surface exactly the excluded rows
+            - It builds a subquery against PermittedIdsTable's TEMP TABLE,
+              loaded with every id, instead of a literal list SQLite would
+              reject past its own limit -- true for NOT IN too (e.g. an
+              install with an enormous trash), not just IN
         """
-        oversized = build_filter([str(i) for i in range(_MAX_IN_VALUES + 1)])
+        ids = list(range(_MAX_IN_VALUES + 1))
+        oversized = build_filter([str(i) for i in ids])
 
-        with caplog.at_level("WARNING"):
-            where, params = _build_where(oversized)
+        where, params = _build_where(conn, oversized)
 
-        assert where == "(1 = 0)"
+        assert where == (
+            f"(document_id {sql_op} (SELECT id FROM {PermittedIdsTable.TABLE_NAME}))"
+        )
         assert params == []
-        assert "document_id" in caplog.text
+        loaded = [
+            row[0]
+            for row in conn.execute(
+                f"SELECT id FROM {PermittedIdsTable.TABLE_NAME} ORDER BY id",
+            )
+        ]
+        assert loaded == ids
+
+    @pytest.mark.parametrize(
+        ("build_filter", "expected_ids"),
+        [(_in_filter, ["b1", "c1"]), (_nin_filter, ["a1"])],
+        ids=["in", "nin"],
+    )
+    def test_query_and_get_nodes_scope_correctly_when_filter_exceeds_max_values(
+        self,
+        store: PaperlessSqliteVecVectorStore,
+        mocker: MockerFixture,
+        build_filter: Callable[[list[int]], MetadataFilters],
+        expected_ids: list[str],
+    ) -> None:
+        """
+        GIVEN:
+            - _MAX_IN_VALUES lowered so a small IN/NOT IN filter exceeds it
+        WHEN:
+            - query() and get_nodes() are called with that filter
+        THEN:
+            - Both still correctly scope results -- the PermittedIdsTable
+              temp-table path behaves identically to the literal
+              IN(...)/NOT IN(...) path it replaces above the threshold
+        """
+        mocker.patch("paperless_ai.vector_store._MAX_IN_VALUES", 1)
+        store.add(
+            [
+                make_node("a1", 1, seed=0.0),
+                make_node("b1", 2, seed=1.0),
+                make_node("c1", 3, seed=2.0),
+            ],
+        )
+
+        result = _query(store, [0.0] * DIM, top_k=10, filters=build_filter([2, 3]))
+        nodes = store.get_nodes(filters=build_filter([2, 3]))
+
+        assert sorted(result.ids) == expected_ids
+        assert sorted(n.node_id for n in nodes) == expected_ids
 
     def test_query_with_untranslatable_filter_returns_no_rows(
         self,

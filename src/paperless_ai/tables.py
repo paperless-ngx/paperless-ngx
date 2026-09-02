@@ -154,6 +154,35 @@ class DocumentMetaTable:
         }
 
 
+class PermittedIdsTable:
+    """Per-connection scratch space for an oversized IN-filter id list.
+
+    A literal ``IN (?,?,...)`` list binds one SQL parameter per id, capped by
+    SQLite's own SQLITE_MAX_VARIABLE_NUMBER (see _MAX_IN_VALUES in
+    vector_store.py). Loading the ids into a TEMP TABLE and filtering via a
+    subquery instead has no such limit. TEMP tables live in a
+    connection-private namespace -- never visible to another connection,
+    even under this identical name -- so this is safe under the vector
+    store's one-connection-per-request model without any extra locking or
+    per-call naming scheme.
+    """
+
+    TABLE_NAME = "permitted_document_ids"
+
+    @staticmethod
+    def load(conn: sqlite3.Connection, ids: Iterable[int]) -> None:
+        """Replace this connection's scratch table with ``ids``."""
+        conn.execute(f"DROP TABLE IF EXISTS temp.{PermittedIdsTable.TABLE_NAME}")
+        conn.execute(
+            f"CREATE TEMP TABLE {PermittedIdsTable.TABLE_NAME} "
+            "(id INTEGER PRIMARY KEY)",
+        )
+        conn.executemany(
+            f"INSERT INTO {PermittedIdsTable.TABLE_NAME} (id) VALUES (?)",
+            ((i,) for i in ids),
+        )
+
+
 class IndexMetaTable:
     """Typed accessors over index_meta's key/value rows -- replaces
     PaperlessSqliteVecVectorStore._meta_get_on/_meta_set_on, which returned

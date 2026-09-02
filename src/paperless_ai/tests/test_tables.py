@@ -9,6 +9,7 @@ from paperless_ai.tables import DocumentChunksTable
 from paperless_ai.tables import DocumentMetaRow
 from paperless_ai.tables import DocumentMetaTable
 from paperless_ai.tables import IndexMetaTable
+from paperless_ai.tables import PermittedIdsTable
 
 
 @pytest.fixture
@@ -338,3 +339,85 @@ class TestIndexMetaTable:
         IndexMetaTable.increment_total_inserts(conn, 100)
         IndexMetaTable.reset_total_inserts(conn, 7)
         assert IndexMetaTable.get_total_inserts(conn) == 7
+
+
+class TestPermittedIdsTable:
+    def _loaded_ids(self, conn: sqlite3.Connection) -> list[int]:
+        return [
+            row["id"]
+            for row in conn.execute(
+                f"SELECT id FROM {PermittedIdsTable.TABLE_NAME} ORDER BY id",
+            )
+        ]
+
+    def test_load_then_read_back_all_ids(self, conn: sqlite3.Connection) -> None:
+        """
+        GIVEN:
+            - A bare sqlite3 connection
+        WHEN:
+            - load() is called with a set of ids
+        THEN:
+            - Every id is present in the TEMP TABLE, and only those ids
+        """
+        PermittedIdsTable.load(conn, [3, 1, 2])
+        assert self._loaded_ids(conn) == [1, 2, 3]
+
+    def test_load_replaces_previous_contents(self, conn: sqlite3.Connection) -> None:
+        """
+        GIVEN:
+            - A connection whose PermittedIdsTable already holds one id set
+        WHEN:
+            - load() is called again with a different id set
+        THEN:
+            - Only the new ids are present -- a connection reused across
+              multiple queries in one request never leaks a stale filter
+        """
+        PermittedIdsTable.load(conn, [1, 2, 3])
+        PermittedIdsTable.load(conn, [4, 5])
+        assert self._loaded_ids(conn) == [4, 5]
+
+    def test_load_is_connection_private(self) -> None:
+        """
+        GIVEN:
+            - Two separate connections
+        WHEN:
+            - Each loads PermittedIdsTable with a different id set, under
+              the identical TABLE_NAME
+        THEN:
+            - Each connection sees only its own ids -- TEMP TABLE is
+              connection-private, so concurrent requests never collide or
+              cross-contaminate despite sharing the same table name (the
+              vector store opens one connection per request; see
+              PaperlessSqliteVecVectorStore)
+        """
+        conn_a = sqlite3.connect(":memory:")
+        conn_a.row_factory = sqlite3.Row
+        conn_b = sqlite3.connect(":memory:")
+        conn_b.row_factory = sqlite3.Row
+        try:
+            PermittedIdsTable.load(conn_a, [1, 2, 3])
+            PermittedIdsTable.load(conn_b, [4, 5, 6])
+            assert self._loaded_ids(conn_a) == [1, 2, 3]
+            assert self._loaded_ids(conn_b) == [4, 5, 6]
+        finally:
+            conn_a.close()
+            conn_b.close()
+
+    def test_load_handles_more_ids_than_a_bound_parameter_list_could(
+        self,
+        conn: sqlite3.Connection,
+    ) -> None:
+        """
+        GIVEN:
+            - An id count over SQLite's own bound-parameter limit
+              (SQLITE_MAX_VARIABLE_NUMBER, 32766 by default) -- more than a
+              literal IN(?,?,...) list could ever bind in one statement
+        WHEN:
+            - load() is called with that many ids
+        THEN:
+            - Every id is loaded without error, since executemany() binds
+              one row at a time rather than one statement with N parameters
+        """
+        ids = list(range(40_000))
+        PermittedIdsTable.load(conn, ids)
+        assert self._loaded_ids(conn) == ids

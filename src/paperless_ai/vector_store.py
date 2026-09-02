@@ -30,6 +30,7 @@ from paperless_ai.tables import DocumentChunksTable
 from paperless_ai.tables import DocumentMetaRow
 from paperless_ai.tables import DocumentMetaTable
 from paperless_ai.tables import IndexMetaTable
+from paperless_ai.tables import PermittedIdsTable
 
 logger = logging.getLogger("paperless_ai.vector_store")
 
@@ -75,14 +76,12 @@ class _Row(NamedTuple):
     embedding: bytes
 
 
-# _build_where(): the largest IN value list translated into bound SQL
-# parameters. SQLite's own hard limit (SQLITE_MAX_VARIABLE_NUMBER) is 32766
-# by default; this leaves headroom below that for the query's other bound
-# parameters (the embedding blob, k, and any NE clause) and for the limit
-# itself to move. An IN filter this large should not happen in practice --
-# callers are expected to pass None (no filter) rather than every id when
-# the filter would not actually narrow anything -- so this is a guard
-# against a future regression, not a normal code path.
+# _build_where(): the largest IN value list translated into a literal
+# IN (?,?,...) clause. SQLite's own hard limit (SQLITE_MAX_VARIABLE_NUMBER)
+# is 32766 by default; this leaves headroom below that for the query's other
+# bound parameters (the embedding blob, k, and any NE clause) and for the
+# limit itself to move. Above this threshold _build_where() switches to
+# PermittedIdsTable instead of failing closed -- see its docstring.
 _MAX_IN_VALUES = 32700
 
 
@@ -106,7 +105,10 @@ def _vec0_params(rows: list[_Row]) -> list[tuple[str, int, str, bytes]]:
     return [(r.chunk_id, r.document_id, r.node_content, r.embedding) for r in rows]
 
 
-def _build_where(filters: MetadataFilters | None) -> tuple[str, list[int]]:
+def _build_where(
+    conn: sqlite3.Connection,
+    filters: MetadataFilters | None,
+) -> tuple[str, list[int]]:
     """Translate the EQ / IN / NIN / NE filters we use into a parameterized
     SQL clause on vec0 metadata columns. Returns ("", []) when there is
     nothing to filter. document_id is vec0's only filterable column and is
@@ -114,6 +116,10 @@ def _build_where(filters: MetadataFilters | None) -> tuple[str, list[int]]:
     still pass strings in places, e.g. indexing.py's MetadataFilter
     construction) don't have to be individually correct -- vec0 doesn't
     coerce types itself.
+
+    ``conn`` is only used for an IN/NOT IN filter over _MAX_IN_VALUES: it
+    loads the ids into PermittedIdsTable's TEMP TABLE on that connection
+    rather than binding them as SQL parameters.
     """
     if filters is None or not filters.filters:
         return "", []
@@ -136,20 +142,16 @@ def _build_where(filters: MetadataFilters | None) -> tuple[str, list[int]]:
                 clauses.append("1 = 0" if is_in else "1 = 1")
                 continue
             if len(values) > _MAX_IN_VALUES:
-                # Refuse rather than risk SQLite's own bound-parameter limit
-                # ("too many SQL variables"): a list this large must match no
-                # rows, never widen the scope to "everything" -- true for
-                # NOT IN too, where failing open would surface every
-                # excluded row.
-                logger.warning(
-                    "Refusing to build a %s filter on %r with %d values "
-                    "(over the %d-value safety limit); returning no rows.",
-                    sql_op,
-                    f.key,
-                    len(values),
-                    _MAX_IN_VALUES,
+                # A literal list this large would exceed SQLite's own
+                # bound-parameter limit. Load the ids into a TEMP TABLE on
+                # this connection instead and filter via subquery, which has
+                # no such limit -- see PermittedIdsTable. Applies to NOT IN
+                # too (e.g. an install with an enormous trash), not just IN.
+                PermittedIdsTable.load(conn, values)
+                clauses.append(
+                    f"{f.key} {sql_op} "
+                    f"(SELECT id FROM {PermittedIdsTable.TABLE_NAME})",
                 )
-                clauses.append("1 = 0")
                 continue
             placeholders = ",".join("?" for _ in values)
             clauses.append(f"{f.key} {sql_op} ({placeholders})")
@@ -488,7 +490,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             )
         if not self.table_exists():
             return []
-        where, params = _build_where(filters)
+        where, params = _build_where(self._conn, filters)
         sql = "SELECT node_content, embedding FROM " + DEFAULT_TABLE_NAME
         if where:
             sql += " WHERE " + where
@@ -504,7 +506,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         if query.query_embedding is None:  # pragma: no cover
             return VectorStoreQueryResult(nodes=[], similarities=[], ids=[])
         top_k = query.similarity_top_k if query.similarity_top_k is not None else 10
-        where, params = _build_where(query.filters)
+        where, params = _build_where(self._conn, query.filters)
         sql = (
             "SELECT id, node_content, embedding, distance FROM "
             + DEFAULT_TABLE_NAME
