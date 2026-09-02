@@ -135,8 +135,6 @@ def _stream_chat_with_documents(
         # limit (_MAX_IN_VALUES) on large installs. Trashed documents stay
         # indexed until permanent deletion (delete_document_from_llm_index
         # hangs off post_delete, not trash), so must be excluded explicitly.
-        trashed_ids = Document.global_objects.filter(
-            deleted_at__isnull=False,
         trashed_ids = Document.deleted_objects.values_list("pk", flat=True)
         filters = exclude_document_ids_filter(str(pk) for pk in trashed_ids)
     else:
