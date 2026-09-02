@@ -8,7 +8,8 @@ from documents.models import Document
 from paperless.config import AIConfig
 from paperless_ai.client import AIClient
 from paperless_ai.db import db_connection_released
-from paperless_ai.indexing import _document_id_filters
+from paperless_ai.indexing import document_id_filters
+from paperless_ai.indexing import exclude_document_ids_filter
 from paperless_ai.indexing import get_rag_prompt_helper
 from paperless_ai.indexing import load_or_build_index
 from paperless_ai.indexing import read_store
@@ -129,12 +130,17 @@ def _stream_chat_with_documents(
 
     config = AIConfig()
     if unrestricted:
-        # The caller can see every document, so an id filter would never narrow
-        # the search, only risk exceeding the vector store's bound parameter
-        # limit (_MAX_IN_VALUES in vector_store.py) on large installs.
-        filters = None
+        # Exclude trashed ids (usually few) instead of an IN filter over the
+        # full permitted set, which risks the vector store's bound parameter
+        # limit (_MAX_IN_VALUES) on large installs. Trashed documents stay
+        # indexed until permanent deletion (delete_document_from_llm_index
+        # hangs off post_delete, not trash), so must be excluded explicitly.
+        trashed_ids = Document.global_objects.filter(
+            deleted_at__isnull=False,
+        ).values_list("pk", flat=True)
+        filters = exclude_document_ids_filter(str(pk) for pk in trashed_ids)
     else:
-        filters = _document_id_filters(
+        filters = document_id_filters(
             str(pk) for pk in documents.values_list("pk", flat=True)
         )
 

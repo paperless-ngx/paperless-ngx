@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 import pytest
 from django.db.models.signals import post_init
+from django.utils import timezone
 from llama_index.core import settings as llama_settings
 from llama_index.core.embeddings.mock_embed_model import MockEmbedding
 from llama_index.core.schema import TextNode
@@ -319,6 +320,14 @@ def test_stream_chat_unexpected_failure_returns_generic_error(caplog) -> None:
         assert "private provider detail" in caplog.text
 
 
+def _retriever_filter_values(captured_filters: list[Any]) -> list[str]:
+    """The value list of the single MetadataFilter the retriever received."""
+    assert captured_filters, "VectorIndexRetriever was never constructed"
+    filt = captured_filters[0]
+    assert filt is not None, "Retriever must receive a MetadataFilters"
+    return filt.filters[0].value
+
+
 @pytest.mark.django_db
 class TestStreamChatRetrieval:
     @pytest.fixture
@@ -382,14 +391,11 @@ class TestStreamChatRetrieval:
             ),
         )
 
-        assert captured_filters, "VectorIndexRetriever was never constructed"
-        filt = captured_filters[0]
-        assert filt is not None, "Retriever must receive a MetadataFilters"
-        filter_values = filt.filters[0].value
+        filter_values = _retriever_filter_values(captured_filters)
         assert str(included.pk) in filter_values
         assert str(excluded.pk) not in filter_values
 
-    def test_unrestricted_chat_skips_document_id_filter(
+    def test_unrestricted_chat_excludes_nothing_when_no_documents_are_trashed(
         self,
         temp_llm_index_dir: Path,
         mock_embed_model: pytest_mock.MockType,
@@ -397,12 +403,13 @@ class TestStreamChatRetrieval:
     ) -> None:
         """
         GIVEN:
-            - A document indexed in the vector store
+            - A document indexed in the vector store, nothing trashed
         WHEN:
             - stream_chat_with_documents is called with unrestricted=True
         THEN:
-            - The retriever receives no document id filter (filters=None), so
-              the whole index is searched instead of an IN-list that risks the
+            - The retriever receives a NOT IN filter excluding zero ids, so
+              the whole index is effectively searched -- and no IN-list is
+              built from the full permitted set, which is what risks the
               vector store's safety limit on large installs
         """
         document = DocumentFactory.create(content="indexed document content")
@@ -416,8 +423,45 @@ class TestStreamChatRetrieval:
             ),
         )
 
-        assert captured_filters, "VectorIndexRetriever was never constructed"
-        assert captured_filters[0] is None
+        assert _retriever_filter_values(captured_filters) == []
+
+    def test_unrestricted_chat_excludes_trashed_documents(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: pytest_mock.MockType,
+        captured_filters: list[Any],
+    ) -> None:
+        """
+        GIVEN:
+            - Two indexed documents, one of them trashed -- trashed documents
+              stay in the vector index until permanently deleted, since
+              delete_document_from_llm_index is wired to post_delete
+        WHEN:
+            - stream_chat_with_documents is called with unrestricted=True
+        THEN:
+            - The retriever receives a NOT IN filter excluding the trashed
+              document's id, so an unrestricted caller (e.g. a superuser)
+              never has trashed content surfaced in a chat answer
+        """
+        kept = DocumentFactory.create(content="kept document content")
+        trashed = DocumentFactory.create(content="trashed document content")
+        indexing.llm_index_add_or_update_document(kept)
+        indexing.llm_index_add_or_update_document(trashed)
+        Document.global_objects.filter(pk=trashed.pk).update(
+            deleted_at=timezone.now(),
+        )
+
+        list(
+            chat.stream_chat_with_documents(
+                "question?",
+                Document.objects.filter(pk=kept.pk),
+                unrestricted=True,
+            ),
+        )
+
+        filter_values = _retriever_filter_values(captured_filters)
+        assert str(trashed.pk) in filter_values
+        assert str(kept.pk) not in filter_values
 
     @pytest.mark.django_db
     def test_get_document_references_only_queries_referenced_documents(

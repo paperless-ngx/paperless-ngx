@@ -54,7 +54,8 @@ class TestChatStreamingViewInputValidation(APITestCase):
 @pytest.mark.django_db
 class TestChatStreamingViewUnrestrictedFlag:
     """The document id filter may only be skipped (``unrestricted=True``) for
-    a caller who can see every document, i.e. an active superuser.
+    an active superuser, never for a regular user -- regardless of what
+    permissions that user holds.
     """
 
     @pytest.fixture
@@ -71,9 +72,10 @@ class TestChatStreamingViewUnrestrictedFlag:
 
     @pytest.fixture
     def viewer_client(self, user_client: APIClient, regular_user: User) -> APIClient:
-        """The conftest regular-user client, additionally granted
-        view_document -- able to see every document without being a
-        superuser.
+        """The conftest regular-user client, granted the global
+        view_document permission -- the minimum ViewDocumentsPermissions
+        needs to reach the view at all. Model-level only: says nothing
+        about which documents (if any) this user can actually see.
         """
         regular_user.user_permissions.add(
             *Permission.objects.filter(codename="view_document"),
@@ -97,13 +99,14 @@ class TestChatStreamingViewUnrestrictedFlag:
     ) -> None:
         """
         GIVEN:
-            - A superuser, or a regular user holding view_document
+            - A superuser, or a regular user holding the global
+              view_document permission (but no object-level document access)
         WHEN:
             - They post a chat question with no document_id
         THEN:
-            - stream_chat_with_documents is called with unrestricted=True for
-              the superuser and unrestricted=False for the regular user, even
-              though that user can view every document
+            - stream_chat_with_documents is called with unrestricted=True
+              only for the superuser; the regular user is always
+              unrestricted=False, regardless of their permissions
         """
         client: APIClient = request.getfixturevalue(client_fixture)
 
