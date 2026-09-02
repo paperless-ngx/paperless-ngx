@@ -149,8 +149,7 @@ def _build_where(
                 # too (e.g. an install with an enormous trash), not just IN.
                 PermittedIdsTable.load(conn, values)
                 clauses.append(
-                    f"{f.key} {sql_op} "
-                    f"(SELECT id FROM {PermittedIdsTable.TABLE_NAME})",
+                    f"{f.key} {sql_op} (SELECT id FROM {PermittedIdsTable.TABLE_NAME})",
                 )
                 continue
             placeholders = ",".join("?" for _ in values)
