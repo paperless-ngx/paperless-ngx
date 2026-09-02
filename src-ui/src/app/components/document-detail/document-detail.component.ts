@@ -233,6 +233,9 @@ export class DocumentDetailComponent
   private readonly aiEnabledSetting = this.settings.getSignal<boolean>(
     SETTINGS_KEYS.AI_ENABLED
   )
+  private readonly aiSuggestOnOpenSetting = this.settings.getSignal<boolean>(
+    SETTINGS_KEYS.AI_SUGGEST_ON_OPEN
+  )
   private readonly showThumbnailOverlaySetting =
     this.settings.getSignal<boolean>(
       SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL
@@ -358,8 +361,7 @@ export class DocumentDetailComponent
   }
 
   get aiSuggestOnOpen(): boolean {
-    this.settings.trackChanges()
-    return this.settings.get(SETTINGS_KEYS.AI_SUGGEST_ON_OPEN)
+    return this.aiSuggestOnOpenSetting()
   }
 
   get archiveContentRenderType(): ContentRenderType {
