@@ -621,6 +621,43 @@ describe('FilterEditorComponent', () => {
     component.toggleTag(2) // coverage
   })
 
+  it('should reflect ingested tag filter rules in the dropdown toggle', () => {
+    const dropdown = fixture.debugElement.query(
+      By.css('pngx-filterable-dropdown')
+    )
+    const toggle = dropdown.nativeElement.querySelector('#dropdown_tags')
+    expect(toggle.classList.contains('btn-primary')).toBeFalsy()
+    expect(
+      dropdown.nativeElement.querySelector('pngx-clearable-badge')
+    ).toBeNull()
+
+    // switching to a view with a tag filter
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_TAGS_ALL,
+        value: '2',
+      },
+    ]
+    fixture.detectChanges()
+    expect(toggle.classList.contains('btn-primary')).toBeTruthy()
+    expect(
+      dropdown.nativeElement.querySelector('pngx-clearable-badge')
+    ).not.toBeNull()
+
+    // and back to a view without one
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_CORRESPONDENT_ANY,
+        value: '12',
+      },
+    ]
+    fixture.detectChanges()
+    expect(toggle.classList.contains('btn-primary')).toBeFalsy()
+    expect(
+      dropdown.nativeElement.querySelector('pngx-clearable-badge')
+    ).toBeNull()
+  })
+
   it('should ingest filter rules for has any tags', () => {
     expect(component.tagSelectionModel.getSelectedItems()).toHaveLength(0)
     component.filterRules = [
@@ -1078,7 +1115,7 @@ describe('FilterEditorComponent', () => {
   })
 
   it('should ingest filter rules for owner', () => {
-    expect(component.permissionsSelectionModel.ownerFilter).toEqual(
+    expect(component.permissionsSelectionModel.ownerFilter()).toEqual(
       OwnerFilterType.NONE
     )
     component.filterRules = [
@@ -1087,15 +1124,38 @@ describe('FilterEditorComponent', () => {
         value: '100',
       },
     ]
-    expect(component.permissionsSelectionModel.ownerFilter).toEqual(
+    expect(component.permissionsSelectionModel.ownerFilter()).toEqual(
       OwnerFilterType.SELF
     )
-    expect(component.permissionsSelectionModel.hideUnowned).toBeFalsy()
-    expect(component.permissionsSelectionModel.userID).toEqual(100)
+    expect(component.permissionsSelectionModel.hideUnowned()).toBeFalsy()
+    expect(component.permissionsSelectionModel.userID()).toEqual(100)
+  })
+
+  it('should reflect ingested owner filter rules in the dropdown toggle', () => {
+    const dropdown = fixture.debugElement.query(
+      By.css('pngx-permissions-filter-dropdown')
+    )
+    const toggle = dropdown.nativeElement.querySelector('button')
+    expect(toggle.classList.contains('btn-primary')).toBeFalsy()
+
+    // switching to a view with an owner filter
+    component.filterRules = [
+      {
+        rule_type: FILTER_OWNER,
+        value: '100',
+      },
+    ]
+    fixture.detectChanges()
+    expect(toggle.classList.contains('btn-primary')).toBeTruthy()
+
+    // and back to a view without one
+    component.filterRules = []
+    fixture.detectChanges()
+    expect(toggle.classList.contains('btn-primary')).toBeFalsy()
   })
 
   it('should ingest filter rules for owner is others', () => {
-    expect(component.permissionsSelectionModel.ownerFilter).toEqual(
+    expect(component.permissionsSelectionModel.ownerFilter()).toEqual(
       OwnerFilterType.NONE
     )
     component.filterRules = [
@@ -1104,14 +1164,14 @@ describe('FilterEditorComponent', () => {
         value: '50',
       },
     ]
-    expect(component.permissionsSelectionModel.ownerFilter).toEqual(
+    expect(component.permissionsSelectionModel.ownerFilter()).toEqual(
       OwnerFilterType.OTHERS
     )
-    expect(component.permissionsSelectionModel.includeUsers).toContain(50)
+    expect(component.permissionsSelectionModel.includeUsers()).toContain(50)
   })
 
   it('should ingest filter rules for owner does not include others', () => {
-    expect(component.permissionsSelectionModel.ownerFilter).toEqual(
+    expect(component.permissionsSelectionModel.ownerFilter()).toEqual(
       OwnerFilterType.NONE
     )
     component.filterRules = [
@@ -1120,14 +1180,14 @@ describe('FilterEditorComponent', () => {
         value: '50',
       },
     ]
-    expect(component.permissionsSelectionModel.ownerFilter).toEqual(
+    expect(component.permissionsSelectionModel.ownerFilter()).toEqual(
       OwnerFilterType.NOT_SELF
     )
-    expect(component.permissionsSelectionModel.excludeUsers).toContain(50)
+    expect(component.permissionsSelectionModel.excludeUsers()).toContain(50)
   })
 
   it('should ingest filter rules for owner is null', () => {
-    expect(component.permissionsSelectionModel.ownerFilter).toEqual(
+    expect(component.permissionsSelectionModel.ownerFilter()).toEqual(
       OwnerFilterType.NONE
     )
     component.filterRules = [
@@ -1136,10 +1196,10 @@ describe('FilterEditorComponent', () => {
         value: 'true',
       },
     ]
-    expect(component.permissionsSelectionModel.ownerFilter).toEqual(
+    expect(component.permissionsSelectionModel.ownerFilter()).toEqual(
       OwnerFilterType.UNOWNED
     )
-    expect(component.permissionsSelectionModel.hideUnowned).toBeFalsy()
+    expect(component.permissionsSelectionModel.hideUnowned()).toBeFalsy()
   })
 
   it('should ingest filter rules for owner is not null', () => {
@@ -1149,14 +1209,14 @@ describe('FilterEditorComponent', () => {
         value: 'false',
       },
     ]
-    expect(component.permissionsSelectionModel.hideUnowned).toBeTruthy()
+    expect(component.permissionsSelectionModel.hideUnowned()).toBeTruthy()
     component.filterRules = [
       {
         rule_type: FILTER_OWNER_ISNULL,
         value: '0',
       },
     ]
-    expect(component.permissionsSelectionModel.hideUnowned).toBeTruthy()
+    expect(component.permissionsSelectionModel.hideUnowned()).toBeTruthy()
   })
 
   it('should ingest filter rules for shared by me', () => {
@@ -1166,7 +1226,7 @@ describe('FilterEditorComponent', () => {
         value: '2',
       },
     ]
-    expect(component.permissionsSelectionModel.userID).toEqual(2)
+    expect(component.permissionsSelectionModel.userID()).toEqual(2)
   })
 
   // GET filterRules
@@ -1932,7 +1992,10 @@ describe('FilterEditorComponent', () => {
         value: '1',
       },
     ])
-    component.permissionsSelectionModel.excludeUsers.push(2)
+    component.permissionsSelectionModel.excludeUsers.update((users) => [
+      ...users,
+      2,
+    ])
     fixture.detectChanges()
     expect(component.filterRules).toEqual([
       {
@@ -1982,8 +2045,11 @@ describe('FilterEditorComponent', () => {
     // TODO: mock input in code
     // userSelect.query(By.css('input')).nativeElement.value = '3'
     // userSelect.triggerEventHandler('change')
-    component.permissionsSelectionModel.ownerFilter = OwnerFilterType.OTHERS
-    component.permissionsSelectionModel.includeUsers.push(3)
+    component.permissionsSelectionModel.ownerFilter.set(OwnerFilterType.OTHERS)
+    component.permissionsSelectionModel.includeUsers.update((users) => [
+      ...users,
+      3,
+    ])
     fixture.detectChanges()
     expect(component.filterRules).toEqual([
       {
@@ -2003,7 +2069,7 @@ describe('FilterEditorComponent', () => {
     ownerToggle.nativeElement.checked = true
     // ownerToggle.triggerEventHandler('change')
     // TODO: ngModel isn't doing this here
-    component.permissionsSelectionModel.hideUnowned = true
+    component.permissionsSelectionModel.hideUnowned.set(true)
     fixture.detectChanges()
     expect(component.filterRules).toEqual([
       {

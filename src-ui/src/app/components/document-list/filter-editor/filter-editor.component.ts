@@ -735,38 +735,50 @@ export class FilterEditorComponent
           this._textFilter = rule.value
           break
         case FILTER_OWNER:
-          this.permissionsSelectionModel.ownerFilter = OwnerFilterType.SELF
-          this.permissionsSelectionModel.hideUnowned = false
+          this.permissionsSelectionModel.ownerFilter.set(OwnerFilterType.SELF)
+          this.permissionsSelectionModel.hideUnowned.set(false)
           if (rule.value)
-            this.permissionsSelectionModel.userID = parseInt(rule.value, 10)
+            this.permissionsSelectionModel.userID.set(
+              Number.parseInt(rule.value, 10)
+            )
           break
         case FILTER_OWNER_ANY:
-          this.permissionsSelectionModel.ownerFilter = OwnerFilterType.OTHERS
+          this.permissionsSelectionModel.ownerFilter.set(OwnerFilterType.OTHERS)
           if (rule.value)
-            this.permissionsSelectionModel.includeUsers.push(
-              parseInt(rule.value, 10)
-            )
+            this.permissionsSelectionModel.includeUsers.update((users) => [
+              ...users,
+              Number.parseInt(rule.value, 10),
+            ])
           break
         case FILTER_OWNER_DOES_NOT_INCLUDE:
-          this.permissionsSelectionModel.ownerFilter = OwnerFilterType.NOT_SELF
+          this.permissionsSelectionModel.ownerFilter.set(
+            OwnerFilterType.NOT_SELF
+          )
           if (rule.value)
-            this.permissionsSelectionModel.excludeUsers.push(
-              parseInt(rule.value, 10)
-            )
+            this.permissionsSelectionModel.excludeUsers.update((users) => [
+              ...users,
+              Number.parseInt(rule.value, 10),
+            ])
           break
         case FILTER_SHARED_BY_USER:
-          this.permissionsSelectionModel.ownerFilter =
+          this.permissionsSelectionModel.ownerFilter.set(
             OwnerFilterType.SHARED_BY_ME
+          )
           if (rule.value)
-            this.permissionsSelectionModel.userID = parseInt(rule.value, 10)
+            this.permissionsSelectionModel.userID.set(
+              Number.parseInt(rule.value, 10)
+            )
           break
         case FILTER_OWNER_ISNULL:
           if (rule.value === 'true' || rule.value === '1') {
-            this.permissionsSelectionModel.hideUnowned = false
-            this.permissionsSelectionModel.ownerFilter = OwnerFilterType.UNOWNED
+            this.permissionsSelectionModel.hideUnowned.set(false)
+            this.permissionsSelectionModel.ownerFilter.set(
+              OwnerFilterType.UNOWNED
+            )
           } else {
-            this.permissionsSelectionModel.hideUnowned =
+            this.permissionsSelectionModel.hideUnowned.set(
               rule.value === 'false' || rule.value === '0'
+            )
             break
           }
       }
@@ -1074,34 +1086,35 @@ export class FilterEditorComponent
         })
       }
     }
-    if (this.permissionsSelectionModel.ownerFilter == OwnerFilterType.SELF) {
+    if (this.permissionsSelectionModel.ownerFilter() == OwnerFilterType.SELF) {
       filterRules.push({
         rule_type: FILTER_OWNER,
-        value: this.permissionsSelectionModel.userID.toString(),
+        value: this.permissionsSelectionModel.userID().toString(),
       })
     } else if (
-      this.permissionsSelectionModel.ownerFilter == OwnerFilterType.NOT_SELF
+      this.permissionsSelectionModel.ownerFilter() == OwnerFilterType.NOT_SELF
     ) {
       filterRules.push({
         rule_type: FILTER_OWNER_DOES_NOT_INCLUDE,
-        value: this.permissionsSelectionModel.excludeUsers?.join(','),
+        value: this.permissionsSelectionModel.excludeUsers()?.join(','),
       })
     } else if (
-      this.permissionsSelectionModel.ownerFilter == OwnerFilterType.OTHERS
+      this.permissionsSelectionModel.ownerFilter() == OwnerFilterType.OTHERS
     ) {
       filterRules.push({
         rule_type: FILTER_OWNER_ANY,
-        value: this.permissionsSelectionModel.includeUsers?.join(','),
+        value: this.permissionsSelectionModel.includeUsers()?.join(','),
       })
     } else if (
-      this.permissionsSelectionModel.ownerFilter == OwnerFilterType.SHARED_BY_ME
+      this.permissionsSelectionModel.ownerFilter() ==
+      OwnerFilterType.SHARED_BY_ME
     ) {
       filterRules.push({
         rule_type: FILTER_SHARED_BY_USER,
-        value: this.permissionsSelectionModel.userID.toString(),
+        value: this.permissionsSelectionModel.userID().toString(),
       })
     } else if (
-      this.permissionsSelectionModel.ownerFilter == OwnerFilterType.UNOWNED
+      this.permissionsSelectionModel.ownerFilter() == OwnerFilterType.UNOWNED
     ) {
       filterRules.push({
         rule_type: FILTER_OWNER_ISNULL,
@@ -1109,7 +1122,7 @@ export class FilterEditorComponent
       })
     }
 
-    if (this.permissionsSelectionModel.hideUnowned) {
+    if (this.permissionsSelectionModel.hideUnowned()) {
       filterRules.push({
         rule_type: FILTER_OWNER_ISNULL,
         value: 'false',

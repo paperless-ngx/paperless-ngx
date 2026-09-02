@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http'
 import {
   DOCUMENT,
   EventEmitter,
+  Signal,
+  computed,
   inject,
   Injectable,
   LOCALE_ID,
@@ -297,6 +299,7 @@ export class SettingsService {
 
   private settings: Record<string, any> = {}
   private readonly settingsVersion = signal(0)
+  private readonly settingSignals = new Map<string, Signal<unknown>>()
   readonly currentUser = signal<User>(undefined)
 
   public settingsSaved: EventEmitter<any> = new EventEmitter()
@@ -326,10 +329,6 @@ export class SettingsService {
     return !UNSAFE_OBJECT_KEYS.has(key)
   }
 
-  public trackChanges(): void {
-    this.settingsVersion()
-  }
-
   private assignSafeSettings(source: Record<string, any>) {
     if (!source || typeof source !== 'object' || Array.isArray(source)) {
       return
@@ -339,6 +338,7 @@ export class SettingsService {
       if (!this.isSafeObjectKey(key)) continue
       this.settings[key] = source[key]
     }
+    this.settingsVersion.update((version) => version + 1)
   }
 
   // this is called by the app initializer in app.module
@@ -592,6 +592,18 @@ export class SettingsService {
     } else {
       return setting.default
     }
+  }
+
+  getSignal<T = any>(key: string): Signal<T> {
+    let settingSignal = this.settingSignals.get(key)
+    if (!settingSignal) {
+      settingSignal = computed(() => {
+        this.settingsVersion()
+        return this.get(key)
+      })
+      this.settingSignals.set(key, settingSignal)
+    }
+    return settingSignal as Signal<T>
   }
 
   set(key: string, value: any) {

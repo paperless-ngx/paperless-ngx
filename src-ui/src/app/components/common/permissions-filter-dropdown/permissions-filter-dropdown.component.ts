@@ -25,18 +25,18 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 
 export class PermissionsSelectionModel {
-  ownerFilter: OwnerFilterType
-  hideUnowned: boolean
-  userID: number
-  includeUsers: number[]
-  excludeUsers: number[]
+  readonly ownerFilter = signal(OwnerFilterType.NONE)
+  readonly hideUnowned = signal(false)
+  readonly userID = signal<number>(null)
+  readonly includeUsers = signal<number[]>([])
+  readonly excludeUsers = signal<number[]>([])
 
   clear() {
-    this.ownerFilter = OwnerFilterType.NONE
-    this.userID = null
-    this.hideUnowned = false
-    this.includeUsers = []
-    this.excludeUsers = []
+    this.ownerFilter.set(OwnerFilterType.NONE)
+    this.userID.set(null)
+    this.hideUnowned.set(false)
+    this.includeUsers.set([])
+    this.excludeUsers.set([])
   }
 }
 
@@ -84,33 +84,31 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
 
   readonly users = signal<User[]>([])
 
-  hideUnowned: boolean
-
   get isActive(): boolean {
     return (
-      this.selectionModel.ownerFilter !== OwnerFilterType.NONE ||
-      this.selectionModel.hideUnowned
+      this.selectionModel.ownerFilter() !== OwnerFilterType.NONE ||
+      this.selectionModel.hideUnowned()
     )
   }
 
   get ownerFilterLabel(): string {
     if (
-      this.selectionModel?.ownerFilter !== OwnerFilterType.SELF ||
-      this.selectionModel?.userID === this.settingsService.currentUser()?.id
+      this.selectionModel?.ownerFilter() !== OwnerFilterType.SELF ||
+      this.selectionModel?.userID() === this.settingsService.currentUser()?.id
     ) {
       return $localize`My documents`
     }
 
-    const username = this.getUsername(this.selectionModel?.userID)
+    const username = this.getUsername(this.selectionModel?.userID())
     return username
       ? $localize`Owned by ${username}`
       : $localize`Owned by another user`
   }
 
   get ownerExclusionFilterLabel(): string {
-    const excludedUsers = this.selectionModel?.excludeUsers ?? []
+    const excludedUsers = this.selectionModel?.excludeUsers() ?? []
     if (
-      this.selectionModel?.ownerFilter !== OwnerFilterType.NOT_SELF ||
+      this.selectionModel?.ownerFilter() !== OwnerFilterType.NOT_SELF ||
       (excludedUsers.length === 1 &&
         excludedUsers[0] === this.settingsService.currentUser()?.id)
     ) {
@@ -130,13 +128,13 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
 
   get sharedByFilterLabel(): string {
     if (
-      this.selectionModel?.ownerFilter !== OwnerFilterType.SHARED_BY_ME ||
-      this.selectionModel?.userID === this.settingsService.currentUser()?.id
+      this.selectionModel?.ownerFilter() !== OwnerFilterType.SHARED_BY_ME ||
+      this.selectionModel?.userID() === this.settingsService.currentUser()?.id
     ) {
       return $localize`Shared by me`
     }
 
-    const username = this.getUsername(this.selectionModel?.userID)
+    const username = this.getUsername(this.selectionModel?.userID())
     return username
       ? $localize`Shared by ${username}`
       : $localize`Shared by another user`
@@ -169,34 +167,36 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
   }
 
   setFilter(type: OwnerFilterType) {
-    this.selectionModel.ownerFilter = type
-    if (this.selectionModel.ownerFilter === OwnerFilterType.SELF) {
-      this.selectionModel.includeUsers = []
-      this.selectionModel.excludeUsers = []
-      this.selectionModel.userID = this.settingsService.currentUser().id
-      this.selectionModel.hideUnowned = false
-    } else if (this.selectionModel.ownerFilter === OwnerFilterType.NOT_SELF) {
-      this.selectionModel.userID = null
-      this.selectionModel.includeUsers = []
-      this.selectionModel.excludeUsers = [this.settingsService.currentUser().id]
-      this.selectionModel.hideUnowned = false
-    } else if (this.selectionModel.ownerFilter === OwnerFilterType.NONE) {
-      this.selectionModel.userID = null
-      this.selectionModel.includeUsers = []
-      this.selectionModel.excludeUsers = []
-      this.selectionModel.hideUnowned = false
+    this.selectionModel.ownerFilter.set(type)
+    if (this.selectionModel.ownerFilter() === OwnerFilterType.SELF) {
+      this.selectionModel.includeUsers.set([])
+      this.selectionModel.excludeUsers.set([])
+      this.selectionModel.userID.set(this.settingsService.currentUser().id)
+      this.selectionModel.hideUnowned.set(false)
+    } else if (this.selectionModel.ownerFilter() === OwnerFilterType.NOT_SELF) {
+      this.selectionModel.userID.set(null)
+      this.selectionModel.includeUsers.set([])
+      this.selectionModel.excludeUsers.set([
+        this.settingsService.currentUser().id,
+      ])
+      this.selectionModel.hideUnowned.set(false)
+    } else if (this.selectionModel.ownerFilter() === OwnerFilterType.NONE) {
+      this.selectionModel.userID.set(null)
+      this.selectionModel.includeUsers.set([])
+      this.selectionModel.excludeUsers.set([])
+      this.selectionModel.hideUnowned.set(false)
     } else if (
-      this.selectionModel.ownerFilter === OwnerFilterType.SHARED_BY_ME
+      this.selectionModel.ownerFilter() === OwnerFilterType.SHARED_BY_ME
     ) {
-      this.selectionModel.userID = this.settingsService.currentUser()?.id
-      this.selectionModel.includeUsers = []
-      this.selectionModel.excludeUsers = []
-      this.selectionModel.hideUnowned = false
-    } else if (this.selectionModel.ownerFilter === OwnerFilterType.UNOWNED) {
-      this.selectionModel.userID = null
-      this.selectionModel.includeUsers = []
-      this.selectionModel.excludeUsers = []
-      this.selectionModel.hideUnowned = false
+      this.selectionModel.userID.set(this.settingsService.currentUser()?.id)
+      this.selectionModel.includeUsers.set([])
+      this.selectionModel.excludeUsers.set([])
+      this.selectionModel.hideUnowned.set(false)
+    } else if (this.selectionModel.ownerFilter() === OwnerFilterType.UNOWNED) {
+      this.selectionModel.userID.set(null)
+      this.selectionModel.includeUsers.set([])
+      this.selectionModel.excludeUsers.set([])
+      this.selectionModel.hideUnowned.set(false)
     }
     this.onChange()
   }
@@ -206,11 +206,11 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
   }
 
   onUserSelect() {
-    if (this.selectionModel.includeUsers?.length) {
-      this.selectionModel.ownerFilter = OwnerFilterType.OTHERS
-    } else {
-      this.selectionModel.ownerFilter = OwnerFilterType.NONE
-    }
+    this.selectionModel.ownerFilter.set(
+      this.selectionModel.includeUsers()?.length
+        ? OwnerFilterType.OTHERS
+        : OwnerFilterType.NONE
+    )
     this.onChange()
   }
 

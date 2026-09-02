@@ -839,7 +839,9 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     selectionModel.items = [memoRoot]
     selectionModel.documentCounts = [{ id: memoRoot.id, document_count: 9 }]
 
-    const getRootDocCount = (selectionModel as any).createRootDocCounter()
+    const getRootDocCount = (selectionModel as any).createRootDocCounter(
+      selectionModel.items
+    )
 
     expect(getRootDocCount(memoRoot.id)).toEqual(9)
     selectionModel.documentCounts = []
@@ -855,7 +857,9 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     selectionModel.items = [rootWithoutSelection]
     selectionModel.documentCounts = []
 
-    const getRootDocCount = (selectionModel as any).createRootDocCounter()
+    const getRootDocCount = (selectionModel as any).createRootDocCounter(
+      selectionModel.items
+    )
 
     expect(getRootDocCount(rootWithoutSelection.id)).toEqual(4)
   })
@@ -865,7 +869,9 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     selectionModel.items = [rootWithoutCounts]
     selectionModel.documentCounts = []
 
-    const getRootDocCount = (selectionModel as any).createRootDocCounter()
+    const getRootDocCount = (selectionModel as any).createRootDocCounter(
+      selectionModel.items
+    )
 
     expect(getRootDocCount(rootWithoutCounts.id)).toEqual(0)
   })
@@ -966,7 +972,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     component.selectionModel['temporarySelectionStates'].set(id, state)
     const changedSpy = jest.spyOn(component.selectionModel.changed, 'next')
     component.selectionModel.exclude(id)
-    expect(component.selectionModel.temporaryLogicalOperator).toBe(
+    expect(component.selectionModel.temporaryLogicalOperator()).toBe(
       LogicalOperator.And
     )
     expect(component.selectionModel['temporarySelectionStates'].get(id)).toBe(
