@@ -2,10 +2,13 @@ import datetime
 import json
 from unittest import mock
 
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import override_settings
 from guardian.shortcuts import assign_perm
+from guardian.shortcuts import get_groups_with_perms
+from guardian.shortcuts import get_users_with_perms
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -841,6 +844,47 @@ class TestBulkEditObjects(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(StoragePath.objects.count(), 0)
+
+    def test_bulk_objects_set_permissions_batched_across_object_count(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - Many tags are being bulk-edited to set permissions at once
+        WHEN:
+            - bulk_edit_objects API endpoint is called with set_permissions
+              operation over a small batch vs. a much larger one
+        THEN:
+            - Permissions are applied correctly at both scales
+        """
+        group1 = Group.objects.create(name="perm-group")
+        permissions = {
+            "view": {"users": [self.user1.id, self.user2.id], "groups": [group1.id]},
+            "change": {"users": [self.user1.id], "groups": [group1.id]},
+        }
+
+        def run_with_n_tags(n: int) -> None:
+            tags = [Tag.objects.create(name=f"perm-tag-{n}-{i}") for i in range(n)]
+            response = self.client.post(
+                "/api/bulk_edit_objects/",
+                json.dumps(
+                    {
+                        "objects": [t.id for t in tags],
+                        "object_type": "tags",
+                        "operation": "set_permissions",
+                        "permissions": permissions,
+                        "merge": False,
+                    },
+                ),
+                content_type="application/json",
+            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            for tag in tags:
+                self.assertEqual(get_users_with_perms(tag).count(), 2)
+                self.assertEqual(get_groups_with_perms(tag).count(), 1)
+
+        run_with_n_tags(5)
+        run_with_n_tags(50)
 
     def test_bulk_objects_delete_all_filtered(self) -> None:
         """
