@@ -247,7 +247,7 @@ per-file-ignores."src/documents/models.py" = [
 isort.force-single-line = true
 
 [tool.codespell]
-ignore-words-list = "criterias,afterall,valeu,ureue,equest,ure,assertIn,Oktober,commitish"
+ignore-words-list = "criterias,afterall,valeu,ureue,equest,ure,assertIn,Oktober,commitish,NIN,nin"
 skip = """\
   src-ui/src/locale/*,src-ui/pnpm-lock.yaml,src-ui/e2e/*,src/paperless_mail/tests/samples/*,src/paperless/tests/samples\
   /mail/*,src/documents/tests/samples/*,*.po,*.json\

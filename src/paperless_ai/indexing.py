@@ -362,7 +362,7 @@ def _embed_nodes(nodes: list["BaseNode"], embed_model) -> None:
         node.embedding = emb
 
 
-def _document_id_filters(doc_ids):
+def document_id_filters(doc_ids):
     """Return a MetadataFilters IN filter scoped to ``doc_ids``."""
     from llama_index.core.vector_stores.types import FilterOperator
     from llama_index.core.vector_stores.types import MetadataFilter
@@ -391,6 +391,23 @@ def _exclude_document_id_filter(document_id: int | str):
                 key="document_id",
                 operator=FilterOperator.NE,
                 value=str(document_id),
+            ),
+        ],
+    )
+
+
+def exclude_document_ids_filter(doc_ids):
+    """Return a MetadataFilters NIN filter excluding every id in ``doc_ids``."""
+    from llama_index.core.vector_stores.types import FilterOperator
+    from llama_index.core.vector_stores.types import MetadataFilter
+    from llama_index.core.vector_stores.types import MetadataFilters
+
+    return MetadataFilters(
+        filters=[
+            MetadataFilter(
+                key="document_id",
+                operator=FilterOperator.NIN,
+                value=list(doc_ids),
             ),
         ],
     )
@@ -660,7 +677,7 @@ def retrieve_similar_nodes(
 
     filter_parts = []
     if allowed_document_ids is not None:
-        filter_parts.extend(_document_id_filters(allowed_document_ids).filters)
+        filter_parts.extend(document_id_filters(allowed_document_ids).filters)
     if document.pk is not None:
         filter_parts.extend(_exclude_document_id_filter(document.pk).filters)
 

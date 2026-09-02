@@ -1,5 +1,6 @@
 import inspect
 import sqlite3
+from collections.abc import Callable
 from collections.abc import Generator
 from pathlib import Path
 
@@ -92,6 +93,18 @@ def _ne_filter(document_id: int):
                 key="document_id",
                 operator=FilterOperator.NE,
                 value=document_id,
+            ),
+        ],
+    )
+
+
+def _nin_filter(document_ids: list[int]):
+    return MetadataFilters(
+        filters=[
+            MetadataFilter(
+                key="document_id",
+                operator=FilterOperator.NIN,
+                value=document_ids,
             ),
         ],
     )
@@ -280,6 +293,47 @@ class TestBuildWhere:
             "b1",
         ]
 
+    def test_nin_filter_translates_to_not_in_clause(self) -> None:
+        where, params = _build_where(_nin_filter([1, 2]))
+        assert where == "(document_id NOT IN (?,?))"
+        assert params == [1, 2]
+
+    def test_query_with_nin_filter_excludes_matching_documents(self, store) -> None:
+        store.add([make_node("a1", 1), make_node("b1", 2), make_node("c1", 3)])
+        assert sorted(
+            _query(store, [0.0] * DIM, top_k=5, filters=_nin_filter([1, 2])).ids,
+        ) == ["c1"]
+
+    def test_empty_in_filter_excludes_everything(self) -> None:
+        """
+        GIVEN:
+            - An IN filter with an empty value list
+        WHEN:
+            - _build_where() translates it to SQL
+        THEN:
+            - It excludes everything (the opposite of an empty NOT IN
+              filter) -- an empty inclusion list must never widen results
+        """
+        where, params = _build_where(_in_filter([]))
+        assert where == "(1 = 0)"
+        assert params == []
+
+    def test_empty_nin_filter_excludes_nothing(self) -> None:
+        """
+        GIVEN:
+            - A NOT IN filter with an empty value list -- e.g. an
+              unrestricted chat caller when nothing is currently trashed
+        WHEN:
+            - _build_where() translates it to SQL
+        THEN:
+            - It excludes nothing (unlike an empty IN filter, which
+              excludes everything) -- an empty exclusion list must never
+              narrow results
+        """
+        where, params = _build_where(_nin_filter([]))
+        assert where == "(1 = 1)"
+        assert params == []
+
     def test_fails_closed_when_no_filter_is_translatable(self) -> None:
         # A nested MetadataFilters is not a MetadataFilter, so it is skipped.
         # With no translatable clauses, the function must fail closed rather
@@ -297,24 +351,31 @@ class TestBuildWhere:
         assert where == "1 = 0"
         assert params == []
 
-    def test_fails_closed_when_in_filter_exceeds_max_values(
+    @pytest.mark.parametrize(
+        "build_filter",
+        [_in_filter, _nin_filter],
+        ids=["in", "nin"],
+    )
+    def test_fails_closed_when_filter_exceeds_max_values(
         self,
+        build_filter: Callable[[list[str]], MetadataFilters],
         caplog: pytest.LogCaptureFixture,
     ) -> None:
         """
         GIVEN:
-            - An IN filter with more values than _MAX_IN_VALUES (SQLite's
-              own bound-parameter limit is 32766; this guard sits below
-              that with headroom for the query's other bound parameters)
+            - An IN or NOT IN filter with more values than _MAX_IN_VALUES
+              (SQLite's own bound-parameter limit is 32766; this guard sits
+              below that with headroom for the query's other bound parameters)
         WHEN:
             - _build_where() translates it to SQL
         THEN:
-            - It fails closed ("1 = 0", no params) instead of building an
-              IN clause SQLite would reject, and logs a warning -- this
-              filter scopes document access, so refusing to build it must
-              never widen the scope to "everything" by accident
+            - It fails closed ("1 = 0", no params) instead of building a
+              clause SQLite would reject, and logs a warning -- this filter
+              scopes document access, so refusing to build it must never
+              widen the scope to "everything" by accident. Failing open on
+              a NOT IN would surface exactly the excluded rows
         """
-        oversized = _in_filter([str(i) for i in range(_MAX_IN_VALUES + 1)])
+        oversized = build_filter([str(i) for i in range(_MAX_IN_VALUES + 1)])
 
         with caplog.at_level("WARNING"):
             where, params = _build_where(oversized)

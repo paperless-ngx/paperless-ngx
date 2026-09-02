@@ -180,6 +180,7 @@ from documents.permissions import has_system_status_permission
 from documents.permissions import permitted_document_ids
 from documents.permissions import permitted_object_ids
 from documents.permissions import set_permissions_for_object
+from documents.permissions import user_is_unrestricted
 from documents.plugins.date_parsing import get_date_parser
 from documents.schema import generate_object_with_permissions_schema
 from documents.search import SearchHit
@@ -2329,10 +2330,12 @@ class ChatStreamingView(GenericAPIView[Any]):
                 return HttpResponseForbidden("Insufficient permissions")
 
             documents = Document.objects.filter(pk=document.pk)
+            unrestricted = False
         else:
             documents = Document.objects.filter(
                 id__in=permitted_document_ids(request.user),
             )
+            unrestricted = user_is_unrestricted(request.user)
 
         output_language = get_llm_output_language(
             ai_config=ai_config,
@@ -2343,6 +2346,7 @@ class ChatStreamingView(GenericAPIView[Any]):
             stream_chat_with_documents(
                 query_str=question,
                 documents=documents,
+                unrestricted=unrestricted,
                 output_language=output_language,
             ),
             content_type="text/event-stream",
