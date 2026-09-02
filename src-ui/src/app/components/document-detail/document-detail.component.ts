@@ -28,7 +28,7 @@ import {
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
-import { BehaviorSubject, Observable, of, Subject, timer } from 'rxjs'
+import { BehaviorSubject, EMPTY, Observable, of, Subject, timer } from 'rxjs'
 import {
   catchError,
   debounceTime,
@@ -98,8 +98,8 @@ import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
 import { DocumentDetailFieldID } from '../admin/settings/settings.component'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
-import { ReprocessConfirmDialogComponent } from '../common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component'
 import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
+import { ReprocessConfirmDialogComponent } from '../common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
@@ -732,6 +732,45 @@ export class DocumentDetailComponent
     this.toastService.showInfo($localize`Document reloaded.`)
   }
 
+  private processSuggestionsResponse = (
+    suggestionsResponse: Observable<DocumentSuggestions>
+  ) =>
+    suggestionsResponse.pipe(
+      first(),
+      takeUntil(this.unsubscribeNotifier),
+      takeUntil(this.docChangeNotifier),
+      tap((result) => {
+        this.suggestions.set(result)
+      }),
+      catchError((error) => {
+        this.suggestions.set(null)
+        this.toastService.showError(
+          $localize`Error retrieving suggestions.`,
+          error
+        )
+        return EMPTY
+      }),
+      finalize(() => this.suggestionsLoading.set(false))
+    )
+
+  private getAiSuggestions() {
+    this.suggestionsLoading.set(true)
+    return this.documentsService
+      .getAiSuggestions(this.documentId())
+      .pipe(this.processSuggestionsResponse)
+  }
+
+  private getSuggestions() {
+    this.suggestionsLoading.set(true)
+    return this.documentsService
+      .getSuggestions(this.documentId())
+      .pipe(this.processSuggestionsResponse)
+  }
+
+  private requestSuggestionsForDocument() {
+    return this.aiEnabled ? this.getAiSuggestions() : this.getSuggestions()
+  }
+
   ngOnInit(): void {
     this.setZoom(
       this.settings.get(SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING) as PdfZoomScale
@@ -903,10 +942,8 @@ export class DocumentDetailComponent
     this.requiresPassword = false
     this.updateFormForCustomFields()
     this.loadMetadataForSelectedVersion()
+
     if (
-      // AI suggestions can be requested on open or left to the Suggest control;
-      // classifier suggestions are always requested automatically
-      (!this.aiEnabled || this.aiSuggestOnOpen) &&
       this.permissionsService.currentUserHasObjectPermissions(
         PermissionAction.Change,
         doc
@@ -916,13 +953,21 @@ export class DocumentDetailComponent
         PermissionType.Document
       )
     ) {
-      this.tagService.getCachedMany(doc.tags).subscribe((tags) => {
-        // only show suggestions if document has inbox tags
-        if (tags.some((tag) => tag.is_inbox_tag)) {
-          this.getSuggestions()
-        }
-      })
+      this.tagService
+        .getCachedMany(doc.tags)
+        .pipe(
+          switchMap((tags) => {
+            // only show suggestions if document has inbox tags
+            if (!tags.some((tag) => tag.is_inbox_tag)) return EMPTY
+            this.suggestionsLoading.set(true)
+            return this.aiSuggestOnOpen
+              ? this.requestSuggestionsForDocument()
+              : this.getSuggestions()
+          })
+        )
+        .subscribe()
     }
+
     this.title.set(this.documentTitlePipe.transform(doc.title))
     this.prepareForm(doc)
 
@@ -1016,30 +1061,8 @@ export class DocumentDetailComponent
     return this.documentForm.get('custom_fields') as FormArray
   }
 
-  getSuggestions() {
-    this.suggestionsLoading.set(true)
-    const suggestionsObservable = this.aiEnabled
-      ? this.documentsService.getAiSuggestions(this.documentId())
-      : this.documentsService.getSuggestions(this.documentId())
-    suggestionsObservable
-      .pipe(
-        first(),
-        takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier),
-        finalize(() => this.suggestionsLoading.set(false))
-      )
-      .subscribe({
-        next: (result) => {
-          this.suggestions.set(result)
-        },
-        error: (error) => {
-          this.suggestions.set(null)
-          this.toastService.showError(
-            $localize`Error retrieving suggestions.`,
-            error
-          )
-        },
-      })
+  onGetSuggestionsClick() {
+    this.requestSuggestionsForDocument().subscribe()
   }
 
   createTag(newName: string) {

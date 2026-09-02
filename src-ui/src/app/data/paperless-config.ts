@@ -425,7 +425,7 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     type: ConfigOptionType.Boolean,
     config_key: 'PAPERLESS_AI_SUGGEST_ON_OPEN',
     category: ConfigCategory.AI,
-    note: $localize`Request AI suggestions automatically when opening a document with an inbox tag. When disabled, AI suggestions are only requested via the Suggest button. Classifier-based suggestions are not affected.`,
+    note: $localize`Request AI suggestions automatically when opening a document with an inbox tag. When disabled, AI suggestions are only requested via the Suggest button and opening a document falls back to classifier-based suggestions.`,
   },
 ]
 

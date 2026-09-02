@@ -2202,8 +2202,9 @@ used with the OpenAI-compatible backend to target a custom provider or local gat
 #### [`PAPERLESS_AI_SUGGEST_ON_OPEN=<bool>`](#PAPERLESS_AI_SUGGEST_ON_OPEN) {#PAPERLESS_AI_SUGGEST_ON_OPEN}
 
 : If set to false, AI suggestions are not requested automatically when a document with an inbox tag
-is opened, and are only requested when the "Suggest" button is actively invoked. Classifier-based suggestions are
-not affected. Useful to limit token usage or the load on a local model.
+is opened, and are only requested when the "Suggest" button is actively invoked. Opening a document
+still requests classifier-based suggestions, as it does when AI is disabled. Useful to limit token
+usage or the load on a local model.
 
     Defaults to true.
 

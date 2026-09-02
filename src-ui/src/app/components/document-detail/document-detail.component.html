@@ -138,7 +138,7 @@
                 [appliedCorrespondent]="documentForm.value.correspondent"
                 [appliedDocumentType]="documentForm.value.document_type"
                 [appliedStoragePath]="documentForm.value.storage_path"
-                (getSuggestions)="getSuggestions()"
+                (getSuggestions)="onGetSuggestionsClick()"
                 (addTag)="createTag($event)"
                 (addDocumentType)="createDocumentType($event)"
                 (addCorrespondent)="createCorrespondent($event)">

@@ -1444,6 +1444,104 @@ describe('DocumentDetailComponent', () => {
     })
   })
 
+  it('should not get AI suggestions on open if suggest on open is disabled', () => {
+    const getSetting = settingsService.get.bind(settingsService)
+    jest.spyOn(settingsService, 'get').mockImplementation((key) => {
+      if (key === SETTINGS_KEYS.AI_ENABLED) return true
+      if (key === SETTINGS_KEYS.AI_SUGGEST_ON_OPEN) return false
+      return getSetting(key)
+    })
+    const suggestionsSpy = jest.spyOn(documentService, 'getSuggestions')
+    const aiSuggestionsSpy = jest.spyOn(documentService, 'getAiSuggestions')
+    suggestionsSpy.mockReturnValue(
+      of({
+        tags: [42, 43],
+        suggested_tags: [],
+        suggested_document_types: [],
+        suggested_correspondents: [],
+      })
+    )
+    initNormally()
+    // falls back to the classifier rather than requesting AI suggestions
+    expect(aiSuggestionsSpy).not.toHaveBeenCalled()
+    expect(suggestionsSpy).toHaveBeenCalled()
+    expect(component.suggestions()).toEqual({
+      tags: [42, 43],
+      suggested_tags: [],
+      suggested_document_types: [],
+      suggested_correspondents: [],
+    })
+  })
+
+  it('should still get AI suggestions on request if suggest on open is disabled', () => {
+    const getSetting = settingsService.get.bind(settingsService)
+    jest.spyOn(settingsService, 'get').mockImplementation((key) => {
+      if (key === SETTINGS_KEYS.AI_ENABLED) return true
+      if (key === SETTINGS_KEYS.AI_SUGGEST_ON_OPEN) return false
+      return getSetting(key)
+    })
+    const aiSuggestionsSpy = jest.spyOn(documentService, 'getAiSuggestions')
+    aiSuggestionsSpy.mockReturnValue(
+      of({
+        tags: [42, 43],
+        suggested_tags: [],
+        suggested_document_types: [],
+        suggested_correspondents: [],
+      })
+    )
+    initNormally()
+    expect(aiSuggestionsSpy).not.toHaveBeenCalled()
+    component.onGetSuggestionsClick()
+    expect(aiSuggestionsSpy).toHaveBeenCalled()
+    expect(component.suggestions()).toEqual({
+      tags: [42, 43],
+      suggested_tags: [],
+      suggested_document_types: [],
+      suggested_correspondents: [],
+    })
+  })
+
+  it('should not get suggestions on open if the document has no inbox tags', () => {
+    jest
+      .spyOn(TestBed.inject(TagService), 'getCachedMany')
+      .mockReturnValue(
+        of([{ id: 42, name: 'Tag42', is_inbox_tag: false } as Tag])
+      )
+    const suggestionsSpy = jest.spyOn(documentService, 'getSuggestions')
+    const aiSuggestionsSpy = jest.spyOn(documentService, 'getAiSuggestions')
+    initNormally()
+    expect(suggestionsSpy).not.toHaveBeenCalled()
+    expect(aiSuggestionsSpy).not.toHaveBeenCalled()
+    expect(component.suggestionsLoading()).toBeFalsy()
+  })
+
+  it('should still get suggestions on open if AI is disabled', () => {
+    // the setting only gates AI suggestions, the classifier is unaffected
+    const getSetting = settingsService.get.bind(settingsService)
+    jest
+      .spyOn(settingsService, 'get')
+      .mockImplementation((key) =>
+        key === SETTINGS_KEYS.AI_SUGGEST_ON_OPEN ? false : getSetting(key)
+      )
+    const suggestionsSpy = jest.spyOn(documentService, 'getSuggestions')
+    suggestionsSpy.mockReturnValue(
+      of({
+        tags: [42, 43],
+        suggested_tags: [],
+        suggested_document_types: [],
+        suggested_correspondents: [],
+      })
+    )
+    initNormally()
+    expect(suggestionsSpy).toHaveBeenCalled()
+    expect(component.suggestions()).toEqual({
+      tags: [42, 43],
+      suggested_tags: [],
+      suggested_document_types: [],
+      suggested_correspondents: [],
+    })
+  })
+
   it('should reset the suggestions loading state if the document changes mid-request', () => {
     const getSetting = settingsService.get.bind(settingsService)
     jest
