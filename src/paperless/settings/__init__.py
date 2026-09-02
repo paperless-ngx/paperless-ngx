@@ -705,6 +705,12 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT: Final[int] = get_int_from_env("PAPERLESS_WORKER_TIMEOUT", 1800)
 
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#std-setting-task_allow_error_cb_on_chord_header
+# Without this, a failing chord header never triggers the errback, so a mail
+# whose attachments all fail is never recorded and is re-fetched forever.
+# The errback runs once per failed header task, so it must be idempotent.
+CELERY_TASK_ALLOW_ERROR_CB_ON_CHORD_HEADER = True
+
 CELERY_CACHE_BACKEND = "default"
 
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-serializer
