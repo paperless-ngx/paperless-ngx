@@ -334,18 +334,24 @@ def error_callback(
     """
     A shared task that is called whenever something goes wrong during
     consumption of a file. See queue_consumption_tasks.
+
+    With CELERY_TASK_ALLOW_ERROR_CB_ON_CHORD_HEADER enabled this runs once per
+    failed header task, not once per chord, so it must be idempotent.
     """
     rule = MailRule.objects.get(pk=rule_id)
+    received = make_aware(message_date) if is_naive(message_date) else message_date
 
-    ProcessedMail.objects.create(
+    ProcessedMail.objects.get_or_create(
         rule=rule,
         folder=rule.folder,
         uid=message_uid,
         uid_validity=uid_validity,
-        subject=message_subject,
-        received=make_aware(message_date) if is_naive(message_date) else message_date,
-        status="FAILED",
-        error=traceback.format_exc(),
+        defaults={
+            "subject": message_subject,
+            "received": received,
+            "status": "FAILED",
+            "error": traceback.format_exc(),
+        },
     )
 
 
