@@ -314,7 +314,7 @@ def _consume_file(
     consumption_dir: Path,
     *,
     subdirs_as_tags: bool,
-) -> None:
+) -> bool:
     """
     Queue a file for consumption.
 
@@ -322,15 +322,20 @@ def _consume_file(
         filepath: Path to the file to consume.
         consumption_dir: Base consumption directory.
         subdirs_as_tags: Whether to create tags from subdirectory names.
+
+    Returns:
+        True if the file was successfully handed to Celery, False otherwise.
+        Callers must not treat the file as queued on failure, or it will be
+        stranded until the consumer process restarts.
     """
     # Verify file still exists and is accessible
     try:
         if not filepath.is_file():
             logger.debug(f"Not consuming {filepath}: not a file or doesn't exist")
-            return
+            return False
     except OSError as e:
         logger.warning(f"Not consuming {filepath}: {e}")
-        return
+        return False
 
     # Get tags from path if configured
     tag_ids: list[int] | None = None
@@ -355,6 +360,9 @@ def _consume_file(
         )
     except Exception:
         logger.exception(f"Error while queuing document {filepath}")
+        return False
+    else:
+        return True
 
 
 class Command(BaseCommand):
@@ -492,12 +500,12 @@ class Command(BaseCommand):
             if not consumer_filter(Change.added, str(filepath)):
                 continue
 
-            _consume_file(
+            if _consume_file(
                 filepath=filepath,
                 consumption_dir=directory,
                 subdirs_as_tags=subdirs_as_tags,
-            )
-            queued.add(filepath.resolve())
+            ):
+                queued.add(filepath.resolve())
 
         return queued
 
@@ -651,14 +659,18 @@ class Command(BaseCommand):
 
                     # Check for stable files
                     for stable_path in tracker.get_stable_files():
-                        _consume_file(
+                        if _consume_file(
                             filepath=stable_path,
                             consumption_dir=directory,
                             subdirs_as_tags=subdirs_as_tags,
-                        )
-                        # Remember it so the rescan does not re-queue it while
-                        # the consume task has yet to remove it from disk
-                        queued.add(stable_path)
+                        ):
+                            # Remember it so the rescan does not re-queue it
+                            # while the consume task has yet to remove it
+                            # from disk
+                            queued.add(stable_path)
+                        # else: leave it untracked and un-queued so the next
+                        # rescan retries the failed publish (GH #13923)
+                        # instead of stranding it until a restart.
 
                     # Exit watch loop to reconfigure timeout
                     break

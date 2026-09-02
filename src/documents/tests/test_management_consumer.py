@@ -445,12 +445,13 @@ class TestConsumeFile:
         target = consumption_dir / "document.pdf"
         shutil.copy(sample_pdf, target)
 
-        _consume_file(
+        result = _consume_file(
             filepath=target,
             consumption_dir=consumption_dir,
             subdirs_as_tags=False,
         )
 
+        assert result is True
         mock_consume_file_delay.apply_async.assert_called_once()
         call_args = mock_consume_file_delay.apply_async.call_args
         consumable_doc = call_args.kwargs["kwargs"]["input_doc"]
@@ -464,11 +465,12 @@ class TestConsumeFile:
         mock_consume_file_delay: MagicMock,
     ) -> None:
         """Test _consume_file handles nonexistent files gracefully."""
-        _consume_file(
+        result = _consume_file(
             filepath=consumption_dir / "nonexistent.pdf",
             consumption_dir=consumption_dir,
             subdirs_as_tags=False,
         )
+        assert result is False
         mock_consume_file_delay.apply_async.assert_not_called()
 
     def test_consume_directory(
@@ -480,11 +482,12 @@ class TestConsumeFile:
         subdir = consumption_dir / "subdir"
         subdir.mkdir()
 
-        _consume_file(
+        result = _consume_file(
             filepath=subdir,
             consumption_dir=consumption_dir,
             subdirs_as_tags=False,
         )
+        assert result is False
         mock_consume_file_delay.apply_async.assert_not_called()
 
     def test_consume_with_permission_error(
@@ -499,12 +502,38 @@ class TestConsumeFile:
         shutil.copy(sample_pdf, target)
 
         mocker.patch.object(Path, "is_file", side_effect=PermissionError("denied"))
-        _consume_file(
+        result = _consume_file(
             filepath=target,
             consumption_dir=consumption_dir,
             subdirs_as_tags=False,
         )
+        assert result is False
         mock_consume_file_delay.apply_async.assert_not_called()
+
+    def test_consume_with_apply_async_failure(
+        self,
+        consumption_dir: Path,
+        sample_pdf: Path,
+        mock_consume_file_delay: MagicMock,
+    ) -> None:
+        """
+        Test _consume_file reports failure when apply_async raises.
+
+        Callers rely on this return value to avoid marking the file as
+        queued when the broker publish itself failed (GH #13923) - a false
+        positive here would strand the file until the consumer restarts.
+        """
+        target = consumption_dir / "document.pdf"
+        shutil.copy(sample_pdf, target)
+
+        mock_consume_file_delay.apply_async.side_effect = Exception("broker down")
+
+        result = _consume_file(
+            filepath=target,
+            consumption_dir=consumption_dir,
+            subdirs_as_tags=False,
+        )
+        assert result is False
 
     def test_consume_with_tags_error(
         self,
@@ -522,11 +551,12 @@ class TestConsumeFile:
             side_effect=DatabaseError("Something happened"),
         )
 
-        _consume_file(
+        result = _consume_file(
             filepath=target,
             consumption_dir=consumption_dir,
             subdirs_as_tags=True,
         )
+        assert result is True
         mock_consume_file_delay.apply_async.assert_called_once()
         call_args = mock_consume_file_delay.apply_async.call_args
         overrides = call_args.kwargs["kwargs"]["overrides"]
@@ -1247,6 +1277,54 @@ class TestProcessExistingFilesQueued:
         )
 
         assert target.resolve() in queued
+
+
+@pytest.mark.management
+@pytest.mark.django_db
+class TestCommandRetryAfterQueueFailure:
+    """
+    Regression test for GH #13923.
+
+    A file whose ``apply_async`` publish fails (e.g. broker briefly down)
+    must not be marked as queued, so the periodic rescan retries it once
+    the broker recovers, instead of stranding it until the consumer
+    process is restarted.
+    """
+
+    def test_watch_loop_retries_failed_publish_on_rescan(
+        self,
+        consumption_dir: Path,
+        sample_pdf: Path,
+        mock_consume_file_delay: MagicMock,
+        start_consumer: Callable[..., ConsumerThread],
+    ) -> None:
+        """A publish failure from the watch loop is retried by the rescan."""
+        call_count = 0
+
+        def flaky_apply_async(*args: object, **kwargs: object) -> None:
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                raise Exception("broker down")
+
+        mock_consume_file_delay.apply_async.side_effect = flaky_apply_async
+
+        thread = start_consumer(stability_delay=0.1, rescan_interval=0.3)
+
+        target = consumption_dir / "document.pdf"
+        shutil.copy(sample_pdf, target)
+
+        start_time = monotonic()
+        while call_count < 2 and monotonic() - start_time < 5.0:
+            sleep(0.1)
+
+        if thread.exception:
+            raise thread.exception
+
+        assert call_count >= 2, (
+            "Expected the failed publish to be retried by the rescan, "
+            f"but apply_async was only called {call_count} time(s)"
+        )
 
 
 @pytest.mark.management
