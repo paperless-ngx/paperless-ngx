@@ -53,13 +53,9 @@ class TestChatStreamingViewInputValidation(APITestCase):
 
 @pytest.mark.django_db
 class TestChatStreamingViewUnrestrictedFlag:
-    """ChatStreamingView must only skip the vector store's document id
-    filter (``unrestricted=True``) for a caller who can see every document
-    -- an active superuser -- never for a regular user, regardless of how
-    many documents that user happens to be permitted to view.
+    """The document id filter may only be skipped (``unrestricted=True``) for
+    a caller who can see every document, i.e. an active superuser.
     """
-
-    ENDPOINT = "/api/documents/chat/"
 
     @pytest.fixture
     def mocked_stream_chat(self, mocker: MockerFixture) -> mock.MagicMock:
@@ -112,7 +108,7 @@ class TestChatStreamingViewUnrestrictedFlag:
         client: APIClient = request.getfixturevalue(client_fixture)
 
         client.post(
-            self.ENDPOINT,
+            "/api/documents/chat/",
             data={"q": "What's in these documents?"},
             format="json",
         )

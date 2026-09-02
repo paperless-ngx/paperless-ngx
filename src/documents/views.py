@@ -2319,7 +2319,6 @@ class ChatStreamingView(GenericAPIView[Any]):
         question = serializer.validated_data["q"]
 
         doc_id = serializer.validated_data.get("document_id")
-        unrestricted = False
 
         if doc_id:
             try:
@@ -2331,6 +2330,7 @@ class ChatStreamingView(GenericAPIView[Any]):
                 return HttpResponseForbidden("Insufficient permissions")
 
             documents = Document.objects.filter(pk=document.pk)
+            unrestricted = False
         else:
             documents = Document.objects.filter(
                 id__in=permitted_document_ids(request.user),

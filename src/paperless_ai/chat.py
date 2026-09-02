@@ -114,9 +114,9 @@ def stream_chat_with_documents(
 def _stream_chat_with_documents(
     query_str: str,
     documents: QuerySet[Document],
-    output_language: str | None = None,
     *,
     unrestricted: bool = False,
+    output_language: str | None = None,
 ):
     if not documents.exists():
         yield CHAT_NO_CONTENT_MESSAGE
@@ -128,18 +128,15 @@ def _stream_chat_with_documents(
     from llama_index.core.retrievers import VectorIndexRetriever
 
     config = AIConfig()
-    # An unrestricted caller can see the entire corpus, so an id filter here
-    # would never narrow the search -- only cost an IN() list that can blow
-    # past the vector store's bound-parameter safety limit on large
-    # installs (see _MAX_IN_VALUES in vector_store.py). Skip it and let the
-    # retriever search the whole index.
-    filters = (
-        None
-        if unrestricted
-        else _document_id_filters(
+    if unrestricted:
+        # The caller can see every document, so an id filter would never narrow
+        # the search, only risk exceeding the vector store's bound parameter
+        # limit (_MAX_IN_VALUES in vector_store.py) on large installs.
+        filters = None
+    else:
+        filters = _document_id_filters(
             str(pk) for pk in documents.values_list("pk", flat=True)
         )
-    )
 
     # Hold the shared read lock for the whole operation: the query engine
     # retrieves from the vector store again during synthesis, so the connection

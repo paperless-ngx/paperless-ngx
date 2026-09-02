@@ -401,18 +401,17 @@ class TestStreamChatRetrieval:
         WHEN:
             - stream_chat_with_documents is called with unrestricted=True
         THEN:
-            - The retriever receives no document id filter (filters=None),
-              since an unrestricted caller can see every document and an id
-              filter here would only risk the vector store's IN-filter
-              safety limit on large installs, never narrow the search
+            - The retriever receives no document id filter (filters=None), so
+              the whole index is searched instead of an IN-list that risks the
+              vector store's safety limit on large installs
         """
-        included = DocumentFactory.create(content="included document content")
-        indexing.llm_index_add_or_update_document(included)
+        document = DocumentFactory.create(content="indexed document content")
+        indexing.llm_index_add_or_update_document(document)
 
         list(
             chat.stream_chat_with_documents(
                 "question?",
-                Document.objects.filter(pk=included.pk),
+                Document.objects.filter(pk=document.pk),
                 unrestricted=True,
             ),
         )
