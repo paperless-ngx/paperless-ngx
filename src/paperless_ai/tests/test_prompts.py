@@ -43,6 +43,7 @@ _MINIMAL_CONTEXTS = {
     PromptName.LOCALIZATION: LocalizationPromptContext(
         language_name="German",
         suggestions_json="{}",
+        schema_name="DocumentClassifierSchema",
     ),
     PromptName.TAXONOMY_BLOCK: TaxonomyBlockPromptContext(
         candidate_payload_json="",

@@ -32,6 +32,7 @@ class LocalizationPromptContext(PromptContext):
     template_name: ClassVar[PromptName] = PromptName.LOCALIZATION
     language_name: str
     suggestions_json: str
+    schema_name: str
 
 
 @dataclass(frozen=True, slots=True)

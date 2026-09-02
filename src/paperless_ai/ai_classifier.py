@@ -7,6 +7,7 @@ from documents.models import Document
 from documents.permissions import get_objects_for_user_owner_aware
 from paperless.config import AIConfig
 from paperless_ai.base_model import ClassificationSuggestions
+from paperless_ai.base_model import DocumentClassifierSchema
 from paperless_ai.base_model import TaxonomyChoiceDict
 from paperless_ai.base_model import classification_suggestions_to_model
 from paperless_ai.client import AIClient
@@ -127,6 +128,9 @@ def build_localization_prompt(
         LocalizationPromptContext(
             language_name=language_name,
             suggestions_json=model_suggestions.model_dump_json(),
+            # Naming the tool is what keeps certain models from answering with a
+            # fenced JSON blob instead of calling it.
+            schema_name=DocumentClassifierSchema.__name__,
         ),
     )
 

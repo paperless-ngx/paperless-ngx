@@ -18,6 +18,7 @@ from paperless_ai.ai_classifier import build_prompt_without_rag
 from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.ai_classifier import get_language_name
 from paperless_ai.ai_classifier import get_taxonomy_context
+from paperless_ai.base_model import DocumentClassifierSchema
 from paperless_ai.taxonomy import TaxonomyCandidate
 from paperless_ai.taxonomy import TaxonomyCandidates
 
@@ -292,6 +293,23 @@ def test_get_language_name_falls_back_to_language_code():
         - The original language code is returned unchanged
     """
     assert get_language_name("zz-zz") == "zz-zz"
+
+
+def test_build_localization_prompt_names_the_tool():
+    """
+    GIVEN:
+        - A localization prompt, which shows the model a JSON blob
+    WHEN:
+        - build_localization_prompt() is called
+    THEN:
+        - The prompt names the tool the model is meant to call, without which
+          models answer with a fenced JSON blob and no tool call at all
+        - The name is the one get_function_tool() derives from the schema
+          class, so the two cannot drift apart
+    """
+    prompt = build_localization_prompt(NESTED_SUGGESTIONS, output_language="de-de")
+
+    assert f"by calling the {DocumentClassifierSchema.__name__} tool" in prompt
 
 
 def test_build_localization_prompt_preserves_unicode_characters():
