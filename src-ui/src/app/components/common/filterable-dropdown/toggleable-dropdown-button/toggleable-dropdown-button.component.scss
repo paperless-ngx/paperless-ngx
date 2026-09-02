@@ -7,6 +7,8 @@
   padding-left: calc(calc(var(--depth) - 2) * 1rem);
   display: flex;
   align-items: center;
+    min-width: 0;
+    overflow-wrap: anywhere;
 
   .indicator {
     display: inline-block;
@@ -18,3 +20,7 @@
     margin-left: .5rem;
   }
 }
+
+  .badge {
+    flex-shrink: 0;
+  }
