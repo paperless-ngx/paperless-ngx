@@ -5621,11 +5621,15 @@ class TestApplyAISuggestionsWorkflowAction(
         action = self.make_action()
         self.make_workflow(action, WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED)
 
-        with mock.patch("documents.tasks.apply_ai_suggestions.delay") as delay:
+        with (
+            mock.patch("documents.tasks.apply_ai_suggestions.delay") as delay,
+            self.captureOnCommitCallbacks(execute=True),
+        ):
             run_workflows(
                 WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
                 self.doc,
             )
+            delay.assert_not_called()
 
         delay.assert_called_once_with(action_id=action.pk, document_id=self.doc.pk)
 

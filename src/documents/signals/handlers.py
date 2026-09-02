@@ -1003,7 +1003,7 @@ def run_workflows(
 
                         # kwargs so the PaperlessTask record can note the
                         # document, see _extract_input_data
-                        apply_ai_suggestions.delay(
+                        apply_ai_suggestions.delay_on_commit(
                             action_id=action.pk,
                             document_id=document.pk,
                         )
