@@ -137,7 +137,7 @@ def _stream_chat_with_documents(
         # hangs off post_delete, not trash), so must be excluded explicitly.
         trashed_ids = Document.global_objects.filter(
             deleted_at__isnull=False,
-        ).values_list("pk", flat=True)
+        trashed_ids = Document.deleted_objects.values_list("pk", flat=True)
         filters = exclude_document_ids_filter(str(pk) for pk in trashed_ids)
     else:
         filters = document_id_filters(
