@@ -317,7 +317,7 @@ a "document already exists" message.
 
 Paperless-ngx can suggest tags, correspondents, document types and storage paths for documents based on the content of the document. This is done using a (non-LLM) machine learning model that is trained on the documents in your database. The suggestions are shown in the document detail page and can be accepted or rejected by the user.
 
-Suggestions are requested automatically when you open a document that still has an inbox tag. To only request them by pressing the "Suggest" button instead, turn off "Automatically request suggestions for inbox documents" under Settings > Documents. This applies to both classifier-based and AI suggestions.
+Suggestions are requested automatically when you open a document that still has an inbox tag. To only request them by pressing the "Suggest" button instead, turn off "Automatically request suggestions for inbox documents" under Settings > Documents.
 
 ## AI Features
 
