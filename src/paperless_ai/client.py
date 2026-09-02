@@ -131,11 +131,10 @@ class AIClient:
 
         from llama_index.core.llms import ChatMessage
 
-        user_msg = ChatMessage(role="user", content=prompt)
         if self.settings.llm_backend == LLMBackend.OLLAMA:
             with self._normalize_timeouts():
                 result = self.llm.chat(
-                    [user_msg],
+                    [ChatMessage(role="user", content=prompt)],
                     format=DocumentClassifierSchema.model_json_schema(),
                     think=False,
                 )
@@ -149,6 +148,11 @@ class AIClient:
         from llama_index.core.program.function_program import get_function_tool
 
         tool = get_function_tool(DocumentClassifierSchema)
+        user_msg = ChatMessage(
+            role="user",
+            content=f"{prompt}\n\n"
+            f"Answer by calling the {tool.metadata.name} tool. Do not write the answer as text.",
+        )
         with self._normalize_timeouts():
             result = self.llm.chat_with_tools(
                 tools=[tool],

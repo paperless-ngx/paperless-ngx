@@ -146,6 +146,8 @@ def test_run_llm_query_ollama_uses_structured_json(mock_ai_config, mock_ollama_l
         format=ANY,
         think=False,
     )
+    messages = mock_llm_instance.chat.call_args.args[0]
+    assert messages[0].content == "test_prompt"
 
 
 def test_run_llm_query_openai_uses_tools(mock_ai_config, mock_openai_llm):
@@ -183,6 +185,13 @@ def test_run_llm_query_openai_uses_tools(mock_ai_config, mock_openai_llm):
     assert result["title"] == "Test Title"
     assert result["tags"] == {"existing_ids": [1], "new_names": []}
     mock_llm_instance.chat_with_tools.assert_called_once()
+    kwargs = mock_llm_instance.chat_with_tools.call_args.kwargs
+    offered_tool_name = kwargs["tools"][0].metadata.name
+    assert kwargs["user_msg"].content == (
+        "test_prompt\n\n"
+        f"Answer by calling the {offered_tool_name} tool. "
+        "Do not write the answer as text."
+    )
 
 
 def test_run_llm_query_openai_timeout_raises_local_error(
