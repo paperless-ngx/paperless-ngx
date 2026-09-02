@@ -2046,8 +2046,8 @@ class TestPostConsumeAction(TestCase):
         self.assertIn("Test Exception", processed_mail.error)
 
 
+@pytest.mark.django_db
 class TestErrorCallback:
-    @pytest.mark.django_db
     def test_error_callback_is_idempotent_for_same_mail(self) -> None:
         """
         GIVEN:
@@ -2059,21 +2059,20 @@ class TestErrorCallback:
         THEN:
             - Only one ProcessedMail row is created for that mail
         """
-        account = MailAccountFactory()
-        rule = MailRuleFactory(account=account)
+        rule = MailRuleFactory()
         message_uid = "12345"
-        message_subject = "Test Subject"
-        message_date = timezone.make_aware(timezone.datetime(2023, 1, 1, 12, 0, 0))
 
-        for exc_message in ("boom 1", "boom 2"):
+        for _ in range(2):
             error_callback(
                 None,
-                Exception(exc_message),
+                Exception("Test Exception"),
                 None,
                 rule_id=rule.pk,
                 message_uid=message_uid,
-                message_subject=message_subject,
-                message_date=message_date,
+                message_subject="Test Subject",
+                message_date=timezone.make_aware(
+                    timezone.datetime(2023, 1, 1, 12, 0, 0),
+                ),
             )
 
         processed_mails = ProcessedMail.objects.filter(

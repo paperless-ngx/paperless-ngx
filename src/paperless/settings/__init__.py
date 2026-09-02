@@ -706,11 +706,9 @@ CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT: Final[int] = get_int_from_env("PAPERLESS_WORKER_TIMEOUT", 1800)
 
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std-setting-task_allow_error_cb_on_chord_header
-# Without this, a chord's error callback is not invoked when a header task
-# fails, so a mail whose every attachment is a duplicate never gets an
-# errback call and is never recorded in ProcessedMail, causing it to be
-# re-fetched and re-processed indefinitely. error_callback is written to be
-# idempotent to tolerate the resulting one-call-per-failed-task behavior.
+# Without this, a failing chord header never triggers the errback, so a mail
+# whose attachments all fail is never recorded and is re-fetched forever.
+# The errback runs once per failed header task, so it must be idempotent.
 CELERY_TASK_ALLOW_ERROR_CB_ON_CHORD_HEADER = True
 
 CELERY_CACHE_BACKEND = "default"
