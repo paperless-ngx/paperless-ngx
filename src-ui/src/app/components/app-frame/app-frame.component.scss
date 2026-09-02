@@ -195,6 +195,26 @@ main {
   --bs-popover-body-padding-y: .5rem;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .sidebar-sticky > ul,
+  .sidebar-sticky > .nav-group {
+    animation: sidebar-nav-in .3s cubic-bezier(.22, .61, .36, 1) backwards;
+  }
+
+  @for $i from 2 through 5 {
+    .sidebar-sticky > :nth-child(#{$i}) {
+      animation-delay: #{($i - 1) * 0.04}s;
+    }
+  }
+}
+
+@keyframes sidebar-nav-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
 .sidebar-sticky {
   position: relative;
   top: 0;
