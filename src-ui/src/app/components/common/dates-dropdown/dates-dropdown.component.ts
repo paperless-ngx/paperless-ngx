@@ -23,6 +23,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import { pngxPopperOptions } from 'src/app/utils/popper-options'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
+import { _IdGenerator } from '@angular/cdk/a11y'
 
 export interface DateSelection {
   createdTo?: string
@@ -68,6 +69,10 @@ export enum RelativeDate {
 })
 export class DatesDropdownComponent implements OnInit, OnDestroy {
   public popperOptions = pngxPopperOptions
+  private readonly idGenerator = inject(_IdGenerator)
+  public readonly dropdownMenuId = this.idGenerator.getId(
+    'pngx-dates-dropdown-'
+  )
 
   constructor() {
     const settings = inject(SettingsService)

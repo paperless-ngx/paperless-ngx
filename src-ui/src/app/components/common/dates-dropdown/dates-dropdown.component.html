@@ -3,7 +3,7 @@
     <i-bs width="1em" height="1em" name="calendar-event-fill"></i-bs><div class="d-none d-sm-inline ms-1">{{title}}</div>
     <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
   </button>
-  <div class="dropdown-menu date-dropdown shadow p-2" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
+  <div [id]="dropdownMenuId" class="dropdown-menu date-dropdown shadow p-2" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
     <h6 class="dropdown-header border-bottom" i18n>Created</h6>
     <div class="list-group list-group-flush">
       <div class="list-group-item d-flex p-2 select-item" role="menuitem">
@@ -21,6 +21,7 @@
           bindValue="id"
           bindLabel="name"
           clearable="false"
+          [appendTo]="'#' + dropdownMenuId"
           placeholder="Relative dates"
           i18n-placeholder
           (change)="onSetCreatedRelativeDate($event)">
@@ -97,6 +98,7 @@
             bindValue="id"
             bindLabel="name"
             clearable="false"
+            [appendTo]="'#' + dropdownMenuId"
             placeholder="Relative dates"
             i18n-placeholder
             (change)="onSetAddedRelativeDate($event)">
