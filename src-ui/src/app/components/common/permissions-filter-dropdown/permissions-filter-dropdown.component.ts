@@ -1,3 +1,4 @@
+import { _IdGenerator } from '@angular/cdk/a11y'
 import { NgClass } from '@angular/common'
 import {
   Component,
@@ -69,6 +70,11 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
   private settingsService = inject(SettingsService)
 
   public OwnerFilterType = OwnerFilterType
+
+  private readonly idGenerator = inject(_IdGenerator)
+  public readonly dropdownMenuId = this.idGenerator.getId(
+    'pngx-permissions-filter-dropdown-'
+  )
 
   @Input()
   title: string

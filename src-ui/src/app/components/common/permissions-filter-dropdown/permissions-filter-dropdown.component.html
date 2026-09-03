@@ -3,7 +3,7 @@
     <i-bs name="person-fill-lock"></i-bs><div class="d-none d-sm-inline ms-1">{{title}}</div>
     <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
   </button>
-  <div class="dropdown-menu permission-filter-dropdown shadow py-0 w-2" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
+  <div [id]="dropdownMenuId" class="dropdown-menu permission-filter-dropdown shadow py-0 w-2" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
     <div class="list-group list-group-flush">
       <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.NONE)" [disabled]="disabled">
         <div class="selected-icon me-1">
@@ -69,6 +69,7 @@
             (ngModelChange)="selectionModel.includeUsers.set($event)"
             [disabled]="disabled"
             [clearable]="false"
+            [appendTo]="'#' + dropdownMenuId"
             [items]="users()"
             bindLabel="username"
             multiple="true"
