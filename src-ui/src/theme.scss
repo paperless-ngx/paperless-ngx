@@ -237,8 +237,8 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,%3csvg xmlns='h
     mix-blend-mode: luminosity;
   }
 
-  .paperless-input-select .ng-select .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:not(.ng-option-selected):hover,
-  .paperless-input-select .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:not(.ng-option-selected):hover,
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
     background-color: var(--bs-light) !important;
   }
 
