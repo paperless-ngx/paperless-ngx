@@ -207,3 +207,41 @@ test('bulk edit', async ({ page }) => {
   await page.getByRole('button', { name: 'Confirm' }).click()
   await bulkEditPromise
 })
+
+test('permissions dropdown stays open when selecting a user', async ({
+  page,
+}) => {
+  await page.goto('/documents')
+  await page.getByRole('button', { name: 'Permissions' }).click()
+  const dropdown = page.locator(
+    'pngx-permissions-filter-dropdown .dropdown-menu'
+  )
+  await expect(dropdown).toBeVisible()
+  await dropdown.locator('ng-select').click()
+  await page.getByRole('option', { name: 'playwright' }).click()
+  await expect(dropdown).toBeVisible()
+  await expect(dropdown.locator('.ng-value-label')).toHaveText('playwright')
+})
+
+test('custom fields query dropdown stays open when building a query', async ({
+  page,
+}) => {
+  await page.goto('/documents')
+  await page.getByRole('button', { name: 'Custom fields' }).click()
+  const dropdown = page.locator(
+    'pngx-custom-fields-query-dropdown .dropdown-menu'
+  )
+  await expect(dropdown).toBeVisible()
+
+  // field picker
+  await dropdown.locator('ng-select').first().click()
+  await page.getByRole('option', { name: 'Test Select Field' }).click()
+  await expect(dropdown).toBeVisible()
+
+  // value picker, shown once the operator takes a list of options
+  await dropdown.locator('select').first().selectOption({ label: 'In' })
+  await dropdown.locator('ng-select').last().click()
+  await page.getByRole('option', { name: 'Alpha' }).click()
+  await expect(dropdown).toBeVisible()
+  await expect(dropdown.locator('.ng-value-label').last()).toHaveText('Alpha')
+})
