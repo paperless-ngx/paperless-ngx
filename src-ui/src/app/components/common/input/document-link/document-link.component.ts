@@ -81,6 +81,12 @@ export class DocumentLinkComponent
   @Input()
   placeholder: string = $localize`Search for documents`
 
+  /**
+   * Parent for ng-select dropdown, needed to prevent close on click.
+   */
+  @Input()
+  appendTo: string = null
+
   get selectedDocumentIDs(): number[] {
     return this.selectedDocuments.map((d) => d.id)
   }
