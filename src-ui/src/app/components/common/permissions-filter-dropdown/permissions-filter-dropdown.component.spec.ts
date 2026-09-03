@@ -171,6 +171,21 @@ describe('PermissionsFilterDropdownComponent', () => {
 
     expect(component.selectionModel.ownerFilter()).toEqual(OwnerFilterType.NONE)
   })
+  it('should clear selected users', () => {
+    component.selectionModel.includeUsers.set([12])
+    component.onUserSelect()
+    component.selectionModel.hideUnowned.set(true)
+    expect(component.selectionModel.ownerFilter()).toEqual(
+      OwnerFilterType.OTHERS
+    )
+
+    component.clearIncludeUsers()
+
+    expect(component.selectionModel.includeUsers()).toEqual([])
+    expect(component.selectionModel.ownerFilter()).toEqual(OwnerFilterType.NONE)
+    expect(component.selectionModel.hideUnowned()).toBeTruthy()
+  })
+
   it('should emit a selection model depending on the type of owner filter set', () => {
     const emitted = () => ({
       excludeUsers: ownerFilterSetResult.excludeUsers(),

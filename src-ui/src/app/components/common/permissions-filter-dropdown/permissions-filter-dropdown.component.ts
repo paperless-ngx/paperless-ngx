@@ -211,6 +211,11 @@ export class PermissionsFilterDropdownComponent extends ComponentWithPermissions
     this.ownerFilterSet.emit(this.selectionModel)
   }
 
+  clearIncludeUsers() {
+    this.selectionModel.includeUsers.set([])
+    this.onUserSelect()
+  }
+
   onUserSelect() {
     this.selectionModel.ownerFilter.set(
       this.selectionModel.includeUsers()?.length
