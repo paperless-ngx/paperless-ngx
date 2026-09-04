@@ -76,7 +76,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 "remote_ocr_api_key": None,
                 "remote_ocr_endpoint": None,
                 "remote_ocr_mode": None,
-                "ai_enabled": False,
+                "ai_enabled": None,
                 "llm_embedding_backend": None,
                 "llm_embedding_model": None,
                 "llm_embedding_endpoint": None,
@@ -948,6 +948,26 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 content_type="application/json",
             )
             mock_update.assert_called_once()
+
+    @override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND=None)
+    def test_external_ai_setting_triggers_index_update(self) -> None:
+        config = ApplicationConfiguration.objects.first()
+        assert config is not None
+        config.ai_enabled = None
+        config.llm_embedding_backend = None
+        config.save()
+
+        with (
+            patch("documents.tasks.llmindex_index.apply_async") as mock_update,
+            patch("paperless.views.llm_index_exists", return_value=False),
+        ):
+            self.client.patch(
+                f"{self.ENDPOINT}1/",
+                json.dumps({"llm_embedding_backend": "openai-like"}),
+                content_type="application/json",
+            )
+
+        mock_update.assert_called_once()
 
     def test_update_llm_embedding_chunk_size_triggers_rebuild(self) -> None:
         config = ApplicationConfiguration.objects.first()
