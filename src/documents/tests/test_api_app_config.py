@@ -76,7 +76,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 "remote_ocr_api_key": None,
                 "remote_ocr_endpoint": None,
                 "remote_ocr_mode": None,
-                "ai_enabled": False,
+                "ai_enabled": None,
                 "llm_embedding_backend": None,
                 "llm_embedding_model": None,
                 "llm_embedding_endpoint": None,
