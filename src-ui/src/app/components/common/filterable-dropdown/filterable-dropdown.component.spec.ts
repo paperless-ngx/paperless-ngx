@@ -703,6 +703,40 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     expect(selectionModel.getSelectedItems()).toEqual([other])
   })
 
+  it('re-selects ancestors when a child is re-selected while editing', () => {
+    // https://github.com/paperless-ngx/paperless-ngx/issues/13970
+    const inbox: Tag = { id: 200, name: 'Inbox' }
+    const parent: Tag = { id: 201, name: 'Parent Tag' }
+    const child: Tag = { id: 202, name: 'Child Tag', parent: parent.id }
+
+    selectionModel.editing = true
+    selectionModel.items = [inbox, parent, child]
+    selectionModel.init(
+      new Map([
+        [inbox.id, ToggleableItemState.Selected],
+        [parent.id, ToggleableItemState.Selected],
+        [child.id, ToggleableItemState.Selected],
+      ])
+    )
+
+    // deselecting the parent also deselects the child
+    selectionModel.toggle(parent.id, false)
+    expect(selectionModel.getSelectedItems()).toEqual([inbox])
+
+    // re-selecting the child brings its parent back, so nothing is changed
+    selectionModel.toggle(child.id, false)
+    expect(
+      selectionModel
+        .getSelectedItems()
+        .map((item) => item.id)
+        .sort((a, b) => a - b)
+    ).toEqual([inbox.id, parent.id, child.id])
+    expect(selectionModel.diff()).toEqual({
+      itemsToAdd: [],
+      itemsToRemove: [],
+    })
+  })
+
   it('un-excluding a parent clears excluded descendants', () => {
     const root: Tag = { id: 110, name: 'Root Tag' }
     const child: Tag = { id: 111, name: 'Child Tag', parent: root.id }
@@ -739,7 +773,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
     const apple: Tag = { id: 55, name: 'Apple' }
     const zebra: Tag = { id: 56, name: 'Zebra' }
 
-    selectionModel.documentCountSortingEnabled = true
+    selectionModel.editing = true
     selectionModel.items = [apple, zebra]
     expect(selectionModel.items.map((item) => item?.id ?? null)).toEqual([
       null,

@@ -78,7 +78,7 @@ export class FilterableDropdownSelectionModel {
     new Map<number, ToggleableItemState>()
   )
 
-  public documentCountSortingEnabled = false
+  public editing = false
 
   private get selectionStates(): ReadonlyMap<number, ToggleableItemState> {
     return this._selectionStates()
@@ -93,7 +93,7 @@ export class FilterableDropdownSelectionModel {
 
   public set documentCounts(counts: SelectionDataItem[]) {
     this._documentCounts.set(counts)
-    if (this.documentCountSortingEnabled) {
+    if (this.editing) {
       this._items.set(this.sortItems(this.items))
     }
   }
@@ -242,6 +242,9 @@ export class FilterableDropdownSelectionModel {
         }
         states.set(id, newState)
       }
+      if (this.editing && states.get(id) == ToggleableItemState.Selected) {
+        this.addAncestorSelections(states, id)
+      }
     } else if (
       state == ToggleableItemState.Selected ||
       state == ToggleableItemState.Excluded
@@ -324,6 +327,21 @@ export class FilterableDropdownSelectionModel {
   ) {
     for (const descendantID of this.getDescendantIDs(id)) {
       states.delete(descendantID)
+    }
+  }
+
+  private addAncestorSelections(
+    states: Map<number, ToggleableItemState>,
+    id: number
+  ) {
+    const parentById = this.buildParentById(this.items)
+    const seen = new Set<number>([id])
+    let parentID = parentById.get(id)
+
+    while (typeof parentID === 'number' && !seen.has(parentID)) {
+      seen.add(parentID)
+      states.set(parentID, ToggleableItemState.Selected)
+      parentID = parentById.get(parentID)
     }
   }
 
@@ -731,7 +749,7 @@ export class FilterableDropdownComponent
       model.manyToOne = this.selectionModel.manyToOne
       model.singleSelect = this._editing && !model.manyToOne
     }
-    model.documentCountSortingEnabled = this._editing
+    model.editing = this._editing
     model.changed.subscribe((updatedModel) => {
       this.selectionModelChange.next(updatedModel)
     })
@@ -769,7 +787,7 @@ export class FilterableDropdownComponent
     if (this.selectionModel) {
       this.selectionModel.singleSelect =
         this._editing && !this.selectionModel.manyToOne
-      this.selectionModel.documentCountSortingEnabled = this._editing
+      this.selectionModel.editing = this._editing
     }
   }
 
