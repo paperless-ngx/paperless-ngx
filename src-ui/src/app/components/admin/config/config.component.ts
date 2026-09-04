@@ -166,7 +166,9 @@ export class ConfigComponent
           this.configForm.patchValue(state, { emitEvent: false })
         })
 
-      this.isDirty$ = dirtyCheck(this.configForm, this.store.asObservable())
+      this.isDirty$ = dirtyCheck(this.configForm, this.store.asObservable(), {
+        excludeKeys: ['externally_configured_variables'],
+      })
     }
     this.configForm.patchValue(config)
 
