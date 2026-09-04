@@ -1,3 +1,4 @@
+import { _IdGenerator } from '@angular/cdk/a11y'
 import {
   getLocaleNumberSymbol,
   NgClass,
@@ -249,6 +250,18 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
 
   @Input()
   useDropdown: boolean = true
+
+  private readonly idGenerator = inject(_IdGenerator)
+  public readonly dropdownMenuId = this.idGenerator.getId(
+    'pngx-custom-fields-query-dropdown-'
+  )
+
+  /**
+   * Keep ng-select dropdown panels inside the dropdown menu
+   */
+  get selectAppendTo(): string {
+    return this.useDropdown ? `#${this.dropdownMenuId}` : null
+  }
 
   get name(): string {
     return this.title ? this.title.replace(/\s/g, '_').toLowerCase() : null

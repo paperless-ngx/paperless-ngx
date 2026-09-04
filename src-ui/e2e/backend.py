@@ -48,6 +48,7 @@ def seed_database() -> None:
     from django.utils import timezone
 
     from documents.models import Correspondent
+    from documents.models import CustomField
     from documents.models import Document
     from documents.models import DocumentType
     from documents.models import Note
@@ -80,6 +81,16 @@ def seed_database() -> None:
         name="Testing 12",
         path="e2e/{created_year}/{title}",
         owner=admin,
+    )
+    CustomField.objects.create(
+        name="Test Select Field",
+        data_type=CustomField.FieldDataType.SELECT,
+        extra_data={
+            "select_options": [
+                {"id": "abc123", "label": "Alpha"},
+                {"id": "def456", "label": "Beta"},
+            ],
+        },
     )
 
     today = timezone.localdate()

@@ -6,7 +6,7 @@
         <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge>
       }
     </button>
-    <div class="px-3 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
+    <div [id]="dropdownMenuId" class="px-3 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
       <ng-container *ngTemplateOutlet="list; context: { queries: selectionModel.queries }"></ng-container>
     </div>
   </div>
@@ -64,10 +64,11 @@
       [disabled]="disabled"
       [virtualScroll]="getSelectOptionsForField(atom.field)?.length > 100"
       [searchFn]="selectOptionSearchFn"
+      [appendTo]="selectAppendTo"
       (mousedown)="$event.stopImmediatePropagation()"
     ></ng-select>
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.DocumentLink) {
-    <pngx-input-document-link [(ngModel)]="atom.value" class="w-25 form-select doc-link-select p-0" placeholder="Search docs..." i18n-placeholder [minimal]="true"></pngx-input-document-link>
+    <pngx-input-document-link [(ngModel)]="atom.value" class="w-25 form-select doc-link-select p-0" placeholder="Search docs..." i18n-placeholder [minimal]="true" [appendTo]="selectAppendTo"></pngx-input-document-link>
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Monetary) {
     <input class="w-25 form-control rounded-end" type="text" inputmode="decimal"
       [ngModel]="atom.value"
@@ -88,6 +89,7 @@
       bindLabel="name"
       bindValue="id"
       [searchFn]="customFieldSearchFn"
+      [appendTo]="selectAppendTo"
       (mousedown)="$event.stopImmediatePropagation()"
     ></ng-select>
     <select class="w-25 form-select" [(ngModel)]="atom.operator" [disabled]="disabled">
@@ -121,7 +123,7 @@
         <ng-container *ngTemplateOutlet="comparisonValueTemplate; context: { atom: atom }"></ng-container>
       }
       @case (CustomFieldQueryOperator.Contains) {
-        <pngx-input-document-link [(ngModel)]="atom.value" class="w-25 form-select doc-link-select p-0" placeholder="Search docs..." i18n-placeholder [minimal]="true"></pngx-input-document-link>
+        <pngx-input-document-link [(ngModel)]="atom.value" class="w-25 form-select doc-link-select p-0" placeholder="Search docs..." i18n-placeholder [minimal]="true" [appendTo]="selectAppendTo"></pngx-input-document-link>
       }
       @case (CustomFieldQueryOperator.In) {
         <ng-select
@@ -133,6 +135,7 @@
           [disabled]="disabled"
           [multiple]="true"
           [searchFn]="selectOptionSearchFn"
+          [appendTo]="selectAppendTo"
           (mousedown)="$event.stopImmediatePropagation()"
         ></ng-select>
       }
