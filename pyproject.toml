@@ -90,7 +90,7 @@ postgres = [
   "psycopg-pool==3.3.1",
 ]
 webserver = [
-  "granian[uvloop]~=2.7.0",
+  "granian[uvloop]>=2.7,<2.9",
 ]
 
 [dependency-groups]
