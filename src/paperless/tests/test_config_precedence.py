@@ -9,8 +9,7 @@ from paperless.models import ApplicationConfiguration
 class TestBooleanConfigPrecedence(TestCase):
     @override_settings(CONSUMER_ENABLE_BARCODES=True)
     def test_database_false_overrides_barcode_environment_setting(self) -> None:
-        config = ApplicationConfiguration.objects.first()
-        assert config is not None
+        config, _ = ApplicationConfiguration.objects.get_or_create()
         config.barcodes_enabled = False
         config.save()
 
@@ -18,8 +17,7 @@ class TestBooleanConfigPrecedence(TestCase):
 
     @override_settings(AI_ENABLED=True)
     def test_database_false_overrides_ai_environment_setting(self) -> None:
-        config = ApplicationConfiguration.objects.first()
-        assert config is not None
+        config, _ = ApplicationConfiguration.objects.get_or_create()
         config.ai_enabled = False
         config.save()
 
@@ -27,8 +25,7 @@ class TestBooleanConfigPrecedence(TestCase):
 
     @override_settings(AI_ENABLED=True)
     def test_null_ai_setting_uses_environment_setting(self) -> None:
-        config = ApplicationConfiguration.objects.first()
-        assert config is not None
+        config, _ = ApplicationConfiguration.objects.get_or_create()
         config.ai_enabled = None
         config.save()
 
