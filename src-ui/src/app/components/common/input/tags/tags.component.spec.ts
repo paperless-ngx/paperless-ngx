@@ -207,6 +207,21 @@ describe('TagsComponent', () => {
     expect(component.value).toEqual([2, 1])
   })
 
+  it('should propagate parents added via ng-select selection', () => {
+    const parent: Tag = { id: 1, name: 'parent' }
+    const child: Tag = { id: 2, name: 'child', parent: 1 }
+    component.tags = [parent, child]
+    fixture.detectChanges()
+    let propagated: number[]
+    component.registerOnChange((value: number[]) => (propagated = value))
+
+    component.value = []
+    component.select.select(component.select.itemsList.findItem(child.id))
+
+    expect(component.value).toEqual([2, 1])
+    expect(propagated).toEqual([2, 1])
+  })
+
   it('should not duplicate parents when adding sibling nested tags', () => {
     const root: Tag = { id: 1, name: 'root' }
     const parent: Tag = { id: 2, name: 'parent', parent: 1 }
