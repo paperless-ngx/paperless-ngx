@@ -29,7 +29,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends gettext
       - name: Install uv
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
@@ -43,7 +43,7 @@ jobs:
           PAPERLESS_SECRET_KEY: "ci-translate-not-a-real-secret"
         run: cd src/ && uv run manage.py makemessages -l en_US -i "samples*"
       - name: Install pnpm
-        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         with:
           package_json_file: src-ui/package.json
       - name: Use Node.js 24
