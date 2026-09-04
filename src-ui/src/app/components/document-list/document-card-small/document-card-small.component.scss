@@ -69,6 +69,11 @@
   button {
     line-height: 1;
 
+    small {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
     &:hover,
     &:focus {
       background-color: transparent !important;
