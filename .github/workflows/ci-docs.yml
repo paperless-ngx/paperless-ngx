@@ -50,7 +50,7 @@ jobs:
       - name: Detect changes
         id: filter
         if: steps.force.outputs.run_all != 'true'
-        uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         with:
           base: ${{ steps.range.outputs.base }}
           ref: ${{ steps.range.outputs.ref }}
@@ -78,7 +78,7 @@ jobs:
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Install uv
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
