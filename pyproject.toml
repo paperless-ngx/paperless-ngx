@@ -153,10 +153,6 @@ environments = [
   "sys_platform == 'linux'",
 ]
 package = false
-[[tool.uv.index]]
-name = "pytorch-cpu"
-url = "https://download.pytorch.org/whl/cpu"
-explicit = true
 [tool.uv.sources]
 # Markers are chosen to select these almost exclusively when building the Docker image
 psycopg-c = [
@@ -168,6 +164,10 @@ psycopg-c = [
 torch = [
   { index = "pytorch-cpu" },
 ]
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [tool.ruff]
 target-version = "py311"
@@ -327,12 +327,6 @@ PAPERLESS_CHANNELS_BACKEND = "channels.layers.InMemoryChannelLayer"
 # I don't think anything hits this, but just in case, basically infinite
 PAPERLESS_TOKEN_THROTTLE_RATE = "1000/min"
 
-[tool.coverage.report]
-exclude_also = [
-  "if settings.AUDIT_LOG_ENABLED:",
-  "if AUDIT_LOG_ENABLED:",
-  "if TYPE_CHECKING:",
-]
 [tool.coverage.run]
 source = [
   "src/",
@@ -342,6 +336,12 @@ omit = [
   "manage.py",
   "paperless/wsgi.py",
   "paperless/auth.py",
+]
+[tool.coverage.report]
+exclude_also = [
+  "if settings.AUDIT_LOG_ENABLED:",
+  "if AUDIT_LOG_ENABLED:",
+  "if TYPE_CHECKING:",
 ]
 
 [tool.mypy-baseline]

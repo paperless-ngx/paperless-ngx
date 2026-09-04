@@ -415,10 +415,10 @@ plain class attributes (not instance attributes or properties):
 
 ```python
 class MyCustomParser:
-    name    = "My Format Parser"   # human-readable name shown in logs
-    version = "1.0.0"              # semantic version string
-    author  = "Acme Corp"          # author / organisation
-    url     = "https://example.com/my-parser"  # docs or issue tracker
+    name = "My Format Parser"  # human-readable name shown in logs
+    version = "1.0.0"  # semantic version string
+    author = "Acme Corp"  # author / organisation
+    url = "https://example.com/my-parser"  # docs or issue tracker
 ```
 
 **Declaring supported MIME types**
@@ -482,7 +482,8 @@ attribute are treated as fully local and are always considered.
 @property
 def can_produce_archive(self) -> bool:
     """True if parse() can produce a searchable PDF archive copy."""
-    return True   # or False if your parser doesn't produce PDFs
+    return True  # or False if your parser doesn't produce PDFs
+
 
 @property
 def requires_pdf_rendition(self) -> bool:
@@ -506,6 +507,7 @@ from typing import Self
 from types import TracebackType
 
 from django.conf import settings
+
 
 class MyCustomParser:
     ...
@@ -539,8 +541,9 @@ implementation is fine:
 ```python
 from paperless.parsers import ParserContext
 
+
 def configure(self, context: ParserContext) -> None:
-    pass   # override if you need context.mailrule_id, etc.
+    pass  # override if you need context.mailrule_id, etc.
 ```
 
 **Parsing**
@@ -551,6 +554,7 @@ Raise `documents.parsers.ParseError` on any unrecoverable failure.
 
 ```python
 from documents.parsers import ParseError
+
 
 def parse(
     self,
@@ -577,18 +581,20 @@ def get_text(self) -> str:
     # Return the extracted text, or an empty string if none was found.
     return self._text
 
+
 def get_date(self) -> "datetime.datetime | None":
     # Return a datetime extracted from the document, or None to let
     # Paperless-ngx use its default date-guessing logic.
     return None
 
+
 def get_archive_path(self) -> Path | None:
     return self._archive_path
+
 
 def get_page_count(self, document_path: Path, mime_type: str) -> int | None:
     # If the format doesn't have the concept of pages, return None
     return count_pages(document_path)
-
 ```
 
 **Thumbnail**
@@ -611,7 +617,6 @@ Implement them if your format supports the information; otherwise return
 `None` / `[]`.
 
 ```python
-
 def extract_metadata(
     self,
     document_path: Path,
@@ -619,6 +624,7 @@ def extract_metadata(
 ) -> "list[MetadataEntry]":
     # Must never raise. Return [] if metadata cannot be read.
     from paperless.parsers import MetadataEntry
+
     return [
         MetadataEntry(
             namespace="https://example.com/ns/",
@@ -681,17 +687,19 @@ from paperless.parsers import ParserContext
 
 
 class XmlDocumentParser:
-    name    = "XML Parser"
+    name = "XML Parser"
     version = "1.0.0"
-    author  = "Acme Corp"
-    url     = "https://example.com/xml-parser"
+    author = "Acme Corp"
+    url = "https://example.com/xml-parser"
 
     @classmethod
     def supported_mime_types(cls) -> dict[str, str]:
         return {"application/xml": ".xml", "text/xml": ".xml"}
 
     @classmethod
-    def score(cls, mime_type: str, filename: str, path: Path | None = None) -> int | None:
+    def score(
+        cls, mime_type: str, filename: str, path: Path | None = None
+    ) -> int | None:
         return 10
 
     @property
@@ -704,7 +712,9 @@ class XmlDocumentParser:
 
     def __init__(self, logging_group: object = None) -> None:
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
-        self._tempdir = Path(tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR))
+        self._tempdir = Path(
+            tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
+        )
         self._text: str = ""
 
     def __enter__(self) -> Self:
@@ -716,7 +726,9 @@ class XmlDocumentParser:
     def configure(self, context: ParserContext) -> None:
         pass
 
-    def parse(self, document_path: Path, mime_type: str, *, produce_archive: bool = True) -> None:
+    def parse(
+        self, document_path: Path, mime_type: str, *, produce_archive: bool = True
+    ) -> None:
         try:
             tree = ET.parse(document_path)
             self._text = " ".join(tree.getroot().itertext())
@@ -734,6 +746,7 @@ class XmlDocumentParser:
 
     def get_thumbnail(self, document_path: Path, mime_type: str) -> Path:
         from PIL import Image, ImageDraw
+
         img = Image.new("RGB", (500, 700), color="white")
         ImageDraw.Draw(img).text((10, 10), "XML Document", fill="black")
         out = self._tempdir / "thumb.webp"
@@ -821,6 +834,7 @@ def _parse_string(
     """
     Parse a single date string using dateparser with configured settings.
     """
+
 
 def _filter_date(
     self,
