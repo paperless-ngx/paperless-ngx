@@ -30,7 +30,7 @@ RUN set -eux \
 # Purpose: Installs s6-overlay and rootfs
 # Comments:
 #  - Don't leave anything extra in here either
-FROM ghcr.io/astral-sh/uv:0.12.5-python3.14-trixie-slim AS s6-overlay-base
+FROM ghcr.io/astral-sh/uv:0.12.9-python3.14-trixie-slim AS s6-overlay-base
 
 WORKDIR /usr/src/s6
 
