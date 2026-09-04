@@ -821,7 +821,7 @@ wheels = [
 
 [[package]]
 name = "dateparser"
-version = "1.4.1"
+version = "1.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "python-dateutil" },
@@ -829,9 +829,9 @@ dependencies = [
     { name = "regex" },
     { name = "tzlocal" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d3/f4/561c49bca97af561d34eed27e3e831135eb5cb88e754c1150be41820f5c6/dateparser-1.4.1.tar.gz", hash = "sha256:f265df13c0380e2e07543ba74b67c0681aaa1096981ffcd35227e1aa0cb81c7c", size = 314734, upload-time = "2026-06-15T08:45:47.659Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/59/6a/9f06999c4f27e9192c5eb38bfffadc2e6752df8178e97e88b10b9eb4c682/dateparser-1.4.2.tar.gz", hash = "sha256:bed2a3fd9bad8f2fb2d72b57748bada260b3a9349a264c22ffc23c3249d7049a", size = 338363, upload-time = "2026-08-04T12:11:03.201Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8b/7c/2e5dcf53909deddd0bf38cbe277ad9806be038276b1c6c436561b4d9b2e2/dateparser-1.4.1-py3-none-any.whl", hash = "sha256:f25d4e051a84be27a35bd297e3e1dc59ff78373701b89be352ba80372d22d0d0", size = 300503, upload-time = "2026-06-15T08:45:45.951Z" },
+    { url = "https://files.pythonhosted.org/packages/cb/1b/349e07ad184d64e81109e85a3557d7e05631fa3d05344169114ba743c4d3/dateparser-1.4.2-py3-none-any.whl", hash = "sha256:752f3d49d477cf7f60a7a9c8bcb19c882496ede0e377d5a3d80014cdfeca7050", size = 316546, upload-time = "2026-08-04T12:11:01.396Z" },
 ]
 
 [[package]]
@@ -934,14 +934,14 @@ wheels = [
 
 [[package]]
 name = "django-cachalot"
-version = "2.9.0"
+version = "2.9.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6c/d6/2f4033cc3443b7ce15459247488050cd0b8b56f15a03fcf2650b2483026e/django_cachalot-2.9.0.tar.gz", hash = "sha256:67d3d19a3f6deab7dc5b081b5f78ea926318f64a7b3afb06f28e61d8d31e02b3", size = 76922, upload-time = "2026-01-28T05:23:30.318Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b6/6b/e9df6b94965f783f660a2c469f2b1fd2ffb15fb3d6953bcec9652030c8f8/django_cachalot-2.9.1.tar.gz", hash = "sha256:7d3b12022abc811e344deac8830228e2d027ed8dcf762e1116dccde74d360512", size = 77071, upload-time = "2026-08-10T19:37:48.455Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/12/bf/af8ad2aa5a402f278b444ca70729fb12ee96ddb89c19c32a2d7c5189358f/django_cachalot-2.9.0-py3-none-any.whl", hash = "sha256:b80ac4930613a7849988ea772a53598d262a15eaf55e5ec8c78accae7fdd99ff", size = 57814, upload-time = "2026-01-28T05:23:28.741Z" },
+    { url = "https://files.pythonhosted.org/packages/7f/75/58c631f44f41f9eab7ab5dc29cfcdebeecabb63ee9487654990e1b7ac31e/django_cachalot-2.9.1-py3-none-any.whl", hash = "sha256:cd015b9e5235b74d6c9dc8cc984165aea876be02b51ce76d534870dbdd81dab0", size = 57818, upload-time = "2026-08-10T19:37:46.482Z" },
 ]
 
 [[package]]
@@ -1215,11 +1215,11 @@ wheels = [
 
 [[package]]
 name = "filelock"
-version = "3.32.0"
+version = "3.32.4"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c0/80/8232b582c4b318b817cf1274ba74976b07b34d35ef439b3eb948f98645a1/filelock-3.32.0.tar.gz", hash = "sha256:7be2ad23a14607ccc71808e68fe30848aeace7058ace17852f68e2a68e310402", size = 213757, upload-time = "2026-07-21T13:17:42.898Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6d/30/03b03951873a1a0ffc7e8ca0e10c15597b59e8d0e39260704cd2ea087bc4/filelock-3.32.4.tar.gz", hash = "sha256:2bde2e4cf732e0153406d8a7bc80620ecf5e621fe0d25e41143c4e3b4733ff30", size = 222126, upload-time = "2026-08-23T17:37:55.363Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/06/79/b4c714bef36bc4ec2beeae1e0c124f0223888cd8c6feb1cdc56038116920/filelock-3.32.0-py3-none-any.whl", hash = "sha256:d396bea984af47333ef05e50eae7eff88c84256de6112aea0ec48a233c064fe3", size = 97732, upload-time = "2026-07-21T13:17:41.55Z" },
+    { url = "https://files.pythonhosted.org/packages/01/a4/9b63d595d748e3aff8812b65eacc1a2c4bd90b7c2012e08e72373b4835eb/filelock-3.32.4-py3-none-any.whl", hash = "sha256:22e58ca3b1ae3b98993b762d7338367ae64fe50252bf78d59da3bfebcdf1cedd", size = 99864, upload-time = "2026-08-23T17:37:53.913Z" },
 ]
 
 [[package]]
@@ -2114,7 +2114,7 @@ wheels = [
 
 [[package]]
 name = "llama-index-core"
-version = "0.14.23"
+version = "0.14.24"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -2146,9 +2146,9 @@ dependencies = [
     { name = "typing-inspect" },
     { name = "wrapt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5c/ac/f885ae14317af43a026c909ea4d2083fcee2f0d014f90426b5b9aa1f9912/llama_index_core-0.14.23.tar.gz", hash = "sha256:c4baf2f2ab4f84e95090fe7941e0c87d6c514304f7bd2a749b8fa22164c1822b", size = 11588373, upload-time = "2026-06-24T19:35:55.43Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d9/7a/e54d5ea405b51c1b7e1ed078036f698bcbeefc82128d5c48b7cb6d997ce6/llama_index_core-0.14.24.tar.gz", hash = "sha256:4b2eb3af98eecf3579707ef018be0346bd851be2c7660102d88fab0457b95b61", size = 11590565, upload-time = "2026-08-19T18:47:21.401Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ec/d5/05d61f34c01c6578fb758d0a3ddef58d36c6ffa9a9f84a5c9a16262ad94d/llama_index_core-0.14.23-py3-none-any.whl", hash = "sha256:6a54d267826732a8507f81df40785b107f7592af20f451a39a59005147caf84c", size = 11924908, upload-time = "2026-06-24T19:35:52.833Z" },
+    { url = "https://files.pythonhosted.org/packages/be/f8/8a2aec65cba9459b24cce9bc188392014f70c2af0dc43c4cc668c685912e/llama_index_core-0.14.24-py3-none-any.whl", hash = "sha256:a12f39b8a777cc526bf400d929016cd244372af61c5e98f6f4186f51a0b9288c", size = 11927515, upload-time = "2026-08-19T18:47:18.772Z" },
 ]
 
 [[package]]
@@ -3955,11 +3955,11 @@ wheels = [
 
 [[package]]
 name = "python-dotenv"
-version = "1.2.2"
+version = "1.2.3"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/82/ed/0301aeeac3e5353ef3d94b6ec08bbcabd04a72018415dcb29e588514bba8/python_dotenv-1.2.2.tar.gz", hash = "sha256:2c371a91fbd7ba082c2c1dc1f8bf89ca22564a087c2c287cd9b662adde799cf3", size = 50135, upload-time = "2026-03-01T16:00:26.196Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6a/53/ed9d74092561d4b01a2ef1349d52cdbc135e526c245f366b089cfca6de49/python_dotenv-1.2.3.tar.gz", hash = "sha256:a20a594dabeaa385725aa239d5244871c143ecb356add8a20fcf23773a6c3a35", size = 58945, upload-time = "2026-08-16T16:54:54.067Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0b/d7/1959b9648791274998a9c3526f6d0ec8fd2233e4d4acce81bbae76b44b2a/python_dotenv-1.2.2-py3-none-any.whl", hash = "sha256:1d8214789a24de455a8b8bd8ae6fe3c6b69a5e3d64aa8a8e5d68e694bbcb285a", size = 22101, upload-time = "2026-03-01T16:00:25.09Z" },
+    { url = "https://files.pythonhosted.org/packages/0d/17/c5c6b53ddc18f297992099b3d9ec16c855c0ccc83263a21fe4d1c625ec6c/python_dotenv-1.2.3-py3-none-any.whl", hash = "sha256:904552145e8bfed22162c09dab1c2b9b54fefa7b23ba780f4f26ca0316b0f0d9", size = 22780, upload-time = "2026-08-16T16:54:52.473Z" },
 ]
 
 [[package]]
@@ -5194,11 +5194,11 @@ wheels = [
 
 [[package]]
 name = "types-dateparser"
-version = "1.4.1.20260617"
+version = "1.4.2.20260813"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/d1/1d/647618b84fe99f40ff485c859de1b0db45c95a955704f5952e719f16834c/types_dateparser-1.4.1.20260617.tar.gz", hash = "sha256:aaf1958a88e2bca849ff36b4696476c829c7b0ad06ff8d473635a8a985468346", size = 17703, upload-time = "2026-06-17T06:56:49.371Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/21/37/461d44e06a0d7b0af4b8aef470dd2ac422b3838a084688115fe7a815f19e/types_dateparser-1.4.2.20260813.tar.gz", hash = "sha256:f8e5dbdffca084a47f35efe181715b528f67436f9a44e476c514a3841452b206", size = 18288, upload-time = "2026-08-13T03:56:32.06Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9d/1f/75b08cc011dc70cfa9b31715dd56b0603d42dfd98f45c70131f7d2fc2da5/types_dateparser-1.4.1.20260617-py3-none-any.whl", hash = "sha256:af5619f005b56880898c54a9cb25bbc1c145751710d456be4f94c50751316ddb", size = 24889, upload-time = "2026-06-17T06:56:48.315Z" },
+    { url = "https://files.pythonhosted.org/packages/cf/fb/3b1644bc509bbf4390f2df086d3cd38a5e43882f963268b637a193a23ee5/types_dateparser-1.4.2.20260813-py3-none-any.whl", hash = "sha256:2f5b3daabde0bdcabce3b186281f948434a24bdfdf72323b111c928f7c310798", size = 25567, upload-time = "2026-08-13T03:56:31.094Z" },
 ]
 
 [[package]]
