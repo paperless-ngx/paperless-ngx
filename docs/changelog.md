@@ -2,11 +2,6 @@
 
 ## paperless-ngx 3.1.3
 
-### Features / Enhancements
-
-- docker-compose(deps): bump nginx from 1.31.3-alpine to 1.31.5-alpine in /docker/compose @[dependabot[bot]](https://github.com/apps/dependabot) ([#13909](https://github.com/paperless-ngx/paperless-ngx/pull/13909))
-- docker-compose(deps): Bump greenmail/standalone from 2.1.11 to 2.1.13 in /docker/compose @[dependabot[bot]](https://github.com/apps/dependabot) ([#13907](https://github.com/paperless-ngx/paperless-ngx/pull/13907))
-
 ### Bug Fixes
 
 - Fix: use the header loading indicator on tasks page [@shamoon](https://github.com/shamoon) ([#13949](https://github.com/paperless-ngx/paperless-ngx/pull/13949))
@@ -36,6 +31,8 @@
 - Chore(deps): Bump nltk from 3.10.0 to 3.10.3 in the data-nlp-search group across 1 directory @[dependabot[bot]](https://github.com/apps/dependabot) ([#13917](https://github.com/paperless-ngx/paperless-ngx/pull/13917))
 - Chore(deps): Bump the frontend-angular-dependencies group across 1 directory with 14 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#13915](https://github.com/paperless-ngx/paperless-ngx/pull/13915))
 - Chore(deps): Bump djangorestframework from 3.17.1 to 3.17.2 in the uv group across 1 directory @[dependabot[bot]](https://github.com/apps/dependabot) ([#13904](https://github.com/paperless-ngx/paperless-ngx/pull/13904))
+- docker-compose(deps): bump nginx from 1.31.3-alpine to 1.31.5-alpine in /docker/compose @[dependabot[bot]](https://github.com/apps/dependabot) ([#13909](https://github.com/paperless-ngx/paperless-ngx/pull/13909))
+- docker-compose(deps): Bump greenmail/standalone from 2.1.11 to 2.1.13 in /docker/compose @[dependabot[bot]](https://github.com/apps/dependabot) ([#13907](https://github.com/paperless-ngx/paperless-ngx/pull/13907))
 
 </details>
 
