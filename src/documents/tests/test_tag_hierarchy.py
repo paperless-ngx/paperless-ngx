@@ -75,6 +75,19 @@ class TestTagHierarchy(DirectoriesMixin, APITestCase):
         tags = set(self.document.tags.values_list("pk", flat=True))
         assert tags == {self.parent.pk, self.child.pk}
 
+    def test_document_api_add_child_keeps_parent_already_assigned(self) -> None:
+        # https://github.com/paperless-ngx/paperless-ngx/issues/13970
+        inbox = Tag.objects.create(name="Inbox", is_inbox_tag=True)
+        self.document.add_nested_tags([inbox, self.parent])
+        self.client.patch(
+            f"/api/documents/{self.document.pk}/",
+            {"tags": [self.child.pk]},
+            format="json",
+        )
+        self.document.refresh_from_db()
+        tags = set(self.document.tags.values_list("pk", flat=True))
+        assert tags == {self.parent.pk, self.child.pk}
+
     def test_document_api_remove_parent_removes_children(self) -> None:
         self.document.add_nested_tags([self.parent, self.child])
         self.client.patch(

@@ -1220,11 +1220,19 @@ class DocumentSerializer(
             prev_tags = set(instance.tags.all())
             requested_tags = set(validated_data["tags"])
 
-            # Tags being removed in this update and all descendants
+            # Tags newly added in this update and the ancestors they require
+            added_tags = requested_tags - prev_tags
+            required_by_add_tags = set(added_tags)
+            for t in added_tags:
+                required_by_add_tags.update(t.get_ancestors())
+
+            # Tags being removed in this update and all descendants, except
+            # those required by a tag that is being added in this same update
             removed_tags = prev_tags - requested_tags
             blocked_tags = set(removed_tags)
             for t in removed_tags:
                 blocked_tags.update(t.get_descendants())
+            blocked_tags.difference_update(required_by_add_tags)
 
             # Add all parent tags
             final_tags = set(requested_tags)
