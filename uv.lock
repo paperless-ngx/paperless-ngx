@@ -1245,7 +1245,7 @@ wheels = [
 
 [[package]]
 name = "flower"
-version = "2.0.1"
+version = "2.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "celery" },
@@ -1254,9 +1254,9 @@ dependencies = [
     { name = "pytz" },
     { name = "tornado" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/09/a1/357f1b5d8946deafdcfdd604f51baae9de10aafa2908d0b7322597155f92/flower-2.0.1.tar.gz", hash = "sha256:5ab717b979530770c16afb48b50d2a98d23c3e9fe39851dcf6bc4d01845a02a0", size = 3220408, upload-time = "2023-08-13T14:37:46.073Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fd/9f/e3061a153ba1928a96cf1a431449411ff4a9411465d1554fdcd0feb8d239/flower-2.1.0.tar.gz", hash = "sha256:ece79fd190bfd198947e30470c4b26a6d5df1861d54309430dd926ed516302ff", size = 3486971, upload-time = "2026-08-16T07:36:18.882Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a6/ff/ee2f67c0ff146ec98b5df1df637b2bc2d17beeb05df9f427a67bd7a7d79c/flower-2.0.1-py2.py3-none-any.whl", hash = "sha256:9db2c621eeefbc844c8dd88be64aef61e84e2deb29b271e02ab2b5b9f01068e2", size = 383553, upload-time = "2023-08-13T14:37:41.552Z" },
+    { url = "https://files.pythonhosted.org/packages/67/87/cd70fe77cb5ad4a79eaebe7d86d15efd8b1d950f8d0ab99470a4fd21c9a8/flower-2.1.0-py2.py3-none-any.whl", hash = "sha256:2f433aaee3efeba5b844b2ab7371f16058d892de76156b77e6d09de03a4095bc", size = 404618, upload-time = "2026-08-16T07:36:16.627Z" },
 ]
 
 [[package]]
@@ -3047,7 +3047,7 @@ requires-dist = [
     { name = "drf-spectacular-sidecar", specifier = "~=2026.7.1" },
     { name = "drf-writable-nested", specifier = "~=0.7.1" },
     { name = "filelock", specifier = "~=3.32.0" },
-    { name = "flower", specifier = "~=2.0.1" },
+    { name = "flower", specifier = ">=2.0.1,<2.2.0" },
     { name = "gotenberg-client", specifier = "~=0.14.0" },
     { name = "granian", extras = ["uvloop"], marker = "extra == 'webserver'", specifier = "~=2.7.0" },
     { name = "httpx-oauth", specifier = "~=0.17" },
