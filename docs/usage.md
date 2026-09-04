@@ -684,7 +684,8 @@ It requires [AI features](configuration.md#ai) to be enabled. You can specify:
   never replace the document's existing tags.
 
 The action works with every trigger **except Consumption Started**, because suggestions are made from
-the document's text, which does not exist until after the document has been processed.
+the document's text, which does not exist until after the document has been processed. Documents whose
+processed text is empty or contains only whitespace are skipped.
 
 Because the query to the AI service is slow, the action is queued and runs in the background rather
 than as part of the workflow run itself. The document is updated once the suggestions come back.
