@@ -2918,7 +2918,7 @@ dependencies = [
     { name = "setproctitle" },
     { name = "sqlite-vec" },
     { name = "tantivy" },
-    { name = "tika-client" },
+    { name = "tika-client", extra = ["httpx"] },
     { name = "torch", version = "2.13.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'linux'" },
     { name = "torch", version = "2.13.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'linux'" },
     { name = "watchfiles" },
@@ -3077,7 +3077,7 @@ requires-dist = [
     { name = "setproctitle", specifier = "~=1.3.4" },
     { name = "sqlite-vec", specifier = "==0.1.9" },
     { name = "tantivy", specifier = "~=0.26.0" },
-    { name = "tika-client", specifier = ">=0.11,<1.1" },
+    { name = "tika-client", extras = ["httpx"], specifier = "~=1.0" },
     { name = "torch", specifier = "~=2.13.0", index = "https://download.pytorch.org/whl/cpu" },
     { name = "watchfiles", specifier = ">=1.2" },
     { name = "whitenoise", specifier = "~=6.11" },
@@ -4794,6 +4794,11 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/d2/54/7525db2491a1bdfbaf869a713d1492572161b24a145d3c8dec9688635ec3/tika_client-1.0.0.tar.gz", hash = "sha256:899c2fd08c717d8d590d46d76942103ef972fc37d43eadbfd6772a9961351ced", size = 2212108, upload-time = "2026-08-07T04:22:26.265Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f5/9d/5b0815192600f338ee18f6c37bc61be28cd9618e3f46cc3311c4c1677abb/tika_client-1.0.0-py3-none-any.whl", hash = "sha256:f9d4c86b2cf037a71d8b6322aaace78c16c7f1fcca47e3726a442f87cee9a0b8", size = 25584, upload-time = "2026-08-07T04:22:25.106Z" },
+]
+
+[package.optional-dependencies]
+httpx = [
+    { name = "httpx" },
 ]
 
 [[package]]
