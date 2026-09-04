@@ -35,7 +35,8 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         THEN:
             - Existing config
         """
-        response = self.client.get(self.ENDPOINT, format="json")
+        with patch.dict("os.environ", {}, clear=True):
+            response = self.client.get(self.ENDPOINT, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -45,6 +46,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
             response.data[0],
             {
                 "id": 1,
+                "externally_configured_variables": [],
                 "output_type": None,
                 "pages": None,
                 "language": None,
@@ -90,6 +92,31 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 "llm_request_timeout": None,
             },
         )
+
+    def test_api_get_config_reports_external_configuration_without_values(self) -> None:
+        with patch.dict(
+            "os.environ",
+            {
+                "PAPERLESS_OCR_LANGUAGE": "eng",
+                "PAPERLESS_REMOTE_OCR_API_KEY": "secret-value",
+                "PAPERLESS_FUTURE_SETTING": "future-value",
+                "UNRELATED_SETTING": "unrelated-value",
+            },
+            clear=True,
+        ):
+            response = self.client.get(self.ENDPOINT, format="json")
+
+        self.assertCountEqual(
+            response.data[0]["externally_configured_variables"],
+            [
+                "PAPERLESS_FUTURE_SETTING",
+                "PAPERLESS_OCR_LANGUAGE",
+                "PAPERLESS_REMOTE_OCR_API_KEY",
+            ],
+        )
+        self.assertNotContains(response, "secret-value")
+        self.assertNotContains(response, "future-value")
+        self.assertNotContains(response, "UNRELATED_SETTING")
 
     def test_api_get_ui_settings_with_config(self) -> None:
         """
