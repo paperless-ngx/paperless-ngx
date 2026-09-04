@@ -163,6 +163,19 @@ describe('ConfigComponent', () => {
     expect(component.configForm.get('barcodes_enabled').value).toBeNull()
   })
 
+  it('should identify externally configured options', () => {
+    component.externallyConfiguredVariables = new Set([
+      'PAPERLESS_OCR_LANGUAGE',
+    ])
+
+    expect(
+      component.isExternallyConfigured('PAPERLESS_OCR_LANGUAGE')
+    ).toBeTruthy()
+    expect(
+      component.isExternallyConfigured('PAPERLESS_OCR_OUTPUT_TYPE')
+    ).toBeFalsy()
+  })
+
   it('should group options into sections within a category, or not', () => {
     const sections = component.getCategorySections(ConfigCategory.OCR)
     expect(sections).toEqual([null, ConfigSection.RemoteOCR])
