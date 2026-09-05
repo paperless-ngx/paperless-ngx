@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import math
 import re
+from collections.abc import Iterable
 from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
@@ -879,8 +880,90 @@ def validate_documentlink_targets(user, doc_ids):
         )
 
 
+# drf-writable-nested revalidates a document's custom_fields more than once
+# per request: once as the ordinary nested list, then again per-item while
+# matching existing vs. new CustomFieldInstance rows during save() -- and
+# that second pass builds a brand new serializer (and field) instance per
+# item (see its update_or_create_reverse_relations / _get_serializer_for_field),
+# so a cache on the field instance alone only helps the first pass. It does,
+# however, explicitly pass `context=self.context` to every one of those
+# fresh serializers -- the *same* dict object the outer DocumentSerializer
+# is using, not a copy. That context dict is already request-scoped (DRF
+# builds it fresh per request via get_serializer_context()), so stashing the
+# resolved CustomField objects there -- rather than in some new global/
+# thread-local cache -- lets every later pass reuse them for free while
+# staying entirely within DRF's existing, already-request-scoped machinery.
+_CUSTOM_FIELD_CONTEXT_CACHE_KEY = "_custom_field_lookup_cache"
+
+
+class _CachingCustomFieldPrimaryKeyField(serializers.PrimaryKeyRelatedField):
+    """
+    Resolves CustomField ids via a cache on the serializer context, so
+    later, separately-instantiated fields for the same request (drf-writable-
+    nested rebuilds one per item during save) reuse what was already
+    resolved instead of re-querying.
+    """
+
+    def _cache(self) -> dict[int, CustomField]:
+        return self.context.setdefault(_CUSTOM_FIELD_CONTEXT_CACHE_KEY, {})
+
+    @staticmethod
+    def _normalize_pk(data: Any) -> int | None:
+        """
+        Returns `data` coerced to the int a valid CustomField pk would be,
+        or None if `data` isn't a plausible pk (wrong type, unhashable,
+        non-numeric, or a bool -- DRF itself rejects bools as pks since
+        `True == 1` would otherwise silently match). None tells callers to
+        leave `data` alone and let `super().to_internal_value()` report the
+        normal validation error instead of touching the cache/queryset with
+        it directly.
+        """
+        if isinstance(data, bool):
+            return None
+        try:
+            return int(data)
+        except (TypeError, ValueError):
+            return None
+
+    def prefetch(self, ids: Iterable[Any]) -> None:
+        cache = self._cache()
+        candidates = {pk for i in ids if (pk := self._normalize_pk(i)) is not None}
+        missing = {i for i in candidates if i not in cache}
+        if missing:
+            for obj in self.get_queryset().filter(pk__in=missing):
+                cache[obj.pk] = obj
+
+    def to_internal_value(self, data: Any) -> CustomField:
+        pk = self._normalize_pk(data)
+        if pk is None:
+            return super().to_internal_value(data)
+        cache = self._cache()
+        if pk in cache:
+            return cache[pk]
+        obj: CustomField = super().to_internal_value(data)
+        cache[obj.pk] = obj
+        return obj
+
+
+class CustomFieldInstanceListSerializer(serializers.ListSerializer):
+    def to_internal_value(self, data: Any) -> list[Any]:
+        if isinstance(data, list):
+            field_ids = []
+            for item in data:
+                if not isinstance(item, dict) or "field" not in item:
+                    continue
+                try:
+                    hash(item["field"])
+                except TypeError:
+                    continue
+                field_ids.append(item["field"])
+            if field_ids:
+                self.child.fields["field"].prefetch(field_ids)
+        return super().to_internal_value(data)
+
+
 class CustomFieldInstanceSerializer(serializers.ModelSerializer[CustomFieldInstance]):
-    field = serializers.PrimaryKeyRelatedField(queryset=CustomField.objects.all())
+    field = _CachingCustomFieldPrimaryKeyField(queryset=CustomField.objects.all())
     value = ReadWriteSerializerMethodField(allow_null=True)
 
     def create(self, validated_data):
@@ -981,6 +1064,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer[CustomFieldInsta
 
     class Meta:
         model = CustomFieldInstance
+        list_serializer_class = CustomFieldInstanceListSerializer
         fields = [
             "value",
             "field",

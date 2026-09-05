@@ -129,7 +129,7 @@ class DocumentMetadataOverrides:
         )
         overrides.custom_fields = {
             custom_field.field.id: custom_field.value
-            for custom_field in doc.custom_fields.all()
+            for custom_field in doc.custom_fields.select_related("field").all()
         }
 
         groups_with_perms = get_groups_with_perms(
