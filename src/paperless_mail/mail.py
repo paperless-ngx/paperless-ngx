@@ -300,7 +300,7 @@ def apply_mail_action(
             folder=rule.folder,
             uid=message_uid,
             uid_validity=uid_validity,
-            subject=message_subject,
+            subject=message_subject[:256],
             received=message_date,
             status="SUCCESS",
         )
@@ -312,7 +312,7 @@ def apply_mail_action(
             folder=rule.folder,
             uid=message_uid,
             uid_validity=uid_validity,
-            subject=message_subject,
+            subject=message_subject[:256],
             received=message_date,
             status="FAILED",
             error=traceback.format_exc(),
@@ -347,7 +347,7 @@ def error_callback(
         uid=message_uid,
         uid_validity=uid_validity,
         defaults={
-            "subject": message_subject,
+            "subject": message_subject[:256],
             "received": received,
             "status": "FAILED",
             "error": traceback.format_exc(),
@@ -947,7 +947,7 @@ class MailAccountHandler(LoggingMixin):
             folder=rule.folder,
             uid_validity=self._current_uid_validity,
             defaults={
-                "subject": message.subject,
+                "subject": message.subject[:256],
                 "received": make_aware(message.date)
                 if is_naive(message.date)
                 else message.date,
