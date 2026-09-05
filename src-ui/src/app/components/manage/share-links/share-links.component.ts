@@ -7,6 +7,7 @@ import {
   PermissionType,
 } from 'src/app/services/permissions.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
+import { ShareLinkBundleListComponent } from './share-link-bundle-list/share-link-bundle-list.component'
 
 export enum ShareLinksNavIDs {
   DocumentLinks = 'documents',
@@ -16,7 +17,7 @@ export enum ShareLinksNavIDs {
 @Component({
   selector: 'pngx-share-links',
   templateUrl: './share-links.component.html',
-  imports: [NgbNavModule, PageHeaderComponent],
+  imports: [NgbNavModule, PageHeaderComponent, ShareLinkBundleListComponent],
 })
 export class ShareLinksComponent {
   private readonly route = inject(ActivatedRoute)

@@ -2,11 +2,14 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router'
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { of } from 'rxjs'
 import {
   PermissionAction,
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
+import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { ShareLinksComponent, ShareLinksNavIDs } from './share-links.component'
 
@@ -34,6 +37,18 @@ describe('ShareLinksComponent', () => {
         {
           provide: Router,
           useValue: { navigate: jest.fn().mockResolvedValue(true) },
+        },
+        {
+          provide: ShareLinkBundleService,
+          useValue: {
+            listAllBundles: jest.fn().mockReturnValue(of([])),
+            rebuildBundle: jest.fn(),
+            delete: jest.fn(),
+          },
+        },
+        {
+          provide: ToastService,
+          useValue: { showInfo: jest.fn(), showError: jest.fn() },
         },
       ],
     }).compileComponents()
