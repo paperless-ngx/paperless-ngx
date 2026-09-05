@@ -1,0 +1,51 @@
+#!/command/with-contenv /usr/bin/bash
+# shellcheck shell=bash
+declare -r log_prefix="[init-compile-bytecode]"
+
+# PYTHONDONTWRITEBYTECODE=1 is set for the whole container. This unit compiles a
+# scoped set of libraries anyway, to speed up startup without bloating image size.
+
+# Handle the people using a read only file system
+if [[ "${S6_READ_ONLY_ROOT}" == "1" ]]; then
+	echo "${log_prefix} S6_READ_ONLY_ROOT=1, skipping (nothing to write bytecode to)"
+	exit 0
+fi
+
+declare -r site_packages="$(python3 -c 'import site; print(site.getsitepackages()[0])')"
+
+# Deliberately scoped to packages that paperless.settings/paperless/__init__.py import
+# unconditionally on every manage.py invocation (Django itself, the always-loaded
+# INSTALLED_APPS, and celery). This is NOT "compile everything" - the optional AI stack
+# (torch, llama-index, sentence-transformers, ...) is intentionally excluded since it is
+# lazy-imported and large.
+declare -a scope=(
+	"${PAPERLESS_SRC_DIR}"
+	"${site_packages}/django"
+	"${site_packages}/celery"
+	"${site_packages}/kombu"
+	"${site_packages}/rest_framework"
+	"${site_packages}/django_filters"
+	"${site_packages}/whitenoise"
+	"${site_packages}/corsheaders"
+	"${site_packages}/django_extensions"
+	"${site_packages}/guardian"
+	"${site_packages}/allauth"
+	"${site_packages}/drf_spectacular"
+	"${site_packages}/drf_spectacular_sidecar"
+	"${site_packages}/treenode"
+	"${site_packages}/compression_middleware"
+)
+
+declare -a existing_scope=()
+for path in "${scope[@]}"; do
+	[[ -d "${path}" ]] && existing_scope+=("${path}")
+done
+
+echo "${log_prefix} Compiling bytecode for: ${existing_scope[*]}"
+declare -r start_seconds=${SECONDS}
+
+if ! PYTHONDONTWRITEBYTECODE= python3 -m compileall -q "${existing_scope[@]}"; then
+	echo "${log_prefix} WARNING: compileall reported errors (read-only filesystem or unwritable site-packages?); continuing without a bytecode cache"
+fi
+
+echo "${log_prefix} Done in $((SECONDS - start_seconds))s"
