@@ -54,7 +54,6 @@ services:
       - /home/pablo/datos/paperless/consume:/usr/src/paperless/consume
       - /home/pablo/datos/paperless/export:/usr/src/paperless/export
     env_file:
-      - docker-compose.env
       - /home/pablo/datos/paperless/service.env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
