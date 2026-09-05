@@ -1,0 +1,62 @@
+# Docker Compose file for running paperless from the Docker Hub.
+# This file contains everything paperless needs to run.
+# Paperless supports amd64, arm and arm64 hardware.
+#
+# All compose files of paperless configure paperless in the following way:
+#
+# - Paperless is (re)started on system boot, if it was running before shutdown.
+# - Docker volumes for storing data are managed by Docker.
+# - Folders for importing and exporting files are created in the same directory
+#   as this file and mounted to the correct folders inside the container.
+# - Paperless listens on port 8000.
+#
+# In addition to that, this Docker Compose file adds the following optional
+# configurations:
+#
+# - Instead of SQLite (default), PostgreSQL is used as the database server.
+#
+# To install and update paperless with this file, do the following:
+#
+# - Copy this file as 'docker-compose.yml' and the files 'docker-compose.env'
+#   and '.env' into a folder.
+# - Run 'docker compose pull'.
+# - Run 'docker compose up -d'.
+#
+# For more extensive installation and update instructions, refer to the
+# documentation.
+services:
+  broker:
+    image: docker.io/library/redis:8@sha256:aa049e689e141a4358ad1d4562dc49c88a89fbab711fd8fcc33f684c80b26301
+    restart: unless-stopped
+    volumes:
+      - /home/pablo/datos/paperless/redis:/data
+  db:
+    image: docker.io/library/postgres:18@sha256:8ff36f3c66371cba71d20ceedccfc3de9669a68737607888c4ef0af93abe8e39
+    restart: unless-stopped
+    volumes:
+      - /home/pablo/datos/paperless/postgres:/var/lib/postgresql
+    env_file:
+      - /home/pablo/datos/paperless/service.env
+  webserver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: paperless-local:dev
+    restart: unless-stopped
+    depends_on:
+      - db
+      - broker
+    ports:
+      - "8010:8000"
+    volumes:
+      - /home/pablo/datos/paperless/data:/usr/src/paperless/data
+      - /home/pablo/datos/paperless/media:/usr/src/paperless/media
+      - /home/pablo/datos/paperless/consume:/usr/src/paperless/consume
+      - /home/pablo/datos/paperless/export:/usr/src/paperless/export
+    env_file:
+      - docker-compose.env
+      - /home/pablo/datos/paperless/service.env
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBHOST: db
+      PAPERLESS_DBENGINE: postgresql
