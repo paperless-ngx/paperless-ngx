@@ -6,7 +6,9 @@ from unittest import mock
 import pikepdf
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
@@ -343,6 +345,202 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         _cf_3 = self.doc2.custom_fields.filter(field=cf3).first()
         assert _cf_3 is not None
         self.assertNotIn(self.doc3.id, _cf_3.value)
+
+    def test_modify_custom_fields_batches_field_lookup(self) -> None:
+        """
+        GIVEN:
+            - Several documents are being bulk-edited to add several custom
+              fields at once
+        WHEN:
+            - modify_custom_fields runs
+        THEN:
+            - Each CustomField is resolved with one batched query total, not
+              once per (field, document) pair
+        """
+        docs = [
+            Document.objects.create(checksum=f"batch-{i}", title=f"batch-{i}")
+            for i in range(6)
+        ]
+        fields = [
+            CustomField.objects.create(
+                name=f"Batch Field {i}",
+                data_type=CustomField.FieldDataType.STRING,
+            )
+            for i in range(4)
+        ]
+
+        with CaptureQueriesContext(connection) as ctx:
+            bulk_edit.modify_custom_fields(
+                [doc.id for doc in docs],
+                add_custom_fields=[field.id for field in fields],
+                remove_custom_fields=[],
+            )
+
+        field_lookups = [
+            q
+            for q in ctx.captured_queries
+            if 'FROM "documents_customfield"' in q["sql"]
+        ]
+        self.assertEqual(
+            len(field_lookups),
+            1,
+            "Expected a single batched query to resolve the custom fields, "
+            f"got {len(field_lookups)}: {field_lookups}",
+        )
+
+        for doc in docs:
+            self.assertEqual(doc.custom_fields.count(), len(fields))
+
+    def test_modify_custom_fields_batches_document_lookup_for_documentlink(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - Several documents are being bulk-edited to add a DOCUMENTLINK
+              custom field at once
+        WHEN:
+            - modify_custom_fields runs
+        THEN:
+            - The Document rows needed to reflect the symmetrical links are
+              resolved with one batched query total, not once per document
+        """
+        docs = [
+            Document.objects.create(checksum=f"link-{i}", title=f"link-{i}")
+            for i in range(6)
+        ]
+        target = Document.objects.create(checksum="link-target", title="link-target")
+        doclink_field = CustomField.objects.create(
+            name="Related",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+
+        with CaptureQueriesContext(connection) as ctx:
+            bulk_edit.modify_custom_fields(
+                [doc.id for doc in docs],
+                add_custom_fields={doclink_field.id: [target.id]},
+                remove_custom_fields=[],
+            )
+
+        single_document_lookups = [
+            q
+            for q in ctx.captured_queries
+            if 'FROM "documents_document"' in q["sql"]
+            and '"documents_document"."id" = ' in q["sql"]
+        ]
+        self.assertEqual(
+            len(single_document_lookups),
+            0,
+            "Expected document rows to come from a batched query, not "
+            f"per-document lookups, got: {single_document_lookups}",
+        )
+
+        for doc in docs:
+            self.assertEqual(
+                doc.custom_fields.get(field=doclink_field).value,
+                [target.id],
+            )
+
+    def test_modify_custom_fields_update_caches_document_and_field(self) -> None:
+        """
+        GIVEN:
+            - Several documents already have an instance of a custom field
+        WHEN:
+            - modify_custom_fields runs again for the same field, updating
+              the existing instances rather than creating new ones
+        THEN:
+            - No per-instance `.document`/`.field` reload query is issued
+              (e.g. by auditlog's post_save receiver touching them)
+        """
+        docs = [
+            Document.objects.create(checksum=f"update-{i}", title=f"update-{i}")
+            for i in range(6)
+        ]
+        field = CustomField.objects.create(
+            name="Update Field",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        bulk_edit.modify_custom_fields(
+            [doc.id for doc in docs],
+            add_custom_fields=[field.id],
+            remove_custom_fields=[],
+        )
+
+        with CaptureQueriesContext(connection) as ctx:
+            bulk_edit.modify_custom_fields(
+                [doc.id for doc in docs],
+                add_custom_fields={field.id: "updated value"},
+                remove_custom_fields=[],
+            )
+
+        single_row_reloads = [
+            q
+            for q in ctx.captured_queries
+            if ('FROM "documents_document"' in q["sql"] and '."id" = ' in q["sql"])
+            or ('FROM "documents_customfield"' in q["sql"] and '."id" = ' in q["sql"])
+        ]
+        self.assertEqual(
+            single_row_reloads,
+            [],
+            "Expected no per-instance document/field reload queries when "
+            f"updating existing custom field instances, got: {single_row_reloads}",
+        )
+
+        for doc in docs:
+            self.assertEqual(
+                doc.custom_fields.get(field=field).value,
+                "updated value",
+            )
+
+    def test_modify_custom_fields_removes_symmetrical_doclinks_batched(self) -> None:
+        """
+        GIVEN:
+            - Several source documents link to a shared target via a doc
+              link field
+        WHEN:
+            - The field is removed from all of them in one call
+        THEN:
+            - The symmetrical links are removed from the target
+            - No per-document lookup query is issued, on either side
+        """
+        target = Document.objects.create(checksum="rm-target", title="rm-target")
+        docs = [
+            Document.objects.create(checksum=f"rm-{i}", title=f"rm-{i}")
+            for i in range(6)
+        ]
+        field = CustomField.objects.create(
+            name="Related",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+        bulk_edit.modify_custom_fields(
+            [doc.id for doc in docs],
+            add_custom_fields={field.id: [target.id]},
+            remove_custom_fields=[],
+        )
+        self.assertEqual(
+            target.custom_fields.get(field=field).value,
+            [d.id for d in docs],
+        )
+
+        with CaptureQueriesContext(connection) as ctx:
+            bulk_edit.modify_custom_fields(
+                [doc.id for doc in docs],
+                add_custom_fields=[],
+                remove_custom_fields=[field.id],
+            )
+
+        single_document_lookups = [
+            q
+            for q in ctx.captured_queries
+            if 'FROM "documents_document"' in q["sql"]
+            and '"documents_document"."id" = ' in q["sql"]
+        ]
+        self.assertEqual(
+            single_document_lookups,
+            [],
+            "Expected batched document resolution, not per-document lookups, "
+            f"got: {single_document_lookups}",
+        )
+        self.assertEqual(target.custom_fields.get(field=field).value, [])
 
     def test_modify_custom_fields_doclink_self_link(self) -> None:
         """

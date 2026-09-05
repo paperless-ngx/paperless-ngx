@@ -305,46 +305,74 @@ def modify_custom_fields(
         else [(field, None) for field in add_custom_fields]
     )
 
-    custom_fields = CustomField.objects.filter(
-        id__in=[int(field) for field, _ in add_custom_fields],
-    ).distinct()
+    custom_fields_by_id: dict[int, CustomField] = {
+        cf.id: cf
+        for cf in CustomField.objects.filter(
+            id__in=[int(field) for field, _ in add_custom_fields],
+        )
+    }
+    # Deferred, not `.only()`: signal receivers touch other Document fields,
+    # and `.only("pk")` would just turn that into a per-document reload.
+    # `content` is the one field both large and unused here. Skipped
+    # entirely for a remove-only call -- the removal pass below resolves
+    # its own documents.
+    docs_by_id: dict[int, Document] = (
+        {
+            doc.id: doc
+            for doc in Document.objects.filter(id__in=affected_docs).defer("content")
+        }
+        if add_custom_fields
+        else {}
+    )
     for field_id, value in add_custom_fields:
+        custom_field = custom_fields_by_id[field_id]
+        value_field = CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+            custom_field.data_type
+        ]
         for doc_id in affected_docs:
-            defaults = {}
-            custom_field = custom_fields.get(id=field_id)
-            if custom_field:
-                value_field = CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
-                    custom_field.data_type
-                ]
-                defaults[value_field] = value
-                if (
-                    custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK
-                    and value
-                    and doc_id in value
-                ):
-                    # Prevent self-linking
-                    continue
-            CustomFieldInstance.objects.update_or_create(
-                document_id=doc_id,
-                field_id=field_id,
-                defaults=defaults,
-            )
+            defaults = {value_field: value}
+            if (
+                custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK
+                and value
+                and doc_id in value
+            ):
+                # Prevent self-linking
+                continue
+            # Not update_or_create(): it fetches an existing row via plain
+            # `.get()` before calling .save(), so a signal receiver touching
+            # `.field`/`.document` (e.g. auditlog) on that save re-fetches
+            # per instance regardless of what's passed in as lookup kwargs.
+            # Assigning the cached objects ourselves before .save() avoids
+            # that for both the create and update case.
+            try:
+                instance = CustomFieldInstance.objects.get(
+                    document=docs_by_id[doc_id],
+                    field=custom_field,
+                )
+            except CustomFieldInstance.DoesNotExist:
+                instance = CustomFieldInstance(
+                    document=docs_by_id[doc_id],
+                    field=custom_field,
+                )
+            instance.document = docs_by_id[doc_id]
+            instance.field = custom_field
+            for attr, val in defaults.items():
+                setattr(instance, attr, val)
+            instance.save()
             if custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
-                doc = Document.objects.get(id=doc_id)
-                reflect_doclinks(doc, custom_field, value)
+                reflect_doclinks(docs_by_id[doc_id], custom_field, value)
 
-    # For doc link fields that are being removed, remove symmetrical links
+    # For doc link fields being removed, remove symmetrical links.
+    # select_related here avoids resolving every affected document up front.
     for doclink_being_removed_instance in CustomFieldInstance.objects.filter(
         document_id__in=affected_docs,
         field__id__in=remove_custom_fields,
         field__data_type=CustomField.FieldDataType.DOCUMENTLINK,
         value_document_ids__isnull=False,
-    ):
+    ).select_related("field", "document"):
         for target_doc_id in doclink_being_removed_instance.value:
             remove_doclink(
-                document=Document.objects.get(
-                    id=doclink_being_removed_instance.document.id,
-                ),
+                document=doclink_being_removed_instance.document,
                 field=doclink_being_removed_instance.field,
                 target_doc_id=target_doc_id,
             )
@@ -1177,10 +1205,13 @@ def remove_doclink(
     """
     Removes a 'symmetrical' link to `document` from the target document's existing custom field instance
     """
-    target_doc_field_instance = CustomFieldInstance.objects.filter(
-        document_id=target_doc_id,
-        field=field,
-    ).first()
+    # select_related: a signal receiver (auditlog) touches .document/.field
+    # on save() below -- without this, that's a per-call reload query.
+    target_doc_field_instance = (
+        CustomFieldInstance.objects.filter(document_id=target_doc_id, field=field)
+        .select_related("document", "field")
+        .first()
+    )
     if (
         target_doc_field_instance is not None
         and document.id in target_doc_field_instance.value
