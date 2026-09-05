@@ -33,7 +33,7 @@ describe('PngxDatePickerConfig', () => {
     expect(config.firstDayOfWeek).toEqual(1)
   })
 
-  it('supports browsers that provide getWeekInfo()', () => {
+  it('supports browsers that provide getWeekInfo() and weekInfo', () => {
     const getWeekInfo = jest.fn().mockReturnValue({ firstDay: 6 })
     const originalDescriptor = Object.getOwnPropertyDescriptor(
       Intl.Locale.prototype,
@@ -61,5 +61,19 @@ describe('PngxDatePickerConfig', () => {
 
     expect(getWeekInfo).toHaveBeenCalledTimes(1)
     expect(config.firstDayOfWeek).toEqual(6)
+
+    Object.defineProperty(Intl.Locale.prototype, 'weekInfo', {
+      configurable: true,
+      value: { firstDay: 5 },
+    })
+    try {
+      TestBed.resetTestingModule()
+      configureLocale('ar-EG')
+      config = TestBed.inject(NgbInputDatepickerConfig)
+    } finally {
+      delete Intl.Locale.prototype['weekInfo']
+    }
+
+    expect(config.firstDayOfWeek).toEqual(5)
   })
 })
