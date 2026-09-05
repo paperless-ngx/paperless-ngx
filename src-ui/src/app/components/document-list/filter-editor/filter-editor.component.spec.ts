@@ -53,6 +53,7 @@ import {
   FILTER_HAS_CUSTOM_FIELDS_ALL,
   FILTER_HAS_CUSTOM_FIELDS_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
+  FILTER_HAS_DUPLICATES,
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
   FILTER_HAS_TAGS_ANY,
@@ -425,6 +426,38 @@ describe('FilterEditorComponent', () => {
     ]
     expect(component.textFilter).toEqual('pdf')
     expect(component.textFilterTarget).toEqual('mime-type') // TEXT_FILTER_TARGET_MIME_TYPE
+  })
+
+  it('should ingest filter rules for documents with duplicates', () => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_DUPLICATES,
+        value: 'true',
+      },
+    ]
+    fixture.detectChanges()
+
+    expect(component.textFilterTarget).toEqual('duplicates')
+    expect(component.textFilterModifier).toEqual('has-duplicates')
+    expect(component.textFilterInputDisabled).toBeTruthy()
+  })
+
+  it('should ingest filter rules for documents without duplicates', () => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_DUPLICATES,
+        value: 'false',
+      },
+    ]
+
+    expect(component.textFilterTarget).toEqual('duplicates')
+    expect(component.textFilterModifier).toEqual('does-not-have-duplicates')
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_HAS_DUPLICATES,
+        value: 'false',
+      },
+    ])
   })
 
   it('should ingest text filter rules for fulltext query', () => {
@@ -1390,6 +1423,33 @@ describe('FilterEditorComponent', () => {
     ])
   })
 
+  it('should convert duplicate target input to the correct filter rule', () => {
+    const textFieldTargetDropdown = fixture.debugElement.queryAll(
+      By.directive(NgbDropdownItem)
+    )[5]
+    textFieldTargetDropdown.triggerEventHandler('click')
+    fixture.detectChanges()
+
+    expect(component.textFilterTarget).toEqual('duplicates')
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_HAS_DUPLICATES,
+        value: 'true',
+      },
+    ])
+
+    const textFieldModifierSelect = fixture.debugElement.query(By.css('select'))
+    textFieldModifierSelect.nativeElement.value = 'does-not-have-duplicates'
+    textFieldModifierSelect.nativeElement.dispatchEvent(new Event('change'))
+    fixture.detectChanges()
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_HAS_DUPLICATES,
+        value: 'false',
+      },
+    ])
+  })
+
   it('should convert user input to correct filter rules on full text query', () => {
     component.textFilterInput.nativeElement.value = 'foo'
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
@@ -2177,6 +2237,22 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.generateFilterName()).toEqual('Without any tag')
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_DUPLICATES,
+        value: 'true',
+      },
+    ]
+    expect(component.generateFilterName()).toEqual('With duplicates')
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_DUPLICATES,
+        value: 'false',
+      },
+    ]
+    expect(component.generateFilterName()).toEqual('Without duplicates')
 
     component.filterRules = [
       {

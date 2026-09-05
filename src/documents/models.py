@@ -227,6 +227,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         editable=False,
         blank=True,
         null=True,
+        db_index=True,
         help_text=_("The checksum of the archived document."),
     )
 
@@ -706,6 +707,7 @@ class SavedViewFilterRule(models.Model):
         (47, _("mime type is")),
         (48, _("simple title search")),
         (49, _("simple text search")),
+        (50, _("has duplicates")),
     ]
 
     saved_view = models.ForeignKey(

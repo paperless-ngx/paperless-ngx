@@ -981,6 +981,110 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["id"], doc.id)
 
+    def test_has_duplicates_filter(self) -> None:
+        original_match = Document.objects.create(
+            title="original match",
+            checksum="same-original",
+        )
+        second_original_match = Document.objects.create(
+            title="second original match",
+            checksum="same-original",
+        )
+        archive_match = Document.objects.create(
+            title="archive match",
+            checksum="archive-source",
+            archive_checksum="same-archive",
+        )
+        original_to_archive_match = Document.objects.create(
+            title="original to archive match",
+            checksum="same-archive",
+        )
+        first_archive_match = Document.objects.create(
+            title="first archive match",
+            checksum="first-archive-source",
+            archive_checksum="same-archive-only",
+        )
+        second_archive_match = Document.objects.create(
+            title="second archive match",
+            checksum="second-archive-source",
+            archive_checksum="same-archive-only",
+        )
+        unique = Document.objects.create(title="unique", checksum="unique")
+        version_root = Document.objects.create(
+            title="version root",
+            checksum="version-root",
+        )
+        Document.objects.create(
+            title="version",
+            checksum=unique.checksum,
+            root_document=version_root,
+            version_index=1,
+        )
+        trash_match = Document.objects.create(
+            title="trash match",
+            checksum="trash-match",
+        )
+        trashed_duplicate = Document.objects.create(
+            title="trashed duplicate",
+            checksum="trash-match",
+        )
+        trashed_duplicate.delete()
+
+        response = self.client.get("/api/documents/?has_duplicates=true")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertCountEqual(
+            [document["id"] for document in response.data["results"]],
+            [
+                original_match.id,
+                second_original_match.id,
+                archive_match.id,
+                original_to_archive_match.id,
+                first_archive_match.id,
+                second_archive_match.id,
+                trash_match.id,
+            ],
+        )
+
+        response = self.client.get("/api/documents/?has_duplicates=false")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertCountEqual(
+            [document["id"] for document in response.data["results"]],
+            [unique.id, version_root.id],
+        )
+
+    def test_has_duplicates_filter_respects_document_permissions(self) -> None:
+        owner = User.objects.create_user(username="duplicate-owner")
+        requester = User.objects.create_user(username="duplicate-requester")
+        requester.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
+        visible_document = Document.objects.create(
+            title="visible document",
+            checksum="permission-match",
+            owner=requester,
+        )
+        hidden_duplicate = Document.objects.create(
+            title="hidden duplicate",
+            checksum="permission-match",
+            owner=owner,
+        )
+        self.client.force_authenticate(user=requester)
+
+        response = self.client.get("/api/documents/?has_duplicates=true")
+        self.assertNotIn(
+            visible_document.id,
+            [document["id"] for document in response.data["results"]],
+        )
+
+        assign_perm("view_document", requester, hidden_duplicate)
+        response = self.client.get("/api/documents/?has_duplicates=true")
+        self.assertIn(
+            visible_document.id,
+            [document["id"] for document in response.data["results"]],
+        )
+
     def test_custom_fields_icontains_filter_no_duplicates(self) -> None:
         """
         GIVEN:
