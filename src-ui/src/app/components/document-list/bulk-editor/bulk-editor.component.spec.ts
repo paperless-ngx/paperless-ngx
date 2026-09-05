@@ -7,6 +7,7 @@ import {
 import { EventEmitter, signal } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
+import { Router } from '@angular/router'
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
@@ -46,7 +47,6 @@ import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage
 import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { FilterableDropdownComponent } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ShareLinkBundleDialogComponent } from '../../common/share-link-bundle-dialog/share-link-bundle-dialog.component'
-import { ShareLinkBundleManageDialogComponent } from '../../common/share-link-bundle-manage-dialog/share-link-bundle-manage-dialog.component'
 import { BulkEditorComponent } from './bulk-editor.component'
 
 const selectionData: SelectionData = {
@@ -82,6 +82,7 @@ describe('BulkEditorComponent', () => {
   let customFieldsService: CustomFieldsService
   let httpTestingController: HttpTestingController
   let shareLinkBundleService: ShareLinkBundleService
+  let router: Router
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -172,6 +173,10 @@ describe('BulkEditorComponent', () => {
             delete: jest.fn(),
           },
         },
+        {
+          provide: Router,
+          useValue: { navigate: jest.fn().mockResolvedValue(true) },
+        },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
@@ -189,6 +194,7 @@ describe('BulkEditorComponent', () => {
     customFieldsService = TestBed.inject(CustomFieldsService)
     httpTestingController = TestBed.inject(HttpTestingController)
     shareLinkBundleService = TestBed.inject(ShareLinkBundleService)
+    router = TestBed.inject(Router)
 
     fixture = TestBed.createComponent(BulkEditorComponent)
     component = fixture.componentInstance
@@ -1824,9 +1830,9 @@ describe('BulkEditorComponent', () => {
       },
     }
 
-    const openSpy = jest.spyOn(modalService, 'open')
-    openSpy.mockReturnValueOnce(modalRef as NgbModalRef)
-    openSpy.mockReturnValueOnce({} as NgbModalRef)
+    const openSpy = jest
+      .spyOn(modalService, 'open')
+      .mockReturnValueOnce(modalRef as NgbModalRef)
     ;(shareLinkBundleService.createBundle as jest.Mock).mockReturnValueOnce(
       of({ id: 42 })
     )
@@ -1860,11 +1866,9 @@ describe('BulkEditorComponent', () => {
 
     dialogInstance.onOpenManage()
     expect(modalRef.close).toHaveBeenCalled()
-    expect(openSpy).toHaveBeenNthCalledWith(
-      2,
-      ShareLinkBundleManageDialogComponent,
-      expect.objectContaining({ backdrop: 'static', size: 'lg' })
-    )
+    expect(router.navigate).toHaveBeenCalledWith(['/share-links'], {
+      queryParams: { type: 'bundles' },
+    })
     openSpy.mockRestore()
   })
 
@@ -1917,13 +1921,10 @@ describe('BulkEditorComponent', () => {
     openSpy.mockRestore()
   })
 
-  it('should open share link bundle management dialog', () => {
-    const openSpy = jest.spyOn(modalService, 'open')
+  it('should navigate to share link bundle management', () => {
     component.manageShareLinkBundles()
-    expect(openSpy).toHaveBeenCalledWith(
-      ShareLinkBundleManageDialogComponent,
-      expect.objectContaining({ backdrop: 'static', size: 'lg' })
-    )
-    openSpy.mockRestore()
+    expect(router.navigate).toHaveBeenCalledWith(['/share-links'], {
+      queryParams: { type: 'bundles' },
+    })
   })
 })
