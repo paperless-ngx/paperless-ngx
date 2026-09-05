@@ -1,4 +1,5 @@
 import {
+  LOCALE_ID,
   importProvidersFrom,
   inject,
   provideAppInitializer,
@@ -18,6 +19,8 @@ import { BrowserModule, bootstrapApplication } from '@angular/platform-browser'
 import {
   NgbDateAdapter,
   NgbDateParserFormatter,
+  NgbDatepickerConfig,
+  NgbInputDatepickerConfig,
   NgbModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
@@ -186,6 +189,7 @@ import { FilterPipe } from './app/pipes/filter.pipe'
 import { UsernamePipe } from './app/pipes/username.pipe'
 import { SettingsService } from './app/services/settings.service'
 import { LocalizedDateParserFormatter } from './app/utils/ngb-date-parser-formatter'
+import { localizedDatepickerConfigFactory } from './app/utils/ngb-datepicker-config'
 import { ISODateAdapter } from './app/utils/ngb-iso-date-adapter'
 
 import localeAf from '@angular/common/locales/af'
@@ -441,6 +445,15 @@ bootstrapApplication(AppComponent, {
     DocumentTitlePipe,
     { provide: NgbDateAdapter, useClass: ISODateAdapter },
     { provide: NgbDateParserFormatter, useClass: LocalizedDateParserFormatter },
+    {
+      provide: NgbInputDatepickerConfig,
+      useFactory: localizedDatepickerConfigFactory,
+      deps: [LOCALE_ID],
+    },
+    {
+      provide: NgbDatepickerConfig,
+      useExisting: NgbInputDatepickerConfig,
+    },
     PermissionsGuard,
     DirtyDocGuard,
     DirtySavedViewGuard,
