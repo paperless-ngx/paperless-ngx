@@ -221,6 +221,19 @@ export class AppFrameComponent
     return this.appTitleSetting() || environment.appTitle
   }
 
+  get canManageShareLinks(): boolean {
+    return (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.ShareLink
+      ) ||
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.ShareLinkBundle
+      )
+    )
+  }
+
   get customAppTitle(): string {
     return this.appTitleSetting()
   }

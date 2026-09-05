@@ -244,6 +244,15 @@
                 <i-bs class="me-2" name="window-stack"></i-bs><span class="nav-link-label"><ng-container i18n>Saved Views</ng-container></span>
               </a>
             </li>
+            @if (canManageShareLinks) {
+              <li class="nav-item app-link">
+                <a class="nav-link" routerLink="share-links" routerLinkActive="active" (click)="closeMenu()"
+                  ngbPopover="Share links" i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end"
+                  container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                  <i-bs class="me-2" name="link"></i-bs><span class="nav-link-label"><ng-container i18n>Share links</ng-container></span>
+                </a>
+              </li>
+            }
             <li class="nav-item app-link"
               *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Workflow }"
               tourAnchor="tour.workflows">

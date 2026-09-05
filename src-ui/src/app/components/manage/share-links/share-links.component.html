@@ -1,0 +1,37 @@
+<pngx-page-header
+  title="Share links"
+  i18n-title
+  info="Manage public links to individual documents and document bundles."
+  i18n-info
+></pngx-page-header>
+
+<ul
+  ngbNav
+  #nav="ngbNav"
+  class="nav-tabs"
+  [activeId]="activeNavID()"
+  (activeIdChange)="selectTab($event)"
+>
+  @if (canViewDocumentLinks) {
+    <li [ngbNavItem]="ShareLinksNavIDs.DocumentLinks">
+      <button ngbNavLink i18n>Document links</button>
+      <ng-template ngbNavContent>
+        <div class="border border-top-0 rounded-bottom p-3 text-muted" i18n>
+          Manage links to individual documents here.
+        </div>
+      </ng-template>
+    </li>
+  }
+  @if (canViewBundles) {
+    <li [ngbNavItem]="ShareLinksNavIDs.Bundles">
+      <button ngbNavLink i18n>Bundles</button>
+      <ng-template ngbNavContent>
+        <div class="border border-top-0 rounded-bottom p-3 text-muted" i18n>
+          Manage share link bundles here.
+        </div>
+      </ng-template>
+    </li>
+  }
+</ul>
+
+<div [ngbNavOutlet]="nav"></div>
