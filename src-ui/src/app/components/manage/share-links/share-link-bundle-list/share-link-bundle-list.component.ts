@@ -106,7 +106,6 @@ export class ShareLinkBundleListComponent
       setTimeout(() => {
         this.copiedSlug.set(null)
       }, 3000)
-      this.toastService.showInfo($localize`Share link copied to clipboard.`)
     }
   }
 

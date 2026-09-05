@@ -122,16 +122,24 @@ describe('ShareLinkBundleListComponent', () => {
       slug: 'ready-slug',
       status: ShareLinkBundleStatus.Ready,
     })
+    component.bundles.set([readyBundle])
+    fixture.detectChanges()
     component.copy(readyBundle)
 
     expect(clipboard.copy).toHaveBeenCalledWith(
       component.getShareUrl(readyBundle)
     )
     expect(component.copiedSlug()).toBe('ready-slug')
-    expect(toastService.showInfo).toHaveBeenCalled()
+    expect(toastService.showInfo).not.toHaveBeenCalled()
+    fixture.detectChanges()
+    expect(
+      fixture.nativeElement.querySelector('.badge.show').textContent
+    ).toContain('Copied!')
 
     jest.advanceTimersByTime(3000)
     expect(component.copiedSlug()).toBeNull()
+    fixture.detectChanges()
+    expect(fixture.nativeElement.querySelector('.badge.show')).toBeNull()
   })
 
   it('ignores copy requests for non-ready bundles', () => {

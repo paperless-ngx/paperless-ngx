@@ -99,42 +99,49 @@
                 <td>{{ bundle.document_count }}</td>
                 <td>{{ fileVersionLabel(bundle.file_version) }}</td>
                 <td class="text-end">
-                  <div class="btn-group btn-group-sm">
-                    <button
-                      type="button"
-                      class="btn btn-outline-primary"
-                      [disabled]="bundle.status !== statuses.Ready"
-                      (click)="copy(bundle)"
-                      title="Copy share link"
-                      i18n-title
-                    >
-                      @if (copiedSlug() === bundle.slug) {
-                        <i-bs name="clipboard-check"></i-bs>
-                      }
-                      @if (copiedSlug() !== bundle.slug) {
-                        <i-bs name="clipboard"></i-bs>
-                      }
-                      <span class="visually-hidden" i18n>Copy share link</span>
-                    </button>
-                    @if (bundle.status === statuses.Failed) {
+                  <div class="d-inline-block position-relative">
+                    <span
+                      class="badge bg-primary small fade position-absolute top-50 end-100 translate-middle-y me-2 pe-none z-3 text-nowrap"
+                      [class.show]="copiedSlug() === bundle.slug"
+                      i18n
+                    >Copied!</span>
+                    <div class="btn-group btn-group-sm">
                       <button
                         type="button"
-                        class="btn btn-outline-warning"
-                        [disabled]="loading()"
-                        (click)="retry(bundle)"
+                        class="btn btn-outline-primary"
+                        [disabled]="bundle.status !== statuses.Ready"
+                        (click)="copy(bundle)"
+                        title="Copy share link"
+                        i18n-title
                       >
-                        <i-bs name="arrow-clockwise"></i-bs>
-                        <span class="visually-hidden" i18n>Retry</span>
+                        @if (copiedSlug() === bundle.slug) {
+                          <i-bs name="clipboard-check"></i-bs>
+                        }
+                        @if (copiedSlug() !== bundle.slug) {
+                          <i-bs name="clipboard"></i-bs>
+                        }
+                        <span class="visually-hidden" i18n>Copy share link</span>
                       </button>
-                    }
-                    <pngx-confirm-button
-                      buttonClasses="btn btn-sm btn-outline-danger"
-                      [disabled]="loading()"
-                      (confirm)="delete(bundle)"
-                      iconName="trash"
-                    >
-                      <span class="visually-hidden" i18n>Delete share link bundle</span>
-                    </pngx-confirm-button>
+                      @if (bundle.status === statuses.Failed) {
+                        <button
+                          type="button"
+                          class="btn btn-outline-warning"
+                          [disabled]="loading()"
+                          (click)="retry(bundle)"
+                        >
+                          <i-bs name="arrow-clockwise"></i-bs>
+                          <span class="visually-hidden" i18n>Retry</span>
+                        </button>
+                      }
+                      <pngx-confirm-button
+                        buttonClasses="btn btn-sm btn-outline-danger"
+                        [disabled]="loading()"
+                        (confirm)="delete(bundle)"
+                        iconName="trash"
+                      >
+                        <span class="visually-hidden" i18n>Delete share link bundle</span>
+                      </pngx-confirm-button>
+                    </div>
                   </div>
                 </td>
               </tr>
