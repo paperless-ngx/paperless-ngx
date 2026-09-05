@@ -89,6 +89,7 @@ from documents.templating.utils import convert_format_str_to_template_format
 from documents.templating.workflows import validate_workflow_template
 from documents.validators import uri_validator
 from documents.validators import url_validator
+from documents.versioning import has_prefetched_effective_content
 from documents.versioning import sort_versions_newest_first
 
 if TYPE_CHECKING:
@@ -1149,8 +1150,14 @@ class DocumentSerializer(
 
     def to_representation(self, instance):
         doc = super().to_representation(instance)
-        if "content" in self.fields and hasattr(instance, "effective_content"):
-            doc["content"] = getattr(instance, "effective_content") or ""
+        if "content" in self.fields and has_prefetched_effective_content(instance):
+            # Only resolve version-aware content when it's cheap: an SQL
+            # annotation or a versions prefetch is already on the instance.
+            # A caller that set up neither (e.g. TrashView, GlobalSearchView,
+            # which build their own querysets) gets the document's own,
+            # unresolved content instead of paying for an extra per-instance
+            # query -- same as before effective_content resolution existed.
+            doc["content"] = instance.get_effective_content() or ""
         if self.truncate_content and "content" in self.fields:
             doc["content"] = doc.get("content")[0:550]
         return doc

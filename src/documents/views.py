@@ -137,12 +137,14 @@ from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
 from documents.filters import DocumentsOrderingFilter
 from documents.filters import DocumentTypeFilterSet
+from documents.filters import EffectiveContentFilter
 from documents.filters import PaperlessTaskFilterSet
 from documents.filters import PermittedObjectsFilter
 from documents.filters import ShareLinkBundleFilterSet
 from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
+from documents.filters import TitleContentFilter
 from documents.mail import EmailAttachment
 from documents.mail import send_email
 from documents.matching import match_correspondents
@@ -235,6 +237,7 @@ from documents.versioning import VersionResolutionError
 from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_request_version_param
 from documents.versioning import get_root_document
+from documents.versioning import latest_version_content_prefetch
 from documents.versioning import resolve_requested_version_for_root
 from documents.versioning import versions_newest_first
 from paperless import version
@@ -1082,12 +1085,47 @@ class DocumentViewSet(
             ],
         }
 
-    def get_queryset(self):
-        latest_version_content = Subquery(
-            versions_newest_first(
-                Document.objects.filter(root_document=OuterRef("pk")),
-            ).values("content")[:1],
+    @classmethod
+    def _content_filter_params(cls) -> tuple[str, ...]:
+        """
+        Query params whose filtering needs effective_content evaluated in
+        SQL against every candidate row -- see
+        _needs_effective_content_annotation(). Derived from DocumentFilterSet
+        and search_fields, rather than a hand-maintained list, so a new
+        content-filtering param automatically counts here too.
+        """
+        params = [
+            name
+            for name, f in DocumentFilterSet.declared_filters.items()
+            if isinstance(f, (TitleContentFilter, EffectiveContentFilter))
+        ]
+        if "effective_content" in cls.search_fields:
+            params.append(SearchFilter().search_param)
+        return tuple(params)
+
+    def _needs_effective_content_annotation(self) -> bool:
+        # effective_content is a per-row correlated subquery resolving each
+        # document's latest version. Cheap when evaluated only for the page
+        # that survives filtering/sorting/pagination (the common case, via
+        # the "versions" prefetch + Document.get_effective_content()'s
+        # fallback), but if anything filters *on* it, the database has to
+        # evaluate it for every candidate row before the LIMIT is reached --
+        # pathological on MariaDB specifically for the root_document_id
+        # self-join once real candidate counts get large. Everything on this
+        # list is deprecated in favor of the Tantivy-backed search endpoint
+        # (see filters.py's TitleContentFilter/EffectiveContentFilter docs),
+        # so keep paying that cost only when one is actually used. Checked as
+        # a stripped, non-blank value (not just key presence) to match how
+        # DRF's SearchFilter and TitleContentFilter/EffectiveContentFilter
+        # themselves no-op on a blank value -- otherwise an empty `?search=`
+        # or a saved view with a cleared text filter would still pay for the
+        # annotation despite applying no actual predicate.
+        params = self.request.query_params
+        return any(
+            params.get(param, "").strip() for param in self._content_filter_params()
         )
+
+    def get_queryset(self):
         # A correlated subquery avoids the LEFT JOIN + Count() this used to
         # be, which forced a GROUP BY aggregate over every matching document
         # before the query could even be sorted or limited.
@@ -1107,10 +1145,9 @@ class DocumentViewSet(
         # ObjectFilter.filter(). A blanket .distinct() here forces the
         # database to fully sort and dedupe every visible document before
         # it can apply LIMIT, which is disastrous at scale.
-        return (
+        queryset = (
             Document.objects.filter(root_document__isnull=True)
             .order_by("-created", "-id")
-            .annotate(effective_content=Coalesce(latest_version_content, F("content")))
             .annotate(num_notes=Coalesce(note_count, 0))
             .select_related("correspondent", "storage_path", "document_type", "owner")
             .prefetch_related(
@@ -1125,6 +1162,7 @@ class DocumentViewSet(
                         "version_index",
                     ),
                 ),
+                latest_version_content_prefetch(),
                 "tags",
                 Prefetch(
                     "custom_fields",
@@ -1134,6 +1172,16 @@ class DocumentViewSet(
                 Prefetch("notes", queryset=Note.objects.select_related("user")),
             )
         )
+        if self._needs_effective_content_annotation():
+            latest_version_content = Subquery(
+                versions_newest_first(
+                    Document.objects.filter(root_document=OuterRef("pk")),
+                ).values("content")[:1],
+            )
+            queryset = queryset.annotate(
+                effective_content=Coalesce(latest_version_content, F("content")),
+            )
+        return queryset
 
     def get_serializer(self, *args, **kwargs):
         fields_param = self.request.query_params.get("fields", None)

@@ -7,9 +7,12 @@ from typing import Any
 
 from django.db.models import F
 from django.db.models import OuterRef
+from django.db.models import Prefetch
 from django.db.models import QuerySet
 from django.db.models import Subquery
+from django.db.models import Window
 from django.db.models.functions import Coalesce
+from django.db.models.functions import RowNumber
 
 from documents.models import Document
 
@@ -41,6 +44,68 @@ def annotate_effective_content(documents: QuerySet[Document]) -> QuerySet[Docume
             F("content"),
         ),
     )
+
+
+LATEST_VERSION_CONTENT_PREFETCH_ATTR = "_latest_version_content_prefetch"
+
+
+def latest_version_content_prefetch() -> Prefetch:
+    """
+    A Prefetch for Document.versions scoped to just the newest version's
+    content, for get_effective_content()'s fallback when no SQL annotation
+    is present.
+
+    Deliberately not merged into a metadata-only "versions" prefetch (the one
+    used for the serialized versions list): that one fetches every historical
+    version of every document, and pulling full OCR content for versions
+    nobody will read wastes DB transfer/memory at scale. This one is windowed
+    down to a single row per root, then bounded by Prefetch's own IN-list to
+    whatever page/result set it's attached to -- one cheap bulk query total,
+    not one per document and not one per version.
+    """
+    return Prefetch(
+        "versions",
+        queryset=(
+            Document.objects.filter(
+                root_document_id__isnull=False,
+                deleted_at__isnull=True,
+            )
+            .annotate(
+                rn=Window(
+                    RowNumber(),
+                    partition_by=F("root_document_id"),
+                    order_by=[
+                        F("version_index").desc(nulls_last=True),
+                        F("id").desc(),
+                    ],
+                ),
+            )
+            .filter(rn=1)
+            .only("id", "root_document_id", "content")
+        ),
+        to_attr=LATEST_VERSION_CONTENT_PREFETCH_ATTR,
+    )
+
+
+def has_prefetched_effective_content(document: Document) -> bool:
+    """
+    True if document.get_effective_content() can answer without an extra
+    per-instance query -- an SQL ``effective_content`` annotation, the lean
+    latest_version_content_prefetch(), or the metadata-only "versions"
+    prefetch is already present on the instance.
+
+    Callers that haven't set any of those up (e.g. views that build their
+    own querysets independently of DocumentViewSet.get_queryset(), like
+    TrashView or GlobalSearchView) intentionally don't pay for version-aware
+    content resolution -- see DocumentSerializer.to_representation(), which
+    uses this to decide whether to call get_effective_content() at all.
+    """
+    if hasattr(document, "effective_content"):
+        return True
+    if getattr(document, LATEST_VERSION_CONTENT_PREFETCH_ATTR, None) is not None:
+        return True
+    prefetched_cache = getattr(document, "_prefetched_objects_cache", None)
+    return isinstance(prefetched_cache, dict) and "versions" in prefetched_cache
 
 
 def sort_versions_newest_first(documents: list[Document]) -> list[Document]:
