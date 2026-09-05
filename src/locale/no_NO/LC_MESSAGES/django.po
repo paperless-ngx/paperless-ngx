@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-02 18:09+0000\n"
-"PO-Revision-Date: 2026-09-02 18:11\n"
+"POT-Creation-Date: 2026-09-04 14:16+0000\n"
+"PO-Revision-Date: 2026-09-04 15:28\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -282,119 +282,119 @@ msgstr "Arkiv"
 
 #: documents/models.py:530
 msgid "Bank"
-msgstr ""
+msgstr "Bank"
 
 #: documents/models.py:531
 msgid "Basket"
-msgstr ""
+msgstr "Kurv"
 
 #: documents/models.py:532
 msgid "Bell"
-msgstr ""
+msgstr "Bjelle"
 
 #: documents/models.py:533
 msgid "Bookmark"
-msgstr ""
+msgstr "Bokmerke"
 
 #: documents/models.py:534
 msgid "Boxes"
-msgstr ""
+msgstr "Bokser"
 
 #: documents/models.py:535
 msgid "Briefcase"
-msgstr ""
+msgstr "Koffert"
 
 #: documents/models.py:536
 msgid "Building"
-msgstr ""
+msgstr "Bygning"
 
 #: documents/models.py:537
 msgid "Calculator"
-msgstr ""
+msgstr "Kalkulator"
 
 #: documents/models.py:538
 msgid "Calendar"
-msgstr ""
+msgstr "Kalender"
 
 #: documents/models.py:539
 msgid "Camera"
-msgstr ""
+msgstr "Kamera"
 
 #: documents/models.py:540
 msgid "Checklist"
-msgstr ""
+msgstr "Sjekkliste"
 
 #: documents/models.py:541
 msgid "Cash"
-msgstr ""
+msgstr "Kontanter"
 
 #: documents/models.py:542
 msgid "Chat"
-msgstr ""
+msgstr "Samtale"
 
 #: documents/models.py:543
 msgid "Check"
-msgstr ""
+msgstr "Sjekk"
 
 #: documents/models.py:544
 msgid "Clipboard"
-msgstr ""
+msgstr "Utklippstavle"
 
 #: documents/models.py:545
 msgid "Clock"
-msgstr ""
+msgstr "Klokke"
 
 #: documents/models.py:546
 msgid "Credit card"
-msgstr ""
+msgstr "Kredittkort"
 
 #: documents/models.py:547
 msgid "Download"
-msgstr ""
+msgstr "Last ned"
 
 #: documents/models.py:548
 msgid "Envelope"
-msgstr ""
+msgstr "Konvolutt"
 
 #: documents/models.py:549
 msgid "Warning"
-msgstr ""
+msgstr "Advarsel"
 
 #: documents/models.py:550
 msgid "File"
-msgstr ""
+msgstr "Fil"
 
 #: documents/models.py:551
 msgid "Checked file"
-msgstr ""
+msgstr "Avkrysset fil"
 
 #: documents/models.py:552
 msgid "Locked file"
-msgstr ""
+msgstr "Låst fil"
 
 #: documents/models.py:553
 msgid "Medical file"
-msgstr ""
+msgstr "Medisinsk fil"
 
 #: documents/models.py:554
 msgid "Person file"
-msgstr ""
+msgstr "Personlig fil"
 
 #: documents/models.py:557
 msgid "Spreadsheet"
-msgstr ""
+msgstr "Regneark"
 
 #: documents/models.py:559
 msgid "Text file"
-msgstr ""
+msgstr "Tekstfil"
 
 #: documents/models.py:560
 msgid "Files"
-msgstr ""
+msgstr "Filer"
 
 #: documents/models.py:561
 msgid "Folder"
-msgstr ""
+msgstr "Mappe"
 
 #: documents/models.py:562 paperless_mail/admin.py:58
 msgid "Filter"
@@ -402,87 +402,87 @@ msgstr "Filtrer"
 
 #: documents/models.py:563
 msgid "Gear"
-msgstr ""
+msgstr "Tannhjul"
 
 #: documents/models.py:564
 msgid "Globe"
-msgstr ""
+msgstr "Klode"
 
 #: documents/models.py:565
 msgid "Hash"
-msgstr ""
+msgstr "Hash"
 
 #: documents/models.py:566
 msgid "Heart"
-msgstr ""
+msgstr "Hjerte"
 
 #: documents/models.py:567
 msgid "House"
-msgstr ""
+msgstr "Hus"
 
 #: documents/models.py:568
 msgid "Inbox"
-msgstr ""
+msgstr "Innboks"
 
 #: documents/models.py:569
 msgid "Journals"
-msgstr ""
+msgstr "Tidsskrifter"
 
 #: documents/models.py:570
 msgid "Task list"
-msgstr ""
+msgstr "Oppgaveliste"
 
 #: documents/models.py:571
 msgid "Newspaper"
-msgstr ""
+msgstr "Avis"
 
 #: documents/models.py:572
 msgid "Attachment"
-msgstr ""
+msgstr "Vedlegg"
 
 #: documents/models.py:573
 msgid "People"
-msgstr ""
+msgstr "Mennesker"
 
 #: documents/models.py:574
 msgid "Person"
-msgstr ""
+msgstr "Person"
 
 #: documents/models.py:575
 msgid "Printer"
-msgstr ""
+msgstr "Skriver"
 
 #: documents/models.py:576
 msgid "Receipt"
-msgstr ""
+msgstr "Kvittering"
 
 #: documents/models.py:577
 msgid "Safe"
-msgstr ""
+msgstr "Sikker"
 
 #: documents/models.py:578
 msgid "Search"
-msgstr ""
+msgstr "Søk"
 
 #: documents/models.py:579
 msgid "Send"
-msgstr ""
+msgstr "Send"
 
 #: documents/models.py:580
 msgid "Shop"
-msgstr ""
+msgstr "Butikk"
 
 #: documents/models.py:581
 msgid "Stack"
-msgstr ""
+msgstr "Stabel"
 
 #: documents/models.py:582
 msgid "Stars"
-msgstr ""
+msgstr "Stjerner"
 
 #: documents/models.py:583
 msgid "Tag"
-msgstr ""
+msgstr "Merke"
 
 #: documents/models.py:584 documents/models.py:599 documents/models.py:1689
 msgid "Tags"
@@ -494,15 +494,15 @@ msgstr ""
 
 #: documents/models.py:586
 msgid "Truck"
-msgstr ""
+msgstr "Lastebil"
 
 #: documents/models.py:587
 msgid "Barcode"
-msgstr ""
+msgstr "Strekkode"
 
 #: documents/models.py:588
 msgid "Wallet"
-msgstr ""
+msgstr "Lommebok"
 
 #: documents/models.py:591
 msgid "Table"
@@ -562,7 +562,7 @@ msgstr "Sider"
 
 #: documents/models.py:613
 msgid "icon"
-msgstr ""
+msgstr "ikon"
 
 #: documents/models.py:620
 msgid "sort field"
@@ -830,7 +830,7 @@ msgstr "Tilbakekalt"
 
 #: documents/models.py:761
 msgid "Consume File"
-msgstr "Forbruk fil"
+msgstr "Bruk fil"
 
 #: documents/models.py:762
 msgid "Train Classifier"
@@ -878,7 +878,7 @@ msgstr "Massesletting"
 
 #: documents/models.py:773
 msgid "Apply AI Suggestions"
-msgstr ""
+msgstr "Bruk KI-forslag"
 
 #: documents/models.py:782 documents/models.py:1353
 msgid "Scheduled"
@@ -898,7 +898,7 @@ msgstr "Mappeforbruk"
 
 #: documents/models.py:786
 msgid "Email Consume"
-msgstr "E-postforbruk"
+msgstr "E-posthenting"
 
 #: documents/models.py:787
 msgid "System"
@@ -1379,23 +1379,23 @@ msgstr "Flytt til papirkurven"
 
 #: documents/models.py:1680
 msgid "Remote OCR"
-msgstr ""
+msgstr "Ekstern OCR"
 
 #: documents/models.py:1684
 msgid "Apply AI suggestions"
-msgstr ""
+msgstr "Bruk KI-forslag"
 
 #: documents/models.py:1691
 msgid "Document type"
-msgstr ""
+msgstr "Dokumenttype"
 
 #: documents/models.py:1692
 msgid "Storage path"
-msgstr ""
+msgstr "Lagringssti"
 
 #: documents/models.py:1693
 msgid "Created date"
-msgstr ""
+msgstr "Opprettet dato"
 
 #: documents/models.py:1696
 msgid "Workflow Action Type"
@@ -1548,27 +1548,27 @@ msgstr "Passwords to try when removing PDF protection. Separate with commas or n
 
 #: documents/models.py:1933
 msgid "AI suggestion fields"
-msgstr ""
+msgstr "KI forslags felter"
 
 #: documents/models.py:1937
 msgid "Which of the AI-suggested fields to apply to the document."
-msgstr ""
+msgstr "Hvilke av KI-foreslåtte felter som skal gjelde for dokumentet."
 
 #: documents/models.py:1942
 msgid "create missing objects"
-msgstr ""
+msgstr "opprett manglende objekter"
 
 #: documents/models.py:1945
 msgid "Create suggested tags, correspondents, document types and storage paths that do not already exist instead of skipping them."
-msgstr ""
+msgstr "Opprett foreslåtte merker, korrespondenter, dokumenttyper og lagringsveier som ikke allerede eksisterer i stedet for å hoppe over dem."
 
 #: documents/models.py:1951
 msgid "overwrite existing values"
-msgstr ""
+msgstr "overskrive eksisterende verdier"
 
 #: documents/models.py:1954
 msgid "Apply suggestions even if the document already has a value for that field. Tags are always added to, never replaced."
-msgstr ""
+msgstr "Bruk forslag selv om dokumentet allerede har en verdi for feltet. Merker blir alltid lagt til, aldri erstattet."
 
 #: documents/models.py:1960
 msgid "workflow action"
@@ -1611,7 +1611,7 @@ msgid "workflow runs"
 msgstr "workflow runs (NO)"
 
 #: documents/serialisers.py:524 documents/serialisers.py:878
-#: documents/serialisers.py:2830 documents/views.py:314 documents/views.py:2623
+#: documents/serialisers.py:2838 documents/views.py:314 documents/views.py:2623
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "Insufficient permissions. (NO)"
@@ -1620,38 +1620,38 @@ msgstr "Insufficient permissions. (NO)"
 msgid "Invalid color."
 msgstr "Ugyldig farge."
 
-#: documents/serialisers.py:2307
+#: documents/serialisers.py:2315
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Filtype %(type)s støttes ikke"
 
-#: documents/serialisers.py:2351
+#: documents/serialisers.py:2359
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "Egendefinert felt-id må være et heltall: %(id)s"
 
-#: documents/serialisers.py:2358
+#: documents/serialisers.py:2366
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Egendefinert felt med id %(id)s finnes ikke"
 
-#: documents/serialisers.py:2375 documents/serialisers.py:2385
+#: documents/serialisers.py:2383 documents/serialisers.py:2393
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Custom fields must be a list of integers or an object mapping ids to values. (NO)"
 
-#: documents/serialisers.py:2380
+#: documents/serialisers.py:2388
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Some custom fields don't exist or were specified twice. (NO)"
 
-#: documents/serialisers.py:2527
+#: documents/serialisers.py:2535
 msgid "Invalid variable detected."
 msgstr "Ugyldig variabel oppdaget."
 
-#: documents/serialisers.py:2886
+#: documents/serialisers.py:2894
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Duplicate document identifiers are not allowed. (NO)"
 
-#: documents/serialisers.py:2916 documents/views.py:4624
+#: documents/serialisers.py:2924 documents/views.py:4624
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Documents not found: %(ids)s (NO)"
@@ -2022,15 +2022,15 @@ msgstr "CMYK (NO)"
 
 #: paperless/models.py:82
 msgid "Azure AI Document Intelligence"
-msgstr ""
+msgstr "Azure KI dokumentetterretning"
 
 #: paperless/models.py:90
 msgid "All supported documents"
-msgstr ""
+msgstr "Alle støttede dokumenter"
 
 #: paperless/models.py:91
 msgid "Only when a workflow enables it"
-msgstr ""
+msgstr "Bare når en arbeidsflyt aktiverer den"
 
 #: paperless/models.py:95 paperless/models.py:105
 msgid "OpenAI-compatible"
@@ -2154,19 +2154,19 @@ msgstr "Enables splitting on tag barcodes"
 
 #: paperless/models.py:312
 msgid "Sets the remote OCR engine"
-msgstr ""
+msgstr "Angir ekstern OCR motor"
 
 #: paperless/models.py:321
 msgid "Sets the remote OCR API key"
-msgstr ""
+msgstr "Angir ekstern OCR API-nøkkel"
 
 #: paperless/models.py:329
 msgid "Sets the remote OCR endpoint"
-msgstr ""
+msgstr "Angir ekstern OCR endepunkt"
 
 #: paperless/models.py:337
 msgid "Sets which documents are sent to the remote OCR engine"
-msgstr ""
+msgstr "Angir hvilke dokumenter som skal sendes til ekstern OCR motor"
 
 #: paperless/models.py:349
 msgid "Enables AI features"
@@ -2402,7 +2402,7 @@ msgstr "Tilordne metadata til dokumenter som brukes fra denne regelen automatisk
 
 #: paperless_mail/apps.py:8
 msgid "Paperless mail"
-msgstr "Paperløst e-post"
+msgstr "Paperless e-post"
 
 #: paperless_mail/models.py:10
 msgid "mail account"
