@@ -279,6 +279,10 @@ different means. These are as follows:
 Paperless is set up to check your mails every 10 minutes. This can be
 configured via [`PAPERLESS_EMAIL_TASK_CRON`](configuration.md#PAPERLESS_EMAIL_TASK_CRON)
 
+#### Email metadata on consumed documents
+
+A mail rule can optionally set the document's created date from the email's `Date` header, and copy the subject, `From`, `To` addresses (comma-joined; `Cc`/`Bcc` omitted), and message date onto pre-existing custom fields. Text values must target `String` custom fields and are truncated at 128 characters; the message date must target a `Date` custom field. All five options are off by default and are configured on the mail rule form.
+
 #### Processed Mail
 
 Paperless keeps track of emails it has processed in order to avoid processing the same mail multiple times. This uses the message `UID` provided by the mail server, which should be unique for each message. You can view and manage processed mails from the web UI under Mail > Processed Mails. If you need to re-process a message, you can delete the corresponding processed mail entry, which will allow Paperless-ngx to process the email again the next time the mail fetch task runs.
