@@ -50,6 +50,7 @@ from documents.models import ShareLink
 from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.permissions import permitted_document_ids
 from documents.permissions import permitted_object_ids
 
 if TYPE_CHECKING:
@@ -793,6 +794,8 @@ class CustomFieldQueryFilter(Filter):
 
 
 class DocumentFilterSet(FilterSet):
+    has_duplicates = BooleanFilter(method="filter_has_duplicates")
+
     is_tagged = BooleanFilter(
         label="Is tagged",
         field_name="tags",
@@ -851,6 +854,28 @@ class DocumentFilterSet(FilterSet):
     shared_by__id = SharedByUser()
 
     mime_type = MimeTypeFilter()
+
+    def filter_has_duplicates(self, queryset, name, value):
+        if value is None:
+            return queryset
+
+        visible_root_documents = Document.global_objects.filter(
+            root_document__isnull=True,
+            pk__in=permitted_document_ids(
+                getattr(self.request, "user", None),
+                include_deleted=True,
+            ),
+        ).exclude(pk=OuterRef("pk"))
+        matching_duplicates = visible_root_documents.filter(
+            Q(checksum=OuterRef("checksum"))
+            | Q(checksum=OuterRef("archive_checksum"))
+            | Q(archive_checksum=OuterRef("checksum"))
+            | Q(archive_checksum=OuterRef("archive_checksum")),
+        )
+
+        return queryset.alias(
+            has_visible_duplicates=Exists(matching_duplicates),
+        ).filter(has_visible_duplicates=value)
 
     # Backwards compatibility
     created__date__gt = DateFilter(field_name="created", lookup_expr="gt")
