@@ -18,7 +18,6 @@ import { BrowserModule, bootstrapApplication } from '@angular/platform-browser'
 import {
   NgbDateAdapter,
   NgbDateParserFormatter,
-  NgbDatepickerConfig,
   NgbInputDatepickerConfig,
   NgbModule,
 } from '@ng-bootstrap/ng-bootstrap'
