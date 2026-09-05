@@ -4,21 +4,24 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from documents.models import Document
-from documents.permissions import get_objects_for_user_owner_aware
+from documents.permissions import permitted_object_ids
+from documents.permissions import restrict_queryset_to_visible
+from documents.permissions import user_is_unrestricted
 from paperless.config import AIConfig
 from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.base_model import TaxonomyChoiceDict
 from paperless_ai.base_model import classification_suggestions_to_model
 from paperless_ai.client import AIClient
 from paperless_ai.db import db_connection_released
-from paperless_ai.indexing import _node_document_ids
 from paperless_ai.indexing import retrieve_similar_nodes
 from paperless_ai.indexing import truncate_content
 from paperless_ai.prompts.context import ClassificationPromptContext
 from paperless_ai.prompts.context import LocalizationPromptContext
 from paperless_ai.prompts.context import RagContextPromptContext
 from paperless_ai.prompts.render import render_prompt
+from paperless_ai.taxonomy import SimilarDocument
 from paperless_ai.taxonomy import TaxonomyCandidates
+from paperless_ai.taxonomy import _node_document_weights
 from paperless_ai.taxonomy import build_taxonomy_candidates
 from paperless_ai.taxonomy import empty_taxonomy_candidates
 from paperless_ai.taxonomy import format_taxonomy_for_prompt
@@ -35,6 +38,48 @@ logger = logging.getLogger("paperless_ai.rag_classifier")
 # how many neighbours went in - so raising this does not by itself grow the
 # prompt.
 TAXONOMY_CANDIDATE_TOP_K = 15
+
+
+def _fulltext_similar_documents(
+    document: Document,
+    user: User | None,
+    top_k: int,
+) -> list[SimilarDocument]:
+    """Rank-based fallback when no embedding backend is configured. Uses
+    Tantivy's "More Like This" (term-overlap similarity) instead of vector
+    similarity - cruder, but far better than no candidates at all.
+    more_like_this_ids returns only a ranked ID list, no scores, so weight is
+    synthesized from rank (descending from top_k) rather than claiming a
+    similarity magnitude that doesn't exist. An unrestricted user (none, or an
+    active superuser - see user_is_unrestricted) is normalized to ``None``
+    before calling, since the backend's permission filter has no superuser
+    short-circuit of its own. Results are re-checked with
+    restrict_queryset_to_visible() since Tantivy's indexed permission fields
+    lag the DB via async reindexing.
+    """
+    from documents.search import get_backend
+
+    unrestricted = user_is_unrestricted(user)
+    search_user = None if unrestricted else user
+    backend = get_backend()
+    similar_ids = backend.more_like_this_ids(
+        document.pk,
+        user=search_user,
+        limit=top_k,
+    )
+    if not unrestricted:
+        allowed_ids = set(
+            restrict_queryset_to_visible(
+                Document.objects.filter(pk__in=similar_ids),
+                user,
+                "view_document",
+            ).values_list("pk", flat=True),
+        )
+        similar_ids = [doc_id for doc_id in similar_ids if doc_id in allowed_ids]
+    return [
+        SimilarDocument(document_id=doc_id, weight=float(top_k - rank))
+        for rank, doc_id in enumerate(similar_ids)
+    ]
 
 
 def get_language_name(language_code: str) -> str:
@@ -136,43 +181,52 @@ def get_taxonomy_context(
     user: User | None = None,
     max_docs: int = 5,
 ) -> tuple[TaxonomyCandidates, str]:
-    """One retrieval feeds both taxonomy candidates and RAG text context.
-    On any retrieval failure, degrades to empty candidates/context rather than
-    propagating the exception - a vector-store outage should not block
-    classification, only its RAG-assisted enrichment.
+    """One retrieval feeds both taxonomy candidates and RAG text context. Uses
+    vector similarity when an embedding backend is configured, otherwise
+    falls back to Tantivy full-text "More Like This" similarity - see
+    _fulltext_similar_documents. On any retrieval failure, degrades to empty
+    candidates/context rather than propagating the exception - neither a
+    vector-store outage nor a search-index issue should block classification,
+    only its context-assisted enrichment.
     """
+    ai_config = AIConfig()
     try:
-        # None means "no restriction" to retrieve_similar_nodes. A superuser
-        # (like no user at all) can see every document, so skip materializing
-        # every visible pk into a Python list and passing it through as an IN
-        # filter: for a large library that is a wasted quadratic scan in the
-        # vector store at best, and past ~32,763 documents a hard
-        # sqlite3.OperationalError (SQLite's bound-parameter limit) at worst.
-        # get_objects_for_user_owner_aware() would return every Document for a
-        # superuser anyway (guardian's own with_superuser shortcut), so this
-        # changes nothing about which documents are considered -- only how we
-        # get there.
-        visible_document_ids = (
-            None
-            if user is None or user.is_superuser
-            else list(
-                get_objects_for_user_owner_aware(
-                    user,
-                    "view_document",
-                    Document,
-                ).values_list("pk", flat=True),
+        if ai_config.llm_embedding_backend:
+            # None means "no restriction" to retrieve_similar_nodes. An
+            # unrestricted user (no user at all, or an active superuser -- see
+            # user_is_unrestricted) can see every document, so skip
+            # materializing every visible pk into a Python list and passing it
+            # through as an IN filter: for a large library that is a wasted
+            # quadratic scan in the vector store at best, and past ~32,763
+            # documents a hard sqlite3.OperationalError (SQLite's
+            # bound-parameter limit) at worst.
+            # permitted_object_ids() has its own superuser shortcut that would
+            # return every Document's id anyway, so this changes nothing about
+            # which documents are considered -- only how we get there.
+            visible_document_ids = (
+                None
+                if user_is_unrestricted(user)
+                else list(permitted_object_ids(user, Document, "view_document"))
             )
-        )
-        nodes = retrieve_similar_nodes(
-            document,
-            top_k=TAXONOMY_CANDIDATE_TOP_K,
-            document_ids=visible_document_ids,
-        )
+            nodes = retrieve_similar_nodes(
+                document,
+                top_k=TAXONOMY_CANDIDATE_TOP_K,
+                document_ids=visible_document_ids,
+            )
+            similar_documents = _node_document_weights(nodes)
+        else:
+            # See _fulltext_similar_documents: it applies its own permission
+            # filter via `user`, so no visible-document-id list is needed here.
+            similar_documents = _fulltext_similar_documents(
+                document,
+                user,
+                top_k=TAXONOMY_CANDIDATE_TOP_K,
+            )
 
-        candidates = build_taxonomy_candidates(nodes, user)
+        candidates = build_taxonomy_candidates(similar_documents, user)
 
-        # ``nodes`` are already ordered by descending vector similarity; don't lose it.
-        similar_document_ids = list(dict.fromkeys(_node_document_ids(nodes)))
+        # similar_documents is already ordered by descending weight; don't lose it.
+        similar_document_ids = [s["document_id"] for s in similar_documents]
         similar_documents_by_id = Document.objects.in_bulk(similar_document_ids)
         similar_docs = [
             similar_documents_by_id[document_id]
@@ -186,8 +240,8 @@ def get_taxonomy_context(
             context_blocks.append(f"TITLE: {title}\n{text}")
     except Exception:
         logger.exception(
-            "Failed to retrieve RAG neighbours for document %s; continuing "
-            "without taxonomy candidates or similar-document context.",
+            "Failed to retrieve similar-document context for document %s; "
+            "continuing without taxonomy candidates or similar-document context.",
             document.pk,
         )
         return empty_taxonomy_candidates(), ""
@@ -241,17 +295,13 @@ def get_ai_document_classification(
 ) -> ClassificationSuggestions:
     ai_config = AIConfig()
 
-    if ai_config.llm_embedding_backend:
-        candidates, context = get_taxonomy_context(document, user)
-        prompt = build_prompt_with_rag(
-            document,
-            ai_config,
-            candidates=candidates,
-            context=context,
-        )
-    else:
-        candidates = empty_taxonomy_candidates()
-        prompt = build_prompt_without_rag(document, ai_config, candidates=candidates)
+    candidates, context = get_taxonomy_context(document, user)
+    prompt = build_prompt_with_rag(
+        document,
+        ai_config,
+        candidates=candidates,
+        context=context,
+    )
 
     client = AIClient()
     # Hand the pooled DB connection back while the (slow) LLM query runs so it

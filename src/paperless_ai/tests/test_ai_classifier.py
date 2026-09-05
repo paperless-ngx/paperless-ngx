@@ -1,4 +1,5 @@
 import datetime
+from collections.abc import Generator
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -8,16 +9,20 @@ import pytest_mock
 from django.test import override_settings
 
 from documents.models import Document
+from documents.search import TantivyBackend
 from documents.tests.factories import DocumentFactory
 from documents.tests.factories import TagFactory
 from documents.tests.factories import UserFactory
 from paperless.config import AIConfig
+from paperless_ai.ai_classifier import TAXONOMY_CANDIDATE_TOP_K
+from paperless_ai.ai_classifier import _fulltext_similar_documents
 from paperless_ai.ai_classifier import build_localization_prompt
 from paperless_ai.ai_classifier import build_prompt_with_rag
 from paperless_ai.ai_classifier import build_prompt_without_rag
 from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.ai_classifier import get_language_name
 from paperless_ai.ai_classifier import get_taxonomy_context
+from paperless_ai.taxonomy import SimilarDocument
 from paperless_ai.taxonomy import TaxonomyCandidate
 from paperless_ai.taxonomy import TaxonomyCandidates
 
@@ -220,12 +225,10 @@ def test_use_rag_if_configured(
 
 @pytest.mark.django_db
 @patch("paperless_ai.client.AIClient.run_llm_query")
-@patch("paperless_ai.ai_classifier.build_prompt_without_rag")
-@patch("paperless_ai.ai_classifier.AIConfig")
+@patch("paperless_ai.ai_classifier.build_prompt_with_rag")
 @override_settings(LLM_BACKEND="ollama", LLM_MODEL="some_model")
-def test_use_without_rag_if_not_configured(
-    mock_ai_config,
-    mock_build_prompt_without_rag,
+def test_use_rag_prompt_even_without_embedding_backend(
+    mock_build_prompt_with_rag,
     mock_run_llm_query,
     mock_document,
 ):
@@ -235,13 +238,13 @@ def test_use_without_rag_if_not_configured(
     WHEN:
         - get_ai_document_classification() is called
     THEN:
-        - The non-RAG prompt builder is used
+        - The RAG-context prompt builder is still used (fed by the full-text
+          fallback's context/candidates instead of the vector store's)
     """
-    mock_ai_config.return_value.llm_embedding_backend = None
-    mock_build_prompt_without_rag.return_value = "Prompt without RAG"
+    mock_build_prompt_with_rag.return_value = "Prompt with RAG"
     mock_run_llm_query.return_value = NESTED_SUGGESTIONS
     get_ai_document_classification(mock_document)
-    mock_build_prompt_without_rag.assert_called_once()
+    mock_build_prompt_with_rag.assert_called_once()
 
 
 @pytest.mark.django_db
@@ -320,6 +323,7 @@ def test_build_localization_prompt_preserves_unicode_characters():
 
 
 @pytest.mark.django_db
+@override_settings(LLM_EMBEDDING_BACKEND="huggingface")
 def test_get_taxonomy_context_assembles_rag_text_and_candidates():
     """
     GIVEN:
@@ -354,6 +358,7 @@ def test_get_taxonomy_context_assembles_rag_text_and_candidates():
 
 
 @pytest.mark.django_db
+@override_settings(LLM_EMBEDDING_BACKEND="huggingface")
 def test_get_taxonomy_context_preserves_similarity_order_and_distinct_documents():
     """
     GIVEN:
@@ -424,6 +429,7 @@ def test_get_taxonomy_context_preserves_similarity_order_and_distinct_documents(
 
 
 @pytest.mark.django_db
+@override_settings(LLM_EMBEDDING_BACKEND="huggingface")
 def test_get_taxonomy_context_no_similar_docs():
     """
     GIVEN:
@@ -447,6 +453,67 @@ def test_get_taxonomy_context_no_similar_docs():
     }
 
 
+@pytest.mark.django_db
+def test_get_taxonomy_context_uses_fulltext_fallback_when_no_embedding_backend(
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """
+    GIVEN:
+        - No LLM embedding backend is configured (the default test settings)
+    WHEN:
+        - get_taxonomy_context() is called
+    THEN:
+        - _fulltext_similar_documents() is called with the document, the user
+          and TAXONOMY_CANDIDATE_TOP_K
+        - retrieve_similar_nodes() (the vector path) is never called
+    """
+    document = DocumentFactory.create(content="Some content")
+    mock_fulltext = mocker.patch(
+        "paperless_ai.ai_classifier._fulltext_similar_documents",
+        return_value=[],
+    )
+    mock_retrieve = mocker.patch("paperless_ai.ai_classifier.retrieve_similar_nodes")
+
+    get_taxonomy_context(document, user=None)
+
+    mock_fulltext.assert_called_once_with(
+        document,
+        None,
+        top_k=TAXONOMY_CANDIDATE_TOP_K,
+    )
+    mock_retrieve.assert_not_called()
+
+
+@pytest.mark.django_db
+@override_settings(LLM_EMBEDDING_BACKEND="huggingface")
+def test_get_taxonomy_context_uses_vector_path_when_embedding_backend_configured(
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """
+    GIVEN:
+        - An LLM embedding backend is configured
+    WHEN:
+        - get_taxonomy_context() is called
+    THEN:
+        - retrieve_similar_nodes() (the vector path) is called
+        - _fulltext_similar_documents() (the no-embedding-backend fallback)
+          is never called
+    """
+    document = DocumentFactory.create(content="Some content")
+    mock_retrieve = mocker.patch(
+        "paperless_ai.ai_classifier.retrieve_similar_nodes",
+        return_value=[],
+    )
+    mock_fulltext = mocker.patch(
+        "paperless_ai.ai_classifier._fulltext_similar_documents",
+    )
+
+    get_taxonomy_context(document, user=None)
+
+    mock_retrieve.assert_called_once()
+    mock_fulltext.assert_not_called()
+
+
 class TestGetTaxonomyContextVisibility:
     """get_taxonomy_context must not materialize every visible document id
     for a user who can already see the whole library: a superuser (like no
@@ -459,6 +526,7 @@ class TestGetTaxonomyContextVisibility:
     """
 
     @pytest.mark.django_db
+    @override_settings(LLM_EMBEDDING_BACKEND="huggingface")
     def test_skips_permission_lookup_for_superuser(
         self,
         mocker: pytest_mock.MockerFixture,
@@ -477,17 +545,18 @@ class TestGetTaxonomyContextVisibility:
             "paperless_ai.ai_classifier.retrieve_similar_nodes",
             return_value=[],
         )
-        mock_get_objects = mocker.patch(
-            "paperless_ai.ai_classifier.get_objects_for_user_owner_aware",
+        mock_permitted = mocker.patch(
+            "paperless_ai.ai_classifier.permitted_object_ids",
         )
         user = UserFactory.create(is_superuser=True)
 
         get_taxonomy_context(document, user)
 
-        mock_get_objects.assert_not_called()
+        mock_permitted.assert_not_called()
         assert mock_retrieve.call_args.kwargs["document_ids"] is None
 
     @pytest.mark.django_db
+    @override_settings(LLM_EMBEDDING_BACKEND="huggingface")
     def test_skips_permission_lookup_when_no_user(
         self,
         mocker: pytest_mock.MockerFixture,
@@ -506,16 +575,17 @@ class TestGetTaxonomyContextVisibility:
             "paperless_ai.ai_classifier.retrieve_similar_nodes",
             return_value=[],
         )
-        mock_get_objects = mocker.patch(
-            "paperless_ai.ai_classifier.get_objects_for_user_owner_aware",
+        mock_permitted = mocker.patch(
+            "paperless_ai.ai_classifier.permitted_object_ids",
         )
 
         get_taxonomy_context(document, None)
 
-        mock_get_objects.assert_not_called()
+        mock_permitted.assert_not_called()
         assert mock_retrieve.call_args.kwargs["document_ids"] is None
 
     @pytest.mark.django_db
+    @override_settings(LLM_EMBEDDING_BACKEND="huggingface")
     def test_restricts_to_visible_documents_for_non_superuser(
         self,
         mocker: pytest_mock.MockerFixture,
@@ -526,7 +596,7 @@ class TestGetTaxonomyContextVisibility:
         WHEN:
             - get_taxonomy_context() is called
         THEN:
-            - The user's visible document ids are looked up and passed to
+            - The user's permitted document ids are looked up and passed to
               retrieve_similar_nodes() as a restriction
         """
         document = DocumentFactory.create(content="Some content")
@@ -534,21 +604,186 @@ class TestGetTaxonomyContextVisibility:
             "paperless_ai.ai_classifier.retrieve_similar_nodes",
             return_value=[],
         )
-        mock_queryset = mocker.MagicMock()
-        mock_queryset.values_list.return_value = [1, 2, 3]
-        mock_get_objects = mocker.patch(
-            "paperless_ai.ai_classifier.get_objects_for_user_owner_aware",
-            return_value=mock_queryset,
+        mock_permitted = mocker.patch(
+            "paperless_ai.ai_classifier.permitted_object_ids",
+            return_value=[1, 2, 3],
         )
         user = UserFactory.create(is_superuser=False)
 
         get_taxonomy_context(document, user)
 
-        mock_get_objects.assert_called_once_with(user, "view_document", Document)
+        mock_permitted.assert_called_once_with(user, Document, "view_document")
         assert mock_retrieve.call_args.kwargs["document_ids"] == [1, 2, 3]
 
 
 @pytest.mark.django_db
+class TestFulltextSimilarDocuments:
+    """_fulltext_similar_documents is the no-embedding-backend fallback: it
+    asks the Tantivy full-text index for "More Like This" neighbours instead
+    of the vector store, and synthesizes a rank-based weight since Tantivy's
+    more_like_this_ids returns only an ordered id list, no scores.
+    """
+
+    @pytest.fixture
+    def fulltext_backend(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> Generator[TantivyBackend, None, None]:
+        """An in-memory Tantivy backend, wired up as the module-level
+        singleton _fulltext_similar_documents resolves via get_backend()."""
+        backend = TantivyBackend(path=None)
+        backend.open()
+        mocker.patch("documents.search.get_backend", return_value=backend)
+        try:
+            yield backend
+        finally:
+            backend.close()
+
+    def test_ranks_by_rank_based_weight_descending(
+        self,
+        fulltext_backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A source document and two similar documents indexed in Tantivy
+        WHEN:
+            - _fulltext_similar_documents() is called
+        THEN:
+            - Each result's weight reflects its rank (first result weighted
+              higher than the second), not a raw similarity score
+        """
+        source = DocumentFactory.create(content="quarterly financial report details")
+        first = DocumentFactory.create(content="quarterly financial report details")
+        second = DocumentFactory.create(content="financial report")
+        for doc in (source, first, second):
+            fulltext_backend.add_or_update(doc)
+
+        result = _fulltext_similar_documents(source, user=None, top_k=5)
+
+        assert len(result) == 2
+        weight_by_id = {s["document_id"]: s["weight"] for s in result}
+        assert weight_by_id[first.pk] > weight_by_id[second.pk]
+
+    def test_excludes_source_document(
+        self,
+        fulltext_backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A source document indexed in Tantivy with no other documents
+        WHEN:
+            - _fulltext_similar_documents() is called
+        THEN:
+            - An empty list is returned - the source document is never its
+              own similar document
+        """
+        source = DocumentFactory.create(content="unique unrelated content")
+        fulltext_backend.add_or_update(source)
+
+        result = _fulltext_similar_documents(source, user=None, top_k=5)
+
+        assert result == []
+
+    def test_empty_index_returns_empty_list(
+        self,
+        fulltext_backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A document that has never been indexed (fresh/empty Tantivy index)
+        WHEN:
+            - _fulltext_similar_documents() is called
+        THEN:
+            - An empty list is returned rather than raising
+        """
+        source = DocumentFactory.create(content="never indexed")
+
+        result = _fulltext_similar_documents(source, user=None, top_k=5)
+
+        assert result == []
+
+    def test_respects_top_k_limit(
+        self,
+        fulltext_backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A source document and four similar documents indexed
+        WHEN:
+            - _fulltext_similar_documents() is called with top_k=2
+        THEN:
+            - At most 2 results are returned
+        """
+        source = DocumentFactory.create(content="shared overlapping keyword text")
+        fulltext_backend.add_or_update(source)
+        for _ in range(4):
+            fulltext_backend.add_or_update(
+                DocumentFactory.create(content="shared overlapping keyword text"),
+            )
+
+        result = _fulltext_similar_documents(source, user=None, top_k=2)
+
+        assert len(result) == 2
+
+    def test_result_shape_is_similar_document(
+        self,
+        fulltext_backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A source document and one similar document indexed
+        WHEN:
+            - _fulltext_similar_documents() is called
+        THEN:
+            - Each result is a SimilarDocument (document_id + weight only)
+        """
+        source = DocumentFactory.create(content="shared content phrase")
+        other = DocumentFactory.create(content="shared content phrase")
+        fulltext_backend.add_or_update(source)
+        fulltext_backend.add_or_update(other)
+
+        result = _fulltext_similar_documents(source, user=None, top_k=5)
+
+        # rank 0 (the only/best result) with top_k=5 -> weight = top_k - rank = 5.0,
+        # per the "first result gets top_k, the last gets 1" formula.
+        assert result == [SimilarDocument(document_id=other.pk, weight=5.0)]
+
+    def test_superuser_sees_other_users_documents(
+        self,
+        fulltext_backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A source document owned by one user and a similar document
+              owned by a different user, with no sharing between them
+        WHEN:
+            - _fulltext_similar_documents() is called with a superuser
+        THEN:
+            - The other user's document is still returned as a similar
+              document - a superuser must not be narrowed by the backend's
+              owner-based permission filter
+        """
+        owner = UserFactory.create()
+        other_owner = UserFactory.create()
+        superuser = UserFactory.create(is_superuser=True)
+        source = DocumentFactory.create(
+            content="shared content phrase",
+            owner=owner,
+        )
+        other = DocumentFactory.create(
+            content="shared content phrase",
+            owner=other_owner,
+        )
+        fulltext_backend.add_or_update(source)
+        fulltext_backend.add_or_update(other)
+
+        result = _fulltext_similar_documents(source, user=superuser, top_k=5)
+
+        assert [s["document_id"] for s in result] == [other.pk]
+
+
+@pytest.mark.django_db
+@override_settings(LLM_EMBEDDING_BACKEND="huggingface")
 @patch("paperless_ai.ai_classifier.retrieve_similar_nodes")
 def test_get_taxonomy_context_retrieval_failure_degrades_to_no_hints(mock_retrieve):
     """
@@ -575,6 +810,7 @@ def test_get_taxonomy_context_retrieval_failure_degrades_to_no_hints(mock_retrie
 
 
 @pytest.mark.django_db
+@override_settings(LLM_EMBEDDING_BACKEND="huggingface")
 @patch("paperless_ai.ai_classifier.build_taxonomy_candidates")
 @patch("paperless_ai.ai_classifier.retrieve_similar_nodes")
 def test_get_taxonomy_context_candidate_building_failure_degrades_to_no_hints(

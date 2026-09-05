@@ -1,5 +1,4 @@
 import json
-from types import SimpleNamespace
 
 import pytest
 import pytest_mock
@@ -10,14 +9,14 @@ from documents.tests.factories import DocumentTypeFactory
 from documents.tests.factories import StoragePathFactory
 from documents.tests.factories import TagFactory
 from documents.tests.factories import UserFactory
+from paperless_ai.taxonomy import SimilarDocument
 from paperless_ai.taxonomy import TaxonomyCandidates
 from paperless_ai.taxonomy import build_taxonomy_candidates
 from paperless_ai.taxonomy import format_taxonomy_for_prompt
 
 
-def make_node(document_id: int, score: float) -> SimpleNamespace:
-    """A stand-in for NodeWithScore: only ``.metadata``/``.score`` are read."""
-    return SimpleNamespace(metadata={"document_id": str(document_id)}, score=score)
+def make_similar(document_id: int, weight: float) -> SimilarDocument:
+    return SimilarDocument(document_id=document_id, weight=weight)
 
 
 @pytest.mark.django_db
@@ -53,9 +52,9 @@ class TestBuildTaxonomyCandidates:
         doc_a.tags.add(tag)
         doc_b = DocumentFactory.create()
         doc_b.tags.add(tag)
-        nodes = [make_node(doc_a.pk, 0.9), make_node(doc_b.pk, 0.4)]
+        similar_documents = [make_similar(doc_a.pk, 0.9), make_similar(doc_b.pk, 0.4)]
 
-        result = build_taxonomy_candidates(nodes, user=None)
+        result = build_taxonomy_candidates(similar_documents, user=None)
 
         assert len(result["tags"]) == 1
         assert result["tags"][0]["id"] == tag.pk
@@ -80,9 +79,9 @@ class TestBuildTaxonomyCandidates:
         document.tags.add(tag)
         tag.name = "New Name"
         tag.save()
-        nodes = [make_node(document.pk, 0.5)]
+        similar_documents = [make_similar(document.pk, 0.5)]
 
-        result = build_taxonomy_candidates(nodes, user=None)
+        result = build_taxonomy_candidates(similar_documents, user=None)
 
         assert result["tags"][0]["name"] == "New Name"
 
@@ -102,9 +101,9 @@ class TestBuildTaxonomyCandidates:
         document = DocumentFactory.create()
         document.tags.add(tag)
         tag.delete()
-        nodes = [make_node(document.pk, 0.5)]
+        similar_documents = [make_similar(document.pk, 0.5)]
 
-        result = build_taxonomy_candidates(nodes, user=None)
+        result = build_taxonomy_candidates(similar_documents, user=None)
 
         assert result["tags"] == []
 
@@ -123,9 +122,12 @@ class TestBuildTaxonomyCandidates:
         strong_doc.tags.add(strong_tag)
         weak_doc = DocumentFactory.create()
         weak_doc.tags.add(weak_tag)
-        nodes = [make_node(strong_doc.pk, 0.9), make_node(weak_doc.pk, 0.1)]
+        similar_documents = [
+            make_similar(strong_doc.pk, 0.9),
+            make_similar(weak_doc.pk, 0.1),
+        ]
 
-        result = build_taxonomy_candidates(nodes, user=None)
+        result = build_taxonomy_candidates(similar_documents, user=None)
 
         assert [c["name"] for c in result["tags"]] == ["Strong", "Weak"]
 
@@ -141,9 +143,9 @@ class TestBuildTaxonomyCandidates:
         document = DocumentFactory.create()
         for i in range(15):
             document.tags.add(TagFactory.create(name=f"Tag{i}"))
-        nodes = [make_node(document.pk, 0.5)]
+        similar_documents = [make_similar(document.pk, 0.5)]
 
-        result = build_taxonomy_candidates(nodes, user=None)
+        result = build_taxonomy_candidates(similar_documents, user=None)
 
         assert len(result["tags"]) == 10
 
@@ -157,12 +159,12 @@ class TestBuildTaxonomyCandidates:
             - Only 5 correspondents are returned
         """
         correspondents = CorrespondentFactory.create_batch(7)
-        nodes = [
-            make_node(DocumentFactory.create(correspondent=c).pk, 0.5)
+        similar_documents = [
+            make_similar(DocumentFactory.create(correspondent=c).pk, 0.5)
             for c in correspondents
         ]
 
-        result = build_taxonomy_candidates(nodes, user=None)
+        result = build_taxonomy_candidates(similar_documents, user=None)
 
         assert len(result["correspondents"]) == 5
 
@@ -177,9 +179,9 @@ class TestBuildTaxonomyCandidates:
         """
         document_type = DocumentTypeFactory.create(name="Invoice")
         document = DocumentFactory.create(document_type=document_type)
-        nodes = [make_node(document.pk, 0.5)]
+        similar_documents = [make_similar(document.pk, 0.5)]
 
-        result = build_taxonomy_candidates(nodes, user=None)
+        result = build_taxonomy_candidates(similar_documents, user=None)
 
         assert len(result["document_types"]) == 1
         assert result["document_types"][0]["id"] == document_type.pk
@@ -195,12 +197,12 @@ class TestBuildTaxonomyCandidates:
             - Only 5 document_types are returned
         """
         document_types = DocumentTypeFactory.create_batch(7)
-        nodes = [
-            make_node(DocumentFactory.create(document_type=dt).pk, 0.5)
+        similar_documents = [
+            make_similar(DocumentFactory.create(document_type=dt).pk, 0.5)
             for dt in document_types
         ]
 
-        result = build_taxonomy_candidates(nodes, user=None)
+        result = build_taxonomy_candidates(similar_documents, user=None)
 
         assert len(result["document_types"]) == 5
 
@@ -215,9 +217,9 @@ class TestBuildTaxonomyCandidates:
         """
         storage_path = StoragePathFactory.create(name="Invoices")
         document = DocumentFactory.create(storage_path=storage_path)
-        nodes = [make_node(document.pk, 0.5)]
+        similar_documents = [make_similar(document.pk, 0.5)]
 
-        result = build_taxonomy_candidates(nodes, user=None)
+        result = build_taxonomy_candidates(similar_documents, user=None)
 
         assert len(result["storage_paths"]) == 1
         assert result["storage_paths"][0]["id"] == storage_path.pk
@@ -233,12 +235,12 @@ class TestBuildTaxonomyCandidates:
             - Only 5 storage_paths are returned
         """
         storage_paths = StoragePathFactory.create_batch(7)
-        nodes = [
-            make_node(DocumentFactory.create(storage_path=sp).pk, 0.5)
+        similar_documents = [
+            make_similar(DocumentFactory.create(storage_path=sp).pk, 0.5)
             for sp in storage_paths
         ]
 
-        result = build_taxonomy_candidates(nodes, user=None)
+        result = build_taxonomy_candidates(similar_documents, user=None)
 
         assert len(result["storage_paths"]) == 5
 
@@ -258,14 +260,14 @@ class TestBuildTaxonomyCandidates:
         tag = TagFactory.create(name="Restricted")
         document = DocumentFactory.create()
         document.tags.add(tag)
-        nodes = [make_node(document.pk, 0.5)]
+        similar_documents = [make_similar(document.pk, 0.5)]
         user = UserFactory.create()
         mocker.patch(
             "documents.permissions.permitted_object_ids",
             return_value=[],  # user cannot see this tag
         )
 
-        result = build_taxonomy_candidates(nodes, user=user)
+        result = build_taxonomy_candidates(similar_documents, user=user)
 
         assert result["tags"] == []
 
@@ -295,10 +297,10 @@ class TestBuildTaxonomyCandidates:
         tag.save()
         document = DocumentFactory.create()
         document.tags.add(tag)
-        nodes = [make_node(document.pk, 0.5)]
+        similar_documents = [make_similar(document.pk, 0.5)]
         spy = mocker.patch("documents.permissions.permitted_object_ids")
 
-        result = build_taxonomy_candidates(nodes, user=None)
+        result = build_taxonomy_candidates(similar_documents, user=None)
 
         assert result["tags"][0]["name"] == "Owned"
         spy.assert_not_called()
