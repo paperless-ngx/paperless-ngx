@@ -796,6 +796,10 @@ class CustomFieldQueryFilter(Filter):
 class DocumentFilterSet(FilterSet):
     has_duplicates = BooleanFilter(method="filter_has_duplicates")
 
+    def __init__(self, *args: Any, user: Any = None, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self._user = user
+
     is_tagged = BooleanFilter(
         label="Is tagged",
         field_name="tags",
@@ -859,10 +863,16 @@ class DocumentFilterSet(FilterSet):
         if value is None:
             return queryset
 
+        user = (
+            self._user
+            if self._user is not None
+            else getattr(self.request, "user", None)
+        )
+
         visible_root_documents = Document.global_objects.filter(
             root_document__isnull=True,
             pk__in=permitted_document_ids(
-                getattr(self.request, "user", None),
+                user,
                 include_deleted=True,
             ),
         ).exclude(pk=OuterRef("pk"))

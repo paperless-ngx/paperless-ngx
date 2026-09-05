@@ -2815,6 +2815,7 @@ class DocumentSelectionMixin:
         filtered_documents = DocumentFilterSet(
             data=orm_filters,
             queryset=permitted_documents,
+            user=user,
         ).qs.distinct()
         # tantivy-filtered docs (if search params provided)
         search_filtered_ids = self._get_search_document_ids(
