@@ -24,6 +24,7 @@ from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
+from django.db import DataError
 from django.db.models import Count
 from django.db.models import Q
 from django.db.models.functions import Lower
@@ -43,6 +44,7 @@ from guardian.shortcuts import get_users_with_perms
 from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from rest_framework import fields
+from rest_framework import relations
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.fields import SerializerMethodField
@@ -745,12 +747,85 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         return super().validate(attrs)
 
 
+class _BatchingTagsRelatedField(serializers.ManyRelatedField):
+    """
+    `ManyRelatedField.to_internal_value` resolves each id in the submitted
+    list with its own `child_relation.to_internal_value()` call -- one query
+    per tag on every PATCH/PUT that sets `TagsField` (DocumentSerializer.tags,
+    WorkflowActionSerializer.assign_tags). Batch-resolve them instead,
+    falling back to the child relation's normal (query-per-item) validation
+    for anything that isn't a plausible int pk, so bad input still gets the
+    usual DRF validation error rather than being silently dropped.
+
+    This is a known upstream DRF limitation, not something paperless-specific:
+    https://github.com/encode/django-rest-framework/issues/9607, with a fix
+    (https://github.com/encode/django-rest-framework/pull/9984) open but
+    stalled as of 2026-08. If that lands, this class and the many_init()
+    override on TagsField below can be deleted in favor of plain
+    `PrimaryKeyRelatedField(many=True)`.
+    """
+
+    @staticmethod
+    def _normalize_pk(item) -> int | None:
+        # Excludes bool: DRF's own PrimaryKeyRelatedField rejects it too
+        # (True == 1 would otherwise silently match pk 1).
+        if isinstance(item, bool):
+            return None
+        try:
+            return int(item)
+        except (TypeError, ValueError):
+            return None
+
+    def to_internal_value(self, data):
+        if isinstance(data, str) or not hasattr(data, "__iter__"):
+            self.fail("not_a_list", input_type=type(data).__name__)
+        if not self.allow_empty and len(data) == 0:
+            self.fail("empty")
+
+        item_pks = [(item, self._normalize_pk(item)) for item in data]
+        candidate_pks = {pk for _, pk in item_pks if pk is not None}
+
+        # Django's IntegerFieldOverflow guard (-> EmptyResultSet, i.e. no
+        # match) only covers exact/gt/gte/lt/lte lookups, not `in` -- an
+        # out-of-range int in `pk__in=` reaches the DB driver as-is and
+        # raises OverflowError (SQLite) / DataError (Postgres) instead of
+        # cleanly matching nothing. The per-item `exact`-lookup fallback
+        # below IS covered, so on that failure just skip the batch and let
+        # every item resolve individually -- each still costs one query,
+        # but reports the normal validation error instead of a raw 500.
+        try:
+            resolved_by_pk = {
+                obj.pk: obj
+                for obj in self.child_relation.get_queryset().filter(
+                    pk__in=candidate_pks,
+                )
+            }
+        except (OverflowError, DataError):
+            resolved_by_pk = {}
+
+        result = []
+        for item, pk in item_pks:
+            obj = resolved_by_pk.get(pk) if pk is not None else None
+            result.append(
+                obj if obj is not None else self.child_relation.to_internal_value(item),
+            )
+        return result
+
+
 class CorrespondentField(serializers.PrimaryKeyRelatedField[Correspondent]):
     def get_queryset(self):
         return Correspondent.objects.all()
 
 
 class TagsField(serializers.PrimaryKeyRelatedField[Tag]):
+    @classmethod
+    def many_init(cls, *args, **kwargs):
+        list_kwargs = {"child_relation": cls(*args, **kwargs)}
+        for key, value in kwargs.items():
+            if key in relations.MANY_RELATION_KWARGS:
+                list_kwargs[key] = value
+        return _BatchingTagsRelatedField(**list_kwargs)
+
     def get_queryset(self):
         return Tag.objects.all()
 
