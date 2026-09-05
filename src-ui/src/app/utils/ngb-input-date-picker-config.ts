@@ -7,10 +7,13 @@ export class PngxDatePickerConfig extends NgbInputDatepickerConfig {
 
   constructor() {
     super()
-    const localeInfo = new Intl.Locale(this.currentLocale)
-    // getWeekInfo returns an object containing 'firstDay' (1 = Monday, 7 = Sunday)
-    if ('getWeekInfo' in localeInfo) {
-      const firstDay = (localeInfo as any).getWeekInfo().firstDay
+    const localeInfo = new Intl.Locale(this.currentLocale) as any
+    let firstDay
+    if (localeInfo?.getWeekInfo) firstDay = localeInfo.getWeekInfo?.().firstDay
+    else if (localeInfo.weekInfo?.firstDay)
+      firstDay = localeInfo.weekInfo.firstDay
+
+    if (firstDay !== undefined) {
       this.firstDayOfWeek = firstDay
     }
   }
