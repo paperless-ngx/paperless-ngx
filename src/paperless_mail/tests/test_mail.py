@@ -665,6 +665,37 @@ class TestMail(
             1,
         )
 
+    def test_handle_empty_message_long_subject(self) -> None:
+        """
+        GIVEN:
+            - A mail with no attachments and a subject longer than the
+              ProcessedMail.subject field
+        WHEN:
+            - The mail is handled by an attachments-only rule
+        THEN:
+            - The subject is truncated to the field length instead of raising
+        """
+        message = self.mailMocker.messageBuilder.create_message(
+            subject="A" * 300,
+            attachments=[],
+        )
+
+        account = MailAccount.objects.create()
+        rule = MailRule.objects.create(
+            account=account,
+            consumption_scope=MailRule.ConsumptionScope.ATTACHMENTS_ONLY,
+        )
+
+        self.mail_account_handler._handle_message(message, rule)
+
+        processed = ProcessedMail.objects.get(
+            rule=rule,
+            uid=message.uid,
+            folder=rule.folder,
+        )
+        self.assertEqual(processed.status, "PROCESSED_WO_CONSUMPTION")
+        self.assertEqual(processed.subject, "A" * 256)
+
     def test_handle_unknown_mime_type(self) -> None:
         message = self.mailMocker.messageBuilder.create_message(
             attachments=[
