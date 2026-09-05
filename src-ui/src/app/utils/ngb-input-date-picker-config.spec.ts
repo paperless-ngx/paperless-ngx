@@ -66,12 +66,17 @@ describe('PngxDatePickerConfig', () => {
       configurable: true,
       value: { firstDay: 5 },
     })
+    Object.defineProperty(Intl.Locale.prototype, 'getWeekInfo', {
+      configurable: true,
+      value: undefined,
+    })
     try {
       TestBed.resetTestingModule()
       configureLocale('ar-EG')
       config = TestBed.inject(NgbInputDatepickerConfig)
     } finally {
       delete Intl.Locale.prototype['weekInfo']
+      delete Intl.Locale.prototype['getWeekInfo']
     }
 
     expect(config.firstDayOfWeek).toEqual(5)
