@@ -1009,6 +1009,16 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             checksum="second-archive-source",
             archive_checksum="same-archive-only",
         )
+        first_empty_archive = Document.objects.create(
+            title="first empty archive",
+            checksum="first-empty-archive",
+            archive_checksum="",
+        )
+        second_empty_archive = Document.objects.create(
+            title="second empty archive",
+            checksum="second-empty-archive",
+            archive_checksum="",
+        )
         unique = Document.objects.create(title="unique", checksum="unique")
         version_root = Document.objects.create(
             title="version root",
@@ -1051,8 +1061,16 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertCountEqual(
             [document["id"] for document in response.data["results"]],
-            [unique.id, version_root.id],
+            [
+                unique.id,
+                version_root.id,
+                first_empty_archive.id,
+                second_empty_archive.id,
+            ],
         )
+
+        response = self.client.get(f"/api/documents/{first_empty_archive.id}/")
+        self.assertEqual(response.data["duplicate_documents"], [])
 
     def test_has_duplicates_filter_respects_document_permissions(self) -> None:
         owner = User.objects.create_user(username="duplicate-owner")

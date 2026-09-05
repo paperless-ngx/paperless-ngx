@@ -25,6 +25,7 @@ from django.db.models import Sum
 from django.db.models import Value
 from django.db.models import When
 from django.db.models.functions import Cast
+from django.db.models.functions import NullIf
 from django.utils.translation import gettext_lazy as _
 from django_filters import DateFilter
 from django_filters.rest_framework import BooleanFilter
@@ -868,6 +869,9 @@ class DocumentFilterSet(FilterSet):
             if self._user is not None
             else getattr(self.request, "user", None)
         )
+        queryset = queryset.alias(
+            nonempty_archive_checksum=NullIf("archive_checksum", Value("")),
+        )
 
         visible_root_documents = Document.global_objects.filter(
             root_document__isnull=True,
@@ -876,11 +880,12 @@ class DocumentFilterSet(FilterSet):
                 include_deleted=True,
             ),
         ).exclude(pk=OuterRef("pk"))
+        # see serialisers._get_viewable_duplicates().
         matching_duplicates = visible_root_documents.filter(
             Q(checksum=OuterRef("checksum"))
-            | Q(checksum=OuterRef("archive_checksum"))
+            | Q(checksum=OuterRef("nonempty_archive_checksum"))
             | Q(archive_checksum=OuterRef("checksum"))
-            | Q(archive_checksum=OuterRef("archive_checksum")),
+            | Q(archive_checksum=OuterRef("nonempty_archive_checksum")),
         )
 
         return queryset.alias(
