@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-02 18:09+0000\n"
-"PO-Revision-Date: 2026-09-02 18:11\n"
+"POT-Creation-Date: 2026-09-04 14:16+0000\n"
+"PO-Revision-Date: 2026-09-04 14:25\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -1611,7 +1611,7 @@ msgid "workflow runs"
 msgstr "poteka dela"
 
 #: documents/serialisers.py:524 documents/serialisers.py:878
-#: documents/serialisers.py:2830 documents/views.py:314 documents/views.py:2623
+#: documents/serialisers.py:2838 documents/views.py:314 documents/views.py:2623
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "Nezadostna dovoljenja."
@@ -1620,38 +1620,38 @@ msgstr "Nezadostna dovoljenja."
 msgid "Invalid color."
 msgstr "Napačna barva."
 
-#: documents/serialisers.py:2307
+#: documents/serialisers.py:2315
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Vrsta datoteke %(type)s ni podprta"
 
-#: documents/serialisers.py:2351
+#: documents/serialisers.py:2359
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "ID polja po meri mora biti celo število: %(id)s"
 
-#: documents/serialisers.py:2358
+#: documents/serialisers.py:2366
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Polje po meri z ID-jem %(id)s ne obstaja"
 
-#: documents/serialisers.py:2375 documents/serialisers.py:2385
+#: documents/serialisers.py:2383 documents/serialisers.py:2393
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Polja po meri morajo biti seznam celih števil ali objekt, ki preslika ID-je v vrednosti."
 
-#: documents/serialisers.py:2380
+#: documents/serialisers.py:2388
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Nekatera polja po meri ne obstajajo ali pa so bila navedena dvakrat."
 
-#: documents/serialisers.py:2527
+#: documents/serialisers.py:2535
 msgid "Invalid variable detected."
 msgstr "Zaznani neveljavni znaki."
 
-#: documents/serialisers.py:2886
+#: documents/serialisers.py:2894
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Podvojeni identifikatorji dokumentov niso dovoljeni."
 
-#: documents/serialisers.py:2916 documents/views.py:4624
+#: documents/serialisers.py:2924 documents/views.py:4624
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Dokumentov ni bilo mogoče najti: %(ids)s"

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-02 18:09+0000\n"
-"PO-Revision-Date: 2026-09-02 18:11\n"
+"POT-Creation-Date: 2026-09-04 14:16+0000\n"
+"PO-Revision-Date: 2026-09-04 14:25\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -1611,7 +1611,7 @@ msgid "workflow runs"
 msgstr "工作流运行"
 
 #: documents/serialisers.py:524 documents/serialisers.py:878
-#: documents/serialisers.py:2830 documents/views.py:314 documents/views.py:2623
+#: documents/serialisers.py:2838 documents/views.py:314 documents/views.py:2623
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "权限不足。"
@@ -1620,38 +1620,38 @@ msgstr "权限不足。"
 msgid "Invalid color."
 msgstr "无效的颜色"
 
-#: documents/serialisers.py:2307
+#: documents/serialisers.py:2315
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "不支持文件类型 %(type)s"
 
-#: documents/serialisers.py:2351
+#: documents/serialisers.py:2359
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "自定义字段 id 必须是数字：%(id)s"
 
-#: documents/serialisers.py:2358
+#: documents/serialisers.py:2366
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "自定义字段 id %(id)s 不存在"
 
-#: documents/serialisers.py:2375 documents/serialisers.py:2385
+#: documents/serialisers.py:2383 documents/serialisers.py:2393
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "自定义字段必须为整数列表，或是一个将ID映射到值的对象。"
 
-#: documents/serialisers.py:2380
+#: documents/serialisers.py:2388
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "部分自定义字段不存在或重复指定。"
 
-#: documents/serialisers.py:2527
+#: documents/serialisers.py:2535
 msgid "Invalid variable detected."
 msgstr "检测到无效变量。"
 
-#: documents/serialisers.py:2886
+#: documents/serialisers.py:2894
 msgid "Duplicate document identifiers are not allowed."
 msgstr "不允许重复文档标识符。"
 
-#: documents/serialisers.py:2916 documents/views.py:4624
+#: documents/serialisers.py:2924 documents/views.py:4624
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "未找到文档：%(ids)s"
