@@ -2,14 +2,12 @@ from __future__ import annotations
 
 import datetime
 from typing import TYPE_CHECKING
-from unittest import TestCase
 from unittest import mock
 
 from auditlog.models import LogEntry  # type: ignore[import-untyped]
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import FieldError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase as DjangoTestCase
 from django.utils import timezone
@@ -22,6 +20,7 @@ from documents.filters import TitleContentFilter
 from documents.models import Document
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import read_streaming_response
+from documents.versioning import annotate_effective_content
 from documents.views import DocumentSelectionMixin
 
 if TYPE_CHECKING:
@@ -891,32 +890,104 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         )
 
 
-class TestVersionAwareFilters(TestCase):
-    def test_title_content_filter_falls_back_to_content(self) -> None:
-        queryset = mock.Mock()
-        fallback_queryset = mock.Mock()
-        queryset.filter.side_effect = [FieldError("missing field"), fallback_queryset]
+class TestVersionAwareFilters(DjangoTestCase):
+    """
+    The filters annotate effective_content themselves rather than relying on
+    the caller's queryset carrying it, so they stay version-aware on a plain
+    Document queryset (e.g. the bulk-edit "select all matching" path).
+    """
 
-        result = TitleContentFilter().filter(queryset, " latest ")
+    def setUp(self) -> None:
+        super().setUp()
+        self.root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+            content="superseded-content",
+        )
+        Document.objects.create(
+            title="version",
+            checksum="version",
+            mime_type="application/pdf",
+            root_document=self.root,
+            version_index=1,
+            content="latest-content",
+        )
+        self.unversioned = Document.objects.create(
+            title="unversioned",
+            checksum="unversioned",
+            mime_type="application/pdf",
+            content="latest-content",
+        )
 
-        self.assertIs(result, fallback_queryset)
-        self.assertEqual(queryset.filter.call_count, 2)
-
-    def test_effective_content_filter_falls_back_to_content_lookup(self) -> None:
-        queryset = mock.Mock()
-        fallback_queryset = mock.Mock()
-        queryset.filter.side_effect = [FieldError("missing field"), fallback_queryset]
-
-        result = EffectiveContentFilter(lookup_expr="icontains").filter(
-            queryset,
+    def test_title_content_filter_matches_latest_version_content(self) -> None:
+        result = TitleContentFilter().filter(
+            Document.objects.filter(root_document__isnull=True),
             " latest ",
         )
 
-        self.assertIs(result, fallback_queryset)
-        first_kwargs = queryset.filter.call_args_list[0].kwargs
-        second_kwargs = queryset.filter.call_args_list[1].kwargs
-        self.assertEqual(first_kwargs, {"effective_content__icontains": "latest"})
-        self.assertEqual(second_kwargs, {"content__icontains": "latest"})
+        self.assertCountEqual(
+            [doc.id for doc in result],
+            [self.root.id, self.unversioned.id],
+        )
+
+    def test_effective_content_filter_matches_latest_version_content(self) -> None:
+        result = EffectiveContentFilter(lookup_expr="icontains").filter(
+            Document.objects.filter(root_document__isnull=True),
+            " latest ",
+        )
+
+        self.assertCountEqual(
+            [doc.id for doc in result],
+            [self.root.id, self.unversioned.id],
+        )
+
+    def test_effective_content_filter_ignores_superseded_content(self) -> None:
+        result = EffectiveContentFilter(lookup_expr="icontains").filter(
+            Document.objects.filter(root_document__isnull=True),
+            "superseded",
+        )
+
+        self.assertEqual(list(result), [])
+
+    def test_filters_reuse_an_existing_annotation(self) -> None:
+        """
+        Annotating twice under the same alias is an error, so an already
+        annotated queryset (the search path) has to be left alone.
+        """
+        annotated = annotate_effective_content(
+            Document.objects.filter(root_document__isnull=True),
+        )
+        self.assertIs(annotate_effective_content(annotated), annotated)
+
+        result = EffectiveContentFilter(lookup_expr="icontains").filter(
+            annotated,
+            "latest",
+        )
+
+        self.assertCountEqual(
+            [doc.id for doc in result],
+            [self.root.id, self.unversioned.id],
+        )
+
+    def test_bulk_selection_does_not_match_superseded_content(self) -> None:
+        """
+        Bulk edit's "select all matching" builds its own queryset, so before
+        the filters annotated for themselves it matched the root document's
+        superseded content -- selecting documents the list view, filtered by
+        the same term, does not show.
+        """
+        user = User.objects.create_superuser(username="bulk_selection")
+
+        selected = DocumentSelectionMixin()._resolve_document_ids(
+            user=user,
+            validated_data={
+                "all": True,
+                "filters": {"content__icontains": "superseded"},
+            },
+        )
+
+        self.assertEqual(selected, [])
 
     def test_effective_content_filter_returns_input_for_empty_values(self) -> None:
         queryset = mock.Mock()

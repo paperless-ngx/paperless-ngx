@@ -27,10 +27,13 @@ def versions_newest_first(documents: QuerySet[Document]) -> QuerySet[Document]:
 
 def annotate_effective_content(documents: QuerySet[Document]) -> QuerySet[Document]:
     """
-    Annotates documents with the content of their newest version, falling back
-    to their own, so get_effective_content() can answer from the row rather
-    than querying for the versions of each document
+    Annotates documents with the content of their newest version unless the
+    queryset already carries the annotation, falling back to their own, so
+    get_effective_content() can answer from the row rather than querying for
+    the versions of each document.
     """
+    if "effective_content" in documents.query.annotations:
+        return documents
     return documents.annotate(
         effective_content=Coalesce(
             Subquery(

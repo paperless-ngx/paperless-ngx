@@ -232,6 +232,7 @@ from documents.tasks import train_classifier
 from documents.tasks import update_document_parent_tags
 from documents.utils import get_boolean
 from documents.versioning import VersionResolutionError
+from documents.versioning import annotate_effective_content
 from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_request_version_param
 from documents.versioning import get_root_document
@@ -3630,8 +3631,13 @@ class GlobalSearchView(PassUserMixin):
         OBJECT_LIMIT = 3
         docs = []
         if request.user.has_perm("documents.view_document"):
-            all_docs = Document.objects.filter(
-                id__in=permitted_document_ids(request.user),
+            # Never more than OBJECT_LIMIT rows come back here, so annotating
+            # is cheap -- and without it these results show the root
+            # document's superseded content.
+            all_docs = annotate_effective_content(
+                Document.objects.filter(
+                    id__in=permitted_document_ids(request.user),
+                ),
             )
             if db_only:
                 docs = all_docs.filter(title__icontains=query)[:OBJECT_LIMIT]
