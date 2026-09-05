@@ -1,7 +1,7 @@
 from collections.abc import Generator
 
 import pytest
-from pytest_django.fixtures import SettingsWrapper
+from pytest_django.fixtures import Settings
 
 from documents.parsers import get_default_file_extension
 from documents.parsers import get_supported_file_extensions
@@ -14,7 +14,7 @@ from paperless.parsers.tika import TikaDocumentParser
 
 
 @pytest.fixture()
-def _tika_registry(settings: SettingsWrapper) -> Generator[None, None, None]:
+def _tika_registry(settings: Settings) -> Generator[None, None, None]:
     """
     Rebuild the parser registry with Tika enabled for the duration of the
     test, then reset on exit so other tests see the default (Tika-disabled)

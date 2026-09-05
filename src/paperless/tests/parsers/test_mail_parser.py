@@ -7,7 +7,7 @@ import httpx
 import pytest
 from django.test.html import parse_html
 from django.utils import timezone
-from pytest_django.fixtures import SettingsWrapper
+from pytest_django.fixtures import Settings
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 
@@ -428,7 +428,7 @@ class TestTikaHtmlParse:
 
     def test_tika_parse_unreachable(
         self,
-        settings: SettingsWrapper,
+        settings: Settings,
         mail_parser: MailDocumentParser,
     ) -> None:
         """

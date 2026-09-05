@@ -11,7 +11,8 @@ from documents.search._schema import needs_rebuild
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from pytest_django.fixtures import SettingsWrapper
+    from pytest_django.fixtures import Settings
+
 
 pytestmark = pytest.mark.search
 
@@ -25,7 +26,7 @@ class TestNeedsRebuild:
     def test_returns_false_when_version_and_language_match(
         self,
         index_dir: Path,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         settings.SEARCH_LANGUAGE = "en"
         (index_dir / ".index_settings.json").write_text(
@@ -36,7 +37,7 @@ class TestNeedsRebuild:
     def test_returns_true_on_schema_version_mismatch(
         self,
         index_dir: Path,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         settings.SEARCH_LANGUAGE = None
         (index_dir / ".index_settings.json").write_text(
@@ -47,7 +48,7 @@ class TestNeedsRebuild:
     def test_returns_true_when_version_is_not_an_integer(
         self,
         index_dir: Path,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         settings.SEARCH_LANGUAGE = None
         (index_dir / ".index_settings.json").write_text(
@@ -58,7 +59,7 @@ class TestNeedsRebuild:
     def test_returns_true_when_language_key_missing(
         self,
         index_dir: Path,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         settings.SEARCH_LANGUAGE = "en"
         (index_dir / ".index_settings.json").write_text(
@@ -69,7 +70,7 @@ class TestNeedsRebuild:
     def test_returns_true_when_language_differs(
         self,
         index_dir: Path,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         settings.SEARCH_LANGUAGE = "de"
         (index_dir / ".index_settings.json").write_text(

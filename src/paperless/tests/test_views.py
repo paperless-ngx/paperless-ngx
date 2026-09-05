@@ -1,13 +1,13 @@
 from pathlib import Path
 
 from django.test import Client
-from pytest_django.fixtures import SettingsWrapper
+from pytest_django.fixtures import Settings
 
 
 def test_favicon_view(
     client: Client,
     tmp_path: Path,
-    settings: SettingsWrapper,
+    settings: Settings,
 ) -> None:
     favicon_path = tmp_path / "paperless" / "img" / "favicon.ico"
     favicon_path.parent.mkdir(parents=True)
@@ -24,7 +24,7 @@ def test_favicon_view(
 def test_favicon_view_missing_file(
     client: Client,
     tmp_path: Path,
-    settings: SettingsWrapper,
+    settings: Settings,
 ) -> None:
     settings.STATIC_ROOT = tmp_path
     response = client.get("/favicon.ico")

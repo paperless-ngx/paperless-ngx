@@ -70,7 +70,7 @@ def clear_lru_cache() -> Generator[None, None, None]:
 
 
 @pytest.fixture
-def mock_date_parser_settings(settings: pytest_django.fixtures.SettingsWrapper) -> Any:
+def mock_date_parser_settings(settings: pytest_django.fixtures.Settings) -> Any:
     """
     Override Django settings for the duration of date parser tests.
     """
