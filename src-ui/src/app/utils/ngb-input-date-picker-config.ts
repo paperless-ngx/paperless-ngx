@@ -10,7 +10,7 @@ export class PngxDatePickerConfig extends NgbInputDatepickerConfig {
     const localeInfo = new Intl.Locale(this.currentLocale) as any
     let firstDay
     if (localeInfo?.getWeekInfo) firstDay = localeInfo.getWeekInfo?.().firstDay
-    else if (localeInfo.weekInfo?.firstDay)
+    else if (localeInfo?.weekInfo?.firstDay)
       firstDay = localeInfo.weekInfo.firstDay
 
     if (firstDay !== undefined) {
