@@ -84,6 +84,8 @@ export const SETTINGS_KEYS = {
     'general-settings:document-editing:remove-inbox-tags',
   DOCUMENT_EDITING_OVERLAY_THUMBNAIL:
     'general-settings:document-editing:overlay-thumbnail',
+  DOCUMENT_EDITING_AUTO_SUGGEST:
+    'general-settings:document-editing:auto-suggest',
   DOCUMENT_DETAILS_HIDDEN_FIELDS:
     'general-settings:document-details:hidden-fields',
   SEARCH_DB_ONLY: 'general-settings:search:db-only',
@@ -297,6 +299,11 @@ export const SETTINGS: UiSetting[] = [
   },
   {
     key: SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL,
+    type: 'boolean',
+    default: true,
+  },
+  {
+    key: SETTINGS_KEYS.DOCUMENT_EDITING_AUTO_SUGGEST,
     type: 'boolean',
     default: true,
   },
