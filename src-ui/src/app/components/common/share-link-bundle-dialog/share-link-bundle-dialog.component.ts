@@ -80,6 +80,7 @@ export class ShareLinkBundleDialogComponent extends ConfirmDialogComponent {
     }
     this.buttonsEnabled.set(false)
     super.confirm()
+    this.cancelBtnCaption = $localize`Close`
   }
 
   getShareUrl(bundle: ShareLinkBundleSummary): string {
