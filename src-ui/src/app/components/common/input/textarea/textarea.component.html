@@ -17,6 +17,7 @@
           [class.is-invalid]="error"
           [class.font-monospace]="monospace"
           [(ngModel)]="value"
+          [ngModelOptions]="{standalone: true}"
           (change)="onChange(value)"
           [disabled]="disabled"
           [placeholder]="placeholder"

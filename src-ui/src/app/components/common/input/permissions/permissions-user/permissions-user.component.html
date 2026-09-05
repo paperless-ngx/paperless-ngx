@@ -1,6 +1,6 @@
 <div class="paperless-input-select" [class.disabled]="disabled">
   <div>
-    <ng-select name="inputId" [(ngModel)]="value"
+    <ng-select name="inputId" [(ngModel)]="value" [ngModelOptions]="{standalone: true}"
       [disabled]="disabled"
       clearable="true"
       [items]="users()"

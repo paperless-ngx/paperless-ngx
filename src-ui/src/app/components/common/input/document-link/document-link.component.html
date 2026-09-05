@@ -24,7 +24,7 @@
 }
 
 <ng-template #select>
-  <ng-select name="inputId" [(ngModel)]="selectedDocuments"
+  <ng-select name="inputId" [(ngModel)]="selectedDocuments" [ngModelOptions]="{standalone: true}"
     [disabled]="disabled"
     [items]="foundDocuments$ | async"
     [placeholder]="placeholder"
