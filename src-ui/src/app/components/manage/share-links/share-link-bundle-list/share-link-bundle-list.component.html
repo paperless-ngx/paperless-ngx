@@ -1,9 +1,4 @@
-<div class="modal-header">
-  <h4 class="modal-title">{{ title }}</h4>
-  <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
-</div>
-
-<div class="modal-body">
+<div class="border border-top-0 rounded-bottom p-3">
   @if (loading()) {
     <div class="d-flex align-items-center gap-2">
       <div class="spinner-border spinner-border-sm" role="status"></div>
@@ -149,8 +144,4 @@
       </div>
     }
   }
-</div>
-
-<div class="modal-footer">
-  <button type="button" class="btn btn-outline-secondary btn-sm" (click)="close()" i18n>Close</button>
 </div>

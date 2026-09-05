@@ -1,6 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { FileVersion } from 'src/app/data/share-link'
@@ -11,7 +10,7 @@ import {
 import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
-import { ShareLinkBundleManageDialogComponent } from './share-link-bundle-manage-dialog.component'
+import { ShareLinkBundleListComponent } from './share-link-bundle-list.component'
 
 class MockShareLinkBundleService {
   listAllBundles = jest.fn()
@@ -24,13 +23,12 @@ class MockToastService {
   showError = jest.fn()
 }
 
-describe('ShareLinkBundleManageDialogComponent', () => {
-  let component: ShareLinkBundleManageDialogComponent
-  let fixture: ComponentFixture<ShareLinkBundleManageDialogComponent>
+describe('ShareLinkBundleListComponent', () => {
+  let component: ShareLinkBundleListComponent
+  let fixture: ComponentFixture<ShareLinkBundleListComponent>
   let service: MockShareLinkBundleService
   let toastService: MockToastService
   let clipboard: Clipboard
-  let activeModal: NgbActiveModal
   let originalApiBaseUrl: string
 
   beforeEach(() => {
@@ -44,20 +42,18 @@ describe('ShareLinkBundleManageDialogComponent', () => {
 
     TestBed.configureTestingModule({
       imports: [
-        ShareLinkBundleManageDialogComponent,
+        ShareLinkBundleListComponent,
         NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
-        NgbActiveModal,
         { provide: ShareLinkBundleService, useValue: service },
         { provide: ToastService, useValue: toastService },
       ],
     })
 
-    fixture = TestBed.createComponent(ShareLinkBundleManageDialogComponent)
+    fixture = TestBed.createComponent(ShareLinkBundleListComponent)
     component = fixture.componentInstance
     clipboard = TestBed.inject(Clipboard)
-    activeModal = TestBed.inject(NgbActiveModal)
   })
 
   afterEach(() => {
@@ -213,7 +209,7 @@ describe('ShareLinkBundleManageDialogComponent', () => {
     expect(toastService.showError).toHaveBeenCalled()
   })
 
-  it('maps helpers and closes dialog', () => {
+  it('maps status and file version helpers', () => {
     service.listAllBundles.mockReturnValue(of([]))
     fixture.detectChanges()
 
@@ -227,9 +223,5 @@ describe('ShareLinkBundleManageDialogComponent', () => {
     environment.apiBaseUrl = 'https://example.com/api/'
     const url = component.getShareUrl(sampleBundle({ slug: 'sluggy' }))
     expect(url).toBe('https://example.com/share/sluggy')
-
-    const closeSpy = jest.spyOn(activeModal, 'close')
-    component.close()
-    expect(closeSpy).toHaveBeenCalled()
   })
 })
