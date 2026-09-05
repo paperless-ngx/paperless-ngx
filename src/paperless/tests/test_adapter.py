@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from django.forms import ValidationError
 from django.http import HttpRequest
 from django.urls import reverse
-from pytest_django.fixtures import SettingsWrapper
+from pytest_django.fixtures import Settings
 from pytest_mock import MockerFixture
 from rest_framework.authtoken.models import Token
 
@@ -19,7 +19,7 @@ from paperless.adapter import DrfTokenStrategy
 
 @pytest.mark.django_db
 class TestCustomAccountAdapter:
-    def test_is_open_for_signup(self, settings: SettingsWrapper) -> None:
+    def test_is_open_for_signup(self, settings: Settings) -> None:
         adapter = get_adapter()
 
         # With no accounts, signups should be allowed
@@ -33,7 +33,7 @@ class TestCustomAccountAdapter:
         settings.ACCOUNT_ALLOW_SIGNUPS = False
         assert not adapter.is_open_for_signup(None)
 
-    def test_is_safe_url(self, settings: SettingsWrapper) -> None:
+    def test_is_safe_url(self, settings: Settings) -> None:
         request = HttpRequest()
         request.get_host = lambda: "example.com"
         with context.request_context(request):
@@ -55,7 +55,7 @@ class TestCustomAccountAdapter:
 
     def test_pre_authenticate(
         self,
-        settings: SettingsWrapper,
+        settings: Settings,
         mocker: MockerFixture,
     ) -> None:
         mocker.patch("allauth.core.internal.ratelimit.consume", return_value=True)
@@ -70,7 +70,7 @@ class TestCustomAccountAdapter:
         with pytest.raises(ValidationError):
             adapter.pre_authenticate(request)
 
-    def test_get_reset_password_from_key_url(self, settings: SettingsWrapper) -> None:
+    def test_get_reset_password_from_key_url(self, settings: Settings) -> None:
         request = HttpRequest()
         request.get_host = lambda: "foo.org"
         with context.request_context(request):
@@ -87,7 +87,7 @@ class TestCustomAccountAdapter:
 
     def test_save_user_adds_groups(
         self,
-        settings: SettingsWrapper,
+        settings: Settings,
         mocker: MockerFixture,
     ) -> None:
         settings.ACCOUNT_DEFAULT_GROUPS = ["group1", "group2"]
@@ -130,7 +130,7 @@ class TestCustomAccountAdapter:
 
 class TestCustomSocialAccountAdapter:
     @pytest.mark.django_db
-    def test_is_open_for_signup(self, settings: SettingsWrapper) -> None:
+    def test_is_open_for_signup(self, settings: Settings) -> None:
         adapter = get_social_adapter()
 
         settings.SOCIALACCOUNT_ALLOW_SIGNUPS = True
@@ -146,7 +146,7 @@ class TestCustomSocialAccountAdapter:
     @pytest.mark.django_db
     def test_save_user_adds_groups(
         self,
-        settings: SettingsWrapper,
+        settings: Settings,
         mocker: MockerFixture,
     ) -> None:
         settings.SOCIAL_ACCOUNT_DEFAULT_GROUPS = ["group1", "group2"]
