@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from pathlib import Path
 
-    from pytest_django.fixtures import SettingsWrapper
+    from pytest_django.fixtures import Settings
     from pytest_mock import MockerFixture
 
 
@@ -67,7 +67,7 @@ def make_azure_mock() -> Callable[[str], Mock]:
 
 @pytest.fixture()
 def azure_client(
-    azure_settings: SettingsWrapper,
+    azure_settings: Settings,
     make_azure_mock: Callable[[str], Mock],
     mocker: MockerFixture,
 ) -> Mock:
@@ -83,7 +83,7 @@ def azure_client(
 
 @pytest.fixture()
 def failing_azure_client(
-    azure_settings: SettingsWrapper,
+    azure_settings: Settings,
     mocker: MockerFixture,
 ) -> Mock:
     """Patch the Azure DI client to raise RuntimeError on every call.
@@ -199,7 +199,7 @@ class TestRemoteParserScore:
 
     def test_score_returns_none_when_api_key_missing(
         self,
-        no_engine_settings: SettingsWrapper,
+        no_engine_settings: Settings,
     ) -> None:
         no_engine_settings.REMOTE_OCR_ENGINE = "azureai"
         no_engine_settings.REMOTE_OCR_ENDPOINT = (
@@ -210,7 +210,7 @@ class TestRemoteParserScore:
 
     def test_score_returns_none_when_endpoint_missing(
         self,
-        no_engine_settings: SettingsWrapper,
+        no_engine_settings: Settings,
     ) -> None:
         no_engine_settings.REMOTE_OCR_ENGINE = "azureai"
         no_engine_settings.REMOTE_OCR_API_KEY = "key"
@@ -231,7 +231,7 @@ class TestRemoteParserScore:
     @pytest.mark.django_db
     def test_score_uses_app_config_when_env_unset(
         self,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         """The app config alone is enough to activate the parser."""
         settings.REMOTE_OCR_ENGINE = None
