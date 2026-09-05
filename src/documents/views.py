@@ -5467,8 +5467,7 @@ class TrashView(ListModelMixin, PassUserMixin):
                 from documents.search import get_backend
 
                 with get_backend().batch_update() as batch:
-                    for doc in restored:
-                        batch.add_or_update(doc)
+                    batch.add_or_update_ids([doc.pk for doc in restored])
         elif action == "empty":
             if doc_ids is None:
                 doc_ids = [doc.id for doc in docs]

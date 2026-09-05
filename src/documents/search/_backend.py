@@ -284,6 +284,46 @@ class WriteBatch:
             tantivy.Query.term_query(self._backend._schema, "id", doc_id),
         )
 
+    def add_or_update_ids(self, ids: Sequence[int]) -> None:
+        """
+        Add or update multiple documents in the batch by primary key.
+
+        Unlike calling ``add_or_update()`` once per document, this resolves
+        viewer permissions and effective (versioned) content in bulk against
+        the ids as a whole, instead of once per document -- see
+        ``_DocumentViewerStream`` and ``annotate_effective_content``. Use
+        this whenever more than one document is being written in the same
+        batch.
+
+        An id with no matching document (e.g. deleted between the caller
+        collecting ids and the batch running) is silently skipped, matching
+        ``add_or_update()``'s existing single-document deferred-task behavior
+        rather than erroring or leaving a stale index entry.
+
+        Args:
+            ids: Primary keys of Document instances to index
+        """
+        from documents.models import Document
+        from documents.versioning import annotate_effective_content
+
+        ids = list(ids)
+        if not ids:
+            return
+
+        queryset = annotate_effective_content(
+            Document.objects.filter(pk__in=ids)
+            .select_related("correspondent", "document_type", "storage_path", "owner")
+            .prefetch_related("tags", "notes__user", "custom_fields__field"),
+        )
+        for document, grant in _DocumentViewerStream(queryset, chunk_size=1000):
+            self.remove(document.pk)
+            doc = self._backend._build_tantivy_doc(
+                document,
+                viewer_ids=grant.viewer_ids,
+                viewer_group_ids=grant.viewer_group_ids,
+            )
+            self._writer.add_document(doc)
+
 
 class TantivyBackend:
     """
