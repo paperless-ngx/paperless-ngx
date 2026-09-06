@@ -1,7 +1,10 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { CommonModule } from '@angular/common'
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core'
-import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
+import {
+  NgbPaginationModule,
+  NgbPopoverModule,
+} from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, catchError, of, switchMap, takeUntil, timer } from 'rxjs'
 import { FileVersion } from 'src/app/data/share-link'
@@ -25,6 +28,7 @@ import { LoadingComponentWithPermissions } from 'src/app/components/loading-comp
   imports: [
     ConfirmButtonComponent,
     CommonModule,
+    NgbPaginationModule,
     NgbPopoverModule,
     NgxBootstrapIconsModule,
     FileSizePipe,
@@ -41,6 +45,9 @@ export class ShareLinkBundleListComponent
   readonly bundles = signal<ShareLinkBundleSummary[]>([])
   readonly error = signal<string | null>(null)
   readonly copiedSlug = signal<string | null>(null)
+  readonly total = signal(0)
+  readonly page = signal(1)
+  readonly pageSize = 25
 
   readonly statuses = ShareLinkBundleStatus
   readonly fileVersions = FileVersion
@@ -55,25 +62,28 @@ export class ShareLinkBundleListComponent
             this.loading.set(true)
           }
           this.error.set(null)
-          return this.shareLinkBundleService.listAllBundles().pipe(
-            catchError((error) => {
-              if (!silent) {
-                this.loading.set(false)
-              }
-              this.error.set($localize`Failed to load share link bundles.`)
-              this.toastService.showError(
-                $localize`Error retrieving share link bundles.`,
-                error
-              )
-              return of(null)
-            })
-          )
+          return this.shareLinkBundleService
+            .list(this.page(), this.pageSize, 'created', true)
+            .pipe(
+              catchError((error) => {
+                if (!silent) {
+                  this.loading.set(false)
+                }
+                this.error.set($localize`Failed to load share link bundles.`)
+                this.toastService.showError(
+                  $localize`Error retrieving share link bundles.`,
+                  error
+                )
+                return of(null)
+              })
+            )
         }),
         takeUntil(this.unsubscribeNotifier)
       )
       .subscribe((results) => {
         if (results) {
-          this.bundles.set(results)
+          this.bundles.set(results.results)
+          this.total.set(results.count)
           this.copiedSlug.set(null)
         }
         this.loading.set(false)
@@ -96,6 +106,11 @@ export class ShareLinkBundleListComponent
     }`
   }
 
+  setPage(page: number): void {
+    this.page.set(page)
+    this.triggerRefresh(false)
+  }
+
   copy(bundle: ShareLinkBundleSummary): void {
     if (bundle.status !== ShareLinkBundleStatus.Ready) {
       return
@@ -114,6 +129,9 @@ export class ShareLinkBundleListComponent
     this.loading.set(true)
     this.shareLinkBundleService.delete(bundle).subscribe({
       next: () => {
+        if (this.bundles().length === 1 && this.page() > 1) {
+          this.page.update((page) => page - 1)
+        }
         this.toastService.showInfo($localize`Share link bundle deleted.`)
         this.triggerRefresh(false)
       },

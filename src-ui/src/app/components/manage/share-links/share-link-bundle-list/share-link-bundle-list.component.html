@@ -149,6 +149,20 @@
           </tbody>
         </table>
       </div>
+      @if (total() > pageSize) {
+        <div class="d-flex justify-content-end mt-3">
+          <ngb-pagination
+            [pageSize]="pageSize"
+            [collectionSize]="total()"
+            [page]="page()"
+            [maxSize]="5"
+            (pageChange)="setPage($event)"
+            size="sm"
+            aria-label="Share link bundles pagination"
+            i18n-aria-label
+          ></ngb-pagination>
+        </div>
+      }
     }
   }
 </div>

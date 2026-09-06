@@ -13,7 +13,7 @@ import { environment } from 'src/environments/environment'
 import { ShareLinkBundleListComponent } from './share-link-bundle-list.component'
 
 class MockShareLinkBundleService {
-  listAllBundles = jest.fn()
+  list = jest.fn()
   delete = jest.fn()
   rebuildBundle = jest.fn()
 }
@@ -36,7 +36,7 @@ describe('ShareLinkBundleListComponent', () => {
     toastService = new MockToastService()
     originalApiBaseUrl = environment.apiBaseUrl
 
-    service.listAllBundles.mockReturnValue(of([]))
+    service.list.mockReturnValue(of({ count: 0, results: [] }))
     service.delete.mockReturnValue(of(true))
     service.rebuildBundle.mockReturnValue(of(sampleBundle()))
 
@@ -80,28 +80,28 @@ describe('ShareLinkBundleListComponent', () => {
   it('loads bundles on init and polls periodically', () => {
     jest.useFakeTimers()
     const bundles = [sampleBundle({ status: ShareLinkBundleStatus.Ready })]
-    service.listAllBundles.mockReset()
-    service.listAllBundles
-      .mockReturnValueOnce(of(bundles))
-      .mockReturnValue(of(bundles))
+    service.list.mockReset()
+    service.list
+      .mockReturnValueOnce(of({ count: bundles.length, results: bundles }))
+      .mockReturnValue(of({ count: bundles.length, results: bundles }))
 
     fixture.detectChanges()
 
-    expect(service.listAllBundles).toHaveBeenCalledTimes(1)
+    expect(service.list).toHaveBeenCalledWith(1, 25, 'created', true)
     expect(component.bundles()).toEqual(bundles)
     expect(component.loading()).toBe(false)
     expect(component.error()).toBeNull()
 
     jest.advanceTimersByTime(5000)
-    expect(service.listAllBundles).toHaveBeenCalledTimes(2)
+    expect(service.list).toHaveBeenCalledTimes(2)
   })
 
   it('handles errors when loading bundles', () => {
     jest.useFakeTimers()
-    service.listAllBundles.mockReset()
-    service.listAllBundles
+    service.list.mockReset()
+    service.list
       .mockReturnValueOnce(throwError(() => new Error('load fail')))
-      .mockReturnValue(of([]))
+      .mockReturnValue(of({ count: 0, results: [] }))
 
     fixture.detectChanges()
 
@@ -110,7 +110,15 @@ describe('ShareLinkBundleListComponent', () => {
     expect(component.loading()).toBe(false)
 
     jest.advanceTimersByTime(5000)
-    expect(service.listAllBundles).toHaveBeenCalledTimes(2)
+    expect(service.list).toHaveBeenCalledTimes(2)
+  })
+
+  it('loads another page', () => {
+    fixture.detectChanges()
+
+    component.setPage(2)
+
+    expect(service.list).toHaveBeenLastCalledWith(2, 25, 'created', true)
   })
 
   it('copies bundle links when ready', () => {
@@ -150,7 +158,7 @@ describe('ShareLinkBundleListComponent', () => {
   })
 
   it('deletes bundles and refreshes list', () => {
-    service.listAllBundles.mockReturnValue(of([]))
+    service.list.mockReturnValue(of({ count: 0, results: [] }))
     service.delete.mockReturnValue(of(true))
 
     fixture.detectChanges()
@@ -161,12 +169,12 @@ describe('ShareLinkBundleListComponent', () => {
     expect(toastService.showInfo).toHaveBeenCalledWith(
       expect.stringContaining('deleted.')
     )
-    expect(service.listAllBundles).toHaveBeenCalledTimes(2)
+    expect(service.list).toHaveBeenCalledTimes(2)
     expect(component.loading()).toBe(false)
   })
 
   it('handles delete errors gracefully', () => {
-    service.listAllBundles.mockReturnValue(of([]))
+    service.list.mockReturnValue(of({ count: 0, results: [] }))
     service.delete.mockReturnValue(throwError(() => new Error('delete fail')))
 
     fixture.detectChanges()
@@ -178,7 +186,7 @@ describe('ShareLinkBundleListComponent', () => {
   })
 
   it('retries bundle build and replaces existing entry', () => {
-    service.listAllBundles.mockReturnValue(of([]))
+    service.list.mockReturnValue(of({ count: 0, results: [] }))
     const updated = sampleBundle({ status: ShareLinkBundleStatus.Ready })
     service.rebuildBundle.mockReturnValue(of(updated))
 
@@ -193,7 +201,7 @@ describe('ShareLinkBundleListComponent', () => {
   })
 
   it('adds new bundle when retry returns unknown entry', () => {
-    service.listAllBundles.mockReturnValue(of([]))
+    service.list.mockReturnValue(of({ count: 0, results: [] }))
     service.rebuildBundle.mockReturnValue(
       of(sampleBundle({ id: 99, slug: 'new-slug' }))
     )
@@ -207,7 +215,7 @@ describe('ShareLinkBundleListComponent', () => {
   })
 
   it('handles retry errors', () => {
-    service.listAllBundles.mockReturnValue(of([]))
+    service.list.mockReturnValue(of({ count: 0, results: [] }))
     service.rebuildBundle.mockReturnValue(throwError(() => new Error('fail')))
 
     fixture.detectChanges()
@@ -218,7 +226,7 @@ describe('ShareLinkBundleListComponent', () => {
   })
 
   it('maps status and file version helpers', () => {
-    service.listAllBundles.mockReturnValue(of([]))
+    service.list.mockReturnValue(of({ count: 0, results: [] }))
     fixture.detectChanges()
 
     expect(component.statusLabel(ShareLinkBundleStatus.Processing)).toContain(
