@@ -6,7 +6,7 @@ import {
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { takeUntil } from 'rxjs'
+import { Subscription, finalize, takeUntil } from 'rxjs'
 import { EditDialogMode } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { FolderEditDialogComponent } from 'src/app/components/common/edit-dialog/folder-edit-dialog/folder-edit-dialog.component'
 import { Document } from 'src/app/data/document'
@@ -66,6 +66,32 @@ export class FoldersComponent
   public collapsedFolders: Set<number> = new Set()
 
   private draggedDocIds: number[] = []
+  private documentsRequest?: Subscription
+  public moving = false
+  public dropTarget: number | null = null
+  public destinationSearch = ''
+
+  get destinationFolders(): Folder[] {
+    const search = this.destinationSearch.trim().toLocaleLowerCase()
+    return this.flatFolders.filter((folder) =>
+      (folder.full_path || folder.name || '')
+        .toLocaleLowerCase()
+        .includes(search)
+    )
+  }
+
+  canMoveDocument(doc: Document): boolean {
+    return (
+      this.permissionsService.currentUserCan(
+        this.PermissionAction.Change,
+        this.PermissionType.Document
+      ) &&
+      this.permissionsService.currentUserHasObjectPermissions(
+        this.PermissionAction.Change,
+        doc
+      )
+    )
+  }
 
   get visibleFlatFolders(): Folder[] {
     return this.flatFolders.filter(
@@ -79,6 +105,7 @@ export class FoldersComponent
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe((params) => {
           const id = params.get('id')
+          if ((id ? +id : null) === (this.currentFolder?.id ?? null)) return
           if (id) {
             this.openFolder(this.foldersById.get(+id) ?? null, false)
           } else {
@@ -113,34 +140,37 @@ export class FoldersComponent
   }
 
   reloadTree(callback?: () => void): void {
-    this.loading = true
+    this.loading.set(true)
     this.folderService.clearCache()
-    this.folderService.getTree().subscribe({
-      next: (result) => {
-        this.roots = result.results
-        this.foldersById = new Map()
-        this.flatFolders = []
-        this.flatten(this.roots, 0)
-        this.collapsedFolders.forEach((folderId) => {
-          if (!this.foldersById.has(folderId)) {
-            this.collapsedFolders.delete(folderId)
+    this.folderService
+      .getTree()
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (result) => {
+          this.roots = result.results
+          this.foldersById = new Map()
+          this.flatFolders = []
+          this.flatten(this.roots, 0)
+          this.collapsedFolders.forEach((folderId) => {
+            if (!this.foldersById.has(folderId)) {
+              this.collapsedFolders.delete(folderId)
+            }
+          })
+          this.loading.set(false)
+          this.show.set(true)
+          // Refresh the current folder reference / contents
+          if (this.currentFolder) {
+            this.currentFolder =
+              this.foldersById.get(this.currentFolder.id) ?? null
           }
-        })
-        this.loading = false
-        this.show = true
-        // Refresh the current folder reference / contents
-        if (this.currentFolder) {
-          this.currentFolder =
-            this.foldersById.get(this.currentFolder.id) ?? null
-        }
-        this.computeSubfolders()
-        callback?.()
-      },
-      error: (e) => {
-        this.loading = false
-        this.toastService.showError($localize`Error loading folders`, e)
-      },
-    })
+          this.computeSubfolders()
+          callback?.()
+        },
+        error: (e) => {
+          this.loading.set(false)
+          this.toastService.showError($localize`Error loading folders`, e)
+        },
+      })
   }
 
   private computeSubfolders(): void {
@@ -163,9 +193,14 @@ export class FoldersComponent
   }
 
   openFolder(folder: Folder | null, updateUrl: boolean = true): void {
+    this.documentsRequest?.unsubscribe()
+    this.documentsLoading = false
+    this.documents = []
+    this.documentsCount = 0
     this.currentFolder = folder
     this.selected.clear()
     this.page = 1
+    this.destinationSearch = ''
     this.computeSubfolders()
     if (updateUrl) {
       this.router.navigate(folder ? ['/folders', folder.id] : ['/folders'])
@@ -179,18 +214,24 @@ export class FoldersComponent
   }
 
   loadDocuments(): void {
+    this.documentsRequest?.unsubscribe()
     if (!this.currentFolder) return
     this.documentsLoading = true
-    this.documentService
+    this.documentsRequest = this.documentService
       .list(this.page, this.pageSize, 'created', true, {
         folder__id: this.currentFolder.id,
         truncate_content: true,
       })
+      .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (result) => {
           this.documents = result.results
           this.documentsCount = result.count
           this.documentsLoading = false
+          if (!result.results.length && this.page > 1) {
+            this.page = Math.max(1, Math.ceil(result.count / this.pageSize))
+            this.loadDocuments()
+          }
         },
         error: (e) => {
           this.documentsLoading = false
@@ -200,6 +241,7 @@ export class FoldersComponent
   }
 
   onPageChange(page: number): void {
+    this.selected.clear()
     this.page = page
     this.loadDocuments()
   }
@@ -230,10 +272,6 @@ export class FoldersComponent
       this.toastService.showInfo($localize`Folder updated.`)
       this.reloadTree()
     })
-  }
-
-  moveFolder(folder: Folder): void {
-    this.renameFolder(folder)
   }
 
   deleteFolder(folder: Folder): void {
@@ -292,6 +330,7 @@ export class FoldersComponent
   }
 
   toggleSelected(doc: Document): void {
+    if (this.moving || !this.canMoveDocument(doc)) return
     if (this.selected.has(doc.id)) {
       this.selected.delete(doc.id)
     } else {
@@ -301,15 +340,21 @@ export class FoldersComponent
 
   get allSelected(): boolean {
     return (
-      this.documents.length > 0 && this.selected.size === this.documents.length
+      this.documents.some((doc) => this.canMoveDocument(doc)) &&
+      this.documents
+        .filter((doc) => this.canMoveDocument(doc))
+        .every((doc) => this.selected.has(doc.id))
     )
   }
 
   toggleSelectAll(): void {
+    if (this.moving) return
     if (this.allSelected) {
       this.selected.clear()
     } else {
-      this.documents.forEach((d) => this.selected.add(d.id))
+      this.documents
+        .filter((doc) => this.canMoveDocument(doc))
+        .forEach((d) => this.selected.add(d.id))
     }
   }
 
@@ -320,13 +365,22 @@ export class FoldersComponent
   }
 
   moveDocsTo(folderId: number, docIds: number[]): void {
-    if (!docIds.length) return
+    if (!docIds.length || this.moving || folderId === this.currentFolder?.id)
+      return
+    this.moving = true
+    const destination = this.foldersById.get(folderId)?.name ?? String(folderId)
     this.documentService
       .bulkEdit({ documents: docIds }, 'set_folder', { folder: folderId })
+      .pipe(
+        takeUntil(this.unsubscribeNotifier),
+        finalize(() => {
+          this.moving = false
+        })
+      )
       .subscribe({
         next: () => {
           this.toastService.showInfo(
-            $localize`Moved ${docIds.length} document(s).`
+            $localize`Moved ${docIds.length} document(s) to ${destination}.`
           )
           this.selected.clear()
           this.documentService.clearCache()
@@ -342,6 +396,10 @@ export class FoldersComponent
   // --- Native drag & drop ----------------------------------------------------
 
   onDocDragStart(event: DragEvent, doc: Document): void {
+    if (this.moving || !this.canMoveDocument(doc)) {
+      event.preventDefault()
+      return
+    }
     // If the dragged document is part of the current selection, move all
     // selected documents; otherwise move just this one.
     this.draggedDocIds =
@@ -349,19 +407,32 @@ export class FoldersComponent
         ? Array.from(this.selected)
         : [doc.id]
     event.dataTransfer?.setData('text/plain', this.draggedDocIds.join(','))
+    if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move'
   }
 
-  onFolderDragOver(event: DragEvent): void {
-    if (this.draggedDocIds.length) {
+  onFolderDragOver(event: DragEvent, folder: Folder): void {
+    if (
+      this.draggedDocIds.length &&
+      folder.id !== this.currentFolder?.id &&
+      !this.moving
+    ) {
       event.preventDefault()
+      this.dropTarget = folder.id
+      if (event.dataTransfer) event.dataTransfer.dropEffect = 'move'
     }
+  }
+
+  onDragEnd(): void {
+    this.draggedDocIds = []
+    this.dropTarget = null
   }
 
   onFolderDrop(event: DragEvent, folder: Folder): void {
     event.preventDefault()
+    event.stopPropagation()
     if (this.draggedDocIds.length) {
       this.moveDocsTo(folder.id, this.draggedDocIds)
-      this.draggedDocIds = []
+      this.onDragEnd()
     }
   }
 

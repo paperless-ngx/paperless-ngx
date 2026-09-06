@@ -39,6 +39,37 @@
 
 .folder-card {
   cursor: pointer;
+  min-height: 3.5rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.5rem;
+}
+
+.folder-tree-link {
+  min-width: 0;
+  color: inherit;
+}
+
+.folder-tree .active .folder-collapse-toggle {
+  color: inherit;
+}
+
+.drop-target {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: -2px;
+  background-color: var(--bs-primary-bg-subtle) !important;
+  color: var(--bs-body-color) !important;
+}
+
+.document-summary {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--bs-tertiary-bg);
+}
+
+@media (max-width: 767.98px) {
+  .folder-tree {
+    max-height: 15rem;
+  }
 }
 
 .folder-move-menu {

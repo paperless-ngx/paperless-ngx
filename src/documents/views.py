@@ -4113,7 +4113,7 @@ class FolderViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Folder]):
     filter_backends = (
         DjangoFilterBackend,
         OrderingFilter,
-        ObjectOwnedOrGrantedPermissionsFilter,
+        PermittedObjectsFilter,
     )
     filterset_class = FolderFilterSet
     ordering_fields = ("name", "document_count")
@@ -4127,7 +4127,7 @@ class FolderViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Folder]):
 
     def _build_children_map(self, request):
         base_qs = self.get_queryset()
-        visible = ObjectOwnedOrGrantedPermissionsFilter().filter_queryset(request, base_qs, self)
+        visible = PermittedObjectsFilter().filter_queryset(request, base_qs, self)
         ordering = OrderingFilter().get_ordering(request, visible, self) or (Lower("name"),)
         children_map = {}
         for folder in visible.order_by(*ordering):
