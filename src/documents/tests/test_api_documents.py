@@ -3735,6 +3735,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             },
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(resp.data["document_title"], doc.title)
 
         resp = self.client.post(
             "/api/share_links/",
@@ -3745,6 +3746,17 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             },
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(resp.data["document_title"], doc.title)
+
+        response = self.client.get("/api/share_links/", format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 2)
+        self.assertTrue(
+            all(
+                link["document_title"] == doc.title for link in response.data["results"]
+            ),
+        )
 
         response = self.client.get(
             f"/api/documents/{doc.pk}/share_links/",
@@ -3756,6 +3768,9 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         resp_data = response.json()
 
         self.assertEqual(len(resp_data), 2)
+        self.assertTrue(
+            all(link["document_title"] == doc.title for link in resp_data),
+        )
 
         self.assertGreater(len(resp_data[1]["slug"]), 0)
         self.assertIsNone(resp_data[1]["expiration"])

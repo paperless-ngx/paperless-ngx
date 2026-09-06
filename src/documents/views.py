@@ -1888,7 +1888,14 @@ class DocumentViewSet(
             now = timezone.now()
             links = (
                 ShareLink.objects.filter(document=doc)
-                .only("pk", "created", "expiration", "slug")
+                .select_related("document")
+                .only(
+                    "pk",
+                    "created",
+                    "expiration",
+                    "slug",
+                    "document__title",
+                )
                 .exclude(expiration__lt=now)
                 .order_by("-created")
             )
@@ -4553,7 +4560,7 @@ class ShareLinkViewSet(
 ):
     model = ShareLink
 
-    queryset = ShareLink.objects.all()
+    queryset = ShareLink.objects.select_related("document")
 
     serializer_class = ShareLinkSerializer
     pagination_class = StandardPagination

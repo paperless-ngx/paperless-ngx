@@ -2812,6 +2812,11 @@ class AcknowledgeTasksViewSerializer(serializers.Serializer[dict[str, Any]]):
 
 
 class ShareLinkSerializer(OwnedObjectSerializer):
+    document_title = serializers.CharField(
+        source="document.title",
+        read_only=True,
+    )
+
     class Meta:
         model = ShareLink
         fields = (
@@ -2820,6 +2825,7 @@ class ShareLinkSerializer(OwnedObjectSerializer):
             "expiration",
             "slug",
             "document",
+            "document_title",
             "file_version",
         )
 
