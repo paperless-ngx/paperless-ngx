@@ -1,0 +1,28 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="cancel()">
+  </button>
+</div>
+<div class="modal-body">
+  @if (messageBold) {
+    <p class="text-break"><b>{{messageBold}}</b></p>
+  }
+  @if (message) {
+    <p class="mb-0 text-break" [innerHTML]="message"></p>
+  }
+  @if (showRemoteOcr) {
+    <div class="form-check mt-3">
+      <input class="form-check-input" type="checkbox" id="reprocessRemoteOcr" [(ngModel)]="remoteOcr" />
+      <label class="form-check-label" for="reprocessRemoteOcr" i18n>Use remote OCR</label>
+      <div class="form-text" i18n>Sends the document to the configured remote OCR service, which may incur costs.</div>
+    </div>
+  }
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">
+    <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
+  </button>
+  <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled">
+    {{btnCaption}}
+  </button>
+</div>

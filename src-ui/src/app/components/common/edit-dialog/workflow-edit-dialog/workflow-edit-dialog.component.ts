@@ -4,7 +4,8 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
 import { NgTemplateOutlet } from '@angular/common'
-import { Component, OnInit, inject } from '@angular/core'
+import { Component, OnInit, computed, inject, signal } from '@angular/core'
+import { toSignal } from '@angular/core/rxjs-interop'
 import {
   AbstractControl,
   FormArray,
@@ -15,7 +16,7 @@ import {
 } from '@angular/forms'
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { Subscription, first, takeUntil } from 'rxjs'
+import { Subscription, map, takeUntil } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentType } from 'src/app/data/document-type'
@@ -29,6 +30,7 @@ import { StoragePath } from 'src/app/data/storage-path'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { Workflow } from 'src/app/data/workflow'
 import {
+  AISuggestionField,
   WorkflowAction,
   WorkflowActionType,
 } from 'src/app/data/workflow-action'
@@ -146,6 +148,41 @@ export const WORKFLOW_ACTION_OPTIONS = [
   {
     id: WorkflowActionType.MoveToTrash,
     name: $localize`Move to trash`,
+  },
+  {
+    id: WorkflowActionType.RemoteOcr,
+    name: $localize`Remote OCR`,
+  },
+  {
+    id: WorkflowActionType.ApplyAiSuggestions,
+    name: $localize`Apply AI suggestions`,
+  },
+]
+
+export const AI_SUGGESTION_FIELD_OPTIONS = [
+  {
+    id: AISuggestionField.Title,
+    name: $localize`Title`,
+  },
+  {
+    id: AISuggestionField.Tags,
+    name: $localize`Tags`,
+  },
+  {
+    id: AISuggestionField.Correspondent,
+    name: $localize`Correspondent`,
+  },
+  {
+    id: AISuggestionField.DocumentType,
+    name: $localize`Document type`,
+  },
+  {
+    id: AISuggestionField.StoragePath,
+    name: $localize`Storage path`,
+  },
+  {
+    id: AISuggestionField.Created,
+    name: $localize`Created date`,
   },
 ]
 
@@ -470,23 +507,45 @@ export class WorkflowEditDialogComponent
   public TriggerFilterType = TriggerFilterType
   public filterDefinitions = TRIGGER_FILTER_DEFINITIONS
 
-  private correspondentService: CorrespondentService
-  private documentTypeService: DocumentTypeService
-  private storagePathService: StoragePathService
-  private mailRuleService: MailRuleService
-  private customFieldsService: CustomFieldsService
+  private readonly correspondentService = inject(CorrespondentService)
+  private readonly documentTypeService = inject(DocumentTypeService)
+  private readonly storagePathService = inject(StoragePathService)
+  private readonly mailRuleService = inject(MailRuleService)
+  private readonly customFieldsService = inject(CustomFieldsService)
 
-  templates: Workflow[]
-  correspondents: Correspondent[]
-  documentTypes: DocumentType[]
-  storagePaths: StoragePath[]
-  mailRules: MailRule[]
-  customFields: CustomField[]
-  dateCustomFields: CustomField[]
+  readonly templates = signal<Workflow[]>(undefined)
+  readonly correspondents = toSignal(
+    this.correspondentService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as Correspondent[] }
+  )
+  readonly documentTypes = toSignal(
+    this.documentTypeService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as DocumentType[] }
+  )
+  readonly storagePaths = toSignal(
+    this.storagePathService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as StoragePath[] }
+  )
+  readonly mailRules = toSignal(
+    this.mailRuleService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as MailRule[] }
+  )
+  readonly customFields = toSignal(
+    this.customFieldsService.listAll().pipe(map((result) => result.results)),
+    { initialValue: undefined as CustomField[] }
+  )
+  readonly dateCustomFields = computed(() =>
+    this.customFields()?.filter((f) => f.data_type === CustomFieldDataType.Date)
+  )
+  private readonly emailEnabledSetting =
+    this.settingsService.getSignal<boolean>(SETTINGS_KEYS.EMAIL_ENABLED)
+  private readonly remoteOcrConfiguredSetting =
+    this.settingsService.getSignal<boolean>(SETTINGS_KEYS.REMOTE_OCR_CONFIGURED)
+  private readonly aiEnabledSetting = this.settingsService.getSignal<boolean>(
+    SETTINGS_KEYS.AI_ENABLED
+  )
 
   expandedItem: number = null
-
-  private allowedActionTypes = []
 
   private readonly triggerFilterOptionsMap = new WeakMap<
     FormArray,
@@ -496,43 +555,8 @@ export class WorkflowEditDialogComponent
   constructor() {
     super()
     this.service = inject(WorkflowService)
-    this.correspondentService = inject(CorrespondentService)
-    this.documentTypeService = inject(DocumentTypeService)
-    this.storagePathService = inject(StoragePathService)
-    this.mailRuleService = inject(MailRuleService)
     this.userService = inject(UserService)
     this.settingsService = inject(SettingsService)
-    this.customFieldsService = inject(CustomFieldsService)
-
-    this.correspondentService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.correspondents = result.results))
-
-    this.documentTypeService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.documentTypes = result.results))
-
-    this.storagePathService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.storagePaths = result.results))
-
-    this.mailRuleService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => (this.mailRules = result.results))
-
-    this.customFieldsService
-      .listAll()
-      .pipe(first())
-      .subscribe((result) => {
-        this.customFields = result.results
-        this.dateCustomFields = this.customFields?.filter(
-          (f) => f.data_type === CustomFieldDataType.Date
-        )
-      })
   }
 
   getCreateTitle() {
@@ -565,11 +589,58 @@ export class WorkflowEditDialogComponent
       this.checkRemovalActionFields.bind(this)
     )
     this.checkRemovalActionFields(this.objectForm.value)
-    this.allowedActionTypes = this.settingsService.get(
-      SETTINGS_KEYS.EMAIL_ENABLED
-    )
-      ? WORKFLOW_ACTION_OPTIONS
-      : WORKFLOW_ACTION_OPTIONS.filter((a) => a.id !== WorkflowActionType.Email)
+  }
+
+  private allowedActionTypes: typeof WORKFLOW_ACTION_OPTIONS = null
+
+  private getAllowedActionTypes() {
+    let allowed = WORKFLOW_ACTION_OPTIONS
+
+    if (!this.emailEnabledSetting()) {
+      allowed = allowed.filter((a) => a.id !== WorkflowActionType.Email)
+    }
+
+    // Remote OCR is decided before the document is parsed, so it is only
+    // offered for workflows that run at consumption.
+    const formWorkflow: Workflow = this.objectForm?.value
+    const remoteOcrUsable =
+      this.remoteOcrConfiguredSetting() &&
+      (formWorkflow?.triggers?.some(
+        (trigger) => trigger.type === WorkflowTriggerType.Consumption
+      ) ||
+        formWorkflow?.actions?.some(
+          (action) => action.type === WorkflowActionType.RemoteOcr
+        ))
+    if (!remoteOcrUsable) {
+      allowed = allowed.filter((a) => a.id !== WorkflowActionType.RemoteOcr)
+    }
+
+    // Only available after consumption. Unlike remote OCR this is hidden only
+    // once every trigger is consumption, so it stays offered on a workflow
+    // that has no triggers yet.
+    const aiSuggestionsUsable =
+      this.aiEnabledSetting() &&
+      (!formWorkflow?.triggers?.length ||
+        formWorkflow.triggers.some(
+          (trigger) => trigger.type !== WorkflowTriggerType.Consumption
+        ) ||
+        formWorkflow.actions?.some(
+          (action) => action.type === WorkflowActionType.ApplyAiSuggestions
+        ))
+    if (!aiSuggestionsUsable) {
+      allowed = allowed.filter(
+        (a) => a.id !== WorkflowActionType.ApplyAiSuggestions
+      )
+    }
+
+    if (
+      this.allowedActionTypes?.length === allowed.length &&
+      this.allowedActionTypes.every((a, i) => a.id === allowed[i].id)
+    ) {
+      return this.allowedActionTypes
+    }
+    this.allowedActionTypes = allowed
+    return allowed
   }
 
   private checkRemovalActionFields(formWorkflow: Workflow) {
@@ -948,17 +1019,17 @@ export class WorkflowEditDialogComponent
 
   getFilterSelectItems(type: TriggerFilterType) {
     const definition = this.getFilterDefinition(type)
-    if (!definition || definition.inputType !== 'select') {
+    if (definition?.inputType !== 'select') {
       return []
     }
 
     switch (definition.selectItems) {
       case 'correspondents':
-        return this.correspondents
+        return this.correspondents()
       case 'documentTypes':
-        return this.documentTypes
+        return this.documentTypes()
       case 'storagePaths':
-        return this.storagePaths
+        return this.storagePaths()
       default:
         return []
     }
@@ -1213,6 +1284,11 @@ export class WorkflowEditDialogComponent
         passwords: new FormControl(
           this.formatPasswords(action.passwords ?? [])
         ),
+        ai_suggestion_fields: new FormControl(
+          action.ai_suggestion_fields ?? []
+        ),
+        ai_create_missing: new FormControl(!!action.ai_create_missing),
+        ai_overwrite_existing: new FormControl(!!action.ai_overwrite_existing),
       }),
       { emitEvent }
     )
@@ -1222,9 +1298,8 @@ export class WorkflowEditDialogComponent
     return passwords.join('\n')
   }
 
-  private parsePasswords(value: string = ''): string[] {
-    return value
-      .split(/[\n,]+/)
+  private parsePasswords(value: string | string[] = ''): string[] {
+    return (Array.isArray(value) ? value : value.split(/[\n,]+/))
       .map((entry) => entry.trim())
       .filter((entry) => entry.length > 0)
   }
@@ -1294,11 +1369,16 @@ export class WorkflowEditDialogComponent
   }
 
   get actionTypeOptions() {
-    return this.allowedActionTypes
+    // Computed on read rather than cached
+    return this.getAllowedActionTypes()
   }
 
   getActionTypeOptionName(type: WorkflowActionType): string {
     return this.actionTypeOptions.find((t) => t.id === type)?.name ?? ''
+  }
+
+  get aiSuggestionFieldOptions() {
+    return AI_SUGGESTION_FIELD_OPTIONS
   }
 
   addAction() {
@@ -1354,6 +1434,9 @@ export class WorkflowEditDialogComponent
         include_document: false,
       },
       passwords: [],
+      ai_suggestion_fields: [],
+      ai_create_missing: false,
+      ai_overwrite_existing: false,
     }
     this.object.actions.push(action)
     this.createActionField(action)

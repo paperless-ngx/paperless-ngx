@@ -7,9 +7,10 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.models import Document
+from documents.tests.utils import DirectoriesMixin
 
 
-class TestTrashAPI(APITestCase):
+class TestTrashAPI(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 

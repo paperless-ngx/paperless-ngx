@@ -1,12 +1,12 @@
 @if (useDropdown) {
   <div class="btn-group w-100" role="group" ngbDropdown #dropdown="ngbDropdown" (openChange)="onOpenChange($event)" [popperOptions]="popperOptions">
-    <button class="btn btn-sm btn-outline-primary" id="dropdown_toggle" ngbDropdownToggle [disabled]="disabled">
+    <button class="btn btn-sm" [ngClass]="!editing && isActive ? 'btn-primary' : 'btn-outline-primary'" id="dropdown_toggle" ngbDropdownToggle [disabled]="disabled" [aria-label]="title">
       <i-bs name="{{icon}}"></i-bs><div class="d-none d-sm-inline ms-1">{{title}}</div>
       @if (isActive) {
         <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge>
       }
     </button>
-    <div class="px-3 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
+    <div [id]="dropdownMenuId" class="px-3 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown_{{name}}">
       <ng-container *ngTemplateOutlet="list; context: { queries: selectionModel.queries }"></ng-container>
     </div>
   </div>
@@ -35,10 +35,11 @@
   @if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Date) {
     <input class="form-control" placeholder="yyyy-mm-dd"
       [(ngModel)]="atom.value"
+      [ngModelOptions]="{standalone: true}"
       ngbDatepicker
       #d="ngbDatepicker"
       [footerTemplate]="datePickerFooterTemplate" />
-    <button class="btn btn-sm btn-outline-secondary rounded-end" (click)="d.toggle()" type="button">
+    <button class="btn btn-sm btn-outline-secondary rounded-end" (click)="d.toggle()" type="button" aria-label="Open date picker" i18n-aria-label>
       <i-bs name="calendar-event"></i-bs>
     </button>
     <ng-template #datePickerFooterTemplate>
@@ -48,9 +49,9 @@
       </div>
     </ng-template>
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Float || getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Integer) {
-    <input class="w-25 form-control rounded-end" type="number" [(ngModel)]="atom.value" [disabled]="disabled">
+    <input class="w-25 form-control rounded-end" type="number" [(ngModel)]="atom.value" [ngModelOptions]="{standalone: true}" [disabled]="disabled">
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Boolean) {
-    <select class="w-25 form-select rounded-end" [(ngModel)]="atom.value" [disabled]="disabled">
+    <select class="w-25 form-select rounded-end" [(ngModel)]="atom.value" [ngModelOptions]="{standalone: true}" [disabled]="disabled">
       <option value="true" i18n>True</option>
       <option value="false" i18n>False</option>
     </select>
@@ -61,42 +62,54 @@
       bindLabel="label"
       bindValue="id"
       [(ngModel)]="atom.value"
+      [ngModelOptions]="{standalone: true}"
       [disabled]="disabled"
       [virtualScroll]="getSelectOptionsForField(atom.field)?.length > 100"
+      [searchFn]="selectOptionSearchFn"
+      [appendTo]="selectAppendTo"
       (mousedown)="$event.stopImmediatePropagation()"
     ></ng-select>
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.DocumentLink) {
-    <pngx-input-document-link [(ngModel)]="atom.value" class="w-25 form-select doc-link-select p-0" placeholder="Search docs..." i18n-placeholder [minimal]="true"></pngx-input-document-link>
+    <pngx-input-document-link [(ngModel)]="atom.value" [ngModelOptions]="{standalone: true}" class="w-25 form-select doc-link-select p-0" placeholder="Search docs..." i18n-placeholder [minimal]="true" [appendTo]="selectAppendTo"></pngx-input-document-link>
+  } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Monetary) {
+    <input class="w-25 form-control rounded-end" type="text" inputmode="decimal"
+      [ngModel]="atom.value"
+      [ngModelOptions]="{standalone: true}"
+      (ngModelChange)="setMonetaryValue(atom, $event)"
+      [disabled]="disabled">
   } @else {
-    <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [disabled]="disabled">
+    <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [ngModelOptions]="{standalone: true}" [disabled]="disabled">
   }
 </ng-template>
 
 <ng-template #queryAtom let-atom="atom">
   <div class="input-group input-group-sm">
-    <ng-select
+    <ng-select #fieldSelects
       class="paperless-input-select"
-      [items]="customFields"
+      [items]="customFields()"
       [(ngModel)]="atom.field"
+      [ngModelOptions]="{standalone: true}"
       [disabled]="disabled"
       bindLabel="name"
       bindValue="id"
+      [searchFn]="customFieldSearchFn"
+      [appendTo]="selectAppendTo"
       (mousedown)="$event.stopImmediatePropagation()"
     ></ng-select>
-    <select class="w-25 form-select" [(ngModel)]="atom.operator" [disabled]="disabled">
+    <select class="w-25 form-select" [(ngModel)]="atom.operator" [ngModelOptions]="{standalone: true}" [disabled]="disabled">
       @for (operator of getOperatorsForField(atom.field); track operator.label) {
         <option [ngValue]="operator.value">{{operator.label}}</option>
       }
     </select>
     @switch (atom.operator) {
       @case (CustomFieldQueryOperator.Exists) {
-        <select class="w-25 form-select rounded-end" [(ngModel)]="atom.value" [disabled]="disabled">
+        <select class="w-25 form-select rounded-end" [(ngModel)]="atom.value" [ngModelOptions]="{standalone: true}" [disabled]="disabled">
           <option value="true" i18n>True</option>
           <option value="false" i18n>False</option>
         </select>
       }
       @case (CustomFieldQueryOperator.IsNull) {
-        <select class="w-25 form-select rounded-end" [(ngModel)]="atom.value" [disabled]="disabled">
+        <select class="w-25 form-select rounded-end" [(ngModel)]="atom.value" [ngModelOptions]="{standalone: true}" [disabled]="disabled">
           <option value="true" i18n>True</option>
           <option value="false" i18n>False</option>
         </select>
@@ -114,7 +127,7 @@
         <ng-container *ngTemplateOutlet="comparisonValueTemplate; context: { atom: atom }"></ng-container>
       }
       @case (CustomFieldQueryOperator.Contains) {
-        <pngx-input-document-link [(ngModel)]="atom.value" class="w-25 form-select doc-link-select p-0" placeholder="Search docs..." i18n-placeholder [minimal]="true"></pngx-input-document-link>
+        <pngx-input-document-link [(ngModel)]="atom.value" [ngModelOptions]="{standalone: true}" class="w-25 form-select doc-link-select p-0" placeholder="Search docs..." i18n-placeholder [minimal]="true" [appendTo]="selectAppendTo"></pngx-input-document-link>
       }
       @case (CustomFieldQueryOperator.In) {
         <ng-select
@@ -123,8 +136,11 @@
           bindLabel="label"
           bindValue="id"
           [(ngModel)]="atom.value"
+          [ngModelOptions]="{standalone: true}"
           [disabled]="disabled"
           [multiple]="true"
+          [searchFn]="selectOptionSearchFn"
+          [appendTo]="selectAppendTo"
           (mousedown)="$event.stopImmediatePropagation()"
         ></ng-select>
       }
@@ -132,10 +148,10 @@
         <ng-container *ngTemplateOutlet="comparisonValueTemplate; context: { atom: atom }"></ng-container>
       }
       @default {
-        <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [disabled]="disabled">
+        <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [ngModelOptions]="{standalone: true}" [disabled]="disabled">
       }
     }
-    <button class="btn btn-link btn-sm text-danger pe-0" type="button" (click)="removeElement(atom)" [disabled]="disabled">
+    <button class="btn btn-link btn-sm text-danger pe-0" type="button" (click)="removeElement(atom)" [disabled]="disabled" aria-label="Remove query" i18n-aria-label>
       <i-bs name="x-circle"></i-bs>
     </button>
   </div>
@@ -145,12 +161,12 @@
   <div class="d-flex w-100">
     <div class="d-flex flex-grow-1 flex-column">
       <div class="btn-group btn-group-xs" role="group">
-        <input [(ngModel)]="expression.operator" type="radio" class="btn-check" id="logicalOperatorOr_{{expression.id}}" name="logicalOperatorOr_{{expression.id}}" value="OR" [disabled]="expression.depth > 0 && expression.value.length < 2">
+        <input [(ngModel)]="expression.operator" [ngModelOptions]="{standalone: true}" type="radio" class="btn-check" id="logicalOperatorOr_{{expression.id}}" name="logicalOperatorOr_{{expression.id}}" value="OR" [disabled]="expression.depth > 0 && expression.value.length < 2">
         <label class="btn btn-outline-primary" for="logicalOperatorOr_{{expression.id}}" i18n>Any</label>
-        <input [(ngModel)]="expression.operator" type="radio" class="btn-check" id="logicalOperatorAnd_{{expression.id}}" name="logicalOperatorAnd_{{expression.id}}" value="AND" [disabled]="expression.depth > 0 && expression.value.length < 2">
+        <input [(ngModel)]="expression.operator" [ngModelOptions]="{standalone: true}" type="radio" class="btn-check" id="logicalOperatorAnd_{{expression.id}}" name="logicalOperatorAnd_{{expression.id}}" value="AND" [disabled]="expression.depth > 0 && expression.value.length < 2">
         <label class="btn btn-outline-primary" for="logicalOperatorAnd_{{expression.id}}" i18n>All</label>
         @if (expression.negatable)  {
-          <input [(ngModel)]="expression.operator" type="radio" class="btn-check" id="logicalOperatorNot_{{expression.id}}" name="logicalOperatorNot_{{expression.id}}" value="NOT">
+          <input [(ngModel)]="expression.operator" [ngModelOptions]="{standalone: true}" type="radio" class="btn-check" id="logicalOperatorNot_{{expression.id}}" name="logicalOperatorNot_{{expression.id}}" value="NOT">
           <label class="btn btn-outline-secondary" for="logicalOperatorNot_{{expression.id}}" i18n>Not</label>
         }
       </div>
@@ -177,7 +193,7 @@
         <i-bs name="braces"></i-bs>
       </button>
       @if (expression.depth > 0) {
-        <button type="button" class="btn btn-sm btn-outline-secondary text-danger" (click)="removeElement(expression)" [disabled]="disabled">
+        <button type="button" class="btn btn-sm btn-outline-secondary text-danger" (click)="removeElement(expression)" [disabled]="disabled" aria-label="Remove expression" i18n-aria-label>
           <i-bs name="x-circle"></i-bs>
         </button>
       }

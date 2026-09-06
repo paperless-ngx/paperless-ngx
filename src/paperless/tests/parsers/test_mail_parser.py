@@ -145,6 +145,41 @@ class TestEmailFileParsing:
         assert parsed_msg.text == "This is just a simple Text Mail.\n"
         assert parsed_msg.to == ("some@one.de",)
 
+    def test_parse_file_to_message_makes_naive_date_aware(
+        self,
+        mocker: MockerFixture,
+        mail_parser: MailDocumentParser,
+        simple_txt_email_file: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - An email whose parsed date is naive (no tzinfo)
+        WHEN:
+            - The .eml file is parsed into a MailMessage
+        THEN:
+            - The resulting message date is made timezone-aware
+        """
+        mock_message = mocker.Mock(
+            from_values="mail@someserver.de",
+            date=datetime.datetime(2022, 10, 12, 21, 40, 43),
+        )
+        mocker.patch(
+            "paperless.parsers.mail.MailMessage.from_bytes",
+            return_value=mock_message,
+        )
+
+        parsed_msg = mail_parser.parse_file_to_message(simple_txt_email_file)
+
+        assert timezone.is_aware(parsed_msg.date)
+        assert parsed_msg.date.replace(tzinfo=None) == datetime.datetime(
+            2022,
+            10,
+            12,
+            21,
+            40,
+            43,
+        )
+
 
 class TestEmailMetadataExtraction:
     """
@@ -699,6 +734,34 @@ class TestParser:
             actual_html = parse_html(html_file.read_text())
 
             assert expected_html == actual_html
+
+    def test_mail_to_html_bounds_email_linkification(
+        self,
+        mail_parser: MailDocumentParser,
+    ) -> None:
+        mail = mock.Mock(
+            subject="sender@example.com",
+            from_values=None,
+            to_values=[],
+            cc_values=[],
+            bcc_values=[],
+            attachments=[],
+            date=timezone.now(),
+            text=("a." * 1500) + "@example.com",
+        )
+
+        with mock.patch(
+            "paperless.parsers.mail.linkify",
+            side_effect=lambda text, **kwargs: text,
+        ) as mock_linkify:
+            mail_parser.mail_to_html(mail)
+
+        parse_email_by_text = {
+            call.args[0]: call.kwargs["parse_email"]
+            for call in mock_linkify.call_args_list
+        }
+        assert parse_email_by_text["sender@example.com"] is True
+        assert parse_email_by_text[mail.text] is False
 
     def test_generate_pdf_from_mail(
         self,

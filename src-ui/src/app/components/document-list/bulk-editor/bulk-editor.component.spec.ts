@@ -4,7 +4,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import { EventEmitter } from '@angular/core'
+import { EventEmitter, signal } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
@@ -19,7 +19,11 @@ import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { PermissionsService } from 'src/app/services/permissions.service'
+import {
+  PermissionAction,
+  PermissionsService,
+  PermissionType,
+} from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
@@ -38,7 +42,6 @@ import { environment } from 'src/environments/environment'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
-import { EditDialogMode } from '../../common/edit-dialog/edit-dialog.component'
 import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { FilterableDropdownComponent } from '../../common/filterable-dropdown/filterable-dropdown.component'
@@ -210,6 +213,98 @@ describe('BulkEditorComponent', () => {
     expect(component.tagSelectionModel.selectionSize()).toEqual(1)
   })
 
+  it('should allow sending an all-filtered selection that fits on the current page', () => {
+    jest
+      .spyOn(documentListViewService, 'hasSelection', 'get')
+      .mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'allSelected', 'get')
+      .mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'selectedCount', 'get')
+      .mockReturnValue(5)
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([1, 2, 3, 4, 5]))
+
+    fixture.detectChanges()
+
+    expect(component.canSendSelection).toBe(true)
+    expect(
+      fixture.debugElement.query(By.css('#dropdownSend')).nativeElement.disabled
+    ).toBe(false)
+  })
+
+  it('should prevent sending an all-filtered selection spanning multiple pages', () => {
+    jest
+      .spyOn(documentListViewService, 'hasSelection', 'get')
+      .mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'allSelected', 'get')
+      .mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'selectedCount', 'get')
+      .mockReturnValue(6)
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([1, 2, 3, 4, 5]))
+
+    fixture.detectChanges()
+
+    expect(component.canSendSelection).toBe(false)
+    expect(
+      fixture.debugElement.query(By.css('#dropdownSend')).nativeElement.disabled
+    ).toBe(true)
+  })
+
+  it('should only show permitted share link bundle actions', () => {
+    permissionsService.initialize(
+      [
+        permissionsService.getPermissionCode(
+          PermissionAction.Add,
+          PermissionType.ShareLinkBundle
+        ),
+      ],
+      { is_superuser: false } as any
+    )
+    fixture.detectChanges()
+
+    expect(fixture.nativeElement.textContent).toContain(
+      'Create a share link bundle'
+    )
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'Manage share link bundles'
+    )
+
+    permissionsService.initialize(
+      [
+        permissionsService.getPermissionCode(
+          PermissionAction.View,
+          PermissionType.ShareLinkBundle
+        ),
+      ],
+      { is_superuser: false } as any
+    )
+    fixture.detectChanges()
+
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'Create a share link bundle'
+    )
+    expect(fixture.nativeElement.textContent).toContain(
+      'Manage share link bundles'
+    )
+
+    permissionsService.initialize([], { is_superuser: false } as any)
+    fixture.detectChanges()
+
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'Create a share link bundle'
+    )
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'Manage share link bundles'
+    )
+  })
+
   it('should apply selection data to correspondents menu', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     fixture.detectChanges()
@@ -305,7 +400,7 @@ describe('BulkEditorComponent', () => {
     component.openDocumentTypeDropdown()
 
     expect(getSelectionDataSpy).not.toHaveBeenCalled()
-    expect(component.documentTypeDocumentCounts).toEqual(
+    expect(component.documentTypeDocumentCounts()).toEqual(
       selectionData.selected_document_types
     )
   })
@@ -322,7 +417,7 @@ describe('BulkEditorComponent', () => {
     component.openCorrespondentDropdown()
 
     expect(getSelectionDataSpy).not.toHaveBeenCalled()
-    expect(component.correspondentDocumentCounts).toEqual(
+    expect(component.correspondentDocumentCounts()).toEqual(
       selectionData.selected_correspondents
     )
   })
@@ -339,7 +434,7 @@ describe('BulkEditorComponent', () => {
     component.openStoragePathDropdown()
 
     expect(getSelectionDataSpy).not.toHaveBeenCalled()
-    expect(component.storagePathDocumentCounts).toEqual(
+    expect(component.storagePathDocumentCounts()).toEqual(
       selectionData.selected_storage_paths
     )
   })
@@ -356,7 +451,7 @@ describe('BulkEditorComponent', () => {
     component.openCustomFieldsDropdown()
 
     expect(getSelectionDataSpy).not.toHaveBeenCalled()
-    expect(component.customFieldDocumentCounts).toEqual(
+    expect(component.customFieldDocumentCounts()).toEqual(
       selectionData.selected_custom_fields
     )
   })
@@ -1080,6 +1175,7 @@ describe('BulkEditorComponent', () => {
     req.flush(true)
     expect(req.request.body).toEqual({
       documents: [3, 4],
+      remote_ocr: false,
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
@@ -1147,7 +1243,7 @@ describe('BulkEditorComponent', () => {
     fixture.detectChanges()
     component.mergeSelected()
     expect(modal).not.toBeUndefined()
-    modal.componentInstance.metadataDocumentID = 3
+    modal.componentInstance.metadataDocumentID.set(3)
     modal.componentInstance.confirm()
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/merge/`
@@ -1165,7 +1261,7 @@ describe('BulkEditorComponent', () => {
     ) // listAllFilteredIds
 
     // Test with Delete Originals enabled
-    modal.componentInstance.deleteOriginals = true
+    modal.componentInstance.deleteOriginals.set(true)
     modal.componentInstance.confirm()
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/merge/`
@@ -1185,8 +1281,8 @@ describe('BulkEditorComponent', () => {
     expect(documentListViewService.selected.size).toEqual(0)
 
     // Test with archiveFallback enabled
-    modal.componentInstance.deleteOriginals = false
-    modal.componentInstance.archiveFallback = true
+    modal.componentInstance.deleteOriginals.set(false)
+    modal.componentInstance.archiveFallback.set(true)
     modal.componentInstance.confirm()
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/merge/`
@@ -1204,6 +1300,89 @@ describe('BulkEditorComponent', () => {
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     ) // listAllFilteredIds
     expect(documentListViewService.selected.size).toEqual(0)
+  })
+
+  it('should support merging documents as versions', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 3 }, { id: 4 }])
+    jest.spyOn(documentService, 'getFew').mockReturnValue(
+      of({
+        all: [3, 4],
+        count: 2,
+        results: [
+          { id: 3, title: 'Document 3' },
+          { id: 4, title: 'Document 4' },
+        ],
+      })
+    )
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([3, 4]))
+    jest
+      .spyOn(permissionsService, 'currentUserHasObjectPermissions')
+      .mockReturnValue(true)
+    jest
+      .spyOn(permissionsService, 'currentUserOwnsObject')
+      .mockReturnValue(true)
+    const mergeAsVersionsSpy = jest
+      .spyOn(documentService, 'mergeDocumentsAsVersions')
+      .mockReturnValue(of(true))
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    fixture.detectChanges()
+
+    component.mergeSelectedAsVersions()
+    expect(modal).not.toBeUndefined()
+    modal.componentInstance.rootDocumentID.set(4)
+    modal.componentInstance.confirm()
+
+    expect(mergeAsVersionsSpy).toHaveBeenCalledWith([3, 4], 4)
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+    )
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
+    )
+    expect(documentListViewService.selected.size).toEqual(0)
+    expect(toastInfoSpy).toHaveBeenCalledWith('Documents merged as versions.')
+  })
+
+  it('should not report success when merging documents as versions fails', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 3 }, { id: 4 }])
+    jest.spyOn(documentService, 'getFew').mockReturnValue(
+      of({
+        all: [3, 4],
+        count: 2,
+        results: [
+          { id: 3, title: 'Document 3' },
+          { id: 4, title: 'Document 4' },
+        ],
+      })
+    )
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([3, 4]))
+    jest
+      .spyOn(documentService, 'mergeDocumentsAsVersions')
+      .mockReturnValue(throwError(() => new Error('failed')))
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastErrorSpy = jest.spyOn(toastService, 'showError')
+    fixture.detectChanges()
+
+    component.mergeSelectedAsVersions()
+    modal.componentInstance.rootDocumentID.set(4)
+    modal.componentInstance.confirm()
+
+    expect(toastErrorSpy).toHaveBeenCalled()
+    expect(toastInfoSpy).not.toHaveBeenCalled()
   })
 
   it('should support bulk download with archive, originals or both and file formatting', () => {
@@ -1340,7 +1519,7 @@ describe('BulkEditorComponent', () => {
 
     const modalInstance = {
       componentInstance: {
-        dialogMode: EditDialogMode.CREATE,
+        dialogMode: { set: jest.fn() },
         object: { name },
         succeeded: of(newTag),
       },
@@ -1383,7 +1562,7 @@ describe('BulkEditorComponent', () => {
 
     const modalInstance = {
       componentInstance: {
-        dialogMode: EditDialogMode.CREATE,
+        dialogMode: { set: jest.fn() },
         object: { name },
         succeeded: of(newCorrespondent),
       },
@@ -1432,7 +1611,7 @@ describe('BulkEditorComponent', () => {
 
     const modalInstance = {
       componentInstance: {
-        dialogMode: EditDialogMode.CREATE,
+        dialogMode: { set: jest.fn() },
         object: { name },
         succeeded: of(newDocumentType),
       },
@@ -1478,7 +1657,7 @@ describe('BulkEditorComponent', () => {
 
     const modalInstance = {
       componentInstance: {
-        dialogMode: EditDialogMode.CREATE,
+        dialogMode: { set: jest.fn() },
         object: { name },
         succeeded: of(newStoragePath),
       },
@@ -1532,7 +1711,7 @@ describe('BulkEditorComponent', () => {
 
     const modalInstance = {
       componentInstance: {
-        dialogMode: EditDialogMode.CREATE,
+        dialogMode: { set: jest.fn() },
         object: { name },
         succeeded: of(newCustomField),
       },
@@ -1599,6 +1778,7 @@ describe('BulkEditorComponent', () => {
     expect(modal.componentInstance.customFields.length).toEqual(2)
     expect(modal.componentInstance.fieldsToAddIds).toEqual([1, 2])
     expect(modal.componentInstance.selection).toEqual({ documents: [3, 4] })
+    expect(modal.componentInstance.selectionCount).toEqual(2)
     expect(modal.componentInstance.documents).toEqual([3, 4])
 
     modal.componentInstance.failed.emit()
@@ -1630,15 +1810,18 @@ describe('BulkEditorComponent', () => {
       close: jest.fn(),
       componentInstance: {
         documents: [],
+        setDocuments(docs) {
+          this.documents = docs
+        },
         confirmClicked,
         payload: {
           document_ids: [5, 7],
           file_version: 'archive',
           expiration_days: 7,
         },
-        loading: false,
-        buttonsEnabled: true,
-        copied: false,
+        loading: signal(false),
+        buttonsEnabled: signal(true),
+        copied: signal(false),
       },
     }
 
@@ -1668,8 +1851,8 @@ describe('BulkEditorComponent', () => {
       file_version: 'archive',
       expiration_days: 7,
     })
-    expect(dialogInstance.loading).toBe(false)
-    expect(dialogInstance.buttonsEnabled).toBe(false)
+    expect(dialogInstance.loading()).toBe(false)
+    expect(dialogInstance.buttonsEnabled()).toBe(false)
     expect(dialogInstance.createdBundle).toEqual({ id: 42 })
     expect(typeof dialogInstance.onOpenManage).toBe('function')
     expect(toastInfoSpy).toHaveBeenCalledWith(
@@ -1699,14 +1882,17 @@ describe('BulkEditorComponent', () => {
     const modalRef: Partial<NgbModalRef> = {
       componentInstance: {
         documents: [],
+        setDocuments(docs) {
+          this.documents = docs
+        },
         confirmClicked,
         payload: {
           document_ids: [9],
           file_version: 'original',
           expiration_days: null,
         },
-        loading: false,
-        buttonsEnabled: true,
+        loading: signal(false),
+        buttonsEnabled: signal(true),
       },
     }
 
@@ -1727,8 +1913,8 @@ describe('BulkEditorComponent', () => {
       $localize`Share link bundle creation is not available yet.`,
       expect.any(Error)
     )
-    expect(dialogInstance.loading).toBe(false)
-    expect(dialogInstance.buttonsEnabled).toBe(true)
+    expect(dialogInstance.loading()).toBe(false)
+    expect(dialogInstance.buttonsEnabled()).toBe(true)
     openSpy.mockRestore()
   })
 

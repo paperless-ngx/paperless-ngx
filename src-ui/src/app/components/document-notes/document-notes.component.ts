@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  Output,
+  inject,
+  input,
+  model,
+  signal,
+} from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -31,22 +39,16 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
   private notesService = inject(DocumentNotesService)
   private toastService = inject(ToastService)
   private usersService = inject(UserService)
+  readonly documentId = model<number>(undefined)
+  readonly notes = model<DocumentNote[]>([])
+  readonly addDisabled = input(false)
+  readonly networkActive = signal(false)
 
   noteForm: FormGroup = new FormGroup({
     newNote: new FormControl(''),
   })
 
-  networkActive = false
   newNoteError: boolean = false
-
-  @Input()
-  documentId: number
-
-  @Input()
-  notes: DocumentNote[] = []
-
-  @Input()
-  addDisabled: boolean = false
 
   @Output()
   updated: EventEmitter<DocumentNote[]> = new EventEmitter()
@@ -68,30 +70,30 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
       return
     }
     this.newNoteError = false
-    this.networkActive = true
-    this.notesService.addNote(this.documentId, note).subscribe({
+    this.networkActive.set(true)
+    this.notesService.addNote(this.documentId(), note).subscribe({
       next: (result) => {
-        this.notes = result
+        this.notes.set(result)
         this.noteForm.get('newNote').reset()
-        this.networkActive = false
-        this.updated.emit(this.notes)
+        this.networkActive.set(false)
+        this.updated.emit(this.notes())
       },
       error: (e) => {
-        this.networkActive = false
+        this.networkActive.set(false)
         this.toastService.showError($localize`Error saving note`, e)
       },
     })
   }
 
   deleteNote(noteId: number) {
-    this.notesService.deleteNote(this.documentId, noteId).subscribe({
+    this.notesService.deleteNote(this.documentId(), noteId).subscribe({
       next: (result) => {
-        this.notes = result
-        this.networkActive = false
-        this.updated.emit(this.notes)
+        this.notes.set(result)
+        this.networkActive.set(false)
+        this.updated.emit(this.notes())
       },
       error: (e) => {
-        this.networkActive = false
+        this.networkActive.set(false)
         this.toastService.showError($localize`Error deleting note`, e)
       },
     })

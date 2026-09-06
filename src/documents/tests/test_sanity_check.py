@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+from documents.sanity_checker import SanityCheckMessages
 from documents.sanity_checker import check_sanity
 
 if TYPE_CHECKING:
@@ -19,6 +20,26 @@ if TYPE_CHECKING:
 
     from documents.models import Document
     from documents.tests.conftest import PaperlessDirs
+
+
+class TestSanityCheckMessages:
+    def test_document_counts_are_unique_per_severity(self) -> None:
+        messages = SanityCheckMessages()
+
+        messages.error(1, "first error")
+        messages.error(1, "second error")
+        messages.warning(1, "first warning")
+        messages.warning(1, "second warning")
+        messages.info(1, "first info")
+        messages.info(1, "second info")
+        messages.warning(None, "global warning")
+
+        assert messages.document_count == 1
+        assert messages.document_error_count == 1
+        assert messages.document_warning_count == 1
+        assert messages.document_info_count == 1
+        assert messages.global_warning_count == 1
+        assert messages.total_issue_count == 5
 
 
 @pytest.mark.django_db

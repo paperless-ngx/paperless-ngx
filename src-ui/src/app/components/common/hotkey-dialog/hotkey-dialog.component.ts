@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core'
+import { Component, inject, signal } from '@angular/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 
 const SYMBOLS = {
@@ -20,9 +20,8 @@ const SYMBOLS = {
 })
 export class HotkeyDialogComponent {
   activeModal = inject(NgbActiveModal)
-
-  public title: string = $localize`Keyboard shortcuts`
-  public hotkeys: Map<string, string> = new Map()
+  readonly title = signal($localize`Keyboard shortcuts`)
+  readonly hotkeys = signal<Map<string, string>>(new Map())
 
   public close(): void {
     this.activeModal.close()

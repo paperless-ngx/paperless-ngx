@@ -60,6 +60,10 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
                 },
                 "email_enabled": False,
                 "ai_enabled": False,
+                "remote_ocr": {
+                    "configured": False,
+                    "mode": "always",
+                },
             },
         )
 
@@ -153,6 +157,50 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
             "Expected a dictionary",
             str(response.data["settings"]),
         )
+
+    @override_settings(
+        REMOTE_OCR_ENGINE="azureai",
+        REMOTE_OCR_API_KEY="somekey",
+        REMOTE_OCR_ENDPOINT="https://example.cognitiveservices.azure.com",
+        REMOTE_OCR_MODE="workflow_only",
+    )
+    def test_settings_reports_remote_ocr_when_configured(self) -> None:
+        """
+        GIVEN:
+            - A fully configured remote OCR engine in workflow_only mode
+        WHEN:
+            - The ui_settings endpoint is called
+        THEN:
+            - The UI is told remote OCR is available and selective, so it can
+              offer it where it would actually change something
+        """
+        response = self.client.get(self.ENDPOINT, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data["settings"]["remote_ocr"],
+            {"configured": True, "mode": "workflow_only"},
+        )
+
+    @override_settings(
+        REMOTE_OCR_ENGINE="azureai",
+        REMOTE_OCR_API_KEY=None,
+        REMOTE_OCR_ENDPOINT=None,
+    )
+    def test_settings_reports_remote_ocr_incompletely_configured(self) -> None:
+        """
+        GIVEN:
+            - An engine named but missing its endpoint and API key
+        WHEN:
+            - The ui_settings endpoint is called
+        THEN:
+            - It is reported as not configured, matching what the parser
+              registry will actually do
+        """
+        response = self.client.get(self.ENDPOINT, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(response.data["settings"]["remote_ocr"]["configured"])
 
     @override_settings(
         OAUTH_CALLBACK_BASE_URL="http://localhost:8000",

@@ -108,6 +108,24 @@ describe('PermissionsService', () => {
       actionKey: 'View', // PermissionAction.View
       typeKey: 'Document', // PermissionType.Document
     })
+    expect(
+      permissionsService.getPermissionKeys('view_global_statistics')
+    ).toEqual({
+      actionKey: 'View', // PermissionAction.View
+      typeKey: 'GlobalStatistics', // PermissionType.GlobalStatistics
+    })
+    expect(
+      permissionsService.getPermissionKeys('view_system_monitoring')
+    ).toEqual({
+      actionKey: 'View', // PermissionAction.View
+      typeKey: 'SystemMonitoring', // PermissionType.SystemMonitoring
+    })
+    expect(permissionsService.getPermissionKeys('add_sharelinkbundle')).toEqual(
+      {
+        actionKey: 'Add', // PermissionAction.Add
+        typeKey: 'ShareLinkBundle', // PermissionType.ShareLinkBundle
+      }
+    )
   })
 
   it('correctly checks explicit global permissions', () => {
@@ -261,6 +279,10 @@ describe('PermissionsService', () => {
         'view_sharelink',
         'change_sharelink',
         'delete_sharelink',
+        'add_sharelinkbundle',
+        'view_sharelinkbundle',
+        'change_sharelinkbundle',
+        'delete_sharelinkbundle',
         'add_workflow',
         'view_workflow',
         'change_workflow',

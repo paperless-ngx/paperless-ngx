@@ -74,8 +74,20 @@ export class ConfigComponent
     return Object.values(ConfigCategory)
   }
 
-  getCategoryOptions(category: string): ConfigOption[] {
-    return PaperlessConfigOptions.filter((o) => o.category === category)
+  getCategorySections(category: string): string[] {
+    return [
+      ...new Set(
+        PaperlessConfigOptions.filter((o) => o.category === category).map(
+          (o) => o.section ?? null // null means no section
+        )
+      ),
+    ]
+  }
+
+  getCategoryOptions(category: string, section: string = null): ConfigOption[] {
+    return PaperlessConfigOptions.filter(
+      (o) => o.category === category && (o.section ?? null) === section
+    )
   }
 
   initialConfig: PaperlessConfig
@@ -97,11 +109,11 @@ export class ConfigComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (config) => {
-          this.loading = false
+          this.loading.set(false)
           this.initialize(config)
         },
         error: (e) => {
-          this.loading = false
+          this.loading.set(false)
           this.toastService.showError($localize`Error retrieving config`, e)
         },
       })
@@ -162,20 +174,20 @@ export class ConfigComponent
   }
 
   public saveConfig() {
-    this.loading = true
+    this.loading.set(true)
     this.configService
       .saveConfig(this.configForm.value as PaperlessConfig)
       .pipe(takeUntil(this.unsubscribeNotifier), first())
       .subscribe({
         next: (config) => {
-          this.loading = false
+          this.loading.set(false)
           this.initialize(config)
           this.store.next(config)
           this.settingsService.initializeSettings().subscribe()
           this.toastService.showInfo($localize`Configuration updated`)
         },
         error: (e) => {
-          this.loading = false
+          this.loading.set(false)
           this.toastService.showError(
             $localize`An error occurred updating configuration`,
             e
@@ -189,20 +201,20 @@ export class ConfigComponent
   }
 
   public uploadFile(file: File, key: string) {
-    this.loading = true
+    this.loading.set(true)
     this.configService
       .uploadFile(file, this.configForm.value['id'], key)
       .pipe(takeUntil(this.unsubscribeNotifier), first())
       .subscribe({
         next: (config) => {
-          this.loading = false
+          this.loading.set(false)
           this.initialize(config)
           this.store.next(config)
           this.settingsService.initializeSettings().subscribe()
           this.toastService.showInfo($localize`File successfully updated`)
         },
         error: (e) => {
-          this.loading = false
+          this.loading.set(false)
           this.toastService.showError(
             $localize`An error occurred uploading file`,
             e

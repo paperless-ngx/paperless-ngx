@@ -350,9 +350,13 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     })
   }
 
-  reprocessDocuments(selection: DocumentSelectionQuery) {
+  reprocessDocuments(
+    selection: DocumentSelectionQuery,
+    remoteOcr: boolean = false
+  ) {
     return this.http.post(this.getResourceUrl(null, 'reprocess'), {
       ...selection,
+      remote_ocr: remoteOcr,
     })
   }
 
@@ -372,6 +376,18 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     return this.http.post(this.getResourceUrl(null, 'merge'), {
       documents: ids,
       ...request,
+    })
+  }
+
+  mergeDocumentsAsVersions(
+    ids: number[],
+    rootDocumentId: number,
+    versionLabel?: string
+  ) {
+    return this.http.post(this.getResourceUrl(null, 'merge_as_versions'), {
+      documents: ids,
+      root_document_id: rootDocumentId,
+      ...(versionLabel ? { version_label: versionLabel } : {}),
     })
   }
 

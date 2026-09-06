@@ -21,20 +21,20 @@ describe('ClearableBadgeComponent', () => {
   })
 
   it('should support selected', () => {
-    component.selected = true
-    expect(component.active).toBeTruthy()
+    fixture.componentRef.setInput('selected', true)
+    expect(component.active()).toBeTruthy()
   })
 
   it('should support numbered', () => {
-    component.number = 3
+    fixture.componentRef.setInput('number', 3)
     fixture.detectChanges()
-    expect(component.active).toBeTruthy()
+    expect(component.active()).toBeTruthy()
     expect((fixture.nativeElement as HTMLDivElement).textContent).toContain('3')
   })
 
   it('should support selected', () => {
     let clearedResult
-    component.selected = true
+    fixture.componentRef.setInput('selected', true)
     fixture.detectChanges()
     component.cleared.subscribe((clear) => {
       clearedResult = clear

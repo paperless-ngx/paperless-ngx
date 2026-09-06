@@ -421,6 +421,11 @@ class TikaDocumentParser:
         logger.info("Converting %s to PDF as %s", document_path, pdf_path)
 
         with self._gotenberg_client.libre_office.to_pdf() as route:
+            # Preserve document fields as authored. updateIndexes (Gotenberg's
+            # default) triggers a refresh() that rewrites dynamic fields like
+            # auto-dates to the current date.
+            route.update_indexes(update_indexes=False)
+
             # Set the output format of the resulting PDF.
             # OutputTypeConfig reads the database-stored ApplicationConfiguration
             # first, then falls back to the PAPERLESS_OCR_OUTPUT_TYPE env var.

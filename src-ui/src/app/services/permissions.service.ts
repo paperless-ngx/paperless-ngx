@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, signal } from '@angular/core'
 import { ObjectWithPermissions } from '../data/object-with-permissions'
 import { User } from '../data/user'
 
@@ -27,6 +27,7 @@ export enum PermissionType {
   User = '%s_user',
   Group = '%s_group',
   ShareLink = '%s_sharelink',
+  ShareLinkBundle = '%s_sharelinkbundle',
   CustomField = '%s_customfield',
   Workflow = '%s_workflow',
   ProcessedMail = '%s_processedmail',
@@ -40,16 +41,19 @@ export enum PermissionType {
 export class PermissionsService {
   private permissions: string[]
   private currentUser: User
+  private readonly permissionsVersion = signal(0)
 
   public initialize(permissions: string[], currentUser: User) {
     this.permissions = permissions
     this.currentUser = currentUser
+    this.permissionsVersion.update((version) => version + 1)
   }
 
   public currentUserCan(
     action: PermissionAction,
     type: PermissionType
   ): boolean {
+    this.permissionsVersion()
     return (
       this.currentUser?.is_superuser ||
       this.permissions?.includes(this.getPermissionCode(action, type))
@@ -108,19 +112,16 @@ export class PermissionsService {
     actionKey: string
     typeKey: string
   } {
-    const matches = permissionStr.match(/(.+)_/)
     let typeKey
     let actionKey
-    if (matches?.length > 0) {
-      const action = matches[1]
-      const actionIndex = Object.values(PermissionAction).indexOf(
-        action as PermissionAction
-      )
-      if (actionIndex > -1) {
-        actionKey = Object.keys(PermissionAction)[actionIndex]
-      }
+    const actionIndex = Object.values(PermissionAction).findIndex((action) =>
+      permissionStr.startsWith(`${action}_`)
+    )
+    if (actionIndex > -1) {
+      const action = Object.values(PermissionAction)[actionIndex]
+      actionKey = Object.keys(PermissionAction)[actionIndex]
       const typeIndex = Object.values(PermissionType).indexOf(
-        permissionStr.replace(action, '%s') as PermissionType
+        permissionStr.replace(`${action}_`, '%s_') as PermissionType
       )
       if (typeIndex > -1) {
         typeKey = Object.keys(PermissionType)[typeIndex]

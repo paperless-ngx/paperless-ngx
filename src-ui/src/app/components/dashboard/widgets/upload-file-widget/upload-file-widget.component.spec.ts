@@ -1,11 +1,6 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
@@ -133,7 +128,8 @@ describe('UploadFileWidgetComponent', () => {
     expect(dismissSpy).toHaveBeenCalled()
   })
 
-  it('should allow dismissing completed alerts', fakeAsync(() => {
+  it('should allow dismissing completed alerts', () => {
+    jest.useFakeTimers()
     mockConsumerStatuses(websocketStatusService)
     fixture.detectChanges()
     jest
@@ -141,10 +137,11 @@ describe('UploadFileWidgetComponent', () => {
       .mockImplementation(() => SUCCESS_STATUSES)
     const dismissSpy = jest.spyOn(websocketStatusService, 'dismiss')
     component.dismissCompleted()
-    tick(1000)
+    jest.advanceTimersByTime(1000)
     fixture.detectChanges()
     expect(dismissSpy).toHaveBeenCalledTimes(4)
-  }))
+    jest.useRealTimers()
+  })
 })
 
 function mockConsumerStatuses(consumerStatusService) {

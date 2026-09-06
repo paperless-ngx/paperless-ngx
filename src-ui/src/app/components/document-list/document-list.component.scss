@@ -56,17 +56,24 @@ $paperless-card-breakpoints: (
 
 .sticky-top {
   z-index: 990; // below main navbar
-  top: calc(7rem - 2px); // height of navbar + search row (mobile)
+  top: calc(7.5rem - 2px); // height of navbar + search row (mobile)
   transition: top 0.2s ease;
 
   @media (min-width: 580px) {
-    top: 3.5rem; // height of navbar
+    top: 4.5em; // height of navbar
   }
+}
+
+// Popper may place a dropdown above its toggle when the virtual keyboard
+// reduces the available viewport, increase the z-index so navbar doesn't
+// obscure it. See github.com/paperless-ngx/paperless-ngx/pull/13694
+:host ::ng-deep .sticky-top:has(.dropdown-menu.show) {
+  z-index: 1040;
 }
 
 @media (max-width: 579.98px) {
   :host-context(main.mobile-search-hidden) .sticky-top {
-    top: calc(3.5rem - 2px); // height of navbar only when search is hidden
+    top: calc(4rem - 2px); // height of navbar only when search is hidden
   }
 }
 
@@ -86,4 +93,8 @@ a {
 
 pngx-page-header .dropdown-menu {
   --bs-dropdown-min-width: 12em;
+
+  .views-list {
+    max-height: min(400px, calc(100vh - 260px)); // leave room for the header above and the actions below
+  }
 }

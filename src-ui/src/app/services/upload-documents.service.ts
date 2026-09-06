@@ -23,6 +23,7 @@ export class UploadDocumentsService {
     let status = this.websocketStatusService.newFileUpload(file.name)
 
     status.message = $localize`Connecting...`
+    this.websocketStatusService.statusChanged()
 
     this.uploadSubscriptions[file.name] = this.documentService
       .uploadDocument(formData)
@@ -35,9 +36,11 @@ export class UploadDocumentsService {
               event.total
             )
             status.message = $localize`Uploading...`
+            this.websocketStatusService.statusChanged()
           } else if (event.type == HttpEventType.Response) {
             status.taskId = event.body['task_id'] ?? event.body.toString()
             status.message = $localize`Upload complete, waiting...`
+            this.websocketStatusService.statusChanged()
             this.uploadSubscriptions[file.name]?.complete()
           }
         },

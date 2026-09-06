@@ -1,6 +1,6 @@
 <pngx-page-header [title]="getTitle()">
   <div ngbDropdown class="btn-group flex-fill d-sm-none">
-    <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle>
+    <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle aria-label="Select" i18n-aria-label>
       <i-bs name="text-indent-left"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Select</ng-container></div>
       @if (list.hasSelection) {
         <pngx-clearable-badge [selected]="list.hasSelection" [number]="list.selectedCount" (cleared)="list.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
@@ -14,7 +14,7 @@
   </div>
   <div class="d-none d-sm-flex flex-fill me-3">
     <div class="input-group input-group-sm">
-      <span class="input-group-text border-0" i18n>Select:</span>
+      <span class="input-group-text bg-transparent border-0" i18n>Select:</span>
     </div>
     <div class="btn-group btn-group-sm flex-nowrap">
       @if (list.hasSelection) {
@@ -31,12 +31,12 @@
     </div>
   </div>
   <div ngbDropdown class="btn-group flex-fill">
-    <button class="btn btn-sm btn-outline-primary" id="dropdownDisplayFields" ngbDropdownToggle>
+    <button class="btn btn-sm btn-outline-primary" id="dropdownDisplayFields" ngbDropdownToggle aria-label="Show" i18n-aria-label>
       <i-bs name="card-heading"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Show</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownDisplayFields" class="shadow">
       <div class="px-3">
-        @for (field of settingsService.allDisplayFields; track field.id) {
+        @for (field of settingsService.allDisplayFields(); track field.id) {
           <div class="form-check my-1">
             <input class="form-check-input mt-1" type="checkbox" id="displayField{{field.id}}" [checked]="activeDisplayFields.includes(field.id)" (change)="toggleDisplayField(field.id)">
             <label class="form-check-label" for="displayField{{field.id}}">{{field.name}}</label>
@@ -61,7 +61,7 @@
   </div>
 
   <div ngbDropdown class="btn-group flex-fill">
-    <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle>
+    <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle aria-label="Sort" i18n-aria-label>
       <i-bs name="arrow-down-up"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Sort</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow dropdown-menu-right">
@@ -85,8 +85,8 @@
     </div>
   </div>
 
-  <div class="btn-group flex-fill" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }" ngbDropdown role="group">
-    <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" tourAnchor="tour.documents-views" ngbDropdownToggle>
+  <div class="btn-group flex-fill" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }" ngbDropdown #viewsDropdown="ngbDropdown" role="group">
+    <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" tourAnchor="tour.documents-views" ngbDropdownToggle aria-label="Views" i18n-aria-label>
       <i-bs name="window-stack"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Views</ng-container></div>
       @if (savedViewIsModified) {
         <div class="position-absolute top-0 start-100 p-2 translate-middle badge bg-secondary border border-light rounded-circle">
@@ -95,13 +95,15 @@
       }
     </button>
     <div class="dropdown-menu shadow dropdown-menu-right" ngbDropdownMenu>
-      @if (!list.activeSavedViewId) {
-        @for (view of savedViewService.allViews; track view) {
-          <button ngbDropdownItem (click)="loadViewConfig(view.id)">{{view.name}}</button>
-        }
-        @if (savedViewService.allViews.length > 0) {
-          <div class="dropdown-divider"></div>
-        }
+      @if (viewsDropdown.isOpen() && !list.activeSavedViewId && savedViewService.allViews.length > 0) {
+        <div class="views-list overflow-y-auto">
+          @for (view of savedViewService.allViews; track view.id) {
+            <button ngbDropdownItem (click)="loadViewConfig(view.id)">
+              <i-bs class="me-2" [name]="view.icon || 'funnel'"></i-bs>{{view.name}}
+            </button>
+          }
+        </div>
+        <div class="dropdown-divider"></div>
       }
 
       @if (list.activeSavedViewId && activeSavedViewCanChange) {
@@ -114,8 +116,8 @@
 
 </pngx-page-header>
 
-<div class="row sticky-top py-3 mt-n2 mt-md-n3 bg-body">
-  <pngx-filter-editor [hidden]="isBulkEditing" [disabled]="isBulkEditing" [filterRules]="list.filterRules" (filterRulesChange)="onFilterRulesChange($event)" (resetFilterRules)="onFilterRulesReset($event)" [unmodifiedFilterRules]="unmodifiedFilterRules" [selectionData]="list.selectionData" #filterEditor></pngx-filter-editor>
+<div class="row sticky-top py-3 mt-n2 mt-md-n3 bg-body rounded shadow-sm">
+  <pngx-filter-editor [hidden]="isBulkEditing" [disabled]="isBulkEditing" [filterRules]="list.filterRules" (filterRulesChange)="onFilterRulesChange($event)" (resetFilterRules)="onFilterRulesReset($event)" [unmodifiedFilterRules]="unmodifiedFilterRules()" [selectionData]="list.selectionData" #filterEditor></pngx-filter-editor>
   <pngx-bulk-editor [hidden]="!isBulkEditing" [disabled]="!isBulkEditing"></pngx-bulk-editor>
 </div>
 
@@ -155,7 +157,7 @@
     </div>
   </ng-template>
 
-  <div tourAnchor="tour.documents">
+  <div class="mt-3 mb-n2" tourAnchor="tour.documents">
     <ng-container *ngTemplateOutlet="pagination"></ng-container>
   </div>
 
@@ -164,9 +166,10 @@
   } @else {
     @if (list.displayMode === DisplayMode.LARGE_CARDS) {
       <div>
-        @for (d of list.documents; track d.id) {
+        @for (d of list.documents; track d.id; let i = $index) {
           <pngx-document-card-large
             [selected]="list.isSelected(d)"
+            [priority]="i < 2"
             (toggleSelected)="toggleSelected(d, $event)"
             (dblClickDocument)="openDocumentDetail(d)"
             [document]="d"
@@ -398,9 +401,10 @@
     }
     @if (list.displayMode === DisplayMode.SMALL_CARDS) {
       <div class="row row-cols-paperless-cards">
-        @for (d of list.documents; track d.id) {
+        @for (d of list.documents; track d.id; let i = $index) {
           <pngx-document-card-small class="p-0"
             [selected]="list.isSelected(d)"
+            [priority]="i < 6"
             (toggleSelected)="toggleSelected(d, $event)"
             (dblClickDocument)="openDocumentDetail(d)"
             [document]="d"

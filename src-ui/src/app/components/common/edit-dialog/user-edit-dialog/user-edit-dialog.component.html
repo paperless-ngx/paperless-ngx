@@ -31,7 +31,7 @@
             </div>
           </div>
 
-          <pngx-input-select i18n-title title="Groups" [items]="groups" multiple="true" formControlName="groups"></pngx-input-select>
+          <pngx-input-select i18n-title title="Groups" [items]="groups()" multiple="true" formControlName="groups"></pngx-input-select>
 
           @if (object?.is_mfa_enabled && currentUserIsSuperUser) {
             <label class="form-label" i18n>Two-factor Authentication</label>
@@ -42,7 +42,7 @@
               i18n-title
               buttonClasses="btn-outline-danger btn-sm"
               iconName="trash"
-              [disabled]="totpLoading"
+              [disabled]="totpLoading()"
               (confirm)="deactivateTotp()">
             </pngx-confirm-button>
           }

@@ -10,6 +10,8 @@
     "experimentalDecorators": true,
     "moduleResolution": "bundler",
     "importHelpers": true,
+    "ignoreDeprecations": "6.0",
+    "strict": false,
     "target": "ES2022",
     "module": "es2020",
     "lib": [
@@ -20,5 +22,6 @@
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
+    "strictTemplates": false
   }
 }

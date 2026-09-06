@@ -36,12 +36,12 @@ export class DirtySavedViewGuard {
     modal.componentInstance.alternativeBtnClass = 'btn-primary'
     modal.componentInstance.alternativeBtnCaption = $localize`Save and close`
     modal.componentInstance.alternativeClicked.pipe(first()).subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
+      modal.componentInstance.buttonsEnabled.set(false)
       component.saveViewConfig()
       modal.close()
     })
     modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
+      modal.componentInstance.buttonsEnabled.set(false)
       modal.close()
     })
 

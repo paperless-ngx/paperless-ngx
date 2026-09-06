@@ -30,20 +30,20 @@ describe('StoragePathEditDialogComponent', () => {
     documentService = TestBed.inject(DocumentService)
     fixture = TestBed.createComponent(StoragePathEditDialogComponent)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = { id: 99, username: 'user99' }
+    settingsService.currentUser.set({ id: 99, username: 'user99' })
     component = fixture.componentInstance
 
     fixture.detectChanges()
   })
 
   it('should support create and edit modes', () => {
-    component.dialogMode = EditDialogMode.CREATE
+    component.dialogMode.set(EditDialogMode.CREATE)
     const createTitleSpy = jest.spyOn(component, 'getCreateTitle')
     const editTitleSpy = jest.spyOn(component, 'getEditTitle')
     fixture.detectChanges()
     expect(createTitleSpy).toHaveBeenCalled()
     expect(editTitleSpy).not.toHaveBeenCalled()
-    component.dialogMode = EditDialogMode.EDIT
+    component.dialogMode.set(EditDialogMode.EDIT)
     fixture.detectChanges()
     expect(editTitleSpy).toHaveBeenCalled()
   })
@@ -58,17 +58,17 @@ describe('StoragePathEditDialogComponent', () => {
     fixture.detectChanges()
     component.testPath({ id: 1 })
     expect(testSpy).toHaveBeenCalledWith('test/{{title}}', 1)
-    expect(component.testResult).toBe('test/abc123')
-    expect(component.testFailed).toBeFalsy()
+    expect(component.testResult()).toBe('test/abc123')
+    expect(component.testFailed()).toBeFalsy()
 
     // test failed
     testSpy.mockReturnValueOnce(of(''))
     component.testPath({ id: 1 })
-    expect(component.testResult).toBeNull()
-    expect(component.testFailed).toBeTruthy()
+    expect(component.testResult()).toBeNull()
+    expect(component.testFailed()).toBeTruthy()
 
     component.testPath(null)
-    expect(component.testResult).toBeNull()
+    expect(component.testResult()).toBeNull()
   })
 
   it('should compare two documents by id', () => {

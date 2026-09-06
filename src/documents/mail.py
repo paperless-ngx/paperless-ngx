@@ -36,6 +36,9 @@ def send_email(
 
     TODO: re-evaluate this pending https://code.djangoproject.com/ticket/35581 / https://github.com/django/django/pull/18966
     """
+    if "\r" in subject or "\n" in subject:
+        subject = " ".join(line.strip(" \t") for line in subject.splitlines())
+
     email = EmailMessage(
         subject=subject,
         body=body,

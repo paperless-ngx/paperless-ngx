@@ -102,6 +102,7 @@ def build_schema() -> tantivy.Schema:
         "tag_id",
         "owner_id",
         "viewer_id",
+        "viewer_group_id",
     ):
         sb.add_unsigned_field(field, stored=False, indexed=True, fast=True)
 

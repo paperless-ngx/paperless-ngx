@@ -6,12 +6,13 @@ import {
   OnDestroy,
   OnInit,
   QueryList,
+  signal,
   ViewChildren,
 } from '@angular/core'
 import { Router, RouterModule } from '@angular/router'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { delay, Subject, takeUntil, tap } from 'rxjs'
+import { Subject, takeUntil } from 'rxjs'
 import { CustomFieldDisplayComponent } from 'src/app/components/common/custom-field-display/custom-field-display.component'
 import { PreviewPopupComponent } from 'src/app/components/common/preview-popup/preview-popup.component'
 import { TagComponent } from 'src/app/components/common/tag/tag.component'
@@ -106,7 +107,7 @@ export class SavedViewWidgetComponent
   @Input()
   savedView: SavedView
 
-  documents: Document[] = []
+  readonly documents = signal<Document[]>([])
 
   unsubscribeNotifier: Subject<any> = new Subject()
 
@@ -116,21 +117,26 @@ export class SavedViewWidgetComponent
   mouseOnPreview = false
   popoverHidden = true
 
-  displayMode: DisplayMode
+  readonly displayMode = signal<DisplayMode>(null)
 
-  displayFields: DisplayField[] = DEFAULT_DASHBOARD_DISPLAY_FIELDS
+  readonly displayFields = signal<DisplayField[]>(
+    DEFAULT_DASHBOARD_DISPLAY_FIELDS
+  )
 
-  count: number
+  readonly count = signal<number>(null)
+
+  readonly error = signal<string | null>(null)
+
+  placeholderRows: number[] = []
 
   ngOnInit(): void {
-    this.reload()
-    this.displayMode = this.savedView.display_mode ?? DisplayMode.TABLE
-    this.websocketStatusService
-      .onDocumentConsumptionFinished()
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(() => {
-        this.reload()
-      })
+    this.placeholderRows = Array.from(
+      {
+        length: this.savedView?.page_size ?? DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
+      },
+      (_, index) => index
+    )
+    this.displayMode.set(this.savedView.display_mode ?? DisplayMode.TABLE)
 
     if (
       this.permissionsService.currentUserCan(
@@ -150,15 +156,23 @@ export class SavedViewWidgetComponent
       this.savedView.display_fields &&
       this.savedView.display_fields.length > 0
     ) {
-      this.displayFields = this.savedView.display_fields
+      this.displayFields.set(this.savedView.display_fields)
     }
 
     // filter by perms etc
-    this.displayFields = this.displayFields.filter(
-      (field) =>
-        this.settingsService.allDisplayFields.find((f) => f.id === field) !==
-        undefined
+    this.displayFields.set(
+      this.displayFields().filter((field) =>
+        this.settingsService.allDisplayFields().some((f) => f.id === field)
+      )
     )
+
+    this.reload()
+    this.websocketStatusService
+      .onDocumentConsumptionFinished()
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        this.reload()
+      })
   }
 
   ngOnDestroy(): void {
@@ -167,7 +181,9 @@ export class SavedViewWidgetComponent
   }
 
   reload() {
-    this.loading = this.documents.length == 0
+    this.loading.set(this.documents().length == 0)
+    this.error.set(null)
+    this.show.set(true)
     this.documentService
       .listFiltered(
         1,
@@ -177,18 +193,41 @@ export class SavedViewWidgetComponent
         this.savedView.filter_rules,
         { truncate_content: true }
       )
-      .pipe(
-        takeUntil(this.unsubscribeNotifier),
-        tap((result) => {
-          this.show = true
-          this.documents = result.results
-          this.count = result.count
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (result) => {
+          this.documents.set(result.results)
+          this.count.set(result.count)
           this.savedViewService.setDocumentCount(this.savedView, result.count)
-        }),
-        delay(500)
-      )
-      .subscribe((result) => {
-        this.loading = false
+          this.loading.set(false)
+          this.show.set(true)
+        },
+        error: (error) => {
+          this.documents.set([])
+          this.count.set(null)
+          let errorMessage
+          if (
+            typeof error.error === 'object' &&
+            Object.keys(error.error).length > 0
+          ) {
+            errorMessage = Object.keys(error.error)
+              .map((fieldName) => {
+                const fieldNameBase = fieldName.split('__')[0]
+                const fieldError: Array<string> = error.error[fieldName]
+                return `${
+                  this.documentService.sortFields.find(
+                    (f) => f.field?.split('__')[0] == fieldNameBase
+                  )?.name ?? fieldNameBase
+                }: ${fieldError[0]}`
+              })
+              .join(', ')
+          } else {
+            errorMessage = error.error
+          }
+          this.error.set(errorMessage)
+          this.loading.set(false)
+          this.show.set(true)
+        },
       })
   }
 

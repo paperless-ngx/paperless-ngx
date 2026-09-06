@@ -109,6 +109,7 @@ describe('DocumentListViewService', () => {
     documentListViewService = TestBed.inject(DocumentListViewService)
     settingsService = TestBed.inject(SettingsService)
     router = TestBed.inject(Router)
+    jest.spyOn(router, 'navigate').mockResolvedValue(true)
   })
 
   afterEach(() => {
@@ -705,11 +706,16 @@ describe('DocumentListViewService', () => {
     const customFields = ['custom_field_1', 'custom_field_2']
     documentListViewService.displayFields = customFields as any
     expect(documentListViewService.displayFields).toEqual(customFields)
-    jest.spyOn(settingsService, 'allDisplayFields', 'get').mockReturnValue([
+    const mockDisplayFields = [
       { id: DisplayField.ADDED, name: 'Added' },
       { id: DisplayField.TITLE, name: 'Title' },
       { id: 'custom_field_1', name: 'Custom Field 1' },
-    ] as any)
+    ] as any
+    jest
+      .spyOn(settingsService.allDisplayFields, 'toString')
+      .mockReturnValue(mockDisplayFields.toString() as any)
+    // Mock the signal directly by overriding its value
+    settingsService.allDisplayFields = jest.fn(() => mockDisplayFields) as any
     settingsService.displayFieldsInit.emit(true)
     expect(documentListViewService.displayFields).toEqual(['custom_field_1'])
 

@@ -19,7 +19,10 @@ class AutoLoginMiddleware(MiddlewareMixin):
         if request.path.startswith("/api/token/") and request.method == "POST":
             return None
         try:
-            request.user = User.objects.get(username=settings.AUTO_LOGIN_USERNAME)
+            request.user = User.objects.get(
+                username=settings.AUTO_LOGIN_USERNAME,
+                is_active=True,
+            )
             auth.login(
                 request=request,
                 user=request.user,

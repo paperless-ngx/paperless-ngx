@@ -114,7 +114,26 @@ def remote_parser() -> Generator[RemoteDocumentParser, None, None]:
 
 
 @pytest.fixture()
-def azure_settings(settings: SettingsWrapper) -> SettingsWrapper:
+def empty_remote_ocr_app_config(mocker: MockerFixture) -> MagicMock:
+    # empty app config without accessing db
+    app_config = mocker.MagicMock(
+        remote_ocr_engine=None,
+        remote_ocr_api_key=None,
+        remote_ocr_endpoint=None,
+        remote_ocr_mode=None,
+    )
+    mocker.patch(
+        "paperless.config.BaseConfig._get_config_instance",
+        return_value=app_config,
+    )
+    return app_config
+
+
+@pytest.fixture()
+def azure_settings(
+    settings: SettingsWrapper,
+    empty_remote_ocr_app_config: MagicMock,
+) -> SettingsWrapper:
     """Configure Django settings for a valid Azure AI OCR engine.
 
     Sets ``REMOTE_OCR_ENGINE``, ``REMOTE_OCR_API_KEY``, and
@@ -133,7 +152,10 @@ def azure_settings(settings: SettingsWrapper) -> SettingsWrapper:
 
 
 @pytest.fixture()
-def no_engine_settings(settings: SettingsWrapper) -> SettingsWrapper:
+def no_engine_settings(
+    settings: SettingsWrapper,
+    empty_remote_ocr_app_config: MagicMock,
+) -> SettingsWrapper:
     """Configure Django settings with no remote engine configured.
 
     Returns

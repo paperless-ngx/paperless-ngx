@@ -68,7 +68,14 @@
   <!-- <policy domain="resource" name="thread" value="4"/> -->
   <!-- <policy domain="resource" name="throttle" value="0"/> -->
   <!-- <policy domain="resource" name="time" value="3600"/> -->
-  <!-- <policy domain="coder" rights="none" pattern="MVG" /> -->
+  <!-- Paperless does not process SVG or ImageMagick scripting formats. -->
+  <policy domain="coder" rights="none" pattern="SVG" />
+  <policy domain="coder" rights="none" pattern="SVGZ" />
+  <policy domain="coder" rights="none" pattern="MSVG" />
+  <policy domain="coder" rights="none" pattern="RSVG" />
+  <policy domain="coder" rights="none" pattern="MSL" />
+  <policy domain="coder" rights="none" pattern="MVG" />
+  <policy domain="coder" rights="none" pattern="EPHEMERAL" />
   <!-- <policy domain="module" rights="none" pattern="{PS,PDF,XPS}" /> -->
   <!-- <policy domain="delegate" rights="none" pattern="HTTPS" /> -->
   <!-- <policy domain="path" rights="none" pattern="@*" /> -->
@@ -78,8 +85,6 @@
   <!-- <policy domain="system" name="pixel-cache-memory" value="anonymous"/> -->
   <!-- <policy domain="system" name="shred" value="2"/> -->
   <!-- <policy domain="system" name="precision" value="6"/> -->
-  <!-- not needed due to the need to use explicitly by mvg: -->
-  <!-- <policy domain="delegate" rights="none" pattern="MVG" /> -->
   <!-- use curl -->
   <policy domain="delegate" rights="none" pattern="URL" />
   <policy domain="delegate" rights="none" pattern="HTTPS" />

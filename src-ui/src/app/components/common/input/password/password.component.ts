@@ -25,7 +25,7 @@ export class PasswordComponent extends AbstractInputComponent<string> {
   showReveal: boolean = false
 
   @Input()
-  autocomplete: string
+  autocomplete: string = 'off'
 
   public textVisible: boolean = false
 

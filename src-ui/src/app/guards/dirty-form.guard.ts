@@ -18,7 +18,7 @@ export class DirtyFormGuard extends DirtyCheckGuard {
     modal.componentInstance.btnClass = 'btn-warning'
     modal.componentInstance.btnCaption = $localize`Leave page`
     modal.componentInstance.confirmClicked.subscribe(() => {
-      modal.componentInstance.buttonsEnabled = false
+      modal.componentInstance.buttonsEnabled.set(false)
       modal.close()
     })
     const subject = new Subject<boolean>()

@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core'
+import { Injectable, inject, signal } from '@angular/core'
 import { ParamMap, Router, UrlTree } from '@angular/router'
 import { Observable, Subject, takeUntil } from 'rxjs'
 import {
@@ -118,6 +118,7 @@ export class DocumentListViewService {
   isReloading: boolean = false
   initialized: boolean = false
   error: string = null
+  private readonly stateVersion = signal(0)
 
   rangeSelectionAnchorIndex: number
   lastRangeSelectionToIndex: number
@@ -131,6 +132,14 @@ export class DocumentListViewService {
   private _activeSavedViewId: number = null
 
   private displayFieldsInitialized: boolean = false
+
+  private markChanged(): void {
+    this.stateVersion.update((version) => version + 1)
+  }
+
+  private trackState(): void {
+    this.stateVersion()
+  }
 
   private restoreListViewState(savedState: unknown): ListViewState {
     const newState = this.defaultListViewState()
@@ -159,10 +168,12 @@ export class DocumentListViewService {
   }
 
   get activeSavedViewId() {
+    this.trackState()
     return this._activeSavedViewId
   }
 
   get activeSavedViewTitle() {
+    this.trackState()
     return this.activeListViewState.title
   }
 
@@ -184,13 +195,12 @@ export class DocumentListViewService {
       this.displayFieldsInitialized = true
       if (this.activeListViewState.displayFields) {
         this.activeListViewState.displayFields =
-          this.activeListViewState.displayFields.filter(
-            (field) =>
-              this.settings.allDisplayFields.find((f) => f.id === field) !==
-              undefined
+          this.activeListViewState.displayFields.filter((field) =>
+            this.settings.allDisplayFields().some((f) => f.id === field)
           )
         this.saveDocumentListView()
       }
+      this.markChanged()
     })
   }
 
@@ -243,6 +253,7 @@ export class DocumentListViewService {
     } else {
       this._activeSavedViewId = null
     }
+    this.markChanged()
   }
 
   activateSavedViewWithQueryParams(view: SavedView, queryParams: ParamMap) {
@@ -267,6 +278,7 @@ export class DocumentListViewService {
     this.activeListViewState.displayFields = view.display_fields
 
     this.reduceSelectionToFilter()
+    this.markChanged()
 
     if (!this.router.routerState.snapshot.url.includes('/view/')) {
       this.router.navigate(['view', view.id])
@@ -297,6 +309,7 @@ export class DocumentListViewService {
       this.activeListViewState.sortField = newState.sortField
       this.activeListViewState.sortReverse = newState.sortReverse
       this.activeListViewState.currentPage = newState.currentPage
+      this.markChanged()
       this.reload(null, paramsEmpty) // update the params if there aren't any
     }
   }
@@ -305,6 +318,7 @@ export class DocumentListViewService {
     this.cancelPending()
     this.isReloading = true
     this.error = null
+    this.markChanged()
     let activeListViewState = this.activeListViewState
     this.documentService
       .listFiltered(
@@ -325,6 +339,7 @@ export class DocumentListViewService {
           activeListViewState.documents = result.results
           this.selectionData = resultWithSelectionData.selection_data ?? null
           this.syncSelectedToCurrentPage()
+          this.markChanged()
 
           if (updateQueryParams && !this._activeSavedViewId) {
             let base = ['/documents']
@@ -343,18 +358,20 @@ export class DocumentListViewService {
             onFinish()
           }
           this.rangeSelectionAnchorIndex = this.lastRangeSelectionToIndex = null
+          this.markChanged()
         },
         error: (error) => {
           this.isReloading = false
           if (activeListViewState.currentPage != 1 && error.status == 404) {
             // this happens when applying a filter: the current page might not be available anymore due to the reduced result set.
             activeListViewState.currentPage = 1
+            this.markChanged()
             this.reload()
           } else if (
             activeListViewState.sortField.indexOf('custom_field') === 0 &&
-            this.settings.allDisplayFields.find(
-              (f) => f.id === activeListViewState.sortField
-            ) === undefined
+            !this.settings
+              .allDisplayFields()
+              .some((f) => f.id === activeListViewState.sortField)
           ) {
             // e.g. field was deleted
             this.sortField = 'created'
@@ -381,6 +398,7 @@ export class DocumentListViewService {
               errorMessage = error.error
             }
             this.error = errorMessage
+            this.markChanged()
           }
         },
       })
@@ -397,12 +415,14 @@ export class DocumentListViewService {
     if (resetPage) {
       this.activeListViewState.currentPage = 1
     }
+    this.markChanged()
     this.reload()
     this.reduceSelectionToFilter()
     this.saveDocumentListView()
   }
 
   get filterRules(): FilterRule[] {
+    this.trackState()
     return this.activeListViewState.filterRules
   }
 
@@ -416,48 +436,58 @@ export class DocumentListViewService {
 
   set sortField(field: string) {
     this.activeListViewState.sortField = field
+    this.markChanged()
     this.reload()
     this.saveDocumentListView()
   }
 
   get sortField(): string {
+    this.trackState()
     return this.activeListViewState.sortField
   }
 
   set sortReverse(reverse: boolean) {
     this.activeListViewState.sortReverse = reverse
+    this.markChanged()
     this.reload()
     this.saveDocumentListView()
   }
 
   get sortReverse(): boolean {
+    this.trackState()
     return this.activeListViewState.sortReverse
   }
 
   get collectionSize(): number {
+    this.trackState()
     return this.activeListViewState.collectionSize
   }
 
   get currentPage(): number {
+    this.trackState()
     return this.activeListViewState.currentPage
   }
 
   set currentPage(page: number) {
     if (this.activeListViewState.currentPage == page) return
     this.activeListViewState.currentPage = page
+    this.markChanged()
     this.reload()
     this.saveDocumentListView()
   }
 
   get documents(): Document[] {
+    this.trackState()
     return this.activeListViewState.documents
   }
 
   get selected(): Set<number> {
+    this.trackState()
     return this.activeListViewState.selected
   }
 
   get allSelected(): boolean {
+    this.trackState()
     return this.activeListViewState.allSelected ?? false
   }
 
@@ -474,16 +504,19 @@ export class DocumentListViewService {
   setSort(field: string, reverse: boolean) {
     this.activeListViewState.sortField = field
     this.activeListViewState.sortReverse = reverse
+    this.markChanged()
     this.reload()
     this.saveDocumentListView()
   }
 
   set displayMode(mode: DisplayMode) {
     this.activeListViewState.displayMode = mode
+    this.markChanged()
     this.saveDocumentListView()
   }
 
   get displayMode(): DisplayMode {
+    this.trackState()
     const mode = this.activeListViewState.displayMode ?? DisplayMode.SMALL_CARDS
     if (mode === ('details' as any)) {
       // legacy
@@ -494,11 +527,13 @@ export class DocumentListViewService {
 
   set pageSize(size: number) {
     this.activeListViewState.pageSize = size
+    this.markChanged()
     this.reload()
     this.saveDocumentListView()
   }
 
   get pageSize(): number {
+    this.trackState()
     return (
       this.activeListViewState.pageSize ??
       this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
@@ -506,17 +541,17 @@ export class DocumentListViewService {
   }
 
   get displayFields(): DisplayField[] {
+    this.trackState()
     return this.activeListViewState.displayFields ?? LIST_DEFAULT_DISPLAY_FIELDS
   }
 
   set displayFields(fields: DisplayField[]) {
     this.activeListViewState.displayFields = this.displayFieldsInitialized
-      ? fields?.filter(
-          (field) =>
-            this.settings.allDisplayFields.find((f) => f.id === field) !==
-            undefined
+      ? fields?.filter((field) =>
+          this.settings.allDisplayFields().some((f) => f.id === field)
         )
       : fields
+    this.markChanged()
     this.saveDocumentListView()
   }
 
@@ -540,6 +575,7 @@ export class DocumentListViewService {
 
   quickFilter(filterRules: FilterRule[]) {
     this._activeSavedViewId = null
+    this.markChanged()
     this.setFilterRules(filterRules)
     this.router.navigate(['documents'])
   }
@@ -628,6 +664,7 @@ export class DocumentListViewService {
     this.activeListViewState.allSelected = false
     this.selected.clear()
     this.rangeSelectionAnchorIndex = this.lastRangeSelectionToIndex = null
+    this.markChanged()
   }
 
   reduceSelectionToFilter() {
@@ -644,6 +681,7 @@ export class DocumentListViewService {
               this.selected.delete(id)
             }
           }
+          this.markChanged()
         })
     }
   }
@@ -651,6 +689,7 @@ export class DocumentListViewService {
   selectAll() {
     this.activeListViewState.allSelected = true
     this.syncSelectedToCurrentPage()
+    this.markChanged()
   }
 
   selectPage() {
@@ -659,6 +698,7 @@ export class DocumentListViewService {
     this.documents.forEach((doc) => {
       this.selected.add(doc.id)
     })
+    this.markChanged()
   }
 
   isSelected(d: Document) {
@@ -673,6 +713,7 @@ export class DocumentListViewService {
     else this.selected.add(d.id)
     this.rangeSelectionAnchorIndex = this.documentIndexInCurrentView(d.id)
     this.lastRangeSelectionToIndex = null
+    this.markChanged()
   }
 
   selectRangeTo(d: Document) {
@@ -710,6 +751,7 @@ export class DocumentListViewService {
         this.selected.add(d.id)
       })
       this.lastRangeSelectionToIndex = documentToIndex
+      this.markChanged()
     } else {
       // e.g. shift key but was first click
       this.toggleSelected(d)

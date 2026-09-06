@@ -3,6 +3,7 @@
     <div class="d-flex flex-wrap flex-row gap-2 w-100 mh-1" style="min-height: 1em;"
         cdkDropList #selectedList="cdkDropList"
         cdkDropListOrientation="mixed"
+        [cdkDropListDisabled]="disabled"
         (cdkDropListDropped)="drop($event)"
         [cdkDropListConnectedTo]="[unselectedList]">
         @for (item of selectedItems; track item.id) {
@@ -17,6 +18,7 @@
     <div class="d-flex flex-wrap flex-row gap-2 w-100" style="min-height: 1em;"
         cdkDropList #unselectedList="cdkDropList"
         cdkDropListOrientation="mixed"
+        [cdkDropListDisabled]="disabled"
         (cdkDropListDropped)="drop($event)"
         [cdkDropListConnectedTo]="[selectedList]">
         @for (item of unselectedItems; track item.id) {

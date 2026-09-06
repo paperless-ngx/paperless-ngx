@@ -1,5 +1,12 @@
 import { DecimalPipe } from '@angular/common'
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  inject,
+  signal,
+} from '@angular/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { Subject } from 'rxjs'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
@@ -23,10 +30,10 @@ export class ConfirmDialogComponent extends LoadingComponentWithPermissions {
   title = $localize`Confirmation`
 
   @Input()
-  messageBold
+  messageBold: string
 
   @Input()
-  message
+  message: string
 
   @Input()
   btnClass = 'btn-primary'
@@ -38,7 +45,7 @@ export class ConfirmDialogComponent extends LoadingComponentWithPermissions {
   alternativeBtnClass = 'btn-secondary'
 
   @Input()
-  alternativeBtnCaption
+  alternativeBtnCaption: string
 
   @Input()
   cancelBtnClass = 'btn-outline-secondary'
@@ -46,8 +53,7 @@ export class ConfirmDialogComponent extends LoadingComponentWithPermissions {
   @Input()
   cancelBtnCaption = $localize`Cancel`
 
-  @Input()
-  buttonsEnabled = true
+  readonly buttonsEnabled = signal(true)
 
   confirmButtonEnabled = true
   alternativeButtonEnabled = true

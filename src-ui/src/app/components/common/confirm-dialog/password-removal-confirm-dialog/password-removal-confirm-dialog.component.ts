@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'
+import { Component } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { ConfirmDialogComponent } from '../confirm-dialog.component'
@@ -14,18 +14,11 @@ export class PasswordRemovalConfirmDialogComponent extends ConfirmDialogComponen
   includeMetadata: boolean = true
   deleteOriginal: boolean = false
 
-  @Input()
-  override title = $localize`Remove password protection`
-
-  @Input()
-  override message =
-    $localize`Create an unprotected copy or replace the existing file.`
-
-  @Input()
-  override btnCaption = $localize`Start`
-
   constructor() {
     super()
+    this.title = $localize`Remove password protection`
+    this.message = $localize`Create an unprotected copy or replace the existing file.`
+    this.btnCaption = $localize`Start`
   }
 
   onUpdateDocumentChange(updateDocument: boolean) {

@@ -21,7 +21,7 @@ jobs:
       frontend_changed: ${{ steps.force.outputs.run_all == 'true' || steps.filter.outputs.frontend == 'true' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -60,7 +60,7 @@ jobs:
       - name: Detect changes
         id: filter
         if: steps.force.outputs.run_all != 'true'
-        uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         with:
           base: ${{ steps.range.outputs.base }}
           ref: ${{ steps.range.outputs.ref }}
@@ -77,22 +77,22 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         with:
-          version: 10
+          package_json_file: src-ui/package.json
       - name: Use Node.js 24
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24.x
           cache: 'pnpm'
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
         id: cache-frontend-deps
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             ~/.pnpm-store
@@ -109,28 +109,28 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         with:
-          version: 10
+          package_json_file: src-ui/package.json
       - name: Use Node.js 24
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24.x
           cache: 'pnpm'
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             ~/.pnpm-store
             ~/.cache
           key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
-      - name: Re-link Angular CLI
-        run: cd src-ui && pnpm link @angular/cli
+      - name: Install dependencies
+        run: cd src-ui && pnpm install --frozen-lockfile
       - name: Run lint
         run: cd src-ui && pnpm run lint
   unit-tests:
@@ -148,133 +148,142 @@ jobs:
         shard-count: [4]
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         with:
-          version: 10
+          package_json_file: src-ui/package.json
       - name: Use Node.js 24
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24.x
           cache: 'pnpm'
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             ~/.pnpm-store
             ~/.cache
           key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
-      - name: Re-link Angular CLI
-        run: cd src-ui && pnpm link @angular/cli
+      - name: Install dependencies
+        run: cd src-ui && pnpm install --frozen-lockfile
       - name: Run Jest unit tests
         run: cd src-ui && pnpm run test --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
       - name: Upload test results to Codecov
         if: always()
-        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/
           report_type: test_results
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/coverage/
   e2e-tests:
-    name: "E2E Tests (${{ matrix.shard-index }}/${{ matrix.shard-count }})"
+    name: E2E Tests
     needs: [changes, install-dependencies]
     if: needs.changes.outputs.frontend_changed == 'true'
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-    container: mcr.microsoft.com/playwright:v1.60.0-noble
+    container: mcr.microsoft.com/playwright:v1.62.1-noble
     env:
       PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: [24.x]
-        shard-index: [1, 2]
-        shard-count: [2]
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         with:
-          version: 10
+          package_json_file: src-ui/package.json
       - name: Use Node.js 24
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24.x
           cache: 'pnpm'
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - name: Install uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: '0.12.x'
+          enable-cache: false
+          python-version: ${{ steps.setup-python.outputs.python-version }}
       - name: Cache frontend dependencies
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             ~/.pnpm-store
             ~/.cache
           key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
-      - name: Re-link Angular CLI
-        run: cd src-ui && pnpm link @angular/cli
       - name: Install dependencies
-        run: cd src-ui && pnpm install --no-frozen-lockfile
+        run: cd src-ui && pnpm install --frozen-lockfile
+      - name: Install backend system dependencies
+        run: |
+          apt-get update
+          apt-get install --yes --quiet --no-install-recommends libmagic1
+      - name: Install backend dependencies
+        env:
+          PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}
+        # The frozen repository lockfile and its build hooks are trusted.
+        run: uv sync --python "${PYTHON_VERSION}" --no-dev --frozen # NOSONAR
       - name: Run Playwright E2E tests
-        run: cd src-ui && pnpm exec playwright test --shard ${{ matrix.shard-index }}/${{ matrix.shard-count }}
-  bundle-analysis:
-    name: Bundle Analysis
+        run: cd src-ui && pnpm exec playwright test
+  frontend-build:
+    name: Frontend Build
     needs: [changes, unit-tests, e2e-tests]
     if: needs.changes.outputs.frontend_changed == 'true'
     runs-on: ubuntu-24.04
-    environment: bundle-analysis
     permissions:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 2
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         with:
-          version: 10
+          package_json_file: src-ui/package.json
       - name: Use Node.js 24
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24.x
           cache: 'pnpm'
           cache-dependency-path: 'src-ui/pnpm-lock.yaml'
       - name: Cache frontend dependencies
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             ~/.pnpm-store
             ~/.cache
           key: ${{ runner.os }}-frontend-${{ hashFiles('src-ui/pnpm-lock.yaml') }}
-      - name: Re-link Angular CLI
-        run: cd src-ui && pnpm link @angular/cli
-      - name: Build and analyze
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Install dependencies
+        run: cd src-ui && pnpm install --frozen-lockfile
+      - name: Build
         run: cd src-ui && pnpm run build --configuration=production
   gate:
     name: Frontend CI Gate
-    needs: [changes, install-dependencies, lint, unit-tests, e2e-tests, bundle-analysis]
+    needs: [changes, install-dependencies, lint, unit-tests, e2e-tests, frontend-build]
     if: always()
     runs-on: ubuntu-slim
     steps:
       - name: Check gate
         env:
-          BUNDLE_ANALYSIS_RESULT: ${{ needs['bundle-analysis'].result }}
+          BUILD_RESULT: ${{ needs['frontend-build'].result }}
           E2E_RESULT: ${{ needs['e2e-tests'].result }}
           FRONTEND_CHANGED: ${{ needs.changes.outputs.frontend_changed }}
           INSTALL_RESULT: ${{ needs['install-dependencies'].result }}
@@ -306,8 +315,8 @@ jobs:
             exit 1
           fi
 
-          if [[ "${BUNDLE_ANALYSIS_RESULT}" != "success" ]]; then
-            echo "::error::Frontend bundle-analysis job result: ${BUNDLE_ANALYSIS_RESULT}"
+          if [[ "${BUILD_RESULT}" != "success" ]]; then
+            echo "::error::Frontend build job result: ${BUILD_RESULT}"
             exit 1
           fi
 

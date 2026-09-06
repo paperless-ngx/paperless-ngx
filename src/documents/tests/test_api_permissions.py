@@ -131,6 +131,10 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
             self.client.get("/api/saved_views/").status_code,
             status.HTTP_403_FORBIDDEN,
         )
+        self.assertEqual(
+            self.client.get("/api/search/autocomplete/?term=test").status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
 
     def test_api_sufficient_permissions(self) -> None:
         user = User.objects.create_user(username="test")
@@ -563,6 +567,30 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertIn("permissions", results[0])
         self.assertNotIn("user_can_change", results[0])
         self.assertNotIn("is_shared_by_requester", results[0])
+
+    def test_superuser_user_can_change_without_explicit_grant(self) -> None:
+        """
+        A superuser has implicit change access to every document, even one
+        owned by someone else with no explicit guardian grant -- mirrors
+        guardian's own ObjectPermissionChecker.has_perm() superuser shortcut.
+        """
+        superuser = User.objects.create_superuser(username="admin")
+        other_user = User.objects.create_user(username="user2")
+        Document.objects.create(
+            title="Test",
+            content="content",
+            checksum="1",
+            owner=other_user,
+        )
+
+        self.client.force_authenticate(superuser)
+
+        response = self.client.get("/api/documents/", format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.json()["results"]
+        self.assertEqual(len(results), 1)
+        self.assertTrue(results[0]["user_can_change"])
 
     @mock.patch("allauth.mfa.adapter.DefaultMFAAdapter.is_mfa_enabled")
     def test_basic_auth_mfa_enabled(self, mock_is_mfa_enabled) -> None:
@@ -1331,6 +1359,145 @@ class TestBulkEditObjectPermissions(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(response.content, b"Insufficient permissions")
+
+    def test_bulk_edit_object_permissions_shared_object_not_owner(self) -> None:
+        """
+        GIVEN:
+            - Object owned by another user, shared with the logged in user with
+              change permissions
+        WHEN:
+            - bulk_edit_objects API endpoint is called with set_permissions operation
+        THEN:
+            - User is not able to take ownership or change permissions, consistent
+              with the single object API
+        """
+        self.t1.owner = self.user2
+        self.t1.save()
+        assign_perm("view_tag", self.user1, self.t1)
+        assign_perm("change_tag", self.user1, self.t1)
+        self.user1.user_permissions.add(
+            *Permission.objects.filter(
+                codename__in=["view_tag", "change_tag"],
+            ),
+        )
+        user1 = User.objects.get(pk=self.user1.pk)
+        self.client.force_authenticate(user=user1)
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id],
+                    "object_type": "tags",
+                    "operation": "set_permissions",
+                    "owner": user1.id,
+                    "permissions": {
+                        "view": {"users": [user1.id], "groups": []},
+                        "change": {"users": [user1.id], "groups": []},
+                    },
+                    "merge": False,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Tag.objects.get(pk=self.t1.id).owner, self.user2)
+
+        # the single object endpoint refuses the same request
+        response = self.client.patch(
+            f"/api/tags/{self.t1.id}/",
+            {"owner": user1.id},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Tag.objects.get(pk=self.t1.id).owner, self.user2)
+
+    def test_bulk_edit_object_permissions_all_with_shared_objects(self) -> None:
+        """
+        GIVEN:
+            - Objects owned by the logged in user, unowned objects and objects owned
+              by another user but shared with the logged in user
+        WHEN:
+            - bulk_edit_objects API endpoint is called with set_permissions operation
+              and all = True
+        THEN:
+            - The request is refused and no objects are changed
+        """
+        owned = Tag.objects.create(name="owned", owner=self.user1)
+        shared = Tag.objects.create(name="shared", owner=self.user2)
+        assign_perm("view_tag", self.user1, shared)
+        assign_perm("change_tag", self.user1, shared)
+        self.user1.user_permissions.add(
+            *Permission.objects.filter(
+                codename__in=["view_tag", "change_tag"],
+            ),
+        )
+        user1 = User.objects.get(pk=self.user1.pk)
+        self.client.force_authenticate(user=user1)
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "objects": [],
+                    "all": True,
+                    "object_type": "tags",
+                    "operation": "set_permissions",
+                    "permissions": {
+                        "view": {"users": [self.user3.id], "groups": []},
+                        "change": {"users": [self.user3.id], "groups": []},
+                    },
+                    "merge": False,
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # nothing was changed, including the objects the user does own
+        self.assertNotIn(self.user3, get_users_with_perms(owned))
+        self.assertNotIn(self.user3, get_users_with_perms(self.t1))
+        self.assertNotIn(self.user3, get_users_with_perms(shared))
+        self.assertEqual(Tag.objects.get(pk=shared.pk).owner, self.user2)
+
+    def test_bulk_edit_object_delete_shared_object_not_owner(self) -> None:
+        """
+        GIVEN:
+            - Object owned by another user, shared with the logged in user with
+              change and delete permissions
+        WHEN:
+            - bulk_edit_objects API endpoint is called with delete operation
+        THEN:
+            - User is not able to delete the object, consistent with documents
+        """
+        self.t1.owner = self.user2
+        self.t1.save()
+        assign_perm("view_tag", self.user1, self.t1)
+        assign_perm("change_tag", self.user1, self.t1)
+        assign_perm("delete_tag", self.user1, self.t1)
+        self.user1.user_permissions.add(
+            *Permission.objects.filter(
+                codename__in=["view_tag", "change_tag", "delete_tag"],
+            ),
+        )
+        user1 = User.objects.get(pk=self.user1.pk)
+        self.client.force_authenticate(user=user1)
+
+        response = self.client.post(
+            "/api/bulk_edit_objects/",
+            json.dumps(
+                {
+                    "objects": [self.t1.id],
+                    "object_type": "tags",
+                    "operation": "delete",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(Tag.objects.filter(pk=self.t1.id).exists())
 
     def test_bulk_edit_object_permissions_validation(self) -> None:
         """

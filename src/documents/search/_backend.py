@@ -8,21 +8,22 @@ import time
 from datetime import UTC
 from datetime import datetime
 from enum import StrEnum
+from itertools import islice
 from typing import TYPE_CHECKING
 from typing import Final
+from typing import NamedTuple
 from typing import Self
 from typing import TypedDict
 from typing import TypeVar
 from typing import cast
 
 import filelock
-import regex
 import tantivy
 from django.conf import settings
 from django.utils.timezone import get_current_timezone
-from guardian.shortcuts import get_users_with_perms
 
 from documents.search._query import build_permission_filter
+from documents.search._query import extract_cjk_text
 from documents.search._query import parse_simple_text_highlight_query
 from documents.search._query import parse_simple_text_query
 from documents.search._query import parse_simple_title_query
@@ -32,14 +33,20 @@ from documents.search._schema import build_schema
 from documents.search._schema import open_or_rebuild_index
 from documents.search._schema import wipe_index
 from documents.search._tokenizer import ascii_fold
+from documents.search._tokenizer import autocomplete_tokens
 from documents.search._tokenizer import register_tokenizers
 from documents.utils import IterWrapper
+from documents.utils import QuerySetStream
 from documents.utils import identity
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from collections.abc import Sequence
     from pathlib import Path
 
     from django.contrib.auth.models import AbstractUser
+    from django.contrib.auth.models import Group
+    from django.contrib.auth.models import User
     from django.db.models import QuerySet
 
     from documents.models import Document
@@ -51,10 +58,19 @@ _LOCK_RETRY_ATTEMPTS: Final[int] = 4  # total attempts (1 initial + 3 retries)
 _LOCK_BACKOFF_BASE: Final[float] = 1.0  # seconds
 _LOCK_BACKOFF_CAP: Final[float] = 10.0  # seconds
 
-_WORD_RE = regex.compile(r"\w+")
-_AUTOCOMPLETE_REGEX_TIMEOUT = 1.0  # seconds; guards against ReDoS on untrusted content
-
 T = TypeVar("T")
+
+
+class ViewerGrant(NamedTuple):
+    """Direct user and group view grants for a single document.
+
+    Named fields (rather than a bare 2-tuple) so ``viewer_ids`` and
+    ``viewer_group_ids`` can't be silently transposed at a call site — both
+    are ``list[int]``, so a positional swap would type-check cleanly.
+    """
+
+    viewer_ids: list[int]
+    viewer_group_ids: list[int]
 
 
 class SearchMode(StrEnum):
@@ -66,25 +82,16 @@ class SearchMode(StrEnum):
 def _extract_autocomplete_words(text_sources: list[str]) -> set[str]:
     """Extract and normalize words for autocomplete.
 
-    Splits on non-word characters (matching Tantivy's simple tokenizer), lowercases,
-    and ascii-folds each token. Uses the regex library with a timeout to guard against
-    ReDoS on untrusted document content.
+    Tokenizes with Tantivy's simple analyzer (simple -> lowercase -> ascii_fold)
+    so the extracted words match how document content is indexed, and runs the
+    whole pass in Rust. This replaces a Python regex scan plus per-token folding,
+    which dominated full-reindex CPU time. Tokenizing natively also removes the
+    ReDoS exposure of running a regex over untrusted content.
     """
     words = set()
     for text in text_sources:
-        if not text:
-            continue
-        try:
-            tokens = _WORD_RE.findall(text, timeout=_AUTOCOMPLETE_REGEX_TIMEOUT)
-        except TimeoutError:  # pragma: no cover
-            logger.warning(
-                "Autocomplete word extraction timed out for a text source; skipping.",
-            )
-            continue
-        for token in tokens:
-            normalized = ascii_fold(token.lower())
-            if normalized:
-                words.add(normalized)
+        if text:
+            words.update(autocomplete_tokens(text))
     return words
 
 
@@ -213,7 +220,27 @@ class WriteBatch:
                     )
                     time.sleep(sleep_s)
 
-        self._raw_writer = self._backend._index.writer()
+            # Open a fresh Index (and thus a fresh Tantivy ManagedDirectory)
+            # for the write, rather than reusing the process-local cached
+            # index. ManagedDirectory loads its GC bookkeeping (.managed.json)
+            # once, at construction, and never re-reads it; paperless runs
+            # several long-lived processes (Granian workers, Celery workers)
+            # that take turns writing under the file lock above. A cached,
+            # long-lived writer index would carry a stale managed-files view
+            # and, on commit, overwrite .managed.json with that stale view -
+            # permanently losing track of segment files other processes
+            # registered in the meantime, so they can never be garbage
+            # collected. Reopening fresh here always picks up the current
+            # on-disk state. The long-lived self._backend._index is used for
+            # reads only and is reloaded (not reopened) after commit below.
+            write_index = tantivy.Index(
+                build_schema(),
+                path=str(self._backend._path),
+            )
+            register_tokenizers(write_index, settings.SEARCH_LANGUAGE)
+            self._raw_writer = write_index.writer()
+        else:
+            self._raw_writer = self._backend._index.writer()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -236,11 +263,7 @@ class WriteBatch:
             if self._lock is not None:
                 self._lock.release()
 
-    def add_or_update(
-        self,
-        document: Document,
-        effective_content: str | None = None,
-    ) -> None:
+    def add_or_update(self, document: Document) -> None:
         """
         Add or update a document in the batch.
 
@@ -250,11 +273,9 @@ class WriteBatch:
 
         Args:
             document: Django Document instance to index
-            effective_content: Override document.content for indexing (used when
-                re-indexing with newer OCR text from document versions)
         """
         self.remove(document.pk)
-        doc = self._backend._build_tantivy_doc(document, effective_content)
+        doc = self._backend._build_tantivy_doc(document)
         self._writer.add_document(doc)
 
     def remove(self, doc_id: int) -> None:
@@ -374,7 +395,7 @@ class TantivyBackend:
     ) -> tantivy.Query:
         """Wrap a query with a permission filter if the user is not a superuser."""
         if user is not None:
-            permission_filter = build_permission_filter(self._schema, user)
+            permission_filter = self._build_permission_filter(user)
             return tantivy.Query.boolean_query(
                 [
                     (tantivy.Occur.Must, query),
@@ -383,19 +404,32 @@ class TantivyBackend:
             )
         return query
 
+    def _build_permission_filter(self, user: AbstractUser) -> tantivy.Query:
+        """Build a filter using the user's current group memberships."""
+        group_ids = user.groups.values_list("pk", flat=True)
+        return build_permission_filter(
+            self._schema,
+            user,
+            viewer_group_ids=group_ids,
+        )
+
     def _build_tantivy_doc(
         self,
         document: Document,
-        effective_content: str | None = None,
+        viewer_ids: list[int] | None = None,
+        viewer_group_ids: list[int] | None = None,
     ) -> tantivy.Document:
         """Build a tantivy Document from a Django Document instance.
 
-        ``effective_content`` overrides ``document.content`` for indexing —
-        used when re-indexing a root document with a newer version's OCR text.
+        A root document is indexed with its effective content, i.e. the newest
+        version's OCR text, so it is never indexed with its own outdated text.
+        Annotate the queryset with ``annotate_effective_content`` when indexing
+        more than a couple of documents, to resolve that without a query each.
         """
-        content = (
-            effective_content if effective_content is not None else document.content
-        )
+        from guardian.shortcuts import get_groups_with_perms
+        from guardian.shortcuts import get_users_with_perms
+
+        content = document.get_effective_content() or ""
 
         doc = tantivy.Document()
 
@@ -405,10 +439,14 @@ class TantivyBackend:
         doc.add_text("title", document.title)
         doc.add_text("title_sort", document.title)
         doc.add_text("simple_title", document.title)
-        doc.add_text("bigram_title", document.title)
         doc.add_text("content", content)
-        doc.add_text("bigram_content", content)
         doc.add_text("simple_content", content)
+        # Bigram (character-ngram) fields exist for CJK substring search,
+        # no need to bloat the bigram index with latin characters.
+        if cjk_title := extract_cjk_text(document.title):
+            doc.add_text("bigram_title", cjk_title)
+        if content and (cjk_content := extract_cjk_text(content)):
+            doc.add_text("bigram_content", cjk_content)
 
         # Original filename - only add if not None/empty
         if document.original_filename:
@@ -418,14 +456,16 @@ class TantivyBackend:
         if document.correspondent:
             doc.add_text("correspondent", document.correspondent.name)
             doc.add_text("correspondent_sort", document.correspondent.name)
-            doc.add_text("bigram_correspondent", document.correspondent.name)
+            if cjk_corr := extract_cjk_text(document.correspondent.name):
+                doc.add_text("bigram_correspondent", cjk_corr)
             doc.add_unsigned("correspondent_id", document.correspondent_id)
 
         # Document type
         if document.document_type:
             doc.add_text("document_type", document.document_type.name)
             doc.add_text("type_sort", document.document_type.name)
-            doc.add_text("bigram_document_type", document.document_type.name)
+            if cjk_type := extract_cjk_text(document.document_type.name):
+                doc.add_text("bigram_document_type", cjk_type)
             doc.add_unsigned("document_type_id", document.document_type_id)
 
         # Storage path
@@ -437,7 +477,8 @@ class TantivyBackend:
         tag_names: list[str] = []
         for tag in document.tags.all():
             doc.add_text("tag", tag.name)
-            doc.add_text("bigram_tag", tag.name)
+            if cjk_tag := extract_cjk_text(tag.name):
+                doc.add_text("bigram_tag", cjk_tag)
             doc.add_unsigned("tag_id", tag.pk)
             tag_names.append(tag.name)
 
@@ -448,7 +489,13 @@ class TantivyBackend:
         note_texts: list[str] = []
         for note in document.notes.all():
             num_notes += 1
-            doc.add_json("notes", {"note": note.note, "user": note.user.username})
+            doc.add_json(
+                "notes",
+                {
+                    "note": note.note,
+                    "user": note.user.username if note.user else None,
+                },
+            )
             note_texts.append(note.note)
         if note_texts:
             doc.add_text("notes_text", " ".join(note_texts))
@@ -492,12 +539,30 @@ class TantivyBackend:
             doc.add_unsigned("owner_id", document.owner_id)
 
         # Viewers with permission
-        users_with_perms = get_users_with_perms(
-            document,
-            only_with_perms_in=["view_document"],
-        )
-        for user in users_with_perms:
-            doc.add_unsigned("viewer_id", user.pk)
+        if viewer_ids is None:
+            users_with_perms = get_users_with_perms(
+                document,
+                only_with_perms_in=["view_document"],
+                with_group_users=False,
+            )
+            viewer_ids = list(
+                cast("QuerySet[User]", users_with_perms).values_list("id", flat=True),
+            )
+        for viewer_id in viewer_ids:
+            doc.add_unsigned("viewer_id", viewer_id)
+        if viewer_group_ids is None:
+            groups_with_perms = get_groups_with_perms(
+                document,
+                only_with_perms_in=["view_document"],
+            )
+            viewer_group_ids = list(
+                cast("QuerySet[Group]", groups_with_perms).values_list(
+                    "id",
+                    flat=True,
+                ),
+            )
+        for viewer_group_id in viewer_group_ids:
+            doc.add_unsigned("viewer_group_id", viewer_group_id)
 
         # Autocomplete words
         text_sources = [document.title, content]
@@ -512,11 +577,7 @@ class TantivyBackend:
 
         return doc
 
-    def add_or_update(
-        self,
-        document: Document,
-        effective_content: str | None = None,
-    ) -> None:
+    def add_or_update(self, document: Document) -> None:
         """
         Add or update a single document with file locking.
 
@@ -529,12 +590,11 @@ class TantivyBackend:
 
         Args:
             document: Django Document instance to index
-            effective_content: Override document.content for indexing
         """
         self._ensure_open()
         try:
             with self.batch_update(lock_timeout=_LOCK_TIMEOUT_SECONDS) as batch:
-                batch.add_or_update(document, effective_content)
+                batch.add_or_update(document)
         except SearchIndexLockError:
             logger.error(
                 "Search index lock exhausted for document %d after %d attempts; "
@@ -810,7 +870,7 @@ class TantivyBackend:
         # Intersect with permission filter so autocomplete words from
         # invisible documents don't leak to other users.
         if user is not None and not user.is_superuser:
-            permission_query = build_permission_filter(self._schema, user)
+            permission_query = self._build_permission_filter(user)
 
         matches = searcher.terms_with_prefix(
             "autocomplete_word",
@@ -866,8 +926,24 @@ class TantivyBackend:
         final_query = self._apply_permission_filter(mlt_query, user)
 
         effective_limit = limit if limit is not None else searcher.num_docs
-        # Fetch one extra to account for excluding the original document
-        results = searcher.search(final_query, limit=effective_limit + 1)
+        try:
+            # Fetch one extra to account for excluding the original document
+            results = searcher.search(final_query, limit=effective_limit + 1)
+        except BaseException:  # pragma: no cover
+            # Tantivy 0.26 panics in BM25 idf scoring when the index holds
+            # soft-deleted documents (doc_freq can exceed the alive doc count),
+            # which only surfaces for the More Like This query. The panic crosses
+            # the pyo3 boundary as a `pyo3_runtime.PanicException` — a
+            # BaseException, not an Exception — so catch BaseException and degrade
+            # to "no similar documents" instead of bubbling a 500 to the client.
+            # Fixed upstream: https://github.com/quickwit-oss/tantivy/pull/2964
+            # Remove once the bundled tantivy includes that fix.
+            logger.warning(
+                "More Like This scoring panicked (likely stale tantivy segment "
+                "stats after deletions); returning no results. A search index "
+                "reindex will rebuild consistent statistics.",
+            )
+            return []
 
         addrs = [addr for _score, addr in results.hits]
         all_ids = cast("list[int]", searcher.fast_field_values("id", addrs))
@@ -896,7 +972,8 @@ class TantivyBackend:
     def rebuild(
         self,
         documents: QuerySet[Document],
-        iter_wrapper: IterWrapper[Document] = identity,
+        iter_wrapper: IterWrapper[tuple[Document, ViewerGrant]] = identity,
+        writer_heap_bytes: int = 512_000_000,
     ) -> None:
         """
         Rebuild the entire search index from scratch.
@@ -907,7 +984,12 @@ class TantivyBackend:
         Args:
             documents: QuerySet of Document instances to index
             iter_wrapper: Optional wrapper function for progress tracking
-                (e.g., progress bar). Should yield each document unchanged.
+                (e.g., progress bar). Wraps an iterable of
+                ``(document, (viewer_ids, viewer_group_ids))`` pairs and should yield
+                each unchanged, advancing one step per document.
+            writer_heap_bytes: Tantivy writer memory budget (split across the
+                writer's threads). Larger values buffer more docs in RAM before
+                flushing a segment, deferring merge work; they do not avoid it.
         """
         # Create new index (on-disk or in-memory)
         if self._path is not None:
@@ -922,13 +1004,19 @@ class TantivyBackend:
         old_index, old_schema = self._raw_index, self._raw_schema
         self._raw_index = new_index
         self._raw_schema = new_index.schema
-
+        # Stream documents one-by-one (so the progress bar advances per
+        # document) while fetching viewer permissions one SQL query per chunk.
+        # The stream is Sized, so iter_wrapper can still discover the total.
+        documents_stream = _DocumentViewerStream(documents, chunk_size=1000)
         try:
-            writer = new_index.writer()
-            for document in iter_wrapper(documents):
+            writer = new_index.writer(heap_size=writer_heap_bytes)
+            for document, (viewer_ids, viewer_group_ids) in iter_wrapper(
+                documents_stream,
+            ):
                 doc = self._build_tantivy_doc(
                     document,
-                    document.get_effective_content(),
+                    viewer_ids=viewer_ids,
+                    viewer_group_ids=viewer_group_ids,
                 )
                 writer.add_document(doc)
             writer.commit()
@@ -941,6 +1029,100 @@ class TantivyBackend:
             self._raw_index = old_index
             self._raw_schema = old_schema
             raise
+
+
+def chunked(iterable, size):
+    iterator = iter(iterable)
+    while chunk := list(islice(iterator, size)):
+        yield chunk
+
+
+_EMPTY_VIEWER_GRANT: Final[ViewerGrant] = ViewerGrant(
+    viewer_ids=[],
+    viewer_group_ids=[],
+)
+
+
+class _DocumentViewerStream(QuerySetStream["Document"]):
+    """Yield document permission data while batch-loading grants.
+
+    Viewer permissions are fetched in batches (see
+    ``_bulk_get_viewer_permissions``), but documents are yielded individually so a
+    progress bar wrapped around this stream advances per document rather than
+    jumping a whole chunk at a time. ``__len__`` (inherited from
+    ``QuerySetStream``) lets the progress helper still discover the total (it
+    inspects ``QuerySet``/``Sized``).
+
+    The viewer and group ids travel with each document in the yielded pair
+    rather than through a separate mutable attribute, so the pairing survives
+    regardless of how ``iter_wrapper`` consumes the stream (buffering,
+    batching, etc.) — there is no reliance on the caller advancing this
+    generator in lock-step.
+    """
+
+    def __iter__(self) -> Iterator[tuple[Document, ViewerGrant]]:
+        # iterator(chunk_size=…) streams from a server-side cursor instead of
+        # materialising the whole queryset in memory; since Django 4.1 it still
+        # honours prefetch_related, running the prefetches one batch at a time.
+        documents = self._queryset.iterator(chunk_size=self._chunk_size)
+        for chunk in chunked(documents, self._chunk_size):
+            grants_by_pk = _bulk_get_viewer_permissions([doc.pk for doc in chunk])
+            for doc in chunk:
+                yield doc, grants_by_pk.get(doc.pk, _EMPTY_VIEWER_GRANT)
+
+
+def _bulk_get_viewer_permissions(
+    doc_pks: Sequence[int],
+) -> dict[int, ViewerGrant]:
+    """Fetch direct user and group view grants for a batch of documents, keyed by pk.
+
+    Group grants remain group IDs in the index so permission checks use the
+    requesting user's current memberships. Expanding groups to user IDs here
+    would leave stale access behind after a user is removed from a group.
+    """
+    from collections import defaultdict
+
+    from django.contrib.contenttypes.models import ContentType
+    from guardian.models import GroupObjectPermission
+    from guardian.models import UserObjectPermission
+
+    from documents.models import Document
+
+    # get_for_model is cached by Django, so this costs at most one query total.
+    ct = ContentType.objects.get_for_model(Document)
+    str_pks = [str(pk) for pk in doc_pks]
+
+    viewer_map: dict[int, set[int]] = defaultdict(set)
+    viewer_group_map: dict[int, set[int]] = defaultdict(set)
+
+    # Fold the permission lookup into the query via a join on codename instead
+    # of a separate Permission.objects.get(), which would otherwise run once per
+    # chunk during a full reindex.
+    user_qs = UserObjectPermission.objects.filter(
+        content_type=ct,
+        permission__content_type=ct,
+        permission__codename="view_document",
+        object_pk__in=str_pks,
+    ).values_list("object_pk", "user_id")
+    for object_pk, user_id in user_qs:
+        viewer_map[int(object_pk)].add(user_id)
+
+    group_qs = GroupObjectPermission.objects.filter(
+        content_type=ct,
+        permission__content_type=ct,
+        permission__codename="view_document",
+        object_pk__in=str_pks,
+    ).values_list("object_pk", "group_id")
+    for object_pk, group_id in group_qs:
+        viewer_group_map[int(object_pk)].add(group_id)
+
+    return {
+        object_pk: ViewerGrant(
+            viewer_ids=list(viewer_map.get(object_pk, ())),
+            viewer_group_ids=list(viewer_group_map.get(object_pk, ())),
+        )
+        for object_pk in viewer_map.keys() | viewer_group_map.keys()
+    }
 
 
 # Module-level singleton with proper thread safety

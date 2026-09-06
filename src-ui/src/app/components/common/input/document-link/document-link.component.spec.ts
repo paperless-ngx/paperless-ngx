@@ -2,7 +2,11 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NG_VALUE_ACCESSOR } from '@angular/forms'
-import { of, throwError } from 'rxjs'
+import { By } from '@angular/platform-browser'
+import { provideRouter } from '@angular/router'
+import { NgSelectComponent } from '@ng-select/ng-select'
+import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { of, Subject, throwError } from 'rxjs'
 import { FILTER_SIMPLE_TITLE } from 'src/app/data/filter-rule-type'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { DocumentLinkComponent } from './document-link.component'
@@ -33,10 +37,11 @@ describe('DocumentLinkComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [DocumentLinkComponent],
+      imports: [DocumentLinkComponent, NgxBootstrapIconsModule.pick(allIcons)],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
+        provideRouter([]),
       ],
     })
     documentService = TestBed.inject(DocumentService)
@@ -58,6 +63,25 @@ describe('DocumentLinkComponent', () => {
     })
     component.writeValue([1])
     expect(getSpy).toHaveBeenCalled()
+  })
+
+  it('should render loading and selected documents after async updates', async () => {
+    const result$ = new Subject<any>()
+    jest.spyOn(documentService, 'getFew').mockReturnValue(result$)
+
+    component.writeValue([1])
+    await fixture.whenStable()
+
+    const select = fixture.debugElement.query(By.directive(NgSelectComponent))
+      .componentInstance as NgSelectComponent
+    expect(select.loading()).toBe(true)
+
+    result$.next({ count: 1, all: [1], results: [documents[0]] })
+    result$.complete()
+    await fixture.whenStable()
+
+    expect(select.loading()).toBe(false)
+    expect(fixture.nativeElement.textContent).toContain(documents[0].title)
   })
 
   it('shoud maintain ordering of selected documents', () => {
@@ -127,6 +151,23 @@ describe('DocumentLinkComponent', () => {
     expect(component.selectedDocuments).toEqual([])
   })
 
+  it('should preserve and neutrally label unavailable document IDs', async () => {
+    jest.spyOn(documentService, 'getFew').mockReturnValue(
+      of({
+        count: 0,
+        all: [],
+        results: [],
+      })
+    )
+
+    component.writeValue([99])
+    await fixture.whenStable()
+
+    expect(component.selectedDocuments).toEqual([{ id: 99 }])
+    expect(fixture.nativeElement.textContent).toContain('Unavailable')
+    expect(fixture.nativeElement.textContent).not.toContain('Not found')
+  })
+
   it('should support unselect', () => {
     const getSpy = jest.spyOn(documentService, 'getFew')
     getSpy.mockImplementation((ids) => {
@@ -141,6 +182,15 @@ describe('DocumentLinkComponent', () => {
     component.unselect({ id: 23 })
     fixture.detectChanges()
     expect(component.selectedDocuments).toEqual([documents[1]])
+  })
+
+  it('should not unselect documents when disabled', () => {
+    component.disabled = true
+    component.selectedDocuments = [documents[0]]
+
+    component.unselect(documents[0])
+
+    expect(component.selectedDocuments).toEqual([documents[0]])
   })
 
   it('should use correct compare, trackBy functions', () => {

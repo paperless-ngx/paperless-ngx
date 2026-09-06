@@ -7,7 +7,7 @@
   >
   @if (activeManagementList) {
     <div ngbDropdown class="btn-group flex-fill d-sm-none">
-      <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle>
+      <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle aria-label="Select" i18n-aria-label>
         <i-bs name="text-indent-left"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Select</ng-container></div>
         @if (activeManagementList.hasSelection) {
           <pngx-clearable-badge [selected]="activeManagementList.hasSelection" [number]="activeManagementList.selectedCount" (cleared)="activeManagementList.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
@@ -51,15 +51,15 @@
       *pngxIfPermissions="{ action: PermissionAction.Add, type: activeManagementList.permissionType }">
       <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Create</ng-container>
     </button>
-  } @else if (activeCustomFields) {
-    <button type="button" class="btn btn-sm btn-outline-primary" (click)="activeCustomFields.editField()"
+  } @else if (customFieldsActive) {
+    <button type="button" class="btn btn-sm btn-outline-primary" (click)="addCustomField()"
       *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.CustomField }">
       <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Add Field</ng-container>
     </button>
   }
 </pngx-page-header>
 
-<ul ngbNav #nav="ngbNav" (navChange)="onNavChange($event)" [(activeId)]="activeNavID" class="nav-underline">
+<ul ngbNav #nav="ngbNav" (navChange)="onNavChange($event)" [activeId]="activeNavID()" (activeIdChange)="activeNavID.set($event)" class="nav-underline">
   @for (section of visibleSections; track section.id) {
     <li [ngbNavItem]="section.id">
       <a ngbNavLink >
@@ -69,7 +69,7 @@
   }
 </ul>
 
-<div class="my-3 shadow-sm">
+<div class="my-3">
   <ng-container
     [ngComponentOutlet]="activeSection?.component"
     #activeOutlet="ngComponentOutlet"

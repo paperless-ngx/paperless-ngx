@@ -86,7 +86,7 @@ describe('LogsComponent', () => {
       throwError(() => new Error('error getting logs'))
     )
     component.reloadLogs()
-    expect(component.logs).toHaveLength(0)
+    expect(component.logs()).toHaveLength(0)
   })
 
   it('should auto refresh, allow toggle', () => {
@@ -97,7 +97,7 @@ describe('LogsComponent', () => {
     jest.advanceTimersByTime(6000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
 
-    component.autoRefreshEnabled = false
+    component.autoRefreshEnabled.set(false)
     jest.advanceTimersByTime(6000)
     expect(reloadSpy).toHaveBeenCalledTimes(2)
   })
@@ -112,9 +112,9 @@ describe('LogsComponent', () => {
   })
 
   it('should update jump to bottom visibility on scroll', () => {
-    component.showJumpToBottom = false
+    component.showJumpToBottom.set(false)
     jest.spyOn(component as any, 'isNearBottom').mockReturnValue(false)
     component.onScroll()
-    expect(component.showJumpToBottom).toBe(true)
+    expect(component.showJumpToBottom()).toBe(true)
   })
 })

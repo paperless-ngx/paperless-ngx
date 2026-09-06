@@ -293,7 +293,7 @@ def check_deprecated_db_settings(
                     f"{var_name} is no longer supported and will be removed in v3.2. "
                     f"Set the equivalent option via PAPERLESS_DB_OPTIONS instead. "
                     f'Example: PAPERLESS_DB_OPTIONS=\'{{"{db_option_key}": "<value>"}}\'. '
-                    "See https://docs.paperless-ngx.com/migration/ for the full reference."
+                    "See https://docs.paperless-ngx.com/migration-v3/ for the full reference."
                 ),
                 id="paperless.W001",
             ),
@@ -335,20 +335,6 @@ def check_deprecated_v2_ocr_env_vars(
         )
 
     return warnings
-
-
-@register()
-def check_remote_parser_configured(app_configs: Any, **kwargs: Any) -> list[Error]:
-    if settings.REMOTE_OCR_ENGINE == "azureai" and not (
-        settings.REMOTE_OCR_ENDPOINT and settings.REMOTE_OCR_API_KEY
-    ):
-        return [
-            Error(
-                "Azure AI remote parser requires endpoint and API key to be configured.",
-            ),
-        ]
-
-    return []
 
 
 def get_tesseract_langs():

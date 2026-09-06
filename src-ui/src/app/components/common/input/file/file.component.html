@@ -22,7 +22,7 @@
               </button>
             </div>
         }
-        <input #inputField type="hidden" class="form-control small" [(ngModel)]="value" [disabled]="true">
+        <input #inputField type="hidden" class="form-control small" [(ngModel)]="value" [ngModelOptions]="{standalone: true}" [disabled]="true">
         @if (hint) {
             <small class="form-text text-muted" [innerHTML]="hint"></small>
         }

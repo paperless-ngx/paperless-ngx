@@ -1,12 +1,7 @@
 import { DatePipe } from '@angular/common'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
@@ -59,27 +54,32 @@ describe('DatesDropdownComponent', () => {
     expect(settingsSpy).toHaveBeenCalled()
   })
 
-  it('should support date input, emit change', fakeAsync(() => {
+  it('should support date input, emit change', () => {
+    jest.useFakeTimers()
     let result: string
     component.createdDateFromChange.subscribe((date) => (result = date))
     const input: HTMLInputElement = fixture.nativeElement.querySelector('input')
     input.value = '5/30/2023'
     input.dispatchEvent(new Event('change'))
-    tick(500)
+    jest.advanceTimersByTime(500)
     expect(result).not.toBeNull()
-  }))
+    jest.useRealTimers()
+  })
 
-  it('should support date select, emit datesSet change', fakeAsync(() => {
+  it('should support date select, emit datesSet change', () => {
+    jest.useFakeTimers()
     let result: DateSelection
     component.datesSet.subscribe((date) => (result = date))
     const input: HTMLInputElement = fixture.nativeElement.querySelector('input')
     input.value = '5/30/2023'
     input.dispatchEvent(new Event('dateSelect'))
-    tick(500)
+    jest.advanceTimersByTime(500)
     expect(result).not.toBeNull()
-  }))
+    jest.useRealTimers()
+  })
 
-  it('should support relative dates', fakeAsync(() => {
+  it('should support relative dates', () => {
+    jest.useFakeTimers()
     let result: DateSelection
     component.datesSet.subscribe((date) => (result = date))
     component.createdRelativeDate = RelativeDate.WITHIN_1_WEEK // normally set by ngModel binding in dropdown
@@ -88,7 +88,7 @@ describe('DatesDropdownComponent', () => {
     } as any)
     component.addedRelativeDate = RelativeDate.WITHIN_1_WEEK // normally set by ngModel binding in dropdown
     component.onSetAddedRelativeDate({ id: RelativeDate.WITHIN_1_WEEK } as any)
-    tick(500)
+    jest.advanceTimersByTime(500)
     expect(result).toEqual({
       createdFrom: null,
       createdTo: null,
@@ -97,7 +97,8 @@ describe('DatesDropdownComponent', () => {
       addedTo: null,
       addedRelativeDateID: RelativeDate.WITHIN_1_WEEK,
     })
-  }))
+    jest.useRealTimers()
+  })
 
   it('should support report if active', () => {
     component.createdRelativeDate = RelativeDate.WITHIN_1_WEEK
@@ -177,11 +178,12 @@ describe('DatesDropdownComponent', () => {
     expect(eventSpy).toHaveBeenCalled()
   })
 
-  it('should support debounce', fakeAsync(() => {
+  it('should support debounce', () => {
+    jest.useFakeTimers()
     let result: DateSelection
     component.datesSet.subscribe((date) => (result = date))
     component.onChangeDebounce()
-    tick(500)
+    jest.advanceTimersByTime(500)
     expect(result).toEqual({
       createdFrom: null,
       createdTo: null,
@@ -190,5 +192,6 @@ describe('DatesDropdownComponent', () => {
       addedTo: null,
       addedRelativeDateID: null,
     })
-  }))
+    jest.useRealTimers()
+  })
 })

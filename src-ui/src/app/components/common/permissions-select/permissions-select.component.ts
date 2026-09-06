@@ -74,12 +74,22 @@ export class PermissionsSelectComponent
       ? inherited.map((p) => p.replace(/^\w+\./g, ''))
       : []
 
-    if (this._inheritedPermissions !== newInheritedPermissions) {
-      this._inheritedPermissions = newInheritedPermissions
-      this.writeValue(this.permissions) // updates visual checks etc.
-    }
+    const changed =
+      newInheritedPermissions.length !== this._inheritedPermissions.length ||
+      newInheritedPermissions.some(
+        (p) => !this._inheritedPermissions.includes(p)
+      )
 
-    this.updateDisabledStates()
+    if (changed) {
+      // skip inherited permissions, these are the explicitly set ones
+      this.permissions = this.getSelectedPermissions(
+        this.form.getRawValue()
+      ).filter((p) => !this._inheritedPermissions.includes(p))
+      this._inheritedPermissions = newInheritedPermissions
+      this.applyCheckedState()
+    } else {
+      this.updateDisabledStates()
+    }
   }
 
   inheritedWarning: string = $localize`Inherited from group`
@@ -106,20 +116,29 @@ export class PermissionsSelectComponent
     }
 
     this.permissions = permissions ?? []
-    const allPerms = this._inheritedPermissions.concat(this.permissions)
+    this.applyCheckedState()
+  }
 
-    allPerms.forEach((permissionStr) => {
-      const { actionKey, typeKey } =
-        this.permissionsService.getPermissionKeys(permissionStr)
+  // sets every checkbox from inherited + own perms
+  private applyCheckedState(): void {
+    const allPerms = new Set(
+      this._inheritedPermissions.concat(this.permissions)
+    )
 
-      if (actionKey && typeKey) {
-        this.form
-          .get(typeKey)
-          ?.get(actionKey)
-          ?.patchValue(true, { emitEvent: false })
-      }
-    })
     this.allowedTypes.forEach((type) => {
+      const typeGroup = this.form.get(type)
+      for (const action of Object.keys(PermissionAction)) {
+        typeGroup.get(action)?.patchValue(
+          allPerms.has(
+            this.permissionsService.getPermissionCode(
+              PermissionAction[action],
+              PermissionType[type]
+            )
+          ),
+          { emitEvent: false } // don't trigger valueChanges now
+        )
+      }
+
       if (this.typeHasAllActionsSelected(type)) {
         this.typesWithAllActions.add(type)
       } else {
@@ -150,26 +169,9 @@ export class PermissionsSelectComponent
 
   ngOnInit(): void {
     this.form.valueChanges.subscribe((newValue) => {
-      let permissions = []
-      Object.entries(newValue).forEach(([typeKey, typeValue]) => {
-        const selectedActions = Object.entries(typeValue).filter(
-          ([actionKey, actionValue]) =>
-            actionValue &&
-            this.isActionSupported(
-              PermissionType[typeKey],
-              PermissionAction[actionKey]
-            )
-        )
+      const permissions = this.getSelectedPermissions(newValue)
 
-        selectedActions.forEach(([actionKey]) => {
-          permissions.push(
-            (PermissionType[typeKey] as string).replace(
-              '%s',
-              PermissionAction[actionKey]
-            )
-          )
-        })
-
+      Object.keys(newValue).forEach((typeKey) => {
         if (this.typeHasAllActionsSelected(typeKey)) {
           this.typesWithAllActions.add(typeKey)
         } else {
@@ -267,6 +269,30 @@ export class PermissionsSelectComponent
     }
 
     return true
+  }
+
+  private getSelectedPermissions(formValue: object): string[] {
+    const permissions = []
+    Object.entries(formValue).forEach(([typeKey, typeValue]) => {
+      Object.entries(typeValue)
+        .filter(
+          ([actionKey, actionValue]) =>
+            actionValue &&
+            this.isActionSupported(
+              PermissionType[typeKey],
+              PermissionAction[actionKey]
+            )
+        )
+        .forEach(([actionKey]) => {
+          permissions.push(
+            this.permissionsService.getPermissionCode(
+              PermissionAction[actionKey],
+              PermissionType[typeKey]
+            )
+          )
+        })
+    })
+    return permissions
   }
 
   private typeHasAllActionsSelected(typeKey: string): boolean {

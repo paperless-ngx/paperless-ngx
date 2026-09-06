@@ -8,6 +8,7 @@ import {
   ViewChild,
   ViewChildren,
   inject,
+  signal,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
@@ -23,6 +24,7 @@ import {
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { pngxPopperOptions } from 'src/app/utils/popper-options'
+import { matchesSearchText } from 'src/app/utils/text-search'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 
@@ -64,14 +66,12 @@ export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissio
   @ViewChildren('button') buttons: QueryList<ElementRef>
 
   private customFields: CustomField[] = []
-  private unusedFields: CustomField[] = []
+  private readonly unusedFields = signal<CustomField[]>([])
   private keyboardIndex: number
 
   public get filteredFields(): CustomField[] {
-    return this.unusedFields.filter(
-      (f) =>
-        !this.filterText ||
-        f.name.toLowerCase().includes(this.filterText.toLowerCase())
+    return this.unusedFields().filter(
+      (f) => !this.filterText || matchesSearchText(f.name, this.filterText)
     )
   }
 
@@ -100,8 +100,10 @@ export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissio
   }
 
   private updateUnusedFields() {
-    this.unusedFields = this.customFields.filter(
-      (f) => !this.existingFields?.find((e) => e.field === f.id)
+    this.unusedFields.set(
+      this.customFields.filter(
+        (f) => !this.existingFields?.find((e) => e.field === f.id)
+      )
     )
   }
 

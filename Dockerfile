@@ -5,7 +5,7 @@
 # Purpose: Compiles the frontend
 # Notes:
 #  - Does PNPM stuff with Typescript and such
-FROM --platform=$BUILDPLATFORM docker.io/node:24-trixie-slim@sha256:50c3b2f6988dfc307b86e5301d69611af31f4789bdf232863b07d3b02fe55ae0 AS compile-frontend
+FROM --platform=$BUILDPLATFORM docker.io/node:24-trixie-slim AS compile-frontend
 
 COPY ./src-ui /src/src-ui
 
@@ -30,7 +30,7 @@ RUN set -eux \
 # Purpose: Installs s6-overlay and rootfs
 # Comments:
 #  - Don't leave anything extra in here either
-FROM ghcr.io/astral-sh/uv:0.11.6-python3.12-trixie-slim@sha256:711674b082f2fc5eb3d34a50dfc8456cc4900a51db1b6a0efed4e653c3cb430e AS s6-overlay-base
+FROM ghcr.io/astral-sh/uv:0.12.9-python3.14-trixie-slim AS s6-overlay-base
 
 WORKDIR /usr/src/s6
 
@@ -238,6 +238,10 @@ RUN set -eux \
     && chown --from root:root --changes --recursive paperless:paperless /usr/src/paperless \
   && echo "Making fontconfig cache writable for arbitrary container UIDs" \
     && chmod 1777 /var/cache/fontconfig \
+  && echo "Making /run world-writable for rootless operation" \
+    && chmod 1777 /run \
+  && echo "Removing setuid from s6-overlay-suexec for rootless compat" \
+    && chmod u-s /command/s6-overlay-suexec \
   && echo "Collecting static files" \
     && PAPERLESS_SECRET_KEY=build-time-dummy s6-setuidgid paperless python3 manage.py collectstatic --clear --no-input --link \
     && PAPERLESS_SECRET_KEY=build-time-dummy s6-setuidgid paperless python3 manage.py compilemessages \

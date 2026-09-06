@@ -45,6 +45,12 @@ class SanityCheckMessages:
 
     def __init__(self) -> None:
         self._messages: dict[int | None, list[MessageEntry]] = defaultdict(list)
+        self._document_pks: set[int] = set()
+        self._document_error_pks: set[int] = set()
+        self._document_warning_pks: set[int] = set()
+        self._document_info_pks: set[int] = set()
+        self._document_error_issue_count: int = 0
+        self._document_warning_issue_count: int = 0
         self.has_error: bool = False
         self.has_warning: bool = False
         self.has_info: bool = False
@@ -56,20 +62,33 @@ class SanityCheckMessages:
 
     # -- Recording ----------------------------------------------------------
 
+    def _add_document_issue(self, doc_pk: int, document_pks: set[int]) -> bool:
+        if doc_pk not in self._document_pks:
+            self._document_pks.add(doc_pk)
+            self.document_count += 1
+
+        if doc_pk in document_pks:
+            return False
+
+        document_pks.add(doc_pk)
+        return True
+
     def error(self, doc_pk: int | None, message: str) -> None:
         self._messages[doc_pk].append({"level": logging.ERROR, "message": message})
         self.has_error = True
         if doc_pk is not None:
-            self.document_count += 1
-            self.document_error_count += 1
+            self._document_error_issue_count += 1
+            if self._add_document_issue(doc_pk, self._document_error_pks):
+                self.document_error_count += 1
 
     def warning(self, doc_pk: int | None, message: str) -> None:
         self._messages[doc_pk].append({"level": logging.WARNING, "message": message})
         self.has_warning = True
 
         if doc_pk is not None:
-            self.document_count += 1
-            self.document_warning_count += 1
+            self._document_warning_issue_count += 1
+            if self._add_document_issue(doc_pk, self._document_warning_pks):
+                self.document_warning_count += 1
         else:
             # This is the only type of global message we do right now
             self.global_warning_count += 1
@@ -78,8 +97,10 @@ class SanityCheckMessages:
         self._messages[doc_pk].append({"level": logging.INFO, "message": message})
         self.has_info = True
 
-        if doc_pk is not None:
-            self.document_count += 1
+        if doc_pk is not None and self._add_document_issue(
+            doc_pk,
+            self._document_info_pks,
+        ):
             self.document_info_count += 1
 
     # -- Iteration / query --------------------------------------------------
@@ -105,8 +126,8 @@ class SanityCheckMessages:
     def total_issue_count(self) -> int:
         """Total number of error and warning messages across all documents and global."""
         return (
-            self.document_error_count
-            + self.document_warning_count
+            self._document_error_issue_count
+            + self._document_warning_issue_count
             + self.global_warning_count
         )
 

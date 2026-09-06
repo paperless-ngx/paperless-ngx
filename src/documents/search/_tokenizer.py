@@ -48,6 +48,9 @@ _LANGUAGE_MAP: dict[str, str] = {
 }
 
 SUPPORTED_LANGUAGES: frozenset[str] = frozenset(_LANGUAGE_MAP)
+# Document.title is max_length=128, so use 129 as the limit for
+# Tantivy's remove_long filter
+_TOKEN_REMOVE_LONG_LIMIT: Final[int] = 129
 
 
 def register_tokenizers(index: tantivy.Index, language: str | None) -> None:
@@ -77,10 +80,10 @@ def register_tokenizers(index: tantivy.Index, language: str | None) -> None:
 
 
 def _paperless_text(language: str | None) -> tantivy.TextAnalyzer:
-    """Main full-text tokenizer for content, title, etc: simple -> remove_long(65) -> lowercase -> ascii_fold [-> stemmer]"""
+    """Main full-text tokenizer for content, title, etc: simple -> remove_long(129) -> lowercase -> ascii_fold [-> stemmer]"""
     builder = (
         tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.simple())
-        .filter(tantivy.Filter.remove_long(65))
+        .filter(tantivy.Filter.remove_long(_TOKEN_REMOVE_LONG_LIMIT))
         .filter(tantivy.Filter.lowercase())
         .filter(tantivy.Filter.ascii_fold())
     )
@@ -119,12 +122,12 @@ def _bigram_analyzer() -> tantivy.TextAnalyzer:
 
 
 def _simple_search_analyzer() -> tantivy.TextAnalyzer:
-    """Tokenizer for simple substring search fields: non-whitespace chunks -> remove_long(65) -> lowercase -> ascii_fold."""
+    """Tokenizer for simple substring search fields: non-whitespace chunks -> remove_long(129) -> lowercase -> ascii_fold."""
     return (
         tantivy.TextAnalyzerBuilder(
             tantivy.Tokenizer.regex(r"\S+"),
         )
-        .filter(tantivy.Filter.remove_long(65))
+        .filter(tantivy.Filter.remove_long(_TOKEN_REMOVE_LONG_LIMIT))
         .filter(tantivy.Filter.lowercase())
         .filter(tantivy.Filter.ascii_fold())
         .build()
@@ -149,6 +152,23 @@ _ASCII_FOLD_ANALYZER: Final = (
 def simple_search_tokens(text: str) -> list[str]:
     """Tokenize a query string exactly as simple_title/simple_content are indexed."""
     return _SIMPLE_SEARCH_ANALYZER.analyze(text)
+
+
+# Autocomplete word extraction: tokenize -> lowercase -> ascii_fold in a single
+# Rust pass. Uses the simple tokenizer so extracted words match how document
+# content is actually indexed (the content tokenizer _paperless_text also uses
+# simple()), replacing a Python regex scan plus per-token folding.
+_AUTOCOMPLETE_ANALYZER: Final = (
+    tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.simple())
+    .filter(tantivy.Filter.lowercase())
+    .filter(tantivy.Filter.ascii_fold())
+    .build()
+)
+
+
+def autocomplete_tokens(text: str) -> list[str]:
+    """Tokenize text into normalized autocomplete words (lowercased, ascii-folded)."""
+    return _AUTOCOMPLETE_ANALYZER.analyze(text)
 
 
 def ascii_fold(text: str) -> str:

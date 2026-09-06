@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  inject,
+  signal,
+} from '@angular/core'
+import { toSignal } from '@angular/core/rxjs-interop'
 import {
   FormControl,
   FormGroup,
@@ -6,6 +14,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { map } from 'rxjs'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { User } from 'src/app/data/user'
 import { UserService } from 'src/app/services/rest/user.service'
@@ -27,26 +36,22 @@ export class PermissionsDialogComponent {
   activeModal = inject(NgbActiveModal)
   private userService = inject(UserService)
 
-  users: User[]
+  readonly users = toSignal(
+    this.userService.listAll().pipe(map((r) => r.results)),
+    { initialValue: undefined as User[] }
+  )
+  readonly title = signal($localize`Set permissions`)
+  readonly note = signal<string>(null)
+  readonly buttonsEnabled = signal(true)
   private o: ObjectWithPermissions = undefined
-
-  constructor() {
-    this.userService.listAll().subscribe((r) => (this.users = r.results))
-  }
 
   @Output()
   public confirmClicked = new EventEmitter()
 
   @Input()
-  title = $localize`Set permissions`
-
-  @Input()
-  note: string = null
-
-  @Input()
   set object(o: ObjectWithPermissions) {
     this.o = o
-    this.title = $localize`Edit permissions for ` + o['name']
+    this.title.set($localize`Edit permissions for ` + o['name'])
     this.form.patchValue({
       merge: true,
       permissions_form: {
@@ -64,8 +69,6 @@ export class PermissionsDialogComponent {
     permissions_form: new FormControl(),
     merge: new FormControl(true),
   })
-
-  buttonsEnabled: boolean = true
 
   get permissions() {
     return {

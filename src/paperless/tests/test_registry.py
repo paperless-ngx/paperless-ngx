@@ -468,6 +468,124 @@ class TestParserRegistryGetParserForFile:
         assert result is AcceptingBuiltin
 
 
+class TestParserRegistryRemoteParsers:
+    """Verify the allow_remote filter in ParserRegistry.get_parser_for_file()."""
+
+    @staticmethod
+    def _remote_parser_cls() -> type:
+        class RemoteParser:
+            name = "remote"
+            version = "1.0"
+            author = "A"
+            url = "https://example.com/remote"
+            uses_remote_service = True
+
+            @classmethod
+            def supported_mime_types(cls):
+                return {"text/plain": ".txt"}
+
+            @classmethod
+            def score(cls, mime_type, filename, path=None):
+                return 20
+
+        return RemoteParser
+
+    def test_remote_parser_wins_when_remote_allowed(
+        self,
+        dummy_parser_cls: type,
+    ) -> None:
+        """
+        GIVEN: A remote parser scoring 20 and a local parser scoring 10.
+        WHEN:  get_parser_for_file() is called with allow_remote=True.
+        THEN:  The remote parser is returned.
+        """
+        remote_parser_cls = self._remote_parser_cls()
+        registry = ParserRegistry()
+        registry.register_builtin(dummy_parser_cls)
+        registry.register_builtin(remote_parser_cls)
+
+        result = registry.get_parser_for_file(
+            "text/plain",
+            "readme.txt",
+            allow_remote=True,
+        )
+        assert result is remote_parser_cls
+
+    def test_remote_parser_skipped_when_remote_not_allowed(
+        self,
+        dummy_parser_cls: type,
+    ) -> None:
+        """
+        GIVEN: A remote parser scoring 20 and a local parser scoring 10.
+        WHEN:  get_parser_for_file() is called with allow_remote=False.
+        THEN:  The local parser is returned despite its lower score.
+        """
+        registry = ParserRegistry()
+        registry.register_builtin(dummy_parser_cls)
+        registry.register_builtin(self._remote_parser_cls())
+
+        result = registry.get_parser_for_file(
+            "text/plain",
+            "readme.txt",
+            allow_remote=False,
+        )
+        assert result is dummy_parser_cls
+
+    def test_no_parser_when_only_remote_available_and_not_allowed(self) -> None:
+        """
+        GIVEN: A registry whose only candidate declares uses_remote_service.
+        WHEN:  get_parser_for_file() is called with allow_remote=False.
+        THEN:  None is returned — the remote parser is never used as a
+               fallback when remote processing was not requested.
+        """
+        registry = ParserRegistry()
+        registry.register_builtin(self._remote_parser_cls())
+
+        result = registry.get_parser_for_file(
+            "text/plain",
+            "readme.txt",
+            allow_remote=False,
+        )
+        assert result is None
+
+    def test_parser_without_attribute_treated_as_local(
+        self,
+        dummy_parser_cls: type,
+    ) -> None:
+        """
+        GIVEN: A third-party parser predating uses_remote_service, so it does
+               not declare the attribute at all.
+        WHEN:  get_parser_for_file() is called with allow_remote=False.
+        THEN:  It is still considered, i.e. treated as fully local, rather
+               than raising AttributeError.
+        """
+        assert not hasattr(dummy_parser_cls, "uses_remote_service")
+
+        registry = ParserRegistry()
+        registry.register_builtin(dummy_parser_cls)
+
+        result = registry.get_parser_for_file(
+            "text/plain",
+            "readme.txt",
+            allow_remote=False,
+        )
+        assert result is dummy_parser_cls
+
+    def test_remote_allowed_by_default(self) -> None:
+        """
+        GIVEN: A registry containing only a remote parser.
+        WHEN:  get_parser_for_file() is called without allow_remote.
+        THEN:  The remote parser is returned — callers that do not opt in to
+               the filter keep the previous behaviour.
+        """
+        remote_parser_cls = self._remote_parser_cls()
+        registry = ParserRegistry()
+        registry.register_builtin(remote_parser_cls)
+
+        result = registry.get_parser_for_file("text/plain", "readme.txt")
+        assert result is remote_parser_cls
+
+
 class TestDiscover:
     """Verify entrypoint discovery in ParserRegistry.discover()."""
 

@@ -61,7 +61,7 @@ class Command(PaperlessCommand):
         )
         table.add_column("Level", width=7, no_wrap=True)
         table.add_column("Document", min_width=20)
-        table.add_column("Issue", ratio=1)
+        table.add_column("Issue", ratio=1, overflow="fold")
 
         for doc_pk, doc_messages in messages.iter_messages():
             if doc_pk is not None:

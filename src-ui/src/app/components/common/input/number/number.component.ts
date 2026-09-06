@@ -37,6 +37,7 @@ export class NumberComponent extends AbstractInputComponent<number> {
     this.documentService.getNextAsn().subscribe((nextAsn) => {
       this.value = nextAsn
       this.onChange(this.value)
+      this.changeDetector.markForCheck()
     })
   }
 

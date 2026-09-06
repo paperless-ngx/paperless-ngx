@@ -8,3 +8,14 @@
         width: 0.6rem;
     }
 }
+
+.list-group {
+  --bs-list-group-border-color: color-mix(in srgb, var(--bs-border-color) 58%, transparent);
+  --bs-list-group-bg: transparent;
+  border-radius: .6rem;
+  overflow: hidden;
+}
+
+.list-group-item {
+  padding: .7rem .8rem;
+}

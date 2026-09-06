@@ -146,8 +146,8 @@ describe('PDFEditorComponent', () => {
     const previewSpy = jest
       .spyOn(documentService, 'getPreviewUrl')
       .mockReturnValue('preview-version')
-    component.documentID = 3
-    component.versionID = 10
+    component.documentID.set(3)
+    component.versionID.set(10)
 
     expect(component.pdfSrc).toBe('preview-version')
     expect(previewSpy).toHaveBeenCalledWith(3, false, 10)

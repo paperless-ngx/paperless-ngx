@@ -1,5 +1,5 @@
 import { AsyncPipe, KeyValuePipe, TitleCasePipe } from '@angular/common'
-import { Component, Input, OnInit, inject } from '@angular/core'
+import { Component, Input, OnInit, inject, signal } from '@angular/core'
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Observable, first, map, of, shareReplay } from 'rxjs'
@@ -26,11 +26,11 @@ import { UserService } from 'src/app/services/rest/user.service'
   ],
 })
 export class DocumentHistoryComponent implements OnInit {
-  private documentService = inject(DocumentService)
-  private correspondentService = inject(CorrespondentService)
-  private storagePathService = inject(StoragePathService)
-  private documentTypeService = inject(DocumentTypeService)
-  private userService = inject(UserService)
+  private readonly documentService = inject(DocumentService)
+  private readonly correspondentService = inject(CorrespondentService)
+  private readonly storagePathService = inject(StoragePathService)
+  private readonly documentTypeService = inject(DocumentTypeService)
+  private readonly userService = inject(UserService)
 
   public AuditLogAction = AuditLogAction
 
@@ -44,8 +44,8 @@ export class DocumentHistoryComponent implements OnInit {
     }
   }
 
-  public loading: boolean = true
-  public entries: AuditLogEntry[] = []
+  readonly loading = signal(true)
+  readonly entries = signal<AuditLogEntry[]>([])
 
   private readonly prettyNameCache = new Map<string, Observable<string>>()
 
@@ -55,10 +55,10 @@ export class DocumentHistoryComponent implements OnInit {
 
   private loadHistory(): void {
     if (this._documentId) {
-      this.loading = true
+      this.loading.set(true)
       this.documentService.getHistory(this._documentId).subscribe((entries) => {
-        this.entries = entries
-        this.loading = false
+        this.entries.set(entries)
+        this.loading.set(false)
       })
     }
   }
@@ -70,7 +70,7 @@ export class DocumentHistoryComponent implements OnInit {
       return cached
     }
 
-    const idInt = parseInt(id, 10)
+    const idInt = Number.parseInt(id, 10)
     const fallback$ = of(id)
 
     let result$: Observable<string>

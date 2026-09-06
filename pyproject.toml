@@ -1,6 +1,6 @@
 [project]
 name = "paperless-ngx"
-version = "3.0.0"
+version = "3.1.3"
 description = "A community-supported supercharged document management system: scan, index and archive all your physical documents"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -16,12 +16,12 @@ classifiers = [
 dependencies = [
   "azure-ai-documentintelligence>=1.0.2",
   "babel>=2.17",
-  "bleach~=6.3.0",
+  "bleach~=6.4.0",
   "celery[redis]~=5.6.2",
   "channels~=4.2",
   "channels-redis~=4.2",
   "concurrent-log-handler~=0.9.25",
-  "dateparser~=1.2",
+  "dateparser~=1.4",
   # WARNING: django does not use semver.
   #          Only patch versions are guaranteed to not introduce breaking changes.
   "django~=5.2.13",
@@ -32,35 +32,32 @@ dependencies = [
   "django-cors-headers~=4.9.0",
   "django-extensions~=4.1",
   "django-filter~=25.1",
-  "django-guardian~=3.3.0",
+  "django-guardian~=3.3.3",
   "django-multiselectfield~=1.0.1",
   "django-rich~=2.2.0",
   "django-soft-delete~=1.0.18",
   "django-treenode>=0.24",
   "djangorestframework~=3.16",
-  "djangorestframework-guardian~=0.4.0",
-  "drf-spectacular~=0.28",
-  "drf-spectacular-sidecar~=2026.5.1",
+  "drf-spectacular~=0.30",
+  "drf-spectacular-sidecar~=2026.7.1",
   "drf-writable-nested~=0.7.1",
-  "faiss-cpu>=1.10",
-  "filelock~=3.29.0",
-  "flower~=2.0.1",
-  "gotenberg-client~=0.14.0",
-  "httpx-oauth~=0.16",
-  "ijson>=3.2",
-  "imap-tools~=1.13.0",
-  "jinja2~=3.1.5",
+  "filelock~=3.32.0",
+  "flower>=2.0.1,<2.2",
+  "gotenberg-client[httpx]~=1.0",
+  "httpx-oauth~=0.17",
+  "ijson>=3.5.1",
+  "imap-tools~=1.14.0",
+  "jinja2~=3.1.6",
   "langdetect~=1.0.9",
-  "llama-index-core>=0.14.21",
+  "llama-index-core>=0.14.23",
   "llama-index-embeddings-huggingface>=0.6.1",
   "llama-index-embeddings-ollama>=0.9",
   "llama-index-embeddings-openai-like>=0.2.2",
   "llama-index-llms-ollama>=0.9.1",
   "llama-index-llms-openai-like>=0.7.1",
-  "llama-index-vector-stores-faiss>=0.5.2",
-  "nltk~=3.9.1",
-  "ocrmypdf~=17.4.2",
-  "openai>=2.32",
+  "nltk~=3.10.0",
+  "ocrmypdf>=17.7,<17.11",
+  "openai>=2.48",
   "pathvalidate~=3.3.1",
   "pdf2image~=1.17.0",
   "python-dateutil~=2.9.0",
@@ -69,30 +66,31 @@ dependencies = [
   "python-ipware~=3.0.0",
   "python-magic~=0.4.27",
   "rapidfuzz~=3.14.5",
-  "redis[hiredis]~=5.2.1",
-  "regex>=2026.4.4",
-  "scikit-learn~=1.8.0",
-  "sentence-transformers>=5.4.1",
+  "redis[hiredis]~=6.4.0",
+  "regex>=2026.7.19",
+  "scikit-learn~=1.9.0",
+  "sentence-transformers>=5.6.1",
   "setproctitle~=1.3.4",
+  "sqlite-vec==0.1.9",
   "tantivy~=0.26.0",
-  "tika-client~=0.11.0",
-  "torch~=2.11.0",
-  "watchfiles>=1.1.1",
+  "tika-client[httpx]~=1.0",
+  "torch~=2.13.0",
+  "watchfiles>=1.2",
   "whitenoise~=6.11",
-  "zxing-cpp~=3.0.0",
+  "zxing-cpp~=3.1.0",
 ]
 [project.optional-dependencies]
 mariadb = [
   "mysqlclient~=2.2.7",
 ]
 postgres = [
-  "psycopg[c,pool]==3.3",
+  "psycopg[c,pool]==3.3.4",
   # Direct dependency for proper resolution of the pre-built wheels
-  "psycopg-c==3.3",
-  "psycopg-pool==3.3",
+  "psycopg-c==3.3.4",
+  "psycopg-pool==3.3.1",
 ]
 webserver = [
-  "granian[uvloop]~=2.7.0",
+  "granian[uvloop]>=2.7,<2.9",
 ]
 
 [dependency-groups]
@@ -102,25 +100,25 @@ dev = [
   { include-group = "testing" },
 ]
 docs = [
-  "zensical>=0.0.36",
+  "zensical>=0.0.51",
 ]
 lint = [
-  "prek~=0.3.10",
-  "ruff~=0.15.12",
+  "prek~=0.4.11",
+  "ruff~=0.16.1",
 ]
 testing = [
   "daphne",
   "factory-boy~=3.3.1",
-  "faker~=40.15.0",
+  "faker~=40.36.0",
   "imagehash",
-  "pytest~=9.0.3",
+  "pytest~=9.1.1",
   "pytest-cov~=7.1.0",
   "pytest-django~=4.12.0",
-  "pytest-env~=1.6.0",
+  "pytest-env~=1.7.0",
   "pytest-httpx",
   "pytest-mock~=3.15.1",
   # "pytest-randomly~=4.0.1",
-  "pytest-rerunfailures~=16.1",
+  "pytest-rerunfailures~=16.4",
   "pytest-sugar",
   "pytest-xdist~=3.8.0",
   "time-machine>=2.13",
@@ -155,19 +153,21 @@ environments = [
   "sys_platform == 'linux'",
 ]
 package = false
-[[tool.uv.index]]
-name = "pytorch-cpu"
-url = "https://download.pytorch.org/whl/cpu"
-explicit = true
 [tool.uv.sources]
 # Markers are chosen to select these almost exclusively when building the Docker image
 psycopg-c = [
-  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.0/psycopg_c-3.3.0-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
-  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.0/psycopg_c-3.3.0-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.14'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.14'" },
 ]
 torch = [
   { index = "pytorch-cpu" },
 ]
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [tool.ruff]
 target-version = "py311"
@@ -184,6 +184,7 @@ output-format = "grouped"
 line-ending = "lf"
 [tool.ruff.lint]
 # https://docs.astral.sh/ruff/rules/
+select = [ "E4", "E7", "E9", "F" ]
 extend-select = [
   "COM",  # https://docs.astral.sh/ruff/rules/#flake8-commas-com
   "DJ",   # https://docs.astral.sh/ruff/rules/#flake8-django-dj
@@ -246,50 +247,38 @@ per-file-ignores."src/documents/models.py" = [
 isort.force-single-line = true
 
 [tool.codespell]
-write-changes = true
-ignore-words-list = "criterias,afterall,valeu,ureue,equest,ure,assertIn,Oktober,commitish"
+ignore-words-list = "criterias,afterall,valeu,ureue,equest,ure,assertIn,Oktober,commitish,NIN,nin"
 skip = """\
   src-ui/src/locale/*,src-ui/pnpm-lock.yaml,src-ui/e2e/*,src/paperless_mail/tests/samples/*,src/paperless/tests/samples\
   /mail/*,src/documents/tests/samples/*,*.po,*.json\
   """
+write-changes = true
 
 [tool.pyproject-fmt]
 table_format = "long"
 
 [tool.mypy]
 mypy_path = "src"
+disallow_any_generics = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
 plugins = [
   "mypy_django_plugin.main",
   "mypy_drf_plugin.main",
 ]
-check_untyped_defs = true
-disallow_any_generics = true
-disallow_incomplete_defs = true
-disallow_untyped_defs = true
-warn_redundant_casts = true
-warn_unused_ignores = true
 
 [tool.pyrefly]
-search-path = [ "src" ]
 baseline = ".pyrefly-baseline.json"
 python-platform = "linux"
+search-path = [ "src" ]
 
 [tool.django-stubs]
 django_settings_module = "paperless.settings"
 
 [tool.pytest]
-minversion = "9.0"
-pythonpath = [ "src" ]
-strict_config = true
-strict_markers = true
-strict_parametrization_ids = true
-strict_xfail = true
-testpaths = [
-  "src/documents/tests/",
-  "src/paperless/tests/",
-  "src/paperless_mail/tests/",
-  "src/paperless_ai/tests",
-]
 addopts = [
   "--pythonwarnings=all",
   "--cov",
@@ -304,7 +293,6 @@ addopts = [
   "-o",
   "junit_family=legacy",
 ]
-norecursedirs = [ "src/locale/", ".venv/", "src-ui/" ]
 DJANGO_SETTINGS_MODULE = "paperless.settings"
 markers = [
   "live: Integration tests requiring external services (Gotenberg, Tika, nginx, etc)",
@@ -317,6 +305,19 @@ markers = [
   "search: Tests for the Tantivy search backend",
   "api: Tests for REST API endpoints",
 ]
+minversion = "9.0"
+norecursedirs = [ "src/locale/", ".venv/", "src-ui/" ]
+pythonpath = [ "src" ]
+strict_config = true
+strict_markers = true
+strict_parametrization_ids = true
+strict_xfail = true
+testpaths = [
+  "src/documents/tests/",
+  "src/paperless/tests/",
+  "src/paperless_mail/tests/",
+  "src/paperless_ai/tests",
+]
 
 [tool.pytest_env]
 PAPERLESS_SECRET_KEY = "test-secret-key-do-not-use-in-production"
@@ -326,12 +327,6 @@ PAPERLESS_CHANNELS_BACKEND = "channels.layers.InMemoryChannelLayer"
 # I don't think anything hits this, but just in case, basically infinite
 PAPERLESS_TOKEN_THROTTLE_RATE = "1000/min"
 
-[tool.coverage.report]
-exclude_also = [
-  "if settings.AUDIT_LOG_ENABLED:",
-  "if AUDIT_LOG_ENABLED:",
-  "if TYPE_CHECKING:",
-]
 [tool.coverage.run]
 source = [
   "src/",
@@ -341,6 +336,12 @@ omit = [
   "manage.py",
   "paperless/wsgi.py",
   "paperless/auth.py",
+]
+[tool.coverage.report]
+exclude_also = [
+  "if settings.AUDIT_LOG_ENABLED:",
+  "if AUDIT_LOG_ENABLED:",
+  "if TYPE_CHECKING:",
 ]
 
 [tool.mypy-baseline]

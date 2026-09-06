@@ -22,11 +22,11 @@
             <ng-template>
               <div class="card mb-2">
                 <div class="card-body p-2">
-                  @if (testLoading) {
+                  @if (testLoading()) {
                     <ng-container [ngTemplateOutlet]="loadingTemplate"></ng-container>
-                  } @else if (testResult) {
-                    <code>{{testResult}}</code>
-                  } @else if (testFailed) {
+                  } @else if (testResult()) {
+                    <code>{{testResult()}}</code>
+                  } @else if (testFailed()) {
                     <div class="text-danger" i18n>Path test failed</div>
                   } @else {
                     <div class="text-muted small" i18n>No document selected</div>
@@ -42,7 +42,7 @@
                 [compareWith]="compareDocuments"
                 [trackByFn]="trackByFn"
                 [minTermLength]="2"
-                [loading]="loading"
+                [loading]="loading()"
                 [typeahead]="documentsInput$"
                 (change)="testPath($event)">
                 <ng-template #loadingTemplate ng-loadingspinner-tmp>

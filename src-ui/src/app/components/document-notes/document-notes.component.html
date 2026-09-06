@@ -1,4 +1,4 @@
-@if (notes) {
+@if (notes()) {
   <div>
     <form [formGroup]="noteForm" class="needs-validation mt-3" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Note }" novalidate>
       <div class="form-group">
@@ -8,14 +8,14 @@
             </div>
       </div>
       <div class="form-group mt-2 d-flex justify-content-end align-items-center">
-        @if (networkActive) {
+        @if (networkActive()) {
           <div class="spinner-border spinner-border-sm fw-normal me-auto" role="status"></div>
         }
-        <button type="button" class="btn btn-primary btn-sm" [disabled]="networkActive || addDisabled" (click)="addNote()" i18n>Add note</button>
+        <button type="button" class="btn btn-primary btn-sm" [disabled]="networkActive() || addDisabled()" (click)="addNote()" i18n>Add note</button>
       </div>
     </form>
     <hr>
-      @for (note of notes; track note) {
+      @for (note of notes(); track note) {
         <div class="card border mb-3">
           <div class="card-body text-dark">
             <p class="card-text">{{note.note}}</p>

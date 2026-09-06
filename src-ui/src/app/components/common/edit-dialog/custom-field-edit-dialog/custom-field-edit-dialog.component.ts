@@ -149,7 +149,7 @@ export class CustomFieldEditDialogComponent
   }
 
   get typeFieldDisabled(): boolean {
-    return this.dialogMode === EditDialogMode.EDIT
+    return this.dialogMode() === EditDialogMode.EDIT
   }
 
   private updateSelectOptions() {

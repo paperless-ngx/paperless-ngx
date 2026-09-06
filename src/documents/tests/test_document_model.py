@@ -156,6 +156,40 @@ class TestDocument(TestCase):
         )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test")
 
+    def test_version_file_name_uses_root_document_metadata(self) -> None:
+        root_correspondent = Correspondent.objects.create(name="Root correspondent")
+        version_correspondent = Correspondent.objects.create(
+            name="Version correspondent",
+        )
+        root = Document.objects.create(
+            mime_type="application/pdf",
+            title="Root title",
+            created=date(2020, 12, 25),
+            correspondent=root_correspondent,
+        )
+        version = Document.objects.create(
+            mime_type="application/pdf",
+            title="Version title",
+            created=date(1990, 1, 1),
+            correspondent=version_correspondent,
+            root_document=root,
+            version_index=1,
+        )
+
+        self.assertEqual(
+            version.get_public_filename(),
+            "2020-12-25 Root correspondent Root title.pdf",
+        )
+
+        root.title = "Updated root title"
+        root.save(update_fields=("title",))
+        version.refresh_from_db()
+
+        self.assertEqual(
+            version.get_public_filename(),
+            "2020-12-25 Root correspondent Updated root title.pdf",
+        )
+
     def test_suggestion_content_uses_latest_version_content_for_root_documents(
         self,
     ) -> None:

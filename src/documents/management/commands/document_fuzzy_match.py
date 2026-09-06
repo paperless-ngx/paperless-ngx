@@ -55,7 +55,7 @@ class Command(PaperlessCommand):
             "--ratio",
             default=85.0,
             type=float,
-            help="Ratio to consider documents a match",
+            help="Ratio to consider documents a match (0.0 - 100.0)",
         )
         parser.add_argument(
             "--delete",
@@ -69,6 +69,17 @@ class Command(PaperlessCommand):
             action="store_true",
             help="Skip the confirmation prompt when used with --delete",
         )
+        parser.add_argument(
+            "--url",
+            default=None,
+            type=str,
+            help=(
+                "Base URL of the Paperless instance (e.g. "
+                "http://localhost:8000 or https://paperless.local). If set, matched "
+                "documents are shown as clickable (usually ctrl+click) links to "
+                "<url>/documents/<id>/details instead of by title."
+            ),
+        )
 
     def _render_results(
         self,
@@ -76,6 +87,7 @@ class Command(PaperlessCommand):
         *,
         opt_ratio: float,
         do_delete: bool,
+        base_url: str | None = None,
     ) -> list[int]:
         """Render match results as a Rich table. Returns list of PKs to delete."""
         if not matches:
@@ -88,13 +100,22 @@ class Command(PaperlessCommand):
             )
             return []
 
-        # Fetch titles for matched documents in a single query.
-        all_pks = {pk for m in matches for pk in (m.doc_one_pk, m.doc_two_pk)}
-        titles: dict[int, str] = dict(
-            Document.objects.filter(pk__in=all_pks)
-            .only("pk", "title")
-            .values_list("pk", "title"),
-        )
+        # Fetch titles for matched documents in a single query, unless we're
+        # going to show URLs instead.
+        titles: dict[int, str] = {}
+        if not base_url:
+            all_pks = {pk for m in matches for pk in (m.doc_one_pk, m.doc_two_pk)}
+            titles = dict(
+                Document.objects.filter(pk__in=all_pks)
+                .only("pk", "title")
+                .values_list("pk", "title"),
+            )
+
+        def _cell(pk: int) -> str:
+            if base_url:
+                doc_url = f"{base_url.rstrip('/')}/documents/{pk}/details"
+                return f"[link={doc_url}]{doc_url}[/link]"
+            return f"[dim]#{pk}[/dim] {titles.get(pk, 'Unknown')}"
 
         table = Table(
             title=f"Fuzzy Matches (threshold: {opt_ratio:.1f}%)",
@@ -124,8 +145,8 @@ class Command(PaperlessCommand):
 
             table.add_row(
                 str(i),
-                f"[dim]#{pk_a}[/dim] {titles.get(pk_a, 'Unknown')}",
-                f"[dim]#{pk_b}[/dim] {titles.get(pk_b, 'Unknown')}",
+                _cell(pk_a),
+                _cell(pk_b),
                 Text(f"{ratio:.1f}%", style=ratio_style),
             )
             maybe_delete_ids.append(pk_b)
@@ -208,6 +229,7 @@ class Command(PaperlessCommand):
             matches,
             opt_ratio=opt_ratio,
             do_delete=options["delete"],
+            base_url=options["url"],
         )
 
         if options["delete"] and maybe_delete_ids:

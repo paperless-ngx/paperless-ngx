@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core'
+import { Component, OnInit, inject, signal } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { FILTER_ASN } from '../../data/filter-rule-type'
 import { DocumentService } from '../../services/rest/document.service'
@@ -13,13 +13,13 @@ export class DocumentAsnComponent implements OnInit {
   private route = inject(ActivatedRoute)
   private router = inject(Router)
 
-  asn: string
+  readonly asn = signal<string>(undefined)
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((paramMap) => {
-      this.asn = paramMap.get('id')
+      this.asn.set(paramMap.get('id'))
       this.documentsService
-        .listAllFilteredIds([{ rule_type: FILTER_ASN, value: this.asn }])
+        .listAllFilteredIds([{ rule_type: FILTER_ASN, value: this.asn() }])
         .subscribe((documentId) => {
           if (documentId.length == 1) {
             this.router.navigate(['documents', documentId[0]])

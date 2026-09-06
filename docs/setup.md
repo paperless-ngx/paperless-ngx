@@ -142,7 +142,7 @@ a [superuser](usage.md#superusers) account.
 
     It is not possible to run the container rootless if additional languages are specified via `PAPERLESS_OCR_LANGUAGES`.
 
-If you want to run Paperless as a rootless container, set `user:` in `docker-compose.yml` to the UID and GID of your host user (use `id -u` and `id -g` to find these values). The container process starts directly as that user with no internal privilege remapping:
+If you want to run Paperless as a rootless container, set `user:` in `docker-compose.yml` to the UID and GID of your host user (use `id -u` and `id -g` to find these values). The container process starts directly as that user with no internal privilege remapping. Any UID and GID is supported:
 
 ```yaml
 webserver:
@@ -157,8 +157,8 @@ Do not combine this with `USERMAP_UID` or `USERMAP_GID`, which are intended for 
 Some file systems, such as NFS network shares, don't support file system
 notifications with `inotify`. When the consumption directory is on such a
 file system, Paperless-ngx will not pick up new files with the default
-configuration. Use [`PAPERLESS_CONSUMER_POLLING`](configuration.md#PAPERLESS_CONSUMER_POLLING)
-to enable polling and disable inotify. See [here](configuration.md#polling).
+configuration. Set [`PAPERLESS_CONSUMER_POLLING_INTERVAL`](configuration.md#PAPERLESS_CONSUMER_POLLING_INTERVAL)
+to a positive number to enable polling and disable native filesystem notifications.
 
 ## Bare Metal Install {#bare_metal}
 
@@ -178,7 +178,7 @@ to enable polling and disable inotify. See [here](configuration.md#polling).
     - `fonts-liberation` for generating thumbnails for plain text
       files
     - `imagemagick` >= 6 for PDF conversion
-    - `gnupg` for handling encrypted documents
+    - `gnupg` for decrypting GPG-encrypted email
     - `libpq-dev` for PostgreSQL
     - `libmagic-dev` for mime type detection
     - `mariadb-client` for MariaDB compile time
@@ -226,7 +226,8 @@ to enable polling and disable inotify. See [here](configuration.md#polling).
     build-essential python3-setuptools python3-wheel
     ```
 
-2.  Install `redis` >= 6.0 and configure it to start automatically.
+2.  Install a Redis-compatible broker (a current release of Valkey or
+    Redis) and configure it to start automatically.
 
 3.  Optional: Install `postgresql` and configure a database, user, and
     password for Paperless-ngx. If you do not wish to use PostgreSQL,
@@ -261,6 +262,14 @@ to enable polling and disable inotify. See [here](configuration.md#polling).
     and copy the contents to the home directory of the user you created
     earlier (`/opt/paperless`).
 
+    !!! note
+
+        If you are updating an existing bare-metal installation rather than
+        installing for the first time, see the
+        [bare metal update instructions](administration.md#bare-metal-updating)
+        instead -- extracting a new release on top of an old one can leave
+        behind stale files from the previous version.
+
     Optional: If you cloned the Git repository, you will need to
     compile the frontend yourself. See [here](development.md#front-end-development)
     and use the `build` step, not `serve`.
@@ -268,10 +277,10 @@ to enable polling and disable inotify. See [here](configuration.md#polling).
 6.  Configure Paperless-ngx. See [configuration](configuration.md) for details.
     Edit the included `paperless.conf` and adjust the settings to your
     needs. Required settings for getting Paperless-ngx running are:
-    - [`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS) should point to your Redis server, such as
+    - [`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS) should point to your broker, such as
       `redis://localhost:6379`.
-    - [`PAPERLESS_DBENGINE`](configuration.md#PAPERLESS_DBENGINE) is optional, and should be one of `postgres`,
-      `mariadb`, or `sqlite`
+    - [`PAPERLESS_DBENGINE`](configuration.md#PAPERLESS_DBENGINE) should be one of `postgresql`,
+      `mariadb`, or `sqlite`. PostgreSQL and MariaDB users must set this explicitly.
     - [`PAPERLESS_DBHOST`](configuration.md#PAPERLESS_DBHOST) should be the hostname on which your
       PostgreSQL server is running. Do not configure this to use
       SQLite instead. Also configure port, database name, user and
@@ -297,7 +306,7 @@ to enable polling and disable inotify. See [here](configuration.md#polling).
 
     !!! warning
 
-        Ensure your Redis instance [is secured](https://redis.io/docs/latest/operate/oss_and_stack/management/security/).
+        Ensure your broker instance [is secured](https://valkey.io/topics/security/).
 
 7.  Create the following directories if they do not already exist:
     - `/opt/paperless/media`
@@ -389,9 +398,9 @@ to enable polling and disable inotify. See [here](configuration.md#polling).
         `Require=paperless-webserver.socket` in the `webserver` script
         and configure `granian` to listen on port 80 (set `GRANIAN_PORT`).
 
-    These services rely on Redis and optionally the database server, but
+    These services rely on the broker and optionally the database server, but
     don't need to be started in any particular order. The example files
-    depend on Redis being started. If you use a database server, you
+    depend on the broker being started. If you use a database server, you
     should add additional dependencies.
 
     !!! note
@@ -407,22 +416,15 @@ to enable polling and disable inotify. See [here](configuration.md#polling).
         You may need to change the path in the files. Example:
         `ExecStart=/opt/paperless/.local/bin/celery --app paperless worker --loglevel INFO`
 
-12. Configure ImageMagick to allow processing of PDF documents. Most
-    distributions have this disabled by default, since PDF documents can
-    contain malware. If you don't do this, Paperless-ngx will fall back to
-    Ghostscript for certain steps such as thumbnail generation.
+12. Configure ImageMagick to allow processing of PDF documents and disable
+    formats that Paperless-ngx does not use. Most distributions disable PDF
+    processing by default, since PDF documents can contain malware. If you
+    don't enable it, Paperless-ngx will fall back to Ghostscript for certain
+    steps such as thumbnail generation.
 
-    Edit `/etc/ImageMagick-6/policy.xml` and adjust
-
-    ```
-    <policy domain="coder" rights="none" pattern="PDF" />
-    ```
-
-    to
-
-    ```
-    <policy domain="coder" rights="read|write" pattern="PDF" />
-    ```
+    Configure the active ImageMagick policy file (commonly
+    `/etc/ImageMagick-6/policy.xml` or `/etc/ImageMagick-7/policy.xml`) and
+    adjust similar to [the docker policy file](https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/refs/heads/main/docker/rootfs/etc/ImageMagick-6/paperless-policy.xml). You should also include restrictions as noted there.
 
 **Optional: Install the [jbig2enc](https://ocrmypdf.readthedocs.io/en/latest/jbig2.html) encoder.**
 This will reduce the size of generated PDF documents. You'll most likely need to compile this yourself, because this
@@ -448,6 +450,12 @@ development documentation.
 
 You can migrate to Paperless-ngx from Paperless-ng or from the original
 Paperless project.
+
+!!! note
+
+    Upgrading an existing Paperless-ngx installation from v2 to v3 has its own
+    breaking changes and required steps. See the [v3 migration guide](migration-v3.md)
+    before upgrading.
 
 <h3 id="migration_ng">Migrating from Paperless-ng</h3>
 
@@ -494,7 +502,7 @@ installation. Keep these points in mind:
   for other services, you might as well use it for Paperless as well.
 - The task scheduler of Paperless, which is used to execute periodic
   tasks such as email checking and maintenance, requires a
-  [Redis](https://redis.io/) message broker instance. The
+  Redis-compatible message broker instance (such as Valkey or Redis). The
   Docker Compose route takes care of that.
 - The layout of the folder structure for your documents and data
   remains the same, so you can plug your old Docker volumes into
@@ -582,16 +590,16 @@ commands as well.
 
 1.  Stop and remove the Paperless container.
 2.  If using an external database, stop that container.
-3.  Update Redis configuration.
+3.  Update broker configuration.
     1. If `REDIS_URL` is already set, change it to [`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS)
        and continue to step 4.
 
-    1. Otherwise, add a new Redis service in `docker-compose.yml`,
+    1. Otherwise, add a new broker service in `docker-compose.yml`,
        following [the example compose
        files](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose)
 
     1. Set the environment variable [`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS) so it points to
-       the new Redis container.
+       the new broker container.
 
 4.  Update user mapping.
     1. If set, change the environment variable `PUID` to `USERMAP_UID`.

@@ -1,5 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard'
-import { Component, Input, inject } from '@angular/core'
+import { Component, effect, inject, input, signal } from '@angular/core'
 import { Title } from '@angular/platform-browser'
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -14,42 +14,28 @@ import { environment } from 'src/environments/environment'
 })
 export class PageHeaderComponent {
   private titleService = inject(Title)
-  private clipboard = inject(Clipboard)
+  private readonly clipboard = inject(Clipboard)
 
-  private _title = ''
-  public copied: boolean = false
+  readonly id = input<number>(undefined)
+  readonly subTitle = input('')
+  readonly info = input<string>(undefined)
+  readonly infoLink = input<string>(undefined)
+  readonly loading = input(false)
+  readonly title = input('')
+  readonly copied = signal(false)
   private copyTimeout: any
 
-  @Input()
-  set title(title: string) {
-    this._title = title
-    this.titleService.setTitle(`${this.title} - ${environment.appTitle}`)
+  constructor() {
+    effect(() => {
+      this.titleService.setTitle(`${this.title()} - ${environment.appTitle}`)
+    })
   }
-
-  get title() {
-    return this._title
-  }
-
-  @Input()
-  id: number
-
-  @Input()
-  subTitle: string = ''
-
-  @Input()
-  info: string
-
-  @Input()
-  infoLink: string
-
-  @Input()
-  loading: boolean = false
 
   public copyID() {
-    this.copied = this.clipboard.copy(this.id.toString())
+    this.copied.set(this.clipboard.copy(this.id().toString()))
     clearTimeout(this.copyTimeout)
     this.copyTimeout = setTimeout(() => {
-      this.copied = false
+      this.copied.set(false)
     }, 3000)
   }
 }

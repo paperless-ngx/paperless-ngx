@@ -28,7 +28,7 @@ describe('LogoComponent', () => {
 
   it('should support extra classes', () => {
     expect(fixture.debugElement.queryAll(By.css('.foo'))).toHaveLength(0)
-    component.extra_classes = 'foo'
+    fixture.componentRef.setInput('extra_classes', 'foo')
     fixture.detectChanges()
     expect(fixture.debugElement.queryAll(By.css('.foo'))).toHaveLength(1)
   })
@@ -37,7 +37,7 @@ describe('LogoComponent', () => {
     expect(fixture.debugElement.query(By.css('svg')).attributes.style).toEqual(
       'height:6em'
     )
-    component.height = '10em'
+    fixture.componentRef.setInput('height', '10em')
     fixture.detectChanges()
     expect(fixture.debugElement.query(By.css('svg')).attributes.style).toEqual(
       'height:10em'

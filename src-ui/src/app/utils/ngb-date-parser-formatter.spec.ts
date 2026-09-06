@@ -57,6 +57,19 @@ describe('LocalizedDateParserFormatter', () => {
     expect(val).toEqual({ day: 4, month: 5, year: 2023 })
   })
 
+  it('should parse yyyy-mm-dd input with unpadded month or day by locale', () => {
+    let val = dateParserFormatter.parse('2023-5-4')
+    expect(val).toEqual({ day: 4, month: 5, year: 2023 })
+
+    settingsService.setLanguage('de-de') // dd.mm.yyyy
+    val = dateParserFormatter.parse('2023-5-4')
+    expect(val).toEqual({ day: 4, month: 5, year: 2023 })
+
+    settingsService.setLanguage('tr-tr') // yyyy-mm-dd
+    val = dateParserFormatter.parse('2023-5-4')
+    expect(val).toEqual({ day: 4, month: 5, year: 2023 })
+  })
+
   it('should parse date struct to string by locale', () => {
     const dateStruct = {
       day: 4,

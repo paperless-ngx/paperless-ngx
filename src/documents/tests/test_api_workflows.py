@@ -351,11 +351,45 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
 
         self.assertEqual(WorkflowTrigger.objects.count(), 1)
 
-    def test_api_create_invalid_assign_title(self) -> None:
+    def test_api_create_complex_assign_title(self) -> None:
         """
         GIVEN:
             - API request to create a workflow
-            - Invalid f-string for assign_title
+            - Template using Jinja flow control statements
+        WHEN:
+            - API is called
+        THEN:
+            - Workflow is created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 2",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "assign_title": '{# this is a comment #}foo{% if created_year < 2000 %}bar{% endif %}{{ "{:04d}".format(42) }}',
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.assertEqual(Workflow.objects.count(), 2)
+
+    def test_api_create_invalid_assign_title_syntax_error(self) -> None:
+        """
+        GIVEN:
+            - API request to create a workflow
+            - Invalid template for assign_title
         WHEN:
             - API is called
         THEN:
@@ -366,7 +400,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             self.ENDPOINT,
             json.dumps(
                 {
-                    "name": "Workflow 1",
+                    "name": "Workflow 2",
                     "order": 1,
                     "triggers": [
                         {
@@ -375,7 +409,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
                     ],
                     "actions": [
                         {
-                            "assign_title": "{created_year]",
+                            "assign_title": "{{created_year}",
                         },
                     ],
                 },
@@ -384,11 +418,367 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            "Invalid f-string detected",
+            "Template syntax error",
             response.data["actions"][0]["assign_title"][0],
         )
 
         self.assertEqual(Workflow.objects.count(), 1)
+
+    def test_api_create_invalid_assign_title_assertion_error(self) -> None:
+        """
+        GIVEN:
+            - API request to create a workflow
+            - Template using unknown filters for assign_title
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+            - No objects are created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 2",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "assign_title": "{{ created_year | foo }}",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            "Template assertion error",
+            response.data["actions"][0]["assign_title"][0],
+        )
+
+        self.assertEqual(Workflow.objects.count(), 1)
+
+    def test_api_create_invalid_assign_title_unknown_placeholder(self) -> None:
+        """
+        GIVEN:
+            - API request to create a workflow
+            - Template with unknown placeholders for assign_title
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+            - No objects are created
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 2",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "assign_title": "{{creation_year}}",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            "Template references unknown placeholders",
+            response.data["actions"][0]["assign_title"][0],
+        )
+        self.assertIn(
+            "creation_year",
+            response.data["actions"][0]["assign_title"][0],
+        )
+
+        self.assertEqual(Workflow.objects.count(), 1)
+
+    def test_api_create_remote_ocr_action_requires_consumption_trigger(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - API request to create a workflow with a remote OCR action
+            - No consumption started trigger, so the action could never run
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+            - No objects are created
+        """
+        existing_count = Workflow.objects.count()
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Remote OCR too late",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.REMOTE_OCR,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Workflow.objects.count(), existing_count)
+
+    def test_api_create_remote_ocr_action_with_consumption_trigger(self) -> None:
+        """
+        GIVEN:
+            - API request to create a workflow with a remote OCR action
+            - A consumption started trigger alongside another trigger type
+        WHEN:
+            - API is called
+        THEN:
+            - The workflow is created, the action applies to consumption only
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Remote OCR on consume",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "filter_filename": "*.pdf",
+                        },
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.REMOTE_OCR,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_api_partial_update_adds_remote_ocr_action(self) -> None:
+        """
+        GIVEN:
+            - An existing workflow with a consumption started trigger
+        WHEN:
+            - A partial update adds a remote OCR action without resubmitting triggers
+        THEN:
+            - The existing trigger is considered and the update succeeds
+        """
+        response = self.client.patch(
+            f"{self.ENDPOINT}{self.workflow.id}/",
+            json.dumps(
+                {
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.REMOTE_OCR,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            self.workflow.actions.get().type,
+            WorkflowAction.WorkflowActionType.REMOTE_OCR,
+        )
+
+    def test_api_partial_update_cannot_remove_remote_ocr_trigger(self) -> None:
+        """
+        GIVEN:
+            - An existing workflow with a remote OCR action
+            - An existing consumption started trigger
+        WHEN:
+            - A partial update replaces the trigger without resubmitting actions
+        THEN:
+            - The existing action is considered and the update is rejected
+        """
+        self.action.type = WorkflowAction.WorkflowActionType.REMOTE_OCR
+        self.action.save()
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{self.workflow.id}/",
+            json.dumps(
+                {
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(self.workflow.triggers.get(), self.trigger)
+
+    def _post_ai_suggestions_workflow(self, *, trigger_types, action: dict):
+        def trigger(trigger_type):
+            # consumption triggers require a filter of their own
+            if trigger_type == WorkflowTrigger.WorkflowTriggerType.CONSUMPTION:
+                return {"type": trigger_type, "filter_filename": "*.pdf"}
+            return {"type": trigger_type}
+
+        return self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Apply AI suggestions",
+                    "order": 1,
+                    "triggers": [trigger(t) for t in trigger_types],
+                    "actions": [
+                        {
+                            "type": WorkflowAction.WorkflowActionType.APPLY_AI_SUGGESTIONS,
+                            **action,
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+
+    def test_api_create_apply_ai_suggestions_action(self) -> None:
+        """
+        GIVEN:
+            - API request to create a workflow with an apply AI suggestions
+              action and a valid set of fields
+        WHEN:
+            - API is called
+        THEN:
+            - The workflow is created with the chosen options
+        """
+        response = self._post_ai_suggestions_workflow(
+            trigger_types=[WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED],
+            action={
+                "ai_suggestion_fields": ["title", "tags", "correspondent"],
+                "ai_create_missing": True,
+                "ai_overwrite_existing": True,
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        action = Workflow.objects.get(name="Apply AI suggestions").actions.first()
+        self.assertEqual(
+            action.ai_suggestion_fields,
+            ["title", "tags", "correspondent"],
+        )
+        self.assertTrue(action.ai_create_missing)
+        self.assertTrue(action.ai_overwrite_existing)
+
+    def test_api_create_apply_ai_suggestions_action_requires_fields(self) -> None:
+        """
+        GIVEN:
+            - API request to create an apply AI suggestions action with no
+              fields selected, which could never do anything
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+            - No objects are created
+        """
+        existing_count = Workflow.objects.count()
+
+        response = self._post_ai_suggestions_workflow(
+            trigger_types=[WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED],
+            action={"ai_suggestion_fields": []},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Workflow.objects.count(), existing_count)
+
+    def test_api_create_apply_ai_suggestions_action_rejects_unknown_field(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - API request to create an apply AI suggestions action naming a
+              field that does not exist
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+        """
+        response = self._post_ai_suggestions_workflow(
+            trigger_types=[WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED],
+            action={"ai_suggestion_fields": ["title", "not_a_field"]},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_api_create_apply_ai_suggestions_action_rejects_consumption_only(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - API request to create an apply AI suggestions action whose only
+              trigger is consumption started, so there is no document content
+              to make suggestions from yet
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+            - No objects are created
+        """
+        existing_count = Workflow.objects.count()
+
+        response = self._post_ai_suggestions_workflow(
+            trigger_types=[WorkflowTrigger.WorkflowTriggerType.CONSUMPTION],
+            action={"ai_suggestion_fields": ["title"]},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Workflow.objects.count(), existing_count)
+
+    def test_api_create_apply_ai_suggestions_action_allows_extra_consumption_trigger(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - API request to create an apply AI suggestions action with a
+              consumption trigger alongside a usable one
+        WHEN:
+            - API is called
+        THEN:
+            - The workflow is created, the action applies to the other trigger
+        """
+        response = self._post_ai_suggestions_workflow(
+            trigger_types=[
+                WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            ],
+            action={"ai_suggestion_fields": ["title"]},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_api_create_workflow_trigger_action_empty_fields(self) -> None:
         """
@@ -422,6 +812,11 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             json.dumps(
                 {
                     "assign_title": "",
+                    "assign_custom_fields": [self.cf1.id, self.cf2.id],
+                    "assign_custom_fields_values": {
+                        str(self.cf1.id): "",
+                        str(self.cf2.id): 0,
+                    },
                 },
             ),
             content_type="application/json",
@@ -429,6 +824,10 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         action = WorkflowAction.objects.get(id=response.data["id"])
         self.assertIsNone(action.assign_title)
+        self.assertEqual(
+            action.assign_custom_fields_values,
+            {str(self.cf1.id): None, str(self.cf2.id): 0},
+        )
 
         response = self.client.post(
             self.ENDPOINT_TRIGGERS,

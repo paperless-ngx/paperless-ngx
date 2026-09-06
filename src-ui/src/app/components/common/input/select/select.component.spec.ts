@@ -1,9 +1,4 @@
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import {
   FormsModule,
   NG_VALUE_ACCESSOR,
@@ -112,12 +107,23 @@ describe('SelectComponent', () => {
     expect(createNewVal).toEqual('baz')
   })
 
-  it('should clear search term on blur after delay', fakeAsync(() => {
+  it('should search items by independent normalized terms', () => {
+    expect(
+      component.searchFn('tax 26', { id: 11, name: 'Tax\u00e9s 2026' })
+    ).toBeTruthy()
+    expect(
+      component.searchFn('tax receipt', { id: 11, name: 'Tax\u00e9s 2026' })
+    ).toBeFalsy()
+  })
+
+  it('should clear search term on blur after delay', () => {
+    jest.useFakeTimers()
     const clearSpy = jest.spyOn(component, 'clearLastSearchTerm')
     component.onBlur()
-    tick(3000)
+    jest.advanceTimersByTime(3000)
     expect(clearSpy).toHaveBeenCalled()
-  }))
+    jest.useRealTimers()
+  })
 
   it('should emit filtered documents', () => {
     component.value = 10

@@ -97,8 +97,14 @@ MODEL_FILE = get_path_from_env(
     DATA_DIR / "classification_model.pickle",
 )
 LLM_INDEX_DIR = DATA_DIR / "llm_index"
-LLM_INDEX_LOCK = DATA_DIR / "locks" / "llm_index.lock"
-(DATA_DIR / "locks").mkdir(parents=True, exist_ok=True)
+LLM_INDEX_LOCK = LLM_INDEX_DIR / "index.lock"
+# Cross-process read/write lock guarding the LLM index compaction/migration
+# file swap. Readers hold it shared; the swap takes it exclusively so it never
+# runs while a reader connection is open. Must be a SQLite (.db) file.
+LLM_INDEX_RWLOCK = LLM_INDEX_DIR / "llmindex.rwlock.db"
+# Seconds the compaction swap waits for active readers to drain before skipping
+# this cycle (it is a maintenance operation; the next run retries).
+LLM_INDEX_COMPACTION_LOCK_TIMEOUT = 30
 
 LOGGING_DIR = get_path_from_env("PAPERLESS_LOGGING_DIR", DATA_DIR / "log")
 
@@ -338,6 +344,12 @@ SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM: Final[str] = os.getenv(
     "PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS_CLAIM",
     "groups",
 )
+SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP: Final[str | None] = os.getenv(
+    "PAPERLESS_SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP",
+)
+SOCIAL_ACCOUNT_SYNC_STAFF_GROUP: Final[str | None] = os.getenv(
+    "PAPERLESS_SOCIAL_ACCOUNT_SYNC_STAFF_GROUP",
+)
 
 HEADLESS_TOKEN_STRATEGY = "paperless.adapter.DrfTokenStrategy"
 
@@ -454,11 +466,22 @@ def _parse_paperless_url():
 
 PAPERLESS_URL = _parse_paperless_url()
 
+
+def _get_allauth_trusted_proxy_count(trusted_proxies: list[str]) -> int:
+    count = get_int_from_env(
+        "PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT",
+        len(trusted_proxies),
+    )
+    if count < 0:
+        raise ImproperlyConfigured(
+            "PAPERLESS_ALLAUTH_TRUSTED_PROXY_COUNT must be zero or greater",
+        )
+    return count
+
+
 # For use with trusted proxies
 TRUSTED_PROXIES = get_list_from_env("PAPERLESS_TRUSTED_PROXIES")
-# Derive allauth's proxy count from the same list so X-Forwarded-For is trusted
-# correctly when users have configured PAPERLESS_TRUSTED_PROXIES.
-ALLAUTH_TRUSTED_PROXY_COUNT = len(TRUSTED_PROXIES)
+ALLAUTH_TRUSTED_PROXY_COUNT = _get_allauth_trusted_proxy_count(TRUSTED_PROXIES)
 ALLAUTH_TRUSTED_CLIENT_IP_HEADER = os.getenv(
     "PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER",
 )
@@ -644,6 +667,7 @@ LOGGING = {
         "kombu": {"handlers": ["file_celery"], "level": "DEBUG"},
         "_granian": {"handlers": ["file_paperless"], "level": "DEBUG"},
         "granian.access": {"handlers": ["file_paperless"], "level": "DEBUG"},
+        "httpx": {"level": "WARNING"},
     },
 }
 
@@ -680,6 +704,12 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {
 
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT: Final[int] = get_int_from_env("PAPERLESS_WORKER_TIMEOUT", 1800)
+
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#std-setting-task_allow_error_cb_on_chord_header
+# Without this, a failing chord header never triggers the errback, so a mail
+# whose attachments all fail is never recorded and is re-fetched forever.
+# The errback runs once per failed header task, so it must be idempotent.
+CELERY_TASK_ALLOW_ERROR_CB_ON_CHORD_HEADER = True
 
 CELERY_CACHE_BACKEND = "default"
 
@@ -1179,6 +1209,15 @@ WEBHOOKS_ALLOW_INTERNAL_REQUESTS = get_bool_from_env(
 REMOTE_OCR_ENGINE = os.getenv("PAPERLESS_REMOTE_OCR_ENGINE")
 REMOTE_OCR_API_KEY = os.getenv("PAPERLESS_REMOTE_OCR_API_KEY")
 REMOTE_OCR_ENDPOINT = os.getenv("PAPERLESS_REMOTE_OCR_ENDPOINT")
+REMOTE_OCR_MODE = get_choice_from_env(
+    "PAPERLESS_REMOTE_OCR_MODE",
+    {"always", "workflow_only"},
+    default="always",
+)
+REMOTE_OCR_ALLOW_INTERNAL_ENDPOINTS = get_bool_from_env(
+    "PAPERLESS_REMOTE_OCR_ALLOW_INTERNAL_ENDPOINTS",
+    "true",
+)
 
 ################################################################################
 # AI Settings                                                                  #
@@ -1199,6 +1238,9 @@ if LLM_EMBEDDING_CHUNK_SIZE < 1:
 LLM_CONTEXT_SIZE = get_int_from_env("PAPERLESS_AI_LLM_CONTEXT_SIZE", 8192)
 if LLM_CONTEXT_SIZE < 1:
     raise ImproperlyConfigured("PAPERLESS_AI_LLM_CONTEXT_SIZE must be >= 1")
+LLM_REQUEST_TIMEOUT = get_int_from_env("PAPERLESS_AI_LLM_REQUEST_TIMEOUT", 120)
+if LLM_REQUEST_TIMEOUT < 1:
+    raise ImproperlyConfigured("PAPERLESS_AI_LLM_REQUEST_TIMEOUT must be >= 1")
 LLM_BACKEND = get_choice_from_env(
     "PAPERLESS_AI_LLM_BACKEND",
     {"ollama", "openai-like"},

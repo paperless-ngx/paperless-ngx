@@ -338,6 +338,14 @@ class ProcessedMail(document_models.ModelWithOwner):
         editable=False,
     )
 
+    uid_validity = models.CharField(
+        _("uid validity"),
+        null=True,
+        blank=True,
+        max_length=64,
+        editable=False,
+    )
+
     subject = models.CharField(
         _("subject"),
         null=False,

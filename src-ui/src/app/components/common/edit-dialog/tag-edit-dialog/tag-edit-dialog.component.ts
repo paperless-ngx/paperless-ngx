@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core'
+import { Component, inject, signal } from '@angular/core'
 import {
   FormControl,
   FormGroup,
@@ -35,7 +35,7 @@ import { TextComponent } from '../../input/text/text.component'
   ],
 })
 export class TagEditDialogComponent extends EditDialogComponent<Tag> {
-  tags: Tag[]
+  readonly tags = signal<Tag[]>([])
 
   constructor() {
     super()
@@ -43,7 +43,7 @@ export class TagEditDialogComponent extends EditDialogComponent<Tag> {
     this.userService = inject(UserService)
     this.settingsService = inject(SettingsService)
     this.service.listAll().subscribe((result) => {
-      this.tags = result.results
+      this.tags.set(result.results)
     })
   }
 

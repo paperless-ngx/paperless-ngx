@@ -1,49 +1,51 @@
 categories:
+  - type: 'pre-include'
+    when:
+      - label: 'enhancement'
+      - label: 'bug'
+      - label: 'chore'
+      - label: 'deployment'
+      - label: 'translation'
+      - label: 'dependencies'
+      - label: 'documentation'
+      - label: 'frontend'
+      - label: 'backend'
+      - label: 'ci-cd'
+      - label: 'breaking-change'
+      - label: 'notable'
+  - type: 'pre-exclude'
+    when:
+      - label: 'skip-changelog'
   - title: 'Breaking Changes'
-    labels:
-      - 'breaking-change'
+    when:
+      - label: 'breaking-change'
   - title: 'Notable Changes'
-    labels:
-      - 'notable'
+    when:
+      - label: 'notable'
   - title: 'Features / Enhancements'
-    labels:
-      - 'enhancement'
+    when:
+      - label: 'enhancement'
   - title: 'Bug Fixes'
-    labels:
-      - 'bug'
+    when:
+      - label: 'bug'
   - title: 'Documentation'
-    labels:
-      - 'documentation'
+    when:
+      - label: 'documentation'
   - title: 'Maintenance'
-    labels:
-      - 'chore'
-      - 'deployment'
-      - 'translation'
-      - 'ci-cd'
+    when:
+      - label: 'chore'
+      - label: 'deployment'
+      - label: 'translation'
+      - label: 'ci-cd'
   - title: 'Dependencies'
     collapse-after: 3
-    labels:
-      - 'dependencies'
+    when:
+      - label: 'dependencies'
   - title: 'All App Changes'
-    labels:
-      - 'frontend'
-      - 'backend'
     collapse-after: 1
-include-labels:
-  - 'enhancement'
-  - 'bug'
-  - 'chore'
-  - 'deployment'
-  - 'translation'
-  - 'dependencies'
-  - 'documentation'
-  - 'frontend'
-  - 'backend'
-  - 'ci-cd'
-  - 'breaking-change'
-  - 'notable'
-exclude-labels:
-  - 'skip-changelog'
+    when:
+      - label: 'frontend'
+      - label: 'backend'
 filter-by-commitish: true
 category-template: '### $TITLE'
 change-template: '- $TITLE @$AUTHOR ([#$NUMBER]($URL))'

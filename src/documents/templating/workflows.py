@@ -6,9 +6,11 @@ from pathlib import Path
 from django.utils.text import slugify as django_slugify
 from jinja2 import StrictUndefined
 from jinja2 import Template
+from jinja2 import TemplateAssertionError
 from jinja2 import TemplateSyntaxError
 from jinja2 import UndefinedError
 from jinja2 import make_logging_undefined
+from jinja2.meta import find_undeclared_variables
 from jinja2.sandbox import SecurityError
 
 from documents.templating.environment import _template_environment
@@ -27,6 +29,49 @@ _template_environment.filters["datetime"] = format_datetime
 _template_environment.filters["slugify"] = django_slugify
 
 _template_environment.filters["localize_date"] = localize_date
+
+
+_known_placeholder_names = {
+    "correspondent",
+    "document_type",
+    "added",
+    "added_year",
+    "added_year_short",
+    "added_month",
+    "added_month_name",
+    "added_month_name_short",
+    "added_day",
+    "added_time",
+    "owner_username",
+    "original_filename",
+    "filename",
+    "created",
+    "created_year",
+    "created_year_short",
+    "created_month",
+    "created_month_name",
+    "created_month_name_short",
+    "created_day",
+    "created_time",
+    "doc_title",
+    "doc_url",
+    "doc_id",
+}
+
+
+def validate_workflow_template(text: str) -> None:
+    try:
+        ast = _template_environment.parse(text)
+        undeclared_vars = find_undeclared_variables(ast)
+    except TemplateAssertionError as e:
+        raise ValueError(f"Template assertion error: {e}")
+    except TemplateSyntaxError as e:
+        raise ValueError(f"Template syntax error: {e}")
+    unknown_vars = undeclared_vars - _known_placeholder_names
+    if unknown_vars:
+        raise KeyError(
+            f"Template references unknown placeholders: {', '.join(unknown_vars)}",
+        )
 
 
 def parse_w_workflow_placeholders(

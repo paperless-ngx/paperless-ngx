@@ -20,6 +20,7 @@ from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 
+from paperless.parsers.utils import read_file_handle_unicode_errors
 from paperless.version import __full_version_str__
 
 if TYPE_CHECKING:
@@ -183,7 +184,7 @@ class TextDocumentParser:
         documents.parsers.ParseError
             If the file cannot be read.
         """
-        self._text = self._read_text(document_path)
+        self._text = read_file_handle_unicode_errors(document_path, log=logger)
 
     # ------------------------------------------------------------------
     # Result accessors
@@ -295,30 +296,3 @@ class TextDocumentParser:
             Always ``[]`` — plain text files carry no structured metadata.
         """
         return []
-
-    # ------------------------------------------------------------------
-    # Private helpers
-    # ------------------------------------------------------------------
-
-    def _read_text(self, filepath: Path) -> str:
-        """Read file content, replacing invalid UTF-8 bytes rather than failing.
-
-        Parameters
-        ----------
-        filepath:
-            Path to the file to read.
-
-        Returns
-        -------
-        str
-            File content as a string.
-        """
-        try:
-            return filepath.read_text(encoding="utf-8")
-        except UnicodeDecodeError as exc:
-            logger.warning(
-                "Unicode error reading %s, replacing bad bytes: %s",
-                filepath,
-                exc,
-            )
-            return filepath.read_bytes().decode("utf-8", errors="replace")

@@ -83,12 +83,12 @@ describe('TagListComponent', () => {
     ]
     component['_nameFilter'] = null // Simulate empty name filter
     const filtered = component.filterData(tags as any)
-    expect(filtered.length).toBe(2)
+    expect(filtered).toHaveLength(2)
     expect(filtered.find((t) => t.id === 2)).toBeUndefined()
 
     component['_nameFilter'] = 'Tag2' // Simulate non-empty name filter
     const filteredWithName = component.filterData(tags as any)
-    expect(filteredWithName.length).toBe(2)
+    expect(filteredWithName).toHaveLength(2)
     expect(filteredWithName.find((t) => t.id === 2)).toBeUndefined()
     expect(
       filteredWithName
@@ -136,7 +136,7 @@ describe('TagListComponent', () => {
       ],
     }
 
-    component.data = [parent as any]
+    component.data.set([parent as any])
     component.selectPage()
 
     expect(component.selectedObjects.has(10)).toBe(true)

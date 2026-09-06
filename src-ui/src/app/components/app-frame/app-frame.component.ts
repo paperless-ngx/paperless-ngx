@@ -6,7 +6,7 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
 import { NgClass } from '@angular/common'
-import { Component, HostListener, inject, OnInit } from '@angular/core'
+import { Component, HostListener, inject, OnInit, signal } from '@angular/core'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import {
   NgbCollapseModule,
@@ -45,6 +45,8 @@ import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ChatComponent } from '../chat/chat/chat.component'
+import { BrandMarkComponent } from '../common/logo/brand-mark/brand-mark.component'
+import { LogoComponent } from '../common/logo/logo.component'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
@@ -59,6 +61,8 @@ const SCROLL_THRESHOLD = 16
   styleUrls: ['./app-frame.component.scss'],
   imports: [
     GlobalSearchComponent,
+    LogoComponent,
+    BrandMarkComponent,
     DocumentTitlePipe,
     IfPermissionsDirective,
     ToastsDropdownComponent,
@@ -90,14 +94,33 @@ export class AppFrameComponent
   permissionsService = inject(PermissionsService)
   private djangoMessagesService = inject(DjangoMessagesService)
 
-  appRemoteVersion: AppRemoteVersion
-
-  isMenuCollapsed: boolean = true
-
-  slimSidebarAnimating: boolean = false
-
-  public mobileSearchHidden: boolean = false
-
+  readonly appRemoteVersion = signal<AppRemoteVersion>(null)
+  readonly isMenuCollapsed = signal(true)
+  readonly slimSidebarAnimating = signal(false)
+  readonly mobileSearchHidden = signal(false)
+  private readonly versionSetting = this.settingsService.getSignal<string>(
+    SETTINGS_KEYS.VERSION
+  )
+  private readonly appTitleSetting = this.settingsService.getSignal<string>(
+    SETTINGS_KEYS.APP_TITLE
+  )
+  private readonly appLogoSetting = this.settingsService.getSignal<string>(
+    SETTINGS_KEYS.APP_LOGO
+  )
+  private readonly slimSidebarSetting = this.settingsService.getSignal<boolean>(
+    SETTINGS_KEYS.SLIM_SIDEBAR
+  )
+  private readonly attributesSectionsCollapsedSetting =
+    this.settingsService.getSignal<CollapsibleSection[]>(
+      SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED
+    )
+  private readonly aiEnabledSetting = this.settingsService.getSignal<boolean>(
+    SETTINGS_KEYS.AI_ENABLED
+  )
+  private readonly sidebarViewsShowCountSetting =
+    this.settingsService.getSignal<boolean>(
+      SETTINGS_KEYS.SIDEBAR_VIEWS_SHOW_COUNT
+    )
   private lastScrollY: number = 0
 
   constructor() {
@@ -118,6 +141,7 @@ export class AppFrameComponent
 
   ngOnInit(): void {
     this.lastScrollY = window.scrollY
+    this.detectClassicScrollbars()
 
     if (this.settingsService.get(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED)) {
       this.checkForUpdates()
@@ -147,7 +171,7 @@ export class AppFrameComponent
   }
 
   toggleSlimSidebar(): void {
-    this.slimSidebarAnimating = true
+    this.slimSidebarAnimating.set(true)
     const slimSidebarEnabled = !this.slimSidebarEnabled
     this.settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, slimSidebarEnabled)
     if (slimSidebarEnabled) {
@@ -167,7 +191,7 @@ export class AppFrameComponent
         },
       })
     setTimeout(() => {
-      this.slimSidebarAnimating = false
+      this.slimSidebarAnimating.set(false)
     }, 200) // slightly longer than css animation for slim sidebar
   }
 
@@ -177,12 +201,39 @@ export class AppFrameComponent
     this.attributesSectionsCollapsed = !this.attributesSectionsCollapsed
   }
 
+  toggleMenuCollapsed(): void {
+    this.isMenuCollapsed.set(!this.isMenuCollapsed())
+  }
+
+  closeMobileSearch(): void {
+    this.mobileSearchHidden.set(false)
+  }
+
+  setMobileSearchHidden(hidden: boolean): void {
+    this.mobileSearchHidden.set(hidden)
+  }
+
   get versionString(): string {
-    return `${environment.appTitle} v${this.settingsService.get(SETTINGS_KEYS.VERSION)}${environment.tag === 'prod' ? '' : ` #${environment.tag}`}`
+    return `${environment.appTitle} v${this.versionSetting()}${environment.tag === 'prod' ? '' : ` #${environment.tag}`}`
+  }
+
+  get appTitle(): string {
+    return this.appTitleSetting() || environment.appTitle
   }
 
   get customAppTitle(): string {
-    return this.settingsService.get(SETTINGS_KEYS.APP_TITLE)
+    return this.appTitleSetting()
+  }
+
+  get hasCustomBranding(): boolean {
+    return !!(this.appTitleSetting()?.length || this.appLogoSetting()?.length)
+  }
+
+  get customAppLogo(): string {
+    const logo = this.appLogoSetting()
+    return logo?.length
+      ? environment.apiBaseUrl.replace(/\/api\/$/, logo)
+      : null
   }
 
   get canSaveSettings(): boolean {
@@ -224,7 +275,7 @@ export class AppFrameComponent
   }
 
   get slimSidebarEnabled(): boolean {
-    return this.settingsService.get(SETTINGS_KEYS.SLIM_SIDEBAR)
+    return this.slimSidebarSetting()
   }
 
   set slimSidebarEnabled(enabled: boolean) {
@@ -242,10 +293,14 @@ export class AppFrameComponent
       })
   }
 
+  get slimSidebarPopoversEnabled(): boolean {
+    return this.slimSidebarEnabled && !this.isMobileViewport()
+  }
+
   get attributesSectionsCollapsed(): boolean {
-    return this.settingsService
-      .get(SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED)
-      ?.includes(CollapsibleSection.ATTRIBUTES)
+    return this.attributesSectionsCollapsedSetting()?.includes(
+      CollapsibleSection.ATTRIBUTES
+    )
   }
 
   set attributesSectionsCollapsed(collapsed: boolean) {
@@ -268,13 +323,13 @@ export class AppFrameComponent
   }
 
   get aiEnabled(): boolean {
-    return this.settingsService.get(SETTINGS_KEYS.AI_ENABLED)
+    return this.aiEnabledSetting()
   }
 
   @HostListener('window:resize')
   onWindowResize(): void {
     if (!this.isMobileViewport()) {
-      this.mobileSearchHidden = false
+      this.mobileSearchHidden.set(false)
     }
   }
 
@@ -282,8 +337,8 @@ export class AppFrameComponent
   onWindowScroll(): void {
     const currentScrollY = window.scrollY
 
-    if (!this.isMobileViewport() || this.isMenuCollapsed === false) {
-      this.mobileSearchHidden = false
+    if (!this.isMobileViewport() || this.isMenuCollapsed() === false) {
+      this.mobileSearchHidden.set(false)
       this.lastScrollY = currentScrollY
       return
     }
@@ -291,12 +346,28 @@ export class AppFrameComponent
     const delta = currentScrollY - this.lastScrollY
 
     if (currentScrollY <= 0 || delta < -SCROLL_THRESHOLD) {
-      this.mobileSearchHidden = false
+      this.mobileSearchHidden.set(false)
     } else if (currentScrollY > SCROLL_THRESHOLD && delta > SCROLL_THRESHOLD) {
-      this.mobileSearchHidden = true
+      this.mobileSearchHidden.set(true)
     }
 
     this.lastScrollY = currentScrollY
+  }
+
+  /**
+   * Flag for browsers whose scrollbars take up layout width. Remove me
+   * some day, I hope.
+   */
+  private detectClassicScrollbars(): void {
+    const probe = document.createElement('div')
+    probe.style.cssText =
+      'position:absolute;top:-9999px;width:100px;height:100px;overflow:scroll'
+    document.body.appendChild(probe)
+    document.documentElement.classList.toggle(
+      'pngx-classic-scrollbars',
+      probe.offsetWidth > probe.clientWidth
+    )
+    probe.remove()
   }
 
   private isMobileViewport(): boolean {
@@ -304,7 +375,7 @@ export class AppFrameComponent
   }
 
   closeMenu() {
-    this.isMenuCollapsed = true
+    this.isMenuCollapsed.set(true)
   }
 
   editProfile() {
@@ -367,11 +438,11 @@ export class AppFrameComponent
   }
 
   onDragStart(event: CdkDragStart) {
-    this.settingsService.globalDropzoneEnabled = false
+    this.settingsService.globalDropzoneEnabled.set(false)
   }
 
   onDragEnd(event: CdkDragEnd) {
-    this.settingsService.globalDropzoneEnabled = true
+    this.settingsService.globalDropzoneEnabled.set(true)
   }
 
   onDrop(event: CdkDragDrop<SavedView[]>) {
@@ -392,7 +463,7 @@ export class AppFrameComponent
     this.remoteVersionService
       .checkForUpdates()
       .subscribe((appRemoteVersion: AppRemoteVersion) => {
-        this.appRemoteVersion = appRemoteVersion
+        this.appRemoteVersion.set(appRemoteVersion)
       })
   }
 
@@ -420,8 +491,8 @@ export class AppFrameComponent
 
   get showSidebarCounts(): boolean {
     return (
-      this.settingsService.get(SETTINGS_KEYS.SIDEBAR_VIEWS_SHOW_COUNT) &&
-      !this.settingsService.organizingSidebarSavedViews
+      this.sidebarViewsShowCountSetting() &&
+      !this.settingsService.organizingSidebarSavedViews()
     )
   }
 }

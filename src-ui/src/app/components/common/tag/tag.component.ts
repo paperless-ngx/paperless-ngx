@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core'
+import { Component, effect, inject, input, model } from '@angular/core'
 import { Tag } from 'src/app/data/tag'
 import {
   PermissionAction,
@@ -16,43 +16,32 @@ export class TagComponent {
   private permissionsService = inject(PermissionsService)
   private tagService = inject(TagService)
 
-  private _tag: Tag
-  private _tagID: number
+  readonly tag = model<Tag>(null)
+  readonly tagID = input<number>(undefined)
+  readonly linkTitle = input('')
+  readonly clickable = input(false, {
+    transform: (value: boolean | string) =>
+      value === '' || value === true || value === 'true',
+  })
+  readonly showParents = input(false)
 
-  @Input()
-  public set tag(tag: Tag) {
-    this._tag = tag
-  }
-
-  public get tag(): Tag {
-    return this._tag
-  }
-
-  @Input()
-  set tagID(tagID: number) {
-    if (tagID !== this._tagID) {
-      this._tagID = tagID
-      if (
-        this.permissionsService.currentUserCan(
-          PermissionAction.View,
-          PermissionType.Tag
-        )
-      ) {
-        this.tagService.getCached(this._tagID).subscribe((tag) => {
-          this.tag = tag
-        })
+  constructor() {
+    effect(() => {
+      const tagID = this.tagID()
+      if (tagID) {
+        if (
+          this.permissionsService.currentUserCan(
+            PermissionAction.View,
+            PermissionType.Tag
+          )
+        ) {
+          this.tagService.getCached(tagID).subscribe((tag) => {
+            this.tag.set(tag)
+          })
+        }
       }
-    }
+    })
   }
-
-  @Input()
-  linkTitle: string = ''
-
-  @Input()
-  clickable: boolean = false
-
-  @Input()
-  showParents: boolean = false
 
   public get loading(): boolean {
     return this.tagService.loading

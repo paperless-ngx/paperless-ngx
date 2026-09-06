@@ -1,17 +1,19 @@
 from typing import Any
+from typing import TypeVar
 
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
-from django.db.models import OuterRef
+from django.db.models import Model
 from django.db.models import Q
 from django.db.models import QuerySet
-from django.db.models import Subquery
+from django.db.models import Value
+from django.db.models import When
 from django.db.models.functions import Cast
-from django.db.models.functions import Coalesce
 from guardian.core import ObjectPermissionChecker
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
@@ -53,11 +55,15 @@ class PaperlessObjectPermissions(DjangoObjectPermissions):
 
 class PaperlessAdminPermissions(BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_staff
+        return request.user.is_active and request.user.is_staff
 
 
 def has_global_statistics_permission(user: User | None) -> bool:
-    if user is None or not getattr(user, "is_authenticated", False):
+    if (
+        user is None
+        or not getattr(user, "is_active", False)
+        or not getattr(user, "is_authenticated", False)
+    ):
         return False
 
     return getattr(user, "is_superuser", False) or user.has_perm(
@@ -66,7 +72,11 @@ def has_global_statistics_permission(user: User | None) -> bool:
 
 
 def has_system_status_permission(user: User | None) -> bool:
-    if user is None or not getattr(user, "is_authenticated", False):
+    if (
+        user is None
+        or not getattr(user, "is_active", False)
+        or not getattr(user, "is_authenticated", False)
+    ):
         return False
 
     return (
@@ -163,61 +173,227 @@ def set_permissions_for_object(
                         )
 
 
-def _permitted_document_ids(user):
+def permitted_object_ids(
+    user: User | None,
+    model: type[Model],
+    perm: str,
+    *,
+    include_deleted: bool = False,
+) -> QuerySet[int]:
     """
-    Return a queryset of document IDs the user may view, limited to non-deleted
-    documents. This intentionally avoids ``get_objects_for_user`` to keep the
-    subquery small and index-friendly.
+    Generic version of ``permitted_document_ids`` for any model with an
+    ``owner`` field and guardian object-level permissions. ``include_deleted``
+    only has an effect for models exposing a ``global_objects``/``deleted_at``
+    soft-delete pattern (currently only ``Document``); for every other model
+    it is accepted but has no effect, since those models have no soft-delete
+    concept.
     """
-
-    base_docs = Document.objects.filter(deleted_at__isnull=True).only("id", "owner")
+    has_soft_delete = hasattr(model, "global_objects")
+    manager = (
+        model.global_objects if include_deleted and has_soft_delete else model.objects
+    )
+    base_qs = manager.all().only("id", "owner")
 
     if user is None or not getattr(user, "is_authenticated", False):
-        # Just Anonymous user e.g. for drf-spectacular
-        return base_docs.filter(owner__isnull=True).values_list("id", flat=True)
+        return base_qs.filter(owner__isnull=True).values_list("id", flat=True)
+
+    # Deactivated users get nothing, deactivated superusers included, so this
+    # has to come before the superuser shortcut. guardian's
+    # ObjectPermissionChecker denies inactive users, but get_objects_for_user
+    # (the pattern this replaces) does not, so it would not be inherited.
+    if not getattr(user, "is_active", False):
+        return base_qs.none().values_list("id", flat=True)
 
     if getattr(user, "is_superuser", False):
-        return base_docs.values_list("id", flat=True)
+        return base_qs.values_list("id", flat=True)
 
-    document_ct = ContentType.objects.get_for_model(Document)
+    # Guardian's UserObjectPermission/GroupObjectPermission always store a bare
+    # codename, but has_perm()-style callers commonly pass the qualified
+    # "app_label.codename" form. content_type already disambiguates the
+    # codename, so just drop any prefix rather than silently under-permitting.
+    perm = perm.rsplit(".", 1)[-1]
+
+    content_type = ContentType.objects.get_for_model(model)
     perm_filter = {
-        "permission__codename": "view_document",
-        "permission__content_type": document_ct,
+        "permission__codename": perm,
+        "permission__content_type": content_type,
     }
 
-    user_perm_docs = (
+    user_perm_ids = (
         UserObjectPermission.objects.filter(user=user, **perm_filter)
         .annotate(object_pk_int=Cast("object_pk", IntegerField()))
         .values_list("object_pk_int", flat=True)
     )
-
-    group_perm_docs = (
+    group_perm_ids = (
         GroupObjectPermission.objects.filter(group__user=user, **perm_filter)
         .annotate(object_pk_int=Cast("object_pk", IntegerField()))
         .values_list("object_pk_int", flat=True)
     )
+    permitted_ids = user_perm_ids.union(group_perm_ids)
 
-    permitted_documents = user_perm_docs.union(group_perm_docs)
-
-    return base_docs.filter(
-        Q(owner=user) | Q(owner__isnull=True) | Q(id__in=permitted_documents),
+    return base_qs.filter(
+        Q(owner=user) | Q(owner__isnull=True) | Q(id__in=permitted_ids),
     ).values_list("id", flat=True)
 
 
-def get_document_count_filter_for_user(user):
+ModelT = TypeVar("ModelT", bound=Model)
+
+
+def user_is_unrestricted(user: User | None) -> bool:
+    """
+    True when ``user`` means "no restriction at all" (an absent user, or an
+    *active* superuser) without needing a database check to know it.
+
+    ``permitted_object_ids(None, ...)`` itself means the much narrower "only
+    unowned rows", which is NOT the same thing as "no user filtering
+    requested", so callers must special-case this before ever calling it.
+    A deactivated superuser is deliberately NOT unrestricted here, matching
+    permitted_object_ids's own is_active-before-is_superuser ordering.
+
+    Callers that can avoid a database round trip entirely when this is true
+    (e.g. checking a single already-loaded object's visibility rather than
+    filtering a queryset) should do so via this function directly, rather
+    than through restrict_queryset_to_visible() below.
+    """
+    if user is None:
+        return True
+    return (
+        getattr(user, "is_authenticated", False)
+        and getattr(user, "is_active", False)
+        and getattr(user, "is_superuser", False)
+    )
+
+
+def restrict_queryset_to_visible(
+    queryset: QuerySet[ModelT],
+    user: User | None,
+    perm: str,
+) -> QuerySet[ModelT]:
+    """
+    Restrict ``queryset`` to the rows ``user`` may see with ``perm``.
+
+    Delegates the visibility check to the database as a
+    ``WHERE id IN (subquery)`` rather than materializing the full
+    permitted-id set into a Python collection first: a caller that only
+    needs to check a small handful of rows (a resolved-id list, a few
+    RAG-neighbour candidate ids) never pays for scanning or holding the
+    installation's entire taxonomy in memory to do it.
+
+    Returns ``queryset`` unchanged for user_is_unrestricted(user); every
+    other case is delegated to ``permitted_object_ids`` rather than
+    re-deciding the ordering here.
+    """
+    if user_is_unrestricted(user):
+        return queryset
+    return queryset.filter(pk__in=permitted_object_ids(user, queryset.model, perm))
+
+
+def permitted_document_ids(
+    user: User | None,
+    *,
+    perm: str = "view_document",
+    include_deleted: bool = False,
+) -> QuerySet[int]:
+    """
+    Document-specific convenience wrapper around ``permitted_object_ids``.
+    Return a queryset of document IDs the user has ``perm`` on (default
+    ``"view_document"``). By default limited to non-deleted documents; pass
+    ``include_deleted=True`` for callers that need to check permission on
+    soft-deleted documents (e.g. trash restore). This intentionally avoids
+    ``get_objects_for_user`` to keep the subquery small and index-friendly.
+    """
+    return permitted_object_ids(user, Document, perm, include_deleted=include_deleted)
+
+
+def get_document_count_filter_for_user(user, related_name: str = "documents"):
     """
     Return the Q object used to filter document counts for the given user.
 
     The filter is expressed as an ``id__in`` against a small subquery of permitted
     document IDs to keep the generated SQL simple and avoid large OR clauses.
+
+    ``related_name`` is the ORM path from the annotated model to Document (e.g.
+    ``"documents"`` for Tag's direct M2M, or ``"fields__document"`` for CustomField,
+    which only reaches Document via the CustomFieldInstance through-model).
     """
 
     if getattr(user, "is_superuser", False):
         # Superuser: no permission filtering needed
-        return Q(documents__deleted_at__isnull=True)
+        return Q(**{f"{related_name}__deleted_at__isnull": True})
 
-    permitted_ids = _permitted_document_ids(user)
-    return Q(documents__id__in=permitted_ids)
+    permitted_ids = permitted_document_ids(user)
+    return Q(**{f"{related_name}__id__in": permitted_ids})
+
+
+def annotate_document_count_by_ids(
+    queryset: QuerySet[Any],
+    through_model: Any,
+    related_object_field: str,
+    document_ids: Any,
+    target_field: str = "document_id",
+) -> QuerySet[Any]:
+    """
+    Annotate a queryset with a document count for a relation to Document that
+    goes through an M2M/through-model table (e.g. Tag via
+    ``Document.tags.through``, or CustomField via ``CustomFieldInstance``),
+    for an explicit, already-resolved set of document ids.
+
+    Counts are computed via a single, independent GROUP BY over the relation
+    table -- with the id filter expressed as a plain ``WHERE`` rather than an
+    aggregate ``FILTER`` -- then injected via ``Case``/``When``. This
+    deliberately avoids two slower alternatives found while building this:
+
+    - A per-outer-row correlated subquery (one execution per row of the
+      annotated queryset): fine at a handful of rows, catastrophic once the
+      queryset has hundreds/thousands of rows.
+    - ``Count(..., filter=Q(id__in=document_ids), distinct=True)`` applied
+      directly to the M2M relation: Postgres can fail to plan the ``id__in``
+      check as a semi-join and instead re-checks subquery membership once per
+      row of the (much larger) M2M join -- worse than the correlated subquery.
+
+    Aggregation is restricted to rows whose ``related_object_field`` is one of
+    ``queryset``'s pks, so passing a subset (e.g. a handful of tag descendants)
+    doesn't pay the cost of counting for every row matching ``document_ids``.
+
+    Args:
+        queryset: base queryset to annotate (must contain pk)
+        through_model: model representing the relation (e.g., Document.tags.through
+                       or CustomFieldInstance)
+        related_object_field: field on the relation pointing back to queryset pk
+        document_ids: the document ids to count against -- a concrete list/set,
+                       or a simple (already resolved) queryset of ids. Callers
+                       that need this filtered by a complex condition (e.g. a
+                       permission check) should resolve it to a concrete list
+                       first if the same ids will be reused across multiple
+                       calls, rather than passing the complex queryset itself
+                       into each -- see ``_get_selection_data_for_queryset``.
+        target_field: field on the relation pointing to Document id
+    """
+
+    counts = (
+        through_model.objects.filter(
+            **{
+                f"{related_object_field}__in": queryset.values("pk"),
+                f"{target_field}__in": document_ids,
+            },
+        )
+        .values(related_object_field)
+        .annotate(c=Count(target_field, distinct=True))
+    )
+    counts_by_pk = {row[related_object_field]: row["c"] for row in counts}
+
+    if not counts_by_pk:
+        return queryset.annotate(
+            document_count=Value(0, output_field=IntegerField()),
+        )
+
+    return queryset.annotate(
+        document_count=Case(
+            *(When(pk=pk, then=Value(count)) for pk, count in counts_by_pk.items()),
+            default=Value(0),
+            output_field=IntegerField(),
+        ),
+    )
 
 
 def annotate_document_count_for_related_queryset(
@@ -228,31 +404,17 @@ def annotate_document_count_for_related_queryset(
     user: User | None = None,
 ) -> QuerySet[Any]:
     """
-    Annotate a queryset with permissions-aware document counts using a subquery
-    against a relation table.
-
-    Args:
-        queryset: base queryset to annotate (must contain pk)
-        through_model: model representing the relation (e.g., Document.tags.through
-                       or CustomFieldInstance)
-        source_field: field on the relation pointing back to queryset pk
-        target_field: field on the relation pointing to Document id
-        user: the user for whom to filter permitted document ids
+    Same as ``annotate_document_count_by_ids``, but resolves the document ids
+    from the given user's view permissions rather than taking them directly.
     """
 
-    permitted_ids = _permitted_document_ids(user)
-    counts = (
-        through_model.objects.filter(
-            **{
-                related_object_field: OuterRef("pk"),
-                f"{target_field}__in": permitted_ids,
-            },
-        )
-        .values(related_object_field)
-        .annotate(c=Count(target_field))
-        .values("c")
+    return annotate_document_count_by_ids(
+        queryset,
+        through_model=through_model,
+        related_object_field=related_object_field,
+        document_ids=permitted_document_ids(user),
+        target_field=target_field,
     )
-    return queryset.annotate(document_count=Coalesce(Subquery(counts[:1]), 0))
 
 
 def get_objects_for_user_owner_aware(
@@ -265,6 +427,13 @@ def get_objects_for_user_owner_aware(
     """
     Returns objects the user owns, are unowned, or has explicit perms.
     When include_deleted is True, soft-deleted items are also included.
+
+    Legacy slow path (guardian-backed, O(n) style permission resolution).
+    Most queryset-filtering call sites have migrated onto
+    ``PermittedObjectsFilter``/``permitted_object_ids()``, but this function
+    is kept because production callers still remain. Several callers remain
+    across ``documents/``, ``paperless_mail/``, and ``paperless_ai/`` --
+    grep for this function name before removing it.
     """
     manager = (
         Model.global_objects
@@ -284,6 +453,15 @@ def get_objects_for_user_owner_aware(
 
 
 def has_perms_owner_aware(user, perms, obj):
+    """
+    Legacy slow path (guardian-backed) single-object permission check.
+
+    The queryset-filtering side of this migrated onto
+    ``PermittedObjectsFilter``/``permitted_object_ids()``, but this
+    single-object check still has many production callers. Several callers
+    remain across ``documents/``, ``paperless_mail/``, and ``paperless_ai/``
+    -- grep for this function name before removing it.
+    """
     checker = ObjectPermissionChecker(user)
     return obj.owner is None or obj.owner == user or checker.has_perm(perms, obj)
 

@@ -160,7 +160,7 @@ class TestDateLocalization:
     )
     def test_localize_date_raises_type_error_for_invalid_input(
         self,
-        invalid_value: None | list[object] | dict[Any, Any] | Literal[1698330605],
+        invalid_value: list[object] | dict[Any, Any] | Literal[1698330605] | None,
     ) -> None:
         with pytest.raises(TypeError) as excinfo:
             localize_date(invalid_value, "medium", "en_US")

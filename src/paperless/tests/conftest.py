@@ -36,6 +36,23 @@ def samples_dir() -> Path:
     return (Path(__file__).parent / "samples").resolve()
 
 
+@pytest.fixture(scope="session")
+def tagged_no_text_pdf_file(samples_dir: Path) -> Path:
+    """Path to a tagged PDF whose only "text" is pdftotext layout padding.
+
+    Reproduces GH #13387: ``/MarkInfo /Marked true`` is set, but the only
+    extractable content is a form-feed byte, not real text. Lives here
+    rather than in parsers/conftest.py so both parser tests and
+    paperless/tests/test_parser_utils.py can use it.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/tagged-but-no-text.pdf``.
+    """
+    return samples_dir / "tesseract" / "tagged-but-no-text.pdf"
+
+
 @pytest.fixture(autouse=True)
 def clean_registry() -> Generator[None, None, None]:
     """Reset the parser registry before and after every test.

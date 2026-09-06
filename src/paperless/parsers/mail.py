@@ -58,6 +58,12 @@ _SUPPORTED_MIME_TYPES: dict[str, str] = {
     "message/rfc822": ".eml",
 }
 
+# Bleach's email-address linkifier uses a superlinear regular expression. Keep
+# email linkification for ordinary headers and short messages, but never run it
+# over an unbounded attacker-controlled field. URL linkification remains enabled
+# for longer text.
+_MAX_EMAIL_LINKIFY_LENGTH = 2048
+
 
 class MailDocumentParser:
     """Parse .eml email files for Paperless-ngx.
@@ -266,10 +272,7 @@ class MailDocumentParser:
         logger.debug("Building formatted text from email")
         self._text = build_formatted_text(mail)
 
-        if is_naive(mail.date):
-            self._date = make_aware(mail.date)
-        else:
-            self._date = mail.date
+        self._date = mail.date
 
         logger.debug("Creating a PDF from the email")
         if self._mailrule_id:
@@ -496,6 +499,9 @@ class MailDocumentParser:
                 f"Could not parse {filepath}: {err}",
             ) from err
 
+        if is_naive(parsed.date):
+            parsed.date = make_aware(parsed.date)
+
         return parsed
 
     def tika_parse(self, html: str) -> str:
@@ -627,7 +633,10 @@ class MailDocumentParser:
                 text = str(text)
             text = escape(text)
             text = clean(text)
-            text = linkify(text, parse_email=True)
+            text = linkify(
+                text,
+                parse_email="@" in text and len(text) <= _MAX_EMAIL_LINKIFY_LENGTH,
+            )
             text = text.replace("\n", "<br>")
             return text
 

@@ -73,7 +73,7 @@ describe('UserEditDialogComponent', () => {
 
     fixture = TestBed.createComponent(UserEditDialogComponent)
     settingsService = TestBed.inject(SettingsService)
-    settingsService.currentUser = { id: 99, username: 'user99' }
+    settingsService.currentUser.set({ id: 99, username: 'user99' })
     permissionsService = TestBed.inject(PermissionsService)
     toastService = TestBed.inject(ToastService)
     component = fixture.componentInstance
@@ -82,13 +82,13 @@ describe('UserEditDialogComponent', () => {
   })
 
   it('should support create and edit modes', () => {
-    component.dialogMode = EditDialogMode.CREATE
+    component.dialogMode.set(EditDialogMode.CREATE)
     const createTitleSpy = jest.spyOn(component, 'getCreateTitle')
     const editTitleSpy = jest.spyOn(component, 'getEditTitle')
     fixture.detectChanges()
     expect(createTitleSpy).toHaveBeenCalled()
     expect(editTitleSpy).not.toHaveBeenCalled()
-    component.dialogMode = EditDialogMode.EDIT
+    component.dialogMode.set(EditDialogMode.EDIT)
     fixture.detectChanges()
     expect(editTitleSpy).toHaveBeenCalled()
   })
@@ -114,17 +114,17 @@ describe('UserEditDialogComponent', () => {
   it('should detect whether password was changed in form on save', () => {
     component.objectForm.get('password').setValue(null)
     component.save()
-    expect(component.passwordIsSet).toBeFalsy()
+    expect(component.passwordIsSet()).toBeFalsy()
 
     // unchanged pw
     component.objectForm.get('password').setValue('*******')
     component.save()
-    expect(component.passwordIsSet).toBeFalsy()
+    expect(component.passwordIsSet()).toBeFalsy()
 
     // unchanged pw
     component.objectForm.get('password').setValue('helloworld')
     component.save()
-    expect(component.passwordIsSet).toBeTruthy()
+    expect(component.passwordIsSet()).toBeTruthy()
   })
 
   it('should support deactivation of TOTP', () => {

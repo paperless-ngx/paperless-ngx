@@ -1,11 +1,4 @@
-import {
-  ComponentFixture,
-  discardPeriodicTasks,
-  fakeAsync,
-  flush,
-  TestBed,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { Clipboard } from '@angular/cdk/clipboard'
 import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -48,28 +41,25 @@ describe('ToastComponent', () => {
     expect(component).toBeTruthy()
   })
 
-  it('should countdown toast', fakeAsync(() => {
+  it('should countdown toast', () => {
+    jest.useFakeTimers()
     component.toast = toast2
     fixture.detectChanges()
     component.onShown(toast2)
-    tick(5000)
+    jest.advanceTimersByTime(5000)
     expect(component.toast.delayRemaining).toEqual(0)
-    flush()
-    discardPeriodicTasks()
-  }))
+    jest.useRealTimers()
+  })
 
-  it('should show an error if given with toast', fakeAsync(() => {
+  it('should show an error if given with toast', () => {
     component.toast = toast1
     fixture.detectChanges()
 
     expect(fixture.nativeElement.querySelector('details')).not.toBeNull()
     expect(fixture.nativeElement.textContent).toContain('Error 1 content')
+  })
 
-    flush()
-    discardPeriodicTasks()
-  }))
-
-  it('should show error details, support copy', fakeAsync(() => {
+  it('should show error details, support copy', () => {
     component.toast = toast2
     fixture.detectChanges()
 
@@ -81,10 +71,7 @@ describe('ToastComponent', () => {
     const copySpy = jest.spyOn(clipboard, 'copy')
     component.copyError(toast2.error)
     expect(copySpy).toHaveBeenCalled()
-
-    flush()
-    discardPeriodicTasks()
-  }))
+  })
 
   it('should parse error text, add ellipsis', () => {
     expect(component.getErrorText(toast2.error)).toEqual(

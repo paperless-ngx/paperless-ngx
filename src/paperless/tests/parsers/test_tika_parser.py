@@ -223,4 +223,11 @@ class TestTikaParser:
 
         assert form_field_found
 
+        # Field updates must be disabled so LibreOffice preserves document
+        # fields (e.g. auto-date fields) as authored rather than refreshing
+        # them to the current date.
+        assert any(
+            b'name="updateIndexes"' in part and b"false" in part for part in parts
+        )
+
         httpx_mock.reset()

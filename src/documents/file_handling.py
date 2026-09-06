@@ -1,11 +1,32 @@
+import logging
 import os
 from pathlib import Path
 
 from django.conf import settings
 
 from documents.models import Document
+from documents.templating.filepath import is_safe_relative_path
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.templating.utils import convert_format_str_to_template_format
+
+logger = logging.getLogger("paperless.filehandling")
+
+
+class UnsafeFilePathError(Exception):
+    """
+    Raised when a path generated for a document would land outside of its root.
+    """
+
+
+def validate_path_in_root(path: Path, root: Path) -> None:
+    """
+    Ensures the given absolute path is contained within root, the
+    equivalent guard for the later move.
+    """
+    if not path.resolve().is_relative_to(root.resolve()):
+        msg = f"Refusing to write file outside of root {root}: {path}."
+        logger.warning(msg)
+        raise UnsafeFilePathError(msg)
 
 
 def create_source_path_directory(source_path: Path) -> None:
@@ -62,18 +83,17 @@ def generate_unique_filename(doc, *, archive_filename=False) -> Path:
         old_filename = Path(doc.filename) if doc.filename else None
         root = settings.ORIGINALS_DIR
 
+    base_filename = generate_filename(doc, archive_filename=archive_filename)
+
     # If generating archive filenames, try to make a name that is similar to
     # the original filename first.
 
     if archive_filename and doc.filename:
-        # Generate the full path using the same logic as generate_filename
-        base_generated = generate_filename(doc, archive_filename=archive_filename)
-
         # Try to create a simple PDF version based on the original filename
         # but preserve any directory structure from the template
-        if str(base_generated.parent) != ".":
+        if str(base_filename.parent) != ".":
             # Has directory structure, preserve it
-            simple_pdf_name = base_generated.parent / (Path(doc.filename).stem + ".pdf")
+            simple_pdf_name = base_filename.parent / (Path(doc.filename).stem + ".pdf")
         else:
             # No directory structure
             simple_pdf_name = Path(Path(doc.filename).stem + ".pdf")
@@ -81,14 +101,17 @@ def generate_unique_filename(doc, *, archive_filename=False) -> Path:
         if simple_pdf_name == old_filename or not (root / simple_pdf_name).exists():
             return simple_pdf_name
 
+    file_extension = ".pdf" if archive_filename else doc.file_type
+    filename_stem = base_filename.name.removesuffix(file_extension)
     counter = 0
 
     while True:
-        new_filename = generate_filename(
-            doc,
-            counter=counter,
-            archive_filename=archive_filename,
-        )
+        new_filename = base_filename
+        if counter:
+            new_filename = base_filename.with_name(
+                f"{filename_stem}_{counter:02}{file_extension}",
+            )
+
         if new_filename == old_filename:
             # still the same as before.
             return new_filename
@@ -118,6 +141,14 @@ def format_filename(document: Document, template_str: str) -> str | None:
         "-none-",
         "none",
     )  # backward compatibility
+
+    # Validate again after remove none
+    if not is_safe_relative_path(rendered_filename):
+        logger.warning(
+            "Filename became unsafe after placeholder removal, "
+            "falling back to default naming",
+        )
+        return None
 
     return rendered_filename
 

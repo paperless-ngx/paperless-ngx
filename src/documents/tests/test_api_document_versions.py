@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 from unittest import TestCase
 from unittest import mock
@@ -10,6 +11,8 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase as DjangoTestCase
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -19,6 +22,7 @@ from documents.filters import TitleContentFilter
 from documents.models import Document
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import read_streaming_response
+from documents.views import DocumentSelectionMixin
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -137,6 +141,8 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
             root_document=root,
             content="v2-content",
         )
+        original_modified = timezone.now() - datetime.timedelta(days=1)
+        Document.objects.filter(pk=root.pk).update(modified=original_modified)
 
         with mock.patch("documents.search.get_backend"):
             resp = self.client.delete(f"/api/documents/{root.id}/versions/{v2.id}/")
@@ -146,6 +152,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.data["current_version_id"], v1.id)
         root.refresh_from_db()
         self.assertEqual(root.content, "root-content")
+        self.assertGreater(root.modified, original_modified)
 
         with mock.patch("documents.search.get_backend"):
             resp = self.client.delete(f"/api/documents/{root.id}/versions/{v1.id}/")
@@ -326,6 +333,8 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
             root_document=root,
             version_label="old",
         )
+        original_modified = timezone.now() - datetime.timedelta(days=1)
+        Document.objects.filter(pk=root.pk).update(modified=original_modified)
 
         resp = self.client.patch(
             f"/api/documents/{root.id}/versions/{version.id}/",
@@ -339,6 +348,8 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.data["version_label"], "Label 1")
         self.assertEqual(resp.data["id"], version.id)
         self.assertFalse(resp.data["is_root"])
+        root.refresh_from_db()
+        self.assertGreater(root.modified, original_modified)
 
     def test_update_version_label_clears_on_blank(self) -> None:
         root = Document.objects.create(
@@ -660,6 +671,26 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_update_version_requires_global_change_permission(self) -> None:
+        user = User.objects.create_user(username="add-only")
+        user.user_permissions.add(Permission.objects.get(codename="add_document"))
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+        )
+        self.client.force_authenticate(user=user)
+
+        with mock.patch("documents.views.consume_file") as consume_mock:
+            resp = self.client.post(
+                f"/api/documents/{root.id}/update_version/",
+                {"document": self._make_pdf_upload()},
+                format="multipart",
+            )
+
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+        consume_mock.apply_async.assert_not_called()
+
     def test_update_version_returns_404_for_missing_document(self) -> None:
         resp = self.client.post(
             "/api/documents/9999/update_version/",
@@ -798,6 +829,67 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data["content"], "v1-content")
 
+    def _make_root_with_out_of_order_versions(self) -> tuple[Document, ...]:
+        """
+        A root whose newest version has a *lower* id than an older one, which is
+        what merging an existing document in as a version produces.
+        """
+        root = Document.objects.create(
+            title="root",
+            checksum="root",
+            mime_type="application/pdf",
+            content="root-content",
+        )
+        newest = Document.objects.create(
+            title="newest",
+            checksum="newest",
+            mime_type="application/pdf",
+            content="newest-content",
+        )
+        older = Document.objects.create(
+            title="older",
+            checksum="older",
+            mime_type="application/pdf",
+            root_document=root,
+            version_index=1,
+            content="older-content",
+        )
+        # Assigned last, so `newest` has the lower id despite being the later version
+        newest.root_document = root
+        newest.version_index = 2
+        newest.save()
+        return root, newest, older
+
+    def test_retrieve_uses_version_index_not_id_for_latest(self) -> None:
+        root, _, _ = self._make_root_with_out_of_order_versions()
+
+        resp = self.client.get(f"/api/documents/{root.id}/")
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.data["content"], "newest-content")
+
+    def test_list_uses_version_index_not_id_for_latest(self) -> None:
+        self._make_root_with_out_of_order_versions()
+
+        resp = self.client.get("/api/documents/?fields=id,content")
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            [doc["content"] for doc in resp.data["results"]],
+            ["newest-content"],
+        )
+
+    def test_versions_are_listed_newest_first_with_root_last(self) -> None:
+        root, newest, older = self._make_root_with_out_of_order_versions()
+
+        resp = self.client.get(f"/api/documents/{root.id}/")
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            [(version["id"], version["is_root"]) for version in resp.data["versions"]],
+            [(newest.id, False), (older.id, False), (root.id, True)],
+        )
+
 
 class TestVersionAwareFilters(TestCase):
     def test_title_content_filter_falls_back_to_content(self) -> None:
@@ -833,3 +925,36 @@ class TestVersionAwareFilters(TestCase):
 
         self.assertIs(result, queryset)
         queryset.filter.assert_not_called()
+
+
+class TestBulkSelectionExcludesVersions(DjangoTestCase):
+    def test_select_all_matching_does_not_select_version_documents(self) -> None:
+        """
+        "Select all matching" reconstructs the document list, which never
+        contains version documents as rows of their own.
+        """
+        user = User.objects.create_superuser(username="bulk_versions")
+        root = Document.objects.create(
+            title="shared-title root",
+            checksum="bulk-root",
+            mime_type="application/pdf",
+            content="root",
+        )
+        Document.objects.create(
+            title="shared-title version",
+            checksum="bulk-version",
+            mime_type="application/pdf",
+            root_document=root,
+            version_index=1,
+            content="version",
+        )
+
+        selected = DocumentSelectionMixin()._resolve_document_ids(
+            user=user,
+            validated_data={
+                "all": True,
+                "filters": {"title__icontains": "shared-title"},
+            },
+        )
+
+        self.assertEqual(selected, [root.id])

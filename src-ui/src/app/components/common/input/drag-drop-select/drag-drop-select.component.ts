@@ -46,6 +46,8 @@ export class DragDropSelectComponent extends AbstractInputComponent<string[]> {
   }
 
   public drop(event: CdkDragDrop<string[]>) {
+    if (this.disabled) return
+
     if (
       event.previousContainer === event.container &&
       event.container === this.selectedList

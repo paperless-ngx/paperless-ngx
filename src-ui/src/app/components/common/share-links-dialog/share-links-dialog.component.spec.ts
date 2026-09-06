@@ -4,12 +4,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing'
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
@@ -56,7 +51,7 @@ describe('ShareLinksDialogComponent', () => {
 
   it('should support refresh to retrieve links', () => {
     const getSpy = jest.spyOn(shareLinkService, 'getLinksForDocument')
-    component.documentId = 99
+    component.documentId.set(99)
 
     const now = new Date()
     const expiration7days = new Date()
@@ -88,7 +83,7 @@ describe('ShareLinksDialogComponent', () => {
 
     fixture.detectChanges()
 
-    expect(component.shareLinks).toHaveLength(2)
+    expect(component.shareLinks()).toHaveLength(2)
   })
 
   it('should show error on refresh if needed', () => {
@@ -96,16 +91,17 @@ describe('ShareLinksDialogComponent', () => {
     jest
       .spyOn(shareLinkService, 'getLinksForDocument')
       .mockReturnValueOnce(throwError(() => new Error('Unable to get links')))
-    component.documentId = 99
+    component.documentId.set(99)
 
     component.ngOnInit()
     fixture.detectChanges()
     expect(toastSpy).toHaveBeenCalled()
   })
 
-  it('should support link creation then refresh & copy url', fakeAsync(() => {
+  it('should support link creation then refresh & copy url', () => {
+    jest.useFakeTimers()
     const createSpy = jest.spyOn(shareLinkService, 'createLinkForDocument')
-    component.documentId = 99
+    component.documentId.set(99)
     component.expirationDays = 7
     component.useArchiveVersion = false
 
@@ -126,16 +122,17 @@ describe('ShareLinksDialogComponent', () => {
       expiration: expiration.toISOString(),
     })
     fixture.detectChanges()
-    tick(3000)
+    jest.advanceTimersByTime(3000)
 
     expect(refreshSpy).toHaveBeenCalled()
     expect(copySpy).toHaveBeenCalled()
-    expect(component.copied).toEqual(1)
-    tick(100) // copy timeout
-  }))
+    expect(component.copied()).toEqual(1)
+    jest.advanceTimersByTime(100) // copy timeout
+    jest.useRealTimers()
+  })
 
   it('should show error on link creation if needed', () => {
-    component.documentId = 99
+    component.documentId.set(99)
     component.expirationDays = 7
 
     const expiration = new Date()
@@ -227,7 +224,7 @@ describe('ShareLinksDialogComponent', () => {
   })
 
   it('should disable archive switch & option if no archive available', (done) => {
-    component.hasArchiveVersion = false
+    component.hasArchiveVersion.set(false)
     component.ngOnInit()
     fixture.detectChanges()
     expect(component.useArchiveVersion).toBeFalsy()

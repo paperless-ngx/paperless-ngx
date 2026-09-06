@@ -93,6 +93,36 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data["count"], 0)
         self.assertEqual(len(results), 0)
 
+    def test_search_after_restore_from_trash(self) -> None:
+        """
+        GIVEN:
+            - Indexed document that was moved to the trash
+        WHEN:
+            - The document is restored from the trash
+        THEN:
+            - The document is searchable again without a reindex
+        """
+        doc = Document.objects.create(
+            title="invoice",
+            content="the thing i bought at a shop and paid with bank account",
+            checksum="A",
+            pk=1,
+        )
+        get_backend().add_or_update(doc)
+
+        self.assertEqual(self.client.get("/api/documents/?query=shop").data["count"], 1)
+
+        self.client.delete(f"/api/documents/{doc.pk}/")
+        self.assertEqual(self.client.get("/api/documents/?query=shop").data["count"], 0)
+
+        response = self.client.post(
+            "/api/trash/",
+            {"action": "restore", "documents": [doc.pk]},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(self.client.get("/api/documents/?query=shop").data["count"], 1)
+
     def test_simple_text_search(self) -> None:
         tagged = Tag.objects.create(name="invoice")
         matching_doc = Document.objects.create(
@@ -720,14 +750,58 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(results[0]["id"], 3)
         self.assertEqual(results[0]["title"], "bank statement 3")
 
+    def test_search_added_previous_month_excludes_next_period_start(self) -> None:
+        """
+        GIVEN:
+            - One document added at the last instant of last month
+            - One document added exactly at the first instant of this month
+        WHEN:
+            - Query for documents added in the previous month
+        THEN:
+            - Only the document from last month is returned; the document dated
+              exactly at the start of this month (the exclusive upper bound of
+              the range) is not
+        """
+        d1 = DocumentFactory.create(
+            title="end of last month",
+            content="last instant of last month",
+            checksum="A",
+            pk=1,
+            added=timezone.make_aware(datetime.datetime(2024, 1, 31, 23, 59, 59)),
+        )
+        d2 = DocumentFactory.create(
+            title="start of this month",
+            content="first instant of this month",
+            checksum="B",
+            pk=2,
+            added=timezone.make_aware(datetime.datetime(2024, 2, 1, 0, 0, 0)),
+        )
+
+        backend = get_backend()
+        backend.add_or_update(d1)
+        backend.add_or_update(d2)
+
+        with time_machine.travel(
+            timezone.make_aware(datetime.datetime(2024, 2, 15, 12, 0, 0)),
+            tick=False,
+        ):
+            response = self.client.get("/api/documents/?query=added:previous month")
+        results = response.data["results"]
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], 1)
+        self.assertEqual(results[0]["title"], "end of last month")
+
     def test_search_added_invalid_date(self) -> None:
         """
         GIVEN:
             - One document added right now
         WHEN:
-            - Query with invalid added date
+            - Query with an invalid added date
         THEN:
-            - 400 Bad Request returned (Tantivy rejects invalid date field syntax)
+            - 400 Bad Request with a message naming the malformed date, so the
+              user knows their date is invalid rather than silently getting zero
+              results
         """
         d1 = Document.objects.create(
             title="invoice",
@@ -740,8 +814,9 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
 
         response = self.client.get("/api/documents/?query=added:invalid-date")
 
-        # Tantivy rejects unparsable field queries with a 400
+        # An unparsable date is reported as a malformed query, not silently empty.
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("invalid-date", str(response.data["query"]))
 
     @override_settings(
         TIME_ZONE="UTC",
@@ -829,6 +904,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         """
         u1 = User.objects.create_user("user1")
         u2 = User.objects.create_user("user2")
+        u1.user_permissions.add(Permission.objects.get(codename="view_document"))
 
         self.client.force_authenticate(user=u1)
 
@@ -874,6 +950,30 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         response = self.client.get("/api/search/autocomplete/?term=app")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, ["applebaum", "apples", "appletini"])
+
+    def test_search_autocomplete_group_revocation_is_immediate(self) -> None:
+        user = User.objects.create_user("group-user")
+        owner = User.objects.create_user("document-owner")
+        group = Group.objects.create(name="temporary-viewers")
+        user.user_permissions.add(Permission.objects.get(codename="view_document"))
+        user.groups.add(group)
+
+        document = Document.objects.create(
+            title="private",
+            content="canarysecretautocomplete",
+            checksum="group-revocation",
+            owner=owner,
+        )
+        assign_perm("view_document", group, document)
+        get_backend().add_or_update(document)
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get("/api/search/autocomplete/?term=canarysecret")
+        self.assertEqual(response.data, ["canarysecretautocomplete"])
+
+        user.groups.remove(group)
+        response = self.client.get("/api/search/autocomplete/?term=canarysecret")
+        self.assertEqual(response.data, [])
 
     def test_search_autocomplete_field_name_match(self) -> None:
         """
@@ -987,33 +1087,52 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         THEN:
             - The similar documents are returned from the API request
         """
-        # Distinct created/added dates: documents created at the same instant
-        # share a timestamp term, and more_like_this (which cannot be scoped to
-        # content fields) would then match on it, surfacing unrelated documents.
-        d1 = DocumentFactory(
-            title="invoice",
-            content="the thing i bought at a shop and paid with bank account",
-            created=datetime.date(2018, 1, 1),
-            added=timezone.make_aware(datetime.datetime(2018, 1, 1)),
-        )
-        d2 = DocumentFactory(
-            title="bank statement 1",
-            content="things i paid for in august",
-            created=datetime.date(2019, 3, 4),
-            added=timezone.make_aware(datetime.datetime(2019, 3, 4)),
-        )
-        d3 = DocumentFactory(
-            title="bank statement 3",
-            content="things i paid for in september",
-            created=datetime.date(2020, 7, 9),
-            added=timezone.make_aware(datetime.datetime(2020, 7, 9)),
-        )
-        d4 = DocumentFactory(
-            title="Quarterly Report",
-            content="quarterly revenue profit margin earnings growth",
-            created=datetime.date(2021, 11, 30),
-            added=timezone.make_aware(datetime.datetime(2021, 11, 30)),
-        )
+        # Distinct created/added/modified dates: documents sharing a timestamp
+        # term (down to the second) would be matched on it by more_like_this
+        # (which cannot be scoped to content fields), surfacing unrelated
+        # documents. `modified` is auto_now, so it can't be set via factory
+        # kwargs like created/added - freeze time per document instead so all
+        # three date fields land on distinct seconds.
+        with time_machine.travel(
+            timezone.make_aware(datetime.datetime(2018, 1, 1)),
+            tick=False,
+        ):
+            d1 = DocumentFactory(
+                title="invoice",
+                content="the thing i bought at a shop and paid with bank account",
+                created=datetime.date(2018, 1, 1),
+                added=timezone.make_aware(datetime.datetime(2018, 1, 1)),
+            )
+        with time_machine.travel(
+            timezone.make_aware(datetime.datetime(2019, 3, 4)),
+            tick=False,
+        ):
+            d2 = DocumentFactory(
+                title="bank statement 1",
+                content="things i paid for in august",
+                created=datetime.date(2019, 3, 4),
+                added=timezone.make_aware(datetime.datetime(2019, 3, 4)),
+            )
+        with time_machine.travel(
+            timezone.make_aware(datetime.datetime(2020, 7, 9)),
+            tick=False,
+        ):
+            d3 = DocumentFactory(
+                title="bank statement 3",
+                content="things i paid for in september",
+                created=datetime.date(2020, 7, 9),
+                added=timezone.make_aware(datetime.datetime(2020, 7, 9)),
+            )
+        with time_machine.travel(
+            timezone.make_aware(datetime.datetime(2021, 11, 30)),
+            tick=False,
+        ):
+            d4 = DocumentFactory(
+                title="Quarterly Report",
+                content="quarterly revenue profit margin earnings growth",
+                created=datetime.date(2021, 11, 30),
+                added=timezone.make_aware(datetime.datetime(2021, 11, 30)),
+            )
         backend = get_backend()
         backend.add_or_update(d1)
         backend.add_or_update(d2)

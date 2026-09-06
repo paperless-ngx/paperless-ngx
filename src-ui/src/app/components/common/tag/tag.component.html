@@ -1,13 +1,13 @@
-@if (tag) {
-  @if (showParents && tag.parent) {
-    <pngx-tag [tagID]="tag.parent" [clickable]="clickable" [linkTitle]="linkTitle"></pngx-tag>
+@if (tag()) {
+  @if (showParents() && tag().parent) {
+    <pngx-tag [tagID]="tag().parent" [clickable]="clickable()" [linkTitle]="linkTitle()"></pngx-tag>
       &nbsp;&gt;&nbsp;
   }
-  @if (!clickable) {
-    <span class="badge" [style.background]="tag.color" [style.color]="tag.text_color">{{tag.name}}</span>
+  @if (!clickable()) {
+    <span class="badge" [style.background]="tag().color" [style.color]="tag().text_color">{{tag().name}}</span>
   }
-  @if (clickable) {
-    <a [title]="linkTitle" class="badge" [style.background]="tag.color" [style.color]="tag.text_color">{{tag.name}}</a>
+  @if (clickable()) {
+    <a [title]="linkTitle()" class="badge" [style.background]="tag().color" [style.color]="tag().text_color">{{tag().name}}</a>
   }
 } @else if (loading) {
   <span class="placeholder-glow">
@@ -16,10 +16,10 @@
     </span>
   </span>
 } @else {
-  @if (!clickable) {
+  @if (!clickable()) {
     <span class="badge private" i18n>Private</span>
   }
-  @if (clickable) {
-    <a [title]="linkTitle" class="badge private" i18n>Private</a>
+  @if (clickable()) {
+    <a [title]="linkTitle()" class="badge private" i18n>Private</a>
   }
 }

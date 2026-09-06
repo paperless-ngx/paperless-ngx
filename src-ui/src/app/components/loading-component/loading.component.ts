@@ -1,4 +1,4 @@
-import { Directive, OnDestroy } from '@angular/core'
+import { Directive, OnDestroy, signal } from '@angular/core'
 import { Subject } from 'rxjs'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 
@@ -7,8 +7,8 @@ export abstract class LoadingComponentWithPermissions
   extends ComponentWithPermissions
   implements OnDestroy
 {
-  public loading: boolean = true
-  public show: boolean = false
+  readonly loading = signal(true)
+  readonly show = signal(false)
 
   protected unsubscribeNotifier: Subject<any> = new Subject()
 

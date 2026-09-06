@@ -445,12 +445,13 @@ class TestConsumeFile:
         target = consumption_dir / "document.pdf"
         shutil.copy(sample_pdf, target)
 
-        _consume_file(
+        result = _consume_file(
             filepath=target,
             consumption_dir=consumption_dir,
             subdirs_as_tags=False,
         )
 
+        assert result is True
         mock_consume_file_delay.apply_async.assert_called_once()
         call_args = mock_consume_file_delay.apply_async.call_args
         consumable_doc = call_args.kwargs["kwargs"]["input_doc"]
@@ -464,11 +465,12 @@ class TestConsumeFile:
         mock_consume_file_delay: MagicMock,
     ) -> None:
         """Test _consume_file handles nonexistent files gracefully."""
-        _consume_file(
+        result = _consume_file(
             filepath=consumption_dir / "nonexistent.pdf",
             consumption_dir=consumption_dir,
             subdirs_as_tags=False,
         )
+        assert result is False
         mock_consume_file_delay.apply_async.assert_not_called()
 
     def test_consume_directory(
@@ -480,11 +482,12 @@ class TestConsumeFile:
         subdir = consumption_dir / "subdir"
         subdir.mkdir()
 
-        _consume_file(
+        result = _consume_file(
             filepath=subdir,
             consumption_dir=consumption_dir,
             subdirs_as_tags=False,
         )
+        assert result is False
         mock_consume_file_delay.apply_async.assert_not_called()
 
     def test_consume_with_permission_error(
@@ -499,12 +502,32 @@ class TestConsumeFile:
         shutil.copy(sample_pdf, target)
 
         mocker.patch.object(Path, "is_file", side_effect=PermissionError("denied"))
-        _consume_file(
+        result = _consume_file(
             filepath=target,
             consumption_dir=consumption_dir,
             subdirs_as_tags=False,
         )
+        assert result is False
         mock_consume_file_delay.apply_async.assert_not_called()
+
+    def test_consume_with_apply_async_failure(
+        self,
+        consumption_dir: Path,
+        sample_pdf: Path,
+        mock_consume_file_delay: MagicMock,
+    ) -> None:
+        """Test _consume_file reports failure when apply_async raises."""
+        target = consumption_dir / "document.pdf"
+        shutil.copy(sample_pdf, target)
+
+        mock_consume_file_delay.apply_async.side_effect = Exception("broker down")
+
+        result = _consume_file(
+            filepath=target,
+            consumption_dir=consumption_dir,
+            subdirs_as_tags=False,
+        )
+        assert result is False
 
     def test_consume_with_tags_error(
         self,
@@ -522,11 +545,12 @@ class TestConsumeFile:
             side_effect=DatabaseError("Something happened"),
         )
 
-        _consume_file(
+        result = _consume_file(
             filepath=target,
             consumption_dir=consumption_dir,
             subdirs_as_tags=True,
         )
+        assert result is True
         mock_consume_file_delay.apply_async.assert_called_once()
         call_args = mock_consume_file_delay.apply_async.call_args
         overrides = call_args.kwargs["kwargs"]["overrides"]
@@ -684,6 +708,7 @@ class ConsumerThread(Thread):
         subdirs_as_tags: bool = False,
         polling_interval: float = 0,
         stability_delay: float = 0.1,
+        rescan_interval: float | None = None,
     ) -> None:
         super().__init__()
         self.consumption_dir = consumption_dir
@@ -693,6 +718,8 @@ class ConsumerThread(Thread):
         self.polling_interval = polling_interval
         self.stability_delay = stability_delay
         self.cmd = Command()
+        if rescan_interval is not None:
+            self.cmd.rescan_interval_s = rescan_interval
         self.cmd.stop_flag.clear()
         # Non-daemon ensures finally block runs and connections are closed
         self.daemon = False
@@ -877,6 +904,41 @@ class TestCommandWatch:
         ]
         assert call_args.original_file.name == "valid.pdf"
 
+    def test_ignores_event_for_already_queued_file(
+        self,
+        consumption_dir: Path,
+        sample_pdf: Path,
+        mock_consume_file_delay: MagicMock,
+        start_consumer: Callable[..., ConsumerThread],
+    ) -> None:
+        """
+        A stray filesystem event (NAS metadata touch, AV scan, etc.) on a
+        file that has already been queued and is awaiting consumption must
+        not cause it to be queued a second time (GH #13511). The task is
+        mocked, so the file is never removed from disk, mirroring a
+        long-running OCR job still holding it.
+        """
+        thread = start_consumer()
+
+        target = consumption_dir / "document.pdf"
+        shutil.copy(sample_pdf, target)
+
+        wait_for_mock_call(mock_consume_file_delay.apply_async, timeout_s=2.0)
+
+        if thread.exception:
+            raise thread.exception
+
+        assert mock_consume_file_delay.apply_async.call_count == 1
+
+        # Simulate a stray event on the still-present, already-queued file.
+        target.touch()
+        sleep(0.5)
+
+        if thread.exception:
+            raise thread.exception
+
+        assert mock_consume_file_delay.apply_async.call_count == 1
+
     @pytest.mark.django_db
     @pytest.mark.usefixtures("mock_supported_extensions")
     def test_stop_flag_stops_consumer(
@@ -1052,3 +1114,246 @@ class TestCommandWatchEdgeCases:
             thread.stop_and_wait(timeout=5.0)
             # Clean up any Tags created by the thread
             Tag.objects.all().delete()
+
+
+class TestRescanExistingFiles:
+    """
+    Unit tests for the rescan safety net.
+
+    Each ``watch()`` recreation silently adopts the current directory contents
+    as its baseline, so a file appearing between one batch and the next
+    watcher's baseline is never reported and would sit in the consume directory
+    forever. ``_rescan_existing_files`` re-injects such files into the
+    stability tracker as a periodic safety net (see GH issue #13011).
+    """
+
+    @pytest.fixture
+    def pdf_only_filter(self) -> ConsumerFilter:
+        return ConsumerFilter(
+            supported_extensions=frozenset({".pdf"}),
+            ignore_patterns=[],
+        )
+
+    def _rescan(
+        self,
+        directory: Path,
+        consumer_filter: ConsumerFilter,
+        tracker: FileStabilityTracker,
+        queued: set[Path],
+        *,
+        recursive: bool = False,
+    ) -> None:
+        Command()._rescan_existing_files(
+            directory=directory,
+            recursive=recursive,
+            consumer_filter=consumer_filter,
+            tracker=tracker,
+            queued=queued,
+        )
+
+    def test_tracks_stranded_file(
+        self,
+        consumption_dir: Path,
+        sample_pdf: Path,
+        pdf_only_filter: ConsumerFilter,
+    ) -> None:
+        """A supported on-disk file the watcher never reported gets tracked."""
+        target = consumption_dir / "stranded.pdf"
+        shutil.copy(sample_pdf, target)
+        tracker = FileStabilityTracker(stability_delay=0.1)
+
+        self._rescan(consumption_dir, pdf_only_filter, tracker, set())
+
+        assert tracker.is_tracking(target) is True
+        assert tracker.pending_count == 1
+
+    def test_skips_already_tracked_file(
+        self,
+        consumption_dir: Path,
+        sample_pdf: Path,
+        pdf_only_filter: ConsumerFilter,
+    ) -> None:
+        """A file already being tracked by the watcher is not double-tracked."""
+        target = consumption_dir / "tracked.pdf"
+        shutil.copy(sample_pdf, target)
+        tracker = FileStabilityTracker(stability_delay=0.1)
+        tracker.track(target, Change.added)
+
+        self._rescan(consumption_dir, pdf_only_filter, tracker, set())
+
+        assert tracker.pending_count == 1
+
+    def test_skips_queued_file(
+        self,
+        consumption_dir: Path,
+        sample_pdf: Path,
+        pdf_only_filter: ConsumerFilter,
+    ) -> None:
+        """A file already queued and awaiting consumption is not re-tracked."""
+        target = consumption_dir / "inflight.pdf"
+        shutil.copy(sample_pdf, target)
+        tracker = FileStabilityTracker(stability_delay=0.1)
+        queued = {target.resolve()}
+
+        self._rescan(consumption_dir, pdf_only_filter, tracker, queued)
+
+        assert tracker.pending_count == 0
+
+    def test_prunes_vanished_queued_paths(
+        self,
+        consumption_dir: Path,
+        pdf_only_filter: ConsumerFilter,
+    ) -> None:
+        """Queued paths no longer on disk are dropped so the name can recur."""
+        gone = (consumption_dir / "gone.pdf").resolve()
+        tracker = FileStabilityTracker(stability_delay=0.1)
+        queued = {gone}
+
+        self._rescan(consumption_dir, pdf_only_filter, tracker, queued)
+
+        assert gone not in queued
+
+    def test_skips_unsupported_extension(
+        self,
+        consumption_dir: Path,
+        pdf_only_filter: ConsumerFilter,
+    ) -> None:
+        """Files filtered out by the consumer filter are not tracked."""
+        (consumption_dir / "notes.xyz").write_bytes(b"content")
+        tracker = FileStabilityTracker(stability_delay=0.1)
+
+        self._rescan(consumption_dir, pdf_only_filter, tracker, set())
+
+        assert tracker.pending_count == 0
+
+    def test_recursive_respects_flag(
+        self,
+        consumption_dir: Path,
+        sample_pdf: Path,
+        pdf_only_filter: ConsumerFilter,
+    ) -> None:
+        """Nested files are only found when recursive scanning is enabled."""
+        subdir = consumption_dir / "nested"
+        subdir.mkdir()
+        target = subdir / "deep.pdf"
+        shutil.copy(sample_pdf, target)
+
+        shallow = FileStabilityTracker(stability_delay=0.1)
+        self._rescan(consumption_dir, pdf_only_filter, shallow, set())
+        assert shallow.pending_count == 0
+
+        deep = FileStabilityTracker(stability_delay=0.1)
+        self._rescan(consumption_dir, pdf_only_filter, deep, set(), recursive=True)
+        assert deep.is_tracking(target) is True
+
+
+class TestProcessExistingFilesQueued:
+    """Tests that startup processing reports which paths it queued."""
+
+    @pytest.mark.usefixtures("mock_supported_extensions")
+    def test_returns_queued_paths(
+        self,
+        consumption_dir: Path,
+        sample_pdf: Path,
+        mock_consume_file_delay: MagicMock,
+        settings: SettingsWrapper,
+    ) -> None:
+        """The set returned seeds the rescan's queued set, avoiding re-queue."""
+        target = consumption_dir / "document.pdf"
+        shutil.copy(sample_pdf, target)
+        settings.CONSUMER_IGNORE_PATTERNS = []
+
+        queued = Command()._process_existing_files(
+            directory=consumption_dir,
+            recursive=False,
+            subdirs_as_tags=False,
+            consumer_filter=ConsumerFilter(ignore_patterns=[]),
+        )
+
+        assert target.resolve() in queued
+
+
+@pytest.mark.management
+@pytest.mark.django_db
+class TestCommandRetryAfterQueueFailure:
+    """
+    Regression test for GH #13923.
+
+    A file whose ``apply_async`` publish fails (e.g. broker briefly down)
+    must not be marked as queued, so the periodic rescan retries it once
+    the broker recovers, instead of stranding it until the consumer
+    process is restarted.
+    """
+
+    def test_watch_loop_retries_failed_publish_on_rescan(
+        self,
+        consumption_dir: Path,
+        sample_pdf: Path,
+        mock_consume_file_delay: MagicMock,
+        start_consumer: Callable[..., ConsumerThread],
+    ) -> None:
+        """A publish failure from the watch loop is retried by the rescan."""
+        apply_async = mock_consume_file_delay.apply_async
+
+        def fail_first_call(*args: object, **kwargs: object) -> None:
+            if apply_async.call_count == 1:
+                raise Exception("broker down")
+
+        apply_async.side_effect = fail_first_call
+
+        thread = start_consumer(stability_delay=0.1, rescan_interval=0.3)
+
+        target = consumption_dir / "document.pdf"
+        shutil.copy(sample_pdf, target)
+
+        deadline = monotonic() + 5.0
+        while apply_async.call_count < 2 and monotonic() < deadline:
+            sleep(0.1)
+
+        if thread.exception:
+            raise thread.exception
+
+        assert apply_async.call_count >= 2, (
+            "Expected the failed publish to be retried by the rescan, "
+            f"but apply_async was only called {apply_async.call_count} time(s)"
+        )
+
+
+@pytest.mark.management
+@pytest.mark.django_db
+class TestCommandRescanRecovery:
+    """End-to-end test that the rescan recovers files the watcher misses."""
+
+    def test_rescan_consumes_file_the_watcher_never_reports(
+        self,
+        consumption_dir: Path,
+        sample_pdf: Path,
+        mock_consume_file_delay: MagicMock,
+        start_consumer: Callable[..., ConsumerThread],
+    ) -> None:
+        """
+        Isolate the rescan path: a long polling interval guarantees the
+        watcher cannot report the file within the test window, so only the
+        periodic rescan can consume it.
+        """
+        # poll interval far longer than the test window -> watcher stays silent
+        thread = start_consumer(
+            polling_interval=30.0,
+            stability_delay=0.1,
+            rescan_interval=0.5,
+        )
+
+        # created after startup, so _process_existing_files did not see it
+        target = consumption_dir / "stranded.pdf"
+        shutil.copy(sample_pdf, target)
+
+        wait_for_mock_call(mock_consume_file_delay.apply_async, timeout_s=5.0)
+
+        if thread.exception:
+            raise thread.exception
+
+        mock_consume_file_delay.apply_async.assert_called()
+        call_args = mock_consume_file_delay.apply_async.call_args.kwargs["kwargs"][
+            "input_doc"
+        ]
+        assert call_args.original_file.name == "stranded.pdf"

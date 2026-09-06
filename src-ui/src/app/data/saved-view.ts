@@ -5,6 +5,8 @@ import { ObjectWithPermissions } from './object-with-permissions'
 export interface SavedView extends ObjectWithPermissions {
   name?: string
 
+  icon?: string
+
   show_on_dashboard?: boolean
 
   show_in_sidebar?: boolean

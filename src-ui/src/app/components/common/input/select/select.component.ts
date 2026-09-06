@@ -13,6 +13,7 @@ import {
 import { RouterModule } from '@angular/router'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { matchesSearchText } from 'src/app/utils/text-search'
 import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
@@ -34,7 +35,7 @@ import { AbstractInputComponent } from '../abstract-input'
     NgxBootstrapIconsModule,
   ],
 })
-export class SelectComponent extends AbstractInputComponent<number> {
+export class SelectComponent extends AbstractInputComponent<number | string> {
   constructor() {
     super()
     this.addItemRef = this.addItem.bind(this)
@@ -98,6 +99,12 @@ export class SelectComponent extends AbstractInputComponent<number> {
 
   @Input()
   bindLabel: string = 'name'
+
+  @Input()
+  iconField: string
+
+  public searchFn = (term: string, item: any): boolean =>
+    matchesSearchText(item?.[this.bindLabel], term)
 
   @Input()
   showFilter: boolean = false
