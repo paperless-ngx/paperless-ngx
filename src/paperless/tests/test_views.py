@@ -29,3 +29,29 @@ def test_favicon_view_missing_file(
     settings.STATIC_ROOT = tmp_path
     response = client.get("/favicon.ico")
     assert response.status_code == 404
+
+
+def test_favicon_file_is_safari_compatible() -> None:
+    """
+    Safari's icon loader silently rejects any ICO with more than 6 images and
+    then caches the rejection, so the shipped favicon must stay at 6 entries.
+    Every embedded PNG must also match the size its directory entry declares.
+    """
+    favicon = (
+        Path(__file__).parents[1] / "static" / "paperless" / "img" / "favicon.ico"
+    ).read_bytes()
+
+    entry_count = int.from_bytes(favicon[4:6], "little")
+    assert 0 < entry_count <= 6
+
+    for i in range(entry_count):
+        entry = favicon[6 + i * 16 : 6 + (i + 1) * 16]
+        declared = (entry[0] or 256, entry[1] or 256)
+        offset = int.from_bytes(entry[12:16], "little")
+        image = favicon[offset : offset + int.from_bytes(entry[8:12], "little")]
+        if image.startswith(b"\x89PNG\r\n\x1a\n"):
+            actual = (
+                int.from_bytes(image[16:20], "big"),
+                int.from_bytes(image[20:24], "big"),
+            )
+            assert actual == declared, f"entry {i}: PNG {actual} in {declared} slot"
