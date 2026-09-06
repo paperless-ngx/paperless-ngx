@@ -10,7 +10,7 @@ permissions:
   contents: read
 concurrency:
   group: fork-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
 jobs:
   backend:
     uses: ./.github/workflows/ci-backend.yml
