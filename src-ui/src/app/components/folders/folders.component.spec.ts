@@ -116,7 +116,10 @@ describe('FoldersComponent', () => {
   it('should load documents when navigating into a folder', () => {
     const listSpy = jest.spyOn(documentService, 'list')
     component.openFolder(component.foldersById.get(1))
-    expect(listSpy).toHaveBeenCalled()
+    expect(listSpy).toHaveBeenCalledWith(1, 50, 'created', true, {
+      folder__id: 1,
+      truncate_content: true,
+    })
     expect(component.currentFolder?.id).toEqual(1)
     expect(component.subfolders.length).toEqual(1)
   })
@@ -165,9 +168,9 @@ describe('FoldersComponent', () => {
     component.moveDocsTo(2, [10])
     component.moveDocsTo(3, [10])
     expect(bulkSpy).toHaveBeenCalledTimes(1)
-    expect(component.moving).toBe(true)
+    expect(component.moving()).toBe(true)
     pending.complete()
-    expect(component.moving).toBe(false)
+    expect(component.moving()).toBe(false)
   })
 
   it('keeps selection when moving fails so the user can retry', () => {
@@ -178,7 +181,7 @@ describe('FoldersComponent', () => {
     component.selected.add(10)
     component.moveDocsTo(2, [10])
     expect(component.selected.has(10)).toBe(true)
-    expect(component.moving).toBe(false)
+    expect(component.moving()).toBe(false)
   })
 
   it('clears selection on page changes', () => {
@@ -247,7 +250,28 @@ describe('FoldersComponent', () => {
     component.openFolder(null, false)
     pending.next({ count: 1, results: [{ id: 10 }] })
     expect(component.documents).toEqual([])
-    expect(component.documentsLoading).toBe(false)
+    expect(component.documentsLoading()).toBe(false)
+  })
+
+  it('clears asynchronous document loading state when results arrive', () => {
+    const pending = new Subject<any>()
+    jest.spyOn(documentService, 'list').mockReturnValue(pending)
+
+    component.currentFolder = tree[0]
+    component.loadDocuments()
+    expect(component.documentsLoading()).toBe(true)
+
+    pending.next({
+      count: 1,
+      all: [10],
+      results: [{ id: 10, title: 'Invoice', created: '2026-09-06' }],
+    })
+    pending.complete()
+
+    expect(component.documentsLoading()).toBe(false)
+    expect(component.documents.map((document) => document.title)).toEqual([
+      'Invoice',
+    ])
   })
 
   it('should edit name and parent in a single folder dialog', () => {

@@ -139,7 +139,7 @@
               <button
                 type="button"
                 class="btn btn-sm btn-link"
-                [disabled]="moving"
+                [disabled]="moving()"
                 (click)="selected.clear()"
                 i18n
               >
@@ -148,7 +148,7 @@
               <button
                 type="button"
                 class="btn btn-sm btn-primary"
-                [disabled]="moving"
+                [disabled]="moving()"
                 ngbDropdownToggle
               >
                 <i-bs name="folder-symlink"></i-bs>&nbsp;<ng-container i18n
@@ -176,7 +176,7 @@
                   <button
                     type="button"
                     ngbDropdownItem
-                    [disabled]="moving || folder.id === currentFolder.id"
+                    [disabled]="moving() || folder.id === currentFolder.id"
                     [style.padding-left.rem]="1 + folder.depth * 1"
                     (click)="moveSelectedTo(folder)"
                   >
@@ -236,7 +236,7 @@
           <span i18n
             >{{ documentsCount }} documents · {{ selected.size }} selected</span
           >
-          @if (moving) {
+          @if (moving()) {
             <span role="status" i18n>Moving documents…</span>
           } @else {
             <span class="text-muted small" i18n
@@ -246,7 +246,7 @@
         </div>
       }
       @if (currentFolder) {
-        @if (documentsLoading) {
+        @if (documentsLoading()) {
           <div class="d-flex justify-content-center p-4">
             <div class="spinner-border spinner-border-sm" role="status"></div>
           </div>
@@ -261,7 +261,7 @@
                       class="form-check-input"
                       aria-label="Select all movable documents on this page"
                       i18n-aria-label
-                      [disabled]="moving"
+                      [disabled]="moving()"
                       [indeterminate]="selected.size > 0 && !allSelected"
                       [checked]="allSelected"
                       (change)="toggleSelectAll()"
@@ -275,7 +275,7 @@
                 @for (doc of documents; track trackByDocId($index, doc)) {
                   <tr
                     [class.table-active]="isSelected(doc)"
-                    [draggable]="!moving && canMoveDocument(doc)"
+                    [draggable]="!moving() && canMoveDocument(doc)"
                     (dragend)="onDragEnd()"
                     (dragstart)="onDocDragStart($event, doc)"
                   >
@@ -284,7 +284,7 @@
                         type="checkbox"
                         class="form-check-input"
                         [attr.aria-label]="doc.title"
-                        [disabled]="moving || !canMoveDocument(doc)"
+                        [disabled]="moving() || !canMoveDocument(doc)"
                         [checked]="isSelected(doc)"
                         (change)="toggleSelected(doc)"
                       />
@@ -309,7 +309,7 @@
               <ngb-pagination
                 [collectionSize]="documentsCount"
                 [pageSize]="pageSize"
-                [disabled]="moving"
+                [disabled]="moving()"
                 [(page)]="page"
                 [maxSize]="5"
                 (pageChange)="onPageChange($event)"

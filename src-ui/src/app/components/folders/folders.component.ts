@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core'
+import { Component, OnInit, inject, signal } from '@angular/core'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import {
   NgbDropdownModule,
@@ -60,14 +60,14 @@ export class FoldersComponent
   public documentsCount: number = 0
   public page: number = 1
   public pageSize: number = 50
-  public documentsLoading: boolean = false
+  public readonly documentsLoading = signal(false)
 
   public selected: Set<number> = new Set()
   public collapsedFolders: Set<number> = new Set()
 
   private draggedDocIds: number[] = []
   private documentsRequest?: Subscription
-  public moving = false
+  public readonly moving = signal(false)
   public dropTarget: number | null = null
   public destinationSearch = ''
 
@@ -194,7 +194,7 @@ export class FoldersComponent
 
   openFolder(folder: Folder | null, updateUrl: boolean = true): void {
     this.documentsRequest?.unsubscribe()
-    this.documentsLoading = false
+    this.documentsLoading.set(false)
     this.documents = []
     this.documentsCount = 0
     this.currentFolder = folder
@@ -216,7 +216,7 @@ export class FoldersComponent
   loadDocuments(): void {
     this.documentsRequest?.unsubscribe()
     if (!this.currentFolder) return
-    this.documentsLoading = true
+    this.documentsLoading.set(true)
     this.documentsRequest = this.documentService
       .list(this.page, this.pageSize, 'created', true, {
         folder__id: this.currentFolder.id,
@@ -227,14 +227,14 @@ export class FoldersComponent
         next: (result) => {
           this.documents = result.results
           this.documentsCount = result.count
-          this.documentsLoading = false
+          this.documentsLoading.set(false)
           if (!result.results.length && this.page > 1) {
             this.page = Math.max(1, Math.ceil(result.count / this.pageSize))
             this.loadDocuments()
           }
         },
         error: (e) => {
-          this.documentsLoading = false
+          this.documentsLoading.set(false)
           this.toastService.showError($localize`Error loading documents`, e)
         },
       })
@@ -330,7 +330,7 @@ export class FoldersComponent
   }
 
   toggleSelected(doc: Document): void {
-    if (this.moving || !this.canMoveDocument(doc)) return
+    if (this.moving() || !this.canMoveDocument(doc)) return
     if (this.selected.has(doc.id)) {
       this.selected.delete(doc.id)
     } else {
@@ -348,7 +348,7 @@ export class FoldersComponent
   }
 
   toggleSelectAll(): void {
-    if (this.moving) return
+    if (this.moving()) return
     if (this.allSelected) {
       this.selected.clear()
     } else {
@@ -365,16 +365,16 @@ export class FoldersComponent
   }
 
   moveDocsTo(folderId: number, docIds: number[]): void {
-    if (!docIds.length || this.moving || folderId === this.currentFolder?.id)
+    if (!docIds.length || this.moving() || folderId === this.currentFolder?.id)
       return
-    this.moving = true
+    this.moving.set(true)
     const destination = this.foldersById.get(folderId)?.name ?? String(folderId)
     this.documentService
       .bulkEdit({ documents: docIds }, 'set_folder', { folder: folderId })
       .pipe(
         takeUntil(this.unsubscribeNotifier),
         finalize(() => {
-          this.moving = false
+          this.moving.set(false)
         })
       )
       .subscribe({
@@ -396,7 +396,7 @@ export class FoldersComponent
   // --- Native drag & drop ----------------------------------------------------
 
   onDocDragStart(event: DragEvent, doc: Document): void {
-    if (this.moving || !this.canMoveDocument(doc)) {
+    if (this.moving() || !this.canMoveDocument(doc)) {
       event.preventDefault()
       return
     }
@@ -414,7 +414,7 @@ export class FoldersComponent
     if (
       this.draggedDocIds.length &&
       folder.id !== this.currentFolder?.id &&
-      !this.moving
+      !this.moving()
     ) {
       event.preventDefault()
       this.dropTarget = folder.id
