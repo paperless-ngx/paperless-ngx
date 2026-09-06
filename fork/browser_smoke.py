@@ -26,7 +26,11 @@ def main():
             context = browser.new_context(viewport={"width": 1440, "height": 1000})
 
             def local_only(route):
-                if urlsplit(route.request.url).hostname in {"localhost", "127.0.0.1"}:
+                target = urlsplit(route.request.url)
+                if (
+                    target.hostname in {"localhost", "127.0.0.1"}
+                    and target.port == 18080
+                ):
                     route.continue_()
                 else:
                     route.abort()
@@ -48,7 +52,7 @@ def main():
             with page.expect_response(
                 lambda response: (
                     response.request.method in {"PATCH", "PUT"}
-                    and response.url.endswith(path)
+                    and urlsplit(response.url).path == path
                 ),
             ) as saved:
                 page.get_by_role("button", name="Save", exact=True).first.click()
