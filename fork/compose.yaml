@@ -1,0 +1,65 @@
+name: paperless-fork-lab
+# Disposable test state only. No host data mounts and no routed network.
+services:
+  db:
+    image: docker.io/library/postgres:18
+    environment:
+      POSTGRES_DB: paperless_test
+      POSTGRES_USER: paperless_test
+      POSTGRES_PASSWORD: synthetic-test-only
+    volumes:
+      - database:/var/lib/postgresql
+    networks: [lab]
+  broker:
+    image: docker.io/library/redis:7
+    networks: [lab]
+  mock:
+    image: docker.io/library/python:3.14-slim
+    command: [python, -B, /mock/mock_suggestions.py]
+    read_only: true
+    volumes:
+      - ./mock_suggestions.py:/mock/mock_suggestions.py:ro
+    networks: [lab]
+  paperless:
+    image: ${PAPERLESS_TEST_IMAGE:?Set PAPERLESS_TEST_IMAGE to the image under test}
+    depends_on: [db, broker, mock]
+    ports:
+      - "127.0.0.1:18080:8000"
+    environment:
+      PAPERLESS_URL: http://localhost:18080
+      PAPERLESS_ALLOWED_HOSTS: localhost,127.0.0.1,paperless
+      PAPERLESS_CSRF_TRUSTED_ORIGINS: http://localhost:18080,http://127.0.0.1:18080
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_DBHOST: db
+      PAPERLESS_DBNAME: paperless_test
+      PAPERLESS_DBUSER: paperless_test
+      PAPERLESS_DBPASS: synthetic-test-only
+      PAPERLESS_REDIS: redis://broker:6379/0
+      PAPERLESS_SECRET_KEY: synthetic-isolated-lab-only-not-for-deployment
+      PAPERLESS_ADMIN_USER: reviewer
+      PAPERLESS_ADMIN_PASSWORD: synthetic-review-only
+      PAPERLESS_ADMIN_MAIL: reviewer@example.invalid
+      PAPERLESS_OCR_LANGUAGE: eng
+      PAPERLESS_OCR_MODE: skip
+      PAPERLESS_TASK_WORKERS: "1"
+      PAPERLESS_THREADS_PER_WORKER: "1"
+      PAPERLESS_CONSUMER_DISABLE: "1"
+      PAPERLESS_EMAIL_TASK_CRON: disable
+      PAPERLESS_AI_ENABLED: "true"
+      PAPERLESS_AI_LLM_BACKEND: openai-like
+      PAPERLESS_AI_LLM_ENDPOINT: http://mock:8080/v1
+      PAPERLESS_AI_LLM_MODEL: synthetic-fixture
+      PAPERLESS_AI_LLM_API_KEY: synthetic-test-only
+      PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS: "true"
+      PAPERLESS_AI_LLM_REQUEST_TIMEOUT: "15"
+    volumes:
+      - data:/usr/src/paperless/data
+      - media:/usr/src/paperless/media
+    networks: [lab]
+networks:
+  lab:
+    internal: true
+volumes:
+  database:
+  data:
+  media:
