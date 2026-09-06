@@ -27,6 +27,7 @@ services:
       - "127.0.0.1:18080:8000"
     environment:
       PAPERLESS_URL: http://localhost:18080
+      PAPERLESS_BIND_ADDR: 0.0.0.0
       PAPERLESS_ALLOWED_HOSTS: localhost,127.0.0.1,paperless
       PAPERLESS_CSRF_TRUSTED_ORIGINS: http://localhost:18080,http://127.0.0.1:18080
       PAPERLESS_DBENGINE: postgresql
@@ -40,7 +41,7 @@ services:
       PAPERLESS_ADMIN_PASSWORD: synthetic-review-only
       PAPERLESS_ADMIN_MAIL: reviewer@example.invalid
       PAPERLESS_OCR_LANGUAGE: eng
-      PAPERLESS_OCR_MODE: skip
+      PAPERLESS_OCR_MODE: auto
       PAPERLESS_TASK_WORKERS: "1"
       PAPERLESS_THREADS_PER_WORKER: "1"
       PAPERLESS_CONSUMER_DISABLE: "1"

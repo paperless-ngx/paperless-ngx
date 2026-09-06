@@ -2,11 +2,7 @@
 set -euo pipefail
 
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
-if [[ "${PAPERLESS_TEST_ENGINE:-podman}" == docker ]]; then
-	compose=(docker compose)
-else
-	compose=(podman-compose --in-pod=false)
-fi
+compose=(podman-compose --in-pod=false)
 # Do not inherit a developer's application .env file.
 compose+=(--env-file /dev/null -p paperless-fork-lab -f fork/compose.yaml)
 case "${1:-}" in

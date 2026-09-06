@@ -3,7 +3,9 @@
 import json
 import sys
 import unittest
+import urllib.error
 from pathlib import Path
+from unittest.mock import patch
 
 import yaml
 
@@ -66,6 +68,29 @@ class LabTests(unittest.TestCase):
             smoke.SAMPLE.relative_to(FORK.parent).as_posix(),
             "src/documents/tests/samples/simple.pdf",
         )
+
+    def test_readiness_reports_connection_failure(self):
+        import smoke
+
+        with (
+            patch.object(smoke, "api", side_effect=ConnectionError("not listening")),
+            patch.object(smoke.time, "monotonic", side_effect=[0, 0, 241]),
+            patch.object(smoke.time, "sleep"),
+            self.assertRaisesRegex(RuntimeError, "not listening"),
+        ):
+            smoke.wait_for_api()
+
+    def test_readiness_rejects_invalid_credentials_immediately(self):
+        import smoke
+
+        error = urllib.error.HTTPError(smoke.BASE_URL, 401, "Unauthorized", {}, None)
+        with (
+            patch.object(smoke, "api", side_effect=error),
+            patch.object(smoke.time, "sleep") as sleep,
+            self.assertRaisesRegex(RuntimeError, "HTTP 401"),
+        ):
+            smoke.wait_for_api()
+        sleep.assert_not_called()
 
 
 if __name__ == "__main__":

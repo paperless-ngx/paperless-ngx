@@ -34,18 +34,28 @@ def api(path, data=None, method=None, content_type="application/json"):
 
 def wait_for_api():
     deadline = time.monotonic() + 240
+    last_error = None
     while time.monotonic() < deadline:
         try:
             api("/api/documents/?page_size=1")
             return
+        except urllib.error.HTTPError as exc:
+            if exc.code < 500:
+                raise RuntimeError(
+                    f"Lab API configuration/authentication error: HTTP {exc.code}",
+                ) from exc
+            last_error = exc
         except (
             urllib.error.URLError,
             TimeoutError,
             ConnectionError,
             http.client.HTTPException,
-        ):
-            time.sleep(2)
-    raise RuntimeError("The isolated Paperless API did not become ready within 240s")
+        ) as exc:
+            last_error = exc
+        time.sleep(2)
+    raise RuntimeError(
+        f"The isolated Paperless API did not become ready within 240s: {last_error}",
+    ) from last_error
 
 
 def get_or_create(kind, name):

@@ -28,7 +28,6 @@ jobs:
       contents: read
       packages: write
     env:
-      PAPERLESS_TEST_ENGINE: docker
       PAPERLESS_TEST_IMAGE: paperless-fork-test:${{ github.sha }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -38,7 +37,7 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.14'
-      - run: python -m pip install PyYAML==6.0.3
+      - run: python -m pip install PyYAML==6.0.3 podman-compose==1.5.0
       - name: Verify synthetic-only lab contract
         run: python -m unittest discover -s fork/tests -v
       - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
@@ -54,6 +53,8 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
           cache-from: type=gha,scope=fork-amd64
           cache-to: type=gha,scope=fork-amd64,mode=max
+      - name: Load the built image into the acceptance runtime
+        run: bash fork/load_image.sh
       - name: Start isolated stack
         run: bash fork/lab.sh up
       - name: Test native suggestions with the upstream fixture

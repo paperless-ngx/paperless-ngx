@@ -16,7 +16,7 @@ results only.
 
 ## Local review
 
-Requirements: rootless Podman with podman-compose, or Docker Compose; Python 3.
+Requirements: rootless Podman with podman-compose 1.5.0; Python 3.
 The stack has its own PostgreSQL database, Redis, document volumes and a
 deterministic native-AI mock. Its network is internal and only the Paperless UI
 is published, on loopback. No production configuration is loaded.
@@ -28,8 +28,12 @@ bash fork/lab.sh smoke
 ```
 
 Use the upstream image only to establish the baseline. For fork acceptance, set
-`PAPERLESS_TEST_IMAGE` to the exact published fork digest. For Docker, also set
-`PAPERLESS_TEST_ENGINE=docker`.
+`PAPERLESS_TEST_IMAGE` to the exact published fork digest.
+
+Local review and CI acceptance both use Podman. Docker's bridge implementation
+can leave host ports unpublished on an internal-only network; see the
+[upstream report](https://github.com/moby/moby/discussions/53256). The lab keeps
+its internal-only network and loopback binding.
 
 Open <http://localhost:18080>, sign in with `reviewer` /
 `synthetic-review-only`, and open the uploaded **Upstream fixture**. Click
@@ -64,8 +68,9 @@ future document-aware provider or a production proxy.
 ## Release contract
 
 GitHub Actions first runs the reusable upstream backend and frontend tests,
-then builds the upstream Dockerfile for `linux/amd64`, tests the
-result in the isolated stack, and publishes successful branch builds to
+then builds the upstream Dockerfile for `linux/amd64` with Docker Buildx. It
+loads that same image into Podman, verifies its image ID, tests it in the
+isolated stack, and publishes successful branch builds to
 `ghcr.io/szaiser/paperless-ngx` with a `sha-<commit>` tag. Fork release tags use
 `szaiser-v<upstream-version>-<revision>`, for example `szaiser-v3.1.3-1`.
 Retain released tags and images unchanged. Deployments pin the resulting digest;
