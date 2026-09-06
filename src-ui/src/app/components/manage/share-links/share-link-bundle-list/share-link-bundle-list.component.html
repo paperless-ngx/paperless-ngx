@@ -11,11 +11,6 @@
     </div>
   }
   @if (!loading() && !error()) {
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <p class="mb-0 text-muted small">
-        <ng-container i18n>Status updates every few seconds while bundles are being prepared.</ng-container>
-      </p>
-    </div>
     @if (bundles().length === 0) {
       <p class="mb-0 text-muted fst-italic" i18n>No share link bundles currently exist.</p>
     }
@@ -149,20 +144,35 @@
           </tbody>
         </table>
       </div>
-      @if (total() > pageSize) {
-        <div class="d-flex justify-content-end mt-3">
-          <ngb-pagination
-            [pageSize]="pageSize"
-            [collectionSize]="total()"
-            [page]="page()"
-            [maxSize]="5"
-            (pageChange)="setPage($event)"
-            size="sm"
-            aria-label="Share link bundles pagination"
-            i18n-aria-label
-          ></ngb-pagination>
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mt-2">
+        <p class="mb-0 text-muted small">
+          <ng-container i18n>Status updates every few seconds while bundles are being prepared.</ng-container>
+        </p>
+        <div class="d-flex flex-wrap justify-content-end align-items-center gap-3">
+          <div class="d-flex align-items-center">
+            <label class="small text-muted me-2" for="shareLinkBundlePageSize" i18n>Show:</label>
+            <select id="shareLinkBundlePageSize" class="form-select form-select-sm w-auto" [(ngModel)]="pageSize">
+              <option [ngValue]="25">25</option>
+              <option [ngValue]="50">50</option>
+              <option [ngValue]="100">100</option>
+            </select>
+            <span class="small text-muted ms-2 d-none d-md-inline" i18n>per page</span>
+          </div>
+          @if (total() > pageSize) {
+            <ngb-pagination
+              class="mb-0"
+              [pageSize]="pageSize"
+              [collectionSize]="total()"
+              [page]="page()"
+              [maxSize]="5"
+              (pageChange)="setPage($event)"
+              size="sm"
+              aria-label="Share link bundles pagination"
+              i18n-aria-label
+            ></ngb-pagination>
+          }
         </div>
-      }
+      </div>
     }
   }
 </div>

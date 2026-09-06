@@ -85,9 +85,19 @@
         </tbody>
       </table>
     </div>
-    @if (total() > pageSize) {
-      <div class="d-flex justify-content-end mt-3">
+    <div class="d-flex flex-wrap justify-content-end align-items-center gap-3 mt-2">
+      <div class="d-flex align-items-center">
+        <label class="small text-muted me-2" for="shareLinkPageSize" i18n>Show:</label>
+        <select id="shareLinkPageSize" class="form-select form-select-sm w-auto" [(ngModel)]="pageSize">
+          <option [ngValue]="25">25</option>
+          <option [ngValue]="50">50</option>
+          <option [ngValue]="100">100</option>
+        </select>
+        <span class="small text-muted ms-2 d-none d-md-inline" i18n>per page</span>
+      </div>
+      @if (total() > pageSize) {
         <ngb-pagination
+          class="mb-0"
           [pageSize]="pageSize"
           [collectionSize]="total()"
           [page]="page()"
@@ -97,7 +107,7 @@
           aria-label="Share links pagination"
           i18n-aria-label
         ></ngb-pagination>
-      </div>
-    }
+      }
+    </div>
   }
 </div>

@@ -1,6 +1,7 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { CommonModule } from '@angular/common'
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core'
+import { FormsModule } from '@angular/forms'
 import {
   NgbPaginationModule,
   NgbPopoverModule,
@@ -14,8 +15,10 @@ import {
   ShareLinkBundleStatus,
   ShareLinkBundleSummary,
 } from 'src/app/data/share-link-bundle'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { FileSizePipe } from 'src/app/pipes/file-size.pipe'
 import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ConfirmButtonComponent } from 'src/app/components/common/confirm-button/confirm-button.component'
@@ -28,6 +31,7 @@ import { LoadingComponentWithPermissions } from 'src/app/components/loading-comp
   imports: [
     ConfirmButtonComponent,
     CommonModule,
+    FormsModule,
     NgbPaginationModule,
     NgbPopoverModule,
     NgxBootstrapIconsModule,
@@ -39,6 +43,7 @@ export class ShareLinkBundleListComponent
   implements OnInit, OnDestroy
 {
   private readonly shareLinkBundleService = inject(ShareLinkBundleService)
+  private readonly settingsService = inject(SettingsService)
   private readonly toastService = inject(ToastService)
   private readonly clipboard = inject(Clipboard)
 
@@ -47,10 +52,32 @@ export class ShareLinkBundleListComponent
   readonly copiedSlug = signal<string | null>(null)
   readonly total = signal(0)
   readonly page = signal(1)
-  readonly pageSize = 25
 
   readonly statuses = ShareLinkBundleStatus
   readonly fileVersions = FileVersion
+
+  get pageSize(): number {
+    return (
+      this.settingsService.get(SETTINGS_KEYS.OBJECT_LIST_SIZES)
+        ?.share_link_bundles || 25
+    )
+  }
+
+  set pageSize(pageSize: number) {
+    this.settingsService.set(SETTINGS_KEYS.OBJECT_LIST_SIZES, {
+      ...this.settingsService.get(SETTINGS_KEYS.OBJECT_LIST_SIZES),
+      share_link_bundles: pageSize,
+    })
+    this.settingsService.storeSettings().subscribe({
+      next: () => {
+        this.page.set(1)
+        this.triggerRefresh(false)
+      },
+      error: (error) => {
+        this.toastService.showError($localize`Error saving settings`, error)
+      },
+    })
+  }
 
   private readonly refresh$ = new Subject<boolean>()
 

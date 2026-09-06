@@ -7,7 +7,9 @@ import {
   ShareLinkBundleStatus,
   ShareLinkBundleSummary,
 } from 'src/app/data/share-link-bundle'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ShareLinkBundleListComponent } from './share-link-bundle-list.component'
@@ -119,6 +121,25 @@ describe('ShareLinkBundleListComponent', () => {
     component.setPage(2)
 
     expect(service.list).toHaveBeenLastCalledWith(2, 25, 'created', true)
+  })
+
+  it('stores a changed page size and reloads from the first page', () => {
+    fixture.detectChanges()
+    const settingsService = TestBed.inject(SettingsService)
+    jest
+      .spyOn(settingsService, 'get')
+      .mockReturnValueOnce({ share_link_bundles: 25 })
+    const setSpy = jest.spyOn(settingsService, 'set')
+    jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of({}))
+    component.page.set(2)
+
+    component.pageSize = 100
+
+    expect(setSpy).toHaveBeenCalledWith(SETTINGS_KEYS.OBJECT_LIST_SIZES, {
+      share_link_bundles: 100,
+    })
+    expect(component.page()).toBe(1)
+    expect(service.list).toHaveBeenLastCalledWith(1, 100, 'created', true)
   })
 
   it('copies bundle links when ready', () => {

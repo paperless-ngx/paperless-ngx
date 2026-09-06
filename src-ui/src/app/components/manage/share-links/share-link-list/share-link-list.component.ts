@@ -1,6 +1,7 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { CommonModule } from '@angular/common'
 import { Component, OnInit, inject, signal } from '@angular/core'
+import { FormsModule } from '@angular/forms'
 import { RouterModule } from '@angular/router'
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -9,6 +10,7 @@ import { ConfirmButtonComponent } from 'src/app/components/common/confirm-button
 import { LoadingComponentWithPermissions } from 'src/app/components/loading-component/loading.component'
 import { FileVersion, ShareLink } from 'src/app/data/share-link'
 import { SHARE_LINK_BUNDLE_FILE_VERSION_LABELS } from 'src/app/data/share-link-bundle'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import {
@@ -16,6 +18,7 @@ import {
   PermissionType,
 } from 'src/app/services/permissions.service'
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 
@@ -26,6 +29,7 @@ import { environment } from 'src/environments/environment'
     CommonModule,
     ConfirmButtonComponent,
     DocumentTitlePipe,
+    FormsModule,
     IfPermissionsDirective,
     NgbPaginationModule,
     NgxBootstrapIconsModule,
@@ -38,6 +42,7 @@ export class ShareLinkListComponent
 {
   private readonly clipboard = inject(Clipboard)
   private readonly shareLinkService = inject(ShareLinkService)
+  private readonly settingsService = inject(SettingsService)
   private readonly toastService = inject(ToastService)
 
   readonly links = signal<ShareLink[]>([])
@@ -46,9 +51,31 @@ export class ShareLinkListComponent
   readonly copiedID = signal<number | null>(null)
   readonly copiedDocumentID = signal<number | null>(null)
   readonly error = signal<string | null>(null)
-  readonly pageSize = 25
   readonly PermissionAction = PermissionAction
   readonly PermissionType = PermissionType
+
+  get pageSize(): number {
+    return (
+      this.settingsService.get(SETTINGS_KEYS.OBJECT_LIST_SIZES)?.share_links ||
+      25
+    )
+  }
+
+  set pageSize(pageSize: number) {
+    this.settingsService.set(SETTINGS_KEYS.OBJECT_LIST_SIZES, {
+      ...this.settingsService.get(SETTINGS_KEYS.OBJECT_LIST_SIZES),
+      share_links: pageSize,
+    })
+    this.settingsService.storeSettings().subscribe({
+      next: () => {
+        this.page.set(1)
+        this.reload()
+      },
+      error: (error) => {
+        this.toastService.showError($localize`Error saving settings`, error)
+      },
+    })
+  }
 
   ngOnInit(): void {
     this.reload()

@@ -4,7 +4,9 @@ import { RouterTestingModule } from '@angular/router/testing'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { FileVersion, ShareLink } from 'src/app/data/share-link'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ShareLinkListComponent } from './share-link-list.component'
 
@@ -63,7 +65,7 @@ describe('ShareLinkListComponent', () => {
     expect(service.list).toHaveBeenCalledWith(1, 25, 'created', true)
     expect(component.links()).toEqual([link])
     expect(fixture.nativeElement.textContent).toContain('Test document')
-    expect(fixture.nativeElement.textContent).toContain('Document #42')
+    expect(fixture.nativeElement.textContent).toContain('ID: 42')
   })
 
   it('loads another page', () => {
@@ -71,6 +73,23 @@ describe('ShareLinkListComponent', () => {
     component.setPage(2)
 
     expect(service.list).toHaveBeenLastCalledWith(2, 25, 'created', true)
+  })
+
+  it('stores a changed page size and reloads from the first page', () => {
+    const settingsService = TestBed.inject(SettingsService)
+    jest.spyOn(settingsService, 'get').mockReturnValueOnce({ share_links: 25 })
+    const setSpy = jest.spyOn(settingsService, 'set')
+    jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of({}))
+    const reloadSpy = jest.spyOn(component, 'reload')
+    component.page.set(2)
+
+    component.pageSize = 50
+
+    expect(setSpy).toHaveBeenCalledWith(SETTINGS_KEYS.OBJECT_LIST_SIZES, {
+      share_links: 50,
+    })
+    expect(component.page()).toBe(1)
+    expect(reloadSpy).toHaveBeenCalled()
   })
 
   it('shows local copy feedback without a toast', () => {

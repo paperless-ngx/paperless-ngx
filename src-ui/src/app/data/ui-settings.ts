@@ -228,6 +228,8 @@ export const SETTINGS: UiSetting[] = [
       document_types: 25,
       tags: 25,
       storage_paths: 25,
+      share_links: 25,
+      share_link_bundles: 25,
     },
   },
   {
