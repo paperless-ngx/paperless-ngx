@@ -26,12 +26,12 @@
 # documentation.
 services:
   broker:
-    image: docker.io/library/redis:8@sha256:aa049e689e141a4358ad1d4562dc49c88a89fbab711fd8fcc33f684c80b26301
+    image: docker.io/library/redis:8@sha256:298e5b3bc566bade82f46ad5511777a4a07a294097ce16ada2f6a42be5239df5
     restart: unless-stopped
     volumes:
       - /home/pablo/datos/paperless/redis:/data
   db:
-    image: docker.io/library/postgres:18@sha256:8ff36f3c66371cba71d20ceedccfc3de9669a68737607888c4ef0af93abe8e39
+    image: docker.io/library/postgres:18@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280
     restart: unless-stopped
     volumes:
       - /home/pablo/datos/paperless/postgres:/var/lib/postgresql
