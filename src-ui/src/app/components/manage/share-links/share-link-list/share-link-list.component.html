@@ -29,9 +29,14 @@
           @for (link of links(); track link.id) {
             <tr>
               <td>
-                <a routerLink="/documents/{{ link.document }}">
-                  <ng-container i18n>Document #{{ link.document }}</ng-container>
-                </a>
+                <a routerLink="/documents/{{ link.document }}">{{ link.document_title | documentTitle }}</a>
+                <span class="badge bg-primary text-primary-text-contrast ms-3 small fs-normal cursor-pointer" (click)="copyDocumentID(link.document)">
+                  @if (copiedDocumentID() === link.document) {
+                    <i-bs width="1em" height="1em" name="clipboard-check" class="me-1"></i-bs><ng-container i18n>Copied!</ng-container>
+                  } @else {
+                    ID: {{link.document}}
+                  }
+                </span>
               </td>
               <td>{{ link.created | date: 'short' }}</td>
               <td>

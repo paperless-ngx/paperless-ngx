@@ -10,6 +10,7 @@ import { LoadingComponentWithPermissions } from 'src/app/components/loading-comp
 import { FileVersion, ShareLink } from 'src/app/data/share-link'
 import { SHARE_LINK_BUNDLE_FILE_VERSION_LABELS } from 'src/app/data/share-link-bundle'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import {
   PermissionAction,
   PermissionType,
@@ -24,6 +25,7 @@ import { environment } from 'src/environments/environment'
   imports: [
     CommonModule,
     ConfirmButtonComponent,
+    DocumentTitlePipe,
     IfPermissionsDirective,
     NgbPaginationModule,
     NgxBootstrapIconsModule,
@@ -42,6 +44,7 @@ export class ShareLinkListComponent
   readonly total = signal(0)
   readonly page = signal(1)
   readonly copiedID = signal<number | null>(null)
+  readonly copiedDocumentID = signal<number | null>(null)
   readonly error = signal<string | null>(null)
   readonly pageSize = 25
   readonly PermissionAction = PermissionAction
@@ -113,5 +116,12 @@ export class ShareLinkListComponent
         )
       },
     })
+  }
+
+  copyDocumentID(documentID: number): void {
+    if (this.clipboard.copy(documentID.toString())) {
+      this.copiedDocumentID.set(documentID)
+      setTimeout(() => this.copiedDocumentID.set(null), 3000)
+    }
   }
 }

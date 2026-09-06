@@ -18,6 +18,7 @@ describe('ShareLinkListComponent', () => {
   const link = {
     id: 1,
     document: 42,
+    document_title: 'Test document',
     slug: 'share-slug',
     created: new Date().toISOString(),
     expiration: null,
@@ -61,6 +62,7 @@ describe('ShareLinkListComponent', () => {
 
     expect(service.list).toHaveBeenCalledWith(1, 25, 'created', true)
     expect(component.links()).toEqual([link])
+    expect(fixture.nativeElement.textContent).toContain('Test document')
     expect(fixture.nativeElement.textContent).toContain('Document #42')
   })
 
