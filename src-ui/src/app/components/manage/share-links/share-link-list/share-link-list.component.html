@@ -1,0 +1,98 @@
+<div class="border border-top-0 rounded-bottom p-3">
+  @if (loading()) {
+    <div class="d-flex align-items-center gap-2">
+      <div class="spinner-border spinner-border-sm" role="status"></div>
+      <span i18n>Loading share links…</span>
+    </div>
+  }
+  @if (!loading() && error()) {
+    <div class="alert alert-danger mb-0" role="alert">{{ error() }}</div>
+  }
+  @if (!loading() && !error() && links().length === 0) {
+    <p class="mb-0 text-muted fst-italic" i18n>
+      No document share links currently exist.
+    </p>
+  }
+  @if (!loading() && !error() && links().length > 0) {
+    <div class="table-responsive">
+      <table class="table table-sm align-middle mb-0">
+        <thead>
+          <tr>
+            <th scope="col" i18n>Document</th>
+            <th scope="col" i18n>Created</th>
+            <th scope="col" i18n>Expires</th>
+            <th scope="col" i18n>File version</th>
+            <th scope="col" class="text-end" i18n>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (link of links(); track link.id) {
+            <tr>
+              <td>
+                <a routerLink="/documents/{{ link.document }}">
+                  <ng-container i18n>Document #{{ link.document }}</ng-container>
+                </a>
+              </td>
+              <td>{{ link.created | date: 'short' }}</td>
+              <td>
+                @if (link.expiration) {
+                  {{ link.expiration | date: 'short' }}
+                } @else {
+                  <span i18n>Never</span>
+                }
+              </td>
+              <td>{{ fileVersionLabel(link.file_version) }}</td>
+              <td class="text-end">
+                <div class="d-inline-block position-relative">
+                  <span
+                    class="badge bg-primary small fade position-absolute top-50 end-100 translate-middle-y me-2 pe-none z-3 text-nowrap"
+                    [class.show]="copiedID() === link.id"
+                    i18n
+                  >Copied!</span>
+                  <div class="btn-group btn-group-sm">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary"
+                      (click)="copy(link)"
+                      title="Copy share link"
+                      i18n-title
+                    >
+                      @if (copiedID() === link.id) {
+                        <i-bs name="clipboard-check"></i-bs>
+                      } @else {
+                        <i-bs name="clipboard"></i-bs>
+                      }
+                      <span class="visually-hidden" i18n>Copy share link</span>
+                    </button>
+                    <pngx-confirm-button
+                      *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.ShareLink }"
+                      buttonClasses="btn btn-sm btn-outline-danger"
+                      (confirm)="delete(link)"
+                      iconName="trash"
+                    >
+                      <span class="visually-hidden" i18n>Delete share link</span>
+                    </pngx-confirm-button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (total() > pageSize) {
+      <div class="d-flex justify-content-end mt-3">
+        <ngb-pagination
+          [pageSize]="pageSize"
+          [collectionSize]="total()"
+          [page]="page()"
+          [maxSize]="5"
+          (pageChange)="setPage($event)"
+          size="sm"
+          aria-label="Share links pagination"
+          i18n-aria-label
+        ></ngb-pagination>
+      </div>
+    }
+  }
+</div>

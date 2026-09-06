@@ -16,9 +16,7 @@
     <li [ngbNavItem]="ShareLinksNavIDs.DocumentLinks">
       <button ngbNavLink i18n>Document links</button>
       <ng-template ngbNavContent>
-        <div class="border border-top-0 rounded-bottom p-3 text-muted" i18n>
-          Manage links to individual documents here.
-        </div>
+        <pngx-share-link-list></pngx-share-link-list>
       </ng-template>
     </li>
   }

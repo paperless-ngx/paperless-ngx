@@ -9,6 +9,7 @@ import {
   PermissionType,
 } from 'src/app/services/permissions.service'
 import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
+import { ShareLinkService } from 'src/app/services/rest/share-link.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { ShareLinksComponent, ShareLinksNavIDs } from './share-links.component'
@@ -43,6 +44,13 @@ describe('ShareLinksComponent', () => {
           useValue: {
             listAllBundles: jest.fn().mockReturnValue(of([])),
             rebuildBundle: jest.fn(),
+            delete: jest.fn(),
+          },
+        },
+        {
+          provide: ShareLinkService,
+          useValue: {
+            list: jest.fn().mockReturnValue(of({ count: 0, results: [] })),
             delete: jest.fn(),
           },
         },
