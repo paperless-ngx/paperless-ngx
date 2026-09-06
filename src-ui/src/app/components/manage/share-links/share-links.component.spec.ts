@@ -42,7 +42,7 @@ describe('ShareLinksComponent', () => {
         {
           provide: ShareLinkBundleService,
           useValue: {
-            listAllBundles: jest.fn().mockReturnValue(of([])),
+            list: jest.fn().mockReturnValue(of({ count: 0, results: [] })),
             rebuildBundle: jest.fn(),
             delete: jest.fn(),
           },

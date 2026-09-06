@@ -168,7 +168,6 @@ describe('BulkEditorComponent', () => {
           provide: ShareLinkBundleService,
           useValue: {
             createBundle: jest.fn(),
-            listAllBundles: jest.fn(),
             rebuildBundle: jest.fn(),
             delete: jest.fn(),
           },

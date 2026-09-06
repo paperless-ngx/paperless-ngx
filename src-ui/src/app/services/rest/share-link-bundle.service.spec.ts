@@ -48,13 +48,4 @@ describe('ShareLinkBundleService', () => {
     expect(req.request.body).toEqual({})
     req.flush({})
   })
-
-  it('lists bundles with expected parameters', () => {
-    subscription = service.listAllBundles().subscribe()
-    const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=1000&ordering=-created`
-    )
-    expect(req.request.method).toBe('GET')
-    req.flush({ results: [] })
-  })
 })
