@@ -24,7 +24,7 @@ from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
-from django.db import DataError
+from django.db import connection
 from django.db.models import Count
 from django.db.models import Q
 from django.db.models.functions import Lower
@@ -782,30 +782,24 @@ class _BatchingTagsRelatedField(serializers.ManyRelatedField):
         if not self.allow_empty and len(data) == 0:
             self.fail("empty")
 
-        item_pks = [(item, self._normalize_pk(item)) for item in data]
-        candidate_pks = {pk for _, pk in item_pks if pk is not None}
-
-        # Django's IntegerFieldOverflow guard (-> EmptyResultSet, i.e. no
-        # match) only covers exact/gt/gte/lt/lte lookups, not `in` -- an
-        # out-of-range int in `pk__in=` reaches the DB driver as-is and
+        queryset = self.child_relation.get_queryset()
+        # An out-of-range int in `pk__in=` reaches the DB driver as-is and
         # raises OverflowError (SQLite) / DataError (Postgres) instead of
-        # cleanly matching nothing. The per-item `exact`-lookup fallback
-        # below IS covered, so on that failure just skip the batch and let
-        # every item resolve individually -- each still costs one query,
-        # but reports the normal validation error instead of a raw 500.
-        try:
-            resolved_by_pk = {
-                obj.pk: obj
-                for obj in self.child_relation.get_queryset().filter(
-                    pk__in=candidate_pks,
-                )
-            }
-        except (OverflowError, DataError):
-            resolved_by_pk = {}
+        # cleanly matching nothing, unlike the exact/gt/gte/lt/lte lookups
+        # Django itself guards. Pre-filter against the pk column's range so
+        # such an id never reaches the query, and let it fall through to the
+        # per-item `exact` lookup below for the normal validation error.
+        min_pk, max_pk = connection.ops.integer_field_range(
+            queryset.model._meta.pk.get_internal_type(),
+        )
+        item_pks = [(item, self._normalize_pk(item)) for item in data]
+        resolved_by_pk = queryset.in_bulk(
+            {pk for _, pk in item_pks if pk is not None and min_pk <= pk <= max_pk},
+        )
 
         result = []
         for item, pk in item_pks:
-            obj = resolved_by_pk.get(pk) if pk is not None else None
+            obj = resolved_by_pk.get(pk)
             result.append(
                 obj if obj is not None else self.child_relation.to_internal_value(item),
             )
