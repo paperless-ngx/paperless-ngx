@@ -237,6 +237,9 @@ export class DocumentDetailComponent
     this.settings.getSignal<boolean>(
       SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL
     )
+  private readonly autoSuggestSetting = this.settings.getSignal<boolean>(
+    SETTINGS_KEYS.DOCUMENT_EDITING_AUTO_SUGGEST
+  )
   private readonly hiddenFieldsSetting = this.settings.getSignal<
     DocumentDetailFieldID[]
   >(SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS)
@@ -355,6 +358,10 @@ export class DocumentDetailComponent
 
   get aiEnabled(): boolean {
     return this.aiEnabledSetting()
+  }
+
+  get autoSuggest(): boolean {
+    return this.autoSuggestSetting()
   }
 
   get archiveContentRenderType(): ContentRenderType {
@@ -904,6 +911,7 @@ export class DocumentDetailComponent
     this.updateFormForCustomFields()
     this.loadMetadataForSelectedVersion()
     if (
+      this.autoSuggest &&
       this.permissionsService.currentUserHasObjectPermissions(
         PermissionAction.Change,
         doc
