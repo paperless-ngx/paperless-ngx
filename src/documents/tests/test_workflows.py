@@ -5711,6 +5711,39 @@ class TestApplyAISuggestionsWorkflowAction(
         self.assertEqual(changed, [])
         self.assertIn("AI is not enabled", "".join(cm.output))
 
+    def test_document_without_content_does_nothing(self) -> None:
+        """
+        GIVEN:
+            - A document whose OCR content is empty or whitespace-only
+        WHEN:
+            - AI suggestions are applied by a workflow
+        THEN:
+            - The classifier is not called and the document is left unchanged
+        """
+        action = self.make_action(ai_overwrite_existing=True)
+
+        for content in ("", " \n\t"):
+            with self.subTest(content=content):
+                self.doc.content = content
+                self.doc.save(update_fields=["content"])
+
+                with (
+                    mock.patch(
+                        "documents.workflows.ai.get_ai_document_classification",
+                    ) as get_classification,
+                    self.assertLogs(
+                        "paperless.workflows.ai",
+                        level="WARNING",
+                    ) as cm,
+                ):
+                    changed = apply_ai_suggestions_to_document(action, self.doc)
+
+                self.assertEqual(changed, [])
+                get_classification.assert_not_called()
+                self.assertIn("has no content", "".join(cm.output))
+                self.doc.refresh_from_db()
+                self.assertEqual(self.doc.title, "original.pdf")
+
     def test_invalid_configuration_leaves_document_untouched(self) -> None:
         """
         GIVEN:
