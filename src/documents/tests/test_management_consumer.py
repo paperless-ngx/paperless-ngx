@@ -43,7 +43,7 @@ if TYPE_CHECKING:
     from collections.abc import Generator
     from unittest.mock import MagicMock
 
-    from pytest_django.fixtures import SettingsWrapper
+    from pytest_django.fixtures import Settings
     from pytest_mock import MockerFixture
 
 
@@ -605,7 +605,7 @@ class TestCommandValidation:
 
     def test_raises_for_missing_consumption_dir(
         self,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         """Test command raises error when directory is not provided."""
         settings.CONSUMPTION_DIR = None
@@ -639,7 +639,7 @@ class TestCommandOneshot:
         scratch_dir: Path,
         sample_pdf: Path,
         mock_consume_file_delay: MagicMock,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         """Test oneshot mode processes existing files."""
         target = consumption_dir / "document.pdf"
@@ -659,7 +659,7 @@ class TestCommandOneshot:
         scratch_dir: Path,
         sample_pdf: Path,
         mock_consume_file_delay: MagicMock,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         """Test oneshot mode processes files recursively."""
         subdir = consumption_dir / "subdir"
@@ -681,7 +681,7 @@ class TestCommandOneshot:
         consumption_dir: Path,
         scratch_dir: Path,
         mock_consume_file_delay: MagicMock,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         """Test oneshot mode ignores unsupported file extensions."""
         target = consumption_dir / "document.xyz"
@@ -1256,7 +1256,7 @@ class TestProcessExistingFilesQueued:
         consumption_dir: Path,
         sample_pdf: Path,
         mock_consume_file_delay: MagicMock,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         """The set returned seeds the rescan's queued set, avoiding re-queue."""
         target = consumption_dir / "document.pdf"

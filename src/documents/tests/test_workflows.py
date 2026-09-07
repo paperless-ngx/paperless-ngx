@@ -23,6 +23,7 @@ from guardian.shortcuts import get_users_with_perms
 from httpx import ConnectError
 from httpx import HTTPError
 from httpx import HTTPStatusError
+from pytest_django.fixtures import Settings
 from pytest_httpx import HTTPXMock
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
@@ -38,7 +39,6 @@ from paperless_ai.exceptions import LLMTimeoutError
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
-from pytest_django.fixtures import SettingsWrapper
 
 from documents import tasks
 from documents.data_models import ConsumableDocument
@@ -5356,7 +5356,7 @@ class TestDateWorkflowLocalization(
     def test_document_consumption_workflow_localization(
         self,
         tmp_path: Path,
-        settings: SettingsWrapper,
+        settings: Settings,
         title_template: str,
         expected_title: str,
     ) -> None:

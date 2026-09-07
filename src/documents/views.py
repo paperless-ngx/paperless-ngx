@@ -2091,6 +2091,7 @@ class DocumentViewSet(
             if version_label:
                 overrides.version_label = version_label.strip()
             if request.user is not None:
+                overrides.owner_id = request.user.id
                 overrides.actor_id = request.user.id
 
             async_task = consume_file.apply_async(
@@ -2815,6 +2816,7 @@ class DocumentSelectionMixin:
         filtered_documents = DocumentFilterSet(
             data=orm_filters,
             queryset=permitted_documents,
+            user=user,
         ).qs.distinct()
         # tantivy-filtered docs (if search params provided)
         search_filtered_ids = self._get_search_document_ids(
