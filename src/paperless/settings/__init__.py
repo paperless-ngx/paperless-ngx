@@ -1226,13 +1226,16 @@ AI_ENABLED = get_bool_from_env("PAPERLESS_AI_ENABLED", "NO")
 # Optional document-aware classification provider. Native AI remains the default.
 AI_SUGGESTIONS_ENDPOINT = os.getenv("PAPERLESS_AI_SUGGESTIONS_ENDPOINT", "").strip()
 AI_SUGGESTIONS_API_KEY = os.getenv("PAPERLESS_AI_SUGGESTIONS_API_KEY", "")
-AI_SUGGESTIONS_ALLOW_INTERNAL = get_bool_from_env(
-    "PAPERLESS_AI_SUGGESTIONS_ALLOW_INTERNAL",
+AI_SUGGESTIONS_ALLOW_INTERNAL_ENDPOINTS = get_bool_from_env(
+    "PAPERLESS_AI_SUGGESTIONS_ALLOW_INTERNAL_ENDPOINTS",
     "false",
 )
-AI_SUGGESTIONS_TIMEOUT = get_int_from_env("PAPERLESS_AI_SUGGESTIONS_TIMEOUT", 120)
-if AI_SUGGESTIONS_TIMEOUT < 1:
-    raise ImproperlyConfigured("PAPERLESS_AI_SUGGESTIONS_TIMEOUT must be >= 1")
+AI_SUGGESTIONS_REQUEST_TIMEOUT = get_int_from_env(
+    "PAPERLESS_AI_SUGGESTIONS_REQUEST_TIMEOUT",
+    120,
+)
+if AI_SUGGESTIONS_REQUEST_TIMEOUT < 1:
+    raise ImproperlyConfigured("PAPERLESS_AI_SUGGESTIONS_REQUEST_TIMEOUT must be >= 1")
 LLM_EMBEDDING_BACKEND = get_choice_from_env(
     "PAPERLESS_AI_LLM_EMBEDDING_BACKEND",
     {"huggingface", "openai-like", "ollama"},

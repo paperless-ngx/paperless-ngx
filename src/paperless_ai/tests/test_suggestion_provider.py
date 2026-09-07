@@ -1,5 +1,7 @@
 import copy
 import json
+import socket
+from collections.abc import Callable
 from contextlib import nullcontext
 from typing import Any
 from unittest.mock import patch
@@ -21,6 +23,7 @@ from documents.models import WorkflowAction
 from documents.tests.utils import DirectoriesMixin
 from documents.workflows.ai import apply_ai_suggestions_to_document
 from paperless_ai.ai_classifier import get_ai_document_classification
+from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.exceptions import StaleSuggestions
 from paperless_ai.exceptions import SuggestionProviderError
 from paperless_ai.exceptions import SuggestionProviderUnavailable
@@ -38,7 +41,7 @@ PROPOSAL = {
 }
 
 
-def response_for(request) -> dict[str, Any]:
+def response_for(request: dict[str, Any]) -> dict[str, Any]:
     return {
         "protocol_version": 1,
         "request_id": request["request_id"],
@@ -53,7 +56,7 @@ def response_for(request) -> dict[str, Any]:
     NUMBER_OF_SUGGESTED_DATES=3,
 )
 class TestSuggestionProvider(DirectoriesMixin, TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.user = User.objects.create_superuser(username="synthetic-reviewer")
         self.document = Document.objects.create(
@@ -85,10 +88,10 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
         self.llm = self.enterContext(patch("paperless_ai.ai_classifier.AIClient"))
         self.client.force_login(self.user)
 
-    def classify(self):
+    def classify(self) -> ClassificationSuggestions:
         return get_ai_document_classification(self.document, self.user, "de")
 
-    def test_explicit_context_and_classic_candidates_without_writes(self):
+    def test_explicit_context_and_classic_candidates_without_writes(self) -> None:
         field = CustomField.objects.create(
             name="Synthetic amount",
             data_type="monetary",
@@ -113,7 +116,7 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
         self.assertEqual(document_snapshot(self.document), before)
         self.llm.assert_not_called()
 
-    def test_effective_content_carries_its_actual_version_identity(self):
+    def test_effective_content_carries_its_actual_version_identity(self) -> None:
         version = Document.objects.create(
             root_document=self.document,
             version_index=2,
@@ -129,7 +132,49 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
         self.assertEqual(snapshot["content"], "Synthetic revised text")
         self.assertEqual(snapshot["title"], "Saved title")
 
-    def test_external_provider_bypasses_native_cache(self):
+    def test_native_endpoint_uses_the_http_adapter_without_writes(self) -> None:
+        before = document_snapshot(self.document)
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            payload = json.loads(request.content)
+            self.assertEqual(payload["event"], "suggestions.requested")
+            self.assertEqual(payload["document"], before)
+            self.assertEqual(payload["classic_suggestions"]["tags"], [self.tag.pk])
+            response = response_for(payload)
+            response["suggestions"]["tags"]["existing_ids"] = [self.tag.pk]
+            return httpx.Response(200, json=response)
+
+        self.post.side_effect = post_provider
+        with patch(
+            "paperless_ai.suggestion_provider.create_pinned_httpx_client",
+            return_value=httpx.Client(transport=httpx.MockTransport(handler)),
+        ):
+            response = self.client.get(
+                f"/api/documents/{self.document.pk}/ai_suggestions/",
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["title"], PROPOSAL["title"])
+        self.assertEqual(response.json()["tags"], [self.tag.pk])
+        self.assertEqual(document_snapshot(self.document), before)
+        self.llm.assert_not_called()
+
+    def test_document_permissions_are_checked_before_contacting_provider(self) -> None:
+        self.client.force_login(User.objects.create_user(username="other-reviewer"))
+        response = self.client.get(f"/api/documents/{self.document.pk}/ai_suggestions/")
+        self.assertEqual(response.status_code, 403)
+        self.post.assert_not_called()
+
+    @override_settings(NUMBER_OF_SUGGESTED_DATES=0)
+    def test_disabled_date_suggestions_skip_the_parser(self) -> None:
+        with patch("paperless_ai.suggestion_provider.get_date_parser") as parser:
+            self.classify()
+        parser.assert_not_called()
+        self.assertEqual(
+            self.post.call_args.args[0]["classic_suggestions"]["dates"],
+            [],
+        )
+
+    def test_external_provider_bypasses_native_cache(self) -> None:
         with (
             patch("documents.views.get_llm_suggestion_cache") as cache_get,
             patch("documents.views.set_llm_suggestions_cache") as cache_set,
@@ -147,11 +192,13 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
         cache_get.assert_not_called()
         cache_set.assert_not_called()
 
-    def test_metadata_and_ocr_changes_are_rejected_even_without_checksum_change(self):
+    def test_metadata_and_ocr_changes_are_rejected_even_without_checksum_change(
+        self,
+    ) -> None:
         for change in ({"title": "Human correction"}, {"content": "Corrected text"}):
             with self.subTest(change=change):
 
-                def changed(request):
+                def changed(request: dict[str, Any]) -> dict[str, Any]:
                     Document.objects.filter(pk=self.document.pk).update(**change)
                     return response_for(request)
 
@@ -159,8 +206,8 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
                 with self.assertRaises(StaleSuggestions):
                     self.classify()
 
-    def test_new_version_during_request_is_rejected(self):
-        def changed(request):
+    def test_new_version_during_request_is_rejected(self) -> None:
+        def changed(request: dict[str, Any]) -> dict[str, Any]:
             Document.objects.create(
                 root_document=self.document,
                 version_index=1,
@@ -172,8 +219,21 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
         with self.assertRaises(StaleSuggestions):
             self.classify()
 
-    def test_tag_changes_are_rejected(self):
-        def changed(request):
+    def test_document_deleted_before_or_during_request_is_rejected(self) -> None:
+        def deleted(request: dict[str, Any]) -> dict[str, Any]:
+            Document.objects.filter(pk=self.document.pk).delete()
+            return response_for(request)
+
+        self.post.side_effect = deleted
+        with self.assertRaises(StaleSuggestions):
+            self.classify()
+        self.post.reset_mock()
+        with self.assertRaises(StaleSuggestions):
+            self.classify()
+        self.post.assert_not_called()
+
+    def test_tag_changes_are_rejected(self) -> None:
+        def changed(request: dict[str, Any]) -> dict[str, Any]:
             self.document.tags.clear()
             return response_for(request)
 
@@ -181,10 +241,10 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
         with self.assertRaises(StaleSuggestions):
             self.classify()
 
-    def test_custom_field_changes_are_rejected(self):
+    def test_custom_field_changes_are_rejected(self) -> None:
         field = CustomField.objects.create(name="Synthetic note", data_type="string")
 
-        def changed(request):
+        def changed(request: dict[str, Any]) -> dict[str, Any]:
             CustomFieldInstance.objects.create(
                 document=self.document,
                 field=field,
@@ -197,7 +257,7 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
             self.classify()
 
     @override_settings(AI_SUGGESTIONS_ENDPOINT="")
-    def test_disabled_provider_retains_upstream_classifier(self):
+    def test_disabled_provider_retains_upstream_classifier(self) -> None:
         self.llm.return_value.run_llm_query.return_value = copy.deepcopy(PROPOSAL)
         self.assertEqual(
             get_ai_document_classification(self.document, self.user),
@@ -206,24 +266,34 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
         self.post.assert_not_called()
         self.llm.assert_called_once()
 
-    def test_response_must_echo_exact_request_and_context(self):
+    def test_response_must_echo_exact_request_and_context(self) -> None:
         for key in ("request_id", "context_id"):
             with self.subTest(key=key):
 
-                def wrong(request):
+                def wrong(request: dict[str, Any]) -> dict[str, Any]:
                     return {**response_for(request), key: "another-request"}
 
                 self.post.side_effect = wrong
                 with self.assertRaises(SuggestionProviderError):
                     self.classify()
 
-    def test_invisible_taxonomy_is_neither_sent_nor_accepted(self):
+    def test_protocol_version_requires_integer_one(self) -> None:
+        for version in (True, 1.0, "1", 0, 2):
+            with self.subTest(version=version):
+                self.post.side_effect = lambda request: {
+                    **response_for(request),
+                    "protocol_version": version,
+                }
+                with self.assertRaises(SuggestionProviderError):
+                    self.classify()
+
+    def test_invisible_taxonomy_is_neither_sent_nor_accepted(self) -> None:
         limited = User.objects.create_user(username="limited")
         hidden = Tag.objects.create(name="Private synthetic tag", owner=self.user)
         self.document.owner = limited
         self.document.save()
 
-        def wrong(request):
+        def wrong(request: dict[str, Any]) -> dict[str, Any]:
             self.assertNotIn(
                 hidden.pk,
                 [item["id"] for item in request["taxonomy"]["tags"]],
@@ -236,16 +306,22 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
         with self.assertRaises(SuggestionProviderError):
             get_ai_document_classification(self.document, limited)
 
-    def test_invalid_response_fails_without_fallback(self):
+    def test_invalid_response_fails_without_fallback(self) -> None:
         for field, value in (
             ("title", "x" * 129),
             ("dates", ["2026-02-30"]),
+            ("dates", ["2026-01-01"] * 4),
             ("tags", {"existing_ids": [True]}),
+            ("tags", {"existing_ids": [-1]}),
+            ("tags", {"existing_ids": list(range(1, 102))}),
+            ("tags", {"new_names": [" "]}),
+            ("tags", {"new_names": ["x" * 129]}),
+            ("tags", {"new_names": ["new"] * 9}),
             ("extra", "unexpected"),
         ):
             with self.subTest(field=field):
 
-                def invalid(request):
+                def invalid(request: dict[str, Any]) -> dict[str, Any]:
                     response = response_for(request)
                     response["suggestions"][field] = value
                     return response
@@ -255,7 +331,7 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
                     self.classify()
         self.llm.assert_not_called()
 
-    def test_view_reports_provider_errors_without_changing_document(self):
+    def test_view_reports_provider_errors_without_changing_document(self) -> None:
         for error, code in (
             (StaleSuggestions, 409),
             (SuggestionProviderUnavailable, 503),
@@ -267,16 +343,17 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
                     f"/api/documents/{self.document.pk}/ai_suggestions/",
                 )
                 self.assertEqual(response.status_code, code)
+                self.assertNotIn("Synthetic provider error", response.content.decode())
                 self.document.refresh_from_db()
                 self.assertEqual(self.document.title, "Saved title")
 
     @override_settings(AI_ENABLED=False)
-    def test_native_ai_enable_gate_still_applies(self):
+    def test_native_ai_enable_gate_still_applies(self) -> None:
         response = self.client.get(f"/api/documents/{self.document.pk}/ai_suggestions/")
         self.assertEqual(response.status_code, 400)
         self.post.assert_not_called()
 
-    def test_workflow_uses_same_provider_and_native_field_selection(self):
+    def test_workflow_uses_same_provider_and_native_field_selection(self) -> None:
         storage = StoragePath.objects.create(name="Existing path", path="existing")
         self.document.storage_path = storage
         self.document.save()
@@ -297,7 +374,9 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
         self.assertEqual(self.post.call_args.args[0]["requester_id"], self.user.pk)
         self.llm.assert_not_called()
 
-    def test_background_apply_notifies_separately_without_updated_workflow_loop(self):
+    def test_background_apply_notifies_separately_without_updated_workflow_loop(
+        self,
+    ) -> None:
         action = WorkflowAction.objects.create(
             type=WorkflowAction.WorkflowActionType.APPLY_AI_SUGGESTIONS,
             ai_suggestion_fields=[WorkflowAction.AISuggestionField.TITLE],
@@ -320,7 +399,7 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
         self.assertNotIn("content", event)
         updated.send.assert_not_called()
 
-    def test_notification_only_acknowledges_without_regenerating(self):
+    def test_notification_only_acknowledges_without_regenerating(self) -> None:
         event = applied_event(self.document.pk, 1, ["title"], "synthetic-event")
         self.post.side_effect = lambda value: {"event_id": value["event_id"]}
         tasks.notify_suggestions_applied(event)
@@ -330,14 +409,55 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
         self.assertEqual(self.document.title, "Saved title")
         self.llm.assert_not_called()
 
+    def test_notification_retries_reuse_event_without_regenerating(self) -> None:
+        event = applied_event(self.document.pk, 1, ["title"], "synthetic-event")
+        self.post.side_effect = [
+            SuggestionProviderUnavailable("Synthetic outage"),
+            {"event_id": event["event_id"]},
+        ]
+        result = tasks.notify_suggestions_applied.apply(args=(event,))
+        self.assertTrue(result.successful())
+        self.assertEqual(self.post.call_count, 2)
+        self.assertTrue(all(call.args == (event,) for call in self.post.call_args_list))
+        self.document.refresh_from_db()
+        self.assertEqual(self.document.title, "Saved title")
+        self.llm.assert_not_called()
+
+    def test_notification_rejects_mismatched_acknowledgement_without_retry(
+        self,
+    ) -> None:
+        self.post.return_value = {"event_id": "other-event"}
+        self.post.side_effect = None
+        result = tasks.notify_suggestions_applied.apply(
+            args=({"event_id": "synthetic-event"},),
+        )
+        self.assertIsInstance(result.result, SuggestionProviderError)
+        self.post.assert_called_once()
+
+    def test_notification_stops_after_retry_limit(self) -> None:
+        self.post.side_effect = SuggestionProviderUnavailable("Synthetic outage")
+        result = tasks.notify_suggestions_applied.apply(
+            args=({"event_id": "synthetic-event"},),
+        )
+        self.assertIsInstance(result.result, SuggestionProviderUnavailable)
+        self.assertEqual(self.post.call_count, 6)
+
+    @override_settings(AI_SUGGESTIONS_ENDPOINT="")
+    def test_disabling_provider_skips_queued_notification(self) -> None:
+        tasks.notify_suggestions_applied({"event_id": "synthetic-event"})
+        self.post.assert_not_called()
+
 
 @override_settings(
     AI_SUGGESTIONS_ENDPOINT="https://provider.example.invalid/suggestions",
     AI_SUGGESTIONS_API_KEY="synthetic-only",
-    AI_SUGGESTIONS_ALLOW_INTERNAL=False,
+    AI_SUGGESTIONS_ALLOW_INTERNAL_ENDPOINTS=False,
 )
 class TestProviderTransport(SimpleTestCase):
-    def run_http(self, handler):
+    def run_http(
+        self,
+        handler: Callable[[httpx.Request], httpx.Response],
+    ) -> dict[str, Any]:
         client = httpx.Client(transport=httpx.MockTransport(handler))
         with (
             patch(
@@ -359,15 +479,15 @@ class TestProviderTransport(SimpleTestCase):
         )
         return result
 
-    def test_authenticated_post(self):
-        def handler(request):
+    def test_authenticated_post(self) -> None:
+        def handler(request: httpx.Request) -> httpx.Response:
             self.assertEqual(request.headers["Authorization"], "Bearer synthetic-only")
             self.assertEqual(json.loads(request.content), {"synthetic": True})
             return httpx.Response(200, json={"ok": True})
 
         self.assertEqual(self.run_http(handler), {"ok": True})
 
-    def test_retryable_http_responses(self):
+    def test_retryable_http_responses(self) -> None:
         for code in (408, 409, 425, 429, 500, 503):
             with (
                 self.subTest(code=code),
@@ -377,7 +497,7 @@ class TestProviderTransport(SimpleTestCase):
                     lambda request: httpx.Response(code, text="private response body"),
                 )
 
-    def test_redirects_and_invalid_payloads_are_not_accepted(self):
+    def test_redirects_and_invalid_payloads_are_not_accepted(self) -> None:
         for response in (
             httpx.Response(302, headers={"Location": "http://elsewhere.invalid"}),
             httpx.Response(200, content=b"x" * 1_048_577),
@@ -390,16 +510,56 @@ class TestProviderTransport(SimpleTestCase):
             ):
                 self.run_http(lambda request: response)
 
-    def test_transport_failure_does_not_expose_endpoint_credentials(self):
-        def handler(request):
+    def test_transport_failure_does_not_expose_endpoint_credentials(self) -> None:
+        def handler(request: httpx.Request) -> httpx.Response:
             raise httpx.ConnectError("sensitive transport detail")
 
         with self.assertRaises(SuggestionProviderUnavailable) as error:
             self.run_http(handler)
         self.assertNotIn("sensitive", str(error.exception))
 
+    def test_malformed_http_encoding_is_a_provider_error(self) -> None:
+        def handler(request: httpx.Request) -> httpx.Response:
+            return httpx.Response(
+                200,
+                headers={"Content-Encoding": "gzip"},
+                content=b"not gzip",
+            )
+
+        with self.assertRaises(SuggestionProviderError):
+            self.run_http(handler)
+
+    def test_invalid_url_is_a_provider_error(self) -> None:
+        with (
+            patch(
+                "paperless_ai.suggestion_provider.create_pinned_httpx_client",
+                side_effect=httpx.InvalidURL("Sensitive endpoint detail"),
+            ),
+            patch(
+                "paperless_ai.suggestion_provider.db_connection_released",
+                return_value=nullcontext(),
+            ),
+            self.assertRaises(SuggestionProviderError) as error,
+        ):
+            post_provider({"synthetic": True})
+        self.assertNotIn("Sensitive", str(error.exception))
+
+    def test_dns_failure_is_retryable(self) -> None:
+        with (
+            patch(
+                "paperless.network.socket.getaddrinfo",
+                side_effect=socket.gaierror(socket.EAI_AGAIN, "Temporary DNS failure"),
+            ),
+            patch(
+                "paperless_ai.suggestion_provider.db_connection_released",
+                return_value=nullcontext(),
+            ),
+            self.assertRaises(SuggestionProviderUnavailable),
+        ):
+            post_provider({"synthetic": True})
+
     @override_settings(AI_SUGGESTIONS_ENDPOINT="http://127.0.0.1:8080/suggestions")
-    def test_internal_endpoint_requires_explicit_opt_in(self):
+    def test_internal_endpoint_requires_explicit_opt_in(self) -> None:
         with (
             patch(
                 "paperless_ai.suggestion_provider.db_connection_released",

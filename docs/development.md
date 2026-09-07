@@ -450,6 +450,11 @@ Failed external requests do not fall back to built-in classification. The
 workflow task retries transient failures and stale inputs up to three times;
 permanent failures leave suggestions unapplied.
 
+The editor displays translated failure messages. Provider diagnostics, including
+HTTP status codes, are recorded in the Paperless server logs; these messages omit
+endpoint credentials and response bodies. Documents moved to the trash are
+rejected before contacting the provider or when checking the returned result.
+
 ### Automatic-application notification
 
 After a workflow applies changes, a separate Celery task POSTs

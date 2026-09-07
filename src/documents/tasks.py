@@ -7,6 +7,7 @@ from collections.abc import Callable
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from tempfile import mkstemp
+from typing import Any
 
 from celery import Task
 from celery import shared_task
@@ -772,7 +773,7 @@ def apply_ai_suggestions(self, action_id: int, document_id: int) -> None:
     retry_backoff_max=600,
     retry_jitter=True,
 )
-def notify_suggestions_applied(event: dict) -> None:
+def notify_suggestions_applied(event: dict[str, Any]) -> None:
     from paperless_ai.exceptions import SuggestionProviderError
     from paperless_ai.suggestion_provider import post_provider
 

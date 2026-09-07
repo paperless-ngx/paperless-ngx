@@ -3,12 +3,15 @@
 import hashlib
 import itertools
 import json
+import socket
 import uuid
 from datetime import date
-from typing import Literal
+from typing import Any
+from typing import Final
 
 import httpx
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.serializers.json import DjangoJSONEncoder
 from pydantic import BaseModel
 from pydantic import ConfigDict
@@ -31,45 +34,51 @@ from documents.permissions import restrict_queryset_to_visible
 from documents.plugins.date_parsing import get_date_parser
 from documents.versioning import get_latest_version_for_root
 from paperless.network import create_pinned_httpx_client
+from paperless_ai.base_model import MAX_DATES
+from paperless_ai.base_model import MAX_NEW_NAMES
+from paperless_ai.base_model import MAX_TITLE_LENGTH
 from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.db import db_connection_released
 from paperless_ai.exceptions import StaleSuggestions
 from paperless_ai.exceptions import SuggestionProviderError
 from paperless_ai.exceptions import SuggestionProviderUnavailable
 
+PROTOCOL_VERSION: Final = 1
+MAX_RESPONSE_BYTES: Final = 1_048_576
+
 
 class Choice(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     existing_ids: list[int] = Field(default_factory=list, max_length=100)
-    new_names: list[str] = Field(default_factory=list, max_length=8)
+    new_names: list[str] = Field(default_factory=list, max_length=MAX_NEW_NAMES)
 
     @field_validator("existing_ids")
     @classmethod
-    def positive_ids(cls, values):
+    def positive_ids(cls, values: list[int]) -> list[int]:
         if any(value < 1 for value in values):
             raise ValueError("IDs must be positive")
         return list(dict.fromkeys(values))
 
     @field_validator("new_names")
     @classmethod
-    def valid_names(cls, values):
-        if any(not value.strip() or len(value) > 128 for value in values):
+    def valid_names(cls, values: list[str]) -> list[str]:
+        if any(not value.strip() or len(value) > MAX_TITLE_LENGTH for value in values):
             raise ValueError("Names must contain 1 to 128 characters")
         return list(dict.fromkeys(values))
 
 
 class Suggestions(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
-    title: str = Field(max_length=128)
+    title: str = Field(max_length=MAX_TITLE_LENGTH)
     tags: Choice
     correspondents: Choice
     document_types: Choice
     storage_paths: Choice
-    dates: list[str] = Field(max_length=3)
+    dates: list[str] = Field(max_length=MAX_DATES)
 
     @field_validator("dates")
     @classmethod
-    def valid_dates(cls, values):
+    def valid_dates(cls, values: list[str]) -> list[str]:
         for value in values:
             if date.fromisoformat(value).isoformat() != value:
                 raise ValueError("Dates must use YYYY-MM-DD")
@@ -78,7 +87,7 @@ class Suggestions(BaseModel):
 
 class ProviderResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
-    protocol_version: Literal[1]
+    protocol_version: int = Field(ge=PROTOCOL_VERSION, le=PROTOCOL_VERSION)
     request_id: str
     context_id: str
     suggestions: Suggestions
@@ -92,13 +101,13 @@ TAXONOMY = {
 }
 
 
-def fingerprint(value) -> str:
+def fingerprint(value: object) -> str:
     return hashlib.sha256(
         json.dumps(value, sort_keys=True, cls=DjangoJSONEncoder).encode(),
     ).hexdigest()
 
 
-def document_snapshot(document: Document) -> dict:
+def document_snapshot(document: Document) -> dict[str, Any]:
     """Saved metadata plus the actual source version of the effective Content."""
     source = (
         get_latest_version_for_root(document)
@@ -142,7 +151,7 @@ def document_snapshot(document: Document) -> dict:
     return json.loads(json.dumps(snapshot, cls=DjangoJSONEncoder))
 
 
-def post_provider(payload: dict) -> dict:
+def post_provider(payload: dict[str, Any]) -> dict[str, Any]:
     """Bounded, DNS-pinned HTTP call. Redirects and environment proxies are off."""
     headers = (
         {"Authorization": f"Bearer {settings.AI_SUGGESTIONS_API_KEY}"}
@@ -154,8 +163,8 @@ def post_provider(payload: dict) -> dict:
             db_connection_released(),
             create_pinned_httpx_client(
                 settings.AI_SUGGESTIONS_ENDPOINT,
-                allow_internal=settings.AI_SUGGESTIONS_ALLOW_INTERNAL,
-                timeout=settings.AI_SUGGESTIONS_TIMEOUT,
+                allow_internal=settings.AI_SUGGESTIONS_ALLOW_INTERNAL_ENDPOINTS,
+                timeout=settings.AI_SUGGESTIONS_REQUEST_TIMEOUT,
                 follow_redirects=False,
                 trust_env=False,
             ) as client,
@@ -171,16 +180,16 @@ def post_provider(payload: dict) -> dict:
                 or response.status_code >= 500
             ):
                 raise SuggestionProviderUnavailable(
-                    "Suggestion provider temporarily unavailable",
+                    f"Suggestion provider temporarily unavailable (HTTP {response.status_code})",
                 )
             if response.status_code != 200:
                 raise SuggestionProviderError(
-                    "Suggestion provider rejected the request",
+                    f"Suggestion provider rejected the request (HTTP {response.status_code})",
                 )
             body = bytearray()
-            for chunk in response.iter_bytes():
+            for chunk in response.iter_bytes(chunk_size=65_536):
                 body.extend(chunk)
-                if len(body) > 1_048_576:
+                if len(body) > MAX_RESPONSE_BYTES:
                     raise SuggestionProviderError(
                         "Suggestion provider response exceeds 1 MiB",
                     )
@@ -194,7 +203,11 @@ def post_provider(payload: dict) -> dict:
         raise SuggestionProviderUnavailable(
             "Suggestion provider connection failed",
         ) from None
-    except (ValueError, UnicodeError):
+    except (ValueError, UnicodeError, httpx.DecodingError, httpx.InvalidURL) as exc:
+        if isinstance(exc.__cause__, socket.gaierror):
+            raise SuggestionProviderUnavailable(
+                "Suggestion provider hostname resolution failed",
+            ) from None
         raise SuggestionProviderError(
             "Invalid suggestion provider configuration or response",
         ) from None
@@ -202,10 +215,15 @@ def post_provider(payload: dict) -> dict:
 
 def get_provider_classification(
     document: Document,
-    user=None,
-    output_language=None,
+    user: User | None = None,
+    output_language: str | None = None,
 ) -> ClassificationSuggestions:
-    document.refresh_from_db()
+    try:
+        document.refresh_from_db()
+    except Document.DoesNotExist:
+        raise StaleSuggestions("Document no longer exists") from None
+    if document.is_deleted:
+        raise StaleSuggestions("Document no longer exists")
     snapshot = document_snapshot(document)
     taxonomy = {}
     classic: dict[str, list[int] | list[str]] = {}
@@ -224,21 +242,23 @@ def get_provider_classification(
         classic[key] = [
             item.pk for item in match(document, classifier, user) if item.pk in allowed
         ]
-    with get_date_parser() as parser:
-        dates = parser.parse(
-            snapshot["content_version"]["original_filename"] or "",
-            snapshot["content"],
-        )
-        classic["dates"] = sorted(
-            {
-                value.strftime("%Y-%m-%d")
-                for value in itertools.islice(
-                    dates,
-                    max(settings.NUMBER_OF_SUGGESTED_DATES, 0),
-                )
-                if value is not None
-            },
-        )
+    classic["dates"] = []
+    if settings.NUMBER_OF_SUGGESTED_DATES > 0:
+        with get_date_parser() as parser:
+            dates = parser.parse(
+                snapshot["content_version"]["original_filename"] or "",
+                snapshot["content"],
+            )
+            classic["dates"] = sorted(
+                {
+                    value.strftime("%Y-%m-%d")
+                    for value in itertools.islice(
+                        dates,
+                        settings.NUMBER_OF_SUGGESTED_DATES,
+                    )
+                    if value is not None
+                },
+            )
     context = {
         "document": snapshot,
         "requester_id": user.pk if user else None,
@@ -247,7 +267,7 @@ def get_provider_classification(
         "classic_suggestions": classic,
     }
     payload = {
-        "protocol_version": 1,
+        "protocol_version": PROTOCOL_VERSION,
         "event": "suggestions.requested",
         "request_id": str(uuid.uuid4()),
         "context_id": fingerprint(context),
@@ -288,10 +308,10 @@ def applied_event(
     action_id: int,
     changed_fields: list[str],
     task_id: str | None,
-) -> dict:
+) -> dict[str, Any]:
     snapshot = document_snapshot(Document.objects.get(pk=document_id))
     return {
-        "protocol_version": 1,
+        "protocol_version": PROTOCOL_VERSION,
         "event": "suggestions.applied",
         "event_id": task_id or str(uuid.uuid4()),
         "document_id": document_id,

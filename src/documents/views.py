@@ -1588,12 +1588,20 @@ class DocumentViewSet(
                     output_language,
                 )
             except SuggestionProviderError as exc:
+                logger.warning(
+                    "Suggestion provider failed for document %s: %s",
+                    doc.pk,
+                    exc,
+                )
                 code = status.HTTP_502_BAD_GATEWAY
+                message = _("The suggestion provider returned an invalid response.")
                 if isinstance(exc, StaleSuggestions):
                     code = status.HTTP_409_CONFLICT
+                    message = _("Document changed. Request suggestions again.")
                 elif isinstance(exc, SuggestionProviderUnavailable):
                     code = status.HTTP_503_SERVICE_UNAVAILABLE
-                return Response({"ai": [str(exc)]}, status=code)
+                    message = _("The suggestion provider is temporarily unavailable.")
+                return Response({"ai": [message]}, status=code)
             except ValueError as exc:
                 logger.exception(
                     "Invalid AI configuration while generating suggestions for "
