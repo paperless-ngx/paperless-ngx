@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core'
+import { Component, computed, inject, signal, viewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
 import {
@@ -32,6 +32,15 @@ export class ShareLinksComponent {
 
   readonly ShareLinksNavIDs = ShareLinksNavIDs
   readonly activeNavID = signal(this.getInitialNavID())
+  private readonly documentLinks = viewChild(ShareLinkListComponent)
+  private readonly bundles = viewChild(ShareLinkBundleListComponent)
+  readonly loading = computed(() => {
+    const activeList =
+      this.activeNavID() === ShareLinksNavIDs.DocumentLinks
+        ? this.documentLinks()
+        : this.bundles()
+    return activeList?.loading() ?? true
+  })
 
   get canViewDocumentLinks(): boolean {
     return this.permissionsService.currentUserCan(

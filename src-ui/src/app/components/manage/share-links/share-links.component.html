@@ -3,6 +3,7 @@
   i18n-title
   info="Manage public links to individual documents and document bundles."
   i18n-info
+  [loading]="loading()"
 ></pngx-page-header>
 
 <ul
@@ -30,4 +31,4 @@
   }
 </ul>
 
-<div [ngbNavOutlet]="nav"></div>
+<div class="bg-body" [ngbNavOutlet]="nav"></div>

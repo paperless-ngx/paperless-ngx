@@ -1,10 +1,4 @@
 <div class="border border-top-0 rounded-bottom p-3">
-  @if (loading()) {
-    <div class="d-flex align-items-center gap-2">
-      <div class="spinner-border spinner-border-sm" role="status"></div>
-      <span i18n>Loading share link bundles…</span>
-    </div>
-  }
   @if (!loading() && error()) {
     <div class="alert alert-danger mb-0" role="alert">
       {{ error() }}
