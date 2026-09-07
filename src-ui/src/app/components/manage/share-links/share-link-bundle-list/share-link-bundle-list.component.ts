@@ -195,6 +195,10 @@ export class ShareLinkBundleListComponent
     return SHARE_LINK_BUNDLE_FILE_VERSION_LABELS[version] ?? version
   }
 
+  isExpired(expiration?: string): boolean {
+    return !!expiration && Date.parse(expiration) <= Date.now()
+  }
+
   private replaceBundle(updated: ShareLinkBundleSummary): void {
     const bundles = this.bundles()
     const index = bundles.findIndex((bundle) => bundle.id === updated.id)

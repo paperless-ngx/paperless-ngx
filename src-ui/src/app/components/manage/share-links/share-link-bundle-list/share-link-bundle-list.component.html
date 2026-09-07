@@ -80,6 +80,9 @@
                 <td>
                   @if (bundle.expiration) {
                     {{ bundle.expiration | date: 'short' }}
+                    @if (isExpired(bundle.expiration)) {
+                      <span class="badge text-bg-danger ms-2" i18n>Expired</span>
+                    }
                   }
                   @if (!bundle.expiration) {
                     <span i18n>Never</span>

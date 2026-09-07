@@ -123,6 +123,19 @@ describe('ShareLinkBundleListComponent', () => {
     expect(service.list).toHaveBeenLastCalledWith(2, 25, 'created', true)
   })
 
+  it('marks expired share link bundles', () => {
+    service.list.mockReturnValue(
+      of({
+        count: 1,
+        results: [sampleBundle({ expiration: '2000-01-01T00:00:00.000Z' })],
+      })
+    )
+
+    fixture.detectChanges()
+
+    expect(fixture.nativeElement.textContent).toContain('Expired')
+  })
+
   it('stores a changed page size and reloads from the first page', () => {
     fixture.detectChanges()
     const settingsService = TestBed.inject(SettingsService)

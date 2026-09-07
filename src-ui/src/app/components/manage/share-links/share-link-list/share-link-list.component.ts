@@ -120,6 +120,10 @@ export class ShareLinkListComponent
     return SHARE_LINK_BUNDLE_FILE_VERSION_LABELS[version] ?? version
   }
 
+  isExpired(expiration?: string): boolean {
+    return !!expiration && Date.parse(expiration) <= Date.now()
+  }
+
   copy(link: ShareLink): void {
     if (this.clipboard.copy(this.getShareUrl(link))) {
       this.copiedID.set(link.id)

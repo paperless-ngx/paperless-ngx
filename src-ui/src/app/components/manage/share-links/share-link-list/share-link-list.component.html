@@ -36,6 +36,9 @@
               <td>
                 @if (link.expiration) {
                   {{ link.expiration | date: 'short' }}
+                  @if (isExpired(link.expiration)) {
+                    <span class="badge text-bg-danger ms-2" i18n>Expired</span>
+                  }
                 } @else {
                   <span i18n>Never</span>
                 }
