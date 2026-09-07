@@ -32,14 +32,14 @@ dependencies = [
   "django-cors-headers~=4.9.0",
   "django-extensions~=4.1",
   "django-filter~=25.1",
-  "django-guardian>=3.3.3,<3.5.0",
+  "django-guardian>=3.3.3,<3.5",
   "django-multiselectfield~=1.0.1",
   "django-rich~=2.2.0",
   "django-soft-delete~=1.0.18",
   "django-treenode>=0.24",
   "djangorestframework~=3.16",
   "drf-spectacular~=0.30",
-  "drf-spectacular-sidecar>=2026.7.1,<2026.9.0",
+  "drf-spectacular-sidecar>=2026.7.1,<2026.9",
   "drf-writable-nested~=0.7.1",
   "filelock~=3.32.0",
   "flower>=2.0.1,<2.2",
@@ -103,7 +103,7 @@ docs = [
   "zensical>=0.0.51",
 ]
 lint = [
-  "prek>=0.4.11,<0.6.0",
+  "prek>=0.4.11,<0.6",
   "ruff~=0.16.1",
 ]
 testing = [
