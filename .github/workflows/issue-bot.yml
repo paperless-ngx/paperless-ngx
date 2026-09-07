@@ -72,11 +72,9 @@ jobs:
                 'You are welcome to open a new issue that describes the problem you observed in your own words.'
               : 'This issue was automatically closed because it was not opened using our bug report form. ' +
                 'Issues have to be created through the form so that the details we need to investigate are included.\n\n' +
-                `If the problem is still there, please [open a new issue](${newIssue}) using the form — that is all it takes ` +
-                'to get it looked at, and no other action is needed here.\n\n' +
+                `If the problem is still there, please [open a new issue](${newIssue}) using the form. No other action is needed here.\n\n' +
                 'If any part of your report was written by an AI tool or agent, you must say so: undisclosed AI-generated ' +
-                `contributions are a violation of our [Code of Conduct](${codeOfConduct}), and such reports must describe the ` +
-                `behavior you observed only, without code analysis or suggested fixes. See our [contributing guidelines](${contributing}).`;
+                `contributions are a violation of our [Code of Conduct](${codeOfConduct}).`;
 
             await github.rest.issues.createComment({ ...common, body });
             await github.rest.issues.addLabels({ ...common, labels: ['ai'] });
