@@ -717,6 +717,44 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(args[0], [self.doc2.id])
         self.assertEqual(kwargs["storage_path"], self.sp1.id)
 
+    @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
+    def test_api_bulk_edit_with_all_true_resolves_owned_duplicates(self, m) -> None:
+        self.setup_mock(m, "set_storage_path")
+        user = User.objects.create_user(username="duplicate-owner")
+        user.user_permissions.add(
+            Permission.objects.get(codename="change_document"),
+        )
+        first_duplicate = Document.objects.create(
+            checksum="owned-duplicate",
+            title="First duplicate",
+            owner=user,
+        )
+        second_duplicate = Document.objects.create(
+            checksum="owned-duplicate",
+            title="Second duplicate",
+            owner=user,
+        )
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "all": True,
+                    "filters": {"has_duplicates": True},
+                    "method": "set_storage_path",
+                    "parameters": {"storage_path": self.sp1.id},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertCountEqual(args[0], [first_duplicate.id, second_duplicate.id])
+        self.assertEqual(kwargs["storage_path"], self.sp1.id)
+
     @mock.patch("documents.search.get_backend")
     @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
     def test_api_bulk_edit_with_all_true_resolves_documents_from_search_filters(
