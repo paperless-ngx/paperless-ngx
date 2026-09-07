@@ -1,5 +1,74 @@
 import { expect, test } from '@playwright/test'
 
+for (const width of [1440, 390]) {
+  test(`should save a selected title suggestion explicitly at ${width}px`, async ({
+    page,
+  }) => {
+    const documentId = width === 1440 ? 60 : 61
+    const apiUrl = `http://localhost:8001/api/documents/${documentId}/`
+    const currentTitle = `document ${documentId}`
+    const suggestedTitle = `Suggested title ${documentId}`
+
+    // Keep AI responses deterministic while using the real editor and save API.
+    await page.route('**/api/ui_settings/', async (route) => {
+      const response = await route.fetch()
+      const settings = await response.json()
+      settings.settings.ai_enabled = true
+      await route.fulfill({ response, json: settings })
+    })
+    await page.route(
+      `**/api/documents/${documentId}/ai_suggestions/`,
+      (route) =>
+        route.fulfill({
+          json: {
+            title: suggestedTitle,
+            tags: [],
+            suggested_tags: [],
+            correspondents: [],
+            suggested_correspondents: [],
+            document_types: [],
+            suggested_document_types: [],
+            storage_paths: [],
+            suggested_storage_paths: [],
+            dates: [],
+          },
+        })
+    )
+
+    await page.setViewportSize({ width, height: 1000 })
+    await page.goto(`/documents/${documentId}/details`)
+    const title = page.locator('pngx-input-text[formcontrolname="title"]')
+    await expect(title.locator('input')).toHaveValue(currentTitle)
+    await page.getByRole('button', { name: 'Suggest', exact: true }).click()
+    await title.getByText(suggestedTitle, { exact: true }).click()
+    await expect(title.locator('input')).toHaveValue(suggestedTitle)
+
+    const headers = { Referer: page.url() }
+    const beforeSave = await page.request.get(apiUrl, { headers })
+    expect((await beforeSave.json()).title).toBe(currentTitle)
+    try {
+      const saved = page.waitForResponse(
+        (response) =>
+          new URL(response.url()).pathname === new URL(apiUrl).pathname &&
+          response.request().method() === 'PATCH'
+      )
+      await page
+        .getByRole('button', { name: 'Save', exact: true })
+        .first()
+        .click()
+      expect((await saved).ok()).toBe(true)
+      await page.reload()
+      await expect(title.locator('input')).toHaveValue(suggestedTitle)
+    } finally {
+      const restored = await page.request.patch(apiUrl, {
+        headers,
+        data: { title: currentTitle },
+      })
+      expect(restored.ok()).toBe(true)
+    }
+  })
+}
+
 test('should activate / deactivate save button when changes are saved', async ({
   page,
 }) => {

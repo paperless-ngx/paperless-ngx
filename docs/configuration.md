@@ -2096,6 +2096,45 @@ password. All of these options come from their similarly-named [Django settings]
 
 ## AI {#ai}
 
+### External suggestion providers
+
+An external service can supply suggestions to the document editor and the
+[Apply AI Suggestions workflow action](usage.md#workflow-actions). Configure the
+same endpoint on the web server and task workers. See the
+[provider protocol](development.md#external-suggestion-providers) for integration
+details. Enable `PAPERLESS_AI_ENABLED` to use this feature.
+
+#### [`PAPERLESS_AI_SUGGESTIONS_ENDPOINT=<url>`](#PAPERLESS_AI_SUGGESTIONS_ENDPOINT) {#PAPERLESS_AI_SUGGESTIONS_ENDPOINT}
+
+: URL of a trusted suggestion provider. Paperless sends the document's complete
+text, saved metadata, custom fields, visible taxonomy and native matching
+candidates to this service. The provider replaces AI classification; chat
+and embeddings retain their own LLM configuration.
+
+    Defaults to an empty string, which uses the built-in AI classifier.
+
+#### [`PAPERLESS_AI_SUGGESTIONS_API_KEY=<str>`](#PAPERLESS_AI_SUGGESTIONS_API_KEY) {#PAPERLESS_AI_SUGGESTIONS_API_KEY}
+
+: Optional provider credential, sent as an HTTP Bearer token. Use HTTPS outside
+a trusted local network.
+
+    Defaults to an empty string.
+
+#### [`PAPERLESS_AI_SUGGESTIONS_ALLOW_INTERNAL=<bool>`](#PAPERLESS_AI_SUGGESTIONS_ALLOW_INTERNAL) {#PAPERLESS_AI_SUGGESTIONS_ALLOW_INTERNAL}
+
+: Allows the provider URL to resolve to private or loopback addresses.
+Redirects and environment-configured HTTP proxies are disabled.
+
+    Defaults to false.
+
+#### [`PAPERLESS_AI_SUGGESTIONS_TIMEOUT=<int>`](#PAPERLESS_AI_SUGGESTIONS_TIMEOUT) {#PAPERLESS_AI_SUGGESTIONS_TIMEOUT}
+
+: Timeout in seconds for provider HTTP connection and read operations.
+
+    Defaults to 120; the minimum is 1.
+
+### AI settings
+
 #### [`PAPERLESS_AI_ENABLED=<bool>`](#PAPERLESS_AI_ENABLED) {#PAPERLESS_AI_ENABLED}
 
 : Enables the AI features in Paperless. This includes the AI-based
@@ -2156,7 +2195,8 @@ local or slow inference servers that need more time to generate responses.
 : The AI backend to use. This can be either "openai-like" or "ollama". If set to "ollama", the AI
 features will be run locally on your machine. If set to "openai-like", the AI features will use
 an OpenAI-compatible API endpoint, including OpenAI itself and compatible providers. This
-setting is required to be set to use the AI features.
+setting is required for built-in AI classification and chat. An external
+[suggestion provider](#PAPERLESS_AI_SUGGESTIONS_ENDPOINT) does not require it.
 
     Defaults to None.
 

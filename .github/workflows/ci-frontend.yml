@@ -7,18 +7,12 @@ on:
     branches-ignore:
       - 'translations**'
   workflow_dispatch:
-  workflow_call:
-    inputs:
-      force_all:
-        type: boolean
-        default: false
 concurrency:
-  group: frontend-${{ github.event.pull_request.number || github.ref }}-${{ inputs.force_all && 'fork' || 'standalone' }}
+  group: frontend-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 permissions: {}
 jobs:
   changes:
-    if: github.repository_owner == 'paperless-ngx' || inputs.force_all || github.event_name == 'workflow_dispatch'
     name: Detect Frontend Changes
     runs-on: ubuntu-slim
     permissions:
@@ -36,9 +30,8 @@ jobs:
         env:
           EVENT_NAME: ${{ github.event_name }}
           REF_NAME: ${{ github.ref_name }}
-          FORCE_ALL: ${{ inputs.force_all || false }}
         run: |
-          if [[ "${FORCE_ALL}" == "true" || "${EVENT_NAME}" == "workflow_dispatch" ]]; then
+          if [[ "${EVENT_NAME}" == "workflow_dispatch" ]]; then
             echo "run_all=true" >> "$GITHUB_OUTPUT"
           elif [[ "${EVENT_NAME}" == "push" && ( "${REF_NAME}" == "main" || "${REF_NAME}" == "dev" ) ]]; then
             echo "run_all=true" >> "$GITHUB_OUTPUT"

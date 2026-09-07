@@ -1,1 +1,0 @@
-"""Fork lab contract tests."""

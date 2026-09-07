@@ -1,7 +1,0 @@
-services:
-  paperless:
-    environment:
-      PAPERLESS_AI_SUGGESTIONS_ENDPOINT: http://mock:8080/suggestions
-      PAPERLESS_AI_SUGGESTIONS_API_KEY: synthetic-provider-only
-      PAPERLESS_AI_SUGGESTIONS_ALLOW_INTERNAL: "true"
-      PAPERLESS_AI_SUGGESTIONS_TIMEOUT: "15"
