@@ -1,6 +1,7 @@
 import copy
 import json
 from contextlib import nullcontext
+from typing import Any
 from unittest.mock import patch
 
 import httpx
@@ -37,7 +38,7 @@ PROPOSAL = {
 }
 
 
-def response_for(request):
+def response_for(request) -> dict[str, Any]:
     return {
         "protocol_version": 1,
         "request_id": request["request_id"],
@@ -308,7 +309,7 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
             patch("documents.tasks.document_updated") as updated,
         ):
             tasks.apply_ai_suggestions.apply(
-                args=[action.pk, self.document.pk],
+                args=(action.pk, self.document.pk),
                 task_id="synthetic-apply-task",
                 throw=True,
             )

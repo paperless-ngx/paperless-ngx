@@ -22,6 +22,7 @@ from documents.matching import match_document_types
 from documents.matching import match_storage_paths
 from documents.matching import match_tags
 from documents.models import Correspondent
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
@@ -123,9 +124,9 @@ def document_snapshot(document: Document) -> dict:
                 "data_type": item.field.data_type,
                 "value": item.value,
             }
-            for item in document.custom_fields.select_related("field").order_by(
-                "field_id",
-            )
+            for item in CustomFieldInstance.objects.filter(document=document)
+            .select_related("field")
+            .order_by("field_id")
         ],
         "content": source.content,
         "content_version": {
@@ -207,7 +208,7 @@ def get_provider_classification(
     document.refresh_from_db()
     snapshot = document_snapshot(document)
     taxonomy = {}
-    classic = {}
+    classic: dict[str, list[int] | list[str]] = {}
     classifier = load_classifier()
     for key, (model, permission, match) in TAXONOMY.items():
         taxonomy[key] = list(

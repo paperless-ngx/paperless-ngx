@@ -44,7 +44,11 @@ def log_reason(
     )
 
 
-def match_correspondents(document: Document, classifier: DocumentClassifier, user=None):
+def match_correspondents(
+    document: Document,
+    classifier: DocumentClassifier | None,
+    user=None,
+):
     pred_id = (
         classifier.predict_correspondent(document.suggestion_content)
         if classifier
@@ -74,7 +78,11 @@ def match_correspondents(document: Document, classifier: DocumentClassifier, use
     )
 
 
-def match_document_types(document: Document, classifier: DocumentClassifier, user=None):
+def match_document_types(
+    document: Document,
+    classifier: DocumentClassifier | None,
+    user=None,
+):
     pred_id = (
         classifier.predict_document_type(document.suggestion_content)
         if classifier
@@ -103,7 +111,7 @@ def match_document_types(document: Document, classifier: DocumentClassifier, use
     )
 
 
-def match_tags(document: Document, classifier: DocumentClassifier, user=None):
+def match_tags(document: Document, classifier: DocumentClassifier | None, user=None):
     predicted_tag_ids = (
         classifier.predict_tags(document.suggestion_content) if classifier else []
     )
@@ -132,7 +140,11 @@ def match_tags(document: Document, classifier: DocumentClassifier, user=None):
     )
 
 
-def match_storage_paths(document: Document, classifier: DocumentClassifier, user=None):
+def match_storage_paths(
+    document: Document,
+    classifier: DocumentClassifier | None,
+    user=None,
+):
     pred_id = (
         classifier.predict_storage_path(document.suggestion_content)
         if classifier
