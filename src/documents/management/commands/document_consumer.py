@@ -24,6 +24,7 @@ from watchfiles import Change
 from watchfiles import DefaultFilter
 from watchfiles import watch
 
+from documents.colors import random_color
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
@@ -302,7 +303,7 @@ def _tags_from_path(filepath: Path, consumption_dir: Path) -> list[int]:
     for part in path_parts:
         tag, _ = Tag.objects.get_or_create(
             name__iexact=part,
-            defaults={"name": part},
+            defaults={"name": part, "color": random_color()},
         )
         tag_ids.add(tag.pk)
 

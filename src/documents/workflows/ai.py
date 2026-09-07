@@ -5,6 +5,7 @@ from typing import TypeVar
 
 from django.contrib.auth.models import User
 
+from documents.colors import random_color
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
@@ -103,6 +104,7 @@ def resolve_tags(
         tag, created = Tag.objects.get_or_create(
             name=name[:128],
             owner=owner,
+            defaults={"color": random_color()},
         )
         if created:
             logger.info("Created tag '%s' from AI suggestion", tag.name)

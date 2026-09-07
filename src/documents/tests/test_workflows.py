@@ -5873,6 +5873,34 @@ class TestApplyAISuggestionsWorkflowAction(
         self.assertFalse(StoragePath.objects.exists())
         self.assertNotIn("storage_path", changed)
 
+        suggested = Tag.objects.get(name="Suggested Tag", owner=self.user)
+        self.assertNotEqual(suggested.color, "#a6cee3")
+
+    def test_create_missing_tag_uses_random_color(self) -> None:
+        """
+        GIVEN:
+            - An action with create missing enabled
+            - random_color patched to a fixed non-default value
+        WHEN:
+            - A suggested tag that does not exist is created
+        THEN:
+            - The new tag receives that color rather than the model default
+        """
+        action = self.make_action(
+            ai_create_missing=True,
+            ai_overwrite_existing=True,
+            ai_suggestion_fields=[WorkflowAction.AISuggestionField.TAGS],
+        )
+
+        with mock.patch(
+            "documents.workflows.ai.random_color",
+            return_value="#abcdef",
+        ):
+            self.apply(action)
+
+        suggested = Tag.objects.get(name="Suggested Tag", owner=self.user)
+        self.assertEqual(suggested.color, "#abcdef")
+
     def test_overwrite_disabled_keeps_existing_values(self) -> None:
         """
         GIVEN:

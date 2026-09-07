@@ -14,6 +14,7 @@ from pikepdf import Page
 from pikepdf import PasswordError
 from pikepdf import Pdf
 
+from documents.colors import random_color
 from documents.converters import convert_from_tiff_to_pdf
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
@@ -428,7 +429,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
                     if tag_str:
                         tag, _ = Tag.objects.get_or_create(
                             name__iexact=tag_str,
-                            defaults={"name": tag_str},
+                            defaults={"name": tag_str, "color": random_color()},
                         )
 
                         logger.debug(
