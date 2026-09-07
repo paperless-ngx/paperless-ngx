@@ -82,6 +82,7 @@ describe('UserEditDialogComponent', () => {
   })
 
   it('should use an empty group list when retrieval fails', () => {
+    const toastSpy = jest.spyOn(toastService, 'showError')
     jest
       .spyOn(TestBed.inject(GroupService), 'listAll')
       .mockReturnValue(throwError(() => new Error('Forbidden')))
@@ -91,6 +92,10 @@ describe('UserEditDialogComponent', () => {
 
     expect(failedComponent.groups()).toEqual([])
     expect(() => failedFixture.detectChanges()).not.toThrow()
+    expect(toastSpy).toHaveBeenCalledWith(
+      'Error retrieving groups',
+      expect.any(Error)
+    )
   })
 
   it('should support create and edit modes', () => {

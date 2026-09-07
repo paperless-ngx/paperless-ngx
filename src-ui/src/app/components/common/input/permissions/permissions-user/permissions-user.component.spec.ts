@@ -9,6 +9,7 @@ import {
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
 import { UserService } from 'src/app/services/rest/user.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { PermissionsUserComponent } from './permissions-user.component'
 
 describe('PermissionsUserComponent', () => {
@@ -62,6 +63,7 @@ describe('PermissionsUserComponent', () => {
   })
 
   it('should use an empty user list when retrieval fails', () => {
+    const toastSpy = jest.spyOn(TestBed.inject(ToastService), 'showError')
     userServiceSpy.mockReturnValue(throwError(() => new Error('Forbidden')))
 
     const failedFixture = TestBed.createComponent(PermissionsUserComponent)
@@ -69,5 +71,9 @@ describe('PermissionsUserComponent', () => {
 
     expect(failedComponent.users()).toEqual([])
     expect(() => failedFixture.detectChanges()).not.toThrow()
+    expect(toastSpy).toHaveBeenCalledWith(
+      'Error retrieving users',
+      expect.any(Error)
+    )
   })
 })

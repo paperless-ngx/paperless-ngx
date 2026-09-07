@@ -6,6 +6,7 @@ import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
 import { UserService } from 'src/app/services/rest/user.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { PermissionsFormComponent } from '../input/permissions/permissions-form/permissions-form.component'
 import { PermissionsGroupComponent } from '../input/permissions/permissions-group/permissions-group.component'
 import { PermissionsUserComponent } from '../input/permissions/permissions-user/permissions-user.component'
@@ -78,6 +79,7 @@ describe('PermissionsDialogComponent', () => {
   })
 
   it('should use an empty user list when retrieval fails', () => {
+    const toastSpy = jest.spyOn(TestBed.inject(ToastService), 'showError')
     jest
       .spyOn(TestBed.inject(UserService), 'listAll')
       .mockReturnValue(throwError(() => new Error('Forbidden')))
@@ -87,6 +89,10 @@ describe('PermissionsDialogComponent', () => {
 
     expect(failedComponent.users()).toEqual([])
     expect(() => failedFixture.detectChanges()).not.toThrow()
+    expect(toastSpy).toHaveBeenCalledWith(
+      'Error retrieving users',
+      expect.any(Error)
+    )
   })
 
   it('should return permissions', () => {

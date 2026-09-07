@@ -44,7 +44,10 @@ export class UserEditDialogComponent
   readonly groups = toSignal(
     this.groupsService.listAll().pipe(
       map((result) => result.results),
-      catchError(() => of([]))
+      catchError((error) => {
+        this.toastService.showError($localize`Error retrieving groups`, error)
+        return of([])
+      })
     ),
     { initialValue: undefined as Group[] }
   )

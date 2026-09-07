@@ -39,6 +39,7 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { CustomFieldQueryExpression } from 'src/app/utils/custom-field-query-element'
 import { ConfirmButtonComponent } from '../../confirm-button/confirm-button.component'
 import { NumberComponent } from '../../input/number/number.component'
@@ -208,6 +209,7 @@ describe('WorkflowEditDialogComponent', () => {
 
   it('should use empty related object lists when access is forbidden', () => {
     const forbidden = () => throwError(() => new Error('Forbidden'))
+    const toastSpy = jest.spyOn(TestBed.inject(ToastService), 'showError')
     jest
       .spyOn(TestBed.inject(CorrespondentService), 'listAll')
       .mockReturnValue(forbidden())
@@ -236,6 +238,11 @@ describe('WorkflowEditDialogComponent', () => {
     expect(forbiddenComponent.customFields()).toEqual([])
     expect(forbiddenComponent.dateCustomFields()).toEqual([])
     expect(() => forbiddenFixture.detectChanges()).not.toThrow()
+    expect(toastSpy).toHaveBeenCalledTimes(1)
+    expect(toastSpy).toHaveBeenCalledWith(
+      'Some workflow options could not be loaded.',
+      expect.any(Error)
+    )
   })
 
   it('should support create and edit modes, support adding triggers and actions on new workflow', () => {

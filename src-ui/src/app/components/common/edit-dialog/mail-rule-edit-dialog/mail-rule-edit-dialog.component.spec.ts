@@ -15,6 +15,7 @@ import { CorrespondentService } from 'src/app/services/rest/correspondent.servic
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { CheckComponent } from '../../input/check/check.component'
 import { NumberComponent } from '../../input/number/number.component'
 import { PermissionsFormComponent } from '../../input/permissions/permissions-form/permissions-form.component'
@@ -83,6 +84,7 @@ describe('MailRuleEditDialogComponent', () => {
 
   it('should use empty related object lists when retrieval fails', () => {
     const failed = () => throwError(() => new Error('Forbidden'))
+    const toastSpy = jest.spyOn(TestBed.inject(ToastService), 'showError')
     jest
       .spyOn(TestBed.inject(MailAccountService), 'listAll')
       .mockReturnValue(failed())
@@ -100,6 +102,19 @@ describe('MailRuleEditDialogComponent', () => {
     expect(failedComponent.correspondents()).toEqual([])
     expect(failedComponent.documentTypes()).toEqual([])
     expect(() => failedFixture.detectChanges()).not.toThrow()
+    expect(toastSpy).toHaveBeenCalledTimes(3)
+    expect(toastSpy).toHaveBeenCalledWith(
+      'Error retrieving mail accounts',
+      expect.any(Error)
+    )
+    expect(toastSpy).toHaveBeenCalledWith(
+      'Error retrieving correspondents',
+      expect.any(Error)
+    )
+    expect(toastSpy).toHaveBeenCalledWith(
+      'Error retrieving document types',
+      expect.any(Error)
+    )
   })
 
   it('should support create and edit modes', () => {

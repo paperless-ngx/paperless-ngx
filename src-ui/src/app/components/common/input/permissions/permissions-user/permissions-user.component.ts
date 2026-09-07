@@ -9,6 +9,7 @@ import { NgSelectComponent } from '@ng-select/ng-select'
 import { catchError, map, of } from 'rxjs'
 import { User } from 'src/app/data/user'
 import { UserService } from 'src/app/services/rest/user.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { AbstractInputComponent } from '../../abstract-input'
 
 @Component({
@@ -26,10 +27,14 @@ import { AbstractInputComponent } from '../../abstract-input'
 })
 export class PermissionsUserComponent extends AbstractInputComponent<User[]> {
   private readonly userService = inject(UserService)
+  private readonly toastService = inject(ToastService)
   readonly users = toSignal(
     this.userService.listAll().pipe(
       map((result) => result.results),
-      catchError(() => of([]))
+      catchError((error) => {
+        this.toastService.showError($localize`Error retrieving users`, error)
+        return of([])
+      })
     ),
     { initialValue: undefined as User[] }
   )

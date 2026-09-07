@@ -9,6 +9,7 @@ import {
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
 import { GroupService } from 'src/app/services/rest/group.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { PermissionsGroupComponent } from './permissions-group.component'
 
 describe('PermissionsGroupComponent', () => {
@@ -62,6 +63,7 @@ describe('PermissionsGroupComponent', () => {
   })
 
   it('should use an empty group list when retrieval fails', () => {
+    const toastSpy = jest.spyOn(TestBed.inject(ToastService), 'showError')
     groupServiceSpy.mockReturnValue(throwError(() => new Error('Forbidden')))
 
     const failedFixture = TestBed.createComponent(PermissionsGroupComponent)
@@ -69,5 +71,9 @@ describe('PermissionsGroupComponent', () => {
 
     expect(failedComponent.groups()).toEqual([])
     expect(() => failedFixture.detectChanges()).not.toThrow()
+    expect(toastSpy).toHaveBeenCalledWith(
+      'Error retrieving groups',
+      expect.any(Error)
+    )
   })
 })
