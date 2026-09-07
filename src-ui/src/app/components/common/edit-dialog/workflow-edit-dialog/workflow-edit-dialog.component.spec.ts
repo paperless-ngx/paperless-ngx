@@ -11,7 +11,7 @@ import {
 } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { of } from 'rxjs'
+import { of, throwError } from 'rxjs'
 import { CustomFieldQueriesModel } from 'src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component'
 import { CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldQueryLogicalOperator } from 'src/app/data/custom-field-query'
@@ -205,6 +205,38 @@ describe('WorkflowEditDialogComponent', () => {
     settingsService.set(SETTINGS_KEYS.REMOTE_OCR_CONFIGURED, remoteOcr)
     settingsService.set(SETTINGS_KEYS.AI_ENABLED, ai)
   }
+
+  it('should use empty related object lists when access is forbidden', () => {
+    const forbidden = () => throwError(() => new Error('Forbidden'))
+    jest
+      .spyOn(TestBed.inject(CorrespondentService), 'listAll')
+      .mockReturnValue(forbidden())
+    jest
+      .spyOn(TestBed.inject(DocumentTypeService), 'listAll')
+      .mockReturnValue(forbidden())
+    jest
+      .spyOn(TestBed.inject(StoragePathService), 'listAll')
+      .mockReturnValue(forbidden())
+    jest
+      .spyOn(TestBed.inject(MailRuleService), 'listAll')
+      .mockReturnValue(forbidden())
+    jest
+      .spyOn(TestBed.inject(CustomFieldsService), 'listAll')
+      .mockReturnValue(forbidden())
+
+    const forbiddenFixture = TestBed.createComponent(
+      WorkflowEditDialogComponent
+    )
+    const forbiddenComponent = forbiddenFixture.componentInstance
+
+    expect(forbiddenComponent.correspondents()).toEqual([])
+    expect(forbiddenComponent.documentTypes()).toEqual([])
+    expect(forbiddenComponent.storagePaths()).toEqual([])
+    expect(forbiddenComponent.mailRules()).toEqual([])
+    expect(forbiddenComponent.customFields()).toEqual([])
+    expect(forbiddenComponent.dateCustomFields()).toEqual([])
+    expect(() => forbiddenFixture.detectChanges()).not.toThrow()
+  })
 
   it('should support create and edit modes, support adding triggers and actions on new workflow', () => {
     component.dialogMode.set(EditDialogMode.CREATE)

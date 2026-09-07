@@ -16,7 +16,7 @@ import {
 } from '@angular/forms'
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { Subscription, map, takeUntil } from 'rxjs'
+import { Subscription, catchError, map, of, takeUntil } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentType } from 'src/app/data/document-type'
@@ -515,23 +515,38 @@ export class WorkflowEditDialogComponent
 
   readonly templates = signal<Workflow[]>(undefined)
   readonly correspondents = toSignal(
-    this.correspondentService.listAll().pipe(map((result) => result.results)),
+    this.correspondentService.listAll().pipe(
+      map((result) => result.results),
+      catchError(() => of([]))
+    ),
     { initialValue: undefined as Correspondent[] }
   )
   readonly documentTypes = toSignal(
-    this.documentTypeService.listAll().pipe(map((result) => result.results)),
+    this.documentTypeService.listAll().pipe(
+      map((result) => result.results),
+      catchError(() => of([]))
+    ),
     { initialValue: undefined as DocumentType[] }
   )
   readonly storagePaths = toSignal(
-    this.storagePathService.listAll().pipe(map((result) => result.results)),
+    this.storagePathService.listAll().pipe(
+      map((result) => result.results),
+      catchError(() => of([]))
+    ),
     { initialValue: undefined as StoragePath[] }
   )
   readonly mailRules = toSignal(
-    this.mailRuleService.listAll().pipe(map((result) => result.results)),
+    this.mailRuleService.listAll().pipe(
+      map((result) => result.results),
+      catchError(() => of([]))
+    ),
     { initialValue: undefined as MailRule[] }
   )
   readonly customFields = toSignal(
-    this.customFieldsService.listAll().pipe(map((result) => result.results)),
+    this.customFieldsService.listAll().pipe(
+      map((result) => result.results),
+      catchError(() => of([]))
+    ),
     { initialValue: undefined as CustomField[] }
   )
   readonly dateCustomFields = computed(() =>
