@@ -2091,6 +2091,7 @@ class DocumentViewSet(
             if version_label:
                 overrides.version_label = version_label.strip()
             if request.user is not None:
+                overrides.owner_id = request.user.id
                 overrides.actor_id = request.user.id
 
             async_task = consume_file.apply_async(

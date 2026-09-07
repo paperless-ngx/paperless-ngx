@@ -15,11 +15,11 @@ if TYPE_CHECKING:
     from collections.abc import Generator
     from pathlib import Path
 
-    from pytest_django.fixtures import SettingsWrapper
+    from pytest_django.fixtures import Settings
 
 
 @pytest.fixture
-def index_dir(tmp_path: Path, settings: SettingsWrapper) -> Path:
+def index_dir(tmp_path: Path, settings: Settings) -> Path:
     path = tmp_path / "index"
     path.mkdir()
     settings.INDEX_DIR = path

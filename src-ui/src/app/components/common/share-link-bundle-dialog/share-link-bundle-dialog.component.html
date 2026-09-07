@@ -64,7 +64,7 @@
         <dt class="col-sm-4" i18n>Slug</dt>
         <dd class="col-sm-8"><code>{{ createdBundle.slug }}</code></dd>
         <dt class="col-sm-4" i18n>Link</dt>
-        <dd class="col-sm-8">
+        <dd class="col-sm-8 position-relative">
           <label class="visually-hidden" for="shareBundleLink" i18n>Share link</label>
           <div class="input-group input-group-sm">
             <input id="shareBundleLink" class="form-control" type="text" [value]="getShareUrl(createdBundle)" readonly>
@@ -82,6 +82,7 @@
               <span class="visually-hidden" i18n>Copy link</span>
             </button>
           </div>
+          <span class="badge bg-primary fade position-absolute top-50 end-0 translate-middle-y me-5 pe-none z-3" [class.show]="copied()" i18n>Copied!</span>
         </dd>
         <dt class="col-sm-4" i18n>Documents</dt>
         <dd class="col-sm-8">{{ createdBundle.document_count }}</dd>

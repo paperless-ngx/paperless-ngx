@@ -7,7 +7,7 @@
     }
     <div class="position-relative" [class.col-md-9]="horizontal">
       <div class="input-group flex-nowrap">
-        <ng-select #tagSelect name="tags" [items]="tags" bindLabel="name" bindValue="id" [(ngModel)]="value"
+        <ng-select #tagSelect name="tags" [items]="tags" bindLabel="name" bindValue="id" [(ngModel)]="value" [ngModelOptions]="{standalone: true}"
           [disabled]="disabled"
           [multiple]="multiple"
           [closeOnSelect]="false"
