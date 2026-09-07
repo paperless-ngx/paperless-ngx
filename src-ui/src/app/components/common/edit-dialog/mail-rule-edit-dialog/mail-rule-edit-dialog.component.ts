@@ -6,7 +6,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { map } from 'rxjs'
+import { catchError, map, of } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
@@ -26,6 +26,7 @@ import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { CheckComponent } from '../../input/check/check.component'
 import { NumberComponent } from '../../input/number/number.component'
 import { SelectComponent } from '../../input/select/select.component'
@@ -158,17 +159,45 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
   private readonly accountService = inject(MailAccountService)
   private readonly correspondentService = inject(CorrespondentService)
   private readonly documentTypeService = inject(DocumentTypeService)
+  private readonly toastService = inject(ToastService)
 
   readonly accounts = toSignal(
-    this.accountService.listAll().pipe(map((result) => result.results)),
+    this.accountService.listAll().pipe(
+      map((result) => result.results),
+      catchError((error) => {
+        this.toastService.showError(
+          $localize`Error retrieving mail accounts`,
+          error
+        )
+        return of([])
+      })
+    ),
     { initialValue: undefined as MailAccount[] }
   )
   readonly correspondents = toSignal(
-    this.correspondentService.listAll().pipe(map((result) => result.results)),
+    this.correspondentService.listAll().pipe(
+      map((result) => result.results),
+      catchError((error) => {
+        this.toastService.showError(
+          $localize`Error retrieving correspondents`,
+          error
+        )
+        return of([])
+      })
+    ),
     { initialValue: undefined as Correspondent[] }
   )
   readonly documentTypes = toSignal(
-    this.documentTypeService.listAll().pipe(map((result) => result.results)),
+    this.documentTypeService.listAll().pipe(
+      map((result) => result.results),
+      catchError((error) => {
+        this.toastService.showError(
+          $localize`Error retrieving document types`,
+          error
+        )
+        return of([])
+      })
+    ),
     { initialValue: undefined as DocumentType[] }
   )
 
