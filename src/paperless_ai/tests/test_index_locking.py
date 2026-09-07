@@ -2,7 +2,6 @@ import logging
 import sqlite3
 import threading
 from pathlib import Path
-from unittest.mock import MagicMock
 
 import pytest
 from django.conf import settings
@@ -106,7 +105,7 @@ class TestCompactionLock:
         done = threading.Event()
 
         def remove() -> None:
-            indexing.llm_index_remove_document(MagicMock(id=999))
+            indexing.llm_index_remove_document(999)
             done.set()
 
         holder = _reader_lock()

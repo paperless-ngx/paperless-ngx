@@ -509,7 +509,11 @@ def update_llm_index(
     return msg
 
 
-def llm_index_add_or_update_document(document: Document):
+def llm_index_add_or_update_document(
+    document: Document,
+    *,
+    expected_modified: str | None = None,
+) -> None:
     """Add or atomically replace a document's chunks in the index."""
     config = AIConfig()
     new_nodes = build_document_node(
@@ -535,6 +539,18 @@ def llm_index_add_or_update_document(document: Document):
                 "migration check deferred while index readers are active; "
                 "will retry on the next write.",
                 document.id,
+            )
+            return
+        if (
+            expected_modified is not None
+            and not Document.objects.filter(
+                pk=document.pk,
+                modified=expected_modified,
+            ).exists()
+        ):
+            logger.info(
+                "Skipping stale LLM index update for document %s.",
+                document.pk,
             )
             return
         store.upsert_document(str(document.id), new_nodes)
@@ -576,7 +592,7 @@ def llm_index_compact() -> None:
         _with_exclusive_access("compaction", lambda: store.compact(force=True))
 
 
-def llm_index_remove_document(document: Document):
+def llm_index_remove_document(document_id: int) -> None:
     """Remove a document's chunks from the LLM index."""
     with write_store() as store:
         migration_result = _check_and_run_migrations(store)
@@ -585,7 +601,7 @@ def llm_index_remove_document(document: Document):
                 "Skipping removal of document %s from the LLM index: the "
                 "index requires re-embedding first. Run 'document_llmindex "
                 "rebuild' to resolve.",
-                document.id,
+                document_id,
             )
             return
         if migration_result is MigrationCheckResult.DEFERRED:
@@ -593,10 +609,10 @@ def llm_index_remove_document(document: Document):
                 "Skipping removal of document %s from the LLM index: "
                 "migration check deferred while index readers are active; "
                 "will retry on the next write.",
-                document.id,
+                document_id,
             )
             return
-        store.delete(str(document.id))
+        store.delete(str(document_id))
 
 
 def truncate_content(

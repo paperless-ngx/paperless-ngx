@@ -395,8 +395,27 @@ class TestAIIndex(DirectoriesMixin, TestCase):
         with mock.patch(
             "documents.tasks.llm_index_add_or_update_document",
         ) as llm_index_add_or_update_document:
-            tasks.update_document_in_llm_index(doc)
-            llm_index_add_or_update_document.assert_called_once_with(doc)
+            tasks.update_document_in_llm_index(doc.pk)
+            llm_index_add_or_update_document.assert_called_once_with(
+                doc,
+                expected_modified=doc.modified.isoformat(),
+            )
+
+    def test_legacy_stale_update_document_in_llm_index_is_a_noop(self) -> None:
+        doc = Document.objects.create(
+            title="test",
+            content="my document",
+            checksum="wow",
+        )
+        document_id = doc.pk
+        Document.global_objects.filter(pk=document_id).delete()
+
+        with mock.patch(
+            "documents.tasks.llm_index_add_or_update_document",
+        ) as llm_index_add_or_update_document:
+            tasks.update_document_in_llm_index(document=doc)
+
+        llm_index_add_or_update_document.assert_not_called()
 
     def test_remove_document_from_llm_index(self) -> None:
         """
@@ -407,6 +426,13 @@ class TestAIIndex(DirectoriesMixin, TestCase):
         THEN:
             - llm_index_remove_document is called
         """
+        with mock.patch(
+            "documents.tasks.llm_index_remove_document",
+        ) as llm_index_remove_document:
+            tasks.remove_document_from_llm_index(42)
+            llm_index_remove_document.assert_called_once_with(42)
+
+    def test_legacy_remove_document_from_llm_index_uses_only_id(self) -> None:
         doc = Document.objects.create(
             title="test",
             content="my document",
@@ -415,8 +441,9 @@ class TestAIIndex(DirectoriesMixin, TestCase):
         with mock.patch(
             "documents.tasks.llm_index_remove_document",
         ) as llm_index_remove_document:
-            tasks.remove_document_from_llm_index(doc)
-            llm_index_remove_document.assert_called_once_with(doc)
+            tasks.remove_document_from_llm_index(document=doc)
+
+        llm_index_remove_document.assert_called_once_with(doc.pk)
 
     @override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="huggingface")
     def test_bulk_update_does_not_enqueue_per_doc_llm_tasks(self) -> None:
@@ -444,6 +471,7 @@ class TestAIIndex(DirectoriesMixin, TestCase):
             doc_ids = [doc.pk for doc in docs]
             tasks.bulk_update_documents(doc_ids)
             self.assertEqual(update_document_in_llm_index.apply_async.call_count, 0)
+            self.assertEqual(update_document_in_llm_index.delay_on_commit.call_count, 0)
             update_llm_index.assert_called_once_with(
                 rebuild=False,
                 document_ids=doc_ids,
@@ -533,7 +561,7 @@ class TestApplyAISuggestionsTask(DirectoriesMixin, TestCase):
         ):
             tasks.apply_ai_suggestions(self.action.pk, self.doc.pk)
 
-        update_in_llm_index.apply_async.assert_called_once()
+        update_in_llm_index.delay_on_commit.assert_called_once_with(self.doc.pk)
 
     def test_deleted_document_is_a_noop(self) -> None:
         """

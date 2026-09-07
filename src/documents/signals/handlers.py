@@ -1422,7 +1422,7 @@ def add_or_update_document_in_llm_index(sender, document, **kwargs):
     if ai_config.llm_index_enabled:
         from documents.tasks import update_document_in_llm_index
 
-        update_document_in_llm_index.apply_async(kwargs={"document": document})
+        update_document_in_llm_index.delay_on_commit(document.pk)
 
 
 @receiver(models.signals.post_delete, sender=Document)
@@ -1438,4 +1438,4 @@ def delete_document_from_llm_index(
     if ai_config.llm_index_enabled:
         from documents.tasks import remove_document_from_llm_index
 
-        remove_document_from_llm_index.apply_async(kwargs={"document": instance})
+        remove_document_from_llm_index.delay_on_commit(instance.pk)

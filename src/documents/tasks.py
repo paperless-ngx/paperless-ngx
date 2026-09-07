@@ -459,7 +459,10 @@ def update_document_content_maybe_archive_file(
 
             ai_config = AIConfig()
             if ai_config.llm_index_enabled:
-                llm_index_add_or_update_document(document)
+                llm_index_add_or_update_document(
+                    document,
+                    expected_modified=document.modified.isoformat(),
+                )
 
             clear_document_caches(document.pk)
 
@@ -753,17 +756,50 @@ def apply_ai_suggestions(self, action_id: int, document_id: int) -> None:
 
     ai_config = AIConfig()
     if ai_config.llm_index_enabled:
-        update_document_in_llm_index.apply_async(kwargs={"document": document})
+        update_document_in_llm_index.delay_on_commit(document.pk)
+
+
+def _llm_index_document_id(
+    document_id: int | None,
+    document: Document | None,
+) -> int:
+    candidate = (
+        document_id if document_id is not None else getattr(document, "pk", None)
+    )
+    if isinstance(candidate, bool) or not isinstance(candidate, int) or candidate < 1:
+        raise ValueError("LLM index task requires a document id")
+    return candidate
 
 
 @shared_task
-def update_document_in_llm_index(document) -> None:
-    llm_index_add_or_update_document(document)
+def update_document_in_llm_index(
+    document_id: int | None = None,
+    *,
+    document: Document | None = None,
+) -> None:
+    document_id = _llm_index_document_id(document_id, document)
+    try:
+        document = Document.objects.get(pk=document_id)
+    except Document.DoesNotExist:
+        logger.info(
+            "Skipping stale LLM index update for document %s.",
+            document_id,
+        )
+        return
+    llm_index_add_or_update_document(
+        document,
+        expected_modified=document.modified.isoformat(),
+    )
 
 
 @shared_task
-def remove_document_from_llm_index(document) -> None:
-    llm_index_remove_document(document)
+def remove_document_from_llm_index(
+    document_id: int | None = None,
+    *,
+    document: Document | None = None,
+) -> None:
+    document_id = _llm_index_document_id(document_id, document)
+    llm_index_remove_document(document_id)
 
 
 @shared_task

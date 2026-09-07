@@ -404,6 +404,38 @@ def test_add_or_update_document_updates_existing_entry(
 
 
 @pytest.mark.django_db
+def test_stale_update_cannot_recreate_removed_document(
+    temp_llm_index_dir: Path,
+    real_document: Document,
+    mock_embed_model: FakeEmbedding,
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    indexing.llm_index_add_or_update_document(real_document)
+    document_id = real_document.pk
+    expected_modified = real_document.modified.isoformat()
+    stale_document = Document.objects.get(pk=document_id)
+    embed_nodes = indexing._embed_nodes
+
+    def remove_document_before_update_write(nodes, embed_model) -> None:
+        embed_nodes(nodes, embed_model)
+        Document.global_objects.filter(pk=document_id).delete()
+        indexing.llm_index_remove_document(document_id)
+
+    mocker.patch(
+        "paperless_ai.indexing._embed_nodes",
+        side_effect=remove_document_before_update_write,
+    )
+
+    indexing.llm_index_add_or_update_document(
+        stale_document,
+        expected_modified=expected_modified,
+    )
+
+    with indexing.get_vector_store() as store:
+        assert str(document_id) not in store.get_modified_times()
+
+
+@pytest.mark.django_db
 def test_query_after_remove_does_not_raise_key_error(
     temp_llm_index_dir: Path,
     real_document: Document,
@@ -417,7 +449,7 @@ def test_query_after_remove_does_not_raise_key_error(
         added=timezone.now(),
     )
 
-    indexing.llm_index_remove_document(real_document)
+    indexing.llm_index_remove_document(real_document.pk)
 
     result = indexing.retrieve_similar_nodes(query_doc, top_k=5)
     assert isinstance(result, list)
@@ -584,13 +616,28 @@ class TestDocumentUpdatedSignalTriggersLlmReindex:
         self,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
-        """Firing document_updated should call update_document_in_llm_index.apply_async."""
+        """Firing document_updated queues the document id on commit."""
         mock_task = mocker.patch("documents.tasks.update_document_in_llm_index")
 
         doc = DocumentFactory()
         document_updated.send(sender=object, document=doc)
 
-        mock_task.apply_async.assert_called_once_with(kwargs={"document": doc})
+        mock_task.delay_on_commit.assert_called_once_with(doc.pk)
+
+    @pytest.mark.django_db
+    @override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="huggingface")
+    def test_document_delete_enqueues_llm_removal_by_id(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        from documents.signals.handlers import delete_document_from_llm_index
+
+        mock_task = mocker.patch("documents.tasks.remove_document_from_llm_index")
+        doc = DocumentFactory()
+
+        delete_document_from_llm_index(sender=Document, instance=doc)
+
+        mock_task.delay_on_commit.assert_called_once_with(doc.pk)
 
     @pytest.mark.django_db
     @override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="huggingface")
@@ -611,7 +658,7 @@ class TestDocumentUpdatedSignalTriggersLlmReindex:
         )
         document_updated.send(sender=object, document=root_doc, skip_ai_index=True)
 
-        assert mock_task.apply_async.call_count == 1
+        mock_task.delay_on_commit.assert_called_once_with(root_doc.pk)
 
 
 @pytest.mark.django_db
@@ -784,9 +831,7 @@ class TestLlmIndexLocking:
             ),
         )
 
-        doc = MagicMock(spec=Document)
-        doc.id = 1
-        indexing.llm_index_remove_document(doc)
+        indexing.llm_index_remove_document(1)
 
         mock_store.delete.assert_called_once_with("1")
 
@@ -809,9 +854,7 @@ class TestLlmIndexLocking:
             ),
         )
 
-        doc = MagicMock(spec=Document)
-        doc.id = 1
-        indexing.llm_index_remove_document(doc)
+        indexing.llm_index_remove_document(1)
 
         mock_store.delete.assert_not_called()
 
@@ -837,9 +880,7 @@ class TestLlmIndexLocking:
             side_effect=Timeout("test"),
         )
 
-        doc = MagicMock(spec=Document)
-        doc.id = 1
-        indexing.llm_index_remove_document(doc)
+        indexing.llm_index_remove_document(1)
 
         mock_store.delete.assert_not_called()
 
@@ -919,7 +960,7 @@ class TestVectorStoreIndexing:
             count_sql = "SELECT count(*) FROM documents"
             assert store.client.execute(count_sql).fetchone()[0] >= 1
 
-            indexing.llm_index_remove_document(real_document)
+            indexing.llm_index_remove_document(real_document.pk)
             assert store.client.execute(count_sql).fetchone()[0] == 0
 
     def test_update_shrinks_chunks_without_orphans(
