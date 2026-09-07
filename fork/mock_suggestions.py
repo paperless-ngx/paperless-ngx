@@ -154,7 +154,8 @@ class Handler(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     if sys.argv[1:] == ["--probe"]:
         with urllib.request.urlopen(
-            "http://127.0.0.1:8080/test-state", timeout=5,
+            "http://127.0.0.1:8080/test-state",
+            timeout=5,
         ) as response:
             print(response.read().decode())  # noqa: T201
     else:

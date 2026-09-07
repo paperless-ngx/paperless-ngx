@@ -17,6 +17,25 @@ from mock_suggestions import provider_reply  # noqa: E402
 
 
 class LabTests(unittest.TestCase):
+    def test_image_publication_requires_upstream_lint(self):
+        workflow = yaml.safe_load(
+            (FORK.parent / ".github/workflows/fork-ci.yml").read_text(),
+        )
+        steps = workflow["jobs"]["image"]["steps"]
+        lint = next(
+            index
+            for index, step in enumerate(steps)
+            if step.get("uses", "").startswith("j178/prek-action@")
+        )
+        publish = next(
+            index
+            for index, step in enumerate(steps)
+            if step.get("run") == "bash fork/publish.sh"
+        )
+        self.assertLess(lint, publish)
+        self.assertNotIn("continue-on-error", steps[lint])
+        self.assertNotIn("if", steps[lint])
+
     def test_native_tool_call(self):
         result = completion(
             {

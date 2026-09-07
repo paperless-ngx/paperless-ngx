@@ -38,6 +38,8 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.14'
+      - name: Require upstream lint before image publication
+        uses: j178/prek-action@5337cb91e0fa35a7ff31b9ca345126d8bbbcdf16 # v2.0.6
       - run: python -m pip install PyYAML==6.0.3 podman-compose==1.5.0
       - name: Verify synthetic-only lab contract
         run: python -m unittest discover -s fork/tests -v

@@ -185,7 +185,9 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
 
         def changed(request):
             CustomFieldInstance.objects.create(
-                document=self.document, field=field, value_text="Changed",
+                document=self.document,
+                field=field,
+                value_text="Changed",
             )
             return response_for(request)
 
@@ -197,7 +199,8 @@ class TestSuggestionProvider(DirectoriesMixin, TestCase):
     def test_disabled_provider_retains_upstream_classifier(self):
         self.llm.return_value.run_llm_query.return_value = copy.deepcopy(PROPOSAL)
         self.assertEqual(
-            get_ai_document_classification(self.document, self.user), PROPOSAL,
+            get_ai_document_classification(self.document, self.user),
+            PROPOSAL,
         )
         self.post.assert_not_called()
         self.llm.assert_called_once()

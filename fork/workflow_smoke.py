@@ -82,7 +82,9 @@ def main():
         if workflow is not None:
             api(f"/api/workflows/{workflow['id']}/", method="DELETE")
         api(
-            path, {"title": original["title"], "tags": original["tags"]}, method="PATCH",
+            path,
+            {"title": original["title"], "tags": original["tags"]},
+            method="PATCH",
         )
 
 

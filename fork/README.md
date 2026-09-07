@@ -84,7 +84,8 @@ document-aware contract. It supplies fixed proposals, not domain classification.
 ## Release contract
 
 GitHub Actions first runs the reusable upstream backend and frontend tests,
-then builds the upstream Dockerfile for `linux/amd64` with Docker Buildx. It
+requires the upstream lint checks, then builds the upstream Dockerfile for
+`linux/amd64` with Docker Buildx. It
 loads that same image into Podman, verifies its image ID, tests it in the
 isolated stack, and publishes successful branch builds to
 `ghcr.io/szaiser/paperless-ngx` with a `sha-<commit>` tag. Fork release tags use

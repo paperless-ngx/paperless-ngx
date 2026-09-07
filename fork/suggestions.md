@@ -23,17 +23,17 @@ a Bearer header. The timeout applies to HTTP connection/read operations.
 
 Native **Suggest** and **Apply AI Suggestions** POST to the same endpoint:
 
-| Field | Meaning |
-| --- | --- |
-| `protocol_version` | Integer `1`. |
-| `event` | `suggestions.requested`. |
-| `request_id` | Unique request identifier; echo it in the response. |
-| `context_id` | Opaque context fingerprint; echo it unchanged. |
-| `requester_id` | Interactive user's ID; workflows use the document owner's ID, or `null` for an unowned document. |
-| `output_language` | Requested output language, or `null`. |
-| `document` | Saved metadata, tags, typed custom-field values, complete Content and its source version. |
-| `taxonomy` | Visible `{id, name}` objects for tags, correspondents, document types and storage paths. |
-| `classic_suggestions` | Native matching candidates as IDs and parsed date strings. |
+| Field                 | Meaning                                                                                          |
+| --------------------- | ------------------------------------------------------------------------------------------------ |
+| `protocol_version`    | Integer `1`.                                                                                     |
+| `event`               | `suggestions.requested`.                                                                         |
+| `request_id`          | Unique request identifier; echo it in the response.                                              |
+| `context_id`          | Opaque context fingerprint; echo it unchanged.                                                   |
+| `requester_id`        | Interactive user's ID; workflows use the document owner's ID, or `null` for an unowned document. |
+| `output_language`     | Requested output language, or `null`.                                                            |
+| `document`            | Saved metadata, tags, typed custom-field values, complete Content and its source version.        |
+| `taxonomy`            | Visible `{id, name}` objects for tags, correspondents, document types and storage paths.         |
+| `classic_suggestions` | Native matching candidates as IDs and parsed date strings.                                       |
 
 `document.id` is the metadata document. `document.content_version.id`,
 `version_index`, checksums and original filename identify the source of Content:
@@ -52,10 +52,10 @@ Return HTTP 200 with JSON:
   "context_id": "echo the request value",
   "suggestions": {
     "title": "Suggested title",
-    "tags": {"existing_ids": [], "new_names": []},
-    "correspondents": {"existing_ids": [], "new_names": []},
-    "document_types": {"existing_ids": [], "new_names": []},
-    "storage_paths": {"existing_ids": [], "new_names": []},
+    "tags": { "existing_ids": [], "new_names": [] },
+    "correspondents": { "existing_ids": [], "new_names": [] },
+    "document_types": { "existing_ids": [], "new_names": [] },
+    "storage_paths": { "existing_ids": [], "new_names": [] },
     "dates": ["2026-01-02"]
   }
 }
