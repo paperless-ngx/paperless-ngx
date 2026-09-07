@@ -1,7 +1,7 @@
 import pytest
 from django.core.checks import Error
 from django.core.checks import Warning
-from pytest_django.fixtures import SettingsWrapper
+from pytest_django.fixtures import Settings
 from pytest_mock import MockerFixture
 
 from documents.checks import filename_format_check
@@ -47,7 +47,7 @@ class TestFilenameFormatCheck:
     )
     def test_warns_on_old_style_format(
         self,
-        settings: SettingsWrapper,
+        settings: Settings,
         filename_format: str,
         expected_hint: str,
     ) -> None:
