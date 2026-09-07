@@ -6,7 +6,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { first, map } from 'rxjs'
+import { catchError, first, map, of } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Group } from 'src/app/data/group'
 import { User } from 'src/app/data/user'
@@ -42,7 +42,10 @@ export class UserEditDialogComponent
   private readonly groupsService = inject(GroupService)
 
   readonly groups = toSignal(
-    this.groupsService.listAll().pipe(map((result) => result.results)),
+    this.groupsService.listAll().pipe(
+      map((result) => result.results),
+      catchError(() => of([]))
+    ),
     { initialValue: undefined as Group[] }
   )
   readonly passwordIsSet = signal(false)

@@ -4,7 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { of } from 'rxjs'
+import { of, throwError } from 'rxjs'
 import {
   MailAction,
   MailMetadataCorrespondentOption,
@@ -79,6 +79,27 @@ describe('MailRuleEditDialogComponent', () => {
     component = fixture.componentInstance
 
     fixture.detectChanges()
+  })
+
+  it('should use empty related object lists when retrieval fails', () => {
+    const failed = () => throwError(() => new Error('Forbidden'))
+    jest
+      .spyOn(TestBed.inject(MailAccountService), 'listAll')
+      .mockReturnValue(failed())
+    jest
+      .spyOn(TestBed.inject(CorrespondentService), 'listAll')
+      .mockReturnValue(failed())
+    jest
+      .spyOn(TestBed.inject(DocumentTypeService), 'listAll')
+      .mockReturnValue(failed())
+
+    const failedFixture = TestBed.createComponent(MailRuleEditDialogComponent)
+    const failedComponent = failedFixture.componentInstance
+
+    expect(failedComponent.accounts()).toEqual([])
+    expect(failedComponent.correspondents()).toEqual([])
+    expect(failedComponent.documentTypes()).toEqual([])
+    expect(() => failedFixture.detectChanges()).not.toThrow()
   })
 
   it('should support create and edit modes', () => {

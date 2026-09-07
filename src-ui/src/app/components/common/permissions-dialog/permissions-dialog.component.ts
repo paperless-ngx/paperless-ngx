@@ -14,7 +14,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { map } from 'rxjs'
+import { catchError, map, of } from 'rxjs'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { User } from 'src/app/data/user'
 import { UserService } from 'src/app/services/rest/user.service'
@@ -37,7 +37,10 @@ export class PermissionsDialogComponent {
   private userService = inject(UserService)
 
   readonly users = toSignal(
-    this.userService.listAll().pipe(map((r) => r.results)),
+    this.userService.listAll().pipe(
+      map((r) => r.results),
+      catchError(() => of([]))
+    ),
     { initialValue: undefined as User[] }
   )
   readonly title = signal($localize`Set permissions`)

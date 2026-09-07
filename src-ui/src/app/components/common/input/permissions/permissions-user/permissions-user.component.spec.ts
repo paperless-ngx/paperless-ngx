@@ -7,7 +7,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { of } from 'rxjs'
+import { of, throwError } from 'rxjs'
 import { UserService } from 'src/app/services/rest/user.service'
 import { PermissionsUserComponent } from './permissions-user.component'
 
@@ -59,5 +59,15 @@ describe('PermissionsUserComponent', () => {
     component.writeValue({ id: 2, name: 'User 2' })
     expect(component.value).toEqual({ id: 2, name: 'User 2' })
     expect(userServiceSpy).toHaveBeenCalled()
+  })
+
+  it('should use an empty user list when retrieval fails', () => {
+    userServiceSpy.mockReturnValue(throwError(() => new Error('Forbidden')))
+
+    const failedFixture = TestBed.createComponent(PermissionsUserComponent)
+    const failedComponent = failedFixture.componentInstance
+
+    expect(failedComponent.users()).toEqual([])
+    expect(() => failedFixture.detectChanges()).not.toThrow()
   })
 })

@@ -81,6 +81,18 @@ describe('UserEditDialogComponent', () => {
     fixture.detectChanges()
   })
 
+  it('should use an empty group list when retrieval fails', () => {
+    jest
+      .spyOn(TestBed.inject(GroupService), 'listAll')
+      .mockReturnValue(throwError(() => new Error('Forbidden')))
+
+    const failedFixture = TestBed.createComponent(UserEditDialogComponent)
+    const failedComponent = failedFixture.componentInstance
+
+    expect(failedComponent.groups()).toEqual([])
+    expect(() => failedFixture.detectChanges()).not.toThrow()
+  })
+
   it('should support create and edit modes', () => {
     component.dialogMode.set(EditDialogMode.CREATE)
     const createTitleSpy = jest.spyOn(component, 'getCreateTitle')

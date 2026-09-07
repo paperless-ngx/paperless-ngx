@@ -6,7 +6,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { map } from 'rxjs'
+import { catchError, map, of } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Correspondent } from 'src/app/data/correspondent'
 import { DocumentType } from 'src/app/data/document-type'
@@ -160,15 +160,24 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
   private readonly documentTypeService = inject(DocumentTypeService)
 
   readonly accounts = toSignal(
-    this.accountService.listAll().pipe(map((result) => result.results)),
+    this.accountService.listAll().pipe(
+      map((result) => result.results),
+      catchError(() => of([]))
+    ),
     { initialValue: undefined as MailAccount[] }
   )
   readonly correspondents = toSignal(
-    this.correspondentService.listAll().pipe(map((result) => result.results)),
+    this.correspondentService.listAll().pipe(
+      map((result) => result.results),
+      catchError(() => of([]))
+    ),
     { initialValue: undefined as Correspondent[] }
   )
   readonly documentTypes = toSignal(
-    this.documentTypeService.listAll().pipe(map((result) => result.results)),
+    this.documentTypeService.listAll().pipe(
+      map((result) => result.results),
+      catchError(() => of([]))
+    ),
     { initialValue: undefined as DocumentType[] }
   )
 

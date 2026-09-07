@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgSelectComponent } from '@ng-select/ng-select'
-import { map } from 'rxjs/operators'
+import { catchError, map, of } from 'rxjs'
 import { User } from 'src/app/data/user'
 import { UserService } from 'src/app/services/rest/user.service'
 import { AbstractInputComponent } from '../../abstract-input'
@@ -27,7 +27,10 @@ import { AbstractInputComponent } from '../../abstract-input'
 export class PermissionsUserComponent extends AbstractInputComponent<User[]> {
   private readonly userService = inject(UserService)
   readonly users = toSignal(
-    this.userService.listAll().pipe(map((result) => result.results)),
+    this.userService.listAll().pipe(
+      map((result) => result.results),
+      catchError(() => of([]))
+    ),
     { initialValue: undefined as User[] }
   )
 }

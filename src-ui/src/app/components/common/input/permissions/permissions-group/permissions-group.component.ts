@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgSelectComponent } from '@ng-select/ng-select'
-import { map } from 'rxjs/operators'
+import { catchError, map, of } from 'rxjs'
 import { Group } from 'src/app/data/group'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { AbstractInputComponent } from '../../abstract-input'
@@ -27,7 +27,10 @@ import { AbstractInputComponent } from '../../abstract-input'
 export class PermissionsGroupComponent extends AbstractInputComponent<Group> {
   private readonly groupService = inject(GroupService)
   readonly groups = toSignal(
-    this.groupService.listAll().pipe(map((result) => result.results)),
+    this.groupService.listAll().pipe(
+      map((result) => result.results),
+      catchError(() => of([]))
+    ),
     { initialValue: undefined as Group[] }
   )
 }
