@@ -138,6 +138,16 @@ def apply_ai_suggestions_to_document(
         )
         return []
 
+    if not document.content.strip():
+        logger.warning(
+            "Document %s has no content, skipping AI suggestions for workflow "
+            "action %s",
+            document.pk,
+            action.pk,
+            extra={"group": logging_group},
+        )
+        return []
+
     # Workflows run without a user, so we use the document owner
     owner = document.owner
 
