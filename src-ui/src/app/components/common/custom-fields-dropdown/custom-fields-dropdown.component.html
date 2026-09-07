@@ -6,7 +6,7 @@
         <div class="list-group list-group-flush" (keydown)="listKeyDown($event)">
             <div class="list-group-item">
                 <div class="input-group input-group-sm">
-                  <input class="form-control" type="text" [(ngModel)]="filterText" placeholder="Search fields" i18n-placeholder (keyup.enter)="listFilterEnter()" #listFilterTextInput>
+                  <input class="form-control" type="text" [(ngModel)]="filterText" [ngModelOptions]="{standalone: true}" placeholder="Search fields" i18n-placeholder (keyup.enter)="listFilterEnter()" #listFilterTextInput>
                 </div>
             </div>
             @for (field of filteredFields; track field.id) {

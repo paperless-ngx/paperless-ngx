@@ -598,6 +598,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(input_doc.root_document_id, root.id)
         self.assertEqual(input_doc.source, DocumentSource.ApiUpload)
         self.assertEqual(overrides.version_label, "New Version")
+        self.assertEqual(overrides.owner_id, self.user.id)
         self.assertEqual(overrides.actor_id, self.user.id)
 
     def test_update_version_with_version_pk_normalizes_to_root(self) -> None:
