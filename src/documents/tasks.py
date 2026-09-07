@@ -72,6 +72,8 @@ from paperless.logging import consume_task_id
 from paperless.parsers import ParserContext
 from paperless.parsers.registry import get_parser_registry
 from paperless_ai.exceptions import LLMTimeoutError
+from paperless_ai.exceptions import StaleSuggestions
+from paperless_ai.exceptions import SuggestionProviderUnavailable
 from paperless_ai.indexing import llm_index_add_or_update_document
 from paperless_ai.indexing import llm_index_remove_document
 from paperless_ai.indexing import update_llm_index
@@ -717,7 +719,7 @@ def llmindex_index(
 
 @shared_task(
     bind=True,
-    autoretry_for=(LLMTimeoutError,),
+    autoretry_for=(LLMTimeoutError, SuggestionProviderUnavailable, StaleSuggestions),
     max_retries=3,
     retry_backoff=60,
     retry_backoff_max=600,
@@ -742,16 +744,45 @@ def apply_ai_suggestions(self, action_id: int, document_id: int) -> None:
         )
         return
 
-    if not apply_ai_suggestions_to_document(action, document):
+    changed_fields = apply_ai_suggestions_to_document(action, document)
+    if not changed_fields:
         return
 
     # No document_updated signal to avoid loop
     clear_document_caches(document.pk)
     index_document.delay(document.pk)
 
+    if settings.AI_SUGGESTIONS_ENDPOINT:
+        # Retry notification separately, never the already completed writes.
+        from paperless_ai.suggestion_provider import applied_event
+
+        notify_suggestions_applied.delay(
+            applied_event(document.pk, action.pk, changed_fields, self.request.id),
+        )
+
     ai_config = AIConfig()
     if ai_config.llm_index_enabled:
         update_document_in_llm_index.apply_async(kwargs={"document": document})
+
+
+@shared_task(
+    autoretry_for=(SuggestionProviderUnavailable,),
+    max_retries=5,
+    retry_backoff=30,
+    retry_backoff_max=600,
+    retry_jitter=True,
+)
+def notify_suggestions_applied(event: dict) -> None:
+    from paperless_ai.exceptions import SuggestionProviderError
+    from paperless_ai.suggestion_provider import post_provider
+
+    if not settings.AI_SUGGESTIONS_ENDPOINT:
+        return
+    response = post_provider(event)
+    if response.get("event_id") != event["event_id"]:
+        raise SuggestionProviderError(
+            "Suggestion provider did not acknowledge the event",
+        )
 
 
 @shared_task

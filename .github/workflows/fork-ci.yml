@@ -29,6 +29,7 @@ jobs:
       packages: write
     env:
       PAPERLESS_TEST_IMAGE: paperless-fork-test:${{ github.sha }}
+      PAPERLESS_TEST_PROVIDER: external
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -65,6 +66,8 @@ jobs:
         run: python -m playwright install --with-deps chromium
       - name: Verify native suggestion selection and Save
         run: python fork/browser_smoke.py
+      - name: Verify native background apply and provider notification
+        run: python fork/workflow_smoke.py
       - name: Logs on failure (synthetic data only)
         if: failure()
         run: bash fork/lab.sh logs

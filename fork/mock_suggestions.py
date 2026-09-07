@@ -1,6 +1,10 @@
 """Deterministic native-AI test double; never contacts an inference provider."""
 
+import hashlib
 import json
+import sys
+import threading
+import urllib.request
 from http.server import BaseHTTPRequestHandler
 from http.server import ThreadingHTTPServer
 
@@ -12,6 +16,56 @@ PROPOSAL = {
     "storage_paths": [],
     "dates": ["2026-01-02"],
 }
+STATE = {"native_requests": 0, "provider_requests": 0, "applied": {}}
+STATE_LOCK = threading.Lock()
+
+
+def provider_reply(request):
+    if request.get("protocol_version") != 1:
+        raise ValueError("Unsupported protocol")
+    if request.get("event") == "suggestions.applied":
+        event_id = request["event_id"]
+        with STATE_LOCK:
+            STATE["applied"][event_id] = request
+        return {"event_id": event_id}
+    if request.get("event") != "suggestions.requested":
+        raise ValueError("Unexpected event")
+    context = {
+        key: request[key]
+        for key in (
+            "document",
+            "requester_id",
+            "output_language",
+            "taxonomy",
+            "classic_suggestions",
+        )
+    }
+    digest = hashlib.sha256(json.dumps(context, sort_keys=True).encode()).hexdigest()
+    if digest != request["context_id"] or not request["document"]["id"]:
+        raise ValueError("Invalid document context")
+    if (
+        not request["document"]["content"]
+        or not request["document"]["content_version"]["id"]
+    ):
+        raise ValueError("Missing source content or version")
+    suggestions = {"title": PROPOSAL["title"], "dates": PROPOSAL["dates"]}
+    for key in ("tags", "correspondents", "document_types", "storage_paths"):
+        suggestions[key] = {
+            "existing_ids": [
+                item["id"]
+                for item in request["taxonomy"][key]
+                if item["name"] in PROPOSAL[key]
+            ],
+            "new_names": [],
+        }
+    with STATE_LOCK:
+        STATE["provider_requests"] += 1
+    return {
+        "protocol_version": 1,
+        "request_id": request["request_id"],
+        "context_id": request["context_id"],
+        "suggestions": suggestions,
+    }
 
 
 def completion(request):
@@ -66,11 +120,14 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/health":
             self.respond(200, {"mode": "synthetic-fixture"})
+        elif self.path == "/test-state":
+            with STATE_LOCK:
+                self.respond(200, STATE)
         else:
             self.respond(404, {"error": "Unknown test endpoint"})
 
     def do_POST(self):
-        if self.path != "/v1/chat/completions":
+        if self.path not in {"/v1/chat/completions", "/suggestions"}:
             self.respond(404, {"error": "Unknown test endpoint"})
             return
         try:
@@ -78,10 +135,27 @@ class Handler(BaseHTTPRequestHandler):
             if not 0 < length <= 1_048_576:
                 raise ValueError("Invalid request size")
             request = json.loads(self.rfile.read(length))
-            self.respond(200, completion(request))
-        except (ValueError, TypeError, AttributeError):
+            if self.path == "/suggestions":
+                if (
+                    self.headers.get("Authorization")
+                    != "Bearer synthetic-provider-only"
+                ):
+                    self.respond(401, {"error": "Invalid synthetic provider key"})
+                    return
+                self.respond(200, provider_reply(request))
+            else:
+                with STATE_LOCK:
+                    STATE["native_requests"] += 1
+                self.respond(200, completion(request))
+        except (ValueError, TypeError, AttributeError, KeyError):
             self.respond(400, {"error": "Invalid synthetic completion request"})
 
 
 if __name__ == "__main__":
-    ThreadingHTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
+    if sys.argv[1:] == ["--probe"]:
+        with urllib.request.urlopen(
+            "http://127.0.0.1:8080/test-state", timeout=5,
+        ) as response:
+            print(response.read().decode())  # noqa: T201
+    else:
+        ThreadingHTTPServer(("0.0.0.0", 8080), Handler).serve_forever()

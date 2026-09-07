@@ -13,6 +13,7 @@ FORK = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(FORK))
 from mock_suggestions import PROPOSAL  # noqa: E402
 from mock_suggestions import completion  # noqa: E402
+from mock_suggestions import provider_reply  # noqa: E402
 
 
 class LabTests(unittest.TestCase):
@@ -68,6 +69,35 @@ class LabTests(unittest.TestCase):
             smoke.SAMPLE.relative_to(FORK.parent).as_posix(),
             "src/documents/tests/samples/simple.pdf",
         )
+
+    def test_provider_overlay_only_configures_internal_mock(self):
+        config = yaml.safe_load((FORK / "compose.provider.yaml").read_text())
+        self.assertEqual(set(config), {"services"})
+        self.assertEqual(set(config["services"]), {"paperless"})
+        service = config["services"]["paperless"]
+        self.assertEqual(set(service), {"environment"})
+        self.assertEqual(
+            service["environment"],
+            {
+                "PAPERLESS_AI_SUGGESTIONS_ENDPOINT": "http://mock:8080/suggestions",
+                "PAPERLESS_AI_SUGGESTIONS_API_KEY": "synthetic-provider-only",
+                "PAPERLESS_AI_SUGGESTIONS_ALLOW_INTERNAL": "true",
+                "PAPERLESS_AI_SUGGESTIONS_TIMEOUT": "15",
+            },
+        )
+
+    def test_provider_mock_rejects_missing_context(self):
+        with self.assertRaises((ValueError, KeyError)):
+            provider_reply({"protocol_version": 1, "event": "suggestions.requested"})
+
+    def test_provider_acknowledges_repeat_event_id(self):
+        event = {
+            "protocol_version": 1,
+            "event": "suggestions.applied",
+            "event_id": "synthetic-test",
+        }
+        self.assertEqual(provider_reply(event), {"event_id": "synthetic-test"})
+        self.assertEqual(provider_reply(event), {"event_id": "synthetic-test"})
 
     def test_readiness_reports_connection_failure(self):
         import smoke

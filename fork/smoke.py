@@ -3,6 +3,7 @@
 import base64
 import http.client
 import json
+import os
 import subprocess
 import time
 import urllib.error
@@ -28,8 +29,32 @@ def api(path, data=None, method=None, content_type="application/json"):
         method=method,
         headers={"Authorization": f"Basic {AUTH}", "Content-Type": content_type},
     )
-    with OPENER.open(request, timeout=30) as response:
-        return json.load(response)
+    try:
+        with OPENER.open(request, timeout=30) as response:
+            if response.status == 204:
+                return None
+            return json.load(response)
+    except urllib.error.HTTPError as exc:
+        exc.add_note(exc.read(2000).decode(errors="replace"))
+        raise
+
+
+def provider_state():
+    return json.loads(
+        subprocess.run(
+            [
+                "podman",
+                "exec",
+                "paperless-fork-lab_mock_1",
+                "python3",
+                "/mock/mock_suggestions.py",
+                "--probe",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout,
+    )
 
 
 def wait_for_api():
@@ -115,6 +140,11 @@ def main():
     document_id = fixture_document()
     path = f"/api/documents/{document_id}/"
     before = api(path)
+    state = (
+        provider_state()
+        if os.environ.get("PAPERLESS_TEST_PROVIDER") == "external"
+        else None
+    )
     suggestions = api(path + "ai_suggestions/")
     assert suggestions["title"] == PROPOSAL["title"], suggestions
     assert suggestions["tags"] == [tag], suggestions
@@ -133,6 +163,10 @@ def main():
     ):
         assert before[key] == after[key], f"Suggest unexpectedly modified {key}"
     assert api(path + "ai_suggestions/") == suggestions
+    if state is not None:
+        after_state = provider_state()
+        assert after_state["provider_requests"] == state["provider_requests"] + 2
+        assert after_state["native_requests"] == state["native_requests"]
     print(  # noqa: T201
         f"PASS: upstream fixture {document_id}, native AI suggestions, existing taxonomy, unchanged metadata, repeated request",
     )

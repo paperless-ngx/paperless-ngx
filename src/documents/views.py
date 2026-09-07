@@ -252,6 +252,9 @@ from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.ai_classifier import get_llm_output_language
 from paperless_ai.chat import stream_chat_with_documents
 from paperless_ai.exceptions import LLMTimeoutError
+from paperless_ai.exceptions import StaleSuggestions
+from paperless_ai.exceptions import SuggestionProviderError
+from paperless_ai.exceptions import SuggestionProviderUnavailable
 from paperless_ai.matching import extract_unmatched_names
 from paperless_ai.matching import match_correspondents_by_name
 from paperless_ai.matching import match_document_types_by_name
@@ -1555,9 +1558,14 @@ class DocumentViewSet(
             if part
         )
 
-        cached_llm_suggestions = get_llm_suggestion_cache(
-            doc.pk,
-            backend=llm_cache_backend,
+        # External providers own reuse, including their rule/config revision.
+        cached_llm_suggestions = (
+            None
+            if settings.AI_SUGGESTIONS_ENDPOINT
+            else get_llm_suggestion_cache(
+                doc.pk,
+                backend=llm_cache_backend,
+            )
         )
 
         if cached_llm_suggestions:
@@ -1579,6 +1587,13 @@ class DocumentViewSet(
                     request.user,
                     output_language,
                 )
+            except SuggestionProviderError as exc:
+                code = status.HTTP_502_BAD_GATEWAY
+                if isinstance(exc, StaleSuggestions):
+                    code = status.HTTP_409_CONFLICT
+                elif isinstance(exc, SuggestionProviderUnavailable):
+                    code = status.HTTP_503_SERVICE_UNAVAILABLE
+                return Response({"ai": [str(exc)]}, status=code)
             except ValueError as exc:
                 logger.exception(
                     "Invalid AI configuration while generating suggestions for "
@@ -1602,11 +1617,12 @@ class DocumentViewSet(
                     {"ai": [_("AI backend request timed out.")]},
                     status=status.HTTP_503_SERVICE_UNAVAILABLE,
                 )
-            set_llm_suggestions_cache(
-                doc.pk,
-                llm_suggestions,
-                backend=llm_cache_backend,
-            )
+            if not settings.AI_SUGGESTIONS_ENDPOINT:
+                set_llm_suggestions_cache(
+                    doc.pk,
+                    llm_suggestions,
+                    backend=llm_cache_backend,
+                )
 
         tags_choice: TaxonomyChoiceDict = llm_suggestions["tags"]
         correspondents_choice: TaxonomyChoiceDict = llm_suggestions["correspondents"]

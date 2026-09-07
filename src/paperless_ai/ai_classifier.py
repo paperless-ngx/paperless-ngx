@@ -240,6 +240,10 @@ def get_ai_document_classification(
     output_language: str | None = None,
 ) -> ClassificationSuggestions:
     ai_config = AIConfig()
+    if settings.AI_SUGGESTIONS_ENDPOINT:
+        from paperless_ai.suggestion_provider import get_provider_classification
+
+        return get_provider_classification(document, user, output_language)
 
     if ai_config.llm_embedding_backend:
         candidates, context = get_taxonomy_context(document, user)

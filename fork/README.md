@@ -2,8 +2,9 @@
 
 This fork follows stable [Paperless-ngx releases](https://github.com/paperless-ngx/paperless-ngx/releases).
 The development branch is `dev_szaiser`, initially based on `v3.1.3`.
-The current increment supplies build and isolated-review tooling. Application
-behavior is unchanged; the external suggestion-provider extension comes next.
+An optional [document-aware suggestion provider](suggestions.md) feeds the
+existing editor and workflow action. The isolated lab tests that interface
+with deterministic responses; domain classification lives in the external service.
 
 ## Test-data boundary
 
@@ -23,12 +24,16 @@ is published, on loopback. No production configuration is loaded.
 
 ```sh
 export PAPERLESS_TEST_IMAGE=ghcr.io/paperless-ngx/paperless-ngx:3.1.3
+export PAPERLESS_TEST_PROVIDER=native
 bash fork/lab.sh up
 bash fork/lab.sh smoke
 ```
 
 Use the upstream image only to establish the baseline. For fork acceptance, set
-`PAPERLESS_TEST_IMAGE` to the exact published fork digest.
+`PAPERLESS_TEST_IMAGE` to the exact published fork digest and
+`PAPERLESS_TEST_PROVIDER=external`. Then run `up` and `smoke` again. External mode
+connects only to the same isolated mock through the document-aware API. The API
+test verifies that this route, rather than the LLM mock, was called.
 
 Local review and CI acceptance both use Podman. Docker's bridge implementation
 can leave host ports unpublished on an internal-only network; see the
@@ -53,6 +58,17 @@ On NixOS, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to the installed Chromium binary
 instead of downloading a browser. The test selects a native title suggestion,
 checks that it is unsaved, clicks Save and verifies persistence. It restores the
 fixture title afterwards and checks the editor at mobile width.
+Run API and browser checks sequentially: they share one synthetic document.
+
+In external-provider mode, also run:
+
+```sh
+python fork/workflow_smoke.py
+```
+
+This creates a temporary native workflow, triggers queued **Apply AI
+Suggestions**, verifies its completion callback and retained Inbox tag, then
+removes the workflow and restores the fixture's title and tags.
 
 ```sh
 bash fork/lab.sh status
@@ -62,8 +78,8 @@ bash fork/lab.sh stop
 
 `down` removes this project's containers and network, retaining test volumes.
 The helper has no volume-deletion command. Do not upload personal files through
-the test UI. The mock is a test double for the existing AI protocol, not the
-future document-aware provider or a production proxy.
+the test UI. The mock implements both the upstream AI protocol and the
+document-aware contract. It supplies fixed proposals, not domain classification.
 
 ## Release contract
 
@@ -95,8 +111,9 @@ dispatch. Upstream release tags retain their original meaning.
 
 ## Integration boundary
 
-The next increment adds an optional external provider shared by native Suggest
-and Apply AI Suggestions, explicit document context, cache/freshness handling,
-and completion notification. Rules, inference and domain add-ons remain outside
-Paperless. Add-ons write their owned custom fields through the Paperless API.
-This extension is not implemented by the lab mock.
+The [provider contract](suggestions.md) defines document and requester context,
+response validation, freshness and completion notification. Rules, inference,
+review status and domain add-ons remain outside Paperless. The companion must
+return suggestions without writing document fields during generation; add-on
+enrichment follows saved-state notifications. Adapting the companion to this
+contract and verifying its domain results are separate from the fork acceptance.
