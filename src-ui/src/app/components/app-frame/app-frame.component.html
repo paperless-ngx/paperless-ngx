@@ -86,7 +86,7 @@
       }
       <div class="sidebar-sticky pt-3 pb-1 d-flex flex-column justify-space-around">
         <ul class="nav flex-column">
-          <li class="nav-item app-link">
+          <li class="nav-item app-link" [class.d-none]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.Dashboard)">
             <a class="nav-link" routerLink="dashboard" routerLinkActive="active" (click)="closeMenu()"
               ngbPopover="Dashboard" i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end"
               container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
@@ -237,14 +237,14 @@
                 </div>
               </li>
             }
-            <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
+            <li class="nav-item app-link" [class.d-none]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.SavedViews)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
               <a class="nav-link" routerLink="savedviews" routerLinkActive="active" (click)="closeMenu()"
                 ngbPopover="Saved Views" i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end"
                 container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
                 <i-bs class="me-2" name="window-stack"></i-bs><span class="nav-link-label"><ng-container i18n>Saved Views</ng-container></span>
               </a>
             </li>
-            <li class="nav-item app-link"
+            <li class="nav-item app-link" [class.d-none]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.Workflows)"
               *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Workflow }"
               tourAnchor="tour.workflows">
               <a class="nav-link" routerLink="workflows" routerLinkActive="active" (click)="closeMenu()"
@@ -253,7 +253,7 @@
                 <i-bs class="me-2" name="boxes"></i-bs><span class="nav-link-label"><ng-container i18n>Workflows</ng-container></span>
               </a>
             </li>
-            <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }"
+            <li class="nav-item app-link" [class.d-none]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.Mail)" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }"
               tourAnchor="tour.mail">
               <a class="nav-link" routerLink="mail" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Mail"
                 i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end" container="body"
@@ -322,7 +322,7 @@
                 </a>
               </li>
             }
-            <li class="nav-item mt-2" tourAnchor="tour.outro">
+            <li class="nav-item mt-2" [class.d-none]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.Documentation)" tourAnchor="tour.outro">
               <a class="text-muted small d-flex align-items-center flex-wrap text-decoration-none nav-anchor"
                 target="_blank" rel="noopener noreferrer" href="https://docs.paperless-ngx.com" ngbPopover="Documentation"
                 i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end" container="body"

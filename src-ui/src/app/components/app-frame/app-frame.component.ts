@@ -21,7 +21,11 @@ import { Observable } from 'rxjs'
 import { first } from 'rxjs/operators'
 import { Document } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
-import { CollapsibleSection, SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import {
+  CollapsibleSection,
+  HideableSidebarItemID,
+  SETTINGS_KEYS,
+} from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { ComponentCanDeactivate } from 'src/app/guards/dirty-doc.guard'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
@@ -98,6 +102,7 @@ export class AppFrameComponent
   readonly isMenuCollapsed = signal(true)
   readonly slimSidebarAnimating = signal(false)
   readonly mobileSearchHidden = signal(false)
+  readonly HideableSidebarItemID = HideableSidebarItemID
   private readonly versionSetting = this.settingsService.getSignal<string>(
     SETTINGS_KEYS.VERSION
   )

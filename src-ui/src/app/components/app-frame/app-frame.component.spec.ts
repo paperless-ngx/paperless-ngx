@@ -15,7 +15,7 @@ import { provideUiTour } from 'ngx-ui-tour-ng-bootstrap'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import { SavedView } from 'src/app/data/saved-view'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { HideableSidebarItemID, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import {
@@ -285,6 +285,27 @@ describe('AppFrameComponent', () => {
       ['attributes']
     )
     jest.useRealTimers()
+  })
+
+  it('should hide configured sidebar items', () => {
+    settingsService.set(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS, [
+      HideableSidebarItemID.Dashboard,
+      HideableSidebarItemID.Workflows,
+    ])
+    fixture.detectChanges()
+
+    expect(
+      fixture.nativeElement.querySelector('[routerLink="dashboard"]')
+        .parentElement.classList
+    ).toContain('d-none')
+    expect(
+      fixture.nativeElement.querySelector('[routerLink="workflows"]')
+        .parentElement.classList
+    ).toContain('d-none')
+    expect(
+      fixture.nativeElement.querySelector('[routerLink="mail"]').parentElement
+        .classList
+    ).not.toContain('d-none')
   })
 
   it('should show error on toggle slim sidebar if store settings fails', () => {
