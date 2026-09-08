@@ -24,6 +24,7 @@ import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
 import { RemoteOCRModeConfig } from '../data/paperless-config'
 import { SavedView } from '../data/saved-view'
 import {
+  HideableSidebarItemID,
   PAPERLESS_GREEN_HEX,
   SETTINGS,
   SETTINGS_KEYS,
@@ -313,6 +314,10 @@ export class SettingsService {
   readonly globalDropzoneEnabled = signal(true)
   readonly globalDropzoneActive = signal(false)
   readonly organizingSidebarSavedViews = signal(false)
+  readonly organizingSidebarItems = signal(false)
+  readonly hiddenSidebarItems = this.getSignal<HideableSidebarItemID[]>(
+    SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS
+  )
 
   readonly allDisplayFields = signal<Array<{ id: DisplayField; name: string }>>(
     DEFAULT_DISPLAY_FIELDS
@@ -746,6 +751,24 @@ export class SettingsService {
     this.set(SETTINGS_KEYS.SIDEBAR_VIEWS_SORT_ORDER, [
       ...new Set(sidebarViews.map((v) => v.id)),
     ])
+    return this.storeSettings()
+  }
+
+  sidebarItemIsHidden(item: HideableSidebarItemID): boolean {
+    return this.hiddenSidebarItems().includes(item)
+  }
+
+  updateSidebarItemVisibility(
+    item: HideableSidebarItemID,
+    visible: boolean
+  ): Observable<any> {
+    const hiddenItems = new Set(this.hiddenSidebarItems())
+    if (visible) {
+      hiddenItems.delete(item)
+    } else {
+      hiddenItems.add(item)
+    }
+    this.set(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS, [...hiddenItems])
     return this.storeSettings()
   }
 
