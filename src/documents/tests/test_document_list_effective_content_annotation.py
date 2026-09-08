@@ -177,14 +177,14 @@ def _get_effective_content_fallback_queries(
 
 
 @pytest.mark.django_db
-class TestTrashAndGlobalSearchDoNotResolveEffectiveContent:
+class TestTrashAndGlobalSearchEffectiveContentIsNeverPerInstance:
     """
     TrashView and GlobalSearchView serialize Document instances with
     DocumentSerializer too, but build their querysets independently of
-    DocumentViewSet.get_queryset() -- and neither actually displays
-    document content. They should keep showing the document's own,
-    unresolved content with no extra query, exactly as before
-    effective_content resolution existed.
+    DocumentViewSet.get_queryset(). TrashView doesn't display content at all,
+    so it keeps the document's own unresolved content; GlobalSearchView
+    annotates effective_content itself, so it shows the latest version's.
+    Neither should ever fall back to a per-instance query.
     """
 
     def test_trash_list_shows_unresolved_content_with_no_extra_query(
@@ -212,7 +212,7 @@ class TestTrashAndGlobalSearchDoNotResolveEffectiveContent:
         # ...without ever querying for versions to resolve it
         assert _get_effective_content_fallback_queries(ctx) == []
 
-    def test_global_search_db_only_shows_unresolved_content_with_no_extra_query(
+    def test_global_search_db_only_shows_latest_version_content_with_no_extra_query(
         self,
         admin_client: APIClient,
     ) -> None:
@@ -231,9 +231,10 @@ class TestTrashAndGlobalSearchDoNotResolveEffectiveContent:
                 "/api/search/?query=findme&db_only=true",
             )
 
-        # THEN the response shows the document's own content...
+        # THEN the response shows the latest version's content, resolved by
+        # GlobalSearchView's own effective_content annotation...
         assert response.status_code == status.HTTP_200_OK
         [result] = [d for d in response.data["documents"] if d["id"] == root.id]
-        assert result["content"] == "own-content"
-        # ...without ever querying for versions to resolve it
+        assert result["content"] == "version-content"
+        # ...with no per-instance fallback query
         assert _get_effective_content_fallback_queries(ctx) == []

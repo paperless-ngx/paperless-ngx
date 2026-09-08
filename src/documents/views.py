@@ -36,7 +36,6 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.db.models import Avg
 from django.db.models import Case
 from django.db.models import Count
-from django.db.models import F
 from django.db.models import IntegerField
 from django.db.models import Max
 from django.db.models import Model
@@ -1090,11 +1089,10 @@ class DocumentViewSet(
     @classmethod
     def _content_filter_params(cls) -> tuple[str, ...]:
         """
-        Query params whose filtering needs effective_content evaluated in
-        SQL against every candidate row -- see
-        _needs_effective_content_annotation(). Derived from DocumentFilterSet
-        and search_fields, rather than a hand-maintained list, so a new
-        content-filtering param automatically counts here too.
+        Query params whose filtering needs effective_content evaluated in SQL
+        against every candidate row -- see
+        _needs_effective_content_annotation(). Derived rather than
+        hand-maintained so a new content-filtering param counts automatically.
         """
         params = [
             name
@@ -1107,25 +1105,28 @@ class DocumentViewSet(
 
     def _needs_effective_content_annotation(self) -> bool:
         # effective_content is a per-row correlated subquery resolving each
-        # document's latest version. Cheap when evaluated only for the page
-        # that survives filtering/sorting/pagination (the common case, via
-        # the "versions" prefetch + Document.get_effective_content()'s
-        # fallback), but if anything filters *on* it, the database has to
-        # evaluate it for every candidate row before the LIMIT is reached --
-        # pathological on MariaDB specifically for the root_document_id
-        # self-join once real candidate counts get large. Everything on this
-        # list is deprecated in favor of the Tantivy-backed search endpoint
-        # (see filters.py's TitleContentFilter/EffectiveContentFilter docs),
-        # so keep paying that cost only when one is actually used. Checked as
-        # a stripped, non-blank value (not just key presence) to match how
-        # DRF's SearchFilter and TitleContentFilter/EffectiveContentFilter
-        # themselves no-op on a blank value -- otherwise an empty `?search=`
-        # or a saved view with a cleared text filter would still pay for the
-        # annotation despite applying no actual predicate.
+        # document's latest version. Filtering *on* it forces the database to
+        # evaluate it for every candidate row before reaching the LIMIT, which
+        # the root_document_id self-join makes pathological on MariaDB
+        # specifically once real candidate counts get large; otherwise the
+        # "versions" prefetch + Document.get_effective_content() resolves only
+        # the page that survives pagination. Every param here is deprecated in
+        # favor of the Tantivy-backed search endpoint (see filters.py's
+        # TitleContentFilter/EffectiveContentFilter docs), so pay that cost
+        # only when one is actually used. Blank values don't count, matching
+        # how those filters themselves no-op on them -- an empty `?search=`
+        # applies no predicate.
         params = self.request.query_params
         return any(
             params.get(param, "").strip() for param in self._content_filter_params()
         )
+
+    def _needs_effective_content_prefetch(self) -> bool:
+        # The prefetch spares get_effective_content() a per-instance fallback
+        # query, but only earns itself when content can reach the response.
+        # Mirror get_serializer() below: no `fields` param keeps every field.
+        fields_param = self.request.query_params.get("fields", None)
+        return fields_param is None or "content" in fields_param.split(",")
 
     def get_queryset(self):
         # A correlated subquery avoids the LEFT JOIN + Count() this used to
@@ -1147,42 +1148,37 @@ class DocumentViewSet(
         # ObjectFilter.filter(). A blanket .distinct() here forces the
         # database to fully sort and dedupe every visible document before
         # it can apply LIMIT, which is disastrous at scale.
+        prefetches = [
+            Prefetch(
+                "versions",
+                queryset=Document.objects.only(
+                    "id",
+                    "added",
+                    "checksum",
+                    "version_label",
+                    "root_document_id",
+                    "version_index",
+                ),
+            ),
+            "tags",
+            Prefetch(
+                "custom_fields",
+                queryset=CustomFieldInstance.objects.select_related("field"),
+            ),
+            # NotesSerializer nests the author, this avoids query per note
+            Prefetch("notes", queryset=Note.objects.select_related("user")),
+        ]
+        if self._needs_effective_content_prefetch():
+            prefetches.append(latest_version_content_prefetch())
         queryset = (
             Document.objects.filter(root_document__isnull=True)
             .order_by("-created", "-id")
             .annotate(num_notes=Coalesce(note_count, 0))
             .select_related("correspondent", "storage_path", "document_type", "owner")
-            .prefetch_related(
-                Prefetch(
-                    "versions",
-                    queryset=Document.objects.only(
-                        "id",
-                        "added",
-                        "checksum",
-                        "version_label",
-                        "root_document_id",
-                        "version_index",
-                    ),
-                ),
-                latest_version_content_prefetch(),
-                "tags",
-                Prefetch(
-                    "custom_fields",
-                    queryset=CustomFieldInstance.objects.select_related("field"),
-                ),
-                # NotesSerializer nests the author, this avoids query per note
-                Prefetch("notes", queryset=Note.objects.select_related("user")),
-            )
+            .prefetch_related(*prefetches)
         )
         if self._needs_effective_content_annotation():
-            latest_version_content = Subquery(
-                versions_newest_first(
-                    Document.objects.filter(root_document=OuterRef("pk")),
-                ).values("content")[:1],
-            )
-            queryset = queryset.annotate(
-                effective_content=Coalesce(latest_version_content, F("content")),
-            )
+            queryset = annotate_effective_content(queryset)
         return queryset
 
     def get_serializer(self, *args, **kwargs):
