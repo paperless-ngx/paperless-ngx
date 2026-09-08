@@ -317,6 +317,8 @@ a "document already exists" message.
 
 Paperless-ngx can suggest tags, correspondents, document types and storage paths for documents based on the content of the document. This is done using a (non-LLM) machine learning model that is trained on the documents in your database. The suggestions are shown in the document detail page and can be accepted or rejected by the user.
 
+Suggestions are requested automatically when you open a document that still has an inbox tag. To only request them by pressing the "Suggest" button instead, turn off "Automatically request suggestions for inbox documents" under Settings > Documents.
+
 ## AI Features
 
 Paperless-ngx includes several features that use AI to enhance the document management experience. These features are optional and can be enabled or disabled in the settings. If you are using the AI features, you may want to also enable the "LLM index" feature, which supports Retrieval-Augmented Generation (RAG) designed to improve the quality of AI responses. The LLM index feature is not enabled by default and requires additional configuration.
@@ -684,7 +686,8 @@ It requires [AI features](configuration.md#ai) to be enabled. You can specify:
   never replace the document's existing tags.
 
 The action works with every trigger **except Consumption Started**, because suggestions are made from
-the document's text, which does not exist until after the document has been processed.
+the document's text, which does not exist until after the document has been processed. Documents whose
+processed text is empty or contains only whitespace are skipped.
 
 Because the query to the AI service is slow, the action is queued and runs in the background rather
 than as part of the workflow run itself. The document is updated once the suggestions come back.

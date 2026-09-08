@@ -168,6 +168,7 @@ export class SettingsComponent
     pdfEditorDefaultEditMode: new FormControl(null),
     documentEditingRemoveInboxTags: new FormControl(null),
     documentEditingOverlayThumbnail: new FormControl(null),
+    documentEditingAutoSuggest: new FormControl(null),
     documentDetailsHiddenFields: new FormControl([]),
     searchDbOnly: new FormControl(null),
     searchLink: new FormControl(null),
@@ -368,6 +369,9 @@ export class SettingsComponent
       documentEditingOverlayThumbnail: this.settings.get(
         SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL
       ),
+      documentEditingAutoSuggest: this.settings.get(
+        SETTINGS_KEYS.DOCUMENT_EDITING_AUTO_SUGGEST
+      ),
       documentDetailsHiddenFields: this.settings.get(
         SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS
       ),
@@ -564,6 +568,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL,
       this.settingsForm.value.documentEditingOverlayThumbnail
+    )
+    this.settings.set(
+      SETTINGS_KEYS.DOCUMENT_EDITING_AUTO_SUGGEST,
+      this.settingsForm.value.documentEditingAutoSuggest
     )
     this.settings.set(
       SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS,
