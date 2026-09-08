@@ -7,6 +7,8 @@ from unittest.mock import patch
 import pytest
 import pytest_mock
 from django.test import override_settings
+from guardian.shortcuts import assign_perm
+from guardian.shortcuts import remove_perm
 
 from documents.models import Document
 from documents.search import TantivyBackend
@@ -780,6 +782,52 @@ class TestFulltextSimilarDocuments:
         result = _fulltext_similar_documents(source, user=superuser, top_k=5)
 
         assert [s["document_id"] for s in result] == [other.pk]
+
+    def test_excludes_stale_permitted_document_for_regular_user(
+        self,
+        fulltext_backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A regular (non-superuser) user
+            - A similar document the user is permitted to view, and another
+              similar document indexed while the user still had view
+              permission but which has since had that permission revoked in
+              the database, i.e. the Tantivy index has stale permission data
+        WHEN:
+            - _fulltext_similar_documents() is called with that user
+        THEN:
+            - Only the still-permitted document is returned - the DB
+              re-check via restrict_queryset_to_visible() must catch the
+              document Tantivy's stale index still thinks is visible
+        """
+        owner = UserFactory.create()
+        viewer = UserFactory.create(is_superuser=False)
+        source = DocumentFactory.create(
+            content="shared content phrase",
+            owner=owner,
+        )
+        permitted = DocumentFactory.create(
+            content="shared content phrase",
+            owner=owner,
+        )
+        now_private = DocumentFactory.create(
+            content="shared content phrase",
+            owner=owner,
+        )
+        assign_perm("view_document", viewer, permitted)
+        assign_perm("view_document", viewer, now_private)
+        fulltext_backend.add_or_update(source)
+        fulltext_backend.add_or_update(permitted)
+        fulltext_backend.add_or_update(now_private)
+
+        # Revoke access after indexing, without reindexing: the index still
+        # carries viewer as a permitted viewer for `now_private`.
+        remove_perm("view_document", viewer, now_private)
+
+        result = _fulltext_similar_documents(source, user=viewer, top_k=5)
+
+        assert [s["document_id"] for s in result] == [permitted.pk]
 
 
 @pytest.mark.django_db
