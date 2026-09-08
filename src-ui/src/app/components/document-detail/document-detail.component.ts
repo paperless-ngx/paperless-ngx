@@ -98,8 +98,8 @@ import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
 import { DocumentDetailFieldID } from '../admin/settings/settings.component'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
-import { ReprocessConfirmDialogComponent } from '../common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component'
 import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
+import { ReprocessConfirmDialogComponent } from '../common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
@@ -977,6 +977,8 @@ export class DocumentDetailComponent
               emitEvent: false,
             }
           )
+          this.store.next({ ...this.store.value, content })
+          this.documentForm.get('content')?.markAsPristine()
         },
         error: (error) => {
           this.toastService.showError(
@@ -1005,7 +1007,23 @@ export class DocumentDetailComponent
   }
 
   onVersionSelected(versionId: number) {
-    this.selectVersion(versionId)
+    if (!this.documentForm.get('content')?.dirty) {
+      this.selectVersion(versionId)
+      return
+    }
+
+    const modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Discard unsaved content?`
+    modal.componentInstance.message = $localize`Switching versions replaces your unsaved document content.`
+    modal.componentInstance.btnClass = 'btn-warning'
+    modal.componentInstance.btnCaption = $localize`Discard and switch`
+    modal.componentInstance.cancelBtnCaption = $localize`Keep editing`
+    modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
+      modal.close()
+      this.selectVersion(versionId)
+    })
   }
 
   onVersionsUpdated(versions: DocumentVersionInfo[]) {

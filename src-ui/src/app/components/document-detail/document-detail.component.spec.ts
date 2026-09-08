@@ -1972,6 +1972,7 @@ describe('DocumentDetailComponent', () => {
       .spyOn(documentService, 'get')
       .mockReturnValue(of({ content: 'version-content' } as Document))
 
+    component.documentForm.get('content').markAsDirty()
     component.selectVersion(10)
     httpTestingController.expectOne('preview-version').flush('version text')
 
@@ -1979,6 +1980,7 @@ describe('DocumentDetailComponent', () => {
     expect(component.thumbUrl()).toBe('thumb-version')
     expect(component.previewText()).toBe('version text')
     expect(component.documentForm.get('content').value).toBe('version-content')
+    expect(component.documentForm.get('content').pristine).toBeTruthy()
     expect(component.pdfSource()).toBe('preview-version')
     expect(component.pdfPassword()).toBeUndefined()
 
@@ -2023,6 +2025,28 @@ describe('DocumentDetailComponent', () => {
       .mockImplementation(() => {})
 
     component.onVersionSelected(42)
+
+    expect(selectVersionSpy).toHaveBeenCalledWith(42)
+  })
+
+  it('onVersionSelected should confirm before replacing dirty content', async () => {
+    let openModal: NgbModalRef
+    modalService.activeInstances.subscribe((modals) => (openModal = modals[0]))
+    initNormally()
+    httpTestingController.expectOne(component.previewUrl()).flush('preview')
+    component.documentForm.get('content').markAsDirty()
+    const selectVersionSpy = jest
+      .spyOn(component, 'selectVersion')
+      .mockImplementation(() => {})
+
+    component.onVersionSelected(42)
+
+    expect(selectVersionSpy).not.toHaveBeenCalled()
+    const dialog = openModal.componentInstance as ConfirmDialogComponent
+    expect(dialog.message).toContain('replaces your unsaved document content')
+
+    dialog.confirmClicked.next()
+    await openModal.result
 
     expect(selectVersionSpy).toHaveBeenCalledWith(42)
   })
