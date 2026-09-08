@@ -234,7 +234,7 @@ describe('SettingsService', () => {
     expect(notesEnabled()).toBeFalsy()
   })
 
-  it('updates sidebar item visibility', () => {
+  it('reports whether a sidebar item is hidden', () => {
     httpTestingController
       .expectOne(`${environment.apiBaseUrl}ui_settings/`)
       .flush(ui_settings)
@@ -243,19 +243,15 @@ describe('SettingsService', () => {
       settingsService.sidebarItemIsHidden(HideableSidebarItemID.Workflows)
     ).toBe(false)
 
-    settingsService.updateSidebarItemVisibility(
+    settingsService.set(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS, [
       HideableSidebarItemID.Workflows,
-      false
-    )
+    ])
 
     expect(
       settingsService.sidebarItemIsHidden(HideableSidebarItemID.Workflows)
     ).toBe(true)
 
-    settingsService.updateSidebarItemVisibility(
-      HideableSidebarItemID.Workflows,
-      true
-    )
+    settingsService.set(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS, [])
 
     expect(
       settingsService.sidebarItemIsHidden(HideableSidebarItemID.Workflows)

@@ -39,7 +39,12 @@ import {
   SystemStatus,
   SystemStatusItemStatus,
 } from 'src/app/data/system-status'
-import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import {
+  GlobalSearchType,
+  HIDEABLE_SIDEBAR_ITEM_IDS,
+  HideableSidebarItemID,
+  SETTINGS_KEYS,
+} from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -102,6 +107,14 @@ const documentDetailFieldOptions = [
   { id: DocumentDetailFieldID.Tags, label: $localize`Tags` },
 ]
 
+const sidebarItemLabels: Record<HideableSidebarItemID, string> = {
+  [HideableSidebarItemID.Dashboard]: $localize`Dashboard`,
+  [HideableSidebarItemID.SavedViews]: $localize`Saved Views`,
+  [HideableSidebarItemID.Workflows]: $localize`Workflows`,
+  [HideableSidebarItemID.Mail]: $localize`Mail`,
+  [HideableSidebarItemID.Documentation]: $localize`Documentation`,
+}
+
 @Component({
   selector: 'pngx-settings',
   templateUrl: './settings.component.html',
@@ -149,6 +162,7 @@ export class SettingsComponent
     bulkEditApplyOnClose: new FormControl(null),
     documentListItemPerPage: new FormControl(null),
     slimSidebarEnabled: new FormControl(null),
+    sidebarHiddenItems: new FormControl<HideableSidebarItemID[]>([]),
     darkModeUseSystem: new FormControl(null),
     darkModeEnabled: new FormControl(null),
     darkModeInvertThumbs: new FormControl(null),
@@ -203,6 +217,10 @@ export class SettingsComponent
   public readonly PdfEditorEditMode = PdfEditorEditMode
 
   public readonly documentDetailFieldOptions = documentDetailFieldOptions
+  public readonly sidebarItemOptions = HIDEABLE_SIDEBAR_ITEM_IDS.map((id) => ({
+    id,
+    label: sidebarItemLabels[id],
+  }))
 
   get systemStatusHasErrors(): boolean {
     const status = this.systemStatus()
@@ -310,6 +328,7 @@ export class SettingsComponent
         SETTINGS_KEYS.DOCUMENT_LIST_SIZE
       ),
       slimSidebarEnabled: this.settings.get(SETTINGS_KEYS.SLIM_SIDEBAR),
+      sidebarHiddenItems: this.settings.get(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS),
       darkModeUseSystem: this.settings.get(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM),
       darkModeEnabled: this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED),
       darkModeInvertThumbs: this.settings.get(
@@ -448,6 +467,22 @@ export class SettingsComponent
     this.storeSub && this.storeSub.unsubscribe()
   }
 
+  isSidebarItemShown(item: HideableSidebarItemID): boolean {
+    return !(this.settingsForm.value.sidebarHiddenItems || []).includes(item)
+  }
+
+  toggleSidebarItem(item: HideableSidebarItemID, checked: boolean): void {
+    const hiddenItems = new Set(
+      this.settingsForm.value.sidebarHiddenItems || []
+    )
+    if (checked) {
+      hiddenItems.delete(item)
+    } else {
+      hiddenItems.add(item)
+    }
+    this.settingsForm.controls.sidebarHiddenItems.setValue([...hiddenItems])
+  }
+
   public saveSettings() {
     this.savePending = true
     const reloadRequired =
@@ -472,6 +507,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.SLIM_SIDEBAR,
       this.settingsForm.value.slimSidebarEnabled
+    )
+    this.settings.set(
+      SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS,
+      this.settingsForm.value.sidebarHiddenItems
     )
     this.settings.set(
       SETTINGS_KEYS.DARK_MODE_USE_SYSTEM,

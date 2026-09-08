@@ -314,7 +314,6 @@ export class SettingsService {
   readonly globalDropzoneEnabled = signal(true)
   readonly globalDropzoneActive = signal(false)
   readonly organizingSidebarSavedViews = signal(false)
-  readonly organizingSidebarItems = signal(false)
   readonly hiddenSidebarItems = this.getSignal<HideableSidebarItemID[]>(
     SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS
   )
@@ -756,20 +755,6 @@ export class SettingsService {
 
   sidebarItemIsHidden(item: HideableSidebarItemID): boolean {
     return this.hiddenSidebarItems().includes(item)
-  }
-
-  updateSidebarItemVisibility(
-    item: HideableSidebarItemID,
-    visible: boolean
-  ): Observable<any> {
-    const hiddenItems = new Set(this.hiddenSidebarItems())
-    if (visible) {
-      hiddenItems.delete(item)
-    } else {
-      hiddenItems.add(item)
-    }
-    this.set(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS, [...hiddenItems])
-    return this.storeSettings()
   }
 
   updateSavedViewsVisibility(

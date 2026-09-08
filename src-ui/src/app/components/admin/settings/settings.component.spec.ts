@@ -24,7 +24,7 @@ import {
   SystemStatus,
   SystemStatusItemStatus,
 } from 'src/app/data/system-status'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { HideableSidebarItemID, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
@@ -209,6 +209,23 @@ describe('SettingsComponent', () => {
     fixture.detectChanges()
   }
 
+  it('supports configuring sidebar items and canceling changes', () => {
+    completeSetup()
+
+    component.toggleSidebarItem(HideableSidebarItemID.Workflows, false)
+    fixture.detectChanges()
+
+    expect(component.settingsForm.value.sidebarHiddenItems).toContain(
+      HideableSidebarItemID.Workflows
+    )
+
+    component.reset()
+
+    expect(component.settingsForm.value.sidebarHiddenItems).not.toContain(
+      HideableSidebarItemID.Workflows
+    )
+  })
+
   it('should support tabbed settings & change URL, prevent navigation if dirty confirmation rejected', async () => {
     completeSetup()
     const navigateSpy = jest.spyOn(router, 'navigate')
@@ -249,6 +266,7 @@ describe('SettingsComponent', () => {
 
   it('should support save local settings updating appearance settings and calling API, show error', () => {
     completeSetup()
+    component.toggleSidebarItem(HideableSidebarItemID.Workflows, false)
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastSpy = jest.spyOn(toastService, 'show')
     const storeSpy = jest.spyOn(settingsService, 'storeSettings')
@@ -267,7 +285,10 @@ describe('SettingsComponent', () => {
     expect(toastErrorSpy).toHaveBeenCalled()
     expect(storeSpy).toHaveBeenCalled()
     expect(appearanceSettingsSpy).not.toHaveBeenCalled()
-    expect(setSpy).toHaveBeenCalledTimes(33)
+    expect(setSpy).toHaveBeenCalledTimes(34)
+    expect(setSpy).toHaveBeenCalledWith(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS, [
+      HideableSidebarItemID.Workflows,
+    ])
 
     // succeed
     storeSpy.mockReturnValueOnce(of(true))

@@ -112,6 +112,22 @@
 
                 <pngx-input-check i18n-title title="Use 'slim' sidebar (icons only)" formControlName="slimSidebarEnabled"></pngx-input-check>
 
+                <p class="mb-2 mt-3" i18n>Sidebar items to show:</p>
+                @for (option of sidebarItemOptions; track option.id) {
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      [id]="'sidebar-item-setting-' + option.id"
+                      [checked]="isSidebarItemShown(option.id)"
+                      (change)="toggleSidebarItem(option.id, $event.target.checked)"
+                    />
+                    <label class="form-check-label" [for]="'sidebar-item-setting-' + option.id">
+                      {{ option.label }}
+                    </label>
+                  </div>
+                }
+
               </div>
             </div>
 
