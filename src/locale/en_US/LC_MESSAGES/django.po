@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-08 15:31+0000\n"
+"POT-Creation-Date: 2026-09-08 15:56+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr ""
 
-#: documents/filters.py:473
+#: documents/filters.py:463
 msgid "Value must be valid JSON."
 msgstr ""
 
-#: documents/filters.py:492
+#: documents/filters.py:482
 msgid "Invalid custom field query expression"
 msgstr ""
 
-#: documents/filters.py:502
+#: documents/filters.py:492
 msgid "Invalid expression list. Must be nonempty."
 msgstr ""
 
-#: documents/filters.py:523
+#: documents/filters.py:513
 msgid "Invalid logical operator {op!r}"
 msgstr ""
 
-#: documents/filters.py:537
+#: documents/filters.py:527
 msgid "Maximum number of query conditions exceeded."
 msgstr ""
 
-#: documents/filters.py:601
+#: documents/filters.py:591
 msgid "{name!r} is not a valid custom field."
 msgstr ""
 
-#: documents/filters.py:638
+#: documents/filters.py:628
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr ""
 
-#: documents/filters.py:757 documents/models.py:136
+#: documents/filters.py:747 documents/models.py:136
 msgid "Maximum nesting depth exceeded."
 msgstr ""
 
-#: documents/filters.py:1119
+#: documents/filters.py:1109
 msgid "Custom field not found"
 msgstr ""
 
@@ -1632,7 +1632,7 @@ msgid "workflow runs"
 msgstr ""
 
 #: documents/serialisers.py:524 documents/serialisers.py:881
-#: documents/serialisers.py:2841 documents/views.py:314 documents/views.py:2624
+#: documents/serialisers.py:2841 documents/views.py:315 documents/views.py:2625
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr ""
@@ -1673,7 +1673,7 @@ msgstr ""
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2927 documents/views.py:4626
+#: documents/serialisers.py:2927 documents/views.py:4632
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1941,36 +1941,36 @@ msgstr ""
 msgid "Unable to parse URI {value}"
 msgstr ""
 
-#: documents/views.py:307 documents/views.py:2621
+#: documents/views.py:308 documents/views.py:2622
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:1591
+#: documents/views.py:1592
 msgid "Invalid AI configuration."
 msgstr ""
 
-#: documents/views.py:1602
+#: documents/views.py:1603
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:2446 documents/views.py:2767
+#: documents/views.py:2447 documents/views.py:2768
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:4639
+#: documents/views.py:4645
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr ""
 
-#: documents/views.py:4685
+#: documents/views.py:4691
 msgid "Bundle is already being processed."
 msgstr ""
 
-#: documents/views.py:4749
+#: documents/views.py:4755
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr ""
 
-#: documents/views.py:4763
+#: documents/views.py:4769
 msgid "The share link bundle is unavailable."
 msgstr ""
 
