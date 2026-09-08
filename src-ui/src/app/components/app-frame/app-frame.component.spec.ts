@@ -339,6 +339,28 @@ describe('AppFrameComponent', () => {
     expect(
       fixture.nativeElement.querySelector('[routerLink="dashboard"]').classList
     ).not.toContain('pe-5')
+
+    settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, false)
+    component.slimSidebarAnimating.set(true)
+    fixture.detectChanges()
+
+    expect(
+      Array.from(
+        fixture.nativeElement.querySelectorAll('pngx-input-switch')
+      ).every((toggle: HTMLElement) => toggle.classList.contains('d-none'))
+    ).toBe(true)
+
+    component.slimSidebarAnimating.set(false)
+    fixture.detectChanges()
+
+    expect(
+      Array.from(
+        fixture.nativeElement.querySelectorAll('pngx-input-switch')
+      ).every((toggle: HTMLElement) => !toggle.classList.contains('d-none'))
+    ).toBe(true)
+    expect(
+      fixture.nativeElement.querySelector('[routerLink="dashboard"]').classList
+    ).toContain('pe-5')
   })
 
   it('should show error on toggle slim sidebar if store settings fails', () => {
