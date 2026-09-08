@@ -182,17 +182,22 @@ class AIClient:
         except Exception as exc:
             if self._is_openai_timeout(exc):
                 raise LLMTimeoutError from exc
-            if self._is_openai_status_error(exc):
+            if self._is_provider_error(exc):
                 raise LLMProviderError from exc
             raise
 
-    def _is_openai_status_error(self, exc: Exception) -> bool:
-        if self.settings.llm_backend != LLMBackend.OPENAI_LIKE:
-            return False
+    def _is_provider_error(self, exc: Exception) -> bool:
+        if self.settings.llm_backend == LLMBackend.OLLAMA:
+            from ollama import ResponseError
 
-        from openai import APIStatusError
+            return isinstance(exc, ResponseError)
 
-        return isinstance(exc, APIStatusError)
+        if self.settings.llm_backend == LLMBackend.OPENAI_LIKE:
+            from openai import APIStatusError
+
+            return isinstance(exc, APIStatusError)
+
+        return False
 
     def _is_openai_timeout(self, exc: Exception) -> bool:
         if self.settings.llm_backend != LLMBackend.OPENAI_LIKE:
