@@ -308,6 +308,25 @@ describe('AppFrameComponent', () => {
     ).not.toContain('d-none')
   })
 
+  it('should show hidden items and visibility switches while customizing', () => {
+    settingsService.set(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS, [
+      HideableSidebarItemID.Dashboard,
+    ])
+    settingsService.organizingSidebarItems.set(true)
+    fixture.detectChanges()
+
+    expect(
+      fixture.nativeElement.querySelectorAll('pngx-input-switch').length
+    ).toBe(5)
+    expect(
+      fixture.nativeElement.querySelector('[routerLink="dashboard"]')
+        .parentElement.classList
+    ).not.toContain('d-none')
+    expect(
+      fixture.nativeElement.querySelector('[routerLink="dashboard"]').classList
+    ).toContain('opacity-50')
+  })
+
   it('should show error on toggle slim sidebar if store settings fails', () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {})
     const toastSpy = jest.spyOn(toastService, 'showError')

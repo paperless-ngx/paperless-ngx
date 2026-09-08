@@ -226,6 +226,16 @@ describe('SettingsComponent', () => {
     )
   })
 
+  it('enables sidebar item controls on general settings until destroyed', () => {
+    completeSetup()
+
+    expect(settingsService.organizingSidebarItems()).toBe(true)
+
+    component.ngOnDestroy()
+
+    expect(settingsService.organizingSidebarItems()).toBe(false)
+  })
+
   it('should support tabbed settings & change URL, prevent navigation if dirty confirmation rejected', async () => {
     completeSetup()
     const navigateSpy = jest.spyOn(router, 'navigate')

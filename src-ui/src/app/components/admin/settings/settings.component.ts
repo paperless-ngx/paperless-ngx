@@ -297,14 +297,17 @@ export class SettingsComponent
 
     this.activatedRoute.paramMap.subscribe((paramMap) => {
       const section = paramMap.get('section')
+      let navID = SettingsNavIDs.General
       if (section) {
         const navIDKey: string = Object.keys(SettingsNavIDs).find(
           (navID) => navID.toLowerCase() == section
         )
         if (navIDKey) {
-          this.activeNavID.set(SettingsNavIDs[navIDKey])
+          navID = SettingsNavIDs[navIDKey]
         }
       }
+      this.activeNavID.set(navID)
+      this.settings.organizingSidebarItems.set(navID === SettingsNavIDs.General)
     })
   }
 
@@ -463,6 +466,7 @@ export class SettingsComponent
   }
 
   ngOnDestroy() {
+    this.settings.organizingSidebarItems.set(false)
     if (this.isDirty) this.settings.updateAppearanceSettings() // in case user changed appearance but didn't save
     this.storeSub && this.storeSub.unsubscribe()
   }

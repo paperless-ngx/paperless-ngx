@@ -7,6 +7,7 @@ import {
 } from '@angular/cdk/drag-drop'
 import { NgClass } from '@angular/common'
 import { Component, HostListener, inject, OnInit, signal } from '@angular/core'
+import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import {
   NgbCollapseModule,
@@ -52,6 +53,7 @@ import { ChatComponent } from '../chat/chat/chat.component'
 import { BrandMarkComponent } from '../common/logo/brand-mark/brand-mark.component'
 import { LogoComponent } from '../common/logo/logo.component'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
+import { SwitchComponent } from '../common/input/switch/switch.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
@@ -80,6 +82,8 @@ const SCROLL_THRESHOLD = 16
     NgxBootstrapIconsModule,
     DragDropModule,
     TourNgBootstrap,
+    FormsModule,
+    SwitchComponent,
   ],
 })
 export class AppFrameComponent
@@ -198,6 +202,25 @@ export class AppFrameComponent
     setTimeout(() => {
       this.slimSidebarAnimating.set(false)
     }, 200) // slightly longer than css animation for slim sidebar
+  }
+
+  toggleSidebarItem(item: HideableSidebarItemID, visible: boolean): void {
+    const previousHiddenItems = this.settingsService.hiddenSidebarItems()
+    this.settingsService
+      .updateSidebarItemVisibility(item, visible)
+      .pipe(first())
+      .subscribe({
+        error: (error) => {
+          this.settingsService.set(
+            SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS,
+            previousHiddenItems
+          )
+          this.toastService.showError(
+            $localize`An error occurred while saving settings.`,
+            error
+          )
+        },
+      })
   }
 
   toggleAttributesSections(event?: Event): void {
