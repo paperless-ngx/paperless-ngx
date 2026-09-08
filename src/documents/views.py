@@ -231,6 +231,7 @@ from documents.tasks import sanity_check
 from documents.tasks import train_classifier
 from documents.tasks import update_document_parent_tags
 from documents.utils import get_boolean
+from documents.utils import normalize_unicode
 from documents.versioning import VersionResolutionError
 from documents.versioning import annotate_effective_content
 from documents.versioning import get_latest_version_for_root
@@ -2068,6 +2069,7 @@ class DocumentViewSet(
 
         try:
             doc_name, doc_data = serializer.validated_data.get("document")
+            doc_name = normalize_unicode(doc_name)
             version_label = serializer.validated_data.get("version_label")
 
             t = int(mktime(datetime.now().timetuple()))
@@ -3334,7 +3336,7 @@ class PostDocumentView(GenericAPIView[Any]):
         serializer.is_valid(raise_exception=True)
 
         doc_name, doc_data = serializer.validated_data.get("document")
-        doc_name = normalize("NFC", doc_name)
+        doc_name = normalize_unicode(doc_name)
         correspondent_id = serializer.validated_data.get("correspondent")
         document_type_id = serializer.validated_data.get("document_type")
         storage_path_id = serializer.validated_data.get("storage_path")

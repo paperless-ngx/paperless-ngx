@@ -27,6 +27,7 @@ from django_softdelete.models import SoftDeleteModel
 
 from documents.data_models import DocumentSource
 from documents.parsers import get_default_file_extension
+from documents.utils import normalize_unicode
 
 
 class ModelWithOwner(models.Model):
@@ -467,7 +468,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         context_document = (
             self.root_document if self.root_document_id is not None else self
         )
-        result = str(context_document)
+        result = normalize_unicode(str(context_document))
 
         if counter:
             result += f"_{counter:02}"

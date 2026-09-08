@@ -6,7 +6,6 @@ import socket
 import ssl
 import tempfile
 import traceback
-import unicodedata
 from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
@@ -45,6 +44,7 @@ from documents.models import Correspondent
 from documents.models import PaperlessTask
 from documents.parsers import is_mime_type_supported
 from documents.tasks import consume_file
+from documents.utils import normalize_unicode
 from paperless.network import is_public_ip
 from paperless.network import resolve_hostname_ips
 from paperless_mail.models import MailAccount
@@ -617,10 +617,10 @@ class MailAccountHandler(LoggingMixin):
         rule: MailRule,
     ) -> str | None:
         if rule.assign_title_from == MailRule.TitleSource.FROM_SUBJECT:
-            return unicodedata.normalize("NFC", message.subject)
+            return normalize_unicode(message.subject)
 
         elif rule.assign_title_from == MailRule.TitleSource.FROM_FILENAME:
-            return unicodedata.normalize("NFC", Path(att.filename).stem)
+            return normalize_unicode(Path(att.filename).stem)
 
         elif rule.assign_title_from == MailRule.TitleSource.NONE:
             return None
@@ -1004,6 +1004,8 @@ class MailAccountHandler(LoggingMixin):
         consume_tasks = []
 
         for att in message.attachments:
+            attachment_filename = normalize_unicode(att.filename)
+
             if (
                 att.content_disposition != "attachment"
                 and rule.attachment_type
@@ -1018,7 +1020,7 @@ class MailAccountHandler(LoggingMixin):
 
             if not self.filename_inclusion_matches(
                 rule.filter_attachment_filename_include,
-                att.filename,
+                attachment_filename,
             ):
                 # Force the filename and pattern to the lowercase
                 # as this is system dependent otherwise
@@ -1030,7 +1032,7 @@ class MailAccountHandler(LoggingMixin):
                 continue
             elif self.filename_exclusion_matches(
                 rule.filter_attachment_filename_exclude,
-                att.filename,
+                attachment_filename,
             ):
                 self.log.debug(
                     f"Rule {rule}: "
@@ -1064,7 +1066,7 @@ class MailAccountHandler(LoggingMixin):
                 )
 
                 attachment_name = pathvalidate.sanitize_filename(
-                    unicodedata.normalize("NFC", att.filename),
+                    attachment_filename,
                 )
                 if attachment_name:
                     temp_filename = temp_dir / attachment_name
@@ -1175,7 +1177,7 @@ class MailAccountHandler(LoggingMixin):
         doc_overrides = DocumentMetadataOverrides(
             title=message.subject,
             filename=pathvalidate.sanitize_filename(
-                unicodedata.normalize("NFC", f"{message.subject}.eml"),
+                normalize_unicode(f"{message.subject}.eml"),
             ),
             correspondent_id=correspondent.id if correspondent else None,
             document_type_id=doc_type.id if doc_type else None,

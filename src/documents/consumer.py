@@ -52,6 +52,7 @@ from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.utils import compute_checksum
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
+from documents.utils import normalize_unicode
 from documents.utils import run_subprocess
 from paperless.config import OcrConfig
 from paperless.config import RemoteOCRConfig
@@ -201,7 +202,9 @@ class ConsumerPluginMixin:
 
         self.renew_logging_group()
 
-        self.filename = self.metadata.filename or self.input_doc.original_file.name
+        self.filename = normalize_unicode(
+            self.metadata.filename or self.input_doc.original_file.name,
+        )
 
     def _send_progress(
         self,

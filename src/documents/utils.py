@@ -1,6 +1,7 @@
 import hashlib
 import logging
 import shutil
+import unicodedata
 from collections.abc import Callable
 from collections.abc import Iterable
 from collections.abc import Iterator
@@ -29,6 +30,25 @@ IterWrapper = Callable[[Iterable[_T]], Iterable[_T]]
 def identity(iterable: Iterable[_T]) -> Iterable[_T]:
     """Return the iterable unchanged; the no-op default for IterWrapper."""
     return iterable
+
+
+def normalize_unicode(value: str | None) -> str | None:
+    """
+    Normalize a string to Unicode NFC form, or return None unchanged.
+
+    This is the single normalization pass for any user- or filesystem-supplied
+    text that ends up in a filename, path, or is compared/matched against one
+    (titles, correspondent/tag/type names, uploaded filenames, workflow and
+    mail rule filename/path filters). Composed (NFC) and decomposed (NFD)
+    forms of the same visible text are different byte sequences, which breaks
+    exact comparisons and filesystem lookups even though the text looks
+    identical. Always normalize through this function rather than calling
+    unicodedata.normalize() directly, so every call site agrees on the same
+    form.
+    """
+    if value is None:
+        return None
+    return unicodedata.normalize("NFC", value)
 
 
 class QuerySetStream(Generic[_M]):

@@ -21,6 +21,7 @@ from documents.models import Workflow
 from documents.models import WorkflowTrigger
 from documents.permissions import permitted_object_ids
 from documents.regex import safe_regex_search
+from documents.utils import normalize_unicode
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -311,11 +312,12 @@ def consumable_document_matches_workflow(
         trigger_matched = False
 
     # Document filename vs trigger filename
+    document_filename = normalize_unicode(document.original_file.name)
     if (
         trigger.filter_filename is not None
         and len(trigger.filter_filename) > 0
         and not fnmatch(
-            document.original_file.name.lower(),
+            document_filename.lower(),
             trigger.filter_filename.lower(),
         )
     ):
@@ -328,10 +330,12 @@ def consumable_document_matches_workflow(
     # Document path vs trigger path
 
     # Use the original_path if set, else us the original_file
-    match_against = (
-        document.original_path
-        if document.original_path is not None
-        else document.original_file
+    match_against = normalize_unicode(
+        str(
+            document.original_path
+            if document.original_path is not None
+            else document.original_file,
+        ),
     )
 
     if (
@@ -536,7 +540,7 @@ def existing_document_matches_workflow(
         and len(trigger.filter_filename) > 0
         and document.original_filename is not None
         and not fnmatch(
-            document.original_filename.lower(),
+            normalize_unicode(document.original_filename).lower(),
             trigger.filter_filename.lower(),
         )
     ):

@@ -1,7 +1,6 @@
 import logging
 import os
 import re
-import unicodedata
 from collections.abc import Iterable
 from pathlib import PurePath
 
@@ -26,6 +25,7 @@ from documents.templating.environment import _template_environment
 from documents.templating.filters import format_datetime
 from documents.templating.filters import get_cf_value
 from documents.templating.filters import localize_date
+from documents.utils import normalize_unicode
 
 logger = logging.getLogger("paperless.templating")
 
@@ -42,7 +42,7 @@ class FilePathTemplate(Template):
             3. Removing extra spaces before and after forward slashes
             4. Preserving spaces in other parts of the path
             """
-            value = unicodedata.normalize("NFC", value)
+            value = normalize_unicode(value)
             value = value.replace("\n", "").replace("\r", "")
             value = re.sub(r"\s*/\s*", "/", value)
 
@@ -184,17 +184,17 @@ def get_basic_metadata_context(
     """
     return {
         "title": pathvalidate.sanitize_filename(
-            unicodedata.normalize("NFC", document.title),
+            normalize_unicode(document.title),
             replacement_text="-",
         ),
         "correspondent": pathvalidate.sanitize_filename(
-            unicodedata.normalize("NFC", document.correspondent.name),
+            normalize_unicode(document.correspondent.name),
             replacement_text="-",
         )
         if document.correspondent
         else no_value_default,
         "document_type": pathvalidate.sanitize_filename(
-            unicodedata.normalize("NFC", document.document_type.name),
+            normalize_unicode(document.document_type.name),
             replacement_text="-",
         )
         if document.document_type
@@ -205,8 +205,7 @@ def get_basic_metadata_context(
         "owner_username": document.owner.username
         if document.owner
         else no_value_default,
-        "original_name": unicodedata.normalize(
-            "NFC",
+        "original_name": normalize_unicode(
             PurePath(document.original_filename).with_suffix("").name,
         )
         if document.original_filename
@@ -275,12 +274,12 @@ def get_tags_context(tags: Iterable[Tag]) -> dict[str, str | list[str]]:
     return {
         "tag_list": pathvalidate.sanitize_filename(
             ",".join(
-                sorted(unicodedata.normalize("NFC", tag.name) for tag in tags),
+                sorted(normalize_unicode(tag.name) for tag in tags),
             ),
             replacement_text="-",
         ),
         # Assumed to be ordered, but a template could loop through to find what they want
-        "tag_name_list": [unicodedata.normalize("NFC", x.name) for x in tags],
+        "tag_name_list": [normalize_unicode(x.name) for x in tags],
     }
 
 
@@ -307,7 +306,7 @@ def get_custom_fields_context(
             CustomField.FieldDataType.LONG_TEXT,
         }:
             value = pathvalidate.sanitize_filename(
-                unicodedata.normalize("NFC", field_instance.value),
+                normalize_unicode(field_instance.value),
                 replacement_text="-",
             )
         elif (
@@ -316,8 +315,7 @@ def get_custom_fields_context(
         ):
             options = field_instance.field.extra_data["select_options"]
             value = pathvalidate.sanitize_filename(
-                unicodedata.normalize(
-                    "NFC",
+                normalize_unicode(
                     next(
                         option["label"]
                         for option in options
@@ -330,7 +328,7 @@ def get_custom_fields_context(
             value = field_instance.value
         field_data["custom_fields"][
             pathvalidate.sanitize_filename(
-                unicodedata.normalize("NFC", field_instance.field.name),
+                normalize_unicode(field_instance.field.name),
                 replacement_text="-",
             )
         ] = {

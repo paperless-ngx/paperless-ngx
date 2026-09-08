@@ -8,6 +8,7 @@ from documents.serialisers import CorrespondentField
 from documents.serialisers import DocumentTypeField
 from documents.serialisers import OwnedObjectSerializer
 from documents.serialisers import TagsField
+from documents.utils import normalize_unicode
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
@@ -160,6 +161,12 @@ class MailRuleSerializer(OwnedObjectSerializer):
         if value > 36500:  # ~100 years
             raise serializers.ValidationError("Maximum mail age is unreasonably large.")
         return value
+
+    def validate_filter_attachment_filename_include(self, value):
+        return normalize_unicode(value)
+
+    def validate_filter_attachment_filename_exclude(self, value):
+        return normalize_unicode(value)
 
 
 class ProcessedMailSerializer(OwnedObjectSerializer):

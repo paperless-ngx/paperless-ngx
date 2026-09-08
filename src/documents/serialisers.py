@@ -87,6 +87,7 @@ from documents.regex import validate_regex_pattern
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.templating.utils import convert_format_str_to_template_format
 from documents.templating.workflows import validate_workflow_template
+from documents.utils import normalize_unicode
 from documents.validators import uri_validator
 from documents.validators import url_validator
 from documents.versioning import sort_versions_newest_first
@@ -3119,6 +3120,13 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer[WorkflowTrigger]):
             and len(attrs["filter_path"]) == 0
         ):
             attrs["filter_path"] = None
+
+        # Normalize once at write time, since these are matched against many
+        # documents but edited rarely
+        if attrs.get("filter_filename") is not None:
+            attrs["filter_filename"] = normalize_unicode(attrs["filter_filename"])
+        if attrs.get("filter_path") is not None:
+            attrs["filter_path"] = normalize_unicode(attrs["filter_path"])
 
         if (
             "filter_custom_field_query" in attrs
