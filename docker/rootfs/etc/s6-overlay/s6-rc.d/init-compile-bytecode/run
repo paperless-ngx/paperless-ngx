@@ -11,6 +11,13 @@ if [[ "${S6_READ_ONLY_ROOT}" == "1" ]]; then
 	exit 0
 fi
 
+# When running as a non-root user, site-packages is still root-owned and unwritable,
+# so this step would just fail loudly on every container start. Skip it.
+if [[ -n "${USER_IS_NON_ROOT}" ]]; then
+	echo "${log_prefix} USER_IS_NON_ROOT is set, skipping (site-packages is not writable)"
+	exit 0
+fi
+
 declare -r site_packages="$(python3 -c 'import site; print(site.getsitepackages()[0])')"
 
 # Deliberately scoped to packages that paperless.settings/paperless/__init__.py import
