@@ -251,6 +251,7 @@ describe('SettingsService', () => {
     expect(
       settingsService.sidebarItemIsHidden(HideableSidebarItemID.Workflows)
     ).toBe(true)
+    expect(settingsService.get(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS)).toEqual([])
 
     settingsService.updateSidebarItemVisibility(
       HideableSidebarItemID.Workflows,

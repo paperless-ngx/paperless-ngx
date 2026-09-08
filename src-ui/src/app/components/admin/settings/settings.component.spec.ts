@@ -219,10 +219,22 @@ describe('SettingsComponent', () => {
       HideableSidebarItemID.Workflows
     )
 
+    settingsService.updateSidebarItemVisibility(
+      HideableSidebarItemID.Mail,
+      false
+    )
+
+    expect(component.settingsForm.value.sidebarHiddenItems).toContain(
+      HideableSidebarItemID.Mail
+    )
+
     component.reset()
 
     expect(component.settingsForm.value.sidebarHiddenItems).not.toContain(
       HideableSidebarItemID.Workflows
+    )
+    expect(component.settingsForm.value.sidebarHiddenItems).not.toContain(
+      HideableSidebarItemID.Mail
     )
   })
 

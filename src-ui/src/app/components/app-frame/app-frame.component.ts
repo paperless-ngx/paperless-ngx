@@ -205,22 +205,7 @@ export class AppFrameComponent
   }
 
   toggleSidebarItem(item: HideableSidebarItemID, visible: boolean): void {
-    const previousHiddenItems = this.settingsService.hiddenSidebarItems()
-    this.settingsService
-      .updateSidebarItemVisibility(item, visible)
-      .pipe(first())
-      .subscribe({
-        error: (error) => {
-          this.settingsService.set(
-            SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS,
-            previousHiddenItems
-          )
-          this.toastService.showError(
-            $localize`An error occurred while saving settings.`,
-            error
-          )
-        },
-      })
+    this.settingsService.updateSidebarItemVisibility(item, visible)
   }
 
   toggleAttributesSections(event?: Event): void {

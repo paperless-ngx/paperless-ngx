@@ -200,6 +200,7 @@ export class SettingsComponent
 
   store: BehaviorSubject<any>
   storeSub: Subscription
+  sidebarItemsSub: Subscription
   isDirty$: Observable<boolean>
   isDirty: boolean = false
   unsubscribeNotifier: Subject<any> = new Subject()
@@ -248,6 +249,10 @@ export class SettingsComponent
 
   constructor() {
     super()
+    this.sidebarItemsSub =
+      this.settings.sidebarHiddenItemsEditingChanged.subscribe((hiddenItems) =>
+        this.settingsForm.controls.sidebarHiddenItems.setValue(hiddenItems)
+      )
     this.settings.settingsSaved.subscribe(() => {
       if (!this.savePending) this.initialize()
       this.savedViewsService.maybeRefreshDocumentCounts()
@@ -307,7 +312,11 @@ export class SettingsComponent
         }
       }
       this.activeNavID.set(navID)
-      this.settings.organizingSidebarItems.set(navID === SettingsNavIDs.General)
+      this.settings.sidebarHiddenItemsEditing.set(
+        navID === SettingsNavIDs.General
+          ? [...this.settingsForm.controls.sidebarHiddenItems.value]
+          : null
+      )
     })
   }
 
@@ -458,6 +467,12 @@ export class SettingsComponent
       this.settingsForm.patchValue(currentFormValue)
     }
 
+    if (this.settings.organizingSidebarItems()) {
+      this.settings.sidebarHiddenItemsEditing.set([
+        ...this.settingsForm.controls.sidebarHiddenItems.value,
+      ])
+    }
+
     if (this.canViewSystemStatus) {
       this.systemStatusService.get().subscribe((status) => {
         this.systemStatus.set(status)
@@ -466,9 +481,10 @@ export class SettingsComponent
   }
 
   ngOnDestroy() {
-    this.settings.organizingSidebarItems.set(false)
+    this.settings.sidebarHiddenItemsEditing.set(null)
     if (this.isDirty) this.settings.updateAppearanceSettings() // in case user changed appearance but didn't save
     this.storeSub && this.storeSub.unsubscribe()
+    this.sidebarItemsSub.unsubscribe()
   }
 
   isSidebarItemShown(item: HideableSidebarItemID): boolean {
@@ -476,15 +492,7 @@ export class SettingsComponent
   }
 
   toggleSidebarItem(item: HideableSidebarItemID, checked: boolean): void {
-    const hiddenItems = new Set(
-      this.settingsForm.value.sidebarHiddenItems || []
-    )
-    if (checked) {
-      hiddenItems.delete(item)
-    } else {
-      hiddenItems.add(item)
-    }
-    this.settingsForm.controls.sidebarHiddenItems.setValue([...hiddenItems])
+    this.settings.updateSidebarItemVisibility(item, checked)
   }
 
   public saveSettings() {
@@ -675,6 +683,11 @@ export class SettingsComponent
 
   reset() {
     this.settingsForm.patchValue(this.store.getValue())
+    if (this.settings.organizingSidebarItems()) {
+      this.settings.sidebarHiddenItemsEditing.set([
+        ...this.settingsForm.controls.sidebarHiddenItems.value,
+      ])
+    }
   }
 
   clearThemeColor() {

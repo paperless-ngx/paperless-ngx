@@ -312,7 +312,9 @@ describe('AppFrameComponent', () => {
     settingsService.set(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS, [
       HideableSidebarItemID.Dashboard,
     ])
-    settingsService.organizingSidebarItems.set(true)
+    settingsService.sidebarHiddenItemsEditing.set([
+      HideableSidebarItemID.Dashboard,
+    ])
     fixture.detectChanges()
 
     expect(

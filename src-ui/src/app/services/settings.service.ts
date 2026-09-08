@@ -314,7 +314,15 @@ export class SettingsService {
   readonly globalDropzoneEnabled = signal(true)
   readonly globalDropzoneActive = signal(false)
   readonly organizingSidebarSavedViews = signal(false)
-  readonly organizingSidebarItems = signal(false)
+  readonly sidebarHiddenItemsEditing = signal<HideableSidebarItemID[] | null>(
+    null
+  )
+  readonly organizingSidebarItems = computed(
+    () => this.sidebarHiddenItemsEditing() !== null
+  )
+  readonly sidebarHiddenItemsEditingChanged = new EventEmitter<
+    HideableSidebarItemID[]
+  >()
   readonly hiddenSidebarItems = this.getSignal<HideableSidebarItemID[]>(
     SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS
   )
@@ -755,21 +763,26 @@ export class SettingsService {
   }
 
   sidebarItemIsHidden(item: HideableSidebarItemID): boolean {
-    return this.hiddenSidebarItems().includes(item)
+    return (
+      this.sidebarHiddenItemsEditing() ?? this.hiddenSidebarItems()
+    ).includes(item)
   }
 
   updateSidebarItemVisibility(
     item: HideableSidebarItemID,
     visible: boolean
-  ): Observable<any> {
-    const hiddenItems = new Set(this.hiddenSidebarItems())
+  ): void {
+    const hiddenItems = new Set(
+      this.sidebarHiddenItemsEditing() ?? this.hiddenSidebarItems()
+    )
     if (visible) {
       hiddenItems.delete(item)
     } else {
       hiddenItems.add(item)
     }
-    this.set(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS, [...hiddenItems])
-    return this.storeSettings()
+    const updatedHiddenItems = [...hiddenItems]
+    this.sidebarHiddenItemsEditing.set(updatedHiddenItems)
+    this.sidebarHiddenItemsEditingChanged.emit(updatedHiddenItems)
   }
 
   updateSavedViewsVisibility(
