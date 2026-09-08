@@ -33,22 +33,6 @@
     display: none !important;
   }
 
-  &.sidebar-customizing .sidebar-customizable-item {
-    position: relative;
-
-    .nav-link,
-    .nav-anchor {
-      padding-right: 3.5rem;
-    }
-
-    .sidebar-item-toggle {
-      position: absolute;
-      top: 50%;
-      right: 0.25rem;
-      transform: translateY(-50%);
-    }
-  }
-
   @media (min-width: 768px) {
     --pngx-sidebar-width: var(--pngx-sidebar-expanded-width);
   }
@@ -136,10 +120,6 @@ main {
 
   .sidebar.slim {
     max-width: 55px;
-
-    .sidebar-item-toggle {
-      display: none;
-    }
 
     li.nav-item span.badge {
       display: inline-block;
