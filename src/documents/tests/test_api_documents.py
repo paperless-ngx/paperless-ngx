@@ -3796,6 +3796,23 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_order_share_links_by_document_title(self) -> None:
+        document_zulu = Document.objects.create(title="Zulu")
+        document_alpha = Document.objects.create(title="Alpha")
+        ShareLink.objects.create(document=document_zulu, slug="zulu-link")
+        ShareLink.objects.create(document=document_alpha, slug="alpha-link")
+
+        response = self.client.get(
+            "/api/share_links/?ordering=document__title",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            [link["document_title"] for link in response.data["results"]],
+            ["Alpha", "Zulu"],
+        )
+
     def test_share_links_permissions_aware(self) -> None:
         """
         GIVEN:

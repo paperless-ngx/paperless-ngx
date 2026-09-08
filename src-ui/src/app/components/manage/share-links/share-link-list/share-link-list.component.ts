@@ -12,6 +12,10 @@ import { FileVersion, ShareLink } from 'src/app/data/share-link'
 import { SHARE_LINK_BUNDLE_FILE_VERSION_LABELS } from 'src/app/data/share-link-bundle'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import {
+  SortEvent,
+  SortableDirective,
+} from 'src/app/directives/sortable.directive'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import {
   PermissionAction,
@@ -34,6 +38,7 @@ import { environment } from 'src/environments/environment'
     NgbPaginationModule,
     NgxBootstrapIconsModule,
     RouterModule,
+    SortableDirective,
   ],
 })
 export class ShareLinkListComponent
@@ -48,6 +53,8 @@ export class ShareLinkListComponent
   readonly links = signal<ShareLink[]>([])
   readonly total = signal(0)
   readonly page = signal(1)
+  readonly sortField = signal('created')
+  readonly sortReverse = signal(true)
   readonly copiedID = signal<number | null>(null)
   readonly copiedDocumentID = signal<number | null>(null)
   readonly error = signal<string | null>(null)
@@ -85,7 +92,7 @@ export class ShareLinkListComponent
     this.loading.set(true)
     this.error.set(null)
     this.shareLinkService
-      .list(this.page(), this.pageSize, 'created', true)
+      .list(this.page(), this.pageSize, this.sortField(), this.sortReverse())
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (results) => {
@@ -106,6 +113,13 @@ export class ShareLinkListComponent
 
   setPage(page: number): void {
     this.page.set(page)
+    this.reload()
+  }
+
+  onSort(event: SortEvent): void {
+    this.sortField.set(event.column || 'created')
+    this.sortReverse.set(event.column ? event.reverse : true)
+    this.page.set(1)
     this.reload()
   }
 

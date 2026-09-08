@@ -4571,7 +4571,7 @@ class ShareLinkViewSet(
         PermittedObjectsFilter,
     )
     filterset_class = ShareLinkFilterSet
-    ordering_fields = ("created", "expiration", "document")
+    ordering_fields = ("created", "expiration", "document__title")
 
 
 @extend_schema_view(

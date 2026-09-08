@@ -16,6 +16,10 @@ import {
   ShareLinkBundleSummary,
 } from 'src/app/data/share-link-bundle'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import {
+  SortEvent,
+  SortableDirective,
+} from 'src/app/directives/sortable.directive'
 import { FileSizePipe } from 'src/app/pipes/file-size.pipe'
 import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -35,6 +39,7 @@ import { LoadingComponentWithPermissions } from 'src/app/components/loading-comp
     NgbPaginationModule,
     NgbPopoverModule,
     NgxBootstrapIconsModule,
+    SortableDirective,
     FileSizePipe,
   ],
 })
@@ -52,6 +57,8 @@ export class ShareLinkBundleListComponent
   readonly copiedSlug = signal<string | null>(null)
   readonly total = signal(0)
   readonly page = signal(1)
+  readonly sortField = signal('created')
+  readonly sortReverse = signal(true)
 
   readonly statuses = ShareLinkBundleStatus
   readonly fileVersions = FileVersion
@@ -90,7 +97,12 @@ export class ShareLinkBundleListComponent
           }
           this.error.set(null)
           return this.shareLinkBundleService
-            .list(this.page(), this.pageSize, 'created', true)
+            .list(
+              this.page(),
+              this.pageSize,
+              this.sortField(),
+              this.sortReverse()
+            )
             .pipe(
               catchError((error) => {
                 if (!silent) {
@@ -135,6 +147,13 @@ export class ShareLinkBundleListComponent
 
   setPage(page: number): void {
     this.page.set(page)
+    this.triggerRefresh(false)
+  }
+
+  onSort(event: SortEvent): void {
+    this.sortField.set(event.column || 'created')
+    this.sortReverse.set(event.column ? event.reverse : true)
+    this.page.set(1)
     this.triggerRefresh(false)
   }
 

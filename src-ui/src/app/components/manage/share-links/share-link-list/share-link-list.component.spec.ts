@@ -75,6 +75,16 @@ describe('ShareLinkListComponent', () => {
     expect(service.list).toHaveBeenLastCalledWith(2, 25, 'created', true)
   })
 
+  it('sorts links and returns to the first page', () => {
+    fixture.detectChanges()
+    component.page.set(2)
+
+    component.onSort({ column: 'expiration', reverse: false })
+
+    expect(component.page()).toBe(1)
+    expect(service.list).toHaveBeenLastCalledWith(1, 25, 'expiration', false)
+  })
+
   it('marks expired share links', () => {
     service.list.mockReturnValue(
       of({

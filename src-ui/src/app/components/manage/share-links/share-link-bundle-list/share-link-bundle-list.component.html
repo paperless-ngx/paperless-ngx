@@ -13,10 +13,10 @@
         <table class="table table-sm align-middle mb-0 bg-body">
           <thead>
             <tr>
-              <th scope="col" i18n>Created</th>
-              <th scope="col" i18n>Status</th>
+              <th scope="col" class="fw-normal" pngxSortable="created" [currentSortField]="sortField()" [currentSortReverse]="sortReverse()" (sort)="onSort($event)" i18n>Created</th>
+              <th scope="col" class="fw-normal" pngxSortable="status" [currentSortField]="sortField()" [currentSortReverse]="sortReverse()" (sort)="onSort($event)" i18n>Status</th>
               <th scope="col" i18n>Size</th>
-              <th scope="col" i18n>Expires</th>
+              <th scope="col" class="fw-normal" pngxSortable="expiration" [currentSortField]="sortField()" [currentSortReverse]="sortReverse()" (sort)="onSort($event)" i18n>Expires</th>
               <th scope="col" i18n>Documents</th>
               <th scope="col" i18n>File version</th>
               <th scope="col" class="text-end" i18n>Actions</th>
