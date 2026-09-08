@@ -1473,6 +1473,35 @@ describe('DocumentDetailComponent', () => {
     })
   })
 
+  it('should not automatically get suggestions if auto-suggest is disabled', () => {
+    settingsService.set(SETTINGS_KEYS.DOCUMENT_EDITING_AUTO_SUGGEST, false)
+    const suggestionsSpy = jest.spyOn(documentService, 'getSuggestions')
+    suggestionsSpy.mockReturnValue(of({ tags: [42] }))
+    initNormally()
+    expect(suggestionsSpy).not.toHaveBeenCalled()
+
+    // still available on demand
+    component.getSuggestions()
+    expect(suggestionsSpy).toHaveBeenCalled()
+  })
+
+  it('should not automatically get AI suggestions if auto-suggest is disabled', () => {
+    settingsService.set(SETTINGS_KEYS.DOCUMENT_EDITING_AUTO_SUGGEST, false)
+    const getSetting = settingsService.get.bind(settingsService)
+    jest
+      .spyOn(settingsService, 'get')
+      .mockImplementation((key) =>
+        key === SETTINGS_KEYS.AI_ENABLED ? true : getSetting(key)
+      )
+    const aiSuggestionsSpy = jest.spyOn(documentService, 'getAiSuggestions')
+    aiSuggestionsSpy.mockReturnValue(of({ tags: [42] }))
+    initNormally()
+    expect(aiSuggestionsSpy).not.toHaveBeenCalled()
+
+    component.getSuggestions()
+    expect(aiSuggestionsSpy).toHaveBeenCalled()
+  })
+
   it('should reset the suggestions loading state if the document changes mid-request', () => {
     const getSetting = settingsService.get.bind(settingsService)
     jest

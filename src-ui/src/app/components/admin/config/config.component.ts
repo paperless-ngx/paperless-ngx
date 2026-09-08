@@ -69,6 +69,7 @@ export class ConfigComponent
   public configForm = new FormGroup({})
 
   public errors = {}
+  public externallyConfiguredVariables = new Set<string>()
 
   get optionCategories(): string[] {
     return Object.values(ConfigCategory)
@@ -152,6 +153,9 @@ export class ConfigComponent
   }
 
   private initialize(config: PaperlessConfig) {
+    this.externallyConfiguredVariables = new Set(
+      config.externally_configured_variables ?? []
+    )
     if (!this.store) {
       this.store = new BehaviorSubject(config)
 
@@ -162,7 +166,9 @@ export class ConfigComponent
           this.configForm.patchValue(state, { emitEvent: false })
         })
 
-      this.isDirty$ = dirtyCheck(this.configForm, this.store.asObservable())
+      this.isDirty$ = dirtyCheck(this.configForm, this.store.asObservable(), {
+        excludeKeys: ['externally_configured_variables'],
+      })
     }
     this.configForm.patchValue(config)
 
@@ -225,6 +231,10 @@ export class ConfigComponent
 
   public isSet(key: string): boolean {
     return this.configForm.get(key).value != null
+  }
+
+  public isExternallyConfigured(configKey: string): boolean {
+    return this.externallyConfiguredVariables.has(configKey)
   }
 
   public resetOption(key: string) {
