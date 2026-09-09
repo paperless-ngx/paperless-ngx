@@ -3,16 +3,14 @@ from __future__ import annotations
 import hashlib
 import logging
 import pickle
-import time
 import uuid
 from binascii import hexlify
 from collections import OrderedDict
 from dataclasses import dataclass
-from hashlib import sha256
+from time import sleep
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Final
-from uuid import uuid4
 
 from django.conf import settings
 from django.core.cache import cache
@@ -284,7 +282,7 @@ def retrieve_llm_suggestions(
 
     lock_key = (
         f"{get_suggestion_cache_key(document.pk)}_llm_lock_"
-        f"{sha256(backend.encode()).hexdigest()}"
+        f"{hashlib.sha256(backend.encode()).hexdigest()[:16]}"
     )
     waited = False
 
@@ -294,7 +292,7 @@ def retrieve_llm_suggestions(
             refresh_llm_suggestions_cache(document.pk, backend=backend)
             return cached.suggestions
 
-        lock_token = uuid4().hex
+        lock_token = uuid.uuid4().hex
         if cache.add(lock_key, lock_token, lock_timeout):
             if waited:
                 # The generation we were waiting on has ended without caching
@@ -328,7 +326,7 @@ def retrieve_llm_suggestions(
 
         waited = True
         # Another worker is generating suggestions, poll to avoid another LLM request
-        time.sleep(LLM_SUGGESTION_POLL_INTERVAL)
+        sleep(LLM_SUGGESTION_POLL_INTERVAL)
 
 
 def set_llm_suggestions_cache(
