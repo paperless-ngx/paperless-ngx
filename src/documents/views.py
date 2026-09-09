@@ -1622,11 +1622,6 @@ class DocumentViewSet(
                     },
                     status=status.HTTP_502_BAD_GATEWAY,
                 )
-            set_llm_suggestions_cache(
-                doc.pk,
-                llm_suggestions,
-                backend=llm_cache_backend,
-            )
 
         tags_choice: TaxonomyChoiceDict = llm_suggestions["tags"]
         correspondents_choice: TaxonomyChoiceDict = llm_suggestions["correspondents"]
