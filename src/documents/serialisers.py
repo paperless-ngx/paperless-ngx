@@ -1256,20 +1256,26 @@ class DocumentSerializer(
                 if "tags" in validated_data
                 else []
             )
-            inbox_tags_not_being_added = Tag.objects.filter(is_inbox_tag=True).exclude(
-                id__in=tag_ids_being_added,
-            )
+            tags_being_added = Tag.objects.filter(id__in=tag_ids_being_added)
+            required_by_add_tags = set(tags_being_added)
+            for tag in tags_being_added:
+                required_by_add_tags.update(tag.get_ancestors())
+
+            # Remove its descendants too, except any that is being added in this same update
+            tags_to_remove = set()
+            for tag in Tag.objects.filter(is_inbox_tag=True):
+                if tag in required_by_add_tags:
+                    continue
+                tags_to_remove.add(tag)
+                tags_to_remove.update(tag.get_descendants())
+
             if "tags" in validated_data:
                 validated_data["tags"] = [
-                    tag
-                    for tag in validated_data["tags"]
-                    if tag not in inbox_tags_not_being_added
+                    tag for tag in validated_data["tags"] if tag not in tags_to_remove
                 ]
             else:
                 validated_data["tags"] = [
-                    tag
-                    for tag in instance.tags.all()
-                    if tag not in inbox_tags_not_being_added
+                    tag for tag in instance.tags.all() if tag not in tags_to_remove
                 ]
 
         if settings.AUDIT_LOG_ENABLED:
