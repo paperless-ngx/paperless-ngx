@@ -99,7 +99,7 @@ def test_llm_suggestions_are_generated_once_for_concurrent_requests(mocker) -> N
         "paperless_ai.ai_classifier.get_ai_document_classification",
         side_effect=generate,
     )
-    mocker.patch("documents.caching.time.sleep", side_effect=wait_for_generation)
+    mocker.patch("documents.caching.sleep", side_effect=wait_for_generation)
 
     with ThreadPoolExecutor(max_workers=2) as executor:
         first = executor.submit(
@@ -164,7 +164,7 @@ def test_llm_suggestions_waiter_does_not_rerun_a_failed_generation(mocker) -> No
         "paperless_ai.ai_classifier.get_ai_document_classification",
         side_effect=generate,
     )
-    mocker.patch("documents.caching.time.sleep", side_effect=wait_for_generation)
+    mocker.patch("documents.caching.sleep", side_effect=wait_for_generation)
 
     with ThreadPoolExecutor(max_workers=2) as executor:
         first = executor.submit(

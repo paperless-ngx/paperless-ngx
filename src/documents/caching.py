@@ -291,7 +291,7 @@ def retrieve_llm_suggestions(
     while True:
         cached = get_llm_suggestion_cache(document.pk, backend=backend)
         if cached is not None:
-            refresh_suggestions_cache(document.pk)
+            refresh_llm_suggestions_cache(document.pk, backend=backend)
             return cached.suggestions
 
         lock_token = uuid4().hex
@@ -307,7 +307,7 @@ def retrieve_llm_suggestions(
                 # The cache may have been populated while acquiring the lock.
                 cached = get_llm_suggestion_cache(document.pk, backend=backend)
                 if cached is not None:
-                    refresh_suggestions_cache(document.pk)
+                    refresh_llm_suggestions_cache(document.pk, backend=backend)
                     return cached.suggestions
 
                 suggestions = get_ai_document_classification(

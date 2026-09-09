@@ -251,6 +251,7 @@ from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
 from paperless_ai.ai_classifier import get_llm_output_language
 from paperless_ai.chat import stream_chat_with_documents
+from paperless_ai.exceptions import LLMGenerationFailedError
 from paperless_ai.exceptions import LLMProviderError
 from paperless_ai.exceptions import LLMTimeoutError
 from paperless_ai.matching import extract_unmatched_names
@@ -1594,6 +1595,25 @@ class DocumentViewSet(
                 raise ValidationError(
                     {"ai": [_("Invalid AI configuration.")]},
                 ) from exc
+            except LLMGenerationFailedError:
+                # A request we queued behind already failed and logged the
+                # cause, so don't run the same query again just to re-learn it
+                logger.warning(
+                    "Concurrent AI suggestion generation for document %s "
+                    "failed, not retrying",
+                    doc.pk,
+                )
+                return Response(
+                    {
+                        "ai": [
+                            _(
+                                "AI suggestions could not be generated. "
+                                "Check logs for details.",
+                            ),
+                        ],
+                    },
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                )
             except LLMTimeoutError as exc:
                 logger.exception(
                     "AI backend timed out while generating suggestions for "
