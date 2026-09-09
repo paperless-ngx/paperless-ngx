@@ -1,7 +1,9 @@
 import logging
 
+from celery import Task
 from celery import shared_task
 
+from documents.models import PaperlessTask
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.mail import MailError
 from paperless_mail.models import MailAccount
@@ -10,8 +12,26 @@ from paperless_mail.models import MailRule
 logger = logging.getLogger("paperless.mail.tasks")
 
 
-@shared_task
-def process_mail_accounts(account_ids: list[int] | None = None) -> str:
+@shared_task(bind=True)
+def process_mail_accounts(self: Task, account_ids: list[int] | None = None) -> str:
+    # A scheduled check can still be running (or queued) when the next one
+    # ProcessedMail dedup only records a message once its
+    # handling has finished, so an overlapping run can still pick up the same
+    # not-yet-recorded message. Skip outright rather than race it.
+    other_mail_fetch_running = (
+        PaperlessTask.objects.filter(
+            task_type=PaperlessTask.TaskType.MAIL_FETCH,
+            status__in=[PaperlessTask.Status.PENDING, PaperlessTask.Status.STARTED],
+        )
+        .exclude(task_id=self.request.id)
+        .exists()
+    )
+    if other_mail_fetch_running:
+        logger.info(
+            "Mail account processing is already running; skipping this run.",
+        )
+        return "Skipped: mail account processing already in progress."
+
     total_new_documents = 0
     accounts = (
         MailAccount.objects.filter(pk__in=account_ids)
