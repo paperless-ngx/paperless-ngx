@@ -38,6 +38,33 @@ class TestChatStreamingViewInputValidation(APITestCase):
             )
         assert resp.status_code == status.HTTP_400_BAD_REQUEST
 
+    def test_answer_is_exempt_from_compression(self) -> None:
+        """
+        A compressor buffers, so a compressed answer arrives in one piece
+        instead of streaming. The exemption has to land on the underlying
+        Django request, which is what the middleware sees.
+        """
+        with (
+            mock.patch(
+                "documents.views.AIConfig",
+                return_value=self._mock_ai_enabled(),
+            ),
+            mock.patch(
+                "documents.views.stream_chat_with_documents",
+                return_value=iter(["answer"]),
+            ),
+        ):
+            resp = self.client.post(
+                "/api/documents/chat/",
+                {"q": "What is in my archive?"},
+                format="json",
+                HTTP_ACCEPT_ENCODING="gzip, deflate, br",
+            )
+
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp.wsgi_request.compress_exempt is True
+        assert not resp.has_header("Content-Encoding")
+
     def test_missing_question_is_rejected(self) -> None:
         with mock.patch(
             "documents.views.AIConfig",

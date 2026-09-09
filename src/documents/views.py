@@ -243,6 +243,7 @@ from paperless.celery import app as celery_app
 from paperless.config import AIConfig
 from paperless.config import GeneralConfig
 from paperless.config import RemoteOCRConfig
+from paperless.middleware import compress_exempt
 from paperless.models import ApplicationConfiguration
 from paperless.parsers.registry import get_parser_registry
 from paperless.parsers.remote import RemoteEngineConfig
@@ -2303,6 +2304,7 @@ class ChatStreamingSerializer(serializers.Serializer[dict[str, Any]]):
     [
         ensure_csrf_cookie,
         cache_control(no_cache=True),
+        compress_exempt,
     ],
     name="dispatch",
 )
@@ -2311,7 +2313,6 @@ class ChatStreamingView(GenericAPIView[Any]):
     serializer_class = ChatStreamingSerializer
 
     def post(self, request, *args, **kwargs):
-        request.compress_exempt = True
         ai_config = AIConfig()
         if not ai_config.ai_enabled:
             return HttpResponseBadRequest("AI is required for this feature")
@@ -2353,6 +2354,9 @@ class ChatStreamingView(GenericAPIView[Any]):
             ),
             content_type="text/event-stream",
         )
+        # nginx buffers proxied responses by default, which holds the answer
+        # back until it is finished; this asks it not to.
+        response.headers["X-Accel-Buffering"] = "no"
         return response
 
 

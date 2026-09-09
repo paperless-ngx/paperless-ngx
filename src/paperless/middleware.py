@@ -1,6 +1,26 @@
+from functools import wraps
+
 from django.conf import settings
 
 from paperless import version
+
+
+def compress_exempt(view_func):
+    """
+    Exempt a view's response from compression.
+
+    The compression middleware reads the flag off the Django request, so it
+    has to be set there: DRF's request wrapper proxies reads but keeps writes
+    to itself, and a flag set on it never arrives. Decorating dispatch runs
+    before that wrapper exists.
+    """
+
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        request.compress_exempt = True
+        return view_func(request, *args, **kwargs)
+
+    return wrapper
 
 
 class ApiVersionMiddleware:
