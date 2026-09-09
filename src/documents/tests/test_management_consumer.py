@@ -136,6 +136,23 @@ def wait_for_mock_call(
     return False
 
 
+def sleep_past_stability(
+    owner: FileStabilityTracker | ConsumerThread,
+    *,
+    windows: float = 1.5,
+) -> None:
+    """
+    Block until a tracked file's stability window has certainly elapsed.
+
+    Args:
+        owner: The tracker, or the consumer thread running one, whose
+               configured stability delay sets the wait.
+        windows: How many stability windows to wait, giving slop for a slow
+                 or loaded test runner.
+    """
+    sleep(owner.stability_delay * windows)
+
+
 class TestTrackedFile:
     """Tests for the TrackedFile dataclass."""
 
@@ -260,6 +277,56 @@ class TestFileStabilityTracker:
         stable = list(stability_tracker.get_stable_files())
         assert len(stable) == 0
         assert stability_tracker.pending_count == 1
+
+    def test_get_stable_files_skips_empty_file(
+        self,
+        stability_tracker: FileStabilityTracker,
+        tmp_path: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A zero byte file, tracked and past its stability delay
+        WHEN:
+            - Stable files are collected
+        THEN:
+            - The file is not yielded for consumption
+            - The file is dropped from tracking rather than held, so an
+              abandoned placeholder does not keep the watch loop awake
+        """
+        empty = tmp_path / "scan.pdf"
+        empty.write_bytes(b"")
+        stability_tracker.track(empty, Change.added)
+        sleep_past_stability(stability_tracker)
+
+        stable = list(stability_tracker.get_stable_files())
+
+        assert stable == []
+        assert stability_tracker.pending_count == 0
+
+    def test_empty_file_is_yielded_once_content_arrives(
+        self,
+        stability_tracker: FileStabilityTracker,
+        tmp_path: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A zero byte file which was dropped from tracking while empty
+        WHEN:
+            - The writer fills the file and a new event re-tracks it
+        THEN:
+            - The file is yielded for consumption once it is stable
+        """
+        target = tmp_path / "scan.pdf"
+        target.write_bytes(b"")
+        stability_tracker.track(target, Change.added)
+        sleep_past_stability(stability_tracker)
+        assert list(stability_tracker.get_stable_files()) == []
+
+        target.write_bytes(b"%PDF-1.4 content")
+        stability_tracker.track(target, Change.modified)
+        sleep_past_stability(stability_tracker)
+
+        assert list(stability_tracker.get_stable_files()) == [target]
 
     def test_get_stable_files_deleted_during_check(self, temp_file: Path) -> None:
         """Test deleted file is not returned during stability check."""
@@ -878,6 +945,51 @@ class TestCommandWatch:
             raise thread.exception
 
         mock_consume_file_delay.apply_async.assert_called()
+
+    def test_scanner_placeholder_is_not_consumed_while_empty(
+        self,
+        consumption_dir: Path,
+        sample_pdf: Path,
+        mock_consume_file_delay: MagicMock,
+        start_consumer: Callable[..., ConsumerThread],
+    ) -> None:
+        """
+        GIVEN:
+            - A scanner which creates a zero byte placeholder and only writes
+              the page some time later (GH discussion #13969)
+        WHEN:
+            - The placeholder sits untouched well past the stability delay
+            - The scanner then writes the real content
+        THEN:
+            - The empty placeholder is never queued, as it could only fail
+              with "Unsupported mime type inode/x-empty"
+            - The file is queued exactly once, when the content lands
+        """
+        thread = start_consumer(stability_delay=0.2)
+
+        target = consumption_dir / "scan.pdf"
+        target.write_bytes(b"")  # the scanner's placeholder
+
+        # Well past the stability delay: the old behaviour queued it here.
+        sleep_past_stability(thread, windows=5)
+        if thread.exception:
+            raise thread.exception
+        assert mock_consume_file_delay.apply_async.call_count == 0
+
+        shutil.copy(sample_pdf, target)  # the scanner finishes the page
+
+        assert wait_for_mock_call(
+            mock_consume_file_delay.apply_async,
+            timeout_s=5.0,
+        )
+        if thread.exception:
+            raise thread.exception
+
+        assert mock_consume_file_delay.apply_async.call_count == 1
+        queued_doc = mock_consume_file_delay.apply_async.call_args.kwargs["kwargs"][
+            "input_doc"
+        ]
+        assert queued_doc.original_file.name == "scan.pdf"
 
     def test_ignores_macos_files(
         self,
