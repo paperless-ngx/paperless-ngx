@@ -1121,12 +1121,22 @@ class DocumentViewSet(
             params.get(param, "").strip() for param in self._content_filter_params()
         )
 
+    def _requested_fields(self) -> list[str] | None:
+        # The sparse-fieldset `fields` param, as DynamicFieldsModelSerializer
+        # wants it: None means "no restriction, serialize everything", which
+        # a blank value means too. get_queryset() and get_serializer() both
+        # branch on this, and they have to read it identically -- a queryset
+        # that skips the content prefetch for a response that still
+        # serializes content reintroduces get_effective_content()'s
+        # per-instance fallback.
+        fields_param = self.request.query_params.get("fields")
+        return fields_param.split(",") if fields_param else None
+
     def _needs_effective_content_prefetch(self) -> bool:
         # The prefetch spares get_effective_content() a per-instance fallback
         # query, but only earns itself when content can reach the response.
-        # Mirror get_serializer() below: no `fields` param keeps every field.
-        fields_param = self.request.query_params.get("fields", None)
-        return fields_param is None or "content" in fields_param.split(",")
+        fields = self._requested_fields()
+        return fields is None or "content" in fields
 
     def get_queryset(self):
         # A correlated subquery avoids the LEFT JOIN + Count() this used to
@@ -1182,11 +1192,9 @@ class DocumentViewSet(
         return queryset
 
     def get_serializer(self, *args, **kwargs):
-        fields_param = self.request.query_params.get("fields", None)
-        fields = fields_param.split(",") if fields_param else None
         truncate_content = self.request.query_params.get("truncate_content", "False")
         kwargs.setdefault("context", self.get_serializer_context())
-        kwargs.setdefault("fields", fields)
+        kwargs.setdefault("fields", self._requested_fields())
         kwargs.setdefault("truncate_content", truncate_content.lower() in ["true", "1"])
         try:
             full_perms = get_boolean(
