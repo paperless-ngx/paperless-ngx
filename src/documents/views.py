@@ -5437,7 +5437,10 @@ class TrashView(ListModelMixin, PassUserMixin):
 
     model = Document
 
-    queryset = Document.deleted_objects.all()
+    # A version is listed separately only when its root is not in the trash.
+    queryset = Document.deleted_objects.exclude(
+        root_document_id__in=Document.deleted_objects.values("id"),
+    )
 
     def get(self, request: Request, format: str | None = None) -> Response:
         self.serializer_class = DocumentSerializer
@@ -5468,7 +5471,15 @@ class TrashView(ListModelMixin, PassUserMixin):
             return HttpResponseForbidden("Insufficient permissions")
         action = serializer.validated_data.get("action")
         if action == "restore":
-            restored = list(Document.deleted_objects.filter(id__in=doc_ids))
+            restored = list(self.get_queryset().filter(id__in=doc_ids))
+            if len(restored) != len(doc_ids):
+                raise ValidationError(
+                    {
+                        "documents": [
+                            "Restore the root document instead of one of its versions.",
+                        ],
+                    },
+                )
             for doc in restored:
                 doc.restore(strict=False)
             if restored:

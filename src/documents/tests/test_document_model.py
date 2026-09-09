@@ -110,7 +110,7 @@ class TestDocument(TestCase):
             checksum="checksum",
             mime_type="application/pdf",
         )
-        Document.objects.create(
+        version = Document.objects.create(
             root_document=root,
             correspondent=root.correspondent,
             title="Version",
@@ -123,6 +123,10 @@ class TestDocument(TestCase):
 
         self.assertEqual(Document.objects.count(), 0)
         self.assertEqual(Document.deleted_objects.count(), 2)
+
+        root.restore(strict=False)
+
+        self.assertTrue(Document.objects.filter(pk=version.pk).exists())
 
     def test_file_name(self) -> None:
         doc = Document(
