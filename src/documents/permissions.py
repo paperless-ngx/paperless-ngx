@@ -296,21 +296,28 @@ def set_permissions_for_objects(
     model_name = model.__name__.lower()
     ctype = ContentType.objects.get_for_model(model)
 
+    # Every action is resolved up front, before anything is written, so an
+    # unrecognized action name (see _resolve_permissions) aborts the whole
+    # call instead of leaving the actions ahead of it already applied --
+    # BulkEditObjectsSerializer lets unknown keys through and its view turns
+    # the exception into a 400, so a half-applied change would otherwise be
+    # reported to the client as a failure.
+    permissions_by_action: dict[str, list[Permission]] = {}
     for action, entry in permissions.items():
-        codename = f"{action}_{model_name}"
-        implied_codenames = {codename}
+        if "users" not in entry and "groups" not in entry:
+            continue
+        implied_codenames = {f"{action}_{model_name}"}
         if action == "change":
             # change gives view too
             implied_codenames.add(f"view_{model_name}")
-
-        # Resolved once per action (not once per users/groups branch) and
-        # shared between both below -- also where an unrecognized action
-        # name (see _resolve_permissions) is caught.
-        permission_objs = (
-            _resolve_permissions(implied_codenames, ctype)
-            if "users" in entry or "groups" in entry
-            else []
+        permissions_by_action[action] = _resolve_permissions(
+            implied_codenames,
+            ctype,
         )
+
+    for action, entry in permissions.items():
+        codename = f"{action}_{model_name}"
+        permission_objs = permissions_by_action.get(action, [])
 
         if "users" in entry:
             _apply_bulk_permission_entry(

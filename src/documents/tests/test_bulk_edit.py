@@ -631,6 +631,44 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
                 [self.doc1.pk],
             )
 
+    def test_set_permissions_for_objects_unknown_action_applies_nothing(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A permissions dict with a valid action ordered ahead of an
+              unrecognized one
+        WHEN:
+            - set_permissions_for_objects is called
+        THEN:
+            - Permission.DoesNotExist is raised
+            - The valid action ahead of it is not applied either
+
+        Every action is resolved before any row is written, so a bad action
+        name cannot leave a half-applied change behind. That matters because
+        BulkEditObjectsView turns this exception into a 400: without the
+        up-front resolution the client would be told the request failed
+        while the leading action had already been committed.
+        """
+        with self.assertRaises(Permission.DoesNotExist):
+            set_permissions_for_objects(
+                {
+                    "view": {"users": [self.user1.id], "groups": []},
+                    "not_a_real_action": {"users": [self.user1.id], "groups": []},
+                },
+                Document,
+                [self.doc1.pk],
+            )
+
+        self.assertNotIn(
+            self.user1,
+            get_users_with_perms(
+                self.doc1,
+                only_with_perms_in=["view_document"],
+                with_group_users=False,
+            ),
+        )
+
     @mock.patch("documents.models.Document.delete")
     def test_delete_documents_old_uuid_field(self, m) -> None:
         m.side_effect = Exception("Data too long for column 'transaction_id' at row 1")
