@@ -22,6 +22,7 @@ from paperless.network import validate_outbound_http_url
 from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.base_model import DocumentClassifierSchema
 from paperless_ai.base_model import model_to_classification_suggestions
+from paperless_ai.exceptions import LLMProviderError
 from paperless_ai.exceptions import LLMTimeoutError
 
 logger = logging.getLogger("paperless_ai.client")
@@ -132,7 +133,7 @@ class AIClient:
         from llama_index.core.llms import ChatMessage
 
         if self.settings.llm_backend == LLMBackend.OLLAMA:
-            with self._normalize_timeouts():
+            with self._normalize_errors():
                 result = self.llm.chat(
                     [ChatMessage(role="user", content=prompt)],
                     format=DocumentClassifierSchema.model_json_schema(),
@@ -153,7 +154,7 @@ class AIClient:
             content=f"{prompt}\n\n"
             f"Answer by calling the {tool.metadata.name} tool. Do not write the answer as text.",
         )
-        with self._normalize_timeouts():
+        with self._normalize_errors():
             result = self.llm.chat_with_tools(
                 tools=[tool],
                 user_msg=user_msg,
@@ -173,7 +174,7 @@ class AIClient:
         )
 
     @contextmanager
-    def _normalize_timeouts(self) -> Iterator[None]:
+    def _normalize_errors(self) -> Iterator[None]:
         try:
             yield
         except httpx.TimeoutException as exc:
@@ -181,7 +182,22 @@ class AIClient:
         except Exception as exc:
             if self._is_openai_timeout(exc):
                 raise LLMTimeoutError from exc
+            if self._is_provider_error(exc):
+                raise LLMProviderError from exc
             raise
+
+    def _is_provider_error(self, exc: Exception) -> bool:
+        if self.settings.llm_backend == LLMBackend.OLLAMA:
+            from ollama import ResponseError
+
+            return isinstance(exc, ResponseError)
+
+        if self.settings.llm_backend == LLMBackend.OPENAI_LIKE:
+            from openai import APIStatusError
+
+            return isinstance(exc, APIStatusError)
+
+        return False
 
     def _is_openai_timeout(self, exc: Exception) -> bool:
         if self.settings.llm_backend != LLMBackend.OPENAI_LIKE:
