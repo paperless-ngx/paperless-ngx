@@ -251,6 +251,7 @@ from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
 from paperless_ai.ai_classifier import get_llm_output_language
 from paperless_ai.chat import stream_chat_with_documents
+from paperless_ai.exceptions import LLMProviderError
 from paperless_ai.exceptions import LLMTimeoutError
 from paperless_ai.matching import extract_unmatched_names
 from paperless_ai.matching import match_correspondents_by_name
@@ -1605,6 +1606,27 @@ class DocumentViewSet(
                     {"ai": [_("AI backend request timed out.")]},
                     status=status.HTTP_503_SERVICE_UNAVAILABLE,
                 )
+            except LLMProviderError:
+                logger.exception(
+                    "AI backend rejected the request for document %s",
+                    doc.pk,
+                )
+                return Response(
+                    {
+                        "ai": [
+                            _(
+                                "AI backend rejected the request. "
+                                "Check logs for details.",
+                            ),
+                        ],
+                    },
+                    status=status.HTTP_502_BAD_GATEWAY,
+                )
+            set_llm_suggestions_cache(
+                doc.pk,
+                llm_suggestions,
+                backend=llm_cache_backend,
+            )
 
         tags_choice: TaxonomyChoiceDict = llm_suggestions["tags"]
         correspondents_choice: TaxonomyChoiceDict = llm_suggestions["correspondents"]
@@ -5434,7 +5456,10 @@ class TrashView(ListModelMixin, PassUserMixin):
 
     model = Document
 
-    queryset = Document.deleted_objects.all()
+    # A version is listed separately only when its root is not in the trash.
+    queryset = Document.deleted_objects.exclude(
+        root_document_id__in=Document.deleted_objects.values("id"),
+    )
 
     def get(self, request: Request, format: str | None = None) -> Response:
         self.serializer_class = DocumentSerializer
@@ -5465,7 +5490,15 @@ class TrashView(ListModelMixin, PassUserMixin):
             return HttpResponseForbidden("Insufficient permissions")
         action = serializer.validated_data.get("action")
         if action == "restore":
-            restored = list(Document.deleted_objects.filter(id__in=doc_ids))
+            restored = list(self.get_queryset().filter(id__in=doc_ids))
+            if len(restored) != len(doc_ids):
+                raise ValidationError(
+                    {
+                        "documents": [
+                            "Restore the root document instead of one of its versions.",
+                        ],
+                    },
+                )
             for doc in restored:
                 doc.restore(strict=False)
             if restored:

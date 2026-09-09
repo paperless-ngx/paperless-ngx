@@ -392,6 +392,11 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.assertFalse(Document.objects.filter(id=self.doc1.id).exists())
         self.assertFalse(Document.objects.filter(id=version.id).exists())
 
+        Document.deleted_objects.get(id=self.doc1.id).restore(strict=False)
+
+        self.assertTrue(Document.objects.filter(id=self.doc1.id).exists())
+        self.assertTrue(Document.objects.filter(id=version.id).exists())
+
     def test_delete_version_document_keeps_root(self) -> None:
         version = Document.objects.create(
             checksum="A-v1",

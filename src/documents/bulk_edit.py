@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import tempfile
+import uuid
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Literal
@@ -379,7 +380,7 @@ def delete(doc_ids: list[int]) -> Literal["OK"]:
         )
         delete_ids = list({*doc_ids, *version_ids})
 
-        Document.objects.filter(id__in=delete_ids).delete()
+        Document.objects.filter(id__in=delete_ids).delete(transaction_id=uuid.uuid4())
 
         from documents.search import get_backend
 
