@@ -207,4 +207,20 @@ describe('ChatComponent', () => {
     component.searchInputKeyDown(event)
     expect(component.sendMessage).not.toHaveBeenCalled()
   })
+
+  it('should show a thinking indicator until the first response chunk arrives', async () => {
+    component.input.set('Hello')
+    component.sendMessage()
+    fixture.detectChanges()
+
+    const messages = fixture.nativeElement.querySelector('.chat-messages')
+    expect(messages.textContent).toContain('Thinking')
+    expect(messages.querySelector('.spinner-border')).not.toBeNull()
+
+    mockStream$.next('Hi there')
+    await jest.runAllTimersAsync()
+    fixture.detectChanges()
+    expect(messages.textContent).not.toContain('Thinking')
+    expect(messages.querySelector('.spinner-border')).toBeNull()
+  })
 })

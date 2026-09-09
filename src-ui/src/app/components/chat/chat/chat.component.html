@@ -9,10 +9,17 @@
         @for (message of messages(); track message) {
           <div class="message d-flex flex-row small" [class.justify-content-end]="message.role === 'user'">
             <div class="p-2 m-2" [class.bg-body]="message.role === 'user'">
-              <span class="text-break">
-                {{ message.content }}
-                @if (message.isStreaming) { <span class="blinking-cursor">|</span> }
-              </span>
+              @if (message.role === 'assistant' && message.isStreaming && !message.content) {
+                <span class="d-flex align-items-center gap-2 text-muted">
+                  <output class="spinner-border spinner-border-sm" aria-hidden="true"></output>
+                  <ng-container i18n>Thinking...</ng-container>
+                </span>
+              } @else {
+                <span class="text-break">
+                  {{ message.content }}
+                  @if (message.isStreaming) { <span class="blinking-cursor">|</span> }
+                </span>
+              }
               @if (message.role === 'assistant' && message.references?.length) {
                 <div class="chat-references list-group mt-3">
                   @for (reference of message.references; track reference.id) {
