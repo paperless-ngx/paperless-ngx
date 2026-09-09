@@ -209,8 +209,8 @@ class TestDocumentListEffectiveContentAnnotation:
             "version-content-0",
             "version-content-1",
         ]
-        assert len(three_documents.captured_queries) == len(
-            one_document.captured_queries,
+        assert len(_get_document_queries(three_documents)) == len(
+            _get_document_queries(one_document),
         )
 
     def test_list_without_content_field_skips_prefetch_and_omits_content(
@@ -348,6 +348,21 @@ class TestHasPrefetchedEffectiveContent:
         document._prefetched_objects_cache = {"versions": []}
 
         assert has_prefetched_effective_content(document) is True
+
+
+def _get_document_queries(
+    ctx: CaptureQueriesContext,
+) -> list[dict[str, str]]:
+    """
+    The queries a list request spends on the documents themselves, i.e.
+    everything but the one-time django_content_type lookup guardian's
+    permission filtering makes. That lookup is process-cached, and the
+    autouse fixture in conftest clears the cache before every test, so it
+    lands in whichever request happens to run first and never repeats --
+    counting it makes a request look like it costs one query more than the
+    identical request after it.
+    """
+    return [q for q in ctx.captured_queries if '"django_content_type"' not in q["sql"]]
 
 
 def _get_effective_content_fallback_queries(
