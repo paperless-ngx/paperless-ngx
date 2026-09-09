@@ -7,7 +7,9 @@ import pikepdf
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
@@ -529,6 +531,10 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             - set_permissions runs over a small batch vs. a much larger one
         THEN:
             - Permissions are applied correctly at both scales
+            - Query count does not grow with the number of documents, i.e.
+              each user/group is applied across all documents with one
+              batched call rather than one call per (document, identity)
+              pair
         """
         permissions = {
             "view": {
@@ -541,23 +547,39 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             },
         }
 
-        def run_with_n_documents(n: int) -> None:
+        def run_with_n_documents(n: int) -> int:
             docs = [
                 Document.objects.create(checksum=f"perm-{n}-{i}", title=f"perm-{n}-{i}")
                 for i in range(n)
             ]
-            bulk_edit.set_permissions(
-                [doc.id for doc in docs],
-                set_permissions=permissions,
-                owner=self.owner,
-                merge=False,
-            )
+            with CaptureQueriesContext(connection) as ctx:
+                bulk_edit.set_permissions(
+                    [doc.id for doc in docs],
+                    set_permissions=permissions,
+                    owner=self.owner,
+                    merge=False,
+                )
             for doc in docs:
                 self.assertEqual(get_users_with_perms(doc).count(), 2)
                 self.assertEqual(get_groups_with_perms(doc).count(), 1)
+            return len(ctx.captured_queries)
 
-        run_with_n_documents(5)
-        run_with_n_documents(50)
+        small_batch_queries = run_with_n_documents(5)
+        large_batch_queries = run_with_n_documents(50)
+
+        # A tolerance rather than equality, matching the N+1 check in
+        # test_views.py: bulk_create's batch_size caps rows per INSERT, so a
+        # large enough selection does legitimately add statements, and the
+        # per-process ContentType cache makes the first run carry an extra
+        # query. Neither can hide a regression to per-document assignment,
+        # which would be ~10x the small-batch count here.
+        self.assertLessEqual(
+            large_batch_queries,
+            small_batch_queries + 5,
+            "Permission assignment appears to scale with document count: "
+            f"{small_batch_queries} queries for 5 documents vs. "
+            f"{large_batch_queries} for 50",
+        )
 
     @mock.patch("documents.tasks.bulk_update_documents.apply_async")
     def test_set_permissions_grants_direct_perm_even_if_already_granted_via_group(
