@@ -310,8 +310,10 @@ def modify_custom_fields(
     custom_fields_by_id: dict[int, CustomField] = CustomField.objects.in_bulk(
         [field_id for field_id, _ in add_custom_fields],
     )
-    # Only doc link fields need the Document objects themselves, everything
-    # else works off the id alone. content is large and unused here.
+    # Passed to update_or_create() below rather than a bare id, so the FK is
+    # cached on the created instance and auditlog's post_save receiver does
+    # not reload it per row. Only needed for additions. content is deferred:
+    # the one field here that is both large and unused.
     docs_by_id: dict[int, Document] = (
         Document.objects.defer("content").in_bulk(affected_docs)
         if add_custom_fields
