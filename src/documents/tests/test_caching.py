@@ -11,7 +11,7 @@ from documents.caching import retrieve_llm_suggestions
 from paperless.signed_pickle import HMAC_SIZE
 from paperless.signed_pickle import signed_pickle_dumps
 from paperless.signed_pickle import signed_pickle_loads
-from paperless_ai.exceptions import LLMTimeoutError
+from paperless_ai.exceptions import LLMGenerationFailedError
 
 
 def test_lru_cache_entries() -> None:
@@ -190,7 +190,7 @@ def test_llm_suggestions_waiter_does_not_rerun_a_failed_generation(mocker) -> No
         with pytest.raises(ValueError, match="Unknown model"):
             first.result(timeout=2)
         release_waiter.set()
-        with pytest.raises(LLMTimeoutError):
+        with pytest.raises(LLMGenerationFailedError):
             second.result(timeout=2)
 
     assert calls == 1

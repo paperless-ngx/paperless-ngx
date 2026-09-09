@@ -20,6 +20,7 @@ from documents.models import Document
 from paperless.signed_pickle import SignedPickleError
 from paperless.signed_pickle import signed_pickle_dumps
 from paperless.signed_pickle import signed_pickle_loads
+from paperless_ai.exceptions import LLMGenerationFailedError
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import User
@@ -278,7 +279,6 @@ def retrieve_llm_suggestions(
     """Return cached LLM suggestions, generating them once across workers."""
     # Lazy import to avoid pulling in the whole AI stuff
     from paperless_ai.ai_classifier import get_ai_document_classification
-    from paperless_ai.exceptions import LLMTimeoutError
 
     lock_key = (
         f"{get_suggestion_cache_key(document.pk)}_llm_lock_"
@@ -295,11 +295,9 @@ def retrieve_llm_suggestions(
         lock_token = uuid.uuid4().hex
         if cache.add(lock_key, lock_token, lock_timeout):
             if waited:
-                # The generation we were waiting on has ended without caching
-                # anything so it either failed or outlived its lock. Give up
-                # rather than re-running it
+                # generation either failed or outlived its lock, give up rather than re-running
                 cache.delete(lock_key)
-                raise LLMTimeoutError
+                raise LLMGenerationFailedError
 
             try:
                 # The cache may have been populated while acquiring the lock.
