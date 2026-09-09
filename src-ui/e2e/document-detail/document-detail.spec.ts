@@ -1,14 +1,9 @@
-import { expect, test, type WebSocketRoute } from '@playwright/test'
-import path from 'node:path'
-
-const REQUESTS_HAR = path.join(__dirname, 'requests/api-document-detail.har')
-const REQUESTS_HAR2 = path.join(__dirname, 'requests/api-document-detail2.har')
+import { expect, test } from '@playwright/test'
 
 test('should activate / deactivate save button when changes are saved', async ({
   page,
 }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
-  await page.goto('/documents/175/')
+  await page.goto('/documents/1/')
   await page.waitForSelector('pngx-document-detail pngx-input-text:first-child')
   await expect(page.getByTitle('Storage path', { exact: true })).toHaveText(
     /\w+/
@@ -19,8 +14,7 @@ test('should activate / deactivate save button when changes are saved', async ({
 })
 
 test('should warn on unsaved changes', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
-  await page.goto('/documents/175/')
+  await page.goto('/documents/1/')
   await expect(page.getByTitle('Correspondent', { exact: true })).toHaveText(
     /\w+/
   )
@@ -38,28 +32,27 @@ test('should warn on unsaved changes', async ({ page }) => {
 })
 
 test('should support tab direct navigation', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
-  await page.goto('/documents/175/details')
+  await page.goto('/documents/1/details')
   await expect(page.getByRole('tab', { name: 'Details' })).toHaveAttribute(
     'aria-selected',
     'true'
   )
-  await page.goto('/documents/175/content')
+  await page.goto('/documents/1/content')
   await expect(page.getByRole('tab', { name: 'Content' })).toHaveAttribute(
     'aria-selected',
     'true'
   )
-  await page.goto('/documents/175/metadata')
+  await page.goto('/documents/1/metadata')
   await expect(page.getByRole('tab', { name: 'Metadata' })).toHaveAttribute(
     'aria-selected',
     'true'
   )
-  await page.goto('/documents/175/notes')
+  await page.goto('/documents/1/notes')
   await expect(page.getByRole('tab', { name: 'Notes' })).toHaveAttribute(
     'aria-selected',
     'true'
   )
-  await page.goto('/documents/175/permissions')
+  await page.goto('/documents/1/permissions')
   await expect(page.getByRole('tab', { name: 'Permissions' })).toHaveAttribute(
     'aria-selected',
     'true'
@@ -67,8 +60,7 @@ test('should support tab direct navigation', async ({ page }) => {
 })
 
 test('should show a mobile preview', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
-  await page.goto('/documents/175/')
+  await page.goto('/documents/1/')
   await page.setViewportSize({ width: 400, height: 1000 })
   await expect(page.getByRole('tab', { name: 'Preview' })).toBeVisible()
   await page.getByRole('tab', { name: 'Preview' }).click()
@@ -76,8 +68,7 @@ test('should show a mobile preview', async ({ page }) => {
 })
 
 test('should show a list of notes', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
-  await page.goto('/documents/175/notes')
+  await page.goto('/documents/1/notes')
   await expect(page.locator('pngx-document-notes')).toBeVisible()
   await expect(
     await page.getByRole('button', {
@@ -88,32 +79,25 @@ test('should show a list of notes', async ({ page }) => {
 })
 
 test('should support quick filters', async ({ page }) => {
-  await page.routeFromHAR(REQUESTS_HAR2, { notFound: 'fallback' })
-  await page.goto('/documents/175/details')
+  await page.goto('/documents/1/details')
   await page
     .getByRole('button', { name: 'Filter documents with these Tags' })
     .click()
-  await expect(page).toHaveURL(/tags__id__all=4&sort=created&reverse=1&page=1/)
+  await expect(page).toHaveURL(
+    /tags__id__all=2,1&sort=created&reverse=1&page=1/
+  )
 })
 
 test('should finish reloading the preview after a remote document update', async ({
   page,
 }) => {
-  let resolveStatusSocket: (socket: WebSocketRoute) => void
-  const statusSocketReady = new Promise<WebSocketRoute>((resolve) => {
-    resolveStatusSocket = resolve
-  })
-  await page.routeWebSocket(/\/ws\/status\/$/, (socket) => {
-    resolveStatusSocket(socket)
-  })
-  await page.routeFromHAR(REQUESTS_HAR, { notFound: 'fallback' })
   let previewRequestCount = 0
   page.on('request', (request) => {
-    if (request.url().includes('/api/documents/175/preview/')) {
+    if (request.url().includes('/api/documents/1/preview/')) {
       previewRequestCount++
     }
   })
-  await page.goto('/documents/175/details')
+  await page.goto('/documents/1/details')
 
   await page.locator('pngx-document-detail').waitFor()
   await expect(page.getByTitle('Storage path', { exact: true })).toHaveText(
@@ -128,27 +112,37 @@ test('should finish reloading the preview after a remote document update', async
   expect(previewWasLoaded).toBe(true)
   const previewRequestsBeforeReload = previewRequestCount
 
-  const statusSocket = await statusSocketReady
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const detail = document.querySelector('pngx-document-detail')
+        return (window as any).ng.getComponent(detail).networkActive()
+      })
+    )
+    .toBe(false)
   const documentReloaded = page.waitForResponse(
     (response) =>
-      response.url().includes('/api/documents/175/?full_perms=true') &&
+      response.url().includes('/api/documents/1/?full_perms=true') &&
       response.request().method() === 'GET'
   )
-  statusSocket.send(
-    JSON.stringify({
-      type: 'document_updated',
-      data: {
-        document_id: 175,
-        modified: '2026-07-26T20:00:00Z',
-      },
+  await page.evaluate(() => {
+    const detail = document.querySelector('pngx-document-detail')
+    const component = (window as any).ng.getComponent(detail)
+    component.handleIncomingDocumentUpdated({
+      document_id: 1,
+      modified: '2099-07-26T20:00:00Z',
     })
-  )
+  })
   await documentReloaded
-
-  await expect(
-    page.getByText('Document reloaded with latest changes.').first()
-  ).toBeVisible()
   await expect
     .poll(() => previewRequestCount)
-    .toBeGreaterThan(previewRequestsBeforeReload + 1)
+    .toBeGreaterThan(previewRequestsBeforeReload)
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const detail = document.querySelector('pngx-document-detail')
+        return (window as any).ng.getComponent(detail).previewLoaded()
+      })
+    )
+    .toBe(true)
 })

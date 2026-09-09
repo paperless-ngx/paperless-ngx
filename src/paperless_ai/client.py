@@ -19,7 +19,10 @@ from paperless.network import PinnedHostHTTPTransport
 from paperless.network import create_pinned_async_httpx_client
 from paperless.network import create_pinned_httpx_client
 from paperless.network import validate_outbound_http_url
+from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.base_model import DocumentClassifierSchema
+from paperless_ai.base_model import model_to_classification_suggestions
+from paperless_ai.exceptions import LLMProviderError
 from paperless_ai.exceptions import LLMTimeoutError
 
 logger = logging.getLogger("paperless_ai.client")
@@ -115,7 +118,12 @@ class AIClient:
         else:
             raise ValueError(f"Unsupported LLM backend: {self.settings.llm_backend}")
 
-    def run_llm_query(self, prompt: str) -> str:
+    def run_llm_query(
+        self,
+        prompt: str,
+        *,
+        allowed_candidate_ids: dict[str, set[int]] | None = None,
+    ) -> ClassificationSuggestions:
         logger.debug(
             "Running LLM query against %s with model %s",
             self.settings.llm_backend,
@@ -124,22 +132,29 @@ class AIClient:
 
         from llama_index.core.llms import ChatMessage
 
-        user_msg = ChatMessage(role="user", content=prompt)
         if self.settings.llm_backend == LLMBackend.OLLAMA:
-            with self._normalize_timeouts():
+            with self._normalize_errors():
                 result = self.llm.chat(
-                    [user_msg],
+                    [ChatMessage(role="user", content=prompt)],
                     format=DocumentClassifierSchema.model_json_schema(),
                     think=False,
                 )
             logger.debug("LLM query result: %s", result)
             parsed = DocumentClassifierSchema(**json.loads(result.message.content))
-            return parsed.model_dump()
+            return model_to_classification_suggestions(
+                parsed,
+                allowed_candidate_ids,
+            )
 
         from llama_index.core.program.function_program import get_function_tool
 
         tool = get_function_tool(DocumentClassifierSchema)
-        with self._normalize_timeouts():
+        user_msg = ChatMessage(
+            role="user",
+            content=f"{prompt}\n\n"
+            f"Answer by calling the {tool.metadata.name} tool. Do not write the answer as text.",
+        )
+        with self._normalize_errors():
             result = self.llm.chat_with_tools(
                 tools=[tool],
                 user_msg=user_msg,
@@ -153,10 +168,13 @@ class AIClient:
             )
         logger.debug("LLM query result: %s", tool_calls)
         parsed = DocumentClassifierSchema(**tool_calls[0].tool_kwargs)
-        return parsed.model_dump()
+        return model_to_classification_suggestions(
+            parsed,
+            allowed_candidate_ids,
+        )
 
     @contextmanager
-    def _normalize_timeouts(self) -> Iterator[None]:
+    def _normalize_errors(self) -> Iterator[None]:
         try:
             yield
         except httpx.TimeoutException as exc:
@@ -164,7 +182,22 @@ class AIClient:
         except Exception as exc:
             if self._is_openai_timeout(exc):
                 raise LLMTimeoutError from exc
+            if self._is_provider_error(exc):
+                raise LLMProviderError from exc
             raise
+
+    def _is_provider_error(self, exc: Exception) -> bool:
+        if self.settings.llm_backend == LLMBackend.OLLAMA:
+            from ollama import ResponseError
+
+            return isinstance(exc, ResponseError)
+
+        if self.settings.llm_backend == LLMBackend.OPENAI_LIKE:
+            from openai import APIStatusError
+
+            return isinstance(exc, APIStatusError)
+
+        return False
 
     def _is_openai_timeout(self, exc: Exception) -> bool:
         if self.settings.llm_backend != LLMBackend.OPENAI_LIKE:

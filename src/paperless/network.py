@@ -129,7 +129,7 @@ def _rewrite_request_to_pinned_ip(
         method=request.method,
         url=new_url,
         headers=new_headers,
-        content=request.stream,
+        stream=request.stream,
         extensions=request.extensions,
     )
     rewritten_request.extensions["sni_hostname"] = hostname

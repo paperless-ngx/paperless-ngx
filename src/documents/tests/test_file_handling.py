@@ -16,10 +16,12 @@ from django.test import override_settings
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 
+from documents.file_handling import UnsafeFilePathError
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
 from documents.file_handling import generate_unique_filename
+from documents.file_handling import validate_path_in_root
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -1510,6 +1512,101 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
         # Ensure that filename is properly generated
         document.filename = generate_filename(document)
         self.assertEqual(document.filename, Path("XX/doc1.pdf"))
+
+    @override_settings(FILENAME_FORMAT_REMOVE_NONE=True)
+    def test_remove_none_cannot_create_traversal(self) -> None:
+        """
+        GIVEN:
+            - A storage path whose components are safe when validated, but become
+              ".." once the -none- placeholder is stripped out
+            - FILENAME_FORMAT_REMOVE_NONE is True
+        WHEN:
+            - the filename is generated for the document
+        THEN:
+            - The unsafe filename is rejected and the default naming is used
+        """
+        sp = StoragePath.objects.create(
+            name="sp1",
+            path=".-none-./.-none-./tmp/pwned",
+        )
+        document = Document.objects.create(
+            title="doc1",
+            mime_type="application/pdf",
+            storage_path=sp,
+        )
+
+        filename = generate_filename(document)
+
+        self.assertNotIn("..", filename.parts)
+        self.assertEqual(filename, Path(f"{document.pk:07}.pdf"))
+
+    @override_settings(FILENAME_FORMAT_REMOVE_NONE=True)
+    def test_remove_none_still_removes_placeholder(self) -> None:
+        """
+        GIVEN:
+            - A storage path with a placeholder for a value the document does not have
+            - FILENAME_FORMAT_REMOVE_NONE is True
+        WHEN:
+            - the filename is generated for the document
+        THEN:
+            - The placeholder is still removed as before
+        """
+        sp = StoragePath.objects.create(
+            name="sp1",
+            path="{{ correspondent }}/{{ title }}",
+        )
+        document = Document.objects.create(
+            title="doc1",
+            mime_type="application/pdf",
+            storage_path=sp,
+        )
+
+        self.assertEqual(generate_filename(document), Path("doc1.pdf"))
+
+    @override_settings(
+        FILENAME_FORMAT="{{ correspondent }}/{{ title }}/{{ doc_pk }}",
+        FILENAME_FORMAT_REMOVE_NONE=True,
+    )
+    def test_remove_none_cannot_create_traversal_from_metadata(self) -> None:
+        """
+        GIVEN:
+            - A global filename format with directory components
+            - A document whose title becomes ".." once -none- is stripped out
+            - FILENAME_FORMAT_REMOVE_NONE is True
+        WHEN:
+            - the filename is generated for the document
+        THEN:
+            - The unsafe filename is rejected and the default naming is used
+        """
+        document = Document.objects.create(
+            title=".-none-.",
+            mime_type="application/pdf",
+        )
+
+        filename = generate_filename(document)
+
+        self.assertNotIn("..", filename.parts)
+        self.assertEqual(filename, Path(f"{document.pk:07}.pdf"))
+
+    def test_validate_path_in_root(self) -> None:
+        """
+        GIVEN:
+            - A path inside of the root and a path outside of it
+        WHEN:
+            - The path is validated against the root
+        THEN:
+            - Only the path outside of the root is rejected
+        """
+        validate_path_in_root(
+            settings.ORIGINALS_DIR / "0000001.pdf",
+            settings.ORIGINALS_DIR,
+        )
+
+        with self.assertRaises(UnsafeFilePathError):
+            validate_path_in_root(
+                (settings.ORIGINALS_DIR / ".." / ".." / "pwned.pdf"),
+                settings.ORIGINALS_DIR,
+            )
 
     def test_complex_template_strings(self) -> None:
         """

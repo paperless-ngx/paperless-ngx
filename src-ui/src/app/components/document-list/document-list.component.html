@@ -14,7 +14,7 @@
   </div>
   <div class="d-none d-sm-flex flex-fill me-3">
     <div class="input-group input-group-sm">
-      <span class="input-group-text border-0" i18n>Select:</span>
+      <span class="input-group-text bg-transparent border-0" i18n>Select:</span>
     </div>
     <div class="btn-group btn-group-sm flex-nowrap">
       @if (list.hasSelection) {
@@ -116,7 +116,7 @@
 
 </pngx-page-header>
 
-<div class="row sticky-top py-3 mt-n2 mt-md-n3 bg-body">
+<div class="row sticky-top py-3 mt-n2 mt-md-n3 bg-body rounded shadow-sm">
   <pngx-filter-editor [hidden]="isBulkEditing" [disabled]="isBulkEditing" [filterRules]="list.filterRules" (filterRulesChange)="onFilterRulesChange($event)" (resetFilterRules)="onFilterRulesReset($event)" [unmodifiedFilterRules]="unmodifiedFilterRules()" [selectionData]="list.selectionData" #filterEditor></pngx-filter-editor>
   <pngx-bulk-editor [hidden]="!isBulkEditing" [disabled]="!isBulkEditing"></pngx-bulk-editor>
 </div>

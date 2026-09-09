@@ -210,6 +210,48 @@ describe('SettingsService', () => {
     expect(settingsService.get(SETTINGS_KEYS.THEME_COLOR)).toEqual('#000000')
   })
 
+  it('provides stable signals that update when settings change', () => {
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    req.flush(ui_settings)
+
+    const notesEnabled = settingsService.getSignal<boolean>(
+      SETTINGS_KEYS.NOTES_ENABLED
+    )
+
+    expect(notesEnabled()).toBeTruthy()
+    expect(
+      settingsService.getSignal<boolean>(SETTINGS_KEYS.NOTES_ENABLED)
+    ).toBe(notesEnabled)
+
+    settingsService.set(SETTINGS_KEYS.NOTES_ENABLED, false)
+
+    expect(notesEnabled()).toBeFalsy()
+  })
+
+  it('updates setting signals when settings are reinitialized', () => {
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    req.flush(ui_settings)
+    const appTitle = settingsService.getSignal<string>(SETTINGS_KEYS.APP_TITLE)
+
+    settingsService.initializeSettings().subscribe()
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    req.flush({
+      ...ui_settings,
+      settings: {
+        ...ui_settings.settings,
+        app_title: 'Updated title',
+      },
+    })
+
+    expect(appTitle()).toBe('Updated title')
+  })
+
   it('sets django cookie for languages', () => {
     httpTestingController
       .expectOne(`${environment.apiBaseUrl}ui_settings/`)

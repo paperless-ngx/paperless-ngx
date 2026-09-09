@@ -12,7 +12,6 @@ from typing import TYPE_CHECKING
 from typing import Any
 
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import FieldError
 from django.db.models import Case
 from django.db.models import CharField
 from django.db.models import Count
@@ -25,6 +24,7 @@ from django.db.models import Sum
 from django.db.models import Value
 from django.db.models import When
 from django.db.models.functions import Cast
+from django.db.models.functions import NullIf
 from django.utils.translation import gettext_lazy as _
 from django_filters import DateFilter
 from django_filters.rest_framework import BooleanFilter
@@ -50,7 +50,9 @@ from documents.models import ShareLink
 from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.permissions import permitted_document_ids
 from documents.permissions import permitted_object_ids
+from documents.versioning import annotate_effective_content
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -180,14 +182,9 @@ class TitleContentFilter(Filter):
             logger.warning(
                 "Deprecated document filter parameter 'title_content' used; use `text` instead.",
             )
-            try:
-                return qs.filter(
-                    Q(title__icontains=value) | Q(effective_content__icontains=value),
-                )
-            except FieldError:
-                return qs.filter(
-                    Q(title__icontains=value) | Q(content__icontains=value),
-                )
+            return annotate_effective_content(qs).filter(
+                Q(title__icontains=value) | Q(effective_content__icontains=value),
+            )
         else:
             return qs
 
@@ -198,14 +195,9 @@ class EffectiveContentFilter(Filter):
         value = value.strip() if isinstance(value, str) else value
         if not value:
             return qs
-        try:
-            return qs.filter(
-                **{f"effective_content__{self.lookup_expr}": value},
-            )
-        except FieldError:
-            return qs.filter(
-                **{f"content__{self.lookup_expr}": value},
-            )
+        return annotate_effective_content(qs).filter(
+            **{f"effective_content__{self.lookup_expr}": value},
+        )
 
 
 @extend_schema_field(serializers.BooleanField)
@@ -793,6 +785,12 @@ class CustomFieldQueryFilter(Filter):
 
 
 class DocumentFilterSet(FilterSet):
+    has_duplicates = BooleanFilter(method="filter_has_duplicates")
+
+    def __init__(self, *args: Any, user: Any = None, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self._user = user
+
     is_tagged = BooleanFilter(
         label="Is tagged",
         field_name="tags",
@@ -851,6 +849,38 @@ class DocumentFilterSet(FilterSet):
     shared_by__id = SharedByUser()
 
     mime_type = MimeTypeFilter()
+
+    def filter_has_duplicates(self, queryset, name, value):
+        if value is None:
+            return queryset
+
+        user = (
+            self._user
+            if self._user is not None
+            else getattr(self.request, "user", None)
+        )
+        queryset = queryset.alias(
+            nonempty_archive_checksum=NullIf("archive_checksum", Value("")),
+        )
+
+        visible_root_documents = Document.global_objects.filter(
+            root_document__isnull=True,
+            pk__in=permitted_document_ids(
+                user,
+                include_deleted=True,
+            ),
+        ).exclude(pk=OuterRef("pk"))
+        # see serialisers._get_viewable_duplicates().
+        matching_duplicates = visible_root_documents.filter(
+            Q(checksum=OuterRef("checksum"))
+            | Q(checksum=OuterRef("nonempty_archive_checksum"))
+            | Q(archive_checksum=OuterRef("checksum"))
+            | Q(archive_checksum=OuterRef("nonempty_archive_checksum")),
+        )
+
+        return queryset.alias(
+            has_visible_duplicates=Exists(matching_duplicates),
+        ).filter(has_visible_duplicates=value)
 
     # Backwards compatibility
     created__date__gt = DateFilter(field_name="created", lookup_expr="gt")

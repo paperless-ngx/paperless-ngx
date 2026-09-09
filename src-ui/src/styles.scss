@@ -47,25 +47,17 @@ $grid-breakpoints: (
 );
 
 :root {
+  --bs-border-radius: #{$border-radius};
+
   @each $name, $value in $grid-breakpoints {
     --bs-breakpoint-#{$name}: #{$value};
-  }
-}
-
-@media (min-width: 2400px) {
-  .col-xxxl-1 {
-    flex: 0 0 auto;
-    width: 8.33333333%;
-  }
-  .col-xxxl-11 {
-    flex: 0 0 auto;
-    width:91.66666667%
   }
 }
 
 // Paperless-ngx styles
 body {
   --pngx-body-font-size: 0.875rem;
+  --pngx-sidebar-expanded-width: clamp(15rem, 16.66666667vw, 20rem);
   font-size: var(--pngx-body-font-size);
   height: 100vh;
   letter-spacing: -0.005em;
@@ -88,24 +80,26 @@ body {
 }
 
 .btn {
-  --bs-btn-border-radius: .425rem;
-  --bs-border-radius-sm: .425rem;
+  --bs-border-radius-sm: #{$border-radius};
   font-weight: 500;
 }
 
-.form-control,
-.form-select,
-.input-group-text {
-  border-radius: .425rem;
-}
-
 .pagination, .input-group {
-  --bs-border-radius-sm: .425rem;
+  --bs-border-radius-sm: #{$border-radius};
 }
 
 @media(min-width: 768px) {
   .col-slim {
     padding-left: calc(56px + $grid-gutter-width) !important;
+  }
+
+  .col-sidebar-expanded {
+    flex: 0 0 auto;
+    width: calc(100% - var(--pngx-sidebar-expanded-width));
+  }
+
+  .offset-sidebar-expanded {
+    margin-left: var(--pngx-sidebar-expanded-width);
   }
 }
 
@@ -380,17 +374,6 @@ th[pngxSortable] {
       }
     }
 
-    .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
-      background-color: var(--pngx-bg-darker) !important;
-      color: var(--pngx-body-color-accent) !important;
-    }
-
-    .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected,
-    .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected.ng-option-marked {
-      font-weight: bold;
-      background-color: var(--pngx-bg-alt2) !important;
-    }
-
     &.ng-select-multiple .ng-select-container .ng-value-container .ng-placeholder,
     .ng-select-container .ng-value-container .ng-placeholder {
       top: 7px;
@@ -405,6 +388,22 @@ th[pngxSortable] {
         border-bottom-right-radius: 0;
       }
     }
+  }
+}
+
+// ng-select renders the dropdown panel in a CDK overlay outside the component
+.ng-dropdown-panel {
+  font-size: var(--pngx-body-font-size);
+
+  .ng-dropdown-panel-items .ng-option.ng-option-marked {
+    background-color: var(--pngx-bg-darker) !important;
+    color: var(--pngx-body-color-accent) !important;
+  }
+
+  .ng-dropdown-panel-items .ng-option.ng-option-selected,
+  .ng-dropdown-panel-items .ng-option.ng-option-selected.ng-option-marked {
+    font-weight: bold;
+    background-color: var(--pngx-bg-alt2) !important;
   }
 }
 
@@ -690,10 +689,6 @@ table.table {
   --bs-toast-max-width: var(--pngx-toast-max-width);
 }
 
-.alert {
-  --bs-border-radius: .425rem;
-}
-
 .alert-primary {
   --bs-alert-color: var(--bs-primary);
   --bs-alert-bg: var(--pngx-primary-faded);
@@ -825,8 +820,6 @@ code {
   --bs-accordion-bg: var(--bs-light);
   --bs-accordion-active-color: var(--bs-primary);
   --bs-accordion-active-bg: var(--pngx-bg-alt);
-  --bs-border-radius: .425rem;
-  --bs-accordion-inner-border-radius: calc(.425rem - 1px);
 }
 
 .accordion-button::after {
@@ -850,7 +843,7 @@ code {
 }
 
 /* Animate items as they're being sorted. */
-.cdk-drop-list-dragging .cdk-drag {
+.cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-preview) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 

@@ -6,9 +6,9 @@ from pathlib import Path
 import pytest
 from django.test import override_settings
 
-from paperless.celery import HMAC_SIZE
 from paperless.celery import signed_pickle_dumps
 from paperless.celery import signed_pickle_loads
+from paperless.signed_pickle import HMAC_SIZE
 
 
 class TestSignedPickleSerializer:

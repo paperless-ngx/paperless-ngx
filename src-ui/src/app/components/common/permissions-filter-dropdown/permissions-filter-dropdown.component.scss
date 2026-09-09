@@ -6,3 +6,18 @@
     min-width: 1em;
     min-height: 1em;
 }
+
+.focus-variants {
+  .variant-focused {
+    display: none;
+  }
+
+  &:hover, &:focus {
+    .variant-unfocused {
+      display: none;
+    }
+    .variant-focused {
+      display: block;
+    }
+  }
+}

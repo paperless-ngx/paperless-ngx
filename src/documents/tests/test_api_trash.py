@@ -7,9 +7,10 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.models import Document
+from documents.tests.utils import DirectoriesMixin
 
 
-class TestTrashAPI(APITestCase):
+class TestTrashAPI(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
@@ -206,3 +207,65 @@ class TestTrashAPI(APITestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("have not yet been deleted", resp.data["documents"][0])
+
+    def _make_versioned_document(self) -> tuple[Document, list[Document]]:
+        root = Document.objects.create(
+            title="root",
+            content="root-content",
+            checksum="root",
+            mime_type="application/pdf",
+        )
+        versions = [
+            Document.objects.create(
+                title=f"v{index}",
+                content=f"v{index}-content",
+                checksum=f"v{index}",
+                mime_type="application/pdf",
+                root_document=root,
+                version_index=index,
+            )
+            for index in range(1, 3)
+        ]
+        return root, versions
+
+    def test_api_trash_restore_document_restores_its_versions(self) -> None:
+        """
+        GIVEN:
+            - Existing document with two versions
+        WHEN:
+            - API request to delete the document
+            - API request to restore it from the trash
+        THEN:
+            - Only the document itself is listed in the trash
+            - A version cannot be restored without its root
+            - The document is restored together with all of its versions
+        """
+        root, versions = self._make_versioned_document()
+
+        self.client.force_login(user=self.user)
+        self.client.delete(f"/api/documents/{root.pk}/")
+        self.assertEqual(Document.deleted_objects.count(), 3)
+
+        resp = self.client.get("/api/trash/")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.data["count"], 1)
+        self.assertEqual(resp.data["results"][0]["id"], root.pk)
+
+        # A version cannot be restored while its root remains in the trash.
+        resp = self.client.post(
+            "/api/trash/",
+            {"action": "restore", "documents": [versions[0].pk]},
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Restore the root document", resp.data["documents"][0])
+
+        resp = self.client.post(
+            "/api/trash/",
+            {"action": "restore", "documents": [root.pk]},
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(Document.deleted_objects.count(), 0)
+        self.assertCountEqual(
+            Document.objects.filter(root_document=root).values_list("id", flat=True),
+            [version.pk for version in versions],
+        )

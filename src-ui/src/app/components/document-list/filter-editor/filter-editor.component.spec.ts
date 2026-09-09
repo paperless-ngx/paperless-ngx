@@ -53,6 +53,7 @@ import {
   FILTER_HAS_CUSTOM_FIELDS_ALL,
   FILTER_HAS_CUSTOM_FIELDS_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
+  FILTER_HAS_DUPLICATES,
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
   FILTER_HAS_TAGS_ANY,
@@ -427,6 +428,38 @@ describe('FilterEditorComponent', () => {
     expect(component.textFilterTarget).toEqual('mime-type') // TEXT_FILTER_TARGET_MIME_TYPE
   })
 
+  it('should ingest filter rules for documents with duplicates', () => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_DUPLICATES,
+        value: 'true',
+      },
+    ]
+    fixture.detectChanges()
+
+    expect(component.textFilterTarget).toEqual('duplicates')
+    expect(component.textFilterModifier).toEqual('has-duplicates')
+    expect(component.textFilterInputDisabled).toBeTruthy()
+  })
+
+  it('should ingest filter rules for documents without duplicates', () => {
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_DUPLICATES,
+        value: 'false',
+      },
+    ]
+
+    expect(component.textFilterTarget).toEqual('duplicates')
+    expect(component.textFilterModifier).toEqual('does-not-have-duplicates')
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_HAS_DUPLICATES,
+        value: 'false',
+      },
+    ])
+  })
+
   it('should ingest text filter rules for fulltext query', () => {
     expect(component.textFilter).toEqual(null)
     component.filterRules = [
@@ -619,6 +652,43 @@ describe('FilterEditorComponent', () => {
       },
     ]
     component.toggleTag(2) // coverage
+  })
+
+  it('should reflect ingested tag filter rules in the dropdown toggle', () => {
+    const dropdown = fixture.debugElement.query(
+      By.css('pngx-filterable-dropdown')
+    )
+    const toggle = dropdown.nativeElement.querySelector('#dropdown_tags')
+    expect(toggle.classList.contains('btn-primary')).toBeFalsy()
+    expect(
+      dropdown.nativeElement.querySelector('pngx-clearable-badge')
+    ).toBeNull()
+
+    // switching to a view with a tag filter
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_TAGS_ALL,
+        value: '2',
+      },
+    ]
+    fixture.detectChanges()
+    expect(toggle.classList.contains('btn-primary')).toBeTruthy()
+    expect(
+      dropdown.nativeElement.querySelector('pngx-clearable-badge')
+    ).not.toBeNull()
+
+    // and back to a view without one
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_CORRESPONDENT_ANY,
+        value: '12',
+      },
+    ]
+    fixture.detectChanges()
+    expect(toggle.classList.contains('btn-primary')).toBeFalsy()
+    expect(
+      dropdown.nativeElement.querySelector('pngx-clearable-badge')
+    ).toBeNull()
   })
 
   it('should ingest filter rules for has any tags', () => {
@@ -1034,8 +1104,51 @@ describe('FilterEditorComponent', () => {
     ).toEqual([42, CustomFieldQueryOperator.Exists, 'true'])
   })
 
+  it('should reflect ingested custom field query rules in the dropdown toggle', () => {
+    const dropdown = fixture.debugElement.query(
+      By.css('pngx-custom-fields-query-dropdown')
+    )
+    expect(
+      dropdown.nativeElement.querySelector('pngx-clearable-badge')
+    ).toBeNull()
+
+    // switching to a view with a custom field query
+    component.filterRules = [
+      {
+        rule_type: FILTER_CUSTOM_FIELDS_QUERY,
+        value: '["OR",[[42,"exists","true"]]]',
+      },
+    ]
+    fixture.detectChanges()
+    expect(
+      dropdown.nativeElement.querySelector('pngx-clearable-badge')
+    ).not.toBeNull()
+    expect(
+      dropdown.nativeElement
+        .querySelector('#dropdown_toggle')
+        .classList.contains('btn-primary')
+    ).toBeTruthy()
+
+    // and back to a view without one
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_TAGS_ALL,
+        value: '19',
+      },
+    ]
+    fixture.detectChanges()
+    expect(
+      dropdown.nativeElement.querySelector('pngx-clearable-badge')
+    ).toBeNull()
+    expect(
+      dropdown.nativeElement
+        .querySelector('#dropdown_toggle')
+        .classList.contains('btn-primary')
+    ).toBeFalsy()
+  })
+
   it('should ingest filter rules for owner', () => {
-    expect(component.permissionsSelectionModel.ownerFilter).toEqual(
+    expect(component.permissionsSelectionModel.ownerFilter()).toEqual(
       OwnerFilterType.NONE
     )
     component.filterRules = [
@@ -1044,15 +1157,38 @@ describe('FilterEditorComponent', () => {
         value: '100',
       },
     ]
-    expect(component.permissionsSelectionModel.ownerFilter).toEqual(
+    expect(component.permissionsSelectionModel.ownerFilter()).toEqual(
       OwnerFilterType.SELF
     )
-    expect(component.permissionsSelectionModel.hideUnowned).toBeFalsy()
-    expect(component.permissionsSelectionModel.userID).toEqual(100)
+    expect(component.permissionsSelectionModel.hideUnowned()).toBeFalsy()
+    expect(component.permissionsSelectionModel.userID()).toEqual(100)
+  })
+
+  it('should reflect ingested owner filter rules in the dropdown toggle', () => {
+    const dropdown = fixture.debugElement.query(
+      By.css('pngx-permissions-filter-dropdown')
+    )
+    const toggle = dropdown.nativeElement.querySelector('button')
+    expect(toggle.classList.contains('btn-primary')).toBeFalsy()
+
+    // switching to a view with an owner filter
+    component.filterRules = [
+      {
+        rule_type: FILTER_OWNER,
+        value: '100',
+      },
+    ]
+    fixture.detectChanges()
+    expect(toggle.classList.contains('btn-primary')).toBeTruthy()
+
+    // and back to a view without one
+    component.filterRules = []
+    fixture.detectChanges()
+    expect(toggle.classList.contains('btn-primary')).toBeFalsy()
   })
 
   it('should ingest filter rules for owner is others', () => {
-    expect(component.permissionsSelectionModel.ownerFilter).toEqual(
+    expect(component.permissionsSelectionModel.ownerFilter()).toEqual(
       OwnerFilterType.NONE
     )
     component.filterRules = [
@@ -1061,14 +1197,14 @@ describe('FilterEditorComponent', () => {
         value: '50',
       },
     ]
-    expect(component.permissionsSelectionModel.ownerFilter).toEqual(
+    expect(component.permissionsSelectionModel.ownerFilter()).toEqual(
       OwnerFilterType.OTHERS
     )
-    expect(component.permissionsSelectionModel.includeUsers).toContain(50)
+    expect(component.permissionsSelectionModel.includeUsers()).toContain(50)
   })
 
   it('should ingest filter rules for owner does not include others', () => {
-    expect(component.permissionsSelectionModel.ownerFilter).toEqual(
+    expect(component.permissionsSelectionModel.ownerFilter()).toEqual(
       OwnerFilterType.NONE
     )
     component.filterRules = [
@@ -1077,14 +1213,14 @@ describe('FilterEditorComponent', () => {
         value: '50',
       },
     ]
-    expect(component.permissionsSelectionModel.ownerFilter).toEqual(
+    expect(component.permissionsSelectionModel.ownerFilter()).toEqual(
       OwnerFilterType.NOT_SELF
     )
-    expect(component.permissionsSelectionModel.excludeUsers).toContain(50)
+    expect(component.permissionsSelectionModel.excludeUsers()).toContain(50)
   })
 
   it('should ingest filter rules for owner is null', () => {
-    expect(component.permissionsSelectionModel.ownerFilter).toEqual(
+    expect(component.permissionsSelectionModel.ownerFilter()).toEqual(
       OwnerFilterType.NONE
     )
     component.filterRules = [
@@ -1093,10 +1229,10 @@ describe('FilterEditorComponent', () => {
         value: 'true',
       },
     ]
-    expect(component.permissionsSelectionModel.ownerFilter).toEqual(
+    expect(component.permissionsSelectionModel.ownerFilter()).toEqual(
       OwnerFilterType.UNOWNED
     )
-    expect(component.permissionsSelectionModel.hideUnowned).toBeFalsy()
+    expect(component.permissionsSelectionModel.hideUnowned()).toBeFalsy()
   })
 
   it('should ingest filter rules for owner is not null', () => {
@@ -1106,14 +1242,14 @@ describe('FilterEditorComponent', () => {
         value: 'false',
       },
     ]
-    expect(component.permissionsSelectionModel.hideUnowned).toBeTruthy()
+    expect(component.permissionsSelectionModel.hideUnowned()).toBeTruthy()
     component.filterRules = [
       {
         rule_type: FILTER_OWNER_ISNULL,
         value: '0',
       },
     ]
-    expect(component.permissionsSelectionModel.hideUnowned).toBeTruthy()
+    expect(component.permissionsSelectionModel.hideUnowned()).toBeTruthy()
   })
 
   it('should ingest filter rules for shared by me', () => {
@@ -1123,7 +1259,7 @@ describe('FilterEditorComponent', () => {
         value: '2',
       },
     ]
-    expect(component.permissionsSelectionModel.userID).toEqual(2)
+    expect(component.permissionsSelectionModel.userID()).toEqual(2)
   })
 
   // GET filterRules
@@ -1283,6 +1419,33 @@ describe('FilterEditorComponent', () => {
       {
         rule_type: FILTER_MIME_TYPE,
         value: 'pdf',
+      },
+    ])
+  })
+
+  it('should convert duplicate target input to the correct filter rule', () => {
+    const textFieldTargetDropdown = fixture.debugElement.queryAll(
+      By.directive(NgbDropdownItem)
+    )[5]
+    textFieldTargetDropdown.triggerEventHandler('click')
+    fixture.detectChanges()
+
+    expect(component.textFilterTarget).toEqual('duplicates')
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_HAS_DUPLICATES,
+        value: 'true',
+      },
+    ])
+
+    const textFieldModifierSelect = fixture.debugElement.query(By.css('select'))
+    textFieldModifierSelect.nativeElement.value = 'does-not-have-duplicates'
+    textFieldModifierSelect.nativeElement.dispatchEvent(new Event('change'))
+    fixture.detectChanges()
+    expect(component.filterRules).toEqual([
+      {
+        rule_type: FILTER_HAS_DUPLICATES,
+        value: 'false',
       },
     ])
   })
@@ -1889,7 +2052,10 @@ describe('FilterEditorComponent', () => {
         value: '1',
       },
     ])
-    component.permissionsSelectionModel.excludeUsers.push(2)
+    component.permissionsSelectionModel.excludeUsers.update((users) => [
+      ...users,
+      2,
+    ])
     fixture.detectChanges()
     expect(component.filterRules).toEqual([
       {
@@ -1939,8 +2105,11 @@ describe('FilterEditorComponent', () => {
     // TODO: mock input in code
     // userSelect.query(By.css('input')).nativeElement.value = '3'
     // userSelect.triggerEventHandler('change')
-    component.permissionsSelectionModel.ownerFilter = OwnerFilterType.OTHERS
-    component.permissionsSelectionModel.includeUsers.push(3)
+    component.permissionsSelectionModel.ownerFilter.set(OwnerFilterType.OTHERS)
+    component.permissionsSelectionModel.includeUsers.update((users) => [
+      ...users,
+      3,
+    ])
     fixture.detectChanges()
     expect(component.filterRules).toEqual([
       {
@@ -1960,7 +2129,7 @@ describe('FilterEditorComponent', () => {
     ownerToggle.nativeElement.checked = true
     // ownerToggle.triggerEventHandler('change')
     // TODO: ngModel isn't doing this here
-    component.permissionsSelectionModel.hideUnowned = true
+    component.permissionsSelectionModel.hideUnowned.set(true)
     fixture.detectChanges()
     expect(component.filterRules).toEqual([
       {
@@ -2068,6 +2237,22 @@ describe('FilterEditorComponent', () => {
       },
     ]
     expect(component.generateFilterName()).toEqual('Without any tag')
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_DUPLICATES,
+        value: 'true',
+      },
+    ]
+    expect(component.generateFilterName()).toEqual('With duplicates')
+
+    component.filterRules = [
+      {
+        rule_type: FILTER_HAS_DUPLICATES,
+        value: 'false',
+      },
+    ]
+    expect(component.generateFilterName()).toEqual('Without duplicates')
 
     component.filterRules = [
       {

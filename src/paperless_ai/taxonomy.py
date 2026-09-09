@@ -14,8 +14,6 @@ from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import restrict_queryset_to_visible
-from documents.permissions import user_is_unrestricted
-from paperless_ai.prompts.context import AssignedBlockPromptContext
 from paperless_ai.prompts.context import TaxonomyBlockPromptContext
 from paperless_ai.prompts.render import render_prompt
 
@@ -33,18 +31,16 @@ class TaxonomyCandidate(TypedDict):
     weight: float
 
 
+class SimilarDocument(TypedDict):
+    document_id: int
+    weight: float
+
+
 class TaxonomyCandidates(TypedDict):
     tags: list[TaxonomyCandidate]
     document_types: list[TaxonomyCandidate]
     correspondents: list[TaxonomyCandidate]
     storage_paths: list[TaxonomyCandidate]
-
-
-class AssignedMetadata(TypedDict):
-    tags: list[str]
-    document_type: str | None
-    correspondent: str | None
-    storage_path: str | None
 
 
 def empty_taxonomy_candidates() -> TaxonomyCandidates:
@@ -58,57 +54,10 @@ def empty_taxonomy_candidates() -> TaxonomyCandidates:
     )
 
 
-def _visible_name(
-    obj: Model | None,
-    user: User | None,
-    perm: str,
-) -> str | None:
-    """``obj``'s name if ``user`` may see it under ``perm``, else None - a
-    document being visible to a user does not imply every object assigned to
-    it is (per-object guardian permissions can differ), so each assigned
-    relation is checked individually rather than trusted because it's
-    already sitting on a document this user can open.
-
-    Checks user_is_unrestricted() before ever touching type(obj).objects, so
-    the common "no restriction" case (no user, or an active superuser) never
-    needs obj to be backed by a real queryable row.
-    """
-    if obj is None:
-        return None
-    if user_is_unrestricted(user):
-        return obj.name
-    visible = restrict_queryset_to_visible(
-        type(obj).objects.filter(pk=obj.pk),
-        user,
-        perm,
-    )
-    return obj.name if visible.exists() else None
-
-
-def get_assigned_metadata(document: Document, user: User | None) -> AssignedMetadata:
-    """The document's own current taxonomy. Authoritative context, not a
-    candidate list - the model is never asked to add, remove, or replace
-    these values, only to use them when helpful for the title and for
-    fields that are still empty.
-
-    Permission-filtered the same way build_taxonomy_candidates() is: a
-    document a user may change/view does not imply every tag/type/
-    correspondent/storage_path assigned to it is visible to that same user,
-    so names the user cannot see are never surfaced into the prompt.
-    """
-    visible_tags = restrict_queryset_to_visible(document.tags.all(), user, "view_tag")
-    return AssignedMetadata(
-        tags=sorted(tag.name for tag in visible_tags),
-        document_type=_visible_name(document.document_type, user, "view_documenttype"),
-        correspondent=_visible_name(document.correspondent, user, "view_correspondent"),
-        storage_path=_visible_name(document.storage_path, user, "view_storagepath"),
-    )
-
-
-def _node_document_weights(nodes: list["NodeWithScore"]) -> dict[int, float]:
-    """document_id -> that node's similarity score, summed if a document_id
-    appears more than once across the retrieved nodes (e.g. multiple chunks
-    of the same source document)."""
+def _node_document_weights(nodes: list["NodeWithScore"]) -> list[SimilarDocument]:
+    """Sum each node's similarity score into its document_id (a document can
+    appear via multiple chunks/nodes) and return one SimilarDocument per
+    distinct document_id."""
     weights: dict[int, float] = defaultdict(float)
     for node in nodes:
         document_id = node.metadata.get("document_id")
@@ -121,7 +70,14 @@ def _node_document_weights(nodes: list["NodeWithScore"]) -> dict[int, float]:
             weights[int(document_id)] += float(node.score or 0.0)
         except (TypeError, ValueError):  # pragma: no cover
             continue
-    return weights
+    return sorted(
+        (
+            SimilarDocument(document_id=document_id, weight=weight)
+            for document_id, weight in weights.items()
+        ),
+        key=lambda similar: similar["weight"],
+        reverse=True,
+    )
 
 
 def _visible_ranked_candidates(
@@ -157,20 +113,25 @@ def _visible_ranked_candidates(
 
 
 def build_taxonomy_candidates(
-    nodes: list["NodeWithScore"],
+    similar_documents: list[SimilarDocument],
     user: User | None,
 ) -> TaxonomyCandidates:
-    """Resolve each neighbour node's document_id to a live Document, read its
-    *current* tags/type/correspondent/storage_path via the ORM (never the
-    possibly-stale names cached in vector-index node metadata), weight each
-    distinct taxonomy object by aggregate neighbour similarity, permission-filter
+    """Resolve each similar document's id to a live Document, read its
+    *current* tags/type/correspondent/storage_path via the ORM (never any
+    possibly-stale names an adapter's source might have cached), weight each
+    distinct taxonomy object by aggregate similarity weight, permission-filter
     against what ``user`` can see, and return each category ranked by weight
-    and capped.
+    and capped. ``similar_documents`` may come from either the vector-RAG
+    adapter or the full-text fallback adapter - both produce this same shape.
     """
-
-    document_weights = _node_document_weights(nodes)
-    if not document_weights:
+    if not similar_documents:
         return empty_taxonomy_candidates()
+
+    # Both adapters guarantee at most one SimilarDocument per document_id, so
+    # this never silently drops a duplicate's weight.
+    document_weights: dict[int, float] = {
+        s["document_id"]: s["weight"] for s in similar_documents
+    }
 
     # Only .tags.all() needs prefetching (a reverse M2M, one extra query for
     # the whole batch). document_type/correspondent/storage_path are read
@@ -232,37 +193,17 @@ def build_taxonomy_candidates(
     )
 
 
-def _assigned_block(assigned: AssignedMetadata) -> str:
-    return render_prompt(
-        AssignedBlockPromptContext(
-            tags=assigned["tags"],
-            document_type=assigned["document_type"],
-            correspondent=assigned["correspondent"],
-            storage_path=assigned["storage_path"],
-        ),
-    )
-
-
 def format_taxonomy_for_prompt(
     candidates: TaxonomyCandidates,
-    assigned: AssignedMetadata,
 ) -> str:
-    """Render assigned metadata and ranked candidates as labelled prompt
-    blocks. Candidate names are untrusted, user-controlled data, so they are
+    """Render ranked candidates as a labelled prompt block.
+
+    Candidate names are untrusted, user-controlled data, so they are
     JSON-serialized (id/name only - weight is an internal ranking detail)
     rather than bullet-rendered, matching the untrusted-data handling already
     used for document content elsewhere in this module. Returns "" when there
-    is nothing to say (no assigned metadata and no candidates), so callers can
-    treat the result the same as no hints at all.
+    are no candidates, so callers can treat the result the same as no hints at all.
     """
-    has_assigned = any(
-        [
-            assigned["tags"],
-            assigned["document_type"],
-            assigned["correspondent"],
-            assigned["storage_path"],
-        ],
-    )
     candidate_payload = {
         key: [{"id": c["id"], "name": c["name"]} for c in values]
         for key, values in candidates.items()
@@ -271,7 +212,6 @@ def format_taxonomy_for_prompt(
 
     return render_prompt(
         TaxonomyBlockPromptContext(
-            assigned_block=_assigned_block(assigned) if has_assigned else "",
             candidate_payload_json=(
                 json.dumps(candidate_payload, ensure_ascii=False)
                 if candidate_payload

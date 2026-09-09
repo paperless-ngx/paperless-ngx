@@ -107,12 +107,13 @@ def _vec0_params(rows: list[_Row]) -> list[tuple[str, int, str, bytes]]:
 
 
 def _build_where(filters: MetadataFilters | None) -> tuple[str, list[int]]:
-    """Translate the EQ / IN / NE filters we use into a parameterized SQL
-    clause on vec0 metadata columns. Returns ("", []) when there is nothing
-    to filter. document_id is vec0's only filterable column and is INTEGER;
-    every value is coerced via int() here so callers (which today still pass
-    strings in places, e.g. indexing.py's MetadataFilter construction) don't
-    have to be individually correct -- vec0 doesn't coerce types itself.
+    """Translate the EQ / IN / NIN / NE filters we use into a parameterized
+    SQL clause on vec0 metadata columns. Returns ("", []) when there is
+    nothing to filter. document_id is vec0's only filterable column and is
+    INTEGER; every value is coerced via int() here so callers (which today
+    still pass strings in places, e.g. indexing.py's MetadataFilter
+    construction) don't have to be individually correct -- vec0 doesn't
+    coerce types itself.
     """
     if filters is None or not filters.filters:
         return "", []
@@ -125,20 +126,25 @@ def _build_where(filters: MetadataFilters | None) -> tuple[str, list[int]]:
             continue
         if f.key not in _FILTER_COLUMNS:  # pragma: no cover - we build the keys
             raise NotImplementedError(f"Unsupported filter column: {f.key}")
-        if f.operator == FilterOperator.IN:
+        if f.operator in (FilterOperator.IN, FilterOperator.NIN):
+            is_in = f.operator == FilterOperator.IN
+            sql_op = "IN" if is_in else "NOT IN"
             values = [int(v) for v in f.value]  # type: ignore[union-attr]
-            if not values:  # pragma: no cover
-                clauses.append("1 = 0")
+            if not values:
+                # An empty IN list matches nothing; an empty NOT IN list
+                # excludes nothing, so it matches everything.
+                clauses.append("1 = 0" if is_in else "1 = 1")
                 continue
             if len(values) > _MAX_IN_VALUES:
-                # Fail closed (see the empty-clauses case below) rather than
-                # let SQLite raise "too many SQL variables" past its own
-                # limit: this filter scopes document access, so an IN list
-                # too large to safely bind must match no rows, never widen
-                # the scope to "everything" by accident.
+                # Refuse rather than risk SQLite's own bound-parameter limit
+                # ("too many SQL variables"): a list this large must match no
+                # rows, never widen the scope to "everything" -- true for
+                # NOT IN too, where failing open would surface every
+                # excluded row.
                 logger.warning(
-                    "Refusing to build an IN filter on %r with %d values "
+                    "Refusing to build a %s filter on %r with %d values "
                     "(over the %d-value safety limit); returning no rows.",
+                    sql_op,
                     f.key,
                     len(values),
                     _MAX_IN_VALUES,
@@ -146,7 +152,7 @@ def _build_where(filters: MetadataFilters | None) -> tuple[str, list[int]]:
                 clauses.append("1 = 0")
                 continue
             placeholders = ",".join("?" for _ in values)
-            clauses.append(f"{f.key} IN ({placeholders})")
+            clauses.append(f"{f.key} {sql_op} ({placeholders})")
             params.extend(values)
         elif f.operator == FilterOperator.EQ:
             clauses.append(f"{f.key} = ?")
@@ -154,7 +160,7 @@ def _build_where(filters: MetadataFilters | None) -> tuple[str, list[int]]:
         elif f.operator == FilterOperator.NE:
             clauses.append(f"{f.key} != ?")
             params.append(int(f.value))
-        else:  # pragma: no cover - we only ever build EQ/IN/NE filters
+        else:  # pragma: no cover - we only ever build EQ/IN/NIN/NE filters
             raise NotImplementedError(f"Unsupported filter operator: {f.operator}")
     if not clauses:
         # Filters were requested but none could be translated. Fail closed

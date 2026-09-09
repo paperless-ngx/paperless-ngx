@@ -23,6 +23,7 @@ from guardian.shortcuts import get_users_with_perms
 from httpx import ConnectError
 from httpx import HTTPError
 from httpx import HTTPStatusError
+from pytest_django.fixtures import Settings
 from pytest_httpx import HTTPXMock
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
@@ -38,7 +39,6 @@ from paperless_ai.exceptions import LLMTimeoutError
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
-from pytest_django.fixtures import SettingsWrapper
 
 from documents import tasks
 from documents.data_models import ConsumableDocument
@@ -5356,7 +5356,7 @@ class TestDateWorkflowLocalization(
     def test_document_consumption_workflow_localization(
         self,
         tmp_path: Path,
-        settings: SettingsWrapper,
+        settings: Settings,
         title_template: str,
         expected_title: str,
     ) -> None:
@@ -5621,11 +5621,15 @@ class TestApplyAISuggestionsWorkflowAction(
         action = self.make_action()
         self.make_workflow(action, WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED)
 
-        with mock.patch("documents.tasks.apply_ai_suggestions.delay") as delay:
+        with (
+            mock.patch("documents.tasks.apply_ai_suggestions.delay") as delay,
+            self.captureOnCommitCallbacks(execute=True),
+        ):
             run_workflows(
                 WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
                 self.doc,
             )
+            delay.assert_not_called()
 
         delay.assert_called_once_with(action_id=action.pk, document_id=self.doc.pk)
 
@@ -5706,6 +5710,39 @@ class TestApplyAISuggestionsWorkflowAction(
 
         self.assertEqual(changed, [])
         self.assertIn("AI is not enabled", "".join(cm.output))
+
+    def test_document_without_content_does_nothing(self) -> None:
+        """
+        GIVEN:
+            - A document whose OCR content is empty or whitespace-only
+        WHEN:
+            - AI suggestions are applied by a workflow
+        THEN:
+            - The classifier is not called and the document is left unchanged
+        """
+        action = self.make_action(ai_overwrite_existing=True)
+
+        for content in ("", " \n\t"):
+            with self.subTest(content=content):
+                self.doc.content = content
+                self.doc.save(update_fields=["content"])
+
+                with (
+                    mock.patch(
+                        "documents.workflows.ai.get_ai_document_classification",
+                    ) as get_classification,
+                    self.assertLogs(
+                        "paperless.workflows.ai",
+                        level="WARNING",
+                    ) as cm,
+                ):
+                    changed = apply_ai_suggestions_to_document(action, self.doc)
+
+                self.assertEqual(changed, [])
+                get_classification.assert_not_called()
+                self.assertIn("has no content", "".join(cm.output))
+                self.doc.refresh_from_db()
+                self.assertEqual(self.doc.title, "original.pdf")
 
     def test_invalid_configuration_leaves_document_untouched(self) -> None:
         """

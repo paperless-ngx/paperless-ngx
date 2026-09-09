@@ -409,6 +409,7 @@ class TestBulkDownloadPermissionChecksRootDocument:
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("_search_index")
 class TestTrashRestorePermissionBoundary:
     def test_restore_rejects_document_without_delete_permission(
         self,

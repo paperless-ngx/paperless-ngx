@@ -8,7 +8,8 @@ from documents.models import Document
 from paperless.config import AIConfig
 from paperless_ai.client import AIClient
 from paperless_ai.db import db_connection_released
-from paperless_ai.indexing import _document_id_filters
+from paperless_ai.indexing import document_id_filters
+from paperless_ai.indexing import exclude_document_ids_filter
 from paperless_ai.indexing import get_rag_prompt_helper
 from paperless_ai.indexing import load_or_build_index
 from paperless_ai.indexing import read_store
@@ -95,12 +96,15 @@ def _format_chat_metadata_trailer(references: list[dict[str, int | str]]) -> str
 def stream_chat_with_documents(
     query_str: str,
     documents: QuerySet[Document],
+    *,
+    unrestricted: bool = False,
     output_language: str | None = None,
 ):
     try:
         yield from _stream_chat_with_documents(
             query_str,
             documents,
+            unrestricted=unrestricted,
             output_language=output_language,
         )
     except Exception as e:
@@ -111,6 +115,8 @@ def stream_chat_with_documents(
 def _stream_chat_with_documents(
     query_str: str,
     documents: QuerySet[Document],
+    *,
+    unrestricted: bool = False,
     output_language: str | None = None,
 ):
     if not documents.exists():
@@ -123,9 +129,18 @@ def _stream_chat_with_documents(
     from llama_index.core.retrievers import VectorIndexRetriever
 
     config = AIConfig()
-    filters = _document_id_filters(
-        str(pk) for pk in documents.values_list("pk", flat=True)
-    )
+    if unrestricted:
+        # Exclude trashed ids (usually few) instead of an IN filter over the
+        # full permitted set, which risks the vector store's bound parameter
+        # limit (_MAX_IN_VALUES) on large installs. Trashed documents stay
+        # indexed until permanent deletion (delete_document_from_llm_index
+        # hangs off post_delete, not trash), so must be excluded explicitly.
+        trashed_ids = Document.deleted_objects.values_list("pk", flat=True)
+        filters = exclude_document_ids_filter(str(pk) for pk in trashed_ids)
+    else:
+        filters = document_id_filters(
+            str(pk) for pk in documents.values_list("pk", flat=True)
+        )
 
     # Hold the shared read lock for the whole operation: the query engine
     # retrieves from the vector store again during synthesis, so the connection

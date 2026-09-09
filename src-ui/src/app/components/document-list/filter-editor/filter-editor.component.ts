@@ -65,6 +65,7 @@ import {
   FILTER_HAS_CUSTOM_FIELDS_ALL,
   FILTER_HAS_CUSTOM_FIELDS_ANY,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
+  FILTER_HAS_DUPLICATES,
   FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
   FILTER_HAS_TAGS_ANY,
@@ -129,12 +130,15 @@ const TEXT_FILTER_TARGET_FULLTEXT_QUERY = 'fulltext-query'
 const TEXT_FILTER_TARGET_FULLTEXT_MORELIKE = 'fulltext-morelike'
 const TEXT_FILTER_TARGET_CUSTOM_FIELDS = 'custom-fields'
 const TEXT_FILTER_TARGET_MIME_TYPE = 'mime-type'
+const TEXT_FILTER_TARGET_DUPLICATES = 'duplicates'
 
 const TEXT_FILTER_MODIFIER_EQUALS = 'equals'
 const TEXT_FILTER_MODIFIER_NULL = 'is null'
 const TEXT_FILTER_MODIFIER_NOTNULL = 'not null'
 const TEXT_FILTER_MODIFIER_GT = 'greater'
 const TEXT_FILTER_MODIFIER_LT = 'less'
+const TEXT_FILTER_MODIFIER_HAS_DUPLICATES = 'has-duplicates'
+const TEXT_FILTER_MODIFIER_DOES_NOT_HAVE_DUPLICATES = 'does-not-have-duplicates'
 
 const RELATIVE_DATE_QUERY_REGEXP_CREATED = /created:[\["]([^\]]+)[\]"]/g
 const RELATIVE_DATE_QUERY_REGEXP_ADDED = /added:[\["]([^\]]+)[\]"]/g
@@ -205,6 +209,7 @@ const DEFAULT_TEXT_FILTER_TARGET_OPTIONS = [
     id: TEXT_FILTER_TARGET_FULLTEXT_QUERY,
     name: $localize`Advanced search`,
   },
+  { id: TEXT_FILTER_TARGET_DUPLICATES, name: $localize`Duplicates` },
 ]
 
 const DEPRECATED_CUSTOM_FIELDS_TEXT_FILTER_TARGET_OPTION = {
@@ -238,6 +243,17 @@ const DEFAULT_TEXT_FILTER_MODIFIER_OPTIONS = [
   {
     id: TEXT_FILTER_MODIFIER_LT,
     label: $localize`less than`,
+  },
+]
+
+const DUPLICATES_FILTER_MODIFIER_OPTIONS = [
+  {
+    id: TEXT_FILTER_MODIFIER_HAS_DUPLICATES,
+    label: $localize`exist`,
+  },
+  {
+    id: TEXT_FILTER_MODIFIER_DOES_NOT_HAVE_DUPLICATES,
+    label: $localize`do not exist`,
   },
 ]
 
@@ -320,6 +336,12 @@ export class FilterEditorComponent
           if (rule.value == 'false') {
             return $localize`Without any tag`
           }
+          break
+
+        case FILTER_HAS_DUPLICATES:
+          return rule.value == 'false'
+            ? $localize`Without duplicates`
+            : $localize`With duplicates`
 
         case FILTER_CUSTOM_FIELDS_QUERY:
           return $localize`Custom fields query`
@@ -390,12 +412,21 @@ export class FilterEditorComponent
   public textFilterModifier: string
 
   get textFilterModifiers() {
-    return DEFAULT_TEXT_FILTER_MODIFIER_OPTIONS
+    return this.textFilterTarget === TEXT_FILTER_TARGET_DUPLICATES
+      ? DUPLICATES_FILTER_MODIFIER_OPTIONS
+      : DEFAULT_TEXT_FILTER_MODIFIER_OPTIONS
   }
 
   get textFilterModifierIsNull(): boolean {
     return [TEXT_FILTER_MODIFIER_NULL, TEXT_FILTER_MODIFIER_NOTNULL].includes(
       this.textFilterModifier
+    )
+  }
+
+  get textFilterInputDisabled(): boolean {
+    return (
+      this.textFilterModifierIsNull ||
+      this.textFilterTarget === TEXT_FILTER_TARGET_DUPLICATES
     )
   }
 
@@ -444,6 +475,7 @@ export class FilterEditorComponent
     this.customFieldQueriesModel.clear(false)
     this._textFilter = null
     this._moreLikeId = null
+    this.textFilterTarget = TEXT_FILTER_TARGET_TITLE_CONTENT
     this.dateAddedTo = null
     this.dateAddedFrom = null
     this.dateCreatedTo = null
@@ -476,6 +508,13 @@ export class FilterEditorComponent
         case FILTER_MIME_TYPE:
           this.textFilterTarget = TEXT_FILTER_TARGET_MIME_TYPE
           this._textFilter = rule.value
+          break
+        case FILTER_HAS_DUPLICATES:
+          this.textFilterTarget = TEXT_FILTER_TARGET_DUPLICATES
+          this.textFilterModifier =
+            rule.value == 'false' || rule.value == '0'
+              ? TEXT_FILTER_MODIFIER_DOES_NOT_HAVE_DUPLICATES
+              : TEXT_FILTER_MODIFIER_HAS_DUPLICATES
           break
         case FILTER_FULLTEXT_QUERY:
           let allQueryArgs = rule.value.split(',')
@@ -735,38 +774,50 @@ export class FilterEditorComponent
           this._textFilter = rule.value
           break
         case FILTER_OWNER:
-          this.permissionsSelectionModel.ownerFilter = OwnerFilterType.SELF
-          this.permissionsSelectionModel.hideUnowned = false
+          this.permissionsSelectionModel.ownerFilter.set(OwnerFilterType.SELF)
+          this.permissionsSelectionModel.hideUnowned.set(false)
           if (rule.value)
-            this.permissionsSelectionModel.userID = parseInt(rule.value, 10)
+            this.permissionsSelectionModel.userID.set(
+              Number.parseInt(rule.value, 10)
+            )
           break
         case FILTER_OWNER_ANY:
-          this.permissionsSelectionModel.ownerFilter = OwnerFilterType.OTHERS
+          this.permissionsSelectionModel.ownerFilter.set(OwnerFilterType.OTHERS)
           if (rule.value)
-            this.permissionsSelectionModel.includeUsers.push(
-              parseInt(rule.value, 10)
-            )
+            this.permissionsSelectionModel.includeUsers.update((users) => [
+              ...users,
+              Number.parseInt(rule.value, 10),
+            ])
           break
         case FILTER_OWNER_DOES_NOT_INCLUDE:
-          this.permissionsSelectionModel.ownerFilter = OwnerFilterType.NOT_SELF
+          this.permissionsSelectionModel.ownerFilter.set(
+            OwnerFilterType.NOT_SELF
+          )
           if (rule.value)
-            this.permissionsSelectionModel.excludeUsers.push(
-              parseInt(rule.value, 10)
-            )
+            this.permissionsSelectionModel.excludeUsers.update((users) => [
+              ...users,
+              Number.parseInt(rule.value, 10),
+            ])
           break
         case FILTER_SHARED_BY_USER:
-          this.permissionsSelectionModel.ownerFilter =
+          this.permissionsSelectionModel.ownerFilter.set(
             OwnerFilterType.SHARED_BY_ME
+          )
           if (rule.value)
-            this.permissionsSelectionModel.userID = parseInt(rule.value, 10)
+            this.permissionsSelectionModel.userID.set(
+              Number.parseInt(rule.value, 10)
+            )
           break
         case FILTER_OWNER_ISNULL:
           if (rule.value === 'true' || rule.value === '1') {
-            this.permissionsSelectionModel.hideUnowned = false
-            this.permissionsSelectionModel.ownerFilter = OwnerFilterType.UNOWNED
+            this.permissionsSelectionModel.hideUnowned.set(false)
+            this.permissionsSelectionModel.ownerFilter.set(
+              OwnerFilterType.UNOWNED
+            )
           } else {
-            this.permissionsSelectionModel.hideUnowned =
+            this.permissionsSelectionModel.hideUnowned.set(
               rule.value === 'false' || rule.value === '0'
+            )
             break
           }
       }
@@ -786,6 +837,14 @@ export class FilterEditorComponent
       filterRules.push({
         rule_type: FILTER_SIMPLE_TEXT,
         value: this._textFilter.trim(),
+      })
+    }
+    if (this.textFilterTarget == TEXT_FILTER_TARGET_DUPLICATES) {
+      filterRules.push({
+        rule_type: FILTER_HAS_DUPLICATES,
+        value: (
+          this.textFilterModifier == TEXT_FILTER_MODIFIER_HAS_DUPLICATES
+        ).toString(),
       })
     }
     if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_TITLE) {
@@ -1074,34 +1133,35 @@ export class FilterEditorComponent
         })
       }
     }
-    if (this.permissionsSelectionModel.ownerFilter == OwnerFilterType.SELF) {
+    if (this.permissionsSelectionModel.ownerFilter() == OwnerFilterType.SELF) {
       filterRules.push({
         rule_type: FILTER_OWNER,
-        value: this.permissionsSelectionModel.userID.toString(),
+        value: this.permissionsSelectionModel.userID().toString(),
       })
     } else if (
-      this.permissionsSelectionModel.ownerFilter == OwnerFilterType.NOT_SELF
+      this.permissionsSelectionModel.ownerFilter() == OwnerFilterType.NOT_SELF
     ) {
       filterRules.push({
         rule_type: FILTER_OWNER_DOES_NOT_INCLUDE,
-        value: this.permissionsSelectionModel.excludeUsers?.join(','),
+        value: this.permissionsSelectionModel.excludeUsers()?.join(','),
       })
     } else if (
-      this.permissionsSelectionModel.ownerFilter == OwnerFilterType.OTHERS
+      this.permissionsSelectionModel.ownerFilter() == OwnerFilterType.OTHERS
     ) {
       filterRules.push({
         rule_type: FILTER_OWNER_ANY,
-        value: this.permissionsSelectionModel.includeUsers?.join(','),
+        value: this.permissionsSelectionModel.includeUsers()?.join(','),
       })
     } else if (
-      this.permissionsSelectionModel.ownerFilter == OwnerFilterType.SHARED_BY_ME
+      this.permissionsSelectionModel.ownerFilter() ==
+      OwnerFilterType.SHARED_BY_ME
     ) {
       filterRules.push({
         rule_type: FILTER_SHARED_BY_USER,
-        value: this.permissionsSelectionModel.userID.toString(),
+        value: this.permissionsSelectionModel.userID().toString(),
       })
     } else if (
-      this.permissionsSelectionModel.ownerFilter == OwnerFilterType.UNOWNED
+      this.permissionsSelectionModel.ownerFilter() == OwnerFilterType.UNOWNED
     ) {
       filterRules.push({
         rule_type: FILTER_OWNER_ISNULL,
@@ -1109,7 +1169,7 @@ export class FilterEditorComponent
       })
     }
 
-    if (this.permissionsSelectionModel.hideUnowned) {
+    if (this.permissionsSelectionModel.hideUnowned()) {
       filterRules.push({
         rule_type: FILTER_OWNER_ISNULL,
         value: 'false',
@@ -1150,7 +1210,7 @@ export class FilterEditorComponent
   }
 
   get textFilter() {
-    return this.textFilterModifierIsNull ? '' : this._textFilter
+    return this.textFilterInputDisabled ? '' : this._textFilter
   }
 
   set textFilter(value) {
@@ -1350,12 +1410,24 @@ export class FilterEditorComponent
       this._textFilter = ''
     }
     this.textFilterTarget = target
+    if (target == TEXT_FILTER_TARGET_DUPLICATES) {
+      this._textFilter = ''
+      this.textFilterModifier = TEXT_FILTER_MODIFIER_HAS_DUPLICATES
+    } else if (
+      [
+        TEXT_FILTER_MODIFIER_HAS_DUPLICATES,
+        TEXT_FILTER_MODIFIER_DOES_NOT_HAVE_DUPLICATES,
+      ].includes(this.textFilterModifier)
+    ) {
+      this.textFilterModifier = TEXT_FILTER_MODIFIER_EQUALS
+    }
     this.textFilterInput.nativeElement.focus()
     this.updateRules()
   }
 
   textFilterModifierChange() {
     if (
+      this.textFilterTarget == TEXT_FILTER_TARGET_DUPLICATES ||
       this.textFilterModifierIsNull ||
       ([
         TEXT_FILTER_MODIFIER_EQUALS,

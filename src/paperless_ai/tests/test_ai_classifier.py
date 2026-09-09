@@ -1,4 +1,5 @@
 import datetime
+from collections.abc import Generator
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -6,24 +7,26 @@ from unittest.mock import patch
 import pytest
 import pytest_mock
 from django.test import override_settings
+from guardian.shortcuts import assign_perm
+from guardian.shortcuts import remove_perm
 
 from documents.models import Document
+from documents.search import TantivyBackend
 from documents.tests.factories import DocumentFactory
 from documents.tests.factories import TagFactory
 from documents.tests.factories import UserFactory
 from paperless.config import AIConfig
-from paperless_ai.ai_classifier import _restrict_to_shown_candidates
+from paperless_ai.ai_classifier import TAXONOMY_CANDIDATE_TOP_K
+from paperless_ai.ai_classifier import _fulltext_similar_documents
 from paperless_ai.ai_classifier import build_localization_prompt
 from paperless_ai.ai_classifier import build_prompt_with_rag
 from paperless_ai.ai_classifier import build_prompt_without_rag
 from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.ai_classifier import get_language_name
 from paperless_ai.ai_classifier import get_taxonomy_context
-from paperless_ai.base_model import ClassificationSuggestions
-from paperless_ai.base_model import TaxonomyChoiceDict
+from paperless_ai.taxonomy import SimilarDocument
 from paperless_ai.taxonomy import TaxonomyCandidate
 from paperless_ai.taxonomy import TaxonomyCandidates
-from paperless_ai.taxonomy import empty_taxonomy_candidates
 
 
 @pytest.fixture
@@ -45,7 +48,7 @@ def mock_document():
     doc.document_type.name = "Invoice"
     doc.correspondent = MagicMock()
     doc.correspondent.name = "Test Correspondent"
-    doc.storage_path = None  # get_assigned_metadata reads this directly
+    doc.storage_path = None
     doc.archive_serial_number = "12345"
     doc.content = "This is the document content."
 
@@ -175,6 +178,7 @@ def test_get_ai_document_classification_failure(mock_run_llm_query, mock_documen
 @pytest.mark.django_db
 @patch("paperless_ai.client.AIClient.run_llm_query")
 @patch("paperless_ai.ai_classifier.build_prompt_with_rag")
+@patch("paperless_ai.ai_classifier.build_taxonomy_candidates")
 @patch("paperless_ai.ai_classifier.retrieve_similar_nodes")
 @override_settings(
     LLM_EMBEDDING_BACKEND="huggingface",
@@ -184,6 +188,7 @@ def test_get_ai_document_classification_failure(mock_run_llm_query, mock_documen
 )
 def test_use_rag_if_configured(
     mock_retrieve,
+    mock_build_candidates,
     mock_build_prompt_with_rag,
     mock_run_llm_query,
     mock_document,
@@ -195,22 +200,37 @@ def test_use_rag_if_configured(
         - get_ai_document_classification() is called
     THEN:
         - The RAG-augmented prompt builder is used
+        - Classification and candidate reconciliation happen in one LLM call
+        - Only candidate IDs from the permission-filtered candidate set are allowed
     """
     mock_retrieve.return_value = []
+    mock_build_candidates.return_value = TaxonomyCandidates(
+        tags=[TaxonomyCandidate(id=12, name="Contractor", weight=1.0)],
+        document_types=[],
+        correspondents=[],
+        storage_paths=[],
+    )
     mock_build_prompt_with_rag.return_value = "Prompt with RAG"
     mock_run_llm_query.return_value = NESTED_SUGGESTIONS
     get_ai_document_classification(mock_document)
     mock_build_prompt_with_rag.assert_called_once()
+    mock_run_llm_query.assert_called_once_with(
+        "Prompt with RAG",
+        allowed_candidate_ids={
+            "tags": {12},
+            "document_types": set(),
+            "correspondents": set(),
+            "storage_paths": set(),
+        },
+    )
 
 
 @pytest.mark.django_db
 @patch("paperless_ai.client.AIClient.run_llm_query")
-@patch("paperless_ai.ai_classifier.build_prompt_without_rag")
-@patch("paperless_ai.ai_classifier.AIConfig")
+@patch("paperless_ai.ai_classifier.build_prompt_with_rag")
 @override_settings(LLM_BACKEND="ollama", LLM_MODEL="some_model")
-def test_use_without_rag_if_not_configured(
-    mock_ai_config,
-    mock_build_prompt_without_rag,
+def test_use_rag_prompt_even_without_embedding_backend(
+    mock_build_prompt_with_rag,
     mock_run_llm_query,
     mock_document,
 ):
@@ -220,13 +240,13 @@ def test_use_without_rag_if_not_configured(
     WHEN:
         - get_ai_document_classification() is called
     THEN:
-        - The non-RAG prompt builder is used
+        - The RAG-context prompt builder is still used (fed by the full-text
+          fallback's context/candidates instead of the vector store's)
     """
-    mock_ai_config.return_value.llm_embedding_backend = None
-    mock_build_prompt_without_rag.return_value = "Prompt without RAG"
+    mock_build_prompt_with_rag.return_value = "Prompt with RAG"
     mock_run_llm_query.return_value = NESTED_SUGGESTIONS
     get_ai_document_classification(mock_document)
-    mock_build_prompt_without_rag.assert_called_once()
+    mock_build_prompt_with_rag.assert_called_once()
 
 
 @pytest.mark.django_db
@@ -245,7 +265,7 @@ def test_prompt_with_without_rag(mock_document):
     THEN:
         - build_prompt_without_rag() has no similar-documents section
         - build_prompt_with_rag() includes the similar-documents context
-        - build_localization_prompt() asks to rewrite only new_names/title and
+        - build_localization_prompt() asks to rewrite only names/title and
           not to translate correspondents or dates
     """
     config = AIConfig()
@@ -264,6 +284,7 @@ def test_prompt_with_without_rag(mock_document):
     prompt = build_localization_prompt(NESTED_SUGGESTIONS, output_language="de-de")
     assert "Rewrite only the" in prompt
     assert "Do not translate correspondents or dates" in prompt
+    assert '"tag_ids":[]' in prompt
 
 
 def test_get_language_name_falls_back_to_language_code():
@@ -304,6 +325,7 @@ def test_build_localization_prompt_preserves_unicode_characters():
 
 
 @pytest.mark.django_db
+@override_settings(LLM_EMBEDDING_BACKEND="huggingface")
 def test_get_taxonomy_context_assembles_rag_text_and_candidates():
     """
     GIVEN:
@@ -313,7 +335,6 @@ def test_get_taxonomy_context_assembles_rag_text_and_candidates():
     THEN:
         - The neighbour's tag appears in the taxonomy candidates
         - The neighbour's title/content appear in the RAG text context
-        - The document's own (empty) assigned metadata is returned
     """
     tag = TagFactory.create(name="Bloodwork")
     neighbour = DocumentFactory.create(
@@ -331,20 +352,15 @@ def test_get_taxonomy_context_assembles_rag_text_and_candidates():
         "paperless_ai.ai_classifier.retrieve_similar_nodes",
         return_value=[fake_node],
     ):
-        candidates, assigned, context = get_taxonomy_context(document, user=None)
+        candidates, context = get_taxonomy_context(document, user=None)
 
     assert candidates["tags"][0]["name"] == "Bloodwork"
     assert "TITLE: Neighbour Title" in context
     assert "Content of neighbour document" in context
-    assert assigned == {
-        "tags": [],
-        "document_type": None,
-        "correspondent": None,
-        "storage_path": None,
-    }
 
 
 @pytest.mark.django_db
+@override_settings(LLM_EMBEDDING_BACKEND="huggingface")
 def test_get_taxonomy_context_preserves_similarity_order_and_distinct_documents():
     """
     GIVEN:
@@ -402,7 +418,7 @@ def test_get_taxonomy_context_preserves_similarity_order_and_distinct_documents(
         "paperless_ai.ai_classifier.retrieve_similar_nodes",
         return_value=fake_nodes,
     ):
-        _candidates, _assigned, context = get_taxonomy_context(
+        _candidates, context = get_taxonomy_context(
             document,
             user=None,
             max_docs=2,
@@ -415,6 +431,7 @@ def test_get_taxonomy_context_preserves_similarity_order_and_distinct_documents(
 
 
 @pytest.mark.django_db
+@override_settings(LLM_EMBEDDING_BACKEND="huggingface")
 def test_get_taxonomy_context_no_similar_docs():
     """
     GIVEN:
@@ -427,7 +444,7 @@ def test_get_taxonomy_context_no_similar_docs():
     document = DocumentFactory.create(content="Some content")
 
     with patch("paperless_ai.ai_classifier.retrieve_similar_nodes", return_value=[]):
-        candidates, _assigned, context = get_taxonomy_context(document, user=None)
+        candidates, context = get_taxonomy_context(document, user=None)
 
     assert context == ""
     assert candidates == {
@@ -436,6 +453,67 @@ def test_get_taxonomy_context_no_similar_docs():
         "correspondents": [],
         "storage_paths": [],
     }
+
+
+@pytest.mark.django_db
+def test_get_taxonomy_context_uses_fulltext_fallback_when_no_embedding_backend(
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """
+    GIVEN:
+        - No LLM embedding backend is configured (the default test settings)
+    WHEN:
+        - get_taxonomy_context() is called
+    THEN:
+        - _fulltext_similar_documents() is called with the document, the user
+          and TAXONOMY_CANDIDATE_TOP_K
+        - retrieve_similar_nodes() (the vector path) is never called
+    """
+    document = DocumentFactory.create(content="Some content")
+    mock_fulltext = mocker.patch(
+        "paperless_ai.ai_classifier._fulltext_similar_documents",
+        return_value=[],
+    )
+    mock_retrieve = mocker.patch("paperless_ai.ai_classifier.retrieve_similar_nodes")
+
+    get_taxonomy_context(document, user=None)
+
+    mock_fulltext.assert_called_once_with(
+        document,
+        None,
+        top_k=TAXONOMY_CANDIDATE_TOP_K,
+    )
+    mock_retrieve.assert_not_called()
+
+
+@pytest.mark.django_db
+@override_settings(LLM_EMBEDDING_BACKEND="huggingface")
+def test_get_taxonomy_context_uses_vector_path_when_embedding_backend_configured(
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """
+    GIVEN:
+        - An LLM embedding backend is configured
+    WHEN:
+        - get_taxonomy_context() is called
+    THEN:
+        - retrieve_similar_nodes() (the vector path) is called
+        - _fulltext_similar_documents() (the no-embedding-backend fallback)
+          is never called
+    """
+    document = DocumentFactory.create(content="Some content")
+    mock_retrieve = mocker.patch(
+        "paperless_ai.ai_classifier.retrieve_similar_nodes",
+        return_value=[],
+    )
+    mock_fulltext = mocker.patch(
+        "paperless_ai.ai_classifier._fulltext_similar_documents",
+    )
+
+    get_taxonomy_context(document, user=None)
+
+    mock_retrieve.assert_called_once()
+    mock_fulltext.assert_not_called()
 
 
 class TestGetTaxonomyContextVisibility:
@@ -450,6 +528,7 @@ class TestGetTaxonomyContextVisibility:
     """
 
     @pytest.mark.django_db
+    @override_settings(LLM_EMBEDDING_BACKEND="huggingface")
     def test_skips_permission_lookup_for_superuser(
         self,
         mocker: pytest_mock.MockerFixture,
@@ -468,17 +547,18 @@ class TestGetTaxonomyContextVisibility:
             "paperless_ai.ai_classifier.retrieve_similar_nodes",
             return_value=[],
         )
-        mock_get_objects = mocker.patch(
-            "paperless_ai.ai_classifier.get_objects_for_user_owner_aware",
+        mock_permitted = mocker.patch(
+            "paperless_ai.ai_classifier.permitted_object_ids",
         )
         user = UserFactory.create(is_superuser=True)
 
         get_taxonomy_context(document, user)
 
-        mock_get_objects.assert_not_called()
+        mock_permitted.assert_not_called()
         assert mock_retrieve.call_args.kwargs["document_ids"] is None
 
     @pytest.mark.django_db
+    @override_settings(LLM_EMBEDDING_BACKEND="huggingface")
     def test_skips_permission_lookup_when_no_user(
         self,
         mocker: pytest_mock.MockerFixture,
@@ -497,16 +577,17 @@ class TestGetTaxonomyContextVisibility:
             "paperless_ai.ai_classifier.retrieve_similar_nodes",
             return_value=[],
         )
-        mock_get_objects = mocker.patch(
-            "paperless_ai.ai_classifier.get_objects_for_user_owner_aware",
+        mock_permitted = mocker.patch(
+            "paperless_ai.ai_classifier.permitted_object_ids",
         )
 
         get_taxonomy_context(document, None)
 
-        mock_get_objects.assert_not_called()
+        mock_permitted.assert_not_called()
         assert mock_retrieve.call_args.kwargs["document_ids"] is None
 
     @pytest.mark.django_db
+    @override_settings(LLM_EMBEDDING_BACKEND="huggingface")
     def test_restricts_to_visible_documents_for_non_superuser(
         self,
         mocker: pytest_mock.MockerFixture,
@@ -517,7 +598,7 @@ class TestGetTaxonomyContextVisibility:
         WHEN:
             - get_taxonomy_context() is called
         THEN:
-            - The user's visible document ids are looked up and passed to
+            - The user's permitted document ids are looked up and passed to
               retrieve_similar_nodes() as a restriction
         """
         document = DocumentFactory.create(content="Some content")
@@ -525,21 +606,232 @@ class TestGetTaxonomyContextVisibility:
             "paperless_ai.ai_classifier.retrieve_similar_nodes",
             return_value=[],
         )
-        mock_queryset = mocker.MagicMock()
-        mock_queryset.values_list.return_value = [1, 2, 3]
-        mock_get_objects = mocker.patch(
-            "paperless_ai.ai_classifier.get_objects_for_user_owner_aware",
-            return_value=mock_queryset,
+        mock_permitted = mocker.patch(
+            "paperless_ai.ai_classifier.permitted_object_ids",
+            return_value=[1, 2, 3],
         )
         user = UserFactory.create(is_superuser=False)
 
         get_taxonomy_context(document, user)
 
-        mock_get_objects.assert_called_once_with(user, "view_document", Document)
+        mock_permitted.assert_called_once_with(user, Document, "view_document")
         assert mock_retrieve.call_args.kwargs["document_ids"] == [1, 2, 3]
 
 
 @pytest.mark.django_db
+class TestFulltextSimilarDocuments:
+    """_fulltext_similar_documents is the no-embedding-backend fallback: it
+    asks the Tantivy full-text index for "More Like This" neighbours instead
+    of the vector store, and synthesizes a rank-based weight since Tantivy's
+    more_like_this_ids returns only an ordered id list, no scores.
+    """
+
+    @pytest.fixture
+    def fulltext_backend(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> Generator[TantivyBackend, None, None]:
+        """An in-memory Tantivy backend, wired up as the module-level
+        singleton _fulltext_similar_documents resolves via get_backend()."""
+        backend = TantivyBackend(path=None)
+        backend.open()
+        mocker.patch("documents.search.get_backend", return_value=backend)
+        try:
+            yield backend
+        finally:
+            backend.close()
+
+    def test_ranks_by_rank_based_weight_descending(
+        self,
+        fulltext_backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A source document and two similar documents indexed in Tantivy
+        WHEN:
+            - _fulltext_similar_documents() is called
+        THEN:
+            - Each result's weight reflects its rank (first result weighted
+              higher than the second), not a raw similarity score
+        """
+        source = DocumentFactory.create(content="quarterly financial report details")
+        first = DocumentFactory.create(content="quarterly financial report details")
+        second = DocumentFactory.create(content="financial report")
+        for doc in (source, first, second):
+            fulltext_backend.add_or_update(doc)
+
+        result = _fulltext_similar_documents(source, user=None, top_k=5)
+
+        assert len(result) == 2
+        weight_by_id = {s["document_id"]: s["weight"] for s in result}
+        assert weight_by_id[first.pk] > weight_by_id[second.pk]
+
+    def test_excludes_source_document(
+        self,
+        fulltext_backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A source document indexed in Tantivy with no other documents
+        WHEN:
+            - _fulltext_similar_documents() is called
+        THEN:
+            - An empty list is returned - the source document is never its
+              own similar document
+        """
+        source = DocumentFactory.create(content="unique unrelated content")
+        fulltext_backend.add_or_update(source)
+
+        result = _fulltext_similar_documents(source, user=None, top_k=5)
+
+        assert result == []
+
+    def test_empty_index_returns_empty_list(
+        self,
+        fulltext_backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A document that has never been indexed (fresh/empty Tantivy index)
+        WHEN:
+            - _fulltext_similar_documents() is called
+        THEN:
+            - An empty list is returned rather than raising
+        """
+        source = DocumentFactory.create(content="never indexed")
+
+        result = _fulltext_similar_documents(source, user=None, top_k=5)
+
+        assert result == []
+
+    def test_respects_top_k_limit(
+        self,
+        fulltext_backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A source document and four similar documents indexed
+        WHEN:
+            - _fulltext_similar_documents() is called with top_k=2
+        THEN:
+            - At most 2 results are returned
+        """
+        source = DocumentFactory.create(content="shared overlapping keyword text")
+        fulltext_backend.add_or_update(source)
+        for _ in range(4):
+            fulltext_backend.add_or_update(
+                DocumentFactory.create(content="shared overlapping keyword text"),
+            )
+
+        result = _fulltext_similar_documents(source, user=None, top_k=2)
+
+        assert len(result) == 2
+
+    def test_result_shape_is_similar_document(
+        self,
+        fulltext_backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A source document and one similar document indexed
+        WHEN:
+            - _fulltext_similar_documents() is called
+        THEN:
+            - Each result is a SimilarDocument (document_id + weight only)
+        """
+        source = DocumentFactory.create(content="shared content phrase")
+        other = DocumentFactory.create(content="shared content phrase")
+        fulltext_backend.add_or_update(source)
+        fulltext_backend.add_or_update(other)
+
+        result = _fulltext_similar_documents(source, user=None, top_k=5)
+
+        # rank 0 (the only/best result) with top_k=5 -> weight = top_k - rank = 5.0,
+        # per the "first result gets top_k, the last gets 1" formula.
+        assert result == [SimilarDocument(document_id=other.pk, weight=5.0)]
+
+    def test_superuser_sees_other_users_documents(
+        self,
+        fulltext_backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A source document owned by one user and a similar document
+              owned by a different user, with no sharing between them
+        WHEN:
+            - _fulltext_similar_documents() is called with a superuser
+        THEN:
+            - The other user's document is still returned as a similar
+              document - a superuser must not be narrowed by the backend's
+              owner-based permission filter
+        """
+        owner = UserFactory.create()
+        other_owner = UserFactory.create()
+        superuser = UserFactory.create(is_superuser=True)
+        source = DocumentFactory.create(
+            content="shared content phrase",
+            owner=owner,
+        )
+        other = DocumentFactory.create(
+            content="shared content phrase",
+            owner=other_owner,
+        )
+        fulltext_backend.add_or_update(source)
+        fulltext_backend.add_or_update(other)
+
+        result = _fulltext_similar_documents(source, user=superuser, top_k=5)
+
+        assert [s["document_id"] for s in result] == [other.pk]
+
+    def test_excludes_stale_permitted_document_for_regular_user(
+        self,
+        fulltext_backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A regular (non-superuser) user
+            - A similar document the user is permitted to view, and another
+              similar document indexed while the user still had view
+              permission but which has since had that permission revoked in
+              the database, i.e. the Tantivy index has stale permission data
+        WHEN:
+            - _fulltext_similar_documents() is called with that user
+        THEN:
+            - Only the still-permitted document is returned - the DB
+              re-check via restrict_queryset_to_visible() must catch the
+              document Tantivy's stale index still thinks is visible
+        """
+        owner = UserFactory.create()
+        viewer = UserFactory.create(is_superuser=False)
+        source = DocumentFactory.create(
+            content="shared content phrase",
+            owner=owner,
+        )
+        permitted = DocumentFactory.create(
+            content="shared content phrase",
+            owner=owner,
+        )
+        now_private = DocumentFactory.create(
+            content="shared content phrase",
+            owner=owner,
+        )
+        assign_perm("view_document", viewer, permitted)
+        assign_perm("view_document", viewer, now_private)
+        fulltext_backend.add_or_update(source)
+        fulltext_backend.add_or_update(permitted)
+        fulltext_backend.add_or_update(now_private)
+
+        # Revoke access after indexing, without reindexing: the index still
+        # carries viewer as a permitted viewer for `now_private`.
+        remove_perm("view_document", viewer, now_private)
+
+        result = _fulltext_similar_documents(source, user=viewer, top_k=5)
+
+        assert [s["document_id"] for s in result] == [permitted.pk]
+
+
+@pytest.mark.django_db
+@override_settings(LLM_EMBEDDING_BACKEND="huggingface")
 @patch("paperless_ai.ai_classifier.retrieve_similar_nodes")
 def test_get_taxonomy_context_retrieval_failure_degrades_to_no_hints(mock_retrieve):
     """
@@ -554,7 +846,7 @@ def test_get_taxonomy_context_retrieval_failure_degrades_to_no_hints(mock_retrie
     document = DocumentFactory.create(content="Some content")
     mock_retrieve.side_effect = RuntimeError("vector store unavailable")
 
-    candidates, _assigned, rag_context = get_taxonomy_context(document, user=None)
+    candidates, rag_context = get_taxonomy_context(document, user=None)
 
     assert candidates == {
         "tags": [],
@@ -566,6 +858,7 @@ def test_get_taxonomy_context_retrieval_failure_degrades_to_no_hints(mock_retrie
 
 
 @pytest.mark.django_db
+@override_settings(LLM_EMBEDDING_BACKEND="huggingface")
 @patch("paperless_ai.ai_classifier.build_taxonomy_candidates")
 @patch("paperless_ai.ai_classifier.retrieve_similar_nodes")
 def test_get_taxonomy_context_candidate_building_failure_degrades_to_no_hints(
@@ -588,7 +881,7 @@ def test_get_taxonomy_context_candidate_building_failure_degrades_to_no_hints(
     mock_retrieve.return_value = []
     mock_build_candidates.side_effect = RuntimeError("permission backend unavailable")
 
-    candidates, _assigned, rag_context = get_taxonomy_context(document, user=None)
+    candidates, rag_context = get_taxonomy_context(document, user=None)
 
     assert candidates == {
         "tags": [],
@@ -605,10 +898,11 @@ def test_build_prompt_without_rag_includes_taxonomy_block():
     GIVEN:
         - Non-empty taxonomy candidates
     WHEN:
-        - build_prompt_without_rag() is called with candidates and assigned metadata
+        - build_prompt_without_rag() is called with candidates
     THEN:
-        - The candidate's id and the existing_ids/new_names instructions appear
-        - Candidates are presented as deduplication options, not requirements
+        - The candidate and single-call reconciliation instructions appear
+        - Complete name suggestions remain mandatory
+        - Assigned metadata is not included
     """
     document = DocumentFactory.create(content="Some content")
     config = AIConfig()
@@ -618,40 +912,31 @@ def test_build_prompt_without_rag_includes_taxonomy_block():
         "correspondents": [],
         "storage_paths": [],
     }
-    assigned = {
-        "tags": [],
-        "document_type": None,
-        "correspondent": None,
-        "storage_path": None,
-    }
-
     prompt = build_prompt_without_rag(
         document,
         config,
         candidates=candidates,
-        assigned=assigned,
     )
 
     assert '"id": 12' in prompt
-    assert "existing_ids" in prompt
-    assert "new_names" in prompt
-    assert "not requirements" in prompt
-    assert "weak candidate" in prompt
+    assert "Always include every suggested name" in prompt
+    assert "matched_*" in prompt
+    assert "corresponding *_ids" in prompt
+    assert "Candidates must not create, replace, or suppress suggestions" in prompt
+    assert "already assigned" not in prompt
 
 
 @pytest.mark.django_db
-def test_build_prompt_without_rag_identical_when_no_hints():
+def test_build_prompt_without_rag_identical_when_no_candidates():
     """
     GIVEN:
-        - Empty taxonomy candidates and empty assigned metadata
+        - Empty taxonomy candidates
     WHEN:
         - build_prompt_without_rag() is called with those empty values, and
-          separately with no candidates/assigned at all
+          separately with no candidates at all
     THEN:
         - Both prompts are identical
-        - Neither carries the "Available ..." candidate block or the
-          id-vs-name routing instruction
-        - Both still tell the model to leave existing_ids empty
+        - Neither carries candidate reconciliation instructions
     """
     document = DocumentFactory.create(content="Some content")
     config = AIConfig()
@@ -661,67 +946,37 @@ def test_build_prompt_without_rag_identical_when_no_hints():
         "correspondents": [],
         "storage_paths": [],
     }
-    empty_assigned = {
-        "tags": [],
-        "document_type": None,
-        "correspondent": None,
-        "storage_path": None,
-    }
-
     with_empty_hints = build_prompt_without_rag(
         document,
         config,
         candidates=empty_candidates,
-        assigned=empty_assigned,
     )
     with_no_hints = build_prompt_without_rag(document, config)
 
     assert with_empty_hints == with_no_hints
     assert "Available " not in with_no_hints
-    assert "put its id in existing_ids" not in with_no_hints
-    assert "leave every existing_ids list empty" in with_no_hints
+    assert "matched_*" not in with_no_hints
 
 
 @pytest.mark.django_db
-def test_build_prompt_without_rag_tells_model_to_skip_ids_when_no_candidates():
+def test_build_prompt_without_rag_never_includes_assigned_metadata():
     """
     GIVEN:
-        - Assigned metadata but empty taxonomy candidates
+        - A document with assigned taxonomy metadata
     WHEN:
-        - build_prompt_without_rag() is called with candidates and assigned metadata
+        - build_prompt_without_rag() is called
     THEN:
-        - The assigned-metadata block appears (taxonomy_block is non-empty)
-        - The prompt tells the model to leave existing_ids empty
-
-    Staying silent about existing_ids here is not enough: the response schema
-    advertises the field whatever the prompt says, and models fill it with
-    placeholder ids that resolve to real but unrelated objects (#13831).
+        - Assigned metadata is absent so it cannot anchor classification
     """
     document = DocumentFactory.create(content="Some content")
     config = AIConfig()
-    empty_candidates = {
-        "tags": [],
-        "document_types": [],
-        "correspondents": [],
-        "storage_paths": [],
-    }
-    assigned = {
-        "tags": ["Bloodwork"],
-        "document_type": None,
-        "correspondent": None,
-        "storage_path": None,
-    }
+    assigned_tag = TagFactory.create(name="Bloodwork")
+    document.tags.add(assigned_tag)
 
-    prompt = build_prompt_without_rag(
-        document,
-        config,
-        candidates=empty_candidates,
-        assigned=assigned,
-    )
+    prompt = build_prompt_without_rag(document, config)
 
-    assert "already assigned" in prompt
-    assert "No candidates are shown" in prompt
-    assert "leave every existing_ids list empty" in prompt
+    assert "Bloodwork" not in prompt
+    assert "already assigned" not in prompt
 
 
 @pytest.mark.django_db
@@ -786,86 +1041,3 @@ def test_get_ai_document_classification_localizes_only_new_names(
     assert "Contractor Work" in localization_prompt
     assert result["tags"]["existing_ids"] == [12]  # untouched by localization
     assert result["tags"]["new_names"] == ["Auftragsarbeit"]
-
-
-class TestRestrictToShownCandidates:
-    def test_hallucinated_id_not_among_candidates_is_dropped(self) -> None:
-        """
-        GIVEN:
-            - A tag candidate shown to the model with id=12
-            - A model response with existing_ids=[12, 999] for tags, where
-              999 was never offered as a candidate
-        WHEN:
-            - _restrict_to_shown_candidates() is called
-        THEN:
-            - Only the id that was actually shown survives; the hallucinated
-              id is dropped rather than being trusted to resolve to whatever
-              real, visible, unrelated object it happens to match
-        """
-        suggestions = ClassificationSuggestions(
-            title="T",
-            tags=TaxonomyChoiceDict(existing_ids=[12, 999], new_names=[]),
-            correspondents=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
-            document_types=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
-            storage_paths=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
-            dates=[],
-        )
-        candidates = TaxonomyCandidates(
-            tags=[TaxonomyCandidate(id=12, name="Contractor", weight=1.0)],
-            document_types=[],
-            correspondents=[],
-            storage_paths=[],
-        )
-
-        result = _restrict_to_shown_candidates(suggestions, candidates)
-
-        assert result["tags"]["existing_ids"] == [12]
-
-    def test_no_candidates_shown_drops_every_existing_id(self) -> None:
-        """
-        GIVEN:
-            - No candidates were shown in any category
-            - A model response with existing_ids populated anyway
-        WHEN:
-            - _restrict_to_shown_candidates() is called
-        THEN:
-            - Every existing_id is dropped across all four categories - an
-              id can only be trusted if the prompt actually offered it
-        """
-        suggestions = ClassificationSuggestions(
-            title="T",
-            tags=TaxonomyChoiceDict(existing_ids=[1], new_names=[]),
-            correspondents=TaxonomyChoiceDict(existing_ids=[2], new_names=[]),
-            document_types=TaxonomyChoiceDict(existing_ids=[3], new_names=[]),
-            storage_paths=TaxonomyChoiceDict(existing_ids=[4], new_names=[]),
-            dates=[],
-        )
-
-        result = _restrict_to_shown_candidates(suggestions, empty_taxonomy_candidates())
-
-        assert result["tags"]["existing_ids"] == []
-        assert result["correspondents"]["existing_ids"] == []
-        assert result["document_types"]["existing_ids"] == []
-        assert result["storage_paths"]["existing_ids"] == []
-
-    def test_new_names_are_never_touched(self) -> None:
-        """
-        GIVEN:
-            - A model response with new_names populated
-        WHEN:
-            - _restrict_to_shown_candidates() is called
-        THEN:
-            - new_names passes through unchanged regardless of candidates
-        """
-        suggestions = ClassificationSuggestions(
-            title="T",
-            tags=TaxonomyChoiceDict(existing_ids=[], new_names=["Brand New Tag"]),
-            correspondents=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
-            document_types=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
-            storage_paths=TaxonomyChoiceDict(existing_ids=[], new_names=[]),
-            dates=[],
-        )
-
-        result = _restrict_to_shown_candidates(suggestions, empty_taxonomy_candidates())
-
-        assert result["tags"]["new_names"] == ["Brand New Tag"]

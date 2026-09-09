@@ -36,6 +36,7 @@ from paperless_mail.mail import MailAccountHandler
 from paperless_mail.mail import MailError
 from paperless_mail.mail import TagMailAction
 from paperless_mail.mail import apply_mail_action
+from paperless_mail.mail import error_callback
 from paperless_mail.mail import get_mailbox
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -663,6 +664,37 @@ class TestMail(
             ).count(),
             1,
         )
+
+    def test_handle_empty_message_long_subject(self) -> None:
+        """
+        GIVEN:
+            - A mail with no attachments and a subject longer than the
+              ProcessedMail.subject field
+        WHEN:
+            - The mail is handled by an attachments-only rule
+        THEN:
+            - The subject is truncated to the field length instead of raising
+        """
+        message = self.mailMocker.messageBuilder.create_message(
+            subject="A" * 300,
+            attachments=[],
+        )
+
+        account = MailAccount.objects.create()
+        rule = MailRule.objects.create(
+            account=account,
+            consumption_scope=MailRule.ConsumptionScope.ATTACHMENTS_ONLY,
+        )
+
+        self.mail_account_handler._handle_message(message, rule)
+
+        processed = ProcessedMail.objects.get(
+            rule=rule,
+            uid=message.uid,
+            folder=rule.folder,
+        )
+        self.assertEqual(processed.status, "PROCESSED_WO_CONSUMPTION")
+        self.assertEqual(processed.subject, "A" * 256)
 
     def test_handle_unknown_mime_type(self) -> None:
         message = self.mailMocker.messageBuilder.create_message(
@@ -2043,6 +2075,44 @@ class TestPostConsumeAction(TestCase):
         processed_mail = ProcessedMail.objects.get(uid=self.message_uid)
         self.assertEqual(processed_mail.status, "FAILED")
         self.assertIn("Test Exception", processed_mail.error)
+
+
+@pytest.mark.django_db
+class TestErrorCallback:
+    def test_error_callback_is_idempotent_for_same_mail(self) -> None:
+        """
+        GIVEN:
+            - A mail rule and a mail that failed to be consumed
+        WHEN:
+            - error_callback is invoked more than once for the same mail, as
+              happens when task_allow_error_cb_on_chord_header fires the
+              errback once per failed header task in a chord
+        THEN:
+            - Only one ProcessedMail row is created for that mail
+        """
+        rule = MailRuleFactory()
+        message_uid = "12345"
+
+        for _ in range(2):
+            error_callback(
+                None,
+                Exception("Test Exception"),
+                None,
+                rule_id=rule.pk,
+                message_uid=message_uid,
+                message_subject="Test Subject",
+                message_date=timezone.make_aware(
+                    timezone.datetime(2023, 1, 1, 12, 0, 0),
+                ),
+            )
+
+        processed_mails = ProcessedMail.objects.filter(
+            rule=rule,
+            uid=message_uid,
+            folder=rule.folder,
+        )
+        assert processed_mails.count() == 1
+        assert processed_mails.get().status == "FAILED"
 
 
 class TestManagementCommand(TestCase):

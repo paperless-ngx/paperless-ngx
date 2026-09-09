@@ -18,6 +18,7 @@ import { BrowserModule, bootstrapApplication } from '@angular/platform-browser'
 import {
   NgbDateAdapter,
   NgbDateParserFormatter,
+  NgbInputDatepickerConfig,
   NgbModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
@@ -227,6 +228,7 @@ import { provideUiTour } from 'ngx-ui-tour-ng-bootstrap'
 import { CorrespondentNamePipe } from './app/pipes/correspondent-name.pipe'
 import { DocumentTypeNamePipe } from './app/pipes/document-type-name.pipe'
 import { StoragePathNamePipe } from './app/pipes/storage-path-name.pipe'
+import { PngxDatePickerConfig } from './app/utils/ngb-input-date-picker-config'
 
 registerLocaleData(localeAf)
 registerLocaleData(localeAr)
@@ -439,6 +441,7 @@ bootstrapApplication(AppComponent, {
     CookieService,
     FilterPipe,
     DocumentTitlePipe,
+    { provide: NgbInputDatepickerConfig, useClass: PngxDatePickerConfig },
     { provide: NgbDateAdapter, useClass: ISODateAdapter },
     { provide: NgbDateParserFormatter, useClass: LocalizedDateParserFormatter },
     PermissionsGuard,

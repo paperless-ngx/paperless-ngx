@@ -32,6 +32,7 @@ from documents.signals.handlers import update_llm_suggestions_cache
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import read_streaming_response
 from paperless.models import ApplicationConfiguration
+from paperless_ai.exceptions import LLMProviderError
 from paperless_ai.exceptions import LLMTimeoutError
 
 
@@ -733,6 +734,38 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
                 "ai": ["AI backend request timed out."],
             },
         )
+        self.assertIsNone(
+            get_llm_suggestion_cache(self.document.pk, backend="openai-like"),
+        )
+
+    @patch("documents.views.get_ai_document_classification")
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_BACKEND="openai-like",
+    )
+    def test_ai_suggestions_with_llm_provider_error(
+        self,
+        mock_get_ai_classification,
+    ) -> None:
+        mock_get_ai_classification.side_effect = LLMProviderError(
+            "confidential provider response",
+        )
+
+        self.client.force_login(user=self.user)
+        response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_502_BAD_GATEWAY)
+        self.assertEqual(
+            response.json(),
+            {
+                "ai": [
+                    "AI backend rejected the request. Check logs for details.",
+                ],
+            },
+        )
+        self.assertNotIn("confidential provider response", response.content.decode())
         self.assertIsNone(
             get_llm_suggestion_cache(self.document.pk, backend="openai-like"),
         )

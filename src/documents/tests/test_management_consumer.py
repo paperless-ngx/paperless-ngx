@@ -43,7 +43,7 @@ if TYPE_CHECKING:
     from collections.abc import Generator
     from unittest.mock import MagicMock
 
-    from pytest_django.fixtures import SettingsWrapper
+    from pytest_django.fixtures import Settings
     from pytest_mock import MockerFixture
 
 
@@ -134,6 +134,23 @@ def wait_for_mock_call(
             return True
         sleep(poll_interval_s)
     return False
+
+
+def sleep_past_stability(
+    owner: FileStabilityTracker | ConsumerThread,
+    *,
+    windows: float = 1.5,
+) -> None:
+    """
+    Block until a tracked file's stability window has certainly elapsed.
+
+    Args:
+        owner: The tracker, or the consumer thread running one, whose
+               configured stability delay sets the wait.
+        windows: How many stability windows to wait, giving slop for a slow
+                 or loaded test runner.
+    """
+    sleep(owner.stability_delay * windows)
 
 
 class TestTrackedFile:
@@ -260,6 +277,56 @@ class TestFileStabilityTracker:
         stable = list(stability_tracker.get_stable_files())
         assert len(stable) == 0
         assert stability_tracker.pending_count == 1
+
+    def test_get_stable_files_skips_empty_file(
+        self,
+        stability_tracker: FileStabilityTracker,
+        tmp_path: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A zero byte file, tracked and past its stability delay
+        WHEN:
+            - Stable files are collected
+        THEN:
+            - The file is not yielded for consumption
+            - The file is dropped from tracking rather than held, so an
+              abandoned placeholder does not keep the watch loop awake
+        """
+        empty = tmp_path / "scan.pdf"
+        empty.write_bytes(b"")
+        stability_tracker.track(empty, Change.added)
+        sleep_past_stability(stability_tracker)
+
+        stable = list(stability_tracker.get_stable_files())
+
+        assert stable == []
+        assert stability_tracker.pending_count == 0
+
+    def test_empty_file_is_yielded_once_content_arrives(
+        self,
+        stability_tracker: FileStabilityTracker,
+        tmp_path: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A zero byte file which was dropped from tracking while empty
+        WHEN:
+            - The writer fills the file and a new event re-tracks it
+        THEN:
+            - The file is yielded for consumption once it is stable
+        """
+        target = tmp_path / "scan.pdf"
+        target.write_bytes(b"")
+        stability_tracker.track(target, Change.added)
+        sleep_past_stability(stability_tracker)
+        assert list(stability_tracker.get_stable_files()) == []
+
+        target.write_bytes(b"%PDF-1.4 content")
+        stability_tracker.track(target, Change.modified)
+        sleep_past_stability(stability_tracker)
+
+        assert list(stability_tracker.get_stable_files()) == [target]
 
     def test_get_stable_files_deleted_during_check(self, temp_file: Path) -> None:
         """Test deleted file is not returned during stability check."""
@@ -445,12 +512,13 @@ class TestConsumeFile:
         target = consumption_dir / "document.pdf"
         shutil.copy(sample_pdf, target)
 
-        _consume_file(
+        result = _consume_file(
             filepath=target,
             consumption_dir=consumption_dir,
             subdirs_as_tags=False,
         )
 
+        assert result is True
         mock_consume_file_delay.apply_async.assert_called_once()
         call_args = mock_consume_file_delay.apply_async.call_args
         consumable_doc = call_args.kwargs["kwargs"]["input_doc"]
@@ -464,11 +532,12 @@ class TestConsumeFile:
         mock_consume_file_delay: MagicMock,
     ) -> None:
         """Test _consume_file handles nonexistent files gracefully."""
-        _consume_file(
+        result = _consume_file(
             filepath=consumption_dir / "nonexistent.pdf",
             consumption_dir=consumption_dir,
             subdirs_as_tags=False,
         )
+        assert result is False
         mock_consume_file_delay.apply_async.assert_not_called()
 
     def test_consume_directory(
@@ -480,11 +549,12 @@ class TestConsumeFile:
         subdir = consumption_dir / "subdir"
         subdir.mkdir()
 
-        _consume_file(
+        result = _consume_file(
             filepath=subdir,
             consumption_dir=consumption_dir,
             subdirs_as_tags=False,
         )
+        assert result is False
         mock_consume_file_delay.apply_async.assert_not_called()
 
     def test_consume_with_permission_error(
@@ -499,12 +569,32 @@ class TestConsumeFile:
         shutil.copy(sample_pdf, target)
 
         mocker.patch.object(Path, "is_file", side_effect=PermissionError("denied"))
-        _consume_file(
+        result = _consume_file(
             filepath=target,
             consumption_dir=consumption_dir,
             subdirs_as_tags=False,
         )
+        assert result is False
         mock_consume_file_delay.apply_async.assert_not_called()
+
+    def test_consume_with_apply_async_failure(
+        self,
+        consumption_dir: Path,
+        sample_pdf: Path,
+        mock_consume_file_delay: MagicMock,
+    ) -> None:
+        """Test _consume_file reports failure when apply_async raises."""
+        target = consumption_dir / "document.pdf"
+        shutil.copy(sample_pdf, target)
+
+        mock_consume_file_delay.apply_async.side_effect = Exception("broker down")
+
+        result = _consume_file(
+            filepath=target,
+            consumption_dir=consumption_dir,
+            subdirs_as_tags=False,
+        )
+        assert result is False
 
     def test_consume_with_tags_error(
         self,
@@ -522,11 +612,12 @@ class TestConsumeFile:
             side_effect=DatabaseError("Something happened"),
         )
 
-        _consume_file(
+        result = _consume_file(
             filepath=target,
             consumption_dir=consumption_dir,
             subdirs_as_tags=True,
         )
+        assert result is True
         mock_consume_file_delay.apply_async.assert_called_once()
         call_args = mock_consume_file_delay.apply_async.call_args
         overrides = call_args.kwargs["kwargs"]["overrides"]
@@ -581,7 +672,7 @@ class TestCommandValidation:
 
     def test_raises_for_missing_consumption_dir(
         self,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         """Test command raises error when directory is not provided."""
         settings.CONSUMPTION_DIR = None
@@ -615,7 +706,7 @@ class TestCommandOneshot:
         scratch_dir: Path,
         sample_pdf: Path,
         mock_consume_file_delay: MagicMock,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         """Test oneshot mode processes existing files."""
         target = consumption_dir / "document.pdf"
@@ -635,7 +726,7 @@ class TestCommandOneshot:
         scratch_dir: Path,
         sample_pdf: Path,
         mock_consume_file_delay: MagicMock,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         """Test oneshot mode processes files recursively."""
         subdir = consumption_dir / "subdir"
@@ -657,7 +748,7 @@ class TestCommandOneshot:
         consumption_dir: Path,
         scratch_dir: Path,
         mock_consume_file_delay: MagicMock,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         """Test oneshot mode ignores unsupported file extensions."""
         target = consumption_dir / "document.xyz"
@@ -854,6 +945,51 @@ class TestCommandWatch:
             raise thread.exception
 
         mock_consume_file_delay.apply_async.assert_called()
+
+    def test_scanner_placeholder_is_not_consumed_while_empty(
+        self,
+        consumption_dir: Path,
+        sample_pdf: Path,
+        mock_consume_file_delay: MagicMock,
+        start_consumer: Callable[..., ConsumerThread],
+    ) -> None:
+        """
+        GIVEN:
+            - A scanner which creates a zero byte placeholder and only writes
+              the page some time later (GH discussion #13969)
+        WHEN:
+            - The placeholder sits untouched well past the stability delay
+            - The scanner then writes the real content
+        THEN:
+            - The empty placeholder is never queued, as it could only fail
+              with "Unsupported mime type inode/x-empty"
+            - The file is queued exactly once, when the content lands
+        """
+        thread = start_consumer(stability_delay=0.2)
+
+        target = consumption_dir / "scan.pdf"
+        target.write_bytes(b"")  # the scanner's placeholder
+
+        # Well past the stability delay: the old behaviour queued it here.
+        sleep_past_stability(thread, windows=5)
+        if thread.exception:
+            raise thread.exception
+        assert mock_consume_file_delay.apply_async.call_count == 0
+
+        shutil.copy(sample_pdf, target)  # the scanner finishes the page
+
+        assert wait_for_mock_call(
+            mock_consume_file_delay.apply_async,
+            timeout_s=5.0,
+        )
+        if thread.exception:
+            raise thread.exception
+
+        assert mock_consume_file_delay.apply_async.call_count == 1
+        queued_doc = mock_consume_file_delay.apply_async.call_args.kwargs["kwargs"][
+            "input_doc"
+        ]
+        assert queued_doc.original_file.name == "scan.pdf"
 
     def test_ignores_macos_files(
         self,
@@ -1232,7 +1368,7 @@ class TestProcessExistingFilesQueued:
         consumption_dir: Path,
         sample_pdf: Path,
         mock_consume_file_delay: MagicMock,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         """The set returned seeds the rescan's queued set, avoiding re-queue."""
         target = consumption_dir / "document.pdf"
@@ -1247,6 +1383,52 @@ class TestProcessExistingFilesQueued:
         )
 
         assert target.resolve() in queued
+
+
+@pytest.mark.management
+@pytest.mark.django_db
+class TestCommandRetryAfterQueueFailure:
+    """
+    Regression test for GH #13923.
+
+    A file whose ``apply_async`` publish fails (e.g. broker briefly down)
+    must not be marked as queued, so the periodic rescan retries it once
+    the broker recovers, instead of stranding it until the consumer
+    process is restarted.
+    """
+
+    def test_watch_loop_retries_failed_publish_on_rescan(
+        self,
+        consumption_dir: Path,
+        sample_pdf: Path,
+        mock_consume_file_delay: MagicMock,
+        start_consumer: Callable[..., ConsumerThread],
+    ) -> None:
+        """A publish failure from the watch loop is retried by the rescan."""
+        apply_async = mock_consume_file_delay.apply_async
+
+        def fail_first_call(*args: object, **kwargs: object) -> None:
+            if apply_async.call_count == 1:
+                raise Exception("broker down")
+
+        apply_async.side_effect = fail_first_call
+
+        thread = start_consumer(stability_delay=0.1, rescan_interval=0.3)
+
+        target = consumption_dir / "document.pdf"
+        shutil.copy(sample_pdf, target)
+
+        deadline = monotonic() + 5.0
+        while apply_async.call_count < 2 and monotonic() < deadline:
+            sleep(0.1)
+
+        if thread.exception:
+            raise thread.exception
+
+        assert apply_async.call_count >= 2, (
+            "Expected the failed publish to be retried by the rescan, "
+            f"but apply_async was only called {apply_async.call_count} time(s)"
+        )
 
 
 @pytest.mark.management

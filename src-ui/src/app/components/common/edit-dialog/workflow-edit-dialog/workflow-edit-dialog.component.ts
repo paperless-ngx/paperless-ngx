@@ -16,7 +16,7 @@ import {
 } from '@angular/forms'
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { Subscription, map, takeUntil } from 'rxjs'
+import { Subscription, catchError, map, of, takeUntil } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentType } from 'src/app/data/document-type'
@@ -48,6 +48,7 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { CustomFieldQueryExpression } from 'src/app/utils/custom-field-query-element'
 import { ConfirmButtonComponent } from '../../confirm-button/confirm-button.component'
 import {
@@ -512,31 +513,66 @@ export class WorkflowEditDialogComponent
   private readonly storagePathService = inject(StoragePathService)
   private readonly mailRuleService = inject(MailRuleService)
   private readonly customFieldsService = inject(CustomFieldsService)
+  private readonly toastService = inject(ToastService)
+  private relatedObjectLoadErrorShown = false
 
   readonly templates = signal<Workflow[]>(undefined)
   readonly correspondents = toSignal(
-    this.correspondentService.listAll().pipe(map((result) => result.results)),
+    this.correspondentService.listAll().pipe(
+      map((result) => result.results),
+      catchError((error) => this.handleRelatedObjectLoadError(error))
+    ),
     { initialValue: undefined as Correspondent[] }
   )
   readonly documentTypes = toSignal(
-    this.documentTypeService.listAll().pipe(map((result) => result.results)),
+    this.documentTypeService.listAll().pipe(
+      map((result) => result.results),
+      catchError((error) => this.handleRelatedObjectLoadError(error))
+    ),
     { initialValue: undefined as DocumentType[] }
   )
   readonly storagePaths = toSignal(
-    this.storagePathService.listAll().pipe(map((result) => result.results)),
+    this.storagePathService.listAll().pipe(
+      map((result) => result.results),
+      catchError((error) => this.handleRelatedObjectLoadError(error))
+    ),
     { initialValue: undefined as StoragePath[] }
   )
   readonly mailRules = toSignal(
-    this.mailRuleService.listAll().pipe(map((result) => result.results)),
+    this.mailRuleService.listAll().pipe(
+      map((result) => result.results),
+      catchError((error) => this.handleRelatedObjectLoadError(error))
+    ),
     { initialValue: undefined as MailRule[] }
   )
   readonly customFields = toSignal(
-    this.customFieldsService.listAll().pipe(map((result) => result.results)),
+    this.customFieldsService.listAll().pipe(
+      map((result) => result.results),
+      catchError((error) => this.handleRelatedObjectLoadError(error))
+    ),
     { initialValue: undefined as CustomField[] }
   )
   readonly dateCustomFields = computed(() =>
     this.customFields()?.filter((f) => f.data_type === CustomFieldDataType.Date)
   )
+  private readonly emailEnabledSetting =
+    this.settingsService.getSignal<boolean>(SETTINGS_KEYS.EMAIL_ENABLED)
+  private readonly remoteOcrConfiguredSetting =
+    this.settingsService.getSignal<boolean>(SETTINGS_KEYS.REMOTE_OCR_CONFIGURED)
+  private readonly aiEnabledSetting = this.settingsService.getSignal<boolean>(
+    SETTINGS_KEYS.AI_ENABLED
+  )
+
+  private handleRelatedObjectLoadError(error) {
+    if (!this.relatedObjectLoadErrorShown) {
+      this.relatedObjectLoadErrorShown = true
+      this.toastService.showError(
+        $localize`Some workflow options could not be loaded.`,
+        error
+      )
+    }
+    return of([])
+  }
 
   expandedItem: number = null
 
@@ -589,7 +625,7 @@ export class WorkflowEditDialogComponent
   private getAllowedActionTypes() {
     let allowed = WORKFLOW_ACTION_OPTIONS
 
-    if (!this.settingsService.get(SETTINGS_KEYS.EMAIL_ENABLED)) {
+    if (!this.emailEnabledSetting()) {
       allowed = allowed.filter((a) => a.id !== WorkflowActionType.Email)
     }
 
@@ -597,7 +633,7 @@ export class WorkflowEditDialogComponent
     // offered for workflows that run at consumption.
     const formWorkflow: Workflow = this.objectForm?.value
     const remoteOcrUsable =
-      this.settingsService.get(SETTINGS_KEYS.REMOTE_OCR_CONFIGURED) &&
+      this.remoteOcrConfiguredSetting() &&
       (formWorkflow?.triggers?.some(
         (trigger) => trigger.type === WorkflowTriggerType.Consumption
       ) ||
@@ -612,7 +648,7 @@ export class WorkflowEditDialogComponent
     // once every trigger is consumption, so it stays offered on a workflow
     // that has no triggers yet.
     const aiSuggestionsUsable =
-      this.settingsService.get(SETTINGS_KEYS.AI_ENABLED) &&
+      this.aiEnabledSetting() &&
       (!formWorkflow?.triggers?.length ||
         formWorkflow.triggers.some(
           (trigger) => trigger.type !== WorkflowTriggerType.Consumption
@@ -1362,7 +1398,6 @@ export class WorkflowEditDialogComponent
   }
 
   get actionTypeOptions() {
-    this.settingsService.trackChanges()
     // Computed on read rather than cached
     return this.getAllowedActionTypes()
   }

@@ -173,6 +173,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
       if (parent && !this.value.includes(parent.id)) {
         this.value = [...this.value, parent.id]
         this.onAdd(parent)
+        this.onChange(this.value) // re-emit for ng-select
       }
     }
   }

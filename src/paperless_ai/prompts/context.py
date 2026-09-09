@@ -6,18 +6,8 @@ from paperless_ai.prompts.render import PromptName
 
 
 @dataclass(frozen=True, slots=True)
-class AssignedBlockPromptContext(PromptContext):
-    template_name: ClassVar[PromptName] = PromptName.ASSIGNED_BLOCK
-    tags: list[str]
-    document_type: str | None
-    correspondent: str | None
-    storage_path: str | None
-
-
-@dataclass(frozen=True, slots=True)
 class TaxonomyBlockPromptContext(PromptContext):
     template_name: ClassVar[PromptName] = PromptName.TAXONOMY_BLOCK
-    assigned_block: str
     candidate_payload_json: str
 
 

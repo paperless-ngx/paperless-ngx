@@ -16,6 +16,9 @@ from django.core.cache import cache
 from django.core.cache import caches
 
 from documents.models import Document
+from paperless.signed_pickle import SignedPickleError
+from paperless.signed_pickle import signed_pickle_dumps
+from paperless.signed_pickle import signed_pickle_loads
 
 if TYPE_CHECKING:
     from django.core.cache.backends.base import BaseCache
@@ -45,14 +48,16 @@ CLASSIFIER_HASH_KEY: Final[str] = "classifier_hash"
 CLASSIFIER_MODIFIED_KEY: Final[str] = "classifier_modified"
 # Marker distinguishing LLM suggestions from classifier-generated ones (whose
 # FORMAT_VERSION lives in a much lower range - see DocumentClassifier). Bump
-# this whenever the *shape* of the cached `suggestions` dict changes, so a
-# cache entry written by a previous release can never be read back by code
-# that expects a different shape:
+# this whenever cached suggestions must not be reused, including changes to
+# their shape or interpretation, so a previous release's result cannot leak
+# incompatible or obsolete behavior into the new one:
 #   1000 - initial LLM suggestions cache (flat lists of resolved object ids
 #          per taxonomy field)
 #   1001 - suggestions reshaped to {"existing_ids": [...], "new_names":
 #          [...]} per taxonomy field (#13676)
-LLM_CACHE_CLASSIFIER_VERSION: Final[int] = 1001
+#   1002 - names are always generated and optional candidate mappings are
+#          validated separately, so candidate-anchored 1001 results are stale
+LLM_CACHE_CLASSIFIER_VERSION: Final[int] = 1002
 
 CACHE_1_MINUTE: Final[int] = 60
 CACHE_5_MINUTES: Final[int] = 5 * CACHE_1_MINUTE
@@ -116,9 +121,11 @@ class StoredLRUCache(LRUCache):
         serialized_data = self._backend.get(self._backend_key)
         try:
             self._data = (
-                pickle.loads(serialized_data) if serialized_data else OrderedDict()
+                signed_pickle_loads(serialized_data)
+                if serialized_data
+                else OrderedDict()
             )
-        except pickle.PickleError:
+        except (SignedPickleError, pickle.PickleError):
             logger.warning(
                 "Cache exists in backend but could not be read (possibly invalid format)",
             )
@@ -130,7 +137,7 @@ class StoredLRUCache(LRUCache):
         """
         self._backend.set(
             self._backend_key,
-            pickle.dumps(self._data),
+            signed_pickle_dumps(self._data),
             self.backend_ttl,
         )
 

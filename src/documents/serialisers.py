@@ -81,6 +81,7 @@ from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import permitted_document_ids
+from documents.permissions import restrict_queryset_to_visible
 from documents.permissions import set_permissions_for_object
 from documents.regex import validate_regex_pattern
 from documents.templating.filepath import validate_filepath_template_and_render
@@ -661,6 +662,8 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
                 .select_related("owner")
                 .annotate(document_count=Count("documents", filter=filter_q))
             )
+            user = getattr(request, "user", None) if request else self.user
+            children = restrict_queryset_to_visible(children, user, "view_tag")
 
             view = self.context.get("view")
             ordering = (
@@ -670,6 +673,9 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             )
             ordering = ordering or (Lower("name"),)
             children = children.order_by(*ordering)
+
+        if not children:
+            return []
 
         serializer = TagSerializer(
             children,
@@ -1217,11 +1223,19 @@ class DocumentSerializer(
             prev_tags = set(instance.tags.all())
             requested_tags = set(validated_data["tags"])
 
-            # Tags being removed in this update and all descendants
+            # Tags newly added in this update and the ancestors they require
+            added_tags = requested_tags - prev_tags
+            required_by_add_tags = set(added_tags)
+            for t in added_tags:
+                required_by_add_tags.update(t.get_ancestors())
+
+            # Tags being removed in this update and all descendants, except
+            # those required by a tag that is being added in this same update
             removed_tags = prev_tags - requested_tags
             blocked_tags = set(removed_tags)
             for t in removed_tags:
                 blocked_tags.update(t.get_descendants())
+            blocked_tags.difference_update(required_by_add_tags)
 
             # Add all parent tags
             final_tags = set(requested_tags)

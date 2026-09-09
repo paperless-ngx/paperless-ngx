@@ -60,16 +60,16 @@
       <div class="list-group list-group-flush border-0 pt-1 pb-2 card-info">
          @if (document()) {
           @if (displayFields().includes(DisplayField.DOCUMENT_TYPE) && document().document_type) {
-            <button type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle document type filter" i18n-title
+            <button type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0 d-flex align-items-start" title="Toggle document type filter" i18n-title
               (click)="clickDocumentType.emit(document().document_type);$event.stopPropagation()">
-              <i-bs width="1em" height="1em" class="me-2 text-muted" name="file-earmark"></i-bs>
+              <i-bs width="1em" height="1em" class="me-2 text-muted flex-shrink-0" name="file-earmark"></i-bs>
               <small>{{document().document_type | documentTypeName | async}}</small>
             </button>
           }
           @if (displayFields().includes(DisplayField.STORAGE_PATH) && document().storage_path) {
-            <button type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0" title="Toggle storage path filter" i18n-title
+            <button type="button" class="list-group-item list-group-item-action bg-transparent ps-0 p-1 border-0 d-flex align-items-start" title="Toggle storage path filter" i18n-title
               (click)="clickStoragePath.emit(document().storage_path);$event.stopPropagation()">
-              <i-bs width="1em" height="1em" class="me-2 text-muted" name="folder"></i-bs>
+              <i-bs width="1em" height="1em" class="me-2 text-muted flex-shrink-0" name="folder"></i-bs>
               <small>{{document().storage_path | storagePathName | async}}</small>
             </button>
           }

@@ -1,9 +1,14 @@
+from __future__ import annotations
+
 import json
+from typing import TYPE_CHECKING
+from typing import Any
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
 from django.db.models.signals import post_init
+from django.utils import timezone
 from llama_index.core import settings as llama_settings
 from llama_index.core.embeddings.mock_embed_model import MockEmbedding
 from llama_index.core.schema import TextNode
@@ -17,6 +22,11 @@ from paperless_ai.chat import CHAT_METADATA_DELIMITER
 from paperless_ai.chat import _build_chat_prompt
 from paperless_ai.chat import _build_refine_prompt
 from paperless_ai.chat import stream_chat_with_documents
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import pytest_mock
 
 
 @pytest.fixture(autouse=True)
@@ -310,8 +320,40 @@ def test_stream_chat_unexpected_failure_returns_generic_error(caplog) -> None:
         assert "private provider detail" in caplog.text
 
 
+def _retriever_filter_values(captured_filters: list[Any]) -> list[str]:
+    """The value list of the single MetadataFilter the retriever received."""
+    assert captured_filters, "VectorIndexRetriever was never constructed"
+    filt = captured_filters[0]
+    assert filt is not None, "Retriever must receive a MetadataFilters"
+    return filt.filters[0].value
+
+
 @pytest.mark.django_db
 class TestStreamChatRetrieval:
+    @pytest.fixture
+    def captured_filters(self, mocker: pytest_mock.MockerFixture) -> list[Any]:
+        """Stub out the AI client and the retriever, capturing the ``filters``
+        kwarg of every VectorIndexRetriever construction.
+
+        VectorIndexRetriever is imported inside _stream_chat_with_documents,
+        so it is patched at the llama_index source for the lazy import to
+        pick it up.
+        """
+        captured: list[Any] = []
+        retriever = mocker.MagicMock()
+        retriever.retrieve.return_value = []
+
+        def capture_retriever(*args, **kwargs) -> pytest_mock.MockType:
+            captured.append(kwargs.get("filters"))
+            return retriever
+
+        mocker.patch("paperless_ai.chat.AIClient")
+        mocker.patch(
+            "llama_index.core.retrievers.VectorIndexRetriever",
+            side_effect=capture_retriever,
+        )
+        return captured
+
     def test_no_nodes_yields_no_content_message(
         self,
         temp_llm_index_dir,
@@ -329,9 +371,9 @@ class TestStreamChatRetrieval:
 
     def test_chat_filter_contains_only_requested_document_ids(
         self,
-        temp_llm_index_dir,
-        mock_embed_model,
-        mocker,
+        temp_llm_index_dir: Path,
+        mock_embed_model: pytest_mock.MockType,
+        captured_filters: list[Any],
     ) -> None:
         """The MetadataFilter passed to the retriever must be scoped to the
         requested documents only — content from other indexed documents must
@@ -342,22 +384,6 @@ class TestStreamChatRetrieval:
         indexing.llm_index_add_or_update_document(included)
         indexing.llm_index_add_or_update_document(excluded)
 
-        # VectorIndexRetriever is imported inside _stream_chat_with_documents;
-        # patch it at the llama_index source so the lazy import picks it up.
-        captured_filters = []
-        mock_retriever = mocker.MagicMock()
-        mock_retriever.retrieve.return_value = []
-
-        def capture_retriever(*args, **kwargs):
-            captured_filters.append(kwargs.get("filters"))
-            return mock_retriever
-
-        mocker.patch("paperless_ai.chat.AIClient")
-        mocker.patch(
-            "llama_index.core.retrievers.VectorIndexRetriever",
-            side_effect=capture_retriever,
-        )
-
         list(
             chat.stream_chat_with_documents(
                 "question?",
@@ -365,12 +391,77 @@ class TestStreamChatRetrieval:
             ),
         )
 
-        assert captured_filters, "VectorIndexRetriever was never constructed"
-        filt = captured_filters[0]
-        assert filt is not None, "Retriever must receive a MetadataFilters"
-        filter_values = filt.filters[0].value
+        filter_values = _retriever_filter_values(captured_filters)
         assert str(included.pk) in filter_values
         assert str(excluded.pk) not in filter_values
+
+    def test_unrestricted_chat_excludes_nothing_when_no_documents_are_trashed(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: pytest_mock.MockType,
+        captured_filters: list[Any],
+    ) -> None:
+        """
+        GIVEN:
+            - A document indexed in the vector store, nothing trashed
+        WHEN:
+            - stream_chat_with_documents is called with unrestricted=True
+        THEN:
+            - The retriever receives a NOT IN filter excluding zero ids, so
+              the whole index is effectively searched -- and no IN-list is
+              built from the full permitted set, which is what risks the
+              vector store's safety limit on large installs
+        """
+        document = DocumentFactory.create(content="indexed document content")
+        indexing.llm_index_add_or_update_document(document)
+
+        list(
+            chat.stream_chat_with_documents(
+                "question?",
+                Document.objects.filter(pk=document.pk),
+                unrestricted=True,
+            ),
+        )
+
+        assert _retriever_filter_values(captured_filters) == []
+
+    def test_unrestricted_chat_excludes_trashed_documents(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: pytest_mock.MockType,
+        captured_filters: list[Any],
+    ) -> None:
+        """
+        GIVEN:
+            - Two indexed documents, one of them trashed -- trashed documents
+              stay in the vector index until permanently deleted, since
+              delete_document_from_llm_index is wired to post_delete
+        WHEN:
+            - stream_chat_with_documents is called with unrestricted=True
+        THEN:
+            - The retriever receives a NOT IN filter excluding the trashed
+              document's id, so an unrestricted caller (e.g. a superuser)
+              never has trashed content surfaced in a chat answer
+        """
+        kept = DocumentFactory.create(content="kept document content")
+        trashed = DocumentFactory.create(content="trashed document content")
+        indexing.llm_index_add_or_update_document(kept)
+        indexing.llm_index_add_or_update_document(trashed)
+        Document.global_objects.filter(pk=trashed.pk).update(
+            deleted_at=timezone.now(),
+        )
+
+        list(
+            chat.stream_chat_with_documents(
+                "question?",
+                Document.objects.filter(pk=kept.pk),
+                unrestricted=True,
+            ),
+        )
+
+        filter_values = _retriever_filter_values(captured_filters)
+        assert str(trashed.pk) in filter_values
+        assert str(kept.pk) not in filter_values
 
     @pytest.mark.django_db
     def test_get_document_references_only_queries_referenced_documents(

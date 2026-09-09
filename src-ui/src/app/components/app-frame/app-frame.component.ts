@@ -98,6 +98,29 @@ export class AppFrameComponent
   readonly isMenuCollapsed = signal(true)
   readonly slimSidebarAnimating = signal(false)
   readonly mobileSearchHidden = signal(false)
+  private readonly versionSetting = this.settingsService.getSignal<string>(
+    SETTINGS_KEYS.VERSION
+  )
+  private readonly appTitleSetting = this.settingsService.getSignal<string>(
+    SETTINGS_KEYS.APP_TITLE
+  )
+  private readonly appLogoSetting = this.settingsService.getSignal<string>(
+    SETTINGS_KEYS.APP_LOGO
+  )
+  private readonly slimSidebarSetting = this.settingsService.getSignal<boolean>(
+    SETTINGS_KEYS.SLIM_SIDEBAR
+  )
+  private readonly attributesSectionsCollapsedSetting =
+    this.settingsService.getSignal<CollapsibleSection[]>(
+      SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED
+    )
+  private readonly aiEnabledSetting = this.settingsService.getSignal<boolean>(
+    SETTINGS_KEYS.AI_ENABLED
+  )
+  private readonly sidebarViewsShowCountSetting =
+    this.settingsService.getSignal<boolean>(
+      SETTINGS_KEYS.SIDEBAR_VIEWS_SHOW_COUNT
+    )
   private lastScrollY: number = 0
 
   constructor() {
@@ -191,33 +214,23 @@ export class AppFrameComponent
   }
 
   get versionString(): string {
-    this.settingsService.trackChanges()
-    return `${environment.appTitle} v${this.settingsService.get(SETTINGS_KEYS.VERSION)}${environment.tag === 'prod' ? '' : ` #${environment.tag}`}`
+    return `${environment.appTitle} v${this.versionSetting()}${environment.tag === 'prod' ? '' : ` #${environment.tag}`}`
   }
 
   get appTitle(): string {
-    this.settingsService.trackChanges()
-    return (
-      this.settingsService.get(SETTINGS_KEYS.APP_TITLE) || environment.appTitle
-    )
+    return this.appTitleSetting() || environment.appTitle
   }
 
   get customAppTitle(): string {
-    this.settingsService.trackChanges()
-    return this.settingsService.get(SETTINGS_KEYS.APP_TITLE)
+    return this.appTitleSetting()
   }
 
   get hasCustomBranding(): boolean {
-    this.settingsService.trackChanges()
-    return !!(
-      this.settingsService.get(SETTINGS_KEYS.APP_TITLE)?.length ||
-      this.settingsService.get(SETTINGS_KEYS.APP_LOGO)?.length
-    )
+    return !!(this.appTitleSetting()?.length || this.appLogoSetting()?.length)
   }
 
   get customAppLogo(): string {
-    this.settingsService.trackChanges()
-    const logo = this.settingsService.get(SETTINGS_KEYS.APP_LOGO)
+    const logo = this.appLogoSetting()
     return logo?.length
       ? environment.apiBaseUrl.replace(/\/api\/$/, logo)
       : null
@@ -262,8 +275,7 @@ export class AppFrameComponent
   }
 
   get slimSidebarEnabled(): boolean {
-    this.settingsService.trackChanges()
-    return this.settingsService.get(SETTINGS_KEYS.SLIM_SIDEBAR)
+    return this.slimSidebarSetting()
   }
 
   set slimSidebarEnabled(enabled: boolean) {
@@ -286,10 +298,9 @@ export class AppFrameComponent
   }
 
   get attributesSectionsCollapsed(): boolean {
-    this.settingsService.trackChanges()
-    return this.settingsService
-      .get(SETTINGS_KEYS.ATTRIBUTES_SECTIONS_COLLAPSED)
-      ?.includes(CollapsibleSection.ATTRIBUTES)
+    return this.attributesSectionsCollapsedSetting()?.includes(
+      CollapsibleSection.ATTRIBUTES
+    )
   }
 
   set attributesSectionsCollapsed(collapsed: boolean) {
@@ -312,8 +323,7 @@ export class AppFrameComponent
   }
 
   get aiEnabled(): boolean {
-    this.settingsService.trackChanges()
-    return this.settingsService.get(SETTINGS_KEYS.AI_ENABLED)
+    return this.aiEnabledSetting()
   }
 
   @HostListener('window:resize')
@@ -480,9 +490,8 @@ export class AppFrameComponent
   }
 
   get showSidebarCounts(): boolean {
-    this.settingsService.trackChanges()
     return (
-      this.settingsService.get(SETTINGS_KEYS.SIDEBAR_VIEWS_SHOW_COUNT) &&
+      this.sidebarViewsShowCountSetting() &&
       !this.settingsService.organizingSidebarSavedViews()
     )
   }
