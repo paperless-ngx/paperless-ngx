@@ -674,6 +674,9 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             ordering = ordering or (Lower("name"),)
             children = children.order_by(*ordering)
 
+        if not children:
+            return []
+
         serializer = TagSerializer(
             children,
             many=True,

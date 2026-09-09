@@ -1188,9 +1188,7 @@ class TestRetrieveSimilarNodesAgainstRealIndex:
 
         nodes = indexing.retrieve_similar_nodes(a, document_ids=[b.id])
 
-        assert all(
-            document_id == b.id for document_id in indexing._node_document_ids(nodes)
-        )
+        assert all(int(node.metadata["document_id"]) == b.id for node in nodes)
 
     def test_excludes_self(
         self,
@@ -1212,7 +1210,7 @@ class TestRetrieveSimilarNodesAgainstRealIndex:
 
         nodes = indexing.retrieve_similar_nodes(a, top_k=5)
 
-        assert set(indexing._node_document_ids(nodes)) == {b.id}
+        assert {int(node.metadata["document_id"]) for node in nodes} == {b.id}
 
     def test_excludes_self_with_multiple_chunks(
         self,
@@ -1235,4 +1233,4 @@ class TestRetrieveSimilarNodesAgainstRealIndex:
 
         nodes = indexing.retrieve_similar_nodes(a, top_k=3)
 
-        assert set(indexing._node_document_ids(nodes)) == {b.id}
+        assert {int(node.metadata["document_id"]) for node in nodes} == {b.id}

@@ -232,6 +232,7 @@ from documents.tasks import train_classifier
 from documents.tasks import update_document_parent_tags
 from documents.utils import get_boolean
 from documents.versioning import VersionResolutionError
+from documents.versioning import annotate_effective_content
 from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_request_version_param
 from documents.versioning import get_root_document
@@ -3649,8 +3650,13 @@ class GlobalSearchView(PassUserMixin):
         OBJECT_LIMIT = 3
         docs = []
         if request.user.has_perm("documents.view_document"):
-            all_docs = Document.objects.filter(
-                id__in=permitted_document_ids(request.user),
+            # Never more than OBJECT_LIMIT rows come back here, so annotating
+            # is cheap -- and without it these results show the root
+            # document's superseded content.
+            all_docs = annotate_effective_content(
+                Document.objects.filter(
+                    id__in=permitted_document_ids(request.user),
+                ),
             )
             if db_only:
                 docs = all_docs.filter(title__icontains=query)[:OBJECT_LIMIT]
@@ -5448,7 +5454,10 @@ class TrashView(ListModelMixin, PassUserMixin):
 
     model = Document
 
-    queryset = Document.deleted_objects.all()
+    # A version is listed separately only when its root is not in the trash.
+    queryset = Document.deleted_objects.exclude(
+        root_document_id__in=Document.deleted_objects.values("id"),
+    )
 
     def get(self, request: Request, format: str | None = None) -> Response:
         self.serializer_class = DocumentSerializer
@@ -5479,7 +5488,15 @@ class TrashView(ListModelMixin, PassUserMixin):
             return HttpResponseForbidden("Insufficient permissions")
         action = serializer.validated_data.get("action")
         if action == "restore":
-            restored = list(Document.deleted_objects.filter(id__in=doc_ids))
+            restored = list(self.get_queryset().filter(id__in=doc_ids))
+            if len(restored) != len(doc_ids):
+                raise ValidationError(
+                    {
+                        "documents": [
+                            "Restore the root document instead of one of its versions.",
+                        ],
+                    },
+                )
             for doc in restored:
                 doc.restore(strict=False)
             if restored:

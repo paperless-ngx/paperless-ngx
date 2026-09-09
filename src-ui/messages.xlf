@@ -501,15 +501,43 @@
           <context context-type="linenumber">30</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="7057826840809102816" datatype="html">
+        <source>This value overrides <x id="INTERPOLATION" equiv-text="{{option.config_key}}"/>, which is set outside Paperless.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7221396516204435584" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{option.config_key}}"/> is set outside Paperless. Enter a value here to override it.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8318849619178340389" datatype="html">
+        <source>Use the externally configured value</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6032629623003430385" datatype="html">
+        <source>Reset to external</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="7808756054397155068" datatype="html">
         <source>Reset</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">46</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
-          <context context-type="linenumber">35</context>
+          <context context-type="linenumber">47</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
@@ -520,7 +548,7 @@
         <source>Enable</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">56</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
@@ -531,7 +559,7 @@
         <source>Cancel</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
-          <context context-type="linenumber">67,68</context>
+          <context context-type="linenumber">80,81</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
@@ -610,7 +638,7 @@
         <source>Save</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
-          <context context-type="linenumber">70,71</context>
+          <context context-type="linenumber">83,84</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
@@ -681,42 +709,42 @@
         <source>Error retrieving config</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
-          <context context-type="linenumber">117</context>
+          <context context-type="linenumber">118</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1172622527269118932" datatype="html">
         <source>Invalid JSON</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
-          <context context-type="linenumber">143</context>
+          <context context-type="linenumber">144</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5103146006962696736" datatype="html">
         <source>Configuration updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
-          <context context-type="linenumber">187</context>
+          <context context-type="linenumber">193</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1664963291286452273" datatype="html">
         <source>An error occurred updating configuration</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
-          <context context-type="linenumber">192</context>
+          <context context-type="linenumber">198</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2653081282186526824" datatype="html">
         <source>File successfully updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
-          <context context-type="linenumber">214</context>
+          <context context-type="linenumber">220</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5902783625859504265" datatype="html">
         <source>An error occurred uploading file</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/config/config.component.ts</context>
-          <context context-type="linenumber">219</context>
+          <context context-type="linenumber">225</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4804785061014590286" datatype="html">

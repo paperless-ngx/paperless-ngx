@@ -25,6 +25,10 @@ jobs:
   pr-bot:
     name: Automated PR Bot
     runs-on: ubuntu-latest
+    # Runs after Anti-slop so the welcome comment can see whether the PR was closed
+    # instead of racing it. Still runs if that job fails, so labeling is not lost.
+    needs: Anti-slop
+    if: ${{ !cancelled() }}
     permissions:
       contents: read
       pull-requests: write
@@ -99,8 +103,25 @@ jobs:
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
-            const pr = context.payload.pull_request;
-            const user = pr.user.login;
+            const user = context.payload.pull_request.user.login;
+
+            // Re-read the PR: Anti-slop may have closed and labeled it after the webhook
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+            });
+
+            if (pr.state === 'closed') {
+              core.info('Skipping comment: PR is already closed');
+              return;
+            }
+
+            const labels = pr.labels.map((label) => (typeof label === 'string' ? label : label.name));
+            if (labels.includes('ai')) {
+              core.info('Skipping comment: PR is labeled ai');
+              return;
+            }
 
             const { data: members } = await github.rest.orgs.listMembers({
               org: 'paperless-ngx',

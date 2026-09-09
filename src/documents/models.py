@@ -1,4 +1,5 @@
 import datetime
+import uuid
 from pathlib import Path
 from typing import Final
 
@@ -514,13 +515,20 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
     def delete(
         self,
         *args,
+        transaction_id=None,
         **kwargs,
     ):
-        # If deleting a root document, move all its versions to trash as well.
+        # Versions must share the root's transaction ID so they are restored
+        # together by django-softdelete.
+        if transaction_id is None:
+            transaction_id = uuid.uuid4()
         if self.root_document_id is None:
-            Document.objects.filter(root_document=self).delete()
+            Document.objects.filter(root_document=self).delete(
+                transaction_id=transaction_id,
+            )
         return super().delete(
             *args,
+            transaction_id=transaction_id,
             **kwargs,
         )
 
