@@ -7,6 +7,7 @@ import {
 } from '@angular/cdk/drag-drop'
 import { NgClass } from '@angular/common'
 import { Component, HostListener, inject, OnInit, signal } from '@angular/core'
+import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import {
   NgbCollapseModule,
@@ -21,7 +22,11 @@ import { Observable } from 'rxjs'
 import { first } from 'rxjs/operators'
 import { Document } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
-import { CollapsibleSection, SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import {
+  CollapsibleSection,
+  HideableSidebarItemID,
+  SETTINGS_KEYS,
+} from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { ComponentCanDeactivate } from 'src/app/guards/dirty-doc.guard'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
@@ -48,6 +53,7 @@ import { ChatComponent } from '../chat/chat/chat.component'
 import { BrandMarkComponent } from '../common/logo/brand-mark/brand-mark.component'
 import { LogoComponent } from '../common/logo/logo.component'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
+import { SwitchComponent } from '../common/input/switch/switch.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
@@ -76,6 +82,8 @@ const SCROLL_THRESHOLD = 16
     NgxBootstrapIconsModule,
     DragDropModule,
     TourNgBootstrap,
+    FormsModule,
+    SwitchComponent,
   ],
 })
 export class AppFrameComponent
@@ -98,6 +106,7 @@ export class AppFrameComponent
   readonly isMenuCollapsed = signal(true)
   readonly slimSidebarAnimating = signal(false)
   readonly mobileSearchHidden = signal(false)
+  readonly HideableSidebarItemID = HideableSidebarItemID
   private readonly versionSetting = this.settingsService.getSignal<string>(
     SETTINGS_KEYS.VERSION
   )
@@ -193,6 +202,10 @@ export class AppFrameComponent
     setTimeout(() => {
       this.slimSidebarAnimating.set(false)
     }, 200) // slightly longer than css animation for slim sidebar
+  }
+
+  toggleSidebarItem(item: HideableSidebarItemID, visible: boolean): void {
+    this.settingsService.updateSidebarItemVisibility(item, visible)
   }
 
   toggleAttributesSections(event?: Event): void {

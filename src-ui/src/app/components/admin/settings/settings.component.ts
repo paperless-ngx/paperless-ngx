@@ -39,7 +39,12 @@ import {
   SystemStatus,
   SystemStatusItemStatus,
 } from 'src/app/data/system-status'
-import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import {
+  GlobalSearchType,
+  HIDEABLE_SIDEBAR_ITEM_IDS,
+  HideableSidebarItemID,
+  SETTINGS_KEYS,
+} from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -102,6 +107,14 @@ const documentDetailFieldOptions = [
   { id: DocumentDetailFieldID.Tags, label: $localize`Tags` },
 ]
 
+const sidebarItemLabels: Record<HideableSidebarItemID, string> = {
+  [HideableSidebarItemID.Dashboard]: $localize`Dashboard`,
+  [HideableSidebarItemID.SavedViews]: $localize`Saved Views`,
+  [HideableSidebarItemID.Workflows]: $localize`Workflows`,
+  [HideableSidebarItemID.Mail]: $localize`Mail`,
+  [HideableSidebarItemID.Documentation]: $localize`Documentation`,
+}
+
 @Component({
   selector: 'pngx-settings',
   templateUrl: './settings.component.html',
@@ -149,6 +162,7 @@ export class SettingsComponent
     bulkEditApplyOnClose: new FormControl(null),
     documentListItemPerPage: new FormControl(null),
     slimSidebarEnabled: new FormControl(null),
+    sidebarHiddenItems: new FormControl<HideableSidebarItemID[]>([]),
     darkModeUseSystem: new FormControl(null),
     darkModeEnabled: new FormControl(null),
     darkModeInvertThumbs: new FormControl(null),
@@ -186,6 +200,7 @@ export class SettingsComponent
 
   store: BehaviorSubject<any>
   storeSub: Subscription
+  sidebarItemsSub: Subscription
   isDirty$: Observable<boolean>
   isDirty: boolean = false
   unsubscribeNotifier: Subject<any> = new Subject()
@@ -203,6 +218,10 @@ export class SettingsComponent
   public readonly PdfEditorEditMode = PdfEditorEditMode
 
   public readonly documentDetailFieldOptions = documentDetailFieldOptions
+  public readonly sidebarItemOptions = HIDEABLE_SIDEBAR_ITEM_IDS.map((id) => ({
+    id,
+    label: sidebarItemLabels[id],
+  }))
 
   get systemStatusHasErrors(): boolean {
     const status = this.systemStatus()
@@ -230,6 +249,10 @@ export class SettingsComponent
 
   constructor() {
     super()
+    this.sidebarItemsSub =
+      this.settings.sidebarHiddenItemsEditingChanged.subscribe((hiddenItems) =>
+        this.settingsForm.controls.sidebarHiddenItems.setValue(hiddenItems)
+      )
     this.settings.settingsSaved.subscribe(() => {
       if (!this.savePending) this.initialize()
       this.savedViewsService.maybeRefreshDocumentCounts()
@@ -279,14 +302,21 @@ export class SettingsComponent
 
     this.activatedRoute.paramMap.subscribe((paramMap) => {
       const section = paramMap.get('section')
+      let navID = SettingsNavIDs.General
       if (section) {
         const navIDKey: string = Object.keys(SettingsNavIDs).find(
           (navID) => navID.toLowerCase() == section
         )
         if (navIDKey) {
-          this.activeNavID.set(SettingsNavIDs[navIDKey])
+          navID = SettingsNavIDs[navIDKey]
         }
       }
+      this.activeNavID.set(navID)
+      this.settings.sidebarHiddenItemsEditing.set(
+        navID === SettingsNavIDs.General
+          ? [...this.settingsForm.controls.sidebarHiddenItems.value]
+          : null
+      )
     })
   }
 
@@ -310,6 +340,7 @@ export class SettingsComponent
         SETTINGS_KEYS.DOCUMENT_LIST_SIZE
       ),
       slimSidebarEnabled: this.settings.get(SETTINGS_KEYS.SLIM_SIDEBAR),
+      sidebarHiddenItems: this.settings.get(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS),
       darkModeUseSystem: this.settings.get(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM),
       darkModeEnabled: this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED),
       darkModeInvertThumbs: this.settings.get(
@@ -436,6 +467,12 @@ export class SettingsComponent
       this.settingsForm.patchValue(currentFormValue)
     }
 
+    if (this.settings.organizingSidebarItems()) {
+      this.settings.sidebarHiddenItemsEditing.set([
+        ...this.settingsForm.controls.sidebarHiddenItems.value,
+      ])
+    }
+
     if (this.canViewSystemStatus) {
       this.systemStatusService.get().subscribe((status) => {
         this.systemStatus.set(status)
@@ -444,8 +481,18 @@ export class SettingsComponent
   }
 
   ngOnDestroy() {
+    this.settings.sidebarHiddenItemsEditing.set(null)
     if (this.isDirty) this.settings.updateAppearanceSettings() // in case user changed appearance but didn't save
     this.storeSub && this.storeSub.unsubscribe()
+    this.sidebarItemsSub.unsubscribe()
+  }
+
+  isSidebarItemShown(item: HideableSidebarItemID): boolean {
+    return !(this.settingsForm.value.sidebarHiddenItems || []).includes(item)
+  }
+
+  toggleSidebarItem(item: HideableSidebarItemID, checked: boolean): void {
+    this.settings.updateSidebarItemVisibility(item, checked)
   }
 
   public saveSettings() {
@@ -472,6 +519,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.SLIM_SIDEBAR,
       this.settingsForm.value.slimSidebarEnabled
+    )
+    this.settings.set(
+      SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS,
+      this.settingsForm.value.sidebarHiddenItems
     )
     this.settings.set(
       SETTINGS_KEYS.DARK_MODE_USE_SYSTEM,
@@ -632,6 +683,11 @@ export class SettingsComponent
 
   reset() {
     this.settingsForm.patchValue(this.store.getValue())
+    if (this.settings.organizingSidebarItems()) {
+      this.settings.sidebarHiddenItemsEditing.set([
+        ...this.settingsForm.controls.sidebarHiddenItems.value,
+      ])
+    }
   }
 
   clearThemeColor() {

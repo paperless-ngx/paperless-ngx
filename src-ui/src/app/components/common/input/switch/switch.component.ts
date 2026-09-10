@@ -25,6 +25,9 @@ export class SwitchComponent extends AbstractInputComponent<boolean> {
   @Input()
   showUnsetNote: boolean = false
 
+  @Input()
+  compact: boolean = false
+
   constructor() {
     super()
   }

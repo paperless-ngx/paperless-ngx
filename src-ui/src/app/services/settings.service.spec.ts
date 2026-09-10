@@ -14,7 +14,11 @@ import { CustomFieldDataType } from '../data/custom-field'
 import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
 import { SavedView } from '../data/saved-view'
 import { RemoteOCRModeConfig } from '../data/paperless-config'
-import { SETTINGS_KEYS, UiSettings } from '../data/ui-settings'
+import {
+  HideableSidebarItemID,
+  SETTINGS_KEYS,
+  UiSettings,
+} from '../data/ui-settings'
 import { PermissionsService } from './permissions.service'
 import { CustomFieldsService } from './rest/custom-fields.service'
 import { SettingsService } from './settings.service'
@@ -228,6 +232,35 @@ describe('SettingsService', () => {
     settingsService.set(SETTINGS_KEYS.NOTES_ENABLED, false)
 
     expect(notesEnabled()).toBeFalsy()
+  })
+
+  it('updates sidebar item visibility', () => {
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(ui_settings)
+
+    expect(
+      settingsService.sidebarItemIsHidden(HideableSidebarItemID.Workflows)
+    ).toBe(false)
+
+    settingsService.updateSidebarItemVisibility(
+      HideableSidebarItemID.Workflows,
+      false
+    )
+
+    expect(
+      settingsService.sidebarItemIsHidden(HideableSidebarItemID.Workflows)
+    ).toBe(true)
+    expect(settingsService.get(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS)).toEqual([])
+
+    settingsService.updateSidebarItemVisibility(
+      HideableSidebarItemID.Workflows,
+      true
+    )
+
+    expect(
+      settingsService.sidebarItemIsHidden(HideableSidebarItemID.Workflows)
+    ).toBe(false)
   })
 
   it('updates setting signals when settings are reinitialized', () => {
