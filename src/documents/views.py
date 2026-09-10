@@ -2380,7 +2380,6 @@ class ChatStreamingView(GenericAPIView[Any]):
     serializer_class = ChatStreamingSerializer
 
     def post(self, request, *args, **kwargs):
-        request.compress_exempt = True
         ai_config = AIConfig()
         if not ai_config.ai_enabled:
             return HttpResponseBadRequest("AI is required for this feature")
