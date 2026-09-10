@@ -1247,30 +1247,31 @@ class DocumentSerializer(
 
             validated_data["tags"] = list(final_tags)
         if validated_data.get("remove_inbox_tags"):
-            tag_ids_being_added = (
-                [
-                    tag.id
-                    for tag in validated_data["tags"]
-                    if tag not in instance.tags.all()
-                ]
+            current_tag_ids = {t.pk for t in instance.tags.all()}
+            tags = (
+                validated_data["tags"]
                 if "tags" in validated_data
-                else []
+                else list(instance.tags.all())
             )
-            inbox_tags_not_being_added = Tag.objects.filter(is_inbox_tag=True).exclude(
-                id__in=tag_ids_being_added,
-            )
-            if "tags" in validated_data:
-                validated_data["tags"] = [
-                    tag
-                    for tag in validated_data["tags"]
-                    if tag not in inbox_tags_not_being_added
-                ]
-            else:
-                validated_data["tags"] = [
-                    tag
-                    for tag in instance.tags.all()
-                    if tag not in inbox_tags_not_being_added
-                ]
+
+            # Tags newly added in this update, plus their ancestors, are kept
+            keep_ids: set[int] = set()
+            for tag in tags:
+                if tag.pk not in current_tag_ids:
+                    keep_ids.add(tag.pk)
+                    keep_ids.update(int(pk) for pk in tag.get_ancestors_pks())
+
+            # Remove inbox tags and their descendants, except those being kept
+            remove_ids: set[int] = set()
+            for inbox_tag in (
+                Tag.objects.filter(is_inbox_tag=True)
+                .exclude(pk__in=keep_ids)
+                .only("pk", "tn_descendants_pks")
+            ):
+                remove_ids.add(inbox_tag.pk)
+                remove_ids.update(int(pk) for pk in inbox_tag.get_descendants_pks())
+
+            validated_data["tags"] = [t for t in tags if t.pk not in remove_ids]
 
         if settings.AUDIT_LOG_ENABLED:
             with set_actor(self.user):
