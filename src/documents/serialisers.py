@@ -952,15 +952,11 @@ class _CachingCustomFieldPrimaryKeyField(serializers.PrimaryKeyRelatedField):
 class CustomFieldInstanceListSerializer(serializers.ListSerializer):
     def to_internal_value(self, data: Any) -> list[Any]:
         if isinstance(data, list):
-            field_ids = []
-            for item in data:
-                if not isinstance(item, dict) or "field" not in item:
-                    continue
-                try:
-                    hash(item["field"])
-                except TypeError:
-                    continue
-                field_ids.append(item["field"])
+            field_ids = [
+                item["field"]
+                for item in data
+                if isinstance(item, dict) and "field" in item
+            ]
             if field_ids:
                 self.child.fields["field"].prefetch(field_ids)
         return super().to_internal_value(data)
