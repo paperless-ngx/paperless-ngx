@@ -16,7 +16,6 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
-from documents.serialisers import CustomFieldInstanceSerializer
 from documents.serialisers import DocumentSerializer
 from documents.tests.factories import DocumentFactory
 from documents.tests.utils import DirectoriesMixin
@@ -585,38 +584,44 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             f"got {len(custom_field_lookups)}: {custom_field_lookups}",
         )
 
-    def test_custom_field_lookup_reuses_shared_context_cache(self) -> None:
+    def test_document_serializer_save_reuses_cached_custom_fields(self) -> None:
         """
         GIVEN:
-            - A CustomField has already been resolved once, by a serializer
-              sharing a given `context` dict
+            - A document is being saved with several custom field values via
+              DocumentSerializer, which drives drf-writable-nested's real
+              update_or_create_reverse_relations path -- rebuilding a fresh
+              CustomFieldInstanceSerializer per item during save(), the exact
+              mechanism the shared-context cache exists to optimize
         WHEN:
-            - A second, separately-instantiated CustomFieldInstanceSerializer
-              validates the same field id, sharing that same context
-              (this is what drf-writable-nested does: it rebuilds a fresh
-              serializer -- and fresh field instances -- per item while
-              matching existing vs. new instances during save())
+            - The serializer, already validated, is saved
         THEN:
-            - No additional query is issued to resolve the CustomField
+            - No further CustomField queries are issued: each per-item
+              nested serializer reuses the CustomField objects resolved
+              during is_valid(), instead of re-resolving them during save()
         """
-        custom_field = CustomField.objects.create(
-            name="Test Custom Field",
-            data_type=CustomField.FieldDataType.STRING,
-        )
+        doc = DocumentFactory(mime_type="application/pdf")
+        custom_fields = [
+            CustomField.objects.create(
+                name=f"Test Custom Field {i}",
+                data_type=CustomField.FieldDataType.STRING,
+            )
+            for i in range(5)
+        ]
 
-        context: dict = {}
-        first_pass = CustomFieldInstanceSerializer(
-            data={"field": custom_field.id, "value": "a"},
-            context=context,
+        serializer = DocumentSerializer(
+            doc,
+            data={
+                "custom_fields": [
+                    {"field": custom_field.id, "value": "test value"}
+                    for custom_field in custom_fields
+                ],
+            },
+            partial=True,
         )
-        self.assertTrue(first_pass.is_valid(), first_pass.errors)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
 
-        second_pass = CustomFieldInstanceSerializer(
-            data={"field": custom_field.id, "value": "b"},
-            context=context,
-        )
         with CaptureQueriesContext(connection) as ctx:
-            self.assertTrue(second_pass.is_valid(), second_pass.errors)
+            serializer.save()
 
         custom_field_lookups = [
             query
@@ -625,11 +630,12 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             in query["sql"]
         ]
         self.assertEqual(
-            len(custom_field_lookups),
-            0,
-            "Expected the second, separately-instantiated serializer to reuse "
-            f"the already-resolved CustomField, got: {custom_field_lookups}",
+            custom_field_lookups,
+            [],
+            "Expected save() to reuse CustomField objects resolved during "
+            f"is_valid(), got: {custom_field_lookups}",
         )
+        self.assertEqual(doc.custom_fields.count(), 5)
 
     def test_custom_field_validation_rejects_malformed_field_value(self) -> None:
         """
