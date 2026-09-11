@@ -595,6 +595,13 @@ export class DocumentDetailComponent
             openDocument.duplicate_documents = doc.duplicate_documents
             this.openDocumentService.save()
           }
+          // use server versions
+          if (openDocument) {
+            openDocument.versions = doc.versions
+            if (!openDocument.__changedFields?.includes('content')) {
+              openDocument.content = doc.content
+            }
+          }
           let useDoc = openDocument || doc
           if (openDocument && forceRemote) {
             Object.assign(openDocument, doc)
@@ -643,6 +650,14 @@ export class DocumentDetailComponent
               this.documentForm.get('title').markAsDirty()
             })
           this.setupDirtyTracking(useDoc, doc)
+          // Maybe load the stored version
+          if (useDoc.__selectedVersionId) {
+            this.selectVersion(
+              this.selectedVersionId(),
+              useDoc.__selectedVersionId === this.selectedVersionId() &&
+                !!useDoc.__changedFields?.includes('content')
+            )
+          }
         },
       })
   }
@@ -903,9 +918,11 @@ export class DocumentDetailComponent
 
   updateComponent(doc: Document) {
     this.document.set(doc)
-    // Default selected version is the newest version, which the API returns first
+    // Load the selected version, or default to API first (newest)
     const versions = doc.versions ?? []
-    this.selectedVersionId.set(versions.length ? versions[0].id : doc.id)
+    const selectedVersion =
+      versions.find((v) => v.id === doc.__selectedVersionId) ?? versions[0]
+    this.selectedVersionId.set(selectedVersion?.id ?? doc.id)
     this.previewLoaded.set(false)
     this.requiresPassword = false
     this.updateFormForCustomFields()
@@ -940,8 +957,11 @@ export class DocumentDetailComponent
   }
 
   // Update file preview and download target to a specific version (by document id)
-  selectVersion(versionId: number) {
+  selectVersion(versionId: number, keepContentEdits: boolean = false) {
     this.selectedVersionId.set(versionId)
+    // remember so the version can be restored when returning to the document
+    this.document().__selectedVersionId = versionId
+    this.openDocumentService.save()
     this.previewLoaded.set(false)
     this.previewUrl.set(
       this.documentsService.getPreviewUrl(
@@ -972,8 +992,10 @@ export class DocumentDetailComponent
           const content = doc?.content ?? ''
           // Update in-place and avoid the debounce wait
           this.store.value.content = content
-          this.documentForm.patchValue({ content })
-          this.documentForm.get('content').markAsPristine()
+          if (!keepContentEdits) {
+            this.documentForm.patchValue({ content })
+            this.documentForm.get('content').markAsPristine()
+          }
         },
         error: (error) => {
           this.toastService.showError(

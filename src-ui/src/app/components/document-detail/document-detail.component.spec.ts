@@ -2213,6 +2213,7 @@ describe('DocumentDetailComponent', () => {
           ? { content: `version ${versionID} content` }
           : {
               ...doc,
+              content: 'version 12 content',
               versions: docVersions.filter((v) => v.id !== 10),
             }) as Document
       )
@@ -2222,7 +2223,9 @@ describe('DocumentDetailComponent', () => {
     component['loadDocument'](doc.id)
 
     expect(component.selectedVersionId()).toEqual(12)
-    expect(component.documentForm.get('content').value).toEqual(doc.content)
+    expect(component.documentForm.get('content').value).toEqual(
+      'version 12 content'
+    )
   })
 
   it('createDisabled should return true if the user does not have permission to add the specified data type', () => {
