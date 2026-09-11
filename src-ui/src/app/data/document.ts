@@ -167,6 +167,7 @@ export interface Document extends ObjectWithPermissions {
 
   // Frontend only
   __changedFields?: string[]
+  __selectedVersionId?: number
 }
 
 export interface DocumentVersionInfo {
