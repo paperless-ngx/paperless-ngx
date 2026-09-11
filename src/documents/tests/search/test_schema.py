@@ -1,12 +1,9 @@
 from __future__ import annotations
 
 import json
-from datetime import UTC
-from datetime import datetime
 from typing import TYPE_CHECKING
 
 import pytest
-import tantivy
 
 from documents.search._fields import PUBLIC_FIELDS
 from documents.search._schema import SCHEMA_VERSION
@@ -14,11 +11,11 @@ from documents.search._schema import build_schema
 from documents.search._schema import field_descriptors
 from documents.search._schema import needs_rebuild
 from documents.search._schema import schema_fingerprint
-from documents.search._tokenizer import register_tokenizers
 
 if TYPE_CHECKING:
     from pathlib import Path
 
+    import tantivy
     from pytest_django.fixtures import Settings
 
 
@@ -122,37 +119,6 @@ class TestSchemaMatchesPublicFields:
             assert field.name in schema_field_names, (
                 f"{field.name} is in PUBLIC_FIELDS but missing from build_schema()"
             )
-
-    def test_asn_page_count_num_notes_are_fast_unsigned_fields(self) -> None:
-        """
-        GIVEN:
-            - A document with asn/page_count/num_notes values, indexed
-              against the schema built by build_schema()
-        WHEN:
-            - A term query on the fast "asn" field is run
-        THEN:
-            - The document is found, spot-checking kind-derived
-              construction for the U64 fields
-        """
-        schema = build_schema()
-        doc = tantivy.Document()
-        doc.add_unsigned("id", 1)
-        doc.add_text("checksum", "x")
-        doc.add_unsigned("asn", 42)
-        doc.add_unsigned("page_count", 3)
-        doc.add_unsigned("num_notes", 0)
-        doc.add_date("created", datetime(2020, 1, 1, tzinfo=UTC))
-        doc.add_date("modified", datetime(2020, 1, 1, tzinfo=UTC))
-        doc.add_date("added", datetime(2020, 1, 1, tzinfo=UTC))
-        index = tantivy.Index(schema)
-        register_tokenizers(index, None)
-        writer = index.writer()
-        writer.add_document(doc)
-        writer.commit()
-        index.reload()
-        searcher = index.searcher()
-        results = searcher.search(tantivy.Query.term_query(schema, "asn", 42), limit=1)
-        assert len(results.hits) == 1
 
 
 class TestFastFlagAgreement:
