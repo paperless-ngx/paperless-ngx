@@ -28,6 +28,7 @@ import { Subject, of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomFieldDataType } from 'src/app/data/custom-field'
+import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { DataType } from 'src/app/data/datatype'
 import { Document, DocumentVersionInfo } from 'src/app/data/document'
 import { DocumentType } from 'src/app/data/document-type'
@@ -100,11 +101,9 @@ const doc: Document = {
   custom_fields: [
     {
       field: 0,
-      document: 3,
-      created: new Date(),
       value: 'custom foo bar',
     },
-  ],
+  ] as CustomFieldInstance[],
 }
 
 // Newest first, as the API returns them: 12 is the latest, 3 is the root
