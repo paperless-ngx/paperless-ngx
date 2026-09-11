@@ -1033,7 +1033,10 @@ export class DocumentDetailComponent
     const selectedVersionExists = this.document()?.versions?.some(
       (v) => v.id === this.selectedVersionId()
     )
-    if (!this.documentForm.get('content').dirty || !selectedVersionExists) {
+    if (
+      !selectedVersionExists ||
+      this.documentForm.get('content').value === this.store.value.content
+    ) {
       this.selectVersion(versionId)
       return
     }
