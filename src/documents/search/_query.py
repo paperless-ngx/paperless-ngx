@@ -376,6 +376,15 @@ def _negation_clauses(
     Each excluded subtree is emitted as its own positive query and attached
     with ``MustNot``, rather than emitting a negative query and hoping
     tantivy accepts a bare one.
+
+    The except branch has no reachable trigger under the current control
+    flow: this only runs after ``exact = tantivy_emit(result.ast, ...)``
+    (parse_user_query) has already emitted the *whole* AST successfully,
+    and every subtree ``_ConjunctiveNegations`` collects here is a piece
+    of that same tree. Kept as insurance, not dead weight: re-emitting a
+    subtree in isolation is not proven identical to emitting it in
+    context, just believed to be, and this is the seam that finds out if
+    that belief is ever wrong.
     """
     try:
         return [
@@ -385,7 +394,7 @@ def _negation_clauses(
             )
             for negation in _ConjunctiveNegations().visit(ast)
         ]
-    except QueryError as e:
+    except QueryError as e:  # pragma: no cover
         raise _map_emit_error(e) from e
 
 
@@ -559,8 +568,14 @@ def _single_diagnostic_to_error(d: Diagnostic) -> SearchQueryError:
             "wildcard, e.g. a trailing '*', or double-quote the value to "
             "search it as literal text.",
         )
-    logger.warning("Unmapped parse diagnostic %s: %s", d.kind, d.message)
-    return SearchQueryError("The search query could not be executed.")
+    logger.warning(
+        "Unmapped parse diagnostic %s: %s",
+        d.kind,
+        d.message,
+    )  # pragma: no cover
+    return SearchQueryError(
+        "The search query could not be executed.",
+    )  # pragma: no cover
 
 
 def parse_simple_query(

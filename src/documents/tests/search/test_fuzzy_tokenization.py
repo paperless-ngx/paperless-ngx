@@ -40,6 +40,42 @@ def fuzzy_enabled(settings: SettingsWrapper) -> None:
     settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 0.0
 
 
+class TestFuzzyClauseParseFailureDegradesGracefully:
+    def test_a_word_string_tantivy_rejects_drops_the_clause_only(self) -> None:
+        """
+        GIVEN:
+            - A parsed query with free-text words, and an index-like
+              object whose parse_query is forced to raise ValueError
+        WHEN:
+            - _try_parse_fuzzy_query is called
+        THEN:
+            - It returns None instead of propagating, so a fuzzy word
+              string tantivy's own parser rejects only drops the fuzzy
+              clause: the exact/CJK clauses still stand rather than the
+              whole query failing. The ValueError guard is insurance (the
+              word string is plain tokens, so tantivy accepting it is
+              expected, not assumed)
+        """
+        import whoosh_compat as wc
+
+        from documents.search._query import _DEFAULT_SEARCH_FIELDS
+        from documents.search._query import _try_parse_fuzzy_query
+        from documents.search._registry import get_field_registry
+
+        registry = get_field_registry(None)
+        result = wc.parse(
+            "invoice",
+            registry=registry,
+            default_fields=_DEFAULT_SEARCH_FIELDS,
+        )
+
+        class _RaisingIndex:
+            def parse_query(self, *args: object, **kwargs: object) -> object:
+                raise ValueError("synthetic parse failure")
+
+        assert _try_parse_fuzzy_query(_RaisingIndex(), result.ast, registry) is None
+
+
 class TestFuzzyClauseWords:
     def test_a_stemmed_word_is_not_stemmed_a_second_time(
         self,
