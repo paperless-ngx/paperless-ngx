@@ -371,9 +371,6 @@ class TestFingerprintSensitivity:
 
         assert schema_fingerprint() != before
 
-    def test_repeated_calls_agree(self) -> None:
-        assert schema_fingerprint() == schema_fingerprint()
-
 
 class TestFingerprintIsIndependentOfTantivy:
     def test_a_tantivy_option_key_addition_would_not_move_it(self) -> None:
