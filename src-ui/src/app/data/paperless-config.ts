@@ -357,6 +357,7 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     key: 'llm_embedding_api_key',
     title: $localize`LLM Embedding API Key`,
     type: ConfigOptionType.Password,
+    note: $localize`Used for embeddings when set; otherwise the LLM API key is used.`,
     config_key: 'PAPERLESS_AI_LLM_EMBEDDING_API_KEY',
     category: ConfigCategory.AI,
   },
