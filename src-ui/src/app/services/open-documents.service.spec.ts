@@ -221,6 +221,25 @@ describe('OpenDocumentsService', () => {
     expect(openDocumentsService.getOpenDocuments()).toHaveLength(1)
   })
 
+  it('should refresh documents in place and keep unsaved edits', () => {
+    const openDoc = { ...documents[0] }
+    subscriptions.push(openDocumentsService.openDocument(openDoc).subscribe())
+    openDoc.title = 'Unsaved title'
+    openDocumentsService.setDirty(openDoc, true, { title: openDoc.title })
+
+    openDocumentsService.refreshDocument(openDoc.id)
+    httpTestingController
+      .expectOne(
+        `${environment.apiBaseUrl}documents/${openDoc.id}/?full_perms=true`
+      )
+      .flush({ ...documents[0], tags: [4] })
+
+    const refreshed = openDocumentsService.getOpenDocument(openDoc.id)
+    expect(refreshed).toBe(openDoc)
+    expect(refreshed.title).toEqual('Unsaved title')
+    expect(refreshed.tags).toEqual([4])
+  })
+
   it('should handle error on refresh documents', () => {
     subscriptions.push(
       openDocumentsService.openDocument(documents[1]).subscribe()
