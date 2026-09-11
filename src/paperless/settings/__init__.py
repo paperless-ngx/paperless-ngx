@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import Final
 from urllib.parse import urlparse
 
-from compression_middleware.middleware import CompressionMiddleware
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
@@ -201,22 +200,10 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
 ]
 
-# Optional to enable compression
+# Optional to enable compression. The subclass leaves server-sent events
+# uncompressed; see paperless.middleware.StreamAwareCompressionMiddleware.
 if get_bool_from_env("PAPERLESS_ENABLE_COMPRESSION", "yes"):  # pragma: no cover
-    MIDDLEWARE.insert(0, "compression_middleware.middleware.CompressionMiddleware")
-
-# Workaround to not compress streaming responses (e.g. chat).
-# See https://github.com/friedelwolff/django-compression-middleware/pull/7
-original_process_response = CompressionMiddleware.process_response
-
-
-def patched_process_response(self, request, response):
-    if getattr(request, "compress_exempt", False):
-        return response
-    return original_process_response(self, request, response)
-
-
-CompressionMiddleware.process_response = patched_process_response
+    MIDDLEWARE.insert(0, "paperless.middleware.StreamAwareCompressionMiddleware")
 
 ROOT_URLCONF = "paperless.urls"
 
