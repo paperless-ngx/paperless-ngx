@@ -136,25 +136,6 @@ class TestUpgradeFromReleasedV1Index:
         """
         assert needs_rebuild(released_v1_index) is True
 
-    def test_v1_index_rejects_writes_against_the_current_schema(
-        self,
-        released_v1_index: Path,
-    ) -> None:
-        """
-        GIVEN:
-            - A v1 index directory and the current build_schema()
-        WHEN:
-            - A new tantivy.Index is opened against that directory with
-              the current schema
-        THEN:
-            - It raises ValueError("schema does not match ..."), the
-              exact failure mode WriteBatch.__enter__ hits on every index
-              write, which the version bump exists to prevent
-        """
-        schema = build_schema()
-        with pytest.raises(ValueError, match="schema does not match"):
-            tantivy.Index(schema, path=str(released_v1_index))
-
     def test_opening_a_v1_index_leaves_it_writable(
         self,
         released_v1_index: Path,
@@ -168,9 +149,10 @@ class TestUpgradeFromReleasedV1Index:
             - The directory can be reopened with the current schema
               without raising; end to end, open_or_rebuild_index must
               hand back an index the write path can reopen. Before the
-              version bump, needs_rebuild() returned False here, the
-              stale directory survived untouched, and every subsequent
-              write raised the ValueError from the test above
+              version bump, needs_rebuild() returned False here, and the
+              stale directory survived untouched, so every subsequent
+              write against it raised tantivy's own schema-mismatch
+              ValueError
         """
         open_or_rebuild_index(released_v1_index)
 

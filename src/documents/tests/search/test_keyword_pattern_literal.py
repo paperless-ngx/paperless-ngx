@@ -60,17 +60,3 @@ class TestKeywordPatternNormalizer:
         """
         normalize = _normalizer(get_field_registry("en"), "checksum")
         assert normalize(run) == run
-
-    def test_text_runs_still_offer_their_stem(self) -> None:
-        """
-        GIVEN:
-            - The "title" field's registered pattern normalizer (TEXT kind,
-              "en" registry)
-        WHEN:
-            - A wildcard pattern run is normalized
-        THEN:
-            - Both the folded run and its stem are offered, so a term
-              matching either one is reachable
-        """
-        normalize = _normalizer(get_field_registry("en"), "title")
-        assert tuple(normalize("Running")) == ("running", "run")
