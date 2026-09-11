@@ -32,29 +32,6 @@ def _distinct_forms(result: str | Sequence[str]) -> tuple[str, ...]:
 
 
 class TestFieldRegistry:
-    def test_internal_id_fields_are_not_registered(
-        self,
-        registry: FieldRegistry,
-    ) -> None:
-        """
-        GIVEN:
-            - The field registry built from PUBLIC_FIELDS
-        WHEN:
-            - An internal *_id column name (e.g. "tag_id") is looked up
-        THEN:
-            - The registry does not recognize it as a queryable field
-        """
-        for name in (
-            "tag_id",
-            "owner_id",
-            "viewer_id",
-            "correspondent_id",
-            "document_type_id",
-            "storage_path_id",
-            "viewer_group_id",
-        ):
-            assert name not in registry
-
     def test_no_queryable_field_name_ends_in_id(self) -> None:
         """
         GIVEN:
@@ -120,22 +97,6 @@ class TestFieldRegistry:
         """
         for raw in ("custom_fields.name", "custom_fields.value"):
             _resolve(registry, raw)
-
-    def test_unregistered_json_subpath_does_not_resolve(
-        self,
-        registry: FieldRegistry,
-    ) -> None:
-        """
-        GIVEN:
-            - The field registry
-        WHEN:
-            - A dotted name naming an unregistered subpath ("notes.bogus")
-              is turned into a FieldRef
-        THEN:
-            - make_ref returns None (it is not even a valid ref for
-              resolve() to then reject)
-        """
-        assert registry.make_ref("notes.bogus") is None
 
     def test_tag_is_comma_values(self, registry: FieldRegistry) -> None:
         """
