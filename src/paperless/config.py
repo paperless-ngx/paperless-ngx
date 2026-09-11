@@ -244,6 +244,7 @@ class AIConfig(BaseConfig):
     ai_enabled: bool = dataclasses.field(init=False)
     llm_embedding_backend: str = dataclasses.field(init=False)
     llm_embedding_model: str = dataclasses.field(init=False)
+    llm_embedding_api_key: str = dataclasses.field(init=False)
     llm_embedding_endpoint: str = dataclasses.field(init=False)
     llm_embedding_chunk_size: int = dataclasses.field(init=False)
     llm_context_size: int = dataclasses.field(init=False)
@@ -268,6 +269,9 @@ class AIConfig(BaseConfig):
         )
         self.llm_embedding_model = (
             app_config.llm_embedding_model or settings.LLM_EMBEDDING_MODEL
+        )
+        self.llm_embedding_api_key = (
+            app_config.llm_embedding_api_key or settings.LLM_EMBEDDING_API_KEY
         )
         self.llm_embedding_endpoint = (
             app_config.llm_embedding_endpoint or settings.LLM_EMBEDDING_ENDPOINT
