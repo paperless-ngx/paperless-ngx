@@ -54,8 +54,12 @@ def _user_facing_emit_message(d: Diagnostic) -> str:
         return f"The wildcard pattern for field {field!r} is too complex."
     if d.kind is DiagnosticKind.SCHEMA_FIELD_MISSING:
         return f"Field {field!r} is not available in the search index."
-    logger.warning("Unmapped emit diagnostic %s: %s", d.kind, d.message)
-    return "The search query could not be executed."
+    logger.warning(
+        "Unmapped emit diagnostic %s: %s",
+        d.kind,
+        d.message,
+    )  # pragma: no cover
+    return "The search query could not be executed."  # pragma: no cover
 
 
 def _map_emit_error(e: QueryError) -> SearchQueryError:
