@@ -304,6 +304,7 @@ export class DocumentDetailComponent
   isDirty$: Observable<boolean>
   unsubscribeNotifier: Subject<any> = new Subject()
   docChangeNotifier: Subject<any> = new Subject()
+  versionChangeNotifier: Subject<void> = new Subject()
   private incomingUpdateModal: NgbModalRef
   private pendingIncomingUpdate: IncomingDocumentUpdate
   private lastLocalSaveModified: string | null = null
@@ -417,7 +418,8 @@ export class DocumentDetailComponent
       .pipe(
         first(),
         takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
+        takeUntil(this.docChangeNotifier),
+        takeUntil(this.versionChangeNotifier)
       )
       .subscribe({
         next: (result) => {
@@ -533,7 +535,8 @@ export class DocumentDetailComponent
       .pipe(
         first(),
         takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
+        takeUntil(this.docChangeNotifier),
+        takeUntil(this.versionChangeNotifier)
       )
       .subscribe({
         next: (res) => this.previewText.set(res.toString()),
@@ -958,6 +961,7 @@ export class DocumentDetailComponent
 
   // Update file preview and download target to a specific version (by document id)
   selectVersion(versionId: number, keepContentEdits: boolean = false) {
+    this.versionChangeNotifier.next()
     this.selectedVersionId.set(versionId)
     // remember so the version can be restored when returning to the document
     this.document().__selectedVersionId = versionId
@@ -983,12 +987,11 @@ export class DocumentDetailComponent
       .pipe(
         first(),
         takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
+        takeUntil(this.docChangeNotifier),
+        takeUntil(this.versionChangeNotifier)
       )
       .subscribe({
         next: (doc) => {
-          // ignore content for a version that has since been deselected
-          if (versionId !== this.selectedVersionId()) return
           const content = doc?.content ?? ''
           // Update in-place and avoid the debounce wait
           this.store.value.content = content
@@ -1010,7 +1013,8 @@ export class DocumentDetailComponent
       .pipe(
         first(),
         takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
+        takeUntil(this.docChangeNotifier),
+        takeUntil(this.versionChangeNotifier)
       )
       .subscribe({
         next: (res) => this.previewText.set(res.toString()),

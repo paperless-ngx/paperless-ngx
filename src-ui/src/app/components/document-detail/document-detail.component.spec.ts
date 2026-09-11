@@ -2058,15 +2058,29 @@ describe('DocumentDetailComponent', () => {
       .spyOn(documentService, 'get')
       .mockReturnValueOnce(version10Content)
       .mockReturnValueOnce(of({ content: 'version 12 content' } as Document))
+    const version10Metadata = new Subject<any>()
+    jest
+      .spyOn(documentService, 'getMetadata')
+      .mockReturnValueOnce(version10Metadata)
+      .mockReturnValueOnce(of({ lang: 'de' }))
 
     component.selectVersion(10)
     component.selectVersion(12)
     version10Content.next({ content: 'version 10 content' } as Document)
+    version10Metadata.next({ lang: 'en' })
 
     expect(component.documentForm.get('content').value).toEqual(
       'version 12 content'
     )
     expect(component.store.value.content).toEqual('version 12 content')
+    expect(component.metadata().lang).toEqual('de')
+    expect(
+      httpTestingController.expectOne(component.previewUrl()).cancelled
+    ).toBeFalsy()
+    expect(
+      httpTestingController.match((req) => req.url.includes('version=10'))[0]
+        ?.cancelled
+    ).toBeTruthy()
   })
 
   it('should confirm before discarding unsaved content edits when switching versions', () => {
@@ -2090,6 +2104,8 @@ describe('DocumentDetailComponent', () => {
 
     component.documentForm.get('content').setValue('edited content')
     component.documentForm.get('content').markAsDirty()
+    component.onVersionSelected(12) // already selected, nothing to do
+    expect(modalSpy).not.toHaveBeenCalled()
     component.onVersionSelected(10)
     expect(modalSpy).toHaveBeenCalledWith(
       ConfirmDialogComponent,
