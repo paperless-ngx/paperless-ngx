@@ -123,10 +123,16 @@ class TestUpgradeFromReleasedV1Index:
         self,
         released_v1_index: Path,
     ) -> None:
-        """The current schema differs from v1's, so the sentinel must be stale.
-
-        If this fails, `document_index reindex --if-needed` prints "Search index
-        is up to date" and skips, leaving the mismatched index in place.
+        """
+        GIVEN:
+            - An index directory laid out exactly as a v3.0.x (schema
+              version 1) install would leave it
+        WHEN:
+            - needs_rebuild() is called
+        THEN:
+            - It returns True; if this fails,
+              `document_index reindex --if-needed` prints "Search index is
+              up to date" and skips, leaving the mismatched index in place
         """
         assert needs_rebuild(released_v1_index) is True
 
@@ -134,9 +140,16 @@ class TestUpgradeFromReleasedV1Index:
         self,
         released_v1_index: Path,
     ) -> None:
-        """The failure mode the version bump exists to prevent.
-
-        This is exactly what WriteBatch.__enter__ does on every index write.
+        """
+        GIVEN:
+            - A v1 index directory and the current build_schema()
+        WHEN:
+            - A new tantivy.Index is opened against that directory with
+              the current schema
+        THEN:
+            - It raises ValueError("schema does not match ..."), the
+              exact failure mode WriteBatch.__enter__ hits on every index
+              write, which the version bump exists to prevent
         """
         schema = build_schema()
         with pytest.raises(ValueError, match="schema does not match"):
@@ -146,10 +159,19 @@ class TestUpgradeFromReleasedV1Index:
         self,
         released_v1_index: Path,
     ) -> None:
-        """End to end: open_or_rebuild_index must hand back an index that the
-        write path can reopen. Before the version bump, needs_rebuild() returned
-        False here, the stale directory survived untouched, and every subsequent
-        write raised the ValueError above."""
+        """
+        GIVEN:
+            - A v1 index directory
+        WHEN:
+            - open_or_rebuild_index() is called against it
+        THEN:
+            - The directory can be reopened with the current schema
+              without raising; end to end, open_or_rebuild_index must
+              hand back an index the write path can reopen. Before the
+              version bump, needs_rebuild() returned False here, the
+              stale directory survived untouched, and every subsequent
+              write raised the ValueError from the test above
+        """
         open_or_rebuild_index(released_v1_index)
 
         tantivy.Index(build_schema(), path=str(released_v1_index))
@@ -158,8 +180,17 @@ class TestUpgradeFromReleasedV1Index:
         self,
         released_v1_index: Path,
     ) -> None:
-        """The rebuild must stamp the version it actually wrote, otherwise every
-        startup wipes and reindexes the whole corpus."""
+        """
+        GIVEN:
+            - A v1 index directory that has just been rebuilt by
+              open_or_rebuild_index()
+        WHEN:
+            - needs_rebuild() is called again
+        THEN:
+            - It returns False; the rebuild must stamp the version it
+              actually wrote, otherwise every startup wipes and reindexes
+              the whole corpus
+        """
         open_or_rebuild_index(released_v1_index)
 
         assert needs_rebuild(released_v1_index) is False
