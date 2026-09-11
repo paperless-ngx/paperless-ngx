@@ -2098,6 +2098,7 @@ describe('DocumentDetailComponent', () => {
     // shared fields carry over between versions, so no confirmation
     component.documentForm.get('title').setValue('Edited title')
     component.documentForm.get('title').markAsDirty()
+    component.documentForm.get('content').markAsDirty()
     component.onVersionSelected(12)
     expect(modalSpy).not.toHaveBeenCalled()
     expect(component.selectedVersionId()).toEqual(12)
@@ -2138,19 +2139,23 @@ describe('DocumentDetailComponent', () => {
       .spyOn(documentService, 'patch')
       .mockReturnValueOnce(throwError(() => new Error('failed to save')))
       .mockReturnValueOnce(of(doc))
-    let openModal: NgbModalRef
-    modalService.activeInstances.subscribe((modals) => (openModal = modals[0]))
+    const modalSpy = jest.spyOn(modalService, 'open')
     component.documentForm.get('content').setValue('edited content')
     component.documentForm.get('content').markAsDirty()
 
     component.onVersionSelected(10)
-    openModal.componentInstance.alternativeClicked.emit()
+    let modal: NgbModalRef = modalSpy.mock.results[0].value
+    const closeSpy = jest.spyOn(modal, 'close')
+    modal.componentInstance.alternativeClicked.emit()
+    expect(closeSpy).toHaveBeenCalled()
     expect(component.selectedVersionId()).toEqual(12)
     expect(component.documentForm.get('content').value).toEqual(
       'edited content'
     )
 
-    openModal.componentInstance.alternativeClicked.emit()
+    component.onVersionSelected(10)
+    modal = modalSpy.mock.results[1].value
+    modal.componentInstance.alternativeClicked.emit()
     expect(patchSpy).toHaveBeenLastCalledWith(
       expect.objectContaining({ content: 'edited content' }),
       12

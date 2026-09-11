@@ -1056,13 +1056,9 @@ export class DocumentDetailComponent
       modal.close()
       this.selectVersion(versionId)
     })
-    modal.componentInstance.alternativeClicked.subscribe(() => {
-      if (this.networkActive()) return
-      // stays open if the save fails, so it can be retried
-      this.save(false, () => {
-        modal.close()
-        this.selectVersion(versionId)
-      })
+    modal.componentInstance.alternativeClicked.pipe(first()).subscribe(() => {
+      modal.close()
+      this.save(false, () => this.selectVersion(versionId))
     })
   }
 
