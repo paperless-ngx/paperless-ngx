@@ -1024,6 +1024,7 @@ export class DocumentDetailComponent
   }
 
   onVersionSelected(versionId: number) {
+    if (versionId === this.selectedVersionId()) return
     // Bail if the selected version was just deleted.
     const selectedVersionExists = this.document()?.versions?.some(
       (v) => v.id === this.selectedVersionId()
