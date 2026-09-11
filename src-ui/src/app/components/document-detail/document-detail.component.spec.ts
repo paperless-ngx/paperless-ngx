@@ -2170,7 +2170,7 @@ describe('DocumentDetailComponent', () => {
     )
   })
 
-  it('should switch without confirmation when the selected version was deleted', () => {
+  it('should switch without confirmation when the selected version was deleted, even while saving', () => {
     initNormally()
     component.document().versions = docVersions
     component.selectedVersionId.set(10)
@@ -2180,6 +2180,7 @@ describe('DocumentDetailComponent', () => {
     const modalSpy = jest.spyOn(modalService, 'open')
     component.documentForm.get('content').setValue('edited content')
     component.documentForm.get('content').markAsDirty()
+    component.networkActive.set(true)
 
     // the version dropdown emits this after deleting the selected version
     component.onVersionsUpdated(docVersions.filter((v) => v.id !== 10))
