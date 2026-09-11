@@ -32,6 +32,49 @@ def _index(backend: TantivyBackend, **kwargs: object) -> Document:
     return doc
 
 
+class TestCjkParseFailureDegradesGracefully:
+    def test_a_cjk_run_tantivy_cannot_parse_drops_the_clause_only(self) -> None:
+        """
+        GIVEN:
+            - A CJK run and an index-like object whose parse_query is
+              forced to raise
+        WHEN:
+            - _parse_cjk_text is called
+        THEN:
+            - It returns None instead of propagating, so a CJK run tantivy
+              cannot parse only drops the bigram clause rather than
+              failing the whole query. Broad on purpose (bare except
+              Exception), unlike the fuzzy blend's narrower ValueError
+              guard: a CJK run is not filtered to a guaranteed-safe token
+              set the way the fuzzy blend's word string is, so the exact
+              failure mode tantivy could raise here is not pinned down
+        """
+        from documents.search._query import _parse_cjk_text
+
+        class _RaisingIndex:
+            def parse_query(self, *args: object, **kwargs: object) -> object:
+                raise RuntimeError("synthetic parse failure")
+
+        assert _parse_cjk_text(_RaisingIndex(), "東京", ["bigram_content"]) is None
+
+    def test_no_cjk_text_at_all_returns_none_without_parsing(self) -> None:
+        """
+        GIVEN:
+            - A raw query string with no CJK characters at all
+        WHEN:
+            - _build_cjk_query (the simple TEXT/TITLE-mode builder) is
+              called directly
+        THEN:
+            - It returns None without ever attempting to parse anything.
+              The only real caller already guards this with _has_cjk(),
+              so this is defensive: it keeps the function safe to call on
+              its own, not a path a real search currently reaches
+        """
+        from documents.search._query import _build_cjk_query
+
+        assert _build_cjk_query(None, "invoice total due", ["bigram_content"]) is None
+
+
 class TestCjkClauseFollowsTheParsedQuery:
     def test_negated_cjk_term_is_excluded(self, backend: TantivyBackend) -> None:
         """

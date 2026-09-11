@@ -506,3 +506,32 @@ class TestEmitErrorContract:
         assert str(exc_info.value) == (
             "Existence searches (field:*) are not supported for field 'notes.user'."
         )
+
+    def test_a_not_wrapped_unemittable_range_still_becomes_a_search_query_error(
+        self,
+        query_index: tantivy.Index,
+        settings,
+    ) -> None:
+        """
+        GIVEN:
+            - A query combining a fuzzy-eligible free-text word with a NOT
+              wrapping a range on a TEXT field (parses cleanly, but a
+              text-field range cannot be emitted)
+        WHEN:
+            - parse_user_query() runs with fuzzy search enabled
+        THEN:
+            - The emit failure is caught and mapped to a SearchQueryError
+              (400) rather than propagating as a raw QueryError. This
+              fails at the whole-tree "exact" clause emission
+              (`exact = tantivy_emit(result.ast, ...)`), the same path
+              TestRealQueriesRouteCorrectly::test_text_range_is_a_400_naming_the_field
+              already covers without the NOT wrapper: `_negation_clauses`
+              never runs here, since the whole-tree emit already raises
+              before negations are ever computed. `_negation_clauses`'s
+              own except QueryError branch re-emits an already-successful
+              tree's own subtree in isolation, so it has no reachable
+              trigger under the current control flow
+        """
+        settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 0.5
+        with pytest.raises(SearchQueryError):
+            parse_user_query(query_index, "invoice NOT title:[a to b]", UTC)
