@@ -2135,10 +2135,11 @@ describe('DocumentDetailComponent', () => {
     jest
       .spyOn(documentService, 'get')
       .mockReturnValue(of({ content: 'version 10 content' } as Document))
+    const savedDoc = new Subject<Document>()
     const patchSpy = jest
       .spyOn(documentService, 'patch')
       .mockReturnValueOnce(throwError(() => new Error('failed to save')))
-      .mockReturnValueOnce(of(doc))
+      .mockReturnValueOnce(savedDoc)
     const modalSpy = jest.spyOn(modalService, 'open')
     component.documentForm.get('content').setValue('edited content')
     component.documentForm.get('content').markAsDirty()
@@ -2160,6 +2161,9 @@ describe('DocumentDetailComponent', () => {
       expect.objectContaining({ content: 'edited content' }),
       12
     )
+    component.onVersionSelected(doc.id) // ignored while saving
+    expect(modalSpy).toHaveBeenCalledTimes(2)
+    savedDoc.next(doc)
     expect(component.selectedVersionId()).toEqual(10)
     expect(component.documentForm.get('content').value).toEqual(
       'version 10 content'
@@ -2203,21 +2207,21 @@ describe('DocumentDetailComponent', () => {
         )
       )
     component.selectVersion(10)
-    component.documentForm.get('content').setValue('edited content')
+    // an edit that happens to match the latest version's content
+    component.documentForm.get('content').setValue(doc.content)
     openDoc.__changedFields = ['content']
 
     component['loadDocument'](doc.id)
 
     expect(component.selectedVersionId()).toEqual(10)
-    expect(component.documentForm.get('content').value).toEqual(
-      'edited content'
-    )
+    expect(component.documentForm.get('content').value).toEqual(doc.content)
+    expect(openDocumentsService.isDirty(openDoc)).toBeTruthy()
     const patchSpy = jest
       .spyOn(documentService, 'patch')
       .mockReturnValue(of(doc))
     component.save()
     expect(patchSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ content: 'edited content' }),
+      expect.objectContaining({ content: doc.content }),
       10
     )
   })

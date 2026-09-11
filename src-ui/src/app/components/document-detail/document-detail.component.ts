@@ -652,14 +652,13 @@ export class DocumentDetailComponent
               this.documentForm.patchValue({ title: titleValue })
               this.documentForm.get('title').markAsDirty()
             })
+          const keepContentEdits =
+            useDoc.__selectedVersionId === this.selectedVersionId() &&
+            !!useDoc.__changedFields?.includes('content')
           this.setupDirtyTracking(useDoc, doc)
           // Maybe load the stored version
           if (useDoc.__selectedVersionId) {
-            this.selectVersion(
-              this.selectedVersionId(),
-              useDoc.__selectedVersionId === this.selectedVersionId() &&
-                !!useDoc.__changedFields?.includes('content')
-            )
+            this.selectVersion(this.selectedVersionId(), keepContentEdits)
           }
         },
       })
@@ -993,9 +992,11 @@ export class DocumentDetailComponent
       .subscribe({
         next: (doc) => {
           const content = doc?.content ?? ''
-          // Update in-place and avoid the debounce wait
-          this.store.value.content = content
-          if (!keepContentEdits) {
+          if (keepContentEdits) {
+            this.store.next({ ...this.store.value, content })
+          } else {
+            // Update in-place and avoid the debounce wait
+            this.store.value.content = content
             this.documentForm.patchValue({ content })
             this.documentForm.get('content').markAsPristine()
           }
