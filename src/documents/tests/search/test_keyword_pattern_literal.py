@@ -47,14 +47,30 @@ class TestKeywordPatternNormalizer:
         ],
     )
     def test_keyword_runs_are_folded_not_stemmed(self, run: str) -> None:
-        """One form, the run as typed: a KEYWORD pattern must never be widened
-        to a stem, which would return checksums that do not start with what
-        the user typed."""
+        """
+        GIVEN:
+            - The "checksum" field's registered pattern normalizer
+              (KEYWORD kind, "en" registry)
+        WHEN:
+            - A wildcard pattern run is normalized
+        THEN:
+            - The run is returned unchanged, never widened to a stem (which
+              would return checksums that do not start with what the user
+              typed)
+        """
         normalize = _normalizer(get_field_registry("en"), "checksum")
         assert normalize(run) == run
 
     def test_text_runs_still_offer_their_stem(self) -> None:
-        """A TEXT field offers the stem alongside the typed run, so a term
-        matching either one is reachable."""
+        """
+        GIVEN:
+            - The "title" field's registered pattern normalizer (TEXT kind,
+              "en" registry)
+        WHEN:
+            - A wildcard pattern run is normalized
+        THEN:
+            - Both the folded run and its stem are offered, so a term
+              matching either one is reachable
+        """
         normalize = _normalizer(get_field_registry("en"), "title")
         assert tuple(normalize("Running")) == ("running", "run")

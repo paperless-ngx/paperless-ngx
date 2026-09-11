@@ -311,13 +311,32 @@ def _sentinels(index_dir: Path, **overrides: object) -> None:
 
 class TestDescriptorsDescribeTheBuiltSchema:
     def test_descriptors_match_the_pinned_field_layout(self) -> None:
+        """
+        GIVEN:
+            - PINNED_DESCRIPTORS, a frozen snapshot of the v2 on-disk field
+              layout, reproduced from build_schema()'s output as it stood
+              before the descriptor refactor
+        WHEN:
+            - field_descriptors() is called
+        THEN:
+            - It matches the pinned layout exactly, in the same order,
+              pinning that the refactor changed nothing
+        """
         assert tuple(field_descriptors()) == PINNED_DESCRIPTORS
 
     def test_built_schema_matches_the_descriptors(self) -> None:
-        """The descriptors are not a parallel description - they are the input.
-
-        Reading the built schema back proves the loop honours every option, so
-        a descriptor edit cannot claim a shape the SchemaBuilder did not build.
+        """
+        GIVEN:
+            - The schema built by build_schema()
+        WHEN:
+            - Its fields are read back via __reduce__() (schema.__reduce__(),
+              tantivy-py's pickling hook)
+        THEN:
+            - Every field's name, kind, stored/fast flags and tokenizer
+              match what field_descriptors() declared as input; the
+              descriptors are not a parallel description, they are the
+              input, so a descriptor edit cannot claim a shape the
+              SchemaBuilder did not actually build
         """
         kinds = {"text": "text", "json": "json_object", "u64": "u64", "date": "date"}
         built = [
@@ -348,6 +367,15 @@ class TestFingerprintSensitivity:
         self,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
+        """
+        GIVEN:
+            - The current schema fingerprint
+        WHEN:
+            - A single field descriptor's "fast" option is changed, with
+              no other change
+        THEN:
+            - The fingerprint changes
+        """
         before = schema_fingerprint()
         changed = field_descriptors()
         changed[1] = changed[1]._replace(fast=True)
@@ -359,10 +387,16 @@ class TestFingerprintSensitivity:
         self,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        """The original bug: same fields, different declaration order.
-
-        A set- or dict-based fingerprint would be blind to this, and tantivy
-        would reject every write against the existing index.
+        """
+        GIVEN:
+            - The current schema fingerprint
+        WHEN:
+            - Two field descriptors are swapped, with no other change (the
+              original bug: same fields, different declaration order)
+        THEN:
+            - The fingerprint changes; a set- or dict-based fingerprint
+              would be blind to this, and tantivy would reject every write
+              against the existing index
         """
         before = schema_fingerprint()
         swapped = field_descriptors()
@@ -374,11 +408,19 @@ class TestFingerprintSensitivity:
 
 class TestFingerprintIsIndependentOfTantivy:
     def test_a_tantivy_option_key_addition_would_not_move_it(self) -> None:
-        """A tantivy-py upgrade must not force a global reindex.
-
-        Hashing schema.__reduce__() would do exactly that: the simulated new
-        option key below changes that payload for every user with no schema
-        change at all.
+        """
+        GIVEN:
+            - The built schema's raw field list, and the same list with a
+              new tantivy-internal option key added (simulating a
+              tantivy-py upgrade)
+        WHEN:
+            - Both raw lists are hashed directly, and schema_fingerprint()
+              is compared against a hash of field_descriptors()
+        THEN:
+            - The raw hashes differ (hashing schema.__reduce__() would
+              force a global reindex on every tantivy-py upgrade), but
+              schema_fingerprint() is unaffected, since it hashes
+              field_descriptors(), never tantivy's own representation
         """
         fields = _schema_fields(build_schema())
         upgraded = [
@@ -392,6 +434,17 @@ class TestFingerprintIsIndependentOfTantivy:
         self,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
+        """
+        GIVEN:
+            - tantivy.SchemaBuilder replaced with a stand-in that raises if
+              constructed
+        WHEN:
+            - build_schema() is called (and raises), then
+              schema_fingerprint() is called again
+        THEN:
+            - schema_fingerprint() still matches its earlier value,
+              proving it never consults SchemaBuilder
+        """
         before = schema_fingerprint()
 
         class _RemovedSchemaBuilder:
@@ -419,6 +472,15 @@ class TestNeedsRebuildOnFingerprint:
         index_dir: Path,
         settings: SettingsWrapper,
     ) -> None:
+        """
+        GIVEN:
+            - An index directory whose sentinel file records the current
+              schema_fingerprint()
+        WHEN:
+            - needs_rebuild() is called
+        THEN:
+            - It returns False
+        """
         settings.SEARCH_LANGUAGE = None
         _sentinels(index_dir)
 
@@ -430,9 +492,18 @@ class TestNeedsRebuildOnFingerprint:
         settings: SettingsWrapper,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        """The failure this task exists to prevent: schema edited, version not
-        bumped. Without the fingerprint check, `reindex --if-needed` reports the
-        index up to date and every write then raises."""
+        """
+        GIVEN:
+            - An index directory whose sentinel matches SCHEMA_VERSION,
+              but field_descriptors() is patched to add a field the
+              fingerprint never saw (schema edited, version not bumped)
+        WHEN:
+            - needs_rebuild() is called
+        THEN:
+            - It returns True; without the fingerprint check,
+              `reindex --if-needed` would report the index up to date and
+              every subsequent write would raise
+        """
         settings.SEARCH_LANGUAGE = None
         _sentinels(index_dir)
         extended = [
@@ -456,6 +527,16 @@ class TestNeedsRebuildOnFingerprint:
         settings: SettingsWrapper,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
+        """
+        GIVEN:
+            - An index directory whose sentinel matches the current
+              fingerprint, but field_descriptors() is patched to swap two
+              fields' order
+        WHEN:
+            - needs_rebuild() is called
+        THEN:
+            - It returns True
+        """
         settings.SEARCH_LANGUAGE = None
         _sentinels(index_dir)
         reordered = field_descriptors()
@@ -469,8 +550,16 @@ class TestNeedsRebuildOnFingerprint:
         index_dir: Path,
         settings: SettingsWrapper,
     ) -> None:
-        """No seeding: an index whose schema shape nobody recorded is rebuilt
-        rather than trusted."""
+        """
+        GIVEN:
+            - An index directory whose sentinel has no "schema_fingerprint"
+              key at all
+        WHEN:
+            - needs_rebuild() is called
+        THEN:
+            - It returns True; an index whose schema shape nobody recorded
+              is rebuilt rather than trusted
+        """
         settings.SEARCH_LANGUAGE = None
         (index_dir / ".index_settings.json").write_text(
             json.dumps({"schema_version": SCHEMA_VERSION, "language": None}),
@@ -483,6 +572,15 @@ class TestNeedsRebuildOnFingerprint:
         index_dir: Path,
         settings: SettingsWrapper,
     ) -> None:
+        """
+        GIVEN:
+            - An index directory whose sentinels are written by
+              _write_sentinels() itself
+        WHEN:
+            - needs_rebuild() is called
+        THEN:
+            - It returns False
+        """
         settings.SEARCH_LANGUAGE = "en"
         _write_sentinels(index_dir)
 

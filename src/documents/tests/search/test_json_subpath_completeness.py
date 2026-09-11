@@ -40,6 +40,15 @@ class TestJsonSubpathsAreWrittenAtIndexTime:
         self,
         backend: TantivyBackend,
     ) -> None:
+        """
+        GIVEN:
+            - A document with a Note and a CustomFieldInstance attached
+        WHEN:
+            - The document is indexed via TantivyBackend.add_or_update
+        THEN:
+            - Every subpath PUBLIC_FIELDS declares for notes/custom_fields
+              is present as a key in the document's stored JSON payload
+        """
         user = User.objects.create_user(username="completeness-user")
         field = CustomField.objects.create(
             name="Completeness Field",
