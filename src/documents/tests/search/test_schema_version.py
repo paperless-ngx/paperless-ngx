@@ -138,8 +138,9 @@ class TestUpgradeFromReleasedV1Index:
 
         This is exactly what WriteBatch.__enter__ does on every index write.
         """
+        schema = build_schema()
         with pytest.raises(ValueError, match="schema does not match"):
-            tantivy.Index(build_schema(), path=str(released_v1_index))
+            tantivy.Index(schema, path=str(released_v1_index))
 
     def test_opening_a_v1_index_leaves_it_writable(
         self,
