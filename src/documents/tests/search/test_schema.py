@@ -107,6 +107,15 @@ def _schema_fields(schema: tantivy.Schema) -> dict[str, dict]:
 
 class TestSchemaMatchesPublicFields:
     def test_every_public_field_is_in_the_schema(self) -> None:
+        """
+        GIVEN:
+            - PUBLIC_FIELDS and the tantivy schema built by build_schema()
+        WHEN:
+            - Every field declared in PUBLIC_FIELDS is checked against the
+              schema
+        THEN:
+            - Each one is present as a field in the built schema
+        """
         schema = build_schema()
         schema_field_names = set(_schema_fields(schema))
         for field in PUBLIC_FIELDS:
@@ -115,7 +124,16 @@ class TestSchemaMatchesPublicFields:
             )
 
     def test_asn_page_count_num_notes_are_fast_unsigned_fields(self) -> None:
-        # Spot-check kind-derived construction for the U64 fields.
+        """
+        GIVEN:
+            - A document with asn/page_count/num_notes values, indexed
+              against the schema built by build_schema()
+        WHEN:
+            - A term query on the fast "asn" field is run
+        THEN:
+            - The document is found, spot-checking kind-derived
+              construction for the U64 fields
+        """
         schema = build_schema()
         doc = tantivy.Document()
         doc.add_unsigned("id", 1)
@@ -139,21 +157,23 @@ class TestSchemaMatchesPublicFields:
 
 class TestFastFlagAgreement:
     def test_every_public_field_fast_flag_matches_the_built_schema(self) -> None:
-        # whoosh-compat's registry trusts PUBLIC_FIELDS' fast flag when resolving
-        # field:* existence checks (its FAST_FIELD strategy); a fast=True
-        # entry whose actual tantivy column is not fast would make those
-        # searches silently match nothing at search time. Only the U64 and
-        # DATE descriptors can carry the flag today, so this
-        # pins the agreement for EVERY kind: a future fast=True
-        # TEXT/KEYWORD/JSON entry the builder silently ignores fails here
-        # instead of at a user's query.
-        #
-        # field_descriptors() (not tantivy-py's __reduce__() pickling
-        # internals) is used as the probe here: it is exactly the input
-        # build_schema()'s SchemaBuilder consumes for the `fast` kwarg on
-        # every field kind, so it pins the same agreement without depending
-        # on a private pickled representation surviving a tantivy-py
-        # upgrade.
+        """
+        GIVEN:
+            - PUBLIC_FIELDS and field_descriptors() (the latter is exactly
+              the input build_schema()'s SchemaBuilder consumes for the
+              `fast` kwarg on every field kind, so it pins the agreement
+              without depending on a private tantivy-py pickled
+              representation)
+        WHEN:
+            - Every PUBLIC_FIELDS entry's fast flag is compared against
+              field_descriptors()' fast flag for the same field
+        THEN:
+            - They agree for every field, catching a fast=True
+              PUBLIC_FIELDS entry the builder silently ignores here
+              instead of at a user's field:* existence query, which
+              whoosh-compat's registry trusts PUBLIC_FIELDS' fast flag to
+              resolve
+        """
         descriptor_fast = {d.name: d.fast for d in field_descriptors()}
         for public_field in PUBLIC_FIELDS:
             assert descriptor_fast[public_field.name] == public_field.fast, (
