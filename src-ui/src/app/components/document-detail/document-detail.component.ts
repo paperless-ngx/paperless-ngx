@@ -1002,7 +1002,38 @@ export class DocumentDetailComponent
   }
 
   onVersionSelected(versionId: number) {
-    this.selectVersion(versionId)
+    // Bail if the selected version was just deleted.
+    const selectedVersionExists = this.document()?.versions?.some(
+      (v) => v.id === this.selectedVersionId()
+    )
+    if (!this.documentForm.get('content').dirty || !selectedVersionExists) {
+      this.selectVersion(versionId)
+      return
+    }
+
+    // Confirm any unsaved content changes
+    const modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Unsaved Changes`
+    modal.componentInstance.messageBold = $localize`You have unsaved changes to the content of this version.`
+    modal.componentInstance.message = $localize`Switching versions will discard them.`
+    modal.componentInstance.btnClass = 'btn-secondary'
+    modal.componentInstance.btnCaption = $localize`Discard and switch`
+    modal.componentInstance.alternativeBtnClass = 'btn-primary'
+    modal.componentInstance.alternativeBtnCaption = $localize`Save and switch`
+    modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
+      modal.close()
+      this.selectVersion(versionId)
+    })
+    modal.componentInstance.alternativeClicked.subscribe(() => {
+      if (this.networkActive()) return
+      // stays open if the save fails, so it can be retried
+      this.save(false, () => {
+        modal.close()
+        this.selectVersion(versionId)
+      })
+    })
   }
 
   onVersionsUpdated(versions: DocumentVersionInfo[]) {
@@ -1230,7 +1261,7 @@ export class DocumentDetailComponent
     return changes
   }
 
-  save(close: boolean = false) {
+  save(close: boolean = false, savedCallback: () => void = null) {
     this.networkActive.set(true)
     ;(document.activeElement as HTMLElement)?.dispatchEvent(new Event('change'))
     this.documentsService
@@ -1263,6 +1294,7 @@ export class DocumentDetailComponent
             this.flushPendingIncomingUpdate()
           }
           this.savedViewService.maybeRefreshDocumentCounts()
+          savedCallback?.()
         },
         error: (error) => {
           this.networkActive.set(false)
