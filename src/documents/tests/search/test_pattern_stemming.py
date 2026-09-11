@@ -66,6 +66,19 @@ class TestPrefixStemming:
         indexed_doc: Document,
         query: str,
     ) -> None:
+        """
+        GIVEN:
+            - A document indexed with content containing "invoice",
+              "electricity", "companies", "payments", "library" and title
+              "Invoice 2020 productname"
+        WHEN:
+            - A prefix wildcard on the full, unstemmed word is queried
+              (e.g. "invoice*", "title:Invoice*")
+        THEN:
+            - The document matches, since the pattern normalizer offers
+              the word's stem as an alternative alongside the typed run,
+              reaching the stemmed index term
+        """
         assert _matched_ids(backend, query) == {indexed_doc.id}
 
     @pytest.mark.parametrize("query", ["invoic*", "electr*", "payment*"])
@@ -75,6 +88,16 @@ class TestPrefixStemming:
         indexed_doc: Document,
         query: str,
     ) -> None:
+        """
+        GIVEN:
+            - The same indexed document
+        WHEN:
+            - A prefix wildcard is typed already in its stemmed spelling
+              (e.g. "invoic*")
+        THEN:
+            - The document still matches, since the typed-run alternative
+              is itself a prefix of the stored stemmed term
+        """
         assert _matched_ids(backend, query) == {indexed_doc.id}
 
     @pytest.mark.parametrize("query", ["univers*", "librar*"])
@@ -84,16 +107,22 @@ class TestPrefixStemming:
         indexed_doc: Document,
         query: str,
     ) -> None:
-        """A prefix shorter than a whole word still matches, and neither of
-        these needs the two-alternative path to do it.
-
-        Measured under "en": the stemmer leaves "librar" alone, so it has one
-        form, and that form is a prefix of the "librari" the index holds for
-        "library". "univers" stems to the *shorter* "univ", and the run as
-        typed and its stem are both prefixes of the "univers" the index holds
-        for "university". The case where the two forms genuinely diverge, and
-        only one of them matches, is
-        test_stem_substitution_reaches_both_the_inflection_and_the_compound.
+        """
+        GIVEN:
+            - The same indexed document
+        WHEN:
+            - A prefix shorter than a whole word is queried ("univers*",
+              "librar*")
+        THEN:
+            - It still matches, and neither case needs the two-alternative
+              path to do it: measured under "en", the stemmer leaves
+              "librar" alone, so it has one form, and that form is a
+              prefix of the "librari" the index holds for "library";
+              "univers" stems to the *shorter* "univ", and the run as
+              typed and its stem are both prefixes of the "univers" the
+              index holds for "university". The case where the two forms
+              genuinely diverge, and only one of them matches, is
+              test_stem_substitution_reaches_both_the_inflection_and_the_compound
         """
         assert _matched_ids(backend, query) == {indexed_doc.id}
 
@@ -102,14 +131,19 @@ class TestPrefixStemming:
         backend: TantivyBackend,
         indexed_doc: Document,
     ) -> None:
-        """The alternatives widen recall without turning a wildcard into a
-        prefix search over the original text.
-
-        "university" is stored as "univers". The stem of "universities" is
-        that same "univers", so the longer word matches; "universit" is a
-        prefix of neither its own stem nor the stored term, so the *shorter*
-        fragment matches nothing. usage.md names this pair, so a reader told
-        that `universit*` fails is also told which spelling works.
+        """
+        GIVEN:
+            - The same indexed document, storing "university" as "univers"
+        WHEN:
+            - "universities*" and "universit*" are each queried
+        THEN:
+            - "universities*" matches, since the stem of "universities" is
+              that same "univers"; "universit*" matches nothing, since
+              "universit" is a prefix of neither its own stem nor the
+              stored term. The alternatives widen recall without turning
+              a wildcard into a prefix search over the original text, and
+              usage.md names this exact pair so a reader told that
+              `universit*` fails is also told which spelling works
         """
         assert _matched_ids(backend, "universities*") == {indexed_doc.id}
         assert _matched_ids(backend, "universit*") == set()
@@ -119,9 +153,18 @@ class TestPrefixStemming:
         backend: TantivyBackend,
         indexed_doc: Document,
     ) -> None:
-        """produ*name cannot match a stemmed index ("productname" is indexed as
-        "productnam"); usage.md must not advertise it. Pinned so the limitation
-        is deliberate, not accidental."""
+        """
+        GIVEN:
+            - The same indexed document, with "productname" indexed as
+              "productnam"
+        WHEN:
+            - "produ*name" (a pattern straddling the stem boundary) is
+              queried
+        THEN:
+            - It matches nothing; produ*name cannot match a stemmed
+              index, and usage.md must not advertise it. Pinned so the
+              limitation is deliberate, not accidental
+        """
         assert _matched_ids(backend, "produ*name") == set()
 
     def test_stem_substitution_reaches_both_the_inflection_and_the_compound(
@@ -129,12 +172,22 @@ class TestPrefixStemming:
         backend: TantivyBackend,
         indexed_doc: Document,
     ) -> None:
-        """English stemming substitutes as well as truncates: "copy" and
-        "copies" both index as "copi", while "copyright" keeps its literal "y".
-        Neither form is a prefix of the other, so no single normalized string
-        reaches both. The run is therefore emitted as a disjunction of the
-        folded and stemmed forms, and "copy*" reaches the base word, its
-        inflections and the compound alike.
+        """
+        GIVEN:
+            - The indexed document (containing "copies") plus a second
+              document titled "Copyright notice" with content "copyright
+              notice for the work"
+        WHEN:
+            - "copy*" and "copyright*" are each queried
+        THEN:
+            - "copy*" matches both documents, and "copyright*" matches
+              only the compound one. English stemming substitutes as well
+              as truncates: "copy" and "copies" both index as "copi",
+              while "copyright" keeps its literal "y". Neither form is a
+              prefix of the other, so no single normalized string reaches
+              both; the run is therefore emitted as a disjunction of the
+              folded and stemmed forms, and "copy*" reaches the base
+              word, its inflections and the compound alike
         """
         compound = Document.objects.create(
             title="Copyright notice",
@@ -163,6 +216,22 @@ class TestStemsMatchTheIndexAnalyzer:
         ["Copies", "copyright", "Companies", "Invoices", "laufen", "casas", "Straße"],
     )
     def test_stem_equals_the_index_term(self, word: str, language: str | None) -> None:
+        """
+        GIVEN:
+            - A word, across several representative index languages
+              ("en", "de", "fr", "es", "sv"), no language, and an
+              unsupported language ("klingon")
+        WHEN:
+            - `stem_pattern_text` (the pattern-side stemmer) processes the
+              folded word, and `paperless_text_analyzer` (the index-side
+              analyzer) independently processes the same word
+        THEN:
+            - The two produce the identical term. `stem_pattern_text`
+              rebuilds `paperless_text_analyzer`'s stemming tail rather
+              than sharing it, so a filter added to the index analyzer
+              alone would silently stop patterns from reaching the terms
+              it produces; this pins the two staying in sync
+        """
         indexed = paperless_text_analyzer(language).analyze(word)[0]
         assert stem_pattern_text(ascii_fold(word.lower()), language) == indexed
 
@@ -197,26 +266,64 @@ class TestPatternNormalizer:
         text: str,
         expected: tuple[str, ...],
     ) -> None:
+        """
+        GIVEN:
+            - The "en" pattern normalizer
+        WHEN:
+            - It processes a literal run (e.g. "Invoice", "library",
+              "Café")
+        THEN:
+            - It returns the folded run and, where it differs, the
+              stemmed form, as distinct alternatives; a run the stemmer
+              leaves alone (e.g. "invoic") collapses back to the single
+              folded form. "library" needs both forms since y -> i is a
+              substitution: the index holds "librari" for "library" and
+              "library" for "librarian"
+        """
         assert _forms(_make_pattern_normalizer("en"), text) == expected
 
     def test_run_that_yields_no_token_falls_back_to_the_typed_run(self) -> None:
-        """A run past the remove_long limit analyzes to zero tokens, so there is
-        no stem to offer and only the folded run remains."""
+        """
+        GIVEN:
+            - The "en" pattern normalizer
+        WHEN:
+            - It processes a run past the analyzer's remove_long limit
+        THEN:
+            - The run analyzes to zero tokens, so there is no stem to
+              offer, and only the folded run remains
+        """
         over_long = "invoices" * 20
         assert _forms(_make_pattern_normalizer("en"), over_long) == (over_long,)
 
     @pytest.mark.parametrize("language", [None, "klingon"])
     def test_unstemmed_language_folds_only(self, language: str | None) -> None:
-        """With no stemmer configured, or one this build has no stemmer for, the
-        index holds surface forms and the pattern must keep them too."""
+        """
+        GIVEN:
+            - A pattern normalizer with no language configured, or one
+              this build has no stemmer for ("klingon")
+        WHEN:
+            - It processes "Invoices"
+        THEN:
+            - Only the folded form ("invoices") is offered, since with no
+              stemmer configured the index holds surface forms and the
+              pattern must keep them too
+        """
         assert _forms(_make_pattern_normalizer(language), "Invoices") == ("invoices",)
 
     @pytest.mark.parametrize("char", ["a", "Z", "é"])
     def test_a_single_character_collapses_to_one_folded_form(self, char: str) -> None:
-        """A bracket class body is normalized one character at a time and the
-        answer is used only when it is a single one-character form, so a
-        stemmer that changed a lone character would silently disable folding
-        inside classes."""
+        """
+        GIVEN:
+            - The "en" pattern normalizer
+        WHEN:
+            - It processes a single character
+        THEN:
+            - Exactly one, one-character form is returned. A bracket
+              class body is normalized one character at a time and the
+              answer is used only when it is a single one-character
+              form, so a stemmer that changed a lone character would
+              silently disable folding inside classes
+        """
         forms = _forms(_make_pattern_normalizer("en"), char)
         assert len(forms) == 1
         assert len(forms[0]) == 1
@@ -228,6 +335,15 @@ class TestBracketClassStillFolds:
         backend: TantivyBackend,
         indexed_doc: Document,
     ) -> None:
-        """The class body is folded per character, which the alternatives
-        contract preserves only because a lone character stems to itself."""
+        """
+        GIVEN:
+            - The indexed document, titled "Invoice 2020 productname"
+        WHEN:
+            - A bracket-class pattern mixing case is queried
+              ("title:[IP]nvoice*")
+        THEN:
+            - It matches: the class body is folded per character, which
+              the alternatives contract preserves only because a lone
+              character stems to itself
+        """
         assert _matched_ids(backend, "title:[IP]nvoice*") == {indexed_doc.id}

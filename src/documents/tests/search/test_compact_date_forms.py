@@ -1,14 +1,13 @@
 """Whoosh's compact, separator-free date spelling, resolved end to end.
 
-whoosh-compat owns both widths of this spelling and asserts both of each
-form's bounds directly: ``test_compact_numeric_datetime`` pins the 8-digit
-form as a whole calendar day (lower bound, upper bound and exclusivity), and
-``test_compact_numeric_datetime_full_width_is_a_single_second_instant`` pins
-the 14-digit form as one instant. The 14-digit form is kept here as the single
-representative because it is the one that exercises paperless's ``added``
-DATETIME fast field at full precision: the corpus separates a document at
-the named instant from one on the same calendar day at another hour and one
-on the next day at the same hour, so a query that degrades into a whole-day
+whoosh-compat owns both widths of this spelling and asserts both forms'
+bounds directly in its own test suite: the 8-digit form as a whole calendar
+day (lower bound, upper bound and exclusivity), and the 14-digit form as a
+single instant. The 14-digit form is kept here as the single representative
+because it is the one that exercises paperless's ``added`` DATETIME fast
+field at full precision: the corpus separates a document at the named
+instant from one on the same calendar day at another hour and one on the
+next day at the same hour, so a query that degrades into a whole-day
 window, or drops the time of day, matches the wrong set rather than passing
 on a corpus that could not tell the difference.
 """
@@ -70,6 +69,18 @@ def test_fourteen_digits_is_a_single_instant(
     backend: TantivyBackend,
     docs: dict[str, int],
 ) -> None:
-    # same_day is what tells this apart from the 8-digit day-window form,
-    # next_day from a form that ignored the time altogether.
+    """
+    GIVEN:
+        - Three documents indexed on the ``added`` DATETIME fast field:
+          one at 2005-03-04T15:30:00, one on the same calendar day at a
+          different hour, and one on the next day at the same hour
+    WHEN:
+        - Searching with the 14-digit compact date form
+          ``added:20050304153000``
+    THEN:
+        - Only the document at that exact instant matches; the same-day
+          document is what tells this apart from the 8-digit day-window
+          form, and the next-day document from a form that ignored the
+          time of day altogether
+    """
     assert _matched_ids(backend, "added:20050304153000") == {docs["instant"]}

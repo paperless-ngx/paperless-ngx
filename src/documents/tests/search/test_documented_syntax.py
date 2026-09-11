@@ -77,6 +77,14 @@ class TestLogicalExpressions:
         backend: TantivyBackend,
         docs: dict[str, int],
     ) -> None:
+        """
+        GIVEN:
+            - Two indexed documents, one containing "secret" and one not
+        WHEN:
+            - "invoice NOT secret" is searched, as docs/usage.md documents
+        THEN:
+            - Only the document without "secret" matches
+        """
         assert _matched_ids(backend, "invoice NOT secret") == {docs["plain"]}
 
     def test_leading_hyphen_requires_the_term_instead_of_excluding_it(
@@ -84,8 +92,17 @@ class TestLogicalExpressions:
         backend: TantivyBackend,
         docs: dict[str, int],
     ) -> None:
-        # The docs warn about exactly this: separators are stripped at index
-        # time, so "-secret" is the term "secret" and the query is an AND.
+        """
+        GIVEN:
+            - Two indexed documents, one containing "secret" and one not
+        WHEN:
+            - "invoice -secret" is searched (a leading hyphen, not "NOT")
+        THEN:
+            - Only the document containing "secret" matches, because
+              separators are stripped at index time, so "-secret" is
+              indexed as the plain term "secret" and the query becomes an
+              AND rather than an exclusion, exactly as the docs warn
+        """
         assert _matched_ids(backend, "invoice -secret") == {docs["secret"]}
 
     def test_or_inside_parentheses_matches_either_branch(
@@ -93,6 +110,15 @@ class TestLogicalExpressions:
         backend: TantivyBackend,
         docs: dict[str, int],
     ) -> None:
+        """
+        GIVEN:
+            - Two indexed documents, one containing "secret" and one
+              containing "ordinary"
+        WHEN:
+            - "invoice AND (secret OR ordinary)" is searched
+        THEN:
+            - Both documents match
+        """
         matched = _matched_ids(backend, "invoice AND (secret OR ordinary)")
         assert matched == {docs["secret"], docs["plain"]}
 
@@ -102,6 +128,15 @@ class TestPhraseSearch:
         self,
         backend: TantivyBackend,
     ) -> None:
+        """
+        GIVEN:
+            - A document whose content contains "the quick brown fox jumps"
+        WHEN:
+            - A quoted phrase is searched, in order and out of order
+        THEN:
+            - The in-order phrase matches, and the same words reordered do
+              not
+        """
         doc = _index(
             backend,
             title="Phrase",
@@ -131,6 +166,16 @@ class TestTagCommaList:
         self,
         backend: TantivyBackend,
     ) -> None:
+        """
+        GIVEN:
+            - A document carrying both "bills" and "unpaid" tags, and a
+              second document carrying only "bills" (plus "archived")
+        WHEN:
+            - "tag:bills,unpaid" is searched
+        THEN:
+            - Only the document carrying every listed tag matches, and a
+              single-tag "tag:bills" search still matches both documents
+        """
         bills = Tag.objects.create(name="bills")
         unpaid = Tag.objects.create(name="unpaid")
         archived = Tag.objects.create(name="archived")
@@ -195,6 +240,18 @@ class TestArchiveMetadataFields:
         doc: Document,
         query: str,
     ) -> None:
+        """
+        GIVEN:
+            - A document with an ASN, page count, a note, an original
+              filename and a known checksum
+        WHEN:
+            - Every documented metadata-field spelling (exact value,
+              range, and, for checksum, a lowercase prefix pattern
+              regardless of the case the pattern itself is typed in) is
+              searched
+        THEN:
+            - Each one matches the document
+        """
         assert _matched_ids(backend, query) == {doc.pk}
 
     @pytest.mark.parametrize(
@@ -211,6 +268,16 @@ class TestArchiveMetadataFields:
         doc: Document,
         query: str,
     ) -> None:
+        """
+        GIVEN:
+            - A document with a known, complete, lowercase checksum
+        WHEN:
+            - An exact-value search is run with a partial or uppercase
+              spelling of that checksum
+        THEN:
+            - Nothing matches, as the docs say only a complete, lowercase
+              checksum matches as an exact value
+        """
         assert _matched_ids(backend, query) == set()
 
 
@@ -272,6 +339,21 @@ class TestDocumentedDateForms:
         query: str,
         label: str,
     ) -> None:
+        """
+        GIVEN:
+            - Documents dated today, yesterday, tomorrow, next/last
+              Monday, in January, and on an old fixed date, indexed
+              against a frozen "now" (a Monday)
+        WHEN:
+            - Every documented date-form spelling is searched: relative
+              keywords, quoted multi-word phrases, a bare year-month, an
+              explicit range, a quoted full timestamp standing alone, an
+              unquoted full timestamp as a range bound, and a
+              single-quoted range bound
+        THEN:
+            - Each form matches exactly the document dated on its day or
+              within its month
+        """
         assert _matched_ids(backend, query) == {dated[label]}
 
     @pytest.mark.parametrize(
@@ -302,6 +384,21 @@ class TestDocumentedDateForms:
         dated: dict[str, int],
         query: str,
     ) -> None:
+        """
+        GIVEN:
+            - A realistic dated corpus (see the `dated` fixture)
+        WHEN:
+            - A zero-width date form ("now", "noon", "midnight", a quoted
+              "now") or a standalone relative offset ("-1 week") is
+              searched: each resolves to a single instant rather than a
+              span, and quoting does not rescue them the way it rescues
+              other multi-word date expressions, since the problem is the
+              width of the resulting range, not how the value is
+              delimited
+        THEN:
+            - Nothing matches, exactly as the docs warn, rather than
+              presenting these as usable spellings
+        """
         assert _matched_ids(backend, query) == set()
 
     def test_bare_timestamp_is_rejected_rather_than_matching_nothing(
@@ -309,13 +406,20 @@ class TestDocumentedDateForms:
         backend: TantivyBackend,
         dated: dict[str, int],
     ) -> None:
-        """The bare, unquoted spelling of a full timestamp. The quoted and
-        range-bound spellings pinned above do work and match this fixture's
-        document; this one is a user-fixable error rather than an empty
-        result set, so the docs tell the user to quote it.
-
-        The reported value is the whole contiguous fragment the user typed,
-        not just the prefix the date grammar's tokenizer first split on.
+        """
+        GIVEN:
+            - A realistic dated corpus, including a document dated at a
+              known full timestamp
+        WHEN:
+            - The bare, unquoted spelling of that full timestamp is
+              searched (the quoted and range-bound spellings pinned above
+              do work and match this fixture's document)
+        THEN:
+            - `InvalidDateQuery` is raised rather than the query silently
+              matching nothing, since this is a user-fixable error the
+              docs tell the user to quote, and the reported value is the
+              whole contiguous fragment the user typed, not just the
+              prefix the date grammar's tokenizer first split on
         """
         with pytest.raises(InvalidDateQuery) as exc_info:
             _matched_ids(backend, "added:2005-03-04T15:30:00Z")
@@ -327,13 +431,20 @@ class TestDocumentedDateForms:
         backend: TantivyBackend,
         dated: dict[str, int],
     ) -> None:
-        """The same offset that matches nothing on its own spans the last
-        seven days as a lower bound. The docs say so, next to the warning
-        about the standalone form, so both readings are pinned together.
-
-        "last_monday" is indexed at 2026-06-08T10:00, two hours before the
-        window opens, so its exclusion is what shows the bound is the offset
-        and not a whole-day rounding of it.
+        """
+        GIVEN:
+            - A realistic dated corpus, including a document dated two
+              hours before a "last Monday to now" window opens, and
+              documents dated today and yesterday, inside that window
+        WHEN:
+            - "added:['-1 week' to now]" is searched: the same offset
+              that matches nothing standing alone (see the test above),
+              used here as a range bound instead
+        THEN:
+            - The window matches today and yesterday but excludes the
+              document two hours before it opens, showing the bound is
+              the offset itself and not a whole-day rounding of it, as
+              the docs say next to the warning about the standalone form
         """
         assert _matched_ids(backend, "added:['-1 week' to now]") == {
             dated["today"],
@@ -345,10 +456,18 @@ class TestDocumentedDateForms:
         backend: TantivyBackend,
         dated: dict[str, int],
     ) -> None:
-        """Quoting a range bound is allowed, but only with single quotes: the
-        double-quoted spelling reaches the date grammar with its quotes still
-        attached and is not a recognizable date. The docs say so, so pin which
-        of the two quote characters is the one that fails.
+        """
+        GIVEN:
+            - A realistic dated corpus
+        WHEN:
+            - A range bound is double-quoted rather than single-quoted
+              ("added:[\"2005-03-04\" to 2005-03-05]")
+        THEN:
+            - `InvalidDateQuery` is raised, pinning which of the two
+              quote characters fails: quoting a range bound is allowed,
+              but only with single quotes, since the double-quoted
+              spelling reaches the date grammar with its quotes still
+              attached and is not a recognizable date
         """
         with pytest.raises(InvalidDateQuery) as exc_info:
             _matched_ids(backend, 'added:["2005-03-04" to 2005-03-05]')
