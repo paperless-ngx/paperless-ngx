@@ -1788,6 +1788,12 @@ class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMix
                     "update_document only allowed with a single output document",
                 )
 
+        if any(
+            op.get("doc", 0) < 0 or op.get("doc", 0) >= len(operations)
+            for op in operations
+        ):
+            raise serializers.ValidationError("doc index is out of bounds")
+
         doc = Document.objects.get(id=documents[0])
         if doc.page_count:
             for op in operations:
@@ -2150,6 +2156,12 @@ class BulkEditSerializer(
                 raise serializers.ValidationError(
                     "update_document only allowed with a single output document",
                 )
+
+        if any(
+            op.get("doc", 0) < 0 or op.get("doc", 0) >= len(parameters["operations"])
+            for op in parameters["operations"]
+        ):
+            raise serializers.ValidationError("doc index is out of bounds")
 
         doc = Document.objects.get(id=document_id)
         # doc existence is already validated
