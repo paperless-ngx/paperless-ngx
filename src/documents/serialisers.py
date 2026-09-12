@@ -3604,6 +3604,8 @@ class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
 
         if "actions" in validated_data:
             actions = validated_data.pop("actions")
+            for action in actions:
+                action.pop("id", None)
 
         instance = super().create(validated_data)
 
