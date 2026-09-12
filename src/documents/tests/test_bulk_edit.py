@@ -1642,6 +1642,17 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_group.assert_not_called()
         mock_consume_file.assert_not_called()
 
+    @mock.patch("pikepdf.open")
+    def test_edit_pdf_rejects_out_of_bounds_output_index(self, mock_open) -> None:
+        with self.assertLogs("paperless.bulk_edit", level="ERROR"):
+            with self.assertRaisesRegex(ValueError, "index is out of bounds"):
+                bulk_edit.edit_pdf(
+                    [self.doc2.id],
+                    [{"page": 1, "doc": 2**32}],
+                )
+
+        mock_open.assert_not_called()
+
     @mock.patch("documents.bulk_edit.update_document_content_maybe_archive_file.delay")
     @mock.patch("documents.tasks.consume_file.apply_async")
     @mock.patch("documents.bulk_edit.tempfile.mkdtemp")

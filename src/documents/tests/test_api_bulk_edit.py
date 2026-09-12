@@ -1649,6 +1649,24 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_legacy_bulk_edit_rejects_out_of_bounds_pdf_doc_index(self) -> None:
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "edit_pdf",
+                    "parameters": {
+                        "operations": [{"page": 1, "doc": 2**32}],
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"doc index is out of bounds", response.content)
+
     @mock.patch("documents.views.bulk_edit.edit_pdf")
     def test_edit_pdf(self, m) -> None:
         self.setup_mock(m, "edit_pdf")
@@ -1750,6 +1768,21 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(b"doc must be an integer", response.content)
+
+        for doc_index in (-1, 2**32):
+            with self.subTest(doc_index=doc_index):
+                response = self.client.post(
+                    "/api/documents/edit_pdf/",
+                    json.dumps(
+                        {
+                            "documents": [self.doc2.id],
+                            "operations": [{"page": 1, "doc": doc_index}],
+                        },
+                    ),
+                    content_type="application/json",
+                )
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertIn(b"doc index is out of bounds", response.content)
 
         response = self.client.post(
             "/api/documents/edit_pdf/",
