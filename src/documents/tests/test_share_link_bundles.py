@@ -6,8 +6,10 @@ from pathlib import Path
 from unittest import mock
 
 from django.conf import settings
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.utils import timezone
+from guardian.shortcuts import assign_perm
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -47,6 +49,37 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         self.assertEqual(bundle.status, ShareLinkBundle.Status.PENDING)
         delay_mock.assert_called_once()
         self.assertEqual(delay_mock.call_args.kwargs["kwargs"]["bundle_id"], bundle.pk)
+
+    @mock.patch("documents.views.build_share_link_bundle.apply_async")
+    def test_create_bundle_requires_global_document_view_permission(
+        self,
+        delay_mock,
+    ) -> None:
+        owner = User.objects.create_user(username="document_owner")
+        requester = User.objects.create_user(username="bundle_creator")
+        requester.user_permissions.add(
+            Permission.objects.get(codename="add_sharelinkbundle"),
+        )
+        document = DocumentFactory.create(owner=owner)
+        assign_perm("view_document", requester, document)
+        self.client.force_authenticate(requester)
+        payload = {
+            "document_ids": [document.pk],
+            "file_version": ShareLink.FileVersion.ARCHIVE,
+            "expiration_days": 7,
+        }
+
+        response = self.client.post(self.ENDPOINT, payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        requester.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
+        requester = User.objects.get(pk=requester.pk)
+        self.client.force_authenticate(requester)
+        response = self.client.post(self.ENDPOINT, payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        delay_mock.assert_called_once()
 
     def test_create_bundle_rejects_missing_documents(self) -> None:
         payload = {

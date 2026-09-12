@@ -657,16 +657,41 @@ class ViewDocumentsPermissions(BasePermission):
         return request.user.has_perms(self.perms_map.get(request.method, []))
 
 
+class TrashPermissions(BasePermission):
+    """Check the global document permission for each trash operation."""
+
+    perms_map = {
+        "OPTIONS": ["documents.view_document"],
+        "HEAD": ["documents.view_document"],
+        "GET": ["documents.view_document"],
+        "POST": ["documents.delete_document"],
+    }
+
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:  # pragma: no cover
+            return False
+
+        return request.user.has_perms(self.perms_map.get(request.method, []))
+
+
 class PaperlessNotePermissions(BasePermission):
     """
     Permissions class that checks for model permissions for Notes.
     """
 
     perms_map = {
-        "OPTIONS": ["documents.view_note"],
-        "GET": ["documents.view_note"],
-        "POST": ["documents.add_note"],
-        "DELETE": ["documents.delete_note"],
+        "OPTIONS": ["documents.view_note", "documents.view_document"],
+        "GET": ["documents.view_note", "documents.view_document"],
+        "POST": [
+            "documents.add_note",
+            "documents.view_document",
+            "documents.change_document",
+        ],
+        "DELETE": [
+            "documents.delete_note",
+            "documents.view_document",
+            "documents.change_document",
+        ],
     }
 
     def has_permission(self, request, view):

@@ -309,6 +309,9 @@ class TestEmailDocumentPermissionBoundary:
     ):
         owner = User.objects.create_user(username="owner")
         requester = User.objects.create_user(username="requester")
+        requester.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
         rest_api_client.force_authenticate(user=requester)
         hidden = DocumentFactory(owner=owner)
 
@@ -364,6 +367,27 @@ class TestBulkEditChangePermissionBoundary:
 
 @pytest.mark.django_db
 class TestBulkDownloadPermissionChecksRootDocument:
+    def test_download_requires_global_view_permission(
+        self,
+        rest_api_client,
+        paperless_dirs,
+        _media_settings,
+    ):
+        owner = User.objects.create_user(username="owner")
+        requester = User.objects.create_user(username="requester")
+        root = DocumentFactory(owner=owner)
+        root.source_path.write_bytes(b"%PDF-1.4 test")
+        assign_perm("view_document", requester, root)
+        rest_api_client.force_authenticate(user=requester)
+
+        response = rest_api_client.post(
+            "/api/documents/bulk_download/",
+            {"documents": [root.pk]},
+            format="json",
+        )
+
+        assert response.status_code == HTTPStatus.FORBIDDEN
+
     def test_permission_checked_on_root_not_on_version(
         self,
         rest_api_client,
@@ -372,6 +396,9 @@ class TestBulkDownloadPermissionChecksRootDocument:
     ):
         owner = User.objects.create_user(username="owner")
         requester = User.objects.create_user(username="requester")
+        requester.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
         rest_api_client.force_authenticate(user=requester)
         root = DocumentFactory(owner=owner)
         # a version of root that the requester has NOT been individually granted
@@ -396,6 +423,9 @@ class TestBulkDownloadPermissionChecksRootDocument:
         # `stranger` case) can't tell the two apart, since they're denied
         # either way.
         version_only_grantee = User.objects.create_user(username="version_only_grantee")
+        version_only_grantee.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
         assign_perm("view_document", version_only_grantee, version)
         rest_api_client.force_authenticate(user=version_only_grantee)
         response = rest_api_client.post(
@@ -417,6 +447,9 @@ class TestTrashRestorePermissionBoundary:
     ):
         owner = User.objects.create_user(username="owner")
         requester = User.objects.create_user(username="requester")
+        requester.user_permissions.add(
+            Permission.objects.get(codename="delete_document"),
+        )
         rest_api_client.force_authenticate(user=requester)
         doc = DocumentFactory(owner=owner)
         assign_perm("view_document", requester, doc)  # view only, NOT delete
@@ -435,6 +468,9 @@ class TestTrashRestorePermissionBoundary:
     ):
         owner = User.objects.create_user(username="owner")
         requester = User.objects.create_user(username="requester")
+        requester.user_permissions.add(
+            Permission.objects.get(codename="delete_document"),
+        )
         rest_api_client.force_authenticate(user=requester)
         doc = DocumentFactory(owner=owner)
         assign_perm("delete_document", requester, doc)
@@ -446,6 +482,22 @@ class TestTrashRestorePermissionBoundary:
             format="json",
         )
         assert response.status_code == HTTPStatus.OK
+
+    def test_restore_requires_global_delete_permission(self, rest_api_client):
+        owner = User.objects.create_user(username="owner")
+        requester = User.objects.create_user(username="requester")
+        rest_api_client.force_authenticate(user=requester)
+        doc = DocumentFactory(owner=owner)
+        assign_perm("delete_document", requester, doc)
+        doc.delete()
+
+        response = rest_api_client.post(
+            "/api/trash/",
+            {"documents": [doc.pk], "action": "restore"},
+            format="json",
+        )
+
+        assert response.status_code == HTTPStatus.FORBIDDEN
 
 
 @pytest.mark.django_db
@@ -463,6 +515,9 @@ class TestTrashViewExcludesExplicitlyGrantedDocuments:
     def test_explicit_grant_does_not_leak_trashed_document(self, rest_api_client):
         owner = User.objects.create_user(username="trash_owner")
         grantee = User.objects.create_user(username="trash_grantee")
+        grantee.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
         doc = DocumentFactory(owner=owner)
         doc.delete()  # soft delete
         assign_perm("view_document", grantee, doc)
