@@ -1209,6 +1209,14 @@ left unassigned, preventing low-confidence guesses from being applied.
 
     Defaults to 0.6.
 
+#### [`PAPERLESS_MATCH_REGEX_TIMEOUT_SECONDS=<float>`](#PAPERLESS_MATCH_REGEX_TIMEOUT_SECONDS) {#PAPERLESS_MATCH_REGEX_TIMEOUT_SECONDS}
+
+: Sets the timeout, in seconds, for regular expression matching. Increase this
+value if date parsing or user-defined matching rules time out when processing
+long documents, especially on slower hardware.
+
+    Defaults to 0.1 seconds.
+
 #### [`PAPERLESS_DATE_PARSER_LANGUAGES=<lang>`](#PAPERLESS_DATE_PARSER_LANGUAGES) {#PAPERLESS_DATE_PARSER_LANGUAGES}
 
 : Specifies which language Paperless should use when parsing dates from documents.
