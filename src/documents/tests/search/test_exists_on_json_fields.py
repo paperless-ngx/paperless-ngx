@@ -9,7 +9,10 @@ action can clear the condition. Any authenticated user could otherwise emit
 ERROR lines in a loop by repeating ``notes:*``.
 
 SCHEMA_FIELD_MISSING, the other MISCONFIGURED kind, does compare the registry
-against the live schema, so it stays an ERROR.
+against the live schema, so it stays an ERROR log. But it is not a 400
+either: the exact same query would succeed once the index is rebuilt, so it
+is a transient server-side condition, not a permanently bad request, and is
+re-raised the same way an INTERNAL cause is.
 """
 
 from __future__ import annotations
@@ -81,7 +84,7 @@ class TestJsonExistsIsUserError:
 
 
 class TestGenuineMisconfigurationStillLogs:
-    def test_schema_field_missing_is_an_error_log(
+    def test_schema_field_missing_is_an_error_log_and_reraised(
         self,
         caplog: pytest.LogCaptureFixture,
     ) -> None:
@@ -92,9 +95,13 @@ class TestGenuineMisconfigurationStillLogs:
         WHEN:
             - _map_emit_error processes it
         THEN:
-            - It becomes a SearchQueryError and logs exactly one ERROR
-              record naming the diagnostic kind, since this is a real
-              mismatch an operator can fix and keeps the alert
+            - It logs exactly one ERROR record naming the diagnostic kind
+              (a real mismatch an operator can fix, so it keeps the
+              alert), and the original QueryError propagates unchanged
+              rather than becoming a SearchQueryError: the exact same
+              query would succeed once the index is rebuilt, so this is a
+              transient server-side condition, not a permanently bad
+              request, and surfaces as a 500 rather than a 400
         """
         kind = DiagnosticKind.SCHEMA_FIELD_MISSING
         error = QueryError(
@@ -106,9 +113,12 @@ class TestGenuineMisconfigurationStillLogs:
                 field_kind=FieldKind.U64,
             ),
         )
-        with caplog.at_level(logging.ERROR, logger="paperless.search"):
-            mapped = _map_emit_error(error)
-        assert isinstance(mapped, SearchQueryError)
+        with (
+            caplog.at_level(logging.ERROR, logger="paperless.search"),
+            pytest.raises(QueryError) as excinfo,
+        ):
+            _map_emit_error(error)
+        assert excinfo.value is error
         records = [r for r in caplog.records if r.levelno == logging.ERROR]
         assert len(records) == 1
         assert kind.name in records[0].getMessage()
