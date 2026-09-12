@@ -82,7 +82,7 @@ class TestEmitErrorRouting:
             _map_emit_error(error)
         assert excinfo.value is error
 
-    def test_misconfigured_cause_is_logged_and_becomes_a_400(
+    def test_misconfigured_cause_is_logged_and_reraised(
         self,
         caplog: pytest.LogCaptureFixture,
     ) -> None:
@@ -92,15 +92,21 @@ class TestEmitErrorRouting:
         WHEN:
             - _map_emit_error processes it
         THEN:
-            - It becomes a SearchQueryError, and exactly one ERROR log
-              record is emitted naming the field and the diagnostic kind
+            - Exactly one ERROR log record is emitted naming the field and
+              the diagnostic kind, and the original QueryError propagates
+              unchanged: a registry/schema disagreement is transient (the
+              exact same query succeeds once the index is rebuilt), so it
+              surfaces as a 500 an operator can see rather than a 400
+              telling the client their query is permanently invalid
         """
         kind = DiagnosticKind.SCHEMA_FIELD_MISSING
-        with caplog.at_level(logging.ERROR, logger="paperless.search"):
-            error = _map_emit_error(
-                QueryError(_diagnostic(kind, field=FieldRef("asn"))),
-            )
-        assert isinstance(error, SearchQueryError)
+        error = QueryError(_diagnostic(kind, field=FieldRef("asn")))
+        with (
+            caplog.at_level(logging.ERROR, logger="paperless.search"),
+            pytest.raises(QueryError) as excinfo,
+        ):
+            _map_emit_error(error)
+        assert excinfo.value is error
         errors = [r for r in caplog.records if r.levelno == logging.ERROR]
         assert len(errors) == 1
         assert "asn" in errors[0].getMessage()
@@ -144,7 +150,6 @@ class TestEmitErrorRouting:
             DiagnosticKind.TEXT_RANGE,
             DiagnosticKind.PATTERN_TOO_COMPLEX,
             DiagnosticKind.EXISTS_REQUIRES_FAST,
-            DiagnosticKind.SCHEMA_FIELD_MISSING,
         ],
     )
     def test_user_facing_message_never_echoes_library_prose(
@@ -154,7 +159,10 @@ class TestEmitErrorRouting:
         """
         GIVEN:
             - A QueryError carrying whoosh-compat's own developer-facing
-              message text
+              message text (SCHEMA_FIELD_MISSING excluded: it is now
+              re-raised rather than converted, so it never produces a
+              user-facing message at all, see
+              test_misconfigured_cause_is_logged_and_reraised)
         WHEN:
             - _map_emit_error processes it
         THEN:
@@ -170,7 +178,6 @@ class TestEmitErrorRouting:
             DiagnosticKind.TEXT_RANGE,
             DiagnosticKind.PATTERN_TOO_COMPLEX,
             DiagnosticKind.EXISTS_REQUIRES_FAST,
-            DiagnosticKind.SCHEMA_FIELD_MISSING,
         ],
     )
     def test_user_facing_message_names_the_field(

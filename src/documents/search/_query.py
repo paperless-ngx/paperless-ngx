@@ -43,7 +43,8 @@ def _user_facing_emit_message(d: Diagnostic) -> str:
     Built from the Diagnostic's structured fields (kind, field), never from
     d.message: whoosh-compat documents that as developer/log output with no
     stability guarantee, and PATTERN_TOO_COMPLEX embeds the raw backend
-    error text in it.
+    error text in it. SCHEMA_FIELD_MISSING never reaches here: _map_emit_error
+    re-raises it before calling this function, the same as INTERNAL.
     """
     field = str(d.field) if d.field is not None else None
     if d.kind is DiagnosticKind.EXISTS_REQUIRES_FAST:
@@ -52,8 +53,6 @@ def _user_facing_emit_message(d: Diagnostic) -> str:
         return f"Range searches are not supported for field {field!r}."
     if d.kind is DiagnosticKind.PATTERN_TOO_COMPLEX:
         return f"The wildcard pattern for field {field!r} is too complex."
-    if d.kind is DiagnosticKind.SCHEMA_FIELD_MISSING:
-        return f"Field {field!r} is not available in the search index."
     logger.warning(
         "Unmapped emit diagnostic %s: %s",
         d.kind,
@@ -69,10 +68,15 @@ def _map_emit_error(e: QueryError) -> SearchQueryError:
     diagnostic, and map to a 400. INTERNAL means a defect in whoosh-compat
     or in our own AST handling, never the user's query, so the QueryError is
     re-raised rather than converted, reaching the generic 500 handler instead
-    of blaming the query. MISCONFIGURED is deliberately both: the registry and
-    the index schema disagree, which only an operator can fix, so it is logged
-    as an error, but a request is still waiting and the query cannot run
-    either way, so it also returns a 400.
+    of blaming the query. MISCONFIGURED other than EXISTS_REQUIRES_FAST is
+    treated the same way as INTERNAL: the registry and the index schema
+    disagree, which only an operator can fix, and the exact same query would
+    succeed on its own once the index is rebuilt. That makes it a transient
+    server-side condition, not a permanently bad request, so it is logged as
+    an error and re-raised rather than converted to a 400: telling the
+    client their query is invalid would be wrong, it would work once the
+    index catches up, and a 400 also hides the condition from monitoring
+    that only watches 5xx rates.
 
     EXISTS_REQUIRES_FAST is the one MISCONFIGURED kind that is not a
     disagreement. whoosh-compat derives it from the registry's own FieldSpec
@@ -96,6 +100,7 @@ def _map_emit_error(e: QueryError) -> SearchQueryError:
             d.kind.name,
             d.message,
         )
+        raise e
     return SearchQueryError(_user_facing_emit_message(d))
 
 
