@@ -1,5 +1,6 @@
 import pytest
 import regex
+from django.conf import settings
 from pytest_mock import MockerFixture
 
 from documents.regex import safe_regex_finditer
@@ -7,6 +8,12 @@ from documents.regex import safe_regex_match
 from documents.regex import safe_regex_search
 from documents.regex import safe_regex_sub
 from documents.regex import validate_regex_pattern
+
+
+def test_regex_timeout_uses_configured_setting() -> None:
+    from documents.regex import REGEX_TIMEOUT_SECONDS
+
+    assert REGEX_TIMEOUT_SECONDS == settings.MATCH_REGEX_TIMEOUT_SECONDS
 
 
 class TestValidateRegexPattern:
