@@ -354,6 +354,14 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     category: ConfigCategory.AI,
   },
   {
+    key: 'llm_embedding_api_key',
+    title: $localize`LLM Embedding API Key`,
+    type: ConfigOptionType.Password,
+    note: $localize`Used for embeddings when set; otherwise the LLM API key is used.`,
+    config_key: 'PAPERLESS_AI_LLM_EMBEDDING_API_KEY',
+    category: ConfigCategory.AI,
+  },
+  {
     key: 'llm_embedding_endpoint',
     title: $localize`LLM Embedding Endpoint`,
     type: ConfigOptionType.String,
@@ -457,6 +465,7 @@ export interface PaperlessConfig extends ObjectWithId {
   ai_enabled: boolean
   llm_embedding_backend: string
   llm_embedding_model: string
+  llm_embedding_api_key: string
   llm_embedding_endpoint: string
   llm_embedding_chunk_size: number
   llm_context_size: number

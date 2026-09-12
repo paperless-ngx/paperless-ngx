@@ -2130,6 +2130,13 @@ for language and resource considerations.
 
     Defaults to None.
 
+#### [`PAPERLESS_AI_LLM_EMBEDDING_API_KEY=<str>`](#PAPERLESS_AI_LLM_EMBEDDING_API_KEY) {#PAPERLESS_AI_LLM_EMBEDDING_API_KEY}
+
+: The API key to use for the embedding backend. If not supplied, embeddings use
+`PAPERLESS_AI_LLM_API_KEY`.
+
+    Defaults to None.
+
 #### [`PAPERLESS_AI_LLM_EMBEDDING_ENDPOINT=<str>`](#PAPERLESS_AI_LLM_EMBEDDING_ENDPOINT) {#PAPERLESS_AI_LLM_EMBEDDING_ENDPOINT}
 
 : The endpoint / url to use for the embedding backend. If not supplied, embeddings use
