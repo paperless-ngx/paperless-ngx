@@ -550,6 +550,9 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             password="password",
             email="owner@example.com",
         )
+        owner.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
         document = Document.objects.create(
             mime_type="application/pdf",
             owner=owner,
@@ -625,6 +628,9 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             checksum="123",
         )
         assign_perm("view_document", viewer, document)
+        viewer.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
 
         self.client.force_authenticate(user=viewer)
         response = self.client.post(
@@ -712,6 +718,9 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         )
         document.tags.add(private_tag)
         assign_perm("view_document", viewer, document)
+        viewer.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
 
         self.client.force_authenticate(user=viewer)
         response = self.client.post(
@@ -765,6 +774,9 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             value_int=42,
         )
         assign_perm("view_document", viewer, document)
+        viewer.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
 
         self.client.force_authenticate(user=viewer)
         response = self.client.post(
