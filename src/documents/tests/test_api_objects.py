@@ -457,6 +457,9 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
     def test_test_storage_path_requires_document_view_permission(self) -> None:
         owner = User.objects.create_user(username="owner")
         unprivileged = User.objects.create_user(username="unprivileged")
+        unprivileged.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
         document = Document.objects.create(
             mime_type="application/pdf",
             owner=owner,
@@ -488,6 +491,23 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         )
         assign_perm("view_document", viewer, document)
 
+        self.client.force_authenticate(user=viewer)
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "document": document.id,
+                    "path": "path/{{ title }}",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        viewer.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
+        viewer = User.objects.get(pk=viewer.pk)
         self.client.force_authenticate(user=viewer)
         response = self.client.post(
             f"{self.ENDPOINT}test/",
