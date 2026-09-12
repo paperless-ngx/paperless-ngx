@@ -3037,14 +3037,14 @@ requires-dist = [
     { name = "django-cors-headers", specifier = "~=4.9.0" },
     { name = "django-extensions", specifier = "~=4.1" },
     { name = "django-filter", specifier = "~=25.1" },
-    { name = "django-guardian", specifier = ">=3.3.3,<3.5.0" },
+    { name = "django-guardian", specifier = ">=3.3.3,<3.5" },
     { name = "django-multiselectfield", specifier = "~=1.0.1" },
     { name = "django-rich", specifier = "~=2.2.0" },
     { name = "django-soft-delete", specifier = "~=1.0.18" },
     { name = "django-treenode", specifier = ">=0.24" },
     { name = "djangorestframework", specifier = "~=3.16" },
     { name = "drf-spectacular", specifier = "~=0.30" },
-    { name = "drf-spectacular-sidecar", specifier = ">=2026.7.1,<2026.9.0" },
+    { name = "drf-spectacular-sidecar", specifier = ">=2026.7.1,<2026.9" },
     { name = "drf-writable-nested", specifier = "~=0.7.1" },
     { name = "filelock", specifier = "~=3.32.0" },
     { name = "flower", specifier = ">=2.0.1,<2.2" },
@@ -3091,7 +3091,7 @@ requires-dist = [
     { name = "torch", specifier = "~=2.13.0", index = "https://download.pytorch.org/whl/cpu" },
     { name = "watchfiles", specifier = ">=1.2" },
     { name = "whitenoise", specifier = "~=6.11" },
-    { name = "whoosh-compat", extras = ["tantivy"], specifier = "==0.1.0" },
+    { name = "whoosh-compat", extras = ["tantivy"], specifier = "==0.2" },
     { name = "zxing-cpp", specifier = "~=3.1.0" },
 ]
 provides-extras = ["mariadb", "postgres", "webserver"]
@@ -3102,7 +3102,7 @@ dev = [
     { name = "factory-boy", specifier = "~=3.3.1" },
     { name = "faker", specifier = ">=40.36,<40.38" },
     { name = "imagehash" },
-    { name = "prek", specifier = ">=0.4.11,<0.6.0" },
+    { name = "prek", specifier = ">=0.4.11,<0.6" },
     { name = "pytest", specifier = "~=9.1.1" },
     { name = "pytest-cov", specifier = "~=7.1.0" },
     { name = "pytest-django", specifier = ">=4.12,<4.15" },
@@ -3118,7 +3118,7 @@ dev = [
 ]
 docs = [{ name = "zensical", specifier = ">=0.0.51" }]
 lint = [
-    { name = "prek", specifier = ">=0.4.11,<0.6.0" },
+    { name = "prek", specifier = ">=0.4.11,<0.6" },
     { name = "ruff", specifier = "~=0.16.1" },
 ]
 testing = [
@@ -5642,14 +5642,14 @@ wheels = [
 
 [[package]]
 name = "whoosh-compat"
-version = "0.1.0"
+version = "0.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "python-dateutil" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5d/f7/3e45f4a484afa174cd42e424ce2b8c514ae54f564830122656ad17b765e2/whoosh_compat-0.1.0.tar.gz", hash = "sha256:86935bdc159ed9b0a06a4661d17f1251d8280340b84e218cc73d915a2edaddf7", size = 577543, upload-time = "2026-08-25T15:22:42.316Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d7/b2/ef410aa5297d61e9e98448f88ea9385c92840d811e0878de2f9ed2710620/whoosh_compat-0.2.0.tar.gz", hash = "sha256:f5d1b8bf2956a304c9b9c147ec840f2487d976cb7fa872bea767dcdeed7c3e45", size = 605669, upload-time = "2026-08-27T20:30:08.154Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3f/51/9a8399d0f472814e136a2884bf910c6c59843a5a2c66afc4b5133eb531ea/whoosh_compat-0.1.0-py3-none-any.whl", hash = "sha256:3e7c5f519b4d397dbf4f8d7bbe4ca1eb6004da24c8892bc701844ed393bc97e7", size = 153875, upload-time = "2026-08-25T15:22:40.787Z" },
+    { url = "https://files.pythonhosted.org/packages/e2/3f/78e37cd794ae26ee9b94d81d608906a8aefa31a08897ef3aaeafcbb3a55a/whoosh_compat-0.2.0-py3-none-any.whl", hash = "sha256:891e98508042673862516d3811e010a62205998a31ae6e09b80a221eb8d544d3", size = 158514, upload-time = "2026-08-27T20:30:06.764Z" },
 ]
 
 [package.optional-dependencies]
