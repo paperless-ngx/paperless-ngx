@@ -21,6 +21,7 @@ from unittest import mock
 import pytest
 from rest_framework import status
 
+import documents.search._backend
 from documents.tests.factories import DocumentFactory
 from documents.views import _MAX_QUERY_LENGTH
 
@@ -54,16 +55,23 @@ class TestGetSearchEndpointEnforcesTheCap:
             - A query one character over `_MAX_QUERY_LENGTH` is submitted
         THEN:
             - The response is a 400 naming both the actual length and the
-              cap
+              cap, and the query is rejected before it ever reaches the
+              parser -- the 400 alone doesn't prove that, since the parser
+              could run first and the view could discard the result
         """
         query = "a" * (_MAX_QUERY_LENGTH + 1)
 
-        response = admin_client.get("/api/documents/", {"query": query})
+        with mock.patch(
+            "documents.search._backend.parse_user_query",
+            wraps=documents.search._backend.parse_user_query,
+        ) as parse_spy:
+            response = admin_client.get("/api/documents/", {"query": query})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         message = str(response.data["query"])
         assert str(_MAX_QUERY_LENGTH) in message
         assert str(_MAX_QUERY_LENGTH + 1) in message
+        parse_spy.assert_not_called()
 
     def test_query_at_exactly_the_cap_is_accepted(
         self,
@@ -123,26 +131,33 @@ class TestPostSelectionPathsEnforceTheCap:
             - Its `filters.query` is one character over `_MAX_QUERY_LENGTH`
         THEN:
             - The response is a 400 naming both the actual length and the
-              cap
+              cap, and the query is rejected before it ever reaches the
+              parser -- this is the path with no web-server header-length
+              limit to fall back on, so this is the invariant that matters
         """
         query = "a" * (_MAX_QUERY_LENGTH + 1)
 
-        response = admin_client.post(
-            "/api/documents/bulk_edit/",
-            {
-                "documents": [],
-                "all": True,
-                "filters": {"query": query},
-                "method": "set_document_type",
-                "parameters": {"document_type": None},
-            },
-            format="json",
-        )
+        with mock.patch(
+            "documents.search._backend.parse_user_query",
+            wraps=documents.search._backend.parse_user_query,
+        ) as parse_spy:
+            response = admin_client.post(
+                "/api/documents/bulk_edit/",
+                {
+                    "documents": [],
+                    "all": True,
+                    "filters": {"query": query},
+                    "method": "set_document_type",
+                    "parameters": {"document_type": None},
+                },
+                format="json",
+            )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         message = str(response.data["query"])
         assert str(_MAX_QUERY_LENGTH) in message
         assert str(_MAX_QUERY_LENGTH + 1) in message
+        parse_spy.assert_not_called()
 
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
     def test_bulk_edit_query_at_exactly_the_cap_is_accepted(
@@ -191,24 +206,30 @@ class TestPostSelectionPathsEnforceTheCap:
             - Its `filters.query` is one character over `_MAX_QUERY_LENGTH`
         THEN:
             - The response is a 400 naming both the actual length and the
-              cap
+              cap, and the query is rejected before it ever reaches the
+              parser
         """
         query = "a" * (_MAX_QUERY_LENGTH + 1)
 
-        response = admin_client.post(
-            "/api/documents/bulk_download/",
-            {
-                "documents": [],
-                "all": True,
-                "filters": {"query": query},
-            },
-            format="json",
-        )
+        with mock.patch(
+            "documents.search._backend.parse_user_query",
+            wraps=documents.search._backend.parse_user_query,
+        ) as parse_spy:
+            response = admin_client.post(
+                "/api/documents/bulk_download/",
+                {
+                    "documents": [],
+                    "all": True,
+                    "filters": {"query": query},
+                },
+                format="json",
+            )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         message = str(response.data["query"])
         assert str(_MAX_QUERY_LENGTH) in message
         assert str(_MAX_QUERY_LENGTH + 1) in message
+        parse_spy.assert_not_called()
 
 
 class TestGlobalSearchEnforcesTheCapToo:
