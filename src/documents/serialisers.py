@@ -1335,6 +1335,7 @@ class DocumentSerializer(
             "root_document",
             "versions",
         )
+        read_only_fields = ("deleted_at",)
         list_serializer_class = OwnedObjectListSerializer
 
 
