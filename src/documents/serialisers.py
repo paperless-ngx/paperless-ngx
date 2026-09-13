@@ -2130,6 +2130,8 @@ class BulkEditSerializer(
             raise serializers.ValidationError("operations not specified")
         if not isinstance(parameters["operations"], list):
             raise serializers.ValidationError("operations must be a list")
+        if not parameters["operations"]:
+            raise serializers.ValidationError("operations must not be empty")
         for op in parameters["operations"]:
             if not isinstance(op, dict):
                 raise serializers.ValidationError("invalid operation entry")
