@@ -99,6 +99,10 @@ const TASK_TYPE_OPTIONS: Array<{
     value: PaperlessTaskType.BulkDelete,
     label: $localize`Bulk Delete`,
   },
+  {
+    value: PaperlessTaskType.ApplyAiSuggestions,
+    label: $localize`Apply AI Suggestions`,
+  },
 ]
 
 const TRIGGER_SOURCE_OPTIONS: Array<{
