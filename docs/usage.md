@@ -988,14 +988,39 @@ Matching inexact words:
 ```
 invoice*
 title:Invoice*
+20[12]?
+20[!0]?
 ```
 
-Wildcards are matched against the _stemmed_ terms stored in the index, not
-against the words as they appear in the document. Each literal part of a
-pattern is tried both as you typed it and in its stemmed form, so a trailing
-`*` matches a word and its inflections (`invoice*` finds "invoice", "invoices"
-and "invoiced") as well as longer words whose stored term still begins with
-what you typed (`copy*` finds "copyright" alongside "copy" and "copies").
+`*` matches any run of characters, `?` matches exactly one character, and
+`[...]` matches any one character from the set or range inside the brackets
+(`[!...]` negates it) — the same glob syntax as a Unix shell. `20[12]?`
+matches years from 2010-2029, and `20[!0]?` excludes the 2000s. Digits are a
+reliable place to see this literally, since they pass through lowercasing,
+ASCII-folding and stemming unchanged; matching `?` or a bracket class against
+ordinary stemmed text is subject to the same stemming quirks described below
+for `*`, and just as easy to get a surprising zero-result from.
+
+A `[...]` class is only recognized as pattern syntax when the value also
+contains a `*` or `?` elsewhere; on its own it is ordinary text. A bracket
+range that would otherwise be ambiguous with a single character, such as
+`title:200[1-9]`, is rejected with an error rather than silently searched as
+a literal string that will not match anything real.
+
+Wildcards on the text fields are matched against the _stemmed_ terms stored
+in the index, not against the words as they appear in the document, but only
+when a [supported stemmer language](#PAPERLESS_SEARCH_LANGUAGE) is
+configured. Each literal part of a pattern is tried both as you typed it and
+in its stemmed form, so a trailing `*` matches a word and its inflections
+(`invoice*` finds "invoice", "invoices" and "invoiced") as well as longer
+words whose stored term still begins with what you typed (`copy*` finds
+"copyright" alongside "copy" and "copies"). If the configured language has no
+stemmer, or none is configured and none can be inferred from the OCR
+language, the index keeps unstemmed (lowercased, ASCII-folded) terms instead,
+and only the literal typed prefix is tried -- `copy*` then still finds "copy"
+and "copyright" (both literally start with "copy"), but no longer finds
+"copies" (stored as-typed, its surface spelling "copies" does not start with
+"copy").
 
 It is still not a plain prefix search over the original text. A trailing `*`
 matches a stored term when either the run you typed or its stemmed form is a
