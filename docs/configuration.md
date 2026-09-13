@@ -1527,6 +1527,19 @@ within your documents.
     second, and year last order. Characters D, M, or Y can be shuffled
     to meet the required order.
 
+#### [`PAPERLESS_MATCH_REGEX_TIMEOUT_SECONDS=<num>`](#PAPERLESS_MATCH_REGEX_TIMEOUT_SECONDS) {#PAPERLESS_MATCH_REGEX_TIMEOUT_SECONDS}
+
+: Regular expressions used for matching rules and for detecting dates within
+document content are each given this many seconds to complete before being
+aborted. This guards against pathologically slow patterns, but on very long
+documents (particularly on slower hardware) it can also abort date detection
+before it finds a match, silently falling back to the document's import date.
+
+    Raise this value if you notice documents with long extracted text are not
+    getting a `created` date detected from their content.
+
+    Defaults to 0.1 seconds.
+
 #### [`PAPERLESS_ENABLE_GPG_DECRYPTOR=<bool>`](#PAPERLESS_ENABLE_GPG_DECRYPTOR) {#PAPERLESS_ENABLE_GPG_DECRYPTOR}
 
 : Enable or disable the GPG decryptor for encrypted emails. See [GPG Decryptor](advanced_usage.md#gpg-decryptor) for more information.

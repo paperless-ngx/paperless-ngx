@@ -1,12 +1,25 @@
 import pytest
 import regex
+from django.conf import settings
 from pytest_mock import MockerFixture
 
+from documents.regex import REGEX_TIMEOUT_SECONDS
 from documents.regex import safe_regex_finditer
 from documents.regex import safe_regex_match
 from documents.regex import safe_regex_search
 from documents.regex import safe_regex_sub
 from documents.regex import validate_regex_pattern
+
+
+def test_regex_timeout_setting_is_wired_up() -> None:
+    """
+    MATCH_REGEX_TIMEOUT_SECONDS must actually be defined on Django settings.
+    Without it, PAPERLESS_MATCH_REGEX_TIMEOUT_SECONDS has no effect: the
+    getattr() fallback in documents.regex silently keeps the 0.1s default
+    no matter what a user configures.
+    """
+    assert hasattr(settings, "MATCH_REGEX_TIMEOUT_SECONDS")
+    assert REGEX_TIMEOUT_SECONDS == settings.MATCH_REGEX_TIMEOUT_SECONDS
 
 
 class TestValidateRegexPattern:

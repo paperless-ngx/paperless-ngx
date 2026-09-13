@@ -996,6 +996,14 @@ POST_CONSUME_SCRIPT = os.getenv("PAPERLESS_POST_CONSUME_SCRIPT")
 DATE_ORDER = os.getenv("PAPERLESS_DATE_ORDER", "DMY")
 FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
 
+# Maximum time, in seconds, a single regex match/search/sub/finditer call may run
+# before being aborted. Guards against pathological matching rules and slow patterns
+# on long documents.
+MATCH_REGEX_TIMEOUT_SECONDS: Final[float] = get_float_from_env(
+    "PAPERLESS_MATCH_REGEX_TIMEOUT_SECONDS",
+    0.1,
+)
+
 
 # If not set, we will infer it at runtime
 DATE_PARSER_LANGUAGES = (
