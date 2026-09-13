@@ -854,6 +854,36 @@ class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_bulk_delete_requires_global_delete_permission(self) -> None:
+        owner = User.objects.create_user(username="mail_owner")
+        requester = User.objects.create_user(username="mail_deleter")
+        requester.user_permissions.add(
+            Permission.objects.get(codename="add_processedmail"),
+        )
+        mail = ProcessedMailFactory(owner=owner)
+        assign_perm("delete_processedmail", requester, mail)
+        self.client.force_authenticate(requester)
+
+        response = self.client.post(
+            f"{self.ENDPOINT}bulk_delete/",
+            data={"mail_ids": [mail.pk]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        requester.user_permissions.add(
+            Permission.objects.get(codename="delete_processedmail"),
+        )
+        requester = User.objects.get(pk=requester.pk)
+        self.client.force_authenticate(requester)
+        response = self.client.post(
+            f"{self.ENDPOINT}bulk_delete/",
+            data={"mail_ids": [mail.pk]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(ProcessedMail.objects.filter(pk=mail.pk).exists())
+
     def test_bulk_delete_processed_mails_rejects_mixed_batch_atomically(self) -> None:
         """
         GIVEN:

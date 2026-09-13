@@ -4,6 +4,7 @@ import json
 import shutil
 import zipfile
 
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
@@ -326,6 +327,9 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
 
     def test_download_insufficient_permissions(self) -> None:
         user = User.objects.create_user(username="temp_user")
+        user.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
         self.client.force_authenticate(user=user)
 
         self.doc2.owner = self.user

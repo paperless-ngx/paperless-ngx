@@ -1335,6 +1335,7 @@ class DocumentSerializer(
             "root_document",
             "versions",
         )
+        read_only_fields = ("deleted_at",)
         list_serializer_class = OwnedObjectListSerializer
 
 
@@ -2839,10 +2840,14 @@ class ShareLinkSerializer(OwnedObjectSerializer):
         return super().create(validated_data)
 
     def validate_document(self, document):
-        if self.user is not None and has_perms_owner_aware(
-            self.user,
-            "view_document",
-            document,
+        if (
+            self.user is not None
+            and self.user.has_perm("documents.view_document")
+            and has_perms_owner_aware(
+                self.user,
+                "view_document",
+                document,
+            )
         ):
             return document
         raise PermissionDenied(
@@ -3603,6 +3608,8 @@ class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
 
         if "actions" in validated_data:
             actions = validated_data.pop("actions")
+            for action in actions:
+                action.pop("id", None)
 
         instance = super().create(validated_data)
 

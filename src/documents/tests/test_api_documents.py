@@ -3615,6 +3615,55 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(response.content, b"Insufficient permissions to delete notes")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_notes_require_global_document_permissions(self) -> None:
+        user = User.objects.create_user(username="note_editor")
+        user.user_permissions.add(
+            *Permission.objects.filter(
+                codename__in=["view_note", "add_note", "delete_note"],
+            ),
+        )
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="notes",
+            owner=user,
+        )
+        note = Note.objects.create(note="Existing", document=doc, user=user)
+        self.client.force_authenticate(user)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/notes/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        user.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
+        user = User.objects.get(pk=user.pk)
+        self.client.force_authenticate(user)
+        response = self.client.get(f"/api/documents/{doc.pk}/notes/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.post(
+            f"/api/documents/{doc.pk}/notes/",
+            data={"note": "New"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        user.user_permissions.add(
+            Permission.objects.get(codename="change_document"),
+        )
+        user = User.objects.get(pk=user.pk)
+        self.client.force_authenticate(user)
+        response = self.client.post(
+            f"/api/documents/{doc.pk}/notes/",
+            data={"note": "New"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.delete(
+            f"/api/documents/{doc.pk}/notes/?id={note.pk}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_delete_note(self) -> None:
         """
         GIVEN:
@@ -3981,6 +4030,21 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
 
         assign_perm("view_document", user1, doc)
 
+        create_resp = self.client.post(
+            "/api/share_links/",
+            data={
+                "document": doc.pk,
+                "file_version": "original",
+            },
+            format="json",
+        )
+        self.assertEqual(create_resp.status_code, status.HTTP_403_FORBIDDEN)
+
+        user1.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
+        user1 = User.objects.get(pk=user1.pk)
+        self.client.force_authenticate(user1)
         create_resp = self.client.post(
             "/api/share_links/",
             data={

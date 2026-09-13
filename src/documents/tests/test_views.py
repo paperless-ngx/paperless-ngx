@@ -141,6 +141,9 @@ class TestViews(DirectoriesMixin, TestCase):
             codename__contains="sharelink",
         )
         self.user.user_permissions.add(*sharelink_permissions)
+        self.user.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
         self.user.save()
 
         self.client.force_login(self.user)
@@ -202,6 +205,9 @@ class TestViews(DirectoriesMixin, TestCase):
             codename__contains="sharelink",
         )
         self.user.user_permissions.add(*sharelink_permissions)
+        self.user.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
         self.client.force_login(self.user)
 
         create_response = self.client.post(

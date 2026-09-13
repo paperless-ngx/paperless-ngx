@@ -69,6 +69,16 @@ class TestTrashAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(Document.global_objects.count(), 0)
 
+    def test_trash_list_requires_global_document_view_permission(self) -> None:
+        user = User.objects.create_user(username="trash_owner")
+        document = Document.objects.create(title="Owned", owner=user)
+        document.delete()
+        self.client.force_authenticate(user)
+
+        response = self.client.get("/api/trash/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_trash_api_empty_all(self) -> None:
         """
         GIVEN:

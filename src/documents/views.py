@@ -170,6 +170,7 @@ from documents.permissions import AcknowledgeTasksPermissions
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessNotePermissions
 from documents.permissions import PaperlessObjectPermissions
+from documents.permissions import TrashPermissions
 from documents.permissions import ViewDocumentsPermissions
 from documents.permissions import annotate_document_count_by_ids
 from documents.permissions import annotate_document_count_for_related_queryset
@@ -3519,7 +3520,7 @@ class PostDocumentView(GenericAPIView[Any]):
     ),
 )
 class SelectionDataView(GenericAPIView[Any]):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, ViewDocumentsPermissions)
     serializer_class = DocumentListSerializer
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser)
 
@@ -4010,7 +4011,7 @@ class StatisticsView(GenericAPIView[Any]):
     ),
 )
 class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, ViewDocumentsPermissions)
     serializer_class = BulkDownloadSerializer
     parser_classes = (parsers.JSONParser,)
 
@@ -4109,7 +4110,7 @@ class StoragePathViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Storag
     def get_permissions(self):
         if self.action == "test":
             # Test action does not require object level permissions
-            self.permission_classes = (IsAuthenticated,)
+            self.permission_classes = (IsAuthenticated, ViewDocumentsPermissions)
         return super().get_permissions()
 
     def destroy(self, request, *args, **kwargs):
@@ -4675,6 +4676,12 @@ class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
     )
     filterset_class = ShareLinkBundleFilterSet
     ordering_fields = ("created", "expiration", "status")
+
+    def get_permissions(self):
+        permissions = super().get_permissions()
+        if self.action == "create":
+            permissions.append(ViewDocumentsPermissions())
+        return permissions
 
     def get_queryset(self):
         return (
@@ -5494,7 +5501,7 @@ class SystemStatusView(PassUserMixin):
 
 
 class TrashView(ListModelMixin, PassUserMixin):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, TrashPermissions)
     serializer_class = TrashSerializer
 
     class _TrashPermittedObjectsFilter(PermittedObjectsFilter):
