@@ -102,6 +102,10 @@ CLASSIFIER_MATCH_THRESHOLD: Final[float] = get_float_from_env(
     "PAPERLESS_CLASSIFIER_MATCH_THRESHOLD",
     0.6,
 )
+MATCH_REGEX_TIMEOUT_SECONDS: Final[float] = get_float_from_env(
+    "PAPERLESS_MATCH_REGEX_TIMEOUT_SECONDS",
+    0.1,
+)
 LLM_INDEX_DIR = DATA_DIR / "llm_index"
 LLM_INDEX_LOCK = LLM_INDEX_DIR / "index.lock"
 # Cross-process read/write lock guarding the LLM index compaction/migration
