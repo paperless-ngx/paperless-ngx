@@ -1750,7 +1750,7 @@ class MergeDocumentsAsVersionsSerializer(DocumentListSerializer):
 
 
 class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
-    operations = serializers.ListField(required=True)
+    operations = serializers.ListField(required=True, allow_empty=False)
     delete_original = serializers.BooleanField(required=False, default=False)
     update_document = serializers.BooleanField(required=False, default=False)
     include_metadata = serializers.BooleanField(required=False, default=True)
