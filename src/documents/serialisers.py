@@ -1750,7 +1750,7 @@ class MergeDocumentsAsVersionsSerializer(DocumentListSerializer):
 
 
 class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
-    operations = serializers.ListField(required=True)
+    operations = serializers.ListField(required=True, allow_empty=False)
     delete_original = serializers.BooleanField(required=False, default=False)
     update_document = serializers.BooleanField(required=False, default=False)
     include_metadata = serializers.BooleanField(required=False, default=True)
@@ -1787,6 +1787,12 @@ class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMix
                 raise serializers.ValidationError(
                     "update_document only allowed with a single output document",
                 )
+
+        if any(
+            op.get("doc", 0) < 0 or op.get("doc", 0) >= len(operations)
+            for op in operations
+        ):
+            raise serializers.ValidationError("doc index is out of bounds")
 
         doc = Document.objects.get(id=documents[0])
         if doc.page_count:
@@ -2124,6 +2130,8 @@ class BulkEditSerializer(
             raise serializers.ValidationError("operations not specified")
         if not isinstance(parameters["operations"], list):
             raise serializers.ValidationError("operations must be a list")
+        if not parameters["operations"]:
+            raise serializers.ValidationError("operations must not be empty")
         for op in parameters["operations"]:
             if not isinstance(op, dict):
                 raise serializers.ValidationError("invalid operation entry")
@@ -2150,6 +2158,12 @@ class BulkEditSerializer(
                 raise serializers.ValidationError(
                     "update_document only allowed with a single output document",
                 )
+
+        if any(
+            op.get("doc", 0) < 0 or op.get("doc", 0) >= len(parameters["operations"])
+            for op in parameters["operations"]
+        ):
+            raise serializers.ValidationError("doc index is out of bounds")
 
         doc = Document.objects.get(id=document_id)
         # doc existence is already validated

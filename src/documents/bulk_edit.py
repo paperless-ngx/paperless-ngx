@@ -899,16 +899,25 @@ def edit_pdf(
     pdf_docs: list[pikepdf.Pdf] = []
 
     try:
+        if not operations:
+            raise ValueError("Output document index is out of bounds")
+
+        max_idx = max(op.get("doc", 0) for op in operations)
+        if update_document and max_idx > 0:
+            logger.error(
+                "Update requested but multiple output documents specified",
+            )
+            raise ValueError("Multiple output documents specified")
+
+        if any(
+            op.get("doc", 0) < 0 or op.get("doc", 0) >= len(operations)
+            for op in operations
+        ):
+            raise ValueError("Output document index is out of bounds")
+
         with pikepdf.open(pair.source_doc.source_path) as src:
             # prepare output documents
-            max_idx = max(op.get("doc", 0) for op in operations)
             pdf_docs = [pikepdf.new() for _ in range(max_idx + 1)]
-
-            if update_document and len(pdf_docs) > 1:
-                logger.error(
-                    "Update requested but multiple output documents specified",
-                )
-                raise ValueError("Multiple output documents specified")
 
             for op in operations:
                 dst = pdf_docs[op.get("doc", 0)]
