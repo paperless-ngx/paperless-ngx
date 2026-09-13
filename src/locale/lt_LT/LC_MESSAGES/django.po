@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-02 18:09+0000\n"
-"PO-Revision-Date: 2026-09-02 18:11\n"
+"POT-Creation-Date: 2026-09-12 23:18+0000\n"
+"PO-Revision-Date: 2026-09-12 23:19\n"
 "Last-Translator: \n"
 "Language-Team: Lithuanian\n"
 "Language: lt_LT\n"
@@ -21,1637 +21,1641 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumentai"
 
-#: documents/filters.py:471
+#: documents/filters.py:463
 msgid "Value must be valid JSON."
 msgstr "Reikšmė turi būti galiojantis JSON."
 
-#: documents/filters.py:490
+#: documents/filters.py:482
 msgid "Invalid custom field query expression"
 msgstr "Neteisinga pasirinktinio lauko užklausos išraiška"
 
-#: documents/filters.py:500
+#: documents/filters.py:492
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Neteisingas išraiškos sąrašas. Jis turi būti netuščias."
 
-#: documents/filters.py:521
+#: documents/filters.py:513
 msgid "Invalid logical operator {op!r}"
 msgstr "Neteisingas loginis operatorius {op!r}"
 
-#: documents/filters.py:535
+#: documents/filters.py:527
 msgid "Maximum number of query conditions exceeded."
 msgstr "Viršytas maksimalus užklausos sąlygų skaičius."
 
-#: documents/filters.py:599
+#: documents/filters.py:591
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} nėra galiojantis pasirinktas laukas."
 
-#: documents/filters.py:636
+#: documents/filters.py:628
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} nepalaiko užklausos išraiškos {expr!r}."
 
-#: documents/filters.py:755 documents/models.py:136
+#: documents/filters.py:747 documents/models.py:137
 msgid "Maximum nesting depth exceeded."
 msgstr "Viršytas maksimalus įdėjimo gylis."
 
-#: documents/filters.py:1079
+#: documents/filters.py:1109
 msgid "Custom field not found"
 msgstr "Pasirinktinis laukas nerastas"
 
-#: documents/models.py:39 documents/models.py:996 documents/models.py:1044
+#: documents/models.py:40 documents/models.py:1020 documents/models.py:1068
 msgid "owner"
 msgstr "savininkas"
 
-#: documents/models.py:56 documents/models.py:1342
+#: documents/models.py:57 documents/models.py:1366
 msgid "None"
 msgstr "Niekas"
 
-#: documents/models.py:57 documents/models.py:1343
+#: documents/models.py:58 documents/models.py:1367
 msgid "Any word"
 msgstr "Bet koks žodis"
 
-#: documents/models.py:58 documents/models.py:1344
+#: documents/models.py:59 documents/models.py:1368
 msgid "All words"
 msgstr "Visi žodžiai"
 
-#: documents/models.py:59 documents/models.py:1345
+#: documents/models.py:60 documents/models.py:1369
 msgid "Exact match"
 msgstr "Tikslus atitikimas"
 
-#: documents/models.py:60 documents/models.py:1346
+#: documents/models.py:61 documents/models.py:1370
 msgid "Regular expression"
 msgstr "Paprastas paieška"
 
-#: documents/models.py:61 documents/models.py:1347
+#: documents/models.py:62 documents/models.py:1371
 msgid "Fuzzy word"
 msgstr "Neapibrėžtas žodis"
 
-#: documents/models.py:62
+#: documents/models.py:63
 msgid "Automatic"
 msgstr "Automatinis"
 
-#: documents/models.py:65 documents/models.py:610 documents/models.py:1968
+#: documents/models.py:66 documents/models.py:633 documents/models.py:1992
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
 msgstr "vardas"
 
-#: documents/models.py:67 documents/models.py:1411
+#: documents/models.py:68 documents/models.py:1435
 msgid "match"
 msgstr "atitikimas"
 
-#: documents/models.py:70 documents/models.py:1414
+#: documents/models.py:71 documents/models.py:1438
 msgid "matching algorithm"
 msgstr "atitikimo algoritmas"
 
-#: documents/models.py:75 documents/models.py:1419
+#: documents/models.py:76 documents/models.py:1443
 msgid "is insensitive"
 msgstr "yra nejautrus"
 
-#: documents/models.py:98 documents/models.py:166
+#: documents/models.py:99 documents/models.py:167
 msgid "correspondent"
 msgstr "korespondentas"
 
-#: documents/models.py:99
+#: documents/models.py:100
 msgid "correspondents"
 msgstr "korespondentai"
 
-#: documents/models.py:103
+#: documents/models.py:104
 msgid "color"
 msgstr "spalva"
 
-#: documents/models.py:108
+#: documents/models.py:109
 msgid "is inbox tag"
 msgstr "yra pašto dėžutės etiketė"
 
-#: documents/models.py:111
+#: documents/models.py:112
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
 msgstr "Nustato žymę, kaip pašto dėžės etiketę: Visi naujai apdoroti dokumentai bus pažymėti su pašto dėžutės etiketėmis."
 
-#: documents/models.py:117
+#: documents/models.py:118
 msgid "tag"
 msgstr "etiketė"
 
-#: documents/models.py:118 documents/models.py:213
+#: documents/models.py:119 documents/models.py:214
 msgid "tags"
 msgstr "etiketės"
 
-#: documents/models.py:124
+#: documents/models.py:125
 msgid "Cannot set itself as parent."
 msgstr "Negalima nustatyti kaip pirminio dokumento."
 
-#: documents/models.py:126
+#: documents/models.py:127
 msgid "Cannot set parent to a descendant."
 msgstr "Negalima nustatyti tėvinio elemento kaip savo palikuonio."
 
-#: documents/models.py:143 documents/models.py:186
+#: documents/models.py:144 documents/models.py:187
 msgid "document type"
 msgstr "dokumento tipas"
 
-#: documents/models.py:144
+#: documents/models.py:145
 msgid "document types"
 msgstr "dokumentų tipai"
 
-#: documents/models.py:149
+#: documents/models.py:150
 msgid "path"
 msgstr "kelias"
 
-#: documents/models.py:153 documents/models.py:175
+#: documents/models.py:154 documents/models.py:176
 msgid "storage path"
 msgstr "saugyklos kelias"
 
-#: documents/models.py:154
+#: documents/models.py:155
 msgid "storage paths"
 msgstr "saugyklos keliai"
 
-#: documents/models.py:178
+#: documents/models.py:179
 msgid "title"
 msgstr "pavadinimas"
 
-#: documents/models.py:190 documents/models.py:910
+#: documents/models.py:191 documents/models.py:934
 msgid "content"
 msgstr "turinys"
 
-#: documents/models.py:193
+#: documents/models.py:194
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
 msgstr "Neapdoroti dokumento tekstiniai duomenys. Šis laukas naudojamas paieškai."
 
-#: documents/models.py:207
+#: documents/models.py:208
 msgid "mime type"
 msgstr "MIME tipas"
 
-#: documents/models.py:217
+#: documents/models.py:218
 msgid "checksum"
 msgstr "kontrolinė suma"
 
-#: documents/models.py:221
+#: documents/models.py:222
 msgid "The checksum of the original document."
 msgstr "Originalaus dokumento kontrolinė suma."
 
-#: documents/models.py:225
+#: documents/models.py:226
 msgid "archive checksum"
 msgstr "archyvo kontrolinė suma"
 
-#: documents/models.py:230
+#: documents/models.py:232
 msgid "The checksum of the archived document."
 msgstr "Kontrolinė suma suarchyvuoto dokumento."
 
-#: documents/models.py:234
+#: documents/models.py:236
 msgid "page count"
 msgstr "puslapių skaičius"
 
-#: documents/models.py:241
+#: documents/models.py:243
 msgid "The number of pages of the document."
 msgstr "Dokumento puslapių skaičius."
 
-#: documents/models.py:246 documents/models.py:916 documents/models.py:954
-#: documents/models.py:1016 documents/models.py:1144 documents/models.py:1203
+#: documents/models.py:248 documents/models.py:940 documents/models.py:978
+#: documents/models.py:1040 documents/models.py:1168 documents/models.py:1227
 msgid "created"
 msgstr "sukurtas"
 
-#: documents/models.py:252
+#: documents/models.py:254
 msgid "modified"
 msgstr "pakeistas"
 
-#: documents/models.py:259
+#: documents/models.py:261
 msgid "added"
 msgstr "pridėtas"
 
-#: documents/models.py:266
+#: documents/models.py:268
 msgid "filename"
 msgstr "failo pavadinimas"
 
-#: documents/models.py:272
+#: documents/models.py:274
 msgid "Current filename in storage"
 msgstr "Dabartinis failo pavadinimas saugykloje"
 
-#: documents/models.py:276
+#: documents/models.py:278
 msgid "archive filename"
 msgstr "failo archyve pavadinimas"
 
-#: documents/models.py:282
+#: documents/models.py:284
 msgid "Current archive filename in storage"
 msgstr "Dabartinis archyvo failo pavadinimas saugykloje"
 
-#: documents/models.py:286
+#: documents/models.py:288
 msgid "original filename"
 msgstr "originalus failo pavadinimas"
 
-#: documents/models.py:292
+#: documents/models.py:294
 msgid "The original name of the file when it was uploaded"
 msgstr "Originalus failo pavadinimas, kuris buvo suteiktas įkeliant"
 
-#: documents/models.py:299
+#: documents/models.py:301
 msgid "archive serial number"
 msgstr "serijinis numeris"
 
-#: documents/models.py:309
+#: documents/models.py:311
 msgid "The position of this document in your physical document archive."
 msgstr "Šio dokumento pozicija jūsų fiziniame dokumentų archyve."
 
-#: documents/models.py:319
+#: documents/models.py:321
 msgid "root document for this version"
 msgstr ""
 
-#: documents/models.py:323
+#: documents/models.py:325
 msgid "version index"
 msgstr ""
 
-#: documents/models.py:327
+#: documents/models.py:329
 msgid "Index of this version within the root document."
 msgstr ""
 
-#: documents/models.py:331
+#: documents/models.py:333
 msgid "version label"
 msgstr ""
 
-#: documents/models.py:335
+#: documents/models.py:337
 msgid "Optional short label for a document version."
 msgstr ""
 
-#: documents/models.py:340 documents/models.py:927 documents/models.py:981
-#: documents/models.py:2011
+#: documents/models.py:342 documents/models.py:951 documents/models.py:1005
+#: documents/models.py:2035
 msgid "document"
 msgstr "dokumentas"
 
-#: documents/models.py:341 documents/models.py:1087
+#: documents/models.py:343 documents/models.py:1111
 msgid "documents"
 msgstr "dokumentai"
 
-#: documents/models.py:529 documents/models.py:950
+#: documents/models.py:552 documents/models.py:974
 msgid "Archive"
 msgstr "Archyvas"
 
-#: documents/models.py:530
+#: documents/models.py:553
 msgid "Bank"
 msgstr ""
 
-#: documents/models.py:531
+#: documents/models.py:554
 msgid "Basket"
 msgstr ""
 
-#: documents/models.py:532
+#: documents/models.py:555
 msgid "Bell"
 msgstr ""
 
-#: documents/models.py:533
+#: documents/models.py:556
 msgid "Bookmark"
 msgstr ""
 
-#: documents/models.py:534
+#: documents/models.py:557
 msgid "Boxes"
 msgstr ""
 
-#: documents/models.py:535
+#: documents/models.py:558
 msgid "Briefcase"
 msgstr ""
 
-#: documents/models.py:536
+#: documents/models.py:559
 msgid "Building"
 msgstr ""
 
-#: documents/models.py:537
+#: documents/models.py:560
 msgid "Calculator"
 msgstr ""
 
-#: documents/models.py:538
+#: documents/models.py:561
 msgid "Calendar"
 msgstr ""
 
-#: documents/models.py:539
+#: documents/models.py:562
 msgid "Camera"
 msgstr ""
 
-#: documents/models.py:540
+#: documents/models.py:563
 msgid "Checklist"
 msgstr ""
 
-#: documents/models.py:541
+#: documents/models.py:564
 msgid "Cash"
 msgstr ""
 
-#: documents/models.py:542
+#: documents/models.py:565
 msgid "Chat"
 msgstr ""
 
-#: documents/models.py:543
+#: documents/models.py:566
 msgid "Check"
 msgstr ""
 
-#: documents/models.py:544
+#: documents/models.py:567
 msgid "Clipboard"
 msgstr ""
 
-#: documents/models.py:545
+#: documents/models.py:568
 msgid "Clock"
 msgstr ""
 
-#: documents/models.py:546
+#: documents/models.py:569
 msgid "Credit card"
 msgstr ""
 
-#: documents/models.py:547
+#: documents/models.py:570
 msgid "Download"
 msgstr ""
 
-#: documents/models.py:548
+#: documents/models.py:571
 msgid "Envelope"
 msgstr ""
 
-#: documents/models.py:549
+#: documents/models.py:572
 msgid "Warning"
 msgstr ""
 
-#: documents/models.py:550
+#: documents/models.py:573
 msgid "File"
 msgstr ""
 
-#: documents/models.py:551
+#: documents/models.py:574
 msgid "Checked file"
 msgstr ""
 
-#: documents/models.py:552
+#: documents/models.py:575
 msgid "Locked file"
 msgstr ""
 
-#: documents/models.py:553
+#: documents/models.py:576
 msgid "Medical file"
 msgstr ""
 
-#: documents/models.py:554
+#: documents/models.py:577
 msgid "Person file"
 msgstr ""
 
-#: documents/models.py:557
+#: documents/models.py:580
 msgid "Spreadsheet"
 msgstr ""
 
-#: documents/models.py:559
+#: documents/models.py:582
 msgid "Text file"
 msgstr ""
 
-#: documents/models.py:560
+#: documents/models.py:583
 msgid "Files"
 msgstr ""
 
-#: documents/models.py:561
+#: documents/models.py:584
 msgid "Folder"
 msgstr ""
 
-#: documents/models.py:562 paperless_mail/admin.py:58
+#: documents/models.py:585 paperless_mail/admin.py:58
 msgid "Filter"
 msgstr "Filtruoti"
 
-#: documents/models.py:563
+#: documents/models.py:586
 msgid "Gear"
 msgstr ""
 
-#: documents/models.py:564
+#: documents/models.py:587
 msgid "Globe"
 msgstr ""
 
-#: documents/models.py:565
+#: documents/models.py:588
 msgid "Hash"
 msgstr ""
 
-#: documents/models.py:566
+#: documents/models.py:589
 msgid "Heart"
 msgstr ""
 
-#: documents/models.py:567
+#: documents/models.py:590
 msgid "House"
 msgstr ""
 
-#: documents/models.py:568
+#: documents/models.py:591
 msgid "Inbox"
 msgstr ""
 
-#: documents/models.py:569
+#: documents/models.py:592
 msgid "Journals"
 msgstr ""
 
-#: documents/models.py:570
+#: documents/models.py:593
 msgid "Task list"
 msgstr ""
 
-#: documents/models.py:571
+#: documents/models.py:594
 msgid "Newspaper"
 msgstr ""
 
-#: documents/models.py:572
+#: documents/models.py:595
 msgid "Attachment"
 msgstr ""
 
-#: documents/models.py:573
+#: documents/models.py:596
 msgid "People"
 msgstr ""
 
-#: documents/models.py:574
+#: documents/models.py:597
 msgid "Person"
 msgstr ""
 
-#: documents/models.py:575
+#: documents/models.py:598
 msgid "Printer"
 msgstr ""
 
-#: documents/models.py:576
+#: documents/models.py:599
 msgid "Receipt"
 msgstr ""
 
-#: documents/models.py:577
+#: documents/models.py:600
 msgid "Safe"
 msgstr ""
 
-#: documents/models.py:578
+#: documents/models.py:601
 msgid "Search"
 msgstr ""
 
-#: documents/models.py:579
+#: documents/models.py:602
 msgid "Send"
 msgstr ""
 
-#: documents/models.py:580
+#: documents/models.py:603
 msgid "Shop"
 msgstr ""
 
-#: documents/models.py:581
+#: documents/models.py:604
 msgid "Stack"
 msgstr ""
 
-#: documents/models.py:582
+#: documents/models.py:605
 msgid "Stars"
 msgstr ""
 
-#: documents/models.py:583
+#: documents/models.py:606
 msgid "Tag"
 msgstr ""
 
-#: documents/models.py:584 documents/models.py:599 documents/models.py:1689
+#: documents/models.py:607 documents/models.py:622 documents/models.py:1713
 msgid "Tags"
 msgstr "Žymos"
 
-#: documents/models.py:585
+#: documents/models.py:608
 msgid "Telephone"
 msgstr ""
 
-#: documents/models.py:586
+#: documents/models.py:609
 msgid "Truck"
 msgstr ""
 
-#: documents/models.py:587
+#: documents/models.py:610
 msgid "Barcode"
 msgstr ""
 
-#: documents/models.py:588
+#: documents/models.py:611
 msgid "Wallet"
 msgstr ""
 
-#: documents/models.py:591
+#: documents/models.py:614
 msgid "Table"
 msgstr "Lentelė"
 
-#: documents/models.py:592
+#: documents/models.py:615
 msgid "Small Cards"
 msgstr "Mažos kortelės"
 
-#: documents/models.py:593
+#: documents/models.py:616
 msgid "Large Cards"
 msgstr "Didelės kortelės"
 
-#: documents/models.py:596 documents/models.py:1688
+#: documents/models.py:619 documents/models.py:1712
 msgid "Title"
 msgstr "Pavadinimas"
 
-#: documents/models.py:597 documents/models.py:826 documents/models.py:1363
+#: documents/models.py:620 documents/models.py:850 documents/models.py:1387
 msgid "Created"
 msgstr "Sukurta"
 
-#: documents/models.py:598 documents/models.py:1362
+#: documents/models.py:621 documents/models.py:1386
 msgid "Added"
 msgstr "Pridėta"
 
-#: documents/models.py:600 documents/models.py:1690
+#: documents/models.py:623 documents/models.py:1714
 msgid "Correspondent"
 msgstr "Korespondentas"
 
-#: documents/models.py:601
+#: documents/models.py:624
 msgid "Document Type"
 msgstr "Dokumento tipas"
 
-#: documents/models.py:602
+#: documents/models.py:625
 msgid "Storage Path"
 msgstr "Saugyklos kelias"
 
-#: documents/models.py:603
+#: documents/models.py:626
 msgid "Note"
 msgstr "Pastaba"
 
-#: documents/models.py:604
+#: documents/models.py:627
 msgid "Owner"
 msgstr "Savininkas"
 
-#: documents/models.py:605
+#: documents/models.py:628
 msgid "Shared"
 msgstr "Bendrinama"
 
-#: documents/models.py:606
+#: documents/models.py:629
 msgid "ASN"
 msgstr "ASN"
 
-#: documents/models.py:607
+#: documents/models.py:630
 msgid "Pages"
 msgstr "Puslapiai"
 
-#: documents/models.py:613
+#: documents/models.py:636
 msgid "icon"
 msgstr ""
 
-#: documents/models.py:620
+#: documents/models.py:643
 msgid "sort field"
 msgstr "rūšiuoti lauką"
 
-#: documents/models.py:625
+#: documents/models.py:648
 msgid "sort reverse"
 msgstr "rūšiuoti atvirkščiai"
 
-#: documents/models.py:628
+#: documents/models.py:651
 msgid "View page size"
 msgstr "Peržiūros puslapio dydis"
 
-#: documents/models.py:636
+#: documents/models.py:659
 msgid "View display mode"
 msgstr "Peržiūros rodymo režimas"
 
-#: documents/models.py:643
+#: documents/models.py:666
 msgid "Document display fields"
 msgstr "Dokumento rodymo laukai"
 
-#: documents/models.py:650 documents/models.py:715
+#: documents/models.py:673 documents/models.py:739
 msgid "saved view"
 msgstr "išsaugota peržiūra"
 
-#: documents/models.py:651
+#: documents/models.py:674
 msgid "saved views"
 msgstr "išsaugotos peržiūros"
 
-#: documents/models.py:659
+#: documents/models.py:682
 msgid "title contains"
 msgstr "pavadinime yra"
 
-#: documents/models.py:660
+#: documents/models.py:683
 msgid "content contains"
 msgstr "turinyje yra"
 
-#: documents/models.py:661
+#: documents/models.py:684
 msgid "ASN is"
 msgstr "ASN yra"
 
-#: documents/models.py:662
+#: documents/models.py:685
 msgid "correspondent is"
 msgstr "korespondentas yra"
 
-#: documents/models.py:663
+#: documents/models.py:686
 msgid "document type is"
 msgstr "dokumento tipas yra"
 
-#: documents/models.py:664
+#: documents/models.py:687
 msgid "is in inbox"
 msgstr "yra gautuose"
 
-#: documents/models.py:665
+#: documents/models.py:688
 msgid "has tag"
 msgstr "turi žymę"
 
-#: documents/models.py:666
+#: documents/models.py:689
 msgid "has any tag"
 msgstr "turi kokią nors žymę"
 
-#: documents/models.py:667
+#: documents/models.py:690
 msgid "created before"
 msgstr "sukurta prieš"
 
-#: documents/models.py:668
+#: documents/models.py:691
 msgid "created after"
 msgstr "sukurta po"
 
-#: documents/models.py:669
+#: documents/models.py:692
 msgid "created year is"
 msgstr "sukūrimo metai yra"
 
-#: documents/models.py:670
+#: documents/models.py:693
 msgid "created month is"
 msgstr "sukūrimo mėnuo yra"
 
-#: documents/models.py:671
+#: documents/models.py:694
 msgid "created day is"
 msgstr "sukūrimo diena yra"
 
-#: documents/models.py:672
+#: documents/models.py:695
 msgid "added before"
 msgstr "pridėta prieš"
 
-#: documents/models.py:673
+#: documents/models.py:696
 msgid "added after"
 msgstr "pridėta po"
 
-#: documents/models.py:674
+#: documents/models.py:697
 msgid "modified before"
 msgstr "modifikuota prieš"
 
-#: documents/models.py:675
+#: documents/models.py:698
 msgid "modified after"
 msgstr "modifikuota po"
 
-#: documents/models.py:676
+#: documents/models.py:699
 msgid "does not have tag"
 msgstr "neturi žymos"
 
-#: documents/models.py:677
+#: documents/models.py:700
 msgid "does not have ASN"
 msgstr "neturi ASN"
 
-#: documents/models.py:678
+#: documents/models.py:701
 msgid "title or content contains"
 msgstr "pavadinimas arba turinys turi"
 
-#: documents/models.py:679
+#: documents/models.py:702
 msgid "fulltext query"
 msgstr "pilno teksto užklausa"
 
-#: documents/models.py:680
+#: documents/models.py:703
 msgid "more like this"
 msgstr "daugiau tokių"
 
-#: documents/models.py:681
+#: documents/models.py:704
 msgid "has tags in"
 msgstr "turi žymes"
 
-#: documents/models.py:682
+#: documents/models.py:705
 msgid "ASN greater than"
 msgstr "ASN daugiau nei"
 
-#: documents/models.py:683
+#: documents/models.py:706
 msgid "ASN less than"
 msgstr "ASN mažiau nei"
 
-#: documents/models.py:684
+#: documents/models.py:707
 msgid "storage path is"
 msgstr "talpyklos kelias yra"
 
-#: documents/models.py:685
+#: documents/models.py:708
 msgid "has correspondent in"
 msgstr ""
 
-#: documents/models.py:686
+#: documents/models.py:709
 msgid "does not have correspondent in"
 msgstr ""
 
-#: documents/models.py:687
+#: documents/models.py:710
 msgid "has document type in"
 msgstr "turi dokumentą"
 
-#: documents/models.py:688
+#: documents/models.py:711
 msgid "does not have document type in"
 msgstr ""
 
-#: documents/models.py:689
+#: documents/models.py:712
 msgid "has storage path in"
 msgstr "turi talpyklos kelią"
 
-#: documents/models.py:690
+#: documents/models.py:713
 msgid "does not have storage path in"
 msgstr "neturi talpyklos kelio"
 
-#: documents/models.py:691
+#: documents/models.py:714
 msgid "owner is"
 msgstr "savininkas yra"
 
-#: documents/models.py:692
+#: documents/models.py:715
 msgid "has owner in"
 msgstr "turi savininką"
 
-#: documents/models.py:693
+#: documents/models.py:716
 msgid "does not have owner"
 msgstr "neturi savininko"
 
-#: documents/models.py:694
+#: documents/models.py:717
 msgid "does not have owner in"
 msgstr "neturi savininko"
 
-#: documents/models.py:695
+#: documents/models.py:718
 msgid "has custom field value"
 msgstr ""
 
-#: documents/models.py:696
+#: documents/models.py:719
 msgid "is shared by me"
 msgstr ""
 
-#: documents/models.py:697
+#: documents/models.py:720
 msgid "has custom fields"
 msgstr "turi vartotojo apibrėžtus laukus"
 
-#: documents/models.py:698
+#: documents/models.py:721
 msgid "has custom field in"
 msgstr "turi vartotojo apibrėžtą lauką"
 
-#: documents/models.py:699
+#: documents/models.py:722
 msgid "does not have custom field in"
 msgstr "neturi vartotojo apibrėžto lauko"
 
-#: documents/models.py:700
+#: documents/models.py:723
 msgid "does not have custom field"
 msgstr "neturi vartotojo apibrėžto lauko"
 
-#: documents/models.py:701
+#: documents/models.py:724
 msgid "custom fields query"
 msgstr "vartotojo apibrėžto lauko užklausa"
 
-#: documents/models.py:702
+#: documents/models.py:725
 msgid "created to"
 msgstr "sukurtas tam, kad"
 
-#: documents/models.py:703
+#: documents/models.py:726
 msgid "created from"
 msgstr "sukurtas iš"
 
-#: documents/models.py:704
+#: documents/models.py:727
 msgid "added to"
 msgstr "pridėta prie"
 
-#: documents/models.py:705
+#: documents/models.py:728
 msgid "added from"
 msgstr "pridėta iš"
 
-#: documents/models.py:706
+#: documents/models.py:729
 msgid "mime type is"
 msgstr "mime tipas yra"
 
-#: documents/models.py:707
+#: documents/models.py:730
 msgid "simple title search"
 msgstr ""
 
-#: documents/models.py:708
+#: documents/models.py:731
 msgid "simple text search"
 msgstr ""
 
-#: documents/models.py:718
+#: documents/models.py:732
+msgid "has duplicates"
+msgstr ""
+
+#: documents/models.py:742
 msgid "rule type"
 msgstr "taisyklės tipas"
 
-#: documents/models.py:720
+#: documents/models.py:744
 msgid "value"
 msgstr "reikšmė"
 
-#: documents/models.py:723
+#: documents/models.py:747
 msgid "filter rule"
 msgstr "užpildymo taisyklė"
 
-#: documents/models.py:724
+#: documents/models.py:748
 msgid "filter rules"
 msgstr "užpildymo taisyklės"
 
-#: documents/models.py:754 documents/models.py:1010
+#: documents/models.py:778 documents/models.py:1034
 msgid "Pending"
 msgstr "Laukiama"
 
-#: documents/models.py:755 documents/models.py:833
+#: documents/models.py:779 documents/models.py:857
 msgid "Started"
 msgstr ""
 
-#: documents/models.py:756
+#: documents/models.py:780
 msgid "Success"
 msgstr ""
 
-#: documents/models.py:757
+#: documents/models.py:781
 msgid "Failure"
 msgstr ""
 
-#: documents/models.py:758
+#: documents/models.py:782
 msgid "Revoked"
 msgstr ""
 
-#: documents/models.py:761
+#: documents/models.py:785
 msgid "Consume File"
 msgstr "Suvartoti failą"
 
-#: documents/models.py:762
+#: documents/models.py:786
 msgid "Train Classifier"
 msgstr "Išmokinti klasifikatorių"
 
-#: documents/models.py:763
+#: documents/models.py:787
 msgid "Sanity Check"
 msgstr ""
 
-#: documents/models.py:764
+#: documents/models.py:788
 msgid "Index Optimize"
 msgstr "Indekso optimizavimas"
 
-#: documents/models.py:765 documents/models.py:1358
+#: documents/models.py:789 documents/models.py:1382
 msgid "Mail Fetch"
 msgstr ""
 
-#: documents/models.py:766
+#: documents/models.py:790
 msgid "LLM Index"
 msgstr ""
 
-#: documents/models.py:767
+#: documents/models.py:791
 msgid "Empty Trash"
 msgstr ""
 
-#: documents/models.py:768
+#: documents/models.py:792
 msgid "Check Workflows"
 msgstr ""
 
-#: documents/models.py:769
+#: documents/models.py:793
 msgid "Bulk Update"
 msgstr ""
 
-#: documents/models.py:770
+#: documents/models.py:794
 msgid "Reprocess Document"
 msgstr ""
 
-#: documents/models.py:771
+#: documents/models.py:795
 msgid "Build Share Link"
 msgstr ""
 
-#: documents/models.py:772
+#: documents/models.py:796
 msgid "Bulk Delete"
 msgstr ""
 
-#: documents/models.py:773
+#: documents/models.py:797
 msgid "Apply AI Suggestions"
 msgstr ""
 
-#: documents/models.py:782 documents/models.py:1353
+#: documents/models.py:806 documents/models.py:1377
 msgid "Scheduled"
 msgstr ""
 
-#: documents/models.py:783 documents/models.py:1359
+#: documents/models.py:807 documents/models.py:1383
 msgid "Web UI"
 msgstr "Web vartotojo sąsaja"
 
-#: documents/models.py:784
+#: documents/models.py:808
 msgid "API Upload"
 msgstr ""
 
-#: documents/models.py:785
+#: documents/models.py:809
 msgid "Folder Consume"
 msgstr ""
 
-#: documents/models.py:786
+#: documents/models.py:810
 msgid "Email Consume"
 msgstr ""
 
-#: documents/models.py:787
+#: documents/models.py:811
 msgid "System"
 msgstr ""
 
-#: documents/models.py:788
+#: documents/models.py:812
 msgid "Manual"
 msgstr ""
 
-#: documents/models.py:794
+#: documents/models.py:818
 msgid "Task ID"
 msgstr "Užduoties ID"
 
-#: documents/models.py:795
+#: documents/models.py:819
 msgid "Celery task ID"
 msgstr ""
 
-#: documents/models.py:801
+#: documents/models.py:825
 msgid "Task Type"
 msgstr "Užduoties tipas"
 
-#: documents/models.py:802
+#: documents/models.py:826
 msgid "The kind of work being performed"
 msgstr ""
 
-#: documents/models.py:809
+#: documents/models.py:833
 msgid "Trigger Source"
 msgstr ""
 
-#: documents/models.py:810
+#: documents/models.py:834
 msgid "What initiated this task"
 msgstr ""
 
-#: documents/models.py:819
+#: documents/models.py:843
 msgid "Status"
 msgstr ""
 
-#: documents/models.py:839
+#: documents/models.py:863
 msgid "Completed"
 msgstr ""
 
-#: documents/models.py:847
+#: documents/models.py:871
 msgid "Duration (seconds)"
 msgstr ""
 
-#: documents/models.py:848
+#: documents/models.py:872
 msgid "Elapsed time from start to completion"
 msgstr ""
 
-#: documents/models.py:854
+#: documents/models.py:878
 msgid "Wait Time (seconds)"
 msgstr ""
 
-#: documents/models.py:855
+#: documents/models.py:879
 msgid "Time from task creation to worker pickup"
 msgstr ""
 
-#: documents/models.py:862
+#: documents/models.py:886
 msgid "Input Data"
 msgstr ""
 
-#: documents/models.py:863
+#: documents/models.py:887
 msgid "Structured input parameters for the task"
 msgstr ""
 
-#: documents/models.py:869
+#: documents/models.py:893
 msgid "Result Data"
 msgstr "Rezultatų duomenys"
 
-#: documents/models.py:870
+#: documents/models.py:894
 msgid "Structured result data from task execution"
 msgstr ""
 
-#: documents/models.py:876
+#: documents/models.py:900
 msgid "Acknowledged"
 msgstr "Patvirtintas"
 
-#: documents/models.py:881
+#: documents/models.py:905
 msgid "Task"
 msgstr ""
 
-#: documents/models.py:882
+#: documents/models.py:906
 msgid "Tasks"
 msgstr ""
 
-#: documents/models.py:912
+#: documents/models.py:936
 msgid "Note for the document"
 msgstr "Pastaba dokumentui"
 
-#: documents/models.py:936
+#: documents/models.py:960
 msgid "user"
 msgstr "naudotojas"
 
-#: documents/models.py:941
+#: documents/models.py:965
 msgid "note"
 msgstr "pastaba"
 
-#: documents/models.py:942
+#: documents/models.py:966
 msgid "notes"
 msgstr "pastabos"
 
-#: documents/models.py:951
+#: documents/models.py:975
 msgid "Original"
 msgstr "Orginalas"
 
-#: documents/models.py:962 documents/models.py:1024 paperless_mail/models.py:75
+#: documents/models.py:986 documents/models.py:1048 paperless_mail/models.py:75
 msgid "expiration"
 msgstr "galiojimas"
 
-#: documents/models.py:969 documents/models.py:1031
+#: documents/models.py:993 documents/models.py:1055
 msgid "slug"
 msgstr "nuorodos pavadinimas"
 
-#: documents/models.py:1001
+#: documents/models.py:1025
 msgid "share link"
 msgstr "pasidalinti nuorodą"
 
-#: documents/models.py:1002
+#: documents/models.py:1026
 msgid "share links"
 msgstr "pasidalinti nuorodomis"
 
-#: documents/models.py:1011
+#: documents/models.py:1035
 msgid "Processing"
 msgstr "Apdorojama"
 
-#: documents/models.py:1012
+#: documents/models.py:1036
 msgid "Ready"
 msgstr "Paruošta"
 
-#: documents/models.py:1013
+#: documents/models.py:1037
 msgid "Failed"
 msgstr "Nepavyko"
 
-#: documents/models.py:1060
+#: documents/models.py:1084
 msgid "size (bytes)"
 msgstr "dydis (baitais)"
 
-#: documents/models.py:1066
+#: documents/models.py:1090
 msgid "last error"
 msgstr "paskutinė klaida"
 
-#: documents/models.py:1073
+#: documents/models.py:1097
 msgid "file path"
 msgstr "failo kelias"
 
-#: documents/models.py:1079
+#: documents/models.py:1103
 msgid "built at"
 msgstr ""
 
-#: documents/models.py:1092
+#: documents/models.py:1116
 msgid "share link bundle"
 msgstr ""
 
-#: documents/models.py:1093
+#: documents/models.py:1117
 msgid "share link bundles"
 msgstr ""
 
-#: documents/models.py:1096
+#: documents/models.py:1120
 #, python-format
 msgid "Share link bundle %(slug)s"
 msgstr ""
 
-#: documents/models.py:1132
+#: documents/models.py:1156
 msgid "String"
 msgstr ""
 
-#: documents/models.py:1133
+#: documents/models.py:1157
 msgid "URL"
 msgstr ""
 
-#: documents/models.py:1134
+#: documents/models.py:1158
 msgid "Date"
 msgstr ""
 
-#: documents/models.py:1135
+#: documents/models.py:1159
 msgid "Boolean"
 msgstr ""
 
-#: documents/models.py:1136
+#: documents/models.py:1160
 msgid "Integer"
 msgstr ""
 
-#: documents/models.py:1137
+#: documents/models.py:1161
 msgid "Float"
 msgstr ""
 
-#: documents/models.py:1138
+#: documents/models.py:1162
 msgid "Monetary"
 msgstr ""
 
-#: documents/models.py:1139
+#: documents/models.py:1163
 msgid "Document Link"
 msgstr ""
 
-#: documents/models.py:1140
+#: documents/models.py:1164
 msgid "Select"
 msgstr "Pasirinkti"
 
-#: documents/models.py:1141
+#: documents/models.py:1165
 msgid "Long Text"
 msgstr "Ilgas tekstas"
 
-#: documents/models.py:1153
+#: documents/models.py:1177
 msgid "data type"
 msgstr "datos tipas"
 
-#: documents/models.py:1160
+#: documents/models.py:1184
 msgid "extra data"
 msgstr "papildoma data"
 
-#: documents/models.py:1164
+#: documents/models.py:1188
 msgid "Extra data for the custom field, such as select options"
 msgstr ""
 
-#: documents/models.py:1170
+#: documents/models.py:1194
 msgid "custom field"
 msgstr ""
 
-#: documents/models.py:1171
+#: documents/models.py:1195
 msgid "custom fields"
 msgstr ""
 
-#: documents/models.py:1271
+#: documents/models.py:1295
 msgid "custom field instance"
 msgstr ""
 
-#: documents/models.py:1272
+#: documents/models.py:1296
 msgid "custom field instances"
 msgstr ""
 
-#: documents/models.py:1350
+#: documents/models.py:1374
 msgid "Consumption Started"
 msgstr ""
 
-#: documents/models.py:1351
+#: documents/models.py:1375
 msgid "Document Added"
 msgstr "Dokumentas pridėtas"
 
-#: documents/models.py:1352
+#: documents/models.py:1376
 msgid "Document Updated"
 msgstr "Dokumentas atnaujintas"
 
-#: documents/models.py:1356
+#: documents/models.py:1380
 msgid "Consume Folder"
 msgstr ""
 
-#: documents/models.py:1357
+#: documents/models.py:1381
 msgid "Api Upload"
 msgstr "Api užkrauti"
 
-#: documents/models.py:1364
+#: documents/models.py:1388
 msgid "Modified"
 msgstr "Taisytas"
 
-#: documents/models.py:1365
+#: documents/models.py:1389
 msgid "Custom Field"
 msgstr ""
 
-#: documents/models.py:1368
+#: documents/models.py:1392
 msgid "Workflow Trigger Type"
 msgstr ""
 
-#: documents/models.py:1380
+#: documents/models.py:1404
 msgid "filter path"
 msgstr "filtro kelias"
 
-#: documents/models.py:1385
+#: documents/models.py:1409
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr ""
 
-#: documents/models.py:1392
+#: documents/models.py:1416
 msgid "filter filename"
 msgstr "filtro failo vardas"
 
-#: documents/models.py:1397 paperless_mail/models.py:200
+#: documents/models.py:1421 paperless_mail/models.py:200
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr ""
 
-#: documents/models.py:1408
+#: documents/models.py:1432
 msgid "filter documents from this mail rule"
 msgstr ""
 
-#: documents/models.py:1424
+#: documents/models.py:1448
 msgid "has these tag(s)"
 msgstr "turi šias žymes"
 
-#: documents/models.py:1431
+#: documents/models.py:1455
 msgid "has all of these tag(s)"
 msgstr "turi visas šias žymes"
 
-#: documents/models.py:1438
+#: documents/models.py:1462
 msgid "does not have these tag(s)"
 msgstr "neturi šių žymių"
 
-#: documents/models.py:1446
+#: documents/models.py:1470
 msgid "has this document type"
 msgstr "turi šį dokumento tipą"
 
-#: documents/models.py:1453
+#: documents/models.py:1477
 msgid "has one of these document types"
 msgstr ""
 
-#: documents/models.py:1460
+#: documents/models.py:1484
 msgid "does not have these document type(s)"
 msgstr "neturi šių dokumentų tipų"
 
-#: documents/models.py:1468
+#: documents/models.py:1492
 msgid "has this correspondent"
 msgstr ""
 
-#: documents/models.py:1475
+#: documents/models.py:1499
 msgid "does not have these correspondent(s)"
 msgstr ""
 
-#: documents/models.py:1482
+#: documents/models.py:1506
 msgid "has one of these correspondents"
 msgstr ""
 
-#: documents/models.py:1490
+#: documents/models.py:1514
 msgid "has this storage path"
 msgstr "turi šį talpyklos kelią"
 
-#: documents/models.py:1497
+#: documents/models.py:1521
 msgid "has one of these storage paths"
 msgstr ""
 
-#: documents/models.py:1504
+#: documents/models.py:1528
 msgid "does not have these storage path(s)"
 msgstr "neturi šio talpyklos kelio/-ių"
 
-#: documents/models.py:1508
+#: documents/models.py:1532
 msgid "filter custom field query"
 msgstr ""
 
-#: documents/models.py:1511
+#: documents/models.py:1535
 msgid "JSON-encoded custom field query expression."
 msgstr "JSON užkoduotas pritaikomo lauko užklausos išraiška."
 
-#: documents/models.py:1515
+#: documents/models.py:1539
 msgid "schedule offset days"
 msgstr ""
 
-#: documents/models.py:1518
+#: documents/models.py:1542
 msgid "The number of days to offset the schedule trigger by."
 msgstr ""
 
-#: documents/models.py:1523
+#: documents/models.py:1547
 msgid "schedule is recurring"
 msgstr ""
 
-#: documents/models.py:1526
+#: documents/models.py:1550
 msgid "If the schedule should be recurring."
 msgstr ""
 
-#: documents/models.py:1531
+#: documents/models.py:1555
 msgid "schedule recurring delay in days"
 msgstr ""
 
-#: documents/models.py:1535
+#: documents/models.py:1559
 msgid "The number of days between recurring schedule triggers."
 msgstr ""
 
-#: documents/models.py:1540
+#: documents/models.py:1564
 msgid "schedule date field"
 msgstr ""
 
-#: documents/models.py:1545
+#: documents/models.py:1569
 msgid "The field to check for a schedule trigger."
 msgstr ""
 
-#: documents/models.py:1554
+#: documents/models.py:1578
 msgid "schedule date custom field"
 msgstr ""
 
-#: documents/models.py:1558
+#: documents/models.py:1582
 msgid "workflow trigger"
 msgstr ""
 
-#: documents/models.py:1559
+#: documents/models.py:1583
 msgid "workflow triggers"
 msgstr ""
 
-#: documents/models.py:1567
+#: documents/models.py:1591
 msgid "email subject"
 msgstr ""
 
-#: documents/models.py:1571
+#: documents/models.py:1595
 msgid "The subject of the email, can include some placeholders, see documentation."
 msgstr ""
 
-#: documents/models.py:1577
+#: documents/models.py:1601
 msgid "email body"
 msgstr "el. pašto turinys"
 
-#: documents/models.py:1580
+#: documents/models.py:1604
 msgid "The body (message) of the email, can include some placeholders, see documentation."
 msgstr ""
 
-#: documents/models.py:1586
+#: documents/models.py:1610
 msgid "emails to"
 msgstr ""
 
-#: documents/models.py:1589
+#: documents/models.py:1613
 msgid "The destination email addresses, comma separated."
 msgstr ""
 
-#: documents/models.py:1595
+#: documents/models.py:1619
 msgid "include document in email"
 msgstr ""
 
-#: documents/models.py:1606
+#: documents/models.py:1630
 msgid "webhook url"
 msgstr ""
 
-#: documents/models.py:1609
+#: documents/models.py:1633
 msgid "The destination URL for the notification."
 msgstr ""
 
-#: documents/models.py:1614
+#: documents/models.py:1638
 msgid "use parameters"
 msgstr ""
 
-#: documents/models.py:1619
+#: documents/models.py:1643
 msgid "send as JSON"
 msgstr "siųsti kaip JSON"
 
-#: documents/models.py:1623
+#: documents/models.py:1647
 msgid "webhook parameters"
 msgstr "webhook parametrai"
 
-#: documents/models.py:1626
+#: documents/models.py:1650
 msgid "The parameters to send with the webhook URL if body not used."
 msgstr "Parametrai siunčiami su webhook nuoroda, jei turinys nėra naudojamas."
 
-#: documents/models.py:1630
+#: documents/models.py:1654
 msgid "webhook body"
 msgstr "webhook turinys"
 
-#: documents/models.py:1633
+#: documents/models.py:1657
 msgid "The body to send with the webhook URL if parameters not used."
 msgstr "Webhook turinys, jei parametrai nėra naudojami."
 
-#: documents/models.py:1637
+#: documents/models.py:1661
 msgid "webhook headers"
 msgstr "webhook antraštės"
 
-#: documents/models.py:1640
+#: documents/models.py:1664
 msgid "The headers to send with the webhook URL."
 msgstr ""
 
-#: documents/models.py:1645
+#: documents/models.py:1669
 msgid "include document in webhook"
 msgstr ""
 
-#: documents/models.py:1656
+#: documents/models.py:1680
 msgid "Assignment"
 msgstr "Priskyrimas"
 
-#: documents/models.py:1660
+#: documents/models.py:1684
 msgid "Removal"
 msgstr "Pašalinimas"
 
-#: documents/models.py:1664 documents/templates/account/password_reset.html:15
+#: documents/models.py:1688 documents/templates/account/password_reset.html:15
 msgid "Email"
 msgstr "El. paštas"
 
-#: documents/models.py:1668
+#: documents/models.py:1692
 msgid "Webhook"
 msgstr "Webhook"
 
-#: documents/models.py:1672
+#: documents/models.py:1696
 msgid "Password removal"
 msgstr "Slaptažodžio pašalinimas"
 
-#: documents/models.py:1676
+#: documents/models.py:1700
 msgid "Move to trash"
 msgstr ""
 
-#: documents/models.py:1680
+#: documents/models.py:1704
 msgid "Remote OCR"
 msgstr ""
 
-#: documents/models.py:1684
+#: documents/models.py:1708
 msgid "Apply AI suggestions"
 msgstr ""
 
-#: documents/models.py:1691
+#: documents/models.py:1715
 msgid "Document type"
 msgstr ""
 
-#: documents/models.py:1692
+#: documents/models.py:1716
 msgid "Storage path"
 msgstr ""
 
-#: documents/models.py:1693
+#: documents/models.py:1717
 msgid "Created date"
 msgstr ""
 
-#: documents/models.py:1696
+#: documents/models.py:1720
 msgid "Workflow Action Type"
 msgstr ""
 
-#: documents/models.py:1701 documents/models.py:1970
+#: documents/models.py:1725 documents/models.py:1994
 #: paperless_mail/models.py:145
 msgid "order"
 msgstr ""
 
-#: documents/models.py:1704
+#: documents/models.py:1728
 msgid "assign title"
 msgstr "priskirti pavadinimą"
 
-#: documents/models.py:1708
+#: documents/models.py:1732
 msgid "Assign a document title, must  be a Jinja2 template, see documentation."
 msgstr "Priskiriamas pavadinimas, privalo būti Jinja2 šablonas, peržiūrėkite dokumentaciją."
 
-#: documents/models.py:1716 paperless_mail/models.py:274
+#: documents/models.py:1740 paperless_mail/models.py:274
 msgid "assign this tag"
 msgstr "priskirti šią žymę"
 
-#: documents/models.py:1725 paperless_mail/models.py:282
+#: documents/models.py:1749 paperless_mail/models.py:282
 msgid "assign this document type"
 msgstr "priskirt šį dokumento tipą"
 
-#: documents/models.py:1734 paperless_mail/models.py:296
+#: documents/models.py:1758 paperless_mail/models.py:296
 msgid "assign this correspondent"
 msgstr "priskirti šį korespondentą"
 
-#: documents/models.py:1743
+#: documents/models.py:1767
 msgid "assign this storage path"
 msgstr "priskirti šį saugyklos kelią"
 
-#: documents/models.py:1752
+#: documents/models.py:1776
 msgid "assign this owner"
 msgstr "priskirti šį savininką"
 
-#: documents/models.py:1759
+#: documents/models.py:1783
 msgid "grant view permissions to these users"
 msgstr "suteikti peržiūrėjimo leidimą šiems naudotojams"
 
-#: documents/models.py:1766
+#: documents/models.py:1790
 msgid "grant view permissions to these groups"
 msgstr "suteikti peržiūrėjimo leidimą šioms grupėms"
 
-#: documents/models.py:1773
+#: documents/models.py:1797
 msgid "grant change permissions to these users"
 msgstr "suteikti redagavimo leidimą šiems naudotojams"
 
-#: documents/models.py:1780
+#: documents/models.py:1804
 msgid "grant change permissions to these groups"
 msgstr "sutiekti redagavimo leidimą šioms grupėms"
 
-#: documents/models.py:1787
+#: documents/models.py:1811
 msgid "assign these custom fields"
 msgstr "priskirti šiuos nautojo sukurtus laukus"
 
-#: documents/models.py:1791
+#: documents/models.py:1815
 msgid "custom field values"
 msgstr "naudotojo sukurtų laukų reikšmės"
 
-#: documents/models.py:1795
+#: documents/models.py:1819
 msgid "Optional values to assign to the custom fields."
 msgstr "Pasirinktinės reikšmės, kurias reikia priskirti naudotojo sukurtiems laukams."
 
-#: documents/models.py:1804
+#: documents/models.py:1828
 msgid "remove these tag(s)"
 msgstr "pašalinti žym(ę/es)"
 
-#: documents/models.py:1809
+#: documents/models.py:1833
 msgid "remove all tags"
 msgstr "pašalinti visas žymes"
 
-#: documents/models.py:1816
+#: documents/models.py:1840
 msgid "remove these document type(s)"
 msgstr "pašalinti dokumento tip(ą/us)"
 
-#: documents/models.py:1821
+#: documents/models.py:1845
 msgid "remove all document types"
 msgstr "pašalinti visus dokumento tipus"
 
-#: documents/models.py:1828
+#: documents/models.py:1852
 msgid "remove these correspondent(s)"
 msgstr "pašalinti korespondento tip(ą/us)"
 
-#: documents/models.py:1833
+#: documents/models.py:1857
 msgid "remove all correspondents"
 msgstr "pašalinti visus korespondentus"
 
-#: documents/models.py:1840
+#: documents/models.py:1864
 msgid "remove these storage path(s)"
 msgstr "pašalinti saugyklos keli(ą/ius)"
 
-#: documents/models.py:1845
+#: documents/models.py:1869
 msgid "remove all storage paths"
 msgstr "pašalinti visu saugyklos kelius"
 
-#: documents/models.py:1852
+#: documents/models.py:1876
 msgid "remove these owner(s)"
 msgstr "pašalinti savinink(ą/us)"
 
-#: documents/models.py:1857
+#: documents/models.py:1881
 msgid "remove all owners"
 msgstr "pašalinti visus savininkus"
 
-#: documents/models.py:1864
+#: documents/models.py:1888
 msgid "remove view permissions for these users"
 msgstr "panaikinti peržiūrėjimo leidimą šiems naudotojams"
 
-#: documents/models.py:1871
+#: documents/models.py:1895
 msgid "remove view permissions for these groups"
 msgstr "pašalinti peržiūrėjimo leidimą šioms grupėms"
 
-#: documents/models.py:1878
+#: documents/models.py:1902
 msgid "remove change permissions for these users"
 msgstr "pašalinti redagavimo leidima šiems naudotojams"
 
-#: documents/models.py:1885
+#: documents/models.py:1909
 msgid "remove change permissions for these groups"
 msgstr ""
 
-#: documents/models.py:1890
+#: documents/models.py:1914
 msgid "remove all permissions"
 msgstr ""
 
-#: documents/models.py:1897
+#: documents/models.py:1921
 msgid "remove these custom fields"
 msgstr ""
 
-#: documents/models.py:1902
+#: documents/models.py:1926
 msgid "remove all custom fields"
 msgstr ""
 
-#: documents/models.py:1911
+#: documents/models.py:1935
 msgid "email"
 msgstr "e-paštas"
 
-#: documents/models.py:1920
+#: documents/models.py:1944
 msgid "webhook"
 msgstr ""
 
-#: documents/models.py:1924
+#: documents/models.py:1948
 msgid "passwords"
 msgstr ""
 
-#: documents/models.py:1928
+#: documents/models.py:1952
 msgid "Passwords to try when removing PDF protection. Separate with commas or new lines."
 msgstr ""
 
-#: documents/models.py:1933
+#: documents/models.py:1957
 msgid "AI suggestion fields"
 msgstr ""
 
-#: documents/models.py:1937
+#: documents/models.py:1961
 msgid "Which of the AI-suggested fields to apply to the document."
 msgstr ""
 
-#: documents/models.py:1942
+#: documents/models.py:1966
 msgid "create missing objects"
 msgstr ""
 
-#: documents/models.py:1945
+#: documents/models.py:1969
 msgid "Create suggested tags, correspondents, document types and storage paths that do not already exist instead of skipping them."
 msgstr ""
 
-#: documents/models.py:1951
+#: documents/models.py:1975
 msgid "overwrite existing values"
 msgstr ""
 
-#: documents/models.py:1954
+#: documents/models.py:1978
 msgid "Apply suggestions even if the document already has a value for that field. Tags are always added to, never replaced."
 msgstr ""
 
-#: documents/models.py:1960
+#: documents/models.py:1984
 msgid "workflow action"
 msgstr ""
 
-#: documents/models.py:1961
+#: documents/models.py:1985
 msgid "workflow actions"
 msgstr ""
 
-#: documents/models.py:1976
+#: documents/models.py:2000
 msgid "triggers"
 msgstr ""
 
-#: documents/models.py:1983
+#: documents/models.py:2007
 msgid "actions"
 msgstr ""
 
-#: documents/models.py:1986 paperless_mail/models.py:154
+#: documents/models.py:2010 paperless_mail/models.py:154
 msgid "enabled"
 msgstr ""
 
-#: documents/models.py:1997
+#: documents/models.py:2021
 msgid "workflow"
 msgstr ""
 
-#: documents/models.py:2001
+#: documents/models.py:2025
 msgid "workflow trigger type"
 msgstr ""
 
-#: documents/models.py:2015
+#: documents/models.py:2039
 msgid "date run"
 msgstr ""
 
-#: documents/models.py:2021
+#: documents/models.py:2045
 msgid "workflow run"
 msgstr ""
 
-#: documents/models.py:2022
+#: documents/models.py:2046
 msgid "workflow runs"
 msgstr ""
 
-#: documents/serialisers.py:524 documents/serialisers.py:878
-#: documents/serialisers.py:2830 documents/views.py:314 documents/views.py:2623
+#: documents/serialisers.py:525 documents/serialisers.py:882
+#: documents/serialisers.py:2854 documents/views.py:319 documents/views.py:2694
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr ""
 
-#: documents/serialisers.py:714
+#: documents/serialisers.py:718
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:2307
+#: documents/serialisers.py:2327
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:2351
+#: documents/serialisers.py:2371
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:2358
+#: documents/serialisers.py:2378
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:2375 documents/serialisers.py:2385
+#: documents/serialisers.py:2395 documents/serialisers.py:2405
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:2380
+#: documents/serialisers.py:2400
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:2527
+#: documents/serialisers.py:2547
 msgid "Invalid variable detected."
 msgstr ""
 
-#: documents/serialisers.py:2886
+#: documents/serialisers.py:2910
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2916 documents/views.py:4624
+#: documents/serialisers.py:2940 documents/views.py:4707
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1906,36 +1910,40 @@ msgstr "URI schema '{parts.scheme}' nėra leistina. Galimos schemos: {', '.join(
 msgid "Unable to parse URI {value}"
 msgstr "Nepavyko apdoroti URI {value}"
 
-#: documents/views.py:307 documents/views.py:2620
+#: documents/views.py:312 documents/views.py:2691
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:1591
+#: documents/views.py:1646
 msgid "Invalid AI configuration."
 msgstr ""
 
-#: documents/views.py:1602
+#: documents/views.py:1657
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:2445 documents/views.py:2766
+#: documents/views.py:1669
+msgid "AI backend rejected the request. Check logs for details."
+msgstr ""
+
+#: documents/views.py:2516 documents/views.py:2837
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:4637
+#: documents/views.py:4720
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Nepakanka leidimų bendrinti dokumentą %(id)s."
 
-#: documents/views.py:4683
+#: documents/views.py:4766
 msgid "Bundle is already being processed."
 msgstr "Rinkinys jau apdorojamas."
 
-#: documents/views.py:4747
+#: documents/views.py:4830
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Bendrinimo nuorodų rinkinys vis dar ruošiamas. Bandykite dar kartą vėliau."
 
-#: documents/views.py:4761
+#: documents/views.py:4844
 msgid "The share link bundle is unavailable."
 msgstr "Dalinimos nuorodų rinkinys yra nepasiekiamas."
 
@@ -2171,199 +2179,199 @@ msgstr ""
 msgid "Enables AI features"
 msgstr ""
 
-#: paperless/models.py:355
+#: paperless/models.py:354
 msgid "Sets the LLM embedding backend"
 msgstr ""
 
-#: paperless/models.py:363
+#: paperless/models.py:362
 msgid "Sets the LLM embedding model"
 msgstr ""
 
-#: paperless/models.py:370
+#: paperless/models.py:369
 msgid "Sets the LLM embedding endpoint, optional"
 msgstr ""
 
-#: paperless/models.py:377
+#: paperless/models.py:376
 msgid "Sets the LLM embedding chunk size"
 msgstr ""
 
-#: paperless/models.py:383
+#: paperless/models.py:382
 msgid "Sets the LLM context size"
 msgstr ""
 
-#: paperless/models.py:389
+#: paperless/models.py:388
 msgid "Sets the LLM backend"
 msgstr ""
 
-#: paperless/models.py:397
+#: paperless/models.py:396
 msgid "Sets the LLM model"
 msgstr ""
 
-#: paperless/models.py:404
+#: paperless/models.py:403
 msgid "Sets the LLM API key"
 msgstr ""
 
-#: paperless/models.py:411
+#: paperless/models.py:410
 msgid "Sets the LLM endpoint, optional"
 msgstr ""
 
-#: paperless/models.py:418
+#: paperless/models.py:417
 msgid "Sets the LLM output language"
 msgstr ""
 
-#: paperless/models.py:425
+#: paperless/models.py:424
 msgid "Sets the LLM timeout in seconds"
 msgstr ""
 
-#: paperless/models.py:431
+#: paperless/models.py:430
 msgid "paperless application settings"
 msgstr ""
 
-#: paperless/settings/__init__.py:562
+#: paperless/settings/__init__.py:556
 msgid "English (US)"
 msgstr ""
 
-#: paperless/settings/__init__.py:563
+#: paperless/settings/__init__.py:557
 msgid "Arabic"
 msgstr ""
 
-#: paperless/settings/__init__.py:564
+#: paperless/settings/__init__.py:558
 msgid "Afrikaans"
 msgstr ""
 
-#: paperless/settings/__init__.py:565
+#: paperless/settings/__init__.py:559
 msgid "Belarusian"
 msgstr ""
 
-#: paperless/settings/__init__.py:566
+#: paperless/settings/__init__.py:560
 msgid "Bulgarian"
 msgstr ""
 
-#: paperless/settings/__init__.py:567
+#: paperless/settings/__init__.py:561
 msgid "Catalan"
 msgstr ""
 
-#: paperless/settings/__init__.py:568
+#: paperless/settings/__init__.py:562
 msgid "Czech"
 msgstr ""
 
-#: paperless/settings/__init__.py:569
+#: paperless/settings/__init__.py:563
 msgid "Danish"
 msgstr "Daniškai"
 
-#: paperless/settings/__init__.py:570
+#: paperless/settings/__init__.py:564
 msgid "German"
 msgstr "Vokiškai"
 
-#: paperless/settings/__init__.py:571
+#: paperless/settings/__init__.py:565
 msgid "Greek"
 msgstr "Graikų"
 
-#: paperless/settings/__init__.py:572
+#: paperless/settings/__init__.py:566
 msgid "English (GB)"
 msgstr "Anglų (GB)"
 
-#: paperless/settings/__init__.py:573
+#: paperless/settings/__init__.py:567
 msgid "Spanish"
 msgstr "Ispanų"
 
-#: paperless/settings/__init__.py:574
+#: paperless/settings/__init__.py:568
 msgid "Persian"
 msgstr "Persų"
 
-#: paperless/settings/__init__.py:575
+#: paperless/settings/__init__.py:569
 msgid "Finnish"
 msgstr "Suomių"
 
-#: paperless/settings/__init__.py:576
+#: paperless/settings/__init__.py:570
 msgid "French"
 msgstr "Prancūzų"
 
-#: paperless/settings/__init__.py:577
+#: paperless/settings/__init__.py:571
 msgid "Hungarian"
 msgstr "Vengrų"
 
-#: paperless/settings/__init__.py:578
+#: paperless/settings/__init__.py:572
 msgid "Indonesian"
 msgstr "Indoneziečių"
 
-#: paperless/settings/__init__.py:579
+#: paperless/settings/__init__.py:573
 msgid "Italian"
 msgstr "Italų"
 
-#: paperless/settings/__init__.py:580
+#: paperless/settings/__init__.py:574
 msgid "Japanese"
 msgstr "Japonų"
 
-#: paperless/settings/__init__.py:581
+#: paperless/settings/__init__.py:575
 msgid "Korean"
 msgstr "Korėjiečių"
 
-#: paperless/settings/__init__.py:582
+#: paperless/settings/__init__.py:576
 msgid "Luxembourgish"
 msgstr "Liuksemburgiečių"
 
-#: paperless/settings/__init__.py:583
+#: paperless/settings/__init__.py:577
 msgid "Norwegian"
 msgstr "Norvegų"
 
-#: paperless/settings/__init__.py:584
+#: paperless/settings/__init__.py:578
 msgid "Dutch"
 msgstr "Olandų"
 
-#: paperless/settings/__init__.py:585
+#: paperless/settings/__init__.py:579
 msgid "Polish"
 msgstr "Lenkų"
 
-#: paperless/settings/__init__.py:586
+#: paperless/settings/__init__.py:580
 msgid "Portuguese (Brazil)"
 msgstr "Portugalų (Brazilija)"
 
-#: paperless/settings/__init__.py:587
+#: paperless/settings/__init__.py:581
 msgid "Portuguese"
 msgstr "Portugalų"
 
-#: paperless/settings/__init__.py:588
+#: paperless/settings/__init__.py:582
 msgid "Romanian"
 msgstr "Rumunų"
 
-#: paperless/settings/__init__.py:589
+#: paperless/settings/__init__.py:583
 msgid "Russian"
 msgstr "Rusų"
 
-#: paperless/settings/__init__.py:590
+#: paperless/settings/__init__.py:584
 msgid "Slovak"
 msgstr "Slovakų"
 
-#: paperless/settings/__init__.py:591
+#: paperless/settings/__init__.py:585
 msgid "Slovenian"
 msgstr "Slovėnų"
 
-#: paperless/settings/__init__.py:592
+#: paperless/settings/__init__.py:586
 msgid "Serbian"
 msgstr "Serbų"
 
-#: paperless/settings/__init__.py:593
+#: paperless/settings/__init__.py:587
 msgid "Swedish"
 msgstr "Švedų"
 
-#: paperless/settings/__init__.py:594
+#: paperless/settings/__init__.py:588
 msgid "Turkish"
 msgstr "Turkų"
 
-#: paperless/settings/__init__.py:595
+#: paperless/settings/__init__.py:589
 msgid "Ukrainian"
 msgstr "Ukrainiečių"
 
-#: paperless/settings/__init__.py:596
+#: paperless/settings/__init__.py:590
 msgid "Vietnamese"
 msgstr "Vietnamiečių"
 
-#: paperless/settings/__init__.py:597
+#: paperless/settings/__init__.py:591
 msgid "Chinese Simplified"
 msgstr "Kinų supaprastinta"
 
-#: paperless/settings/__init__.py:598
+#: paperless/settings/__init__.py:592
 msgid "Chinese Traditional"
 msgstr "Kinų tradicinė"
 

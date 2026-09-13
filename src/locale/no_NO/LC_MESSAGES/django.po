@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-02 18:09+0000\n"
-"PO-Revision-Date: 2026-09-02 18:11\n"
+"POT-Creation-Date: 2026-09-12 23:18+0000\n"
+"PO-Revision-Date: 2026-09-12 23:19\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -21,1644 +21,1648 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumenter"
 
-#: documents/filters.py:471
+#: documents/filters.py:463
 msgid "Value must be valid JSON."
 msgstr "Verdien må være gyldig JSON."
 
-#: documents/filters.py:490
+#: documents/filters.py:482
 msgid "Invalid custom field query expression"
 msgstr "Ugyldig spørringsuttrykk for egendefinerte felt"
 
-#: documents/filters.py:500
+#: documents/filters.py:492
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Ugyldig uttrykksliste. Kan ikke være tom."
 
-#: documents/filters.py:521
+#: documents/filters.py:513
 msgid "Invalid logical operator {op!r}"
 msgstr "Ugyldig logiske operator {op!r}"
 
-#: documents/filters.py:535
+#: documents/filters.py:527
 msgid "Maximum number of query conditions exceeded."
 msgstr "Maksimalt antall spørringsbetingelser er overskredet."
 
-#: documents/filters.py:599
+#: documents/filters.py:591
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} er ikke et gyldig egendefinert felt."
 
-#: documents/filters.py:636
+#: documents/filters.py:628
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} støtter ikke spørring expr {expr!r}."
 
-#: documents/filters.py:755 documents/models.py:136
+#: documents/filters.py:747 documents/models.py:137
 msgid "Maximum nesting depth exceeded."
 msgstr "For mange nivåer med nøsting."
 
-#: documents/filters.py:1079
+#: documents/filters.py:1109
 msgid "Custom field not found"
 msgstr "Egendefinert felt ble ikke funnet"
 
-#: documents/models.py:39 documents/models.py:996 documents/models.py:1044
+#: documents/models.py:40 documents/models.py:1020 documents/models.py:1068
 msgid "owner"
 msgstr "eier"
 
-#: documents/models.py:56 documents/models.py:1342
+#: documents/models.py:57 documents/models.py:1366
 msgid "None"
 msgstr "Ingen"
 
-#: documents/models.py:57 documents/models.py:1343
+#: documents/models.py:58 documents/models.py:1367
 msgid "Any word"
 msgstr "Hvilket som helst ord"
 
-#: documents/models.py:58 documents/models.py:1344
+#: documents/models.py:59 documents/models.py:1368
 msgid "All words"
 msgstr "Alle ord"
 
-#: documents/models.py:59 documents/models.py:1345
+#: documents/models.py:60 documents/models.py:1369
 msgid "Exact match"
 msgstr "Eksakt treff"
 
-#: documents/models.py:60 documents/models.py:1346
+#: documents/models.py:61 documents/models.py:1370
 msgid "Regular expression"
 msgstr "Vanlige uttrykk"
 
-#: documents/models.py:61 documents/models.py:1347
+#: documents/models.py:62 documents/models.py:1371
 msgid "Fuzzy word"
 msgstr "Omtrentlig ord"
 
-#: documents/models.py:62
+#: documents/models.py:63
 msgid "Automatic"
 msgstr "Automatisk"
 
-#: documents/models.py:65 documents/models.py:610 documents/models.py:1968
+#: documents/models.py:66 documents/models.py:633 documents/models.py:1992
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
 msgstr "navn"
 
-#: documents/models.py:67 documents/models.py:1411
+#: documents/models.py:68 documents/models.py:1435
 msgid "match"
 msgstr "treff"
 
-#: documents/models.py:70 documents/models.py:1414
+#: documents/models.py:71 documents/models.py:1438
 msgid "matching algorithm"
 msgstr "samsvarende algoritme"
 
-#: documents/models.py:75 documents/models.py:1419
+#: documents/models.py:76 documents/models.py:1443
 msgid "is insensitive"
 msgstr "er ikke sensitiv"
 
-#: documents/models.py:98 documents/models.py:166
+#: documents/models.py:99 documents/models.py:167
 msgid "correspondent"
 msgstr "korrespondent"
 
-#: documents/models.py:99
+#: documents/models.py:100
 msgid "correspondents"
 msgstr "korrespondenter"
 
-#: documents/models.py:103
+#: documents/models.py:104
 msgid "color"
 msgstr "farge"
 
-#: documents/models.py:108
+#: documents/models.py:109
 msgid "is inbox tag"
 msgstr "er innboks tag"
 
-#: documents/models.py:111
+#: documents/models.py:112
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
 msgstr "Markerer dette merket som en innboks-tag: Alle nye dokumenter blir merket med innboks-tagger."
 
-#: documents/models.py:117
+#: documents/models.py:118
 msgid "tag"
 msgstr "tagg"
 
-#: documents/models.py:118 documents/models.py:213
+#: documents/models.py:119 documents/models.py:214
 msgid "tags"
 msgstr "merker"
 
-#: documents/models.py:124
+#: documents/models.py:125
 msgid "Cannot set itself as parent."
 msgstr "Kan ikke sette seg selv som forelder."
 
-#: documents/models.py:126
+#: documents/models.py:127
 msgid "Cannot set parent to a descendant."
 msgstr "Kan ikke sette overordnet til en etterkommer."
 
-#: documents/models.py:143 documents/models.py:186
+#: documents/models.py:144 documents/models.py:187
 msgid "document type"
 msgstr "dokumenttype"
 
-#: documents/models.py:144
+#: documents/models.py:145
 msgid "document types"
 msgstr "dokumenttyper"
 
-#: documents/models.py:149
+#: documents/models.py:150
 msgid "path"
 msgstr "sti"
 
-#: documents/models.py:153 documents/models.py:175
+#: documents/models.py:154 documents/models.py:176
 msgid "storage path"
 msgstr "lagringssti"
 
-#: documents/models.py:154
+#: documents/models.py:155
 msgid "storage paths"
 msgstr "lagringsstier"
 
-#: documents/models.py:178
+#: documents/models.py:179
 msgid "title"
 msgstr "tittel"
 
-#: documents/models.py:190 documents/models.py:910
+#: documents/models.py:191 documents/models.py:934
 msgid "content"
 msgstr "innhold"
 
-#: documents/models.py:193
+#: documents/models.py:194
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
 msgstr "Uformatert tekst fra dokumentet. Dette feltet brukes primært for søking."
 
-#: documents/models.py:207
+#: documents/models.py:208
 msgid "mime type"
 msgstr "mimetype"
 
-#: documents/models.py:217
+#: documents/models.py:218
 msgid "checksum"
 msgstr "sjekksum"
 
-#: documents/models.py:221
+#: documents/models.py:222
 msgid "The checksum of the original document."
 msgstr "Sjekksummen av det opprinnelige dokumentet."
 
-#: documents/models.py:225
+#: documents/models.py:226
 msgid "archive checksum"
 msgstr "arkivsjekksum"
 
-#: documents/models.py:230
+#: documents/models.py:232
 msgid "The checksum of the archived document."
 msgstr "Sjekksummen av det arkiverte dokumentet."
 
-#: documents/models.py:234
+#: documents/models.py:236
 msgid "page count"
 msgstr "antall sider"
 
-#: documents/models.py:241
+#: documents/models.py:243
 msgid "The number of pages of the document."
 msgstr "Antall sider i dokumentet."
 
-#: documents/models.py:246 documents/models.py:916 documents/models.py:954
-#: documents/models.py:1016 documents/models.py:1144 documents/models.py:1203
+#: documents/models.py:248 documents/models.py:940 documents/models.py:978
+#: documents/models.py:1040 documents/models.py:1168 documents/models.py:1227
 msgid "created"
 msgstr "opprettet"
 
-#: documents/models.py:252
+#: documents/models.py:254
 msgid "modified"
 msgstr "endret"
 
-#: documents/models.py:259
+#: documents/models.py:261
 msgid "added"
 msgstr "lagt til"
 
-#: documents/models.py:266
+#: documents/models.py:268
 msgid "filename"
 msgstr "filnavn"
 
-#: documents/models.py:272
+#: documents/models.py:274
 msgid "Current filename in storage"
 msgstr "Gjeldende filnavn i lagring"
 
-#: documents/models.py:276
+#: documents/models.py:278
 msgid "archive filename"
 msgstr "arkiver filnavn"
 
-#: documents/models.py:282
+#: documents/models.py:284
 msgid "Current archive filename in storage"
 msgstr "Gjeldende arkiv filnavn i lagring"
 
-#: documents/models.py:286
+#: documents/models.py:288
 msgid "original filename"
 msgstr "opprinnelig filnavn"
 
-#: documents/models.py:292
+#: documents/models.py:294
 msgid "The original name of the file when it was uploaded"
 msgstr "Filens opprinnelige filnavn ved opplasting"
 
-#: documents/models.py:299
+#: documents/models.py:301
 msgid "archive serial number"
 msgstr "arkiver serienummer"
 
-#: documents/models.py:309
+#: documents/models.py:311
 msgid "The position of this document in your physical document archive."
 msgstr "Fysisk lagringsplass for dokument."
 
-#: documents/models.py:319
+#: documents/models.py:321
 msgid "root document for this version"
 msgstr "rot-dokumentet for denne versjonen"
 
-#: documents/models.py:323
+#: documents/models.py:325
 msgid "version index"
 msgstr "versjonsindeks"
 
-#: documents/models.py:327
+#: documents/models.py:329
 msgid "Index of this version within the root document."
 msgstr "Indeks av denne versjonen innenfor rotdokumentet."
 
-#: documents/models.py:331
+#: documents/models.py:333
 msgid "version label"
 msgstr "versjonsmerke"
 
-#: documents/models.py:335
+#: documents/models.py:337
 msgid "Optional short label for a document version."
 msgstr "Valgfri kort merke for dokumentversjon."
 
-#: documents/models.py:340 documents/models.py:927 documents/models.py:981
-#: documents/models.py:2011
+#: documents/models.py:342 documents/models.py:951 documents/models.py:1005
+#: documents/models.py:2035
 msgid "document"
 msgstr "dokument"
 
-#: documents/models.py:341 documents/models.py:1087
+#: documents/models.py:343 documents/models.py:1111
 msgid "documents"
 msgstr "dokumenter"
 
-#: documents/models.py:529 documents/models.py:950
+#: documents/models.py:552 documents/models.py:974
 msgid "Archive"
 msgstr "Arkiv"
 
-#: documents/models.py:530
-msgid "Bank"
-msgstr ""
-
-#: documents/models.py:531
-msgid "Basket"
-msgstr ""
-
-#: documents/models.py:532
-msgid "Bell"
-msgstr ""
-
-#: documents/models.py:533
-msgid "Bookmark"
-msgstr ""
-
-#: documents/models.py:534
-msgid "Boxes"
-msgstr ""
-
-#: documents/models.py:535
-msgid "Briefcase"
-msgstr ""
-
-#: documents/models.py:536
-msgid "Building"
-msgstr ""
-
-#: documents/models.py:537
-msgid "Calculator"
-msgstr ""
-
-#: documents/models.py:538
-msgid "Calendar"
-msgstr ""
-
-#: documents/models.py:539
-msgid "Camera"
-msgstr ""
-
-#: documents/models.py:540
-msgid "Checklist"
-msgstr ""
-
-#: documents/models.py:541
-msgid "Cash"
-msgstr ""
-
-#: documents/models.py:542
-msgid "Chat"
-msgstr ""
-
-#: documents/models.py:543
-msgid "Check"
-msgstr ""
-
-#: documents/models.py:544
-msgid "Clipboard"
-msgstr ""
-
-#: documents/models.py:545
-msgid "Clock"
-msgstr ""
-
-#: documents/models.py:546
-msgid "Credit card"
-msgstr ""
-
-#: documents/models.py:547
-msgid "Download"
-msgstr ""
-
-#: documents/models.py:548
-msgid "Envelope"
-msgstr ""
-
-#: documents/models.py:549
-msgid "Warning"
-msgstr ""
-
-#: documents/models.py:550
-msgid "File"
-msgstr ""
-
-#: documents/models.py:551
-msgid "Checked file"
-msgstr ""
-
-#: documents/models.py:552
-msgid "Locked file"
-msgstr ""
-
 #: documents/models.py:553
-msgid "Medical file"
-msgstr ""
+msgid "Bank"
+msgstr "Bank"
 
 #: documents/models.py:554
-msgid "Person file"
-msgstr ""
+msgid "Basket"
+msgstr "Kurv"
+
+#: documents/models.py:555
+msgid "Bell"
+msgstr "Bjelle"
+
+#: documents/models.py:556
+msgid "Bookmark"
+msgstr "Bokmerke"
 
 #: documents/models.py:557
-msgid "Spreadsheet"
-msgstr ""
+msgid "Boxes"
+msgstr "Bokser"
+
+#: documents/models.py:558
+msgid "Briefcase"
+msgstr "Koffert"
 
 #: documents/models.py:559
-msgid "Text file"
-msgstr ""
+msgid "Building"
+msgstr "Bygning"
 
 #: documents/models.py:560
-msgid "Files"
-msgstr ""
+msgid "Calculator"
+msgstr "Kalkulator"
 
 #: documents/models.py:561
-msgid "Folder"
-msgstr ""
+msgid "Calendar"
+msgstr "Kalender"
 
-#: documents/models.py:562 paperless_mail/admin.py:58
+#: documents/models.py:562
+msgid "Camera"
+msgstr "Kamera"
+
+#: documents/models.py:563
+msgid "Checklist"
+msgstr "Sjekkliste"
+
+#: documents/models.py:564
+msgid "Cash"
+msgstr "Kontanter"
+
+#: documents/models.py:565
+msgid "Chat"
+msgstr "Samtale"
+
+#: documents/models.py:566
+msgid "Check"
+msgstr "Sjekk"
+
+#: documents/models.py:567
+msgid "Clipboard"
+msgstr "Utklippstavle"
+
+#: documents/models.py:568
+msgid "Clock"
+msgstr "Klokke"
+
+#: documents/models.py:569
+msgid "Credit card"
+msgstr "Kredittkort"
+
+#: documents/models.py:570
+msgid "Download"
+msgstr "Last ned"
+
+#: documents/models.py:571
+msgid "Envelope"
+msgstr "Konvolutt"
+
+#: documents/models.py:572
+msgid "Warning"
+msgstr "Advarsel"
+
+#: documents/models.py:573
+msgid "File"
+msgstr "Fil"
+
+#: documents/models.py:574
+msgid "Checked file"
+msgstr "Avkrysset fil"
+
+#: documents/models.py:575
+msgid "Locked file"
+msgstr "Låst fil"
+
+#: documents/models.py:576
+msgid "Medical file"
+msgstr "Medisinsk fil"
+
+#: documents/models.py:577
+msgid "Person file"
+msgstr "Personlig fil"
+
+#: documents/models.py:580
+msgid "Spreadsheet"
+msgstr "Regneark"
+
+#: documents/models.py:582
+msgid "Text file"
+msgstr "Tekstfil"
+
+#: documents/models.py:583
+msgid "Files"
+msgstr "Filer"
+
+#: documents/models.py:584
+msgid "Folder"
+msgstr "Mappe"
+
+#: documents/models.py:585 paperless_mail/admin.py:58
 msgid "Filter"
 msgstr "Filtrer"
 
-#: documents/models.py:563
+#: documents/models.py:586
 msgid "Gear"
-msgstr ""
+msgstr "Tannhjul"
 
-#: documents/models.py:564
+#: documents/models.py:587
 msgid "Globe"
-msgstr ""
+msgstr "Klode"
 
-#: documents/models.py:565
+#: documents/models.py:588
 msgid "Hash"
-msgstr ""
+msgstr "Hash"
 
-#: documents/models.py:566
+#: documents/models.py:589
 msgid "Heart"
-msgstr ""
+msgstr "Hjerte"
 
-#: documents/models.py:567
+#: documents/models.py:590
 msgid "House"
-msgstr ""
+msgstr "Hus"
 
-#: documents/models.py:568
+#: documents/models.py:591
 msgid "Inbox"
-msgstr ""
+msgstr "Innboks"
 
-#: documents/models.py:569
+#: documents/models.py:592
 msgid "Journals"
-msgstr ""
+msgstr "Tidsskrifter"
 
-#: documents/models.py:570
+#: documents/models.py:593
 msgid "Task list"
-msgstr ""
+msgstr "Oppgaveliste"
 
-#: documents/models.py:571
+#: documents/models.py:594
 msgid "Newspaper"
-msgstr ""
+msgstr "Avis"
 
-#: documents/models.py:572
+#: documents/models.py:595
 msgid "Attachment"
-msgstr ""
+msgstr "Vedlegg"
 
-#: documents/models.py:573
+#: documents/models.py:596
 msgid "People"
-msgstr ""
+msgstr "Mennesker"
 
-#: documents/models.py:574
+#: documents/models.py:597
 msgid "Person"
-msgstr ""
+msgstr "Person"
 
-#: documents/models.py:575
+#: documents/models.py:598
 msgid "Printer"
-msgstr ""
+msgstr "Skriver"
 
-#: documents/models.py:576
+#: documents/models.py:599
 msgid "Receipt"
-msgstr ""
+msgstr "Kvittering"
 
-#: documents/models.py:577
+#: documents/models.py:600
 msgid "Safe"
-msgstr ""
+msgstr "Sikker"
 
-#: documents/models.py:578
+#: documents/models.py:601
 msgid "Search"
-msgstr ""
+msgstr "Søk"
 
-#: documents/models.py:579
+#: documents/models.py:602
 msgid "Send"
-msgstr ""
+msgstr "Send"
 
-#: documents/models.py:580
+#: documents/models.py:603
 msgid "Shop"
-msgstr ""
+msgstr "Butikk"
 
-#: documents/models.py:581
+#: documents/models.py:604
 msgid "Stack"
-msgstr ""
+msgstr "Stabel"
 
-#: documents/models.py:582
+#: documents/models.py:605
 msgid "Stars"
-msgstr ""
+msgstr "Stjerner"
 
-#: documents/models.py:583
+#: documents/models.py:606
 msgid "Tag"
-msgstr ""
+msgstr "Merke"
 
-#: documents/models.py:584 documents/models.py:599 documents/models.py:1689
+#: documents/models.py:607 documents/models.py:622 documents/models.py:1713
 msgid "Tags"
 msgstr "Merker"
 
-#: documents/models.py:585
+#: documents/models.py:608
 msgid "Telephone"
 msgstr ""
 
-#: documents/models.py:586
+#: documents/models.py:609
 msgid "Truck"
-msgstr ""
+msgstr "Lastebil"
 
-#: documents/models.py:587
+#: documents/models.py:610
 msgid "Barcode"
-msgstr ""
+msgstr "Strekkode"
 
-#: documents/models.py:588
+#: documents/models.py:611
 msgid "Wallet"
-msgstr ""
+msgstr "Lommebok"
 
-#: documents/models.py:591
+#: documents/models.py:614
 msgid "Table"
 msgstr "Tabell"
 
-#: documents/models.py:592
+#: documents/models.py:615
 msgid "Small Cards"
 msgstr "Små kort"
 
-#: documents/models.py:593
+#: documents/models.py:616
 msgid "Large Cards"
 msgstr "Store kort"
 
-#: documents/models.py:596 documents/models.py:1688
+#: documents/models.py:619 documents/models.py:1712
 msgid "Title"
 msgstr "Tittel"
 
-#: documents/models.py:597 documents/models.py:826 documents/models.py:1363
+#: documents/models.py:620 documents/models.py:850 documents/models.py:1387
 msgid "Created"
 msgstr "Opprettet"
 
-#: documents/models.py:598 documents/models.py:1362
+#: documents/models.py:621 documents/models.py:1386
 msgid "Added"
 msgstr "Lagt til"
 
-#: documents/models.py:600 documents/models.py:1690
+#: documents/models.py:623 documents/models.py:1714
 msgid "Correspondent"
 msgstr "Korrespondent"
 
-#: documents/models.py:601
+#: documents/models.py:624
 msgid "Document Type"
 msgstr "Dokumenttype"
 
-#: documents/models.py:602
+#: documents/models.py:625
 msgid "Storage Path"
 msgstr "Lagringssti"
 
-#: documents/models.py:603
+#: documents/models.py:626
 msgid "Note"
 msgstr "Merknad"
 
-#: documents/models.py:604
+#: documents/models.py:627
 msgid "Owner"
 msgstr "Eier"
 
-#: documents/models.py:605
+#: documents/models.py:628
 msgid "Shared"
 msgstr "Delt"
 
-#: documents/models.py:606
+#: documents/models.py:629
 msgid "ASN"
 msgstr "ASN (NO)"
 
-#: documents/models.py:607
+#: documents/models.py:630
 msgid "Pages"
 msgstr "Sider"
 
-#: documents/models.py:613
+#: documents/models.py:636
 msgid "icon"
-msgstr ""
+msgstr "ikon"
 
-#: documents/models.py:620
+#: documents/models.py:643
 msgid "sort field"
 msgstr "sorter felt"
 
-#: documents/models.py:625
+#: documents/models.py:648
 msgid "sort reverse"
 msgstr "motsatt sortering"
 
-#: documents/models.py:628
+#: documents/models.py:651
 msgid "View page size"
 msgstr "Vis sidestørrelse"
 
-#: documents/models.py:636
+#: documents/models.py:659
 msgid "View display mode"
 msgstr "Vis visningsmodus"
 
-#: documents/models.py:643
+#: documents/models.py:666
 msgid "Document display fields"
 msgstr "Utsnitt for dokumentvisning"
 
-#: documents/models.py:650 documents/models.py:715
+#: documents/models.py:673 documents/models.py:739
 msgid "saved view"
 msgstr "lagret visning"
 
-#: documents/models.py:651
+#: documents/models.py:674
 msgid "saved views"
 msgstr "lagrede visninger"
 
-#: documents/models.py:659
+#: documents/models.py:682
 msgid "title contains"
 msgstr "tittelen inneholder"
 
-#: documents/models.py:660
+#: documents/models.py:683
 msgid "content contains"
 msgstr "innholdet inneholder"
 
-#: documents/models.py:661
+#: documents/models.py:684
 msgid "ASN is"
 msgstr "ASN er"
 
-#: documents/models.py:662
+#: documents/models.py:685
 msgid "correspondent is"
 msgstr "korrespondenten er"
 
-#: documents/models.py:663
+#: documents/models.py:686
 msgid "document type is"
 msgstr "dokumenttype er"
 
-#: documents/models.py:664
+#: documents/models.py:687
 msgid "is in inbox"
 msgstr "er i innboksen"
 
-#: documents/models.py:665
+#: documents/models.py:688
 msgid "has tag"
 msgstr "har merke"
 
-#: documents/models.py:666
+#: documents/models.py:689
 msgid "has any tag"
 msgstr "har en merke"
 
-#: documents/models.py:667
+#: documents/models.py:690
 msgid "created before"
 msgstr "opprettet før"
 
-#: documents/models.py:668
+#: documents/models.py:691
 msgid "created after"
 msgstr "opprettet etter"
 
-#: documents/models.py:669
+#: documents/models.py:692
 msgid "created year is"
 msgstr "opprettet år er"
 
-#: documents/models.py:670
+#: documents/models.py:693
 msgid "created month is"
 msgstr "opprettet måned er"
 
-#: documents/models.py:671
+#: documents/models.py:694
 msgid "created day is"
 msgstr "opprettet dag er"
 
-#: documents/models.py:672
+#: documents/models.py:695
 msgid "added before"
 msgstr "lagt til før"
 
-#: documents/models.py:673
+#: documents/models.py:696
 msgid "added after"
 msgstr "lagt til etter"
 
-#: documents/models.py:674
+#: documents/models.py:697
 msgid "modified before"
 msgstr "endret før"
 
-#: documents/models.py:675
+#: documents/models.py:698
 msgid "modified after"
 msgstr "endret etter"
 
-#: documents/models.py:676
+#: documents/models.py:699
 msgid "does not have tag"
 msgstr "har ikke merke"
 
-#: documents/models.py:677
+#: documents/models.py:700
 msgid "does not have ASN"
 msgstr "har ikke ASN"
 
-#: documents/models.py:678
+#: documents/models.py:701
 msgid "title or content contains"
 msgstr "tittel eller innhold inneholder"
 
-#: documents/models.py:679
+#: documents/models.py:702
 msgid "fulltext query"
 msgstr "fulltekstsøk"
 
-#: documents/models.py:680
+#: documents/models.py:703
 msgid "more like this"
 msgstr "mer som dette"
 
-#: documents/models.py:681
+#: documents/models.py:704
 msgid "has tags in"
 msgstr "har merker i"
 
-#: documents/models.py:682
+#: documents/models.py:705
 msgid "ASN greater than"
 msgstr "ASN større enn"
 
-#: documents/models.py:683
+#: documents/models.py:706
 msgid "ASN less than"
 msgstr "ASN mindre enn"
 
-#: documents/models.py:684
+#: documents/models.py:707
 msgid "storage path is"
 msgstr "lagringssti er"
 
-#: documents/models.py:685
+#: documents/models.py:708
 msgid "has correspondent in"
 msgstr "har korrespondent i"
 
-#: documents/models.py:686
+#: documents/models.py:709
 msgid "does not have correspondent in"
 msgstr "har ingen korrespondent i"
 
-#: documents/models.py:687
+#: documents/models.py:710
 msgid "has document type in"
 msgstr "har dokumenttype i"
 
-#: documents/models.py:688
+#: documents/models.py:711
 msgid "does not have document type in"
 msgstr "har ikke dokumenttype i"
 
-#: documents/models.py:689
+#: documents/models.py:712
 msgid "has storage path in"
 msgstr "har lagringssti i"
 
-#: documents/models.py:690
+#: documents/models.py:713
 msgid "does not have storage path in"
 msgstr "har ikke lagringssti i"
 
-#: documents/models.py:691
+#: documents/models.py:714
 msgid "owner is"
 msgstr "eier er"
 
-#: documents/models.py:692
+#: documents/models.py:715
 msgid "has owner in"
 msgstr "har eier i"
 
-#: documents/models.py:693
+#: documents/models.py:716
 msgid "does not have owner"
 msgstr "har ikke eier"
 
-#: documents/models.py:694
+#: documents/models.py:717
 msgid "does not have owner in"
 msgstr "har ikke eier i"
 
-#: documents/models.py:695
+#: documents/models.py:718
 msgid "has custom field value"
 msgstr "har egendefinert feltverdi"
 
-#: documents/models.py:696
+#: documents/models.py:719
 msgid "is shared by me"
 msgstr "er delt av meg"
 
-#: documents/models.py:697
+#: documents/models.py:720
 msgid "has custom fields"
 msgstr "har egendefinerte felt"
 
-#: documents/models.py:698
+#: documents/models.py:721
 msgid "has custom field in"
 msgstr "har egendefinert felt i"
 
-#: documents/models.py:699
+#: documents/models.py:722
 msgid "does not have custom field in"
 msgstr "har ikke egendefinert felt i"
 
-#: documents/models.py:700
+#: documents/models.py:723
 msgid "does not have custom field"
 msgstr "har ikke egendefinert felt"
 
-#: documents/models.py:701
+#: documents/models.py:724
 msgid "custom fields query"
 msgstr "egendefinerte felt spørring"
 
-#: documents/models.py:702
+#: documents/models.py:725
 msgid "created to"
 msgstr "opprettet til"
 
-#: documents/models.py:703
+#: documents/models.py:726
 msgid "created from"
 msgstr "opprettet fra"
 
-#: documents/models.py:704
+#: documents/models.py:727
 msgid "added to"
 msgstr "lagt til i"
 
-#: documents/models.py:705
+#: documents/models.py:728
 msgid "added from"
 msgstr "lagt til fra"
 
-#: documents/models.py:706
+#: documents/models.py:729
 msgid "mime type is"
 msgstr "mime-type er"
 
-#: documents/models.py:707
+#: documents/models.py:730
 msgid "simple title search"
 msgstr "enkelt tittelsøk"
 
-#: documents/models.py:708
+#: documents/models.py:731
 msgid "simple text search"
 msgstr "enkelt tekstsøk"
 
-#: documents/models.py:718
+#: documents/models.py:732
+msgid "has duplicates"
+msgstr ""
+
+#: documents/models.py:742
 msgid "rule type"
 msgstr "regeltype"
 
-#: documents/models.py:720
+#: documents/models.py:744
 msgid "value"
 msgstr "verdi"
 
-#: documents/models.py:723
+#: documents/models.py:747
 msgid "filter rule"
 msgstr "filterregel"
 
-#: documents/models.py:724
+#: documents/models.py:748
 msgid "filter rules"
 msgstr "filterregler"
 
-#: documents/models.py:754 documents/models.py:1010
+#: documents/models.py:778 documents/models.py:1034
 msgid "Pending"
 msgstr "Venter"
 
-#: documents/models.py:755 documents/models.py:833
+#: documents/models.py:779 documents/models.py:857
 msgid "Started"
 msgstr "Startet"
 
-#: documents/models.py:756
+#: documents/models.py:780
 msgid "Success"
 msgstr "Vellykket"
 
-#: documents/models.py:757
+#: documents/models.py:781
 msgid "Failure"
 msgstr "Feilet"
 
-#: documents/models.py:758
+#: documents/models.py:782
 msgid "Revoked"
 msgstr "Tilbakekalt"
 
-#: documents/models.py:761
+#: documents/models.py:785
 msgid "Consume File"
-msgstr "Forbruk fil"
+msgstr "Bruk fil"
 
-#: documents/models.py:762
+#: documents/models.py:786
 msgid "Train Classifier"
 msgstr "Train Classifier (NO)"
 
-#: documents/models.py:763
+#: documents/models.py:787
 msgid "Sanity Check"
 msgstr "Kontroller holdbarhet"
 
-#: documents/models.py:764
+#: documents/models.py:788
 msgid "Index Optimize"
 msgstr "Indeksoptimalisering"
 
-#: documents/models.py:765 documents/models.py:1358
+#: documents/models.py:789 documents/models.py:1382
 msgid "Mail Fetch"
 msgstr "Epost-henting"
 
-#: documents/models.py:766
+#: documents/models.py:790
 msgid "LLM Index"
 msgstr "LLM indeks"
 
-#: documents/models.py:767
+#: documents/models.py:791
 msgid "Empty Trash"
 msgstr "Tøm papirkurven"
 
-#: documents/models.py:768
+#: documents/models.py:792
 msgid "Check Workflows"
 msgstr "Sjekk arbeidsflyter"
 
-#: documents/models.py:769
+#: documents/models.py:793
 msgid "Bulk Update"
 msgstr "Masseoppdatering"
 
-#: documents/models.py:770
+#: documents/models.py:794
 msgid "Reprocess Document"
 msgstr "Reprosessér dokumentet"
 
-#: documents/models.py:771
+#: documents/models.py:795
 msgid "Build Share Link"
 msgstr "Bygg delingslenke"
 
-#: documents/models.py:772
+#: documents/models.py:796
 msgid "Bulk Delete"
 msgstr "Massesletting"
 
-#: documents/models.py:773
+#: documents/models.py:797
 msgid "Apply AI Suggestions"
-msgstr ""
+msgstr "Bruk KI-forslag"
 
-#: documents/models.py:782 documents/models.py:1353
+#: documents/models.py:806 documents/models.py:1377
 msgid "Scheduled"
 msgstr "Planlagt"
 
-#: documents/models.py:783 documents/models.py:1359
+#: documents/models.py:807 documents/models.py:1383
 msgid "Web UI"
 msgstr "Web UI (NO)"
 
-#: documents/models.py:784
+#: documents/models.py:808
 msgid "API Upload"
 msgstr "API opplasting"
 
-#: documents/models.py:785
+#: documents/models.py:809
 msgid "Folder Consume"
 msgstr "Mappeforbruk"
 
-#: documents/models.py:786
+#: documents/models.py:810
 msgid "Email Consume"
-msgstr "E-postforbruk"
+msgstr "E-posthenting"
 
-#: documents/models.py:787
+#: documents/models.py:811
 msgid "System"
 msgstr "System (NO)"
 
-#: documents/models.py:788
+#: documents/models.py:812
 msgid "Manual"
 msgstr "Håndbok"
 
-#: documents/models.py:794
+#: documents/models.py:818
 msgid "Task ID"
 msgstr "Oppgave ID"
 
-#: documents/models.py:795
+#: documents/models.py:819
 msgid "Celery task ID"
 msgstr "Celery oppgave-ID"
 
-#: documents/models.py:801
+#: documents/models.py:825
 msgid "Task Type"
 msgstr "Oppgavetype"
 
-#: documents/models.py:802
+#: documents/models.py:826
 msgid "The kind of work being performed"
 msgstr "Hva slags arbeid som utføres"
 
-#: documents/models.py:809
+#: documents/models.py:833
 msgid "Trigger Source"
 msgstr "Utløserkilde"
 
-#: documents/models.py:810
+#: documents/models.py:834
 msgid "What initiated this task"
 msgstr "Hva initierte denne oppgaven"
 
-#: documents/models.py:819
+#: documents/models.py:843
 msgid "Status"
 msgstr "Status (NO)"
 
-#: documents/models.py:839
+#: documents/models.py:863
 msgid "Completed"
 msgstr "Fullført"
 
-#: documents/models.py:847
+#: documents/models.py:871
 msgid "Duration (seconds)"
 msgstr "Varighet (sekunder)"
 
-#: documents/models.py:848
+#: documents/models.py:872
 msgid "Elapsed time from start to completion"
 msgstr "Brukt tid fra start til ferdigstillelse"
 
-#: documents/models.py:854
+#: documents/models.py:878
 msgid "Wait Time (seconds)"
 msgstr "Ventetid (sekunder)"
 
-#: documents/models.py:855
+#: documents/models.py:879
 msgid "Time from task creation to worker pickup"
 msgstr "Tid fra opprettelse av arbeidsoppgaver til henting"
 
-#: documents/models.py:862
+#: documents/models.py:886
 msgid "Input Data"
 msgstr "Input Data (NO)"
 
-#: documents/models.py:863
+#: documents/models.py:887
 msgid "Structured input parameters for the task"
 msgstr "Structured input parameters for the task (NO)"
 
-#: documents/models.py:869
+#: documents/models.py:893
 msgid "Result Data"
 msgstr "Resultat data"
 
-#: documents/models.py:870
+#: documents/models.py:894
 msgid "Structured result data from task execution"
 msgstr "Structured result data from task execution (NO)"
 
-#: documents/models.py:876
+#: documents/models.py:900
 msgid "Acknowledged"
 msgstr "Bekreftet"
 
-#: documents/models.py:881
+#: documents/models.py:905
 msgid "Task"
 msgstr "Oppgave"
 
-#: documents/models.py:882
+#: documents/models.py:906
 msgid "Tasks"
 msgstr "Oppgaver"
 
-#: documents/models.py:912
+#: documents/models.py:936
 msgid "Note for the document"
 msgstr "Merknad til dokumentet"
 
-#: documents/models.py:936
+#: documents/models.py:960
 msgid "user"
 msgstr "bruker"
 
-#: documents/models.py:941
+#: documents/models.py:965
 msgid "note"
 msgstr "merknad"
 
-#: documents/models.py:942
+#: documents/models.py:966
 msgid "notes"
 msgstr "merknader"
 
-#: documents/models.py:951
+#: documents/models.py:975
 msgid "Original"
 msgstr "Original (NO)"
 
-#: documents/models.py:962 documents/models.py:1024 paperless_mail/models.py:75
+#: documents/models.py:986 documents/models.py:1048 paperless_mail/models.py:75
 msgid "expiration"
 msgstr "utløp"
 
-#: documents/models.py:969 documents/models.py:1031
+#: documents/models.py:993 documents/models.py:1055
 msgid "slug"
 msgstr "slug (NO)"
 
-#: documents/models.py:1001
+#: documents/models.py:1025
 msgid "share link"
 msgstr "del lenke"
 
-#: documents/models.py:1002
+#: documents/models.py:1026
 msgid "share links"
 msgstr "del lenker"
 
-#: documents/models.py:1011
+#: documents/models.py:1035
 msgid "Processing"
 msgstr "Behandler"
 
-#: documents/models.py:1012
+#: documents/models.py:1036
 msgid "Ready"
 msgstr "Klar"
 
-#: documents/models.py:1013
+#: documents/models.py:1037
 msgid "Failed"
 msgstr "Mislykket"
 
-#: documents/models.py:1060
+#: documents/models.py:1084
 msgid "size (bytes)"
 msgstr "størrelse (bytes)"
 
-#: documents/models.py:1066
+#: documents/models.py:1090
 msgid "last error"
 msgstr "siste feil"
 
-#: documents/models.py:1073
+#: documents/models.py:1097
 msgid "file path"
 msgstr "filsti"
 
-#: documents/models.py:1079
+#: documents/models.py:1103
 msgid "built at"
 msgstr "bygget ved"
 
-#: documents/models.py:1092
+#: documents/models.py:1116
 msgid "share link bundle"
 msgstr "del delingslenkepakke"
 
-#: documents/models.py:1093
+#: documents/models.py:1117
 msgid "share link bundles"
 msgstr "del delingslenkepakker"
 
-#: documents/models.py:1096
+#: documents/models.py:1120
 #, python-format
 msgid "Share link bundle %(slug)s"
 msgstr "Share link bundle %(slug)s (NO)"
 
-#: documents/models.py:1132
+#: documents/models.py:1156
 msgid "String"
 msgstr "Tekst"
 
-#: documents/models.py:1133
+#: documents/models.py:1157
 msgid "URL"
 msgstr "URL (NO)"
 
-#: documents/models.py:1134
+#: documents/models.py:1158
 msgid "Date"
 msgstr "Dato"
 
-#: documents/models.py:1135
+#: documents/models.py:1159
 msgid "Boolean"
 msgstr "Bolsk"
 
-#: documents/models.py:1136
+#: documents/models.py:1160
 msgid "Integer"
 msgstr "Heltall"
 
-#: documents/models.py:1137
+#: documents/models.py:1161
 msgid "Float"
 msgstr "Flyttall"
 
-#: documents/models.py:1138
+#: documents/models.py:1162
 msgid "Monetary"
 msgstr "Monetær"
 
-#: documents/models.py:1139
+#: documents/models.py:1163
 msgid "Document Link"
 msgstr "Dokumentlenke"
 
-#: documents/models.py:1140
+#: documents/models.py:1164
 msgid "Select"
 msgstr "Velg"
 
-#: documents/models.py:1141
+#: documents/models.py:1165
 msgid "Long Text"
 msgstr "Lang tekst"
 
-#: documents/models.py:1153
+#: documents/models.py:1177
 msgid "data type"
 msgstr "datatype"
 
-#: documents/models.py:1160
+#: documents/models.py:1184
 msgid "extra data"
 msgstr "ekstra data"
 
-#: documents/models.py:1164
+#: documents/models.py:1188
 msgid "Extra data for the custom field, such as select options"
 msgstr "Ekstra data for det tilpassede feltet, for eksempel velg alternativer"
 
-#: documents/models.py:1170
+#: documents/models.py:1194
 msgid "custom field"
 msgstr "egendefinert felt"
 
-#: documents/models.py:1171
+#: documents/models.py:1195
 msgid "custom fields"
 msgstr "egendefinerte felt"
 
-#: documents/models.py:1271
+#: documents/models.py:1295
 msgid "custom field instance"
 msgstr "egendefinert felt instans"
 
-#: documents/models.py:1272
+#: documents/models.py:1296
 msgid "custom field instances"
 msgstr "egendefinert felt instanser"
 
-#: documents/models.py:1350
+#: documents/models.py:1374
 msgid "Consumption Started"
 msgstr "Import startet"
 
-#: documents/models.py:1351
+#: documents/models.py:1375
 msgid "Document Added"
 msgstr "Dokument lagt til"
 
-#: documents/models.py:1352
+#: documents/models.py:1376
 msgid "Document Updated"
 msgstr "Dokument oppdatert"
 
-#: documents/models.py:1356
+#: documents/models.py:1380
 msgid "Consume Folder"
 msgstr "Importkatalog"
 
-#: documents/models.py:1357
+#: documents/models.py:1381
 msgid "Api Upload"
 msgstr "API-opplasting"
 
-#: documents/models.py:1364
+#: documents/models.py:1388
 msgid "Modified"
 msgstr "Endret"
 
-#: documents/models.py:1365
+#: documents/models.py:1389
 msgid "Custom Field"
 msgstr "Egendefinerte felt"
 
-#: documents/models.py:1368
+#: documents/models.py:1392
 msgid "Workflow Trigger Type"
 msgstr "Arbeidsflyt utløser-type"
 
-#: documents/models.py:1380
+#: documents/models.py:1404
 msgid "filter path"
 msgstr "filtrer sti"
 
-#: documents/models.py:1385
+#: documents/models.py:1409
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr "Bare last inn dokumenter med en sti som samsvarer med dette hvis angitt. Jokertegn angitt som * er tillatt. Saker er usensitive."
 
-#: documents/models.py:1392
+#: documents/models.py:1416
 msgid "filter filename"
 msgstr "filtrer filnavn"
 
-#: documents/models.py:1397 paperless_mail/models.py:200
+#: documents/models.py:1421 paperless_mail/models.py:200
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "Bare bruke dokumenter som samsvarer med dette filnavnet hvis angitt. Jokertegn som *.pdf eller *faktura* er tillatt. Saksfortegnet."
 
-#: documents/models.py:1408
+#: documents/models.py:1432
 msgid "filter documents from this mail rule"
 msgstr "filtrere dokumenter fra denne epostregelen"
 
-#: documents/models.py:1424
+#: documents/models.py:1448
 msgid "has these tag(s)"
 msgstr "har disse merke(ene)"
 
-#: documents/models.py:1431
+#: documents/models.py:1455
 msgid "has all of these tag(s)"
 msgstr "har alle disse merkene"
 
-#: documents/models.py:1438
+#: documents/models.py:1462
 msgid "does not have these tag(s)"
 msgstr "har ikke disse merkene"
 
-#: documents/models.py:1446
+#: documents/models.py:1470
 msgid "has this document type"
 msgstr "har denne dokumenttypen"
 
-#: documents/models.py:1453
+#: documents/models.py:1477
 msgid "has one of these document types"
 msgstr "har én av disse dokumenttypene"
 
-#: documents/models.py:1460
+#: documents/models.py:1484
 msgid "does not have these document type(s)"
 msgstr "har ikke disse dokumenttypen(e)"
 
-#: documents/models.py:1468
+#: documents/models.py:1492
 msgid "has this correspondent"
 msgstr "har denne korrespondenten"
 
-#: documents/models.py:1475
+#: documents/models.py:1499
 msgid "does not have these correspondent(s)"
 msgstr "har ikke disse korrespondenten(e)"
 
-#: documents/models.py:1482
+#: documents/models.py:1506
 msgid "has one of these correspondents"
 msgstr "har en av disse korrespondentene"
 
-#: documents/models.py:1490
+#: documents/models.py:1514
 msgid "has this storage path"
 msgstr "har denne lagringsstien"
 
-#: documents/models.py:1497
+#: documents/models.py:1521
 msgid "has one of these storage paths"
 msgstr "har en av disse lagringsstiene"
 
-#: documents/models.py:1504
+#: documents/models.py:1528
 msgid "does not have these storage path(s)"
 msgstr "har ikke disse lagringsstien(e)"
 
-#: documents/models.py:1508
+#: documents/models.py:1532
 msgid "filter custom field query"
 msgstr "filter custom field query (NO)"
 
-#: documents/models.py:1511
+#: documents/models.py:1535
 msgid "JSON-encoded custom field query expression."
 msgstr "JSON-kodet egendefinerte feltsøk uttrykk."
 
-#: documents/models.py:1515
+#: documents/models.py:1539
 msgid "schedule offset days"
 msgstr "schedule offset days (NO)"
 
-#: documents/models.py:1518
+#: documents/models.py:1542
 msgid "The number of days to offset the schedule trigger by."
 msgstr "The number of days to offset the schedule trigger by. (NO)"
 
-#: documents/models.py:1523
+#: documents/models.py:1547
 msgid "schedule is recurring"
 msgstr "schedule is recurring (NO)"
 
-#: documents/models.py:1526
+#: documents/models.py:1550
 msgid "If the schedule should be recurring."
 msgstr "If the schedule should be recurring. (NO)"
 
-#: documents/models.py:1531
+#: documents/models.py:1555
 msgid "schedule recurring delay in days"
 msgstr "schedule recurring delay in days (NO)"
 
-#: documents/models.py:1535
+#: documents/models.py:1559
 msgid "The number of days between recurring schedule triggers."
 msgstr "The number of days between recurring schedule triggers. (NO)"
 
-#: documents/models.py:1540
+#: documents/models.py:1564
 msgid "schedule date field"
 msgstr "schedule date field (NO)"
 
-#: documents/models.py:1545
+#: documents/models.py:1569
 msgid "The field to check for a schedule trigger."
 msgstr "The field to check for a schedule trigger. (NO)"
 
-#: documents/models.py:1554
+#: documents/models.py:1578
 msgid "schedule date custom field"
 msgstr "schedule date custom field (NO)"
 
-#: documents/models.py:1558
+#: documents/models.py:1582
 msgid "workflow trigger"
 msgstr "arbeidsflyt utløser"
 
-#: documents/models.py:1559
+#: documents/models.py:1583
 msgid "workflow triggers"
 msgstr "workflow triggers (NO)"
 
-#: documents/models.py:1567
+#: documents/models.py:1591
 msgid "email subject"
 msgstr "e-post emne"
 
-#: documents/models.py:1571
+#: documents/models.py:1595
 msgid "The subject of the email, can include some placeholders, see documentation."
 msgstr "The subject of the email, can include some placeholders, see documentation. (NO)"
 
-#: documents/models.py:1577
+#: documents/models.py:1601
 msgid "email body"
 msgstr "epost innhold"
 
-#: documents/models.py:1580
+#: documents/models.py:1604
 msgid "The body (message) of the email, can include some placeholders, see documentation."
 msgstr "The body (message) of the email, can include some placeholders, see documentation. (NO)"
 
-#: documents/models.py:1586
+#: documents/models.py:1610
 msgid "emails to"
 msgstr "e-post til"
 
-#: documents/models.py:1589
+#: documents/models.py:1613
 msgid "The destination email addresses, comma separated."
 msgstr "The destination email addresses, comma separated. (NO)"
 
-#: documents/models.py:1595
+#: documents/models.py:1619
 msgid "include document in email"
 msgstr "include document in email (NO)"
 
-#: documents/models.py:1606
+#: documents/models.py:1630
 msgid "webhook url"
 msgstr "webhook url (NO)"
 
-#: documents/models.py:1609
+#: documents/models.py:1633
 msgid "The destination URL for the notification."
 msgstr "The destination URL for the notification. (NO)"
 
-#: documents/models.py:1614
+#: documents/models.py:1638
 msgid "use parameters"
 msgstr "bruk parametere"
 
-#: documents/models.py:1619
+#: documents/models.py:1643
 msgid "send as JSON"
 msgstr "send som JSON"
 
-#: documents/models.py:1623
+#: documents/models.py:1647
 msgid "webhook parameters"
 msgstr "webhook parameters (NO)"
 
-#: documents/models.py:1626
+#: documents/models.py:1650
 msgid "The parameters to send with the webhook URL if body not used."
 msgstr "The parameters to send with the webhook URL if body not used. (NO)"
 
-#: documents/models.py:1630
+#: documents/models.py:1654
 msgid "webhook body"
 msgstr "webhook body (NO)"
 
-#: documents/models.py:1633
+#: documents/models.py:1657
 msgid "The body to send with the webhook URL if parameters not used."
 msgstr "The body to send with the webhook URL if parameters not used. (NO)"
 
-#: documents/models.py:1637
+#: documents/models.py:1661
 msgid "webhook headers"
 msgstr "webhook headers (NO)"
 
-#: documents/models.py:1640
+#: documents/models.py:1664
 msgid "The headers to send with the webhook URL."
 msgstr "The headers to send with the webhook URL. (NO)"
 
-#: documents/models.py:1645
+#: documents/models.py:1669
 msgid "include document in webhook"
 msgstr "include document in webhook (NO)"
 
-#: documents/models.py:1656
+#: documents/models.py:1680
 msgid "Assignment"
 msgstr "Assignment (NO)"
 
-#: documents/models.py:1660
+#: documents/models.py:1684
 msgid "Removal"
 msgstr "Fjerning"
 
-#: documents/models.py:1664 documents/templates/account/password_reset.html:15
+#: documents/models.py:1688 documents/templates/account/password_reset.html:15
 msgid "Email"
 msgstr "E-post"
 
-#: documents/models.py:1668
+#: documents/models.py:1692
 msgid "Webhook"
 msgstr "Webhook (NO)"
 
-#: documents/models.py:1672
+#: documents/models.py:1696
 msgid "Password removal"
 msgstr "Passordfjerning"
 
-#: documents/models.py:1676
+#: documents/models.py:1700
 msgid "Move to trash"
 msgstr "Flytt til papirkurven"
 
-#: documents/models.py:1680
+#: documents/models.py:1704
 msgid "Remote OCR"
-msgstr ""
+msgstr "Ekstern OCR"
 
-#: documents/models.py:1684
+#: documents/models.py:1708
 msgid "Apply AI suggestions"
-msgstr ""
+msgstr "Bruk KI-forslag"
 
-#: documents/models.py:1691
+#: documents/models.py:1715
 msgid "Document type"
-msgstr ""
+msgstr "Dokumenttype"
 
-#: documents/models.py:1692
+#: documents/models.py:1716
 msgid "Storage path"
-msgstr ""
+msgstr "Lagringssti"
 
-#: documents/models.py:1693
+#: documents/models.py:1717
 msgid "Created date"
-msgstr ""
+msgstr "Opprettet dato"
 
-#: documents/models.py:1696
+#: documents/models.py:1720
 msgid "Workflow Action Type"
 msgstr "Workflow Action Type (NO)"
 
-#: documents/models.py:1701 documents/models.py:1970
+#: documents/models.py:1725 documents/models.py:1994
 #: paperless_mail/models.py:145
 msgid "order"
 msgstr "ordre"
 
-#: documents/models.py:1704
+#: documents/models.py:1728
 msgid "assign title"
 msgstr "tildel tittel"
 
-#: documents/models.py:1708
+#: documents/models.py:1732
 msgid "Assign a document title, must  be a Jinja2 template, see documentation."
 msgstr "Assign a document title, must  be a Jinja2 template, see documentation. (NO)"
 
-#: documents/models.py:1716 paperless_mail/models.py:274
+#: documents/models.py:1740 paperless_mail/models.py:274
 msgid "assign this tag"
-msgstr "tilordne denne taggen"
+msgstr "tilordne dette merket"
 
-#: documents/models.py:1725 paperless_mail/models.py:282
+#: documents/models.py:1749 paperless_mail/models.py:282
 msgid "assign this document type"
 msgstr "tilordne denne dokumenttypen"
 
-#: documents/models.py:1734 paperless_mail/models.py:296
+#: documents/models.py:1758 paperless_mail/models.py:296
 msgid "assign this correspondent"
 msgstr "Tildel denne korrespondenten"
 
-#: documents/models.py:1743
+#: documents/models.py:1767
 msgid "assign this storage path"
 msgstr "tilordne denne lagringsstien"
 
-#: documents/models.py:1752
+#: documents/models.py:1776
 msgid "assign this owner"
 msgstr "tilordne denne eieren"
 
-#: documents/models.py:1759
+#: documents/models.py:1783
 msgid "grant view permissions to these users"
 msgstr "gir lesetilgang til disse brukerne"
 
-#: documents/models.py:1766
+#: documents/models.py:1790
 msgid "grant view permissions to these groups"
 msgstr "gi lesetilgang til disse brukerne"
 
-#: documents/models.py:1773
+#: documents/models.py:1797
 msgid "grant change permissions to these users"
 msgstr "gir skrivetilgang til disse brukerne"
 
-#: documents/models.py:1780
+#: documents/models.py:1804
 msgid "grant change permissions to these groups"
 msgstr "gi skrivetilgang til disse gruppene"
 
-#: documents/models.py:1787
+#: documents/models.py:1811
 msgid "assign these custom fields"
 msgstr "assign these custom fields (NO)"
 
-#: documents/models.py:1791
+#: documents/models.py:1815
 msgid "custom field values"
 msgstr "custom field values (NO)"
 
-#: documents/models.py:1795
+#: documents/models.py:1819
 msgid "Optional values to assign to the custom fields."
 msgstr "Optional values to assign to the custom fields. (NO)"
 
-#: documents/models.py:1804
+#: documents/models.py:1828
 msgid "remove these tag(s)"
 msgstr "remove these tag(s)"
 
-#: documents/models.py:1809
+#: documents/models.py:1833
 msgid "remove all tags"
 msgstr "fjern alle merker"
 
-#: documents/models.py:1816
+#: documents/models.py:1840
 msgid "remove these document type(s)"
 msgstr "remove these document type(s) (NO)"
 
-#: documents/models.py:1821
+#: documents/models.py:1845
 msgid "remove all document types"
 msgstr "remove all document types (NO)"
 
-#: documents/models.py:1828
+#: documents/models.py:1852
 msgid "remove these correspondent(s)"
 msgstr "remove these correspondent(s) (NO)"
 
-#: documents/models.py:1833
+#: documents/models.py:1857
 msgid "remove all correspondents"
 msgstr "remove all correspondents (NO)"
 
-#: documents/models.py:1840
+#: documents/models.py:1864
 msgid "remove these storage path(s)"
 msgstr "remove these storage path(s) (NO)"
 
-#: documents/models.py:1845
+#: documents/models.py:1869
 msgid "remove all storage paths"
 msgstr "remove all storage paths (NO)"
 
-#: documents/models.py:1852
+#: documents/models.py:1876
 msgid "remove these owner(s)"
 msgstr "remove these owner(s) (NO)"
 
-#: documents/models.py:1857
+#: documents/models.py:1881
 msgid "remove all owners"
 msgstr "remove all owners (NO)"
 
-#: documents/models.py:1864
+#: documents/models.py:1888
 msgid "remove view permissions for these users"
 msgstr "remove view permissions for these users (NO)"
 
-#: documents/models.py:1871
+#: documents/models.py:1895
 msgid "remove view permissions for these groups"
 msgstr "remove view permissions for these groups (NO)"
 
-#: documents/models.py:1878
+#: documents/models.py:1902
 msgid "remove change permissions for these users"
 msgstr "remove change permissions for these users (NO)"
 
-#: documents/models.py:1885
+#: documents/models.py:1909
 msgid "remove change permissions for these groups"
 msgstr "remove change permissions for these groups (NO)"
 
-#: documents/models.py:1890
+#: documents/models.py:1914
 msgid "remove all permissions"
 msgstr "remove all permissions (NO)"
 
-#: documents/models.py:1897
+#: documents/models.py:1921
 msgid "remove these custom fields"
 msgstr "remove these custom fields (NO)"
 
-#: documents/models.py:1902
+#: documents/models.py:1926
 msgid "remove all custom fields"
 msgstr "remove all custom fields (NO)"
 
-#: documents/models.py:1911
+#: documents/models.py:1935
 msgid "email"
 msgstr "e-post"
 
-#: documents/models.py:1920
+#: documents/models.py:1944
 msgid "webhook"
 msgstr "webhook (NO)"
 
-#: documents/models.py:1924
+#: documents/models.py:1948
 msgid "passwords"
 msgstr "passwords (NO)"
 
-#: documents/models.py:1928
+#: documents/models.py:1952
 msgid "Passwords to try when removing PDF protection. Separate with commas or new lines."
 msgstr "Passwords to try when removing PDF protection. Separate with commas or new lines. (NO)"
 
-#: documents/models.py:1933
+#: documents/models.py:1957
 msgid "AI suggestion fields"
-msgstr ""
+msgstr "KI forslags felter"
 
-#: documents/models.py:1937
+#: documents/models.py:1961
 msgid "Which of the AI-suggested fields to apply to the document."
-msgstr ""
+msgstr "Hvilke av KI-foreslåtte felter som skal gjelde for dokumentet."
 
-#: documents/models.py:1942
+#: documents/models.py:1966
 msgid "create missing objects"
-msgstr ""
+msgstr "opprett manglende objekter"
 
-#: documents/models.py:1945
+#: documents/models.py:1969
 msgid "Create suggested tags, correspondents, document types and storage paths that do not already exist instead of skipping them."
-msgstr ""
+msgstr "Opprett foreslåtte merker, korrespondenter, dokumenttyper og lagringsveier som ikke allerede eksisterer i stedet for å hoppe over dem."
 
-#: documents/models.py:1951
+#: documents/models.py:1975
 msgid "overwrite existing values"
-msgstr ""
+msgstr "overskrive eksisterende verdier"
 
-#: documents/models.py:1954
+#: documents/models.py:1978
 msgid "Apply suggestions even if the document already has a value for that field. Tags are always added to, never replaced."
-msgstr ""
+msgstr "Bruk forslag selv om dokumentet allerede har en verdi for feltet. Merker blir alltid lagt til, aldri erstattet."
 
-#: documents/models.py:1960
+#: documents/models.py:1984
 msgid "workflow action"
 msgstr "workflow action (NO)"
 
-#: documents/models.py:1961
+#: documents/models.py:1985
 msgid "workflow actions"
 msgstr "workflow actions (NO)"
 
-#: documents/models.py:1976
+#: documents/models.py:2000
 msgid "triggers"
 msgstr "utløsere"
 
-#: documents/models.py:1983
+#: documents/models.py:2007
 msgid "actions"
 msgstr "handlinger"
 
-#: documents/models.py:1986 paperless_mail/models.py:154
+#: documents/models.py:2010 paperless_mail/models.py:154
 msgid "enabled"
 msgstr "aktivert"
 
-#: documents/models.py:1997
+#: documents/models.py:2021
 msgid "workflow"
 msgstr "arbeidsflyt"
 
-#: documents/models.py:2001
+#: documents/models.py:2025
 msgid "workflow trigger type"
 msgstr "workflow trigger type (NO)"
 
-#: documents/models.py:2015
+#: documents/models.py:2039
 msgid "date run"
 msgstr "date run (NO)"
 
-#: documents/models.py:2021
+#: documents/models.py:2045
 msgid "workflow run"
 msgstr "workflow run (NO)"
 
-#: documents/models.py:2022
+#: documents/models.py:2046
 msgid "workflow runs"
 msgstr "workflow runs (NO)"
 
-#: documents/serialisers.py:524 documents/serialisers.py:878
-#: documents/serialisers.py:2830 documents/views.py:314 documents/views.py:2623
+#: documents/serialisers.py:525 documents/serialisers.py:882
+#: documents/serialisers.py:2854 documents/views.py:319 documents/views.py:2694
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
-msgstr "Insufficient permissions. (NO)"
+msgstr "Utilstrekkelige tillatelser."
 
-#: documents/serialisers.py:714
+#: documents/serialisers.py:718
 msgid "Invalid color."
 msgstr "Ugyldig farge."
 
-#: documents/serialisers.py:2307
+#: documents/serialisers.py:2327
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Filtype %(type)s støttes ikke"
 
-#: documents/serialisers.py:2351
+#: documents/serialisers.py:2371
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "Egendefinert felt-id må være et heltall: %(id)s"
 
-#: documents/serialisers.py:2358
+#: documents/serialisers.py:2378
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Egendefinert felt med id %(id)s finnes ikke"
 
-#: documents/serialisers.py:2375 documents/serialisers.py:2385
+#: documents/serialisers.py:2395 documents/serialisers.py:2405
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Custom fields must be a list of integers or an object mapping ids to values. (NO)"
 
-#: documents/serialisers.py:2380
+#: documents/serialisers.py:2400
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Some custom fields don't exist or were specified twice. (NO)"
 
-#: documents/serialisers.py:2527
+#: documents/serialisers.py:2547
 msgid "Invalid variable detected."
 msgstr "Ugyldig variabel oppdaget."
 
-#: documents/serialisers.py:2886
+#: documents/serialisers.py:2910
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Duplicate document identifiers are not allowed. (NO)"
 
-#: documents/serialisers.py:2916 documents/views.py:4624
+#: documents/serialisers.py:2940 documents/views.py:4707
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Documents not found: %(ids)s (NO)"
 
 #: documents/templates/account/account_inactive.html:5
 msgid "Paperless-ngx account inactive"
-msgstr "Paperless-ngx account inactive (NO)"
+msgstr "Paperless-ngxkonto inaktiv"
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
@@ -1686,7 +1690,7 @@ msgstr "Takk for at du bruker %(site_name)s!\n"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
-msgstr "Paperless-ngx-tegn inn"
+msgstr "Paperless-ngx innlogging"
 
 #: documents/templates/account/login.html:10
 msgid "Please sign in."
@@ -1782,7 +1786,7 @@ msgstr "Endre passord"
 
 #: documents/templates/account/password_reset_from_key_done.html:5
 msgid "Paperless-ngx reset password complete"
-msgstr "Paperless-ngx tilbakestilling passord fullført"
+msgstr "Paperless-ngx tilbakestilling av passord fullført"
 
 #: documents/templates/account/password_reset_from_key_done.html:9
 msgid "Password reset complete."
@@ -1831,7 +1835,7 @@ msgstr "Her er en lenke til dokkene."
 
 #: documents/templates/mfa/authenticate.html:7
 msgid "Paperless-ngx Two-Factor Authentication"
-msgstr "Paperless-ngx to faktor-autentisering"
+msgstr "Paperless-ngx to-faktor autentisering"
 
 #: documents/templates/mfa/authenticate.html:12
 msgid "Your account is protected by two-factor authentication. Please enter an authenticator code:"
@@ -1847,11 +1851,11 @@ msgstr "Cancel (NO)"
 
 #: documents/templates/paperless-ngx/base.html:58
 msgid "Share link was not found."
-msgstr "Delingskobling ble ikke funnet."
+msgstr "Delingslenken ble ikke funnet."
 
 #: documents/templates/paperless-ngx/base.html:62
 msgid "Share link has expired."
-msgstr "Linken er utløpt."
+msgstr "Delingslenken er utløpt."
 
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
@@ -1877,7 +1881,7 @@ msgstr "Continue (NO)"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
-msgstr "Paperless-ngx social account sign up (NO)"
+msgstr "Paperless-ngx registrering med sosial konto"
 
 #: documents/templates/socialaccount/signup.html:11
 #, python-format
@@ -1907,36 +1911,40 @@ msgstr "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(
 msgid "Unable to parse URI {value}"
 msgstr "Unable to parse URI {value} (NO)"
 
-#: documents/views.py:307 documents/views.py:2620
+#: documents/views.py:312 documents/views.py:2691
 msgid "Invalid more_like_id"
 msgstr "Invalid more_like_id (NO)"
 
-#: documents/views.py:1591
+#: documents/views.py:1646
 msgid "Invalid AI configuration."
 msgstr "Invalid AI configuration. (NO)"
 
-#: documents/views.py:1602
+#: documents/views.py:1657
 msgid "AI backend request timed out."
 msgstr "Forespørselen til KI-tjenesten fikk tidsavbrudd."
 
-#: documents/views.py:2445 documents/views.py:2766
+#: documents/views.py:1669
+msgid "AI backend rejected the request. Check logs for details."
+msgstr ""
+
+#: documents/views.py:2516 documents/views.py:2837
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Specify only one of text, title_search, query, or more_like_id. (NO)"
 
-#: documents/views.py:4637
+#: documents/views.py:4720
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Insufficient permissions to share document %(id)s. (NO)"
 
-#: documents/views.py:4683
+#: documents/views.py:4766
 msgid "Bundle is already being processed."
 msgstr "Bundle is already being processed. (NO)"
 
-#: documents/views.py:4747
+#: documents/views.py:4830
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "The share link bundle is still being prepared. Please try again later. (NO)"
 
-#: documents/views.py:4761
+#: documents/views.py:4844
 msgid "The share link bundle is unavailable."
 msgstr "The share link bundle is unavailable. (NO)"
 
@@ -1966,7 +1974,7 @@ msgstr "pdfa-3 (NO)"
 
 #: paperless/models.py:39 paperless/models.py:50
 msgid "auto"
-msgstr "auto (NO)"
+msgstr "automatisk"
 
 #: paperless/models.py:40
 msgid "force"
@@ -2022,15 +2030,15 @@ msgstr "CMYK (NO)"
 
 #: paperless/models.py:82
 msgid "Azure AI Document Intelligence"
-msgstr ""
+msgstr "Azure KI dokumentetterretning"
 
 #: paperless/models.py:90
 msgid "All supported documents"
-msgstr ""
+msgstr "Alle støttede dokumenter"
 
 #: paperless/models.py:91
 msgid "Only when a workflow enables it"
-msgstr ""
+msgstr "Bare når en arbeidsflyt aktiverer den"
 
 #: paperless/models.py:95 paperless/models.py:105
 msgid "OpenAI-compatible"
@@ -2046,47 +2054,47 @@ msgstr "Ollama (NO)"
 
 #: paperless/models.py:115
 msgid "Sets the output PDF type"
-msgstr "Sets the output PDF type (NO)"
+msgstr "Angir PDF-type for utdata"
 
 #: paperless/models.py:127
 msgid "Do OCR from page 1 to this value"
-msgstr "Do OCR from page 1 to this value (NO)"
+msgstr "Utfør OCR fra side 1 til denne verdien"
 
 #: paperless/models.py:133
 msgid "Do OCR using these languages"
-msgstr "Do OCR using these languages (NO)"
+msgstr "Utfør OCR med disse språkene"
 
 #: paperless/models.py:140
 msgid "Sets the OCR mode"
-msgstr "Sets the OCR mode (NO)"
+msgstr "Angir OCR modus"
 
 #: paperless/models.py:148
 msgid "Controls archive file generation"
-msgstr "Controls archive file generation (NO)"
+msgstr "Styrer generering av arkivfiler"
 
 #: paperless/models.py:156
 msgid "Sets image DPI fallback value"
-msgstr "Sets image DPI fallback value (NO)"
+msgstr "Setter bilde DPI reserveverdi"
 
 #: paperless/models.py:163
 msgid "Controls the unpaper cleaning"
-msgstr "Controls the unpaper cleaning (NO)"
+msgstr "Styrer unpaper-rensing"
 
 #: paperless/models.py:170
 msgid "Enables deskew"
-msgstr "Enables deskew (NO)"
+msgstr "Aktiverer skjevhetskorrigering"
 
 #: paperless/models.py:173
 msgid "Enables page rotation"
-msgstr "Enables page rotation (NO)"
+msgstr "Aktiverer siderotasjon"
 
 #: paperless/models.py:178
 msgid "Sets the threshold for rotation of pages"
-msgstr "Sets the threshold for rotation of pages (NO)"
+msgstr "Angir grenseverdi for rotasjon av sider"
 
 #: paperless/models.py:184
 msgid "Sets the maximum image size for decompression"
-msgstr "Sets the maximum image size for decompression (NO)"
+msgstr "Angir maksimal bildestørrelse for dekomprimering"
 
 #: paperless/models.py:190
 msgid "Sets the Ghostscript color conversion strategy"
@@ -2094,7 +2102,7 @@ msgstr "Sets the Ghostscript color conversion strategy (NO)"
 
 #: paperless/models.py:198
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr "Adds additional user arguments for OCRMyPDF (NO)"
+msgstr "Legger til ekstra brukerargumenter for OCRMyPDF"
 
 #: paperless/models.py:207
 msgid "Application title"
@@ -2110,7 +2118,7 @@ msgstr "Aktiverer strekkode skanning"
 
 #: paperless/models.py:235
 msgid "Enables barcode TIFF support"
-msgstr "Aktiverer strekkode TIFF-støtte"
+msgstr "Aktiverer støtte for strekkoder i TIFF-filer"
 
 #: paperless/models.py:241
 msgid "Sets the barcode string"
@@ -2130,11 +2138,11 @@ msgstr "Sets the ASN barcode prefix (NO)"
 
 #: paperless/models.py:269
 msgid "Sets the barcode upscale factor"
-msgstr "Sets the barcode upscale factor (NO)"
+msgstr "Setter oppskaleringsfaktor for strekkode"
 
 #: paperless/models.py:276
 msgid "Sets the barcode DPI"
-msgstr "Sets the barcode DPI (NO)"
+msgstr "Angir DPI for strekkode"
 
 #: paperless/models.py:283
 msgid "Sets the maximum pages for barcode"
@@ -2142,11 +2150,11 @@ msgstr "Sets the maximum pages for barcode (NO)"
 
 #: paperless/models.py:290
 msgid "Enables tag barcode"
-msgstr "Enables tag barcode"
+msgstr "Aktiverer strekkode for merker"
 
 #: paperless/models.py:296
 msgid "Sets the tag barcode mapping"
-msgstr "Sets the tag barcode mapping"
+msgstr "Angir tilordning av strekkode for merker"
 
 #: paperless/models.py:302
 msgid "Enables splitting on tag barcodes"
@@ -2154,217 +2162,217 @@ msgstr "Enables splitting on tag barcodes"
 
 #: paperless/models.py:312
 msgid "Sets the remote OCR engine"
-msgstr ""
+msgstr "Angir ekstern OCR motor"
 
 #: paperless/models.py:321
 msgid "Sets the remote OCR API key"
-msgstr ""
+msgstr "Angir ekstern OCR API-nøkkel"
 
 #: paperless/models.py:329
 msgid "Sets the remote OCR endpoint"
-msgstr ""
+msgstr "Angir ekstern OCR endepunkt"
 
 #: paperless/models.py:337
 msgid "Sets which documents are sent to the remote OCR engine"
-msgstr ""
+msgstr "Angir hvilke dokumenter som skal sendes til ekstern OCR motor"
 
 #: paperless/models.py:349
 msgid "Enables AI features"
-msgstr "Enables AI features (NO)"
+msgstr "Aktiverer KI-funksjoner"
 
-#: paperless/models.py:355
+#: paperless/models.py:354
 msgid "Sets the LLM embedding backend"
 msgstr "Sets the LLM embedding backend (NO)"
 
-#: paperless/models.py:363
+#: paperless/models.py:362
 msgid "Sets the LLM embedding model"
-msgstr "Sets the LLM embedding model (NO)"
+msgstr "Angir modellen som brukes til LLM-innebygging"
 
-#: paperless/models.py:370
+#: paperless/models.py:369
 msgid "Sets the LLM embedding endpoint, optional"
 msgstr "Sets the LLM embedding endpoint, optional (NO)"
 
-#: paperless/models.py:377
+#: paperless/models.py:376
 msgid "Sets the LLM embedding chunk size"
 msgstr "Sets the LLM embedding chunk size (NO)"
 
-#: paperless/models.py:383
+#: paperless/models.py:382
 msgid "Sets the LLM context size"
 msgstr "Sets the LLM context size (NO)"
 
-#: paperless/models.py:389
+#: paperless/models.py:388
 msgid "Sets the LLM backend"
 msgstr "Sets the LLM backend (NO)"
 
-#: paperless/models.py:397
+#: paperless/models.py:396
 msgid "Sets the LLM model"
 msgstr "Sets the LLM model (NO)"
 
-#: paperless/models.py:404
+#: paperless/models.py:403
 msgid "Sets the LLM API key"
 msgstr "Sets the LLM API key (NO)"
 
-#: paperless/models.py:411
+#: paperless/models.py:410
 msgid "Sets the LLM endpoint, optional"
 msgstr "Sets the LLM endpoint, optional (NO)"
 
-#: paperless/models.py:418
+#: paperless/models.py:417
 msgid "Sets the LLM output language"
 msgstr "Sets the LLM output language (NO)"
 
-#: paperless/models.py:425
+#: paperless/models.py:424
 msgid "Sets the LLM timeout in seconds"
 msgstr "Setter tidsavbrudd for LLM i sekunder"
 
-#: paperless/models.py:431
+#: paperless/models.py:430
 msgid "paperless application settings"
 msgstr "paperless application settings (NO)"
 
-#: paperless/settings/__init__.py:562
+#: paperless/settings/__init__.py:556
 msgid "English (US)"
 msgstr "Engelsk (US)"
 
-#: paperless/settings/__init__.py:563
+#: paperless/settings/__init__.py:557
 msgid "Arabic"
 msgstr "Arabisk"
 
-#: paperless/settings/__init__.py:564
+#: paperless/settings/__init__.py:558
 msgid "Afrikaans"
 msgstr "Afrikansk"
 
-#: paperless/settings/__init__.py:565
+#: paperless/settings/__init__.py:559
 msgid "Belarusian"
 msgstr "Hviterussisk"
 
-#: paperless/settings/__init__.py:566
+#: paperless/settings/__init__.py:560
 msgid "Bulgarian"
 msgstr "Bulgarian (NO)"
 
-#: paperless/settings/__init__.py:567
+#: paperless/settings/__init__.py:561
 msgid "Catalan"
 msgstr "Katalansk"
 
-#: paperless/settings/__init__.py:568
+#: paperless/settings/__init__.py:562
 msgid "Czech"
 msgstr "Tsjekkisk"
 
-#: paperless/settings/__init__.py:569
+#: paperless/settings/__init__.py:563
 msgid "Danish"
 msgstr "Dansk"
 
-#: paperless/settings/__init__.py:570
+#: paperless/settings/__init__.py:564
 msgid "German"
 msgstr "Tysk"
 
-#: paperless/settings/__init__.py:571
+#: paperless/settings/__init__.py:565
 msgid "Greek"
 msgstr "Gresk"
 
-#: paperless/settings/__init__.py:572
+#: paperless/settings/__init__.py:566
 msgid "English (GB)"
 msgstr "Engelsk (GB)"
 
-#: paperless/settings/__init__.py:573
+#: paperless/settings/__init__.py:567
 msgid "Spanish"
 msgstr "Spansk"
 
-#: paperless/settings/__init__.py:574
+#: paperless/settings/__init__.py:568
 msgid "Persian"
 msgstr "Persian (NO)"
 
-#: paperless/settings/__init__.py:575
+#: paperless/settings/__init__.py:569
 msgid "Finnish"
 msgstr "Finsk"
 
-#: paperless/settings/__init__.py:576
+#: paperless/settings/__init__.py:570
 msgid "French"
 msgstr "Fransk"
 
-#: paperless/settings/__init__.py:577
+#: paperless/settings/__init__.py:571
 msgid "Hungarian"
 msgstr "Hungarian (NO)"
 
-#: paperless/settings/__init__.py:578
+#: paperless/settings/__init__.py:572
 msgid "Indonesian"
 msgstr "Indonesian (NO)"
 
-#: paperless/settings/__init__.py:579
+#: paperless/settings/__init__.py:573
 msgid "Italian"
 msgstr "Italiensk"
 
-#: paperless/settings/__init__.py:580
+#: paperless/settings/__init__.py:574
 msgid "Japanese"
 msgstr "Japanese (NO)"
 
-#: paperless/settings/__init__.py:581
+#: paperless/settings/__init__.py:575
 msgid "Korean"
 msgstr "Korean (NO)"
 
-#: paperless/settings/__init__.py:582
+#: paperless/settings/__init__.py:576
 msgid "Luxembourgish"
 msgstr "Luxembourgsk"
 
-#: paperless/settings/__init__.py:583
+#: paperless/settings/__init__.py:577
 msgid "Norwegian"
 msgstr "Norsk"
 
-#: paperless/settings/__init__.py:584
+#: paperless/settings/__init__.py:578
 msgid "Dutch"
 msgstr "Nederlandsk"
 
-#: paperless/settings/__init__.py:585
+#: paperless/settings/__init__.py:579
 msgid "Polish"
 msgstr "Polsk"
 
-#: paperless/settings/__init__.py:586
+#: paperless/settings/__init__.py:580
 msgid "Portuguese (Brazil)"
 msgstr "Portugisisk (Brasil)"
 
-#: paperless/settings/__init__.py:587
+#: paperless/settings/__init__.py:581
 msgid "Portuguese"
 msgstr "Portugisisk"
 
-#: paperless/settings/__init__.py:588
+#: paperless/settings/__init__.py:582
 msgid "Romanian"
 msgstr "Rumensk"
 
-#: paperless/settings/__init__.py:589
+#: paperless/settings/__init__.py:583
 msgid "Russian"
 msgstr "Russisk"
 
-#: paperless/settings/__init__.py:590
+#: paperless/settings/__init__.py:584
 msgid "Slovak"
 msgstr "Slovakisk"
 
-#: paperless/settings/__init__.py:591
+#: paperless/settings/__init__.py:585
 msgid "Slovenian"
 msgstr "Slovenian (NO)"
 
-#: paperless/settings/__init__.py:592
+#: paperless/settings/__init__.py:586
 msgid "Serbian"
 msgstr "Serbisk"
 
-#: paperless/settings/__init__.py:593
+#: paperless/settings/__init__.py:587
 msgid "Swedish"
 msgstr "Svensk"
 
-#: paperless/settings/__init__.py:594
+#: paperless/settings/__init__.py:588
 msgid "Turkish"
 msgstr "Tyrkisk"
 
-#: paperless/settings/__init__.py:595
+#: paperless/settings/__init__.py:589
 msgid "Ukrainian"
 msgstr "Ukrainsk"
 
-#: paperless/settings/__init__.py:596
+#: paperless/settings/__init__.py:590
 msgid "Vietnamese"
 msgstr "Vietnamese (NO)"
 
-#: paperless/settings/__init__.py:597
+#: paperless/settings/__init__.py:591
 msgid "Chinese Simplified"
 msgstr "Kinesisk forenklet"
 
-#: paperless/settings/__init__.py:598
+#: paperless/settings/__init__.py:592
 msgid "Chinese Traditional"
 msgstr "Chinese Traditional (NO)"
 
@@ -2402,7 +2410,7 @@ msgstr "Tilordne metadata til dokumenter som brukes fra denne regelen automatisk
 
 #: paperless_mail/apps.py:8
 msgid "Paperless mail"
-msgstr "Paperløst e-post"
+msgstr "Paperless e-post"
 
 #: paperless_mail/models.py:10
 msgid "mail account"
