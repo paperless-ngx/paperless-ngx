@@ -235,6 +235,24 @@ class ApplicationConfigurationSerializer(
     ) -> list[str]:
         return sorted(name for name in os.environ if name.startswith("PAPERLESS_"))
 
+    @staticmethod
+    def _require_json_object(field: str, value: object) -> None:
+        if value is not None and not isinstance(value, dict):
+            raise serializers.ValidationError(f"{field} must be a JSON object.")
+
+    def validate_user_args(self, value):
+        self._require_json_object("user_args", value)
+        return value
+
+    def validate_barcode_tag_mapping(self, value):
+        self._require_json_object("barcode_tag_mapping", value)
+        # Each value is the regex substitute applied to a matching barcode
+        if value is not None and not all(isinstance(v, str) for v in value.values()):
+            raise serializers.ValidationError(
+                "barcode_tag_mapping values must be strings.",
+            )
+        return value
+
     def run_validation(self, data):
         # Empty strings treated as None to avoid unexpected behavior
         if "user_args" in data and data["user_args"] == "":
