@@ -111,7 +111,7 @@
                     } @else if (totpSettings()) {
                       <figure class="figure">
                         @if (qrSvgDataUrl) {
-                          <img class="bg-white d-inline-block" [src]="qrSvgDataUrl" alt="Authenticator QR code">
+                          <img class="bg-white d-inline-block" [src]="qrSvgDataUrl" alt="Authenticator QR code" i18n-alt>
                         }
                         <figcaption class="figure-caption text-end mt-2" i18n>Scan the QR code with your authenticator app and then enter the code below</figcaption>
                       </figure>
