@@ -134,18 +134,19 @@ class TestPrefixStemming:
         GIVEN:
             - The same indexed document, storing "university" as "univers"
         WHEN:
-            - "universities*" and "universit*" are each queried
+            - "universities*", "universit*" and "univers*" are each queried
         THEN:
             - "universities*" matches, since the stem of "universities" is
               that same "univers"; "universit*" matches nothing, since
               "universit" is a prefix of neither its own stem nor the
               stored term. The alternatives widen recall without turning
-              a wildcard into a prefix search over the original text, and
-              usage.md names this exact pair so a reader told that
-              `universit*` fails is also told which spelling works
+              a wildcard into a prefix search over the original text.
+              usage.md tells a reader whose `universit*` finds nothing to
+              shorten it to `univers*`, which matches
         """
         assert _matched_ids(backend, "universities*") == {indexed_doc.id}
         assert _matched_ids(backend, "universit*") == set()
+        assert _matched_ids(backend, "univers*") == {indexed_doc.id}
 
     def test_pattern_past_the_stem_boundary_is_documented_not_fixed(
         self,

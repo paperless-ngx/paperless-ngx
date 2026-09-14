@@ -927,63 +927,59 @@ typed in the search bar. A few things to know about how matching works:
 
 Paperless also offers advanced search syntax if you want to drill down further.
 
-Matching documents with logical expressions:
+#### Combining terms
 
 ```
 shopname AND (product1 OR product2)
 invoice NOT draft
-```
-
-`AND`, `OR` and `NOT` must be written in capitals, and parentheses group sub-expressions. Terms written next to each other with no operator between them are combined with `AND`.
-
-!!! warning
-
-    A leading `-` does **not** exclude a term. Separators are stripped during indexing, so `invoice -secret` searches for `invoice` and `secret`, which is the opposite of what you probably intended. Use `NOT` to exclude a term: `invoice NOT secret`.
-
-Matching an exact phrase, in order, by quoting it:
-
-```
 "quick brown fox"
 ```
 
-Matching specific tags, correspondents or types:
+- `AND`, `OR` and `NOT` must be written in capitals. Parentheses group terms.
+- Terms with no operator between them are combined with `AND`.
+- Quotes match an exact phrase, with the words in that order.
+
+!!! warning
+
+    A leading `-` does **not** exclude a term. `invoice -secret` finds documents containing both words. Use `invoice NOT secret` instead.
+
+#### Searching by field
+
+Put a field name and a colon in front of a value to search only that field:
 
 ```
 type:invoice tag:unpaid
-correspondent:university certificate
+correspondent:"acme corp"
 tag:bills,unpaid
+asn:[50 to 150]
+checksum:9f86d081*
 ```
 
-- `document_type` may be abbreviated to `type`, and `storage_path` to `path`.
-- A comma-separated list after `tag:` requires **all** of the listed tags, so `tag:bills,unpaid` matches only documents tagged both `bills` and `unpaid`.
+| Field                     | Searches                                 |
+| ------------------------- | ---------------------------------------- |
+| `title`                   | Title                                    |
+| `content`                 | Text content                             |
+| `correspondent`           | Correspondent                            |
+| `document_type` or `type` | Document type                            |
+| `storage_path` or `path`  | Storage path                             |
+| `tag`                     | Tags                                     |
+| `original_filename`       | File name the document was consumed with |
+| `asn`                     | Archive serial number                    |
+| `page_count`              | Number of pages                          |
+| `num_notes`               | Number of notes                          |
+| `checksum`                | Checksum of the original file            |
+| `created`                 | Created date                             |
+| `added`                   | When the document was added to paperless |
+| `modified`                | When the document was last modified      |
 
-Matching dates:
+- A field applies only to the word right after it. Quote multi-word values: `correspondent:"acme corp"`.
+- A comma-separated `tag` list requires every listed tag, so `tag:bills,unpaid` only matches documents tagged with both.
+- `asn`, `page_count` and `num_notes` are numbers. They accept ranges like `asn:[50 to 150]`, but not wildcards.
+- `checksum` only matches the complete checksum, in lowercase. To search by its first few characters, add a wildcard: `checksum:9f86d081*`.
+- `created`, `added` and `modified` take the values described in [Searching by date](#searching-by-date).
+- Custom fields and notes have their own syntax, described [below](#searching-custom-fields).
 
-```
-created:[2005 to 2009]
-added:yesterday
-modified:today
-```
-
-Matching by archive metadata:
-
-```
-asn:100
-page_count:12
-num_notes:0
-checksum:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
-original_filename:invoice.pdf
-```
-
-- `asn` matches a document's Archive Serial Number.
-- `page_count` matches a document's page count.
-- `num_notes` matches how many notes a document has.
-- `checksum` matches the checksum of the original document file (not the archived/processed version). Unlike the text fields, this one is stored verbatim rather than tokenized, so only a complete, lowercase checksum matches. To search by the first few characters instead, use a wildcard: `checksum:9f86d081*`. Wildcard patterns on the text fields are also tried stemmed, to line up with the stemmed index, but `checksum` is indexed without stemming, so its patterns are not stemmed either: a wildcard prefix is matched literally, apart from being lowercased first. `checksum:9F86D081*` therefore does find the document, even though the plain uppercase term does not.
-- `original_filename` matches the filename of the document as originally consumed.
-
-`asn`, `page_count` and `num_notes` are numeric and also accept ranges, for example `asn:[50 to 150]`.
-
-Matching inexact words:
+#### Wildcards
 
 ```
 invoice*
@@ -992,97 +988,44 @@ title:Invoice*
 20[!0]?
 ```
 
-`*` matches any run of characters, `?` matches exactly one character, and
-`[...]` matches any one character from the set or range inside the brackets
-(`[!...]` negates it) — the same glob syntax as a Unix shell. `20[12]?`
-matches years from 2010-2029, and `20[!0]?` excludes the 2000s. Digits are a
-reliable place to see this literally, since they pass through lowercasing,
-ASCII-folding and stemming unchanged; matching `?` or a bracket class against
-ordinary stemmed text is subject to the same stemming quirks described below
-for `*`, and just as easy to get a surprising zero-result from.
+- `*` matches any number of characters, and `?` matches exactly one.
+- `[...]` matches one character from a set or range, and `[!...]` matches one character not in it. `20[12]?` matches 2010 to 2029.
+- Brackets only act as a wildcard when the value also contains a `*` or `?`. Otherwise they are searched as ordinary text. The exception is a single-character range such as `title:200[1-9]`, which is rejected with an error. Add a wildcard to use it as a pattern: `title:200[1-9]*`.
 
-A `[...]` class is only recognized as pattern syntax when the value also
-contains a `*` or `?` elsewhere; on its own it is ordinary text. A bracket
-range that would otherwise be ambiguous with a single character, such as
-`title:200[1-9]`, is rejected with an error rather than silently searched as
-a literal string that will not match anything real.
+!!! note
 
-Wildcards on the text fields are matched against the _stemmed_ terms stored
-in the index, not against the words as they appear in the document, but only
-when a [supported stemmer language](#PAPERLESS_SEARCH_LANGUAGE) is
-configured. Each literal part of a pattern is tried both as you typed it and
-in its stemmed form, so a trailing `*` matches a word and its inflections
-(`invoice*` finds "invoice", "invoices" and "invoiced") as well as longer
-words whose stored term still begins with what you typed (`copy*` finds
-"copyright" alongside "copy" and "copies"). If the configured language has no
-stemmer, or none is configured and none can be inferred from the OCR
-language, the index keeps unstemmed (lowercased, ASCII-folded) terms instead,
-and only the literal typed prefix is tried -- `copy*` then still finds "copy"
-and "copyright" (both literally start with "copy"), but no longer finds
-"copies" (stored as-typed, its surface spelling "copies" does not start with
-"copy").
+    When a [stemmer is available](configuration.md#PAPERLESS_SEARCH_LANGUAGE) for your search language, words are indexed by their stem, so `copy*` also finds "copies". A prefix that runs past the stem can find nothing: `universit*` misses "university", which is stored as `univers`. If a wildcard finds nothing, try a shorter prefix, such as `univers*`.
 
-It is still not a plain prefix search over the original text. A trailing `*`
-matches a stored term when either the run you typed or its stemmed form is a
-prefix of that term, so a fragment that stops part-way between the two matches
-neither: `universities*` finds "university" and "universities", which are both
-stored as `univers`, while the shorter `universit*` finds nothing at all. For
-the same reason `happine*` does not find "happiness", which is stored as
-`happi`. And a pattern that requires letters after the wildcard which stemming
-has removed cannot match either: `productname` is stored as `productnam`, so
-`produ*name` finds nothing.
-
-Matching natural date keywords:
-
-The multi-word date keywords listed below work quoted or unquoted after a
-date field (`added:"previous month"` and `added:previous month` are
-equivalent); elsewhere in a query the same words are treated as ordinary
-search text. Other date expressions the parser accepts (relative offsets
-like `-1 week`, or specific dates like `12 december 2019`) must be quoted when
-they stand alone as a value; inside a range's brackets they work unquoted, as
-in `added:[-1 week to now]`.
+#### Searching by date
 
 ```
-added:today
-modified:yesterday
-created:"previous week"
-added:"previous month"
-modified:"this year"
+added:yesterday
+modified:"previous month"
+created:[2005 to 2009]
+added:[-1 week to now]
 ```
 
-Supported date keywords: `today`, `yesterday`, `previous week`,
-`this month`, `previous month`, `this year`, `previous year`,
-`previous quarter`.
+These keywords each cover a whole period, and work with or without quotes: `today`, `yesterday`, `tomorrow`, `previous week`, `this month`, `previous month`, `previous quarter`, `this year`, `previous year`.
 
-These other date forms also work after a date field:
+Other supported forms:
 
-```
-added:tomorrow
-created:2005-03-04
-added:january
-modified:"next monday"
-added:"last monday"
-added:"2005-01-01T00:00:00Z"
-created:[2005-01-01 to 2005-01-31]
-added:[2005-06-15T09:00:00Z to 2005-06-15T17:00:00Z]
-```
+| Example                                                 | Matches                        | Quotes   |
+| ------------------------------------------------------- | ------------------------------ | -------- |
+| `created:2005`, `created:2005-01`, `created:2005-03-04` | That year, month or day        | Optional |
+| `added:january`                                         | That month in the current year | Optional |
+| `added:"next monday"`, `added:"last monday"`            | That day                       | Required |
+| `added:"12 december 2019"`                              | That day                       | Required |
+| `added:"2005-01-01T00:00:00Z"`                          | That exact time                | Required |
 
-- `tomorrow`, like `today` and `yesterday`, covers that whole day.
-- An ISO date such as `2005-03-04` covers that whole day, and `2005-01` covers that whole month.
-- A month name such as `january` covers that whole month in the current year.
-- `next <weekday>` and `last <weekday>` each cover that whole day and must be quoted. A bare weekday name such as `monday` is not accepted.
-- A full timestamp such as `2005-01-01T00:00:00Z` matches that exact instant. Like the other expressions above, it has to be quoted when it stands on its own: `added:"2005-01-01T00:00:00Z"`. The unquoted spelling is rejected with an error rather than searched, because only part of it can be read as a date.
-- A range takes two of the above as its bounds, for example `created:[2005 to 2009]` or `added:[2005-01-01 to 2005-01-31]`. Bounds may carry a time of day. A bound is normally written without quotes; if you do quote one, use single quotes (`added:['-1 week' to now]`), because a double-quoted bound is rejected with an error.
+Ranges take two bounds in square brackets, for example `created:[2005 to 2009]`. A bound can be any of the forms above, or a relative time like `-1 week`, `now-7d` or `now`. Bounds don't need quotes. If you do quote one, use single quotes (`added:['-1 week' to now]`), because double quotes are rejected.
 
 !!! warning
 
-    As a value on its own, `now`, `noon`, `midnight` and relative offsets such as `"-3 days"` or `"-1 week"` are accepted by the parser but resolve to a single instant rather than to a span of time, so they match only a document whose timestamp is exactly that instant, which in practice means no documents at all. Quoting does not change this. As a *range bound* they are the opposite of a trap and are what you want: `added:['-1 week' to now]` covers the whole of the last seven days. Spellings like `now-3days` and `"3 days ago"` are rejected outright wherever they appear.
+    `now`, `noon`, `midnight` and relative times like `-1 week` only work as range bounds. On their own they mean a single instant, so `added:"-1 week"` finds nothing. Use `added:[-1 week to now]` instead. A bare weekday (`monday`) and spellings like `3 days ago` or `this week` are not supported at all.
 
 #### Searching custom fields
 
-Custom field names and values are included in the full-text index, but they
-are not searched by a plain, unqualified query. Use the advanced search syntax
-to search by field name or value:
+Custom field names and values are included in the full-text index, but a plain search without a field name does not look at them. Use the advanced search syntax to search by field name or value:
 
 ```
 custom_fields.value:policy
@@ -1095,9 +1038,7 @@ custom_fields.name:Insurance custom_fields.value:policy
 - Combine both to find documents where a specific named field contains a specific value.
 - The bare `custom_fields:` prefix is shorthand for `custom_fields.value:`.
 
-Because separators are stripped during indexing, individual parts of formatted
-codes are searchable on their own. A value stored as `A-1312/99.50` produces the
-tokens `a`, `1312`, `99`, `50` — each searchable independently:
+Because separators are stripped during indexing, each part of a formatted code can be searched on its own. A value stored as `A-1312/99.50` is indexed as `a`, `1312`, `99` and `50`:
 
 ```
 custom_fields.value:1312
@@ -1106,14 +1047,11 @@ custom_fields.name:"Contract Number" custom_fields.value:1312
 
 !!! note
 
-    Custom date fields do not support relative date syntax (e.g. `[now to 2 weeks]`).
-    For date ranges on custom date fields, use the document list filters in the web UI.
+    Custom date fields do not support relative date syntax such as `[now to 2 weeks]`. For date ranges on custom date fields, use the document list filters in the web UI.
 
 #### Searching notes
 
-Notes are included in the full-text index, but they are not searched by a
-plain, unqualified query. Use the advanced search syntax to search by note
-author or content:
+Notes are included in the full-text index, but a plain search without a field name does not look at them. Use the advanced search syntax to search by note author or content:
 
 ```
 notes.user:alice
@@ -1123,13 +1061,11 @@ notes.user:alice notes.note:insurance
 
 The bare `notes:` prefix is shorthand for `notes.note:`.
 
-All of these constructs can be combined as you see fit. What is described above is the whole of the query language paperless supports. It resembles other search query languages without being identical to any of them, so a construct that is not documented here is most likely treated as ordinary search text rather than as syntax, and an unrecognized field name is searched as text too.
+All of these can be combined. Syntax not described here may not work as expected, and an unknown field name is searched as ordinary text.
 
 !!! note
 
-    Fuzzy (approximate) matching can be enabled by setting
-    [`PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD`](configuration.md#PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD).
-    When enabled, paperless will include near-miss results ranked below exact matches.
+    Fuzzy (approximate) matching can be enabled by setting [`PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD`](configuration.md#PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD). When enabled, paperless also includes near-miss results, ranked below exact matches.
 
 ## Keyboard shortcuts / hotkeys
 
