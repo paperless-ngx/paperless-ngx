@@ -193,21 +193,22 @@ class MatchingModelSerializer(serializers.ModelSerializer[Any]):
             raise serializers.ValidationError(
                 {"error": "Object violates owner / name unique constraint"},
             )
-        return data
-
-    def validate_match(self, match):
-        if (
-            "matching_algorithm" in self.initial_data
-            and self.initial_data["matching_algorithm"] == MatchingModel.MATCH_REGEX
+        matching_algorithm = data.get(
+            "matching_algorithm",
+            getattr(self.instance, "matching_algorithm", None),
+        )
+        if matching_algorithm == MatchingModel.MATCH_REGEX and (
+            "match" in data or "matching_algorithm" in data
         ):
+            match = data.get("match", getattr(self.instance, "match", ""))
             try:
                 validate_regex_pattern(match)
             except ValueError as e:
                 logger.debug(f"Invalid regular expression: {e!s}")
                 raise serializers.ValidationError(
-                    "Invalid regular expression, see log for details.",
+                    {"match": "Invalid regular expression, see log for details."},
                 )
-        return match
+        return data
 
 
 class SetPermissionsMixin:
