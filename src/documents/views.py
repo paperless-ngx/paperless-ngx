@@ -194,7 +194,7 @@ from documents.serialisers import BulkEditSerializer
 from documents.serialisers import CorrespondentSerializer
 from documents.serialisers import CustomFieldSerializer
 from documents.serialisers import DeleteDocumentsSerializer
-from documents.serialisers import DocumentListSerializer
+from documents.serialisers import DocumentSelectionSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
 from documents.serialisers import DocumentVersionLabelSerializer
@@ -3560,16 +3560,19 @@ class PostDocumentView(GenericAPIView[Any]):
         },
     ),
 )
-class SelectionDataView(GenericAPIView[Any]):
+class SelectionDataView(DocumentSelectionMixin, GenericAPIView[Any]):
     permission_classes = (IsAuthenticated, ViewDocumentsPermissions)
-    serializer_class = DocumentListSerializer
+    serializer_class = DocumentSelectionSerializer
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser)
 
     def post(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        ids = serializer.validated_data.get("documents")
+        ids = self._resolve_document_ids(
+            user=request.user,
+            validated_data=serializer.validated_data,
+        )
         permitted_documents = Document.objects.filter(
             id__in=permitted_document_ids(request.user),
         )
