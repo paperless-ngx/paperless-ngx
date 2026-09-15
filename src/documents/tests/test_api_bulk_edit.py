@@ -1144,6 +1144,33 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             ],
         )
 
+    def test_api_selection_data_with_excluded_documents(self) -> None:
+        response = self.client.post(
+            "/api/documents/selection_data/",
+            json.dumps(
+                {
+                    "all": True,
+                    "excluded_documents": [self.doc2.id],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertCountEqual(
+            response.data["selected_correspondents"],
+            [
+                {"id": self.c1.id, "document_count": 0},
+                {"id": self.c2.id, "document_count": 1},
+            ],
+        )
+        self.assertCountEqual(
+            response.data["selected_tags"],
+            [
+                {"id": self.t1.id, "document_count": 1},
+                {"id": self.t2.id, "document_count": 2},
+            ],
+        )
+
     def test_api_selection_data_requires_view_permission(self) -> None:
         self.doc2.owner = self.user
         self.doc2.save()
