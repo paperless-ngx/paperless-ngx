@@ -1681,7 +1681,10 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn(b"operations must not be empty", response.content)
+        self.assertEqual(
+            response.json(),
+            {"operations": ["This list may not be empty."]},
+        )
 
     @mock.patch("documents.views.bulk_edit.edit_pdf")
     def test_edit_pdf(self, m) -> None:
@@ -1751,7 +1754,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn(b"invalid operation entry", response.content)
+        self.assertIn(b"Expected a dictionary", response.content)
 
         response = self.client.post(
             "/api/documents/edit_pdf/",
@@ -1764,7 +1767,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn(b"page must be an integer", response.content)
+        self.assertIn(b"valid integer is required", response.content)
 
         response = self.client.post(
             "/api/documents/edit_pdf/",
@@ -1777,7 +1780,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn(b"rotate must be an integer", response.content)
+        self.assertIn(b"valid integer is required", response.content)
 
         response = self.client.post(
             "/api/documents/edit_pdf/",
@@ -1790,9 +1793,14 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn(b"doc must be an integer", response.content)
+        self.assertIn(b"valid integer is required", response.content)
 
-        for doc_index in (-1, 2**32):
+        # A negative index fails the field's min_value before the
+        # object-level bound against len(operations) is checked
+        for doc_index, expected_message in (
+            (-1, b"greater than or equal to 0"),
+            (2**32, b"doc index is out of bounds"),
+        ):
             with self.subTest(doc_index=doc_index):
                 response = self.client.post(
                     "/api/documents/edit_pdf/",
@@ -1805,7 +1813,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
                     content_type="application/json",
                 )
                 self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-                self.assertIn(b"doc index is out of bounds", response.content)
+                self.assertIn(expected_message, response.content)
 
         response = self.client.post(
             "/api/documents/edit_pdf/",
@@ -1813,7 +1821,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
                 {
                     "documents": [self.doc2.id],
                     "update_document": True,
-                    "operations": [{"page": 1, "doc": 1}, {"page": 2, "doc": 2}],
+                    "operations": [{"page": 1, "doc": 0}, {"page": 2, "doc": 1}],
                 },
             ),
             content_type="application/json",
@@ -1837,6 +1845,72 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(b"Invalid source_mode", response.content)
+
+    @mock.patch("documents.views.bulk_edit.edit_pdf")
+    def test_edit_pdf_rejects_invalid_operation_values(self, m) -> None:
+        """
+        GIVEN:
+            - An edit_pdf operation with a non-positive page, a boolean in
+              place of an integer, or a rotation that is not a multiple of 90
+        WHEN:
+            - API to edit the PDF is called
+        THEN:
+            - API returns HTTP 400 with the field error
+            - edit_pdf is not called
+        """
+        self.setup_mock(m, "edit_pdf")
+        for operation, expected_message in (
+            ({"page": 0}, b"greater than or equal to 1"),
+            ({"page": True}, b"valid integer is required"),
+            ({"page": 1, "rotate": True}, b"valid integer is required"),
+            ({"page": 1, "doc": True}, b"valid integer is required"),
+            ({"page": 1, "rotate": 45}, b"rotate must be a multiple of 90"),
+        ):
+            with self.subTest(operation=operation):
+                response = self.client.post(
+                    "/api/documents/edit_pdf/",
+                    json.dumps(
+                        {
+                            "documents": [self.doc2.id],
+                            "operations": [operation],
+                        },
+                    ),
+                    content_type="application/json",
+                )
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertIn(expected_message, response.content)
+        m.assert_not_called()
+
+    def test_legacy_bulk_edit_keys_pdf_operation_errors_under_operations(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A legacy bulk_edit edit_pdf request with an invalid operation
+        WHEN:
+            - API to bulk edit is called
+        THEN:
+            - API returns HTTP 400
+            - The error is keyed under operations and the operation index,
+              matching the edit_pdf endpoint
+        """
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "edit_pdf",
+                    "parameters": {"operations": [{"page": 1, "rotate": 45}]},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.json(),
+            {"operations": {"0": {"rotate": ["rotate must be a multiple of 90"]}}},
+        )
 
     @mock.patch("documents.views.bulk_edit.edit_pdf")
     def test_edit_pdf_page_out_of_bounds(self, m) -> None:

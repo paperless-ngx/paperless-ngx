@@ -1749,8 +1749,23 @@ class MergeDocumentsAsVersionsSerializer(DocumentListSerializer):
         return attrs
 
 
+class PdfEditOperationSerializer(serializers.Serializer[dict[str, int]]):
+    page = serializers.IntegerField(min_value=1)
+    rotate = serializers.IntegerField(required=False)
+    doc = serializers.IntegerField(required=False, min_value=0)
+
+    def validate_rotate(self, value: int) -> int:
+        if value % 90 != 0:
+            raise serializers.ValidationError("rotate must be a multiple of 90")
+        return value
+
+
 class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
-    operations = serializers.ListField(required=True, allow_empty=False)
+    operations = serializers.ListField(
+        child=PdfEditOperationSerializer(),
+        required=True,
+        allow_empty=False,
+    )
     delete_original = serializers.BooleanField(required=False, default=False)
     update_document = serializers.BooleanField(required=False, default=False)
     include_metadata = serializers.BooleanField(required=False, default=True)
@@ -1768,18 +1783,9 @@ class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMix
             )
 
         operations = attrs["operations"]
-        if not isinstance(operations, list):
-            raise serializers.ValidationError("operations must be a list")
 
-        for op in operations:
-            if not isinstance(op, dict):
-                raise serializers.ValidationError("invalid operation entry")
-            if "page" not in op or not isinstance(op["page"], int):
-                raise serializers.ValidationError("page must be an integer")
-            if "rotate" in op and not isinstance(op["rotate"], int):
-                raise serializers.ValidationError("rotate must be an integer")
-            if "doc" in op and not isinstance(op["doc"], int):
-                raise serializers.ValidationError("doc must be an integer")
+        if any(op.get("doc", 0) >= len(operations) for op in operations):
+            raise serializers.ValidationError("doc index is out of bounds")
 
         if attrs["update_document"]:
             max_idx = max(op.get("doc", 0) for op in operations)
@@ -1788,16 +1794,10 @@ class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMix
                     "update_document only allowed with a single output document",
                 )
 
-        if any(
-            op.get("doc", 0) < 0 or op.get("doc", 0) >= len(operations)
-            for op in operations
-        ):
-            raise serializers.ValidationError("doc index is out of bounds")
-
         doc = Document.objects.get(id=documents[0])
         if doc.page_count:
             for op in operations:
-                if op["page"] < 1 or op["page"] > doc.page_count:
+                if op["page"] > doc.page_count:
                     raise serializers.ValidationError(
                         f"Page {op['page']} is out of bounds for document with {doc.page_count} pages.",
                     )
@@ -2128,19 +2128,18 @@ class BulkEditSerializer(
     def _validate_parameters_edit_pdf(self, parameters, document_id) -> None:
         if "operations" not in parameters:
             raise serializers.ValidationError("operations not specified")
-        if not isinstance(parameters["operations"], list):
-            raise serializers.ValidationError("operations must be a list")
-        if not parameters["operations"]:
-            raise serializers.ValidationError("operations must not be empty")
-        for op in parameters["operations"]:
-            if not isinstance(op, dict):
-                raise serializers.ValidationError("invalid operation entry")
-            if "page" not in op or not isinstance(op["page"], int):
-                raise serializers.ValidationError("page must be an integer")
-            if "rotate" in op and not isinstance(op["rotate"], int):
-                raise serializers.ValidationError("rotate must be an integer")
-            if "doc" in op and not isinstance(op["doc"], int):
-                raise serializers.ValidationError("doc must be an integer")
+        operations_field = serializers.ListField(
+            child=PdfEditOperationSerializer(),
+            allow_empty=False,
+        )
+        try:
+            operations = operations_field.run_validation(parameters["operations"])
+        except serializers.ValidationError as e:
+            # Key the errors under "operations" so they match what the
+            # dedicated edit_pdf endpoint returns
+            raise serializers.ValidationError({"operations": e.detail}) from e
+        parameters["operations"] = operations
+
         if "update_document" in parameters:
             if not isinstance(parameters["update_document"], bool):
                 raise serializers.ValidationError("update_document must be a boolean")
@@ -2152,24 +2151,21 @@ class BulkEditSerializer(
         else:
             parameters["include_metadata"] = True
 
+        if any(op.get("doc", 0) >= len(operations) for op in operations):
+            raise serializers.ValidationError("doc index is out of bounds")
+
         if parameters["update_document"]:
-            max_idx = max(op.get("doc", 0) for op in parameters["operations"])
+            max_idx = max(op.get("doc", 0) for op in operations)
             if max_idx > 0:
                 raise serializers.ValidationError(
                     "update_document only allowed with a single output document",
                 )
 
-        if any(
-            op.get("doc", 0) < 0 or op.get("doc", 0) >= len(parameters["operations"])
-            for op in parameters["operations"]
-        ):
-            raise serializers.ValidationError("doc index is out of bounds")
-
         doc = Document.objects.get(id=document_id)
         # doc existence is already validated
         if doc.page_count:
-            for op in parameters["operations"]:
-                if op["page"] < 1 or op["page"] > doc.page_count:
+            for op in operations:
+                if op["page"] > doc.page_count:
                     raise serializers.ValidationError(
                         f"Page {op['page']} is out of bounds for document with {doc.page_count} pages.",
                     )
