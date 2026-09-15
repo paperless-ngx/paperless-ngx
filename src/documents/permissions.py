@@ -177,13 +177,10 @@ def _resolve_permissions(codenames: set[str], ctype: ContentType) -> list[Permis
     """
     Resolves `codenames` to Permission rows, raising like the single-object
     assign_perm() this bulk path replaces does (via a `.get()` internally)
-    if any codename doesn't exist -- e.g. a client-supplied action name that
-    was never validated (BulkEditObjectsSerializer._validate_permissions
-    calls validate_set_permissions() only for its side-effecting id checks
-    and discards the filtered dict it returns, so an unrecognized action key
-    reaches this function as-is). A plain `.filter()` with no existence
-    check would otherwise silently build zero rows and no-op instead of
-    reporting the bad input.
+    if any codename doesn't exist. SetPermissionsSerializer rejects unknown
+    action names at the API, but a caller passing one directly would
+    otherwise get a plain `.filter()` that silently builds zero rows and
+    no-ops instead of reporting the bad input.
     """
     permission_objs = list(
         Permission.objects.filter(content_type=ctype, codename__in=codenames),
@@ -298,10 +295,9 @@ def set_permissions_for_objects(
 
     # Every action is resolved up front, before anything is written, so an
     # unrecognized action name (see _resolve_permissions) aborts the whole
-    # call instead of leaving the actions ahead of it already applied --
-    # BulkEditObjectsSerializer lets unknown keys through and its view turns
-    # the exception into a 400, so a half-applied change would otherwise be
-    # reported to the client as a failure.
+    # call instead of leaving the actions ahead of it already applied.
+    # SetPermissionsSerializer rejects unknown actions at the API, so this
+    # guards any other caller.
     permissions_by_action: dict[str, list[Permission]] = {}
     for action, entry in permissions.items():
         if "users" not in entry and "groups" not in entry:
