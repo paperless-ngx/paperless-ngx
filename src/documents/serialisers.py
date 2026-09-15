@@ -1669,6 +1669,13 @@ class SourceModeValidationMixin:
         return source_mode
 
 
+def _validate_rotation_degrees(degrees: int, field: str = "degrees") -> int:
+    # QPDF refuses any other angle, which would otherwise fail inside the task
+    if degrees % 90 != 0:
+        raise serializers.ValidationError(f"{field} must be a multiple of 90")
+    return degrees
+
+
 class RotateDocumentsSerializer(DocumentSelectionSerializer, SourceModeValidationMixin):
     degrees = serializers.IntegerField(required=True)
     source_mode = serializers.CharField(
@@ -1676,6 +1683,9 @@ class RotateDocumentsSerializer(DocumentSelectionSerializer, SourceModeValidatio
         default=bulk_edit.SourceModeChoices.LATEST_VERSION,
     )
     from_webui = serializers.BooleanField(required=False, default=False)
+
+    def validate_degrees(self, value: int) -> int:
+        return _validate_rotation_degrees(value)
 
 
 class MergeDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
@@ -1744,9 +1754,7 @@ class PdfEditOperationSerializer(serializers.Serializer[dict[str, int]]):
     doc = serializers.IntegerField(required=False, min_value=0)
 
     def validate_rotate(self, value: int) -> int:
-        if value % 90 != 0:
-            raise serializers.ValidationError("rotate must be a multiple of 90")
-        return value
+        return _validate_rotation_degrees(value, field="rotate")
 
 
 class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
@@ -2031,11 +2039,14 @@ class BulkEditSerializer(
         else:
             raise serializers.ValidationError("remove_custom_fields not specified")
 
-    def _validate_owner(self, owner):
-        ownerUser = User.objects.get(pk=owner)
-        if ownerUser is None:
-            raise serializers.ValidationError("Specified owner cannot be found")
-        return ownerUser
+    def _validate_owner(self, owner) -> User:
+        owner_field = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+        try:
+            return owner_field.run_validation(owner)
+        except serializers.ValidationError as e:
+            raise serializers.ValidationError(
+                "Specified owner cannot be found",
+            ) from e
 
     def _validate_parameters_set_permissions(self, parameters) -> None:
         if "set_permissions" not in parameters:
@@ -2049,19 +2060,18 @@ class BulkEditSerializer(
             set_permissions,
         )
         if "owner" in parameters and parameters["owner"] is not None:
-            self._validate_owner(parameters["owner"])
+            parameters["owner"] = self._validate_owner(parameters["owner"]).pk
         if "merge" not in parameters:
             parameters["merge"] = False
 
     def _validate_parameters_rotate(self, parameters) -> None:
-        try:
-            if (
-                "degrees" not in parameters
-                or not float(parameters["degrees"]).is_integer()
-            ):
-                raise serializers.ValidationError("invalid rotation degrees")
-        except ValueError:
+        if "degrees" not in parameters:
             raise serializers.ValidationError("invalid rotation degrees")
+        try:
+            degrees = serializers.IntegerField().run_validation(parameters["degrees"])
+        except serializers.ValidationError as e:
+            raise serializers.ValidationError("invalid rotation degrees") from e
+        parameters["degrees"] = _validate_rotation_degrees(degrees)
 
     def _validate_source_mode(self, parameters) -> None:
         source_mode = parameters.get(
@@ -2070,28 +2080,25 @@ class BulkEditSerializer(
         )
         parameters["source_mode"] = self.validate_source_mode(source_mode)
 
-    def _validate_parameters_split(self, parameters) -> None:
+    def _validate_parameters_split(self, parameters, document_id) -> None:
         if "pages" not in parameters:
             raise serializers.ValidationError("pages not specified")
-        try:
-            pages = []
-            docs = parameters["pages"].split(",")
-            for doc in docs:
-                if "-" in doc:
-                    pages.append(
-                        [
-                            x
-                            for x in range(
-                                int(doc.split("-")[0]),
-                                int(doc.split("-")[1]) + 1,
-                            )
-                        ],
-                    )
-                else:
-                    pages.append([int(doc)])
-            parameters["pages"] = pages
-        except ValueError:
+        if not isinstance(parameters["pages"], str):
             raise serializers.ValidationError("invalid pages specified")
+        page_count = Document.objects.get(id=document_id).page_count
+        pages = []
+        for group in parameters["pages"].split(","):
+            start, is_range, end = group.partition("-")
+            try:
+                first = int(start)
+                last = int(end) if is_range else first
+            except ValueError as e:
+                raise serializers.ValidationError("invalid pages specified") from e
+            # Bound the range before building it, a huge one would exhaust memory
+            if not 1 <= first <= last or (page_count and last > page_count):
+                raise serializers.ValidationError("invalid pages specified")
+            pages.append(list(range(first, last + 1)))
+        parameters["pages"] = pages
 
         if "delete_originals" in parameters:
             if not isinstance(parameters["delete_originals"], bool):
@@ -2218,7 +2225,7 @@ class BulkEditSerializer(
                 raise serializers.ValidationError(
                     "Split method only supports one document",
                 )
-            self._validate_parameters_split(parameters)
+            self._validate_parameters_split(parameters, attrs["documents"][0])
         elif method == bulk_edit.delete_pages:
             if len(attrs["documents"]) > 1:
                 raise serializers.ValidationError(
