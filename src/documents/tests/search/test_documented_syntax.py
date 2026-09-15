@@ -1,7 +1,8 @@
 """Pins the search syntax that ``docs/usage.md`` promises users.
 
-Every query here appears verbatim, or as a direct paraphrase, in the
-"Document searches" section of ``docs/usage.md``. Each case indexes real
+Every query here is syntax the "Document searches" section of
+``docs/usage.md`` documents, either spelled as the docs spell it or as a
+concrete instance of a form the docs describe. Each case indexes real
 documents and asserts on matched document IDs rather than on the parsed
 query, because a query that parses cleanly is not necessarily a query that
 means what the documentation says it means: ``added:now`` parses without a
@@ -228,9 +229,9 @@ class TestArchiveMetadataFields:
             f"checksum:{DOC_CHECKSUM}",
             "checksum:9f86d081*",
             # A checksum term is stored verbatim, but a checksum *pattern* is
-            # lowercased before it is matched, which the docs now say outright
-            # next to the "only a complete, lowercase checksum matches" rule
-            # that the uppercase term in the negative list below pins.
+            # lowercased before it is matched, so an uppercase prefix pattern
+            # still matches even though the uppercase term in the negative
+            # list below does not.
             "checksum:9F86D081*",
         ],
     )

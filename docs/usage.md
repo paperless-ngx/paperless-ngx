@@ -927,52 +927,105 @@ typed in the search bar. A few things to know about how matching works:
 
 Paperless also offers advanced search syntax if you want to drill down further.
 
-Matching documents with logical expressions:
+#### Combining terms
 
 ```
 shopname AND (product1 OR product2)
+invoice NOT draft
+"quick brown fox"
 ```
 
-Matching specific tags, correspondents or types:
+- `AND`, `OR` and `NOT` must be written in capitals. Parentheses group terms.
+- Terms with no operator between them are combined with `AND`.
+- Quotes match an exact phrase, with the words in that order.
+
+!!! warning
+
+    A leading `-` does **not** exclude a term. `invoice -secret` finds documents containing both words. Use `invoice NOT secret` instead.
+
+#### Searching by field
+
+Put a field name and a colon in front of a value to search only that field:
 
 ```
 type:invoice tag:unpaid
-correspondent:university certificate
+correspondent:"acme corp"
+tag:bills,unpaid
+asn:[50 to 150]
+checksum:9f86d081*
 ```
 
-Matching dates:
+| Field                     | Searches                                 |
+| ------------------------- | ---------------------------------------- |
+| `title`                   | Title                                    |
+| `content`                 | Text content                             |
+| `correspondent`           | Correspondent                            |
+| `document_type` or `type` | Document type                            |
+| `storage_path` or `path`  | Storage path                             |
+| `tag`                     | Tags                                     |
+| `original_filename`       | File name the document was consumed with |
+| `asn`                     | Archive serial number                    |
+| `page_count`              | Number of pages                          |
+| `num_notes`               | Number of notes                          |
+| `checksum`                | Checksum of the original file            |
+| `created`                 | Created date                             |
+| `added`                   | When the document was added to paperless |
+| `modified`                | When the document was last modified      |
+
+- A field applies only to the word right after it. Quote multi-word values: `correspondent:"acme corp"`.
+- A comma-separated `tag` list requires every listed tag, so `tag:bills,unpaid` only matches documents tagged with both.
+- `asn`, `page_count` and `num_notes` are numbers. They accept ranges like `asn:[50 to 150]`, but not wildcards.
+- `checksum` only matches the complete checksum, in lowercase. To search by its first few characters, add a wildcard: `checksum:9f86d081*`.
+- `created`, `added` and `modified` take the values described in [Searching by date](#searching-by-date).
+- Custom fields and notes have their own syntax, described [below](#searching-custom-fields).
+
+#### Wildcards
 
 ```
-created:[2005 to 2009]
+invoice*
+title:Invoice*
+20[12]?
+20[!0]?
+```
+
+- `*` matches any number of characters, and `?` matches exactly one.
+- `[...]` matches one character from a set or range, and `[!...]` matches one character not in it. `20[12]?` matches 2010 to 2029.
+- Brackets only act as a wildcard when the value also contains a `*` or `?`. Otherwise they are searched as ordinary text. The exception is a single-character range such as `title:200[1-9]`, which is rejected with an error. Add a wildcard to use it as a pattern: `title:200[1-9]*`.
+
+!!! note
+
+    When a [stemmer is available](configuration.md#PAPERLESS_SEARCH_LANGUAGE) for your search language, words are indexed by their stem, so `copy*` also finds "copies". A prefix that runs past the stem can find nothing: `universit*` misses "university", which is stored as `univers`. If a wildcard finds nothing, try a shorter prefix, such as `univers*`.
+
+#### Searching by date
+
+```
 added:yesterday
-modified:today
+modified:"previous month"
+created:[2005 to 2009]
+added:[-1 week to now]
 ```
 
-Matching inexact words:
+These keywords each cover a whole period, and work with or without quotes: `today`, `yesterday`, `tomorrow`, `previous week`, `this month`, `previous month`, `previous quarter`, `this year`, `previous year`.
 
-```
-produ*name
-```
+Other supported forms:
 
-Matching natural date keywords:
+| Example                                                 | Matches                        | Quotes   |
+| ------------------------------------------------------- | ------------------------------ | -------- |
+| `created:2005`, `created:2005-01`, `created:2005-03-04` | That year, month or day        | Optional |
+| `added:january`                                         | That month in the current year | Optional |
+| `added:"next monday"`, `added:"last monday"`            | That day                       | Required |
+| `added:"12 december 2019"`                              | That day                       | Required |
+| `added:"2005-01-01T00:00:00Z"`                          | That exact time                | Required |
 
-```
-added:today
-modified:yesterday
-created:"previous week"
-added:"previous month"
-modified:"this year"
-```
+Ranges take two bounds in square brackets, for example `created:[2005 to 2009]`. A bound can be any of the forms above, or a relative time like `-1 week`, `now-7d` or `now`. Bounds don't need quotes. If you do quote one, use single quotes (`added:['-1 week' to now]`), because double quotes are rejected.
 
-Supported date keywords: `today`, `yesterday`, `previous week`,
-`this month`, `previous month`, `this year`, `previous year`,
-`previous quarter`.
+!!! warning
+
+    `now`, `noon`, `midnight` and relative times like `-1 week` only work as range bounds. On their own they mean a single instant, so `added:"-1 week"` finds nothing. Use `added:[-1 week to now]` instead. A bare weekday (`monday`) and spellings like `3 days ago` or `this week` are not supported at all.
 
 #### Searching custom fields
 
-Custom field names and values are included in the full-text index, but they
-are not searched by a plain, unqualified query. Use the advanced search syntax
-to search by field name or value:
+Custom field names and values are included in the full-text index, but a plain search without a field name does not look at them. Use the advanced search syntax to search by field name or value:
 
 ```
 custom_fields.value:policy
@@ -983,10 +1036,9 @@ custom_fields.name:Insurance custom_fields.value:policy
 - `custom_fields.value` matches against the value of any custom field.
 - `custom_fields.name` matches the name of the field (use quotes for multi-word names).
 - Combine both to find documents where a specific named field contains a specific value.
+- The bare `custom_fields:` prefix is shorthand for `custom_fields.value:`.
 
-Because separators are stripped during indexing, individual parts of formatted
-codes are searchable on their own. A value stored as `A-1312/99.50` produces the
-tokens `a`, `1312`, `99`, `50` — each searchable independently:
+Because separators are stripped during indexing, each part of a formatted code can be searched on its own. A value stored as `A-1312/99.50` is indexed as `a`, `1312`, `99` and `50`:
 
 ```
 custom_fields.value:1312
@@ -995,14 +1047,11 @@ custom_fields.name:"Contract Number" custom_fields.value:1312
 
 !!! note
 
-    Custom date fields do not support relative date syntax (e.g. `[now to 2 weeks]`).
-    For date ranges on custom date fields, use the document list filters in the web UI.
+    Custom date fields do not support relative date syntax such as `[now to 2 weeks]`. For date ranges on custom date fields, use the document list filters in the web UI.
 
 #### Searching notes
 
-Notes are included in the full-text index, but they are not searched by a
-plain, unqualified query. Use the advanced search syntax to search by note
-author or content:
+Notes are included in the full-text index, but a plain search without a field name does not look at them. Use the advanced search syntax to search by note author or content:
 
 ```
 notes.user:alice
@@ -1010,15 +1059,13 @@ notes.note:reminder
 notes.user:alice notes.note:insurance
 ```
 
-All of these constructs can be combined as you see fit. If you want to
-learn more about the query language used by paperless, see the
-[Tantivy query language documentation](https://docs.rs/tantivy/latest/tantivy/query/struct.QueryParser.html).
+The bare `notes:` prefix is shorthand for `notes.note:`.
+
+All of these can be combined. Syntax not described here may not work as expected, and an unknown field name is searched as ordinary text.
 
 !!! note
 
-    Fuzzy (approximate) matching can be enabled by setting
-    [`PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD`](configuration.md#PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD).
-    When enabled, paperless will include near-miss results ranked below exact matches.
+    Fuzzy (approximate) matching can be enabled by setting [`PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD`](configuration.md#PAPERLESS_ADVANCED_FUZZY_SEARCH_THRESHOLD). When enabled, paperless also includes near-miss results, ranked below exact matches.
 
 ## Keyboard shortcuts / hotkeys
 
