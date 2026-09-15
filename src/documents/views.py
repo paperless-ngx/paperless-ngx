@@ -2933,9 +2933,10 @@ class DocumentSelectionMixin:
         )
         if search_filtered_ids is not None:
             filtered_documents = filtered_documents.filter(pk__in=search_filtered_ids)
-        filtered_documents = filtered_documents.exclude(
-            pk__in=validated_data["excluded_documents"],
-        )
+        if validated_data.get("excluded_documents"):
+            filtered_documents = filtered_documents.exclude(
+                pk__in=validated_data["excluded_documents"],
+            )
         return list(filtered_documents.values_list("pk", flat=True))
 
 
