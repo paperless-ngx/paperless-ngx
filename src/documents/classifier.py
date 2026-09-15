@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 from django.conf import settings
 from django.core.cache import cache
 from django.core.cache import caches
+from django.db.models import Prefetch
 
 from documents.caching import CACHE_5_MINUTES
 from documents.caching import CACHE_50_MINUTES
@@ -28,6 +29,7 @@ from documents.caching import CLASSIFIER_VERSION_KEY
 from documents.caching import StoredLRUCache
 from documents.models import Document
 from documents.models import MatchingModel
+from documents.models import Tag
 from paperless.signed_pickle import SignedPickleError
 from paperless.signed_pickle import signed_pickle_dumps
 from paperless.signed_pickle import signed_pickle_loads
@@ -260,7 +262,17 @@ class DocumentClassifier:
                 tags__is_inbox_tag=True,
             )
             .select_related("document_type", "correspondent", "storage_path")
-            .prefetch_related("tags")
+            .prefetch_related(
+                Prefetch(
+                    "tags",
+                    queryset=Tag.objects.filter(
+                        matching_algorithm=MatchingModel.MATCH_AUTO,
+                    )
+                    .order_by("pk")
+                    .only("pk"),
+                    to_attr="auto_tags",
+                ),
+            )
             .order_by("pk")
         )
 
@@ -292,11 +304,7 @@ class DocumentClassifier:
             hasher.update(y.to_bytes(4, "little", signed=True))
             labels_correspondent.append(y)
 
-            tags: list[int] = list(
-                doc.tags.filter(matching_algorithm=MatchingModel.MATCH_AUTO)
-                .order_by("pk")
-                .values_list("pk", flat=True),
-            )
+            tags: list[int] = [tag.pk for tag in doc.auto_tags]
             for tag in tags:
                 hasher.update(tag.to_bytes(4, "little", signed=True))
             labels_tags.append(tags)
