@@ -361,6 +361,7 @@ export class BulkEditorComponent
       return {
         all: true,
         filters: queryParamsFromFilterRules(this.list.filterRules),
+        excluded_documents: Array.from(this.list.excluded),
       }
     }
 
