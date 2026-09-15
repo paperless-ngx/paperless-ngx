@@ -175,7 +175,7 @@ describe(`DocumentService`, () => {
 
   it('should call appropriate api endpoint for getting selection data', () => {
     const ids = [documents[0].id]
-    subscription = service.getSelectionData(ids).subscribe()
+    subscription = service.getSelectionData({ documents: ids }).subscribe()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}${endpoint}/selection_data/`
     )
@@ -183,6 +183,20 @@ describe(`DocumentService`, () => {
     expect(req.request.body).toEqual({
       documents: ids,
     })
+  })
+
+  it('should get selection data with all, filters, and exclusions', () => {
+    const selection = {
+      all: true,
+      filters: { title__icontains: 'apple' },
+      excluded_documents: [2, 3],
+    }
+    subscription = service.getSelectionData(selection).subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/selection_data/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toEqual(selection)
   })
 
   it('should call appropriate api endpoint for getting suggestions', () => {
@@ -240,7 +254,7 @@ describe(`DocumentService`, () => {
     })
   })
 
-  it('should call appropriate api endpoint for bulk edit with all and filters', () => {
+  it('should call appropriate api endpoint for bulk edit with all, filters, and exclusions', () => {
     const method = 'modify_tags'
     const parameters = {
       add_tags: [15],
@@ -249,6 +263,7 @@ describe(`DocumentService`, () => {
     const selection = {
       all: true,
       filters: { title__icontains: 'apple' },
+      excluded_documents: [2, 3],
     }
     subscription = service.bulkEdit(selection, method, parameters).subscribe()
     const req = httpTestingController.expectOne(
@@ -258,6 +273,7 @@ describe(`DocumentService`, () => {
     expect(req.request.body).toEqual({
       all: true,
       filters: { title__icontains: 'apple' },
+      excluded_documents: [2, 3],
       method,
       parameters,
     })

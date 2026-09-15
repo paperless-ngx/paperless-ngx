@@ -381,7 +381,7 @@ export class BulkEditorComponent
     }
 
     this.documentService
-      .getSelectionData(Array.from(this.list.selected))
+      .getSelectionData({ documents: Array.from(this.list.selected) })
       .pipe(first())
       .subscribe((s) => {
         this.tagDocumentCounts.set(s.selected_tags)
@@ -403,7 +403,7 @@ export class BulkEditorComponent
     }
 
     this.documentService
-      .getSelectionData(Array.from(this.list.selected))
+      .getSelectionData({ documents: Array.from(this.list.selected) })
       .pipe(first())
       .subscribe((s) => {
         this.documentTypeDocumentCounts.set(s.selected_document_types)
@@ -428,7 +428,7 @@ export class BulkEditorComponent
     }
 
     this.documentService
-      .getSelectionData(Array.from(this.list.selected))
+      .getSelectionData({ documents: Array.from(this.list.selected) })
       .pipe(first())
       .subscribe((s) => {
         this.correspondentDocumentCounts.set(s.selected_correspondents)
@@ -453,7 +453,7 @@ export class BulkEditorComponent
     }
 
     this.documentService
-      .getSelectionData(Array.from(this.list.selected))
+      .getSelectionData({ documents: Array.from(this.list.selected) })
       .pipe(first())
       .subscribe((s) => {
         this.storagePathDocumentCounts.set(s.selected_storage_paths)
@@ -478,7 +478,7 @@ export class BulkEditorComponent
     }
 
     this.documentService
-      .getSelectionData(Array.from(this.list.selected))
+      .getSelectionData({ documents: Array.from(this.list.selected) })
       .pipe(first())
       .subscribe((s) => {
         this.customFieldDocumentCounts.set(s.selected_custom_fields)
