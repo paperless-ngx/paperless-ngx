@@ -70,6 +70,9 @@ read_cache = caches["read-cache"]
 RE_DIGIT = re.compile(r"\d")
 RE_WORD = re.compile(r"\b[\w]+\b")  # words that may contain digits
 
+# Documents whose content is fetched per query while training
+_CONTENT_CHUNK_SIZE = 1000
+
 
 class _SignedFileWriter:
     """
@@ -300,10 +303,30 @@ class DocumentClassifier:
         notify = status_callback if status_callback is not None else lambda _: None
 
         # Get non-inbox documents
-        docs_queryset = (
-            Document.objects.exclude(
-                tags__is_inbox_tag=True,
-            )
+        docs_queryset = Document.objects.exclude(
+            tags__is_inbox_tag=True,
+        ).order_by("pk")
+
+        # No documents exit to train against
+        doc_count = docs_queryset.count()
+        if doc_count == 0:
+            raise ValueError("No training data available.")
+
+        labels_tags = []
+        labels_correspondent = []
+        labels_document_type = []
+        labels_storage_path = []
+        # Content is fetched separately later, for exactly these documents in this
+        # order, so it never all has to be in memory at once
+        doc_pks: list[int] = []
+        latest_doc_change: datetime | None = None
+
+        # Step 1: Extract and preprocess training data from the database.
+        logger.debug("Gathering data from database...")
+        notify(f"Gathering data from {doc_count} document(s)...")
+        hasher = sha256()
+        for doc in (
+            docs_queryset.defer("content")
             .select_related("document_type", "correspondent", "storage_path")
             .prefetch_related(
                 Prefetch(
@@ -316,23 +339,12 @@ class DocumentClassifier:
                     to_attr="auto_tags",
                 ),
             )
-            .order_by("pk")
-        )
+            .iterator(chunk_size=2000)
+        ):
+            doc_pks.append(doc.pk)
+            if latest_doc_change is None or doc.modified > latest_doc_change:
+                latest_doc_change = doc.modified
 
-        # No documents exit to train against
-        if docs_queryset.count() == 0:
-            raise ValueError("No training data available.")
-
-        labels_tags = []
-        labels_correspondent = []
-        labels_document_type = []
-        labels_storage_path = []
-
-        # Step 1: Extract and preprocess training data from the database.
-        logger.debug("Gathering data from database...")
-        notify(f"Gathering data from {docs_queryset.count()} document(s)...")
-        hasher = sha256()
-        for doc in docs_queryset:
             y = -1
             dt = doc.document_type
             if dt and dt.matching_algorithm == MatchingModel.MATCH_AUTO:
@@ -366,7 +378,6 @@ class DocumentClassifier:
         # Check if retraining is actually required.
         # A document has been updated since the classifier was trained
         # New auto tags, types, correspondent, storage paths exist
-        latest_doc_change = docs_queryset.latest("modified").modified
         if (
             self.last_doc_change_time is not None
             and self.last_doc_change_time >= latest_doc_change
@@ -393,7 +404,7 @@ class DocumentClassifier:
         num_storage_paths: int = len(set(labels_storage_path) | {-1}) - 1
 
         logger.debug(
-            f"{docs_queryset.count()} documents, {num_tags} tag(s), {num_correspondents} correspondent(s), "
+            f"{len(doc_pks)} documents, {num_tags} tag(s), {num_correspondents} correspondent(s), "
             f"{num_document_types} document type(s). {num_storage_paths} storage path(s)",
         )
 
@@ -415,10 +426,20 @@ class DocumentClassifier:
 
         def content_generator() -> Iterator[str]:
             """
-            Generates the content for documents, but once at a time
+            Generates the content for documents, in the same order as the labels,
+            fetching it a chunk at a time
             """
-            for doc in docs_queryset:
-                yield self.preprocess_content(doc.content, shared_cache=False)
+            for start in range(0, len(doc_pks), _CONTENT_CHUNK_SIZE):
+                chunk = doc_pks[start : start + _CONTENT_CHUNK_SIZE]
+                docs = Document.objects.only("content").order_by().in_bulk(chunk)
+                for pk in chunk:
+                    # A document deleted since its labels were gathered still
+                    # needs a row, so labels and content stay aligned
+                    doc = docs.get(pk)
+                    yield self.preprocess_content(
+                        doc.content if doc is not None else "",
+                        shared_cache=False,
+                    )
 
         self.data_vectorizer = CountVectorizer(
             analyzer="word",
