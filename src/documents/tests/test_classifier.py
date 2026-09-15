@@ -1172,3 +1172,68 @@ class TestClassifierTrainTagLabels:
         assert list(classifier.tags_binarizer.classes_) == sorted(
             tag.pk for tag in auto_tags
         )
+
+
+@pytest.mark.django_db
+class TestClassifierTrainContent:
+    def test_train_content_follows_label_order_across_chunks(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - More documents than fit in one content chunk
+        WHEN:
+            - The classifier is trained
+        THEN:
+            - Every document's content is preprocessed once, in document order
+        """
+        mocker.patch("documents.classifier._CONTENT_CHUNK_SIZE", 2)
+        docs = DocumentFactory.create_batch(5)
+        preprocess = mocker.patch.object(
+            DocumentClassifier,
+            "preprocess_content",
+            side_effect=dummy_preprocess,
+        )
+
+        DocumentClassifier().train()
+
+        assert [call.args[0] for call in preprocess.call_args_list] == [
+            doc.content for doc in sorted(docs, key=lambda doc: doc.pk)
+        ]
+
+    def test_train_document_deleted_while_training(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - Two documents
+        WHEN:
+            - The second document is deleted after its labels were gathered, but
+              before its content is fetched
+        THEN:
+            - Training completes
+            - The deleted document is trained with empty content, keeping labels
+              and content aligned
+        """
+        mocker.patch("documents.classifier._CONTENT_CHUNK_SIZE", 1)
+        first, second = DocumentFactory.create_batch(2)
+
+        def delete_second_then_preprocess(content: str, **kwargs) -> str:
+            if content == first.content:
+                second.delete()
+            return dummy_preprocess(content)
+
+        preprocess = mocker.patch.object(
+            DocumentClassifier,
+            "preprocess_content",
+            side_effect=delete_second_then_preprocess,
+        )
+
+        assert DocumentClassifier().train()
+
+        assert [call.args[0] for call in preprocess.call_args_list] == [
+            first.content,
+            "",
+        ]
