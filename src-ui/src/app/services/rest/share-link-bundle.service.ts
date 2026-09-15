@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
 import {
   ShareLinkBundleCreatePayload,
   ShareLinkBundleSummary,
@@ -30,12 +29,6 @@ export class ShareLinkBundleService extends AbstractNameFilterService<ShareLinkB
     return this.http.post<ShareLinkBundleSummary>(
       this.getResourceUrl(bundleId, 'rebuild'),
       {}
-    )
-  }
-
-  listAllBundles(): Observable<ShareLinkBundleSummary[]> {
-    return this.list(1, 1000, 'created', true).pipe(
-      map((response) => response.results)
     )
   }
 }

@@ -110,6 +110,7 @@ const documentDetailFieldOptions = [
 const sidebarItemLabels: Record<HideableSidebarItemID, string> = {
   [HideableSidebarItemID.Dashboard]: $localize`Dashboard`,
   [HideableSidebarItemID.SavedViews]: $localize`Saved Views`,
+  [HideableSidebarItemID.ShareLinks]: $localize`Share Links`,
   [HideableSidebarItemID.Workflows]: $localize`Workflows`,
   [HideableSidebarItemID.Mail]: $localize`Mail`,
   [HideableSidebarItemID.Documentation]: $localize`Documentation`,
