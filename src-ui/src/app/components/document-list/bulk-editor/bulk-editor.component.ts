@@ -360,6 +360,7 @@ export class BulkEditorComponent
       return {
         all: true,
         filters: queryParamsFromFilterRules(this.list.filterRules),
+        excluded_documents: Array.from(this.list.excluded),
       }
     }
 
@@ -373,7 +374,8 @@ export class BulkEditorComponent
   }
 
   openTagsDropdown() {
-    if (this.list.allSelected) {
+    // If none excluded, use the selection data already available in the list view, otherwise fetch
+    if (this.list.allSelected && this.list.excluded.size === 0) {
       const selectionData = this.list.selectionData
       this.tagDocumentCounts.set(selectionData?.selected_tags ?? [])
       this.applySelectionData(this.tagDocumentCounts(), this.tagSelectionModel)
@@ -381,7 +383,7 @@ export class BulkEditorComponent
     }
 
     this.documentService
-      .getSelectionData(Array.from(this.list.selected))
+      .getSelectionData(this.getSelectionQuery())
       .pipe(first())
       .subscribe((s) => {
         this.tagDocumentCounts.set(s.selected_tags)
@@ -390,7 +392,7 @@ export class BulkEditorComponent
   }
 
   openDocumentTypeDropdown() {
-    if (this.list.allSelected) {
+    if (this.list.allSelected && this.list.excluded.size === 0) {
       const selectionData = this.list.selectionData
       this.documentTypeDocumentCounts.set(
         selectionData?.selected_document_types ?? []
@@ -403,7 +405,7 @@ export class BulkEditorComponent
     }
 
     this.documentService
-      .getSelectionData(Array.from(this.list.selected))
+      .getSelectionData(this.getSelectionQuery())
       .pipe(first())
       .subscribe((s) => {
         this.documentTypeDocumentCounts.set(s.selected_document_types)
@@ -415,7 +417,7 @@ export class BulkEditorComponent
   }
 
   openCorrespondentDropdown() {
-    if (this.list.allSelected) {
+    if (this.list.allSelected && this.list.excluded.size === 0) {
       const selectionData = this.list.selectionData
       this.correspondentDocumentCounts.set(
         selectionData?.selected_correspondents ?? []
@@ -428,7 +430,7 @@ export class BulkEditorComponent
     }
 
     this.documentService
-      .getSelectionData(Array.from(this.list.selected))
+      .getSelectionData(this.getSelectionQuery())
       .pipe(first())
       .subscribe((s) => {
         this.correspondentDocumentCounts.set(s.selected_correspondents)
@@ -440,7 +442,7 @@ export class BulkEditorComponent
   }
 
   openStoragePathDropdown() {
-    if (this.list.allSelected) {
+    if (this.list.allSelected && this.list.excluded.size === 0) {
       const selectionData = this.list.selectionData
       this.storagePathDocumentCounts.set(
         selectionData?.selected_storage_paths ?? []
@@ -453,7 +455,7 @@ export class BulkEditorComponent
     }
 
     this.documentService
-      .getSelectionData(Array.from(this.list.selected))
+      .getSelectionData(this.getSelectionQuery())
       .pipe(first())
       .subscribe((s) => {
         this.storagePathDocumentCounts.set(s.selected_storage_paths)
@@ -465,7 +467,7 @@ export class BulkEditorComponent
   }
 
   openCustomFieldsDropdown() {
-    if (this.list.allSelected) {
+    if (this.list.allSelected && this.list.excluded.size === 0) {
       const selectionData = this.list.selectionData
       this.customFieldDocumentCounts.set(
         selectionData?.selected_custom_fields ?? []
@@ -478,7 +480,7 @@ export class BulkEditorComponent
     }
 
     this.documentService
-      .getSelectionData(Array.from(this.list.selected))
+      .getSelectionData(this.getSelectionQuery())
       .pipe(first())
       .subscribe((s) => {
         this.customFieldDocumentCounts.set(s.selected_custom_fields)
