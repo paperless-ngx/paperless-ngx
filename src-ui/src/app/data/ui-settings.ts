@@ -27,6 +27,7 @@ export enum CollapsibleSection {
 export enum HideableSidebarItemID {
   Dashboard = 'dashboard',
   SavedViews = 'saved_views',
+  ShareLinks = 'share_links',
   Workflows = 'workflows',
   Mail = 'mail',
   Documentation = 'documentation',
