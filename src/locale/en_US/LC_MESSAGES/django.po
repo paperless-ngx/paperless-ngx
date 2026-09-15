@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-15 15:44+0000\n"
+"POT-Creation-Date: 2026-09-15 18:47+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1631,49 +1631,49 @@ msgstr ""
 msgid "workflow runs"
 msgstr ""
 
-#: documents/serialisers.py:525 documents/serialisers.py:882
-#: documents/serialisers.py:2864 documents/views.py:343 documents/views.py:2719
+#: documents/serialisers.py:514 documents/serialisers.py:871
+#: documents/serialisers.py:2858 documents/views.py:343 documents/views.py:2719
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr ""
 
-#: documents/serialisers.py:718
+#: documents/serialisers.py:707
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:2337
+#: documents/serialisers.py:2331
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:2381
+#: documents/serialisers.py:2375
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:2388
+#: documents/serialisers.py:2382
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:2405 documents/serialisers.py:2415
+#: documents/serialisers.py:2399 documents/serialisers.py:2409
 msgid ""
 "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:2410
+#: documents/serialisers.py:2404
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:2557
+#: documents/serialisers.py:2551
 msgid "Invalid variable detected."
 msgstr ""
 
-#: documents/serialisers.py:2920
+#: documents/serialisers.py:2914
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2950 documents/views.py:4742
+#: documents/serialisers.py:2944 documents/views.py:4742
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
