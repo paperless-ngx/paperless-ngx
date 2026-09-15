@@ -1,5 +1,8 @@
+import pickle
 import re
 import warnings
+from datetime import UTC
+from datetime import datetime
 from pathlib import Path
 from unittest import mock
 
@@ -10,6 +13,7 @@ from django.db import connection
 from django.test import TestCase
 from django.test import override_settings
 from django.test.utils import CaptureQueriesContext
+from pytest_django.fixtures import Settings
 from pytest_mock import MockerFixture
 
 from documents.classifier import ClassifierModelCorruptError
@@ -912,6 +916,85 @@ class TestClassifier(DirectoriesMixin, TestCase):
         mock_load.side_effect = Exception()
         with self.assertRaises(Exception):
             load_classifier(raise_exception=True)
+
+
+class TestClassifierSave:
+    @pytest.fixture
+    def model_file(self, tmp_path: Path, settings: Settings) -> Path:
+        settings.MODEL_FILE = tmp_path / "classifier.pickle"
+        return settings.MODEL_FILE
+
+    @pytest.fixture
+    def classifier(self) -> DocumentClassifier:
+        classifier = DocumentClassifier()
+        classifier.last_doc_change_time = datetime(2026, 1, 2, 3, 4, 5, tzinfo=UTC)
+        classifier.last_auto_type_hash = b"\x01" * 32
+        return classifier
+
+    def test_save_writes_signed_pickle(
+        self,
+        model_file: Path,
+        classifier: DocumentClassifier,
+    ) -> None:
+        """
+        GIVEN:
+            - A classifier with training state
+        WHEN:
+            - The classifier is saved
+        THEN:
+            - The file is the HMAC of the pickled state followed by that pickle
+            - The pickle uses the highest protocol
+            - The saved state loads back into a new classifier
+            - No temporary file is left behind
+        """
+        classifier.save()
+
+        raw = model_file.read_bytes()
+        signature = raw[: DocumentClassifier.HMAC_SIZE]
+        data = raw[DocumentClassifier.HMAC_SIZE :]
+        assert signature == DocumentClassifier._compute_hmac(data)
+        # A pickle opens with the PROTO opcode followed by the protocol number
+        assert data[:2] == bytes([pickle.PROTO[0], pickle.HIGHEST_PROTOCOL])
+        assert pickle.loads(data)[:3] == (
+            DocumentClassifier.FORMAT_VERSION,
+            classifier.last_doc_change_time,
+            classifier.last_auto_type_hash,
+        )
+
+        loaded = DocumentClassifier()
+        loaded.load()
+        assert loaded.last_doc_change_time == classifier.last_doc_change_time
+        assert loaded.last_auto_type_hash == classifier.last_auto_type_hash
+
+        assert not model_file.with_name(f"{model_file.name}.part").exists()
+
+    def test_save_failure_removes_partial_file(
+        self,
+        model_file: Path,
+        classifier: DocumentClassifier,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - An existing classifier model file
+        WHEN:
+            - Saving a new classifier fails part way through writing
+        THEN:
+            - The error is raised
+            - The partially written temporary file is removed
+            - The existing model file is left untouched
+        """
+        model_file.write_bytes(b"existing model")
+        mocker.patch(
+            "documents.classifier.pickle.dump",
+            side_effect=RuntimeError("disk full"),
+        )
+
+        with pytest.raises(RuntimeError, match="disk full"):
+            classifier.save()
+
+        assert not model_file.with_name(f"{model_file.name}.part").exists()
+        assert model_file.read_bytes() == b"existing model"
 
 
 class _StubProbaClassifier:
