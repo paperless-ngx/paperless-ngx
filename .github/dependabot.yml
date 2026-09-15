@@ -81,7 +81,6 @@ updates:
       # Data, NLP, and Search
       data-nlp-search:
         patterns:
-          - "nltk"
           - "scikit-learn"
           - "langdetect"
           - "rapidfuzz"

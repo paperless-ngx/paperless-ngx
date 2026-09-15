@@ -73,8 +73,6 @@ SHARE_LINK_BUNDLE_DIR = MEDIA_ROOT / "documents" / "share_link_bundles"
 
 DATA_DIR = get_path_from_env("PAPERLESS_DATA_DIR", BASE_DIR.parent / "data")
 
-NLTK_DIR = get_path_from_env("PAPERLESS_NLTK_DIR", "/usr/share/nltk_data")
-
 # Check deprecated setting first
 EMPTY_TRASH_DIR = (
     get_path_from_env("PAPERLESS_TRASH_DIR", os.getenv("PAPERLESS_EMPTY_TRASH_DIR"))
@@ -1067,39 +1065,30 @@ APP_LOGO = os.getenv("PAPERLESS_APP_LOGO", None)
 ###############################################################################
 
 
-def _get_nltk_language_setting(ocr_lang: str) -> str | None:
+CLASSIFIER_LANGUAGES: Final[dict[str, str]] = {
+    "dan": "danish",
+    "nld": "dutch",
+    "eng": "english",
+    "fin": "finnish",
+    "fra": "french",
+    "deu": "german",
+    "ita": "italian",
+    "nor": "norwegian",
+    "por": "portuguese",
+    "rus": "russian",
+    "spa": "spanish",
+    "swe": "swedish",
+}
+
+
+def _get_classifier_language_setting(ocr_lang: str) -> str | None:
     """
-    Maps an ISO-639-1 language code supported by Tesseract into
-    an optional NLTK language name.  This is the set of common supported
-    languages for all the NLTK data used.
+    Maps the primary Tesseract language to the classifier's stemming
+    language, or None if unsupported.
 
     Assumption: The primary language is first
-
-    NLTK Languages:
-      - https://www.nltk.org/api/nltk.stem.snowball.html#nltk.stem.snowball.SnowballStemmer
-      - https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/tokenizers/punkt.zip
-      - https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/stopwords.zip
-
-    The common intersection between all languages in those 3 is handled here
-
     """
-    ocr_lang = ocr_lang.split("+", maxsplit=1)[0]
-    iso_code_to_nltk = {
-        "dan": "danish",
-        "nld": "dutch",
-        "eng": "english",
-        "fin": "finnish",
-        "fra": "french",
-        "deu": "german",
-        "ita": "italian",
-        "nor": "norwegian",
-        "por": "portuguese",
-        "rus": "russian",
-        "spa": "spanish",
-        "swe": "swedish",
-    }
-
-    return iso_code_to_nltk.get(ocr_lang)
+    return CLASSIFIER_LANGUAGES.get(ocr_lang.split("+", maxsplit=1)[0])
 
 
 def _get_search_language_setting(ocr_lang: str) -> str | None:
@@ -1145,9 +1134,7 @@ def _get_search_language_setting(ocr_lang: str) -> str | None:
     return _ocr_to_search.get(primary)
 
 
-NLTK_ENABLED: Final[bool] = get_bool_from_env("PAPERLESS_ENABLE_NLTK", "yes")
-
-NLTK_LANGUAGE: str | None = _get_nltk_language_setting(OCR_LANGUAGE)
+CLASSIFIER_LANGUAGE: str | None = _get_classifier_language_setting(OCR_LANGUAGE)
 
 SEARCH_LANGUAGE: str | None = _get_search_language_setting(OCR_LANGUAGE)
 

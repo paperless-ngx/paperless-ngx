@@ -12,7 +12,6 @@ concurrency:
   cancel-in-progress: true
 env:
   DEFAULT_UV_VERSION: "0.12.x"
-  NLTK_DATA: "/usr/share/nltk_data"
 permissions: {}
 jobs:
   changes:
@@ -125,12 +124,8 @@ jobs:
       - name: List installed Python dependencies
         run: |
           uv pip list
-      - name: Install NLTK data
-        run: |
-          uv run python -m nltk.downloader punkt punkt_tab snowball_data stopwords -d "${NLTK_DATA}"
       - name: Run tests
         env:
-          NLTK_DATA: ${{ env.NLTK_DATA }}
           PAPERLESS_CI_TEST: 1
           PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}
         run: |
