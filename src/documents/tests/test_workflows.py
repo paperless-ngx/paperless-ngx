@@ -3770,6 +3770,66 @@ class TestWorkflows(
             self.assertIn(expected_str, cm.output[0])
 
     @override_settings(
+        EMAIL_ENABLED=True,
+        PAPERLESS_URL="http://localhost:8000",
+    )
+    @mock.patch("django.core.mail.message.EmailMessage.send")
+    def test_workflow_email_action_template_error(self, mock_email_send) -> None:
+        """
+        GIVEN:
+            - Document added workflow with an email action whose body uses an
+              undefined template variable, followed by an assignment action
+        WHEN:
+            - Document consumption finishes
+        THEN:
+            - Error is logged, consumption is not aborted
+            - No email is sent
+            - Subsequent actions still run
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        email_action = WorkflowActionEmail.objects.create(
+            subject="Test Notification: {{ doc_title }}",
+            body="Document Title: {{ title }}",
+            to="me@example.com",
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.EMAIL,
+            email=email_action,
+            order=0,
+        )
+        assignment_action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            assign_correspondent=self.c2,
+            order=1,
+        )
+        w = Workflow.objects.create(
+            name="Workflow 1",
+            order=0,
+        )
+        w.triggers.add(trigger)
+        w.actions.add(action, assignment_action)
+        w.save()
+
+        doc = Document.objects.create(
+            title="sample test",
+            correspondent=self.c,
+            original_filename="sample.pdf",
+        )
+
+        with self.assertLogs("paperless.workflows", level="ERROR") as cm:
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=doc,
+            )
+
+        self.assertIn("'title' is undefined", cm.output[0])
+        mock_email_send.assert_not_called()
+        doc.refresh_from_db()
+        self.assertEqual(doc.correspondent, self.c2)
+
+    @override_settings(
         PAPERLESS_EMAIL_HOST="localhost",
         EMAIL_ENABLED=True,
         PAPERLESS_URL="http://localhost:8000",
