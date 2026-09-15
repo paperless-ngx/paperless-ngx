@@ -413,18 +413,12 @@ details.
 
     Defaults to `PAPERLESS_DATA_DIR/log/`.
 
-#### [`PAPERLESS_NLTK_DIR=<path>`](#PAPERLESS_NLTK_DIR) {#PAPERLESS_NLTK_DIR}
+#### ~~[`PAPERLESS_NLTK_DIR`](#PAPERLESS_NLTK_DIR)~~ {#PAPERLESS_NLTK_DIR}
 
-: This is where paperless will search for the data required for NLTK
-processing, if you are using it. If you are using the Docker image,
-this should not be changed, as the data is included in the image
-already.
+!!! failure "Removed in v3.2"
 
-Previously, the location defaulted to `PAPERLESS_DATA_DIR/nltk`.
-Unless you are using this in a bare metal install or other setup,
-this folder is no longer needed and can be removed manually.
-
-Defaults to `/usr/share/nltk_data`
+    Removed and ignored. Any previously downloaded NLTK data folder can be
+    deleted.
 
 #### [`PAPERLESS_MODEL_FILE=<path>`](#PAPERLESS_MODEL_FILE) {#PAPERLESS_MODEL_FILE}
 
@@ -1190,15 +1184,14 @@ for details on how to set it.
 
     Defaults to UTC.
 
-#### [`PAPERLESS_ENABLE_NLTK=<bool>`](#PAPERLESS_ENABLE_NLTK) {#PAPERLESS_ENABLE_NLTK}
+#### ~~[`PAPERLESS_ENABLE_NLTK`](#PAPERLESS_ENABLE_NLTK)~~ {#PAPERLESS_ENABLE_NLTK}
 
-: Enables or disables the advanced natural language processing
-used during automatic classification. If disabled, paperless will
-still perform some basic text pre-processing before matching.
+!!! failure "Removed in v3.2"
 
-: See also `PAPERLESS_NLTK_DIR`.
-
-    Defaults to true, enabling the feature.
+    Removed and ignored. Automatic classification always removes stop words
+    and stems words when the primary OCR language is Danish, Dutch, English,
+    Finnish, French, German, Italian, Norwegian, Portuguese, Russian, Spanish
+    or Swedish. Other languages are only lowercased and split into words.
 
 #### [`PAPERLESS_CLASSIFIER_MATCH_THRESHOLD=<float>`](#PAPERLESS_CLASSIFIER_MATCH_THRESHOLD) {#PAPERLESS_CLASSIFIER_MATCH_THRESHOLD}
 
