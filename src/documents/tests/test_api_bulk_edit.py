@@ -1201,6 +1201,48 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_not_called()
 
     @mock.patch("documents.serialisers.bulk_edit.set_permissions")
+    def test_set_permissions_rejects_invalid_owner(self, m) -> None:
+        """
+        GIVEN:
+            - A set_permissions bulk edit with an owner that is a nonexistent
+              id, a boolean, a list, a dict, or a non-numeric string
+        WHEN:
+            - API to bulk edit is called
+        THEN:
+            - API returns HTTP 400
+            - set_permissions is not called
+        """
+        self.setup_mock(m, "set_permissions")
+
+        for bad_owner in (
+            999999,
+            True,
+            ["not", "an", "id"],
+            {"nested": "dict"},
+            "not-a-number",
+        ):
+            with self.subTest(owner=bad_owner):
+                response = self.client.post(
+                    "/api/documents/bulk_edit/",
+                    json.dumps(
+                        {
+                            "documents": [self.doc2.id],
+                            "method": "set_permissions",
+                            "parameters": {
+                                "set_permissions": {
+                                    "view": {"users": [self.user.id]},
+                                },
+                                "owner": bad_owner,
+                            },
+                        },
+                    ),
+                    content_type="application/json",
+                )
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertIn(b"Specified owner cannot be found", response.content)
+        m.assert_not_called()
+
+    @mock.patch("documents.serialisers.bulk_edit.set_permissions")
     def test_set_permissions_null_is_a_noop(self, m) -> None:
         """
         GIVEN:
@@ -1235,6 +1277,37 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             m.call_args.kwargs["set_permissions"],
             {"view": {}, "change": {}},
         )
+
+    @mock.patch("documents.serialisers.bulk_edit.set_permissions")
+    def test_set_permissions_passes_validated_owner_id(self, m) -> None:
+        """
+        GIVEN:
+            - A set_permissions bulk edit with the owner id given as a string
+        WHEN:
+            - API to bulk edit is called
+        THEN:
+            - set_permissions receives the owner as an integer id
+        """
+        self.setup_mock(m, "set_permissions")
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "set_permissions",
+                    "parameters": {
+                        "set_permissions": {"view": {"users": [self.user.id]}},
+                        "owner": str(self.user.id),
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        self.assertEqual(m.call_args.kwargs["owner"], self.user.id)
 
     @mock.patch("documents.serialisers.bulk_edit.set_permissions")
     def test_set_permissions_merge(self, m) -> None:
@@ -1507,7 +1580,145 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.post(
+            "/api/documents/rotate/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id, self.doc3.id],
+                    "degrees": 45,
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"degrees must be a multiple of 90", response.content)
         m.assert_not_called()
+
+    @mock.patch("documents.serialisers.bulk_edit.rotate")
+    def test_bulk_edit_rotate_rejects_invalid_degrees(self, m) -> None:
+        """
+        GIVEN:
+            - A legacy rotate bulk edit with degrees that are null, not an
+              integer, or not a multiple of 90
+        WHEN:
+            - API to bulk edit is called
+        THEN:
+            - API returns HTTP 400
+            - rotate is not called
+        """
+        self.setup_mock(m, "rotate")
+
+        for degrees, expected_message in (
+            (None, b"invalid rotation degrees"),
+            (True, b"invalid rotation degrees"),
+            ("foo", b"invalid rotation degrees"),
+            (90.5, b"invalid rotation degrees"),
+            (45, b"degrees must be a multiple of 90"),
+        ):
+            with self.subTest(degrees=degrees):
+                response = self.client.post(
+                    "/api/documents/bulk_edit/",
+                    json.dumps(
+                        {
+                            "documents": [self.doc2.id],
+                            "method": "rotate",
+                            "parameters": {"degrees": degrees},
+                        },
+                    ),
+                    content_type="application/json",
+                )
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertIn(expected_message, response.content)
+        m.assert_not_called()
+
+    @mock.patch("documents.serialisers.bulk_edit.rotate")
+    def test_bulk_edit_rotate_passes_integer_degrees(self, m) -> None:
+        """
+        GIVEN:
+            - A legacy rotate bulk edit with degrees given as a string
+        WHEN:
+            - API to bulk edit is called
+        THEN:
+            - rotate receives the degrees as an integer
+        """
+        self.setup_mock(m, "rotate")
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "rotate",
+                    "parameters": {"degrees": "-90"},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        self.assertEqual(m.call_args.kwargs["degrees"], -90)
+
+    @mock.patch("documents.serialisers.bulk_edit.split")
+    def test_bulk_edit_split_rejects_invalid_pages(self, m) -> None:
+        """
+        GIVEN:
+            - A legacy split bulk edit of a 5 page document with pages that
+              are not a string, not numeric, zero, a reversed range, or past
+              the last page
+        WHEN:
+            - API to bulk edit is called
+        THEN:
+            - API returns HTTP 400
+            - split is not called
+        """
+        self.setup_mock(m, "split")
+
+        for pages in (None, "", "a", "1-2-3", "0", "3-1", "1-6", "1-5000000"):
+            with self.subTest(pages=pages):
+                response = self.client.post(
+                    "/api/documents/bulk_edit/",
+                    json.dumps(
+                        {
+                            "documents": [self.doc2.id],
+                            "method": "split",
+                            "parameters": {"pages": pages},
+                        },
+                    ),
+                    content_type="application/json",
+                )
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertIn(b"invalid pages specified", response.content)
+        m.assert_not_called()
+
+    @mock.patch("documents.serialisers.bulk_edit.split")
+    def test_bulk_edit_split_parses_pages(self, m) -> None:
+        """
+        GIVEN:
+            - A legacy split bulk edit with single pages and ranges
+        WHEN:
+            - API to bulk edit is called
+        THEN:
+            - split receives one page list per comma separated group
+        """
+        self.setup_mock(m, "split")
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "split",
+                    "parameters": {"pages": "1,2-4,5"},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        self.assertEqual(m.call_args.kwargs["pages"], [[1], [2, 3, 4], [5]])
 
     @mock.patch("documents.views.bulk_edit.rotate")
     def test_rotate_insufficient_permissions(self, m) -> None:
