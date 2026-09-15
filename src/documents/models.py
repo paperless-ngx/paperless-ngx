@@ -1,4 +1,5 @@
 import datetime
+import uuid
 from pathlib import Path
 from typing import Final
 
@@ -227,6 +228,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         editable=False,
         blank=True,
         null=True,
+        db_index=True,
         help_text=_("The checksum of the archived document."),
     )
 
@@ -373,6 +375,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         If the queryset already annotated ``effective_content``, that value is used.
         """
         # Here to avoid circular import
+        from documents.versioning import LATEST_VERSION_CONTENT_PREFETCH_ATTR
         from documents.versioning import sort_versions_newest_first
         from documents.versioning import versions_newest_first
 
@@ -381,6 +384,19 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
 
         if self.root_document_id is not None or self.pk is None:
             return self.content
+
+        latest_version_prefetch = getattr(
+            self,
+            LATEST_VERSION_CONTENT_PREFETCH_ATTR,
+            None,
+        )
+        if latest_version_prefetch is not None:
+            # Empty list means prefetch ran and found no versions — use own content.
+            return (
+                latest_version_prefetch[0].content
+                if latest_version_prefetch
+                else self.content
+            )
 
         prefetched_cache = getattr(self, "_prefetched_objects_cache", None)
         prefetched_versions = (
@@ -513,13 +529,20 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
     def delete(
         self,
         *args,
+        transaction_id=None,
         **kwargs,
     ):
-        # If deleting a root document, move all its versions to trash as well.
+        # Versions must share the root's transaction ID so they are restored
+        # together by django-softdelete.
+        if transaction_id is None:
+            transaction_id = uuid.uuid4()
         if self.root_document_id is None:
-            Document.objects.filter(root_document=self).delete()
+            Document.objects.filter(root_document=self).delete(
+                transaction_id=transaction_id,
+            )
         return super().delete(
             *args,
+            transaction_id=transaction_id,
             **kwargs,
         )
 
@@ -706,6 +729,7 @@ class SavedViewFilterRule(models.Model):
         (47, _("mime type is")),
         (48, _("simple title search")),
         (49, _("simple text search")),
+        (50, _("has duplicates")),
     ]
 
     saved_view = models.ForeignKey(

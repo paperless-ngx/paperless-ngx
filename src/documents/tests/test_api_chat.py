@@ -38,6 +38,42 @@ class TestChatStreamingViewInputValidation(APITestCase):
             )
         assert resp.status_code == status.HTTP_400_BAD_REQUEST
 
+    def test_answer_is_not_compressed(self) -> None:
+        """
+        GIVEN:
+            - A client that accepts compressed responses
+        WHEN:
+            - It asks the chat endpoint a question
+        THEN:
+            - The answer is streamed unencoded, chunk for chunk
+
+        The stream compressors buffer, so a compressed answer arrives in one
+        piece. The view cannot opt out by flagging the request: DRF's request
+        wrapper proxies reads but keeps writes to itself, so the flag never
+        reaches the Django request the middleware sees.
+        """
+        chunks = [f"token{i} " for i in range(40)]
+        with (
+            mock.patch(
+                "documents.views.AIConfig",
+                return_value=self._mock_ai_enabled(),
+            ),
+            mock.patch(
+                "documents.views.stream_chat_with_documents",
+                return_value=iter(chunks),
+            ),
+        ):
+            resp = self.client.post(
+                "/api/documents/chat/",
+                {"q": "What is in my archive?"},
+                format="json",
+                HTTP_ACCEPT_ENCODING="gzip, deflate, br, zstd",
+            )
+
+        assert resp.status_code == status.HTTP_200_OK
+        assert not resp.has_header("Content-Encoding")
+        assert list(resp.streaming_content) == [c.encode() for c in chunks]
+
     def test_missing_question_is_rejected(self) -> None:
         with mock.patch(
             "documents.views.AIConfig",

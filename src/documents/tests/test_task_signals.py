@@ -106,6 +106,17 @@ class TestBeforeTaskPublishHandler:
         assert task.task_type == PaperlessTask.TaskType.TRAIN_CLASSIFIER
         assert task.trigger_source == PaperlessTask.TriggerSource.MANUAL
 
+        # A Celery retry republishes with the same task_id; this must not
+        # raise a duplicate-key IntegrityError, and must leave the original
+        # PENDING record alone.
+        send_publish(
+            "documents.tasks.train_classifier",
+            (),
+            {},
+            headers={"id": task_id},
+        )
+        assert PaperlessTask.objects.filter(task_id=task_id).count() == 1
+
     def test_creates_task_for_sanity_check(self) -> None:
         task_id = send_publish("documents.tasks.sanity_check", (), {})
         task = PaperlessTask.objects.get(task_id=task_id)

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 from httpx import codes
-from pytest_django.fixtures import SettingsWrapper
+from pytest_django.fixtures import Settings
 from pytest_httpx import HTTPXMock
 
 from documents.parsers import ParseError
@@ -27,7 +27,7 @@ class TestTikaParserRegistryInterface:
 
     def test_score_returns_none_when_tika_disabled(
         self,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         settings.TIKA_ENABLED = False
         result = TikaDocumentParser.score(
@@ -38,7 +38,7 @@ class TestTikaParserRegistryInterface:
 
     def test_score_returns_int_when_tika_enabled(
         self,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         settings.TIKA_ENABLED = True
         result = TikaDocumentParser.score(
@@ -49,7 +49,7 @@ class TestTikaParserRegistryInterface:
 
     def test_score_returns_none_for_unsupported_mime(
         self,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         settings.TIKA_ENABLED = True
         result = TikaDocumentParser.score("application/pdf", "doc.pdf")
@@ -90,7 +90,7 @@ class TestTikaParser:
     def test_parse(
         self,
         httpx_mock: HTTPXMock,
-        settings: SettingsWrapper,
+        settings: Settings,
         tika_parser: TikaDocumentParser,
         sample_odt_file: Path,
     ) -> None:
@@ -179,7 +179,7 @@ class TestTikaParser:
         setting_value: str,
         expected_form_value: str,
         httpx_mock: HTTPXMock,
-        settings: SettingsWrapper,
+        settings: Settings,
         sample_odt_file: Path,
     ) -> None:
         """

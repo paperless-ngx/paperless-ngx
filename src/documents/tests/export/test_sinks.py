@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 import pytest_mock
-from pytest_django.fixtures import SettingsWrapper
+from pytest_django.fixtures import Settings
 
 from documents.export.sinks import DirectoryExportSink
 from documents.export.sinks import ExportSink
@@ -242,7 +242,7 @@ class TestZipExportSink:
         self,
         tmp_path: Path,
         source_file: Path,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         scratch_dir = tmp_path / "scratch"
         settings.SCRATCH_DIR = scratch_dir
@@ -261,7 +261,7 @@ class TestZipExportSink:
     def test_abort_after_manifest_written_cleans_up_pending_tmp(
         self,
         tmp_path: Path,
-        settings: SettingsWrapper,
+        settings: Settings,
     ) -> None:
         scratch_dir = tmp_path / "scratch"
         settings.SCRATCH_DIR = scratch_dir

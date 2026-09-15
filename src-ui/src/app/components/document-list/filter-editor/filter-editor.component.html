@@ -10,7 +10,7 @@
             }
           </div>
         </div>
-        @if (textFilterTarget === 'asn') {
+        @if (textFilterTarget === 'asn' || textFilterTarget === 'duplicates') {
           <select class="form-select flex-grow-0 w-auto" [(ngModel)]="textFilterModifier" (change)="textFilterModifierChange()">
             @for (m of textFilterModifiers; track m) {
               <option ngbDropdownItem [value]="m.id">{{m.label}}</option>
@@ -23,7 +23,7 @@
           </button>
         }
         <input #textFilterInput class="form-control form-control-sm" type="text"
-        [disabled]="textFilterModifierIsNull"
+        [disabled]="textFilterInputDisabled"
         [(ngModel)]="textFilter"
         (keydown)="textFilterKeydown($event)"
         [ngbTypeahead]="searchAutoComplete"

@@ -7,6 +7,7 @@ import {
   FILTER_HAS_ANY_TAG,
   FILTER_HAS_CUSTOM_FIELDS_ALL,
   FILTER_HAS_CUSTOM_FIELDS_ANY,
+  FILTER_HAS_DUPLICATES,
   FILTER_HAS_TAGS_ALL,
   FILTER_SIMPLE_TEXT,
   FILTER_SIMPLE_TITLE,
@@ -134,6 +135,16 @@ describe('QueryParams Utils', () => {
 
     params = queryParamsFromFilterRules([
       {
+        rule_type: FILTER_HAS_DUPLICATES,
+        value: 'false',
+      },
+    ])
+    expect(params).toEqual({
+      has_duplicates: 0,
+    })
+
+    params = queryParamsFromFilterRules([
+      {
         rule_type: FILTER_TITLE_CONTENT,
         value: 'bank statement',
       },
@@ -243,6 +254,18 @@ describe('QueryParams Utils', () => {
     expect(rules).toEqual([
       {
         rule_type: FILTER_HAS_ANY_TAG,
+        value: 'true',
+      },
+    ])
+
+    rules = filterRulesFromQueryParams(
+      convertToParamMap({
+        has_duplicates: 'true',
+      })
+    )
+    expect(rules).toEqual([
+      {
+        rule_type: FILTER_HAS_DUPLICATES,
         value: 'true',
       },
     ])

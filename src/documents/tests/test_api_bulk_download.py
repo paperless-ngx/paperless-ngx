@@ -4,6 +4,7 @@ import json
 import shutil
 import zipfile
 
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
@@ -326,6 +327,9 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
 
     def test_download_insufficient_permissions(self) -> None:
         user = User.objects.create_user(username="temp_user")
+        user.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
         self.client.force_authenticate(user=user)
 
         self.doc2.owner = self.user
@@ -339,3 +343,29 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(response.content, b"Insufficient permissions")
+
+    def test_bad_search_query_returns_400(self) -> None:
+        """
+        GIVEN:
+            - Bulk download request selects documents via a saved-search
+              query filter
+        WHEN:
+            - The query contains a malformed field value (an invalid date)
+        THEN:
+            - The response is a 400 naming the bad value, exactly like the
+              search list endpoint, never a 500
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "all": True,
+                    "filters": {"query": "added:notadate"},
+                    "content": "originals",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"notadate", response.content)

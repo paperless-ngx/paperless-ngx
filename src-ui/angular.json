@@ -71,8 +71,10 @@
             "tsConfig": "tsconfig.app.json",
             "localize": true,
             "assets": [
-              "src/favicon.ico",
               "src/apple-touch-icon.png",
+              "src/icon-192.png",
+              "src/icon-512.png",
+              "src/icon-512-maskable.png",
               "src/assets",
               "src/manifest.webmanifest",
               {

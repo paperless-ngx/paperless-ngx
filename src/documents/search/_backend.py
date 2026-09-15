@@ -22,7 +22,6 @@ import tantivy
 from django.conf import settings
 from django.utils.timezone import get_current_timezone
 
-from documents.search._query import build_permission_filter
 from documents.search._query import extract_cjk_text
 from documents.search._query import parse_simple_text_highlight_query
 from documents.search._query import parse_simple_text_query
@@ -40,6 +39,7 @@ from documents.utils import QuerySetStream
 from documents.utils import identity
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from collections.abc import Iterator
     from collections.abc import Sequence
     from pathlib import Path
@@ -284,6 +284,87 @@ class WriteBatch:
             tantivy.Query.term_query(self._backend._schema, "id", doc_id),
         )
 
+    def add_or_update_ids(self, ids: Sequence[int]) -> None:
+        """
+        Add or update multiple documents in the batch by primary key.
+
+        Unlike calling ``add_or_update()`` once per document, this resolves
+        viewer permissions and effective (versioned) content in bulk against
+        the ids as a whole, instead of once per document -- see
+        ``_DocumentViewerStream`` and ``annotate_effective_content``. Use
+        this whenever more than one document is being written in the same
+        batch.
+
+        An id with no matching document (e.g. deleted between the caller
+        collecting ids and the batch running) is silently skipped, matching
+        ``add_or_update()``'s existing single-document deferred-task behavior
+        rather than erroring or leaving a stale index entry.
+
+        Args:
+            ids: Primary keys of Document instances to index
+        """
+        from documents.models import Document
+        from documents.versioning import annotate_effective_content
+
+        ids = list(ids)
+        if not ids:
+            return
+
+        queryset = annotate_effective_content(
+            Document.objects.filter(pk__in=ids)
+            .select_related("correspondent", "document_type", "storage_path", "owner")
+            .prefetch_related("tags", "notes__user", "custom_fields__field"),
+        )
+        for document, grant in _DocumentViewerStream(queryset, chunk_size=1000):
+            self.remove(document.pk)
+            doc = self._backend._build_tantivy_doc(
+                document,
+                viewer_ids=grant.viewer_ids,
+                viewer_group_ids=grant.viewer_group_ids,
+            )
+            self._writer.add_document(doc)
+
+
+def build_permission_filter(
+    schema: tantivy.Schema,
+    user: AbstractUser,
+    viewer_group_ids: Iterable[int] = (),
+) -> tantivy.Query:
+    """
+    Build a query filter for user document permissions.
+
+    Creates a query that matches only documents visible to the specified user
+    according to paperless-ngx permission rules:
+    - Public documents (no owner) are visible to all users
+    - Private documents are visible to their owner
+    - Documents explicitly shared with the user are visible
+    - Documents shared with one of the user's current groups are visible
+
+    Args:
+        schema: Tantivy schema for field validation
+        user: User to check permissions for
+        viewer_group_ids: Current group memberships for the user
+
+    Returns:
+        Tantivy query that filters results to visible documents
+    """
+    owner_any = tantivy.Query.exists_query("owner_id")
+    no_owner = tantivy.Query.boolean_query(
+        [
+            (tantivy.Occur.Must, tantivy.Query.all_query()),
+            (tantivy.Occur.MustNot, owner_any),
+        ],
+    )
+    owned = tantivy.Query.term_query(schema, "owner_id", user.pk)
+    shared = tantivy.Query.term_query(schema, "viewer_id", user.pk)
+    group_shared = [
+        tantivy.Query.term_query(schema, "viewer_group_id", group_id)
+        for group_id in viewer_group_ids
+    ]
+    return tantivy.Query.disjunction_max_query(
+        [no_owner, owned, shared, *group_shared],
+    )
+
 
 class TantivyBackend:
     """
@@ -458,7 +539,6 @@ class TantivyBackend:
             doc.add_text("correspondent_sort", document.correspondent.name)
             if cjk_corr := extract_cjk_text(document.correspondent.name):
                 doc.add_text("bigram_correspondent", cjk_corr)
-            doc.add_unsigned("correspondent_id", document.correspondent_id)
 
         # Document type
         if document.document_type:
@@ -466,12 +546,10 @@ class TantivyBackend:
             doc.add_text("type_sort", document.document_type.name)
             if cjk_type := extract_cjk_text(document.document_type.name):
                 doc.add_text("bigram_document_type", cjk_type)
-            doc.add_unsigned("document_type_id", document.document_type_id)
 
         # Storage path
         if document.storage_path:
             doc.add_text("storage_path", document.storage_path.name)
-            doc.add_unsigned("storage_path_id", document.storage_path_id)
 
         # Tags — collect names for autocomplete in the same pass
         tag_names: list[str] = []
@@ -479,12 +557,13 @@ class TantivyBackend:
             doc.add_text("tag", tag.name)
             if cjk_tag := extract_cjk_text(tag.name):
                 doc.add_text("bigram_tag", cjk_tag)
-            doc.add_unsigned("tag_id", tag.pk)
             tag_names.append(tag.name)
 
         # Notes — JSON for structured queries (notes.user:alice, notes.note:text).
         # notes_text is a plain-text companion for snippet/highlight generation;
-        # tantivy's SnippetGenerator does not support JSON fields.
+        # tantivy's SnippetGenerator does not support JSON fields. It is not in
+        # _DEFAULT_SEARCH_FIELDS, so an unqualified query never searches it: a
+        # note matches through the JSON field or not at all.
         num_notes = 0
         note_texts: list[str] = []
         for note in document.notes.all():
@@ -500,8 +579,9 @@ class TantivyBackend:
         if note_texts:
             doc.add_text("notes_text", " ".join(note_texts))
 
-        # Custom fields — JSON for structured queries (custom_fields.name:x, custom_fields.value:y),
-        # companion text field for default full-text search.
+        # Custom fields: JSON for structured queries (custom_fields.name:x,
+        # custom_fields.value:y). There is no companion text field here, unlike
+        # notes: custom field values are reachable only through the JSON field.
         for cfi in document.custom_fields.all():
             search_value = cfi.value_for_search
             # Skip fields where there is no value yet
@@ -668,7 +748,17 @@ class TantivyBackend:
         user_query = self._parse_query(query, search_mode)
         highlight_query = user_query
         if search_mode is SearchMode.TEXT:
-            highlight_query = parse_simple_text_highlight_query(self._index, query)
+            try:
+                highlight_query = parse_simple_text_highlight_query(
+                    self._index,
+                    query,
+                )
+            except ValueError:
+                logger.debug(
+                    "Skipping simple text highlight query: token string is not "
+                    "valid tantivy query syntax: %r",
+                    query,
+                )
 
         # For notes_text snippet generation, we need a query that targets the
         # notes_text field directly. user_query may contain JSON-field terms

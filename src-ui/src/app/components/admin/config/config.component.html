@@ -23,17 +23,30 @@
                                     <div class="col">
                                         <div class="card bg-light">
                                             <div class="card-body">
-                                                <div class="card-title d-flex align-items-center">
+                                                <div class="card-title d-flex align-items-center flex-wrap">
                                                     <h6 class="mb-0">
                                                       {{option.title}}
                                                     </h6>
                                                     <a class="btn btn-sm btn-link" title="Read the documentation about this setting" i18n-title [href]="getDocsUrl(option.config_key)" target="_blank" referrerpolicy="no-referrer">
                                                         <i-bs name="info-circle"></i-bs>
                                                     </a>
+                                                    @if (isExternallyConfigured(option.config_key)) {
+                                                      @if (isSet(option.key)) {
+                                                        <span class="badge rounded-pill bg-body-secondary text-dark fw-normal" title="This value overrides {{option.config_key}}, which is set outside Paperless." i18n-title>Overrides external</span>
+                                                      } @else {
+                                                        <span class="badge rounded-pill bg-body-secondary text-dark fw-normal" title="{{option.config_key}} is set outside Paperless. Enter a value here to override it." i18n-title>Set externally</span>
+                                                      }
+                                                    }
                                                     @if (isSet(option.key)) {
-                                                      <button type="button" class="btn btn-sm btn-link text-danger ms-auto pe-0" title="Reset" i18n-title (click)="resetOption(option.key)">
-                                                          <i-bs class="me-1" name="x"></i-bs><ng-container i18n>Reset</ng-container>
-                                                      </button>
+                                                      @if (isExternallyConfigured(option.config_key)) {
+                                                        <button type="button" class="btn btn-sm btn-link text-danger ms-auto pe-0" title="Use the externally configured value" i18n-title (click)="resetOption(option.key)">
+                                                            <i-bs class="me-1" name="x"></i-bs><ng-container i18n>Reset to external</ng-container>
+                                                        </button>
+                                                      } @else {
+                                                        <button type="button" class="btn btn-sm btn-link text-danger ms-auto pe-0" title="Reset" i18n-title (click)="resetOption(option.key)">
+                                                            <i-bs class="me-1" name="x"></i-bs><ng-container i18n>Reset</ng-container>
+                                                        </button>
+                                                      }
                                                     }
                                                 </div>
                                                 <div class="mb-n3">

@@ -348,7 +348,6 @@ class ApplicationConfiguration(AbstractSingletonModel):
     ai_enabled = models.BooleanField(
         verbose_name=_("Enables AI features"),
         null=True,
-        default=False,
     )
 
     llm_embedding_backend = models.CharField(

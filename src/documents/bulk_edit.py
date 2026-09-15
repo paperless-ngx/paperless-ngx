@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import tempfile
+import uuid
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Literal
@@ -27,7 +28,7 @@ from documents.models import DocumentType
 from documents.models import PaperlessTask
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.permissions import set_permissions_for_object
+from documents.permissions import set_permissions_for_objects
 from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
@@ -298,53 +299,55 @@ def modify_custom_fields(
 ) -> Literal["OK"]:
     qs = Document.objects.filter(id__in=doc_ids).only("pk")
     affected_docs = list(qs.values_list("pk", flat=True))
-    # Ensure add_custom_fields is a list of tuples, supports old API
+    # Ensure add_custom_fields is a list of (int, value) tuples, supports old API
     add_custom_fields = (
-        add_custom_fields.items()
+        [(int(field), value) for field, value in add_custom_fields.items()]
         if isinstance(add_custom_fields, dict)
-        else [(field, None) for field in add_custom_fields]
+        else [(int(field), None) for field in add_custom_fields]
     )
 
-    custom_fields = CustomField.objects.filter(
-        id__in=[int(field) for field, _ in add_custom_fields],
-    ).distinct()
+    # Resolved once, instead of re-querying the same field for every document
+    custom_fields_by_id: dict[int, CustomField] = CustomField.objects.in_bulk(
+        [field_id for field_id, _ in add_custom_fields],
+    )
+    # Passed to update_or_create() below rather than a bare id, so the FK is
+    # cached on the created instance and auditlog's post_save receiver does
+    # not reload it per row. Only needed for additions. content is deferred:
+    # the one field here that is both large and unused.
+    docs_by_id: dict[int, Document] = (
+        Document.objects.defer("content").in_bulk(affected_docs)
+        if add_custom_fields
+        else {}
+    )
     for field_id, value in add_custom_fields:
+        custom_field = custom_fields_by_id[field_id]
+        value_field = CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
+            custom_field.data_type
+        ]
+        is_doclink = custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK
         for doc_id in affected_docs:
-            defaults = {}
-            custom_field = custom_fields.get(id=field_id)
-            if custom_field:
-                value_field = CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[
-                    custom_field.data_type
-                ]
-                defaults[value_field] = value
-                if (
-                    custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK
-                    and value
-                    and doc_id in value
-                ):
-                    # Prevent self-linking
-                    continue
+            if is_doclink and value and doc_id in value:
+                # Prevent self-linking
+                continue
             CustomFieldInstance.objects.update_or_create(
-                document_id=doc_id,
-                field_id=field_id,
-                defaults=defaults,
+                document=docs_by_id[doc_id],
+                field=custom_field,
+                defaults={value_field: value},
             )
-            if custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
-                doc = Document.objects.get(id=doc_id)
-                reflect_doclinks(doc, custom_field, value)
+            if is_doclink:
+                reflect_doclinks(docs_by_id[doc_id], custom_field, value)
 
-    # For doc link fields that are being removed, remove symmetrical links
+    # For doc link fields that are being removed, remove symmetrical links.
+    # select_related avoids a per-instance reload of the document and field.
     for doclink_being_removed_instance in CustomFieldInstance.objects.filter(
         document_id__in=affected_docs,
         field__id__in=remove_custom_fields,
         field__data_type=CustomField.FieldDataType.DOCUMENTLINK,
         value_document_ids__isnull=False,
-    ):
+    ).select_related("field", "document"):
         for target_doc_id in doclink_being_removed_instance.value:
             remove_doclink(
-                document=Document.objects.get(
-                    id=doclink_being_removed_instance.document.id,
-                ),
+                document=doclink_being_removed_instance.document,
                 field=doclink_being_removed_instance.field,
                 target_doc_id=target_doc_id,
             )
@@ -379,7 +382,7 @@ def delete(doc_ids: list[int]) -> Literal["OK"]:
         )
         delete_ids = list({*doc_ids, *version_ids})
 
-        Document.objects.filter(id__in=delete_ids).delete()
+        Document.objects.filter(id__in=delete_ids).delete(transaction_id=uuid.uuid4())
 
         from documents.search import get_backend
 
@@ -430,10 +433,13 @@ def set_permissions(
     else:
         qs.update(owner=owner)
 
-    for doc in qs:
-        set_permissions_for_object(permissions=set_permissions, object=doc, merge=merge)
-
     affected_docs = list(qs.values_list("pk", flat=True))
+    set_permissions_for_objects(
+        permissions=set_permissions,
+        model=Document,
+        pks=affected_docs,
+        merge=merge,
+    )
 
     bulk_update_documents.apply_async(
         kwargs={"document_ids": affected_docs},
@@ -893,16 +899,25 @@ def edit_pdf(
     pdf_docs: list[pikepdf.Pdf] = []
 
     try:
+        if not operations:
+            raise ValueError("Output document index is out of bounds")
+
+        max_idx = max(op.get("doc", 0) for op in operations)
+        if update_document and max_idx > 0:
+            logger.error(
+                "Update requested but multiple output documents specified",
+            )
+            raise ValueError("Multiple output documents specified")
+
+        if any(
+            op.get("doc", 0) < 0 or op.get("doc", 0) >= len(operations)
+            for op in operations
+        ):
+            raise ValueError("Output document index is out of bounds")
+
         with pikepdf.open(pair.source_doc.source_path) as src:
             # prepare output documents
-            max_idx = max(op.get("doc", 0) for op in operations)
             pdf_docs = [pikepdf.new() for _ in range(max_idx + 1)]
-
-            if update_document and len(pdf_docs) > 1:
-                logger.error(
-                    "Update requested but multiple output documents specified",
-                )
-                raise ValueError("Multiple output documents specified")
 
             for op in operations:
                 dst = pdf_docs[op.get("doc", 0)]
@@ -1177,10 +1192,13 @@ def remove_doclink(
     """
     Removes a 'symmetrical' link to `document` from the target document's existing custom field instance
     """
-    target_doc_field_instance = CustomFieldInstance.objects.filter(
-        document_id=target_doc_id,
-        field=field,
-    ).first()
+    # select_related: a signal receiver (auditlog) touches .document/.field on
+    # the save() below, without this that is a per-call reload query
+    target_doc_field_instance = (
+        CustomFieldInstance.objects.filter(document_id=target_doc_id, field=field)
+        .select_related("document", "field")
+        .first()
+    )
     if (
         target_doc_field_instance is not None
         and document.id in target_doc_field_instance.value

@@ -89,6 +89,7 @@ from documents.templating.utils import convert_format_str_to_template_format
 from documents.templating.workflows import validate_workflow_template
 from documents.validators import uri_validator
 from documents.validators import url_validator
+from documents.versioning import has_prefetched_effective_content
 from documents.versioning import sort_versions_newest_first
 
 if TYPE_CHECKING:
@@ -674,6 +675,9 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             ordering = ordering or (Lower("name"),)
             children = children.order_by(*ordering)
 
+        if not children:
+            return []
+
         serializer = TagSerializer(
             children,
             many=True,
@@ -1149,8 +1153,14 @@ class DocumentSerializer(
 
     def to_representation(self, instance):
         doc = super().to_representation(instance)
-        if "content" in self.fields and hasattr(instance, "effective_content"):
-            doc["content"] = getattr(instance, "effective_content") or ""
+        if "content" in self.fields and has_prefetched_effective_content(instance):
+            # Only resolve version-aware content when it's cheap: an SQL
+            # annotation or a versions prefetch is already on the instance.
+            # A caller that set up neither (e.g. TrashView, GlobalSearchView,
+            # which build their own querysets) gets the document's own,
+            # unresolved content instead of paying for an extra per-instance
+            # query -- same as before effective_content resolution existed.
+            doc["content"] = instance.get_effective_content() or ""
         if self.truncate_content and "content" in self.fields:
             doc["content"] = doc.get("content")[0:550]
         return doc
@@ -1244,30 +1254,31 @@ class DocumentSerializer(
 
             validated_data["tags"] = list(final_tags)
         if validated_data.get("remove_inbox_tags"):
-            tag_ids_being_added = (
-                [
-                    tag.id
-                    for tag in validated_data["tags"]
-                    if tag not in instance.tags.all()
-                ]
+            current_tag_ids = {t.pk for t in instance.tags.all()}
+            tags = (
+                validated_data["tags"]
                 if "tags" in validated_data
-                else []
+                else list(instance.tags.all())
             )
-            inbox_tags_not_being_added = Tag.objects.filter(is_inbox_tag=True).exclude(
-                id__in=tag_ids_being_added,
-            )
-            if "tags" in validated_data:
-                validated_data["tags"] = [
-                    tag
-                    for tag in validated_data["tags"]
-                    if tag not in inbox_tags_not_being_added
-                ]
-            else:
-                validated_data["tags"] = [
-                    tag
-                    for tag in instance.tags.all()
-                    if tag not in inbox_tags_not_being_added
-                ]
+
+            # Tags newly added in this update, plus their ancestors, are kept
+            keep_ids: set[int] = set()
+            for tag in tags:
+                if tag.pk not in current_tag_ids:
+                    keep_ids.add(tag.pk)
+                    keep_ids.update(int(pk) for pk in tag.get_ancestors_pks())
+
+            # Remove inbox tags and their descendants, except those being kept
+            remove_ids: set[int] = set()
+            for inbox_tag in (
+                Tag.objects.filter(is_inbox_tag=True)
+                .exclude(pk__in=keep_ids)
+                .only("pk", "tn_descendants_pks")
+            ):
+                remove_ids.add(inbox_tag.pk)
+                remove_ids.update(int(pk) for pk in inbox_tag.get_descendants_pks())
+
+            validated_data["tags"] = [t for t in tags if t.pk not in remove_ids]
 
         if settings.AUDIT_LOG_ENABLED:
             with set_actor(self.user):
@@ -1324,6 +1335,7 @@ class DocumentSerializer(
             "root_document",
             "versions",
         )
+        read_only_fields = ("deleted_at",)
         list_serializer_class = OwnedObjectListSerializer
 
 
@@ -1738,7 +1750,7 @@ class MergeDocumentsAsVersionsSerializer(DocumentListSerializer):
 
 
 class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
-    operations = serializers.ListField(required=True)
+    operations = serializers.ListField(required=True, allow_empty=False)
     delete_original = serializers.BooleanField(required=False, default=False)
     update_document = serializers.BooleanField(required=False, default=False)
     include_metadata = serializers.BooleanField(required=False, default=True)
@@ -1775,6 +1787,12 @@ class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMix
                 raise serializers.ValidationError(
                     "update_document only allowed with a single output document",
                 )
+
+        if any(
+            op.get("doc", 0) < 0 or op.get("doc", 0) >= len(operations)
+            for op in operations
+        ):
+            raise serializers.ValidationError("doc index is out of bounds")
 
         doc = Document.objects.get(id=documents[0])
         if doc.page_count:
@@ -2112,6 +2130,8 @@ class BulkEditSerializer(
             raise serializers.ValidationError("operations not specified")
         if not isinstance(parameters["operations"], list):
             raise serializers.ValidationError("operations must be a list")
+        if not parameters["operations"]:
+            raise serializers.ValidationError("operations must not be empty")
         for op in parameters["operations"]:
             if not isinstance(op, dict):
                 raise serializers.ValidationError("invalid operation entry")
@@ -2138,6 +2158,12 @@ class BulkEditSerializer(
                 raise serializers.ValidationError(
                     "update_document only allowed with a single output document",
                 )
+
+        if any(
+            op.get("doc", 0) < 0 or op.get("doc", 0) >= len(parameters["operations"])
+            for op in parameters["operations"]
+        ):
+            raise serializers.ValidationError("doc index is out of bounds")
 
         doc = Document.objects.get(id=document_id)
         # doc existence is already validated
@@ -2834,10 +2860,14 @@ class ShareLinkSerializer(OwnedObjectSerializer):
         return super().create(validated_data)
 
     def validate_document(self, document):
-        if self.user is not None and has_perms_owner_aware(
-            self.user,
-            "view_document",
-            document,
+        if (
+            self.user is not None
+            and self.user.has_perm("documents.view_document")
+            and has_perms_owner_aware(
+                self.user,
+                "view_document",
+                document,
+            )
         ):
             return document
         raise PermissionDenied(
@@ -3598,6 +3628,8 @@ class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
 
         if "actions" in validated_data:
             actions = validated_data.pop("actions")
+            for action in actions:
+                action.pop("id", None)
 
         instance = super().create(validated_data)
 

@@ -16,7 +16,7 @@ import {
 } from '@angular/forms'
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { Subscription, map, takeUntil } from 'rxjs'
+import { Subscription, catchError, map, of, takeUntil } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentType } from 'src/app/data/document-type'
@@ -48,6 +48,7 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { CustomFieldQueryExpression } from 'src/app/utils/custom-field-query-element'
 import { ConfirmButtonComponent } from '../../confirm-button/confirm-button.component'
 import {
@@ -512,26 +513,43 @@ export class WorkflowEditDialogComponent
   private readonly storagePathService = inject(StoragePathService)
   private readonly mailRuleService = inject(MailRuleService)
   private readonly customFieldsService = inject(CustomFieldsService)
+  private readonly toastService = inject(ToastService)
+  private relatedObjectLoadErrorShown = false
 
   readonly templates = signal<Workflow[]>(undefined)
   readonly correspondents = toSignal(
-    this.correspondentService.listAll().pipe(map((result) => result.results)),
+    this.correspondentService.listAll().pipe(
+      map((result) => result.results),
+      catchError((error) => this.handleRelatedObjectLoadError(error))
+    ),
     { initialValue: undefined as Correspondent[] }
   )
   readonly documentTypes = toSignal(
-    this.documentTypeService.listAll().pipe(map((result) => result.results)),
+    this.documentTypeService.listAll().pipe(
+      map((result) => result.results),
+      catchError((error) => this.handleRelatedObjectLoadError(error))
+    ),
     { initialValue: undefined as DocumentType[] }
   )
   readonly storagePaths = toSignal(
-    this.storagePathService.listAll().pipe(map((result) => result.results)),
+    this.storagePathService.listAll().pipe(
+      map((result) => result.results),
+      catchError((error) => this.handleRelatedObjectLoadError(error))
+    ),
     { initialValue: undefined as StoragePath[] }
   )
   readonly mailRules = toSignal(
-    this.mailRuleService.listAll().pipe(map((result) => result.results)),
+    this.mailRuleService.listAll().pipe(
+      map((result) => result.results),
+      catchError((error) => this.handleRelatedObjectLoadError(error))
+    ),
     { initialValue: undefined as MailRule[] }
   )
   readonly customFields = toSignal(
-    this.customFieldsService.listAll().pipe(map((result) => result.results)),
+    this.customFieldsService.listAll().pipe(
+      map((result) => result.results),
+      catchError((error) => this.handleRelatedObjectLoadError(error))
+    ),
     { initialValue: undefined as CustomField[] }
   )
   readonly dateCustomFields = computed(() =>
@@ -544,6 +562,17 @@ export class WorkflowEditDialogComponent
   private readonly aiEnabledSetting = this.settingsService.getSignal<boolean>(
     SETTINGS_KEYS.AI_ENABLED
   )
+
+  private handleRelatedObjectLoadError(error) {
+    if (!this.relatedObjectLoadErrorShown) {
+      this.relatedObjectLoadErrorShown = true
+      this.toastService.showError(
+        $localize`Some workflow options could not be loaded.`,
+        error
+      )
+    }
+    return of([])
+  }
 
   expandedItem: number = null
 

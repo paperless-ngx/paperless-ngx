@@ -133,21 +133,27 @@ class BarcodeConfig(BaseConfig):
         app_config = self._get_config_instance()
 
         self.barcodes_enabled = (
-            app_config.barcodes_enabled or settings.CONSUMER_ENABLE_BARCODES
+            app_config.barcodes_enabled
+            if app_config.barcodes_enabled is not None
+            else settings.CONSUMER_ENABLE_BARCODES
         )
         self.barcode_enable_tiff_support = (
             app_config.barcode_enable_tiff_support
-            or settings.CONSUMER_BARCODE_TIFF_SUPPORT
+            if app_config.barcode_enable_tiff_support is not None
+            else settings.CONSUMER_BARCODE_TIFF_SUPPORT
         )
         self.barcode_string = (
             app_config.barcode_string or settings.CONSUMER_BARCODE_STRING
         )
         self.barcode_retain_split_pages = (
             app_config.barcode_retain_split_pages
-            or settings.CONSUMER_BARCODE_RETAIN_SPLIT_PAGES
+            if app_config.barcode_retain_split_pages is not None
+            else settings.CONSUMER_BARCODE_RETAIN_SPLIT_PAGES
         )
         self.barcode_enable_asn = (
-            app_config.barcode_enable_asn or settings.CONSUMER_ENABLE_ASN_BARCODE
+            app_config.barcode_enable_asn
+            if app_config.barcode_enable_asn is not None
+            else settings.CONSUMER_ENABLE_ASN_BARCODE
         )
         self.barcode_asn_prefix = (
             app_config.barcode_asn_prefix or settings.CONSUMER_ASN_BARCODE_PREFIX
@@ -160,13 +166,17 @@ class BarcodeConfig(BaseConfig):
             app_config.barcode_max_pages or settings.CONSUMER_BARCODE_MAX_PAGES
         )
         self.barcode_enable_tag = (
-            app_config.barcode_enable_tag or settings.CONSUMER_ENABLE_TAG_BARCODE
+            app_config.barcode_enable_tag
+            if app_config.barcode_enable_tag is not None
+            else settings.CONSUMER_ENABLE_TAG_BARCODE
         )
         self.barcode_tag_mapping = (
             app_config.barcode_tag_mapping or settings.CONSUMER_TAG_BARCODE_MAPPING
         )
         self.barcode_tag_split = (
-            app_config.barcode_tag_split or settings.CONSUMER_TAG_BARCODE_SPLIT
+            app_config.barcode_tag_split
+            if app_config.barcode_tag_split is not None
+            else settings.CONSUMER_TAG_BARCODE_SPLIT
         )
 
 
@@ -248,7 +258,11 @@ class AIConfig(BaseConfig):
     def __post_init__(self) -> None:
         app_config = self._get_config_instance()
 
-        self.ai_enabled = app_config.ai_enabled or settings.AI_ENABLED
+        self.ai_enabled = (
+            app_config.ai_enabled
+            if app_config.ai_enabled is not None
+            else settings.AI_ENABLED
+        )
         self.llm_embedding_backend = (
             app_config.llm_embedding_backend or settings.LLM_EMBEDDING_BACKEND
         )

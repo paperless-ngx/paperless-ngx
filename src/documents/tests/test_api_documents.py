@@ -981,6 +981,128 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["id"], doc.id)
 
+    def test_has_duplicates_filter(self) -> None:
+        original_match = Document.objects.create(
+            title="original match",
+            checksum="same-original",
+        )
+        second_original_match = Document.objects.create(
+            title="second original match",
+            checksum="same-original",
+        )
+        archive_match = Document.objects.create(
+            title="archive match",
+            checksum="archive-source",
+            archive_checksum="same-archive",
+        )
+        original_to_archive_match = Document.objects.create(
+            title="original to archive match",
+            checksum="same-archive",
+        )
+        first_archive_match = Document.objects.create(
+            title="first archive match",
+            checksum="first-archive-source",
+            archive_checksum="same-archive-only",
+        )
+        second_archive_match = Document.objects.create(
+            title="second archive match",
+            checksum="second-archive-source",
+            archive_checksum="same-archive-only",
+        )
+        first_empty_archive = Document.objects.create(
+            title="first empty archive",
+            checksum="first-empty-archive",
+            archive_checksum="",
+        )
+        second_empty_archive = Document.objects.create(
+            title="second empty archive",
+            checksum="second-empty-archive",
+            archive_checksum="",
+        )
+        unique = Document.objects.create(title="unique", checksum="unique")
+        version_root = Document.objects.create(
+            title="version root",
+            checksum="version-root",
+        )
+        Document.objects.create(
+            title="version",
+            checksum=unique.checksum,
+            root_document=version_root,
+            version_index=1,
+        )
+        trash_match = Document.objects.create(
+            title="trash match",
+            checksum="trash-match",
+        )
+        trashed_duplicate = Document.objects.create(
+            title="trashed duplicate",
+            checksum="trash-match",
+        )
+        trashed_duplicate.delete()
+
+        response = self.client.get("/api/documents/?has_duplicates=true")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertCountEqual(
+            [document["id"] for document in response.data["results"]],
+            [
+                original_match.id,
+                second_original_match.id,
+                archive_match.id,
+                original_to_archive_match.id,
+                first_archive_match.id,
+                second_archive_match.id,
+                trash_match.id,
+            ],
+        )
+
+        response = self.client.get("/api/documents/?has_duplicates=false")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertCountEqual(
+            [document["id"] for document in response.data["results"]],
+            [
+                unique.id,
+                version_root.id,
+                first_empty_archive.id,
+                second_empty_archive.id,
+            ],
+        )
+
+        response = self.client.get(f"/api/documents/{first_empty_archive.id}/")
+        self.assertEqual(response.data["duplicate_documents"], [])
+
+    def test_has_duplicates_filter_respects_document_permissions(self) -> None:
+        owner = User.objects.create_user(username="duplicate-owner")
+        requester = User.objects.create_user(username="duplicate-requester")
+        requester.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
+        visible_document = Document.objects.create(
+            title="visible document",
+            checksum="permission-match",
+            owner=requester,
+        )
+        hidden_duplicate = Document.objects.create(
+            title="hidden duplicate",
+            checksum="permission-match",
+            owner=owner,
+        )
+        self.client.force_authenticate(user=requester)
+
+        response = self.client.get("/api/documents/?has_duplicates=true")
+        self.assertNotIn(
+            visible_document.id,
+            [document["id"] for document in response.data["results"]],
+        )
+
+        assign_perm("view_document", requester, hidden_duplicate)
+        response = self.client.get("/api/documents/?has_duplicates=true")
+        self.assertIn(
+            visible_document.id,
+            [document["id"] for document in response.data["results"]],
+        )
+
     def test_custom_fields_icontains_filter_no_duplicates(self) -> None:
         """
         GIVEN:
@@ -3493,6 +3615,55 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(response.content, b"Insufficient permissions to delete notes")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_notes_require_global_document_permissions(self) -> None:
+        user = User.objects.create_user(username="note_editor")
+        user.user_permissions.add(
+            *Permission.objects.filter(
+                codename__in=["view_note", "add_note", "delete_note"],
+            ),
+        )
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="notes",
+            owner=user,
+        )
+        note = Note.objects.create(note="Existing", document=doc, user=user)
+        self.client.force_authenticate(user)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/notes/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        user.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
+        user = User.objects.get(pk=user.pk)
+        self.client.force_authenticate(user)
+        response = self.client.get(f"/api/documents/{doc.pk}/notes/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.post(
+            f"/api/documents/{doc.pk}/notes/",
+            data={"note": "New"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        user.user_permissions.add(
+            Permission.objects.get(codename="change_document"),
+        )
+        user = User.objects.get(pk=user.pk)
+        self.client.force_authenticate(user)
+        response = self.client.post(
+            f"/api/documents/{doc.pk}/notes/",
+            data={"note": "New"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.delete(
+            f"/api/documents/{doc.pk}/notes/?id={note.pk}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_delete_note(self) -> None:
         """
         GIVEN:
@@ -3891,6 +4062,21 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
 
         assign_perm("view_document", user1, doc)
 
+        create_resp = self.client.post(
+            "/api/share_links/",
+            data={
+                "document": doc.pk,
+                "file_version": "original",
+            },
+            format="json",
+        )
+        self.assertEqual(create_resp.status_code, status.HTTP_403_FORBIDDEN)
+
+        user1.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
+        user1 = User.objects.get(pk=user1.pk)
+        self.client.force_authenticate(user1)
         create_resp = self.client.post(
             "/api/share_links/",
             data={

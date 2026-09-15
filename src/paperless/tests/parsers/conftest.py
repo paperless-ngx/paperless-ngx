@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from pathlib import Path
     from unittest.mock import MagicMock
 
-    from pytest_django.fixtures import SettingsWrapper
+    from pytest_django.fixtures import Settings
     from pytest_mock import MockerFixture
 
     #: Type for the ``make_tesseract_parser`` fixture factory.
@@ -131,9 +131,9 @@ def empty_remote_ocr_app_config(mocker: MockerFixture) -> MagicMock:
 
 @pytest.fixture()
 def azure_settings(
-    settings: SettingsWrapper,
+    settings: Settings,
     empty_remote_ocr_app_config: MagicMock,
-) -> SettingsWrapper:
+) -> Settings:
     """Configure Django settings for a valid Azure AI OCR engine.
 
     Sets ``REMOTE_OCR_ENGINE``, ``REMOTE_OCR_API_KEY``, and
@@ -142,7 +142,7 @@ def azure_settings(
 
     Returns
     -------
-    SettingsWrapper
+    Settings
         The modified settings object (for chaining further overrides).
     """
     settings.REMOTE_OCR_ENGINE = "azureai"
@@ -153,14 +153,14 @@ def azure_settings(
 
 @pytest.fixture()
 def no_engine_settings(
-    settings: SettingsWrapper,
+    settings: Settings,
     empty_remote_ocr_app_config: MagicMock,
-) -> SettingsWrapper:
+) -> Settings:
     """Configure Django settings with no remote engine configured.
 
     Returns
     -------
-    SettingsWrapper
+    Settings
         The modified settings object.
     """
     settings.REMOTE_OCR_ENGINE = None

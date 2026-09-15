@@ -443,8 +443,13 @@ class ApplicationConfigurationViewSet(ModelViewSet[ApplicationConfiguration]):
         new_llm_embedding_backend = (
             new_instance.llm_embedding_backend or settings.LLM_EMBEDDING_BACKEND
         )
+        new_ai_enabled = (
+            new_instance.ai_enabled
+            if new_instance.ai_enabled is not None
+            else settings.AI_ENABLED
+        )
         new_ai_index_enabled = bool(
-            new_instance.ai_enabled and new_llm_embedding_backend,
+            new_ai_enabled and new_llm_embedding_backend,
         )
         new_llm_embedding_chunk_size = (
             new_instance.llm_embedding_chunk_size or settings.LLM_EMBEDDING_CHUNK_SIZE

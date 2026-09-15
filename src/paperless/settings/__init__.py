@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import Final
 from urllib.parse import urlparse
 
-from compression_middleware.middleware import CompressionMiddleware
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
@@ -95,6 +94,17 @@ ADVANCED_FUZZY_SEARCH_THRESHOLD: float | None = get_float_from_env(
 MODEL_FILE = get_path_from_env(
     "PAPERLESS_MODEL_FILE",
     DATA_DIR / "classification_model.pickle",
+)
+
+# Minimum confidence (0.0-1.0) for the ML classifier to assign a correspondent,
+# document type, or storage path. 0.0 disables the threshold.
+CLASSIFIER_MATCH_THRESHOLD: Final[float] = get_float_from_env(
+    "PAPERLESS_CLASSIFIER_MATCH_THRESHOLD",
+    0.6,
+)
+MATCH_REGEX_TIMEOUT_SECONDS: Final[float] = get_float_from_env(
+    "PAPERLESS_MATCH_REGEX_TIMEOUT_SECONDS",
+    0.1,
 )
 LLM_INDEX_DIR = DATA_DIR / "llm_index"
 LLM_INDEX_LOCK = LLM_INDEX_DIR / "index.lock"
@@ -194,22 +204,10 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
 ]
 
-# Optional to enable compression
+# Optional to enable compression. The subclass leaves server-sent events
+# uncompressed; see paperless.middleware.StreamAwareCompressionMiddleware.
 if get_bool_from_env("PAPERLESS_ENABLE_COMPRESSION", "yes"):  # pragma: no cover
-    MIDDLEWARE.insert(0, "compression_middleware.middleware.CompressionMiddleware")
-
-# Workaround to not compress streaming responses (e.g. chat).
-# See https://github.com/friedelwolff/django-compression-middleware/pull/7
-original_process_response = CompressionMiddleware.process_response
-
-
-def patched_process_response(self, request, response):
-    if getattr(request, "compress_exempt", False):
-        return response
-    return original_process_response(self, request, response)
-
-
-CompressionMiddleware.process_response = patched_process_response
+    MIDDLEWARE.insert(0, "paperless.middleware.StreamAwareCompressionMiddleware")
 
 ROOT_URLCONF = "paperless.urls"
 
@@ -699,6 +697,9 @@ CELERY_SEND_TASK_SENT_EVENT = True
 CELERY_BROKER_CONNECTION_RETRY = True
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_BROKER_TRANSPORT_OPTIONS = {
+    "global_keyprefix": _REDIS_KEY_PREFIX,
+}
+CELERY_RESULT_BACKEND_TRANSPORT_OPTIONS = {
     "global_keyprefix": _REDIS_KEY_PREFIX,
 }
 

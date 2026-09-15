@@ -14,10 +14,11 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { map } from 'rxjs'
+import { catchError, map, of } from 'rxjs'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
 import { User } from 'src/app/data/user'
 import { UserService } from 'src/app/services/rest/user.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { PermissionsFormComponent } from '../input/permissions/permissions-form/permissions-form.component'
 import { SwitchComponent } from '../input/switch/switch.component'
 
@@ -35,9 +36,16 @@ import { SwitchComponent } from '../input/switch/switch.component'
 export class PermissionsDialogComponent {
   activeModal = inject(NgbActiveModal)
   private userService = inject(UserService)
+  private toastService = inject(ToastService)
 
   readonly users = toSignal(
-    this.userService.listAll().pipe(map((r) => r.results)),
+    this.userService.listAll().pipe(
+      map((r) => r.results),
+      catchError((error) => {
+        this.toastService.showError($localize`Error retrieving users`, error)
+        return of([])
+      })
+    ),
     { initialValue: undefined as User[] }
   )
   readonly title = signal($localize`Set permissions`)

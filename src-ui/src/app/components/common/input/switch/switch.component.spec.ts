@@ -48,4 +48,14 @@ describe('SwitchComponent', () => {
     component.value = undefined
     expect(component.isUnset).toBeTruthy()
   })
+
+  it('should support a compact layout', () => {
+    component.compact = true
+    component.title = 'Test switch'
+    fixture.detectChanges()
+
+    expect(fixture.nativeElement.querySelector('.mb-3')).toBeNull()
+    expect(fixture.nativeElement.querySelector('.row')).toBeNull()
+    expect(input.getAttribute('aria-label')).toEqual('Test switch')
+  })
 })

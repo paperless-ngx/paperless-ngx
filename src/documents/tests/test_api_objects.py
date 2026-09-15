@@ -2,10 +2,15 @@ import datetime
 import json
 from unittest import mock
 
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.db import connection
 from django.test import override_settings
+from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import assign_perm
+from guardian.shortcuts import get_groups_with_perms
+from guardian.shortcuts import get_users_with_perms
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -452,6 +457,9 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
     def test_test_storage_path_requires_document_view_permission(self) -> None:
         owner = User.objects.create_user(username="owner")
         unprivileged = User.objects.create_user(username="unprivileged")
+        unprivileged.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
         document = Document.objects.create(
             mime_type="application/pdf",
             owner=owner,
@@ -494,6 +502,23 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             ),
             content_type="application/json",
         )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        viewer.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
+        viewer = User.objects.get(pk=viewer.pk)
+        self.client.force_authenticate(user=viewer)
+        response = self.client.post(
+            f"{self.ENDPOINT}test/",
+            json.dumps(
+                {
+                    "document": document.id,
+                    "path": "path/{{ title }}",
+                },
+            ),
+            content_type="application/json",
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, "path/Shared.pdf")
 
@@ -524,6 +549,9 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             username="owner",
             password="password",
             email="owner@example.com",
+        )
+        owner.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
         )
         document = Document.objects.create(
             mime_type="application/pdf",
@@ -600,6 +628,9 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             checksum="123",
         )
         assign_perm("view_document", viewer, document)
+        viewer.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
 
         self.client.force_authenticate(user=viewer)
         response = self.client.post(
@@ -687,6 +718,9 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         )
         document.tags.add(private_tag)
         assign_perm("view_document", viewer, document)
+        viewer.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
 
         self.client.force_authenticate(user=viewer)
         response = self.client.post(
@@ -740,6 +774,9 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             value_int=42,
         )
         assign_perm("view_document", viewer, document)
+        viewer.user_permissions.add(
+            Permission.objects.get(codename="view_document"),
+        )
 
         self.client.force_authenticate(user=viewer)
         response = self.client.post(
@@ -841,6 +878,66 @@ class TestBulkEditObjects(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(StoragePath.objects.count(), 0)
+
+    def test_bulk_objects_set_permissions_batched_across_object_count(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - Many tags are being bulk-edited to set permissions at once
+        WHEN:
+            - bulk_edit_objects API endpoint is called with set_permissions
+              operation over a small batch vs. a much larger one
+        THEN:
+            - Permissions are applied correctly at both scales
+            - Query count does not grow with the number of tags, i.e. each
+              user/group is applied across all tags with one batched call
+              rather than one call per (tag, identity) pair
+        """
+        group1 = Group.objects.create(name="perm-group")
+        permissions = {
+            "view": {"users": [self.user1.id, self.user2.id], "groups": [group1.id]},
+            "change": {"users": [self.user1.id], "groups": [group1.id]},
+        }
+
+        def run_with_n_tags(n: int) -> int:
+            tags = [Tag.objects.create(name=f"perm-tag-{n}-{i}") for i in range(n)]
+            with CaptureQueriesContext(connection) as ctx:
+                response = self.client.post(
+                    "/api/bulk_edit_objects/",
+                    json.dumps(
+                        {
+                            "objects": [t.id for t in tags],
+                            "object_type": "tags",
+                            "operation": "set_permissions",
+                            "permissions": permissions,
+                            "merge": False,
+                        },
+                    ),
+                    content_type="application/json",
+                )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            for tag in tags:
+                self.assertEqual(get_users_with_perms(tag).count(), 2)
+                self.assertEqual(get_groups_with_perms(tag).count(), 1)
+            return len(ctx.captured_queries)
+
+        small_batch_queries = run_with_n_tags(5)
+        large_batch_queries = run_with_n_tags(50)
+
+        # A tolerance rather than equality, matching the N+1 check in
+        # test_views.py: bulk_create's batch_size caps rows per INSERT, so a
+        # large enough selection does legitimately add statements, and the
+        # per-process ContentType cache makes the first run carry an extra
+        # query. Neither can hide a regression to per-object assignment,
+        # which would be ~10x the small-batch count here.
+        self.assertLessEqual(
+            large_batch_queries,
+            small_batch_queries + 5,
+            "Permission assignment appears to scale with object count: "
+            f"{small_batch_queries} queries for 5 tags vs. "
+            f"{large_batch_queries} for 50",
+        )
 
     def test_bulk_objects_delete_all_filtered(self) -> None:
         """

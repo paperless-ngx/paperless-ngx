@@ -98,8 +98,8 @@ import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
 import { DocumentDetailFieldID } from '../admin/settings/settings.component'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
-import { ReprocessConfirmDialogComponent } from '../common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component'
 import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
+import { ReprocessConfirmDialogComponent } from '../common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
@@ -237,6 +237,9 @@ export class DocumentDetailComponent
     this.settings.getSignal<boolean>(
       SETTINGS_KEYS.DOCUMENT_EDITING_OVERLAY_THUMBNAIL
     )
+  private readonly autoSuggestSetting = this.settings.getSignal<boolean>(
+    SETTINGS_KEYS.DOCUMENT_EDITING_AUTO_SUGGEST
+  )
   private readonly hiddenFieldsSetting = this.settings.getSignal<
     DocumentDetailFieldID[]
   >(SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS)
@@ -301,6 +304,7 @@ export class DocumentDetailComponent
   isDirty$: Observable<boolean>
   unsubscribeNotifier: Subject<any> = new Subject()
   docChangeNotifier: Subject<any> = new Subject()
+  versionChangeNotifier: Subject<void> = new Subject()
   private incomingUpdateModal: NgbModalRef
   private pendingIncomingUpdate: IncomingDocumentUpdate
   private lastLocalSaveModified: string | null = null
@@ -357,6 +361,10 @@ export class DocumentDetailComponent
     return this.aiEnabledSetting()
   }
 
+  get autoSuggest(): boolean {
+    return this.autoSuggestSetting()
+  }
+
   get archiveContentRenderType(): ContentRenderType {
     const hasArchiveVersion =
       this.metadata()?.has_archive_version ??
@@ -410,7 +418,8 @@ export class DocumentDetailComponent
       .pipe(
         first(),
         takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
+        takeUntil(this.docChangeNotifier),
+        takeUntil(this.versionChangeNotifier)
       )
       .subscribe({
         next: (result) => {
@@ -526,7 +535,8 @@ export class DocumentDetailComponent
       .pipe(
         first(),
         takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
+        takeUntil(this.docChangeNotifier),
+        takeUntil(this.versionChangeNotifier)
       )
       .subscribe({
         next: (res) => this.previewText.set(res.toString()),
@@ -588,6 +598,13 @@ export class DocumentDetailComponent
             openDocument.duplicate_documents = doc.duplicate_documents
             this.openDocumentService.save()
           }
+          // use server versions
+          if (openDocument) {
+            openDocument.versions = doc.versions
+            if (!openDocument.__changedFields?.includes('content')) {
+              openDocument.content = doc.content
+            }
+          }
           let useDoc = openDocument || doc
           if (openDocument && forceRemote) {
             Object.assign(openDocument, doc)
@@ -635,7 +652,14 @@ export class DocumentDetailComponent
               this.documentForm.patchValue({ title: titleValue })
               this.documentForm.get('title').markAsDirty()
             })
+          const keepContentEdits =
+            useDoc.__selectedVersionId === this.selectedVersionId() &&
+            !!useDoc.__changedFields?.includes('content')
           this.setupDirtyTracking(useDoc, doc)
+          // Maybe load the stored version
+          if (useDoc.__selectedVersionId) {
+            this.selectVersion(this.selectedVersionId(), keepContentEdits)
+          }
         },
       })
   }
@@ -896,14 +920,17 @@ export class DocumentDetailComponent
 
   updateComponent(doc: Document) {
     this.document.set(doc)
-    // Default selected version is the newest version, which the API returns first
+    // Load the selected version, or default to API first (newest)
     const versions = doc.versions ?? []
-    this.selectedVersionId.set(versions.length ? versions[0].id : doc.id)
+    const selectedVersion =
+      versions.find((v) => v.id === doc.__selectedVersionId) ?? versions[0]
+    this.selectedVersionId.set(selectedVersion?.id ?? doc.id)
     this.previewLoaded.set(false)
     this.requiresPassword = false
     this.updateFormForCustomFields()
     this.loadMetadataForSelectedVersion()
     if (
+      this.autoSuggest &&
       this.permissionsService.currentUserHasObjectPermissions(
         PermissionAction.Change,
         doc
@@ -932,8 +959,12 @@ export class DocumentDetailComponent
   }
 
   // Update file preview and download target to a specific version (by document id)
-  selectVersion(versionId: number) {
+  selectVersion(versionId: number, keepContentEdits: boolean = false) {
+    this.versionChangeNotifier.next()
     this.selectedVersionId.set(versionId)
+    // remember so the version can be restored when returning to the document
+    this.document().__selectedVersionId = versionId
+    this.openDocumentService.save()
     this.previewLoaded.set(false)
     this.previewUrl.set(
       this.documentsService.getPreviewUrl(
@@ -955,20 +986,20 @@ export class DocumentDetailComponent
       .pipe(
         first(),
         takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
+        takeUntil(this.docChangeNotifier),
+        takeUntil(this.versionChangeNotifier)
       )
       .subscribe({
         next: (doc) => {
           const content = doc?.content ?? ''
-          this.document().content = content
-          this.documentForm.patchValue(
-            {
-              content,
-            },
-            {
-              emitEvent: false,
-            }
-          )
+          if (keepContentEdits) {
+            this.store.next({ ...this.store.value, content })
+          } else {
+            // Update in-place and avoid the debounce wait
+            this.store.value.content = content
+            this.documentForm.patchValue({ content })
+            this.documentForm.get('content').markAsPristine()
+          }
         },
         error: (error) => {
           this.toastService.showError(
@@ -983,7 +1014,8 @@ export class DocumentDetailComponent
       .pipe(
         first(),
         takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
+        takeUntil(this.docChangeNotifier),
+        takeUntil(this.versionChangeNotifier)
       )
       .subscribe({
         next: (res) => this.previewText.set(res.toString()),
@@ -997,7 +1029,39 @@ export class DocumentDetailComponent
   }
 
   onVersionSelected(versionId: number) {
-    this.selectVersion(versionId)
+    if (versionId === this.selectedVersionId()) return
+    // Bail if the selected version was just deleted.
+    const selectedVersionExists = this.document()?.versions?.some(
+      (v) => v.id === this.selectedVersionId()
+    )
+    if (this.networkActive() && selectedVersionExists) return
+    if (
+      !selectedVersionExists ||
+      this.documentForm.get('content').value === this.store.value.content
+    ) {
+      this.selectVersion(versionId)
+      return
+    }
+
+    // Confirm any unsaved content changes
+    const modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Unsaved Changes`
+    modal.componentInstance.messageBold = $localize`You have unsaved changes to the content of this version.`
+    modal.componentInstance.message = $localize`Switching versions will discard them.`
+    modal.componentInstance.btnClass = 'btn-secondary'
+    modal.componentInstance.btnCaption = $localize`Discard and switch`
+    modal.componentInstance.alternativeBtnClass = 'btn-primary'
+    modal.componentInstance.alternativeBtnCaption = $localize`Save and switch`
+    modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
+      modal.close()
+      this.selectVersion(versionId)
+    })
+    modal.componentInstance.alternativeClicked.pipe(first()).subscribe(() => {
+      modal.close()
+      this.save(false, () => this.selectVersion(versionId))
+    })
   }
 
   onVersionsUpdated(versions: DocumentVersionInfo[]) {
@@ -1225,7 +1289,7 @@ export class DocumentDetailComponent
     return changes
   }
 
-  save(close: boolean = false) {
+  save(close: boolean = false, savedCallback: () => void = null) {
     this.networkActive.set(true)
     ;(document.activeElement as HTMLElement)?.dispatchEvent(new Event('change'))
     this.documentsService
@@ -1258,6 +1322,7 @@ export class DocumentDetailComponent
             this.flushPendingIncomingUpdate()
           }
           this.savedViewService.maybeRefreshDocumentCounts()
+          savedCallback?.()
         },
         error: (error) => {
           this.networkActive.set(false)

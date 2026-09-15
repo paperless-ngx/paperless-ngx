@@ -8,7 +8,7 @@ import pytest
 from django.conf import settings
 from filelock import ReadWriteLock
 from llama_index.core.schema import TextNode
-from pytest_django.fixtures import SettingsWrapper
+from pytest_django.fixtures import Settings
 
 from paperless_ai import indexing
 from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
@@ -69,7 +69,7 @@ class TestCompactionLock:
     def test_compaction_skips_when_a_reader_holds_the_lock(
         self,
         temp_llm_index_dir: Path,
-        settings: SettingsWrapper,
+        settings: Settings,
         caplog: pytest.LogCaptureFixture,
     ) -> None:
         _seed_bloated_index(temp_llm_index_dir)

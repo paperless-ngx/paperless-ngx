@@ -721,20 +721,3 @@ def retrieve_similar_nodes(
             continue
         filtered.append(node)
     return filtered
-
-
-def _node_document_ids(nodes: list["NodeWithScore"]) -> list[int]:
-    document_ids: list[int] = []
-    for node in nodes:
-        document_id = node.metadata.get("document_id")
-        if document_id is None:  # pragma: no cover
-            # See the matching guard in retrieve_similar_nodes() above.
-            continue
-        try:
-            document_ids.append(int(document_id))
-        except ValueError:  # pragma: no cover
-            logger.warning(
-                "Skipping LLM index result with invalid document_id %r.",
-                document_id,
-            )
-    return document_ids

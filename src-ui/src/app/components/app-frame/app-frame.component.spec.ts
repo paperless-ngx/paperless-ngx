@@ -15,7 +15,7 @@ import { provideUiTour } from 'ngx-ui-tour-ng-bootstrap'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import { SavedView } from 'src/app/data/saved-view'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { HideableSidebarItemID, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import {
@@ -285,6 +285,82 @@ describe('AppFrameComponent', () => {
       ['attributes']
     )
     jest.useRealTimers()
+  })
+
+  it('should hide configured sidebar items', () => {
+    settingsService.set(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS, [
+      HideableSidebarItemID.Dashboard,
+      HideableSidebarItemID.Workflows,
+    ])
+    fixture.detectChanges()
+
+    expect(
+      fixture.nativeElement.querySelector('[routerLink="dashboard"]')
+        .parentElement.classList
+    ).toContain('d-none')
+    expect(
+      fixture.nativeElement.querySelector('[routerLink="workflows"]')
+        .parentElement.classList
+    ).toContain('d-none')
+    expect(
+      fixture.nativeElement.querySelector('[routerLink="mail"]').parentElement
+        .classList
+    ).not.toContain('d-none')
+  })
+
+  it('should show hidden items and visibility switches while customizing', () => {
+    settingsService.set(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS, [
+      HideableSidebarItemID.Dashboard,
+    ])
+    settingsService.sidebarHiddenItemsEditing.set([
+      HideableSidebarItemID.Dashboard,
+    ])
+    fixture.detectChanges()
+
+    expect(
+      fixture.nativeElement.querySelectorAll('pngx-input-switch').length
+    ).toBe(5)
+    expect(
+      fixture.nativeElement.querySelector('[routerLink="dashboard"]')
+        .parentElement.classList
+    ).not.toContain('d-none')
+    expect(
+      fixture.nativeElement.querySelector('[routerLink="dashboard"]').classList
+    ).toContain('opacity-50')
+
+    settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, true)
+    fixture.detectChanges()
+
+    expect(
+      Array.from(
+        fixture.nativeElement.querySelectorAll('pngx-input-switch')
+      ).every((toggle: HTMLElement) => toggle.classList.contains('d-none'))
+    ).toBe(true)
+    expect(
+      fixture.nativeElement.querySelector('[routerLink="dashboard"]').classList
+    ).not.toContain('pe-5')
+
+    settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, false)
+    component.slimSidebarAnimating.set(true)
+    fixture.detectChanges()
+
+    expect(
+      Array.from(
+        fixture.nativeElement.querySelectorAll('pngx-input-switch')
+      ).every((toggle: HTMLElement) => toggle.classList.contains('d-none'))
+    ).toBe(true)
+
+    component.slimSidebarAnimating.set(false)
+    fixture.detectChanges()
+
+    expect(
+      Array.from(
+        fixture.nativeElement.querySelectorAll('pngx-input-switch')
+      ).every((toggle: HTMLElement) => !toggle.classList.contains('d-none'))
+    ).toBe(true)
+    expect(
+      fixture.nativeElement.querySelector('[routerLink="dashboard"]').classList
+    ).toContain('pe-5')
   })
 
   it('should show error on toggle slim sidebar if store settings fails', () => {

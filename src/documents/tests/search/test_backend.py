@@ -4,6 +4,8 @@ from pathlib import Path
 import pytest
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import assign_perm
 from pytest_mock import MockerFixture
 
@@ -100,6 +102,191 @@ class TestWriteBatch:
         mocker.stopall()
         backend.add_or_update(doc)
         assert len(backend.search_ids("indexable", user=None)) == 1
+
+
+class TestAddOrUpdateIds:
+    """Test WriteBatch.add_or_update_ids(), the bulk id-based upsert path.
+
+    Unlike add_or_update() called once per document, this resolves viewer
+    permissions and effective (versioned) content in bulk against the ids as
+    a whole, so it must produce identical indexed output to the per-document
+    path while issuing a constant number of queries regardless of batch size.
+    """
+
+    def test_missing_id_is_skipped_not_errored(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        doc = Document.objects.create(
+            title="doc",
+            content="present",
+            checksum="EXIST1",
+            pk=1,
+        )
+        missing_pk = 999
+
+        with backend.batch_update() as batch:
+            batch.add_or_update_ids([doc.pk, missing_pk])
+
+        assert backend.search_ids("present", user=None) == [doc.pk]
+
+    def test_query_count_does_not_scale_with_batch_size(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """Each query count must stay far below N, not merely match between
+        two runs -- an exact-equality assertion between two measurements is
+        at the mercy of incidental process-level caches (e.g. Django's
+        ContentType.objects.get_for_model) warming on whichever run happens
+        first, which makes counts differ by a query for reasons unrelated to
+        batch size. A generous fixed bound sidesteps that: the old
+        per-document path issued roughly 8 queries per document, so 50
+        documents under a bound this low proves the fix regardless of cache
+        state.
+        """
+        max_queries_for_any_batch_size = 15
+
+        small_docs = [
+            Document.objects.create(
+                title="doc",
+                content=f"unique{i}",
+                checksum=f"SMALL{i}",
+                pk=i,
+            )
+            for i in range(1, 3)
+        ]
+        with CaptureQueriesContext(connection) as ctx_small:
+            with backend.batch_update() as batch:
+                batch.add_or_update_ids([d.pk for d in small_docs])
+        assert len(ctx_small.captured_queries) <= max_queries_for_any_batch_size
+
+        large_docs = [
+            Document.objects.create(
+                title="doc",
+                content=f"unique{i}",
+                checksum=f"LARGE{i}",
+                pk=i,
+            )
+            for i in range(100, 150)
+        ]
+        with CaptureQueriesContext(connection) as ctx_large:
+            with backend.batch_update() as batch:
+                batch.add_or_update_ids([d.pk for d in large_docs])
+        assert len(ctx_large.captured_queries) <= max_queries_for_any_batch_size
+
+        for doc in large_docs:
+            assert backend.search_ids(f"unique{doc.pk}", user=None) == [doc.pk]
+
+    def test_resolves_direct_user_grant_in_bulk(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        owner = UserFactory()
+        user = UserFactory()
+        doc = Document.objects.create(
+            title="doc",
+            checksum="PERM1",
+            pk=1,
+            owner=owner,
+        )
+        assign_perm("view_document", user, doc)
+
+        with backend.batch_update() as batch:
+            batch.add_or_update_ids([doc.pk])
+
+        assert backend.search_ids("doc", user=user) == [doc.pk]
+        other = UserFactory()
+        assert backend.search_ids("doc", user=other) == []
+
+    def test_resolves_group_grant_in_bulk(self, backend: TantivyBackend) -> None:
+        owner = UserFactory()
+        group = Group.objects.create(name="reviewers")
+        user = UserFactory()
+        user.groups.add(group)
+        doc = Document.objects.create(
+            title="doc",
+            checksum="GPERM1",
+            pk=1,
+            owner=owner,
+        )
+        assign_perm("view_document", group, doc)
+
+        with backend.batch_update() as batch:
+            batch.add_or_update_ids([doc.pk])
+
+        assert backend.search_ids("doc", user=user) == [doc.pk]
+        other = UserFactory()
+        assert backend.search_ids("doc", user=other) == []
+
+    def test_indexes_notes_and_custom_fields(self, backend: TantivyBackend) -> None:
+        note_author = UserFactory(username="noter")
+        field = CustomField.objects.create(
+            name="Invoice Number",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        doc = Document.objects.create(title="doc", checksum="RICH1", pk=1)
+        Note.objects.create(document=doc, note="Reviewed", user=note_author)
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=field,
+            value_text="INV-42",
+        )
+
+        with backend.batch_update() as batch:
+            batch.add_or_update_ids([doc.pk])
+
+        assert backend.search_ids("notes.user:noter", user=None) == [doc.pk]
+        assert backend.search_ids("custom_fields.value:INV-42", user=None) == [
+            doc.pk,
+        ]
+
+    def test_uses_effective_content_for_versioned_documents(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        root = Document.objects.create(
+            title="Statement",
+            content="stale text",
+            checksum="ROOT1",
+            pk=1,
+        )
+        Document.objects.create(
+            title="Statement",
+            content="latest version text",
+            checksum="VER1",
+            pk=2,
+            root_document=root,
+            version_index=1,
+        )
+
+        with backend.batch_update() as batch:
+            batch.add_or_update_ids([root.pk])
+
+        assert backend.search_ids("latest", user=None) == [root.pk]
+        assert backend.search_ids("stale", user=None) == []
+
+    def test_reindexes_documents_already_in_the_index(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """add_or_update_ids must upsert, matching add_or_update's behaviour."""
+        doc = Document.objects.create(
+            title="doc",
+            content="original",
+            checksum="UP1",
+            pk=1,
+        )
+        backend.add_or_update(doc)
+        assert backend.search_ids("original", user=None) == [doc.pk]
+
+        doc.content = "updated"
+        doc.save()
+
+        with backend.batch_update() as batch:
+            batch.add_or_update_ids([doc.pk])
+
+        assert backend.search_ids("original", user=None) == []
+        assert backend.search_ids("updated", user=None) == [doc.pk]
 
 
 class TestSearch:

@@ -156,6 +156,15 @@ class FileStabilityTracker:
                     logger.debug(f"File disappeared during stability check: {path}")
                 continue
 
+            # Stable, but empty: some scanners create a zero byte placeholder
+            # and only write the page some time later. Consuming it now can
+            # only fail  so drop it and let the writer's next event
+            # (or the periodic rescan) bring it back once it has content
+            if not tracked.last_size:
+                to_remove.append(path)
+                logger.debug("Ignoring stable but empty file: %s", path)
+                continue
+
             # File is stable, we can return it
             to_yield.append(path)
             logger.info(f"File is stable: {path}")
