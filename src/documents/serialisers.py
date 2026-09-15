@@ -210,6 +210,9 @@ class MatchingModelSerializer(serializers.ModelSerializer[Any]):
         return match
 
 
+PERMISSION_ACTIONS = ("view", "change")
+
+
 class SetPermissionsMixin:
     def _validate_user_ids(self, user_ids):
         users = User.objects.none()
@@ -232,12 +235,9 @@ class SetPermissionsMixin:
         return groups
 
     def validate_set_permissions(self, set_permissions=None):
-        permissions_dict = {
-            "view": {},
-            "change": {},
-        }
+        permissions_dict = {action: {} for action in PERMISSION_ACTIONS}
         if set_permissions is not None:
-            for action in ["view", "change"]:
+            for action in PERMISSION_ACTIONS:
                 if action in set_permissions:
                     if "users" in set_permissions[action]:
                         users = set_permissions[action]["users"]
@@ -265,41 +265,31 @@ class SerializerWithPerms(serializers.Serializer[dict[str, Any]]):
         super().__init__(*args, **kwargs)
 
 
-@extend_schema_field(
-    field={
-        "type": "object",
-        "properties": {
-            "view": {
-                "type": "object",
-                "properties": {
-                    "users": {
-                        "type": "array",
-                        "items": {"type": "integer"},
-                    },
-                    "groups": {
-                        "type": "array",
-                        "items": {"type": "integer"},
-                    },
-                },
-            },
-            "change": {
-                "type": "object",
-                "properties": {
-                    "users": {
-                        "type": "array",
-                        "items": {"type": "integer"},
-                    },
-                    "groups": {
-                        "type": "array",
-                        "items": {"type": "integer"},
-                    },
-                },
-            },
-        },
-    },
-)
-class SetPermissionsSerializer(serializers.DictField):
-    pass
+class PermissionSetSerializer(serializers.Serializer[dict[str, Any]]):
+    users = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=False,
+        allow_null=True,
+    )
+    groups = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=False,
+        allow_null=True,
+    )
+
+
+class SetPermissionsSerializer(serializers.Serializer[dict[str, Any]]):
+    view = PermissionSetSerializer(required=False)
+    change = PermissionSetSerializer(required=False)
+
+    def to_internal_value(self, data):
+        if isinstance(data, dict):
+            unknown_keys = set(data) - set(PERMISSION_ACTIONS)
+            if unknown_keys:
+                raise serializers.ValidationError(
+                    {key: "Unknown permission action." for key in sorted(unknown_keys)},
+                )
+        return super().to_internal_value(data)
 
 
 class OwnedObjectSerializer(
@@ -470,7 +460,6 @@ class OwnedObjectSerializer(
 
     set_permissions = SetPermissionsSerializer(
         label="Set permissions",
-        allow_empty=True,
         required=False,
         write_only=True,
     )
@@ -1680,6 +1669,13 @@ class SourceModeValidationMixin:
         return source_mode
 
 
+def _validate_rotation_degrees(degrees: int, field: str = "degrees") -> int:
+    # QPDF refuses any other angle, which would otherwise fail inside the task
+    if degrees % 90 != 0:
+        raise serializers.ValidationError(f"{field} must be a multiple of 90")
+    return degrees
+
+
 class RotateDocumentsSerializer(DocumentSelectionSerializer, SourceModeValidationMixin):
     degrees = serializers.IntegerField(required=True)
     source_mode = serializers.CharField(
@@ -1687,6 +1683,9 @@ class RotateDocumentsSerializer(DocumentSelectionSerializer, SourceModeValidatio
         default=bulk_edit.SourceModeChoices.LATEST_VERSION,
     )
     from_webui = serializers.BooleanField(required=False, default=False)
+
+    def validate_degrees(self, value: int) -> int:
+        return _validate_rotation_degrees(value)
 
 
 class MergeDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
@@ -1749,8 +1748,21 @@ class MergeDocumentsAsVersionsSerializer(DocumentListSerializer):
         return attrs
 
 
+class PdfEditOperationSerializer(serializers.Serializer[dict[str, int]]):
+    page = serializers.IntegerField(min_value=1)
+    rotate = serializers.IntegerField(required=False)
+    doc = serializers.IntegerField(required=False, min_value=0)
+
+    def validate_rotate(self, value: int) -> int:
+        return _validate_rotation_degrees(value, field="rotate")
+
+
 class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin):
-    operations = serializers.ListField(required=True, allow_empty=False)
+    operations = serializers.ListField(
+        child=PdfEditOperationSerializer(),
+        required=True,
+        allow_empty=False,
+    )
     delete_original = serializers.BooleanField(required=False, default=False)
     update_document = serializers.BooleanField(required=False, default=False)
     include_metadata = serializers.BooleanField(required=False, default=True)
@@ -1768,18 +1780,9 @@ class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMix
             )
 
         operations = attrs["operations"]
-        if not isinstance(operations, list):
-            raise serializers.ValidationError("operations must be a list")
 
-        for op in operations:
-            if not isinstance(op, dict):
-                raise serializers.ValidationError("invalid operation entry")
-            if "page" not in op or not isinstance(op["page"], int):
-                raise serializers.ValidationError("page must be an integer")
-            if "rotate" in op and not isinstance(op["rotate"], int):
-                raise serializers.ValidationError("rotate must be an integer")
-            if "doc" in op and not isinstance(op["doc"], int):
-                raise serializers.ValidationError("doc must be an integer")
+        if any(op.get("doc", 0) >= len(operations) for op in operations):
+            raise serializers.ValidationError("doc index is out of bounds")
 
         if attrs["update_document"]:
             max_idx = max(op.get("doc", 0) for op in operations)
@@ -1788,16 +1791,10 @@ class EditPdfDocumentsSerializer(DocumentListSerializer, SourceModeValidationMix
                     "update_document only allowed with a single output document",
                 )
 
-        if any(
-            op.get("doc", 0) < 0 or op.get("doc", 0) >= len(operations)
-            for op in operations
-        ):
-            raise serializers.ValidationError("doc index is out of bounds")
-
         doc = Document.objects.get(id=documents[0])
         if doc.page_count:
             for op in operations:
-                if op["page"] < 1 or op["page"] > doc.page_count:
+                if op["page"] > doc.page_count:
                     raise serializers.ValidationError(
                         f"Page {op['page']} is out of bounds for document with {doc.page_count} pages.",
                     )
@@ -2042,32 +2039,39 @@ class BulkEditSerializer(
         else:
             raise serializers.ValidationError("remove_custom_fields not specified")
 
-    def _validate_owner(self, owner):
-        ownerUser = User.objects.get(pk=owner)
-        if ownerUser is None:
-            raise serializers.ValidationError("Specified owner cannot be found")
-        return ownerUser
+    def _validate_owner(self, owner) -> User:
+        owner_field = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+        try:
+            return owner_field.run_validation(owner)
+        except serializers.ValidationError as e:
+            raise serializers.ValidationError(
+                "Specified owner cannot be found",
+            ) from e
 
     def _validate_parameters_set_permissions(self, parameters) -> None:
         if "set_permissions" not in parameters:
             raise serializers.ValidationError("set_permissions not specified")
+        set_permissions = parameters["set_permissions"]
+        if set_permissions is not None:
+            set_permissions = SetPermissionsSerializer().run_validation(
+                set_permissions,
+            )
         parameters["set_permissions"] = self.validate_set_permissions(
-            parameters["set_permissions"],
+            set_permissions,
         )
         if "owner" in parameters and parameters["owner"] is not None:
-            self._validate_owner(parameters["owner"])
+            parameters["owner"] = self._validate_owner(parameters["owner"]).pk
         if "merge" not in parameters:
             parameters["merge"] = False
 
     def _validate_parameters_rotate(self, parameters) -> None:
-        try:
-            if (
-                "degrees" not in parameters
-                or not float(parameters["degrees"]).is_integer()
-            ):
-                raise serializers.ValidationError("invalid rotation degrees")
-        except ValueError:
+        if "degrees" not in parameters:
             raise serializers.ValidationError("invalid rotation degrees")
+        try:
+            degrees = serializers.IntegerField().run_validation(parameters["degrees"])
+        except serializers.ValidationError as e:
+            raise serializers.ValidationError("invalid rotation degrees") from e
+        parameters["degrees"] = _validate_rotation_degrees(degrees)
 
     def _validate_source_mode(self, parameters) -> None:
         source_mode = parameters.get(
@@ -2076,28 +2080,25 @@ class BulkEditSerializer(
         )
         parameters["source_mode"] = self.validate_source_mode(source_mode)
 
-    def _validate_parameters_split(self, parameters) -> None:
+    def _validate_parameters_split(self, parameters, document_id) -> None:
         if "pages" not in parameters:
             raise serializers.ValidationError("pages not specified")
-        try:
-            pages = []
-            docs = parameters["pages"].split(",")
-            for doc in docs:
-                if "-" in doc:
-                    pages.append(
-                        [
-                            x
-                            for x in range(
-                                int(doc.split("-")[0]),
-                                int(doc.split("-")[1]) + 1,
-                            )
-                        ],
-                    )
-                else:
-                    pages.append([int(doc)])
-            parameters["pages"] = pages
-        except ValueError:
+        if not isinstance(parameters["pages"], str):
             raise serializers.ValidationError("invalid pages specified")
+        page_count = Document.objects.get(id=document_id).page_count
+        pages = []
+        for group in parameters["pages"].split(","):
+            start, is_range, end = group.partition("-")
+            try:
+                first = int(start)
+                last = int(end) if is_range else first
+            except ValueError as e:
+                raise serializers.ValidationError("invalid pages specified") from e
+            # Bound the range before building it, a huge one would exhaust memory
+            if not 1 <= first <= last or (page_count and last > page_count):
+                raise serializers.ValidationError("invalid pages specified")
+            pages.append(list(range(first, last + 1)))
+        parameters["pages"] = pages
 
         if "delete_originals" in parameters:
             if not isinstance(parameters["delete_originals"], bool):
@@ -2128,19 +2129,18 @@ class BulkEditSerializer(
     def _validate_parameters_edit_pdf(self, parameters, document_id) -> None:
         if "operations" not in parameters:
             raise serializers.ValidationError("operations not specified")
-        if not isinstance(parameters["operations"], list):
-            raise serializers.ValidationError("operations must be a list")
-        if not parameters["operations"]:
-            raise serializers.ValidationError("operations must not be empty")
-        for op in parameters["operations"]:
-            if not isinstance(op, dict):
-                raise serializers.ValidationError("invalid operation entry")
-            if "page" not in op or not isinstance(op["page"], int):
-                raise serializers.ValidationError("page must be an integer")
-            if "rotate" in op and not isinstance(op["rotate"], int):
-                raise serializers.ValidationError("rotate must be an integer")
-            if "doc" in op and not isinstance(op["doc"], int):
-                raise serializers.ValidationError("doc must be an integer")
+        operations_field = serializers.ListField(
+            child=PdfEditOperationSerializer(),
+            allow_empty=False,
+        )
+        try:
+            operations = operations_field.run_validation(parameters["operations"])
+        except serializers.ValidationError as e:
+            # Key the errors under "operations" so they match what the
+            # dedicated edit_pdf endpoint returns
+            raise serializers.ValidationError({"operations": e.detail}) from e
+        parameters["operations"] = operations
+
         if "update_document" in parameters:
             if not isinstance(parameters["update_document"], bool):
                 raise serializers.ValidationError("update_document must be a boolean")
@@ -2152,24 +2152,21 @@ class BulkEditSerializer(
         else:
             parameters["include_metadata"] = True
 
+        if any(op.get("doc", 0) >= len(operations) for op in operations):
+            raise serializers.ValidationError("doc index is out of bounds")
+
         if parameters["update_document"]:
-            max_idx = max(op.get("doc", 0) for op in parameters["operations"])
+            max_idx = max(op.get("doc", 0) for op in operations)
             if max_idx > 0:
                 raise serializers.ValidationError(
                     "update_document only allowed with a single output document",
                 )
 
-        if any(
-            op.get("doc", 0) < 0 or op.get("doc", 0) >= len(parameters["operations"])
-            for op in parameters["operations"]
-        ):
-            raise serializers.ValidationError("doc index is out of bounds")
-
         doc = Document.objects.get(id=document_id)
         # doc existence is already validated
         if doc.page_count:
-            for op in parameters["operations"]:
-                if op["page"] < 1 or op["page"] > doc.page_count:
+            for op in operations:
+                if op["page"] > doc.page_count:
                     raise serializers.ValidationError(
                         f"Page {op['page']} is out of bounds for document with {doc.page_count} pages.",
                     )
@@ -2228,7 +2225,7 @@ class BulkEditSerializer(
                 raise serializers.ValidationError(
                     "Split method only supports one document",
                 )
-            self._validate_parameters_split(parameters)
+            self._validate_parameters_split(parameters, attrs["documents"][0])
         elif method == bulk_edit.delete_pages:
             if len(attrs["documents"]) > 1:
                 raise serializers.ValidationError(
@@ -3021,9 +3018,8 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
         allow_null=True,
     )
 
-    permissions = serializers.DictField(
+    permissions = SetPermissionsSerializer(
         label="Set permissions",
-        allow_empty=False,
         required=False,
         write_only=True,
     )
@@ -3059,8 +3055,8 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
             )
         return objects
 
-    def _validate_permissions(self, permissions) -> None:
-        self.validate_set_permissions(
+    def _validate_permissions(self, permissions) -> dict:
+        return self.validate_set_permissions(
             permissions,
         )
 
@@ -3084,7 +3080,11 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
         if operation == "set_permissions":
             permissions = attrs.get("permissions")
             if permissions is not None:
-                self._validate_permissions(permissions)
+                if not permissions:
+                    raise serializers.ValidationError(
+                        "permissions must not be empty",
+                    )
+                attrs["permissions"] = self._validate_permissions(permissions)
 
         return attrs
 

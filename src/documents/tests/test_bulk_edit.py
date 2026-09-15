@@ -636,14 +636,9 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         THEN:
             - Permission.DoesNotExist is raised, not a silent no-op
 
-        Regression test: the endpoint that calls this
-        (BulkEditObjectPermissionsView) never actually validates action
-        names against the raw client-supplied permissions dict --
-        BulkEditObjectsSerializer._validate_permissions calls
-        validate_set_permissions() only for its side-effecting user/group id
-        checks and discards the filtered dict it returns -- so a bogus
-        action key reaches this function as-is. Resolving the Permission via
-        a bare `.filter()` (which returns empty instead of raising) would
+        The API rejects unknown action names before they get here, but a
+        direct caller could still pass one. Resolving the Permission via a
+        bare `.filter()` (which returns empty instead of raising) would
         silently drop the grant and report success.
         """
         with self.assertRaises(Permission.DoesNotExist):

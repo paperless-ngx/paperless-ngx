@@ -194,6 +194,70 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         self.assertEqual(config.language, None)
         self.assertEqual(config.barcode_tag_mapping, None)
 
+    def test_api_update_config_json_objects(self) -> None:
+        """
+        GIVEN:
+            - API request to update app config with JSON objects for the
+              user_args and barcode_tag_mapping JSONFields
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+            - Both objects are stored as sent
+        """
+        user_args = {"unpaper_args": "--pre-rotate 90", "jobs": 2}
+        barcode_tag_mapping = {"TAG:(.*)": "\\g<1>", "ASN12.*": ""}
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            json.dumps(
+                {
+                    "user_args": json.dumps(user_args),
+                    "barcode_tag_mapping": json.dumps(barcode_tag_mapping),
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        config = ApplicationConfiguration.objects.first()
+        assert config is not None
+        self.assertEqual(config.user_args, user_args)
+        self.assertEqual(config.barcode_tag_mapping, barcode_tag_mapping)
+
+    def test_api_update_config_rejects_invalid_json_objects(self) -> None:
+        """
+        GIVEN:
+            - API request to update app config with a JSON-encoded value that
+              is not an object for user_args or barcode_tag_mapping, or a
+              barcode_tag_mapping with a non-string substitute
+        WHEN:
+            - API is called
+        THEN:
+            - Request is rejected with a 400 naming the problem
+            - Config is not updated
+        """
+        not_objects = (True, 1, [1, 2, 3], "not a dict")
+        cases = [
+            (field, value, b"must be a JSON object")
+            for field in ("user_args", "barcode_tag_mapping")
+            for value in not_objects
+        ]
+        cases += [
+            ("barcode_tag_mapping", {"TAG:(.*)": 5}, b"values must be strings"),
+            ("barcode_tag_mapping", {"TAG:(.*)": None}, b"values must be strings"),
+        ]
+        for field, value, expected_message in cases:
+            with self.subTest(field=field, value=value):
+                response = self.client.patch(
+                    f"{self.ENDPOINT}1/",
+                    json.dumps({field: json.dumps(value)}),
+                    content_type="application/json",
+                )
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertIn(expected_message, response.content)
+                config = ApplicationConfiguration.objects.first()
+                assert config is not None
+                self.assertIsNone(getattr(config, field))
+
     def test_api_replace_app_logo(self) -> None:
         """
         GIVEN:

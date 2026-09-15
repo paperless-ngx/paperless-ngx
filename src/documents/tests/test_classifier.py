@@ -1,13 +1,20 @@
+import pickle
 import re
 import warnings
+from datetime import UTC
+from datetime import datetime
 from pathlib import Path
 from unittest import mock
 
 import numpy as np
 import pytest
 from django.conf import settings
+from django.db import connection
 from django.test import TestCase
 from django.test import override_settings
+from django.test.utils import CaptureQueriesContext
+from pytest_django.fixtures import Settings
+from pytest_mock import MockerFixture
 
 from documents.classifier import ClassifierModelCorruptError
 from documents.classifier import DocumentClassifier
@@ -20,6 +27,8 @@ from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.tests.factories import DocumentFactory
+from documents.tests.factories import TagFactory
 from documents.tests.utils import DirectoriesMixin
 from paperless.signed_pickle import HMAC_SIZE
 from paperless.signed_pickle import signed_pickle_dumps
@@ -909,6 +918,85 @@ class TestClassifier(DirectoriesMixin, TestCase):
             load_classifier(raise_exception=True)
 
 
+class TestClassifierSave:
+    @pytest.fixture
+    def model_file(self, tmp_path: Path, settings: Settings) -> Path:
+        settings.MODEL_FILE = tmp_path / "classifier.pickle"
+        return settings.MODEL_FILE
+
+    @pytest.fixture
+    def classifier(self) -> DocumentClassifier:
+        classifier = DocumentClassifier()
+        classifier.last_doc_change_time = datetime(2026, 1, 2, 3, 4, 5, tzinfo=UTC)
+        classifier.last_auto_type_hash = b"\x01" * 32
+        return classifier
+
+    def test_save_writes_signed_pickle(
+        self,
+        model_file: Path,
+        classifier: DocumentClassifier,
+    ) -> None:
+        """
+        GIVEN:
+            - A classifier with training state
+        WHEN:
+            - The classifier is saved
+        THEN:
+            - The file is the HMAC of the pickled state followed by that pickle
+            - The pickle uses the highest protocol
+            - The saved state loads back into a new classifier
+            - No temporary file is left behind
+        """
+        classifier.save()
+
+        raw = model_file.read_bytes()
+        signature = raw[: DocumentClassifier.HMAC_SIZE]
+        data = raw[DocumentClassifier.HMAC_SIZE :]
+        assert signature == DocumentClassifier._compute_hmac(data)
+        # A pickle opens with the PROTO opcode followed by the protocol number
+        assert data[:2] == bytes([pickle.PROTO[0], pickle.HIGHEST_PROTOCOL])
+        assert pickle.loads(data)[:3] == (
+            DocumentClassifier.FORMAT_VERSION,
+            classifier.last_doc_change_time,
+            classifier.last_auto_type_hash,
+        )
+
+        loaded = DocumentClassifier()
+        loaded.load()
+        assert loaded.last_doc_change_time == classifier.last_doc_change_time
+        assert loaded.last_auto_type_hash == classifier.last_auto_type_hash
+
+        assert not model_file.with_name(f"{model_file.name}.part").exists()
+
+    def test_save_failure_removes_partial_file(
+        self,
+        model_file: Path,
+        classifier: DocumentClassifier,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - An existing classifier model file
+        WHEN:
+            - Saving a new classifier fails part way through writing
+        THEN:
+            - The error is raised
+            - The partially written temporary file is removed
+            - The existing model file is left untouched
+        """
+        model_file.write_bytes(b"existing model")
+        mocker.patch(
+            "documents.classifier.pickle.dump",
+            side_effect=RuntimeError("disk full"),
+        )
+
+        with pytest.raises(RuntimeError, match="disk full"):
+            classifier.save()
+
+        assert not model_file.with_name(f"{model_file.name}.part").exists()
+        assert model_file.read_bytes() == b"existing model"
+
+
 class _StubProbaClassifier:
     """
     A fake scikit-learn classifier exposing just enough of the API for
@@ -1017,3 +1105,135 @@ def test_preprocess_content_nltk_load_fail(mocker) -> None:
         expected_preprocess_content = f.read().rstrip()
     result = classifier.preprocess_content(content)
     assert result == expected_preprocess_content
+
+
+@pytest.mark.django_db
+class TestClassifierTrainTagLabels:
+    @pytest.fixture(autouse=True)
+    def _simple_preprocess(self, mocker: MockerFixture) -> None:
+        mocker.patch.object(
+            DocumentClassifier,
+            "preprocess_content",
+            side_effect=dummy_preprocess,
+        )
+
+    @pytest.fixture
+    def auto_tags(self) -> list[Tag]:
+        return TagFactory.create_batch(2, matching_algorithm=MatchingModel.MATCH_AUTO)
+
+    def test_train_query_count_does_not_scale_with_documents(
+        self,
+        auto_tags: list[Tag],
+    ) -> None:
+        """
+        GIVEN:
+            - Documents with auto matching tags
+        WHEN:
+            - The classifier is trained, then more documents are added and it is
+              trained again
+        THEN:
+            - Both trainings run the same number of queries
+        """
+        for doc in DocumentFactory.create_batch(2):
+            doc.tags.set(auto_tags)
+
+        with CaptureQueriesContext(connection) as few_documents:
+            DocumentClassifier().train()
+
+        for doc in DocumentFactory.create_batch(6):
+            doc.tags.set(auto_tags)
+
+        with CaptureQueriesContext(connection) as more_documents:
+            DocumentClassifier().train()
+
+        assert len(more_documents) == len(few_documents)
+
+    def test_train_uses_only_auto_tags_as_labels(
+        self,
+        auto_tags: list[Tag],
+    ) -> None:
+        """
+        GIVEN:
+            - Documents with both auto matching and non auto matching tags
+        WHEN:
+            - The classifier is trained
+        THEN:
+            - Only the auto matching tags are used as tag labels
+        """
+        manual_tag = TagFactory(matching_algorithm=MatchingModel.MATCH_ANY)
+        first, second, third = DocumentFactory.create_batch(3)
+        first.tags.set([auto_tags[0], manual_tag])
+        second.tags.set([auto_tags[1], manual_tag])
+        third.tags.set([*auto_tags, manual_tag])
+
+        classifier = DocumentClassifier()
+        classifier.train()
+
+        assert list(classifier.tags_binarizer.classes_) == sorted(
+            tag.pk for tag in auto_tags
+        )
+
+
+@pytest.mark.django_db
+class TestClassifierTrainContent:
+    def test_train_content_follows_label_order_across_chunks(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - More documents than fit in one content chunk
+        WHEN:
+            - The classifier is trained
+        THEN:
+            - Every document's content is preprocessed once, in document order
+        """
+        mocker.patch("documents.classifier._CONTENT_CHUNK_SIZE", 2)
+        docs = DocumentFactory.create_batch(5)
+        preprocess = mocker.patch.object(
+            DocumentClassifier,
+            "preprocess_content",
+            side_effect=dummy_preprocess,
+        )
+
+        DocumentClassifier().train()
+
+        assert [call.args[0] for call in preprocess.call_args_list] == [
+            doc.content for doc in sorted(docs, key=lambda doc: doc.pk)
+        ]
+
+    def test_train_document_deleted_while_training(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - Two documents
+        WHEN:
+            - The second document is deleted after its labels were gathered, but
+              before its content is fetched
+        THEN:
+            - Training completes
+            - The deleted document is trained with empty content, keeping labels
+              and content aligned
+        """
+        mocker.patch("documents.classifier._CONTENT_CHUNK_SIZE", 1)
+        first, second = DocumentFactory.create_batch(2)
+
+        def delete_second_then_preprocess(content: str, **kwargs) -> str:
+            if content == first.content:
+                second.delete()
+            return dummy_preprocess(content)
+
+        preprocess = mocker.patch.object(
+            DocumentClassifier,
+            "preprocess_content",
+            side_effect=delete_second_then_preprocess,
+        )
+
+        assert DocumentClassifier().train()
+
+        assert [call.args[0] for call in preprocess.call_args_list] == [
+            first.content,
+            "",
+        ]
