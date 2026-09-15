@@ -324,7 +324,7 @@ describe('AppFrameComponent', () => {
 
     expect(
       fixture.nativeElement.querySelectorAll('pngx-input-switch').length
-    ).toBe(5)
+    ).toBe(6)
     expect(
       fixture.nativeElement.querySelector('[routerLink="dashboard"]')
         .parentElement.classList
