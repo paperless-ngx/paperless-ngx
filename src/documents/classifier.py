@@ -158,7 +158,7 @@ class DocumentClassifier:
         ).hexdigest()
 
     @staticmethod
-    def _compute_hmac(data: bytes) -> bytes:
+    def _compute_hmac(data: bytes | memoryview) -> bytes:
         return hmac.new(
             settings.SECRET_KEY.encode(),
             data,
@@ -173,8 +173,13 @@ class DocumentClassifier:
         if len(raw) <= self.HMAC_SIZE:
             raise ClassifierModelCorruptError
 
-        signature = raw[: self.HMAC_SIZE]
-        data = raw[self.HMAC_SIZE :]
+        # Slice through a memoryview so the (potentially multi-GB) payload is
+        # not copied; hmac and pickle both accept buffers directly.
+        # The whole file is still verified from memory before unpickling, rather
+        # than streamed from disk, so it cannot change between check and load.
+        view = memoryview(raw)
+        signature = view[: self.HMAC_SIZE]
+        data = view[self.HMAC_SIZE :]
 
         if not hmac.compare_digest(signature, self._compute_hmac(data)):
             raise ClassifierModelCorruptError
