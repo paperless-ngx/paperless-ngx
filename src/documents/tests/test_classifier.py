@@ -6,8 +6,11 @@ from unittest import mock
 import numpy as np
 import pytest
 from django.conf import settings
+from django.db import connection
 from django.test import TestCase
 from django.test import override_settings
+from django.test.utils import CaptureQueriesContext
+from pytest_mock import MockerFixture
 
 from documents.classifier import ClassifierModelCorruptError
 from documents.classifier import DocumentClassifier
@@ -20,6 +23,8 @@ from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.tests.factories import DocumentFactory
+from documents.tests.factories import TagFactory
 from documents.tests.utils import DirectoriesMixin
 from paperless.signed_pickle import HMAC_SIZE
 from paperless.signed_pickle import signed_pickle_dumps
@@ -1017,3 +1022,70 @@ def test_preprocess_content_nltk_load_fail(mocker) -> None:
         expected_preprocess_content = f.read().rstrip()
     result = classifier.preprocess_content(content)
     assert result == expected_preprocess_content
+
+
+@pytest.mark.django_db
+class TestClassifierTrainTagLabels:
+    @pytest.fixture(autouse=True)
+    def _simple_preprocess(self, mocker: MockerFixture) -> None:
+        mocker.patch.object(
+            DocumentClassifier,
+            "preprocess_content",
+            side_effect=dummy_preprocess,
+        )
+
+    @pytest.fixture
+    def auto_tags(self) -> list[Tag]:
+        return TagFactory.create_batch(2, matching_algorithm=MatchingModel.MATCH_AUTO)
+
+    def test_train_query_count_does_not_scale_with_documents(
+        self,
+        auto_tags: list[Tag],
+    ) -> None:
+        """
+        GIVEN:
+            - Documents with auto matching tags
+        WHEN:
+            - The classifier is trained, then more documents are added and it is
+              trained again
+        THEN:
+            - Both trainings run the same number of queries
+        """
+        for doc in DocumentFactory.create_batch(2):
+            doc.tags.set(auto_tags)
+
+        with CaptureQueriesContext(connection) as few_documents:
+            DocumentClassifier().train()
+
+        for doc in DocumentFactory.create_batch(6):
+            doc.tags.set(auto_tags)
+
+        with CaptureQueriesContext(connection) as more_documents:
+            DocumentClassifier().train()
+
+        assert len(more_documents) == len(few_documents)
+
+    def test_train_uses_only_auto_tags_as_labels(
+        self,
+        auto_tags: list[Tag],
+    ) -> None:
+        """
+        GIVEN:
+            - Documents with both auto matching and non auto matching tags
+        WHEN:
+            - The classifier is trained
+        THEN:
+            - Only the auto matching tags are used as tag labels
+        """
+        manual_tag = TagFactory(matching_algorithm=MatchingModel.MATCH_ANY)
+        first, second, third = DocumentFactory.create_batch(3)
+        first.tags.set([auto_tags[0], manual_tag])
+        second.tags.set([auto_tags[1], manual_tag])
+        third.tags.set([*auto_tags, manual_tag])
+
+        classifier = DocumentClassifier()
+        classifier.train()
+
+        assert list(classifier.tags_binarizer.classes_) == sorted(
+            tag.pk for tag in auto_tags
+        )
