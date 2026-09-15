@@ -1166,6 +1166,77 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_not_called()
 
     @mock.patch("documents.serialisers.bulk_edit.set_permissions")
+    def test_set_permissions_rejects_malformed_set_permissions(self, m) -> None:
+        """
+        GIVEN:
+            - A set_permissions bulk edit where set_permissions is not an
+              object, has a non-list users value, or has an unknown action
+        WHEN:
+            - API to bulk edit is called
+        THEN:
+            - API returns HTTP 400 describing the problem
+            - set_permissions is not called
+        """
+        self.setup_mock(m, "set_permissions")
+
+        for set_permissions, expected_message in (
+            (False, b"Expected a dictionary"),
+            ({"view": {"users": False}}, b"Expected a list"),
+            ({"not_a_real_action": {"users": [1]}}, b"Unknown permission action"),
+        ):
+            with self.subTest(set_permissions=set_permissions):
+                response = self.client.post(
+                    "/api/documents/bulk_edit/",
+                    json.dumps(
+                        {
+                            "documents": [self.doc2.id],
+                            "method": "set_permissions",
+                            "parameters": {"set_permissions": set_permissions},
+                        },
+                    ),
+                    content_type="application/json",
+                )
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertIn(expected_message, response.content)
+        m.assert_not_called()
+
+    @mock.patch("documents.serialisers.bulk_edit.set_permissions")
+    def test_set_permissions_null_is_a_noop(self, m) -> None:
+        """
+        GIVEN:
+            - A set_permissions bulk edit with set_permissions null and an
+              owner, i.e. a request that only changes the owner
+        WHEN:
+            - API to bulk edit is called
+        THEN:
+            - Request succeeds
+            - set_permissions receives no users or groups for any action
+        """
+        self.setup_mock(m, "set_permissions")
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc2.id],
+                    "method": "set_permissions",
+                    "parameters": {
+                        "set_permissions": None,
+                        "owner": self.user.id,
+                    },
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        self.assertEqual(
+            m.call_args.kwargs["set_permissions"],
+            {"view": {}, "change": {}},
+        )
+
+    @mock.patch("documents.serialisers.bulk_edit.set_permissions")
     def test_set_permissions_merge(self, m) -> None:
         self.setup_mock(m, "set_permissions")
         user1 = User.objects.create(username="user1")
@@ -1300,7 +1371,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.client.force_authenticate(user=user1)
 
         permissions = {
-            "owner": user1.id,
+            "view": {"users": [user1.id]},
         }
 
         response = self.client.post(
