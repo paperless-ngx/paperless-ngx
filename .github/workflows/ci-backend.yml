@@ -12,6 +12,9 @@ concurrency:
   cancel-in-progress: true
 env:
   DEFAULT_UV_VERSION: "0.12.x"
+  # Match the Docker image: nltk refuses to read hardlinked data files, such as
+  # the copy bundled with llama-index when uv links packages from its cache
+  UV_LINK_MODE: copy
 permissions: {}
 jobs:
   changes:
