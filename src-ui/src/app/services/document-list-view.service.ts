@@ -501,7 +501,10 @@ export class DocumentListViewService {
 
   get excluded(): Set<number> {
     this.trackState()
-    return (this.activeListViewState.excluded ??= new Set<number>())
+    if (!this.activeListViewState.excluded) {
+      this.activeListViewState.excluded = new Set<number>()
+    }
+    return this.activeListViewState.excluded
   }
 
   get selectedCount(): number {
