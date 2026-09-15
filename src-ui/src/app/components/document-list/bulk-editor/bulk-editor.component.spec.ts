@@ -9,7 +9,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { Router } from '@angular/router'
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
@@ -501,16 +501,19 @@ describe('BulkEditorComponent', () => {
       .mockReturnValue([{ id: 3 }, { id: 4 }])
     jest
       .spyOn(documentListViewService, 'selected', 'get')
-      .mockReturnValue(new Set([3, 4]))
+      .mockReturnValue(new Set([3]))
     jest
       .spyOn(documentListViewService, 'allSelected', 'get')
       .mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'excluded', 'get')
+      .mockReturnValue(new Set([4]))
     jest
       .spyOn(documentListViewService, 'filterRules', 'get')
       .mockReturnValue([{ rule_type: FILTER_TITLE, value: 'apple' }])
     jest
       .spyOn(documentListViewService, 'selectedCount', 'get')
-      .mockReturnValue(25)
+      .mockReturnValue(24)
     jest
       .spyOn(permissionsService, 'currentUserHasObjectPermissions')
       .mockReturnValue(true)
@@ -529,6 +532,7 @@ describe('BulkEditorComponent', () => {
     expect(req.request.body).toEqual({
       all: true,
       filters: { title_search: 'apple' },
+      excluded_documents: [4],
       method: 'modify_tags',
       parameters: { add_tags: [101], remove_tags: [] },
     })
