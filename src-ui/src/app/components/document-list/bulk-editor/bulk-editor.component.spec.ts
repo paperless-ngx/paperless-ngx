@@ -392,6 +392,42 @@ describe('BulkEditorComponent', () => {
     expect(component.tagSelectionModel.selectionSize()).toEqual(1)
   })
 
+  it('should request selection data for tags when documents are excluded from an all-filtered selection', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    fixture.detectChanges()
+    jest
+      .spyOn(documentListViewService, 'allSelected', 'get')
+      .mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'excluded', 'get')
+      .mockReturnValue(new Set([4]))
+    jest
+      .spyOn(documentListViewService, 'filterRules', 'get')
+      .mockReturnValue([{ rule_type: FILTER_TITLE, value: 'apple' }])
+    jest
+      .spyOn(documentListViewService, 'selectedCount', 'get')
+      .mockReturnValue(2)
+    const adjustedSelectionData: SelectionData = {
+      ...selectionData,
+      selected_tags: [{ id: 12, document_count: 2 }],
+    }
+    const getSelectionDataSpy = jest
+      .spyOn(documentService, 'getSelectionData')
+      .mockReturnValue(of(adjustedSelectionData))
+
+    component.openTagsDropdown()
+
+    expect(getSelectionDataSpy).toHaveBeenCalledWith({
+      all: true,
+      filters: { title_search: 'apple' },
+      excluded_documents: [4],
+    })
+    expect(component.tagDocumentCounts()).toEqual(
+      adjustedSelectionData.selected_tags
+    )
+    expect(component.tagSelectionModel.selectionSize()).toEqual(1)
+  })
+
   it('should apply list selection data to document types menu when all filtered documents are selected', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     fixture.detectChanges()
@@ -455,6 +491,47 @@ describe('BulkEditorComponent', () => {
     component.openCustomFieldsDropdown()
 
     expect(getSelectionDataSpy).not.toHaveBeenCalled()
+    expect(component.customFieldDocumentCounts()).toEqual(
+      selectionData.selected_custom_fields
+    )
+  })
+
+  it('should request selection data for the other metadata menus when documents are excluded', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    fixture.detectChanges()
+    jest
+      .spyOn(documentListViewService, 'allSelected', 'get')
+      .mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'excluded', 'get')
+      .mockReturnValue(new Set([4]))
+    jest
+      .spyOn(documentListViewService, 'filterRules', 'get')
+      .mockReturnValue([{ rule_type: FILTER_TITLE, value: 'apple' }])
+    const getSelectionDataSpy = jest
+      .spyOn(documentService, 'getSelectionData')
+      .mockReturnValue(of(selectionData))
+
+    component.openDocumentTypeDropdown()
+    component.openCorrespondentDropdown()
+    component.openStoragePathDropdown()
+    component.openCustomFieldsDropdown()
+
+    expect(getSelectionDataSpy).toHaveBeenCalledTimes(4)
+    expect(getSelectionDataSpy).toHaveBeenCalledWith({
+      all: true,
+      filters: { title_search: 'apple' },
+      excluded_documents: [4],
+    })
+    expect(component.documentTypeDocumentCounts()).toEqual(
+      selectionData.selected_document_types
+    )
+    expect(component.correspondentDocumentCounts()).toEqual(
+      selectionData.selected_correspondents
+    )
+    expect(component.storagePathDocumentCounts()).toEqual(
+      selectionData.selected_storage_paths
+    )
     expect(component.customFieldDocumentCounts()).toEqual(
       selectionData.selected_custom_fields
     )
