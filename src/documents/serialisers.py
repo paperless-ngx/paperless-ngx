@@ -1647,10 +1647,22 @@ class DocumentSelectionSerializer(DocumentListSerializer):
         write_only=True,
     )
 
+    excluded_documents = serializers.ListField(
+        required=False,
+        default=list,
+        write_only=True,
+        child=serializers.IntegerField(),
+    )
+
     def validate(self, attrs):
         if attrs.get("all", False):
             attrs.setdefault("documents", [])
             return attrs
+
+        if attrs["excluded_documents"]:
+            raise serializers.ValidationError(
+                "excluded_documents is only supported when all is true.",
+            )
 
         if "documents" not in attrs:
             raise serializers.ValidationError(
