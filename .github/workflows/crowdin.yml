@@ -22,7 +22,7 @@ jobs:
           token: ${{ secrets.PNGX_BOT_PAT }}
           persist-credentials: false
       - name: crowdin action
-        uses: crowdin/github-action@e4a6c1338b4063c77d46a81875265f9e8bd76f95 # v3.0.0
+        uses: crowdin/github-action@0d5670f539973aea2f01abce61a8989934df0025 # v3.0.2
         with:
           upload_translations: false
           download_translations: true
