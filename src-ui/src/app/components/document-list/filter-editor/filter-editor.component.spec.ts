@@ -12,6 +12,8 @@ import {
   NgbDatepickerModule,
   NgbDropdownItem,
   NgbDropdownModule,
+  NgbModal,
+  NgbModalRef,
   NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
@@ -1423,11 +1425,16 @@ describe('FilterEditorComponent', () => {
     ])
   })
 
+  const clickTextFilterTarget = (name: string) => {
+    const item = fixture.debugElement
+      .queryAll(By.directive(NgbDropdownItem))
+      .find((el) => el.nativeElement.textContent.trim() === name)
+    expect(item).not.toBeUndefined()
+    item.triggerEventHandler('click')
+  }
+
   it('should convert duplicate target input to the correct filter rule', () => {
-    const textFieldTargetDropdown = fixture.debugElement.queryAll(
-      By.directive(NgbDropdownItem)
-    )[5]
-    textFieldTargetDropdown.triggerEventHandler('click')
+    clickTextFilterTarget('Duplicates')
     fixture.detectChanges()
 
     expect(component.textFilterTarget).toEqual('duplicates')
@@ -1453,10 +1460,7 @@ describe('FilterEditorComponent', () => {
   it('should convert user input to correct filter rules on full text query', () => {
     component.textFilterInput.nativeElement.value = 'foo'
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
-    const textFieldTargetDropdown = fixture.debugElement.queryAll(
-      By.directive(NgbDropdownItem)
-    )[4]
-    textFieldTargetDropdown.triggerEventHandler('click') // TEXT_FILTER_TARGET_FULLTEXT_QUERY
+    clickTextFilterTarget('Advanced search')
     fixture.detectChanges()
     tick(400)
     expect(component.textFilterTarget).toEqual('fulltext-query')
@@ -1925,10 +1929,7 @@ describe('FilterEditorComponent', () => {
   it('should leave relative dates not in quick list intact', () => {
     component.textFilterInput.nativeElement.value = 'created:[-2 week to now]'
     component.textFilterInput.nativeElement.dispatchEvent(new Event('input'))
-    const textFieldTargetDropdown = fixture.debugElement.queryAll(
-      By.directive(NgbDropdownItem)
-    )[4]
-    textFieldTargetDropdown.triggerEventHandler('click')
+    clickTextFilterTarget('Advanced search')
     fixture.detectChanges()
     tick(400)
     expect(component.filterRules).toEqual([
@@ -2515,5 +2516,46 @@ describe('FilterEditorComponent', () => {
     fixture.detectChanges()
 
     expect(component.textFilter).toEqual('help ')
+  })
+
+  it('should open the advanced search editor with the current query and apply the result', () => {
+    const modalService: NgbModal = TestBed.inject(NgbModal)
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe(
+      (instances) => (modal = instances[0])
+    )
+    component.textFilterTarget = 'fulltext-query'
+    component.updateTextFilter('title:invoice')
+    fixture.detectChanges()
+
+    const editorButton = fixture.debugElement.query(
+      By.css('button[title="Edit query"]')
+    )
+    expect(editorButton).not.toBeNull()
+    editorButton.triggerEventHandler('click')
+    fixture.detectChanges()
+
+    expect(modal.componentInstance.query).toEqual('title:invoice')
+
+    const rulesSpy = jest.spyOn(component.filterRulesChange, 'next')
+    modal.componentInstance.queryApplied.emit('title:invoice AND NOT tag:paid')
+    expect(component.textFilter).toEqual('title:invoice AND NOT tag:paid')
+    expect(documentService.searchQuery).toEqual(
+      'title:invoice AND NOT tag:paid'
+    )
+    expect(rulesSpy).toHaveBeenCalledWith([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'title:invoice AND NOT tag:paid',
+      },
+    ])
+  })
+
+  it('should not offer the advanced search editor for other targets', () => {
+    component.textFilterTarget = 'title-content'
+    fixture.detectChanges()
+    expect(
+      fixture.debugElement.query(By.css('button[title="Edit query"]'))
+    ).toBeNull()
   })
 })
