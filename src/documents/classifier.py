@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import functools
 import hmac
 import logging
 import pickle
 import re
+import unicodedata
 import warnings
 from hashlib import sha256
 from pathlib import Path
@@ -17,6 +19,7 @@ if TYPE_CHECKING:
     from typing import BinaryIO
     from typing import Self
 
+    import tantivy
     from numpy import ndarray
     from sklearn.neural_network import MLPClassifier
 
@@ -25,12 +28,12 @@ from django.core.cache import cache
 from django.core.cache import caches
 from django.db.models import Prefetch
 
+from documents._snowball_stopwords import ENGLISH as ENGLISH_STOP_WORDS
 from documents.caching import CACHE_5_MINUTES
 from documents.caching import CACHE_50_MINUTES
 from documents.caching import CLASSIFIER_HASH_KEY
 from documents.caching import CLASSIFIER_MODIFIED_KEY
 from documents.caching import CLASSIFIER_VERSION_KEY
-from documents.caching import StoredLRUCache
 from documents.models import Document
 from documents.models import MatchingModel
 from documents.models import Tag
@@ -61,14 +64,9 @@ def _predict_with_threshold(classifier, X, threshold: float) -> int | None:
     return best_class
 
 
-ADVANCED_TEXT_PROCESSING_ENABLED = (
-    settings.NLTK_LANGUAGE is not None and settings.NLTK_ENABLED
-)
-
 read_cache = caches["read-cache"]
 
 
-RE_DIGIT = re.compile(r"\d")
 RE_WORD = re.compile(r"\b[\w]+\b")  # words that may contain digits
 
 # Documents whose content is fetched per query while training
@@ -116,6 +114,33 @@ class _SignedFileWriter:
         finally:
             # A no-op after a successful rename, otherwise removes the partial file
             self._temp.unlink(missing_ok=True)
+
+
+@functools.cache
+def _text_analyzer(language: str) -> tantivy.TextAnalyzer:
+    """
+    Builds the cached analyzer for a language: word tokens, lowercase, stop words, stemmer.
+
+    Long tokens are kept and accents are not folded to ASCII, since stemmers
+    for languages such as French and German rely on accents.
+    """
+    import tantivy
+
+    if language == "english":
+        # Tantivy's builtin English list is much shorter than Snowball's.
+        # Split contractions ("don't") on word characters, as content is, so they match
+        stop_words = tantivy.Filter.custom_stopword(
+            sorted({t for word in ENGLISH_STOP_WORDS for t in RE_WORD.findall(word)}),
+        )
+    else:
+        stop_words = tantivy.Filter.stopword(language)
+    return (
+        tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.regex(r"\w+"))
+        .filter(tantivy.Filter.lowercase())
+        .filter(stop_words)
+        .filter(tantivy.Filter.stemmer(language))
+        .build()
+    )
 
 
 class IncompatibleClassifierVersionError(Exception):
@@ -177,6 +202,7 @@ class DocumentClassifier:
     # v10 - HMAC-signed model file
     # v11 - Use sample_weight for balanced training; predict_proba with threshold;
     #       drop training-only MLP state before saving
+    #       Tantivy text preprocessing
     FORMAT_VERSION = 11
 
     HMAC_SIZE = 32  # SHA-256 digest length
@@ -194,16 +220,6 @@ class DocumentClassifier:
         self.correspondent_classifier = None
         self.document_type_classifier = None
         self.storage_path_classifier = None
-        self._stemmer = None
-        # 10,000 elements roughly use 200 to 500 KB per worker,
-        # and also in the shared Redis cache,
-        # Keep this cache small to minimize lookup and I/O latency.
-        if ADVANCED_TEXT_PROCESSING_ENABLED:
-            self._stem_cache = StoredLRUCache(
-                f"stem_cache_v{self.FORMAT_VERSION}",
-                capacity=10000,
-            )
-        self._stop_words = None
 
     def _update_data_vectorizer_hash(self) -> None:
         self.data_vectorizer_hash = sha256(
@@ -454,7 +470,6 @@ class DocumentClassifier:
                     doc = docs.get(pk)
                     yield self.preprocess_content(
                         doc.content if doc is not None else "",
-                        shared_cache=False,
                     )
 
         self.data_vectorizer = CountVectorizer(
@@ -564,99 +579,23 @@ class DocumentClassifier:
 
         return True
 
-    def _init_advanced_text_processing(self):
-        if self._stop_words is None or self._stemmer is None:
-            import nltk
-            from nltk.corpus import stopwords
-            from nltk.stem import SnowballStemmer
-
-            # Not really hacky, since it isn't private and is documented, but
-            # set the search path for NLTK data to the single location it should be in
-            nltk.data.path = [settings.NLTK_DIR]
-            try:
-                # Preload the corpus early, to force the lazy loader to transform
-                stopwords.ensure_loaded()
-
-                # Do some one time setup
-                # Sometimes, somehow, there's multiple threads loading the corpus
-                # and it's not thread safe, raising an AttributeError
-                self._stemmer = SnowballStemmer(settings.NLTK_LANGUAGE)
-                self._stop_words = frozenset(stopwords.words(settings.NLTK_LANGUAGE))
-            except AttributeError:
-                logger.debug("Could not initialize NLTK for advanced text processing.")
-                return False
-        return True
-
-    def stem_and_skip_stop_words(self, words: list[str], *, shared_cache=True):
-        """
-        Reduce a list of words to their stem. Stop words are converted to empty strings.
-        :param words: the list of words to stem
-        """
-
-        def _stem_and_skip_stop_word(word: str):
-            """
-            Reduce a given word to its stem. If it's a stop word, return an empty string.
-            E.g. "amazement", "amaze" and "amazed" all return "amaz".
-            """
-            cached = self._stem_cache.get(word)
-            if cached is not None:
-                return cached
-            elif word in self._stop_words:
-                return ""
-            # Assumption: words that contain numbers are never stemmed
-            elif RE_DIGIT.search(word):
-                return word
-            else:
-                result = self._stemmer.stem(word)
-                self._stem_cache.set(word, result)
-                return result
-
-        if shared_cache:
-            self._stem_cache.load()
-
-        # Stem the words and skip stop words
-        result = " ".join(
-            filter(None, (_stem_and_skip_stop_word(w) for w in words)),
-        )
-        if shared_cache:
-            self._stem_cache.save()
-        return result
-
-    def preprocess_content(
-        self,
-        content: str,
-        *,
-        shared_cache=True,
-    ) -> str:
+    def preprocess_content(self, content: str) -> str:
         """
         Process the contents of a document, distilling it down into
         words which are meaningful to the content.
-
-        A stemmer cache is shared across workers with the parameter "shared_cache".
-        This is unnecessary when training the classifier.
         """
-
-        # Lower case the document, reduce space,
-        # and keep only letters and digits.
-        content = " ".join(match.group().lower() for match in RE_WORD.finditer(content))
-
-        if ADVANCED_TEXT_PROCESSING_ENABLED:
-            from nltk.tokenize import word_tokenize
-
-            if not self._init_advanced_text_processing():
-                return content
-            # Tokenize
-            # This splits the content into tokens, roughly words
-            words = word_tokenize(content, language=settings.NLTK_LANGUAGE)
-            # Stem the words and skip stop words
-            content = self.stem_and_skip_stop_words(words, shared_cache=shared_cache)
-
-        return content
+        language = settings.CLASSIFIER_LANGUAGE
+        content = unicodedata.normalize("NFC", content)
+        if language is None:
+            return " ".join(
+                match.group().lower() for match in RE_WORD.finditer(content)
+            )
+        return " ".join(_text_analyzer(language).analyze(content))
 
     def _get_vectorizer_cache_key(self, content: str):
         hash = sha256(content.encode())
         hash.update(
-            f"|{self.FORMAT_VERSION}|{settings.NLTK_LANGUAGE}|{settings.NLTK_ENABLED}|{self.data_vectorizer_hash}".encode(),
+            f"|{self.FORMAT_VERSION}|{settings.CLASSIFIER_LANGUAGE}|{self.data_vectorizer_hash}".encode(),
         )
         return f"vectorized_content_{hash.hexdigest()}"
 

@@ -55,7 +55,6 @@ dependencies = [
   "llama-index-embeddings-openai-like>=0.2.2",
   "llama-index-llms-ollama>=0.9.1",
   "llama-index-llms-openai-like>=0.7.1",
-  "nltk~=3.10.0",
   "ocrmypdf>=17.7,<17.12",
   "openai>=2.48",
   "pathvalidate~=3.3.1",

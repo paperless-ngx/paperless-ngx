@@ -20,6 +20,7 @@ from documents.classifier import ClassifierModelCorruptError
 from documents.classifier import DocumentClassifier
 from documents.classifier import IncompatibleClassifierVersionError
 from documents.classifier import _predict_with_threshold
+from documents.classifier import _text_analyzer
 from documents.classifier import load_classifier
 from documents.models import Correspondent
 from documents.models import Document
@@ -30,11 +31,12 @@ from documents.models import Tag
 from documents.tests.factories import DocumentFactory
 from documents.tests.factories import TagFactory
 from documents.tests.utils import DirectoriesMixin
+from paperless.settings import CLASSIFIER_LANGUAGES
 from paperless.signed_pickle import HMAC_SIZE
 from paperless.signed_pickle import signed_pickle_dumps
 
 
-def dummy_preprocess(content: str, **kwargs):
+def dummy_preprocess(content: str) -> str:
     """
     Simpler, faster pre-processing for testing purposes
     """
@@ -1043,68 +1045,69 @@ def test_classifier_match_threshold_default() -> None:
     assert settings.CLASSIFIER_MATCH_THRESHOLD == 0.6
 
 
-def test_preprocess_content() -> None:
-    """
-    GIVEN:
-        - Advanced text processing is enabled (default)
-    WHEN:
-        - Classifier preprocesses a document's content
-    THEN:
-        - Processed content matches the expected output (stemmed words)
-    """
-    with (Path(__file__).parent / "samples" / "content.txt").open("r") as f:
-        content = f.read()
-    with (Path(__file__).parent / "samples" / "preprocessed_content_advanced.txt").open(
-        "r",
-    ) as f:
-        expected_preprocess_content = f.read().rstrip()
-    classifier = DocumentClassifier()
-    result = classifier.preprocess_content(content)
-    assert result == expected_preprocess_content
+class TestPreprocessContent:
+    @pytest.fixture
+    def samples(self) -> Path:
+        return Path(__file__).parent / "samples"
 
+    @pytest.fixture
+    def content(self, samples: Path) -> str:
+        return (samples / "content.txt").read_text()
 
-def test_preprocess_content_nltk_disabled() -> None:
-    """
-    GIVEN:
-        - Advanced text processing is disabled
-    WHEN:
-        - Classifier preprocesses a document's content
-    THEN:
-        - Processed content matches the expected output (unstemmed words)
-    """
-    with (Path(__file__).parent / "samples" / "content.txt").open("r") as f:
-        content = f.read()
-    with (Path(__file__).parent / "samples" / "preprocessed_content.txt").open(
-        "r",
-    ) as f:
-        expected_preprocess_content = f.read().rstrip()
-    classifier = DocumentClassifier()
-    with mock.patch("documents.classifier.ADVANCED_TEXT_PROCESSING_ENABLED", new=False):
-        result = classifier.preprocess_content(content)
-    assert result == expected_preprocess_content
+    def test_supported_language(
+        self,
+        settings: Settings,
+        samples: Path,
+        content: str,
+    ) -> None:
+        """
+        GIVEN:
+            - The classifier language is English, the default
+        WHEN:
+            - Document content is preprocessed
+        THEN:
+            - Stop words are removed and the remaining words are stemmed
+        """
+        settings.CLASSIFIER_LANGUAGE = "english"
+        expected = (samples / "preprocessed_content_advanced.txt").read_text()
 
+        assert DocumentClassifier().preprocess_content(content) == expected.rstrip()
 
-def test_preprocess_content_nltk_load_fail(mocker) -> None:
-    """
-    GIVEN:
-        - NLTK stop words fail to load
-    WHEN:
-        - Classifier preprocesses a document's content
-    THEN:
-        - Processed content matches the expected output (unstemmed words)
-    """
-    _module = mocker.MagicMock(name="nltk_corpus_mock")
-    _module.stopwords.words.side_effect = AttributeError()
-    mocker.patch.dict("sys.modules", {"nltk.corpus": _module})
-    classifier = DocumentClassifier()
-    with (Path(__file__).parent / "samples" / "content.txt").open("r") as f:
-        content = f.read()
-    with (Path(__file__).parent / "samples" / "preprocessed_content.txt").open(
-        "r",
-    ) as f:
-        expected_preprocess_content = f.read().rstrip()
-    result = classifier.preprocess_content(content)
-    assert result == expected_preprocess_content
+    def test_unsupported_language(
+        self,
+        settings: Settings,
+        samples: Path,
+        content: str,
+    ) -> None:
+        """
+        GIVEN:
+            - No classifier language (the OCR language has no stemming support)
+        WHEN:
+            - Document content is preprocessed
+        THEN:
+            - The content is only lowercased and split into words
+        """
+        settings.CLASSIFIER_LANGUAGE = None
+        expected = (samples / "preprocessed_content.txt").read_text()
+
+        assert DocumentClassifier().preprocess_content(content) == expected.rstrip()
+
+    @pytest.mark.parametrize(
+        "language",
+        [pytest.param("english", id="supported"), pytest.param(None, id="unsupported")],
+    )
+    def test_empty_content(self, settings: Settings, language: str | None) -> None:
+        """
+        GIVEN:
+            - Empty document content
+        WHEN:
+            - The content is preprocessed
+        THEN:
+            - The result is empty
+        """
+        settings.CLASSIFIER_LANGUAGE = language
+
+        assert DocumentClassifier().preprocess_content("") == ""
 
 
 @pytest.mark.django_db
@@ -1237,3 +1240,53 @@ class TestClassifierTrainContent:
             first.content,
             "",
         ]
+
+
+class TestTextAnalyzer:
+    @pytest.mark.parametrize(
+        "language",
+        [
+            pytest.param(language, id=language)
+            for language in sorted(set(CLASSIFIER_LANGUAGES.values()))
+        ],
+    )
+    def test_builds_for_every_classifier_language(self, language: str) -> None:
+        """
+        GIVEN:
+            - A language the classifier supports
+        WHEN:
+            - Text is analyzed with its classifier language
+        THEN:
+            - Tokens are produced
+        """
+        assert _text_analyzer(language).analyze("Paperless invoice 2026")
+
+    def test_english_removes_snowball_stop_words(self) -> None:
+        """
+        GIVEN:
+            - English text with a contraction and stop words missing from
+              Tantivy's own English list
+        WHEN:
+            - The text is analyzed
+        THEN:
+            - All stop words are removed, including the contraction
+            - The remaining words are stemmed
+        """
+        tokens = _text_analyzer("english").analyze(
+            "They were about to pay the invoices, don't worry",
+        )
+
+        assert tokens == ["pay", "invoic", "worri"]
+
+    def test_keeps_underscores_within_tokens(self) -> None:
+        """
+        GIVEN:
+            - Text with a word joined by an underscore
+        WHEN:
+            - The text is analyzed
+        THEN:
+            - The word stays one token
+        """
+        tokens = _text_analyzer("english").analyze("tax_id")
+
+        assert tokens == ["tax_id"]
