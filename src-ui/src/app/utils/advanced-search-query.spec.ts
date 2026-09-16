@@ -8,7 +8,10 @@ import {
   AdvancedSearchQueryElementType,
   AdvancedSearchQueryGroup,
 } from '../data/advanced-search-query'
-import { serializeAdvancedSearchQuery } from './advanced-search-query'
+import {
+  parseAdvancedSearchQuery,
+  serializeAdvancedSearchQuery,
+} from './advanced-search-query'
 
 const atom = (
   field: AdvancedSearchField,
@@ -394,5 +397,119 @@ describe('serializeAdvancedSearchQuery', () => {
         'content:invoice AND (correspondent:"acme corp" OR content:"acme corporation") AND added:[-3 months to now] AND NOT tag:paid'
       )
     })
+  })
+})
+
+describe('parseAdvancedSearchQuery', () => {
+  const canonical = [
+    'title:invoice',
+    'title:invoice AND title:unpaid',
+    'content:invoice OR content:receipt',
+    'a AND b',
+    'title:"quick brown fox"',
+    'title:invoi*',
+    "custom_fields.value:O'Brien",
+    'custom_fields.value:"foo:bar"',
+    'custom_fields.name:"status" AND custom_fields.value:paid',
+    'notes.note:call AND notes.user:alice',
+    'checksum:9f86d081*',
+    'asn:42',
+    'asn:[50 to 150]',
+    'asn:[50 to]',
+    'asn:[to 50]',
+    'page_count:[10 to]',
+    'added:today',
+    'added:"previous month"',
+    'added:[-1 day to now]',
+    'added:[-3 months to now]',
+    'created:[2024-01-01 to 2024-03-31]',
+    'created:[2024-01-01 to]',
+    'created:[to 2024-01-01]',
+    'NOT tag:paid',
+    'NOT (tag:paid OR title:letter)',
+    'NOT (title:a AND title:b)',
+    'content:invoice OR NOT tag:paid',
+    'content:invoice AND (title:letter OR tag:paid)',
+    'content:invoice OR (title:letter AND tag:paid)',
+    'content:invoice AND (correspondent:"acme corp" OR content:"acme corporation") AND added:[-3 months to now] AND NOT tag:paid',
+  ]
+
+  it.each(canonical)('reads back %s unchanged', (query) => {
+    const tree = parseAdvancedSearchQuery(query)
+    expect(tree).not.toBeNull()
+    expect(serializeAdvancedSearchQuery(tree)).toBe(query)
+  })
+
+  it('reads surrounding whitespace', () => {
+    expect(
+      serializeAdvancedSearchQuery(
+        parseAdvancedSearchQuery('  title:invoice  ')
+      )
+    ).toBe('title:invoice')
+  })
+
+  it('puts the words of one condition back together', () => {
+    expect(parseAdvancedSearchQuery('title:invoice AND title:unpaid')).toEqual(
+      group(
+        And,
+        atom(
+          AdvancedSearchField.Title,
+          AdvancedSearchOperator.AllWords,
+          'invoice unpaid'
+        )
+      )
+    )
+  })
+
+  it('keeps words of different fields apart', () => {
+    expect(parseAdvancedSearchQuery('title:a OR content:b')).toEqual(
+      group(
+        Or,
+        atom(AdvancedSearchField.Title, AdvancedSearchOperator.AllWords, 'a'),
+        atom(AdvancedSearchField.Content, AdvancedSearchOperator.AllWords, 'b')
+      )
+    )
+  })
+
+  it('reads a range as its condition', () => {
+    expect(parseAdvancedSearchQuery('added:[-3 months to now]')).toEqual(
+      group(
+        And,
+        atom(
+          AdvancedSearchField.Added,
+          AdvancedSearchOperator.WithinLast,
+          '3',
+          {
+            unit: AdvancedSearchDateUnit.Month,
+          }
+        )
+      )
+    )
+  })
+
+  it.each([
+    ['', 'nothing'],
+    ['   ', 'whitespace'],
+    ['type:invoice', 'a field alias'],
+    ['notes:call', 'a bare notes prefix'],
+    ['unknown:x', 'an unknown field'],
+    ['title:a AND content:b OR title:c', 'AND and OR mixed at one level'],
+    ['title:a b', 'an implicit AND'],
+    ['title:"unterminated', 'an unterminated phrase'],
+    ['asn:[50 to', 'an unterminated range'],
+    ['title:a*b', 'a wildcard in the middle'],
+    ['title:invoice^2', 'a boost'],
+    ['asn:[50 to abc]', 'a non-numeric bound'],
+    ['asn:invoice', 'a word on a number field'],
+    ['created:[2024 to 2025]', 'a year-only date range'],
+    ['added:"last tuesday"', 'a date keyword paperless does not have'],
+    ['title:[a to b]', 'a range on a text field'],
+    ['checksum:9f86d081', 'a checksum without a wildcard'],
+    ['(title:invoice)', 'parentheses the editor would not write'],
+    ['title:invoice AND', 'a trailing operator'],
+    ['title:"a"b', 'a value running into the next'],
+    ['ADDED:today', 'an uppercase field name'],
+  ])('leaves %s alone, having %s', (query) => {
+    expect(parseAdvancedSearchQuery(query)).toBeNull()
   })
 })
