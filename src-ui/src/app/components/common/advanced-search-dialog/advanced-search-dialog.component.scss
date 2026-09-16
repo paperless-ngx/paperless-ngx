@@ -1,0 +1,11 @@
+.query-preview {
+  font-size: 0.8125rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background-color: var(--pngx-bg-darker);
+  border-color: var(--bs-border-color) !important;
+}
+
+.input-group .amount {
+  flex: 0 1 5rem;
+}

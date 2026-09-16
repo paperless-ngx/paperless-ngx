@@ -1,0 +1,347 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="advanced-search-dialog-title" i18n>
+    Advanced search
+  </h4>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    i18n-aria-label
+    (click)="cancel()"
+  ></button>
+</div>
+<div class="modal-body">
+  @if (unreadable) {
+    <div class="alert alert-warning d-flex flex-wrap gap-2 align-items-center">
+      <div class="flex-grow-1">
+        <span i18n
+          >The current query uses syntax this editor can't show. It still works
+          as typed.</span
+        >
+      </div>
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-secondary"
+        (click)="startOver()"
+        i18n
+      >
+        Start a new query
+      </button>
+    </div>
+  }
+
+  <ng-container
+    *ngTemplateOutlet="
+      groupTemplate;
+      context: { group: root, parent: null, depth: 0 }
+    "
+  ></ng-container>
+
+  <div class="mt-4">
+    <label
+      class="form-label small text-muted"
+      for="advanced-search-preview"
+      i18n
+      >Query</label
+    >
+    <pre
+      id="advanced-search-preview"
+      class="query-preview mb-0 p-2 rounded border"
+    >@if (generatedQuery) {{{ generatedQuery }}} @else {<span class="text-muted fst-italic" i18n>Nothing to search for yet</span>}</pre>
+  </div>
+</div>
+<div class="modal-footer">
+  <button
+    type="button"
+    class="btn btn-outline-secondary"
+    (click)="cancel()"
+    i18n
+  >
+    Cancel
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    (click)="apply()"
+    [disabled]="!generatedQuery"
+    i18n
+  >
+    Apply
+  </button>
+</div>
+
+<ng-template
+  #groupTemplate
+  let-group="group"
+  let-parent="parent"
+  let-depth="depth"
+>
+  <div class="d-flex w-100 gap-2">
+    <div class="d-flex flex-grow-1 flex-column">
+      <div class="d-flex align-items-center flex-wrap">
+        <div
+          class="btn-group btn-group-xs"
+          role="group"
+          aria-label="Match"
+          i18n-aria-label
+        >
+          <input
+            type="radio"
+            class="btn-check"
+            [(ngModel)]="group.operator"
+            [ngModelOptions]="{ standalone: true }"
+            [value]="LogicalOperator.Or"
+            id="advancedSearchAny_{{ idFor(group) }}"
+            name="advancedSearchAny_{{ idFor(group) }}"
+          />
+          <label
+            class="btn btn-outline-primary"
+            for="advancedSearchAny_{{ idFor(group) }}"
+            i18n
+            >Any</label
+          >
+          <input
+            type="radio"
+            class="btn-check"
+            [(ngModel)]="group.operator"
+            [ngModelOptions]="{ standalone: true }"
+            [value]="LogicalOperator.And"
+            id="advancedSearchAll_{{ idFor(group) }}"
+            name="advancedSearchAll_{{ idFor(group) }}"
+          />
+          <label
+            class="btn btn-outline-primary"
+            for="advancedSearchAll_{{ idFor(group) }}"
+            i18n
+            >All</label
+          >
+          <input
+            type="radio"
+            class="btn-check"
+            [(ngModel)]="group.operator"
+            [ngModelOptions]="{ standalone: true }"
+            [value]="LogicalOperator.Not"
+            id="advancedSearchNot_{{ idFor(group) }}"
+            name="advancedSearchNot_{{ idFor(group) }}"
+          />
+          <label
+            class="btn btn-outline-secondary"
+            for="advancedSearchNot_{{ idFor(group) }}"
+            i18n
+            >Not</label
+          >
+        </div>
+        <span class="small text-muted ms-2">
+          @switch (group.operator) {
+            @case (LogicalOperator.And) {
+              <ng-container i18n>match all of these</ng-container>
+            }
+            @case (LogicalOperator.Or) {
+              <ng-container i18n>match any of these</ng-container>
+            }
+            @case (LogicalOperator.Not) {
+              <ng-container i18n>match none of these</ng-container>
+            }
+          }
+        </span>
+      </div>
+      <div class="list-group list-group-flush">
+        @for (element of group.children; track element) {
+          <div class="list-group-item px-0 d-flex flex-nowrap">
+            @if (element.type === ElementType.Group) {
+              <ng-container
+                *ngTemplateOutlet="
+                  groupTemplate;
+                  context: { group: element, parent: group, depth: depth + 1 }
+                "
+              ></ng-container>
+            } @else {
+              <ng-container
+                *ngTemplateOutlet="
+                  atomTemplate;
+                  context: { atom: element, parent: group }
+                "
+              ></ng-container>
+            }
+          </div>
+        }
+      </div>
+    </div>
+    <div
+      class="btn-group-vertical align-self-start ms-2 ps-2 border-start"
+      role="group"
+      aria-label="Group actions"
+      i18n-aria-label
+    >
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-secondary text-primary"
+        title="Add condition"
+        i18n-title
+        (click)="addAtom(group)"
+        [disabled]="group.children.length >= maxAtoms"
+      >
+        <i-bs name="node-plus"></i-bs>
+      </button>
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-secondary text-primary"
+        title="Add group"
+        i18n-title
+        (click)="addGroup(group)"
+        [disabled]="depth >= maxDepth"
+      >
+        <i-bs name="braces"></i-bs>
+      </button>
+      @if (parent) {
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-secondary text-danger"
+          aria-label="Remove group"
+          i18n-aria-label
+          (click)="remove(parent, group)"
+        >
+          <i-bs name="x-circle"></i-bs>
+        </button>
+      }
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #atomTemplate let-atom="atom" let-parent="parent">
+  <div class="d-flex align-items-center gap-1 w-100">
+    <div class="input-group input-group-sm flex-wrap">
+      <select
+        class="form-select flex-grow-0 w-auto"
+        [(ngModel)]="atom.field"
+        [ngModelOptions]="{ standalone: true }"
+        (ngModelChange)="onFieldChange(atom)"
+        aria-label="Field"
+        i18n-aria-label
+      >
+        @for (fieldGroup of fieldGroups; track fieldGroup.label) {
+          <optgroup [label]="fieldGroup.label">
+            @for (field of fieldGroup.fields; track field) {
+              <option [ngValue]="field">{{ fieldLabels[field] }}</option>
+            }
+          </optgroup>
+        }
+      </select>
+      <select
+        class="form-select flex-grow-0 w-auto"
+        [(ngModel)]="atom.operator"
+        [ngModelOptions]="{ standalone: true }"
+        (ngModelChange)="onOperatorChange(atom)"
+        aria-label="Condition"
+        i18n-aria-label
+      >
+        @for (operator of operatorsFor(atom); track operator) {
+          <option [ngValue]="operator">
+            {{ operatorLabel(atom, operator) }}
+          </option>
+        }
+      </select>
+
+      @switch (atom.operator) {
+        @case (Operator.DateKeyword) {
+          <select
+            class="form-select"
+            [(ngModel)]="atom.value"
+            [ngModelOptions]="{ standalone: true }"
+            aria-label="Period"
+            i18n-aria-label
+          >
+            <option [ngValue]="''" disabled i18n>Choose a period</option>
+            @for (keyword of dateKeywords; track keyword) {
+              <option [ngValue]="keyword">
+                {{ dateKeywordLabels[keyword] }}
+              </option>
+            }
+          </select>
+        }
+        @case (Operator.WithinLast) {
+          <input
+            class="form-control amount"
+            type="number"
+            min="1"
+            [(ngModel)]="atom.value"
+            [ngModelOptions]="{ standalone: true }"
+            aria-label="Amount"
+            i18n-aria-label
+          />
+          <select
+            class="form-select"
+            [(ngModel)]="atom.unit"
+            [ngModelOptions]="{ standalone: true }"
+            aria-label="Unit"
+            i18n-aria-label
+          >
+            @for (unit of dateUnits; track unit) {
+              <option [ngValue]="unit">{{ dateUnitLabels[unit] }}</option>
+            }
+          </select>
+        }
+        @case (Operator.Between) {
+          <input
+            class="form-control"
+            [type]="kindOf(atom) === FieldKind.Date ? 'date' : 'number'"
+            [(ngModel)]="atom.value"
+            [ngModelOptions]="{ standalone: true }"
+            aria-label="From"
+            i18n-aria-label
+          />
+          <span class="input-group-text" i18n>and</span>
+          <input
+            class="form-control"
+            [type]="kindOf(atom) === FieldKind.Date ? 'date' : 'number'"
+            [(ngModel)]="atom.valueTo"
+            [ngModelOptions]="{ standalone: true }"
+            aria-label="To"
+            i18n-aria-label
+          />
+        }
+        @default {
+          @if (kindOf(atom) === FieldKind.Date) {
+            <input
+              class="form-control"
+              type="date"
+              [(ngModel)]="atom.value"
+              [ngModelOptions]="{ standalone: true }"
+              aria-label="Date"
+              i18n-aria-label
+            />
+          } @else if (kindOf(atom) === FieldKind.Number) {
+            <input
+              class="form-control"
+              type="number"
+              min="0"
+              [(ngModel)]="atom.value"
+              [ngModelOptions]="{ standalone: true }"
+              aria-label="Number"
+              i18n-aria-label
+            />
+          } @else {
+            <input
+              class="form-control"
+              type="text"
+              [(ngModel)]="atom.value"
+              [ngModelOptions]="{ standalone: true }"
+              [placeholder]="placeholderFor(atom)"
+              aria-label="Value"
+              i18n-aria-label
+            />
+          }
+        }
+      }
+    </div>
+    <button
+      class="btn btn-link btn-sm text-danger px-1"
+      type="button"
+      (click)="remove(parent, atom)"
+      aria-label="Remove condition"
+      i18n-aria-label
+    >
+      <i-bs name="x-circle"></i-bs>
+    </button>
+  </div>
+</ng-template>
