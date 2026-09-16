@@ -205,11 +205,11 @@ const DEFAULT_TEXT_FILTER_TARGET_OPTIONS = [
   },
   { id: TEXT_FILTER_TARGET_ASN, name: $localize`ASN` },
   { id: TEXT_FILTER_TARGET_MIME_TYPE, name: $localize`File type` },
+  { id: TEXT_FILTER_TARGET_DUPLICATES, name: $localize`Duplicates` },
   {
     id: TEXT_FILTER_TARGET_FULLTEXT_QUERY,
     name: $localize`Advanced search`,
   },
-  { id: TEXT_FILTER_TARGET_DUPLICATES, name: $localize`Duplicates` },
 ]
 
 const DEPRECATED_CUSTOM_FIELDS_TEXT_FILTER_TARGET_OPTION = {
