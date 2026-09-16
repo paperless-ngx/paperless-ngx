@@ -250,6 +250,18 @@
                 <pngx-input-switch class="position-absolute top-50 end-0 translate-middle-y me-1" [class.d-none]="slimSidebarEnabled || slimSidebarAnimating()" [compact]="true" title="Saved Views" i18n-title [ngModel]="!settingsService.sidebarItemIsHidden(HideableSidebarItemID.SavedViews)" (ngModelChange)="toggleSidebarItem(HideableSidebarItemID.SavedViews, $event)"></pngx-input-switch>
               }
             </li>
+            @if (canManageShareLinks) {
+              <li class="nav-item app-link position-relative" [class.d-none]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.ShareLinks) && !settingsService.organizingSidebarItems()">
+                <a class="nav-link" [class.opacity-50]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.ShareLinks)" [class.pe-5]="settingsService.organizingSidebarItems() && !slimSidebarEnabled && !slimSidebarAnimating()" routerLink="share-links" routerLinkActive="active" (click)="closeMenu()"
+                  ngbPopover="Share links" i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end"
+                  container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                  <i-bs class="me-2" name="link"></i-bs><span class="nav-link-label"><ng-container i18n>Share links</ng-container></span>
+                </a>
+                @if (settingsService.organizingSidebarItems()) {
+                  <pngx-input-switch class="position-absolute top-50 end-0 translate-middle-y me-1" [class.d-none]="slimSidebarEnabled || slimSidebarAnimating()" [compact]="true" title="Share Links" i18n-title [ngModel]="!settingsService.sidebarItemIsHidden(HideableSidebarItemID.ShareLinks)" (ngModelChange)="toggleSidebarItem(HideableSidebarItemID.ShareLinks, $event)"></pngx-input-switch>
+                }
+              </li>
+            }
             <li class="nav-item app-link position-relative" [class.d-none]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.Workflows) && !settingsService.organizingSidebarItems()"
               *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Workflow }"
               tourAnchor="tour.workflows">

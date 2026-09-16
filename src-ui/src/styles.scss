@@ -626,6 +626,10 @@ ul.pagination {
 table.table {
   --bs-table-color: var(--bs-body-color);
   --bs-table-bg: var(--bs-light-rgb);
+
+  &.bg-body {
+    --bs-table-bg: var(--bs-body-bg);
+  }
 }
 
 .close {

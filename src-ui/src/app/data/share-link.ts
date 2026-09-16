@@ -26,5 +26,7 @@ export interface ShareLink extends ObjectWithPermissions {
 
   document: number // Document
 
+  document_title?: string
+
   file_version: string
 }

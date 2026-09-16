@@ -12,6 +12,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
+import { Router } from '@angular/router'
 import {
   NgbDropdownModule,
   NgbModal,
@@ -69,7 +70,6 @@ import {
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import { ShareLinkBundleDialogComponent } from '../../common/share-link-bundle-dialog/share-link-bundle-dialog.component'
-import { ShareLinkBundleManageDialogComponent } from '../../common/share-link-bundle-manage-dialog/share-link-bundle-manage-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { CustomFieldsBulkEditDialogComponent } from './custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component'
 
@@ -104,6 +104,7 @@ export class BulkEditorComponent
   public readonly permissionService = inject(PermissionsService)
   private savedViewService = inject(SavedViewService)
   private readonly shareLinkBundleService = inject(ShareLinkBundleService)
+  private readonly router = inject(Router)
 
   tagSelectionModel = new FilterableDropdownSelectionModel(true)
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
@@ -1135,9 +1136,8 @@ export class BulkEditorComponent
   }
 
   manageShareLinkBundles() {
-    this.modalService.open(ShareLinkBundleManageDialogComponent, {
-      backdrop: 'static',
-      size: 'lg',
+    void this.router.navigate(['/share-links'], {
+      queryParams: { type: 'bundles' },
     })
   }
 

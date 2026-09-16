@@ -1,6 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { FileVersion } from 'src/app/data/share-link'
@@ -8,13 +7,15 @@ import {
   ShareLinkBundleStatus,
   ShareLinkBundleSummary,
 } from 'src/app/data/share-link-bundle'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
-import { ShareLinkBundleManageDialogComponent } from './share-link-bundle-manage-dialog.component'
+import { ShareLinkBundleListComponent } from './share-link-bundle-list.component'
 
 class MockShareLinkBundleService {
-  listAllBundles = jest.fn()
+  list = jest.fn()
   delete = jest.fn()
   rebuildBundle = jest.fn()
 }
@@ -24,13 +25,12 @@ class MockToastService {
   showError = jest.fn()
 }
 
-describe('ShareLinkBundleManageDialogComponent', () => {
-  let component: ShareLinkBundleManageDialogComponent
-  let fixture: ComponentFixture<ShareLinkBundleManageDialogComponent>
+describe('ShareLinkBundleListComponent', () => {
+  let component: ShareLinkBundleListComponent
+  let fixture: ComponentFixture<ShareLinkBundleListComponent>
   let service: MockShareLinkBundleService
   let toastService: MockToastService
   let clipboard: Clipboard
-  let activeModal: NgbActiveModal
   let originalApiBaseUrl: string
 
   beforeEach(() => {
@@ -38,26 +38,24 @@ describe('ShareLinkBundleManageDialogComponent', () => {
     toastService = new MockToastService()
     originalApiBaseUrl = environment.apiBaseUrl
 
-    service.listAllBundles.mockReturnValue(of([]))
+    service.list.mockReturnValue(of({ count: 0, results: [] }))
     service.delete.mockReturnValue(of(true))
     service.rebuildBundle.mockReturnValue(of(sampleBundle()))
 
     TestBed.configureTestingModule({
       imports: [
-        ShareLinkBundleManageDialogComponent,
+        ShareLinkBundleListComponent,
         NgxBootstrapIconsModule.pick(allIcons),
       ],
       providers: [
-        NgbActiveModal,
         { provide: ShareLinkBundleService, useValue: service },
         { provide: ToastService, useValue: toastService },
       ],
     })
 
-    fixture = TestBed.createComponent(ShareLinkBundleManageDialogComponent)
+    fixture = TestBed.createComponent(ShareLinkBundleListComponent)
     component = fixture.componentInstance
     clipboard = TestBed.inject(Clipboard)
-    activeModal = TestBed.inject(NgbActiveModal)
   })
 
   afterEach(() => {
@@ -84,28 +82,28 @@ describe('ShareLinkBundleManageDialogComponent', () => {
   it('loads bundles on init and polls periodically', () => {
     jest.useFakeTimers()
     const bundles = [sampleBundle({ status: ShareLinkBundleStatus.Ready })]
-    service.listAllBundles.mockReset()
-    service.listAllBundles
-      .mockReturnValueOnce(of(bundles))
-      .mockReturnValue(of(bundles))
+    service.list.mockReset()
+    service.list
+      .mockReturnValueOnce(of({ count: bundles.length, results: bundles }))
+      .mockReturnValue(of({ count: bundles.length, results: bundles }))
 
     fixture.detectChanges()
 
-    expect(service.listAllBundles).toHaveBeenCalledTimes(1)
+    expect(service.list).toHaveBeenCalledWith(1, 25, 'created', true)
     expect(component.bundles()).toEqual(bundles)
     expect(component.loading()).toBe(false)
     expect(component.error()).toBeNull()
 
     jest.advanceTimersByTime(5000)
-    expect(service.listAllBundles).toHaveBeenCalledTimes(2)
+    expect(service.list).toHaveBeenCalledTimes(2)
   })
 
   it('handles errors when loading bundles', () => {
     jest.useFakeTimers()
-    service.listAllBundles.mockReset()
-    service.listAllBundles
+    service.list.mockReset()
+    service.list
       .mockReturnValueOnce(throwError(() => new Error('load fail')))
-      .mockReturnValue(of([]))
+      .mockReturnValue(of({ count: 0, results: [] }))
 
     fixture.detectChanges()
 
@@ -114,7 +112,57 @@ describe('ShareLinkBundleManageDialogComponent', () => {
     expect(component.loading()).toBe(false)
 
     jest.advanceTimersByTime(5000)
-    expect(service.listAllBundles).toHaveBeenCalledTimes(2)
+    expect(service.list).toHaveBeenCalledTimes(2)
+  })
+
+  it('loads another page', () => {
+    fixture.detectChanges()
+
+    component.setPage(2)
+
+    expect(service.list).toHaveBeenLastCalledWith(2, 25, 'created', true)
+  })
+
+  it('sorts bundles and returns to the first page', () => {
+    fixture.detectChanges()
+    component.page.set(2)
+
+    component.onSort({ column: 'status', reverse: false })
+
+    expect(component.page()).toBe(1)
+    expect(service.list).toHaveBeenLastCalledWith(1, 25, 'status', false)
+  })
+
+  it('marks expired share link bundles', () => {
+    service.list.mockReturnValue(
+      of({
+        count: 1,
+        results: [sampleBundle({ expiration: '2000-01-01T00:00:00.000Z' })],
+      })
+    )
+
+    fixture.detectChanges()
+
+    expect(fixture.nativeElement.textContent).toContain('Expired')
+  })
+
+  it('stores a changed page size and reloads from the first page', () => {
+    fixture.detectChanges()
+    const settingsService = TestBed.inject(SettingsService)
+    jest
+      .spyOn(settingsService, 'get')
+      .mockReturnValueOnce({ share_link_bundles: 25 })
+    const setSpy = jest.spyOn(settingsService, 'set')
+    jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of({}))
+    component.page.set(2)
+
+    component.pageSize = 100
+
+    expect(setSpy).toHaveBeenCalledWith(SETTINGS_KEYS.OBJECT_LIST_SIZES, {
+      share_link_bundles: 100,
+    })
+    expect(component.page()).toBe(1)
+    expect(service.list).toHaveBeenLastCalledWith(1, 100, 'created', true)
   })
 
   it('copies bundle links when ready', () => {
@@ -126,16 +174,24 @@ describe('ShareLinkBundleManageDialogComponent', () => {
       slug: 'ready-slug',
       status: ShareLinkBundleStatus.Ready,
     })
+    component.bundles.set([readyBundle])
+    fixture.detectChanges()
     component.copy(readyBundle)
 
     expect(clipboard.copy).toHaveBeenCalledWith(
       component.getShareUrl(readyBundle)
     )
     expect(component.copiedSlug()).toBe('ready-slug')
-    expect(toastService.showInfo).toHaveBeenCalled()
+    expect(toastService.showInfo).not.toHaveBeenCalled()
+    fixture.detectChanges()
+    expect(
+      fixture.nativeElement.querySelector('.badge.show').textContent
+    ).toContain('Copied!')
 
     jest.advanceTimersByTime(3000)
     expect(component.copiedSlug()).toBeNull()
+    fixture.detectChanges()
+    expect(fixture.nativeElement.querySelector('.badge.show')).toBeNull()
   })
 
   it('ignores copy requests for non-ready bundles', () => {
@@ -146,7 +202,7 @@ describe('ShareLinkBundleManageDialogComponent', () => {
   })
 
   it('deletes bundles and refreshes list', () => {
-    service.listAllBundles.mockReturnValue(of([]))
+    service.list.mockReturnValue(of({ count: 0, results: [] }))
     service.delete.mockReturnValue(of(true))
 
     fixture.detectChanges()
@@ -157,12 +213,12 @@ describe('ShareLinkBundleManageDialogComponent', () => {
     expect(toastService.showInfo).toHaveBeenCalledWith(
       expect.stringContaining('deleted.')
     )
-    expect(service.listAllBundles).toHaveBeenCalledTimes(2)
+    expect(service.list).toHaveBeenCalledTimes(2)
     expect(component.loading()).toBe(false)
   })
 
   it('handles delete errors gracefully', () => {
-    service.listAllBundles.mockReturnValue(of([]))
+    service.list.mockReturnValue(of({ count: 0, results: [] }))
     service.delete.mockReturnValue(throwError(() => new Error('delete fail')))
 
     fixture.detectChanges()
@@ -174,7 +230,7 @@ describe('ShareLinkBundleManageDialogComponent', () => {
   })
 
   it('retries bundle build and replaces existing entry', () => {
-    service.listAllBundles.mockReturnValue(of([]))
+    service.list.mockReturnValue(of({ count: 0, results: [] }))
     const updated = sampleBundle({ status: ShareLinkBundleStatus.Ready })
     service.rebuildBundle.mockReturnValue(of(updated))
 
@@ -189,7 +245,7 @@ describe('ShareLinkBundleManageDialogComponent', () => {
   })
 
   it('adds new bundle when retry returns unknown entry', () => {
-    service.listAllBundles.mockReturnValue(of([]))
+    service.list.mockReturnValue(of({ count: 0, results: [] }))
     service.rebuildBundle.mockReturnValue(
       of(sampleBundle({ id: 99, slug: 'new-slug' }))
     )
@@ -203,7 +259,7 @@ describe('ShareLinkBundleManageDialogComponent', () => {
   })
 
   it('handles retry errors', () => {
-    service.listAllBundles.mockReturnValue(of([]))
+    service.list.mockReturnValue(of({ count: 0, results: [] }))
     service.rebuildBundle.mockReturnValue(throwError(() => new Error('fail')))
 
     fixture.detectChanges()
@@ -213,8 +269,8 @@ describe('ShareLinkBundleManageDialogComponent', () => {
     expect(toastService.showError).toHaveBeenCalled()
   })
 
-  it('maps helpers and closes dialog', () => {
-    service.listAllBundles.mockReturnValue(of([]))
+  it('maps status and file version helpers', () => {
+    service.list.mockReturnValue(of({ count: 0, results: [] }))
     fixture.detectChanges()
 
     expect(component.statusLabel(ShareLinkBundleStatus.Processing)).toContain(
@@ -227,9 +283,5 @@ describe('ShareLinkBundleManageDialogComponent', () => {
     environment.apiBaseUrl = 'https://example.com/api/'
     const url = component.getShareUrl(sampleBundle({ slug: 'sluggy' }))
     expect(url).toBe('https://example.com/share/sluggy')
-
-    const closeSpy = jest.spyOn(activeModal, 'close')
-    component.close()
-    expect(closeSpy).toHaveBeenCalled()
   })
 })

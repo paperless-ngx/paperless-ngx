@@ -291,6 +291,7 @@ describe('AppFrameComponent', () => {
     settingsService.set(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS, [
       HideableSidebarItemID.Dashboard,
       HideableSidebarItemID.Workflows,
+      HideableSidebarItemID.ShareLinks,
     ])
     fixture.detectChanges()
 
@@ -300,6 +301,10 @@ describe('AppFrameComponent', () => {
     ).toContain('d-none')
     expect(
       fixture.nativeElement.querySelector('[routerLink="workflows"]')
+        .parentElement.classList
+    ).toContain('d-none')
+    expect(
+      fixture.nativeElement.querySelector('[routerLink="share-links"]')
         .parentElement.classList
     ).toContain('d-none')
     expect(
@@ -319,7 +324,7 @@ describe('AppFrameComponent', () => {
 
     expect(
       fixture.nativeElement.querySelectorAll('pngx-input-switch').length
-    ).toBe(5)
+    ).toBe(6)
     expect(
       fixture.nativeElement.querySelector('[routerLink="dashboard"]')
         .parentElement.classList

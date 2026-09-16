@@ -3906,6 +3906,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             },
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(resp.data["document_title"], doc.title)
 
         resp = self.client.post(
             "/api/share_links/",
@@ -3916,6 +3917,17 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             },
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(resp.data["document_title"], doc.title)
+
+        response = self.client.get("/api/share_links/", format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 2)
+        self.assertTrue(
+            all(
+                link["document_title"] == doc.title for link in response.data["results"]
+            ),
+        )
 
         response = self.client.get(
             f"/api/documents/{doc.pk}/share_links/",
@@ -3927,6 +3939,9 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         resp_data = response.json()
 
         self.assertEqual(len(resp_data), 2)
+        self.assertTrue(
+            all(link["document_title"] == doc.title for link in resp_data),
+        )
 
         self.assertGreater(len(resp_data[1]["slug"]), 0)
         self.assertIsNone(resp_data[1]["expiration"])
@@ -3951,6 +3966,23 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_order_share_links_by_document_title(self) -> None:
+        document_zulu = Document.objects.create(title="Zulu")
+        document_alpha = Document.objects.create(title="Alpha")
+        ShareLink.objects.create(document=document_zulu, slug="zulu-link")
+        ShareLink.objects.create(document=document_alpha, slug="alpha-link")
+
+        response = self.client.get(
+            "/api/share_links/?ordering=document__title",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            [link["document_title"] for link in response.data["results"]],
+            ["Alpha", "Zulu"],
+        )
 
     def test_share_links_permissions_aware(self) -> None:
         """
