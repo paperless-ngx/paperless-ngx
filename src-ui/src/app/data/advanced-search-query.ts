@@ -147,3 +147,121 @@ export interface AdvancedSearchQueryGroup {
 
 export type AdvancedSearchQueryElement =
   AdvancedSearchQueryAtom | AdvancedSearchQueryGroup
+
+export const ADVANCED_SEARCH_MAX_DEPTH = 2
+export const ADVANCED_SEARCH_MAX_ATOMS = 10
+
+export const ADVANCED_SEARCH_FIELD_LABELS: Record<AdvancedSearchField, string> =
+  {
+    [AdvancedSearchField.Any]: $localize`Any field`,
+    [AdvancedSearchField.Title]: $localize`Title`,
+    [AdvancedSearchField.Content]: $localize`Content`,
+    [AdvancedSearchField.OriginalFilename]: $localize`File name`,
+    [AdvancedSearchField.NoteText]: $localize`Note text`,
+    [AdvancedSearchField.NoteAuthor]: $localize`Note author`,
+    [AdvancedSearchField.CustomFieldName]: $localize`Custom field name`,
+    [AdvancedSearchField.CustomFieldValue]: $localize`Custom field value`,
+    [AdvancedSearchField.Correspondent]: $localize`Correspondent name`,
+    [AdvancedSearchField.DocumentType]: $localize`Document type name`,
+    [AdvancedSearchField.StoragePath]: $localize`Storage path name`,
+    [AdvancedSearchField.Tag]: $localize`Tag name`,
+    [AdvancedSearchField.ASN]: $localize`ASN`,
+    [AdvancedSearchField.PageCount]: $localize`Pages`,
+    [AdvancedSearchField.NumNotes]: $localize`Number of notes`,
+    [AdvancedSearchField.Created]: $localize`Created`,
+    [AdvancedSearchField.Added]: $localize`Added`,
+    [AdvancedSearchField.Modified]: $localize`Modified`,
+    [AdvancedSearchField.Checksum]: $localize`Checksum`,
+  }
+
+export const ADVANCED_SEARCH_FIELD_GROUPS: {
+  label: string
+  fields: AdvancedSearchField[]
+}[] = [
+  {
+    label: $localize`Text`,
+    fields: [
+      AdvancedSearchField.Any,
+      AdvancedSearchField.Title,
+      AdvancedSearchField.Content,
+      AdvancedSearchField.OriginalFilename,
+      AdvancedSearchField.NoteText,
+      AdvancedSearchField.NoteAuthor,
+      AdvancedSearchField.CustomFieldName,
+      AdvancedSearchField.CustomFieldValue,
+    ],
+  },
+  {
+    // Matched as text against the name, unlike the filter dropdowns
+    label: $localize`Names`,
+    fields: [
+      AdvancedSearchField.Correspondent,
+      AdvancedSearchField.DocumentType,
+      AdvancedSearchField.StoragePath,
+      AdvancedSearchField.Tag,
+    ],
+  },
+  {
+    label: $localize`Numbers`,
+    fields: [
+      AdvancedSearchField.ASN,
+      AdvancedSearchField.PageCount,
+      AdvancedSearchField.NumNotes,
+    ],
+  },
+  {
+    label: $localize`Dates`,
+    fields: [
+      AdvancedSearchField.Created,
+      AdvancedSearchField.Added,
+      AdvancedSearchField.Modified,
+    ],
+  },
+  { label: $localize`Other`, fields: [AdvancedSearchField.Checksum] },
+]
+
+export const ADVANCED_SEARCH_OPERATOR_LABELS: Record<
+  AdvancedSearchOperator,
+  string
+> = {
+  [AdvancedSearchOperator.AllWords]: $localize`contains all words`,
+  [AdvancedSearchOperator.AnyWord]: $localize`contains any word`,
+  [AdvancedSearchOperator.Phrase]: $localize`contains the phrase`,
+  [AdvancedSearchOperator.StartsWith]: $localize`starts with`,
+  [AdvancedSearchOperator.Equals]: $localize`is`,
+  [AdvancedSearchOperator.AtLeast]: $localize`is at least`,
+  [AdvancedSearchOperator.AtMost]: $localize`is at most`,
+  [AdvancedSearchOperator.Between]: $localize`is between`,
+  [AdvancedSearchOperator.DateKeyword]: $localize`is`,
+  [AdvancedSearchOperator.WithinLast]: $localize`is within the last`,
+}
+
+// Comparing dates reads differently than comparing counts
+export const ADVANCED_SEARCH_DATE_OPERATOR_LABELS: Partial<
+  Record<AdvancedSearchOperator, string>
+> = {
+  [AdvancedSearchOperator.AtLeast]: $localize`is on or after`,
+  [AdvancedSearchOperator.AtMost]: $localize`is on or before`,
+}
+
+export const ADVANCED_SEARCH_DATE_KEYWORD_LABELS: Record<string, string> = {
+  today: $localize`today`,
+  yesterday: $localize`yesterday`,
+  tomorrow: $localize`tomorrow`,
+  'previous week': $localize`previous week`,
+  'this month': $localize`this month`,
+  'previous month': $localize`previous month`,
+  'previous quarter': $localize`previous quarter`,
+  'this year': $localize`this year`,
+  'previous year': $localize`previous year`,
+}
+
+export const ADVANCED_SEARCH_DATE_UNIT_LABELS: Record<
+  AdvancedSearchDateUnit,
+  string
+> = {
+  [AdvancedSearchDateUnit.Day]: $localize`days`,
+  [AdvancedSearchDateUnit.Week]: $localize`weeks`,
+  [AdvancedSearchDateUnit.Month]: $localize`months`,
+  [AdvancedSearchDateUnit.Year]: $localize`years`,
+}
