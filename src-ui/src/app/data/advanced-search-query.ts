@@ -130,13 +130,9 @@ export interface AdvancedSearchQueryAtom {
   type: AdvancedSearchQueryElementType.Atom
   field: AdvancedSearchField
   operator: AdvancedSearchOperator
-  // words, phrase, number or yyyy-mm-dd date; the lower bound for Between;
-  // the amount for WithinLast
   value?: string
-  // upper bound for Between
   valueTo?: string
-  // unit for WithinLast
-  unit?: AdvancedSearchDateUnit
+  unit?: AdvancedSearchDateUnit // for WithinLast
 }
 
 export interface AdvancedSearchQueryGroup {
@@ -192,7 +188,6 @@ export const ADVANCED_SEARCH_FIELD_GROUPS: {
     ],
   },
   {
-    // Matched as text against the name, unlike the filter dropdowns
     label: $localize`Names`,
     fields: [
       AdvancedSearchField.Correspondent,
