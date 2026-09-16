@@ -5,6 +5,7 @@ import hmac
 import logging
 import pickle
 import re
+import unicodedata
 import warnings
 from hashlib import sha256
 from pathlib import Path
@@ -584,6 +585,7 @@ class DocumentClassifier:
         words which are meaningful to the content.
         """
         language = settings.CLASSIFIER_LANGUAGE
+        content = unicodedata.normalize("NFC", content)
         if language is None:
             return " ".join(
                 match.group().lower() for match in RE_WORD.finditer(content)
