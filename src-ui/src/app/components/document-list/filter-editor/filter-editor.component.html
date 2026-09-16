@@ -17,6 +17,12 @@
             }
           </select>
         }
+        @if (advancedSearchEditorAvailable) {
+          <button class="btn btn-sm btn-outline-primary" type="button" (click)="openAdvancedSearchEditor()"
+            title="Edit query" i18n-title [disabled]="disabled">
+            <i-bs name="sliders"></i-bs>
+          </button>
+        }
         @if (_textFilter) {
           <button class="btn btn-link btn-sm px-2 position-absolute top-0 end-0 z-10" (click)="resetTextField()" aria-label="Clear search" i18n-aria-label>
             <i-bs width="1em" height="1em" name="x"></i-bs>

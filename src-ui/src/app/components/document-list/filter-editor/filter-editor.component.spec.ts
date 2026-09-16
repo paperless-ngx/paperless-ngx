@@ -12,6 +12,8 @@ import {
   NgbDatepickerModule,
   NgbDropdownItem,
   NgbDropdownModule,
+  NgbModal,
+  NgbModalRef,
   NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
@@ -2514,5 +2516,46 @@ describe('FilterEditorComponent', () => {
     fixture.detectChanges()
 
     expect(component.textFilter).toEqual('help ')
+  })
+
+  it('should open the advanced search editor with the current query and apply the result', () => {
+    const modalService: NgbModal = TestBed.inject(NgbModal)
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe(
+      (instances) => (modal = instances[0])
+    )
+    component.textFilterTarget = 'fulltext-query'
+    component.updateTextFilter('title:invoice')
+    fixture.detectChanges()
+
+    const editorButton = fixture.debugElement.query(
+      By.css('button[title="Edit query"]')
+    )
+    expect(editorButton).not.toBeNull()
+    editorButton.triggerEventHandler('click')
+    fixture.detectChanges()
+
+    expect(modal.componentInstance.query).toEqual('title:invoice')
+
+    const rulesSpy = jest.spyOn(component.filterRulesChange, 'next')
+    modal.componentInstance.queryApplied.emit('title:invoice AND NOT tag:paid')
+    expect(component.textFilter).toEqual('title:invoice AND NOT tag:paid')
+    expect(documentService.searchQuery).toEqual(
+      'title:invoice AND NOT tag:paid'
+    )
+    expect(rulesSpy).toHaveBeenCalledWith([
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: 'title:invoice AND NOT tag:paid',
+      },
+    ])
+  })
+
+  it('should not offer the advanced search editor for other targets', () => {
+    component.textFilterTarget = 'title-content'
+    fixture.detectChanges()
+    expect(
+      fixture.debugElement.query(By.css('button[title="Edit query"]'))
+    ).toBeNull()
   })
 })

@@ -15,12 +15,13 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import {
   NgbDropdownModule,
+  NgbModal,
   NgbTypeahead,
   NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { TourNgBootstrap } from 'ngx-ui-tour-ng-bootstrap'
-import { Observable, Subject, from } from 'rxjs'
+import { first, Observable, Subject, from } from 'rxjs'
 import {
   catchError,
   debounceTime,
@@ -121,6 +122,7 @@ import {
   PermissionsFilterDropdownComponent,
   PermissionsSelectionModel,
 } from '../../common/permissions-filter-dropdown/permissions-filter-dropdown.component'
+import { AdvancedSearchDialogComponent } from '../../common/advanced-search-dialog/advanced-search-dialog.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
@@ -286,6 +288,7 @@ export class FilterEditorComponent
   permissionsService = inject(PermissionsService)
   private customFieldService = inject(CustomFieldsService)
   private searchService = inject(SearchService)
+  private modalService = inject(NgbModal)
 
   generateFilterName() {
     if (this.filterRules.length == 1) {
@@ -1370,6 +1373,23 @@ export class FilterEditorComponent
       this.documentService.searchQuery = text
       this.updateRules()
     }
+  }
+
+  get advancedSearchEditorAvailable(): boolean {
+    return this.textFilterTarget === TEXT_FILTER_TARGET_FULLTEXT_QUERY
+  }
+
+  openAdvancedSearchEditor() {
+    const modal = this.modalService.open(AdvancedSearchDialogComponent, {
+      backdrop: 'static',
+      size: 'lg',
+    })
+    modal.componentInstance.query = this._textFilter ?? ''
+    modal.componentInstance.queryApplied
+      .pipe(first())
+      .subscribe((query: string) => {
+        this.updateTextFilter(query)
+      })
   }
 
   textFilterKeydown(event: KeyboardEvent) {
