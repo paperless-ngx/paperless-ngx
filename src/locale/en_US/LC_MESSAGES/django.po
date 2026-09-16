@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 14:36+0000\n"
+"POT-Creation-Date: 2026-09-16 15:46+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1632,7 +1632,7 @@ msgid "workflow runs"
 msgstr ""
 
 #: documents/serialisers.py:514 documents/serialisers.py:871
-#: documents/serialisers.py:2865 documents/views.py:343 documents/views.py:2719
+#: documents/serialisers.py:2871 documents/views.py:343 documents/views.py:2726
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr ""
@@ -1669,11 +1669,11 @@ msgstr ""
 msgid "Invalid variable detected."
 msgstr ""
 
-#: documents/serialisers.py:2921
+#: documents/serialisers.py:2927
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2951 documents/views.py:4742
+#: documents/serialisers.py:2957 documents/views.py:4749
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1941,7 +1941,7 @@ msgstr ""
 msgid "Unable to parse URI {value}"
 msgstr ""
 
-#: documents/views.py:336 documents/views.py:2716
+#: documents/views.py:336 documents/views.py:2723
 msgid "Invalid more_like_id"
 msgstr ""
 
@@ -1957,24 +1957,24 @@ msgstr ""
 msgid "AI backend rejected the request. Check logs for details."
 msgstr ""
 
-#: documents/views.py:2541 documents/views.py:2857
+#: documents/views.py:2548 documents/views.py:2864
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:4755
+#: documents/views.py:4762
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr ""
 
-#: documents/views.py:4801
+#: documents/views.py:4808
 msgid "Bundle is already being processed."
 msgstr ""
 
-#: documents/views.py:4865
+#: documents/views.py:4872
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr ""
 
-#: documents/views.py:4879
+#: documents/views.py:4886
 msgid "The share link bundle is unavailable."
 msgstr ""
 
