@@ -183,3 +183,318 @@ export function serializeAdvancedSearchQuery(
 ): string {
   return serializeElement(element)?.text ?? ''
 }
+
+// --- Reading a query back into the editor --------------------------------
+//
+// Deliberately narrow: this reads the forms serializeAdvancedSearchQuery
+// writes, and nothing else. A query it cannot read is not a failure, it just
+// stays text, so there is never a lossy or surprising conversion. The final
+// round-trip check below is what holds that promise: a tree is only returned
+// when writing it out again reproduces the query exactly.
+
+const RELATIVE_BOUND = /^-(\d+) (day|week|month|year)s?$/
+const FIELD_PREFIX = /^([a-z_]+(?:\.[a-z_]+)?):/
+const KEYWORD_TOKEN = /^(AND|OR|NOT)(?=[\s(]|$)/
+// Either bound may be missing: [50 to 150], [50 to], [to 50]
+const RANGE_BOUNDS = /^(?:(.+?) )?to(?: (.+))?$/
+const TRAILING_WILDCARD = /^([^*?]+)\*$/
+
+class UnreadableQuery extends Error {}
+
+interface Token {
+  type: 'term' | 'AND' | 'OR' | 'NOT' | '(' | ')'
+  field?: string
+  value?: string
+  quoted?: boolean
+  range?: boolean
+}
+
+// A parsed element, plus what it takes to merge the per-word terms the
+// serializer writes for "contains all words" back into a single condition
+interface Parsed {
+  element: AdvancedSearchQueryElement
+  word?: { field: AdvancedSearchField; text: string }
+}
+
+function tokenize(query: string): Token[] {
+  const tokens: Token[] = []
+  let i = 0
+  while (i < query.length) {
+    const rest = query.slice(i)
+    if (/^\s/.test(rest)) {
+      i++
+      continue
+    }
+    if (rest[0] === '(' || rest[0] === ')') {
+      tokens.push({ type: rest[0] as '(' | ')' })
+      i++
+      continue
+    }
+    const keyword = KEYWORD_TOKEN.exec(rest)
+    if (keyword) {
+      tokens.push({ type: keyword[1] as 'AND' | 'OR' | 'NOT' })
+      i += keyword[1].length
+      continue
+    }
+    const fieldMatch = FIELD_PREFIX.exec(rest)
+    const field = fieldMatch ? fieldMatch[1] : ''
+    i += fieldMatch ? fieldMatch[0].length : 0
+
+    const value = query.slice(i)
+    if (value.startsWith('"')) {
+      const end = query.indexOf('"', i + 1)
+      if (end < 0) throw new UnreadableQuery()
+      tokens.push({
+        type: 'term',
+        field,
+        value: query.slice(i + 1, end),
+        quoted: true,
+      })
+      i = end + 1
+    } else if (value.startsWith('[')) {
+      const end = query.indexOf(']', i + 1)
+      if (end < 0) throw new UnreadableQuery()
+      tokens.push({
+        type: 'term',
+        field,
+        value: query.slice(i + 1, end),
+        range: true,
+      })
+      i = end + 1
+    } else {
+      const bare = /^[^\s()]+/.exec(value)
+      if (!bare) throw new UnreadableQuery()
+      tokens.push({ type: 'term', field, value: bare[0] })
+      i += bare[0].length
+    }
+    // Nothing may run on directly after a value, e.g. title:"a"b
+    if (i < query.length && !/[\s)]/.test(query[i])) throw new UnreadableQuery()
+  }
+  return tokens
+}
+
+function resolveField(name: string): AdvancedSearchField {
+  const fields = Object.values(AdvancedSearchField) as string[]
+  // Aliases (type:, path:, notes:) are left to the text box on purpose:
+  // reading one would mean rewriting the user's query as it was read
+  if (!fields.includes(name)) throw new UnreadableQuery()
+  return name as AdvancedSearchField
+}
+
+function atomFrom(
+  field: AdvancedSearchField,
+  operator: AdvancedSearchOperator,
+  value: string,
+  extra: Partial<AdvancedSearchQueryAtom> = {}
+): AdvancedSearchQueryAtom {
+  return {
+    type: AdvancedSearchQueryElementType.Atom,
+    field,
+    operator,
+    value,
+    ...extra,
+  }
+}
+
+function parseRange(
+  field: AdvancedSearchField,
+  kind: AdvancedSearchFieldKind,
+  body: string
+): AdvancedSearchQueryAtom {
+  const bounds = RANGE_BOUNDS.exec(body)
+  if (!bounds) throw new UnreadableQuery()
+  const lo = bounds[1] ?? ''
+  const hi = bounds[2] ?? ''
+
+  if (kind === AdvancedSearchFieldKind.Date) {
+    const relative = RELATIVE_BOUND.exec(lo)
+    if (relative && hi === 'now') {
+      return atomFrom(field, AdvancedSearchOperator.WithinLast, relative[1], {
+        unit: relative[2] as AdvancedSearchDateUnit,
+      })
+    }
+  } else if (kind !== AdvancedSearchFieldKind.Number) {
+    throw new UnreadableQuery()
+  }
+
+  const isValid =
+    kind === AdvancedSearchFieldKind.Date
+      ? (v: string) => ISO_DATE.test(v)
+      : (v: string) => WHOLE_NUMBER.test(v)
+
+  if (lo && hi) {
+    if (!isValid(lo) || !isValid(hi)) throw new UnreadableQuery()
+    return atomFrom(field, AdvancedSearchOperator.Between, lo, { valueTo: hi })
+  }
+  if (lo && isValid(lo))
+    return atomFrom(field, AdvancedSearchOperator.AtLeast, lo)
+  if (hi && isValid(hi))
+    return atomFrom(field, AdvancedSearchOperator.AtMost, hi)
+  throw new UnreadableQuery()
+}
+
+function parseTerm(token: Token): Parsed {
+  const field = resolveField(token.field)
+  const kind = ADVANCED_SEARCH_FIELD_KINDS[field]
+  const value = token.value
+  const isKeyword = (
+    ADVANCED_SEARCH_DATE_KEYWORDS as readonly string[]
+  ).includes(value)
+
+  if (token.range) {
+    return { element: parseRange(field, kind, value) }
+  }
+
+  if (kind === AdvancedSearchFieldKind.Date) {
+    if (!isKeyword) throw new UnreadableQuery()
+    return {
+      element: atomFrom(field, AdvancedSearchOperator.DateKeyword, value),
+    }
+  }
+
+  if (token.quoted) {
+    if (kind !== AdvancedSearchFieldKind.Text) throw new UnreadableQuery()
+    return { element: atomFrom(field, AdvancedSearchOperator.Phrase, value) }
+  }
+
+  const wildcard = TRAILING_WILDCARD.exec(value)
+  if (wildcard) {
+    if (kind === AdvancedSearchFieldKind.Number) throw new UnreadableQuery()
+    return {
+      element: atomFrom(field, AdvancedSearchOperator.StartsWith, wildcard[1]),
+    }
+  }
+
+  if (kind === AdvancedSearchFieldKind.Number) {
+    if (!WHOLE_NUMBER.test(value)) throw new UnreadableQuery()
+    return { element: atomFrom(field, AdvancedSearchOperator.Equals, value) }
+  }
+  // A checksum is only ever searched by its first characters
+  if (kind === AdvancedSearchFieldKind.Checksum) throw new UnreadableQuery()
+
+  return {
+    element: atomFrom(field, AdvancedSearchOperator.AllWords, value),
+    word: { field, text: value },
+  }
+}
+
+// The serializer repeats the field for every word, because a field applies
+// only to the word after it. Put those back together into one condition.
+function mergeWords(
+  parts: Parsed[],
+  operator: AdvancedSearchLogicalOperator.And | AdvancedSearchLogicalOperator.Or
+): AdvancedSearchQueryElement[] {
+  const merged: AdvancedSearchQueryElement[] = []
+  for (let i = 0; i < parts.length; i++) {
+    const run = [parts[i]]
+    while (
+      parts[i].word &&
+      parts[i + 1]?.word &&
+      parts[i + 1].word.field === parts[i].word.field
+    ) {
+      run.push(parts[++i])
+    }
+    if (run.length === 1) {
+      merged.push(run[0].element)
+      continue
+    }
+    merged.push(
+      atomFrom(
+        run[0].word.field,
+        operator === AdvancedSearchLogicalOperator.And
+          ? AdvancedSearchOperator.AllWords
+          : AdvancedSearchOperator.AnyWord,
+        run.map((part) => part.word.text).join(' ')
+      )
+    )
+  }
+  return merged
+}
+
+interface Cursor {
+  tokens: Token[]
+  at: number
+}
+
+function parseExpression(cursor: Cursor): Parsed {
+  const parts: Parsed[] = [parseOperand(cursor)]
+  let operator:
+    AdvancedSearchLogicalOperator.And | AdvancedSearchLogicalOperator.Or
+  while (
+    cursor.tokens[cursor.at]?.type === 'AND' ||
+    cursor.tokens[cursor.at]?.type === 'OR'
+  ) {
+    const next = cursor.tokens[cursor.at++].type as
+      AdvancedSearchLogicalOperator.And | AdvancedSearchLogicalOperator.Or
+    // One level mixing AND and OR is never something the editor wrote
+    if (operator && next !== operator) throw new UnreadableQuery()
+    operator = next
+    parts.push(parseOperand(cursor))
+  }
+  if (parts.length === 1) return parts[0]
+
+  const children = mergeWords(parts, operator)
+  if (children.length === 1) return { element: children[0] }
+  return {
+    element: {
+      type: AdvancedSearchQueryElementType.Group,
+      operator,
+      children,
+    },
+  }
+}
+
+function parseOperand(cursor: Cursor): Parsed {
+  const token = cursor.tokens[cursor.at++]
+  if (!token) throw new UnreadableQuery()
+
+  if (token.type === 'NOT') {
+    const child = parseOperand(cursor)
+    return {
+      element: {
+        type: AdvancedSearchQueryElementType.Group,
+        operator: AdvancedSearchLogicalOperator.Not,
+        children: [child.element],
+      },
+    }
+  }
+  if (token.type === '(') {
+    const inner = parseExpression(cursor)
+    if (cursor.tokens[cursor.at++]?.type !== ')') throw new UnreadableQuery()
+    return { element: inner.element }
+  }
+  if (token.type !== 'term') throw new UnreadableQuery()
+  return parseTerm(token)
+}
+
+/**
+ * Reads a query the editor could have written back into an editor tree, or
+ * returns null when the editor cannot show it, in which case the query stays
+ * text. Never returns a tree that would be written back differently.
+ */
+export function parseAdvancedSearchQuery(
+  query: string
+): AdvancedSearchQueryGroup | null {
+  const trimmed = query?.trim() ?? ''
+  if (!trimmed) return null
+
+  let parsed: Parsed
+  try {
+    const cursor: Cursor = { tokens: tokenize(trimmed), at: 0 }
+    parsed = parseExpression(cursor)
+    if (cursor.at !== cursor.tokens.length) throw new UnreadableQuery()
+  } catch {
+    return null
+  }
+
+  const root =
+    parsed.element.type === AdvancedSearchQueryElementType.Group
+      ? parsed.element
+      : {
+          type: AdvancedSearchQueryElementType.Group as const,
+          operator: AdvancedSearchLogicalOperator.And,
+          children: [parsed.element],
+        }
+
+  return serializeAdvancedSearchQuery(root) === trimmed ? root : null
+}
