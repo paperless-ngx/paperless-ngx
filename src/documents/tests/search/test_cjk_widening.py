@@ -159,7 +159,7 @@ class TestTokenizerDroppedCodepoints:
         WHEN:
             - "⺀" is searched
         THEN:
-            - Nothing matches: _widen_cjk_leaf finds no pieces to widen
+            - Nothing matches: _widen_leaf finds no CJK pieces to widen
               with and returns the leaf as it is, which analyzes to the
               same nothing it always did
         """
@@ -570,22 +570,22 @@ class TestOtherDefaultFields:
         assert matched_ids("invoice NOT 東京") == {latin.pk}
 
 
-class TestFuzzyOnGap:
+class TestFuzzyDoesNotReadmit:
     @pytest.mark.parametrize(
         ("query", "threshold", "expected"),
         [
             pytest.param("invoice NOT 東京", None, {"latin"}, id="not_fuzzy_off"),
-            pytest.param("invoice NOT 東京", 0.0, {"latin", "cjk"}, id="not_fuzzy_on"),
+            pytest.param("invoice NOT 東京", 0.0, {"latin"}, id="not_fuzzy_on"),
             pytest.param("東京 AND invoice", None, {"cjk"}, id="and_fuzzy_off"),
             pytest.param(
                 "東京 AND invoice",
                 0.0,
-                {"cjk", "cjk_only", "latin"},
+                {"cjk"},
                 id="and_fuzzy_on",
             ),
         ],
     )
-    def test_fuzzy_on_readmits_what_the_structure_excludes(
+    def test_fuzzy_on_matches_fuzzy_off_for_structure(
         self,
         index_document: Callable[..., Document],
         matched_ids: Callable[[str], set[int]],
@@ -602,13 +602,10 @@ class TestFuzzyOnGap:
         WHEN:
             - "invoice NOT 東京" or "東京 AND invoice" is searched
         THEN:
-            - With fuzzy off, the query's structure decides. With fuzzy on,
-              the separate fuzzy clause matches any one of the query's
-              words on its own, and the exclusion restated above it is
-              content-only, so it re-admits what NOT and AND excluded. A
-              known interim gap, not a regression (both settings returned
-              these before), removed when fuzzy moves into the query tree
-              too; pinned so that change flips it deliberately
+            - The result is the same whether fuzzy is on or off: fuzzy
+              widening happens inside the tree now, so a CJK NOT or AND
+              still constrains both the exact and the fuzzy side, and
+              neither re-admits what the structure excludes
         """
         settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = threshold
         cjk = index_document(

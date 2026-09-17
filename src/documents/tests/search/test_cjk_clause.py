@@ -99,7 +99,7 @@ class TestCjkClauseFollowsTheParsedQuery:
         ("threshold", "expected"),
         [
             pytest.param(None, {"titled"}, id="fuzzy_off"),
-            pytest.param(0.0, {"titled", "content_only"}, id="fuzzy_on"),
+            pytest.param(0.0, {"titled"}, id="fuzzy_on"),
         ],
     )
     def test_fielded_cjk_term_searches_only_that_field(
@@ -118,14 +118,10 @@ class TestCjkClauseFollowsTheParsedQuery:
         WHEN:
             - "title:東京" is searched
         THEN:
-            - With fuzzy off, only the titled document matches: the CJK
-              clause honours the field, so 'title:東京' must not match a
-              document whose 東京 is only in the content. With fuzzy on,
-              the content-only document is also readmitted, because the
-              fuzzy clause contributes every free-text term UNFIELDED by
-              design (see _try_parse_fuzzy_query) on its own
-              0.1-boosted terms -- a documented trade-off, pinned here so
-              it stays deliberate
+            - Only the titled document matches, whether fuzzy is on or
+              off: both the CJK alternative and the fuzzy alternative are
+              widened in place on the fielded leaf, so 'title:東京' still
+              must not match a document whose 東京 is only in the content
         """
         settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = threshold
         content_only = index_document(

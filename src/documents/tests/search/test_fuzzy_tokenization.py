@@ -1,9 +1,10 @@
-"""The words the fuzzy blend clause hands back to tantivy's parser.
+"""The words a leaf contributes to its fuzzy alternative.
 
-The clause re-parses a word string through tantivy, which analyzes it
-again, so the words must be the query's raw text rather than the analyzed
-text (analysis is not idempotent), and must still be split into plain
-words so that hyphenated, dotted and quoted terms keep contributing.
+Each leaf is widened in the tree now, so nothing is re-parsed as a string
+and a boolean keyword can no longer be read as grammar. What still has to
+hold is that a word is stemmed exactly once (analysis is not idempotent)
+and that hyphenated, dotted and quoted terms keep contributing their
+words.
 """
 
 from __future__ import annotations
@@ -38,42 +39,6 @@ def fuzzy_enabled(settings: SettingsWrapper) -> None:
     score filter, so it is set to 0.0: every hit passes and the test sees
     the clause's matching behaviour, not the filter's."""
     settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 0.0
-
-
-class TestFuzzyClauseParseFailureDegradesGracefully:
-    def test_a_word_string_tantivy_rejects_drops_the_clause_only(self) -> None:
-        """
-        GIVEN:
-            - A parsed query with free-text words, and an index-like
-              object whose parse_query is forced to raise ValueError
-        WHEN:
-            - _try_parse_fuzzy_query is called
-        THEN:
-            - It returns None instead of propagating, so a fuzzy word
-              string tantivy's own parser rejects only drops the fuzzy
-              clause: the exact clause still stands rather than the
-              whole query failing. The ValueError guard is insurance (the
-              word string is plain tokens, so tantivy accepting it is
-              expected, not assumed)
-        """
-        import whoosh_compat as wc
-
-        from documents.search._query import _DEFAULT_SEARCH_FIELDS
-        from documents.search._query import _try_parse_fuzzy_query
-        from documents.search._registry import get_field_registry
-
-        registry = get_field_registry(None)
-        result = wc.parse(
-            "invoice",
-            registry=registry,
-            default_fields=_DEFAULT_SEARCH_FIELDS,
-        )
-
-        class _RaisingIndex:
-            def parse_query(self, *args: object, **kwargs: object) -> object:
-                raise ValueError("synthetic parse failure")
-
-        assert _try_parse_fuzzy_query(_RaisingIndex(), result.ast, registry) is None
 
 
 class TestFuzzyClauseWords:
@@ -175,10 +140,10 @@ class TestFuzzyClauseWords:
 
 
 class TestBooleanKeywordsInRawText:
-    """Tantivy's boolean keywords are word runs, so they survive the cut
-    into words and its own parser reads them as grammar. Raw query text
-    reaches that parser with its case intact, so a quoted phrase can carry
-    them in."""
+    """Tantivy's boolean keywords used to reach its parser with their case
+    intact, through the word string the old clause was re-parsed from, so a
+    quoted phrase could smuggle grammar in. Leaves are built as AST nodes
+    now, which closes that off structurally; these pin it shut."""
 
     @pytest.fixture
     def corpus(self, backend: TantivyBackend) -> dict[str, int]:
@@ -207,38 +172,41 @@ class TestBooleanKeywordsInRawText:
         }
 
     @pytest.mark.parametrize(
-        "query",
+        ("keyword_spelling", "ordinary_spelling"),
         [
-            pytest.param('"tax AND reports"', id="and"),
-            pytest.param('"tax OR reports"', id="or"),
-            pytest.param('"tax NOT reports"', id="not"),
-            pytest.param('"tax IN reports"', id="in"),
+            pytest.param('"tax AND reports"', '"tax and reports"', id="and"),
+            pytest.param('"tax OR reports"', '"tax or reports"', id="or"),
+            pytest.param('"tax NOT reports"', '"tax not reports"', id="not"),
+            pytest.param('"tax IN reports"', '"tax in reports"', id="in"),
         ],
     )
     def test_a_keyword_inside_a_phrase_stays_an_ordinary_word(
         self,
         backend: TantivyBackend,
         corpus: dict[str, int],
-        query: str,
+        keyword_spelling: str,
+        ordinary_spelling: str,
     ) -> None:
         """
         GIVEN:
             - Three documents: one with both "taxation" and "reportage",
               one with only "taxation", one with only "reportage"
         WHEN:
-            - Searching for a quoted phrase carrying a tantivy boolean
-              keyword as one of its words (e.g. '"tax AND reports"')
+            - A quoted phrase carries a tantivy boolean keyword as one of
+              its words, spelled in upper case and in lower case
         THEN:
-            - The keyword stays an ordinary word inside the phrase, and
-              the fuzzy clause matches all three documents, the same
-              disjunction as the plain '"tax reports"' phrase: AND must
-              not turn it into a conjunction, NOT must not give it its own
-              exclusion, IN must not fail the parse
+            - Both spellings match the same documents, so the keyword is
+              an ordinary word of the phrase rather than grammar: AND does
+              not make it a conjunction, NOT does not give it its own
+              exclusion, IN does not fail the parse. Only the upper-case
+              spelling was ever grammar
         """
-        assert _matched_ids(backend, '"tax reports"') == set(corpus.values())
-        assert _matched_ids(backend, query) == set(corpus.values())
+        assert _matched_ids(backend, keyword_spelling) == _matched_ids(
+            backend,
+            ordinary_spelling,
+        )
 
-    def test_a_trailing_keyword_does_not_drop_the_clause(
+    def test_a_phrase_needs_a_near_match_for_every_word(
         self,
         backend: TantivyBackend,
         corpus: dict[str, int],
@@ -248,14 +216,33 @@ class TestBooleanKeywordsInRawText:
             - Three documents: one with both "taxation" and "reportage",
               one with only "taxation", one with only "reportage"
         WHEN:
-            - Searching for '"tax AND"', a phrase ending in a tantivy
-              syntax error
+            - '"tax reports"' is searched, both words misspelled
         THEN:
-            - The fuzzy clause still matches on "tax"; 'tax AND' alone is
-              a syntax error to tantivy's parser, which would otherwise
-              cost the whole query its fuzzy clause
+            - Only the document near-matching both words comes back. A
+              quoted phrase asks for more than the bare words, so its
+              fuzzy side requires every one of them
         """
-        assert _matched_ids(backend, '"tax AND"') == {
-            corpus["both"],
-            corpus["tax_only"],
-        }
+        assert _matched_ids(backend, '"tax reports"') == {corpus["both"]}
+
+    def test_a_trailing_keyword_is_just_a_word(
+        self,
+        backend: TantivyBackend,
+        corpus: dict[str, int],
+    ) -> None:
+        """
+        GIVEN:
+            - Three documents: one with both "taxation" and "reportage",
+              one with only "taxation", one with only "reportage"
+        WHEN:
+            - '"tax AND"' is searched, a phrase that used to be a tantivy
+              syntax error once the clause was re-parsed as a string
+            - The same phrase is searched with the keyword in lower case
+        THEN:
+            - Both match the same documents, and neither raises. Nothing
+              is re-parsed any more, so a trailing keyword cannot cost the
+              query its fuzzy side
+        """
+        assert _matched_ids(backend, '"tax AND"') == _matched_ids(
+            backend,
+            '"tax and"',
+        )

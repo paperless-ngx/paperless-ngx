@@ -2,7 +2,7 @@
 
 _CJK_RE decides both what is indexed into the bigram fields
 (extract_cjk_text) and how a query's CJK text is cut into runs
-(_widen_cjk_leaf). A character it misses splits a word in two on both
+(_widen_leaf). A character it misses splits a word in two on both
 sides. For the katakana prolonged sound mark that leaves one-character
 runs, which have no bigrams, so the word could not be found through the
 bigram fields at all.

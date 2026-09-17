@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import logging
 import unicodedata
 from functools import cache
@@ -22,6 +23,7 @@ from documents.search._errors import MultipleSearchQueryErrors
 from documents.search._errors import SearchQueryError
 from documents.search._registry import get_field_registry
 from documents.search._tokenizer import _bigram_analyzer
+from documents.search._tokenizer import paperless_text_analyzer
 from documents.search._tokenizer import simple_search_tokens
 
 if TYPE_CHECKING:
@@ -164,10 +166,9 @@ def _parse_cjk_text(
     try:
         return index.parse_query(cjk_text, fields)
     except Exception:
-        # Broad on purpose, unlike _try_parse_fuzzy_query's narrower
-        # ValueError: cjk_text isn't filtered to a guaranteed-safe token
-        # set the way the fuzzy blend's word string is, so the exact
-        # failure mode tantivy could raise here isn't pinned down.
+        # Broad on purpose: cjk_text isn't filtered to a guaranteed-safe
+        # token set, so the exact failure mode tantivy could raise here
+        # isn't pinned down.
         logger.debug(
             "Skipping CJK search clause: could not parse CJK text: %r",
             cjk_text,
@@ -196,110 +197,6 @@ def _build_cjk_query(
     return _parse_cjk_text(index, cjk_text, fields)
 
 
-# A joined fuzzy word string must stay plain words: it goes back through
-# tantivy's own query parser, and the raw query text the clause collects
-# routinely carries characters that parser reads as grammar (a colon, a
-# bracket, a quote, a leading -). Each token is cut into its word runs and
-# only those are kept, so no field syntax, pattern, range or grouping can
-# reach the parser. Cutting rather than dropping the whole token is what
-# keeps ordinary hyphenated, dotted and quoted input ("COVID-19",
-# "hello@example.com", "tax reports") contributing to the clause at all.
-_WORD_RUN_RE = regex.compile(r"\w+")
-
-# The one piece of tantivy grammar that survives the cut: its boolean
-# keywords are themselves word runs. Only these exact spellings are
-# grammar there ("And"/"and" are ordinary terms), so lowercasing exactly
-# these turns them back into the ordinary terms the field analyzer used to
-# make of them, before the clause switched to raw text. Left alone, a
-# quoted phrase would silently restructure the clause ("tax AND reports"
-# becoming a conjunction) or fail to parse and drop it entirely
-# ("tax AND", or "IN" anywhere).
-#
-# Only these words are touched: tantivy lowercases query terms with the
-# field's own analyzer, and doing it ourselves first is not always the
-# same operation (Python folds a final sigma to a different letter than
-# tantivy does, and turns Turkish 'İ' into a sequence tantivy then splits
-# in two), which would search for terms the index does not contain.
-_TANTIVY_KEYWORDS: Final[frozenset[str]] = frozenset({"AND", "OR", "NOT", "IN"})
-
-
-def _try_parse_fuzzy_query(
-    index: tantivy.Index,
-    ast: wc.ast.Node,
-    registry: wc.FieldRegistry,
-) -> tantivy.Query | None:
-    """Build the fuzzy blend clause from the parsed query's free-text
-    words, or None if it has none.
-
-    The clause is built by handing tantivy's own query parser a plain
-    word string (there's no clean AST-level fuzzy equivalent to
-    whoosh-compat's parse tree, and fuzzy matching was always an
-    approximate, secondary, 0.1-boosted clause). The words come from
-    whoosh_compat's ``free_text_tokens`` over the already-parsed AST,
-    never from the raw query string: raw whoosh grammar (date keywords,
-    ``[2005 to 2009]`` ranges, bracket-class wildcards) is not tantivy
-    syntax, and feeding it here used to knock the fuzzy clause out for
-    the whole query the moment any such construct appeared alongside a
-    typo'd word. The helper also keeps excluded terms out: a ``NOT``'d
-    word must not resurface through the fuzzy clause.
-
-    Chosen trade-off: a term explicitly fielded on one of the default
-    search fields (``correspondent:acme``) contributes its text to the
-    word string UNFIELDED, so the fuzzy clause searches it across all
-    default fields rather than just the one the user named. That is
-    recall-only widening on a secondary 0.1-boosted clause the score
-    threshold already disciplines, accepted in exchange for never feeding
-    field syntax to tantivy's parser. What the word string guarantees is
-    exactly that: no field prefix, pattern, range, grouping or quoting
-    survives, and the boolean keywords that do survive (they are word
-    runs) are lowercased into ordinary terms; see _TANTIVY_KEYWORDS.
-
-    The words are the query's RAW text, not the analyzer's output
-    (``analyzed=False``), because ``index.parse_query`` analyzes whatever
-    it is given and analysis is not idempotent: ``universities`` stems to
-    ``univers``, and handing that back stems it again to ``univ``, a term
-    the index does not contain. ``prefix=True`` hid this as over-broad
-    matching (``univ`` also prefixes ``unicycle``) rather than as no
-    matches at all. Raw text is untokenized, which is why it is cut into
-    word runs above rather than taken whole.
-
-    The ValueError guard stays as insurance (the word string is plain
-    tokens, so tantivy accepting it is expected, not assumed): on a parse
-    failure the fuzzy clause is skipped and the exact clause stands,
-    rather than the whole query failing.
-    """
-    tokens = wc.free_text_tokens(
-        ast,
-        registry=registry,
-        fields=_DEFAULT_SEARCH_FIELDS,
-        analyzed=False,
-    )
-    words = list(
-        dict.fromkeys(
-            word.lower() if word in _TANTIVY_KEYWORDS else word
-            for token in tokens
-            for word in _WORD_RUN_RE.findall(token)
-        ),
-    )
-    if not words:
-        return None
-    fuzzy_text = " ".join(words)
-    try:
-        return index.parse_query(
-            fuzzy_text,
-            _DEFAULT_SEARCH_FIELDS,
-            field_boosts=_FIELD_BOOSTS,
-            fuzzy_fields={f: (True, 1, True) for f in _DEFAULT_SEARCH_FIELDS},
-        )
-    except ValueError:
-        logger.debug(
-            "Skipping fuzzy search clause: token string is not valid "
-            "tantivy query syntax: %r",
-            fuzzy_text,
-        )
-        return None
-
-
 _DEFAULT_SEARCH_FIELDS: Final[list[str]] = [
     "title",
     "content",
@@ -322,8 +219,8 @@ _SIMPLE_FIELD_BOOSTS = {"simple_title": 2.0}
 @cache
 def _get_emit_field_registry(language: str | None) -> wc.FieldRegistry:
     """The parse registry plus the CJK bigram fields, for analyzing and
-    emitting a query whose CJK leaves _widen_cjk_leaf has widened. Cached
-    per language, on the same trigger get_field_registry() rebuilds on.
+    emitting a query whose leaves _widen_leaf has widened. Cached per
+    language, on the same trigger get_field_registry() rebuilds on.
 
     Never used to parse: the bigram fields are internal (absent from
     PUBLIC_FIELDS), and queries are still parsed against
@@ -370,32 +267,30 @@ def _collapse(
     return node_cls(children=tuple(children), **span)
 
 
-def _widen_cjk_leaf(leaf: wc.ast.Term | wc.ast.Phrase) -> wc.ast.Node:
-    """``rewrite_leaf`` hook for emit(): widen a CJK term or phrase on a
-    default search field to ``Or(leaf, alternative)`` where it sits, and
-    leave every other leaf as it is.
+def _leaf_span(leaf: wc.ast.Term | wc.ast.Phrase) -> dict[str, int | None]:
+    """The startchar/endchar kwargs a leaf's alternatives are built with,
+    so a rewritten leaf still points at the same span of the original
+    query text."""
+    return {"startchar": leaf.startchar, "endchar": leaf.endchar}
+
+
+def _cjk_alternative(leaf: wc.ast.Term | wc.ast.Phrase) -> wc.ast.Node | None:
+    """Build the bigram alternative for a CJK leaf, or None if it gets none.
 
     The content analyzer keeps an unspaced CJK run as one token, so only
-    the bigram fields can find a CJK term inside running text. Widening in
-    place, rather than OR-ing a separate bigram clause in at the top, keeps
-    every AND, NOT, REQUIRE, boost and field restriction around the leaf
-    applying to its bigram match too. analyze() calls this for negated
-    leaves as well, and they are widened on purpose, so ``NOT X`` excludes
-    exactly what ``X`` matches.
+    the bigram fields can find a CJK term inside running text.
 
     The alternative is built from the leaf's own text, split where the
     content analyzer would split it. What each kind of piece contributes,
     and how the pieces combine, is commented at the step that decides it.
-
-    analyze() only offers Term and Phrase leaves, so Prefix and Wildcard
-    patterns are never widened.
+    None means there was nothing to build one from.
     """
     if leaf.field is None or leaf.field.name not in _CJK_BIGRAM_FIELDS:
-        return leaf
+        return None
     text = str(leaf.text)
     if not _has_cjk(text):
-        return leaf
-    span = {"startchar": leaf.startchar, "endchar": leaf.endchar}
+        return None
+    span = _leaf_span(leaf)
     bigram_field = wc.FieldRef(_CJK_BIGRAM_FIELDS[leaf.field.name])
     cjk_terms: list[wc.ast.Node] = []
     latin_terms: list[wc.ast.Node] = []
@@ -432,91 +327,160 @@ def _widen_cjk_leaf(leaf: wc.ast.Term | wc.ast.Phrase) -> wc.ast.Node:
     if not pieces:
         # A few hundred codepoints match _CJK_RE but yield no token at all
         # from the simple tokenizer (CJK radicals, circled and squared
-        # forms), leaving nothing to widen with. The leaf then analyzes to
-        # the same nothing it does today.
-        return leaf
+        # forms), leaving nothing to widen with. The caller then leaves the
+        # leaf as it is, and it analyzes to the same nothing it does today.
+        return None
     # Separated latin is required alongside the CJK side, which is what
     # stops "invoice NOT 東京-report" from excluding every 東京 document.
-    alternative = _collapse(wc.ast.And, pieces, span)
+    return _collapse(wc.ast.And, pieces, span)
+
+
+# The index analyzer minus stemming: the same word boundaries and the same
+# drops (remove_long, characters the simple tokenizer discards). The field's
+# pattern_normalizer does the one stemming step.
+_FUZZY_WORD_SPLITTER: Final = paperless_text_analyzer(None)
+
+
+def _fuzzy_alternative(leaf: wc.ast.Term | wc.ast.Phrase) -> wc.ast.Node | None:
+    """Build the near-match alternative for a leaf, or None if it gets none.
+
+    Each of the leaf's words becomes a Fuzzy leaf on the leaf's own field.
+    A Term's words are OR'd, which is the per-word recall the old clause
+    had and what lets ``COVID-19`` match on one half. A Phrase's are
+    AND-ed: quoting asks for more than the bare words, so an Or there
+    would make a quoted phrase match strictly more than the same words
+    unquoted. Adjacency is out of reach either way, so requiring every
+    word is the floor.
+
+    Words come from the index analyzer minus its stemmer, so a leaf gets a
+    fuzzy side exactly when its exact side has tokens. A regex split would
+    keep words the index never holds (``__``, or a word past remove_long),
+    whose exact side analyzes to nothing, leaving a required fuzzy clause
+    that can never match.
+
+    Words of one character are skipped: with prefix matching, a
+    one-character fuzzy term matches every term in the field.
+
+    CJK words are skipped entirely. The content analyzer keeps an unspaced
+    CJK run as one token, so a prefix Fuzzy over it matches any run within
+    one edit of its start: ``東京`` would match a document holding only
+    ``京都の観光案内``, the very thing the bigram fields' multitoken=AND
+    exists to prevent (see _get_emit_field_registry). A two-character CJK
+    word is as broad here as the one-character word the length guard
+    already rejects, and _cjk_alternative supplies the in-run recall
+    anyway, so there is nothing to gain and precision to lose.
+
+    Fuzzy text goes through the field's pattern_normalizer rather than its
+    analyzer, and the splitter's output is already lowercased and folded,
+    so the word is stemmed exactly once.
+    """
+    words = [
+        word
+        for word in _FUZZY_WORD_SPLITTER.analyze(str(leaf.text))
+        if len(word) > 1 and not _has_cjk(word)
+    ]
+    if not words:
+        return None
+    span = _leaf_span(leaf)
+    group = wc.ast.And if isinstance(leaf, wc.ast.Phrase) else wc.ast.Or
+    leaves: list[wc.ast.Node] = [
+        wc.ast.Fuzzy(field=leaf.field, text=word, distance=1, prefix=True, **span)
+        for word in words
+    ]
+    return _collapse(group, leaves, span)
+
+
+def _widen_leaf(
+    leaf: wc.ast.Term | wc.ast.Phrase,
+    *,
+    fuzzy: bool,
+    negated: frozenset[int],
+) -> wc.ast.Node:
+    """``rewrite_leaf`` hook for emit(): widen a leaf on a default search
+    field to ``Or(leaf, alternatives...)`` where it sits, and leave every
+    other leaf as it is.
+
+    Widening in place, rather than OR-ing a separate clause in at the top,
+    keeps every AND, NOT, REQUIRE, boost, field restriction and positive
+    filter around the leaf applying to its widened match too.
+
+    A leaf can gain a CJK alternative, a fuzzy one, or both. A negated
+    leaf keeps its CJK alternative, because NOT X should exclude exactly
+    what X matches, but gets no fuzzy one: with prefix matching, NOT tax
+    would otherwise exclude "taxi" and "taxonomy". Negated leaves are
+    identified by identity through the pre-scan, since the hook cannot see
+    a leaf's context.
+
+    analyze() only offers Term and Phrase leaves, so Prefix and Wildcard
+    patterns are never widened.
+    """
+    if leaf.field is None or leaf.field.name not in _DEFAULT_SEARCH_FIELDS:
+        return leaf
+    span = _leaf_span(leaf)
+    alternatives: list[wc.ast.Node] = []
+    cjk = _cjk_alternative(leaf)
+    if cjk is not None:
+        alternatives.append(cjk)
+    if fuzzy and id(leaf) not in negated:
+        near = _fuzzy_alternative(leaf)
+        if near is not None:
+            alternatives.append(wc.ast.Boosted(child=near, boost=0.1, **span))
+    if not alternatives:
+        return leaf
     # The leaf itself, not a copy: analyze() then keeps it combined the way
     # its enclosing group says rather than the way this Or would, and a long
     # run its analyzer drops to nothing leaves just the alternative.
-    return wc.ast.Or(children=(leaf, alternative), **span)
+    return wc.ast.Or(children=(leaf, *alternatives), **span)
 
 
-class _ConjunctiveNegations(wc.ast.Visitor[tuple["wc.ast.Node", ...]]):
-    """Collect the subtrees an AST excludes from every document it matches.
+def _negated_leaf_ids(node: wc.ast.Node) -> frozenset[int]:
+    """Return the id() of every Term and Phrase under a negation.
 
-    A negation reached through ``And``/``AndNot``/``Require`` (and through
-    the required half of an ``AndMaybe``) constrains the whole query, so it
-    can be re-stated above the blend. ``Or`` is deliberately not descended
-    into: in ``invoice OR NOT secret`` the negation is one branch's own
-    condition, and hoisting it would throw away documents the other branch
-    matches. Nor is a collected subtree descended into, since a negation
-    inside a negation is not an exclusion.
+    A negated leaf keeps its CJK alternative but gets no fuzzy one, and
+    the hook cannot see a leaf's context, so the tree is walked once here
+    and the hook compares by identity. analyze() guarantees it is handed
+    the input tree's own leaf objects, which is what makes identity work.
 
-    Node types with no negation to contribute (every leaf, ``Or``) fall
-    through to ``generic_visit``.
+    Negative positions are Not.child and AndNot.negative, and nothing
+    else in the node set. Leaves are collected at any depth and under any
+    number of negations: over-collecting costs a widening, while missing
+    a negated leaf would let NOT tax exclude "taxi".
+
+    Iterative, and total over node types: this runs outside emit()'s
+    error conversion, so an exception here would reach the generic 500
+    handler.
     """
+    negated: set[int] = set()
+    stack: list[tuple[wc.ast.Node, bool]] = [(node, False)]
+    while stack:
+        current, under_negation = stack.pop()
+        if isinstance(current, (wc.ast.Term, wc.ast.Phrase)):
+            if under_negation:
+                negated.add(id(current))
+        elif isinstance(current, wc.ast.Not):
+            stack.append((current.child, True))
+        elif isinstance(current, wc.ast.AndNot):
+            stack.append((current.positive, under_negation))
+            stack.append((current.negative, True))
+        elif isinstance(current, wc.ast.AndMaybe):
+            stack.append((current.required, under_negation))
+            stack.append((current.optional, under_negation))
+        elif isinstance(current, wc.ast.Require):
+            stack.append((current.scored, under_negation))
+            stack.append((current.filter_only, under_negation))
+        elif isinstance(current, wc.ast.Boosted):
+            stack.append((current.child, under_negation))
+        elif isinstance(current, (wc.ast.And, wc.ast.Or)):
+            stack.extend((child, under_negation) for child in current.children)
+    return frozenset(negated)
 
-    def generic_visit(self, node: wc.ast.Node) -> tuple[wc.ast.Node, ...]:
-        return ()
 
-    def visit_not(self, node: wc.ast.Not) -> tuple[wc.ast.Node, ...]:
-        return (node.child,)
-
-    def visit_andnot(self, node: wc.ast.AndNot) -> tuple[wc.ast.Node, ...]:
-        return (*self.visit(node.positive), node.negative)
-
-    def visit_and(self, node: wc.ast.And) -> tuple[wc.ast.Node, ...]:
-        return tuple(
-            negation for child in node.children for negation in self.visit(child)
-        )
-
-    def visit_boosted(self, node: wc.ast.Boosted) -> tuple[wc.ast.Node, ...]:
-        return self.visit(node.child)
-
-    def visit_andmaybe(self, node: wc.ast.AndMaybe) -> tuple[wc.ast.Node, ...]:
-        return self.visit(node.required)
-
-    def visit_require(self, node: wc.ast.Require) -> tuple[wc.ast.Node, ...]:
-        return (*self.visit(node.scored), *self.visit(node.filter_only))
-
-
-def _negation_clauses(
-    index: tantivy.Index,
-    ast: wc.ast.Node,
-    registry: wc.FieldRegistry,
-) -> list[tuple[tantivy.Occur, tantivy.Query]]:
-    """MustNot clauses for everything ``ast`` excludes conjunctively.
-
-    Each excluded subtree is emitted as its own positive query and attached
-    with ``MustNot``, rather than emitting a negative query and hoping
-    tantivy accepts a bare one.
-
-    The except branch has no reachable trigger under the current control
-    flow: this only runs after parse_user_query has already emitted the
-    exact clause from the whole parsed AST (widened, when the query has CJK
-    text), and every subtree ``_ConjunctiveNegations`` collects here is a
-    piece of that same parsed tree. The re-emit here uses the public
-    registry, without the widening hook, while the exact clause was emitted
-    against ``_get_emit_field_registry()``; the two registries agree on
-    every public field, and the hook only adds nodes, so this does not
-    reopen the branch. Kept as insurance, not dead weight: re-emitting a
-    subtree in isolation is not proven identical to emitting it in context,
-    just believed to be, and this is the seam that finds out if that
-    belief is ever wrong.
-    """
-    try:
-        return [
-            (
-                tantivy.Occur.MustNot,
-                tantivy_emit(negation, index=index, registry=registry),
-            )
-            for negation in _ConjunctiveNegations().visit(ast)
-        ]
-    except QueryError as e:  # pragma: no cover
-        raise _map_emit_error(e) from e
+# Weight of the tiebreak clause that restores relevance ordering among
+# near-miss results. The widened tree is const-scored so the threshold
+# cannot cut a near-miss by the BM25 spread of the query's correctly
+# spelled words; this small share of its real score orders them again.
+# A BM25 spread above 0.1/_FUZZY_TIEBREAK can still cut one.
+_FUZZY_TIEBREAK: Final[float] = 0.01
 
 
 def _any_of(clauses: list[tuple[tantivy.Occur, tantivy.Query]]) -> tantivy.Query:
@@ -567,8 +531,8 @@ def parse_user_query(
     tz: tzinfo,
 ) -> tantivy.Query:
     """
-    Parse user query through whoosh-compat, widen CJK terms, then blend in
-    the optional fuzzy clause.
+    Parse user query through whoosh-compat, then widen its leaves and emit,
+    once or twice depending on whether fuzzy matching is on.
 
     1. wc.parse() against the shared FieldRegistry (whoosh grammar -> AST).
        Bare notes:/custom_fields: prefixes resolve to their default subpath
@@ -577,31 +541,23 @@ def parse_user_query(
     2. Any diagnostics (bad dates/numbers) map to SearchQueryError subclasses
        and raise, the view returns HTTP 400 with every offending field
        listed, not just the first.
-    3. When the query has CJK text, emit()'s rewrite_leaf hook
-       (_widen_cjk_leaf) rewrites each CJK term in the AST to also match
-       its bigram field, in place, so the rest of the query constrains the
-       bigram match too. The tree is analyzed and emitted against
-       _get_emit_field_registry(), which adds the bigram fields; the query
-       itself was parsed without them.
+    3. With fuzzy off, the AST is emitted once. If the query has CJK text,
+       emit()'s rewrite_leaf hook (_widen_leaf) rewrites each CJK term in
+       the AST to also match its bigram field, in place, so the rest of
+       the query constrains the bigram match too. With fuzzy on, the AST
+       is emitted twice through the same hook: once with fuzzy=True for
+       the widened tree used as a filter, and once with fuzzy=False for a
+       normally scored tree, and the two are blended into a boolean query
+       (see the comment above the blend for why). Either way the tree is
+       analyzed and emitted against _get_emit_field_registry() whenever
+       CJK or fuzzy widening applies, which adds the bigram fields; the
+       query itself was parsed without them.
        emit() turns the AST into a tantivy.Query directly (no string
        round-trip). A QueryError is routed by its Diagnostic's Cause
        (_map_emit_error): a construct that parses but can't execute against
        tantivy (e.g. a text-field range) is a 400, a registry/schema
        mismatch is logged and re-raised, and an INTERNAL defect is
        re-raised.
-    4. Optional fuzzy blend (ADVANCED_FUZZY_SEARCH_THRESHOLD) builds a
-       plain word string from the parsed AST's free-text tokens
-       (whoosh_compat.free_text_tokens) and feeds THAT to
-       index.parse_query, never raw_query, whose whoosh grammar (date
-       keywords, bracket-class wildcards, etc.) tantivy's parser rejects,
-       which used to silently knock the fuzzy clause out of any mixed
-       query (see _try_parse_fuzzy_query).
-    5. When the fuzzy clause was added, the query's conjunctive exclusions
-       are restated as MustNot above the blend (_negation_clauses): a
-       clause built from positive terms cannot express them, and as a bare
-       Should it would undo them. The restated exclusions come from the
-       unwidened AST, so they are content-only for CJK terms: a known gap
-       that goes away once fuzzy is also widened in the tree.
     """
     registry = get_field_registry(settings.SEARCH_LANGUAGE)
     result = wc.parse(
@@ -614,44 +570,53 @@ def parse_user_query(
     if result.diagnostics:
         raise _diagnostics_to_error(result.diagnostics)
 
-    emit_registry, rewrite_leaf = registry, None
-    if _has_cjk(raw_query):
-        emit_registry = _get_emit_field_registry(settings.SEARCH_LANGUAGE)
-        rewrite_leaf = _widen_cjk_leaf
-    try:
-        exact = tantivy_emit(
+    fuzzy_on = settings.ADVANCED_FUZZY_SEARCH_THRESHOLD is not None
+    cjk = _has_cjk(raw_query)
+    emit_registry = (
+        _get_emit_field_registry(settings.SEARCH_LANGUAGE)
+        if cjk or fuzzy_on
+        else registry
+    )
+    negated = _negated_leaf_ids(result.ast) if fuzzy_on else frozenset()
+
+    def emit_widened(*, fuzzy: bool) -> tantivy.Query:
+        hook = (
+            functools.partial(_widen_leaf, fuzzy=fuzzy, negated=negated)
+            if cjk or fuzzy
+            else None
+        )
+        return tantivy_emit(
             result.ast,
             index=index,
             registry=emit_registry,
-            rewrite_leaf=rewrite_leaf,
+            rewrite_leaf=hook,
         )
+
+    try:
+        if not fuzzy_on:
+            return emit_widened(fuzzy=False)
+        widened = emit_widened(fuzzy=True)
+        scored = emit_widened(fuzzy=False)
     except QueryError as e:
         raise _map_emit_error(e) from e
 
-    clauses: list[tuple[tantivy.Occur, tantivy.Query]] = [
-        (tantivy.Occur.Should, exact),
-    ]
-
-    threshold = settings.ADVANCED_FUZZY_SEARCH_THRESHOLD
-    if threshold is not None:
-        fuzzy = _try_parse_fuzzy_query(index, result.ast, registry)
-        if fuzzy is not None:
-            clauses.append(
-                (tantivy.Occur.Should, tantivy.Query.boost_query(fuzzy, 0.1)),
-            )
-
-    if len(clauses) == 1:
-        return exact
-    # The fuzzy clause is built from positive terms only, so as a plain
-    # Should beside the exact clause it re-admits exactly the documents the
-    # query excluded. Restate the exclusions once, above the whole blend.
-    # Redundant against the exact clause, which already carries them, but
-    # idempotently so.
-    negations = _negation_clauses(index, result.ast, registry)
-    if not negations:
-        return _any_of(clauses)
+    # The widened tree supplies the matched set at a flat score, so a
+    # near-miss is not ranked by how well the query's correctly spelled
+    # words matched. The CJK-only tree adds real scoring back for what
+    # matched exactly, and the last clause reintroduces the widened tree's
+    # own scoring at a small weight so near-misses still rank among
+    # themselves. const_score_query discards every boost inside it, the
+    # title field's 2.0 included, so a title match earns its boost through
+    # the second and third clauses rather than the first.
     return tantivy.Query.boolean_query(
-        [(tantivy.Occur.Must, _any_of(clauses)), *negations],
+        [
+            (tantivy.Occur.Must, tantivy.Query.const_score_query(widened, 0.1)),
+            (tantivy.Occur.Should, scored),
+            (
+                tantivy.Occur.Should,
+                tantivy.Query.boost_query(widened, _FUZZY_TIEBREAK),
+            ),
+        ],
     )
 
 

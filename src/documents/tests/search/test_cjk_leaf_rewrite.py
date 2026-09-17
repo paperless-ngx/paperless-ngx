@@ -17,7 +17,7 @@ import whoosh_compat.ast as wc_ast
 from documents.search._query import _DEFAULT_SEARCH_FIELDS
 from documents.search._query import _FIELD_BOOSTS
 from documents.search._query import _get_emit_field_registry
-from documents.search._query import _widen_cjk_leaf
+from documents.search._query import _widen_leaf
 from documents.search._registry import get_field_registry
 
 if TYPE_CHECKING:
@@ -42,6 +42,11 @@ def _bigram(text: str) -> wc_ast.Term:
 
 def _widened(original: wc_ast.Node, bigram_side: wc_ast.Node) -> wc_ast.Or:
     return wc_ast.Or(children=(original, bigram_side))
+
+
+def _widen_cjk_leaf(leaf: wc_ast.Term | wc_ast.Phrase) -> wc_ast.Node:
+    """The hook as the CJK work used it: no fuzzy side, nothing negated."""
+    return _widen_leaf(leaf, fuzzy=False, negated=frozenset())
 
 
 def _analyze(tree: wc_ast.Node) -> wc_ast.Node:
