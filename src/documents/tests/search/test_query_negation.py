@@ -16,20 +16,10 @@ import pytest
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from pytest_django.fixtures import SettingsWrapper
-
     from documents.models import Document
 
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
-
-
-@pytest.fixture
-def fuzzy_enabled(settings: SettingsWrapper) -> None:
-    """Enable the fuzzy blend clause. The threshold doubles as a minimum
-    score filter, so it is set to 0.0: every hit passes and the test sees
-    the clause's matching behaviour, not the filter's."""
-    settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 0.0
 
 
 class TestNegationConstrainsEveryClause:

@@ -13,38 +13,23 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from documents.models import Document
-
 if TYPE_CHECKING:
-    from pytest_django.fixtures import SettingsWrapper
+    from collections.abc import Callable
 
-    from documents.search._backend import TantivyBackend
+    from documents.models import Document
 
-pytestmark = [pytest.mark.search, pytest.mark.django_db]
-
-
-def _matched_ids(backend: TantivyBackend, query: str) -> set[int]:
-    return set(backend.search_ids(query, user=None))
-
-
-def _index(backend: TantivyBackend, **kwargs: object) -> Document:
-    doc = Document.objects.create(**kwargs)
-    backend.add_or_update(doc)
-    return doc
-
-
-@pytest.fixture(autouse=True)
-def fuzzy_enabled(settings: SettingsWrapper) -> None:
-    """Enable the fuzzy blend clause. The threshold doubles as a minimum
-    score filter, so it is set to 0.0: every hit passes and the test sees
-    the clause's matching behaviour, not the filter's."""
-    settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 0.0
+pytestmark = [
+    pytest.mark.search,
+    pytest.mark.django_db,
+    pytest.mark.usefixtures("fuzzy_enabled"),
+]
 
 
 class TestFuzzyClauseWords:
     def test_a_stemmed_word_is_not_stemmed_a_second_time(
         self,
-        backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
@@ -62,36 +47,29 @@ class TestFuzzyClauseWords:
               reaches unrelated words - the clause must stay wide enough
               for a typo and no wider
         """
-        wanted = _index(
-            backend,
+        wanted = index_document(
             title="A",
             content="universities of europe",
-            checksum="fuzz-stem-1",
         )
-        typo = _index(
-            backend,
+        typo = index_document(
             title="B",
             content="universties of europe",
-            checksum="fuzz-stem-2",
         )
-        _index(
-            backend,
+        index_document(
             title="C",
             content="univalent chemical bonds",
-            checksum="fuzz-stem-3",
         )
-        _index(
-            backend,
+        index_document(
             title="D",
             content="unicycle repair manual",
-            checksum="fuzz-stem-4",
         )
 
-        assert _matched_ids(backend, "universities") == {wanted.pk, typo.pk}
+        assert matched_ids("universities") == {wanted.pk, typo.pk}
 
     def test_a_hyphenated_term_still_reaches_the_clause(
         self,
-        backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
@@ -105,18 +83,17 @@ class TestFuzzyClauseWords:
               would read as grammar, is dropped, and the whole query loses
               its fuzzy clause
         """
-        misspelled = _index(
-            backend,
+        misspelled = index_document(
             title="A",
             content="covidx testing results",
-            checksum="fuzz-hyphen-1",
         )
 
-        assert _matched_ids(backend, "COVID-19") == {misspelled.pk}
+        assert matched_ids("COVID-19") == {misspelled.pk}
 
     def test_a_phrase_still_reaches_the_clause(
         self,
-        backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
@@ -129,14 +106,12 @@ class TestFuzzyClauseWords:
               space, and is the whole query's only free text here, so it
               must still reach the clause
         """
-        near_miss = _index(
-            backend,
+        near_miss = index_document(
             title="A",
             content="taxation reportage weekly",
-            checksum="fuzz-phrase-1",
         )
 
-        assert _matched_ids(backend, '"tax reports"') == {near_miss.pk}
+        assert matched_ids('"tax reports"') == {near_miss.pk}
 
 
 class TestBooleanKeywordsInRawText:
@@ -146,24 +121,18 @@ class TestBooleanKeywordsInRawText:
     now, which closes that off structurally; these pin it shut."""
 
     @pytest.fixture
-    def corpus(self, backend: TantivyBackend) -> dict[str, int]:
-        both = _index(
-            backend,
+    def corpus(self, index_document: Callable[..., Document]) -> dict[str, int]:
+        both = index_document(
             title="A",
             content="taxation reportage weekly",
-            checksum="fuzz-kw-1",
         )
-        tax_only = _index(
-            backend,
+        tax_only = index_document(
             title="B",
             content="taxation only here",
-            checksum="fuzz-kw-2",
         )
-        report_only = _index(
-            backend,
+        report_only = index_document(
             title="C",
             content="reportage only here",
-            checksum="fuzz-kw-3",
         )
         return {
             "both": both.pk,
@@ -182,7 +151,7 @@ class TestBooleanKeywordsInRawText:
     )
     def test_a_keyword_inside_a_phrase_stays_an_ordinary_word(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         corpus: dict[str, int],
         keyword_spelling: str,
         ordinary_spelling: str,
@@ -201,14 +170,11 @@ class TestBooleanKeywordsInRawText:
               exclusion, IN does not fail the parse. Only the upper-case
               spelling was ever grammar
         """
-        assert _matched_ids(backend, keyword_spelling) == _matched_ids(
-            backend,
-            ordinary_spelling,
-        )
+        assert matched_ids(keyword_spelling) == matched_ids(ordinary_spelling)
 
     def test_a_phrase_needs_a_near_match_for_every_word(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         corpus: dict[str, int],
     ) -> None:
         """
@@ -222,11 +188,11 @@ class TestBooleanKeywordsInRawText:
               quoted phrase asks for more than the bare words, so its
               fuzzy side requires every one of them
         """
-        assert _matched_ids(backend, '"tax reports"') == {corpus["both"]}
+        assert matched_ids('"tax reports"') == {corpus["both"]}
 
     def test_a_trailing_keyword_is_just_a_word(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         corpus: dict[str, int],
     ) -> None:
         """
@@ -242,7 +208,4 @@ class TestBooleanKeywordsInRawText:
               is re-parsed any more, so a trailing keyword cannot cost the
               query its fuzzy side
         """
-        assert _matched_ids(backend, '"tax AND"') == _matched_ids(
-            backend,
-            '"tax and"',
-        )
+        assert matched_ids('"tax AND"') == matched_ids('"tax and"')

@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC
+from typing import TYPE_CHECKING
 
 import pytest
-import tantivy
 from whoosh_compat.errors import Diagnostic
 from whoosh_compat.errors import DiagnosticKind
 from whoosh_compat.errors import QueryError
@@ -22,20 +22,14 @@ from documents.search._errors import SearchQueryError
 from documents.search._query import _map_emit_error
 from documents.search._query import _single_diagnostic_to_error
 from documents.search._query import parse_user_query
-from documents.search._schema import build_schema
-from documents.search._tokenizer import register_tokenizers
+
+if TYPE_CHECKING:
+    import tantivy
+
 
 pytestmark = pytest.mark.search
 
 _LIBRARY_PROSE = "INTERNAL LIBRARY WORDING WITH raw tantivy detail"
-
-
-@pytest.fixture(scope="module")
-def query_index() -> tantivy.Index:
-    """An in-memory, unstemmed index; these tests only parse, never index."""
-    idx = tantivy.Index(build_schema(), path=None)
-    register_tokenizers(idx, "")
-    return idx
 
 
 def _diagnostic(

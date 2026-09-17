@@ -29,8 +29,6 @@ from rest_framework import status
 
 from documents.search._backend import SearchMode
 from documents.search._query import parse_simple_text_highlight_query
-from documents.search._schema import build_schema
-from documents.search._tokenizer import register_tokenizers
 from documents.tests.factories import DocumentFactory
 
 if TYPE_CHECKING:
@@ -53,15 +51,6 @@ _MALFORMED_QUERIES = [
     pytest.param("[a", id="unbalanced_range"),
     pytest.param("/a/", id="unsupported_regex"),
 ]
-
-
-@pytest.fixture(scope="module")
-def query_index() -> tantivy.Index:
-    """An in-memory, unstemmed index for parse-only tests."""
-    schema = build_schema()
-    idx = tantivy.Index(schema, path=None)
-    register_tokenizers(idx, "")
-    return idx
 
 
 class TestParseSimpleTextHighlightQueryDoesNotRaise:

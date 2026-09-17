@@ -25,16 +25,6 @@ pytestmark = pytest.mark.search
 
 
 @pytest.fixture(scope="module")
-def query_index() -> tantivy.Index:
-    """An in-memory, unstemmed index shared read-only across this module's
-    parse-only tests (none of them index documents)."""
-    schema = build_schema()
-    idx = tantivy.Index(schema, path=None)
-    register_tokenizers(idx, "")
-    return idx
-
-
-@pytest.fixture(scope="module")
 def populated_index() -> tantivy.Index:
     """An index holding one document, so a query matching nothing is
     distinguishable from one matching everything."""

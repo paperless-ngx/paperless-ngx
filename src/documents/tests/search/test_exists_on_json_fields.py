@@ -19,9 +19,9 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC
+from typing import TYPE_CHECKING
 
 import pytest
-import tantivy
 from whoosh_compat.errors import Diagnostic
 from whoosh_compat.errors import DiagnosticKind
 from whoosh_compat.errors import QueryError
@@ -32,8 +32,10 @@ from whoosh_compat.fields import FieldRef
 from documents.search._errors import SearchQueryError
 from documents.search._query import _map_emit_error
 from documents.search._query import parse_user_query
-from documents.search._schema import build_schema
-from documents.search._tokenizer import register_tokenizers
+
+if TYPE_CHECKING:
+    import tantivy
+
 
 pytestmark = pytest.mark.search
 
@@ -46,13 +48,6 @@ EXISTS_QUERIES = [
     "custom_fields.name:*",
     "custom_fields.value:*",
 ]
-
-
-@pytest.fixture(scope="module")
-def query_index() -> tantivy.Index:
-    idx = tantivy.Index(build_schema(), path=None)
-    register_tokenizers(idx, "")
-    return idx
 
 
 class TestJsonExistsIsUserError:

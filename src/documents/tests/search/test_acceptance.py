@@ -18,13 +18,16 @@ from django.contrib.auth.models import User
 
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
-from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
 from documents.models import StoragePath
 from documents.search._query import parse_user_query
+from documents.tests.factories import DocumentFactory
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from documents.models import Document
     from documents.search._backend import TantivyBackend
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
@@ -32,49 +35,28 @@ pytestmark = [pytest.mark.search, pytest.mark.django_db]
 FROZEN_NOW = datetime(2026, 6, 15, 12, 0, tzinfo=UTC)
 
 
-def _matched_ids(backend: TantivyBackend, query: str) -> set[int]:
-    return set(backend.search_ids(query, user=None))
-
-
-def _index(backend: TantivyBackend, **kwargs: object) -> Document:
-    """Create a Document and index it in one step, for the common case
-    where nothing needs to happen between the two (no related Note/
-    CustomFieldInstance to attach first)."""
-    doc = Document.objects.create(**kwargs)
-    backend.add_or_update(doc)
-    return doc
-
-
 @pytest.fixture
-def indexed_documents(backend: TantivyBackend) -> dict[str, int]:
+def indexed_documents(index_document: Callable[..., Document]) -> dict[str, int]:
     """Index a small fixture set, return {label: doc_id} for corpus queries."""
     docs = {
-        "invoice_2020": _index(
-            backend,
+        "invoice_2020": index_document(
             title="Invoice 2020",
             content="invoice total due",
-            checksum="acc-invoice-2020",
             archive_serial_number=100,
         ),
-        "invoice_2021": _index(
-            backend,
+        "invoice_2021": index_document(
             title="Invoice 2021",
             content="invoice total due",
-            checksum="acc-invoice-2021",
             archive_serial_number=101,
         ),
-        "invoice_2023": _index(
-            backend,
+        "invoice_2023": index_document(
             title="Invoice 2023",
             content="invoice total due",
-            checksum="acc-invoice-2023",
             archive_serial_number=102,
         ),
-        "receipt_2022": _index(
-            backend,
+        "receipt_2022": index_document(
             title="Receipt 2022",
             content="receipt total due",
-            checksum="acc-receipt-2022",
             archive_serial_number=103,
         ),
     }
@@ -87,7 +69,7 @@ class TestIssue13568BracketWildcard:
 
     def test_bracket_class_wildcard_matches_only_in_range_years(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         indexed_documents: dict[str, int],
     ) -> None:
         """
@@ -105,7 +87,7 @@ class TestIssue13568BracketWildcard:
             - Only the 2020 and 2021 documents match, proving the bracket
               character class survived (issue #13568's original bug)
         """
-        matched = _matched_ids(backend, "title:202[0-1]*")
+        matched = matched_ids("title:202[0-1]*")
         expected = {
             indexed_documents["invoice_2020"],
             indexed_documents["invoice_2021"],
@@ -121,6 +103,7 @@ class TestFieldBoosts:
     def test_title_boost_ranks_title_match_above_content_only_match(
         self,
         backend: TantivyBackend,
+        index_document: Callable[..., Document],
     ) -> None:
         """
         GIVEN:
@@ -132,17 +115,13 @@ class TestFieldBoosts:
             - The title match ranks first, proving our title field boost
               actually affects ranking
         """
-        title_match = _index(
-            backend,
+        title_match = index_document(
             title="urgent",
             content="nothing else relevant",
-            checksum="acc-boost-title",
         )
-        _index(
-            backend,
+        index_document(
             title="nothing",
             content="urgent matter here",
-            checksum="acc-boost-content",
         )
         query = parse_user_query(backend._index, "urgent", UTC)
         searcher = backend._index.searcher()
@@ -157,6 +136,8 @@ class TestJsonSubpaths:
     def test_notes_user_matches_document_with_that_note_author(
         self,
         backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
@@ -168,20 +149,20 @@ class TestJsonSubpaths:
             - Only the document with alice's note matches
         """
         alice = User.objects.create_user(username="alice")
-        doc_with_note = Document.objects.create(
+        doc_with_note = DocumentFactory(
             title="Has note",
             content="x",
-            checksum="acc-note-with",
         )
         Note.objects.create(document=doc_with_note, user=alice, note="reminder")
         backend.add_or_update(doc_with_note)
-        _index(backend, title="No note", content="x", checksum="acc-note-without")
-        matched = _matched_ids(backend, "notes.user:alice")
+        index_document(title="No note", content="x")
+        matched = matched_ids("notes.user:alice")
         assert matched == {doc_with_note.pk}
 
     def test_custom_fields_name_and_value_combine(
         self,
         backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
@@ -203,10 +184,9 @@ class TestJsonSubpaths:
             name="Other Field",
             data_type=CustomField.FieldDataType.STRING,
         )
-        matching = Document.objects.create(
+        matching = DocumentFactory(
             title="Matching",
             content="x",
-            checksum="acc-cf-matching",
         )
         CustomFieldInstance.objects.create(
             document=matching,
@@ -214,10 +194,9 @@ class TestJsonSubpaths:
             value_text="policy",
         )
         backend.add_or_update(matching)
-        non_matching = Document.objects.create(
+        non_matching = DocumentFactory(
             title="Non-matching",
             content="x",
-            checksum="acc-cf-nonmatching",
         )
         CustomFieldInstance.objects.create(
             document=non_matching,
@@ -225,8 +204,7 @@ class TestJsonSubpaths:
             value_text="policy",
         )
         backend.add_or_update(non_matching)
-        matched = _matched_ids(
-            backend,
+        matched = matched_ids(
             'custom_fields.name:"Contract Number" custom_fields.value:policy',
         )
         assert matched == {matching.pk}
@@ -240,7 +218,7 @@ class TestUnregisteredIdFieldFoldsToLiteralText:
 
     def test_tag_id_query_matches_nothing(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         indexed_documents: dict[str, int],
     ) -> None:
         """
@@ -254,7 +232,7 @@ class TestUnregisteredIdFieldFoldsToLiteralText:
             - It folds to a literal text search and matches nothing,
               rather than erroring
         """
-        matched = _matched_ids(backend, "tag_id:5")
+        matched = matched_ids("tag_id:5")
         assert matched == set()
 
 
@@ -268,7 +246,8 @@ class TestFuzzyBlendSurvivesWhooshGrammar:
 
     def test_typo_fuzzy_matches_alongside_date_keyword(
         self,
-        backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
         settings,
     ) -> None:
         """
@@ -287,26 +266,25 @@ class TestFuzzyBlendSurvivesWhooshGrammar:
         """
         settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 0.5
         with time_machine.travel(FROZEN_NOW, tick=False):
-            doc = _index(
-                backend,
+            doc = index_document(
                 title="Receipt March",
                 content="receipt total due",
-                checksum="fuzzy-blend-1",
                 archive_serial_number=900,
             )
             # Sanity: the exact spelling matches through the exact clause.
-            assert doc.pk in _matched_ids(backend, "added:today receipt")
+            assert doc.pk in matched_ids("added:today receipt")
             # The regression: the misspelling (one transposition) only
             # matches via the fuzzy clause, and "added:today" is
             # whoosh-only grammar tantivy's parser rejects, so raw-string
             # fuzzy parsing skips the clause entirely and this returns
             # nothing. The typo is deliberate; keep codespell away from it.
             typo_query = "added:today reciept"  # codespell:ignore reciept
-            assert doc.pk in _matched_ids(backend, typo_query)
+            assert doc.pk in matched_ids(typo_query)
 
     def test_negated_words_do_not_fuzzy_match(
         self,
-        backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
         settings,
     ) -> None:
         """
@@ -329,14 +307,12 @@ class TestFuzzyBlendSurvivesWhooshGrammar:
         """
         settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 0.5
         with time_machine.travel(FROZEN_NOW, tick=False):
-            _index(
-                backend,
+            index_document(
                 title="Receipt Archive",
                 content="receipt archived stack",
-                checksum="fuzzy-blend-2",
                 archive_serial_number=901,
             )
-            assert _matched_ids(backend, "added:today total NOT receipt") == set()
+            assert matched_ids("added:today total NOT receipt") == set()
 
 
 class TestUnquotedDateKeywordPhrases:
@@ -346,21 +322,20 @@ class TestUnquotedDateKeywordPhrases:
     spelling keeps working now that paperless no longer pre-quotes it."""
 
     @pytest.fixture
-    def period_documents(self, backend: TantivyBackend) -> dict[str, int]:
+    def period_documents(
+        self,
+        index_document: Callable[..., Document],
+    ) -> dict[str, int]:
         with time_machine.travel(FROZEN_NOW, tick=False):
-            in_may = _index(
-                backend,
+            in_may = index_document(
                 title="May Doc",
                 content="statement",
-                checksum="kw-may",
                 archive_serial_number=910,
                 added=datetime(2026, 5, 20, 12, 0, tzinfo=UTC),
             )
-            in_june = _index(
-                backend,
+            in_june = index_document(
                 title="June Doc",
                 content="statement",
-                checksum="kw-june",
                 archive_serial_number=911,
                 added=datetime(2026, 6, 10, 12, 0, tzinfo=UTC),
             )
@@ -376,7 +351,7 @@ class TestUnquotedDateKeywordPhrases:
     )
     def test_unquoted_matches_the_same_documents_as_quoted(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         period_documents: dict[str, int],
         query: str,
     ) -> None:
@@ -393,7 +368,7 @@ class TestUnquotedDateKeywordPhrases:
               whoosh-compat's own grammar to accept it unquoted natively
         """
         with time_machine.travel(FROZEN_NOW, tick=False):
-            assert _matched_ids(backend, query) == {period_documents["in_may"]}
+            assert matched_ids(query) == {period_documents["in_may"]}
 
     @pytest.mark.parametrize(
         "query",
@@ -409,7 +384,7 @@ class TestUnquotedDateKeywordPhrases:
     )
     def test_every_phrase_and_date_field_parses_without_error(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         period_documents: dict[str, int],
         query: str,
     ) -> None:
@@ -426,11 +401,12 @@ class TestUnquotedDateKeywordPhrases:
               are whoosh-compat's own and are pinned in its own suite
         """
         with time_machine.travel(FROZEN_NOW, tick=False):
-            _matched_ids(backend, query)
+            matched_ids(query)
 
     def test_text_field_keyword_words_are_ordinary_text(
         self,
-        backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
         period_documents: dict[str, int],
     ) -> None:
         """
@@ -447,14 +423,12 @@ class TestUnquotedDateKeywordPhrases:
               documents do not match
         """
         with time_machine.travel(FROZEN_NOW, tick=False):
-            wordy = _index(
-                backend,
+            wordy = index_document(
                 title="Notes from the previous month",
                 content="meeting notes",
-                checksum="kw-text",
                 archive_serial_number=912,
             )
-            assert _matched_ids(backend, "title:previous month") == {wordy.pk}
+            assert matched_ids("title:previous month") == {wordy.pk}
 
 
 class TestFieldAliases:
@@ -464,7 +438,8 @@ class TestFieldAliases:
 
     def test_type_alias_and_canonical_name_match_the_same_document(
         self,
-        backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
@@ -487,25 +462,22 @@ class TestFieldAliases:
               real index
         """
         invoice_type = DocumentType.objects.create(name="invoice")
-        typed = _index(
-            backend,
+        typed = index_document(
             title="First",
             content="quarterly statement",
-            checksum="alias-type-1",
             document_type=invoice_type,
         )
-        _index(
-            backend,
+        index_document(
             title="Second",
             content="invoice mentioned in body",
-            checksum="alias-type-2",
         )
-        assert _matched_ids(backend, "type:invoice") == {typed.pk}
-        assert _matched_ids(backend, "document_type:invoice") == {typed.pk}
+        assert matched_ids("type:invoice") == {typed.pk}
+        assert matched_ids("document_type:invoice") == {typed.pk}
 
     def test_path_alias_and_canonical_name_match_the_same_document(
         self,
-        backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
@@ -523,18 +495,14 @@ class TestFieldAliases:
               real index
         """
         archive = StoragePath.objects.create(name="archive", path="archive/{title}")
-        stored = _index(
-            backend,
+        stored = index_document(
             title="Stored",
             content="quarterly statement",
-            checksum="alias-path-1",
             storage_path=archive,
         )
-        _index(
-            backend,
+        index_document(
             title="Loose",
             content="archive mentioned in body",
-            checksum="alias-path-2",
         )
-        assert _matched_ids(backend, "path:archive") == {stored.pk}
-        assert _matched_ids(backend, "storage_path:archive") == {stored.pk}
+        assert matched_ids("path:archive") == {stored.pk}
+        assert matched_ids("storage_path:archive") == {stored.pk}

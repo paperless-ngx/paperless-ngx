@@ -24,16 +24,18 @@ from typing import TYPE_CHECKING
 import pytest
 import time_machine
 
-from documents.models import Document
 from documents.models import Note
 from documents.models import Tag
 from documents.search._errors import InvalidDateQuery
+from documents.tests.factories import DocumentFactory
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from collections.abc import Generator
 
     from django.contrib.auth.models import User
 
+    from documents.models import Document
     from documents.search._backend import TantivyBackend
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
@@ -45,37 +47,23 @@ FROZEN_NOW = datetime(2026, 6, 15, 12, 0, tzinfo=UTC)
 DOC_CHECKSUM = "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
 
 
-def _matched_ids(backend: TantivyBackend, query: str) -> set[int]:
-    return set(backend.search_ids(query, user=None))
-
-
-def _index(backend: TantivyBackend, **kwargs: object) -> Document:
-    doc = Document.objects.create(**kwargs)
-    backend.add_or_update(doc)
-    return doc
-
-
 class TestLogicalExpressions:
     @pytest.fixture
-    def docs(self, backend: TantivyBackend) -> dict[str, int]:
+    def docs(self, index_document: Callable[..., Document]) -> dict[str, int]:
         return {
-            "secret": _index(
-                backend,
+            "secret": index_document(
                 title="Invoice one",
                 content="invoice secret contents",
-                checksum="doc-syntax-secret",
             ).pk,
-            "plain": _index(
-                backend,
+            "plain": index_document(
                 title="Invoice two",
                 content="invoice ordinary contents",
-                checksum="doc-syntax-plain",
             ).pk,
         }
 
     def test_not_excludes_a_term(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         docs: dict[str, int],
     ) -> None:
         """
@@ -86,11 +74,11 @@ class TestLogicalExpressions:
         THEN:
             - Only the document without "secret" matches
         """
-        assert _matched_ids(backend, "invoice NOT secret") == {docs["plain"]}
+        assert matched_ids("invoice NOT secret") == {docs["plain"]}
 
     def test_leading_hyphen_requires_the_term_instead_of_excluding_it(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         docs: dict[str, int],
     ) -> None:
         """
@@ -104,11 +92,11 @@ class TestLogicalExpressions:
               indexed as the plain term "secret" and the query becomes an
               AND rather than an exclusion, exactly as the docs warn
         """
-        assert _matched_ids(backend, "invoice -secret") == {docs["secret"]}
+        assert matched_ids("invoice -secret") == {docs["secret"]}
 
     def test_or_inside_parentheses_matches_either_branch(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         docs: dict[str, int],
     ) -> None:
         """
@@ -120,14 +108,15 @@ class TestLogicalExpressions:
         THEN:
             - Both documents match
         """
-        matched = _matched_ids(backend, "invoice AND (secret OR ordinary)")
+        matched = matched_ids("invoice AND (secret OR ordinary)")
         assert matched == {docs["secret"], docs["plain"]}
 
 
 class TestPhraseSearch:
     def test_quoted_phrase_requires_the_words_in_order(
         self,
-        backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
@@ -138,14 +127,12 @@ class TestPhraseSearch:
             - The in-order phrase matches, and the same words reordered do
               not
         """
-        doc = _index(
-            backend,
+        doc = index_document(
             title="Phrase",
             content="the quick brown fox jumps",
-            checksum="doc-syntax-phrase",
         )
-        assert _matched_ids(backend, '"quick brown fox"') == {doc.pk}
-        assert _matched_ids(backend, '"brown quick fox"') == set()
+        assert matched_ids('"quick brown fox"') == {doc.pk}
+        assert matched_ids('"brown quick fox"') == set()
 
 
 class TestTagCommaList:
@@ -166,6 +153,7 @@ class TestTagCommaList:
     def test_comma_list_requires_every_listed_tag(
         self,
         backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
@@ -181,30 +169,22 @@ class TestTagCommaList:
         unpaid = Tag.objects.create(name="unpaid")
         archived = Tag.objects.create(name="archived")
 
-        both = Document.objects.create(
-            title="Both tags",
-            content="body",
-            checksum="doc-syntax-tag-both",
-        )
+        both = DocumentFactory(title="Both tags", content="body")
         both.tags.add(bills, unpaid)
         backend.add_or_update(both)
 
-        one = Document.objects.create(
-            title="One tag",
-            content="body",
-            checksum="doc-syntax-tag-one",
-        )
+        one = DocumentFactory(title="One tag", content="body")
         one.tags.add(bills, archived)
         backend.add_or_update(one)
 
-        assert _matched_ids(backend, "tag:bills,unpaid") == {both.pk}
-        assert _matched_ids(backend, "tag:bills") == {both.pk, one.pk}
+        assert matched_ids("tag:bills,unpaid") == {both.pk}
+        assert matched_ids("tag:bills") == {both.pk, one.pk}
 
 
 class TestArchiveMetadataFields:
     @pytest.fixture
     def doc(self, backend: TantivyBackend, admin_user: User) -> Document:
-        doc = Document.objects.create(
+        doc = DocumentFactory(
             title="Metadata",
             content="body",
             checksum=DOC_CHECKSUM,
@@ -237,7 +217,7 @@ class TestArchiveMetadataFields:
     )
     def test_documented_metadata_query_matches(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         doc: Document,
         query: str,
     ) -> None:
@@ -253,7 +233,7 @@ class TestArchiveMetadataFields:
         THEN:
             - Each one matches the document
         """
-        assert _matched_ids(backend, query) == {doc.pk}
+        assert matched_ids(query) == {doc.pk}
 
     @pytest.mark.parametrize(
         "query",
@@ -265,7 +245,7 @@ class TestArchiveMetadataFields:
     )
     def test_partial_or_uppercase_checksum_matches_nothing(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         doc: Document,
         query: str,
     ) -> None:
@@ -279,7 +259,7 @@ class TestArchiveMetadataFields:
             - Nothing matches, as the docs say only a complete, lowercase
               checksum matches as an exact value
         """
-        assert _matched_ids(backend, query) == set()
+        assert matched_ids(query) == set()
 
 
 class TestDocumentedDateForms:
@@ -289,7 +269,7 @@ class TestDocumentedDateForms:
             yield
 
     @pytest.fixture
-    def dated(self, backend: TantivyBackend) -> dict[str, int]:
+    def dated(self, index_document: Callable[..., Document]) -> dict[str, int]:
         stamps = {
             "today": datetime(2026, 6, 15, 9, 0, tzinfo=UTC),
             "yesterday": datetime(2026, 6, 14, 9, 0, tzinfo=UTC),
@@ -300,11 +280,9 @@ class TestDocumentedDateForms:
             "old": datetime(2005, 3, 4, 15, 30, tzinfo=UTC),
         }
         return {
-            label: _index(
-                backend,
+            label: index_document(
                 title=label,
                 content="dated body",
-                checksum=f"doc-syntax-date-{label}",
                 added=stamp,
             ).pk
             for label, stamp in stamps.items()
@@ -335,7 +313,7 @@ class TestDocumentedDateForms:
     )
     def test_documented_date_form_matches_its_day_or_month(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         dated: dict[str, int],
         query: str,
         label: str,
@@ -355,7 +333,7 @@ class TestDocumentedDateForms:
             - Each form matches exactly the document dated on its day or
               within its month
         """
-        assert _matched_ids(backend, query) == {dated[label]}
+        assert matched_ids(query) == {dated[label]}
 
     @pytest.mark.parametrize(
         "query",
@@ -381,7 +359,7 @@ class TestDocumentedDateForms:
     )
     def test_forms_the_docs_warn_about_match_nothing(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         dated: dict[str, int],
         query: str,
     ) -> None:
@@ -400,11 +378,11 @@ class TestDocumentedDateForms:
             - Nothing matches, exactly as the docs warn, rather than
               presenting these as usable spellings
         """
-        assert _matched_ids(backend, query) == set()
+        assert matched_ids(query) == set()
 
     def test_bare_timestamp_is_rejected_rather_than_matching_nothing(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         dated: dict[str, int],
     ) -> None:
         """
@@ -423,13 +401,13 @@ class TestDocumentedDateForms:
               prefix the date grammar's tokenizer first split on
         """
         with pytest.raises(InvalidDateQuery) as exc_info:
-            _matched_ids(backend, "added:2005-03-04T15:30:00Z")
+            matched_ids("added:2005-03-04T15:30:00Z")
         assert exc_info.value.field == "added"
         assert exc_info.value.value == "2005-03-04T15:30:00Z"
 
     def test_relative_offset_as_a_range_bound_is_a_real_window(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         dated: dict[str, int],
     ) -> None:
         """
@@ -447,14 +425,14 @@ class TestDocumentedDateForms:
               the offset itself and not a whole-day rounding of it, as
               the docs say next to the warning about the standalone form
         """
-        assert _matched_ids(backend, "added:['-1 week' to now]") == {
+        assert matched_ids("added:['-1 week' to now]") == {
             dated["today"],
             dated["yesterday"],
         }
 
     def test_double_quoted_range_bound_is_rejected(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         dated: dict[str, int],
     ) -> None:
         """
@@ -471,5 +449,5 @@ class TestDocumentedDateForms:
               attached and is not a recognizable date
         """
         with pytest.raises(InvalidDateQuery) as exc_info:
-            _matched_ids(backend, 'added:["2005-03-04" to 2005-03-05]')
+            matched_ids('added:["2005-03-04" to 2005-03-05]')
         assert exc_info.value.value == '"2005-03-04"'

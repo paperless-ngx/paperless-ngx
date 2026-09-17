@@ -14,20 +14,17 @@ import whoosh_compat as wc
 import whoosh_compat.ast as wc_ast
 
 from documents.search._query import _fuzzy_alternative
+from documents.tests.search._ast_helpers import CONTENT
+from documents.tests.search._ast_helpers import TITLE
+from documents.tests.search._ast_helpers import content
 
 pytestmark = pytest.mark.search
 
-_CONTENT = wc.FieldRef("content")
-_TITLE = wc.FieldRef("title")
 
 # 130 characters, past the analyzer's 129-byte remove_long limit (128 is
 # kept, 129 is dropped), so the index never holds it and neither side
 # should search for it.
 _TOO_LONG = "x" * 130
-
-
-def _content(text: str) -> wc_ast.Term:
-    return wc_ast.Term(field=_CONTENT, text=text)
 
 
 def _fuzzy(field: wc.FieldRef, text: str) -> wc_ast.Fuzzy:
@@ -45,7 +42,7 @@ class TestTheAlternative:
             - It is a single Fuzzy leaf on the same field, distance 1 and
               prefix matching, which is what the old clause used
         """
-        assert _fuzzy_alternative(_content("invoice")) == _fuzzy(_CONTENT, "invoice")
+        assert _fuzzy_alternative(content("invoice")) == _fuzzy(CONTENT, "invoice")
 
     def test_the_leafs_own_field_is_used(self) -> None:
         """
@@ -58,8 +55,8 @@ class TestTheAlternative:
               fields. This is the fielding fix: today's clause searches a
               fielded word everywhere
         """
-        assert _fuzzy_alternative(wc_ast.Term(field=_TITLE, text="invoice")) == _fuzzy(
-            _TITLE,
+        assert _fuzzy_alternative(wc_ast.Term(field=TITLE, text="invoice")) == _fuzzy(
+            TITLE,
             "invoice",
         )
 
@@ -74,8 +71,8 @@ class TestTheAlternative:
               side, which is OR'd for an unfielded term, and would lose
               today's per-word recall inside a term
         """
-        assert _fuzzy_alternative(_content("COVID-19")) == wc_ast.Or(
-            children=(_fuzzy(_CONTENT, "covid"), _fuzzy(_CONTENT, "19")),
+        assert _fuzzy_alternative(content("COVID-19")) == wc_ast.Or(
+            children=(_fuzzy(CONTENT, "covid"), _fuzzy(CONTENT, "19")),
         )
 
     def test_words_are_split_where_the_index_splits_them(self) -> None:
@@ -88,7 +85,7 @@ class TestTheAlternative:
             - The Fuzzy text is the analyzer's output, not the raw text,
               so it is in the same shape as the index terms
         """
-        assert _fuzzy_alternative(_content("Éclair")) == _fuzzy(_CONTENT, "eclair")
+        assert _fuzzy_alternative(content("Éclair")) == _fuzzy(CONTENT, "eclair")
 
     def test_the_splitter_does_not_stem(self) -> None:
         """
@@ -101,8 +98,8 @@ class TestTheAlternative:
               pattern_normalizer, which stems it once; stemming here too
               would search for a term the index does not hold
         """
-        assert _fuzzy_alternative(_content("universities")) == _fuzzy(
-            _CONTENT,
+        assert _fuzzy_alternative(content("universities")) == _fuzzy(
+            CONTENT,
             "universities",
         )
 
@@ -130,7 +127,7 @@ class TestTheAlternative:
               that can never match, making a query return LESS with fuzzy
               on than off
         """
-        assert _fuzzy_alternative(_content(text)) is None
+        assert _fuzzy_alternative(content(text)) is None
 
     def test_a_one_character_word_is_dropped_from_a_longer_term(self) -> None:
         """
@@ -142,7 +139,7 @@ class TestTheAlternative:
             - Only the real word survives. A one-character prefix fuzzy
               term matches every term in the field
         """
-        assert _fuzzy_alternative(_content("h52.1")) == _fuzzy(_CONTENT, "h52")
+        assert _fuzzy_alternative(content("h52.1")) == _fuzzy(CONTENT, "h52")
 
     def test_the_leaf_span_is_copied(self) -> None:
         """
@@ -155,7 +152,7 @@ class TestTheAlternative:
             - Every node it builds carries that span, so an emit-time
               diagnostic still points into the query text
         """
-        leaf = wc_ast.Term(field=_CONTENT, text="ab-cd", startchar=4, endchar=9)
+        leaf = wc_ast.Term(field=CONTENT, text="ab-cd", startchar=4, endchar=9)
 
         alternative = _fuzzy_alternative(leaf)
 
@@ -181,10 +178,10 @@ class TestPhrasesAreNotWidened:
               quoted phrase match strictly more than the same two words
               unquoted
         """
-        leaf = wc_ast.Phrase(field=_CONTENT, text="tax report")
+        leaf = wc_ast.Phrase(field=CONTENT, text="tax report")
 
         assert _fuzzy_alternative(leaf) == wc_ast.And(
-            children=(_fuzzy(_CONTENT, "tax"), _fuzzy(_CONTENT, "report")),
+            children=(_fuzzy(CONTENT, "tax"), _fuzzy(CONTENT, "report")),
         )
 
 
@@ -209,7 +206,7 @@ class TestCjkGetsNoFuzzySide:
               one edit of its start, which is the "東京都 matches 京都"
               failure the bigram fields exist to avoid
         """
-        assert _fuzzy_alternative(_content(text)) is None
+        assert _fuzzy_alternative(content(text)) is None
 
     def test_latin_beside_cjk_still_gets_its_fuzzy_side(self) -> None:
         """
@@ -221,6 +218,6 @@ class TestCjkGetsNoFuzzySide:
             - Only the latin word is fuzzed. Skipping CJK words must not
               cost the latin half its near-match
         """
-        leaf = _content("東京 report")
+        leaf = content("東京 report")
 
-        assert _fuzzy_alternative(leaf) == _fuzzy(_CONTENT, "report")
+        assert _fuzzy_alternative(leaf) == _fuzzy(CONTENT, "report")

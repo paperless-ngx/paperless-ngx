@@ -19,7 +19,6 @@ from whoosh_compat.errors import DiagnosticKind
 from whoosh_compat.errors import QueryError
 
 from documents.search import SearchQueryError
-from documents.tests.factories import DocumentFactory
 
 if TYPE_CHECKING:
     from rest_framework.test import APIClient
@@ -27,15 +26,6 @@ if TYPE_CHECKING:
     from documents.models import Document
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("_search_index")]
-
-
-@pytest.fixture
-def indexed_document() -> Document:
-    from documents.search import get_backend
-
-    doc = DocumentFactory.create(title="quarterly invoice", content="acme corp")
-    get_backend().add_or_update(doc)
-    return doc
 
 
 class TestSearchQueryErrorStillBecomesA400:
