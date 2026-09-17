@@ -30,11 +30,11 @@ from documents.models import Tag
 from documents.parsers import ParseError
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.tasks import sanity_check
-from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import GetConsumerMixin
 from paperless_mail.models import MailRule
+from paperless_testing.dirs import DirectoriesMixin
 
 
 class _BaseNewStyleParser:

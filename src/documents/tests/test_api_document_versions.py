@@ -18,10 +18,10 @@ from documents.data_models import DocumentSource
 from documents.filters import EffectiveContentFilter
 from documents.filters import TitleContentFilter
 from documents.models import Document
-from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import read_streaming_response
 from documents.versioning import annotate_effective_content
 from documents.views import DocumentSelectionMixin
+from paperless_testing.dirs import DirectoriesMixin
 
 if TYPE_CHECKING:
     from pathlib import Path

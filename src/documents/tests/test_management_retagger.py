@@ -14,7 +14,7 @@ from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.tests.utils import DirectoriesMixin
+from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import CorrespondentFactory
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import DocumentTypeFactory

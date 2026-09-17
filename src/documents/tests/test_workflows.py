@@ -64,13 +64,13 @@ from documents.models import WorkflowTrigger
 from documents.plugins.base import StopConsumeTaskError
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_consumption_finished
-from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
 from documents.workflows.actions import execute_password_removal_action
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+from paperless_testing.dirs import DirectoriesMixin
 
 
 class TestWorkflows(

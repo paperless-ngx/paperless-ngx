@@ -14,8 +14,8 @@ from documents.conditionals import preview_etag
 from documents.conditionals import thumbnail_etag
 from documents.conditionals import thumbnail_last_modified
 from documents.models import Document
-from documents.tests.utils import DirectoriesMixin
 from documents.versioning import resolve_effective_document_by_pk
+from paperless_testing.dirs import DirectoriesMixin
 
 if TYPE_CHECKING:
     from rest_framework.request import Request

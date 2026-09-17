@@ -18,11 +18,11 @@ from documents.models import Document
 from documents.models import Tag
 from documents.plugins.base import StopConsumeTaskError
 from documents.tests.utils import ConsumeTaskMixin
-from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
 from paperless.models import ApplicationConfiguration
+from paperless_testing.dirs import DirectoriesMixin
 
 
 class GetReaderPluginMixin:

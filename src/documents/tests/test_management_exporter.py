@@ -46,10 +46,10 @@ from documents.models import WorkflowTrigger
 from documents.sanity_checker import check_sanity
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_SHARE_LINK_BUNDLE_NAME
-from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
 from paperless_mail.models import MailAccount
+from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.dirs import paperless_environment
 
 

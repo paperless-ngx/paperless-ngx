@@ -1,8 +1,5 @@
-import shutil
-import tempfile
 import time
 import warnings
-from collections import namedtuple
 from collections.abc import Callable
 from collections.abc import Generator
 from collections.abc import Iterator
@@ -19,7 +16,6 @@ from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 from django.http import StreamingHttpResponse
 from django.test import TransactionTestCase
-from django.test import override_settings
 
 from documents.consumer import AsnCheckPlugin
 from documents.consumer import ConsumerPlugin
@@ -29,54 +25,6 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.parsers import ParseError
 from documents.plugins.helpers import ProgressStatusOptions
-
-
-def setup_directories():
-    dirs = namedtuple("Dirs", ())
-
-    dirs.data_dir = Path(tempfile.mkdtemp()).resolve()
-    dirs.scratch_dir = Path(tempfile.mkdtemp()).resolve()
-    dirs.media_dir = Path(tempfile.mkdtemp()).resolve()
-    dirs.consumption_dir = Path(tempfile.mkdtemp()).resolve()
-    dirs.static_dir = Path(tempfile.mkdtemp()).resolve()
-    dirs.index_dir = dirs.data_dir / "index"
-    dirs.originals_dir = dirs.media_dir / "documents" / "originals"
-    dirs.thumbnail_dir = dirs.media_dir / "documents" / "thumbnails"
-    dirs.archive_dir = dirs.media_dir / "documents" / "archive"
-    dirs.logging_dir = dirs.data_dir / "log"
-
-    dirs.index_dir.mkdir(parents=True, exist_ok=True)
-    dirs.originals_dir.mkdir(parents=True, exist_ok=True)
-    dirs.thumbnail_dir.mkdir(parents=True, exist_ok=True)
-    dirs.archive_dir.mkdir(parents=True, exist_ok=True)
-    dirs.logging_dir.mkdir(parents=True, exist_ok=True)
-
-    dirs.settings_override = override_settings(
-        DATA_DIR=dirs.data_dir,
-        SCRATCH_DIR=dirs.scratch_dir,
-        MEDIA_ROOT=dirs.media_dir,
-        ORIGINALS_DIR=dirs.originals_dir,
-        THUMBNAIL_DIR=dirs.thumbnail_dir,
-        ARCHIVE_DIR=dirs.archive_dir,
-        CONSUMPTION_DIR=dirs.consumption_dir,
-        LOGGING_DIR=dirs.logging_dir,
-        INDEX_DIR=dirs.index_dir,
-        STATIC_ROOT=dirs.static_dir,
-        MODEL_FILE=dirs.data_dir / "classification_model.pickle",
-        MEDIA_LOCK=dirs.media_dir / "media.lock",
-    )
-    dirs.settings_override.enable()
-
-    return dirs
-
-
-def remove_dirs(dirs) -> None:
-    shutil.rmtree(dirs.media_dir, ignore_errors=True)
-    shutil.rmtree(dirs.data_dir, ignore_errors=True)
-    shutil.rmtree(dirs.scratch_dir, ignore_errors=True)
-    shutil.rmtree(dirs.consumption_dir, ignore_errors=True)
-    shutil.rmtree(dirs.static_dir, ignore_errors=True)
-    dirs.settings_override.disable()
 
 
 def util_call_with_backoff(
@@ -145,27 +93,6 @@ def read_streaming_response(response: StreamingHttpResponse) -> bytes:
     content = b"".join(response.streaming_content)
     response.close()
     return content
-
-
-class DirectoriesMixin:
-    """
-    Creates and overrides settings for all folders and paths, then ensures
-    they are cleaned up on exit
-    """
-
-    def setUp(self) -> None:
-        from documents.search import reset_backend
-
-        reset_backend()
-        self.dirs = setup_directories()
-        super().setUp()
-
-    def tearDown(self) -> None:
-        from documents.search import reset_backend
-
-        super().tearDown()
-        reset_backend()
-        remove_dirs(self.dirs)
 
 
 class FileSystemAssertsMixin:
