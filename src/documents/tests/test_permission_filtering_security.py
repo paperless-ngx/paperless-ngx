@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from http import HTTPStatus
+from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 import pytest
@@ -29,6 +30,9 @@ from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import DocumentTypeFactory
 from paperless_testing.factories import StoragePathFactory
 from paperless_testing.factories import TagFactory
+
+if TYPE_CHECKING:
+    from paperless_testing.dirs import PaperlessDirs
 
 
 def assert_visible_document_ids(actual_ids, *, expected_visible, expected_hidden):
@@ -369,10 +373,9 @@ class TestBulkEditChangePermissionBoundary:
 class TestBulkDownloadPermissionChecksRootDocument:
     def test_download_requires_global_view_permission(
         self,
-        rest_api_client,
-        paperless_dirs,
-        _media_settings,
-    ):
+        rest_api_client: APIClient,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
         owner = User.objects.create_user(username="owner")
         requester = User.objects.create_user(username="requester")
         root = DocumentFactory(owner=owner)
@@ -390,10 +393,9 @@ class TestBulkDownloadPermissionChecksRootDocument:
 
     def test_permission_checked_on_root_not_on_version(
         self,
-        rest_api_client,
-        paperless_dirs,
-        _media_settings,
-    ):
+        rest_api_client: APIClient,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
         owner = User.objects.create_user(username="owner")
         requester = User.objects.create_user(username="requester")
         requester.user_permissions.add(
