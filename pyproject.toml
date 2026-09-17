@@ -76,7 +76,7 @@ dependencies = [
   "torch~=2.13.0",
   "watchfiles>=1.2",
   "whitenoise~=6.11",
-  "whoosh-compat[tantivy]==0.2",
+  "whoosh-compat[tantivy]==0.3",
   "zxing-cpp~=3.1.0",
 ]
 [project.optional-dependencies]

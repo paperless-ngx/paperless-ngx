@@ -3089,7 +3089,7 @@ requires-dist = [
     { name = "torch", specifier = "~=2.13.0", index = "https://download.pytorch.org/whl/cpu" },
     { name = "watchfiles", specifier = ">=1.2" },
     { name = "whitenoise", specifier = "~=6.11" },
-    { name = "whoosh-compat", extras = ["tantivy"], specifier = "==0.2" },
+    { name = "whoosh-compat", extras = ["tantivy"], specifier = "==0.3" },
     { name = "zxing-cpp", specifier = "~=3.1.0" },
 ]
 provides-extras = ["mariadb", "postgres", "webserver"]
@@ -5640,14 +5640,14 @@ wheels = [
 
 [[package]]
 name = "whoosh-compat"
-version = "0.2.0"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "python-dateutil" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d7/b2/ef410aa5297d61e9e98448f88ea9385c92840d811e0878de2f9ed2710620/whoosh_compat-0.2.0.tar.gz", hash = "sha256:f5d1b8bf2956a304c9b9c147ec840f2487d976cb7fa872bea767dcdeed7c3e45", size = 605669, upload-time = "2026-08-27T20:30:08.154Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/23/6b/945311159351411dd5a1de82f2948fe1ef6bf36308ee65ed76f568b94a7a/whoosh_compat-0.3.0.tar.gz", hash = "sha256:a7590ea0f178c60ca83774752d0d511c5d72b20357bbf361223aaab12e3d1813", size = 665922, upload-time = "2026-09-16T15:46:29.852Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e2/3f/78e37cd794ae26ee9b94d81d608906a8aefa31a08897ef3aaeafcbb3a55a/whoosh_compat-0.2.0-py3-none-any.whl", hash = "sha256:891e98508042673862516d3811e010a62205998a31ae6e09b80a221eb8d544d3", size = 158514, upload-time = "2026-08-27T20:30:06.764Z" },
+    { url = "https://files.pythonhosted.org/packages/53/b0/538c7bdcd294ae32f1f6a13ab6486887e208567355820e4a24a56c4558c2/whoosh_compat-0.3.0-py3-none-any.whl", hash = "sha256:91e22de08fc22be50fc90f836c72d45de9c7a552f61465ffd1ebee98a6b28cfb", size = 170602, upload-time = "2026-09-16T15:46:28.227Z" },
 ]
 
 [package.optional-dependencies]

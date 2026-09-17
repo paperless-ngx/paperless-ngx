@@ -522,8 +522,8 @@ class TestEmitErrorContract:
         THEN:
             - The emit failure is caught and mapped to a SearchQueryError
               (400) rather than propagating as a raw QueryError. This
-              fails at the whole-tree "exact" clause emission
-              (`exact = tantivy_emit(result.ast, ...)`), the same path
+              fails at the whole-tree "exact" clause emission (the
+              `tantivy_emit` call in parse_user_query), the same path
               TestRealQueriesRouteCorrectly::test_text_range_is_a_400_naming_the_field
               already covers without the NOT wrapper: `_negation_clauses`
               never runs here, since the whole-tree emit already raises

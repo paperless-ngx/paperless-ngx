@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import logging
+import unicodedata
+from functools import cache
 from typing import TYPE_CHECKING
 from typing import Final
 
@@ -19,6 +21,7 @@ from documents.search._errors import InvalidNumberQuery
 from documents.search._errors import MultipleSearchQueryErrors
 from documents.search._errors import SearchQueryError
 from documents.search._registry import get_field_registry
+from documents.search._tokenizer import _bigram_analyzer
 from documents.search._tokenizer import simple_search_tokens
 
 if TYPE_CHECKING:
@@ -34,7 +37,37 @@ _REGEX_TIMEOUT: Final[float] = 1.0
 
 # Matches CJK/Hangul characters so queries can be routed to bigram fields.
 # Uses Unicode properties to cover all blocks including Extension B+ planes.
-_CJK_RE: Final = regex.compile(r"[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]+")
+# The marks that sit inside a Japanese word are listed explicitly, because
+# their Unicode script is Common and the script classes therefore miss
+# them: the katakana prolonged sound mark ー (U+30FC) and its halfwidth form
+# ｰ (U+FF70), the closing mark 〆 (U+3006), and the halfwidth voiced and
+# semi-voiced sound marks ﾞ (U+FF9E) and ﾟ (U+FF9F). Without them a word
+# splits into one-character runs, which have no bigrams: コーヒー becomes
+# コ + ヒ, and halfwidth ﾊﾟﾝ becomes ﾊ + ﾝ, leaving nothing to index or
+# search at all.
+#
+# The combining marks U+3099/U+309A are deliberately absent: everything
+# entering the index and every query string is put through
+# normalize_search_text first, so decomposed kana is composed away before
+# this pattern ever sees it. The halfwidth marks are not, and cannot be:
+# unlike パ (U+30D1), halfwidth katakana has no precomposed voiced form, so
+# NFC leaves ﾊ + ﾟ as two codepoints where it folds か + U+3099 into が.
+_CJK_RE: Final = regex.compile(
+    r"[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}ーｰ〆ﾞﾟ]+",
+)
+
+
+def normalize_search_text(text: str) -> str:
+    """Put text into the one Unicode normal form the index is built in.
+
+    Both the indexed text and the query string go through this, because a
+    bigram is a pair of codepoints: NFD がっこう is four where NFC is three,
+    so an unnormalized document never matches a normalized query.
+
+    NFC, not NFKC: folding ﾊﾟﾝ to パン would be a search-behavior decision
+    rather than an encoding one.
+    """
+    return unicodedata.normalize("NFC", text)
 
 
 def _user_facing_emit_message(d: Diagnostic) -> str:
@@ -113,8 +146,8 @@ def extract_cjk_text(text: str) -> str:
     """Join the CJK runs in ``text`` for indexing into bigram (char-ngram) fields.
 
     Mirrors the query side, which extracts the CJK runs of whatever it is
-    about to search for (the raw string in simple modes, the parsed query's
-    free-text tokens in query mode): only CJK runs are ever searched against
+    about to search for (the raw string in simple modes, each CJK term's
+    own text in query mode): only CJK runs are ever searched against
     the bigram fields, so only CJK runs are worth indexing there. Latin text
     fed to a character-bigram field is never matched and only bloats the
     index and slows indexing/merge. Returns "" when there is no CJK text.
@@ -161,52 +194,6 @@ def _build_cjk_query(
     if not cjk_text:
         return None
     return _parse_cjk_text(index, cjk_text, fields)
-
-
-def _build_ast_cjk_query(
-    index: tantivy.Index,
-    ast: wc.ast.Node,
-    registry: wc.FieldRegistry,
-) -> tantivy.Query | None:
-    """Build the bigram clause of a QUERY-mode search from the parsed AST.
-
-    Same discipline as the fuzzy clause (see _try_parse_fuzzy_query): the CJK
-    runs come from whoosh_compat's ``free_text_tokens`` over the parsed tree,
-    never from the raw query string, so a term the user negated or restricted
-    to a field outside the default search fields contributes nothing, instead
-    of resurfacing as a top-level clause matching every bigram field.
-
-    ``free_text_tokens`` reports no field of its own, so the tokens are
-    collected one default field at a time: a bare term, which the parser has
-    already copied onto every default field, is therefore searched across
-    every bigram field, while ``title:東京`` reaches ``bigram_title`` alone.
-    Fields whose CJK text is identical (the bare-term case) share a single
-    parse over all of their bigram fields at once.
-
-    Raw (``analyzed=False``) tokens are used because the bigram fields have
-    their own character-ngram analyzer: the default fields' word analyzers
-    have no useful say over a CJK run, and running them first would only
-    risk dropping it (remove_long) before the run is ever extracted.
-    Returns None when the query has no CJK free text.
-    """
-    fields_by_text: dict[str, list[str]] = {}
-    for field, bigram_field in _CJK_BIGRAM_FIELDS.items():
-        tokens = wc.free_text_tokens(
-            ast,
-            registry=registry,
-            fields=[field],
-            analyzed=False,
-        )
-        cjk_text = extract_cjk_text(" ".join(tokens))
-        if cjk_text:
-            fields_by_text.setdefault(cjk_text, []).append(bigram_field)
-
-    clauses: list[tuple[tantivy.Occur, tantivy.Query]] = [
-        (tantivy.Occur.Should, query)
-        for cjk_text, bigram_fields in fields_by_text.items()
-        if (query := _parse_cjk_text(index, cjk_text, bigram_fields)) is not None
-    ]
-    return _any_of(clauses) if clauses else None
 
 
 # A joined fuzzy word string must stay plain words: it goes back through
@@ -278,7 +265,7 @@ def _try_parse_fuzzy_query(
 
     The ValueError guard stays as insurance (the word string is plain
     tokens, so tantivy accepting it is expected, not assumed): on a parse
-    failure the fuzzy clause is skipped and the exact/CJK clauses stand,
+    failure the fuzzy clause is skipped and the exact clause stands,
     rather than the whole query failing.
     """
     tokens = wc.free_text_tokens(
@@ -332,6 +319,131 @@ _FIELD_BOOSTS = {"title": 2.0}
 _SIMPLE_FIELD_BOOSTS = {"simple_title": 2.0}
 
 
+@cache
+def _get_emit_field_registry(language: str | None) -> wc.FieldRegistry:
+    """The parse registry plus the CJK bigram fields, for analyzing and
+    emitting a query whose CJK leaves _widen_cjk_leaf has widened. Cached
+    per language, on the same trigger get_field_registry() rebuilds on.
+
+    Never used to parse: the bigram fields are internal (absent from
+    PUBLIC_FIELDS), and queries are still parsed against
+    get_field_registry(), so ``bigram_content:...`` never becomes query
+    syntax.
+
+    The bigram specs set ``multitoken=Multitoken.AND`` explicitly. A
+    widened leaf's bigram side always sits inside the widening Or, so under
+    Multitoken.DEFAULT a run's bigrams would inherit that Or, and 東京都
+    would match a document containing only 京都.
+    """
+    bigram_analyze = _bigram_analyzer().analyze
+    return wc.FieldRegistry(
+        [
+            *get_field_registry(language),
+            *(
+                wc.FieldSpec(
+                    bigram_field,
+                    wc.FieldKind.TEXT,
+                    analyzer=bigram_analyze,
+                    multitoken=wc.Multitoken.AND,
+                )
+                for bigram_field in _CJK_BIGRAM_FIELDS.values()
+            ),
+        ],
+    )
+
+
+# Splits text exactly where the content analyzer's simple tokenizer does,
+# with none of its filters, so each piece is the raw text of one token the
+# index could hold. No remove_long either: a long CJK run must still reach
+# the bigram side.
+_TOKEN_SPLITTER: Final = tantivy.TextAnalyzerBuilder(tantivy.Tokenizer.simple()).build()
+
+
+def _collapse(
+    node_cls: type[wc.ast.Node],
+    children: list[wc.ast.Node],
+    span: dict[str, int | None],
+) -> wc.ast.Node:
+    """Return the single child as it is, or wrap several in node_cls."""
+    if len(children) == 1:
+        return children[0]
+    return node_cls(children=tuple(children), **span)
+
+
+def _widen_cjk_leaf(leaf: wc.ast.Term | wc.ast.Phrase) -> wc.ast.Node:
+    """``rewrite_leaf`` hook for emit(): widen a CJK term or phrase on a
+    default search field to ``Or(leaf, alternative)`` where it sits, and
+    leave every other leaf as it is.
+
+    The content analyzer keeps an unspaced CJK run as one token, so only
+    the bigram fields can find a CJK term inside running text. Widening in
+    place, rather than OR-ing a separate bigram clause in at the top, keeps
+    every AND, NOT, REQUIRE, boost and field restriction around the leaf
+    applying to its bigram match too. analyze() calls this for negated
+    leaves as well, and they are widened on purpose, so ``NOT X`` excludes
+    exactly what ``X`` matches.
+
+    The alternative is built from the leaf's own text, split where the
+    content analyzer would split it. What each kind of piece contributes,
+    and how the pieces combine, is commented at the step that decides it.
+
+    analyze() only offers Term and Phrase leaves, so Prefix and Wildcard
+    patterns are never widened.
+    """
+    if leaf.field is None or leaf.field.name not in _CJK_BIGRAM_FIELDS:
+        return leaf
+    text = str(leaf.text)
+    if not _has_cjk(text):
+        return leaf
+    span = {"startchar": leaf.startchar, "endchar": leaf.endchar}
+    bigram_field = wc.FieldRef(_CJK_BIGRAM_FIELDS[leaf.field.name])
+    cjk_terms: list[wc.ast.Node] = []
+    latin_terms: list[wc.ast.Node] = []
+    for token in _TOKEN_SPLITTER.analyze(text):
+        runs = _CJK_RE.findall(token)
+        if runs:
+            # One bigram Term per run, never a joined string, which would
+            # produce bigrams spanning the join. A run's own bigrams stay
+            # jointly required through multitoken=AND on the bigram
+            # FieldSpec (see _get_emit_field_registry), which no enclosing
+            # group can loosen. A one-character run has no bigram at all
+            # and analyzes away to nothing.
+            cjk_terms.extend(
+                wc.ast.Term(field=bigram_field, text=run, **span) for run in runs
+            )
+        else:
+            # Latin the analyzer split off on its own. Latin glued to CJK
+            # inside one token (東京report) never reaches here, and must
+            # not: the index holds it only inside that whole unspaced
+            # token, so requiring it would lose documents the run finds.
+            latin_terms.append(wc.ast.Term(field=leaf.field, text=token, **span))
+    # A Term's runs are alternatives to each other, the way the separate
+    # bigram clause treated them. A Phrase's are required together: quoting
+    # asks for more than the bare words, and the parser's default group is
+    # And, so an Or here would make "東京都 大阪府" match strictly more
+    # than 東京都 大阪府 does. And is also the tightest thing available,
+    # since the bigram analyzer puts every token at position 0 and no
+    # alternative built from it can enforce adjacency.
+    cjk_group = wc.ast.And if isinstance(leaf, wc.ast.Phrase) else wc.ast.Or
+    pieces: list[wc.ast.Node] = []
+    if cjk_terms:
+        pieces.append(_collapse(cjk_group, cjk_terms, span))
+    pieces.extend(latin_terms)
+    if not pieces:
+        # A few hundred codepoints match _CJK_RE but yield no token at all
+        # from the simple tokenizer (CJK radicals, circled and squared
+        # forms), leaving nothing to widen with. The leaf then analyzes to
+        # the same nothing it does today.
+        return leaf
+    # Separated latin is required alongside the CJK side, which is what
+    # stops "invoice NOT 東京-report" from excluding every 東京 document.
+    alternative = _collapse(wc.ast.And, pieces, span)
+    # The leaf itself, not a copy: analyze() then keeps it combined the way
+    # its enclosing group says rather than the way this Or would, and a long
+    # run its analyzer drops to nothing leaves just the alternative.
+    return wc.ast.Or(children=(leaf, alternative), **span)
+
+
 class _ConjunctiveNegations(wc.ast.Visitor[tuple["wc.ast.Node", ...]]):
     """Collect the subtrees an AST excludes from every document it matches.
 
@@ -383,13 +495,17 @@ def _negation_clauses(
     tantivy accepts a bare one.
 
     The except branch has no reachable trigger under the current control
-    flow: this only runs after ``exact = tantivy_emit(result.ast, ...)``
-    (parse_user_query) has already emitted the *whole* AST successfully,
-    and every subtree ``_ConjunctiveNegations`` collects here is a piece
-    of that same tree. Kept as insurance, not dead weight: re-emitting a
-    subtree in isolation is not proven identical to emitting it in
-    context, just believed to be, and this is the seam that finds out if
-    that belief is ever wrong.
+    flow: this only runs after parse_user_query has already emitted the
+    exact clause from the whole parsed AST (widened, when the query has CJK
+    text), and every subtree ``_ConjunctiveNegations`` collects here is a
+    piece of that same parsed tree. The re-emit here uses the public
+    registry, without the widening hook, while the exact clause was emitted
+    against ``_get_emit_field_registry()``; the two registries agree on
+    every public field, and the hook only adds nodes, so this does not
+    reopen the branch. Kept as insurance, not dead weight: re-emitting a
+    subtree in isolation is not proven identical to emitting it in context,
+    just believed to be, and this is the seam that finds out if that
+    belief is ever wrong.
     """
     try:
         return [
@@ -451,7 +567,8 @@ def parse_user_query(
     tz: tzinfo,
 ) -> tantivy.Query:
     """
-    Parse user query through whoosh-compat, then blend in fuzzy/CJK clauses.
+    Parse user query through whoosh-compat, widen CJK terms, then blend in
+    the optional fuzzy clause.
 
     1. wc.parse() against the shared FieldRegistry (whoosh grammar -> AST).
        Bare notes:/custom_fields: prefixes resolve to their default subpath
@@ -460,11 +577,18 @@ def parse_user_query(
     2. Any diagnostics (bad dates/numbers) map to SearchQueryError subclasses
        and raise, the view returns HTTP 400 with every offending field
        listed, not just the first.
-    3. emit() turns the AST into a tantivy.Query directly (no string
+    3. When the query has CJK text, emit()'s rewrite_leaf hook
+       (_widen_cjk_leaf) rewrites each CJK term in the AST to also match
+       its bigram field, in place, so the rest of the query constrains the
+       bigram match too. The tree is analyzed and emitted against
+       _get_emit_field_registry(), which adds the bigram fields; the query
+       itself was parsed without them.
+       emit() turns the AST into a tantivy.Query directly (no string
        round-trip). A QueryError is routed by its Diagnostic's Cause
        (_map_emit_error): a construct that parses but can't execute against
        tantivy (e.g. a text-field range) is a 400, a registry/schema
-       mismatch is logged and a 400, and an INTERNAL defect is re-raised.
+       mismatch is logged and re-raised, and an INTERNAL defect is
+       re-raised.
     4. Optional fuzzy blend (ADVANCED_FUZZY_SEARCH_THRESHOLD) builds a
        plain word string from the parsed AST's free-text tokens
        (whoosh_compat.free_text_tokens) and feeds THAT to
@@ -472,13 +596,12 @@ def parse_user_query(
        keywords, bracket-class wildcards, etc.) tantivy's parser rejects,
        which used to silently knock the fuzzy clause out of any mixed
        query (see _try_parse_fuzzy_query).
-    5. Optional CJK bigram clause, built from the same parsed AST for the
-       same reason (see _build_ast_cjk_query): a CJK term the query negated
-       or fielded must not resurface through it.
-    6. When any optional clause was added, the query's conjunctive
-       exclusions are restated as MustNot above the blend
-       (_negation_clauses): a clause built from positive terms cannot
-       express them, and as a bare Should it would undo them.
+    5. When the fuzzy clause was added, the query's conjunctive exclusions
+       are restated as MustNot above the blend (_negation_clauses): a
+       clause built from positive terms cannot express them, and as a bare
+       Should it would undo them. The restated exclusions come from the
+       unwidened AST, so they are content-only for CJK terms: a known gap
+       that goes away once fuzzy is also widened in the tree.
     """
     registry = get_field_registry(settings.SEARCH_LANGUAGE)
     result = wc.parse(
@@ -491,16 +614,19 @@ def parse_user_query(
     if result.diagnostics:
         raise _diagnostics_to_error(result.diagnostics)
 
+    emit_registry, rewrite_leaf = registry, None
+    if _has_cjk(raw_query):
+        emit_registry = _get_emit_field_registry(settings.SEARCH_LANGUAGE)
+        rewrite_leaf = _widen_cjk_leaf
     try:
-        exact = tantivy_emit(result.ast, index=index, registry=registry)
+        exact = tantivy_emit(
+            result.ast,
+            index=index,
+            registry=emit_registry,
+            rewrite_leaf=rewrite_leaf,
+        )
     except QueryError as e:
         raise _map_emit_error(e) from e
-
-    cjk_query = (
-        _build_ast_cjk_query(index, result.ast, registry)
-        if _has_cjk(raw_query)
-        else None
-    )
 
     clauses: list[tuple[tantivy.Occur, tantivy.Query]] = [
         (tantivy.Occur.Should, exact),
@@ -514,16 +640,13 @@ def parse_user_query(
                 (tantivy.Occur.Should, tantivy.Query.boost_query(fuzzy, 0.1)),
             )
 
-    if cjk_query is not None:
-        clauses.append((tantivy.Occur.Should, cjk_query))
-
     if len(clauses) == 1:
         return exact
-    # The fuzzy and CJK clauses are built from positive terms only, so as
-    # plain Shoulds beside the exact clause they re-admit exactly the
-    # documents the query excluded. Restate the exclusions once, above the
-    # whole blend. Redundant against the exact clause, which already
-    # carries them, but idempotently so.
+    # The fuzzy clause is built from positive terms only, so as a plain
+    # Should beside the exact clause it re-admits exactly the documents the
+    # query excluded. Restate the exclusions once, above the whole blend.
+    # Redundant against the exact clause, which already carries them, but
+    # idempotently so.
     negations = _negation_clauses(index, result.ast, registry)
     if not negations:
         return _any_of(clauses)
