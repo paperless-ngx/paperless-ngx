@@ -339,6 +339,8 @@ omit = [
   "manage.py",
   "paperless/auth.py",
   "paperless/wsgi.py",
+  "src/conftest.py",
+  "src/paperless_testing/*",
 ]
 [tool.coverage.report]
 exclude_also = [
