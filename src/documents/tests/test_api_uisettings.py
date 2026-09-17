@@ -6,8 +6,8 @@ from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from documents.tests.utils import DirectoriesMixin
 from paperless.version import __full_version_str__
+from paperless_testing.dirs import DirectoriesMixin
 
 
 class TestApiUiSettings(DirectoriesMixin, APITestCase):

@@ -30,8 +30,8 @@ from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.serialisers import DocumentSerializer
 from documents.tasks import empty_trash
-from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
+from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
 
 
