@@ -2,8 +2,8 @@ import pytest
 
 from documents.models import Correspondent
 from documents.models import Document
-from documents.tests.factories import CorrespondentFactory
-from documents.tests.factories import DocumentFactory
+from paperless_testing.factories import CorrespondentFactory
+from paperless_testing.factories import DocumentFactory
 
 
 @pytest.mark.django_db

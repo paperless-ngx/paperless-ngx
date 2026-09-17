@@ -7,9 +7,6 @@ from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from documents.tests.factories import CorrespondentFactory
-from documents.tests.factories import DocumentTypeFactory
-from documents.tests.factories import TagFactory
 from documents.tests.utils import DirectoriesMixin
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -18,6 +15,9 @@ from paperless_mail.tests.factories import MailAccountFactory
 from paperless_mail.tests.factories import MailRuleFactory
 from paperless_mail.tests.factories import ProcessedMailFactory
 from paperless_mail.tests.test_mail import BogusMailBox
+from paperless_testing.factories import CorrespondentFactory
+from paperless_testing.factories import DocumentTypeFactory
+from paperless_testing.factories import TagFactory
 
 
 class TestAPIMailAccounts(DirectoriesMixin, APITestCase):

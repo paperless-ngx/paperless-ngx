@@ -21,12 +21,12 @@ from documents.models import Note
 from documents.models import PaperlessTask
 from documents.signals import document_consumption_finished
 from documents.signals import document_updated
-from documents.tests.factories import DocumentFactory
-from documents.tests.factories import PaperlessTaskFactory
 from paperless.models import ApplicationConfiguration
 from paperless_ai import indexing
 from paperless_ai.tests.conftest import FakeEmbedding
 from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import PaperlessTaskFactory
 
 
 @pytest.fixture
