@@ -87,15 +87,15 @@ class TestParseUserQuery:
     ) -> None:
         """
         GIVEN:
-            - The fuzzy blend clause enabled (ADVANCED_FUZZY_SEARCH_THRESHOLD
-              set), and a query that is valid whoosh grammar tantivy's own
-              query parser (used only by the fuzzy blend clause) cannot parse
+            - Fuzzy matching enabled (ADVANCED_FUZZY_SEARCH_THRESHOLD set),
+              and a query using whoosh grammar the widened emit still has
+              to handle correctly
         WHEN:
             - parse_user_query() parses it
         THEN:
             - It returns a tantivy.Query rather than raising: the fuzzy
-              clause (_try_parse_fuzzy_query) must degrade gracefully
-              instead of failing the whole query
+              side must degrade gracefully instead of failing the whole
+              query
         """
         settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 0.5
         assert isinstance(parse_user_query(query_index, raw_query, UTC), tantivy.Query)
@@ -522,15 +522,10 @@ class TestEmitErrorContract:
         THEN:
             - The emit failure is caught and mapped to a SearchQueryError
               (400) rather than propagating as a raw QueryError. This
-              fails at the whole-tree "exact" clause emission (the
-              `tantivy_emit` call in parse_user_query), the same path
+              fails at the first widened emit (the `tantivy_emit` call
+              inside `emit_widened` in parse_user_query), the same path
               TestRealQueriesRouteCorrectly::test_text_range_is_a_400_naming_the_field
-              already covers without the NOT wrapper: `_negation_clauses`
-              never runs here, since the whole-tree emit already raises
-              before negations are ever computed. `_negation_clauses`'s
-              own except QueryError branch re-emits an already-successful
-              tree's own subtree in isolation, so it has no reachable
-              trigger under the current control flow
+              already covers without the NOT wrapper
         """
         settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 0.5
         with pytest.raises(SearchQueryError):

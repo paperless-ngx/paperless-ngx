@@ -261,10 +261,10 @@ class TestUnregisteredIdFieldFoldsToLiteralText:
 class TestFuzzyBlendSurvivesWhooshGrammar:
     """A query mixing whoosh-only grammar (a date keyword) with a typo'd
     free-text word must still fuzzy-match the intended document when
-    ADVANCED_FUZZY_SEARCH_THRESHOLD is enabled. The fuzzy clause is built
-    from the parsed query's free-text tokens (whoosh_compat's
-    free_text_tokens), never from the raw query string, so whoosh grammar
-    that tantivy's own parser rejects cannot knock the fuzzy clause out."""
+    ADVANCED_FUZZY_SEARCH_THRESHOLD is enabled. Fuzzy widening happens
+    inside the already-parsed AST (_widen_leaf, via emit()), never by
+    re-parsing the raw query string, so whoosh grammar that tantivy's own
+    parser rejects cannot knock the fuzzy side out."""
 
     def test_typo_fuzzy_matches_alongside_date_keyword(
         self,
@@ -280,11 +280,10 @@ class TestFuzzyBlendSurvivesWhooshGrammar:
               rejects ("added:today") with a one-transposition misspelling
               of a word in the indexed content
         THEN:
-            - The document still matches, because the fuzzy clause is
-              built from the parsed query's free-text tokens
-              (whoosh_compat's free_text_tokens), never from the raw
+            - The document still matches, because fuzzy widening happens
+              inside the already-parsed AST, never by re-parsing the raw
               query string, so grammar tantivy's parser cannot handle
-              cannot knock the fuzzy clause out
+              cannot knock the fuzzy side out
         """
         settings.ADVANCED_FUZZY_SEARCH_THRESHOLD = 0.5
         with time_machine.travel(FROZEN_NOW, tick=False):

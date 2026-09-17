@@ -1279,6 +1279,8 @@ Tantivy stemmer equivalent, stemming is disabled.
 matching. Fuzzy results rank below exact matches. A value of `0.5` is a reasonable
 starting point. Leave unset to disable fuzzy matching entirely.
 
+    Words of a single character are not fuzzy-matched, since a single-character approximate match would match nearly every term in the index.
+
     Defaults to unset (disabled).
 
 #### [`PAPERLESS_SANITY_TASK_CRON=<cron expression>`](#PAPERLESS_SANITY_TASK_CRON) {#PAPERLESS_SANITY_TASK_CRON}
