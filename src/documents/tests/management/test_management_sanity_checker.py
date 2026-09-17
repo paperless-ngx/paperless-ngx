@@ -19,7 +19,7 @@ from paperless_testing.factories import DocumentFactory
 
 if TYPE_CHECKING:
     from documents.models import Document
-    from documents.tests.conftest import PaperlessDirs
+    from paperless_testing.dirs import PaperlessDirs
 
 
 def _render_to_string(messages: SanityCheckMessages) -> str:
@@ -71,7 +71,7 @@ class TestRenderResultsWithIssues:
         assert "INFO" in output
         assert "No OCR data" in output
 
-    @pytest.mark.usefixtures("_media_settings")
+    @pytest.mark.usefixtures("paperless_dirs")
     def test_global_message(self) -> None:
         msgs = SanityCheckMessages()
         msgs.warning(None, "Orphaned file: /tmp/stray.pdf")
@@ -87,7 +87,7 @@ class TestRenderResultsWithIssues:
         assert "Thumbnail missing" in output
         assert "Checksum mismatch" in output
 
-    @pytest.mark.usefixtures("_media_settings")
+    @pytest.mark.usefixtures("paperless_dirs")
     def test_unknown_doc_pk(self) -> None:
         msgs = SanityCheckMessages()
         msgs.error(99999, "Ghost document")
@@ -184,7 +184,6 @@ class TestDocumentSanityCheckerCommand:
         assert "ERROR" in output
         assert "Original of document does not exist" in output
 
-    @pytest.mark.usefixtures("_media_settings")
     def test_checksum_mismatch(self, paperless_dirs: PaperlessDirs) -> None:
         """Lightweight document with zero-byte files triggers checksum mismatch."""
         doc = DocumentFactory(

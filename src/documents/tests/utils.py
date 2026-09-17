@@ -79,17 +79,6 @@ def remove_dirs(dirs) -> None:
     dirs.settings_override.disable()
 
 
-@contextmanager
-def paperless_environment():
-    dirs = None
-    try:
-        dirs = setup_directories()
-        yield dirs
-    finally:
-        if dirs:
-            remove_dirs(dirs)
-
-
 def util_call_with_backoff(
     method_or_callable: Callable,
     args: list | tuple,
