@@ -20,67 +20,53 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from documents.models import Document
-
 if TYPE_CHECKING:
-    from documents.search._backend import TantivyBackend
+    from collections.abc import Callable
+
+    from documents.models import Document
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
 
 
-def _matched_ids(backend: TantivyBackend, query: str) -> set[int]:
-    return set(backend.search_ids(query, user=None))
-
-
-def _index(backend: TantivyBackend, **kwargs: object) -> Document:
-    doc = Document.objects.create(**kwargs)
-    backend.add_or_update(doc)
-    return doc
-
-
 @pytest.fixture
-def docs(backend: TantivyBackend) -> dict[str, int]:
+def docs(index_document: Callable[..., Document]) -> dict[str, int]:
     return {
-        "instant": _index(
-            backend,
+        "instant": index_document(
             title="On the instant",
             content="x",
-            checksum="compact-date-instant",
             added=datetime(2005, 3, 4, 15, 30, tzinfo=UTC),
         ).pk,
-        "same_day": _index(
-            backend,
+        "same_day": index_document(
             title="Same day, other hour",
             content="x",
-            checksum="compact-date-same-day",
             added=datetime(2005, 3, 4, 9, 0, tzinfo=UTC),
         ).pk,
-        "next_day": _index(
-            backend,
+        "next_day": index_document(
             title="Next day, same hour",
             content="x",
-            checksum="compact-date-next-day",
             added=datetime(2005, 3, 5, 15, 30, tzinfo=UTC),
         ).pk,
     }
 
 
-def test_fourteen_digits_is_a_single_instant(
-    backend: TantivyBackend,
-    docs: dict[str, int],
-) -> None:
-    """
-    GIVEN:
-        - Three documents indexed on the ``added`` DATETIME fast field:
-          one at 2005-03-04T15:30:00, one on the same calendar day at a
-          different hour, and one on the next day at the same hour
-    WHEN:
-        - Searching with the 14-digit compact date form
-          ``added:20050304153000``
-    THEN:
-        - Only the document at that exact instant matches; the same-day
-          document is what tells this apart from the 8-digit day-window
-          form, and the next-day document from a form that ignored the
-          time of day altogether
-    """
-    assert _matched_ids(backend, "added:20050304153000") == {docs["instant"]}
+class TestCompactDateForms:
+    def test_fourteen_digits_is_a_single_instant(
+        self,
+        matched_ids: Callable[[str], set[int]],
+        docs: dict[str, int],
+    ) -> None:
+        """
+        GIVEN:
+            - Three documents indexed on the ``added`` DATETIME fast field:
+              one at 2005-03-04T15:30:00, one on the same calendar day at a
+              different hour, and one on the next day at the same hour
+        WHEN:
+            - Searching with the 14-digit compact date form
+              ``added:20050304153000``
+        THEN:
+            - Only the document at that exact instant matches; the same-day
+              document is what tells this apart from the 8-digit day-window
+              form, and the next-day document from a form that ignored the
+              time of day altogether
+        """
+        assert matched_ids("added:20050304153000") == {docs["instant"]}

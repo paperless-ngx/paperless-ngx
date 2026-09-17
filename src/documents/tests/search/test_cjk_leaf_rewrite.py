@@ -19,25 +19,18 @@ from documents.search._query import _FIELD_BOOSTS
 from documents.search._query import _get_emit_field_registry
 from documents.search._query import _widen_leaf
 from documents.search._registry import get_field_registry
+from documents.tests.search._ast_helpers import BIGRAM_CONTENT
+from documents.tests.search._ast_helpers import BIGRAM_TITLE
+from documents.tests.search._ast_helpers import CONTENT
+from documents.tests.search._ast_helpers import NOTES
+from documents.tests.search._ast_helpers import TITLE
+from documents.tests.search._ast_helpers import bigram
+from documents.tests.search._ast_helpers import content
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
 pytestmark = pytest.mark.search
-
-_CONTENT = wc.FieldRef("content")
-_TITLE = wc.FieldRef("title")
-_NOTES = wc.FieldRef("notes", "note")
-_BIGRAM_CONTENT = wc.FieldRef("bigram_content")
-_BIGRAM_TITLE = wc.FieldRef("bigram_title")
-
-
-def _content(text: str) -> wc_ast.Term:
-    return wc_ast.Term(field=_CONTENT, text=text)
-
-
-def _bigram(text: str) -> wc_ast.Term:
-    return wc_ast.Term(field=_BIGRAM_CONTENT, text=text)
 
 
 def _widened(original: wc_ast.Node, bigram_side: wc_ast.Node) -> wc_ast.Or:
@@ -61,9 +54,9 @@ class TestTheHook:
     @pytest.mark.parametrize(
         "leaf",
         [
-            pytest.param(_content("invoice"), id="latin_term"),
+            pytest.param(content("invoice"), id="latin_term"),
             pytest.param(
-                wc_ast.Term(field=_NOTES, text="東京"),
+                wc_ast.Term(field=NOTES, text="東京"),
                 id="non_default_field",
             ),
             pytest.param(wc_ast.Term(field=None, text="東京"), id="unfielded"),
@@ -96,7 +89,7 @@ class TestTheHook:
             - Neither cjk_terms nor latin_terms gains a piece, and the
               leaf is returned unchanged rather than becoming an empty Or
         """
-        leaf = _content("⺀")
+        leaf = content("⺀")
 
         assert _widen_cjk_leaf(leaf) is leaf
 
@@ -111,7 +104,7 @@ class TestTheHook:
               copy: analyze() only keeps the leaf's own enclosing-group
               analysis for that exact object
         """
-        leaf = _content("東京")
+        leaf = content("東京")
 
         widened = _widen_cjk_leaf(leaf)
 
@@ -128,11 +121,11 @@ class TestTheHook:
             - The bigram side targets bigram_title, the leaf's own field's
               companion, so a fielded term stays fielded
         """
-        leaf = wc_ast.Term(field=_TITLE, text="東京")
+        leaf = wc_ast.Term(field=TITLE, text="東京")
 
         assert _widen_cjk_leaf(leaf) == _widened(
             leaf,
-            wc_ast.Term(field=_BIGRAM_TITLE, text="東京"),
+            wc_ast.Term(field=BIGRAM_TITLE, text="東京"),
         )
 
     def test_each_cjk_run_gets_its_own_bigram_leaf(self) -> None:
@@ -151,11 +144,11 @@ class TestTheHook:
               any one of its runs, which is what the separate bigram
               clause did before this change
         """
-        leaf = _content("東京・大阪")
+        leaf = content("東京・大阪")
 
         assert _widen_cjk_leaf(leaf) == _widened(
             leaf,
-            wc_ast.Or(children=(_bigram("東京"), _bigram("大阪"))),
+            wc_ast.Or(children=(bigram("東京"), bigram("大阪"))),
         )
 
     def test_each_run_keeps_its_own_bigrams_required(self) -> None:
@@ -172,11 +165,11 @@ class TestTheHook:
               it does not inherit from the enclosing group. Without this,
               東京都 would match a document holding only 京都
         """
-        assert _analyze(_content("東京都・大阪府")) == wc_ast.Or(
+        assert _analyze(content("東京都・大阪府")) == wc_ast.Or(
             children=(
-                wc_ast.And(children=(_content("東京都"), _content("大阪府"))),
-                wc_ast.And(children=(_bigram("東京"), _bigram("京都"))),
-                wc_ast.And(children=(_bigram("大阪"), _bigram("阪府"))),
+                wc_ast.And(children=(content("東京都"), content("大阪府"))),
+                wc_ast.And(children=(bigram("東京"), bigram("京都"))),
+                wc_ast.And(children=(bigram("大阪"), bigram("阪府"))),
             ),
         )
 
@@ -191,9 +184,9 @@ class TestTheHook:
               every token at position 0, so a positional Phrase against it
               could never match
         """
-        leaf = wc_ast.Phrase(field=_CONTENT, text="東京都")
+        leaf = wc_ast.Phrase(field=CONTENT, text="東京都")
 
-        assert _widen_cjk_leaf(leaf) == _widened(leaf, _bigram("東京都"))
+        assert _widen_cjk_leaf(leaf) == _widened(leaf, bigram("東京都"))
 
     def test_a_multi_word_phrase_requires_every_run(self) -> None:
         """
@@ -208,27 +201,27 @@ class TestTheHook:
               the quoted phrase match strictly more than the same two
               words unquoted, and quoting must not widen a search
         """
-        leaf = wc_ast.Phrase(field=_CONTENT, text="東京都 大阪府")
+        leaf = wc_ast.Phrase(field=CONTENT, text="東京都 大阪府")
 
         assert _widen_cjk_leaf(leaf) == _widened(
             leaf,
-            wc_ast.And(children=(_bigram("東京都"), _bigram("大阪府"))),
+            wc_ast.And(children=(bigram("東京都"), bigram("大阪府"))),
         )
 
     @pytest.mark.parametrize(
         ("leaf", "alternative"),
         [
             pytest.param(
-                _content("東京-report"),
-                wc_ast.And(children=(_bigram("東京"), _content("report"))),
+                content("東京-report"),
+                wc_ast.And(children=(bigram("東京"), content("report"))),
                 id="separated_term",
             ),
             pytest.param(
-                wc_ast.Phrase(field=_CONTENT, text="東京 report"),
-                wc_ast.And(children=(_bigram("東京"), _content("report"))),
+                wc_ast.Phrase(field=CONTENT, text="東京 report"),
+                wc_ast.And(children=(bigram("東京"), content("report"))),
                 id="phrase",
             ),
-            pytest.param(_content("東京report"), _bigram("東京"), id="glued"),
+            pytest.param(content("東京report"), bigram("東京"), id="glued"),
         ],
     )
     def test_latin_is_required_only_where_the_analyzer_splits_it_off(
@@ -265,9 +258,9 @@ class TestTheHook:
               in And (a single piece collapses to itself), even though
               the CJK side contributed nothing
         """
-        leaf = _content("⺀report")
+        leaf = content("⺀report")
 
-        assert _widen_cjk_leaf(leaf) == _widened(leaf, _content("report"))
+        assert _widen_cjk_leaf(leaf) == _widened(leaf, content("report"))
 
     def test_new_nodes_carry_the_leaf_span(self) -> None:
         """
@@ -280,7 +273,7 @@ class TestTheHook:
               span, so an emit-time diagnostic still points into the
               query text
         """
-        leaf = wc_ast.Term(field=_CONTENT, text="東京・大阪", startchar=3, endchar=8)
+        leaf = wc_ast.Term(field=CONTENT, text="東京・大阪", startchar=3, endchar=8)
 
         widened = _widen_cjk_leaf(leaf)
 
@@ -298,9 +291,9 @@ class TestAnalyzedTree:
     @pytest.mark.parametrize(
         "node",
         [
-            pytest.param(wc_ast.Prefix(field=_CONTENT, text="東京"), id="cjk_prefix"),
+            pytest.param(wc_ast.Prefix(field=CONTENT, text="東京"), id="cjk_prefix"),
             pytest.param(
-                wc_ast.Wildcard(field=_CONTENT, pattern="東*"),
+                wc_ast.Wildcard(field=CONTENT, pattern="東*"),
                 id="cjk_wildcard",
             ),
         ],
@@ -340,13 +333,13 @@ class TestAnalyzedTree:
               still negated under NOT. A NOT left holding nothing would
               turn into "match everything" instead
         """
-        resolved = _get_emit_field_registry(None).resolve(_BIGRAM_CONTENT)
+        resolved = _get_emit_field_registry(None).resolve(BIGRAM_CONTENT)
         assert resolved is not None
         bigrams = resolved.spec.analyzer(long_cjk_run)
 
-        assert _analyze(build(_content(long_cjk_run))) == build(
+        assert _analyze(build(content(long_cjk_run))) == build(
             wc_ast.And(
-                children=tuple(_bigram(token) for token in dict.fromkeys(bigrams)),
+                children=tuple(bigram(token) for token in dict.fromkeys(bigrams)),
             ),
         )
 
@@ -361,11 +354,11 @@ class TestAnalyzedTree:
               has no bigram. An accepted gap, the same on the positive and
               the negated side
         """
-        analyzed = _analyze(_content("東・大阪"))
+        analyzed = _analyze(content("東・大阪"))
 
         assert analyzed == _widened(
-            wc_ast.And(children=(_content("東"), _content("大阪"))),
-            _bigram("大阪"),
+            wc_ast.And(children=(content("東"), content("大阪"))),
+            bigram("大阪"),
         )
 
     def test_the_title_boost_wraps_the_widened_title_leaf(self) -> None:
@@ -393,14 +386,14 @@ class TestAnalyzedTree:
         assert (
             wc_ast.Boosted(
                 child=_widened(
-                    wc_ast.Term(field=_TITLE, text="東京"),
-                    wc_ast.Term(field=_BIGRAM_TITLE, text="東京"),
+                    wc_ast.Term(field=TITLE, text="東京"),
+                    wc_ast.Term(field=BIGRAM_TITLE, text="東京"),
                 ),
                 boost=_FIELD_BOOSTS["title"],
             )
             in analyzed.children
         )
-        assert {_BIGRAM_CONTENT, wc.FieldRef("bigram_tag")} <= {
+        assert {BIGRAM_CONTENT, wc.FieldRef("bigram_tag")} <= {
             child.field for child in analyzed.children if isinstance(child, wc_ast.Term)
         }
 
@@ -418,18 +411,18 @@ class TestAnalyzedTree:
               alternative is not a single child here and _widened() does
               not fit; the tree is written out literally
         """
-        tree = wc_ast.And(children=(_content("東京・大阪"), _content("report")))
+        tree = wc_ast.And(children=(content("東京・大阪"), content("report")))
 
         assert _analyze(tree) == wc_ast.And(
             children=(
                 wc_ast.Or(
                     children=(
-                        wc_ast.And(children=(_content("東京"), _content("大阪"))),
-                        _bigram("東京"),
-                        _bigram("大阪"),
+                        wc_ast.And(children=(content("東京"), content("大阪"))),
+                        bigram("東京"),
+                        bigram("大阪"),
                     ),
                 ),
-                _content("report"),
+                content("report"),
             ),
         )
 
@@ -443,15 +436,15 @@ class TestAnalyzedTree:
             - The original side ORs its tokens, as the group says, and the
               hook's Or flattens into the group
         """
-        tree = wc_ast.Or(children=(_content("東京・大阪"), _content("report")))
+        tree = wc_ast.Or(children=(content("東京・大阪"), content("report")))
 
         assert _analyze(tree) == wc_ast.Or(
             children=(
-                _content("東京"),
-                _content("大阪"),
-                _bigram("東京"),
-                _bigram("大阪"),
-                _content("report"),
+                content("東京"),
+                content("大阪"),
+                bigram("東京"),
+                bigram("大阪"),
+                content("report"),
             ),
         )
 
@@ -460,12 +453,12 @@ class TestAnalyzedTree:
         [
             pytest.param(lambda leaf: wc_ast.Not(child=leaf), id="not"),
             pytest.param(
-                lambda leaf: wc_ast.AndNot(positive=_content("invoice"), negative=leaf),
+                lambda leaf: wc_ast.AndNot(positive=content("invoice"), negative=leaf),
                 id="andnot",
             ),
             pytest.param(
                 lambda leaf: wc_ast.AndMaybe(
-                    required=_content("invoice"),
+                    required=content("invoice"),
                     optional=leaf,
                 ),
                 id="andmaybe",
@@ -473,7 +466,7 @@ class TestAnalyzedTree:
             pytest.param(
                 lambda leaf: wc_ast.Require(
                     scored=leaf,
-                    filter_only=_content("invoice"),
+                    filter_only=content("invoice"),
                 ),
                 id="require",
             ),
@@ -500,6 +493,6 @@ class TestAnalyzedTree:
               position. A negated CJK leaf is widened too, so a negation
               excludes exactly what the positive search would match
         """
-        assert _analyze(build(_content("東京"))) == build(
-            _widened(_content("東京"), _bigram("東京")),
+        assert _analyze(build(content("東京"))) == build(
+            _widened(content("東京"), bigram("東京")),
         )

@@ -21,29 +21,24 @@ from django.contrib.auth.models import User
 
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
-from documents.models import Document
 from documents.models import Note
+from documents.tests.factories import DocumentFactory
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from documents.models import Document
     from documents.search._backend import TantivyBackend
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
-
-
-def _matched_ids(backend: TantivyBackend, query: str) -> set[int]:
-    return set(backend.search_ids(query, user=None))
-
-
-def _index(backend: TantivyBackend, **kwargs: object) -> Document:
-    doc = Document.objects.create(**kwargs)
-    backend.add_or_update(doc)
-    return doc
 
 
 class TestBareJsonFieldPrefixes:
     def test_bare_notes_prefix_searches_note_text(
         self,
         backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
@@ -59,26 +54,22 @@ class TestBareJsonFieldPrefixes:
               text search
         """
         alice = User.objects.create_user(username="alice")
-        with_note = Document.objects.create(
-            title="Has note",
-            content="x",
-            checksum="bare-notes-with",
-        )
+        with_note = DocumentFactory(title="Has note", content="x")
         Note.objects.create(document=with_note, user=alice, note="crocodile")
         backend.add_or_update(with_note)
         # This document's CONTENT contains the words a demoted text search
         # would match; it must NOT match once the prefix addresses notes.
-        _index(
-            backend,
+        index_document(
             title="Notes about things",
             content="notes crocodile mention",
-            checksum="bare-notes-decoy",
         )
-        assert _matched_ids(backend, "notes:crocodile") == {with_note.pk}
+        assert matched_ids("notes:crocodile") == {with_note.pk}
 
     def test_bare_custom_fields_prefix_searches_values(
         self,
         backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
@@ -96,28 +87,23 @@ class TestBareJsonFieldPrefixes:
             name="Policy Number",
             data_type=CustomField.FieldDataType.STRING,
         )
-        with_value = Document.objects.create(
-            title="Has field",
-            content="x",
-            checksum="bare-cf-with",
-        )
+        with_value = DocumentFactory(title="Has field", content="x")
         CustomFieldInstance.objects.create(
             document=with_value,
             field=field,
             value_text="crocodile",
         )
         backend.add_or_update(with_value)
-        _index(
-            backend,
+        index_document(
             title="Custom things",
             content="custom fields crocodile",
-            checksum="bare-cf-decoy",
         )
-        assert _matched_ids(backend, "custom_fields:crocodile") == {with_value.pk}
+        assert matched_ids("custom_fields:crocodile") == {with_value.pk}
 
     def test_subpath_spellings_are_untouched(
         self,
         backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
@@ -131,15 +117,11 @@ class TestBareJsonFieldPrefixes:
               prefix does not interfere with explicit subpath addressing
         """
         bob = User.objects.create_user(username="bob")
-        doc = Document.objects.create(
-            title="Bob note",
-            content="x",
-            checksum="bare-subpath",
-        )
+        doc = DocumentFactory(title="Bob note", content="x")
         Note.objects.create(document=doc, user=bob, note="remark")
         backend.add_or_update(doc)
-        assert _matched_ids(backend, "notes.user:bob") == {doc.pk}
-        assert _matched_ids(backend, "notes.note:remark") == {doc.pk}
+        assert matched_ids("notes.user:bob") == {doc.pk}
+        assert matched_ids("notes.note:remark") == {doc.pk}
 
 
 class TestQuotedPhraseContainingNotesColonIsNotCorrupted:
@@ -152,7 +134,8 @@ class TestQuotedPhraseContainingNotesColonIsNotCorrupted:
 
     def test_quoted_phrase_with_notes_colon_matches_by_content(
         self,
-        backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
@@ -167,20 +150,16 @@ class TestQuotedPhraseContainingNotesColonIsNotCorrupted:
               that matches nothing (the bug the deleted regex rewrite
               caused, since it was blind to quoting)
         """
-        target = _index(
-            backend,
+        target = index_document(
             title="Statement",
             content="payment notes: none",
-            checksum="quoted-phrase-notes-colon",
         )
-        assert _matched_ids(
-            backend,
-            'content:"payment notes: none"',
-        ) == {target.pk}
+        assert matched_ids('content:"payment notes: none"') == {target.pk}
 
     def test_quoted_phrase_matches_the_same_document_unquoted(
         self,
-        backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
@@ -194,13 +173,8 @@ class TestQuotedPhraseContainingNotesColonIsNotCorrupted:
               quote-awareness specifically, not about the words
               themselves being unsearchable
         """
-        target = _index(
-            backend,
+        target = index_document(
             title="Statement",
             content="payment notes none",
-            checksum="quoted-phrase-no-colon",
         )
-        assert _matched_ids(
-            backend,
-            'content:"payment notes none"',
-        ) == {target.pk}
+        assert matched_ids('content:"payment notes none"') == {target.pk}

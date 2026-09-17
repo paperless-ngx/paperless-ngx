@@ -10,18 +10,16 @@ from __future__ import annotations
 
 import pytest
 import tantivy
-import whoosh_compat as wc
 import whoosh_compat.ast as wc_ast
 
 from documents.search._query import _CJK_BIGRAM_FIELDS
 from documents.search._query import _get_emit_field_registry
 from documents.search._schema import field_descriptors
 from documents.search._tokenizer import register_tokenizers
+from documents.tests.search._ast_helpers import BIGRAM_CONTENT
+from documents.tests.search._ast_helpers import CONTENT
 
 pytestmark = pytest.mark.search
-
-_BIGRAM_CONTENT = wc.FieldRef("bigram_content")
-_CONTENT = wc.FieldRef("content")
 
 
 class TestEmitFieldRegistry:
@@ -41,8 +39,8 @@ class TestEmitFieldRegistry:
         """
         tree = wc_ast.Or(
             children=(
-                wc_ast.Term(field=_BIGRAM_CONTENT, text="東京都"),
-                wc_ast.Term(field=_CONTENT, text="report"),
+                wc_ast.Term(field=BIGRAM_CONTENT, text="東京都"),
+                wc_ast.Term(field=CONTENT, text="report"),
             ),
         )
 
@@ -52,11 +50,11 @@ class TestEmitFieldRegistry:
             children=(
                 wc_ast.And(
                     children=(
-                        wc_ast.Term(field=_BIGRAM_CONTENT, text="東京"),
-                        wc_ast.Term(field=_BIGRAM_CONTENT, text="京都"),
+                        wc_ast.Term(field=BIGRAM_CONTENT, text="東京"),
+                        wc_ast.Term(field=BIGRAM_CONTENT, text="京都"),
                     ),
                 ),
-                wc_ast.Term(field=_CONTENT, text="report"),
+                wc_ast.Term(field=CONTENT, text="report"),
             ),
         )
 
@@ -95,7 +93,7 @@ class TestEmitFieldRegistry:
         writer.commit()
         index.reload()
 
-        resolved = _get_emit_field_registry(None).resolve(_BIGRAM_CONTENT)
+        resolved = _get_emit_field_registry(None).resolve(BIGRAM_CONTENT)
         assert resolved is not None
         tokens = resolved.spec.analyzer(text)
 

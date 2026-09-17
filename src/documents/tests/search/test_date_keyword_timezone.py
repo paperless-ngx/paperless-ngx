@@ -32,32 +32,23 @@ from typing import TYPE_CHECKING
 import pytest
 import time_machine
 
-from documents.models import Document
-
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from pytest_django.fixtures import SettingsWrapper
 
-    from documents.search._backend import TantivyBackend
+    from documents.models import Document
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
 
 FROZEN_NOW = datetime(2026, 6, 15, 2, 0, tzinfo=UTC)
 
 
-def _matched_ids(backend: TantivyBackend, query: str) -> set[int]:
-    return set(backend.search_ids(query, user=None))
-
-
-def _index(backend: TantivyBackend, **kwargs: object) -> Document:
-    doc = Document.objects.create(**kwargs)
-    backend.add_or_update(doc)
-    return doc
-
-
 class TestDateKeywordUsesTheActiveTimezone:
     def test_today_matches_the_new_york_calendar_day_not_the_utc_one(
         self,
-        backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
         settings: SettingsWrapper,
     ) -> None:
         """
@@ -79,22 +70,18 @@ class TestDateKeywordUsesTheActiveTimezone:
         """
         settings.TIME_ZONE = "America/New_York"
         with time_machine.travel(FROZEN_NOW, tick=False):
-            in_ny_today = _index(
-                backend,
+            in_ny_today = index_document(
                 title="NY today",
                 content="x",
-                checksum="tz-keyword-ny-today",
                 added=datetime(2026, 6, 14, 20, 0, tzinfo=UTC),
             )
             # Not captured: the exact-set assertion below already proves
             # this document (inside a naive UTC-calendar-day window, but
             # outside New York's actual "today") does not match.
-            _index(
-                backend,
+            index_document(
                 title="UTC calendar day only",
                 content="x",
-                checksum="tz-keyword-utc-calendar-day-only",
                 added=datetime(2026, 6, 15, 10, 0, tzinfo=UTC),
             )
 
-            assert _matched_ids(backend, "added:today") == {in_ny_today.pk}
+            assert matched_ids("added:today") == {in_ny_today.pk}

@@ -11,18 +11,13 @@ identity.
 from __future__ import annotations
 
 import pytest
-import whoosh_compat as wc
 import whoosh_compat.ast as wc_ast
 
 from documents.search._query import _negated_leaf_ids
+from documents.tests.search._ast_helpers import CONTENT
+from documents.tests.search._ast_helpers import content
 
 pytestmark = pytest.mark.search
-
-_CONTENT = wc.FieldRef("content")
-
-
-def _term(text: str) -> wc_ast.Term:
-    return wc_ast.Term(field=_CONTENT, text=text)
 
 
 class TestCollection:
@@ -35,7 +30,7 @@ class TestCollection:
         THEN:
             - The set is empty
         """
-        tree = wc_ast.And(children=(_term("invoice"), _term("report")))
+        tree = wc_ast.And(children=(content("invoice"), content("report")))
 
         assert _negated_leaf_ids(tree) == frozenset()
 
@@ -48,8 +43,8 @@ class TestCollection:
         THEN:
             - That leaf's id is collected, and the positive one is not
         """
-        positive = _term("invoice")
-        negated = _term("secret")
+        positive = content("invoice")
+        negated = content("secret")
         tree = wc_ast.And(children=(positive, wc_ast.Not(child=negated)))
 
         ids = _negated_leaf_ids(tree)
@@ -66,8 +61,8 @@ class TestCollection:
         THEN:
             - Only the negative side is collected
         """
-        positive = _term("invoice")
-        negated = _term("secret")
+        positive = content("invoice")
+        negated = content("secret")
         tree = wc_ast.AndNot(positive=positive, negative=negated)
 
         ids = _negated_leaf_ids(tree)
@@ -86,9 +81,9 @@ class TestCollection:
             - All of them are collected, at any depth and whatever the
               leaf type
         """
-        a = _term("alpha")
-        b = _term("beta")
-        phrase = wc_ast.Phrase(field=_CONTENT, text="gamma delta")
+        a = content("alpha")
+        b = content("beta")
+        phrase = wc_ast.Phrase(field=CONTENT, text="gamma delta")
         tree = wc_ast.Not(
             child=wc_ast.Or(
                 children=(a, wc_ast.And(children=(b, phrase))),
@@ -109,7 +104,7 @@ class TestCollection:
               under-collecting would make a negation exclude far more than
               the user asked
         """
-        leaf = _term("tax")
+        leaf = content("tax")
         tree = wc_ast.Not(child=wc_ast.Not(child=leaf))
 
         assert _negated_leaf_ids(tree) == frozenset({id(leaf)})
@@ -144,7 +139,7 @@ class TestCollection:
             - Nothing is collected. Only Not.child and AndNot.negative are
               negative positions
         """
-        leaf = _term("invoice")
+        leaf = content("invoice")
 
         assert _negated_leaf_ids(build(leaf)) == frozenset()
 
@@ -157,7 +152,7 @@ class TestCollection:
         THEN:
             - The set is empty and nothing raises
         """
-        assert _negated_leaf_ids(_term("invoice")) == frozenset()
+        assert _negated_leaf_ids(content("invoice")) == frozenset()
 
 
 class TestTotality:
@@ -167,11 +162,11 @@ class TestTotality:
             pytest.param(wc_ast.Every(), id="every"),
             pytest.param(wc_ast.Nothing(), id="nothing"),
             pytest.param(
-                wc_ast.Wildcard(field=_CONTENT, pattern="inv*"),
+                wc_ast.Wildcard(field=CONTENT, pattern="inv*"),
                 id="wildcard",
             ),
             pytest.param(
-                wc_ast.Fuzzy(field=_CONTENT, text="invoce", distance=1, prefix=True),
+                wc_ast.Fuzzy(field=CONTENT, text="invoce", distance=1, prefix=True),
                 id="fuzzy",
             ),
         ],
@@ -200,7 +195,7 @@ class TestTotality:
             - It completes. The walk is iterative, so depth costs heap
               rather than Python stack frames
         """
-        leaf = _term("invoice")
+        leaf = content("invoice")
         node: wc_ast.Node = leaf
         for _ in range(5000):
             node = wc_ast.Not(child=node)

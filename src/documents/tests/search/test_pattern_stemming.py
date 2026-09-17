@@ -18,10 +18,10 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from documents.models import Document
-
 if TYPE_CHECKING:
-    from documents.search._backend import TantivyBackend
+    from collections.abc import Callable
+
+    from documents.models import Document
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
 
@@ -31,20 +31,13 @@ CONTENT = (
 )
 
 
-def _matched_ids(backend: TantivyBackend, query: str) -> set[int]:
-    return set(backend.search_ids(query, user=None))
-
-
 @pytest.fixture
-def indexed_doc(backend: TantivyBackend) -> Document:
-    doc = Document.objects.create(
+def indexed_doc(index_document: Callable[..., Document]) -> Document:
+    return index_document(
         title="Invoice 2020 productname",
         content=CONTENT,
-        checksum="pattern-stemming-1",
         archive_serial_number=900,
     )
-    backend.add_or_update(doc)
-    return doc
 
 
 class TestPrefixStemming:
@@ -61,7 +54,7 @@ class TestPrefixStemming:
     )
     def test_full_word_prefix_matches_its_stem(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         indexed_doc: Document,
         query: str,
     ) -> None:
@@ -78,12 +71,12 @@ class TestPrefixStemming:
               the word's stem as an alternative alongside the typed run,
               reaching the stemmed index term
         """
-        assert _matched_ids(backend, query) == {indexed_doc.id}
+        assert matched_ids(query) == {indexed_doc.id}
 
     @pytest.mark.parametrize("query", ["invoic*", "electr*", "payment*"])
     def test_already_stemmed_prefix_still_matches(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         indexed_doc: Document,
         query: str,
     ) -> None:
@@ -97,12 +90,12 @@ class TestPrefixStemming:
             - The document still matches, since the typed-run alternative
               is itself a prefix of the stored stemmed term
         """
-        assert _matched_ids(backend, query) == {indexed_doc.id}
+        assert matched_ids(query) == {indexed_doc.id}
 
     @pytest.mark.parametrize("query", ["univers*", "librar*"])
     def test_partial_prefix_reaches_the_stemmed_term(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         indexed_doc: Document,
         query: str,
     ) -> None:
@@ -123,11 +116,11 @@ class TestPrefixStemming:
               genuinely diverge, and only one of them matches, is
               test_stem_substitution_reaches_both_the_inflection_and_the_compound
         """
-        assert _matched_ids(backend, query) == {indexed_doc.id}
+        assert matched_ids(query) == {indexed_doc.id}
 
     def test_full_word_reaches_the_stem_but_a_fragment_of_it_does_not(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         indexed_doc: Document,
     ) -> None:
         """
@@ -144,13 +137,13 @@ class TestPrefixStemming:
               usage.md tells a reader whose `universit*` finds nothing to
               shorten it to `univers*`, which matches
         """
-        assert _matched_ids(backend, "universities*") == {indexed_doc.id}
-        assert _matched_ids(backend, "universit*") == set()
-        assert _matched_ids(backend, "univers*") == {indexed_doc.id}
+        assert matched_ids("universities*") == {indexed_doc.id}
+        assert matched_ids("universit*") == set()
+        assert matched_ids("univers*") == {indexed_doc.id}
 
     def test_pattern_past_the_stem_boundary_is_documented_not_fixed(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         indexed_doc: Document,
     ) -> None:
         """
@@ -165,11 +158,12 @@ class TestPrefixStemming:
               index, and usage.md must not advertise it. Pinned so the
               limitation is deliberate, not accidental
         """
-        assert _matched_ids(backend, "produ*name") == set()
+        assert matched_ids("produ*name") == set()
 
     def test_stem_substitution_reaches_both_the_inflection_and_the_compound(
         self,
-        backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
         indexed_doc: Document,
     ) -> None:
         """
@@ -189,22 +183,20 @@ class TestPrefixStemming:
               folded and stemmed forms, and "copy*" reaches the base
               word, its inflections and the compound alike
         """
-        compound = Document.objects.create(
+        compound = index_document(
             title="Copyright notice",
             content="copyright notice for the work",
-            checksum="pattern-stemming-2",
             archive_serial_number=901,
         )
-        backend.add_or_update(compound)
 
-        assert _matched_ids(backend, "copy*") == {indexed_doc.id, compound.id}
-        assert _matched_ids(backend, "copyright*") == {compound.id}
+        assert matched_ids("copy*") == {indexed_doc.id, compound.id}
+        assert matched_ids("copyright*") == {compound.id}
 
 
 class TestBracketClassStillFolds:
     def test_class_body_matches_case_insensitively(
         self,
-        backend: TantivyBackend,
+        matched_ids: Callable[[str], set[int]],
         indexed_doc: Document,
     ) -> None:
         """
@@ -218,4 +210,4 @@ class TestBracketClassStillFolds:
               the alternatives contract preserves only because a lone
               character stems to itself
         """
-        assert _matched_ids(backend, "title:[IP]nvoice*") == {indexed_doc.id}
+        assert matched_ids("title:[IP]nvoice*") == {indexed_doc.id}
