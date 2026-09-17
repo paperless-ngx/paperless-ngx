@@ -196,20 +196,6 @@ class FileSystemAssertsMixin:
     def assertIsNotDir(self, path: PathLike[str] | str) -> None:
         self.assertFalse(Path(path).resolve().is_dir(), f"Dir does exist: {path}")
 
-    def assertFilesEqual(
-        self,
-        path1: PathLike[str] | str,
-        path2: PathLike[str] | str,
-    ) -> None:
-        path1 = Path(path1)
-        path2 = Path(path2)
-        import hashlib
-
-        hash1 = hashlib.sha256(path1.read_bytes()).hexdigest()
-        hash2 = hashlib.sha256(path2.read_bytes()).hexdigest()
-
-        self.assertEqual(hash1, hash2, "File SHA256 mismatch")
-
     def assertFileCountInDir(self, path: PathLike[str] | str, count: int) -> None:
         path = Path(path).resolve()
         self.assertTrue(path.is_dir(), f"Path {path} is not a directory")
@@ -219,24 +205,6 @@ class FileSystemAssertsMixin:
             count,
             f"Path {path} contains {len(files)} files instead of {count} files",
         )
-
-
-class ConsumerProgressMixin:
-    """
-    Mocks the Consumer _send_progress, preventing attempts to connect to Redis
-    and allowing access to its calls for verification
-    """
-
-    def setUp(self) -> None:
-        self.send_progress_patcher = mock.patch(
-            "documents.consumer.Consumer._send_progress",
-        )
-        self.send_progress_mock = self.send_progress_patcher.start()
-        super().setUp()
-
-    def tearDown(self) -> None:
-        super().tearDown()
-        self.send_progress_patcher.stop()
 
 
 class ConsumeTaskMixin:
@@ -282,7 +250,6 @@ class TestMigrations(TransactionTestCase):
     migrate_from = None
     dependencies = None
     migrate_to = None
-    auto_migrate = True
 
     def setUp(self) -> None:
         super().setUp()
@@ -304,10 +271,6 @@ class TestMigrations(TransactionTestCase):
 
         self.apps = old_apps
 
-        if self.auto_migrate:
-            self.performMigration()
-
-    def performMigration(self) -> None:
         # Run the migration to test
         executor = MigrationExecutor(connection)
         executor.loader.build_graph()  # reload.
